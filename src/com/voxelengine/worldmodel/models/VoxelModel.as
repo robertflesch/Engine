@@ -1025,64 +1025,48 @@ package com.voxelengine.worldmodel.models
 		public function IVMSave():ByteArray
 		{
 			var ba:ByteArray = new ByteArray();
-			writeVersionedHeader( ba);
-			//  n unsigned char root grain size
-			//  n+1 oxel data
-			ba.writeByte(oxel.gc.bound);
+			writeVersionedHeader( ba );
+			writeManifest( ba );
 			oxel.writeData( ba);
 			
 			ba.compress();
 			
 			return ba;
-		}
-		
-		private function writeVersionedHeader( $ba:ByteArray):void
-		{
-			/*
-			   ------------------------------------------
-			   0 char 'i'
-			   1 char 'v'
-			   2 char 'm'
-			   3 char '0' (zero) major version
-			   4 char '' (0-9) minor version
-			   5 char '' (0-9) lesser version
-			   6 unsigned char model info version - (0) for local models
-			   ...n-1 if 0 then oxel data next, otherwise next byte is size of model json
-			   ------------------------------------------
-			 */
 			
-			$ba.writeByte('i'.charCodeAt());
-			$ba.writeByte('v'.charCodeAt());
-			$ba.writeByte('m'.charCodeAt());
-			$ba.writeByte(Globals.VERSION.charCodeAt(0));
-			$ba.writeByte(Globals.VERSION.charCodeAt(1));
-			$ba.writeByte(Globals.VERSION.charCodeAt(2));
-			writeManifest( $ba );
-		}
-		
-		private function writeManifest( $ba:ByteArray ):ByteArray {
+			function writeVersionedHeader( $ba:ByteArray):void
+			{
+				/* ------------------------------------------
+				   0 char 'i'
+				   1 char 'v'
+				   2 char 'm'
+				   3 char '0' (zero) major version
+				   4 char '' (0-9) minor version
+				   5 char '' (0-9) lesser version
+				   ------------------------------------------ */
+				$ba.writeByte('i'.charCodeAt());
+				$ba.writeByte('v'.charCodeAt());
+				$ba.writeByte('m'.charCodeAt());
+				$ba.writeByte(Globals.VERSION.charCodeAt(0));
+				$ba.writeByte(Globals.VERSION.charCodeAt(1));
+				$ba.writeByte(Globals.VERSION.charCodeAt(2));
+			}
 			
-			/*
-			   ------------------------------------------
-				0 for local models
-			   OR for network models
-				0 => Globals.MANIFEST_VERSION 
-			    1 => size of model json
-			    2 - n => model json uncompressed
-			   ------------------------------------------
-			 */
-			if ( false == Globals.sandbox ) {
+			function writeManifest( $ba:ByteArray ):void {
+				
+				// Always write the manifest into the IVM.
+				/* ------------------------------------------
+				   0 unsigned char model info version - 100 currently
+				   next byte is size of model json
+				   n+1...  is model json
+				   ------------------------------------------ */
 				$ba.writeByte(Globals.MANIFEST_VERSION);
 				var modelJson:String = modelInfo.getJSON();
 				modelJson = encodeURI(modelJson);
 				$ba.writeInt(modelJson.length);
 				$ba.writeUTFBytes(modelJson);
 			}
-			else
-				$ba.writeByte(0);
-
-			return $ba;	
 		}
+		
 		
 		public function IVMLoadCompressed($ba:ByteArray):void
 		{
@@ -1103,6 +1087,7 @@ package com.voxelengine.worldmodel.models
 		{
 			var versionInfo:Object = readMetaInfo( $ba );
 			_version = versionInfo.version;
+			Log.out( "VoxelModel.IVMLoadUncompressed version: " + _version + "  manifestVersion: " + versionInfo.manifestVersion );
 			if ( 0 != versionInfo.manifestVersion ) {
 				// this local file has manifest information
 				// so load it but throw away the embedded info
@@ -1113,6 +1098,8 @@ package com.voxelengine.worldmodel.models
 				var strLen:int = $ba.readInt();
 				// read off that many bytes
 				var modelInfoJson:String = $ba.readUTFBytes( strLen );
+				modelInfoJson = decodeURI( modelInfoJson );
+				Log.out( "VoxelModel.IVMLoadUncompressed - modelInfoJson: " + modelInfoJson );
 			}
 			
 			// now just load the model like any other
@@ -1130,10 +1117,10 @@ package com.voxelengine.worldmodel.models
 			var metaInfo:Object = new Object();
 			// Read off next 3 bytes, the data version
 			metaInfo.version = readVersion($ba);
-			Log.out("VoxelModel.readMetaInfo - version: " + metaInfo.version );
 
 			// Read off next byte, the manifest version
 			metaInfo.manifestVersion = $ba.readByte();
+			Log.out("VoxelModel.readMetaInfo - version: " + metaInfo.version + "  manifestVersion: " + metaInfo.manifestVersion );
 			return metaInfo;
 
 			// This reads the format info and advances position on byteArray
@@ -1240,7 +1227,7 @@ package com.voxelengine.worldmodel.models
 			
 			var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
 			gct.grain = rootGrainSize;
-			_statisics.gather( _version, $ba, rootGrainSize);
+//			_statisics.gather( _version, $ba, rootGrainSize);
 			// Version specific data
 			//Log.out( "VoxelModel.loadOxelFromByteArray - modelInfo: " + modelInfo.fileName );
 			
