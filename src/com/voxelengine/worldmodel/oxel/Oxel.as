@@ -1660,7 +1660,14 @@ package com.voxelengine.worldmodel.oxel
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Saving and Restoring from File
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		public function writeData( ba:ByteArray ):void 
+		public function writeData( $ba:ByteArray ):void {
+			//  n unsigned char root grain size
+			$ba.writeByte( gc.bound );
+			//  n+1 oxel data
+			writeDataRecursively( $ba );
+		}
+		
+		private function writeDataRecursively( $ba:ByteArray ):void 
 		{
 			//trace( Oxel.data_mask_temp( _data ) );
 			if ( childrenHas() && Globals.AIR != type )
@@ -1669,27 +1676,28 @@ package com.voxelengine.worldmodel.oxel
 				type = Globals.AIR; 
 			}
 			
+			// If it has flow or lighting, we have to save both.
 			if ( flowInfo || ( _lighting && _lighting.valuesHas() ) )
 			{
 				// I only have 1 bit for additional data...
 				additionalDataMark();
-				ba.writeInt( maskTempData() );
+				$ba.writeUnsignedInt( maskTempData() );
 				
 				if ( !flowInfo )
 					flowInfo = new FlowInfo(); 
-				flowInfo.toByteArray( ba );
+				flowInfo.toByteArray( $ba );
 				
 				if ( !lighting )
 					lighting = LightingPool.poolGet();
-				ba = lighting.toByteArray( ba );
+				lighting.toByteArray( $ba );
 			}
 			else
-				ba.writeInt( maskTempData() );
+				$ba.writeUnsignedInt( maskTempData() );
 			
 			if ( childrenHas() ) 
 			{
 				for each ( var child:Oxel in _children ) 
-					child.writeData( ba );
+					child.writeDataRecursively( $ba );
 			}
 		}
 		
