@@ -459,6 +459,9 @@ public class Lighting  {
 			if ( null != li )
 				remove( li.ID );
 		}
+		
+		_lowerAmbient = 0;
+		_higherAmbient = 0;
 	}
 
 	public function mergeChildren( $childID:uint, $b:Lighting, $grainUnits:uint, $hasAlpha:Boolean ):void {	
@@ -826,6 +829,7 @@ public class Lighting  {
 			if ( null != li ) {
 				if ( $ID == li.ID ) {
 					_lights[i] = null;
+					_lights.splice( i, 1 );
 					return true
 				}
 			}
