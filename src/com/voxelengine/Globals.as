@@ -263,7 +263,7 @@ package com.voxelengine {
 		public static function get muted():Boolean { return g_muted }
 		public static function set muted(val:Boolean):void { g_muted = val; }
 		
-		private static var g_sandbox:Boolean = false;
+		private static var g_sandbox:Boolean = true;
 		public static function get sandbox():Boolean { return g_sandbox }
 		public static function set sandbox(val:Boolean):void { g_sandbox = val; }
 		
