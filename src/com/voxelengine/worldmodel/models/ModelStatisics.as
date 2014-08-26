@@ -89,9 +89,6 @@ package com.voxelengine.worldmodel.models
 			}
 			
 			statsPrint();
-//			trace( "ModelStatisics.grather - old count: " + count );
-//			trace( "ModelStatisics.grather - meter count: " + countInMeters );
-
 		}
 		
 		private function process( $version:String, $ba:ByteArray, currentGrain:int ):ByteArray
