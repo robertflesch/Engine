@@ -8,13 +8,9 @@
 
 package com.voxelengine
 {
-
 	import com.furusystems.dconsole2.DConsole;
 	import com.furusystems.logging.slf4as.Logging;
 	import com.furusystems.logging.slf4as.ILogger;
-
-	//import com.junkbyte.console.Cc;
-	
 	
 	public class Log {
 		
@@ -26,40 +22,34 @@ package com.voxelengine
 		
 		private static var _showing:Boolean = false;
 		private static var _initialized:Boolean = false;
-		private static const L:ILogger = Logging.getLogger(Log);
 		
 		public static function get showing():Boolean { return _showing; }
-		public static function hide():void
-		{
+		public static function hide():void {
+			
 			DConsole.hide();
-			//Cc.visible = true;
 			_showing = false;
 		}
 		
-		public static function show():void
-		{
+		public static function show():void {
+			
 			if ( !_initialized )
 			{
 				_initialized = true;
-				//Cc.config.commandLineAllowed = true // Enables full commandLine features
-				//Cc.config.tracing = true; // also send traces to flash's normal trace()
-				//Cc.config.maxLines = 2000; // change maximum log lines to 2000, default is 1000				
-				//Cc.startOnStage(Globals.g_app, "~");
 				
 				Globals.g_app.addChild(DConsole.view);
-				out("VoxelVerse.init - console created", Log.INFO);
 				DConsole.createCommand( "hide", hide );
 				ConsoleCommands.addCommands();
-				out( "Type 'hide' or '`' to hide the console" );
+				out( "Type 'hide' to hide the console", Log.WARN );
 			}
 			DConsole.show();
 			_showing = true;
 		}
 		
-		public static function out( msg:String, type:int = INFO ):void
-		{
+		public static function out( $msg:String, type:int = INFO ):void {
+			
+			const L:ILogger = Logging.getLogger(Log);
 
-			trace( msg );
+			trace( $msg );
 			
 			if ( INFO < type )
 				show();
@@ -75,16 +65,13 @@ package com.voxelengine
 						//Log.L.info(msg); //These are general debugging messages (your commonplace traces)
 						//break;
 					case WARN:
-						Log.L.warn(msg);
-						//Cc.warn(msg);
+						L.warn( $msg );
 						break;
 					case ERROR:
-						Log.L.error("*** " + msg);
-						//Cc.error("*** " + msg);
+						L.error("*** " + $msg );
 						break;
 					case FATAL:
-						Log.L.fatal(msg);
-						//Cc.fatal("*** " + msg);
+						L.fatal( $msg );
 						break;
 				}
 			}
