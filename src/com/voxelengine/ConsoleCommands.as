@@ -18,6 +18,7 @@ package com.voxelengine
 	import com.voxelengine.worldmodel.models.EditCursor;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
+	import com.voxelengine.worldmodel.oxel.Lighting;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.*;
 	import com.developmentarc.core.tasks.tasks.ITask;
@@ -298,6 +299,11 @@ package com.voxelengine
 			Oxel.merge( $vm.oxel );
 		}
 		
+		private static function ambientOcculsion():void {
+			Lighting.eaoEnabled = !Lighting.eaoEnabled;
+			Log.out( "ambientOcculusion is " + (Lighting.eaoEnabled ? "ENABLED" : "DISABLED"), Log.WARN );
+		}
+		
 		public static function addCommands():void
 		{
 			DConsole.createCommand( "reset", reset );
@@ -321,6 +327,8 @@ package com.voxelengine
 			DConsole.createCommand( "waterSpheres", waterSphere );
 			DConsole.createCommand( "lavaSpheresRandom", lavaSpheres );
 			DConsole.createCommand( "waterSpheresRandom", waterSpheres );
+			DConsole.createCommand( "ambientOcculsion", ambientOcculsion );
+			
 		}
 	}
 }
