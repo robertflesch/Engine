@@ -459,8 +459,17 @@ package com.voxelengine.worldmodel.models
 			var oldOxel:Oxel = oxel.childGetOrCreate( $gc );
 			var oldType:int = oldOxel.type;
 			var oldTypeInfo:TypeInfo = Globals.Info[oldType]
-			if ( oldTypeInfo.lightInfo.lightSource )
-				var oldLightID:uint = oldOxel.lighting.lightIDGet();
+			if ( oldOxel.lighting ) {
+				if ( oldTypeInfo.lightInfo.lightSource )
+					var oldLightID:uint = oldOxel.lighting.lightIDGet();
+				if ( oldOxel.lighting.ambientOcculsionHas() ) {
+//					oldOxel.lighting.ambientOcculsionReset();
+					for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
+						if ( oldOxel.quads && oldOxel.quads[face] )
+							oldOxel.lighting.evaluateAmbientOcculusion( oldOxel, face, false );
+					}
+				}
+			}
 			
 			var result:Boolean;
 			var changedOxel:Oxel = oxel.write( instanceInfo.instanceGuid, $gc, $type, $onlyChangeType );

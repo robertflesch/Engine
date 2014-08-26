@@ -42,16 +42,15 @@ public class Lighting  {
 	public static const DEFAULT_LIGHT_ID:uint = 1;
 	//public static const DEFAULT_BASE_LIGHT_LEVEL:uint = 0x00; // out of 255
 	private static var _defaultBaseLightAttn:uint = 0x33; // out of 255
+	private static var _s_eaoEnabled:Boolean = false;
 	
-	static public function get defaultBaseLightAttn():uint 
-	{
-		return _defaultBaseLightAttn;
-	}
+	private static const CORNER_RESET_VAL:uint = 0;
+	private static const CORNER_BUMP_VAL:uint = 1;
 	
-	static public function set defaultBaseLightAttn(value:uint):void 
-	{
-		_defaultBaseLightAttn = value;
-	}
+	static public function get eaoEnabled():Boolean { return _s_eaoEnabled; }
+	static public function set eaoEnabled(value:Boolean):void  { _s_eaoEnabled = value; }
+	static public function get defaultBaseLightAttn():uint { return _defaultBaseLightAttn; }
+	static public function set defaultBaseLightAttn(value:uint):void  { _defaultBaseLightAttn = value; }
 	
 	
 	private static function defaultLightLevelSetter():uint { 
@@ -102,23 +101,23 @@ public class Lighting  {
 	public function get negZ100():uint { return ((_higherAmbient  & 0x00003000) >> 12 ); }
 	public function get negZ110():uint { return ((_higherAmbient  & 0x0000c000) >> 14 ); }
 	
-	public function get posX():uint { return ((_higherAmbient  & 0x00010000) >> 17 ); }
-	public function get negX():uint { return ((_higherAmbient  & 0x0002000c) >> 18 ); }
-	public function get posY():uint { return ((_higherAmbient  & 0x00040030) >> 19 ); }
-	public function get negY():uint { return ((_higherAmbient  & 0x000800c0) >> 20 ); }
-	public function get posZ():uint { return ((_higherAmbient  & 0x00100300) >> 21 ); }
-	public function get negZ():uint { return ((_higherAmbient  & 0x00200c00) >> 22 ); }
+	public function get posX():uint { return ((_higherAmbient  & 0x00010000) >> 16 ); }
+	public function get negX():uint { return ((_higherAmbient  & 0x00020000) >> 17 ); }
+	public function get posY():uint { return ((_higherAmbient  & 0x00040000) >> 18 ); }
+	public function get negY():uint { return ((_higherAmbient  & 0x00080000) >> 19 ); }
+	public function get posZ():uint { return ((_higherAmbient  & 0x00100000) >> 20 ); }
+	public function get negZ():uint { return ((_higherAmbient  & 0x00200000) >> 21 ); }
 
-	public function set posX( value:uint ):void { _higherAmbient = ((_higherAmbient & 0xfffeffff) | value); }	
-	public function set negX( value:uint ):void { _higherAmbient = ((_higherAmbient & 0xfffdffff) | value); }	
-	public function set posY( value:uint ):void { _higherAmbient = ((_higherAmbient & 0xfffbffff) | value); }	
-	public function set negY( value:uint ):void { _higherAmbient = ((_higherAmbient & 0xfff7ffff) | value); }	
-	public function set posZ( value:uint ):void { _higherAmbient = ((_higherAmbient & 0xffefffff) | value); }	
-	public function set negZ( value:uint ):void { _higherAmbient = ((_higherAmbient & 0xffdfffff) | value); }	
+	public function set posX( value:uint ):void { _higherAmbient = ((_higherAmbient & 0xfffeffff) | value << 16); }	
+	public function set negX( value:uint ):void { _higherAmbient = ((_higherAmbient & 0xfffdffff) | value << 17); }	
+	public function set posY( value:uint ):void { _higherAmbient = ((_higherAmbient & 0xfffbffff) | value << 18); }	
+	public function set negY( value:uint ):void { _higherAmbient = ((_higherAmbient & 0xfff7ffff) | value << 19); }	
+	public function set posZ( value:uint ):void { _higherAmbient = ((_higherAmbient & 0xffefffff) | value << 20); }	
+	public function set negZ( value:uint ):void { _higherAmbient = ((_higherAmbient & 0xffdfffff) | value << 21); }	
 
 	public function set posX100( value:uint ):void {
 		// if we are setting the value of posX100 to ZERO, allow it here
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( posX100 - 1, 0 );
 		// for any other number in value, we can only set posX100 to 1 or 2
 		// depending on its neighbors
 		else if ( 0 == posX100 ) value = 1;
@@ -126,122 +125,122 @@ public class Lighting  {
 		// now take the number in value and put its bits into the bit holder
 		_lowerAmbient = ((_lowerAmbient & 0xfffffffc) | value); }	
 	public function set posX101( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( posX101 - 1, 0 );
 		else if ( 0 == posX101 ) value = 1;
 		else if  ( 1 <= posX100 && 1 <= posX111 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xfffffff3) | value << 2 ); }	
 	public function set posX110( value:uint ):void {
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( posX110 - 1, 0 );
 		else if ( 0 == posX110 ) value = 1;
 		else if  ( 1 <= posX100 && 1 <= posX111 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xffffffcf) | value << 4 ); }	
 	public function set posX111( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( posX111 - 1, 0 );
 		else if ( 0 == posX111 ) value = 1;
 		else if  ( 1 <= posX101 && 1 <= posX110 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xffffff3f) | value << 6 ); }
 	
 	public function set negX000( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( negX000 - 1, 0 );
 		else if ( 0 == negX000 ) value = 1;
 		else if  ( 1 <= negX010 && 1 <= negX001 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xfffffcff) | value << 8 ); }
 	public function set negX001( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( negX001 - 1, 0 );
 		else if ( 0 == negX001 ) value = 1;
 		else if  ( 1 <= negX000 && 1 <= negX011 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xfffff3ff) | value << 10 ); }
 	public function set negX010( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( negX010 - 1, 0 );
 		else if ( 0 == negX010 ) value = 1;
 		else if  ( 1 <= negX000 && 1 <= negX011 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xffffcfff) | value << 12 ); }
 	public function set negX011( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( negX011 - 1, 0 );
 		else if ( 0 == negX011 ) value = 1;
 		else if  ( 1 <= negX010 && 1 <= negX001 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xffff3fff) | value << 14 ); }
 		
 	public function set posY010( value:uint ):void {
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( posY010 - 1, 0 );
 		else if ( 0 == posY010 ) value = 1;
 		else if  ( 1 <= posY110 && 1 <= posY011 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xfffcffff) | value << 16 ); }
 	public function set posY011( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( posY011 - 1, 0 );
 		else if ( 0 == posY011 ) value = 1;
 		else if  ( 1 <= posY010 && 1 <= posY111 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xfff3ffff) | value << 18 ); }
 	public function set posY110( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( posY110 - 1, 0 );
 		else if ( 0 == posY110 ) value = 1;
 		else if  ( 1 <= posY010 && 1 <= posY111 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xffcfffff) | value << 20 ); }
 	public function set posY111( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( posY111 - 1, 0 );
 		else if ( 0 == posY111 ) value = 1;
 		else if  ( 1 <= posY110 && 1 <= posY011 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xff3fffff) | value << 22 ); }
 	
 	public function set negY000( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( negY000 - 1, 0 );
 		else if ( 0 == negY000 ) value = 1;
 		else if  ( 1 <= negY100 && 1 <= negY001 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xfcffffff) | value << 24 ); }
 	public function set negY001( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( negY001 - 1, 0 );
 		else if ( 0 == negY001 ) value = 1;
 		else if  ( 1 <= negY000 && 1 <= negY101 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xf3ffffff) | value << 26 ); }
 	public function set negY100( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( negY100 - 1, 0 );
 		else if ( 0 == negY100 ) value = 1;
 		else if  ( 1 <= negY101 && 1 <= negY000 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0xcfffffff) | value << 28 ); }
 	public function set negY101( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( negY101 - 1, 0 );
 		else if ( 0 == negY101 ) value = 1;
 		else if  ( 1 <= negY100 && 1 <= negY001 ) value = 2;
 		_lowerAmbient = ((_lowerAmbient & 0x3fffffff) | value << 30 ); }
 		
 	public function set posZ001( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( posZ001 - 1, 0 );
 		else if ( 0 == posZ001 ) value = 1;
 		else if  ( 1 <= posZ011 && 1 <= posZ101 ) value = 2;
 		_higherAmbient = ((_higherAmbient & 0xfffffffc) | value << 0 ); }
 	public function set posZ011( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( posZ011 - 1, 0 );
 		else if ( 0 == posZ011 ) value = 1;
 		else if  ( 1 <= posZ001 && 1 <= posZ111 ) value = 2;
 		_higherAmbient = ((_higherAmbient & 0xfffffff3) | value << 2 ); }
 	public function set posZ101( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( posZ101 - 1, 0 );
 		else if ( 0 == posZ101 ) value = 1;
 		else if  ( 1 <= posZ001 && 1 <= posZ111 ) value = 2;
 		_higherAmbient = ((_higherAmbient & 0xffffffcf) | value << 4 ); }
 	public function set posZ111( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( posZ111 - 1, 0 );
 		else if ( 0 == posZ111 ) value = 1;
 		else if  ( 1 <= posZ101 && 1 <= posZ011 ) value = 2;
 		_higherAmbient = ((_higherAmbient & 0xffffff3f) | value << 6 ); }
 	
 	public function set negZ000( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( negZ000 - 1, 0 );
 		else if ( 0 == negZ000 ) value = 1;
 		else if  ( 1 <= negZ010 && 1 <= negZ100 ) value = 2;
 		_higherAmbient = ((_higherAmbient & 0xfffffcff) | value << 8 ); }
 	public function set negZ010( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( negZ010 - 1, 0 );
 		else if ( 0 == negZ010 ) value = 1;
 		else if  ( 1 <= negZ000 && 1 <= negZ110 ) value = 2;
 		_higherAmbient = ((_higherAmbient & 0xfffff3ff) | value << 10 ); }
 	public function set negZ100( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( negZ100 - 1, 0 );
 		else if ( 0 == negZ100 ) value = 1;
 		else if  ( 1 <= negZ000 && 1 <= negZ110 ) value = 2;
 		_higherAmbient = ((_higherAmbient & 0xffffcfff) | value << 12 ); }
 	public function set negZ110( value:uint ):void { 
-		if ( 0 == value ) value = 0;
+		if ( 0 == value ) value = Math.max( negZ110 - 1, 0 );
 		else if ( 0 == negZ110 ) value = 1;
 		else if  ( 1 <= negZ010 && 1 <= negZ100 ) value = 2;
 		_higherAmbient = ((_higherAmbient & 0xffff3fff) | value << 14 ); }
@@ -262,7 +261,18 @@ public class Lighting  {
 	//private function rnd( $val:uint ):uint { return int($val * 100) / 100; }
 	
 	public function Lighting():void {
+		
 		add( DEFAULT_LIGHT_ID, DEFAULT_COLOR, 0x10, _defaultBaseLightAttn );
+	}
+
+	public function ambientOcculsionHas():Boolean {
+			
+		return 0 < (_higherAmbient & 0x003f0000) ? true : false;
+	}
+
+	public function ambientOcculsionReset():void {
+			
+		_higherAmbient = _higherAmbient & 0xffd0ffff;
 	}
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray {
@@ -733,7 +743,7 @@ public class Lighting  {
 		
 		return avgTotal/count;
 	}
-
+	
 	public function lightGet( $ID:uint ):LightInfo {
 		for ( var i:int; i < _lights.length; i++ )
 		{
@@ -865,7 +875,7 @@ public class Lighting  {
 			cornerAttn = Math.max( cornerAttn, 0 );
 			_compositeColor = ColorUtils.placeAlpha( _compositeColor, cornerAttn );
 //			Log.out( "Brightness.lightGetComposite for corner - _compositeColor: " + ColorUtils.extractAlpha( _compositeColor ) );
-//_compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
+_compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 		} else {
 			_compositeColor = ColorUtils.placeAlpha( _compositeColor, MAX_LIGHT_LEVEL );
 		}
@@ -1183,52 +1193,52 @@ public class Lighting  {
 	 *        |
 	 *        \/
 	 */
-	private function incrementEdgeAdjacent( $oxel:Oxel, $majorFace:int, $edgeFace:int ):void {
+	private function setEdgeAdjacent( $oxel:Oxel, $majorFace:int, $edgeFace:int, $adjustVal:uint ):void {
 		var an:Oxel;
  		if ( Globals.POSX == $majorFace ) {
 			
 			if ( Globals.POSY == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSZ);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posX110 = CORNER_BUMP_VAL;
+					an.lighting.posX110 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGZ)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posX111 = CORNER_BUMP_VAL;
+					an.lighting.posX111 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.NEGY == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSZ);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posX100 = CORNER_BUMP_VAL;
+					an.lighting.posX100 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGZ)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posX101 = CORNER_BUMP_VAL;
+					an.lighting.posX101 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.POSZ == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSY);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posX101 = CORNER_BUMP_VAL;
+					an.lighting.posX101 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGY)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posX111 = CORNER_BUMP_VAL;
+					an.lighting.posX111 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.NEGZ == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSY);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posX100 = CORNER_BUMP_VAL;
+					an.lighting.posX100 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGY)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posX110 = CORNER_BUMP_VAL;
+					an.lighting.posX110 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 		}
@@ -1236,45 +1246,45 @@ public class Lighting  {
 			if ( Globals.POSY == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSZ);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negX010 = CORNER_BUMP_VAL;
+					an.lighting.negX010 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGZ)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negX011 = CORNER_BUMP_VAL;
+					an.lighting.negX011 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			} 
 			else if ( Globals.NEGY == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSZ);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negX000 = CORNER_BUMP_VAL;
+					an.lighting.negX000 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGZ)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negX001 = CORNER_BUMP_VAL;
+					an.lighting.negX001 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.POSZ == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSY);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negX001 = CORNER_BUMP_VAL;
+					an.lighting.negX001 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGY)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negX011 = CORNER_BUMP_VAL;
+					an.lighting.negX011 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.NEGZ == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSY);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negX000 = CORNER_BUMP_VAL;
+					an.lighting.negX000 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGY)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negX010 = CORNER_BUMP_VAL;
+					an.lighting.negX010 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 		}
@@ -1283,45 +1293,45 @@ public class Lighting  {
 			if ( Globals.POSX == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSZ);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posY110 = CORNER_BUMP_VAL;
+					an.lighting.posY110 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGZ)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posY111 = CORNER_BUMP_VAL;
+					an.lighting.posY111 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.NEGX == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSZ);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posY010 = CORNER_BUMP_VAL;
+					an.lighting.posY010 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGZ)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posY011 = CORNER_BUMP_VAL;
+					an.lighting.posY011 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.POSZ == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSX);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posY011 = CORNER_BUMP_VAL;
+					an.lighting.posY011 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGX)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posY111 = CORNER_BUMP_VAL;
+					an.lighting.posY111 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.NEGZ == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSX);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posY010 = CORNER_BUMP_VAL;
+					an.lighting.posY010 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGX)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posY110 = CORNER_BUMP_VAL;
+					an.lighting.posY110 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 		}
@@ -1330,45 +1340,45 @@ public class Lighting  {
 			if ( Globals.POSX == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSZ);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negY100 = CORNER_BUMP_VAL;
+					an.lighting.negY100 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGZ)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negY101 = CORNER_BUMP_VAL;
+					an.lighting.negY101 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.NEGX == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSZ);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negY000 = CORNER_BUMP_VAL;
+					an.lighting.negY000 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGZ)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negY001 = CORNER_BUMP_VAL;
+					an.lighting.negY001 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.POSZ == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSX);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negY001 = CORNER_BUMP_VAL;
+					an.lighting.negY001 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGX)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negY101 = CORNER_BUMP_VAL;
+					an.lighting.negY101 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.NEGZ == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSX);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negY000 = CORNER_BUMP_VAL;
+					an.lighting.negY000 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGX)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negY100 = CORNER_BUMP_VAL;
+					an.lighting.negY100 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 		}
@@ -1377,45 +1387,45 @@ public class Lighting  {
 			if ( Globals.POSX == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSY);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posZ101 = CORNER_BUMP_VAL;
+					an.lighting.posZ101 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGY)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posZ111 = CORNER_BUMP_VAL;
+					an.lighting.posZ111 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.NEGX == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSY);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posZ001 = CORNER_BUMP_VAL;
+					an.lighting.posZ001 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGY)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posZ011 = CORNER_BUMP_VAL;
+					an.lighting.posZ011 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.POSY == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSX);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posZ011 = CORNER_BUMP_VAL;
+					an.lighting.posZ011 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGX)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posZ111 = CORNER_BUMP_VAL;
+					an.lighting.posZ111 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.NEGY == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSX);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posZ001 = CORNER_BUMP_VAL;
+					an.lighting.posZ001 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGX)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.posZ101 = CORNER_BUMP_VAL;
+					an.lighting.posZ101 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 		}
@@ -1424,189 +1434,187 @@ public class Lighting  {
 			if ( Globals.POSX == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSY);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negZ100 = CORNER_BUMP_VAL;
+					an.lighting.negZ100 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGY)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negZ110 = CORNER_BUMP_VAL;
+					an.lighting.negZ110 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.NEGX == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSY);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negZ000 = CORNER_BUMP_VAL;
+					an.lighting.negZ000 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGY)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negZ010 = CORNER_BUMP_VAL;
+					an.lighting.negZ010 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.POSY == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSX);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negZ010 = CORNER_BUMP_VAL;
+					an.lighting.negZ010 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGX)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negZ110 = CORNER_BUMP_VAL;
+					an.lighting.negZ110 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 			else if ( Globals.NEGY == $edgeFace ) {
 				an = $oxel.neighbor(Globals.POSX);
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negZ000 = CORNER_BUMP_VAL;
+					an.lighting.negZ000 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
 				an = $oxel.neighbor(Globals.NEGX)
 				if ( Oxel.validLightable( an ) ) {
-					an.lighting.negZ100 = CORNER_BUMP_VAL;
+					an.lighting.negZ100 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 			}
 		}
 
 	}
 	
-	private static const CORNER_RESET_VAL:uint = 0;
-	private static const CORNER_BUMP_VAL:uint = 1;
-	private function edgeIncrement( $majorFace:int, $edgeFace:int ):void {
+	private function edgeValueSet( $majorFace:int, $edgeFace:int, $changeValue:uint ):void {
 		
- 		if ( Globals.POSX == $majorFace ) {
+		if ( Globals.POSX == $majorFace ) {
 			
 			if ( Globals.POSY == $edgeFace ) {
-				posX110 = CORNER_BUMP_VAL;
-				posX111 = CORNER_BUMP_VAL;
-				posY = 1;
+				posX110 = $changeValue;
+				posX111 = $changeValue;
+				posY = $changeValue;
 			}
 			else if ( Globals.NEGY == $edgeFace ) {
-				posX100 = CORNER_BUMP_VAL;
-				posX101 = CORNER_BUMP_VAL;
-				negY = 1;
+				posX100 = $changeValue;
+				posX101 = $changeValue;
+				negY = $changeValue;
 			}
 			else if ( Globals.POSZ == $edgeFace ) {
-				posX101 = CORNER_BUMP_VAL;
-				posX111 = CORNER_BUMP_VAL;
-				posZ = 1;
+				posX101 = $changeValue;
+				posX111 = $changeValue;
+				posZ = $changeValue;
 			}
 			else if ( Globals.NEGZ == $edgeFace ) {
-				posX110 = CORNER_BUMP_VAL;
-				posX100 = CORNER_BUMP_VAL;
-				negZ = 1;
+				posX110 = $changeValue;
+				posX100 = $changeValue;
+				negZ = $changeValue;
 			}
 		}
 		else if ( Globals.NEGX == $majorFace ) {
 			if ( Globals.POSY == $edgeFace ) {
-				negX010 = CORNER_BUMP_VAL;
-				negX011 = CORNER_BUMP_VAL;
-				posY = 1;
+				negX010 = $changeValue;
+				negX011 = $changeValue;
+				posY = $changeValue;
 			}
 			else if ( Globals.NEGY == $edgeFace ) {
-				negX000 = CORNER_BUMP_VAL;
-				negX001 = CORNER_BUMP_VAL;
-				negY = 1;
+				negX000 = $changeValue;
+				negX001 = $changeValue;
+				negY = $changeValue;
 			}
 			else if ( Globals.POSZ == $edgeFace ) {
-				negX001 = CORNER_BUMP_VAL;
-				negX011 = CORNER_BUMP_VAL;
-				posZ = 1;
+				negX001 = $changeValue;
+				negX011 = $changeValue;
+				posZ = $changeValue;
 			}
 			else if ( Globals.NEGZ == $edgeFace ) {
-				negX000 = CORNER_BUMP_VAL;
-				negX010 = CORNER_BUMP_VAL;
-				negZ = 1;
+				negX000 = $changeValue;
+				negX010 = $changeValue;
+				negZ = $changeValue;
 			}
 		}
 		else if ( Globals.POSY == $majorFace ) {
 			if ( Globals.POSX == $edgeFace ) {
-				posY110 = CORNER_BUMP_VAL;
-				posY111 = CORNER_BUMP_VAL;
-				posX = 1;
+				posY110 = $changeValue;
+				posY111 = $changeValue;
+				posX = $changeValue;
 			}
 			else if ( Globals.NEGX == $edgeFace ) {
-				posY010 = CORNER_BUMP_VAL;
-				posY011 = CORNER_BUMP_VAL;
-				negX = 1;
+				posY010 = $changeValue;
+				posY011 = $changeValue;
+				negX = $changeValue;
 			}
 			else if ( Globals.POSZ == $edgeFace ) {
-				posY011 = CORNER_BUMP_VAL;
-				posY111 = CORNER_BUMP_VAL;
-				posZ = 1;
+				posY011 = $changeValue;
+				posY111 = $changeValue;
+				posZ = $changeValue;
 			}
 			else if ( Globals.NEGZ == $edgeFace ) {
-				posY010 = CORNER_BUMP_VAL;
-				posY110 = CORNER_BUMP_VAL;
-				negZ = 1;
+				posY010 = $changeValue;
+				posY110 = $changeValue;
+				negZ = $changeValue;
 			}
 		}
 		else if ( Globals.NEGY == $majorFace ) {
 
 			if ( Globals.POSX == $edgeFace ) {
-				negY100 = CORNER_BUMP_VAL;
-				negY101 = CORNER_BUMP_VAL;
-				posX = 1;
+				negY100 = $changeValue;
+				negY101 = $changeValue;
+				posX = $changeValue;
 			}
 			else if ( Globals.NEGX == $edgeFace ) {
-				negY000 = CORNER_BUMP_VAL;
-				negY001 = CORNER_BUMP_VAL;
-				negX = 1;
+				negY000 = $changeValue;
+				negY001 = $changeValue;
+				negX = $changeValue;
 			}
 			else if ( Globals.POSZ == $edgeFace ) {
-				negY001 = CORNER_BUMP_VAL;
-				negY101 = CORNER_BUMP_VAL;
-				posZ = 1;
+				negY001 = $changeValue;
+				negY101 = $changeValue;
+				posZ = $changeValue;
 			}
 			else if ( Globals.NEGZ == $edgeFace ) {
-				negY000 = CORNER_BUMP_VAL;
-				negY100 = CORNER_BUMP_VAL;
-				negZ = 1;
+				negY000 = $changeValue;
+				negY100 = $changeValue;
+				negZ = $changeValue;
 			}
 		}
 		else if ( Globals.POSZ == $majorFace ) {
 
 			if ( Globals.POSX == $edgeFace ) {
-				posZ101 = CORNER_BUMP_VAL;
-				posZ111 = CORNER_BUMP_VAL;
-				posX = 1;
+				posZ101 = $changeValue;
+				posZ111 = $changeValue;
+				posX = $changeValue;
 			}
 			else if ( Globals.NEGX == $edgeFace ) {
-				posZ001 = CORNER_BUMP_VAL;
-				posZ011 = CORNER_BUMP_VAL;
-				negX = 1;
+				posZ001 = $changeValue;
+				posZ011 = $changeValue;
+				negX = $changeValue;
 			}
 			else if ( Globals.POSY == $edgeFace ) {
-				posZ011 = CORNER_BUMP_VAL;
-				posZ111 = CORNER_BUMP_VAL;
-				posY = 1;
+				posZ011 = $changeValue;
+				posZ111 = $changeValue;
+				posY = $changeValue;
 			}
 			else if ( Globals.NEGY == $edgeFace ) {
-				posZ001 = CORNER_BUMP_VAL;
-				posZ101 = CORNER_BUMP_VAL;
-				negY = 1;
+				posZ001 = $changeValue;
+				posZ101 = $changeValue;
+				negY = $changeValue;
 			}
 		}
 		else if ( Globals.NEGZ == $majorFace ) {
 			
 			if ( Globals.POSX == $edgeFace ) {
-				negZ100 = CORNER_BUMP_VAL;
-				negZ110 = CORNER_BUMP_VAL;
-				posX = 1;
+				negZ100 = $changeValue;
+				negZ110 = $changeValue;
+				posX = $changeValue;
 			}
 			else if ( Globals.NEGX == $edgeFace ) {
-				negZ000 = CORNER_BUMP_VAL;
-				negZ010 = CORNER_BUMP_VAL;
-				negX = 1;
+				negZ000 = $changeValue;
+				negZ010 = $changeValue;
+				negX = $changeValue;
 			}
 			else if ( Globals.POSY == $edgeFace ) {
-				negZ010 = CORNER_BUMP_VAL;
-				negZ110 = CORNER_BUMP_VAL;
-				posY = 1;
+				negZ010 = $changeValue;
+				negZ110 = $changeValue;
+				posY = $changeValue;
 			}
 			else if ( Globals.NEGY == $edgeFace ) {
-				negZ000 = CORNER_BUMP_VAL;
-				negZ100 = CORNER_BUMP_VAL;
-				negY = 1;
+				negZ000 = $changeValue;
+				negZ100 = $changeValue;
+				negY = $changeValue;
 			}
 		}
 	}
@@ -1822,7 +1830,10 @@ public class Lighting  {
 		
 	}
 
-	public function evaluateAmbientOcculusion( $o:Oxel, $face:int ):void {
+	public function evaluateAmbientOcculusion( $o:Oxel, $face:int, $addOrRemoveAmbient:Boolean ):void {
+		
+		if ( !_s_eaoEnabled )
+			return;
 		
 		// get the oxel next to the face we are evaluating.
 		var no:Oxel = $o.neighbor( $face );
@@ -1837,6 +1848,7 @@ public class Lighting  {
 		var afs:Array = Globals.adjacentFaces( $face );
 		
 		var nno:Oxel;
+		var addOrRemove:Boolean;
 		// now for each face that is perpendicular to the neighbor oxel
 		for ( var index:int = 0; index < 5; index++ ) {
 			var af:int = afs[index];
@@ -1844,37 +1856,52 @@ public class Lighting  {
 			if ( !Oxel.validLightable( nno ) )
 				continue;
 			// no perpendicular face to cast shadow
-			if ( Globals.AIR == nno.type && !nno.childrenHas() )
+			else if ( Globals.AIR == nno.type && !nno.childrenHas() )
 				continue;
 				
 			if ( nno.gc.grain > $o.gc.grain )  // implies it has no children.
-				projectOnLargerGrain( $o, nno, $face, af );
+				projectOnLargerGrain( $o, nno, $face, af, $addOrRemoveAmbient );
 			else if ( no.gc.grain == $o.gc.grain ) // equal grain can have children
-				projectOnEqualGrain( $o, nno, $face, af );
+				projectOnEqualGrain( $o, nno, $face, af, $addOrRemoveAmbient );
 			else
 				Log.out( "LightAdd.evaluateAmbientOcculusion - invalid condition - neighbor is smaller: ", Log.ERROR );
 		}
 	}
 	
-	public function projectOnLargerGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int ):void {
+	public function projectOnLargerGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int, $add:Boolean ):void {
 		// So I am evaluating a larger grain next to me.
 		// depending on my child location I may or may not have a face that effects me.
 		// yuck...
 	}
 	
-	public function projectOnEqualGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int ):void {
+	public function projectOnEqualGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int, $add:Boolean ):void {
 
 		if ( $nno.faceHas( Oxel.face_get_opposite( $af ) ) ) {
-			// bump the count on edge of tested oxel.
-			$o.lighting.edgeIncrement( $face, $af );
-			// bump the count on edge of tested oxel.
-			// TODO - Could this bump it too far?
-			$nno.lighting.edgeIncrement( Oxel.face_get_opposite( $af ), Oxel.face_get_opposite( $face ) );
-			// Problem with this is it makes the next frame dirty too, which causes every frame to be dirty, not good!
-			//nno.quadMarkDirty( Oxel.face_get_opposite( af ) );
-			$nno.quadRebuild( Oxel.face_get_opposite( $af ) );
-			
-			$nno.lighting.incrementEdgeAdjacent( $nno, Oxel.face_get_opposite( $af ), Oxel.face_get_opposite( $face ) );
+			if ( $add ) {
+				// bump the count on edge of tested oxel.
+				$o.lighting.edgeValueSet( $face, $af, CORNER_BUMP_VAL );
+				// bump the count on edge of tested oxel.
+				// TODO - Could this bump it too far?
+				$nno.lighting.edgeValueSet( Oxel.face_get_opposite( $af ), Oxel.face_get_opposite( $face ), CORNER_BUMP_VAL );
+				// Problem with this is it makes the next frame dirty too, which causes every frame to be dirty, not good!
+				//nno.quadMarkDirty( Oxel.face_get_opposite( af ) );
+				$nno.quadRebuild( Oxel.face_get_opposite( $af ) );
+				
+				$nno.lighting.setEdgeAdjacent( $nno, Oxel.face_get_opposite( $af ), Oxel.face_get_opposite( $face ), CORNER_BUMP_VAL );
+			}
+			else { 
+				// bump the count on edge of tested oxel.
+				$o.lighting.edgeValueSet( $face, $af, CORNER_RESET_VAL );
+				// bump the count on edge of tested oxel.
+				// TODO - Could this bump it too far?
+				$nno.lighting.edgeValueSet( Oxel.face_get_opposite( $af ), Oxel.face_get_opposite( $face ), CORNER_RESET_VAL );
+				// Problem with this is it makes the next frame dirty too, which causes every frame to be dirty, not good!
+				//nno.quadMarkDirty( Oxel.face_get_opposite( af ) );
+				$nno.quadRebuild( Oxel.face_get_opposite( $af ) );
+				
+				$nno.lighting.setEdgeAdjacent( $nno, Oxel.face_get_opposite( $af ), Oxel.face_get_opposite( $face ), CORNER_RESET_VAL );
+				
+			}
 		}
 	}
 	
