@@ -991,7 +991,7 @@ package com.voxelengine.worldmodel.models
 			if (databaseObject)
 			{
 				trace("VoxelModel.save - saving object back to BigDB: " + instanceInfo.instanceGuid);
-				ba = IVMSave();
+				ba = toByteArray();
 				databaseObject.data = ba;
 				databaseObject.save(false, false, function created():void
 					{
@@ -1004,7 +1004,7 @@ package com.voxelengine.worldmodel.models
 			else
 			{
 				Globals.g_modelManager.createInstanceFromTemplate(this);
-				ba = IVMSave();
+				ba = toByteArray();
 				trace("VoxelModel.save - creating new object: " + instanceInfo.instanceGuid);
 				Persistance.createObject("voxelModels", instanceInfo.instanceGuid, {owner: Network.userId, template: modelInfo.template, name: _name, description: _description, data: ba}, function(o:DatabaseObject):void
 					{
@@ -1022,12 +1022,13 @@ package com.voxelengine.worldmodel.models
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Loading and Saving Voxel Models
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		public function IVMSave():ByteArray
+		public function toByteArray():ByteArray
 		{
 			var ba:ByteArray = new ByteArray();
+			
 			writeVersionedHeader( ba );
 			writeManifest( ba );
-			oxel.writeData( ba);
+			oxel.toByteArray( ba );
 			
 			ba.compress();
 			
@@ -1068,7 +1069,7 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		
-		public function IVMLoadCompressed($ba:ByteArray):void
+		public function uncompress($ba:ByteArray):void
 		{
 			// the try catch here allows me to treat all models as compressed
 			// if the uncompress fails, it simply continues
@@ -1079,11 +1080,11 @@ package com.voxelengine.worldmodel.models
 			catch (error:Error) {
 				//Log.out( "VoxelModel.IVMLoadCompressed - this byteArray is NOT compressed: " + modelInfo.fileName );
 			}
-			IVMLoadUncompressed( $ba );
+			fromByteArray( $ba );
 		}
 		
 		// This is the last part of reading a local model
-		public function IVMLoadUncompressed( $ba:ByteArray ):void
+		public function fromByteArray( $ba:ByteArray ):void
 		{
 			var versionInfo:Object = readMetaInfo( $ba );
 			_version = versionInfo.version;
@@ -1223,13 +1224,9 @@ package com.voxelengine.worldmodel.models
 		{
 			// Read off 1 bytes, the root size
 			var rootGrainSize:int = $ba.readByte();
-			//Log.out( "VoxelModel.loadOxelFromByteArray - rootGrainSize:" + rootGrainSize );			
-			
 			var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
 			gct.grain = rootGrainSize;
-//			_statisics.gather( _version, $ba, rootGrainSize);
-			// Version specific data
-			//Log.out( "VoxelModel.loadOxelFromByteArray - modelInfo: " + modelInfo.fileName );
+			_statisics.gather( _version, $ba, rootGrainSize);
 			
 			oxelReset();
 			oxel = OxelPool.poolGet();

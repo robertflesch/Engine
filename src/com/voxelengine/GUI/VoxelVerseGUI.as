@@ -176,7 +176,7 @@ package com.voxelengine.GUI
 					vm.save();
 				else
 				{
-					var ba:ByteArray = vm.IVMSave();
+					var ba:ByteArray = vm.toByteArray();
 
 					_fileReference.save( ba, vm.modelInfo.fileName + "_new.ivm");
 					_fileReference.addEventListener( Event.CANCEL, function ( e:Event ):void { Globals.GUIControl = false; } );

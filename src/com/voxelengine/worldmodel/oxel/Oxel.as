@@ -75,7 +75,7 @@ package com.voxelengine.worldmodel.oxel
 		private var _children:Vector.<Oxel> 	= null; // These are created when needed
 		private var _neighbors:Vector.<Oxel>	= null;	// 8 children but 6 neighbors, created when needed
 		private var _quads:Vector.<Quad> 		= null;	// Quads that are drawn on card, created when needed
-		private var _vertMan:VertexManager 		= null;  // created when needed
+		private var _vertMan:VertexManager 		= null; // created when needed
 		private var _lighting:Lighting		= null;
 		private var _flowInfo:FlowInfo 			= null; // used to count up and out in flowing oxel ( only uses 2 bytes, down, out )
 		override public function set dirty( $isDirty:Boolean ):void { 
@@ -320,74 +320,10 @@ package com.voxelengine.worldmodel.oxel
 			OxelPool.poolDispose( this );
 		}
 		
-		// This is used to initialize all oxel nodes that are read from the byte array
-		public function initialize( $parent:Oxel, $gc:GrainCursor, $byteData:uint, $stats:ModelStatisics ):void {
-
-			_parent = $parent;
-			dataRaw = $byteData;
-			_gc = GrainCursorPool.poolGet( $gc.bound );
-			_gc.copyFrom( $gc );
-			
-			if ( facesHas() )
-				dirty = true;
-			
-			//try {
-				//Globals.Info[type].flowable
-			//}
-			//catch ( e:Error ) {
-				//type = Globals.AIR;
-			//}
-				
-			if ( Globals.Info[type].flowable )
-			{
-				if ( $parent.flowInfo )
-					flowInfo = $parent.flowInfo.clone();
-				else
-					flowInfo = Globals.Info[type].flowInfo.clone();
-			}
-				
-			if ( $stats )
-				vm_initialize( $stats );
-		}
-		
-		// This is used to initialize all oxel nodes that are read from the byte array
-		public function initializeVersionedData( $version:String, $parent:Oxel, $gc:GrainCursor, $byteData:uint, $stats:ModelStatisics ):void {
-
-			//if ( $version == Globals.VERSION_004 || $version == Globals.VERSION_003 || $version == Globals.VERSION_002 || $version == Globals.VERSION_001 || $version == Globals.VERSION_000 )
-			{
-				initialize( $parent, $gc, $byteData, $stats );	
-				return;
-			}
-			//throw new Error( "Oxel.initialVersionedData - UNKNOWN VERSION" );
-		}
-		
-		// This is used to initialize oxel nodes created via children create
-		private function initializeAndMarkDirty( $parent:Oxel, $gc:GrainCursor, $byteData:uint, $stats:ModelStatisics ):void {
-			initialize( $parent, $gc, $byteData, $stats );
-			super.faces_mark_all_dirty();
-			dirty = true;
-		}
-		
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Children function START
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		/*
-		// This function only finds within the children of the current oxel
-		private function select_child( $gc:GrainCursor ):Oxel	{
-			if ( false == childrenHas() )
-				return Globals.BAD_OXEL;
-				
-			// WARNING: Using the gc_static, is_equal doesn't overwrite
-			var kn:GrainCursor = $gc.get_ancestor( gc.grain - 1 - $gc.grain );
-			for each ( var child:Oxel in _children ) 
-			{
-				if ( kn.is_equal( child.gc ) ) 
-					return child;
-			}
-			return Globals.BAD_OXEL;
-		}
-		*/
 		public function childGetOrCreate( $gc:GrainCursor ):Oxel {
 			if ( !$gc.is_inside( gc ) )
 				return Globals.BAD_OXEL;
@@ -1444,7 +1380,7 @@ package com.voxelengine.worldmodel.oxel
 		protected function quadsBuildTerminal( $plane_facing:int = 1 ):void {
 			var quadCount:int = 0;
 
-			if ( gc.eval( 4, 0, 4, 15 ) )
+			if ( gc.eval( 4, 1, 4, 14 ) )
 				Log.out( "watch faces get built" );
 			// Does this oxel have faces
 			if ( facesHas() )
@@ -1660,25 +1596,23 @@ package com.voxelengine.worldmodel.oxel
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Saving and Restoring from File
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		public function writeData( $ba:ByteArray ):void {
+		public function toByteArray( $ba:ByteArray ):void {
 			//  n unsigned char root grain size
 			$ba.writeByte( gc.bound );
 			//  n+1 oxel data
-			writeDataRecursively( $ba );
+			toByteArrayRecursive( $ba );
 		}
 		
-		private function writeDataRecursively( $ba:ByteArray ):void 
+		private function toByteArrayRecursive( $ba:ByteArray ):void 
 		{
 			//trace( Oxel.data_mask_temp( _data ) );
-			if ( childrenHas() && Globals.AIR != type )
-			{
+			if ( childrenHas() && Globals.AIR != type )	{
 				Log.out( "Oxel.writeData - parent with TYPE: " + Globals.Info[type].name, Log.ERROR );
 				type = Globals.AIR; 
 			}
 			
 			// If it has flow or lighting, we have to save both.
-			if ( flowInfo || ( _lighting && _lighting.valuesHas() ) )
-			{
+			if ( flowInfo || lighting )	{
 				// I only have 1 bit for additional data...
 				additionalDataMark();
 				$ba.writeUnsignedInt( maskTempData() );
@@ -1691,20 +1625,27 @@ package com.voxelengine.worldmodel.oxel
 					lighting = LightingPool.poolGet();
 				lighting.toByteArray( $ba );
 			}
-			else
+			else {
+				additionalDataClear();
 				$ba.writeUnsignedInt( maskTempData() );
-			
-			if ( childrenHas() ) 
-			{
-				for each ( var child:Oxel in _children ) 
-					child.writeDataRecursively( $ba );
 			}
+			
+			if ( childrenHas() ) {
+				for each ( var child:Oxel in _children ) 
+					child.toByteArrayRecursive( $ba );
+			}
+			
+			validateData( $ba );
+		}
+		
+		private function validateData( $ba:ByteArray ):void {
+			
 		}
 		
 		public function readVersionedData( $version:String, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $stats:ModelStatisics ):ByteArray 
 		{
 			var oxelData:uint = $ba.readInt();
-			initializeVersionedData( $version, $parent, $gc, oxelData, $stats );
+			initialize( $parent, $gc, oxelData, $stats );	
 			
 			// Bad data check
 			if ( OxelData.data_is_parent( oxelData ) && Globals.AIR != type )
@@ -1785,6 +1726,37 @@ package com.voxelengine.worldmodel.oxel
 			
 			return $ba;
 		}
+		
+		// This is used to initialize all oxel nodes that are read from the byte array
+		public function initialize( $parent:Oxel, $gc:GrainCursor, $byteData:uint, $stats:ModelStatisics ):void {
+
+			_parent = $parent;
+			dataRaw = $byteData;
+			_gc = GrainCursorPool.poolGet( $gc.bound );
+			_gc.copyFrom( $gc );
+			
+			if ( facesHas() )
+				dirty = true;
+			
+			if ( Globals.Info[type].flowable )
+			{
+				if ( $parent.flowInfo )
+					flowInfo = $parent.flowInfo.clone();
+				else
+					flowInfo = Globals.Info[type].flowInfo.clone();
+			}
+				
+			if ( $stats )
+				vm_initialize( $stats );
+		}
+		
+		// This is used to initialize oxel nodes created via children create
+		private function initializeAndMarkDirty( $parent:Oxel, $gc:GrainCursor, $byteData:uint, $stats:ModelStatisics ):void {
+			initialize( $parent, $gc, $byteData, $stats );
+			super.faces_mark_all_dirty();
+			dirty = true;
+		}
+		
 		
 		private function intToHexString( $val:int ):String
 		{

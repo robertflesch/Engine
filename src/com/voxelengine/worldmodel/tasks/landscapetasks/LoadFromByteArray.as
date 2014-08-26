@@ -42,7 +42,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			//Log.out( "LoadFromByteArray.start - findIVM: " + _guid );
 			if ( vm && ba )		
 			{
-				vm.IVMLoadCompressed( ba ); // why is it compressed?
+				vm.uncompress( ba ); // why is it compressed?
 				//Log.out( "LoadFromByteArray.start - completed - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) + " guid: " + _guid);
 			}
 			else

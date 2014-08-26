@@ -97,7 +97,7 @@ package com.voxelengine.worldmodel.models
 				if ( !_was_selected && null == _ba )
 				{
 					_ba = new ByteArray();
-					oxel.writeData( _ba );
+					oxel.toByteArray( _ba );
 				}
 				
 				var loco:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
