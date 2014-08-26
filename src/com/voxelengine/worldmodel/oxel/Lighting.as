@@ -42,7 +42,7 @@ public class Lighting  {
 	public static const DEFAULT_LIGHT_ID:uint = 1;
 	//public static const DEFAULT_BASE_LIGHT_LEVEL:uint = 0x00; // out of 255
 	private static var _defaultBaseLightAttn:uint = 0x33; // out of 255
-	private static var _s_eaoEnabled:Boolean = false;
+	private static var _s_eaoEnabled:Boolean = true;
 	
 	private static const CORNER_RESET_VAL:uint = 0;
 	private static const CORNER_BUMP_VAL:uint = 1;
@@ -1930,7 +1930,7 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 				break;
 
 			case Globals.POSZ:
-				if ( ( 1 == posZ011 || 1 == posZ101 ) && 0 == posZ001 && 0 == posZ111 )
+				if ( ( 1 == posZ001 || 1 == posZ111 ) && 0 == posZ011 && 0 == posZ101 )
 					return true;
 				break;
 				
