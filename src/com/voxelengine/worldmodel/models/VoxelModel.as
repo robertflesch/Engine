@@ -463,7 +463,7 @@ package com.voxelengine.worldmodel.models
 				if ( oldTypeInfo.lightInfo.lightSource )
 					var oldLightID:uint = oldOxel.lighting.lightIDGet();
 				if ( oldOxel.lighting.ambientOcculsionHas() ) {
-//					oldOxel.lighting.ambientOcculsionReset();
+					// We have to do this here before the model changes, this clears out the ambient occulusion from the removed oxel
 					for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
 						if ( oldOxel.quads && oldOxel.quads[face] )
 							oldOxel.lighting.evaluateAmbientOcculusion( oldOxel, face, false );

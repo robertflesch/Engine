@@ -1905,7 +1905,45 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 		}
 	}
 	
-	public function rotateQuad():Boolean {
+	public function rotateQuad( $face:int ):Boolean {
+		// We dont want single points of light to be on a diagonal;
+		switch ( $face ) 
+		{
+			case Globals.POSX:
+				if ( ( 1 == posX111 || 1 == posX100 ) && 0 == posX110 && 0 == posX101 )
+					return true;
+				break;
+				
+			case Globals.NEGX:
+				if ( ( 1 == negX010 || 1 == negX001 ) && 0 == negX011 && 0 == negX000 )
+					return true;
+				break;
+				
+			case Globals.NEGY:
+				if ( ( 1 == negY000 || 1 == negY101 ) && 0 == negY100 && 0 == negY001 )
+					return true;
+				break;
+				
+			case Globals.POSY:
+				if ( ( 1 == posY010 || 1 == posY111 ) && 0 == posY110 && 0 == posY011 )
+					return true;
+				break;
+
+			case Globals.POSZ:
+				if ( ( 1 == posZ011 || 1 == posZ101 ) && 0 == posZ001 && 0 == posZ111 )
+					return true;
+				break;
+				
+			case Globals.NEGZ:
+				if ( ( 1 == negZ000 || 1 == negZ110 ) && 0 == negZ100 && 0 == negZ010 )
+					return true;
+				break;
+				
+			default:
+				Log.out( "Lighting.rotateQuad - face INVALID", Log.ERROR );
+			}
+		
+		
 		return false;
 	}
 	
