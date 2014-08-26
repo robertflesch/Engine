@@ -500,7 +500,9 @@ package com.voxelengine.worldmodel.models
 		{
 			if ( Globals.controlledModel )
 			{
-				Globals.controlledModel.instanceInfo.positionSetComp(0,0,0);
+				Globals.controlledModel.instanceInfo.positionSet = Globals.g_regionManager.currentRegion.playerPosition;
+				Globals.controlledModel.instanceInfo.rotationSet = Globals.g_regionManager.currentRegion.playerRotation;
+				//Globals.controlledModel.instanceInfo.positionSetComp(0,0,0);
 			}
 		}
 		
