@@ -465,16 +465,25 @@ public class Lighting  {
 		return false;
 	}
 	
-	public function reset():void {
+	public function reset():Boolean {
+		
+		var changed:Boolean;
 		
 		for ( var i:int = 1; i < _lights.length; i++ ) {
 			var li:LightInfo = _lights[i];
-			if ( null != li )
+			if ( null != li ) {
 				remove( li.ID );
+				changed = true;
+			}
 		}
 		
-		_lowerAmbient = 0;
-		_higherAmbient = 0;
+		if ( _lowerAmbient ||  _higherAmbient ) {
+			changed = true;
+			_lowerAmbient = 0;
+			_higherAmbient = 0;
+		}
+		
+		return changed;
 	}
 
 	public function mergeChildren( $childID:uint, $b:Lighting, $grainUnits:uint, $hasAlpha:Boolean ):void {	
@@ -1919,7 +1928,7 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 				break;
 				
 			case Globals.NEGX:
-				if ( ( 1 == negX010 || 1 == negX001 ) && 0 == negX011 && 0 == negX000 )
+				if ( ( 1 == negX011 || 1 == negX000 ) && 0 == negX010 && 0 == negX001 )
 					return true;
 				break;
 				
