@@ -2664,7 +2664,8 @@ package com.voxelengine.worldmodel.oxel
 			}
 			else if ( _lighting )
 			{
-				_lighting.reset();
+				if ( _lighting.reset() )
+					quadsRebuildAll();
 			}
 		}
 		
