@@ -1120,7 +1120,7 @@ package com.voxelengine.worldmodel.oxel
 			if ( true == $ti.lightInfo.fullBright && false == $ti.lightInfo.lightSource )
 				_lighting.lightFullBright();
 			
-			_lighting.evaluateAmbientOcculusion( this, $face, true );
+			_lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
 		}
 
 		protected function faces_build_terminal():void {

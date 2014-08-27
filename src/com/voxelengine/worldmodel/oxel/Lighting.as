@@ -38,6 +38,9 @@ public class Lighting  {
 	private static const DEFAULT_COLOR:uint = 0x00ffffff;
 	private static const DEFAULT_SIGMA:uint = 2;
 	
+	public static const AMBIENT_ADD:Boolean = true;
+	public static const AMBIENT_REMOVE:Boolean = false;
+
 	public static const MAX_LIGHT_LEVEL:uint = 0xff;
 	public static const DEFAULT_LIGHT_ID:uint = 1;
 	//public static const DEFAULT_BASE_LIGHT_LEVEL:uint = 0x00; // out of 255
@@ -1830,6 +1833,7 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 		
 	}
 
+	// $addOrRemoveAmbient should be either Lighting.AMBIENT_ADD or Lighting.AMBIENT_REMOVE
 	public function evaluateAmbientOcculusion( $o:Oxel, $face:int, $addOrRemoveAmbient:Boolean ):void {
 		
 		if ( !_s_eaoEnabled )
@@ -1868,16 +1872,16 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 		}
 	}
 	
-	public function projectOnLargerGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int, $add:Boolean ):void {
+	public function projectOnLargerGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int, $addOrRemoveAmbient:Boolean ):void {
 		// So I am evaluating a larger grain next to me.
 		// depending on my child location I may or may not have a face that effects me.
 		// yuck...
 	}
 	
-	public function projectOnEqualGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int, $add:Boolean ):void {
+	public function projectOnEqualGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int, $addOrRemoveAmbient:Boolean ):void {
 
 		if ( $nno.faceHas( Oxel.face_get_opposite( $af ) ) ) {
-			if ( $add ) {
+			if ( AMBIENT_ADD == $addOrRemoveAmbient ) {
 				// bump the count on edge of tested oxel.
 				$o.lighting.edgeValueSet( $face, $af, CORNER_BUMP_VAL );
 				// bump the count on edge of tested oxel.
