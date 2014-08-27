@@ -1239,14 +1239,8 @@ package com.voxelengine.worldmodel.models
 			
 			oxelReset();
 			oxel = OxelPool.poolGet();
-			oxel.lighting = LightingPool.poolGet();
-			if ( oxel.lighting.lightHas( Lighting.DEFAULT_LIGHT_ID ) ) {
-				var li:LightInfo = oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-				li.setAll( instanceInfo.baseLightLevel );
-				Lighting.defaultBaseLightAttn = instanceInfo.baseLightLevel;
-			}
-			else
-				Log.out( "VoxelModel.loadOxelFromByteArray - new root oxel does not have default light - HOW DOES THIS HAPPEN", Log.ERROR );
+			Lighting.defaultBaseLightAttn = instanceInfo.baseLightLevel;
+			oxel.lighting = LightingPool.poolGet( instanceInfo.baseLightLevel );
 			
 			registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);	
 			registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);	

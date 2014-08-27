@@ -137,7 +137,7 @@ package com.voxelengine.worldmodel.models
 			oxel.faces_mark_all_clean();
 			var gcCursor:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
 			if ( !oxel.lighting )
-				oxel.lighting = LightingPool.poolGet();
+				oxel.lighting = LightingPool.poolGet( 0xff );
 			var li:LightInfo = oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
 			if ( CURSOR_OP_INSERT == cursorOperation ) {
 				

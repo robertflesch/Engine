@@ -76,7 +76,7 @@ package com.voxelengine.worldmodel.oxel
 		private var _neighbors:Vector.<Oxel>	= null;	// 8 children but 6 neighbors, created when needed
 		private var _quads:Vector.<Quad> 		= null;	// Quads that are drawn on card, created when needed
 		private var _vertMan:VertexManager 		= null; // created when needed
-		private var _lighting:Lighting		= null;
+		private var _lighting:Lighting			= null;
 		private var _flowInfo:FlowInfo 			= null; // used to count up and out in flowing oxel ( only uses 2 bytes, down, out )
 		override public function set dirty( $isDirty:Boolean ):void { 
 			super.dirty = $isDirty;
@@ -244,7 +244,7 @@ package com.voxelengine.worldmodel.oxel
 				return false;
 			
 			if ( !$o.lighting ) { // does this oxel already have a brightness?
-				$o.lighting = LightingPool.poolGet();
+				$o.lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
 				$o.lighting.materialFallOffFactor = Globals.Info[$o.type].lightInfo.fallOffFactor;
 			}
 
@@ -527,7 +527,7 @@ package com.voxelengine.worldmodel.oxel
 				_children[i].initializeAndMarkDirty( this, gct, type, null );
 				if ( _lighting )
 				{
-					_children[i].lighting = LightingPool.poolGet();
+					_children[i].lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
 					lighting.childGetAllLights( gct.childId(), _children[i].lighting );
 					// child should attenuate light at same rate.
 					_children[i].lighting.materialFallOffFactor = lighting.materialFallOffFactor;
@@ -776,7 +776,7 @@ package com.voxelengine.worldmodel.oxel
 			/// merge the brightness data into parent.
 			if ( hasBrightnessData ) {
 				if ( null == _lighting )
-					_lighting = LightingPool.poolGet();
+					_lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
 				for each ( var childForBrightness:Oxel in _children ) 
 				{
 					if ( childForBrightness._lighting ) {
@@ -1107,7 +1107,7 @@ package com.voxelengine.worldmodel.oxel
 		private function quadAmbient( $face:int, $ti:TypeInfo ):void {
 			
 			if ( !_lighting ) {
-				_lighting = LightingPool.poolGet();
+				_lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
 				if ( _lighting.lightHas( Lighting.DEFAULT_LIGHT_ID ) ) {
 					var li:LightInfo = _lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
 					var rootAttn:uint = root_get()._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg
@@ -1622,7 +1622,7 @@ package com.voxelengine.worldmodel.oxel
 				flowInfo.toByteArray( $ba );
 				
 				if ( !lighting )
-					lighting = LightingPool.poolGet();
+					lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
 				lighting.toByteArray( $ba );
 			}
 			else {
@@ -1667,7 +1667,7 @@ package com.voxelengine.worldmodel.oxel
 				if ( null == $parent )
 					var baseLightLevel:uint = lighting.avg;
 				if ( !lighting )
-					lighting = LightingPool.poolGet();
+					lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
 				$ba = lighting.fromByteArray( $version, $ba );
 				
 				if ( $parent ) {

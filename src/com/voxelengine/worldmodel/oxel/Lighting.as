@@ -56,7 +56,7 @@ public class Lighting  {
 	static public function set defaultBaseLightAttn(value:uint):void  { _defaultBaseLightAttn = value; }
 	
 	
-	private static function defaultLightLevelSetter():uint { 
+	public static function defaultLightLevelSetter():uint { 
 		var temp:uint = _defaultBaseLightAttn;
 		temp = temp | (_defaultBaseLightAttn << 8);
 		temp = temp | (_defaultBaseLightAttn << 16);

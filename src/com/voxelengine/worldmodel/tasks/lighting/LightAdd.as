@@ -198,8 +198,10 @@ package com.voxelengine.worldmodel.tasks.lighting
 			
 			if ( $no.childrenHas() )
 				return true; // What does this do?
-			var bt:Lighting = LightingPool.poolGet();
-			var btp:Lighting = LightingPool.poolGet();
+				
+			var baseLightLevel:uint = Lighting.defaultLightLevelSetter();
+			var bt:Lighting = LightingPool.poolGet( baseLightLevel );
+			var btp:Lighting = LightingPool.poolGet( baseLightLevel );
 			
 			var grainUnits:uint = $lo.gc.size();
 			// project the light oxel onto the virtual brightness
@@ -280,7 +282,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 			var dchild:Vector.<Oxel> = $no.childrenForDirection( of );
 			//var lobTestChild:Vector.<uint> = Oxel.childIDsForDirection( of );
 
-			var bt:Lighting = LightingPool.poolGet();
+			var bt:Lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
 			for ( var childIndex:int = 0; childIndex < 4; childIndex++ )
 			{
 				var noChild:Oxel = dchild[childIndex];

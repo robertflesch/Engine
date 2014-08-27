@@ -46,7 +46,7 @@ package com.voxelengine.worldmodel.models
 		public function get countInMeters():int { return _count/GRAINS_PER_SQUARE_METER };
 		
 		static private var _TempFlowInfo:FlowInfo = new FlowInfo();
-		static private var _TempBrightness:Lighting = LightingPool.poolGet();
+		static private var _TempBrightness:Lighting = LightingPool.poolGet( 0x12 );
 
 		private function initialize():void
 		{
