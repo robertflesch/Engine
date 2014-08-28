@@ -1882,14 +1882,23 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 	}
 	
 	public function projectOnLargerGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int, $addOrRemoveAmbient:Boolean ):void {
+		
 		// So I am evaluating a larger grain next to me.
 		// depending on my child location I may or may not have a face that effects me.
-		// yuck...
+
+		// if the nno is great then one size larger, do nothing.
+		if ( $o.gc.grain + 1 < $nno.gc.grain )
+			return;
+		
+		// the nno is 1 grain larger.
+		// So now I need to identify which child I am next to. Hm...
+		
 	}
 	
 	public function projectOnEqualGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int, $addOrRemoveAmbient:Boolean ):void {
 
 		if ( $nno.faceHas( Oxel.face_get_opposite( $af ) ) ) {
+			
 			if ( AMBIENT_ADD == $addOrRemoveAmbient ) {
 				// bump the count on edge of tested oxel.
 				$o.lighting.edgeValueSet( $face, $af, CORNER_BUMP_VAL );
@@ -1913,7 +1922,6 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 				$nno.quadRebuild( Oxel.face_get_opposite( $af ) );
 				
 				$nno.lighting.setEdgeAdjacent( $nno, Oxel.face_get_opposite( $af ), Oxel.face_get_opposite( $face ), CORNER_RESET_VAL );
-				
 			}
 		}
 	}
