@@ -4,7 +4,7 @@
   <output>
     <movie outputType="Application" />
     <movie input="" />
-    <movie path="../resources/bin/VoxelVerse.swf" />
+    <movie path="..\resources\bin\VoxelVerse.swf" />
     <movie fps="60" />
     <movie width="1920" />
     <movie height="1280" />
@@ -12,6 +12,7 @@
     <movie minorVersion="9" />
     <movie platform="Flash Player" />
     <movie background="#FFFFFF" />
+    <movie preferredSDK="Apache Flex 4.13.0 FP14.0 AIR14.0 en_US;4.13.0;" />
   </output>
   <!-- Other classes to be compiled into your SWF -->
   <classpaths>
@@ -42,7 +43,7 @@
     <option linkReport="" />
     <option loadExterns="" />
     <option staticLinkRSL="True" />
-    <option additional="-swf-version=21&#xA;-default-script-limits 256 65535" />
+    <option additional="-swf-version=25&#xA;-default-script-limits 256 65535" />
     <option compilerConstants="" />
     <option minorVersion="" />
   </build>
