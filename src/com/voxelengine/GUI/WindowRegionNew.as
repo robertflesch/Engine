@@ -36,6 +36,7 @@ public class WindowRegionNew extends VVPopup
 	
 	private var _region:Region = null;
 	private var _rbGroup:RadioButtonGroup = null;
+	private var _rbPPGroup:RadioButtonGroup = null;
 	
 		//DONE private var _name:String = "Some Friendly Name";
 		//DONE private var _desc:String = "Tell me about it";
@@ -66,8 +67,18 @@ public class WindowRegionNew extends VVPopup
 		
 		_region = $region
 
-		addElement( new Label( "ID: " + _region.regionId ) );
-		addElement( new Label( "Gravity" ) );
+//		addElement( new Label( "ID: " + _region.regionId ) );
+//		addElement( new Label( "Gravity" ) );
+
+		_rbPPGroup = new RadioButtonGroup( this );
+		var radioButtonsPP:DataProvider = new DataProvider();
+		radioButtonsPP.addAll( { label:"Public" }, { label:"Private" } );
+		eventCollector.addEvent( _rbPPGroup, ButtonsGroupEvent.GROUP_CHANGED
+		                       , function (event:ButtonsGroupEvent):void 
+							   {  _region.publicRegion = (0 == event.target.index ?  true : false) } );
+//							   {   Globals.GUIControl = true; _region.gravity = (0 == event.target.index ?  true : false) } );
+		_rbPPGroup.dataProvider = radioButtonsPP;
+		_rbPPGroup.index = 0;
 		
 		addLabel( this, "Name:", changeNameHandler, _region.name );
 		addElement( new Label( "Description" ) );
@@ -87,12 +98,12 @@ public class WindowRegionNew extends VVPopup
 		
 		 var createRegionButton:Button = new Button( "Create" );
 		eventCollector.addEvent( createRegionButton , UIMouseEvent.CLICK
-							   , function( e:UIMouseEvent ):void { Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CREATE_SUCCESS, _region.regionId ) ); remove(); } );
+							   ,create );
 		buttonPanel.addElement( createRegionButton );
 
 		 var cancelRegionButton:Button = new Button( "Cancel" );
 		eventCollector.addEvent( cancelRegionButton , UIMouseEvent.CLICK
-							   , function( e:UIMouseEvent ):void { Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CREATE_CANCEL, _region.regionId ) ); _region = null; remove(); } );
+							   , cancel );
 		buttonPanel.addElement( cancelRegionButton );
 	
 		addElement( buttonPanel );
@@ -108,6 +119,19 @@ public class WindowRegionNew extends VVPopup
 		// this does not...
 		display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
 		//display();
+	}
+	
+	private function create( e:UIMouseEvent ):void {
+		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CREATE_SUCCESS, _region.regionId ) );
+		remove();
+		new WindowSandboxList();
+	}
+	
+	private function cancel( e:UIMouseEvent ):void {
+		
+		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CREATE_CANCEL, _region.regionId ) );
+		remove();
+		new WindowSandboxList();
 	}
 	
 	private function pressWindow(e:UIMouseEvent):void
