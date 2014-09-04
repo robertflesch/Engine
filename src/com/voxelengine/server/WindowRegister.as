@@ -103,7 +103,7 @@ package com.voxelengine.server
 			trace( "userName: " + _userName + "  password: " + _password + "  email:" + _email );
 			PlayerIO.quickConnect.simpleRegister(
 									Globals.g_app.stage,
-									"voxelverse-lpeje46xj0krryqaxq0vog",
+									Globals.g_gamesNetworkID,
 									_userName,
 									_password,
 									_email,
