@@ -167,8 +167,8 @@ public class WindowSandboxList extends VVPopup
 		if ( li && li.data )
 		{
 			if ( Globals.MODE_LOCAL != Globals.mode )
-				VVServer.joinRoom( li.value );
-//				VVServer.joinRoom( li.data );
+//				VVServer.joinRoom( li.value );
+				VVServer.joinRoom( li.data );
 			else	
 				new WindowRegionDetail( li.data );	
 		}
