@@ -2,7 +2,9 @@
 package com.voxelengine.GUI
 {
 
+	import com.voxelengine.events.ModelMetadataEvent;
 	import com.voxelengine.server.Network;
+	import com.voxelengine.server.Persistance;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import org.flashapi.swing.*;
@@ -34,7 +36,6 @@ package com.voxelengine.GUI
 			
 			addElement( _listbox1 );
 			_listbox1.addEventListener(ListEvent.LIST_CHANGED, selectModel);
-			populateModels();
 			
 			var panelParentButton:Panel = new Panel( 200, 30 );
 			panelParentButton.layout.orientation = LayoutOrientation.VERTICAL;
@@ -58,18 +59,28 @@ package com.voxelengine.GUI
 			display();
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
+			
+			Globals.g_app.addEventListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, modelLoaded );
+			populateModels();
         }
 		
 		// Window events
 		private function onRemoved( event:UIOEvent ):void
  		{
+			Globals.g_app.removeEventListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, modelLoaded );
 			removeEventListener(UIOEvent.REMOVED, onRemoved );
+			_s_mi = null;
 		}
 		
 		private function selectModel(event:ListEvent):void 
 		{
 			// Globals.GUIControl = true;
-			_s_mi = event.target.data;
+			if ( Globals.online ) {
+				var key:String = event.target.data;
+				
+			}
+			else
+				_s_mi = event.target.data;
 //			remove();
 		}
 
@@ -85,15 +96,24 @@ package com.voxelengine.GUI
 		{
 			Log.out( "onChildModelFileSelected : " + e.toString() );
 			
-			var ii:InstanceInfo = new InstanceInfo();
-			ii.instanceGuid = Globals.getUID();
 			var fileName:String = e.currentTarget.name;
 			fileName = fileName.substr( 0, fileName.indexOf( "." ) );
-			ii.templateName = fileName;
+
+			Globals.g_app.addEventListener( ModelMetadataEvent.INFO_COLLECTED, metadataCollected );
+			new WindowModelMetadata( fileName );
+		}
+		
+		private function metadataCollected( e:ModelMetadataEvent ):void {
+			Globals.g_app.removeEventListener( ModelMetadataEvent.INFO_COLLECTED, metadataCollected );
+			
+			var ii:InstanceInfo = new InstanceInfo();
+			ii.instanceGuid = Globals.getUID();
+			var fileName:String = e.name;
+			ii.templateName = e.description;
 			ii.name = fileName;
-			//ii.positionSet = parentModel.worldToModel( Globals.controlledModel.instanceInfo.positionGet );
-			//var worldSpaceEndPoint:Vector3D = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( _viewDistance );
-			//ii.positionSet = instance.positionGet.add( worldSpaceEndPoint );
+			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
+			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
+			
 			Globals.g_modelManager.create( ii );
 		}
 		
@@ -121,10 +141,16 @@ package com.voxelengine.GUI
 			remove();
 		}
 		
+		private function modelLoaded( e:ModelMetadataEvent ):void
+		{
+			_listbox1.addItem( e.name + " - " + e.description, e.key );
+		}
+		
 		private function populateModels():void
 		{
 			if ( Globals.online ) {
-				
+				Persistance.loadPublicObjectsMetadata();
+				Persistance.loadUserObjectsMetadata( Network.userId );
 			}
 			else 
 			{

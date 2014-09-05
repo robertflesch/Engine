@@ -94,7 +94,7 @@ package com.voxelengine.server
 		{
 			//Globals.GUIControl = true;
 			PlayerIO.quickConnect.simpleConnect( Globals.g_app.stage
-											   , "voxelverse-lpeje46xj0krryqaxq0vog"
+											   , Globals.g_gamesNetworkID
 											   , _email
 											   , _password
 											   , connectSuccess

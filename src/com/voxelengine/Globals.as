@@ -62,6 +62,8 @@ package com.voxelengine {
 		public static var g_flowTaskController:TaskController =  new TaskController();
 		public static var g_lightTaskController:TaskController =  new TaskController();
 
+		public static var g_gamesNetworkID:String = "voxelverse-lpeje46xj0krryqaxq0vog";
+		//public static var g_gamesNetworkID:String = "servertestgame-co3lwnb10a4ytwvxddjtq";
 		
 		public static var g_debug:Boolean  = false;
 				
@@ -263,7 +265,7 @@ package com.voxelengine {
 		public static function get muted():Boolean { return g_muted }
 		public static function set muted(val:Boolean):void { g_muted = val; }
 		
-		private static var g_sandbox:Boolean = true;
+		private static var g_sandbox:Boolean = false;
 		public static function get sandbox():Boolean { return g_sandbox }
 		public static function set sandbox(val:Boolean):void { g_sandbox = val; }
 		

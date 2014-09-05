@@ -1892,12 +1892,31 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 		
 		// the nno is 1 grain larger.
 		// So now I need to identify which child I am next to. Hm...
+		if ( $nno.childrenHas() ) {
+			
+		}
+		else {
+			// The adjuenct face is larger
+			// So if $o is located on the edge, we influence one corner only
+			// if $o is in the center, there is nothing to do
+		}
 		
 	}
 	
 	public function projectOnEqualGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int, $addOrRemoveAmbient:Boolean ):void {
 
-		if ( $nno.faceHas( Oxel.face_get_opposite( $af ) ) ) {
+		if ( $nno.childrenHas() ) {
+			// Same grain size, but made up of smaller grainer.
+			// So grab the child kittycorner to $o
+			var oxelPair:Object = $nno.childrenForKittyCorner( $face, $af );
+			//if ( Globals.AIR != oxelPair.a.type ) {
+				//
+			//}
+			//if ( Globals.AIR != oxelPair.b.type ) {
+				//
+			//}
+		}
+		else if ( $nno.faceHas( Oxel.face_get_opposite( $af ) ) ) {
 			
 			if ( AMBIENT_ADD == $addOrRemoveAmbient ) {
 				// bump the count on edge of tested oxel.
@@ -1933,30 +1952,42 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 			case Globals.POSX:
 				if ( ( 1 == posX111 || 1 == posX100 ) && 0 == posX110 && 0 == posX101 )
 					return true;
+				if ( ( 2 == posX111 || 2 == posX100 ) && 1 == posX110 && 1 == posX101 )
+					return true;
 				break;
 				
 			case Globals.NEGX:
 				if ( ( 1 == negX011 || 1 == negX000 ) && 0 == negX010 && 0 == negX001 )
+					return true;
+				if ( ( 2 == negX011 || 2 == negX000 ) && 1 == negX010 && 1 == negX001 )
 					return true;
 				break;
 				
 			case Globals.NEGY:
 				if ( ( 1 == negY000 || 1 == negY101 ) && 0 == negY100 && 0 == negY001 )
 					return true;
+				if ( ( 2 == negY000 || 2 == negY101 ) && 1 == negY100 && 1 == negY001 )
+					return true;
 				break;
 				
 			case Globals.POSY:
 				if ( ( 1 == posY010 || 1 == posY111 ) && 0 == posY110 && 0 == posY011 )
+					return true;
+				if ( ( 2 == posY010 || 2 == posY111 ) && 1 == posY110 && 1 == posY011 )
 					return true;
 				break;
 
 			case Globals.POSZ:
 				if ( ( 1 == posZ001 || 1 == posZ111 ) && 0 == posZ011 && 0 == posZ101 )
 					return true;
+				if ( ( 2 == posZ001 || 2 == posZ111 ) && 1 == posZ011 && 1 == posZ101 )
+					return true;
 				break;
 				
 			case Globals.NEGZ:
 				if ( ( 1 == negZ000 || 1 == negZ110 ) && 0 == negZ100 && 0 == negZ010 )
+					return true;
+				if ( ( 2 == negZ000 || 2 == negZ110 ) && 1 == negZ100 && 1 == negZ010 )
 					return true;
 				break;
 				

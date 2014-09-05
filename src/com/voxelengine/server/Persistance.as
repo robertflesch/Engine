@@ -1,10 +1,13 @@
 ﻿package com.voxelengine.server 
 {
+	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.events.ModelMetadataEvent;
 	import com.voxelengine.events.PersistanceEvent;
 	import com.voxelengine.events.RegionEvent;
-	import com.voxelengine.events.RegionLoadedEvent;
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.LoginEvent;
+	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.Region;
 	import playerio.Client;
 	import playerio.BigDB;
@@ -18,6 +21,7 @@
 	{
 		static public const DB_TABLE_OBJECTS:String = "voxelModels";
 		static public const DB_TABLE_REGIONS:String = "regions";
+		static public const DB_PUBLIC:String = "public";
 		
 		static private var _table:String;
 		static private var _key:String;
@@ -26,8 +30,7 @@
 		static private var _errorHandler:Function;
 		static private var _isCreate:Boolean;
 		
-		static public function deleteKeys( $table:String, $keys:Array, $successHandler:Function, $errorHandler:Function ):void
-		{
+		static public function deleteKeys( $table:String, $keys:Array, $successHandler:Function, $errorHandler:Function ):void {
 			if ( Network.client )
 			{
 				Network.client.bigDB.deleteKeys( $table, $keys, $successHandler, $errorHandler );
@@ -38,8 +41,7 @@
 			}
 		}
 
-		static public function createObject( $table:String, $key:String, $data:Object, $successHandler:Function, $errorHandler:Function ):void
-		{
+		static public function createObject( $table:String, $key:String, $data:Object, $successHandler:Function, $errorHandler:Function ):void {
 			if ( Network.client )
 			{
 				Network.client.bigDB.createObject( $table, $key, $data, $successHandler, $errorHandler );
@@ -58,8 +60,7 @@
 			}
 		}
 		
-		static public function loadObject( $table:String, $key:String, $successHandler:Function, $errorHandler:Function ):void
-		{
+		static public function loadObject( $table:String, $key:String, $successHandler:Function, $errorHandler:Function ):void {
 			if ( Network.client )
 				Network.client.bigDB.load( $table, $key, $successHandler, $errorHandler );
 			else
@@ -75,8 +76,7 @@
 			}
 		}
 		
-		static public function loadKeys( $table:String, $key:Array, $successHandler:Function, $errorHandler:Function ):void
-		{
+		static public function loadKeys( $table:String, $key:Array, $successHandler:Function, $errorHandler:Function ):void {
 			if ( Network.client )
 				Network.client.bigDB.loadKeys( $table, $key , $successHandler, $errorHandler );
 			else
@@ -85,8 +85,7 @@
 			}
 		}
 		
-		static public function loadRange( $table:String, $index:String, $path:Array, $start:Object, $stop:Object, $limit:int, $successHandler:Function, $errorHandler:Function ):void
-		{
+		static public function loadRange( $table:String, $index:String, $path:Array, $start:Object, $stop:Object, $limit:int, $successHandler:Function, $errorHandler:Function ):void {
 			/*
 			 * Load a range of DatabaseObjects from a table using the specified index.
 			 * @param table The table to load the DatabaseObject from
@@ -109,8 +108,7 @@
 			}
 		}
 		
-		static private function onLoginSuccessCreateObject(event : LoginEvent ) : void
-		{
+		static private function onLoginSuccessCreateObject(event : LoginEvent ) : void {
 			Globals.g_app.stage.removeEventListener( LoginEvent.LOGIN_SUCCESS, onLoginSuccessCreateObject );
 			if ( _isCreate )
 			{
@@ -135,8 +133,7 @@
 			}
 		}
 		
-		static private function onLoginFailureCreateObject(event : LoginEvent ) : void
-		{
+		static private function onLoginFailureCreateObject(event : LoginEvent ) : void {
 			Globals.g_app.stage.removeEventListener( LoginEvent.LOGIN_FAILURE, onLoginFailureCreateObject );
 			if ( _isCreate )
 				Log.out( "Persistance.onLoginFailureCreateObject.createObject - ERROR - ERROR - ERROR Login Failure", Log.ERROR );
@@ -146,6 +143,7 @@
 			_errorHandler( event.error );	
 		}
 
+		///////////////// REGION ////////////////////////////////
 		static public function loadRegions( $userName:String ):void {
 			
 			loadRange( Persistance.DB_TABLE_REGIONS
@@ -154,48 +152,91 @@
 						 , null
 						 , null
 						 , 100
-						, loadKeysSuccessHandler
+						, loadRegionKeysSuccessHandler
 						, function (e:PlayerIOError):void {  Log.out( "Persistance.errorHandler - e: " + e ); } );
 		}
 		
-		static private function loadKeysSuccessHandler( dba:Array ):void
-		{
+		static private function loadRegionKeysSuccessHandler( dba:Array ):void {
+			
 			trace( "Persistance.loadKeysSuccessHandler - regions loaded: " + dba.length );
 			for each ( var dbo:DatabaseObject in dba )
 			{
-				loadFromDBO( dbo );
+				loadRegionFromDBO( dbo );
 			}
 		}
 		
-		static public function loadFromDBO( dbo:DatabaseObject):void
+		static private function loadRegionFromDBO( dbo:DatabaseObject):void
 		{
 			var newRegion:Region = new Region();
-			//var regionGuid:String = dbo.key;
+			newRegion.admin = dbo.admin,
 			newRegion.databaseObject = dbo;
-			newRegion.name = dbo.name;
 			newRegion.desc = dbo.description;
-			//newRegion.worldId = dbo.world;
+			newRegion.name = dbo.name;
+			newRegion.owner = dbo.owner
+			newRegion.worldId = dbo.world;
 			newRegion.regionId = dbo.region;
-			//newRegion.template = dbo.template;
-			//newRegion.owner = dbo.owner
-			//newRegion.editors	: GetEditorsList(),
-			//newRegion.admin: GetAdminList(),
-			//newRegion.created = dbo.created;
-			//newRegion.modified = dbo.modified;
-			
+			newRegion.editors = dbo.editors;
+			newRegion.created = dbo.created;
+			newRegion.modified = dbo.modified;
 			var $ba:ByteArray = dbo.data as ByteArray;
+			
+			Log.out( "Persistance.loadFromDBO - regionJson: " + newRegion.name + "  owner: " + newRegion.owner );
+			
 			//$ba.uncompress();
 			$ba.position = 0;
 			// how many bytes is the modelInfo
 			var strLen:int = $ba.readInt();
 			// read off that many bytes
 			var regionJson:String = $ba.readUTFBytes( strLen );
-			Log.out( "Persistance.loadFromDBO - regionJson: " + regionJson );
 			//regionJson = decodeURI(regionJson);
 			newRegion.processRegionJson( regionJson );
 		}
 
+		///////////////// MODELS ////////////////////////////////
+		static public function loadUserObjectsMetadata( userName:String ):void {
+			Persistance.loadRange( Persistance.DB_TABLE_OBJECTS
+						 , "voxelModelOwner"
+						 , [userName]
+						 , null
+						 , null
+						 , 100
+						, loadObjectsMetadata
+						, function (e:PlayerIOError):void {  Log.out( "ModelManager.errorHandler - e: " + e ); } );
+		}
 		
+		static public function loadPublicObjectsMetadata():void {
+			Persistance.loadRange( Persistance.DB_TABLE_OBJECTS
+						 , "voxelModelOwner"
+						 , [Persistance.DB_PUBLIC]
+						 , null
+						 , null
+						 , 100
+						, loadObjectsMetadata
+						, function (e:PlayerIOError):void {  Log.out( "ModelManager.errorHandler - e: " + e ); } );
+		}
+
+		static private function loadObjectsMetadata( dba:Array ):void
+		{
+			for each ( var dbo:DatabaseObject in dba )
+			{
+				loadModelMetadataFromDBO( dbo );
+			}
+		}
 		
+		static private function loadModelMetadataFromDBO( dbo:DatabaseObject):void
+		{
+			var name:String = dbo.name;
+			var description:String = dbo.description;
+			var key:String = dbo.key;
+			var owner:String = dbo.owner;
+			var ba:ByteArray = dbo.data;
+			var dbo:DatabaseObject = dbo;
+			var template:String = dbo.template;
+			
+			Log.out( "Persistance.loadModelMetadataFromDBO - name: " + name + "  description: " + description + "  key: " + key + "  owner: " + owner );
+			
+			Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, name, description, key, owner, template, ba, dbo ) );
+		}
+		///////////////// MODELS ////////////////////////////////
 	}	
 }

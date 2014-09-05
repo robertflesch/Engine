@@ -382,9 +382,135 @@ package com.voxelengine.worldmodel.oxel
 
 			return Globals.BAD_OXEL;
 		}
+/*/////////////
+				if ( Globals.POSX == $af ) {
+				}
+				else if ( Globals.NEGX == $af ) {
+				}
+				else if ( Globals.POSY == $af ) {
+				}
+				else if ( Globals.NEGY == $af ) {
+				}
+				else if ( Globals.POSZ == $af ) {
+				}
+				else if ( Globals.NEGZ == $af ) {
+				}
+//////////////*/
+		public function childrenForKittyCorner( $face:int, $af:int ):Object {
+			var oxelPair:Object = new Object();
+			
+			if ( Globals.POSX == $face ) {
+				if ( Globals.POSY == $af ) {
+					oxelPair.a = children[0];
+					oxelPair.b = children[4];
+				}
+				else if ( Globals.NEGY == $af ) {
+					oxelPair.a = children[2];
+					oxelPair.b = children[6];
+				}
+				else if ( Globals.POSZ == $af ) {
+					oxelPair.a = children[0];
+					oxelPair.b = children[2];
+				}
+				else if ( Globals.NEGZ == $af ) {
+					oxelPair.a = children[4];
+					oxelPair.b = children[6];
+				}
+			}
+			else if ( Globals.NEGX == $face ) {
+				if ( Globals.POSY == $af ) {
+					oxelPair.a = children[1];
+					oxelPair.b = children[5];
+				}
+				else if ( Globals.NEGY == $af ) {
+					oxelPair.a = children[3];
+					oxelPair.b = children[7];
+				}
+				else if ( Globals.POSZ == $af ) {
+					oxelPair.a = children[3];
+					oxelPair.b = children[1];
+				}
+				else if ( Globals.NEGZ == $af ) {
+					oxelPair.a = children[7];
+					oxelPair.b = children[5];
+				}
+			}
+			else if ( Globals.POSY == $face ) {
+				if ( Globals.POSX == $af ) {
+					oxelPair.a = children[0];
+					oxelPair.b = children[4];
+				}
+				else if ( Globals.NEGX == $af ) {
+					oxelPair.a = children[1];
+					oxelPair.b = children[4];
+				}
+				else if ( Globals.POSZ == $af ) {
+					oxelPair.a = children[4];
+					oxelPair.b = children[5];
+				}
+				else if ( Globals.NEGZ == $af ) {
+					oxelPair.a = children[0];
+					oxelPair.b = children[1];
+				}
+			}
+			else if ( Globals.NEGY == $face ) {
+				if ( Globals.POSX == $af ) {
+					oxelPair.a = children[2];
+					oxelPair.b = children[6];
+				}
+				else if ( Globals.NEGX == $af ) {
+					oxelPair.a = children[3];
+					oxelPair.b = children[7];
+				}
+				else if ( Globals.POSZ == $af ) {
+					oxelPair.a = children[2];
+					oxelPair.b = children[3];
+				}
+				else if ( Globals.NEGZ == $af ) {
+					oxelPair.a = children[6];
+					oxelPair.b = children[7];
+				}
+			}
+			else if ( Globals.POSZ == $face ) {
+				if ( Globals.POSX == $af ) {
+					oxelPair.a = children[0];
+					oxelPair.b = children[2];
+				}
+				else if ( Globals.NEGX == $af ) {
+					oxelPair.a = children[1];
+					oxelPair.b = children[3];
+				}
+				else if ( Globals.POSY == $af ) {
+					oxelPair.a = children[0];
+					oxelPair.b = children[1];
+				}
+				else if ( Globals.NEGY == $af ) {
+					oxelPair.a = children[2];
+					oxelPair.b = children[3];
+				}
+			}
+			else if ( Globals.NEGZ == $face ) {
+				if ( Globals.POSX == $af ) {
+					oxelPair.a = children[5];
+					oxelPair.b = children[7];
+				}
+				else if ( Globals.NEGX == $af ) {
+					oxelPair.a = children[4];
+					oxelPair.b = children[6];
+				}
+				else if ( Globals.POSY == $af ) {
+					oxelPair.a = children[4];
+					oxelPair.b = children[5];
+				}
+				else if ( Globals.NEGY == $af ) {
+					oxelPair.a = children[6];
+					oxelPair.b = children[7];
+				}
+			}
+			return oxelPair;
+		}
 		
-		
-		// this get the children in that direction whether they exist or not. if not makes them
+		// this get the child in that direction whether it exists or not. if not makes them
 		public function childGetFromDirection( $dir:int, $level:int, opposite:Boolean ):Oxel {
 			
 			if ( !childrenHas() )
@@ -968,8 +1094,10 @@ package com.voxelengine.worldmodel.oxel
 		}
 		
 		// Mark all of the faces opposite this oxel as dirty
-		public function neighborsMarkDirtyFaces( $guid:String, $size:int ):void {
+		// propogate count is to keep it from spreading too far, by maybe this should be distance, rather then hard count?
+		public function neighborsMarkDirtyFaces( $guid:String, $size:int, $propogateCount:int = 2 ):void {
 			var no:Oxel = null;
+			$propogateCount--;
 			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 			{
 				no = neighbor(face);
@@ -982,8 +1110,15 @@ package com.voxelengine.worldmodel.oxel
 					// I was finding that this could spread way out... 8/7/14
 					//no.neighborsMarkDirtyFaces( $guid, $size - gc.size() );
 				//}
-				else if ( no.hasAlpha && no.faceHas( Oxel.face_get_opposite( face ) ) )
-					no.face_mark_dirty( $guid, Oxel.face_get_opposite( face ) );
+				else if ( no.hasAlpha ) {
+					// Water, leaf, ??
+					if ( no.faceHas( Oxel.face_get_opposite( face ) ) )
+						no.face_mark_dirty( $guid, Oxel.face_get_opposite( face ) );
+					// So now I can mark my neighbors dirty, decrementing each time.
+					if ( 0 < $size && 0 < $propogateCount ) {
+						no.neighborsMarkDirtyFaces( $guid, $size, $propogateCount );
+					}
+				}
 				//else if ( no.isSolid || no.childrenHas() ) {
 				else // neighbor is same size, with out alpha
 					no.face_mark_dirty( $guid, Oxel.face_get_opposite( face ) );
@@ -1120,7 +1255,7 @@ package com.voxelengine.worldmodel.oxel
 			if ( true == $ti.lightInfo.fullBright && false == $ti.lightInfo.lightSource )
 				_lighting.lightFullBright();
 			
-			_lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
+//			_lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
 		}
 
 		protected function faces_build_terminal():void {

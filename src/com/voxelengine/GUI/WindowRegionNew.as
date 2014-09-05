@@ -3,6 +3,9 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.RegionEvent;
+import com.voxelengine.events.RegionLoadedEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.server.Persistance;
 import com.voxelengine.worldmodel.Region;
 import flash.display.DisplayObjectContainer;
 import org.flashapi.swing.*;
@@ -66,6 +69,11 @@ public class WindowRegionNew extends VVPopup
 		//_modalObj = new ModalObject( this );
 		
 		_region = $region
+		_region.owner = Persistance.DB_PUBLIC;
+		_region.gravity = true;
+		_region.name = Network.userId + "-" + int( Math.random() * 1000 );
+		_region.desc = "Please enter something meaningful here";
+		_region.changed = true;
 
 //		addElement( new Label( "ID: " + _region.regionId ) );
 //		addElement( new Label( "Gravity" ) );
@@ -73,9 +81,14 @@ public class WindowRegionNew extends VVPopup
 		_rbPPGroup = new RadioButtonGroup( this );
 		var radioButtonsPP:DataProvider = new DataProvider();
 		radioButtonsPP.addAll( { label:"Public" }, { label:"Private" } );
+		if ( Persistance.DB_PUBLIC == _region.owner )
+			_rbPPGroup.index = 0;
+		else 	
+			_rbPPGroup.index = 1;
+
 		eventCollector.addEvent( _rbPPGroup, ButtonsGroupEvent.GROUP_CHANGED
 		                       , function (event:ButtonsGroupEvent):void 
-							   {  _region.publicRegion = (0 == event.target.index ?  true : false) } );
+							   {  _region.owner = (0 == event.target.index ?  Persistance.DB_PUBLIC : Network.userId ) } );
 //							   {   Globals.GUIControl = true; _region.gravity = (0 == event.target.index ?  true : false) } );
 		_rbPPGroup.dataProvider = radioButtonsPP;
 		_rbPPGroup.index = 0;
@@ -87,6 +100,11 @@ public class WindowRegionNew extends VVPopup
 		_rbGroup = new RadioButtonGroup( this );
 		var radioButtons:DataProvider = new DataProvider();
 		radioButtons.addAll( { label:"Use Gravity" }, { label:"NO Gravity. " } );
+		if ( _region.gravity )
+			_rbGroup.index = 0;
+		else 	
+			_rbGroup.index = 1;
+
 		eventCollector.addEvent( _rbGroup, ButtonsGroupEvent.GROUP_CHANGED
 		                       , function (event:ButtonsGroupEvent):void 
 							   {  _region.gravity = (0 == event.target.index ?  true : false) } );
@@ -122,7 +140,8 @@ public class WindowRegionNew extends VVPopup
 	}
 	
 	private function create( e:UIMouseEvent ):void {
-		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CREATE_SUCCESS, _region.regionId ) );
+		//Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CREATE_SUCCESS, _region.regionId ) );
+		Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_EVENT_LOADED, _region ) );
 		remove();
 		new WindowSandboxList();
 	}
@@ -171,7 +190,8 @@ public class WindowRegionNew extends VVPopup
 	private function addLabel( parentPanel:UIContainer, label:String, changeHandler:Function, initialValue:String, inputEnabled:Boolean = false ):LabelInput
 	{
 		var li:LabelInput = new LabelInput( label, initialValue );
-		li.labelControl.width = 120;
+		li.labelControl.width = 40;
+		li.editableText.width = 150;
 		if ( null != changeHandler )
 			li.editableText.addEventListener( TextEvent.EDITED, changeHandler );
 		else

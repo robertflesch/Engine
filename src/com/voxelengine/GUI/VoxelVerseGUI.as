@@ -126,7 +126,7 @@ package com.voxelengine.GUI
 				if ( StageDisplayState.FULL_SCREEN_INTERACTIVE == Globals.g_app.stage.displayState )
 					Globals.g_app.stage.mouseLock = false;
 			}
-			Log.out( "VoxelVerseGui.openWindowCount - adjust - current count: " + _openWindowCount );
+//			Log.out( "VoxelVerseGui.openWindowCount - adjust - current count: " + _openWindowCount );
 		}
 		
 		

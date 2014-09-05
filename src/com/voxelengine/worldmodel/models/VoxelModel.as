@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models
 {
 	import com.voxelengine.events.LightEvent;
+	import com.voxelengine.GUI.VoxelVerseGUI;
 	import com.voxelengine.pools.LightingPool;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.oxel.Lighting;
@@ -71,7 +72,7 @@ package com.voxelengine.worldmodel.models
 		private var 	_initialized:Boolean 			= false; // INSTANCE NOT EXPORTED
 		private var 	_visible:Boolean 				= true; // Not support yet
 		private var 	_stateLock:Boolean 				= false; // Not support yet
-		protected var 	_modified:Boolean 				= false; // INSTANCE NOT EXPORTED
+		protected var 	_changed:Boolean 				= false; // INSTANCE NOT EXPORTED
 		protected var 	_complete:Boolean 				= false; // INSTANCE NOT EXPORTED
 		protected var 	_selected:Boolean 				= false; // INSTANCE NOT EXPORTED
 		private var 	_onSolidGround:Boolean			= false; // INSTANCE NOT EXPORTED
@@ -86,8 +87,6 @@ package com.voxelengine.worldmodel.models
 		private var 	_version:String 				= "0"; // INSTANCE NOT EXPORTED
 		private var 	_clipVelocityFactor:Attribute 	= new Attribute(95); // INSTANCE NOT EXPORTED
 		protected var 	_databaseObject:DatabaseObject 	= null; // INSTANCE NOT EXPORTED
-		protected var 	_name:String 					= "EmptyName"; // saved in bigDB metadata
-		protected var 	_description:String 			= "EmptyDesc"; // saved in bigDB metadata
 		private var 	_anim:Animation 				= null;
 		private var 	_camera:Camera					= new Camera();
 		private var 	_lightIDNext:uint 				= 1024; // reserve space for ?
@@ -122,13 +121,9 @@ package com.voxelengine.worldmodel.models
 		public function set visible(val:Boolean):void 				{ _visible = val; }
 		public function get modelInfo():ModelInfo 					{ return _modelInfo; }
 		public function set modelInfo(val:ModelInfo):void			{ _modelInfo = val; }
-		public function get name():String							{ return _name; }
-		public function set name(val:String):void					{ _name = val; }
-		public function get description():String					{ return _description; }
-		public function set description(val:String):void			{ _description = val; }
 		public function get children():Vector.<VoxelModel>			{ return _children; }
-		public function get modified():Boolean						{ return _modified; }
-		public function set modified( $val:Boolean):void			{ _modified = $val; }
+		public function get changed():Boolean						{ return _changed; }
+		public function set changed( $val:Boolean):void			{ _changed = $val; }
 		public function get selected():Boolean 						{ return _selected; }
 		public function set selected(val:Boolean):void  			{ _selected = val; }
 		public function get onSolidGround():Boolean 				{ return _onSolidGround; }
@@ -458,7 +453,7 @@ package com.voxelengine.worldmodel.models
 			// requires some refactoring but not hard - RSF
 			var oldOxel:Oxel = oxel.childGetOrCreate( $gc );
 			var oldType:int = oldOxel.type;
-			var oldTypeInfo:TypeInfo = Globals.Info[oldType]
+			var oldTypeInfo:TypeInfo = Globals.Info[oldType];
 			if ( oldOxel.lighting ) {
 				if ( oldTypeInfo.lightInfo.lightSource )
 					var oldLightID:uint = oldOxel.lighting.lightIDGet();
@@ -476,7 +471,7 @@ package com.voxelengine.worldmodel.models
 			
 			if ( Globals.BAD_OXEL != changedOxel )
 			{
-				_modified = true;
+				_changed = true;
 				result = true;
 				var typeInfo:TypeInfo = Globals.Info[$type];
 			
@@ -526,26 +521,26 @@ package com.voxelengine.worldmodel.models
 		
 		public function write_sphere(cx:int, cy:int, cz:int, radius:int, what:int, gmin:uint = 0):void
 		{
-			_modified = true;
+			_changed = true;
 			oxel.write_sphere( instanceInfo.instanceGuid, cx, cy, cz, radius, what, gmin);
 		}
 		
 		public function empty_square(cx:int, cy:int, cz:int, radius:int, gmin:uint = 0):void
 		{
-			_modified = true;
+			_changed = true;
 			oxel.empty_square( instanceInfo.instanceGuid, cx, cy, cz, radius, gmin);
 		}
 		
 		public function effect_sphere(cx:int, cy:int, cz:int, ie:ImpactEvent ):void {
 			_timer = getTimer();
-			_modified = true;
+			_changed = true;
 			oxel.effect_sphere( instanceInfo.instanceGuid, cx, cy, cz, ie );
 			//Log.out( "VoxelModel.effect_sphere - radius: " + ie.radius + " gmin: " + ie.detail + " took: " + (getTimer() - _timer) );
 			//oxel.mergeRecursive(); // Causes bad things to happen since we dont regen faces!
 		}
 		public function empty_sphere(cx:int, cy:int, cz:int, radius:Number, gmin:uint = 0):void {
 			_timer = getTimer();
-			_modified = true;
+			_changed = true;
 			oxel.write_sphere( instanceInfo.instanceGuid, cx, cy - 1, cz, radius - 1.5, Globals.AIR, gmin);
 			
 			//Log.out( "VoxelModel.empty_sphere - radius: " + radius + " gmin: " + gmin + " took: " + (getTimer() - _timer) );
@@ -991,41 +986,70 @@ package com.voxelengine.worldmodel.models
 				// not save yet, so nothing to do.
 			}
 			
-			_modified = false;
+			_changed = false;
+		}
+///////////////////////////////////////		
+		private function metadata( ba: ByteArray ):Object
+		{
+			return { 
+				data: ba,
+				description: instanceInfo.templateName,
+				name: instanceInfo.name,
+				owner: Network.userId,  //owner: _publicRegion ? "public": Network.userId,
+				template: modelInfo.template
+			}
 		}
 		
+		private function created(o:DatabaseObject):void 
+		{ 
+			if ( o )
+				databaseObject = o;
+			//Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS ) ); 
+			Log.out( "VoxelModel.created: " + instanceInfo.instanceGuid ); 
+			_changed = false;
+		}	
+		
+		private function saved():void 
+		{ 
+			Log.out( "VoxelModel.saved: " + instanceInfo.instanceGuid ); 
+			_changed = false;
+		}	
+		
+		private function failed(e:PlayerIOError):void 
+		{ 
+//			Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_FAILURE ) ); 
+			Log.out( "VoxelModel.save - error saving: " + instanceInfo.instanceGuid + " error: " + e.message ); 
+			_changed = true;
+		} 
+
 		public function save():void
 		{
-			var ba:ByteArray;
+			if ( !changed )
+				return;
+				
+			Log.out("VoxelModel.save - saving changes to: " + instanceInfo.templateName  );
+			var ba:ByteArray;	
 			if (databaseObject)
 			{
-				trace("VoxelModel.save - saving object back to BigDB: " + instanceInfo.instanceGuid);
+				Log.out("VoxelModel.save - saving object back to BigDB: " + instanceInfo.templateName );
 				ba = toByteArray();
 				databaseObject.data = ba;
-				databaseObject.save(false, false, function created():void
-					{
-						Log.out("VoxelModel.save.databaseObject - saved: " + instanceInfo.instanceGuid);
-					}, function(e:PlayerIOError):void
-					{
-						Log.out("VoxelModel.save.databaseObject - error saving: " + instanceInfo.instanceGuid + " error data: " + e);
-					});
+				databaseObject.save( false
+				                   , false
+								   , saved
+								   , failed );
 			}
 			else
 			{
 				Globals.g_modelManager.createInstanceFromTemplate(this);
 				ba = toByteArray();
-				trace("VoxelModel.save - creating new object: " + instanceInfo.instanceGuid);
-				Persistance.createObject("voxelModels", instanceInfo.instanceGuid, {owner: Network.userId, template: modelInfo.template, name: _name, description: _description, data: ba}, function(o:DatabaseObject):void
-					{
-						databaseObject = o;
-						Log.out("VoxelModel.save - created: " + instanceInfo.instanceGuid + "  setting database object to: " + databaseObject );
-					}, function(e:PlayerIOError):void
-					{
-						Log.out("VoxelModel.save - error creating: " + instanceInfo.instanceGuid + " error data: " + e);
-					});
+				Log.out("VoxelModel.save - creating new object: " + instanceInfo.templateName );
+				Persistance.createObject( Persistance.DB_TABLE_OBJECTS
+								        , instanceInfo.instanceGuid
+								        , metadata( ba )
+								        , created
+								        , failed );
 			}
-			
-			_modified = false;
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1675,7 +1699,7 @@ Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );
 				
 			}
 			else if ( ModelEvent.MODEL_MODIFIED && $me.instanceGuid == instanceInfo.instanceGuid ) {
-				modified = true;
+				changed = true;
 			}
 		}
 		
@@ -1718,7 +1742,7 @@ Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );
 		// these are overriden in subclasses to allow for custom movement
 		protected function onKeyDown(e:KeyboardEvent):void
 		{
-			if (Keyboard.TAB == e.keyCode)
+			if (Keyboard.TAB == e.keyCode && 0 == VoxelVerseGUI.openWindowCount )
 			{
 				camera.next();
 				

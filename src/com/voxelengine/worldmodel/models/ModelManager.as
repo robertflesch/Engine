@@ -394,14 +394,7 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 			// check all models to see if they have changed, if so save them to server.
 			for each ( var vm:VoxelModel in _modelInstances )
 			{
-				if ( vm.modified )
-				{
-					Log.out( "ModelManager.save - save changes to model: " + vm.instanceInfo.templateName );
-					vm.save();
-				}
-				else
-					Log.out( "ModelManager.save - unmodified: " + vm.instanceInfo.templateName );
-
+				vm.save();
 			}
 		}
 		
@@ -443,7 +436,8 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 				if ( vm && true == vm.instanceInfo.dead )
 				{
 					hasDead = true;
-					vm.removeFromBigDB();
+					// This seems like a REALLY bad idea.
+					// vm.removeFromBigDB();
 					break;
 				}
 			}
@@ -1087,21 +1081,26 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 
 		public function getModelJson( outString:String ):String {
 			var count:int = 0;
-			for each ( var vm:VoxelModel in _modelInstances )
-				count++;
+			//for each ( var vm:VoxelModel in _modelInstances )
+			//	count++;
+			var instanceData:Vector.<String> = new Vector.<String>;
 				
 			for each ( var instance:VoxelModel in _modelInstances )
 			{
-				if ( instance )
+				if ( instance  )
 				{
 					if ( instance is Player )
 						continue;
-					outString += instance.getJSON();
-					count--;
-					// add commas to all but the last model
-					if ( count )
-						outString += ","
+					instanceData.push( instance.getJSON() );	
 				}
+			}
+			
+			var len:int = instanceData.length;
+			for ( var index:int; index < len; index++ ) {
+				outString += instanceData[index];
+				if ( index == len - 1 )
+					continue;
+				outString += ",";
 			}
 			return outString;
 		}
@@ -1166,27 +1165,6 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 			return count;
 		}
 		
-		public function loadUserObjects( userName:String, callbackFunction:Function ):void {
-			Persistance.loadRange( Persistance.DB_TABLE_OBJECTS
-						 , "voxelModelOwner"
-						 , [userName]
-						 , null
-						 , null
-						 , 100
-						, callbackFunction
-						, function (e:PlayerIOError):void {  Log.out( "ModelManager.errorHandler - e: " + e ); } );
-		}
-		
-		public function loadPublicObjects( userName:String, callbackFunction:Function ):void {
-			Persistance.loadRange( Persistance.DB_TABLE_OBJECTS
-						 , "voxelModelOwner"
-						 , ["Public"]
-						 , null
-						 , null
-						 , 100
-						, callbackFunction
-						, function (e:PlayerIOError):void {  Log.out( "ModelManager.errorHandler - e: " + e ); } );
-		}
 
 		public function TestCheckForFlow():void
 		{

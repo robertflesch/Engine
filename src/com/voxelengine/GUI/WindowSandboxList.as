@@ -4,6 +4,8 @@ package com.voxelengine.GUI
 import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.RegionLoadedEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.server.Persistance;
 import com.voxelengine.server.VVServer;
 import com.voxelengine.worldmodel.Region;
 import org.flashapi.swing.*;
@@ -90,7 +92,7 @@ public class WindowSandboxList extends VVPopup
 		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
 		eventCollector.addEvent( this, UIMouseEvent.PRESS, pressWindow );
 		
-		Globals.g_app.addEventListener( RegionEvent.REGION_CACHE_COMPLETE, regionCacheComplete );
+		//Globals.g_app.addEventListener( RegionEvent.REGION_CACHE_COMPLETE, regionCacheComplete );
 		Globals.g_app.addEventListener( RegionLoadedEvent.REGION_EVENT_LOADED, regionLoadedEvent );
 		
 		if ( bar )
@@ -178,15 +180,15 @@ public class WindowSandboxList extends VVPopup
 	private function displaySelectedRegionList( type:String ):void
 	{
 		_listbox1.removeAll();
-		if ( Globals.MODE_LOCAL == type )
+		if ( Globals.MODE_LOCAL == Globals.mode )
 		{
 			populateSandboxListFromLocal();
 		}
-		else if ( Globals.MODE_PRIVATE == type )
+		else if ( Globals.MODE_PRIVATE == Globals.mode )
 		{
 			populateSandboxListFromPrivate();
 		}
-		else if ( Globals.MODE_PUBLIC == type )
+		else if ( Globals.MODE_PUBLIC == Globals.mode )
 		{
 			populateSandboxListFromPublic();
 		}
@@ -222,7 +224,16 @@ public class WindowSandboxList extends VVPopup
 	private function regionLoadedEvent( e: RegionLoadedEvent ):void
 	{
 		Log.out( "WindowSandboxList.regionLoadedEvent - adding regionId: " + e.region.name );
-		_listbox1.addItem( e.region.name, e.region.regionId );
+		if ( Globals.MODE_PRIVATE == Globals.mode )
+		{
+			if ( Network.userId == e.region.owner )
+				_listbox1.addItem( e.region.name, e.region.regionId );
+		}
+		else if ( Globals.MODE_PUBLIC == Globals.mode )
+		{
+			if ( Persistance.DB_PUBLIC == e.region.owner )
+				_listbox1.addItem( e.region.name, e.region.regionId );
+		}
 	}
 	
 }
