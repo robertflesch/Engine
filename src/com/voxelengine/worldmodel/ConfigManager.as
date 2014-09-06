@@ -29,6 +29,7 @@ package com.voxelengine.worldmodel
 		private var _showHelp:Boolean = true;
 		private var _showEditMenu:Boolean = true;
 		private var _showButtons:Boolean = true;
+		private var _regionJson:Object
 		
 		public 	var _sr:String = "";
 		
@@ -48,33 +49,25 @@ package com.voxelengine.worldmodel
 		public function onConfigLoadedAction(event:Event):void
 		{
 			var jsonString:String = StringUtil.trim(String(event.target.data));
-			var regionJson:Object = JSON.parse(jsonString);
-			var type:String = regionJson.config.typeName;
-			_showHelp = regionJson.config.showHelp;
-			_showEditMenu = regionJson.config.showEditMenu;
-			_showButtons = regionJson.config.showButtons;
+			_regionJson = JSON.parse(jsonString);
+			var type:String = _regionJson.config.typeName;
+			_showHelp = _regionJson.config.showHelp;
+			_showEditMenu = _regionJson.config.showEditMenu;
+			_showButtons = _regionJson.config.showButtons;
 			
 			TypeInfo.loadTypeData(type);
 			
-			Globals.g_regionManager.request( regionJson.config.region.startingRegion )
-			Globals.g_app.addEventListener( RegionEvent.REGION_STARTING_LOADED, onRegionStartingLoaded );
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 		}   
 		
 		private function onTypesLoaded( $e:LoadingEvent ):void
 		{
+			// This gives the engine a chance to load up the typeInfo file
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
-			// used to load player here
+			
+			Globals.g_regionManager.request( _regionJson.config.region.startingRegion )
 		}
 
-		private function onRegionStartingLoaded( $e:RegionEvent ):void
-		{
-			Globals.g_app.removeEventListener( RegionEvent.REGION_STARTING_LOADED, onRegionStartingLoaded );
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, $e.regionId ) ); 
-			if ( !Globals.player )
-				Globals.createPlayer();
-		}
-		
 		public function errorAction(e:IOErrorEvent):void
 		{
 			trace( "ConfigManager.errorAction: " + e.toString());

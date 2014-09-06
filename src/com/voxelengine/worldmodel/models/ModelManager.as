@@ -1115,8 +1115,10 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 					if (vm is Player)
 						if ( !$removePlayer )
 							continue;
-						else
+						else {
+							Globals.player.loseControl( vm );
 							Globals.player = null;
+						}
 					trace( "ModelManager.removeAllModelInstances - marking as dead: " + vm.instanceInfo.instanceGuid );
 					markDead( vm.instanceInfo.instanceGuid );
 				}

@@ -215,6 +215,10 @@ package com.voxelengine.worldmodel
 			var count:int = _modelManager.loadRegionObjects(_JSON.region);
 			if ( 0 < count )
 				_loaded = false;
+				
+			if ( !Globals.player )
+				Globals.createPlayer();
+				
 			Log.out( "Region.load - completed processing on: " + name );
 		}		
 

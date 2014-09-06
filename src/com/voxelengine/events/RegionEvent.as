@@ -20,10 +20,7 @@ package com.voxelengine.events
 		static public const REQUEST_PRIVATE:String					= "REQUEST_PRIVATE";
 		static public const REQUEST_PUBLIC:String					= "REQUEST_PUBLIC";
 		
-		// Used by the config manager to tell when the starting region is loaded
-		static public const REGION_STARTING_LOADED:String			= "REGION_STARTING_LOADED";
-		
-		// A new region has been added to the regions db
+		// tells the region manager to load this region
 		static public const REGION_LOAD:String						= "REGION_LOAD";
 		// dispatched at the begining of a region load
 		static public const REGION_LOAD_BEGUN:String				= "REGION_LOAD_BEGUN";

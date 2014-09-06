@@ -89,11 +89,11 @@ public class RegionManager
 		var fileNamePathWithExt:String = Globals.regionPath + $regionId + ".rjson"
 		Log.out( "RegionManager.request - loading: " + fileNamePathWithExt );
 		var _urlLoader:CustomURLLoader = new CustomURLLoader(new URLRequest( fileNamePathWithExt ));
-		_urlLoader.addEventListener(Event.COMPLETE, onRegionLoadedAction);
+		_urlLoader.addEventListener(Event.COMPLETE, onRegionLoadedActionFromFile );
 		_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, function (e:IOErrorEvent):void { Log.out("RegionManager.errorAction: " + e.toString(), Log.ERROR); }	);			
 	}
 
-	private function onRegionLoadedAction(event:Event):void
+	private function onRegionLoadedActionFromFile(event:Event):void
 	{
 		Log.out( "RegionManager.onRegionLoadedAction" );
 		var req:URLRequest = CustomURLLoader(event.target).request;			
@@ -105,7 +105,7 @@ public class RegionManager
 		// This adds it to the list of regions
 		Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
 		// This tells the config manager that the local region was loaded and is ready to load rest of data.
-		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_STARTING_LOADED, regionId ) );
+		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, regionId ) ); 
 	}
 	
 	// this calls the region and its model manager to update
@@ -192,37 +192,5 @@ public class RegionManager
 		
 		Globals.create( ii );
 	}
-	
-	
-		//////////////////////////
-			/*
-	private function newRegionCreate( e:RegionEvent ):void
-	{
-		var region:Region = getRegion( e.regionId );
-		if ( region )
-			region.save();
-		else
-			throw new Error( "RegionManager.newRegionCreate - NO Region" );
-			
-	}
-	
-	private function newRegionCreateSucceed( e:PersistanceEvent ):void
-	{
-		Globals.g_app.removeEventListener( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS, newRegionCreateSucceed ); 
-		Globals.g_app.removeEventListener( PersistanceEvent.PERSISTANCE_CREATE_FAILURE, newRegionCreateFailure );
-		if ( !WindowSandboxList.isActive )
-			WindowSandboxList.create();
-	}
-	private function newRegionCreateFailure( e:PersistanceEvent ):void
-	{
-		Globals.g_app.removeEventListener( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS, newRegionCreateSucceed ); 
-		Globals.g_app.removeEventListener( PersistanceEvent.PERSISTANCE_CREATE_FAILURE, newRegionCreateFailure ); 
-		new Alert( "RegionManager.newRegionCreateFailure - Failed to create new Region on Server" );
-		if ( !WindowSandboxList.isActive )
-			WindowSandboxList.create();
-	}
-	*/
-
-	
 } // RegionManager
 } // Package
