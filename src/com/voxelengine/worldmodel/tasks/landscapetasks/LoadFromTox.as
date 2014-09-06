@@ -35,9 +35,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 			var timer:int = getTimer();
 			
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _guid );
+			var vm:VoxelModel = Globals.getModelInstance( _guid );
 			trace( "LoadFromTox.start - loading from byte array: " + _guid );
-			var ba:ByteArray = Globals.g_modelManager.findIVM( _layer.data );
+			var ba:ByteArray = Globals.findIVM( _layer.data );
 			if ( vm && ba )		
 			{
 				vm.loadFromTox( ba );

@@ -40,7 +40,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			Log.out( "CreatePlayer.start" );
 			_layer.type = 106;
 
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _guid );
+			var vm:VoxelModel = Globals.getModelInstance( _guid );
 			if ( vm )
 			{
 				//var root_grain_size:uint = vm.oxel.gc.bound

@@ -34,7 +34,7 @@ package com.voxelengine.GUI
 				padding = 0;
 				
 				// find all the "Gun" models and add a button for each
-				var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _instanceGuid );
+				var vm:VoxelModel = Globals.getModelInstance( _instanceGuid );
 				if ( vm )
 				{
 					for each ( var cm:VoxelModel in vm.children )

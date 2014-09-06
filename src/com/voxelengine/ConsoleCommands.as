@@ -192,14 +192,14 @@ package com.voxelengine
 				return;
 			}
 
-			if ( !Globals.g_modelManager._gci ) {
+			if ( !Globals.gci() ) {
 				Log.out( "ConsoleCommands.carveTunnel  No location selected", Log.WARN );
 				return;
 			}
 				
 			CarveTunnel.contructor( Globals.selectedModel.instanceInfo.instanceGuid
-			                      , Globals.g_modelManager._gci.point
-			                      , Globals.g_modelManager.viewVectorNormalizedGet()
+			                      , Globals.gci().point
+			                      , Globals.viewVectorNormalizedGet()
 			                      , Globals.AIR
 			                      , 2048
 			                      , 64 );
@@ -218,14 +218,14 @@ package com.voxelengine
 				return;
 			}
 
-			if ( !Globals.g_modelManager._gci ) {
+			if ( !Globals.gci() ) {
 				Log.out( "ConsoleCommands.CarveTunnels  No location selected", Log.WARN );
 				return;
 			}
 				
 			CarveTunnels.contructor( Globals.selectedModel.instanceInfo.instanceGuid
-								   , Globals.g_modelManager._gci.point
-								   , Globals.g_modelManager.viewVectorNormalizedGet()
+								   , Globals.gci().point
+								   , Globals.viewVectorNormalizedGet()
 								   , Globals.AIR
 								   , 2048
 								   , 64 );
@@ -237,7 +237,7 @@ package com.voxelengine
 		private static function lavaSphere():void
 		{
 			
-			var loc:Vector3D = Globals.g_modelManager._gci.point;
+			var loc:Vector3D = Globals.gci().point;
 			var vm:VoxelModel = Globals.selectedModel;
 			if ( !vm )
 				{ Log.out( "ConsoleCommands.lavaSpheresCarve  No model selected", Log.WARN ); return; }
@@ -247,7 +247,7 @@ package com.voxelengine
 		
 		private static function waterSphere():void
 		{
-			var loc:Vector3D = Globals.g_modelManager._gci.point;
+			var loc:Vector3D = Globals.gci().point;
 			var vm:VoxelModel = Globals.selectedModel;
 			if ( !vm )
 				{ Log.out( "ConsoleCommands.waterSpheresCarve  No model selected", Log.WARN ); return; }

@@ -140,7 +140,7 @@ package com.voxelengine.renderer
 			// If new context and its not null, dispose of what we have
 			if ( null != _context ) {
 				Log.out("Renderer.onContextCreated - dispose" );
-				Globals.g_modelManager.dispose();
+				Globals.dispose();
 				_context.dispose();
 				_context = null;
 			}
@@ -153,7 +153,7 @@ package com.voxelengine.renderer
 					_context.enableErrorChecking = true;
 				else	
 					_context.enableErrorChecking = false;
-				Globals.g_modelManager.reinitialize( _context );
+				Globals.reinitialize( _context );
 			}
 
 			if ( _context )
@@ -229,7 +229,7 @@ package com.voxelengine.renderer
 			
 			_mvp.append( perspectiveProjection(90, _width/_height, Globals.g_nearplane, Globals.g_farplane) );
 
-			Globals.g_modelManager.draw( _mvp, _context );
+			Globals.draw( _mvp, _context );
 
 			if ( screenShot )
 				_context.drawToBitmapData( screenShot );

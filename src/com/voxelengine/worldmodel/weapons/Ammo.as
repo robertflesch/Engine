@@ -84,7 +84,7 @@ public class Ammo
 		//Log.out( "Ammo.processJsonInfo" );
 		SoundBank.getSound( _impactSoundFile ); // Preload the sound file
 		SoundBank.getSound( _launchSoundFile );
-		Globals.g_modelManager.modelInfoFindOrCreate( _model, null, false );
+		Globals.modelInfoFindOrCreate( _model, null, false );
 	}
 	
 	public function clone():Ammo {

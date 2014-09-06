@@ -93,7 +93,7 @@ public class VertexIndexBuilder
 		if ( !y.gc )
 			return -1;
 		// TODO this is from origin of avatar, rather then camera position.
-		// wanted to use Globals.g_modelManager.worldSpaceStartPoint;
+		// wanted to use Globals.worldSpaceStartPoint;
 		// but it doesnt always exist.
 		// THIS IS REALLY SLOW
 		var xdist:Number = x.gc.GetDistance( Globals.controlledModel.instanceInfo.positionGet );

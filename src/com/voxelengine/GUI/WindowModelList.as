@@ -114,7 +114,7 @@ package com.voxelengine.GUI
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
 			
-			Globals.g_modelManager.create( ii );
+			Globals.create( ii );
 		}
 		
 		private function addThisModelHandler(event:UIMouseEvent):void 
@@ -130,7 +130,7 @@ package com.voxelengine.GUI
 				ii.templateName = _s_mi.fileName;
 				var viewDistance:Vector3D = new Vector3D(0, 0, -75);
 				ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-				Globals.g_modelManager.create( ii );
+				Globals.create( ii );
 				remove();
 			}
 		}
@@ -154,7 +154,7 @@ package com.voxelengine.GUI
 			}
 			else 
 			{
-				var models:Dictionary = Globals.g_modelManager.modelInfoGetDictionary();
+				var models:Dictionary = Globals.modelInfoGetDictionary();
 				for each ( var mi:ModelInfo in models )
 				{
 					if ( mi && "Player" != mi.modelClass && "EditCursor" != mi.modelClass )

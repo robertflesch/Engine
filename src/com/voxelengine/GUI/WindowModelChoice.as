@@ -60,21 +60,21 @@ package com.voxelengine.GUI
 					ii.templateName = "GenerateCube";
 					ii.name = "New Cube Object";
 					// preload the modelInfo for the GenerateCube
-					Globals.g_modelManager.modelInfoPreload( ii.templateName );
+					Globals.modelInfoPreload( ii.templateName );
 					new WindowNewModelGenerateCube( ii );
 					break;
 				case 1: // From Sphere
 					ii.templateName = "GenerateSphere";
 					ii.name = "New Sphere Object";
 					// preload the modelInfo for the GenerateCube
-					Globals.g_modelManager.modelInfoPreload( ii.templateName );
+					Globals.modelInfoPreload( ii.templateName );
 					new WindowNewModelGenerateCube( ii );
 					break;
 				case 2: // From Sphere
 					ii.templateName = "GenerateSubSphere";
 					ii.name = "Sphere in larger Object";
 					// preload the modelInfo for the GenerateCube
-					Globals.g_modelManager.modelInfoPreload( ii.templateName );
+					Globals.modelInfoPreload( ii.templateName );
 					new WindowNewModelGenerateCube( ii );
 					break;
 			}
@@ -101,7 +101,7 @@ package com.voxelengine.GUI
 					ii.templateName = "GenerateCube";
 					ii.name = "New Object";
 					// preload the modelInfo for the GenerateCube
-					Globals.g_modelManager.modelInfoPreload( ii.templateName );
+					Globals.modelInfoPreload( ii.templateName );
 					_modalObj.remove();
 					new WindowNewModelGenerateCube( ii );
 					return;

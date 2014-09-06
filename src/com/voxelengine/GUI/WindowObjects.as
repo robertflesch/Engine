@@ -77,7 +77,7 @@ public class WindowObjects extends VVPopup
 			buttonPanel.addElement( _createFileButton );
 			addElement( buttonPanel );
 			eventCollector.addEvent( _createFileButton , UIMouseEvent.CLICK
-								   , function( e:UIMouseEvent ):void { Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_PERSISTANCE_CREATE, "" ) ); remove(); } );
+								   , function( e:UIMouseEvent ):void { Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CREATE, "" ) ); remove(); } );
 		}
 	*/
 		
@@ -90,8 +90,6 @@ public class WindowObjects extends VVPopup
 		//eventCollector.addEvent( this, UIMouseEvent.CLICK, windowClick );
 		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
 		//eventCollector.addEvent( this, UIMouseEvent.PRESS, pressWindow );
-		
-		//Globals.g_app.addEventListener( RegionEvent.REGION_CACHE_COMPLETE, regionCacheComplete );
 		
 		if ( bar )
 		{
@@ -116,7 +114,6 @@ public class WindowObjects extends VVPopup
 	private function onRemoved( event:UIOEvent ):void
 	{
 		Globals.g_app.stage.removeEventListener(Event.RESIZE, onResize);
-		//Globals.g_app.removeEventListener( RegionEvent.REGION_CACHE_COMPLETE, regionCacheComplete );
 
 		removeEventListener(UIOEvent.REMOVED, onRemoved );
 		eventCollector.removeAllEvents();

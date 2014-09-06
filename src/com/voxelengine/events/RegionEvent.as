@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2014 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -16,30 +16,22 @@ package com.voxelengine.events
 	 */
 	public class RegionEvent extends Event
 	{
-		static public const REGION_CACHE_REQUEST_PRIVATE:String		= "REGION_CACHE_REQUEST_PRIVATE";
-		static public const REGION_CACHE_REQUEST_PUBLIC:String		= "REGION_CACHE_REQUEST_PUBLIC";
-		static public const REGION_CACHE_REQUEST_LOCAL:String		= "REGION_CACHE_REQUEST_LOCAL";
-		static public const REGION_CACHE_COMPLETE:String			= "REGION_CACHE_COMPLETE";
+		// Used to request public and private regions from persistance
+		static public const REQUEST_PRIVATE:String					= "REQUEST_PRIVATE";
+		static public const REQUEST_PUBLIC:String					= "REQUEST_PUBLIC";
 		
+		// Used by the config manager to tell when the starting region is loaded
+		static public const REGION_STARTING_LOADED:String			= "REGION_STARTING_LOADED";
+		
+		// A new region has been added to the regions db
+		static public const REGION_LOAD:String						= "REGION_LOAD";
+		// dispatched at the begining of a region load
 		static public const REGION_LOAD_BEGUN:String				= "REGION_LOAD_BEGUN";
-		//static public const REGION_LOAD_COMPLETE:String				= "REGION_LOAD_COMPLETE";
+		// dispatched when a region is unloaded
 		static public const REGION_UNLOAD:String					= "REGION_UNLOAD";
+		// dispatched when a region is modified in the UI
 		static public const REGION_MODIFIED:String					= "REGION_MODIFIED";
-		
-		static public const REGION_CREATE_SUCCESS:String			= "REGION_CREATE_SUCCESS";
-		static public const REGION_CREATE_CANCEL:String				= "REGION_CREATE_CANCEL";
 
-		// CRUD create retrieve update delete		
-		static public const REGION_LOCAL_CREATE:String				= "REGION_LOCAL_CREATE";
-		static public const REGION_LOCAL_LOAD:String				= "REGION_LOCAL_LOAD";
-		static public const REGION_LOCAL_UPDATE:String				= "REGION_LOCAL_UPDATE";
-		
-		// CRUD create retrieve update delete		
-		static public const REGION_PERSISTANCE_CREATE:String		= "REGION_PERSISTANCE_CREATE";
-		static public const REGION_PERSISTANCE_LOAD:String			= "REGION_PERSISTANCE_LOAD";
-		static public const REGION_PERSISTANCE_UPDATE:String		= "REGION_PERSISTANCE_UPDATE";
-		static public const REGION_PERSISTANCE_DELETE:String		= "REGION_PERSISTANCE_DELETE";
-		
 		private var _regionId:String;
 		
 		public function get regionId():String { return _regionId; } 

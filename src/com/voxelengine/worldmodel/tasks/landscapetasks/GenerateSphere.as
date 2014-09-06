@@ -32,7 +32,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 			var timer:int = getTimer();
 			
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _guid );
+			var vm:VoxelModel = Globals.getModelInstance( _guid );
 			if ( vm )
 			{
 				var root_grain_size:uint = vm.oxel.gc.bound

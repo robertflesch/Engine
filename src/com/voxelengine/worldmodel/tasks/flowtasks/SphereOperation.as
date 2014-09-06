@@ -64,7 +64,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			
 			var timer:int = getTimer();
 	
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _guid );
+			var vm:VoxelModel = Globals.getModelInstance( _guid );
 			var guid:String = vm.instanceInfo.instanceGuid;
 			if ( vm )
 			{

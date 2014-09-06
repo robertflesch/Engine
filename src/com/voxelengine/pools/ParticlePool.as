@@ -44,7 +44,7 @@ public final class ParticlePool
 	{
 		Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 		// Preload the modelInfo for the cannonBall
-		Globals.g_modelManager.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
+		Globals.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
 		// Listen for it being loaded
 		Globals.g_app.addEventListener( ModelEvent.INFO_LOADED, onModelInfoLoaded );
 	}
@@ -101,7 +101,7 @@ public final class ParticlePool
 		pi.usesCollision = false;
 		pi.dynamicObject = true;
 		
-		var mi:ModelInfo = Globals.g_modelManager.modelInfoGet(pi.templateName);
+		var mi:ModelInfo = Globals.modelInfoGet(pi.templateName);
 		var modelAsset:String = mi.modelClass;
 		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
 		var vm:* = new modelClass( pi, mi );

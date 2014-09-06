@@ -33,7 +33,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		override public function start():void {
 			super.start();
 			var timer:int = getTimer();
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _guid );
+			var vm:VoxelModel = Globals.getModelInstance( _guid );
 			var size:uint = vm.oxel.size_in_world_coordinates();
 			var outOf:int = _layer.range;
 			Log.out( "GenerateGrassAndTrees - start - enter: ");					

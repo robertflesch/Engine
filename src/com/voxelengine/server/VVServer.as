@@ -67,7 +67,7 @@
 		static private function handleJoin(connection:Connection):void
 		{
 			
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_PERSISTANCE_LOAD, regionName ) );
+			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, regionName ) );
 			
 			trace("VVServer.handleJoin. Sucessfully joined Room");
 			_connection = connection;

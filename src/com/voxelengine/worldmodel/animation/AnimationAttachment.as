@@ -55,7 +55,7 @@ package com.voxelengine.worldmodel.animation
 			if ( null == _voxelModel )
 			{
 				Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onAttachmentCreated );
-				Globals.g_modelManager.create( _instanceInfo );
+				Globals.create( _instanceInfo );
 			}
 			else
 			{
@@ -76,7 +76,7 @@ package com.voxelengine.worldmodel.animation
 			//Log.out( "AnimationAttachment.onAttachmentCreated owner: " + _owner.toString() );
 			if ( event.instanceGuid == _instanceInfo.instanceGuid )
 			{
-				_voxelModel = Globals.g_modelManager.getModelInstance( _instanceInfo.instanceGuid );
+				_voxelModel = Globals.getModelInstance( _instanceInfo.instanceGuid );
 				_owner.childAdd( _voxelModel );
 				Globals.g_app.removeEventListener( ModelEvent.CHILD_MODEL_ADDED, onAttachmentCreated );			
 			}

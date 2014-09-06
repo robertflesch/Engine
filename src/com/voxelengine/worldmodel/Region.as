@@ -14,6 +14,7 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.events.RegionLoadedEvent;
 	import com.voxelengine.server.Persistance;
 	import com.voxelengine.server.Network;
+	import com.voxelengine.worldmodel.models.ModelManager;
 	import flash.geom.Vector3D;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
@@ -108,6 +109,8 @@ package com.voxelengine.worldmodel
 		private var _playerPosition:Vector3D = new Vector3D();
 		private var _playerRotation:Vector3D = new Vector3D();
 		private var _loaded:Boolean = true;
+		private var _modelManager:ModelManager = new ModelManager();
+
 
 
 		public function get databaseObject():DatabaseObject { return _databaseObject; }
@@ -141,55 +144,17 @@ package com.voxelengine.worldmodel
 		private var _criticalModelDetected:Boolean = false;
 		public function get criticalModelDetected():Boolean { return  _criticalModelDetected; } 
 		
-		public function get playerPosition():Vector3D 
-		{
-			return _playerPosition;
-		}
-		
-		public function get playerRotation():Vector3D 
-		{
-			return _playerRotation;
-		}
-		
-		public function get admin():Vector.<String> 
-		{
-			return _admin;
-		}
-		
-		public function set admin(value:Vector.<String>):void 
-		{
-			_admin = value;
-		}
-		
-		public function get editors():Vector.<String> 
-		{
-			return _editors;
-		}
-		
-		public function set editors(value:Vector.<String>):void 
-		{
-			_editors = value;
-		}
-		
-		public function get created():Date 
-		{
-			return _created;
-		}
-		
-		public function set created(value:Date):void 
-		{
-			_created = value;
-		}
-		
-		public function get modified():Date 
-		{
-			return _modified;
-		}
-		
-		public function set modified(value:Date):void 
-		{
-			_modified = value;
-		}
+		public function get playerPosition():Vector3D { return _playerPosition; }
+		public function get playerRotation():Vector3D {return _playerRotation; }
+		public function get admin():Vector.<String>  { return _admin; }
+		public function set admin(value:Vector.<String>):void { _admin = value; }
+		public function get editors():Vector.<String> { return _editors; }
+		public function set editors(value:Vector.<String>):void  { _editors = value; }
+		public function get created():Date  { return _created; }
+		public function set created(value:Date):void  { _created = value; }
+		public function get modified():Date  { return _modified; }
+		public function set modified(value:Date):void  { _modified = value; }
+		public function get modelManager():ModelManager  { return _modelManager; }
 		
 		private function onCriticalModelDetected( me:ModelEvent ):void
 		{
@@ -197,10 +162,18 @@ package com.voxelengine.worldmodel
 			Log.out( "Region.criticalModelDetected" );
 		}
 		
-		public function Region():void 
+		public function Region( $regionID:String ):void 
 		{
+			_regionId = $regionID;
 			_created = new Date();
 			_modified = _created;
+			_editors.push( "people1" );
+			_editors.push( "people1" );
+			_editors.push( "people1" );
+		}
+		
+		public function update( $elapsed:int ):void {
+			_modelManager.update( $elapsed );
 		}
 			
 		private function onRegionUnload( le:RegionEvent ):void
@@ -224,27 +197,7 @@ package com.voxelengine.worldmodel
 			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_ADDED, function( me:ModelEvent ):void { ; } );
 			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_REMOVED, function( me:ModelEvent ):void { ; } );
 			Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
-			Globals.g_modelManager.removeAllModelInstances();
-		}
-		
-		public function request( $regionId:String ):void
-		{
-			_regionId = $regionId;
-			var _urlLoader:URLLoader = new URLLoader();
-			var fileNameWithExt:String = $regionId + ".rjson"
-			Log.out( "Region.request - loading: " + Globals.regionPath + fileNameWithExt );
-			_urlLoader.load(new URLRequest( Globals.regionPath + fileNameWithExt ));
-			_urlLoader.addEventListener(Event.COMPLETE, onRegionLoadedAction);
-			_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, errorAction);			
-			_urlLoader.addEventListener(ProgressEvent.PROGRESS, onProgressAction);
-		}
-
-		private function onRegionLoadedAction(event:Event):void
-		{
-			trace( "Region.onRegionLoadedAction" );
-
-			var jsonString:String = StringUtil.trim(String(event.target.data));
-			processRegionJson( jsonString );
+			_modelManager.removeAllModelInstances();
 		}
 		
 		private function handleRegionModified( $re:RegionEvent ):void {
@@ -260,7 +213,7 @@ package com.voxelengine.worldmodel
 			Globals.g_app.addEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
 			Globals.g_app.addEventListener( RegionEvent.REGION_MODIFIED, handleRegionModified);
 
-			var count:int = Globals.g_modelManager.loadRegionObjects(_JSON.region);
+			var count:int = _modelManager.loadRegionObjects(_JSON.region);
 			if ( 0 < count )
 				_loaded = false;
 
@@ -270,18 +223,12 @@ package com.voxelengine.worldmodel
 			
 			if ( 0 == count && name != "defaultRegion" )
 				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE ) );
-			
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD_BEGUN, regionId ) );
+			else 
+				Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD_BEGUN, regionId ) );
+				
 			Log.out( "Region.load - completed processing on: " + name );
 		}		
 
-		private function onProgressAction(event:ProgressEvent):void
-		{
-			var percentLoaded:Number=event.bytesLoaded/event.bytesTotal*100;
-			//trace("Region.onProgressAction: "+percentLoaded+"%");
-			//trace("loading xml");
-		}
-		
 		public function getSkyColor():Vector3D
 		{
 			return _skyColor;
@@ -323,11 +270,6 @@ package com.voxelengine.worldmodel
 			
 			if ( _JSON.playerRotation )
 				_playerRotation.setTo( 0, _JSON.playerRotation, 0 );
-				
-			if ( !Globals.online )
-//				Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_EVENT_LOADED, this ) );
-//			else
-				Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CACHE_COMPLETE, regionId ) );
 		}
 		
 		public function toString():String {
@@ -346,7 +288,7 @@ package com.voxelengine.worldmodel
 		public function getJSON():String
 		{
 			var outString:String = "{\"region\":[";
-			outString = Globals.g_modelManager.getModelJson(outString);
+			outString = _modelManager.getModelJson(outString);
 			outString += "],"
 			// if you dont do it this way, there is a null at begining of string
 			outString += "\"skyColor\": {" + "\"r\":" + _skyColor.x  + ",\"g\":" + _skyColor.y + ",\"b\":" + _skyColor.z + "}";
@@ -368,11 +310,6 @@ package com.voxelengine.worldmodel
 			return outString;
 		}
 
-		
-		private function errorAction(e:IOErrorEvent):void
-		{
-			trace("Region.errorAction: " + e.toString());
-		}	
 		
 		private function changeRegionId():void
 		{
@@ -398,20 +335,22 @@ package com.voxelengine.worldmodel
 			if ( !Globals.online )
 				return;
 				
+			_modelManager.save();
+				
 			Log.out( "Region.save - saving changes to Persistance" ); 
 			var ba:ByteArray = new ByteArray();
 			ba.clear();
 
-			_owner = Network.userId;
-			_editors.push( _owner );
-			_admin.push( _owner );
+			//_owner = Network.userId;
+			//_editors.push( _owner );
+			//_admin.push( _owner );
 			writeToByteArray( ba );
 			if ( databaseObject )
 			{
 				Log.out( "Region.save - saving region back to BigDB: " + regionId );
 				databaseObject.data = ba;
 				databaseObject.modified = new Date();
-				databaseObject.owner = _owner,
+//				databaseObject.owner = _owner,
 				databaseObject.save( false
 								   , false
 								   , saveSuccess
@@ -426,6 +365,16 @@ package com.voxelengine.worldmodel
 								  , createSuccess
 								  , createFailed );
 			}
+		}
+		
+		private function writeToByteArray( ba:ByteArray ):void
+		{
+			var regionJson:String = getJSON();
+			//regionJson = encodeURI(regionJson);
+			Log.out( "Region.writeToByteArray: " + regionJson );
+			ba.writeInt( regionJson.length );
+			ba.writeUTFBytes( regionJson );
+			ba.compress();
 		}
 		
 		public function createEmptyRegion():void {
@@ -461,16 +410,6 @@ package com.voxelengine.worldmodel
 			_changed = false;
 		} 
 
-		private function writeToByteArray( ba:ByteArray ):void
-		{
-			var regionJson:String = getJSON();
-			//regionJson = encodeURI(regionJson);
-			Log.out( "Region.writeToByteArray: " + regionJson );
-			ba.writeInt( regionJson.length );
-			ba.writeUTFBytes( regionJson );
-			//ba.compress();
-		}
-		
 		private function metadata( ba: ByteArray ):Object
 		{
 			Log.out( "Region.metadata userId: " + Network.userId + "  this region is owned by: " + _owner );

@@ -705,7 +705,7 @@ package com.voxelengine.worldmodel.models
 					//_modelInfo.removeChild( child );
 					
 					//Log.out( "VoxelModel.internal_initialize - create child of parent.instance: " + instanceInfo.instanceGuid + "  - child.instanceGuid: " + child.instanceGuid );					
-					Globals.g_modelManager.create(child);
+					Globals.create(child);
 				}
 			}
 			
@@ -783,7 +783,7 @@ package com.voxelengine.worldmodel.models
 		public function childAdd(vm:VoxelModel):void
 		{
 			// remove parent level model
-			Globals.g_modelManager.changeFromParentToChild(vm);
+			Globals.changeFromParentToChild(vm);
 			_children.push(vm);
 			vm.instanceInfo.baseLightLevel = instanceInfo.baseLightLevel;
 			modelInfo.childAdd(vm.instanceInfo);
@@ -837,7 +837,7 @@ package com.voxelengine.worldmodel.models
 			// this make it belong to the world
 			vm.instanceInfo.controllingModel = null;
 			//if ( !(vm is Player) )
-			Globals.g_modelManager.modelAdd(vm);
+			Globals.modelAdd(vm);
 			
 			// now give it correct world space position and velocity
 			//////////////////////////////////////////////////////
@@ -1041,7 +1041,7 @@ package com.voxelengine.worldmodel.models
 			}
 			else
 			{
-				Globals.g_modelManager.createInstanceFromTemplate(this);
+				ModelManager.createInstanceFromTemplate(this);
 				ba = toByteArray();
 				Log.out("VoxelModel.save - creating new object: " + instanceInfo.templateName );
 				Persistance.createObject( Persistance.DB_TABLE_OBJECTS
@@ -1211,8 +1211,8 @@ package com.voxelengine.worldmodel.models
 				mi.init( $fileName, jsonResult );
 				
 				// add the modelInfo to the repo
-				Globals.g_modelManager.modelInfoAdd( mi );
-				var ii:InstanceInfo = Globals.g_modelManager.instanceInfoGet( $fileName );
+				Globals.modelInfoAdd( mi );
+				var ii:InstanceInfo = Globals.instanceInfoGet( $fileName );
 				if ( ii )
 				{
 					var modelAsset:String = mi.modelClass;
@@ -1232,7 +1232,7 @@ package com.voxelengine.worldmodel.models
 					}
 					
 					vm._version = versionInfo.version;
-					Globals.g_modelManager.modelAdd( vm );
+					Globals.modelAdd( vm );
 				}
 				else
 				{
@@ -1349,7 +1349,7 @@ Log.out( "VoxelModel.loadOxelFromByteArray - CALCULATE CENTER" );
 			   vm.complete = true;
 			   vm.instanceInfo.position = position;
 			 */
-			Globals.g_modelManager.modelAdd(vm);
+			Globals.modelAdd(vm);
 			return vm;
 		
 			//var ms:ModelStatisics = new ModelStatisics();

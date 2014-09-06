@@ -33,7 +33,7 @@ public class GrowTreesOn extends LandscapeTask
 		var timer:int = getTimer();
 		
 		//Log.out( "GrowTreesOn.start - enter: ", Log.ERROR);					
-		var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _guid );
+		var vm:VoxelModel = Globals.getModelInstance( _guid );
 		if ( vm )
 		{
 			// This should be 1 - 100 range

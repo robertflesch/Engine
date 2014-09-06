@@ -265,7 +265,7 @@ package com.voxelengine.worldmodel.models
 		
 		static private function isAvatarInsideThisOxel( vm:VoxelModel, oxel:Oxel ):Boolean
 		{
-			var mp:Vector3D = vm.worldToModel( Globals.g_modelManager.worldSpaceStartPoint );
+			var mp:Vector3D = vm.worldToModel( Globals.worldSpaceStartPoint() );
 			// check head
 			var result:Boolean = oxel.gc.is_point_inside( mp );
 			// and foot
@@ -360,7 +360,7 @@ package com.voxelengine.worldmodel.models
 				// now for valid steps (not oob), choose the one which is the lesser distance from the camera.
 				//var startPoint:Vector3D = gci.model.worldToModel( Globals.controlledModel.instanceInfo.positionGet );
 				// This seems to fix problem with distance calculation not working correct when using avatar origin ONCE in a while
-				var startPoint:Vector3D = gci.model.worldToModel( Globals.g_modelManager.worldSpaceStartPoint );
+				var startPoint:Vector3D = gci.model.worldToModel( Globals.worldSpaceStartPoint() );
 				var placedGC:GrainCursor = GrainCursorPool.poolGet( foundModel.oxel.gc.bound );
 				var negPlacedGC:GrainCursor = GrainCursorPool.poolGet( foundModel.oxel.gc.bound );
 				var posMove:Boolean = false;

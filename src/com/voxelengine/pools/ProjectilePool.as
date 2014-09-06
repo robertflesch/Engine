@@ -41,7 +41,7 @@ public final class ProjectilePool
 		// So types are done, now we have to preload the CLASS_NAME.mjson file
 		Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 		// Preload the modelInfo for the CLASS_NAME
-		Globals.g_modelManager.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
+		Globals.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
 		// Listen for it being loaded
 		Globals.g_app.addEventListener( ModelEvent.INFO_LOADED, onModelInfoLoaded );
 	}
@@ -94,7 +94,7 @@ public final class ProjectilePool
 		pi.dynamicObject = true;
 		pi.baseLightLevel = 255;
 		
-		var mi:ModelInfo = Globals.g_modelManager.modelInfoGet(pi.templateName);
+		var mi:ModelInfo = Globals.modelInfoGet(pi.templateName);
 		var modelAsset:String = mi.modelClass;
 		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
 		var vm:* = new modelClass( pi, mi );

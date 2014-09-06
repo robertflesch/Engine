@@ -158,7 +158,7 @@ package com.voxelengine.GUI
            //_panelAdvanced.layout.autoSizeAnimated = true;
 			_panelAdvanced.addElement( label );
 			
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _ii.instanceGuid )
+			var vm:VoxelModel = Globals.getModelInstance( _ii.instanceGuid )
 							addLabel( _panelAdvanced, "State:", changeStateHandler, vm.anim ? vm.anim.name : "" );
 							addLabel( _panelAdvanced, "Name:", changeNameHandler, _ii.name );
 			//_GrainSize = 	addLabel( _panelAdvanced, "GrainSize:", null, _vm.oxel.gc.grain.toString() );
@@ -241,7 +241,7 @@ package com.voxelengine.GUI
 		
 		private function changeStateHandler(event:TextEvent):void
 		{
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _ii.instanceGuid )
+			var vm:VoxelModel = Globals.getModelInstance( _ii.instanceGuid )
 			var state:String = event.target.text;
 			vm.stateLock( false );
 			vm.stateSet( state );

@@ -82,7 +82,7 @@ package com.voxelengine.GUI
 			ii.templateName = "GenerateCube";
 			ii.name = "New Object";
 			// preload the modelInfo for the GenerateCube
-			Globals.g_modelManager.modelInfoPreload( ii.templateName );
+			Globals.modelInfoPreload( ii.templateName );
 			new WindowNewModelGenerateCube( ii );
 		}
 
@@ -114,7 +114,7 @@ package com.voxelengine.GUI
 					
 					trace( "onChildModelFileSelected: " + instance.positionGet );
 					instance.controllingModel = parentModel;
-					Globals.g_modelManager.create( instance );
+					Globals.create( instance );
 					Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildModelCreated );
 				}
 			}
@@ -132,7 +132,7 @@ package com.voxelengine.GUI
 				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
 				if ( li && li.data )
 					populateChildModels( li.data );
-				var vm:VoxelModel = Globals.g_modelManager.getModelInstance( guid );
+				var vm:VoxelModel = Globals.getModelInstance( guid );
 				if ( vm )
 					vm.selected = true;
 			}

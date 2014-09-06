@@ -46,7 +46,7 @@ package com.voxelengine.worldmodel.models
 			collisionPointMarker.positionSet 		= point;
 			collisionPointMarker.controllingModel 	= $owner;
 			collisionPointMarker.name				= "CollisionPoint";
-			Globals.g_modelManager.create( collisionPointMarker );
+			Globals.create( collisionPointMarker );
 			
 			instanceGuid = collisionPointMarker.instanceGuid;
 		}
@@ -80,7 +80,7 @@ package com.voxelengine.worldmodel.models
 			{
 				if ( null == _vm )
 				{
-					_vm = Globals.g_modelManager.getModelInstance( _instanceGuid );
+					_vm = Globals.getModelInstance( _instanceGuid );
 					if ( !_vm )
 						return; // not ready yet.
 				}

@@ -67,7 +67,7 @@ public class WindowShipControlQuery extends VVContainer
 
 		private function takeControl():void 
 		{
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _instanceGuid );
+			var vm:VoxelModel = Globals.getModelInstance( _instanceGuid );
 			if ( vm )
 			{
 				addControlWindows( vm );

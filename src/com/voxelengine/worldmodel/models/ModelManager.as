@@ -579,7 +579,7 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 			instanceInfo.templateName = "Player"
 			instanceInfo.grainSize = 4;
 			
-			Globals.g_modelManager.create( instanceInfo );
+			Globals.create( instanceInfo );
 		}
 		
 		public function update( $elapsedTimeMS:int ):void {
@@ -610,7 +610,6 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 		
 		public function dispose():void 	{
 			Log.out("ModelManager.dispose" );
-			Globals.g_textureBank.dispose();
 			
 			for each ( var dm:VoxelModel in _modelDynamicInstances )
 			{
@@ -1124,7 +1123,7 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 			_modelInfo = new Dictionary();
 		}	
 		
-		public function createInstanceFromTemplate( vm:VoxelModel ):void {
+		static public function createInstanceFromTemplate( vm:VoxelModel ):void {
 			//if ( vm.modelInfo.template )
 			{
 	//			var oldGuid:String = vm.instanceInfo.templateName;

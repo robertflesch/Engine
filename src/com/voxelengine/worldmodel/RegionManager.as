@@ -19,12 +19,18 @@ import com.voxelengine.GUI.WindowSplash;
 import com.voxelengine.Log;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.VVServer;
+import flash.events.Event;
+import flash.events.IOErrorEvent;
+import flash.events.ProgressEvent;
 import flash.net.FileReference;
 import org.flashapi.swing.Alert;
 import playerio.PlayerIOError;
 import playerio.DatabaseObject;
 import com.voxelengine.server.Persistance;
 import com.voxelengine.server.Network;
+import mx.utils.StringUtil;
+import com.voxelengine.utils.CustomURLLoader;
+	import flash.net.URLRequest;
 
 import com.voxelengine.worldmodel.Region;
 /**
@@ -36,40 +42,6 @@ public class RegionManager
 	private var _regions:Vector.<Region> = null
 	private var _currentRegion:Region = null
 	
-	public function RegionManager():void 
-	{
-		_regions = new Vector.<Region>;
-		
-		Globals.g_app.addEventListener( RegionEvent.REGION_CACHE_REQUEST_LOCAL, cacheRequestLocal ); 
-		Globals.g_app.addEventListener( RegionEvent.REGION_CACHE_REQUEST_PUBLIC, cacheRequestPublic ); 
-		Globals.g_app.addEventListener( RegionEvent.REGION_CACHE_REQUEST_PRIVATE, cacheRequestPrivate ); 
-		
-		// CRUD create retrieve update delete		
-		//static public const REGION_LOCAL_CREATE:String		= "REGION_LOCAL_CREATE";
-		//Globals.g_app.addEventListener( RegionEvent.REGION_LOCAL_CREATE, create ); 
-		//static public const REGION_LOCAL_LOAD:String		= "REGION_LOCAL_LOAD";
-		Globals.g_app.addEventListener( RegionEvent.REGION_LOCAL_LOAD, loadLocal ); 
-		//static public const REGION_LOCAL_UPDATE:String		= "REGION_LOCAL_UPDATE";
-		//static public const REGION_LOCAL_DELETE:String		= "REGION_LOCAL_DELETE";
-		//
-		// CRUD create retrieve update delete		
-		//static public const REGION_PERSISTANCE_CREATE:String		= "REGION_PERSISTANCE_CREATE";
-		Globals.g_app.addEventListener( RegionEvent.REGION_PERSISTANCE_CREATE, regionCreateGetMetadata ); 
-		//static public const REGION_PERSISTANCE_LOAD:String		= "REGION_PERSISTANCE_LOAD";
-		Globals.g_app.addEventListener( RegionEvent.REGION_PERSISTANCE_LOAD, loadBigDB ); 
-		//static public const REGION_PERSISTANCE_UPDATE:String		= "REGION_PERSISTANCE_UPDATE";
-		//static public const REGION_PERSISTANCE_DELETE:String		= "REGION_PERSISTANCE_DELETE";
-		
-		Globals.g_app.addEventListener( RegionLoadedEvent.REGION_EVENT_LOADED, regionLoadedHandler ); 
-		
-		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED
-									  ,  function( me:ModelEvent ):void { if ( currentRegion ){ currentRegion.changed = true;}} );
-		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_REMOVED
-									  ,  function( me:ModelEvent ):void { if ( currentRegion ){ currentRegion.changed = true;}} );
-	}
-	
-	
-	
 	public function get size():int { return _regions.length; }
 	
 	public function get currentRegion():Region { return _currentRegion; }
@@ -80,22 +52,72 @@ public class RegionManager
 	
 	public function get regions():Vector.<Region> { return _regions; }
 	
+	public function RegionManager():void 
+	{
+		_regions = new Vector.<Region>;
+		
+		Globals.g_app.addEventListener( RegionEvent.REQUEST_PUBLIC, cacheRequestPublic ); 
+		Globals.g_app.addEventListener( RegionEvent.REQUEST_PRIVATE, cacheRequestPrivate ); 
+
+		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, load ); 
+		
+		Globals.g_app.addEventListener( RegionLoadedEvent.REGION_CREATED, regionCreatedHandler ); 
+		
+		
+		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED
+									  ,  function( me:ModelEvent ):void { if ( currentRegion ){ currentRegion.changed = true;}} );
+		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_REMOVED
+									  ,  function( me:ModelEvent ):void { if ( currentRegion ){ currentRegion.changed = true;}} );
+	}
+	
 	public function cacheRequestPrivate( e:RegionEvent ):void
 	{
 		Persistance.loadRegions( Network.userId );
 	}
+	
 	public function cacheRequestPublic( e:RegionEvent ):void
 	{
 		Persistance.loadRegions( Persistance.DB_PUBLIC );
 	}
 	
-	private function regionLoadedHandler( e:RegionLoadedEvent ):void {
+	public function request( $regionId:String ):void
+	{
+		var fileNamePathWithExt:String = Globals.regionPath + $regionId + ".rjson"
+		Log.out( "RegionManager.request - loading: " + fileNamePathWithExt );
+		var _urlLoader:CustomURLLoader = new CustomURLLoader(new URLRequest( fileNamePathWithExt ));
+		_urlLoader.addEventListener(Event.COMPLETE, onRegionLoadedAction);
+		_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, function (e:IOErrorEvent):void { Log.out("RegionManager.errorAction: " + e.toString(), Log.ERROR); }	);			
+	}
 
-		Log.out( "RegionManager.regionLoadedHandler: " + e.region.toString() );
-		// check for dup
+	private function onRegionLoadedAction(event:Event):void
+	{
+		Log.out( "RegionManager.onRegionLoadedAction" );
+		var req:URLRequest = CustomURLLoader(event.target).request;			
+		var regionId:String = CustomURLLoader(event.target).fileName;			
+		regionId = regionId.substr( 0, regionId.indexOf( "." ) );
+		var newRegion:Region = new Region( regionId );
+		var jsonString:String = StringUtil.trim(String(event.target.data));
+		newRegion.processRegionJson( jsonString );
+		// This adds it to the list of regions
+		Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
+		// This tells the config manager that the local region was loaded and is ready to load rest of data.
+		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_STARTING_LOADED, regionId ) );
+	}
+	
+	// this calls the region and its model manager to update
+	public function update( $elapsed:int ):void {
+		if ( currentRegion )
+			currentRegion.update( $elapsed );
+	}
+	
+	// This adds both local and remote region to the _regions list.
+	private function regionCreatedHandler( e:RegionLoadedEvent ):void {
+
+//		Log.out( "RegionManager.regionCreatedHandler: " + e.region.toString() );
+		// check for duplicates
 		for each ( var region:Region in _regions ) {
 			if ( region.regionId == e.region.regionId ) {
-				Log.out( "RegionManager.regionLoadedHandler - DUPS FOUND: " + e.region.toString() );
+				Log.out( "RegionManager.regionCreatedHandler - DUPS FOUND: " + e.region.toString() );
 				return;
 			}
 		}
@@ -106,67 +128,63 @@ public class RegionManager
 				e.region.save();
 				
 		_regions.push( e.region );
-
+		
+		Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_LOADED, e.region ) );
 	}
 	
-	//private function regionsRetrivedEventHandler( dba:Array ):void
-	//{
-		//for each ( var dbo:DatabaseObject in dba )
-		//{
-			//var newRegion:Region = new Region();
-			//_regions.push( newRegion );
-			//loadFromDBO( newRegion, dbo );
-		//}
-	//}
-	
-	public function cacheRequestLocal( e:RegionEvent ):void
-	{
-		var region:Region = getRegion( e.regionId );
-		if ( region )
-		{
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CACHE_COMPLETE, region.regionId ) );
-			return;
-		}
-
-		// region not cached yet.	
-		var newRegion:Region = new Region();
-		currentRegion = newRegion;
-		_regions.push( newRegion );
-		newRegion.request( e.regionId );
-	}
-
 	public function getRegion( $regionId:String ):Region
 	{
-		for each ( var region:Region in _regions )
-		{
-			if ( region && region.regionId == $regionId )
-			{
+		for each ( var region:Region in _regions ) {
+			if ( region && region.regionId == $regionId ) {
 				return region;
 			}
 		}
 		return null;
 	}
 	
-	public function loadDefault():void 
+	private function load( e:RegionEvent ):void
 	{
-		var newRegion:Region = new Region();
+		if ( !WindowSplash.isActive )
+			WindowSplash.create();
+		
+		if ( currentRegion )
+			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_UNLOAD, currentRegion.regionId ) );
+
+		var region:Region = getRegion( e.regionId );
+		if ( region ) {
+			currentRegion = region;
+			region.load();
+			return;
+		}
+		
+		// Should never get here
+		// No matching region found, so we have to go load it
+		var newRegion:Region = new Region( "ERROR_ID" );
 		currentRegion = newRegion;
-		newRegion.name = "defaultRegion";
-		_regions.push( newRegion );
-		newRegion.createEmptyRegion();
-		newRegion.load();
+		Log.out( "RegionManager.loadRegion - ERROR creating new region: " + e.regionId, Log.ERROR );
 	}
 	
-	private function regionCreateGetMetadata( e:RegionEvent ):void
+	public function save():void
 	{
-		var newRegion:Region = new Region();
-		newRegion.createEmptyRegion();
-		newRegion.regionId = Globals.getUID();
-		Globals.g_app.addEventListener( RegionEvent.REGION_CREATE_SUCCESS, newRegionCreate ); 
+		Log.out( "RegionManager.save" );
+		if ( Globals.online ) {
+			currentRegion.save()
+		}
+		else {
+			var fr:FileReference = new FileReference();
+			fr.save( currentRegion.getJSON(), currentRegion.regionId );
+		}
 		
-		Log.out( "RegionManager.create - new regionid: " + newRegion.regionId );
-		
-		new WindowRegionNew( newRegion );
+		//////////////////////////
+			/*
+	private function newRegionCreate( e:RegionEvent ):void
+	{
+		var region:Region = getRegion( e.regionId );
+		if ( region )
+			region.save();
+		else
+			throw new Error( "RegionManager.newRegionCreate - NO Region" );
+			
 	}
 	
 	private function newRegionCreateSucceed( e:PersistanceEvent ):void
@@ -184,117 +202,8 @@ public class RegionManager
 		if ( !WindowSandboxList.isActive )
 			WindowSandboxList.create();
 	}
-	
-	private function newRegionCreate( e:RegionEvent ):void
-	{
-		Globals.g_app.removeEventListener( RegionEvent.REGION_CREATE_CANCEL, newRegionCreate ); 
-		var region:Region = getRegion( e.regionId );
-		if ( region )
-			region.save();
-		else
-			throw new Error( "RegionManager.newRegionCreate - NO Region" );
-			
-		//Globals.g_app.addEventListener( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS, newRegionCreateSucceed ); 
-		//Globals.g_app.addEventListener( PersistanceEvent.PERSISTANCE_CREATE_FAILURE, newRegionCreateFailure ); 
-		
-//		loadRegion( e.regionId );
-//		Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.SANDBOX_SUCCESS, null ) );
-	}
-	/*
-	private function newRegionCancel( e:RegionEvent ):void
-	{
-		Globals.g_app.removeEventListener( RegionEvent.REGION_CREATE_CANCEL, newRegionCreate ); 
-		Globals.g_app.removeEventListener( RegionEvent.REGION_CREATE_SUCCESS, newRegionCancel ); 
-		var index:int = 0
-		for each ( var region:Region in _regions )
-		{
-			
-			if ( region && region.regionId == e.regionId )
-			{
-				_regions.splice( index, 1 );
-				break;
-			}
-			index++;
-		}
-		if ( !WindowSandboxList.isActive )
-			WindowSandboxList.create();
-	}
-	//////////////////////////////////// END REGION_LOCAL_CREATE //////////////
 	*/
-	private function loadLocal( e:RegionEvent ):void
-	{
-		loadRegion( e.regionId );
-		Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.SANDBOX_SUCCESS, null ) );
-	}
-	
-	private function loadBigDB( e:RegionEvent ):void
-	{
-		loadRegion( e.regionId );
-	}
 
-	public function loadRegion( $regionId:String ):void
-	{
-		if ( !WindowSplash.isActive )
-			WindowSplash.create();
-		
-		if ( currentRegion )
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_UNLOAD, currentRegion.regionId ) );
-
-		var region:Region = getRegion( $regionId );
-		if ( region )
-		{
-				currentRegion = region;
-				region.load();
-				return;
-		}
-		
-		// Should never get here
-		// No matching region found, so we have to go load it
-		var newRegion:Region = new Region();
-		currentRegion = newRegion;
-		//newRegion.loadRegion( $regionId );
-		//_regions.push( newRegion );
-		Log.out( "RegionManager.loadRegion - ERROR creating new region: " + $regionId, Log.ERROR );
-	}
-/*	
-	public function writeRegion():void 
-	{
-		var fr:FileReference = new FileReference();
-		var outString:String;
-
-		for each ( var region:Region in _regions )
-		{
-			outString = region.getJSON();
-		}
-		fr.save( outString, region.regionId );
-	}
-	*/
-	public function save():void
-	{
-		Log.out( "RegionManager.save" );
-		if ( Globals.online )
-			currentRegion.save()
-		/*
-		for each ( var region:Region in _regions )
-		{
-			if ( region && "" != region.regionId  ) {
-				if ( region.changed ) {
-					if ( region.databaseObject ) {
-						Log.out( "RegionManager.save - network save of region: " + region.name );
-						region.saveBigDB();
-					}
-					else
-						//region.saveLocal();
-						Log.out( "RegionManager.save - AUTOMATIC local saves are disabled for: " + region.name );
-				}
-				else
-					Log.out( "RegionManager.save - not changed region: + " + region.name );
-			}
-			else
-				Log.out( "RegionManager.save - region && '' != region.regionId" );
-		}
-		Log.out( "RegionManager.save - END" );
-		*/
 	}
 } // RegionManager
 } // Package

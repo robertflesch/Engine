@@ -7,6 +7,8 @@
 ==============================================================================*/
 
 package com.voxelengine {
+	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
+	import flash.utils.Dictionary;
 	import com.voxelengine.worldmodel.RegionManager;
 	import com.voxelengine.worldmodel.Sky;
 	import com.voxelengine.worldmodel.TextureBank;
@@ -19,6 +21,8 @@ package com.voxelengine {
 	import com.voxelengine.worldmodel.MouseKeyboardHandler;
 	import com.voxelengine.renderer.Renderer;
 	import com.voxelengine.utils.GUID;
+	import flash.display3D.Context3D;
+	import flash.geom.Matrix3D;
 
 	import flash.utils.getTimer;
 	import flash.geom.Vector3D;
@@ -29,7 +33,6 @@ package com.voxelengine {
 	public class Globals  {
 		public static var g_app:VoxelVerse = null;
 		
-		public static var g_modelManager:ModelManager = new ModelManager();
 		public static var g_textureBank:TextureBank = new TextureBank();
 		public static var g_regionManager:RegionManager = null;
 		public static var g_renderer:Renderer = new Renderer();
@@ -269,16 +272,121 @@ package com.voxelengine {
 		public static function get sandbox():Boolean { return g_sandbox }
 		public static function set sandbox(val:Boolean):void { g_sandbox = val; }
 		
-		public static const MODE_LOCAL:String = "Local";
 		public static const MODE_PUBLIC:String = "Public";
 		public static const MODE_PRIVATE:String = "Private";
 		
-		private static var g_mode:String = MODE_LOCAL;
+		private static var g_mode:String = MODE_PUBLIC;
 		public static function get mode():String { return g_mode }
 		public static function set mode(val:String):void { g_mode = val; }
 		
 		private static var g_autoFlow:Boolean = true;
 		public static function get autoFlow():Boolean { return g_autoFlow }
 		public static function set autoFlow(val:Boolean):void { g_autoFlow = val; }
+		
+		public static function getModelInstance( $guid:String ):VoxelModel {
+			return g_regionManager.currentRegion.modelManager.getModelInstance( $guid );
+		};
+		
+		public static function findIVM( $guid:String ):ByteArray {
+			return g_regionManager.currentRegion.modelManager.findIVM( $guid );
+		};
+		
+		public static function addIVM( $guid:String, $ba:ByteArray ):void {
+			return g_regionManager.currentRegion.modelManager.addIVM( $guid, $ba );
+		};
+		
+		public static function reinitialize( $context:Context3D ):void {
+			if ( g_regionManager && g_regionManager.currentRegion )
+				return g_regionManager.currentRegion.modelManager.reinitialize( $context );
+		}
+		
+		public static function createPlayer():void {
+			if ( null == g_regionManager.currentRegion )
+				Log.out( "Globals.createPlayer - current region null" );
+			return g_regionManager.currentRegion.modelManager.createPlayer();
+		}
+		
+		public static function draw( $mvp:Matrix3D, $context:Context3D ):void {
+			return g_regionManager.currentRegion.modelManager.draw( $mvp, $context )
+		}
+		
+		public static function modelAdd( $vm:VoxelModel ):void {
+			return g_regionManager.currentRegion.modelManager.modelAdd( $vm )
+		}
+		
+		public static function modelInfoAdd( $modelInfo:ModelInfo ):void {
+			return g_regionManager.currentRegion.modelManager.modelInfoAdd( $modelInfo )
+		}
+		
+		public static function create( $ii:InstanceInfo ):void {
+			return g_regionManager.currentRegion.modelManager.create( $ii )
+		}
+		
+		public static function modelInfoPreload( $name:String ):void {
+			return g_regionManager.currentRegion.modelManager.modelInfoPreload( $name )
+		}
+		
+		public static function instanceInfoGet( $name:String ):InstanceInfo {
+			return g_regionManager.currentRegion.modelManager.instanceInfoGet( $name )
+		}
+		
+		public static function changeFromParentToChild( $vm:VoxelModel ):void {
+			return g_regionManager.currentRegion.modelManager.changeFromParentToChild( $vm )
+		}
+		
+		public static function whichModelsIsThisInfluencedBy( $vm:VoxelModel ):Vector.<VoxelModel>  {
+			return g_regionManager.currentRegion.modelManager.whichModelsIsThisInfluencedBy( $vm )
+		}
+
+		public static function markDead( $guid:String ):void {
+			return g_regionManager.currentRegion.modelManager.markDead( $guid );
+		};
+		
+		public static function modelInstancesGetDictionary():Dictionary {
+			return g_regionManager.currentRegion.modelManager.modelInstancesGetDictionary();
+		};
+		
+		public static function modelInfoGet( $name:String ):ModelInfo {
+			return g_regionManager.currentRegion.modelManager.modelInfoGet( $name );
+		};
+		
+		public static function modelInfoGetDictionary():Dictionary {
+			return g_regionManager.currentRegion.modelManager.modelInfoGetDictionary();
+		};
+		
+		public static function dispose():void {
+			g_textureBank.dispose();
+			return g_regionManager.currentRegion.modelManager.dispose();
+		};
+		
+		public static function gci():GrainCursorIntersection {
+			return g_regionManager.currentRegion.modelManager._gci;
+		};
+		
+		public static function viewVectorNormalizedGet():Vector3D {
+			return g_regionManager.currentRegion.modelManager.viewVectorNormalizedGet();
+		};
+		
+		public static function modelInfoFindOrCreate( $fileName:String, $instanceGuid:String, $block:Boolean = true ):ModelInfo {
+			return g_regionManager.currentRegion.modelManager.modelInfoFindOrCreate( $fileName, $instanceGuid, $block );
+		};
+
+		public static function modelInstancesGetFirst():VoxelModel {
+			return g_regionManager.currentRegion.modelManager.modelInstancesGetFirst();
+		};
+		
+		public static function TestCheckForFlow():void {
+			return g_regionManager.currentRegion.modelManager.TestCheckForFlow();
+		};
+		
+		public static function worldSpaceStartPoint():Vector3D {
+			return g_regionManager.currentRegion.modelManager.worldSpaceStartPoint;
+		};
+		
+		public static function whichModelsIsThisInsideOfNew( $vm:VoxelModel ):Vector.<VoxelModel> {
+			return g_regionManager.currentRegion.modelManager.whichModelsIsThisInsideOfNew( $vm );
+		};
+		
+		
 	}
 }

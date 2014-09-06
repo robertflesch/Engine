@@ -119,7 +119,7 @@ package com.voxelengine.worldmodel.models
 			if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
 				return;
 				
-//			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( me.ownerGuid );
+//			var vm:VoxelModel = Globals.getModelInstance( me.ownerGuid );
 		}
 		
 		protected function throttleEvent( event:ShipEvent ):void
@@ -306,7 +306,7 @@ package com.voxelengine.worldmodel.models
 //				Log.out("CVM.test - findClosestIntersectionInDirection took: " + (getTimer() - timer));
 				
 				
-				_collisionCandidates = Globals.g_modelManager.whichModelsIsThisInfluencedBy( this )
+				_collisionCandidates = Globals.whichModelsIsThisInfluencedBy( this )
 				//trace( "collisionTest: " + _collisionCandidates.length )
 				if ( 0 == _collisionCandidates.length )
 				{
@@ -419,7 +419,7 @@ package com.voxelengine.worldmodel.models
 				trailMarker.positionSet = wsCenter;
 				trailMarker.addTransform( 0, 0, 0, 10, ModelTransform.LIFE );
 				
-				Globals.g_modelManager.create( trailMarker );
+				Globals.create( trailMarker );
 			}
 			count++;
 		}

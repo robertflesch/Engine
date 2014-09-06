@@ -56,7 +56,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				_layer.replaceData( fileName );
 			}
 				
-			var ba:ByteArray = Globals.g_modelManager.findIVM( fileName );
+			var ba:ByteArray = Globals.findIVM( fileName );
 			if ( ba )
 			{
 				//Log.out("LoadModelFromIVM.start - IVM found in modelManager: " + fileName );
@@ -92,7 +92,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			Log.out( "LoadModelFromIVM.loaded: " + o );
 			//var ba:ByteArray = o.;
 			//
-			//Globals.g_modelManager.addIVM( _layer.data, ba );
+			//Globals.addIVM( _layer.data, ba );
 			//addLoadFromByteArray();
 			super.complete() // AbstractTask will send event
 		}
@@ -113,7 +113,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		public function onIVMLoad(event:Event):void	{
 			
 			var ba:ByteArray = event.target.data;
-			Globals.g_modelManager.addIVM( _layer.data, ba );
+			Globals.addIVM( _layer.data, ba );
 			loadByteArray( ba );
 		}
 		

@@ -215,7 +215,7 @@ package com.voxelengine.GUI
 			instance.grainSize = 6;
 			instance.positionSet = Globals.controlledModel.instanceInfo.positionGet.clone();
 			instance.positionSetComp( instance.positionGet.x, instance.positionGet.y - Globals.UNITS_PER_METER * 4, instance.positionGet.z );
-			Globals.g_modelManager.create( instance );
+			Globals.create( instance );
 		}
 		
 		private var _viewDistance:Vector3D = new Vector3D(0, 0, -75);
@@ -238,7 +238,7 @@ package com.voxelengine.GUI
 					
 					trace( "onChildModelFileSelected: " + instance.positionGet );
 					instance.controllingModel = parentModel;
-					Globals.g_modelManager.create( instance );
+					Globals.create( instance );
 					Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildModelCreated );
 				}
 			}
@@ -261,7 +261,7 @@ package com.voxelengine.GUI
 				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
 				if ( li && li.data )
 					populateChildModels( li.data );
-				var vm:VoxelModel = Globals.g_modelManager.getModelInstance( guid );
+				var vm:VoxelModel = Globals.getModelInstance( guid );
 				if ( vm )
 					vm.selected = true;
 			}
@@ -277,7 +277,7 @@ package com.voxelengine.GUI
 				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
 				if ( li && li.data )
 				{
-					Globals.g_modelManager.markDead( li.data.instanceInfo.instanceGuid );
+					Globals.markDead( li.data.instanceInfo.instanceGuid );
 					populateParentModels()
 				}
 			}
@@ -319,7 +319,7 @@ package com.voxelengine.GUI
 		{
 			_listbox1.removeAll();
 			removeChildModels();
-			var models:Dictionary = Globals.g_modelManager.modelInstancesGetDictionary();
+			var models:Dictionary = Globals.modelInstancesGetDictionary();
 			for each ( var vm:VoxelModel in models )
 			{
 				if ( vm && !vm.instanceInfo.dynamicObject && !vm.instanceInfo.dead )

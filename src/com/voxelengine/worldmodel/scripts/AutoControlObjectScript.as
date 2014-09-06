@@ -24,7 +24,7 @@ package com.voxelengine.worldmodel.scripts
 			{
 				if ( $event.instanceGuid == instanceGuid )
 				{
-					var vm:VoxelModel = Globals.g_modelManager.getModelInstance( instanceGuid );
+					var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
 					if ( Globals.player ) {
 						vm.takeControl( Globals.player );
 						Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.instanceInfo.name );
@@ -41,9 +41,9 @@ package com.voxelengine.worldmodel.scripts
 			
 			var player:VoxelModel = Globals.player;
 			if ( !player ) 
-				player = Globals.g_modelManager.getModelInstance( le.name );
+				player = Globals.getModelInstance( le.name );
 				
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( instanceGuid );
+			var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
 			if ( player && vm ) {
 				vm.takeControl( player );
 			}

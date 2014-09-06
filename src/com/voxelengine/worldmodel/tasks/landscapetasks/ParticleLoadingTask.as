@@ -39,7 +39,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var timer:int = getTimer();
 			super.start() // AbstractTask will send event
 			var fileName:String = _vm.modelInfo.fileName;
-			var ba:ByteArray = Globals.g_modelManager.findIVM( fileName );
+			var ba:ByteArray = Globals.findIVM( fileName );
 			if ( ba )
 			{
 				loadByteArray( ba );
@@ -70,7 +70,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private function onIVMLoad(event:Event):void	{
 			
 			var ba:ByteArray = event.target.data;
-			Globals.g_modelManager.addIVM( _vm.modelInfo.fileName, ba );
+			Globals.addIVM( _vm.modelInfo.fileName, ba );
 			loadCompressedByteArray( ba );
 		}
 		

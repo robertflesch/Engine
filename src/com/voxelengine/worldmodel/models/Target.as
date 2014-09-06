@@ -39,7 +39,7 @@ package com.voxelengine.worldmodel.models
 		//override public function explosionResponse( center:Vector3D, ee:ImpactEvent ):void
 		//{
 			/*
-			var ba:ByteArray = Globals.g_modelManager.findIVM( modelInfo.biomes.layers[0].data );
+			var ba:ByteArray = Globals.findIVM( modelInfo.biomes.layers[0].data );
 			statisics.gather( ba, oxel.gc.grain );
 			statisics.statsPrint();
 			var oldCount:int = statisics.countInMeters;

@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.scripts
 			{
 				if ( null == WindowBeastControlQuery.currentInstance && null == WindowBeastControl.currentInstance )
 				{
-					var trigger:VoxelModel = Globals.g_modelManager.getModelInstance( instanceGuid );
+					var trigger:VoxelModel = Globals.getModelInstance( instanceGuid );
 					if ( trigger )
 					{
 						var controllingModel:VoxelModel = trigger.instanceInfo.controllingModel;

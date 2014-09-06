@@ -59,7 +59,7 @@ public class WindowRegionNew extends VVPopup
         //private var _changeTimer:Timer;
 	
 	
-	public function WindowRegionNew( $region:Region )
+	public function WindowRegionNew()
 	{
 		super( "New Region" );
 		autoSize = true;
@@ -68,12 +68,14 @@ public class WindowRegionNew extends VVPopup
 		closeButtonActive = false;
 		//_modalObj = new ModalObject( this );
 		
-		_region = $region
+		_region = new Region( Globals.getUID() );
 		_region.owner = Persistance.DB_PUBLIC;
 		_region.gravity = true;
 		_region.name = Network.userId + "-" + int( Math.random() * 1000 );
 		_region.desc = "Please enter something meaningful here";
 		_region.changed = true;
+		_region.admin.push( Network.userId );
+		_region.editors.push( Network.userId );
 
 //		addElement( new Label( "ID: " + _region.regionId ) );
 //		addElement( new Label( "Gravity" ) );
@@ -140,15 +142,14 @@ public class WindowRegionNew extends VVPopup
 	}
 	
 	private function create( e:UIMouseEvent ):void {
-		//Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CREATE_SUCCESS, _region.regionId ) );
-		Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_EVENT_LOADED, _region ) );
+		Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, _region ) );
+		
 		remove();
 		new WindowSandboxList();
 	}
 	
 	private function cancel( e:UIMouseEvent ):void {
 		
-		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CREATE_CANCEL, _region.regionId ) );
 		remove();
 		new WindowSandboxList();
 	}

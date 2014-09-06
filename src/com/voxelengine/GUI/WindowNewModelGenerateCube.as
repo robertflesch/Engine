@@ -78,7 +78,7 @@ public class WindowNewModelGenerateCube extends ModalPopup
 			_ii.type = type;
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
 			_ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-			Globals.g_modelManager.create( _ii );
+			Globals.create( _ii );
 			_modalObj.remove();
 		}
 	}

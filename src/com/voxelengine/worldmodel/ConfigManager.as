@@ -43,7 +43,6 @@ package com.voxelengine.worldmodel
 			_urlLoader.load(new URLRequest(Globals.appPath + "config.json"));
 			_urlLoader.addEventListener(Event.COMPLETE, onConfigLoadedAction);
 			_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, errorAction);			
-			_urlLoader.addEventListener(ProgressEvent.PROGRESS, onProgressAction);
 		}
 		
 		public function onConfigLoadedAction(event:Event):void
@@ -54,41 +53,26 @@ package com.voxelengine.worldmodel
 			_showHelp = regionJson.config.showHelp;
 			_showEditMenu = regionJson.config.showEditMenu;
 			_showButtons = regionJson.config.showButtons;
+			
 			TypeInfo.loadTypeData(type);
 			
-			//trace( 	regionJson.config.region.startingRegion );
-			// So if this contains
-			// "region": { "startingRegion":"zeppelin"  },
-			// it will use zeppelin.rjson as starting region.
-			// if it contains startingRegion, it will load the default region
-			if ( regionJson.config.region.startingRegion == "startingRegion" )
-				Globals.g_regionManager.loadDefault();
-			else	
-			{
-				Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CACHE_REQUEST_LOCAL, regionJson.config.region.startingRegion ) );
-				Globals.g_app.addEventListener( RegionEvent.REGION_CACHE_COMPLETE, onRegionCacheComplete );
-			}
-			
+			Globals.g_regionManager.request( regionJson.config.region.startingRegion )
+			Globals.g_app.addEventListener( RegionEvent.REGION_STARTING_LOADED, onRegionStartingLoaded );
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 		}   
 		
 		private function onTypesLoaded( $e:LoadingEvent ):void
 		{
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
-			if ( !Globals.player )
-				Globals.g_modelManager.createPlayer();
+			// used to load player here
 		}
 
-		private function onRegionCacheComplete( $e:RegionEvent ):void
+		private function onRegionStartingLoaded( $e:RegionEvent ):void
 		{
-			Globals.g_app.removeEventListener( RegionEvent.REGION_CACHE_COMPLETE, onRegionCacheComplete );
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOCAL_LOAD, $e.regionId ) ); 
-		}
-		
-		public function onProgressAction(event:ProgressEvent):void
-		{
-			var percentLoaded:Number=event.bytesLoaded/event.bytesTotal*100;
-			//trace("ConfigManager.onProgressAction: "+percentLoaded+"%");
+			Globals.g_app.removeEventListener( RegionEvent.REGION_STARTING_LOADED, onRegionStartingLoaded );
+			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, $e.regionId ) ); 
+			if ( !Globals.player )
+				Globals.createPlayer();
 		}
 		
 		public function errorAction(e:IOErrorEvent):void

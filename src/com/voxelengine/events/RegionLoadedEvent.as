@@ -17,7 +17,8 @@ package com.voxelengine.events
 	 */
 	public class RegionLoadedEvent extends Event
 	{
-		static public const REGION_EVENT_LOADED:String					= "REGION_EVENT_LOADED";
+		static public const REGION_CREATED:String					= "REGION_CREATED";
+		static public const REGION_LOADED:String					= "REGION_LOADED";
 		
 		private var _region:Region;
 		

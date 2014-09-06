@@ -63,7 +63,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 				var blockageList:Vector.<BlockageCandidates> = new Vector.<BlockageCandidates>;
 				// The only time this matters is if I have only TWO side that are translucent
 				// All other times this blockage doesnt matter.
-				var vm:VoxelModel = Globals.g_modelManager.getModelInstance( $le.instanceGuid );
+				var vm:VoxelModel = Globals.getModelInstance( $le.instanceGuid );
 				if ( vm ) {
 					var lo:Oxel = vm.oxel.childFind( $le.gc );
 					if ( lo && valid( lo ) ) {
@@ -160,7 +160,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 		override public function start():void {
 			super.start();
 			
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _guid );
+			var vm:VoxelModel = Globals.getModelInstance( _guid );
 			if ( vm ) {
 				var lo:Oxel = vm.oxel.childFind( _gc );
 				if ( LightTask.valid( lo ) ) {

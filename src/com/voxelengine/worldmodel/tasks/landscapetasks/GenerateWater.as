@@ -35,7 +35,7 @@ public class GenerateWater extends LandscapeTask
 		super.start();
 		var timer:int = getTimer();
 		trace( "GenerateWater.start - enter: ", Log.ERROR );					
-		var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _guid );
+		var vm:VoxelModel = Globals.getModelInstance( _guid );
 		if ( vm )
 		{
 			// this gives us a general range

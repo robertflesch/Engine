@@ -68,7 +68,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			
 			var timer:int = getTimer();
 	
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _guid );
+			var vm:VoxelModel = Globals.getModelInstance( _guid );
 			if ( vm && 0 < _runCount )
 			{
 				_runCount--;

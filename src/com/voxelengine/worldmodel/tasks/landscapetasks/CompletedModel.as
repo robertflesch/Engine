@@ -40,7 +40,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 			try
 			{
-				var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _guid );
+				var vm:VoxelModel = Globals.getModelInstance( _guid );
 				if ( vm )
  					vm.complete = true;
 				else
@@ -98,10 +98,10 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			ii.templateName = "GenerateCube";
 			ii.name = "Missing Object";
 			// preload the modelInfo for the GenerateCube
-			Globals.g_modelManager.modelInfoPreload( ii.templateName );
+			Globals.modelInfoPreload( ii.templateName );
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-			Globals.g_modelManager.create( ii );
+			Globals.create( ii );
 		}
 	}
 }

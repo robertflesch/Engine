@@ -93,7 +93,7 @@ public class WindowBeastControlQuery extends VVContainer
 
 		private function takeControl():void 
 		{
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _beastInstanceGuid );
+			var vm:VoxelModel = Globals.getModelInstance( _beastInstanceGuid );
 			if ( vm )
 			{
 				remove();

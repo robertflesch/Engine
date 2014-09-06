@@ -24,7 +24,7 @@ public class FireScript extends ImpactScript
 	
 	override public function impact( $wsLoc:Vector3D ):void
 	{
-		var vm:VoxelModel = Globals.g_modelManager.getModelInstance( instanceGuid );
+		var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
 		if ( vm )
 			vm.instanceInfo.dead = true;
 		

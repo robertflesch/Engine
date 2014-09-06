@@ -33,7 +33,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			super.start();
 			var timer:int = getTimer();
 			trace( "CarveOutsideSurfaceNoTaper  - enter ", Log.ERROR );					
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _guid );
+			var vm:VoxelModel = Globals.getModelInstance( _guid );
 
 			var masterHeightMap:Array = null;
 			var masterMapSize:uint = 0;

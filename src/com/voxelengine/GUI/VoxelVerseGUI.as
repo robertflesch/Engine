@@ -29,7 +29,6 @@ package com.voxelengine.GUI
 	
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.LoginEvent;
-	import com.voxelengine.events.ModeChoiceEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.RegionEvent;
 	
@@ -169,7 +168,7 @@ package com.voxelengine.GUI
 			 //update the model manager, removing old guid and adding new guid
 			var vm:VoxelModel = Globals.selectedModel;
 			if ( !vm )
-				vm = Globals.g_modelManager.modelInstancesGetFirst();
+				vm = Globals.modelInstancesGetFirst();
 			if ( vm )
 			{
 				if ( Network.client )
@@ -426,37 +425,13 @@ package com.voxelengine.GUI
 			
 			if ( true == Globals.sandbox )
 			{
-				Globals.g_app.addEventListener( ModeChoiceEvent.MODE_SANDBOX, modeChoiceEventSandbox );
-				Globals.g_app.addEventListener( ModeChoiceEvent.MODE_ONLINE, modeChoiceEventOnline );
 				EventHandlers.addEventHandlers();
-				if ( "startingRegion" == Globals.g_regionManager.currentRegion.name )
-					new WindowModeChoice();
-				// else just load up the region	
 			}
 			else
 			{
-				modeChoiceEventOnline(null);
+				Globals.mode = Globals.MODE_PUBLIC;
+				new WindowLogin();
 			}
-		}
-		
-		private function modeChoiceEventSandbox( event : ModeChoiceEvent ) : void
-		{
-			Globals.mode = Globals.MODE_LOCAL;
-			Globals.g_app.removeEventListener( ModeChoiceEvent.MODE_SANDBOX, modeChoiceEventSandbox );
-			Globals.g_app.removeEventListener( ModeChoiceEvent.MODE_ONLINE, modeChoiceEventOnline );
-			if ( !WindowSandboxList.isActive )
-				WindowSandboxList.create();
-				
-			// Need this to see cannonballs
-			EventHandlers.addEventHandlers();
-		}
-		
-		private function modeChoiceEventOnline( event : ModeChoiceEvent ) : void
-		{
-			Globals.mode = Globals.MODE_PUBLIC;
-			Globals.g_app.removeEventListener( ModeChoiceEvent.MODE_SANDBOX, modeChoiceEventSandbox );
-			Globals.g_app.removeEventListener( ModeChoiceEvent.MODE_ONLINE, modeChoiceEventOnline );
-			new WindowLogin();
 		}
 		
 		private function onModelLoadingComplete(event : LoadingEvent ) : void
@@ -527,7 +502,7 @@ package com.voxelengine.GUI
 					
 				if ( Keyboard.O == e.keyCode )
 				{
-					Globals.g_modelManager.TestCheckForFlow();
+					Globals.TestCheckForFlow();
 					//Globals.g_renderer.context.dispose();
 					//new WindowObjects();
 				}

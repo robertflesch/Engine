@@ -56,7 +56,7 @@ package com.voxelengine.worldmodel.scripts
 			// That is determined by the guns location, and rotation, and by its parents location and rotation
 			
 			// first we calculate the location of the end of the barrel
-			const gunModel:VoxelModel = Globals.g_modelManager.getModelInstance( instanceGuid );
+			const gunModel:VoxelModel = Globals.getModelInstance( instanceGuid );
 			if ( gunModel )
 			{
 				// What was I thinking here?
@@ -111,7 +111,7 @@ package com.voxelengine.worldmodel.scripts
 		static public function createProjectile( pe:ProjectileEvent ):void
 		{
 			var ownerGuid:String = pe.owner;
-			var gunModel:VoxelModel = Globals.g_modelManager.getModelInstance( ownerGuid );
+			var gunModel:VoxelModel = Globals.getModelInstance( ownerGuid );
 			if ( gunModel && gunModel.instanceInfo.controllingModel )
 			{
 				var cm:VoxelModel = gunModel.instanceInfo.controllingModel;
@@ -132,7 +132,7 @@ package com.voxelengine.worldmodel.scripts
 				}
 				
 			}
-			var mm:ModelManager = Globals.g_modelManager;
+			//var mm:ModelManager = Globals.g_modelManager;
 			//Log.out( "bulletPool.createProjectile" );
 		}
 		
@@ -187,7 +187,7 @@ package com.voxelengine.worldmodel.scripts
 			//pm.instanceInfo.addTransform( 0, 0, 0.1, ModelTransform.INFINITE_TIME, ModelTransform.ROTATION_STRING );
 			
 			// add this particle to the system, it will get returned to pool when it dies.
-			Globals.g_modelManager.modelAdd( pm );
+			Globals.modelAdd( pm );
 			
 		}
 	}

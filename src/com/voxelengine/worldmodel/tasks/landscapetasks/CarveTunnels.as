@@ -93,7 +93,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		override public function start():void {
             super.start() // AbstractTask will send event
 			var timer:int = getTimer();
-            var vm:VoxelModel = Globals.g_modelManager.getModelInstance( _guid );
+            var vm:VoxelModel = Globals.getModelInstance( _guid );
 			if ( !vm ) {
 				super.complete() // AbstractTask will send event
 				return;
@@ -116,7 +116,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				startLoc.z += view.z + rndOffset( tunnelRadius );
 				if ( 0.90 < Math.random() ) {
 					trace( "CarveTunnels.start - Carve SIDE TUNNEL ---------------------------------------------------------------" );					
-					var vv:Vector3D = Globals.g_modelManager.viewVectorNormalizedGet();
+					var vv:Vector3D = Globals.viewVectorNormalizedGet();
 					vv = vv.crossProduct( crossListGet() );
 					CarveTunnels.contructor( _guid
 								 , startLoc

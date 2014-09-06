@@ -1,17 +1,12 @@
-
+/*==============================================================================
+  Copyright 2011-2014 Robert Flesch
+  All rights reserved.  This product contains computer programs, screen
+  displays and printed documentation which are original works of
+  authorship protected under United States Copyright Act.
+  Unauthorized reproduction, translation, or display is prohibited.
+==============================================================================*/
 package com.voxelengine.GUI
 {
-import com.voxelengine.events.LoginEvent;
-import com.voxelengine.events.RegionEvent;
-import com.voxelengine.events.RegionLoadedEvent;
-import com.voxelengine.server.Network;
-import com.voxelengine.server.Persistance;
-import com.voxelengine.server.VVServer;
-import com.voxelengine.worldmodel.Region;
-import org.flashapi.swing.*;
-import org.flashapi.swing.event.*;
-import org.flashapi.swing.constants.*;
-import org.flashapi.swing.list.ListItem;
 import flash.events.Event;
 
 import org.flashapi.collector.EventCollector;
@@ -23,10 +18,15 @@ import org.flashapi.swing.list.ListItem;
 import org.flashapi.swing.constants.BorderStyle;
 import org.flashapi.swing.dnd.*;
 
-
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 
+import com.voxelengine.events.RegionEvent;
+import com.voxelengine.events.RegionLoadedEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.server.Persistance;
+import com.voxelengine.server.VVServer;
+import com.voxelengine.worldmodel.Region;
 
 public class WindowSandboxList extends VVPopup
 {
@@ -41,7 +41,6 @@ public class WindowSandboxList extends VVPopup
 		return _s_currentInstance; 
 	}
 	
-	
 	private var _listbox1:ListBox = new ListBox( WIDTH, 15 );
 	private var _createFileButton:Button		
 	
@@ -53,47 +52,35 @@ public class WindowSandboxList extends VVPopup
 		layout.orientation = LayoutOrientation.VERTICAL;
 		closeButtonActive = false;
 
-		// Buttons in TabBar
-		if ( Globals.MODE_LOCAL != openType  )
-		{
-			var bar:TabBar = new TabBar();
-			bar.setButtonsWidth( WIDTH/2 );
-			bar.addItem( Globals.MODE_PUBLIC );
-			bar.addItem( Globals.MODE_PRIVATE );
-			addGraphicElements( bar );
-			eventCollector.addEvent( bar, ListEvent.ITEM_CLICKED, selectCategory );
-			eventCollector.addEvent( bar, ListEvent.ITEM_PRESSED, pressCategory );
-		}
+		var bar:TabBar = new TabBar();
+		bar.setButtonsWidth( WIDTH/2 );
+		bar.addItem( Globals.MODE_PUBLIC );
+		bar.addItem( Globals.MODE_PRIVATE );
+		addGraphicElements( bar );
+		eventCollector.addEvent( bar, ListEvent.ITEM_CLICKED, selectCategory );
+		eventCollector.addEvent( bar, ListEvent.ITEM_PRESSED, pressCategory );
 
-		// Label
 		addElement(new Label( "Click Sandbox to load" ));
-		
-		// Listbox
 		addElement( _listbox1 );
 		
-		if ( Globals.MODE_LOCAL != openType )
-		{
-			var buttonPanel:Container = new Container( WIDTH, 20);
-			_createFileButton = new Button( "Create" );
-			buttonPanel.addElement( _createFileButton );
-			addElement( buttonPanel );
-			eventCollector.addEvent( _createFileButton , UIMouseEvent.CLICK
-								   , createRegion )
-		}
-	
+		var buttonPanel:Container = new Container( WIDTH, 20);
+		_createFileButton = new Button( "Create" );
+		buttonPanel.addElement( _createFileButton );
+		addElement( buttonPanel );
+		eventCollector.addEvent( _createFileButton , UIMouseEvent.CLICK
+							   , createRegion )
 		
 		// Event handlers
 		eventCollector.addEvent( _listbox1, UIMouseEvent.CLICK, loadthisRegion );
 		//eventCollector.addEventListener( _listbox1, ListEvent.LIST_CHANGED, selectSandbox);
 		// These events are needed to keep mouse clicks from leaking thru window
 		// This needs to be handled by stage
-		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 		eventCollector.addEvent( this, UIMouseEvent.CLICK, windowClick );
 		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
 		eventCollector.addEvent( this, UIMouseEvent.PRESS, pressWindow );
 		
-		//Globals.g_app.addEventListener( RegionEvent.REGION_CACHE_COMPLETE, regionCacheComplete );
-		Globals.g_app.addEventListener( RegionLoadedEvent.REGION_EVENT_LOADED, regionLoadedEvent );
+		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
+		Globals.g_app.addEventListener( RegionLoadedEvent.REGION_LOADED, regionLoadedEvent );
 		
 		if ( bar )
 		{
@@ -106,34 +93,12 @@ public class WindowSandboxList extends VVPopup
 	
 	private function createRegion(e:UIMouseEvent):void
 	{
-		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_PERSISTANCE_CREATE, "" ) ); 
+		new WindowRegionNew();
 		remove();
-	}
-	
-	private function pressWindow(e:UIMouseEvent):void
-	{
-		//Log.out( "WindowInventory.pressWindow" );
-		//Globals.GUIControl = true;
-	}
-	private function windowClick(e:UIMouseEvent):void
-	{
-		//Log.out( "WindowInventory.windowClick" );
-		//Globals.GUIControl = true;
-	}
-	private function pressCategory(e:UIMouseEvent):void
-	{
-		//Log.out( "WindowInventory.pressCategory" );
-		//Globals.GUIControl = true;
 	}
 	
 	private function selectCategory(e:ListEvent):void 
 	{			
-		//Log.out( "WindowInventory.selectCategory" );
-		//Globals.GUIControl = true;
-		//while ( 1 < numElements )
-		//{
-			//removeElementAt( 1 );
-		//}
 		displaySelectedRegionList( e.target.value );	
 	}
 	protected function onResize(event:Event):void
@@ -144,19 +109,15 @@ public class WindowSandboxList extends VVPopup
 	// Window events
 	private function onRemoved( event:UIOEvent ):void
 	{
-		//Globals.GUIControl = false;
-		
 		Globals.g_app.stage.removeEventListener(Event.RESIZE, onResize);
-		Globals.g_app.removeEventListener( RegionEvent.REGION_CACHE_COMPLETE, regionCacheComplete );
+		Globals.g_app.removeEventListener( RegionLoadedEvent.REGION_LOADED, regionLoadedEvent );
 
-		removeEventListener(UIOEvent.REMOVED, onRemoved );
 		eventCollector.removeAllEvents();
 		_s_currentInstance = null;
 	}
 	
 	private function onClickSandBox(event:UIMouseEvent):void 
 	{
-		//Globals.GUIControl = true;
 		loadthisRegion( null );
 	}
 	
@@ -168,73 +129,52 @@ public class WindowSandboxList extends VVPopup
 		var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
 		if ( li && li.data )
 		{
-			if ( Globals.MODE_LOCAL != Globals.mode )
-//				VVServer.joinRoom( li.value );
-				VVServer.joinRoom( li.data );
-			else	
-				new WindowRegionDetail( li.data );	
+			VVServer.joinRoom( li.data );
 		}
 		remove();
 	}
 	
 	private function displaySelectedRegionList( type:String ):void
 	{
-		_listbox1.removeAll();
-		if ( Globals.MODE_LOCAL == Globals.mode )
+//		_listbox1.removeAll();
+		if ( Globals.MODE_PRIVATE == Globals.mode )
 		{
-			populateSandboxListFromLocal();
-		}
-		else if ( Globals.MODE_PRIVATE == Globals.mode )
-		{
-			populateSandboxListFromPrivate();
+			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REQUEST_PRIVATE, "" ) );
 		}
 		else if ( Globals.MODE_PUBLIC == Globals.mode )
 		{
-			populateSandboxListFromPublic();
+			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REQUEST_PUBLIC, "" ) );
 		}
 	}
 
-	private function populateSandboxListFromPrivate():void
-	{
-		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CACHE_REQUEST_PRIVATE, "" ) );
-	}
-	
-	private function populateSandboxListFromPublic():void
-	{
-		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CACHE_REQUEST_PUBLIC, "" ) );
-	}
-	
-	private function populateSandboxListFromLocal():void
-	{
-		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CACHE_REQUEST_LOCAL, "startingRegion" ) );
-		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CACHE_REQUEST_LOCAL, "kickstarter" ) );
-		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CACHE_REQUEST_LOCAL, "collisionTest" ) );
-		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CACHE_REQUEST_LOCAL, "multiplayerTestRegion" ) );
-		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CACHE_REQUEST_LOCAL, "startingRegionTwoPlatforms" ) );
-		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_CACHE_REQUEST_LOCAL, "zeppelin" ) );
-	}
-	
-	private function regionCacheComplete( e: RegionEvent ):void
-	{
-		Log.out( "WindowSandboxList.regionCacheComplete - adding regionId: " + e.regionId );
-		var region:Region = Globals.g_regionManager.getRegion( e.regionId );
-		_listbox1.addItem( region.name, region.regionId );
-	}
-	
 	private function regionLoadedEvent( e: RegionLoadedEvent ):void
 	{
-		Log.out( "WindowSandboxList.regionLoadedEvent - adding regionId: " + e.region.name );
+		var region:Region = e.region;
+		
+//		Log.out( "WindowSandboxList.regionLoadedEvent - adding regionId: " + region.toString() );
 		if ( Globals.MODE_PRIVATE == Globals.mode )
 		{
-			if ( Network.userId == e.region.owner )
-				_listbox1.addItem( e.region.name, e.region.regionId );
+			if ( Network.userId == region.owner )
+				_listbox1.addItem( region.name, region.regionId );
 		}
 		else if ( Globals.MODE_PUBLIC == Globals.mode )
 		{
 			if ( Persistance.DB_PUBLIC == e.region.owner )
-				_listbox1.addItem( e.region.name, e.region.regionId );
+				_listbox1.addItem( region.name, region.regionId );
 		}
 	}
 	
+	private function pressWindow(e:UIMouseEvent):void
+	{
+		//Log.out( "WindowInventory.pressWindow" );
+	}
+	private function windowClick(e:UIMouseEvent):void
+	{
+		//Log.out( "WindowInventory.windowClick" );
+	}
+	private function pressCategory(e:UIMouseEvent):void
+	{
+		//Log.out( "WindowInventory.pressCategory" );
+	}
 }
 }

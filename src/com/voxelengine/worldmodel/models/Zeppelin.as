@@ -43,7 +43,7 @@ package com.voxelengine.worldmodel.models
 			if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
 				return;
 				
-			var vm:VoxelModel = Globals.g_modelManager.getModelInstance( me.instanceGuid );
+			var vm:VoxelModel = Globals.getModelInstance( me.instanceGuid );
 			if ( vm is Engine )
 				_engines.push( vm );
 			if ( vm is Gun )
@@ -82,7 +82,7 @@ package com.voxelengine.worldmodel.models
 			// does model have collision, if no collision, then why bother with gravity
 			if ( instanceInfo.usesCollision )
 			{
-				_collisionCandidates = Globals.g_modelManager.whichModelsIsThisInfluencedBy( this )
+				_collisionCandidates = Globals.whichModelsIsThisInfluencedBy( this )
 				//trace( "collisionTest: " + _collisionCandidates.length )
 				if ( 0 == _collisionCandidates.length )
 				{

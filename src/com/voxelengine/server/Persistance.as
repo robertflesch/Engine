@@ -5,6 +5,7 @@
 	import com.voxelengine.events.ModelMetadataEvent;
 	import com.voxelengine.events.PersistanceEvent;
 	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.events.RegionLoadedEvent;
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.LoginEvent;
 	import com.voxelengine.worldmodel.models.VoxelModel;
@@ -165,24 +166,40 @@
 			}
 		}
 		
+		// comma seperated variables
+		static private function cvsToVector( value:String ):Vector.<String> {
+			var v:Vector.<String> = new Vector.<String>;
+			var start:int = 0;
+			var end:int = value.indexOf( ",", 0 );
+			while ( -1 < end ) {
+				v.push( value.substring( start, end ) );
+				start = end + 1;
+				end = value.indexOf( ",", start );
+			}
+			// there is only one, or this is the last one
+			if ( -1 == end && start < value.length ) {
+				v.push( value.substring( start, value.length ) );
+			}
+			return v;
+		}
+		
 		static private function loadRegionFromDBO( dbo:DatabaseObject):void
 		{
-			var newRegion:Region = new Region();
-			newRegion.admin = dbo.admin,
+			var newRegion:Region = new Region( dbo.region );
+			newRegion.admin = cvsToVector( dbo.admin );
 			newRegion.databaseObject = dbo;
 			newRegion.desc = dbo.description;
 			newRegion.name = dbo.name;
 			newRegion.owner = dbo.owner
 			newRegion.worldId = dbo.world;
-			newRegion.regionId = dbo.region;
-			newRegion.editors = dbo.editors;
+			newRegion.editors = cvsToVector( dbo.editors );
 			newRegion.created = dbo.created;
 			newRegion.modified = dbo.modified;
 			var $ba:ByteArray = dbo.data as ByteArray;
 			
-			Log.out( "Persistance.loadFromDBO - regionJson: " + newRegion.name + "  owner: " + newRegion.owner );
+//			Log.out( "Persistance.loadFromDBO - regionJson: " + newRegion.name + "  owner: " + newRegion.owner );
 			
-			//$ba.uncompress();
+			$ba.uncompress();
 			$ba.position = 0;
 			// how many bytes is the modelInfo
 			var strLen:int = $ba.readInt();
@@ -190,6 +207,9 @@
 			var regionJson:String = $ba.readUTFBytes( strLen );
 			//regionJson = decodeURI(regionJson);
 			newRegion.processRegionJson( regionJson );
+			
+			// Now that we have a fully formed region, inform the region manager
+			Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
 		}
 
 		///////////////// MODELS ////////////////////////////////

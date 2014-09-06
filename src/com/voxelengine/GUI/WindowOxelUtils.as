@@ -100,7 +100,7 @@ package com.voxelengine.GUI
 		
 		private function statsHandler(event:UIMouseEvent):void 
 		{
-			var ba:ByteArray = Globals.g_modelManager.findIVM( _vm.modelInfo.biomes.layers[0].data );
+			var ba:ByteArray = Globals.findIVM( _vm.modelInfo.biomes.layers[0].data );
 			// this positions the ba pointer to the oxel data, which is what the statisics needs
 			var versionInfo:Object = VoxelModel.readMetaInfo( ba );
 			if ( 0 != versionInfo.manifestVersion ) {
