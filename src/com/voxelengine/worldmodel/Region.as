@@ -164,9 +164,6 @@ package com.voxelengine.worldmodel
 			_regionId = $regionID;
 			_created = new Date();
 			_modified = _created;
-			_editors.push( "people1" );
-			_editors.push( "people1" );
-			_editors.push( "people1" );
 		}
 		
 		public function update( $elapsed:int ):void {
