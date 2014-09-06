@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.RegionEvent;
@@ -19,9 +20,11 @@ import com.voxelengine.GUI.WindowSplash;
 import com.voxelengine.Log;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.VVServer;
+import com.voxelengine.worldmodel.models.InstanceInfo;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.ProgressEvent;
+import flash.geom.Vector3D;
 import flash.net.FileReference;
 import org.flashapi.swing.Alert;
 import playerio.PlayerIOError;
@@ -58,6 +61,7 @@ public class RegionManager
 		
 		Globals.g_app.addEventListener( RegionEvent.REQUEST_PUBLIC, cacheRequestPublic ); 
 		Globals.g_app.addEventListener( RegionEvent.REQUEST_PRIVATE, cacheRequestPrivate ); 
+		Globals.g_app.addEventListener( ModelMetadataEvent.INFO_COLLECTED, metadataCollected );
 
 		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, load ); 
 		
@@ -174,7 +178,22 @@ public class RegionManager
 			var fr:FileReference = new FileReference();
 			fr.save( currentRegion.getJSON(), currentRegion.regionId );
 		}
+	}
+	
+	static private function metadataCollected( e:ModelMetadataEvent ):void {
 		
+		var ii:InstanceInfo = new InstanceInfo();
+		ii.instanceGuid = Globals.getUID();
+		var fileName:String = e.name;
+		ii.templateName = e.description;
+		ii.name = fileName;
+		var viewDistance:Vector3D = new Vector3D(0, 0, -75);
+		ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
+		
+		Globals.create( ii );
+	}
+	
+	
 		//////////////////////////
 			/*
 	private function newRegionCreate( e:RegionEvent ):void
@@ -204,6 +223,6 @@ public class RegionManager
 	}
 	*/
 
-	}
+	
 } // RegionManager
 } // Package

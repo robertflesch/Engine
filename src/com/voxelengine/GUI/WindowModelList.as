@@ -99,22 +99,8 @@ package com.voxelengine.GUI
 			var fileName:String = e.currentTarget.name;
 			fileName = fileName.substr( 0, fileName.indexOf( "." ) );
 
-			Globals.g_app.addEventListener( ModelMetadataEvent.INFO_COLLECTED, metadataCollected );
 			new WindowModelMetadata( fileName );
-		}
-		
-		private function metadataCollected( e:ModelMetadataEvent ):void {
-			Globals.g_app.removeEventListener( ModelMetadataEvent.INFO_COLLECTED, metadataCollected );
-			
-			var ii:InstanceInfo = new InstanceInfo();
-			ii.instanceGuid = Globals.getUID();
-			var fileName:String = e.name;
-			ii.templateName = e.description;
-			ii.name = fileName;
-			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
-			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-			
-			Globals.create( ii );
+			remove();
 		}
 		
 		private function addThisModelHandler(event:UIMouseEvent):void 

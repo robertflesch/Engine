@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import flash.geom.Matrix3D;
@@ -1105,7 +1106,7 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 		}
 		
 		public function removeAllModelInstances( $removePlayer:Boolean = false ):void {
-			Log.out( "ModelManager.removeAllModelInstances" );
+			Log.out( "ModelManager.removeAllModelInstances - Should this remove the player since it is now unique?" );
 			// clear out old models
 			for each ( var vm:VoxelModel in _modelInstances )
 			{
@@ -1114,13 +1115,15 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 					if (vm is Player)
 						if ( !$removePlayer )
 							continue;
+						else
+							Globals.player = null;
 					trace( "ModelManager.removeAllModelInstances - marking as dead: " + vm.instanceInfo.instanceGuid );
 					markDead( vm.instanceInfo.instanceGuid );
 				}
 			}
 			
-			_modelInfo = null;
-			_modelInfo = new Dictionary();
+			//_modelInfo = null;
+			//_modelInfo = new Dictionary();
 		}	
 		
 		static public function createInstanceFromTemplate( vm:VoxelModel ):void {
@@ -1160,6 +1163,11 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 				create( instance );
 				count++;
 			}
+			// why is defaultRegion special?
+			//if ( 0 == count && name != "defaultRegion" ) {
+			if ( 0 == count )
+				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE ) );
+
 			Globals.g_landscapeTaskController.activeTaskLimit = 1;
 			return count;
 		}

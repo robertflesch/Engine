@@ -3,6 +3,7 @@
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.LoginEvent;
 	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.Log;
 	import playerio.Client;
 	import playerio.Connection;
 	import playerio.PlayerIO;
@@ -14,7 +15,7 @@
 		static private var _connection:Connection = null;
 		static public function connection():Connection { return _connection; }
 		
-		static public var regionName:String;
+		static public var regionId:String;
 /*		
 		static public function connect( email:String, password:String ):void
 		{
@@ -30,7 +31,7 @@
 			);   
 		}
 */		
-		static public function joinRoom( $regionName:String ):void
+		static public function joinRoom( $regionId:String ):void
 		{
 			//trace("VVServer.connectSuccess - connection to server established");
 			//
@@ -39,17 +40,17 @@
 			//Network.userId = $client.connectUserId;
 			//Network.client = $client
 			//Set developmentsever (Comment out to connect to your server online)
-			trace( "joinRoom: " + Network.client.multiplayer.developmentServer );
+			//trace( "joinRoom: " + Network.client.multiplayer.developmentServer );
 			Network.client.multiplayer.developmentServer = "localhost:8184";
-			trace( "joinRoom: " + Network.client.multiplayer.developmentServer );
+			//trace( "joinRoom: " + Network.client.multiplayer.developmentServer );
 			
-			
-			regionName = $regionName;
+			// Save the region id for when we need to load the region.
+			regionId = $regionId;
 			
 			trace("VVServer.joinRoom - trying to join room at host: " + Network.client.multiplayer.developmentServer );
 			//Create pr join the room test
 			Network.client.multiplayer.createJoinRoom(
-				regionName,							//Room id. If set to null a random roomid is used
+				regionId,							//Room id. If set to null a random roomid is used
 				"VoxelVerse",							//The game type started on the server
 				true,								//Should the room be visible in the lobby?
 				{},									//Room data. This data is returned to lobby list. Variabels can be modifed on the server
@@ -59,15 +60,16 @@
 			);
 		}
 		
-		static public function connectFailure(error:PlayerIOError):void
+		static private function handleJoinError(error:PlayerIOError):void
 		{
-			trace("VVServer.handleConnectError",error)
+			trace("VVServer.handleJoinError",error)
+			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.LOGIN_FAILURE, error ) );
 		}
 		
 		static private function handleJoin(connection:Connection):void
 		{
 			
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, regionName ) );
+			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, regionId ) );
 			
 			trace("VVServer.handleJoin. Sucessfully joined Room");
 			_connection = connection;
@@ -78,20 +80,12 @@
 			EventHandlers.addEventHandlers( _connection );
 		}
 		
-		static private function handleMessages(m:Message):void
-		{
-			trace("VVServer.handleMessages - Received * message", m)
-		}
-		
+		// This disconnection from room server - Tested - RSF 9.6.14
 		static private function handleDisconnect():void
 		{
-			trace("Disconnected from server")
+			Log.out ("VVServer.handleDisconnect - Disconnected from server", Log.WARN );
+			Globals.online = false;
 		}
 		
-		static private function handleJoinError(error:PlayerIOError):void
-		{
-			trace("VVServer.handleJoinError",error)
-			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.LOGIN_FAILURE, error ) );
-		}
 	}	
 }

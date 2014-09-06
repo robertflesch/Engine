@@ -111,8 +111,6 @@ package com.voxelengine.worldmodel
 		private var _loaded:Boolean = true;
 		private var _modelManager:ModelManager = new ModelManager();
 
-
-
 		public function get databaseObject():DatabaseObject { return _databaseObject; }
 		public function set databaseObject(val:DatabaseObject):void { _databaseObject = val; }
 		
@@ -137,7 +135,6 @@ package com.voxelengine.worldmodel
 		{ 
 			if ( !_loaded )
 				return;
-			Log.out( "Region.changed: " + val );
 			_changed = val; 
 		}
 		
@@ -197,7 +194,7 @@ package com.voxelengine.worldmodel
 			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_ADDED, function( me:ModelEvent ):void { ; } );
 			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_REMOVED, function( me:ModelEvent ):void { ; } );
 			Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
-			_modelManager.removeAllModelInstances();
+			_modelManager.removeAllModelInstances( true );
 		}
 		
 		private function handleRegionModified( $re:RegionEvent ):void {
@@ -212,20 +209,12 @@ package com.voxelengine.worldmodel
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.addEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
 			Globals.g_app.addEventListener( RegionEvent.REGION_MODIFIED, handleRegionModified);
+			
+			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD_BEGUN, regionId ) );
 
 			var count:int = _modelManager.loadRegionObjects(_JSON.region);
 			if ( 0 < count )
 				_loaded = false;
-
-			//if ( 0 == count )
-			//	Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE ) );
-
-			
-			if ( 0 == count && name != "defaultRegion" )
-				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE ) );
-			else 
-				Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD_BEGUN, regionId ) );
-				
 			Log.out( "Region.load - completed processing on: " + name );
 		}		
 

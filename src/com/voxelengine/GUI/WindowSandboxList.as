@@ -80,7 +80,9 @@ public class WindowSandboxList extends VVPopup
 		eventCollector.addEvent( this, UIMouseEvent.PRESS, pressWindow );
 		
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
-		Globals.g_app.addEventListener( RegionLoadedEvent.REGION_LOADED, regionLoadedEvent );
+		//Globals.g_app.addEventListener( RegionLoadedEvent.REGION_LOADED, regionLoadedEvent );
+		Globals.g_app.addEventListener( RegionLoadedEvent.REGION_CREATED, regionLoadedEvent ); 
+
 		
 		if ( bar )
 		{
@@ -136,12 +138,12 @@ public class WindowSandboxList extends VVPopup
 	
 	private function displaySelectedRegionList( type:String ):void
 	{
-//		_listbox1.removeAll();
-		if ( Globals.MODE_PRIVATE == Globals.mode )
+		_listbox1.removeAll();
+		if ( Globals.MODE_PRIVATE == type )
 		{
 			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REQUEST_PRIVATE, "" ) );
 		}
-		else if ( Globals.MODE_PUBLIC == Globals.mode )
+		else if ( Globals.MODE_PUBLIC == type )
 		{
 			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REQUEST_PUBLIC, "" ) );
 		}
