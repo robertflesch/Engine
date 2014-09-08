@@ -101,8 +101,8 @@ package com.voxelengine.worldmodel.models
 			return _worldSpaceStartPoint;
 		}
 		
-		public function instanceInfoAdd(val:InstanceInfo):void  {  _instanceDictionary[val.instanceGuid] = val; }
-		public function instanceInfoGet( instanceGuid:String ):InstanceInfo  {  return _instanceDictionary[instanceGuid]; }
+		public function instanceInfoAdd(val:InstanceInfo):void  {  _instanceDictionary[val.guid] = val; }
+		public function instanceInfoGet( guid:String ):InstanceInfo  {  return _instanceDictionary[guid]; }
 		
 		public function ModelManager() {
 			_viewDistances = new Vector.<Vector3D>(6); 
@@ -114,12 +114,12 @@ package com.voxelengine.worldmodel.models
 			_viewDistances[DOWN] = new Vector3D(0, -1, 0);
 		}
 		
-		public function modelInstancesGet( instanceGuid:String ):VoxelModel { 
-			var vm:VoxelModel = _modelInstances[instanceGuid];
+		public function modelInstancesGet( guid:String ):VoxelModel { 
+			var vm:VoxelModel = _modelInstances[guid];
 			if ( vm )
 				return vm;
 			
-			vm = _modelDynamicInstances[instanceGuid];
+			vm = _modelDynamicInstances[guid];
 			
 			return vm;
 		}
@@ -158,12 +158,12 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		public function create( instance:InstanceInfo ):void {
-			//Log.out( "ModelManager.create: instance.templateName" + instance.templateName )
+			//Log.out( "ModelManager.create: instance.guid" + instance.guid )
 			instanceInfoAdd( instance );
-Log.out( "ModelManager.create - instance.templateName: " + instance.templateName + " ii: " + instance.toString() );
-			if ( !Globals.isGuid( instance.templateName ) && instance.templateName != "LoadModelFromBigDB" )
+Log.out( "ModelManager.create - instance.guid: " + instance.guid + " ii: " + instance.toString() );
+			if ( !Globals.isGuid( instance.guid ) && instance.guid != "LoadModelFromBigDB" )
 			{
-				var modelInfo:ModelInfo = modelInfoFindOrCreate( instance.templateName, instance.instanceGuid );
+				var modelInfo:ModelInfo = modelInfoFindOrCreate( instance.guid, instance.guid );
 				if ( modelInfo )
 				{
 					instantiate( instance, modelInfo );
@@ -174,37 +174,37 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 				// land task controller, this tells task controller not to run until it is done loading all tasks
 				Globals.g_landscapeTaskController.activeTaskLimit = 0;
 				// Create task group
-				var taskGroup:TaskGroup = new TaskGroup("Download Model for " + instance.instanceGuid, 2);
+				var taskGroup:TaskGroup = new TaskGroup("Download Model for " + instance.guid, 2);
 			
 				// This loads the tasks into the LandscapeTaskQueue
-				//var layer:LayerInfo = new LayerInfo( "LoadModelFromBigDB", instance.instanceGuid ); 
-				var task:ITask = new LoadModelFromBigDB( instance.instanceGuid, null );
+				//var layer:LayerInfo = new LayerInfo( "LoadModelFromBigDB", instance.guid ); 
+				var task:ITask = new LoadModelFromBigDB( instance.guid, null );
 				taskGroup.addTask(task);
 				
-				task = new CompletedModel( instance.instanceGuid, null );
+				task = new CompletedModel( instance.guid, null );
 				taskGroup.addTask(task);
 				
 				Globals.g_landscapeTaskController.addTask( taskGroup );
 			}
 		}
 		
-		private function addBlock( instanceGuid:String, fileName:String ):void {
-			//Log.out( "ModelManager.addBlock - instanceGIUD: " + instanceGuid + "  fileName: " + fileName );
+		private function addBlock( guid:String, fileName:String ):void {
+			//Log.out( "ModelManager.addBlock - instanceGIUD: " + guid + "  fileName: " + fileName );
 			if ( _blocks[fileName] )
 			{
 				var block:Vector.<String> = _blocks[fileName];
 				// check to make sure its not in more then once
 				for each ( var guid:String in block )
 				{
-					if ( guid == instanceGuid )
+					if ( guid == guid )
 						return;
 				}
-				block.push( instanceGuid );
+				block.push( guid );
 			}
 			else
 			{
 				var newBlock:Vector.<String> = new Vector.<String>;
-				newBlock.push( instanceGuid );
+				newBlock.push( guid );
 				_blocks[fileName] = newBlock;
 			}
 		}
@@ -217,10 +217,10 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 				if ( !error )
 				{
 					var instanceInfo:InstanceInfo = null;
-					for each ( var instanceGuid:String in block )
+					for each ( var guid:String in block )
 					{
-						instanceInfo = instanceInfoGet( instanceGuid );
-						//Log.out( "CLEAR BLOCK " + instanceInfo.toString() + " for guid: " + instanceGuid  );
+						instanceInfo = instanceInfoGet( guid );
+						//Log.out( "CLEAR BLOCK " + instanceInfo.toString() + " for guid: " + guid  );
 						if ( instanceInfo )
 						{
 							//Log.out( "CLEAR BLOCK " + instanceInfo.toString()  );
@@ -265,7 +265,7 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 			{
 				if ( vm && $vm == vm )
 				{
-					_modelInstances[$vm.instanceInfo.instanceGuid] = null;
+					_modelInstances[$vm.instanceInfo.guid] = null;
 					found = true;
 					break;
 				}
@@ -282,17 +282,17 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 			if ( vm.instanceInfo.controllingModel )
 			{
 				vm.instanceInfo.controllingModel.childAdd( vm );
-				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.CHILD_MODEL_ADDED, vm.instanceInfo.instanceGuid, null, null, vm.instanceInfo.controllingModel.instanceInfo.instanceGuid ) );
+				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.CHILD_MODEL_ADDED, vm.instanceInfo.guid, null, null, vm.instanceInfo.controllingModel.instanceInfo.guid ) );
 			}
 			else if ( vm.instanceInfo.dynamicObject )
 			{
-				_modelDynamicInstances[vm.instanceInfo.instanceGuid] = vm;
-				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.DYNAMIC_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
+				_modelDynamicInstances[vm.instanceInfo.guid] = vm;
+				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.DYNAMIC_MODEL_ADDED, vm.instanceInfo.guid ) );
 			}
 			else
 			{
-				_modelInstances[vm.instanceInfo.instanceGuid] = vm;
-				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
+				_modelInstances[vm.instanceInfo.guid] = vm;
+				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.guid ) );
 				//Log.out( "ModelManager.instantiate - Parent Model Addd" );
 			}
 		}
@@ -322,7 +322,7 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 			modelInfoFindOrCreate( fileName, "", false );
 		}
 		
-		public function modelInfoFindOrCreate( $fileName:String, instanceGuid:String, block:Boolean = true ):ModelInfo {
+		public function modelInfoFindOrCreate( $fileName:String, guid:String, block:Boolean = true ):ModelInfo {
 			var modelInfo:ModelInfo = modelInfoGet( $fileName );
 			
 			if ( null == $fileName )
@@ -345,7 +345,7 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 				}
 				// If we want to preload the modelInfo, we dont need to block on it
 				if ( block )
-					addBlock( instanceGuid, $fileName );
+					addBlock( guid, $fileName );
 			}
 			
 			return modelInfo;
@@ -403,12 +403,12 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 			return fileName.substr( 0, fileName.indexOf( "." ) );
 		}
 
-		public function markDead( instanceGuid:String ):void {
+		public function markDead( guid:String ):void {
 			// This works on both dyamanic and regular instances
-			var vm:VoxelModel = modelInstancesGet(instanceGuid);
+			var vm:VoxelModel = modelInstancesGet(guid);
 			if ( vm )
 			{
-				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, vm.instanceInfo.instanceGuid ) );
+				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, vm.instanceInfo.guid ) );
 				vm.instanceInfo.dead = true;
 			}
 		}
@@ -456,13 +456,13 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 			{
 				if ( instance && true == instance.dead )
 				{
-					var oldGuid:String = instance.instanceGuid;
+					var oldGuid:String = instance.guid;
 					instance = null;
 					oldDic[oldGuid] = null;
 				}
 				else
 				{
-					tempDic[instance.instanceGuid] = instance;
+					tempDic[instance.guid] = instance;
 				}
 			}
 			oldDic = null;
@@ -486,14 +486,14 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 				// If its marked dead release it
 				if ( instance && true == instance.instanceInfo.dead )
 				{
-					oldDic[instance.instanceInfo.instanceGuid] = null;
+					oldDic[instance.instanceInfo.guid] = null;
 					instance.release();
 					// could I just use a delete here, rather then creating new dictionary? See Dictionary class for details - RSF
 				}
 				else
 				{
 					if ( instance )
-						tempDic[instance.instanceInfo.instanceGuid] = instance;
+						tempDic[instance.instanceInfo.guid] = instance;
 					else
 						Log.out( "clearDictionaryOfNullsAndDead - Null found" );
 				}
@@ -502,25 +502,25 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 			return tempDic;
 		}
 		
-		public function getModelInstance( instanceGuid:String ):VoxelModel {
-			var vm:VoxelModel = modelInstancesGet(instanceGuid);
+		public function getModelInstance( guid:String ):VoxelModel {
+			var vm:VoxelModel = modelInstancesGet(guid);
 			
 			if ( !vm )
 			{
-				var ii:InstanceInfo = instanceInfoGet( instanceGuid );
+				var ii:InstanceInfo = instanceInfoGet( guid );
 				if ( ii )
 				{
 					var parentModel:VoxelModel = ii.controllingModel;
 					if ( parentModel )
-						vm = parentModel.childModelFind( instanceGuid );
+						vm = parentModel.childModelFind( guid );
 					else
 					{
 						return Globals.player;
-						//Log.out("ModelManager.getModelInstance - parent model not found: " + instanceGuid, Log.ERROR );	
+						//Log.out("ModelManager.getModelInstance - parent model not found: " + guid, Log.ERROR );	
 					}
 				}
 				else
-					Log.out("ModelManager.getModelInstance - model not found: " + instanceGuid, Log.ERROR );	
+					Log.out("ModelManager.getModelInstance - model not found: " + guid, Log.ERROR );	
 			}
 				
 			return vm;	
@@ -570,14 +570,12 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 			return newModelInfo;
 		}
 		
-		private static const PLAYER_ID:String = "PLAYER_ID";
 		public function createPlayer():void	{
 			
 			//private static var g_player:Player = null;			
 			//Log.out("ModelManager.createPlayer" );
 			var instanceInfo:InstanceInfo = new InstanceInfo();
-			instanceInfo.instanceGuid = PLAYER_ID;
-			instanceInfo.templateName = "Player"
+			instanceInfo.guid = "player";
 			instanceInfo.grainSize = 4;
 			
 			Globals.create( instanceInfo );
@@ -1119,8 +1117,8 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 							Globals.player.loseControl( vm );
 							Globals.player = null;
 						}
-					trace( "ModelManager.removeAllModelInstances - marking as dead: " + vm.instanceInfo.instanceGuid );
-					markDead( vm.instanceInfo.instanceGuid );
+					trace( "ModelManager.removeAllModelInstances - marking as dead: " + vm.instanceInfo.guid );
+					markDead( vm.instanceInfo.guid );
 				}
 			}
 			
@@ -1129,27 +1127,12 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 		}	
 		
 		static public function createInstanceFromTemplate( vm:VoxelModel ):void {
-			//if ( vm.modelInfo.template )
-			{
-	//			var oldGuid:String = vm.instanceInfo.templateName;
-				//vm.instanceInfo.fileName = vm.modelInfo.fileName;
-				//if ( Globals.MODE_PRIVATE == Globals.mode || Globals.MODE_PUBLIC == Globals.mode )
-				//{
-				var newLayerInfo:LayerInfo;
-				newLayerInfo = new LayerInfo( "LoadModelFromBigDB", vm.instanceInfo.instanceGuid );
-				vm.modelInfo.biomes.layerReset();
-				vm.modelInfo.biomes.add_layer( newLayerInfo );
-					//vm.modelInfo.fileName = "LoadModelFromBigDB";
-				vm.modelInfo.jsonReset();
-				//}
-				//else
-				//{
-					// Not really sure when this would get called if ever
-					//newLayerInfo = new LayerInfo( "LoadModelFromIVM", "./assets/models/" + vm.instanceInfo.instanceGuid );
-				//}
-				
-			}
-			vm.instanceInfo.templateName = vm.instanceInfo.instanceGuid;
+			
+			var newLayerInfo:LayerInfo = new LayerInfo( "LoadModelFromBigDB", vm.instanceInfo.guid );
+			vm.modelInfo.biomes.layerReset();
+			vm.modelInfo.biomes.add_layer( newLayerInfo );
+			vm.modelInfo.jsonReset();
+			vm.instanceInfo.guid = vm.instanceInfo.guid;
 			vm.modelInfo.template = false;
 		}
 		
@@ -1161,7 +1144,7 @@ Log.out( "ModelManager.create - instance.templateName: " + instance.templateName
 				instance.initJSON( v.model );
 				//trace( "ModelManager.loadObjects: ----------------  fileName:" + v.model.fileName );
 				
-				Log.out( "ModelManager.loadObjects - loading fileName:" + v.model.fileName + "  instance Guid: " + instance.instanceGuid + "  name: " +  instance.name);
+				Log.out( "ModelManager.loadObjects - loading fileName:" + v.model.fileName + "  instance Guid: " + instance.guid + "  name: " +  instance.name);
 				create( instance );
 				count++;
 			}

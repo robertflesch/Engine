@@ -180,17 +180,27 @@ public class RegionManager
 		}
 	}
 	
+	static private function modelAdded( e:ModelEvent ):void {
+		
+		var ii:InstanceInfo = new InstanceInfo();
+		ii.guid = e.instanceGuid;
+	}
+	
 	static private function metadataCollected( e:ModelMetadataEvent ):void {
 		
 		var ii:InstanceInfo = new InstanceInfo();
-		ii.instanceGuid = Globals.getUID();
-		var fileName:String = e.name;
-		ii.templateName = e.description;
-		ii.name = fileName;
-		var viewDistance:Vector3D = new Vector3D(0, 0, -75);
-		ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
+		ii.guid = Globals.getUID();
+		ii.guid = e.description;
+		ii.name = e.name;
+	}
+	
+	static private function addModel( $ii:InstanceInfo ):void {
 		
-		Globals.create( ii );
+		var viewDistance:Vector3D = new Vector3D(0, 0, -75);
+		$ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
+		Log.out( "RegionManager.addModel - " + $ii.toString() );
+		
+		Globals.create( $ii );
 	}
 } // RegionManager
 } // Package

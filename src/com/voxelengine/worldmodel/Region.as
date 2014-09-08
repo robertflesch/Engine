@@ -213,7 +213,7 @@ package com.voxelengine.worldmodel
 			if ( 0 < count )
 				_loaded = false;
 				
-			if ( !Globals.player )
+			if ( !Globals.online && !Globals.player )
 				Globals.createPlayer();
 				
 			Log.out( "Region.load - completed processing on: " + name );

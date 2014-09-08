@@ -92,7 +92,7 @@ package com.voxelengine.GUI
 		private function fire(event:UIMouseEvent):void 
 		{
 			var vm:VoxelModel = (event.target.data) as VoxelModel;
-			Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, vm.instanceInfo.instanceGuid, null ) );
+			Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, vm.instanceInfo.guid, null ) );
 
 			event.target.enabled = false;
 			var reloadTimer:DataTimer = new DataTimer( 5000, 1 );

@@ -97,7 +97,7 @@ package com.voxelengine.worldmodel.scripts
 				// dont handle event directly, since then I will generate event at same times as everyone else.
 				var pe:ProjectileEvent = new ProjectileEvent( ProjectileEvent.PROJECTILE_SHOT );
 				pe.ammo = ammo.clone();
-				pe.owner = gunModel.instanceInfo.instanceGuid;
+				pe.owner = gunModel.instanceInfo.guid;
 				pe.position = bulletWSLocation;
 				pe.direction = dr;
 				

@@ -211,7 +211,7 @@ package com.voxelengine.GUI
 		{
 			// Globals.GUIControl = true;
 			var instance:InstanceInfo = new InstanceInfo();
-			instance.templateName = _fileReference.name.substr( 0, _fileReference.name.length - _fileReference.type.length )
+			instance.guid = _fileReference.name.substr( 0, _fileReference.name.length - _fileReference.type.length )
 			instance.grainSize = 6;
 			instance.positionSet = Globals.controlledModel.instanceInfo.positionGet.clone();
 			instance.positionSetComp( instance.positionGet.x, instance.positionGet.y - Globals.UNITS_PER_METER * 4, instance.positionGet.z );
@@ -229,7 +229,7 @@ package com.voxelengine.GUI
 				{
 					var parentModel:VoxelModel = li.data;
 					var instance:InstanceInfo = new InstanceInfo();
-					instance.templateName = _fileReference.name.substr( 0, _fileReference.name.length - _fileReference.type.length )
+					instance.guid = _fileReference.name.substr( 0, _fileReference.name.length - _fileReference.type.length )
 					instance.positionSet = parentModel.worldToModel( Globals.controlledModel.instanceInfo.positionGet );
 
 					var worldSpaceEndPoint:Vector3D = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( _viewDistance );
@@ -277,7 +277,7 @@ package com.voxelengine.GUI
 				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
 				if ( li && li.data )
 				{
-					Globals.markDead( li.data.instanceInfo.instanceGuid );
+					Globals.markDead( li.data.instanceInfo.guid );
 					populateParentModels()
 				}
 			}
@@ -327,9 +327,9 @@ package com.voxelengine.GUI
 					if ( vm is Player )
 						continue;
 					if ( "Default_Name" != vm.instanceInfo.name )
-						_listbox1.addItem( vm.instanceInfo.name + " - " + vm.instanceInfo.instanceGuid, vm );
+						_listbox1.addItem( vm.instanceInfo.name + " - " + vm.instanceInfo.guid, vm );
 					else
-						_listbox1.addItem( vm.instanceInfo.templateName + " - " + vm.instanceInfo.instanceGuid, vm );
+						_listbox1.addItem( vm.instanceInfo.guid + " - " + vm.instanceInfo.guid, vm );
 				}
 			}
 		}
@@ -342,9 +342,9 @@ package com.voxelengine.GUI
 			for each ( var vm:VoxelModel in models )
 			{
 				if ( "Default Name" != vm.instanceInfo.name )
-					_listbox2.addItem( vm.instanceInfo.name + " - " + vm.instanceInfo.templateName, vm );
+					_listbox2.addItem( vm.instanceInfo.name + " - " + vm.instanceInfo.guid, vm );
 				else	
-					_listbox2.addItem( vm.instanceInfo.templateName, vm );
+					_listbox2.addItem( vm.instanceInfo.guid, vm );
 			}
 		}
 		

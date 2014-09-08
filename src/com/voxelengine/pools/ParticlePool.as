@@ -95,13 +95,13 @@ public final class ParticlePool
 	private static function newModel():Particle
 	{
 		var pi:InstanceInfo = new InstanceInfo();
-		pi.templateName = CLASS_NAME;
+		pi.guid = CLASS_NAME;
 		pi.name = CLASS_NAME;
 		pi.grainSize = 2;
 		pi.usesCollision = false;
 		pi.dynamicObject = true;
 		
-		var mi:ModelInfo = Globals.modelInfoGet(pi.templateName);
+		var mi:ModelInfo = Globals.modelInfoGet(pi.guid);
 		var modelAsset:String = mi.modelClass;
 		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
 		var vm:* = new modelClass( pi, mi );

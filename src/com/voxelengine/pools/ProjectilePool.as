@@ -87,14 +87,14 @@ public final class ProjectilePool
 	private static function newModel():Projectile
 	{
 		var pi:InstanceInfo = new InstanceInfo();
-		pi.templateName = CLASS_NAME;
+		pi.guid = CLASS_NAME;
 		pi.name = "Projectile";
 		pi.grainSize = 2;
 		pi.usesCollision = true;
 		pi.dynamicObject = true;
 		pi.baseLightLevel = 255;
 		
-		var mi:ModelInfo = Globals.modelInfoGet(pi.templateName);
+		var mi:ModelInfo = Globals.modelInfoGet(pi.guid);
 		var modelAsset:String = mi.modelClass;
 		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
 		var vm:* = new modelClass( pi, mi );

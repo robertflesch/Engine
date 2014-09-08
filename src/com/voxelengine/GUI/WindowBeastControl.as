@@ -144,7 +144,7 @@ package com.voxelengine.GUI
 							actionItem["image"] = ammo.name + ".png";
 							actionItem["ammo"] = ammo;
 							actionItem["callback"] = fireGun;
-							actionItem["modelGuid"] = gm.instanceInfo.instanceGuid;
+							actionItem["modelGuid"] = gm.instanceInfo.guid;
 							box = buildAction( actionItem, count++ );
 						}
 					}

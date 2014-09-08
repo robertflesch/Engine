@@ -43,7 +43,7 @@ package com.voxelengine.worldmodel.scripts
 						var controllingModel:VoxelModel = trigger.instanceInfo.controllingModel;
 						var ii:InstanceInfo = Globals.player.instanceInfo;
 						if ( Globals.player && controllingModel && null == Globals.player.instanceInfo.controllingModel )
-							new WindowBeastControlQuery( controllingModel.instanceInfo.instanceGuid );
+							new WindowBeastControlQuery( controllingModel.instanceInfo.guid );
 					}
 				}
 			}

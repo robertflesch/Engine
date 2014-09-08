@@ -158,14 +158,14 @@ package com.voxelengine.GUI
            //_panelAdvanced.layout.autoSizeAnimated = true;
 			_panelAdvanced.addElement( label );
 			
-			var vm:VoxelModel = Globals.getModelInstance( _ii.instanceGuid )
+			var vm:VoxelModel = Globals.getModelInstance( _ii.guid )
 							addLabel( _panelAdvanced, "State:", changeStateHandler, vm.anim ? vm.anim.name : "" );
 							addLabel( _panelAdvanced, "Name:", changeNameHandler, _ii.name );
 			//_GrainSize = 	addLabel( _panelAdvanced, "GrainSize:", null, _vm.oxel.gc.grain.toString() );
 							addLabel( _panelAdvanced, "GrainSize:", null, String( _ii.grainSize ) );
-			addLabel( _panelAdvanced, "Instance GUID:", null, _ii.instanceGuid );
-			addLabel( _panelAdvanced, "Model GUID:", null, _ii.templateName );
-			addLabel( _panelAdvanced, "Parent:", null, _ii.controllingModel ? _ii.controllingModel.instanceInfo.templateName : "" );
+			addLabel( _panelAdvanced, "Instance GUID:", null, _ii.guid );
+			addLabel( _panelAdvanced, "Model GUID:", null, _ii.guid );
+			addLabel( _panelAdvanced, "Parent:", null, _ii.controllingModel ? _ii.controllingModel.instanceInfo.guid : "" );
 			//addLabel( _panelAdvanced, "Script:", null, _ii.scriptName );
 			//_Texture = 		addLabel( _panelAdvanced, "Texture:", null, _ii.textureName );
 			//_TextureScale =	addLabel( _panelAdvanced, "TextureScale:", null, _ii.textureScale.toString() );
@@ -199,7 +199,7 @@ package com.voxelengine.GUI
 			_s_inExistance--;
 			_s_currentInstance = null;
 			
-			Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.MODEL_MODIFIED, _ii.instanceGuid ) );
+			Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.MODEL_MODIFIED, _ii.guid ) );
 			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_MODIFIED, "" ) );
 		}
 		
@@ -241,7 +241,7 @@ package com.voxelengine.GUI
 		
 		private function changeStateHandler(event:TextEvent):void
 		{
-			var vm:VoxelModel = Globals.getModelInstance( _ii.instanceGuid )
+			var vm:VoxelModel = Globals.getModelInstance( _ii.guid )
 			var state:String = event.target.text;
 			vm.stateLock( false );
 			vm.stateSet( state );

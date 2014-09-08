@@ -53,7 +53,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				
 				var c:int = vm.oxel.size_in_world_coordinates() / 2;
 				//vm.oxel.write_sphere( c, c, c, c - 1, _layer.type, min_grain_size );
-				vm.oxel.write_sphere( vm.instanceInfo.instanceGuid, c, c/2, c, c, _layer.type, min_grain_size );
+				vm.oxel.write_sphere( vm.instanceInfo.guid, c, c/2, c, c, _layer.type, min_grain_size );
 			}
 			else
 			{

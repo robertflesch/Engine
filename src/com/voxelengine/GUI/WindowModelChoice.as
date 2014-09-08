@@ -57,24 +57,24 @@ package com.voxelengine.GUI
 			switch ( id )
 			{
 				case 0: // From Cube
-					ii.templateName = "GenerateCube";
+					ii.guid = "GenerateCube";
 					ii.name = "New Cube Object";
 					// preload the modelInfo for the GenerateCube
-					Globals.modelInfoPreload( ii.templateName );
+					Globals.modelInfoPreload( ii.guid );
 					new WindowNewModelGenerateCube( ii );
 					break;
 				case 1: // From Sphere
-					ii.templateName = "GenerateSphere";
+					ii.guid = "GenerateSphere";
 					ii.name = "New Sphere Object";
 					// preload the modelInfo for the GenerateCube
-					Globals.modelInfoPreload( ii.templateName );
+					Globals.modelInfoPreload( ii.guid );
 					new WindowNewModelGenerateCube( ii );
 					break;
 				case 2: // From Sphere
-					ii.templateName = "GenerateSubSphere";
+					ii.guid = "GenerateSubSphere";
 					ii.name = "Sphere in larger Object";
 					// preload the modelInfo for the GenerateCube
-					Globals.modelInfoPreload( ii.templateName );
+					Globals.modelInfoPreload( ii.guid );
 					new WindowNewModelGenerateCube( ii );
 					break;
 			}
@@ -98,10 +98,10 @@ package com.voxelengine.GUI
 					break;
 				case 2: // From Cube
 					var ii:InstanceInfo = new InstanceInfo();
-					ii.templateName = "GenerateCube";
+					ii.guid = "GenerateCube";
 					ii.name = "New Object";
 					// preload the modelInfo for the GenerateCube
-					Globals.modelInfoPreload( ii.templateName );
+					Globals.modelInfoPreload( ii.guid );
 					_modalObj.remove();
 					new WindowNewModelGenerateCube( ii );
 					return;

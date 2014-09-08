@@ -45,7 +45,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
  					vm.complete = true;
 				else
 				{
-					createPlaceholder( _guid );
+//					createPlaceholder( _guid );
 					Log.out( "CompletedModel.start - VoxelModel Not found: " + _guid, Log.WARN );
 					super.complete();
 					return
@@ -55,17 +55,17 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			}
 			catch ( error:Error )
 			{
-				if ( Globals.player.instanceInfo.instanceGuid == _guid )
+				if ( Globals.player.instanceInfo.guid == _guid )
 					Globals.player.complete = true;
 				else
 					Log.out( "CompletedModel.start - exception was thrown for model guid: " + _guid, Log.ERROR );
 			}
 			
 			_count--;
-			//Log.out( "CompletedModel.start - completedModel: " + vm.instanceInfo.templateName + "  count: " + _count );
+			//Log.out( "CompletedModel.start - completedModel: " + vm.instanceInfo.guid + "  count: " + _count );
 			if ( vm is Player )
 			{
-				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, vm.instanceInfo.instanceGuid ) );
+				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, vm.instanceInfo.guid ) );
 				_playerLoaded = true;
 			}
 			
@@ -91,17 +91,17 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			super.cancel();
 		}
 		
-		private function createPlaceholder( guid:String ):void 
-		{
-			var ii:InstanceInfo = new InstanceInfo();
-			ii.instanceGuid = guid;
-			ii.templateName = "GenerateCube";
-			ii.name = "Missing Object";
+		//private function createPlaceholder( guid:String ):void 
+		//{
+			//var ii:InstanceInfo = new InstanceInfo();
+			//ii.instanceGuid = guid;
+			//ii.guid = "GenerateCube";
+			//ii.name = "Missing Object";
 			// preload the modelInfo for the GenerateCube
-			Globals.modelInfoPreload( ii.templateName );
-			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
-			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-			Globals.create( ii );
-		}
+			//Globals.modelInfoPreload( ii.guid );
+			//var viewDistance:Vector3D = new Vector3D(0, 0, -75);
+			//ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
+			//Globals.create( ii );
+		//}
 	}
 }

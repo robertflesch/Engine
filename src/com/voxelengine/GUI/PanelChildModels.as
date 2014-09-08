@@ -79,10 +79,10 @@ package com.voxelengine.GUI
 		{
 			//Globals.GUIControl = true;
 			var ii:InstanceInfo = new InstanceInfo();
-			ii.templateName = "GenerateCube";
+			ii.guid = "GenerateCube";
 			ii.name = "New Object";
 			// preload the modelInfo for the GenerateCube
-			Globals.modelInfoPreload( ii.templateName );
+			Globals.modelInfoPreload( ii.guid );
 			new WindowNewModelGenerateCube( ii );
 		}
 
@@ -176,9 +176,9 @@ package com.voxelengine.GUI
 			for each ( var vm:VoxelModel in models )
 			{
 				if ( "Default Name" != vm.instanceInfo.name )
-					_lbChildModel.addItem( vm.instanceInfo.name + " - " + vm.instanceInfo.templateName, vm );
+					_lbChildModel.addItem( vm.instanceInfo.name + " - " + vm.instanceInfo.guid, vm );
 				else	
-					_lbChildModel.addItem( vm.instanceInfo.templateName, vm );
+					_lbChildModel.addItem( vm.instanceInfo.guid, vm );
 			}
 		}
 		

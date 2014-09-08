@@ -22,6 +22,9 @@ package com.voxelengine.events
 		static public const LOGIN_FAILURE:String		= "LOGIN_FAILURE";
 		static public const SANDBOX_SUCCESS:String		= "SANDBOX_SUCCESS";
 		
+		static public const JOIN_ROOM_SUCCESS:String		= "JOIN_ROOM_SUCCESS";
+		static public const JOIN_ROOM_FAILURE:String		= "JOIN_ROOM_FAILURE";
+
 		private var _error:PlayerIOError;
 		public function get error():PlayerIOError { return _error; }
 		

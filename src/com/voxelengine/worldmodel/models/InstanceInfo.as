@@ -37,8 +37,7 @@ package com.voxelengine.worldmodel.models
 		private var	_moveSpeed:Attribute 				= new Attribute( 0.01 );
 		private var _transforms:Vector.<ModelTransform> = new Vector.<ModelTransform>;	// toJSON
 		private var _shader:String 						= "ShaderOxel";					// toJSON
-		private var _templateName:String 				= null;                         // toJSON
-		private var _instanceGuid:String 				= null;                         // toJSON
+		private var _guid:String 				= null;                         // toJSON
 		private var _name:String 						= "Default_Name";               // toJSON
 		private var _scriptName:String 					= "";                           // toJSON
 		private var _grainSize:int 						= 0;                            // toJSON
@@ -77,12 +76,14 @@ package com.voxelengine.worldmodel.models
 		public function set critical(val:Boolean):void 				
 		{ 
 			_critical = val; 
-			Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.CRITICAL_MODEL_DETECTED, instanceGuid ) );
+			Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.CRITICAL_MODEL_DETECTED, guid ) );
 		}
-		public function get templateName():String 					{ return _templateName; }
-		public function set templateName(val:String):void 			{ _templateName = val; }
-		public function get instanceGuid():String 					{ return _instanceGuid; }
-		public function set instanceGuid(val:String):void			{ _instanceGuid = val; }
+		public function get guid():String 							{ return _guid; }
+		//public function set guid(val:String):void					{ _guid = val; }
+		public function set guid(val:String):void { 
+			Log.out( "InstanceInfo.GUID was: " + _guid + " is now: " + val );
+			_guid = val; 
+		}
 		public function get grainSize():int  						{ return _grainSize; }
 		public function get type():int  							{ return _type; }
 		public function set type( val:int):void  					{ _type = val; }
@@ -119,8 +120,7 @@ package com.voxelengine.worldmodel.models
 			if ( 0 == velocityGet.length )
 			{
 				return {
-						instanceGuid: 	_instanceGuid,
-						fileName: 		_templateName,
+						guid: 			_guid,
 						location: 		positionGet,
 						rotation: 		rotationGet,
 						transforms:		_transforms,
@@ -135,8 +135,7 @@ package com.voxelengine.worldmodel.models
 			else {
 				return {
 						grainSize: 		_grainSize,
-						instanceGuid: 	_instanceGuid,
-						fileName: 		_templateName,
+						guid: 			_guid,
 						velocity: 		velocityGet,
 						location: 		positionGet,
 						rotation: 		rotationGet,
@@ -158,7 +157,6 @@ package com.voxelengine.worldmodel.models
 		{ 
 			//Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
-			instanceGuid = Globals.getUID();
 		}
 
 		public function clone():InstanceInfo
@@ -181,7 +179,7 @@ package com.voxelengine.worldmodel.models
 
 		public function toString():String
 		{
-			return " templateName: " + templateName + " " + positionGet + " controllingModel: " + (controllingModel ? controllingModel.instanceInfo.instanceGuid : "None" + "  instanceGuid: " + instanceGuid );
+			return " guid: " + guid + " " + positionGet + " controllingModel: " + (controllingModel ? controllingModel.instanceInfo.guid : "None" );
 		}
 
 		private function onLoadingComplete( le:LoadingEvent ):void
@@ -193,28 +191,18 @@ package com.voxelengine.worldmodel.models
 			// Save off a copy of this in case we need multiple instances
 			_creationJSON = json;
 			
-			if ( !json.instanceGuid )
-			{
-				//var ig_result:String = JSON.stringify(json);
-				//throw new Error( "json.initJSON - Exception - instanceGuid not found: " + ig_result );
-				if ( json.fileName && Globals.isGuid( json.fileName ) )
-					_instanceGuid = json.fileName
+			// fileName == templateName == guid ALL THE SAME
+			if ( json.fileName ) {
+				guid = json.fileName;
 			}
-			else
-				_instanceGuid = json.instanceGuid;
-			
-			if ( !json.fileName )
-			{
-				var mg_result:String = JSON.stringify(json);
-				throw new Error( "json.initJSON - Exception - fileName not found: " + mg_result );
-			}
-			_templateName = json.fileName;
 				
 			if ( json.name )
 			{
 				_name = json.name;
 				//Log.out( "InstanceInfo.initJSON - Name: " + _name );
 			}
+			else
+				_name = guid;
 			
 			if ( json.state )
 				_state = json.state;
@@ -255,7 +243,7 @@ package com.voxelengine.worldmodel.models
 			
 			if ( script )
 			{
-				script.instanceGuid = instanceGuid;
+				script.instanceGuid = guid;
 				//script.event( OxelEvent.CREATE );
 				// Only person using this is the AutoControlObjectScript
 			}

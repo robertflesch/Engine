@@ -70,7 +70,7 @@
 		
 		override protected function onChildAdded( me:ModelEvent ):void
 		{
-			if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
+			if ( me.parentInstanceGuid != instanceInfo.guid )
 				return;
 				
 			var vm:VoxelModel = Globals.getModelInstance( me.instanceGuid );
@@ -381,7 +381,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 				if ( MIN_TURN_AMOUNT >= Math.abs(dy) )
 					dy = 0;
 				//
-				//Log.out( "Player.handleMouseMovement - rotation: " + _instanceInfo.rotationGet );
+				//Log.out( "Player.handleMouseMovement - rotation: " + instanceInfo.rotationGet );
 				// I only want to rotate the head here, not the whole body. in the X dir.
 				// so if I made the head the main body part, could I keep the rest of the head fixed on the x and z axis...
 				instanceInfo.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y + dy, instanceInfo.rotationGet.z );
@@ -726,8 +726,8 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 								//Log.out( "voxelmodel.update - first collision model: " );
 			
 								
-							//_instanceInfo.lastModelPosition = collisionCandidate.worldToModel( instanceInfo.positionGet );
-							//_instanceInfo.lastModelRotation = collisionCandidate.instanceInfo.rotationGet;
+							//instanceInfo.lastModelPosition = collisionCandidate.worldToModel( instanceInfo.positionGet );
+							//instanceInfo.lastModelRotation = collisionCandidate.instanceInfo.rotationGet;
 						//}
 						lastCollisionModel = collisionCandidate;
 						onSolidGround = true;

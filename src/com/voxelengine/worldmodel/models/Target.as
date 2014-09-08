@@ -31,7 +31,7 @@ package com.voxelengine.worldmodel.models
 		public function Target( instanceInfo:InstanceInfo, mi:ModelInfo ) 
 		{ 
 			super( instanceInfo, mi );
-			Globals.g_app.dispatchEvent( new TargetEvent( TargetEvent.CREATED, instanceInfo.instanceGuid, _pointValue ) );
+			Globals.g_app.dispatchEvent( new TargetEvent( TargetEvent.CREATED, instanceInfo.guid, _pointValue ) );
 			//WindowScore.instance.register();
 		}
 

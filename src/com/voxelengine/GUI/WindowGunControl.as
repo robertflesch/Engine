@@ -51,7 +51,7 @@ package com.voxelengine.GUI
 							
 							cannon.width = 120;
 							cannon.addEventListener(MouseEvent.CLICK, fire );
-							cannon.data = cm.instanceInfo.instanceGuid;
+							cannon.data = cm.instanceInfo.guid;
 
 							addElement( cannon );
 						}

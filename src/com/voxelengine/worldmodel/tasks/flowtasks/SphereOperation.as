@@ -65,7 +65,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			var timer:int = getTimer();
 	
 			var vm:VoxelModel = Globals.getModelInstance( _guid );
-			var guid:String = vm.instanceInfo.instanceGuid;
+			var guid:String = vm.instanceInfo.guid;
 			if ( vm )
 			{
 				var oxel:Oxel = vm.oxel.childGetOrCreate( _gc );

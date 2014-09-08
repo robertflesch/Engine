@@ -18,6 +18,7 @@ package com.voxelengine.events
 	{
 		static public const INVALID:String					= "INVALID";
 		
+		static public const ADDED:String					= "ADDED";
 		static public const MOVED:String					= "MOVED";
 		
 		static public const DETACH:String					= "DETACH";

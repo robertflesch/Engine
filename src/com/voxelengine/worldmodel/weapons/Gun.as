@@ -52,7 +52,7 @@ package com.voxelengine.worldmodel.weapons
 
 		public function fire():void
 		{
-			Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, instanceInfo.instanceGuid, ammo ) );			
+			Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, instanceInfo.guid, ammo ) );			
 		}
 		
 		private	function processJsonInfo():void {

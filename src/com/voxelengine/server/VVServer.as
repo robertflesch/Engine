@@ -62,14 +62,16 @@
 		
 		static private function handleJoinError(error:PlayerIOError):void
 		{
-			trace("VVServer.handleJoinError",error)
-			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.LOGIN_FAILURE, error ) );
+			trace("VVServer.handleJoinError", error);
+			
+			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.JOIN_ROOM_FAILURE, error ) );
 		}
 		
 		static private function handleJoin(connection:Connection):void
 		{
 			
 			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, regionId ) );
+			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.JOIN_ROOM_SUCCESS, null ) );
 			
 			trace("VVServer.handleJoin. Sucessfully joined Room");
 			_connection = connection;

@@ -2,6 +2,7 @@
 package com.voxelengine.GUI
 {
 
+	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.ModelMetadataEvent;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.server.Persistance;
@@ -23,9 +24,8 @@ package com.voxelengine.GUI
 	
 	public class WindowModelList extends VVPopup
 	{
-		static private var _s_mi:ModelInfo = null;
+		private var _modelKey:String;
 		
-		static public function get modelInfo():ModelInfo { return _s_mi; }
 		private var _listbox1:ListBox = new ListBox( 200, 15, 300 );
 		
 		public function WindowModelList()
@@ -37,7 +37,7 @@ package com.voxelengine.GUI
 			addElement( _listbox1 );
 			_listbox1.addEventListener(ListEvent.LIST_CHANGED, selectModel);
 			
-			var panelParentButton:Panel = new Panel( 200, 30 );
+			var panelParentButton:Panel = new Panel( 200, 100 );
 			panelParentButton.layout.orientation = LayoutOrientation.VERTICAL;
 			panelParentButton.padding = 2;
 			addElement( panelParentButton );
@@ -69,19 +69,11 @@ package com.voxelengine.GUI
  		{
 			Globals.g_app.removeEventListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, modelLoaded );
 			removeEventListener(UIOEvent.REMOVED, onRemoved );
-			_s_mi = null;
 		}
 		
 		private function selectModel(event:ListEvent):void 
 		{
-			// Globals.GUIControl = true;
-			if ( Globals.online ) {
-				var key:String = event.target.data;
-				
-			}
-			else
-				_s_mi = event.target.data;
-//			remove();
+			_modelKey = event.target.data;
 		}
 
 		private function addDesktopModelHandler(event:UIMouseEvent):void 
@@ -111,19 +103,13 @@ package com.voxelengine.GUI
 			var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
 			if ( li && li.data )
 			{
-				_s_mi = li.data;
-				var ii:InstanceInfo = new InstanceInfo();
-				ii.templateName = _s_mi.fileName;
-				var viewDistance:Vector3D = new Vector3D(0, 0, -75);
-				ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-				Globals.create( ii );
+				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.ADDED, li.data ) );
 				remove();
 			}
 		}
 		
 		private function cancelSelection(event:UIMouseEvent):void 
 		{
-			_s_mi = null;
 			remove();
 		}
 		
@@ -134,25 +120,8 @@ package com.voxelengine.GUI
 		
 		private function populateModels():void
 		{
-			if ( Globals.online ) {
-				Persistance.loadPublicObjectsMetadata();
-				Persistance.loadUserObjectsMetadata( Network.userId );
-			}
-			else 
-			{
-				var models:Dictionary = Globals.modelInfoGetDictionary();
-				for each ( var mi:ModelInfo in models )
-				{
-					if ( mi && "Player" != mi.modelClass && "EditCursor" != mi.modelClass )
-						_listbox1.addItem( mi.fileName + " - " + mi.modelClass, mi );
-				}
-				//var models:Dictionary = Globals.g_modelManager.instanceInfo;
-				//for each ( var mi:InstanceInfo in models )
-				//{
-					//if ( mi && "Player" != mi.modelClass && "EditCursor" != mi.modelClass )
-						//_listbox1.addItem( mi.modelGuid + " - " + mi.instanceGuid, mi );
-				//}
-			}
+			Persistance.loadPublicObjectsMetadata();
+			Persistance.loadUserObjectsMetadata( Network.userId );
 		}
 	}
 }

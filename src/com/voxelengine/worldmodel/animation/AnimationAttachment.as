@@ -74,9 +74,9 @@ package com.voxelengine.worldmodel.animation
 		private function onAttachmentCreated( event:ModelEvent ):void
 		{
 			//Log.out( "AnimationAttachment.onAttachmentCreated owner: " + _owner.toString() );
-			if ( event.instanceGuid == _instanceInfo.instanceGuid )
+			if ( event.instanceGuid == instanceInfo.guid )
 			{
-				_voxelModel = Globals.getModelInstance( _instanceInfo.instanceGuid );
+				_voxelModel = Globals.getModelInstance( instanceInfo.guid );
 				_owner.childAdd( _voxelModel );
 				Globals.g_app.removeEventListener( ModelEvent.CHILD_MODEL_ADDED, onAttachmentCreated );			
 			}

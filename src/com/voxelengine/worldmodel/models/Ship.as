@@ -68,7 +68,7 @@ package com.voxelengine.worldmodel.models
 		
 		private function altitudeEvent( event:ShipEvent ):void
 		{
-			if ( event.instanceGuid != instanceInfo.instanceGuid )
+			if ( event.instanceGuid != instanceInfo.guid )
 				return;
 				
 			Log.out( "Ship.altitudeEvent - val: " + event.value );
@@ -90,7 +90,7 @@ package com.voxelengine.worldmodel.models
 		
 		private function directionEvent( event:ShipEvent ):void
 		{
-			if ( event.instanceGuid != instanceInfo.instanceGuid )
+			if ( event.instanceGuid != instanceInfo.guid )
 				return;
 				
 			Log.out( "Ship.directionEvent - val: " + event.value );
@@ -137,14 +137,14 @@ package com.voxelengine.worldmodel.models
 				case 87: case Keyboard.UP:
 					if ( !_up )
 					{
-						throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, _instanceInfo.instanceGuid, _accelRate ) );
+						throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, _instanceInfo.guid, _accelRate ) );
 						_up = true;
 					}
 					break;
 				case 83: case Keyboard.DOWN: 
 					if ( !_down )
 					{
-						throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, _instanceInfo.instanceGuid, -_accelRate ) );
+						throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, _instanceInfo.guid, -_accelRate ) );
 						_down = true;
 					}
 					break;

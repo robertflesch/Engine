@@ -73,7 +73,7 @@ package com.voxelengine
 		{
 			if ( Globals.selectedModel )
 			{
-				Globals.selectedModel.oxel.growTreesOn( Globals.selectedModel.instanceInfo.instanceGuid, Globals.GRASS );
+				Globals.selectedModel.oxel.growTreesOn( Globals.selectedModel.instanceInfo.guid, Globals.GRASS );
 			}
 			else
 				Log.out( "No selected model", Log.WARN );
@@ -90,7 +90,7 @@ package com.voxelengine
 					return;
 				}
 
-				TreeGenerator.generateTree( Globals.selectedModel.instanceInfo.instanceGuid, oxel, 1 );
+				TreeGenerator.generateTree( Globals.selectedModel.instanceInfo.guid, oxel, 1 );
 			}
 			else
 				Log.out( "No selected model", Log.WARN );
@@ -111,7 +111,7 @@ package com.voxelengine
 		{
 			if ( Globals.selectedModel )
 			{
-				Globals.selectedModel.oxel.vines( Globals.selectedModel.instanceInfo.instanceGuid );
+				Globals.selectedModel.oxel.vines( Globals.selectedModel.instanceInfo.guid );
 			}
 			else
 				Log.out( "No selected model", Log.WARN );
@@ -134,7 +134,7 @@ package com.voxelengine
 			for each ( var oxel:Oxel in ol )
 			{
 				//if ( count < 200 )
-					LightSunCheck.addTask( Globals.selectedModel.instanceInfo.instanceGuid, oxel.gc, 1, Globals.POSY );
+					LightSunCheck.addTask( Globals.selectedModel.instanceInfo.guid, oxel.gc, 1, Globals.POSY );
 				//count++;
 			}
 			*/
@@ -155,7 +155,7 @@ package com.voxelengine
 		{
 			if ( Globals.selectedModel )
 			{
-				Globals.selectedModel.oxel.harvestTrees( Globals.selectedModel.instanceInfo.instanceGuid );
+				Globals.selectedModel.oxel.harvestTrees( Globals.selectedModel.instanceInfo.guid );
 			}
 			else
 				Log.out( "No selected model", Log.WARN );
@@ -197,7 +197,7 @@ package com.voxelengine
 				return;
 			}
 				
-			CarveTunnel.contructor( Globals.selectedModel.instanceInfo.instanceGuid
+			CarveTunnel.contructor( Globals.selectedModel.instanceInfo.guid
 			                      , Globals.gci().point
 			                      , Globals.viewVectorNormalizedGet()
 			                      , Globals.AIR
@@ -223,7 +223,7 @@ package com.voxelengine
 				return;
 			}
 				
-			CarveTunnels.contructor( Globals.selectedModel.instanceInfo.instanceGuid
+			CarveTunnels.contructor( Globals.selectedModel.instanceInfo.guid
 								   , Globals.gci().point
 								   , Globals.viewVectorNormalizedGet()
 								   , Globals.AIR
@@ -278,7 +278,7 @@ package com.voxelengine
 		private static function spheresCarve( $vm:VoxelModel, $loc:Vector3D, $type:int, $radius:int = 32, $minGrain:int = 2 ):void {
 			var timer:int = getTimer();
 			Oxel.nodes = 0;
-			$vm.oxel.write_sphere( $vm.instanceInfo.instanceGuid
+			$vm.oxel.write_sphere( $vm.instanceInfo.guid
 			                                       , $loc.x
 												   , $loc.y
 												   , $loc.z
@@ -287,7 +287,7 @@ package com.voxelengine
 												   , $minGrain );
 			Log.out( "ConsoleCommands.waterSpheresCarve  carve AIR time: " + (getTimer() - timer) + "  change count: " + Oxel.nodes );
 			timer = getTimer();
-			$vm.oxel.writeHalfSphere( $vm.instanceInfo.instanceGuid
+			$vm.oxel.writeHalfSphere( $vm.instanceInfo.guid
 			                                       , $loc.x
 												   , $loc.y
 												   , $loc.z

@@ -18,6 +18,10 @@ package com.voxelengine.GUI
 	import flash.utils.getQualifiedClassName;
 	import flash.events.FullScreenEvent;
 	import flash.display.StageDisplayState;
+	import org.flashapi.swing.Button;
+	import org.flashapi.swing.event.UIOEvent;
+	import org.flashapi.swing.Label;
+	import org.flashapi.swing.Popup;
 	
 	import org.flashapi.swing.UIManager;
 	
@@ -407,6 +411,21 @@ package com.voxelengine.GUI
 			
 			Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControl.handleModelEvents );
 			Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
+			Globals.g_app.addEventListener(LoginEvent.JOIN_ROOM_FAILURE, joinRoomFailureHandler );
+		}
+		
+		private function joinRoomFailureHandler( e:LoginEvent ):void {
+			
+			var popup:VVPopup = new VVPopup("NO SERVERS FOUND");
+			popup.width = 250;
+			popup.height = 50;
+            //popup.innerPanel = popup.autoHeight = true;
+            
+            var label:Label = new Label("No servers were found for this room, try later");
+			popup.addElement(label);
+            
+			popup.display( Globals.g_renderer.width / 2 - (((popup.width + 10) / 2) + popup.x ), Globals.g_renderer.height / 2 - (((popup.height + 10) / 2) + popup.y) );
+			popup.eventCollector.addEvent( popup, UIOEvent.REMOVED, function( e:UIOEvent ):void { new WindowSandboxList(); popup.remove(); } );
 		}
 
 		private function addKeyboardListeners(event : Event) : void
