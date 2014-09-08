@@ -1147,7 +1147,10 @@ package org.flashapi.swing {
 					if (_keyManager.getKeyObserver() != this) _keyManager.setKeyObserver(this);
 				} else {
 					if(_unselectEnabled) {
-						caller.selected = $listItem.item.selected = caller.dotted = false;
+						caller.selected = false;
+						caller.dotted = false;
+						//$listItem.item.selected = false;
+						
 						$selectedIndex = -1;
 						$listItem = null;
 						$value = null;
