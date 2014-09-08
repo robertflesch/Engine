@@ -282,7 +282,29 @@ package com.voxelengine {
 		private static var g_autoFlow:Boolean = true;
 		public static function get autoFlow():Boolean { return g_autoFlow }
 		public static function set autoFlow(val:Boolean):void { g_autoFlow = val; }
+
 		
+		import flash.display.StageDisplayState;
+		private static var _openWindowCount:int = 0;
+		static public function get openWindowCount():int { return _openWindowCount; }
+		static public function set openWindowCount(value:int):void  
+		{ 
+			_openWindowCount = value; 
+			
+			if ( 0 == _openWindowCount ) {
+				Globals.GUIControl = false;
+				if ( StageDisplayState.FULL_SCREEN_INTERACTIVE == Globals.g_app.stage.displayState )
+					Globals.g_app.stage.mouseLock = true;
+			}
+			else {
+				Globals.GUIControl = true;
+				if ( StageDisplayState.FULL_SCREEN_INTERACTIVE == Globals.g_app.stage.displayState )
+					Globals.g_app.stage.mouseLock = false;
+			}
+//			Log.out( "VoxelVerseGui.openWindowCount - adjust - current count: " + _openWindowCount );
+		}
+		
+//////////////////////////////////////////////////////////////////////////////////		
 		public static function getModelInstance( $guid:String ):VoxelModel {
 			return g_regionManager.currentRegion.modelManager.getModelInstance( $guid );
 		};

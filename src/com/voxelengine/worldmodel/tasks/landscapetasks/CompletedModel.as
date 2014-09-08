@@ -41,8 +41,10 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			try
 			{
 				var vm:VoxelModel = Globals.getModelInstance( _guid );
-				if ( vm )
+				if ( vm ) {
  					vm.complete = true;
+					Log.out( "CompletedModel.start - VoxelModel marked as complete: " + _guid );
+				}
 				else
 				{
 //					createPlaceholder( _guid );

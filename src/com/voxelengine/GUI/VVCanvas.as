@@ -10,7 +10,7 @@ public class VVCanvas extends Canvas
 	public function VVCanvas($width:Number = 100, $height:Number = 100)
 	{
 		super($width,$height);
-//		VoxelVerseGUI.openWindowCount = VoxelVerseGUI.openWindowCount + 1;
+//		Globals.openWindowCount = Globals.openWindowCount + 1;
 		eventCollector.addEvent(this, UIOEvent.REMOVED, onRemoved );
 		
 	}
@@ -18,7 +18,7 @@ public class VVCanvas extends Canvas
 	private function onRemoved( event:UIOEvent ):void
 	{
 		eventCollector.removeEvent(this, UIOEvent.REMOVED, onRemoved );
-//		VoxelVerseGUI.openWindowCount = VoxelVerseGUI.openWindowCount - 1;
+//		Globals.openWindowCount = Globals.openWindowCount - 1;
 	}
 	
 }

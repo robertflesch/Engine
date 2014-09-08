@@ -1515,8 +1515,8 @@ package com.voxelengine.worldmodel.oxel
 		protected function quadsBuildTerminal( $plane_facing:int = 1 ):void {
 			var quadCount:int = 0;
 
-			if ( gc.eval( 4, 1, 4, 14 ) )
-				Log.out( "watch faces get built" );
+//			if ( gc.eval( 4, 1, 4, 14 ) )
+//				Log.out( "watch faces get built" );
 			// Does this oxel have faces
 			if ( facesHas() )
 			{

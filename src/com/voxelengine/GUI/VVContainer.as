@@ -11,14 +11,14 @@ public class VVContainer extends Container
 	public function VVContainer($width:Number = 100, $height:Number = 100):void 
 	{ 
 		super($width,$height);
-//		VoxelVerseGUI.openWindowCount = VoxelVerseGUI.openWindowCount + 1;
+//		Globals.openWindowCount = Globals.openWindowCount + 1;
 		eventCollector.addEvent(this, UIOEvent.REMOVED, onRemoved );
 	}
 	
 	private function onRemoved( event:UIOEvent ):void
 	{
 		eventCollector.removeEvent(this, UIOEvent.REMOVED, onRemoved );
-//		VoxelVerseGUI.openWindowCount = VoxelVerseGUI.openWindowCount - 1;
+//		Globals.openWindowCount = Globals.openWindowCount - 1;
 	}
 	
 }

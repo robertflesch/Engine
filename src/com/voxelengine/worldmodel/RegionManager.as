@@ -61,7 +61,7 @@ public class RegionManager
 		
 		Globals.g_app.addEventListener( RegionEvent.REQUEST_PUBLIC, cacheRequestPublic ); 
 		Globals.g_app.addEventListener( RegionEvent.REQUEST_PRIVATE, cacheRequestPrivate ); 
-		Globals.g_app.addEventListener( ModelMetadataEvent.INFO_COLLECTED, metadataCollected );
+		Globals.g_app.addEventListener( ModelMetadataEvent.INFO_COLLECTED, localModelReadyToBeCreated );
 
 		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, load ); 
 		
@@ -186,21 +186,18 @@ public class RegionManager
 		ii.guid = e.instanceGuid;
 	}
 	
-	static private function metadataCollected( e:ModelMetadataEvent ):void {
+	static private function localModelReadyToBeCreated( e:ModelMetadataEvent ):void {
 		
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.guid = Globals.getUID();
-		ii.guid = e.description;
+		//ii.guid = e.description;
 		ii.name = e.name;
-	}
-	
-	static private function addModel( $ii:InstanceInfo ):void {
 		
 		var viewDistance:Vector3D = new Vector3D(0, 0, -75);
-		$ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-		Log.out( "RegionManager.addModel - " + $ii.toString() );
+		ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
+		Log.out( "RegionManager.addModel - " + ii.toString() );
 		
-		Globals.create( $ii );
+		Globals.create( ii );
 	}
 } // RegionManager
 } // Package

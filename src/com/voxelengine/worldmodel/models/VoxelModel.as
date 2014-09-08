@@ -7,9 +7,45 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import flash.display3D.Context3D;
+	
+	
+	import flash.events.TimerEvent;
+	import flash.events.KeyboardEvent;
+	
+	import flash.geom.Matrix3D;
+	import flash.geom.Vector3D;
+	
+	import flash.net.registerClassAlias;
+	
+	import flash.ui.Keyboard;
+	
+	import flash.utils.ByteArray;
+	import flash.utils.getTimer;
+	import flash.utils.Timer;
+	import flash.utils.getQualifiedClassName;
+
+	import playerio.DatabaseObject;
+	import playerio.PlayerIOError;
+	
+	import com.voxelengine.Globals;
+	import com.voxelengine.Log;
+	
 	import com.voxelengine.events.LightEvent;
-	import com.voxelengine.GUI.VoxelVerseGUI;
+	import com.voxelengine.events.ImpactEvent;
+	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.events.OxelEvent;
+	import com.voxelengine.events.GUIEvent;
+	import com.voxelengine.events.LoadingEvent;
+	
 	import com.voxelengine.pools.LightingPool;
+	import com.voxelengine.pools.GrainCursorPool;
+	import com.voxelengine.pools.OxelPool;
+	
+	import com.voxelengine.renderer.shaders.*
+	
+	import com.voxelengine.worldmodel.*;
+	import com.voxelengine.worldmodel.animation.*;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.oxel.Lighting;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
@@ -19,46 +55,13 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.worldmodel.oxel.OxelData;
 	import com.voxelengine.worldmodel.tasks.flowtasks.Flow;
 	import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
-	import flash.display3D.Context3D;
-	
-	import flash.events.KeyboardEvent;
-	import flash.ui.Keyboard;
-	
-	import flash.events.TimerEvent;
-	
-	import flash.geom.Matrix3D;
-	import flash.geom.Vector3D;
-	
-	import flash.utils.ByteArray;
-	import flash.utils.getTimer;
-	import flash.utils.Timer;
-	import flash.utils.getQualifiedClassName;
-	
-	import com.voxelengine.Globals;
-	import com.voxelengine.Log;
-	
-	import com.voxelengine.events.ImpactEvent;
-	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.events.OxelEvent;
-	
-	import com.voxelengine.renderer.shaders.*
-	import com.voxelengine.pools.GrainCursorPool;
-	import com.voxelengine.pools.OxelPool;
-	
-	import com.voxelengine.worldmodel.*;
-	import com.voxelengine.worldmodel.animation.*;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.worldmodel.weapons.Projectile;
 	
-	import playerio.DatabaseObject;
-	import playerio.PlayerIOError;
 	import com.voxelengine.server.Persistance;
-	import com.voxelengine.events.GUIEvent;
-	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.server.Persistance;
 	
-	import flash.net.registerClassAlias;
 	import com.voxelengine.worldmodel.oxel.FlowInfo;
 	/**
 	 * ...
@@ -69,6 +72,19 @@ package com.voxelengine.worldmodel.models
 	{
 		private var 	_oxel:Oxel 						= null; // INSTANCE NOT EXPORTED
 		private var 	_editCursor:EditCursor 			= null; // INSTANCE NOT EXPORTED
+		protected var 	_shaders:Vector.<Shader>        = new Vector.<Shader>;
+		protected var 	_modelInfo:ModelInfo 			= null; // INSTANCE NOT EXPORTED
+		protected var 	_instanceInfo:InstanceInfo 		= null; // INSTANCE NOT EXPORTED
+		protected var 	_children:Vector.<VoxelModel> 	= new Vector.<VoxelModel>; // INSTANCE NOT EXPORTED
+		protected var 	_databaseObject:DatabaseObject 	= null; // INSTANCE NOT EXPORTED
+		private var 	_statisics:ModelStatisics 		= new ModelStatisics(); // INSTANCE NOT EXPORTED
+		private var 	_version:String 				= "0"; // INSTANCE NOT EXPORTED
+		private var 	_timer:int 						= getTimer(); // INSTANCE NOT EXPORTED
+		private var 	_anim:Animation 				= null;
+		private var 	_camera:Camera					= new Camera();
+
+		private var 	_lightIDNext:uint 				= 1024; // reserve space for ?
+		
 		private var 	_initialized:Boolean 			= false; // INSTANCE NOT EXPORTED
 		private var 	_visible:Boolean 				= true; // Not support yet
 		private var 	_stateLock:Boolean 				= false; // Not support yet
@@ -77,26 +93,13 @@ package com.voxelengine.worldmodel.models
 		protected var 	_selected:Boolean 				= false; // INSTANCE NOT EXPORTED
 		private var 	_onSolidGround:Boolean			= false; // INSTANCE NOT EXPORTED
 		private var 	_keyboardControl:Boolean		= false; // INSTANCE NOT EXPORTED
-		protected var 	_shaders:Vector.<Shader>        = new Vector.<Shader>;
-		private var 	_timer:int 						= getTimer(); // INSTANCE NOT EXPORTED
-		protected var 	_modelInfo:ModelInfo 			= null; // INSTANCE NOT EXPORTED
-		protected var 	_instanceInfo:InstanceInfo 		= null; // INSTANCE NOT EXPORTED
-		protected var 	_children:Vector.<VoxelModel> 	= new Vector.<VoxelModel>; // INSTANCE NOT EXPORTED
-		private var 	_lastCollisionModel:VoxelModel 	= null; // INSTANCE NOT EXPORTED
-		private var 	_statisics:ModelStatisics 		= new ModelStatisics(); // INSTANCE NOT EXPORTED
-		private var 	_version:String 				= "0"; // INSTANCE NOT EXPORTED
-		private var 	_clipVelocityFactor:Attribute 	= new Attribute(95); // INSTANCE NOT EXPORTED
-		protected var 	_databaseObject:DatabaseObject 	= null; // INSTANCE NOT EXPORTED
-		private var 	_anim:Animation 				= null;
-		private var 	_camera:Camera					= new Camera();
-		private var 	_lightIDNext:uint 				= 1024; // reserve space for ?
 		private var 	_usesGravity:Boolean 			= false;     				// Should be exported
 		
 		// TODO this should be moved to controlled model
+		private var 	_lastCollisionModel:VoxelModel 	= null; // INSTANCE NOT EXPORTED
+		private var 	_clipVelocityFactor:Attribute 	= new Attribute(95); // INSTANCE NOT EXPORTED
 		protected var 	_turnRate:Number 				= 20; // 2.5 for ship
 		protected var 	_accelRate:Number 				= 2.5;
-		
-		
 		
 		
 		public function get usesGravity():Boolean 					{ return _usesGravity; }
@@ -1121,7 +1124,7 @@ package com.voxelengine.worldmodel.models
 		{
 			var versionInfo:Object = readMetaInfo( $ba );
 			_version = versionInfo.version;
-			Log.out( "VoxelModel.IVMLoadUncompressed version: " + _version + "  manifestVersion: " + versionInfo.manifestVersion );
+			//Log.out( "VoxelModel.IVMLoadUncompressed version: " + _version + "  manifestVersion: " + versionInfo.manifestVersion );
 			if ( 0 != versionInfo.manifestVersion ) {
 				// this local file has manifest information
 				// so load it but throw away the embedded info
@@ -1133,7 +1136,7 @@ package com.voxelengine.worldmodel.models
 				// read off that many bytes
 				var modelInfoJson:String = $ba.readUTFBytes( strLen );
 				modelInfoJson = decodeURI( modelInfoJson );
-				Log.out( "VoxelModel.IVMLoadUncompressed - modelInfoJson: " + modelInfoJson );
+				//Log.out( "VoxelModel.IVMLoadUncompressed - modelInfoJson: " + modelInfoJson );
 			}
 			
 			// now just load the model like any other
@@ -1154,7 +1157,7 @@ package com.voxelengine.worldmodel.models
 
 			// Read off next byte, the manifest version
 			metaInfo.manifestVersion = $ba.readByte();
-			Log.out("VoxelModel.readMetaInfo - version: " + metaInfo.version + "  manifestVersion: " + metaInfo.manifestVersion );
+			//Log.out("VoxelModel.readMetaInfo - version: " + metaInfo.version + "  manifestVersion: " + metaInfo.manifestVersion );
 			return metaInfo;
 
 			// This reads the format info and advances position on byteArray
@@ -1280,7 +1283,7 @@ package com.voxelengine.worldmodel.models
 			oxel.gc.bound = rootGrainSize;
 			instanceInfo.grainSize = rootGrainSize;
 			GrainCursorPool.poolDispose(gct);
-Log.out( "VoxelModel.loadOxelFromByteArray - CALCULATE CENTER" );
+//Log.out( "VoxelModel.loadOxelFromByteArray - CALCULATE CENTER" );
 			calculateCenter();
 			set_camera_data();
 			oxelLoaded();
@@ -1742,7 +1745,7 @@ Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );
 		// these are overriden in subclasses to allow for custom movement
 		protected function onKeyDown(e:KeyboardEvent):void
 		{
-			if (Keyboard.TAB == e.keyCode && 0 == VoxelVerseGUI.openWindowCount )
+			if (Keyboard.TAB == e.keyCode && 0 == Globals.openWindowCount )
 			{
 				camera.next();
 				

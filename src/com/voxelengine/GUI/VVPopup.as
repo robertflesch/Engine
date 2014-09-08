@@ -12,14 +12,14 @@ public class VVPopup extends Popup
 	public function VVPopup( title:String )
 	{
 		super( title );
-		VoxelVerseGUI.openWindowCount = VoxelVerseGUI.openWindowCount + 1;
+		Globals.openWindowCount = Globals.openWindowCount + 1;
 		eventCollector.addEvent(this, UIOEvent.REMOVED, onRemoved );
 	}
 	
 	private function onRemoved( event:UIOEvent ):void
 	{
 		eventCollector.removeEvent(this, UIOEvent.REMOVED, onRemoved );
-		VoxelVerseGUI.openWindowCount = VoxelVerseGUI.openWindowCount - 1;
+		Globals.openWindowCount = Globals.openWindowCount - 1;
 	}
 	
 }

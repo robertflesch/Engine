@@ -160,7 +160,7 @@ package com.voxelengine.worldmodel.models
 		public function create( instance:InstanceInfo ):void {
 			//Log.out( "ModelManager.create: instance.guid" + instance.guid )
 			instanceInfoAdd( instance );
-Log.out( "ModelManager.create - instance.guid: " + instance.guid + " ii: " + instance.toString() );
+Log.out( "ModelManager.create - ii.toString(): " + instance.toString() );
 			if ( !Globals.isGuid( instance.guid ) && instance.guid != "LoadModelFromBigDB" )
 			{
 				var modelInfo:ModelInfo = modelInfoFindOrCreate( instance.guid, instance.guid );
@@ -1137,6 +1137,7 @@ Log.out( "ModelManager.create - instance.guid: " + instance.guid + " ii: " + ins
 		}
 		
 		public function loadRegionObjects( objects:Array ):int {
+			Log.out( "ModelManager.loadRegionObjects - START =============================" );
 			var count:int = 0;
 			for each ( var v:Object in objects )		   
 			{
@@ -1144,7 +1145,7 @@ Log.out( "ModelManager.create - instance.guid: " + instance.guid + " ii: " + ins
 				instance.initJSON( v.model );
 				//trace( "ModelManager.loadObjects: ----------------  fileName:" + v.model.fileName );
 				
-				Log.out( "ModelManager.loadObjects - loading fileName:" + v.model.fileName + "  instance Guid: " + instance.guid + "  name: " +  instance.name);
+				Log.out( "ModelManager.loadRegionObjects - loading fileName:" + v.model.fileName + "  instance Guid: " + instance.guid + "  name: " +  instance.name );
 				create( instance );
 				count++;
 			}
@@ -1154,6 +1155,7 @@ Log.out( "ModelManager.create - instance.guid: " + instance.guid + " ii: " + ins
 				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE ) );
 
 			Globals.g_landscapeTaskController.activeTaskLimit = 1;
+			Log.out( "ModelManager.loadRegionObjects - END =============================" );
 			return count;
 		}
 		
