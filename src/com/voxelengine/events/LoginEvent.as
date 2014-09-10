@@ -26,21 +26,25 @@ package com.voxelengine.events
 		static public const JOIN_ROOM_FAILURE:String		= "JOIN_ROOM_FAILURE";
 
 		private var _error:PlayerIOError;
+		private var _guid:String;
 		public function get error():PlayerIOError { return _error; }
 		
-		public function LoginEvent( $type:String, error:PlayerIOError , $bubbles:Boolean = true, $cancellable:Boolean = false )
+		public function get guid():String { return _guid; }
+		
+		public function LoginEvent( $type:String, error:PlayerIOError, $guid:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
 		{
 			super( $type, $bubbles, $cancellable );
+			_guid = $guid;
 		}
 		
 		public override function clone():Event
 		{
-			return new LoginEvent(type, error, bubbles, cancelable);
+			return new LoginEvent(type, error, guid, bubbles, cancelable);
 		}
 	   
 		public override function toString():String
 		{
-			return formatToString("LoginEvent", "bubbles", "cancelable") + _error ? _error.message : "";
+			return formatToString("LoginEvent", "bubbles", "cancelable") + _error ? _error.message : "" + "  guid: " + guid;
 		}
 		
 	}

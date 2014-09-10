@@ -110,6 +110,7 @@ package com.voxelengine.worldmodel
 		private var _playerPosition:Vector3D = new Vector3D();
 		private var _playerRotation:Vector3D = new Vector3D();
 		private var _loaded:Boolean = true;
+		private var _guestAllow:Boolean = true;
 		private var _modelManager:ModelManager = new ModelManager();
 
 		public function get databaseObject():DatabaseObject { return _databaseObject; }
@@ -273,6 +274,7 @@ package com.voxelengine.worldmodel
 			outString += "  modifed:" + JSON.stringify(_modified);
 			outString += "  editors:" + JSON.stringify(_editors);
 			outString += "  admin:" + JSON.stringify(_admin);
+			outString += "  guests:" + JSON.stringify(_guestAllow);
 			return outString;
 		}
 		
@@ -297,6 +299,8 @@ package com.voxelengine.worldmodel
 			outString += "\"editors\":" + JSON.stringify(_editors);
 			outString += ","
 			outString += "\"admin\":" + JSON.stringify(_admin);
+			outString += ","
+			outString += "\"guests\":" + JSON.stringify(_guestAllow);
 			outString += "}"
 			return outString;
 		}

@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.GUI
 {
+import com.voxelengine.worldmodel.RegionManager;
 import flash.events.Event;
 
 import org.flashapi.collector.EventCollector;
@@ -132,7 +133,7 @@ public class WindowSandboxList extends VVPopup
 		if ( li )
 		{
 			if ( li.data )
-				VVServer.joinRoom( li.data );
+				Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REQUEST_JOIN, li.data ) ); 
 			else
 				Log.out( "WindowSandboxList.loadthisRegion - NO REGION GUID FOUND", Log.ERROR );
 		}

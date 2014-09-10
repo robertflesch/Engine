@@ -202,7 +202,7 @@ package com.voxelengine.worldmodel.models
 					return null;
 				}
 				
-				vm._version = versionInfo.version;
+				vm.version = versionInfo.version;
 				Globals.modelAdd( vm );
 			}
 

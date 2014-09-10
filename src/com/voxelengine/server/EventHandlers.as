@@ -38,7 +38,7 @@
 				connection.addMessageHandler("UserLeft", function(m:Message, userid:uint):void{
 					trace("Player with the userid", userid, "just left the room"); } );
 					
-				Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.LOGIN_SUCCESS, null ) );
+				Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.LOGIN_SUCCESS, null, "" ) );
 				// Only need this if we are online
 				Globals.g_app.addEventListener( ModelEvent.MOVED, sourceMovementEvent );
 			}

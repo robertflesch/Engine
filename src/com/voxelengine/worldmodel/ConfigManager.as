@@ -65,7 +65,7 @@ package com.voxelengine.worldmodel
 			// This gives the engine a chance to load up the typeInfo file
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 			
-			Globals.g_regionManager.request( _regionJson.config.region.startingRegion )
+			Globals.g_regionManager.requestRegionFile( _regionJson.config.region.startingRegion )
 		}
 
 		public function errorAction(e:IOErrorEvent):void

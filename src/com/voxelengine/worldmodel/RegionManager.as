@@ -70,7 +70,9 @@ public class RegionManager
 		Globals.g_app.addEventListener( RegionEvent.REQUEST_PRIVATE, cacheRequestPrivate ); 
 
 		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, load ); 
+		Globals.g_app.addEventListener( LoginEvent.JOIN_ROOM_SUCCESS, loadRegionOnJoinEvent );
 		
+		Globals.g_app.addEventListener( RegionEvent.REQUEST_JOIN, requestServerJoin ); 
 		Globals.g_app.addEventListener( RegionLoadedEvent.REGION_CREATED, regionCreatedHandler ); 
 		
 		
@@ -89,19 +91,20 @@ public class RegionManager
 	{
 		Persistance.loadRegions( Persistance.PUBLIC );
 	}
-	
-	public function request( $guid:String ):void
+	////////////////////////////////////////////////////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////
+	public function requestRegionFile( $guid:String ):void
 	{
 		var fileNamePathWithExt:String = Globals.regionPath + $guid + ".rjson"
-		Log.out( "RegionManager.request - loading: " + fileNamePathWithExt );
+		Log.out( "RegionManager.requestRegionFile - downloading: " + fileNamePathWithExt );
 		var _urlLoader:CustomURLLoader = new CustomURLLoader(new URLRequest( fileNamePathWithExt ));
 		_urlLoader.addEventListener(Event.COMPLETE, onRegionLoadedActionFromFile );
-		_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, function (e:IOErrorEvent):void { Log.out("RegionManager.errorAction: " + e.toString(), Log.ERROR); }	);			
+		_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, function (e:IOErrorEvent):void { Log.out("RegionManager.requestRegionFile - ERROR: " + e.toString(), Log.ERROR); }	);			
 	}
 
 	private function onRegionLoadedActionFromFile(event:Event):void
 	{
-		Log.out( "RegionManager.onRegionLoadedAction" );
+		Log.out( "RegionManager.onRegionLoadedActionFromFile" );
 		var req:URLRequest = CustomURLLoader(event.target).request;			
 		var guid:String = CustomURLLoader(event.target).fileName;			
 		guid = guid.substr( 0, guid.indexOf( "." ) );
@@ -113,6 +116,23 @@ public class RegionManager
 		// This tells the config manager that the local region was loaded and is ready to load rest of data.
 		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, guid ) ); 
 	}
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
+	static public function requestServerJoin( e:RegionEvent ):void {
+		Log.out( "RegionManager.requestServerJoin - guid: " + e.guid );
+		VVServer.joinRoom( e.guid );	
+	}
+	
+	public function loadRegionOnJoinEvent( e:LoginEvent ):void {
+		Log.out( "RegionManager.loadRegionOnJoinEvent - guid: " + e.guid );
+		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, e.guid ) );
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////
+	/////////////////////////////////////////////////////////////////////////////////////////
 	
 	// this calls the region and its model manager to update
 	public function update( $elapsed:int ):void {
@@ -154,6 +174,7 @@ public class RegionManager
 	
 	private function load( e:RegionEvent ):void
 	{
+		Log.out( "RegionManager.load - region: " + e.guid );
 		if ( !WindowSplash.isActive )
 			WindowSplash.create();
 		

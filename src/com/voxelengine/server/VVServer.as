@@ -15,7 +15,7 @@
 		static private var _connection:Connection = null;
 		static public function connection():Connection { return _connection; }
 		
-		static public var regionId:String;
+		static public var _guid:String;
 /*		
 		static public function connect( email:String, password:String ):void
 		{
@@ -31,7 +31,7 @@
 			);   
 		}
 */		
-		static public function joinRoom( $regionId:String ):void
+		static public function joinRoom( $guid:String ):void
 		{
 			//trace("VVServer.connectSuccess - connection to server established");
 			//
@@ -45,13 +45,13 @@
 			//trace( "joinRoom: " + Network.client.multiplayer.developmentServer );
 			
 			// Save the region id for when we need to load the region.
-			regionId = $regionId;
+			_guid = $guid;
 			
 			trace("VVServer.joinRoom - trying to join room at host: " + Network.client.multiplayer.developmentServer );
 			//Create pr join the room test
 			Network.client.multiplayer.createJoinRoom(
-				regionId,							//Room id. If set to null a random roomid is used
-				"VoxelVerse",							//The game type started on the server
+				_guid,								//Room id. If set to null a random roomid is used
+				"VoxelVerse",						//The game type started on the server
 				true,								//Should the room be visible in the lobby?
 				{},									//Room data. This data is returned to lobby list. Variabels can be modifed on the server
 				{},									//User join data
@@ -63,7 +63,7 @@
 		static private function handleJoinError(error:PlayerIOError):void
 		{
 			Log.out("VVServer.handleJoinError: " + error );
-			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.JOIN_ROOM_FAILURE, error ) );
+			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.JOIN_ROOM_FAILURE, error, _guid ) );
 		}
 		
 		static private function handleJoin(connection:Connection):void
@@ -76,8 +76,7 @@
 			
 			EventHandlers.addEventHandlers( _connection );
 			
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, regionId ) );
-			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.JOIN_ROOM_SUCCESS, null ) );
+			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.JOIN_ROOM_SUCCESS, null, _guid ) );
 		}
 		
 		// This disconnection from room server - Tested - RSF 9.6.14

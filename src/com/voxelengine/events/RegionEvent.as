@@ -20,6 +20,9 @@ package com.voxelengine.events
 		static public const REQUEST_PRIVATE:String					= "REQUEST_PRIVATE";
 		static public const REQUEST_PUBLIC:String					= "REQUEST_PUBLIC";
 		
+		// Used by the sandbox list to request a join of a server region
+		static public const REQUEST_JOIN:String						= "REQUEST_JOIN";
+
 		// tells the region manager to load this region
 		static public const REGION_LOAD:String						= "REGION_LOAD";
 		// dispatched at the begining of a region load
