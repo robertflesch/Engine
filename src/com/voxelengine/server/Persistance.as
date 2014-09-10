@@ -212,6 +212,43 @@
 			Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
 		}
 
+		static public function saveRegion( $metadata:Object, $dbo:DatabaseObject, $createSuccess:Function ):void {
+
+			if ( $dbo )
+			{
+				Log.out( "Region.save - saving region back to BigDB: " + $metadata.guid );
+				$dbo.data = $metadata.data;
+				$dbo.admin = $metadata.admin;
+				$dbo.description = $metadata.desc;
+				$dbo.editors = $metadata.editors;
+				$dbo.modified = new Date();
+				$dbo.name = $metadata.name;
+				//$dbo.owner = $metadata.owner;  // Do not think this should be allowed to change under normal circumstances
+				$dbo.world = $metadata.world;
+				
+				$dbo.save( false
+					     , false
+					     , function saveRegionSuccess():void  {  Log.out( "Persistance.saveRegionSuccess" ); }	
+					     , function saveRegionFailed(e:PlayerIOError):void  { 
+							Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_SAVE_FAILURE ) ); 
+							Log.out( "Persistance.saveRegionFailed - error data: " + e); }  
+						);
+			}
+			else
+			{
+				Log.out( "Region.create - creating new region: " + $metadata.guid + "" );
+				createObject( Persistance.DB_TABLE_REGIONS
+							, $metadata.guid
+							, $metadata
+							, $createSuccess
+							, function createFailed(e:PlayerIOError):void { 
+								Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_FAILURE ) ); 
+								Log.out( "Persistance.createFailed - error saving: " + $metadata.guid + " error data: " + e);  }
+							);
+			}
+			
+		}
+		
 		///////////////// MODELS ////////////////////////////////
 		static public function loadUserObjectsMetadata( userName:String ):void {
 			Persistance.loadRange( Persistance.DB_TABLE_OBJECTS

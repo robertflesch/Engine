@@ -318,13 +318,14 @@ package com.voxelengine.worldmodel
 		// this should all get refactored out to be part of the Persistance Object
 		public function save():void 
 		{
-			// Model manager might have changes not see in the region file
+			// dont save changes to anything if we are not online
+			if ( !Globals.online )
+				return;
+				
+			// Models might have changes not seen in the region file
 			_modelManager.save();
 			
 			if ( !changed )
-				return;
-				
-			if ( !Globals.online )
 				return;
 			
 			if ( !Globals.isGuid( guid ) ) {
@@ -332,63 +333,38 @@ package com.voxelengine.worldmodel
 				return;
 			}
 				
-				
 			Log.out( "Region.save - saving changes to Persistance" ); 
 			var ba:ByteArray = new ByteArray();
 			ba.clear();
-
-			//_owner = Network.userId;
-			//_editors.push( _owner );
-			//_admin.push( _owner );
 			writeToByteArray( ba );
-			if ( databaseObject )
-			{
-				Log.out( "Region.save - saving region back to BigDB: " + guid );
-				databaseObject.data = ba;
-				databaseObject.modified = new Date();
-//				databaseObject.owner = _owner,
-				databaseObject.save( false
-								   , false
-								   , saveSuccess
-								   , saveFailed );
-			}
-			else
-			{
-				Log.out( "Region.create - creating new region: " + guid + "" );
-				Persistance.createObject( Persistance.DB_TABLE_REGIONS
-								  , guid
-								  , metadata( ba )
-								  , createSuccess
-								  , createFailed );
-			}
-		}
-		
-		private function writeToByteArray( ba:ByteArray ):void
-		{
-			var regionJson:String = getJSON();
-			//regionJson = encodeURI(regionJson);
-			Log.out( "Region.writeToByteArray: " + regionJson );
-			ba.writeInt( regionJson.length );
-			ba.writeUTFBytes( regionJson );
-			ba.compress();
-		}
-		
-		public function createEmptyRegion():void {
-			processRegionJson( BLANK_REGION_TEMPLETE );
-		}
-		
-		private function saveFailed(e:PlayerIOError):void 
-		{ 
-			Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_SAVE_FAILURE ) ); 
-			Log.out( "Region.saveFailed - error saving: " + guid + " error data: " + e); 
+			
+			Persistance.saveRegion( metadata( ba ), databaseObject, createSuccess );
+
 			_changed = false;
-		} 
-		
-		private function saveSuccess():void 
-		{ 
-			Log.out( "Region.saveSuccess - saved: " + guid + " name: " + name ); 
-			_changed = false;
-		}	
+			
+			function metadata( ba: ByteArray ):Object {
+				Log.out( "Region.metadata userId: " + Network.userId + "  this region is owned by: " + _owner );
+				return {
+						admin: GetAdminList(),
+						created: _created ? _created : new Date(),
+						data: ba,
+						description: _desc,
+						guid: guid,
+						editors: GetEditorsList(),
+						modified: _modified,
+						name: _name,
+						owner:  _owner,
+						world: _worldId
+						};
+			}
+			
+			function writeToByteArray( ba:ByteArray ):void {
+				var regionJson:String = getJSON();
+				ba.writeInt( regionJson.length );
+				ba.writeUTFBytes( regionJson );
+				ba.compress();
+			}
+		}
 		
 		private function createSuccess(o:DatabaseObject):void 
 		{ 
@@ -396,31 +372,11 @@ package com.voxelengine.worldmodel
 				databaseObject = o;
 			Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS ) ); 
 			Log.out( "Region.createSuccess - created: " + guid ); 
-			_changed = false;
 		}	
 		
-		private function createFailed(e:PlayerIOError):void 
-		{ 
-			Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_FAILURE ) ); 
-			Log.out( "Region.createFailed - error saving: " + guid + " error data: " + e); 
-			_changed = false;
-		} 
-
-		private function metadata( ba: ByteArray ):Object
-		{
-			Log.out( "Region.metadata userId: " + Network.userId + "  this region is owned by: " + _owner );
-			// give it all to them!
-			return {
-					admin: GetAdminList(),
-					created: _created ? _created : new Date(),
-					data: ba,
-					description: _desc,
-					editors: GetEditorsList(),
-					modified: _modified,
-					name: _name,
-					owner:  _owner,
-					world: _worldId
-					};
+		
+		public function createEmptyRegion():void {
+			processRegionJson( BLANK_REGION_TEMPLETE );
 		}
 		
 		private function GetEditorsList():String
