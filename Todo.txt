@@ -1,14 +1,3 @@
-
-
-WORK
-
-Coding Standards
-camelCase used for variables, and function names
-member variables start with _ first letter lower case
-parameters start with $
-local variables use lowerCase letter
-avoid using New
-
 Check out
 Global Games Fund ( 25 million investment from Tango messaging app )
 
@@ -25,6 +14,8 @@ TODO: Fix fire animation around wood so that it can work with any voxel. Is it a
 TODO: Head needs to turn up and down with camera.
 TODO: Limit camera angle when in first person?
 IDEA: Glass, have engine use ambientOcclusion data to draw edges around glass, if edge value for a side >= 1 then draw border.
+IDEA: VertexManager sharing, this would allow us to have multiple creatures on the screen, just using one vertexManager
+
 
 
 DRAGON
