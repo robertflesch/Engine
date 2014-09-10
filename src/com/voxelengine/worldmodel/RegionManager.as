@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.LoginEvent;
@@ -21,6 +22,9 @@ import com.voxelengine.Log;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.VVServer;
 import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelLoader;
+import com.voxelengine.worldmodel.models.ModelManager;
+import com.voxelengine.worldmodel.models.VoxelModel;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.ProgressEvent;
@@ -44,16 +48,19 @@ public class RegionManager
 {
 	private var _regions:Vector.<Region> = null
 	private var _currentRegion:Region = null
+	private var _modelLoader:ModelLoader = new ModelLoader();
 	
 	public function get size():int { return _regions.length; }
 	
 	public function get currentRegion():Region { return _currentRegion; }
 	public function set currentRegion(val:Region):void { 
 		_currentRegion = val; 
-		Log.out("RegionManager.currentRegion - set to: " + val.regionId ) 
+		Log.out("RegionManager.currentRegion - set to: " + val.guid ) 
 	}
 	
 	public function get regions():Vector.<Region> { return _regions; }
+	
+	public function get modelLoader():ModelLoader { return _modelLoader; }
 	
 	public function RegionManager():void 
 	{
@@ -61,7 +68,6 @@ public class RegionManager
 		
 		Globals.g_app.addEventListener( RegionEvent.REQUEST_PUBLIC, cacheRequestPublic ); 
 		Globals.g_app.addEventListener( RegionEvent.REQUEST_PRIVATE, cacheRequestPrivate ); 
-		Globals.g_app.addEventListener( ModelMetadataEvent.INFO_COLLECTED, localModelReadyToBeCreated );
 
 		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, load ); 
 		
@@ -81,12 +87,12 @@ public class RegionManager
 	
 	public function cacheRequestPublic( e:RegionEvent ):void
 	{
-		Persistance.loadRegions( Persistance.DB_PUBLIC );
+		Persistance.loadRegions( Persistance.PUBLIC );
 	}
 	
-	public function request( $regionId:String ):void
+	public function request( $guid:String ):void
 	{
-		var fileNamePathWithExt:String = Globals.regionPath + $regionId + ".rjson"
+		var fileNamePathWithExt:String = Globals.regionPath + $guid + ".rjson"
 		Log.out( "RegionManager.request - loading: " + fileNamePathWithExt );
 		var _urlLoader:CustomURLLoader = new CustomURLLoader(new URLRequest( fileNamePathWithExt ));
 		_urlLoader.addEventListener(Event.COMPLETE, onRegionLoadedActionFromFile );
@@ -97,15 +103,15 @@ public class RegionManager
 	{
 		Log.out( "RegionManager.onRegionLoadedAction" );
 		var req:URLRequest = CustomURLLoader(event.target).request;			
-		var regionId:String = CustomURLLoader(event.target).fileName;			
-		regionId = regionId.substr( 0, regionId.indexOf( "." ) );
-		var newRegion:Region = new Region( regionId );
+		var guid:String = CustomURLLoader(event.target).fileName;			
+		guid = guid.substr( 0, guid.indexOf( "." ) );
+		var newRegion:Region = new Region( guid );
 		var jsonString:String = StringUtil.trim(String(event.target.data));
 		newRegion.processRegionJson( jsonString );
 		// This adds it to the list of regions
 		Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
 		// This tells the config manager that the local region was loaded and is ready to load rest of data.
-		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, regionId ) ); 
+		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, guid ) ); 
 	}
 	
 	// this calls the region and its model manager to update
@@ -120,7 +126,7 @@ public class RegionManager
 //		Log.out( "RegionManager.regionCreatedHandler: " + e.region.toString() );
 		// check for duplicates
 		for each ( var region:Region in _regions ) {
-			if ( region.regionId == e.region.regionId ) {
+			if ( region.guid == e.region.guid ) {
 				Log.out( "RegionManager.regionCreatedHandler - DUPS FOUND: " + e.region.toString() );
 				return;
 			}
@@ -136,10 +142,10 @@ public class RegionManager
 		Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_LOADED, e.region ) );
 	}
 	
-	public function getRegion( $regionId:String ):Region
+	public function getRegion( $guid:String ):Region
 	{
 		for each ( var region:Region in _regions ) {
-			if ( region && region.regionId == $regionId ) {
+			if ( region && region.guid == $guid ) {
 				return region;
 			}
 		}
@@ -152,9 +158,9 @@ public class RegionManager
 			WindowSplash.create();
 		
 		if ( currentRegion )
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_UNLOAD, currentRegion.regionId ) );
+			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_UNLOAD, currentRegion.guid ) );
 
-		var region:Region = getRegion( e.regionId );
+		var region:Region = getRegion( e.guid );
 		if ( region ) {
 			currentRegion = region;
 			region.load();
@@ -165,7 +171,7 @@ public class RegionManager
 		// No matching region found, so we have to go load it
 		var newRegion:Region = new Region( "ERROR_ID" );
 		currentRegion = newRegion;
-		Log.out( "RegionManager.loadRegion - ERROR creating new region: " + e.regionId, Log.ERROR );
+		Log.out( "RegionManager.loadRegion - ERROR creating new region: " + e.guid, Log.ERROR );
 	}
 	
 	public function save():void
@@ -176,28 +182,8 @@ public class RegionManager
 		}
 		else {
 			var fr:FileReference = new FileReference();
-			fr.save( currentRegion.getJSON(), currentRegion.regionId );
+			fr.save( currentRegion.getJSON(), currentRegion.guid );
 		}
-	}
-	
-	static private function modelAdded( e:ModelEvent ):void {
-		
-		var ii:InstanceInfo = new InstanceInfo();
-		ii.guid = e.instanceGuid;
-	}
-	
-	static private function localModelReadyToBeCreated( e:ModelMetadataEvent ):void {
-		
-		var ii:InstanceInfo = new InstanceInfo();
-		ii.guid = Globals.getUID();
-		//ii.guid = e.description;
-		ii.name = e.name;
-		
-		var viewDistance:Vector3D = new Vector3D(0, 0, -75);
-		ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-		Log.out( "RegionManager.addModel - " + ii.toString() );
-		
-		Globals.create( ii );
 	}
 } // RegionManager
 } // Package

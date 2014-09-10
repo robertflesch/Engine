@@ -41,7 +41,6 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			AddAxes;
 			GenerateClouds;
 			CarveCloudOutside;
-			CreatePlayer;
 			Flow;
 			
 			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeError" ) );

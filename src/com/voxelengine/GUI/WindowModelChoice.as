@@ -1,6 +1,7 @@
 
 package com.voxelengine.GUI
 {
+	import com.voxelengine.worldmodel.models.ModelLoader;
 	import org.flashapi.swing.*;
 	import org.flashapi.swing.button.RadioButtonGroup;
 	import org.flashapi.swing.databinding.DataProvider;
@@ -60,21 +61,21 @@ package com.voxelengine.GUI
 					ii.guid = "GenerateCube";
 					ii.name = "New Cube Object";
 					// preload the modelInfo for the GenerateCube
-					Globals.modelInfoPreload( ii.guid );
+					ModelLoader.modelInfoPreload( ii.guid );
 					new WindowNewModelGenerateCube( ii );
 					break;
 				case 1: // From Sphere
 					ii.guid = "GenerateSphere";
 					ii.name = "New Sphere Object";
 					// preload the modelInfo for the GenerateCube
-					Globals.modelInfoPreload( ii.guid );
+					ModelLoader.modelInfoPreload( ii.guid );
 					new WindowNewModelGenerateCube( ii );
 					break;
 				case 2: // From Sphere
 					ii.guid = "GenerateSubSphere";
 					ii.name = "Sphere in larger Object";
 					// preload the modelInfo for the GenerateCube
-					Globals.modelInfoPreload( ii.guid );
+					ModelLoader.modelInfoPreload( ii.guid );
 					new WindowNewModelGenerateCube( ii );
 					break;
 			}

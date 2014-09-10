@@ -340,14 +340,6 @@ package com.voxelengine {
 			return g_regionManager.currentRegion.modelManager.modelInfoAdd( $modelInfo )
 		}
 		
-		public static function create( $ii:InstanceInfo ):void {
-			return g_regionManager.currentRegion.modelManager.create( $ii )
-		}
-		
-		public static function modelInfoPreload( $name:String ):void {
-			return g_regionManager.currentRegion.modelManager.modelInfoPreload( $name )
-		}
-		
 		public static function instanceInfoGet( $name:String ):InstanceInfo {
 			return g_regionManager.currentRegion.modelManager.instanceInfoGet( $name )
 		}
@@ -389,10 +381,6 @@ package com.voxelengine {
 			return g_regionManager.currentRegion.modelManager.viewVectorNormalizedGet();
 		};
 		
-		public static function modelInfoFindOrCreate( $fileName:String, $instanceGuid:String, $block:Boolean = true ):ModelInfo {
-			return g_regionManager.currentRegion.modelManager.modelInfoFindOrCreate( $fileName, $instanceGuid, $block );
-		};
-
 		public static function modelInstancesGetFirst():VoxelModel {
 			return g_regionManager.currentRegion.modelManager.modelInstancesGetFirst();
 		};
@@ -409,6 +397,12 @@ package com.voxelengine {
 			return g_regionManager.currentRegion.modelManager.whichModelsIsThisInsideOfNew( $vm );
 		};
 		
+		public static function modelInstancesChangeGuid( $oldGuid:String, $newGuid:String ):void { 
+			return g_regionManager.currentRegion.modelManager.modelInstancesChangeGuid( $oldGuid, $newGuid );
+		};
 		
+			public static function instanceInfoAdd( $val:InstanceInfo ):void {
+			return g_regionManager.currentRegion.modelManager.instanceInfoAdd( $val );
+		};
 	}
 }

@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.animation
 {
 	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.Globals;
@@ -55,7 +56,7 @@ package com.voxelengine.worldmodel.animation
 			if ( null == _voxelModel )
 			{
 				Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onAttachmentCreated );
-				Globals.create( _instanceInfo );
+				ModelLoader.load( _instanceInfo );
 			}
 			else
 			{

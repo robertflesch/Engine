@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2014 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -9,7 +9,6 @@
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
 	import flash.events.Event;
-	import flash.events.ProgressEvent;
 	import flash.events.IOErrorEvent;
 
 	import flash.net.URLLoader;
@@ -20,8 +19,6 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import flash.utils.getTimer;
 	
 	import com.developmentarc.core.tasks.tasks.ITask;
-	
-	import playerio.DatabaseObject;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
@@ -59,7 +56,6 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var ba:ByteArray = Globals.findIVM( fileName );
 			if ( ba )
 			{
-				//Log.out("LoadModelFromIVM.start - IVM found in modelManager: " + fileName );
 				loadByteArray( ba );
 				return;
 			}
@@ -84,23 +80,20 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			urlLoader.dataFormat = URLLoaderDataFormat.BINARY;
 			urlLoader.addEventListener(Event.COMPLETE, onIVMLoad);
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, errorAction);			
-		}
-		
-		// once this is downloaded, we already have everything we need
-		// why is this still around?
-		private	function loaded(o:DatabaseObject):void 	{ 	
-			Log.out( "LoadModelFromIVM.loaded: " + o );
-			//var ba:ByteArray = o.;
-			//
-			//Globals.addIVM( _layer.data, ba );
-			//addLoadFromByteArray();
-			super.complete() // AbstractTask will send event
+			
+			// byte array data has been successfully loaded from the local IVM file
+			function onIVMLoad(event:Event):void	{
+				var ba:ByteArray = event.target.data;
+				Globals.addIVM( _layer.data, ba );
+				loadByteArray( ba );
+			}
+
+			function errorAction(e:IOErrorEvent):void {
+				Log.out( "LoadModelFromIVM.errorAction: " + e.toString(), Log.ERROR );
+				super.complete() // AbstractTask will send event
+			}	
 		}
 
-		/*
-		 * Load the byte array which is the visual representation of the 
-		 * voxel model into the oxel
-		 * */
 		private function loadByteArray( $ba:ByteArray ):void {
 			
 			var task:ITask = new LoadFromByteArray( _guid, _layer );
@@ -109,19 +102,6 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			super.complete() // AbstractTask will send event
 		}
 
-		// byte array data has been successfully loaded
-		public function onIVMLoad(event:Event):void	{
-			
-			var ba:ByteArray = event.target.data;
-			Globals.addIVM( _layer.data, ba );
-			loadByteArray( ba );
-		}
-		
-
-		public function errorAction(e:IOErrorEvent):void {
-			Log.out( "LoadModelFromIVM.errorAction: " + e.toString(), Log.ERROR );
-			super.complete() // AbstractTask will send event
-		}	
 		
 		override public function cancel():void {
 			// TODO stop this somehow?

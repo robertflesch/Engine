@@ -14,6 +14,7 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.events.RegionLoadedEvent;
 	import com.voxelengine.server.Persistance;
 	import com.voxelengine.server.Network;
+	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.ModelManager;
 	import flash.geom.Vector3D;
 	import flash.net.URLLoader;
@@ -94,7 +95,7 @@ package com.voxelengine.worldmodel
 		private var _name:String = "";
 		private var _desc:String = "";
 		private var _worldId:String = "VoxelVerse";
-		private var _regionId:String = DEFAULT_REGION_ID;
+		private var _guid:String = DEFAULT_REGION_ID;
 		private var _template:String = DEFAULT_REGION_ID;
 		private var _owner:String;
 		private var _editors:Vector.<String> = new Vector.<String>() //{ user Id1:role, user id2:role... }
@@ -125,8 +126,8 @@ package com.voxelengine.worldmodel
 		public function set desc(val:String):void { _desc = val; }
 		public function get name():String { return _name; }
 		public function set name(val:String):void { _name = val; }
-		public function get regionId():String { return _regionId; }
-		public function set regionId(val:String):void { _regionId = val; }
+		public function get guid():String { return _guid; }
+		public function set guid(val:String):void { _guid = val; }
 //		public function get regionJson():String { return _regionJson; }
 		public function get gravity():Boolean { return _gravity; }
 		public function set gravity(val:Boolean):void { _gravity = val; }
@@ -159,9 +160,9 @@ package com.voxelengine.worldmodel
 			Log.out( "Region.criticalModelDetected" );
 		}
 		
-		public function Region( $regionID:String ):void 
+		public function Region( $guid:String ):void 
 		{
-			_regionId = $regionID;
+			_guid = $guid;
 			_created = new Date();
 			_modified = _created;
 		}
@@ -172,23 +173,23 @@ package com.voxelengine.worldmodel
 			
 		private function onRegionUnload( le:RegionEvent ):void
 		{
-			if ( regionId == le.regionId )
+			if ( guid == le.guid )
 				unload();
 		}
 		
 		private function onLoadingComplete( le:LoadingEvent ):void
 		{
-			Log.out( "Region.onLoadingComplete: regionId: " + regionId );
+			Log.out( "Region.onLoadingComplete: regionId: " + guid );
 			_loaded = true;
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		}
 
 		public function unload():void
 		{
-			Log.out( "Region.unloadRegion: " + regionId );
+			Log.out( "Region.unloadRegion: " + guid );
 			// Removes anonymous function
 			Globals.g_app.removeEventListener( RegionEvent.REGION_MODIFIED, handleRegionModified );
-			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_ADDED, function( me:ModelEvent ):void { ; } );
+			//Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_ADDED, function( me:ModelEvent ):void { ; } );
 			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_REMOVED, function( me:ModelEvent ):void { ; } );
 			Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
 			_modelManager.removeAllModelInstances( true );
@@ -201,22 +202,22 @@ package com.voxelengine.worldmodel
 				
 		public function load():void
 		{
-			Log.out( "Region.load - loading region: " + regionId + "  name: " +  name );
+			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name );
 			Globals.g_app.addEventListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.addEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
 			Globals.g_app.addEventListener( RegionEvent.REGION_MODIFIED, handleRegionModified);
 			
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD_BEGUN, regionId ) );
+			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD_BEGUN, guid ) );
 
-			var count:int = _modelManager.loadRegionObjects(_JSON.region);
+			var count:int = ModelLoader.loadRegionObjects(_JSON.region);
 			if ( 0 < count )
 				_loaded = false;
 				
 			if ( !Globals.online && !Globals.player )
 				Globals.createPlayer();
 				
-			Log.out( "Region.load - completed processing on: " + name );
+			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name );
 		}		
 
 		public function getSkyColor():Vector3D
@@ -301,18 +302,12 @@ package com.voxelengine.worldmodel
 		}
 
 		
-		private function changeRegionId():void
-		{
-			var newId:String = Globals.getUID();
-			_regionId = newId;
-		}
-		
 		public function saveLocal():void 
 		{
 			var fr:FileReference = new FileReference();
 			_modified = new Date();
 			var outString:String = getJSON();
-			fr.save( outString, regionId );
+			fr.save( outString, guid );
 		}
 		
 		// TO do I dont like that I have reference to BigDB here
@@ -337,7 +332,7 @@ package com.voxelengine.worldmodel
 			writeToByteArray( ba );
 			if ( databaseObject )
 			{
-				Log.out( "Region.save - saving region back to BigDB: " + regionId );
+				Log.out( "Region.save - saving region back to BigDB: " + guid );
 				databaseObject.data = ba;
 				databaseObject.modified = new Date();
 //				databaseObject.owner = _owner,
@@ -348,9 +343,9 @@ package com.voxelengine.worldmodel
 			}
 			else
 			{
-				Log.out( "Region.create - creating new region: " + regionId + "" );
+				Log.out( "Region.create - creating new region: " + guid + "" );
 				Persistance.createObject( Persistance.DB_TABLE_REGIONS
-								  , regionId
+								  , guid
 								  , metadata( ba )
 								  , createSuccess
 								  , createFailed );
@@ -374,13 +369,13 @@ package com.voxelengine.worldmodel
 		private function saveFailed(e:PlayerIOError):void 
 		{ 
 			Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_SAVE_FAILURE ) ); 
-			Log.out( "Region.saveFailed - error saving: " + regionId + " error data: " + e); 
+			Log.out( "Region.saveFailed - error saving: " + guid + " error data: " + e); 
 			_changed = false;
 		} 
 		
 		private function saveSuccess():void 
 		{ 
-			Log.out( "Region.saveSuccess - saved: " + regionId + " name: " + name ); 
+			Log.out( "Region.saveSuccess - saved: " + guid + " name: " + name ); 
 			_changed = false;
 		}	
 		
@@ -389,14 +384,14 @@ package com.voxelengine.worldmodel
 			if ( o )
 				databaseObject = o;
 			Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS ) ); 
-			Log.out( "Region.createSuccess - created: " + regionId ); 
+			Log.out( "Region.createSuccess - created: " + guid ); 
 			_changed = false;
 		}	
 		
 		private function createFailed(e:PlayerIOError):void 
 		{ 
 			Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_FAILURE ) ); 
-			Log.out( "Region.createFailed - error saving: " + regionId + " error data: " + e); 
+			Log.out( "Region.createFailed - error saving: " + guid + " error data: " + e); 
 			_changed = false;
 		} 
 
@@ -413,7 +408,6 @@ package com.voxelengine.worldmodel
 					modified: _modified,
 					name: _name,
 					owner:  _owner,
-					region: _regionId,
 					world: _worldId
 					};
 		}

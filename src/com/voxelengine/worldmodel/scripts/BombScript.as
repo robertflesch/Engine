@@ -90,8 +90,7 @@ package com.voxelengine.worldmodel.scripts
 			var newShip:VoxelModel = Globals.getModelInstance( shipGuid );
 			ii.controllingModel = newShip;
 
-			Globals.create( ii );    
-			
+			ModelLoader.load( ii );    
 		}
 		
 		

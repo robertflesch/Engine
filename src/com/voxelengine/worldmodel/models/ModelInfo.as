@@ -151,7 +151,7 @@ package com.voxelengine.worldmodel.models
 					};
 		} 	
 		
-		public function init( $fileNameNoExt:String, $json:Object ):void 
+		public function initJSON( $fileNameNoExt:String, $json:Object ):void 
 		{
 			//Log.out( "ModelInfo.init - fileName: " + $fileNameNoExt + "  $json: " + JSON.stringify( $json.model ) );
 			_modelJson = $json;

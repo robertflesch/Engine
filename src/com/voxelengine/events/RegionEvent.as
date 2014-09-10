@@ -29,24 +29,24 @@ package com.voxelengine.events
 		// dispatched when a region is modified in the UI
 		static public const REGION_MODIFIED:String					= "REGION_MODIFIED";
 
-		private var _regionId:String;
+		private var _guid:String;
 		
-		public function get regionId():String { return _regionId; } 
+		public function get guid():String { return _guid; } 
 		
-		public function RegionEvent( $type:String, $regionId:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false )
+		public function RegionEvent( $type:String, $guid:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false )
 		{
 			super( $type, $bubbles, $cancellable );
-			_regionId = $regionId;
+			_guid = $guid;
 		}
 		
 		public override function clone():Event
 		{
-			return new RegionEvent(type, _regionId, bubbles, cancelable);
+			return new RegionEvent(type, _guid, bubbles, cancelable);
 		}
 	   
 		public override function toString():String
 		{
-			return formatToString("RegionEvent", "bubbles", "cancelable") + " regionId: " + _regionId;
+			return formatToString("RegionEvent", "bubbles", "cancelable") + " regionId: " + _guid;
 		}
 		
 	}

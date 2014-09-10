@@ -62,24 +62,22 @@
 		
 		static private function handleJoinError(error:PlayerIOError):void
 		{
-			trace("VVServer.handleJoinError", error);
-			
+			Log.out("VVServer.handleJoinError: " + error );
 			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.JOIN_ROOM_FAILURE, error ) );
 		}
 		
 		static private function handleJoin(connection:Connection):void
 		{
-			
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, regionId ) );
-			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.JOIN_ROOM_SUCCESS, null ) );
-			
-			trace("VVServer.handleJoin. Sucessfully joined Room");
+			Log.out("VVServer.handleJoin. Sucessfully joined Room");
 			_connection = connection;
 			
 			//Add disconnect listener
 			_connection.addDisconnectHandler(handleDisconnect);
 			
 			EventHandlers.addEventHandlers( _connection );
+			
+			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, regionId ) );
+			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.JOIN_ROOM_SUCCESS, null ) );
 		}
 		
 		// This disconnection from room server - Tested - RSF 9.6.14

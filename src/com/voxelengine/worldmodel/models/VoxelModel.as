@@ -101,7 +101,6 @@ package com.voxelengine.worldmodel.models
 		protected var 	_turnRate:Number 				= 20; // 2.5 for ship
 		protected var 	_accelRate:Number 				= 2.5;
 		
-		
 		public function get usesGravity():Boolean 					{ return _usesGravity; }
 		public function set usesGravity(val:Boolean):void 			{ _usesGravity = val; }
 		public function get getPerModelLightID():uint 				{ return _lightIDNext++ }
@@ -166,6 +165,11 @@ package com.voxelengine.worldmodel.models
 			if (null != _oxel && null != val)
 				throw new Error("VoxelModel.oxel SET, old oxel not null")
 			_oxel = val;
+		}
+		
+		public function set version(value:String):void 
+		{
+			_version = value;
 		}
 		
 		
@@ -708,7 +712,7 @@ package com.voxelengine.worldmodel.models
 					//_modelInfo.removeChild( child );
 					
 					//Log.out( "VoxelModel.internal_initialize - create child of parent.instance: " + instanceInfo.guid + "  - child.instanceGuid: " + child.instanceGuid );					
-					Globals.create(child);
+					ModelLoader.load(child);
 				}
 			}
 			
@@ -1025,17 +1029,18 @@ package com.voxelengine.worldmodel.models
 			_changed = true;
 		} 
 
-		public function save():void
+		public function save( objectMetadata:Object = null ):void
 		{
-			if ( !changed )
+			if ( !changed ) {
+				Log.out( "VoxelModel.save - NOT SAVING: " + instanceInfo.guid );
 				return;
+			}
 				
 			Log.out("VoxelModel.save - saving changes to: " + instanceInfo.guid  );
-			var ba:ByteArray;	
+			var ba:ByteArray = toByteArray();
 			if (databaseObject)
 			{
 				Log.out("VoxelModel.save - saving object back to BigDB: " + instanceInfo.guid );
-				ba = toByteArray();
 				databaseObject.data = ba;
 				databaseObject.save( false
 				                   , false
@@ -1044,12 +1049,15 @@ package com.voxelengine.worldmodel.models
 			}
 			else
 			{
-				ModelManager.createInstanceFromTemplate(this);
-				ba = toByteArray();
+				if ( null == objectMetadata )
+					objectMetadata = metadata( ba );
+				else
+					objectMetadata.data = ba;
+				
 				Log.out("VoxelModel.save - creating new object: " + instanceInfo.guid );
 				Persistance.createObject( Persistance.DB_TABLE_OBJECTS
 								        , instanceInfo.guid
-								        , metadata( ba )
+								        , objectMetadata
 								        , created
 								        , failed );
 			}
@@ -1105,157 +1113,6 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		
-		public function uncompress($ba:ByteArray):void
-		{
-			// the try catch here allows me to treat all models as compressed
-			// if the uncompress fails, it simply continues
-			try { 
-				$ba.uncompress();
-				//Log.out( "VoxelModel.IVMLoadCompressed - this byteArray IS compressed: " + modelInfo.fileName );
-			}
-			catch (error:Error) {
-				//Log.out( "VoxelModel.IVMLoadCompressed - this byteArray is NOT compressed: " + modelInfo.fileName );
-			}
-			fromByteArray( $ba );
-		}
-		
-		// This is the last part of reading a local model
-		public function fromByteArray( $ba:ByteArray ):void
-		{
-			var versionInfo:Object = readMetaInfo( $ba );
-			_version = versionInfo.version;
-			//Log.out( "VoxelModel.IVMLoadUncompressed version: " + _version + "  manifestVersion: " + versionInfo.manifestVersion );
-			if ( 0 != versionInfo.manifestVersion ) {
-				// this local file has manifest information
-				// so load it but throw away the embedded info
-				// how should I handle if there is a mismatch?
-				// do I use the local or the network? hm...
-				
-				// how many bytes is the modelInfo
-				var strLen:int = $ba.readInt();
-				// read off that many bytes
-				var modelInfoJson:String = $ba.readUTFBytes( strLen );
-				modelInfoJson = decodeURI( modelInfoJson );
-				//Log.out( "VoxelModel.IVMLoadUncompressed - modelInfoJson: " + modelInfoJson );
-			}
-			
-			// now just load the model like any other
-			loadOxelFromByteArray($ba);
-		}
-		
-		static public function readMetaInfo( $ba:ByteArray ):Object
-		{
-			$ba.position = 0;
-			// Read off first 3 bytes, the data format
-			var format:String = readFormat($ba);
-			if ("ivm" != format)
-				throw new Error("VoxelModel.readMetaInfo - Exception - unsupported format: " + format );
-			
-			var metaInfo:Object = new Object();
-			// Read off next 3 bytes, the data version
-			metaInfo.version = readVersion($ba);
-
-			// Read off next byte, the manifest version
-			metaInfo.manifestVersion = $ba.readByte();
-			//Log.out("VoxelModel.readMetaInfo - version: " + metaInfo.version + "  manifestVersion: " + metaInfo.manifestVersion );
-			return metaInfo;
-
-			// This reads the format info and advances position on byteArray
-			function readFormat($ba:ByteArray):String
-			{
-				var format:String;
-				var byteRead:int = 0;
-				byteRead = $ba.readByte();
-				format = String.fromCharCode(byteRead);
-				byteRead = $ba.readByte();
-				format += String.fromCharCode(byteRead);
-				byteRead = $ba.readByte();
-				format += String.fromCharCode(byteRead);
-				
-				return format;
-			}
-			
-			// This reads the version info and advances position on byteArray
-			function readVersion($ba:ByteArray):String
-			{
-				var version:String;
-				var byteRead:int = 0;
-				byteRead = $ba.readByte();
-				version = String.fromCharCode(byteRead);
-				byteRead = $ba.readByte();
-				version += String.fromCharCode(byteRead);
-				byteRead = $ba.readByte();
-				version += String.fromCharCode(byteRead);
-				
-				return version;
-			}
-		}
-
-		private static const MANIFEST_VERSION:int = 100;
-		static public function loadFromManifestByteArray( $ba:ByteArray, $fileName:String ):VoxelModel {
-				
-			var versionInfo:Object = readMetaInfo( $ba );
-			if ( MANIFEST_VERSION != versionInfo.manifestVersion )
-			{
-				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
-				return null;
-			}
-			
-			// how many bytes is the modelInfo
-			var strLen:int = $ba.readInt();
-			// read off that many bytes
-			var modelInfoJson:String = $ba.readUTFBytes( strLen );
-			
-			if ( null != $fileName ) {
-				// create the modelInfo object from embedded metadata
-				modelInfoJson = decodeURI(modelInfoJson);
-				var jsonResult:Object = JSON.parse(modelInfoJson);
-				var mi:ModelInfo = new ModelInfo();
-				mi.init( $fileName, jsonResult );
-				
-				// add the modelInfo to the repo
-				Globals.modelInfoAdd( mi );
-				var ii:InstanceInfo = Globals.instanceInfoGet( $fileName );
-				if ( ii )
-				{
-					var modelAsset:String = mi.modelClass;
-					var modelClass:Class = ModelLibrary.getAsset( modelAsset )
-					var vm:* = new modelClass( ii, mi );
-					if ( null == vm )
-					{
-						Log.out( "VoxelModel.loadFromManifestByteArray - failed to create new instance of modelClass: " + modelClass, Log.ERROR );
-						return null;
-					}
-					
-					if ( "Player" == modelAsset )
-					{
-						Globals.player = vm;
-						Globals.controlledModel = vm;
-						return null;
-					}
-					
-					vm._version = versionInfo.version;
-					Globals.modelAdd( vm );
-				}
-				else
-				{
-					Log.out( "VoxelModel.loadFromManifestByteArray - No instanceInfo was found for: " + mi.fileName, Log.WARN );
-					return null;
-				}
-			}
-			
-
-			try {
-				vm.loadOxelFromByteArray( $ba );
-				//Log.out( "VoxelModel.loadFromManifestByteArray - completed: " + $fileName );
-			}
-			catch ( e:Error ) {
-				Log.out( "VoxelModel.loadFromManifestByteArray in loadOxelFromByteArray: " + $fileName ? $fileName : "Uknown modelName" );
-			}
-			
-			return vm;
-		}
-		
 		public function loadOxelFromByteArray($ba:ByteArray):void
 		{
 			// Read off 1 bytes, the root size
@@ -1283,13 +1140,10 @@ package com.voxelengine.worldmodel.models
 			oxel.gc.bound = rootGrainSize;
 			instanceInfo.grainSize = rootGrainSize;
 			GrainCursorPool.poolDispose(gct);
-//Log.out( "VoxelModel.loadOxelFromByteArray - CALCULATE CENTER" );
+			
 			calculateCenter();
 			set_camera_data();
 			oxelLoaded();
-			
-		
-			//trace( "loadOXelFromByteArray: " + oxel );
 		}
 		
 		protected function oxelLoaded():void
@@ -1708,10 +1562,10 @@ Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );
 		
 		public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void
 		{
-			if ( $modelLosingControl )
-				Log.out( "VoxelModel.takeControl of : " + modelInfo.fileName + " by: " + $modelLosingControl.modelInfo.fileName );
-			else	
-				Log.out( "VoxelModel.takeControl of : " + modelInfo.fileName );
+			//if ( $modelLosingControl )
+				//Log.out( "VoxelModel.takeControl of : " + modelInfo.fileName + " by: " + $modelLosingControl.modelInfo.fileName );
+			//else	
+				//Log.out( "VoxelModel.takeControl of : " + modelInfo.fileName );
 			
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);

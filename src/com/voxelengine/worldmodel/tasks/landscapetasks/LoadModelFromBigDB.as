@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2014 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -8,79 +8,66 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
-	import com.voxelengine.server.Persistance;
-	import com.voxelengine.server.Network;
-	import com.voxelengine.worldmodel.oxel.GrainCursor;
-	import com.voxelengine.worldmodel.oxel.Oxel;
-	import com.voxelengine.worldmodel.models.*;
-	import com.voxelengine.pools.GrainCursorPool;
-	import com.voxelengine.pools.OxelPool;
-	import flash.events.Event;
-	import flash.events.ProgressEvent;
-	import flash.events.IOErrorEvent;
-
-	import flash.net.URLLoader;
-	import flash.net.URLRequest;
-	import flash.net.URLLoaderDataFormat;
+	import com.voxelengine.worldmodel.models.ModelLoader;
+	import playerio.DatabaseObject;
+	import playerio.PlayerIOError;
 	
 	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
 	
-	import com.developmentarc.core.tasks.tasks.ITask;
+	import com.developmentarc.core.tasks.tasks.AbstractTask;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.server.Persistance;
+	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
-	import com.developmentarc.core.tasks.tasks.AbstractTask;
 
-	import playerio.DatabaseObject;
-	import playerio.PlayerIOError;
 	/**
 	 * ...
 	 * @author Robert Flesch
 	 */
 	public class LoadModelFromBigDB extends AbstractTask 
 	{		
-		private var _keyName:String;
+		private var _guid:String;
 		protected var _startTime:int;
 		
-		public function LoadModelFromBigDB( $keyName:String, $layer:LayerInfo = null ):void {
+		public function LoadModelFromBigDB( $guid:String, $layer:LayerInfo = null ):void {
 			//Log.out( "LoadModelFromBigDB.construct " );
-			_keyName = $keyName
+			_guid = $guid
 			_startTime = getTimer();
-			super( _keyName );
+			super( _guid );
 		}
 		
-		// use data = for model guid
 		override public function start():void
 		{
 			//Log.out( "LoadModelFromBigDB.start" );
 			var timer:int = getTimer();
 			super.start() // AbstractTask will send event
 			
-			Persistance.loadObject( "voxelModels", _keyName, successHandler, errorHandler );
+			Persistance.loadObject( "voxelModels", _guid, successHandler, errorHandler );
 		}
 		
-		private 	function successHandler(o:DatabaseObject):void 
+		private function successHandler($dbo:DatabaseObject):void 
 		{ 
-			//Log.out( "LoadModelFromBigDB.successHandler" );
-			///////////////////////////////////////////////////////////////////////////////////////////////////////////////
-			//var timer:int = getTimer();
-			if ( !o )
+			if ( !$dbo )
 			{
-				Log.out( "LoadModelFromBigDB.successHandler - NULL DBObject" );
+				// This seems to be the failure case, not the error handler
+				Log.out( "LoadModelFromBigDB.successHandler - ERROR - NULL DatabaseObject for guid:" + _guid );
 				super.complete() // AbstractTask will send event
 				return;
 			}
 
-			var keyName:String = o.key;
-			var $ba:ByteArray = o.data as ByteArray;
+			var $ba:ByteArray = $dbo.data as ByteArray;
 			$ba.uncompress();
 			$ba.position = 0;
 			
-			var vm:VoxelModel = VoxelModel.loadFromManifestByteArray( $ba, keyName );
+			var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( $ba, _guid );
 			if ( vm )
-				vm.databaseObject = o;
+				vm.databaseObject = $dbo;
+			else 
+				Log.out( "LoadModelFromBigDB.successHandler - FAILED loadFromManifestByteArray:" + _guid );
+
 			super.complete() // AbstractTask will send event
 		}
 		

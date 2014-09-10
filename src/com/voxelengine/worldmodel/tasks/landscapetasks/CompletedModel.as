@@ -37,6 +37,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		override public function start():void
 		{
 			super.start() // AbstractTask will send event
+			_count--;
 
 			try
 			{
@@ -44,16 +45,24 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				if ( vm ) {
  					vm.complete = true;
 					Log.out( "CompletedModel.start - VoxelModel marked as complete: " + _guid );
+					if ( vm is Player )
+					{
+						Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, vm.instanceInfo.guid ) );
+						_playerLoaded = true;
+					}
+					
+					vm.calculateCenter();
+					
+					if (vm.modelInfo.editable && Globals.g_app.configManager.showEditMenu) {
+						if ( null == vm.editCursor )
+							vm.editCursor = EditCursor.create();
+						vm.editCursor.oxel.gc.bound = vm.oxel.gc.bound;
+					}
 				}
 				else
 				{
-//					createPlaceholder( _guid );
 					Log.out( "CompletedModel.start - VoxelModel Not found: " + _guid, Log.WARN );
-					super.complete();
-					return
 				}
-					
-				//Log.out( "CompletedModel.start - VoxelModel marked complete guid: " + _guid );
 			}
 			catch ( error:Error )
 			{
@@ -63,26 +72,12 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 					Log.out( "CompletedModel.start - exception was thrown for model guid: " + _guid, Log.ERROR );
 			}
 			
-			_count--;
 			//Log.out( "CompletedModel.start - completedModel: " + vm.instanceInfo.guid + "  count: " + _count );
-			if ( vm is Player )
-			{
-				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, vm.instanceInfo.guid ) );
-				_playerLoaded = true;
-			}
-			
-			vm.calculateCenter();
-			
-			if (vm.modelInfo.editable && Globals.g_app.configManager.showEditMenu) {
-				if ( null == vm.editCursor )
-					vm.editCursor = EditCursor.create();
-				vm.editCursor.oxel.gc.bound = vm.oxel.gc.bound;
-			}
 				
 			if ( 0 == _count && _playerLoaded )
 			{
-				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + vm.modelInfo.fileName );
-				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE ) );
+				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _guid );
+				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 			}
 			
 			super.complete(); // This MUST be called for tasks to continue
@@ -92,18 +87,5 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			// TODO stop this somehow?
 			super.cancel();
 		}
-		
-		//private function createPlaceholder( guid:String ):void 
-		//{
-			//var ii:InstanceInfo = new InstanceInfo();
-			//ii.instanceGuid = guid;
-			//ii.guid = "GenerateCube";
-			//ii.name = "Missing Object";
-			// preload the modelInfo for the GenerateCube
-			//Globals.modelInfoPreload( ii.guid );
-			//var viewDistance:Vector3D = new Vector3D(0, 0, -75);
-			//ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-			//Globals.create( ii );
-		//}
 	}
 }

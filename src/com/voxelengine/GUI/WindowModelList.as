@@ -2,12 +2,17 @@
 package com.voxelengine.GUI
 {
 
+	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.ModelMetadataEvent;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.server.Persistance;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;
+	import com.voxelengine.worldmodel.models.ModelLoader;
+	import com.voxelengine.worldmodel.models.Player;
+	import com.voxelengine.worldmodel.models.VoxelModel;
+	import flash.utils.ByteArray;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
@@ -25,8 +30,10 @@ package com.voxelengine.GUI
 	public class WindowModelList extends VVPopup
 	{
 		private var _modelKey:String;
+		private const _TOTAL_LB_WIDTH:int = 400;
+		private const _TOTAL_BUTTON_PANEL_HEIGHT:int = 100;
 		
-		private var _listbox1:ListBox = new ListBox( 200, 15, 300 );
+		private var _listbox1:ListBox = new ListBox( _TOTAL_LB_WIDTH, 15 );
 		
 		public function WindowModelList()
 		{
@@ -37,7 +44,7 @@ package com.voxelengine.GUI
 			addElement( _listbox1 );
 			_listbox1.addEventListener(ListEvent.LIST_CHANGED, selectModel);
 			
-			var panelParentButton:Panel = new Panel( 200, 100 );
+			var panelParentButton:Panel = new Panel( _TOTAL_LB_WIDTH, _TOTAL_BUTTON_PANEL_HEIGHT );
 			panelParentButton.layout.orientation = LayoutOrientation.VERTICAL;
 			panelParentButton.padding = 2;
 			addElement( panelParentButton );
@@ -95,7 +102,7 @@ package com.voxelengine.GUI
 			remove();
 		}
 		
-		private function addThisModelHandler(event:UIMouseEvent):void 
+		private function addThisModelHandler( event:UIMouseEvent ):void 
 		{
 			// Globals.GUIControl = true;
 			if ( -1 == _listbox1.selectedIndex )
@@ -103,7 +110,10 @@ package com.voxelengine.GUI
 			var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
 			if ( li && li.data )
 			{
-				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.ADDED, li.data ) );
+				var mmde:ModelMetadataEvent = li.data as ModelMetadataEvent;
+				var ba:ByteArray = mmde.ba as ByteArray;
+				ba.uncompress();
+				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( ba, mmde.guid );
 				remove();
 			}
 		}
@@ -115,13 +125,26 @@ package com.voxelengine.GUI
 		
 		private function modelLoaded( e:ModelMetadataEvent ):void
 		{
-			_listbox1.addItem( e.name + " - " + e.description, e.key );
+			_listbox1.addItem( e.name + " - " + e.description, e );
 		}
 		
 		private function populateModels():void
 		{
 			Persistance.loadPublicObjectsMetadata();
 			Persistance.loadUserObjectsMetadata( Network.userId );
+			_listbox1.removeAll();
+			var models:Dictionary = Globals.modelInstancesGetDictionary();
+			for each ( var vm:VoxelModel in models )
+			{
+				if ( vm && !vm.instanceInfo.dynamicObject && !vm.instanceInfo.dead )
+				{
+					if ( vm is Player )
+						continue;
+						
+					_listbox1.addItem( vm.instanceInfo.name, vm );
+				}
+			}
+			
 		}
 	}
 }

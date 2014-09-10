@@ -1,6 +1,7 @@
 
 package com.voxelengine.GUI
 {
+	import com.voxelengine.worldmodel.models.ModelLoader;
 	import flash.utils.ByteArray;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
@@ -102,7 +103,7 @@ package com.voxelengine.GUI
 		{
 			var ba:ByteArray = Globals.findIVM( _vm.modelInfo.biomes.layers[0].data );
 			// this positions the ba pointer to the oxel data, which is what the statisics needs
-			var versionInfo:Object = VoxelModel.readMetaInfo( ba );
+			var versionInfo:Object = ModelLoader.modelMetaInfoRead( ba );
 			if ( 0 != versionInfo.manifestVersion ) {
 				// how many bytes is the modelInfo
 				var strLen:int = ba.readInt();

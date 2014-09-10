@@ -4,6 +4,7 @@ package com.voxelengine.GUI
 
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.worldmodel.models.ModelInfo;
+	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.Player;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
@@ -215,7 +216,7 @@ package com.voxelengine.GUI
 			instance.grainSize = 6;
 			instance.positionSet = Globals.controlledModel.instanceInfo.positionGet.clone();
 			instance.positionSetComp( instance.positionGet.x, instance.positionGet.y - Globals.UNITS_PER_METER * 4, instance.positionGet.z );
-			Globals.create( instance );
+			ModelLoader.load( instance );
 		}
 		
 		private var _viewDistance:Vector3D = new Vector3D(0, 0, -75);
@@ -238,7 +239,7 @@ package com.voxelengine.GUI
 					
 					trace( "onChildModelFileSelected: " + instance.positionGet );
 					instance.controllingModel = parentModel;
-					Globals.create( instance );
+					ModelLoader.load( instance );
 					Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildModelCreated );
 				}
 			}
@@ -248,7 +249,11 @@ package com.voxelengine.GUI
 		{
 			var guid:String = event.instanceGuid;
 			Log.out( "WindowModels.onParentModelCreated: " + guid );
-			populateParentModels();
+			var vm:VoxelModel = Globals.getModelInstance( event.instanceGuid );
+			if ( vm )
+				_listbox1.addItem( vm.instanceInfo.name, vm );
+			
+			//populateParentModels();
 		}
 		
 		private function onChildModelCreated(event:ModelEvent):void
@@ -327,9 +332,9 @@ package com.voxelengine.GUI
 					if ( vm is Player )
 						continue;
 					if ( "Default_Name" != vm.instanceInfo.name )
-						_listbox1.addItem( vm.instanceInfo.name + " - " + vm.instanceInfo.guid, vm );
+						_listbox1.addItem( vm.instanceInfo.name, vm );
 					else
-						_listbox1.addItem( vm.instanceInfo.guid + " - " + vm.instanceInfo.guid, vm );
+						_listbox1.addItem( vm.instanceInfo.guid, vm );
 				}
 			}
 		}

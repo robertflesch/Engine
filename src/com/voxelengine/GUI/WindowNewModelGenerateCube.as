@@ -3,6 +3,7 @@ package com.voxelengine.GUI
 {
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
+	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import flash.events.MouseEvent;
@@ -78,7 +79,7 @@ public class WindowNewModelGenerateCube extends ModalPopup
 			_ii.type = type;
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
 			_ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-			Globals.create( _ii );
+			ModelLoader.load( _ii );
 			_modalObj.remove();
 		}
 	}

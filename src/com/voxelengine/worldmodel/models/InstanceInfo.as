@@ -49,7 +49,7 @@ package com.voxelengine.worldmodel.models
 		private var _controllingModel:VoxelModel 		= null;    						// INSTANCE NOT EXPORTED
 		private var _owner:VoxelModel 					= null;               			// INSTANCE NOT EXPORTED
 		private var _creationJSON:Object 				= null;                         // INSTANCE NOT EXPORTED
-		private var _state:String 						= "";						// INSTANCE NOT EXPORTED
+		private var _state:String 						= "";							// INSTANCE NOT EXPORTED
 		public var	_repeat:int = 0;
 		
 		private var _life:Vector3D 						= new Vector3D(1, 1, 1);		// INSTANCE NOT EXPORTED
@@ -81,7 +81,7 @@ package com.voxelengine.worldmodel.models
 		public function get guid():String 							{ return _guid; }
 		//public function set guid(val:String):void					{ _guid = val; }
 		public function set guid(val:String):void { 
-			Log.out( "InstanceInfo.GUID was: " + _guid + " is now: " + val );
+			//Log.out( "InstanceInfo.GUID was: " + _guid + " is now: " + val );
 			_guid = val; 
 		}
 		public function get grainSize():int  						{ return _grainSize; }
@@ -179,7 +179,7 @@ package com.voxelengine.worldmodel.models
 
 		public function toString():String
 		{
-			return " guid: " + guid + " pos: " + positionGet + " controllingModel: " + (controllingModel ? controllingModel.instanceInfo.guid : "None" );
+			return " GUID: " + guid + " pos: " + positionGet + " controllingModel: " + (controllingModel ? controllingModel.instanceInfo.guid : "None" );
 		}
 
 		private function onLoadingComplete( le:LoadingEvent ):void
@@ -194,6 +194,9 @@ package com.voxelengine.worldmodel.models
 			// fileName == templateName == guid ALL THE SAME
 			if ( json.fileName ) {
 				guid = json.fileName;
+			}
+			if ( json.guid ) {
+				guid = json.guid;
 			}
 				
 			if ( json.name )

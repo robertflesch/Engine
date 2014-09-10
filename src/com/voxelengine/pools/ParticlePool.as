@@ -13,6 +13,7 @@ import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
+import com.voxelengine.worldmodel.models.ModelLoader;
 import com.voxelengine.worldmodel.models.Particle;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.InstanceInfo;
@@ -44,7 +45,7 @@ public final class ParticlePool
 	{
 		Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 		// Preload the modelInfo for the cannonBall
-		Globals.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
+		ModelLoader.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
 		// Listen for it being loaded
 		Globals.g_app.addEventListener( ModelEvent.INFO_LOADED, onModelInfoLoaded );
 	}

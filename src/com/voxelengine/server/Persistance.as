@@ -22,7 +22,7 @@
 	{
 		static public const DB_TABLE_OBJECTS:String = "voxelModels";
 		static public const DB_TABLE_REGIONS:String = "regions";
-		static public const DB_PUBLIC:String = "public";
+		static public const PUBLIC:String = "public";
 		
 		static private var _table:String;
 		static private var _key:String;
@@ -185,7 +185,7 @@
 		
 		static private function loadRegionFromDBO( dbo:DatabaseObject):void
 		{
-			var newRegion:Region = new Region( dbo.region );
+			var newRegion:Region = new Region( dbo.key );
 			newRegion.admin = cvsToVector( dbo.admin );
 			newRegion.databaseObject = dbo;
 			newRegion.desc = dbo.description;
@@ -227,7 +227,7 @@
 		static public function loadPublicObjectsMetadata():void {
 			Persistance.loadRange( Persistance.DB_TABLE_OBJECTS
 						 , "voxelModelOwner"
-						 , [Persistance.DB_PUBLIC]
+						 , [Persistance.PUBLIC]
 						 , null
 						 , null
 						 , 100
@@ -251,7 +251,7 @@
 			var owner:String = dbo.owner;
 			var ba:ByteArray = dbo.data;
 			var dbo:DatabaseObject = dbo;
-			var template:String = dbo.template;
+			var template:Boolean = dbo.template;
 			
 			Log.out( "Persistance.loadModelMetadataFromDBO - name: " + name + "  description: " + description + "  key: " + key + "  owner: " + owner );
 			

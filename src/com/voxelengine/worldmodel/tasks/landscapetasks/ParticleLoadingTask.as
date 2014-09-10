@@ -8,6 +8,7 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
+	import com.voxelengine.worldmodel.models.ModelLoader;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 
@@ -77,7 +78,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private function loadCompressedByteArray( $ba:ByteArray ):void {
 			if ( _vm && $ba )		
 			{
-				_vm.uncompress( $ba );
+				ModelLoader.loadLocalModelFromByteArray( _vm, $ba );
 				//Log.out( "ParticleLoadingTask.start - completed - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) + " guid: " + _guid);
 			}
 			else
@@ -89,7 +90,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private function loadByteArray( $ba:ByteArray ):void {
 			if ( _vm && $ba )		
 			{
-				_vm.fromByteArray( $ba );
+				//_vm.fromByteArray( $ba );
+				ModelLoader.loadLocalModelFromByteArray( _vm, $ba );
 				//Log.out( "ParticleLoadingTask.start - completed - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) + " guid: " + _guid);
 			}
 			else

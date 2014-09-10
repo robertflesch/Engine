@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.weapons
  * ...
  * @author Bob
  */
+import com.voxelengine.worldmodel.models.ModelLoader;
 import playerio.Message;
 
 import com.voxelengine.Log;
@@ -84,7 +85,7 @@ public class Ammo
 		//Log.out( "Ammo.processJsonInfo" );
 		SoundBank.getSound( _impactSoundFile ); // Preload the sound file
 		SoundBank.getSound( _launchSoundFile );
-		Globals.modelInfoFindOrCreate( _model, null, false );
+		ModelLoader.modelInfoFindOrCreate( _model, null, false );
 	}
 	
 	public function clone():Ammo {

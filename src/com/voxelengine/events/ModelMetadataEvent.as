@@ -21,26 +21,26 @@ package com.voxelengine.events
 		static public const INFO_COLLECTED:String  = "INFO_COLLECTED";
 		
 		private var _name:String;
-		private var _key:String;
+		private var _guid:String;
 		private var _description:String;
 		private var _owner:String;
-		private var _template:String;
+		private var _template:Boolean;
 		private var _ba:ByteArray; // Do I need to copy this? RSF - 9.4.14
 		private var _dbo:DatabaseObject;
 		
 		public function get name():String { return _name; }
-		public function get key():String { return _key; }
+		public function get guid():String { return _guid; }
 		public function get description():String { return _description; }
 		public function get owner():String { return _owner; }
-		public function get template():String { return _template; }
+		public function get template():Boolean { return _template; }
 		public function get ba():ByteArray { return _ba; }
 		public function get dbo():DatabaseObject { return _dbo; }
 
-		public function ModelMetadataEvent( $type:String, $name:String, $description:String, $key:String = "", $owner:String = "", $template:String = "", $ba:ByteArray = null, $dbo:DatabaseObject = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
+		public function ModelMetadataEvent( $type:String, $name:String, $description:String, $guid:String = "", $owner:String = "", $template:Boolean = true, $ba:ByteArray = null, $dbo:DatabaseObject = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
 		{
 			super( $type, $bubbles, $cancellable );
 			_name = $name;
-			_key = $key;
+			_guid = $guid;
 			_description = $description;
 			_owner = $owner;
 			_template = _template;
@@ -50,12 +50,12 @@ package com.voxelengine.events
 		
 		public override function clone():Event
 		{
-			return new ModelMetadataEvent(type, _name, _description, _key, _owner, _template, _ba, _dbo, bubbles, cancelable);
+			return new ModelMetadataEvent(type, _name, _description, _guid, _owner, _template, _ba, _dbo, bubbles, cancelable);
 		}
 	   
 		public override function toString():String
 		{
-			return formatToString("ModelMetadataEvent", "bubbles", "cancelable") + " _name: " + _name + " _description: " + _description + "  key: " + key + "  owner: " + _owner + "  template: " + _template;
+			return formatToString("ModelMetadataEvent", "bubbles", "cancelable") + " _name: " + _name + " _description: " + _description + "  guid: " + guid + "  owner: " + _owner + "  template: " + _template;
 		}
 		
 		

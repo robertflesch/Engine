@@ -66,18 +66,12 @@ package com.voxelengine.worldmodel.models
 		// the model mjson for an model guid
 		private var _modelInfo:Dictionary = new Dictionary(true);
 		
-		// objects that are waiting on model data to load
-		private var _blocks:Dictionary = new Dictionary(true);
-		
 		// temporary reference to last model from by find closest model function
 		private var _lastFoundModel:VoxelModel = null;
 		
 		private const EDIT_RANGE:int = 250;
 		private var _viewDistances:Vector.<Vector3D> = null;
 		
-		public const MODEL_MANAGER_MODEL_EXT:String = ".mjson";
-
-		public function modelInstancesGetDictionary():Dictionary { return _modelInstances; }
 		public function modelInfoGetDictionary():Dictionary { return _modelInfo; }
 		public function modelInfoGet( fileName:String ):ModelInfo {
 			var mi:ModelInfo = _modelInfo[fileName]
@@ -114,6 +108,11 @@ package com.voxelengine.worldmodel.models
 			_viewDistances[DOWN] = new Vector3D(0, -1, 0);
 		}
 		
+		//////////////////////////////////////////////////////////////////////////////////
+		//////////////////////// modelInstances //////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////
+		
+		public function modelInstancesGetDictionary():Dictionary { return _modelInstances; }
 		public function modelInstancesGet( guid:String ):VoxelModel { 
 			var vm:VoxelModel = _modelInstances[guid];
 			if ( vm )
@@ -124,13 +123,124 @@ package com.voxelengine.worldmodel.models
 			return vm;
 		}
 		
+		public function modelInstancesChangeGuid( $oldGuid:String, $newGuid:String ):void { 
+			var vm:VoxelModel = _modelInstances[$oldGuid];
+			if ( vm ) {
+				vm.instanceInfo.guid = $newGuid;
+				_modelInstances[vm.instanceInfo.guid] = vm;
+				_modelInstances[$oldGuid] = null;
+				_modelInstances = clearDictionaryOfNullsAndDead( _modelInstances );
+			}
+		}
+
+		public function getModelInstance( guid:String ):VoxelModel {
+			// This tried to get the model directly
+			var vm:VoxelModel = modelInstancesGet(guid);
+			// if not found, perhaps it is a child model.
+			if ( !vm )
+			{
+				// Get the instanceInfo for the model
+				var ii:InstanceInfo = instanceInfoGet( guid );
+				if ( ii )
+				{
+					// if has instanceInfo, see if there is a parent model
+					var parentModel:VoxelModel = ii.controllingModel;
+					if ( parentModel )
+						vm = parentModel.childModelFind( guid );
+					else
+					{
+						return null;
+						//return Globals.player;
+						//Log.out("ModelManager.getModelInstance - parent model not found: " + guid, Log.ERROR );	
+					}
+				}
+				else
+					Log.out("ModelManager.getModelInstance - model not found: " + guid, Log.ERROR );	
+			}
+				
+			return vm;	
+		}
+			
+
 		public function modelInstancesGetFirst():VoxelModel { 
 			for each ( var vm:VoxelModel in _modelInstances )
 				return vm;
 
 			return null;
 		}
-
+		
+		// Models removed this way are not dead, just no longer part of the parent model loop
+		public function changeFromParentToChild( $vm:VoxelModel ):void {
+			var found:Boolean = false;
+			for each ( var vm:VoxelModel in _modelInstances )
+			{
+				if ( vm && $vm == vm )
+				{
+					_modelInstances[$vm.instanceInfo.guid] = null;
+					found = true;
+					break;
+				}
+			}
+			
+			if ( found )
+				_modelInstances = clearDictionaryOfNullsAndDead( _modelInstances );
+		}
+		
+		public function save():void {
+			// check all models to see if they have changed, if so save them to server.
+			for each ( var vm:VoxelModel in _modelInstances )
+			{
+				vm.save();
+			}
+		}
+		
+		public function bringOutYourDead():void {
+			var hasDead:Boolean = false;
+			for each ( var vm:VoxelModel in _modelInstances )
+			{
+				if ( vm && true == vm.instanceInfo.dead )
+				{
+					hasDead = true;
+					// This seems like a REALLY bad idea.
+					// vm.removeFromBigDB();
+					break;
+				}
+			}
+			
+			if ( hasDead )
+			{
+				_modelInstances = clearDictionaryOfNullsAndDead( _modelInstances );
+				_instanceDictionary = clearInstanceInfoOfNullsAndDead( _instanceDictionary );
+			}
+		}
+		
+		public function removeAllModelInstances( $removePlayer:Boolean = false ):void {
+			Log.out( "ModelManager.removeAllModelInstances - Should this remove the player since it is now unique?" );
+			// clear out old models
+			for each ( var vm:VoxelModel in _modelInstances )
+			{
+				if ( vm )
+				{
+					if (vm is Player)
+						if ( !$removePlayer )
+							continue;
+						else {
+							Globals.player.loseControl( vm );
+							Globals.player = null;
+						}
+					trace( "ModelManager.removeAllModelInstances - marking as dead: " + vm.instanceInfo.guid );
+					markDead( vm.instanceInfo.guid );
+				}
+			}
+			
+			//_modelInfo = null;
+			//_modelInfo = new Dictionary();
+		}	
+		
+		//////////////////////////////////////////////////////////////////////////////////
+		//////////////////////// END modelInstances //////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////
+		
 		public function addIVM( fileName:String, ba:ByteArray ):void {
 			//Log.out( "ModelManager.addIVM: " + fileName );
 			_modelByteArrays[fileName] = ba;
@@ -157,124 +267,6 @@ package com.voxelengine.worldmodel.models
 			return null;
 		}
 		
-		public function create( instance:InstanceInfo ):void {
-			//Log.out( "ModelManager.create: instance.guid" + instance.guid )
-			instanceInfoAdd( instance );
-Log.out( "ModelManager.create - ii.toString(): " + instance.toString() );
-			if ( !Globals.isGuid( instance.guid ) && instance.guid != "LoadModelFromBigDB" )
-			{
-				var modelInfo:ModelInfo = modelInfoFindOrCreate( instance.guid, instance.guid );
-				if ( modelInfo )
-				{
-					instantiate( instance, modelInfo );
-				}		
-			}
-			else
-			{
-				// land task controller, this tells task controller not to run until it is done loading all tasks
-				Globals.g_landscapeTaskController.activeTaskLimit = 0;
-				// Create task group
-				var taskGroup:TaskGroup = new TaskGroup("Download Model for " + instance.guid, 2);
-			
-				// This loads the tasks into the LandscapeTaskQueue
-				//var layer:LayerInfo = new LayerInfo( "LoadModelFromBigDB", instance.guid ); 
-				var task:ITask = new LoadModelFromBigDB( instance.guid, null );
-				taskGroup.addTask(task);
-				
-				task = new CompletedModel( instance.guid, null );
-				taskGroup.addTask(task);
-				
-				Globals.g_landscapeTaskController.addTask( taskGroup );
-			}
-		}
-		
-		private function addBlock( guid:String, fileName:String ):void {
-			//Log.out( "ModelManager.addBlock - instanceGIUD: " + guid + "  fileName: " + fileName );
-			if ( _blocks[fileName] )
-			{
-				var block:Vector.<String> = _blocks[fileName];
-				// check to make sure its not in more then once
-				for each ( var guid:String in block )
-				{
-					if ( guid == guid )
-						return;
-				}
-				block.push( guid );
-			}
-			else
-			{
-				var newBlock:Vector.<String> = new Vector.<String>;
-				newBlock.push( guid );
-				_blocks[fileName] = newBlock;
-			}
-		}
-		
-		public function clearBlock( fileName:String, error:Boolean = false ):void {
-			//Log.out( "ModelManager.clearBlock " + fileName  );
-			if ( _blocks[fileName] )
-			{
-				var block:Vector.<String> = _blocks[fileName];
-				if ( !error )
-				{
-					var instanceInfo:InstanceInfo = null;
-					for each ( var guid:String in block )
-					{
-						instanceInfo = instanceInfoGet( guid );
-						//Log.out( "CLEAR BLOCK " + instanceInfo.toString() + " for guid: " + guid  );
-						if ( instanceInfo )
-						{
-							//Log.out( "CLEAR BLOCK " + instanceInfo.toString()  );
-							instantiate( instanceInfo, modelInfoGet(fileName) );
-						}
-					}
-				}
-				// TODO This should create a new _blocks that doesnt include the fileName, rather then it being null
-				// but whats the saving vs creating new memory...
-				_blocks[fileName] = null;
-			}
-			//else
-			//{
-				//Log.out( "ModelManager.clearBlock - ERROR - didnt find fileName: " + fileName, Log.ERROR );
-				//Log.out("---------- List of object bank -------------", Log.ERROR );
-				//for (var k:Object in _blocks)
-				  //Log.out("fileName: " + k + "\t\t  InstanceGuid: "+ _blocks[k] );
-				//Log.out("---------- End List of object bank -------------", Log.ERROR );
-				//Log.out( "ModelManager.clearBlock - end Dictionary listing - NOTE makes sure CASE is the same", Log.ERROR );
-			//}
-		}
-		
-		private function instantiate( $instanceInfo:InstanceInfo, $modelInfo:ModelInfo ):void {
-			if ( !$instanceInfo )
-				throw new Error( "ModelManager.instantiate - InstanceInfo null" );
-				
-			var modelAsset:String = $modelInfo.modelClass;
-			var modelClass:Class = ModelLibrary.getAsset( modelAsset )
-			var vm:* = new modelClass( $instanceInfo, $modelInfo );
-			if ( null == vm )
-				throw new Error( "ModelManager.instantiate - Model failed in creation - modelClass: " + modelClass );
-			
-			
-			//Log.out( "ModelManager.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $instanceInfo.toString() );
-			modelAdd( vm );
-		}
-		
-		// Models removed this way are not dead, just no longer part of the parent model loop
-		public function changeFromParentToChild( $vm:VoxelModel ):void {
-			var found:Boolean = false;
-			for each ( var vm:VoxelModel in _modelInstances )
-			{
-				if ( vm && $vm == vm )
-				{
-					_modelInstances[$vm.instanceInfo.guid] = null;
-					found = true;
-					break;
-				}
-			}
-			
-			if ( found )
-				_modelInstances = clearDictionaryOfNullsAndDead( _modelInstances );
-		}
-		
 		public function modelAdd( vm:VoxelModel ):void {
 			// if this is a child model, give it to parent, 
 			// next check to see if its a dynamic model
@@ -293,109 +285,6 @@ Log.out( "ModelManager.create - ii.toString(): " + instance.toString() );
 			{
 				_modelInstances[vm.instanceInfo.guid] = vm;
 				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.guid ) );
-				//Log.out( "ModelManager.instantiate - Parent Model Addd" );
-			}
-		}
-
-		public function addToTaskController( fileName:String ):void {
-			// land task controller
-			Globals.g_landscapeTaskController.activeTaskLimit = 0;
-			// Create task group
-			var taskGroup:TaskGroup = new TaskGroup("Generate Model for " + fileName, 2);
-        
-			// This loads the tasks into the LandscapeTaskQueue
-			var task:ITask = new LoadModelFromBigDB( fileName );
-			taskGroup.addTask(task);
-			task = null;
-			task = new CompletedModel( fileName, null );
-			Log.out( "ModelManager.add_to_task_controller - adding completedTask" );
-			taskGroup.addTask(task);
-			
-			Globals.g_landscapeTaskController.addTask( taskGroup );
-			
-			if ( 0 == Globals.g_landscapeTaskController.activeTaskLimit )
-				Globals.g_landscapeTaskController.activeTaskLimit = 1;
-		}
-		
-		// If we want to preload the modelInfo, we dont need to block on it
-		public function modelInfoPreload( fileName:String ):void {
-			modelInfoFindOrCreate( fileName, "", false );
-		}
-		
-		public function modelInfoFindOrCreate( $fileName:String, guid:String, block:Boolean = true ):ModelInfo {
-			var modelInfo:ModelInfo = modelInfoGet( $fileName );
-			
-			if ( null == $fileName )
-			{
-				Log.out( "ModelManager.modelInfoFindOrCreate - ERROR fileName is NULL", Log.ERROR );
-			}
-			
-			// if no model info found, we have to load a copy
-			if ( !modelInfo )
-			{
-				// if we are already waiting for a copy to load, then add a block if shouldBlock is true, else add a loader.
-				if ( !_blocks[$fileName] )
-				{
-					var fileName:String = $fileName + MODEL_MANAGER_MODEL_EXT
-					//Log.out( "ModelManager.modelInfoFindOrCreate - loading: " + Globals.appPath + modelNameAndLoc );
-					var request:URLRequest = new URLRequest( Globals.modelPath + fileName );
-					var loader:CustomURLLoader = new CustomURLLoader(request);
-					loader.addEventListener(Event.COMPLETE, onModelLoadedAction);
-					loader.addEventListener(IOErrorEvent.IO_ERROR, onModelLoadErrorAction);
-				}
-				// If we want to preload the modelInfo, we dont need to block on it
-				if ( block )
-					addBlock( guid, $fileName );
-			}
-			
-			return modelInfo;
-		}
-		
-		public function onModelLoadErrorAction(event:IOErrorEvent):void {
-			var req:URLRequest = CustomURLLoader(event.target).request;			
-			var fileName:String = CustomURLLoader(event.target).fileName;			
-			clearBlock( fileName );
-			Log.out("----------------------------------------------------------------------------------", Log.ERROR );
-			Log.out("ModelManager.onModelLoadErrorAction: ERROR LOADING MODEL: " + event.text, Log.ERROR );
-			Log.out("----------------------------------------------------------------------------------", Log.ERROR );
-		}	
-			
-		public function onModelLoadedAction(event:Event):void {
-			var req:URLRequest = CustomURLLoader(event.target).request;			
-//Log.out("ModelManager.onModelLoadedAction - requested: " + req.url );
-			var fileName:String = CustomURLLoader(event.target).fileName;			
-			
-			var fileData:String = String(event.target.data);
-			var jsonString:String = StringUtil.trim(fileData);
-			//Log.out("ModelManager.onModelLoadedAction - loaded model from: " + event.target.data );
-			try {
-				var jsonResult:Object = JSON.parse(jsonString);
-			}
-			catch ( error:Error )
-			{
-				Log.out("----------------------------------------------------------------------------------" );
-				Log.out("ModelManager.onModelLoadedAction - ERROR PARSING: " + fileData, Log.ERROR );
-				Log.out("----------------------------------------------------------------------------------" );
-				return;
-			}
-			var mi:ModelInfo = new ModelInfo();
-			var fileNameNoExt:String = ModelManager.stripExtension( fileName );
-			mi.init( fileNameNoExt, jsonResult );
-			modelInfoAdd( mi );
-			//Log.out("ModelManager.onModelLoadedAction - loaded model guid: " + mi.guid + MODEL_MANAGER_MODEL_EXT );
-
-			var dotLoc:int = fileName.lastIndexOf( "." );
-			fileName = fileName.substr( 0, dotLoc );
-			
-			clearBlock( fileName );
-			Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.INFO_LOADED, fileName ) );
-		}       
-		
-		public function save():void {
-			// check all models to see if they have changed, if so save them to server.
-			for each ( var vm:VoxelModel in _modelInstances )
-			{
-				vm.save();
 			}
 		}
 		
@@ -430,25 +319,6 @@ Log.out( "ModelManager.create - ii.toString(): " + instance.toString() );
 			}
 		}
 			
-		public function bringOutYourDead():void {
-			var hasDead:Boolean = false;
-			for each ( var vm:VoxelModel in _modelInstances )
-			{
-				if ( vm && true == vm.instanceInfo.dead )
-				{
-					hasDead = true;
-					// This seems like a REALLY bad idea.
-					// vm.removeFromBigDB();
-					break;
-				}
-			}
-			
-			if ( hasDead )
-			{
-				_modelInstances = clearDictionaryOfNullsAndDead( _modelInstances );
-				_instanceDictionary = clearInstanceInfoOfNullsAndDead( _instanceDictionary );
-			}
-		}
 		
 		private function clearInstanceInfoOfNullsAndDead( oldDic:Dictionary ):Dictionary {
 			var tempDic:Dictionary = new Dictionary(true);
@@ -502,30 +372,6 @@ Log.out( "ModelManager.create - ii.toString(): " + instance.toString() );
 			return tempDic;
 		}
 		
-		public function getModelInstance( guid:String ):VoxelModel {
-			var vm:VoxelModel = modelInstancesGet(guid);
-			
-			if ( !vm )
-			{
-				var ii:InstanceInfo = instanceInfoGet( guid );
-				if ( ii )
-				{
-					var parentModel:VoxelModel = ii.controllingModel;
-					if ( parentModel )
-						vm = parentModel.childModelFind( guid );
-					else
-					{
-						return Globals.player;
-						//Log.out("ModelManager.getModelInstance - parent model not found: " + guid, Log.ERROR );	
-					}
-				}
-				else
-					Log.out("ModelManager.getModelInstance - model not found: " + guid, Log.ERROR );	
-			}
-				
-			return vm;	
-		}
-			
 		public function draw( $mvp:Matrix3D, $context:Context3D ):void {
 			
 			// TODO Could optimize here by only making the calls needed for this shader.
@@ -578,7 +424,7 @@ Log.out( "ModelManager.create - ii.toString(): " + instance.toString() );
 			instanceInfo.guid = "player";
 			instanceInfo.grainSize = 4;
 			
-			Globals.create( instanceInfo );
+			ModelLoader.load( instanceInfo );
 		}
 		
 		public function update( $elapsedTimeMS:int ):void {
@@ -1103,63 +949,6 @@ Log.out( "ModelManager.create - ii.toString(): " + instance.toString() );
 			return outString;
 		}
 		
-		public function removeAllModelInstances( $removePlayer:Boolean = false ):void {
-			Log.out( "ModelManager.removeAllModelInstances - Should this remove the player since it is now unique?" );
-			// clear out old models
-			for each ( var vm:VoxelModel in _modelInstances )
-			{
-				if ( vm )
-				{
-					if (vm is Player)
-						if ( !$removePlayer )
-							continue;
-						else {
-							Globals.player.loseControl( vm );
-							Globals.player = null;
-						}
-					trace( "ModelManager.removeAllModelInstances - marking as dead: " + vm.instanceInfo.guid );
-					markDead( vm.instanceInfo.guid );
-				}
-			}
-			
-			//_modelInfo = null;
-			//_modelInfo = new Dictionary();
-		}	
-		
-		static public function createInstanceFromTemplate( vm:VoxelModel ):void {
-			
-			var newLayerInfo:LayerInfo = new LayerInfo( "LoadModelFromBigDB", vm.instanceInfo.guid );
-			vm.modelInfo.biomes.layerReset();
-			vm.modelInfo.biomes.add_layer( newLayerInfo );
-			vm.modelInfo.jsonReset();
-			vm.instanceInfo.guid = vm.instanceInfo.guid;
-			vm.modelInfo.template = false;
-		}
-		
-		public function loadRegionObjects( objects:Array ):int {
-			Log.out( "ModelManager.loadRegionObjects - START =============================" );
-			var count:int = 0;
-			for each ( var v:Object in objects )		   
-			{
-				var instance:InstanceInfo = new InstanceInfo();
-				instance.initJSON( v.model );
-				//trace( "ModelManager.loadObjects: ----------------  fileName:" + v.model.fileName );
-				
-				Log.out( "ModelManager.loadRegionObjects - loading fileName:" + v.model.fileName + "  instance Guid: " + instance.guid + "  name: " +  instance.name );
-				create( instance );
-				count++;
-			}
-			// why is defaultRegion special?
-			//if ( 0 == count && name != "defaultRegion" ) {
-			if ( 0 == count )
-				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE ) );
-
-			Globals.g_landscapeTaskController.activeTaskLimit = 1;
-			Log.out( "ModelManager.loadRegionObjects - END =============================" );
-			return count;
-		}
-		
-
 		public function TestCheckForFlow():void
 		{
 			for each ( var vm:VoxelModel in _modelInstances )

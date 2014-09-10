@@ -129,9 +129,12 @@ public class WindowSandboxList extends VVPopup
 			return;
 			
 		var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
-		if ( li && li.data )
+		if ( li )
 		{
-			VVServer.joinRoom( li.data );
+			if ( li.data )
+				VVServer.joinRoom( li.data );
+			else
+				Log.out( "WindowSandboxList.loadthisRegion - NO REGION GUID FOUND", Log.ERROR );
 		}
 		remove();
 	}
@@ -157,12 +160,12 @@ public class WindowSandboxList extends VVPopup
 		if ( Globals.MODE_PRIVATE == Globals.mode )
 		{
 			if ( Network.userId == region.owner )
-				_listbox1.addItem( region.name, region.regionId );
+				_listbox1.addItem( region.name, region.guid );
 		}
 		else if ( Globals.MODE_PUBLIC == Globals.mode )
 		{
-			if ( Persistance.DB_PUBLIC == e.region.owner )
-				_listbox1.addItem( region.name, region.regionId );
+			if ( Persistance.PUBLIC == e.region.owner )
+				_listbox1.addItem( region.name, region.guid );
 		}
 	}
 	

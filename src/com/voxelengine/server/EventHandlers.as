@@ -6,6 +6,7 @@
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.models.Avatar;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
+	import com.voxelengine.worldmodel.models.ModelLoader;
 	import flash.geom.Vector3D;
 	import playerio.Connection;
 	import playerio.PlayerIO;
@@ -100,7 +101,7 @@
 			ii.guid = userid;
 			ii.guid = "Player";
 			ii.name = userid;
-			Globals.create( ii );
+			ModelLoader.load( ii );
 			trace("VVServer.createPlayer - create player model for :" + userid );
 		}
 		
@@ -110,7 +111,7 @@
 			ii.guid = userid;
 			ii.guid = "Player"; // Avatar
 			ii.name = userid;
-			Globals.create( ii );
+			ModelLoader.load( ii );
 			trace("VVServer.createAvatar - create avatar for :" + userid );
 		}
 		

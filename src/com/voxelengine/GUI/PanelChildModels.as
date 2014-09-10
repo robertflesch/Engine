@@ -4,6 +4,7 @@ package com.voxelengine.GUI
 
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.worldmodel.models.ModelInfo;
+	import com.voxelengine.worldmodel.models.ModelLoader;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
@@ -82,7 +83,7 @@ package com.voxelengine.GUI
 			ii.guid = "GenerateCube";
 			ii.name = "New Object";
 			// preload the modelInfo for the GenerateCube
-			Globals.modelInfoPreload( ii.guid );
+			ModelLoader.modelInfoPreload( ii.guid );
 			new WindowNewModelGenerateCube( ii );
 		}
 

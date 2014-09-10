@@ -419,7 +419,7 @@ package com.voxelengine.worldmodel.models
 				trailMarker.positionSet = wsCenter;
 				trailMarker.addTransform( 0, 0, 0, 10, ModelTransform.LIFE );
 				
-				Globals.create( trailMarker );
+				ModelLoader.load( trailMarker );
 			}
 			count++;
 		}
