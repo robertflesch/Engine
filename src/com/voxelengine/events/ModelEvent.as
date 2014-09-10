@@ -40,7 +40,6 @@ package com.voxelengine.events
 		static public const PARENT_MODEL_REMOVED:String		= "PARENT_MODEL_REMOVED";
 		static public const DYNAMIC_MODEL_REMOVED:String	= "DYNAMIC_MODEL_REMOVED";
 		
-		static public const CRITICAL_MODEL_LOADED:String	= "CRITICAL_MODEL_LOADED";
 		static public const CRITICAL_MODEL_DETECTED:String	= "CRITICAL_MODEL_DETECTED";
 		
 		private var _parentInstanceGuid:String;

@@ -43,20 +43,20 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			{
 				var vm:VoxelModel = Globals.getModelInstance( _guid );
 				if ( vm ) {
- 					vm.complete = true;
 					Log.out( "CompletedModel.start - VoxelModel marked as complete: " + _guid );
+ 					vm.complete = true;
+					vm.calculateCenter();
+
 					if ( vm is Player )
 					{
-						Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, vm.instanceInfo.guid ) );
+						Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, _guid ) );
 						_playerLoaded = true;
 					}
-					
-					vm.calculateCenter();
-					
-					if (vm.modelInfo.editable && Globals.g_app.configManager.showEditMenu) {
-						if ( null == vm.editCursor )
-							vm.editCursor = EditCursor.create();
-						vm.editCursor.oxel.gc.bound = vm.oxel.gc.bound;
+					else {
+						if ( vm.instanceInfo.critical )
+							Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.CRITICAL_MODEL_LOADED, _guid ));
+						else
+							Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.MODEL_LOAD_COMPLETE, _guid ) );
 					}
 				}
 				else
@@ -72,7 +72,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 					Log.out( "CompletedModel.start - exception was thrown for model guid: " + _guid, Log.ERROR );
 			}
 			
-			//Log.out( "CompletedModel.start - completedModel: " + vm.instanceInfo.guid + "  count: " + _count );
+			//Log.out( "CompletedModel.start - completedModel: " + _guid + "  count: " + _count );
 				
 			if ( 0 == _count && _playerLoaded )
 			{

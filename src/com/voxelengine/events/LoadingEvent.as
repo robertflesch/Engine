@@ -18,32 +18,34 @@ package com.voxelengine.events
 	{
 		static public const LOAD_COMPLETE:String			= "LOAD_COMPLETE";
 		static public const PLAYER_LOAD_COMPLETE:String		= "PLAYER_LOAD_COMPLETE";
+		static public const MODEL_LOAD_COMPLETE:String		= "MODEL_LOAD_COMPLETE";
+		static public const CRITICAL_MODEL_LOADED:String	= "CRITICAL_MODEL_LOADED";
 		
 		static public const SPLASH_LOAD_COMPLETE:String		= "SPLASH_LOAD_COMPLETE";
 		static public const LOAD_TYPES_COMPLETE:String		= "LOAD_TYPES_COMPLETE";
 		
 		static public const ANIMATION_LOAD_COMPLETE:String	= "ANIMATION_LOAD_COMPLETE";
 
-		private var _name:String = "";
-		public function LoadingEvent( $type:String, $name:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false )
+		private var _guid:String = "";
+		public function LoadingEvent( $type:String, $guid:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false )
 		{
 			super( $type, $bubbles, $cancellable );
-			_name = $name;
+			_guid = $guid;
 		}
 		
 		public override function clone():Event
 		{
-			return new LoadingEvent(type, _name, bubbles, cancelable);
+			return new LoadingEvent(type, _guid, bubbles, cancelable);
 		}
 	   
 		public override function toString():String
 		{
-			return formatToString("LoadingEvent", "name", "bubbles", "cancelable");
+			return formatToString("LoadingEvent", "guid", "bubbles", "cancelable");
 		}
 		
-		public function get name():String 
+		public function get guid():String 
 		{
-			return _name;
+			return _guid;
 		}
 		
 	}
