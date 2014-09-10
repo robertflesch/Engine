@@ -333,7 +333,7 @@ package com.voxelengine.worldmodel
 				return;
 			}
 				
-			Log.out( "Region.save - saving changes to Persistance" ); 
+			Log.out( "Region.save - saving changes to Persistance: " + guid ); 
 			var ba:ByteArray = new ByteArray();
 			ba.clear();
 			writeToByteArray( ba );

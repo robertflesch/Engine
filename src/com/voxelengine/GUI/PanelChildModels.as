@@ -91,7 +91,6 @@ package com.voxelengine.GUI
 		{
 			//Globals.GUIControl = true;
 			new WindowModelTemplate( new ModelInfo() );
-			//new WindowNewModel();
 		}
 
 		private var _viewDistance:Vector3D = new Vector3D(0, 0, -75);

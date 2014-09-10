@@ -216,7 +216,7 @@
 
 			if ( $dbo )
 			{
-				Log.out( "Region.save - saving region back to BigDB: " + $metadata.guid );
+//				Log.out( "Persistance.save - saving region back to BigDB: " + $metadata.guid );
 				$dbo.data = $metadata.data;
 				$dbo.admin = $metadata.admin;
 				$dbo.description = $metadata.desc;
@@ -236,7 +236,7 @@
 			}
 			else
 			{
-				Log.out( "Region.create - creating new region: " + $metadata.guid + "" );
+				Log.out( "Persistance.create - creating new region: " + $metadata.guid + "" );
 				createObject( Persistance.DB_TABLE_REGIONS
 							, $metadata.guid
 							, $metadata

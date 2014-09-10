@@ -486,6 +486,9 @@ package com.voxelengine.GUI
 				if ( Keyboard.F == e.keyCode )
 					createProjectile( Globals.controlledModel )
 				
+				if ( Keyboard.P == e.keyCode )
+					new WindowSandboxList();
+					
 				if ( Keyboard.M == e.keyCode )
 					saveModelIVM();
 
@@ -503,16 +506,12 @@ package com.voxelengine.GUI
 				{
 					Globals.TestCheckForFlow();
 					//Globals.g_renderer.context.dispose();
-					//new WindowObjects();
 				}
 				
 				if ( Keyboard.L == e.keyCode )
 				{
 					Globals.muted = !Globals.muted;
 				}
-				
-				//if ( Keyboard.T == e.keyCode )
-				//	new WindowTest();
 			}
 		}
 	}

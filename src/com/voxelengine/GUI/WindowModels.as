@@ -76,7 +76,7 @@ package com.voxelengine.GUI
 			newModel.width = 150;
 			panelParentButton.addElement( newModel );
 
-			//var editModel:Button = new Button("Edit Template");
+		//var editModel:Button = new Button("Edit Template");
 			//editModel.addEventListener(UIMouseEvent.CLICK, editModelHandler );
 			//editModel.width = 150;
 			//panelParentButton.addElement( editModel );
@@ -88,6 +88,11 @@ package com.voxelengine.GUI
 				oxelUtils.width = 150;
 				panelParentButton.addElement( oxelUtils );
 //			}
+			
+			var testB:Button = new Button("Test");
+			testB.addEventListener(UIMouseEvent.CLICK, test );
+			testB.width = 150;
+			panelParentButton.addElement( testB );
 			
 			var addCModel:Button = new Button( "Add Child Model..." );
 			addCModel.addEventListener(UIMouseEvent.CLICK, addChildModel );
@@ -160,7 +165,6 @@ package com.voxelengine.GUI
 		{
 			// Globals.GUIControl = true;
 			new WindowModelChoice();
-			//new WindowNewModel();
 		}
 
 		private function editModelHandler(event:UIMouseEvent):void 
@@ -179,8 +183,6 @@ package com.voxelengine.GUI
 			}
 			else
 				noModelSelected();
-			
-			//new WindowNewModel();
 		}
 		
 		private function parentDetailHandler(event:UIMouseEvent):void 
@@ -331,10 +333,10 @@ package com.voxelengine.GUI
 				{
 					if ( vm is Player )
 						continue;
-					if ( "Default_Name" != vm.instanceInfo.name )
+					//if ( "Default_Name" != vm.instanceInfo.name )
 						_listbox1.addItem( vm.instanceInfo.name, vm );
-					else
-						_listbox1.addItem( vm.instanceInfo.guid, vm );
+					//else
+					//	_listbox1.addItem( vm.instanceInfo.guid, vm );
 				}
 			}
 		}
@@ -379,5 +381,23 @@ package com.voxelengine.GUI
 			else
 				Log.out( "WindowModel.childModelDetail - VoxelModelNotFound" );
 		}
+		
+		private function test(event:UIMouseEvent):void 
+		{
+			if ( -1 < _listbox1.selectedIndex )
+			{
+				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
+				if ( li && li.data )
+				{
+					Globals.selectedModel = li.data;
+//					new WindowModelDetail( li.data.instanceInfo );
+					// Basically works.
+					//new WindowModelTemplate( li.data.modelInfo );
+				}
+			}
+			else
+				noModelSelected();
+		}
+		
   }
 }
