@@ -51,9 +51,9 @@
 			clipVelocityFactor = AVATAR_CLIP_FACTOR;
 			modelInfo.editable = false;
 			
-			Globals.g_app.addEventListener( ModelEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
 			Globals.g_app.addEventListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
 			
+			Globals.g_app.addEventListener( LoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
 			Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			
@@ -313,6 +313,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		}
 		
 		private function onLoadingPlayerComplete( le:LoadingEvent ):void {
+			Log.out( "Player.onLoadingPlayerComplete - PLAYER LOADED =============================================" );
 			complete = true;
 			calculateCenter();
 			Globals.player = this;

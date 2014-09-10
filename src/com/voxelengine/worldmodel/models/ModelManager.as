@@ -365,7 +365,7 @@ package com.voxelengine.worldmodel.models
 					if ( instance )
 						tempDic[instance.instanceInfo.guid] = instance;
 					else
-						Log.out( "clearDictionaryOfNullsAndDead - Null found" );
+						Log.out( "ModelManager.clearDictionaryOfNullsAndDead - Null found" );
 				}
 			}
 			oldDic = null;

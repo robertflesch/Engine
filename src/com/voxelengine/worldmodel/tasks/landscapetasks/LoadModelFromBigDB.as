@@ -63,8 +63,10 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			$ba.position = 0;
 			
 			var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( $ba, _guid );
-			if ( vm )
+			if ( vm ) {
 				vm.databaseObject = $dbo;
+				vm.complete = true;
+			}
 			else 
 				Log.out( "LoadModelFromBigDB.successHandler - FAILED loadFromManifestByteArray:" + _guid );
 

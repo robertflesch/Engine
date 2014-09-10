@@ -113,7 +113,8 @@ package com.voxelengine.GUI
 				var mmde:ModelMetadataEvent = li.data as ModelMetadataEvent;
 				var ba:ByteArray = mmde.ba as ByteArray;
 				ba.uncompress();
-				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( ba, mmde.guid );
+				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( ba, mmde.guid );				
+
 				remove();
 			}
 		}

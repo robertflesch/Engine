@@ -114,7 +114,7 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
-		static private function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo ):void {
+		static private function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo ):* {
 			if ( !$ii )
 				throw new Error( "ModelLoader.instantiate - InstanceInfo null" );
 				
@@ -127,6 +127,7 @@ package com.voxelengine.worldmodel.models
 			
 			//Log.out( "ModelLoader.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
 			Globals.modelAdd( vm );
+			return vm;
 		}
 		
 		// If we want to preload the modelInfo, we dont need to block on it
@@ -149,8 +150,8 @@ package com.voxelengine.worldmodel.models
 			var task:ITask = new LoadModelFromBigDB( $ii.guid, null );
 			taskGroup.addTask(task);
 			
-			task = new CompletedModel( $ii.guid, null );
-			taskGroup.addTask(task);
+			//task = new CompletedModel( $ii.guid, null );
+			//taskGroup.addTask(task);
 			
 			Globals.g_landscapeTaskController.addTask( taskGroup );
 		}
@@ -185,35 +186,20 @@ package com.voxelengine.worldmodel.models
 					ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
 					ii.guid = $guid;
 				}
-					
-				var modelAsset:String = mi.modelClass;
-				var modelClass:Class = ModelLibrary.getAsset( modelAsset )
-				var vm:* = new modelClass( ii, mi );
-				if ( null == vm )
-				{
-					Log.out( "VoxelModel.loadFromManifestByteArray - failed to create new instance of modelClass: " + modelClass, Log.ERROR );
-					return null;
-				}
 				
-				if ( "Player" == modelAsset )
-				{
-					Globals.player = vm;
-					Globals.controlledModel = vm;
-					return null;
-				}
+				var vm:* = instantiate( ii, mi );
+				
+				//if ( "Player" == mi.modelClass )
+				//{
+					//Globals.player = vm;
+					//Globals.controlledModel = vm;
+					//return null;
+				//}
 				
 				vm.version = versionInfo.version;
-				Globals.modelAdd( vm );
+				vm.loadOxelFromByteArray( $ba );
 			}
 
-			try {
-				vm.loadOxelFromByteArray( $ba );
-				//Log.out( "VoxelModel.loadFromManifestByteArray - completed: " + $guid );
-			}
-			catch ( e:Error ) {
-				Log.out( "VoxelModel.loadFromManifestByteArray in loadOxelFromByteArray: " + $guid ? $guid : "Uknown guid" );
-			}
-			
 			return vm;
 		}
 		///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -338,10 +324,11 @@ package com.voxelengine.worldmodel.models
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		static private var modelDesc:String;
+		static private var modelGuid:String;
 		static private function localModelReadyToBeCreated( $e:ModelMetadataEvent ):void {
 			
 			var ii:InstanceInfo = new InstanceInfo();
-			ii.guid = $e.guid;
+			modelGuid = ii.guid = $e.guid;
 			modelDesc = $e.description;
 			ii.name = $e.name;
 			
@@ -349,19 +336,21 @@ package com.voxelengine.worldmodel.models
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
 			Log.out( "RegionManager.addModel - " + ii.toString() );
 			
-			Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED, localModelLoaded );
-			Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, localModelLoaded );
-
+			Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_COMPLETE, localModelLoaded );
+			
 			load( ii );
 		}
 		
-		static private function localModelLoaded( e:ModelEvent ):void {
+		static private function localModelLoaded( e:LoadingEvent ):void {
 			
-			Log.out( "RegionManager.localModelLoaded - " + e.toString() );
-			var vm:VoxelModel = Globals.getModelInstance( e.instanceGuid );
-			createInstanceFromTemplate(vm);
-
-			vm.save( { name: vm.instanceInfo.name, description: modelDesc, owner: Network.userId, template: vm.modelInfo.template, data: null } );
+			if ( modelGuid == e.guid ) {
+				Log.out( "ModelLoader.localModelLoaded - " + e.toString() );
+				var vm:VoxelModel = Globals.getModelInstance( e.guid );
+				createInstanceFromTemplate(vm);
+				vm.save( { name: vm.instanceInfo.name, description: modelDesc, owner: Network.userId, template: vm.modelInfo.template, data: null } );
+				modelGuid = "";
+				modelDesc = "";
+			}
 		}
 		
 		///////////////////////////////////////////////////////////////////////////////////////////////////

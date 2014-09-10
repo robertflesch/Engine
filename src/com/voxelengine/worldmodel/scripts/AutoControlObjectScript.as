@@ -41,7 +41,7 @@ package com.voxelengine.worldmodel.scripts
 			
 			var player:VoxelModel = Globals.player;
 			if ( !player ) 
-				player = Globals.getModelInstance( le.name );
+				player = Globals.getModelInstance( le.guid );
 				
 			var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
 			if ( player && vm ) {

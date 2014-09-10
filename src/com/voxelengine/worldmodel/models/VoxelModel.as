@@ -137,11 +137,10 @@ package com.voxelengine.worldmodel.models
 			//Log.out( "VoxelModel.complete: " + modelInfo.fileName );
 			_complete = val;
 			
-			if (instanceInfo.critical)
-			{
-				// This model (vm.instanceInfo.guid) is detaching (ModelEvent.DETACH) from root model (instanceInfo.guid)
-				var me:ModelEvent = new ModelEvent(ModelEvent.CRITICAL_MODEL_LOADED, instanceInfo.guid);
-				Globals.g_app.dispatchEvent(me);
+			if ( modelInfo.editable && Globals.g_app.configManager.showEditMenu) {
+				if ( null == editCursor )
+					editCursor = EditCursor.create();
+				editCursor.oxel.gc.bound = oxel.gc.bound;
 			}
 		}
 		
@@ -655,16 +654,16 @@ package com.voxelengine.worldmodel.models
 				if (oxel && oxel.dirty)
 				{
 					_timer = getTimer();
-					//Log.out( "VoxelModel.internal_update - starting facing and quad building" );	
+Log.out( "VoxelModel.internal_update - starting facing and quad building" );	
 					oxel.timeBuilding = getTimer();
 					var newFacesFound:Boolean = oxel.faces_build();
-					//Log.out( "VoxelModel.internal_update - faces_build - model guid: " + modelInfo.fileName + " - inst guid: " + instanceInfo.guid + " took: " + (getTimer() - _timer) );					
+Log.out( "VoxelModel.internal_update - faces_build - model guid: " + modelInfo.fileName + " - inst guid: " + instanceInfo.guid + " took: " + (getTimer() - _timer) );					
 					if (newFacesFound)
 					{
-//Log.out( "VoxelModel.internal_update - new faces found - faces_build - model guid: " + modelInfo.fileName + " time: " + oxel.timeBuilding );					
+Log.out( "VoxelModel.internal_update - new faces found - faces_build - model guid: " + modelInfo.fileName + " time: " + oxel.timeBuilding );					
 						_timer = getTimer();
 						oxel.quadsBuild();
-						//Log.out( "VoxelModel.internal_update - quads_build - model guid: " + modelInfo.fileName + " - inst guid: " + instanceInfo.guid + " took: " + (getTimer() - _timer) );					
+Log.out( "VoxelModel.internal_update - quads_build - model guid: " + modelInfo.fileName + " - inst guid: " + instanceInfo.guid + " took: " + (getTimer() - _timer) );					
 					}
 				}
 			}
@@ -1013,7 +1012,6 @@ package com.voxelengine.worldmodel.models
 				databaseObject = o;
 			//Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS ) ); 
 			Log.out( "VoxelModel.created: " + instanceInfo.guid ); 
-			_changed = false;
 		}	
 		
 		private function saved():void 
@@ -1036,6 +1034,7 @@ package com.voxelengine.worldmodel.models
 				return;
 			}
 				
+			_changed = false;
 			Log.out("VoxelModel.save - saving changes to: " + instanceInfo.guid  );
 			var ba:ByteArray = toByteArray();
 			if (databaseObject)

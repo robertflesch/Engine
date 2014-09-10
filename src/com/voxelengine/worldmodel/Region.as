@@ -318,13 +318,20 @@ package com.voxelengine.worldmodel
 		// this should all get refactored out to be part of the Persistance Object
 		public function save():void 
 		{
+			// Model manager might have changes not see in the region file
+			_modelManager.save();
+			
 			if ( !changed )
 				return;
 				
 			if ( !Globals.online )
 				return;
+			
+			if ( !Globals.isGuid( guid ) ) {
+				Log.out( "Region.save - INVALID REGION DATA", Log.ERROR ); 
+				return;
+			}
 				
-			_modelManager.save();
 				
 			Log.out( "Region.save - saving changes to Persistance" ); 
 			var ba:ByteArray = new ByteArray();
