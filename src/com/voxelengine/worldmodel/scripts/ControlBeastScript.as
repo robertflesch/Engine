@@ -41,9 +41,13 @@ package com.voxelengine.worldmodel.scripts
 					if ( trigger )
 					{
 						var controllingModel:VoxelModel = trigger.instanceInfo.controllingModel;
-						var ii:InstanceInfo = Globals.player.instanceInfo;
-						if ( Globals.player && controllingModel && null == Globals.player.instanceInfo.controllingModel )
-							new WindowBeastControlQuery( controllingModel.instanceInfo.guid );
+						if ( Globals.player && Globals.player.instanceInfo ) {
+							var ii:InstanceInfo = Globals.player.instanceInfo;
+							if ( controllingModel && null == Globals.player.instanceInfo.controllingModel )
+								new WindowBeastControlQuery( controllingModel.instanceInfo.guid );
+						}
+						else
+							Log.out( "ControlBeastScript.onInsideEvent - NO PLAYER defined" );
 					}
 				}
 			}

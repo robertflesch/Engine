@@ -24,19 +24,22 @@ package com.voxelengine.events
 		
 		static public const PERSISTANCE_CONNECTION_FAILURE:String	= "PERSISTANCE_CONNECTION_FAILURE";
 		
-		public function PersistanceEvent( $type:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
+		private var _guid:String;
+		
+		public function PersistanceEvent( $type:String, $guid:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
 		{
 			super( $type, $bubbles, $cancellable );
+			_guid = $guid;
 		}
 		
 		public override function clone():Event
 		{
-			return new PersistanceEvent(type, bubbles, cancelable);
+			return new PersistanceEvent(type, _guid, bubbles, cancelable);
 		}
 	   
 		public override function toString():String
 		{
-			return formatToString("PersistanceEvent", "bubbles", "cancelable");
+			return formatToString("PersistanceEvent", "bubbles", "cancelable") + "  guid: " + _guid;
 		}
 		
 	}

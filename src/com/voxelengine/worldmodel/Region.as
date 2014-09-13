@@ -12,8 +12,8 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.events.RegionLoadedEvent;
-	import com.voxelengine.server.Persistance;
 	import com.voxelengine.server.Network;
+	import com.voxelengine.server.PersistRegion;
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.ModelManager;
 	import flash.geom.Vector3D;
@@ -233,7 +233,7 @@ package com.voxelengine.worldmodel
 			_skyColor.z = b;
 		}
 		
-		public function processRegionJson( $regionJson:String ):void
+		public function initJSON( $regionJson:String ):void
 		{
 			//Log.out( "Region.processRegionJson: " + $regionJson );
 			_JSON = JSON.parse($regionJson);
@@ -338,7 +338,7 @@ package com.voxelengine.worldmodel
 			ba.clear();
 			writeToByteArray( ba );
 			
-			Persistance.saveRegion( metadata( ba ), databaseObject, createSuccess );
+			PersistRegion.saveRegion( metadata( ba ), databaseObject, createSuccess );
 
 			_changed = false;
 			
@@ -370,23 +370,12 @@ package com.voxelengine.worldmodel
 		{ 
 			if ( o )
 				databaseObject = o;
-			Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS ) ); 
+			Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS, guid ) ); 
 			Log.out( "Region.createSuccess - created: " + guid ); 
 		}	
 		
-		
-		public function createEmptyRegion():void {
-			processRegionJson( BLANK_REGION_TEMPLETE );
-		}
-		
-		private function GetEditorsList():String
-		{
-			return _editors.toString();
-		}
-		
-		private function GetAdminList():String
-		{
-			return _admin.toString();
-		}
+		public function createEmptyRegion():void { initJSON( BLANK_REGION_TEMPLETE ); }
+		private function GetEditorsList():String { return _editors.toString(); }
+		private function GetAdminList():String { return _admin.toString(); }
 	} // Region
 } // Package

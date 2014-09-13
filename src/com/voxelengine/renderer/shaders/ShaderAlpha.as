@@ -45,8 +45,8 @@ package com.voxelengine.renderer.shaders
 		}
 
 		override public function animationOffsets():void {
-				//_textureOffsetV -= 0.0001; // This was in here
-				_textureOffsetV -= 0.000025;
+				_textureOffsetV -= 0.000001; // This was in here
+				//_textureOffsetV -= 0.000025;
 
 				if ( _textureOffsetV < -0.953125 ) // this scrolls up a single 1952 pixels
 					_textureOffsetV = 0;

@@ -8,11 +8,13 @@
 package com.voxelengine.worldmodel.animation
 {
 	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.server.PersistAnimation;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
 	import flash.utils.Dictionary;
-
+	import playerio.DatabaseObject;
+	
 	import mx.utils.StringUtil;
 	
 	import com.voxelengine.Globals;
@@ -29,31 +31,45 @@ package com.voxelengine.worldmodel.animation
 	public class Animation
 	{
 		private var _loaded:Boolean = false;
-		private var _name:String;
 		private var _transforms:Vector.<AnimationTransform> = new Vector.<AnimationTransform>;
 		private var _attachments:Vector.<AnimationAttachment> = new Vector.<AnimationAttachment>;
 		private var _loader:CustomURLLoader;
-		private var _owner:String;
 		
+		public var guid:String;
+		public var owner:String;
+		public var databaseObject:DatabaseObject;
+		public var name:String;
+		public var desc:String;
+		public var world:String;
+		public var model:String;
+		public var created:String;
+		public var modified:String;
+
 		private var _sound:AnimationSound = null;
 		
-		public function get name():String  { return _name; }
 		public function get transforms():Vector.<AnimationTransform> { return _transforms; }
 		public function get loaded():Boolean { return _loaded; }
 		
 		public function Animation( $animationName:Object, $owner:String ) 
 		{ 
-			_owner = $owner;
+			owner = $owner;
 			if ( $animationName.name )
 			{
-				_name = $animationName.name;
-				load( _name );
+				name = $animationName.name;
 			}
 			else
 				Log.out( "Animation - No animation name", Log.ERROR );	
 		}
 		
-		public function init( $json:Object ):void 
+		public function loadFromLocalFile():void {
+				load( name, onLoadedAction );
+		}
+		
+		public function loadForImport():void {
+				load( name, onLoadForImport );
+		}
+		
+		public function initJSON( $json:Object ):void 
 		{
 			//Log.out( "Animation.init - fileName: " + _name );
 			if ( $json.sound )
@@ -123,14 +139,14 @@ package com.voxelengine.worldmodel.animation
 		}
 		
 		static private const ANIMATION_FILE_EXT:String = ".ajson"
-		private function load( $fileName:String ):void
+		private function load( $fileName:String, $successAction:Function ):void
 		{
 			var fileName:String = $fileName + ANIMATION_FILE_EXT
-			var aniNameAndLoc:String = Globals.modelPath + _owner + "/" + fileName;
+			var aniNameAndLoc:String = Globals.modelPath + owner + "/" + fileName;
 			//Log.out( "Animation.load - loading: " + aniNameAndLoc );
 			var request:URLRequest = new URLRequest( aniNameAndLoc );
 			_loader = new CustomURLLoader(request);
-			_loader.addEventListener(Event.COMPLETE, onLoadedAction);
+			_loader.addEventListener(Event.COMPLETE, $successAction );
 			_loader.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorAction);
 		}
 		
@@ -139,6 +155,23 @@ package com.voxelengine.worldmodel.animation
 			_loader.reportIOError( event, "Animation.onLoadErrorAction: ERROR LOADING ANIMATION: " );
 		}	
 			
+		private function onLoadForImport(event:Event):void
+		{
+			_loaded = true;
+			Log.out( "Animation.onLoadForImport - LOADED: " + name );
+			try 
+			{
+				var jsonString:String = StringUtil.trim( String(event.target.data) );
+				var jsonResult:Object = JSON.parse(jsonString);
+			}
+			catch ( error:Error )
+			{
+				_loader.reportError( event, "Animation.onLoadForImport - ERROR PARSING: " );
+			}
+			
+			initJSON( jsonResult );
+		}
+
 		private function onLoadedAction(event:Event):void
 		{
 			_loaded = true;
@@ -153,7 +186,21 @@ package com.voxelengine.worldmodel.animation
 				_loader.reportError( event, "Animation.onLoadedAction - ERROR PARSING: " );
 			}
 			
-			init( jsonResult );
-		}       
+			initJSON( jsonResult );
+		}
+		
+		public function save():void {
+			PersistAnimation.saveAnim( metadata(), databaseObject, createSuccess );
+			
+			function metadata():String {
+				var md:String = "";
+				return md;
+			}
+			function createSuccess(o:DatabaseObject):void 
+			{ 
+				if ( o )
+					databaseObject = o;
+			}
+		}
 	}
 }

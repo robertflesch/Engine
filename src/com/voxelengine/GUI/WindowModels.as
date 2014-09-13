@@ -2,7 +2,9 @@
 package com.voxelengine.GUI
 {
 
+	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.worldmodel.animation.Animation;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.Player;
@@ -393,10 +395,35 @@ package com.voxelengine.GUI
 //					new WindowModelDetail( li.data.instanceInfo );
 					// Basically works.
 					//new WindowModelTemplate( li.data.modelInfo );
+					_fileReference.addEventListener(Event.SELECT, onAnimationFileSelected);
+					var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.ajson");
+					_fileReference.browse([swfTypeFilter]);
+					
 				}
 			}
 			else
 				noModelSelected();
+		}
+		
+		public function onAnimationFileSelected(e:Event):void
+		{
+			// Globals.GUIControl = true;
+			if ( -1 < _listbox1.selectedIndex )
+			{
+				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
+				if ( li && li.data )
+				{
+					var animName:String = _fileReference.name.substr( 0, _fileReference.name.length - _fileReference.type.length );
+					var na:Animation = new Animation( animName, li.data );
+					na.loadForImport();
+					Globals.g_app.addEventListener( LoadingEvent.ANIMATION_LOAD_COMPLETE, animationLoaded );
+					//Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildModelCreated );
+				}
+			}
+		}
+		
+		private function animationLoaded( le:LoadingEvent ):void {
+			
 		}
 		
   }

@@ -258,6 +258,7 @@ package com.voxelengine.worldmodel.models
 				for each ( var a:Object in animationsObj )		   
 				{
 					var animation:Animation = new Animation( a, $fileNameNoExt );
+					animation.loadFromLocalFile();
 					_animations.push( animation )
 				}
 			}

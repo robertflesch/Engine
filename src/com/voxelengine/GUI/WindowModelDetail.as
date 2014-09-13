@@ -30,7 +30,7 @@ package com.voxelengine.GUI
 		private static const BORDER_WIDTH_2:int = BORDER_WIDTH * 2;
 		private static const BORDER_WIDTH_3:int = BORDER_WIDTH * 3;
 		private static const BORDER_WIDTH_4:int = BORDER_WIDTH * 4;
-		private static const PANEL_HEIGHT:int = 120;
+		private static const PANEL_HEIGHT:int = 115;
 		
 		private var _calculatedWidth:int = 300;
 		private var _calculatedHeight:int = 20;

@@ -20,6 +20,7 @@ import com.voxelengine.GUI.WindowSandboxList;
 import com.voxelengine.GUI.WindowSplash;
 import com.voxelengine.Log;
 import com.voxelengine.server.Network;
+import com.voxelengine.server.PersistRegion;
 import com.voxelengine.server.VVServer;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelLoader;
@@ -49,6 +50,7 @@ public class RegionManager
 	private var _regions:Vector.<Region> = null
 	private var _currentRegion:Region = null
 	private var _modelLoader:ModelLoader = new ModelLoader();
+	private var _persistRegion:PersistRegion;
 	
 	public function get size():int { return _regions.length; }
 	
@@ -64,10 +66,11 @@ public class RegionManager
 	
 	public function RegionManager():void 
 	{
+		// Create this object just so the handlers get added
+		_persistRegion = new PersistRegion();
+		
 		_regions = new Vector.<Region>;
 		
-		Globals.g_app.addEventListener( RegionEvent.REQUEST_PUBLIC, cacheRequestPublic ); 
-		Globals.g_app.addEventListener( RegionEvent.REQUEST_PRIVATE, cacheRequestPrivate ); 
 
 		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, load ); 
 		Globals.g_app.addEventListener( LoginEvent.JOIN_ROOM_SUCCESS, loadRegionOnJoinEvent );
@@ -82,15 +85,6 @@ public class RegionManager
 									  ,  function( me:ModelEvent ):void { if ( currentRegion ){ currentRegion.changed = true;}} );
 	}
 	
-	public function cacheRequestPrivate( e:RegionEvent ):void
-	{
-		Persistance.loadRegions( Network.userId );
-	}
-	
-	public function cacheRequestPublic( e:RegionEvent ):void
-	{
-		Persistance.loadRegions( Persistance.PUBLIC );
-	}
 	////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////
 	public function requestRegionFile( $guid:String ):void
@@ -110,7 +104,7 @@ public class RegionManager
 		guid = guid.substr( 0, guid.indexOf( "." ) );
 		var newRegion:Region = new Region( guid );
 		var jsonString:String = StringUtil.trim(String(event.target.data));
-		newRegion.processRegionJson( jsonString );
+		newRegion.initJSON( jsonString );
 		// This adds it to the list of regions
 		Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
 		// This tells the config manager that the local region was loaded and is ready to load rest of data.
