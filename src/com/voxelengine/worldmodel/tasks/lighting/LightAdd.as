@@ -124,6 +124,8 @@ package com.voxelengine.worldmodel.tasks.lighting
 						Log.out( "LightAdd.start - valid failed", Log.ERROR );
 				}
 				catch (error:Error) {
+					
+					Log.out( "LightAdd.start - Exception Caught: " + error.getStackTrace() );
 					Log.out( "LightAdd.start - Exception Caught: " + error.message + " lo.gc: " + lo.gc.toString(), Log.ERROR );
 				}
 			}
@@ -199,7 +201,8 @@ package com.voxelengine.worldmodel.tasks.lighting
 			if ( $no.childrenHas() )
 				return true; // What does this do?
 				
-			var baseLightLevel:uint = Lighting.defaultLightLevelSetter();
+			//var baseLightLevel:uint = Lighting.defaultLightLevelSetter();
+			var baseLightLevel:uint = Lighting.defaultBaseLightAttn;
 			var bt:Lighting = LightingPool.poolGet( baseLightLevel );
 			var btp:Lighting = LightingPool.poolGet( baseLightLevel );
 			
