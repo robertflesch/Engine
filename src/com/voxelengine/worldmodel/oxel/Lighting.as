@@ -369,10 +369,10 @@ public class Lighting  {
 	public function copyFrom( $b:Lighting ):void {
 		
 		// Copy all of the light data from the passed in Brightness
-		for ( var i:int; i < _lights.length; i++ ) {
+		for ( var i:int; i < $b._lights.length; i++ ) {
 			var sli:LightInfo = $b._lights[i];
 			if ( null != sli ) { 
-				if ( null == _lights[i] )
+				if ( _lights.length <= i || (null == _lights[i]) )
 					_lights[i] = new LightInfo(0, 0, defaultLightLevelSetter(), 0, false );
 				_lights[i].copyFrom( sli );
 			}
