@@ -1524,10 +1524,9 @@ package com.voxelengine.worldmodel.oxel
 					_quads = QuadsPool.poolGet();
 				
 				var ti:TypeInfo = Globals.Info[type];
-				var scale:uint = 1 << gc.grain;
 				// We have to go thru each one, since some may be added, and others removed.
 				for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
-					quadCount += quadAddOrRemoveFace( face, $plane_facing, scale, ti );
+					quadCount += quadAddOrRemoveFace( face, $plane_facing, gc.grain, ti );
 			}
 			else 
 			{
@@ -1551,7 +1550,7 @@ package com.voxelengine.worldmodel.oxel
 			dirty = false;
 		}
 		
-		protected function quadAddOrRemoveFace( $face:int, $plane_facing:int, $scale:uint, $ti:TypeInfo ):int {
+		protected function quadAddOrRemoveFace( $face:int, $plane_facing:int, $grain:uint, $ti:TypeInfo ):int {
 			var validFace:Boolean = faceHas($face);
 			var quad:Quad = _quads[$face];
 			
@@ -1559,7 +1558,7 @@ package com.voxelengine.worldmodel.oxel
 			if ( validFace && quad ) {
 				if ( quad.dirty ) {
 					quadAmbient( $face, $ti );
-					quad.rebuild( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $scale, _lighting );
+					quad.rebuild( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $grain, _lighting );
 				}
 				return 1;
 			}
@@ -1569,13 +1568,13 @@ package com.voxelengine.worldmodel.oxel
 				quadAmbient( $face, $ti );				
 				quad = QuadPool.poolGet();
 				if ( flowInfo && isFlowable ) {
-					if ( !quad.buildScaled( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $scale, _lighting, flowInfo ) ) {
+					if ( !quad.buildScaled( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $grain, _lighting, flowInfo ) ) {
 						QuadPool.poolDispose( quad );
 						return 0;
 					}
 				}
 				else {
-					if ( !quad.build( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $scale, _lighting ) ) {
+					if ( !quad.build( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $grain, _lighting ) ) {
 						QuadPool.poolDispose( quad );
 						return 0;
 					}
