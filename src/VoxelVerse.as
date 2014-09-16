@@ -141,7 +141,7 @@ package {
 
 		private function enterFrame(e:Event):void 
 		{
-			var timeEntered:int = getTimer();
+			const timeEntered:int = getTimer();
 			var elapsed:int = timeEntered - _timePrevious;
 			_timePrevious = timeEntered;
 			
@@ -157,7 +157,7 @@ package {
 			
 			if ( showConsole )
 				toggleConsole();
-//			Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed );
+			//Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed );
 			_timePrevious = getTimer();
 		}
 		

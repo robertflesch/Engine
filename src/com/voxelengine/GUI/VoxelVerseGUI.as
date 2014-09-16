@@ -216,6 +216,7 @@ package com.voxelengine.GUI
 		
 		private function deactivate(e:Event):void 
 		{
+			//Log.out( "VoxelVerseGUI.DEactivate - change cross hairs:" + e.toString() );
 			_crossHairColor = CROSS_HAIR_RED;
 			crossHairChange();
 			crossHairShow();
