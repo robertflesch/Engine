@@ -21,6 +21,9 @@ package com.voxelengine.renderer.shaders
 	
 	public class ShaderFire extends Shader {
 
+		private	var		_textureOffsetFireU:Number = 0.0
+		private	var		_textureOffsetFireV:Number = 0.0
+		
 		public function ShaderFire( $context:Context3D ) {
 			super( $context );
 			createProgram( $context );
@@ -50,28 +53,19 @@ package com.voxelengine.renderer.shaders
 			// send down the view matrix
 			$context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mvp, true); // aka vc0
 
-			var invmat:Matrix3D = $vm.instanceInfo.modelMatrix.clone();
-			if ( _isAnimated ) 
-			{
-				animationOffsets();
-			}
+			_textureOffsetFireV += 0.0078125;
+			_textureOffsetFireU = 0;
+			// ah, now I recall, I repeated the first texture at the end, so that it doesnt pop.
+			if ( _textureOffsetFireV > 0.9921875 ) // this scroll DOWN a single 2048x2048 texture
+				_textureOffsetFireV = 0;
+				
+			_offsets[0] = _textureOffsetFireU;
+			_offsets[1] = _textureOffsetFireV;
+			
 			$context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, _offsets);
 		}
 		
 		override protected function setFragmentData( $isChild:Boolean, $vm:VoxelModel, $context:Context3D ): void { return; } // nothing needed here
-		
-		override public function animationOffsets():void {
-				_textureOffsetV += 0.0078125;
-				_textureOffsetU = 0;
-//				if ( _textureOffsetU > (0.0625 * 5) )
-				// ah, now I recall, I repeated the first texture at the end, so that it doesnt pop.
-				if ( _textureOffsetV > 0.9921875 ) // this scroll DOWN a single 2048x2048 texture
-					_textureOffsetV = 0;
-					
-				_offsets[0] = _textureOffsetU;
-				_offsets[1] = _textureOffsetV;
-
-		}
 		
 		override public function createProgram( $context:Context3D ):void {
 			// This uses 3 peices of vertex data from - setVertexData

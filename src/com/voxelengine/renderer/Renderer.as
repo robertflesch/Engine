@@ -8,6 +8,7 @@
 
 package com.voxelengine.renderer 
 {
+	import com.voxelengine.renderer.shaders.Shader;
 	import flash.display.Stage3D;
 	import flash.display.BitmapData;
 	import flash.display.Stage;
@@ -206,6 +207,7 @@ package com.voxelengine.renderer
 			if ( !cm )
 				return;
 				
+			Shader.animationOffsetsUpdate();
 			backgroundColor();
 			
 			var wsPositionCamera:Vector3D = cm.instanceInfo.worldSpaceMatrix.transformVector( cm.camera.current.position );

@@ -29,13 +29,13 @@ package com.voxelengine.renderer.shaders
 	public class Shader {
 
 		static private      var     _s_lights:Vector.<ShaderLight> = new Vector.<ShaderLight>();
+		static protected	var		_textureOffsetU:Number = 0.0
+		static protected	var		_textureOffsetV:Number = 0.0
 		
 		protected			var		_program3D:Program3D = null;	
 		protected			var		_textureName:String = "assets/textures/oxel.png";
 		protected			var		_textureScale:Number = 2048; 
 		protected			var		_isAnimated:Boolean = false;
-		protected			var		_textureOffsetU:Number = 0.0
-		protected			var		_textureOffsetV:Number = 0.0
 						
 		protected 			var 	_offsets:Vector.<Number> = Vector.<Number>([0,0,0,0]);
 		protected 			var 	_constants:Vector.<Number> = Vector.<Number>([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -45,6 +45,13 @@ package com.voxelengine.renderer.shaders
 		static public  function     lightAdd( light:ShaderLight ):void 		{ _s_lights.push( light ); }
 		static public  function     lightsClear():void 						{ 
 			_s_lights = new Vector.<ShaderLight>(); 
+		}
+		
+		static public  function     animationOffsetsUpdate():void 						{ 
+			_textureOffsetV -= 0.0001;
+
+			if ( _textureOffsetV < -0.888671875 )
+				_textureOffsetV = 0;
 		}
 		
 		public function		get		textureName():String  					{ return _textureName; }
@@ -65,17 +72,6 @@ package com.voxelengine.renderer.shaders
 		//public function reinitialize( $context:Context3D ):void  { _context = $context; }
 		public function update( mvp:Matrix3D, vm:VoxelModel, $context:Context3D, selected:Boolean, $isChild:Boolean = false ): Boolean { throw new Error( "Shader.update - NEEDS TO BE OVERRIDED" ); return true; }
 		
-		public function animationOffsets():void { 
-			
-			_textureOffsetV -= 0.000025;
-
-			if ( _textureOffsetV < -0.953125 )
-				_textureOffsetV = 0;
-				
-			_offsets[0] = _textureOffsetU;
-			_offsets[1] = _textureOffsetV;
-		}
-		
 		public function createProgram( $context:Context3D ):void {
 			//Log.out( "Shader.createProgram" );
 //			_context = $context;
@@ -92,7 +88,9 @@ package com.voxelengine.renderer.shaders
 				// this result has the camera angle as part of the matrix, which is not good when calculating light
 				"mov op, vt0",       // move the transformed vertex data (vt0) in output position (op)
 
-				"add v0, va1, vc12.xy",	// add in the UV offset (va1) and the animated offset (vc12) (may be 0 for non animated), and put in v0 which holds the UV offset
+				"div vt1, vc12.xy, va1.z",        // grain
+				"add v0, va1.xy, vt1.xy", // add in the UV offset (va1) and the animated offset (vc12) (may be 0 for non animated), and put in v0 which holds the UV offset
+//				"add v0, va1.xy, vc12.xy", // add in the UV offset (va1) and the animated offset (vc12) (may be 0 for non animated), and put in v0 which holds the UV offset
 				"mov v1, va3",        	// pass texture color and brightness (va3) to the fragment shader via v1
 				"m44 v2, va2, vc4",  	// transform vertex normal, send to fragment shader
 				
@@ -135,7 +133,7 @@ package com.voxelengine.renderer.shaders
 				// texture filtering. Options: nearest, linear
 				// texture repeat. Options: repeat, wrap, clamp
 				// 0.125 is texture bias for adjusting the mipmap distance
-				"tex ft0, v0, fs0 <2d,clamp,mipnearest,0.125>", // v1 is passed in from vertex, UV coordinates
+				"tex ft0, v0, fs0 <2d,clamp,mipnearest,0.125>", // v0 is passed in from vertex, UV coordinates
 				
 				/////////////////////////////////////////////////
 				// TINT on base texture
@@ -298,6 +296,11 @@ package com.voxelengine.renderer.shaders
 			}
 			
 			$context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 12, _offsets);
+		}
+		
+		public function animationOffsets():void { 
+			_offsets[0] = _textureOffsetU;
+			_offsets[1] = _textureOffsetV;
 		}
 		
 		public function setTextureInfo( json:Object ):void {

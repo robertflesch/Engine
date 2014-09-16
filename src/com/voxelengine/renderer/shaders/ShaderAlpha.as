@@ -18,7 +18,6 @@ package com.voxelengine.renderer.shaders
 	
 	public class ShaderAlpha extends Shader {
 
-
 		public function ShaderAlpha( $context:Context3D ) {
 			super( $context );
 			createProgram( $context );
@@ -42,17 +41,6 @@ package com.voxelengine.renderer.shaders
 			$context.setBlendFactors( sourceFactor, destinationFactor );
 			
 			return true;
-		}
-
-		override public function animationOffsets():void {
-				_textureOffsetV -= 0.000001; // This was in here
-				//_textureOffsetV -= 0.000025;
-
-				if ( _textureOffsetV < -0.953125 ) // this scrolls up a single 1952 pixels
-					_textureOffsetV = 0;
-					
-				_offsets[0] = _textureOffsetU;
-				_offsets[1] = _textureOffsetV;
 		}
 	}
 }
