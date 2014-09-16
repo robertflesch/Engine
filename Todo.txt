@@ -7,7 +7,7 @@ IMPROVE: Lava Flow should stop at X when flowing straight down? Break into rock 
 IMPROVE: Water Flow should stop at X when flowing straight down? Break into mist and then mist emitter?
 TODO: Camera collision - ideally the camera will want to go back to its default distance and height, but collision with things around it can cause it to move closer to avatar at minimum, and ideally to move up and closers as needed
 FIX: When collide is off, if you hit space bar and collide with stuff, it throws you way up in sky
-
+NEED: Friends list for adding editor
 
 TODO: Backside of water oxels
 TODO: Fix fire animation around wood so that it can work with any voxel. Is it a double voxel? Is there a limit to the amound of faces an oxel can have?
@@ -16,6 +16,8 @@ TODO: Limit camera angle when in first person?
 IDEA: Glass, have engine use ambientOcclusion data to draw edges around glass, if edge value for a side >= 1 then draw border.
 IDEA: VertexManager sharing, this would allow us to have multiple creatures on the screen, just using one vertexManager
 
+WindowVoxelModel
+Be nice if selected model was somehow highlighted.
 
 
 DRAGON
@@ -29,6 +31,9 @@ IMPROVE: Dragon: Starts going TOO fast when diving (really just moving forward).
 IMPROVE: Pops between states (?) after landing
 FIX: If you get on and off multiple times, the avatar angle gets off.
 
+NEW REGION WINDOW:
+ADD: Sky color
+ADD: GuestAllowed
 
 ZEPPELIN
 TODO: Add new hud
