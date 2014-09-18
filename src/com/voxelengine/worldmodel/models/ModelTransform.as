@@ -323,6 +323,24 @@ package com.voxelengine.worldmodel.models
 			return "Undefined";
 		}
 
+		private function vectorToJSON( v:Vector3D ):String {  return JSON.stringify( {x:v.x, y:v.y, z:v.z} ); } 	
+
+		public function getJSON():String {
+			
+			var outString:String = "{";
+			outString += "\"delta\": " + vectorToJSON( _delta );
+			outString += ",";
+			outString += "\"time\": " + _time/1000;
+			outString += ",";
+			outString += "\"type\": ";
+			outString += "\"" + typeToString( _type ) + "\"";
+			//outString += ","; // Redundant
+			//outString += "\"name\": ";
+			//outString += "\"" + name + "\"";
+			outString += "}";
+			return outString;
+		}
+		
 		public function toString():String 
 		{ 
 			return "{ delta: " +  _delta + "  time: " + _time + "  type: " + typeToString( _type ) + "  name: " + name + "}";

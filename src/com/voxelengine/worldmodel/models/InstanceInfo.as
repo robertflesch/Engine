@@ -179,7 +179,7 @@ package com.voxelengine.worldmodel.models
 
 		public function toString():String
 		{
-			return " GUID: " + guid + " pos: " + positionGet + " controllingModel: " + (controllingModel ? controllingModel.instanceInfo.guid : "None" );
+			return "Name: " + name + " GUID: " + guid + " pos: " + positionGet + " controllingModel: " + (controllingModel ? controllingModel.instanceInfo.guid : "None" );
 		}
 
 		private function onLoadingComplete( le:LoadingEvent ):void

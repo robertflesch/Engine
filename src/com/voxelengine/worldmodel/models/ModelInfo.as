@@ -31,7 +31,8 @@ package com.voxelengine.worldmodel.models
 		private var _desc:String = "Default_Description";
 		private var _modelJson:Object = null;
 		private var _animations:Vector.<Animation> 		= new Vector.<Animation>();
-
+		private var _childCount:int // number of children this model has at start. Used to determine if animation can be played.
+		
 		public function get json():Object 						{ return _modelJson; }
 		public function jsonReset():void 						{ _modelJson = toJSON(null); }
 		public function get fileName():String 					{ return _fileName; }
@@ -56,6 +57,7 @@ package com.voxelengine.worldmodel.models
 		public function set parent(val:ModelInfo):void 			{ _parent = val; }
 		
 		public function get animations():Vector.<Animation> 	{ return _animations; }
+		public function get childCount():int 					{ return _childCount; }
 
 		//public function biomesReset():void 					{ _biomes = null; }
 
@@ -79,6 +81,7 @@ package com.voxelengine.worldmodel.models
 			newModelInfo._grainSize		= this.grainSize;
 			newModelInfo._name			= this.name;
 			newModelInfo._modelJson		= this._modelJson;
+			newModelInfo._childCount	= this._childCount;
 			
 			if ( _biomes )
 				newModelInfo._biomes 		= _biomes.clone();
@@ -95,6 +98,7 @@ package com.voxelengine.worldmodel.models
 			
 			for each ( var animation:Animation in _animations )
 				newModelInfo._animations.push( animation );
+			
 				
 			return newModelInfo;
 		}
@@ -244,6 +248,7 @@ package com.voxelengine.worldmodel.models
 				var children:Object = json.children;
 				for each ( var v:Object in children )		   
 				{
+					_childCount++;
 					var ii:InstanceInfo = new InstanceInfo();
 					ii.initJSON( v );
 					parent = this;

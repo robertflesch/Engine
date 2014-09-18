@@ -7,6 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.animation
 {
+	import flash.geom.Vector3D;
+	
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.VoxelModel;
@@ -22,6 +24,7 @@ package com.voxelengine.worldmodel.animation
 	public class AnimationAttachment
 	{
 		private var _attachsTo:String = "INVALID_ATTACHMENT";
+		private var _fileName:String = "INVALID_NAME";
 		private var _instanceInfo:InstanceInfo = null;
 		private var _voxelModel:VoxelModel = null;
 		private var _owner:VoxelModel = null;
@@ -32,11 +35,44 @@ package com.voxelengine.worldmodel.animation
 				_attachsTo = $json.attachsTo;
 			else
 				throw new Error( "AnimationAttachment.construct - NO attachsTo" );
+				
+			if ( $json.fileName )
+				_fileName = $json.fileName;
+			else
+				throw new Error( "AnimationAttachment.construct - NO fileName" );
+				
 			
 			Log.out( "AnimationAttachment - _attachsTo: " + _attachsTo + " fileName: " + $json.fileName );
 			_instanceInfo = new InstanceInfo();
 			_instanceInfo.initJSON( $json );
 		}
+
+		private function vectorToJSON( v:Vector3D ):String {  return JSON.stringify( {x:v.x, y:v.y, z:v.z} ); } 	
+
+		
+		public function getJSON():String {
+			
+			var outString:String = "{";
+			outString += "\"fileName\": ";
+			outString += "\"" + _fileName + "\"";
+			outString += ",";
+			outString += "\"attachsTo\": ";
+			outString += "\"" + _attachsTo + "\"";
+			outString += ",";
+			outString += "\"location\": ";
+			outString += vectorToJSON( _instanceInfo.positionGet );
+			outString += ",";
+			outString += "\"rotation\": ";
+			outString += vectorToJSON( _instanceInfo.rotationGet );
+			
+			outString += "}";
+			
+			// TEST TEST TEST
+			//JSON.parse( outString );
+			
+			return outString;
+		}
+		
 		
 		public function get instanceInfo():InstanceInfo 
 		{

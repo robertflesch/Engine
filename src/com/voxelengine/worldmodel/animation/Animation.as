@@ -146,30 +146,35 @@ package com.voxelengine.worldmodel.animation
 		private function getJSON():String
 		{
 			var jsonString:String = "{";
-			if ( _sound )
-				_sound.getJSON( jsonString );
-			//if ( _attachments ) {
-				//if ( _sound )
-					//jsonString += ","
-				//jsonString += "\"attachment\":[";
-				//jsonString += attachmentsToJSON();
-				//jsonString += "]"
-			//}
-			//if ( _transforms )
-				//if ( _sound || _attachments )
-					//jsonString += ","
-				//jsonString += "\"animation\":[";
-				//jsonString += animationsToJSON();
-				//jsonString += "]"
+			if ( _sound ) {
+				jsonString += "\"sound\":";
+				jsonString += _sound.getJSON();
+			}
+			if ( _attachments ) {
+				if ( _sound )
+					jsonString += ","
+				jsonString += "\"attachment\":[";
+				jsonString += attachmentsToJSON();
+				jsonString += "]"
+			}
+			if ( _transforms ) {
+				if ( _sound || _attachments )
+					jsonString += ","
+				jsonString += "\"animation\":[";
+				jsonString += animationsToJSON();
+				jsonString += "]"
+			}
 
 			jsonString += "}";
+trace( name + " = " + jsonString );
 			return jsonString;
 		}
-		/*
-		private function animationsToJSON( $outString:String ):String {
+
+		private function animationsToJSON():String {
 			var count:int = 0;
 			var animations:Vector.<String> = new Vector.<String>;
-				
+			var outString:String = new String();
+			
 			for each ( var at:AnimationTransform in _transforms ) {
 				if ( at )
 					animations.push( at.getJSON() );	
@@ -184,11 +189,12 @@ package com.voxelengine.worldmodel.animation
 			}
 			return outString;
 		}
-		
-		private function attachmentsToJSON( $outString:String ):String {
+
+		private function attachmentsToJSON():String {
 			var count:int = 0;
 			var attachments:Vector.<String> = new Vector.<String>;
-				
+			var outString:String = new String();
+			
 			for each ( var aa:AnimationAttachment in _attachments ) {
 				if ( aa  )
 					attachments.push( aa.getJSON() );	
@@ -312,6 +318,10 @@ package com.voxelengine.worldmodel.animation
 			}
 			
 			initJSON( jsonResult );
+			
+			/// TEST TEST TEST ONLY
+			var ba:ByteArray = new ByteArray();
+			writeToByteArray( ba );
 		}
 		
 		public function save():void {
@@ -346,7 +356,6 @@ package com.voxelengine.worldmodel.animation
 			{ 
 				if ( o ) {
 					databaseObject = o;
-					guid = o.key;
 				}
 			}
 	}

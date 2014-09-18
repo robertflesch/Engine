@@ -95,31 +95,54 @@ package com.voxelengine.worldmodel.animation
 			}
 		}
 		
-		public function getJSON( $outString:String ):String {
+		flash.geom.Vector3D.prototype.toJSON = function (k:*):* { 
+		return {x:this.x, y:this.y, z:this.z};
+		} 	
+		
+		private function vectorToJSON( v:Vector3D ):String { 
+		return JSON.stringify( {x:v.x, y:v.y, z:v.z} );
+		} 	
 
-			$outString += "{";
-			$outString += "\"attachmentName\": "
-			$outString += _attachmentName;
-			$outString += ","
-			$outString += position.toString();
-			$outString += ","
-			$outString += rotation.toString();
-			$outString += ","
-			$outString += scale.toString();
-			$outString += ","
-			$outString += "\"transforms\": ["
-
-			var len:int = _transforms.length;
-			for ( var index:int; index < len; index++ ) {
-				$outString += _transforms[index].toString();
-				if ( index == len - 1 )
-					continue;
-				$outString += ",";
+		public function getJSON():String {
+			
+			var outString:String = "{";
+			outString += "\"attachmentName\": ";
+			outString += "\"" + _attachmentName + "\"";
+			if ( hasPosition ) {
+				outString += ",";
+				outString += "\"location\": ";
+				outString += vectorToJSON( position );
 			}
-			$outString += "]"
+			if ( hasRotation )  {
+				outString += ",";
+				outString += "\"rotation\": ";
+				outString += vectorToJSON( rotation );
+			}
+			if ( hasScale ) {
+				outString += ",";
+				outString += "\"scale\": ";
+				outString += vectorToJSON( scale );
+			}
+			if ( hasTransform ) {
+				outString += ",";
+				outString += "\"transforms\": [";
 
-			$outString += "}";
-			return $outString;
+				var len:int = _transforms.length;
+				for ( var index:int; index < len; index++ ) {
+					outString += _transforms[index].getJSON();
+					if ( index == len - 1 )
+						continue;
+					outString += ",";
+				}
+				outString += "]"
+			}
+			
+			outString += "}";
+			
+			// TEST TEST TEST
+			//JSON.parse( outString );
+			
+			return outString;
 		}
 
 		

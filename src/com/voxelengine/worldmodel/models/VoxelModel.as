@@ -788,6 +788,7 @@ package com.voxelengine.worldmodel.models
 		
 		public function childAdd(vm:VoxelModel):void
 		{
+			Log.out(  "-------------- VoxelModel.childAdd - VM: " + vm.toString() );
 			// remove parent level model
 			Globals.changeFromParentToChild(vm);
 			_children.push(vm);
@@ -1657,6 +1658,11 @@ Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );
 				return;
 			if ( (_anim && _anim.name == $state) || 0 == modelInfo.animations.length )
 				return;
+				
+			if ( _modelInfo.childCount > _children.length ) {
+				//Log.out("VoxelModel.stateSet - children not all loaded yet: " + $state );
+				return; // not all children have loaded yet
+			}
 			
 			//Log.out( "VoxelModel.stateSet: " + $state ); 
 			if (_anim)
