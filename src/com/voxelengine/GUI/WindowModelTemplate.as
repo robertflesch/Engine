@@ -17,7 +17,6 @@ package com.voxelengine.GUI
 		{
 			super( "Model Template" );
 			_mi = $mi;
-			name = "Voxel Models";
 			autoSize = true;
 			layout.orientation = LayoutOrientation.HORIZONTAL;
 			

@@ -151,22 +151,22 @@ package com.voxelengine.worldmodel.models
 					};
 		} 	
 		
-		public function initJSON( $fileNameNoExt:String, $json:Object ):void 
+		public function initJSON( $modelNameNoExt:String, $json:Object ):void 
 		{
-			//Log.out( "ModelInfo.init - fileName: " + $fileNameNoExt + "  $json: " + JSON.stringify( $json.model ) );
+			//Log.out( "ModelInfo.init - fileName: " + $modelNameNoExt + "  $json: " + JSON.stringify( $json.model ) );
 			_modelJson = $json;
-			_fileName = $fileNameNoExt;
+			_fileName = $modelNameNoExt;
 			
 			if ( !$json.model  )
 			{
-				Log.out( "ModelInfo.init - ERROR - unable to find model Info in : " + $fileNameNoExt + "  containing: " + JSON.stringify($json), Log.ERROR );					
+				Log.out( "ModelInfo.init - ERROR - unable to find model Info in : " + $modelNameNoExt + "  containing: " + JSON.stringify($json), Log.ERROR );					
 				return;
 			}
 				
 			var json:Object = $json.model;
 			
 			if ( json && json.guid  )
-				Log.out( "ModelInfo.init - WARNING - FOUND OLD modelGuid in file: " + $fileNameNoExt );					
+				Log.out( "ModelInfo.init - WARNING - FOUND OLD modelGuid in file: " + $modelNameNoExt );					
 				
 			
 			if ( json.grainSize )
@@ -255,10 +255,11 @@ package com.voxelengine.worldmodel.models
 			{
 				//Log.out( "ModelInfo.init - animations found" );
 				var animationsObj:Object = json.animations;
-				for each ( var a:Object in animationsObj )		   
+				// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
+				for each ( var animData:Object in animationsObj )		   
 				{
-					var animation:Animation = new Animation( a, $fileNameNoExt );
-					animation.loadFromLocalFile();
+					var animation:Animation = new Animation();
+					animation.loadFromLocalFile( animData, $modelNameNoExt );
 					_animations.push( animation )
 				}
 			}

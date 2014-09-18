@@ -325,7 +325,7 @@ package com.voxelengine.worldmodel.models
 
 		public function toString():String 
 		{ 
-			return "ModelTransform - delta: " +  _delta + "  time: " + _time + "  type: " + typeToString( _type ) + "  name: " + name;
+			return "{ delta: " +  _delta + "  time: " + _time + "  type: " + typeToString( _type ) + "  name: " + name + "}";
 		} 			
 	}
 }

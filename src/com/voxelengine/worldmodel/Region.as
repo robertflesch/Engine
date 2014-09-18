@@ -287,20 +287,6 @@ package com.voxelengine.worldmodel
 			outString += "\"skyColor\": {" + "\"r\":" + _skyColor.x  + ",\"g\":" + _skyColor.y + ",\"b\":" + _skyColor.z + "}";
 			outString += ","
 			outString += "\"gravity\":" + JSON.stringify(gravity);
-			outString += ","
-			outString += "\"name\":" + JSON.stringify(name);
-			outString += ","
-			outString += "\"desc\":" + JSON.stringify(desc);
-			outString += ","
-			outString += "\"created\":" + JSON.stringify(_created);
-			outString += ","
-			outString += "\"modifed\":" + JSON.stringify(_modified);
-			outString += ","
-			outString += "\"editors\":" + JSON.stringify(_editors);
-			outString += ","
-			outString += "\"admin\":" + JSON.stringify(_admin);
-			outString += ","
-			outString += "\"guests\":" + JSON.stringify(_guestAllow);
 			outString += "}"
 			return outString;
 		}

@@ -7,6 +7,7 @@
 ==============================================================================*/
 
 package {
+	import com.voxelengine.server.PersistAnimation;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
@@ -117,6 +118,7 @@ package {
 			addEventListener( LightEvent.REMOVE, LightRemove.handleLightEvents );
 			
 			VoxelVerseGUI.currentInstance.init();
+			PersistAnimation.addEvents();
 
 			if ( false == WindowSplash.isActive )
 				WindowSplash.create();

@@ -170,32 +170,6 @@ package com.voxelengine.GUI
 				Log.out( "VoxelVerseGUI.saveModelIVM - No VoxelModel selected", Log.ERROR );
 		}
 		
-		//public function saveModelMeta():void 
-		//{
-			//Globals.GUIControl = true;
-			//trace("VoxelVerseGUI.saveModel - Saving model to FILE");
-			// three steps
-			// save updated model meta data with new guid
-			// save updated model ivm
-			// update the model manager, removing old guid and adding new guid
-			//var vm:VoxelModel = Globals.selectedModel;
-			//if ( vm )
-			//{
-				//if ( vm.modelInfo.template )
-				//{
-					//var oldGuid:String = vm.instanceInfo.fileName;
-					//var newGuid:String = Globals.getUID();
-					//vm.modelInfo = Globals.g_modelManager.updateFileName( newGuid, oldGuid );
-					//vm.instanceInfo.fileName = vm.modelInfo.fileName;
-				//}
-//
-				//var modelJSON:String = vm.modelInfo.getJSON();
-				//_fileReference.save( modelJSON, vm.modelInfo.fileName + ".mjson" );
-			//}
-			//else
-				//Log.out( "VoxelVerseGUI.saveModelIVM - No VoxelModel selected", Log.ERROR );
-		//}
-		
 		public function crossHairResize(event:Event):void 
 		{
 			//trace( "VoxelVerseGUI.crossHairResize" );

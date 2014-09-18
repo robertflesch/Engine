@@ -48,6 +48,12 @@ package com.voxelengine.worldmodel.animation
 			return _attachsTo;
 		}
 		
+		public function toJSON(k:*):* {
+			return {
+				attachmentName: _owner
+			}
+		}
+		
 		public function create( $owner:VoxelModel ):void
 		{
 			Log.out( "AnimationAttachment.create owner: " + $owner.toString() );

@@ -27,8 +27,12 @@ package com.voxelengine.GUI
 
 	public class WindowModels extends VVPopup
 	{
-		private var _listbox1:ListBox = new ListBox( 200, 15, 300 );
-		private var _listbox2:ListBox = new ListBox( 200, 15, 300 );
+		private const PANEL_WIDTH:int = 200;
+		private const PANEL_HEIGHT:int = 300;
+		private const PANEL_BUTTON_HEIGHT:int = 200;
+		private var _listParents:ListBox = new ListBox( PANEL_WIDTH, 15, PANEL_HEIGHT );
+		private var _listChildModels:ListBox = new ListBox( PANEL_WIDTH, 15, PANEL_HEIGHT );
+		private var _listAnimations:ListBox = new ListBox( PANEL_WIDTH, 15, PANEL_HEIGHT );
 		private var _fileReference:FileReference = new FileReference();
 		private var _popup:Popup = null;
 		
@@ -36,24 +40,27 @@ package com.voxelengine.GUI
 		{
 			super("Voxel Models");
 			autoSize = true;
+			layout.orientation = LayoutOrientation.VERTICAL;
 			
 			populateParentModels();
 			
-			var listBoxPanel:Container = new Container( 500, 300 );
+			var listBoxPanel:Container = new Container( PANEL_WIDTH * 3, PANEL_HEIGHT );
 			listBoxPanel.layout.orientation = LayoutOrientation.HORIZONTAL;
 			listBoxPanel.padding = 0;
-			//_listbox1.height = 300
-			//_listbox2.height = 300
-			listBoxPanel.addElement( _listbox1 );
-			listBoxPanel.addElement( _listbox2 );
-			_listbox1.addEventListener(ListEvent.LIST_CHANGED, selectParentModel);
-			_listbox2.addEventListener(ListEvent.LIST_CHANGED, childModelDetail );
+			listBoxPanel.addElement( _listParents );
+			listBoxPanel.addElement( _listChildModels );
+			listBoxPanel.addElement( _listAnimations );
+			_listParents.addEventListener(ListEvent.LIST_CHANGED, selectParentModel);
+			_listChildModels.addEventListener(ListEvent.LIST_CHANGED, childModelDetail );
 			addElement( listBoxPanel );
 			
-			var panelButton:Container = new Container( 500, 100 );
+			///////// Buttons //////////////////////////////
+			var panelButton:Container = new Container( PANEL_WIDTH * 3, PANEL_BUTTON_HEIGHT );
 			panelButton.padding = 0;
+			addElement( panelButton );
 
-			var panelParentButton:Container = new Container( 200, 80 );
+			// PARENT BUTTONS
+			var panelParentButton:Container = new Container( PANEL_WIDTH, PANEL_BUTTON_HEIGHT );
 			panelParentButton.layout.orientation = LayoutOrientation.VERTICAL;
 			panelParentButton.padding = 0;
 			panelButton.addElement( panelParentButton );
@@ -96,121 +103,48 @@ package com.voxelengine.GUI
 			testB.width = 150;
 			panelParentButton.addElement( testB );
 			
-			var addCModel:Button = new Button( "Add Child Model..." );
-			addCModel.addEventListener(UIMouseEvent.CLICK, addChildModel );
-			var deleteCModel:Button = new Button("Delete Child Model");
-			deleteCModel.addEventListener(UIMouseEvent.CLICK, deleteChild );
-			
-			var panelChildButton:Container = new Container( 300, 180 );
+			// CHILD BUTTONS
+			var panelChildButton:Container = new Container( PANEL_WIDTH, PANEL_BUTTON_HEIGHT );
 			panelChildButton.layout.orientation = LayoutOrientation.VERTICAL;
 			panelChildButton.padding = 0;
-			panelChildButton.addElement( addCModel );
-			panelChildButton.addElement( deleteCModel );
 			panelButton.addElement( panelChildButton );
+			
+			var addCModel:Button = new Button( "Add Child Model..." );
+			addCModel.addEventListener(UIMouseEvent.CLICK, addChildModel );
+			panelChildButton.addElement( addCModel );
+			
+			var deleteCModel:Button = new Button("Delete Child Model");
+			deleteCModel.addEventListener(UIMouseEvent.CLICK, deleteChild );
+			panelChildButton.addElement( deleteCModel );
+			
 
-			layout.orientation = LayoutOrientation.VERTICAL;
-			addElement( panelButton );
+			// ANIMATION BUTTONS
+			var panelAnimButton:Container = new Container( PANEL_WIDTH, PANEL_BUTTON_HEIGHT );
+			panelAnimButton.layout.orientation = LayoutOrientation.VERTICAL;
+			panelAnimButton.padding = 0;
+			panelButton.addElement( panelAnimButton );
+			
+			var addAminB:Button = new Button( "Add Anim Model..." );
+			addAminB.addEventListener(UIMouseEvent.CLICK, addAnim );
+			panelAnimButton.addElement( addAminB );
+			
+			var deleteAminB:Button = new Button("Delete Anim Model");
+			deleteAminB.addEventListener(UIMouseEvent.CLICK, deleteAnim );
+			panelAnimButton.addElement( deleteAminB );
+			
+			
 			display();
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 			Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelCreated );
         }
 		
-		// Window events
-		private function onRemoved( event:UIOEvent ):void
- 		{
-			removeEventListener(UIOEvent.REMOVED, onRemoved );
-			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelCreated );
-			removeChildModels();
-			Globals.selectedModel = null;
-		}
-		
-		private function addChildModel(event:UIMouseEvent):void 
-		{
-			// Globals.GUIControl = true;
-			if ( -1 < _listbox1.selectedIndex )
-			{
-				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
-				if ( li && li.data )
-				{
-					_fileReference.addEventListener(Event.SELECT, onChildModelFileSelected);
-					var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
-					_fileReference.browse([swfTypeFilter]);
-				}
-			}
-			else
-				noModelSelected();
-		}
-		
-		private function oxelUtilsHandler(event:UIMouseEvent):void 
-		{
-			// Globals.GUIControl = true;
-			if ( -1 < _listbox1.selectedIndex )
-			{
-				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
-				if ( li && li.data )
-				{
-					Globals.selectedModel = li.data;
-					new WindowOxelUtils( li.data );
-				}
-			}
-			else
-				noModelSelected();
-		}
-		
 		private function noModelSelected():void
 		{
 			(new Alert( "No model selected" )).display();
 		}
 		
-		private function newModelHandler(event:UIMouseEvent):void 
-		{
-			// Globals.GUIControl = true;
-			new WindowModelChoice();
-		}
-
-		private function editModelHandler(event:UIMouseEvent):void 
-		{
-			// Globals.GUIControl = true;
-			if ( -1 < _listbox1.selectedIndex )
-			{
-				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
-				if ( li && li.data )
-				{
-					Globals.selectedModel = li.data;
-					
-					new WindowModelTemplate( Globals.selectedModel.modelInfo );
-					
-				}
-			}
-			else
-				noModelSelected();
-		}
 		
-		private function parentDetailHandler(event:UIMouseEvent):void 
-		{
-			// Globals.GUIControl = true;
-			if ( -1 < _listbox1.selectedIndex )
-			{
-				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
-				if ( li && li.data )
-				{
-					Globals.selectedModel = li.data;
-					new WindowModelDetail( li.data.instanceInfo );
-				}
-			}
-			else
-				noModelSelected();
-		}
-		
-		private function addParent(event:UIMouseEvent):void 
-		{
-			// Globals.GUIControl = true;
-			new WindowModelList();
-			//_fileReference.addEventListener(Event.SELECT, onModelFileSelected);
-			//var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
-			//_fileReference.browse([swfTypeFilter]);
-		}
 		
 		public function onModelFileSelected(e:Event):void
 		{
@@ -223,13 +157,161 @@ package com.voxelengine.GUI
 			ModelLoader.load( instance );
 		}
 		
+		
+		
+		
+		//////////////////////////////////////////////////////////
+		///////////////////////////// PARENT
+		//////////////////////////////////////////////////////////
+		private function onParentModelCreated(event:ModelEvent):void {
+			var guid:String = event.instanceGuid;
+			Log.out( "WindowModels.onParentModelCreated: " + guid );
+			var vm:VoxelModel = Globals.getModelInstance( event.instanceGuid );
+			if ( vm )
+				_listParents.addItem( vm.instanceInfo.name, vm );
+			
+			//populateParentModels();
+		}
+		
+		private function deleteParent(event:UIMouseEvent):void  {
+			// Globals.GUIControl = true;
+			if ( -1 < _listParents.selectedIndex )
+			{
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
+				if ( li && li.data )
+				{
+					Globals.markDead( li.data.instanceInfo.guid );
+					populateParentModels()
+				}
+			}
+			else
+				noModelSelected();
+		}
+		
+		// PARENT BUTTONS //////////////////////////////////////////////
+		private function onRemoved( event:UIOEvent ):void
+ 		{
+			removeEventListener(UIOEvent.REMOVED, onRemoved );
+			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelCreated );
+			removeChildModels();
+			Globals.selectedModel = null;
+		}
+		
+		private function newModelHandler(event:UIMouseEvent):void 
+		{
+			// Globals.GUIControl = true;
+			new WindowModelChoice();
+		}
+
+		private function editModelHandler(event:UIMouseEvent):void  {
+			// Globals.GUIControl = true;
+			if ( -1 < _listParents.selectedIndex )
+			{
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
+				if ( li && li.data )
+				{
+					Globals.selectedModel = li.data;
+					
+					new WindowModelTemplate( Globals.selectedModel.modelInfo );
+					
+				}
+			}
+			else
+				noModelSelected();
+		}
+		
+		private function addParent(event:UIMouseEvent):void  {
+			// Globals.GUIControl = true;
+			new WindowModelList();
+			//_fileReference.addEventListener(Event.SELECT, onModelFileSelected);
+			//var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
+			//_fileReference.browse([swfTypeFilter]);
+		}
+		
+		private function parentDetailHandler(event:UIMouseEvent):void  {
+			// Globals.GUIControl = true;
+			if ( -1 < _listParents.selectedIndex )
+			{
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
+				if ( li && li.data )
+				{
+					Globals.selectedModel = li.data;
+					new WindowModelDetail( li.data.instanceInfo );
+				}
+			}
+			else
+				noModelSelected();
+		}
+		
+		private function oxelUtilsHandler(event:UIMouseEvent):void  {
+			// Globals.GUIControl = true;
+			if ( -1 < _listParents.selectedIndex )
+			{
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
+				if ( li && li.data )
+				{
+					Globals.selectedModel = li.data;
+					new WindowOxelUtils( li.data );
+				}
+			}
+			else
+				noModelSelected();
+		}
+		
+		
+		//////////////////////////////////////////////////////////
+		///////////////////////////// END PARENT
+		//////////////////////////////////////////////////////////
+		
+		//////////////////////////////////////////////////////////
+		///////////////////////////// CHILD MODELS
+		//////////////////////////////////////////////////////////
+		private function onChildModelCreated(event:ModelEvent):void
+		{
+			var guid:String = event.instanceGuid;
+			var rootGuid:String = event.parentInstanceGuid;
+			Log.out( "WindowModels.onChildModelCreated: " + guid );
+			if ( -1 < _listParents.selectedIndex )
+			{
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
+				if ( li && li.data )
+					populateChildModels( li.data );
+				var vm:VoxelModel = Globals.getModelInstance( guid );
+				if ( vm )
+					vm.selected = true;
+			}
+			else
+				noModelSelected();
+		}
+		
+		private function deleteChild(event:UIMouseEvent):void 
+		{
+			// Globals.GUIControl = true;
+			if ( -1 < _listParents.selectedIndex )
+			{
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
+				if ( li && li.data )
+				{
+					var parentModel:VoxelModel = li.data;
+					var lic:ListItem = _listChildModels.getItemAt( _listChildModels.selectedIndex );
+					if ( lic && lic.data )
+					{
+						parentModel.childRemove( lic.data )
+					}
+					populateChildModels( li.data );
+				}
+			}
+			else
+				noModelSelected();
+		}
+		
 		private var _viewDistance:Vector3D = new Vector3D(0, 0, -75);
 		public function onChildModelFileSelected(e:Event):void
 		{
 			// Globals.GUIControl = true;
-			if ( -1 < _listbox1.selectedIndex )
+			if ( -1 < _listParents.selectedIndex )
 			{
-				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
 				if ( li && li.data )
 				{
 					var parentModel:VoxelModel = li.data;
@@ -249,84 +331,82 @@ package com.voxelengine.GUI
 			}
 		}
 		
-		private function onParentModelCreated(event:ModelEvent):void
-		{
-			var guid:String = event.instanceGuid;
-			Log.out( "WindowModels.onParentModelCreated: " + guid );
-			var vm:VoxelModel = Globals.getModelInstance( event.instanceGuid );
-			if ( vm )
-				_listbox1.addItem( vm.instanceInfo.name, vm );
-			
-			//populateParentModels();
-		}
-		
-		private function onChildModelCreated(event:ModelEvent):void
-		{
-			var guid:String = event.instanceGuid;
-			var rootGuid:String = event.parentInstanceGuid;
-			Log.out( "WindowModels.onChildModelCreated: " + guid );
-			if ( -1 < _listbox1.selectedIndex )
-			{
-				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
-				if ( li && li.data )
-					populateChildModels( li.data );
-				var vm:VoxelModel = Globals.getModelInstance( guid );
-				if ( vm )
-					vm.selected = true;
-			}
-			else
-				noModelSelected();
-		}
-		
-		private function deleteParent(event:UIMouseEvent):void 
+		// Window events
+		private function addChildModel(event:UIMouseEvent):void 
 		{
 			// Globals.GUIControl = true;
-			if ( -1 < _listbox1.selectedIndex )
+			if ( -1 < _listParents.selectedIndex )
 			{
-				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
 				if ( li && li.data )
 				{
-					Globals.markDead( li.data.instanceInfo.guid );
-					populateParentModels()
+					_fileReference.addEventListener(Event.SELECT, onChildModelFileSelected);
+					var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
+					_fileReference.browse([swfTypeFilter]);
 				}
 			}
 			else
 				noModelSelected();
 		}
 		
-		private function deleteChild(event:UIMouseEvent):void 
+		//////////////////////////////////////////////////////////
+		///////////////////////////// END CHILD MODELS
+		//////////////////////////////////////////////////////////
+		
+		//////////////////////////////////////////////////////////
+		///////////////////////////// Animations
+		//////////////////////////////////////////////////////////
+		private function addAnim(event:UIMouseEvent):void 
 		{
 			// Globals.GUIControl = true;
-			if ( -1 < _listbox1.selectedIndex )
+			if ( -1 < _listParents.selectedIndex )
 			{
-				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
 				if ( li && li.data )
 				{
-					var parentModel:VoxelModel = li.data;
-					var lic:ListItem = _listbox2.getItemAt( _listbox2.selectedIndex );
-					if ( lic && lic.data )
-					{
-						parentModel.childRemove( lic.data )
-					}
-					populateChildModels( li.data );
+					var parentGuid:String = li.data;
+					new WindowAnimationMetadata( parentGuid );
 				}
 			}
 			else
 				noModelSelected();
 		}
+		
+		private function deleteAnim(event:UIMouseEvent):void 
+		{
+			// Globals.GUIControl = true;
+			if ( -1 < _listParents.selectedIndex )
+			{
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
+				if ( li && li.data )
+				{
+					var parentGuid:String = li.data;
+				}
+			}
+			else
+				noModelSelected();
+		}
+		//////////////////////////////////////////////////////////
+		///////////////////////////// END ANIMATOINS
+		//////////////////////////////////////////////////////////
 		
 		private function removeChildModels():void
 		{
-			for each ( var vm:VoxelModel in _listbox2 )
+			for each ( var vm:VoxelModel in _listChildModels )
 			{
 				vm.selected = false;
 			}
-			_listbox2.removeAll();
+			_listChildModels.removeAll();
+		}
+		
+		private function removeAnimations():void
+		{
+			_listAnimations.removeAll();
 		}
 		
 		private function populateParentModels():void
 		{
-			_listbox1.removeAll();
+			_listParents.removeAll();
 			removeChildModels();
 			var models:Dictionary = Globals.modelInstancesGetDictionary();
 			for each ( var vm:VoxelModel in models )
@@ -336,7 +416,7 @@ package com.voxelengine.GUI
 					if ( vm is Player )
 						continue;
 					//if ( "Default_Name" != vm.instanceInfo.name )
-						_listbox1.addItem( vm.instanceInfo.name, vm );
+						_listParents.addItem( vm.instanceInfo.name, vm );
 					//else
 					//	_listbox1.addItem( vm.instanceInfo.guid, vm );
 				}
@@ -351,9 +431,19 @@ package com.voxelengine.GUI
 			for each ( var vm:VoxelModel in models )
 			{
 				if ( "Default Name" != vm.instanceInfo.name )
-					_listbox2.addItem( vm.instanceInfo.name + " - " + vm.instanceInfo.guid, vm );
+					_listChildModels.addItem( vm.instanceInfo.name + " - " + vm.instanceInfo.guid, vm );
 				else	
-					_listbox2.addItem( vm.instanceInfo.guid, vm );
+					_listChildModels.addItem( vm.instanceInfo.guid, vm );
+			}
+		}
+
+		private function populateAnimations( $vm:VoxelModel ):void
+		{
+			removeAnimations();
+			var anims:Vector.<Animation> = $vm.modelInfo.animations;
+			for each ( var anim:Animation in anims )
+			{
+				_listAnimations.addItem( anim.name + " - " + anim.guid, anim.guid );
 			}
 		}
 		
@@ -364,6 +454,7 @@ package com.voxelengine.GUI
 			if ( selectedModel )
 			{
 				populateChildModels( selectedModel );
+				populateAnimations( selectedModel );
 			}
 		}
 		
@@ -386,9 +477,9 @@ package com.voxelengine.GUI
 		
 		private function test(event:UIMouseEvent):void 
 		{
-			if ( -1 < _listbox1.selectedIndex )
+			if ( -1 < _listParents.selectedIndex )
 			{
-				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
 				if ( li && li.data )
 				{
 					Globals.selectedModel = li.data;
@@ -408,14 +499,15 @@ package com.voxelengine.GUI
 		public function onAnimationFileSelected(e:Event):void
 		{
 			// Globals.GUIControl = true;
-			if ( -1 < _listbox1.selectedIndex )
+			if ( -1 < _listParents.selectedIndex )
 			{
-				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
 				if ( li && li.data )
 				{
 					var animName:String = _fileReference.name.substr( 0, _fileReference.name.length - _fileReference.type.length );
-					var na:Animation = new Animation( animName, li.data );
-					na.loadForImport();
+					// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
+					var na:Animation = new Animation();
+					na.loadForImport( _fileReference.name );
 					Globals.g_app.addEventListener( LoadingEvent.ANIMATION_LOAD_COMPLETE, animationLoaded );
 					//Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildModelCreated );
 				}

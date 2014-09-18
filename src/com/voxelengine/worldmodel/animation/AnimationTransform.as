@@ -95,6 +95,34 @@ package com.voxelengine.worldmodel.animation
 			}
 		}
 		
+		public function getJSON( $outString:String ):String {
+
+			$outString += "{";
+			$outString += "\"attachmentName\": "
+			$outString += _attachmentName;
+			$outString += ","
+			$outString += position.toString();
+			$outString += ","
+			$outString += rotation.toString();
+			$outString += ","
+			$outString += scale.toString();
+			$outString += ","
+			$outString += "\"transforms\": ["
+
+			var len:int = _transforms.length;
+			for ( var index:int; index < len; index++ ) {
+				$outString += _transforms[index].toString();
+				if ( index == len - 1 )
+					continue;
+				$outString += ",";
+			}
+			$outString += "]"
+
+			$outString += "}";
+			return $outString;
+		}
+
+		
 		public function clone( $val:Number = 1 ):AnimationTransform
 		{
 			new Error( "AnimationTransform.clone - NOT VALIDATED" );

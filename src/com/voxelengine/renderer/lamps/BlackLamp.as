@@ -6,7 +6,7 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
-package com.voxelengine.renderer {
+package com.voxelengine.renderer.lamps {
 
 import flash.geom.Vector3D;
 	

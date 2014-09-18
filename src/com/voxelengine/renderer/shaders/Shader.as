@@ -8,7 +8,7 @@
 
 package com.voxelengine.renderer.shaders 
 {
-	import com.voxelengine.renderer.ShaderLight;
+	import com.voxelengine.renderer.lamps.ShaderLight;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import flash.display3D.textures.Texture;
 

@@ -8,10 +8,12 @@
 package com.voxelengine.worldmodel.animation
 {
 	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.server.Network;
 	import com.voxelengine.server.PersistAnimation;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
+	import flash.utils.ByteArray;
 	import flash.utils.Dictionary;
 	import playerio.DatabaseObject;
 	
@@ -30,43 +32,59 @@ package com.voxelengine.worldmodel.animation
 	 */
 	public class Animation
 	{
+		static private const BLANK_ANIMATION_TEMPLATE:Object = { "animation":[] };
+		
 		private var _loaded:Boolean = false;
-		private var _transforms:Vector.<AnimationTransform> = new Vector.<AnimationTransform>;
-		private var _attachments:Vector.<AnimationAttachment> = new Vector.<AnimationAttachment>;
-		private var _loader:CustomURLLoader;
+		private var _transforms:Vector.<AnimationTransform>;
+		private var _attachments:Vector.<AnimationAttachment>;
+		private var _sound:AnimationSound;
 		
 		public var guid:String;
-		public var owner:String;
+		public var ownerGuid:String;
 		public var databaseObject:DatabaseObject;
 		public var name:String;
 		public var desc:String;
 		public var world:String;
-		public var model:String;
-		public var created:String;
-		public var modified:String;
+		//public var model:String;
+		public var created:Date;
+		public var modified:Date;
 
-		private var _sound:AnimationSound = null;
-		
 		public function get transforms():Vector.<AnimationTransform> { return _transforms; }
 		public function get loaded():Boolean { return _loaded; }
 		
-		public function Animation( $animationName:Object, $owner:String ) 
-		{ 
-			owner = $owner;
-			if ( $animationName.name )
+		public function Animation() { ; }
+		
+		public function createBlank():void {
+			initJSON( BLANK_ANIMATION_TEMPLATE );
+		}
+		
+		// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
+		public function loadFromLocalFile( $animData:Object, $ownerGuid:String ):void {
+			  
+			ownerGuid = $ownerGuid;
+			if ( $animData.name )
 			{
-				name = $animationName.name;
+				name = $animData.name;
 			}
 			else
-				Log.out( "Animation - No animation name", Log.ERROR );	
+				Log.out( "Animation.loadFromLocalFile - No animation name", Log.ERROR );	
+				
+			if ( $animData.guid )
+			{
+				guid = $animData.guid;
+			}
+			else
+				Log.out( "Animation.loadFromLocalFile - No animation guid", Log.ERROR );	
+				
+			load( name, onLoadedAction );
 		}
 		
-		public function loadFromLocalFile():void {
-				load( name, onLoadedAction );
+		public function loadForImport( $nameAndLoc:String ):void {
+			load( $nameAndLoc, onLoadForImport );
 		}
 		
-		public function loadForImport():void {
-				load( name, onLoadForImport );
+		public function loadFromPersistance():void {
+			PersistAnimation.loadAnims( Network.userId );
 		}
 		
 		public function initJSON( $json:Object ):void 
@@ -79,6 +97,7 @@ package com.voxelengine.worldmodel.animation
 			}
 			if ( $json.attachment )
 			{
+				_attachments = new Vector.<AnimationAttachment>;
 				for each ( var attachmentJson:Object in $json.attachment )
 				{
 					_attachments.push( new AnimationAttachment( attachmentJson ) );				
@@ -86,6 +105,7 @@ package com.voxelengine.worldmodel.animation
 			}
 			if ( $json.animation )
 			{
+				_transforms = new Vector.<AnimationTransform>;
 				for each ( var transformJson:Object in $json.animation )
 				{
 					_transforms.push( new AnimationTransform( transformJson ) );				
@@ -95,13 +115,124 @@ package com.voxelengine.worldmodel.animation
 			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.ANIMATION_LOAD_COMPLETE, name ) );
 		}
 		
+		/*
+		public function getModelJson( outString:String ):String {
+			var count:int = 0;
+			//for each ( var vm:VoxelModel in _modelInstances )
+			//	count++;
+			var instanceData:Vector.<String> = new Vector.<String>;
+				
+			for each ( var instance:VoxelModel in _modelInstances )
+			{
+				if ( instance  )
+				{
+					if ( instance is Player )
+						continue;
+					instanceData.push( instance.getJSON() );	
+				}
+			}
+			
+			var len:int = instanceData.length;
+			for ( var index:int; index < len; index++ ) {
+				outString += instanceData[index];
+				if ( index == len - 1 )
+					continue;
+				outString += ",";
+			}
+			return outString;
+		}
+		*/
+	
+		private function getJSON():String
+		{
+			var jsonString:String = "{";
+			if ( _sound )
+				_sound.getJSON( jsonString );
+			//if ( _attachments ) {
+				//if ( _sound )
+					//jsonString += ","
+				//jsonString += "\"attachment\":[";
+				//jsonString += attachmentsToJSON();
+				//jsonString += "]"
+			//}
+			//if ( _transforms )
+				//if ( _sound || _attachments )
+					//jsonString += ","
+				//jsonString += "\"animation\":[";
+				//jsonString += animationsToJSON();
+				//jsonString += "]"
+
+			jsonString += "}";
+			return jsonString;
+		}
+		/*
+		private function animationsToJSON( $outString:String ):String {
+			var count:int = 0;
+			var animations:Vector.<String> = new Vector.<String>;
+				
+			for each ( var at:AnimationTransform in _transforms ) {
+				if ( at )
+					animations.push( at.getJSON() );	
+			}
+			
+			var len:int = animations.length;
+			for ( var index:int; index < len; index++ ) {
+				outString += animations[index];
+				if ( index == len - 1 )
+					continue;
+				outString += ",";
+			}
+			return outString;
+		}
+		
+		private function attachmentsToJSON( $outString:String ):String {
+			var count:int = 0;
+			var attachments:Vector.<String> = new Vector.<String>;
+				
+			for each ( var aa:AnimationAttachment in _attachments ) {
+				if ( aa  )
+					attachments.push( aa.getJSON() );	
+			}
+			
+			var len:int = attachments.length;
+			for ( var index:int; index < len; index++ ) {
+				outString += attachments[index];
+				if ( index == len - 1 )
+					continue;
+				outString += ",";
+			}
+			return outString;
+		}
+	/*		
+			
+			
+			
+			var outString:String = "{\"region\":[";
+			outString = _modelManager.getModelJson(outString);
+			outString += "],"
+			// if you dont do it this way, there is a null at begining of string
+			outString += "\"skyColor\": {" + "\"r\":" + _skyColor.x  + ",\"g\":" + _skyColor.y + ",\"b\":" + _skyColor.z + "}";
+			outString += ","
+			outString += "\"gravity\":" + JSON.stringify(gravity);
+			outString += "}"
+			return outString;
+		}
+		*/
+/*
+		public function toJSON(k:*):* {
+			return {
+				sound: _sound.toJSON(k),
+				animation: _attachments.toJSON(k)
+			}
+		}
+*/
 		public function play( $owner:VoxelModel, $val:Number ):void
 		{
 			//Log.out( "Animation.play - name: " + _name );
 			if ( _sound )
 				_sound.play( $owner, $val );
 				
-			if ( 0 < _attachments.length )
+			if ( _attachments && 0 < _attachments.length )
 			{
 				for each ( var aa:AnimationAttachment in _attachments )
 				{
@@ -119,7 +250,7 @@ package com.voxelengine.worldmodel.animation
 			if ( _sound )
 				_sound.stop();
 				
-			if ( 0 < _attachments.length )
+			if ( _attachments && 0 < _attachments.length )
 			{
 				for each ( var aa:AnimationAttachment in _attachments )
 				{
@@ -142,36 +273,30 @@ package com.voxelengine.worldmodel.animation
 		private function load( $fileName:String, $successAction:Function ):void
 		{
 			var fileName:String = $fileName + ANIMATION_FILE_EXT
-			var aniNameAndLoc:String = Globals.modelPath + owner + "/" + fileName;
+			var aniNameAndLoc:String = Globals.modelPath + ownerGuid + "/" + fileName;
 			//Log.out( "Animation.load - loading: " + aniNameAndLoc );
 			var request:URLRequest = new URLRequest( aniNameAndLoc );
-			_loader = new CustomURLLoader(request);
-			_loader.addEventListener(Event.COMPLETE, $successAction );
-			_loader.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorAction);
+			var loader:CustomURLLoader = new CustomURLLoader(request);
+			loader.addEventListener(Event.COMPLETE, $successAction );
+			loader.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorAction);
 		}
 		
 		private function onLoadErrorAction(event:IOErrorEvent):void
 		{
-			_loader.reportIOError( event, "Animation.onLoadErrorAction: ERROR LOADING ANIMATION: " );
+			Log.out( "Animation.onLoadErrorAction: ERROR LOADING ANIMATION: ", Log.WARN );
 		}	
 			
 		private function onLoadForImport(event:Event):void
 		{
-			_loaded = true;
-			Log.out( "Animation.onLoadForImport - LOADED: " + name );
-			try 
-			{
-				var jsonString:String = StringUtil.trim( String(event.target.data) );
-				var jsonResult:Object = JSON.parse(jsonString);
-			}
-			catch ( error:Error )
-			{
-				_loader.reportError( event, "Animation.onLoadForImport - ERROR PARSING: " );
-			}
-			
-			initJSON( jsonResult );
+			onLoadedAction( event );
+			save();
 		}
 
+		private function onLoadFromPersistance():void
+		{
+			Log.out( "Animation.onLoadFromPersistance - NOT SUPPOERTED YET", Log.ERROR );
+		}
+		
 		private function onLoadedAction(event:Event):void
 		{
 			_loaded = true;
@@ -183,24 +308,46 @@ package com.voxelengine.worldmodel.animation
 			}
 			catch ( error:Error )
 			{
-				_loader.reportError( event, "Animation.onLoadedAction - ERROR PARSING: " );
+				Log.out( "Animation.onLoadedAction - ERROR PARSING: " );
 			}
 			
 			initJSON( jsonResult );
 		}
 		
 		public function save():void {
-			PersistAnimation.saveAnim( metadata(), databaseObject, createSuccess );
+			var ba:ByteArray = new ByteArray;
+			writeToByteArray( ba );
+			PersistAnimation.saveAnim( metadata( ba ), databaseObject, createSuccess );
 			
-			function metadata():String {
-				var md:String = "";
-				return md;
-			}
-			function createSuccess(o:DatabaseObject):void 
-			{ 
-				if ( o )
-					databaseObject = o;
-			}
 		}
+		private	function writeToByteArray( $ba:ByteArray ):void {
+				var rawJSON:String = getJSON();
+				var animJson:String = JSON.stringify( rawJSON );
+				$ba.writeInt( animJson.length );
+				$ba.writeUTFBytes( animJson );
+				$ba.compress();
+			}
+			
+		private	function metadata( $ba: ByteArray ):Object {
+				Log.out( "Animation.metadata userId: " + Network.userId );
+				return {
+						created: created ? created : new Date(),
+						data: $ba,
+						description: desc,
+						guid: guid,
+						modified: modified,
+						name: name,
+						owner:  ownerGuid,
+						world: world
+						};
+			}
+			
+		private	function createSuccess(o:DatabaseObject):void 
+			{ 
+				if ( o ) {
+					databaseObject = o;
+					guid = o.key;
+				}
+			}
 	}
 }

@@ -1,15 +1,11 @@
 ﻿package com.voxelengine.worldmodel.models
 {
 	import com.voxelengine.events.GUIEvent;
-	import com.voxelengine.renderer.BlackLamp;
-	import com.voxelengine.renderer.Lamp;
-	import com.voxelengine.renderer.LampBright;
-	import com.voxelengine.renderer.Torch;
-	import com.voxelengine.renderer.RainbowLight;
+	import com.voxelengine.renderer.lamps.*;
 	import com.voxelengine.worldmodel.weapons.Gun;
 	import com.voxelengine.worldmodel.weapons.Bomb;
 	
-	import com.voxelengine.renderer.ShaderLight;
+	import com.voxelengine.renderer.lamps.ShaderLight;
 	import com.voxelengine.renderer.shaders.Shader;
 	import com.voxelengine.worldmodel.models.*;
 	import com.voxelengine.worldmodel.MouseKeyboardHandler;

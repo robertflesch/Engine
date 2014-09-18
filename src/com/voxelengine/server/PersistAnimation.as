@@ -1,6 +1,7 @@
 ﻿package com.voxelengine.server 
 {
 	import com.voxelengine.events.AnimationLoadedEvent;
+	import com.voxelengine.events.AnimationMetadataEvent;
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.worldmodel.animation.Animation;
 	import flash.utils.ByteArray;
@@ -17,7 +18,26 @@
 	{
 		static public const DB_TABLE_ANIMATIONS:String = "animations";
 		
+		static public function addEvents():void {
+			Globals.g_app.addEventListener( AnimationMetadataEvent.ANIMATION_INFO_COLLECTED, animationCreate ); 
+		}
 
+		static public function animationCreate( e:AnimationMetadataEvent):void {
+			var anim:Animation = new Animation();
+			anim.createBlank();
+			anim.guid = e.guid;
+			anim.desc = e.description;
+			anim.name =  e.name;
+			anim.ownerGuid =  e.owner;
+			anim.world = "VoxelVerse";
+			//anim.databaseObject = dbo;
+			//anim.model = dbo.model;  // Parent model - OWNER?
+			anim.created = new Date();
+			anim.modified = new Date();
+			anim.save();
+		}
+
+		
 		static public function loadAnims( $userName:String ):void {
 			
 			loadRange( PersistAnimation.DB_TABLE_ANIMATIONS
@@ -41,15 +61,16 @@
 		
 		static private function loadAnimFromDBO( dbo:DatabaseObject ):void
 		{
-			var anim:Animation = new Animation( dbo.name, dbo.owner );
+			var anim:Animation = new Animation();
 //			anim.admin = cvsToVector( dbo.admin );
 //			anim.editors = cvsToVector( dbo.editors );
+			anim.guid = dbo.key;
 			anim.databaseObject = dbo;
 			anim.desc = dbo.description;
-			//anim.name = ;
-			//anim.owner = 
+			anim.name =  dbo.name;
+			anim.ownerGuid =  dbo.owner;
 			anim.world = dbo.world;
-			anim.model = dbo.model;  // Parent model
+			//anim.model = dbo.model;  // Parent model
 			anim.created = dbo.created;
 			anim.modified = dbo.modified;
 			var $ba:ByteArray = dbo.data as ByteArray;

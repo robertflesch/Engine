@@ -24,7 +24,6 @@ package com.voxelengine.GUI
 			super( "Model Choice" );
 			_modalObj = new ModalObject( this );
 
-			name = "Voxel Models";
 			autoSize = true;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			
