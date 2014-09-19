@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			super.start() // AbstractTask will send event
 			var timer:int = getTimer();
 			
-			var vm:VoxelModel = Globals.getModelInstance( _guid );
+			var vm:VoxelModel = getVoxelModel();
 			var ba:ByteArray = Globals.findIVM( _layer.data );
 			if ( vm && ba )		
 			{

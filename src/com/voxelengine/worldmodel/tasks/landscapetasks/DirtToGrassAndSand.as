@@ -33,7 +33,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var timer:int = getTimer();
 			Log.out( "DirtToGrassAndSand.start - enter: ");					
 			
-			var vm:VoxelModel = Globals.getModelInstance( _guid );
+			var vm:VoxelModel = getVoxelModel();
 			if ( vm )
 			{
 				vm.oxel.dirtToGrassAndSand();

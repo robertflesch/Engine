@@ -16,6 +16,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.Log;
+	import com.voxelengine.Globals;
 	
 	/**
 	 * ...
@@ -37,5 +38,23 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			
 			super(taskType, taskPriority);
 		}
+		
+		protected function getVoxelModel():VoxelModel {
+
+			var vm:VoxelModel;
+			var topMostParentGuid:String = _layer.optionalString;
+			if ( "" != topMostParentGuid ) {
+				vm = Globals.getModelInstance( topMostParentGuid );
+				if ( vm )
+					vm = vm.childModelFind( _guid );
+				else 	
+					Log.out( "LandscapeTask.getVoxelModel - FAILED voxel model for parent guid " + topMostParentGuid + "  data: " + _layer.data , Log.ERROR );
+			}
+			else
+				vm = Globals.getModelInstance( _guid );
+			
+			return vm;	
+		}
+		
 	}
 }

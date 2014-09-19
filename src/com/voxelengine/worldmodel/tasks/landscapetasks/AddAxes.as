@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			//////////////////////////////////////////////////////////
 			// Builds Solid Cube of any grain size
 			//////////////////////////////////////////////////////////
-			var vm:VoxelModel = Globals.getModelInstance( _guid );
+			var vm:VoxelModel = getVoxelModel();
 			var max:uint  = 1 << vm.instanceInfo.grainSize;
 			
 			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
@@ -66,7 +66,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		private function GeneratePlusX( xo:int, yo:int, zo:int ):void
         {
-			var vm:VoxelModel = Globals.getModelInstance( _guid );
+			var vm:VoxelModel = getVoxelModel();
 			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
 			
 			vm.write( loco.set_values(xo, 0, 0, 0 ), Globals.RED, true );
@@ -114,7 +114,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		private function GeneratePlusY( xo:int, yo:int, zo:int ):void
         {
-			var vm:VoxelModel = Globals.getModelInstance( _guid );
+			var vm:VoxelModel = getVoxelModel();
 			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
 
             vm.write( loco.set_values(xo + 0, yo, zo - 0, 0 ), Globals.GREEN, true );
@@ -142,7 +142,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		private function GeneratePlusZ( xo:int, yo:int, zo:int ):void
         {
-			var vm:VoxelModel = Globals.getModelInstance( _guid );
+			var vm:VoxelModel = getVoxelModel();
 			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
 
             vm.write( loco.set_values(xo + 7, yo - 0, zo, 0 ), Globals.BLUE, true );

@@ -50,7 +50,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		override public function start():void {
             super.start() // AbstractTask will send event
 			var timer:int = getTimer();
-            var vm:VoxelModel = Globals.getModelInstance( _guid );
+            var vm:VoxelModel = getVoxelModel();
 			if ( !vm ) {
 				super.complete() // AbstractTask will send event
 				return;

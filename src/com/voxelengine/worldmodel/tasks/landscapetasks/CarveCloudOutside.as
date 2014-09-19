@@ -32,7 +32,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			super.start();
 			var timer:int = getTimer();
 			trace( "CarveCloudOutside  - enter " );					
-			var vm:VoxelModel = Globals.getModelInstance( _guid );
+			var vm:VoxelModel = getVoxelModel();
 
 			var masterHeightMap:Array = null;
 			var masterMapSize:uint = 0;

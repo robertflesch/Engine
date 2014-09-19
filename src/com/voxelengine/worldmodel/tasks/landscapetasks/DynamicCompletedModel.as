@@ -35,7 +35,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 			try
 			{
-				var vm:VoxelModel = Globals.getModelInstance( _guid );
+				var vm:VoxelModel = getVoxelModel();
 				if ( vm )
 				{
  					vm.complete = true;

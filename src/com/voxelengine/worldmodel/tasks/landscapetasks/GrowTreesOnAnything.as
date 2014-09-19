@@ -33,7 +33,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var timer:int = getTimer();
 
 			Log.out( "GrowTreesOnAnything.start - enter: ");
-			var vm:VoxelModel = Globals.getModelInstance( _guid );
+			var vm:VoxelModel = getVoxelModel();
 			if ( vm )
 			{
 				var outOf:int = _layer.range;
