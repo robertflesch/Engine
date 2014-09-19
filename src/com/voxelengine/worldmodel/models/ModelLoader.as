@@ -61,56 +61,56 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		static public function load( $ii:InstanceInfo ):void {
-			Globals.instanceInfoAdd( $ii );
+			Globals.instanceInfoAdd( $ii ); // Uses a name + guid as identifier
 			if ( !Globals.isGuid( $ii.guid ) && $ii.guid != "LoadModelFromBigDB" )
 				loadLocal( $ii )
 			else
 				loadPersistant( $ii );
 		}
 		
-		static private function addBlock( $guid:String, fileName:String ):void {
+		static private function addBlock( $guid:String, $name:String ):void {
 			//Log.out( "ModelLoader.addBlock - instanceGIUD: " + $guid + "  fileName: " + fileName );
-			if ( _blocks[fileName] )
+			if ( _blocks[$guid] )
 			{
-				var block:Vector.<String> = _blocks[fileName];
+				var block:Vector.<String> = _blocks[$guid];
 				// check to make sure its not in more then once
-				for each ( var guid:String in block )
+				for each ( var name:String in block )
 				{
-					if ( guid == $guid )
+					if ( name == $name )
 						return;
 				}
-				block.push( $guid );
+				block.push( $name );
 			}
 			else
 			{
 				var newBlock:Vector.<String> = new Vector.<String>;
-				newBlock.push( $guid );
-				_blocks[fileName] = newBlock;
+				newBlock.push( $name );
+				_blocks[$guid] = newBlock;
 			}
 		}
 		
-		static private function clearBlock( $fileName:String, $error:Boolean = false ):void {
-			//Log.out( "ModelLoader.clearBlock " + $fileName  );
-			if ( _blocks[$fileName] )
+		static private function clearBlock( $guid:String, $error:Boolean = false ):void {
+			//Log.out( "ModelLoader.clearBlock " + $guid  );
+			if ( _blocks[$guid] )
 			{
-				var block:Vector.<String> = _blocks[$fileName];
+				var block:Vector.<String> = _blocks[$guid];
 				if ( !$error )
 				{
 					var instanceInfo:InstanceInfo = null;
-					for each ( var guid:String in block )
+					for each ( var name:String in block )
 					{
-						instanceInfo = Globals.instanceInfoGet( guid );
+						instanceInfo = Globals.instanceInfoGet( name + $guid );
 						//Log.out( "CLEAR BLOCK " + instanceInfo.toString() + " for guid: " + guid  );
 						if ( instanceInfo )
 						{
 							//Log.out( "CLEAR BLOCK " + instanceInfo.toString()  );
-							instantiate( instanceInfo, Globals.modelInfoGet($fileName) );
+							instantiate( instanceInfo, Globals.modelInfoGet($guid) );
 						}
 					}
 				}
-				// TODO This should create a new _blocks that doesnt include the $fileName, rather then it being null
+				// TODO This should create a new _blocks that doesnt include the $guid, rather then it being null
 				// but whats the saving vs creating new memory...
-				_blocks[$fileName] = null;
+				_blocks[$guid] = null;
 			}
 		}
 		
@@ -179,6 +179,7 @@ package com.voxelengine.worldmodel.models
 				
 				// add the modelInfo to the repo
 				Globals.modelInfoAdd( mi );
+				// needs to be name + guid??
 				var ii:InstanceInfo = Globals.instanceInfoGet( $guid );
 				if ( !ii ) {
 					ii = new InstanceInfo();
@@ -211,17 +212,17 @@ package com.voxelengine.worldmodel.models
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		static private function loadLocal( $ii:InstanceInfo ):void {
 			Log.out( "ModelLoader.loadLocal - InstanceInfo: " + $ii.toString() );
-			var modelInfo:ModelInfo = modelInfoFindOrCreate( $ii.guid, $ii.guid );
+			var modelInfo:ModelInfo = modelInfoFindOrCreate( $ii.guid, $ii.name );
 			if ( modelInfo )
 			{
 				instantiate( $ii, modelInfo );
 			}		
 		}
 		
-		static public function modelInfoFindOrCreate( $fileName:String, $guid:String, $block:Boolean = true ):ModelInfo {
-			var modelInfo:ModelInfo = Globals.modelInfoGet( $fileName );
+		static public function modelInfoFindOrCreate( $guid:String, $name:String, $block:Boolean = true ):ModelInfo {
+			var modelInfo:ModelInfo = Globals.modelInfoGet( $name );
 			
-			if ( null == $fileName )
+			if ( null == $name )
 			{
 				Log.out( "ModelLoader.modelInfoFindOrCreate - ERROR fileName is NULL", Log.ERROR );
 			}
@@ -230,16 +231,16 @@ package com.voxelengine.worldmodel.models
 			if ( !modelInfo )
 			{
 				// if we are already waiting for a copy to load, then add a $block if shouldBlock is true, else add a loader.
-				if ( !_blocks[$fileName] )
+				if ( !_blocks[$name] )
 				{
 					//Log.out( "ModelLoader.modelInfoFindOrCreate - loading: " + Globals.appPath + modelNameAndLoc );
-					var loader:CustomURLLoader = new CustomURLLoader( new URLRequest( Globals.modelPath + $fileName + MODEL_MANAGER_MODEL_EXT ) );
+					var loader:CustomURLLoader = new CustomURLLoader( new URLRequest( Globals.modelPath + $guid + MODEL_MANAGER_MODEL_EXT ) );
 					loader.addEventListener(Event.COMPLETE, onModelInfoLoaded);
 					loader.addEventListener(IOErrorEvent.IO_ERROR, onModelInfoLoadError);
 				}
 				// If we want to preload the modelInfo, we dont need to block on it
 				if ( $block )
-					addBlock( $guid, $fileName );
+					addBlock( $guid, $name );
 			}
 			
 			return modelInfo;
@@ -247,7 +248,8 @@ package com.voxelengine.worldmodel.models
 			function onModelInfoLoadError(event:IOErrorEvent):void {
 				var req:URLRequest = CustomURLLoader(event.target).request;			
 				var fileName:String = CustomURLLoader(event.target).fileName;			
-				clearBlock( fileName );
+				var guid:String = fileName.substr( 0, fileName.lastIndexOf( "." ) );
+				clearBlock( guid );
 				Log.out("----------------------------------------------------------------------------------" );
 				Log.out("ModelLoader.onModelInfoLoadError: ERROR LOADING MODEL: " + event.text, Log.ERROR );
 				Log.out("----------------------------------------------------------------------------------" );
@@ -270,15 +272,15 @@ package com.voxelengine.worldmodel.models
 					return;
 				}
 				var mi:ModelInfo = new ModelInfo();
-				var fileNameNoExt:String = fileName.substr( 0, fileName.lastIndexOf( "." ) );
+				var guid:String = fileName.substr( 0, fileName.lastIndexOf( "." ) );
 				
-				mi.initJSON( fileNameNoExt, jsonResult );
+				mi.initJSON( guid, jsonResult );
 				Globals.modelInfoAdd( mi );
 				
 				//Log.out("ModelLoader.onModelInfoLoaded - loaded model $guid: " + mi.guid + MODEL_MANAGER_MODEL_EXT );
 
-				clearBlock( fileNameNoExt );
-				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.INFO_LOADED, fileNameNoExt ) );
+				clearBlock( guid );
+				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.INFO_LOADED, guid ) );
 			}       
 			
 		}
