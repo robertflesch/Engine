@@ -69,8 +69,12 @@
 			if ( me.parentInstanceGuid != instanceInfo.guid )
 				return;
 				
-			var vm:VoxelModel = Globals.getModelInstance( me.instanceGuid );
-Log.out( "Player.onChildAdded model: " + vm.toString() );
+			var vm:VoxelModel = childModelFind( me.instanceGuid );	
+			if ( !vm ) {
+				Log.out( "Player.onChildAdded ERROR FIND CHILD MODEL: " + me.instanceGuid );
+			}
+			//var vm:VoxelModel = Globals.getModelInstance( me.instanceGuid );
+//Log.out( "Player.onChildAdded model: " + vm.toString() );
 			if ( vm is Engine )
 Log.out( "Player.onChildAdded - Player has ENGINE" )
 				//_engines.push( vm );
