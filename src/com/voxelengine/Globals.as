@@ -340,8 +340,8 @@ package com.voxelengine {
 			return g_regionManager.currentRegion.modelManager.modelInfoAdd( $modelInfo )
 		}
 		
-		public static function instanceInfoGet( $name:String ):InstanceInfo {
-			return g_regionManager.currentRegion.modelManager.instanceInfoGet( $name )
+		public static function instanceInfoGet( $nameGuid:String ):InstanceInfo {
+			return g_regionManager.currentRegion.modelManager.instanceInfoGet( $nameGuid )
 		}
 		
 		public static function changeFromParentToChild( $vm:VoxelModel ):void {
