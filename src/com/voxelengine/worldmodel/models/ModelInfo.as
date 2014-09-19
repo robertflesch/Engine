@@ -260,7 +260,7 @@ package com.voxelengine.worldmodel.models
 			{
 				//Log.out( "ModelInfo.init - animations found" );
 				var animationsObj:Object = json.animations;
-				// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
+				// i.e. animData = { "name": "Glide", "type": "state OR action", "guid":"Glide.ajson" }
 				for each ( var animData:Object in animationsObj )		   
 				{
 					var animation:Animation = new Animation();
