@@ -187,6 +187,12 @@ package com.voxelengine.worldmodel.models
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		}
 		
+		public function topmostGuid():String {
+			if ( _controllingModel )
+				return _controllingModel.instanceInfo.topmostGuid();
+			return guid;	
+		}
+		
 		public function initJSON( json:Object ):void {
 			// Save off a copy of this in case we need multiple instances
 			_creationJSON = json;
