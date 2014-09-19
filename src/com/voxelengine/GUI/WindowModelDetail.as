@@ -206,7 +206,13 @@ package com.voxelengine.GUI
            //_panelAdvanced.layout.autoSizeAnimated = true;
 			_panelAdvanced.addElement( label );
 			
-			var vm:VoxelModel = Globals.getModelInstance( _ii.guid )
+			var parentModel:VoxelModel = _ii.controllingModel;
+			var vm:VoxelModel;
+			if ( parentModel )
+				vm = parentModel.childModelFind( _ii.guid );
+			else	
+				vm = Globals.getModelInstance( _ii.guid );
+				
 							addLabel( _panelAdvanced, "State:", changeStateHandler, vm.anim ? vm.anim.name : "" );
 							addLabel( _panelAdvanced, "Name:", changeNameHandler, _ii.name );
 			//_GrainSize = 	addLabel( _panelAdvanced, "GrainSize:", null, _vm.oxel.gc.grain.toString() );

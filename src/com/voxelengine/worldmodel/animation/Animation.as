@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.animation
 {
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.server.Network;
+	import com.voxelengine.server.Persistance;
 	import com.voxelengine.server.PersistAnimation;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -32,15 +33,27 @@ package com.voxelengine.worldmodel.animation
 	 */
 	public class Animation
 	{
+		// This should be a list so that it can be added to easily, this is hard coded.
+		static public const MODEL_BIPEDAL_10:String = "MODEL_BIPEDAL_10";
+		static public const MODEL_DRAGON_9:String =  "MODEL_DRAGON_9";
+		static public const MODEL_PROPELLER:String =  "MODEL_PROPELLER";
+		
 		static private const BLANK_ANIMATION_TEMPLATE:Object = { "animation":[] };
+
+		static private const ANIMATION_STATE:String = "ANIMATION_STATE";
+		static private const ANIMATION_ACTION:String = "ANIMATION_ACTION";
 		
 		private var _loaded:Boolean = false;
 		private var _transforms:Vector.<AnimationTransform>;
 		private var _attachments:Vector.<AnimationAttachment>;
 		private var _sound:AnimationSound;
-		
-		public var guid:String;
+		private var _type:String;
+		// For loading local files only
 		public var ownerGuid:String;
+
+		/// META DATA for DB
+		public var guid:String; // File name if used locally, GUID from DB
+		public var model:String = MODEL_BIPEDAL_10;  // What class of models does this apply do BIPEDAL_10, DRAGON_9, PROPELLER
 		public var databaseObject:DatabaseObject;
 		public var name:String;
 		public var desc:String;
@@ -76,6 +89,13 @@ package com.voxelengine.worldmodel.animation
 			else
 				Log.out( "Animation.loadFromLocalFile - No animation guid", Log.ERROR );	
 				
+			if ( $animData.type )
+			{
+				_type = ( "action" == $animData.type ? ANIMATION_ACTION : ANIMATION_STATE );
+			}
+			else
+				_type = ANIMATION_STATE;
+
 			load( name, onLoadedAction );
 		}
 		
@@ -324,6 +344,11 @@ trace( name + " = " + jsonString );
 			writeToByteArray( ba );
 		}
 		
+		public function importAnimation():void {
+			guid = Globals.getUID();
+			save();
+		}
+		
 		public function save():void {
 			var ba:ByteArray = new ByteArray;
 			writeToByteArray( ba );
@@ -343,12 +368,13 @@ trace( name + " = " + jsonString );
 				return {
 						created: created ? created : new Date(),
 						data: $ba,
-						description: desc,
-						guid: guid,
-						modified: modified,
-						name: name,
-						owner:  ownerGuid,
-						world: world
+						description: desc ? desc : "No Description",
+						model: model ? model : "No Description",
+						guid: guid ? guid : Globals.getUID(),
+						modified: modified ? modified : new Date(),
+						name: name ? name : "No name",
+						owner:  Persistance.PUBLIC,
+						world: world ? world : "VoxelVerse"
 						};
 			}
 			

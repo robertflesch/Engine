@@ -113,7 +113,7 @@ package com.voxelengine.GUI
 			addCModel.addEventListener(UIMouseEvent.CLICK, addChildModel );
 			panelChildButton.addElement( addCModel );
 			
-			var deleteCModel:Button = new Button("Delete Child Model");
+			var deleteCModel:Button = new Button("Delete Child Model...");
 			deleteCModel.addEventListener(UIMouseEvent.CLICK, deleteChild );
 			panelChildButton.addElement( deleteCModel );
 			
@@ -124,14 +124,21 @@ package com.voxelengine.GUI
 			panelAnimButton.padding = 0;
 			panelButton.addElement( panelAnimButton );
 			
-			var addAminB:Button = new Button( "Add Anim Model..." );
+			var addAminB:Button = new Button( "Add Animimation..." );
 			addAminB.addEventListener(UIMouseEvent.CLICK, addAnim );
 			panelAnimButton.addElement( addAminB );
 			
-			var deleteAminB:Button = new Button("Delete Anim Model");
+			var deleteAminB:Button = new Button("Delete Animimation...");
 			deleteAminB.addEventListener(UIMouseEvent.CLICK, deleteAnim );
 			panelAnimButton.addElement( deleteAminB );
 			
+			var editAminB:Button = new Button("Edit Animimation...");
+			editAminB.addEventListener(UIMouseEvent.CLICK, editAnim );
+			panelAnimButton.addElement( editAminB );
+			
+			var importAminB:Button = new Button("Import Animimation...");
+			importAminB.addEventListener(UIMouseEvent.CLICK, importAnim );
+			panelAnimButton.addElement( importAminB );
 			
 			display();
 			
@@ -352,40 +359,65 @@ package com.voxelengine.GUI
 		//////////////////////////////////////////////////////////
 		///////////////////////////// END CHILD MODELS
 		//////////////////////////////////////////////////////////
+		private function getItemData( $lb:ListBox ):* {
+			
+			if ( -1 < $lb.selectedIndex )
+			{
+				var li:ListItem = $lb.getItemAt( $lb.selectedIndex );
+				if ( li && li.data )
+				{
+					return li.data;
+				}
+			}
+			else
+				noModelSelected();
+				
+			return null;	
+		}
+		
 		
 		//////////////////////////////////////////////////////////
 		///////////////////////////// Animations
 		//////////////////////////////////////////////////////////
 		private function addAnim(event:UIMouseEvent):void 
 		{
-			// Globals.GUIControl = true;
-			if ( -1 < _listParents.selectedIndex )
-			{
-				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
-				if ( li && li.data )
-				{
-					var parentGuid:String = li.data;
-					new WindowAnimationMetadata( parentGuid );
-				}
-			}
-			else
-				noModelSelected();
+			var anim:Animation = getItemData( _listAnimations ) as Animation;
+			if ( null != anim )
+				new WindowAnimationMetadata( anim.ownerGuid );
 		}
 		
 		private function deleteAnim(event:UIMouseEvent):void 
 		{
-			// Globals.GUIControl = true;
-			if ( -1 < _listParents.selectedIndex )
-			{
-				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
-				if ( li && li.data )
-				{
-					var parentGuid:String = li.data;
-				}
-			}
-			else
-				noModelSelected();
+			var anim:Animation = getItemData( _listAnimations ) as Animation;
+			if ( null != anim )
+				Log.out( "WindowModels.deleteAnim", Log.ERROR );
 		}
+		
+		private function editAnim(event:UIMouseEvent):void 
+		{
+			var anim:Animation = getItemData( _listAnimations ) as Animation;
+			if ( null != anim )
+				Log.out( "WindowModels.editAnim", Log.ERROR );
+		}
+		
+		private function importAnim(event:UIMouseEvent):void 
+		{
+			var anim:Animation = getItemData( _listAnimations ) as Animation;
+			if ( null != anim )
+				anim.importAnimation();
+		}
+		
+		private function populateAnimations( $vm:VoxelModel ):void
+		{
+			removeAnimations();
+			var anims:Vector.<Animation> = $vm.modelInfo.animations;
+			for each ( var anim:Animation in anims )
+			{
+				_listAnimations.addItem( anim.name + " - " + anim.guid, anim );
+			}
+		}
+		
+		
 		//////////////////////////////////////////////////////////
 		///////////////////////////// END ANIMATOINS
 		//////////////////////////////////////////////////////////
@@ -413,12 +445,12 @@ package com.voxelengine.GUI
 			{
 				if ( vm && !vm.instanceInfo.dynamicObject && !vm.instanceInfo.dead )
 				{
-					if ( vm is Player )
-						continue;
-					//if ( "Default_Name" != vm.instanceInfo.name )
-						_listParents.addItem( vm.instanceInfo.name, vm );
-					//else
-					//	_listbox1.addItem( vm.instanceInfo.guid, vm );
+					// if not debug, hide the player
+					if ( !Globals.g_debug ) {
+						if ( vm is Player )
+							continue;
+					}
+					_listParents.addItem( vm.instanceInfo.name, vm );
 				}
 			}
 		}
@@ -437,16 +469,6 @@ package com.voxelengine.GUI
 			}
 		}
 
-		private function populateAnimations( $vm:VoxelModel ):void
-		{
-			removeAnimations();
-			var anims:Vector.<Animation> = $vm.modelInfo.animations;
-			for each ( var anim:Animation in anims )
-			{
-				_listAnimations.addItem( anim.name + " - " + anim.guid, anim.guid );
-			}
-		}
-		
 		private function selectParentModel(event:ListEvent):void 
 		{
 			// Globals.GUIControl = true;

@@ -83,7 +83,7 @@ public class WindowRegionNew extends VVPopup
 
 		_rbPPGroup = new RadioButtonGroup( this );
 		var radioButtonsPP:DataProvider = new DataProvider();
-		radioButtonsPP.addAll( { label:"Public" }, { label:"Private" } );
+		radioButtonsPP.addAll( { label:Globals.MODE_PUBLIC }, { label:Globals.MODE_PRIVATE } );
 		if ( Persistance.PUBLIC == _region.owner )
 			_rbPPGroup.index = 0;
 		else 	
