@@ -788,7 +788,7 @@ package com.voxelengine.worldmodel.models
 		
 		public function childAdd(vm:VoxelModel):void
 		{
-			Log.out(  "-------------- VoxelModel.childAdd - VM: " + vm.toString() );
+			//Log.out(  "-------------- VoxelModel.childAdd - VM: " + vm.toString() );
 			// remove parent level model
 			Globals.changeFromParentToChild(vm);
 			_children.push(vm);
@@ -871,6 +871,14 @@ package com.voxelengine.worldmodel.models
 				if (child.instanceInfo.guid == guid)
 					return child;
 			}
+			// didnt find it at first level, lets look recurvsivly
+			for each ( child in _children)
+			{
+				var cvm:VoxelModel = child.childModelFind( guid );
+				if ( cvm )
+					return cvm;
+			}
+			
 			return null
 			Log.out(  "VoxelModel.childFind - not found for guid: " + guid, Log.WARN );
 		}
@@ -1660,7 +1668,7 @@ Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );
 				return;
 				
 			if ( _modelInfo.childCount > _children.length ) {
-				//Log.out("VoxelModel.stateSet - children not all loaded yet: " + $state );
+				Log.out("VoxelModel.stateSet - children not all loaded yet: " + $state );
 				return; // not all children have loaded yet
 			}
 			
