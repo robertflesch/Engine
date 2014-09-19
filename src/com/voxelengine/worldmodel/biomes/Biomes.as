@@ -62,6 +62,8 @@ package com.voxelengine.worldmodel.biomes
 				// instanceInfo can override type
 				if ( -1 != instanceInfo.type )
 					layer.type = instanceInfo.type;
+				if ( instanceInfo.controllingModel )
+					layer.optionalString = instanceInfo.topmostGuid();
 					
 				task = new layer.task( guid, layer );
 				//Log.out( "Biomes.add_to_task_controller - creating task: " + layer.task );
@@ -76,7 +78,7 @@ package com.voxelengine.worldmodel.biomes
 			if ( instanceInfo.dynamicObject )
 				task = new DynamicCompletedModel( guid, null );
 			else
-				task = new CompletedModel( guid, null );
+				task = new CompletedModel( guid, layer );
 			taskGroup.addTask(task);
 			
 			Globals.g_landscapeTaskController.addTask( taskGroup );

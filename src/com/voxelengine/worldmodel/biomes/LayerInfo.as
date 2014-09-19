@@ -39,6 +39,7 @@ package com.voxelengine.worldmodel.biomes
 		public function get type():int { return _type; }
 		public function set type(val:int):void { _type = val; }
 		public function get optionalString():String { return _optionalString; }
+		public function set optionalString( $val:String ):void  { _optionalString = $val; }
 		public function get optionalInt():int { return _optionalInt; }
 		
 		public function replaceData( val:String ):void { _data = val; }
