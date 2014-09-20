@@ -340,8 +340,12 @@ package com.voxelengine {
 			return g_regionManager.currentRegion.modelManager.modelInfoAdd( $modelInfo )
 		}
 		
-		public static function instanceInfoGet( $nameGuid:String ):InstanceInfo {
-			return g_regionManager.currentRegion.modelManager.instanceInfoGet( $nameGuid )
+		public static function instanceInfoAdd( $val:InstanceInfo ):void {
+			return g_regionManager.currentRegion.modelManager.instanceInfoAdd( $val );
+		};
+
+		public static function instanceInfoGet( $guid:String ):InstanceInfo {
+			return g_regionManager.currentRegion.modelManager.instanceInfoGet( $guid )
 		}
 		
 		public static function changeFromParentToChild( $vm:VoxelModel ):void {
@@ -399,10 +403,6 @@ package com.voxelengine {
 		
 		public static function modelInstancesChangeGuid( $oldGuid:String, $newGuid:String ):void { 
 			return g_regionManager.currentRegion.modelManager.modelInstancesChangeGuid( $oldGuid, $newGuid );
-		};
-		
-			public static function instanceInfoAdd( $val:InstanceInfo ):void {
-			return g_regionManager.currentRegion.modelManager.instanceInfoAdd( $val );
 		};
 	}
 }
