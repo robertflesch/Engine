@@ -292,16 +292,14 @@ package com.voxelengine {
 			_openWindowCount = value; 
 			
 			if ( 0 == _openWindowCount ) {
-				Globals.GUIControl = false;
 				if ( StageDisplayState.FULL_SCREEN_INTERACTIVE == Globals.g_app.stage.displayState )
 					Globals.g_app.stage.mouseLock = true;
 			}
 			else {
-				Globals.GUIControl = true;
 				if ( StageDisplayState.FULL_SCREEN_INTERACTIVE == Globals.g_app.stage.displayState )
 					Globals.g_app.stage.mouseLock = false;
 			}
-//			Log.out( "VoxelVerseGui.openWindowCount - adjust - current count: " + _openWindowCount );
+			Log.out( "VoxelVerseGui.openWindowCount - adjust - current count: " + _openWindowCount );
 		}
 		
 //////////////////////////////////////////////////////////////////////////////////		

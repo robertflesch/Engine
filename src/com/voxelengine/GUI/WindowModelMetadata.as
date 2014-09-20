@@ -99,7 +99,6 @@ public class WindowModelMetadata extends VVPopup
 	
 	protected function onResize(event:Event):void
 	{
-		//Globals.GUIControl = true;
 		move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
 	}
 	

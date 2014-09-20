@@ -89,19 +89,6 @@ package com.voxelengine.GUI
 		
 		private function releaseShape(e:UIMouseEvent):void 
 		{
-//			Globals.GUIControl = false;
 		}			
-		
-		//static public function report(evt:MouseEvent):void
-		//{
-			//if ( "rollOver" == evt.type )
-			//{
-				//Globals.GUIControl = true;
-			//}
-			//else if ( "rollOut" == evt.type )
-			//{
-//				Globals.GUIControl = false;
-			//}
-		//}			
 	}
 }

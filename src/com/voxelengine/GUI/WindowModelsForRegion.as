@@ -5,6 +5,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.worldmodel.animation.Animation;
+	import com.voxelengine.worldmodel.models.Dragon;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.Player;
@@ -25,7 +26,7 @@ package com.voxelengine.GUI
 	
 	import flash.geom.Vector3D;
 
-	public class WindowModels extends VVPopup
+	public class WindowModelsForRegion extends VVPopup
 	{
 		private const PANEL_WIDTH:int = 200;
 		private const PANEL_HEIGHT:int = 300;
@@ -36,7 +37,7 @@ package com.voxelengine.GUI
 		private var _fileReference:FileReference = new FileReference();
 		private var _popup:Popup = null;
 		
-		public function WindowModels()
+		public function WindowModelsForRegion()
 		{
 			super("Voxel Models");
 			autoSize = true;
@@ -80,7 +81,7 @@ package com.voxelengine.GUI
 			parentDetail.width = 150;
 			panelParentButton.addElement( parentDetail );
 			
-			var newModel:Button = new Button("New Model");
+			var newModel:Button = new Button("New Model...");
 			newModel.addEventListener(UIMouseEvent.CLICK, newModelHandler );
 			newModel.width = 150;
 			panelParentButton.addElement( newModel );
@@ -98,10 +99,10 @@ package com.voxelengine.GUI
 				panelParentButton.addElement( oxelUtils );
 //			}
 			
-			var testB:Button = new Button("Test");
-			testB.addEventListener(UIMouseEvent.CLICK, test );
-			testB.width = 150;
-			panelParentButton.addElement( testB );
+			//var testB:Button = new Button("Import Model");
+			//testB.addEventListener(UIMouseEvent.CLICK,  );
+			//testB.width = 150;
+			//panelParentButton.addElement( testB );
 			
 			// CHILD BUTTONS
 			var panelChildButton:Container = new Container( PANEL_WIDTH, PANEL_BUTTON_HEIGHT );
@@ -155,7 +156,6 @@ package com.voxelengine.GUI
 		
 		public function onModelFileSelected(e:Event):void
 		{
-			// Globals.GUIControl = true;
 			var instance:InstanceInfo = new InstanceInfo();
 			instance.guid = _fileReference.name.substr( 0, _fileReference.name.length - _fileReference.type.length )
 			instance.grainSize = 6;
@@ -181,7 +181,6 @@ package com.voxelengine.GUI
 		}
 		
 		private function deleteParent(event:UIMouseEvent):void  {
-			// Globals.GUIControl = true;
 			if ( -1 < _listParents.selectedIndex )
 			{
 				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
@@ -206,12 +205,10 @@ package com.voxelengine.GUI
 		
 		private function newModelHandler(event:UIMouseEvent):void 
 		{
-			// Globals.GUIControl = true;
 			new WindowModelChoice();
 		}
 
 		private function editModelHandler(event:UIMouseEvent):void  {
-			// Globals.GUIControl = true;
 			if ( -1 < _listParents.selectedIndex )
 			{
 				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
@@ -228,7 +225,6 @@ package com.voxelengine.GUI
 		}
 		
 		private function addParent(event:UIMouseEvent):void  {
-			// Globals.GUIControl = true;
 			new WindowModelList();
 			//_fileReference.addEventListener(Event.SELECT, onModelFileSelected);
 			//var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
@@ -236,7 +232,6 @@ package com.voxelengine.GUI
 		}
 		
 		private function parentDetailHandler(event:UIMouseEvent):void  {
-			// Globals.GUIControl = true;
 			if ( -1 < _listParents.selectedIndex )
 			{
 				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
@@ -251,7 +246,6 @@ package com.voxelengine.GUI
 		}
 		
 		private function oxelUtilsHandler(event:UIMouseEvent):void  {
-			// Globals.GUIControl = true;
 			if ( -1 < _listParents.selectedIndex )
 			{
 				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
@@ -264,7 +258,28 @@ package com.voxelengine.GUI
 			else
 				noModelSelected();
 		}
-		
+		/*
+		private function importLocalFile(event:UIMouseEvent):void 
+		{
+			if ( -1 < _listParents.selectedIndex )
+			{
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
+				if ( li && li.data )
+				{
+					Globals.selectedModel = li.data;
+//					new WindowModelDetail( li.data.instanceInfo );
+					// Basically works.
+					//new WindowModelTemplate( li.data.modelInfo );
+					_fileReference.addEventListener(Event.SELECT, onAnimationFileSelected);
+					var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.ajson");
+					_fileReference.browse([swfTypeFilter]);
+					
+				}
+			}
+			else
+				noModelSelected();
+		}
+		*/
 		
 		//////////////////////////////////////////////////////////
 		///////////////////////////// END PARENT
@@ -293,7 +308,6 @@ package com.voxelengine.GUI
 		
 		private function deleteChild(event:UIMouseEvent):void 
 		{
-			// Globals.GUIControl = true;
 			if ( -1 < _listParents.selectedIndex )
 			{
 				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
@@ -315,7 +329,6 @@ package com.voxelengine.GUI
 		private var _viewDistance:Vector3D = new Vector3D(0, 0, -75);
 		public function onChildModelFileSelected(e:Event):void
 		{
-			// Globals.GUIControl = true;
 			if ( -1 < _listParents.selectedIndex )
 			{
 				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
@@ -341,7 +354,6 @@ package com.voxelengine.GUI
 		// Window events
 		private function addChildModel(event:UIMouseEvent):void 
 		{
-			// Globals.GUIControl = true;
 			if ( -1 < _listParents.selectedIndex )
 			{
 				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
@@ -381,9 +393,9 @@ package com.voxelengine.GUI
 		//////////////////////////////////////////////////////////
 		private function addAnim(event:UIMouseEvent):void 
 		{
-			var anim:Animation = getItemData( _listAnimations ) as Animation;
-			if ( null != anim )
-				new WindowAnimationMetadata( anim.ownerGuid );
+			var parent:VoxelModel = getItemData( _listParents ) as VoxelModel;
+			if ( null != parent )
+				new WindowAnimationMetadata( parent.instanceInfo.guid );
 		}
 		
 		private function deleteAnim(event:UIMouseEvent):void 
@@ -397,14 +409,57 @@ package com.voxelengine.GUI
 		{
 			var anim:Animation = getItemData( _listAnimations ) as Animation;
 			if ( null != anim )
-				Log.out( "WindowModels.editAnim", Log.ERROR );
+				new WindowAnimationEdit( anim );
 		}
+		
+		//private function importAnim(event:UIMouseEvent):void 
+		//{
+			//var anim:Animation = getItemData( _listAnimations ) as Animation;
+			//if ( null != anim )
+				//anim.importAnimation();
+		//}
 		
 		private function importAnim(event:UIMouseEvent):void 
 		{
-			var anim:Animation = getItemData( _listAnimations ) as Animation;
-			if ( null != anim )
-				anim.importAnimation();
+			if ( -1 < _listParents.selectedIndex )
+			{
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
+				if ( li && li.data )
+				{
+					Globals.selectedModel = li.data;
+//					new WindowModelDetail( li.data.instanceInfo );
+					// Basically works.
+					//new WindowModelTemplate( li.data.modelInfo );
+					_fileReference.addEventListener(Event.SELECT, onAnimationFileSelected);
+					var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.ajson");
+					_fileReference.browse([swfTypeFilter]);
+					
+				}
+			}
+			else
+				noModelSelected();
+		}
+		
+		public function onAnimationFileSelected(e:Event):void
+		{
+			var animName:String = _fileReference.name.substr( 0, _fileReference.name.length - _fileReference.type.length );
+			// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
+			var na:Animation = new Animation();
+			var modelClass:String;
+			if ( Globals.selectedModel is Player )
+				modelClass = Animation.MODEL_BIPEDAL_10;
+			else if ( Globals.selectedModel is Dragon )
+				modelClass = Animation.MODEL_DRAGON_9;
+			else
+				modelClass = Animation.MODEL_UNKNOWN;
+				
+			na.loadForImport( _fileReference.name );
+			Globals.g_app.addEventListener( LoadingEvent.ANIMATION_LOAD_COMPLETE, animationLoaded );
+		}
+		
+		
+		private function animationLoaded( le:LoadingEvent ):void {
+			
 		}
 		
 		private function populateAnimations( $vm:VoxelModel ):void
@@ -471,7 +526,6 @@ package com.voxelengine.GUI
 
 		private function selectParentModel(event:ListEvent):void 
 		{
-			// Globals.GUIControl = true;
 			var selectedModel:VoxelModel = event.target.data;
 			if ( selectedModel )
 			{
@@ -482,7 +536,6 @@ package com.voxelengine.GUI
 		
 		public function childModelDetail(event:ListEvent):void 
 		{ 
-			// Globals.GUIControl = true;
 			var vm:VoxelModel = event.target.data;
 			if ( vm )
 			{
@@ -497,48 +550,6 @@ package com.voxelengine.GUI
 				Log.out( "WindowModel.childModelDetail - VoxelModelNotFound" );
 		}
 		
-		private function test(event:UIMouseEvent):void 
-		{
-			if ( -1 < _listParents.selectedIndex )
-			{
-				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
-				if ( li && li.data )
-				{
-					Globals.selectedModel = li.data;
-//					new WindowModelDetail( li.data.instanceInfo );
-					// Basically works.
-					//new WindowModelTemplate( li.data.modelInfo );
-					_fileReference.addEventListener(Event.SELECT, onAnimationFileSelected);
-					var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.ajson");
-					_fileReference.browse([swfTypeFilter]);
-					
-				}
-			}
-			else
-				noModelSelected();
-		}
-		
-		public function onAnimationFileSelected(e:Event):void
-		{
-			// Globals.GUIControl = true;
-			if ( -1 < _listParents.selectedIndex )
-			{
-				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
-				if ( li && li.data )
-				{
-					var animName:String = _fileReference.name.substr( 0, _fileReference.name.length - _fileReference.type.length );
-					// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
-					var na:Animation = new Animation();
-					na.loadForImport( _fileReference.name );
-					Globals.g_app.addEventListener( LoadingEvent.ANIMATION_LOAD_COMPLETE, animationLoaded );
-					//Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildModelCreated );
-				}
-			}
-		}
-		
-		private function animationLoaded( le:LoadingEvent ):void {
-			
-		}
 		
   }
 }

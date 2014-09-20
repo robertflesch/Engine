@@ -366,8 +366,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		}
 
 		override protected function handleMouseMovement( $elapsedTimeMS:int ):void {
-			//if ( Globals.mouseView && Globals.active ) 
-			if ( Globals.active && !Globals.GUIControl && Globals.clicked ) 
+			if ( Globals.active && 0 == Globals.openWindowCount && Globals.clicked ) 
 			{
 				// up down
 				var dx:Number = 0;

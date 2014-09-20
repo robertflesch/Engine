@@ -27,7 +27,6 @@ package com.voxelengine.GUI
 			{ 
 				super();
 				_s_currentInstance = this;
-				//Globals.GUIControl = true;
 				_instanceGuid = $instanceGuid;
 				
 				layout.orientation = LayoutOrientation.VERTICAL;

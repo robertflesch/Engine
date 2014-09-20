@@ -1,13 +1,6 @@
 
 package com.voxelengine.GUI 
 {
-import com.voxelengine.events.AnimationMetadataEvent;
-import com.voxelengine.server.Network;
-import com.voxelengine.server.Persistance;
-import org.flashapi.swing.*;
-import org.flashapi.swing.event.*;
-import org.flashapi.swing.constants.*;
-import org.flashapi.swing.list.ListItem;
 import flash.events.Event;
 
 import org.flashapi.collector.EventCollector;
@@ -23,6 +16,9 @@ import org.flashapi.swing.databinding.DataProvider;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
+import com.voxelengine.events.AnimationMetadataEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.server.Persistance;
 
 public class WindowAnimationMetadata extends VVPopup
 {

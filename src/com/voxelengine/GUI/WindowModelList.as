@@ -104,7 +104,6 @@ package com.voxelengine.GUI
 		
 		private function addThisModelHandler( event:UIMouseEvent ):void 
 		{
-			// Globals.GUIControl = true;
 			if ( -1 == _listbox1.selectedIndex )
 				return;
 			var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );

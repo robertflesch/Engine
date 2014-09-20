@@ -97,18 +97,15 @@ class ChildModelPanel extends SimpleContainerBase
 	
 	private function fileNameChanged( te:TextEvent ):void
 	{
-		//Globals.GUIControl = true;
 		_ii.fileName =  te.target.text;
 	}
 	private function nameChanged( te:TextEvent ):void
 	{
-		//Globals.GUIControl = true;
 		_ii.name =  te.target.text;
 	}
 	/*
 	private function locationChanged( te:TextEvent ):void
 	{
-		//Globals.GUIControl = true;
 		_location =  te.target.text;
 	}
 	*/

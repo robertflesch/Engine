@@ -651,7 +651,7 @@ package com.voxelengine.worldmodel.models
 		
 		static private function keyDown(e:KeyboardEvent):void 
 		{
-			if ( Globals.GUIControl || !Globals.clicked )
+			if ( Globals.openWindowCount || !Globals.clicked )
 				return;
 				
 			var foundModel:VoxelModel;
@@ -728,7 +728,7 @@ package com.voxelengine.worldmodel.models
 		
 		static protected function onRepeat(event:TimerEvent):void
 		{
-			if ( Globals.GUIControl )
+			if ( Globals.openWindowCount )
 				return;
 				
 			if ( 1 < _count )
@@ -750,8 +750,7 @@ package com.voxelengine.worldmodel.models
 		
 		static private function mouseDown(e:MouseEvent):void 
 		{
-			//Log.out( "EditCursor.mouseDown GUIControl: " + Globals.GUIControl + "  Globals.clicked: " + Globals.clicked );
-			if ( Globals.GUIControl || !Globals.clicked )
+			if ( Globals.openWindowCount || !Globals.clicked )
 				return;
 				
 			_repeatTimer = new Timer( 200 );

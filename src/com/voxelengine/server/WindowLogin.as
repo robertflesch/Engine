@@ -42,7 +42,6 @@ package com.voxelengine.server
 			_emailInput.editableText.addEventListener( TextEvent.EDITED, 
 				function( event:TextEvent ):void 
 				{ _email = event.target.text; } );
-//				{ Globals.GUIControl = true; _email = event.target.text; } );
 			addElement( _emailInput );
 			
 			_password = password;
@@ -51,7 +50,6 @@ package com.voxelengine.server
 			_passwordInput.editableText.addEventListener( TextEvent.EDITED, 
 				function( event:TextEvent ):void 
 				{ _password = event.target.text; } );
-//				{ Globals.GUIControl = true; _password = event.target.text; } );
 			addElement( _passwordInput );
 			
 			//var buttonPanel:Panel = new Panel( 200, 30 );
@@ -92,7 +90,6 @@ package com.voxelengine.server
 		
 		private function loginButtonHandler(event:UIMouseEvent):void 
 		{
-			//Globals.GUIControl = true;
 			PlayerIO.quickConnect.simpleConnect( Globals.g_app.stage
 											   , Globals.g_gamesNetworkID
 											   , _email
@@ -112,7 +109,6 @@ package com.voxelengine.server
 		
 		private function registerButtonHandler(event:UIMouseEvent):void 
 		{
-			//Globals.GUIControl = true;
 			new WindowRegister();
 			remove();
 		}

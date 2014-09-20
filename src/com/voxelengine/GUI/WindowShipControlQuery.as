@@ -125,7 +125,6 @@ public class WindowShipControlQuery extends VVContainer
 		
 		private function closeFunction():void
 		{
-			//Globals.GUIControl = false;
 			_s_currentInstance = null;
 		}
 		

@@ -159,25 +159,21 @@ class WorkerPanel extends SimpleContainerBase
 	
 	private function offsetChanged( te:TextEvent ):void
 	{
-		//Globals.GUIControl = true;
 		_offset = int( te.target.text );
 		
 	}
 	private function rangeChanged( te:TextEvent ):void
 	{
-		//Globals.GUIControl = true;
 		_range = int( te.target.text );
 		
 	}
 	private function optionalIntChanged( te:TextEvent ):void
 	{
-		//Globals.GUIControl = true;
 		_optionalInt = int( te.target.text );
 		
 	}
 	private function typeChanged( le:ListEvent ):void
 	{
-		//Globals.GUIControl = true;
 		var cb:ComboBox = (le.target as ComboBox);
 		var selected:int = cb.selectedIndex;
 		if ( -1 == cb.selectedIndex )

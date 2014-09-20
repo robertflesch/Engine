@@ -61,7 +61,6 @@ package com.voxelengine.GUI
 		private function onRemoved( event:UIOEvent ):void 
 		{
 			//Log.out( "WindowInventory.onRemoved" );
-//			Globals.GUIControl = false;
 			eventCollector.removeAllEvents();
 		}
 			
@@ -73,13 +72,11 @@ package com.voxelengine.GUI
 				e.dropTarget.backgroundTexture = e.dragOperation.initiator.backgroundTexture;
 				e.dropTarget.data = e.dragOperation.initiator.data;
 			}
-//			Globals.GUIControl = false;
 		}
 			
 		private function doDrag(e:UIMouseEvent):void 
 		{
 			//Log.out( "WindowInventory.doDrag" );
-			//Globals.GUIControl = true;
 			_dragOp.initiator = e.target as UIObject;
 			UIManager.dragManager.startDragDrop(_dragOp);
 		}			
@@ -87,23 +84,19 @@ package com.voxelengine.GUI
 		private function pressWindow(e:UIMouseEvent):void
 		{
 			//Log.out( "WindowInventory.pressWindow" );
-			//Globals.GUIControl = true;
 		}
 		private function windowClick(e:UIMouseEvent):void
 		{
 			//Log.out( "WindowInventory.windowClick" );
-			//Globals.GUIControl = true;
 		}
 		private function pressCategory(e:UIMouseEvent):void
 		{
 			//Log.out( "WindowInventory.pressCategory" );
-			//Globals.GUIControl = true;
 		}
 		
 		private function selectCategory(e:ListEvent):void 
 		{			
 			//Log.out( "WindowInventory.selectCategory" );
-			//Globals.GUIControl = true;
 			while ( 1 < numElements )
 			{
 				removeElementAt( 1 );

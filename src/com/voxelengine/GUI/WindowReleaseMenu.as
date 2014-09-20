@@ -30,7 +30,6 @@ package com.voxelengine.GUI
 		{ 
 			super();
 			_s_currentInstance = this;
-			//Globals.GUIControl = true;
 			autoSize = false;
 			padding = 10;
 			shadow = true;

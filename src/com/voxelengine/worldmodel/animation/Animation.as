@@ -37,6 +37,7 @@ package com.voxelengine.worldmodel.animation
 		static public const MODEL_BIPEDAL_10:String = "MODEL_BIPEDAL_10";
 		static public const MODEL_DRAGON_9:String =  "MODEL_DRAGON_9";
 		static public const MODEL_PROPELLER:String =  "MODEL_PROPELLER";
+		static public const MODEL_UNKNOWN:String =  "MODEL_UNKNOWN";
 		
 		static private const BLANK_ANIMATION_TEMPLATE:Object = { "animation":[] };
 

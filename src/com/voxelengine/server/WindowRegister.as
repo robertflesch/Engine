@@ -50,7 +50,6 @@ package com.voxelengine.server
 			_userNameInput.editableText.addEventListener( TextEvent.EDITED, 
 				function( event:TextEvent ):void 
 				{ _userName = event.target.text; } );
-//				{ Globals.GUIControl = true; _userName = event.target.text; } );
 			addElement( _userNameInput );
 			
 			_email = "me@me.com";
@@ -59,7 +58,6 @@ package com.voxelengine.server
 			_emailInput.editableText.addEventListener( TextEvent.EDITED, 
 				function( event:TextEvent ):void 
 				{ _email = event.target.text; } );
-//				{ Globals.GUIControl = true; _email = event.target.text; } );
 			addElement( _emailInput );
 			
 			_password = "";
@@ -68,7 +66,6 @@ package com.voxelengine.server
 			_passwordInput.editableText.addEventListener( TextEvent.EDITED, 
 				function( event:TextEvent ):void 
 				{ _password = event.target.text; } );
-//				{ Globals.GUIControl = true; _password = event.target.text; } );
 			addElement( _passwordInput );
 			
 			_password2 = "";
@@ -77,7 +74,6 @@ package com.voxelengine.server
 			_password2Input.editableText.addEventListener( TextEvent.EDITED, 
 				function( event:TextEvent ):void 
 				{ _password2 = event.target.text; } );
-//				{ Globals.GUIControl = true; _password2 = event.target.text; } );
 			addElement( _password2Input );
 			
 			var createAccountButton:Button = new Button( "Create Account" );
@@ -99,7 +95,6 @@ package com.voxelengine.server
 
 		private function createAccountButtonHandler(event:UIMouseEvent):void 
 		{
-			//Globals.GUIControl = true;
 			trace( "userName: " + _userName + "  password: " + _password + "  email:" + _email );
 			PlayerIO.quickConnect.simpleRegister(
 									Globals.g_app.stage,

@@ -144,7 +144,6 @@ package com.voxelengine.GUI
 		
 		public function saveModelIVM():void 
 		{
-			Globals.GUIControl = true;
 			trace("VoxelVerseGUI.saveModel - Saving model to FILE");
 			 //three steps
 			 //save updated model meta data with new guid
@@ -162,8 +161,6 @@ package com.voxelengine.GUI
 					var ba:ByteArray = vm.toByteArray();
 
 					_fileReference.save( ba, vm.modelInfo.fileName + "_new.ivm");
-					_fileReference.addEventListener( Event.CANCEL, function ( e:Event ):void { Globals.GUIControl = false; } );
-					_fileReference.addEventListener( Event.COMPLETE, function ( e:Event ):void { Globals.GUIControl = false; } );
 				}
 			}
 			else
@@ -423,7 +420,7 @@ package com.voxelengine.GUI
 				//createProjectile( Globals.controlledModel );
 				//return;
 			//}
-			if ( (Globals.GUIControl || Log.showing) )
+			if ( ( 0 < Globals.openWindowCount || Log.showing) )
 				return;				
 				
 			//trace( "onKeyPressed: " + e.keyCode );	
@@ -468,7 +465,7 @@ package com.voxelengine.GUI
 					saveModelIVM();
 
 				if ( Keyboard.N == e.keyCode )
-					new WindowModels();
+					new WindowModelsForRegion();
 					//new WindowVideoTest(); Wait for hummingbird
 			}
 			

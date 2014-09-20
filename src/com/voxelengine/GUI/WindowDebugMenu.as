@@ -31,7 +31,6 @@ package com.voxelengine.GUI
 		{ 
 			super( 100, 100 );
 			_s_currentInstance = this;
-			//Globals.GUIControl = true;
 			
 			//glowColor = "red";
 			//glow = true;

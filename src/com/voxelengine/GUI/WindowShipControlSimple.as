@@ -23,7 +23,6 @@ package com.voxelengine.GUI
 		{ 
 			super();
 			_s_currentInstance = this;
-			//Globals.GUIControl = true;
 			_ship = vm;
 			autoSize = true;
 			padding = 10;

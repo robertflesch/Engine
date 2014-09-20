@@ -61,7 +61,6 @@ package com.voxelengine.GUI
 		{
 			new Alert( "Where do I get my list of child models from?" );
 			/*
-			//Globals.GUIControl = true;
 			if ( -1 < _listbox1.selectedIndex )
 			{
 				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
@@ -78,7 +77,6 @@ package com.voxelengine.GUI
 		
 		private function newModelHandlerOld(event:UIMouseEvent):void 
 		{
-			//Globals.GUIControl = true;
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.guid = "GenerateCube";
 			ii.name = "New Object";
@@ -89,7 +87,6 @@ package com.voxelengine.GUI
 
 		private function newModelHandler(event:UIMouseEvent):void 
 		{
-			//Globals.GUIControl = true;
 			new WindowModelTemplate( new ModelInfo() );
 		}
 
@@ -97,7 +94,6 @@ package com.voxelengine.GUI
 		public function onChildModelFileSelected(e:Event):void
 		{
 			/*
-			//Globals.GUIControl = true;
 			if ( -1 < _listbox1.selectedIndex )
 			{
 				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
@@ -142,7 +138,6 @@ package com.voxelengine.GUI
 		private function deleteChild(event:UIMouseEvent):void 
 		{
 			/*
-			//Globals.GUIControl = true;
 			if ( -1 < _listbox1.selectedIndex )
 			{
 				var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
@@ -184,7 +179,6 @@ package com.voxelengine.GUI
 		
 		public function childModelDetail(event:ListEvent):void 
 		{ 
-			//Globals.GUIControl = true;
 			var vm:VoxelModel = event.target.data;
 			if ( vm )
 			{

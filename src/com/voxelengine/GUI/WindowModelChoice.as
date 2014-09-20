@@ -22,7 +22,6 @@ package com.voxelengine.GUI
 		public function WindowModelChoice()
 		{
 			super( "Model Choice" );
-			_modalObj = new ModalObject( this );
 
 			autoSize = true;
 			layout.orientation = LayoutOrientation.VERTICAL;
@@ -31,8 +30,6 @@ package com.voxelengine.GUI
 			var radioButtons:DataProvider = new DataProvider();
 //            radioButtons.addAll( { label:"My Models" }, { label:"All Models" }, { label:"From Cube" }, { label:"From Model Template" }, { label:"New Model Template" } );
             radioButtons.addAll( { label:"From Cube" }, { label:"From Sphere" }, { label:"From SubSphere" } );
-			//eventCollector.addEvent( _rbGroup, ButtonsGroupEvent.GROUP_CHANGED
-			//                       , function (event:ButtonsGroupEvent):void {  Globals.GUIControl = true; createWindow( event.target.index  ); } );
 			_rbGroup.dataProvider = radioButtons;
 			_rbGroup.index = 2;
 			
@@ -40,6 +37,7 @@ package com.voxelengine.GUI
 			eventCollector.addEvent( button, UIMouseEvent.CLICK, create );
 			addElement( button );
 			
+			_modalObj = new ModalObject( this );
 			_modalObj.display();
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
@@ -47,12 +45,14 @@ package com.voxelengine.GUI
 		
 		private function create( e:UIMouseEvent ):void
 		{
-			createWindow( _rbGroup.index );
+			_modalObj.remove();
+			_modalObj = null;
+			//createWindow( _rbGroup.index );
+			remove();
 		}
 
 		private function createWindow( id:int ):void
 		{
-			var alert:Alert;
 			var ii:InstanceInfo = new InstanceInfo();
 			switch ( id )
 			{
@@ -78,10 +78,6 @@ package com.voxelengine.GUI
 					new WindowNewModelGenerateCube( ii );
 					break;
 			}
-			if ( alert )
-				alert.display();
-				
-			_modalObj.remove();
 		}
 
 		/*
@@ -119,9 +115,14 @@ package com.voxelengine.GUI
 			_modalObj.remove();
 		}
 		*/
-		private function onRemoved( event:UIOEvent ):void
+		override protected function onRemoved( event:UIOEvent ):void
  		{
+			super.onRemoved( event );
 			removeEventListener(UIOEvent.REMOVED, onRemoved );
+			if ( _modalObj ) {
+				_modalObj.remove();
+				_modalObj = null;
+			}
 		}
   }
 }

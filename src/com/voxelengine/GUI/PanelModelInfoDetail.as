@@ -33,8 +33,6 @@ package com.voxelengine.GUI
 			var fileNameInput:TextInput = new TextInput( _mi.fileName );
 			fileNameInput.width = $width - $width/5;
 			fileNameInput.height = 20;
-//			eventCollector.addEvent( fileNameInput, TextEvent.EDITED
-//								   , function(e:TextEvent):void { _mi.fileName = e.target.text; Globals.GUIControl = true; } );
 			eventCollector.addEvent( fileNameInput, TextEvent.EDITED
 								   , function(e:TextEvent):void { _mi.fileName = e.target.text; } );
 			addElement( fileNameInput );
@@ -43,8 +41,6 @@ package com.voxelengine.GUI
 			var nameInput:TextInput = new TextInput( _mi.name );
 			nameInput.width = $width - $width/5;
 			nameInput.height = 20;
-//			eventCollector.addEvent( nameInput, TextEvent.EDITED
-//								   , function(e:TextEvent):void { _mi.name = e.target.text; Globals.GUIControl = true; } );
 			eventCollector.addEvent( nameInput, TextEvent.EDITED
 								   , function(e:TextEvent):void { _mi.name = e.target.text; } );
 			addElement( nameInput );
@@ -52,8 +48,6 @@ package com.voxelengine.GUI
 			addElement( new Label( "Description" ) );
 			var descInput:TextArea = new TextArea( $width - $width / 5 );
 			descInput.appendText( _mi.desc );
-//			eventCollector.addEvent( descInput, TextEvent.EDITED
-//								   , function(e:TextEvent):void { _mi.desc = e.target.text; Globals.GUIControl = true; } );
 			eventCollector.addEvent( descInput, TextEvent.EDITED
 								   , function(e:TextEvent):void { _mi.desc = e.target.text; } );
 			addElement( descInput );

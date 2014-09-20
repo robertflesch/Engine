@@ -14,14 +14,13 @@ public class ModalPopup extends Popup
 	public function ModalPopup( $title:String, $width:int = undefined, $height:int = undefined ):void
 	{
 		super( $title, $width, $height );
+		Globals.openWindowCount = Globals.openWindowCount + 1;
 		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
-	// if the mouse is over a window, this causes the event to only be handled by the UI
-		eventCollector.addEvent( this, UIMouseEvent.ROLL_OVER, function(e:UIMouseEvent):void { Globals.GUIControl = true; } );
-		eventCollector.addEvent( this, UIMouseEvent.ROLL_OUT, function(e:UIMouseEvent):void { Globals.GUIControl = false; } );
 	}
 	
-	private function onRemoved( event:UIOEvent ):void
+	protected function onRemoved( event:UIOEvent ):void
 	{
+		Globals.openWindowCount = Globals.openWindowCount - 1;
 	}
 }
 }

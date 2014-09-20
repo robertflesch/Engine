@@ -92,7 +92,6 @@ public class WindowRegionNew extends VVPopup
 		eventCollector.addEvent( _rbPPGroup, ButtonsGroupEvent.GROUP_CHANGED
 		                       , function (event:ButtonsGroupEvent):void 
 							   {  _region.owner = (0 == event.target.index ?  Persistance.PUBLIC : Network.userId ) } );
-//							   {   Globals.GUIControl = true; _region.gravity = (0 == event.target.index ?  true : false) } );
 		_rbPPGroup.dataProvider = radioButtonsPP;
 		_rbPPGroup.index = 0;
 		
@@ -111,7 +110,6 @@ public class WindowRegionNew extends VVPopup
 		eventCollector.addEvent( _rbGroup, ButtonsGroupEvent.GROUP_CHANGED
 		                       , function (event:ButtonsGroupEvent):void 
 							   {  _region.gravity = (0 == event.target.index ?  true : false) } );
-//							   {   Globals.GUIControl = true; _region.gravity = (0 == event.target.index ?  true : false) } );
 		_rbGroup.dataProvider = radioButtons;
 		_rbGroup.index = 0;
 		
@@ -158,16 +156,13 @@ public class WindowRegionNew extends VVPopup
 	private function pressWindow(e:UIMouseEvent):void
 	{
 		//Log.out( "WindowInventory.pressWindow" );
-		// Globals.GUIControl = true;
 	}
 	private function windowClick(e:UIMouseEvent):void
 	{
 		//Log.out( "WindowInventory.windowClick" );
-		// Globals.GUIControl = true;
 	}
 	protected function onResize(event:Event):void
 	{
-		// Globals.GUIControl = true;
 		move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
 	}
 	private function onRemoved( event:UIOEvent ):void
@@ -179,13 +174,11 @@ public class WindowRegionNew extends VVPopup
 	
 	private function changeNameHandler(event:TextEvent):void
 	{
-		// Globals.GUIControl = true;
 		_region.name = event.target.text;
 	}
 	
 	private function changeDescHandler(event:TextEvent):void
 	{
-		// Globals.GUIControl = true;
 		_region.desc = event.target.text;
 	}
 	
@@ -222,9 +215,6 @@ public class WindowRegionNew extends VVPopup
 		li.width = 250;
 		if ( null != changeHandler )
 			li.addEventListener( TextEvent.EDITED, changeHandler );
-			
-//			eventCollector.addEvent( descInput, TextEvent.EDITED
-//								   , function(e:TextEvent):void { _mi.desc = e.target.text; // Globals.GUIControl = true; } );
 			
 		//else
 		//{

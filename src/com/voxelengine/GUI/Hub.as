@@ -332,8 +332,6 @@ package com.voxelengine.GUI
 		
 		public function hotKeyInventory(e:KeyboardEvent):void 
 		{
-//			if  ( Globals.GUIControl )
-//				return;
 			if  ( !Globals.active )
 				return;
 				
@@ -355,8 +353,6 @@ package com.voxelengine.GUI
 		
 		protected function onMouseWheel(event:MouseEvent):void
 		{
-//			if  ( Globals.GUIControl )
-//				return;
 			if  ( !Globals.active )
 				return;
 				

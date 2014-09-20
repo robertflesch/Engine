@@ -155,25 +155,21 @@ package com.voxelengine.GUI
 
 		private function rotateHandler(event:UIMouseEvent):void 
 		{
-			// Globals.GUIControl = true;
 			_vm.oxel.rotateCCW();
 		}
 
 		private function centerHandler(event:UIMouseEvent):void 
 		{
-			// Globals.GUIControl = true;
 			_vm.oxel.centerOxel();
 		}
 		
 		private function breakdownHandler(event:UIMouseEvent):void 
 		{
-			// Globals.GUIControl = true;
 			_vm.breakdown();
 		}
 		
 		private function changeTypeHandler(event:UIMouseEvent):void 
 		{
-			// Globals.GUIControl = true;
 			new WindowChangeType( _vm );
 		}
 	
