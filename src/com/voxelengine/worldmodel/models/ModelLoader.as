@@ -99,7 +99,7 @@ package com.voxelengine.worldmodel.models
 					var instanceInfo:InstanceInfo = null;
 					for each ( var name:String in block )
 					{
-						instanceInfo = Globals.instanceInfoGet( name + $guid );
+						instanceInfo = Globals.instanceInfoGet( $guid );
 						//Log.out( "CLEAR BLOCK " + instanceInfo.toString() + " for guid: " + guid  );
 						if ( instanceInfo )
 						{
