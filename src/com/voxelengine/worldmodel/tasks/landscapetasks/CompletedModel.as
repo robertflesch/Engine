@@ -28,7 +28,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		static private var _playerLoaded:Boolean = false;
 		
 		public function CompletedModel( instanceGuid:String, layer:LayerInfo, taskType:String = TASK_TYPE, taskPriority:int = TASK_PRIORITY ):void {
-			//Log.out( "CompletedModel.construct for guid: " + instanceGuid + "  count: " + _count );
+			Log.out( "CompletedModel.construct for guid: " + instanceGuid + "  count: " + _count );
 			_startTime = getTimer();
 			_count++;
 			super( instanceGuid, layer, "CompletedModel" );

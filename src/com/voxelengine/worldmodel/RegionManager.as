@@ -93,7 +93,12 @@ public class RegionManager
 		Log.out( "RegionManager.requestRegionFile - downloading: " + fileNamePathWithExt );
 		var _urlLoader:CustomURLLoader = new CustomURLLoader(new URLRequest( fileNamePathWithExt ));
 		_urlLoader.addEventListener(Event.COMPLETE, onRegionLoadedActionFromFile );
-		_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, function (e:IOErrorEvent):void { Log.out("RegionManager.requestRegionFile - ERROR: " + e.toString(), Log.ERROR); }	);			
+		_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onRegionLoadError );			
+	}
+
+	private function onRegionLoadError(error:IOErrorEvent):void
+	{
+		Log.out("RegionManager.onRegionLoadError - ERROR: " + error.toString(), Log.ERROR);
 	}
 
 	private function onRegionLoadedActionFromFile(event:Event):void

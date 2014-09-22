@@ -226,9 +226,6 @@ package com.voxelengine.GUI
 		
 		private function addParent(event:UIMouseEvent):void  {
 			new WindowModelList();
-			//_fileReference.addEventListener(Event.SELECT, onModelFileSelected);
-			//var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
-			//_fileReference.browse([swfTypeFilter]);
 		}
 		
 		private function parentDetailHandler(event:UIMouseEvent):void  {
@@ -325,7 +322,7 @@ package com.voxelengine.GUI
 			else
 				noModelSelected();
 		}
-		
+/*		
 		private var _viewDistance:Vector3D = new Vector3D(0, 0, -75);
 		public function onChildModelFileSelected(e:Event):void
 		{
@@ -350,7 +347,7 @@ package com.voxelengine.GUI
 				}
 			}
 		}
-		
+	*/	
 		// Window events
 		private function addChildModel(event:UIMouseEvent):void 
 		{
@@ -359,9 +356,12 @@ package com.voxelengine.GUI
 				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
 				if ( li && li.data )
 				{
-					_fileReference.addEventListener(Event.SELECT, onChildModelFileSelected);
-					var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
-					_fileReference.browse([swfTypeFilter]);
+					var vm:VoxelModel = li.data as VoxelModel
+					new WindowModelList( vm.instanceInfo.guid );
+//
+					//_fileReference.addEventListener(Event.SELECT, onChildModelFileSelected);
+					//var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
+					//_fileReference.browse([swfTypeFilter]);
 				}
 			}
 			else
@@ -442,16 +442,26 @@ package com.voxelengine.GUI
 		
 		public function onAnimationFileSelected(e:Event):void
 		{
+			if ( -1 < _listParents.selectedIndex )
+			{
+				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
+				if ( li && li.data )
+						var vm:VoxelModel = li.data as VoxelModel;
+			}
+			
+			if ( !vm ) 
+				return;
+
 			var animName:String = _fileReference.name.substr( 0, _fileReference.name.length - _fileReference.type.length );
 			// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
 			var na:Animation = new Animation();
-			var modelClass:String;
+			na.ownerGuid = vm.modelInfo.modelClass;
 			if ( Globals.selectedModel is Player )
-				modelClass = Animation.MODEL_BIPEDAL_10;
+				na.model = Animation.MODEL_BIPEDAL_10;
 			else if ( Globals.selectedModel is Dragon )
-				modelClass = Animation.MODEL_DRAGON_9;
+				na.model = Animation.MODEL_DRAGON_9;
 			else
-				modelClass = Animation.MODEL_UNKNOWN;
+				na.model = Animation.MODEL_UNKNOWN;
 				
 			na.loadForImport( _fileReference.name );
 			Globals.g_app.addEventListener( LoadingEvent.ANIMATION_LOAD_COMPLETE, animationLoaded );

@@ -52,7 +52,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		}
 		
 		private	function loadFromFile( fileName:String ):void { 	
-			//Log.out( "ParticleLoadingTask.loadFromFile" );
+			Log.out( "ParticleLoadingTask.loadFromFile" );
 			var path:String = Globals.modelPath + fileName + ".ivm";
 			
 			var urlLoader:URLLoader = new URLLoader();

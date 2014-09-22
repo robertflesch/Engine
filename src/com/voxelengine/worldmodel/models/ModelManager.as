@@ -271,6 +271,7 @@ package com.voxelengine.worldmodel.models
 			// if this is a child model, give it to parent, 
 			// next check to see if its a dynamic model
 			//otherwise add it to modelmanager list.
+			Log.out( "ModelManager.modelAdd - guid: " + vm.instanceInfo.guid );			
 			if ( vm.instanceInfo.controllingModel )
 			{
 				vm.instanceInfo.controllingModel.childAdd( vm );
@@ -324,15 +325,17 @@ package com.voxelengine.worldmodel.models
 			var tempDic:Dictionary = new Dictionary(true);
 			for each ( var instance:InstanceInfo in oldDic )
 			{
-				if ( instance && true == instance.dead )
-				{
-					var oldGuid:String = instance.guid;
-					instance = null;
-					oldDic[oldGuid] = null;
-				}
-				else
-				{
-					tempDic[instance.guid] = instance;
+				if ( instance ) {
+					if ( true == instance.dead )
+					{
+						var oldGuid:String = instance.guid;
+						instance = null;
+						oldDic[oldGuid] = null;
+					}
+					else
+					{
+						tempDic[instance.guid] = instance;
+					}
 				}
 			}
 			oldDic = null;
@@ -421,11 +424,36 @@ package com.voxelengine.worldmodel.models
 			//private static var g_player:Player = null;			
 			//Log.out("ModelManager.createPlayer" );
 			var instanceInfo:InstanceInfo = new InstanceInfo();
-			instanceInfo.guid = "player";
-			instanceInfo.grainSize = 4;
-			
-			ModelLoader.load( instanceInfo );
+			if ( Globals.online ) {
+				Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
+			}
+			else {
+				instanceInfo.guid = "player";
+				instanceInfo.grainSize = 4;
+				ModelLoader.load( instanceInfo );
+			}
 		}
+		
+		import playerio.DatabaseObject;
+		private function onPlayerLoadedAction( o:DatabaseObject ):void {
+			
+			var instanceInfo:InstanceInfo = new InstanceInfo();
+			instanceInfo.grainSize = 4;
+			instanceInfo.guid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
+			//instanceInfo.guid = "player";
+			//Log.out("ModelManager.onPlayerLoadedAction" );
+			ModelLoader.load( instanceInfo );
+			o.name = "Bob";
+			o.age = 32;
+			o.save();
+		}
+		
+		private function onPlayerLoadError(error:PlayerIOError):void {
+			
+			Log.out("ModelManager.onPlayerLoadError" );
+		}
+
+
 		
 		public function update( $elapsedTimeMS:int ):void {
 			

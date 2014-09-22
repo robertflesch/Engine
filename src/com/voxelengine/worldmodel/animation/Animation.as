@@ -97,7 +97,8 @@ package com.voxelengine.worldmodel.animation
 			else
 				_type = ANIMATION_STATE;
 
-			load( name, onLoadedAction );
+			var fileName:String = name + ANIMATION_FILE_EXT
+			load( fileName, onLoadedAction );
 		}
 		
 		public function loadForImport( $nameAndLoc:String ):void {
@@ -299,8 +300,7 @@ trace( name + " = " + jsonString );
 		static private const ANIMATION_FILE_EXT:String = ".ajson"
 		private function load( $fileName:String, $successAction:Function ):void
 		{
-			var fileName:String = $fileName + ANIMATION_FILE_EXT
-			var aniNameAndLoc:String = Globals.modelPath + ownerGuid + "/" + fileName;
+			var aniNameAndLoc:String = Globals.modelPath + ownerGuid + "/" + $fileName;
 			//Log.out( "Animation.load - loading: " + aniNameAndLoc );
 			var request:URLRequest = new URLRequest( aniNameAndLoc );
 			var loader:CustomURLLoader = new CustomURLLoader(request);

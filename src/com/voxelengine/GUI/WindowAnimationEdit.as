@@ -59,18 +59,13 @@ public class WindowAnimationEdit extends VVPopup
 		
 		addElement( new Label( "Animation Type: " + _anim.name ) );
 		
-		_desc = new LabelInput( "Description: ", _anim.desc );
+		_desc = new LabelInput( "Description: ", _anim.desc ? _anim.desc : "No Description" );
 		addElement( _desc );
 		
 		var saveMetadata:Button = new Button( "Save" );
 		eventCollector.addEvent( saveMetadata, UIMouseEvent.CLICK, save );
 		addElement( saveMetadata );
 		
-		var cancelButton:Button = new Button( "Cancel" );
-		eventCollector.addEvent( cancelButton , UIMouseEvent.CLICK
-							   , function( e:UIMouseEvent ):void { remove(); } );
-		addElement( cancelButton );
-
 		eventCollector.addEvent( this, Event.RESIZE, onResize );
 		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
 		

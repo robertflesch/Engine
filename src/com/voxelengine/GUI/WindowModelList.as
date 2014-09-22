@@ -29,15 +29,17 @@ package com.voxelengine.GUI
 	
 	public class WindowModelList extends VVPopup
 	{
-		private var _modelKey:String;
 		private const _TOTAL_LB_WIDTH:int = 400;
 		private const _TOTAL_BUTTON_PANEL_HEIGHT:int = 100;
+		private var _modelKey:String;
+		private var _parentGuid:String;
 		
 		private var _listbox1:ListBox = new ListBox( _TOTAL_LB_WIDTH, 15 );
 		
-		public function WindowModelList()
+		public function WindowModelList( $parentGuid:String = "" )
 		{
 			super("Model List");
+			_parentGuid = $parentGuid;
 			autoSize = true;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			
@@ -112,7 +114,7 @@ package com.voxelengine.GUI
 				var mmde:ModelMetadataEvent = li.data as ModelMetadataEvent;
 				var ba:ByteArray = mmde.ba as ByteArray;
 				ba.uncompress();
-				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( ba, mmde.guid );				
+				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( ba, mmde.guid, _parentGuid );				
 
 				remove();
 			}

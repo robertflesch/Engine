@@ -30,15 +30,15 @@
 		static private var _errorHandler:Function;
 		static private var _isCreate:Boolean;
 		
+		static public function loadMyPlayerObject( $success:Function, $failure:Function ):void {
+			Network.client.bigDB.loadMyPlayerObject( $success, $failure );
+		}
+		
 		static public function deleteKeys( $table:String, $keys:Array, $successHandler:Function, $errorHandler:Function ):void {
 			if ( Network.client )
-			{
 				Network.client.bigDB.deleteKeys( $table, $keys, $successHandler, $errorHandler );
-			}
 			else
-			{
 				$errorHandler( new PlayerIOError( "No connection", 0 ) );
-			}
 		}
 
 		static public function createObject( $table:String, $key:String, $data:Object, $successHandler:Function, $errorHandler:Function ):void {

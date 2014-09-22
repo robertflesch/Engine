@@ -19,13 +19,12 @@ package com.voxelengine.worldmodel.models
 	import com.developmentarc.core.tasks.tasks.ITask;
 	import com.developmentarc.core.tasks.groups.TaskGroup;
 	
-	import com.voxelengine.server.Network;
-	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelMetadataEvent;
+	import com.voxelengine.server.Network;
 	import com.voxelengine.utils.CustomURLLoader;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.models.*;
@@ -141,7 +140,7 @@ package com.voxelengine.worldmodel.models
 		static private function loadPersistant( $ii:InstanceInfo ):void {
 			Log.out( "ModelLoader.loadPersistant - InstanceInfo: " + $ii.toString() );
 			// land task controller, this tells task controller not to run until it is done loading all tasks
-			Globals.g_landscapeTaskController.activeTaskLimit = 0;
+//			Globals.g_landscapeTaskController.activeTaskLimit = 0;
 			// Create task group
 			var taskGroup:TaskGroup = new TaskGroup("Download Model for " + $ii.guid, 2);
 		
@@ -150,13 +149,13 @@ package com.voxelengine.worldmodel.models
 			var task:ITask = new LoadModelFromBigDB( $ii.guid, null );
 			taskGroup.addTask(task);
 			
-			//task = new CompletedModel( $ii.guid, null );
+			//task = new CompletedPersistantModel( $ii.guid, null );
 			//taskGroup.addTask(task);
 			
 			Globals.g_landscapeTaskController.addTask( taskGroup );
 		}
 		
-		static public function loadFromManifestByteArray( $ba:ByteArray, $guid:String ):VoxelModel {
+		static public function loadFromManifestByteArray( $ba:ByteArray, $guid:String, controllingModelGuid:String = "" ):VoxelModel {
 				
 			var versionInfo:Object = modelMetaInfoRead( $ba );
 			if ( MANIFEST_VERSION != versionInfo.manifestVersion )
@@ -188,17 +187,14 @@ package com.voxelengine.worldmodel.models
 					ii.guid = $guid;
 				}
 				
-				var vm:* = instantiate( ii, mi );
+			if ( "" != controllingModelGuid ) {
+				var vm:VoxelModel = Globals.getModelInstance( controllingModelGuid );
+				ii.controllingModel = vm;
+			}
 				
-				//if ( "Player" == mi.modelClass )
-				//{
-					//Globals.player = vm;
-					//Globals.controlledModel = vm;
-					//return null;
-				//}
-				
-				vm.version = versionInfo.version;
-				vm.loadOxelFromByteArray( $ba );
+			var vm:* = instantiate( ii, mi );
+			vm.version = versionInfo.version;
+			vm.loadOxelFromByteArray( $ba );
 			}
 
 			return vm;
@@ -246,6 +242,7 @@ package com.voxelengine.worldmodel.models
 			return modelInfo;
 			
 			function onModelInfoLoadError(event:IOErrorEvent):void {
+				Log.out("ModelLoader.onModelInfoLoadError: ERROR" );
 				var req:URLRequest = CustomURLLoader(event.target).request;			
 				var fileName:String = CustomURLLoader(event.target).fileName;			
 				var guid:String = fileName.substr( 0, fileName.lastIndexOf( "." ) );
@@ -292,11 +289,10 @@ package com.voxelengine.worldmodel.models
 		{
 			// the try catch here allows me to treat all models as compressed
 			// if the uncompress fails, it simply continues
-			try { 
-				$ba.uncompress();
-			}
-			catch (error:Error) {
-			}
+			// This sequence of bytes shows it is compressed ???
+			try {  $ba.uncompress(); }
+			catch (error:Error) { ; }
+			$ba.position = 0;
 
 			var versionInfo:Object = modelMetaInfoRead( $ba );
 			$vm.version = versionInfo.version;
@@ -339,6 +335,7 @@ package com.voxelengine.worldmodel.models
 			Log.out( "RegionManager.addModel - " + ii.toString() );
 			
 			Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_COMPLETE, localModelLoaded );
+			Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, localModelLoaded );
 			
 			load( ii );
 		}

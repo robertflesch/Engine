@@ -1039,16 +1039,16 @@ package com.voxelengine.worldmodel.models
 		public function save( objectMetadata:Object = null ):void
 		{
 			if ( !changed ) {
-				Log.out( "VoxelModel.save - NOT SAVING: " + instanceInfo.guid );
+				Log.out( "VoxelModel.save - NOT SAVING: " + instanceInfo.name );
 				return;
 			}
 				
 			_changed = false;
-			Log.out("VoxelModel.save - saving changes to: " + instanceInfo.guid  );
+			Log.out("VoxelModel.save - saving changes to: " + instanceInfo.name  );
 			var ba:ByteArray = toByteArray();
 			if (databaseObject)
 			{
-				Log.out("VoxelModel.save - saving object back to BigDB: " + instanceInfo.guid );
+				Log.out("VoxelModel.save - saving object back to BigDB: " + instanceInfo.name );
 				databaseObject.data = ba;
 				databaseObject.save( false
 				                   , false
@@ -1062,7 +1062,7 @@ package com.voxelengine.worldmodel.models
 				else
 					objectMetadata.data = ba;
 				
-				Log.out("VoxelModel.save - creating new object: " + instanceInfo.guid );
+				Log.out("VoxelModel.save - creating new object: " + instanceInfo.name );
 				Persistance.createObject( Persistance.DB_TABLE_OBJECTS
 								        , instanceInfo.guid
 								        , objectMetadata
