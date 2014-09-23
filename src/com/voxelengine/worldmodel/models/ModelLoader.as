@@ -275,13 +275,13 @@ package com.voxelengine.worldmodel.models
 		// local TO Persistant model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		static private var modelDesc:String;
-		static private var modelGuid:String;
+		static private var _s_mmd:VoxelModelMetadata;
 		static private function localModelReadyToBeCreated( $e:ModelMetadataEvent ):void {
 			
 			var ii:InstanceInfo = new InstanceInfo();
-			modelGuid = ii.guid = $e.vmm.guid;
-			modelDesc = $e.vmm.description;
+			// hack to save it 
+			_s_mmd = $e.vmm;
+			ii.guid = $e.vmm.guid;
 			ii.name = $e.vmm.name;
 			
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
@@ -296,15 +296,13 @@ package com.voxelengine.worldmodel.models
 		
 		static private function localModelLoaded( e:LoadingEvent ):void {
 			
-			if ( modelGuid == e.guid ) {
+			if ( _s_mmd.guid == e.guid ) {
 				Log.out( "ModelLoader.localModelLoaded - " + e.toString() );
 				var vm:VoxelModel = Globals.getModelInstance( e.guid );
 				createInstanceFromTemplate(vm);
-				var vmm:VoxelModelMetadata = vm.metadata;
-				vmm.description = modelDesc;
-				vm.save( vmm );
-				modelGuid = "";
-				modelDesc = "";
+				vm.metadata = _s_mmd;
+				var test:Object = _s_mmd.toObject();
+				vm.save( test );
 			}
 		}
 		

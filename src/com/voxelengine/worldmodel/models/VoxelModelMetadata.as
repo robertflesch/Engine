@@ -21,7 +21,7 @@ package com.voxelengine.worldmodel.models
 		private var _name:String;
 		private var _description:String;
 		private var _owner:String;
-		private var _ba:ByteArray;
+		private var _data:ByteArray;
 		private var _dbo:DatabaseObject;
 
 		// Permissions
@@ -45,7 +45,7 @@ package com.voxelengine.worldmodel.models
 				   , copyCount: _copyCount
 				   , modify: _modify
 				   , transfer: _transfer
-				   , data: _ba } 			
+				   , data: _data } 			
 		}
 		
 		public function fromPersistance( $dbo:DatabaseObject ):void {
@@ -57,69 +57,34 @@ package com.voxelengine.worldmodel.models
 			_modify			= $dbo.modify;
 			_transfer		= $dbo.transfer;
 			_guid 			= $dbo.key;
-			_ba 			= $dbo.data;
+			_data 			= $dbo.data;
 			_dbo 			= $dbo;
 		}
 		
-		public function get name():String 
-		{
-			return _name;
-		}
+		public function get name():String  					{ return _name; }
+		public function set name(value:String):void  		{ _name = value; }
 		
-		public function set name(value:String):void 
-		{
-			_name = value;
-		}
+		public function get description():String  			{ return _description; }
+		public function set description(value:String):void  { _description = value; }
 		
-		public function get description():String 
-		{
-			return _description;
-		}
+		public function get owner():String  				{ return _owner; }
+		public function set owner(value:String):void  		{ _owner = value; }
 		
-		public function set description(value:String):void 
-		{
-			_description = value;
-		}
+		public function get copy():Boolean 					{ return _copy; }
 		
-		public function get owner():String 
-		{
-			return _owner;
-		}
+		public function get modify():Boolean 				{ return _modify; }
+		public function set modify(value:Boolean):void 		{ _modify = value; }
 		
-		public function get copy():Boolean 
-		{
-			return _copy;
-		}
+		public function get guid():String 					{ return _guid; }
+		public function set guid(value:String):void  		{ _guid = value; }
 		
-		public function get modify():Boolean 
-		{
-			return _modify;
-		}
+		public function get data():ByteArray 				{ return _data; }
+		public function set data(value:ByteArray):void  	{ _data = value; }
 		
-		public function get guid():String 
-		{
-			return _guid;
-		}
+		public function get databaseObject():DatabaseObject 		{ return _dbo; }
+		public function set databaseObject(val:DatabaseObject):void { _dbo = val; }
 		
-		public function set guid(value:String):void 
-		{
-			_guid = value;
-		}
 		
-		public function get ba():ByteArray 
-		{
-			return _ba;
-		}
-		
-		public function set owner(value:String):void 
-		{
-			_owner = value;
-		}
-		
-		public function set modify(value:Boolean):void 
-		{
-			_modify = value;
-		}
 	}
 }
 

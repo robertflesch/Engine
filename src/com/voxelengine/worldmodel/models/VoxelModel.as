@@ -71,7 +71,6 @@ package com.voxelengine.worldmodel.models
 		protected var 	_modelInfo:ModelInfo 			= null; // INSTANCE NOT EXPORTED
 		protected var 	_instanceInfo:InstanceInfo 		= null; // INSTANCE NOT EXPORTED
 		protected var 	_children:Vector.<VoxelModel> 	= new Vector.<VoxelModel>; // INSTANCE NOT EXPORTED
-		protected var 	_databaseObject:DatabaseObject 	= null; // INSTANCE NOT EXPORTED
 		private var 	_statisics:ModelStatisics 		= new ModelStatisics(); // INSTANCE NOT EXPORTED
 		private var 	_version:String 				= "0"; // INSTANCE NOT EXPORTED
 		private var 	_timer:int 						= getTimer(); // INSTANCE NOT EXPORTED
@@ -104,8 +103,6 @@ package com.voxelengine.worldmodel.models
 		public function get getPerModelLightID():uint 				{ return _lightIDNext++ }
 		public function get camera():Camera							{ return _camera; }
 		protected function get initialized():Boolean 				{ return _initialized; }
-		public function get databaseObject():DatabaseObject 		{ return _databaseObject; }
-		public function set databaseObject(val:DatabaseObject):void { _databaseObject = val; }
 		public function get anim():Animation 						{ return _anim; }
 		public function get accelRate():Number 						{ return _accelRate; }
 		public function get clipVelocityFactor():Number 			{ return _clipVelocityFactor.val; }
@@ -690,7 +687,7 @@ package com.voxelengine.worldmodel.models
 			//if ( 1 == _modelInfo.biomes.layers.length && "LoadModelFromIVM" == _modelInfo.biomes.layers[0].functionName && null != Globals.g_modelManager.modelByteArrays[_modelInfo.biomes.layers[0].data] )	
 			//	byteArrayLoad( Globals.g_modelManager.modelByteArrays[_modelInfo.biomes.layers[0].data] );
 			//else 
-			if (_modelInfo.biomes && false == complete && null == databaseObject )
+			if (_modelInfo.biomes && false == complete && null == metadata.databaseObject )
 				_modelInfo.biomes.add_to_task_controller(instanceInfo);
 			else
 				complete = true; // no model info to load, so just mark it as complete
@@ -987,7 +984,7 @@ package com.voxelengine.worldmodel.models
 			 * @param errorHandler Function executed if an error occurs while deleting the DatabaseObjects
 			 *
 			 */
-			if (databaseObject)
+			if ( metadata.databaseObject )
 			{
 				//function deleteKeys(table:String, keys:Array, callback:Function=null, errorHandler:Function=null):void;
 				trace("VoxelModel.delete - delete object: " + instanceInfo.guid);
@@ -1021,7 +1018,7 @@ package com.voxelengine.worldmodel.models
 		private function created(o:DatabaseObject):void 
 		{ 
 			if ( o )
-				databaseObject = o;
+				metadata.databaseObject = o;
 			//Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS ) ); 
 			Log.out( "VoxelModel.created: " + instanceInfo.guid ); 
 		}	
@@ -1049,14 +1046,14 @@ package com.voxelengine.worldmodel.models
 			_changed = false;
 			Log.out("VoxelModel.save - saving changes to: " + instanceInfo.name  );
 			var ba:ByteArray = toByteArray();
-			if (databaseObject)
+			if (metadata.databaseObject)
 			{
 				Log.out("VoxelModel.save - saving object back to BigDB: " + instanceInfo.name );
-				databaseObject.data = ba;
-				databaseObject.save( false
-				                   , false
-								   , saved
-								   , failed );
+				metadata.databaseObject.data = ba;
+				metadata.databaseObject.save( false
+										    , false
+										    , saved
+										    , failed );
 			}
 			else
 			{

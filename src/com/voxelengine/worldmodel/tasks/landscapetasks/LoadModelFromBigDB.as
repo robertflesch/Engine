@@ -61,11 +61,17 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			{
 				// This seems to be the failure case, not the error handler
 				Log.out( "LoadModelFromBigDB.successHandler - ERROR - NULL DatabaseObject for guid:" + _guid );
-				super.complete() // AbstractTask will send event
+				finish();
 				return;
 			}
 
 			var $ba:ByteArray = $dbo.data as ByteArray;
+			if ( null == $ba ) {
+				// This seems to be the failure case, not the error handler
+				Log.out( "LoadModelFromBigDB.successHandler - ERROR - NULL data for guid:" + _guid );
+				finish();
+				return;
+			}
 			$ba.uncompress();
 			$ba.position = 0;
 			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
@@ -73,7 +79,6 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			
 			var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( $ba, _guid, vmm );
 			if ( vm ) {
-				vm.databaseObject = $dbo;
 				vm.complete = true;
 				
 				if ( vm is Player )
@@ -90,8 +95,21 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			else 
 				Log.out( "LoadModelFromBigDB.successHandler - FAILED loadFromManifestByteArray:" + _guid );
 
-			_count--;				
 			
+			finish();
+		}
+		
+		private	function errorHandler(e:PlayerIOError):void	
+		{ 
+			Log.out( "LoadModelFromBigDB.errorHandler" );
+			Log.out( "LoadModelFromBigDB.errorHandler - e: " + e );
+			trace(e); 
+			
+			finish();
+		}	
+		
+		private	function finish():void {
+			_count--;				
 			if ( 0 == _count )
 			{
 				Log.out( "LoadModelFromBigDB.successHandler - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _guid );
@@ -101,13 +119,5 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			super.complete() // AbstractTask will send event
 		}
 		
-		private	function errorHandler(e:PlayerIOError):void	
-		{ 
-			Log.out( "LoadModelFromBigDB.errorHandler" );
-			Log.out( "LoadModelFromBigDB.errorHandler - e: " + e );
-			trace(e); 
-			_count--;
-			super.complete() // AbstractTask will send event
-		}	
 	}
 }

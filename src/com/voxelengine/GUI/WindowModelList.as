@@ -114,7 +114,7 @@ package com.voxelengine.GUI
 			if ( li && li.data )
 			{
 				var mmde:ModelMetadataEvent = li.data as ModelMetadataEvent;
-				var ba:ByteArray = mmde.vmm.ba as ByteArray;
+				var ba:ByteArray = mmde.vmm.data as ByteArray;
 				ba.uncompress();
 				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( ba, mmde.vmm.guid, mmde.vmm, _parentGuid );				
 
@@ -134,21 +134,20 @@ package com.voxelengine.GUI
 		
 		private function populateModels():void
 		{
+			_listbox1.removeAll();
 			Persistance.loadPublicObjectsMetadata();
 			Persistance.loadUserObjectsMetadata( Network.userId );
-			_listbox1.removeAll();
-			var models:Dictionary = Globals.modelInstancesGetDictionary();
-			for each ( var vm:VoxelModel in models )
-			{
-				if ( vm && !vm.instanceInfo.dynamicObject && !vm.instanceInfo.dead )
-				{
-					if ( vm is Player )
-						continue;
-						
-					_listbox1.addItem( vm.instanceInfo.name, vm );
-				}
-			}
-			
+			//var models:Dictionary = Globals.modelInstancesGetDictionary();
+			//for each ( var vm:VoxelModel in models )
+			//{
+				//if ( vm && !vm.instanceInfo.dynamicObject && !vm.instanceInfo.dead )
+				//{
+					//if ( vm is Player )
+						//continue;
+						//
+					//_listbox1.addItem( vm.instanceInfo.name, vm );
+				//}
+			//}
 		}
 	}
 }
