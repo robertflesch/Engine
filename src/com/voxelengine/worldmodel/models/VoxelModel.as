@@ -8,18 +8,12 @@
 package com.voxelengine.worldmodel.models
 {
 	import flash.display3D.Context3D;
-	
-	
 	import flash.events.TimerEvent;
 	import flash.events.KeyboardEvent;
-	
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
-	
 	import flash.net.registerClassAlias;
-	
 	import flash.ui.Keyboard;
-	
 	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
 	import flash.utils.Timer;
@@ -70,6 +64,7 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class VoxelModel
 	{
+		private var 	_metadata:VoxelModelMetadata    = new VoxelModelMetadata();
 		private var 	_oxel:Oxel 						= null; // INSTANCE NOT EXPORTED
 		private var 	_editCursor:EditCursor 			= null; // INSTANCE NOT EXPORTED
 		protected var 	_shaders:Vector.<Shader>        = new Vector.<Shader>;
@@ -101,6 +96,8 @@ package com.voxelengine.worldmodel.models
 		protected var 	_turnRate:Number 				= 20; // 2.5 for ship
 		protected var 	_accelRate:Number 				= 2.5;
 		
+		public function get metadata():VoxelModelMetadata    		{ return _metadata; }
+
 		public function get usesGravity():Boolean 					{ return _usesGravity; }
 		public function set usesGravity(val:Boolean):void 			{ _usesGravity = val; }
 		public function get getPerModelLightID():uint 				{ return _lightIDNext++ }
@@ -137,7 +134,7 @@ package com.voxelengine.worldmodel.models
 			//Log.out( "VoxelModel.complete: " + modelInfo.fileName );
 			_complete = val;
 			
-			if ( modelInfo.editable && Globals.g_app.configManager.showEditMenu) {
+			if ( metadata.editable && Globals.g_app.configManager.showEditMenu) {
 				if ( null == editCursor )
 					editCursor = EditCursor.create();
 				editCursor.oxel.gc.bound = oxel.gc.bound;
@@ -255,7 +252,7 @@ package com.voxelengine.worldmodel.models
 			}
 			else
 			{
-				if ( modelInfo.editable )
+				if ( metadata.editable )
 				{
 					Globals.g_app.addEventListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
 					
@@ -943,7 +940,7 @@ package com.voxelengine.worldmodel.models
 		{
 			//trace("VoxelModel.release - removing listeners and deleting oxel");
 			
-			if ( modelInfo.editable )
+			if ( metadata.editable )
 			{
 				Globals.g_app.removeEventListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
 				
@@ -1004,16 +1001,16 @@ package com.voxelengine.worldmodel.models
 			_changed = false;
 		}
 ///////////////////////////////////////		
-		private function metadata( ba: ByteArray ):Object
-		{
-			return { 
-				data: ba,
-				description: instanceInfo.guid,
-				name: instanceInfo.name,
-				owner: Network.userId,  //owner: _publicRegion ? "public": Network.userId,
-				template: modelInfo.template
-			}
-		}
+		//private function metadata( ba: ByteArray ):Object
+		//{
+			//return { 
+				//data: ba,
+				//description: instanceInfo.guid,
+				//name: instanceInfo.name,
+				//owner: Network.userId,  //owner: _publicRegion ? "public": Network.userId,
+				//template: modelInfo.template
+			//}
+		//}
 		
 		private function created(o:DatabaseObject):void 
 		{ 
@@ -1058,9 +1055,9 @@ package com.voxelengine.worldmodel.models
 			else
 			{
 				if ( null == objectMetadata )
-					objectMetadata = metadata( ba );
-				else
-					objectMetadata.data = ba;
+					objectMetadata = metadata.toObject;
+					
+				objectMetadata.data = ba;
 				
 				Log.out("VoxelModel.save - creating new object: " + instanceInfo.name );
 				Persistance.createObject( Persistance.DB_TABLE_OBJECTS

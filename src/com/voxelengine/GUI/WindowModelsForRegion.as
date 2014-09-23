@@ -216,7 +216,7 @@ package com.voxelengine.GUI
 				{
 					Globals.selectedModel = li.data;
 					
-					new WindowModelTemplate( Globals.selectedModel.modelInfo );
+					new WindowModelTemplate( Globals.selectedModel );
 					
 				}
 			}

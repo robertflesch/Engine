@@ -41,7 +41,7 @@ package com.voxelengine.GUI
 			if ( btn.selected )
 			{
 				//parentContainer.removeElementAt( index );
-				parentContainer.addElement( new ChildModelPanel( new InstanceInfo(), WindowModelTemplate.PANEL_WIDTH) );
+//				parentContainer.addElement( new ChildModelPanel( new InstanceInfo(), WindowModelTemplate.PANEL_WIDTH) );
 				//parentContainer.addElement( btn );
 				btn.selected = false;
 			}

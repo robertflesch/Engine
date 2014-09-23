@@ -752,7 +752,7 @@ package com.voxelengine.worldmodel.models
 					continue;
 					
 				// finds up to two intersecting planes per model
-				if ( vm && vm.complete && vm.modelInfo.editable )
+				if ( vm && vm.complete && vm.metadata.editable )
 				{
 					vm.lineIntersect( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections );
 				
@@ -775,7 +775,7 @@ package com.voxelengine.worldmodel.models
 			for each ( var vm:VoxelModel in _modelInstances )
 			{
 				// finds up to two intersecting planes
-				if ( vm && vm.complete && vm.modelInfo.editable )
+				if ( vm && vm.complete && vm.metadata.editable )
 				{
 					vm.lineIntersect( startPoint, endPoint, _worldSpaceIntersections );
 				}

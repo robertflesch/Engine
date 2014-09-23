@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.models
 		private var	_moveSpeed:Attribute 				= new Attribute( 0.01 );
 		private var _transforms:Vector.<ModelTransform> = new Vector.<ModelTransform>;	// toJSON
 		private var _shader:String 						= "ShaderOxel";					// toJSON
-		private var _guid:String 				= null;                         // toJSON
+		private var _guid:String 						= null;                         // toJSON
 		private var _name:String 						= "Default_Name";               // toJSON
 		private var _scriptName:String 					= "";                           // toJSON
 		private var _grainSize:int 						= 0;                            // toJSON
@@ -90,7 +90,12 @@ package com.voxelengine.worldmodel.models
 		public function set grainSize(val:int):void					{ _grainSize = val; }
 		public function get shader():String 						{ return _shader; }
 		public function get controllingModel():VoxelModel  			{ return _controllingModel; }
-		public function set controllingModel(val:VoxelModel):void 	{ _controllingModel = val; }
+		public function set controllingModel(val:VoxelModel):void 	
+		{ 
+			if ( val && this == val.instanceInfo )
+				Log.out( "Instance	Info.controllingModel SET - trying to set this to itself" );
+			_controllingModel = val; 
+		}
 		public function get owner():VoxelModel  					{ return _owner; }
 		public function set owner(val:VoxelModel):void 				
 		{ 
@@ -188,8 +193,8 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		public function topmostGuid():String {
-			if ( _controllingModel )
-				return _controllingModel.instanceInfo.topmostGuid();
+			if ( controllingModel )
+				return controllingModel.instanceInfo.topmostGuid();
 			return guid;	
 		}
 		

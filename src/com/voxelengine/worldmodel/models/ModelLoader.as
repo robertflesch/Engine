@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class ModelLoader 
 	{
-		static public const MODEL_MANAGER_MODEL_EXT:String = ".mjson";
+		static private const MODEL_MANAGER_MODEL_EXT:String = ".mjson";
 		static private const MANIFEST_VERSION:int = 100;
 		
 		// objects that are waiting on model data to load
@@ -67,50 +67,9 @@ package com.voxelengine.worldmodel.models
 				loadPersistant( $ii );
 		}
 		
-		static private function addBlock( $guid:String, $name:String ):void {
-			//Log.out( "ModelLoader.addBlock - instanceGIUD: " + $guid + "  fileName: " + fileName );
-			if ( _blocks[$guid] )
-			{
-				var block:Vector.<String> = _blocks[$guid];
-				// check to make sure its not in more then once
-				for each ( var name:String in block )
-				{
-					if ( name == $name )
-						return;
-				}
-				block.push( $name );
-			}
-			else
-			{
-				var newBlock:Vector.<String> = new Vector.<String>;
-				newBlock.push( $name );
-				_blocks[$guid] = newBlock;
-			}
-		}
-		
-		static private function clearBlock( $guid:String, $error:Boolean = false ):void {
-			//Log.out( "ModelLoader.clearBlock " + $guid  );
-			if ( _blocks[$guid] )
-			{
-				var block:Vector.<String> = _blocks[$guid];
-				if ( !$error )
-				{
-					var instanceInfo:InstanceInfo = null;
-					for each ( var name:String in block )
-					{
-						instanceInfo = Globals.instanceInfoGet( $guid );
-						//Log.out( "CLEAR BLOCK " + instanceInfo.toString() + " for guid: " + guid  );
-						if ( instanceInfo )
-						{
-							//Log.out( "CLEAR BLOCK " + instanceInfo.toString()  );
-							instantiate( instanceInfo, Globals.modelInfoGet($guid) );
-						}
-					}
-				}
-				// TODO This should create a new _blocks that doesnt include the $guid, rather then it being null
-				// but whats the saving vs creating new memory...
-				_blocks[$guid] = null;
-			}
+		// If we want to preload the modelInfo, we dont need to block on it
+		static public function modelInfoPreload( $fileName:String ):void {
+			modelInfoFindOrCreate( $fileName, "", false );
 		}
 		
 		static private function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo ):* {
@@ -127,11 +86,6 @@ package com.voxelengine.worldmodel.models
 			//Log.out( "ModelLoader.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
 			Globals.modelAdd( vm );
 			return vm;
-		}
-		
-		// If we want to preload the modelInfo, we dont need to block on it
-		static public function modelInfoPreload( $fileName:String ):void {
-			modelInfoFindOrCreate( $fileName, "", false );
 		}
 		
 		///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -188,8 +142,8 @@ package com.voxelengine.worldmodel.models
 				}
 				
 			if ( "" != controllingModelGuid ) {
-				var vm:VoxelModel = Globals.getModelInstance( controllingModelGuid );
-				ii.controllingModel = vm;
+				var cvm:VoxelModel = Globals.getModelInstance( controllingModelGuid );
+				ii.controllingModel = cvm;
 			}
 				
 			var vm:* = instantiate( ii, mi );
@@ -332,7 +286,7 @@ package com.voxelengine.worldmodel.models
 			
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-			Log.out( "RegionManager.addModel - " + ii.toString() );
+			Log.out( "ModelLoader.localModelReadyToBeCreated - " + ii.toString() );
 			
 			Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_COMPLETE, localModelLoaded );
 			Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, localModelLoaded );
@@ -346,7 +300,9 @@ package com.voxelengine.worldmodel.models
 				Log.out( "ModelLoader.localModelLoaded - " + e.toString() );
 				var vm:VoxelModel = Globals.getModelInstance( e.guid );
 				createInstanceFromTemplate(vm);
-				vm.save( { name: vm.instanceInfo.name, description: modelDesc, owner: Network.userId, template: vm.modelInfo.template, data: null } );
+				var vmm:VoxelModelMetadata = vm.metadata;
+				vmm.description = modelDesc;
+				vm.save( vmm );
 				modelGuid = "";
 				modelDesc = "";
 			}
@@ -362,7 +318,7 @@ package com.voxelengine.worldmodel.models
 			// Read off first 3 bytes, the data format
 			var format:String = readFormat($ba);
 			if ("ivm" != format)
-				throw new Error("VoxelModel.readMetaInfo - Exception - unsupported format: " + format );
+				throw new Error("ModelLoader.modelMetaInfoRead - Exception - unsupported format: " + format );
 			
 			var metaInfo:Object = new Object();
 			// Read off next 3 bytes, the data version
@@ -426,5 +382,53 @@ package com.voxelengine.worldmodel.models
 			Log.out( "ModelLoader.loadRegionObjects - END =============================" );
 			return count;
 		}
+		
+		static private function addBlock( $guid:String, $name:String ):void {
+			//Log.out( "ModelLoader.addBlock - instanceGIUD: " + $guid + "  fileName: " + fileName );
+			if ( _blocks[$guid] )
+			{
+				var block:Vector.<String> = _blocks[$guid];
+				// check to make sure its not in more then once
+				for each ( var name:String in block )
+				{
+					if ( name == $name )
+						return;
+				}
+				block.push( $name );
+			}
+			else
+			{
+				var newBlock:Vector.<String> = new Vector.<String>;
+				newBlock.push( $name );
+				_blocks[$guid] = newBlock;
+			}
+		}
+		
+		static private function clearBlock( $guid:String, $error:Boolean = false ):void {
+			//Log.out( "ModelLoader.clearBlock " + $guid  );
+			if ( _blocks[$guid] )
+			{
+				var block:Vector.<String> = _blocks[$guid];
+				if ( !$error )
+				{
+					var instanceInfo:InstanceInfo = null;
+					for each ( var name:String in block )
+					{
+						instanceInfo = Globals.instanceInfoGet( $guid );
+						//Log.out( "CLEAR BLOCK " + instanceInfo.toString() + " for guid: " + guid  );
+						if ( instanceInfo )
+						{
+							//Log.out( "CLEAR BLOCK " + instanceInfo.toString()  );
+							instantiate( instanceInfo, Globals.modelInfoGet($guid) );
+						}
+					}
+				}
+				// TODO This should create a new _blocks that doesnt include the $guid, rather then it being null
+				// but whats the saving vs creating new memory...
+				_blocks[$guid] = null;
+			}
+		}
+		
+		
 	}
 }

@@ -87,7 +87,8 @@ package com.voxelengine.GUI
 
 		private function newModelHandler(event:UIMouseEvent):void 
 		{
-			new WindowModelTemplate( new ModelInfo() );
+			new Alert( "Where do I get my list of child models from?" );
+			//new WindowModelTemplate( new ModelInfo() );
 		}
 
 		private var _viewDistance:Vector3D = new Vector3D(0, 0, -75);

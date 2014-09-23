@@ -37,13 +37,13 @@ package com.voxelengine.GUI
 			{
 				if ( "Bomb" == vm1.modelInfo.modelClass )
 				{
-					var BombName:String = "";
-					if ( "Default Name" != vm1.instanceInfo.name )
-						BombName = vm1.instanceInfo.name
-					else 
-						BombName = vm1.modelInfo.name
+					//var BombName:String = "";
+					//if ( "Default Name" != vm1.instanceInfo.name )
+						//BombName = vm1.instanceInfo.name
+					//else 
+						//BombName = vm1.modelInfo.name
 						
-					var cannon:Button = new Button( BombName );
+					var cannon:Button = new Button( "BombName" );
 					
 					cannon.width = 120;
 					cannon.addEventListener(MouseEvent.CLICK, fire );
@@ -70,13 +70,13 @@ package com.voxelengine.GUI
 			{
 				if ( "Bomb" == vm1.modelInfo.modelClass )
 				{
-					var BombName:String = "";
-					if ( "Default Name" != vm1.instanceInfo.name )
-						BombName = vm1.instanceInfo.name
-					else 
-						BombName = vm1.modelInfo.name
+					//var BombName:String = "";
+					//if ( "Default Name" != vm1.instanceInfo.name )
+						//BombName = vm1.instanceInfo.name
+					//else 
+						//BombName = vm1.modelInfo.name
 						
-					var cannon:Button = new Button( BombName );
+					var cannon:Button = new Button( "BombName" );
 					
 					cannon.width = 120;
 					cannon.addEventListener(MouseEvent.CLICK, fire );

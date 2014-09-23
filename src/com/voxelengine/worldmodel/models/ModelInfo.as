@@ -19,16 +19,12 @@ package com.voxelengine.worldmodel.models
 	public class ModelInfo 
 	{
 		private var _fileName:String = "INVALID";
-		private var _editable:Boolean = false;
-		private var _template:Boolean = false;
 		private var _biomes:Biomes = null;
 		private var _parent:ModelInfo = null;
 		private var _modelClass:String = "VoxelModel";
 		private var _children:Vector.<InstanceInfo> = new Vector.<InstanceInfo>;
 		private var _scripts:Vector.<String> = new Vector.<String>;
 		private var _grainSize:int = 0;
-		private var _name:String = "Default_Name";
-		private var _desc:String = "Default_Description";
 		private var _modelJson:Object = null;
 		private var _animations:Vector.<Animation> 		= new Vector.<Animation>();
 		private var _childCount:int // number of children this model has at start. Used to determine if animation can be played.
@@ -37,10 +33,6 @@ package com.voxelengine.worldmodel.models
 		public function jsonReset():void 						{ _modelJson = toJSON(null); }
 		public function get fileName():String 					{ return _fileName; }
 		public function set fileName(val:String):void 			{ _fileName = val; }
-		public function get editable():Boolean 					{ return _editable; }
-		public function set editable(val:Boolean):void			{ _editable = val; }
-		public function get template():Boolean 					{ return _template; }
-		public function set template(val:Boolean):void	 		{ _template = val; }
 		public function get biomes():Biomes 					{ return _biomes; }
 		public function get children():Vector.<InstanceInfo> 	{ return _children; }
 		public function get scripts():Vector.<String> 			{ return _scripts; }
@@ -48,10 +40,6 @@ package com.voxelengine.worldmodel.models
 		public function set modelClass(val:String):void 		{ _modelClass = val; }
 		public function get grainSize():int						{ return _grainSize; }
 		public function set grainSize(val:int):void				{ _grainSize = val; }
-		public function get name():String						{ return _name; }
-		public function set name(val:String):void				{ _name = val; }
-		public function get desc():String						{ return _desc; }
-		public function set desc(val:String):void				{ _desc = val; }
 		
 		public function get parent():ModelInfo  				{ return _parent; }
 		public function set parent(val:ModelInfo):void 			{ _parent = val; }
@@ -59,12 +47,7 @@ package com.voxelengine.worldmodel.models
 		public function get animations():Vector.<Animation> 	{ return _animations; }
 		public function get childCount():int 					{ return _childCount; }
 
-		//public function biomesReset():void 					{ _biomes = null; }
-
-		public function ModelInfo():void 
-		{ 
-			; 
-		}
+		public function ModelInfo():void  { ; }
 		
 		public function clone( newGuid:String = "" ):ModelInfo
 		{
@@ -74,12 +57,9 @@ package com.voxelengine.worldmodel.models
 			else	
 				newModelInfo.fileName 			= newGuid;
 				
-			newModelInfo._editable 		= this.editable;
-			newModelInfo._template      = this.template;
 			newModelInfo._parent		= null;               // Don't want to inherit this
 			newModelInfo._modelClass	= this.modelClass;
 			newModelInfo._grainSize		= this.grainSize;
-			newModelInfo._name			= this.name;
 			newModelInfo._modelJson		= this._modelJson;
 			newModelInfo._childCount	= this._childCount;
 			
@@ -143,10 +123,10 @@ package com.voxelengine.worldmodel.models
 		public function toJSON(k:*):* 
 		{ 
 			return {
-					name:			_name,
-					desc:			_desc,
-					editable: 		_editable,
-					template:		_template,
+//					name:			_name,
+//					desc:			_desc,
+//					editable: 		_editable,
+//					template:		_template,
 					biomes:			_biomes,
 					children:		_children,
 					grainSize:		_grainSize,
@@ -180,16 +160,6 @@ package com.voxelengine.worldmodel.models
 			else if ( json.grainsize )
 				_grainSize = 	json.grainsize;
 			
-			if ( json.name )
-			{
-				name = json.name;
-			}
-			
-			if ( json.desc )
-			{
-				desc = json.desc;
-			}
-			
 			if ( json.modelClass )
 				_modelClass = json.modelClass;
 
@@ -205,24 +175,6 @@ package com.voxelengine.worldmodel.models
 				}
 			}
 			
-			if ( json.template )
-			{
-				var templateAbility:String = json.template;
-				if ( "true" == templateAbility.toLowerCase() )
-					_template = true;
-				else	
-					_template = false;
-			}
-			
-			if ( json.editable )
-			{
-				var editAbility:String = json.editable;
-				if ( "true" == editAbility.toLowerCase() )
-					_editable = true;
-				else	
-					_editable = false;
-			}
-				
 			if ( json.biomes )
 			{
 				var biomes:Object = json.biomes;

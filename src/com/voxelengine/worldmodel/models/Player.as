@@ -45,7 +45,7 @@
 			
 			instanceInfo.usesCollision = true;
 			clipVelocityFactor = AVATAR_CLIP_FACTOR;
-			modelInfo.editable = false;
+			metadata.editable = false;
 			
 			Globals.g_app.addEventListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
 			

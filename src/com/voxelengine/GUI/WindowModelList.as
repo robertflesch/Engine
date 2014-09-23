@@ -97,6 +97,8 @@ package com.voxelengine.GUI
 		{
 			Log.out( "onChildModelFileSelected : " + e.toString() );
 			
+			var selectedModel:VoxelModel = e.currentTarget as VoxelModel;
+			//if ( selectedModel
 			var fileName:String = e.currentTarget.name;
 			fileName = fileName.substr( 0, fileName.indexOf( "." ) );
 

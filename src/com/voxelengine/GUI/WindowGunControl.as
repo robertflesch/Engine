@@ -40,13 +40,13 @@ package com.voxelengine.GUI
 					{
 						if ( "Gun" == cm.modelInfo.modelClass )
 						{
-							var gunName:String = "";
-							if ( "Default Name" != cm.instanceInfo.name )
-								gunName = cm.instanceInfo.name
-							else 
-								gunName = cm.modelInfo.name
+							//var gunName:String = "";
+							//if ( "Default Name" != cm.instanceInfo.name )
+								//gunName = cm.instanceInfo.name
+							//else 
+								//gunName = cm.modelInfo.name
 								
-							var cannon:Button = new Button( gunName );
+							var cannon:Button = new Button( "gunName" );
 							
 							cannon.width = 120;
 							cannon.addEventListener(MouseEvent.CLICK, fire );
