@@ -39,9 +39,9 @@ package com.voxelengine.worldmodel.models
 		protected var _bombs:Vector.<VoxelModel> = new Vector.<VoxelModel>;
 		
 
-		public function Ship( ii:InstanceInfo, mi:ModelInfo ) 
+		public function Ship( ii:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
 		{ 
-			super( ii, mi );
+			super( ii, mi, $vmm );
 			
 			// TODO These should be loading from the json file
 			clipVelocityFactor = SHIP_CLIP_FACTOR;

@@ -45,9 +45,9 @@ package com.voxelengine.worldmodel.models
 		// Todo: From metadata (someday)
 		private var _maxThrust:int = 10;
 		
-		public function Engine( instanceInfo:InstanceInfo, mi:ModelInfo ) 
+		public function Engine( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
 		{ 
-			super( instanceInfo, mi );
+			super( instanceInfo, mi, $vmm );
 			
 			if ( mi.json && mi.json.model && mi.json.model.engine )
 			{

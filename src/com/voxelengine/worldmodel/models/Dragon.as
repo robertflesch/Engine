@@ -27,8 +27,8 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class Dragon extends Beast 
 	{
-		public function Dragon( ii:InstanceInfo, mi:ModelInfo ) { 
-			super( ii, mi );
+		public function Dragon( ii:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
+			super( ii, mi, $vmm );
 			
 			//MouseKeyboardHandler.backwardEnabled = false;
 			

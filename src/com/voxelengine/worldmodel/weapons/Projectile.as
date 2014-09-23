@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.weapons
 	import com.voxelengine.Log;
 	import com.voxelengine.pools.ParticlePool;
 	import com.voxelengine.pools.ProjectilePool;
+	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 	import com.voxelengine.worldmodel.scripts.ImpactScript;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.events.ImpactEvent;
@@ -44,9 +45,9 @@ package com.voxelengine.worldmodel.weapons
 		//private var _explosionRadius:int 			= 16; // oxel.gc.grain * 8
 		//private var _explosionMin:int 				= 2; // oxel.gc.grain * 2
 		//
-		public function Projectile( $instanceInfo:InstanceInfo, $mi:ModelInfo ) 
+		public function Projectile( $instanceInfo:InstanceInfo, $mi:ModelInfo, $vmm:VoxelModelMetadata ) 
 		{ 
-			super( $instanceInfo, $mi );
+			super( $instanceInfo, $mi, $vmm );
 			instanceInfo.dynamicObject = true;
 		}
 		

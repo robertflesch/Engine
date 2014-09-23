@@ -40,12 +40,12 @@
 		private var _inventoryStore:SharedObject;
 		private var _inventory:Vector.<InventoryObjects> = new Vector.<InventoryObjects>();
 		
-		public function Player( instanceInfo:InstanceInfo, mi:ModelInfo ) { 
-			super( instanceInfo, mi );
+		public function Player( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
+			super( instanceInfo, mi, $vmm );
 			
 			instanceInfo.usesCollision = true;
 			clipVelocityFactor = AVATAR_CLIP_FACTOR;
-			metadata.editable = false;
+			//metadata.modify = false;
 			
 			Globals.g_app.addEventListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
 			

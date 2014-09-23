@@ -15,12 +15,12 @@
 	import flash.geom.Matrix3D;
 
 
-    public class Avatar extends VoxelModel
+    public class Avatar extends ControllableVoxelModel
     {
-		public function Avatar( instanceInfo:InstanceInfo, mi:ModelInfo ) 
+		public function Avatar( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
 		{ 
 			trace( "Avatar CREATED" );
-			super( instanceInfo, mi );
+			super( instanceInfo, mi, $vmm );
 		}
 	}
 }

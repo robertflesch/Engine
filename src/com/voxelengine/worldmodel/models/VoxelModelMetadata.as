@@ -7,6 +7,8 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import flash.utils.ByteArray;
+	import playerio.DatabaseObject;
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF
@@ -14,24 +16,49 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class VoxelModelMetadata
 	{
-//		public function get editable():Boolean 					{ return _editable; }
-//		public function set editable(val:Boolean):void			{ _editable = val; }
-//		public function get template():Boolean 					{ return _template; }
-//		public function set template(val:Boolean):void	 		{ _template = val; }
-		
+		private static const COPY_COUNT_INFINITE:int = -1;
+		private var _guid:String;
 		private var _name:String;
 		private var _description:String;
 		private var _owner:String;
-		private var _template:Boolean;
-		private var _editable:Boolean = true;
+		private var _ba:ByteArray;
+		private var _dbo:DatabaseObject;
+
+		// Permissions
+		// http://wiki.secondlife.com/wiki/Permission
+		// move is more of a region type permission
+		private var _copy:Boolean;
+		private var _copyCount:int = COPY_COUNT_INFINITE;
+		private var _modify:Boolean = true;
+		private var _transfer:Boolean = true;
+
+		public function toString():String {
+			return "name: " + _name + "  description: " + _description + "  guid: " + _guid + "  owner: " + _owner;
+		}
 		
 		public function get toObject():Object {
-			return { name: _name
+			return { guid: _guid
+				   , name: _name
 			       , description: _description
 				   , owner: _owner
-				   , template: _template
-				   , editable: _editable
-				   , data: null } 			
+				   , copy: _copy
+				   , copyCount: _copyCount
+				   , modify: _modify
+				   , transfer: _transfer
+				   , data: _ba } 			
+		}
+		
+		public function fromPersistance( $dbo:DatabaseObject ):void {
+			_name 			= $dbo.name;
+			_description	= $dbo.description;
+			_owner			= $dbo.owner;
+			_copy			= $dbo.copy;
+			_copyCount		= $dbo.copyCount;
+			_modify			= $dbo.modify;
+			_transfer		= $dbo.transfer;
+			_guid 			= $dbo.key;
+			_ba 			= $dbo.data;
+			_dbo 			= $dbo;
 		}
 		
 		public function get name():String 
@@ -59,29 +86,39 @@ package com.voxelengine.worldmodel.models
 			return _owner;
 		}
 		
+		public function get copy():Boolean 
+		{
+			return _copy;
+		}
+		
+		public function get modify():Boolean 
+		{
+			return _modify;
+		}
+		
+		public function get guid():String 
+		{
+			return _guid;
+		}
+		
+		public function set guid(value:String):void 
+		{
+			_guid = value;
+		}
+		
+		public function get ba():ByteArray 
+		{
+			return _ba;
+		}
+		
 		public function set owner(value:String):void 
 		{
 			_owner = value;
 		}
 		
-		public function get template():Boolean 
+		public function set modify(value:Boolean):void 
 		{
-			return _template;
-		}
-		
-		public function set template(value:Boolean):void 
-		{
-			_template = value;
-		}
-		
-		public function get editable():Boolean 
-		{
-			return _editable;
-		}
-		
-		public function set editable(value:Boolean):void 
-		{
-			_editable = value;
+			_modify = value;
 		}
 	}
 }

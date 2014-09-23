@@ -55,8 +55,8 @@ package com.voxelengine.worldmodel.models
 		static protected 	const 	FOOT:String					= "FOOT";
 		static protected 	const 	FALL:String					= "FALL";
 		
-		public function Beast( ii:InstanceInfo, mi:ModelInfo ) { 
-			super( ii, mi );
+		public function Beast( ii:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
+			super( ii, mi, $vmm );
 			
 			//MouseKeyboardHandler.backwardEnabled = false;
 			

@@ -31,9 +31,9 @@ package com.voxelengine.worldmodel.models
 		private var _was_selected:Boolean = false;
 		private var _ba:ByteArray = null;
 		
-		public function Trigger( instanceInfo:InstanceInfo, mi:ModelInfo ) 
+		public function Trigger( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
 		{ 
-			super( instanceInfo, mi );
+			super( instanceInfo, mi, $vmm );
 		}
 
 		override public function update(context:Context3D, elapsedTimeMS:int):void 

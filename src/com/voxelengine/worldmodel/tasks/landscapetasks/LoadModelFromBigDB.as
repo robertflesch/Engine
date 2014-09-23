@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.Player;
+	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 	import playerio.DatabaseObject;
 	import playerio.PlayerIOError;
 	
@@ -67,8 +68,10 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var $ba:ByteArray = $dbo.data as ByteArray;
 			$ba.uncompress();
 			$ba.position = 0;
+			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
+			vmm.fromPersistance( $dbo );
 			
-			var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( $ba, _guid );
+			var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( $ba, _guid, vmm );
 			if ( vm ) {
 				vm.databaseObject = $dbo;
 				vm.complete = true;

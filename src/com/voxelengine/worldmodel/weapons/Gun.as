@@ -37,9 +37,9 @@ package com.voxelengine.worldmodel.weapons
 		//Barrel
 		//Stand
 		//Sight
-		public function Gun( instanceInfo:InstanceInfo, mi:ModelInfo ) 
+		public function Gun( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
 		{ 
-			super( instanceInfo, mi );
+			super( instanceInfo, mi, $vmm );
 			var centerLoc:int = 2 << (mi.grainSize - 2);
 			calculateCenter( centerLoc );
 			

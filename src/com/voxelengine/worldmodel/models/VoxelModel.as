@@ -64,7 +64,7 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class VoxelModel
 	{
-		private var 	_metadata:VoxelModelMetadata    = new VoxelModelMetadata();
+		private var 	_metadata:VoxelModelMetadata;
 		private var 	_oxel:Oxel 						= null; // INSTANCE NOT EXPORTED
 		private var 	_editCursor:EditCursor 			= null; // INSTANCE NOT EXPORTED
 		protected var 	_shaders:Vector.<Shader>        = new Vector.<Shader>;
@@ -97,6 +97,7 @@ package com.voxelengine.worldmodel.models
 		protected var 	_accelRate:Number 				= 2.5;
 		
 		public function get metadata():VoxelModelMetadata    		{ return _metadata; }
+		public function set metadata(val:VoxelModelMetadata):void   { _metadata = val; }
 
 		public function get usesGravity():Boolean 					{ return _usesGravity; }
 		public function set usesGravity(val:Boolean):void 			{ _usesGravity = val; }
@@ -134,7 +135,7 @@ package com.voxelengine.worldmodel.models
 			//Log.out( "VoxelModel.complete: " + modelInfo.fileName );
 			_complete = val;
 			
-			if ( metadata.editable && Globals.g_app.configManager.showEditMenu) {
+			if ( metadata.modify && Globals.g_app.configManager.showEditMenu) {
 				if ( null == editCursor )
 					editCursor = EditCursor.create();
 				editCursor.oxel.gc.bound = oxel.gc.bound;
@@ -239,12 +240,17 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		
-		public function VoxelModel(ii:InstanceInfo, mi:ModelInfo, initializeRoot:Boolean = true):void {
+		public function VoxelModel(ii:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata, initializeRoot:Boolean = true):void {
 			_instanceInfo = ii;
 			_modelInfo = mi;
 			
 			if (initializeRoot)
 				initialize_root_oxel(0 < instanceInfo.grainSize ? instanceInfo.grainSize : modelInfo.grainSize);
+			
+			if ( null == $vmm )
+				metadata = new VoxelModelMetadata();
+			else 
+				metadata = $vmm;
 			
 			if ((this is EditCursor) || null != instanceInfo.controllingModel || true == instanceInfo.dynamicObject)
 			{
@@ -252,7 +258,7 @@ package com.voxelengine.worldmodel.models
 			}
 			else
 			{
-				if ( metadata.editable )
+				if ( metadata.modify )
 				{
 					Globals.g_app.addEventListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
 					
@@ -289,7 +295,7 @@ package com.voxelengine.worldmodel.models
 				repeat--;
 			ii._repeat = repeat;
 			
-			var vm:VoxelModel = new VoxelModel(ii, mi, false);
+			var vm:VoxelModel = new VoxelModel(ii, mi, null, false);
 			return vm;
 		}
 		
@@ -940,7 +946,7 @@ package com.voxelengine.worldmodel.models
 		{
 			//trace("VoxelModel.release - removing listeners and deleting oxel");
 			
-			if ( metadata.editable )
+			if ( metadata.modify )
 			{
 				Globals.g_app.removeEventListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
 				
@@ -1162,7 +1168,7 @@ package com.voxelengine.worldmodel.models
 			var ii:InstanceInfo = instanceInfo.explosionClone();
 			ii.guid = "ExplosionFragment";
 			var mi:ModelInfo = new ModelInfo();
-			var vm:VoxelModel = new VoxelModel(ii, mi, false);
+			var vm:VoxelModel = new VoxelModel(ii, mi, null, false);
 			vm._version = Globals.VERSION_000;
 			vm.instanceInfo.dynamicObject = true;
 			vm.oxel = childOxel;

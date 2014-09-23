@@ -28,9 +28,9 @@ package com.voxelengine.worldmodel.models
 	{
 		private var _pointValue:int = 10;
 		
-		public function Target( instanceInfo:InstanceInfo, mi:ModelInfo ) 
+		public function Target( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
 		{ 
-			super( instanceInfo, mi );
+			super( instanceInfo, mi, $vmm );
 			Globals.g_app.dispatchEvent( new TargetEvent( TargetEvent.CREATED, instanceInfo.guid, _pointValue ) );
 			//WindowScore.instance.register();
 		}

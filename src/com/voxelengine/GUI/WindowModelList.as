@@ -114,9 +114,9 @@ package com.voxelengine.GUI
 			if ( li && li.data )
 			{
 				var mmde:ModelMetadataEvent = li.data as ModelMetadataEvent;
-				var ba:ByteArray = mmde.ba as ByteArray;
+				var ba:ByteArray = mmde.vmm.ba as ByteArray;
 				ba.uncompress();
-				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( ba, mmde.guid, _parentGuid );				
+				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( ba, mmde.vmm.guid, mmde.vmm, _parentGuid );				
 
 				remove();
 			}
@@ -129,7 +129,7 @@ package com.voxelengine.GUI
 		
 		private function modelLoaded( e:ModelMetadataEvent ):void
 		{
-			_listbox1.addItem( e.name + " - " + e.description, e );
+			_listbox1.addItem( e.vmm.name + " - " + e.vmm.description, e );
 		}
 		
 		private function populateModels():void

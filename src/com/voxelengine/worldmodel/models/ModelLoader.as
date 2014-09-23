@@ -72,13 +72,13 @@ package com.voxelengine.worldmodel.models
 			modelInfoFindOrCreate( $fileName, "", false );
 		}
 		
-		static private function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo ):* {
+		static private function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:VoxelModelMetadata ):* {
 			if ( !$ii )
 				throw new Error( "ModelLoader.instantiate - InstanceInfo null" );
 				
 			var modelAsset:String = $modelInfo.modelClass;
 			var modelClass:Class = ModelLibrary.getAsset( modelAsset )
-			var vm:* = new modelClass( $ii, $modelInfo );
+			var vm:* = new modelClass( $ii, $modelInfo, $vmm );
 			if ( null == vm )
 				throw new Error( "ModelLoader.instantiate - Model failed in creation - modelClass: " + modelClass );
 			
@@ -109,7 +109,7 @@ package com.voxelengine.worldmodel.models
 			Globals.g_landscapeTaskController.addTask( taskGroup );
 		}
 		
-		static public function loadFromManifestByteArray( $ba:ByteArray, $guid:String, controllingModelGuid:String = "" ):VoxelModel {
+		static public function loadFromManifestByteArray( $ba:ByteArray, $guid:String, $vmm:VoxelModelMetadata, controllingModelGuid:String = "" ):VoxelModel {
 				
 			var versionInfo:Object = modelMetaInfoRead( $ba );
 			if ( MANIFEST_VERSION != versionInfo.manifestVersion )
@@ -146,7 +146,7 @@ package com.voxelengine.worldmodel.models
 				ii.controllingModel = cvm;
 			}
 				
-			var vm:* = instantiate( ii, mi );
+			var vm:* = instantiate( ii, mi, $vmm );
 			vm.version = versionInfo.version;
 			vm.loadOxelFromByteArray( $ba );
 			}
@@ -165,7 +165,7 @@ package com.voxelengine.worldmodel.models
 			var modelInfo:ModelInfo = modelInfoFindOrCreate( $ii.guid, $ii.name );
 			if ( modelInfo )
 			{
-				instantiate( $ii, modelInfo );
+				instantiate( $ii, modelInfo, null );
 			}		
 		}
 		
@@ -280,9 +280,9 @@ package com.voxelengine.worldmodel.models
 		static private function localModelReadyToBeCreated( $e:ModelMetadataEvent ):void {
 			
 			var ii:InstanceInfo = new InstanceInfo();
-			modelGuid = ii.guid = $e.guid;
-			modelDesc = $e.description;
-			ii.name = $e.name;
+			modelGuid = ii.guid = $e.vmm.guid;
+			modelDesc = $e.vmm.description;
+			ii.name = $e.vmm.name;
 			
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
@@ -419,7 +419,7 @@ package com.voxelengine.worldmodel.models
 						if ( instanceInfo )
 						{
 							//Log.out( "CLEAR BLOCK " + instanceInfo.toString()  );
-							instantiate( instanceInfo, Globals.modelInfoGet($guid) );
+							instantiate( instanceInfo, Globals.modelInfoGet($guid), null );
 						}
 					}
 				}

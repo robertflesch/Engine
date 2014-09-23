@@ -9,6 +9,7 @@
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.LoginEvent;
 	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 	import com.voxelengine.worldmodel.Region;
 	import playerio.Client;
 	import playerio.BigDB;
@@ -176,17 +177,10 @@
 		
 		static private function loadModelMetadataFromDBO( dbo:DatabaseObject):void
 		{
-			var name:String = dbo.name;
-			var description:String = dbo.description;
-			var key:String = dbo.key;
-			var owner:String = dbo.owner;
-			var ba:ByteArray = dbo.data;
-			var dbo:DatabaseObject = dbo;
-			var template:Boolean = dbo.template;
+			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
+			vmm.fromPersistance( dbo );
 			
-			Log.out( "Persistance.loadModelMetadataFromDBO - name: " + name + "  description: " + description + "  key: " + key + "  owner: " + owner );
-			
-			Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, name, description, key, owner, template, ba, dbo ) );
+			Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm ) );
 		}
 		///////////////// MODELS ////////////////////////////////
 	}	

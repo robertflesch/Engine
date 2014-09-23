@@ -83,7 +83,7 @@ package com.voxelengine.worldmodel.models
 			modelInfo.modelClass = EDIT_CURSOR;
 
 			
-			return new EditCursor( instanceInfo, modelInfo );
+			return new EditCursor( instanceInfo, modelInfo, null );
 		}
 		
 		override public function get visible():Boolean
@@ -106,9 +106,9 @@ package com.voxelengine.worldmodel.models
 			EditCursor.mouseUp( null );
 		}
 		
-		public function EditCursor( instanceInfo:InstanceInfo, mi:ModelInfo ):void 
+		public function EditCursor( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ):void 
 		{
-			super( instanceInfo, mi );
+			super( instanceInfo, mi, $vmm );
 			oxel.gc.bound = 4;
 			visible = false;
 		}

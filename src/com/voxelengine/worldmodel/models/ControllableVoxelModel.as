@@ -66,9 +66,9 @@ package com.voxelengine.worldmodel.models
 		protected function set 	mForward($val:Boolean):void 			{ _forward = $val; }
 		
 		
-		public function ControllableVoxelModel( ii:InstanceInfo, mi:ModelInfo ):void 
+		public function ControllableVoxelModel( ii:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata  ):void 
 		{
-			super( ii, mi );
+			super( ii, mi, $vmm );
 			Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent, false, 0, true );
 			Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 			Globals.g_app.addEventListener( GUIEvent.APP_DEACTIVATE, onDeactivate );

@@ -21,9 +21,9 @@ package com.voxelengine.worldmodel.models
 		// Todo: This needs to be global?
 		static private const SHIP_WINGS:String 		= "Wings"
 		
-		public function Wings( instanceInfo:InstanceInfo, mi:ModelInfo ) 
+		public function Wings( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
 		{ 
-			super( instanceInfo, mi );
+			super( instanceInfo, mi, $vmm );
 			
 			if ( mi.json && mi.json.model && mi.json.model.engine )
 			{

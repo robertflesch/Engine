@@ -30,9 +30,9 @@ package com.voxelengine.worldmodel.weapons
 		private var _bombHolder:VoxelModel = null;
 		protected var _soundFile:String = "CannonBallExploding.mp3";		
 		
-		public function Bomb( instanceInfo:InstanceInfo, mi:ModelInfo ) 
+		public function Bomb( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
 		{ 
-			super( instanceInfo, mi );
+			super( instanceInfo, mi, $vmm );
 			_bombHolder = instanceInfo.controllingModel;
 			SoundBank.getSound( _soundFile ); // Preload the sound file
 			instanceInfo.dynamicObject = true;

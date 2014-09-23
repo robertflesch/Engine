@@ -4,6 +4,7 @@ package com.voxelengine.GUI
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.Persistance;
+import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
@@ -85,7 +86,13 @@ public class WindowModelMetadata extends VVPopup
 	}
 	
 	private function save( e:UIMouseEvent ):void { 
-		Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_COLLECTED, _name.label, _desc.label, _guid, _owner, _template ) );
+		var vmm:VoxelModelMetadata = new VoxelModelMetadata();
+		vmm.name = _name.label;
+		vmm.description = _desc.label;
+		vmm.guid = _guid;
+		vmm.owner = _owner;
+		vmm.modify = _template;
+		Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_COLLECTED, vmm ) );
 		remove();
 	}
 	

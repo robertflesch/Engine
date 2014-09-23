@@ -25,9 +25,9 @@ package com.voxelengine.worldmodel.weapons
 		// Types of ammo
 		// Size of ammo
 		// Velocity of ammo
-		public function Barrel( instanceInfo:InstanceInfo, mi:ModelInfo ) 
+		public function Barrel( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
 		{ 
-			super( instanceInfo, mi );
+			super( instanceInfo, mi, $vmm );
 			
 			if ( mi.json && mi.json.model && mi.json.model.barrel )
 			{

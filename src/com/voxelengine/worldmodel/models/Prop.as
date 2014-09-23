@@ -24,9 +24,9 @@ package com.voxelengine.worldmodel.models
 		// Todo: From metadata (someday)
 		private var _rotationRate:int = 1440;
 		
-		public function Prop( instanceInfo:InstanceInfo, mi:ModelInfo ) 
+		public function Prop( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
 		{ 
-			super( instanceInfo, mi );
+			super( instanceInfo, mi, $vmm );
 			
 			if ( mi.json && mi.json.model && mi.json.model.engine )
 			{
