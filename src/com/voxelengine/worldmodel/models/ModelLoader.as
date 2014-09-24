@@ -109,9 +109,18 @@ package com.voxelengine.worldmodel.models
 			Globals.g_landscapeTaskController.addTask( taskGroup );
 		}
 		
-		static public function loadFromManifestByteArray( $ba:ByteArray, $guid:String, $vmm:VoxelModelMetadata, controllingModelGuid:String = "" ):VoxelModel {
+		static public function loadFromManifestByteArray( $vmm:VoxelModelMetadata, controllingModelGuid:String = "" ):VoxelModel {
 				
-			var versionInfo:Object = modelMetaInfoRead( $ba );
+			var ba:ByteArray = $vmm.data as ByteArray;
+			if ( null == ba )
+			{
+				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad data in VoxelModelMetadata: " + $vmm.guid, Log.ERROR );
+				return null;
+			}
+			
+			ba.uncompress();
+
+			var versionInfo:Object = modelMetaInfoRead( ba );
 			if ( MANIFEST_VERSION != versionInfo.manifestVersion )
 			{
 				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
@@ -119,26 +128,27 @@ package com.voxelengine.worldmodel.models
 			}
 			
 			// how many bytes is the modelInfo
-			var strLen:int = $ba.readInt();
+			var strLen:int = ba.readInt();
 			// read off that many bytes
-			var modelInfoJson:String = $ba.readUTFBytes( strLen );
+			var modelInfoJson:String = ba.readUTFBytes( strLen );
 			
-			if ( null != $guid && "" != $guid ) {
+			if ( null != $vmm.guid && "" != $vmm.guid ) {
 				// create the modelInfo object from embedded metadata
 				modelInfoJson = decodeURI(modelInfoJson);
 				var jsonResult:Object = JSON.parse(modelInfoJson);
 				var mi:ModelInfo = new ModelInfo();
-				mi.initJSON( $guid, jsonResult );
+				mi.initJSON( $vmm.guid, jsonResult );
 				
 				// add the modelInfo to the repo
+				// is the still needed TODO - RSF 9.23.14
 				Globals.modelInfoAdd( mi );
 				// needs to be name + guid??
-				var ii:InstanceInfo = Globals.instanceInfoGet( $guid );
+				var ii:InstanceInfo = Globals.instanceInfoGet( $vmm.guid );
 				if ( !ii ) {
 					ii = new InstanceInfo();
 					var viewDistance:Vector3D = new Vector3D(0, 0, -75);
 					ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-					ii.guid = $guid;
+					ii.guid = $vmm.guid;
 				}
 				
 			if ( "" != controllingModelGuid ) {
@@ -148,7 +158,7 @@ package com.voxelengine.worldmodel.models
 				
 			var vm:* = instantiate( ii, mi, $vmm );
 			vm.version = versionInfo.version;
-			vm.loadOxelFromByteArray( $ba );
+			vm.loadOxelFromByteArray( ba );
 			}
 
 			return vm;
@@ -301,8 +311,7 @@ package com.voxelengine.worldmodel.models
 				var vm:VoxelModel = Globals.getModelInstance( e.guid );
 				createInstanceFromTemplate(vm);
 				vm.metadata = _s_mmd;
-				var test:Object = _s_mmd.toObject();
-				vm.save( test );
+				vm.save();
 			}
 		}
 		

@@ -154,9 +154,9 @@ package com.voxelengine.GUI
 				vm = Globals.modelInstancesGetFirst();
 			if ( vm )
 			{
-				if ( Network.client )
-					vm.save();
-				else
+				//if ( Network.client )
+					//vm.save();
+				//else
 				{
 					var ba:ByteArray = vm.toByteArray();
 

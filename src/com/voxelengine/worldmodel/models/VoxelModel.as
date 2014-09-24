@@ -65,11 +65,11 @@ package com.voxelengine.worldmodel.models
 	public class VoxelModel
 	{
 		private var 	_metadata:VoxelModelMetadata;
+		protected var 	_modelInfo:ModelInfo 			= null; // INSTANCE NOT EXPORTED
+		protected var 	_instanceInfo:InstanceInfo 		= null; // INSTANCE NOT EXPORTED
 		private var 	_oxel:Oxel 						= null; // INSTANCE NOT EXPORTED
 		private var 	_editCursor:EditCursor 			= null; // INSTANCE NOT EXPORTED
 		protected var 	_shaders:Vector.<Shader>        = new Vector.<Shader>;
-		protected var 	_modelInfo:ModelInfo 			= null; // INSTANCE NOT EXPORTED
-		protected var 	_instanceInfo:InstanceInfo 		= null; // INSTANCE NOT EXPORTED
 		protected var 	_children:Vector.<VoxelModel> 	= new Vector.<VoxelModel>; // INSTANCE NOT EXPORTED
 		private var 	_statisics:ModelStatisics 		= new ModelStatisics(); // INSTANCE NOT EXPORTED
 		private var 	_version:String 				= "0"; // INSTANCE NOT EXPORTED
@@ -80,14 +80,15 @@ package com.voxelengine.worldmodel.models
 		private var 	_lightIDNext:uint 				= 1024; // reserve space for ?
 		
 		private var 	_initialized:Boolean 			= false; // INSTANCE NOT EXPORTED
-		private var 	_visible:Boolean 				= true; // Not support yet
-		private var 	_stateLock:Boolean 				= false; // Not support yet
+		private var 	_stateLock:Boolean 				= false; // INSTANCE NOT EXPORTED
 		protected var 	_changed:Boolean 				= false; // INSTANCE NOT EXPORTED
 		protected var 	_complete:Boolean 				= false; // INSTANCE NOT EXPORTED
 		protected var 	_selected:Boolean 				= false; // INSTANCE NOT EXPORTED
 		private var 	_onSolidGround:Boolean			= false; // INSTANCE NOT EXPORTED
 		private var 	_keyboardControl:Boolean		= false; // INSTANCE NOT EXPORTED
-		private var 	_usesGravity:Boolean 			= false;     				// Should be exported
+		
+		private var 	_usesGravity:Boolean 			= false; // Should be exported/ move to instance
+		private var 	_visible:Boolean 				= true;  // Should be exported/ move to instance
 		
 		// TODO this should be moved to controlled model
 		private var 	_lastCollisionModel:VoxelModel 	= null; // INSTANCE NOT EXPORTED
@@ -240,11 +241,12 @@ package com.voxelengine.worldmodel.models
 		public function VoxelModel(ii:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata, initializeRoot:Boolean = true):void {
 			_instanceInfo = ii;
 			_modelInfo = mi;
+			_metadata = $vmm;
 			
 			if (initializeRoot)
 				initialize_root_oxel(0 < instanceInfo.grainSize ? instanceInfo.grainSize : modelInfo.grainSize);
 			
-			if ( null == $vmm )
+			if ( null == _metadata )
 				metadata = new VoxelModelMetadata();
 			else 
 				metadata = $vmm;
@@ -1003,17 +1005,6 @@ package com.voxelengine.worldmodel.models
 			
 			_changed = false;
 		}
-///////////////////////////////////////		
-		//private function metadata( ba: ByteArray ):Object
-		//{
-			//return { 
-				//data: ba,
-				//description: instanceInfo.guid,
-				//name: instanceInfo.name,
-				//owner: Network.userId,  //owner: _publicRegion ? "public": Network.userId,
-				//template: modelInfo.template
-			//}
-		//}
 		
 		private function created(o:DatabaseObject):void 
 		{ 
@@ -1036,39 +1027,17 @@ package com.voxelengine.worldmodel.models
 			_changed = true;
 		} 
 
-		public function save( objectMetadata:Object = null ):void
+		public function save():void
 		{
 			if ( !changed ) {
-				Log.out( "VoxelModel.save - NOT SAVING: " + instanceInfo.name );
+				//Log.out( "VoxelModel.save - NOT SAVING: " + metadata.name );
 				return;
 			}
 				
 			_changed = false;
-			Log.out("VoxelModel.save - saving changes to: " + instanceInfo.name  );
-			var ba:ByteArray = toByteArray();
-			if (metadata.databaseObject)
-			{
-				Log.out("VoxelModel.save - saving object back to BigDB: " + instanceInfo.name );
-				metadata.databaseObject.data = ba;
-				metadata.databaseObject.save( false
-										    , false
-										    , saved
-										    , failed );
-			}
-			else
-			{
-				if ( null == objectMetadata )
-					objectMetadata = metadata.toObject;
-					
-				objectMetadata.data = ba;
-				
-				Log.out("VoxelModel.save - creating new object: " + instanceInfo.name );
-				Persistance.createObject( Persistance.DB_TABLE_OBJECTS
-								        , instanceInfo.guid
-								        , objectMetadata
-								        , created
-								        , failed );
-			}
+			Log.out("VoxelModel.save - saving changes to: " + metadata.name  );
+			metadata.data = toByteArray();
+			metadata.save( saved , failed, created );
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////

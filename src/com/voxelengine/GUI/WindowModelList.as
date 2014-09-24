@@ -12,6 +12,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.Player;
 	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 	import flash.utils.ByteArray;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
@@ -88,14 +89,14 @@ package com.voxelengine.GUI
 		private function addDesktopModelHandler(event:UIMouseEvent):void 
 		{
 			var fr:FileReference = new FileReference();
-			fr.addEventListener(Event.SELECT, onChildModelFileSelected);
+			fr.addEventListener(Event.SELECT, onDesktopModelFileSelected );
 			var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
 			fr.browse([swfTypeFilter]);
 		}
 		
-		public function onChildModelFileSelected(e:Event):void
+		public function onDesktopModelFileSelected(e:Event):void
 		{
-			Log.out( "onChildModelFileSelected : " + e.toString() );
+			Log.out( "onDesktopModelFileSelected : " + e.toString() );
 			
 			var selectedModel:VoxelModel = e.currentTarget as VoxelModel;
 			//if ( selectedModel
@@ -113,10 +114,14 @@ package com.voxelengine.GUI
 			var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
 			if ( li && li.data )
 			{
-				var mmde:ModelMetadataEvent = li.data as ModelMetadataEvent;
-				var ba:ByteArray = mmde.vmm.data as ByteArray;
-				ba.uncompress();
-				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( ba, mmde.vmm.guid, mmde.vmm, _parentGuid );				
+				var vmm:VoxelModelMetadata = li.data as VoxelModelMetadata;
+				// So if I see the database object to null. And give it a new guid, I have a nice copy ;-)
+				vmm.databaseObject = null;
+				vmm.guid = Globals.getUID();
+				vmm.copy = false;
+				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( vmm, _parentGuid );				
+				vm.changed = true;
+				vm.save();
 
 				remove();
 			}
@@ -129,7 +134,7 @@ package com.voxelengine.GUI
 		
 		private function modelLoaded( e:ModelMetadataEvent ):void
 		{
-			_listbox1.addItem( e.vmm.name + " - " + e.vmm.description, e );
+			_listbox1.addItem( e.vmm.name + " - " + e.vmm.description, e.vmm );
 		}
 		
 		private function populateModels():void

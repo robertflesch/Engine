@@ -7,8 +7,12 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import com.voxelengine.server.Persistance;
 	import flash.utils.ByteArray;
 	import playerio.DatabaseObject;
+	import com.voxelengine.Globals;
+	import com.voxelengine.Log;
+	
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF
@@ -36,7 +40,7 @@ package com.voxelengine.worldmodel.models
 			return "name: " + _name + "  description: " + _description + "  guid: " + _guid + "  owner: " + _owner;
 		}
 		
-		public function get toObject():Object {
+		public function toObject():Object {
 			return { guid: _guid
 				   , name: _name
 			       , description: _description
@@ -45,7 +49,7 @@ package com.voxelengine.worldmodel.models
 				   , copyCount: _copyCount
 				   , modify: _modify
 				   , transfer: _transfer
-				   , data: _data } 			
+				   , data: data } 			
 		}
 		
 		public function fromPersistance( $dbo:DatabaseObject ):void {
@@ -61,6 +65,32 @@ package com.voxelengine.worldmodel.models
 			_dbo 			= $dbo;
 		}
 		
+		public function save( $save:Function, $fail:Function, $created:Function ):void {
+						 
+						 
+			if ( _dbo )
+			{
+				Log.out("VoxelModelMetadata.save - saving object back to BigDB: " + name );
+				_dbo.save( false
+					     , false
+						 , $save
+						 , $fail );
+			}
+			else
+			{
+				var obj:Object = toObject();
+				
+				Log.out("VoxelModelMetadata.save - creating new object: " + name );
+				Persistance.createObject( Persistance.DB_TABLE_OBJECTS
+								        , guid
+								        , obj
+								        , $created
+								        , $fail );
+			}
+						 
+		}
+		
+		
 		public function get name():String  					{ return _name; }
 		public function set name(value:String):void  		{ _name = value; }
 		
@@ -71,6 +101,7 @@ package com.voxelengine.worldmodel.models
 		public function set owner(value:String):void  		{ _owner = value; }
 		
 		public function get copy():Boolean 					{ return _copy; }
+		public function set copy(val:Boolean):void			{ _copy = val; }
 		
 		public function get modify():Boolean 				{ return _modify; }
 		public function set modify(value:Boolean):void 		{ _modify = value; }

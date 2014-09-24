@@ -65,19 +65,10 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				return;
 			}
 
-			var $ba:ByteArray = $dbo.data as ByteArray;
-			if ( null == $ba ) {
-				// This seems to be the failure case, not the error handler
-				Log.out( "LoadModelFromBigDB.successHandler - ERROR - NULL data for guid:" + _guid );
-				finish();
-				return;
-			}
-			$ba.uncompress();
-			$ba.position = 0;
 			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
 			vmm.fromPersistance( $dbo );
 			
-			var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( $ba, _guid, vmm );
+			var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( vmm );
 			if ( vm ) {
 				vm.complete = true;
 				

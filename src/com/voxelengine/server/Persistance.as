@@ -171,16 +171,11 @@
 		{
 			for each ( var dbo:DatabaseObject in dba )
 			{
-				loadModelMetadataFromDBO( dbo );
+				var vmm:VoxelModelMetadata = new VoxelModelMetadata();
+				vmm.fromPersistance( dbo );
+				
+				Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm ) );
 			}
-		}
-		
-		static private function loadModelMetadataFromDBO( dbo:DatabaseObject):void
-		{
-			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
-			vmm.fromPersistance( dbo );
-			
-			Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm ) );
 		}
 		///////////////// MODELS ////////////////////////////////
 	}	
