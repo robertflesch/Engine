@@ -7,6 +7,21 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+import flash.events.Event;
+import flash.events.IOErrorEvent;
+import flash.events.ProgressEvent;
+import flash.geom.Vector3D;
+import flash.net.FileReference;
+import flash.net.URLRequest;
+import playerio.PlayerIOError;
+import playerio.DatabaseObject;
+
+import mx.utils.StringUtil;
+
+import org.flashapi.swing.Alert;
+
+import com.voxelengine.Globals;
+import com.voxelengine.Log;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.PersistanceEvent;
@@ -14,11 +29,9 @@ import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.RegionLoadedEvent;
 import com.voxelengine.events.ModelEvent;
-import com.voxelengine.Globals;
 import com.voxelengine.GUI.WindowRegionNew;
 import com.voxelengine.GUI.WindowSandboxList;
 import com.voxelengine.GUI.WindowSplash;
-import com.voxelengine.Log;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.PersistRegion;
 import com.voxelengine.server.VVServer;
@@ -26,21 +39,9 @@ import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelLoader;
 import com.voxelengine.worldmodel.models.ModelManager;
 import com.voxelengine.worldmodel.models.VoxelModel;
-import flash.events.Event;
-import flash.events.IOErrorEvent;
-import flash.events.ProgressEvent;
-import flash.geom.Vector3D;
-import flash.net.FileReference;
-import org.flashapi.swing.Alert;
-import playerio.PlayerIOError;
-import playerio.DatabaseObject;
-import com.voxelengine.server.Persistance;
 import com.voxelengine.server.Network;
-import mx.utils.StringUtil;
 import com.voxelengine.utils.CustomURLLoader;
-	import flash.net.URLRequest;
 
-import com.voxelengine.worldmodel.Region;
 /**
  * ...
  * @author Bob
@@ -104,7 +105,7 @@ public class RegionManager
 	private function onRegionLoadedActionFromFile(event:Event):void
 	{
 		Log.out( "RegionManager.onRegionLoadedActionFromFile" );
-		var req:URLRequest = CustomURLLoader(event.target).request;			
+		//var req:URLRequest = CustomURLLoader(event.target).request;			
 		var guid:String = CustomURLLoader(event.target).fileName;			
 		guid = guid.substr( 0, guid.indexOf( "." ) );
 		var newRegion:Region = new Region( guid );

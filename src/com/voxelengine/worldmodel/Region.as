@@ -36,8 +36,6 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	
-	import com.voxelengine.server.Persistance;
-
 	//{
 	   //"region":[
 		  //{"model":{
@@ -96,17 +94,14 @@ package com.voxelengine.worldmodel
 		private var _desc:String = "";
 		private var _worldId:String = "VoxelVerse";
 		private var _guid:String = DEFAULT_REGION_ID;
-		private var _template:String = DEFAULT_REGION_ID;
 		private var _owner:String;
 		private var _editors:Vector.<String> = new Vector.<String>() //{ user Id1:role, user id2:role... }
 		private var _admin:Vector.<String> = new Vector.<String>() // : { user Id1:role, user id2:role... }
 		private var _created:Date;
 		private var _modified:Date;
-		private var _data:String;
 		private var _JSON:Object;
 		private var _databaseObject:DatabaseObject  = null;							// INSTANCE NOT EXPORTED
 		private var _changed:Boolean;
-        private var _changeTimer:Timer;
 		private var _playerPosition:Vector3D = new Vector3D();
 		private var _playerRotation:Vector3D = new Vector3D();
 		private var _loaded:Boolean = true;

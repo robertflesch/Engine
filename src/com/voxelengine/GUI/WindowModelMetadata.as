@@ -3,7 +3,6 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.server.Persistance;
 import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
@@ -32,7 +31,6 @@ public class WindowModelMetadata extends VVPopup
 	private var _desc:LabelInput;
 	private var _template:Boolean;
 	private var _owner:String;
-	private var _rbGroup:RadioButtonGroup = null;
 	
 	
 	public function WindowModelMetadata( $guid:String )

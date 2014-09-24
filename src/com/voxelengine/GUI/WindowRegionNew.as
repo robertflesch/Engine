@@ -5,7 +5,6 @@ import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.RegionLoadedEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.server.Persistance;
 import com.voxelengine.worldmodel.Region;
 import flash.display.DisplayObjectContainer;
 import org.flashapi.swing.*;

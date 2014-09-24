@@ -61,15 +61,9 @@ package com.voxelengine.GUI
 		private var _built:Boolean = false;
 		private var _debugMenu:WindowDebugMenu = null;
 		private var _releaseMenu:WindowReleaseMenu = null;
-		
 		private var _fileReference:FileReference = new FileReference();
-
-		private var _dirty : Boolean;
-		
-		private var _bulletSize:int = 2;
 		private var _projectileEnabled:Boolean = true;
 		private var _hub:Hub = null;
-		private var _initialized:Boolean = false;
 
 		static private var _currentInstance:VoxelVerseGUI = null;
 		static public function get currentInstance():VoxelVerseGUI 
@@ -85,7 +79,7 @@ package com.voxelengine.GUI
 		//	----------------------------------------------------------------
 		public function VoxelVerseGUI(title : String = null) { 
 			
-					Globals.g_app.stage.addEventListener( FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
+			Globals.g_app.stage.addEventListener( FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
 		}
 		
 		public function fullScreenEvent(event:FullScreenEvent):void {
@@ -234,10 +228,10 @@ package com.voxelengine.GUI
 			return new WindowReleaseMenu();
 		}
 		
-		private function showHelpWindow():void
-		{
-			new WindowHelp();
-		}
+		//private function showHelpWindow():void
+		//{
+			//new WindowHelp();
+		//}
 		
 		private function crossHairAdd():void
 		{
@@ -385,10 +379,10 @@ package com.voxelengine.GUI
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
 		}
 
-		private function removeKeyboardListeners(event : Event) : void
-		{
-			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
-		}
+		//private function removeKeyboardListeners(event : Event) : void
+		//{
+			//Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
+		//}
 
 		private function onRegionLoadingComplete(event : RegionEvent ) : void
 		{

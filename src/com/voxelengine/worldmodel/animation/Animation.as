@@ -9,7 +9,6 @@ package com.voxelengine.worldmodel.animation
 {
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.server.Network;
-	import com.voxelengine.server.Persistance;
 	import com.voxelengine.server.PersistAnimation;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -66,7 +65,7 @@ package com.voxelengine.worldmodel.animation
 		public function get transforms():Vector.<AnimationTransform> { return _transforms; }
 		public function get loaded():Boolean { return _loaded; }
 		
-		public function Animation() { ; }
+		public function Animation() {}
 		
 		public function createBlank():void {
 			initJSON( BLANK_ANIMATION_TEMPLATE );
@@ -193,7 +192,6 @@ trace( name + " = " + jsonString );
 		}
 
 		private function animationsToJSON():String {
-			var count:int = 0;
 			var animations:Vector.<String> = new Vector.<String>;
 			var outString:String = new String();
 			
@@ -213,7 +211,6 @@ trace( name + " = " + jsonString );
 		}
 
 		private function attachmentsToJSON():String {
-			var count:int = 0;
 			var attachments:Vector.<String> = new Vector.<String>;
 			var outString:String = new String();
 			
@@ -319,10 +316,10 @@ trace( name + " = " + jsonString );
 			save();
 		}
 
-		private function onLoadFromPersistance():void
-		{
-			Log.out( "Animation.onLoadFromPersistance - NOT SUPPOERTED YET", Log.ERROR );
-		}
+		//private function onLoadFromPersistance():void
+		//{
+			//Log.out( "Animation.onLoadFromPersistance - NOT SUPPOERTED YET", Log.ERROR );
+		//}
 		
 		private function onLoadedAction(event:Event):void
 		{

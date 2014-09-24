@@ -27,7 +27,6 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.server.Network;
 	import com.voxelengine.utils.CustomURLLoader;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
-	import com.voxelengine.worldmodel.models.*;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.CompletedModel;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LoadModelFromBigDB;
 	

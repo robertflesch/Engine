@@ -18,7 +18,6 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.AnimationMetadataEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.server.Persistance;
 
 public class WindowAnimationMetadata extends VVPopup
 {

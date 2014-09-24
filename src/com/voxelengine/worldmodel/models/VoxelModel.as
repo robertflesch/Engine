@@ -53,9 +53,7 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.worldmodel.weapons.Projectile;
 	
-	import com.voxelengine.server.Persistance;
 	import com.voxelengine.server.Network;
-	import com.voxelengine.server.Persistance;
 	
 	import com.voxelengine.worldmodel.oxel.FlowInfo;
 	/**

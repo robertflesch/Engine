@@ -7,7 +7,6 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.server.Persistance;
 	import com.voxelengine.server.PersistModel;
 	import flash.utils.ByteArray;
 	import playerio.DatabaseObject;

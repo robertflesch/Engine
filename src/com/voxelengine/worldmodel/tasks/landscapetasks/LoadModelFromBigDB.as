@@ -36,7 +36,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private var _guid:String;
 		protected var _startTime:int;
 		
-		public function LoadModelFromBigDB( $guid:String, $layer:LayerInfo = null ):void {
+		public function LoadModelFromBigDB( $guid:String, $layer:LayerInfo = null ) {
 			//Log.out( "LoadModelFromBigDB.construct " );
 			_guid = $guid
 			_startTime = getTimer();

@@ -24,8 +24,8 @@ public class WindowAnimationEdit extends VVPopup
 {
 	static private var _s_currentInstance:WindowAnimationEdit = null;
 	
-	private var _eventCollector:EventCollector = new EventCollector();
-	private var _panelAdvanced:Panel;
+//	private var _eventCollector:EventCollector = new EventCollector();
+//	private var _panelAdvanced:Panel;
 	
 	private var _anim:Animation;
 	
