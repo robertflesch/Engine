@@ -63,7 +63,7 @@ public class WindowModelMetadata extends VVPopup
 		radioButtonsOwner.addAll( { label:"Owned by " + Network.userId }
 		                        , { label:"Public Object" } );
 		eventCollector.addEvent( rbOwnerGroup, ButtonsGroupEvent.GROUP_CHANGED
-		                       , function (event:ButtonsGroupEvent):void {  _owner = (0 == event.target.index ?  Network.userId :  Persistance.PUBLIC ) } );
+		                       , function (event:ButtonsGroupEvent):void {  _owner = (0 == event.target.index ?  Network.userId :  Network.PUBLIC ) } );
 		rbOwnerGroup.dataProvider = radioButtonsOwner;
 		rbOwnerGroup.index = 0;
 		

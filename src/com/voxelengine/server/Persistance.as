@@ -1,29 +1,17 @@
 ﻿package com.voxelengine.server 
 {
-	import com.voxelengine.events.LoadingEvent;
-	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.events.ModelMetadataEvent;
-	import com.voxelengine.events.PersistanceEvent;
-	import com.voxelengine.events.RegionEvent;
-	import com.voxelengine.events.RegionLoadedEvent;
-	import com.voxelengine.Globals;
-	import com.voxelengine.events.LoginEvent;
-	import com.voxelengine.worldmodel.models.VoxelModel;
-	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
-	import com.voxelengine.worldmodel.Region;
 	import playerio.Client;
 	import playerio.BigDB;
 	import playerio.PlayerIOError;
 	import playerio.DatabaseObject;
-	import flash.utils.ByteArray;
 		
+	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	
+	import com.voxelengine.events.LoginEvent;
 	
 	public class Persistance
 	{
-		static public const DB_TABLE_OBJECTS:String = "voxelModels";
-		static public const PUBLIC:String = "public";
-		
 		static private var _table:String;
 		static private var _key:String;
 		static private var _data:Object;
@@ -143,40 +131,5 @@
 				
 			_errorHandler( event.error );	
 		}
-
-		///////////////// MODELS ////////////////////////////////
-		static public function loadUserObjectsMetadata( userName:String ):void {
-			Persistance.loadRange( Persistance.DB_TABLE_OBJECTS
-						 , "voxelModelOwner"
-						 , [userName]
-						 , null
-						 , null
-						 , 100
-						, loadObjectsMetadata
-						, function (e:PlayerIOError):void {  Log.out( "ModelManager.errorHandler - e: " + e ); } );
-		}
-		
-		static public function loadPublicObjectsMetadata():void {
-			Persistance.loadRange( Persistance.DB_TABLE_OBJECTS
-						 , "voxelModelOwner"
-						 , [Persistance.PUBLIC]
-						 , null
-						 , null
-						 , 100
-						, loadObjectsMetadata
-						, function (e:PlayerIOError):void {  Log.out( "ModelManager.errorHandler - e: " + e ); } );
-		}
-
-		static private function loadObjectsMetadata( dba:Array ):void
-		{
-			for each ( var dbo:DatabaseObject in dba )
-			{
-				var vmm:VoxelModelMetadata = new VoxelModelMetadata();
-				vmm.fromPersistance( dbo );
-				
-				Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm ) );
-			}
-		}
-		///////////////// MODELS ////////////////////////////////
 	}	
 }

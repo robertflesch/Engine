@@ -75,7 +75,7 @@ public class WindowAnimationMetadata extends VVPopup
 	}
 	
 	private function save( e:UIMouseEvent ):void { 
-		Globals.g_app.dispatchEvent( new AnimationMetadataEvent( AnimationMetadataEvent.ANIMATION_INFO_COLLECTED, _name, _desc.label, _guid, Persistance.PUBLIC ) );
+		Globals.g_app.dispatchEvent( new AnimationMetadataEvent( AnimationMetadataEvent.ANIMATION_INFO_COLLECTED, _name, _desc.label, _guid, Network.PUBLIC ) );
 		remove();
 	}
 	

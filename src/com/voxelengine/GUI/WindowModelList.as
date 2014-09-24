@@ -1,32 +1,31 @@
 
 package com.voxelengine.GUI
 {
+	import flash.geom.Vector3D;
+	import flash.net.FileReference;
+	import flash.events.Event;
+	import flash.net.FileFilter;
+	import flash.utils.ByteArray;
+	import flash.utils.Dictionary;
 
+	import org.flashapi.swing.*;
+    import org.flashapi.swing.event.*;
+    import org.flashapi.swing.constants.*;
+	import org.flashapi.swing.list.ListItem;
+	
+	import com.voxelengine.Globals;
+	import com.voxelengine.Log;
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.ModelMetadataEvent;
 	import com.voxelengine.server.Network;
-	import com.voxelengine.server.Persistance;
+	import com.voxelengine.server.PersistModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.Player;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
-	import flash.utils.ByteArray;
-	import org.flashapi.swing.*;
-    import org.flashapi.swing.event.*;
-    import org.flashapi.swing.constants.*;
-	import org.flashapi.swing.list.ListItem;
-	import flash.geom.Vector3D;
-	import flash.net.FileReference;
-	import flash.events.Event;
-	import flash.net.FileFilter;
-	
-	import flash.utils.Dictionary;
-
-	import com.voxelengine.Globals;
-	import com.voxelengine.Log;
 	
 	public class WindowModelList extends VVPopup
 	{
@@ -140,8 +139,8 @@ package com.voxelengine.GUI
 		private function populateModels():void
 		{
 			_listbox1.removeAll();
-			Persistance.loadPublicObjectsMetadata();
-			Persistance.loadUserObjectsMetadata( Network.userId );
+			PersistModel.loadModelMetadata( Network.PUBLIC );
+			PersistModel.loadModelMetadata( Network.userId );
 			//var models:Dictionary = Globals.modelInstancesGetDictionary();
 			//for each ( var vm:VoxelModel in models )
 			//{

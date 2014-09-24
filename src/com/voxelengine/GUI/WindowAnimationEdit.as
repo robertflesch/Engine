@@ -76,7 +76,7 @@ public class WindowAnimationEdit extends VVPopup
 		display( 600, 20 );
 	}
 	private function save( e:UIMouseEvent ):void { 
-//		Globals.g_app.dispatchEvent( new AnimationMetadataEvent( AnimationMetadataEvent.ANIMATION_INFO_COLLECTED, _name, _desc.label, _guid, Persistance.PUBLIC ) );
+//		Globals.g_app.dispatchEvent( new AnimationMetadataEvent( AnimationMetadataEvent.ANIMATION_INFO_COLLECTED, _name, _desc.label, _guid, Network.PUBLIC ) );
 		remove();
 	}
 	

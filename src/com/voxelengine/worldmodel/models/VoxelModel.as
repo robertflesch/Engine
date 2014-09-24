@@ -7,6 +7,7 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import com.voxelengine.server.PersistModel;
 	import flash.display3D.Context3D;
 	import flash.events.TimerEvent;
 	import flash.events.KeyboardEvent;
@@ -990,13 +991,7 @@ package com.voxelengine.worldmodel.models
 			{
 				//function deleteKeys(table:String, keys:Array, callback:Function=null, errorHandler:Function=null):void;
 				trace("VoxelModel.delete - delete object: " + instanceInfo.guid);
-				Persistance.deleteKeys("voxelModels", [instanceInfo.guid], function():void
-					{
-						Log.out("VoxelModel.removeFromBigDB - deleted: " + instanceInfo.guid);
-					}, function(e:PlayerIOError):void
-					{
-						Log.out("VoxelModel.removeFromBigDB - error deleting: " + instanceInfo.guid + " error data: " + e);
-					});
+				PersistModel.deleteModel( metadata.guid );
 			}
 			else
 			{

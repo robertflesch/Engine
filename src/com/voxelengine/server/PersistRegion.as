@@ -23,7 +23,7 @@
 		}
 		
 		public function cacheRequestPrivate( e:RegionEvent ):void { loadRegions( Network.userId ); }
-		public function cacheRequestPublic( e:RegionEvent ):void { loadRegions( Persistance.PUBLIC ); }
+		public function cacheRequestPublic( e:RegionEvent ):void { loadRegions( Network.PUBLIC ); }
 		
 
 		static public function loadRegions( $userName:String ):void {

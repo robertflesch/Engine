@@ -70,7 +70,7 @@ public class WindowRegionNew extends VVPopup
 		
 		_region = new Region( Globals.getUID() );
 		_region.createEmptyRegion();
-		_region.owner = Persistance.PUBLIC;
+		_region.owner = Network.PUBLIC;
 		_region.gravity = true;
 		_region.name = Network.userId + "-" + int( Math.random() * 1000 );
 		_region.desc = "Please enter something meaningful here";
@@ -84,14 +84,14 @@ public class WindowRegionNew extends VVPopup
 		_rbPPGroup = new RadioButtonGroup( this );
 		var radioButtonsPP:DataProvider = new DataProvider();
 		radioButtonsPP.addAll( { label:Globals.MODE_PUBLIC }, { label:Globals.MODE_PRIVATE } );
-		if ( Persistance.PUBLIC == _region.owner )
+		if ( Network.PUBLIC == _region.owner )
 			_rbPPGroup.index = 0;
 		else 	
 			_rbPPGroup.index = 1;
 
 		eventCollector.addEvent( _rbPPGroup, ButtonsGroupEvent.GROUP_CHANGED
 		                       , function (event:ButtonsGroupEvent):void 
-							   {  _region.owner = (0 == event.target.index ?  Persistance.PUBLIC : Network.userId ) } );
+							   {  _region.owner = (0 == event.target.index ?  Network.PUBLIC : Network.userId ) } );
 		_rbPPGroup.dataProvider = radioButtonsPP;
 		_rbPPGroup.index = 0;
 		

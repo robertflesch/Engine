@@ -374,7 +374,7 @@ trace( name + " = " + jsonString );
 						guid: guid ? guid : Globals.getUID(),
 						modified: modified ? modified : new Date(),
 						name: name ? name : "No name",
-						owner:  Persistance.PUBLIC,
+						owner:  Network.PUBLIC,
 						world: world ? world : "VoxelVerse"
 						};
 			}

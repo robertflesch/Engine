@@ -165,7 +165,7 @@ public class WindowSandboxList extends VVPopup
 		}
 		else if ( Globals.MODE_PUBLIC == Globals.mode )
 		{
-			if ( Persistance.PUBLIC == e.region.owner )
+			if ( Network.PUBLIC == e.region.owner )
 				_listbox1.addItem( region.name, region.guid );
 		}
 	}

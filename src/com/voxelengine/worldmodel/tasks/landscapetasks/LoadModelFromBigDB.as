@@ -22,7 +22,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.server.Persistance;
+	import com.voxelengine.server.PersistModel;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 
@@ -51,7 +51,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var timer:int = getTimer();
 			super.start() // AbstractTask will send event
 			
-			Persistance.loadObject( "voxelModels", _guid, successHandler, errorHandler );
+			PersistModel.loadModel( _guid, successHandler, errorHandler );
 		}
 		
 		private function successHandler($dbo:DatabaseObject):void 
