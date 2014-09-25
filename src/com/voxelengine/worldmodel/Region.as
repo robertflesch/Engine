@@ -134,6 +134,9 @@ package com.voxelengine.worldmodel
 				return;
 			_changed = val; 
 		}
+		public function set changedForce(val:Boolean):void { 
+			_changed = val; 
+		}
 		
 		private var _criticalModelDetected:Boolean = false;
 		public function get criticalModelDetected():Boolean { return  _criticalModelDetected; } 
@@ -321,7 +324,7 @@ package com.voxelengine.worldmodel
 			
 			PersistRegion.saveRegion( metadata( ba ), databaseObject, createSuccess );
 
-			_changed = false;
+			changed = false;
 			
 			function metadata( ba: ByteArray ):Object {
 				Log.out( "Region.metadata userId: " + Network.userId + "  this region is owned by: " + _owner );

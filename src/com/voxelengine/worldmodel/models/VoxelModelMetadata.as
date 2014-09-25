@@ -27,10 +27,12 @@ package com.voxelengine.worldmodel.models
 		private var _owner:String;
 		private var _data:ByteArray;
 		private var _dbo:DatabaseObject;
+		private var _templateGuid:String;
 
 		// Permissions
 		// http://wiki.secondlife.com/wiki/Permission
 		// move is more of a region type permission
+		private var _template:Boolean;
 		private var _copy:Boolean;
 		private var _copyCount:int = COPY_COUNT_INFINITE;
 		private var _modify:Boolean = true;
@@ -41,10 +43,13 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		public function toObject():Object {
+			
 			return { guid: _guid
 				   , name: _name
 			       , description: _description
 				   , owner: _owner
+				   , template: _template
+				   , templateGuid: _templateGuid
 				   , copy: _copy
 				   , copyCount: _copyCount
 				   , modify: _modify
@@ -52,10 +57,18 @@ package com.voxelengine.worldmodel.models
 				   , data: data } 			
 		}
 		
+		public function toJSONString():String {
+			
+			return JSON.stringify( this );
+		}
+
 		public function fromPersistance( $dbo:DatabaseObject ):void {
+			
 			_name 			= $dbo.name;
 			_description	= $dbo.description;
 			_owner			= $dbo.owner;
+			_template		= $dbo.template
+			_templateGuid	= $dbo.templateGuid
 			_copy			= $dbo.copy;
 			_copyCount		= $dbo.copyCount;
 			_modify			= $dbo.modify;
@@ -66,7 +79,6 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		public function save( $save:Function, $fail:Function, $created:Function ):void {
-						 
 						 
 			if ( _dbo )
 			{
@@ -79,16 +91,13 @@ package com.voxelengine.worldmodel.models
 			else
 			{
 				var obj:Object = toObject();
-				
 				Log.out("VoxelModelMetadata.save - creating new object: " + name );
 				PersistModel.createModel( guid
 								        , obj
 								        , $created
 								        , $fail );
 			}
-						 
 		}
-		
 		
 		public function get name():String  					{ return _name; }
 		public function set name(value:String):void  		{ _name = value; }
@@ -99,6 +108,12 @@ package com.voxelengine.worldmodel.models
 		public function get owner():String  				{ return _owner; }
 		public function set owner(value:String):void  		{ _owner = value; }
 		
+		public function get template():Boolean  			{ return _template; }
+		public function set template(value:Boolean):void  	{ _template = value; }
+		
+		public function get templateGuid():String  			{ return _templateGuid; }
+		public function set templateGuid(value:String):void { _templateGuid = value; }
+
 		public function get copy():Boolean 					{ return _copy; }
 		public function set copy(val:Boolean):void			{ _copy = val; }
 		
@@ -109,10 +124,35 @@ package com.voxelengine.worldmodel.models
 		public function set guid(value:String):void  		{ _guid = value; }
 		
 		public function get data():ByteArray 				{ return _data; }
-		public function set data(value:ByteArray):void  	{ _data = value; }
+		public function set data(value:ByteArray):void  	
+		{ 
+			_data = value; 
+			if ( _dbo )
+				_dbo.data = _data;
+		}
 		
 		public function get databaseObject():DatabaseObject 		{ return _dbo; }
 		public function set databaseObject(val:DatabaseObject):void { _dbo = val; }
+		
+		public function get copyCount():int 
+		{
+			return _copyCount;
+		}
+		
+		public function set copyCount(value:int):void 
+		{
+			_copyCount = value;
+		}
+		
+		public function get transfer():Boolean 
+		{
+			return _transfer;
+		}
+		
+		public function set transfer(value:Boolean):void 
+		{
+			_transfer = value;
+		}
 		
 		
 	}

@@ -510,12 +510,12 @@ package com.voxelengine.GUI
 			{
 				if ( vm && !vm.instanceInfo.dynamicObject && !vm.instanceInfo.dead )
 				{
-					// if not debug, hide the player
-					if ( !Globals.g_debug ) {
-						if ( vm is Player )
-							continue;
+					if ( vm is Player ) {
+						if ( Globals.g_debug )
+							_listParents.addItem( "PLAYER: " + vm.metadata.name, vm ); 
 					}
-					_listParents.addItem( vm.instanceInfo.name, vm );
+					else
+						_listParents.addItem( vm.metadata.name, vm );
 				}
 			}
 		}
@@ -527,10 +527,7 @@ package com.voxelengine.GUI
 			var models:Vector.<VoxelModel> = $vm.children;
 			for each ( var vm:VoxelModel in models )
 			{
-				if ( "Default Name" != vm.instanceInfo.name )
-					_listChildModels.addItem( vm.instanceInfo.name + " - " + vm.instanceInfo.guid, vm );
-				else	
-					_listChildModels.addItem( vm.instanceInfo.guid, vm );
+				_listChildModels.addItem( vm.metadata.name + ": " + vm.metadata.description, vm );
 			}
 		}
 

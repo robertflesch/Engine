@@ -192,13 +192,13 @@ package com.voxelengine.renderer
 		{
 			if ( null == _context )
 			{
-				Log.out( "Renderer.render - CONTEXT NULL" );
+				//Log.out( "Renderer.render - CONTEXT NULL" );
 				return;
 			}
 			
 			if ( "Disposed" == _context.driverInfo )
 			{
-				Log.out( "Renderer.render - CONTEXT Disposed" + _context.toString() );
+				//Log.out( "Renderer.render - CONTEXT Disposed" + _context.toString() );
 				return;
 			}
 				

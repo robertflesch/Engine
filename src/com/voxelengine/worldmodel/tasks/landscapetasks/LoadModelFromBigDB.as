@@ -61,6 +61,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			{
 				// This seems to be the failure case, not the error handler
 				Log.out( "LoadModelFromBigDB.successHandler - ERROR - NULL DatabaseObject for guid:" + _guid );
+				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.MODEL_LOAD_FAILURE, _guid ) );
 				finish();
 				return;
 			}

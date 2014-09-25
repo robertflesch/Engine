@@ -42,7 +42,7 @@ package com.voxelengine.GUI
 //			dtf.setDateTimePattern( "yyyy-MM-dd" );
 //			trace(dtf.format(d)); 
 
-			var name:Label = new Label( "VoxelVerse 2014.7.6 - 00.15" );
+			var name:Label = new Label( "VoxelVerse 2014.9.24 - 12.05" );
 			name.fontSize = 14;
 			name.fontColor = 0xffffff;
 			addElement( name );

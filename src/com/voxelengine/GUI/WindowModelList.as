@@ -115,8 +115,11 @@ package com.voxelengine.GUI
 				var vmm:VoxelModelMetadata = li.data as VoxelModelMetadata;
 				// So if I see the database object to null. And give it a new guid, I have a nice copy ;-)
 				vmm.databaseObject = null;
+				// no longer based on a template
+				vmm.template = false;
+				// we will track where it came from since we might want to return it to pool.
+				vmm.templateGuid = vmm.guid;
 				vmm.guid = Globals.getUID();
-				vmm.copy = false;
 				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( vmm, _parentGuid );				
 				vm.changed = true;
 				vm.save();
@@ -138,8 +141,9 @@ package com.voxelengine.GUI
 		private function populateModels():void
 		{
 			_listbox1.removeAll();
-			PersistModel.loadModelMetadata( Network.PUBLIC );
-			PersistModel.loadModelMetadata( Network.userId );
+			//PersistModel.loadModels( Network.PUBLIC );
+			//PersistModel.loadModels( Network.userId );
+			PersistModel.loadCopyableModels( Network.userId );
 			//var models:Dictionary = Globals.modelInstancesGetDictionary();
 			//for each ( var vm:VoxelModel in models )
 			//{

@@ -17,7 +17,7 @@ IDEA: Glass, have engine use ambientOcclusion data to draw edges around glass, i
 IDEA: VertexManager sharing, this would allow us to have multiple creatures on the screen, just using one vertexManager
 
 WindowVoxelModel
-Be nice if selected model was somehow highlighted.
+Be nice if selected model was somehow highlighted. And camera faced it
 
 
 DRAGON
@@ -80,6 +80,7 @@ IDEA: Break out contour from flow, so any block can contour (like grass)
 IDEA: Glass voxel are full bright
 IDEA: on ambient occlusion, if neighbor is larger...
 IDEA: on ambient occlusion, if neighbor is smaller...
+
 
 
 ////////////////////////////////////////////

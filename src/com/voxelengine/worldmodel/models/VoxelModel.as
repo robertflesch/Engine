@@ -1006,19 +1006,6 @@ package com.voxelengine.worldmodel.models
 			//Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS ) ); 
 			Log.out( "VoxelModel.created: " + instanceInfo.guid ); 
 		}	
-		
-		private function saved():void 
-		{ 
-			Log.out( "VoxelModel.saved: " + instanceInfo.guid ); 
-			_changed = false;
-		}	
-		
-		private function failed(e:PlayerIOError):void 
-		{ 
-//			Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_FAILURE ) ); 
-			Log.out( "VoxelModel.save - error saving: " + instanceInfo.guid + " error: " + e.message ); 
-			_changed = true;
-		} 
 
 		public function save():void
 		{
@@ -1027,10 +1014,21 @@ package com.voxelengine.worldmodel.models
 				return;
 			}
 				
-			_changed = false;
 			Log.out("VoxelModel.save - saving changes to: " + metadata.name  );
 			metadata.data = toByteArray();
+			_changed = false;
 			metadata.save( saved , failed, created );
+			
+			function saved():void 
+			{ 
+				Log.out( "VoxelModel.saved: " + metadata.name ); 
+			}	
+			
+			function failed(e:PlayerIOError):void 
+			{ 
+				Log.out( "VoxelModel.save - error saving: " + metadata.name + " error: " + e.message ); 
+				_changed = true;
+			} 
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////

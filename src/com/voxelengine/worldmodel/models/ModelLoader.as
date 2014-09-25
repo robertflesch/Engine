@@ -290,8 +290,18 @@ package com.voxelengine.worldmodel.models
 			var ii:InstanceInfo = new InstanceInfo();
 			// hack to save it 
 			_s_mmd = $e.vmm;
-			ii.guid = $e.vmm.guid;
-			ii.name = $e.vmm.name;
+			//////////////////////
+			_s_mmd.databaseObject = null;
+			// all items from desktop are templates
+			_s_mmd.template = true;
+			// we will track where it came from since we might want to return it to pool.
+			_s_mmd.templateGuid = null;
+			// needed??
+			//_s_mmd.guid = Globals.getUID();
+			
+			//////////////////////
+			ii.guid = _s_mmd.guid;
+			ii.name = _s_mmd.name;
 			
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
@@ -310,6 +320,9 @@ package com.voxelengine.worldmodel.models
 				var vm:VoxelModel = Globals.getModelInstance( e.guid );
 				createInstanceFromTemplate(vm);
 				vm.metadata = _s_mmd;
+				_s_mmd = null;
+				vm.metadata.guid = vm.instanceInfo.guid;
+				vm.changed = true;
 				vm.save();
 			}
 		}
@@ -368,6 +381,7 @@ package com.voxelengine.worldmodel.models
 		
 		static public function loadRegionObjects( objects:Array ):int {
 			Log.out( "ModelLoader.loadRegionObjects - START =============================" );
+			
 			var count:int = 0;
 			for each ( var v:Object in objects )		   
 			{
@@ -379,13 +393,16 @@ package com.voxelengine.worldmodel.models
 				load( instance );
 				count++;
 			}
+
+			Log.out( "ModelLoader.loadRegionObjects - END =============================" );
+
 			// why is defaultRegion special?
 			//if ( 0 == count && name != "defaultRegion" ) {
 			if ( 0 == count )
 				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE ) );
-
-			Globals.g_landscapeTaskController.activeTaskLimit = 1;
-			Log.out( "ModelLoader.loadRegionObjects - END =============================" );
+			else	
+				Globals.g_landscapeTaskController.activeTaskLimit = 1;
+				
 			return count;
 		}
 		

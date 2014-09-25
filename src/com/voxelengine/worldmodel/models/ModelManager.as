@@ -434,17 +434,21 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		import playerio.DatabaseObject;
-		private function onPlayerLoadedAction( o:DatabaseObject ):void {
+		private function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
 			
-			var instanceInfo:InstanceInfo = new InstanceInfo();
-			instanceInfo.grainSize = 4;
-			instanceInfo.guid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
-			//instanceInfo.guid = "player";
-			//Log.out("ModelManager.onPlayerLoadedAction" );
-			ModelLoader.load( instanceInfo );
-			o.name = "Bob";
-			o.age = 32;
-			o.save();
+			if ( $dbo ) {
+				var instanceInfo:InstanceInfo = new InstanceInfo();
+				instanceInfo.grainSize = 4;
+				instanceInfo.guid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
+				instanceInfo.name = $dbo.name;
+				//instanceInfo.guid = "player";
+				//Log.out("ModelManager.onPlayerLoadedAction" );
+				ModelLoader.load( instanceInfo );
+				$dbo.name = "Bob";
+				$dbo.age = 32;
+				$dbo.save();
+			}
+			
 		}
 		
 		private function onPlayerLoadError(error:PlayerIOError):void {

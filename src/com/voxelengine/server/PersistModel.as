@@ -12,6 +12,7 @@
 	{
 		static public const DB_TABLE_MODELS:String = "voxelModels";
 		static public const DB_INDEX_MODEL_OWNER:String = "voxelModelOwner";
+		static public const DB_INDEX_OWNER_TEMPLATE:String = "ownerTemplate"
 		
 		static public function loadModel( $guid:String, $success:Function, $error:Function ):void {
 
@@ -41,7 +42,7 @@
 								        , $error );
 		}
 		
-		static public function loadModelMetadata( $userName:String ):void {
+		static public function loadModels( $userName:String ):void {
 			
 			Persistance.loadRange( DB_TABLE_MODELS
 						 , DB_INDEX_MODEL_OWNER
@@ -50,9 +51,22 @@
 						 , null
 						 , 100
 						, loadObjectsMetadata
-						, function (e:PlayerIOError):void {  Log.out( "ModelManager.errorHandler - e: " + e ); } );
+						, function (e:PlayerIOError):void {  Log.out( "PersistModel.errorHandler - e: " + e ); } );
 		}
 		
+		static public function loadCopyableModels( $userName:String ):void {
+			
+			Persistance.loadRange( DB_TABLE_MODELS
+						 , DB_INDEX_OWNER_TEMPLATE
+						 , [$userName]
+						 , true
+						 , null
+						 , 100
+						, loadObjectsMetadata
+						, function (e:PlayerIOError):void {  Log.out( "PersistModel.errorHandler - e: " + e ); } );
+						
+		}
+
 		static private function loadObjectsMetadata( dba:Array ):void {
 			
 			for each ( var dbo:DatabaseObject in dba )

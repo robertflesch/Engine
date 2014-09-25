@@ -83,11 +83,24 @@ public class RegionManager
 		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED
 									  ,  function( me:ModelEvent ):void { if ( currentRegion ){ currentRegion.changed = true;}} );
 		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_REMOVED
-									  ,  function( me:ModelEvent ):void { if ( currentRegion ){ currentRegion.changed = true;}} );
+									  ,  function( me:ModelEvent ):void { if ( currentRegion ) { currentRegion.changed = true; }} );
+									  
+		Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_FAILURE, removeFailedObjectFromRegion );									  
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////
+	
+	private function removeFailedObjectFromRegion( $e:LoadingEvent):void {
+		// Do I need to remove this failed load?
+		Log.out( "RegionManager.removeFailedObjectFromRegion - failed to load: " + $e.guid );
+		currentRegion.changedForce = true;
+		// Dont want to save if partially loaded
+		//currentRegion.save();
+	}
+	
+	
+	
 	public function requestRegionFile( $guid:String ):void
 	{
 		var fileNamePathWithExt:String = Globals.regionPath + $guid + ".rjson"
