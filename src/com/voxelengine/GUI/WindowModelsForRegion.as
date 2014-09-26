@@ -551,7 +551,7 @@ package com.voxelengine.GUI
 					WindowModelDetail.currentInstance.remove();
 				}
 				Globals.selectedModel = vm;
-				new WindowModelDetail( vm.instanceInfo );
+				new WindowModelDetail( vm );
 			}
 			else
 				Log.out( "WindowModel.childModelDetail - VoxelModelNotFound" );

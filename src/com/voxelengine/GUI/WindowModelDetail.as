@@ -24,6 +24,7 @@ package com.voxelengine.GUI
 		private var _eventCollector:EventCollector = new EventCollector();
 		private var _panelAdvanced:Panel;
 		
+		private var _vm:VoxelModel = null;
 		private var _ii:InstanceInfo = null;
 		
 		private static const BORDER_WIDTH:int = 4;
@@ -191,6 +192,27 @@ package com.voxelengine.GUI
 			addElement( panel );
 		}
 		
+		private function Basic():void
+		{
+			var label:Text = new Text( 300, 20 );
+			label.text = "Basic";
+			label.textAlign = TextAlign.CENTER;
+			label.fontSize = 16;
+			label.fixToParentWidth = true;
+			_panelAdvanced = new Panel( 300, 20 );
+            _panelAdvanced.autoSize = true;
+			_panelAdvanced.padding = 0;
+			_panelAdvanced.layout.orientation = LayoutOrientation.VERTICAL;
+			_panelAdvanced.addElement( label );
+			
+				
+			addLabel( _panelAdvanced, "Name:", function changeNameHandler(event:TextEvent):void { _vm.metadata.name = event.target.text; _vm.changed = true;  }, _vm.metadata.name );
+			addLabel( _panelAdvanced, "Desc:", function changeNameHandler(event:TextEvent):void { _vm.metadata.description = event.target.text; _vm.changed = true;  }, _vm.metadata.description );
+			
+			addElement( _panelAdvanced );
+			
+		}
+		
 		private function Advanced():void
 		{
 			var label:Text = new Text( 300, 20 );
@@ -213,10 +235,9 @@ package com.voxelengine.GUI
 			else	
 				vm = Globals.getModelInstance( _ii.guid );
 				
-							addLabel( _panelAdvanced, "State:", changeStateHandler, vm.anim ? vm.anim.name : "" );
-							addLabel( _panelAdvanced, "Name:", changeNameHandler, _ii.name );
+			addLabel( _panelAdvanced, "State:", changeStateHandler, vm.anim ? vm.anim.name : "" );
 			//_GrainSize = 	addLabel( _panelAdvanced, "GrainSize:", null, _vm.oxel.gc.grain.toString() );
-							addLabel( _panelAdvanced, "GrainSize:", null, String( _ii.grainSize ) );
+			addLabel( _panelAdvanced, "GrainSize:", null, String( _ii.grainSize ) );
 			addLabel( _panelAdvanced, "Instance GUID:", null, _ii.guid );
 			addLabel( _panelAdvanced, "Model GUID:", null, _ii.guid );
 			addLabel( _panelAdvanced, "Parent:", null, _ii.controllingModel ? _ii.controllingModel.instanceInfo.guid : "" );
@@ -227,13 +248,15 @@ package com.voxelengine.GUI
 			addElement( _panelAdvanced );
 		}
 		
-		public function WindowModelDetail( $ii:InstanceInfo )
+		public function WindowModelDetail( $vm:VoxelModel )
 		{
 			super( "Model Details" );
 			_s_inExistance++;
 			_s_currentInstance = this;
 			
-			_ii = $ii;
+			_vm = $vm;
+			_ii	= _vm.instanceInfo;
+			
 			onCloseFunction = closeFunction;
 			defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION;
 			layout.orientation = LayoutOrientation.VERTICAL;
@@ -257,8 +280,6 @@ package com.voxelengine.GUI
 		}
 		
 
-		private function changeNameHandler(event:TextEvent):void { _ii.name = event.target.text; }
-		
 		private function changeStateHandler(event:TextEvent):void {
 			var vm:VoxelModel = Globals.getModelInstance( _ii.guid )
 			var state:String = event.target.text;
