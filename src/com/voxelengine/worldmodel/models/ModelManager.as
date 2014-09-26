@@ -440,7 +440,7 @@ package com.voxelengine.worldmodel.models
 				var instanceInfo:InstanceInfo = new InstanceInfo();
 				instanceInfo.grainSize = 4;
 				instanceInfo.guid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
-				instanceInfo.name = $dbo.name;
+				//instanceInfo.name = $dbo.name;
 				//instanceInfo.guid = "player";
 				//Log.out("ModelManager.onPlayerLoadedAction" );
 				ModelLoader.load( instanceInfo );

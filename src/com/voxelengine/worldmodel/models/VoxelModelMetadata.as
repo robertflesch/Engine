@@ -21,22 +21,22 @@ package com.voxelengine.worldmodel.models
 	public class VoxelModelMetadata
 	{
 		private static const COPY_COUNT_INFINITE:int = -1;
-		private var _guid:String;
-		private var _name:String;
-		private var _description:String;
-		private var _owner:String;
-		private var _data:ByteArray;
+		private var _guid:String			= "";
+		private var _name:String			= "";
+		private var _description:String		= "";
+		private var _owner:String			= "";
+		private var _data:ByteArray
 		private var _dbo:DatabaseObject;
-		private var _templateGuid:String;
 
 		// Permissions
 		// http://wiki.secondlife.com/wiki/Permission
 		// move is more of a region type permission
-		private var _template:Boolean;
-		private var _copy:Boolean;
-		private var _copyCount:int = COPY_COUNT_INFINITE;
-		private var _modify:Boolean = true;
-		private var _transfer:Boolean = true;
+		private var _template:Boolean       = true;
+		private var _templateGuid:String	= "";
+		private var _copy:Boolean			= true;
+		private var _copyCount:int 			= COPY_COUNT_INFINITE;
+		private var _modify:Boolean 		= true;
+		private var _transfer:Boolean 		= true;
 
 		public function toString():String {
 			return "name: " + _name + "  description: " + _description + "  guid: " + _guid + "  owner: " + _owner;
@@ -44,8 +44,7 @@ package com.voxelengine.worldmodel.models
 		
 		public function toObject():Object {
 			
-			return { guid: _guid
-				   , name: _name
+			return { name: _name
 			       , description: _description
 				   , owner: _owner
 				   , template: _template
@@ -78,11 +77,27 @@ package com.voxelengine.worldmodel.models
 			_dbo 			= $dbo;
 		}
 		
+		public function toPersistance():void {
+			
+			_dbo.name 			= _name;
+			_dbo.description	= _description;
+			_dbo.owner			= _owner;
+			_dbo.template		= _template
+			_dbo.templateGuid	= _templateGuid
+			_dbo.copy			= _copy;
+			_dbo.copyCount		= _copyCount;
+			_dbo.modify			= _modify;
+			_dbo.transfer		= _transfer;
+			_dbo.guid 			= _guid;
+			_dbo.data 			= _data;
+		}
+		
 		public function save( $save:Function, $fail:Function, $created:Function ):void {
 						 
 			if ( _dbo )
 			{
 				Log.out("VoxelModelMetadata.save - saving object back to BigDB: " + name );
+				toPersistance();
 				_dbo.save( false
 					     , false
 						 , $save

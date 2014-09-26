@@ -191,26 +191,28 @@ package com.voxelengine.GUI
 			panel.layout.autoSizeAnimated = true;
 			addElement( panel );
 		}
-		
-		private function Basic():void
-		{
+
+		private function createPanel( text:String ):Panel {
 			var label:Text = new Text( 300, 20 );
 			label.text = "Basic";
 			label.textAlign = TextAlign.CENTER;
 			label.fontSize = 16;
 			label.fixToParentWidth = true;
-			_panelAdvanced = new Panel( 300, 20 );
-            _panelAdvanced.autoSize = true;
-			_panelAdvanced.padding = 0;
-			_panelAdvanced.layout.orientation = LayoutOrientation.VERTICAL;
-			_panelAdvanced.addElement( label );
-			
+			var panel:Panel = new Panel( 300, 20 );
+            panel.autoSize = true;
+			panel.padding = 0;
+			panel.layout.orientation = LayoutOrientation.VERTICAL;
+			panel.addElement( label );
+			return panel;
+		}
+		
+		private function Basic():void
+		{
+			var panel:Panel = createPanel( "Basic" );
 				
-			addLabel( _panelAdvanced, "Name:", function changeNameHandler(event:TextEvent):void { _vm.metadata.name = event.target.text; _vm.changed = true;  }, _vm.metadata.name );
-			addLabel( _panelAdvanced, "Desc:", function changeNameHandler(event:TextEvent):void { _vm.metadata.description = event.target.text; _vm.changed = true;  }, _vm.metadata.description );
-			
-			addElement( _panelAdvanced );
-			
+			addLabel( panel, "Name:", function changeNameHandler(event:TextEvent):void { _vm.metadata.name = event.target.text; _vm.changed = true;  }, _vm.metadata.name );
+			addLabel( panel, "Desc:", function changeNameHandler(event:TextEvent):void { _vm.metadata.description = event.target.text; _vm.changed = true;  }, _vm.metadata.description );
+			addElement( panel );
 		}
 		
 		private function Advanced():void
@@ -263,6 +265,7 @@ package com.voxelengine.GUI
             autoSize = true;
 			shadow = true;
 			
+			Basic();
 			LocationGroup();
 			RotationGroup();
 			Advanced();

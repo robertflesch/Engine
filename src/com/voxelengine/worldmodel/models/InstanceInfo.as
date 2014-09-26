@@ -38,7 +38,6 @@ package com.voxelengine.worldmodel.models
 		private var _transforms:Vector.<ModelTransform> = new Vector.<ModelTransform>;	// toJSON
 		private var _shader:String 						= "ShaderOxel";					// toJSON
 		private var _guid:String 						= null;                         // toJSON
-		private var _name:String 						= "Default_Name";               // toJSON
 		private var _scriptName:String 					= "";                           // toJSON
 		private var _grainSize:int 						= 0;                            // toJSON
 		private var _type:int 							= -1;                           // toJSON - This type overrides a native task type.
@@ -107,8 +106,6 @@ package com.voxelengine.worldmodel.models
 		public function get scripts():Vector.<Script>				{ return _scripts; }
 		public function get state():String 							{ return _state; }
 		public function set state(val:String):void						{ _state = val; }
-		public function get name():String							{ return _name; }
-		public function set name(val:String):void					{ _name = val; }
 		// I dont like that sometimes this is in World Space, and sometimes in Model Space
 		public function get transforms():Vector.<ModelTransform>	{ return _transforms; }
 		public function set transforms(val:Vector.<ModelTransform>):void
@@ -131,7 +128,6 @@ package com.voxelengine.worldmodel.models
 						transforms:		_transforms,
 						script: 		_scriptName,
 						grainSize: 		_grainSize,
-						name: 			_name,
 						collidable:     _collidable,
 						critical:     	_critical,
 						baseLightLevel: _baseLightLevel
@@ -149,7 +145,6 @@ package com.voxelengine.worldmodel.models
 						shader:			_shader,
 						collision:		_usesCollision,
 						script: 		_scriptName,
-						name: 			_name,
 						collidable:     _collidable,
 						critical:     	_critical,
 						state:			_state,
@@ -184,7 +179,7 @@ package com.voxelengine.worldmodel.models
 
 		public function toString():String
 		{
-			return "Name: " + name + " GUID: " + guid + " pos: " + positionGet + " controllingModel: " + (controllingModel ? controllingModel.instanceInfo.guid : "None" );
+			return " GUID: " + guid + " pos: " + positionGet + " controllingModel: " + (controllingModel ? controllingModel.instanceInfo.guid : "None" );
 		}
 
 		private function onLoadingComplete( le:LoadingEvent ):void
@@ -212,11 +207,8 @@ package com.voxelengine.worldmodel.models
 				
 			if ( json.name )
 			{
-				_name = json.name;
-				//Log.out( "InstanceInfo.initJSON - Name: " + _name );
+				Log.out( "========================= InstanceInfo.initJSON - Name: " + json.name + "  guid: " + _guid );
 			}
-			else
-				_name = guid;
 			
 			if ( json.state )
 				_state = json.state;

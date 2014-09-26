@@ -27,7 +27,7 @@ package com.voxelengine.worldmodel.scripts
 					var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
 					if ( Globals.player ) {
 						vm.takeControl( Globals.player );
-						Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.instanceInfo.name );
+						Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.metadata.name );
 					}
 					else {
 						Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingPlayerComplete );

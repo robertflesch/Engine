@@ -100,7 +100,7 @@
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.guid = userid;
 			ii.guid = "Player";
-			ii.name = userid;
+			//ii.name = userid;
 			ModelLoader.load( ii );
 			trace("VVServer.createPlayer - create player model for :" + userid );
 		}
@@ -110,7 +110,7 @@
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.guid = userid;
 			ii.guid = "Player"; // Avatar
-			ii.name = userid;
+			//ii.name = userid;
 			ModelLoader.load( ii );
 			trace("VVServer.createAvatar - create avatar for :" + userid );
 		}

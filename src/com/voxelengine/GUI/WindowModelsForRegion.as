@@ -174,8 +174,8 @@ package com.voxelengine.GUI
 			var guid:String = event.instanceGuid;
 			Log.out( "WindowModels.onParentModelCreated: " + guid );
 			var vm:VoxelModel = Globals.getModelInstance( event.instanceGuid );
-			if ( vm )
-				_listParents.addItem( vm.instanceInfo.name, vm );
+			if ( vm && vm.metadata && "" != vm.metadata.name )
+				_listParents.addItem( vm.metadata.name, vm );
 			
 			//populateParentModels();
 		}
@@ -235,7 +235,7 @@ package com.voxelengine.GUI
 				if ( li && li.data )
 				{
 					Globals.selectedModel = li.data;
-					new WindowModelDetail( li.data.instanceInfo );
+					new WindowModelDetail( li.data );
 				}
 			}
 			else

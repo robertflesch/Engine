@@ -92,7 +92,8 @@ class ChildModelPanel extends SimpleContainerBase
 	
 	private function onClickHandler( e:UIMouseEvent ):void
 	{
-		new WindowModelDetail( _ii );
+		new Error( "PanelChildModelsOld.onClickHandler - NOT IMPLEMENTED" );
+		//new WindowModelDetail( _ii );
 	}
 	
 	private function fileNameChanged( te:TextEvent ):void

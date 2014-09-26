@@ -41,6 +41,8 @@ package com.voxelengine.worldmodel.models
 		
 		// objects that are waiting on model data to load
 		static private var _blocks:Dictionary = new Dictionary(true);
+		// This is used only for loading local models into persistance
+		static private var _s_mmd:VoxelModelMetadata;
 		
 		public function ModelLoader():void {
 			Globals.g_app.addEventListener( ModelMetadataEvent.INFO_COLLECTED, localModelReadyToBeCreated );
@@ -58,10 +60,10 @@ package com.voxelengine.worldmodel.models
 			$vm.complete = true;
 		}
 		
-		static public function load( $ii:InstanceInfo ):void {
+		static public function load( $ii:InstanceInfo, $vmm:VoxelModelMetadata = null ):void {
 			Globals.instanceInfoAdd( $ii ); // Uses a name + guid as identifier
 			if ( !Globals.isGuid( $ii.guid ) && $ii.guid != "LoadModelFromBigDB" )
-				loadLocal( $ii )
+				loadLocal( $ii, $vmm )
 			else
 				loadPersistant( $ii );
 		}
@@ -81,7 +83,11 @@ package com.voxelengine.worldmodel.models
 			if ( null == vm )
 				throw new Error( "ModelLoader.instantiate - Model failed in creation - modelClass: " + modelClass );
 			
-			
+			if ( null == $vmm )
+				Log.out( "ModelLoader.instantiate - null VoxelModelMetata" );
+			else
+				vm.metadata = $vmm;
+				
 			//Log.out( "ModelLoader.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
 			Globals.modelAdd( vm );
 			return vm;
@@ -169,12 +175,12 @@ package com.voxelengine.worldmodel.models
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// local model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
-		static private function loadLocal( $ii:InstanceInfo ):void {
+		static private function loadLocal( $ii:InstanceInfo, $vmm:VoxelModelMetadata ):void {
 			Log.out( "ModelLoader.loadLocal - InstanceInfo: " + $ii.toString() );
-			var modelInfo:ModelInfo = modelInfoFindOrCreate( $ii.guid, $ii.name );
+			var modelInfo:ModelInfo = modelInfoFindOrCreate( $ii.guid, $ii.guid );
 			if ( modelInfo )
 			{
-				instantiate( $ii, modelInfo, null );
+				instantiate( $ii, modelInfo, $vmm );
 			}		
 		}
 		
@@ -274,6 +280,8 @@ package com.voxelengine.worldmodel.models
 				//Log.out( "VoxelModel.IVMLoadUncompressed - modelInfoJson: " + modelInfoJson );
 			}
 			
+			$vm.metadata.name = $vm.modelInfo.fileName;
+			
 			// now just load the model like any other
 			$vm.loadOxelFromByteArray($ba);
 		}
@@ -284,7 +292,6 @@ package com.voxelengine.worldmodel.models
 		// local TO Persistant model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		static private var _s_mmd:VoxelModelMetadata;
 		static private function localModelReadyToBeCreated( $e:ModelMetadataEvent ):void {
 			
 			var ii:InstanceInfo = new InstanceInfo();
@@ -294,14 +301,12 @@ package com.voxelengine.worldmodel.models
 			_s_mmd.databaseObject = null;
 			// all items from desktop are templates
 			_s_mmd.template = true;
-			// we will track where it came from since we might want to return it to pool.
-			_s_mmd.templateGuid = null;
 			// needed??
 			//_s_mmd.guid = Globals.getUID();
 			
 			//////////////////////
 			ii.guid = _s_mmd.guid;
-			ii.name = _s_mmd.name;
+			//ii.name = _s_mmd.name;
 			
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
@@ -310,7 +315,7 @@ package com.voxelengine.worldmodel.models
 			Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_COMPLETE, localModelLoaded );
 			Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, localModelLoaded );
 			
-			load( ii );
+			load( ii, _s_mmd );
 		}
 		
 		static private function localModelLoaded( e:LoadingEvent ):void {
@@ -442,7 +447,7 @@ package com.voxelengine.worldmodel.models
 						if ( instanceInfo )
 						{
 							//Log.out( "CLEAR BLOCK " + instanceInfo.toString()  );
-							instantiate( instanceInfo, Globals.modelInfoGet($guid), null );
+							instantiate( instanceInfo, Globals.modelInfoGet($guid), _s_mmd );
 						}
 					}
 				}

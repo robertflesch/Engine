@@ -17,7 +17,8 @@ IDEA: Glass, have engine use ambientOcclusion data to draw edges around glass, i
 IDEA: VertexManager sharing, this would allow us to have multiple creatures on the screen, just using one vertexManager
 
 WindowVoxelModel
-Be nice if selected model was somehow highlighted. And camera faced it
+TODO: Be nice if selected model was somehow highlighted. And camera faced it
+TODO: Deleting objects from a region should put them into your inventory? Other option is to remove them permanently from BigDB
 
 
 DRAGON

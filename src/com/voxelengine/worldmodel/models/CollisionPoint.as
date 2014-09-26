@@ -45,7 +45,7 @@ package com.voxelengine.worldmodel.models
 			collisionPointMarker.scale 				= new Vector3D( 1/16, 1/16, 1/16 );
 			collisionPointMarker.positionSet 		= point;
 			collisionPointMarker.controllingModel 	= $owner;
-			collisionPointMarker.name				= "CollisionPoint";
+			//collisionPointMarker.name				= "CollisionPoint";
 			ModelLoader.load( collisionPointMarker );
 			
 			instanceGuid = collisionPointMarker.guid;

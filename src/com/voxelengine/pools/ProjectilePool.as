@@ -88,7 +88,7 @@ public final class ProjectilePool
 	{
 		var pi:InstanceInfo = new InstanceInfo();
 		pi.guid = CLASS_NAME;
-		pi.name = "Projectile";
+		//pi.name = "Projectile";
 		pi.grainSize = 2;
 		pi.usesCollision = true;
 		pi.dynamicObject = true;

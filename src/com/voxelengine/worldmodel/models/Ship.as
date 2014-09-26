@@ -115,7 +115,7 @@ package com.voxelengine.worldmodel.models
 			{
 				if ( name != "" )
 				{
-					if ( engine.instanceInfo.name == name )
+					if ( engine.metadata.name == name )
 						engine.start( val, this );
 						
 				}

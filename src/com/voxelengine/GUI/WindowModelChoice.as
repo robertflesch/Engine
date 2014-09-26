@@ -58,21 +58,21 @@ package com.voxelengine.GUI
 			{
 				case 0: // From Cube
 					ii.guid = "GenerateCube";
-					ii.name = "New Cube Object";
+					//ii.name = "New Cube Object";
 					// preload the modelInfo for the GenerateCube
 					ModelLoader.modelInfoPreload( ii.guid );
 					new WindowNewModelGenerateCube( ii );
 					break;
 				case 1: // From Sphere
 					ii.guid = "GenerateSphere";
-					ii.name = "New Sphere Object";
+					//ii.name = "New Sphere Object";
 					// preload the modelInfo for the GenerateCube
 					ModelLoader.modelInfoPreload( ii.guid );
 					new WindowNewModelGenerateCube( ii );
 					break;
 				case 2: // From Sphere
 					ii.guid = "GenerateSubSphere";
-					ii.name = "Sphere in larger Object";
+					//ii.name = "Sphere in larger Object";
 					// preload the modelInfo for the GenerateCube
 					ModelLoader.modelInfoPreload( ii.guid );
 					new WindowNewModelGenerateCube( ii );

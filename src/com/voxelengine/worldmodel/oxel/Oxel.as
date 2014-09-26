@@ -2576,10 +2576,12 @@ package com.voxelengine.worldmodel.oxel
 			if ( type == fromType )
 				type = toType;
 				
-			for each ( var child:Oxel in _children )
-			{
-				child.changeTypeFromTo( fromType, toType );
+			if ( childrenHas() ) {
+				for each ( var child:Oxel in _children )
+					child.changeTypeFromTo( fromType, toType );
 			}
+			else
+				changeTypeFromTo( fromType, toType );
 		}
 		
 		private function reboundAll( newBound:int ):void {

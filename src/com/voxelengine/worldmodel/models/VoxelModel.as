@@ -888,7 +888,7 @@ package com.voxelengine.worldmodel.models
 		{
 			for each (var child:VoxelModel in _children)
 			{
-				if (child.instanceInfo.name == $name)
+				if (child.metadata.name == $name)
 					return child;
 			}
 			throw new Error("VoxelModel.childFindByName - not found for name: " + $name);
@@ -1681,7 +1681,7 @@ Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );
 				for each (var child:VoxelModel in $children)
 				{
 					//Log.out( "VoxelModel.checkChildren - child: " + child.instanceInfo.name );
-					if (child.instanceInfo.name == $at.attachmentName)
+					if (child.metadata.name == $at.attachmentName)
 					{
 						child.stateSetData($at, $useInitializer, $val);
 						result = true;
@@ -1767,7 +1767,7 @@ Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );
 			{
 				//Log.out( "VoxelModel.updateAnimationsInChildren - child: " + child.instanceInfo.name );
 				// Does this child have this name? if so update the transform
-				if (child.instanceInfo.name == $at.attachmentName)
+				if (child.metadata.name == $at.attachmentName)
 				{
 					for each (var mt:ModelTransform in $at.transforms)
 					{
