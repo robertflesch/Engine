@@ -174,7 +174,7 @@ package com.voxelengine.GUI
 			var guid:String = event.instanceGuid;
 			Log.out( "WindowModels.onParentModelCreated: " + guid );
 			var vm:VoxelModel = Globals.getModelInstance( event.instanceGuid );
-			if ( vm && vm.metadata && "" != vm.metadata.name )
+			if ( vm && vm.metadata && "" != vm.metadata.name && false == vm.metadata.template )
 				_listParents.addItem( vm.metadata.name, vm );
 			
 			//populateParentModels();

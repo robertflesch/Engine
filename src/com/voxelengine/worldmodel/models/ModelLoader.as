@@ -76,10 +76,8 @@ package com.voxelengine.worldmodel.models
 			else
 				vm.metadata = $vmm;
 			
-			// Templates should not be added to world automatically
-			if ( !vm.metadata.template )
-				Globals.modelAdd( vm );
-			else {
+			// Templates have to be added to world on import, in order to be saved
+			if ( vm.metadata.template ) {
 				// so far the model had been loading on the file guid
 				// for importing models, this needs to be converted to the DB guid before saving
 				vm.instanceInfo.guid = _s_mmd.guid;
@@ -88,9 +86,9 @@ package com.voxelengine.worldmodel.models
 				TemplateManager.templateAdd( vm.metadata );
 				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.TEMPLATE_MODEL_LOADED, vm.metadata.guid ) );
 			}
+			else
+				Globals.modelAdd( vm );
 
-				Log.out( "ModelLoader.instantiate - not loading template model name: " + vm.metadata.name );
-				
 			//Log.out( "ModelLoader.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
 			return vm;
 		}
@@ -342,6 +340,7 @@ package com.voxelengine.worldmodel.models
 					_s_mmd = null;
 					vm.save();
 					Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.TEMPLATE_MODEL_COMPLETE, vm.metadata.guid ) );
+					Globals.markDead( e.guid );
 				}
 				else
 					Log.out( "ModelLoader.templateModelLoaded - Failed to find template in template manager guid: " + vm.metadata.guid );
