@@ -117,10 +117,10 @@
 		
 		static private function userJoinedMessage(m:Message, userid:String):void
 		{
-			trace("VVServer.userJoinedMessage - Player with the userid", userid, "just joined the room -- Network.userId: " + Network.userId );
+			//trace("VVServer.userJoinedMessage - Player with the userid", userid, "just joined the room -- Network.userId: " + Network.userId );
 			if ( Network.userId != userid )
 			{
-				trace("VVServer.userJoinedMessage - I LOGGED ON" );
+				trace("VVServer.userJoinedMessage - ANOTHER PLAYER LOGGED ON" );
 				createPlayer( userid );
 				
 				var addMe:Message = _connection.createMessage( Network.ADD_ME );
@@ -138,7 +138,7 @@
 			}
 			else 
 			{
-				trace("VVServer.userJoinedMessage - REcieved message that I logged on ", userid );	
+				//trace("VVServer.userJoinedMessage - Recieved message that I logged on ", userid );	
 				if ( !Globals.player )
 					Globals.createPlayer();
 				else	

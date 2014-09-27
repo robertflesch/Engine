@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+import com.voxelengine.worldmodel.models.TemplateManager;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.ProgressEvent;
@@ -71,7 +72,6 @@ public class RegionManager
 		_persistRegion = new PersistRegion();
 		
 		_regions = new Vector.<Region>;
-		
 
 		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, load ); 
 		Globals.g_app.addEventListener( LoginEvent.JOIN_ROOM_SUCCESS, loadRegionOnJoinEvent );
@@ -86,6 +86,9 @@ public class RegionManager
 									  ,  function( me:ModelEvent ):void { if ( currentRegion ) { currentRegion.changed = true; }} );
 									  
 		Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_FAILURE, removeFailedObjectFromRegion );									  
+		
+		// This adds the event handlers
+		TemplateManager.addEvents();
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////

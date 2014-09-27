@@ -35,7 +35,7 @@ package com.voxelengine.events
 		static public const CHILD_MODEL_ADDED:String		= "CHILD_MODEL_ADDED";
 		static public const PARENT_MODEL_ADDED:String		= "PARENT_MODEL_ADDED";
 		static public const DYNAMIC_MODEL_ADDED:String		= "DYNAMIC_MODEL_ADDED";
-
+		
 		static public const CHILD_MODEL_REMOVED:String		= "CHILD_MODEL_REMOVED";
 		static public const PARENT_MODEL_REMOVED:String		= "PARENT_MODEL_REMOVED";
 		static public const DYNAMIC_MODEL_REMOVED:String	= "DYNAMIC_MODEL_REMOVED";

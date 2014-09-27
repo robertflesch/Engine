@@ -130,6 +130,8 @@ public class WindowModelMetadata extends VVPopup
 		_vmm.name = _name.label;
 		_vmm.description = _desc.label;
 		_vmm.copyCount = parseInt( _copies.label, 10 );
+		_vmm.createdDate = new Date();
+		_vmm.modifiedDate = new Date();
 		Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_COLLECTED, _vmm ) );
 		remove();
 	}

@@ -1,6 +1,7 @@
 
 package com.voxelengine.GUI
 {
+	import com.voxelengine.worldmodel.models.TemplateManager;
 	import flash.geom.Vector3D;
 	import flash.net.FileReference;
 	import flash.events.Event;
@@ -70,6 +71,7 @@ package com.voxelengine.GUI
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 			
 			Globals.g_app.addEventListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, modelLoaded );
+			Globals.g_app.addEventListener( LoadingEvent.TEMPLATE_MODEL_COMPLETE, newTemplateLoaded );
 			populateModels();
         }
 		
@@ -102,7 +104,7 @@ package com.voxelengine.GUI
 			fileName = fileName.substr( 0, fileName.indexOf( "." ) );
 
 			new WindowModelMetadata( fileName );
-			remove();
+		//	remove();
 		}
 		
 		private function addThisModelHandler( event:UIMouseEvent ):void 
@@ -138,12 +140,21 @@ package com.voxelengine.GUI
 			_listbox1.addItem( e.vmm.name + " - " + e.vmm.description, e.vmm );
 		}
 		
+		private function newTemplateLoaded( $e:LoadingEvent ):void {
+			var vmm:VoxelModelMetadata = TemplateManager.templateGet( $e.guid );
+			_listbox1.addItem( vmm.name + " - " + vmm.description, vmm );
+		}
+	
+	
+		
+		
 		private function populateModels():void
 		{
 			_listbox1.removeAll();
+			TemplateManager.templatesLoad();
+
 			//PersistModel.loadModels( Network.PUBLIC );
 			//PersistModel.loadModels( Network.userId );
-			PersistModel.loadCopyableModels( Network.userId );
 			//var models:Dictionary = Globals.modelInstancesGetDictionary();
 			//for each ( var vm:VoxelModel in models )
 			//{

@@ -56,7 +56,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		private function successHandler($dbo:DatabaseObject):void 
 		{ 
-			Log.out( "LoadModelFromBigDB.successHandler" );
+			Log.out( "LoadModelFromBigDB.successHandler for guid:" + _guid );
 			if ( !$dbo )
 			{
 				// This seems to be the failure case, not the error handler

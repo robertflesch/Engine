@@ -13,6 +13,7 @@
 		static public const DB_TABLE_MODELS:String = "voxelModels";
 		static public const DB_INDEX_MODEL_OWNER:String = "voxelModelOwner";
 		static public const DB_INDEX_OWNER_TEMPLATE:String = "ownerTemplate"
+		static private var _modifedDate:Date;
 		
 		static public function loadModel( $guid:String, $success:Function, $error:Function ):void {
 
@@ -54,11 +55,12 @@
 						, function (e:PlayerIOError):void {  Log.out( "PersistModel.errorHandler - e: " + e ); } );
 		}
 		
-		static public function loadCopyableModels( $userName:String ):void {
+		static public function loadModelTemplates( $modifiedDate:Date ):void {
 			
+			_modifedDate = $modifiedDate;
 			Persistance.loadRange( DB_TABLE_MODELS
 						 , DB_INDEX_OWNER_TEMPLATE
-						 , [$userName]
+						 , [Network.userId]
 						 , true
 						 , null
 						 , 100
@@ -73,6 +75,8 @@
 			{
 				var vmm:VoxelModelMetadata = new VoxelModelMetadata();
 				vmm.fromPersistance( dbo );
+				if ( vmm.modifiedDate < _modifedDate )
+					continue;
 				
 				Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm ) );
 			}

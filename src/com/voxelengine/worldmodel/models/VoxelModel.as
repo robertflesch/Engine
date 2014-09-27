@@ -132,7 +132,7 @@ package com.voxelengine.worldmodel.models
 			//Log.out( "VoxelModel.complete: " + modelInfo.fileName );
 			_complete = val;
 			
-			if ( metadata.modify && Globals.g_app.configManager.showEditMenu) {
+			if ( !metadata.template && metadata.modify && Globals.g_app.configManager.showEditMenu) {
 				if ( null == editCursor )
 					editCursor = EditCursor.create();
 				editCursor.oxel.gc.bound = oxel.gc.bound;

@@ -48,18 +48,6 @@ package com.voxelengine.worldmodel.models
 			Globals.g_app.addEventListener( ModelMetadataEvent.INFO_COLLECTED, localModelReadyToBeCreated );
 		}
 		
-		static private function createInstanceFromTemplate( $vm:VoxelModel ):void {
-			
-			Log.out( "ModelLoader.createInstanceFromTemplate - Converting LOCAL to PERSISTANT - InstanceInfo: " + $vm.instanceInfo.toString() );
-			Globals.modelInstancesChangeGuid( $vm.instanceInfo.guid, Globals.getUID() );
-			var newLayerInfo:LayerInfo = new LayerInfo( "LoadModelFromBigDB", $vm.instanceInfo.guid );
-			$vm.modelInfo.biomes.layerReset();
-			$vm.modelInfo.biomes.add_layer( newLayerInfo );
-			$vm.modelInfo.jsonReset();
-			$vm.changed = true;
-			$vm.complete = true;
-		}
-		
 		static public function load( $ii:InstanceInfo, $vmm:VoxelModelMetadata = null ):void {
 			Globals.instanceInfoAdd( $ii ); // Uses a name + guid as identifier
 			if ( !Globals.isGuid( $ii.guid ) && $ii.guid != "LoadModelFromBigDB" )
@@ -87,9 +75,23 @@ package com.voxelengine.worldmodel.models
 				Log.out( "ModelLoader.instantiate - null VoxelModelMetata" );
 			else
 				vm.metadata = $vmm;
+			
+			// Templates should not be added to world automatically
+			if ( !vm.metadata.template )
+				Globals.modelAdd( vm );
+			else {
+				// so far the model had been loading on the file guid
+				// for importing models, this needs to be converted to the DB guid before saving
+				vm.instanceInfo.guid = _s_mmd.guid;
+				// need this so that new model can be save back to db.
+				Globals.modelAdd( vm );
+				TemplateManager.templateAdd( vm.metadata );
+				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.TEMPLATE_MODEL_LOADED, vm.metadata.guid ) );
+			}
+
+				Log.out( "ModelLoader.instantiate - not loading template model name: " + vm.metadata.name );
 				
 			//Log.out( "ModelLoader.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
-			Globals.modelAdd( vm );
 			return vm;
 		}
 		
@@ -254,8 +256,8 @@ package com.voxelengine.worldmodel.models
 		//
 
 		// This is the last part of reading a local model
-		static public function loadLocalModelFromByteArray( $vm:VoxelModel, $ba:ByteArray):void
-		{
+		static public function loadLocalModelFromByteArray( $vm:VoxelModel, $ba:ByteArray):void 	{
+			
 			// the try catch here allows me to treat all models as compressed
 			// if the uncompress fails, it simply continues
 			// This sequence of bytes shows it is compressed ???
@@ -301,12 +303,11 @@ package com.voxelengine.worldmodel.models
 			_s_mmd.databaseObject = null;
 			// all items from desktop are templates
 			_s_mmd.template = true;
-			// needed??
-			//_s_mmd.guid = Globals.getUID();
-			
-			//////////////////////
+			// need to get rid of duplicate guids
 			ii.guid = _s_mmd.guid;
-			//ii.name = _s_mmd.name;
+			// now generate a UID for DB
+			// need to retain instanceInfo guid for loading
+			_s_mmd.guid = Globals.getUID();
 			
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
@@ -314,21 +315,37 @@ package com.voxelengine.worldmodel.models
 			
 			Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_COMPLETE, localModelLoaded );
 			Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, localModelLoaded );
+			Globals.g_app.addEventListener( LoadingEvent.TEMPLATE_MODEL_LOADED, templateModelLoaded );
 			
 			load( ii, _s_mmd );
 		}
 		
 		static private function localModelLoaded( e:LoadingEvent ):void {
+			Log.out( " ModelLoader.localModelLoaded - I DONT WANT THESE" );
+		}
+
+		static private function templateModelLoaded( e:LoadingEvent ):void {
 			
 			if ( _s_mmd.guid == e.guid ) {
-				Log.out( "ModelLoader.localModelLoaded - " + e.toString() );
+				Log.out( "ModelLoader.templateModelLoaded - " + e.toString() );
+				//var vm:VoxelModel = TemplateManager.templateGet( e.guid );
 				var vm:VoxelModel = Globals.getModelInstance( e.guid );
-				createInstanceFromTemplate(vm);
-				vm.metadata = _s_mmd;
-				_s_mmd = null;
-				vm.metadata.guid = vm.instanceInfo.guid;
-				vm.changed = true;
-				vm.save();
+				
+				if ( vm ) {
+					// Convert this from a locally loaded model, to a persistance loaded model
+					var newLayerInfo:LayerInfo = new LayerInfo( "LoadModelFromBigDB", vm.instanceInfo.guid );
+					vm.modelInfo.biomes.layerReset();
+					vm.modelInfo.biomes.add_layer( newLayerInfo );
+					vm.modelInfo.jsonReset();
+					vm.changed = true;
+					vm.complete = true;
+					_s_mmd = null;
+					vm.save();
+					Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.TEMPLATE_MODEL_COMPLETE, vm.metadata.guid ) );
+				}
+				else
+					Log.out( "ModelLoader.templateModelLoaded - Failed to find template in template manager guid: " + vm.metadata.guid );
+
 			}
 		}
 		

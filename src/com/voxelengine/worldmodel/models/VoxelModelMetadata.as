@@ -27,11 +27,13 @@ package com.voxelengine.worldmodel.models
 		private var _owner:String			= "";
 		private var _data:ByteArray
 		private var _dbo:DatabaseObject;
+		private var _createdDate:Date;
+		private var _modifiedDate:Date;
 
 		// Permissions
 		// http://wiki.secondlife.com/wiki/Permission
 		// move is more of a region type permission
-		private var _template:Boolean       = true;
+		private var _template:Boolean       = false;
 		private var _templateGuid:String	= "";
 		private var _copy:Boolean			= true;
 		private var _copyCount:int 			= COPY_COUNT_INFINITE;
@@ -53,6 +55,8 @@ package com.voxelengine.worldmodel.models
 				   , copyCount: _copyCount
 				   , modify: _modify
 				   , transfer: _transfer
+				   , createdDate: _createdDate
+				   , modifiedDate: _modifiedDate
 				   , data: data } 			
 		}
 		
@@ -74,6 +78,8 @@ package com.voxelengine.worldmodel.models
 			_transfer		= $dbo.transfer;
 			_guid 			= $dbo.key;
 			_data 			= $dbo.data;
+			_createdDate	= $dbo.createdDate;
+			_modifiedDate   = $dbo.modifiedDate;
 			_dbo 			= $dbo;
 		}
 		
@@ -89,6 +95,8 @@ package com.voxelengine.worldmodel.models
 			_dbo.modify			= _modify;
 			_dbo.transfer		= _transfer;
 			_dbo.guid 			= _guid;
+			_dbo.createdDate	= _createdDate;
+			_dbo.modifiedDate   = new Date();
 			_dbo.data 			= _data;
 		}
 		
@@ -167,6 +175,26 @@ package com.voxelengine.worldmodel.models
 		public function set transfer(value:Boolean):void 
 		{
 			_transfer = value;
+		}
+		
+		public function get createdDate():Date 
+		{
+			return _createdDate;
+		}
+		
+		public function set createdDate(value:Date):void 
+		{
+			_createdDate = value;
+		}
+		
+		public function get modifiedDate():Date 
+		{
+			return _modifiedDate;
+		}
+		
+		public function set modifiedDate(value:Date):void 
+		{
+			_modifiedDate = value;
 		}
 		
 		
