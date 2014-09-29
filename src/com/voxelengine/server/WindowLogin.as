@@ -96,15 +96,7 @@ package com.voxelengine.server
 											   , _password
 											   , connectSuccess
 											   , connectFailure );
-			trace("WindowLogin.loginButtonHandler - Trying to establish connection to server");
-			/*
-			PlayerIO.quickConnect.simpleConnect( Globals.g_app.stage
-			                , "servertestgame-co3lwnb10a4ytwvxddjtq"
-							, "public"
-							, "testuser"
-							, connectSuccess
-							, connectFailure );// connection established
-				*/			
+			Log.out("WindowLogin.loginButtonHandler - Trying to establish connection to server");
 		}
 		
 		private function registerButtonHandler(event:UIMouseEvent):void 
@@ -115,28 +107,43 @@ package com.voxelengine.server
 		
 		public function connectFailure(error:PlayerIOError):void
 		{
-			_result.text = error.message;
-			trace("VVServer.handleConnectError",error)
+			Log.writeError(" VVServer.handleConnectError", "Failed on connect to server", error );
 		}
 		
 		public function connectSuccess( $client:Client):void
 		{
-			trace("WindowLogin.connectSuccess - connection to server established");
-			Network.userId = $client.connectUserId;
-			Network.client = $client
-
-			Globals.online = true;
 			remove();
-			if ( !WindowSandboxList.isActive )
-				WindowSandboxList.create();
+			trace("WindowLogin.connectSuccess - connection to server established");
+			onSuccess( $client );
 		}
 		
-		//private function onLoginSucess( event:LoginEvent ):void 
-		//{
-			//Globals.online = true;
-			//remove();
-			//if ( !WindowSandboxList.isActive )
-				//WindowSandboxList.create();
-		//}
+		// This was a test to see if I could make a client that didnt need user interaction.
+		// This will allow me to do things like post to Facebook things that users create.
+		static public function autoLogin():void {
+			PlayerIO.quickConnect.simpleConnect( Globals.g_app.stage
+											   , Globals.g_gamesNetworkID
+											   , "bob@me.com"
+											   , "bob"
+											   , connectSuccess
+											   , function (error:PlayerIOError):void { Log.out("WindowLogin.handleConnectError", Log.ERROR); }
+											   );
+											   
+			function connectSuccess( $client:Client):void
+			{
+				Log.out("WindowLogin.connectSuccess - connection to server established using AUTOLOGIN");
+				onSuccess( $client );
+			}
+		}
+		
+		static private function onSuccess( $client:Client ):void {
+			
+			Network.userId = $client.connectUserId;
+			Network.client = $client
+			Globals.online = true;
+			if ( !WindowSandboxList.isActive )
+				WindowSandboxList.create();
+			
+		}
+		
 	}
 }
