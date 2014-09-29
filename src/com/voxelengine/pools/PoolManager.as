@@ -34,7 +34,6 @@ import com.voxelengine.worldmodel.MemoryManager;
 		
 		public function PoolManager()
 		{
-			MemoryManager.initialize();
 			ChildOxelPool.initialize( INITIAL_POOL_SETTINGS, INITIAL_POOL_SETTINGS* 2/8 );
 			QuadPool.initialize( INITIAL_POOL_SETTINGS * 4, INITIAL_POOL_SETTINGS/2 );
 			QuadsPool.initialize( INITIAL_POOL_SETTINGS * 1.7, INITIAL_POOL_SETTINGS/6 );
