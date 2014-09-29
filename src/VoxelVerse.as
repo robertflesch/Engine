@@ -129,7 +129,7 @@ package {
 		{
 			// TODO I dont like that some objects are created in globals, others are created here - RSF
 			removeEventListener(LoadingEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
-			_poolManager = new PoolManager();
+			
 			Globals.g_regionManager = new RegionManager();
 			_configManager = new ConfigManager();
 			_poolManager = new PoolManager();
