@@ -384,6 +384,7 @@ package com.voxelengine.GUI
 			//Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
 		//}
 
+		
 		private function onRegionLoadingComplete(event : RegionEvent ) : void
 		{
 			Globals.g_app.removeEventListener(RegionEvent.REGION_LOAD_BEGUN, onRegionLoadingComplete);
@@ -395,9 +396,11 @@ package com.voxelengine.GUI
 			else
 			{
 				Globals.mode = Globals.MODE_PUBLIC;
-				new WindowLogin();
+				WindowLogin.autoLogin();
+				//new WindowLogin();
 			}
 		}
+		
 		
 		private function onModelLoadingComplete(event : LoadingEvent ) : void
 		{
