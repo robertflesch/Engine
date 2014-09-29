@@ -11,6 +11,8 @@ package com.voxelengine
 	import com.furusystems.dconsole2.DConsole;
 	import com.furusystems.logging.slf4as.Logging;
 	import com.furusystems.logging.slf4as.ILogger;
+	import com.voxelengine.server.Network;
+	import playerio.ErrorLog;
 	
 	public class Log {
 		
@@ -45,6 +47,20 @@ package com.voxelengine
 			_showing = true;
 		}
 		
+		public static function writeError( $errorType:String, $details:String, $error:Error, $extraData:Object = null, callback:Function = null, errorHandler:Function = null):void {
+			
+			var stackTrace:String = $error.getStackTrace();
+			var split:Array = stackTrace.split("\n");
+			split.shift();
+			stackTrace = "Stack trace: \n\t" + split.join("\n\t");
+			if ( Network.client )
+				Network.client.errorLog.writeError( $errorType, $details, stackTrace, $extraData );
+			else {
+				Logging.getLogger(Log).error( $errorType + "  " + $details + "  " + stackTrace );
+			}
+		}
+		
+		
 		public static function out( $msg:String, type:int = INFO ):void {
 			
 			const L:ILogger = Logging.getLogger(Log);
@@ -69,6 +85,7 @@ package com.voxelengine
 						break;
 					case ERROR:
 						L.error("*** " + $msg );
+						writeError( "Error", $msg, null );
 						break;
 					case FATAL:
 						L.fatal( $msg );
