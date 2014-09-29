@@ -19,7 +19,7 @@ public final class MemoryManager
 	
 	public static function initialize():void 
 	{ 
-		_s_startingMemory = System.totalMemory / 1024;
+		//_s_startingMemory = System.totalMemory / 1024;
 	} 
 	 
 	public static function update():void 
