@@ -178,6 +178,8 @@ package com.voxelengine.renderer
 					Log.out( "Renderer.onContextCreated - SOFTWARE RENDERING - driverInfo: " + _context.driverInfo, Log.WARN );
 				else
 					Log.out( "Renderer.onContextCreated - driverInfo: " + _context.driverInfo );
+					
+				_context.clear();
 			}
 		}
 		
@@ -262,7 +264,7 @@ package com.voxelengine.renderer
 		
 		private function backgroundColor():void 
 		{
-			if ( Globals.g_regionManager.currentRegion )
+			if ( Globals.g_regionManager && Globals.g_regionManager.currentRegion )
 			{
 				var skyColor:Vector3D = Globals.g_regionManager.currentRegion.getSkyColor();
 				// Not only does this set the color, but it appears to clear the "BackBuffer"
