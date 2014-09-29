@@ -44,6 +44,35 @@ package com.voxelengine.worldmodel.models
 			return "name: " + _name + "  description: " + _description + "  guid: " + _guid + "  owner: " + _owner;
 		}
 		
+		public function clone():VoxelModelMetadata {
+			
+			var newVmm:VoxelModelMetadata = new VoxelModelMetadata();	
+			newVmm.guid 			= new String( _guid );
+			newVmm.name 			= new String( _name );
+			newVmm.description 		= new String( _description );
+			newVmm.owner 			= new String( _owner );
+			
+			// is this stored compressed? probably should be.
+			var buffer:ByteArray = new ByteArray();
+			buffer.writeObject( _data );
+			buffer.position = 0;
+			
+			newVmm.data				= buffer.readObject() as ByteArray;
+			
+			// how to copy this?
+			newVmm._dbo				= null;
+			newVmm.createdDate		= new Date();
+			newVmm.modifiedDate		= new Date();
+			newVmm.template			= false
+			newVmm.templateGuid		= new String ( newVmm.copyCount );
+			newVmm.copy				= copy;
+			newVmm.copyCount		= copyCount;
+			newVmm.modify			= modify;
+			newVmm.transfer			= transfer;
+			
+			return newVmm;
+		}
+		
 		public function toObject():Object {
 			
 			return { name: _name
