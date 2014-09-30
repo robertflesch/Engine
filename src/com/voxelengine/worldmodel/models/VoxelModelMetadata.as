@@ -106,7 +106,9 @@ package com.voxelengine.worldmodel.models
 			_modify			= $dbo.modify;
 			_transfer		= $dbo.transfer;
 			_guid 			= $dbo.key;
-			_data 			= $dbo.data;
+			var ba:ByteArray= $dbo.data 
+			ba.uncompress();
+			_data 			= ba;
 			_createdDate	= $dbo.createdDate;
 			_modifiedDate   = $dbo.modifiedDate;
 			_dbo 			= $dbo;

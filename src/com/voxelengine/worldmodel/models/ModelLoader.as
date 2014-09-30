@@ -71,23 +71,11 @@ package com.voxelengine.worldmodel.models
 			if ( null == vm )
 				throw new Error( "ModelLoader.instantiate - Model failed in creation - modelClass: " + modelClass );
 			
-			if ( null == $vmm )
-				Log.out( "ModelLoader.instantiate - null VoxelModelMetata" );
-			else
+			// if we were given metadata, use it.
+			if ( null != $vmm )
 				vm.metadata = $vmm;
-			
-			// Templates have to be added to world on import, in order to be saved
-			if ( vm.metadata.template ) {
-				// so far the model had been loading on the file guid
-				// for importing models, this needs to be converted to the DB guid before saving
-				vm.instanceInfo.guid = _s_mmd.guid;
-				// need this so that new model can be save back to db.
-				Globals.modelAdd( vm );
-				TemplateManager.templateAdd( vm.metadata );
-				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.TEMPLATE_MODEL_LOADED, vm.metadata.guid ) );
-			}
-			else
-				Globals.modelAdd( vm );
+
+			Globals.modelAdd( vm );
 
 			//Log.out( "ModelLoader.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
 			return vm;
@@ -123,8 +111,6 @@ package com.voxelengine.worldmodel.models
 				return null;
 			}
 			
-			ba.uncompress();
-
 			var versionInfo:Object = modelMetaInfoRead( ba );
 			if ( MANIFEST_VERSION != versionInfo.manifestVersion )
 			{
@@ -156,14 +142,16 @@ package com.voxelengine.worldmodel.models
 					ii.guid = $vmm.guid;
 				}
 				
-			if ( "" != controllingModelGuid ) {
-				var cvm:VoxelModel = Globals.getModelInstance( controllingModelGuid );
-				ii.controllingModel = cvm;
-			}
-				
-			var vm:* = instantiate( ii, mi, $vmm );
-			vm.version = versionInfo.version;
-			vm.loadOxelFromByteArray( ba );
+				if ( "" != controllingModelGuid ) {
+					var cvm:VoxelModel = Globals.getModelInstance( controllingModelGuid );
+					ii.controllingModel = cvm;
+				}
+					
+				var vm:* = instantiate( ii, mi, $vmm );
+				if ( vm ) {
+					vm.version = versionInfo.version;
+					vm.loadOxelFromByteArray( ba );
+				}
 			}
 
 			return vm;
@@ -251,8 +239,6 @@ package com.voxelengine.worldmodel.models
 			
 		}
 		
-		//
-
 		// This is the last part of reading a local model
 		static public function loadLocalModelFromByteArray( $vm:VoxelModel, $ba:ByteArray):void 	{
 			
@@ -297,15 +283,7 @@ package com.voxelengine.worldmodel.models
 			var ii:InstanceInfo = new InstanceInfo();
 			// hack to save it 
 			_s_mmd = $e.vmm;
-			//////////////////////
-			_s_mmd.databaseObject = null;
-			// all items from desktop are templates
-			_s_mmd.template = true;
-			// need to get rid of duplicate guids
 			ii.guid = _s_mmd.guid;
-			// now generate a UID for DB
-			// need to retain instanceInfo guid for loading
-			_s_mmd.guid = Globals.getUID();
 			
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
@@ -313,16 +291,12 @@ package com.voxelengine.worldmodel.models
 			
 			Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_COMPLETE, localModelLoaded );
 			Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, localModelLoaded );
-			Globals.g_app.addEventListener( LoadingEvent.TEMPLATE_MODEL_LOADED, templateModelLoaded );
 			
 			load( ii, _s_mmd );
 		}
 		
+		// We have to wait for the oxel data to be loaded before we can convert this to a template.
 		static private function localModelLoaded( e:LoadingEvent ):void {
-			Log.out( " ModelLoader.localModelLoaded - I DONT WANT THESE" );
-		}
-
-		static private function templateModelLoaded( e:LoadingEvent ):void {
 			
 			if ( _s_mmd.guid == e.guid ) {
 				Log.out( "ModelLoader.templateModelLoaded - " + e.toString() );
@@ -336,18 +310,18 @@ package com.voxelengine.worldmodel.models
 					vm.modelInfo.biomes.add_layer( newLayerInfo );
 					vm.modelInfo.jsonReset();
 					vm.changed = true;
-					vm.complete = true;
+					vm.instanceInfo.guid = vm.metadata.guid = Globals.getUID();
 					_s_mmd = null;
 					vm.save();
+					TemplateManager.templateAdd( vm.metadata );
 					Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.TEMPLATE_MODEL_COMPLETE, vm.metadata.guid ) );
 					Globals.markDead( e.guid );
 				}
 				else
 					Log.out( "ModelLoader.templateModelLoaded - Failed to find template in template manager guid: " + vm.metadata.guid );
-
 			}
 		}
-		
+
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// END local TO Persistant model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
