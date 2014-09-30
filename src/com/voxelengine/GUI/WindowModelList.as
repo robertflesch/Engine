@@ -115,16 +115,17 @@ package com.voxelengine.GUI
 			if ( li && li.data )
 			{
 				var vmm:VoxelModelMetadata = li.data as VoxelModelMetadata;
+				//vmm = vmm.clone();
 				// So if I see the database object to null. And give it a new guid, I have a nice copy ;-)
-				vmm.databaseObject = null;
+//				vmm.databaseObject = null;
 				// no longer based on a template
-				vmm.template = false;
+//				vmm.template = false;
 				// we will track where it came from since we might want to return it to pool.
-				vmm.templateGuid = vmm.guid;
-				vmm.guid = Globals.getUID();
+//				vmm.templateGuid = vmm.guid;
+//				vmm.guid = Globals.getUID();
 				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( vmm, _parentGuid );				
-				vm.changed = true;
-				vm.save();
+//				vm.changed = true;
+//				vm.save();
 
 				remove();
 			}
@@ -142,6 +143,7 @@ package com.voxelengine.GUI
 		
 		private function newTemplateLoaded( $e:LoadingEvent ):void {
 			var vmm:VoxelModelMetadata = TemplateManager.templateGet( $e.guid );
+			Log.out( "WindowModelList.newTemplateLoaded name: " + vmm.name + " - " + vmm.description );
 			_listbox1.addItem( vmm.name + " - " + vmm.description, vmm );
 		}
 	
