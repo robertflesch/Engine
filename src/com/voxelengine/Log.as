@@ -49,10 +49,13 @@ package com.voxelengine
 		
 		public static function writeError( $errorType:String, $details:String, $error:Error, $extraData:Object = null, callback:Function = null, errorHandler:Function = null):void {
 			
-			var stackTrace:String = $error.getStackTrace();
-			var split:Array = stackTrace.split("\n");
-			split.shift();
-			stackTrace = "Stack trace: \n\t" + split.join("\n\t");
+			var stackTrace:String = "unknown stack trace";
+			if ( $error ) {
+				stackTrace = $error.getStackTrace();
+				var split:Array = stackTrace.split("\n");
+				split.shift();
+				stackTrace = "Stack trace: \n\t" + split.join("\n\t");
+			}
 			if ( Network.client )
 				Network.client.errorLog.writeError( $errorType, $details, stackTrace, $extraData );
 			else {
