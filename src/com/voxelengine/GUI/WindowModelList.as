@@ -116,15 +116,6 @@ package com.voxelengine.GUI
 			{
 				var tvmm:VoxelModelMetadata = li.data as VoxelModelMetadata;
 				var vmm:VoxelModelMetadata = tvmm.createInstanceOfTemplate();
-				// So if I see the database object to null. And give it a new guid, I have a nice copy ;-)
-//				vmm.databaseObject = null;
-				// no longer based on a template
-//				vmm.template = false;
-				// we will track where it came from since we might want to return it to pool.
-//				vmm.templateGuid = vmm.guid;
-//				vmm.guid = Globals.getUID();
-//				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( vmm, _parentGuid );				
-
 				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( vmm, tvmm.data, _parentGuid );				
 				vm.changed = true;
 				vm.save( true );
