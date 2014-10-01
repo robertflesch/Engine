@@ -281,7 +281,7 @@ package com.voxelengine.worldmodel.models
 		
 		static private function localModelReadyToBeCreated( $e:ModelMetadataEvent ):void {
 			
-			Log.out( "ModelLoader.localModelReadyToBeCreated - " + ii.toString() );
+			Log.out( "ModelLoader.localModelReadyToBeCreated - " + $e.toString() );
 			var ii:InstanceInfo = new InstanceInfo();
 			// no easy way to pass the VoxelModelMetadata thru loader, so save it off here, and reapply after it is loaded
 			_s_mmd = $e.vmm;
