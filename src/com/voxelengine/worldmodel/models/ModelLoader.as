@@ -102,16 +102,16 @@ package com.voxelengine.worldmodel.models
 			Globals.g_landscapeTaskController.addTask( taskGroup );
 		}
 		
-		static public function loadFromManifestByteArray( $vmm:VoxelModelMetadata, controllingModelGuid:String = "" ):VoxelModel {
+		static public function loadFromManifestByteArray( $vmm:VoxelModelMetadata, $ba:ByteArray, controllingModelGuid:String = "" ):VoxelModel {
 				
-			var ba:ByteArray = $vmm.data as ByteArray;
-			if ( null == ba )
+			if ( null == $ba )
 			{
 				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad data in VoxelModelMetadata: " + $vmm.guid, Log.ERROR );
 				return null;
 			}
+			$ba.position = 0;
 			
-			var versionInfo:Object = modelMetaInfoRead( ba );
+			var versionInfo:Object = modelMetaInfoRead( $ba );
 			if ( MANIFEST_VERSION != versionInfo.manifestVersion )
 			{
 				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
@@ -119,41 +119,42 @@ package com.voxelengine.worldmodel.models
 			}
 			
 			// how many bytes is the modelInfo
-			var strLen:int = ba.readInt();
+			var strLen:int = $ba.readInt();
 			// read off that many bytes
-			var modelInfoJson:String = ba.readUTFBytes( strLen );
+			var modelInfoJson:String = $ba.readUTFBytes( strLen );
 			
-			if ( null != $vmm.guid && "" != $vmm.guid ) {
-				// create the modelInfo object from embedded metadata
-				modelInfoJson = decodeURI(modelInfoJson);
-				var jsonResult:Object = JSON.parse(modelInfoJson);
-				var mi:ModelInfo = new ModelInfo();
-				mi.initJSON( $vmm.guid, jsonResult );
+			// create the modelInfo object from embedded metadata
+			modelInfoJson = decodeURI(modelInfoJson);
+			var jsonResult:Object = JSON.parse(modelInfoJson);
+			var mi:ModelInfo = new ModelInfo();
+			mi.initJSON( $vmm.guid, jsonResult );
+			
+			// add the modelInfo to the repo
+			// is the still needed TODO - RSF 9.23.14
+			Globals.modelInfoAdd( mi );
+			// needs to be name + guid??
+			var ii:InstanceInfo = Globals.instanceInfoGet( $vmm.guid );
+			// Templates dont have instanceInfo.
+			if ( !ii ) {
+				ii = new InstanceInfo();
+				var viewDistance:Vector3D = new Vector3D(0, 0, -75);
+				ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
+				//ii.guid = Globals.getUID();
+				ii.guid = $vmm.guid;
+			}
+			
+			if ( "" != controllingModelGuid ) {
+				var cvm:VoxelModel = Globals.getModelInstance( controllingModelGuid );
+				ii.controllingModel = cvm;
+			}
 				
-				// add the modelInfo to the repo
-				// is the still needed TODO - RSF 9.23.14
-				Globals.modelInfoAdd( mi );
-				// needs to be name + guid??
-				var ii:InstanceInfo = Globals.instanceInfoGet( $vmm.guid );
-				if ( !ii ) {
-					ii = new InstanceInfo();
-					var viewDistance:Vector3D = new Vector3D(0, 0, -75);
-					ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-					ii.guid = $vmm.guid;
-				}
-				
-				if ( "" != controllingModelGuid ) {
-					var cvm:VoxelModel = Globals.getModelInstance( controllingModelGuid );
-					ii.controllingModel = cvm;
-				}
-					
-				var vm:* = instantiate( ii, mi, $vmm );
-				if ( vm ) {
-					vm.version = versionInfo.version;
-					vm.loadOxelFromByteArray( ba );
-				}
+			var vm:* = instantiate( ii, mi, $vmm );
+			if ( vm ) {
+				vm.version = versionInfo.version;
+				vm.loadOxelFromByteArray( $ba );
 			}
 
+			vm.complete = true;
 			return vm;
 		}
 		///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -280,15 +281,13 @@ package com.voxelengine.worldmodel.models
 		
 		static private function localModelReadyToBeCreated( $e:ModelMetadataEvent ):void {
 			
-			var ii:InstanceInfo = new InstanceInfo();
-			// hack to save it 
-			_s_mmd = $e.vmm;
-			ii.guid = _s_mmd.guid;
-			
-			var viewDistance:Vector3D = new Vector3D(0, 0, -75);
-			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
 			Log.out( "ModelLoader.localModelReadyToBeCreated - " + ii.toString() );
+			var ii:InstanceInfo = new InstanceInfo();
+			// no easy way to pass the VoxelModelMetadata thru loader, so save it off here, and reapply after it is loaded
+			_s_mmd = $e.vmm;
+			ii.guid = $e.vmm.guid; // Since it used the file name to load locally, this has to be the same 
 			
+			// this will occur after the oxel data has been loaded
 			Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_COMPLETE, localModelLoaded );
 			Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, localModelLoaded );
 			
@@ -315,7 +314,9 @@ package com.voxelengine.worldmodel.models
 					vm.save();
 					TemplateManager.templateAdd( vm.metadata );
 					Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.TEMPLATE_MODEL_COMPLETE, vm.metadata.guid ) );
+					// clear out any evidence that we loaded this model (modelInfo too?)
 					Globals.markDead( e.guid );
+					Globals.instanceInfoRemove( e.guid );
 				}
 				else
 					Log.out( "ModelLoader.templateModelLoaded - Failed to find template in template manager guid: " + vm.metadata.guid );

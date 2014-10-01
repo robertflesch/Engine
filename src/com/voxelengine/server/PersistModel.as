@@ -75,13 +75,13 @@
 			{
 				var vmm:VoxelModelMetadata = new VoxelModelMetadata();
 				vmm.fromPersistance( dbo );
-				if ( vmm.modifiedDate < _modifedDate )
+				if ( vmm.modifiedDate < _modifedDate ) {
+					vmm = null;
 					continue;
+				}
 				
 				Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm ) );
 			}
 		}
-		
 	}	
-	
 }

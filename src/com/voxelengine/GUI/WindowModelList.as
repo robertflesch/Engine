@@ -59,7 +59,7 @@ package com.voxelengine.GUI
 			}
 			
 			var addModel:Button = new Button( "Add This Model" );
-			addModel.addEventListener(UIMouseEvent.CLICK, addThisModelHandler );
+			addModel.addEventListener(UIMouseEvent.CLICK, createInstanceFromTemplate );
 			panelParentButton.addElement( addModel );
 			
 			var cancel:Button = new Button( "Cancel" );
@@ -107,15 +107,15 @@ package com.voxelengine.GUI
 		//	remove();
 		}
 		
-		private function addThisModelHandler( event:UIMouseEvent ):void 
+		private function createInstanceFromTemplate( event:UIMouseEvent ):void 
 		{
 			if ( -1 == _listbox1.selectedIndex )
 				return;
 			var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
 			if ( li && li.data )
 			{
-				var vmm:VoxelModelMetadata = li.data as VoxelModelMetadata;
-				//vmm = vmm.clone();
+				var tvmm:VoxelModelMetadata = li.data as VoxelModelMetadata;
+				var vmm:VoxelModelMetadata = tvmm.createInstanceOfTemplate();
 				// So if I see the database object to null. And give it a new guid, I have a nice copy ;-)
 //				vmm.databaseObject = null;
 				// no longer based on a template
@@ -123,9 +123,11 @@ package com.voxelengine.GUI
 				// we will track where it came from since we might want to return it to pool.
 //				vmm.templateGuid = vmm.guid;
 //				vmm.guid = Globals.getUID();
-				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( vmm, _parentGuid );				
-//				vm.changed = true;
-//				vm.save();
+//				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( vmm, _parentGuid );				
+
+				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( vmm, tvmm.data, _parentGuid );				
+				vm.changed = true;
+				vm.save();
 
 				remove();
 			}

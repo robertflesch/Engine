@@ -120,7 +120,7 @@ package com.voxelengine.worldmodel.models
 		public function set modelInfo(val:ModelInfo):void			{ _modelInfo = val; }
 		public function get children():Vector.<VoxelModel>			{ return _children; }
 		public function get changed():Boolean						{ return _changed; }
-		public function set changed( $val:Boolean):void			{ _changed = $val; }
+		public function set changed( $val:Boolean):void				{ _changed = $val; }
 		public function get selected():Boolean 						{ return _selected; }
 		public function set selected(val:Boolean):void  			{ _selected = val; }
 		public function get onSolidGround():Boolean 				{ return _onSolidGround; }
@@ -690,10 +690,6 @@ package com.voxelengine.worldmodel.models
 			//else 
 			if (_modelInfo.biomes && false == complete && null == metadata.databaseObject )
 				_modelInfo.biomes.add_to_task_controller(instanceInfo);
-			else
-				complete = true; // no model info to load, so just mark it as complete
-			
-//			calculateCenter();
 			
 			// This unblocks the landscape task controller when all terrain tasks have been added
 			if (0 == Globals.g_landscapeTaskController.activeTaskLimit)
@@ -1014,20 +1010,27 @@ package com.voxelengine.worldmodel.models
 				return;
 			}
 				
-			Log.out("VoxelModel.save - saving changes to: " + metadata.name  );
-			metadata.data = toByteArray();
+			Log.out("VoxelModel.save - saving changes to: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.guid: " + instanceInfo.guid  );
+			if ( "" == metadata.templateGuid )
+				metadata.data = toByteArray();
+			else	
+				metadata.data = null;
+				
 			_changed = false;
 			metadata.save( saved , failed, created );
 			
 			function saved():void 
 			{ 
-				Log.out( "VoxelModel.saved: " + metadata.name ); 
+				Log.out("VoxelModel.saved - saving changes to: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.guid: " + instanceInfo.guid  );
 			}	
 			
-			function failed(e:PlayerIOError):void 
+			function failed( $e:PlayerIOError ):void 
 			{ 
-				Log.out( "VoxelModel.save - error saving: " + metadata.name + " error: " + e.message ); 
-				_changed = true;
+				Log.writeError( "VoxelModel.save"
+				              , "error saving: " + metadata.name + " error: " + $e.message
+							  , $e );
+				// seems like this MIGHT throw it in an endless loop
+				//_changed = true;
 			} 
 		}
 		

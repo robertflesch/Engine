@@ -314,7 +314,6 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		
 		private function onLoadingPlayerComplete( le:LoadingEvent ):void {
 			Log.out( "Player.onLoadingPlayerComplete - PLAYER LOADED =============================================" );
-			complete = true;
 			calculateCenter();
 			Globals.player = this;
 			Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );

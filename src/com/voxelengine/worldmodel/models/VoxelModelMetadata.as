@@ -73,6 +73,31 @@ package com.voxelengine.worldmodel.models
 			return newVmm;
 		}
 		
+		public function createInstanceOfTemplate():VoxelModelMetadata {
+			
+			var newVmm:VoxelModelMetadata = new VoxelModelMetadata();	
+			newVmm.guid 			= Globals.getUID();
+			newVmm.name 			= new String( _name );
+			newVmm.description 		= new String( _description );
+			newVmm.owner 			= new String( _owner );
+			
+			// instances dont have data, they use the template data
+			newVmm.data				= null;
+			
+			// how to copy this?
+			newVmm._dbo				= null;
+			newVmm.createdDate		= new Date( _createdDate );
+			newVmm.modifiedDate		= new Date();
+			newVmm.template			= false
+			newVmm.templateGuid		= new String ( _guid );
+			newVmm.copy				= copy;
+			newVmm.copyCount		= copyCount;
+			newVmm.modify			= modify;
+			newVmm.transfer			= transfer;
+			
+			return newVmm;
+		}
+		
 		public function toObject():Object {
 			
 			return { name: _name
@@ -106,12 +131,17 @@ package com.voxelengine.worldmodel.models
 			_modify			= $dbo.modify;
 			_transfer		= $dbo.transfer;
 			_guid 			= $dbo.key;
-			var ba:ByteArray= $dbo.data 
-			ba.uncompress();
-			_data 			= ba;
 			_createdDate	= $dbo.createdDate;
 			_modifiedDate   = $dbo.modifiedDate;
 			_dbo 			= $dbo;
+			
+			if ( $dbo.data ) {
+				var ba:ByteArray= $dbo.data 
+				ba.uncompress();
+				_data 		= ba;
+			}
+			else
+				_data 		= null;
 		}
 		
 		public function toPersistance():void {
@@ -135,7 +165,8 @@ package com.voxelengine.worldmodel.models
 						 
 			if ( _dbo )
 			{
-				Log.out("VoxelModelMetadata.save - saving object back to BigDB: " + name );
+				Log.out("VoxelModelMetadata.save - saving changes to: " + name + "  guid: " + guid  );
+
 				toPersistance();
 				_dbo.save( false
 					     , false
@@ -145,7 +176,7 @@ package com.voxelengine.worldmodel.models
 			else
 			{
 				var obj:Object = toObject();
-				Log.out("VoxelModelMetadata.save - creating new object: " + name );
+				Log.out("VoxelModelMetadata.save - creating new object: " + name + "  guid: " + guid  );
 				PersistModel.createModel( guid
 								        , obj
 								        , $created
