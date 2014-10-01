@@ -43,7 +43,7 @@ package com.voxelengine.worldmodel.models
 		public function toString():String {
 			return "name: " + _name + "  description: " + _description + "  guid: " + _guid + "  owner: " + _owner;
 		}
-		
+		/*
 		public function clone():VoxelModelMetadata {
 			
 			var newVmm:VoxelModelMetadata = new VoxelModelMetadata();	
@@ -72,7 +72,7 @@ package com.voxelengine.worldmodel.models
 			
 			return newVmm;
 		}
-		
+		*/
 		public function createInstanceOfTemplate():VoxelModelMetadata {
 			
 			var newVmm:VoxelModelMetadata = new VoxelModelMetadata();	
@@ -155,7 +155,6 @@ package com.voxelengine.worldmodel.models
 			_dbo.copyCount		= _copyCount;
 			_dbo.modify			= _modify;
 			_dbo.transfer		= _transfer;
-			_dbo.guid 			= _guid;
 			_dbo.createdDate	= _createdDate;
 			_dbo.modifiedDate   = new Date();
 			_dbo.data 			= _data;
