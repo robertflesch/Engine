@@ -299,7 +299,7 @@ package com.voxelengine {
 				if ( StageDisplayState.FULL_SCREEN_INTERACTIVE == Globals.g_app.stage.displayState )
 					Globals.g_app.stage.mouseLock = false;
 			}
-			Log.out( "VoxelVerseGui.openWindowCount - adjust - current count: " + _openWindowCount );
+			//Log.out( "VoxelVerseGui.openWindowCount - adjust - current count: " + _openWindowCount );
 		}
 		
 //////////////////////////////////////////////////////////////////////////////////		
@@ -346,6 +346,10 @@ package com.voxelengine {
 			return g_regionManager.currentRegion.modelManager.instanceInfoGet( $guid )
 		}
 		
+		public static function instanceInfoRemove( $guid:String ):void {
+			g_regionManager.currentRegion.modelManager.instanceInfoRemove( $guid )
+		}
+
 		public static function changeFromParentToChild( $vm:VoxelModel ):void {
 			return g_regionManager.currentRegion.modelManager.changeFromParentToChild( $vm )
 		}
