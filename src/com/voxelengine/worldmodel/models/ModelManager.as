@@ -94,8 +94,15 @@ package com.voxelengine.worldmodel.models
 			return _worldSpaceStartPoint;
 		}
 		
-		public function instanceInfoAdd(val:InstanceInfo):void  {  _instanceDictionary[val.guid] = val; }
-		public function instanceInfoGet( guid:String ):InstanceInfo  {  return _instanceDictionary[guid]; }
+		//////////////////////////////////////////////////////////////////////////////////
+		//////////////////////// Instance Info //////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////
+		public function instanceInfoAdd(val:InstanceInfo):void  	{  _instanceDictionary[val.guid] = val; }
+		public function instanceInfoGet( guid:String ):InstanceInfo {  return _instanceDictionary[guid]; }
+		public function instanceInfoRemove( guid:String ):void  	{  _instanceDictionary[guid] = null; }
+		//////////////////////////////////////////////////////////////////////////////////
+		//////////////////////// END Instance Info  //////////////////////////////////////////
+		//////////////////////////////////////////////////////////////////////////////////
 		
 		public function ModelManager() {
 			_viewDistances = new Vector.<Vector3D>(6); 
