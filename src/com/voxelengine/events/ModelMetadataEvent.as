@@ -18,6 +18,7 @@ package com.voxelengine.events
 	public class ModelMetadataEvent extends Event
 	{
 		static public const INFO_LOADED_PERSISTANCE:String  = "INFO_LOADED_PERSISTANCE";
+		static public const INFO_FAILED_PERSISTANCE:String  = "INFO_FAILED_PERSISTANCE";
 		static public const INFO_COLLECTED:String  = "INFO_COLLECTED";
 		
 		private var _vmm:VoxelModelMetadata;
