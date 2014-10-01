@@ -126,7 +126,7 @@ limited testing at scale
 some dependancy on online service providers (player.io aka yahoo game network)
 
 Opportunities
-Minecraft exposed a 250 million opportunity which could be a billion dollar opportunity
+Minecraft exposed a 250 (2.5 billion) million opportunity which could be a billion dollar opportunity
 steam punk space under targeted.
 
 Threats
@@ -134,6 +134,8 @@ Adobe Flash is 5-10 years from end of lifecycle
 While other next generation voxel engines exist. None are targeted toward this space currently.
 
 Other
+A playbook for cutting the corporate purse strings
+http://gamasutra.com/blogs/EthanLevy/20140930/226702/A_playbook_for_cutting_the_corporate_purse_strings.php
 https://www.kickstarter.com/projects/nerdkingdom/tug-1
 https://www.kickstarter.com/projects/winterkewlgames/yogventures/comments
 http://steveblank.com/2014/09/16/who-do-you-need-on-your-startup-team/
