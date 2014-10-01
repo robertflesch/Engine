@@ -127,7 +127,7 @@ package com.voxelengine.GUI
 
 				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( vmm, tvmm.data, _parentGuid );				
 				vm.changed = true;
-				vm.save();
+				vm.save( true );
 
 				remove();
 			}

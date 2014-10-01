@@ -1003,18 +1003,24 @@ package com.voxelengine.worldmodel.models
 			Log.out( "VoxelModel.created: " + instanceInfo.guid ); 
 		}	
 
-		public function save():void
+		// Force save is used ONLY when creating instances from templates.
+		public function save( forceSave:Boolean = false ):void
 		{
-			if ( !changed ) {
+			if ( !changed && !forceSave ) {
 				//Log.out( "VoxelModel.save - NOT SAVING: " + metadata.name );
 				return;
 			}
 				
 			Log.out("VoxelModel.save - saving changes to: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.guid: " + instanceInfo.guid  );
-			if ( "" == metadata.templateGuid )
-				metadata.data = toByteArray();
-			else	
+			if ( forceSave ) {
 				metadata.data = null;
+			}
+			else {
+				if ( "" != metadata.templateGuid )
+					metadata.templateGuid = "";
+					
+				metadata.data = toByteArray();
+			}
 				
 			_changed = false;
 			metadata.save( saved , failed, created );

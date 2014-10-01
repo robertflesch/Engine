@@ -38,10 +38,10 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private var _guid:String;
 		private var _startTime:int;
 		private var _guidTemplate:String;
-		private var _vmm:VoxelModelMetadata;
+		private var _vmmBase:VoxelModelMetadata;
 		
 		public function LoadModelFromBigDB( $guid:String, $layer:LayerInfo = null ) {
-			Log.out( "LoadModelFromBigDB.construct " );
+			//Log.out( "LoadModelFromBigDB.construct " );
 			_guid = $guid
 			_startTime = getTimer();
 			//public function AbstractTask(type:String, priority:int = 5, uid:Object = null, selfOverride:Boolean = false, blocking:Boolean = false)
@@ -51,7 +51,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		override public function start():void
 		{
-			Log.out( "LoadModelFromBigDB.start for guid:" + _guid );
+			//Log.out( "LoadModelFromBigDB.start for guid:" + _guid );
 			var timer:int = getTimer();
 			super.start() // AbstractTask will send event
 			
@@ -60,7 +60,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		private function successHandler($dbo:DatabaseObject):void 
 		{ 
-			Log.out( "LoadModelFromBigDB.successHandler for guid:" + _guid );
+			Log.out( "LoadModelFromBigDB.successHandler base data loaded for guid:" + _guid );
 			if ( !$dbo )
 			{
 				// This seems to be the failure case, not the error handler
@@ -73,22 +73,27 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			vmm.fromPersistance( $dbo );
 			
 			var vm:VoxelModel;
+			// is this model using a template? if so them the model doesnt have oxel data itsself, 
+			// but uses the oxel data from the template.
 			if ( "" != vmm.templateGuid && null == vmm.data ) {
 				// We have an object that is dependant on a template
-				// is the template loaded?
+				// is the template loaded, if not the templateManager will load the template
+				// and inform us with a ModelMetadataEvent
 				var tvmm:VoxelModelMetadata = TemplateManager.templateGet( vmm.templateGuid );
 				if ( tvmm ) {
 					vm = ModelLoader.loadFromManifestByteArray( vmm, tvmm.data );
 					finish( vm );
 				}
 				else {	
+					// We need to hold onto this data with the template loades
 					_guidTemplate = vmm.templateGuid;
-					_vmm = vmm;
+					_vmmBase = vmm;
 					Globals.g_app.addEventListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, templateLoaded );
 					Globals.g_app.addEventListener( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, templateLoadFailed );
 				}
 			}
 			else {
+				// no template, just use the data from this record
 				vm = ModelLoader.loadFromManifestByteArray( vmm, vmm.data );
 				finish( vm );
 			}
@@ -96,10 +101,12 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		private	function errorHandler( $error:PlayerIOError ):void	
 		{ 
-			Log.writeError( "ModelLoad", $error.message, $error );
+			// Not sure when this error occurs, since if the database has no record, it succeeds but returns an empty record.
+			Log.writeError( "LoadModelFromBigDB.failed to load base model - DB Server Down?", $error.message, $error );
 			finish( null);
 		}	
 		
+		// all of the models and data have loaded ( or failed ). Send out the messages and clean up.
 		private	function finish( $vm:VoxelModel ):void {
 			
 			if ( $vm ) {
@@ -123,7 +130,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				Log.out( "LoadModelFromBigDB.successHandler - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _guid );
 				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 			}
-			_vmm = null;
+			
+			_vmmBase = null;
 			_guidTemplate = null;
 				
 			super.complete() // AbstractTask will send event
@@ -135,13 +143,14 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				Globals.g_app.removeEventListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, templateLoaded );
 				Globals.g_app.removeEventListener( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, templateLoadFailed );
 				// load the byte data from the template
-				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( _vmm, $e.vmm.data );
+				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( _vmmBase, $e.vmm.data );
 				finish( vm );
 			}
 		}
 		
 		private function templateLoadFailed( $e:ModelMetadataEvent ):void {
 			
+			// The event data hold an emtpy voxelmodelMetadata object that only has the guid filled in,
 			if ( _guidTemplate == $e.vmm.guid ) {
 				Globals.g_app.removeEventListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, templateLoaded );
 				Globals.g_app.removeEventListener( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, templateLoadFailed );
