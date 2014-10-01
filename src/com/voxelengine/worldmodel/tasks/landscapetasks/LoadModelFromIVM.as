@@ -88,11 +88,12 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				loadByteArray( ba );
 			}
 
-			function errorAction(e:IOErrorEvent):void {
-				Log.out( "LoadModelFromIVM.errorAction: " + e.toString(), Log.ERROR );
-				super.complete() // AbstractTask will send event
-			}	
 		}
+		
+		private	function errorAction(e:IOErrorEvent):void {
+			Log.out( "LoadModelFromIVM.errorAction: " + e.toString(), Log.ERROR );
+			super.complete() // AbstractTask will send event
+		}	
 
 		private function loadByteArray( $ba:ByteArray ):void {
 			
