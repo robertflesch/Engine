@@ -10,6 +10,8 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.events.ModelMetadataEvent;
 	import com.voxelengine.server.PersistModel;
 	import flash.utils.Dictionary;
+	import playerio.DatabaseObject;
+	import playerio.generated.PlayerIOError;
 
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
@@ -23,9 +25,12 @@ package com.voxelengine.worldmodel.models
 	{
 		static private var _modifiedDate:Date;
 		static private var _initialized:Boolean;
+		static private var _guidError:String;
 		
 		// this acts as a holding spot for templates models in game
 		static private var _templates:Dictionary = new Dictionary(true);
+		
+		static public function templateAdd( $vmm:VoxelModelMetadata ):void { _templates[$vmm.guid] = $vmm; }
 
 		static public function templatesLoad():void {
 			// This should get any new models
@@ -53,7 +58,35 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		static public function templateGetDictionary():Dictionary { return _templates; }
-		static public function templateGet( $guid:String ):VoxelModelMetadata {  return _templates[$guid]; }
-		static public function templateAdd( $vmm:VoxelModelMetadata ):void { _templates[$vmm.guid] = $vmm; }
+		static public function templateGet( $guid:String ):VoxelModelMetadata 
+		{  
+			var vmm:VoxelModelMetadata = _templates[$guid]; 
+			if ( null == vmm ) {
+				_guidError = $guid;
+				PersistModel.loadModel( $guid, templateLoadSuccess, templateLoadFailure );
+			}
+			return vmm; 
+		}
+		
+		static private function templateLoadSuccess( dbo:DatabaseObject ):void {
+			
+			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
+			if ( dbo ) {
+				vmm.fromPersistance( dbo );
+				Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm ) );
+			}
+			else {
+				vmm.guid = _guidError;
+				Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm ) );
+			}
+		}
+		
+		static private function templateLoadFailure( $error:PlayerIOError ):void {
+			
+			Log.writeError( "TemplateLoad", $error.message, $error );
+			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
+			vmm.guid = _guidError;
+			Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm ) );
+		}
 	}
 }
