@@ -1317,18 +1317,9 @@ package com.voxelengine.worldmodel.oxel
 								}
 							}
 							else {
-								rface = Oxel.face_get_opposite( face );
-								const dchildrena:Vector.<Oxel> = no.childrenForDirection( rface );
-								for each ( var dchilda:Oxel in dchildrena ) 
-								{
-									// Need to gather the alpha info from each child
-									// if a neighbor child has alpha AND is not the same as my type, then I need to generate a face
-									// if all neighbors are opaque, that face is not needed
-									if ( true == dchilda.faceHasAlpha( rface ) && dchilda.type != type ) {
-										face_set( face );
-										continue;
-									}
-								}
+								face_clear( face );
+								if ( faceAlphaNeedsFace( face, type, no ) )
+									face_set( face );
 							}
 							
 							//var rface:int = Oxel.face_get_opposite( face );
@@ -1338,7 +1329,7 @@ package com.voxelengine.worldmodel.oxel
 						// no children, so just check against type
 						else
 						{
-							if ( Globals.hasAlpha( no.type ) )
+							if ( ( no.hasAlpha ) )
 								face_set( face );
 							else if ( flowInfo )
 							{ 
@@ -1385,7 +1376,7 @@ package com.voxelengine.worldmodel.oxel
 			//	If no children, then is this an opaque type
 			if ( !childrenHas() )
 			{
-  				return Globals.hasAlpha( type );
+  				return hasAlpha;
 			}
 			else // I have children, so check each child on that face
 			{
@@ -1423,6 +1414,31 @@ package com.voxelengine.worldmodel.oxel
 			return false;	
 		}
 		
+		// returns true if face is required
+		// works like a charm!
+		public function faceAlphaNeedsFace( $face:int, $type:int, $no:Oxel ):Boolean	{
+
+			//	we only need a face here is the nieghbor is alpha of a different type
+			if ( !$no.childrenHas() ) {
+				if ( $no.hasAlpha )
+					return !( $type == $no.type );
+				else
+					return false;
+			}
+
+			// get the children touching $face
+			const dchildren:Vector.<Oxel> = $no.childrenForDirection( Oxel.face_get_opposite( $face ) );
+			for each ( var dchild:Oxel in dchildren ) 
+			{
+				// if any of the children have alpha of a different type
+				if ( faceAlphaNeedsFace( $face, $type, dchild ) )
+					return true;
+			}
+
+			// all children for that direction are opaque, so this face is opaque
+			return false;	
+		}
+
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// face function END
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
