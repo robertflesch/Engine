@@ -108,7 +108,7 @@ package com.voxelengine.worldmodel.oxel
 		}
 		// these bits tell engine if the oxel has a face at that location
 		// that information is then used to clear out OR build the quads
-		protected  	function face_mark_dirty( $guid:String, $face:uint ):void {
+		protected  	function faceMarkDirty( $guid:String, $face:uint, $propogateCount:int = 2 ):void {
 			switch( $face ) {
 				case Globals.POSX:
 					_data |= OXEL_DATA_FACES_DIRTY_POSX; break;

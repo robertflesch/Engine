@@ -1096,32 +1096,23 @@ package com.voxelengine.worldmodel.oxel
 		// Mark all of the faces opposite this oxel as dirty
 		// propogate count is to keep it from spreading too far, by maybe this should be distance, rather then hard count?
 		public function neighborsMarkDirtyFaces( $guid:String, $size:int, $propogateCount:int = 2 ):void {
-			var no:Oxel = null;
+			var no:Oxel;
 			$propogateCount--;
 			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 			{
 				no = neighbor(face);
 				if ( Globals.BAD_OXEL == no )
 					continue;
-				else if ( no.childrenHas() )
-					no.face_mark_dirty( $guid, Oxel.face_get_opposite( face ) );
-				//else if ( no.hasAlpha && 0 < $size ) {
-					// this seems like seriuous overkill, dont we just need to mark this ONE neighbor?
-					// I was finding that this could spread way out... 8/7/14
-					//no.neighborsMarkDirtyFaces( $guid, $size - gc.size() );
-				//}
-				else if ( no.hasAlpha ) {
-					// Water, leaf, ??
-					if ( no.faceHas( Oxel.face_get_opposite( face ) ) )
-						no.face_mark_dirty( $guid, Oxel.face_get_opposite( face ) );
+					
+				// RSF - 10.2.14 This just got way easier, always mark the neighbor face!
+				no.faceMarkDirty( $guid, Oxel.face_get_opposite( face ), $propogateCount );
+				// now test if we need to propagate it.
+				// Why do alpha faces have to propagate? Is it because of light changes?
+				if ( no.hasAlpha ) {
 					// So now I can mark my neighbors dirty, decrementing each time.
-					if ( 0 < $size && 0 < $propogateCount ) {
+					if ( 0 < $size && 0 < $propogateCount )
 						no.neighborsMarkDirtyFaces( $guid, $size, $propogateCount );
-					}
 				}
-				//else if ( no.isSolid || no.childrenHas() ) {
-				else // neighbor is same size, with out alpha
-					no.face_mark_dirty( $guid, Oxel.face_get_opposite( face ) );
 			}
 		}
 		
@@ -1162,24 +1153,24 @@ package com.voxelengine.worldmodel.oxel
 		// face function
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		override protected function face_mark_dirty( $guid:String, $face:uint ):void {
-			// RSF should this go here too? do I ever pass this to a parent?
-			//super.face_mark_dirty( $face );
+		override protected function faceMarkDirty( $guid:String, $face:uint, $propogateCount:int = 2 ):void {
+			
 			if ( childrenHas() )
 			{
 				const children:Vector.<Oxel> = childrenForDirection( $face );
 				for each ( var child:Oxel in children ) 
 				{
-					child.face_mark_dirty( $guid, $face );
+					child.faceMarkDirty( $guid, $face, $propogateCount );
 				}
 			}
 			else
 			{
 				var ti:TypeInfo = Globals.Info[type];
 				// TODO This needs to be refactored to remove this from this function, so more likely go in the write function of the voxelModel.
-				if ( ti.flowable && Globals.autoFlow && EditCursor.EDIT_CURSOR != $guid ) {
+				// TODO also be nice to pass in the flow direction if possible. We know which face, so we know flow dir...
+				// 1 = $propogateCount means only the oxel directly next to the effect oxel will have flow tasks generated.
+				if ( ti.flowable && Globals.autoFlow && EditCursor.EDIT_CURSOR != $guid && 1 == $propogateCount )
 					Flow.addTask( $guid, gc, type, null != flowInfo ? flowInfo : ti.flowInfo.clone(), 1 );
-				}
 					
 				if ( _quads && _quads[$face] )
 					_quads[$face].dirty = 1;
@@ -1187,7 +1178,7 @@ package com.voxelengine.worldmodel.oxel
 				if ( lighting )
 					lighting.occlusionResetFace( $face );
 
-				super.face_mark_dirty( $guid, $face );
+				super.faceMarkDirty( $guid, $face, $propogateCount );
 			}
 		}
 
@@ -1232,7 +1223,7 @@ package com.voxelengine.worldmodel.oxel
 				}
 				else
 				{
-					facesBuildTermina();
+					facesBuildTerminal();
 				}
 			}
 			
@@ -1258,8 +1249,8 @@ package com.voxelengine.worldmodel.oxel
 //			_lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
 		}
 
-		protected function facesBuildTermina():void {
-			//trace( "Oxel.faces_build_terminal");
+		protected function facesBuildTerminal():void {
+			//trace( "Oxel.facesBuildTerminal");
 			if ( Globals.AIR == type )
 			{
 				faces_mark_all_clean();
@@ -1270,6 +1261,8 @@ package com.voxelengine.worldmodel.oxel
 				return;
 			} else if ( faces_has_dirty() )
 			{
+				if ( gc.eval( 5, 0, 1, 0 ) )
+					Log.out( "watch face build" );
 				var no:Oxel = null ;
 				for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 				{
@@ -1305,9 +1298,42 @@ package com.voxelengine.worldmodel.oxel
 						}
 						else if ( no.childrenHas() ) 
 						{
-							var rface:int = Oxel.face_get_opposite( face )
-							if ( no.faceHasAlpha( rface ) )
-								face_set( face );
+							// so I am a larger face looking to see if there is visability to me.
+							// if I am solid, and any neighbors has alpha, then I am visible.
+							var rface:int;
+							if ( !hasAlpha ) {
+								rface = Oxel.face_get_opposite( face );
+								// get the children of my neighbor, that touch me.
+								const dchildren:Vector.<Oxel> = no.childrenForDirection( rface );
+								for each ( var dchild:Oxel in dchildren ) 
+								{
+									// Need to gather the alpha info from each child
+									// if a neighbor child has alpha, then I need to generate a face
+									// if all neighbors are opaque, that face is not needed
+									if ( true == dchild.faceHasAlpha( rface ) ) {
+										face_set( face );
+										continue;
+									}
+								}
+							}
+							else {
+								rface = Oxel.face_get_opposite( face );
+								const dchildrena:Vector.<Oxel> = no.childrenForDirection( rface );
+								for each ( var dchilda:Oxel in dchildrena ) 
+								{
+									// Need to gather the alpha info from each child
+									// if a neighbor child has alpha AND is not the same as my type, then I need to generate a face
+									// if all neighbors are opaque, that face is not needed
+									if ( true == dchilda.faceHasAlpha( rface ) && dchilda.type != type ) {
+										face_set( face );
+										continue;
+									}
+								}
+							}
+							
+							//var rface:int = Oxel.face_get_opposite( face );
+							//if ( no.faceHasAlpha( rface ) )
+								//face_set( face );
 						}
 						// no children, so just check against type
 						else
