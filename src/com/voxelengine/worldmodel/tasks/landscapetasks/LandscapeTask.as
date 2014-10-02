@@ -27,6 +27,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		protected var _guid:String;
 		protected var _layer:LayerInfo;
 		protected var _startTime:int;
+		static protected var _autoFlowState:Boolean;
+		static protected var _taskCount:int;
 		
 		public static const TASK_TYPE:String = "ABSTRACT_LANDSCAPE_TASK";
         public static const TASK_PRIORITY:int = 1;
@@ -35,9 +37,23 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			_guid = guid;
 			_layer = layer;
 			_startTime = getTimer();
-			
+			// turn off autoflow during landscape, turn it back on when all are complete.
+			if ( true == Globals.autoFlow ) {
+				_autoFlowState = true;
+				Globals.autoFlow = false;
+			}
+			_taskCount++;
 			super(taskType, taskPriority);
 		}
+		
+		override public function complete():void {
+			_taskCount--;
+			// turn off autoflow during landscape operations.
+			if ( true == _autoFlowState && 0 == _taskCount )
+				Globals.autoFlow = true;
+			super.complete();	
+		}
+
 		
 		protected function getVoxelModel():VoxelModel {
 
