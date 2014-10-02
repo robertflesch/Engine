@@ -396,8 +396,8 @@ package com.voxelengine.GUI
 			else
 			{
 				Globals.mode = Globals.MODE_PUBLIC;
-				WindowLogin.autoLogin();
-				//new WindowLogin();
+				//WindowLogin.autoLogin();
+				new WindowLogin();
 			}
 		}
 		

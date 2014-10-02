@@ -62,6 +62,7 @@ public class Quad {
 	private var _v:Vector.<Number> 					= new Vector.<Number>(QUAD_UV_COUNT, true);
 	private var _data:uint;
 
+	// This needs to get changed to a boolean, hiding that fact that it is using a bit. - TODO RSF 10.2.14
 	public function get dirty():uint { return ((_data & 0x00000001)); }
 	public function set dirty( value:uint ):void { _data = ((_data & 0xfffffffe) | value); }	
 	
