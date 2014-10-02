@@ -177,7 +177,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		{
 			var ao:Oxel = oxel.root_get().childFind( gc );
 			if ( Globals.BAD_OXEL != ao )
-				ao.write( $guid, gc, e_type, true );			
+				//ao.write( $guid, gc, e_type, true );
+				// write was over writting the trunk.
+				ao.write_empty( $guid, gc, e_type );	
 		}
 		
         private static function generateLeafLevel( $guid:String, oxel:Oxel, gcc:GrainCursor, radius:int, e_type:int, percent:Number = 0.5 ):void 
