@@ -1232,7 +1232,7 @@ package com.voxelengine.worldmodel.oxel
 				}
 				else
 				{
-					faces_build_terminal();
+					facesBuildTermina();
 				}
 			}
 			
@@ -1258,19 +1258,17 @@ package com.voxelengine.worldmodel.oxel
 //			_lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
 		}
 
-		protected function faces_build_terminal():void {
+		protected function facesBuildTermina():void {
 			//trace( "Oxel.faces_build_terminal");
 			if ( Globals.AIR == type )
 			{
 				faces_mark_all_clean();
 				return;
-			}
-			
-//			if ( 4 == gc.grain && 10 == gc.grainX && 8 == gc.grainY && 8 == gc.grainZ  )
-// 				var temp:int = 1; // place holder for b reak point
-				
-			// check to see if any faces are marked as dirty
-			if ( faces_has_dirty() )
+			} else  if ( Globals.LEAF == type )
+			{
+				faces_set_all();
+				return;
+			} else if ( faces_has_dirty() )
 			{
 				var no:Oxel = null ;
 				for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
