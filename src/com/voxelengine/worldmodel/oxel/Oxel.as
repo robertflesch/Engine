@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
+	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 	import flash.geom.Point;
 	import flash.net.registerClassAlias;
 	import flash.utils.getTimer;
@@ -1195,8 +1196,71 @@ package com.voxelengine.worldmodel.oxel
 			faces_mark_all_dirty();
 		}
 		
+		public function cleanup( $md:VoxelModelMetadata ):void {
+			var timer:int = getTimer();
+			//Log.out( "Oxel.cleanup - name: " + $md.name + " - guid: " + $md.guid );					
+			_s_oxelsCreated = 0;
+			_s_oxelsEvaluated = 0;
+			facesBuildWater();
+			Log.out( "Oxel.cleanup - facesBuildWater took: " + (getTimer() - timer) + "  oxels eval: " + _s_oxelsEvaluated + "  oxels created: " + _s_oxelsCreated );					
+			timer = getTimer();
+			facesBuild();
+			Log.out( "Oxel.cleanup - facesBuild - took: " + (getTimer() - timer) );					
+			timer = getTimer();
+//			if ( 0 < _facesChanged )
+			{
+				quadsBuild();
+				Log.out( "Oxel.cleanup - quadsBuild -  took: " + (getTimer() - timer) );					
+			}
+		}
+		
+		private function facesBuildWater():void {
+			if ( dirty ) {
+				if ( childrenHas())
+				{
+					//for each ( var child:Oxel in _children )
+					//	child.facesBuildWater();
+					for ( var childIndex:int = 0; childIndex < OXEL_CHILD_COUNT; childIndex++ )
+						_children[childIndex].facesBuildWater();
+				}
+				else {
+					if ( Globals.WATER == type )
+					{
+						_s_oxelsEvaluated++;
+						var no:Oxel = null;
+						for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
+						{
+							no = neighbor( face );
+							if ( Globals.BAD_OXEL == no ) 
+								continue;
+							if ( !no.childrenHas() )
+								continue;
+							
+							// so the neighbor has children, are all the children facing us water oxels?
+							// if there is anything other then a water oxel facing this face, it needs to break up into smaller oxel
+							const dchildren:Vector.<Oxel> = no.childrenForDirection( Oxel.face_get_opposite( face ) );
+							var breakup:Boolean;
+							for each ( var dchild:Oxel in dchildren ) 
+							{
+								if ( Globals.WATER != dchild.type ) {
+									breakup = true;
+									break;
+								}
+							}
+							if ( breakup ) {
+								childrenCreate();
+								_s_oxelsCreated += 8;
+								facesBuildWater();
+							}
+							
+						}
+					}
+				}
+			}
+		}
+		
 		public var timeBuilding:int;
-		public function faces_build():Boolean {
+		public function facesBuild():Boolean {
 //			if ( MAX_BUILD_TIME < getTimer() - timeBuilding )
 //				return false;
 				
@@ -1214,7 +1278,7 @@ package com.voxelengine.worldmodel.oxel
 					for each ( var child:Oxel in _children ) {
 						if ( child.dirty )
 						{
-							continueProcessing = child.faces_build();
+							continueProcessing = child.facesBuild();
 							// We have timed out in one of the children, get out.
 							if ( !continueProcessing )
 								return false;
@@ -1251,6 +1315,10 @@ package com.voxelengine.worldmodel.oxel
 
 		protected function facesBuildTerminal():void {
 			//trace( "Oxel.facesBuildTerminal");
+			if ( gc.eval( 4, 42, 99, 106 ) ) {
+				Log.out( "watch" );
+				faces_mark_all_dirty();
+			}
 			if ( Globals.AIR == type )
 			{
 				faces_mark_all_clean();
@@ -1261,8 +1329,6 @@ package com.voxelengine.worldmodel.oxel
 				return;
 			} else if ( faces_has_dirty() )
 			{
-				if ( gc.eval( 5, 0, 1, 0 ) )
-					Log.out( "watch face build" );
 				var no:Oxel = null ;
 				for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 				{
@@ -1331,12 +1397,16 @@ package com.voxelengine.worldmodel.oxel
 						{
 							if ( ( no.hasAlpha ) )
 								face_set( face );
-							else if ( flowInfo )
+							else if ( flowInfo ) // All water and lava have flow info.
 							{ 
 								if ( flowInfo.flowScaling.scalingHas() ) 	// for scaled lava or other non alpha flowing types
 									face_set( face );
-								else
-									face_clear( face );
+								else {
+									if ( Globals.WATER == type )
+										face_set( face )
+									else
+										face_clear( face );
+								}
 							}
 							else if ( no.flowInfo )	// for scaled lava or other non alpha flowing types
 							{
@@ -1345,8 +1415,9 @@ package com.voxelengine.worldmodel.oxel
 								else
 									face_clear( face );
 							}
-							else
+							else {
 								face_clear( face );
+							}
 						}
 					}
 				}
@@ -1445,7 +1516,7 @@ package com.voxelengine.worldmodel.oxel
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// lighting START
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		public static var _s_oxelsTested:int = 0;
+		public static var _s_oxelsCreated:int = 0;
 		public static var _s_oxelsEvaluated:int = 0;
 		public static var _s_lightsFound:int = 0;
 		
@@ -1457,7 +1528,6 @@ package com.voxelengine.worldmodel.oxel
 			}
 			else
 			{
-				_s_oxelsTested++;
 				// Does this oxel have the a face in the $face direction, if not move on
 				if ( faceHas( $face ) )
 				{

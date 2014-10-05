@@ -133,14 +133,22 @@ Threats
 Adobe Flash is 5-10 years from end of lifecycle
 While other next generation voxel engines exist. None are targeted toward this space currently.
 
+Marketing
+http://gamasutra.com/blogs/MariosMouratidis/20141001/226838/Indie_Game_Marketing_Guide_Part_1__How_to_create_Landing_Pages.php
+
 Other
 A playbook for cutting the corporate purse strings
 http://gamasutra.com/blogs/EthanLevy/20140930/226702/A_playbook_for_cutting_the_corporate_purse_strings.php
 https://www.kickstarter.com/projects/nerdkingdom/tug-1
 https://www.kickstarter.com/projects/winterkewlgames/yogventures/comments
+https://www.kickstarter.com/projects/1294225970/kingdom-come-deliverance
+https://www.kickstarter.com/projects/harmonix/amplitude
+https://www.kickstarter.com/projects/482445197/unsung-story-tale-of-the-guardians
+http://gamasutra.com/blogs/LeePerry/20140930/226747/Solving_the_quotunsolvablequot_issue_of_mobility_in_VR.php
+http://gamasutra.com/blogs/ThomasBidaux/20140930/226762/Kickstarter_and_video_games__1st_half_of_2014.php
 http://steveblank.com/2014/09/16/who-do-you-need-on-your-startup-team/
 http://venturebeat.com/2014/09/16/is-mindfulness-and-less-stress-worth-299-the-muse-makes-a-case-review/
-
+http://gamasutra.com/blogs/MariosMouratidis/20141001/226838/Indie_Game_Marketing_Guide_Part_1__How_to_create_Landing_Pages.php
 http://techcrunch.com/2014/09/17/indiegogo-forever-funding/
 
 Support for business idea
