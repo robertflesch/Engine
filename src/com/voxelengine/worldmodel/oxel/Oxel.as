@@ -1315,10 +1315,6 @@ package com.voxelengine.worldmodel.oxel
 
 		protected function facesBuildTerminal():void {
 			//trace( "Oxel.facesBuildTerminal");
-			if ( gc.eval( 4, 42, 99, 106 ) ) {
-				Log.out( "watch" );
-				faces_mark_all_dirty();
-			}
 			if ( Globals.AIR == type )
 			{
 				faces_mark_all_clean();
@@ -1402,9 +1398,13 @@ package com.voxelengine.worldmodel.oxel
 								if ( flowInfo.flowScaling.scalingHas() ) 	// for scaled lava or other non alpha flowing types
 									face_set( face );
 								else {
-									if ( Globals.WATER == type )
-										face_set( face )
-									else
+									//if ( Globals.WATER == type ) {
+										//face_set( face ) This adds an interior face, but z buffer conflicts makes it not work.
+										//if ( no.lighting )
+											//var li:LightInfo = no.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+											//li.color = 0x0000ff;
+									//}
+									//else
 										face_clear( face );
 								}
 							}
@@ -1624,9 +1624,6 @@ package com.voxelengine.worldmodel.oxel
 		
 		protected function quadsBuildTerminal( $plane_facing:int = 1 ):void {
 			var quadCount:int = 0;
-
-//			if ( gc.eval( 4, 1, 4, 14 ) )
-//				Log.out( "watch faces get built" );
 			// Does this oxel have faces
 			if ( facesHas() )
 			{
@@ -1719,8 +1716,7 @@ package com.voxelengine.worldmodel.oxel
 			if ( quad )
 			{
 				var plane_facing:int = 1;
-				var scale:uint = 1 << gc.grain;
-				quad.rebuild( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, plane_facing, scale, _lighting );
+				quad.rebuild( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, plane_facing, gc.grain, _lighting );
 			}
 		}
 
