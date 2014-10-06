@@ -72,11 +72,11 @@ public class Quad {
 	public function rebuild( $type:int,						 // material type
 						     $x:Number, $y:Number, $z:Number,// world location
 						     $face:int,						 // which 
-						     $$planeFacing:int,				 // facing
+						     $planeFacing:int,				 // facing
 						     $grain:Number,                  // the world size of the quad 
 						     $lighting:Lighting ):void			
 	{
-		add( $type, $x, $y, $z, $face, $$planeFacing, $grain, Globals.Info[$type], $lighting, null );
+		add( $type, $x, $y, $z, $face, $planeFacing, $grain, Globals.Info[$type], $lighting, null );
 		dirty = 0;
 	}
 	
