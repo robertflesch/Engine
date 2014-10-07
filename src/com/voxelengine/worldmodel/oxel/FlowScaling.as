@@ -71,7 +71,7 @@ public class FlowScaling
 		return $ba;
 	}
 	
-	public function fromByteArray( $version:String, $ba:ByteArray ):ByteArray {
+	public function fromByteArray( $version:int, $ba:ByteArray ):ByteArray {
 		// No need to handle versions yet
 		if ( Globals.VERSION_004 == $version || Globals.VERSION_003 == $version ) {
 			PxPz = rnd( $ba.readFloat() );

@@ -7,18 +7,17 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
-	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
+	import flash.display3D.Context3D;
 	import flash.geom.Point;
+	import flash.geom.Vector3D;
+	import flash.geom.Matrix3D;
 	import flash.net.registerClassAlias;
+	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
 
 	import com.developmentarc.core.tasks.tasks.ITask;
 	import com.developmentarc.core.tasks.groups.TaskGroup;
 	
-	import flash.display3D.Context3D;
-	import flash.geom.Vector3D;
-	import flash.utils.ByteArray;
-	import flash.geom.Matrix3D;
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
@@ -35,6 +34,7 @@ package com.voxelengine.worldmodel.oxel
 	import com.voxelengine.worldmodel.models.ModelStatisics;
 	import com.voxelengine.worldmodel.models.EditCursor;
 	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.TreeGenerator;
 	import com.voxelengine.worldmodel.tasks.lighting.LightRemove;
 	import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
@@ -59,7 +59,7 @@ package com.voxelengine.worldmodel.oxel
 		private static		const ALL_NEGX_CHILD:uint						= 0x55;
 		private static		const ALL_POSX_CHILD:uint						= 0xaa;
 		
-		private static		const MAX_BUILD_TIME:int                           	= 14000;
+		private static		const MAX_BUILD_TIME:int                        = 14000;
 		
 		static private 		var _s_scratchGrain:GrainCursor 				= new GrainCursor();
 		static private 		var _s_scratchVector:Vector3D 					= null;
@@ -650,8 +650,9 @@ package com.voxelengine.worldmodel.oxel
 				_children[i]  = OxelPool.poolGet();
 				gct.copyFrom( gc );
 				gct.become_child( i );   
-				// this sets the RAW data, used here only sets the type
-				_children[i].initializeAndMarkDirty( this, gct, type, null );
+				_children[i].initialize( this, gct, 0, type, null );
+				super.faces_mark_all_dirty();
+				
 				if ( _lighting )
 				{
 					_children[i].lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
@@ -1398,14 +1399,17 @@ package com.voxelengine.worldmodel.oxel
 								if ( flowInfo.flowScaling.scalingHas() ) 	// for scaled lava or other non alpha flowing types
 									face_set( face );
 								else {
-									//if ( Globals.WATER == type ) {
-										//face_set( face ) This adds an interior face, but z buffer conflicts makes it not work.
-										//if ( no.lighting )
-											//var li:LightInfo = no.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-											//li.color = 0x0000ff;
-									//}
-									//else
-										face_clear( face );
+									face_clear( face );
+									/*
+									if ( Globals.WATER == type ) {
+										//face_set( face ) This adds an interior face, but z buffer conflicts makes it not work well.
+										if ( no.lighting ) {
+											var li:LightInfo = no.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+											li.color = 0x0000ff;
+											no.dirty = true;
+										}
+									}
+									*/
 								}
 							}
 							else if ( no.flowInfo )	// for scaled lava or other non alpha flowing types
@@ -1856,6 +1860,7 @@ package com.voxelengine.worldmodel.oxel
 				// I only have 1 bit for additional data...
 				additionalDataMark();
 				$ba.writeUnsignedInt( maskTempData() );
+				$ba.writeUnsignedInt( type );
 				
 				if ( !flowInfo )
 					flowInfo = new FlowInfo(); 
@@ -1868,7 +1873,9 @@ package com.voxelengine.worldmodel.oxel
 			else {
 				additionalDataClear();
 				$ba.writeUnsignedInt( maskTempData() );
+				$ba.writeUnsignedInt( type );
 			}
+			
 			
 			if ( childrenHas() ) {
 				for each ( var child:Oxel in _children ) 
@@ -1882,19 +1889,25 @@ package com.voxelengine.worldmodel.oxel
 			
 		}
 		
-		public function readVersionedData( $version:String, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $stats:ModelStatisics ):ByteArray 
+		public function readVersionedData( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $stats:ModelStatisics ):ByteArray 
 		{
-			var oxelData:uint = $ba.readInt();
-			initialize( $parent, $gc, oxelData, $stats );	
+			var faceData:uint = $ba.readUnsignedInt();
+			if ( $version <= Globals.VERSION_006 )
+				initialize( $parent, $gc, OxelData.dataFromRawDataOld( faceData ), OxelData.typeFromRawDataOld( faceData ), $stats );	
+			else {
+				var typeData:uint = $ba.readUnsignedInt();
+				initialize( $parent, $gc, faceData, typeData, $stats );	
+			}
+				
 			
 			// Bad data check
-			if ( OxelData.data_is_parent( oxelData ) && Globals.AIR != type )
+			if ( OxelData.data_is_parent( faceData ) && Globals.AIR != type )
 			{
-				Log.out( "Oxel.readData001 - parent with TYPE: " + Globals.Info[type].name, Log.ERROR );
+				Log.out( "Oxel.readVersionedData - parent with TYPE: " + Globals.Info[type].name, Log.ERROR );
 				type = Globals.AIR;
 			}
 			// Check for flow and brightnessInfo
-			if ( OxelData.dataHasAdditional( oxelData ) )
+			if ( OxelData.dataHasAdditional( faceData ) )
 			{
 				if ( !flowInfo )
 					flowInfo = new FlowInfo();
@@ -1923,7 +1936,7 @@ package com.voxelengine.worldmodel.oxel
 				lighting.materialFallOffFactor = Globals.Info[type].lightInfo.fallOffFactor;
 			}
 			
-			if ( OxelData.data_is_parent( oxelData ) )
+			if ( OxelData.data_is_parent( faceData ) )
 			{
 				_children = ChildOxelPool.poolGet();
 				var gct:GrainCursor = GrainCursorPool.poolGet( $stats.largest );
@@ -1944,7 +1957,7 @@ package com.voxelengine.worldmodel.oxel
 		{
 			var oxelData:uint = $ba.readInt();
 			//trace( intToHexString() + "  " + oxelData );
-			initialize( $parent, $gc, oxelData, $stats );
+			initialize( $parent, $gc, oxelData, OxelData.typeFromRawDataOld( oxelData ), $stats );
 			if ( OxelData.data_is_parent( oxelData ) && Globals.AIR != type )
 			{
 				Log.out( "Oxel.readData - parent with TYPE: " + Globals.Info[type].name, Log.ERROR );
@@ -1968,10 +1981,10 @@ package com.voxelengine.worldmodel.oxel
 		}
 		
 		// This is used to initialize all oxel nodes that are read from the byte array
-		public function initialize( $parent:Oxel, $gc:GrainCursor, $byteData:uint, $stats:ModelStatisics ):void {
+		public function initialize( $parent:Oxel, $gc:GrainCursor, $data:uint, $type:uint, $stats:ModelStatisics ):void {
 
 			_parent = $parent;
-			dataRaw = $byteData;
+			dataRaw( $data, $type );
 			_gc = GrainCursorPool.poolGet( $gc.bound );
 			_gc.copyFrom( $gc );
 			
@@ -1989,14 +2002,6 @@ package com.voxelengine.worldmodel.oxel
 			if ( $stats )
 				vm_initialize( $stats );
 		}
-		
-		// This is used to initialize oxel nodes created via children create
-		private function initializeAndMarkDirty( $parent:Oxel, $gc:GrainCursor, $byteData:uint, $stats:ModelStatisics ):void {
-			initialize( $parent, $gc, $byteData, $stats );
-			super.faces_mark_all_dirty();
-			dirty = true;
-		}
-		
 		
 		private function intToHexString( $val:int ):String
 		{

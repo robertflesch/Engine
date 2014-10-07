@@ -71,7 +71,7 @@ package com.voxelengine.worldmodel.models
 		protected var 	_shaders:Vector.<Shader>        = new Vector.<Shader>;
 		protected var 	_children:Vector.<VoxelModel> 	= new Vector.<VoxelModel>; // INSTANCE NOT EXPORTED
 		private var 	_statisics:ModelStatisics 		= new ModelStatisics(); // INSTANCE NOT EXPORTED
-		private var 	_version:String 				= "0"; // INSTANCE NOT EXPORTED
+		private var 	_version:int 					= 0; // INSTANCE NOT EXPORTED
 		private var 	_timer:int 						= getTimer(); // INSTANCE NOT EXPORTED
 		private var 	_anim:Animation 				= null;
 		private var 	_camera:Camera					= new Camera();
@@ -151,6 +151,10 @@ package com.voxelengine.worldmodel.models
 			_keyboardControl = val;
 		}
 		
+		public function set version(value:int):void  	{ _version = value; }
+		public function get version():int  				{ return _version; }
+		
+		public function toString():String 				{ return instanceInfo.toString(); }
 		public function get oxel():Oxel { return _oxel; }
 		
 		public function set oxel(val:Oxel):void
@@ -161,16 +165,6 @@ package com.voxelengine.worldmodel.models
 			_oxel = val;
 		}
 		
-		public function set version(value:String):void 
-		{
-			_version = value;
-		}
-		
-		
-		public function toString():String
-		{
-			return instanceInfo.toString();
-		}
 		
 		protected function cameraAddLocations():void
 		{
@@ -729,7 +723,7 @@ package com.voxelengine.worldmodel.models
 			gc.grain = grainSize;
 			oxelReset();
 			oxel = OxelPool.poolGet();
-			oxel.initialize(null, gc, Globals.AIR, _statisics);
+			oxel.initialize(null, gc, 0, Globals.AIR, _statisics);
 			// The VM gets an empty oxel as a place holder when it first loads.
 			// this replaces the placeholder and replaces it with a new root.
 			oxel.type = Globals.AIR;
@@ -1057,9 +1051,17 @@ package com.voxelengine.worldmodel.models
 				$ba.writeByte('i'.charCodeAt());
 				$ba.writeByte('v'.charCodeAt());
 				$ba.writeByte('m'.charCodeAt());
-				$ba.writeByte(Globals.VERSION.charCodeAt(0));
-				$ba.writeByte(Globals.VERSION.charCodeAt(1));
-				$ba.writeByte(Globals.VERSION.charCodeAt(2));
+				var outVersion:String = zeroPad( Globals.VERSION, 3 );
+				$ba.writeByte(outVersion.charCodeAt(0));
+				$ba.writeByte(outVersion.charCodeAt(1));
+				$ba.writeByte(outVersion.charCodeAt(2));
+
+				function zeroPad(number:int, width:int):String {
+				   var ret:String = ""+number;
+				   while( ret.length < width )
+					   ret="0" + ret;
+				   return ret;
+				}
 			}
 			
 			function writeManifest( $ba:ByteArray ):void {
@@ -1085,7 +1087,7 @@ package com.voxelengine.worldmodel.models
 			var rootGrainSize:int = $ba.readByte();
 			var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
 			gct.grain = rootGrainSize;
-			_statisics.gather( _version, $ba, rootGrainSize);
+			_statisics.gather( version, $ba, rootGrainSize);
 			
 			oxelReset();
 			oxel = OxelPool.poolGet();
@@ -1094,14 +1096,10 @@ package com.voxelengine.worldmodel.models
 			
 			registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);	
 			registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);	
-			if (Globals.VERSION_000 == _version)
-			{
+			if (Globals.VERSION_000 == version)
 				oxel.readData( null, gct, $ba, _statisics );
-			}
 			else
-			{
-				oxel.readVersionedData( _version, null, gct, $ba, _statisics );
-			}
+				oxel.readVersionedData( version, null, gct, $ba, _statisics );
 			
 			oxel.gc.bound = rootGrainSize;
 			instanceInfo.grainSize = rootGrainSize;
@@ -1124,7 +1122,7 @@ package com.voxelengine.worldmodel.models
 			ii.guid = "ExplosionFragment";
 			var mi:ModelInfo = new ModelInfo();
 			var vm:VoxelModel = new VoxelModel(ii, mi, null, false);
-			vm._version = Globals.VERSION_000;
+			vm.version = Globals.VERSION;
 			vm.instanceInfo.dynamicObject = true;
 			vm.oxel = childOxel;
 			vm.oxel.breakFromParent();
@@ -1151,7 +1149,7 @@ package com.voxelengine.worldmodel.models
 			   ii.fileName = "ExplosionFragment";
 			   var mi:ModelInfo = new ModelInfo();
 			   var vm:VoxelModel = new VoxelModel( ii, mi );
-			   vm._version = Globals.VERSION_000;
+			   vm.version = Globals.VERSION;
 			   ba.position = 0;
 			   vm.IVMLoad( ba );
 			   //			vm.oxel.rebuildAll();
@@ -1165,7 +1163,7 @@ package com.voxelengine.worldmodel.models
 			   ii.fileName = "ExplosionFragment";
 			   var mi:ModelInfo = new ModelInfo();
 			   var vm:VoxelModel = new VoxelModel( ii, mi, false );
-			   vm._version = Globals.VERSION_000;
+			   vm.version = Globals.VERSION;
 			   vm.oxel = OxelPool.oxel_get();
 			   ba.position = 8;
 			   vm.oxel.byteArrayLoad( null,childOxel.gc, ba, _statisics );
@@ -1387,32 +1385,38 @@ package com.voxelengine.worldmodel.models
 			oxel.validate();
 		}
 		
-		private function validateOxel(ba:ByteArray, currentGrain:int):ByteArray
+		private function validateOxel( $ba:ByteArray, $currentGrain:int):ByteArray
 		{
-			var data:int = ba.readInt();
-			if (OxelData.data_is_parent(data))
+			var faceData:uint = $ba.readUnsignedInt();
+			var type:uint;
+			if ( version <= Globals.VERSION_006 )
+				type = OxelData.typeFromRawDataOld(faceData);
+			else {  //_version > Globals.VERSION_006
+				var typeData:uint = $ba.readUnsignedInt();
+				type = OxelData.type1FromData(typeData);
+			}
+			
+			if (OxelData.data_is_parent(faceData))
 			{
-				currentGrain--;
+				$currentGrain--;
 				for (var i:int = 0; i < 8; i++)
 				{
-					validateOxel(ba, currentGrain);
+					validateOxel($ba, $currentGrain);
 				}
-				currentGrain++;
+				$currentGrain++;
 			}
 			else
 			{
-				var type:int = OxelData.typeFromData(data);
 				if (!Globals.Info[type])
 				{
 					trace("unknown grain of - unknown key: " + type);
-					ba.position -= 4;
-					ba.writeInt(Globals.RED);
+					$ba.position -= 4;
+					$ba.writeInt(Globals.RED);
 					trace("set unknown grain to RED: " + type);
 				}
-				
 			}
 			
-			return ba;
+			return $ba;
 		}
 		
 		public function changeGrainSize( changeSize:int):void

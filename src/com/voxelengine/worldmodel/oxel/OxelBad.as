@@ -32,14 +32,8 @@ package com.voxelengine.worldmodel.oxel
 			_s_constructed_count++;
 			if ( 1 < _s_constructed_count )
 				throw new Error("OxelBad - ERROR - construction of OxelBad");
-				
-			Oxel(this).initialize( null, new GrainCursor( 0xffffffff, 0xffffffff, 0xffffffff, 0 ), 0, null );				
 		}
 		
-		override public function initialize( parent:Oxel, param_gc:GrainCursor, what:uint, stats:ModelStatisics ):void
-		{
-//			throw new Error("OxelBad - ERROR - initialize");
-		}
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//     Getters/Setters
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

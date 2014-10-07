@@ -63,7 +63,7 @@ package com.voxelengine.worldmodel.models
 			_stats = new Array(256);				// INSTANCE NOT EXPORTED
 		}
 		
-		public function gather( $version:String, $ba:ByteArray, $rootGrain:int ):void
+		public function gather( $version:int, $ba:ByteArray, $rootGrain:int ):void
 		{
 			if ( !$ba )
 				throw new Error( "ModelStatisics.gather - NO ByteArray found" );
@@ -91,18 +91,23 @@ package com.voxelengine.worldmodel.models
 			//statsPrint();
 		}
 		
-		private function process( $version:String, $ba:ByteArray, currentGrain:int ):ByteArray
+		private function process( $version:int, $ba:ByteArray, currentGrain:int ):ByteArray
 		{
-			var data:int = $ba.readUnsignedInt();
-			if ( OxelData.dataHasAdditional( data ) )
-			{
+			var faceData:uint = $ba.readUnsignedInt();
+			var type:uint;
+			if ( $version <= Globals.VERSION_006 )
+				type = OxelData.typeFromRawDataOld(faceData);
+			else {  //_version > Globals.VERSION_006
+				var typeData:uint = $ba.readUnsignedInt();
+				type = OxelData.type1FromData(typeData);
+			}
+			
+			if ( OxelData.dataHasAdditional( faceData ) ) {
 				$ba = _TempFlowInfo.fromByteArray( $version, $ba );
 				$ba = _TempBrightness.fromByteArray( $version, $ba, 0 );
 			}
 			
-			if ( OxelData.data_is_parent( data ) )
-			{
-
+			if ( OxelData.data_is_parent( faceData ) ) {
 				currentGrain--;
 				for ( var i:int = 0; i < 8; i++ )
 				{
@@ -110,9 +115,7 @@ package com.voxelengine.worldmodel.models
 				}
 				currentGrain++;
 			}
-			else 
-			{
-				var type:int = OxelData.typeFromData( data );
+			else  {
 				statAdd( type, currentGrain );
 				if ( currentGrain < _solid_min && Globals.AIR != type )
 					_solid_min = currentGrain

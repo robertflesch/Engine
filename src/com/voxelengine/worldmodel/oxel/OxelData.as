@@ -59,11 +59,17 @@ package com.voxelengine.worldmodel.oxel
 		private static const OXEL_DATA_PARENT_MASK:uint 			= 0xfffffbff;
 		private static const OXEL_DATA_PARENT:uint					= 0x00000400;
 
-		private static const OXEL_DATA_TYPE_MASK_CLEAR:uint 		= 0xfffffc00;
-		private static const OXEL_DATA_TYPE_MASK:uint  				= 0x000003ff;
 		private static const OXEL_DATA_TYPE_MASK_TEMP:uint			= 0xfe7fffff;
 		
-		private var _data:uint = 0;					// holds type and face data
+		// type 1
+		private static const OXEL_DATA_TYPE_1_MASK_CLEAR:uint 		= 0xffff0000;
+		private static const OXEL_DATA_TYPE_1_MASK:uint				= 0x0000ffff;
+		// type 2
+		private static const OXEL_DATA_TYPE_2_MASK_CLEAR:uint 		= 0x0000ffff;
+		private static const OXEL_DATA_TYPE_2_MASK:uint				= 0xffff0000;
+
+		private var _data:uint = 0;					// holds face data
+		private var _type:uint = 0;					// holds type data
 		
 		public function get dirty():Boolean 					{ return 0 < (_data & OXEL_DATA_DIRTY); }
 		public function set dirty( $val:Boolean ):void { 
@@ -79,24 +85,37 @@ package com.voxelengine.worldmodel.oxel
 				_data |= OXEL_DATA_ADD_VERTEX; 
 		}
 		
-		// Type is stored in the lower 2 bytes ( or 1 ) of the _data variable
-		// TODO, I am using 16 bits here, I think the dirty faces are using some of these already.
-		// need to reduce it down to 10 bits
-		public function get type():int 							{ return (_data & OXEL_DATA_TYPE_MASK); }
+		// Type is stored in the lower 2 bytes of the _type variable
+		public function get type():int 							{ return (_type & OXEL_DATA_TYPE_1_MASK); }
 		public function set type( val:int ):void { 
-			_data &= OXEL_DATA_TYPE_MASK_CLEAR;
-			_data |= (val & OXEL_DATA_TYPE_MASK); 
+			_type &= OXEL_DATA_TYPE_1_MASK_CLEAR;
+			_type |= (val & OXEL_DATA_TYPE_1_MASK); 
+		}
+		public function get mask():int 							{ return (_type & OXEL_DATA_TYPE_2_MASK); }
+		public function set mask( val:int ):void { 
+			_type &= OXEL_DATA_TYPE_2_MASK_CLEAR;
+			_type |= ( (val << 16) & OXEL_DATA_TYPE_2_MASK); 
 		}
 		
+		private static const OXEL_DATA_TYPE_MASK_CLEAR:uint 		= 0xfffffc00;
+		private static const OXEL_DATA_TYPE_OLD_MASK:uint			= 0x000003ff;
+				
+			   protected 	function maskTempData():uint 					{ return _data & OXEL_DATA_TYPE_MASK_TEMP; }
+		static public 		function type1FromData( $data:uint ):uint 		{ return $data & OXEL_DATA_TYPE_1_MASK; }
+		static public 		function type2FromData( $data:uint ):uint 		{ return $data & OXEL_DATA_TYPE_2_MASK; }
+		static public 		function typeFromRawDataOld( $data:uint ):uint	{ return $data & OXEL_DATA_TYPE_OLD_MASK; }
+		static public 		function dataFromRawDataOld( $data:uint ):uint	{ return $data & OXEL_DATA_TYPE_MASK_CLEAR; }
+		
 		// this is needed to initialize from byteArray
-		public function set dataRaw(value:uint):void 			{ _data = value; }
+		public function dataRaw(value:uint,type:uint):void 					{ _data = value; _type = type }
+		public function get data():uint 									{ return _data }
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//     operations
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		protected	function resetData():void 					{ _data &= OXEL_DATA_CLEAR; }
-		public 		function faces_clean_all_face_bits():void 	{ _data &= OXEL_DATA_FACE_BITS_CLEAR; } //  doesnt touch dirty;
+		protected	function resetData():void 								{ _data &= OXEL_DATA_CLEAR; }
+		public 		function faces_clean_all_face_bits():void 				{ _data &= OXEL_DATA_FACE_BITS_CLEAR; } //  doesnt touch dirty;
 		// faces marked as dirty that need re-evaluation to determine if a face exists there.
 		protected	function faces_has_dirty():Boolean 			{ return 0 < (_data & OXEL_DATA_FACES_DIRTY); }
 		public		function faces_mark_all_clean():void 		{ _data &= OXEL_DATA_FACES_DIRTY_CLEAR; dirty = true; }
@@ -221,9 +240,6 @@ package com.voxelengine.worldmodel.oxel
 		public      function additionalDataHas():Boolean			{ return 0 < ( _data & OXEL_DATA_ADDITIONAL );  }
 		public      function additionalDataClear():void 			{ _data &= OXEL_DATA_ADDITIONAL_CLEAR; }
 
-		protected 	function maskTempData():uint 					{ return _data & OXEL_DATA_TYPE_MASK_TEMP; }
-		
-		static public function typeFromData( $data:uint ):uint 			{ return $data & OXEL_DATA_TYPE_MASK; }
 		static public function data_is_parent( $data:uint ):Boolean 	{ return 0 < ($data & OXEL_DATA_PARENT); }
 		static public function dataHasAdditional( $data:uint ):Boolean 	
 		{ 

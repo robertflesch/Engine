@@ -147,7 +147,7 @@ public class FlowInfo
 		return $ba;
 	}
 	
-	public function fromByteArray( $version:String, $ba:ByteArray ):ByteArray {
+	public function fromByteArray( $version:int, $ba:ByteArray ):ByteArray {
 		_flowInfo = $ba.readInt();
 		$ba = _flowScaling.fromByteArray( $version, $ba )
 		return $ba;

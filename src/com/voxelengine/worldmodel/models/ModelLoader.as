@@ -360,7 +360,7 @@ package com.voxelengine.worldmodel.models
 			}
 			
 			// This reads the version info and advances position on byteArray
-			function readVersion($ba:ByteArray):String
+			function readVersion($ba:ByteArray):int
 			{
 				var version:String;
 				var byteRead:int = 0;
@@ -371,7 +371,7 @@ package com.voxelengine.worldmodel.models
 				byteRead = $ba.readByte();
 				version += String.fromCharCode(byteRead);
 				
-				return version;
+				return int(version);
 			}
 		}
 		

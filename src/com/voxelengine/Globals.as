@@ -49,14 +49,15 @@ package com.voxelengine {
 		
 		static public const GRAVITY:int = 10;
 		
-		static public const VERSION_000:String = "000";
-		static public const VERSION_001:String = "001";
-		static public const VERSION_002:String = "002";
-		static public const VERSION_003:String = "003";
-		static public const VERSION_004:String = "004";
-		static public const VERSION_005:String = "005";
-		static public const VERSION_006:String = "006";
-		static public const VERSION:String = VERSION_006;
+		static public const VERSION_000:int 		  = 0;
+		static public const VERSION_001:int 		  = 1;
+		static public const VERSION_002:int 		  = 2;
+		static public const VERSION_003:int 		  = 3;
+		static public const VERSION_004:int 		  = 4;
+		static public const VERSION_005:int 		  = 5;
+		static public const VERSION_006:int 		  = 6;
+		static public const VERSION_007:int 		  = 7;
+		static public const VERSION:int 			  = VERSION_007;
 		
 		static public const MANIFEST_VERSION:int = 100;
 		

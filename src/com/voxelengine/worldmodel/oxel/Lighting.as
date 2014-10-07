@@ -305,7 +305,7 @@ public class Lighting  {
 	
 	// TODO Maybe - Not sure what attnPerMeter should be here, that value is not persisted to the ivm.
 	// However I dont know if it is ever used again, so what should I set it to?
-	public function fromByteArray( $version:String, $ba:ByteArray, $attnPerMeter:uint = 0x10 ):ByteArray {
+	public function fromByteArray( $version:int, $ba:ByteArray, $attnPerMeter:uint = 0x10 ):ByteArray {
 		var lightCount:int;
 		var i:int;
 		if ( Globals.VERSION_001 == $version || Globals.VERSION_002 == $version ) {
@@ -338,7 +338,7 @@ public class Lighting  {
 				_lights[i].fromByteArray( $ba );
 			}
 		}
-		else if ( Globals.VERSION_006 == $version ) { 
+		else if ( Globals.VERSION_006 <= $version ) { 
 			_color = $ba.readUnsignedInt();
 			_lowerAmbient = $ba.readUnsignedInt();
 			_higherAmbient = $ba.readUnsignedInt();
