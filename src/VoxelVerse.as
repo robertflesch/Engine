@@ -198,6 +198,7 @@ package {
 			//	Log.out( "VoxelVerse.activateApp - setting active = TRUE" );
 				Globals.active = true;
 				Globals.clicked = true;
+				VoxelVerseGUI.currentInstance.crossHairActive();
 				
 				stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 				stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
@@ -215,6 +216,7 @@ package {
 				Globals.active = false;
 				Globals.mouseView = false;
 				Globals.clicked = false;
+				VoxelVerseGUI.currentInstance.crossHairInactive();
 				
 				MemoryManager.update();
 				MouseKeyboardHandler.reset();

@@ -82,7 +82,7 @@ package com.voxelengine.GUI
 			Globals.g_app.stage.addEventListener( FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
 		}
 		
-		public function fullScreenEvent(event:FullScreenEvent):void {
+		private function fullScreenEvent(event:FullScreenEvent):void {
 			if ( event.fullScreen )
 			{
 				//Log.out( "Renderer - enter fullscreen has been called" + event );
@@ -95,20 +95,16 @@ package com.voxelengine.GUI
 			}
 		}
 		
-		public function toggleFullscreen():void
-		{
+		public function toggleFullscreen():void {
 			if ( StageDisplayState.NORMAL == Globals.g_app.stage.displayState )
 				Globals.g_app.stage.displayState =	StageDisplayState.FULL_SCREEN_INTERACTIVE;
 			else
 				Globals.g_app.stage.displayState =	StageDisplayState.NORMAL;
 		}
-
-		
 		
 		public function get toolBar(): Hub { return _hub; }
 		
-		private function createProjectile( vm:VoxelModel ):void 
-		{
+		private function createProjectile( vm:VoxelModel ):void  {
 			/*
 			if ( _projectileEnabled )
 			{
@@ -126,15 +122,9 @@ package com.voxelengine.GUI
 			*/
 		}
 
-		protected function onEnableProjectile(event:TimerEvent):void
-		{
+		protected function onEnableProjectile(event:TimerEvent):void {
 			_projectileEnabled = true;
 		}
-		
-		//public function saveMap():void {
-			//Globals.g_regionManager.writeRegion();
-		//}
-
 		
 		public function saveModelIVM():void 
 		{
@@ -161,8 +151,7 @@ package com.voxelengine.GUI
 				Log.out( "VoxelVerseGUI.saveModelIVM - No VoxelModel selected", Log.ERROR );
 		}
 		
-		public function crossHairResize(event:Event):void 
-		{
+		private function crossHairResize(event:Event):void {
 			//trace( "VoxelVerseGUI.crossHairResize" );
 			if ( _crossHairHorizontal )
 			{
@@ -179,16 +168,25 @@ package com.voxelengine.GUI
 				_hub.resizeHub( event );
 		}
 		
-		private function deactivate(e:Event):void 
-		{
+		public function crossHairActive():void {
+			_crossHairColor = CROSS_HAIR_YELLOW;
+			crossHairChange();
+		}
+		
+		public function crossHairInactive():void {
+			_crossHairColor = CROSS_HAIR_RED;
+			crossHairChange();
+		}
+		
+		/*
+		private function deactivate(e:Event):void {
 			//Log.out( "VoxelVerseGUI.DEactivate - change cross hairs:" + e.toString() );
 			_crossHairColor = CROSS_HAIR_RED;
 			crossHairChange();
 			crossHairShow();
 		}
 		
-		private function activate(e:Event):void 
-		{
+		private function activate(e:Event):void {
 			//Log.out( "VoxelVerseGUI.activate - change cross hairs:" + e.toString() );
 			_crossHairColor = CROSS_HAIR_YELLOW;
 			crossHairChange();
@@ -196,28 +194,8 @@ package com.voxelengine.GUI
 				crossHairHide();
 			else
 				crossHairShow();
-			
 		}
-		
-		private function mouseMove(e:MouseEvent):void 
-		{
-			Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
-			if ( Globals.active && Globals.clicked )
-			{
-				//Log.out( "VoxelVerseGUI.mouseMove change cross hairs: " + e.toString() );
-				_crossHairColor = CROSS_HAIR_YELLOW;
-				crossHairChange();
-			}
-		}
-		
-		public function mouseLeave( e:Event ):void
-		{
-			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
-			_crossHairColor = CROSS_HAIR_RED;
-			crossHairChange();
-		}
-		
-		
+		*/
 		private function addReleaseMenu():WindowReleaseMenu
 		{
 			if ( Globals.g_app.configManager.showButtons && Globals.g_app.configManager.showEditMenu )
@@ -351,9 +329,9 @@ package com.voxelengine.GUI
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 			Globals.g_app.addEventListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
 			Globals.g_app.addEventListener( GUIEvent.TOOLBAR_SHOW, guiEventHandler );
-			Globals.g_app.addEventListener(Event.DEACTIVATE, deactivate);
-			Globals.g_app.addEventListener(Event.ACTIVATE, activate);
-			Globals.g_app.stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
+//			Globals.g_app.addEventListener(Event.DEACTIVATE, deactivate);
+//			Globals.g_app.addEventListener(Event.ACTIVATE, activate);
+//			Globals.g_app.stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
 			
 			Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControl.handleModelEvents );
 			Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
