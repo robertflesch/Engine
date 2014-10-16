@@ -339,7 +339,7 @@ package com.voxelengine.worldmodel.models
 			{
 				var selected:Boolean = Globals.selectedModel == this ? true : false;
 				
-				oxel.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
+				oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
 				
 				if (Globals.g_app.editing && editCursor && editCursor.visible)
 					editCursor.draw(viewMatrix, $context, false );
@@ -366,7 +366,7 @@ package com.voxelengine.worldmodel.models
 			{
 				// We have to draw all of the non alpha first, otherwise parts of the tree might get drawn after the alpha does
 				var selected:Boolean = Globals.selectedModel == this ? true : false;
-				oxel.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
+				oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
 				
 				if (Globals.g_app.editing && editCursor && editCursor.visible)
 					editCursor.draw(viewMatrix, $context, false );

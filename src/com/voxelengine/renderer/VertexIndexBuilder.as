@@ -8,12 +8,11 @@
 package com.voxelengine.renderer 
 {
 
-import com.voxelengine.pools.VertexIndexBuilderPool;
-import com.voxelengine.renderer.vertexComponents.VertexComponent;
 import flash.display3D.VertexBuffer3D;
 import flash.display3D.IndexBuffer3D;
 import flash.display3D.Context3D;
 import flash.display3D.Context3DVertexBufferFormat;
+import flash.geom.Vector3D;
 import flash.utils.getTimer;
 import flash.utils.ByteArray;
 import flash.utils.Endian;
@@ -22,6 +21,8 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.renderer.Quad;
+import com.voxelengine.pools.VertexIndexBuilderPool;
+import com.voxelengine.renderer.vertexComponents.VertexComponent;
 
 
 public class VertexIndexBuilder
@@ -64,7 +65,8 @@ public class VertexIndexBuilder
 	
 	private var _sorted:Boolean = false;
 	private var _dirty:Boolean = false;
-	
+
+	private var _sortCount:int;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//     Getters/Setters
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -78,6 +80,7 @@ public class VertexIndexBuilder
 	
 	public function VertexIndexBuilder()
 	{
+		_sortCount = int( Math.random() * 30 );
 	}
 
 	public function release():void
@@ -87,17 +90,16 @@ public class VertexIndexBuilder
 			_oxels.length = 0;
 	}
 	
+	static private var _s_compareVec:Vector3D;
 	private function compareFunction( x:Oxel, y:Oxel ):int {
 		if ( !x.gc )
 			return 1;
 		if ( !y.gc )
 			return -1;
-		// TODO this is from origin of avatar, rather then camera position.
-		// wanted to use Globals.worldSpaceStartPoint;
-		// but it doesnt always exist.
-		// THIS IS REALLY SLOW
-		var xdist:Number = x.gc.GetDistance( Globals.controlledModel.instanceInfo.positionGet );
-		var ydist:Number = y.gc.GetDistance( Globals.controlledModel.instanceInfo.positionGet );
+
+		// this could be speed up for sure	
+		var xdist:Number = x.gc.GetDistance( _s_compareVec );
+		var ydist:Number = y.gc.GetDistance( _s_compareVec );
 		
 		if ( xdist == ydist ) return 0;
 		if ( xdist < ydist ) return -1;
@@ -105,12 +107,19 @@ public class VertexIndexBuilder
 	}
 	
 	public function sort() : void {
-		//var timer:int = getTimer();
+		_sortCount++;
+		if ( _sortCount < 30 )
+			return;
+			
+		_sortCount = 0;	
+		var timer:int = getTimer();
 
 		if ( _oxels && 0 < _oxels.length ) {
 			// this causes a major bottleneck if done each frame.
 			if ( false == _sorted ) 
 			{
+				_s_compareVec = Globals.controlledModel.modelToWorld( Globals.controlledModel.camera.center );
+				//Log.out( "VertexIndexBuilder.sort - _s_compareVec: " + _s_compareVec );
 				_oxels.sort( compareFunction );	
 				//trace( "VertexIndexBuilder - sorted: " + _oxels.length + " - took: "  + (getTimer() - timer) );					
 				_sorted = true;

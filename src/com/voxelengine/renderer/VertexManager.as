@@ -10,6 +10,7 @@ package com.voxelengine.renderer {
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.worldmodel.models.VoxelModel;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.pools.VertexIndexBuilderPool;
 import flash.geom.Matrix3D;
@@ -26,6 +27,8 @@ public class VertexManager {
 	private var _vertBufAnimated:VertexIndexBuilder = null;
 	private var _vertBufAnimatedAlpha:VertexIndexBuilder = null;
 	private var _vertBufFire:VertexIndexBuilder = null;
+	private var _subManagers:Vector.<VertexManager> = new Vector.<VertexManager>();
+	private var _gc:GrainCursor;
 	
 	//private var _minGrain:uint = 9;
 	private var _minGrain:uint = 10;
@@ -33,10 +36,18 @@ public class VertexManager {
 	public function set minGrain(val:uint):void {  _minGrain = val;  }
 	public function get minGrain():uint { return _minGrain; }
 	
-	public function VertexManager()
+	public function VertexManager( $gc:GrainCursor, $parent:VertexManager )
 	{
+		_gc = $gc;
+		if ( null != $parent )
+			$parent.childAdd( this );
 		//var name:String = NameUtil.createUniqueName( this );
 		//Log.out( "----------VertexManager.construct---------- " + name );
+	}
+	
+	public function childAdd( $vertMan:VertexManager ):void {
+		_subManagers.push( $vertMan );
+		//Log.out( "VertexManager.childAdd: " + _subManagers.length );
 	}
 	
 	public function release():void
@@ -110,22 +121,17 @@ public class VertexManager {
 				_vertBufAnimated.BufferCopyToGPU( $context );
 			}
 		}
+		
+		var count:int = _subManagers.length;
+		for ( var i:int; i < count; i++ ) {
+			_subManagers[i].drawNew( $mvp, $vm, $context, $shaders, $selected, $isChild );
+		}
 	}
 	
 	public function drawNewAlpha( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $shaders:Vector.<Shader>, $selected:Boolean, $isChild:Boolean = false ):void	{
 		// Only update the shaders if they are in use, other wise 
 		// we have all of the costly state changes happening for no good reason.
 		// TODO - RSF - We should probably NOT upload the shaders unless they are being used.
-		if ( _vertBufAlpha && _vertBufAlpha.length )
-		{
-			if ( $shaders[2].update( $mvp, $vm, $context, $selected, $isChild ) )
-			{
-				_vertBufAlpha.sort();
-				_vertBufAlpha.buffersBuildFromOxels( $context );
-				_vertBufAlpha.BufferCopyToGPU( $context );
-			}
-		}
-		
 		if ( _vertBufAnimatedAlpha && _vertBufAnimatedAlpha.length )
 		{
 			if ( $shaders[3].update( $mvp, $vm, $context, $selected, $isChild ) )
@@ -144,7 +150,27 @@ public class VertexManager {
 				_vertBufFire.buffersBuildFromOxels( $context );
 				_vertBufFire.BufferCopyToGPU( $context );
 			}
-		}		
+		}	
+		
+		if ( _vertBufAlpha && _vertBufAlpha.length )
+		{
+			if ( $shaders[2].update( $mvp, $vm, $context, $selected, $isChild ) )
+			{
+				var xdist:Number = _gc.GetDistance( Globals.controlledModel.modelToWorld( Globals.controlledModel.camera.center ) );
+				if (  xdist < 512 ) {
+					_vertBufAlpha.sorted = false;
+					//Log.out( "xdist: " + xdist );
+				}
+				_vertBufAlpha.sort();
+				_vertBufAlpha.buffersBuildFromOxels( $context );
+				_vertBufAlpha.BufferCopyToGPU( $context );
+			}
+		}
+		
+		var count:int = _subManagers.length;
+		for ( var i:int; i < count; i++ ) {
+			_subManagers[i].drawNewAlpha( $mvp, $vm, $context, $shaders, $selected, $isChild );
+		}
 	}
 	
 	public function oxelAdd( oxel:Oxel ):void { 	

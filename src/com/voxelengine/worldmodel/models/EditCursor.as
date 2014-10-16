@@ -203,7 +203,7 @@ package com.voxelengine.worldmodel.models
 			viewMatrix.prependTranslation( -t, -t, -t)
 			viewMatrix.append(mvp);
 			
-			oxel.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
+			oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
 		}
 		
 		override public function drawAlpha( mvp:Matrix3D,$context:Context3D, $isChild:Boolean ):void 
@@ -216,7 +216,7 @@ package com.voxelengine.worldmodel.models
 			viewMatrix.prependTranslation( -t, -t, -t)
 			viewMatrix.append(mvp);
 			
-			oxel.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
+			oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
 		}
 		
 		override public function update($context:Context3D, elapsedTimeMS:int ):void

@@ -23,7 +23,6 @@ package com.voxelengine.worldmodel.oxel
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.ImpactEvent;
 	import com.voxelengine.utils.Plane;
-	import com.voxelengine.renderer.VertexIndexBuilder;
 	import com.voxelengine.renderer.VertexManager;
 	import com.voxelengine.renderer.Quad;
 	import com.voxelengine.renderer.shaders.Shader;
@@ -156,53 +155,15 @@ package com.voxelengine.worldmodel.oxel
 			if ( null == _parent )
 			{
 				//Log.out( "Oxel.vm_initialize - This should only happen ONCE PER MODEL --------------------------------------" );
-				_vertMan = new VertexManager();
+				_vertMan = new VertexManager( gc, null );
 				// Only set minGrain for root oxel
 				if ( 8 < gc.bound  )
 				{
 					if ( 4 <= $stats.range )
-						_vertMan.minGrain = $stats.largest; 
-						// TODO I still dont like how this causes delay if too large.
-						// On g12 island, if 
-						//minGrain is 10
-						//VoxelVerse.enterFrame - update time: 16
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 34800(98280)  _vertices:278400(786240)  quadsToProcess: 16380  took: 37
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 24222(98280)  _vertices:193776(786240)  quadsToProcess: 16380  took: 27
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 25458(98280)  _vertices:203664(786240)  quadsToProcess: 16380  took: 30
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 27792(98280)  _vertices:222336(786240)  quadsToProcess: 16380  took: 31
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 33504(98280)  _vertices:268032(786240)  quadsToProcess: 16380  took: 70
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 1164(2016)  _vertices:9312(16128)  quadsToProcess: 336  took: 6
-						//VertexIndexBuilder.buffersBuildFromOxels -  processed 13706 oxels  took: 222
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 354(828)  _vertices:2832(6624)  quadsToProcess: 138  took: 1
-						//VertexIndexBuilder.buffersBuildFromOxels -  processed 23 oxels  took: 3
-						//VoxelVerse.enterFrame - render time: 231
-						//VoxelVerse.enterFrame - total time: 250
-						//
-						//minGrain is 9
-						//VoxelVerse.enterFrame - update time: 16
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 30744(98280)  _vertices:245952(786240)  quadsToProcess: 16380  took: 35
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 24918(98280)  _vertices:199344(786240)  quadsToProcess: 16380  took: 28
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 26352(98280)  _vertices:210816(786240)  quadsToProcess: 16380  took: 31
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 14352(47268)  _vertices:114816(378144)  quadsToProcess: 7878  took: 38
-						//VertexIndexBuilder.buffersBuildFromOxels -  processed 9503 oxels  took: 144
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 510(1152)  _vertices:4080(9216)  quadsToProcess: 192  took: 6
-						//VertexIndexBuilder.buffersBuildFromOxels -  processed 32 oxels  took: 8
-						//VoxelVerse.enterFrame - render time: 159
-						//VoxelVerse.enterFrame - total time: 179
-						//
-						// minGrain is 8
-						//VoxelVerse.enterFrame - update time: 19
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 4362(13536)  _vertices:34896(108288)  quadsToProcess: 2256  took: 6
-						//VertexIndexBuilder.buffersBuildFromOxels -  processed 376 oxels  took: 8
-						//VertexIndexBuilder.quadsCopyToBuffers - _offsetIndices: 384(900)  _vertices:3072(7200)  quadsToProcess: 150  took: 1
-						//VertexIndexBuilder.buffersBuildFromOxels -  processed 25 oxels  took: 3
-						//VoxelVerse.enterFrame - render time: 22
-						//VoxelVerse.enterFrame - total time: 46
-						
+						_vertMan.minGrain = $stats.largest + 1; 
 					else
 						_vertMan.minGrain = $stats.rootSize;
 				}
-
 				else
 				{
 					if ( 11 < gc.bound )
@@ -217,7 +178,7 @@ package com.voxelengine.worldmodel.oxel
 					// We should inherit the min grain size from our parent
 					var minGrain:int = vm_get().minGrain
 					//Log.out( "Oxel.vm_initialize - Grabbing sub vertex manager: gc.grain: " + gc.grain + "  vm_get().minGrain: " + vm_get().minGrain );
-					_vertMan = new VertexManager();
+					_vertMan = new VertexManager( gc, vm_get() );
 					_vertMan.minGrain = minGrain;
 				}
 			}		
@@ -234,6 +195,8 @@ package com.voxelengine.worldmodel.oxel
 		public function get isFlowable():Boolean { return Globals.Info[type].flowable; }
 		public function get isSolid():Boolean { return Globals.Info[type].solid; }
 		public function get isLight():Boolean { return Globals.Info[type].lightInfo.lightSource; }
+		
+		public function get vertMan():VertexManager { return _vertMan; }
 		
 		// Intentionally empty, since these are allocated enmase in pool
 		public function Oxel() {
@@ -812,51 +775,7 @@ package com.voxelengine.worldmodel.oxel
 				}
 			}
 		}
-		
-		public function drawNew( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $shaders:Vector.<Shader>, $selected:Boolean, $isChild:Boolean ):void {
-			if ( _vertMan )
-			{
-				_vertMan.drawNew( $mvp, $vm, $context, $shaders, $selected, $isChild );
 
-				if ( _vertMan.minGrain < gc.grain )
-				{
-					for each ( var pchild:Oxel in _children )
-						pchild.drawNew( $mvp, $vm, $context, $shaders, $selected, $isChild );
-				}
-			}
-			else
-			{
-				if ( vm_get() && vm_get().minGrain < gc.grain )
-				{
-					for each ( var cchild:Oxel in _children ) 
-						cchild.drawNew( $mvp, $vm, $context, $shaders, $selected, $isChild );
-				}
-			}		
-			
-		}
-		
-		public function drawNewAlpha( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $shaders:Vector.<Shader>, $selected:Boolean, $isChild:Boolean ):void	{
-			if ( _vertMan )
-			{
-				_vertMan.drawNewAlpha( $mvp, $vm, $context, $shaders, $selected, $isChild );
-
-				if ( _vertMan.minGrain < gc.grain )
-				{
-					for each ( var pchild:Oxel in _children )
-						pchild.drawNewAlpha( $mvp, $vm, $context, $shaders, $selected, $isChild );
-				}
-			}
-			else
-			{
-				if ( vm_get() && vm_get().minGrain < gc.grain )
-				{
-					for each ( var cchild:Oxel in _children ) 
-						cchild.drawNewAlpha( $mvp, $vm, $context, $shaders, $selected, $isChild );
-				}
-			}		
-			
-		}
-		
 		public function mergeAndRebuild():void {
 			var _timer:int = getTimer();
 			Oxel.nodes = 0;
@@ -3019,7 +2938,8 @@ package com.voxelengine.worldmodel.oxel
 			if ( childrenHas() )
 				calculateGC();
 			Log.out( "Oxel.breakFromParent - This should NEVER happen " );
-			_vertMan = new VertexManager();
+			// God know what this should be at this point
+			_vertMan = new VertexManager( gc, null );
 			_parent = null;
 		}
 		
@@ -3126,47 +3046,3 @@ package com.voxelengine.worldmodel.oxel
 	} // end of class Oxel
 	
 } // end of package
-
-/*
-		public function toxLoad( parent:Oxel, $gc:GrainCursor, ba:ByteArray, rootGrainSize:int ):ByteArray 
-		{
-			var data:int = ba.readByte();
-			if ( 0 == data )
-				data = Globals.AIR;
-			initializeTox( parent, $gc, data );
-			var isParent:int = ba.readByte();
-			if ( 0 < isParent )
-			{
-				this.markAsParent();
-				_children = ChildOxelPool.child_vector_get();
-				var gct:GrainCursor = GrainCursorPool.poolGet( rootGrainSize );
-				for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
-				{
-					_children[i]  = OxelPool.oxel_get();
-					gct.copyFrom($gc);
-					gct.become_child(i);   
-					_children[i].toxLoad( this, gct, ba, rootGrainSize );
-				}
-				GrainCursorPool.poolDispose( gct );
-			}
-			
-			return ba;
-		}
-		// What should only be used when loading from byte array data.
-		public function initializeTox( $parent:Oxel, $gc:GrainCursor, $type:int = 0 ):void
-		{
-			_parent = $parent;
-			_data = $type;
-			_gc = GrainCursorPool.poolGet($gc.bound);
-			gc.copyFrom( $gc );
-			dirty = true;
-			faces_mark_all_dirty();
-
-			if ( null == _parent || (_vertMan && _vertMan.minGrain == gc.grain)  )
-			{
-				_vertMan = new VertexManager();	
-			}
-			//trace( "Oxel.initialize: " + toString() );
-		}
-*/
-		
