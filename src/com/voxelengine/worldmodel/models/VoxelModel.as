@@ -1634,11 +1634,12 @@ Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );
 				return;
 				
 			if ( _modelInfo.childCount > _children.length ) {
+				// really need to check if children are complete, not just added
 				Log.out("VoxelModel.stateSet - children not all loaded yet: " + $state );
 				return; // not all children have loaded yet
 			}
 			
-			//Log.out( "VoxelModel.stateSet: " + $state ); 
+			Log.out( "VoxelModel.stateSet: " + $state ); 
 			if (_anim)
 			{
 				//Log.out( "VoxelModel.stateSet - Stopping anim: " + _anim.name + "  starting: " + $state ); 
@@ -1686,7 +1687,7 @@ Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );
 				var result:Boolean = false;
 				for each (var child:VoxelModel in $children)
 				{
-					//Log.out( "VoxelModel.checkChildren - child: " + child.instanceInfo.name );
+					//Log.out( "VoxelModel.stateSet - addAnimationsInChildren - child: " + child.metadata.name );
 					if (child.metadata.name == $at.attachmentName)
 					{
 						child.stateSetData($at, $useInitializer, $val);
@@ -1694,7 +1695,7 @@ Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );
 					}
 					else if (0 < child.children.length)
 					{
-						//Log.out( "VoxelModel.checkChildren - looking in children of child for: " + $at.attachmentName );
+						//Log.out( "VoxelModel.stateSet - addAnimationsInChildren - looking in children of child for: " + $at.attachmentName );
 						if (addAnimationsInChildren(child.children, $at, $useInitializer, $val))
 							result = true;
 					}

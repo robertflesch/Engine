@@ -24,20 +24,21 @@ package com.voxelengine.worldmodel.scripts
 			{
 				if ( $event.instanceGuid == instanceGuid )
 				{
-					var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
 					if ( Globals.player ) {
+						var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
 						vm.takeControl( Globals.player );
 						Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.metadata.name );
 					}
 					else {
-						Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingPlayerComplete );
+						Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
+						//Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingPlayerComplete );
 					}
 				}
 			}
 		}
 		
 		private function onLoadingPlayerComplete( le:LoadingEvent ):void {
-			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingPlayerComplete );
+			Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 			
 			var player:VoxelModel = Globals.player;
 			if ( !player ) 

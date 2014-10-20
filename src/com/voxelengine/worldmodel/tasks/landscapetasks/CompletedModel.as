@@ -25,10 +25,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	public class CompletedModel extends LandscapeTask 
 	{		
 		static private var _count:int = 0;
-		static private var _playerLoaded:Boolean = false;
 		
 		public function CompletedModel( instanceGuid:String, layer:LayerInfo, taskType:String = TASK_TYPE, taskPriority:int = TASK_PRIORITY ):void {
-			Log.out( "CompletedModel.construct for guid: " + instanceGuid + "  count: " + _count );
+//			Log.out( "CompletedModel.construct for guid: " + instanceGuid + "  count: " + _count );
 			_startTime = getTimer();
 			_count++;
 			super( instanceGuid, layer, "CompletedModel" );
@@ -39,19 +38,20 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			super.start() // AbstractTask will send event
 			_count--;
 
+//			Log.out( "CompletedModel.start - start: " + _guid );
 			try
 			{
 				var vm:VoxelModel = getVoxelModel();
 //				var vm:VoxelModel = Globals.getModelInstance( _guid );
 				if ( vm ) {
-					Log.out( "CompletedModel.start - VoxelModel marked as complete: " + _guid );
+//					Log.out( "CompletedModel.start - VoxelModel marked as complete: " + _guid );
  					vm.complete = true;
 					vm.calculateCenter();
 
 					if ( vm is Player )
 					{
+						Globals.player = vm as Player;
 						Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, _guid ) );
-						_playerLoaded = true;
 					}
 					else {
 						if ( vm.instanceInfo.critical )
@@ -75,7 +75,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			
 			//Log.out( "CompletedModel.start - completedModel: " + _guid + "  count: " + _count );
 				
-			if ( 0 == _count && _playerLoaded )
+			if ( 0 == _count  ) // && _playerLoaded  should I add ( null != Globals.player )
 			{
 				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _guid );
 				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );

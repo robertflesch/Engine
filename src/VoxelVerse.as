@@ -8,6 +8,7 @@
 
 package {
 	import com.voxelengine.server.PersistAnimation;
+	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
@@ -49,6 +50,7 @@ package {
 		private var _showConsole:Boolean = false;
 		private var _toolOrBlockEnabled: Boolean = false;
 		private var _editing: Boolean = true;
+		private var _displayGuid:String;
 		
 		public function get editing():Boolean { return _editing; }
 		public function set editing(val:Boolean):void { _editing = val; }
@@ -68,11 +70,21 @@ package {
 		private function init(e:Event = null):void {
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			
+			var parameters:Object = stage.loaderInfo.parameters;
+			if ( parameters.guid ) {
+				Log.out( "VoxelVerse.init - single model found: " + parameters.guid );
+				//_displayGuid = parameters.guid;			
+			}
+			
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			
+			//var strUserAgent:String = String(ExternalInterface.call("function() {return navigator.userAgent;}")).toLowerCase();			
+			
 			try
 			{
+				// This doesnt work in chrome, so I need someway to detect chrome and do it differently
+				// Globals.appPath = "file:///C:/dev/VoxelVerse/resources/bin/";
 				var urlPath:String = ExternalInterface.call("window.location.href.toString");
 				Log.out( "VoxelVerse.swf loaded from: " + urlPath, Log.INFO);
 				var index:int = urlPath.indexOf( "index.html" );
@@ -131,7 +143,7 @@ package {
 			removeEventListener(LoadingEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
 			
 			Globals.g_regionManager = new RegionManager();
-			_configManager = new ConfigManager();
+			_configManager = new ConfigManager( _displayGuid );
 			_poolManager = new PoolManager();
 			
 			addEventListener(Event.ENTER_FRAME, enterFrame);

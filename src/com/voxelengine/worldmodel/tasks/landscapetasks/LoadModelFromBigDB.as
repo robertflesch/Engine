@@ -41,7 +41,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private var _vmmBase:VoxelModelMetadata;
 		
 		public function LoadModelFromBigDB( $guid:String, $layer:LayerInfo = null ) {
-			//Log.out( "LoadModelFromBigDB.construct " );
+			Log.out( "LoadModelFromBigDB.construct " );
 			_guid = $guid
 			_startTime = getTimer();
 			//public function AbstractTask(type:String, priority:int = 5, uid:Object = null, selfOverride:Boolean = false, blocking:Boolean = false)
@@ -51,7 +51,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		override public function start():void
 		{
-			//Log.out( "LoadModelFromBigDB.start for guid:" + _guid );
+			Log.out( "LoadModelFromBigDB.start for guid:" + _guid );
 			var timer:int = getTimer();
 			super.start() // AbstractTask will send event
 			

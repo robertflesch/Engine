@@ -1122,16 +1122,13 @@ package com.voxelengine.worldmodel.oxel
 			_s_oxelsCreated = 0;
 			_s_oxelsEvaluated = 0;
 			facesBuildWater();
-			Log.out( "Oxel.cleanup - facesBuildWater took: " + (getTimer() - timer) + "  oxels eval: " + _s_oxelsEvaluated + "  oxels created: " + _s_oxelsCreated );					
-			timer = getTimer();
+//			Log.out( "Oxel.cleanup - facesBuildWater took: " + (getTimer() - timer) + "  oxels eval: " + _s_oxelsEvaluated + "  oxels created: " + _s_oxelsCreated );					
+//			timer = getTimer();
 			facesBuild();
-			Log.out( "Oxel.cleanup - facesBuild - took: " + (getTimer() - timer) );					
-			timer = getTimer();
-//			if ( 0 < _facesChanged )
-			{
-				quadsBuild();
-				Log.out( "Oxel.cleanup - quadsBuild -  took: " + (getTimer() - timer) );					
-			}
+//			Log.out( "Oxel.cleanup - facesBuild - took: " + (getTimer() - timer) );					
+//			timer = getTimer();
+			quadsBuild();
+//			Log.out( "Oxel.cleanup - quadsBuild -  took: " + (getTimer() - timer) );					
 		}
 		
 		private function facesBuildWater():void {
@@ -1912,7 +1909,7 @@ package com.voxelengine.worldmodel.oxel
 			
 			if ( Globals.Info[type].flowable )
 			{
-				if ( $parent.flowInfo )
+				if ( $parent && $parent.flowInfo )
 					flowInfo = $parent.flowInfo.clone();
 				else
 					flowInfo = Globals.Info[type].flowInfo.clone();

@@ -7,7 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-	import com.voxelengine.events.RegionEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.events.Event;
@@ -37,13 +36,20 @@ package com.voxelengine.worldmodel
 		public function get showEditMenu():Boolean { return _showEditMenu; }
 		public function get showButtons():Boolean { return _showButtons; }
 
-		public function ConfigManager():void 
+		public function ConfigManager( $optionalGuid:String ):void 
 		{
-			var _urlLoader:URLLoader = new URLLoader();
-			Log.out( "ConfigManager.new - loading: " + Globals.appPath + "config.json", Log.INFO );
-			_urlLoader.load(new URLRequest(Globals.appPath + "config.json"));
-			_urlLoader.addEventListener(Event.COMPLETE, onConfigLoadedAction);
-			_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, errorAction);			
+			if ( null != $optionalGuid ) {
+				// need to log onto network. has Gui been initialized at this point?
+				//WindowLogin.autoLogin();
+				Log.out( "ConfigManager.new - individual model to be loaded: " + $optionalGuid );
+			}
+			else {
+				var _urlLoader:URLLoader = new URLLoader();
+				Log.out( "ConfigManager.new - loading: " + Globals.appPath + "config.json", Log.INFO );
+				_urlLoader.load(new URLRequest(Globals.appPath + "config.json"));
+				_urlLoader.addEventListener(Event.COMPLETE, onConfigLoadedAction);
+				_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, errorAction);			
+			}
 		}
 		
 		public function onConfigLoadedAction(event:Event):void

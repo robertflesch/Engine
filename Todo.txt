@@ -1,25 +1,34 @@
+cr403986537
+
 Check out
 Global Games Fund ( 25 million investment from Tango messaging app )
 
-CRITICAL:
-REENABLE: Saving on the network.
+GENERAL CRITICAL:
 IMPROVE: Lava Flow should stop at X when flowing straight down? Break into rock emitter?
 IMPROVE: Water Flow should stop at X when flowing straight down? Break into mist and then mist emitter?
 TODO: Camera collision - ideally the camera will want to go back to its default distance and height, but collision with things around it can cause it to move closer to avatar at minimum, and ideally to move up and closers as needed
 FIX: When collide is off, if you hit space bar and collide with stuff, it throws you way up in sky
-NEED: Friends list for adding editor
-
 TODO: Backside of water oxels
 TODO: Fix fire animation around wood so that it can work with any voxel. Is it a double voxel? Is there a limit to the amound of faces an oxel can have?
-TODO: Head needs to turn up and down with camera.
 TODO: Limit camera angle when in first person?
+
+NICE TO HAVE:
+NEED: Friends list for adding editor
+TODO: Head needs to turn up and down with camera.
 IDEA: Glass, have engine use ambientOcclusion data to draw edges around glass, if edge value for a side >= 1 then draw border.
 IDEA: VertexManager sharing, this would allow us to have multiple creatures on the screen, just using one vertexManager
 
-WindowVoxelModel
-TODO: Be nice if selected model was somehow highlighted. And camera faced it
-TODO: Deleting objects from a region should put them into your inventory? Other option is to remove them permanently from BigDB
+MODELS
+ZEPPELIN
+TODO: Add new hud
+TODO: Add ammo store and ammount
+TODO: Add particles to cannon fire
 
+CANNON
+TODO - MINOR: Break the ammo description out into its own json file for reuse.
+
+PARTICLE
+TODO: All(Many) particles should share the same vertex manager, and maybe a modified rendering loop?
 
 DRAGON
 IMPROVE: Dragon: Needs idle animation, being stopped plays walk animation now
@@ -32,20 +41,14 @@ IMPROVE: Dragon: Starts going TOO fast when diving (really just moving forward).
 IMPROVE: Pops between states (?) after landing
 FIX: If you get on and off multiple times, the avatar angle gets off.
 
+GUI WindowVoxelModel
+TODO: Be nice if selected model was somehow highlighted. And camera faced it
+TODO: Deleting objects from a region should put them into your inventory? Other option is to remove them permanently from BigDB
+
 NEW REGION WINDOW:
 ADD: Sky color
 ADD: GuestAllowed
 
-ZEPPELIN
-TODO: Add new hud
-TODO: Add ammo store and ammount
-TODO: Add particles to cannon fire
-
-CANNON
-TODO - MINOR: Break the ammo description out into its own json file for reuse.
-
-PARTICLE
-TODO: All(Many) particles should share the same vertex manager, and maybe a modified rendering loop?
 
 EMITTER
 TODO: Create emitter manager and emitter class to use in showing splash, mist, fire, etc
@@ -57,13 +60,14 @@ TODO: Water faces next to solid should be inverted, arg, how does this work with
 ADJUST: Water speed.
 
 
-LIGHTING - STATIC
+LIGHTING 
+STATIC
 FINISH: WORKING - directional component of lighting
 FINISH: WORKING - per material attenuation
 FIX: HOLD - Still bug in propogation by light enclousure
 FIX: In ambient Occlusion - quads need to be flipped some times to show lighting correctly
 
-LIGHTING - DYNAMIC
+DYNAMIC
 TODO: Add lighting manager for dynamic lights, so the closest X lights can be retrived
 
 RENDERING
@@ -86,6 +90,7 @@ IDEA: on ambient occlusion, if neighbor is smaller...
 
 ////////////////////////////////////////////
 COMPLETED
+REENABLE: Saving on the network.
 FIX: Dragon: Wings not right after taking off
 FIX: Dragon Fire breath uses RED, yuck! Change to Lava or Fire
 FIX: Lagging after hitting dragon breath on stone

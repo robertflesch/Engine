@@ -375,17 +375,15 @@ package com.voxelengine.GUI
 			{
 				Globals.mode = Globals.MODE_PUBLIC;
 				//WindowLogin.autoLogin();
-				new WindowLogin();
 			}
 		}
-		
 		
 		private function onModelLoadingComplete(event : LoadingEvent ) : void
 		{
 			//Log.out( "VVGui.onModelLoadingComplete" );
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 			addKeyboardListeners( event );
-//			buildGUI();	
+			new WindowLogin();
 		}
 		
 		private function onKeyPressed( e : KeyboardEvent) : void

@@ -187,7 +187,7 @@ package com.voxelengine.worldmodel.animation
 			}
 
 			jsonString += "}";
-trace( name + " = " + jsonString );
+			//Log.out( Animation.getJSON - name + " = " + jsonString );
 			return jsonString;
 		}
 
@@ -324,7 +324,7 @@ trace( name + " = " + jsonString );
 		private function onLoadedAction(event:Event):void
 		{
 			_loaded = true;
-			Log.out( "Animation.onLoadedAction - LOADED: " + name );
+			//Log.out( "Animation.onLoadedAction - LOADED: " + name );
 			try 
 			{
 				var jsonString:String = StringUtil.trim( String(event.target.data) );
