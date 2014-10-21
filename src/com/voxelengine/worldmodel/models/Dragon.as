@@ -125,6 +125,7 @@ package com.voxelengine.worldmodel.models
 		
 		override protected function setAnimation():void	{
 			
+			clipVelocityFactor = 0.995;
 			var climbFactor:Number = ( mMaxClimbAngle + instanceInfo.rotationGet.x) / mMaxClimbAngle;
 			if ( onSolidGround )
 			{
@@ -141,7 +142,6 @@ package com.voxelengine.worldmodel.models
 			{
 				updateAnimations( "Fly", 1 - climbFactor );
 				mSpeedMultiplier = 0.35;
-				//clipVelocityFactor = 0.95;
 			}
 			else if ( 15 < instanceInfo.rotationGet.x )
 			{
@@ -152,6 +152,7 @@ package com.voxelengine.worldmodel.models
 			// Be fun to make this have the avatar put their arms out to the side
 			else	
 			{
+				Log.out( "Dragon.setAnimation - else ? forward: " + mForward );
 				clipVelocityFactor = 0.995;
 				if ( mForward )
 				{

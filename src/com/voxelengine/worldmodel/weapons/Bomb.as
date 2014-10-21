@@ -72,7 +72,7 @@ package com.voxelengine.worldmodel.weapons
 		
 		private function bang( center:Vector3D ):void
 		{
-			instanceInfo.dead = true;
+			dead = true;
 			for each ( var script:Script in _instanceInfo.scripts )
 				script.dispose();
 

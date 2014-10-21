@@ -43,7 +43,6 @@ package com.voxelengine.worldmodel.models
 		private var _type:int 							= -1;                           // toJSON - This type overrides a native task type.
 		
 		private var _dynamicObject:Boolean 				= false;						// INSTANCE NOT EXPORTED
-		private var _dead:Boolean 						= false;						// INSTANCE NOT EXPORTED
 		private var _scripts:Vector.<Script> 			= new Vector.<Script>			// INSTANCE NOT EXPORTED
 		private var _controllingModel:VoxelModel 		= null;    						// INSTANCE NOT EXPORTED
 		private var _owner:VoxelModel 					= null;               			// INSTANCE NOT EXPORTED
@@ -63,8 +62,6 @@ package com.voxelengine.worldmodel.models
 		public function get life():Vector3D 						{ return _life; }
 		public function get moveSpeed():Number  					{ return _moveSpeed.val; }
 		public function set moveSpeed(value:Number):void  			{ _moveSpeed.val = value; }
-		public function get dead():Boolean 							{ return _dead; }
-		public function set dead(val:Boolean):void 					{ _dead = val; }
 		public function get dynamicObject():Boolean 				{ return _dynamicObject; }
 		public function set dynamicObject(val:Boolean):void 		{ _dynamicObject = val; }
 		public function get usesCollision():Boolean 				{ return _usesCollision; }
@@ -130,7 +127,7 @@ package com.voxelengine.worldmodel.models
 						grainSize: 		_grainSize,
 						collidable:     _collidable,
 						critical:     	_critical,
-						baseLightLevel: _baseLightLevel
+						baseLightLevel: baseLightLevel
 				};
 			}
 			else {
@@ -148,7 +145,7 @@ package com.voxelengine.worldmodel.models
 						collidable:     _collidable,
 						critical:     	_critical,
 						state:			_state,
-						baseLightLevel: _baseLightLevel
+						baseLightLevel: baseLightLevel
 						};
 			}
 		} 	
@@ -217,7 +214,7 @@ package com.voxelengine.worldmodel.models
 				_repeat = json.repeat;
 				
 			if ( json.baseLightLevel )
-				_baseLightLevel = json.baseLightLevel;
+				baseLightLevel = json.baseLightLevel;
 						
 			//if ( json.modelClass )
 			//	Log.out( "InstanceInfo.initJSON - found modelClass in guid: " + instanceGuid );
@@ -372,7 +369,7 @@ package com.voxelengine.worldmodel.models
 				{
 					if ( ModelTransform.LIFE == trans.type )
 					{
-						owner.instanceInfo.dead = true;
+						owner.dead = true;
 						//Log.out("InstanceInfo.update - marking expired instance as dead: " + instanceGuid );
 						return true;
 					}

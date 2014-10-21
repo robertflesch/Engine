@@ -36,7 +36,7 @@ package com.voxelengine.worldmodel.models
 		override public function release():void 
 		{
 			//Log.out( "Particle.release - guid: " + instanceInfo.instanceGuid );
-			instanceInfo.dead = false;
+			dead = false;
 			ParticlePool.poolDispose( this );
 		}
 		

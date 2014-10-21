@@ -143,14 +143,14 @@ package com.voxelengine.worldmodel.weapons
 		override public function release():void 
 		{
 			//Log.out( "Projectile.release - guid: " + instanceInfo.instanceGuid );
-			instanceInfo.dead = false;
+			dead = false;
 			instanceInfo.removeAllTransforms();
 			ProjectilePool.poolDispose( this );
 		}
 		
 		override public function update( $context:Context3D, $elapsedTimeMS:int):void 
 		{
-			if ( instanceInfo.dead )
+			if ( dead )
 				return;
 				
 			super.update( $context, $elapsedTimeMS );

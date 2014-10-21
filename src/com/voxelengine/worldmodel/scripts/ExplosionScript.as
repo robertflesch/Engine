@@ -27,7 +27,7 @@ public class ExplosionScript extends ImpactScript
 	{
 		var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
 		if ( vm )
-			vm.instanceInfo.dead = true;
+			vm.dead = true;
 		
 		Log.out( "ExplosionScript.impact - at x: " + $wsLoc.x + " y: " + $wsLoc.y + "  z: " + $wsLoc.z );
 		

@@ -27,7 +27,7 @@ public class AcidScript extends ImpactScript
 	{
 		var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
 		if ( vm )
-			vm.instanceInfo.dead = true;
+			vm.dead = true;
 
 		Log.out( "AcidScript.impact - at x: " + $wsLoc.x + " y: " + $wsLoc.y + "  z: " + $wsLoc.z );
 		

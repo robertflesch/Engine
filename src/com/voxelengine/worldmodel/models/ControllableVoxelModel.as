@@ -461,14 +461,16 @@ package com.voxelengine.worldmodel.models
 				
 				// Add in movement factors
 				if ( MouseKeyboardHandler.forward )	{ 
-					if ( instanceInfo.velocityGet.length < mMaxSpeed )
-					{
+					if ( instanceInfo.velocityGet.length < mMaxSpeed ) {
 						instanceInfo.velocitySetComp( vel.x, vel.y, vel.z + speedVal ); 
 						changed = true; 
-						mForward = true; }
+						mForward = true; 
+					}
 				}
-				else	
-					{ mForward = false; }
+				else { 
+					mForward = false; 
+				}
+				
 				if ( MouseKeyboardHandler.backward )	{ instanceInfo.velocitySetComp( vel.x, vel.y, vel.z - speedVal ); changed = true; }
 				if ( MouseKeyboardHandler.leftSlide )	{ instanceInfo.velocitySetComp( vel.x + speedVal, vel.y, vel.z ); changed = true; }
 				if ( MouseKeyboardHandler.rightSlide )	{ instanceInfo.velocitySetComp( vel.x - speedVal, vel.y, vel.z ); changed = true; }

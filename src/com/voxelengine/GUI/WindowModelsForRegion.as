@@ -508,7 +508,7 @@ package com.voxelengine.GUI
 			var models:Dictionary = Globals.modelInstancesGetDictionary();
 			for each ( var vm:VoxelModel in models )
 			{
-				if ( vm && !vm.instanceInfo.dynamicObject && !vm.instanceInfo.dead )
+				if ( vm && !vm.instanceInfo.dynamicObject && !vm.dead )
 				{
 					if ( vm is Player ) {
 						if ( Globals.g_debug )

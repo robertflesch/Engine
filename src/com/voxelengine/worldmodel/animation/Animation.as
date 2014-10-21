@@ -338,8 +338,8 @@ package com.voxelengine.worldmodel.animation
 			initJSON( jsonResult );
 			
 			/// TEST TEST TEST ONLY
-			var ba:ByteArray = new ByteArray();
-			writeToByteArray( ba );
+			//var ba:ByteArray = new ByteArray();
+			//writeToByteArray( ba );
 		}
 		
 		public function importAnimation():void {

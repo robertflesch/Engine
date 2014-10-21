@@ -85,6 +85,7 @@ package com.voxelengine.worldmodel.models
 		protected var 	_selected:Boolean 				= false; // INSTANCE NOT EXPORTED
 		private var 	_onSolidGround:Boolean			= false; // INSTANCE NOT EXPORTED
 		private var 	_keyboardControl:Boolean		= false; // INSTANCE NOT EXPORTED
+		private var 	_dead:Boolean 					= false; // INSTANCE NOT EXPORTED
 		
 		private var 	_usesGravity:Boolean 			= false; // Should be exported/ move to instance
 		private var 	_visible:Boolean 				= true;  // Should be exported/ move to instance
@@ -97,6 +98,26 @@ package com.voxelengine.worldmodel.models
 		
 		public function get metadata():VoxelModelMetadata    		{ return _metadata; }
 		public function set metadata(val:VoxelModelMetadata):void   { _metadata = val; }
+		public function get dead():Boolean 							{ return _dead; }
+		public function set dead(val:Boolean):void 					{ 
+			_dead = val; 
+			
+			if ( Globals.controlledModel && Globals.controlledModel == this )
+				loseControl( Globals.player );
+				
+			if (script)
+			{
+				Globals.g_app.dispatchEvent(new OxelEvent(OxelEvent.DESTROY, instanceInfo.guid));
+			}
+			
+			if (0 < instanceInfo.scripts.length)
+			{
+				for each (var script:Script in instanceInfo.scripts)
+				{
+					script.instanceGuid = instanceInfo.guid;
+				}
+			}
+		}
 
 		public function get usesGravity():Boolean 					{ return _usesGravity; }
 		public function set usesGravity(val:Boolean):void 			{ _usesGravity = val; }
@@ -620,7 +641,7 @@ package com.voxelengine.worldmodel.models
 			
 			for each (var deadCandidate:VoxelModel in _children)
 			{
-				if (true == deadCandidate.instanceInfo.dead)
+				if (true == deadCandidate.dead)
 					childRemove(deadCandidate);
 			}
 			
@@ -691,6 +712,7 @@ package com.voxelengine.worldmodel.models
 				{
 					// Add the parent model info to the child.
 					child.controllingModel = this;
+					child.baseLightLevel = instanceInfo.baseLightLevel;
 					
 					//_modelInfo.removeChild( child );
 					
@@ -772,11 +794,12 @@ package com.voxelengine.worldmodel.models
 		
 		public function childAdd(vm:VoxelModel):void
 		{
+			changed = true;
 			//Log.out(  "-------------- VoxelModel.childAdd - VM: " + vm.toString() );
 			// remove parent level model
 			Globals.changeFromParentToChild(vm);
 			_children.push(vm);
-			vm.instanceInfo.baseLightLevel = instanceInfo.baseLightLevel;
+			//vm.instanceInfo.baseLightLevel = instanceInfo.baseLightLevel;
 			modelInfo.childAdd(vm.instanceInfo);
 		}
 		
@@ -801,6 +824,7 @@ package com.voxelengine.worldmodel.models
 		
 		public function childRemove(vm:VoxelModel):void
 		{
+			changed = true;
 			var index:int = 0;
 			for each (var child:VoxelModel in _children)
 			{
@@ -927,6 +951,7 @@ package com.voxelengine.worldmodel.models
 		{
 			//trace("VoxelModel.release - removing listeners and deleting oxel");
 			
+			
 			if ( metadata.modify )
 			{
 				Globals.g_app.removeEventListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
@@ -943,19 +968,6 @@ package com.voxelengine.worldmodel.models
 			
 			if (editCursor)
 				editCursor.release();
-			
-			if (script)
-			{
-				Globals.g_app.dispatchEvent(new OxelEvent(OxelEvent.DESTROY, instanceInfo.guid));
-			}
-			
-			if (0 < instanceInfo.scripts.length)
-			{
-				for each (var script:Script in instanceInfo.scripts)
-				{
-					script.instanceGuid = instanceInfo.guid;
-				}
-			}
 		}
 		
 		public function removeFromBigDB():void
@@ -1639,10 +1651,10 @@ Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );
 				return; // not all children have loaded yet
 			}
 			
-			Log.out( "VoxelModel.stateSet: " + $state ); 
+			//Log.out( "VoxelModel.stateSet setTo: " + $state + "  current: " + (_anim ? _anim.name : "No current state") ); 
 			if (_anim)
 			{
-				//Log.out( "VoxelModel.stateSet - Stopping anim: " + _anim.name + "  starting: " + $state ); 
+				Log.out( "VoxelModel.stateSet - Stopping anim: " + _anim.name + "  starting: " + $state ); 
 				_anim.stop( this );
 				_anim = null;
 			}
@@ -1681,6 +1693,7 @@ Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );
 //			else
 //				Log.out("VoxelModel.stateSet - addAnimationsInChildren returned false for: " + $state);
 			
+			// if any of the children load, then it succeeds, which is slightly problematic
 			function addAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $useInitializer:Boolean, $val:Number):Boolean
 			{
 				//Log.out( "VoxelModel.checkChildren - have AnimationTransform looking for child : " + $at.attachmentName );

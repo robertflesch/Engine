@@ -41,6 +41,7 @@
 		private var _inventory:Vector.<InventoryObjects> = new Vector.<InventoryObjects>();
 		
 		public function Player( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
+			Log.out( "Player.contruct --------------------------------------------------------------------------------------------------------------------" );
 			super( instanceInfo, mi, $vmm );
 			
 			instanceInfo.usesCollision = true;
@@ -63,6 +64,12 @@
 			//inventoryLoad();
 			torchToggle();
 		}
+		
+		override public function release():void {
+			Log.out( "Player.release --------------------------------------------------------------------------------------------------------------------" );
+			super.release();
+		}
+
 		
 		override protected function onChildAdded( me:ModelEvent ):void
 		{
@@ -268,7 +275,9 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		}
 
 		override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
-			//Log.out( "Player.takeControl" );
+			Log.out( "Player.takeControl --------------------------------------------------------------------------------------------------------------------" );
+						
+
 			super.takeControl( $modelLosingControl, false );
 			instanceInfo.usesCollision = true;
 			// We need to grab the rotation of the old parent, otherwise we get rotated back to 0 since last rotation is 0
@@ -280,7 +289,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 
 		override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void
 		{
-			Log.out( "Player.loseControl" );
+			Log.out( "Player.loseControl--------------------------------------------------------------------------------------------------------------------" );
 			super.loseControl( $modelDetaching, false );
 			instanceInfo.usesCollision = false;
 		}

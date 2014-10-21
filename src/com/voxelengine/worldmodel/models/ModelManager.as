@@ -204,7 +204,7 @@ package com.voxelengine.worldmodel.models
 			var hasDead:Boolean = false;
 			for each ( var vm:VoxelModel in _modelInstances )
 			{
-				if ( vm && true == vm.instanceInfo.dead )
+				if ( vm && true == vm.dead )
 				{
 					hasDead = true;
 					// This seems like a REALLY bad idea.
@@ -216,26 +216,30 @@ package com.voxelengine.worldmodel.models
 			if ( hasDead )
 			{
 				_modelInstances = clearDictionaryOfNullsAndDead( _modelInstances );
-				_instanceDictionary = clearInstanceInfoOfNullsAndDead( _instanceDictionary );
+				//_instanceDictionary = clearInstanceInfoOfNullsAndDead( _instanceDictionary );
 			}
 		}
 		
 		public function removeAllModelInstances( $removePlayer:Boolean = false ):void {
-			Log.out( "ModelManager.removeAllModelInstances - Should this remove the player since it is now unique?" );
 			// clear out old models
 			for each ( var vm:VoxelModel in _modelInstances )
 			{
 				if ( vm )
 				{
-					if (vm is Player)
+					if (vm is Player) {
 						if ( !$removePlayer )
 							continue;
 						else {
-							Globals.player.loseControl( vm );
-							Globals.player = null;
+							Log.out( "ModelManager.removeAllModelInstances - Removing player" );
+							//Globals.player.loseControl( vm );
+							//Globals.player = null;
+							markDead( vm.instanceInfo.guid );
 						}
-					trace( "ModelManager.removeAllModelInstances - marking as dead: " + vm.instanceInfo.guid );
-					markDead( vm.instanceInfo.guid );
+					}
+					else {
+						Log.out( "ModelManager.removeAllModelInstances - marking as dead: " + vm.instanceInfo.guid );
+						markDead( vm.instanceInfo.guid );
+					}
 				}
 			}
 			
@@ -305,7 +309,7 @@ package com.voxelengine.worldmodel.models
 			if ( vm )
 			{
 				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, vm.instanceInfo.guid ) );
-				vm.instanceInfo.dead = true;
+				vm.dead = true;
 			}
 		}
 
@@ -313,7 +317,7 @@ package com.voxelengine.worldmodel.models
 			var hasDead:Boolean = false;
 			for each ( var vm:VoxelModel in _modelDynamicInstances )
 			{
-				if ( vm && true == vm.instanceInfo.dead )
+				if ( vm && true == vm.dead )
 				{
 					hasDead = true;
 					break;
@@ -326,7 +330,7 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 			
-		
+		/*
 		private function clearInstanceInfoOfNullsAndDead( oldDic:Dictionary ):Dictionary {
 			var tempDic:Dictionary = new Dictionary(true);
 			for each ( var instance:InstanceInfo in oldDic )
@@ -347,6 +351,7 @@ package com.voxelengine.worldmodel.models
 			oldDic = null;
 			return tempDic;
 		}
+		*/
 		
 		private function countDict( oldDic:Dictionary ):int {
 			var count:int = 0;
@@ -363,7 +368,7 @@ package com.voxelengine.worldmodel.models
 			for each ( var instance:VoxelModel in oldDic )
 			{
 				// If its marked dead release it
-				if ( instance && true == instance.instanceInfo.dead )
+				if ( instance && true == instance.dead )
 				{
 					oldDic[instance.instanceInfo.guid] = null;
 					instance.release();
@@ -431,9 +436,11 @@ package com.voxelengine.worldmodel.models
 			//Log.out("ModelManager.createPlayer" );
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			if ( Globals.online ) {
+				Log.out( "ModelManager.createPlayer - creating from database" );
 				Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
 			}
 			else {
+				Log.out( "ModelManager.createPlayer - creating from LOCAL" );
 				instanceInfo.guid = "player";
 				instanceInfo.grainSize = 4;
 				ModelLoader.load( instanceInfo );
