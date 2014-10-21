@@ -334,6 +334,7 @@ package com.voxelengine.GUI
 //			Globals.g_app.stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
 			
 			Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControl.handleModelEvents );
+			Globals.g_app.addEventListener(ModelEvent.RELEASE_CONTROL, WindowBeastControl.handleModelEvents );
 			Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
 			Globals.g_app.addEventListener(LoginEvent.JOIN_ROOM_FAILURE, joinRoomFailureHandler );
 		}

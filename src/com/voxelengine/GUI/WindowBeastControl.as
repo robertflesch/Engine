@@ -46,6 +46,12 @@ package com.voxelengine.GUI
 				if ( classCalled != "com.voxelengine.worldmodel.models::Player" )
 					new WindowBeastControl( $me.instanceGuid );
 			}
+			else if ( ModelEvent.RELEASE_CONTROL == $me.type ) {
+				if ( _s_currentInstance ) {
+					_s_currentInstance.remove();
+					_s_currentInstance = null;
+				}
+			}
 		}
 		
 		public function WindowBeastControl( $beastInstanceGuid:String ):void 
