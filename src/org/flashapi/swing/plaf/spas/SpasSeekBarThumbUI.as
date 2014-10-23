@@ -210,6 +210,8 @@ package org.flashapi.swing.plaf.spas {
 		}
 		
 		private function drawSpasEffect(target:Sprite, w:Number, lineColor1:uint, cu:LafDTOCornerUtil, middle:Number):void {
+			// This draws a VERY annoying line down the middle of the panel
+			return;
 			with(target.graphics) {
 				moveTo(cu.topLeft, 0);
 				lineStyle(0, lineColor1, 0);

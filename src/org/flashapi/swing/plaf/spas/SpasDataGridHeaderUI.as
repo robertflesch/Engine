@@ -212,6 +212,8 @@ package org.flashapi.swing.plaf.spas {
 		}
 		
 		private function drawSpasEffect(tgt:Sprite, w:Number, middle:Number, bch:Number):void {
+			// This draws a VERY annoying line down the middle of the panel
+			return;
 			with(tgt.graphics) {
 				moveTo(0, 0);
 				beginFill(0xFFFFFF, .2);

@@ -324,6 +324,8 @@ package org.flashapi.swing.plaf.spas {
 		}
 		
 		private function drawSpasEffect(tgt:Sprite, r:Number, offset:Number):void {
+			// This draws a VERY annoying line down the middle of the panel
+			return;
 			var m:Matrix = MatrixUtil.getMatrix(2*r, r, Math.PI / 2);
 			with (tgt.graphics) {
 				lineStyle(0, 0, 0);

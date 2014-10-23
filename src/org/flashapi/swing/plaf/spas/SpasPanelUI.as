@@ -114,15 +114,17 @@ package org.flashapi.swing.plaf.spas {
 				var m:Matrix = MatrixUtil.getMatrix(w, h);
 				var color2:RGB = new RGB(c);
 				f.clear();
-				f.beginGradientFill(GradientType.LINEAR, [color2.darker(), c], [a, a], [0, 250], m);
-				f.lineStyle(1, dto.borderColor, .5, true);
-				//p.lineGradientStyle(GradientType.LINEAR, [0x969696, 0x505050], [1, 1], [0, 250], m);
-				f.drawRoundedBox(0, 0,w, h, cu.topLeft, cu.topRight, cu.bottomRight, cu.bottomLeft);
+				//f.beginGradientFill(GradientType.LINEAR, [color2.darker(), c], [a, a], [0, 250], m);
+				f.lineStyle(2, dto.borderColor, .5, true);
+				f.drawRoundedBox(0, 0, w, h, cu.topLeft, cu.topRight, cu.bottomRight, cu.bottomLeft);
 				drawSpasEffect(w, tlc, trc, h / 2, PANEL_CURVE_HEIGHT);
 			}
 		}
 		
 		private function drawSpasEffect(w:Number, tlc:Number, trc:Number, curveMiddle:Number, pch:Number):void {
+			// This draws a VERY annoying line down the middle of the panel
+			return;
+			
 			with(dto.currentTarget.graphics) {
 				moveTo(tlc, 0);
 				lineStyle(0, 0x969696, 0);
