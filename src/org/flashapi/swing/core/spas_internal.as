@@ -40,5 +40,6 @@ package org.flashapi.swing.core {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public namespace spas_internal = "http://www.flashapi.org/spas/internal";
+	//public namespace spas_internal = "http://www.flashapi.org/spas/internal";
+	public namespace spas_internal = "http://www.doesthisurlmatter.org/";
 }
