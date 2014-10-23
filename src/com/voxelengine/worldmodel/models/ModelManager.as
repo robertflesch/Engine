@@ -193,6 +193,10 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		public function save():void {
+			
+			if ( !Globals.online )
+				return;
+			
 			// check all models to see if they have changed, if so save them to server.
 			for each ( var vm:VoxelModel in _modelInstances )
 			{
