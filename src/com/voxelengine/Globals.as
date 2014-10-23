@@ -275,6 +275,8 @@ package com.voxelengine {
 		
 		public static const MODE_PUBLIC:String = "Public";
 		public static const MODE_PRIVATE:String = "Private";
+		public static const MODE_MANAGE:String = "Manage";
+		
 		
 		private static var g_mode:String = MODE_PUBLIC;
 		public static function get mode():String { return g_mode }

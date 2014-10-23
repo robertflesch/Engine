@@ -22,6 +22,7 @@ package com.voxelengine.GUI
 	import org.flashapi.swing.event.UIOEvent;
 	import org.flashapi.swing.Label;
 	import org.flashapi.swing.Popup;
+	import org.flashapi.swing.framework.FDTrace; // Allows FlashDevelop to trace
 	
 	import org.flashapi.swing.UIManager;
 	
@@ -325,6 +326,7 @@ package com.voxelengine.GUI
 		public function init():void
 		{
             UIManager.initialize( Globals.g_app.stage );
+			UIManager.debugger = new FDTrace();
 			Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_BEGUN, onRegionLoadingComplete );
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 			Globals.g_app.addEventListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );

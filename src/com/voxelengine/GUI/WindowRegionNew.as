@@ -1,136 +1,115 @@
 
 package com.voxelengine.GUI 
 {
-import com.voxelengine.events.LoginEvent;
-import com.voxelengine.events.RegionEvent;
-import com.voxelengine.events.RegionLoadedEvent;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.Region;
-import flash.display.DisplayObjectContainer;
-import org.flashapi.swing.*;
-import org.flashapi.swing.core.UIDescriptor;
-import org.flashapi.swing.event.*;
-import org.flashapi.swing.constants.*;
-import org.flashapi.swing.list.ListItem;
+import flash.geom.Vector3D;
 import flash.events.Event;
+import flash.display.Bitmap;
 
-import org.flashapi.collector.EventCollector;
 import org.flashapi.swing.*
 import org.flashapi.swing.core.UIObject;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.list.ListItem;
 import org.flashapi.swing.constants.BorderStyle;
-import org.flashapi.swing.dnd.*;
 import org.flashapi.swing.button.RadioButtonGroup;
 import org.flashapi.swing.databinding.DataProvider;
+import org.flashapi.swing.containers.*;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
+import com.voxelengine.events.RegionLoadedEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.Region;
 
 public class WindowRegionNew extends VVPopup
 {
+	private static const PADDING:int = 15;
 	private static const WIDTH:int = 300;
 	private static const BORDER_WIDTH:int = 4;
 	private static const BORDER_WIDTH_2:int = BORDER_WIDTH * 2;
-	private static const BORDER_WIDTH_3:int = BORDER_WIDTH * 3;
 	private static const BORDER_WIDTH_4:int = BORDER_WIDTH * 4;
 	
-	private var _region:Region = null;
-	private var _rbGroup:RadioButtonGroup = null;
-	private var _rbPPGroup:RadioButtonGroup = null;
+	private var _region:Region;
+	private var _rbGroup:RadioButtonGroup;
+	private var _rbPPGroup:RadioButtonGroup;
+	private var _create:Boolean;
 	
-		//DONE private var _name:String = "Some Friendly Name";
-		//DONE private var _desc:String = "Tell me about it";
-		//HM...private var _worldId:String = "VoxelVerse";
-		//DONE private var _regionId:String = DEFAULT_REGION_ID;
-		//Hm...private var _template:String = DEFAULT_REGION_ID;
-		//Hm...private var _owner:String;
-		//Hm...private var _editors:Vector.<String> = new Vector.<String>() //{ user Id1:role, user id2:role... }
-		//Hm...private var _admin:Vector.<String> = new Vector.<String>() // : { user Id1:role, user id2:role... }
-		//DONE private var _created:Date;
-		//DONE private var _modified:Date;
-		//private var _data:String;
-		//private var _regionObject:Object;
-		//private var _databaseObject:DatabaseObject  = null;							// INSTANCE NOT EXPORTED
-		//private var _changed:Boolean = false;
-		//private var _currentRegion:Boolean = true;
-        //private var _changeTimer:Timer;
+	private var _background:Bitmap;
+	[Embed(source='../../../../../Resources/bin/assets/textures/black.jpg')]
+	private var _backgroundImage:Class;
 	
-	
-	public function WindowRegionNew()
+	public function WindowRegionNew( $region:Region )
 	{
-		super( "New Region" );
+		var title:String;
+		if ( $region ) 	title = "Edit Region";
+		else			title = "New Region";
+		super( title );	
+		
+		_background = (new _backgroundImage() as Bitmap);
+		//texture = _background;
+		//backgroundTexture = _background;
+
 		autoSize = true;
 		layout.orientation = LayoutOrientation.VERTICAL;
-		//closeButtonEnabled = false;
-		closeButtonActive = false;
-		//_modalObj = new ModalObject( this );
+		//closeButtonEnabled = false; // this show it enabled, but doesnt allow it to be clicked
+		//closeButtonActive = false;  // this greys it out, and doesnt allow it to be clicked
 		
-		_region = new Region( Globals.getUID() );
-		_region.createEmptyRegion();
-		_region.owner = Network.PUBLIC;
-		_region.gravity = true;
-		_region.name = Network.userId + "-" + int( Math.random() * 1000 );
-		_region.desc = "Please enter something meaningful here";
-		_region.changed = true;
-		_region.admin.push( Network.userId );
-		_region.editors.push( Network.userId );
+		if ( $region ) {
+			_region = $region;
+		}
+		else {
+			_create = true
+			_region = new Region( Globals.getUID() );
+			_region.createEmptyRegion();
+			_region.owner = Network.PUBLIC;
+			_region.gravity = true;
+			_region.name = Network.userId + "-" + int( Math.random() * 1000 );
+			_region.desc = "Please enter something meaningful here";
+			_region.changed = true;
+			_region.admin.push( Network.userId );
+			_region.editors.push( Network.userId );
+		}
 
-//		addElement( new Label( "ID: " + _region.regionId ) );
-//		addElement( new Label( "Gravity" ) );
-
-		_rbPPGroup = new RadioButtonGroup( this );
-		var radioButtonsPP:DataProvider = new DataProvider();
-		radioButtonsPP.addAll( { label:Globals.MODE_PUBLIC }, { label:Globals.MODE_PRIVATE } );
-		if ( Network.PUBLIC == _region.owner )
-			_rbPPGroup.index = 0;
-		else 	
-			_rbPPGroup.index = 1;
-
-		eventCollector.addEvent( _rbPPGroup, ButtonsGroupEvent.GROUP_CHANGED
-		                       , function (event:ButtonsGroupEvent):void 
-							   {  _region.owner = (0 == event.target.index ?  Network.PUBLIC : Network.userId ) } );
-		_rbPPGroup.dataProvider = radioButtonsPP;
-		_rbPPGroup.index = 0;
+		addElement( new Spacer( WIDTH, 10 ) );
+		addElement( new ComponentTextInput( "Name", changeNameHandler, _region.name, WIDTH ) );
+		addElement( new ComponentTextArea( "Desc", changeDescHandler, _region.desc ? _region.desc : "No Description", WIDTH ) );
 		
-		addLabel( this, "Name:", changeNameHandler, _region.name );
-		addElement( new Label( "Description" ) );
-		addTextArea( this, "Desc:", changeDescHandler, _region.desc );
+		var ownerArray:Array = [ { label:Globals.MODE_PUBLIC }, { label:Globals.MODE_PRIVATE } ];
+		addElement( new ComponentRadioButtonGroup( "Owner", ownerArray, ownerChange, Network.PUBLIC == _region.owner ? 0 : 1, WIDTH ) );
+		var gravArray:Array = [ { label:"Use Gravity" }, { label:"NO Gravity. " } ];
+		addElement( new ComponentRadioButtonGroup( "Gravity", gravArray, gravChange,  _region.gravity ? 0 : 1, WIDTH ) );
 		
-		_rbGroup = new RadioButtonGroup( this );
-		var radioButtons:DataProvider = new DataProvider();
-		radioButtons.addAll( { label:"Use Gravity" }, { label:"NO Gravity. " } );
-		if ( _region.gravity )
-			_rbGroup.index = 0;
-		else 	
-			_rbGroup.index = 1;
-
-		eventCollector.addEvent( _rbGroup, ButtonsGroupEvent.GROUP_CHANGED
-		                       , function (event:ButtonsGroupEvent):void 
-							   {  _region.gravity = (0 == event.target.index ?  true : false) } );
-		_rbGroup.dataProvider = radioButtons;
-		_rbGroup.index = 0;
+		var playerStartingPosition:ComponentVector3D = new ComponentVector3D( "Player Starting Location", "X: ", "Y: ", "Z: ",  _region.playerPosition );
+		addElement( playerStartingPosition );
 		
+		var playerStartingRotation:ComponentVector3D = new ComponentVector3D( "Player Starting Rotation", "X: ", "Y: ", "Z: ",  _region.playerRotation );
+		addElement( playerStartingRotation );
+		
+		var skyColor:ComponentVector3D = new ComponentVector3D( "Sky Color", "Red: ", "Green: ", "Blue: ",  _region.getSkyColor() );
+		addElement( skyColor );
+		
+		/// Buttons /////////////////////////////////////////////
 		var buttonPanel:Container = new Container( WIDTH, 40 );
-		
-		 var createRegionButton:Button = new Button( "Create" );
-		eventCollector.addEvent( createRegionButton , UIMouseEvent.CLICK
-							   ,create );
-		buttonPanel.addElement( createRegionButton );
+		buttonPanel.padding = 2;
 
-		 var cancelRegionButton:Button = new Button( "Cancel" );
-		eventCollector.addEvent( cancelRegionButton , UIMouseEvent.CLICK
-							   , cancel );
-		buttonPanel.addElement( cancelRegionButton );
-	
+		var _createRegionButton:Button;
+		if ( _create )
+			_createRegionButton = new Button( "Create", WIDTH - 10 );
+		else
+			_createRegionButton = new Button( "Save", WIDTH - 10 );
+		eventCollector.addEvent( _createRegionButton , UIMouseEvent.CLICK ,create );
+		buttonPanel.addElement( _createRegionButton );
+
+//		var cancelRegionButton:Button = new Button( "Cancel" );
+//		eventCollector.addEvent( cancelRegionButton , UIMouseEvent.CLICK, cancel );
+//		buttonPanel.addElement( cancelRegionButton );
 		addElement( buttonPanel );
+		/// Buttons /////////////////////////////////////////////
+		defaultCloseOperation = ClosableProperties.DO_NOTHING_ON_CLOSE;
 		
-		
+		$evtColl.addEvent( this, WindowEvent.CLOSE_BUTTON_CLICKED, cancel );
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
-		eventCollector.addEvent( this, UIMouseEvent.CLICK, windowClick );
 		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
-		eventCollector.addEvent( this, UIMouseEvent.PRESS, pressWindow );
 		
 		// This auto centers
 		//_modalObj.display();
@@ -140,26 +119,23 @@ public class WindowRegionNew extends VVPopup
 	}
 	
 	private function create( e:UIMouseEvent ):void {
-		Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, _region ) );
+		
+		if ( _create )
+			Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, _region ) );
+		else {
+			_region.saveEdit();
+		}
+			
+		remove();
+		new WindowSandboxList();
+	}
+	
+	private function cancel( e:WindowEvent ):void {
 		
 		remove();
 		new WindowSandboxList();
 	}
 	
-	private function cancel( e:UIMouseEvent ):void {
-		
-		remove();
-		new WindowSandboxList();
-	}
-	
-	private function pressWindow(e:UIMouseEvent):void
-	{
-		//Log.out( "WindowInventory.pressWindow" );
-	}
-	private function windowClick(e:UIMouseEvent):void
-	{
-		//Log.out( "WindowInventory.windowClick" );
-	}
 	protected function onResize(event:Event):void
 	{
 		move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
@@ -170,6 +146,14 @@ public class WindowRegionNew extends VVPopup
 //			removeEventListener(UIOEvent.REMOVED, onRemoved );
 		eventCollector.removeAllEvents();
 	}
+
+	private function gravChange(event:ButtonsGroupEvent):void {  
+		_region.gravity = (0 == event.target.index ?  true : false );
+	} 
+	
+	private function ownerChange(event:ButtonsGroupEvent):void {  
+		_region.owner = (0 == event.target.index ?  Network.PUBLIC : Network.userId );
+	} 
 	
 	private function changeNameHandler(event:TextEvent):void
 	{
@@ -181,55 +165,6 @@ public class WindowRegionNew extends VVPopup
 		_region.desc = event.target.text;
 	}
 	
-	private function addLabel( parentPanel:UIContainer, label:String, changeHandler:Function, initialValue:String, inputEnabled:Boolean = false ):LabelInput
-	{
-		var li:LabelInput = new LabelInput( label, initialValue );
-		li.labelControl.width = 40;
-		li.editableText.width = 150;
-		if ( null != changeHandler )
-			li.editableText.addEventListener( TextEvent.EDITED, changeHandler );
-		else
-		{
-			li.editableText.editable = false;
-			li.editableText.fontColor = 0x888888;
-		}
 
-		var myWidth:int = li.width + BORDER_WIDTH_4 + BORDER_WIDTH_2;
-		var myHeight:int = li.height + BORDER_WIDTH_4;
-		var panel:Panel = new Panel( myWidth, myHeight );
-		panel.addElement( li );
-		panel.borderWidth = BORDER_WIDTH;
-		parentPanel.addElement( panel );
-		//_calculatedWidth = Math.max( myWidth, _calculatedWidth );
-		
-		return li;
-	}
-
-	import org.flashapi.swing.containers.UIContainer;
-	private function addTextArea( parentPanel:UIContainer, label:String, changeHandler:Function, initialValue:String, inputEnabled:Boolean = false ):TextArea
-	{
-		var li:TextArea = new TextArea();
-//		li.labelControl.width = 120;
-		li.appendText( initialValue );
-		li.width = 250;
-		if ( null != changeHandler )
-			li.addEventListener( TextEvent.EDITED, changeHandler );
-			
-		//else
-		//{
-			//li.editableText.editable = false;
-			//li.editableText.fontColor = 0x888888;
-		//}
-
-		var myWidth:int = li.width + BORDER_WIDTH_4 + BORDER_WIDTH_2;
-		var myHeight:int = li.height + BORDER_WIDTH_4;
-		var panel:Panel = new Panel( myWidth, myHeight );
-		panel.addElement( li );
-		panel.borderWidth = BORDER_WIDTH;
-		parentPanel.addElement( panel );
-		//_calculatedWidth = Math.max( myWidth, _calculatedWidth );
-		
-		return li;
-	}	
 }
 }

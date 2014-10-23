@@ -2,6 +2,7 @@
 package com.voxelengine.server
 {
 	import flash.events.Event;
+	import flash.display.Bitmap;
 	
 	import org.flashapi.swing.*;
 	import org.flashapi.swing.button.ButtonGroup;
@@ -28,13 +29,24 @@ package com.voxelengine.server
 		private var _password:String;
 		private var _result:Text;
 
+		private var _background:Bitmap;
+		[Embed(source='../../../../../Resources/bin/assets/textures/black.jpg')]
+		private var _backgroundImage:Class;
+		
 		public function WindowLogin( email:String = "bob@me.com", password:String = "bob" )
 		{
 			super( "Login" );
             autoSize = true;
-			//width = 300;
-			//height = 300;
+			width = 300;
+			height = 800;
 			layout.orientation = LayoutOrientation.VERTICAL;
+			
+			_background = (new _backgroundImage() as Bitmap);
+			//backgroundTexture = _background;
+			//texture = _background;
+			
+			var infoPanel:Panel = new Panel( width, 200 );
+			infoPanel.layout.orientation = LayoutOrientation.VERTICAL;
 			
 			_email = email;
 			_emailInput = new LabelInput( "email", _email );
@@ -42,7 +54,7 @@ package com.voxelengine.server
 			_emailInput.editableText.addEventListener( TextEvent.EDITED, 
 				function( event:TextEvent ):void 
 				{ _email = event.target.text; } );
-			addElement( _emailInput );
+			infoPanel.addElement( _emailInput );
 			
 			_password = password;
 			_passwordInput = new LabelInput( "Password", _password );
@@ -50,25 +62,26 @@ package com.voxelengine.server
 			_passwordInput.editableText.addEventListener( TextEvent.EDITED, 
 				function( event:TextEvent ):void 
 				{ _password = event.target.text; } );
-			addElement( _passwordInput );
+			infoPanel.addElement( _passwordInput );
+			addElement( infoPanel );
 			
+			var buttonPanel:Panel = new Panel( width, 40 );
 			//var buttonPanel:Panel = new Panel( 200, 30 );
 			var loginButton:Button = new Button( "Login" );
 			loginButton.addEventListener(UIMouseEvent.CLICK, loginButtonHandler );
-			addElement( loginButton );
+			buttonPanel.addElement( loginButton );
 			
 			var registerButton:Button = new Button( "Register" );
 			registerButton.addEventListener(UIMouseEvent.CLICK, registerButtonHandler );
-			addElement( registerButton );
+			buttonPanel.addElement( registerButton );
+			addElement( buttonPanel );
 			
-			_result = new Text(200, 30);
-			_result.textAlign = TextAlign.CENTER;
-			_result.textFormat.size = 16;
-			var my_SVGCK:SVGCK = new SVGCK("orangered");
-			_result.textFormat.color = my_SVGCK;
-			addElement( _result );
-			
-			//addElement( buttonPanel );
+			//_result = new Text(200, 30);
+			//_result.textAlign = TextAlign.CENTER;
+			//_result.textFormat.size = 16;
+			//var my_SVGCK:SVGCK = new SVGCK("orangered");
+			//_result.textFormat.color = my_SVGCK;
+			//addElement( _result );
 			
 			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
 			
