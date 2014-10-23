@@ -100,19 +100,19 @@ package com.voxelengine.worldmodel
 		private var _created:Date;
 		private var _modified:Date;
 		private var _JSON:Object;
-		private var _databaseObject:DatabaseObject  = null;							// INSTANCE NOT EXPORTED
-		private var _changed:Boolean;
+		private var _databaseObject:DatabaseObject  = null;							
+		private var _changed:Boolean;								// INSTANCE NOT EXPORTED
 		private var _playerPosition:Vector3D = new Vector3D();
 		private var _playerRotation:Vector3D = new Vector3D();
-		private var _loaded:Boolean = true;
+		private var _loaded:Boolean = true;							// INSTANCE NOT EXPORTED
 		private var _guestAllow:Boolean = true;
 		private var _modelManager:ModelManager = new ModelManager();
+		private var _skyColor:Vector3D = new Vector3D(92, 	172, 	238);
+		private var _gravity:Boolean = true;
 
 		public function get databaseObject():DatabaseObject { return _databaseObject; }
 		public function set databaseObject(val:DatabaseObject):void { _databaseObject = val; }
 		
-		private var _skyColor:Vector3D = new Vector3D(92, 	172, 	238);
-		private var _gravity:Boolean = true;
 		
 		public function get worldId():String { return _worldId; }
 		public function set worldId(val:String):void { _worldId = val; }
@@ -237,8 +237,13 @@ package com.voxelengine.worldmodel
 		{
 			//Log.out( "Region.processRegionJson: " + $regionJson );
 			_JSON = JSON.parse($regionJson);
-			if ( _JSON.skyColor )
-				setSkyColor( _JSON.skyColor.r, _JSON.skyColor.g, _JSON.skyColor.b );
+			if ( _JSON.skyColor ) {
+				// legacy < v008 has rgb values
+				if ( _JSON.skyColor.r )
+					setSkyColor( _JSON.skyColor.r, _JSON.skyColor.g, _JSON.skyColor.b );
+				else	
+					_skyColor.setTo( _JSON.skyColor.x, _JSON.skyColor.y, _JSON.skyColor.z );
+			}
 				
 			if ( _JSON.name && "" == _name )
 				_name = _JSON.name;
@@ -261,7 +266,7 @@ package com.voxelengine.worldmodel
 				_playerPosition.setTo( _JSON.playerPosition.x, _JSON.playerPosition.y, _JSON.playerPosition.z );
 			
 			if ( _JSON.playerRotation )
-				_playerRotation.setTo( 0, _JSON.playerRotation, 0 );
+				_playerRotation.setTo( 0, _JSON.playerRotation.y, 0 );
 		}
 		
 		public function toString():String {
@@ -284,20 +289,15 @@ package com.voxelengine.worldmodel
 			outString = _modelManager.getModelJson(outString);
 			outString += "],"
 			// if you dont do it this way, there is a null at begining of string
-			outString += "\"skyColor\": {" + "\"r\":" + _skyColor.x  + ",\"g\":" + _skyColor.y + ",\"b\":" + _skyColor.z + "}";
+			outString += "\"skyColor\":" + JSON.stringify( _skyColor );
+			outString += ","
+			outString += "\"playerPosition\":" + JSON.stringify( _playerPosition );
+			outString += ","
+			outString += "\"playerRotation\":" + JSON.stringify( _playerRotation );
 			outString += ","
 			outString += "\"gravity\":" + JSON.stringify(gravity);
 			outString += "}"
 			return outString;
-		}
-
-		
-		public function saveLocal():void 
-		{
-			var fr:FileReference = new FileReference();
-			_modified = new Date();
-			var outString:String = getJSON();
-			fr.save( outString, guid );
 		}
 		
 		// TO do I dont like that I have reference to BigDB here
@@ -322,36 +322,70 @@ package com.voxelengine.worldmodel
 			Log.out( "Region.save - saving changes to Persistance: " + guid ); 
 			var ba:ByteArray = new ByteArray();
 			ba.clear();
-			writeToByteArray( ba );
+			var regionJson:String = getJSON();
+			ba.writeInt( regionJson.length );
+			ba.writeUTFBytes( regionJson );
+			ba.compress();
 			
 			PersistRegion.saveRegion( metadata( ba ), databaseObject, createSuccess );
 
 			changed = false;
-			
-			function metadata( ba: ByteArray ):Object {
-				Log.out( "Region.metadata userId: " + Network.userId + "  this region is owned by: " + _owner );
-				return {
-						admin: GetAdminList(),
-						created: _created ? _created : new Date(),
-						data: ba,
-						description: _desc,
-						guid: guid,
-						editors: GetEditorsList(),
-						modified: _modified,
-						name: _name,
-						owner:  _owner,
-						world: _worldId
-						};
-			}
-			
-			function writeToByteArray( ba:ByteArray ):void {
-				var regionJson:String = getJSON();
-				ba.writeInt( regionJson.length );
-				ba.writeUTFBytes( regionJson );
-				ba.compress();
-			}
 		}
 		
+		// TO do I dont like that I have reference to BigDB here
+		// this should all get refactored out to be part of the Persistance Object
+		public function saveEdit():void 
+		{
+			// dont save changes to anything if we are not online
+			if ( !Globals.online )
+				return;
+				
+			if ( !Globals.isGuid( guid ) ) {
+				Log.out( "Region.saveEdit - INVALID REGION DATA", Log.ERROR ); 
+				return;
+			}
+				
+			Log.out( "Region.saveEdit - saving changes to Persistance: " + guid ); 
+			var ba:ByteArray = new ByteArray();
+			ba.clear();
+			// Lets see if this updates the _JSON object.
+			_JSON.playerPosition = _playerPosition;
+			_JSON.playerRotation = _playerRotation;
+			_JSON.skyColor = _skyColor;
+			_JSON.gravity = _gravity;
+			
+			var regionJson:String = JSON.stringify(_JSON);
+			ba.writeInt( regionJson.length );
+			ba.writeUTFBytes( regionJson );
+			ba.compress();
+			
+			PersistRegion.saveRegion( metadata( ba ), databaseObject, createSuccess );
+
+			changed = false;
+		}
+
+		public function saveLocal():void {
+			var fr:FileReference = new FileReference();
+			_modified = new Date();
+			var outString:String = getJSON();
+			fr.save( outString, guid );
+		}
+		
+		private function metadata( ba: ByteArray ):Object {
+			Log.out( "Region.metadata userId: " + Network.userId + "  this region is owned by: " + _owner );
+			return {
+					admin: 			GetAdminList(),
+					created: 		_created ? _created : new Date(),
+					data: 			ba,
+					description: 	_desc,
+					guid: 			guid,
+					editors: 		GetEditorsList(),
+					name: 			_name,
+					owner:  		_owner,
+					world: 			_worldId
+					};
+		}
+
 		private function createSuccess(o:DatabaseObject):void 
 		{ 
 			if ( o )
