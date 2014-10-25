@@ -212,10 +212,6 @@ package com.voxelengine {
 		public static function seed():int { return g_seed; }
 		public static function seedSet( val:int ):void { g_seed = val; }
 		
-		private static var g_GUIControl:Boolean = false;
-		public static function get GUIControl():Boolean{ return g_GUIControl; }
-		public static function set GUIControl( val:Boolean ):void { g_GUIControl = val; }
-		
 		private static var g_active:Boolean = false; // app is active
 		public static function get active():Boolean{ return g_active; }
 		public static function set active( val:Boolean ):void  { g_active = val; }
