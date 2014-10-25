@@ -37,19 +37,5 @@ package com.voxelengine.GUI
 			Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 		}
-
-			
-		// Window events
-		private function onRemoved( event:UIOEvent ):void
- 		{
-            Globals.g_app.stage.removeEventListener(Event.RESIZE, onResize);
-			removeEventListener(UIOEvent.REMOVED, onRemoved );
-		}
-		
-        protected function onResize(event:Event):void
-        {
-			move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
-		}
-
 	}
 }

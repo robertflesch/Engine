@@ -58,12 +58,6 @@ package com.voxelengine.GUI
 			move( Globals.g_renderer.width / 2 - width / 2, Globals.g_renderer.height / 2 - height / 2 );
 		}
 
-		private function onRemoved( event:UIOEvent ):void 
-		{
-			//Log.out( "WindowInventory.onRemoved" );
-			eventCollector.removeAllEvents();
-		}
-			
 		private function dropMaterial(e:DnDEvent):void 
 		{
 			//Log.out( "WindowInventory.dropMaterial" );

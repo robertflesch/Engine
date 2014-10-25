@@ -117,11 +117,6 @@ public class WindowModelMetadata extends VVPopup
 							   //, function( e:UIMouseEvent ):void { remove(); } );
 		//addElement( cancelButton );
 
-		eventCollector.addEvent( this, Event.RESIZE, onResize );
-		eventCollector.addEvent( this, UIMouseEvent.CLICK, windowClick );
-		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
-		eventCollector.addEvent( this, UIMouseEvent.PRESS, pressWindow );
-		
 		// This auto centers
 		display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
 	}
@@ -134,24 +129,6 @@ public class WindowModelMetadata extends VVPopup
 		_vmm.modifiedDate = new Date();
 		Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_COLLECTED, _vmm ) );
 		remove();
-	}
-	
-	private function pressWindow(e:UIMouseEvent):void
-	{
-	}
-	
-	private function windowClick(e:UIMouseEvent):void
-	{
-	}
-	
-	protected function onResize(event:Event):void
-	{
-		move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
-	}
-	
-	private function onRemoved( event:UIOEvent ):void
-	{
-		eventCollector.removeAllEvents();
 	}
 }
 }

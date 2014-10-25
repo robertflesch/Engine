@@ -107,18 +107,8 @@ public class WindowSandboxList extends VVPopup
 		displaySelectedRegionList( e.target.value );	
 	}
 	
-	protected function onResize(event:Event):void
-	{
-		move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
-	}
-	
-	// Window events
-	private function onRemoved( event:UIOEvent ):void
-	{
-		Globals.g_app.stage.removeEventListener(Event.RESIZE, onResize);
-		Globals.g_app.removeEventListener( RegionLoadedEvent.REGION_LOADED, regionLoadedEvent );
-
-		eventCollector.removeAllEvents();
+	override protected function onRemoved( event:UIOEvent ):void {
+		super.onRemoved( event );
 		_s_currentInstance = null;
 	}
 	

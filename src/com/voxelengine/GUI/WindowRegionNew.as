@@ -34,9 +34,9 @@ public class WindowRegionNew extends VVPopup
 	private var _rbPPGroup:RadioButtonGroup;
 	private var _create:Boolean;
 	
-	private var _background:Bitmap;
-	[Embed(source='../../../../../Resources/bin/assets/textures/black.jpg')]
-	private var _backgroundImage:Class;
+	//private var _background:Bitmap;
+	//[Embed(source='../../../../../Resources/bin/assets/textures/black.jpg')]
+	//private var _backgroundImage:Class;
 	
 	public function WindowRegionNew( $region:Region )
 	{
@@ -45,7 +45,7 @@ public class WindowRegionNew extends VVPopup
 		else			title = "New Region";
 		super( title );	
 		
-		_background = (new _backgroundImage() as Bitmap);
+		//_background = (new _backgroundImage() as Bitmap);
 		//texture = _background;
 		//backgroundTexture = _background;
 
@@ -136,17 +136,6 @@ public class WindowRegionNew extends VVPopup
 		new WindowSandboxList();
 	}
 	
-	protected function onResize(event:Event):void
-	{
-		move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
-	}
-	private function onRemoved( event:UIOEvent ):void
-	{
-         Globals.g_app.stage.removeEventListener(Event.RESIZE, onResize);
-//			removeEventListener(UIOEvent.REMOVED, onRemoved );
-		eventCollector.removeAllEvents();
-	}
-
 	private function gravChange(event:ButtonsGroupEvent):void {  
 		_region.gravity = (0 == event.target.index ?  true : false );
 	} 

@@ -75,13 +75,6 @@ package com.voxelengine.GUI
 			populateModels();
         }
 		
-		// Window events
-		private function onRemoved( event:UIOEvent ):void
- 		{
-			Globals.g_app.removeEventListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, modelLoaded );
-			removeEventListener(UIOEvent.REMOVED, onRemoved );
-		}
-		
 		private function selectModel(event:ListEvent):void 
 		{
 			_modelKey = event.target.data;

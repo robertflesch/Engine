@@ -195,10 +195,9 @@ package com.voxelengine.GUI
 		}
 		
 		// PARENT BUTTONS //////////////////////////////////////////////
-		private function onRemoved( event:UIOEvent ):void
+		override protected function onRemoved( event:UIOEvent ):void
  		{
-			removeEventListener(UIOEvent.REMOVED, onRemoved );
-			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelCreated );
+			super.onRemoved( event );
 			removeChildModels();
 			Globals.selectedModel = null;
 		}

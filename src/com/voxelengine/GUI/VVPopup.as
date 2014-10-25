@@ -1,6 +1,8 @@
 
 package com.voxelengine.GUI
 {
+import flash.events.Event;
+
 import org.flashapi.swing.Popup;
 import org.flashapi.swing.event.UIOEvent;
 
@@ -13,13 +15,19 @@ public class VVPopup extends Popup
 	{
 		super( title );
 		Globals.openWindowCount = Globals.openWindowCount + 1;
-		eventCollector.addEvent(this, UIOEvent.REMOVED, onRemoved );
+		eventCollector.addEvent( this, Event.RESIZE, onResize );
+		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
+	}
+
+	protected function onResize($event:Event):void
+	{
+		move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
 	}
 	
-	private function onRemoved( event:UIOEvent ):void
+	protected function onRemoved( event:UIOEvent ):void
 	{
-		eventCollector.removeEvent(this, UIOEvent.REMOVED, onRemoved );
 		Globals.openWindowCount = Globals.openWindowCount - 1;
+		eventCollector.removeAllEvents();
 	}
 	
 }

@@ -153,7 +153,7 @@ package com.voxelengine.GUI
 		
 		public function hotKeyItem(e:KeyboardEvent):void 
 		{
-			if  ( !Globals.active )
+			if  ( !Globals.active || Globals.openWindowCount )
 				return;
 				
 			//Log.out( "ToolBar.hotKeyItem: " + (e.keyCode - 49) );

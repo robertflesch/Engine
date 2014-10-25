@@ -28,52 +28,74 @@ package com.voxelengine.server
 		private var _passwordInput:LabelInput = null;
 		private var _password:String;
 		private var _result:Text;
+		private var _errorText:TextArea;
 
-		private var _background:Bitmap;
-		[Embed(source='../../../../../Resources/bin/assets/textures/black.jpg')]
-		private var _backgroundImage:Class;
+		private var _topImage:Bitmap;
+		[Embed(source='../../../../../Resources/bin/assets/textures/loginImage.png')]
+		private var _topImageClass:Class;
 		
 		public function WindowLogin( email:String = "bob@me.com", password:String = "bob" )
 		{
 			super( "Login" );
-            autoSize = true;
+            //autoSize = true;
 			width = 300;
-			height = 800;
+			height = 340;
 			layout.orientation = LayoutOrientation.VERTICAL;
+
+			if ( !Globals.g_debug )
+				closeButtonActive = false;  // this greys it out, and doesnt allow it to be clicked
+
+			_topImage = (new _topImageClass() as Bitmap);
+			var pic:Image = new Image( _topImage, width, 189 );
+			addElement(pic);
 			
-			_background = (new _backgroundImage() as Bitmap);
-			//backgroundTexture = _background;
-			//texture = _background;
-			
-			var infoPanel:Panel = new Panel( width, 200 );
+			var infoPanel:Container = new Container( width, 80 );
 			infoPanel.layout.orientation = LayoutOrientation.VERTICAL;
+			infoPanel.addElement( new Spacer( width, 15 ) );
 			
 			_email = email;
-			_emailInput = new LabelInput( "email", _email );
+			_emailInput = new LabelInput( " Email", _email, width );
 			_emailInput.labelControl.width = 80;
 			_emailInput.editableText.addEventListener( TextEvent.EDITED, 
 				function( event:TextEvent ):void 
 				{ _email = event.target.text; } );
 			infoPanel.addElement( _emailInput );
 			
+			infoPanel.addElement( new Spacer( width, 10 ) );
+			
 			_password = password;
-			_passwordInput = new LabelInput( "Password", _password );
+			_passwordInput = new LabelInput( " Password", _password, width );
 			_passwordInput.labelControl.width = 80;
 			_passwordInput.editableText.addEventListener( TextEvent.EDITED, 
 				function( event:TextEvent ):void 
 				{ _password = event.target.text; } );
 			infoPanel.addElement( _passwordInput );
+			
+			_errorText = new TextArea( width, 40);
+			_errorText.backgroundColor = 0xC0C0C0;
+			_errorText.scrollPolicy = ScrollPolicy.NONE;
+			_errorText.fontColor = 0xff0000;
+			
+			infoPanel.addElement( _errorText )
+			
 			addElement( infoPanel );
 			
-			var buttonPanel:Panel = new Panel( width, 40 );
-			//var buttonPanel:Panel = new Panel( 200, 30 );
-			var loginButton:Button = new Button( "Login" );
+			const buttonWidth:int = 100;
+			const buttonHeight:int = 40;
+			var buttonPanel:Container = new Container( width, 40 );
+			var loginButton:Button = new Button( "Login", buttonWidth, buttonHeight );
 			loginButton.addEventListener(UIMouseEvent.CLICK, loginButtonHandler );
 			buttonPanel.addElement( loginButton );
 			
-			var registerButton:Button = new Button( "Register" );
+			var registerButton:Button = new Button( "Register..", buttonWidth, buttonHeight );
 			registerButton.addEventListener(UIMouseEvent.CLICK, registerButtonHandler );
 			buttonPanel.addElement( registerButton );
+			
+			var lostPasswordButton:Button = new Button( "Lost Password", buttonWidth, buttonHeight );
+			lostPasswordButton.fontSize = 10;
+			lostPasswordButton.addEventListener(UIMouseEvent.CLICK, lostPasswordHandler );
+			buttonPanel.addElement( lostPasswordButton );
+			
 			addElement( buttonPanel );
 			
 			//_result = new Text(200, 30);
@@ -87,28 +109,18 @@ package com.voxelengine.server
 			
 			//Globals.g_app.stage.addEventListener( LoginEvent.LOGIN_SUCCESS, onLoginSucess );
 		}
-
 			
-		// Window events
-		private function onRemoved( event:UIOEvent ):void
- 		{
-            Globals.g_app.stage.removeEventListener(Event.RESIZE, onResize);
-			removeEventListener(UIOEvent.REMOVED, onRemoved );
-		}
-		
-        protected function onResize(event:Event):void
-        {
-			move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
-		}
-		
 		private function loginButtonHandler(event:UIMouseEvent):void 
 		{
+			_errorText.text = "";
+			_emailInput.glow = false;
+			_passwordInput.glow = false;
 			PlayerIO.quickConnect.simpleConnect( Globals.g_app.stage
 											   , Globals.g_gamesNetworkID
 											   , _email
 											   , _password
 											   , connectSuccess
-											   , connectFailure );
+											   , simpleConnectFailure );
 			Log.out("WindowLogin.loginButtonHandler - Trying to establish connection to server");
 		}
 		
@@ -118,9 +130,31 @@ package com.voxelengine.server
 			remove();
 		}
 		
-		public function connectFailure(error:PlayerIOError):void
+		private function lostPasswordHandler(event:UIMouseEvent):void 
 		{
-			Log.writeError(" VVServer.handleConnectError", "Failed on connect to server", error );
+			PlayerIO.quickConnect.simpleRecoverPassword( Globals.g_gamesNetworkID, _email, recoverySuccess, recoveryFailure );
+
+			function recoverySuccess():void 
+			{ 
+				(new Alert( "An email has been sent to " + ( _email ? _email : "INVALID EMAIL ADDRESS"), 350 )).display();
+			}
+
+			function recoveryFailure( error:PlayerIOError ):void 
+			{ 
+				(new Alert( "No account has been found for " + ( _email ? _email : "INVALID EMAIL ADDRESS"), 350 )).display();
+			}
+		}
+		
+		
+		public function simpleConnectFailure( $error:PlayerIOError):void
+		{
+			_errorText.text = $error.name + ": " + $error.message;
+			if ( 0 < _errorText.text.indexOf( "user" ) )
+				_emailInput.glow = true;
+			else if ( 0 < _errorText.text.indexOf( "password" ) )
+				_passwordInput.glow = true;
+			else
+				Log.writeError(" WindowLogin.simpleConnectFailure", _errorText.text, $error );
 		}
 		
 		public function connectSuccess( $client:Client):void

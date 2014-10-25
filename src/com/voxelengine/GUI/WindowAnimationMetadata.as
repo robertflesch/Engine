@@ -60,9 +60,6 @@ public class WindowAnimationMetadata extends VVPopup
 							   , function( e:UIMouseEvent ):void { remove(); } );
 		addElement( cancelButton );
 
-		eventCollector.addEvent( this, Event.RESIZE, onResize );
-		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
-		
 		// This auto centers
 		display();
 		onResize( null );
@@ -76,17 +73,6 @@ public class WindowAnimationMetadata extends VVPopup
 	private function save( e:UIMouseEvent ):void { 
 		Globals.g_app.dispatchEvent( new AnimationMetadataEvent( AnimationMetadataEvent.ANIMATION_INFO_COLLECTED, _name, _desc.label, _guid, Network.PUBLIC ) );
 		remove();
-	}
-	
-	protected function onResize(event:Event):void
-	{
-		move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
-		//display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
-	}
-	
-	private function onRemoved( event:UIOEvent ):void
-	{
-		eventCollector.removeAllEvents();
 	}
 }
 }

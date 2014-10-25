@@ -66,9 +66,6 @@ public class WindowAnimationEdit extends VVPopup
 		eventCollector.addEvent( saveMetadata, UIMouseEvent.CLICK, save );
 		addElement( saveMetadata );
 		
-		eventCollector.addEvent( this, Event.RESIZE, onResize );
-		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
-		
 		//LocationGroup();
 		//RotationGroup();
 		//Advanced();
@@ -84,17 +81,6 @@ public class WindowAnimationEdit extends VVPopup
 		//var li:ListItem = _animCombo.getItemAt( _animCombo.selectedIndex );
 		//_name = li.value;
 	}
-	protected function onResize(event:Event):void
-	{
-		move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
-		//display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
-	}
-	
-	private function onRemoved( event:UIOEvent ):void
-	{
-		eventCollector.removeAllEvents();
-	}
-	
 		/*
 		private function addSpinLabel( parentPanel:Panel, label:String, clickHandler:Function, textChanged:Function, initialValue:String ):TextInput
 		{

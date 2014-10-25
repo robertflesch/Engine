@@ -28,10 +28,5 @@ package com.voxelengine.GUI
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
         }
-		
-		private function onRemoved( event:UIOEvent ):void
- 		{
-			removeEventListener(UIOEvent.REMOVED, onRemoved );
-		}
   }
 }

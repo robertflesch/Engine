@@ -391,7 +391,7 @@ package org.flashapi.swing.plaf.spas {
 				f.clear();
 				//f.beginGradientFill(GradientType.LINEAR, [color2.darker(), dto.color], [a, a], [0, 250], m);
 				//f.beginGradientFill(GradientType.LINEAR, [color2.darker(), color2.darker()], [a, a], [0, 250], m);
-//				f.beginFill( color2.darker(), a );
+				f.beginFill( color2.darker(), a );
 				f.lineStyle(1, 0x969696, .5, true);
 //				f.lineGradientStyle(GradientType.LINEAR, [0x969696, 0x505050], [1, 1], [0, 250], m);
 				f.lineGradientStyle(GradientType.LINEAR, [0x969696, 0x969696], [1, 1], [0, 250], m);
