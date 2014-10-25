@@ -26,6 +26,7 @@ package com.voxelengine.events
 		
 		static public const SPLASH_LOAD_COMPLETE:String		= "SPLASH_LOAD_COMPLETE";
 		static public const LOAD_TYPES_COMPLETE:String		= "LOAD_TYPES_COMPLETE";
+		static public const LOAD_CONFIG_COMPLETE:String		= "LOAD_CONFIG_COMPLETE";
 		
 		static public const ANIMATION_LOAD_COMPLETE:String	= "ANIMATION_LOAD_COMPLETE";
 

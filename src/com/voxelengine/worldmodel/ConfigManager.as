@@ -45,7 +45,7 @@ package com.voxelengine.worldmodel
 			}
 			else {
 				var _urlLoader:URLLoader = new URLLoader();
-				Log.out( "ConfigManager.new - loading: " + Globals.appPath + "config.json", Log.INFO );
+				Log.out( "ConfigManager.new - loading: " + Globals.appPath + "config.json" );
 				_urlLoader.load(new URLRequest(Globals.appPath + "config.json"));
 				_urlLoader.addEventListener(Event.COMPLETE, onConfigLoadedAction);
 				_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, errorAction);			
@@ -70,13 +70,13 @@ package com.voxelengine.worldmodel
 		{
 			// This gives the engine a chance to load up the typeInfo file
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
-			
-			Globals.g_regionManager.requestRegionFile( _regionJson.config.region.startingRegion )
+			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_CONFIG_COMPLETE, _regionJson.config.region.startingRegion ) );
 		}
 
 		public function errorAction(e:IOErrorEvent):void
 		{
-			trace( "ConfigManager.errorAction: " + e.toString());
+			Log.writeError( "ConfigManager", "Config failed to load: " + e.toString(), null );
+			throw new Error( "ConfigManager can load config, what to do when this happenes" );
 		}	
 		
 	} // ConfigManager

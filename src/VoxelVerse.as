@@ -79,7 +79,25 @@ package {
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			
+			// wrong approach to getting files from gameFS
+			//Security.allowDomain("http://r.playerio.com/r/voxelverse-lpeje46xj0krryqaxq0vog/"); 
+			//Security.allowInsecureDomain("http://r.playerio.com/r/voxelverse-lpeje46xj0krryqaxq0vog/"); 
+			//var context:LoaderContext = new LoaderContext();
+			//context.securityDomain = SecurityDomain.currentDomain;
+			
+			//System .security.loadPolicyFile("http://www.example.com/~user1/myPolicy.xml");
 			//var strUserAgent:String = String(ExternalInterface.call("function() {return navigator.userAgent;}")).toLowerCase();			
+			
+			// expect an exception to be thrown and caught here, the best way I know of to find out of we are in debug or release mode
+			try
+			{
+				var result : Boolean = new Error().getStackTrace().search(/:[0-9]+]$/m) > -1;
+				Globals.g_debug = result;
+			}
+			catch ( error:Error )
+			{
+				Globals.g_debug = false;
+			}
 			
 			try
 			{
@@ -94,24 +112,17 @@ package {
 					var gap:String = urlPath.substr( 0, index + 1 );
 					Globals.appPath = gap;
 				}
-				else
-					Globals.appPath = urlPath.substr( 0, index );
+				else {
+					//if ( Globals.g_debug ) 
+						Globals.appPath = urlPath.substr( 0, index );
+				}
+				Log.out( "VoxelVerse.init set appPath to: " + Globals.appPath );
 			}
 			catch ( error:Error )
 			{
 				Log.out("VoxelVerse.init - ExternalInterface not found, using default location", Log.INFO);
-				Globals.appPath = "";
-			}
-			
-			// expect an exception to be thrown and caught here, the best way I know of to find out of we are in debug or release mode
-			try
-			{
-				var result : Boolean = new Error().getStackTrace().search(/:[0-9]+]$/m) > -1;
-				Globals.g_debug = result;
-			}
-			catch ( error:Error )
-			{
-				Globals.g_debug = false;
+				Globals.appPath = "http://r.playerio.com/r/voxelverse-lpeje46xj0krryqaxq0vog/"
+				//Globals.appPath = "";
 			}
 			
 			Globals.g_renderer.init( stage );

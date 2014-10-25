@@ -86,6 +86,7 @@ public class RegionManager
 									  ,  function( me:ModelEvent ):void { if ( currentRegion ) { currentRegion.changed = true; }} );
 									  
 		Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_FAILURE, removeFailedObjectFromRegion );									  
+		Globals.g_app.addEventListener( LoadingEvent.LOAD_CONFIG_COMPLETE, requestStartingRegionFile );
 		
 		// This adds the event handlers
 		TemplateManager.addEvents();
@@ -102,12 +103,18 @@ public class RegionManager
 		//currentRegion.save();
 	}
 	
+				//Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_CONFIG_COMPLETE, _regionJson.config.region.startingRegion ) );
+
 	
-	
-	public function requestRegionFile( $guid:String ):void
+	public function requestStartingRegionFile( $e:LoadingEvent ):void
 	{
-		var fileNamePathWithExt:String = Globals.regionPath + $guid + ".rjson"
-		Log.out( "RegionManager.requestRegionFile - downloading: " + fileNamePathWithExt );
+		var fileNamePathWithExt:String = Globals.regionPath + $e.guid + ".rjson"
+		Log.out( "RegionManager.requestStartingRegionFile - downloading: " + fileNamePathWithExt );
+		
+		Log.out( "RegionManager.requestStartingRegionFile /////////////////////////////////////////////////////////////////////////////////////////" );
+		Log.out( "RegionManager.requestStartingRegionFile - CHANGE TO LOADING FROM BIGDB" );
+		Log.out( "RegionManager.requestStartingRegionFile /////////////////////////////////////////////////////////////////////////////////////////" );
+		
 		var _urlLoader:CustomURLLoader = new CustomURLLoader(new URLRequest( fileNamePathWithExt ));
 		_urlLoader.addEventListener(Event.COMPLETE, onRegionLoadedActionFromFile );
 		_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onRegionLoadError );			
@@ -121,7 +128,6 @@ public class RegionManager
 	private function onRegionLoadedActionFromFile(event:Event):void
 	{
 		Log.out( "RegionManager.onRegionLoadedActionFromFile" );
-		//var req:URLRequest = CustomURLLoader(event.target).request;			
 		var guid:String = CustomURLLoader(event.target).fileName;			
 		guid = guid.substr( 0, guid.indexOf( "." ) );
 		var newRegion:Region = new Region( guid );
