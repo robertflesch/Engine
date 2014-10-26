@@ -10,7 +10,8 @@ package com.furusystems.logging.slf4as.bindings {
 		private static var _lineNumber:int = 0;
 		
 		public function print(owner:Object, level:String, str:String):void {
-			trace((_lineNumber++) + "\t" + level + "\t" + owner + "\t" + str);
+//			trace((_lineNumber++) + "\t" + level + "\t" + owner + "\t" + str);
+			trace(str);
 		}
 	
 	}
