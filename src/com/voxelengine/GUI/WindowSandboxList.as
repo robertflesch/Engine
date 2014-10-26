@@ -26,7 +26,6 @@ import com.voxelengine.Log;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.RegionLoadedEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.server.VVServer;
 import com.voxelengine.worldmodel.Region;
 
 public class WindowSandboxList extends VVPopup

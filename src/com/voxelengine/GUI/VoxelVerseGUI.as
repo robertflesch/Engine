@@ -2,6 +2,8 @@
 package com.voxelengine.GUI
 {
 	import com.voxelengine.events.GUIEvent;
+	import com.voxelengine.events.RoomEvent;
+	import com.voxelengine.server.RoomConnection;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.display.Stage;
@@ -22,7 +24,7 @@ package com.voxelengine.GUI
 	import org.flashapi.swing.event.UIOEvent;
 	import org.flashapi.swing.Label;
 	import org.flashapi.swing.Popup;
-	import org.flashapi.swing.framework.FDTrace; // Allows FlashDevelop to trace
+	import org.flashapi.swing.framework.FDTrace; // Allows FlashDevelop to trace FlashAPI messages
 	
 	import org.flashapi.swing.UIManager;
 	
@@ -38,8 +40,6 @@ package com.voxelengine.GUI
 	import com.voxelengine.events.RegionEvent;
 	
 	import com.voxelengine.server.WindowLogin;
-	import com.voxelengine.server.EventHandlers;
-	import com.voxelengine.server.Network;
 	
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.models.VoxelModel;
@@ -338,24 +338,10 @@ package com.voxelengine.GUI
 			Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControl.handleModelEvents );
 			Globals.g_app.addEventListener(ModelEvent.RELEASE_CONTROL, WindowBeastControl.handleModelEvents );
 			Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
-			Globals.g_app.addEventListener(LoginEvent.JOIN_ROOM_FAILURE, joinRoomFailureHandler );
 			Globals.g_app.addEventListener(LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
+			Globals.g_app.addEventListener(RoomEvent.ROOM_JOIN_FAILURE, joinRoomFailureHandler );
 		}
 		
-		private function joinRoomFailureHandler( e:LoginEvent ):void {
-			
-			var popup:VVPopup = new VVPopup("NO SERVERS FOUND");
-			popup.width = 250;
-			popup.height = 50;
-            //popup.innerPanel = popup.autoHeight = true;
-            
-            var label:Label = new Label("No servers were found for this room, try later");
-			popup.addElement(label);
-            
-			popup.display( Globals.g_renderer.width / 2 - (((popup.width + 10) / 2) + popup.x ), Globals.g_renderer.height / 2 - (((popup.height + 10) / 2) + popup.y) );
-			popup.eventCollector.addEvent( popup, UIOEvent.REMOVED, function( e:UIOEvent ):void { new WindowSandboxList(); popup.remove(); } );
-		}
-
 		private function addKeyboardListeners(event : Event) : void
 		{
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
@@ -371,9 +357,9 @@ package com.voxelengine.GUI
 		{
 			Globals.g_app.removeEventListener(RegionEvent.REGION_LOAD_BEGUN, onRegionLoadingComplete);
 			
-			if ( true == Globals.sandbox )
+			if ( false == Globals.inRoom )
 			{
-				EventHandlers.addEventHandlers();
+				RoomConnection.addEventHandlers();
 			}
 			else
 			{
@@ -463,5 +449,20 @@ package com.voxelengine.GUI
 				}
 			}
 		}
+		
+		private function joinRoomFailureHandler( e:LoginEvent ):void {
+			
+			var popup:VVPopup = new VVPopup("NO SERVERS FOUND");
+			popup.width = 250;
+			popup.height = 50;
+			//popup.innerPanel = popup.autoHeight = true;
+			
+			var label:Label = new Label("No servers were found for this room, try later");
+			popup.addElement(label);
+			
+			popup.display( Globals.g_renderer.width / 2 - (((popup.width + 10) / 2) + popup.x ), Globals.g_renderer.height / 2 - (((popup.height + 10) / 2) + popup.y) );
+			popup.eventCollector.addEvent( popup, UIOEvent.REMOVED, function( e:UIOEvent ):void { new WindowSandboxList(); popup.remove(); } );
+		}
+		
 	}
 }

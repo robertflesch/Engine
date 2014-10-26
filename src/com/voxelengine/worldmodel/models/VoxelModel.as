@@ -1532,7 +1532,7 @@ package com.voxelengine.worldmodel.models
 		public function handleModelEvents( $me:ModelEvent ):void {
 			if ( ModelEvent.RELEASE_CONTROL == $me.type ) {
 				var classCalled:String = $me.parentInstanceGuid;
-Log.out( "VoxelModel.handleModelEvents - classCalled" + classCalled );				
+Log.out( "VoxelModel.handleModelEvents - ModelEvent.RELEASE_CONTROL called on: " + classCalled, Log.DEBUG );				
 				if ( classCalled != "com.voxelengine.worldmodel.models::Player" )
 					Globals.player.takeControl( null, false );
 					// TODO Need something here to determine which model

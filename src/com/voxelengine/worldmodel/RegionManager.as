@@ -7,18 +7,16 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-import com.voxelengine.server.PersistRegion;
-import com.voxelengine.worldmodel.models.TemplateManager;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.ProgressEvent;
 import flash.geom.Vector3D;
 import flash.net.FileReference;
 import flash.net.URLRequest;
+import mx.utils.StringUtil;
+
 import playerio.PlayerIOError;
 import playerio.DatabaseObject;
-
-import mx.utils.StringUtil;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
@@ -26,21 +24,21 @@ import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.LoginEvent;
+import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.RegionLoadedEvent;
-import com.voxelengine.events.ModelEvent;
-import com.voxelengine.GUI.WindowRegionNew;
-import com.voxelengine.GUI.WindowSandboxList;
-import com.voxelengine.GUI.WindowSplash;
+import com.voxelengine.events.RoomEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.server.VVServer;
+import com.voxelengine.server.Room;
+import com.voxelengine.server.PersistRegion;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelLoader;
 import com.voxelengine.worldmodel.models.ModelManager;
 import com.voxelengine.worldmodel.models.VoxelModel;
-import com.voxelengine.server.Network;
 import com.voxelengine.utils.CustomURLLoader;
+import com.voxelengine.worldmodel.models.TemplateManager;
 
+import com.voxelengine.GUI.WindowSplash;
 /**
  * ...
  * @author Bob
@@ -68,7 +66,7 @@ public class RegionManager
 		_regions = new Vector.<Region>;
 
 		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, regionLoad ); 
-		Globals.g_app.addEventListener( LoginEvent.JOIN_ROOM_SUCCESS, loadRegionOnJoinEvent );
+		Globals.g_app.addEventListener( RoomEvent.ROOM_JOIN_SUCCESS, loadRegionOnJoinEvent );
 		
 		Globals.g_app.addEventListener( RegionEvent.REQUEST_JOIN, requestServerJoin ); 
 		Globals.g_app.addEventListener( RegionLoadedEvent.REGION_CREATED, regionCreatedHandler ); 
@@ -82,9 +80,12 @@ public class RegionManager
 		Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_FAILURE, removeFailedObjectFromRegion );									  
 		Globals.g_app.addEventListener( LoadingEvent.LOAD_CONFIG_COMPLETE, requestStartingRegionFile );
 		
+		
 		// This adds the event handlers
 		TemplateManager.addEvents();
 	}
+	
+
 	
 	////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////
@@ -130,8 +131,8 @@ public class RegionManager
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
 	static public function requestServerJoin( e:RegionEvent ):void {
-		Log.out( "RegionManager.requestServerJoin - guid: " + e.guid, Log.DEBUG );
-		VVServer.joinRoom( e.guid );	
+		Log.out( "RegionManager.requestServerJoin - guid: " + e.guid, Log.WARN );
+		Room.createJoinRoom( e.guid );	
 	}
 	
 	public function loadRegionOnJoinEvent( e:LoginEvent ):void {

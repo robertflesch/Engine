@@ -121,7 +121,7 @@ package com.voxelengine.server
 											   , _password
 											   , connectSuccess
 											   , simpleConnectFailure );
-			Log.out("WindowLogin.loginButtonHandler - Trying to establish connection to server");
+			Log.out("WindowLogin.loginButtonHandler - Trying to establish connection to server", Log.WARN );
 		}
 		
 		private function registerButtonHandler(event:UIMouseEvent):void 
@@ -160,7 +160,7 @@ package com.voxelengine.server
 		public function connectSuccess( $client:Client):void
 		{
 			remove();
-			trace("WindowLogin.connectSuccess - connection to server established");
+			Log.out("WindowLogin.connectSuccess - connection to server established", Log.WARN );
 			onSuccess( $client );
 		}
 		

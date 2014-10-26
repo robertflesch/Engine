@@ -194,16 +194,12 @@ package com.voxelengine.worldmodel.models
 		
 		public function save():void {
 			
-			if ( false == Globals.online || false == Globals.inRoom ) {
-				Log.out( "ModelManager.save - trying to save when not online and in room" );
+			if ( false == Globals.online || false == Globals.inRoom )
 				return;
-			}
 			
 			// check all models to see if they have changed, if so save them to server.
 			for each ( var vm:VoxelModel in _modelInstances )
-			{
 				vm.save();
-			}
 		}
 		
 		public function bringOutYourDead():void {

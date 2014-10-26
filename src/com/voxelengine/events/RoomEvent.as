@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.events
 {
+	import adobe.utils.ProductManager;
 	import flash.events.Event;
 	import playerio.PlayerIOError;
 	
@@ -15,18 +16,19 @@ package com.voxelengine.events
 	 * @author Robert Flesch - RSF 
 	 * 
 	 */
-	public class LoginEvent extends Event
+	public class RoomEvent extends Event
 	{
-		static public const LOGIN_SUCCESS:String		= "LOGIN_SUCCESS";
-		static public const LOGIN_FAILURE:String		= "LOGIN_FAILURE";
-		
+		static public const ROOM_JOIN_SUCCESS:String		= "ROOM_JOIN_SUCCESS";
+		static public const ROOM_JOIN_FAILURE:String		= "ROOM_JOIN_FAILURE";
+		static public const ROOM_DISCONNECT:String			= "ROOM_DISCONNECT";
+
 		private var _error:PlayerIOError;
 		private var _guid:String;
 		public function get error():PlayerIOError { return _error; }
 		
 		public function get guid():String { return _guid; }
 		
-		public function LoginEvent( $type:String, error:PlayerIOError, $guid:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
+		public function RoomEvent( $type:String, error:PlayerIOError, $guid:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
 		{
 			super( $type, $bubbles, $cancellable );
 			_guid = $guid;
@@ -34,12 +36,12 @@ package com.voxelengine.events
 		
 		public override function clone():Event
 		{
-			return new LoginEvent(type, error, guid, bubbles, cancelable);
+			return new RoomEvent(type, error, guid, bubbles, cancelable);
 		}
 	   
 		public override function toString():String
 		{
-			return formatToString("LoginEvent", "bubbles", "cancelable") + _error ? _error.message : "" + "  guid: " + guid;
+			return formatToString("RoomEvent", "bubbles", "cancelable") + _error ? _error.message : "" + "  guid: " + guid;
 		}
 		
 	}
