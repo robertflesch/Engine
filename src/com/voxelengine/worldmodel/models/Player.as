@@ -41,7 +41,7 @@
 		private var _inventory:Vector.<InventoryObjects> = new Vector.<InventoryObjects>();
 		
 		public function Player( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
-			Log.out( "Player.contruct --------------------------------------------------------------------------------------------------------------------" );
+			//Log.out( "Player.contruct --------------------------------------------------------------------------------------------------------------------" );
 			super( instanceInfo, mi, $vmm );
 			
 			instanceInfo.usesCollision = true;
@@ -66,7 +66,7 @@
 		}
 		
 		override public function release():void {
-			Log.out( "Player.release --------------------------------------------------------------------------------------------------------------------" );
+			//Log.out( "Player.release --------------------------------------------------------------------------------------------------------------------" );
 			super.release();
 		}
 
@@ -275,9 +275,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		}
 
 		override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
-			Log.out( "Player.takeControl --------------------------------------------------------------------------------------------------------------------" );
-						
-
+			//Log.out( "Player.takeControl --------------------------------------------------------------------------------------------------------------------" );
 			super.takeControl( $modelLosingControl, false );
 			instanceInfo.usesCollision = true;
 			// We need to grab the rotation of the old parent, otherwise we get rotated back to 0 since last rotation is 0
@@ -322,7 +320,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		}
 		
 		private function onLoadingPlayerComplete( le:LoadingEvent ):void {
-			Log.out( "Player.onLoadingPlayerComplete - PLAYER LOADED =============================================" );
+			//Log.out( "Player.onLoadingPlayerComplete - PLAYER LOADED =============================================" );
 			calculateCenter();
 			Globals.player = this;
 			Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );

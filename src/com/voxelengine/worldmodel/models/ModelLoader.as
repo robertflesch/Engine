@@ -189,7 +189,7 @@ package com.voxelengine.worldmodel.models
 				// if we are already waiting for a copy to load, then add a $block if shouldBlock is true, else add a loader.
 				if ( !_blocks[$name] )
 				{
-					Log.out( "ModelLoader.modelInfoFindOrCreate - loading: " + ( Globals.modelPath + $guid + MODEL_MANAGER_MODEL_EXT ), Log.DEBUG );
+					Log.out( "ModelLoader.modelInfoFindOrCreate - loading: " + ( Globals.modelPath + $guid + MODEL_MANAGER_MODEL_EXT ), Log.INFO );
 					var loader:CustomURLLoader = new CustomURLLoader( new URLRequest( Globals.modelPath + $guid + MODEL_MANAGER_MODEL_EXT ) );
 					loader.addEventListener(Event.COMPLETE, onModelInfoLoaded);
 					loader.addEventListener(IOErrorEvent.IO_ERROR, onModelInfoLoadError);

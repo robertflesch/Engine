@@ -22,8 +22,8 @@
 			Globals.g_app.addEventListener( RegionEvent.REQUEST_PRIVATE, cacheRequestPrivate ); 
 		}
 		
-		public function cacheRequestPrivate( e:RegionEvent ):void { loadRegions( Network.userId ); }
-		public function cacheRequestPublic( e:RegionEvent ):void { loadRegions( Network.PUBLIC ); }
+		private function cacheRequestPrivate( e:RegionEvent ):void { loadRegions( Network.userId ); }
+		private function cacheRequestPublic( e:RegionEvent ):void { loadRegions( Network.PUBLIC ); }
 		
 		static public function loadRegion( $guid:String ):void {
 		
@@ -48,7 +48,7 @@
 			loadRegionFromDBO( dbo );
 		}
 
-		static public function loadRegions( $userName:String ):void {
+		static private function loadRegions( $userName:String ):void {
 			
 			loadRange( PersistRegion.DB_TABLE_REGIONS
 						 , "regionOwner"

@@ -204,7 +204,11 @@ package com.voxelengine.worldmodel.models
 				
 			if ( json.name )
 			{
-				Log.out( "========================= InstanceInfo.initJSON - Name: " + json.name + "  guid: " + _guid );
+				if ( owner && owner.metadata ) {
+					owner.metadata.name = json.name;
+					Log.out( "InstanceInfo.initJSON - Setting Metadata Name from instance data: " + json.name + "  guid: " + _guid );
+				}
+					
 			}
 			
 			if ( json.state )

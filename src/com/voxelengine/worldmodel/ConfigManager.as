@@ -71,7 +71,7 @@ package com.voxelengine.worldmodel
 		{
 			// This gives the engine a chance to load up the typeInfo file
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
-			if ( true ) {
+			if ( false ) {
 				Globals.g_app.addEventListener(LoginEvent.LOGIN_SUCCESS, listenForLoginSuccess );
 				Network.autoLogin( _regionJson.config.region.startingRegion );
 			}

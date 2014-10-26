@@ -8,6 +8,7 @@
 
 package {
 	import com.voxelengine.server.PersistAnimation;
+	import com.voxelengine.server.PersistRegion;
 	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
@@ -43,7 +44,7 @@ package {
 	public class VoxelVerse extends Sprite 
 	{
 		private var _timePrevious:int = getTimer();
-		
+		private var _persistRegion:PersistRegion;
 		private var _configManager:ConfigManager = null;
 		private var _poolManager:PoolManager = null;
 		
@@ -118,6 +119,8 @@ package {
 			}
 			
 			Globals.g_renderer.init( stage );
+			// adds handlers for persistance of regions
+			_persistRegion = new PersistRegion();
 			
 			addEventListener(LoadingEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
 			

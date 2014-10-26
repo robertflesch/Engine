@@ -7,6 +7,7 @@
 ==============================================================================*/
 
 package com.voxelengine {
+	import com.voxelengine.server.PersistRegion;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import flash.utils.Dictionary;
 	import com.voxelengine.worldmodel.RegionManager;
@@ -260,6 +261,10 @@ package com.voxelengine {
 		private static var g_online:Boolean = false;
 		public static function get online():Boolean { return g_online }
 		public static function set online(val:Boolean):void { g_online = val; }
+		
+		private static var g_inRoom:Boolean = false;
+		public static function get inRoom():Boolean { return g_inRoom }
+		public static function set inRoom(val:Boolean):void { g_inRoom = val; }
 		
 		private static var g_muted:Boolean = false;
 		public static function get muted():Boolean { return g_muted }

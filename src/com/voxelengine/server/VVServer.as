@@ -76,6 +76,8 @@
 			
 			EventHandlers.addEventHandlers( _connection );
 			
+			Globals.inRoom = true;
+			
 			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.JOIN_ROOM_SUCCESS, null, _guid ) );
 		}
 		

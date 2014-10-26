@@ -232,7 +232,7 @@ public class RegionManager
 	public function save():void
 	{
 		Log.out( "RegionManager.save", Log.DEBUG );
-		if ( Globals.online ) {
+		if ( true == Globals.online && true == Globals.inRoom ) {
 			currentRegion.save()
 		}
 		else {
