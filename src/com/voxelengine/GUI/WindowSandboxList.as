@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.GUI
 {
+import com.voxelengine.events.LoginEvent;
 import com.voxelengine.worldmodel.RegionManager;
 import flash.events.Event;
 
@@ -40,6 +41,16 @@ public class WindowSandboxList extends VVPopup
 			new WindowSandboxList();
 		return _s_currentInstance; 
 	}
+	
+	// Listener is added in VoxelVerseGUI constuctor
+	static public function listenForLoginSuccess( $e:LoginEvent ):void {
+		// See if a region has been specified, if not, show user a list
+		if ( "" == $e.guid ) {
+			if ( !WindowSandboxList.isActive )
+				WindowSandboxList.create();
+		}
+	}
+	
 	
 	private var _listbox1:ListBox = new ListBox( WIDTH, 15 );
 	private var _createFileButton:Button		
@@ -121,7 +132,7 @@ public class WindowSandboxList extends VVPopup
 		if ( li )
 		{
 			if ( Globals.MODE_PRIVATE != Globals.mode && Globals.MODE_PUBLIC != Globals.mode ) {
-				new WindowRegionNew( Globals.g_regionManager.getRegion( li.data ) );
+				new WindowRegionNew( Globals.g_regionManager.regionGet( li.data ) );
 				remove();
 				return;
 			}

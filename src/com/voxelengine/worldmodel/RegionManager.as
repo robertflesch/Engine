@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+import com.voxelengine.server.PersistRegion;
 import com.voxelengine.worldmodel.models.TemplateManager;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
@@ -18,8 +19,6 @@ import playerio.PlayerIOError;
 import playerio.DatabaseObject;
 
 import mx.utils.StringUtil;
-
-import org.flashapi.swing.Alert;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
@@ -34,7 +33,6 @@ import com.voxelengine.GUI.WindowRegionNew;
 import com.voxelengine.GUI.WindowSandboxList;
 import com.voxelengine.GUI.WindowSplash;
 import com.voxelengine.server.Network;
-import com.voxelengine.server.PersistRegion;
 import com.voxelengine.server.VVServer;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelLoader;
@@ -52,14 +50,13 @@ public class RegionManager
 	private var _regions:Vector.<Region> = null
 	private var _currentRegion:Region = null
 	private var _modelLoader:ModelLoader = new ModelLoader();
-	private var _persistRegion:PersistRegion;
 	
 	public function get size():int { return _regions.length; }
 	
 	public function get currentRegion():Region { return _currentRegion; }
 	public function set currentRegion(val:Region):void { 
 		_currentRegion = val; 
-		Log.out("RegionManager.currentRegion - set to: " + val.guid ) 
+		Log.out("RegionManager.currentRegion - set to: " + val.guid, Log.DEBUG ) 
 	}
 	
 	public function get regions():Vector.<Region> { return _regions; }
@@ -68,12 +65,9 @@ public class RegionManager
 	
 	public function RegionManager():void 
 	{
-		// Create this object just so the handlers get added
-		_persistRegion = new PersistRegion();
-		
 		_regions = new Vector.<Region>;
 
-		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, load ); 
+		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, regionLoad ); 
 		Globals.g_app.addEventListener( LoginEvent.JOIN_ROOM_SUCCESS, loadRegionOnJoinEvent );
 		
 		Globals.g_app.addEventListener( RegionEvent.REQUEST_JOIN, requestServerJoin ); 
@@ -97,37 +91,29 @@ public class RegionManager
 	
 	private function removeFailedObjectFromRegion( $e:LoadingEvent):void {
 		// Do I need to remove this failed load?
-		Log.out( "RegionManager.removeFailedObjectFromRegion - failed to load: " + $e.guid );
+		Log.out( "RegionManager.removeFailedObjectFromRegion - failed to load: " + $e.guid, Log.ERROR );
 		currentRegion.changedForce = true;
 		// Dont want to save if partially loaded
 		//currentRegion.save();
 	}
 	
-				//Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_CONFIG_COMPLETE, _regionJson.config.region.startingRegion ) );
-
-	
 	public function requestStartingRegionFile( $e:LoadingEvent ):void
 	{
 		var fileNamePathWithExt:String = Globals.regionPath + $e.guid + ".rjson"
-		Log.out( "RegionManager.requestStartingRegionFile - downloading: " + fileNamePathWithExt );
-		
-		Log.out( "RegionManager.requestStartingRegionFile /////////////////////////////////////////////////////////////////////////////////////////" );
-		Log.out( "RegionManager.requestStartingRegionFile - CHANGE TO LOADING FROM BIGDB" );
-		Log.out( "RegionManager.requestStartingRegionFile /////////////////////////////////////////////////////////////////////////////////////////" );
-		
+		Log.out( "RegionManager.requestStartingRegionFile - downloading: " + fileNamePathWithExt, Log.DEBUG );
 		var _urlLoader:CustomURLLoader = new CustomURLLoader(new URLRequest( fileNamePathWithExt ));
-		_urlLoader.addEventListener(Event.COMPLETE, onRegionLoadedActionFromFile );
+		_urlLoader.addEventListener(Event.COMPLETE, onStartingRegionLoadedActionFromFile );
 		_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onRegionLoadError );			
 	}
 
 	private function onRegionLoadError(error:IOErrorEvent):void
 	{
-		Log.out("RegionManager.onRegionLoadError - ERROR: " + error.toString(), Log.ERROR);
+		Log.out("RegionManager.onRegionLoadError - ERROR: " + error.toString(), Log.ERROR );
 	}
 
-	private function onRegionLoadedActionFromFile(event:Event):void
+	private function onStartingRegionLoadedActionFromFile(event:Event):void
 	{
-		Log.out( "RegionManager.onRegionLoadedActionFromFile" );
+		Log.out( "RegionManager.onRegionLoadedActionFromFile", Log.DEBUG );
 		var guid:String = CustomURLLoader(event.target).fileName;			
 		guid = guid.substr( 0, guid.indexOf( "." ) );
 		var newRegion:Region = new Region( guid );
@@ -144,13 +130,24 @@ public class RegionManager
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
 	static public function requestServerJoin( e:RegionEvent ):void {
-		Log.out( "RegionManager.requestServerJoin - guid: " + e.guid );
+		Log.out( "RegionManager.requestServerJoin - guid: " + e.guid, Log.DEBUG );
 		VVServer.joinRoom( e.guid );	
 	}
 	
 	public function loadRegionOnJoinEvent( e:LoginEvent ):void {
-		Log.out( "RegionManager.loadRegionOnJoinEvent - guid: " + e.guid );
+		Log.out( "RegionManager.loadRegionOnJoinEvent - guid: " + e.guid, Log.DEBUG );
+		
+		var region:Region = regionGet( e.guid );
+		if ( null == region ) {
+			Globals.g_app.addEventListener( RegionLoadedEvent.REGION_LOADED, regionLoadedFromPersistance );
+			return;
+		}
 		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, e.guid ) );
+	}
+	
+	private function regionLoadedFromPersistance( $rle:RegionLoadedEvent ):void {
+		Globals.g_app.removeEventListener( RegionLoadedEvent.REGION_LOADED, regionLoadedFromPersistance );
+		Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD, $rle.region.guid ) );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -169,7 +166,7 @@ public class RegionManager
 		// check for duplicates
 		for each ( var region:Region in _regions ) {
 			if ( region.guid == e.region.guid ) {
-				Log.out( "RegionManager.regionCreatedHandler - DUPS FOUND: " + e.region.toString() );
+				Log.out( "RegionManager.regionCreatedHandler - DUPS FOUND: " + e.region.toString(), Log.WARN );
 				return;
 			}
 		}
@@ -184,26 +181,40 @@ public class RegionManager
 		Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_LOADED, e.region ) );
 	}
 	
-	public function getRegion( $guid:String ):Region
+	/**
+	 * @param  - guid of region
+	 * @return - region or null, if null tries to load it from persistance
+	 * Generates Event RegionLoadedEvent.REGION_LOADED when region is loaded
+	*/
+	public function regionGet( $guid:String ):Region
 	{
 		for each ( var region:Region in _regions ) {
 			if ( region && region.guid == $guid ) {
 				return region;
 			}
 		}
+		
+		// if not found load it
+		PersistRegion.loadRegion( $guid );
+		
 		return null;
 	}
 	
-	private function load( e:RegionEvent ):void
+	/**
+	 * @param  - RegionEvent generated by a region when it has 
+	 * @return - region or null, if null tries to load it from persistance
+	 * Generates Event RegionLoadedEvent.REGION_LOADED when region is loaded
+	*/
+	private function regionLoad( e:RegionEvent ):void
 	{
-		Log.out( "RegionManager.load - region: " + e.guid );
+		Log.out( "RegionManager.load - region: " + e.guid, Log.DEBUG );
 		if ( !WindowSplash.isActive )
 			WindowSplash.create();
 		
 		if ( currentRegion )
 			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_UNLOAD, currentRegion.guid ) );
 
-		var region:Region = getRegion( e.guid );
+		var region:Region = regionGet( e.guid );
 		if ( region ) {
 			currentRegion = region;
 			region.load();
@@ -213,13 +224,14 @@ public class RegionManager
 		// Should never get here
 		// No matching region found, so we have to go load it
 		var newRegion:Region = new Region( "ERROR_ID" );
+		newRegion.createEmptyRegion();
 		currentRegion = newRegion;
 		Log.out( "RegionManager.loadRegion - ERROR creating new region: " + e.guid, Log.ERROR );
 	}
 	
 	public function save():void
 	{
-		Log.out( "RegionManager.save" );
+		Log.out( "RegionManager.save", Log.DEBUG );
 		if ( Globals.online ) {
 			currentRegion.save()
 		}

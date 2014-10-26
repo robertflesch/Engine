@@ -47,7 +47,7 @@
 			// Save the region id for when we need to load the region.
 			_guid = $guid;
 			
-			trace("VVServer.joinRoom - trying to join room at host: " + Network.client.multiplayer.developmentServer );
+			trace("VVServer.joinRoom - trying to join room at host: " + Network.client.multiplayer.developmentServer, Log.DEBUG );
 			//Create pr join the room test
 			Network.client.multiplayer.createJoinRoom(
 				_guid,								//Room id. If set to null a random roomid is used
@@ -62,13 +62,13 @@
 		
 		static private function handleJoinError(error:PlayerIOError):void
 		{
-			Log.out("VVServer.handleJoinError: " + error );
+			Log.out( "VVServer.handleJoinError - Join Room Error: " + error.message, Log.ERROR, error );
 			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.JOIN_ROOM_FAILURE, error, _guid ) );
 		}
 		
 		static private function handleJoin(connection:Connection):void
 		{
-			Log.out("VVServer.handleJoin. Sucessfully joined Room");
+			Log.out("VVServer.handleJoin. Sucessfully joined Room", Log.DEBUG );
 			_connection = connection;
 			
 			//Add disconnect listener

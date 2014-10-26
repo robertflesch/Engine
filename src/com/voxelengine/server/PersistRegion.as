@@ -25,6 +25,28 @@
 		public function cacheRequestPrivate( e:RegionEvent ):void { loadRegions( Network.userId ); }
 		public function cacheRequestPublic( e:RegionEvent ):void { loadRegions( Network.PUBLIC ); }
 		
+		static public function loadRegion( $guid:String ):void {
+		
+			Log.out( "PersistRegion.loadRegion - guid: " + $guid, Log.DEBUG ); 
+			loadObject( PersistRegion.DB_TABLE_REGIONS
+						 , $guid
+						, loadRegionSuccessHandler
+						, loadRegionFailureHandler );
+						
+			function loadRegionFailureHandler(e:PlayerIOError):void 
+			{  
+				Log.out( "PersistRegion.loadRegion - errorHandler requesting guid: " + $guid + " error: " + e.message, Log.ERROR, e ); 
+				// We have failed to load a region, to keep app from trying over and over again, load a blank region.
+				var newRegion:Region = new Region( $guid );
+				newRegion.createEmptyRegion();
+				// Now that we have a fully formed region, inform the region manager
+				Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
+			}
+		}
+
+		static private function loadRegionSuccessHandler( dbo:DatabaseObject ):void {
+			loadRegionFromDBO( dbo );
+		}
 
 		static public function loadRegions( $userName:String ):void {
 			
@@ -35,12 +57,12 @@
 						 , null
 						 , 100
 						, loadRegionKeysSuccessHandler
-						, function (e:PlayerIOError):void {  Log.out( "PersistRegion.errorHandler - e: " + e ); } );
+						, function (e:PlayerIOError):void {  Log.out( "PersistRegion.errorHandler - e: " + e.message, Log.ERROR, e ); } );
 		}
 		
 		static private function loadRegionKeysSuccessHandler( dba:Array ):void {
 			
-			trace( "PersistRegion.loadKeysSuccessHandler - regions loaded: " + dba.length );
+			Log.out( "PersistRegion.loadKeysSuccessHandler - regions loaded: " + dba.length, Log.DEBUG );
 			for each ( var dbo:DatabaseObject in dba )
 			{
 				loadRegionFromDBO( dbo );
@@ -61,7 +83,7 @@
 			newRegion.modified = dbo.modified;
 			var $ba:ByteArray = dbo.data as ByteArray;
 			
-//			Log.out( "PersistRegion.loadFromDBO - regionJson: " + newRegion.name + "  owner: " + newRegion.owner );
+			Log.out( "PersistRegion.loadFromDBO - region Name: " + newRegion.name + "  owner: " + newRegion.owner + "  guid: " + newRegion.guid, Log.DEBUG );
 			
 			$ba.uncompress();
 			$ba.position = 0;
@@ -92,11 +114,10 @@
 				
 				$dbo.save( false
 					     , false
-					     , function saveRegionSuccess():void  {  Log.out( "PersistRegion.saveRegionSuccess - guid: " + $metadata.guid ); }	
-					     , function saveRegionFailed(e:PlayerIOError):void  { 
-							Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_SAVE_FAILURE, $metadata.guid ) ); 
-							Log.out( "PersistRegion.saveRegionFailed - error data: " + e); }  
-						);
+					     , function ():void  {  Log.out( "PersistRegion.saveRegionSuccess - guid: " + $metadata.guid, Log.DEBUG ); }	
+					     , function (e:PlayerIOError):void { 
+										Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_SAVE_FAILURE, $metadata.guid ) ); 
+										Log.out( "PersistRegion.saveRegionFailed - error data: " + e, Log.ERROR, e ) } );
 			}
 			else
 			{
@@ -107,7 +128,7 @@
 							, $createSuccess
 							, function createFailed(e:PlayerIOError):void { 
 								Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_FAILURE, $metadata.guid ) ); 
-								Log.out( "PersistRegion.createFailed - error saving: " + $metadata.guid + " error data: " + e);  }
+								Log.out( "PersistRegion.createFailed - error saving: " + $metadata.guid + " error data: " + e, Log.ERROR, e);  }
 							);
 			}
 			

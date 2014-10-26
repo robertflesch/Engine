@@ -3,7 +3,9 @@
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.LoginEvent;
 	import com.voxelengine.events.ProjectileEvent;
+	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.Globals;
+	import com.voxelengine.Log;
 	import com.voxelengine.worldmodel.models.Avatar;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelLoader;
@@ -36,9 +38,8 @@
 				
 				//Add message listener for users leaving the room
 				connection.addMessageHandler("UserLeft", function(m:Message, userid:uint):void{
-					trace("Player with the userid", userid, "just left the room"); } );
+					Log.out("Player with the userid: " + userid + "just left the room", Log.DEBUG ); } );
 					
-				Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.LOGIN_SUCCESS, null, "" ) );
 				// Only need this if we are online
 				Globals.g_app.addEventListener( ModelEvent.MOVED, sourceMovementEvent );
 			}
@@ -48,7 +49,7 @@
 		
 		static private function sourceMovementEvent( event:ModelEvent ):void
 		{
-			//trace("VVServer.handleMovementEvent - Received move event: " + event)
+			//trace("EventHandler.handleMovementEvent - Received move event: " + event)
 			var msg:Message = _connection.createMessage( Network.MOVE_MESSAGE );
 			msg.add( Network.userId );
 			msg.add( event.position.x, event.position.y, event.position.z );
@@ -91,7 +92,7 @@
 		
 		static private function addMeMessage(m:Message):void
 		{
-			trace("VVServer.addMeMessage - avatar for :" + m );
+			Log.out("EventHandler.addMeMessage - avatar for :" + m, Log.DEBUG );
 			createAvatar( m.getString(1) );
 		}
 		
@@ -102,7 +103,7 @@
 			ii.guid = "Player";
 			//ii.name = userid;
 			ModelLoader.load( ii );
-			trace("VVServer.createPlayer - create player model for :" + userid );
+			Log.out("EventHandler.createPlayer - create player model for :" + userid, Log.DEBUG );
 		}
 		
 		static private function createAvatar( userid:String ):void
@@ -112,19 +113,19 @@
 			ii.guid = "Player"; // Avatar
 			//ii.name = userid;
 			ModelLoader.load( ii );
-			trace("VVServer.createAvatar - create avatar for :" + userid );
+			Log.out("EventHandler.createAvatar - create avatar for :" + userid, Log.DEBUG );
 		}
 		
-		static private function userJoinedMessage(m:Message, userid:String):void
+		static private function userJoinedMessage( $m:Message, $userid:String):void
 		{
-			//trace("VVServer.userJoinedMessage - Player with the userid", userid, "just joined the room -- Network.userId: " + Network.userId );
-			if ( Network.userId != userid )
+			//trace("EventHandler.userJoinedMessage - Player with the userid", userid, "just joined the room -- Network.userId: " + Network.userId );
+			if ( Network.userId != $userid )
 			{
-				trace("VVServer.userJoinedMessage - ANOTHER PLAYER LOGGED ON" );
-				createPlayer( userid );
+				Log.out("EventHandler.userJoinedMessage - ANOTHER PLAYER LOGGED ON", Log.DEBUG );
+				createPlayer( $userid );
 				
 				var addMe:Message = _connection.createMessage( Network.ADD_ME );
-				addMe.add( userid );
+				addMe.add( $userid );
 				addMe.add( Network.userId );
 				_connection.sendMessage( addMe );
 
@@ -138,19 +139,26 @@
 			}
 			else 
 			{
-				//trace("VVServer.userJoinedMessage - Recieved message that I logged on ", userid );	
+				// This is ME!
+				Log.out("EventHandler.userJoinedMessage - Recieved message that I logged on " + $userid, Log.DEBUG );	
 				if ( !Globals.player )
-					Globals.createPlayer();
+					if ( false == Globals.createPlayer() )
+						Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
 				else	
-					trace("VVServer.userJoinedMessage - MY GHOST IS ALREADY ON!!!", userid );	
+					Log.out("EventHandler.userJoinedMessage - MY GHOST IS ALREADY ON!!!" + $userid, Log.DEBUG );	
 			}
+		}
+		
+		static private function createPlayerAfterRegionLoad( $e:RegionEvent ):void {
+			Globals.g_app.removeEventListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
+			Globals.createPlayer();
 		}
 				
 		static private function handleMoveMessage(m:Message):void
 		{
 			var userid:String = m.getString(0);
 			if ( Network.userId != userid ) {
-				//trace("VVServer.handleMoveMessage - Received move message", m);
+				//trace("EventHandler.handleMoveMessage - Received move message", m);
 				var am:Avatar = Globals.getModelInstance( userid ) as Avatar;
 				if ( am )
 				{
@@ -159,7 +167,7 @@
 				}
 			}
 			//else	
-			//	trace("VVServer.handleMoveMessage - Ignoring move messages for self")
+			//	trace("EventHandler.handleMoveMessage - Ignoring move messages for self")
 		}
 	}	
 }

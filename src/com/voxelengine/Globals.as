@@ -319,10 +319,13 @@ package com.voxelengine {
 				return g_regionManager.currentRegion.modelManager.reinitialize( $context );
 		}
 		
-		public static function createPlayer():void {
-			if ( null == g_regionManager.currentRegion )
-				Log.out( "Globals.createPlayer - current region null" );
-			return g_regionManager.currentRegion.modelManager.createPlayer();
+		public static function createPlayer():Boolean {
+			if ( null == g_regionManager.currentRegion ) {
+				Log.out( "Globals.createPlayer - current region null", Log.WARN );
+				return false;
+			}
+			else 	
+				return g_regionManager.currentRegion.modelManager.createPlayer();
 		}
 		
 		public static function draw( $mvp:Matrix3D, $context:Context3D ):void {

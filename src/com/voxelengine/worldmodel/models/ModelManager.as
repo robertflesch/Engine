@@ -434,21 +434,21 @@ package com.voxelengine.worldmodel.models
 			return newModelInfo;
 		}
 		
-		public function createPlayer():void	{
+		public function createPlayer():Boolean	{
 			
-			//private static var g_player:Player = null;			
-			//Log.out("ModelManager.createPlayer" );
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			if ( Globals.online ) {
-				Log.out( "ModelManager.createPlayer - creating from database" );
+				Log.out( "ModelManager.createPlayer - creating from database", Log.DEBUG );
 				Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
 			}
 			else {
-				Log.out( "ModelManager.createPlayer - creating from LOCAL" );
+				Log.out( "ModelManager.createPlayer - creating from LOCAL", Log.DEBUG );
 				instanceInfo.guid = "player";
 				instanceInfo.grainSize = 4;
 				ModelLoader.load( instanceInfo );
 			}
+			
+			return true
 		}
 		
 		import playerio.DatabaseObject;
@@ -466,15 +466,11 @@ package com.voxelengine.worldmodel.models
 				$dbo.age = 32;
 				$dbo.save();
 			}
-			
 		}
 		
 		private function onPlayerLoadError(error:PlayerIOError):void {
-			
-			Log.out("ModelManager.onPlayerLoadError" );
+			Log.out("ModelManager.onPlayerLoadError", Log.ERROR, error );
 		}
-
-
 		
 		public function update( $elapsedTimeMS:int ):void {
 			

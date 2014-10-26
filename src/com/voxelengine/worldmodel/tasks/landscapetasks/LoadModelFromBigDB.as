@@ -41,7 +41,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private var _vmmBase:VoxelModelMetadata;
 		
 		public function LoadModelFromBigDB( $guid:String, $layer:LayerInfo = null ) {
-			Log.out( "LoadModelFromBigDB.construct " );
+			//Log.out( "LoadModelFromBigDB.construct " );
 			_guid = $guid
 			_startTime = getTimer();
 			//public function AbstractTask(type:String, priority:int = 5, uid:Object = null, selfOverride:Boolean = false, blocking:Boolean = false)
@@ -51,7 +51,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		override public function start():void
 		{
-			Log.out( "LoadModelFromBigDB.start for guid:" + _guid );
+			//Log.out( "LoadModelFromBigDB.start for guid:" + _guid );
 			var timer:int = getTimer();
 			super.start() // AbstractTask will send event
 			
@@ -60,11 +60,11 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		private function successHandler($dbo:DatabaseObject):void 
 		{ 
-			Log.out( "LoadModelFromBigDB.successHandler base data loaded for guid:" + _guid );
+			Log.out( "LoadModelFromBigDB.successHandler base data loaded for guid:" + _guid, Log.DEBUG );
 			if ( !$dbo )
 			{
 				// This seems to be the failure case, not the error handler
-				Log.out( "LoadModelFromBigDB.successHandler - ERROR - NULL DatabaseObject for guid:" + _guid );
+				Log.out( "LoadModelFromBigDB.successHandler - ERROR - NULL DatabaseObject for guid:" + _guid, Log.ERROR );
 				finish( null );
 				return;
 			}
@@ -102,7 +102,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private	function errorHandler( $error:PlayerIOError ):void	
 		{ 
 			// Not sure when this error occurs, since if the database has no record, it succeeds but returns an empty record.
-			Log.writeError( "LoadModelFromBigDB.failed to load base model - DB Server Down?", $error.message, $error );
+			Log.out( "LoadModelFromBigDB.failed to load base model - DB Server Down? error: " + $error.message, Log.ERROR, $error );
 			finish( null);
 		}	
 		
@@ -127,7 +127,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			_count--;				
 			if ( 0 == _count )
 			{
-				Log.out( "LoadModelFromBigDB.successHandler - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _guid );
+				Log.out( "LoadModelFromBigDB.successHandler - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _guid, Log.DEBUG );
 				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 			}
 			
@@ -150,6 +150,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		private function templateLoadFailed( $e:ModelMetadataEvent ):void {
 			
+			Log.out( "LoadModelFromBigDB.templateLoadFailed - guid: " + _guid, Log.ERROR );
 			// The event data hold an emtpy voxelmodelMetadata object that only has the guid filled in,
 			if ( _guidTemplate == $e.vmm.guid ) {
 				Globals.g_app.removeEventListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, templateLoaded );

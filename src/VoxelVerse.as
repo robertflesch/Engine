@@ -72,7 +72,7 @@ package {
 			
 			var parameters:Object = stage.loaderInfo.parameters;
 			if ( parameters.guid ) {
-				Log.out( "VoxelVerse.init - single model found: " + parameters.guid );
+				Log.out( "VoxelVerse.init - single model found: " + parameters.guid, Log.DEBUG );
 				//_displayGuid = parameters.guid;			
 			}
 			
@@ -104,7 +104,7 @@ package {
 				// This doesnt work in chrome, so I need someway to detect chrome and do it differently
 				// Globals.appPath = "file:///C:/dev/VoxelVerse/resources/bin/";
 				var urlPath:String = ExternalInterface.call("window.location.href.toString");
-				Log.out( "VoxelVerse.swf loaded from: " + urlPath, Log.INFO);
+				Log.out( "VoxelVerse.swf loaded from: " + urlPath, Log.DEBUG );
 				var index:int = urlPath.indexOf( "index.html" );
 				if ( -1 == index )
 				{
@@ -120,7 +120,7 @@ package {
 			}
 			catch ( error:Error )
 			{
-				Log.out("VoxelVerse.init - ExternalInterface not found, using default location", Log.INFO);
+				Log.out("VoxelVerse.init - ExternalInterface not found, using default location", Log.DEBUG );
 				Globals.appPath = "http://r.playerio.com/r/voxelverse-lpeje46xj0krryqaxq0vog/"
 				//Globals.appPath = "";
 			}

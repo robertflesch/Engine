@@ -49,6 +49,7 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		static public function load( $ii:InstanceInfo, $vmm:VoxelModelMetadata = null ):void {
+			//Log.out( "ModelLoader.load - InstanceInfo: " + $ii.toString(), Log.DEBUG );
 			Globals.instanceInfoAdd( $ii ); // Uses a name + guid as identifier
 			if ( !Globals.isGuid( $ii.guid ) && $ii.guid != "LoadModelFromBigDB" )
 				loadLocal( $ii, $vmm )
@@ -85,7 +86,7 @@ package com.voxelengine.worldmodel.models
 		// Persistant model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		static private function loadPersistant( $ii:InstanceInfo ):void {
-			Log.out( "ModelLoader.loadPersistant - InstanceInfo: " + $ii.toString() );
+			Log.out( "ModelLoader.loadPersistant - InstanceInfo: " + $ii.toString(), Log.DEBUG );
 			// land task controller, this tells task controller not to run until it is done loading all tasks
 //			Globals.g_landscapeTaskController.activeTaskLimit = 0;
 			// Create task group
@@ -168,7 +169,7 @@ package com.voxelengine.worldmodel.models
 			if ( Globals.online )
 				Log.out( "ModelLoader.loadLocal - LOADING LOCAL WHEN ONLINE - InstanceInfo: " + $ii.toString(), Log.ERROR );
 				
-			Log.out( "ModelLoader.loadLocal - InstanceInfo: " + $ii.toString() );
+			Log.out( "ModelLoader.loadLocal - InstanceInfo: " + $ii.toString(), Log.DEBUG );
 			var modelInfo:ModelInfo = modelInfoFindOrCreate( $ii.guid, $ii.guid );
 			if ( modelInfo )
 			{
@@ -179,10 +180,8 @@ package com.voxelengine.worldmodel.models
 		static public function modelInfoFindOrCreate( $guid:String, $name:String, $block:Boolean = true ):ModelInfo {
 			var modelInfo:ModelInfo = Globals.modelInfoGet( $name );
 			
-			if ( null == $name )
-			{
-				Log.out( "ModelLoader.modelInfoFindOrCreate - ERROR fileName is NULL", Log.ERROR );
-			}
+			if ( null == $name || null == $guid )
+				Log.out( "ModelLoader.modelInfoFindOrCreate - ERROR fileName or guid is NULL", Log.ERROR );
 			
 			// if no model info found, we have to load a copy
 			if ( !modelInfo )
@@ -190,7 +189,7 @@ package com.voxelengine.worldmodel.models
 				// if we are already waiting for a copy to load, then add a $block if shouldBlock is true, else add a loader.
 				if ( !_blocks[$name] )
 				{
-					Log.out( "ModelLoader.modelInfoFindOrCreate - loading: " + ( Globals.modelPath + $guid + MODEL_MANAGER_MODEL_EXT ) );
+					Log.out( "ModelLoader.modelInfoFindOrCreate - loading: " + ( Globals.modelPath + $guid + MODEL_MANAGER_MODEL_EXT ), Log.DEBUG );
 					var loader:CustomURLLoader = new CustomURLLoader( new URLRequest( Globals.modelPath + $guid + MODEL_MANAGER_MODEL_EXT ) );
 					loader.addEventListener(Event.COMPLETE, onModelInfoLoaded);
 					loader.addEventListener(IOErrorEvent.IO_ERROR, onModelInfoLoadError);
@@ -203,17 +202,13 @@ package com.voxelengine.worldmodel.models
 			return modelInfo;
 			
 			function onModelInfoLoadError(event:IOErrorEvent):void {
-				Log.out("ModelLoader.onModelInfoLoadError: ERROR" );
+				Log.out("ModelLoader.onModelInfoLoadError: ERROR: " + event.formatToString, Log.ERROR );
 				var req:URLRequest = CustomURLLoader(event.target).request;			
 				var fileName:String = CustomURLLoader(event.target).fileName;			
 				var guid:String = fileName.substr( 0, fileName.lastIndexOf( "." ) );
 				clearBlock( guid, true );
-				Log.out("----------------------------------------------------------------------------------" );
-				Log.out("ModelLoader.onModelInfoLoadError: ERROR LOADING MODEL: " + event.text, Log.ERROR );
-				Log.out("----------------------------------------------------------------------------------" );
 			}	
 				
-			//
 			function onModelInfoLoaded(event:Event):void {
 				//var req:URLRequest = CustomURLLoader(event.target).request;			
 				var fileName:String = CustomURLLoader(event.target).fileName;			
@@ -225,7 +220,7 @@ package com.voxelengine.worldmodel.models
 				}
 				catch ( error:Error ) {
 					Log.out("----------------------------------------------------------------------------------" );
-					Log.out("ModelLoader.onModelInfoLoaded - ERROR PARSING: fileName: " + fileName + "  data: " + fileData, Log.ERROR );
+					Log.out("ModelLoader.onModelInfoLoaded - ERROR PARSING: fileName: " + fileName + "  data: " + fileData, Log.ERROR, error );
 					Log.out("----------------------------------------------------------------------------------" );
 					return;
 				}
@@ -386,9 +381,6 @@ package com.voxelengine.worldmodel.models
 			{
 				var instance:InstanceInfo = new InstanceInfo();
 				instance.initJSON( v.model );
-				//trace( "ModelLoader.loadObjects: ----------------  fileName:" + v.model.fileName );
-				
-				//Log.out( "ModelLoader.loadRegionObjects - loading: " + instance.toString() );
 				load( instance );
 				count++;
 			}

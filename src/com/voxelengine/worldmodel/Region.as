@@ -178,14 +178,14 @@ package com.voxelengine.worldmodel
 		
 		private function onLoadingComplete( le:LoadingEvent ):void
 		{
-			Log.out( "Region.onLoadingComplete: regionId: " + guid );
+			Log.out( "Region.onLoadingComplete: regionId: " + guid, Log.DEBUG );
 			_loaded = true;
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		}
 
 		public function unload():void
 		{
-			Log.out( "Region.unloadRegion: " + guid );
+			Log.out( "Region.unloadRegion: " + guid, Log.DEBUG );
 			// Removes anonymous function
 			Globals.g_app.removeEventListener( RegionEvent.REGION_MODIFIED, handleRegionModified );
 			//Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_ADDED, function( me:ModelEvent ):void { ; } );
@@ -203,7 +203,7 @@ package com.voxelengine.worldmodel
 				
 		public function load():void
 		{
-			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name );
+			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
 			Globals.g_app.addEventListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.addEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
@@ -218,7 +218,7 @@ package com.voxelengine.worldmodel
 			if ( !Globals.online && !Globals.player )
 				Globals.createPlayer();
 				
-			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name );
+			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name, Log.DEBUG );
 		}		
 
 		public function getSkyColor():Vector3D
@@ -319,7 +319,7 @@ package com.voxelengine.worldmodel
 				return;
 			}
 				
-			Log.out( "Region.save - saving changes to Persistance: " + guid ); 
+			Log.out( "Region.save - saving changes to Persistance: " + guid, Log.DEBUG ); 
 			var ba:ByteArray = new ByteArray();
 			ba.clear();
 			var regionJson:String = getJSON();
@@ -345,7 +345,7 @@ package com.voxelengine.worldmodel
 				return;
 			}
 				
-			Log.out( "Region.saveEdit - saving changes to Persistance: " + guid ); 
+			Log.out( "Region.saveEdit - saving changes to Persistance: " + guid, Log.DEBUG ); 
 			var ba:ByteArray = new ByteArray();
 			ba.clear();
 			// Lets see if this updates the _JSON object.
@@ -372,7 +372,7 @@ package com.voxelengine.worldmodel
 		}
 		
 		private function metadata( ba: ByteArray ):Object {
-			Log.out( "Region.metadata userId: " + Network.userId + "  this region is owned by: " + _owner );
+			Log.out( "Region.metadata userId: " + Network.userId + "  this region is owned by: " + _owner, Log.DEBUG );
 			return {
 					admin: 			GetAdminList(),
 					created: 		_created ? _created : new Date(),
@@ -391,7 +391,7 @@ package com.voxelengine.worldmodel
 			if ( o )
 				databaseObject = o;
 			Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS, guid ) ); 
-			Log.out( "Region.createSuccess - created: " + guid ); 
+			Log.out( "Region.createSuccess - created: " + guid, Log.DEBUG ); 
 		}	
 		
 		public function createEmptyRegion():void { initJSON( BLANK_REGION_TEMPLETE ); }

@@ -83,7 +83,7 @@ package com.voxelengine.worldmodel.models
 		
 		static private function templateLoadFailure( $error:PlayerIOError ):void {
 			
-			Log.writeError( "TemplateLoad", $error.message, $error );
+			Log.out( "TemplateManager.templateLoadFailure - error: " + $error.message, Log.ERROR, $error );
 			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
 			vmm.guid = _guidError;
 			Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm ) );

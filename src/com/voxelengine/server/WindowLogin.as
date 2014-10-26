@@ -39,11 +39,11 @@ package com.voxelengine.server
 			super( "Login" );
             //autoSize = true;
 			width = 300;
-			height = 340;
+			height = 336;
 			layout.orientation = LayoutOrientation.VERTICAL;
 
 			if ( !Globals.g_debug )
-				closeButtonActive = false;  // this greys it out, and doesnt allow it to be clicked
+				showCloseButton = false;
 
 			_topImage = (new _topImageClass() as Bitmap);
 			var pic:Image = new Image( _topImage, width, 189 );
@@ -80,7 +80,7 @@ package com.voxelengine.server
 			
 			addElement( infoPanel );
 			
-			const buttonWidth:int = 100;
+			const buttonWidth:int = 99;
 			const buttonHeight:int = 40;
 			var buttonPanel:Container = new Container( width, 40 );
 			var loginButton:Button = new Button( "Login", buttonWidth, buttonHeight );
@@ -92,7 +92,7 @@ package com.voxelengine.server
 			buttonPanel.addElement( registerButton );
 			
 			var lostPasswordButton:Button = new Button( "Lost Password", buttonWidth, buttonHeight );
-			lostPasswordButton.fontSize = 10;
+			lostPasswordButton.fontSize = 9;
 			lostPasswordButton.addEventListener(UIMouseEvent.CLICK, lostPasswordHandler );
 			buttonPanel.addElement( lostPasswordButton );
 			
@@ -154,7 +154,7 @@ package com.voxelengine.server
 			else if ( 0 < _errorText.text.indexOf( "password" ) )
 				_passwordInput.glow = true;
 			else
-				Log.writeError(" WindowLogin.simpleConnectFailure", _errorText.text, $error );
+				Log.out(" WindowLogin.simpleConnectFailure" + $error.message, Log.ERROR, $error );
 		}
 		
 		public function connectSuccess( $client:Client):void

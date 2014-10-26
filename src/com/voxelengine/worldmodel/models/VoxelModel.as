@@ -1031,9 +1031,7 @@ package com.voxelengine.worldmodel.models
 			
 			function failed( $e:PlayerIOError ):void 
 			{ 
-				Log.writeError( "VoxelModel.save"
-				              , "error saving: " + metadata.name + " error: " + $e.message
-							  , $e );
+				Log.out( "VoxelModel.save error saving: " + metadata.name + " error: " + $e.message, Log.ERROR, $e )
 				// seems like this MIGHT throw it in an endless loop
 				//_changed = true;
 			} 

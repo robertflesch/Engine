@@ -339,6 +339,7 @@ package com.voxelengine.GUI
 			Globals.g_app.addEventListener(ModelEvent.RELEASE_CONTROL, WindowBeastControl.handleModelEvents );
 			Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
 			Globals.g_app.addEventListener(LoginEvent.JOIN_ROOM_FAILURE, joinRoomFailureHandler );
+			Globals.g_app.addEventListener(LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
 		}
 		
 		private function joinRoomFailureHandler( e:LoginEvent ):void {

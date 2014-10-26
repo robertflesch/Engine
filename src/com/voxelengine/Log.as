@@ -13,6 +13,7 @@ package com.voxelengine
 	import com.furusystems.logging.slf4as.ILogger;
 	import com.voxelengine.server.Network;
 	import playerio.ErrorLog;
+	import org.flashdevelop.utils.TraceLevel;
 	
 	public class Log {
 		
@@ -41,15 +42,15 @@ package com.voxelengine
 				Globals.g_app.addChild(DConsole.view);
 				DConsole.createCommand( "hide", hide );
 				ConsoleCommands.addCommands();
-				out( "Type 'hide' to hide the console", Log.WARN );
+				out( "Type 'hide' to hide the console", Log.ERROR );
 			}
 			DConsole.show();
 			_showing = true;
 		}
 		
-		public static function writeError( $errorType:String, $details:String, $error:Error, $extraData:Object = null, callback:Function = null, errorHandler:Function = null):void {
+		private static function writeErrorToServer( $errorType:String, $details:String, $error:Error, $extraData:Object = null, callback:Function = null, errorHandler:Function = null):void {
 			
-			var stackTrace:String = "unknown stack trace";
+			var stackTrace:String = "NO stack trace";
 			if ( $error ) {
 				stackTrace = $error.getStackTrace();
 				var split:Array = stackTrace.split("\n");
@@ -58,43 +59,40 @@ package com.voxelengine
 			}
 			if ( Network.client )
 				Network.client.errorLog.writeError( $errorType, $details, stackTrace, $extraData );
-			else {
-				Logging.getLogger(Log).error( $errorType + "  " + $details + "  " + stackTrace );
-			}
 		}
 		
 		
-		public static function out( $msg:String, type:int = INFO ):void {
+		public static function out( $msg:String, $type:int = INFO, $error:Error = null ):void {
 			
 			const L:ILogger = Logging.getLogger(Log);
 
-			trace( $msg );
-			
-			if ( INFO < type )
-				show();
-
-			if ( _showing )
-			{
-				switch ( type )
-				{ 
-					//case DEBUG:
-						//Log.L.debug(msg); //These are general debugging messages (your commonplace traces)
-						//break;
-					//case INFO:
-						//Log.L.info(msg); //These are general debugging messages (your commonplace traces)
-						//break;
-					case WARN:
-						L.warn( $msg );
-						break;
-					case ERROR:
-						L.error("*** " + $msg );
-						writeError( "Error", $msg, null );
-						break;
-					case FATAL:
-						L.fatal( $msg );
-						break;
-				}
+			switch ( $type )
+			{ 
+				case DEBUG:
+					trace( String(TraceLevel.DEBUG) + ":" + $msg );	
+					break;
+				case INFO:
+					trace( String(TraceLevel.INFO) + ":" + $msg );	
+					break;
+				case WARN:
+					trace( String(TraceLevel.ERROR) + ":" + $msg );	// I hate the warning color
+					//L.warn( $msg );
+					break;
+				case ERROR:
+					trace( String(TraceLevel.FATAL) + ":" + $msg );	
+					L.error( $msg );
+					writeErrorToServer( "Error", $msg, $error );
+					break;
+				case FATAL:
+					trace( String(TraceLevel.FATAL) + ":"+ $msg );	
+					L.fatal( $msg );
+					writeErrorToServer( "Error", $msg, $error );
+					break;
 			}
+			
+			
+			if ( ERROR < $type )
+				show();
 		}
 	}
 }

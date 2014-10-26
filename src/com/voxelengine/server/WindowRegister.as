@@ -55,7 +55,7 @@ package com.voxelengine.server
 		{
 			super( "Register" );
 			padding = 15;
-			width = 290;
+			width = 280;
 			height = 340;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			
@@ -192,7 +192,7 @@ package com.voxelengine.server
 			}
 							
 			function onCaptchaLoadError( $error:IOErrorEvent):void {
-				Log.writeError("WindowRegister", "onCaptchaLoadError: " + $error.formatToString, null );
+				Log.out("WindowRegister.onCaptchaLoadError: " + $error.formatToString, Log.ERROR );
 			}		
 		}
 		
@@ -206,7 +206,7 @@ package com.voxelengine.server
 			
 							
 			function onCaptchaReLoadError( $error:IOErrorEvent):void {
-				Log.writeError("WindowRegister", "onCaptchaReLoadError: " + $error.formatToString, null );
+				Log.out("WindowRegister.onCaptchaReLoadError: " + $error.formatToString, Log.ERROR );
 			}		
 		}		
 
@@ -217,7 +217,7 @@ package com.voxelengine.server
 		}
 		
 		private function captchaFailure( $error:PlayerIOError):void {
-			Log.writeError("WindowRegister", "captchaFailure: " + $error.message, $error );
+			Log.out("WindowRegister.captchaFailure: " + $error.message, Log.ERROR, $error );
 		}		
 		
 		private function captchaReload($event:UIMouseEvent):void {
@@ -238,7 +238,7 @@ package com.voxelengine.server
 				return;
 			}
 			
-			trace( "userName: " + _userName + "  password: " + _password + "  email:" + _email );
+			Log.out( "userName: " + _userName + "  password: " + _password + "  email:" + _email, Log.DEBUG );
 			PlayerIO.quickConnect.simpleRegister(
 									Globals.g_app.stage,
 									Globals.g_gamesNetworkID,
@@ -273,13 +273,13 @@ package com.voxelengine.server
 			}
 			else {
 				_errorText.text = "Unknown Error in simpleResister: " + e.message;
-				Log.writeError( "Registration Error", "Unknown Error in simpleResister: " + e.message, e);
+				Log.out( "WindowRegistration.registrationError Unknow Registrion Error in simpleResister: " + e.message, Log.ERROR, e);
 			}
 		}
 			
 		private function registrationSuccess(client:Client):void 
 		{ 
-			trace("simpleRegister succeed");
+			Log.out("WindowRegistration.registrationSuccess - simpleRegister succeed");
 			new WindowLogin( _email, _password );
 			remove();
 		}
