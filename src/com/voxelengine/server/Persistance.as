@@ -1,11 +1,12 @@
 ﻿package com.voxelengine.server 
 {
+	import flash.events.EventDispatcher;
 	import playerio.Client;
 	import playerio.BigDB;
 	import playerio.PlayerIOError;
 	import playerio.DatabaseObject;
 		
-	import com.voxelengine.Globals;
+	//import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	
 	import com.voxelengine.events.LoginEvent;
@@ -19,8 +20,23 @@
 		static private var _errorHandler:Function;
 		static private var _isCreate:Boolean;
 		
+		private var _persistInventory:PersistInventory;
+		private var _persistRegion:PersistRegion;
+		
+		static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
+		static public function get eventDispatcher():EventDispatcher { return _eventDispatcher; }
+		
 		static public function loadMyPlayerObject( $success:Function, $failure:Function ):void {
 			Network.client.bigDB.loadMyPlayerObject( $success, $failure );
+		}
+		
+		public function Persistance() {
+		}
+		
+		public function addEventHandlers():void {
+			PersistRegion.addEvents();
+			PersistInventory.addEvents();
+			PersistAnimation.addEvents();
 		}
 		
 		static public function deleteKeys( $table:String, $keys:Array, $successHandler:Function, $errorHandler:Function ):void {
@@ -35,34 +51,38 @@
 			{
 				Network.client.bigDB.createObject( $table, $key, $data, $successHandler, $errorHandler );
 			}
-			else
-			{
-				Globals.g_app.stage.addEventListener( LoginEvent.LOGIN_SUCCESS, onLoginSuccessCreateObject );
-				Globals.g_app.stage.addEventListener( LoginEvent.LOGIN_FAILURE, onLoginFailureCreateObject );
-				_table = $table;
-				_key = $key;
-				_data = $data;
-				_successHandler = $successHandler;
-				_errorHandler = $errorHandler;
-				_isCreate = true;
-				new WindowLogin();
-			}
+			//else
+			//{
+				//Globals.g_app.stage.addEventListener( LoginEvent.LOGIN_SUCCESS, onLoginSuccessCreateObject );
+				//Globals.g_app.stage.addEventListener( LoginEvent.LOGIN_FAILURE, onLoginFailureCreateObject );
+				//_table = $table;
+				//_key = $key;
+				//_data = $data;
+				//_successHandler = $successHandler;
+				//_errorHandler = $errorHandler;
+				//_isCreate = true;
+				//new WindowLogin();
+			//}
 		}
 		
-		static public function loadObject( $table:String, $key:String, $successHandler:Function, $errorHandler:Function ):void {
-			if ( Network.client )
+		static public function loadObject( $table:String, $key:String, $successHandler:Function, $errorHandler:Function ):Boolean {
+			var result:Boolean;
+			if ( Network.client ) {
 				Network.client.bigDB.load( $table, $key, $successHandler, $errorHandler );
-			else
-			{
-				Globals.g_app.stage.addEventListener( LoginEvent.LOGIN_SUCCESS, onLoginSuccessCreateObject );
-				Globals.g_app.stage.addEventListener( LoginEvent.LOGIN_FAILURE, onLoginFailureCreateObject );
-				_table = $table;
-				_key = $key;
-				_successHandler = $successHandler;
-				_errorHandler = $errorHandler;
-				_isCreate = false;
-				new WindowLogin();
+				result = true;
 			}
+			//else
+			//{
+				//Globals.g_app.stage.addEventListener( LoginEvent.LOGIN_SUCCESS, onLoginSuccessCreateObject );
+				//Globals.g_app.stage.addEventListener( LoginEvent.LOGIN_FAILURE, onLoginFailureCreateObject );
+				//_table = $table;
+				//_key = $key;
+				//_successHandler = $successHandler;
+				//_errorHandler = $errorHandler;
+				//_isCreate = false;
+				//new WindowLogin();
+			//}
+			return result;
 		}
 		
 		static public function loadKeys( $table:String, $key:Array, $successHandler:Function, $errorHandler:Function ):void {
@@ -96,7 +116,7 @@
 				$errorHandler( new PlayerIOError( "LoadKeys", 0 ) );
 			}
 		}
-		
+		/*
 		static private function onLoginSuccessCreateObject(event : LoginEvent ) : void {
 			Globals.g_app.stage.removeEventListener( LoginEvent.LOGIN_SUCCESS, onLoginSuccessCreateObject );
 			if ( _isCreate )
@@ -131,5 +151,6 @@
 				
 			_errorHandler( event.error );	
 		}
+		*/
 	}	
 }
