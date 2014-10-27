@@ -450,7 +450,7 @@ package com.voxelengine.GUI
 			}
 		}
 		
-		private function joinRoomFailureHandler( e:LoginEvent ):void {
+		private function joinRoomFailureHandler( e:RoomEvent ):void {
 			
 			var popup:VVPopup = new VVPopup("NO SERVERS FOUND");
 			popup.width = 250;

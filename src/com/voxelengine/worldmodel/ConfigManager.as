@@ -31,11 +31,13 @@ package com.voxelengine.worldmodel
 		private var _showHelp:Boolean = true;
 		private var _showEditMenu:Boolean = true;
 		private var _showButtons:Boolean = true;
-		private var _regionJson:Object
+		private var _defaultRegionJson:Object
 		
 		public function get showHelp():Boolean { return _showHelp; }
 		public function get showEditMenu():Boolean { return _showEditMenu; }
 		public function get showButtons():Boolean { return _showButtons; }
+		
+		public function get defaultRegionJson():Object  { return _defaultRegionJson; }
 
 		public function ConfigManager( $optionalGuid:String ):void 
 		{
@@ -57,11 +59,11 @@ package com.voxelengine.worldmodel
 		public function onConfigLoadedAction(event:Event):void
 		{
 			var jsonString:String = StringUtil.trim(String(event.target.data));
-			_regionJson = JSON.parse(jsonString);
-			var type:String = _regionJson.config.typeName;
-			_showHelp = _regionJson.config.showHelp;
-			_showEditMenu = _regionJson.config.showEditMenu;
-			_showButtons = _regionJson.config.showButtons;
+			_defaultRegionJson = JSON.parse(jsonString);
+			var type:String = _defaultRegionJson.config.typeName;
+			_showHelp = _defaultRegionJson.config.showHelp;
+			_showEditMenu = _defaultRegionJson.config.showEditMenu;
+			_showButtons = _defaultRegionJson.config.showButtons;
 			
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 			TypeInfo.loadTypeData(type);
@@ -73,15 +75,15 @@ package com.voxelengine.worldmodel
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 			if ( false ) {
 				Globals.g_app.addEventListener(LoginEvent.LOGIN_SUCCESS, listenForLoginSuccess );
-				Network.autoLogin( _regionJson.config.region.startingRegion );
+				Network.autoLogin( _defaultRegionJson.config.region.startingRegion );
 			}
 			else // loading local
-				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_CONFIG_COMPLETE, _regionJson.config.region.startingRegion ) );
+				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_CONFIG_COMPLETE, _defaultRegionJson.config.region.startingRegion ) );
 		}
 		
 		private function listenForLoginSuccess( $event:LoginEvent ):void {
 			Globals.g_app.removeEventListener(LoginEvent.LOGIN_SUCCESS, listenForLoginSuccess );
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REQUEST_JOIN, _regionJson.config.region.startingRegion ) ); 
+			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REQUEST_JOIN, _defaultRegionJson.config.region.startingRegion ) ); 
 		}
 
 		public function errorAction(e:IOErrorEvent):void

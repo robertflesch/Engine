@@ -1,5 +1,4 @@
-﻿package com.voxelengine.worldmodel.models
-{
+﻿package com.voxelengine.worldmodel.inventory {
 	public class InventoryObjects
     {
 		static public const ITEM_INVALID:int = 0;
