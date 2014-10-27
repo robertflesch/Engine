@@ -2,6 +2,8 @@
 {
 	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.renderer.lamps.*;
+	import com.voxelengine.server.Persistance;
+	import com.voxelengine.worldmodel.inventory.Inventory;
 	import com.voxelengine.worldmodel.weapons.Gun;
 	import com.voxelengine.worldmodel.weapons.Bomb;
 	
@@ -37,8 +39,7 @@
 		static private const 	AVATAR_CLIP_FACTOR:Number 	= 0.90;
 		static private var  	STEP_UP_MAX:int 			= 16;
 		
-		private var _inventoryStore:SharedObject;
-		private var _inventory:Vector.<InventoryObjects> = new Vector.<InventoryObjects>();
+		private var _inventory:Inventory;
 		
 		public function Player( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
 			//Log.out( "Player.contruct --------------------------------------------------------------------------------------------------------------------" );
@@ -61,8 +62,10 @@
 			
 			//_ct.markersAdd();
 			
-			//inventoryLoad();
 			torchToggle();
+			
+			_inventory = new Inventory( metadata.guid );
+			_inventory.load();
 		}
 		
 		override public function release():void {
@@ -145,37 +148,21 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 			Shader.lightsClear();
 		}
 		*/
-		private function inventoryLoad():void
-		{
-			//returns the mySharedObject if it exists, if not creates a new one
-			_inventoryStore = SharedObject.getLocal("inventory");
-			//take your array and put it on the so
-			_inventory = _inventoryStore.data.inventory;
-			
-			//save the data
-			inventorySave();			
-		}
-
+		
 		private function inventorySave():void
 		{
-			_inventoryStore.data.inventory = _inventory;
-			_inventoryStore.flush();			
+			_inventory.save();
 		}
 		
 		private function inventoryAdd( $type:int, $item:* ):void
 		{
-			var io:InventoryObjects = new InventoryObjects();
+/*			var io:InventoryObjects = new InventoryObjects();
 			io.item = $item;
 			io.type = $type
 			
 			_inventory.push( io );
 			
-			inventorySave();
-		}
-		
-		public function inventoryGet():Array
-		{
-			return _inventoryStore.data.inventory
+			inventorySave();*/
 		}
 		
 		override public function collisionTest( $elapsedTimeMS:Number ):Boolean {

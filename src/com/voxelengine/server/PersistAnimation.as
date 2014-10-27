@@ -12,7 +12,7 @@
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.events.PersistanceEvent;
+	import com.voxelengine.events.RegionPersistanceEvent;
 	
 	public class PersistAnimation extends Persistance
 	{
@@ -91,41 +91,6 @@
 		}
 
 		static public function saveAnim( $metadata:Object, $dbo:DatabaseObject, $createSuccess:Function ):void {
-
-			if ( $dbo )
-			{
-				Log.out( "PersistAnimation.save - saving Anim back to BigDB: " + $metadata.guid );
-				$dbo.name = $metadata.name;
-				$dbo.description = $metadata.desc;
-				$dbo.data = $metadata.data;
-				$dbo.world = $metadata.world;
-				$dbo.modified = new Date();
-				//$dbo.model = $metadata.model;  // Parent model
-//				$dbo.admin = $metadata.admin;
-//				$dbo.editors = $metadata.editors;
-				//$dbo.owner = $metadata.owner;  // Do not think this should be allowed to change under normal circumstances
-				
-				$dbo.save( false
-					     , false
-					     , function saveAnimSuccess():void  {  Log.out( "PersistAnimation.saveAnimSuccess - guid: " + $metadata.guid ); }	
-					     , function saveAnimFailed(e:PlayerIOError):void  { 
-							Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_SAVE_FAILURE, $metadata.guid ) ); 
-							Log.out( "PersistAnimation.saveAnimFailed - error data: " + e); }  
-						);
-			}
-			else
-			{
-				Log.out( "PersistAnimation.create - creating new Anim: " + $metadata.guid + "" );
-				createObject( PersistAnimation.DB_TABLE_ANIMATIONS
-							, $metadata.guid
-							, $metadata
-							, $createSuccess
-							, function createFailed(e:PlayerIOError):void { 
-								Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_FAILURE, $metadata.guid ) ); 
-								Log.out( "PersistAnimation.createFailed - error saving: " + $metadata.guid + " error data: " + e);  }
-							);
-			}
-			
 		}
 		
 		// comma seperated variables

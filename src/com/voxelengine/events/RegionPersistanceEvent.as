@@ -14,19 +14,18 @@ package com.voxelengine.events
 	 * @author Robert Flesch - RSF 
 	 * 
 	 */
-	public class PersistanceEvent extends Event
+	public class RegionPersistanceEvent extends Event
 	{
-		static public const PERSISTANCE_CREATE_SUCCESS:String		= "PERSISTANCE_CREATE_SUCCESS";
-		static public const PERSISTANCE_CREATE_FAILURE:String		= "PERSISTANCE_CREATE_FAILURE";
+		static public const REGION_CREATE_SUCCESS:String		= "REGION_CREATE_SUCCESS";
+		static public const REGION_CREATE_FAILURE:String		= "REGION_CREATE_FAILURE";
 		
-		static public const PERSISTANCE_SAVE_SUCCESS:String			= "PERSISTANCE_SAVE_SUCCESS";
-		static public const PERSISTANCE_SAVE_FAILURE:String			= "PERSISTANCE_SAVE_FAILURE";
-		
-		static public const PERSISTANCE_CONNECTION_FAILURE:String	= "PERSISTANCE_CONNECTION_FAILURE";
+		// Not handled anywhere
+		static public const REGION_SAVE_SUCCESS:String			= "REGION_SAVE_SUCCESS";
+		static public const REGION_SAVE_FAILURE:String			= "REGION_SAVE_FAILURE";
 		
 		private var _guid:String;
 		
-		public function PersistanceEvent( $type:String, $guid:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
+		public function RegionPersistanceEvent( $type:String, $guid:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
 		{
 			super( $type, $bubbles, $cancellable );
 			_guid = $guid;
@@ -34,7 +33,7 @@ package com.voxelengine.events
 		
 		public override function clone():Event
 		{
-			return new PersistanceEvent(type, _guid, bubbles, cancelable);
+			return new RegionPersistanceEvent(type, _guid, bubbles, cancelable);
 		}
 	   
 		public override function toString():String

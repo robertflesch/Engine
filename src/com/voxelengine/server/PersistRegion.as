@@ -8,7 +8,7 @@
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.events.PersistanceEvent;
+	import com.voxelengine.events.RegionPersistanceEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.events.RegionLoadedEvent;
 	import com.voxelengine.worldmodel.Region;
@@ -17,18 +17,18 @@
 	{
 		static public const DB_TABLE_REGIONS:String = "regions";
 		
-		public function PersistRegion():void {
+		static public function addEvents():void {
 			Globals.g_app.addEventListener( RegionEvent.REQUEST_PUBLIC, cacheRequestPublic ); 
 			Globals.g_app.addEventListener( RegionEvent.REQUEST_PRIVATE, cacheRequestPrivate ); 
 		}
 		
-		private function cacheRequestPrivate( e:RegionEvent ):void { loadRegions( Network.userId ); }
-		private function cacheRequestPublic( e:RegionEvent ):void { loadRegions( Network.PUBLIC ); }
+		static private function cacheRequestPrivate( e:RegionEvent ):void { loadRegions( Network.userId ); }
+		static private function cacheRequestPublic( e:RegionEvent ):void { loadRegions( Network.PUBLIC ); }
 		
 		static public function loadRegion( $guid:String ):void {
 		
 			Log.out( "PersistRegion.loadRegion - guid: " + $guid, Log.DEBUG ); 
-			loadObject( PersistRegion.DB_TABLE_REGIONS
+			loadObject( DB_TABLE_REGIONS
 						 , $guid
 						, loadRegionSuccessHandler
 						, loadRegionFailureHandler );
@@ -50,7 +50,7 @@
 
 		static private function loadRegions( $userName:String ):void {
 			
-			loadRange( PersistRegion.DB_TABLE_REGIONS
+			loadRange( DB_TABLE_REGIONS
 						 , "regionOwner"
 						 , [$userName]
 						 , null
@@ -98,7 +98,7 @@
 			Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
 		}
 
-		static public function saveRegion( $metadata:Object, $dbo:DatabaseObject, $createSuccess:Function ):void {
+		static public function save( $guid:String, $metadata:Object, $dbo:DatabaseObject, $createSuccess:Function ):void {
 
 			if ( $dbo )
 			{
@@ -116,18 +116,18 @@
 					     , false
 					     , function ():void  {  Log.out( "PersistRegion.saveRegionSuccess - guid: " + $metadata.guid, Log.DEBUG ); }	
 					     , function (e:PlayerIOError):void { 
-										Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_SAVE_FAILURE, $metadata.guid ) ); 
+										Globals.g_app.dispatchEvent( new RegionPersistanceEvent( RegionPersistanceEvent.REGION_SAVE_FAILURE, $metadata.guid ) ); 
 										Log.out( "PersistRegion.saveRegionFailed - error data: " + e, Log.ERROR, e ) } );
 			}
 			else
 			{
 				Log.out( "PersistRegion.create - creating new region: " + $metadata.guid + "" );
 				createObject( PersistRegion.DB_TABLE_REGIONS
-							, $metadata.guid
+							, $guid
 							, $metadata
 							, $createSuccess
 							, function createFailed(e:PlayerIOError):void { 
-								Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_FAILURE, $metadata.guid ) ); 
+								Globals.g_app.dispatchEvent( new RegionPersistanceEvent( RegionPersistanceEvent.REGION_CREATE_FAILURE, $metadata.guid ) ); 
 								Log.out( "PersistRegion.createFailed - error saving: " + $metadata.guid + " error data: " + e, Log.ERROR, e);  }
 							);
 			}

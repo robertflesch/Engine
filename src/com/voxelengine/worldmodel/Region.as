@@ -7,7 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-	import com.voxelengine.events.PersistanceEvent;
+	import com.voxelengine.events.RegionPersistanceEvent;
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.RegionEvent;
@@ -327,7 +327,7 @@ package com.voxelengine.worldmodel
 			ba.writeUTFBytes( regionJson );
 			ba.compress();
 			
-			PersistRegion.saveRegion( metadata( ba ), databaseObject, createSuccess );
+			PersistRegion.save( guid, metadata( ba ), databaseObject, createSuccess );
 
 			changed = false;
 		}
@@ -359,7 +359,7 @@ package com.voxelengine.worldmodel
 			ba.writeUTFBytes( regionJson );
 			ba.compress();
 			
-			PersistRegion.saveRegion( metadata( ba ), databaseObject, createSuccess );
+			PersistRegion.save( guid, metadata( ba ), databaseObject, createSuccess );
 
 			changed = false;
 		}
@@ -378,7 +378,6 @@ package com.voxelengine.worldmodel
 					created: 		_created ? _created : new Date(),
 					data: 			ba,
 					description: 	_desc,
-					guid: 			guid,
 					editors: 		GetEditorsList(),
 					name: 			_name,
 					owner:  		_owner,
@@ -390,7 +389,7 @@ package com.voxelengine.worldmodel
 		{ 
 			if ( o )
 				databaseObject = o;
-			Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS, guid ) ); 
+			Globals.g_app.dispatchEvent( new RegionPersistanceEvent( RegionPersistanceEvent.REGION_CREATE_SUCCESS, guid ) ); 
 			Log.out( "Region.createSuccess - created: " + guid, Log.DEBUG ); 
 		}	
 		

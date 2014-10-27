@@ -22,7 +22,6 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.RegionEvent;
@@ -66,7 +65,7 @@ public class RegionManager
 		_regions = new Vector.<Region>;
 
 		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, regionLoad ); 
-		Globals.g_app.addEventListener( RoomEvent.ROOM_JOIN_SUCCESS, loadRegionOnJoinEvent );
+		Globals.g_app.addEventListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
 		
 		Globals.g_app.addEventListener( RegionEvent.REQUEST_JOIN, requestServerJoin ); 
 		Globals.g_app.addEventListener( RegionLoadedEvent.REGION_CREATED, regionCreatedHandler ); 
@@ -79,6 +78,8 @@ public class RegionManager
 									  
 		Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_FAILURE, removeFailedObjectFromRegion );									  
 		Globals.g_app.addEventListener( LoadingEvent.LOAD_CONFIG_COMPLETE, requestStartingRegionFile );
+		
+		Globals.g_app.addEventListener( RoomEvent.ROOM_DISCONNECT, requestDefaultRegionLoad );
 		
 		
 		// This adds the event handlers
@@ -106,7 +107,7 @@ public class RegionManager
 		_urlLoader.addEventListener(Event.COMPLETE, onStartingRegionLoadedActionFromFile );
 		_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onRegionLoadError );			
 	}
-
+	
 	private function onRegionLoadError(error:IOErrorEvent):void
 	{
 		Log.out("RegionManager.onRegionLoadError - ERROR: " + error.toString(), Log.ERROR );
@@ -135,8 +136,15 @@ public class RegionManager
 		Room.createJoinRoom( e.guid );	
 	}
 	
-	public function loadRegionOnJoinEvent( e:LoginEvent ):void {
-		Log.out( "RegionManager.loadRegionOnJoinEvent - guid: " + e.guid, Log.DEBUG );
+	static public function requestDefaultRegionLoad( e:RoomEvent ):void {
+		Log.out( "RegionManager.requestDefaultRegionLoad", Log.DEBUG );
+		var defaultRegionJSON:Object = Globals.g_app.configManager.defaultRegionJson;
+		var defaultRegionID:String = defaultRegionJSON.config.region.startingRegion;
+		Room.createJoinRoom( defaultRegionID );	
+	}
+	
+	public function onJoinRoomEvent( e:RoomEvent ):void {
+		Log.out( "RegionManager.onJoinRoomEvent - guid: " + e.guid, Log.DEBUG );
 		
 		var region:Region = regionGet( e.guid );
 		if ( null == region ) {
