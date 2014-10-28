@@ -7,9 +7,7 @@
 ==============================================================================*/
 
 package {
-	import com.voxelengine.server.PersistAnimation;
-	import com.voxelengine.server.PersistRegion;
-	import flash.display.LoaderInfo;
+	import com.voxelengine.server.Persistance;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
@@ -25,11 +23,11 @@ package {
 	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.GUI.VoxelVerseGUI;
-	import com.voxelengine.GUI.WindowSplash;
+//	import com.voxelengine.GUI.WindowSplash;
 	import com.voxelengine.renderer.Renderer;
+	import com.voxelengine.pools.PoolManager;
 	import com.voxelengine.worldmodel.ConfigManager;
 	import com.voxelengine.worldmodel.MemoryManager;
-	import com.voxelengine.pools.PoolManager;
 	import com.voxelengine.worldmodel.MouseKeyboardHandler;
 	import com.voxelengine.worldmodel.RegionManager;
 
@@ -44,7 +42,7 @@ package {
 	public class VoxelVerse extends Sprite 
 	{
 		private var _timePrevious:int = getTimer();
-		private var _persistRegion:PersistRegion;
+		private var _persistance:Persistance;
 		private var _configManager:ConfigManager = null;
 		private var _poolManager:PoolManager = null;
 		
@@ -120,7 +118,8 @@ package {
 			
 			Globals.g_renderer.init( stage );
 			// adds handlers for persistance of regions
-			_persistRegion = new PersistRegion();
+			_persistance = new Persistance();
+			_persistance.addEventHandlers();
 			
 			addEventListener(LoadingEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
 			
@@ -130,16 +129,18 @@ package {
 			stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, mouseDownRight);
 			stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, mouseUpRight);
 			
+			
+			VoxelVerseGUI.currentInstance.init();
+
+			if ( false == WindowSplash.isActive )
+				WindowSplash.create();
+		}
+		
+		private function addStaticListeners():void {
 			addEventListener( LightEvent.ADD, LightAdd.handleLightEvents );
 			addEventListener( LightEvent.SOLID_TO_ALPHA, LightAdd.handleLightEvents );
 			addEventListener( LightEvent.ALPHA_TO_SOLID, LightRemove.handleLightEvents );
 			addEventListener( LightEvent.REMOVE, LightRemove.handleLightEvents );
-			
-			VoxelVerseGUI.currentInstance.init();
-			PersistAnimation.addEvents();
-
-			if ( false == WindowSplash.isActive )
-				WindowSplash.create();
 		}
 
 		// after the splash and config have been loaded
