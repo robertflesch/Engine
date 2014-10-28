@@ -9,8 +9,6 @@
 	//import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	
-	import com.voxelengine.events.LoginEvent;
-	
 	public class Persistance
 	{
 		static private var _table:String;
@@ -46,23 +44,13 @@
 				$errorHandler( new PlayerIOError( "No connection", 0 ) );
 		}
 
-		static public function createObject( $table:String, $key:String, $data:Object, $successHandler:Function, $errorHandler:Function ):void {
-			if ( Network.client )
-			{
+		static public function createObject( $table:String, $key:String, $data:Object, $successHandler:Function, $errorHandler:Function ):Boolean {
+			var result:Boolean;
+			if ( Network.client ) {
 				Network.client.bigDB.createObject( $table, $key, $data, $successHandler, $errorHandler );
+				result = true;
 			}
-			//else
-			//{
-				//Globals.g_app.stage.addEventListener( LoginEvent.LOGIN_SUCCESS, onLoginSuccessCreateObject );
-				//Globals.g_app.stage.addEventListener( LoginEvent.LOGIN_FAILURE, onLoginFailureCreateObject );
-				//_table = $table;
-				//_key = $key;
-				//_data = $data;
-				//_successHandler = $successHandler;
-				//_errorHandler = $errorHandler;
-				//_isCreate = true;
-				//new WindowLogin();
-			//}
+			return result;
 		}
 		
 		static public function loadObject( $table:String, $key:String, $successHandler:Function, $errorHandler:Function ):Boolean {
@@ -71,17 +59,6 @@
 				Network.client.bigDB.load( $table, $key, $successHandler, $errorHandler );
 				result = true;
 			}
-			//else
-			//{
-				//Globals.g_app.stage.addEventListener( LoginEvent.LOGIN_SUCCESS, onLoginSuccessCreateObject );
-				//Globals.g_app.stage.addEventListener( LoginEvent.LOGIN_FAILURE, onLoginFailureCreateObject );
-				//_table = $table;
-				//_key = $key;
-				//_successHandler = $successHandler;
-				//_errorHandler = $errorHandler;
-				//_isCreate = false;
-				//new WindowLogin();
-			//}
 			return result;
 		}
 		
@@ -116,41 +93,5 @@
 				$errorHandler( new PlayerIOError( "LoadKeys", 0 ) );
 			}
 		}
-		/*
-		static private function onLoginSuccessCreateObject(event : LoginEvent ) : void {
-			Globals.g_app.stage.removeEventListener( LoginEvent.LOGIN_SUCCESS, onLoginSuccessCreateObject );
-			if ( _isCreate )
-			{
-				if ( Network.client )
-					Network.client.bigDB.createObject( _table, _key, _data, _successHandler, _errorHandler );
-				else
-				{
-					//Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.BIGDB_CONNECTION_FAILURE ) );
-					_errorHandler( event.error );
-					Log.out( "Persistance.onLoginSuccessCreateObject.createObject - ERROR - ERROR - ERROR Login Failure", Log.ERROR );
-				}
-			}
-			else
-			{
-				if ( Network.client )
-					Network.client.bigDB.load( _table, _key, _successHandler, _errorHandler );
-				else
-				{
-					_errorHandler( event.error );
-					Log.out( "Persistance.onLoginSuccessCreateObject.loadObject - ERROR - ERROR - ERROR Login Failure", Log.ERROR );
-				}
-			}
-		}
-		
-		static private function onLoginFailureCreateObject(event : LoginEvent ) : void {
-			Globals.g_app.stage.removeEventListener( LoginEvent.LOGIN_FAILURE, onLoginFailureCreateObject );
-			if ( _isCreate )
-				Log.out( "Persistance.onLoginFailureCreateObject.createObject - ERROR - ERROR - ERROR Login Failure", Log.ERROR );
-			else	
-				Log.out( "Persistance.onLoginFailureCreateObject.loadObject - ERROR - ERROR - ERROR Login Failure", Log.ERROR );
-				
-			_errorHandler( event.error );	
-		}
-		*/
 	}	
 }

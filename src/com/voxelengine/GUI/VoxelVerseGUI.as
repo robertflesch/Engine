@@ -373,7 +373,7 @@ package com.voxelengine.GUI
 			//Log.out( "VVGui.onModelLoadingComplete" );
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 			addKeyboardListeners( event );
-			new WindowLogin();
+			new WindowLogin( "robertflesch@yahoo.com", "redparrot" )
 		}
 		
 		private function onKeyPressed( e : KeyboardEvent) : void

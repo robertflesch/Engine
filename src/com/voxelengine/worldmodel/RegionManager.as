@@ -22,7 +22,6 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.RegionLoadedEvent;

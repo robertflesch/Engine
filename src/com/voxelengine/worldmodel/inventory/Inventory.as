@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2014 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under uinted States Copyright Act.
@@ -26,12 +26,23 @@ package com.voxelengine.worldmodel.inventory {
 		private var _modifiedDate:Date;
 		private var _guid:String;
 		
-		private var _items:Vector.<InventoryObjects>;
+		private var _items:Vector.<InventoryObject>;
 		
 		public function Inventory( $guid:String ) 
 		{
 			_guid = $guid;
-			registerClassAlias("InventoryObjects", InventoryObjects);
+		}
+		
+		private function generateNewInventory():void {
+			_items = new Vector.<InventoryObject>();
+			var item1:InventoryObject = new InventoryObject();
+			item1.item = "Pick";
+			item1.type = 1;
+			_items.push( item1 );
+			var item2:InventoryObject = new InventoryObject();
+			item2.item = "Shovel";
+			item2.type = 2;
+			_items.push( item2 );
 		}
 		
 		public function fromPersistance( $dbo:DatabaseObject ):void {
@@ -52,16 +63,23 @@ package com.voxelengine.worldmodel.inventory {
 		}
 		
 		private function fromByteArray( $ba:ByteArray ):void {
-			if ( 0 < $ba.bytesAvailable )
-				_items = $ba.readObject() as Vector.<InventoryObjects>;
-			return;
+			if ( 0 == $ba.bytesAvailable )
+				return;
+			_items = new Vector.<InventoryObject>();	
+			var itemCount:int = $ba.readInt();
+			for ( var i:int; i < itemCount; i++ ) {
+				var io:InventoryObject = new InventoryObject();
+				io.fromByteArray( $ba )
+				_items.push( io );
+			}
 		}
 		
 		private function asByteArray():ByteArray {
 
 			var ba:ByteArray = new ByteArray();
-			for each ( var item:InventoryObjects in _items )
-				ba.writeObject( item );
+			ba.writeInt( _items.length );
+			for each ( var item:InventoryObject in _items )
+				item.toByteArray( ba );
 			ba.compress();	
 			return ba;	
 		}
@@ -75,25 +93,33 @@ package com.voxelengine.worldmodel.inventory {
 		
 		public function load():void {
 			if ( Globals.online ) {
-				Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, inventoryLoad );
-				Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, inventoryLoadFailed );
+				addLoadEvents();
 				Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_REQUEST, _guid ) );
 			}
 		}
 		
 		private function inventoryLoad( $inve:InventoryPersistanceEvent ):void
 		{
+			removeLoadEvents();
+			fromPersistance( $inve.dbo );
+		}
+		
+		private function addLoadEvents():void {
+				Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, inventoryLoad );
+				Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, inventoryLoadFailed );
+		}
+		
+		private function removeLoadEvents():void {
 			Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, inventoryLoad );
 			Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, inventoryLoadFailed );
-			fromPersistance( $inve.dbo );
+			
 		}
 		
 		private function inventoryLoadFailed( $inve:InventoryPersistanceEvent ):void
 		{
-			Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, inventoryLoad );
-			Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, inventoryLoadFailed );
+			removeLoadEvents();
 			Log.out( "Inventory.inventoryLoadFailed - No object for this avatar, this is ok for first time use.", Log.DEBUG );
-			_items = new Vector.<InventoryObjects>();
+			generateNewInventory();
 			save();
 		}
 		
@@ -125,7 +151,6 @@ package com.voxelengine.worldmodel.inventory {
 		private function saveSucceed( $inve:InventoryPersistanceEvent ):void
 		{
 			removeSaveEvents();
-			fromPersistance( $inve.dbo );
 		}
 		
 		private function saveFailed( $inve:InventoryPersistanceEvent ):void

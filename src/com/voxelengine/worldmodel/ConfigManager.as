@@ -44,7 +44,6 @@ package com.voxelengine.worldmodel
 			if ( null != $optionalGuid ) {
 				// need to log onto network. has Gui been initialized at this point?
 				// this is the guid of a model to be loaded into a blank region.
-				//WindowLogin.autoLogin();
 				Log.out( "ConfigManager.new - individual model to be loaded: " + $optionalGuid, Log.DEBUG );
 			}
 			else {

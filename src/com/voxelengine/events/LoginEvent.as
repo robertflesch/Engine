@@ -17,16 +17,19 @@ package com.voxelengine.events
 	 */
 	public class LoginEvent extends Event
 	{
-		static public const LOGIN_SUCCESS:String		= "LOGIN_SUCCESS";
-		static public const LOGIN_FAILURE:String		= "LOGIN_FAILURE";
+		static public const LOGIN_SUCCESS:String			= "LOGIN_SUCCESS";
+		static public const LOGIN_FAILURE:String			= "LOGIN_FAILURE";
+		static public const LOGIN_FAILURE_PASSWORD:String	= "LOGIN_FAILURE_PASSWORD";
+		static public const LOGIN_FAILURE_EMAIL:String		= "LOGIN_FAILURE_EMAIL";
 		
-		private var _error:PlayerIOError;
+		static public const PASSWORD_RECOVERY_SUCCESS:String			= "PASSWORD_RECOVERY_SUCCESS";
+		static public const PASSWORD_RECOVERY_FAILURE:String			= "PASSWORD_RECOVERY_FAILURE";
+		
 		private var _guid:String;
-		public function get error():PlayerIOError { return _error; }
 		
 		public function get guid():String { return _guid; }
 		
-		public function LoginEvent( $type:String, error:PlayerIOError, $guid:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
+		public function LoginEvent( $type:String, $guid:String = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
 		{
 			super( $type, $bubbles, $cancellable );
 			_guid = $guid;
@@ -34,12 +37,12 @@ package com.voxelengine.events
 		
 		public override function clone():Event
 		{
-			return new LoginEvent(type, error, guid, bubbles, cancelable);
+			return new LoginEvent(type, guid, bubbles, cancelable);
 		}
 	   
 		public override function toString():String
 		{
-			return formatToString("LoginEvent", "bubbles", "cancelable") + _error ? _error.message : "" + "  guid: " + guid;
+			return formatToString("LoginEvent", "bubbles", "cancelable") + "  guid: " + guid;
 		}
 		
 	}

@@ -20,8 +20,6 @@ package com.voxelengine.worldmodel.models
 	
 	import mx.utils.StringUtil;
 	
-	import playerio.PlayerIOError;
-	
 	import com.developmentarc.core.tasks.tasks.ITask;
 	import com.developmentarc.core.tasks.groups.TaskGroup;
 	
@@ -435,39 +433,12 @@ package com.voxelengine.worldmodel.models
 		public function createPlayer():Boolean	{
 			
 			var instanceInfo:InstanceInfo = new InstanceInfo();
-			if ( Globals.online ) {
-				Log.out( "ModelManager.createPlayer - creating from database", Log.DEBUG );
-				Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
-			}
-			else {
-				Log.out( "ModelManager.createPlayer - creating from LOCAL", Log.DEBUG );
-				instanceInfo.guid = "player";
-				instanceInfo.grainSize = 4;
-				ModelLoader.load( instanceInfo );
-			}
+			Log.out( "ModelManager.createPlayer - creating from LOCAL", Log.DEBUG );
+			instanceInfo.guid = "player";
+			instanceInfo.grainSize = 4;
+			ModelLoader.load( instanceInfo );
 			
 			return true
-		}
-		
-		import playerio.DatabaseObject;
-		private function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
-			
-			if ( $dbo ) {
-				var instanceInfo:InstanceInfo = new InstanceInfo();
-				instanceInfo.grainSize = 4;
-				instanceInfo.guid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
-				//instanceInfo.name = $dbo.name;
-				//instanceInfo.guid = "player";
-				//Log.out("ModelManager.onPlayerLoadedAction" );
-				ModelLoader.load( instanceInfo );
-				$dbo.name = "Bob";
-				$dbo.age = 32;
-				$dbo.save();
-			}
-		}
-		
-		private function onPlayerLoadError(error:PlayerIOError):void {
-			Log.out("ModelManager.onPlayerLoadError", Log.ERROR, error );
 		}
 		
 		public function update( $elapsedTimeMS:int ):void {

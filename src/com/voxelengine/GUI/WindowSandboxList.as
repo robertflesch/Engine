@@ -44,7 +44,7 @@ public class WindowSandboxList extends VVPopup
 	// Listener is added in VoxelVerseGUI constuctor
 	static public function listenForLoginSuccess( $e:LoginEvent ):void {
 		// See if a region has been specified, if not, show user a list
-		if ( "" == $e.guid ) {
+		if ( null == $e.guid ) {
 			if ( !WindowSandboxList.isActive )
 				WindowSandboxList.create();
 		}

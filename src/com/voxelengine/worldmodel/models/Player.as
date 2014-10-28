@@ -1,6 +1,7 @@
 ﻿package com.voxelengine.worldmodel.models
 {
 	import com.voxelengine.events.GUIEvent;
+	import com.voxelengine.events.LoginEvent;
 	import com.voxelengine.renderer.lamps.*;
 	import com.voxelengine.server.Persistance;
 	import com.voxelengine.worldmodel.inventory.Inventory;
@@ -18,7 +19,10 @@
     import flash.geom.Vector3D;
 	import flash.net.SharedObject;
 	
+	import playerio.PlayerIOError;
+	
 	import com.voxelengine.events.ModelEvent;
+	
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.worldmodel.Region;
@@ -57,16 +61,51 @@
 			
 			Globals.g_app.addEventListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
 			Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
+			Globals.g_app.addEventListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 			
 			takeControl( null );
 			
 			//_ct.markersAdd();
 			
 			torchToggle();
-			
-			_inventory = new Inventory( metadata.guid );
-			_inventory.load();
 		}
+		
+		private function onLogin( $event:LoginEvent ):void {
+			Log.out( "Player.onLogin - retrive player info from Persistance", Log.DEBUG );
+			Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
+		}
+		
+		import playerio.DatabaseObject;
+		private function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
+			
+			if ( $dbo ) {
+				if ( null == $dbo.modelGuid ) {
+					$dbo.modelGuid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
+					
+					var userName:String = $dbo.key.substring( 6 );
+					var firstChar:String = userName.substr(0, 1); 
+					var restOfString:String = userName.substr(1, userName.length); 
+					$dbo.userName = firstChar.toUpperCase() + restOfString.toLowerCase(); 
+					$dbo.save();
+				}
+				var instanceInfo:InstanceInfo = new InstanceInfo();
+				instanceInfo.grainSize = 4;
+				instanceInfo.guid = $dbo.modelGuid;
+				ModelLoader.load( instanceInfo );
+				
+				_inventory = new Inventory( $dbo.key );
+				_inventory.load();
+			}
+			else {
+				Log.out( "Player.onPlayerLoadedAction - ERROR, failed to create new record for ?" );
+			}
+		}
+		
+		private function onPlayerLoadError(error:PlayerIOError):void {
+			Log.out("ModelManager.onPlayerLoadError", Log.ERROR, error );
+		}
+		
+		
 		
 		override public function release():void {
 			//Log.out( "Player.release --------------------------------------------------------------------------------------------------------------------" );

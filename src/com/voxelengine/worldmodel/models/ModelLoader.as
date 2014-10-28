@@ -68,6 +68,10 @@ package com.voxelengine.worldmodel.models
 				
 			var modelAsset:String = $modelInfo.modelClass;
 			var modelClass:Class = ModelLibrary.getAsset( modelAsset )
+			if ( "Player" == modelAsset ) {
+				if ( null != Globals.player )
+					return Globals.player;
+			}
 			var vm:* = new modelClass( $ii, $modelInfo, $vmm );
 			if ( null == vm )
 				throw new Error( "ModelLoader.instantiate - Model failed in creation - modelClass: " + modelClass );
