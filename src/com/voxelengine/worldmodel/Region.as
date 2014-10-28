@@ -7,15 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-	import com.voxelengine.events.RegionPersistanceEvent;
-	import com.voxelengine.events.LoadingEvent;
-	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.events.RegionEvent;
-	import com.voxelengine.events.RegionLoadedEvent;
-	import com.voxelengine.server.Network;
-	import com.voxelengine.server.PersistRegion;
-	import com.voxelengine.worldmodel.models.ModelLoader;
-	import com.voxelengine.worldmodel.models.ModelManager;
 	import flash.geom.Vector3D;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
@@ -35,6 +26,15 @@ package com.voxelengine.worldmodel
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.events.RegionPersistanceEvent;
+	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.events.RegionLoadedEvent;
+	import com.voxelengine.server.Network;
+	import com.voxelengine.server.PersistRegion;
+	import com.voxelengine.worldmodel.models.ModelLoader;
+	import com.voxelengine.worldmodel.models.ModelManager;
 	
 	//{
 	   //"region":[

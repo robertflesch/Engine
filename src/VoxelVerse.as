@@ -23,7 +23,7 @@ package {
 	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.GUI.VoxelVerseGUI;
-//	import com.voxelengine.GUI.WindowSplash;
+	import com.voxelengine.GUI.WindowSplash;
 	import com.voxelengine.renderer.Renderer;
 	import com.voxelengine.pools.PoolManager;
 	import com.voxelengine.worldmodel.ConfigManager;

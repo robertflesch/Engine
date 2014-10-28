@@ -12,7 +12,6 @@
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.events.RegionPersistanceEvent;
 	
 	public class PersistAnimation extends Persistance
 	{
