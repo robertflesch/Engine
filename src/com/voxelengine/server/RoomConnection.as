@@ -1,22 +1,32 @@
 ﻿package com.voxelengine.server {
 
-	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.events.LoginEvent;
-	import com.voxelengine.events.ProjectileEvent;
-	import com.voxelengine.events.RegionEvent;
-	import com.voxelengine.Globals;
-	import com.voxelengine.Log;
-	import com.voxelengine.worldmodel.models.Avatar;
-	import com.voxelengine.worldmodel.models.InstanceInfo;
-	import com.voxelengine.worldmodel.models.ModelLoader;
 	import flash.geom.Vector3D;
 	import playerio.Connection;
 	import playerio.PlayerIO;
 	import playerio.PlayerIOError;
 	import playerio.Message;
 	
+	import com.voxelengine.Log;
+	import com.voxelengine.Globals;
+	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.events.LoginEvent;
+	import com.voxelengine.events.ProjectileEvent;
+	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.worldmodel.models.Avatar;
+	import com.voxelengine.worldmodel.models.InstanceInfo;
+	import com.voxelengine.worldmodel.models.ModelLoader;
+	
 	public class RoomConnection
 	{
+		// VV messages
+		static public const MOVE_MESSAGE:String = "mov";
+		static public const PROJECTILE_SHOT_MESSAGE:String = "psm";
+		static public const YOUR_ID:String = "yid";
+		static public const ADD_ME:String = "add";
+		
+		// PlayerIO Messages
+		static public const USER_JOINED:String = "UserJoined";
+		
 		static private var _connection:Connection = null;
 		static public function addEventHandlers( $connection:Connection = null ):void
 		{
@@ -25,13 +35,13 @@
 				_connection = $connection;
 				
 				// Add my avatar to your system
-				_connection.addMessageHandler( Network.ADD_ME, addMeMessage );
+				_connection.addMessageHandler( ADD_ME, addMeMessage );
 
-				_connection.addMessageHandler( Network.MOVE_MESSAGE, handleMoveMessage );
+				_connection.addMessageHandler( MOVE_MESSAGE, handleMoveMessage );
 				// Add message listener for users joining the room
-				_connection.addMessageHandler( Network.USER_JOINED, userJoinedMessage );
+				_connection.addMessageHandler( USER_JOINED, userJoinedMessage );
 				// A user (could be me ) shoots a projectile
-				_connection.addMessageHandler( Network.PROJECTILE_SHOT_MESSAGE, handleProjectileEvent );
+				_connection.addMessageHandler( PROJECTILE_SHOT_MESSAGE, handleProjectileEvent );
 				//Listen to all messages using a private function
 				//_connection.addMessageHandler("*", handleMessages)
 				
@@ -51,13 +61,13 @@
 			if ( null != $connection )
 			{
 				// Add my avatar to your system
-				$connection.removeMessageHandler( Network.ADD_ME, addMeMessage );
+				$connection.removeMessageHandler( ADD_ME, addMeMessage );
 
-				$connection.removeMessageHandler( Network.MOVE_MESSAGE, handleMoveMessage );
+				$connection.removeMessageHandler( MOVE_MESSAGE, handleMoveMessage );
 				// Add message listener for users joining the room
-				$connection.removeMessageHandler( Network.USER_JOINED, userJoinedMessage );
+				$connection.removeMessageHandler( USER_JOINED, userJoinedMessage );
 				// A user (could be me ) shoots a projectile
-				$connection.removeMessageHandler( Network.PROJECTILE_SHOT_MESSAGE, handleProjectileEvent );
+				$connection.removeMessageHandler( PROJECTILE_SHOT_MESSAGE, handleProjectileEvent );
 				//Listen to all messages using a private function
 				//$connection.removeMessageHandler("*", handleMessages)
 				
@@ -76,7 +86,7 @@
 		static private function sourceMovementEvent( event:ModelEvent ):void
 		{
 			//trace("EventHandler.handleMovementEvent - Received move event: " + event)
-			var msg:Message = _connection.createMessage( Network.MOVE_MESSAGE );
+			var msg:Message = _connection.createMessage( MOVE_MESSAGE );
 			msg.add( Network.userId );
 			msg.add( event.position.x, event.position.y, event.position.z );
 			msg.add( event.rotation.x, event.rotation.y, event.rotation.z );
@@ -87,7 +97,7 @@
 		{
 			if ( Globals.online )
 			{
-				var msg:Message = _connection.createMessage( Network.PROJECTILE_SHOT_MESSAGE );
+				var msg:Message = _connection.createMessage( PROJECTILE_SHOT_MESSAGE );
 				msg.add( Network.userId );
 				msg.add( event.position.x, event.position.y, event.position.z );
 				msg.add( event.direction.x, event.direction.y, event.direction.z );
@@ -150,7 +160,7 @@
 				Log.out("EventHandler.userJoinedMessage - ANOTHER PLAYER LOGGED ON", Log.DEBUG );
 				createPlayer( $userid );
 				
-				var addMe:Message = _connection.createMessage( Network.ADD_ME );
+				var addMe:Message = _connection.createMessage( ADD_ME );
 				addMe.add( $userid );
 				addMe.add( Network.userId );
 				_connection.sendMessage( addMe );

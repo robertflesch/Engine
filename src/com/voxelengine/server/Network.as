@@ -17,16 +17,8 @@ package com.voxelengine.server
 	
 	public class Network
 	{
-		// VV messages
-		static public const MOVE_MESSAGE:String = "mov";
-		static public const PROJECTILE_SHOT_MESSAGE:String = "psm";
-		static public const YOUR_ID:String = "yid";
-		static public const ADD_ME:String = "add";
 		public static const PUBLIC:String = "public";
 		
-		// PlayerIO Messages
-		static public const USER_JOINED:String = "UserJoined";
-
 		static private var _client:Client;	
 		static public function get client():Client { return _client; };
 		static public function set client( val:Client ):void { _client = val; };
