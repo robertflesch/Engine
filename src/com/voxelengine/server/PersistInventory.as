@@ -30,13 +30,13 @@ public class PersistInventory extends Persistance
 	
 	static private function load( $ie:InventoryPersistanceEvent ):void { 
 		
-		Log.out( "PersistInventory.save - loading inventory for player: " + $ie.guid, Log.DEBUG );
+		Log.out( "PersistInventory.load - loading inventory for player: " + $ie.guid, Log.DEBUG );
 		var result:Boolean;
 		result = Persistance.loadObject( DB_INVENTORY_TABLE
 									  , $ie.guid
 									  , loadSuccess
 									  , function (e:PlayerIOError):void {
-										  Log.out( "PersistInventory.save - Failed - guid: " + $ie.guid + "  error data: " + e, Log.ERROR, e ) 
+										  Log.out( "PersistInventory.load.failed - guid: " + $ie.guid + "  error data: " + e, Log.ERROR, e ) 
 										  Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, $ie.guid ) );
 										} );
 		if ( false == result )		
@@ -47,7 +47,7 @@ public class PersistInventory extends Persistance
 			{
 				// This seems to be the failure case, not the error handler
 				Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, $ie.guid ) );
-				Log.out( "PersistInventory.loadSuccess - NULL DatabaseObject for guid:" + $ie.guid, Log.DEBUG );
+				Log.out( "PersistInventory.load.loadSuccess - NULL DatabaseObject for guid:" + $ie.guid, Log.DEBUG );
 				return;
 			}
 			

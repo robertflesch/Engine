@@ -35,14 +35,9 @@ package {
 	import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
 	import com.voxelengine.worldmodel.tasks.lighting.LightRemove;
 	
-	// TODO Flowing materials
-	// TODO Gas
-	// TODO Light maps
-	
 	public class VoxelVerse extends Sprite 
 	{
 		private var _timePrevious:int = getTimer();
-		private var _persistance:Persistance;
 		private var _configManager:ConfigManager = null;
 		private var _poolManager:PoolManager = null;
 		
@@ -118,8 +113,7 @@ package {
 			
 			Globals.g_renderer.init( stage );
 			// adds handlers for persistance of regions
-			_persistance = new Persistance();
-			_persistance.addEventHandlers();
+			Persistance.addEventHandlers();
 			
 			addEventListener(LoadingEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
 			

@@ -1,4 +1,10 @@
-
+/*==============================================================================
+  Copyright 2011-2014 Robert Flesch
+  All rights reserved.  This product contains computer programs, screen
+  displays and printed documentation which are original works of
+  authorship protected under United States Copyright Act.
+  Unauthorized reproduction, translation, or display is prohibited.
+==============================================================================*/
 package com.voxelengine.GUI
 {
 	import com.voxelengine.worldmodel.models.TemplateManager;
@@ -52,7 +58,7 @@ package com.voxelengine.GUI
 			panelParentButton.padding = 2;
 			addElement( panelParentButton );
 			
-			if ( Network._userId == "simpleBob" ) {
+			if ( "simpleBob" == Network.userId ) {
 				var addDeskTopModel:Button = new Button( "Add Desktop Model" );
 				addDeskTopModel.addEventListener(UIMouseEvent.CLICK, addDesktopModelHandler );
 				panelParentButton.addElement( addDeskTopModel );

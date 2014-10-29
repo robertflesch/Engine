@@ -1,4 +1,11 @@
-﻿package com.voxelengine.server 
+﻿/*==============================================================================
+  Copyright 2011-2014 Robert Flesch
+  All rights reserved.  This product contains computer programs, screen
+  displays and printed documentation which are original works of
+  authorship protected under United States Copyright Act.
+  Unauthorized reproduction, translation, or display is prohibited.
+==============================================================================*/
+package com.voxelengine.server 
 {
 	import playerio.Client;
 	import playerio.PlayerIO;
@@ -24,7 +31,7 @@
 		static public function get client():Client { return _client; };
 		static public function set client( val:Client ):void { _client = val; };
 		
-		static public var _userId:String;
+		static private var _userId:String;
 		static public function get userId():String { return _userId; };
 		static public function set userId( val:String ):void { _userId = val; };
 		
@@ -53,6 +60,10 @@
 		}
 		
 		static public function login( $email:String, $password:String ):void {
+			// If true, API Requests will be encrypted using TLS/SSL. 
+			// Beware that this will cause a performance degredation by introducting secure connection negotiation latency for requests.
+			// Need to run some timing tests on this to assess performance hit
+			//PlayerIO.useSecureApiRequests = true;
 			PlayerIO.quickConnect.simpleConnect( Globals.g_app.stage
 											   , Globals.g_gamesNetworkID
 											   , $email
