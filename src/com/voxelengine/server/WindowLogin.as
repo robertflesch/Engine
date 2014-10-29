@@ -2,6 +2,8 @@
 package com.voxelengine.server
 {
 	import flash.display.Bitmap;
+	import flash.events.KeyboardEvent;
+	import flash.ui.Keyboard;
 	
 	import org.flashapi.swing.*;
 	import org.flashapi.swing.button.ButtonGroup;
@@ -84,8 +86,18 @@ package com.voxelengine.server
 			addElement( buttonPanel );
 			
 			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
-		}
 			
+			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
+		}
+
+		// Allows the enter key to activate the login key.
+		private function onKeyPressed( e : KeyboardEvent) : void {
+			if ( Keyboard.ENTER == e.keyCode ) {
+				Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
+				loginButtonHandler(null);
+			}
+		}
+		
 		////////////////////////////////////////////////////////////////////////////////
 		// recovery password
 		////////////////////////////////////////////////////////////////////////////////
