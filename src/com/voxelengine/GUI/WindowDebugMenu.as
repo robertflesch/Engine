@@ -18,7 +18,7 @@ package com.voxelengine.GUI
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;	
-	public class WindowDebugMenu extends VVContainer
+	public class WindowDebugMenu extends VVCanvas
 	{
 		static private var _s_currentInstance:WindowDebugMenu = null;
 		static public function get currentInstance():WindowDebugMenu { return _s_currentInstance; }

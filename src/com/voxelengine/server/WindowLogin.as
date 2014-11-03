@@ -88,6 +88,9 @@ package com.voxelengine.server
 			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
 			
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
+
+			
+			//BTween( this, { x: this.x, y: this.y }, { x: this.x + 300, y: this.y + 300 }, 5000 );
 		}
 
 		// Allows the enter key to activate the login key.
@@ -187,6 +190,7 @@ package com.voxelengine.server
 		private function loginSuccess( $e:LoginEvent ):void {
 			removeLoginEventHandlers()
 			Log.out(" WindowLogin.loginSuccess - Closing Login Window" );
+			
 			remove();
 		}
 	}

@@ -14,7 +14,7 @@ package com.voxelengine.GUI
 	import flash.events.Event;
 	import flash.events.TimerEvent;
 	
-	public class WindowScore extends VVContainer
+	public class WindowScore extends VVCanvas
 	{
 		static private var _s_currentInstance:WindowScore = null;
 		private var _targets:int = 0;

@@ -14,7 +14,7 @@ package com.voxelengine.GUI
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
-	public class WindowGunControl extends VVContainer
+	public class WindowGunControl extends VVCanvas
 	{
 		static private var _s_currentInstance:WindowGunControl = null;
 

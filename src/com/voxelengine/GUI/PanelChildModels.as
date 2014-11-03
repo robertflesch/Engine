@@ -22,7 +22,7 @@ package com.voxelengine.GUI
 	
 	import flash.geom.Vector3D;
 
-	public class PanelChildModels extends VVContainer
+	public class PanelChildModels extends VVCanvas
 	{
 		private var _lbChildModel:ListBox = null;
 		private var _parentModel:VoxelModel = null

@@ -7,7 +7,7 @@ package com.voxelengine.GUI
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
 	
-	public class WindowWarning extends VVContainer
+	public class WindowWarning extends VVCanvas
 	{
 		static private var _s_currentInstance:WindowWarning = null;
 		static public function get currentInstance():WindowWarning { return _s_currentInstance; }

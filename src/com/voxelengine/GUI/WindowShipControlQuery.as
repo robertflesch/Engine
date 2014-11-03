@@ -14,7 +14,8 @@ package com.voxelengine.GUI
 	import flash.ui.Keyboard;
 	
 	
-public class WindowShipControlQuery extends VVContainer
+public class WindowShipControlQuery extends VVCanvas
+
 	{
 		private var _instanceGuid:String = "";
 		private var _windowShipControl:WindowShipControl = null;

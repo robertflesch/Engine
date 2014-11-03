@@ -5,6 +5,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.worldmodel.animation.Animation;
+	import com.voxelengine.worldmodel.inventory.InventoryObject;
 	import com.voxelengine.worldmodel.models.Dragon;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.worldmodel.models.ModelLoader;
@@ -186,6 +187,8 @@ package com.voxelengine.GUI
 				var li:ListItem = _listParents.getItemAt( _listParents.selectedIndex );
 				if ( li && li.data )
 				{
+					// move this item to the players INVENTORY so that is it not "lost"
+					Globals.player.inventory.add( InventoryObject.ITEM_MODEL, li.data.instanceInfo.guid );
 					Globals.markDead( li.data.instanceInfo.guid );
 					populateParentModels()
 				}
@@ -509,12 +512,15 @@ package com.voxelengine.GUI
 			{
 				if ( vm && !vm.instanceInfo.dynamicObject && !vm.dead )
 				{
+					var li:ListItem;
 					if ( vm is Player ) {
-						if ( Globals.g_debug )
+						if ( Globals.g_debug ) 
 							_listParents.addItem( "PLAYER: " + vm.metadata.name, vm ); 
 					}
-					else
-						_listParents.addItem( vm.metadata.name, vm );
+					else {
+						li = _listParents.addItem( vm.metadata.name, vm );
+						li.item;
+					}
 				}
 			}
 		}

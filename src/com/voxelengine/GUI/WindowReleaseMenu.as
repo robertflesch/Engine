@@ -13,7 +13,7 @@ package com.voxelengine.GUI
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;	
-	public class WindowReleaseMenu extends VVContainer
+	public class WindowReleaseMenu extends VVCanvas
 	{
 		static private var _s_currentInstance:WindowReleaseMenu = null;
 		static public function get currentInstance():WindowReleaseMenu { return _s_currentInstance; }

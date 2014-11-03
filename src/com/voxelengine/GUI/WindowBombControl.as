@@ -16,7 +16,7 @@ package com.voxelengine.GUI
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
-	public class WindowBombControl extends VVContainer
+	public class WindowBombControl extends VVCanvas
 	{
 		static private var _s_currentInstance:WindowBombControl = null;
 

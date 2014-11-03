@@ -21,7 +21,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.worldmodel.models.EditCursor;
 	 
-	public class Hub extends VVContainer
+	public class Hub extends VVCanvas
 	{
 		private var TOOLBAROUTLINE_WIDTH:int = 748;
 		private var TOOLBAROUTLINE_HEIGHT:int = 172;

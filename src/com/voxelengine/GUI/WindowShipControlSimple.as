@@ -9,7 +9,7 @@ package com.voxelengine.GUI
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
 	
-	public class WindowShipControlSimple extends VVContainer
+	public class WindowShipControlSimple extends VVCanvas
 	{
 		static private var _s_currentInstance:WindowShipControlSimple = null;
 		static public function get currentInstance():WindowShipControlSimple { return _s_currentInstance; }

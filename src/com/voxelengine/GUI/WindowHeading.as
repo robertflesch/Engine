@@ -13,7 +13,7 @@ package com.voxelengine.GUI
 	import flash.events.Event;
 	import flash.events.TimerEvent;
 	
-	public class WindowHeading extends VVContainer
+	public class WindowHeading extends VVCanvas
 	{
 		static private var _s_currentInstance:WindowHeading = null;
 

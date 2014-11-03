@@ -15,7 +15,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	
 	/////////////////////////////////////////////////////		
-	public class PanelModelInfoDetail extends VVContainer
+	public class PanelModelInfoDetail extends VVCanvas
 	{
 		private var _templateName:TextInput = null;
 		private var _templateLabel:Label = null;

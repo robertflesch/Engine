@@ -27,7 +27,7 @@ package com.voxelengine.GUI
 	import flash.media.Sound;
 	import flash.media.SoundChannel;
 	
-	public class WindowShipControl extends VVContainer
+	public class WindowShipControl extends VVCanvas
 	{
 		static private var _s_currentInstance:WindowShipControl = null;
 		static public function get currentInstance():WindowShipControl { return _s_currentInstance; }

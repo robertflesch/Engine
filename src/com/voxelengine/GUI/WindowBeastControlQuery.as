@@ -19,7 +19,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.events.RegionEvent;
 	
 	
-public class WindowBeastControlQuery extends VVContainer
+public class WindowBeastControlQuery extends VVCanvas
 	{
 		static private var _s_currentInstance:WindowBeastControlQuery = null;
 		static public function get currentInstance():WindowBeastControlQuery { return _s_currentInstance; }
