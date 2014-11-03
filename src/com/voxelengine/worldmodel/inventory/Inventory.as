@@ -10,8 +10,9 @@ package com.voxelengine.worldmodel.inventory {
 	import flash.utils.ByteArray;
 	import playerio.DatabaseObject;
 	
-	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.Globals;
+	import com.voxelengine.events.InventoryEvent;
 	import com.voxelengine.events.InventoryPersistanceEvent;
 	import com.voxelengine.server.Persistance;
 
@@ -28,23 +29,42 @@ package com.voxelengine.worldmodel.inventory {
 		
 		private var _items:Vector.<InventoryObject>;
 		
+		public function get items():Vector.<InventoryObject> {
+			if ( null == _items ) 
+				_items = new Vector.<InventoryObject>();	
+				
+			return _items;
+		}
+
+		
 		public function Inventory( $guid:String ) 
 		{
 			_guid = $guid;
 		}
 		
 		private function generateNewInventory():void {
+			_generateNewInventory = true;
 			_items = new Vector.<InventoryObject>();
 			var item1:InventoryObject = new InventoryObject();
-			item1.item = "Pick";
+			item1.guid = "Pick";
 			item1.type = 1;
 			_items.push( item1 );
 			var item2:InventoryObject = new InventoryObject();
-			item2.item = "Shovel";
+			item2.guid = "Shovel";
 			item2.type = 2;
 			_items.push( item2 );
 		}
-		
+
+		public function add( $type:int, $guid:String ):void {
+			var item:InventoryObject = new InventoryObject();
+			item.type = $type;
+			item.guid = $guid;
+			items.push( item );
+		}
+
+		//////////////////////////////////////////////////////////////////
+		// Persistance
+		//////////////////////////////////////////////////////////////////
 		public function fromPersistance( $dbo:DatabaseObject ):void {
 			
 			_createdDate	= $dbo.createdDate;
@@ -70,7 +90,7 @@ package com.voxelengine.worldmodel.inventory {
 			for ( var i:int; i < itemCount; i++ ) {
 				var io:InventoryObject = new InventoryObject();
 				io.fromByteArray( $ba )
-				_items.push( io );
+				items.push( io );
 			}
 		}
 		
@@ -98,33 +118,37 @@ package com.voxelengine.worldmodel.inventory {
 			}
 		}
 		
-		private function inventoryLoad( $inve:InventoryPersistanceEvent ):void
+		private function addLoadEvents():void {
+				Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, inventoryLoadSuccess );
+				Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, inventoryLoadFailed );
+		}
+		
+		private function removeLoadEvents():void {
+			Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, inventoryLoadSuccess );
+			Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, inventoryLoadFailed );
+			
+		}
+		
+		private function inventoryLoadSuccess( $inve:InventoryPersistanceEvent ):void
 		{
 			removeLoadEvents();
 			fromPersistance( $inve.dbo );
 		}
 		
-		private function addLoadEvents():void {
-				Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, inventoryLoad );
-				Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, inventoryLoadFailed );
-		}
-		
-		private function removeLoadEvents():void {
-			Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, inventoryLoad );
-			Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, inventoryLoadFailed );
-			
-		}
-		
+		private var _generateNewInventory:Boolean;
 		private function inventoryLoadFailed( $inve:InventoryPersistanceEvent ):void
 		{
 			removeLoadEvents();
 			Log.out( "Inventory.inventoryLoadFailed - No object for this avatar, this is ok for first time use.", Log.DEBUG );
-			generateNewInventory();
-			save();
+			if ( false == _generateNewInventory ) {
+				generateNewInventory();
+				save();
+			}
 		}
 		
 		public function save():void {
 			if ( Globals.online ) {
+				Log.out( "Inventory.save - Saving User Inventory", Log.WARN );
 				if ( _dbo )
 					toPersistance();
 				else
@@ -132,6 +156,9 @@ package com.voxelengine.worldmodel.inventory {
 				addSaveEvents();
 				Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_SAVE_REQUEST, _guid, _dbo, ba ) );
 			}
+			else
+				Log.out( "Inventory.save - NOT NOT NOT Saving User Inventory", Log.WARN );
+
 		}
 		
 		private function addSaveEvents():void {

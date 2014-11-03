@@ -44,6 +44,7 @@
 		static private var  	STEP_UP_MAX:int 			= 16;
 		
 		private var _inventory:Inventory;
+		public function get inventory():Inventory { return _inventory; }
 		
 		public function Player( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
 			//Log.out( "Player.contruct --------------------------------------------------------------------------------------------------------------------" );

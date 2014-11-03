@@ -16,30 +16,30 @@ package com.voxelengine.worldmodel.inventory {
 		// FIXME: These should be attributes too, so user cant hack in new items.
 		public var _version:int = 0;
 		private var _type:int
-		private var _item:String;
+		private var _guid:String;
 		
 		public function toByteArray( $ba:ByteArray ):void {
 			$ba.writeByte( _version );
 			$ba.writeInt( _type );
-			$ba.writeUTF( _item );
+			$ba.writeUTF( _guid );
 		}
 		
 		public function fromByteArray( $ba:ByteArray ):void {
 			_version = $ba.readByte();
 			if ( 0 == _version ) {
 				_type =    $ba.readInt();
-				_item =    $ba.readUTF();
+				_guid =    $ba.readUTF();
 			}
 		}
 		
-		public function get item():String 
+		public function get guid():String 
 		{
-			return _item;
+			return _guid;
 		}
 		
-		public function set item(value:String):void 
+		public function set guid(value:String):void 
 		{
-			_item = value;
+			_guid = value;
 		}
 		
 		public function get type():int 
