@@ -13,7 +13,6 @@ package com.voxelengine
 	import com.furusystems.logging.slf4as.ILogger;
 	import com.voxelengine.server.Network;
 	import playerio.ErrorLog;
-	import org.flashdevelop.utils.TraceLevel;
 	
 	public class Log {
 		
@@ -69,22 +68,22 @@ package com.voxelengine
 			switch ( $type )
 			{ 
 				case DEBUG:
-					trace( String(TraceLevel.DEBUG) + ":" + $msg );	
+					trace( String(DEBUG) + ":" + $msg );	
 					break;
 				case INFO:
-					trace( String(TraceLevel.INFO) + ":" + $msg );	
+					trace( String(INFO) + ":" + $msg );	
 					break;
 				case WARN:
-					trace( String(TraceLevel.ERROR) + ":" + $msg );	// I hate the warning color
+					trace( String(ERROR) + ":" + $msg );	// I hate the warning color
 					//L.warn( $msg );
 					break;
 				case ERROR:
-					trace( String(TraceLevel.FATAL) + ":" + $msg );	
+					trace( String(FATAL) + ":" + $msg );	
 					L.error( $msg );
 					writeErrorToServer( "Error", $msg, $error );
 					break;
 				case FATAL:
-					trace( String(TraceLevel.FATAL) + ":"+ $msg );	
+					trace( String(FATAL) + ":"+ $msg );	
 					L.fatal( $msg );
 					writeErrorToServer( "Error", $msg, $error );
 					break;
