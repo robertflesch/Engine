@@ -42,7 +42,7 @@ package com.enjoymondays.i18n.providers {
 	 */
 	public class DefaultProviderFactory implements IResourceBundleProviderFactory {
 		
-		static public const DEFAULT_PATH				:String = 'assets/xml/{0}/{1}.xml';
+		static public const DEFAULT_PATH				:String = 'assets/languages/{0}/{1}.xml';
 		static public const LANG_PREFIX					:String = 'lang_';
 		
 		protected var _mapping							:HashMap;
