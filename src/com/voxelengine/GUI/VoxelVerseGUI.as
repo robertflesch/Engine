@@ -65,6 +65,8 @@ package com.voxelengine.GUI
 		private var _fileReference:FileReference = new FileReference();
 		private var _projectileEnabled:Boolean = true;
 		private var _hub:Hub = null;
+		
+		static private var _languageManager:LanguageManager;
 
 		static private var _currentInstance:VoxelVerseGUI = null;
 		static public function get currentInstance():VoxelVerseGUI 
@@ -75,7 +77,10 @@ package com.voxelengine.GUI
 			return _currentInstance;
 		}
 		
-
+		static public function resourceGet( $key:String, $default:String = "No translation" ):String {
+			return _languageManager.resourceGet( $key, $default );
+		}
+		
 		//	CONSTRUCTOR
 		//	----------------------------------------------------------------
 		public function VoxelVerseGUI(title : String = null) { 
@@ -323,6 +328,7 @@ package com.voxelengine.GUI
 				 
 		}
 		
+
 		public function init():void
 		{
             UIManager.initialize( Globals.g_app.stage );
@@ -340,6 +346,9 @@ package com.voxelengine.GUI
 			Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
 			Globals.g_app.addEventListener(LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
 			Globals.g_app.addEventListener(RoomEvent.ROOM_JOIN_FAILURE, joinRoomFailureHandler );
+			
+			_languageManager = new LanguageManager();
+			_languageManager.init();
 		}
 		
 		private function addKeyboardListeners(event : Event) : void
