@@ -58,7 +58,7 @@ package com.voxelengine.GUI
 			panelParentButton.padding = 2;
 			addElement( panelParentButton );
 			
-			if ( "simpleBob" == Network.userId ) {
+			if ( Globals.g_debug ) {
 				var addDeskTopModel:Button = new Button( "Add Desktop Model" );
 				addDeskTopModel.addEventListener(UIMouseEvent.CLICK, addDesktopModelHandler );
 				panelParentButton.addElement( addDeskTopModel );
@@ -68,15 +68,11 @@ package com.voxelengine.GUI
 			addModel.addEventListener(UIMouseEvent.CLICK, createInstanceFromTemplate );
 			panelParentButton.addElement( addModel );
 			
-			var cancel:Button = new Button( "Cancel" );
-			cancel.addEventListener(UIMouseEvent.CLICK, cancelSelection );
-			panelParentButton.addElement( cancel );
-			
 			display();
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 			
-			Globals.g_app.addEventListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, modelLoaded );
+			Globals.g_app.addEventListener( ModelMetadataEvent.INFO_TEMPLATE_REPO, modelLoaded );
 			Globals.g_app.addEventListener( LoadingEvent.TEMPLATE_MODEL_COMPLETE, newTemplateLoaded );
 			populateModels();
         }
@@ -121,11 +117,6 @@ package com.voxelengine.GUI
 
 				remove();
 			}
-		}
-		
-		private function cancelSelection(event:UIMouseEvent):void 
-		{
-			remove();
 		}
 		
 		private function modelLoaded( e:ModelMetadataEvent ):void

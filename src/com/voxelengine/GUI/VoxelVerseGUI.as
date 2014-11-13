@@ -437,7 +437,7 @@ package com.voxelengine.GUI
 					saveModelIVM();
 
 				if ( Keyboard.N == e.keyCode )
-					new WindowModelsForRegion();
+					new WindowRegionModels();
 					//new WindowVideoTest(); Wait for hummingbird
 			}
 			

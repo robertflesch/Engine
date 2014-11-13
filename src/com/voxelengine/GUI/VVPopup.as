@@ -20,7 +20,7 @@ public class VVPopup extends Popup
 		displayEffectDuration = 500;
 		
 		Globals.openWindowCount = Globals.openWindowCount + 1;
-		eventCollector.addEvent( this, Event.RESIZE, onResize );
+		Globals.g_app.stage.addEventListener( Event.RESIZE, onResize );
 		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
 	}
 
@@ -34,6 +34,7 @@ public class VVPopup extends Popup
 		removeEffectRef = SlideOut;
 		removeEffectDuration = 500;
 		super.remove();
+		Globals.g_app.stage.removeEventListener( Event.RESIZE, onResize );
 	}
 	
 	protected function onRemoved( event:UIOEvent ):void

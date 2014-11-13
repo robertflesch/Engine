@@ -3,6 +3,7 @@ package com.voxelengine.server
 {
 	import flash.display.Bitmap;
 	import flash.events.KeyboardEvent;
+	import flash.events.Event;
 	import flash.ui.Keyboard;
 	
 	import org.flashapi.swing.*;
@@ -88,10 +89,12 @@ package com.voxelengine.server
 			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
 			
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
-
-			
-			//BTween( this, { x: this.x, y: this.y }, { x: this.x + 300, y: this.y + 300 }, 5000 );
 		}
+		
+        //override protected function onResize(event:Event):void
+        //{
+			//move( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
+		//}
 
 		// Allows the enter key to activate the login key.
 		private function onKeyPressed( e : KeyboardEvent) : void {

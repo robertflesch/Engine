@@ -46,6 +46,7 @@ package org.flashapi.swing.effect {
 	 */
 	public class SlideOut extends SlideEffects implements Effect {
 		
+		private static const UP:String = "up";
 		//--------------------------------------------------------------------------
 		//
 		// Constructor
@@ -60,7 +61,7 @@ package org.flashapi.swing.effect {
 		 * 	@param	direction	The direction of the effect
 		 * 	@param	duration	The effect duration, in milliseconds.
 		 */
-		public function SlideOut(target:Object, direction:String = Direction.UP, duration:uint = 250) {
+		public function SlideOut(target:Object, direction:String = UP, duration:uint = 250) {
 			super(target, direction, duration);
 		}
 		

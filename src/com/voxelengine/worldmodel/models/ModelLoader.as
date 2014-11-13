@@ -383,10 +383,12 @@ package com.voxelengine.worldmodel.models
 			var count:int = 0;
 			for each ( var v:Object in objects )		   
 			{
-				var instance:InstanceInfo = new InstanceInfo();
-				instance.initJSON( v.model );
-				load( instance );
-				count++;
+				if ( v.model ) {
+					var instance:InstanceInfo = new InstanceInfo();
+					instance.initJSON( v.model );
+					load( instance );
+					count++;
+				}
 			}
 
 			Log.out( "ModelLoader.loadRegionObjects - END =============================" );

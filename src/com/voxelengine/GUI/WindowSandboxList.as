@@ -108,7 +108,7 @@ public class WindowSandboxList extends VVPopup
 	
 	private function createRegion(e:UIMouseEvent):void
 	{
-		new WindowRegionNew( null );
+		new WindowRegionDetail( null );
 		remove();
 	}
 	
@@ -131,7 +131,7 @@ public class WindowSandboxList extends VVPopup
 		if ( li )
 		{
 			if ( Globals.MODE_PRIVATE != Globals.mode && Globals.MODE_PUBLIC != Globals.mode ) {
-				new WindowRegionNew( Globals.g_regionManager.regionGet( li.data ) );
+				new WindowRegionDetail( Globals.g_regionManager.regionGet( li.data ) );
 				remove();
 				return;
 			}

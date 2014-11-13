@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models
 {
 	import com.voxelengine.events.ModelMetadataEvent;
+	import com.voxelengine.server.Network;
 	import com.voxelengine.server.PersistModel;
 	import flash.utils.Dictionary;
 	import playerio.DatabaseObject;
@@ -30,18 +31,25 @@ package com.voxelengine.worldmodel.models
 		// this acts as a holding spot for templates models in game
 		static private var _templates:Dictionary = new Dictionary(true);
 		
-		static public function templateAdd( $vmm:VoxelModelMetadata ):void { _templates[$vmm.guid] = $vmm; }
+		static public function templateAdd( $vmm:VoxelModelMetadata ):void 
+		{ 
+			Log.out( "TemplateManager.templateAdd vmm: " + $vmm.toString(), Log.DEBUG );
+			_templates[$vmm.guid] = $vmm; 
+			Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_TEMPLATE_REPO, $vmm ) );
+		}
 
 		static public function templatesLoad():void {
 			// This should get any new models
 			if ( null == _modifiedDate )
 				_modifiedDate = new Date( 2000, 1, 1, 12, 0, 0, 0 );
-			PersistModel.loadModelTemplates( _modifiedDate );
+			Log.out( "TemplateManager.templatesLoad _modifiedDate: " + _modifiedDate.toString(), Log.DEBUG );
+			PersistModel.loadModelTemplates( Network.userId, _modifiedDate );
+			PersistModel.loadModelTemplates( Network.PUBLIC, _modifiedDate );
 			_modifiedDate = new Date();
 			
 			// This will return models already loaded.
 			for each ( var vmm:VoxelModelMetadata in _templates ) {
-				Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm ) );
+				Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_TEMPLATE_REPO, vmm ) );
 			}
 		}
 		
@@ -59,7 +67,7 @@ package com.voxelengine.worldmodel.models
 		
 		static public function templateGetDictionary():Dictionary { return _templates; }
 		static public function templateGet( $guid:String ):VoxelModelMetadata 
-		{  
+		{   
 			var vmm:VoxelModelMetadata = _templates[$guid]; 
 			if ( null == vmm ) {
 				_guidError = $guid;
@@ -73,6 +81,7 @@ package com.voxelengine.worldmodel.models
 			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
 			if ( dbo ) {
 				vmm.fromPersistance( dbo );
+				Log.out( "TemplateManager.templateLoadSuccess vmm: " + vmm.toString(), Log.DEBUG );
 				Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm ) );
 			}
 			else {

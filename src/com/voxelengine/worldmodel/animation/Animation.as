@@ -62,6 +62,8 @@ package com.voxelengine.worldmodel.animation
 		public var created:Date;
 		public var modified:Date;
 
+		public function get attachments():Vector.<AnimationAttachment> { return _attachments; }
+
 		public function get transforms():Vector.<AnimationTransform> { return _transforms; }
 		public function get loaded():Boolean { return _loaded; }
 		

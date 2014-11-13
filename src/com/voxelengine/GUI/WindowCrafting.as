@@ -20,7 +20,7 @@ public class WindowCrafting extends VVPopup
 	private const PANEL_HEIGHT:int = 300;
 	private const PANEL_BUTTON_HEIGHT:int = 200;
 	
-	public function WindowModelsForRegion()
+	public function WindowCrafting()
 	{
 		super("Voxel Models");
 		autoSize = true;

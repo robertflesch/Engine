@@ -157,7 +157,7 @@ package com.voxelengine.GUI
 			panel.layout.orientation = LayoutOrientation.VERTICAL;
 			panel.width = _calculatedWidth;
 			panel.height = label.height + PANEL_HEIGHT + BORDER_WIDTH_4;
-			panel.layout.autoSizeAnimated = true;
+			//panel.layout.autoSizeAnimated = true;
 			addElement( panel );
 		}
 
@@ -188,7 +188,7 @@ package com.voxelengine.GUI
 			panel.layout.orientation = LayoutOrientation.VERTICAL;
 			panel.width = _calculatedWidth;
 			panel.height = label.height + PANEL_HEIGHT + BORDER_WIDTH_4;
-			panel.layout.autoSizeAnimated = true;
+			//panel.layout.autoSizeAnimated = true;
 			addElement( panel );
 		}
 
@@ -230,14 +230,14 @@ package com.voxelengine.GUI
            //_panelAdvanced.layout.autoSizeAnimated = true;
 			_panelAdvanced.addElement( label );
 			
-			var parentModel:VoxelModel = _ii.controllingModel;
-			var vm:VoxelModel;
-			if ( parentModel )
-				vm = parentModel.childModelFind( _ii.guid );
-			else	
-				vm = Globals.getModelInstance( _ii.guid );
+			//var parentModel:VoxelModel = _ii.controllingModel;
+			//var vm:VoxelModel;
+			//if ( parentModel )
+				//vm = parentModel.childModelFind( _ii.guid );
+			//else	
+				//vm = Globals.getModelInstance( _ii.guid );
 				
-			addLabel( _panelAdvanced, "State:", changeStateHandler, vm.anim ? vm.anim.name : "" );
+			addLabel( _panelAdvanced, "State:", changeStateHandler, _vm.anim ? _vm.anim.name : "" );
 			//_GrainSize = 	addLabel( _panelAdvanced, "GrainSize:", null, _vm.oxel.gc.grain.toString() );
 			addLabel( _panelAdvanced, "GrainSize:", null, String( _ii.grainSize ) );
 			addLabel( _panelAdvanced, "Instance GUID:", null, _ii.guid );

@@ -88,11 +88,6 @@ package com.voxelengine.GUI
 			newModel.width = 150;
 			panelParentButton.addElement( newModel );
 
-		//var editModel:Button = new Button("Edit Template");
-			//editModel.addEventListener(UIMouseEvent.CLICK, editModelHandler );
-			//editModel.width = 150;
-			//panelParentButton.addElement( editModel );
-			
 //			if ( true == Globals.g_debug )
 //			{
 				var oxelUtils:Button = new Button( VoxelVerseGUI.resourceGet( "Oxel_Utils", "Oxel Utils" ) );
@@ -101,10 +96,6 @@ package com.voxelengine.GUI
 				panelParentButton.addElement( oxelUtils );
 //			}
 			
-			//var testB:Button = new Button("Import Model");
-			//testB.addEventListener(UIMouseEvent.CLICK,  );
-			//testB.width = 150;
-			//panelParentButton.addElement( testB );
 			
 			// CHILD BUTTONS
 			var panelChildButton:Container = new Container( PANEL_WIDTH, PANEL_BUTTON_HEIGHT );

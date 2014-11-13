@@ -178,7 +178,7 @@ package {
 		
 		private function deactivate(e:Event):void 
 		{
-			Log.out( "VoxelVerse.deactive event", Log.WARN );
+			//Log.out( "VoxelVerse.deactive event", Log.WARN );
 			if ( Globals.active )
 				deactivateApp();
 		}
@@ -224,9 +224,9 @@ package {
 
 		private function deactivateApp():void {
 			
-			Log.out( "VoxelVerse.deactivateApp", Log.WARN );
+			//Log.out( "VoxelVerse.deactivateApp", Log.WARN );
 			if ( true == Globals.active ) {
-				Log.out( "VoxelVerse.deactivateApp with active app", Log.WARN );
+				//Log.out( "VoxelVerse.deactivateApp with active app", Log.WARN );
 				Globals.active = false;
 				Globals.mouseView = false;
 				Globals.clicked = false;
@@ -246,8 +246,8 @@ package {
 				
 				dispatchEvent( new GUIEvent( GUIEvent.APP_DEACTIVATE ) );
 			}
-			else
-				Log.out( "VoxelVerse.activateApp - ignoring", Log.WARN );
+			//else
+			//	Log.out( "VoxelVerse.activateApp - ignoring", Log.WARN );
 		}
 		
 		private function mouseDown(e:MouseEvent):void 

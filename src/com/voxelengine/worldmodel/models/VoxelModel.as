@@ -140,6 +140,7 @@ package com.voxelengine.worldmodel.models
 		public function get modelInfo():ModelInfo 					{ return _modelInfo; }
 		public function set modelInfo(val:ModelInfo):void			{ _modelInfo = val; }
 		public function get children():Vector.<VoxelModel>			{ return _children; }
+		public function 	childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
 		public function get changed():Boolean						{ return _changed; }
 		public function set changed( $val:Boolean):void				{ _changed = $val; }
 		public function get selected():Boolean 						{ return _selected; }

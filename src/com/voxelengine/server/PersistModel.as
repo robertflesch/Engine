@@ -55,12 +55,12 @@
 						, function (e:PlayerIOError):void {  Log.out( "PersistModel.errorHandler - e: " + e ); } );
 		}
 		
-		static public function loadModelTemplates( $modifiedDate:Date ):void {
+		static public function loadModelTemplates( $userName:String, $modifiedDate:Date ):void {
 			
 			_modifedDate = $modifiedDate;
 			Persistance.loadRange( DB_TABLE_MODELS
 						 , DB_INDEX_OWNER_TEMPLATE
-						 , [Network.userId]
+						 , [$userName]
 						 , true
 						 , null
 						 , 100

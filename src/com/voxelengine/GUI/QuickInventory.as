@@ -14,7 +14,6 @@ package com.voxelengine.GUI
 	import org.flashapi.swing.Canvas;
 	import org.flashapi.swing.Box;
 	import org.flashapi.swing.Label;
-	import org.flashapi.swing.dnd.DnDOperation;
 	import org.flashapi.swing.layout.AbsoluteLayout;
 	
 	import com.voxelengine.worldmodel.TypeInfo;
@@ -27,7 +26,6 @@ package com.voxelengine.GUI
 		public static function set currentItemSelection(val:int):void { s_currentItemSelection = val; }
 		
 		private const IMAGE_SIZE:int = 64;
-		private var _dragOp:DnDOperation = new DnDOperation();
 		private var _selector:Sprite = new Canvas(IMAGE_SIZE, IMAGE_SIZE);
 		
 		
