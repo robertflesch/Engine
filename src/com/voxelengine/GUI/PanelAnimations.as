@@ -17,34 +17,27 @@ package com.voxelengine.GUI
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	
 	// all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
-	public class PanelAnimations extends Box
+	public class PanelAnimations extends PanelBase
 	{
 		private var _listAnimations:			ListBox;
-		private var _parent:					PanelModelAnimations;
 		private var _selectedAnimation:			Animation;
 		private var _buttonContainer:			Container;
 		
-		private const pbPadding:int = 5;
-		
 		public function PanelAnimations( $parent:PanelModelAnimations, $widthParam:Number, $elementHeight:Number, $heightParam:Number )
 		{
-			super( $widthParam, $heightParam, BorderStyle.GROOVE );
-			autoSize = true;
-			backgroundColor = 0xCCCCCC;
-			padding = pbPadding - 1;
-			layout.orientation = LayoutOrientation.VERTICAL;
-			_parent = $parent;
+			super( $parent, $widthParam, $heightParam );
 			
 			var ha:Label = new Label( "Has Animations", width );
 			ha.textAlign = TextAlign.CENTER;
 			addElement( ha );
 			
-			_listAnimations = new ListBox(  width, $elementHeight, $heightParam );
+			_listAnimations = new ListBox(  width - pbPadding, $elementHeight, $heightParam );
 			_listAnimations.addEventListener( ListEvent.LIST_CHANGED, select );			
 			addElement( _listAnimations );
 			
-			addEventListener( UIMouseEvent.ROLL_OVER, rollOverHandler );
-			addEventListener( UIMouseEvent.ROLL_OUT, rollOutHandler );
+			animationButtonsCreate();
+			//addEventListener( UIMouseEvent.ROLL_OVER, rollOverHandler );
+			//addEventListener( UIMouseEvent.ROLL_OUT, rollOutHandler );
 			
 			recalc( width, height );
         }
@@ -83,19 +76,19 @@ package com.voxelengine.GUI
 			
 			addElement( _buttonContainer );
 
-			var addButton:Button = new Button( VoxelVerseGUI.resourceGet( "Animation_Add", "+Add Animation..." )  );
+			var addButton:Button = new Button( VoxelVerseGUI.localizedStringGet( "Animation_Add", "+Add Animation..." )  );
 			addButton.addEventListener(UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowAnimationDetail( null ); } );
 			addButton.width = width - 2 * pbPadding;
 			_buttonContainer.addElement( addButton );
 			_buttonContainer.height += addButton.height + pbPadding;
 			
-			var deleteButton:Button = new Button( VoxelVerseGUI.resourceGet( "Animation_Delete", "+Animation Model") );
+			var deleteButton:Button = new Button( VoxelVerseGUI.localizedStringGet( "Animation_Delete", "+Animation Model") );
 			deleteButton.addEventListener(UIMouseEvent.CLICK, deleteAnimationHandler );
 			deleteButton.width = width - 2 * pbPadding;
 			_buttonContainer.addElement( deleteButton );
 			_buttonContainer.height += deleteButton.height + pbPadding;
 			
-			var detailButton:Button = new Button( VoxelVerseGUI.resourceGet( "Animation_Detail", "+Animation Detail") );
+			var detailButton:Button = new Button( VoxelVerseGUI.localizedStringGet( "Animation_Detail", "+Animation Detail") );
 			detailButton.addEventListener( UIMouseEvent.CLICK, animationDetailHandler );
 			detailButton.width = width - 2 * pbPadding;
 			_buttonContainer.addElement( detailButton );
@@ -103,7 +96,7 @@ package com.voxelengine.GUI
 			function deleteAnimationHandler(event:UIMouseEvent):void  {
 				if ( _selectedAnimation )
 				{
-					(new Alert( VoxelVerseGUI.resourceGet( "NOT IMPLEMENTED", "NOT IMPLEMENTED" ) )).display();
+					(new Alert( VoxelVerseGUI.localizedStringGet( "NOT IMPLEMENTED", "NOT IMPLEMENTED" ) )).display();
 				}
 				else
 					noAnimationSelected();
@@ -118,24 +111,15 @@ package com.voxelengine.GUI
 		
 		private function animationDetailHandler(event:UIMouseEvent):void 
 		{ 
-			new WindowAnimationDetail(  _selectedAnimation );	
+			//new WindowModelList();
+			new WindowAnimationDetail( _selectedAnimation );	
 		}
 			
 		///////////////////////////////////////////////////////////////////////
 		
 		private function noAnimationSelected():void
 		{
-			(new Alert( VoxelVerseGUI.resourceGet( "No_Animation_Selected", "No animation selected" ) )).display();
-		}
-		
-		public function topLevelGet():* {
-			if ( _parent )
-				return _parent.topLevelGet();
-			return null;	
-		}
-		
-		public function recalc( width:Number, height:Number ):void {
-			_parent.recalc( width, height );
+			(new Alert( VoxelVerseGUI.localizedStringGet( "No_Animation_Selected", "No animation selected" ) )).display();
 		}
 	}
 }

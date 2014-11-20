@@ -169,7 +169,7 @@ package org.flashapi.swing.plaf.spas {
 		 *  @inheritDoc 
 		 */
 		public function getColor():uint {
-			return DEFAULT_COLOR;
+			return DEFAULT_BUTTON_COLOR;
 		}
 		
 		/**
@@ -328,7 +328,8 @@ package org.flashapi.swing.plaf.spas {
 				if (lineColor2 != -1) {
 					f.lineGradientStyle(GradientType.LINEAR, [lineColor1, lineColor2], [bdra, bdra], [0, 250], m);
 				}
-				f.beginGradientFill(GradientType.LINEAR, [color2.darker(), buttonColor], [bga, bga], [0, 250], m);
+//				f.beginGradientFill(GradientType.LINEAR, [color2.darker(), buttonColor], [bga, bga], [0, 250], m);
+f.beginFill( buttonColor, 1 );
 				f.drawRoundedBox(0, 0, w, h, cu.topLeft, cu.topRight, cu.bottomRight, cu.bottomLeft);
 				f.endFill();
 				drawSpasEffect(tgt, w, lineColor1, cu, middle, bch);

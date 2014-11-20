@@ -291,9 +291,14 @@ package org.flashapi.swing.draw {
 			_eventCollector.removeEvent(_target, LoaderEvent.GRAPHIC_COMPLETE, completeEvent);
 		}
 		
-		private function setPattern(bitmap:Bitmap):void {
+		import flash.geom.Matrix;
+		public function setPattern(bitmap:Bitmap):void {
+			// this always loads the bitmap at the native resolution
 			_bmpData = new BitmapData(bitmap.width, bitmap.height, false, 0);
-			_bmpData.draw(bitmap);
+			// this version allows me to scale the textures
+			var matrix:Matrix = new Matrix();
+            matrix.scale(width/bitmap.width, height/bitmap.height);
+			_bmpData.draw( bitmap, matrix );
 			drawPattern();
 		}
 		

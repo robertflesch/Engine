@@ -58,15 +58,20 @@ package com.voxelengine.GUI
 			panelParentButton.padding = 2;
 			addElement( panelParentButton );
 			
+			var addModel:Button = new Button( "Add This Model" );
+			addModel.addEventListener(UIMouseEvent.CLICK, createInstanceFromTemplate );
+			panelParentButton.addElement( addModel );
+			
+			var newModel:Button = new Button( VoxelVerseGUI.localizedStringGet( "New_Model", "New Model..." ));
+			newModel.addEventListener(UIMouseEvent.CLICK, newModelHandler );
+			//newModel.width = pbWidth - 2 * pbPadding;
+			panelParentButton.addElement( newModel );
+			
 			if ( Globals.g_debug ) {
 				var addDeskTopModel:Button = new Button( "Add Desktop Model" );
 				addDeskTopModel.addEventListener(UIMouseEvent.CLICK, addDesktopModelHandler );
 				panelParentButton.addElement( addDeskTopModel );
 			}
-			
-			var addModel:Button = new Button( "Add This Model" );
-			addModel.addEventListener(UIMouseEvent.CLICK, createInstanceFromTemplate );
-			panelParentButton.addElement( addModel );
 			
 			display();
 			
@@ -76,6 +81,13 @@ package com.voxelengine.GUI
 			Globals.g_app.addEventListener( LoadingEvent.TEMPLATE_MODEL_COMPLETE, newTemplateLoaded );
 			populateModels();
         }
+		
+
+		private function newModelHandler(event:UIMouseEvent):void 
+		{
+			new WindowModelChoice();
+		}
+		
 		
 		private function selectModel(event:ListEvent):void 
 		{

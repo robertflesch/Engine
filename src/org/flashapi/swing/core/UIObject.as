@@ -4435,8 +4435,8 @@ package org.flashapi.swing.core {
 		/**
 		 *  @private
 		 */
-		protected function createBackgroundTextureManager(target:DisplayObject):void {
-			$backgroundTextureManager = new TextureManager(target);
+		protected function createBackgroundTextureManager(target:DisplayObject,$width:Number = 100, $height:Number = 100):void {
+			$backgroundTextureManager = new TextureManager(target, $width, $height );
 			spas_internal::lafDTO.backgroundTextureManager = $backgroundTextureManager;
 		}
 		

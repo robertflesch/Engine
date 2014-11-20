@@ -403,7 +403,7 @@ package org.flashapi.swing {
 			$borderStyle = borderStyle;
 			initLaf(BoxUIRef);
 			createContainers();
-			createBackgroundTextureManager(spas_internal::background);
+			createBackgroundTextureManager(spas_internal::background, $width, $height);
 			$layout = new FlowLayout();
 			spas_internal::initLayout();
 			//$borderColor = lookAndFeel.getBorderColor();

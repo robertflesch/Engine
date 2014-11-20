@@ -78,7 +78,11 @@ package org.flashapi.swing.plaf.spas {
 		 * 	default look and feel. This color correpsonds to the <code>"silver"</code>
 		 * 	color defined by the default SPAS 3.0 color module (SVGCK).
 		 */
-		public static const DEFAULT_COLOR:uint = 0xC0C0C0;
+		// http://www.google.com/design/spec/style/color.html
+		//public static const DEFAULT_COLOR:uint = 0xC0C0C0;
+		public static const DEFAULT_COLOR:uint = 0xE1F5FE;
+		public static const DEFAULT_BUTTON_COLOR:uint = 0x0277BD;
+		public static const DEFAULT_CLOSE_BUTTON_COLOR:uint = 0xF44336;
 		
 		/**
 		 *  A constant integer that defines the default background color value.

@@ -8,6 +8,7 @@
 
 package com.voxelengine {
 	import com.voxelengine.server.PersistRegion;
+	import com.voxelengine.worldmodel.crafting.CraftingManager;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import flash.utils.Dictionary;
 	import com.voxelengine.worldmodel.RegionManager;
@@ -37,6 +38,7 @@ package com.voxelengine {
 		public static var g_textureBank:TextureBank = new TextureBank();
 		public static var g_regionManager:RegionManager = null;
 		public static var g_renderer:Renderer = new Renderer();
+		public static var g_craftingManager:CraftingManager;
 		public static var g_mouseKeyboardHandler:MouseKeyboardHandler = new MouseKeyboardHandler();
 
 		public static var g_nearplane:Number = 1/4;
@@ -105,6 +107,15 @@ package com.voxelengine {
 		public static const EDITCURSOR_CYLINDER_ANIMATED:uint	= 1003;
 		// NO MORE!!
 		
+		public static const CATEGORY_METAL:String				= "METAL";
+		public static const CATEGORY_LEATHER:String				= "LEATHER";
+		public static const CATEGORY_PLANT:String				= "PLANT";
+		
+		public static const MODIFIER_DAMAGE:String				= "DAMAGE";
+		public static const MODIFIER_SPEED:String				= "SPEED";
+		public static const MODIFIER_DURABILITY:String			= "DURABILITY";
+		public static const MODIFIER_LUCK:String				= "LUCK";
+
 		// code throws an exception when WRITE or READ is done from this object
 		public static const BAD_OXEL:OxelBad = new OxelBad();
 

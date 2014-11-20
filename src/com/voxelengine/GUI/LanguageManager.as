@@ -64,13 +64,16 @@ package com.voxelengine.GUI
 		}
 		
 		
-		public function resourceGet( $key:String, $default:String ):String {
+		public function localizeStringGet( $key:String, $default:String ):String {
 			if ( _localization.currentBundle.hasResource( $key ) && _initialized ) {
 				return _localization.currentBundle.getResourceString( $key );
 			}
 			else {
-				Log.out( "LanguageManager.resourceGet - Not initialized or no translation found for: " + $key );
-				return $default;
+				Log.out( "LanguageManager.localizeStringGet - no translation found for: " + $key );
+				if ( "" != $default )
+					return $default;
+				else	
+					return $key;
 			}
 		}
 	}

@@ -35,7 +35,7 @@ package com.voxelengine.server
 		{
 			super( "Login" );
 			width = 300;
-			height = 336;
+			height = 325;
 			layout.orientation = LayoutOrientation.VERTICAL;
 
 			if ( !Globals.g_debug )
@@ -59,7 +59,8 @@ package com.voxelengine.server
 			_passwordInput.labelControl.width = 80;
 			infoPanel.addElement( _passwordInput );
 			
-			_errorText = new TextArea( width, 40);
+			_errorText = new TextArea( width, 20 );
+			_errorText.textAlign = TextAlign.CENTER;
 			_errorText.backgroundColor = SpasUI.DEFAULT_COLOR;
 			_errorText.scrollPolicy = ScrollPolicy.NONE;
 			_errorText.fontColor = 0xff0000; // Red
@@ -68,19 +69,23 @@ package com.voxelengine.server
 			
 			addElement( infoPanel );
 			
-			const buttonWidth:int = 99;
-			const buttonHeight:int = 40;
+			const buttonWidth:int = 94;
+			const buttonHeight:int = 45;
 			var buttonPanel:Container = new Container( width, buttonHeight );
-			var loginButton:Button = new Button( "Login", buttonWidth, buttonHeight );
+			buttonPanel.padding = 7.5;
+			var loginButton:Button = new Button( "Login", buttonWidth, buttonHeight - 15 );
 			loginButton.addEventListener(UIMouseEvent.CLICK, loginButtonHandler );
+			loginButton.shadow = true;
 			buttonPanel.addElement( loginButton );
 			
-			var registerButton:Button = new Button( "Register..", buttonWidth, buttonHeight );
+			var registerButton:Button = new Button( "Register..", buttonWidth, buttonHeight - 15 );
 			registerButton.addEventListener(UIMouseEvent.CLICK, registerButtonHandler );
+			registerButton.shadow = true;
 			buttonPanel.addElement( registerButton );
 			
-			var lostPasswordButton:Button = new Button( "Lost Password", buttonWidth, buttonHeight );
+			var lostPasswordButton:Button = new Button( "Lost Password", buttonWidth, buttonHeight - 15 );
 			lostPasswordButton.fontSize = 9;
+			lostPasswordButton.shadow = true;
 			lostPasswordButton.addEventListener(UIMouseEvent.CLICK, lostPasswordHandler );
 			buttonPanel.addElement( lostPasswordButton );
 			
@@ -170,18 +175,21 @@ package com.voxelengine.server
 			Globals.g_app.removeEventListener( LoginEvent.LOGIN_FAILURE_EMAIL, onEmailFailure );
 		}
 		
+		private const BAD_EMAIL_PASSWORD:String = "Wrong email or password";
 		private function onPasswordFailure( $e:LoginEvent ):void {
 			removeLoginEventHandlers()
 			Log.out(" WindowLogin.onPasswordFailure" + $e.guid );
-			_passwordInput.glow = true;
-			_errorText.text = $e.guid;
+			//_passwordInput.glow = true;
+			//_errorText.text = $e.guid;
+			_errorText.text = BAD_EMAIL_PASSWORD;
 		}
 		
 		private function onEmailFailure( $e:LoginEvent ):void {
 			removeLoginEventHandlers()
 			Log.out(" WindowLogin.onEmailFailure" + $e.guid );
-			_emailInput.glow = true;
-			_errorText.text = $e.guid;
+//			_emailInput.glow = true;
+//			_errorText.text = $e.guid;
+			_errorText.text = BAD_EMAIL_PASSWORD;
 		}
 		
 		private function onUnknownFailure( $e:LoginEvent ):void {

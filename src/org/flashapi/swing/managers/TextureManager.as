@@ -429,7 +429,8 @@ package org.flashapi.swing.managers {
 			_target = target;
 			_width = width;
 			_height = height;
-			_pattern = new Pattern(_target);
+			//_pattern = new Pattern(_target);
+			_pattern = new Pattern(_target, null, width, height );
 			_color = 0xFFFFFF;
 			_alpha = 1.0;
 			_gradientProperties = {

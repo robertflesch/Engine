@@ -1,43 +1,54 @@
 
 package com.voxelengine.GUI
 {
+	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.events.UIRegionModelEvent;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
 	import org.flashapi.swing.list.ListItem;
-	import org.flashapi.swing.containers.UIContainer;	
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	
 	// all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
-	public class PanelModelAnimations extends Box
+	public class PanelModelAnimations extends PanelBase
 	{
+		private var _parentModel:VoxelModel;
 		private var _listModels:PanelModels;
 		private var _listAnimations:PanelAnimations;
 		private var _childPanel:PanelModelAnimations;
-		private var _parent:*;
 		
 		private const width_default:int = 200;
 		private const height_default:int = 150;
-		private const pbPadding:int = 5;
 		
-		public function PanelModelAnimations( $parent:UIContainer )
+		public function PanelModelAnimations( $parent:PanelBase )
 		{
-			super( width_default, height_default, BorderStyle.GROOVE );
-			autoSize = true;
-			backgroundColor = 0xCCCCCC;
-			padding = pbPadding - 1;
-			layout.orientation = LayoutOrientation.VERTICAL;
-			_parent = $parent;
+			super( $parent, width_default, height_default );
 			
 			modelPanelAdd();
+			
+			Globals.g_app.addEventListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
+			eventCollector.addEvent(this, UIOEvent.REMOVED, onRemoved );
         }
 		
-		public function updateChildren( $dictionarySource:Function ):void {
-			if ( null != _listModels )
-				_listModels.populateModels( $dictionarySource );
+		private function selectedModelChanged(e:UIRegionModelEvent):void 
+		{
+			// true if our child changed the model
+			if ( e.parentVM == _parentModel ) {
+				childPanelAdd( e.voxelModel );
+				animationPanelAdd( e.voxelModel );
+			}
+		}
+		
+		public function updateChildren( $dictionarySource:Function, $parentModel:VoxelModel ):void {
+			_parentModel = $parentModel;
+			if ( null != _listModels ) {
+				var countAdded:int = _listModels.populateModels( $dictionarySource, $parentModel );
+				if ( 0 == countAdded )
+					childPanelRemove();
+			}
 		}
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,8 +64,8 @@ package com.voxelengine.GUI
 		public function childPanelAdd( $selectedModel:VoxelModel ):void {
 			if ( null == _childPanel ) 
 				_childPanel = new PanelModelAnimations( _parent );
-			_childPanel.updateChildren( $selectedModel.childrenGet );
-			var topLevel:UIContainer = topLevelGet() as UIContainer;
+			_childPanel.updateChildren( $selectedModel.childrenGet, $selectedModel );
+			var topLevel:PanelBase = topLevelGet();
 			topLevel.addElement( _childPanel );
 			
 		}
@@ -76,16 +87,17 @@ package com.voxelengine.GUI
 			}
 		}
 		
-		public function topLevelGet():* {
-			if ( null == _parent )
-				return this;
-			if ( _parent )
-				return _parent.topLevelGet();
-			return null;	
+		private function onRemoved( event:UIOEvent ):void
+		{
+			if ( _childPanel ) {
+				_childPanel.remove();
+				_childPanel = null;
+			}
+			_parentModel = null;
+			_listModels = null;
+			_listAnimations = null;
+			_childPanel = null;
 		}
-		
-		public function recalc( width:Number, height:Number ):void {
-			_parent.recalc( width, height );
-		}
+
 	}
 }

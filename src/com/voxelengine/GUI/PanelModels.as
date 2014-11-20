@@ -1,17 +1,18 @@
 
 package com.voxelengine.GUI
 {
-	import com.voxelengine.worldmodel.animation.Animation;
+//	import com.voxelengine.worldmodel.animation.Animation;
+	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.events.UIRegionModelEvent;
 	import com.voxelengine.worldmodel.inventory.InventoryObject;
 	import com.voxelengine.worldmodel.models.Player;
-	import flash.utils.Dictionary;
+//	import flash.utils.Dictionary;
 	
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
 	import org.flashapi.swing.event.ListEvent;
     import org.flashapi.swing.constants.*;
 	import org.flashapi.swing.list.ListItem;
-	import org.flashapi.swing.containers.UIContainer;	
 	import org.flashapi.swing.dnd.DnDOperation;
 
 	
@@ -21,15 +22,13 @@ package com.voxelengine.GUI
 	import com.voxelengine.GUI.CanvasHeirarchy;
 	
 	// all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
-	public class PanelModels extends Box
+	public class PanelModels extends PanelBase
 	{
+		private var _parentModel:VoxelModel;
 		private var _listModels:ListBox;
 		private var _dictionarySource:Function;
-		private var _parent:PanelModelAnimations;
 		private var _selectedModel:VoxelModel;
 		private var _buttonContainer:Container
-		
-		private const pbPadding:int = 5;
 		
 		private var _detailButton:Button
 		
@@ -38,11 +37,7 @@ package com.voxelengine.GUI
 		
 		public function PanelModels( $parent:PanelModelAnimations, $widthParam:Number, $elementHeight:Number, $heightParam:Number )
 		{
-			super( $widthParam, $heightParam, BorderStyle.GROOVE );
-			autoSize = true;
-			backgroundColor = 0xCCCCCC;
-			padding = pbPadding - 1;
-			layout.orientation = LayoutOrientation.VERTICAL;
+			super( $parent, $widthParam, $heightParam );
 			_parent = $parent;
 			
 			//Log.out( "PanelModels - list box width: width: " + width + "  padding: " + pbPadding, Log.WARN );
@@ -61,9 +56,10 @@ package com.voxelengine.GUI
 			//addListeners();
         }
 		
-		public function populateModels( $dictionarySource:Function ):void
+		public function populateModels( $dictionarySource:Function, $parentModel:VoxelModel ):int
 		{
-			_dictionarySource = $dictionarySource
+			_dictionarySource = $dictionarySource;
+			_parentModel = $parentModel;
 			_listModels.removeAll();
 			var countAdded:int;
 			for each ( var vm:VoxelModel in _dictionarySource() )
@@ -81,9 +77,7 @@ package com.voxelengine.GUI
 					countAdded++;
 				}
 			}
-			if ( 0 == countAdded ) {
-				_parent.childPanelRemove();
-			}
+			return countAdded;
 		}
 
 		//// FIXME This would be much better with drag and drop
@@ -95,19 +89,19 @@ package com.voxelengine.GUI
 			_buttonContainer.height = 0;
 			addElementAt( _buttonContainer, 0 );
 
-			var addButton:Button = new Button( VoxelVerseGUI.resourceGet( "Model_Add", "+Add Model..." )  );
+			var addButton:Button = new Button( VoxelVerseGUI.localizedStringGet( "Model_Add", "+Add Model..." )  );
 			addButton.addEventListener(UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
 			addButton.width = width - 2 * pbPadding;
 			_buttonContainer.addElement( addButton );
 			_buttonContainer.height += addButton.height + pbPadding;
 			
-			var deleteButton:Button = new Button( VoxelVerseGUI.resourceGet( "Model_Delete", "+Delete Model") );
+			var deleteButton:Button = new Button( VoxelVerseGUI.localizedStringGet( "Model_Delete", "+Delete Model") );
 			deleteButton.addEventListener(UIMouseEvent.CLICK, deleteModelHandler );
 			deleteButton.width = width - 2 * pbPadding;
 			_buttonContainer.addElement( deleteButton );
 			_buttonContainer.height += deleteButton.height + pbPadding;
 			
-			_detailButton = new Button( VoxelVerseGUI.resourceGet( "Model_Detail", "+Model Detail") );
+			_detailButton = new Button( VoxelVerseGUI.localizedStringGet( "Model_Detail", "+Model Detail") );
 			_detailButton.addEventListener( UIMouseEvent.CLICK, function (event:UIMouseEvent):void { if ( _selectedModel ) { new WindowModelDetail( _selectedModel ); } } );
 			_detailButton.width = width - 2 * pbPadding;
 			_detailButton.enabled = false;
@@ -121,7 +115,7 @@ package com.voxelengine.GUI
 					if ( Globals.player.inventory )
 						Globals.player.inventory.add( InventoryObject.ITEM_MODEL, _selectedModel.instanceInfo.guid );
 					Globals.markDead( _selectedModel.instanceInfo.guid );
-					populateModels( _dictionarySource );
+					populateModels( _dictionarySource, _parentModel );
 				}
 				else
 					noModelSelected();
@@ -135,24 +129,16 @@ package com.voxelengine.GUI
 			{
 				_detailButton.enabled = true;
 				Globals.selectedModel = _selectedModel;
-				_parent.childPanelAdd( _selectedModel );
-				_parent.animationPanelAdd( _selectedModel );
+				// TO DO this is the right path, but probably need a custom event for this...
+				Globals.g_app.dispatchEvent( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, _selectedModel, _parentModel ) );
+				//_parent.childPanelAdd( _selectedModel );
+				//_parent.animationPanelAdd( _selectedModel );
 			}
 		}
 		
 		private function noModelSelected():void
 		{
-			(new Alert( VoxelVerseGUI.resourceGet( "No_Model_Selected", "No model selected" ) )).display();
-		}
-		
-		public function topLevelGet():* {
-			if ( _parent )
-				return _parent.topLevelGet();
-			return null;	
-		}
-		
-		public function recalc( width:Number, height:Number ):void {
-			_parent.recalc( width, height );
+			(new Alert( VoxelVerseGUI.localizedStringGet( "No_Model_Selected", "No model selected" ) )).display();
 		}
 		
 		//private function rollOverHandler(e:UIMouseEvent):void 

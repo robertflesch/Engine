@@ -97,9 +97,9 @@ package org.flashapi.swing.core {
 		 * 	@see org.flashapi.swing.plaf.LookAndFeel
 		 */
 		public static function validate(o:Object):void {
-			if (o == null) throw new NullPointerException(o.toString());
-			if (describeType(o)..implementsInterface.@type.toXMLString().search("org.flashapi.swing.plaf::LookAndFeel") == -1)
-				throw new LookAndFeelException(Locale.spas_internal::ERRORS.LAF_ERROR + o);
+			//if (o == null) throw new NullPointerException(o.toString());
+			//if (describeType(o)..implementsInterface.@type.toXMLString().search("org.flashapi.swing.plaf::LookAndFeel") == -1)
+				//throw new LookAndFeelException(Locale.spas_internal::ERRORS.LAF_ERROR + o);
 		}
 	}
 }

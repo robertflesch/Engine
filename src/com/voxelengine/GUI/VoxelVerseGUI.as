@@ -43,6 +43,7 @@ package com.voxelengine.GUI
 	
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.GUI.crafting.WindowCrafting;
 //	import com.voxelengine.worldmodel.scripts.FireProjectileScript;
 	
 	public class VoxelVerseGUI extends EventDispatcher
@@ -77,8 +78,8 @@ package com.voxelengine.GUI
 			return _currentInstance;
 		}
 		
-		static public function resourceGet( $key:String, $default:String = "No translation" ):String {
-			return _languageManager.resourceGet( $key, $default );
+		static public function localizedStringGet( $key:String, $default:String = "" ):String {
+			return _languageManager.localizeStringGet( $key, $default );
 		}
 		
 		//	CONSTRUCTOR
@@ -382,21 +383,16 @@ package com.voxelengine.GUI
 			//Log.out( "VVGui.onModelLoadingComplete" );
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 			addKeyboardListeners( event );
-			new WindowLogin( "robertflesch@yahoo.com", "redparrot" )
+			new WindowLogin( "robertflesch@yahoo.com", "redparrot" );
 		}
 		
 		private function onKeyPressed( e : KeyboardEvent) : void
 		{
-			//if ( Keyboard.F == e.keyCode )
-			//{
-				//createProjectile( Globals.controlledModel );
-				//return;
-			//}
-			if ( ( 0 < Globals.openWindowCount || Log.showing) )
-				return;				
+			// this is required for windows that have text fields. 
+			// but...
+//			if ( ( 0 < Globals.openWindowCount || Log.showing) )
+//				return;				
 				
-			//trace( "onKeyPressed: " + e.keyCode );	
-//			if ( true == Globals.g_debug )
 			if ( !Log.showing )
 			{
 				if ( Keyboard.T == e.keyCode )
@@ -411,6 +407,11 @@ package com.voxelengine.GUI
 				if ( Keyboard.F9 == e.keyCode )
 					toggleFullscreen();
 					
+				//if ( Keyboard.F == e.keyCode )
+				//{
+					//createProjectile( Globals.controlledModel );
+					//return;
+				//}
 					
 				//if ( Keyboard.O == e.keyCode )
 				//{
@@ -439,6 +440,10 @@ package com.voxelengine.GUI
 				if ( Keyboard.N == e.keyCode )
 					new WindowRegionModels();
 					//new WindowVideoTest(); Wait for hummingbird
+					
+				if ( Keyboard.C == e.keyCode )
+					new WindowCrafting();
+					
 			}
 			
 			if  ( Globals.g_app.configManager.showEditMenu )
@@ -446,11 +451,11 @@ package com.voxelengine.GUI
 				if ( Keyboard.I == e.keyCode )
 					new WindowInventory();
 					
-				if ( Keyboard.O == e.keyCode )
-				{
-					Globals.TestCheckForFlow();
-					//Globals.g_renderer.context.dispose();
-				}
+				//if ( Keyboard.O == e.keyCode )
+				//{
+					//Globals.TestCheckForFlow();
+					////Globals.g_renderer.context.dispose();
+				//}
 				
 				if ( Keyboard.L == e.keyCode )
 				{

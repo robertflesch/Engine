@@ -16,7 +16,7 @@ package com.voxelengine.GUI
 	{
 		public function WindowRegionModels()
 		{
-			super( VoxelVerseGUI.resourceGet( "Voxel_Model", "Voxel Model" ) );
+			super( VoxelVerseGUI.localizedStringGet( "Voxel_Model", "Voxel Model" ) );
 			autoSize = true;
 			//width = 600;
 			//height = 400;
@@ -42,14 +42,9 @@ package com.voxelengine.GUI
 			panelButton.padding = pbPadding;
 			addElement( panelButton );
 
-			var newModel:Button = new Button( VoxelVerseGUI.resourceGet( "New_Model", "New Model..." ));
-			newModel.addEventListener(UIMouseEvent.CLICK, newModelHandler );
-			//newModel.width = pbWidth - 2 * pbPadding;
-			panelButton.addElement( newModel );
-
 //			if ( true == Globals.g_debug )
 //			{
-				var oxelUtils:Button = new Button( VoxelVerseGUI.resourceGet( "Oxel_Utils", "Oxel Utils" ) );
+				var oxelUtils:Button = new Button( VoxelVerseGUI.localizedStringGet( "Oxel_Utils", "Oxel Utils" ) );
 				oxelUtils.addEventListener(UIMouseEvent.CLICK, oxelUtilsHandler );
 				//oxelUtils.width = pbWidth - 2 * pbPadding;
 				panelButton.addElement( oxelUtils );
@@ -75,13 +70,12 @@ package com.voxelengine.GUI
 			// Popup is NOT a UIContainer for some reason.
 			// So we have to create this holding object for all of the panels
 			// so that they may resize correctly
-			var panelCanvas:CanvasHeirarchy = new CanvasHeirarchy( this );
+			var panelCanvas:PanelBase = new PanelBase( null, width, height );
 			panelCanvas.layout.orientation = LayoutOrientation.HORIZONTAL;
-			panelCanvas.autoSize = true;
 			addElement( panelCanvas );
 			
 			var modelPanel:PanelModelAnimations = new PanelModelAnimations( panelCanvas );
-			modelPanel.updateChildren( Globals.modelInstancesGetDictionary );
+			modelPanel.updateChildren( Globals.modelInstancesGetDictionary, null );
 			panelCanvas.addElement( modelPanel );
 		}
 		
@@ -93,14 +87,10 @@ package com.voxelengine.GUI
 				noModelSelected();
 		}
 		
-		private function newModelHandler(event:UIMouseEvent):void 
-		{
-			new WindowModelChoice();
-		}
 		
 		private function noModelSelected():void
 		{
-			(new Alert( VoxelVerseGUI.resourceGet( "No_Model_Selected", "No model selected" ) )).display();
+			(new Alert( VoxelVerseGUI.localizedStringGet( "No_Model_Selected", "No model selected" ) )).display();
 		}
 		
 		public function recalc( $width:Number, $height:Number ):void {
