@@ -67,8 +67,6 @@ package com.voxelengine.GUI
 		private var _projectileEnabled:Boolean = true;
 		private var _hub:Hub = null;
 		
-		static private var _languageManager:LanguageManager;
-
 		static private var _currentInstance:VoxelVerseGUI = null;
 		static public function get currentInstance():VoxelVerseGUI 
 		{
@@ -76,10 +74,6 @@ package com.voxelengine.GUI
 				_currentInstance = new VoxelVerseGUI();
 				
 			return _currentInstance;
-		}
-		
-		static public function localizedStringGet( $key:String, $default:String = "" ):String {
-			return _languageManager.localizeStringGet( $key, $default );
 		}
 		
 		//	CONSTRUCTOR
@@ -348,8 +342,7 @@ package com.voxelengine.GUI
 			Globals.g_app.addEventListener(LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
 			Globals.g_app.addEventListener(RoomEvent.ROOM_JOIN_FAILURE, joinRoomFailureHandler );
 			
-			_languageManager = new LanguageManager();
-			_languageManager.init();
+			LanguageManager.init();
 		}
 		
 		private function addKeyboardListeners(event : Event) : void

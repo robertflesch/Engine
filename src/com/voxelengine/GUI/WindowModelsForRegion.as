@@ -41,7 +41,7 @@ package com.voxelengine.GUI
 		
 		public function WindowModelsForRegion()
 		{
-			super( VoxelVerseGUI.localizedStringGet( "Voxel_Model", "Voxel Model" ) );
+			super( LanguageManager.localizedStringGet( "Voxel_Model", "Voxel Model" ) );
 			autoSize = true;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			
@@ -68,29 +68,29 @@ package com.voxelengine.GUI
 			panelParentButton.padding = 0;
 			panelButton.addElement( panelParentButton );
 
-			var addModel:Button = new Button( VoxelVerseGUI.localizedStringGet( "Add_Parent_Model", "Add Parent Model..." )  );
+			var addModel:Button = new Button( LanguageManager.localizedStringGet( "Add_Parent_Model", "Add Parent Model..." )  );
 			addModel.addEventListener(UIMouseEvent.CLICK, addParent );
 			addModel.width = 150;
 			panelParentButton.addElement( addModel );
 			
-			var deleteModel:Button = new Button( VoxelVerseGUI.localizedStringGet( "Delete_Parent_Model", "Delete Parent Model") );
+			var deleteModel:Button = new Button( LanguageManager.localizedStringGet( "Delete_Parent_Model", "Delete Parent Model") );
 			deleteModel.addEventListener(UIMouseEvent.CLICK, deleteParent );
 			deleteModel.width = 150;
 			panelParentButton.addElement( deleteModel );
 			
-			var parentDetail:Button = new Button( VoxelVerseGUI.localizedStringGet( "Parent_Detail", "Parent Detail") );
+			var parentDetail:Button = new Button( LanguageManager.localizedStringGet( "Parent_Detail", "Parent Detail") );
 			parentDetail.addEventListener(UIMouseEvent.CLICK, parentDetailHandler );
 			parentDetail.width = 150;
 			panelParentButton.addElement( parentDetail );
 			
-			var newModel:Button = new Button( VoxelVerseGUI.localizedStringGet( "New_Model", "New Model..." ));
+			var newModel:Button = new Button( LanguageManager.localizedStringGet( "New_Model", "New Model..." ));
 			newModel.addEventListener(UIMouseEvent.CLICK, newModelHandler );
 			newModel.width = 150;
 			panelParentButton.addElement( newModel );
 
 //			if ( true == Globals.g_debug )
 //			{
-				var oxelUtils:Button = new Button( VoxelVerseGUI.localizedStringGet( "Oxel_Utils", "Oxel Utils" ) );
+				var oxelUtils:Button = new Button( LanguageManager.localizedStringGet( "Oxel_Utils", "Oxel Utils" ) );
 				oxelUtils.addEventListener(UIMouseEvent.CLICK, oxelUtilsHandler );
 				oxelUtils.width = 150;
 				panelParentButton.addElement( oxelUtils );
@@ -103,11 +103,11 @@ package com.voxelengine.GUI
 			panelChildButton.padding = 0;
 			panelButton.addElement( panelChildButton );
 			
-			var addCModel:Button = new Button( VoxelVerseGUI.localizedStringGet( "Add_Child_Model", "Add Child Model..." ) );
+			var addCModel:Button = new Button( LanguageManager.localizedStringGet( "Add_Child_Model", "Add Child Model..." ) );
 			addCModel.addEventListener(UIMouseEvent.CLICK, addChildModel );
 			panelChildButton.addElement( addCModel );
 			
-			var deleteCModel:Button = new Button( VoxelVerseGUI.localizedStringGet( "Delete_Child_Model", "Delete Child Model...") );
+			var deleteCModel:Button = new Button( LanguageManager.localizedStringGet( "Delete_Child_Model", "Delete Child Model...") );
 			deleteCModel.addEventListener(UIMouseEvent.CLICK, deleteChild );
 			panelChildButton.addElement( deleteCModel );
 			
@@ -118,19 +118,19 @@ package com.voxelengine.GUI
 			panelAnimButton.padding = 0;
 			panelButton.addElement( panelAnimButton );
 			
-			var addAminB:Button = new Button( VoxelVerseGUI.localizedStringGet( "Add_Animation", "Add Animimation..." ) );
+			var addAminB:Button = new Button( LanguageManager.localizedStringGet( "Add_Animation", "Add Animimation..." ) );
 			addAminB.addEventListener(UIMouseEvent.CLICK, addAnim );
 			panelAnimButton.addElement( addAminB );
 			
-			var deleteAminB:Button = new Button( VoxelVerseGUI.localizedStringGet( "Delete_Animation", "Delete Animimation...") );
+			var deleteAminB:Button = new Button( LanguageManager.localizedStringGet( "Delete_Animation", "Delete Animimation...") );
 			deleteAminB.addEventListener(UIMouseEvent.CLICK, deleteAnim );
 			panelAnimButton.addElement( deleteAminB );
 			
-			var editAminB:Button = new Button( VoxelVerseGUI.localizedStringGet( "Edit_Animation", "Edit Animimation...") );
+			var editAminB:Button = new Button( LanguageManager.localizedStringGet( "Edit_Animation", "Edit Animimation...") );
 			editAminB.addEventListener(UIMouseEvent.CLICK, editAnim );
 			panelAnimButton.addElement( editAminB );
 			
-			var importAminB:Button = new Button( VoxelVerseGUI.localizedStringGet( "Import_Animation", "Import Animimation...") );
+			var importAminB:Button = new Button( LanguageManager.localizedStringGet( "Import_Animation", "Import Animimation...") );
 			importAminB.addEventListener(UIMouseEvent.CLICK, importAnim );
 			panelAnimButton.addElement( importAminB );
 			
@@ -142,7 +142,7 @@ package com.voxelengine.GUI
 		
 		private function noModelSelected():void
 		{
-			(new Alert( VoxelVerseGUI.localizedStringGet( "No_Model_Selected", "No model selected" ) )).display();
+			(new Alert( LanguageManager.localizedStringGet( "No_Model_Selected", "No model selected" ) )).display();
 		}
 		
 		

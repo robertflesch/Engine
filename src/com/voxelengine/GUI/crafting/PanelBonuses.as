@@ -10,6 +10,7 @@ package com.voxelengine.GUI.crafting {
 	import com.voxelengine.GUI.PanelBase;	
 	import com.voxelengine.worldmodel.crafting.Recipe;
 	import com.voxelengine.GUI.VoxelVerseGUI;
+	import com.voxelengine.GUI.LanguageManager;
 	
 	// all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
 	public class PanelBonuses extends PanelBase
@@ -25,7 +26,7 @@ package com.voxelengine.GUI.crafting {
 			if ( $recipe ) {
 				for each( var bonus:Bonus in $recipe.bonuses ) {
 					optionals = bonus.optional;
-					var lb:Label = new Label( VoxelVerseGUI.localizedStringGet( bonus.category ) + (bonus.optional ? "*" : "") );
+					var lb:Label = new Label( LanguageManager.localizedStringGet( bonus.category ) + (bonus.optional ? "*" : "") );
 					addElement( lb );
 					var category:String = bonus.category.toUpperCase();
 
@@ -51,7 +52,7 @@ package com.voxelengine.GUI.crafting {
 					addElement( mb );
 				}
 				if ( optionals )
-					addElement( new Label( "*=" + VoxelVerseGUI.localizedStringGet( "optional") ) );
+					addElement( new Label( "*=" + LanguageManager.localizedStringGet( "optional") ) );
 			}
 		}
 	}

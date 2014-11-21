@@ -62,7 +62,7 @@ package com.voxelengine.GUI
 			addModel.addEventListener(UIMouseEvent.CLICK, createInstanceFromTemplate );
 			panelParentButton.addElement( addModel );
 			
-			var newModel:Button = new Button( VoxelVerseGUI.localizedStringGet( "New_Model", "New Model..." ));
+			var newModel:Button = new Button( LanguageManager.localizedStringGet( "New_Model" ));
 			newModel.addEventListener(UIMouseEvent.CLICK, newModelHandler );
 			//newModel.width = pbWidth - 2 * pbPadding;
 			panelParentButton.addElement( newModel );

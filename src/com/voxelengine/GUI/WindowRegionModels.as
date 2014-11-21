@@ -16,7 +16,7 @@ package com.voxelengine.GUI
 	{
 		public function WindowRegionModels()
 		{
-			super( VoxelVerseGUI.localizedStringGet( "Voxel_Model", "Voxel Model" ) );
+			super( LanguageManager.localizedStringGet( "Voxel_Model" ) );
 			autoSize = true;
 			//width = 600;
 			//height = 400;
@@ -44,7 +44,7 @@ package com.voxelengine.GUI
 
 //			if ( true == Globals.g_debug )
 //			{
-				var oxelUtils:Button = new Button( VoxelVerseGUI.localizedStringGet( "Oxel_Utils", "Oxel Utils" ) );
+				var oxelUtils:Button = new Button( LanguageManager.localizedStringGet( "Oxel_Utils" ) );
 				oxelUtils.addEventListener(UIMouseEvent.CLICK, oxelUtilsHandler );
 				//oxelUtils.width = pbWidth - 2 * pbPadding;
 				panelButton.addElement( oxelUtils );
@@ -90,7 +90,7 @@ package com.voxelengine.GUI
 		
 		private function noModelSelected():void
 		{
-			(new Alert( VoxelVerseGUI.localizedStringGet( "No_Model_Selected", "No model selected" ) )).display();
+			(new Alert( LanguageManager.localizedStringGet( "No_Model_Selected" ) )).display();
 		}
 		
 		public function recalc( $width:Number, $height:Number ):void {

@@ -10,6 +10,7 @@ import com.voxelengine.Globals;
 import com.voxelengine.GUI.PanelBase;
 import com.voxelengine.GUI.VoxelVerseGUI;
 import com.voxelengine.worldmodel.crafting.Recipe;
+import com.voxelengine.GUI.LanguageManager;
 
 public class PanelRecipe extends PanelBase
 {
@@ -28,7 +29,7 @@ public class PanelRecipe extends PanelBase
 		padding = 0;
 		layout.orientation = LayoutOrientation.VERTICAL;
 		
-		_recipeDesc = new Label( "Desc of Recipe", 300 );
+		_recipeDesc = new Label( "", 300 );
 		addElement( _recipeDesc );
 		if ( $recipe )
 			_recipeDesc.text = $recipe.desc;
@@ -53,7 +54,7 @@ public class PanelRecipe extends PanelBase
 		_panelButtons.borderStyle = BorderStyle.NONE;
 		_panelButtons.padding = 5;
 		addElement( _panelButtons );
-		var craftButton:Button = new Button( VoxelVerseGUI.localizedStringGet( "Craft_Item", "Craft Item" ) );
+		var craftButton:Button = new Button( LanguageManager.localizedStringGet( "Craft_Item" ) );
 		eventCollector.addEvent( craftButton, UIMouseEvent.CLICK, craft );
 
 		_panelButtons.addElement( craftButton );

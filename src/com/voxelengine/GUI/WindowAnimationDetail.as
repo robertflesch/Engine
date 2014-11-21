@@ -78,8 +78,8 @@ package com.voxelengine.GUI
 		public function WindowAnimationDetail( $ani:Animation )
 		{
 			var title:String;
-			if ( $ani ) 	title = VoxelVerseGUI.localizedStringGet( "Edit_Animation", "Edit Animation" );
-			else			title = VoxelVerseGUI.localizedStringGet( "New_Animation", "New Animation" );
+			if ( $ani ) 	title = LanguageManager.localizedStringGet( "Edit_Animation" );
+			else			title = LanguageManager.localizedStringGet( "New_Animation" );
 			super( title );	
 		
 			if ( $ani ) {
@@ -113,7 +113,7 @@ package com.voxelengine.GUI
 			panelParentButton.padding = 2;
 			addElement( panelParentButton );
 			
-			var saveAnimation:Button = new Button( VoxelVerseGUI.localizedStringGet( "Save_Animation", "Save Animation" ));
+			var saveAnimation:Button = new Button( LanguageManager.localizedStringGet( "Save_Animation" ));
 			saveAnimation.addEventListener(UIMouseEvent.CLICK, saveAnimationHandler );
 			//saveAnimation.width = pbWidth - 2 * pbPadding;
 			panelParentButton.addElement( saveAnimation );

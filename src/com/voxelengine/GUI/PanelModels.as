@@ -89,19 +89,19 @@ package com.voxelengine.GUI
 			_buttonContainer.height = 0;
 			addElementAt( _buttonContainer, 0 );
 
-			var addButton:Button = new Button( VoxelVerseGUI.localizedStringGet( "Model_Add", "+Add Model..." )  );
+			var addButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Add" )  );
 			addButton.addEventListener(UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
 			addButton.width = width - 2 * pbPadding;
 			_buttonContainer.addElement( addButton );
 			_buttonContainer.height += addButton.height + pbPadding;
 			
-			var deleteButton:Button = new Button( VoxelVerseGUI.localizedStringGet( "Model_Delete", "+Delete Model") );
+			var deleteButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Delete" ) );
 			deleteButton.addEventListener(UIMouseEvent.CLICK, deleteModelHandler );
 			deleteButton.width = width - 2 * pbPadding;
 			_buttonContainer.addElement( deleteButton );
 			_buttonContainer.height += deleteButton.height + pbPadding;
 			
-			_detailButton = new Button( VoxelVerseGUI.localizedStringGet( "Model_Detail", "+Model Detail") );
+			_detailButton = new Button( LanguageManager.localizedStringGet( "Model_Detail" ) );
 			_detailButton.addEventListener( UIMouseEvent.CLICK, function (event:UIMouseEvent):void { if ( _selectedModel ) { new WindowModelDetail( _selectedModel ); } } );
 			_detailButton.width = width - 2 * pbPadding;
 			_detailButton.enabled = false;
@@ -138,7 +138,7 @@ package com.voxelengine.GUI
 		
 		private function noModelSelected():void
 		{
-			(new Alert( VoxelVerseGUI.localizedStringGet( "No_Model_Selected", "No model selected" ) )).display();
+			(new Alert( LanguageManager.localizedStringGet( "No_Model_Selected" ) )).display();
 		}
 		
 		//private function rollOverHandler(e:UIMouseEvent):void 

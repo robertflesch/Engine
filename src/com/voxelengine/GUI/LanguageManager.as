@@ -1,7 +1,5 @@
 package com.voxelengine.GUI
 {
-	import flash.events.MouseEvent;
-	
 	import com.enjoymondays.i18n.core.ILocale;
 	import com.enjoymondays.i18n.core.ILocalizationManager;
 	import com.enjoymondays.i18n.core.IResourceBundleProviderFactory;
@@ -15,17 +13,18 @@ package com.voxelengine.GUI
 	
 	import com.voxelengine.Log;
 
+	// Localization Manager which wraps the i18n classes.
 	public class LanguageManager
 	{
-		private var _localization				:ILocalizationManager;
-		private var _provider					:IResourceBundleProviderManager;
-		private var _factory					:IResourceBundleProviderFactory;
-		private var _initialized				:Boolean;
+		static private var _localization				:ILocalizationManager;
+		static private var _provider					:IResourceBundleProviderManager;
+		static private var _factory					:IResourceBundleProviderFactory;
+		static private var _initialized				:Boolean;
 		
 		public function LanguageManager():void {
 		}
 		
-		public function init():void {
+		static public function init():void {
 			
 			//var test:String = Capabilities.language;
 			var currentLocale:ILocale = _getCurrentLocale( );
@@ -51,29 +50,27 @@ package com.voxelengine.GUI
 				return Locale.EN;
 			}
 			
-			function _selectLocale(e:MouseEvent):void {
-				
-				var locale:ILocale = Locale.convert( e.target.name );
-				Log.out( "LanguageManager._selectLocale: " + e.target.name + "  selected locale is " + locale.variant );
-				_localization.setCurrentLocale( locale );
-			}
 			
 			function _onComplete( e:LocalizationEvent ):void {		
 				_initialized = true;
 			}
 		}
 		
+		static public function selectLocale( $localName:String ):void {
+				
+				var locale:ILocale = Locale.convert( $localName );
+				Log.out( "LanguageManager.selectLocale: " + $localName + "  selected locale is " + locale.variant );
+				_localization.setCurrentLocale( locale );
+			}
 		
-		public function localizeStringGet( $key:String, $default:String ):String {
-			if ( _localization.currentBundle.hasResource( $key ) && _initialized ) {
-				return _localization.currentBundle.getResourceString( $key );
+		static public function localizedStringGet( $key:String ):String {
+			var lowerKey:String = $key.toLowerCase()
+			if ( _localization.currentBundle.hasResource( lowerKey ) && _initialized ) {
+				return _localization.currentBundle.getResourceString( lowerKey );
 			}
 			else {
-				Log.out( "LanguageManager.localizeStringGet - no translation found for: " + $key );
-				if ( "" != $default )
-					return $default;
-				else	
-					return $key;
+				Log.out( "LanguageManager.localizeStringGet - no translation found for: " + lowerKey, Log.WARN );
+				return $key;
 			}
 		}
 	}

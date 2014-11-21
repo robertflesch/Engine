@@ -9,6 +9,7 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.GUI.VVPopup;
 import com.voxelengine.GUI.VoxelVerseGUI;
+import com.voxelengine.GUI.LanguageManager;
 import com.voxelengine.events.CraftingEvent;
 import com.voxelengine.worldmodel.crafting.CraftingManager;
 import com.voxelengine.worldmodel.crafting.Recipe;
@@ -26,7 +27,7 @@ public class WindowCrafting extends VVPopup
 	
 	public function WindowCrafting()
 	{
-		super( VoxelVerseGUI.localizedStringGet( "Crafting", "Crafting" ) );
+		super( LanguageManager.localizedStringGet( "Crafting" ) );
 		width = 150;
 		height = 300;
 		layout.orientation = LayoutOrientation.HORIZONTAL;

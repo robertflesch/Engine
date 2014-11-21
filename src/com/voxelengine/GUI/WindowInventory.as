@@ -27,24 +27,24 @@ package com.voxelengine.GUI
 		
 		public function WindowInventory()
 		{
-			super( VoxelVerseGUI.localizedStringGet( "Inventory", "Inventory" ));
+			super( LanguageManager.localizedStringGet( "Inventory" ));
 			autoSize = true;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			
             var bar:TabBar = new TabBar();
 			// TODO I should really iterate thru that types and collect the categories - RSF
-            bar.addItem( VoxelVerseGUI.localizedStringGet( "Earth" ) );
-			bar.addItem( VoxelVerseGUI.localizedStringGet( "Liquid" ) );
-            bar.addItem( VoxelVerseGUI.localizedStringGet( "Plant" ) );
-            bar.addItem( VoxelVerseGUI.localizedStringGet( "Metal" ) );
-            bar.addItem( VoxelVerseGUI.localizedStringGet( "Air" ) );
-            bar.addItem( VoxelVerseGUI.localizedStringGet( "Dragon" ) );
-            bar.addItem( VoxelVerseGUI.localizedStringGet( "Util" ) );
-            bar.addItem( VoxelVerseGUI.localizedStringGet( "Gem" ) );
-            bar.addItem( VoxelVerseGUI.localizedStringGet( "Avatar" ) );
-            bar.addItem( VoxelVerseGUI.localizedStringGet( "Light" ) );
-            bar.addItem( VoxelVerseGUI.localizedStringGet( "Bonuses" ) );
-            var li:ListItem = bar.addItem( VoxelVerseGUI.localizedStringGet( "All" ) );
+            bar.addItem( LanguageManager.localizedStringGet( "Earth" ) );
+			bar.addItem( LanguageManager.localizedStringGet( "Liquid" ) );
+            bar.addItem( LanguageManager.localizedStringGet( "Plant" ) );
+            bar.addItem( LanguageManager.localizedStringGet( "Metal" ) );
+            bar.addItem( LanguageManager.localizedStringGet( "Air" ) );
+            bar.addItem( LanguageManager.localizedStringGet( "Dragon" ) );
+            bar.addItem( LanguageManager.localizedStringGet( "Util" ) );
+            bar.addItem( LanguageManager.localizedStringGet( "Gem" ) );
+            bar.addItem( LanguageManager.localizedStringGet( "Avatar" ) );
+            bar.addItem( LanguageManager.localizedStringGet( "Light" ) );
+            bar.addItem( LanguageManager.localizedStringGet( "Bonuses" ) );
+            var li:ListItem = bar.addItem( LanguageManager.localizedStringGet( "All" ) );
 			bar.setButtonsWidth( 64 );
 			bar.selectedIndex = li.index;
             

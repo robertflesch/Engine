@@ -14,6 +14,7 @@ package com.voxelengine.GUI.crafting {
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.GUI.PanelBase;	
 	import com.voxelengine.GUI.VoxelVerseGUI;
+	import com.voxelengine.GUI.LanguageManager;
 	
 	// all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
 	public class PanelMaterials extends PanelBase
@@ -23,13 +24,13 @@ package com.voxelengine.GUI.crafting {
 		{
 			super( $parent, $widthParam, $heightParam );
 			
-			addElement( new Label( VoxelVerseGUI.localizedStringGet( "Materials" ) ) );
+			addElement( new Label( LanguageManager.localizedStringGet( "Materials" ) ) );
 			padding = 5;
 			var optionals:Boolean;
 			if ( $recipe ) {
 				for each( var mat:Material in $recipe.materials ) {
 					optionals = mat.optional;
-					var lb:Label = new Label( "(" + mat.quantity + ") " + VoxelVerseGUI.localizedStringGet( mat.category ) + (mat.optional ? "*" : "") );
+					var lb:Label = new Label( "(" + mat.quantity + ") " + LanguageManager.localizedStringGet( mat.category ) + (mat.optional ? "*" : "") );
 					addElement( lb );
 					var category:String = mat.category.toUpperCase();
 					var mb:Box;
@@ -51,7 +52,7 @@ package com.voxelengine.GUI.crafting {
 					addElement( mb );
 				}
 				if ( optionals )
-					addElement( new Label( "*=" + VoxelVerseGUI.localizedStringGet( "optional") ) );
+					addElement( new Label( "*=" + LanguageManager.localizedStringGet( "optional") ) );
 			}
 		}
 		
