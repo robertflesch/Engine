@@ -15,13 +15,15 @@ package com.voxelengine.worldmodel.crafting {
 	 */
 	public class Bonus 
 	{
-		private var _category:String;
+		private var _category:String = "Crafting";
+		private var _subCat:String;
+		
 		private var _optional:Boolean;
 
 		public function fromJSON( $json:Object ):void 
 		{
-			if ( $json.category )
-				_category = $json.category;
+			if ( $json.subCat )
+				_subCat = $json.subCat.toLowerCase();
 				
 			if ( $json.optional )
 				_optional = $json.optional;
@@ -36,5 +38,11 @@ package com.voxelengine.worldmodel.crafting {
 		{
 			return _optional;
 		}
+		
+		public function get subCat():String 
+		{
+			return _subCat;
+		}
+		
 	}
 }

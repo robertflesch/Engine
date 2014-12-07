@@ -38,7 +38,15 @@ package com.voxelengine {
 		public static var g_textureBank:TextureBank = new TextureBank();
 		public static var g_regionManager:RegionManager = null;
 		public static var g_renderer:Renderer = new Renderer();
-		public static var g_craftingManager:CraftingManager;
+		
+		private static var g_craftingManager:CraftingManager;
+		public static function get craftingManager():CraftingManager { return g_craftingManager; } 
+		public static function craftingManagerCreate():void 
+		{ 
+			if ( null == g_craftingManager )
+				g_craftingManager = new CraftingManager(); 
+		} 
+		
 		public static var g_mouseKeyboardHandler:MouseKeyboardHandler = new MouseKeyboardHandler();
 
 		public static var g_nearplane:Number = 1/4;

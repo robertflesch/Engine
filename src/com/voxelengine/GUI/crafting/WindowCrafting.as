@@ -37,15 +37,14 @@ public class WindowCrafting extends VVPopup
 		_recipeList.addEventListener( ListEvent.LIST_CHANGED, selectRecipe );		
 		addElement( _recipeList );
 		
-		if ( null == Globals.g_craftingManager ) {
-			Globals.g_craftingManager = new CraftingManager();
-		}
+		// This makes sure the crafting manager is running
+		Globals.craftingManagerCreate();
 		
 		display();
 		
 		addEventListener(UIOEvent.REMOVED, onRemoved );
-		Globals.g_app.addEventListener( CraftingEvent.RECIPE_LOADED, onRecipeLoaded );
-		Globals.g_app.dispatchEvent( new CraftingEvent( CraftingEvent.RECIPE_LOAD_PUBLIC, null, null ) );
+		Globals.craftingManager.addEventListener( CraftingEvent.RECIPE_LOADED, onRecipeLoaded );
+		Globals.craftingManager.dispatchEvent( new CraftingEvent( CraftingEvent.RECIPE_LOAD_PUBLIC, null, null ) );
 	}
 	
 	private function onResized(e:UIOEvent):void 
@@ -75,7 +74,7 @@ public class WindowCrafting extends VVPopup
 	override protected function onRemoved( event:UIOEvent ):void
 	{
 		super.onRemoved( event );
-		Globals.g_app.removeEventListener( CraftingEvent.RECIPE_LOADED, onRecipeLoaded );
+		Globals.craftingManager.removeEventListener( CraftingEvent.RECIPE_LOADED, onRecipeLoaded );
 		_recipeList = null;
 		_selectedRecipe = null;
 		_panelRecipe = null;

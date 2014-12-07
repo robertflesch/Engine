@@ -396,6 +396,18 @@ package org.flashapi.swing.dnd {
 			}
 		}
 		
+		/**
+		 * 	Removes the specified drop format from this <code>DnDOperation</code> object.
+		 * 
+		 * 	@param	format 	The drop format to remove from this <code>DnDOperation</code>
+		 * 					object.
+		 * 
+		 * 	@see org.flashapi.swing.dnd.DnDFormat
+		 */
+		public function resetDropFormat():void {
+			spas_internal::dropFmt = [];
+		}
+		
 		//--------------------------------------------------------------------------
 		//
 		// Protected methods

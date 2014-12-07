@@ -647,7 +647,14 @@ package org.flashapi.swing.managers {
 						fmt = opFormat[i].format;
 						l = l2 - 1;
 						for (; l >= 0; l--) {
-							if (fmt == tgtFormat[l].format) return true;
+							if (fmt == tgtFormat[l].format)
+							{
+								// The higher level format agree, now check the data.
+								if ( !tgtFormat[l].data || !opFormat[i].data )
+									return true;
+								if ( tgtFormat[l].data == opFormat[i].data )
+									return true;
+							}
 						}
 					}
 				}

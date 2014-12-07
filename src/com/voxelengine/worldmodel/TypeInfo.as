@@ -31,6 +31,7 @@ package com.voxelengine.worldmodel
 	{
 		private var _typeId:uint				= Globals.INVALID;
 		private var _category:String 			= "INVALID";
+		private var _subCat:String 				= "INVALID";
 		private var _name:String 				= "INVALID"
 
 		private var _maxpix:uint 				= 256;
@@ -47,7 +48,7 @@ package com.voxelengine.worldmodel
 		private var _solid:Boolean 				= true;
 		private var _flowable:Boolean 			= false;
 		private var _animated:Boolean 			= false;
-		private var _image:String				= "invalid.png";
+		private var _image:String				= "grey64.png";
 		private var _placeable:Boolean  		= true;
 		private var _flame:Boolean  			= false;
 		private var _interactions:Interactions 	= null;
@@ -68,6 +69,7 @@ package com.voxelengine.worldmodel
 				return false; 
 		}
 		public function get category():String 		{ return _category; }
+		public function get subCat():String 		{ return _subCat; }
 		public function get name():String 			{ return _name; }
 		public function get image():String 			{ return _image; }
 		public function get flowInfo():FlowInfo		{ return _flowInfo; }
@@ -94,7 +96,15 @@ package com.voxelengine.worldmodel
 		public function get side():uint 			{ return _sidett; }
 
 		public function TypeInfo():void { }
+		
+		public function get damage():Number {
+			return 1;
+		}
 
+		public function get speed():Number {
+			return 2;
+		}
+		
 		public function getJSON():String
 		{
 			var typesJson:String = "{\"model\":";
@@ -154,50 +164,53 @@ package com.voxelengine.worldmodel
 			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_TYPES_COMPLETE ) );
 		}
 
-		public function init( typesJson:Object ):void 
+		public function init( $json:Object ):void 
 		{
-			if ( !typesJson.id  )
-				throw new Error( "TypeInfo.init - WARNING - unable to find type id: " + JSON.stringify(typesJson) );					
-			_typeId = typesJson.id;
+			if ( !$json.id  )
+				throw new Error( "TypeInfo.init - WARNING - unable to find type id: " + JSON.stringify($json) );					
+			_typeId = $json.id;
 
-			if ( !typesJson.category  )
-				throw new Error( "TypeInfo.init - WARNING - unable to find category: " + JSON.stringify(typesJson) );					
-			_category = typesJson.category;
+			if ( !$json.category  )
+				throw new Error( "TypeInfo.init - WARNING - unable to find category: " + JSON.stringify($json) );					
+			_category = $json.category;
 			
-			if ( !typesJson.name  )
-				throw new Error( "TypeInfo.init - WARNING - unable to find name: " + JSON.stringify(typesJson) );					
-			_name = typesJson.name;
+			if ( $json.subCat  )
+				_subCat = $json.subCat.toLowerCase();
 			
-			if ( typesJson.image  )
-				_image = typesJson.image;
+			if ( !$json.name  )
+				throw new Error( "TypeInfo.init - WARNING - unable to find name: " + JSON.stringify($json) );					
+			_name = $json.name;
+			
+			if ( $json.image  )
+				_image = $json.image;
 
-			if ( typesJson.color  )
+			if ( $json.color  )
 			{
-				_color = ColorUtils.placeRedNumber( _color, typesJson.color.r );
-				_color = ColorUtils.placeGreenNumber( _color, typesJson.color.g );
-				_color = ColorUtils.placeBlueNumber( _color, typesJson.color.b );
-				_color = ColorUtils.placeAlphaNumber( _color, typesJson.color.a );
+				_color = ColorUtils.placeRedNumber( _color, $json.color.r );
+				_color = ColorUtils.placeGreenNumber( _color, $json.color.g );
+				_color = ColorUtils.placeBlueNumber( _color, $json.color.b );
+				_color = ColorUtils.placeAlphaNumber( _color, $json.color.a );
 			}
 			
-			if ( typesJson.uv )
+			if ( $json.uv )
 			{
-				_maxpix = typesJson.uv.maxpix;
-				_minpix = typesJson.uv.minpix;
-				_toptt = typesJson.uv.top; 
-				_ut = typesJson.uv.ut;
-				_vt = typesJson.uv.vt;
-				_sidett = typesJson.uv.side; 
-				_us = typesJson.uv.us;
-				_vs = typesJson.uv.vs;
-				_bottomtt = typesJson.uv.bottom; 
-				_ub = typesJson.uv.ub;
-				_vb = typesJson.uv.vb;
+				_maxpix = $json.uv.maxpix;
+				_minpix = $json.uv.minpix;
+				_toptt = $json.uv.top; 
+				_ut = $json.uv.ut;
+				_vt = $json.uv.vt;
+				_sidett = $json.uv.side; 
+				_us = $json.uv.us;
+				_vs = $json.uv.vs;
+				_bottomtt = $json.uv.bottom; 
+				_ub = $json.uv.ub;
+				_vb = $json.uv.vb;
 			}
 			
-			if ( typesJson.interactions )
+			if ( $json.interactions )
 			{
 				_interactions = new Interactions( _name );
-				_interactions.fromJson( typesJson.interactions );
+				_interactions.fromJson( $json.interactions );
 			}
 			else
 			{
@@ -206,18 +219,18 @@ package com.voxelengine.worldmodel
 				_interactions.setDefault();
 			}
 			
-			if ( typesJson.solid )
+			if ( $json.solid )
 			{
-				if ( "true" ==  typesJson.solid.toLowerCase() )
+				if ( "true" ==  $json.solid.toLowerCase() )
 					_solid = true;
 				else
 					_solid = false;
 			}
-			if ( typesJson.flowable )
+			if ( $json.flowable )
 			{
 				_flowable = true;
 				_flowInfo = new FlowInfo();
-				_flowInfo.fromJson( typesJson.flowable );
+				_flowInfo.fromJson( $json.flowable );
 			}
 			else
 			{
@@ -225,42 +238,42 @@ package com.voxelengine.worldmodel
 				_flowInfo = new FlowInfo();
 			}
 
-			if ( typesJson.animated )
+			if ( $json.animated )
 			{
-				if ( "true" ==  typesJson.animated.toLowerCase() )
+				if ( "true" ==  $json.animated.toLowerCase() )
 					_animated = true;
 				else
 					_animated = false;
 			}
-			if ( typesJson.placeable )
+			if ( $json.placeable )
 			{
-				if ( "true" ==  typesJson.placeable.toLowerCase() )
+				if ( "true" ==  $json.placeable.toLowerCase() )
 					_placeable = true;
 				else
 					_placeable = false;
 			}
-			if ( typesJson.light )
+			if ( $json.light )
 			{
-				if ( typesJson.light.lightSource )
-					if ( "true" ==  typesJson.light.lightSource.toLowerCase() )
+				if ( $json.light.lightSource )
+					if ( "true" ==  $json.light.lightSource.toLowerCase() )
 						_lightInfo.lightSource = true;
 					
-				if ( typesJson.light.attn )
-					_lightInfo.attn = typesJson.light.attn;
+				if ( $json.light.attn )
+					_lightInfo.attn = $json.light.attn;
 
-				if ( typesJson.light.color )
-					_lightInfo.color = typesJson.light.color;
+				if ( $json.light.color )
+					_lightInfo.color = $json.light.color;
 					
-				if ( typesJson.light.fullBright )
-					if ( "true" ==  typesJson.light.fullBright.toLowerCase() )
+				if ( $json.light.fullBright )
+					if ( "true" ==  $json.light.fullBright.toLowerCase() )
 						_lightInfo.fullBright = true;
 						
-				if ( typesJson.light.fallOffFactor )
-					_lightInfo.fallOffFactor = typesJson.light.fallOffFactor;
+				if ( $json.light.fallOffFactor )
+					_lightInfo.fallOffFactor = $json.light.fallOffFactor;
 			}
-			if ( typesJson.flame )
+			if ( $json.flame )
 			{
-				if ( "true" ==  typesJson.flame.toLowerCase() )
+				if ( "true" ==  $json.flame.toLowerCase() )
 					_flame = true;
 				else
 					_flame = false;

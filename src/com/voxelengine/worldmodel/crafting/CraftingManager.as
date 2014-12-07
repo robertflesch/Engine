@@ -7,8 +7,10 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.crafting {
 import flash.events.Event;
+import flash.events.EventDispatcher;
 import flash.events.IOErrorEvent;
 import flash.net.URLRequest;
+import flash.utils.getDefinitionByName;
 import mx.utils.StringUtil;
 
 import org.flashapi.swing.*;
@@ -21,6 +23,7 @@ import com.voxelengine.Log;
 import com.voxelengine.events.CraftingEvent;
 import com.voxelengine.worldmodel.crafting.Recipe;
 import com.voxelengine.utils.CustomURLLoader;
+import com.voxelengine.worldmodel.crafting.items.*;
 
 	/**
 	 * ...
@@ -28,13 +31,17 @@ import com.voxelengine.utils.CustomURLLoader;
 	 */
 	
 	 
-public class CraftingManager 
+public class CraftingManager extends EventDispatcher
 {
+	// Adding these makes the event available in MXML
+	// http://help.adobe.com/en_US/flex/using/WS2db454920e96a9e51e63e3d11c0bf69084-7ab2.html
+	// [Event(name = "complete", type = "com.voxelengine.events.CraftingEvent")]
+	
 	static private var _initialized:Boolean;
 	static private var _recipes:Vector.<Recipe> = new Vector.<Recipe>;
 	
 	public function CraftingManager() {
-		Globals.g_app.addEventListener( CraftingEvent.RECIPE_LOAD_PUBLIC, loadRecipes );
+		addEventListener( CraftingEvent.RECIPE_LOAD_PUBLIC, loadRecipes );
 	}
 	
 	static private function loadRecipes(e:CraftingEvent):void 
@@ -46,7 +53,7 @@ public class CraftingManager
 		}
 		else {
 			for each ( var recipe:Recipe in _recipes ) {
-				Globals.g_app.dispatchEvent( new CraftingEvent( CraftingEvent.RECIPE_LOADED, recipe.name, recipe ) );	
+				Globals.craftingManager.dispatchEvent( new CraftingEvent( CraftingEvent.RECIPE_LOADED, recipe.name, recipe ) );	
 			}
 		}
 		
@@ -82,11 +89,27 @@ public class CraftingManager
 		if ( jsonResult.recipe ) {
 			_r.fromJSON( jsonResult.recipe );
 			_recipes.push( _r );
-			Globals.g_app.dispatchEvent( new CraftingEvent( CraftingEvent.RECIPE_LOADED, _r.name, _r ) );	
+			Globals.craftingManager.dispatchEvent( new CraftingEvent( CraftingEvent.RECIPE_LOADED, _r.name, _r ) );	
 		}
 		else	
 			Log.out("CraftingManager.onRecipeLoaded - ERROR recipe data not found in fileName: " + fileName + "  data: " + fileData, Log.ERROR );
 			
 	}       
+	
+	public static function getClass( $className : String ) : Class
+	{
+		Pick;
+		try 
+		{
+			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.crafting.items." + $className ) );
+		}
+		catch ( error:Error )
+		{
+			Log.out( "CraftingManager.getClass - ERROR - getDefinitionByName failed to find: com.voxelengine.worldmodel.crafting.items." + $className + " ERROR: " + error, Log.ERROR );
+		}
+		
+		return asset;
+	}
+
 }
 }

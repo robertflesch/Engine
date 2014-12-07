@@ -4,6 +4,7 @@ package com.voxelengine.GUI.crafting {
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
+	import org.flashapi.swing.dnd.DnDFormat;
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
@@ -26,18 +27,18 @@ package com.voxelengine.GUI.crafting {
 			if ( $recipe ) {
 				for each( var bonus:Bonus in $recipe.bonuses ) {
 					optionals = bonus.optional;
-					var lb:Label = new Label( LanguageManager.localizedStringGet( bonus.category ) + (bonus.optional ? "*" : "") );
+					var lb:Label = new Label( LanguageManager.localizedStringGet( bonus.subCat ) + (bonus.optional ? "*" : "") );
 					addElement( lb );
-					var category:String = bonus.category.toUpperCase();
+					var subCat:String = bonus.subCat.toUpperCase();
 
 					var mb:Box;
-					if ( Globals.MODIFIER_DAMAGE == category )
+					if ( Globals.MODIFIER_DAMAGE == subCat )
 						mb = new BoxDamage( BOX_SIZE, BOX_SIZE );
-					else if ( Globals.MODIFIER_SPEED == category )
+					else if ( Globals.MODIFIER_SPEED == subCat )
 						mb = new BoxSpeed( BOX_SIZE, BOX_SIZE );
-					else if ( Globals.MODIFIER_DURABILITY == category )
+					else if ( Globals.MODIFIER_DURABILITY == subCat )
 						mb = new BoxDurability( BOX_SIZE, BOX_SIZE );
-					else if ( Globals.MODIFIER_LUCK == category )
+					else if ( Globals.MODIFIER_LUCK == subCat )
 						mb = new BoxLuck( BOX_SIZE, BOX_SIZE );
 					else {
 						Log.out( "PanelMaterials - Unknown bonus type found in Recipe: " + $recipe.name, Log.WARN );
@@ -48,6 +49,8 @@ package com.voxelengine.GUI.crafting {
 	//				mb.backgroundTexture = "assets/textures/blank.png";
 					mb.dropEnabled = true;
 					mb.borderStyle = BorderStyle.INSET;
+					var dndFmt:DnDFormat = new DnDFormat( bonus.category, bonus.subCat );
+					mb.addDropFormat( dndFmt );
 
 					addElement( mb );
 				}

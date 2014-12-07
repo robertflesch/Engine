@@ -16,24 +16,33 @@ package com.voxelengine.worldmodel.crafting {
 	public class Recipe 
 	{
 		private var _name:String = "INVLAID";
+		private var _className:String = "INVLAID";
 		private var _desc:String = "NONE";
-		private var _category:String = "NONE";
+		private var _subcat:String = "NONE";
 		private var _preview:String = "none.jpg";
-		private var _materials:Vector.<Material> = new Vector.<Material>();
-		private var _bonuses:Vector.<Bonus> = new Vector.<Bonus>();
+		protected var _materialsRequired:Vector.<Material>;
+		protected var _bonusesAllowed:Vector.<Bonus>;
 		
 		public function fromJSON( $json:Object ):void 
 		{
+			_materialsRequired = new Vector.<Material>();
+			_bonusesAllowed = new Vector.<Bonus>();
+			
 			if ( $json.name )
 				_name = $json.name;
 			else
 				Log.out("Recipe.fromJSON - Null NAME found in recipe: " + $json.toString(), Log.ERROR );
 				
+			if ( $json.className )
+				_className = $json.className;
+			else
+				Log.out("Recipe.fromJSON - Null CLASS NAME found in recipe: " + $json.toString(), Log.ERROR );
+				
 			if ( $json.desc )
 				_desc = $json.desc;
 				
-			if ( $json.category )
-				_category = $json.category;
+			if ( $json.subcat )
+				_subcat = $json.subcat;
 				
 			if ( $json.preview )
 				_preview = $json.preview;
@@ -48,7 +57,7 @@ package com.voxelengine.worldmodel.crafting {
 					if ( materialData.material ) {
 						var mat:Material = new Material();
 						mat.fromJSON( materialData.material );
-						_materials.push( mat )
+						_materialsRequired.push( mat )
 					}
 					else 
 						Log.out("Recipe.fromJSON - Null material found in recipe: " + _name, Log.ERROR );
@@ -65,7 +74,7 @@ package com.voxelengine.worldmodel.crafting {
 					if ( bonusData.bonus ) {
 						var bonus:Bonus = new Bonus();
 						bonus.fromJSON( bonusData.bonus );
-						_bonuses.push( bonus )
+						_bonusesAllowed.push( bonus )
 					}
 					else 
 						Log.out("Recipe.fromJSON - Null bonus found in recipe: " + _name, Log.ERROR );
@@ -73,8 +82,24 @@ package com.voxelengine.worldmodel.crafting {
 			}
 		}
 		
+		public function copy( $recipe:Recipe ):void {
+			_materialsRequired = $recipe._materialsRequired;
+			_bonusesAllowed = $recipe._bonusesAllowed;
+			_name			= $recipe._name;
+			_className		= $recipe._className;
+			_desc			= $recipe._desc;
+			_subcat			= $recipe._subcat;
+			_preview		= $recipe._preview;
+			
+		}
+		
+		public function cancel():void {
+			_materialsRequired = null;
+			_bonusesAllowed = null;
+		}
+		
 		public function toString():String {
-			return "name: " + _name + "  desc: " + _desc + "  category: " + _category;
+			return "name: " + _name + "  desc: " + _desc + "  subcat: " + _subcat;
 		}
 		
 		public function get name():String 
@@ -87,24 +112,29 @@ package com.voxelengine.worldmodel.crafting {
 			return _desc;
 		}
 		
-		public function get category():String 
+		public function get subcat():String 
 		{
-			return _category;
+			return _subcat;
 		}
 		
 		public function get materials():Vector.<Material> 
 		{
-			return _materials;
+			return _materialsRequired;
 		}
 		
 		public function get bonuses():Vector.<Bonus> 
 		{
-			return _bonuses;
+			return _bonusesAllowed;
 		}
 		
 		public function get preview():String 
 		{
 			return _preview;
+		}
+		
+		public function get className():String 
+		{
+			return _className;
 		}
 	}
 }

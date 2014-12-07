@@ -1,6 +1,8 @@
 
 package com.voxelengine.GUI.crafting 
 {
+import com.voxelengine.worldmodel.crafting.CraftingManager;
+import com.voxelengine.worldmodel.crafting.items.CraftedItem;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
@@ -21,6 +23,8 @@ public class PanelRecipe extends PanelBase
 	private var _panelPreview:PanelPreview;
 	private var _recipeDesc:Label;
 	
+	private var _craftedItem:CraftedItem;
+	
 	public function PanelRecipe( $parent:PanelBase, $widthParam:Number, $heightParam:Number, $recipe:Recipe )
 	{
 		super( $parent, $widthParam, $heightParam );
@@ -28,6 +32,10 @@ public class PanelRecipe extends PanelBase
 		autoSize = true;
 		padding = 0;
 		layout.orientation = LayoutOrientation.VERTICAL;
+		
+		var craftedClass:Class = CraftingManager.getClass( $recipe.className );
+		if ( craftedClass )
+			_craftedItem = new craftedClass( $recipe );
 		
 		_recipeDesc = new Label( "", 300 );
 		addElement( _recipeDesc );
@@ -58,11 +66,34 @@ public class PanelRecipe extends PanelBase
 		eventCollector.addEvent( craftButton, UIMouseEvent.CLICK, craft );
 
 		_panelButtons.addElement( craftButton );
+		
+		addEventListener(UIOEvent.REMOVED, onRemoved );
+	}
+	
+	override public function remove():void {
+		_craftedItem.cancel();
+		_craftedItem = null;
+		super.remove();
+	}
+	
+	private function onRemoved(e:UIOEvent):void 
+	{
+		_panelForumla.remove();
+		_panelBonuses.remove();
+		_panelMaterials.remove();
+		_panelPreview.remove();
+		_panelButtons.remove();
+		
 	}
 	
 	private function craft( e:UIMouseEvent ):void
 	{
 		
+	}
+	
+	public function get craftedItem():CraftedItem 
+	{
+		return _craftedItem;
 	}
 }
 }

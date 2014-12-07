@@ -3,11 +3,14 @@ package com.voxelengine.GUI.crafting {
 	import com.voxelengine.worldmodel.crafting.Material;
 	import com.voxelengine.worldmodel.crafting.Recipe;
 	import org.flashapi.swing.*;
+	import org.flashapi.swing.dnd.DnDFormat;
     import org.flashapi.swing.event.*;
 	import org.flashapi.swing.event.ListEvent;
     import org.flashapi.swing.constants.*;
 	import org.flashapi.swing.list.ListItem;
 	import org.flashapi.swing.dnd.DnDOperation;
+	import org.flashapi.swing.core.*;
+	import flash.display.DisplayObject;
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
@@ -19,6 +22,7 @@ package com.voxelengine.GUI.crafting {
 	// all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
 	public class PanelMaterials extends PanelBase
 	{
+		private var _dragOp:DnDOperation = new DnDOperation();
 		private const BOX_SIZE:int = 64;
 		public function PanelMaterials( $parent:PanelBase, $widthParam:Number, $heightParam:Number, $recipe:Recipe )
 		{
@@ -46,8 +50,13 @@ package com.voxelengine.GUI.crafting {
 					}
 						
 					mb.dropEnabled = true;
+					mb.dragEnabled = true;
+					var dndFmt:DnDFormat = new DnDFormat( mat.category );
+					mb.addDropFormat( dndFmt );
+
 					mb.addEventListener( DnDEvent.DND_DROP, onDrop );
 					mb.borderStyle = BorderStyle.INSET;
+					eventCollector.addEvent( mb, UIMouseEvent.PRESS, doDrag);
 
 					addElement( mb );
 				}
@@ -55,6 +64,14 @@ package com.voxelengine.GUI.crafting {
 					addElement( new Label( "*=" + LanguageManager.localizedStringGet( "optional") ) );
 			}
 		}
+		
+		private function doDrag(e:UIMouseEvent):void 
+		{
+			Log.out( "PanelMaterials.doDrag" );
+			_dragOp.initiator = e.target as UIObject;
+			_dragOp.dragImage = e.target as DisplayObject;
+			UIManager.dragManager.startDragDrop(_dragOp);
+		}			
 		
 		private function onDrop(e:DnDEvent):void 
 		{
