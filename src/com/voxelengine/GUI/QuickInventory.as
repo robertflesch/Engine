@@ -97,7 +97,7 @@ package com.voxelengine.GUI
 			else	
 				hk.text = String( count + 1 );
 			addElement(hk);
-
+			
 			return { box: box, hotkey:hk };
 		}
 		
@@ -118,36 +118,6 @@ package com.voxelengine.GUI
 			hk.text = "F" + String( count );
 			addElement(hk);
 			
-			return { box: box, hotkey:hk };
-		}
-		
-		public function buildItem( item:TypeInfo, count:int, shortCutImage:String ):Object {
-			var box:Box = new Box(IMAGE_SIZE, IMAGE_SIZE);
-			var hk:Label = new Label("", 20);
-			box.x = IMAGE_SIZE * count;
-			box.y = 0;
-			box.name = String( count );
-			if ( item )
-			{
-				box.data = item;
-				hk.data = item;
-				box.backgroundTexture = "assets/textures/" + item.image;
-			}
-			else
-			{
-				box.backgroundTexture = "assets/textures/blank.png";
-				box.dropEnabled = true;
-			}
-			addElement( box );
-			
-			hk.x = IMAGE_SIZE * count;
-			hk.fontColor = 0xffffff;
-			if ( count == 10 )
-				hk.text = "0";
-			else	
-				hk.text = String( count + 1 );
-			addElement(hk);
-
 			return { box: box, hotkey:hk };
 		}
 	}
