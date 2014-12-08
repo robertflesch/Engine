@@ -117,6 +117,21 @@ FIX - MINOR: Oxels appear to not already being removed. I just saw a oxel with n
 
 PlayerIO
 SFTP password = redparrotSFTP
+FB bought Oculus
+
+they obviously have desire to be part of the Virtual World(Reality) scene
+I think VoxelVerse, has a chance to be big in both of those markets
+FB is popular amongst the oldER crowds these days, less to amongst the younger crowd
+so VoxelVerse would give them a good destination for the millions of kids playing MC
+
+Since VoxelVerse is browser based users could display on FB the models they had created and get likes, etc
+This is also good since VoxelVerse is model based
+ as opposed to MC which is really just one big world
+ Also VV can work with Oculus Rift, on Desktops initially, but could migrate to mobile
+ I designed it to be mobile friendly, and Flash can compile to mobile targets
+ plus, VV is a combination of a building expereince, exploration, and PVP (and PVE)
+ so it has a lot of stickiness
+
 
 /////////////////////////////////////////////////////
 Goal: to become a profitable game studio in 1 year
@@ -164,6 +179,12 @@ http://steveblank.com/2014/09/16/who-do-you-need-on-your-startup-team/
 http://venturebeat.com/2014/09/16/is-mindfulness-and-less-stress-worth-299-the-muse-makes-a-case-review/
 http://gamasutra.com/blogs/MariosMouratidis/20141001/226838/Indie_Game_Marketing_Guide_Part_1__How_to_create_Landing_Pages.php
 http://techcrunch.com/2014/09/17/indiegogo-forever-funding/
+http://www.redblobgames.com/pathfinding/a-star/introduction.html
+
+machine learning and vectors math
+http://metacademy.org/roadmaps/cjrd/level-up-your-ml
+http://metacademy.org/graphs/concepts/logistic_regression#focus=dot_product&mode=learn
+https://www.khanacademy.org/math/linear-algebra/vectors_and_spaces/dot_cross_products/v/vector-dot-product-and-vector-length
 
 Support for business idea
 http://motherboard.vice.com/read/minecraft-25-billion-and-the-founder-who-never-meant-to-make-a-hit?trk_source=popular
