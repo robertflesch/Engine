@@ -607,6 +607,7 @@ package com.voxelengine.worldmodel.oxel
 			//trace( "childrenCreate to grain: " + gc.grain+ " (" + gc.size() + ") to grain: " + (gc.grain- 1) + );
 			_children = ChildOxelPool.poolGet();
 			var gct:GrainCursor = GrainCursorPool.poolGet(root_get().gc.bound );
+			faces_clear_all();
 
 			for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
 			{
@@ -614,7 +615,10 @@ package com.voxelengine.worldmodel.oxel
 				gct.copyFrom( gc );
 				gct.become_child( i );   
 				_children[i].initialize( this, gct, 0, type, null );
-				super.faces_mark_all_dirty();
+				// use the super so you dont start a flow event on flowable types.
+				// No longer used, not sure if above comment is valid.
+				//super.faces_mark_all_dirty();
+				_children[i].faces_mark_all_dirty();
 				
 				if ( _lighting )
 				{
@@ -624,8 +628,8 @@ package com.voxelengine.worldmodel.oxel
 					_children[i].lighting.materialFallOffFactor = lighting.materialFallOffFactor;
 					_children[i].lighting.color = lighting.color;
 				}
-				// use the super so you dont start a flow event on flowable types.
-				if ( Globals.GRASS == type )
+				// Special case for grass, leave upper oxels as grass.
+				if ( Globals.GRASS == type && ( 0 == gct.grainY % 2 ) )
 					_children[i].type = Globals.DIRT;
 			}
 
