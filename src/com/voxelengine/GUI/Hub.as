@@ -88,8 +88,8 @@ package com.voxelengine.GUI
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		private function buildItem( ti:TypeInfo, count:int ):Box
 		{
-			var buildResult:Object;
-			buildResult = _itemInventory.buildItem( ti, count, String(count+1) + ".png" );
+			//var buildResult:Object = _itemInventory.buildItem( ti, count, String(count+1) + ".png" );
+			var buildResult:Object = _itemInventory.buildActionItem( ti, count );
 			_evtColl.addEvent( buildResult.box, UIMouseEvent.PRESS, pressItem );
 			_evtColl.addEvent( buildResult.box, UIMouseEvent.RELEASE, releaseItem );
 			_evtColl.addEvent( buildResult.hotkey, UIMouseEvent.PRESS, pressItem );

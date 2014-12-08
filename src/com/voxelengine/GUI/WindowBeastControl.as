@@ -134,6 +134,7 @@ package com.voxelengine.GUI
 			var dismountItem:Object = new Object();
 			dismountItem["image"] = "dismount.png";
 			dismountItem["callback"] = loseControl;
+			dismountItem["category"] = "action";
 			box = buildAction( dismountItem, count++ );
 			
 			var beast:VoxelModel = Globals.getModelInstance( _beastInstanceGuid );
