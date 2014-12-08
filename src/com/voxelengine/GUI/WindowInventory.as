@@ -2,7 +2,6 @@ package com.voxelengine.GUI
 {
 	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
-//	import flash.display.BlendMode;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.display.BitmapData;
@@ -27,9 +26,9 @@ package com.voxelengine.GUI
 	public class WindowInventory extends VVPopup
 	{
 		private var _dragOp:DnDOperation = new DnDOperation();
-        private var bar:TabBar = new TabBar();
-		private var barLower:TabBar = new TabBar();
-		private var itemContainer:Container = new Container( 64, 64);
+        private var _barUpper:TabBar = new TabBar();
+		private var _barLower:TabBar = new TabBar();
+		private var _itemContainer:Container = new Container( 64, 64);
 		
 		public function WindowInventory()
 		{
@@ -56,44 +55,50 @@ package com.voxelengine.GUI
 		}
 		
 		private function upperTabsAdd():void {
+			_barUpper.name = "upper";
 			// TODO I should really iterate thru the types and collect the categories - RSF
-            bar.addItem( LanguageManager.localizedStringGet( "Earth" ) );
-			bar.addItem( LanguageManager.localizedStringGet( "Liquid" ) );
-            bar.addItem( LanguageManager.localizedStringGet( "Plant" ) );
-            bar.addItem( LanguageManager.localizedStringGet( "Metal" ) );
-            bar.addItem( LanguageManager.localizedStringGet( "Air" ) );
-            var li:ListItem = bar.addItem( LanguageManager.localizedStringGet( "All" ) );
-			bar.setButtonsWidth( 128 );
-			bar.selectedIndex = li.index;
-            eventCollector.addEvent( bar, ListEvent.ITEM_CLICKED, selectCategory );
-            addGraphicElements( bar );
+            _barUpper.addItem( LanguageManager.localizedStringGet( "Earth" ) );
+			_barUpper.addItem( LanguageManager.localizedStringGet( "Liquid" ) );
+            _barUpper.addItem( LanguageManager.localizedStringGet( "Plant" ) );
+            _barUpper.addItem( LanguageManager.localizedStringGet( "Metal" ) );
+            _barUpper.addItem( LanguageManager.localizedStringGet( "Air" ) );
+            var li:ListItem = _barUpper.addItem( LanguageManager.localizedStringGet( "All" ) );
+			_barUpper.setButtonsWidth( 128 );
+			_barUpper.selectedIndex = li.index;
+            eventCollector.addEvent( _barUpper, ListEvent.ITEM_CLICKED, selectCategory );
+            addGraphicElements( _barUpper );
 		}
 
 		private function addItemContainer():void {
-			addElement( itemContainer );
-			itemContainer.autoSize = true;
-			itemContainer.layout.orientation = LayoutOrientation.VERTICAL;
+			addElement( _itemContainer );
+			_itemContainer.autoSize = true;
+			_itemContainer.layout.orientation = LayoutOrientation.VERTICAL;
 		}
 		private function lowerTabsAdd():void {
+			_barLower.name = "lower";
 			// TODO I should really iterate thru the types and collect the categories - RSF
-            barLower.addItem( LanguageManager.localizedStringGet( "Dragon" ) );
-            barLower.addItem( LanguageManager.localizedStringGet( "Util" ) );
-            barLower.addItem( LanguageManager.localizedStringGet( "Gem" ) );
-            barLower.addItem( LanguageManager.localizedStringGet( "Avatar" ) );
-            barLower.addItem( LanguageManager.localizedStringGet( "Light" ) );
-            barLower.addItem( LanguageManager.localizedStringGet( "Crafting" ) );
-			barLower.setButtonsWidth( 128 );
-            eventCollector.addEvent( barLower, ListEvent.ITEM_CLICKED, selectCategory );
-			addGraphicElements( barLower );
+            _barLower.addItem( LanguageManager.localizedStringGet( "Dragon" ) );
+            _barLower.addItem( LanguageManager.localizedStringGet( "Util" ) );
+            _barLower.addItem( LanguageManager.localizedStringGet( "Gem" ) );
+            _barLower.addItem( LanguageManager.localizedStringGet( "Avatar" ) );
+            _barLower.addItem( LanguageManager.localizedStringGet( "Light" ) );
+            _barLower.addItem( LanguageManager.localizedStringGet( "Crafting" ) );
+			_barLower.setButtonsWidth( 128 );
+            eventCollector.addEvent( _barLower, ListEvent.ITEM_CLICKED, selectCategory );
+			addGraphicElements( _barLower );
 		}
 		
 		private function selectCategory(e:ListEvent):void 
 		{			
 			//Log.out( "WindowInventory.selectCategory" );
-			while ( 1 <= itemContainer.numElements )
-			{
-				itemContainer.removeElementAt( 0 );
-			}
+			while ( 1 <= _itemContainer.numElements )
+				_itemContainer.removeElementAt( 0 );
+			
+			if ( e.target.name == "lower" )
+				_barUpper.selectedIndex = -1;
+			else
+				_barLower.selectedIndex = -1;
+				
 			displaySelectedCategory( e.target.value );	
 		}
 		
@@ -108,31 +113,14 @@ package com.voxelengine.GUI
 			var box:BoxInventory;
 			for each (var item:TypeInfo in Globals.Info )
 			{
-				if ( "BONUSES" == category.toUpperCase() ) {
-					if ( Globals.MODIFIER_DAMAGE == item.category.toUpperCase()
-					  || Globals.MODIFIER_DURABILITY == item.category.toUpperCase()
-					  || Globals.MODIFIER_LUCK == item.category.toUpperCase()
-					  || Globals.MODIFIER_SPEED == item.category.toUpperCase() ) 
-					  {
-							if ( countMax == count )
-							{
-								itemContainer.addElement( pc );
-								pc = new Container( width, 64 );
-								pc.layout = new AbsoluteLayout();
-								count = 0;		
-							}
-							box = new BoxInventory(64, 64, BorderStyle.NONE, item );
-							box.x = count * 64;
-							pc.addElement( box );
-							eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
-							count++
-					  }
-				}
-				else if ( item.placeable && (item.category.toUpperCase() == category.toUpperCase() || "ALL" == String(category).toUpperCase() ) )
+				if ( item.placeable && (item.category.toUpperCase() == category.toUpperCase() || "ALL" == String(category).toUpperCase() ) )
 				{
+//					if ( "crafting" == category.toLowerCase() )
+//						continue;
+					// Add the filled bar to the container and create a new container
 					if ( countMax == count )
 					{
-						itemContainer.addElement( pc );
+						_itemContainer.addElement( pc );
 						pc = new Container( width, 64 );
 						pc.layout = new AbsoluteLayout();
 						count = 0;		
@@ -145,7 +133,7 @@ package com.voxelengine.GUI
 					count++
 				}
 			}
-			itemContainer.addElement( pc );
+			_itemContainer.addElement( pc );
 		}
 		
 		private function dropMaterial(e:DnDEvent):void 
