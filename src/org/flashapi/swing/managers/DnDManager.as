@@ -638,7 +638,8 @@ package org.flashapi.swing.managers {
 			var l2:int = tgtFormat.length;
 			if (l1 == 0 && l2 == 0) return true;
 			if (l1 > 0) {
-				if (l2 == 0) return false;
+				// if target has no format, allow everything to drop into it
+				if (l2 == 0) return true;
 				else {
 					var i:int = l1 - 1;
 					var l:int;
