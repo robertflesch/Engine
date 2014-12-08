@@ -59,13 +59,14 @@ public class PanelRecipe extends PanelBase
 		_panelForumla.addElement( _panelPreview );
 		
 		_panelButtons = new PanelBase( this, $width, 30 );
+		_panelButtons.layout.orientation = LayoutOrientation.HORIZONTAL;
 		_panelButtons.borderStyle = BorderStyle.NONE;
 		_panelButtons.padding = 5;
 		addElement( _panelButtons );
 		var craftButton:Button = new Button( LanguageManager.localizedStringGet( "Craft_Item" ) );
 		eventCollector.addEvent( craftButton, UIMouseEvent.CLICK, craft );
-
 		_panelButtons.addElement( craftButton );
+		_panelButtons.addElement( new Label( "Drag Items from Inventory", 200 ) );
 		
 		addEventListener(UIOEvent.REMOVED, onRemoved );
 	}

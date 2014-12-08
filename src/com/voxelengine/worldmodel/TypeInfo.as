@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.utils.ColorUtils;
+	import com.voxelengine.worldmodel.models.Attribute;
 	import com.voxelengine.worldmodel.oxel.Lighting;
 	import com.voxelengine.worldmodel.oxel.FlowInfo;
 	import flash.geom.Vector3D;
@@ -55,7 +56,11 @@ package com.voxelengine.worldmodel
 		private var _flowInfo:FlowInfo 			= null;
 		private var _lightInfo:Light  			= new Light();
 		private var _color:uint					= 0xffffffff;
-
+		private var _damage:Number				= 1;
+		private var _speed:Number				= 1;
+		private var _durability:Number			= 1;
+		private var _luck:Number				= 1;
+		
 		public function set name(val:String):void 	{ _name = val; }
 		public function set image(val:String):void 	{ _image = val; }
 		
@@ -95,15 +100,12 @@ package com.voxelengine.worldmodel
 		public function get bottom():uint 			{ return _bottomtt; }
 		public function get side():uint 			{ return _sidett; }
 
-		public function TypeInfo():void { }
+		public function get damage():Number { return _damage; }
+		public function get speed():Number { return _speed; }
+		public function get durability():Number { return _durability; }
+		public function get luck():Number { return _luck; }
 		
-		public function get damage():Number {
-			return 1;
-		}
-
-		public function get speed():Number {
-			return 2;
-		}
+		public function TypeInfo():void { }
 		
 		public function getJSON():String
 		{

@@ -15,6 +15,7 @@ package com.voxelengine.GUI.crafting {
 	{
 		private	var _damageLabel:Label;
 		private	var _speedLabel:Label;
+		private	var _durabilityLabel:Label;
 				
 		public function PanelPreview( $parent:PanelBase, $widthParam:Number, $heightParam:Number, $recipe:Recipe )
 		{
@@ -30,8 +31,10 @@ package com.voxelengine.GUI.crafting {
 				addElement( image );
 				_damageLabel = new Label( "requirements not met", 128 );
 				addElement( _damageLabel );
-				_speedLabel = new Label( "requirements not met", 128 );
+				_speedLabel = new Label( "", 128 );
 				addElement( _speedLabel );
+				_durabilityLabel = new Label( "", 128 );
+				addElement( _durabilityLabel );
 			}
 		}
 		
@@ -46,6 +49,7 @@ package com.voxelengine.GUI.crafting {
 			if ( ci.hasMetRequirements() ) {
 				_speedLabel.text = "Speed: " + ci.estimate( "speed" );
 				_damageLabel.text = "Damage: " + ci.estimate( "damage" );
+				_durabilityLabel.text = "Durability: " + ci.estimate( "durability" );
 			}
 			
 		}
