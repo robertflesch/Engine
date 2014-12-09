@@ -18,6 +18,7 @@ package com.voxelengine.worldmodel
 
 	import flash.events.IOErrorEvent;
 	import mx.utils.StringUtil;
+	
 	import flash.text.TextField; 
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
@@ -207,6 +208,18 @@ package com.voxelengine.worldmodel
 				_bottomtt = $json.uv.bottom; 
 				_ub = $json.uv.ub;
 				_vb = $json.uv.vb;
+			}
+			
+			if ( $json.stats )
+			{
+				if ( $json.stats.damage )
+					_damage = $json.stats.damage;
+				if ( $json.stats.speed )
+					_speed = $json.stats.speed;
+				if ( $json.stats.durability )
+					_durability = $json.stats.durability;
+				if ( $json.stats.luck )
+					_luck = $json.stats.luck;
 			}
 			
 			if ( $json.interactions )

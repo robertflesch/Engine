@@ -17,8 +17,10 @@ package com.voxelengine.events
 	 */
 	public class CraftingItemEvent extends Event
 	{
-		static public const DROPPED_BONUS:String				= "DROPPED_BONUS";
-		static public const DROPPED_MATERIAL:String				= "DROPPED_MATERIAL";
+		static public const BONUS_DROPPED:String				= "BONUS_DROPPED";
+		static public const BONUS_REMOVED:String				= "BONUS_REMOVED";
+		static public const MATERIAL_DROPPED:String				= "MATERIAL_DROPPED";
+		static public const MATERIAL_REMOVED:String				= "MATERIAL_REMOVED";
 		static public const STATS_UPDATED:String				= "STATS_UPDATED";
 		
 		

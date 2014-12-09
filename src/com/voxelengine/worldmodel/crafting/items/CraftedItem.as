@@ -27,13 +27,18 @@ public class CraftedItem extends Recipe
 	public function CraftedItem( $recipe:Recipe ):void {
 		super();
 		copy( $recipe );
-		Globals.craftingManager.addEventListener( CraftingItemEvent.DROPPED_MATERIAL, onMaterialDropped );	
-		Globals.craftingManager.addEventListener( CraftingItemEvent.DROPPED_BONUS, onBonusDropped );	
+		Globals.craftingManager.addEventListener( CraftingItemEvent.MATERIAL_DROPPED, onMaterialDropped );	
+		Globals.craftingManager.addEventListener( CraftingItemEvent.MATERIAL_REMOVED, onMaterialRemoved );	
+		
+		Globals.craftingManager.addEventListener( CraftingItemEvent.BONUS_DROPPED, onBonusDropped );	
+		Globals.craftingManager.addEventListener( CraftingItemEvent.BONUS_REMOVED, onBonusRemoved );	
 	}
 	
 	override public function cancel():void {
-		Globals.craftingManager.removeEventListener( CraftingItemEvent.DROPPED_MATERIAL, onMaterialDropped );	
-		Globals.craftingManager.removeEventListener( CraftingItemEvent.DROPPED_BONUS, onBonusDropped );	
+		Globals.craftingManager.removeEventListener( CraftingItemEvent.MATERIAL_DROPPED, onMaterialDropped );	
+		Globals.craftingManager.removeEventListener( CraftingItemEvent.MATERIAL_REMOVED, onMaterialRemoved );	
+		Globals.craftingManager.removeEventListener( CraftingItemEvent.BONUS_DROPPED, onBonusDropped );	
+		Globals.craftingManager.removeEventListener( CraftingItemEvent.BONUS_REMOVED, onBonusRemoved );	
 		_materialsUsed = null;
 		_bonusesUsed = null;
 		super.cancel();
@@ -46,6 +51,7 @@ public class CraftedItem extends Recipe
 	public function hasMetRequirements():Boolean {
 		var matFound:Boolean;
 		for each ( var matReq:Material in _materialsRequired ) {
+			matFound = false;
 			if ( true == matReq.optional )
 				continue;
 			for each ( var matsUsed:TypeInfo in _materialsUsed ) {
@@ -115,12 +121,47 @@ public class CraftedItem extends Recipe
 		Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
 	}
 	
-	private function onBonusDropped(e:CraftingItemEvent):void {
-		bonusAdd( e.typeInfo );
+	public function materialRemove( $typeInfo:TypeInfo ):void {
+		// replace existing bonus if it already has one of this type
+		for ( var i:int = 0; i < _materialsUsed.length; i++ ) {
+			var mat:TypeInfo = _materialsUsed[i];
+			if ( mat.category == $typeInfo.category ) {
+				_materialsUsed.splice( i, 1 );
+				Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+				return;
+			}
+		}
+		Log.out( "CraftedItem.materialRemove - material: " + $typeInfo.category + " NOT FOUND" );
+	}
+	
+	private function bonusRemove( $typeInfo:TypeInfo ):void {
+		// replace existing bonus if it already has one of this type
+		for ( var i:int = 0; i < _bonusesUsed.length; i++ ) {
+			var bonus:TypeInfo = _bonusesUsed[i];
+			if ( bonus.category == $typeInfo.category ) {
+				_bonusesUsed.splice( i, 1 );
+				Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+				return;
+			}
+		}
+		
+		Log.out( "CraftedItem.bonusRemove - bonus: " + $typeInfo.category + " NOT FOUND" );
 	}
 	
 	private function onMaterialDropped(e:CraftingItemEvent):void {
 		materialAdd( e.typeInfo );
+	}
+	
+	private function onMaterialRemoved(e:CraftingItemEvent):void {
+		materialRemove( e.typeInfo );
+	}
+	
+	private function onBonusDropped(e:CraftingItemEvent):void {
+		bonusAdd( e.typeInfo );
+	}
+	
+	private function onBonusRemoved(e:CraftingItemEvent):void {
+		bonusRemove( e.typeInfo );
 	}
 }
 }

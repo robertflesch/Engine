@@ -29,9 +29,9 @@ package com.voxelengine.GUI.crafting {
 				var path:String = Globals.appPath + "assets/crafting/" + $recipe.preview;
 				var image:Image = new Image( path, 128, 128 );
 				addElement( image );
-				_damageLabel = new Label( "requirements not met", 128 );
+				_damageLabel = new Label( "Requirements not met", 128 );
 				addElement( _damageLabel );
-				_speedLabel = new Label( "", 128 );
+				_speedLabel = new Label( "Add non optional materials", 128 );
 				addElement( _speedLabel );
 				_durabilityLabel = new Label( "", 128 );
 				addElement( _durabilityLabel );
@@ -47,10 +47,17 @@ package com.voxelengine.GUI.crafting {
 		{
 			var ci:CraftedItem = (_parent as PanelRecipe).craftedItem;
 			if ( ci.hasMetRequirements() ) {
-				_speedLabel.text = "Speed: " + ci.estimate( "speed" );
 				_damageLabel.text = "Damage: " + ci.estimate( "damage" );
+				_speedLabel.text = "Speed: " + ci.estimate( "speed" );
 				_durabilityLabel.text = "Durability: " + ci.estimate( "durability" );
 			}
+			else
+			{
+				_damageLabel.text = "Requirements not met";
+				_speedLabel.text = "Add non optional materials";
+				_durabilityLabel.text = "";
+			}
+			
 			
 		}
 	}

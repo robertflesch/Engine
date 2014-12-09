@@ -54,6 +54,7 @@
   <!-- SWC Libraries -->
   <libraryPaths>
     <element path="src\PlayerIOClient.swc" />
+	<!-- <element path="C:\Users\Dev\AppData\Local\FlashDevelop\Apps\flexairsdk\4.6.0+15.0.0\frameworks\libs\player\14.0\playerglobal.swc" /> -->
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>
