@@ -20,6 +20,7 @@ package com.voxelengine.worldmodel.crafting {
 		private var _desc:String = "NONE";
 		private var _subcat:String = "NONE";
 		private var _preview:String = "none.jpg";
+		private var _templateId:String;
 		protected var _materialsRequired:Vector.<Material>;
 		protected var _bonusesAllowed:Vector.<Bonus>;
 		
@@ -46,6 +47,9 @@ package com.voxelengine.worldmodel.crafting {
 				
 			if ( $json.preview )
 				_preview = $json.preview;
+				
+			if ( $json.templateId )
+				_templateId = $json.templateId;
 				
 			if ( $json.materials )
 			{
@@ -83,14 +87,14 @@ package com.voxelengine.worldmodel.crafting {
 		}
 		
 		public function copy( $recipe:Recipe ):void {
-			_materialsRequired = $recipe._materialsRequired;
-			_bonusesAllowed = $recipe._bonusesAllowed;
-			_name			= $recipe._name;
-			_className		= $recipe._className;
-			_desc			= $recipe._desc;
-			_subcat			= $recipe._subcat;
-			_preview		= $recipe._preview;
-			
+			_materialsRequired	= $recipe._materialsRequired;
+			_bonusesAllowed		= $recipe._bonusesAllowed;
+			_name				= $recipe._name;
+			_className			= $recipe._className;
+			_desc				= $recipe._desc;
+			_subcat				= $recipe._subcat;
+			_preview			= $recipe._preview;
+			_templateId			= $recipe._templateId;
 		}
 		
 		public function cancel():void {

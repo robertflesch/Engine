@@ -78,24 +78,28 @@ public class CraftedItem extends Recipe
 	private function calculateBonusFactor( $property:String ):Number {
 		var est:Number = 0;
 		for each ( var bonusUsed:TypeInfo in _bonusesUsed )
-			est += bonusUsed[$property];
+			if ( 1 != bonusUsed[$property] )
+				est += bonusUsed[$property];
+		Log.out( "CraftedItem.calculateBonusFactor bonus for " + $property + "  = " + est );
 		return est;
 	}
 	
 	public function estimate( $property:String ):String {
+		Log.out( "CraftedItem.estimate for " + $property );
+		
 		var estimateMats:Number = calculateMaterialsFactor( $property );
 		if ( 0 == estimateMats )
 			return "requirements not met";
 		var estimateBonus:Number = calculateBonusFactor( $property );
-		var estimate:Number = estimateMats + estimateBonus;
-		return String ( estimate - estimate/10 ) + " - " + ( estimate + estimate/10 );
+		var estTotal:Number = estimateMats + estimateBonus;
+		return String ( estTotal - estTotal/10 ) + " - " + ( estTotal + estTotal/10 );
 	}
 	
 	public function bonusAdd( $typeInfo:TypeInfo ):void {
 		// replace existing bonus if it already has one of this type
 		for ( var i:int = 0; i < _bonusesUsed.length; i++ ) {
 			var bonus:TypeInfo = _bonusesUsed[i];
-			if ( bonus.category == $typeInfo.category ) {
+			if ( bonus.subCat == $typeInfo.subCat ) {
 				_bonusesUsed[i] = $typeInfo;
 				Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
 				return;
@@ -138,7 +142,7 @@ public class CraftedItem extends Recipe
 		// replace existing bonus if it already has one of this type
 		for ( var i:int = 0; i < _bonusesUsed.length; i++ ) {
 			var bonus:TypeInfo = _bonusesUsed[i];
-			if ( bonus.category == $typeInfo.category ) {
+			if ( bonus.subCat == $typeInfo.subCat ) {
 				_bonusesUsed.splice( i, 1 );
 				Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
 				return;

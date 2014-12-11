@@ -68,10 +68,11 @@ package com.voxelengine.GUI.crafting {
 			mb.dragEnabled = true;
 			mb.borderStyle = BorderStyle.INSET;
 			eventCollector.addEvent( mb, UIMouseEvent.PRESS, doDrag);
-			return mb;
 
 			var dndFmt:DnDFormat = new DnDFormat( bonus.category, bonus.subCat );
 			mb.addDropFormat( dndFmt );
+			
+			return mb;
 		}
 	}
 }
