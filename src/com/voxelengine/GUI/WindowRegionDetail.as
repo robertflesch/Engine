@@ -20,6 +20,7 @@ import com.voxelengine.Log;
 import com.voxelengine.events.RegionLoadedEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.GUI.components.*;
 
 public class WindowRegionDetail extends VVPopup
 {

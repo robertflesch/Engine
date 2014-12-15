@@ -1,10 +1,10 @@
 
-package com.voxelengine.GUI 
-{
+package com.voxelengine.GUI.components {
 import org.flashapi.swing.Box;
 import org.flashapi.swing.TextInput;
 import org.flashapi.swing.event.TextEvent;
 import org.flashapi.swing.constants.BorderStyle;
+import org.flashapi.swing.plaf.spas.SpasUI;
 
 public class ComponentTextInput extends Box
 {
@@ -13,7 +13,7 @@ public class ComponentTextInput extends Box
 		super( $width, $height );
 		
 		padding = $padding;
-		backgroundColor = 0xCCCCCC;
+		backgroundColor = SpasUI.DEFAULT_COLOR;
 		title = label;
 		borderStyle = BorderStyle.GROOVE;
 		

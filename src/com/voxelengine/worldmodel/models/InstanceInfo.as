@@ -99,7 +99,6 @@ package com.voxelengine.worldmodel.models
 			// make sure we have a previous position
 			positionSet = positionGet;
 		}
-		public function get scriptName():String						{ return _scriptName; }
 		public function get scripts():Vector.<Script>				{ return _scripts; }
 		public function get state():String 							{ return _state; }
 		public function set state(val:String):void						{ _state = val; }

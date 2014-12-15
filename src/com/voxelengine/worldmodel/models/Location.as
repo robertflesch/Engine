@@ -49,6 +49,11 @@ package com.voxelengine.worldmodel.models
 		// Scale
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		public function get scale():Vector3D 					{ return _scale };
+		public function 	scaleSetComp( $x:Number, $y:Number, $z:Number ):void { 
+			_changed = true;
+			_scale.setTo( $x, $y, $z ); 
+			_center.setTo( _centerConst.x * $x, _centerConst.y * $y, _centerConst.z * $z );
+		}
 		public function set scale($val:Vector3D):void 			{ 
 			_changed = true;
 			_scale.setTo( $val.x, $val.y, $val.z ); 
@@ -60,6 +65,7 @@ package com.voxelengine.worldmodel.models
 		// Rotation
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		public function get rotationGet():Vector3D 				{ return _rotation; }
+		public function 	rotationGetComp():Vector3D 				{ return _rotation; }
 		public function set rotationSet($val:Vector3D):void 	{ rotationSetComp( $val.x, $val.y, $val.z ); }
 		public function get rotationGetRadians():Vector3D 		{ return new Vector3D( _rotation.x * Math.PI / 180, _rotation.y * Math.PI / 180, _rotation.z * Math.PI / 180 ) };
 		public function 	rotationSetComp( $x:Number, $y:Number, $z:Number ):void { 

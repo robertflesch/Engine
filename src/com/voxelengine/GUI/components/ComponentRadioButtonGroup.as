@@ -1,11 +1,11 @@
 
-package com.voxelengine.GUI 
-{
+package com.voxelengine.GUI.components {
 import org.flashapi.swing.Box;
 import org.flashapi.swing.event.ButtonsGroupEvent;
 import org.flashapi.swing.constants.BorderStyle;
 import org.flashapi.swing.button.RadioButtonGroup;
 import org.flashapi.swing.databinding.DataProvider;
+import org.flashapi.swing.plaf.spas.SpasUI;
 
 public class ComponentRadioButtonGroup extends Box
 {
@@ -14,7 +14,7 @@ public class ComponentRadioButtonGroup extends Box
 		super( $width, $height );
 		
 		padding = $padding;
-		backgroundColor = 0xCCCCCC;
+		backgroundColor = SpasUI.DEFAULT_COLOR;
 		title = $label;
 		borderStyle = BorderStyle.GROOVE;
 

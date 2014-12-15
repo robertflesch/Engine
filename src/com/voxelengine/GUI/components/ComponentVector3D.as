@@ -1,6 +1,5 @@
 
-package com.voxelengine.GUI 
-{
+package com.voxelengine.GUI.components {
 import flash.geom.ColorTransform;
 import flash.geom.Vector3D;
 import org.flashapi.swing.color.Color;
@@ -9,6 +8,7 @@ import org.flashapi.swing.*
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.containers.*;
+import org.flashapi.swing.plaf.spas.SpasUI;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
@@ -22,8 +22,7 @@ public class ComponentVector3D extends Box
 		padding = 15;
 		title = $title;
 		borderStyle = BorderStyle.GROOVE;
-//		color = 0xCCCCCC;
-		backgroundColor = 0xCCCCCC;
+		backgroundColor = SpasUI.DEFAULT_COLOR;
 		
 		addSpinLabel( $s1Label
 					, function($e:SpinButtonEvent):void { $vect.setTo( updateVal($e), $vect.y, $vect.z ); }

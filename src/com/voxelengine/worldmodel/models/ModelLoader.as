@@ -299,8 +299,11 @@ package com.voxelengine.worldmodel.models
 		// We have to wait for the oxel data to be loaded before we can convert this to a template.
 		static private function localModelLoaded( e:LoadingEvent ):void {
 			
+			if ( null == _s_mmd )
+				Log.out( "ModelLoader.localModelLoaded - _s_mmd is null " + e.toString() );
+				
 			if ( _s_mmd.guid == e.guid ) {
-				Log.out( "ModelLoader.templateModelLoaded - " + e.toString() );
+				Log.out( "ModelLoader.localModelLoaded - " + e.toString() );
 				//var vm:VoxelModel = TemplateManager.templateGet( e.guid );
 				var vm:VoxelModel = Globals.getModelInstance( e.guid );
 				
@@ -321,7 +324,7 @@ package com.voxelengine.worldmodel.models
 					Globals.instanceInfoRemove( e.guid );
 				}
 				else
-					Log.out( "ModelLoader.templateModelLoaded - Failed to find template in template manager guid: " + vm.metadata.guid );
+					Log.out( "ModelLoader.localModelLoaded - Failed to find template in template manager guid: " + vm.metadata.guid );
 			}
 		}
 

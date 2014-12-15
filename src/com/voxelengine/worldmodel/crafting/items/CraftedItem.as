@@ -80,7 +80,6 @@ public class CraftedItem extends Recipe
 		for each ( var bonusUsed:TypeInfo in _bonusesUsed )
 			if ( 1 != bonusUsed[$property] )
 				est += bonusUsed[$property];
-		Log.out( "CraftedItem.calculateBonusFactor bonus for " + $property + "  = " + est );
 		return est;
 	}
 	

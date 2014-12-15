@@ -203,7 +203,9 @@ package com.voxelengine.renderer
 				//Log.out( "Renderer.render - CONTEXT Disposed" + _context.toString() );
 				return;
 			}
-				
+			
+			// New in Flash 16
+			// Context3D's setFillMode()  "wireframe" or "solid".
 			var cm:VoxelModel = Globals.controlledModel;
 			// Very early in render cycle the controlled model may not be instantitated yet.
 			if ( !cm )

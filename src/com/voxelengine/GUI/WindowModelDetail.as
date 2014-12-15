@@ -1,10 +1,6 @@
 
 package com.voxelengine.GUI
 {
-	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.events.RegionEvent;
-	import com.voxelengine.worldmodel.models.InstanceInfo;
-	import com.voxelengine.worldmodel.Region;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
 	import org.flashapi.collector.EventCollector;
@@ -14,7 +10,13 @@ package com.voxelengine.GUI
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.worldmodel.Region;
+	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.GUI.components.*;
+
 	
 	public class WindowModelDetail extends VVPopup
 	{
@@ -39,43 +41,6 @@ package com.voxelengine.GUI
 		static public function get inExistance():int { return _s_inExistance; }
 		static public function get currentInstance():WindowModelDetail { return _s_currentInstance; }
 		
-		private function addSpinLabel( parentPanel:Panel, label:String, clickHandler:Function, textChanged:Function, initialValue:String ):TextInput
-		{
-			var lbl:Label = new Label(label);
-			lbl.width = 80;
-			lbl.height = 20;
-			
-			var src:TextInput = new TextInput(initialValue);
-			src.width = 80;
-			src.height = 20;
-			src.x = 100;
-			src.addEventListener( TextEvent.EDITED, textChanged );
-			
-			var sb:SpinButton = new SpinButton( 20, 20 );
-			sb.addEventListener( SpinButtonEvent.CLICK_DOWN, clickHandler );
-			sb.addEventListener( SpinButtonEvent.CLICK_UP, clickHandler );
-			sb.data = src;
-
-			//var myWidth:int = li.width + sb.width + BORDER_WIDTH_4 + BORDER_WIDTH_2;
-			//var myHeight:int = sb.height + BORDER_WIDTH_4;
-			
-			var panel:Panel = new Panel( 300, 100 );
-			panel.layout.orientation = LayoutOrientation.HORIZONTAL;
-			
-			panel.addElement( lbl );
-			panel.addElement( src );
-			panel.addElement( sb );
-			panel.width = lbl.width + src.width + sb.width + BORDER_WIDTH_4 + BORDER_WIDTH_2;
-			panel.height = sb.height + BORDER_WIDTH_4;
-			panel.borderWidth = BORDER_WIDTH;
-			parentPanel.addElement( panel );
-			
-			//_calculatedWidth = Math.max( panel.width, _calculatedWidth );
-			//_calculatedHeight += panel.height;
-			
-			return src;
-		}
-		
 		private function addLabel( parentPanel:Panel, label:String, changeHandler:Function, initialValue:String, inputEnabled:Boolean = false ):LabelInput
 		{
 			var li:LabelInput = new LabelInput( label, initialValue );
@@ -98,161 +63,36 @@ package com.voxelengine.GUI
 			
 			return li;
 		}
-
-		private function LocationGroup():void
-		{
-			var panel:Panel = new Panel( 300, 20 );
-			panel.padding = 0;
-			var label:Text = new Text( 300, 20 );
-			label.text = "Location";
-			label.textAlign = TextAlign.CENTER;
-			label.fontSize = 16;
-			label.fixToParentWidth = true;
-			panel.addElement( label );
-			
-			addSpinLabel( panel, "X:"
-						, function($e:SpinButtonEvent):void { _ii.positionSetComp( updateVal($e), _ii.positionGet.y, _ii.positionGet.z ); }
-						, function($e:TextEvent):void       { _ii.positionSetComp( int( $e.target.text ), _ii.positionGet.y, _ii.positionGet.z ); }
-						, _ii.positionGet.x.toFixed(0) );
-			addSpinLabel( panel, "Y:"
-						, function($e:SpinButtonEvent):void { _ii.positionSetComp( _ii.positionGet.x, updateVal($e), _ii.positionGet.z ); }
-						, function($e:TextEvent):void       { _ii.positionSetComp( _ii.positionGet.x, int( $e.target.text ), _ii.positionGet.z ); }
-						, _ii.positionGet.y.toFixed(0) );
-			addSpinLabel( panel, "Z:"
-						, function($e:SpinButtonEvent):void { _ii.positionSetComp( _ii.positionGet.x, _ii.positionGet.y, updateVal($e) ); }
-						, function($e:TextEvent):void       { _ii.positionSetComp( _ii.positionGet.x, _ii.positionGet.y, int( $e.target.text ) ); }
-						, _ii.positionGet.z.toFixed(0) );
-						
-			panel.layout.orientation = LayoutOrientation.VERTICAL;
-			panel.width = _calculatedWidth;
-			panel.height = label.height + PANEL_HEIGHT + BORDER_WIDTH_4;
-			addElement( panel );
-		}
 		
-		private function CenterGroup():void
+		private function addLabelNew( label:String, changeHandler:Function, initialValue:String, inputEnabled:Boolean = false ):LabelInput
 		{
-			var panel:Panel = new Panel( 300, 20 );
-			panel.padding = 0;
-			
-			var label:Text = new Text( 300, 20 );
-			label.text = "Center";
-			label.textAlign = TextAlign.CENTER;
-			label.fontSize = 16;
-			label.fixToParentWidth = true;
-			panel.addElement( label );
-			
-			addSpinLabel( panel, "X:"
-						, function($e:SpinButtonEvent):void { _ii.centerSetComp( updateVal($e), _ii.center.y, _ii.center.z ); }
-						, function($e:TextEvent):void       { _ii.centerSetComp( int( $e.target.text ), _ii.center.y, _ii.center.z ); }
-						, _ii.center.x.toFixed(0) );
-			addSpinLabel( panel, "Y:"
-						, function($e:SpinButtonEvent):void { _ii.centerSetComp( _ii.center.x, updateVal($e), _ii.center.z ); }
-						, function($e:TextEvent):void       { _ii.centerSetComp( _ii.center.x, int( $e.target.text ), _ii.center.z ); }
-						, _ii.center.y.toFixed(0) );
-			addSpinLabel( panel, "Z:"
-						, function($e:SpinButtonEvent):void { _ii.centerSetComp( _ii.center.x, _ii.center.y, updateVal($e) ); }
-						, function($e:TextEvent):void       { _ii.centerSetComp( _ii.center.x, _ii.center.y, int( $e.target.text ) ); }
-						, _ii.center.z.toFixed(0) );
-			
-			panel.layout.orientation = LayoutOrientation.VERTICAL;
-			panel.width = _calculatedWidth;
-			panel.height = label.height + PANEL_HEIGHT + BORDER_WIDTH_4;
-			//panel.layout.autoSizeAnimated = true;
+			var li:LabelInput = new LabelInput( label, initialValue );
+			li.labelControl.width = 120;
+			if ( null != changeHandler )
+				li.editableText.addEventListener( TextEvent.EDITED, changeHandler );
+			else
+			{
+				li.editableText.editable = false;
+				li.editableText.fontColor = 0x888888;
+			}
+
+			var myWidth:int = li.width + BORDER_WIDTH_4 + BORDER_WIDTH_2;
+			var myHeight:int = li.height + BORDER_WIDTH_4;
+			var panel:Panel = new Panel( myWidth, myHeight );
+			panel.addElement( li );
+			panel.borderWidth = BORDER_WIDTH;
 			addElement( panel );
+			_calculatedWidth = Math.max( myWidth, _calculatedWidth );
+			
+			return li;
 		}
 
-		private function RotationGroup():void
-		{
-			var label:Text = new Text( 300, 20 );
-			label.text = "Rotation";
-			label.textAlign = TextAlign.CENTER;
-			label.fontSize = 16;
-			label.fixToParentWidth = true;
-			var panel:Panel = new Panel( 300, 20 );
-			panel.padding = 0;
-			panel.addElement( label );
-			
-			addSpinLabel( panel, "X:"
-						, function($e:SpinButtonEvent):void { _ii.rotationSetComp( updateVal($e), _ii.rotationGet.y, _ii.rotationGet.z ); }
-						, function($e:TextEvent):void       { _ii.rotationSetComp( int( $e.target.text ), _ii.rotationGet.y, _ii.rotationGet.z ); }
-						, _ii.rotationGet.x.toFixed(0) );
-			addSpinLabel( panel, "Y:"
-						, function($e:SpinButtonEvent):void { _ii.rotationSetComp( _ii.rotationGet.x, updateVal($e), _ii.rotationGet.z ); }
-						, function($e:TextEvent):void       { _ii.rotationSetComp( _ii.rotationGet.x, int( $e.target.text ), _ii.rotationGet.z ); }
-						, _ii.rotationGet.y.toFixed(0) );
-			addSpinLabel( panel, "Z:"
-						, function($e:SpinButtonEvent):void { _ii.rotationSetComp( _ii.rotationGet.x, _ii.rotationGet.y, updateVal($e) ); }
-						, function($e:TextEvent):void       { _ii.rotationSetComp( _ii.rotationGet.x, _ii.rotationGet.y, int( $e.target.text ) ); }
-						, _ii.rotationGet.z.toFixed(0) );
-
-			panel.layout.orientation = LayoutOrientation.VERTICAL;
-			panel.width = _calculatedWidth;
-			panel.height = label.height + PANEL_HEIGHT + BORDER_WIDTH_4;
-			//panel.layout.autoSizeAnimated = true;
-			addElement( panel );
-		}
-
-		private function createPanel( text:String ):Panel {
-			var label:Text = new Text( 300, 20 );
-			label.text = "Basic";
-			label.textAlign = TextAlign.CENTER;
-			label.fontSize = 16;
-			label.fixToParentWidth = true;
-			var panel:Panel = new Panel( 300, 20 );
-            panel.autoSize = true;
-			panel.padding = 0;
-			panel.layout.orientation = LayoutOrientation.VERTICAL;
-			panel.addElement( label );
-			return panel;
-		}
-		
-		private function Basic():void
-		{
-			var panel:Panel = createPanel( "Basic" );
-				
-			addLabel( panel, "Name:", function changeNameHandler(event:TextEvent):void { _vm.metadata.name = event.target.text; _vm.changed = true;  }, _vm.metadata.name );
-			addLabel( panel, "Desc:", function changeNameHandler(event:TextEvent):void { _vm.metadata.description = event.target.text; _vm.changed = true;  }, _vm.metadata.description );
-			addElement( panel );
-		}
-		
-		private function Advanced():void
-		{
-			var label:Text = new Text( 300, 20 );
-			label.text = "Advanced";
-			label.textAlign = TextAlign.CENTER;
-			label.fontSize = 16;
-			label.fixToParentWidth = true;
-			//label.addEventListener(MouseEvent.CLICK, close );
-			_panelAdvanced = new Panel( 300, 20 );
-            _panelAdvanced.autoSize = true;
-			_panelAdvanced.padding = 0;
-			_panelAdvanced.layout.orientation = LayoutOrientation.VERTICAL;
-           //_panelAdvanced.layout.autoSizeAnimated = true;
-			_panelAdvanced.addElement( label );
-			
-			//var parentModel:VoxelModel = _ii.controllingModel;
-			//var vm:VoxelModel;
-			//if ( parentModel )
-				//vm = parentModel.childModelFind( _ii.guid );
-			//else	
-				//vm = Globals.getModelInstance( _ii.guid );
-				
-			addLabel( _panelAdvanced, "State:", changeStateHandler, _vm.anim ? _vm.anim.name : "" );
-			//_GrainSize = 	addLabel( _panelAdvanced, "GrainSize:", null, _vm.oxel.gc.grain.toString() );
-			addLabel( _panelAdvanced, "GrainSize:", null, String( _ii.grainSize ) );
-			addLabel( _panelAdvanced, "Instance GUID:", null, _ii.guid );
-			addLabel( _panelAdvanced, "Model GUID:", null, _ii.guid );
-			addLabel( _panelAdvanced, "Parent:", null, _ii.controllingModel ? _ii.controllingModel.instanceInfo.guid : "" );
-			//addLabel( _panelAdvanced, "Script:", null, _ii.scriptName );
-			//_Texture = 		addLabel( _panelAdvanced, "Texture:", null, _ii.textureName );
-			//_TextureScale =	addLabel( _panelAdvanced, "TextureScale:", null, _ii.textureScale.toString() );
-			
-			addElement( _panelAdvanced );
-		}
-		
 		public function WindowModelDetail( $vm:VoxelModel )
 		{
 			super( "Model Details" );
+			width = 300;
+			padding = 0;
+
 			_s_inExistance++;
 			_s_currentInstance = this;
 			
@@ -265,11 +105,23 @@ package com.voxelengine.GUI
             autoSize = true;
 			shadow = true;
 			
-			Basic();
-			LocationGroup();
-			RotationGroup();
-			Advanced();
-			CenterGroup();
+			addElement( new ComponentSpacer( width ) );
+			addElement( new ComponentTextInput( "Name", function ($e:TextEvent):void { _vm.metadata.name = $e.target.text; }, _vm.metadata.name, width ) );
+			addElement( new ComponentTextArea( "Desc", function ($e:TextEvent):void { _vm.metadata.description = $e.target.text; }, _vm.metadata.description ? _vm.metadata.description : "No Description", width ) );
+
+			// TODO add a drop down of available states
+			addElement( new ComponentLabel( "State", _vm.anim ? _vm.anim.name : "", width ) );
+			// TODO need to be able to handle an array of scipts.
+			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { _ii.scriptName = $e.target.text; }, _ii.scriptName, width ) );
+			addElement( new ComponentLabel( "GrainSize", String(_ii.grainSize), width ) );
+			addElement( new ComponentLabel( "Instance GUID",  _ii.guid, width ) );
+			addElement( new ComponentLabel( "Parent GUID",  _ii.controllingModel ? _ii.controllingModel.instanceInfo.guid : "", width ) );
+//
+			addElement( new ComponentVector3D( "Position", "X: ", "Y: ", "Z: ",  _ii.positionGet ) );
+			addElement( new ComponentVector3D( "Rotation", "X: ", "Y: ", "Z: ",  _ii.rotationGet ) );
+			addElement( new ComponentVector3D( "Center", "X: ", "Y: ", "Z: ",  _ii.center ) );
+			addElement( new ComponentVector3D( "Scale", "X: ", "Y: ", "Z: ",  _ii.scale ) );
+			
 			display( 600, 20 );
         }
 		
