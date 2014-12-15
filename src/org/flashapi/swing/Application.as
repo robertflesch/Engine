@@ -48,7 +48,7 @@ package org.flashapi.swing {
 	import org.flashapi.swing.containers.MainContainer;
 	import org.flashapi.swing.containers.PseudoMainContainer;
 	import org.flashapi.swing.containers.UIContainer;
-	import org.flashapi.swing.core.crypto.GUID;
+	//import org.flashapi.swing.core.crypto.GUID;
 	import org.flashapi.swing.core.Finalizable;
 	import org.flashapi.swing.core.spas_internal;
 	import org.flashapi.swing.core.UIObject;
@@ -650,7 +650,7 @@ package org.flashapi.swing {
 		 * 
 		 * 	@see org.flashapi.swing.crypto.GUID
 		 */
-		public function get guid():GUID {
+		public function get guid():String {
 			return _targetContainer.guid;
 		}
 		

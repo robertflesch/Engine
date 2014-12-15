@@ -60,7 +60,7 @@ package org.flashapi.swing.core {
 	import org.flashapi.swing.constants.TextTransformType;
 	import org.flashapi.swing.containers.IMainContainer;
 	import org.flashapi.swing.containers.IUIContainer;
-	import org.flashapi.swing.core.crypto.GUID;
+	//import org.flashapi.swing.core.crypto.GUID;
 	import org.flashapi.swing.css.Selectors;
 	import org.flashapi.swing.dnd.DnDFormat;
 	import org.flashapi.swing.dnd.DragAndDrop;
@@ -87,6 +87,7 @@ package org.flashapi.swing.core {
 	import org.flashapi.swing.ui.analytics.AnalyticsObject;
 	import org.flashapi.swing.util.Observable;
 	import org.flashapi.swing.util.RangeChecker;
+	import com.voxelengine.utils.GUID;
 	
 	use namespace spas_internal;
 	
@@ -1725,11 +1726,11 @@ package org.flashapi.swing.core {
 			$analitycsObj.id = _id;
 		}
 		
-		private var _guid:GUID;
+		private var _guid:String;
 		/**
 		 *  @inheritDoc
 		 */
-		public function get guid():GUID {
+		public function get guid():String {
 			return _guid;
 		}
 		
@@ -3986,7 +3987,8 @@ package org.flashapi.swing.core {
 				$target = $parent = $uiManager.hasMainContainer() ?
 					$uiManager.document : $stage;
 			}
-			_guid = new GUID();
+
+			_guid = GUID.create();
 		}
 		
 		private function onDisplay():void {

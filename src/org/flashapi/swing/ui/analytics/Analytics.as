@@ -36,9 +36,10 @@ package org.flashapi.swing.ui.analytics {
 	import flash.system.Capabilities;
 	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
-	import org.flashapi.swing.core.crypto.GUID;
+	//import org.flashapi.swing.core.crypto.GUID;
 	import org.flashapi.swing.core.spas_internal;
 	import org.flashapi.swing.core.UIDescriptor;
+	import com.voxelengine.utils.GUID;
 	
 	use namespace spas_internal;
 	
@@ -365,7 +366,7 @@ package org.flashapi.swing.ui.analytics {
 			_initTime = getTimer();
 			initUserDataScript();
 			_stack = [];
-			_sessionID = new GUID().toString();
+			_sessionID = GUID.create();
 			
 			_appId = getQualifiedClassName(UIDescriptor.getUIManager().document).toLowerCase();
 			var ao:AnalyticsObject = new AnalyticsObject(this, AnalyticsType.APPLICATION, _appId);

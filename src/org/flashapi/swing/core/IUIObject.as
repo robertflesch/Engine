@@ -32,7 +32,7 @@ package org.flashapi.swing.core {
 	import flash.geom.Transform;
 	import flash.text.TextField;
 	import org.flashapi.collector.EventCollector;
-	import org.flashapi.swing.core.crypto.GUID;
+	//import org.flashapi.swing.core.crypto.GUID;
 	import org.flashapi.swing.effect.Effect;
 	import org.flashapi.swing.framework.Debugger;
 	import org.flashapi.swing.managers.TextureManager;
@@ -939,7 +939,7 @@ package org.flashapi.swing.core {
 		 * 	@see #id
 		 * 	@see org.flashapi.swing.crypto.GUID
 		 */
-		function get guid():GUID;
+		function get guid():String;
 		
 		/**
 		 * 	Returns the current index of the <code>IUIObject</code>. The index is often
