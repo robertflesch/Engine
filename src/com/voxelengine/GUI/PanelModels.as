@@ -31,6 +31,7 @@ package com.voxelengine.GUI
 		private var _buttonContainer:Container
 		
 		private var _detailButton:Button
+		private var _deleteButton:Button
 		
 		//private var _dragOp:DnDOperation = new DnDOperation();
 		
@@ -60,6 +61,7 @@ package com.voxelengine.GUI
 		{
 			_dictionarySource = $dictionarySource;
 			_parentModel = $parentModel;
+			_selectedModel = null;
 			_listModels.removeAll();
 			var countAdded:int;
 			for each ( var vm:VoxelModel in _dictionarySource() )
@@ -81,30 +83,37 @@ package com.voxelengine.GUI
 		}
 
 		//// FIXME This would be much better with drag and drop
+		// meaning removing the buttons completely
 		private function buttonsCreate():void {
+			
+
 			//Log.out( "PanelModels.buttonsCreate" );
 			_buttonContainer = new Container( width, 10 );
 			_buttonContainer.layout.orientation = LayoutOrientation.VERTICAL;
-			_buttonContainer.padding = 2;
+			_buttonContainer.padding = 5;
 			_buttonContainer.height = 0;
 			addElementAt( _buttonContainer, 0 );
 
 			var addButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Add" )  );
 			addButton.addEventListener(UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
+			
 			addButton.width = width - 2 * pbPadding;
 			_buttonContainer.addElement( addButton );
 			_buttonContainer.height += addButton.height + pbPadding;
 			
-			var deleteButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Delete" ) );
-			deleteButton.addEventListener(UIMouseEvent.CLICK, deleteModelHandler );
-			deleteButton.width = width - 2 * pbPadding;
-			_buttonContainer.addElement( deleteButton );
-			_buttonContainer.height += deleteButton.height + pbPadding;
+			_deleteButton = new Button( LanguageManager.localizedStringGet( "Model_Delete" ) );
+			_deleteButton.enabled = false;
+			_deleteButton.active = false;
+			_deleteButton.addEventListener(UIMouseEvent.CLICK, deleteModelHandler );
+			_deleteButton.width = width - 2 * pbPadding;
+			_buttonContainer.addElement( _deleteButton );
+			_buttonContainer.height += _deleteButton.height + pbPadding;
 			
 			_detailButton = new Button( LanguageManager.localizedStringGet( "Model_Detail" ) );
+			_detailButton.enabled = false;
+			_detailButton.active = false;
 			_detailButton.addEventListener( UIMouseEvent.CLICK, function (event:UIMouseEvent):void { if ( _selectedModel ) { new WindowModelDetail( _selectedModel ); } } );
 			_detailButton.width = width - 2 * pbPadding;
-			_detailButton.enabled = false;
 			_buttonContainer.addElement( _detailButton );
 			
 			function deleteModelHandler(event:UIMouseEvent):void  {
@@ -128,11 +137,20 @@ package com.voxelengine.GUI
 			if ( _selectedModel )
 			{
 				_detailButton.enabled = true;
-				Globals.selectedModel = _selectedModel;
+				_detailButton.active = true;
+				_deleteButton.enabled = true;
+				_deleteButton.active = true;
+				//Globals.selectedModel = _selectedModel;
 				// TO DO this is the right path, but probably need a custom event for this...
 				Globals.g_app.dispatchEvent( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, _selectedModel, _parentModel ) );
 				//_parent.childPanelAdd( _selectedModel );
 				//_parent.animationPanelAdd( _selectedModel );
+			}
+			else {
+				_detailButton.enabled = false;
+				_detailButton.active = false;
+				_deleteButton.enabled = false;
+				_deleteButton.active = false;
 			}
 		}
 		

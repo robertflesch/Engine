@@ -22,7 +22,7 @@ package com.voxelengine.GUI
 	{
 		static private var _s_currentInstance:WindowDebugMenu = null;
 		static public function get currentInstance():WindowDebugMenu { return _s_currentInstance; }
-		private var _smids:Vector.<StaticMemoryIntDisplay> = new Vector.<StaticMemoryIntDisplay>;
+		private var _smids:Vector.<StaticMemoryDisplay> = new Vector.<StaticMemoryDisplay>;
 		private var _modelLoc:Label = new Label();
 		private var _gcLabel:Label = new Label("grain: 0 x: 0  y: 0  z: 0");
 
@@ -103,6 +103,8 @@ package com.voxelengine.GUI
 			addInt( "Light Tasks:", Globals.g_lightTaskController.queueSize );
 			addSpace();
 			
+			addString( "selected model:", null );
+
 			_gcLabel.textAlign = TextAlign.CENTER;
 			_gcLabel.textFormat.color = 0xFFFFFF;
 			addElement( _gcLabel );
@@ -120,6 +122,14 @@ package com.voxelengine.GUI
 			smid.width = 200;
 			addElement( smid );
 			_smids.push( smid );
+		}
+		
+		private function addString( title:String, callback:Function ):void
+		{
+			var smsd:StaticMemoryStringDisplay = new StaticMemoryStringDisplay( title, callback );
+			smsd.width = 200;
+			addElement( smsd );
+			_smids.push( smsd );
 		}
 		
 		private function addButton( title:String, callback:Function ):void
@@ -144,7 +154,7 @@ package com.voxelengine.GUI
 		
 		private function onEnterFrame( event:Event ):void
 		{
-			for each ( var smid:StaticMemoryIntDisplay in _smids )
+			for each ( var smid:StaticMemoryDisplay in _smids )
 			{
 				smid.updateFunction();
 			}
@@ -187,8 +197,16 @@ import org.flashapi.swing.Label;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.layout.AbsoluteLayout;
 import com.voxelengine.GUI.VVCanvas;
+class StaticMemoryDisplay extends VVCanvas
+{
+	public function StaticMemoryDisplay() {
+		super( 200, 10 );
+	}
+	
+	public function updateFunction():void {};
+}
 
-class StaticMemoryIntDisplay extends VVCanvas
+class StaticMemoryIntDisplay extends StaticMemoryDisplay
 {
 	private var _prefix:Label = new Label();
 	private var _data:Label = new Label();
@@ -199,7 +217,7 @@ class StaticMemoryIntDisplay extends VVCanvas
 	
 	public function StaticMemoryIntDisplay( prefix:String, value:Function ) 
 	{
-		super( 200, 10 );
+		super();
 		_value = value;
 		
 		layout = new AbsoluteLayout();
@@ -220,7 +238,7 @@ class StaticMemoryIntDisplay extends VVCanvas
 		addElement( _data );
 	}
 	
-	public function updateFunction():void
+	override public function updateFunction():void
 	{
 		var k:int = _value();
 		var result:String = addCommasToLargeInt(k);
@@ -250,4 +268,46 @@ class StaticMemoryIntDisplay extends VVCanvas
 		
 		return answer;
 	}
+}
+
+import com.voxelengine.Globals;
+class StaticMemoryStringDisplay extends StaticMemoryDisplay
+{
+	private var _prefix:Label = new Label();
+	private var _data:Label = new Label();
+	private var _value:Function = null;
+	static private const PREFIX_WIDTH:int = 90;
+	static private const FONT_COLOR:int = 0xffffff;
+	
+	public function StaticMemoryStringDisplay( prefix:String, value:Function ) 
+	{
+		super();
+		_value = value;
+		
+		layout = new AbsoluteLayout();
+		_prefix.textAlign = TextAlign.RIGHT
+		_prefix.text = prefix;
+		_prefix.width = PREFIX_WIDTH;
+		_prefix.x = 0;
+		_prefix.y = 0;
+		_prefix.fontColor = FONT_COLOR;
+		_prefix.fontSize = 10;
+		addElement( _prefix );
+		_data.textAlign = TextAlign.RIGHT
+		_data.width = 60;
+		_data.x = PREFIX_WIDTH;
+		_data.y = 0;
+		_data.fontColor = FONT_COLOR;
+		_data.fontSize = 10;
+		addElement( _data );
+	}
+	
+	override public function updateFunction():void
+	{
+		if ( Globals.selectedModel && Globals.selectedModel.instanceInfo )
+			_data.text = Globals.selectedModel.instanceInfo.guid;
+		else	
+			_data.text = "";
+	}
+	
 }

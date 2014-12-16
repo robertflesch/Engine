@@ -109,13 +109,16 @@ package com.voxelengine.GUI
 			addElement( new ComponentTextInput( "Name", function ($e:TextEvent):void { _vm.metadata.name = $e.target.text; }, _vm.metadata.name, width ) );
 			addElement( new ComponentTextArea( "Desc", function ($e:TextEvent):void { _vm.metadata.description = $e.target.text; }, _vm.metadata.description ? _vm.metadata.description : "No Description", width ) );
 
-			// TODO add a drop down of available states
-			addElement( new ComponentLabel( "State", _vm.anim ? _vm.anim.name : "", width ) );
 			// TODO need to be able to handle an array of scipts.
 			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { _ii.scriptName = $e.target.text; }, _ii.scriptName, width ) );
-			addElement( new ComponentLabel( "GrainSize", String(_ii.grainSize), width ) );
+			addElement( new ComponentLabel( "Grain Size", String(_ii.grainSize), width ) );
 			addElement( new ComponentLabel( "Instance GUID",  _ii.guid, width ) );
-			addElement( new ComponentLabel( "Parent GUID",  _ii.controllingModel ? _ii.controllingModel.instanceInfo.guid : "", width ) );
+			if ( _vm.anim )
+				// TODO add a drop down of available states
+				addElement( new ComponentLabel( "State", _vm.anim ? _vm.anim.name : "", width ) );
+				
+			if ( _ii.controllingModel )
+				addElement( new ComponentLabel( "Parent GUID",  _ii.controllingModel ? _ii.controllingModel.instanceInfo.guid : "", width ) );
 //
 			addElement( new ComponentVector3D( "Position", "X: ", "Y: ", "Z: ",  _ii.positionGet ) );
 			addElement( new ComponentVector3D( "Rotation", "X: ", "Y: ", "Z: ",  _ii.rotationGet ) );
