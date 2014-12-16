@@ -103,7 +103,9 @@ package org.flashapi.swing.plaf.wireframe {
 		/**
 		 *  A constant string that defines the default font face value.
 		 */
-		public static const DEFAULT_FONT_FACE:String = WebFonts.ARIAL;
+		//public static const DEFAULT_FONT_FACE:String = WebFonts.ARIAL; // ORIGINAL
+		//public static const DEFAULT_FONT_FACE:String = WebFonts.VERDANA; // too wide
+		public static const DEFAULT_FONT_FACE:String = WebFonts.TIMES_NEW_ROMAN;
 		
 		/**
 		 *  A constant string that defines the default font color value for button

@@ -102,18 +102,23 @@ package org.flashapi.swing.plaf.spas {
 		/**
 		 *  A constant integer that defines the default size value.
 		 */
-		public static const DEFAULT_FONT_SIZE:uint = 12;
+		//public static const DEFAULT_FONT_SIZE:uint = 12;
+		public static const DEFAULT_FONT_SIZE:uint = 11;
 		
 		/**
 		 *  A constant string that defines the default font face value.
 		 */
-		public static const DEFAULT_FONT_FACE:String = WebFonts.ARIAL;
+		//public static const DEFAULT_FONT_FACE:String = WebFonts.ARIAL; // ORIGINAL
+		public static const DEFAULT_FONT_FACE:String = WebFonts.VERDANA; // too wide
+		//public static const DEFAULT_FONT_FACE:String = WebFonts.TREBUCHET_MS;
+
 		
 		/**
 		 *  A constant string that defines the default font color value for button
 		 * 	objects.
 		 */
-		public static const DEFAULT_BUTTON_FONT_COLOR:uint = 0xFFFFFF;
+		//public static const DEFAULT_BUTTON_FONT_COLOR:uint = 0xFFFFFF;
+		public static const DEFAULT_BUTTON_FONT_COLOR:uint = 0x000000;
 		
 		/**
 		 *  A constant string that defines the default color color value.
