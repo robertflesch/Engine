@@ -94,6 +94,8 @@ package org.flashapi.swing {
 		public function LabelInput(title:String = "", defaultText:String = "", width:Number = 250, baseline:Number = 100, height:Number = 20) {
 			super(LabelInputUIRef, Selectors.LABEL_INPUT, title, defaultText, width, baseline, height);
 			initObj();
+			// per material design, non interactive labels are grey.
+			fontColor = 0x8c8c8c;
 		}
 		
 		//--------------------------------------------------------------------------

@@ -107,10 +107,13 @@ package org.flashapi.swing {
 		 */
 		public function Button(label:String = null, width:Number = NaN, height:Number = NaN, htmlText:Boolean = false) {
 			super(label == null ? Locale.spas_internal::LABELS.BUTTON_LABEL : label,
-				width, height, htmlText, ButtonUIRef);
+				width, height, htmlText, getUIRef());
 			initObj();
 		}
 		
+		public function getUIRef():Class {
+			return ButtonUIRef;
+		}
 		//--------------------------------------------------------------------------
 		//
 		//  Initialization ID constant

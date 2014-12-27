@@ -82,10 +82,12 @@ package org.flashapi.swing.plaf.spas {
 		
 		/**
 		 *  @inheritDoc 
+		 *  @copy http://www.google.com/design/spec/components/buttons.html#buttons-flat-raised-buttons
 		 */
 		public function drawOutState():void {
-			var bntColor:uint = (dto.colors.up != StateObjectValue.NONE) ?
-				dto.colors.up : dto.color;
+			//var bntColor:uint = (dto.colors.up != StateObjectValue.NONE) ? dto.colors.up : dto.color;
+			//var bntColor:uint = 0xe0e0e0;
+			var bntColor:uint = SpasUI.DEFAULT_COLOR
 			var lineColor1:uint = 0x888888;//0x969696
 			var lineColor2:int = 0x505050;//0x505050
 			if (dto.borderColors.up != StateObjectValue.NONE){
@@ -97,12 +99,12 @@ package org.flashapi.swing.plaf.spas {
 		
 		/**
 		 *  @inheritDoc 
+		 *  AKA Hover
 		 */
 		public function drawOverState():void {
-			var bntColor:uint = (dto.colors.over != StateObjectValue.NONE) ?
-				dto.colors.over : dto.color;
-			var lineColor:uint = (dto.borderColors.over != StateObjectValue.NONE) ?
-				dto.borderColors.over : 0xFFFFFF;
+			//var bntColor:uint = (dto.colors.over != StateObjectValue.NONE) ? dto.colors.over : dto.color;
+			var bntColor:uint = 0xe0e0e0;
+			var lineColor:uint = (dto.borderColors.over != StateObjectValue.NONE) ? dto.borderColors.over : 0xFFFFFF;
 			drawButtonShape(ButtonState.OVER, bntColor, lineColor);
 		}
 		
@@ -110,10 +112,9 @@ package org.flashapi.swing.plaf.spas {
 		 *  @inheritDoc 
 		 */
 		public function drawPressedState():void {
-			var bntColor:uint = (dto.colors.down != StateObjectValue.NONE) ?
-				dto.colors.down : new RGB(dto.color).darker();
-			var lineColor:uint = (dto.borderColors.down != StateObjectValue.NONE) ?
-				dto.borderColors.down : 0x505050;
+			//var bntColor:uint = (dto.colors.down != StateObjectValue.NONE) ? dto.colors.down : new RGB(dto.color).darker();
+			var bntColor:uint = 0xd6d6d6;
+			var lineColor:uint = (dto.borderColors.down != StateObjectValue.NONE) ? dto.borderColors.down : 0x505050;
 			drawButtonShape(ButtonState.DOWN, bntColor, lineColor);
 		}
 		
@@ -121,10 +122,8 @@ package org.flashapi.swing.plaf.spas {
 		 *  @inheritDoc 
 		 */
 		public function drawSelectedState():void {
-			var bntColor:uint = (dto.colors.selected != StateObjectValue.NONE) ?
-				dto.colors.selected : new RGB(dto.color).darker();
-			var lineColor:uint = (dto.borderColors.selected != StateObjectValue.NONE) ?
-				dto.borderColors.selected : 0x505050;
+			var bntColor:uint = (dto.colors.selected != StateObjectValue.NONE) ? dto.colors.selected : new RGB(dto.color).darker();
+			var lineColor:uint = (dto.borderColors.selected != StateObjectValue.NONE) ? dto.borderColors.selected : 0x505050;
 			drawButtonShape(ButtonState.SELECTED, bntColor, lineColor);
 		}
 		
@@ -132,10 +131,10 @@ package org.flashapi.swing.plaf.spas {
 		 *  @inheritDoc 
 		 */
 		public function drawInactiveState():void {
-			var bntColor:uint = (dto.colors.disabled != StateObjectValue.NONE) ?
-				dto.colors.disabled : new RGB(dto.color).brighter();
-			var lineColor:uint = (dto.borderColors.disabled != StateObjectValue.NONE) ?
-				dto.borderColors.disabled : getGrayTintColor();
+			//var bntColor:uint = (dto.colors.disabled != StateObjectValue.NONE) ? dto.colors.disabled : new RGB(dto.color).brighter(0.99);
+//			var bntColor:uint = 0xdfdfdf //0x0b0d0e //0xACA899;
+			var bntColor:uint = SpasUI.DEFAULT_COLOR
+			var lineColor:uint = (dto.borderColors.disabled != StateObjectValue.NONE) ? dto.borderColors.disabled : getGrayTintColor();
 			drawButtonShape(ButtonState.DISABLED, bntColor, lineColor);
 		}
 		
@@ -269,13 +268,13 @@ package org.flashapi.swing.plaf.spas {
 		//
 		//--------------------------------------------------------------------------
 		
-		private var _fontFormat:FontFormat =
+		protected var _fontFormat:FontFormat =
 			new FontFormat(DEFAULT_FONT_FACE, DEFAULT_FONT_SIZE, DEFAULT_BUTTON_FONT_COLOR, true);
 		private var _disabledFontFormat:FontFormat =
 			new FontFormat(DEFAULT_FONT_FACE, DEFAULT_FONT_SIZE, getGrayTintColor(), true);
 		
 		//private var dashedLine:DashedLine;
-		private const BUTTON_CURVE_HEIGHT:Number = 1;
+		protected const BUTTON_CURVE_HEIGHT:Number = 1;
 		
 		//--------------------------------------------------------------------------
 		//
@@ -283,7 +282,7 @@ package org.flashapi.swing.plaf.spas {
 		//
 		//--------------------------------------------------------------------------
 		
-		private function drawButtonShape(state:String, buttonColor:uint, lineColor1:uint, lineColor2:int = -1):void {
+		protected function drawButtonShape(state:String, buttonColor:uint, lineColor1:uint, lineColor2:int = -1):void {
 			var w:Number = dto.width;
 			var h:Number = dto.height;
 			var bch:Number = BUTTON_CURVE_HEIGHT;
@@ -304,6 +303,10 @@ package org.flashapi.swing.plaf.spas {
 						ct = new ColorTransform();
 						ct.redOffset = ct.blueOffset = ct.greenOffset = 50;
 						break;
+					case ButtonState.DISABLED :
+						ct = new ColorTransform();
+						ct.redOffset = ct.blueOffset = ct.greenOffset = 150;
+						break;
 					case ButtonState.DOWN :
 					case ButtonState.SELECTED:
 						ct = new ColorTransform();
@@ -322,17 +325,23 @@ package org.flashapi.swing.plaf.spas {
 				manager.draw(TextureType.TEXTURE);
 			} else {
 				var f:Figure = Figure.setFigure(tgt);
-				var color2:RGB = new RGB(buttonColor);
 				f.clear();
-				f.lineStyle(bw, lineColor1, bdra, true);
-				if (lineColor2 != -1) {
-					f.lineGradientStyle(GradientType.LINEAR, [lineColor1, lineColor2], [bdra, bdra], [0, 250], m);
+				switch(state) {
+					case ButtonState.UP :
+					case ButtonState.OVER :
+					case ButtonState.DOWN :
+					case ButtonState.SELECTED:
+						//f.lineStyle(bw, lineColor1, bdra, true);
+						f.beginFill( buttonColor, 1 );
+						f.drawRoundedBox(0, 0, w, h, cu.topLeft, cu.topRight, cu.bottomRight, cu.bottomLeft);
+						f.endFill();
 				}
-//				f.beginGradientFill(GradientType.LINEAR, [color2.darker(), buttonColor], [bga, bga], [0, 250], m);
-f.beginFill( buttonColor, 1 );
-				f.drawRoundedBox(0, 0, w, h, cu.topLeft, cu.topRight, cu.bottomRight, cu.bottomLeft);
-				f.endFill();
-				drawSpasEffect(tgt, w, lineColor1, cu, middle, bch);
+				//if (lineColor2 != -1)
+					//f.lineGradientStyle(GradientType.LINEAR, [lineColor1, lineColor2], [bdra, bdra], [0, 250], m);
+
+				//var color2:RGB = new RGB(buttonColor);
+				//f.beginGradientFill(GradientType.LINEAR, [color2.darker(), buttonColor], [bga, bga], [0, 250], m);
+				//drawSpasEffect(tgt, w, lineColor1, cu, middle, bch);
 			}
 		}
 		

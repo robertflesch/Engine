@@ -18,32 +18,36 @@
 //    
 ////////////////////////////////////////////////////////////////////////////////
 
-package org.flashapi.swing.plaf.spas.brushes {
+package org.flashapi.swing.wtk {
 	
 	// -----------------------------------------------------------
-	// SpasIconColors.as
+	// WindowButtonClose.as
 	// -----------------------------------------------------------
 
 	/**
 	* @author Pascal ECHEMANN
-	* @version 1.0.1, 19/01/2009 19:18
+	* @version 1.0.2, 13/11/2010 16:28
 	* @see http://www.flashapi.org/
 	*/
 	
-	import org.flashapi.swing.core.DeniedConstructorAccess;
+	import org.flashapi.swing.Button;
+	import org.flashapi.swing.constants.HorizontalAlignment;
+	import org.flashapi.swing.constants.LabelPlacement;
+	import org.flashapi.swing.constants.VerticalAlignment;
+	import org.flashapi.swing.plaf.libs.ButtonCloseUIRef;
+	import org.flashapi.swing.util.Observer;
 	
 	/**
-	 *  The <code>SpasIconColors</code> class provides constant values to manage colors
-	 * 	of drawable icons for the SPAS 3.0 default Look and Feel.
+	 * 	The <code>WindowButtonClose</code> class allows to create buttons that are used
+	 * 	within windows title bars, to control <code>WTK</code> objects.
 	 * 
-	 * 	<p>You cannot create a <code>SpasIconColors</code> object directly from ActionScript code.
-	 * 	If you call <code>new SpasIconColors()</code>, an exception is thrown.</p>
+	 * 	@see org.flashapi.swing.wtk.WTK
 	 * 
 	 * 	@langversion ActionScript 3.0
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasIconColors {
+	public class WindowButtonClose extends WindowButton implements Observer, WTKButton {
 		
 		//--------------------------------------------------------------------------
 		//
@@ -52,54 +56,28 @@ package org.flashapi.swing.plaf.spas.brushes {
 		//--------------------------------------------------------------------------
 		
 		/**
-		 * 	Constructor.
-		 * 
-		 *  @throws 	org.flashapi.swing.exceptions.DeniedConstructorAccess
-		 * 				A <code>DeniedConstructorAccess</code> if you try to create
-		 * 				a new <code>SpasIconColors</code> instance;
+		 *  Constructor. Creates a new <code>WindowButtonClose</code> instance.
 		 */
-		public function SpasIconColors() {
-			super();
-			new DeniedConstructorAccess(this);
+		public function WindowButtonClose() {
+			super("", 36, 36);
+			initObj();
+		}
+		
+		override public function getUIRef():Class {
+			return ButtonCloseUIRef;
 		}
 		
 		//--------------------------------------------------------------------------
 		//
-		//  Public constants
+		//  Private methods
 		//
 		//--------------------------------------------------------------------------
 		
-		/**
-		 * 	The default LAF icon color for the "out" state.
-		 */
-		//public static const OUT:uint = 0xFFFFFF;
-		public static const OUT:uint = 0xBBBBBB;
-		
-		/**
-		 * 	The default LAF icon color for the "pressed" state.
-		 */
-		public static const PRESSED:uint = 0x222222;
-		
-		/**
-		 * 	The default LAF icon color for the "over" state.
-		 */
-		//public static const OVER:uint = 0xFFFFFF;
-		public static const OVER:uint = 0xff0000;
-		
-		/**
-		 * 	The default LAF icon's color for the "selected" state.
-		 */
-		public static const SELECTED:uint = 0x222222;
-		//public static const SELECTED:uint = 0xff0000;
-		
-		/**
-		 * 	The default LAF icon color for the "emphasized" state.
-		 */
-		public static const EMPHASIZED:uint = 0xFFFFFF;
-		
-		/**
-		 * 	The default LAF icon color for the "inactive" state.
-		 */
-		public static const INACTIVE:uint = 0xBBBBBB;
+		private function initObj():void {
+			$padL = $padR = 0;
+			$vAlign = VerticalAlignment.TOP;
+			$hAlign = HorizontalAlignment.LEFT; 
+			$labelPlacement = LabelPlacement.RIGHT;
+		}
 	}
 }

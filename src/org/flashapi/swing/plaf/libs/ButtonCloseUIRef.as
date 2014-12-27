@@ -18,61 +18,62 @@
 //    
 ////////////////////////////////////////////////////////////////////////////////
 
-package org.flashapi.swing.wtk {
+package org.flashapi.swing.plaf.libs {
 	
 	// -----------------------------------------------------------
-	// WindowButton.as
+	// ButtonCloseUIRef.as
 	// -----------------------------------------------------------
 
 	/**
 	* @author Pascal ECHEMANN
-	* @version 1.0.2, 13/11/2010 16:28
+	* @version 1.0.0, 14/03/2010 18:29
 	* @see http://www.flashapi.org/
 	*/
 	
-	import org.flashapi.swing.Button;
-	import org.flashapi.swing.constants.HorizontalAlignment;
-	import org.flashapi.swing.constants.LabelPlacement;
-	import org.flashapi.swing.constants.VerticalAlignment;
-	import org.flashapi.swing.util.Observer;
+	import org.flashapi.swing.plaf.spas.SpasButtonCloseUI;
+	import org.flashapi.swing.util.Observable;
 	
 	/**
-	 * 	The <code>WindowButton</code> class allows to create buttons that are used
-	 * 	within windows title bars, to control <code>WTK</code> objects.
+	 * 	<strong>FOR DEVELOPERS ONLY.</strong>
 	 * 
-	 * 	@see org.flashapi.swing.wtk.WTK
+	 * 	The <code>ButtonCloseUIRef</code> is the Library Reference for 
+	 * 	Look And Feel of <code>Button</code> objects.
+	 * 
+	 * 	@see org.flashapi.swing.Button
 	 * 
 	 * 	@langversion ActionScript 3.0
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class WindowButton extends Button implements Observer, WTKButton {
+	public class ButtonCloseUIRef implements LafLibRef {
+		
+		/**
+		 * 	<strong>FOR DEVELOPERS ONLY.</strong>
+		 * 
+		 * 	Returns the default Look And Feel reference for the <code>ButtonCloseUIRef</code>
+		 * 	Library.
+		 * 
+		 * 	@return	The default Look And Feel reference for this <code>LafLibRef</code>
+		 * 			object.
+		 */
+		public static function getDefaultUI():Class {
+			return SpasButtonCloseUI;
+		}
 		
 		//--------------------------------------------------------------------------
 		//
-		//  Constructor
+		//  Public static properties
 		//
 		//--------------------------------------------------------------------------
 		
 		/**
-		 *  Constructor. Creates a new <code>WindowButton</code> instance.
+		 *  @private
 		 */
-		public function WindowButton( $title:String = "", $width:int = 18, $height:int = 18 ) {
-			super( $title, $width, $height, false);
-			initObj();
-		}
+		public static var lafList:Observable;
 		
-		//--------------------------------------------------------------------------
-		//
-		//  Private methods
-		//
-		//--------------------------------------------------------------------------
-		
-		private function initObj():void {
-			$padL = $padR = 0;
-			$vAlign = VerticalAlignment.TOP;
-			$hAlign = HorizontalAlignment.LEFT; 
-			$labelPlacement = LabelPlacement.RIGHT;
-		}
+		/**
+		 *  @private
+		 */
+		public static var laf:Object;
 	}
 }

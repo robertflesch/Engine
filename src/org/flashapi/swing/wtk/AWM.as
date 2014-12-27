@@ -1493,17 +1493,20 @@ package org.flashapi.swing.wtk {
 		//--> End header & footer controls managment
 		
 		private function createUIObjects():void {
-			$closeButton = new WindowButton();
+//			$closeButton = new WindowButton();
+			$closeButton = new WindowButtonClose();
 			spas_internal::lafDTO.closeButton = $closeButton;
 			$closeButton.alt = $closeButtonAlt;
 			$icon = new Icon();
 		}
 		
+		import org.flashapi.swing.plaf.spas.SpasButtonCloseUI;
 		private function setUIObjectsLaf():void {
 			$scrollableArea.lockLaf(lookAndFeel.getScrollBarLaf(), true);
 			fixControlsLaf();
 			//iconMenu.lockLaf(lookAndFeel.ICON_MENU_LAF, true);
-			$closeButton.lockLaf(lookAndFeel.getButtonLaf(), true);
+			//$closeButton.lockLaf(lookAndFeel.getButtonLaf(), true);
+			$closeButton.lockLaf( SpasButtonCloseUI, true);
 			fixWindowButtonLaf($closeButton, lookAndFeel.getCloseButtonBrush());
 		}
 		
