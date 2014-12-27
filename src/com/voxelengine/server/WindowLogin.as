@@ -5,6 +5,7 @@ package com.voxelengine.server
 	import flash.events.KeyboardEvent;
 	import flash.events.Event;
 	import flash.ui.Keyboard;
+	import flash.net.SharedObject;
 	
 	import org.flashapi.swing.*;
 	import org.flashapi.swing.button.ButtonGroup;
@@ -26,6 +27,8 @@ package com.voxelengine.server
 		private var _emailInput:LabelInput;
 		private var _passwordInput:LabelInput;
 		private var _errorText:TextArea;
+		private var _userInfo:SharedObject;
+		
 
 		private var _topImage:Bitmap;
 		[Embed(source='../../../../../Resources/bin/assets/textures/loginImage.png')]
@@ -38,6 +41,14 @@ package com.voxelengine.server
 			height = 325;
 			layout.orientation = LayoutOrientation.VERTICAL;
 
+			try {
+				_userInfo = SharedObject.getLocal( "voxelverse" );
+			}
+			catch ( error:Error )
+			{
+				Log.out( "WindowLogin.constructor - unable to open local shared object" );
+			}
+
 			if ( !Globals.g_debug )
 				showCloseButton = false;
 
@@ -46,10 +57,16 @@ package com.voxelengine.server
 			addElement(pic);
 			
 			var infoPanel:Container = new Container( width, 80 );
+			infoPanel.tabEnabled = false;
 			infoPanel.layout.orientation = LayoutOrientation.VERTICAL;
 			infoPanel.addElement( new Spacer( width, 15 ) );
 			
-			_emailInput = new LabelInput( " Email", $email, width );
+			
+			// is if the shared object has been loaded
+			// if so, get the email address from that
+			// otherwise use empty
+				
+			_emailInput = new LabelInput( " Email", ( _userInfo.data.email ?  _userInfo.data.email : $email ), width );
 			_emailInput.labelControl.width = 80;
 			infoPanel.addElement( _emailInput );
 			
@@ -60,6 +77,7 @@ package com.voxelengine.server
 			infoPanel.addElement( _passwordInput );
 			
 			_errorText = new TextArea( width, 20 );
+			_errorText.tabEnabled = false;
 			_errorText.textAlign = TextAlign.CENTER;
 			_errorText.backgroundColor = SpasUI.DEFAULT_COLOR;
 			_errorText.scrollPolicy = ScrollPolicy.NONE;
@@ -90,17 +108,12 @@ package com.voxelengine.server
 			buttonPanel.addElement( lostPasswordButton );
 			
 			addElement( buttonPanel );
-			
+
 			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
 			
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
 		}
 		
-        //override protected function onResize(event:Event):void
-        //{
-			//move( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
-		//}
-
 		// Allows the enter key to activate the login key.
 		private function onKeyPressed( e : KeyboardEvent) : void {
 			if ( Keyboard.ENTER == e.keyCode ) {
@@ -199,7 +212,14 @@ package com.voxelengine.server
 		}
 		
 		private function loginSuccess( $e:LoginEvent ):void {
-			removeLoginEventHandlers()
+			removeLoginEventHandlers();
+			if ( _userInfo ) {
+				_userInfo.data.email = _emailInput.label;
+				_userInfo.flush();
+			}
+			else
+				Log.out(" WindowLogin.loginSuccess - Unable to save user email", Log.WARN );
+				
 			Log.out(" WindowLogin.loginSuccess - Closing Login Window" );
 			
 			remove();

@@ -376,15 +376,20 @@ package com.voxelengine.GUI
 			//Log.out( "VVGui.onModelLoadingComplete" );
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 			addKeyboardListeners( event );
-			new WindowLogin( "robertflesch@yahoo.com", "redparrot" );
+			if ( Globals.g_debug )
+				new WindowLogin( "robertflesch@yahoo.com", "redparrot" );
+			else	
+				new WindowLogin( "", "" );
 		}
 		
 		private function onKeyPressed( e : KeyboardEvent) : void
 		{
 			// this is required for windows that have text fields. 
-			// but...
-//			if ( ( 0 < Globals.openWindowCount || Log.showing) )
-//				return;				
+			// but if I have crafting up, then I need to have inventory up too.
+			// TODO Fix this, question is how, do I bring both the crafting AND inventory window up,
+			// or do I give the crafting window access to the inventory thru some built in mechanism
+			if ( ( 0 < Globals.openWindowCount || Log.showing) )
+				return;				
 				
 			if ( !Log.showing )
 			{
@@ -434,8 +439,10 @@ package com.voxelengine.GUI
 					new WindowRegionModels();
 					//new WindowVideoTest(); Wait for hummingbird
 					
-				if ( Keyboard.C == e.keyCode )
+				if ( Keyboard.C == e.keyCode ) {
 					new WindowCrafting();
+					new WindowInventory();
+				}
 					
 			}
 			

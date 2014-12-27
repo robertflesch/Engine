@@ -57,7 +57,6 @@ public class WindowSandboxList extends VVPopup
 	public function WindowSandboxList()
 	{
 		super("Sandbox List");
-		var openType:String = Globals.mode;
 		autoSize = true;
 		layout.orientation = LayoutOrientation.VERTICAL;
 		closeButtonActive = false;
@@ -67,6 +66,7 @@ public class WindowSandboxList extends VVPopup
 		bar.addItem( Globals.MODE_PUBLIC );
 		bar.addItem( Globals.MODE_PRIVATE );
 		bar.addItem( Globals.MODE_MANAGE );
+		var openType:String = Globals.mode;
 		if ( Globals.MODE_PUBLIC == openType )
 			bar.selectedIndex = 0;
 		else if ( Globals.MODE_PRIVATE == openType ) 	
