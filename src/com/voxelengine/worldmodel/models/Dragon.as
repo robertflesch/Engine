@@ -30,6 +30,7 @@ package com.voxelengine.worldmodel.models
 		public function Dragon( ii:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
 			super( ii, mi, $vmm );
 			
+			// TODO reimplement in handler
 			//MouseKeyboardHandler.backwardEnabled = false;
 			
 			processJsonInfo();

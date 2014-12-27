@@ -101,9 +101,9 @@ package com.voxelengine.worldmodel.models
 		
 		protected function onDeactivate( e:GUIEvent ):void 
 		{
-			//Log.out( "EditCursor.onDeactivate - disabling repeat" );
+			//Log.out( "onDeactivate - disabling repeat" );
 			// We dont want the repeat on if app loses focus
-			EditCursor.mouseUp( null );
+			mouseUp( null );
 		}
 		
 		public function EditCursor( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ):void 
@@ -164,13 +164,13 @@ package com.voxelengine.worldmodel.models
 				oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
 				li.color = 0xffffffff;
 				gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
-				oxel.write( EditCursor.EDIT_CURSOR, gcCursor, selectedCursor, true );
+				oxel.write( EDIT_CURSOR, gcCursor, selectedCursor, true );
 			}
 			else
 			{
 				oxel.faces_set_all();
 				gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
-				oxel.write( EditCursor.EDIT_CURSOR, gcCursor, selectedCursor, true );
+				oxel.write( EDIT_CURSOR, gcCursor, selectedCursor, true );
 				li.color = cursorColorRainbow();
 			}
 			
@@ -239,10 +239,14 @@ package com.voxelengine.worldmodel.models
 		{
 			internal_initialize($context );
 			visible = false;
+			// these are all static calls, should only be added once.
+			Log.out( "EditCursor.initialize" );
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			Globals.g_app.stage.addEventListener(MouseEvent.CLICK, mouseClick);
 			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+			// this one is not a static call
+			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_MOVE, mouseMove);
 
 			if ( oxel.gc.grain == editCursorSize )
 				return;
@@ -676,12 +680,12 @@ package com.voxelengine.worldmodel.models
 						deleteOxel();
 					break;
 				case 33: case Keyboard.PAGE_UP:
-						EditCursor.editCursorSize = EditCursor.editCursorSize + 1;
+						editCursorSize = editCursorSize + 1;
 						growCursor()
 					break;
 					
 				case 34: case Keyboard.PAGE_DOWN:
-						EditCursor.editCursorSize = EditCursor.editCursorSize - 1;
+						editCursorSize = editCursorSize - 1;
 						shrinkCursor();
 					break;
 			}
@@ -696,12 +700,12 @@ package com.voxelengine.worldmodel.models
 				
 				// If edit cursor wants to be larger the the size of the selected object
 				// then set it to the size of the selected object
-				if ( Globals.selectedModel.oxel.gc.grain < EditCursor.editCursorSize )
-					EditCursor.editCursorSize = Globals.selectedModel.oxel.gc.grain;
+				if ( Globals.selectedModel.oxel.gc.grain < editCursorSize )
+					editCursorSize = Globals.selectedModel.oxel.gc.grain;
 					
 				if ( gcGrow.grain < Globals.selectedModel.oxel.gc.grain )
 				{
-					for ( var i:int = gcGrow.grain; i < EditCursor.editCursorSize; i++ )
+					for ( var i:int = gcGrow.grain; i < editCursorSize; i++ )
 						gcGrow.grain = ++gcGrow.grain;
 						
 					editCursorSize = gcGrow.grain;
@@ -718,7 +722,7 @@ package com.voxelengine.worldmodel.models
 				if ( 0 < gcShrink.grain )
 				{
 					var currentSize:int = gcShrink.grain;
-					for ( var i:int = EditCursor.editCursorSize; i < currentSize; i++ )
+					for ( var i:int = editCursorSize; i < currentSize; i++ )
 						gcShrink.grain = --gcShrink.grain;
 					editCursorSize = gcShrink.grain;
 					Globals.selectedModel.editCursor.oxel.faces_rebuild( EDIT_CURSOR );
@@ -748,16 +752,40 @@ package com.voxelengine.worldmodel.models
 			_count = 0;	
 		}
 		
+		import com.voxelengine.worldmodel.MouseKeyboardHandler;
+		private static var _s_dy:Number = 0;
+		private static var _s_dx:Number = 0;
+		private function mouseMove(e:MouseEvent):void 
+		{
+			if ( MouseKeyboardHandler.ctrl ) {
+				if ( 0 == _s_dx && 0 == _s_dy ) {
+					_s_dy = Globals.g_app.stage.mouseY;
+					_s_dx = Globals.g_app.stage.mouseX;
+					return;
+				}
+				var dy:Number = Globals.g_app.stage.mouseY - _s_dy;
+				_s_dy = Globals.g_app.stage.mouseY;
+				var dx:Number =  Globals.g_app.stage.mouseX - _s_dx;
+				_s_dx = Globals.g_app.stage.mouseX
+//				Log.out( "EditCursor.mouse move dx: " + dx + "  dy: " + dy );
+				
+			// do I need to add axis models?	
+			//	this.childAdd();
+				var t:Vector3D = Globals.selectedModel.instanceInfo.positionGet;
+				t.z += dy/4;
+				t.x += dx/4;
+				Globals.selectedModel.instanceInfo.positionSetComp( t.x, t.y, t.z );
+			}
+		}
 		static private function mouseDown(e:MouseEvent):void 
 		{
-			if ( Globals.openWindowCount || !Globals.clicked )
+			if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey )
 				return;
 				
 			_repeatTimer = new Timer( 200 );
 			_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
 			_repeatTimer.start();
 			
-			var foundModel:VoxelModel;
 			switch (e.type) 
 			{
 				case "mouseDown": case Keyboard.NUMPAD_ADD:
@@ -771,21 +799,21 @@ package com.voxelengine.worldmodel.models
 		
 		static private function mouseClick(e:MouseEvent):void 
 		{
-			//Log.out( "EditCursor.initialize - mouseClick mouseClick mouseClick" );
+			//Log.out( "initialize - mouseClick mouseClick mouseClick" );
 		}
 		
 		static public function setPickColorFromType( type:int ):void
 		{
 			switch ( type )
 			{
-				case EditCursor.CURSOR_TYPE_CYLINDER:
-					EditCursor.cursorColor = Globals.EDITCURSOR_CYLINDER;
+				case CURSOR_TYPE_CYLINDER:
+					cursorColor = Globals.EDITCURSOR_CYLINDER;
 					break;
-				case EditCursor.CURSOR_TYPE_SPHERE:
-					EditCursor.cursorColor = Globals.EDITCURSOR_ROUND;
+				case CURSOR_TYPE_SPHERE:
+					cursorColor = Globals.EDITCURSOR_ROUND;
 					break;
-				case EditCursor.CURSOR_TYPE_GRAIN:
-					EditCursor.cursorColor = Globals.EDITCURSOR_SQUARE;
+				case CURSOR_TYPE_GRAIN:
+					cursorColor = Globals.EDITCURSOR_SQUARE;
 					break;
 			} 
 		}

@@ -27,15 +27,16 @@ package com.voxelengine.worldmodel
 		static private var _s_backward:Boolean 		 					= false;
 		static private var _s_left:Boolean  							= false;
 		static private var _s_right:Boolean  							= false;
-		static private var _s_turn_left:Boolean  						= false;
-		static private var _s_turn_right:Boolean  						= false;
 		static private var _s_up:Boolean 								= false;
 		static private var _s_down:Boolean 								= false;
+		
+		static private var _s_ctrl:Boolean 								= false;
+		static private var _s_shift:Boolean 							= false;
+		static private var _s_alt:Boolean 								= false;
 		
 		// Enable / Disable Keys
 		static private var _s_leftTurnEnabled:Boolean 					= true;
 		static private var _s_rightTurnEnabled:Boolean 					= true;
-		static private var _s_backwardEnabled:Boolean 					= true;
 		
 		static private var _s_handlersAdded:Boolean 					= false;
 		
@@ -46,17 +47,16 @@ package com.voxelengine.worldmodel
 		static public function set leftTurnEnabled(value:Boolean):void 		{ _s_leftTurnEnabled = value; }
 		static public function get rightTurnEnabled():Boolean 				{ return _s_rightTurnEnabled; }
 		static public function set rightTurnEnabled(value:Boolean):void 	{ _s_rightTurnEnabled = value; }
-		static public function get backwardEnabled():Boolean 				{ return _s_backwardEnabled; }
-		static public function set backwardEnabled(value:Boolean):void 		{ _s_backwardEnabled = value; }
 		
 		static public function get forward():Boolean 					{ return (Globals.openWindowCount || Log.showing) ? false : _s_forward; }
 		static public function get backward():Boolean 					{ return (Globals.openWindowCount || Log.showing) ? false : _s_backward; }
 		static public function get leftSlide():Boolean 					{ return (Globals.openWindowCount || Log.showing) ? false : _s_left; }
 		static public function get rightSlide():Boolean 				{ return (Globals.openWindowCount || Log.showing) ? false : _s_right; }
-		static public function get leftTurn():Boolean 					{ return (Globals.openWindowCount || Log.showing) ? false : _s_turn_left; }
-		static public function get rightTurn():Boolean 					{ return (Globals.openWindowCount || Log.showing) ? false : _s_turn_right; }
 		static public function get up():Boolean 						{ return (Globals.openWindowCount || Log.showing) ? false : _s_up; }
 		static public function get down():Boolean 						{ return (Globals.openWindowCount || Log.showing) ? false : _s_down; }
+		static public function get ctrl():Boolean 						{ return _s_ctrl; }
+		static public function get shift():Boolean 						{ return _s_shift; }
+		static public function get alt():Boolean 						{ return _s_alt; }
 		
 		
 		public function MouseKeyboardHandler() 
@@ -74,6 +74,7 @@ package com.voxelengine.worldmodel
 			}			
 		}
 		
+		// this is only used in full screen mode
 		static private function onMove( event: MouseEvent) : void
 		{
 			_s_x += event.movementX;
@@ -114,29 +115,6 @@ package com.voxelengine.worldmodel
 			return val;
 		}
 		
-		static public function rotationFromKeyboard( elapsedTimeMS:Number ):Number
-		{
-			// tweak this number to adjust rotation speed
-			// derived from watching log of screen position
-			const MAX_ROT_RATE:Number = 0.137;
-			
-			var dx:Number = 0;
-			if ( leftTurn && leftTurnEnabled )     
-				dx = -MAX_ROT_RATE * elapsedTimeMS;
-			else if ( rightTurn && rightTurnEnabled )    
-				dx = MAX_ROT_RATE * elapsedTimeMS;
-			
-			const MIN_TURN_AMOUNT:Number = 0.05;
-			// Now apply the change from keyboard
-//			Log.out( "MouseKeyboardHandler.rotationFromKeyboard - USING time: " + dx + "  time elapsed: " + elapsedTimeMS, Log.WARN );
-			if ( MIN_TURN_AMOUNT < Math.abs(dx) )
-			{
-				return dx;
-			}
-			else
-				return 0;
-		}
-
 		static public function addInputListeners():void 
 		{
 			if ( false == _s_handlersAdded )
@@ -170,47 +148,40 @@ package com.voxelengine.worldmodel
 			_s_backward = false;			
 			_s_left = false;			
 			_s_right = false;			
-			_s_turn_left = false;			
-			_s_turn_right = false;			
 			_s_up = false;			
 			_s_down = false;			
+			_s_ctrl = false;			
+			_s_shift = false;			
+			_s_alt = false;			
 		}
 		
-		
-		
-		static private function keyDown(e:KeyboardEvent):void 
+		static private function keyDown( $ke:KeyboardEvent):void 
 		{
-			//if ( Keyboard.HOME == e.keyCode ) 									resetCamera();
-			//if ( Keyboard.KEYNAME_BREAK == e.keyCode ) 							resetPosition()
-			if ( 87 == e.keyCode || Keyboard.UP == e.keyCode )					_s_forward = true; 
-			if ( ( 83 == e.keyCode || Keyboard.DOWN == e.keyCode ) && backwardEnabled )	_s_backward = true; 
-			if ( 69 == e.keyCode || Keyboard.SPACE == e.keyCode )				_s_up = true; 
-			if ( 81 == e.keyCode || Keyboard.SHIFT == e.keyCode )				_s_down = true; 
-//			if ( Keyboard.A == e.keyCode )												_s_turn_left = true; 
-//			if ( Keyboard.D == e.keyCode )												_s_turn_right = true; 
-//			if ( Keyboard.LEFT == e.keyCode )									_s_left = true; 
-//			if ( Keyboard.RIGHT == e.keyCode )									_s_right = true; 
-			if ( Keyboard.LEFT == e.keyCode || Keyboard.A == e.keyCode )		_s_left = true; 
-			if ( Keyboard.RIGHT == e.keyCode || Keyboard.D == e.keyCode )		_s_right = true; 
+			processKey( $ke, true );
+			
+			//if ( Keyboard.HOME == $ke.keyCode ) 									resetCamera();
+			//if ( Keyboard.KEYNAME_BREAK == $ke.keyCode ) 							resetPosition()
+			//if ( 69 == $ke.keyCode || Keyboard.SPACE == $ke.keyCode )				_s_up = true; 
 		}
 		
-		static private function keyUp(e:KeyboardEvent):void 
+		static private function keyUp( $ke:KeyboardEvent ):void 
 		{
-			switch (e.keyCode) {
-				case Keyboard.W: case Keyboard.UP: 		_s_forward = false; break;
-				case Keyboard.S: case Keyboard.DOWN: 	_s_backward = false; break;
-				
-				case Keyboard.E: case Keyboard.SPACE: 	_s_up = false; break; // E
-				case Keyboard.Q: case Keyboard.SHIFT: 	_s_down = false; break; // Q
-				//case Keyboard.LEFT: _s_left = false; break;
-				//case Keyboard.RIGHT: _s_right = false; break;
-				//case 65: 
-					//_s_turn_left = false; break;
-				//case 68: 
-					//_s_turn_right = false; break;
-				case Keyboard.A: case Keyboard.LEFT: 	_s_left = false; break;
-				case Keyboard.D: case Keyboard.RIGHT: 	_s_right = false; break;
-				
+			processKey( $ke, false );
+		}
+		
+		static private function processKey( $ke:KeyboardEvent, $setter:Boolean):void 
+		{
+			switch ($ke.keyCode) {
+				case Keyboard.CONTROL: 					_s_ctrl = $setter; break;
+				case Keyboard.SHIFT: 					_s_shift = $setter; 
+				case Keyboard.ALTERNATE: 				_s_alt = $setter; break;
+				case Keyboard.Q: 						_s_down = $setter; break;
+				case Keyboard.E: 						_s_up = $setter; break;
+				case Keyboard.W: case Keyboard.UP: 		_s_forward = $setter; break;
+				// individual use case need to disable backward
+				case Keyboard.S: case Keyboard.DOWN: 	_s_backward = $setter; break;
+				case Keyboard.A: case Keyboard.LEFT: 	_s_left = $setter; break;
+				case Keyboard.D: case Keyboard.RIGHT: 	_s_right = $setter; break;
 			}
 		}
 	}

@@ -409,7 +409,8 @@ package com.voxelengine.worldmodel.models
 			super.loseControl( $modelDetaching );
 			MouseKeyboardHandler.leftTurnEnabled = true;
 			MouseKeyboardHandler.rightTurnEnabled = true;
-			MouseKeyboardHandler.backwardEnabled = true;
+			// TODO reimplement in handler
+			//MouseKeyboardHandler.backwardEnabled = true;
 			$modelDetaching.instanceInfo.positionSetComp( $modelDetaching.instanceInfo.positionGet.x, $modelDetaching.instanceInfo.positionGet.y + _seatLocation.y, $modelDetaching.instanceInfo.positionGet.z );
 			//$vm.instanceInfo.rotationSet = this.instanceInfo.rotationGet;
 			$modelDetaching.instanceInfo.rotationSetComp( 0, instanceInfo.rotationGet.y, 0 );

@@ -662,13 +662,6 @@ package com.voxelengine.worldmodel.models
 				// this was inside of the the controlled model if...
 				updateVelocity($elapsedTimeMS, clipVelocityFactor );
 				
-				if (this == Globals.controlledModel)
-				{
-					var rotation:Vector3D = new Vector3D(0, MouseKeyboardHandler.rotationFromKeyboard($elapsedTimeMS), 0);
-					if (!_sZERO_VEC.nearEquals(rotation, 0.01))
-						instanceInfo.rotationSet = instanceInfo.rotationGet.add(rotation);
-				}
-				
 				instanceInfo.update($elapsedTimeMS);
 				
 				
