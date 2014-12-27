@@ -128,6 +128,7 @@ package {
 
 			if ( false == WindowSplash.isActive )
 				WindowSplash.create();
+			Log.out( "VoxelVerse.init exit init" );
 		}
 		
 		private function addStaticListeners():void {
@@ -138,8 +139,7 @@ package {
 		}
 
 		// after the splash and config have been loaded
-		public function onSplashLoaded( event : LoadingEvent ):void
-		{
+		public function onSplashLoaded( event : LoadingEvent ):void	{
 			// TODO I dont like that some objects are created in globals, others are created here - RSF
 			removeEventListener(LoadingEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
 			
@@ -154,8 +154,8 @@ package {
 			VoxelVerseGUI.currentInstance.buildGUI();	
 		}
 
-		private function enterFrame(e:Event):void 
-		{
+		private function enterFrame(e:Event):void {
+			//Log.out( "VoxelVerse.enterFrame" );
 			const timeEntered:int = getTimer();
 			var elapsed:int = timeEntered - _timePrevious;
 			_timePrevious = timeEntered;
@@ -172,7 +172,9 @@ package {
 			
 			if ( showConsole )
 				toggleConsole();
-			//Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed );
+				
+			if ( 5 < timeRender || 1 < timeUpdate )	
+				Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed );
 			_timePrevious = getTimer();
 		}
 		

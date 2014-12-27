@@ -441,10 +441,15 @@ package com.voxelengine.worldmodel.models
 			return true
 		}
 		
+	import flash.utils.getTimer;
 		public function update( $elapsedTimeMS:int ):void {
 			
+			var totalTime:int = getTimer();
+			var wsTime:int = getTimer();
 			worldSpaceStartAndEndPointCalculate();
-			
+			wsTime = getTimer() - wsTime;
+
+			var taskTime:int = getTimer();
 			// Make sure to call this before the model update, so that models have time to repair them selves.
 			if ( 0 == Globals.g_landscapeTaskController.VVNextTask() )
 			{
@@ -452,19 +457,29 @@ package com.voxelengine.worldmodel.models
 				//while ( 0 < Globals.g_lightTaskController.queueSize() )
 					Globals.g_lightTaskController.VVNextTask();
 			}
+			taskTime = getTimer() - taskTime;
 
+			var editableTime:int = getTimer();
 			if ( Globals.g_app.toolOrBlockEnabled )
 				highLightEditableOxel();
+			editableTime = getTimer() - editableTime;	
 
+			var dynModelTime:int = getTimer();
 			for each ( var instanceDyn:VoxelModel in _modelDynamicInstances )
 			{
 				instanceDyn.update( Globals.g_renderer.context,  $elapsedTimeMS );	
 			}
+			dynModelTime = getTimer() - dynModelTime;
 			
+			var modelTime:int = getTimer();
 			for each ( var instance:VoxelModel in _modelInstances )
 			{
 				instance.update( Globals.g_renderer.context, $elapsedTimeMS );	
 			}
+			modelTime = getTimer() - modelTime;
+			totalTime = getTimer() - totalTime;
+			if ( 1 < taskTime || 1 < modelTime || 5 < totalTime )
+				Log.out( "ModelManager.update - taskTime: " + taskTime  + "  totalTime: " + totalTime  + "  modelTime: " + modelTime + "  wsTime: " + wsTime + " editableTime: " + editableTime  );
 		}
 		
 		public function dispose():void 	{
