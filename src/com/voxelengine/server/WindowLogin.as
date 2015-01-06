@@ -26,9 +26,9 @@ package com.voxelengine.server
 	{
 		private var _emailInput:LabelInput;
 		private var _passwordInput:LabelInput;
-		private var _errorText:TextArea;
+		private var _errorText:Label;
 		private var _userInfo:SharedObject;
-		
+		private var _savePW:CheckBox;
 
 		private var _topImage:Bitmap;
 		[Embed(source='../../../../../Resources/bin/assets/textures/loginImage.png')]
@@ -37,8 +37,8 @@ package com.voxelengine.server
 		public function WindowLogin( $email:String, $password:String )
 		{
 			super( "Login" );
-			width = 300;
-			height = 325;
+			width = 309;
+			height = 336;
 			layout.orientation = LayoutOrientation.VERTICAL;
 
 			try {
@@ -57,6 +57,7 @@ package com.voxelengine.server
 			addElement(pic);
 			
 			var infoPanel:Container = new Container( width, 80 );
+			infoPanel.autoSize = false;
 			infoPanel.tabEnabled = false;
 			infoPanel.layout.orientation = LayoutOrientation.VERTICAL;
 			infoPanel.addElement( new Spacer( width, 15 ) );
@@ -66,34 +67,46 @@ package com.voxelengine.server
 			// if so, get the email address from that
 			// otherwise use empty
 				
-			_emailInput = new LabelInput( " Email", ( _userInfo.data.email ?  _userInfo.data.email : $email ), width );
+			var emailAddy:String = _userInfo.data.email ?  _userInfo.data.email : $email;
+			_emailInput = new LabelInput( " Email", emailAddy, width );
 			_emailInput.labelControl.width = 80;
 			infoPanel.addElement( _emailInput );
 			
 			infoPanel.addElement( new Spacer( width, 10 ) );
 			
-			_passwordInput = new LabelInput( " Password", $password, width );
+			var password:String = _userInfo.data.password ?  _userInfo.data.password : "";
+			_passwordInput = new LabelInput( " Password", password, width );
 			_passwordInput.labelControl.width = 80;
 			infoPanel.addElement( _passwordInput );
 			
-			_errorText = new TextArea( width, 20 );
+			addElement( infoPanel );
+			
+			var otherPanel:Container = new Container( width, 10 );
+			otherPanel.autoSize = false;
+			otherPanel.padding = 0;
+			otherPanel.layout.orientation = LayoutOrientation.HORIZONTAL;
+			
+			_errorText = new Label( "", width - 120 );
 			_errorText.tabEnabled = false;
 			_errorText.textAlign = TextAlign.CENTER;
 			_errorText.backgroundColor = SpasUI.DEFAULT_COLOR;
-			_errorText.scrollPolicy = ScrollPolicy.NONE;
 			_errorText.fontColor = 0xff0000; // Red
+			otherPanel.addElement( _errorText );
 			
-			infoPanel.addElement( _errorText )
+			_savePW = new CheckBox( "Save Password", 110, 20 );
+			if ( "" != password )
+				_savePW.selected = true;
+			otherPanel.addElement( _savePW );
 			
-			addElement( infoPanel );
+			addElement( otherPanel );
 			
-			const buttonWidth:int = 94;
+			const buttonWidth:int = 97;
 			const buttonHeight:int = 45;
 			var buttonPanel:Container = new Container( width, buttonHeight );
 			buttonPanel.padding = 7.5;
 			var loginButton:Button = new Button( "Login", buttonWidth, buttonHeight - 15 );
 			loginButton.addEventListener(UIMouseEvent.CLICK, loginButtonHandler );
-			loginButton.shadow = true;
+//			loginButton.shadow = true;
 			buttonPanel.addElement( loginButton );
 			
 			var registerButton:Button = new Button( "Register..", buttonWidth, buttonHeight - 15 );
@@ -215,6 +228,10 @@ package com.voxelengine.server
 			removeLoginEventHandlers();
 			if ( _userInfo ) {
 				_userInfo.data.email = _emailInput.label;
+				if ( _savePW.selected )
+					_userInfo.data.password = _passwordInput.label;
+				else
+					_userInfo.data.password = null;
 				_userInfo.flush();
 			}
 			else
