@@ -138,6 +138,7 @@ package org.flashapi.swing {
 			$hAlign = HorizontalAlignment.CENTER; 
 			spas_internal::setSelector(Selectors.BUTTON);
 			spas_internal::isInitialized(1);
+			shadow = true;
 			if (spas_internal::isComponent) this.display();
 		}
 	}
