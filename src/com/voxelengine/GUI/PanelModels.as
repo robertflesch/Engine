@@ -6,6 +6,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.events.UIRegionModelEvent;
 	import com.voxelengine.worldmodel.inventory.InventoryObject;
 	import com.voxelengine.worldmodel.models.Player;
+	import org.flashapi.swing.layout.AbsoluteLayout;
 //	import flash.utils.Dictionary;
 	
 	import org.flashapi.swing.*;
@@ -46,16 +47,26 @@ package com.voxelengine.GUI
 			_listModels.dragEnabled = true;
 			_listModels.draggable = true;
 
-			//_listModels.dndData
 			_listModels.addEventListener( ListEvent.LIST_CHANGED, selectModel );		
-			//_listModels.eventCollector.addEvent( _dragOp, DnDEvent.DND_DROP_ACCEPTED, dropMaterial );
-			//_listModels.eventCollector.addEvent( this, ListEvent.ITEM_PRESSED, doDrag);
 			
 			buttonsCreate();
 			addElement( _listModels );
 			
+			// ALL DRAG AND DROP methods, which are not working
+			//_listModels.dndData
+			//_listModels.eventCollector.addEvent( _dragOp, DnDEvent.DND_DROP_ACCEPTED, dropMaterial );
+			//_listModels.eventCollector.addEvent( this, ListEvent.ITEM_PRESSED, doDrag);
 			//addListeners();
         }
+		
+		override public function close():void {
+			super.close();
+			_listModels.removeEventListener( ListEvent.LIST_CHANGED, selectModel );		
+			
+			_parentModel = null;
+			_dictionarySource = null;
+			_selectedModel = null;
+		}
 		
 		public function populateModels( $dictionarySource:Function, $parentModel:VoxelModel ):int
 		{
@@ -86,34 +97,42 @@ package com.voxelengine.GUI
 		// meaning removing the buttons completely
 		private function buttonsCreate():void {
 			
-
+			const btnWidth:int = width - 10;
 			//Log.out( "PanelModels.buttonsCreate" );
 			_buttonContainer = new Container( width, 10 );
-			_buttonContainer.layout.orientation = LayoutOrientation.VERTICAL;
-			_buttonContainer.padding = 5;
+			//_buttonContainer.layout.orientation = LayoutOrientation.VERTICAL;
+			_buttonContainer.layout = new AbsoluteLayout();
+			_buttonContainer.padding = 0;
 			_buttonContainer.height = 0;
 			addElementAt( _buttonContainer, 0 );
 
 			var addButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Add" )  );
-			addButton.addEventListener(UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
-			
-			addButton.width = width - 2 * pbPadding;
+			addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
+			addButton.y = 5;			
+			addButton.x = 2;			
+			addButton.width = btnWidth;
 			_buttonContainer.addElement( addButton );
 			_buttonContainer.height += addButton.height + pbPadding;
 			
 			_deleteButton = new Button( LanguageManager.localizedStringGet( "Model_Delete" ) );
+			_deleteButton.y = 30;			
+			_deleteButton.x = 2;			
+			_deleteButton.width = width - 10;
 			_deleteButton.enabled = false;
 			_deleteButton.active = false;
-			_deleteButton.addEventListener(UIMouseEvent.CLICK, deleteModelHandler );
-			_deleteButton.width = width - 2 * pbPadding;
+			_deleteButton.eventCollector.addEvent( _deleteButton, UIMouseEvent.CLICK, deleteModelHandler );
+			_deleteButton.width = btnWidth;
 			_buttonContainer.addElement( _deleteButton );
 			_buttonContainer.height += _deleteButton.height + pbPadding;
 			
 			_detailButton = new Button( LanguageManager.localizedStringGet( "Model_Detail" ) );
+			_detailButton.y = 55;			
+			_detailButton.x = 2;			
+			_detailButton.width = width - 10;
 			_detailButton.enabled = false;
 			_detailButton.active = false;
-			_detailButton.addEventListener( UIMouseEvent.CLICK, function (event:UIMouseEvent):void { if ( _selectedModel ) { new WindowModelDetail( _selectedModel ); } } );
-			_detailButton.width = width - 2 * pbPadding;
+			_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, deleteModelHandler );
+			_detailButton.width = btnWidth;
 			_buttonContainer.addElement( _detailButton );
 			
 			function deleteModelHandler(event:UIMouseEvent):void  {

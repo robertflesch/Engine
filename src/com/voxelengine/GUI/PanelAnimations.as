@@ -32,7 +32,7 @@ package com.voxelengine.GUI
 			addElement( ha );
 			
 			_listAnimations = new ListBox(  width - pbPadding, $elementHeight, $heightParam );
-			_listAnimations.addEventListener( ListEvent.LIST_CHANGED, select );			
+			_listAnimations.eventCollector.addEvent( _listAnimations, ListEvent.LIST_CHANGED, select );			
 			addElement( _listAnimations );
 			
 			animationButtonsCreate();
@@ -41,6 +41,13 @@ package com.voxelengine.GUI
 			
 			recalc( width, height );
         }
+		
+		override public function close():void {
+			super.close();
+			_listAnimations = null;
+			_selectedAnimation = null;
+			_buttonContainer = null;
+		}
 		
 		private function rollOverHandler(e:UIMouseEvent):void 
 		{
@@ -77,19 +84,19 @@ package com.voxelengine.GUI
 			addElement( _buttonContainer );
 
 			var addButton:Button = new Button( LanguageManager.localizedStringGet( "Animation_Add" )  );
-			addButton.addEventListener(UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowAnimationDetail( null ); } );
+			addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowAnimationDetail( null ); } );
 			addButton.width = width - 2 * pbPadding;
 			_buttonContainer.addElement( addButton );
 			_buttonContainer.height += addButton.height + pbPadding;
 			
 			var deleteButton:Button = new Button( LanguageManager.localizedStringGet( "Animation_Delete" ) );
-			deleteButton.addEventListener(UIMouseEvent.CLICK, deleteAnimationHandler );
+			deleteButton.eventCollector.addEvent( deleteButton, UIMouseEvent.CLICK, deleteAnimationHandler );
 			deleteButton.width = width - 2 * pbPadding;
 			_buttonContainer.addElement( deleteButton );
 			_buttonContainer.height += deleteButton.height + pbPadding;
 			
 			var detailButton:Button = new Button( LanguageManager.localizedStringGet( "Animation_Detail" ) );
-			detailButton.addEventListener( UIMouseEvent.CLICK, animationDetailHandler );
+			detailButton.eventCollector.addEvent( detailButton, UIMouseEvent.CLICK, animationDetailHandler );
 			detailButton.width = width - 2 * pbPadding;
 			_buttonContainer.addElement( detailButton );
 			

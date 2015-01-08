@@ -67,18 +67,17 @@ public class PanelRecipe extends PanelBase
 		eventCollector.addEvent( craftButton, UIMouseEvent.CLICK, craft );
 		_panelButtons.addElement( craftButton );
 		_panelButtons.addElement( new Label( "Drag Items from Inventory", 200 ) );
-		
-		addEventListener(UIOEvent.REMOVED, onRemoved );
 	}
 	
 	override public function remove():void {
-		_craftedItem.cancel();
-		_craftedItem = null;
 		super.remove();
 	}
 	
-	private function onRemoved(e:UIOEvent):void 
+	override public function close():void 
 	{
+		//super.onRemoved(e);
+		_craftedItem.cancel();
+		_craftedItem = null;
 		_panelForumla.remove();
 		_panelBonuses.remove();
 		_panelMaterials.remove();

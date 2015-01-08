@@ -15,15 +15,16 @@ package com.voxelengine.GUI
 		protected var _parent:PanelBase;
 		protected const pbPadding:int = 5;
 		
-		public function PanelBase( $parent:PanelBase, $widthParam:Number, $heightParam:Number )
+		public function PanelBase( $parent:PanelBase, $widthParam:Number, $heightParam:Number, $borderStyle:String = BorderStyle.GROOVE )
 		{
-			super( $widthParam, $heightParam, BorderStyle.GROOVE );
+			super( $widthParam, $heightParam );
 			autoSize = true;
 			//backgroundColor = 0xCCCCCC;
 			backgroundColor = SpasUI.DEFAULT_COLOR;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			padding = pbPadding - 1;
 			_parent = $parent;
+			Log.out( "PanelBase constructed for: " + this, Log.WARN );
         }
 		
 		public function topLevelGet():PanelBase {
@@ -38,6 +39,11 @@ package com.voxelengine.GUI
 			else if ( width < $width || height < $height ) {
 				resize( $width, $height );
 			}
+		}
+		
+		// Override if additional clean up is needed
+		public function close():void {
+			Log.out( "PanelBase.close for: " + this, Log.WARN );
 		}
 	}
 }

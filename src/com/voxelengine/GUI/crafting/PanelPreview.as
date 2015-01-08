@@ -20,7 +20,6 @@ package com.voxelengine.GUI.crafting {
 		public function PanelPreview( $parent:PanelBase, $widthParam:Number, $heightParam:Number, $recipe:Recipe )
 		{
 			super( $parent, $widthParam, $heightParam );
-			addEventListener(UIOEvent.REMOVED, onRemoved );
 			
 			Globals.craftingManager.addEventListener( CraftingItemEvent.STATS_UPDATED, onStatsUpdated );	
 			
@@ -38,7 +37,7 @@ package com.voxelengine.GUI.crafting {
 			}
 		}
 		
-		private function onRemoved(e:UIOEvent):void 
+		override public function close():void 
 		{
 			Globals.craftingManager.removeEventListener( CraftingItemEvent.STATS_UPDATED, onStatsUpdated );	
 		}

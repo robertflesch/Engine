@@ -1,8 +1,6 @@
 
 package com.voxelengine.GUI
 {
-	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.events.UIRegionModelEvent;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
@@ -10,6 +8,8 @@ package com.voxelengine.GUI
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
+	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.events.UIRegionModelEvent;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	
 	// all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
@@ -30,8 +30,26 @@ package com.voxelengine.GUI
 			modelPanelAdd();
 			
 			Globals.g_app.addEventListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
-			eventCollector.addEvent(this, UIOEvent.REMOVED, onRemoved );
         }
+		
+		override public function close():void {
+			super.close();
+			Globals.g_app.removeEventListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
+			
+			_listModels.close();
+			_listModels = null;
+			
+			if ( _childPanel ) {
+				_childPanel.close();
+				_childPanel = null;
+			}
+			
+			if ( _listAnimations ) {
+				_listAnimations.close();
+				_listAnimations = null;
+			}
+			_parentModel = null;
+		}
 		
 		private function selectedModelChanged(e:UIRegionModelEvent):void 
 		{
@@ -86,18 +104,5 @@ package com.voxelengine.GUI
 				_childPanel = null;
 			}
 		}
-		
-		private function onRemoved( event:UIOEvent ):void
-		{
-			if ( _childPanel ) {
-				_childPanel.remove();
-				_childPanel = null;
-			}
-			_parentModel = null;
-			_listModels = null;
-			_listAnimations = null;
-			_childPanel = null;
-		}
-
 	}
 }
