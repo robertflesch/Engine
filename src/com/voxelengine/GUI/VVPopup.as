@@ -16,7 +16,8 @@ public class VVPopup extends Popup
 	{
 		super( title );
 		borderWidth = 20;
-		hasDisplayEffect = true;
+		
+//		hasDisplayEffect = true;
 //		displayEffectRef = ScaleIn;
 //		displayEffectDuration = 500;
 		
@@ -31,10 +32,10 @@ public class VVPopup extends Popup
 	}
 	
 	override public function remove():void {
+		super.remove();
 //		hasRemoveEffect = true;
 //		removeEffectRef = SlideOut;
 //		removeEffectDuration = 500;
-		super.remove();
 		Globals.g_app.stage.removeEventListener( Event.RESIZE, onResize );
 	}
 	
