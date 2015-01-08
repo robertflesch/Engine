@@ -72,7 +72,7 @@
 		}
 		
 		private function onLogin( $event:LoginEvent ):void {
-			Log.out( "Player.onLogin - retrive player info from Persistance", Log.DEBUG );
+			Log.out( "Player.onLogin - retrieve player info from Persistance", Log.DEBUG );
 			Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
 		}
 		
@@ -81,6 +81,7 @@
 			
 			if ( $dbo ) {
 				if ( null == $dbo.modelGuid ) {
+					// Assign the player the default avatar
 					$dbo.modelGuid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
 					
 					var userName:String = $dbo.key.substring( 6 );
@@ -88,6 +89,9 @@
 					var restOfString:String = userName.substr(1, userName.length); 
 					$dbo.userName = firstChar.toUpperCase() + restOfString.toLowerCase(); 
 					$dbo.save();
+					
+					// now assign a starting region
+					Log.out( "Player.onPlayerLoadedAction - ASSIGN STARTING REGION IF NULL", Log.WARN  );
 				}
 				var instanceInfo:InstanceInfo = new InstanceInfo();
 				instanceInfo.grainSize = 4;
