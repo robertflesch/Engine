@@ -47,7 +47,7 @@ package com.voxelengine.GUI
 			_listModels.dragEnabled = true;
 			_listModels.draggable = true;
 
-			_listModels.addEventListener( ListEvent.LIST_CHANGED, selectModel );		
+			_listModels.eventCollector.addEvent( _listModels, ListEvent.LIST_CHANGED, selectModel );		
 			
 			buttonsCreate();
 			addElement( _listModels );
@@ -131,7 +131,7 @@ package com.voxelengine.GUI
 			_detailButton.width = width - 10;
 			_detailButton.enabled = false;
 			_detailButton.active = false;
-			_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, deleteModelHandler );
+			_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new WindowModelDetail( _selectedModel ); } );
 			_detailButton.width = btnWidth;
 			_buttonContainer.addElement( _detailButton );
 			

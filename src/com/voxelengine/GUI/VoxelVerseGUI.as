@@ -326,8 +326,10 @@ package com.voxelengine.GUI
 
 		public function init():void
 		{
+			Log.out( "VoxelVerseGUI.init ENTER" );
             UIManager.initialize( Globals.g_app.stage );
-			UIManager.debugger = new FDTrace();
+			Log.out( "VoxelVerseGUI.init After - UIManager.initialize stage: " + Globals.g_app.stage );
+//			UIManager.debugger = new FDTrace();
 			Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_BEGUN, onRegionLoadingComplete );
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 			Globals.g_app.addEventListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
@@ -341,8 +343,10 @@ package com.voxelengine.GUI
 			Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
 			Globals.g_app.addEventListener(LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
 			Globals.g_app.addEventListener(RoomEvent.ROOM_JOIN_FAILURE, joinRoomFailureHandler );
+			Log.out( "VoxelVerseGUI.init handlersAdded" );
 			
 			LanguageManager.init();
+			Log.out( "VoxelVerseGUI.init exit" );
 		}
 		
 		private function addKeyboardListeners(event : Event) : void
@@ -433,7 +437,9 @@ package com.voxelengine.GUI
 					new WindowSandboxList();
 					
 				if ( Keyboard.M == e.keyCode )
-					saveModelIVM();
+					if ( Globals.selectedModel )
+						new WindowModelDetail( Globals.selectedModel );
+					//saveModelIVM();
 
 				if ( Keyboard.N == e.keyCode )
 					new WindowRegionModels();

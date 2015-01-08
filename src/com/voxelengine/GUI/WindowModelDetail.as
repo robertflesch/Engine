@@ -123,10 +123,33 @@ package com.voxelengine.GUI
 			addElement( new ComponentVector3D( "Position", "X: ", "Y: ", "Z: ",  _ii.positionGet ) );
 			addElement( new ComponentVector3D( "Rotation", "X: ", "Y: ", "Z: ",  _ii.rotationGet ) );
 			addElement( new ComponentVector3D( "Center", "X: ", "Y: ", "Z: ",  _ii.center ) );
-			addElement( new ComponentVector3D( "Scale", "X: ", "Y: ", "Z: ",  _ii.scale ) );
+			addElement( new ComponentVector3D( "Scale", "X: ", "Y: ", "Z: ",  _ii.scale, updateScaleVal ) );
+			
+//			if ( true == Globals.g_debug )
+//			{
+				var oxelUtils:Button = new Button( LanguageManager.localizedStringGet( "Oxel_Utils" ) );
+				oxelUtils.addEventListener(UIMouseEvent.CLICK, oxelUtilsHandler );
+				//oxelUtils.width = pbWidth - 2 * pbPadding;
+				addElement( oxelUtils );
+//			}
 			
 			display( 600, 20 );
         }
+		
+		static private function updateScaleVal( $e:SpinButtonEvent ):Number {
+			var ival:Number = Number( $e.target.data.text );
+			if ( "clickDown" == $e.type ) 	ival = ival/2;
+			else 							ival = ival*2;
+			$e.target.data.text = ival.toString();
+			return ival;
+		}
+		
+		
+		private function oxelUtilsHandler(event:UIMouseEvent):void  {
+
+			if ( _vm )
+				new WindowOxelUtils( _vm );
+		}
 		
 		private function closeFunction():void
 		{

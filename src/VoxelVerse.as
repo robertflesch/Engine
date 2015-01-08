@@ -117,6 +117,7 @@ package {
 			
 			addEventListener(LoadingEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
 			
+			Log.out( "VoxelVerse.init add addEventListeners" );
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
 			stage.addEventListener(MouseEvent.RIGHT_CLICK, onMouseRightClick);
@@ -124,6 +125,7 @@ package {
 			stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, mouseUpRight);
 			
 			
+			Log.out( "VoxelVerse.init b4 VoxelVerseGUI.currentInstance.init" );
 			VoxelVerseGUI.currentInstance.init();
 
 			if ( false == WindowSplash.isActive )
@@ -173,8 +175,8 @@ package {
 			if ( showConsole )
 				toggleConsole();
 				
-			if ( 5 < timeRender || 1 < timeUpdate )	
-				Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed );
+//			if ( 5 < timeRender || 1 < timeUpdate )	
+//				Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed );
 			_timePrevious = getTimer();
 		}
 		
