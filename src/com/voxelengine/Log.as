@@ -79,12 +79,12 @@ package com.voxelengine
 					break;
 				case ERROR:
 					trace( String(FATAL) + ":" + $msg );	
-					L.error( $msg );
+					//L.error( $msg );
 					writeErrorToServer( "Error", $msg, $error );
 					break;
 				case FATAL:
 					trace( String(FATAL) + ":"+ $msg );	
-					L.fatal( $msg );
+					//L.fatal( $msg );
 					writeErrorToServer( "Error", $msg, $error );
 					break;
 			}
