@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+	import com.voxelengine.worldmodel.models.Player;
 	import flash.geom.Vector3D;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
@@ -192,9 +193,9 @@ package com.voxelengine.worldmodel
 			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_REMOVED, function( me:ModelEvent ):void { ; } );
 			Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
 //			_modelManager.removeAllModelInstances( true );
+//			Globals.player = null;
 			_modelManager.removeAllModelInstances( false ); // dont delete player object.
 			_modelManager.bringOutYourDead();
-			Globals.player = null;
 		}
 		
 		private function handleRegionModified( $re:RegionEvent ):void {
@@ -393,6 +394,37 @@ package com.voxelengine.worldmodel
 			Globals.g_app.dispatchEvent( new RegionPersistanceEvent( RegionPersistanceEvent.REGION_CREATE_SUCCESS, guid ) ); 
 			Log.out( "Region.createSuccess - created: " + guid, Log.DEBUG ); 
 		}	
+		
+		static public function resetPosition():void
+		{
+			if ( Globals.controlledModel )
+			{
+				Globals.controlledModel.instanceInfo.positionSet = Globals.g_regionManager.currentRegion.playerPosition;
+				Globals.controlledModel.instanceInfo.rotationSet = Globals.g_regionManager.currentRegion.playerRotation;
+				//Globals.controlledModel.instanceInfo.positionSetComp(0,0,0);
+			}
+		}
+		
+		public function applyRegionInfoToPlayer( $avatar:Player ):void {
+			Log.out( "Region.applyRegionInfoToPlayer" );
+			if ( playerPosition )
+			{
+				//Log.out( "Player.onLoadingPlayerComplete - setting position to  - x: "  + playerPosition.x + "   y: " + playerPosition.y + "   z: " + playerPosition.z );
+				$avatar.instanceInfo.positionSetComp( playerPosition.x, playerPosition.y, playerPosition.z );
+			}
+			else
+				$avatar.instanceInfo.positionSetComp( 0, 0, 0 );
+			
+			if ( playerRotation )
+			{
+				//Log.out( "Player.onLoadingPlayerComplete - setting player rotation to  -  y: " + playerRotation );
+				$avatar.instanceInfo.rotationSet = new Vector3D( 0, playerRotation.y, 0 );
+			}
+			else
+				$avatar.instanceInfo.rotationSet = new Vector3D( 0, 0, 0 );
+		}
+		
+		
 		
 		public function createEmptyRegion():void { initJSON( BLANK_REGION_TEMPLETE ); }
 		private function GetEditorsList():String { return _editors.toString(); }
