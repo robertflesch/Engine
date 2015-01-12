@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2014 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under uinted States Copyright Act.
@@ -26,6 +26,9 @@ package com.voxelengine.worldmodel.inventory {
 		private var _createdDate:Date;
 		private var _modifiedDate:Date;
 		private var _guid:String;
+		private var _changed:Boolean;
+		private function get changed():Boolean { return _changed; }
+		private function set changed(value:Boolean):void  { _changed = value; }
 		
 		private var _items:Vector.<InventoryObject>;
 		
@@ -35,6 +38,7 @@ package com.voxelengine.worldmodel.inventory {
 				
 			return _items;
 		}
+		
 
 		
 		public function Inventory( $guid:String ) 
@@ -53,6 +57,7 @@ package com.voxelengine.worldmodel.inventory {
 			item2.guid = "Shovel";
 			item2.type = 2;
 			_items.push( item2 );
+			changed = true;
 		}
 
 		public function add( $type:int, $guid:String ):void {
@@ -60,6 +65,7 @@ package com.voxelengine.worldmodel.inventory {
 			item.type = $type;
 			item.guid = $guid;
 			items.push( item );
+			changed = true;
 		}
 
 		//////////////////////////////////////////////////////////////////
@@ -97,8 +103,8 @@ package com.voxelengine.worldmodel.inventory {
 		private function asByteArray():ByteArray {
 
 			var ba:ByteArray = new ByteArray();
-			ba.writeInt( _items.length );
-			for each ( var item:InventoryObject in _items )
+			ba.writeInt( items.length );
+			for each ( var item:InventoryObject in items )
 				item.toByteArray( ba );
 			ba.compress();	
 			return ba;	
@@ -147,7 +153,7 @@ package com.voxelengine.worldmodel.inventory {
 		}
 		
 		public function save():void {
-			if ( Globals.online ) {
+			if ( Globals.online && changed ) {
 				Log.out( "Inventory.save - Saving User Inventory", Log.WARN );
 				if ( _dbo )
 					toPersistance();
@@ -157,7 +163,7 @@ package com.voxelengine.worldmodel.inventory {
 				Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_SAVE_REQUEST, _guid, _dbo, ba ) );
 			}
 			else
-				Log.out( "Inventory.save - NOT NOT NOT Saving User Inventory", Log.WARN );
+				Log.out( "Inventory.save - NOT Saving User Inventory, either offline or NOT changed", Log.DEBUG );
 
 		}
 		
@@ -178,12 +184,13 @@ package com.voxelengine.worldmodel.inventory {
 		private function saveSucceed( $inve:InventoryPersistanceEvent ):void
 		{
 			removeSaveEvents();
+			Log.out( "Inventory.saveSucceed" );
 		}
 		
 		private function saveFailed( $inve:InventoryPersistanceEvent ):void
 		{
 			removeSaveEvents();
-			Log.out( "Inventory.saveFailed - Why did this happen?", Log.ERROR );
+			Log.out( "Inventory.saveFailed - MAY BE (error #2032)  The method SaveObjectChanges can only be called when connected to a game", Log.ERROR );
 		}
 		
 		private function createFailed( $inve:InventoryPersistanceEvent ):void
