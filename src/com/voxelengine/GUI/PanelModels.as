@@ -1,3 +1,10 @@
+/*==============================================================================
+  Copyright 2011-2015 Robert Flesch
+  All rights reserved.  This product contains computer programs, screen
+  displays and printed documentation which are original works of
+  authorship protected under United States Copyright Act.
+  Unauthorized reproduction, translation, or display is prohibited.
+==============================================================================*/
 
 package com.voxelengine.GUI
 {
@@ -106,7 +113,7 @@ package com.voxelengine.GUI
 			_buttonContainer.height = 0;
 			addElementAt( _buttonContainer, 0 );
 
-			var addButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Add" )  );
+			var addButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Add" ) + ".."  );
 			addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
 			addButton.y = 5;			
 			addButton.x = 2;			
@@ -114,7 +121,7 @@ package com.voxelengine.GUI
 			_buttonContainer.addElement( addButton );
 			_buttonContainer.height += addButton.height + pbPadding;
 			
-			_deleteButton = new Button( LanguageManager.localizedStringGet( "Model_Delete" ) );
+			_deleteButton = new Button( LanguageManager.localizedStringGet( "Model_Delete" ) + ".." );
 			_deleteButton.y = 30;			
 			_deleteButton.x = 2;			
 			_deleteButton.width = width - 10;
@@ -125,7 +132,7 @@ package com.voxelengine.GUI
 			_buttonContainer.addElement( _deleteButton );
 			_buttonContainer.height += _deleteButton.height + pbPadding;
 			
-			_detailButton = new Button( LanguageManager.localizedStringGet( "Model_Detail" ) );
+			_detailButton = new Button( LanguageManager.localizedStringGet( "Model_Detail" ) + ".." );
 			_detailButton.y = 55;			
 			_detailButton.x = 2;			
 			_detailButton.width = width - 10;
@@ -140,8 +147,9 @@ package com.voxelengine.GUI
 				{
 					// move this item to the players INVENTORY so that is it not "lost"
 					// FIXME NEED TO DISPATCH EVENT HERE
-					if ( Globals.player.inventory )
-						Globals.player.inventory.add( InventoryObject.ITEM_MODEL, _selectedModel.instanceInfo.guid );
+					var p:Player = Globals.player;
+					if ( p.inventory )
+						p.inventory.add( InventoryObject.ITEM_MODEL, _selectedModel.instanceInfo.guid );
 					Globals.markDead( _selectedModel.instanceInfo.guid );
 					populateModels( _dictionarySource, _parentModel );
 				}

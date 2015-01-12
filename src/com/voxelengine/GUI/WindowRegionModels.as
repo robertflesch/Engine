@@ -31,6 +31,8 @@ package com.voxelengine.GUI
 			
 			// TODO - Handle new models being added to system
 			Log.out( "WindowRegionModels.onParentModelAdded - NEED A HANDLER SOMEWHERE?", Log.WARN );
+			if ( _modelPanel )
+				_modelPanel.updateChildren( Globals.modelInstancesGetDictionary, null );
 		}
 		
 		override protected function onRemoved(event:UIOEvent):void 

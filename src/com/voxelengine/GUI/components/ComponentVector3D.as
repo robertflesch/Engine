@@ -15,7 +15,7 @@ import com.voxelengine.Log;
 
 public class ComponentVector3D extends Box
 {
-	public function ComponentVector3D( $title:String, $s1Label:String, $s2Label:String, $s3Label:String, $vect:Vector3D, $changeFunction:Function = null )
+	public function ComponentVector3D( $title:String, $s1Label:String, $s2Label:String, $s3Label:String, $vect:Vector3D, $changeFunction:Function = null, $decimalPlaces:int = 0 )
 	{
 		super();
 		width = 300;
@@ -30,23 +30,23 @@ public class ComponentVector3D extends Box
 		addSpinLabel( $s1Label
 					, function($e:SpinButtonEvent):void { $vect.setTo( $changeFunction($e), $vect.y, $vect.z ); }
 					, function($e:TextEvent):void       { $vect.setTo( int( $e.target.text ), $vect.y, $vect.z ); }
-					, $vect.x.toFixed(0) );
+					, $vect.x.toFixed($decimalPlaces) );
 		addSpinLabel( $s2Label
 					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $changeFunction($e), $vect.z ); }
 					, function($e:TextEvent):void       { $vect.setTo( $vect.x, int( $e.target.text ), $vect.z ); }
-					, $vect.y.toFixed(0) );
+					, $vect.y.toFixed($decimalPlaces) );
 		addSpinLabel( $s3Label
 					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $vect.y, $changeFunction($e) ); }
 					, function($e:TextEvent):void       { $vect.setTo( $vect.x, $vect.y, int( $e.target.text ) ); }
-					, $vect.z.toFixed(0) );
+					, $vect.z.toFixed($decimalPlaces) );
 					
 		layout.orientation = LayoutOrientation.VERTICAL;
 	}
 	
 	static private function updateVal( $e:SpinButtonEvent ):int {
 		var ival:int = int( $e.target.data.text );
-		if ( "clickDown" == $e.type ) 	ival--;
-		else 							ival++;
+		if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival--;
+		else 											ival++;
 		$e.target.data.text = ival.toString();
 		return ival;
 	}

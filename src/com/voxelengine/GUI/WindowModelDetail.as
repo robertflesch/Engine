@@ -41,52 +41,6 @@ package com.voxelengine.GUI
 		static public function get inExistance():int { return _s_inExistance; }
 		static public function get currentInstance():WindowModelDetail { return _s_currentInstance; }
 		
-		private function addLabel( parentPanel:Panel, label:String, changeHandler:Function, initialValue:String, inputEnabled:Boolean = false ):LabelInput
-		{
-			var li:LabelInput = new LabelInput( label, initialValue );
-			li.labelControl.width = 120;
-			if ( null != changeHandler )
-				li.editableText.addEventListener( TextEvent.EDITED, changeHandler );
-			else
-			{
-				li.editableText.editable = false;
-				li.editableText.fontColor = 0x888888;
-			}
-
-			var myWidth:int = li.width + BORDER_WIDTH_4 + BORDER_WIDTH_2;
-			var myHeight:int = li.height + BORDER_WIDTH_4;
-			var panel:Panel = new Panel( myWidth, myHeight );
-			panel.addElement( li );
-			panel.borderWidth = BORDER_WIDTH;
-			parentPanel.addElement( panel );
-			_calculatedWidth = Math.max( myWidth, _calculatedWidth );
-			
-			return li;
-		}
-		
-		private function addLabelNew( label:String, changeHandler:Function, initialValue:String, inputEnabled:Boolean = false ):LabelInput
-		{
-			var li:LabelInput = new LabelInput( label, initialValue );
-			li.labelControl.width = 120;
-			if ( null != changeHandler )
-				li.editableText.addEventListener( TextEvent.EDITED, changeHandler );
-			else
-			{
-				li.editableText.editable = false;
-				li.editableText.fontColor = 0x888888;
-			}
-
-			var myWidth:int = li.width + BORDER_WIDTH_4 + BORDER_WIDTH_2;
-			var myHeight:int = li.height + BORDER_WIDTH_4;
-			var panel:Panel = new Panel( myWidth, myHeight );
-			panel.addElement( li );
-			panel.borderWidth = BORDER_WIDTH;
-			addElement( panel );
-			_calculatedWidth = Math.max( myWidth, _calculatedWidth );
-			
-			return li;
-		}
-
 		public function WindowModelDetail( $vm:VoxelModel )
 		{
 			super( "Model Details" );
@@ -106,8 +60,14 @@ package com.voxelengine.GUI
 			shadow = true;
 			
 			addElement( new ComponentSpacer( width ) );
-			addElement( new ComponentTextInput( "Name", function ($e:TextEvent):void { _vm.metadata.name = $e.target.text; }, _vm.metadata.name, width ) );
-			addElement( new ComponentTextArea( "Desc", function ($e:TextEvent):void { _vm.metadata.description = $e.target.text; }, _vm.metadata.description ? _vm.metadata.description : "No Description", width ) );
+			addElement( new ComponentTextInput( "Name"
+			                                  , function ($e:TextEvent):void { _vm.metadata.name = $e.target.text; }
+											  , _vm.metadata.name
+											  , width ) );
+			addElement( new ComponentTextArea( "Desc"
+											 , function ($e:TextEvent):void { _vm.metadata.description = $e.target.text; }
+											 , _vm.metadata.description ? _vm.metadata.description : "No Description"
+											 , width ) );
 
 			// TODO need to be able to handle an array of scipts.
 			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { _ii.scriptName = $e.target.text; }, _ii.scriptName, width ) );
@@ -123,7 +83,7 @@ package com.voxelengine.GUI
 			addElement( new ComponentVector3D( "Position", "X: ", "Y: ", "Z: ",  _ii.positionGet ) );
 			addElement( new ComponentVector3D( "Rotation", "X: ", "Y: ", "Z: ",  _ii.rotationGet ) );
 			addElement( new ComponentVector3D( "Center", "X: ", "Y: ", "Z: ",  _ii.center ) );
-			addElement( new ComponentVector3D( "Scale", "X: ", "Y: ", "Z: ",  _ii.scale, updateScaleVal ) );
+			addElement( new ComponentVector3D( "Scale", "X: ", "Y: ", "Z: ",  _ii.scale, updateScaleVal, 5 ) );
 			
 //			if ( true == Globals.g_debug )
 //			{
@@ -138,8 +98,8 @@ package com.voxelengine.GUI
 		
 		static private function updateScaleVal( $e:SpinButtonEvent ):Number {
 			var ival:Number = Number( $e.target.data.text );
-			if ( "clickDown" == $e.type ) 	ival = ival/2;
-			else 							ival = ival*2;
+			if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival = ival/2;
+			else 											ival = ival*2;
 			$e.target.data.text = ival.toString();
 			return ival;
 		}
