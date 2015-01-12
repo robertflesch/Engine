@@ -1,18 +1,12 @@
-﻿package com.voxelengine.worldmodel.models
+﻿/*==============================================================================
+  Copyright 2011-2015 Robert Flesch
+  All rights reserved.  This product contains computer programs, screen
+  displays and printed documentation which are original works of
+  authorship protected under United States Copyright Act.
+  Unauthorized reproduction, translation, or display is prohibited.
+==============================================================================*/
+package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.events.GUIEvent;
-	import com.voxelengine.events.LoginEvent;
-	import com.voxelengine.renderer.lamps.*;
-	import com.voxelengine.server.Persistance;
-	import com.voxelengine.worldmodel.inventory.Inventory;
-	import com.voxelengine.worldmodel.weapons.Gun;
-	import com.voxelengine.worldmodel.weapons.Bomb;
-	
-	import com.voxelengine.renderer.lamps.ShaderLight;
-	import com.voxelengine.renderer.shaders.Shader;
-	import com.voxelengine.worldmodel.models.*;
-	import com.voxelengine.worldmodel.MouseKeyboardHandler;
-	import com.voxelengine.worldmodel.oxel.Oxel;
 	import flash.display3D.Context3D;
 	import flash.events.KeyboardEvent;
 	import flash.geom.Matrix3D;
@@ -21,16 +15,29 @@
 	
 	import playerio.PlayerIOError;
 	
-	import com.voxelengine.events.ModelEvent;
-	
-	import com.voxelengine.events.LoadingEvent;
-	import com.voxelengine.events.RegionEvent;
-	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-
-	import com.voxelengine.pools.GrainCursorPool;
 	
+	import com.voxelengine.events.GUIEvent;
+	import com.voxelengine.events.LoginEvent;
+	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.events.RegionEvent;
+	
+	import com.voxelengine.renderer.lamps.ShaderLight;
+	import com.voxelengine.renderer.shaders.Shader;
+	import com.voxelengine.renderer.lamps.*;
+	import com.voxelengine.server.Persistance;
+	
+	import com.voxelengine.worldmodel.inventory.Inventory;
+	import com.voxelengine.worldmodel.models.*;
+	import com.voxelengine.worldmodel.MouseKeyboardHandler;
+	import com.voxelengine.worldmodel.oxel.Oxel;
+	import com.voxelengine.worldmodel.Region;
+	import com.voxelengine.worldmodel.weapons.Gun;
+	import com.voxelengine.worldmodel.weapons.Bomb;
+	
+
     public class Player extends ControllableVoxelModel
     {
 		//static private const 	HIPWIDTH:Number 			= (Globals.UNITS_PER_METER * 3)/8;
@@ -54,15 +61,17 @@
 			clipVelocityFactor = AVATAR_CLIP_FACTOR;
 			//metadata.modify = false;
 			
+			Globals.g_app.addEventListener( LoginEvent.LOGIN_SUCCESS, onLogin );
+			
 			Globals.g_app.addEventListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
+			Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 			
 			Globals.g_app.addEventListener( LoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
 			Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			
 			Globals.g_app.addEventListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
-			Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
-			Globals.g_app.addEventListener( LoginEvent.LOGIN_SUCCESS, onLogin );
+			Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, onRegionLoad );
 			
 			takeControl( null );
 			
@@ -75,6 +84,7 @@
 			Log.out( "Player.onLogin - retrieve player info from Persistance", Log.DEBUG );
 			Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
 		}
+		
 		
 		import playerio.DatabaseObject;
 		private function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
@@ -97,9 +107,6 @@
 				instanceInfo.grainSize = 4;
 				instanceInfo.guid = $dbo.modelGuid;
 				ModelLoader.load( instanceInfo );
-				
-				_inventory = new Inventory( $dbo.key );
-				_inventory.load();
 			}
 			else {
 				Log.out( "Player.onPlayerLoadedAction - ERROR, failed to create new record for ?" );
@@ -108,15 +115,12 @@
 		
 		private function onPlayerLoadError(error:PlayerIOError):void {
 			Log.out("ModelManager.onPlayerLoadError", Log.ERROR, error );
-		}
-		
-		
+		}			
 		
 		override public function release():void {
 			//Log.out( "Player.release --------------------------------------------------------------------------------------------------------------------" );
 			super.release();
 		}
-
 		
 		override protected function onChildAdded( me:ModelEvent ):void
 		{
@@ -139,8 +143,6 @@ Log.out( "Player.onChildAdded - Player has GUN" )
 Log.out( "Player.onChildAdded - Player has BOMP" )
 				//_bombs.push( vm );
 		}
-		
-		
 		
 		private var _torchIndex:int;
 		public function torchToggle():void 
@@ -306,7 +308,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		}
 
 		override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
-			//Log.out( "Player.takeControl --------------------------------------------------------------------------------------------------------------------" );
+			Log.out( "Player.takeControl --------------------------------------------------------------------------------------------------------------------" );
 			super.takeControl( $modelLosingControl, false );
 			instanceInfo.usesCollision = true;
 			// We need to grab the rotation of the old parent, otherwise we get rotated back to 0 since last rotation is 0
@@ -350,41 +352,38 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 			lastCollisionModelReset();
 		}
 		
+		private function onRegionLoad( $re:RegionEvent ):void {
+			//var region:Region = Globals.g_regionManager.currentRegion;
+			//var regionGuid:String = $re.guid;
+			Globals.modelAdd( this );
+			Globals.g_regionManager.currentRegion.applyRegionInfoToPlayer( this );
+		}
+		
+		
 		private function onLoadingPlayerComplete( le:LoadingEvent ):void {
 			//Log.out( "Player.onLoadingPlayerComplete - PLAYER LOADED =============================================" );
 			calculateCenter();
+			if ( Globals.player )
+				Globals.player.loseControl( null );
 			Globals.player = this;
-			Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
-			
-			var region:Region = Globals.g_regionManager.currentRegion;
-			if ( region.playerPosition )
-			{
-				//Log.out( "Player.onLoadingPlayerComplete - setting position to  - x: "  + region.playerPosition.x + "   y: " + region.playerPosition.y + "   z: " + region.playerPosition.z );
-				instanceInfo.positionSetComp( region.playerPosition.x, region.playerPosition.y, region.playerPosition.z );
-			}
-			else
-				instanceInfo.positionSetComp( 0, 0, 0 );
-			
-			if ( region.playerRotation )
-			{
-				//Log.out( "Player.onLoadingPlayerComplete - setting player rotation to  -  y: " + region.playerRotation );
-				instanceInfo.rotationSet = new Vector3D( 0, region.playerRotation.y, 0 );
-			}
-			else
-				instanceInfo.rotationSet = new Vector3D( 0, 0, 0 );
+			Globals.player.takeControl( null );
+			//Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
+			_inventory = new Inventory( instanceInfo.guid );
+			_inventory.load();
+			MouseKeyboardHandler.addInputListeners();
+			collisionPointsAdd();
 		}
 
 		private function onLoadingComplete( le:LoadingEvent ):void {
 			//Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_LOADED, onLoadingComplete );
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
-			if ( !Globals.g_regionManager.currentRegion.criticalModelDetected )
-			{
-				//Log.out( "Player.onLoadingComplete - no critical model" );
-				collisionPointsAdd();
-				MouseKeyboardHandler.addInputListeners();
-				gravityOn()
-				
-			}
+			//if ( !Globals.g_regionManager.currentRegion.criticalModelDetected )
+			//{
+				////Log.out( "Player.onLoadingComplete - no critical model" );
+				//collisionPointsAdd();
+				//MouseKeyboardHandler.addInputListeners();
+				//gravityOn()
+			//}
 		}
 		
 		private function onCriticalModelLoaded( le:ModelEvent ):void {
