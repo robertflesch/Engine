@@ -11,9 +11,9 @@ package com.voxelengine.worldmodel.models
 	import flash.events.KeyboardEvent;
 	import flash.geom.Matrix3D;
     import flash.geom.Vector3D;
-	import flash.net.SharedObject;
 	
 	import playerio.PlayerIOError;
+	import playerio.DatabaseObject;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
@@ -36,9 +36,8 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.weapons.Gun;
 	import com.voxelengine.worldmodel.weapons.Bomb;
-	
 
-    public class Player extends ControllableVoxelModel
+    public class Player extends Avatar
     {
 		//static private const 	HIPWIDTH:Number 			= (Globals.UNITS_PER_METER * 3)/8;
 		static private const 	FALL:String					= "FALL";
@@ -52,6 +51,19 @@ package com.voxelengine.worldmodel.models
 		
 		private var _inventory:Inventory;
 		public function get inventory():Inventory { return _inventory; }
+		private function inventoryLoad():void {
+			if ( null != _inventory )
+				Log.out( "Player.inventoryLoad - Player already has an inventory", Log.WARN );
+				
+			_inventory = new Inventory( instanceInfo.guid );
+			_inventory.load();
+		}
+		private function inventorySave():void { _inventory.save(); }
+		private function inventoryAdd( $type:int, $item:* ):void {
+			_inventory.add( $type, $item );
+			inventorySave();
+		}
+		
 		
 		public function Player( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
 			//Log.out( "Player.contruct --------------------------------------------------------------------------------------------------------------------" );
@@ -86,7 +98,6 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		
-		import playerio.DatabaseObject;
 		private function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
 			
 			if ( $dbo ) {
@@ -194,22 +205,6 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 			Shader.lightsClear();
 		}
 		*/
-		
-		private function inventorySave():void
-		{
-			_inventory.save();
-		}
-		
-		private function inventoryAdd( $type:int, $item:* ):void
-		{
-/*			var io:InventoryObjects = new InventoryObjects();
-			io.item = $item;
-			io.type = $type
-			
-			_inventory.push( io );
-			
-			inventorySave();*/
-		}
 		
 		override public function collisionTest( $elapsedTimeMS:Number ):Boolean {
 			
@@ -347,15 +342,15 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		}
 		
 		private function onRegionUnload( le:RegionEvent ):void {
-			instanceInfo.controllingModel = null;
-			usesGravity = false;
+			//instanceInfo.controllingModel = null;
+			//usesGravity = false;
 			lastCollisionModelReset();
 		}
 		
 		private function onRegionLoad( $re:RegionEvent ):void {
-			//var region:Region = Globals.g_regionManager.currentRegion;
-			//var regionGuid:String = $re.guid;
+			// add the player to this regions model list.
 			Globals.modelAdd( this );
+			// apply this regions location, position, etc setting to the player
 			Globals.g_regionManager.currentRegion.applyRegionInfoToPlayer( this );
 		}
 		
@@ -368,15 +363,14 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 			Globals.player = this;
 			Globals.player.takeControl( null );
 			//Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
-			_inventory = new Inventory( instanceInfo.guid );
-			_inventory.load();
+			inventoryLoad();
 			MouseKeyboardHandler.addInputListeners();
 			collisionPointsAdd();
 		}
 
 		private function onLoadingComplete( le:LoadingEvent ):void {
 			//Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_LOADED, onLoadingComplete );
-			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+			//Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			//if ( !Globals.g_regionManager.currentRegion.criticalModelDetected )
 			//{
 				////Log.out( "Player.onLoadingComplete - no critical model" );
