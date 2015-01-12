@@ -27,7 +27,7 @@
 			//Network.client = $client
 			//Set developmentsever (Comment out to connect to your server online)
 			//trace( "joinRoom: " + Network.client.multiplayer.developmentServer );
-			Network.client.multiplayer.developmentServer = "localhost:8184";
+			//Network.client.multiplayer.developmentServer = "localhost:8184";
 			//trace( "joinRoom: " + Network.client.multiplayer.developmentServer );
 			
 			// Save the region id for when we need to load the region.
