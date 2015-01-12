@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models
 {
 	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.worldmodel.Region;
 	import flash.geom.Vector3D;
 	import flash.geom.Matrix3D;
 	//import org.flintparticles.threeD.initializers.Rotation;
@@ -487,18 +488,8 @@ package com.voxelengine.worldmodel.models
 		
 		public function reset():void
 		{
-			resetPosition();
+			Region.resetPosition();
 			resetCamera();
-		}
-		
-		static private function resetPosition():void
-		{
-			if ( Globals.controlledModel )
-			{
-				Globals.controlledModel.instanceInfo.positionSet = Globals.g_regionManager.currentRegion.playerPosition;
-				Globals.controlledModel.instanceInfo.rotationSet = Globals.g_regionManager.currentRegion.playerRotation;
-				//Globals.controlledModel.instanceInfo.positionSetComp(0,0,0);
-			}
 		}
 		
 		static private function resetCamera():void
