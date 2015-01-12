@@ -177,18 +177,22 @@
 			{
 				// This is ME!
 				Log.out("EventHandler.userJoinedMessage - Recieved message that I logged on " + $userid, Log.DEBUG );	
-				if ( !Globals.player )
-					if ( false == Globals.createPlayer() )
-						Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
+				if ( !Globals.player ) {
+					Log.out("EventHandler.userJoinedMessage - NO player object creating new one " + $userid, Log.DEBUG );	
+					Globals.createPlayer();
+				}
+						//Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
+					//if ( false == Globals.createPlayer() )
+						//Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
 				else	
 					Log.out("EventHandler.userJoinedMessage - MY GHOST IS ALREADY ON!!!" + $userid, Log.DEBUG );	
 			}
 		}
 		
-		static private function createPlayerAfterRegionLoad( $e:RegionEvent ):void {
-			Globals.g_app.removeEventListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
-			Globals.createPlayer();
-		}
+		//static private function createPlayerAfterRegionLoad( $e:RegionEvent ):void {
+			//Globals.g_app.removeEventListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
+			//Globals.createPlayer();
+		//}
 				
 		static private function handleMoveMessage(m:Message):void
 		{

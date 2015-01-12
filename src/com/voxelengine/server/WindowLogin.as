@@ -183,7 +183,7 @@ package com.voxelengine.server
 			_emailInput.glow = false;
 			_passwordInput.glow = false;
 			addLoginEventHandlers();
-			Log.out("WindowLogin.loginButtonHandler - Trying to establish connection to server", Log.WARN );
+			Log.out("WindowLogin.loginButtonHandler - Trying to establish connection to server", Log.DEBUG );
 			Network.login( _emailInput.label, _passwordInput.label );
 		}
 		

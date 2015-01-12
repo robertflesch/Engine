@@ -76,7 +76,7 @@ package com.voxelengine.server
 			
 			function connectSuccess( $client:Client):void
 			{
-				Log.out("Network.login - connection to server established", Log.WARN );
+				Log.out("Network.login - connection to server established", Log.DEBUG );
 				Network.userId = $client.connectUserId;
 				Network.client = $client
 				Globals.online = true;
