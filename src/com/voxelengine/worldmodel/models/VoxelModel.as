@@ -1,5 +1,5 @@
 /*==============================================================================
-   Copyright 2011-2013 Robert Flesch
+   Copyright 2011-2015 Robert Flesch
    All rights reserved.  This product contains computer programs, screen
    displays and printed documentation which are original works of
    authorship protected under United States Copyright Act.
@@ -881,8 +881,8 @@ package com.voxelengine.worldmodel.models
 					return cvm;
 			}
 			
-			return null
 			Log.out(  "VoxelModel.childFind - not found for guid: " + guid, Log.WARN );
+			return null
 		}
 		
 		public function childFindByName($name:String):VoxelModel
@@ -1533,8 +1533,13 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.RELEASE_CONTROL called on: "
 					//if ( $me.instanceGuid
 				
 			}
-			else if ( ModelEvent.MODEL_MODIFIED && $me.instanceGuid == instanceInfo.guid ) {
-				changed = true;
+			else if ( ModelEvent.MODEL_MODIFIED ) {
+Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on instance: " + $me.instanceGuid + "  my guid: " + instanceInfo.guid, Log.DEBUG );								
+//				$me.instanceGuid
+				if ( $me.instanceGuid == instanceInfo.guid ) 
+					changed = true;
+				else if ( childModelFind( $me.instanceGuid ) )
+					changed = true;
 			}
 		}
 		
