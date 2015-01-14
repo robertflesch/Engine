@@ -133,8 +133,7 @@ package com.voxelengine.worldmodel.models
 			super.release();
 		}
 		
-		override protected function onChildAdded( me:ModelEvent ):void
-		{
+		override protected function onChildAdded( me:ModelEvent ):void	{
 			if ( me.parentInstanceGuid != instanceInfo.guid )
 				return;
 				
@@ -156,8 +155,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		}
 		
 		private var _torchIndex:int;
-		public function torchToggle():void 
-		{
+		public function torchToggle():void {
 			Shader.lightsClear();
 			var sl:ShaderLight;
 			switch( _torchIndex ) {
@@ -313,8 +311,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 			Globals.g_app.dispatchEvent(new GUIEvent(GUIEvent.TOOLBAR_SHOW));
 		}
 
-		override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void
-		{
+		override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
 			Log.out( "Player.loseControl--------------------------------------------------------------------------------------------------------------------" );
 			super.loseControl( $modelDetaching, false );
 			instanceInfo.usesCollision = false;
