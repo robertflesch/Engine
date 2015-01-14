@@ -22,6 +22,9 @@ package com.voxelengine.GUI
 		private var _listAnimations:			ListBox;
 		private var _selectedAnimation:			Animation;
 		private var _buttonContainer:			Container;
+		private var _addButton:					Button;
+		private var _deleteButton:				Button;
+		private var _detailButton:				Button;
 		
 		public function PanelAnimations( $parent:PanelModelAnimations, $widthParam:Number, $elementHeight:Number, $heightParam:Number )
 		{
@@ -83,22 +86,26 @@ package com.voxelengine.GUI
 			
 			addElement( _buttonContainer );
 
-			var addButton:Button = new Button( LanguageManager.localizedStringGet( "Animation_Add" )  );
-			addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowAnimationDetail( null ); } );
-			addButton.width = width - 2 * pbPadding;
-			_buttonContainer.addElement( addButton );
-			_buttonContainer.height += addButton.height + pbPadding;
+			_addButton = new Button( LanguageManager.localizedStringGet( "Animation_Add" )  );
+			_addButton.eventCollector.addEvent( _addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowAnimationDetail( null ); } );
+			_addButton.width = width - 2 * pbPadding;
+			_buttonContainer.addElement( _addButton );
+			_buttonContainer.height += _addButton.height + pbPadding;
 			
-			var deleteButton:Button = new Button( LanguageManager.localizedStringGet( "Animation_Delete" ) );
-			deleteButton.eventCollector.addEvent( deleteButton, UIMouseEvent.CLICK, deleteAnimationHandler );
-			deleteButton.width = width - 2 * pbPadding;
-			_buttonContainer.addElement( deleteButton );
-			_buttonContainer.height += deleteButton.height + pbPadding;
+			_deleteButton = new Button( LanguageManager.localizedStringGet( "Animation_Delete" ) );
+			_deleteButton.eventCollector.addEvent( _deleteButton, UIMouseEvent.CLICK, deleteAnimationHandler );
+			_deleteButton.enabled = false;
+			_deleteButton.active = false;
+			_deleteButton.width = width - 2 * pbPadding;
+			_buttonContainer.addElement( _deleteButton );
+			_buttonContainer.height += _deleteButton.height + pbPadding;
 			
-			var detailButton:Button = new Button( LanguageManager.localizedStringGet( "Animation_Detail" ) );
-			detailButton.eventCollector.addEvent( detailButton, UIMouseEvent.CLICK, animationDetailHandler );
-			detailButton.width = width - 2 * pbPadding;
-			_buttonContainer.addElement( detailButton );
+			_detailButton = new Button( LanguageManager.localizedStringGet( "Animation_Detail" ) );
+			_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, animationDetailHandler );
+			_detailButton.enabled = false;
+			_detailButton.active = false;
+			_detailButton.width = width - 2 * pbPadding;
+			_buttonContainer.addElement( _detailButton );
 			
 			function deleteAnimationHandler(event:UIMouseEvent):void  {
 				if ( _selectedAnimation )
@@ -114,7 +121,21 @@ package com.voxelengine.GUI
 		private function select(event:ListEvent):void 
 		{
 			_selectedAnimation = event.target.data;
+			if ( _selectedAnimation )
+			{
+				_detailButton.enabled = true;
+				_detailButton.active = true;
+				_deleteButton.enabled = true;
+				_deleteButton.active = true;
+			}
+			else {
+				_detailButton.enabled = false;
+				_detailButton.active = false;
+				_deleteButton.enabled = false;
+				_deleteButton.active = false;
+			}
 		}
+		
 		
 		private function animationDetailHandler(event:UIMouseEvent):void 
 		{ 

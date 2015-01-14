@@ -12,7 +12,7 @@ package com.voxelengine.worldmodel.inventory {
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
-	import com.voxelengine.events.InventoryEvent;
+	import com.voxelengine.events.InventoryModelEvent;
 	import com.voxelengine.events.InventoryPersistanceEvent;
 	import com.voxelengine.server.Persistance;
 
@@ -49,11 +49,11 @@ package com.voxelengine.worldmodel.inventory {
 		private function generateNewInventory():void {
 			_generateNewInventory = true;
 			_items = new Vector.<InventoryObject>();
-			var item1:InventoryObject = new InventoryObject();
+			var item1:InventoryModel = new InventoryModel();
 			item1.guid = "Pick";
 			item1.type = 1;
 			_items.push( item1 );
-			var item2:InventoryObject = new InventoryObject();
+			var item2:InventoryModel = new InventoryModel();
 			item2.guid = "Shovel";
 			item2.type = 2;
 			_items.push( item2 );
@@ -61,7 +61,7 @@ package com.voxelengine.worldmodel.inventory {
 		}
 
 		public function add( $type:int, $guid:String ):void {
-			var item:InventoryObject = new InventoryObject();
+			var item:InventoryModel = new InventoryModel();
 			item.type = $type;
 			item.guid = $guid;
 			items.push( item );

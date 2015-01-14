@@ -422,6 +422,8 @@ package com.voxelengine.worldmodel
 			}
 			else
 				$avatar.instanceInfo.rotationSet = new Vector3D( 0, 0, 0 );
+				
+			$avatar.usesGravity = gravity;
 		}
 		
 		

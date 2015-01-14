@@ -32,16 +32,6 @@ package com.voxelengine.worldmodel.inventory {
 			}
 		}
 		
-		public function get guid():String 
-		{
-			return _guid;
-		}
-		
-		public function set guid(value:String):void 
-		{
-			_guid = value;
-		}
-		
 		public function get type():int 
 		{
 			return _type;

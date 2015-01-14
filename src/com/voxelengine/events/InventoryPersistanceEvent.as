@@ -11,7 +11,6 @@ package com.voxelengine.events
 	import flash.utils.ByteArray;
 	import playerio.DatabaseObject;
 	
-	import com.voxelengine.worldmodel.inventory.Inventory;
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF 

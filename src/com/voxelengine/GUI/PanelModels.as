@@ -9,8 +9,11 @@
 package com.voxelengine.GUI
 {
 //	import com.voxelengine.worldmodel.animation.Animation;
+	import com.voxelengine.events.InventoryModelEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.UIRegionModelEvent;
+	import com.voxelengine.worldmodel.inventory.InventoryManager;
+	import com.voxelengine.worldmodel.inventory.Inventory;
 	import com.voxelengine.worldmodel.inventory.InventoryObject;
 	import com.voxelengine.worldmodel.models.Player;
 	import org.flashapi.swing.layout.AbsoluteLayout;
@@ -90,7 +93,7 @@ package com.voxelengine.GUI
 						if ( vm is Player )
 							continue;
 					}
-					var itemName:String = "" == vm.metadata.name ? "No Name(Player)" : vm.metadata.name;
+					var itemName:String = "" == vm.metadata.name ? vm.modelInfo.fileName : vm.metadata.name;
 					//Log.out( "PanelModels.populateModels - adding: " + itemName );
 					
 					_listModels.addItem( itemName, vm );
@@ -146,10 +149,8 @@ package com.voxelengine.GUI
 				if ( _selectedModel )
 				{
 					// move this item to the players INVENTORY so that is it not "lost"
-					// FIXME NEED TO DISPATCH EVENT HERE
-					var p:Player = Globals.player;
-					if ( p.inventory )
-						p.inventory.add( InventoryObject.ITEM_MODEL, _selectedModel.instanceInfo.guid );
+					Globals.inventoryManager.dispatchEvent( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_ADD, _selectedModel.instanceInfo.guid ) );
+
 					Globals.markDead( _selectedModel.instanceInfo.guid );
 					populateModels( _dictionarySource, _parentModel );
 				}

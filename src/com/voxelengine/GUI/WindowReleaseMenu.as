@@ -42,7 +42,7 @@ package com.voxelengine.GUI
 //			dtf.setDateTimePattern( "yyyy-MM-dd" );
 //			trace(dtf.format(d)); 
 
-			var name:Label = new Label( "VoxelVerse 2014.9.24 - 12.05" );
+			var name:Label = new Label( "VoxelVerse 2015.1.12 - 3:47" );
 			name.fontSize = 14;
 			name.fontColor = 0xffffff;
 			addElement( name );
@@ -109,9 +109,9 @@ package com.voxelengine.GUI
 			if ( Globals.controlledModel )
 			{
 				var loc:Vector3D = Globals.controlledModel.instanceInfo.positionGet;
-				_locLabel.text = "x: " + int( loc.x ) + "  y: " + int( loc.y ) + "  z: " + int( loc.z ); 
+				_locLabel.text = "Loc x: " + int( loc.x ) + "  y: " + int( loc.y ) + "  z: " + int( loc.z ); 
 				var rot:Vector3D = Globals.controlledModel.instanceInfo.rotationGet;
-				_rotLabel.text = "x: " + int( rot.x ) + "  y: " + int( rot.y ) + "  z: " + int( rot.z ); 
+				_rotLabel.text = "Rot x: " + int( rot.x ) + "  y: " + int( rot.y ) + "  z: " + int( rot.z ); 
 			}
 		}
 		
