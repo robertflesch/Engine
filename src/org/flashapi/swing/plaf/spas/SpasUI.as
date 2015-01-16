@@ -79,8 +79,8 @@ package org.flashapi.swing.plaf.spas {
 		 * 	color defined by the default SPAS 3.0 color module (SVGCK).
 		 */
 		// http://www.google.com/design/spec/style/color.html
-		//public static const DEFAULT_COLOR:uint = 0xC0C0C0;
-		public static const DEFAULT_COLOR:uint = 0xE1F5FE;
+		public static const DEFAULT_COLOR:uint = 0xC0C0C0;
+//		public static const DEFAULT_COLOR:uint = 0xE1F5FE;
 		public static const DEFAULT_BUTTON_COLOR:uint = 0x0277BD;
 		public static const DEFAULT_CLOSE_BUTTON_COLOR:uint = 0xF44336;
 		
@@ -120,6 +120,9 @@ package org.flashapi.swing.plaf.spas {
 		//public static const DEFAULT_BUTTON_FONT_COLOR:uint = 0xFFFFFF;
 		public static const DEFAULT_BUTTON_FONT_COLOR:uint = 0x000000;
 		
+		public static const DISABLED_BUTTON_FONT_COLOR:uint = 0xBDB9aa;
+		public static const UP_BUTTON_FONT_COLOR:uint = 0x9B9788;
+
 		/**
 		 *  A constant string that defines the default color color value.
 		 */
