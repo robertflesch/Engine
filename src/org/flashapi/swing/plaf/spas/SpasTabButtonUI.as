@@ -97,60 +97,65 @@ package org.flashapi.swing.plaf.spas {
 		 * 	@inheritDoc
 		 */
 		public function drawOutState():void {
-			var bntColor:uint = (dto.colors.up != StateObjectValue.NONE) ?
-				dto.colors.up : dto.color;
-			var lineColor1:uint = 0x888888;//0x969696
-			var lineColor2:int = 0x505050;//0x505050
-			if (dto.fontColors.up != StateObjectValue.NONE) {
-				lineColor1 = dto.fontColors.up;
-				lineColor2 = -1;
-			}
-			drawButtonShape(bntColor, lineColor1, lineColor2);
+			//var bntColor:uint = (dto.colors.up != StateObjectValue.NONE) ?
+				//dto.colors.up : dto.color;
+			//var $lineColor1:uint = 0x888888;//0x969696
+			//var $lineColor2:int = 0x505050;//0x505050
+			//if (dto.fontColors.up != StateObjectValue.NONE) {
+				//$lineColor1 = dto.fontColors.up;
+				//$lineColor2 = -1;
+			//}
+			//drawButtonShape(bntColor, $lineColor1, $lineColor2);
+			drawButtonShapeMD( dto.color, false );
 		}
 		
 		/**
 		 *  @inheritDoc 
 		 */
 		public function drawOverState():void {
-			var bntColor:uint = (dto.colors.over != StateObjectValue.NONE) ?
-				dto.colors.over : new RGB(dto.color).brighter();
-			var lineColor:uint = (dto.fontColors.over != StateObjectValue.NONE) ?
-				dto.fontColors.over : 0x505050;
-			drawButtonShape(bntColor, lineColor);
+			//var bntColor:uint = (dto.colors.over != StateObjectValue.NONE) ?
+				//dto.colors.over : new RGB(dto.color).brighter();
+			//var lineColor:uint = (dto.fontColors.over != StateObjectValue.NONE) ?
+				//dto.fontColors.over : 0x505050;
+			//drawButtonShape(bntColor, lineColor);
+			drawButtonShapeMD( dto.color, false );
 		}
 		
 		/**
 		 *  @inheritDoc 
 		 */
 		public function drawPressedState():void {
-			var bntColor:uint = (dto.colors.down != StateObjectValue.NONE) ?
-				dto.colors.down : new RGB(dto.color).darker();
-			var lineColor:uint = (dto.fontColors.down != StateObjectValue.NONE) ?
-				dto.fontColors.down : 0x505050;
-			drawButtonShape(bntColor, lineColor);
+			//var bntColor:uint = (dto.colors.down != StateObjectValue.NONE) ?
+				//dto.colors.down : new RGB(dto.color).darker();
+			//var lineColor:uint = (dto.fontColors.down != StateObjectValue.NONE) ?
+				//dto.fontColors.down : 0x505050;
+			//drawButtonShape(bntColor, lineColor);
+			drawButtonShapeMD( dto.color, false );
 		}
 		
 		/**
 		 *  @inheritDoc 
 		 */
 		public function drawSelectedState():void {
-			var bntColor:uint = (dto.colors.selected != StateObjectValue.NONE) ?
-				dto.colors.selected : 0xFFFFFF;
-			//var c:RGB = new RGB(bntColor);
-			var lineColor:uint = (dto.fontColors.selected != StateObjectValue.NONE) ?
-				dto.fontColors.selected : DEFAULT_FONT_COLOR;
-			drawButtonShape(bntColor, lineColor, -1);
+			//var bntColor:uint = (dto.colors.selected != StateObjectValue.NONE) ?
+				//dto.colors.selected : 0xFFFFFF;
+			////var c:RGB = new RGB(bntColor);
+			//var lineColor:uint = (dto.fontColors.selected != StateObjectValue.NONE) ?
+				//dto.fontColors.selected : DEFAULT_FONT_COLOR;
+			//drawButtonShape(bntColor, lineColor, -1, true );
+			drawButtonShapeMD( dto.color, true );
 		}
 		
 		/**
 		 *  @inheritDoc 
 		 */
 		public function drawInactiveState():void {
-			var bntColor:uint = (dto.colors.disabled != StateObjectValue.NONE) ?
-				dto.colors.disabled : 0x999999;
-			var lineColor:uint = (dto.fontColors.disabled != StateObjectValue.NONE) ?
-				dto.fontColors.disabled : 0xcccccc;
-			drawButtonShape(lineColor, bntColor, bntColor);
+			//var bntColor:uint = (dto.colors.disabled != StateObjectValue.NONE) ?
+				//dto.colors.disabled : 0x999999;
+			//var lineColor:uint = (dto.fontColors.disabled != StateObjectValue.NONE) ?
+				//dto.fontColors.disabled : 0xcccccc;
+			//drawButtonShape(lineColor, bntColor, bntColor);
+			drawButtonShapeMD( dto.color, false );
 		}
 		
 		/**
@@ -183,7 +188,7 @@ package org.flashapi.swing.plaf.spas {
 		 *  @inheritDoc
 		 */
 		public function getUpFontFormat():FontFormat {
-			return _fontFormat;
+			return _upFontFormat;
 		}
 		
 		/**
@@ -211,7 +216,7 @@ package org.flashapi.swing.plaf.spas {
 		 *  @inheritDoc 
 		 */
 		public function getDisabledFontFormat():FontFormat {
-			return _fontFormat;
+			return _disabledFontFormat;
 		}
 		
 		/**
@@ -269,6 +274,10 @@ package org.flashapi.swing.plaf.spas {
 		//
 		//--------------------------------------------------------------------------
 		
+		private var _upFontFormat:FontFormat =
+			new FontFormat(DEFAULT_FONT_FACE, DEFAULT_FONT_SIZE, UP_BUTTON_FONT_COLOR, true);
+		private var _disabledFontFormat:FontFormat =
+			new FontFormat(DEFAULT_FONT_FACE, DEFAULT_FONT_SIZE, DISABLED_BUTTON_FONT_COLOR, true);
 		private var _fontFormat:FontFormat =
 			new FontFormat(DEFAULT_FONT_FACE, DEFAULT_FONT_SIZE, DEFAULT_BUTTON_FONT_COLOR, true);
 		private var _selectedFontFormat:FontFormat =
@@ -282,36 +291,52 @@ package org.flashapi.swing.plaf.spas {
 		//
 		//--------------------------------------------------------------------------
 		
-		private function drawButtonShape(buttonColor:uint, lineColor1:uint, lineColor2:int = -1):void {
+		private function drawButtonShapeMD( $buttonColor:uint, $selected:Boolean = false ):void {
+			var f:Figure = Figure.setFigure( dto.currentTarget );
+			f.clear();
+			f.beginFill( $buttonColor );
+			var w:Number = dto.width;
+			var h:Number = dto.height;
+			f.drawRectangle( 0, 0, w, h );
+			f.endFill();
+			if ( $selected ) {
+				f.beginFill( 0xff0000 );
+				f.drawRectangle( 0, (9*h)/10, w, h );
+				f.endFill();
+			}
+		}
+		
+		private function drawButtonShapeOld($buttonColor:uint, $lineColor1:uint, $lineColor2:int = -1):void {
 			var w:Number = dto.width;
 			var h:Number = dto.height;
 			var tgt:Sprite = dto.currentTarget;
 			var bch:Number = _BUTTON_CURVE_HEIGHT;
 			var f:Figure = Figure.setFigure(tgt);
 			var middle:Number = h/2;
-			var color2:RGB = new RGB(buttonColor);
+			var color2:RGB = new RGB($buttonColor);
 			f.clear();
 			var bw:Number = dto.borderWidth;
 			var m:Matrix = MatrixUtil.getMatrix(w, h);
-			if (lineColor2 == -1) f.lineStyle(bw, lineColor1, 1, true);
+			if ($lineColor2 == -1) f.lineStyle(bw, $lineColor1, 1, true);
 			else {
-				f.lineStyle(bw, lineColor1, 1, true);
-				f.lineGradientStyle(GradientType.LINEAR, [lineColor1, lineColor2], [1, 1], [0, 250], m);
+				f.lineStyle(bw, $lineColor1, 1, true);
+				f.lineGradientStyle(GradientType.LINEAR, [$lineColor1, $lineColor2], [1, 1], [0, 250], m);
 			}
 			var state:String = dto.state;
 			var c2:uint = state == ButtonState.SELECTED ? 0xCCCCCC : color2.darker();
-			f.beginGradientFill("linear", [c2, buttonColor], [1, 1], [0, 250], m);
+			f.beginGradientFill("linear", [c2, $buttonColor], [1, 1], [0, 250], m);
 			var cu:LafDTOCornerUtil = new LafDTOCornerUtil(dto, 6);
 			f.drawRoundedBox(0, 0, w, h, cu.topLeft, cu.topRight, cu.bottomRight, cu.bottomLeft);
 			f.endFill();
+			/*
 			with (tgt.graphics) {
 				if (state == ButtonState.SELECTED) {
-					lineStyle(1, buttonColor, 1, true);
+					lineStyle(1, $buttonColor, 1, true);
 					moveTo(0, h);
 					lineTo(w, h);
 				} else {
 					moveTo(cu.topLeft, 0);
-					lineStyle(0, lineColor1, 0);
+					lineStyle(0, $lineColor1, 0);
 					beginFill(0xFFFFFF, .2);
 					lineTo(w-cu.topRight, 0);
 					curveTo(w, 0, w, cu.topRight);
@@ -323,6 +348,7 @@ package org.flashapi.swing.plaf.spas {
 				}
 				endFill();
 			}
+			*/
 		}
 	}
 }
