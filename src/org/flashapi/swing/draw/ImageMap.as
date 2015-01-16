@@ -241,13 +241,6 @@ package org.flashapi.swing.draw {
 		}
 		
 		private function drawMapDataArea():void {
-			/*
-			if(_xmlQuery.strictMode) {
-				if(data.namespace().prefix != "spas") throw new DataFormatException("Namespace prefix mismatch: prefix must be 'spas' in strict mode.");
-				if(data.namespace() != UIManager.SPAS_XML_NAMESPACE) throw new DataFormatException("Namespace mismatch: namespace must be '"+UIManager.SPAS_XML_NAMESPACE+"' in strict mode.");
-				if(data.@caller != "PictureGallery") throw new DataFormatException("Caller attribute mismatch: caller must be 'PictureGallery' in strict mode.");
-			}
-			 */
 			if(_mapData.@urlPath) _urlPath = _mapData.@urlPath.toString();
 			for each(var prop:XML in _mapData.area) {
 				var btn:MapAreaButton =

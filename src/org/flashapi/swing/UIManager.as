@@ -663,7 +663,9 @@ package org.flashapi.swing {
 		spas_internal static function init(target:DisplayObject, newDocument:Boolean = true):Boolean {
 			if(_initialized) return false;
 			else {
-				UIDescriptor.spas_internal::initDescriptor("SPAS 3.0", UIManager);
+				trace( "UIManager.init - not initialized" );
+
+				UIDescriptor.spas_internal::initDescriptor( UIManager );
 				_initialized = true;
 				_stage = target.stage;
 				_layoutManager = LayoutManager.spas_internal::getInstance();
@@ -673,22 +675,29 @@ package org.flashapi.swing {
 				_topLevelManager = TopLevelManager.spas_internal::getInstance();
 				_libManager = LibraryManager.spas_internal::getInstance();
 				_cssManager = CSSManager.spas_internal::getInstance();
+				trace( "UIManager.init - just after _cssManager" );
 				_focusManager = FocusManager.spas_internal::getInstance();
-				if (newDocument) _document =  new Application();
+				if (newDocument) 
+					_document =  new Application();
 				else {
 					_document = target as Application;
 					_hasMainContainer = true;
 				}
+				trace( "UIManager.init - just b4 hasUIManagerDocument()" );
 				if (!UIManagerUtil.spas_internal::hasUIManagerDocument())
 					UIManagerUtil.spas_internal::setUIManagerDocument(_document);
+				trace( "UIManager.init - after hasUIManagerDocument()" );
 				_cursor = Cursor.spas_internal::getInstance();
+				trace( "UIManager.init - b4 drag manager" );
 				_dragManager = DnDManager.spas_internal::getInstance();
+				trace( "UIManager.init - after drag manager" );
 				_keyboardManager = KeyboardManager.spas_internal::getInstance();
+				trace( "UIManager.init - just b4 target.root.loaderInfo" );
 				_loader = target.root.loaderInfo;
 				UIManager.quality = Quality.HIGH;
 				initStage();
-				initMainMenu();
 				initJavaScript();
+				trace( "UIManager.init - exit" );
 			}
 			return true;
 		}
@@ -729,17 +738,6 @@ package org.flashapi.swing {
 		//  Private methods
 		//
 		//--------------------------------------------------------------------------
-		
-		private static function initMainMenu():void {
-			spas_internal::mainMenu.hideBuiltInItems();
-			var spasItem:ContextMenuItem = new ContextMenuItem("SPAS 3.0");
-			_stageEvtColl.addEvent(spasItem, ContextMenuEvent.MENU_ITEM_SELECT, spasItemSelect);
-			spas_internal::mainMenu.customItems.push(spasItem);
-		}
-		
-		private static function spasItemSelect(e:ContextMenuEvent):void {
-			flash.net.navigateToURL(new URLRequest(UIDescriptor.spas_internal:: SPAS_URL));
-		}
 		
 		private static function setFullScreenMode():void {
 			stage.displayState = _fullScreenMode ?
@@ -784,11 +782,21 @@ package org.flashapi.swing {
 			if (_hasMainContainer) _document.spas_internal::resizeEventHandler();
 		}
 		
+		private static function JSAvailable():Boolean {
+			if (ExternalInterface.available) {
+				if (ExternalInterface.call("Function(\"return true;\")")) {
+					return true;
+				}
+			}           
+
+			return false;
+		}
+		
 		private static function initJavaScript():void {
 			//http://www.kirupa.com/forum/showthread.php?t=238858
-			if (!ExternalInterface.available) return;
-			var initGetURL:String = 
-			"document.insertScript = function (){ function getURL(){ return document.URL; } }";
+			if (!JSAvailable())
+				return;
+			var initGetURL:String = "document.insertScript = function (){ function getURL(){ return document.URL; } }";
 			ExternalInterface.call(initGetURL);
 		}
 	}

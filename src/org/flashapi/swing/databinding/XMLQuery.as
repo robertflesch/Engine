@@ -173,10 +173,6 @@ package org.flashapi.swing.databinding {
 				if (_xml.namespace().prefix != "spas")
 					throw new DataFormatException(
 						Locale.spas_internal::ERRORS.SPAS_PREFIX_NAMESPACE_MISMATCH);
-				if (_xml.namespace() != UIDescriptor.spas_internal::SPAS_XML_NAMESPACE)
-					throw new DataFormatException(
-						Locale.spas_internal::ERRORS.SPAS_NAMESPACE_MISMATCH
-						+ UIDescriptor.spas_internal::SPAS_XML_NAMESPACE);
 				if (_xml.@caller != caller)
 					throw new DataFormatException(
 					Locale.spas_internal::ERRORS.SPAS_CALLER_MISMATCH + caller);
