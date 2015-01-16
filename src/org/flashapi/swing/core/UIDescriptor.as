@@ -63,7 +63,6 @@ package org.flashapi.swing.core {
 		//
 		//--------------------------------------------------------------------------
 		
-		private static var _interfaceName:String;
 		/**
 		 * 	Teturns the name of the SPAS 3.0 API specified by this <code>UIDescriptor</code>
 		 * 	instance.
@@ -71,9 +70,6 @@ package org.flashapi.swing.core {
 		 * 	@return	The name of the SPAS 3.0 API specified by this <code>UIDescriptor</code>
 		 * 	instance.
 		 */
-		public static function getInterfaceName():String {
-			return _interfaceName;
-		}
 		
 		private static var _managerRef:*;
 		/**
@@ -96,11 +92,6 @@ package org.flashapi.swing.core {
 		/**
 		 * @private
 		 */
-		spas_internal static const SPAS_XML_NAMESPACE:String = "http://www.flashapi.org/spas";
-		
-		/**
-		 * @private
-		 */
 		spas_internal static const SPAS_URL:String = "http://www.flashapi.org/";
 		
 		//--------------------------------------------------------------------------
@@ -112,8 +103,7 @@ package org.flashapi.swing.core {
 		/**
 		 * 	@private
 		 */
-		spas_internal static function initDescriptor(interfaceName:String, managerRef:Class):void {
-			_interfaceName = interfaceName;
+		spas_internal static function initDescriptor( managerRef:Class ):void {
 			_managerRef = managerRef;
 			UIObject.spas_internal::setUIManager(managerRef);
 		}
