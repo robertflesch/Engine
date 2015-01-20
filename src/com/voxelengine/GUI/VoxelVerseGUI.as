@@ -1,9 +1,6 @@
 
 package com.voxelengine.GUI
 {
-	import com.voxelengine.events.GUIEvent;
-	import com.voxelengine.events.RoomEvent;
-	import com.voxelengine.server.RoomConnection;
 	import flash.display.DisplayObjectContainer;
 	import flash.display.Sprite;
 	import flash.display.Stage;
@@ -34,16 +31,22 @@ package com.voxelengine.GUI
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	
+	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.LoginEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.events.RoomEvent;
+	
+	import com.voxelengine.GUI.crafting.WindowCrafting;
+	import com.voxelengine.GUI.inventory.WindowInventory;
+	import com.voxelengine.GUI.inventory.WindowInventoryNew;
 	
 	import com.voxelengine.server.WindowLogin;
+	import com.voxelengine.server.RoomConnection;
 	
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.models.VoxelModel;
-	import com.voxelengine.GUI.crafting.WindowCrafting;
 //	import com.voxelengine.worldmodel.scripts.FireProjectileScript;
 	
 	public class VoxelVerseGUI extends EventDispatcher
@@ -329,7 +332,8 @@ package com.voxelengine.GUI
 			Log.out( "VoxelVerseGUI.init ENTER" );
             UIManager.initialize( Globals.g_app.stage );
 			Log.out( "VoxelVerseGUI.init After - UIManager.initialize stage: " + Globals.g_app.stage );
-//			UIManager.debugger = new FDTrace();
+			UIManager.debugger = new FDTrace();
+			Log.out( "VoxelVerseGUI.init After - FDTRace" );
 			Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_BEGUN, onRegionLoadingComplete );
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 			Globals.g_app.addEventListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
@@ -455,7 +459,7 @@ package com.voxelengine.GUI
 			if  ( Globals.g_app.configManager.showEditMenu )
 			{
 				if ( Keyboard.I == e.keyCode )
-					new WindowInventory();
+					new WindowInventoryNew();
 					
 				//if ( Keyboard.O == e.keyCode )
 				//{

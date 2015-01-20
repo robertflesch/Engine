@@ -15,9 +15,11 @@ package com.voxelengine.events
 	 */
 	public class InventoryVoxelEvent extends Event
 	{
-		static public const INVENTORY_VOXEL_ADD:String  		= "INVENTORY_VOXEL_ADD";
-//		static public const INVENTORY_PRIM_REMOVE:String  		= "INVENTORY_VOXEL_REMOVE";
-		static public const INVENTORY_VOXEL_DELETE:String  		= "INVENTORY_VOXEL_DELETE";
+		static public const INVENTORY_VOXEL_INCREMENT:String  		= "INVENTORY_VOXEL_INCREMENT";
+		static public const INVENTORY_VOXEL_DECREMENT:String  		= "INVENTORY_VOXEL_DECREMENT";
+		static public const INVENTORY_VOXEL_COUNT_REQUEST:String  	= "INVENTORY_VOXEL_COUNT_REQUEST";
+		static public const INVENTORY_VOXEL_COUNT_RESULT:String  	= "INVENTORY_VOXEL_COUNT_RESULT";
+//		static public const INVENTORY_PRIM_REMOVE:String  			= "INVENTORY_VOXEL_REMOVE";
 		
 		private var _id:int;
 		private var _count:int;
@@ -37,6 +39,16 @@ package com.voxelengine.events
 		public override function toString():String
 		{
 			return formatToString("InventoryEvent", "bubbles", "cancelable") + " InventoryPrim type: " + _id + " count: " + _count;
+		}
+		
+		public function get id():int 
+		{
+			return _id;
+		}
+		
+		public function get count():int 
+		{
+			return _count;
 		}
 		
 		

@@ -127,9 +127,12 @@ package {
 			
 			Log.out( "VoxelVerse.init b4 VoxelVerseGUI.currentInstance.init" );
 			VoxelVerseGUI.currentInstance.init();
-
+			Globals.inventoryManagerCreate();
+			
 			if ( false == WindowSplash.isActive )
 				WindowSplash.create();
+				
+				
 			Log.out( "VoxelVerse.init exit init" );
 		}
 		

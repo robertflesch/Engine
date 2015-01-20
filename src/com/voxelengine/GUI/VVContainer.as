@@ -8,14 +8,26 @@ import com.voxelengine.Globals;
 
 public class VVContainer extends Container
 {
-	public function VVContainer($width:Number = 100, $height:Number = 100):void 
+	protected var _parent:VVContainer;
+	public function VVContainer( $parent:VVContainer ):void 
 	{ 
-		super($width,$height);
+		_parent = $parent;
+		super();
 //		Globals.openWindowCount = Globals.openWindowCount + 1;
 		eventCollector.addEvent(this, UIOEvent.REMOVED, onRemoved );
+		eventCollector.addEvent( this, UIOEvent.RESIZED, onResized );
 	}
 	
-	private function onRemoved( event:UIOEvent ):void
+	protected function onResized(e:UIOEvent):void 
+	{
+		trace( "VVContainer.onResize" );
+		if ( _parent )
+			_parent.onResized( e );
+		//_barUpper.setButtonsWidth( width / _barUpper.length, 36 );
+		//_underline.width = width;
+	}
+	
+	protected function onRemoved( event:UIOEvent ):void
 	{
 		eventCollector.removeEvent(this, UIOEvent.REMOVED, onRemoved );
 //		Globals.openWindowCount = Globals.openWindowCount - 1;

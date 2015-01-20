@@ -149,7 +149,7 @@ package com.voxelengine.GUI
 				if ( _selectedModel )
 				{
 					// move this item to the players INVENTORY so that is it not "lost"
-					Globals.inventoryManager.dispatchEvent( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_ADD, _selectedModel.instanceInfo.guid ) );
+					Globals.inventoryManager.dispatchEvent( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_INCREMENT, _selectedModel.instanceInfo.guid, 1 ) );
 
 					Globals.markDead( _selectedModel.instanceInfo.guid );
 					populateModels( _dictionarySource, _parentModel );

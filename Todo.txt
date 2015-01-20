@@ -74,6 +74,7 @@ FINISH: WORKING - directional component of lighting
 FINISH: WORKING - per material attenuation
 FIX: HOLD - Still bug in propogation by light enclousure
 FIX: In ambient Occlusion - quads need to be flipped some times to show lighting correctly
+3:15 Tuesday Lensecrafters - N Druid Hills
 
 DYNAMIC
 TODO: Add lighting manager for dynamic lights, so the closest X lights can be retrived
@@ -94,6 +95,7 @@ IDEA: Glass voxel are full bright
 IDEA: on ambient occlusion, if neighbor is larger...
 IDEA: on ambient occlusion, if neighbor is smaller...
 
+Ageing System for Oxels: Quicksand to sand, mud to dirt, laval to stone.
 
 
 ////////////////////////////////////////////

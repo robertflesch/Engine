@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.inventory {
 	import flash.utils.ByteArray;
 	public class InventoryVoxel extends InventoryObject
     {
+		private var _id:int;
 		private var _count:int;
 		
 		override public function toByteArray( $ba:ByteArray ):void {
@@ -29,6 +30,16 @@ package com.voxelengine.worldmodel.inventory {
 		public function set count(value:int):void 
 		{
 			_count = value;
+		}
+		
+		public function get id():int 
+		{
+			return _id;
+		}
+		
+		public function set id(value:int):void 
+		{
+			_id = value;
 		}
 		
 	}

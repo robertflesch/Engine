@@ -1,14 +1,15 @@
 
-package com.voxelengine.GUI {
+package com.voxelengine.GUI.inventory {
 	
 import flash.display.BlendMode;
 	
-import com.voxelengine.worldmodel.TypeInfo;
 import org.flashapi.swing.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.event.*;
 
 import com.voxelengine.Globals;
+import com.voxelengine.GUI.*;
+import com.voxelengine.worldmodel.TypeInfo;
 
 public class BoxInventory extends VVBox
 {

@@ -56,8 +56,10 @@ package com.voxelengine
 				split.shift();
 				stackTrace = "Stack trace: \n\t" + split.join("\n\t");
 			}
-			if ( Network.client )
-				Network.client.errorLog.writeError( $errorType, $details, stackTrace, $extraData );
+			if ( Network.client ) {
+				var detailsPlus:String = "UserID: " + Network.userId + " details: " + $details;
+				Network.client.errorLog.writeError( $errorType, detailsPlus, stackTrace, $extraData );
+			}
 		}
 		
 		

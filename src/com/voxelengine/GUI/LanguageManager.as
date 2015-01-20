@@ -69,7 +69,7 @@ package com.voxelengine.GUI
 				return _localization.currentBundle.getResourceString( lowerKey );
 			}
 			else {
-				Log.out( "LanguageManager.localizeStringGet - no translation found for: " + lowerKey, Log.WARN );
+				Log.out( "LanguageManager.localizeStringGet - no translation found for: " + lowerKey, Log.INFO );
 				return $key;
 			}
 		}

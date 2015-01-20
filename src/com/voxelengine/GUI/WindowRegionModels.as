@@ -1,6 +1,7 @@
 
 package com.voxelengine.GUI
 {
+	import com.voxelengine.events.InventoryVoxelEvent;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;

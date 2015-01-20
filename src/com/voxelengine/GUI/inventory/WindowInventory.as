@@ -1,5 +1,4 @@
-package com.voxelengine.GUI
-{
+package com.voxelengine.GUI.inventory {
 	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
 	import flash.events.Event;
@@ -22,6 +21,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.worldmodel.TypeInfo;
 	import com.voxelengine.GUI.crafting.*;
 	import com.voxelengine.events.CraftingItemEvent;
+	import com.voxelengine.GUI.*;
 	
 	public class WindowInventory extends VVPopup
 	{

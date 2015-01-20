@@ -15,7 +15,6 @@ public class VVPopup extends Popup
 	public function VVPopup( title:String )
 	{
 		super( title );
-		borderWidth = 20;
 		
 //		hasDisplayEffect = true;
 //		displayEffectRef = ScaleIn;
