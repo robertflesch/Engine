@@ -161,7 +161,7 @@ package org.flashapi.swing.list {
 		 * 	
 		 * 	@param	width The new width for all button controls, in pixels.
 		 */
-		public function setButtonsWidth(width:Number):void {
+		public function setButtonsWidth(width:Number, $height:Number = 20 ):void {
 			var it:Iterator = $objList.iterator;
 			it.reset();
 			var next:ListItem;
@@ -171,6 +171,7 @@ package org.flashapi.swing.list {
 				next = it.next() as ListItem;
 				abm = next.item;
 				abm.width = width - hr;
+				abm.height = $height;
 			}
 			it.reset();
 		}
