@@ -61,7 +61,7 @@ public class InventoryManager extends EventDispatcher
 		// This iterates thru the keys
 		for (var key:String in _voxels) {
 			var typeId:int = key as int;
-			if ( cat == Globals.Info[typeId].category )
+			if ( cat == Globals.typeInfo[typeId].category )
 				result[key]	= _voxels[key];
 		}
 

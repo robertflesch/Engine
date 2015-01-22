@@ -47,7 +47,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				trace( "LandscapeError.start - WARNING - Adjusting range: " + min_grain_size );
 			}
 
-			trace("LandscapeError.start on rootGrain of max size: " + root_grain_size + "  Filling with grain of size: " + min_grain_size + " of type: " + Globals.Info[_layer.type].name );
+			trace("LandscapeError.start on rootGrain of max size: " + root_grain_size + "  Filling with grain of size: " + min_grain_size + " of type: " + Globals.typeInfo[_layer.type].name );
 			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
 			
 			var size:int = 1 << (root_grain_size - min_grain_size);

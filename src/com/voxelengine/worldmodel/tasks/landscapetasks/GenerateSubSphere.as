@@ -23,7 +23,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	{		
 		public function GenerateSubSphere( guid:String,layer:LayerInfo ):void {
 			//Log.out( "GenerateSubSphere.construct of type: " + (Globals.Info[layer.type].name.toUpperCase()) );					
-			super(guid, layer, "GenerateSubSphere: " + (Globals.Info[layer.type].name.toUpperCase()) );
+			super(guid, layer, "GenerateSubSphere: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );
 		}
 		
 		override public function start():void

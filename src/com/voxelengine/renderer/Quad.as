@@ -76,7 +76,7 @@ public class Quad {
 						     $grain:Number,                  // the world size of the quad 
 						     $lighting:Lighting ):void			
 	{
-		add( $type, $x, $y, $z, $face, $planeFacing, $grain, Globals.Info[$type], $lighting, null );
+		add( $type, $x, $y, $z, $face, $planeFacing, $grain, Globals.typeInfo[$type], $lighting, null );
 		dirty = 0;
 	}
 	
@@ -87,7 +87,7 @@ public class Quad {
 						   $grain:Number,                   // the world size of the quad 
 						   $lighting:Lighting ):Boolean			
 	{
-		var typeInfo:TypeInfo = Globals.Info[$type];
+		var typeInfo:TypeInfo = Globals.typeInfo[$type];
 		if ( !calculateUV( typeInfo, $face, $grain, null, $lighting ) )
 			return false;
 			
@@ -104,7 +104,7 @@ public class Quad {
 									    $lighting:Lighting,
 										$flowInfo:FlowInfo ):Boolean			// the scaled for flow distance
 	{
-		var typeInfo:TypeInfo = Globals.Info[$type];
+		var typeInfo:TypeInfo = Globals.typeInfo[$type];
 		if ( !calculateUV( typeInfo, $face, $grain, $flowInfo, $lighting ) )
 			return false;
 		

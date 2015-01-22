@@ -27,8 +27,8 @@ package com.voxelengine.worldmodel.tasks
 	public class LoadSky extends LandscapeTask 
 	{		
 		public function LoadSky( guid:String,layer:LayerInfo ):void {
-			trace( "LoadSky.construct of type: " + (Globals.Info[layer.type].name.toUpperCase()) );					
-			super(guid, layer, "LoadSky: " + (Globals.Info[layer.type].name.toUpperCase()) );
+			trace( "LoadSky.construct of type: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );					
+			super(guid, layer, "LoadSky: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );
 		}
 		
 		override public function start():void
@@ -39,7 +39,7 @@ package com.voxelengine.worldmodel.tasks
 			
 			var vm:VoxelModel = Globals.getModelInstance( _guid );
 
-			trace( "LoadSky.start - completed layer of type: " + (Globals.Info[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
+			trace( "LoadSky.start - completed layer of type: " + (Globals.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
 			super.complete() // AbstractTask will send event
 		}
 		

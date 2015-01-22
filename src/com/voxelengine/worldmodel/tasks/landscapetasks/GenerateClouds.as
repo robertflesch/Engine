@@ -24,7 +24,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	public class GenerateClouds extends LandscapeTask 
 	{		
 		public function GenerateClouds( guid:String, layer:LayerInfo ):void {
-			trace( "GenerateClouds.construct of type: " + (Globals.Info[layer.type].name.toUpperCase()) );					
+			trace( "GenerateClouds.construct of type: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );					
 			super(guid, layer, "GenerateClouds");
 		}
 		
@@ -46,7 +46,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				trace( "GenerateClouds.start - WARNING - Adjusting range: " + min_grain_size );
 			}
 
-			trace("GenerateClouds.start on rootGrain of max size: " + root_grain_size + "  Filling with grain of size: " + min_grain_size + " of type: " + Globals.Info[_layer.type].name );
+			trace("GenerateClouds.start on rootGrain of max size: " + root_grain_size + "  Filling with grain of size: " + min_grain_size + " of type: " + Globals.typeInfo[_layer.type].name );
 			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
 			
 			var size:int = 1 << (root_grain_size - min_grain_size);

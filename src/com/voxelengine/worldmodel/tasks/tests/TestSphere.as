@@ -24,8 +24,8 @@ package com.voxelengine.worldmodel.tasks.tests
 	public class TestSphere extends LandscapeTask 
 	{		
 		public function TestSphere( guid:String,layer:LayerInfo ):void {
-			trace( "TestSphere.construct of type: " + (Globals.Info[layer.type].name.toUpperCase()) );					
-			super(guid, layer, "TestSphere: " + (Globals.Info[layer.type].name.toUpperCase()) );
+			trace( "TestSphere.construct of type: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );					
+			super(guid, layer, "TestSphere: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );
 		}
 		
 		override public function start():void
@@ -67,7 +67,7 @@ package com.voxelengine.worldmodel.tasks.tests
 				throw new Error("Didnt find model for: " + _guid );
 			}
 
-			trace( "TestSphere.start - completed layer of type: " + (Globals.Info[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
+			trace( "TestSphere.start - completed layer of type: " + (Globals.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
 			super.complete() // AbstractTask will send event
 		}
 		

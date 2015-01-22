@@ -51,7 +51,7 @@ public class WindowNewModelGenerateCube extends ModalPopup
 			madeOfType.fontSize = 14;
 			panel.addElement( madeOfType );
 			_cbType = new ComboBox( "Made Of" );
-			for each (var nitem:TypeInfo in Globals.Info )
+			for each (var nitem:TypeInfo in Globals.typeInfo )
 			{
 				_cbType.addItem( nitem.name, nitem.type );
 			}

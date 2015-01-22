@@ -212,7 +212,7 @@ class LayerTypeData extends SimpleContainerBase
 		var cbType:ComboBox = new ComboBox( $value, 80, 10 );
 		cbType.addEventListener( ListEvent.LIST_CHANGED, callBack );
 		cbType.x = $width - 80;
-		for each (var nitem:TypeInfo in Globals.Info )
+		for each (var nitem:TypeInfo in Globals.typeInfo )
 		{
 			//if ( "INVALID" != nitem.name && "AIR" != nitem.name && "BRAND" != nitem.name && -1 == nitem.name.indexOf( "EDIT" ) && -1 == nitem.name.indexOf( "UNNAMED" ) )
 			if ( "INVALID" != nitem.name && "AIR" != nitem.name && "BRAND" != nitem.name && -1 == nitem.name.indexOf( "EDIT" ) )

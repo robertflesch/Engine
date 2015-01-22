@@ -321,7 +321,7 @@ package com.voxelengine.worldmodel.models
 			{
 				var typeString:String = "INVALID";
 				typeString = json.type.toLowerCase();
-				for each ( var o:TypeInfo in Globals.Info )
+				for each ( var o:TypeInfo in Globals.typeInfo )
 					if ( typeString == o.name.toLowerCase() ) 
 						{ _type = o.type; 
 						  break; }

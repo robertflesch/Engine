@@ -25,7 +25,7 @@ package com.voxelengine.worldmodel.tasks.tests
 	public class TestGrain0inCorner extends LandscapeTask 
 	{		
 		public function TestGrain0inCorner( guid:String,layer:LayerInfo ):void {
-			trace( "TestGrain0inCorner of type: " + (Globals.Info[layer.type].name.toUpperCase()) );					
+			trace( "TestGrain0inCorner of type: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );					
 			super(guid, layer);
 		}
 		

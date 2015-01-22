@@ -111,7 +111,7 @@ package com.voxelengine.GUI.inventory {
 
 			var countMax:int = width / 64;
 			var box:BoxInventory;
-			for each (var item:TypeInfo in Globals.Info )
+			for each (var item:TypeInfo in Globals.typeInfo )
 			{
 				if ( item.placeable && (item.category.toUpperCase() == category.toUpperCase() || "ALL" == String(category).toUpperCase() ) )
 				{

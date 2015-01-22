@@ -33,14 +33,14 @@ public class WindowChangeType extends VVPopup
 			
 			_cb = new ComboBox( "Original Type" );
 			
-			for each (var item:TypeInfo in Globals.Info )
+			for each (var item:TypeInfo in Globals.typeInfo )
 			{
 				_cb.addItem( item.name, item.type );
 			}
 			panel.addElement( _cb );
 			
 			_cbTo = new ComboBox( "New Type" );
-			for each (var nitem:TypeInfo in Globals.Info )
+			for each (var nitem:TypeInfo in Globals.typeInfo )
 			{
 				_cbTo.addItem( nitem.name, nitem.type );
 			}

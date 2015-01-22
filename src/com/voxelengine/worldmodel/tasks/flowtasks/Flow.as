@@ -85,7 +85,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				}
 				else {	
 					flowOxel.flowInfo = new FlowInfo()
-					flowOxel.flowInfo = Globals.Info[_type].flowInfo;
+					flowOxel.flowInfo = Globals.typeInfo[_type].flowInfo;
 				}
 					
 				flowTerminal(flowOxel);
@@ -119,7 +119,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				
 			if ( flowOxel.type == _type )
 			{
-				Log.out( "Flow.start - ALREADY " + Globals.Info[_type].name + " here" );
+				Log.out( "Flow.start - ALREADY " + Globals.typeInfo[_type].name + " here" );
 				return; 
 			}
 			else if ( null == flowOxel.gc )
@@ -136,13 +136,13 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			{
 				// Is it still the type I am expected?
 				// I would need to do a reverse lookup.
-				var toTypeName:String = Globals.Info[type].name;
-				var ip:InteractionParams = Globals.Info[flowOxel.type].interactions.IOGet( toTypeName );
+				var toTypeName:String = Globals.typeInfo[type].name;
+				var ip:InteractionParams = Globals.typeInfo[flowOxel.type].interactions.IOGet( toTypeName );
 				var writeType:int = Globals.getTypeId( ip.type );
 				//var writeType:int = Globals.Info[type].interactions.IOGet( Globals.Info[flowOxel.type].name ).type
 				if ( flowOxel.type != writeType )
 				{
-					Log.out( "Flow.scale - wrong write type is: " + Globals.Info[flowOxel.type].name + " expecting: " + Globals.Info[writeType].name );
+					Log.out( "Flow.scale - wrong write type is: " + Globals.typeInfo[flowOxel.type].name + " expecting: " + Globals.typeInfo[writeType].name );
 					return; 
 				}
 			}
@@ -305,17 +305,17 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					}
 				}
 				// if the neighbor is a flowable type, look up its interaction with that type
-				else if ( Globals.Info[co.type].flowable )
+				else if ( Globals.typeInfo[co.type].flowable )
 				{
 					if ( co.type != type )
 					{
 						//Log.out( "Oxel.flowable - 2 Different flow types here! getting IP for: " + Globals.Info[type].name + "  with " + Globals.Info[co.type].name );
 						
-						var ip:InteractionParams = Globals.Info[type].interactions.IOGet( Globals.Info[co.type].name );
+						var ip:InteractionParams = Globals.typeInfo[type].interactions.IOGet( Globals.typeInfo[co.type].name );
 						var writeType:int = Globals.getTypeId( ip.type );
 						if ( type != writeType )
 						{
-							if ( Globals.Info[writeType].flowable )
+							if ( Globals.typeInfo[writeType].flowable )
 							{
 								// if write type is same as flow type, add it.
 								if ( type == writeType )

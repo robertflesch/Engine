@@ -61,7 +61,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var voxelType:int = _layer.type;
 			var minGrain:int = _layer.optionalInt;
 			
-			trace( "CarveTunnel.start - carving tunnel of type " + (Globals.Info[voxelType].name.toUpperCase()) + " starting at x: " + startLoc.x + "  y: " + startLoc.y + "  z: " + startLoc.z );					
+			trace( "CarveTunnel.start - carving tunnel of type " + (Globals.typeInfo[voxelType].name.toUpperCase()) + " starting at x: " + startLoc.x + "  y: " + startLoc.y + "  z: " + startLoc.z );					
 			
 			view.scaleBy( stepSize );
 			for ( var i:int = 1; i < tunnelLength / stepSize; i++ ) {

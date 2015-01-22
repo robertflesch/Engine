@@ -476,7 +476,7 @@ package com.voxelengine.worldmodel.models
 			// requires some refactoring but not hard - RSF
 			var oldOxel:Oxel = oxel.childGetOrCreate( $gc );
 			var oldType:int = oldOxel.type;
-			var oldTypeInfo:TypeInfo = Globals.Info[oldType];
+			var oldTypeInfo:TypeInfo = Globals.typeInfo[oldType];
 			if ( oldOxel.lighting ) {
 				if ( oldTypeInfo.lightInfo.lightSource )
 					var oldLightID:uint = oldOxel.lighting.lightIDGet();
@@ -496,7 +496,7 @@ package com.voxelengine.worldmodel.models
 			{
 				_changed = true;
 				result = true;
-				var typeInfo:TypeInfo = Globals.Info[$type];
+				var typeInfo:TypeInfo = Globals.typeInfo[$type];
 			
 				if ( typeInfo.flowable )
 				{
@@ -750,7 +750,7 @@ package com.voxelengine.worldmodel.models
 			GrainCursorPool.poolDispose(gc);
 			}
 			catch (e:Error) {
-				Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.guid: " + instanceInfo.guid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + Globals.Info[oxel.type].name );					
+				Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.guid: " + instanceInfo.guid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + Globals.typeInfo[oxel.type].name );					
 			}
 		
 			//Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.guid: " + instanceInfo.guid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + Globals.Info[type].name );					
@@ -1370,7 +1370,7 @@ package com.voxelengine.worldmodel.models
 				//Log.out( "Camera.isNewPositionValid - oxel is BAD, so passable")
 				$cp.collided = false;
 			}
-			else if ( Globals.Info[$cp.oxel.type].solid )
+			else if ( Globals.typeInfo[$cp.oxel.type].solid )
 			{
 				$cp.collided = true;
 			}
@@ -1415,7 +1415,7 @@ package com.voxelengine.worldmodel.models
 			}
 			else
 			{
-				if (!Globals.Info[type])
+				if (!Globals.typeInfo[type])
 				{
 					trace("unknown grain of - unknown key: " + type);
 					$ba.position -= 4;

@@ -86,7 +86,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 		override public function start():void {
             super.start() // AbstractTask will send event
-			trace( "GenerateLavaPockets - enter - creating " +_layer.offset + " pockets of type " + (Globals.Info[_layer.type].name.toUpperCase()) );					
+			trace( "GenerateLavaPockets - enter - creating " +_layer.offset + " pockets of type " + (Globals.typeInfo[_layer.type].name.toUpperCase()) );					
 			var timer:int = getTimer();
             var vm:VoxelModel = Globals.getModelInstance( _guid );
 			

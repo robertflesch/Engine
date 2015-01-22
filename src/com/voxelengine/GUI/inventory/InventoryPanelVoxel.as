@@ -166,7 +166,7 @@ package com.voxelengine.GUI.inventory {
 			{
 				var typeId:int = k as int;
 				var voxelCount:int = results[k];
-				item = Globals.Info[typeId];
+				item = Globals.typeInfo[typeId];
 //				if ( item.placeable && (item.category.toUpperCase() == category.toUpperCase() || "ALL" == String(category).toUpperCase() ) )
 				if ( item.placeable )
 				{

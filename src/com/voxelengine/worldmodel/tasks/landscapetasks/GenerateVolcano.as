@@ -25,8 +25,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	public class GenerateVolcano extends LandscapeTask 
 	{		
 		public function GenerateVolcano( guid:String, layer:LayerInfo ):void {
-			Log.out( "GenerateVolcano of type: " + (Globals.Info[layer.type].name.toUpperCase()) );					
-			super( guid, layer, "GenerateVolcano: " + (Globals.Info[layer.type].name.toUpperCase()) );
+			Log.out( "GenerateVolcano of type: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );					
+			super( guid, layer, "GenerateVolcano: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );
 		}
 		
 		override public function start():void {
@@ -115,7 +115,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			if ( Globals.AIR == _layer.type || Globals.RED == _layer.type )
 				ignoreSolid = true;
 			vm.oxel.write_height_map( _guid, _layer.type, minHeightMapArray, maxHeightMapArray, minGrain, arrayOffset, ignoreSolid );
-			Log.out( "GenerateVolcano - completed layer of type: " + (Globals.Info[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer() - timer) ); // + " in queue for: " + (timer - _startTime));
+			Log.out( "GenerateVolcano - completed layer of type: " + (Globals.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer() - timer) ); // + " in queue for: " + (timer - _startTime));
 			//timer = getTimer();
 			//Log.out( "GenerateVolcano - merging: ");
 			//vm.oxel.mergeRecursive();

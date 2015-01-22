@@ -81,7 +81,7 @@ package com.voxelengine.worldmodel.models
 			{
 				if ( !isNaN( key ) )
 				{
-					if ( Globals.Info[key] )
+					if ( Globals.typeInfo[key] )
 						_count += _stats[key];
 					else
 						Log.out( "ModelStatisics.gather - key not found key: " + key, Log.WARN );
@@ -155,8 +155,8 @@ package com.voxelengine.worldmodel.models
 			{
 				if ( !isNaN( key ) )
 				{
-					if ( Globals.Info[key] )
-						trace( "Contains " + _stats[key]/GRAINS_PER_SQUARE_METER + " cubic meters of " + Globals.Info[key].name);
+					if ( Globals.typeInfo[key] )
+						trace( "Contains " + _stats[key]/GRAINS_PER_SQUARE_METER + " cubic meters of " + Globals.typeInfo[key].name);
 					else	
 						trace( "ModelStatisics.statsPrint - unknown key: " + key );
 				}

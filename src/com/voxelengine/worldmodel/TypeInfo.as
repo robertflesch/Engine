@@ -144,7 +144,7 @@ package com.voxelengine.worldmodel
 			ti._name = "INVALID";
 			ti._solid = false;
 			ti._placeable = false;
-			Globals.Info[ti._typeId] = ti;
+			Globals.typeInfo[ti._typeId] = ti;
 			
 			
 			var jsonString:String = StringUtil.trim(String(event.target.data));
@@ -161,7 +161,7 @@ package com.voxelengine.worldmodel
 			{
 				ti = new TypeInfo();
 				ti.init( v );
-				Globals.Info[ti._typeId] = ti;
+				Globals.typeInfo[ti._typeId] = ti;
 			}
 			
 			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_TYPES_COMPLETE ) );

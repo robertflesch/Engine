@@ -169,7 +169,7 @@ public class FlowScaling
 			return;
 			
 		//if ( fromOxel.type == $oxel.type )
-		if ( Globals.Info[fromOxel.type].flowable && fromOxel.flowInfo && fromOxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling )
+		if ( Globals.typeInfo[fromOxel.type].flowable && fromOxel.flowInfo && fromOxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling )
 		{
 			var fromRecalc:Boolean = false;
 			var fromOxelScale:FlowScaling = fromOxel.flowInfo.flowScaling;

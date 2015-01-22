@@ -321,7 +321,7 @@ package com.voxelengine.GUI
 			{
 				EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
 				var index:int = 0;
-				for each ( var o:TypeInfo in Globals.Info )
+				for each ( var o:TypeInfo in Globals.typeInfo )
 				{
 					if ( name == o.name.toLowerCase() ) 
 					{ 

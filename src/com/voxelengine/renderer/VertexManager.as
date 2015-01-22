@@ -194,11 +194,11 @@ public class VertexManager {
 		else
 			VIBType = oldType;
 			
-		if ( Globals.Info[VIBType].animated  ) 
+		if ( Globals.typeInfo[VIBType].animated  ) 
 		{
-    		if ( Globals.Info[VIBType].alpha )
+    		if ( Globals.typeInfo[VIBType].alpha )
 			{
-				if ( Globals.Info[VIBType].flame )
+				if ( Globals.typeInfo[VIBType].flame )
 				{
 					if ( !_vertBufFire )
 						_vertBufFire = VertexIndexBuilderPool.poolGet();
@@ -220,7 +220,7 @@ public class VertexManager {
 		} 
 		else 
 		{
-    		if ( Globals.Info[VIBType].alpha ) 
+    		if ( Globals.typeInfo[VIBType].alpha ) 
 			{
 				if ( !_vertBufAlpha )
 					_vertBufAlpha = VertexIndexBuilderPool.poolGet();

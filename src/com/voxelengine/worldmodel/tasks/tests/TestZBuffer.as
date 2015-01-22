@@ -25,7 +25,7 @@ package com.voxelengine.worldmodel.tasks.tests
 	public class TestZBuffer extends LandscapeTask 
 	{		
 		public function TestZBuffer( guid:String,layer:LayerInfo ):void {
-			trace( "TestZBuffer of type: " + (Globals.Info[layer.type].name.toUpperCase()) );					
+			trace( "TestZBuffer of type: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );					
 			super(guid, layer);
 		}
 		

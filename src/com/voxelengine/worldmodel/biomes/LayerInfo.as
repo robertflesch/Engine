@@ -139,7 +139,7 @@ package com.voxelengine.worldmodel.biomes
 		
 		public function toString():String
 		{
-			return " LayerInfo task: " + _task + " data: " + data + " range: " + range + " offset: " + offset + " type: " + Globals.Info[_type].name + " task: " + task; 
+			return " LayerInfo task: " + _task + " data: " + data + " range: " + range + " offset: " + offset + " type: " + Globals.typeInfo[_type].name + " task: " + task; 
 		}
 	}
 }

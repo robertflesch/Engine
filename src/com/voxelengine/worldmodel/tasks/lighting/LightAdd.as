@@ -41,7 +41,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 					var lo:Oxel = vm.oxel.childFind( $le.gc );
 					if ( Oxel.validLightable( lo ) )
 					{
-						var ti:TypeInfo = Globals.Info[lo.type];
+						var ti:TypeInfo = Globals.typeInfo[lo.type];
 						if ( !lo.lighting.add( $le.lightID, ti.lightInfo.color, Lighting.MAX_LIGHT_LEVEL, ti.lightInfo.attn, true ) )
 							throw new Error( "LightAdd.handleLightEvent - How did we get here?" );
 //						lo.brightness.fallOffPerMeter = ti.lightInfo.attn;
@@ -62,7 +62,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 					{
 						// This oxel changed from solid to AIR or Translucent
 						// So I just need to rebalance it as an AIR oxel
-						var airAttn:uint = Globals.Info[ Globals.AIR ].lightInfo.attn;
+						var airAttn:uint = Globals.typeInfo[ Globals.AIR ].lightInfo.attn;
 						const attnScaling:uint = co.lighting.materialFallOffFactor * airAttn * (co.gc.size() / Globals.UNITS_PER_METER);
 						co.lighting.balanceAttnAll( attnScaling );
 						// REVIEW - Just grabbing the ID of the brightest light, but I THINK all will spread.

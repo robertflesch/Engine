@@ -51,24 +51,24 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 							
 							// check above us, could flow down? if tunnel cuts out voxel under?
 							testVoxel = voxels.getVoxelOffset( index + layerOffset );
-							if ( true == Globals.Info[testVoxel.type].flowable ) 
+							if ( true == Globals.typeInfo[testVoxel.type].flowable ) 
 								addFlowTask( x, y, z, testVoxel.type );
 							
 							testVoxel = voxels.layerCheckedGetVoxel( index - sideOffset )
-							if ( true == Globals.Info[testVoxel.type].flowable ) 
+							if ( true == Globals.typeInfo[testVoxel.type].flowable ) 
 								addFlowTask( x, y, z, testVoxel.type );
 
 							//var tvoxel:VoxelBase = voxels.directGetVoxel( index + sideOffset );	
 							testVoxel = voxels.layerCheckedGetVoxel( index + sideOffset )
-							if ( true == Globals.Info[testVoxel.type].flowable ) 
+							if ( true == Globals.typeInfo[testVoxel.type].flowable ) 
 								addFlowTask( x, y, z, testVoxel.type );
 
 							testVoxel = voxels.rowCheckedGetVoxel( index - 1 );
-							if ( true == Globals.Info[testVoxel.type].flowable ) 
+							if ( true == Globals.typeInfo[testVoxel.type].flowable ) 
 								addFlowTask( x, y, z, testVoxel.type );
 
 							testVoxel = voxels.rowCheckedGetVoxel( index + 1 );
-							if ( true == Globals.Info[testVoxel.type].flowable ) 
+							if ( true == Globals.typeInfo[testVoxel.type].flowable ) 
 								addFlowTask( x, y, z, testVoxel.type );
 						}
 						index++;

@@ -24,7 +24,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	public class AddAxes extends LandscapeTask
 	{		
 		public function AddAxes( guid:String, layer:LayerInfo ):void {
-			trace( "AddAxes of type: " + (Globals.Info[layer.type].name.toUpperCase()) );					
+			trace( "AddAxes of type: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );					
 			super(guid, layer, "Add Axes");
 		}
 		

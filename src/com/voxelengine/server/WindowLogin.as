@@ -201,10 +201,10 @@ package com.voxelengine.server
 			Globals.g_app.removeEventListener( LoginEvent.LOGIN_FAILURE_EMAIL, onEmailFailure );
 		}
 		
-		private const BAD_EMAIL_PASSWORD:String = "Wrong email or password";
+		private const BAD_EMAIL_PASSWORD:String = "Bad email or password";
 		private function onPasswordFailure( $e:LoginEvent ):void {
 			removeLoginEventHandlers()
-			Log.out(" WindowLogin.onPasswordFailure" + $e.guid );
+			Log.out("WindowLogin.onPasswordFailure" + $e.guid );
 			//_passwordInput.glow = true;
 			//_errorText.text = $e.guid;
 			_errorText.text = BAD_EMAIL_PASSWORD;
@@ -212,7 +212,7 @@ package com.voxelengine.server
 		
 		private function onEmailFailure( $e:LoginEvent ):void {
 			removeLoginEventHandlers()
-			Log.out(" WindowLogin.onEmailFailure" + $e.guid );
+			Log.out("WindowLogin.onEmailFailure" + $e.guid );
 //			_emailInput.glow = true;
 //			_errorText.text = $e.guid;
 			_errorText.text = BAD_EMAIL_PASSWORD;
@@ -220,8 +220,8 @@ package com.voxelengine.server
 		
 		private function onUnknownFailure( $e:LoginEvent ):void {
 			removeLoginEventHandlers()
-			Log.out(" WindowLogin.onUnknownFailure" + $e.guid );
-			_errorText.text = $e.guid;
+			Log.out("WindowLogin.onUnknownFailure" + $e.guid, Log.ERROR );
+			_errorText.text = "Server error, try again later";
 		}
 		
 		private function loginSuccess( $e:LoginEvent ):void {
@@ -235,9 +235,9 @@ package com.voxelengine.server
 				_userInfo.flush();
 			}
 			else
-				Log.out(" WindowLogin.loginSuccess - Unable to save user email", Log.WARN );
+				Log.out("WindowLogin.loginSuccess - Unable to save user email", Log.WARN );
 				
-			Log.out(" WindowLogin.loginSuccess - Closing Login Window" );
+			Log.out("WindowLogin.loginSuccess - Closing Login Window" );
 			
 			remove();
 		}

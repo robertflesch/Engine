@@ -192,9 +192,9 @@ package com.voxelengine.worldmodel.oxel
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		public function get hasAlpha():Boolean { return Globals.hasAlpha( type ); }
-		public function get isFlowable():Boolean { return Globals.Info[type].flowable; }
-		public function get isSolid():Boolean { return Globals.Info[type].solid; }
-		public function get isLight():Boolean { return Globals.Info[type].lightInfo.lightSource; }
+		public function get isFlowable():Boolean { return Globals.typeInfo[type].flowable; }
+		public function get isSolid():Boolean { return Globals.typeInfo[type].solid; }
+		public function get isLight():Boolean { return Globals.typeInfo[type].lightInfo.lightSource; }
 		
 		public function get vertMan():VertexManager { return _vertMan; }
 		
@@ -209,7 +209,7 @@ package com.voxelengine.worldmodel.oxel
 			
 			if ( !$o.lighting ) { // does this oxel already have a brightness?
 				$o.lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
-				$o.lighting.materialFallOffFactor = Globals.Info[$o.type].lightInfo.fallOffFactor;
+				$o.lighting.materialFallOffFactor = Globals.typeInfo[$o.type].lightInfo.fallOffFactor;
 			}
 
 			return true;
@@ -930,12 +930,12 @@ package com.voxelengine.worldmodel.oxel
 				}
 			var r:String;
 			if ( Globals.INVALID == type )
-				r = "\t\t oxel of type: " + Globals.Info[type].name;
+				r = "\t\t oxel of type: " + Globals.typeInfo[type].name;
 			else
 				var str:String = "";
 				str = maskTempData().toString(16)
 				var hex:String = ("0x00000000").substr(2,8 - str.length) + str;
-				r = t + " oxel of type: " + Globals.Info[type].name + "\t location: " + gc.toString() + "  data: " + hex + " parent: " + p + " children: " + c;
+				r = t + " oxel of type: " + Globals.typeInfo[type].name + "\t location: " + gc.toString() + "  data: " + hex + " parent: " + p + " children: " + c;
 			}
 			else
 				r = "Uninitialized Oxel" + p + c;
@@ -944,7 +944,7 @@ package com.voxelengine.worldmodel.oxel
 		}
 		
 		public function toStringShort():String {
-			return "oxel of type: " + Globals.Info[type].name + "\t location: " + gc.toString();
+			return "oxel of type: " + Globals.typeInfo[type].name + "\t location: " + gc.toString();
 		}
 		
 		public function rebuildAll():void
@@ -953,7 +953,7 @@ package com.voxelengine.worldmodel.oxel
 			{
 				if ( Globals.AIR != type )
 				{
-					Log.out( "Oxel.rebuildAll - parent with TYPE: " + Globals.Info[type].name, Log.ERROR );
+					Log.out( "Oxel.rebuildAll - parent with TYPE: " + Globals.typeInfo[type].name, Log.ERROR );
 					type = Globals.AIR; 
 				}
 				for each ( var child:Oxel in _children )
@@ -1090,7 +1090,7 @@ package com.voxelengine.worldmodel.oxel
 			}
 			else
 			{
-				var ti:TypeInfo = Globals.Info[type];
+				var ti:TypeInfo = Globals.typeInfo[type];
 				// TODO This needs to be refactored to remove this from this function, so more likely go in the write function of the voxelModel.
 				// TODO also be nice to pass in the flow direction if possible. We know which face, so we know flow dir...
 				// 1 = $propogateCount means only the oxel directly next to the effect oxel will have flow tasks generated.
@@ -1554,7 +1554,7 @@ package com.voxelengine.worldmodel.oxel
 				if ( null == _quads )
 					_quads = QuadsPool.poolGet();
 				
-				var ti:TypeInfo = Globals.Info[type];
+				var ti:TypeInfo = Globals.typeInfo[type];
 				// We have to go thru each one, since some may be added, and others removed.
 				for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 					quadCount += quadAddOrRemoveFace( face, $plane_facing, gc.grain, ti );
@@ -1745,7 +1745,7 @@ package com.voxelengine.worldmodel.oxel
 			}
 			else
 			{
-				if ( Globals.Info[type].flowable )
+				if ( Globals.typeInfo[type].flowable )
 				{
 					Log.out( "Oxel.flowFindCandidates - gc: " + gc.toString() );
 					//flowTerminal();
@@ -1771,7 +1771,7 @@ package com.voxelengine.worldmodel.oxel
 		{
 			//trace( Oxel.data_mask_temp( _data ) );
 			if ( childrenHas() && Globals.AIR != type )	{
-				Log.out( "Oxel.writeData - parent with TYPE: " + Globals.Info[type].name, Log.ERROR );
+				Log.out( "Oxel.writeData - parent with TYPE: " + Globals.typeInfo[type].name, Log.ERROR );
 				type = Globals.AIR; 
 			}
 			
@@ -1823,7 +1823,7 @@ package com.voxelengine.worldmodel.oxel
 			// Bad data check
 			if ( OxelData.data_is_parent( faceData ) && Globals.AIR != type )
 			{
-				Log.out( "Oxel.readVersionedData - parent with TYPE: " + Globals.Info[type].name, Log.ERROR );
+				Log.out( "Oxel.readVersionedData - parent with TYPE: " + Globals.typeInfo[type].name, Log.ERROR );
 				type = Globals.AIR;
 			}
 			// Check for flow and brightnessInfo
@@ -1853,7 +1853,7 @@ package com.voxelengine.worldmodel.oxel
 				else {
 					lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).setAll( baseLightLevel );
 				}
-				lighting.materialFallOffFactor = Globals.Info[type].lightInfo.fallOffFactor;
+				lighting.materialFallOffFactor = Globals.typeInfo[type].lightInfo.fallOffFactor;
 			}
 			
 			if ( OxelData.data_is_parent( faceData ) )
@@ -1880,7 +1880,7 @@ package com.voxelengine.worldmodel.oxel
 			initialize( $parent, $gc, oxelData, OxelData.typeFromRawDataOld( oxelData ), $stats );
 			if ( OxelData.data_is_parent( oxelData ) && Globals.AIR != type )
 			{
-				Log.out( "Oxel.readData - parent with TYPE: " + Globals.Info[type].name, Log.ERROR );
+				Log.out( "Oxel.readData - parent with TYPE: " + Globals.typeInfo[type].name, Log.ERROR );
 				type = Globals.AIR;
 			}
 			if ( OxelData.data_is_parent( oxelData ) )
@@ -1911,12 +1911,12 @@ package com.voxelengine.worldmodel.oxel
 			if ( facesHas() )
 				dirty = true;
 			
-			if ( Globals.Info[type].flowable )
+			if ( Globals.typeInfo[type].flowable )
 			{
 				if ( $parent && $parent.flowInfo )
 					flowInfo = $parent.flowInfo.clone();
 				else
-					flowInfo = Globals.Info[type].flowInfo.clone();
+					flowInfo = Globals.typeInfo[type].flowInfo.clone();
 			}
 				
 			if ( $stats )
@@ -2291,7 +2291,7 @@ package com.voxelengine.worldmodel.oxel
 			// I never see this get called - RSF
 			if ( true == GrainCursorUtils.is_inside_sphere( gc, cx, cy, cz, radius ))
 			{
-				ip = Globals.Info[type].interactions.IOGet( ie.type );
+				ip = Globals.typeInfo[type].interactions.IOGet( ie.type );
 				writeType = Globals.getTypeId( ip.type );
 				if ( type == writeType )
 					return;
@@ -2306,7 +2306,7 @@ package com.voxelengine.worldmodel.oxel
 			
 			if ( gc.grain <= ie.detail )
 			{
-				ip = Globals.Info[type].interactions.IOGet( ie.type );
+				ip = Globals.typeInfo[type].interactions.IOGet( ie.type );
 				writeType = Globals.getTypeId( ip.type );
 				if ( type == writeType )
 					return;
@@ -2340,7 +2340,7 @@ package com.voxelengine.worldmodel.oxel
 										, gmin:uint
 										, heightMapOffset:int
 										, ignoreSolid:Boolean ):void {
-			if ( Globals.Info[type].solid && !ignoreSolid )
+			if ( Globals.typeInfo[type].solid && !ignoreSolid )
 				return;
 
 			// this fills in the grains that are not too high, and not too short.

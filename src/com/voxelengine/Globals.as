@@ -136,11 +136,11 @@ package com.voxelengine {
 		// code throws an exception when WRITE or READ is done from this object
 		public static const BAD_OXEL:OxelBad = new OxelBad();
 
-		public static var Info:Array = new Array;
+		public static var typeInfo:Array = new Array;
 		
 		static public function drawable( type:int ):Boolean
 		{
-			if ( Info[type].solid || Info[type].alpha )
+			if ( typeInfo[type].solid || typeInfo[type].alpha )
 				return true;
 			return false;
 		}
@@ -148,7 +148,7 @@ package com.voxelengine {
 		// This ideally should be define by texture, but then it is very hard to operate on programattically
 		static public function hasAlpha( type:int ):Boolean
 		{
-			if ( Info[type].alpha || AIR == type )
+			if ( typeInfo[type].alpha || AIR == type )
 				return true;
 			return false;	
 		}
@@ -156,7 +156,7 @@ package com.voxelengine {
 		// solid is a collidable object
 		static public function isSolid( type:int ):Boolean
 		{
-			if ( Info[type].solid )
+			if ( typeInfo[type].solid )
 				return true;
 			return false;	
 		}
@@ -170,7 +170,7 @@ package com.voxelengine {
 			else if ( type is String )
 			{
 				var typeString:String = type.toLowerCase();
-				for each ( var o:TypeInfo in Info )
+				for each ( var o:TypeInfo in typeInfo )
 				{
 					if ( typeString == o.name.toLowerCase() ) 
 						return o.type; 
