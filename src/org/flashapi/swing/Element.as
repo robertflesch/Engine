@@ -154,7 +154,8 @@ package org.flashapi.swing {
 			_isUIObject = isUIObject;
 			if (isUIObject) spas_internal::target.eventCollector.addEvent(_element, UIOEvent.METRICS_CHANGED, addToLayoutManagerQueue);
 			else {
-				if (!hasResizableProperty(_element)) return;
+				if ( !_element || !hasResizableProperty(_element)) 
+					return;
 				spas_internal::elementStack[_element] =
 					{ target:target, width:_element.width, height:_element.height };
 				spas_internal::target.eventCollector.addEvent(_element, Event.CHANGE, Element.spas_internal::proxyLayoutListener);
