@@ -6,6 +6,7 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
+	import com.voxelengine.worldmodel.inventory.InventoryManager;
 	import flash.display.DisplayObject;
 	import flash.events.MouseEvent;
 	import org.flashapi.swing.containers.UIContainer;
@@ -83,7 +84,7 @@ package com.voxelengine.GUI.inventory {
 
 		private function testInventoryVoxelResult(e:InventoryVoxelEvent):void 
 		{
-			Log.out( "WindowRegionModels.testInventoryVoxelResult - id: " + e.id + "  count: " + e.count );
+			Log.out( "WindowRegionModels.testInventoryVoxelResult - id: " + e.id + "  count: " + e.result );
 		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
@@ -141,9 +142,16 @@ package com.voxelengine.GUI.inventory {
 			displaySelectedCategory( e.target.value );	
 		}
 		
-		// TODO I see problem here when langauge is different then what is in TypeInfo RSF - 11.16.14
-		private function displaySelectedCategory( category:String ):void
-		{	
+		private function displaySelectedCategory( $category:String ):void {
+			Globals.inventoryManager.addEventListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, populateVoxels );
+			Globals.inventoryManager.dispatchEvent( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST, -1, $category ) );
+		}
+		
+		private function populateVoxels(e:InventoryVoxelEvent):void {
+			
+			var results:Array = e.result as Array;
+			Globals.inventoryManager.removeEventListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, populateVoxels );
+			
 			var VOXEL_CONTAINER_WIDTH:int = 512;
 			var count:int = 0;
 			var pc:Container = new Container( VOXEL_CONTAINER_WIDTH, 64 );
@@ -151,9 +159,16 @@ package com.voxelengine.GUI.inventory {
 
 			var countMax:int = VOXEL_CONTAINER_WIDTH / 64;
 			var box:BoxInventory;
-			for each (var item:TypeInfo in Globals.Info )
+			var item:TypeInfo;
+			
+			for (var k:Object in results)
+			//for each (var item:TypeInfo in results )
 			{
-				if ( item.placeable && (item.category.toUpperCase() == category.toUpperCase() || "ALL" == String(category).toUpperCase() ) )
+				var typeId:int = k as int;
+				var voxelCount:int = results[k];
+				item = Globals.Info[typeId];
+//				if ( item.placeable && (item.category.toUpperCase() == category.toUpperCase() || "ALL" == String(category).toUpperCase() ) )
+				if ( item.placeable )
 				{
 //					if ( "crafting" == category.toLowerCase() )
 //						continue;

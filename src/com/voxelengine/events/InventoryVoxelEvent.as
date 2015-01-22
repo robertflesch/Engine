@@ -19,26 +19,28 @@ package com.voxelengine.events
 		static public const INVENTORY_VOXEL_DECREMENT:String  		= "INVENTORY_VOXEL_DECREMENT";
 		static public const INVENTORY_VOXEL_COUNT_REQUEST:String  	= "INVENTORY_VOXEL_COUNT_REQUEST";
 		static public const INVENTORY_VOXEL_COUNT_RESULT:String  	= "INVENTORY_VOXEL_COUNT_RESULT";
+		static public const INVENTORY_VOXEL_TYPES_REQUEST:String  	= "INVENTORY_VOXEL_TYPES_REQUEST";
+		static public const INVENTORY_VOXEL_TYPES_RESULT:String  	= "INVENTORY_VOXEL_TYPES_RESULT";
 //		static public const INVENTORY_PRIM_REMOVE:String  			= "INVENTORY_VOXEL_REMOVE";
 		
 		private var _id:int;
-		private var _count:int;
+		private var _result:*;
 		
-		public function InventoryVoxelEvent( $type:String, $id:int, $count:int, $bubbles:Boolean = true, $cancellable:Boolean = false )
+		public function InventoryVoxelEvent( $type:String, $id:int, $result:*, $bubbles:Boolean = true, $cancellable:Boolean = false )
 		{
 			super( $type, $bubbles, $cancellable );
 			_id = $id;
-			_count = $count;
+			_result = $result;
 		}
 		
 		public override function clone():Event
 		{
-			return new InventoryVoxelEvent( type, _id, _count, bubbles, cancelable);
+			return new InventoryVoxelEvent( type, _id, _result, bubbles, cancelable);
 		}
 	   
 		public override function toString():String
 		{
-			return formatToString("InventoryEvent", "bubbles", "cancelable") + " InventoryPrim type: " + _id + " count: " + _count;
+			return formatToString("InventoryEvent", "bubbles", "cancelable") + " InventoryPrim type: " + _id + " result: " + _result;
 		}
 		
 		public function get id():int 
@@ -46,9 +48,9 @@ package com.voxelengine.events
 			return _id;
 		}
 		
-		public function get count():int 
+		public function get result():* 
 		{
-			return _count;
+			return _result;
 		}
 		
 		

@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
+import com.voxelengine.worldmodel.TypeInfo;
 import flash.events.EventDispatcher;
 import flash.utils.Dictionary;
 
@@ -38,12 +39,33 @@ public class InventoryManager extends EventDispatcher
 	public function InventoryManager() {
 		addEventListener( InventoryModelEvent.INVENTORY_MODEL_INCREMENT,		inventoryModelIncrement );
 		addEventListener( InventoryModelEvent.INVENTORY_MODEL_DECREMENT, 		inventoryModelDecrement );
-		addEventListener( InventoryVoxelEvent.INVENTORY_VOXEL_INCREMENT, 	inventoryVoxelIncrement );
-		addEventListener( InventoryVoxelEvent.INVENTORY_VOXEL_DECREMENT, 	inventoryVoxelDecrement );
-		addEventListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST, inventoryVoxelCount );
+		addEventListener( InventoryVoxelEvent.INVENTORY_VOXEL_INCREMENT, 		inventoryVoxelIncrement );
+		addEventListener( InventoryVoxelEvent.INVENTORY_VOXEL_DECREMENT, 		inventoryVoxelDecrement );
+		addEventListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST,	inventoryVoxelTypes );
 		
 		addModelTestData();
 		addVoxelTestData();
+	}
+	
+	// This returns an Array which holds the typeId and the count of those voxels
+	private function inventoryVoxelTypes(e:InventoryVoxelEvent):void 
+	{
+		const cat:String = (e.result as String).toUpperCase();
+		if ( cat == "ALL" ) {
+			dispatchEvent( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, -1, _voxels ) );
+			return;
+		}
+			
+		var result:Array = [];
+		var item:TypeInfo;
+		// This iterates thru the keys
+		for (var key:String in _voxels) {
+			var typeId:int = key as int;
+			if ( cat == Globals.Info[typeId].category )
+				result[key]	= _voxels[key];
+		}
+
+		dispatchEvent( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, -1, result ) );
 	}
 	
 	private function inventoryVoxelCount(e:InventoryVoxelEvent):void 
@@ -67,6 +89,7 @@ public class InventoryManager extends EventDispatcher
 	
 	private function addVoxelTestData():void {
 		_voxels[Globals.STONE] = 1234;
+		_voxels[Globals.DIRT] = 432;
 	}
 	
 	private function inventoryModelIncrement(e:InventoryModelEvent):void 
@@ -82,15 +105,16 @@ public class InventoryManager extends EventDispatcher
 	private function inventoryVoxelDecrement(e:InventoryVoxelEvent):void 
 	{
 		var count:int = _voxels[e.id];
-		Log.out( "InventoryManager.inventoryVoxelDecrement - trying to remove id: " + e.id + " of count: " + e.count + " current count: " + count );
-		if ( 0 < count && e.count <= count ) {
-			count -= e.count;
+		var resultCount:int = int( e.result );
+		Log.out( "InventoryManager.inventoryVoxelDecrement - trying to remove id: " + e.id + " of count: " + resultCount + " current count: " + count );
+		if ( 0 < count && resultCount <= count ) {
+			count -= resultCount;
 			_voxels[e.id] = count;
-			Log.out( "InventoryManager.inventoryVoxelDecrement - removed : " + e.count );
+			Log.out( "InventoryManager.inventoryVoxelDecrement - removed : " + resultCount );
 			return;
 		}
 			
-		Log.out( "InventoryManager.inventoryVoxelDecrement - FAILED to remove a type has less then request count - id: " + e.id + " of count: " + e.count + " current count: " + count, Log.ERROR );
+		Log.out( "InventoryManager.inventoryVoxelDecrement - FAILED to remove a type has less then request count - id: " + e.id + " of count: " + resultCount + " current count: " + count, Log.ERROR );
 	}
 	
 	private function inventoryVoxelIncrement(e:InventoryVoxelEvent):void 
