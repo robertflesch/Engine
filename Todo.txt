@@ -74,7 +74,7 @@ FINISH: WORKING - directional component of lighting
 FINISH: WORKING - per material attenuation
 FIX: HOLD - Still bug in propogation by light enclousure
 FIX: In ambient Occlusion - quads need to be flipped some times to show lighting correctly
-3:15 Tuesday Lensecrafters - N Druid Hills
+
 
 DYNAMIC
 TODO: Add lighting manager for dynamic lights, so the closest X lights can be retrived
