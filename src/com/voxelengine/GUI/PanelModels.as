@@ -12,6 +12,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.events.InventoryModelEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.UIRegionModelEvent;
+	import com.voxelengine.server.Network;
 	import com.voxelengine.worldmodel.inventory.InventoryManager;
 	import com.voxelengine.worldmodel.inventory.Inventory;
 	import com.voxelengine.worldmodel.inventory.InventoryObject;
@@ -149,7 +150,7 @@ package com.voxelengine.GUI
 				if ( _selectedModel )
 				{
 					// move this item to the players INVENTORY so that is it not "lost"
-					Globals.inventoryManager.dispatchEvent( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_INCREMENT, _selectedModel.instanceInfo.guid, 1 ) );
+					InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_INCREMENT, Network.userId, _selectedModel.instanceInfo.guid, 1 ) );
 
 					Globals.markDead( _selectedModel.instanceInfo.guid );
 					populateModels( _dictionarySource, _parentModel );
