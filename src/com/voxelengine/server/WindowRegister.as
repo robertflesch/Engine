@@ -44,7 +44,7 @@ package com.voxelengine.server
 		
 		private var _refresh:Bitmap;
 		[Embed(source='../../../../../Resources/bin/assets/textures/refresh.png')]
-		private var _refreshImage:Class;
+		private var _refreshImageTest:Class;
 		
 		private var _retrievingCaptcha:Bitmap;
 		[Embed(source='../../../../../Resources/bin/assets/textures/retrievingCaptcha.jpg')]
@@ -59,7 +59,7 @@ package com.voxelengine.server
 			height = 340;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			
-			_refresh = (new _refreshImage() as Bitmap);
+			_refresh = (new _refreshImageTest() as Bitmap);
 			_retrievingCaptcha = (new _retrievingCaptchaImage() as Bitmap);
 
 			var unc:Container = new Container( width, 30 );
