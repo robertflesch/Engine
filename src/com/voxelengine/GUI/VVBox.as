@@ -17,7 +17,7 @@ public class VVBox extends Box
 {
 	private var _boxhelp:BoxHelp;
 	
-	public function VVBox( $widthParam:Number, $heightParam:Number, $borderStyle:String, $help:String )
+	public function VVBox( $widthParam:Number, $heightParam:Number, $borderStyle:String, $help:String = "" )
 	{
 		super( $widthParam, $heightParam, $borderStyle );
 		_boxhelp = new BoxHelp( $help );
