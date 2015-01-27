@@ -19,7 +19,6 @@ package com.voxelengine {
 	import com.voxelengine.server.PersistRegion;
 	import com.voxelengine.worldmodel.crafting.CraftingManager;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
-	import com.voxelengine.worldmodel.inventory.InventoryManager;
 	import com.voxelengine.worldmodel.RegionManager;
 	import com.voxelengine.worldmodel.Sky;
 	import com.voxelengine.worldmodel.TextureBank;
@@ -48,14 +47,6 @@ package com.voxelengine {
 				g_craftingManager = new CraftingManager(); 
 		} 
 		
-		private static var g_inventoryManager:InventoryManager;
-		public static function get inventoryManager():InventoryManager { return g_inventoryManager; } 
-		public static function inventoryManagerCreate():void 
-		{ 
-			if ( null == g_inventoryManager )
-				g_inventoryManager = new InventoryManager(); 
-		} 
-
 		public static var g_mouseKeyboardHandler:MouseKeyboardHandler = new MouseKeyboardHandler();
 
 		public static var g_nearplane:Number = 1/4;
