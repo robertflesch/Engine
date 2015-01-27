@@ -105,11 +105,6 @@ package com.voxelengine.worldmodel.models
 			if ( Globals.controlledModel && Globals.controlledModel == this )
 				loseControl( Globals.player );
 				
-			if (script)
-			{
-				Globals.g_app.dispatchEvent(new OxelEvent(OxelEvent.DESTROY, instanceInfo.guid));
-			}
-			
 			if (0 < instanceInfo.scripts.length)
 			{
 				for each (var script:Script in instanceInfo.scripts)
