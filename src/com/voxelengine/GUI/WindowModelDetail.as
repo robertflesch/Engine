@@ -80,10 +80,10 @@ package com.voxelengine.GUI
 			if ( _ii.controllingModel )
 				addElement( new ComponentLabel( "Parent GUID",  _ii.controllingModel ? _ii.controllingModel.instanceInfo.guid : "", width ) );
 //
-			addElement( new ComponentVector3D( "Position", "X: ", "Y: ", "Z: ",  _ii.positionGet ) );
-			addElement( new ComponentVector3D( "Rotation", "X: ", "Y: ", "Z: ",  _ii.rotationGet ) );
-			addElement( new ComponentVector3D( "Center", "X: ", "Y: ", "Z: ",  _ii.center ) );
-			addElement( new ComponentVector3D( "Scale", "X: ", "Y: ", "Z: ",  _ii.scale, updateScaleVal, 5 ) );
+			addElement( new ComponentVector3D( "Position", "X: ", "Y: ", "Z: ",  _ii.positionGet, _ii ) );
+			addElement( new ComponentVector3D( "Rotation", "X: ", "Y: ", "Z: ",  _ii.rotationGet, _ii ) );
+			addElement( new ComponentVector3D( "Center", "X: ", "Y: ", "Z: ",  _ii.center, _ii ) );
+			addElement( new ComponentVector3D( "Scale", "X: ", "Y: ", "Z: ",  _ii.scale, _ii, updateScaleVal, 5 ) );
 			
 //			if ( true == Globals.g_debug )
 //			{
