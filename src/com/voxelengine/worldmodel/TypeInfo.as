@@ -29,12 +29,11 @@ package com.voxelengine.worldmodel
 	 * ...
 	 * @author Bob
 	 */
-	public class TypeInfo 
+	public class TypeInfo extends ObjectInfo
 	{
 		private var _typeId:uint				= Globals.INVALID;
 		private var _category:String 			= "INVALID";
 		private var _subCat:String 				= "INVALID";
-		private var _name:String 				= "INVALID"
 
 		private var _maxpix:uint 				= 256;
 		private var _minpix:uint 				= 1;
@@ -50,7 +49,6 @@ package com.voxelengine.worldmodel
 		private var _solid:Boolean 				= true;
 		private var _flowable:Boolean 			= false;
 		private var _animated:Boolean 			= false;
-		private var _image:String				= "grey64.png";
 		private var _placeable:Boolean  		= true;
 		private var _flame:Boolean  			= false;
 		private var _interactions:Interactions 	= null;
@@ -61,9 +59,6 @@ package com.voxelengine.worldmodel
 		private var _speed:Number				= 1;
 		private var _durability:Number			= 1;
 		private var _luck:Number				= 1;
-		
-		public function set name(val:String):void 	{ _name = val; }
-		public function set image(val:String):void 	{ _image = val; }
 		
 		public function get interactions():Interactions { return _interactions; }
 		public function get type():uint 		{ return _typeId; }
@@ -76,8 +71,6 @@ package com.voxelengine.worldmodel
 		}
 		public function get category():String 		{ return _category; }
 		public function get subCat():String 		{ return _subCat; }
-		public function get name():String 			{ return _name; }
-		public function get image():String 			{ return _image; }
 		public function get flowInfo():FlowInfo		{ return _flowInfo; }
 		public function get placeable():Boolean 	{ return _placeable; }
 		
