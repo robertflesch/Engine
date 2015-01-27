@@ -30,8 +30,8 @@ package com.voxelengine.worldmodel.models
 		private var _modelMatrix:Matrix3D 						= new Matrix3D();			// INSTANCE NOT EXPORTED
 		private var _worldMatrix:Matrix3D 						= new Matrix3D();			// INSTANCE NOT EXPORTED
 				
-		private function get changed():Boolean 					{ return _changed; }
-		private function set changed($val:Boolean):void			{ _changed = $val; }
+		public function get changed():Boolean 					{ return _changed; }
+		public function set changed($val:Boolean):void			{ _changed = $val; }
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Center
