@@ -891,6 +891,8 @@ package com.voxelengine.worldmodel.models
 				if ( collideCandidate && collideCandidate.complete && collideCandidate != vm )
 				{
 					var sizeOfInstance:Number = collideCandidate.oxel.gc.size();
+					if ( sizeOfInstance <= 2 ) 
+						continue;
 					var offset:Vector3D = new Vector3D( sizeOfInstance, sizeOfInstance, sizeOfInstance );
 					offset.scaleBy( 0.05 );
 					
