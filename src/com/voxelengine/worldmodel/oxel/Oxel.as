@@ -7,6 +7,9 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
+	import com.voxelengine.events.InventoryVoxelEvent;
+	import com.voxelengine.server.Network;
+	import com.voxelengine.worldmodel.inventory.InventoryManager;
 	import flash.display3D.Context3D;
 	import flash.geom.Point;
 	import flash.geom.Vector3D;
@@ -650,7 +653,7 @@ package com.voxelengine.worldmodel.oxel
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		// This only writes into empty voxel.
-		public function write_empty( $guid:String, $gc:GrainCursor, $type:int ):Boolean {
+		public function write_empty( $modelGuid:String, $gc:GrainCursor, $type:int ):Boolean {
 			// have we arrived?
 			if ( $gc.is_equal( gc ) )
 			{			
@@ -683,13 +686,51 @@ package com.voxelengine.worldmodel.oxel
 			if ( Globals.BAD_OXEL == child )
 				return false;
 			
-			return child.write_empty( $guid, $gc, $type );
+			return child.write_empty( $modelGuid, $gc, $type );
 			
 		}
 		
-		private function writeInternal( $guid:String, $newType:int, $onlyChangeType:Boolean ):Oxel {
+		public function writeFromHeightMap( $gc:GrainCursor, $newType:int ):void {
+			
+			var co:Oxel = childGetOrCreate( $gc );
+			super.type = $newType;
+			dirty = true;
+		}
+
+		private function updateInventory( $newType:int ):void {
+			
+			// If this is a parent oxel
+			if ( childrenHas() ) {
+				for ( var i:int = 0; i < 8; i++ )
+					children[i].updateInventory( $newType );
+				return;	
+			} 
+
+			var amount:int = Math.pow( 1 << Math.abs(gc.grain), 3 );
+			var typeIdToUse:int;
+			if ( Globals.AIR == $newType ) {
+				typeIdToUse = type;
+				amount = amount;
+			}
+			else {
+				typeIdToUse = $newType;
+				amount = -amount;
+			}
+				
+			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, typeIdToUse, amount ) );
+		}
+		
+		private function writeInternal( $modelGuid:String, $newType:int, $onlyChangeType:Boolean ):Oxel {
 			
 			nodes++;
+
+			// so I am changing type to new type
+			// if type == air then I am removing x amount of newType from inventory
+			const EDIT_CURSOR_MIN:int = 990;
+			// we dont want to add edit cursor to our inventory
+			if ( EditCursor.EDIT_CURSOR != $modelGuid )
+				updateInventory( $newType );
+			
 			// kill any existing family, you can be parent type OR physical type, not both
 			if ( childrenHas() )
 			{
@@ -701,6 +742,8 @@ package com.voxelengine.worldmodel.oxel
 			
 			additionalDataClear();
 			
+				
+			// Now we can change type
 			type = $newType;
 			
 			// This is only used by terrain builder scripts.
@@ -708,7 +751,7 @@ package com.voxelengine.worldmodel.oxel
 				return this;
 			
 			// anytime oxel changes, neighbors need to know
-			neighborsMarkDirtyFaces( $guid, gc.size() );
+			neighborsMarkDirtyFaces( $modelGuid, gc.size() );
 			
 			var p:Oxel = _parent;
 			// This is only a two level merge, brain not up to a n level recursive today...
@@ -734,16 +777,9 @@ package com.voxelengine.worldmodel.oxel
 			return this;
 		}
 		
-		public function writeFromHeightMap( $gc:GrainCursor, $newType:int ):void {
-			
-			var co:Oxel = childGetOrCreate( $gc );
-			super.type = $newType;
-			dirty = true;
-		}
-
 		// This write to a child if it is a valid child of the oxel
 		// if the child does not exist, it is created
-		public function write( $guid:String, $gc:GrainCursor, $newType:int, $onlyChangeType:Boolean = false ):Oxel	{
+		public function write( $modelGuid:String, $gc:GrainCursor, $newType:int, $onlyChangeType:Boolean = false ):Oxel	{
 			
 			// this finds the closest oxel, could be target oxel, could be parent
 			var co:Oxel = childFind( $gc );
@@ -761,7 +797,7 @@ package com.voxelengine.worldmodel.oxel
 			if ( $newType == co.type && $gc.bound == co.gc.bound && !co.childrenHas() )
 				return co;
 			
-			return co.writeInternal( $guid, $newType, $onlyChangeType );	
+			return co.writeInternal( $modelGuid, $newType, $onlyChangeType );	
 		}
 				
 		public function dispose():void {
@@ -1020,7 +1056,7 @@ package com.voxelengine.worldmodel.oxel
 		
 		// Mark all of the faces opposite this oxel as dirty
 		// propogate count is to keep it from spreading too far, by maybe this should be distance, rather then hard count?
-		public function neighborsMarkDirtyFaces( $guid:String, $size:int, $propogateCount:int = 2 ):void {
+		public function neighborsMarkDirtyFaces( $modelGuid:String, $size:int, $propogateCount:int = 2 ):void {
 			var no:Oxel;
 			$propogateCount--;
 			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
@@ -1030,13 +1066,13 @@ package com.voxelengine.worldmodel.oxel
 					continue;
 					
 				// RSF - 10.2.14 This just got way easier, always mark the neighbor face!
-				no.faceMarkDirty( $guid, Oxel.face_get_opposite( face ), $propogateCount );
+				no.faceMarkDirty( $modelGuid, Oxel.face_get_opposite( face ), $propogateCount );
 				// now test if we need to propagate it.
 				// Why do alpha faces have to propagate? Is it because of light changes?
 				if ( no.hasAlpha ) {
 					// So now I can mark my neighbors dirty, decrementing each time.
 					if ( 0 < $size && 0 < $propogateCount )
-						no.neighborsMarkDirtyFaces( $guid, $size, $propogateCount );
+						no.neighborsMarkDirtyFaces( $modelGuid, $size, $propogateCount );
 				}
 			}
 		}
@@ -1078,14 +1114,14 @@ package com.voxelengine.worldmodel.oxel
 		// face function
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		override protected function faceMarkDirty( $guid:String, $face:uint, $propogateCount:int = 2 ):void {
+		override protected function faceMarkDirty( $modelGuid:String, $face:uint, $propogateCount:int = 2 ):void {
 			
 			if ( childrenHas() )
 			{
 				const children:Vector.<Oxel> = childrenForDirection( $face );
 				for each ( var child:Oxel in children ) 
 				{
-					child.faceMarkDirty( $guid, $face, $propogateCount );
+					child.faceMarkDirty( $modelGuid, $face, $propogateCount );
 				}
 			}
 			else
@@ -1094,8 +1130,8 @@ package com.voxelengine.worldmodel.oxel
 				// TODO This needs to be refactored to remove this from this function, so more likely go in the write function of the voxelModel.
 				// TODO also be nice to pass in the flow direction if possible. We know which face, so we know flow dir...
 				// 1 = $propogateCount means only the oxel directly next to the effect oxel will have flow tasks generated.
-				if ( ti.flowable && Globals.autoFlow && EditCursor.EDIT_CURSOR != $guid && 1 == $propogateCount )
-					Flow.addTask( $guid, gc, type, null != flowInfo ? flowInfo : ti.flowInfo.clone(), 1 );
+				if ( ti.flowable && Globals.autoFlow && EditCursor.EDIT_CURSOR != $modelGuid && 1 == $propogateCount )
+					Flow.addTask( $modelGuid, gc, type, null != flowInfo ? flowInfo : ti.flowInfo.clone(), 1 );
 					
 				if ( _quads && _quads[$face] )
 					_quads[$face].dirty = 1;
@@ -1103,7 +1139,7 @@ package com.voxelengine.worldmodel.oxel
 				if ( lighting )
 					lighting.occlusionResetFace( $face );
 
-				super.faceMarkDirty( $guid, $face, $propogateCount );
+				super.faceMarkDirty( $modelGuid, $face, $propogateCount );
 			}
 		}
 
@@ -1112,11 +1148,11 @@ package com.voxelengine.worldmodel.oxel
 			faces_clear_all();
 		}
 		
-		public function faces_rebuild( $guid:String ):void {
+		public function faces_rebuild( $modelGuid:String ):void {
 			quadsDeleteAll();
 			
 			// anytime oxel changes, neighbors need to know
-			neighborsMarkDirtyFaces( $guid, gc.size() );
+			neighborsMarkDirtyFaces( $modelGuid, gc.size() );
 			faces_mark_all_dirty();
 		}
 		
@@ -1444,11 +1480,11 @@ package com.voxelengine.worldmodel.oxel
 		public static var _s_oxelsEvaluated:int = 0;
 		public static var _s_lightsFound:int = 0;
 		
-		public function lightingFromSun( $guid:String, $face:int ):void {
+		public function lightingFromSun( $modelGuid:String, $face:int ):void {
 			if ( childrenHas() )
 			{
 				for each ( var child:Oxel in _children )
-					child.lightingFromSun( $guid, $face );
+					child.lightingFromSun( $modelGuid, $face );
 			}
 			else
 			{
@@ -1456,7 +1492,7 @@ package com.voxelengine.worldmodel.oxel
 				if ( faceHas( $face ) )
 				{
 					_s_oxelsEvaluated++;
-					//LightSunCheck.addTask( $guid, gc, 1, $face );
+					//LightSunCheck.addTask( $modelGuid, gc, 1, $face );
 				}
 
 			}
@@ -1464,11 +1500,11 @@ package com.voxelengine.worldmodel.oxel
 		
 		// This would only be run once when model loads
 		// set the activeVoxelModelGuid before calling
-		public function lightsStaticCount( $guid:String ):void {
+		public function lightsStaticCount( $modelGuid:String ):void {
 			if ( childrenHas() )
 			{
 				for each ( var child:Oxel in _children )
-					child.lightsStaticCount( $guid );
+					child.lightsStaticCount( $modelGuid );
 			}
 			else
 			{
@@ -1736,12 +1772,12 @@ package com.voxelengine.worldmodel.oxel
 		 *
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 		private const MIN_FLOW_GRAIN:int = 2;
-		public function flowFindCandidates( $guid:String, $countDown:int = 8, $countOut:int = 8):void {
+		public function flowFindCandidates( $modelGuid:String, $countDown:int = 8, $countOut:int = 8):void {
 			if ( childrenHas() )
 			{
 				for each ( var child:Oxel in children )
 					if ( MIN_FLOW_GRAIN <= child.gc.grain )
-						child.flowFindCandidates( $guid, $countDown, $countOut);
+						child.flowFindCandidates( $modelGuid, $countDown, $countOut);
 			}
 			else
 			{
@@ -1749,7 +1785,7 @@ package com.voxelengine.worldmodel.oxel
 				{
 					Log.out( "Oxel.flowFindCandidates - gc: " + gc.toString() );
 					//flowTerminal();
-					Flow.addTask( $guid, gc, type, flowInfo, 1 );
+					Flow.addTask( $modelGuid, gc, type, flowInfo, 1 );
 				}
 			}
 		}
@@ -2149,10 +2185,10 @@ package com.voxelengine.worldmodel.oxel
 			return temp;
 		}
 		
-		public function write_sphere( $guid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, gmin:uint = 0 ):void {
+		public function write_sphere( $modelGuid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, gmin:uint = 0 ):void {
 			if ( true == GrainCursorUtils.is_inside_sphere( gc, cx, cy, cz, radius ))
 			{
-				write( $guid, gc, $newType );
+				write( $modelGuid, gc, $newType );
 				return;
 			}
 			
@@ -2175,11 +2211,11 @@ package com.voxelengine.worldmodel.oxel
 			{
 				// make sure child has not already been released.
 				if ( child && child.gc )
-					child.write_sphere( $guid, cx, cy, cz, radius, $newType, gmin );
+					child.write_sphere( $modelGuid, cx, cy, cz, radius, $newType, gmin );
 			}
 		}
 		
-		public function writeHalfSphere( $guid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, gmin:uint = 0 ):void {
+		public function writeHalfSphere( $modelGuid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, gmin:uint = 0 ):void {
 			
 			if ( true == GrainCursorUtils.is_inside_sphere( gc, cx, cy, cz, radius ) )
 			{
@@ -2188,7 +2224,7 @@ package com.voxelengine.worldmodel.oxel
 					for each ( var newChild:Oxel in _children )
 					{
 						if ( newChild && newChild.gc )
-							newChild.writeHalfSphere( $guid, cx, cy, cz, radius, $newType, gmin );
+							newChild.writeHalfSphere( $modelGuid, cx, cy, cz, radius, $newType, gmin );
 					}
 					// if I put a return here, the top layer stays the same, but changes occur below the surface.
 					//return;
@@ -2197,7 +2233,7 @@ package com.voxelengine.worldmodel.oxel
 					return;
 					
 //				Log.out( "writeHalfSphere gc: " + gc.toString() + "  cy: " + cy + " gc.getModelY(): " + gc.getModelY() + "  gc.size: " + gc.size() );
-				write( $guid, gc, $newType );
+				write( $modelGuid, gc, $newType );
 				return;
 			}
 			
@@ -2220,11 +2256,11 @@ package com.voxelengine.worldmodel.oxel
 			{
 				// make sure child has not already been released.
 				if ( child && child.gc )
-					child.writeHalfSphere( $guid, cx, cy, cz, radius, $newType, gmin );
+					child.writeHalfSphere( $modelGuid, cx, cy, cz, radius, $newType, gmin );
 			}
 		}
 		
-		public function writeCylinder( $guid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, axis:int, gmin:uint, startTime:int, runTime:int, startingSize:int ):Boolean {
+		public function writeCylinder( $modelGuid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, axis:int, gmin:uint, startTime:int, runTime:int, startingSize:int ):Boolean {
 			var result:Boolean = true;
 			var timer:int = getTimer();
 			if ( startTime + runTime < timer )
@@ -2232,7 +2268,7 @@ package com.voxelengine.worldmodel.oxel
 				
 			if ( true == GrainCursorUtils.isInsideCircle( gc, cx, cy, cz, radius, axis ))
 			{
-				write( $guid, gc, $newType );
+				write( $modelGuid, gc, $newType );
 				return result;
 			}
 			else if ( gc.grain < startingSize && true == GrainCursorUtils.isOutsideCircle( gc, cx, cy, cz, radius, axis ))
@@ -2250,7 +2286,7 @@ package com.voxelengine.worldmodel.oxel
 			{
 				if ( child )
 				{
-					result = child.writeCylinder( $guid, cx, cy, cz, radius, $newType, axis, gmin, startTime, runTime, startingSize );
+					result = child.writeCylinder( $modelGuid, cx, cy, cz, radius, $newType, axis, gmin, startTime, runTime, startingSize );
 					if ( !result )
 						return result;
 				}
@@ -2259,10 +2295,10 @@ package com.voxelengine.worldmodel.oxel
 			return result
 		}
 		
-		public function empty_square( $guid:String, cx:int, cy:int, cz:int, radius:int, gmin:uint=0 ):void {
+		public function empty_square( $modelGuid:String, cx:int, cy:int, cz:int, radius:int, gmin:uint=0 ):void {
 			if ( true == GrainCursorUtils.is_inside_square( gc, cx, cy, cz, radius ))
 			{
-				write( $guid, gc, Globals.AIR );
+				write( $modelGuid, gc, Globals.AIR );
 				return;
 			} 
 			if ( true == GrainCursorUtils.is_outside_square( gc, cx, cy, cz, radius ))
@@ -2272,7 +2308,7 @@ package com.voxelengine.worldmodel.oxel
 			
 			if ( gc.grain <= gmin )
 			{
-				write( $guid, gc, Globals.AIR );
+				write( $modelGuid, gc, Globals.AIR );
 				return;	
 			}
 
@@ -2280,11 +2316,11 @@ package com.voxelengine.worldmodel.oxel
 			
 			for each ( var child:Oxel in _children )
 			{
-				child.empty_square( $guid, cx, cy, cz, radius, gmin );
+				child.empty_square( $modelGuid, cx, cy, cz, radius, gmin );
 			}
 		}
 
-		public function effect_sphere( $guid:String, cx:int, cy:int, cz:int, ie:ImpactEvent ):void {
+		public function effect_sphere( $modelGuid:String, cx:int, cy:int, cz:int, ie:ImpactEvent ):void {
 			var radius:int = ie.radius
 			var writeType:int = 0;
 			var ip:InteractionParams = null;
@@ -2295,7 +2331,7 @@ package com.voxelengine.worldmodel.oxel
 				writeType = Globals.getTypeId( ip.type );
 				if ( type == writeType )
 					return;
-				write( $guid, gc, writeType, false );
+				write( $modelGuid, gc, writeType, false );
 				return;
 			} 
 			
@@ -2312,7 +2348,7 @@ package com.voxelengine.worldmodel.oxel
 					return;
 //				if ( "melt" == ip.script )
 //					flowInfo.type = FlowInfo.FLOW_TYPE_MELT;
-				write( $guid, gc, writeType, false );
+				write( $modelGuid, gc, writeType, false );
 				//else if ( "" != ip.script )
 					//Log.out( "Oxel.effect_sphere - " + ip.script + " source type: " + type +  " writeType: " + writeType );
 				return;	
@@ -2328,12 +2364,12 @@ package com.voxelengine.worldmodel.oxel
 			for each ( var child:Oxel in _children )
 			{
 				if ( child && child.gc )
-					child.effect_sphere( $guid, cx, cy, cz, ie );
+					child.effect_sphere( $modelGuid, cx, cy, cz, ie );
 			}
 		}
 		
 		// pass in 8 levels of height maps.
-		public function write_height_map( $guid:String 
+		public function write_height_map( $modelGuid:String 
 		                                , $type:int
 		                                , minHeightMapArray:Vector.<Array>
 										, maxHeightMapArray:Vector.<Array>
@@ -2362,17 +2398,17 @@ package com.voxelengine.worldmodel.oxel
 				{
 					for each ( var child1:Oxel in _children )
 					{
-						child1.write_height_map( $guid, $type, minHeightMapArray, maxHeightMapArray, gmin, heightMapOffset - 1, ignoreSolid );
+						child1.write_height_map( $modelGuid, $type, minHeightMapArray, maxHeightMapArray, gmin, heightMapOffset - 1, ignoreSolid );
 					}
 				}
 				else
 				{
 					if ( ignoreSolid )
-						//write( $guid, gc, $type, true );
+						//write( $modelGuid, gc, $type, true );
 						writeFromHeightMap( gc, $type );
 					else
 						writeFromHeightMap( gc, $type );
-						//write_empty( $guid, gc, $type );
+						//write_empty( $modelGuid, gc, $type );
 				}
 				return;
 			}
@@ -2388,7 +2424,7 @@ package com.voxelengine.worldmodel.oxel
 			
 				for each ( var child:Oxel in _children )
 				{
-					child.write_height_map( $guid, $type, minHeightMapArray, maxHeightMapArray, gmin, heightMapOffset - 1, ignoreSolid );
+					child.write_height_map( $modelGuid, $type, minHeightMapArray, maxHeightMapArray, gmin, heightMapOffset - 1, ignoreSolid );
 				}
 			}
 		}
@@ -2694,34 +2730,34 @@ package com.voxelengine.worldmodel.oxel
 			return newOxel;
 		}
 		
-		public function growTreesOn( $guid:String, $type:int, $chance:int = 2000 ):void {
+		public function growTreesOn( $modelGuid:String, $type:int, $chance:int = 2000 ):void {
 			if ( childrenHas() )
 			{
 				for each ( var child:Oxel in children )
-					child.growTreesOn( $guid, $type, $chance );
+					child.growTreesOn( $modelGuid, $type, $chance );
 			}
 			else if ( $type == type )
 			{
 				var upperNeighbor:Oxel = neighbor( Globals.POSY );
 				if ( Globals.BAD_OXEL != upperNeighbor && Globals.AIR == upperNeighbor.type ) // false == upperNeighbor.hasAlpha
 				{
-					TreeGenerator.generateTree( $guid, this, $chance );
+					TreeGenerator.generateTree( $modelGuid, this, $chance );
 				}
 			}
 		}
 		
-		public function growTreesOnAnything( $guid:String, $chance:int = 2000 ):void {
+		public function growTreesOnAnything( $modelGuid:String, $chance:int = 2000 ):void {
 			if ( childrenHas() )
 			{
 				for each ( var child:Oxel in children )
-					child.growTreesOnAnything( $guid, $chance );
+					child.growTreesOnAnything( $modelGuid, $chance );
 			}
 			else
 			{
 				var upperNeighbor:Oxel = neighbor( Globals.POSY );
 				if ( Globals.BAD_OXEL != upperNeighbor && Globals.AIR == upperNeighbor.type )
 				{
-					TreeGenerator.generateTree( $guid, this, $chance );
+					TreeGenerator.generateTree( $modelGuid, this, $chance );
 				}
 			}
 		}
@@ -2784,31 +2820,31 @@ package com.voxelengine.worldmodel.oxel
 			}
 		}
 		
-		public function vines( $guid:String ):void {
+		public function vines( $modelGuid:String ):void {
 
 			if ( childrenHas() )
 			{
 				for each ( var child:Oxel in children )
-					child.vines( $guid );
+					child.vines( $modelGuid );
 			}
 			else if ( 152 == type  )
 			{
 				var nou:Oxel = neighbor( Globals.POSY )
 				if ( Globals.BAD_OXEL == nou && Globals.AIR == nou.type && !nou.childrenHas() && nou.gc.grain <= 4 )
-					nou.write( $guid, gc, 152 );
+					nou.write( $modelGuid, gc, 152 );
 				var nod:Oxel = neighbor( Globals.NEGY )
 				if ( Globals.BAD_OXEL != nod && Globals.AIR == nod.type && !nod.childrenHas() && nod.gc.grain <= 4 )
-					nou.write( $guid, gc, 152 );
+					nou.write( $modelGuid, gc, 152 );
 			}
 		}
 		
-		public function harvestTrees( $guid:String ):void {
+		public function harvestTrees( $modelGuid:String ):void {
 
 			if ( childrenHas() )
 			{
 				for each ( var child:Oxel in children )
 				{
-					child.harvestTrees( $guid );
+					child.harvestTrees( $modelGuid );
 					// harvesting trees can cause air oxels to merge. So we need to make sure we still have a valid parent.
 					if ( !children )
 						return;
@@ -2816,7 +2852,7 @@ package com.voxelengine.worldmodel.oxel
 			}
 			else if ( Globals.LEAF == type || Globals.BARK == type )
 			{
-				write( $guid, gc, Globals.AIR );
+				write( $modelGuid, gc, Globals.AIR );
 			}
 		}
 		
@@ -2962,8 +2998,8 @@ package com.voxelengine.worldmodel.oxel
 		// Explosion Event Helpers END
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		public function generateID( $guid:String ):String {
-			return $guid + _gc.toID();
+		public function generateID( $modelGuid:String ):String {
+			return $modelGuid + _gc.toID();
 		}
 		
 		static public function childIdOpposite( $face:uint, $childID:uint ):uint {
