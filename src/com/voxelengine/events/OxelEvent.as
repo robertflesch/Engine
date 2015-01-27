@@ -16,9 +16,6 @@ package com.voxelengine.events
 	import flash.events.Event;
 	public class OxelEvent extends Event
 	{
-		static public const CREATE:String 			= "CREATE";
-		static public const DESTROY:String 			= "DESTROY";
-		
 		static public const INSIDE:String 			= "INSIDE";
 		static public const OUTSIDE:String 			= "OUTSIDE";
 		
