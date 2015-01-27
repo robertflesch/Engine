@@ -9,6 +9,7 @@
 package com.voxelengine.GUI
 {
 	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.worldmodel.ObjectInfo;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
@@ -115,7 +116,7 @@ package com.voxelengine.GUI
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Inventory and ToolSize
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		public function buildAction( actionItem:Object, count:int ):Box
+		public function buildAction( actionItem:ObjectInfo, count:int ):Box
 		{
 			var buildResult:Object = _itemInventory.buildActionItem( actionItem, count );
 			eventCollector.addEvent( buildResult.box, UIMouseEvent.PRESS, pressItem );

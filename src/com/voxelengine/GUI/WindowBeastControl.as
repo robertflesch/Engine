@@ -9,6 +9,7 @@
 package com.voxelengine.GUI
 {
 	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.worldmodel.ObjectInfo;
 	import com.voxelengine.worldmodel.weapons.Ammo;
 	import com.voxelengine.worldmodel.weapons.Gun;
 	import com.voxelengine.worldmodel.TypeInfo;
@@ -131,7 +132,7 @@ package com.voxelengine.GUI
 			
 			var box:Box = null;
 			var count:int = 0;
-			var dismountItem:Object = new Object();
+			var dismountItem:ObjectInfo = new ObjectInfo();
 			dismountItem["image"] = "dismount.png";
 			dismountItem["callback"] = loseControl;
 			dismountItem["category"] = "action";
@@ -147,7 +148,7 @@ package com.voxelengine.GUI
 						var gm:Gun = cm as Gun;
 						for each ( var ammo:Ammo in gm.armory )
 						{
-							var actionItem:Object = new Object();
+							var actionItem:ObjectInfo = new ObjectInfo();
 							actionItem["image"] = ammo.name + ".png";
 							actionItem["ammo"] = ammo;
 							actionItem["callback"] = fireGun;
