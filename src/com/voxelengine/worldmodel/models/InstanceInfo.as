@@ -117,39 +117,22 @@ public class InstanceInfo extends Location	{
 	
 	public function toJSON(k:*):* 
 	{ 
-		if ( 0 == velocityGet.length )
-		{
-			return {
-					guid: 			_guid,
-					location: 		positionGet,
-					rotation: 		rotationGet,
-					scale: 			scale,
-					transforms:		_transforms,
-					script: 		_scriptName,
-					grainSize: 		_grainSize,
-					collidable:     _collidable,
-					critical:     	_critical,
-					baseLightLevel: baseLightLevel
-			};
-		}
-		else {
-			return {
-					grainSize: 		_grainSize,
-					guid: 			_guid,
-					velocity: 		velocityGet,
-					location: 		positionGet,
-					rotation: 		rotationGet,
-					scale: 			scale,
-					transforms:		_transforms,
-					shader:			_shader,
-					collision:		_usesCollision,
-					script: 		_scriptName,
-					collidable:     _collidable,
-					critical:     	_critical,
-					state:			_state,
-					baseLightLevel: baseLightLevel
-					};
-		}
+		return {
+				grainSize: 		_grainSize,
+				guid: 			_guid,
+				velocity: 		velocityGet,
+				location: 		positionGet,
+				rotation: 		rotationGet,
+				scale: 			scale,
+				transforms:		_transforms,
+//				shader:			_shader,
+				collision:		_usesCollision,
+				script: 		_scriptName,
+				collidable:     _collidable,
+				critical:     	_critical,
+				state:			_state,
+				baseLightLevel: baseLightLevel
+				};
 	} 	
 	
 	public function InstanceInfo() 
