@@ -250,19 +250,22 @@ package com.voxelengine.worldmodel.models
 				var scl:Vector3D = new Vector3D();
 				if ( json.scale.x )
 				{
-					scl.x = 1/json.scale.x;
+					//scl.x = 1/json.scale.x;
+					scl.x = json.scale.x;
 					if ( 0 == _scale.x )
 						scl.x = 1;
 				}
 				if ( json.scale.y )
 				{
-					scl.y = 1/json.scale.y;
+					//scl.y = 1 / json.scale.y;
+					scl.y = json.scale.y;
 					if ( 0 == scl.y )
 						scl.y = 1;
 				}
 				if ( json.scale.z )
 				{
-					scl.z = 1/json.scale.z;
+					//scl.z = 1/json.scale.z;
+					scl.z = json.scale.z;
 					if ( 0 == scl.z )
 						scl.z = 1;
 				}

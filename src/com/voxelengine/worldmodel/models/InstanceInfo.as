@@ -123,6 +123,7 @@ public class InstanceInfo extends Location	{
 					guid: 			_guid,
 					location: 		positionGet,
 					rotation: 		rotationGet,
+					scale: 			scale,
 					transforms:		_transforms,
 					script: 		_scriptName,
 					grainSize: 		_grainSize,
