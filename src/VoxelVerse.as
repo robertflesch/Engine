@@ -246,8 +246,8 @@ package {
 				stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp);
 					
 				Globals.g_regionManager.currentRegion.save();
-				if ( Globals.player && Globals.player.inventory )
-					Globals.player.inventory.save();
+				if ( Globals.player && Globals.online )
+					Globals.player.inventorySave();
 				
 				dispatchEvent( new GUIEvent( GUIEvent.APP_DEACTIVATE ) );
 			}

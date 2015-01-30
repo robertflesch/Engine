@@ -7,6 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
+import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.GUI.Hub;
 import flash.events.EventDispatcher;
 import flash.net.registerClassAlias;
 import flash.utils.ByteArray;
@@ -16,9 +18,7 @@ import playerio.DatabaseObject;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.server.Network;
 import com.voxelengine.server.Persistance;
-import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.ObjectInfo;
 
@@ -30,8 +30,8 @@ import com.voxelengine.events.InventoryPersistanceEvent;
 public class Inventory
 {
 	private var  _slots:Vector.<ObjectInfo> = new Vector.<ObjectInfo>(10, true);
-	private var _models:Array = new Array();
 	private var _voxels:Array;
+	private var _models:Array = new Array();
 	private var _guid:String;
 
 	// support data for persistance
@@ -44,13 +44,22 @@ public class Inventory
 
 	public function Inventory( $ownerGuid:String ) {
 
+		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_INCREMENT,		modelIncrement );
+		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_DECREMENT, 		modelDecrement );
+		
+		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, 			voxelChange );
+		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST,	voxelCount );
+		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST,	voxelTypes );
+		
+		InventoryManager.addListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
+
 		_guid = $ownerGuid;
 		_voxels = new Array();
 		var allTypes:Array = Globals.typeInfo;
 		for (var key:String in allTypes )
 			_voxels[key] = 0;
 			
-		addVoxelTestData();
+		addTestData();
 	}
 	
 	public function slotChange(e:InventorySlotEvent):void 
@@ -82,6 +91,7 @@ public class Inventory
 		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _guid, -1, result ) );
 	}
 	
+	
 	public function voxelCount(e:InventoryVoxelEvent):void 
 	{
 		if ( e.ownerGuid == _guid && null != _voxels ) {
@@ -98,9 +108,28 @@ public class Inventory
 		//InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, _guid, modelId, modelCount ) );
 	}
 	
+	private function addTestData():void {
+		addModelTestData()
+		addVoxelTestData();
+	};
+	
 	public function addModelTestData():void {
-		_models["Pick"] = 1;
-		_models["Shovel"] = 1;
+		var pickItem:ObjectInfo = new ObjectInfo( ObjectInfo.OBJECTINFO_MODEL, "pickItem" );
+		pickItem.image = "pick.png";
+		pickItem.name = "pick";
+		
+		_slots[0] = pickItem;
+		//_slots[3] = pickItem;
+
+		//pickItem.image = "pick.png";
+		//pickItem.name = "pick";
+		//_models["Pick"] = 1;
+		//buildItem( pickItem, count++ );
+		//
+		//var noneItem:ObjectInfo = new ObjectInfo();
+		//noneItem.image = "none.png";
+		//noneItem.name = "none";
+		//var noneBox:Box = buildItem( noneItem, count++ );
 	}
 	
 	public function addVoxelTestData():void {
@@ -138,6 +167,14 @@ public class Inventory
 		return _models;
 	}
 	
+	private function reset():void {
+		_voxels = null;
+	}
+	
+	public function unload():void {
+		save();
+		reset();
+	}
 	
 	public function load():void {
 		if ( Globals.online ) {
@@ -151,8 +188,10 @@ public class Inventory
 			Log.out( "Inventory.save - Saving User Inventory", Log.WARN );
 			if ( _dbo )
 				toPersistance();
-			else
-				var ba:ByteArray = asByteArray();
+			else {
+				var ba:ByteArray = new ByteArray();	
+				ba = asByteArray( ba );
+			}
 			addSaveEvents();
 			Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_SAVE_REQUEST, _guid, _dbo, ba ) );
 		}
@@ -162,6 +201,7 @@ public class Inventory
 	}
 	
 	public function add( $type:int, $item:* ):void {	
+		Log.out( "Inventory.add - NOT IMPLEMENTED", Log.WARN );
 	}
 	
 	//////////////////////////////////////////////////////////////////
@@ -181,7 +221,8 @@ public class Inventory
 	}
 	
 	private function toPersistance():void {
-		_dbo.data 			= asByteArray();
+		var ba:ByteArray = new ByteArray(); 
+		_dbo.data 			= asByteArray( ba );
 	}
 	
 	private function fromByteArray( $ba:ByteArray ):void {
@@ -194,16 +235,30 @@ public class Inventory
 			//io.fromByteArray( $ba )
 			//items.push( io );
 		//}
+		
+		
 	}
 	
-	private function asByteArray():ByteArray {
+	public function asByteArray( $ba:ByteArray ):ByteArray {
 
-		var ba:ByteArray = new ByteArray();
+		
 		//ba.writeInt( items.length );
 		//for each ( var item:InventoryObject in items )
 			//item.toByteArray( ba );
 		//ba.compress();	
-		return ba;	
+		$ba.writeUTF( _guid );
+		
+		for ( var i:int; i < Hub.ITEM_COUNT; i++ ) {
+			var item:ObjectInfo = _slots[i];
+			if ( item )
+				item.asByteArray( $ba );
+		}
+		
+
+	//_voxels:Array;
+	//_models:Array = new Array();
+		
+		return $ba;	
 	}
 	
 	private function addLoadEvents():void {
@@ -221,13 +276,16 @@ public class Inventory
 	{
 		removeLoadEvents();
 		fromPersistance( $inve.dbo );
+		InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_LOADED, _guid, _slots ) );
 	}
 	
 	private var _generateNewInventory:Boolean;
 	private function InventoryLoadFailed( $inve:InventoryPersistanceEvent ):void
 	{
 		removeLoadEvents();
-		Log.out( "Inventory.InventoryLoadFailed - No object for this avatar, this is ok for first time use.", Log.DEBUG );
+		changed = true;
+		save();
+		
 		//if ( false == _generateNewInventory ) {
 			//generateNewInventory();
 			//save();

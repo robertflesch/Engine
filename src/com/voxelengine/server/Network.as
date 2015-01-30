@@ -23,7 +23,7 @@ public class Network
 	static public function get client():Client { return _client; };
 	static public function set client( val:Client ):void { _client = val; };
 	
-	static private var _userId:String;
+	static private var _userId:String = "player";
 	static public function get userId():String { return _userId; };
 	static public function set userId( val:String ):void { _userId = val; };
 	

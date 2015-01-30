@@ -50,27 +50,20 @@ public class Player extends Avatar
 	static private const 	MIN_TURN_AMOUNT:Number 		= 0.09;
 	static private const 	AVATAR_CLIP_FACTOR:Number 	= 0.90;
 	static private var  	STEP_UP_MAX:int 			= 16;
-	
-	private var _inventory:Inventory;
-	public function get inventory():Inventory { return _inventory; }
-	private function inventoryLoad():void {
-		if ( null != _inventory )
-			Log.out( "Player.inventoryLoad - Player already has an inventory", Log.WARN );
-
-		_inventory = InventoryManager.objectInventoryGet( instanceInfo.guid );	
+		
+	public function inventorySave():void { 
+		var inv:Inventory = InventoryManager.objectInventoryGet( Network.userId );
+		inv.save(); 
 	}
-	private function inventorySave():void { _inventory.save(); }
 	private function inventoryAdd( $type:int, $item:* ):void {
-		_inventory.add( $type, $item );
-		inventorySave();
+		var inv:Inventory = InventoryManager.objectInventoryGet(Network.userId );
+		inv.add( $type, $item );
 	}
 	
 	
 	public function Player( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
-		//Log.out( "Player.contruct --------------------------------------------------------------------------------------------------------------------" );
+		Log.out( "Player.contruct guid: " + instanceInfo.guid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super( instanceInfo, mi, $vmm );
-		
-		Network.userId = instanceInfo.guid;
 		
 		instanceInfo.usesCollision = true;
 		clipVelocityFactor = AVATAR_CLIP_FACTOR;
@@ -104,6 +97,7 @@ public class Player extends Avatar
 	private function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
 		
 		if ( $dbo ) {
+			Globals.player = null;
 			if ( null == $dbo.modelGuid ) {
 				// Assign the player the default avatar
 				$dbo.modelGuid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
@@ -121,6 +115,7 @@ public class Player extends Avatar
 			instanceInfo.grainSize = 4;
 			instanceInfo.guid = $dbo.modelGuid;
 			ModelLoader.load( instanceInfo );
+			var inv:Inventory = InventoryManager.objectInventoryGet( Network.userId );
 		}
 		else {
 			Log.out( "Player.onPlayerLoadedAction - ERROR, failed to create new record for ?" );
@@ -270,23 +265,25 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		 * */
 		// TO DO Should define this in meta data??? RSF or using extents?
 		// diamond around feet
-		_ct.addCollisionPoint( new CollisionPoint( FALL, new Vector3D( 7.5, -1, 7.5 ), false ) );
-		
-		_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
-		//_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX/2, 0 ) ) );
-		//_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX, 0 ) ) );
-//			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 11, Globals.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
-//			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT, 11 ) ) );
-//			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 4, Globals.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
-		// middle of chest
-		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST - 4, 7.5 ) ) );
-		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST, 7.5 ) ) );
-		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST + 4, 7.5 ) ) );
-		// diamond around feet
-		_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
-		_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 7.5 ), false ) );
-		//_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 15 ) ) );
-		//_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 0, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
+		if ( !_ct.hasPoints() ) {
+			_ct.addCollisionPoint( new CollisionPoint( FALL, new Vector3D( 7.5, -1, 7.5 ), false ) );
+			
+			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
+			//_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX/2, 0 ) ) );
+			//_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX, 0 ) ) );
+	//			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 11, Globals.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
+	//			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT, 11 ) ) );
+	//			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 4, Globals.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
+			// middle of chest
+			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST - 4, 7.5 ) ) );
+			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST, 7.5 ) ) );
+			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST + 4, 7.5 ) ) );
+			// diamond around feet
+			_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
+			_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 7.5 ), false ) );
+			//_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 15 ) ) );
+			//_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 0, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
+		}
 
 		//_ct.markersAdd();
 	}
@@ -363,7 +360,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		Globals.player = this;
 		Globals.player.takeControl( null );
 		//Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
-		inventoryLoad();
+		// TODO  - this forces inventory load, should I let it load lazily?
 		MouseKeyboardHandler.addInputListeners();
 		collisionPointsAdd();
 	}

@@ -239,10 +239,9 @@ public class VoxelVerseGUI extends EventDispatcher
 		{
 			if ( !_hub ) {
 				_hub = new Hub();
-				Log.out( "VoxelVerseGUI.guiEventHandler = creating HUB, need to link to user inventory", Log.WARN );
 			}
 				
-			_hub.show();
+			//_hub.show();
 			crossHairShow()
 		}
 	}

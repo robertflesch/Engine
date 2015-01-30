@@ -8,6 +8,9 @@
 
 package com.voxelengine.GUI
 {
+import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.GUI.inventory.BoxInventory;
+import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.ObjectInfo;
 import flash.events.Event;
 import flash.events.MouseEvent;
@@ -45,13 +48,19 @@ public class Hub extends VVCanvas
 	
 	private var _evtColl:EventCollector = new EventCollector();;
 	
-	private const ITEM_COUNT:int = 10;
+	static public const ITEM_COUNT:int = 10;
 	
 	public function get itemInventory():QuickInventory { return _itemInventory; }
 	public function get toolSize():QuickInventory { return _toolSize; }
 	
 	public function Hub()
 	{
+		//Globals.g_app.dispatchEvent( new GUIEvent( GUIEvent.TOOLBAR_SHOW ) );
+		InventoryManager.addListener( InventoryEvent.INVENTORY_LOADED, inventoryLoaded );
+	}
+	
+	private function inventoryLoaded(e:InventoryEvent):void {
+		Log.out( "Hub.inventoryLoaded - populate from here" , Log.WARN );
 		var outline:Image = new Image( Globals.appPath + "assets/textures/" + "hub.png");
 		addElement( outline );
 		
@@ -74,7 +83,12 @@ public class Hub extends VVCanvas
 		
 		show();
 		
-		//Globals.g_app.dispatchEvent( new GUIEvent( GUIEvent.TOOLBAR_SHOW ) );
+		var slots:Vector.<ObjectInfo> = e.result as Vector.<ObjectInfo>;
+		for ( var i:int; i < ITEM_COUNT; i++ ) {
+			var item:ObjectInfo = slots[i];
+			if ( item )
+				(_itemInventory._boxes[i] as BoxInventory).updateObjectInfo( item );
+		}
 	}
 
 	public function addListeners():void
@@ -131,16 +145,6 @@ public class Hub extends VVCanvas
 		_itemInventory.name = "ItemSelector";
 		
 		var count:int = 0;
-		var pickItem:ObjectInfo = new ObjectInfo();
-		pickItem.image = "pick.png";
-		pickItem.name = "pick";
-		buildItem( pickItem, count++ );
-		
-		var noneItem:ObjectInfo = new ObjectInfo();
-		noneItem.image = "none.png";
-		noneItem.name = "none";
-		var noneBox:Box = buildItem( noneItem, count++ );
-		
 		// Should add what is in current inventory here.
 		for  ( ; count < ITEM_COUNT;  )
 		{
@@ -152,12 +156,12 @@ public class Hub extends VVCanvas
 		_itemInventory.width = ITEM_COUNT * 64;
 		_itemInventory.display();
 		
-		processItemSelection( noneBox );
+		//processItemSelection( noneBox );
 		
 		resizeHub(null);
 	}
 
-	private function buildGrain( ti:TypeInfo, count:int ):Box
+	private function buildGrain( ti:ObjectInfo, count:int ):Box
 	{
 		var buildResult:Object = _toolSize.buildGrain( ti, count, "F" + String(count) + ".png" );
 		_evtColl.addEvent( buildResult.box, UIMouseEvent.PRESS, pressGrain );
@@ -172,37 +176,37 @@ public class Hub extends VVCanvas
 		_toolSize.name = "GrainSelector";
 
 		var count:int = 1;
-		var ti:TypeInfo = new TypeInfo();
+		var ti:ObjectInfo = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "0" );
 		ti.image = "0.0625meter.png";
 		ti.name = "0";
 		buildGrain( ti, count++ );
 		
-		ti = new TypeInfo();
+		ti = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "1" );
 		ti.image = "0.125meter.png";
 		ti.name = "1";
 		buildGrain( ti, count++ );
 		
-		ti = new TypeInfo();
+		ti = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "2" );
 		ti.image = "0.25meter.png";
 		ti.name = "2";
 		buildGrain( ti, count++ );
 		
-		ti = new TypeInfo();
+		ti = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "3" );
 		ti.image = "0.5meter.png";
 		ti.name = "3";
 		buildGrain( ti, count++ );
 		
-		ti = new TypeInfo();
+		ti = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "4" );
 		ti.image = "1meter.png";
 		ti.name = "4";
 		var meterBox:Box = buildGrain( ti, count++ );
 		
-		ti = new TypeInfo();
+		ti = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "5" );
 		ti.image = "2meter.png";
 		ti.name = "5";
 		buildGrain( ti, count++ );
 		
-		ti = new TypeInfo();
+		ti = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "6" );
 		ti.image = "4meter.png";
 		ti.name = "6";
 		buildGrain( ti, count++ );
@@ -247,7 +251,7 @@ public class Hub extends VVCanvas
 	
 	public function processGrainSelection( box:UIObject ):void 
 	{
-		var ti:TypeInfo = box.data as TypeInfo;
+		var ti:ObjectInfo = box.data as ObjectInfo;
 		EditCursor.editCursorSize = int ( ti.name.toLowerCase() );
 		_toolSize.moveSelector( box.x );
 
@@ -410,6 +414,7 @@ public class Hub extends VVCanvas
 	{
 		var halfRW:int = Globals.g_renderer.width / 2;
 		var halfRH:int = Globals.g_renderer.height / 2;
+		if ( _toolSize ) {
 		_toolSize.y = Globals.g_renderer.height - (_toolSize.height * 2);
 		_toolSize.x = halfRW - (_toolSize.width / 2) + 73;
 
@@ -421,6 +426,7 @@ public class Hub extends VVCanvas
 		
 		y = Globals.g_renderer.height - TOOLBAROUTLINE_HEIGHT;
 		x = halfRW - (TOOLBAROUTLINE_WIDTH / 2);
+		}
 	}
 }
 }

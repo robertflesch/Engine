@@ -132,7 +132,7 @@ package com.voxelengine.GUI
 			
 			var box:Box = null;
 			var count:int = 0;
-			var dismountItem:ObjectInfo = new ObjectInfo();
+			var dismountItem:ObjectInfo = new ObjectInfo( ObjectInfo.OBJECTINFO_ACTION, "HOW TO USE HERE?" );
 			dismountItem["image"] = "dismount.png";
 			dismountItem["callback"] = loseControl;
 			dismountItem["category"] = "action";
@@ -148,7 +148,7 @@ package com.voxelengine.GUI
 						var gm:Gun = cm as Gun;
 						for each ( var ammo:Ammo in gm.armory )
 						{
-							var actionItem:ObjectInfo = new ObjectInfo();
+							var actionItem:ObjectInfo = new ObjectInfo( ObjectInfo.OBJECTINFO_ACTION, "HOW TO USE HERE?" );
 							actionItem["image"] = ammo.name + ".png";
 							actionItem["ammo"] = ammo;
 							actionItem["callback"] = fireGun;

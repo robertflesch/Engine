@@ -30,7 +30,7 @@ public class QuickInventory extends VVCanvas
 	
 	private const IMAGE_SIZE:int = 64;
 	private var _selector:Sprite = new Canvas(IMAGE_SIZE, IMAGE_SIZE);
-	
+	public var _boxes:Vector.<BoxInventory> = new Vector.<BoxInventory>(10,true);
 	
 	public function QuickInventory() {
 		super( 256, IMAGE_SIZE );
@@ -76,7 +76,8 @@ public class QuickInventory extends VVCanvas
 	
 	public function buildActionItem( actionItem:ObjectInfo, count:int ):Object {
 		//var box:Box = new Box(IMAGE_SIZE, IMAGE_SIZE);
-		var box:Box = new BoxInventory(64, 64, BorderStyle.NONE, actionItem );
+		var box:BoxInventory = new BoxInventory(64, 64, BorderStyle.NONE, actionItem );
+		_boxes[count] = box;
 		var hk:Label = new Label("", 20);
 		box.x = IMAGE_SIZE * count;
 		box.y = 0;
@@ -106,7 +107,7 @@ public class QuickInventory extends VVCanvas
 	}
 	
 	
-	public function buildGrain( item:TypeInfo, count:int, shortCutImage:String):Object {
+	public function buildGrain( item:ObjectInfo, count:int, shortCutImage:String):Object {
 		var box:Box = new Box(IMAGE_SIZE, IMAGE_SIZE);
 		var hk:Label = new Label("", 20);
 		box.x = IMAGE_SIZE * (count - 1);

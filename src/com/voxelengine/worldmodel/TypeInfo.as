@@ -99,7 +99,10 @@ package com.voxelengine.worldmodel
 		public function get durability():Number { return _durability; }
 		public function get luck():Number { return _luck; }
 		
-		public function TypeInfo():void { }
+		public function TypeInfo( $typeId:int ):void { 
+			_typeId = $typeId;
+			super( ObjectInfo.OBJECTINFO_VOXEL, String( $typeId ) );
+		}
 		
 		public function getJSON():String
 		{
@@ -131,7 +134,7 @@ package com.voxelengine.worldmodel
 		static private function onTypesLoadedAction(event:Event):void 
 		{
 			//Log.out( "TypeInfo.onTypesLoadedAction - loading", Log.WARN );
-			var ti:TypeInfo = new TypeInfo();
+			var ti:TypeInfo = new TypeInfo( 0 );
 			ti._typeId = 0;
 			ti._category = "INVALID";
 			ti._name = "INVALID";
@@ -152,7 +155,7 @@ package com.voxelengine.worldmodel
 			var types:Object = result.types;
 			for each ( var v:Object in types )		   
 			{
-				ti = new TypeInfo();
+				ti = new TypeInfo( v.id );
 				ti.init( v );
 				Globals.typeInfo[ti._typeId] = ti;
 			}
