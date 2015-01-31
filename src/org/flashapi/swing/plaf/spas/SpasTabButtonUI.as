@@ -37,6 +37,7 @@ package org.flashapi.swing.plaf.spas {
 	import flash.geom.Point;
 	import flash.geom.Transform;
 	import org.flashapi.swing.color.RGB;
+	import org.flashapi.swing.constants.ButtonOrientation;
 	import org.flashapi.swing.constants.ButtonState;
 	import org.flashapi.swing.constants.StateObjectValue;
 	import org.flashapi.swing.draw.DashedLine;
@@ -143,7 +144,10 @@ package org.flashapi.swing.plaf.spas {
 			//var lineColor:uint = (dto.fontColors.selected != StateObjectValue.NONE) ?
 				//dto.fontColors.selected : DEFAULT_FONT_COLOR;
 			//drawButtonShape(bntColor, lineColor, -1, true );
-			drawButtonShapeMD( dto.color, true );
+			var selectedColor:uint = new RGB(dto.color).darker( 0.9 );
+			
+			//drawButtonShapeMD( dto.color, true );
+			drawButtonShapeMD( selectedColor, true );
 		}
 		
 		/**
@@ -301,7 +305,10 @@ package org.flashapi.swing.plaf.spas {
 			f.endFill();
 			if ( $selected ) {
 				f.beginFill( 0xff0000 );
-				f.drawRectangle( 0, (9*h)/10, w, h );
+				if ( ButtonOrientation.HORIZONTAL == dto.uio.orientation )
+					f.drawRectangle( 0, (9 * h) / 10, w, h );
+				else	
+					f.drawRectangle( (9.5 *w)/ 10, 0, w, h );
 				f.endFill();
 			}
 		}

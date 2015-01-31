@@ -41,6 +41,7 @@ package org.flashapi.swing.button.core {
 	import org.flashapi.swing.constants.ButtonState;
 	import org.flashapi.swing.constants.LabelPlacement;
 	import org.flashapi.swing.constants.LayoutOrientation;
+	import org.flashapi.swing.constants.ButtonOrientation;
 	import org.flashapi.swing.constants.StateObjectValue;
 	import org.flashapi.swing.constants.TextDecoration;
 	import org.flashapi.swing.core.IconTextFieldLayout;
@@ -844,6 +845,30 @@ package org.flashapi.swing.button.core {
 			setRefresh();
 		}
 		
+		protected var $orientation:String = ButtonOrientation.HORIZONTAL;
+		/**
+		 * 	Sets or gets the orientation of the <code>Button</code> instance.
+		 * 	Possible values are:
+		 * 	<ul>
+		 * 		<li><code>ButtonOrientation.HORIZONTAL</code></li>
+		 * 		<li><code>ButtonOrientation.VERTICAL</code></li>
+		 * 	</ul>
+		 * 
+		 * 	@default ButtonOrientation.HORIZONTAL
+		 * 
+		 * 	@see org.flashapi.swing.constants.ButtonBarOrientation
+		 */
+		public function get orientation():String {
+			return $orientation;
+		}
+		public function set orientation(value:String):void {
+			//setOrientation(value);
+			$orientation = value;
+			//updateItemList();
+			spas_internal::metricsChanged = true;
+			setRefresh();
+		}
+			
 		/**
 		 * 	<strong>FOR DEVELOPERS ONLY.</strong>
 		 * 

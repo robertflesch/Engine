@@ -34,6 +34,7 @@ package org.flashapi.swing {
 	import org.flashapi.swing.button.core.AbstractButtonBar;
 	import org.flashapi.swing.button.TabButton;
 	import org.flashapi.swing.constants.ButtonBarOrientation;
+	import org.flashapi.swing.constants.ButtonOrientation;
 	import org.flashapi.swing.core.Initializable;
 	import org.flashapi.swing.core.LafRenderer;
 	import org.flashapi.swing.core.spas_internal;
@@ -304,9 +305,11 @@ package org.flashapi.swing {
 				if (horizontal) {
 					btn.topRightCorner = btn.topLeftCorner = NaN;
 					btn.bottomRightCorner = btn.bottomLeftCorner = 0;
+					btn.orientation = ButtonOrientation.HORIZONTAL
 				} else {
 					btn.topLeftCorner = btn.bottomLeftCorner = NaN;
 					btn.bottomRightCorner = btn.topRightCorner = 0;
+					btn.orientation = ButtonOrientation.VERTICAL
 				}
 				fixButtonWidth(btn);
 				i++;
