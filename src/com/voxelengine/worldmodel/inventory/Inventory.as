@@ -29,20 +29,17 @@ import com.voxelengine.events.InventoryPersistanceEvent;
 
 public class Inventory
 {
-	private var  _slots:Vector.<ObjectInfo> = new Vector.<ObjectInfo>(10, true);
+	private var  _slots:Slots
 	private var _voxels:Array;
 	private var _models:Array = new Array();
-	private var _guid:String;
+	private var _networkId:String;
 
 	// support data for persistance
 	private var _dbo:DatabaseObject  = null;							
 	private var _createdDate:Date;
 	private var _modifiedDate:Date;
-	private var _changed:Boolean;
-	private function get changed():Boolean { return _changed; }
-	private function set changed(value:Boolean):void  { _changed = value; }
 
-	public function Inventory( $ownerGuid:String ) {
+	public function Inventory( $networkId:String ) {
 
 		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_INCREMENT,		modelIncrement );
 		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_DECREMENT, 		modelDecrement );
@@ -51,9 +48,8 @@ public class Inventory
 		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST,	voxelCount );
 		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST,	voxelTypes );
 		
-		InventoryManager.addListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
-
-		_guid = $ownerGuid;
+		_slots = new Slots( $networkId );
+		_networkId = $networkId;
 		_voxels = new Array();
 		var allTypes:Array = Globals.typeInfo;
 		for (var key:String in allTypes )
@@ -62,21 +58,12 @@ public class Inventory
 		addTestData();
 	}
 	
-	public function slotChange(e:InventorySlotEvent):void 
-	{
-		var slotId:int = e.slotId;
-		var item:ObjectInfo = e.item;
-		Log.out( "InventoryManager.slotChange slot: " + slotId + "  item: " + item );
-		_slots[slotId] = item;
-		// save it here...
-	}
-	
 	// This returns an Array which holds the typeId and the count of those voxels
 	public function voxelTypes(e:InventoryVoxelEvent):void 
 	{
 		const cat:String = (e.result as String).toUpperCase();
 		if ( cat == "ALL" ) {
-			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _guid, -1, _voxels ) );
+			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, _voxels ) );
 			return;
 		}
 			
@@ -88,16 +75,16 @@ public class Inventory
 				result[key]	= _voxels[key];
 		}
 
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _guid, -1, result ) );
+		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, result ) );
 	}
 	
 	
 	public function voxelCount(e:InventoryVoxelEvent):void 
 	{
-		if ( e.ownerGuid == _guid && null != _voxels ) {
+		if ( e.ownerGuid == _networkId && null != _voxels ) {
 			var typeId:int = e.typeId;
 			var voxelCount:int = _voxels[typeId];
-			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, _guid, typeId, voxelCount ) );
+			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, _networkId, typeId, voxelCount ) );
 		}
 	}
 	
@@ -105,7 +92,7 @@ public class Inventory
 	{
 		//var modelId:String = e.guid;
 		//var modelCount:int = _models[modelId];
-		//InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, _guid, modelId, modelCount ) );
+		//InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, _networkId, modelId, modelCount ) );
 	}
 	
 	private function addTestData():void {
@@ -114,22 +101,6 @@ public class Inventory
 	};
 	
 	public function addModelTestData():void {
-		var pickItem:ObjectInfo = new ObjectInfo( ObjectInfo.OBJECTINFO_MODEL, "pickItem" );
-		pickItem.image = "pick.png";
-		pickItem.name = "pick";
-		
-		_slots[0] = pickItem;
-		//_slots[3] = pickItem;
-
-		//pickItem.image = "pick.png";
-		//pickItem.name = "pick";
-		//_models["Pick"] = 1;
-		//buildItem( pickItem, count++ );
-		//
-		//var noneItem:ObjectInfo = new ObjectInfo();
-		//noneItem.image = "none.png";
-		//noneItem.name = "none";
-		//var noneBox:Box = buildItem( noneItem, count++ );
 	}
 	
 	public function addVoxelTestData():void {
@@ -158,7 +129,7 @@ public class Inventory
 		count += changeCount;
 		_voxels[typeId] = count;
 		Log.out( "Inventory.voxelChange - changed: " + _voxels[typeId] );
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, _guid, typeId, count ) );			
+		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, _networkId, typeId, count ) );			
 //		Log.out( "Inventory.voxelChange - FAILED to remove a type has less then request count - id: " + e.type + " of count: " + resultCount + " current count: " + count, Log.ERROR );
 	}
 	
@@ -166,6 +137,8 @@ public class Inventory
 	{
 		return _models;
 	}
+	
+	public function get slots():Slots  { return _slots; }
 	
 	private function reset():void {
 		_voxels = null;
@@ -179,12 +152,18 @@ public class Inventory
 	public function load():void {
 		if ( Globals.online ) {
 			addLoadEvents();
-			Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_REQUEST, _guid ) );
+			Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_REQUEST, _networkId ) );
 		}
 	}
 	
+	private function changed():Boolean {
+		if ( _slots.changed )
+			return true;
+		return false;
+	}
+	
 	public function save():void {
-		if ( Globals.online && changed ) {
+		if ( Globals.online && changed() ) {
 			Log.out( "Inventory.save - Saving User Inventory", Log.WARN );
 			if ( _dbo )
 				toPersistance();
@@ -193,7 +172,7 @@ public class Inventory
 				ba = asByteArray( ba );
 			}
 			addSaveEvents();
-			Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_SAVE_REQUEST, _guid, _dbo, ba ) );
+			Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_SAVE_REQUEST, _networkId, _dbo, ba ) );
 		}
 		else
 			Log.out( "Inventory.save - NOT Saving User Inventory, either offline or NOT changed", Log.DEBUG );
@@ -213,21 +192,30 @@ public class Inventory
 		_modifiedDate   = $dbo.modifiedDate;
 		_dbo 			= $dbo;
 		
+		// Slot data is stored as fields for easy analysis
+		// we can know what user carry around
+		_slots.fromPersistance( $dbo );
+		
 		if ( $dbo.data ) {
-			var ba:ByteArray= $dbo.data 
-			ba.uncompress();
-			fromByteArray( ba );
+			var ba:ByteArray = $dbo.data 
+			if ( ba && 0 < ba.bytesAvailable ) {
+				ba.uncompress();
+				fromByteArray( ba );
+			}
 		}
 	}
 	
 	private function toPersistance():void {
+		_slots.toPersistance(_dbo);
 		var ba:ByteArray = new ByteArray(); 
 		_dbo.data 			= asByteArray( ba );
 	}
-	
+
 	private function fromByteArray( $ba:ByteArray ):void {
-		if ( 0 == $ba.bytesAvailable )
+		if ( 0 == $ba.bytesAvailable ) {
+			addModelTestData();
 			return;
+		}
 		//_items = new Vector.<InventoryObject>();	
 		//var itemCount:int = $ba.readInt();
 		//for ( var i:int; i < itemCount; i++ ) {
@@ -235,8 +223,6 @@ public class Inventory
 			//io.fromByteArray( $ba )
 			//items.push( io );
 		//}
-		
-		
 	}
 	
 	public function asByteArray( $ba:ByteArray ):ByteArray {
@@ -246,15 +232,16 @@ public class Inventory
 		//for each ( var item:InventoryObject in items )
 			//item.toByteArray( ba );
 		//ba.compress();	
-		$ba.writeUTF( _guid );
+		$ba.writeUTF( _networkId );
+		$ba.writeInt( Hub.ITEM_COUNT )
 		
-		for ( var i:int; i < Hub.ITEM_COUNT; i++ ) {
-			var item:ObjectInfo = _slots[i];
-			if ( item )
-				item.asByteArray( $ba );
-		}
+		//for ( var i:int; i < Hub.ITEM_COUNT; i++ ) {
+			//var item:ObjectInfo = _slots[i];
+////			if ( item )
+				//item.asByteArray( $ba );
+		//}
 		
-
+		$ba.compress();
 	//_voxels:Array;
 	//_models:Array = new Array();
 		
@@ -276,20 +263,13 @@ public class Inventory
 	{
 		removeLoadEvents();
 		fromPersistance( $inve.dbo );
-		InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_LOADED, _guid, _slots ) );
+		InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_LOADED, _networkId, this ) );
 	}
 	
 	private var _generateNewInventory:Boolean;
 	private function InventoryLoadFailed( $inve:InventoryPersistanceEvent ):void
 	{
 		removeLoadEvents();
-		changed = true;
-		save();
-		
-		//if ( false == _generateNewInventory ) {
-			//generateNewInventory();
-			//save();
-		//}
 	}
 	
 	private function addSaveEvents():void {

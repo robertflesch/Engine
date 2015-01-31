@@ -291,5 +291,26 @@ package com.voxelengine.worldmodel
 			}
 		}
 		
+		override public function asInventoryString():String {
+			return _objectType + ";" + _typeId + ";" + _image + ";" + _name;
+		}
+		
+		override public function fromInventoryString( $data:String ): ObjectInfo {
+			var values:Array = $data.split(";");
+			if ( values.length != 4 ) {
+				Log.out( "TypeInfo.fromInventoryString - not equal to 4 tokens found, length is: " + values.length, Log.WARN );
+				_objectType = ObjectInfo.OBJECTINFO_VOXEL;
+				_typeId = Globals.RED;
+				_image = "invalid.png";
+				_name = "LoadingError";
+				return this;
+			}
+			_objectType = ObjectInfo.OBJECTINFO_VOXEL;
+			_typeId = values[1];
+			_image = values[2];
+			_name = values[3];
+			
+			return this;
+		}
 	}
 }

@@ -35,6 +35,12 @@ public class BoxInventory extends VVBox
 		autoSize = false;
 		dragEnabled = true;
 		data = $item;
+		_count = new Label( "", 64 );
+		_count.fontColor = 0xffffff;
+		_count.textAlign = TextAlign.CENTER
+		//_count.x = 16;
+		_count.y = 20;
+		addElement(_count);
 		
 		updateObjectInfo( $item );
 	}	
@@ -46,12 +52,6 @@ public class BoxInventory extends VVBox
 		_objectInfo = $item;
 		backgroundTexture = "assets/textures/" + $item.image;
 		
-		_count = new Label( "", 64 );
-		_count.fontColor = 0xffffff;
-		_count.textAlign = TextAlign.CENTER
-		//_count.x = 16;
-		_count.y = 20;
-		addElement(_count);
 		
 		if ( $item is TypeInfo ) {
 			InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, voxelCount ) ;

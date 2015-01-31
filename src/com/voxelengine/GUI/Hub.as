@@ -10,7 +10,9 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.GUI.inventory.BoxInventory;
+import com.voxelengine.worldmodel.inventory.Inventory;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
+import com.voxelengine.worldmodel.inventory.Slots;
 import com.voxelengine.worldmodel.ObjectInfo;
 import flash.events.Event;
 import flash.events.MouseEvent;
@@ -83,11 +85,13 @@ public class Hub extends VVCanvas
 		
 		show();
 		
-		var slots:Vector.<ObjectInfo> = e.result as Vector.<ObjectInfo>;
+		var inv:Inventory = e.result as Inventory;
+		var slots:Slots = inv.slots;
+		
+		var items:Vector.<ObjectInfo> = slots.items;
 		for ( var i:int; i < ITEM_COUNT; i++ ) {
-			var item:ObjectInfo = slots[i];
-			if ( item )
-				(_itemInventory._boxes[i] as BoxInventory).updateObjectInfo( item );
+			var item:ObjectInfo = items[i];
+			(_itemInventory._boxes[i] as BoxInventory).updateObjectInfo( item );
 		}
 	}
 

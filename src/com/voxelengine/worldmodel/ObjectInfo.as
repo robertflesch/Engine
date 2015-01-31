@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel
 {
 import flash.utils.ByteArray;
+import com.voxelengine.Log;
 
 /**
  * ...
@@ -16,17 +17,21 @@ import flash.utils.ByteArray;
 public class ObjectInfo 
 {
 	static public const OBJECTINFO_INVALID:int = 0;
-	static public const OBJECTINFO_VOXEL:int = 1;
-	static public const OBJECTINFO_MODEL:int = 2;
-	static public const OBJECTINFO_ACTION:int = 3;
-	static public const OBJECTINFO_GRAIN:int = 4;
+	static public const OBJECTINFO_EMPTY:int = 1;
+	static public const OBJECTINFO_VOXEL:int = 2;
+	static public const OBJECTINFO_MODEL:int = 3;
+	static public const OBJECTINFO_ACTION:int = 4;
+	static public const OBJECTINFO_GRAIN:int = 5;
 	
-	protected var _image:String				= "grey64.png";
-	protected var _name:String 				= "INVALID";
+	protected var _image:String				= "blank.png";
+	protected var _name:String 				= "Empty";
 	protected var _guid:String 				= "INVALID";
 	protected var _objectType:int 			= OBJECTINFO_INVALID;
 	
-	public function ObjectInfo( $type:int, $guid:String ):void { }
+	public function ObjectInfo( $type:int, $guid:String ):void {
+		_objectType = $type;
+		_guid = $guid;
+	}
 	
 	public function get image():String 
 	{
@@ -58,15 +63,43 @@ public class ObjectInfo
 		_guid = value;
 	}
 	
+	public function get objectType():int 
+	{
+		return _objectType;
+	}
+	
 	public function asByteArray( $ba:ByteArray ):ByteArray {
-		// TODO I dont like that I have to reencode this over and over again.
-		// should just be able to use the reference object.
-		$ba.writeInt( _objectType );
-		$ba.writeUTF( _guid );
-		//ba.writeUTF( _name );
-		//ba.writeUTF( _image );
+		// no additional byte data
 		return $ba;
 	}
+	
+	public function fromByteArray( $ba:ByteArray ):ByteArray {
+		// no additional byte data
+		return $ba;
+	}
+	
+	public function asInventoryString():String {
+		return _objectType + ";" + _guid + ";" + _image + ";" + _name;
+	}
+	
+	public function fromInventoryString( $data:String ): ObjectInfo {
+		var values:Array = $data.split(";");
+		if ( values.length != 4 ) {
+			Log.out( "TypeInfo.fromInventoryString - not equal to 4 tokens found, length is: " + values.length, Log.WARN );
+			_objectType = ObjectInfo.OBJECTINFO_EMPTY;
+			_guid = "";
+			_image = "invalid.png";
+			_name = "LoadingError";
+			return this;
+		}
+		_objectType = ObjectInfo.OBJECTINFO_MODEL;
+		_guid = values[1];
+		_image = values[2];
+		_name = values[3];
+		
+		return this;
+	}
+	
 	
 }
 
