@@ -8,6 +8,7 @@
 package com.voxelengine.GUI
 {
 import com.voxelengine.events.LoginEvent;
+import com.voxelengine.events.VVWindowEvent;
 import com.voxelengine.worldmodel.RegionManager;
 import flash.events.Event;
 
@@ -30,6 +31,7 @@ import com.voxelengine.worldmodel.Region;
 public class WindowSandboxList extends VVPopup
 {
 	static private const WIDTH:int = 200;
+	static public const WINDOWSANDBOXLIST_TITLE:String = "Sandbox List";
 	
 	static private var _s_currentInstance:WindowSandboxList = null;
 	static public function get isActive():Boolean { return null != _s_currentInstance; }
@@ -55,7 +57,7 @@ public class WindowSandboxList extends VVPopup
 	
 	public function WindowSandboxList()
 	{
-		super("Sandbox List");
+		super(WINDOWSANDBOXLIST_TITLE);
 		autoSize = true;
 		layout.orientation = LayoutOrientation.VERTICAL;
 		closeButtonActive = false;
@@ -93,7 +95,6 @@ public class WindowSandboxList extends VVPopup
 		// These events are needed to keep mouse clicks from leaking thru window
 		// This needs to be handled by stage
 		eventCollector.addEvent( this, UIMouseEvent.CLICK, windowClick );
-		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
 		eventCollector.addEvent( this, UIMouseEvent.PRESS, pressWindow );
 		
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
@@ -118,6 +119,7 @@ public class WindowSandboxList extends VVPopup
 	
 	override protected function onRemoved( event:UIOEvent ):void {
 		super.onRemoved( event );
+		Globals.g_app.dispatchEvent( new VVWindowEvent( VVWindowEvent.WINDOW_CLOSING, label ) );
 		_s_currentInstance = null;
 	}
 	

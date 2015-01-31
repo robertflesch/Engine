@@ -317,7 +317,7 @@ package com.voxelengine.worldmodel
 				return;
 			
 			if ( !Globals.isGuid( guid ) ) {
-				Log.out( "Region.save - INVALID REGION DATA", Log.ERROR ); 
+				Log.out( "Region.save - INVALID REGION DATA - this happens because when I add models to a region during the load phase, it sets to to changed.", Log.WARN ); 
 				return;
 			}
 				

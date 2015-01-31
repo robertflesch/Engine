@@ -9,6 +9,7 @@
 package com.voxelengine.GUI
 {
 import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.VVWindowEvent;
 import com.voxelengine.GUI.inventory.BoxInventory;
 import com.voxelengine.worldmodel.inventory.Inventory;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
@@ -19,6 +20,7 @@ import flash.events.MouseEvent;
 import flash.events.Event;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
+import org.flashapi.swing.event.WindowEvent;
 
 import org.flashapi.swing.Box;
 import org.flashapi.swing.Image;
@@ -59,6 +61,7 @@ public class Hub extends VVCanvas
 	{
 		//Globals.g_app.dispatchEvent( new GUIEvent( GUIEvent.TOOLBAR_SHOW ) );
 		InventoryManager.addListener( InventoryEvent.INVENTORY_LOADED, inventoryLoaded );
+		this.visible = false;
 	}
 	
 	private function inventoryLoaded(e:InventoryEvent):void {
@@ -67,8 +70,10 @@ public class Hub extends VVCanvas
 		addElement( outline );
 		
 		_itemInventory = new QuickInventory();
+		_itemInventory.visible = false;
 		addChild(_itemInventory);
 		_toolSize = new QuickInventory();
+		_toolSize.visible = false;
 		addChild(_toolSize);
 		
 		_shape = new ShapeSelector();
@@ -80,10 +85,11 @@ public class Hub extends VVCanvas
 		buildGrainSizeSelector();	
 		buildInventorSelector();
 		_shape.addShapeSelector();			
+		_shape.visible = false;
 		
 		resizeHub( null );
 		
-		show();
+	//	show();
 		
 		var inv:Inventory = e.result as Inventory;
 		var slots:Slots = inv.slots;
@@ -92,7 +98,16 @@ public class Hub extends VVCanvas
 		for ( var i:int; i < ITEM_COUNT; i++ ) {
 			var item:ObjectInfo = items[i];
 			(_itemInventory._boxes[i] as BoxInventory).updateObjectInfo( item );
+			
 		}
+		Globals.g_app.addEventListener( VVWindowEvent.WINDOW_CLOSING, shouldDisplay );			
+	}
+	
+	private function shouldDisplay(e:VVWindowEvent):void 
+	{
+		Log.out( "Test of sandbox has closed" );
+		if ( WindowSandboxList.WINDOWSANDBOXLIST_TITLE == e.windowTitle )
+			show();
 	}
 
 	public function addListeners():void

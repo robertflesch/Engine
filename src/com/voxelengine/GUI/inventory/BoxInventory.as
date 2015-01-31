@@ -51,7 +51,7 @@ public class BoxInventory extends VVBox
 			
 		_objectInfo = $item;
 		backgroundTexture = "assets/textures/" + $item.image;
-		
+		data = $item;
 		
 		if ( $item is TypeInfo ) {
 			InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, voxelCount ) ;
@@ -91,6 +91,14 @@ public class BoxInventory extends VVBox
 		// while it is active we want to monitor the count of oxels as they change
 		InventoryManager.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, voxelCount ) ;
 		InventoryManager.removeListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, modelCount ) ;
+	}
+	
+	public function reset():void {
+		InventoryManager.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, voxelCount ) ;
+		InventoryManager.removeListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, modelCount ) ;
+		_count.text = "";
+		backgroundTexture = "assets/textures/blank.png";
+		data = null;
 	}
 }	
 }

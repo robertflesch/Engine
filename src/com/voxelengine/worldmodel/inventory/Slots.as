@@ -28,12 +28,8 @@ public class Slots
 {
 	private var  _items:Vector.<ObjectInfo> = new Vector.<ObjectInfo>(10, true);
 	private var _networkId:String;
-
-	// support data for persistance
-	//private var _dbo:DatabaseObject  = null;							
-	//private var _createdDate:Date;
-	//private var _modifiedDate:Date;
 	private var _changed:Boolean;
+	
 	public function get changed():Boolean { return _changed; }
 	public function set changed(value:Boolean):void  { _changed = value; }
 	
@@ -48,9 +44,11 @@ public class Slots
 		var slotId:int = e.slotId;
 		var item:ObjectInfo = e.item;
 		Log.out( "SlotsManager.slotChange slot: " + slotId + "  item: " + item );
-		_items[slotId] = item;
+		if ( null == item )
+			_items[slotId].reset( "" );
+		else
+			_items[slotId] = item;
 		changed = true;
-		// save it here...
 	}
 	
 	private function createObjectFromInventoryString( $data:String ):ObjectInfo {
@@ -133,35 +131,7 @@ public class Slots
 		}
 	}
 
-	private function fromByteArray( $ba:ByteArray ):void {
-	
-	}
-
-	public function asByteArray( $ba:ByteArray ):ByteArray {
-		return $ba;
-	}
-		
-	
-	private function reset():void {
-		if ( changed )
-			save();
-		_items = null;
-	}
-	
-	public function unload():void {
-		save();
-		reset();
-	}
-	
-	public function load():void {
-	}
-	
-	public function save():void {
-	}
-	
-	public function add( $type:int, $item:* ):void {	
-		Log.out( "Slots.add - NOT IMPLEMENTED", Log.WARN );
-	}
-	
+	private function fromByteArray( $ba:ByteArray ):void {}
+	public function asByteArray( $ba:ByteArray ):ByteArray { return $ba; }
 }
 }

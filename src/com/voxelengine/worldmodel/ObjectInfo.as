@@ -12,7 +12,8 @@ import com.voxelengine.Log;
 
 /**
  * ...
- * @author ...
+ * @author Robert Flesch
+ * Base class for the representation of inventory items in memory and persistance
  */
 public class ObjectInfo 
 {
@@ -28,55 +29,21 @@ public class ObjectInfo
 	protected var _guid:String 				= "INVALID";
 	protected var _objectType:int 			= OBJECTINFO_INVALID;
 	
+	public function get image():String 						{ return _image; }
+	public function set image(value:String):void 			{ _image = value; }
+	public function get name():String 						{ return _name; }
+	public function set name(value:String):void 			{ _name = value; }
+	public function get guid():String 						{ return _guid; }
+	public function set guid(value:String):void 			{ _guid = value; }
+	public function get objectType():int 					{ return _objectType; }
+	
 	public function ObjectInfo( $type:int, $guid:String ):void {
 		_objectType = $type;
 		_guid = $guid;
 	}
 	
-	public function get image():String 
-	{
-		return _image;
-	}
-	
-	public function set image(value:String):void 
-	{
-		_image = value;
-	}
-	
-	public function get name():String 
-	{
-		return _name;
-	}
-	
-	public function set name(value:String):void 
-	{
-		_name = value;
-	}
-	
-	public function get guid():String 
-	{
-		return _guid;
-	}
-	
-	public function set guid(value:String):void 
-	{
-		_guid = value;
-	}
-	
-	public function get objectType():int 
-	{
-		return _objectType;
-	}
-	
-	public function asByteArray( $ba:ByteArray ):ByteArray {
-		// no additional byte data
-		return $ba;
-	}
-	
-	public function fromByteArray( $ba:ByteArray ):ByteArray {
-		// no additional byte data
-		return $ba;
-	}
+	public function asByteArray( $ba:ByteArray ):ByteArray 	{ return $ba; }
+	public function fromByteArray( $ba:ByteArray ):ByteArray{ return $ba; }
 	
 	public function asInventoryString():String {
 		return _objectType + ";" + _guid + ";" + _image + ";" + _name;
@@ -86,10 +53,7 @@ public class ObjectInfo
 		var values:Array = $data.split(";");
 		if ( values.length != 4 ) {
 			Log.out( "TypeInfo.fromInventoryString - not equal to 4 tokens found, length is: " + values.length, Log.WARN );
-			_objectType = ObjectInfo.OBJECTINFO_EMPTY;
-			_guid = "";
-			_image = "invalid.png";
-			_name = "LoadingError";
+			reset( "Loading Error" );
 			return this;
 		}
 		_objectType = ObjectInfo.OBJECTINFO_MODEL;
@@ -100,6 +64,12 @@ public class ObjectInfo
 		return this;
 	}
 	
+	public function reset( $newName:String ):void {
+		_objectType = ObjectInfo.OBJECTINFO_EMPTY;
+		_guid = "";
+		_image = "blank.png";
+		_name = $newName;
+	}
 	
 }
 
