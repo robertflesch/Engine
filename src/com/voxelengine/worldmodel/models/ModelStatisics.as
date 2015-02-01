@@ -14,6 +14,7 @@ package com.voxelengine.worldmodel.models
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import com.voxelengine.worldmodel.oxel.OxelData;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	
@@ -81,7 +82,7 @@ package com.voxelengine.worldmodel.models
 			{
 				if ( !isNaN( key ) )
 				{
-					if ( Globals.typeInfo[key] )
+					if ( TypeInfo.typeInfo[key] )
 						_count += _stats[key];
 					else
 						Log.out( "ModelStatisics.gather - key not found key: " + key, Log.WARN );
@@ -117,9 +118,9 @@ package com.voxelengine.worldmodel.models
 			}
 			else  {
 				statAdd( type, currentGrain );
-				if ( currentGrain < _solid_min && Globals.AIR != type )
+				if ( currentGrain < _solid_min && TypeInfo.AIR != type )
 					_solid_min = currentGrain
-				if ( currentGrain > _solid_max && Globals.AIR != type )
+				if ( currentGrain > _solid_max && TypeInfo.AIR != type )
 					_solid_max = currentGrain
 			}
 			
@@ -155,8 +156,8 @@ package com.voxelengine.worldmodel.models
 			{
 				if ( !isNaN( key ) )
 				{
-					if ( Globals.typeInfo[key] )
-						trace( "Contains " + _stats[key]/GRAINS_PER_SQUARE_METER + " cubic meters of " + Globals.typeInfo[key].name);
+					if ( TypeInfo.typeInfo[key] )
+						trace( "Contains " + _stats[key]/GRAINS_PER_SQUARE_METER + " cubic meters of " + TypeInfo.typeInfo[key].name);
 					else	
 						trace( "ModelStatisics.statsPrint - unknown key: " + key );
 				}

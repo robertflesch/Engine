@@ -344,8 +344,8 @@ public class Hub extends VVCanvas
 		{
 			if ( oi is TypeInfo ) {
 				EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
-				var selectedTypeId:int = Globals.getTypeId( name );
-				if ( Globals.INVALID != selectedTypeId ) {
+				var selectedTypeId:int = TypeInfo.getTypeId( name );
+				if ( TypeInfo.INVALID != selectedTypeId ) {
 					EditCursor.cursorColor = selectedTypeId; 
 					_itemMaterialSelection = itemIndex;
 					Globals.g_app.editing = true;

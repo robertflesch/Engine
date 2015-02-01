@@ -13,6 +13,7 @@ package com.voxelengine
 	import com.furusystems.logging.slf4as.Logging;
 	import com.furusystems.logging.slf4as.ILogger;
 	import com.voxelengine.pools.LightingPool;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.models.ControllableVoxelModel;
 	import com.voxelengine.worldmodel.models.EditCursor;
@@ -73,7 +74,7 @@ package com.voxelengine
 		{
 			if ( Globals.selectedModel )
 			{
-				Globals.selectedModel.oxel.growTreesOn( Globals.selectedModel.instanceInfo.guid, Globals.GRASS );
+				Globals.selectedModel.oxel.growTreesOn( Globals.selectedModel.instanceInfo.guid, TypeInfo.GRASS );
 			}
 			else
 				Log.out( "No selected model", Log.WARN );
@@ -200,7 +201,7 @@ package com.voxelengine
 			CarveTunnel.contructor( Globals.selectedModel.instanceInfo.guid
 			                      , Globals.gci().point
 			                      , Globals.viewVectorNormalizedGet()
-			                      , Globals.AIR
+			                      , TypeInfo.AIR
 			                      , 2048
 			                      , 64 );
 		}
@@ -226,7 +227,7 @@ package com.voxelengine
 			CarveTunnels.contructor( Globals.selectedModel.instanceInfo.guid
 								   , Globals.gci().point
 								   , Globals.viewVectorNormalizedGet()
-								   , Globals.AIR
+								   , TypeInfo.AIR
 								   , 2048
 								   , 64 );
 		}
@@ -242,7 +243,7 @@ package com.voxelengine
 			if ( !vm )
 				{ Log.out( "ConsoleCommands.lavaSpheresCarve  No model selected", Log.WARN ); return; }
 			
-			spheresCarve( vm, loc, Globals.LAVA );
+			spheresCarve( vm, loc, TypeInfo.LAVA );
 		}
 		
 		private static function waterSphere():void
@@ -252,7 +253,7 @@ package com.voxelengine
 			if ( !vm )
 				{ Log.out( "ConsoleCommands.waterSpheresCarve  No model selected", Log.WARN ); return; }
 
-			spheresCarve( vm, loc, Globals.WATER );
+			spheresCarve( vm, loc, TypeInfo.WATER );
 		}
 		
 		private static function lavaSpheres( $count:int = 10 ):void
@@ -262,7 +263,7 @@ package com.voxelengine
 				{ Log.out( "ConsoleCommands.lavaSpheresCarve  No model selected", Log.WARN ); return; }
 			
 			for ( var i:int; i < $count; i++ )
-				spheresCarve( vm, Oxel.locationRandomGet( vm.oxel ), Globals.LAVA );
+				spheresCarve( vm, Oxel.locationRandomGet( vm.oxel ), TypeInfo.LAVA );
 		}
 		
 		private static function waterSpheres( $count:int = 10 ):void
@@ -272,7 +273,7 @@ package com.voxelengine
 				{ Log.out( "ConsoleCommands.waterSpheresCarve  No model selected", Log.WARN ); return; }
 
 			for ( var i:int; i < $count; i++ )
-				spheresCarve( vm, Oxel.locationRandomGet( vm.oxel ), Globals.WATER );
+				spheresCarve( vm, Oxel.locationRandomGet( vm.oxel ), TypeInfo.WATER );
 		}
 		
 		private static function spheresCarve( $vm:VoxelModel, $loc:Vector3D, $type:int, $radius:int = 32, $minGrain:int = 2 ):void {
@@ -283,7 +284,7 @@ package com.voxelengine
 												   , $loc.y
 												   , $loc.z
 												   , $radius 
-												   , Globals.AIR
+												   , TypeInfo.AIR
 												   , $minGrain );
 			Log.out( "ConsoleCommands.waterSpheresCarve  carve AIR time: " + (getTimer() - timer) + "  change count: " + Oxel.nodes );
 			timer = getTimer();

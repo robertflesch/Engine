@@ -39,11 +39,11 @@ package com.voxelengine.worldmodel.tasks.tests
 			_gc.grain = 0;
 			var oxel:Oxel = vm.oxel.childFind( _gc );
 			count++;
-			if ( Globals.BAD_OXEL != oxel && Globals.AIR == oxel.type )
+			if ( Globals.BAD_OXEL != oxel && TypeInfo.AIR == oxel.type )
 			{
 				if ( 60 < count ) {
 					trace( "STONE" );
-					vm.write( _gc, Globals.STONE );
+					vm.write( _gc, TypeInfo.STONE );
 					count = 0;
 				}
 			}
@@ -51,7 +51,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			{
 				if ( 60 < count ) {
 					trace( "AIR" );
-					vm.write( _gc, Globals.AIR );
+					vm.write( _gc, TypeInfo.AIR );
 					count = 0;
 				}
 			}

@@ -47,7 +47,7 @@ package com.voxelengine.worldmodel.tasks.tests
 				
 				if ( on ) {
 					//if ( 2 < count2 ) {
-						vm.write( gc, Globals.AIR );
+						vm.write( gc, TypeInfo.AIR );
 						trace( "TestFlowSingleOxelFaces.start - AIR" );
 						count2 = 0;
 					//}
@@ -55,7 +55,7 @@ package com.voxelengine.worldmodel.tasks.tests
 					count2++;
 				}
 				else {
-					vm.write( gc, Globals.GRASS );
+					vm.write( gc, TypeInfo.GRASS );
 					trace( "TestFlowSingleOxelFaces.start - GRASS" );
 					on = true;
 				}

@@ -76,7 +76,7 @@ public class Quad {
 						     $grain:Number,                  // the world size of the quad 
 						     $lighting:Lighting ):void			
 	{
-		add( $type, $x, $y, $z, $face, $planeFacing, $grain, Globals.typeInfo[$type], $lighting, null );
+		add( $type, $x, $y, $z, $face, $planeFacing, $grain, TypeInfo.typeInfo[$type], $lighting, null );
 		dirty = 0;
 	}
 	
@@ -87,7 +87,7 @@ public class Quad {
 						   $grain:Number,                   // the world size of the quad 
 						   $lighting:Lighting ):Boolean			
 	{
-		var typeInfo:TypeInfo = Globals.typeInfo[$type];
+		var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
 		if ( !calculateUV( typeInfo, $face, $grain, null, $lighting ) )
 			return false;
 			
@@ -104,7 +104,7 @@ public class Quad {
 									    $lighting:Lighting,
 										$flowInfo:FlowInfo ):Boolean			// the scaled for flow distance
 	{
-		var typeInfo:TypeInfo = Globals.typeInfo[$type];
+		var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
 		if ( !calculateUV( typeInfo, $face, $grain, $flowInfo, $lighting ) )
 			return false;
 		
@@ -202,7 +202,7 @@ public class Quad {
 		// maxpix is the total size of the texture to sample from
 		// scale is how many pixels the texture uses
 		// texture size is the size of the overall texture
-//		if ( Globals.GRASS == type && face != Globals.NEGY && face != Globals.POSY && 1 == minpix)
+//		if ( TypeInfo.GRASS == type && face != Globals.NEGY && face != Globals.POSY && 1 == minpix)
 		//static public const TILE_FIXED:int				= 0;
 		//static public const TILE_RANDOM:int 				= 1;
 		//static public const TILE_RANDOM_CENTERED:int 		= 2;
@@ -270,7 +270,7 @@ public class Quad {
 		// but I get tearing, so I am doing something wrong.
 		//if ( TileType.TILE_FIXED == tilingType )
 		//{
-			//if ( Globals.WATER == typeInfo.type && face != Globals.POSY && face != Globals.NEGY )
+			//if ( TypeInfo.WATER == typeInfo.type && face != Globals.POSY && face != Globals.NEGY )
 			//{
 				//for (var ii:int = 0; i < 4; i++)
 				//{

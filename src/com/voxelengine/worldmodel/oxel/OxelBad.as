@@ -43,7 +43,7 @@ package com.voxelengine.worldmodel.oxel
 		override public function get type():int 
 		{ 
 			throw new Error("OxelBad - ERROR - type - get");
-			return Globals.INVALID;
+			return TypeInfo.INVALID;
 		}
 		/*
 		override public function set type( val:int, $guid:String ):void 

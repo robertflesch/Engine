@@ -41,7 +41,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 					var lo:Oxel = vm.oxel.childFind( $le.gc );
 					if ( Oxel.validLightable( lo ) )
 					{
-						var ti:TypeInfo = Globals.typeInfo[lo.type];
+						var ti:TypeInfo = TypeInfo.typeInfo[lo.type];
 						if ( !lo.lighting.add( $le.lightID, ti.lightInfo.color, Lighting.MAX_LIGHT_LEVEL, ti.lightInfo.attn, true ) )
 							throw new Error( "LightAdd.handleLightEvent - How did we get here?" );
 //						lo.brightness.fallOffPerMeter = ti.lightInfo.attn;
@@ -62,7 +62,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 					{
 						// This oxel changed from solid to AIR or Translucent
 						// So I just need to rebalance it as an AIR oxel
-						var airAttn:uint = Globals.typeInfo[ Globals.AIR ].lightInfo.attn;
+						var airAttn:uint = TypeInfo.typeInfo[ TypeInfo.AIR ].lightInfo.attn;
 						const attnScaling:uint = co.lighting.materialFallOffFactor * airAttn * (co.gc.size() / Globals.UNITS_PER_METER);
 						co.lighting.balanceAttnAll( attnScaling );
 						// REVIEW - Just grabbing the ID of the brightest light, but I THINK all will spread.
@@ -177,7 +177,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 					if ( $no.lighting.influenceAdd( lightID, $lo.lighting, $face, true, $no.gc.size() ) )
 						rebuildFace( $no, $face );
 				} 
-				else if ( Globals.AIR == $no.type ) { // this oxel does not have faces OR children, and transmits light
+				else if ( TypeInfo.AIR == $no.type ) { // this oxel does not have faces OR children, and transmits light
 					// Add the influence, test for changes, if changed add this to light list
 					if ( $no.lighting.influenceAdd( lightID, $lo.lighting, $face, false, $no.gc.size() ) )
 						add( $no );
@@ -243,7 +243,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 			if ( changed ) {
 				if ( true == $no.isSolid ) { // this is a SOLID object which does not transmit light (leaves, water are exceptions)
 					rebuildFace( $no, $face );
-				} else if ( Globals.AIR == $no.type ) {
+				} else if ( TypeInfo.AIR == $no.type ) {
 					add( $no );
 				} else {
 					rebuildFace( $no, $face ); // what case is this? leaves and water?

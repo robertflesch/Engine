@@ -1,6 +1,7 @@
 
 package com.voxelengine.GUI
 {
+	import com.voxelengine.worldmodel.TypeInfo;
 	import org.flashapi.swing.Container;
 	import org.flashapi.swing.Box;
 	import org.flashapi.swing.Label;
@@ -66,8 +67,8 @@ package com.voxelengine.GUI
 				_butCurrent.backgroundTexture = "assets/textures/cylinder.jpg";
 				EditCursor.cursorType = EditCursor.CURSOR_TYPE_CYLINDER;
 				if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-					EditCursor.cursorColor = Globals.EDITCURSOR_CYLINDER;
-				//EditCursor.cursorColor = Globals.EDITCURSOR_CYLINDER_ANIMATED;
+					EditCursor.cursorColor = TypeInfo.EDITCURSOR_CYLINDER;
+				//EditCursor.cursorColor = TypeInfo.EDITCURSOR_CYLINDER_ANIMATED;
 			} 
 			else if ( "cylinder" == _butCurrent.data)
 			{
@@ -75,7 +76,7 @@ package com.voxelengine.GUI
 				_butCurrent.backgroundTexture = "assets/textures/sphere.jpg";
 				EditCursor.cursorType = EditCursor.CURSOR_TYPE_SPHERE;
 				if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-					EditCursor.cursorColor = Globals.EDITCURSOR_ROUND;
+					EditCursor.cursorColor = TypeInfo.EDITCURSOR_ROUND;
 			} 
 			else if ( "sphere" == _butCurrent.data)
 			{
@@ -83,7 +84,7 @@ package com.voxelengine.GUI
 				_butCurrent.backgroundTexture = "assets/textures/square.jpg";
 				EditCursor.cursorType = EditCursor.CURSOR_TYPE_GRAIN;
 				if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-					EditCursor.cursorColor = Globals.EDITCURSOR_SQUARE;
+					EditCursor.cursorColor = TypeInfo.EDITCURSOR_SQUARE;
 			}
 		}
 		

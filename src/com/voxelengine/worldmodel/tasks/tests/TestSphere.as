@@ -14,6 +14,7 @@ package com.voxelengine.worldmodel.tasks.tests
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.display.BitmapData;
 	import flash.utils.getTimer;
 	
@@ -24,8 +25,8 @@ package com.voxelengine.worldmodel.tasks.tests
 	public class TestSphere extends LandscapeTask 
 	{		
 		public function TestSphere( guid:String,layer:LayerInfo ):void {
-			trace( "TestSphere.construct of type: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );					
-			super(guid, layer, "TestSphere: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );
+			trace( "TestSphere.construct of type: " + (TypeInfo.typeInfo[layer.type].name.toUpperCase()) );					
+			super(guid, layer, "TestSphere: " + (TypeInfo.typeInfo[layer.type].name.toUpperCase()) );
 		}
 		
 		override public function start():void
@@ -51,7 +52,7 @@ package com.voxelengine.worldmodel.tasks.tests
 				vm.oxel.write_sphere( _guid, c, c/2, c, c - 1, _layer.type, min_grain_size );
 				/* 
 				// 8 spheres 
-				var type:int = Globals.GRASS;
+				var type:int = TypeInfo.GRASS;
 				vm.write_sphere( c/2, c/2, c/2, c/2 - 1, type++, min_grain_size );
 				vm.write_sphere( c/2, c/2, c/2 + c, c/2 - 1, type++, min_grain_size );
 				vm.write_sphere( c/2, c/2 + c, c/2, c/2 - 1, type++, min_grain_size );
@@ -67,7 +68,7 @@ package com.voxelengine.worldmodel.tasks.tests
 				throw new Error("Didnt find model for: " + _guid );
 			}
 
-			trace( "TestSphere.start - completed layer of type: " + (Globals.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
+			trace( "TestSphere.start - completed layer of type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
 			super.complete() // AbstractTask will send event
 		}
 		

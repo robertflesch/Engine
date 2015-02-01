@@ -23,7 +23,7 @@ package com.voxelengine.worldmodel.tasks.tests
 	public class TestGrain0inCenter extends LandscapeTask 
 	{		
 		public function TestGrain0inCenter( guid:String,layer:LayerInfo ):void {
-			trace( "TestGrain0inCorner of type: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );					
+			trace( "TestGrain0inCorner of type: " + (TypeInfo.typeInfo[layer.type].name.toUpperCase()) );					
 			super(guid, layer);
 		}
 		
@@ -44,7 +44,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			//
 			//gc.set_values( max/2, max/2, max/2, gc.grain );
 			//oxel = vm.oxel.childFind( gc, true );
-			//oxel.type = Globals.AIR;
+			//oxel.type = TypeInfo.AIR;
 			
 			trace( gc.edgeval( vm.oxel.size_of_grain() ) );
 			trace( vm.oxel.size_of_grain() / 120 );

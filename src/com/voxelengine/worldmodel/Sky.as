@@ -65,7 +65,7 @@ package com.voxelengine.worldmodel
 			var grain:int = 24;
 			var loc:GrainCursor = GrainCursorPool.poolGet( _voxelModel.oxel.size_of_grain() );
 			loc.grain = grain;
-			_oxel = new Oxel( null, loc , Globals.STONE );
+			_oxel = new Oxel( null, loc , TypeInfo.STONE );
 			_oxel.faces_set_all();
 			Quad.texture_scale_set( 1.0 );
 			_oxel.quads_build_sky( plane_facing );

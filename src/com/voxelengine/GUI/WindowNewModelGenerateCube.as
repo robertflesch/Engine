@@ -55,7 +55,7 @@ public class WindowNewModelGenerateCube extends ModalPopup
 			var item:TypeInfo
 			for ( var i:int = TypeInfo.MIN_TYPE_INFO; i < TypeInfo.MAX_TYPE_INFO; i++ )
 			{
-				item = Globals.typeInfo[i];
+				item = TypeInfo.typeInfo[i];
 				if ( null == item )
 					continue;
 				if ( "INVALID" != item.name && "AIR" != item.name && "BRAND" != item.name && -1 == item.name.indexOf( "EDIT" ) && item.placeable )

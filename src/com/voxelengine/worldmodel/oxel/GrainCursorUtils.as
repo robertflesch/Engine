@@ -40,7 +40,7 @@ public class GrainCursorUtils
 			if (c == "C")	{ gc.become_child	(); }
 			if (c == "P")	{ gc.become_parent	(); }
 			if (c == "+")	{ root.write( gc, int(m.charAt(i++)) ); }
-			if (c == "-")	{ root.write( gc, Globals.AIR		 ); }
+			if (c == "-")	{ root.write( gc, TypeInfo.AIR		 ); }
 		}
 		return true;
 	}

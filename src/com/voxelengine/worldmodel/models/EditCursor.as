@@ -12,6 +12,7 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.pools.LightingPool;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import com.voxelengine.worldmodel.oxel.Oxel;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.display3D.Context3D;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
@@ -471,7 +472,6 @@ package com.voxelengine.worldmodel.models
 				{
 					Globals.player.stateSet( "Pick", 1 );
 					Globals.player.stateLock( true, 300 );
-
 				}
 				
 				
@@ -488,7 +488,7 @@ package com.voxelengine.worldmodel.models
 					gcDelete.become_ancestor( foundModel.editCursor.oxel.gc.grain );
 					var oxelToBeDeleted:Oxel = foundModel.oxel.childGetOrCreate( gcDelete );
 					if ( Globals.BAD_OXEL != oxelToBeDeleted )
-						foundModel.write( gcDelete, Globals.AIR );
+						foundModel.write( gcDelete, TypeInfo.AIR );
 					GrainCursorPool.poolDispose( gcDelete );
 				}
 				else if ( CURSOR_TYPE_SPHERE == cursorType )
@@ -562,7 +562,7 @@ package com.voxelengine.worldmodel.models
 				{
 					where = gciCyl.gc;
 					radius -= radius / 8
-					what = Globals.AIR;
+					what = TypeInfo.AIR;
 				}
 				
 				var cuttingPointCyl:Vector3D = new Vector3D();
@@ -632,7 +632,7 @@ package com.voxelengine.worldmodel.models
 					where = gciCyl.gc;
 					radius -= radius / 8
 					//radius += radius / 16
-					what = Globals.AIR;
+					what = TypeInfo.AIR;
 				}
 					
 				var minGrain:int = Math.max( foundModel.editCursor.oxel.gc.grain - 5, 0 );
@@ -807,13 +807,13 @@ package com.voxelengine.worldmodel.models
 			switch ( type )
 			{
 				case CURSOR_TYPE_CYLINDER:
-					cursorColor = Globals.EDITCURSOR_CYLINDER;
+					cursorColor = TypeInfo.EDITCURSOR_CYLINDER;
 					break;
 				case CURSOR_TYPE_SPHERE:
-					cursorColor = Globals.EDITCURSOR_ROUND;
+					cursorColor = TypeInfo.EDITCURSOR_ROUND;
 					break;
 				case CURSOR_TYPE_GRAIN:
-					cursorColor = Globals.EDITCURSOR_SQUARE;
+					cursorColor = TypeInfo.EDITCURSOR_SQUARE;
 					break;
 			} 
 		}

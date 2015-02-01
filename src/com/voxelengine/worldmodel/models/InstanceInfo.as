@@ -305,9 +305,9 @@ public class InstanceInfo extends Location	{
 		{
 			var typeString:String = "INVALID";
 			typeString = json.type.toLowerCase();
-			_type = Globals.getTypeId( typeString );
-			if ( Globals.INVALID == type )
-				trace( "LayerInfo.initJSON - WARNING - INVALID type found: " + typeString );
+			_type = TypeInfo.getTypeId( typeString );
+			if ( TypeInfo.INVALID == type )
+				Log.out( "LayerInfo.initJSON - WARNING - INVALID type found: " + typeString, Log.WARN );
 		}
 		
 		if ( json.grainSize )

@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.oxel
 {
 	import com.voxelengine.renderer.Quad;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.geom.Vector3D;
 	import flash.utils.ByteArray;
 
@@ -1825,7 +1826,7 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 			if ( !Oxel.validLightable( nno ) )
 				continue;
 			// no perpendicular face to cast shadow
-			if ( Globals.AIR == nno.type && !nno.childrenHas() )
+			if ( TypeInfo.AIR == nno.type && !nno.childrenHas() )
 				continue;
 				
 			if ( nno.gc.grain > $o.gc.grain )  // implies it has no children.
@@ -1869,7 +1870,7 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 			if ( !Oxel.validLightable( nno ) )
 				continue;
 			// no perpendicular face to cast shadow
-			else if ( Globals.AIR == nno.type && !nno.childrenHas() )
+			else if ( TypeInfo.AIR == nno.type && !nno.childrenHas() )
 				continue;
 				
 			if ( nno.gc.grain > $o.gc.grain )  // implies it has no children.
@@ -1909,10 +1910,10 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 			// Same grain size, but made up of smaller grainer.
 			// So grab the child kittycorner to $o
 			var oxelPair:Object = $nno.childrenForKittyCorner( $face, $af );
-			//if ( Globals.AIR != oxelPair.a.type ) {
+			//if ( TypeInfo.AIR != oxelPair.a.type ) {
 				//
 			//}
-			//if ( Globals.AIR != oxelPair.b.type ) {
+			//if ( TypeInfo.AIR != oxelPair.b.type ) {
 				//
 			//}
 		}

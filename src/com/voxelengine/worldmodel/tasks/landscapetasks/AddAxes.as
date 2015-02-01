@@ -15,6 +15,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.Globals;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.utils.getTimer;
 	
 	/**
@@ -24,7 +25,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	public class AddAxes extends LandscapeTask
 	{		
 		public function AddAxes( guid:String, layer:LayerInfo ):void {
-			trace( "AddAxes of type: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );					
+			trace( "AddAxes of type: " + (TypeInfo.typeInfo[layer.type].name.toUpperCase()) );					
 			super(guid, layer, "Add Axes");
 		}
 		
@@ -42,9 +43,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			
 			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
 			for ( var x:int = 0; x < max; x++ ) {
-				vm.write( loco.set_values( x, 0, 0, 0 ), Globals.RED, true );
-				vm.write( loco.set_values( 0, x, 0, 0 ), Globals.GREEN, true );
-				vm.write( loco.set_values( 0, 0, x, 0 ), Globals.BLUE, true );
+				vm.write( loco.set_values( x, 0, 0, 0 ), TypeInfo.RED, true );
+				vm.write( loco.set_values( 0, x, 0, 0 ), TypeInfo.GREEN, true );
+				vm.write( loco.set_values( 0, 0, x, 0 ), TypeInfo.BLUE, true );
 			}
 			
 			//vm.print();
@@ -69,47 +70,47 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var vm:VoxelModel = getVoxelModel();
 			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
 			
-			vm.write( loco.set_values(xo, 0, 0, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo, zo, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo+1, zo-1, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo+2, zo-2, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo+3, zo-3, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo+4, zo-4, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo+5, zo-5, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo+6, zo-6, 0 ), Globals.RED, true );
+			vm.write( loco.set_values(xo, 0, 0, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo, zo, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo+1, zo-1, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo+2, zo-2, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo+3, zo-3, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo+4, zo-4, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo+5, zo-5, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo+6, zo-6, 0 ), TypeInfo.RED, true );
 
-            vm.write( loco.set_values(xo, yo+1, zo+1, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo+2, zo+2, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo+3, zo+3, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo+4, zo+4, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo+5, zo+5, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo+6, zo+6, 0 ), Globals.RED, true );
+            vm.write( loco.set_values(xo, yo+1, zo+1, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo+2, zo+2, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo+3, zo+3, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo+4, zo+4, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo+5, zo+5, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo+6, zo+6, 0 ), TypeInfo.RED, true );
 
-            vm.write( loco.set_values(xo, yo - 1, zo - 1, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo - 2, zo - 2, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo - 3, zo - 3, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo - 4, zo - 4, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo - 5, zo - 5, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo - 6, zo - 6, 0 ), Globals.RED, true );
+            vm.write( loco.set_values(xo, yo - 1, zo - 1, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo - 2, zo - 2, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo - 3, zo - 3, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo - 4, zo - 4, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo - 5, zo - 5, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo - 6, zo - 6, 0 ), TypeInfo.RED, true );
 
-            vm.write( loco.set_values(xo, yo - 1, zo + 1, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo - 2, zo + 2, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo - 3, zo + 3, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo - 4, zo + 4, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo - 5, zo + 5, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo - 6, zo + 6, 0 ), Globals.RED, true );
+            vm.write( loco.set_values(xo, yo - 1, zo + 1, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo - 2, zo + 2, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo - 3, zo + 3, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo - 4, zo + 4, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo - 5, zo + 5, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo - 6, zo + 6, 0 ), TypeInfo.RED, true );
 
-            vm.write( loco.set_values(xo, yo , zo - 7, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo , zo -8, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo , zo -9, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo , zo -10, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo , zo - 11, 0 ), Globals.RED, true );
+            vm.write( loco.set_values(xo, yo , zo - 7, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo , zo -8, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo , zo -9, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo , zo -10, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo , zo - 11, 0 ), TypeInfo.RED, true );
 
-            vm.write( loco.set_values(xo, yo +2, zo - 9, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo + 1, zo - 9, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo , zo - 9, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo -1, zo - 9, 0 ), Globals.RED, true );
-            vm.write( loco.set_values(xo, yo -2, zo - 9, 0 ), Globals.RED, true );
+            vm.write( loco.set_values(xo, yo +2, zo - 9, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo + 1, zo - 9, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo , zo - 9, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo -1, zo - 9, 0 ), TypeInfo.RED, true );
+            vm.write( loco.set_values(xo, yo -2, zo - 9, 0 ), TypeInfo.RED, true );
         }	
 		
 		private function GeneratePlusY( xo:int, yo:int, zo:int ):void
@@ -117,27 +118,27 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var vm:VoxelModel = getVoxelModel();
 			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
 
-            vm.write( loco.set_values(xo + 0, yo, zo - 0, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 1, yo, zo - 1, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 2, yo, zo - 2, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 3, yo, zo - 3, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 4, yo, zo - 4, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 5, yo, zo - 5, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo - 1, yo, zo - 1, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo - 2, yo, zo - 2, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo - 3, yo, zo - 3, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo - 4, yo, zo - 4, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo - 5, yo, zo - 5, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo - 0, yo, zo + 1, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 0, yo, zo + 2, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 0, yo, zo + 3, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 0, yo, zo + 4, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 0, yo, zo + 5, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 7, yo, zo - 0, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 8, yo, zo - 0, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 9, yo, zo - 0, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 8, yo, zo + 1, 0 ), Globals.GREEN, true );
-            vm.write( loco.set_values(xo + 8, yo, zo - 1, 0 ), Globals.GREEN, true );
+            vm.write( loco.set_values(xo + 0, yo, zo - 0, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 1, yo, zo - 1, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 2, yo, zo - 2, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 3, yo, zo - 3, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 4, yo, zo - 4, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 5, yo, zo - 5, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo - 1, yo, zo - 1, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo - 2, yo, zo - 2, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo - 3, yo, zo - 3, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo - 4, yo, zo - 4, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo - 5, yo, zo - 5, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo - 0, yo, zo + 1, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 0, yo, zo + 2, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 0, yo, zo + 3, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 0, yo, zo + 4, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 0, yo, zo + 5, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 7, yo, zo - 0, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 8, yo, zo - 0, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 9, yo, zo - 0, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 8, yo, zo + 1, 0 ), TypeInfo.GREEN, true );
+            vm.write( loco.set_values(xo + 8, yo, zo - 1, 0 ), TypeInfo.GREEN, true );
         }	
 		
 		private function GeneratePlusZ( xo:int, yo:int, zo:int ):void
@@ -145,11 +146,11 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var vm:VoxelModel = getVoxelModel();
 			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
 
-            vm.write( loco.set_values(xo + 7, yo - 0, zo, 0 ), Globals.BLUE, true );
-            vm.write( loco.set_values(xo + 8, yo - 0, zo, 0 ), Globals.BLUE, true );
-            vm.write( loco.set_values(xo + 9, yo - 0, zo, 0 ), Globals.BLUE, true );
-            vm.write( loco.set_values(xo + 8, yo + 1, zo, 0 ), Globals.BLUE, true );
-            vm.write( loco.set_values(xo + 8, yo - 1, zo, 0 ), Globals.BLUE, true );
+            vm.write( loco.set_values(xo + 7, yo - 0, zo, 0 ), TypeInfo.BLUE, true );
+            vm.write( loco.set_values(xo + 8, yo - 0, zo, 0 ), TypeInfo.BLUE, true );
+            vm.write( loco.set_values(xo + 9, yo - 0, zo, 0 ), TypeInfo.BLUE, true );
+            vm.write( loco.set_values(xo + 8, yo + 1, zo, 0 ), TypeInfo.BLUE, true );
+            vm.write( loco.set_values(xo + 8, yo - 1, zo, 0 ), TypeInfo.BLUE, true );
         }
 	}
 }

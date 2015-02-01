@@ -30,10 +30,96 @@ package com.voxelengine.worldmodel
 	 */
 	public class TypeInfo extends ObjectInfo
 	{
+		public static const INVALID:uint						= 0;	//  0
+		private static var  enum_val:uint						= 100; // TypeInfo.MIN_TYPE_INFO
+		public static const AIR:uint							= enum_val++;	//  100
+		public static const GRASS:uint							= enum_val++;	//  101
+		public static const DIRT:uint							= enum_val++;	//  102
+		public static const SAND:uint							= enum_val++;	//  103
+		public static const STONE:uint							= enum_val++;	//  104 
+		public static const GRAVEL:uint							= enum_val++;	//  105
+		public static const PLANK:uint							= enum_val++;	//  106
+		public static const WATER:uint							= enum_val++;	//  107
+		public static const MIST:uint							= enum_val++;	//  108 
+		public static const LEAF:uint							= enum_val++;	//  109 
+		public static const BARK:uint							= enum_val++;	//  110 
+		public static const LAVA:uint							= enum_val++;	//  111
+		public static const RED:uint							= enum_val++;	// 112
+		public static const BLUE:uint							= enum_val++;	// 113
+		public static const GREEN:uint							= enum_val++;	// 114
+		public static const CLOUD:uint							= enum_val++;	// 115
+		public static const BALLOON:uint						= enum_val++;	// 116
+		public static const ROPE:uint							= enum_val++;	// 117
+		public static const IRON:uint							= enum_val++;	// 118
+		public static const UNUSED_1:uint						= enum_val++;	// 119
+		public static const STONE_WALL:uint						= enum_val++;	// 120
+		public static const COPPER:uint							= enum_val++;	// 121
+		public static const BRONZE:uint							= enum_val++;	// 122
+		public static const STEEL:uint							= enum_val++;	// 123
+		public static const GLASS:uint							= enum_val++;	// 124
+		public static const EDITCURSOR_SQUARE:uint				= 1000;
+		public static const EDITCURSOR_ROUND:uint				= 1001;
+		public static const EDITCURSOR_CYLINDER:uint			= 1002;
+		public static const EDITCURSOR_CYLINDER_ANIMATED:uint	= 1003;
+		// NO MORE!!
+		
+		// WARNING use sparingly
+		static public function getTypeId( type:* ):int
+		{
+			if ( type is int )
+				return type;
+			else if ( type is Number )
+				return (type as int);
+			else if ( type is String )
+			{
+				var typeString:String = type.toUpperCase();
+				 return typeInfoByName[ typeString ].type;
+				//for ( var i:int = TypeInfo.MIN_TYPE_INFO; i < TypeInfo.MAX_TYPE_INFO; i++ )
+				//{
+					//
+					//if ( TypeInfo.typeInfo[i] && ( typeString == TypeInfo.typeInfo[i].name.toUpperCase() ) ) 
+						//return TypeInfo.typeInfo[i].type; 
+				//}
+			}
+
+   			Log.out( "TypeInfo.getTypeId - WARNING - INVALID type found: " + type, Log.WARN );
+			
+			return AIR
+		}
+		
+		public static var typeInfo:Vector.<TypeInfo> = new Vector.<TypeInfo>(1024);
+		public static var typeInfoByName:Array = new Array;
+		
+		static public function drawable( type:int ):Boolean
+		{
+			if ( typeInfo[type].solid || typeInfo[type].alpha )
+				return true;
+			return false;
+		}
+		
+		// This ideally should be define by texture, but then it is very hard to operate on programattically
+		static public function hasAlpha( type:int ):Boolean
+		{
+			if ( typeInfo[type].alpha || AIR == type )
+				return true;
+			return false;	
+		}
+
+		// solid is a collidable object
+		static public function isSolid( type:int ):Boolean
+		{
+			if ( typeInfo[type].solid )
+				return true;
+			return false;	
+		}
+		
+		
+		
 		static public const MIN_TYPE_INFO:uint = 100;
 		static public const MAX_TYPE_INFO:uint = 1024;
-		
-		private var _typeId:uint				= Globals.INVALID;
+
+		//////////////////////////////////////////////////////////////////////////////////////////////
+		private var _typeId:uint				= TypeInfo.INVALID;
 		private var _category:String 			= "INVALID";
 		private var _subCat:String 				= "INVALID";
 
@@ -143,8 +229,8 @@ package com.voxelengine.worldmodel
 			ti._name = "INVALID";
 			ti._solid = false;
 			ti._placeable = false;
-			Globals.typeInfo[ti._typeId] = ti;
-			Globals.typeInfoByName[ti.name.toUpperCase()] = ti;
+			TypeInfo.typeInfo[ti._typeId] = ti;
+			TypeInfo.typeInfoByName[ti.name.toUpperCase()] = ti;
 			
 			
 			var jsonString:String = StringUtil.trim(String(event.target.data));
@@ -161,8 +247,8 @@ package com.voxelengine.worldmodel
 			{
 				ti = new TypeInfo( v.id );
 				ti.init( v );
-				Globals.typeInfo[ti._typeId] = ti;
-				Globals.typeInfoByName[ti.name.toUpperCase()] = ti;
+				TypeInfo.typeInfo[ti._typeId] = ti;
+				TypeInfo.typeInfoByName[ti.name.toUpperCase()] = ti;
 			}
 			
 			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_TYPES_COMPLETE ) );
@@ -305,7 +391,7 @@ package com.voxelengine.worldmodel
 			if ( values.length != 4 ) {
 				Log.out( "TypeInfo.fromInventoryString - not equal to 4 tokens found, length is: " + values.length, Log.WARN );
 				_objectType = ObjectInfo.OBJECTINFO_VOXEL;
-				_typeId = Globals.RED;
+				_typeId = TypeInfo.RED;
 				_image = "invalid.png";
 				_name = "LoadingError";
 				return this;

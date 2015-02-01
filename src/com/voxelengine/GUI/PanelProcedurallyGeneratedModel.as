@@ -215,7 +215,7 @@ class LayerTypeData extends SimpleContainerBase
 		var item:TypeInfo
 		for ( var i:int = TypeInfo.MIN_TYPE_INFO; i < TypeInfo.MAX_TYPE_INFO; i++ )
 		{
-			item = Globals.typeInfo[i];
+			item = TypeInfo.typeInfo[i];
 			//if ( "INVALID" != nitem.name && "AIR" != nitem.name && "BRAND" != nitem.name && -1 == nitem.name.indexOf( "EDIT" ) && -1 == nitem.name.indexOf( "UNNAMED" ) )
 			if ( null != item && "INVALID" != item.name && "AIR" != item.name && "BRAND" != item.name && -1 == item.name.indexOf( "EDIT" ) )
 			{

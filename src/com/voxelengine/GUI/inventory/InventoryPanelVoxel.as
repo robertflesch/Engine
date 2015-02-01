@@ -77,13 +77,13 @@ public class InventoryPanelVoxel extends VVContainer
 	private function inventoryTestListeners():void { 
 		
 		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, testInventoryVoxelResult ) ;
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST, Network.userId, Globals.STONE, -1 ) );
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST, Network.userId, Globals.IRON, -1 ) );
+		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST, Network.userId, TypeInfo.STONE, -1 ) );
+		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST, Network.userId, TypeInfo.IRON, -1 ) );
 		
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, Globals.STONE, 1 ) );
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, Globals.STONE, 100 ) );
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, Globals.STONE, 1000 ) );
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, Globals.STONE, 10000 ) );
+		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, TypeInfo.STONE, 1 ) );
+		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, TypeInfo.STONE, 100 ) );
+		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, TypeInfo.STONE, 1000 ) );
+		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, TypeInfo.STONE, 10000 ) );
 	}
 
 	private function testInventoryVoxelResult(e:InventoryVoxelEvent):void 
@@ -167,7 +167,7 @@ public class InventoryPanelVoxel extends VVContainer
 		
 		for (var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
 		{
-			item = Globals.typeInfo[typeId];
+			item = TypeInfo.typeInfo[typeId];
 			if ( null == item )
 				continue;
 			var voxelCount:int = results[typeId].val;

@@ -13,6 +13,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 	import com.voxelengine.worldmodel.biomes.*;
+	import com.voxelengine.worldmodel.TypeInfo;
 
 	import flash.utils.getTimer;
 
@@ -47,7 +48,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 							if ( dy >= -paintRadius && 0 >= dy ) {
 								voxels.setVoxelType(x + dx, y + dy, z + dz, type);
 							} else
-								voxels.setVoxelType(x + dx, y + dy, z + dz, Globals.AIR);
+								voxels.setVoxelType(x + dx, y + dy, z + dz, TypeInfo.AIR);
 						}
 					}		
 				}			
@@ -77,7 +78,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
             const radiusParameter:int = radius;
 			var voxel:VoxelBase = _region.oxel.voxels.getVoxel( sx, sy, sz );
 			//trace( "GenerateLavaPockets - placeLava - found point of type " + (Globals.Info[voxel.type].name) + "  at x: " + sx + " y: " + sy + " z: " + sz );					
-			if ( Globals.AIR != voxel.type && false == Globals.Info[voxel.type].flowable ) {
+			if ( TypeInfo.AIR != voxel.type && false == Globals.Info[voxel.type].flowable ) {
 				trace( "GenerateLavaPockets - placeLava - PLACED at x: " + sx + " y: " + sy + " z: " + sz );					
 				paintAtPoint( region, sx, sy, sz, radius, type );
 			}
@@ -86,7 +87,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 		override public function start():void {
             super.start() // AbstractTask will send event
-			trace( "GenerateLavaPockets - enter - creating " +_layer.offset + " pockets of type " + (Globals.typeInfo[_layer.type].name.toUpperCase()) );					
+			trace( "GenerateLavaPockets - enter - creating " +_layer.offset + " pockets of type " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );					
 			var timer:int = getTimer();
             var vm:VoxelModel = Globals.getModelInstance( _guid );
 			

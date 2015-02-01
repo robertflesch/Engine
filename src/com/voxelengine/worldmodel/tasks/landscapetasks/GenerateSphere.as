@@ -13,6 +13,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.utils.getTimer;
 	
 	/**
@@ -23,7 +24,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	{		
 		public function GenerateSphere( guid:String,layer:LayerInfo ):void {
 			//Log.out( "GenerateSphere.construct of type: " + (Globals.Info[layer.type].name.toUpperCase()) );					
-			super(guid, layer, "GenerateSphere: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );
+			super(guid, layer, "GenerateSphere: " + (TypeInfo.typeInfo[layer.type].name.toUpperCase()) );
 		}
 		
 		override public function start():void
@@ -53,7 +54,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				vm.oxel.write_sphere( _guid, c, c, c, c, _layer.type, min_grain_size );
 				/* 
 				// 8 spheres 
-				var type:int = Globals.GRASS;
+				var type:int = TypeInfo.GRASS;
 				vm.write_sphere( c/2, c/2, c/2, c/2 - 1, type++, min_grain_size );
 				vm.write_sphere( c/2, c/2, c/2 + c, c/2 - 1, type++, min_grain_size );
 				vm.write_sphere( c/2, c/2 + c, c/2, c/2 - 1, type++, min_grain_size );

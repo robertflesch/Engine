@@ -42,7 +42,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			var repeatCount:int = 64;
 			while ( 0 < repeatCount )
 			{
-				vm.write( _gc, Globals.AIR );
+				vm.write( _gc, TypeInfo.AIR );
 				_gc.child_inc(grainSize);
 				repeatCount--;
 			}

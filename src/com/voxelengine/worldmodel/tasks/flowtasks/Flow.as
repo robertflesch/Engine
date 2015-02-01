@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 {
 	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.oxel.FlowInfo;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.utils.Timer;
 	import flash.utils.getTimer;
 	import flash.events.TimerEvent;
@@ -85,7 +86,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				}
 				else {	
 					flowOxel.flowInfo = new FlowInfo()
-					flowOxel.flowInfo = Globals.typeInfo[_type].flowInfo;
+					flowOxel.flowInfo = TypeInfo.typeInfo[_type].flowInfo;
 				}
 					
 				flowTerminal(flowOxel);
@@ -119,7 +120,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				
 			if ( flowOxel.type == _type )
 			{
-				Log.out( "Flow.start - ALREADY " + Globals.typeInfo[_type].name + " here" );
+				Log.out( "Flow.start - ALREADY " + TypeInfo.typeInfo[_type].name + " here" );
 				return; 
 			}
 			else if ( null == flowOxel.gc )
@@ -128,21 +129,21 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				return; 
 			}
 				
-			if ( Globals.getTypeId( "obsidian" ) == flowOxel.type )
+			if ( TypeInfo.getTypeId( "obsidian" ) == flowOxel.type )
 			{
 				flowOxel.flowInfo.flowScaling.scaleRecalculate( flowOxel );
 			}
-			else if ( Globals.AIR != flowOxel.type )
+			else if ( TypeInfo.AIR != flowOxel.type )
 			{
 				// Is it still the type I am expected?
 				// I would need to do a reverse lookup.
-				var toTypeName:String = Globals.typeInfo[type].name;
-				var ip:InteractionParams = Globals.typeInfo[flowOxel.type].interactions.IOGet( toTypeName );
-				var writeType:int = Globals.getTypeId( ip.type );
+				var toTypeName:String = TypeInfo.typeInfo[type].name;
+				var ip:InteractionParams = TypeInfo.typeInfo[flowOxel.type].interactions.IOGet( toTypeName );
+				var writeType:int = TypeInfo.getTypeId( ip.type );
 				//var writeType:int = Globals.Info[type].interactions.IOGet( Globals.Info[flowOxel.type].name ).type
 				if ( flowOxel.type != writeType )
 				{
-					Log.out( "Flow.scale - wrong write type is: " + Globals.typeInfo[flowOxel.type].name + " expecting: " + Globals.typeInfo[writeType].name );
+					Log.out( "Flow.scale - wrong write type is: " + TypeInfo.typeInfo[flowOxel.type].name + " expecting: " + TypeInfo.typeInfo[writeType].name );
 					return; 
 				}
 			}
@@ -192,7 +193,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 
 		private function flowStartContinous(flowOxel:Oxel):void {
 			// Prefer going down if possible (or up for floatium)
-			var floatiumTypeID:uint = Globals.getTypeId( "floatium" );
+			var floatiumTypeID:uint = TypeInfo.getTypeId( "floatium" );
 			var fc:Vector.<FlowTest> = new Vector.<FlowTest>;
 			var partial:Boolean = false;
 			if ( floatiumTypeID == type )
@@ -258,7 +259,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					continue;
 					
 				var no:Oxel = flowOxel.neighbor( face );
-				if ( Globals.AIR == no.type )
+				if ( TypeInfo.AIR == no.type )
 					return face;
 					
 			}
@@ -275,7 +276,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			if ( Globals.BAD_OXEL != co && co.gc && co.gc.grain >= MIN_FLOW_GRAIN )
 			{
 				// if our neighbor is air, just flow into it.o
-				if ( co.type == Globals.AIR && !co.childrenHas() )
+				if ( co.type == TypeInfo.AIR && !co.childrenHas() )
 				{
 					// Our neighbor oxel might be larger then this oxel
 					// in which case just ask for oxel of same size
@@ -305,17 +306,17 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					}
 				}
 				// if the neighbor is a flowable type, look up its interaction with that type
-				else if ( Globals.typeInfo[co.type].flowable )
+				else if ( TypeInfo.typeInfo[co.type].flowable )
 				{
 					if ( co.type != type )
 					{
 						//Log.out( "Oxel.flowable - 2 Different flow types here! getting IP for: " + Globals.Info[type].name + "  with " + Globals.Info[co.type].name );
 						
-						var ip:InteractionParams = Globals.typeInfo[type].interactions.IOGet( Globals.typeInfo[co.type].name );
-						var writeType:int = Globals.getTypeId( ip.type );
+						var ip:InteractionParams = TypeInfo.typeInfo[type].interactions.IOGet( TypeInfo.typeInfo[co.type].name );
+						var writeType:int = TypeInfo.getTypeId( ip.type );
 						if ( type != writeType )
 						{
-							if ( Globals.typeInfo[writeType].flowable )
+							if ( TypeInfo.typeInfo[writeType].flowable )
 							{
 								// if write type is same as flow type, add it.
 								if ( type == writeType )
@@ -341,7 +342,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					else
 					{
 						//Log.out( "Oxel.flowable - ALREADY " + Globals.Info[co.type].name + " here" );
-						if ( Globals.getTypeId( "floatium" ) == co.type )
+						if ( TypeInfo.getTypeId( "floatium" ) == co.type )
 						{
 							// there is floatium above us, we should not flow out.
 							if ( Globals.POSY == $face )
@@ -364,9 +365,9 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					const dchildren:Vector.<Oxel> = co.childrenForDirection( Oxel.face_get_opposite( $face ) );
 					for each ( var dchild:Oxel in dchildren ) 
 					{
-						if ( Globals.AIR == dchild.type )
+						if ( TypeInfo.AIR == dchild.type )
 						{
-							if ( Globals.getTypeId( "floatium" ) == type )
+							if ( TypeInfo.getTypeId( "floatium" ) == type )
 							{
 								ft = new FlowTest();
 								ft.dir = $face;

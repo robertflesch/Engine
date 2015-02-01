@@ -345,7 +345,7 @@ package com.voxelengine.worldmodel.models
 			{
 				var coxel:Oxel = oxel.children[i];
 				// dont want to clone empty air oxels
-				if (Globals.AIR != coxel.type || coxel.childrenHas())
+				if (TypeInfo.AIR != coxel.type || coxel.childrenHas())
 				{
 					// need to get this position info before we break off child.
 					var dr:Vector3D = new Vector3D(coxel.gc.grainX ? Math.random() * 1 : Math.random() * -1, coxel.gc.grainY ? Math.random() * 1 : Math.random() * -1, coxel.gc.grainZ ? Math.random() * 1 : Math.random() * -1);
@@ -471,7 +471,7 @@ package com.voxelengine.worldmodel.models
 			// requires some refactoring but not hard - RSF
 			var oldOxel:Oxel = oxel.childGetOrCreate( $gc );
 			var oldType:int = oldOxel.type;
-			var oldTypeInfo:TypeInfo = Globals.typeInfo[oldType];
+			var oldTypeInfo:TypeInfo = TypeInfo.typeInfo[oldType];
 			if ( oldOxel.lighting ) {
 				if ( oldTypeInfo.lightInfo.lightSource )
 					var oldLightID:uint = oldOxel.lighting.lightIDGet();
@@ -491,7 +491,7 @@ package com.voxelengine.worldmodel.models
 			{
 				_changed = true;
 				result = true;
-				var typeInfo:TypeInfo = Globals.typeInfo[$type];
+				var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
 			
 				if ( typeInfo.flowable )
 				{
@@ -520,13 +520,13 @@ package com.voxelengine.worldmodel.models
 					Globals.g_app.dispatchEvent( le );
 				}
 				
-				if ( Globals.isSolid( oldType ) && Globals.hasAlpha( $type ) ) {
+				if ( TypeInfo.isSolid( oldType ) && TypeInfo.hasAlpha( $type ) ) {
 					
 					// we removed a solid block, and are replacing it with air or transparent
 					if ( changedOxel.lighting && changedOxel.lighting.valuesHas() )
 						Globals.g_app.dispatchEvent( new LightEvent( LightEvent.SOLID_TO_ALPHA, instanceInfo.guid, changedOxel.gc ) );
 				} 
-				else if ( Globals.isSolid( $type ) && Globals.hasAlpha( oldType ) ) {
+				else if ( TypeInfo.isSolid( $type ) && TypeInfo.hasAlpha( oldType ) ) {
 					
 					// we added a solid block, and are replacing the transparent block that was there
 					if ( changedOxel.lighting && changedOxel.lighting.valuesHas() )
@@ -559,7 +559,7 @@ package com.voxelengine.worldmodel.models
 		public function empty_sphere(cx:int, cy:int, cz:int, radius:Number, gmin:uint = 0):void {
 			_timer = getTimer();
 			_changed = true;
-			oxel.write_sphere( instanceInfo.guid, cx, cy - 1, cz, radius - 1.5, Globals.AIR, gmin);
+			oxel.write_sphere( instanceInfo.guid, cx, cy - 1, cz, radius - 1.5, TypeInfo.AIR, gmin);
 			
 			//Log.out( "VoxelModel.empty_sphere - radius: " + radius + " gmin: " + gmin + " took: " + (getTimer() - _timer) );
 			//oxel.mergeRecursive(); // Causes bad things to happen since we dont regen faces!
@@ -738,14 +738,14 @@ package com.voxelengine.worldmodel.models
 			gc.grain = grainSize;
 			oxelReset();
 			oxel = OxelPool.poolGet();
-			oxel.initialize(null, gc, 0, Globals.AIR, _statisics);
+			oxel.initialize(null, gc, 0, TypeInfo.AIR, _statisics);
 			// The VM gets an empty oxel as a place holder when it first loads.
 			// this replaces the placeholder and replaces it with a new root.
-			oxel.type = Globals.AIR;
+			oxel.type = TypeInfo.AIR;
 			GrainCursorPool.poolDispose(gc);
 			}
 			catch (e:Error) {
-				Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.guid: " + instanceInfo.guid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + Globals.typeInfo[oxel.type].name );					
+				Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.guid: " + instanceInfo.guid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + TypeInfo.typeInfo[oxel.type].name );					
 			}
 		
 			//Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.guid: " + instanceInfo.guid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + Globals.Info[type].name );					
@@ -1339,7 +1339,7 @@ package com.voxelengine.worldmodel.models
 			{
 				result = false;
 			}
-			else if ( Globals.isSolid( fo.type ))
+			else if ( TypeInfo.isSolid( fo.type ))
 			{
 				result = false;
 			}
@@ -1365,7 +1365,7 @@ package com.voxelengine.worldmodel.models
 				//Log.out( "Camera.isNewPositionValid - oxel is BAD, so passable")
 				$cp.collided = false;
 			}
-			else if ( Globals.typeInfo[$cp.oxel.type].solid )
+			else if ( TypeInfo.typeInfo[$cp.oxel.type].solid )
 			{
 				$cp.collided = true;
 			}
@@ -1410,11 +1410,11 @@ package com.voxelengine.worldmodel.models
 			}
 			else
 			{
-				if (!Globals.typeInfo[type])
+				if (!TypeInfo.typeInfo[type])
 				{
 					trace("unknown grain of - unknown key: " + type);
 					$ba.position -= 4;
-					$ba.writeInt(Globals.RED);
+					$ba.writeInt(TypeInfo.RED);
 					trace("set unknown grain to RED: " + type);
 				}
 			}

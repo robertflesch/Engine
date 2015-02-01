@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -7,18 +7,21 @@
 ==============================================================================*/
 package com.voxelengine.renderer {
 
+import flash.geom.Matrix3D;
+import flash.display3D.Context3D;
+import flash.utils.getTimer;
+import flash.utils.Timer;
+
+import mx.utils.NameUtil;
+
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
+import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.VoxelModel;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.pools.VertexIndexBuilderPool;
-import flash.geom.Matrix3D;
 import com.voxelengine.renderer.shaders.Shader;
-import flash.display3D.Context3D;
-import flash.utils.getTimer;
-import flash.utils.Timer;
-import mx.utils.NameUtil;
 
 public class VertexManager {
 	
@@ -189,16 +192,16 @@ public class VertexManager {
 	{
 		var VIBType:int = 0;
 		// We have to remeber what is WAS, so we can remove it form correct buffer
-		if ( Globals.INVALID == oldType )
+		if ( TypeInfo.INVALID == oldType )
 			VIBType = newType;
 		else
 			VIBType = oldType;
 			
-		if ( Globals.typeInfo[VIBType].animated  ) 
+		if ( TypeInfo.typeInfo[VIBType].animated  ) 
 		{
-    		if ( Globals.typeInfo[VIBType].alpha )
+    		if ( TypeInfo.typeInfo[VIBType].alpha )
 			{
-				if ( Globals.typeInfo[VIBType].flame )
+				if ( TypeInfo.typeInfo[VIBType].flame )
 				{
 					if ( !_vertBufFire )
 						_vertBufFire = VertexIndexBuilderPool.poolGet();
@@ -220,7 +223,7 @@ public class VertexManager {
 		} 
 		else 
 		{
-    		if ( Globals.typeInfo[VIBType].alpha ) 
+    		if ( TypeInfo.typeInfo[VIBType].alpha ) 
 			{
 				if ( !_vertBufAlpha )
 					_vertBufAlpha = VertexIndexBuilderPool.poolGet();

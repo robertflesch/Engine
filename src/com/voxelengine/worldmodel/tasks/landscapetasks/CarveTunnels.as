@@ -8,6 +8,7 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
+	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.geom.Vector3D;
 	import flash.utils.getTimer;
 	
@@ -104,13 +105,13 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var voxelType:int = _layer.type;
 			var minGrain:int = _layer.optionalInt;
 			
-			trace( "CarveTunnels.start - carving tunnel of type " + (Globals.typeInfo[voxelType].name.toUpperCase()) + " starting at x: " + startLoc.x + "  y: " + startLoc.y + "  z: " + startLoc.z );					
+			trace( "CarveTunnels.start - carving tunnel of type " + (TypeInfo.typeInfo[voxelType].name.toUpperCase()) + " starting at x: " + startLoc.x + "  y: " + startLoc.y + "  z: " + startLoc.z );					
 			
 			view.scaleBy( stepSize );
 			for ( var i:int = 1; i < tunnelLength / stepSize; i++ ) {
 				
 				var radius:int = Math.min( tunnelRadius * radiusMultiplierMin, Math.random() * tunnelRadius * radiusMultiplierMax );
-				vm.oxel.write_sphere( _guid, startLoc.x, startLoc.y, startLoc.z, radius, Globals.AIR, minGrain );
+				vm.oxel.write_sphere( _guid, startLoc.x, startLoc.y, startLoc.z, radius, TypeInfo.AIR, minGrain );
 				startLoc.x += view.x + rndOffset( tunnelRadius );
 				startLoc.y += view.y + rndOffset( tunnelRadius );
 				startLoc.z += view.z + rndOffset( tunnelRadius );
@@ -121,7 +122,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 					CarveTunnels.contructor( _guid
 								 , startLoc
 								 , vv
-								 , Globals.AIR
+								 , TypeInfo.AIR
 								 , tunnelLength / 2
 								 , tunnelRadius * 0.75 );
 

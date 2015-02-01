@@ -18,6 +18,7 @@ package com.voxelengine.worldmodel.biomes
 	import com.developmentarc.core.tasks.groups.TaskGroup;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
+	import com.voxelengine.worldmodel.TypeInfo;
 
 	/**
 	 * ...
@@ -130,35 +131,35 @@ package com.voxelengine.worldmodel.biomes
 
 		public static function sky( biomes:Biomes ):void 
 		{
-			biomes.add_layer( new LayerInfo( "LoadSky", "",  Globals.INVALID, 0, 0 ) );
+			biomes.add_layer( new LayerInfo( "LoadSky", "",  TypeInfo.INVALID, 0, 0 ) );
 		}
 
 		public static function testSphere( biomes:Biomes ):void 
 		{
-			biomes.add_layer( new LayerInfo( "TestSphere", "",  Globals.DIRT, 7, 0 ) );
+			biomes.add_layer( new LayerInfo( "TestSphere", "",  TypeInfo.DIRT, 7, 0 ) );
 		}
 		
 		public static function testQuarterSphere( biomes:Biomes ):void 
 		{
-			biomes.add_layer( new LayerInfo( "TestQuarterSphere", "",  Globals.STONE, 8, 0 ) );
+			biomes.add_layer( new LayerInfo( "TestQuarterSphere", "",  TypeInfo.STONE, 8, 0 ) );
 		}
 		
 		public static function testDebugMacro( biomes:Biomes ):void {
-			biomes.add_layer( new LayerInfo( "TestDebugMacro", "",  Globals.GRASS,   4, 0 ) );
+			biomes.add_layer( new LayerInfo( "TestDebugMacro", "",  TypeInfo.GRASS,   4, 0 ) );
 		}
 		
 		public static function testSolid( biomes:Biomes ):void {
-			//biomes.add_layer( new LayerInfo( TestSingleOxelFaces,  Globals.GRASS,   1, 0 ) );
-			biomes.add_layer( new LayerInfo( "TestSolid", "",  Globals.GRAVEL,   1, 0 ) );
-			//biomes.add_layer( new LayerInfo( TestRemoveSequential,  Globals.INVALID,   0, 0 ) );
+			//biomes.add_layer( new LayerInfo( TestSingleOxelFaces,  TypeInfo.GRASS,   1, 0 ) );
+			biomes.add_layer( new LayerInfo( "TestSolid", "",  TypeInfo.GRAVEL,   1, 0 ) );
+			//biomes.add_layer( new LayerInfo( TestRemoveSequential,  TypeInfo.INVALID,   0, 0 ) );
 		}
 		
 		public static function testGrain0inCorner( biomes:Biomes ):void {
-			biomes.add_layer( new LayerInfo( "TestGrain0inCorner", "",  Globals.STONE,   0, 0 ) );
+			biomes.add_layer( new LayerInfo( "TestGrain0inCorner", "",  TypeInfo.STONE,   0, 0 ) );
 		}
 		
 		public static function testZBuffer( biomes:Biomes ):void {
-			biomes.add_layer( new LayerInfo( "TestZBuffer",  "", Globals.BARK,   100, Globals.SAND ) );
+			biomes.add_layer( new LayerInfo( "TestZBuffer",  "", TypeInfo.BARK,   100, TypeInfo.SAND ) );
 		}
 	}
 	

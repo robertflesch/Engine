@@ -12,6 +12,7 @@ package com.voxelengine.worldmodel.weapons
  * @author Bob
  */
 import com.voxelengine.worldmodel.models.ModelLoader;
+import com.voxelengine.worldmodel.TypeInfo;
 import playerio.Message;
 
 import com.voxelengine.Log;
@@ -26,7 +27,7 @@ public class Ammo
 	protected var _accuracy:Number = 0.1;
 	protected var _velocity:int = 200;
 	protected var _life:int = 5;
-	protected var _oxelType:int = Globals.STEEL;
+	protected var _oxelType:int = TypeInfo.STEEL;
 	protected var _model:String = "CannonBall";
 	protected var _launchSoundFile:String = "Cannon.mp3";		
 	protected var _impactSoundFile:String = "CannonBallExploding.mp3";		
@@ -67,7 +68,7 @@ public class Ammo
 		if ( $ammoJson.count )
 			_count = $ammoJson.count;
 		if ( $ammoJson.oxelType )
-			_oxelType = Globals.getTypeId( $ammoJson.oxelType );
+			_oxelType = TypeInfo.getTypeId( $ammoJson.oxelType );
 		if ( $ammoJson.life )
 			_life = $ammoJson.life;
 		if ( $ammoJson.grain )

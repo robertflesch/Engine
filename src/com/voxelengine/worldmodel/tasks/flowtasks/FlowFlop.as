@@ -105,13 +105,13 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					var changedOxel:Oxel = null;
 					var underOxel:Oxel = flowOxel.neighbor( Globals.NEGY );
 					// TODO there is a partial flow case here
-					if ( Globals.AIR == underOxel.type )
+					if ( TypeInfo.AIR == underOxel.type )
 					{
 						var uchildren:Vector.<Oxel> = underOxel.childrenForDirection( Globals.POSY );
 						var dchildren:Vector.<Oxel> = flowOxel.childrenForDirection( Globals.POSY );
 						for ( var i:int = 0; i < 4; i++ )
 						{
-							if ( Globals.AIR == uchildren[i].type )
+							if ( TypeInfo.AIR == uchildren[i].type )
 							{
 								changedOxel = flowDown( uchildren[i], dchildren[i] );
 								if ( changedOxel ) {
@@ -180,7 +180,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			
 			$toChild.write( _guid, $toChild.gc, _type );
 			$toChild.flowInfo.direction = Globals.NEGY;
-			$fromChild.write( _guid, $fromChild.gc, Globals.AIR );
+			$fromChild.write( _guid, $fromChild.gc, TypeInfo.AIR );
 			return $toChild;
 		}
 		
@@ -189,7 +189,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			var flowIntoChild:Oxel = null;
 			var flowFromChild:Oxel = null;
 			var flowIntoParent:Oxel = $flowOxel.neighbor( $dir );
-			if ( Globals.BAD_OXEL == flowIntoParent && Globals.AIR == flowIntoParent.type )
+			if ( Globals.BAD_OXEL == flowIntoParent && TypeInfo.AIR == flowIntoParent.type )
 			{
 				var gct:GrainCursor = GrainCursorPool.poolGet( $flowOxel.gc.bound );
 				// this is oxel next to the one we want, but the flowIntoParent might be a larger grain.
@@ -201,13 +201,13 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				// now get the possibly reduced oxel we want.
 				flowIntoChild = flowIntoParent.childGetOrCreate( gct );
 				GrainCursorPool.poolDispose( gct );
-				if ( Globals.AIR == flowIntoChild.type )
+				if ( TypeInfo.AIR == flowIntoChild.type )
 				{
 					flowIntoChild.write( _guid, flowIntoChild.gc, _type );
 					flowIntoChild.flowInfo.direction = $dir;
 					flowIntoChild.flowInfo.flowScaling.scalingCalculate( flowIntoChild );
 					flowFromChild = $flowOxel.childGetFromDirection( $dir, TOP_LEVEL, opposite );
-					flowFromChild.write( _guid, flowFromChild.gc, Globals.AIR );
+					flowFromChild.write( _guid, flowFromChild.gc, TypeInfo.AIR );
 					return flowIntoChild;
 				}
 				else
@@ -215,13 +215,13 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					opposite = !opposite;
 					// The parent oxel has already been reduced to size we need
 					flowFromChild = $flowOxel.childGetFromDirection( Oxel.face_get_opposite( $dir ), BOTTOM_LEVEL, opposite );
-					if ( Globals.AIR == flowIntoChild.type )
+					if ( TypeInfo.AIR == flowIntoChild.type )
 					{
 						flowIntoChild.write( _guid, flowIntoChild.gc, _type );
 						flowIntoChild.flowInfo.direction = $dir;
 						flowIntoChild.flowInfo.flowScaling.scalingCalculate( flowIntoChild );
 						flowFromChild = $flowOxel.childGetFromDirection( $dir, TOP_LEVEL, opposite );
-						flowFromChild.write( _guid, flowFromChild.gc, Globals.AIR );
+						flowFromChild.write( _guid, flowFromChild.gc, TypeInfo.AIR );
 						return flowIntoChild;
 					}
 				}

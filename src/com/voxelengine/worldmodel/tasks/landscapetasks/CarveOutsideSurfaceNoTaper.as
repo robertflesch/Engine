@@ -16,6 +16,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.biomes.*;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.utils.getTimer;
 	
 	/**
@@ -90,7 +91,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 							to = vm.oxel.childFind( gct );
 							if ( Globals.BAD_OXEL != to )
 							{
-								to.write( _guid, gct, Globals.AIR )
+								to.write( _guid, gct, TypeInfo.AIR )
 							}
 						}
 					}

@@ -39,7 +39,7 @@ public class Voxels
 	public function Voxels( $networkId:String ) {
 		_networkId = $networkId;
 		
-		var allTypes:Vector.<TypeInfo> = Globals.typeInfo;
+		var allTypes:Vector.<TypeInfo> = TypeInfo.typeInfo;
 		for ( var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
 			_items[typeId] = new SecureInt( 0 );
 			
@@ -63,7 +63,7 @@ public class Voxels
 		// This iterates thru the keys
 		for ( var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
 		{
-			var catData:String = Globals.typeInfo[typeId].category;
+			var catData:String = TypeInfo.typeInfo[typeId].category;
 			if ( cat == catData.toUpperCase() && 0 < _items[typeId].val )
 				result[typeId].val	= _items[typeId].val;
 			else;
@@ -89,9 +89,9 @@ public class Voxels
 	
 	
 	public function addVoxelTestData():void {
-		_items[Globals.STONE].val = 1234;
-		_items[Globals.DIRT].val = 432;
-		_items[Globals.GRASS].val = 123456789;
+		_items[TypeInfo.STONE].val = 1234;
+		_items[TypeInfo.DIRT].val = 432;
+		_items[TypeInfo.GRASS].val = 123456789;
 	}
 			
 	

@@ -72,7 +72,7 @@ public class Inventory
 		var typeId:int = e.typeId;
 		var changeCount:int = int( e.result );
 		var count:int = _voxels[typeId];
-		Log.out( "Inventory.voxelChange - trying to change type id: " + Globals.typeInfo[typeId].name + " of count: " + changeCount + " current count: " + _voxels[typeId] );
+		Log.out( "Inventory.voxelChange - trying to change type id: " + TypeInfo.typeInfo[typeId].name + " of count: " + changeCount + " current count: " + _voxels[typeId] );
 		
 		count += changeCount;
 		_voxels[typeId] = count;

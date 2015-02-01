@@ -73,20 +73,20 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				//////////////////////////////////////////////////////////
 				// should always look down first, regardless of direction
 				var flowIntoNeighbor:Oxel = null;
-				if ( Globals.getTypeId( "floatium" ) == _type )
+				if ( TypeInfo.getTypeId( "floatium" ) == _type )
 					flowIntoNeighbor = flowOxel.neighbor( Globals.POSY );
 				else	
 					flowIntoNeighbor = flowOxel.neighbor( Globals.NEGY );
 				// is oxel above or below free?	
 				var flowIntoTarget:Oxel = null;
-				if ( Globals.BAD_OXEL != flowIntoNeighbor && Globals.AIR == flowIntoNeighbor.type )
+				if ( Globals.BAD_OXEL != flowIntoNeighbor && TypeInfo.AIR == flowIntoNeighbor.type )
 				{
 					flowIntoTarget = neighborGetOrCreate( flowOxel, flowIntoNeighbor );
-					if ( Globals.BAD_OXEL != flowIntoTarget && Globals.AIR == flowIntoTarget.type )
+					if ( Globals.BAD_OXEL != flowIntoTarget && TypeInfo.AIR == flowIntoTarget.type )
 					{
 						flowIntoTarget.flowInfo = _flowInfo; // flowInfo has to be present when write is performed
 						flowIntoTarget.write( _guid, flowIntoTarget.gc, _type );
-						flowOxel.write( _guid, flowOxel.gc, Globals.AIR );
+						flowOxel.write( _guid, flowOxel.gc, TypeInfo.AIR );
 						FlowLimited.addTask( _guid, flowIntoTarget.gc, _type, flowIntoTarget.flowInfo, FlowTask.TASK_PRIORITY );
 						break main;
 					}
@@ -105,16 +105,16 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					// we have a valid flow direction
 					flowIntoNeighbor = flowOxel.neighbor( _flowInfo.direction );
 					
-				if ( Globals.BAD_OXEL != flowIntoNeighbor && Globals.AIR == flowIntoNeighbor.type )
+				if ( Globals.BAD_OXEL != flowIntoNeighbor && TypeInfo.AIR == flowIntoNeighbor.type )
 				{
 					flowIntoTarget = neighborGetOrCreate( flowOxel, flowIntoNeighbor );
-					if ( Globals.BAD_OXEL != flowIntoTarget && Globals.AIR == flowIntoTarget.type )
+					if ( Globals.BAD_OXEL != flowIntoTarget && TypeInfo.AIR == flowIntoTarget.type )
 					{
 						flowIntoTarget.flowInfo = _flowInfo; // flowInfo has to be present when write is performed
 						flowIntoTarget.write( _guid, flowIntoTarget.gc, _type );
 						//flowIntoTarget.flowInfo.direction = _flowInfo.direction;
 						flowIntoTarget.flowInfo.flowScaling.scalingCalculate( flowIntoTarget );
-						flowOxel.write( _guid, flowOxel.gc, Globals.AIR );
+						flowOxel.write( _guid, flowOxel.gc, TypeInfo.AIR );
 						FlowLimited.addTask( _guid, flowIntoTarget.gc, _type, flowIntoTarget.flowInfo, FlowTask.TASK_PRIORITY );
 					}
 					else
@@ -127,25 +127,25 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 						/*
 						// The parent oxel has already been reduced to size we need
 						flowOxel = $flowOxel.childGetFromDirection( Oxel.face_get_opposite( _flowInfo.direction ), BOTTOM_LEVEL, false );
-						if ( Globals.AIR == flowIntoTarget.type )
+						if ( TypeInfo.AIR == flowIntoTarget.type )
 						{
 							flowIntoTarget.write( flowIntoTarget.gc, _type );
 							flowIntoTarget.flowInfo.direction = $dir;
 							flowIntoTarget.flowInfo.flowScaling.scalingCalculate( flowIntoTarget );
-							flowOxel.write( flowOxel.gc, Globals.AIR );
+							flowOxel.write( flowOxel.gc, TypeInfo.AIR );
 							FlowLimited.addTask( _guid, flowIntoTarget.gc, _type, flowIntoTarget.flowInfo, FlowTask.TASK_PRIORITY );
 						}
 						*/
 					}
 				}
 			}
-				/*if ( Globals.AIR != flowOxel.type )
+				/*if ( TypeInfo.AIR != flowOxel.type )
 				{
 					// Is it still the type I am expected?
 					// I would need to do a reverse lookup.
 					var toTypeName:String = Globals.Info[type].name;
 					var ip:InteractionParams = Globals.Info[flowOxel.type].interactions.IOGet( toTypeName );
-					var writeType:int = Globals.getTypeId( ip.type );
+					var writeType:int = TypeInfo.getTypeId( ip.type );
 					//var writeType:int = Globals.Info[type].interactions.IOGet( Globals.Info[flowOxel.type].name ).type
 					if ( flowOxel.type != writeType )
 					{

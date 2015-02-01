@@ -25,7 +25,7 @@ package com.voxelengine.worldmodel.tasks.tests
 	public class TestGrain0inCorner extends LandscapeTask 
 	{		
 		public function TestGrain0inCorner( guid:String,layer:LayerInfo ):void {
-			trace( "TestGrain0inCorner of type: " + (Globals.typeInfo[layer.type].name.toUpperCase()) );					
+			trace( "TestGrain0inCorner of type: " + (TypeInfo.typeInfo[layer.type].name.toUpperCase()) );					
 			super(guid, layer);
 		}
 		
@@ -46,21 +46,21 @@ package com.voxelengine.worldmodel.tasks.tests
 			
 			
 			gc.set_values( 0, 0, 0, gc.grain );
-			vm.write( gc, Globals.STONE );
+			vm.write( gc, TypeInfo.STONE );
 			gc.set_values( 0, 0, max, gc.grain );
-			vm.write( gc, Globals.STONE );
+			vm.write( gc, TypeInfo.STONE );
 			gc.set_values( 0, max, 0, gc.grain );
-			vm.write( gc, Globals.STONE );
+			vm.write( gc, TypeInfo.STONE );
 			gc.set_values( 0, max, max, gc.grain );
-			vm.write( gc, Globals.STONE );
+			vm.write( gc, TypeInfo.STONE );
 			gc.set_values( max, 0, 0, gc.grain );
-			vm.write( gc, Globals.STONE );
+			vm.write( gc, TypeInfo.STONE );
 			gc.set_values( max, 0, max, gc.grain );
-			vm.write( gc, Globals.STONE );
+			vm.write( gc, TypeInfo.STONE );
 			gc.set_values( max, max, 0, gc.grain );
-			vm.write( gc, Globals.STONE );
+			vm.write( gc, TypeInfo.STONE );
 			gc.set_values( max, max, max, gc.grain );
-			vm.write( gc, Globals.STONE );
+			vm.write( gc, TypeInfo.STONE );
 			
 			trace( "TestGrain0inCorner - took: "  + (getTimer() - timer) );					
             super.complete() // AbstractTask will send event

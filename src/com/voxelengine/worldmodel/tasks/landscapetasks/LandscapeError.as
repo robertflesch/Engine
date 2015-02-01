@@ -15,6 +15,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.biomes.*;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.Globals;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.utils.getTimer;
 	
 	/**
@@ -47,7 +48,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				trace( "LandscapeError.start - WARNING - Adjusting range: " + min_grain_size );
 			}
 
-			trace("LandscapeError.start on rootGrain of max size: " + root_grain_size + "  Filling with grain of size: " + min_grain_size + " of type: " + Globals.typeInfo[_layer.type].name );
+			trace("LandscapeError.start on rootGrain of max size: " + root_grain_size + "  Filling with grain of size: " + min_grain_size + " of type: " + TypeInfo.typeInfo[_layer.type].name );
 			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
 			
 			var size:int = 1 << (root_grain_size - min_grain_size);
@@ -55,7 +56,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			for ( var x:int = 0; x < size; x++ ) {
 				for ( var y:int = 0; y < size; y++ ) {
 					for ( var z:int = 0; z < size; z++ ) {
-						vm.write( loco.set_values( x, y, z, min_grain_size ), Globals.STONE );
+						vm.write( loco.set_values( x, y, z, min_grain_size ), TypeInfo.STONE );
 					}
 				}
 			}

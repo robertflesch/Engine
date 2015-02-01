@@ -15,6 +15,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.developmentarc.core.tasks.groups.TaskGroup;
 	
 	import com.voxelengine.Globals;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
@@ -61,13 +62,13 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var voxelType:int = _layer.type;
 			var minGrain:int = _layer.optionalInt;
 			
-			trace( "CarveTunnel.start - carving tunnel of type " + (Globals.typeInfo[voxelType].name.toUpperCase()) + " starting at x: " + startLoc.x + "  y: " + startLoc.y + "  z: " + startLoc.z );					
+			trace( "CarveTunnel.start - carving tunnel of type " + (TypeInfo.typeInfo[voxelType].name.toUpperCase()) + " starting at x: " + startLoc.x + "  y: " + startLoc.y + "  z: " + startLoc.z );					
 			
 			view.scaleBy( stepSize );
 			for ( var i:int = 1; i < tunnelLength / stepSize; i++ ) {
 				
 				var radius:int = Math.min( tunnelRadius * radiusMultiplierMin, Math.random() * tunnelRadius * radiusMultiplierMax );
-				vm.oxel.write_sphere( _guid, startLoc.x, startLoc.y, startLoc.z, radius, Globals.AIR, minGrain );
+				vm.oxel.write_sphere( _guid, startLoc.x, startLoc.y, startLoc.z, radius, TypeInfo.AIR, minGrain );
 				startLoc.x += view.x + rndOffset( tunnelRadius );
 				startLoc.y += view.y + rndOffset( tunnelRadius );
 				startLoc.z += view.z + rndOffset( tunnelRadius );

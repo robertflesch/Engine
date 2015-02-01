@@ -13,6 +13,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.geom.Point;	
 	
 	/**
@@ -46,7 +47,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			// check to make sure we are not growing INTO something
 			/*
 			var bid:VoxelBase = voxelVector.getVoxel(x, startingLeafLevel + leafLevels, z);
-			if ( Globals.AIR != bid.type || Globals.VOXEL_INVALID == bid ) {
+			if ( TypeInfo.AIR != bid.type || Globals.VOXEL_INVALID == bid ) {
 				//trace( "TreeGenerator - buildSplitTree - spot rejected empty or invalid" );
 				return;
 			}
@@ -54,7 +55,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			if ( 0.05 > Math.random() ) return; // 5 percent chance of tree being dead
 			/*
 			var offset:Point = buildForkedTrunk( voxelVector, x, y, z, trunk, trunk / 2 );
-			var leaf:int = Globals.LEAF;
+			var leaf:int = TypeInfo.LEAF;
 			generateLeafLevel(voxelVector, x           , startingLeafLevel-2, z,            2, leaf, 0.4);
 			generateLeafLevel(voxelVector, x + offset.x, startingLeafLevel,   z + offset.y, 2, leaf, 0.8);
 			generateLeafLevel(voxelVector, x + offset.x, startingLeafLevel+1, z + offset.y, 4, leaf, 0.6);
@@ -77,15 +78,15 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			// Make sure top is not cut off AND
 			// check to make sure we are not growing INTO something
 			var bid:VoxelBase = voxelVector.getVoxel(x, startingLeafLevel + leafLevels, z);
-			if ( Globals.AIR != bid.type || Globals.VOXEL_INVALID == bid ) {
+			if ( TypeInfo.AIR != bid.type || Globals.VOXEL_INVALID == bid ) {
 				//trace( "TreeGenerator - buildAfricanTree - spot rejected empty or invalid" );
 				return;
 			}
 			
 			buildTrunk( voxelVector, x, y, z, trunk + 3 );
-			generateLeafLevel( $guid, oxel, gct, 3, Globals.LEAF, 0.5);
-			generateLeafLevel( $guid, oxel, gct, 6, Globals.LEAF, 0.5);
-			generateLeafLevel( $guid, oxel, gct, 3, Globals.LEAF, 0.5);
+			generateLeafLevel( $guid, oxel, gct, 3, TypeInfo.LEAF, 0.5);
+			generateLeafLevel( $guid, oxel, gct, 6, TypeInfo.LEAF, 0.5);
+			generateLeafLevel( $guid, oxel, gct, 3, TypeInfo.LEAF, 0.5);
 			*/
 		}
 
@@ -119,12 +120,12 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			
 			var gct:GrainCursor = GrainCursorPool.poolGet( $oxel.gc.bound );
 			gct.copyFrom( $oxel.gc );
-			var e_trunkType:uint = Globals.BARK;
+			var e_trunkType:uint = TypeInfo.BARK;
 			// this returns gct at the top of the trunk
 			buildTrunk( $guid, $oxel, gct, trunk, e_trunkType );
 			
 			// build down from the top, since we dont know how tall it is
-			var e_leafType:uint = Globals.LEAF;
+			var e_leafType:uint = TypeInfo.LEAF;
  			generateLeafLevel( $guid, $oxel, gct, 3, e_leafType, 0.5);
 			gct.move_negy();
  			generateLeafLevel( $guid, $oxel, gct, 4, e_leafType, 0.5);
@@ -151,12 +152,12 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			
 			var gct:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
 			gct.copyFrom( oxel.gc );
-			var e_trunkType:uint = Globals.BARK;
+			var e_trunkType:uint = TypeInfo.BARK;
 			// this returns gct at the top of the trunk
 			buildTrunk( $guid, oxel, gct, trunk, e_trunkType );
 					
 			// Add leaves and additional trunk levels
-			var e_leafType:uint = Globals.LEAF;
+			var e_leafType:uint = TypeInfo.LEAF;
 			generateLeafLevel( $guid, oxel, gct, 1, e_leafType, 1 ); // 0.95);
 			gct.move_negy();
 			gct.move_negy();

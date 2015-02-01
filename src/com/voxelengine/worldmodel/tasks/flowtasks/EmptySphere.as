@@ -47,28 +47,28 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				for (var z:int = 0; z < voxels.regionWidth; z++) {
 					for (var x:int = 0; x < voxels.regionWidth; x++) {
 						voxel = voxels.directGetVoxel( index );	
-						if ( Globals.AIR == voxel.type ) {
+						if ( TypeInfo.AIR == voxel.type ) {
 							
 							// check above us, could flow down? if tunnel cuts out voxel under?
 							testVoxel = voxels.getVoxelOffset( index + layerOffset );
-							if ( true == Globals.typeInfo[testVoxel.type].flowable ) 
+							if ( true == TypeInfo.typeInfo[testVoxel.type].flowable ) 
 								addFlowTask( x, y, z, testVoxel.type );
 							
 							testVoxel = voxels.layerCheckedGetVoxel( index - sideOffset )
-							if ( true == Globals.typeInfo[testVoxel.type].flowable ) 
+							if ( true == TypeInfo.typeInfo[testVoxel.type].flowable ) 
 								addFlowTask( x, y, z, testVoxel.type );
 
 							//var tvoxel:VoxelBase = voxels.directGetVoxel( index + sideOffset );	
 							testVoxel = voxels.layerCheckedGetVoxel( index + sideOffset )
-							if ( true == Globals.typeInfo[testVoxel.type].flowable ) 
+							if ( true == TypeInfo.typeInfo[testVoxel.type].flowable ) 
 								addFlowTask( x, y, z, testVoxel.type );
 
 							testVoxel = voxels.rowCheckedGetVoxel( index - 1 );
-							if ( true == Globals.typeInfo[testVoxel.type].flowable ) 
+							if ( true == TypeInfo.typeInfo[testVoxel.type].flowable ) 
 								addFlowTask( x, y, z, testVoxel.type );
 
 							testVoxel = voxels.rowCheckedGetVoxel( index + 1 );
-							if ( true == Globals.typeInfo[testVoxel.type].flowable ) 
+							if ( true == TypeInfo.typeInfo[testVoxel.type].flowable ) 
 								addFlowTask( x, y, z, testVoxel.type );
 						}
 						index++;

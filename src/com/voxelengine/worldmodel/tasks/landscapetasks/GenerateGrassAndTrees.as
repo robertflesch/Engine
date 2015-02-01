@@ -39,7 +39,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			Log.out( "GenerateGrassAndTrees - start - enter: ");					
 			
 			vm.oxel.dirtToGrassAndSand();
-			//vm.oxel.growTreesOn( _guid, Globals.DIRT, outOf ? outOf : 2000 );
+			//vm.oxel.growTreesOn( _guid, TypeInfo.DIRT, outOf ? outOf : 2000 );
 			
 			Log.out( "GenerateGrassAndTrees - complete & trees - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) );	
 			

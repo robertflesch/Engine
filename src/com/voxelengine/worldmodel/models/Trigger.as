@@ -102,7 +102,7 @@ package com.voxelengine.worldmodel.models
 				
 				var loco:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
 				// this prunes the children oxel
-				oxel.write( instanceInfo.guid, loco.set_values( 0, 0, 0, oxel.gc.grain ), Globals.LEAF, true );
+				oxel.write( instanceInfo.guid, loco.set_values( 0, 0, 0, oxel.gc.grain ), TypeInfo.LEAF, true );
 				GrainCursorPool.poolDispose( loco );
 				oxel.faces_set_all();
 				oxel.faces_rebuild( instanceInfo.guid );

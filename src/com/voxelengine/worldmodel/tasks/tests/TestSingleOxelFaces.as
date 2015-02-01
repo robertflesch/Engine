@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			var grainSize:uint = vm.oxel.size_of_grain();	
 			var gc:GrainCursor = GrainCursorPool.poolGet();
 			vm.oxel.cursor_copy_to( gc );
-			vm.write( gc, Globals.GRASS );
+			vm.write( gc, TypeInfo.GRASS );
 			addFlowTask( gc );
 			super.complete();
 		}

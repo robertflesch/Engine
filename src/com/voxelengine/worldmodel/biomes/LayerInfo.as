@@ -14,6 +14,7 @@ package com.voxelengine.worldmodel.biomes
 	import com.voxelengine.worldmodel.tasks.flowtasks.*;
 	import com.voxelengine.worldmodel.tasks.tests.*;
 	import com.voxelengine.worldmodel.tasks.*;
+	import com.voxelengine.worldmodel.TypeInfo;
 
 
 	/**
@@ -27,7 +28,7 @@ package com.voxelengine.worldmodel.biomes
 		private var _data:String = "";
 		private var _offset:int = 1;
 		private var _range:int = 1;
-		private var _type:int = Globals.STONE;
+		private var _type:int = TypeInfo.STONE;
 		private var _optionalString:String = "";
 		private var _optionalInt:int = 0;
 		
@@ -84,7 +85,7 @@ package com.voxelengine.worldmodel.biomes
 			
 			if ( layerInfo.type )
 			{
-				type = Globals.getTypeId( layerInfo.type );
+				type = TypeInfo.getTypeId( layerInfo.type );
 			}
 			
 			if ( layerInfo.data )
@@ -139,7 +140,7 @@ package com.voxelengine.worldmodel.biomes
 		
 		public function toString():String
 		{
-			return " LayerInfo task: " + _task + " data: " + data + " range: " + range + " offset: " + offset + " type: " + Globals.typeInfo[_type].name + " task: " + task; 
+			return " LayerInfo task: " + _task + " data: " + data + " range: " + range + " offset: " + offset + " type: " + TypeInfo.typeInfo[_type].name + " task: " + task; 
 		}
 	}
 }

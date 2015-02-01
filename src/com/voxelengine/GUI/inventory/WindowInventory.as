@@ -114,7 +114,7 @@ package com.voxelengine.GUI.inventory {
 			var item:TypeInfo;
 			for ( var i:int = TypeInfo.MIN_TYPE_INFO; i < TypeInfo.MAX_TYPE_INFO; i++ )
 			{
-				item = Globals.typeInfo[i];
+				item = TypeInfo.typeInfo[i];
 				if ( null == item )
 					continue;
 				if ( item.placeable && (item.category.toUpperCase() == category.toUpperCase() || "ALL" == String(category).toUpperCase() ) )

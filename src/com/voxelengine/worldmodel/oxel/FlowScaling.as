@@ -13,6 +13,7 @@ package com.voxelengine.worldmodel.oxel
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.worldmodel.TypeInfo;
 /**
  * ...
  * @author Robert Flesch 
@@ -169,7 +170,7 @@ public class FlowScaling
 			return;
 			
 		//if ( fromOxel.type == $oxel.type )
-		if ( Globals.typeInfo[fromOxel.type].flowable && fromOxel.flowInfo && fromOxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling )
+		if ( TypeInfo.typeInfo[fromOxel.type].flowable && fromOxel.flowInfo && fromOxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling )
 		{
 			var fromRecalc:Boolean = false;
 			var fromOxelScale:FlowScaling = fromOxel.flowInfo.flowScaling;
