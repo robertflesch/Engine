@@ -31,7 +31,7 @@ public class Inventory
 {
 	private var  _slots:Slots
 	private var _voxels:Voxels;
-	private var _models:Array = new Array();
+	private var _models:Models;
 	private var _networkId:String;
 
 	// support data for persistance
@@ -39,55 +39,17 @@ public class Inventory
 	private var _createdDate:Date;
 	private var _modifiedDate:Date;
 
+	public function get slots():Slots  { return _slots; }
+	public function get voxels():Voxels  { return _voxels; }
+	public function get models():Models  { return _models; }
+	
 	public function Inventory( $networkId:String ) {
-
-		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_INCREMENT,		modelIncrement );
-		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_DECREMENT, 		modelDecrement );
-		
 		_slots = new Slots( $networkId );
 		_networkId = $networkId;
 		_voxels = new Voxels( $networkId );
+		_models = new Models( $networkId );
 			
 	}
-	
-	public function modelCount(e:InventoryModelEvent):void 
-	{
-		//var modelId:String = e.guid;
-		//var modelCount:int = _models[modelId];
-		//InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, _networkId, modelId, modelCount ) );
-	}
-	
-	public function modelIncrement(e:InventoryModelEvent):void 
-	{
-		
-	}
-	
-	public function modelDecrement(e:InventoryModelEvent):void 
-	{
-		
-	}
-	
-	public function voxelChange(e:InventoryVoxelEvent):void 
-	{
-		var typeId:int = e.typeId;
-		var changeCount:int = int( e.result );
-		var count:int = _voxels[typeId];
-		Log.out( "Inventory.voxelChange - trying to change type id: " + TypeInfo.typeInfo[typeId].name + " of count: " + changeCount + " current count: " + _voxels[typeId] );
-		
-		count += changeCount;
-		_voxels[typeId] = count;
-		Log.out( "Inventory.voxelChange - changed: " + _voxels[typeId] );
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, _networkId, typeId, count ) );			
-//		Log.out( "Inventory.voxelChange - FAILED to remove a type has less then request count - id: " + e.type + " of count: " + resultCount + " current count: " + count, Log.ERROR );
-	}
-	
-	public function get models():Array
-	{
-		return _models;
-	}
-	
-	public function get slots():Slots  { return _slots; }
-	public function get voxels():Voxels  { return _voxels; }
 	
 	public function load():void {
 		if ( Globals.online ) {
@@ -97,7 +59,7 @@ public class Inventory
 	}
 	
 	private function changed():Boolean {
-		if ( _slots.changed || _voxels.changed )
+		if ( _slots.changed || _voxels.changed || _models.changed )
 			return true;
 		return false;
 	}
@@ -117,10 +79,6 @@ public class Inventory
 		else
 			Log.out( "Inventory.save - NOT Saving User Inventory, either offline or NOT changed", Log.DEBUG );
 
-	}
-	
-	public function add( $type:int, $item:* ):void {	
-		Log.out( "Inventory.add - NOT IMPLEMENTED", Log.WARN );
 	}
 	
 	//////////////////////////////////////////////////////////////////

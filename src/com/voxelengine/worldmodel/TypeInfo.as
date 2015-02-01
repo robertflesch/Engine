@@ -147,6 +147,7 @@ package com.voxelengine.worldmodel
 		private var _speed:Number				= 1;
 		private var _durability:Number			= 1;
 		private var _luck:Number				= 1;
+		private var _countColor:uint			= 0x00ff00ff; // the color to be used to show how many of this object exist
 		
 		
 		public function get interactions():Interactions { return _interactions; }
@@ -187,6 +188,7 @@ package com.voxelengine.worldmodel
 		public function get speed():Number { return _speed; }
 		public function get durability():Number { return _durability; }
 		public function get luck():Number { return _luck; }
+		public function get countColor():uint {return _countColor;}
 		
 		public function TypeInfo( $typeId:int ):void { 
 			_typeId = $typeId;
@@ -274,6 +276,9 @@ package com.voxelengine.worldmodel
 			if ( $json.image  )
 				_image = $json.image;
 
+			if ( $json.countColor  )
+				_countColor = $json.countColor;
+				
 			if ( $json.color  )
 			{
 				_color = ColorUtils.placeRedNumber( _color, $json.color.r );

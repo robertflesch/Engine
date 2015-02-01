@@ -77,10 +77,13 @@ public class BoxInventory extends VVBox
 	
 	private function voxelCount(e:InventoryVoxelEvent):void 
 	{
-		if ( (_objectInfo as TypeInfo).type == e.typeId ) {
+		var ti:TypeInfo = (_objectInfo as TypeInfo);
+		if ( ti.type == e.typeId ) {
 			var totalOxelsOfThisType:String = String( e.result );
-			if ( 8 < totalOxelsOfThisType.length )
+			_count.fontColor = ti.countColor;
+			if ( 8 < totalOxelsOfThisType.length ) {
 				_count.text = "LOTS";
+			}
 			else
 				_count.text = totalOxelsOfThisType;
 		}

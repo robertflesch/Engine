@@ -8,6 +8,7 @@
 
 package {
 	import com.voxelengine.server.Persistance;
+	import com.voxelengine.worldmodel.inventory.InventoryManager;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
@@ -246,8 +247,8 @@ package {
 				stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp);
 					
 				Globals.g_regionManager.currentRegion.save();
-				if ( Globals.player && Globals.online )
-					Globals.player.inventorySave();
+				if ( Globals.online )
+					InventoryManager.save();
 				
 				dispatchEvent( new GUIEvent( GUIEvent.APP_DEACTIVATE ) );
 			}

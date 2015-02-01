@@ -14,7 +14,7 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 
 	/**
-	 * ...
+	 * The inventory manager is a static object that hold the inventory of different objects
 	 * @author Bob
 	 */
 	
@@ -31,6 +31,12 @@ public class InventoryManager extends EventDispatcher
 			
 		return s_inventoryManager;
 	} 
+	
+	public static function save():void {
+		for each ( var inventory:Inventory in s_inventoryManager )
+			if ( null != inventory )
+				inventory.save();
+	}
 	
 	///////////////// Event handler interface /////////////////////////////
 

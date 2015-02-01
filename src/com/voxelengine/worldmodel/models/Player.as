@@ -51,16 +51,6 @@ public class Player extends Avatar
 	static private const 	AVATAR_CLIP_FACTOR:Number 	= 0.90;
 	static private var  	STEP_UP_MAX:int 			= 16;
 		
-	public function inventorySave():void { 
-		var inv:Inventory = InventoryManager.objectInventoryGet( Network.userId );
-		inv.save(); 
-	}
-	private function inventoryAdd( $type:int, $item:* ):void {
-		var inv:Inventory = InventoryManager.objectInventoryGet(Network.userId );
-		inv.add( $type, $item );
-	}
-	
-	
 	public function Player( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
 		Log.out( "Player.contruct guid: " + instanceInfo.guid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super( instanceInfo, mi, $vmm );
