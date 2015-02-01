@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 import com.voxelengine.worldmodel.inventory.InventoryManager;
+import com.voxelengine.worldmodel.models.SecureInt;
 import com.voxelengine.worldmodel.ObjectInfo;
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
@@ -152,7 +153,7 @@ public class InventoryPanelVoxel extends VVContainer
 	
 	private function populateVoxels(e:InventoryVoxelEvent):void {
 		
-		var results:Array = e.result as Array;
+		var results:Vector.<SecureInt> = e.result as Vector.<SecureInt>;
 		InventoryManager.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, populateVoxels );
 		
 		var VOXEL_CONTAINER_WIDTH:int = 512;
@@ -164,13 +165,13 @@ public class InventoryPanelVoxel extends VVContainer
 		var box:BoxInventory;
 		var item:TypeInfo;
 		
-		for (var k:Object in results)
-		//for each (var item:TypeInfo in results )
+		for (var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
 		{
-			var typeId:int = k as int;
-			var voxelCount:int = results[k];
 			item = Globals.typeInfo[typeId];
-			if ( item.placeable )
+			if ( null == item )
+				continue;
+			var voxelCount:int = results[typeId].val;
+			if ( item.placeable && 0 < voxelCount)
 			{
 				// Add the filled bar to the container and create a new container
 				if ( countMax == count )
@@ -189,6 +190,7 @@ public class InventoryPanelVoxel extends VVContainer
 			}
 		}
 		_itemContainer.addElement( pc );
+		
 	}
 	
 	private function dropMaterial(e:DnDEvent):void 

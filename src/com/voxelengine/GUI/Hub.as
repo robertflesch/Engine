@@ -105,7 +105,6 @@ public class Hub extends VVCanvas
 	
 	private function shouldDisplay(e:VVWindowEvent):void 
 	{
-		Log.out( "Test of sandbox has closed" );
 		if ( WindowSandboxList.WINDOWSANDBOXLIST_TITLE == e.windowTitle )
 			show();
 	}
@@ -298,11 +297,11 @@ public class Hub extends VVCanvas
 	{
 		_itemInventory.moveSelector( box.x );
 		
-		var ti:ObjectInfo = box.data as ObjectInfo;
+		var oi:ObjectInfo = box.data as ObjectInfo;
 		var itemIndex:int = int( box.name );
 		var name:String
-		if ( ti )
-			name = ti.name.toLowerCase();
+		if ( oi )
+			name = oi.name.toLowerCase();
 		else 
 			name = "none";
 		
@@ -343,19 +342,21 @@ public class Hub extends VVCanvas
 		}
 		else
 		{
-			EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
-			var index:int = 0;
-			for each ( var o:TypeInfo in Globals.typeInfo )
-			{
-				if ( name == o.name.toLowerCase() ) 
-				{ 
-					EditCursor.cursorColor = o.type; 
+			if ( oi is TypeInfo ) {
+				EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
+				var selectedTypeId:int = Globals.getTypeId( name );
+				if ( Globals.INVALID != selectedTypeId ) {
+					EditCursor.cursorColor = selectedTypeId; 
 					_itemMaterialSelection = itemIndex;
 					Globals.g_app.editing = true;
 					Globals.g_app.toolOrBlockEnabled = true;
-					break;
 				}
-				index++;
+			}
+			else {
+				EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
+				Globals.g_app.editing = false;
+				Globals.g_app.toolOrBlockEnabled = false;
+				Log.out( "Hub.processItemSelection - How do we handle actions here?", Log.WARN );
 			}
 		}
 		_lastItemSelection = itemIndex;

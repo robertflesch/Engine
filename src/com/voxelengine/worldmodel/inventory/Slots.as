@@ -131,7 +131,7 @@ public class Slots
 		}
 	}
 
-	private function fromByteArray( $ba:ByteArray ):void {}
+	public function fromByteArray( $ba:ByteArray ):void {}
 	public function asByteArray( $ba:ByteArray ):ByteArray { return $ba; }
 }
 }

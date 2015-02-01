@@ -30,11 +30,11 @@ package com.voxelengine.worldmodel.models
 		static private const MIN_TURN_AMOUNT:Number = 0.02;
 		
 		// Trying to keep these numbers between 1 and 100
-		private var   _climbRate:Attribute = new Attribute( 70 );
-		private var   _moveSpeed:Attribute = new Attribute( 20 );
-		private var	  _maxClimbAngle:Attribute = new Attribute( 45 );
-		private var   _maxTurnRate:Attribute = new Attribute( 100 );
-		private var   _stallSpeed:Attribute = new Attribute( 2 );
+		private var   _climbRate:SecureNumber = new SecureNumber( 70 );
+		private var   _moveSpeed:SecureNumber = new SecureNumber( 20 );
+		private var	  _maxClimbAngle:SecureNumber = new SecureNumber( 45 );
+		private var   _maxTurnRate:SecureNumber = new SecureNumber( 100 );
+		private var   _stallSpeed:SecureNumber = new SecureNumber( 2 );
 		
 		protected var   _seatLocation:Vector3D =  new Vector3D( 8, 12, 13 );
 

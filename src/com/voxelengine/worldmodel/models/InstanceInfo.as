@@ -35,7 +35,7 @@ public class InstanceInfo extends Location	{
 	private var _usesCollision:Boolean 				= false;                        // toJSON
 	private var _collidable:Boolean 				= true;							// toJSON
 	private var _critical:Boolean 					= false;						// toJSON
-	private var	_moveSpeed:Attribute 				= new Attribute( 0.01 );
+	private var	_moveSpeed:SecureNumber 				= new SecureNumber( 0.01 );
 	private var _transforms:Vector.<ModelTransform> = new Vector.<ModelTransform>;	// toJSON
 	private var _shader:String 						= "ShaderOxel";					// toJSON
 	private var _guid:String 						= null;                         // toJSON
@@ -305,11 +305,7 @@ public class InstanceInfo extends Location	{
 		{
 			var typeString:String = "INVALID";
 			typeString = json.type.toLowerCase();
-			for each ( var o:TypeInfo in Globals.typeInfo )
-				if ( typeString == o.name.toLowerCase() ) 
-					{ _type = o.type; 
-					  break; }
-
+			_type = Globals.getTypeId( typeString );
 			if ( Globals.INVALID == type )
 				trace( "LayerInfo.initJSON - WARNING - INVALID type found: " + typeString );
 		}

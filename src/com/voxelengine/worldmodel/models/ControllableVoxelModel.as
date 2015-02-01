@@ -50,8 +50,8 @@ package com.voxelengine.worldmodel.models
 		protected var _leaveTrail:Boolean 						= false
 		protected var _forward:Boolean 							= false
 
-		private var		_maxFallRate:Attribute 					= new Attribute( 5 );
-		private var   	_maxSpeed:Attribute 					= new Attribute( 15 );
+		private var		_maxFallRate:SecureNumber 					= new SecureNumber( 5 );
+		private var   	_maxSpeed:SecureNumber 					= new SecureNumber( 15 );
 		private var   	_speedMultiplier:Number 				= 0.5;
 
 		

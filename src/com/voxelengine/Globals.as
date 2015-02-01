@@ -83,7 +83,7 @@ package com.voxelengine {
 		public static var g_debug:Boolean  = false;
 				
 		public static const INVALID:uint						= 0;	//  0
-		private static var  enum_val:uint						= 100;
+		private static var  enum_val:uint						= 100; // TypeInfo.MIN_TYPE_INFO
 		public static const AIR:uint							= enum_val++;	//  100
 		public static const GRASS:uint							= enum_val++;	//  101
 		public static const DIRT:uint							= enum_val++;	//  102
@@ -127,7 +127,8 @@ package com.voxelengine {
 		// code throws an exception when WRITE or READ is done from this object
 		public static const BAD_OXEL:OxelBad = new OxelBad();
 
-		public static var typeInfo:Array = new Array;
+		public static var typeInfo:Vector.<TypeInfo> = new Vector.<TypeInfo>(1024);
+		public static var typeInfoByName:Array = new Array;
 		
 		static public function drawable( type:int ):Boolean
 		{
@@ -152,6 +153,7 @@ package com.voxelengine {
 			return false;	
 		}
 		
+		// WARNING use sparingly
 		static public function getTypeId( type:* ):int
 		{
 			if ( type is int )
@@ -160,12 +162,14 @@ package com.voxelengine {
 				return (type as int);
 			else if ( type is String )
 			{
-				var typeString:String = type.toLowerCase();
-				for each ( var o:TypeInfo in typeInfo )
-				{
-					if ( typeString == o.name.toLowerCase() ) 
-						return o.type; 
-				}
+				var typeString:String = type.toUpperCase();
+				 return typeInfoByName[ typeString ].type;
+				//for ( var i:int = TypeInfo.MIN_TYPE_INFO; i < TypeInfo.MAX_TYPE_INFO; i++ )
+				//{
+					//
+					//if ( Globals.typeInfo[i] && ( typeString == Globals.typeInfo[i].name.toUpperCase() ) ) 
+						//return Globals.typeInfo[i].type; 
+				//}
 			}
 
    			Log.out( "Globals.getTypeId - WARNING - INVALID type found: " + type, Log.WARN );

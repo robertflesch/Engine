@@ -30,7 +30,7 @@ import com.voxelengine.events.InventoryPersistanceEvent;
 public class Inventory
 {
 	private var  _slots:Slots
-	private var _voxels:Array;
+	private var _voxels:Voxels;
 	private var _models:Array = new Array();
 	private var _networkId:String;
 
@@ -44,48 +44,10 @@ public class Inventory
 		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_INCREMENT,		modelIncrement );
 		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_DECREMENT, 		modelDecrement );
 		
-		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, 			voxelChange );
-		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST,	voxelCount );
-		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST,	voxelTypes );
-		
 		_slots = new Slots( $networkId );
 		_networkId = $networkId;
-		_voxels = new Array();
-		var allTypes:Array = Globals.typeInfo;
-		for (var key:String in allTypes )
-			_voxels[key] = 0;
+		_voxels = new Voxels( $networkId );
 			
-		addTestData();
-	}
-	
-	// This returns an Array which holds the typeId and the count of those voxels
-	public function voxelTypes(e:InventoryVoxelEvent):void 
-	{
-		const cat:String = (e.result as String).toUpperCase();
-		if ( cat == "ALL" ) {
-			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, _voxels ) );
-			return;
-		}
-			
-		var result:Array = [];
-		// This iterates thru the keys
-		for (var key:String in _voxels) {
-			var catData:String = Globals.typeInfo[key].category;
-			if ( cat == catData.toUpperCase() && 0 < _voxels[key] )
-				result[key]	= _voxels[key];
-		}
-
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, result ) );
-	}
-	
-	
-	public function voxelCount(e:InventoryVoxelEvent):void 
-	{
-		if ( e.ownerGuid == _networkId && null != _voxels ) {
-			var typeId:int = e.typeId;
-			var voxelCount:int = _voxels[typeId];
-			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, _networkId, typeId, voxelCount ) );
-		}
 	}
 	
 	public function modelCount(e:InventoryModelEvent):void 
@@ -93,20 +55,6 @@ public class Inventory
 		//var modelId:String = e.guid;
 		//var modelCount:int = _models[modelId];
 		//InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, _networkId, modelId, modelCount ) );
-	}
-	
-	private function addTestData():void {
-		addModelTestData()
-		addVoxelTestData();
-	};
-	
-	public function addModelTestData():void {
-	}
-	
-	public function addVoxelTestData():void {
-		_voxels[Globals.STONE] = 1234;
-		_voxels[Globals.DIRT] = 432;
-		_voxels[Globals.GRASS] = 123456789;
 	}
 	
 	public function modelIncrement(e:InventoryModelEvent):void 
@@ -139,15 +87,7 @@ public class Inventory
 	}
 	
 	public function get slots():Slots  { return _slots; }
-	
-	private function reset():void {
-		_voxels = null;
-	}
-	
-	public function unload():void {
-		save();
-		reset();
-	}
+	public function get voxels():Voxels  { return _voxels; }
 	
 	public function load():void {
 		if ( Globals.online ) {
@@ -157,7 +97,7 @@ public class Inventory
 	}
 	
 	private function changed():Boolean {
-		if ( _slots.changed )
+		if ( _slots.changed || _voxels.changed )
 			return true;
 		return false;
 	}
@@ -195,6 +135,7 @@ public class Inventory
 		// Slot data is stored as fields for easy analysis
 		// we can know what user carry around
 		_slots.fromPersistance( $dbo );
+		_voxels.fromPersistance( $dbo );
 		
 		if ( $dbo.data ) {
 			var ba:ByteArray = $dbo.data 
@@ -207,44 +148,27 @@ public class Inventory
 	
 	private function toPersistance():void {
 		_slots.toPersistance(_dbo);
+		_voxels.toPersistance(_dbo);
 		var ba:ByteArray = new ByteArray(); 
 		_dbo.data 			= asByteArray( ba );
 	}
 
 	private function fromByteArray( $ba:ByteArray ):void {
 		if ( 0 == $ba.bytesAvailable ) {
-			addModelTestData();
+			//addModelTestData();
 			return;
 		}
-		//_items = new Vector.<InventoryObject>();	
-		//var itemCount:int = $ba.readInt();
-		//for ( var i:int; i < itemCount; i++ ) {
-			//var io:InventoryObject = new InventoryObject();
-			//io.fromByteArray( $ba )
-			//items.push( io );
-		//}
+		
+		var ownerId:String = $ba.readUTF();
+		_slots.fromByteArray( $ba );
+		_voxels.fromByteArray( $ba );
 	}
 	
 	public function asByteArray( $ba:ByteArray ):ByteArray {
-
-		
-		//ba.writeInt( items.length );
-		//for each ( var item:InventoryObject in items )
-			//item.toByteArray( ba );
-		//ba.compress();	
 		$ba.writeUTF( _networkId );
-		$ba.writeInt( Hub.ITEM_COUNT )
-		
-		//for ( var i:int; i < Hub.ITEM_COUNT; i++ ) {
-			//var item:ObjectInfo = _slots[i];
-////			if ( item )
-				//item.asByteArray( $ba );
-		//}
-		
+		_slots.asByteArray( $ba );
+		_voxels.asByteArray( $ba );
 		$ba.compress();
-	//_voxels:Array;
-	//_models:Array = new Array();
-		
 		return $ba;	
 	}
 	

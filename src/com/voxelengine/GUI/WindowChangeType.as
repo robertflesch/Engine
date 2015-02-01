@@ -32,19 +32,23 @@ public class WindowChangeType extends VVPopup
 			panel.layout.orientation = LayoutOrientation.VERTICAL;
 			
 			_cb = new ComboBox( "Original Type" );
-			
-			for each (var item:TypeInfo in Globals.typeInfo )
-			{
-				_cb.addItem( item.name, item.type );
-			}
 			panel.addElement( _cb );
 			
 			_cbTo = new ComboBox( "New Type" );
-			for each (var nitem:TypeInfo in Globals.typeInfo )
-			{
-				_cbTo.addItem( nitem.name, nitem.type );
-			}
 			panel.addElement( _cbTo );
+			
+			var item:TypeInfo
+			for ( var i:int = TypeInfo.MIN_TYPE_INFO; i < TypeInfo.MAX_TYPE_INFO; i++ )
+			{
+				item = Globals.typeInfo[i];
+				if ( null == item )
+					continue;
+				if ( "INVALID" != item.name && "AIR" != item.name && "BRAND" != item.name && -1 == item.name.indexOf( "EDIT" ) && item.placeable )
+				{
+					_cb.addItem( item.name, item.type );
+					_cbTo.addItem( item.name, item.type );
+				}
+			}
 			
 			addElement( panel );
 			

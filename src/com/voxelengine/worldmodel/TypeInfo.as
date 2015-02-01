@@ -11,7 +11,6 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.utils.ColorUtils;
-	import com.voxelengine.worldmodel.models.Attribute;
 	import com.voxelengine.worldmodel.oxel.Lighting;
 	import com.voxelengine.worldmodel.oxel.FlowInfo;
 	import flash.geom.Vector3D;
@@ -31,6 +30,9 @@ package com.voxelengine.worldmodel
 	 */
 	public class TypeInfo extends ObjectInfo
 	{
+		static public const MIN_TYPE_INFO:uint = 100;
+		static public const MAX_TYPE_INFO:uint = 1024;
+		
 		private var _typeId:uint				= Globals.INVALID;
 		private var _category:String 			= "INVALID";
 		private var _subCat:String 				= "INVALID";
@@ -59,6 +61,7 @@ package com.voxelengine.worldmodel
 		private var _speed:Number				= 1;
 		private var _durability:Number			= 1;
 		private var _luck:Number				= 1;
+		
 		
 		public function get interactions():Interactions { return _interactions; }
 		public function get type():uint 		{ return _typeId; }
@@ -141,6 +144,7 @@ package com.voxelengine.worldmodel
 			ti._solid = false;
 			ti._placeable = false;
 			Globals.typeInfo[ti._typeId] = ti;
+			Globals.typeInfoByName[ti.name.toUpperCase()] = ti;
 			
 			
 			var jsonString:String = StringUtil.trim(String(event.target.data));
@@ -158,6 +162,7 @@ package com.voxelengine.worldmodel
 				ti = new TypeInfo( v.id );
 				ti.init( v );
 				Globals.typeInfo[ti._typeId] = ti;
+				Globals.typeInfoByName[ti.name.toUpperCase()] = ti;
 			}
 			
 			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_TYPES_COMPLETE ) );

@@ -40,9 +40,9 @@ public class WindowNewModelGenerateCube extends ModalPopup
 			panel.addElement( size );
 			_cbSize = new ComboBox( "Size in meters" );
 			
-			for ( var i:int = 4; i < 12; i++ )
+			for ( var j:int = 4; j < 12; j++ )
 			{
-				_cbSize.addItem( String(1<<(i-4)), i );
+				_cbSize.addItem( String(1<<(i-4)), j );
 			}
 			_cbSize.selectedIndex = 0;
 			panel.addElement( _cbSize );
@@ -51,10 +51,19 @@ public class WindowNewModelGenerateCube extends ModalPopup
 			madeOfType.fontSize = 14;
 			panel.addElement( madeOfType );
 			_cbType = new ComboBox( "Made Of" );
-			for each (var nitem:TypeInfo in Globals.typeInfo )
+			
+			var item:TypeInfo
+			for ( var i:int = TypeInfo.MIN_TYPE_INFO; i < TypeInfo.MAX_TYPE_INFO; i++ )
 			{
-				_cbType.addItem( nitem.name, nitem.type );
+				item = Globals.typeInfo[i];
+				if ( null == item )
+					continue;
+				if ( "INVALID" != item.name && "AIR" != item.name && "BRAND" != item.name && -1 == item.name.indexOf( "EDIT" ) && item.placeable )
+				{
+					_cbType.addItem( item.name, item.type );
+				}
 			}
+			
 			_cbType.selectedIndex = 0;
 			panel.addElement( _cbType );
 			

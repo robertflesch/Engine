@@ -111,8 +111,12 @@ package com.voxelengine.GUI.inventory {
 
 			var countMax:int = width / 64;
 			var box:BoxInventory;
-			for each (var item:TypeInfo in Globals.typeInfo )
+			var item:TypeInfo;
+			for ( var i:int = TypeInfo.MIN_TYPE_INFO; i < TypeInfo.MAX_TYPE_INFO; i++ )
 			{
+				item = Globals.typeInfo[i];
+				if ( null == item )
+					continue;
 				if ( item.placeable && (item.category.toUpperCase() == category.toUpperCase() || "ALL" == String(category).toUpperCase() ) )
 				{
 //					if ( "crafting" == category.toLowerCase() )

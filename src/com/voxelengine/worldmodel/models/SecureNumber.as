@@ -22,7 +22,7 @@ package com.voxelengine.worldmodel.models
 	 * var someVal:Number = someAttrib + 1.23;
 	 * Best way to protect against this in as3 is to wrap the Attribute in a setter and getter
 	 */
-	public class Attribute
+	public class SecureNumber
 	{
 		private const VECTOR_SIZE:int = 16;
 		private const RANDOM_NUMBER_RANGE:int = 256;
@@ -31,7 +31,7 @@ package com.voxelengine.worldmodel.models
 		private var _vec:Vector.<Number> = new Vector.<Number>(VECTOR_SIZE);
 		
 		// the $ sign is a style used to differeinate function params from local vars
-		public function Attribute( $value:Number = 1 ):void
+		public function SecureNumber( $value:Number = 1 ):void
 		{
 			val = $value;
 		}

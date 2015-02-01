@@ -92,7 +92,7 @@ package com.voxelengine.worldmodel.models
 		
 		// TODO this should be moved to controlled model
 		private var 	_lastCollisionModel:VoxelModel 	= null; // INSTANCE NOT EXPORTED
-		private var 	_clipVelocityFactor:Attribute 	= new Attribute(95); // INSTANCE NOT EXPORTED
+		private var 	_clipVelocityFactor:SecureNumber 	= new SecureNumber(95); // INSTANCE NOT EXPORTED
 		protected var 	_turnRate:Number 				= 20; // 2.5 for ship
 		protected var 	_accelRate:Number 				= 2.5;
 		
