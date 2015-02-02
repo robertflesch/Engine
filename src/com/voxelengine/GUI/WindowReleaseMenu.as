@@ -46,28 +46,34 @@ package com.voxelengine.GUI
 			name.fontSize = 14;
 			name.fontColor = 0xffffff;
 			addElement( name );
+			
+			var ss:Label = new Label( "Screen Shot F12" );
+			ss.fontSize = 14;
+			ss.fontColor = 0x0000ff;
+			addElement( ss );
+			
+			var fs:Label = new Label( "FullScreen F9" );
+			fs.fontSize = 14;
+			fs.fontColor = 0x0000ff;
+			addElement( fs );
+			
 			_startTime = getTimer();
 			_prefix = "FPS: ";
 			_fpsLabel.fontSize = 14;
 			_fpsLabel.fontColor = 0xff0000;
 			addElement( _fpsLabel );
+			
 			_locLabel.fontSize = 14;
 			_locLabel.fontColor = 0x808080;
 			addElement( _locLabel );
+			
 			_rotLabel.fontSize = 14;
 			_rotLabel.fontColor = 0x808080;
 			addElement( _rotLabel );
+			
 			var spacer:Label = new Label( "" );
 			spacer.fontSize = 14;
 			addElement( spacer );
-			var fs:Label = new Label( "FullScreen F9" );
-			fs.fontSize = 14;
-			fs.fontColor = 0x0000ff;
-			addElement( fs );
-			var ss:Label = new Label( "Screen Shot F12" );
-			ss.fontSize = 14;
-			ss.fontColor = 0x0000ff;
-			addElement( ss );
 			
 			display( 0, 0 );	
 			
