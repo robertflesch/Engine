@@ -24,7 +24,7 @@ package com.voxelengine.GUI
 			layout.orientation = LayoutOrientation.VERTICAL;
 			padding = pbPadding - 1;
 			_parent = $parent;
-			Log.out( "PanelBase constructed for: " + this, Log.WARN );
+			//Log.out( "PanelBase constructed for: " + this, Log.WARN );
         }
 		
 		public function topLevelGet():PanelBase {
