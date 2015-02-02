@@ -52,8 +52,6 @@ public class Hub extends VVCanvas
 	
 	private var _evtColl:EventCollector = new EventCollector();;
 	
-	static public const ITEM_COUNT:int = 10;
-	
 	public function get itemInventory():QuickInventory { return _itemInventory; }
 	public function get toolSize():QuickInventory { return _toolSize; }
 	
@@ -95,9 +93,9 @@ public class Hub extends VVCanvas
 		var slots:Slots = inv.slots;
 		
 		var items:Vector.<ObjectInfo> = slots.items;
-		for ( var i:int; i < ITEM_COUNT; i++ ) {
+		for ( var i:int; i < Slots.ITEM_COUNT; i++ ) {
 			var item:ObjectInfo = items[i];
-			(_itemInventory._boxes[i] as BoxInventory).updateObjectInfo( item );
+			(_itemInventory.boxes[i] as BoxInventory).updateObjectInfo( item );
 			
 		}
 		Globals.g_app.addEventListener( VVWindowEvent.WINDOW_CLOSING, shouldDisplay );			
@@ -164,14 +162,14 @@ public class Hub extends VVCanvas
 		
 		var count:int = 0;
 		// Should add what is in current inventory here.
-		for  ( ; count < ITEM_COUNT;  )
+		for  ( ; count < Slots.ITEM_COUNT;  )
 		{
 			buildItem( null, count++ );
 		}
 		
 		_itemInventory.addSelector();			
 		
-		_itemInventory.width = ITEM_COUNT * 64;
+		_itemInventory.width = Slots.ITEM_COUNT * 64;
 		_itemInventory.display();
 		
 		//processItemSelection( noneBox );
@@ -392,17 +390,17 @@ public class Hub extends VVCanvas
 		{
 			if ( -1 != _lastItemSelection )
 			{
-				if ( 0 < event.delta && _lastItemSelection < (ITEM_COUNT - 1)  )
+				if ( 0 < event.delta && _lastItemSelection < (Slots.ITEM_COUNT - 1)  )
 				{
 					selectItemByIndex( _lastItemSelection + 1 );
 				}
-				else if ( 0 < event.delta && ( ITEM_COUNT -1 ) == _lastItemSelection )
+				else if ( 0 < event.delta && ( Slots.ITEM_COUNT -1 ) == _lastItemSelection )
 				{
 					selectItemByIndex( 0 );
 				}
 				else if ( 0 > event.delta && 0 == _lastItemSelection )
 				{
-					selectItemByIndex( ITEM_COUNT - 1 );
+					selectItemByIndex( Slots.ITEM_COUNT - 1 );
 				}
 				else if ( 0 < _lastItemSelection )
 				{
