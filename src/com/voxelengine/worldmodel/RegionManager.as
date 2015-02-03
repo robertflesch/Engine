@@ -34,7 +34,7 @@ import com.voxelengine.worldmodel.models.ModelLoader;
 import com.voxelengine.worldmodel.models.ModelManager;
 import com.voxelengine.worldmodel.models.VoxelModel;
 import com.voxelengine.utils.CustomURLLoader;
-import com.voxelengine.worldmodel.models.TemplateManager;
+import com.voxelengine.worldmodel.models.PlanManager;
 
 import com.voxelengine.GUI.WindowSplash;
 /**
@@ -82,7 +82,7 @@ public class RegionManager
 		
 		
 		// This adds the event handlers
-		TemplateManager.addEvents();
+		PlanManager.addEvents();
 	}
 	
 

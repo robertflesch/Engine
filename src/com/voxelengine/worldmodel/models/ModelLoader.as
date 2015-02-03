@@ -317,7 +317,7 @@ package com.voxelengine.worldmodel.models
 					vm.instanceInfo.guid = vm.metadata.guid = Globals.getUID();
 					_s_mmd = null;
 					vm.save();
-					TemplateManager.templateAdd( vm.metadata );
+					PlanManager.templateAdd( vm.metadata );
 					Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.TEMPLATE_MODEL_COMPLETE, vm.metadata.guid ) );
 					// clear out any evidence that we loaded this model (modelInfo too?)
 					Globals.markDead( e.guid );

@@ -1,67 +1,156 @@
 package com.voxelengine.GUI.inventory {
 
-	import org.flashapi.swing.*
-	import org.flashapi.swing.core.UIObject;
-    import org.flashapi.swing.event.*;
-    import org.flashapi.swing.constants.*;
-	import org.flashapi.swing.list.ListItem;
-	
-	import com.voxelengine.Globals;
-	import com.voxelengine.Log;
-	import com.voxelengine.GUI.*;
-	
-	public class InventoryPanelModel extends VVContainer
-	{
-		// TODO need a more central location for these
-        static public const MODEL_CAT_ARCHITECTURE:String = "Architecture";
-        static public const MODEL_CAT_CHARACTERS:String = "Characters";
-        static public const MODEL_CAT_PLANTS:String = "Plants";
-        static public const MODEL_CAT_FURNITURE:String = "Furniture";
-		
-		private var _barUpper:TabBar
-		// This hold the items to be displayed
-		private var _itemContainer:Container;
-		
-		public function InventoryPanelModel( $parent:VVContainer ) {
-			super( $parent );
-			autoSize = true;
-			layout.orientation = LayoutOrientation.VERTICAL;
-			
-			upperTabsAdd();
-			addItemContainer();
-		}
-		
-		private function upperTabsAdd():void {
-			_barUpper = new TabBar();
-			_barUpper.orientation = ButtonBarOrientation.VERTICAL;
-			_barUpper.name = "upper";
-			// TODO I should really iterate thru the types and collect the categories - RSF
-            _barUpper.addItem( LanguageManager.localizedStringGet( MODEL_CAT_ARCHITECTURE ), MODEL_CAT_ARCHITECTURE );
-			_barUpper.addItem( LanguageManager.localizedStringGet( MODEL_CAT_CHARACTERS ), MODEL_CAT_CHARACTERS );
-            _barUpper.addItem( LanguageManager.localizedStringGet( MODEL_CAT_PLANTS ), MODEL_CAT_PLANTS );
-            _barUpper.addItem( LanguageManager.localizedStringGet( MODEL_CAT_FURNITURE ), MODEL_CAT_FURNITURE );
-			_barUpper.setButtonsWidth( 128 );
-			_barUpper.selectedIndex = 0;
-            eventCollector.addEvent( _barUpper, ListEvent.ITEM_CLICKED, selectCategory );
-            addGraphicElements( _barUpper );
-		}
+import org.flashapi.swing.*
+import org.flashapi.swing.core.UIObject;
+import org.flashapi.swing.event.*;
+import org.flashapi.swing.constants.*;
+import org.flashapi.swing.list.ListItem;
+import org.flashapi.swing.layout.AbsoluteLayout;
 
-		private function addItemContainer():void {
-			_itemContainer = new Container();
-			_itemContainer.autoSize = true;
-			_itemContainer.layout.orientation = LayoutOrientation.VERTICAL;
-			addElement( _itemContainer );
-		}
+import com.voxelengine.Globals;
+import com.voxelengine.Log;
+import com.voxelengine.GUI.*;
+import com.voxelengine.events.InventoryModelEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.inventory.InventoryManager;
+import com.voxelengine.worldmodel.ObjectInfo;
+
+public class InventoryPanelModel extends VVContainer
+{
+	// TODO need a more central location for these
+	static public const MODEL_CAT_ARCHITECTURE:String = "Architecture";
+	static public const MODEL_CAT_CHARACTERS:String = "Characters";
+	static public const MODEL_CAT_PLANTS:String = "Plants";
+	static public const MODEL_CAT_FURNITURE:String = "Furniture";
+	static public const MODEL_CAT_ALL:String = "ALL";
+	
+	private var _barLeft:TabBar
+	// This hold the items to be displayed
+	private var _itemContainer:Container;
+	
+	public function InventoryPanelModel( $parent:VVContainer ) {
+		super( $parent );
+		autoSize = true;
+		layout.orientation = LayoutOrientation.VERTICAL;
 		
-		private function selectCategory(e:ListEvent):void 
-		{			
-			displaySelectedCategory( e.target.value );	
-		}
-		
-		// TODO I see problem here when langauge is different then what is in TypeInfo RSF - 11.16.14
-		// That is if I use the target "Name"
-		private function displaySelectedCategory( category:String ):void
-		{	
-		}
+		upperTabsAdd();
+		addItemContainer();
 	}
+	
+	private function upperTabsAdd():void {
+		_barLeft = new TabBar();
+		_barLeft.orientation = ButtonBarOrientation.VERTICAL;
+		_barLeft.name = "upper";
+		// TODO I should really iterate thru the types and collect the categories - RSF
+		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_ARCHITECTURE ), MODEL_CAT_ARCHITECTURE );
+		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_CHARACTERS ), MODEL_CAT_CHARACTERS );
+		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_PLANTS ), MODEL_CAT_PLANTS );
+		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_FURNITURE ), MODEL_CAT_FURNITURE );
+		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_ALL ), MODEL_CAT_ALL );
+		_barLeft.setButtonsWidth( 128 );
+		_barLeft.selectedIndex = 4;
+		eventCollector.addEvent( _barLeft, ListEvent.ITEM_CLICKED, selectCategory );
+		addGraphicElements( _barLeft );
+	}
+
+	private function addItemContainer():void {
+		_itemContainer = new Container();
+		_itemContainer.autoSize = true;
+		_itemContainer.layout.orientation = LayoutOrientation.VERTICAL;
+		addElement( _itemContainer );
+	}
+	
+	private function selectCategory(e:ListEvent):void 
+	{			
+		displaySelectedCategory( e.target.value );	
+	}
+	
+	// TODO I see problem here when langauge is different then what is in TypeInfo RSF - 11.16.14
+	// That is if I use the target "Name"
+	private function displaySelectedCategory( $category:String ):void
+	{	
+		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_LIST_RESULT, populateModels );
+		InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_LIST_REQUEST, Network.userId, "", $category ) );
+	}
+	
+	private function populateModels(e:InventoryModelEvent):void 
+	{
+		//var results:Vector.<SecureInt> = e.result as Vector.<SecureInt>;
+		InventoryManager.removeListener( InventoryModelEvent.INVENTORY_MODEL_LIST_RESULT, populateModels );
+		
+		var MODEL_CONTAINER_WIDTH:int = 512;
+		const MODEL_IMAGE_WIDTH:int = 128;
+		var count:int = 0;
+		var pc:Container = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
+		pc.layout = new AbsoluteLayout();
+
+		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
+		var box:BoxInventory;
+		var item:ObjectInfo;
+		
+		//for (var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
+		//{
+			//item = TypeInfo.typeInfo[typeId];
+			//if ( null == item )
+				//continue;
+			//var voxelCount:int = results[typeId].val;
+			//if ( item.placeable && 0 < voxelCount)
+			//{
+				//// Add the filled bar to the container and create a new container
+				//if ( countMax == count )
+				//{
+					//_itemContainer.addElement( pc );
+					//pc = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
+					//pc.layout = new AbsoluteLayout();
+					//count = 0;		
+				//}
+				//box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE, item );
+				//box.x = count * MODEL_IMAGE_WIDTH;
+				//pc.addElement( box );
+				//eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
+//
+				//count++
+			//}
+		//}
+		_itemContainer.addElement( pc );
+	}
+	
+	private function dropMaterial(e:DnDEvent):void 
+	{
+		//if ( e.dragOperation.initiator.data is TypeInfo )
+		//{
+			//e.dropTarget.backgroundTexture = e.dragOperation.initiator.backgroundTexture;
+			//e.dropTarget.data = e.dragOperation.initiator.data;
+			//
+			//if ( e.dropTarget.target is PanelMaterials ) {
+				//Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.MATERIAL_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
+			//}
+			//else if ( e.dropTarget.target is PanelBonuses ) {
+				//Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.BONUS_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
+				//e.dropTarget.backgroundTextureManager.resize( 32, 32 );
+			//}
+			//else if ( e.dropTarget.target is QuickInventory ) {
+				//if ( e.dropTarget is BoxInventory ) {
+					//var bi:BoxInventory = e.dropTarget as BoxInventory;
+					//var item:ObjectInfo = e.dragOperation.initiator.data;
+					//bi.updateObjectInfo( item );
+					//var slotId:int = int( bi.name );
+					//InventoryManager.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, item ) );
+				//}
+			//}
+		//}
+	}
+	
+	private function doDrag(e:UIMouseEvent):void 
+	{
+		//_dragOp.initiator = e.target as UIObject;
+		//_dragOp.dragImage = e.target as DisplayObject;
+		//// this adds a drop format, which is checked again what the target is expecting
+		//_dragOp.resetDropFormat();
+		//var dndFmt:DnDFormat = new DnDFormat( e.target.data.category, e.target.data.subCat );
+		//_dragOp.addDropFormat( dndFmt );
+		//
+		//UIManager.dragManager.startDragDrop(_dragOp);
+	}			
+}
 }

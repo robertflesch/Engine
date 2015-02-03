@@ -402,8 +402,10 @@ public class VoxelVerseGUI extends EventDispatcher
 		
 		if  ( Globals.g_app.configManager.showEditMenu )
 		{
-			if ( Keyboard.I == e.keyCode )
-				new WindowInventoryNew();
+			if ( Keyboard.I == e.keyCode ) {
+				var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
+				new WindowInventoryNew( startingTab );
+			}
 				
 			//if ( Keyboard.O == e.keyCode )
 			//{

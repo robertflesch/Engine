@@ -22,21 +22,21 @@ public class InventoryVoxelEvent extends Event
 	static public const INVENTORY_VOXEL_TYPES_RESULT:String  	= "INVENTORY_VOXEL_TYPES_RESULT";
 //		static public const INVENTORY_PRIM_REMOVE:String  			= "INVENTORY_VOXEL_REMOVE";
 	
-	private var _ownerGuid:String; // Guid of model which is implementing this action
+	private var _networkId:String; // Guid of model which is implementing this action
 	private var _typeId:int;	  // Voxel Type ID
 	private var _result:*;
 	
 	public function InventoryVoxelEvent( $type:String, $ownerGuid:String, $typeId:int, $result:*, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
-		_ownerGuid = $ownerGuid;
+		_networkId = $ownerGuid;
 		_typeId = $typeId;
 		_result = $result;
 	}
 	
 	public override function clone():Event
 	{
-		return new InventoryVoxelEvent( type, _ownerGuid, _typeId, _result, bubbles, cancelable);
+		return new InventoryVoxelEvent( type, _networkId, _typeId, _result, bubbles, cancelable);
 	}
    
 	public override function toString():String
@@ -54,6 +54,6 @@ public class InventoryVoxelEvent extends Event
 		return _result;
 	}
 	
-	public function get ownerGuid():String { return _ownerGuid; }
+	public function get networkId():String { return _networkId; }
 }
 }

@@ -7,26 +7,21 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
-import com.voxelengine.GUI.Hub;
-import flash.events.EventDispatcher;
-import flash.net.registerClassAlias;
 import flash.utils.ByteArray;
-import flash.utils.Dictionary;
 
 import playerio.DatabaseObject;
 
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.server.Persistance;
+import com.voxelengine.events.InventorySlotEvent;
+import com.voxelengine.events.InventoryPersistanceEvent;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.ObjectInfo;
 
-import com.voxelengine.events.InventorySlotEvent;
-import com.voxelengine.events.InventoryPersistanceEvent;
-
 public class Slots
 {
-	private var  _items:Vector.<ObjectInfo> = new Vector.<ObjectInfo>(10, true);
+	static public const ITEM_COUNT:int = 10;
+	
+	private var _items:Vector.<ObjectInfo> = new Vector.<ObjectInfo>(10, true);
 	private var _networkId:String;
 	private var _changed:Boolean;
 	
@@ -36,19 +31,22 @@ public class Slots
 	public function get items():Vector.<ObjectInfo>  { return _items; }
 
 	public function Slots( $networkId:String ) {
+		// Do I need to unregister this?
 		InventoryManager.addListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
 		_networkId = $networkId;
 	}
 	
 	public function slotChange(e:InventorySlotEvent):void {
-		var slotId:int = e.slotId;
-		var item:ObjectInfo = e.item;
-		Log.out( "SlotsManager.slotChange slot: " + slotId + "  item: " + item );
-		if ( null == item )
-			_items[slotId].reset( "" );
+		Log.out( "SlotsManager.slotChange slot: " + e.slotId + "  item: " + e.item );
+		if ( _items ) {
+			if ( null == e.item )
+				_items[e.slotId].reset( "" );
+			else
+				_items[e.slotId] = e.item;
+			changed = true;
+		}
 		else
-			_items[slotId] = item;
-		changed = true;
+			Log.out( "SlotsManager.slotChange _slots container not initialized", Log.WARN );
 	}
 	
 	private function createObjectFromInventoryString( $data:String ):ObjectInfo {
@@ -82,17 +80,6 @@ public class Slots
 			_items[9] = createObjectFromInventoryString( $dbo.slot9 );
 		}
 		else {
-			Log.out( "Slots.fromPersistance - Loading default data into slots" , Log.WARN );
-			_items[0]	= new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY, "" );
-			_items[1]	= new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY, "" );
-			_items[2]	= new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY, "" );
-			_items[3]	= new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY, "" );
-			_items[4]	= new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY, "" );
-			_items[5]	= new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY, "" );
-			_items[6]	= new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY, "" );
-			_items[7]	= new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY, "" );
-			_items[8]	= new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY, "" );
-			_items[9]	= new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY, "" );
 			addSlotDefaultData();		
 		}
 	}
@@ -112,21 +99,25 @@ public class Slots
 	}
 	
 	public function addSlotDefaultData():void {
+
+		initializeSlots();
+		Log.out( "Slots.addSlotDefaultData - Loading default data into slots" , Log.WARN );
+		
 		var pickItem:ObjectInfo = new ObjectInfo( ObjectInfo.OBJECTINFO_MODEL, "pickItem" );
 		pickItem.image = "pick.png";
 		pickItem.name = "pick";
-		
 		_items[0] = pickItem;
-
+		
 		var noneItem:ObjectInfo = new ObjectInfo( ObjectInfo.OBJECTINFO_ACTION, "" );
 		noneItem.image = "none.png";
 		noneItem.name = "none";
 		_items[1] = noneItem;
+		
 		changed = true;
 	}
 
 	private function initializeSlots():void {
-		for ( var i:int; i < Hub.ITEM_COUNT; i++ ) {
+		for ( var i:int; i < ITEM_COUNT; i++ ) {
 			_items[i] = new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY, "" );
 		}
 	}

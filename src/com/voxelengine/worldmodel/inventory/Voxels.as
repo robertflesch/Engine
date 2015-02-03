@@ -7,23 +7,15 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
-import com.voxelengine.GUI.Hub;
-import com.voxelengine.worldmodel.models.SecureInt;
-import flash.events.EventDispatcher;
-import flash.net.registerClassAlias;
 import flash.utils.ByteArray;
-import flash.utils.Dictionary;
 
 import playerio.DatabaseObject;
 
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.server.Persistance;
+import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.ObjectInfo;
-
-import com.voxelengine.events.InventoryVoxelEvent;
-import com.voxelengine.events.InventoryPersistanceEvent;
+import com.voxelengine.worldmodel.models.SecureInt;
 
 public class Voxels
 {
@@ -46,8 +38,6 @@ public class Voxels
 		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, 			voxelChange );
 		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST,	voxelCount );
 		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST,	voxelTypes );
-		
-		//addVoxelTestData();	
 	}
 
 	// This returns an Array which holds the typeId and the count of those voxels
@@ -59,15 +49,21 @@ public class Voxels
 			return;
 		}
 			
-		var result:Vector.<SecureInt> = new Vector.<SecureInt>(TypeInfo.MAX_TYPE_INFO,true);
-		// This iterates thru the keys
-		for ( var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
-		{
-			var catData:String = TypeInfo.typeInfo[typeId].category;
-			if ( cat == catData.toUpperCase() && 0 < _items[typeId].val )
-				result[typeId].val	= _items[typeId].val;
-			else;
-				result[typeId].val	= -1;
+		var result:Vector.<SecureInt> = new Vector.<SecureInt>(TypeInfo.MAX_TYPE_INFO, true);
+		for ( var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ ) {
+			result[typeId] = new SecureInt( 0 );
+			var ti:TypeInfo = TypeInfo.typeInfo[typeId]
+			if ( ti ) { 
+				var catData:String = ti.category;
+				if ( cat == catData.toUpperCase() ) {
+					if ( 0 < _items[typeId].val )
+						result[typeId].val	= _items[typeId].val;
+					else
+						result[typeId].val	= -2;
+				}
+				else
+					result[typeId].val	= -1;
+			}
 		}
 
 		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, result ) );
@@ -78,24 +74,40 @@ public class Voxels
 	{
 		if ( null == _items )
 			return;
-		if ( e.ownerGuid == _networkId ) {
+		if ( e.networkId == _networkId ) {
 			var typeId:int = e.typeId;
 			var voxelCount:int = _items[typeId].val;
 			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, _networkId, typeId, voxelCount ) );
 			return;
 		}
-		Log.out( "Voxels.voxelCount - Failed test of e.ownerGuid: " + e.ownerGuid + " == _networkId: " + _networkId, Log.WARN );
+		Log.out( "Voxels.voxelCount - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
 	}
 	
 	
 	public function addVoxelTestData():void {
-		_items[TypeInfo.STONE].val = 1234;
-		_items[TypeInfo.DIRT].val = 432;
-		_items[TypeInfo.GRASS].val = 123456789;
+		for ( var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ ) {
+			if ( _items[typeId] )
+				_items[typeId].val = Math.random() * 1000000;
+		}
 	}
 			
 	
 	public function voxelChange(e:InventoryVoxelEvent):void {
+//InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, typeIdToUse, amountInGrain0 ) );		
+		if ( null == _items ) {
+			Log.out( "Voxels.voxelChange - ITEMS NULL", Log.WARN );
+			return;
+		}
+		if ( e.networkId == _networkId ) {
+			var typeId:int = e.typeId;
+			var changeAmount:int = e.result as int;
+			var voxelCount:int = _items[typeId].val;
+			voxelCount += changeAmount;
+			_items[typeId].val = voxelCount;
+			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, _networkId, typeId, voxelCount ) );
+			return;
+		}
+		Log.out( "Voxels.voxelChange - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
 	}
 	
 	public function fromPersistance( $dbo:DatabaseObject ):void {}
@@ -108,7 +120,7 @@ public class Voxels
 				return;
 			_items[i].val = $ba.readInt();
 		}
-		
+		addVoxelTestData();	
 	}
 	public function asByteArray( $ba:ByteArray ):ByteArray { 
 		$ba.writeInt( TypeInfo.MAX_TYPE_INFO )

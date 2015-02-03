@@ -12,7 +12,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.events.ModelMetadataEvent;
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.Player;
-	import com.voxelengine.worldmodel.models.TemplateManager;
+	import com.voxelengine.worldmodel.models.PlanManager;
 	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 	import playerio.DatabaseObject;
 	import playerio.PlayerIOError;
@@ -79,7 +79,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				// We have an object that is dependant on a template
 				// is the template loaded, if not the templateManager will load the template
 				// and inform us with a ModelMetadataEvent
-				var tvmm:VoxelModelMetadata = TemplateManager.templateGet( vmm.templateGuid );
+				var tvmm:VoxelModelMetadata = PlanManager.templateGet( vmm.templateGuid );
 				if ( tvmm ) {
 					vm = ModelLoader.loadFromManifestByteArray( vmm, tvmm.data );
 					finish( vm );

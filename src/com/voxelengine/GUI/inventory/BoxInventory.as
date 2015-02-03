@@ -66,7 +66,7 @@ public class BoxInventory extends VVBox
 	private function modelCount(e:InventoryModelEvent):void 
 	{
 		if ( _objectInfo.guid == e.itemGuid ) {
-			var modelsOfThisGuid:String = String( e.count );
+			var modelsOfThisGuid:String = String( e.result.toFixed(5) );
 			if ( 8 < modelsOfThisGuid.length )
 				_count.text = "LOTS";
 			else
@@ -79,9 +79,12 @@ public class BoxInventory extends VVBox
 	{
 		var ti:TypeInfo = (_objectInfo as TypeInfo);
 		if ( ti.type == e.typeId ) {
-			var totalOxelsOfThisType:String = String( e.result );
+			var totalOxelsOfThisTypeCount:Number = e.result / 4096;
+			var totalOxelsOfThisType:String = String( totalOxelsOfThisTypeCount.toFixed(0) );
 			_count.fontColor = ti.countColor;
-			if ( 8 < totalOxelsOfThisType.length ) {
+			if ( totalOxelsOfThisTypeCount < 1 )
+				_count.text = "< 1";
+			else if ( 8 < totalOxelsOfThisType.length ) {
 				_count.text = "LOTS";
 			}
 			else

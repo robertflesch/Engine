@@ -24,23 +24,37 @@ package com.voxelengine.GUI.inventory {
 	
 	public class WindowInventoryNew extends VVPopup
 	{
-        static public const ALL_ITEMS:String = "All items";
-        static public const INVENTORY_OWNED:String = "Backpack";
-        static public const INVENTORY_STORE:String = "Store";
+        static public const ALL_ITEMS:String = "all_items";
+        static public const INVENTORY_OWNED:String = "backpack";
+        static public const INVENTORY_STORE:String = "store";
+		
+		// TODO need a more central location for these
+        static public const INVENTORY_CAT_VOXELS:String = "Voxels";
+        static public const INVENTORY_CAT_MODELS:String = "Models";
+        static public const INVENTORY_CAT_REGIONS:String = "Regions";
+		
 		
         private var _ownedVsStore:TabBar;
 		private var _panelContainer:Container;
 		private var _rbGroup:RadioButtonGroup;
 		private var _underline:Box
 		
-		public function WindowInventoryNew()
+		static public function makeStartingTabString( $parentTab:String, ...args ):String {
+			var result:String = $parentTab + ";";
+			for ( var i:uint = 0; i < args.length; i++ ) {
+				result += args[i] + ";";
+			}
+			return result;
+		}
+		
+		public function WindowInventoryNew( $startingTab:String )
 		{
 			super( LanguageManager.localizedStringGet( ALL_ITEMS ));
 			autoSize = true;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			
 			//ownedVsStoreRB();
-			ownedVsStoreTabsHorizontal();
+			ownedVsStoreTabsHorizontal( $startingTab );
 			
 			var count:int = width / 64;
 			width = count * 64;
@@ -54,31 +68,20 @@ package com.voxelengine.GUI.inventory {
 		public function onResized(e:UIOEvent):void 
 		{
 			_ownedVsStore.setButtonsWidth( width / 2, 36 );
-			//_underline.width = width;
 		}
 		
 		public function onResizedFromChild(e:UIOEvent):void 
 		{
-			//_ownedVsStore.setButtonsWidth( width / 2, 36 );
-			//_underline.width = width;
+			_ownedVsStore.setButtonsWidth( width / 2, 36 );
 		}
 
-		private function ownedVsStoreRB():void {
-			var rbContainer:Container = new Container(width, 20);
-			rbContainer.layout.orientation = LayoutOrientation.HORIZONTAL;
-			addElement( rbContainer );
-			_rbGroup = new RadioButtonGroup( rbContainer );
-			var radioButtons:DataProvider = new DataProvider();
-            radioButtons.addAll( { label:LanguageManager.localizedStringGet( INVENTORY_OWNED ), data:INVENTORY_OWNED }
-			                   , { label:LanguageManager.localizedStringGet( INVENTORY_STORE ), data:INVENTORY_STORE } );
-			eventCollector.addEvent( _rbGroup, ButtonsGroupEvent.GROUP_CHANGED
-		                           , function (event:ButtonsGroupEvent):void {  displaySelectedContainer( event.target.data ); } );
-			_rbGroup.dataProvider = radioButtons;
-			_rbGroup.index = 0;
-			addGraphicElements( new Box( 10, height) );			
-		}
-
-		private function ownedVsStoreTabsHorizontal():void {
+		private function ownedVsStoreTabsHorizontal( $tabTokens:String ):void {
+			var index:int = $tabTokens.indexOf( ";" );
+			var startingTabName:String;
+			if ( -1 < index ) {
+				startingTabName = $tabTokens.substr( 0 , index );
+				$tabTokens = $tabTokens.substr( index + 1, $tabTokens.length );
+			}
 			_ownedVsStore = new TabBar();
 			_ownedVsStore.orientation = ButtonBarOrientation.HORIZONTAL;
 			_ownedVsStore.name = "ownedVsStore";
@@ -86,7 +89,10 @@ package com.voxelengine.GUI.inventory {
             _ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_OWNED ), INVENTORY_OWNED );
 			_ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_STORE ), INVENTORY_STORE );
 			_ownedVsStore.setButtonsWidth( 256, 36 );
-			_ownedVsStore.selectedIndex = 0;
+			if ( startingTabName == INVENTORY_OWNED )
+				_ownedVsStore.selectedIndex = 0;
+			else
+				_ownedVsStore.selectedIndex = 1;
 			//_ownedVsStore.itemsCollection
             eventCollector.addEvent( _ownedVsStore, ListEvent.ITEM_CLICKED, selectCategory );
             addGraphicElements( _ownedVsStore );
@@ -95,22 +101,7 @@ package com.voxelengine.GUI.inventory {
 			_underline.backgroundColor = SpasUI.DEFAULT_COLOR
 			addGraphicElements( _underline );			
 			
-			displaySelectedContainer( INVENTORY_OWNED );
-		}
-		
-		private function ownedVsStoreTabsVertical():void {
-			_ownedVsStore = new TabBar();
-			_ownedVsStore.orientation = ButtonBarOrientation.VERTICAL;
-			_ownedVsStore.name = "ownedVsStore";
-			// TODO I should really iterate thru the types and collect the categories - RSF
-            _ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_OWNED ), INVENTORY_OWNED );
-			_ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_STORE ), INVENTORY_STORE );
-			_ownedVsStore.setButtonsWidth( 32 );
-			_ownedVsStore.selectedIndex = 0;
-            eventCollector.addEvent( _ownedVsStore, ListEvent.ITEM_CLICKED, selectCategory );
-            addGraphicElements( _ownedVsStore );
-			addGraphicElements( new Box( 5, height) );			
-			displaySelectedContainer( INVENTORY_OWNED );
+			displaySelectedContainer( startingTabName, $tabTokens );
 		}
 		
 		override protected function onRemoved( event:UIOEvent ):void {
@@ -129,17 +120,17 @@ package com.voxelengine.GUI.inventory {
 		
 		private function selectCategory(e:ListEvent):void 
 		{			
-			displaySelectedContainer( e.target.data as String );	
+			displaySelectedContainer( e.target.data as String, "" );	
 		}
 		
-		private function displaySelectedContainer( $category:String ):void
+		private function displaySelectedContainer( $category:String, $tabTokens:String ):void
 		{	
 			if ( _panelContainer ) {
 				removeElement( _panelContainer );
 				_panelContainer.remove();
 			}
 				
-			_panelContainer = new InventoryPanelOverview( this, $category );
+			_panelContainer = new InventoryPanelOverview( this, $category, $tabTokens );
 			addElement( _panelContainer );
 		}
 	}

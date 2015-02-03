@@ -706,18 +706,18 @@ package com.voxelengine.worldmodel.oxel
 				return;	
 			} 
 
-			var amount:int = Math.pow( 1 << Math.abs(gc.grain), 3 );
+			var amountInGrain0:int = Math.pow( 1 << Math.abs(gc.grain), 3 );
 			var typeIdToUse:int;
 			if ( TypeInfo.AIR == $newType ) {
 				typeIdToUse = type;
-				amount = amount;
+				amountInGrain0 = amountInGrain0;
 			}
 			else {
 				typeIdToUse = $newType;
-				amount = -amount;
+				amountInGrain0 = -amountInGrain0;
 			}
 				
-			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, typeIdToUse, amount ) );
+			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, typeIdToUse, amountInGrain0 ) );
 		}
 		
 		private function writeInternal( $modelGuid:String, $newType:int, $onlyChangeType:Boolean ):Oxel {

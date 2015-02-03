@@ -48,7 +48,6 @@ public class Inventory
 		_networkId = $networkId;
 		_voxels = new Voxels( $networkId );
 		_models = new Models( $networkId );
-			
 	}
 	
 	public function load():void {
@@ -187,34 +186,3 @@ public class Inventory
 	}
 }
 }
-
-
-/*
-	private function generateNewInventory():void {
-		_generateNewInventory = true;
-		_items = new Vector.<InventoryObject>();
-		var item1:InventoryModel = new InventoryModel();
-		item1.guid = "Pick";
-		item1.type = 1;
-		_items.push( item1 );
-		var item2:InventoryModel = new InventoryModel();
-		item2.guid = "Shovel";
-		item2.type = 2;
-		_items.push( item2 );
-		changed = true;
-	}
-
-	public function add( $type:int, $guid:String ):void {
-		var item:InventoryModel = new InventoryModel();
-		item.type = $type;
-		item.guid = $guid;
-		items.push( item );
-		changed = true;
-	}
-	
-	public function toString():String {
-		// FIXME
-		throw new Error( "Inventory.toString not implemented" );
-		return null;
-	}
-}*/

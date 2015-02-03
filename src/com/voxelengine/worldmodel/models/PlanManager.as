@@ -22,7 +22,7 @@ package com.voxelengine.worldmodel.models
 	 * ...
 	 * @author Bob
 	 */
-	public class TemplateManager 
+	public class PlanManager 
 	{
 		static private var _modifiedDate:Date;
 		static private var _initialized:Boolean;

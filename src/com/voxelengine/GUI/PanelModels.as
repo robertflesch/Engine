@@ -12,6 +12,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.events.InventoryModelEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.UIRegionModelEvent;
+	import com.voxelengine.GUI.inventory.WindowInventoryNew;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.worldmodel.inventory.InventoryManager;
 	import com.voxelengine.worldmodel.inventory.Inventory;
@@ -118,7 +119,10 @@ package com.voxelengine.GUI
 			addElementAt( _buttonContainer, 0 );
 
 			var addButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Add" ) + ".."  );
-			addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
+			//addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
+			var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
+			addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowInventoryNew( startingTab ); } );
+			
 			addButton.y = 5;			
 			addButton.x = 2;			
 			addButton.width = btnWidth;

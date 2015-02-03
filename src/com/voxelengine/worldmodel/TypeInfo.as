@@ -147,7 +147,7 @@ package com.voxelengine.worldmodel
 		private var _speed:Number				= 1;
 		private var _durability:Number			= 1;
 		private var _luck:Number				= 1;
-		private var _countColor:uint			= 0x00ff00ff; // the color to be used to show how many of this object exist
+		private var _countColor:uint			= 0x00ffffff; // the color to be used to show how many of this object exist
 		
 		
 		public function get interactions():Interactions { return _interactions; }

@@ -7,7 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.GUI
 {
-	import com.voxelengine.worldmodel.models.TemplateManager;
+	import com.voxelengine.worldmodel.models.PlanManager;
 	import flash.geom.Vector3D;
 	import flash.net.FileReference;
 	import flash.events.Event;
@@ -137,7 +137,7 @@ package com.voxelengine.GUI
 		}
 		
 		private function newTemplateLoaded( $e:LoadingEvent ):void {
-			var vmm:VoxelModelMetadata = TemplateManager.templateGet( $e.guid );
+			var vmm:VoxelModelMetadata = PlanManager.templateGet( $e.guid );
 			Log.out( "WindowModelList.newTemplateLoaded name: " + vmm.name + " - " + vmm.description );
 			_listbox1.addItem( vmm.name + " - " + vmm.description, vmm );
 		}
@@ -148,7 +148,7 @@ package com.voxelengine.GUI
 		private function populateModels():void
 		{
 			_listbox1.removeAll();
-			TemplateManager.templatesLoad();
+			PlanManager.templatesLoad();
 
 			//PersistModel.loadModels( Network.PUBLIC );
 			//PersistModel.loadModels( Network.userId );
