@@ -43,30 +43,32 @@ public class Voxels
 	// This returns an Array which holds the typeId and the count of those voxels
 	public function voxelTypes(e:InventoryVoxelEvent):void 
 	{
-		const cat:String = (e.result as String).toUpperCase();
-		if ( cat == "ALL" ) {
-			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, _items ) );
-			return;
-		}
-			
-		var result:Vector.<SecureInt> = new Vector.<SecureInt>(TypeInfo.MAX_TYPE_INFO, true);
-		for ( var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ ) {
-			result[typeId] = new SecureInt( 0 );
-			var ti:TypeInfo = TypeInfo.typeInfo[typeId]
-			if ( ti ) { 
-				var catData:String = ti.category;
-				if ( cat == catData.toUpperCase() ) {
-					if ( 0 < _items[typeId].val )
-						result[typeId].val	= _items[typeId].val;
-					else
-						result[typeId].val	= -2;
-				}
-				else
-					result[typeId].val	= -1;
+		if ( e.networkId != _networkId ) {
+			const cat:String = (e.result as String).toUpperCase();
+			if ( cat == "ALL" ) {
+				InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, _items ) );
+				return;
 			}
-		}
+				
+			var result:Vector.<SecureInt> = new Vector.<SecureInt>(TypeInfo.MAX_TYPE_INFO, true);
+			for ( var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ ) {
+				result[typeId] = new SecureInt( 0 );
+				var ti:TypeInfo = TypeInfo.typeInfo[typeId]
+				if ( ti ) { 
+					var catData:String = ti.category;
+					if ( cat == catData.toUpperCase() ) {
+						if ( 0 < _items[typeId].val )
+							result[typeId].val	= _items[typeId].val;
+						else
+							result[typeId].val	= -2;
+					}
+					else
+						result[typeId].val	= -1;
+				}
+			}
 
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, result ) );
+			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, result ) );
+		}
 	}
 	
 	
@@ -93,18 +95,19 @@ public class Voxels
 			
 	
 	public function voxelChange(e:InventoryVoxelEvent):void {
-//InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, typeIdToUse, amountInGrain0 ) );		
-		if ( null == _items ) {
-			Log.out( "Voxels.voxelChange - ITEMS NULL", Log.WARN );
-			return;
-		}
+		//InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, typeIdToUse, amountInGrain0 ) );		
 		if ( e.networkId == _networkId ) {
+			if ( null == _items ) {
+				Log.out( "Voxels.voxelChange - ITEMS NULL", Log.WARN );
+				return;
+			}
 			var typeId:int = e.typeId;
 			var changeAmount:int = e.result as int;
 			var voxelCount:int = _items[typeId].val;
 			voxelCount += changeAmount;
 			_items[typeId].val = voxelCount;
 			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, _networkId, typeId, voxelCount ) );
+			changed = true;
 			return;
 		}
 		Log.out( "Voxels.voxelChange - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
@@ -127,6 +130,7 @@ public class Voxels
 		for ( var i:int; i < TypeInfo.MAX_TYPE_INFO; i++ ) {
 			$ba.writeInt( _items[i].val )
 		}
+		changed = false;
 		return $ba; 
 	}
 }

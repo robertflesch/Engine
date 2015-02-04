@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+import com.voxelengine.worldmodel.inventory.InventoryManager;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.events.ProgressEvent;
@@ -82,7 +83,10 @@ public class RegionManager
 		
 		
 		// This adds the event handlers
+		// Is there a central place to do this?
 		PlanManager.addEvents();
+		// This causes the to load its caches and listeners
+		InventoryManager.init();
 	}
 	
 

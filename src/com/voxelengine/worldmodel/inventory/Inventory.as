@@ -93,6 +93,7 @@ public class Inventory
 		// we can know what user carry around
 		_slots.fromPersistance( $dbo );
 		_voxels.fromPersistance( $dbo );
+		_models.fromPersistance( $dbo);
 		
 		if ( $dbo.data ) {
 			var ba:ByteArray = $dbo.data 
@@ -106,25 +107,23 @@ public class Inventory
 	private function toPersistance():void {
 		_slots.toPersistance(_dbo);
 		_voxels.toPersistance(_dbo);
+		_models.toPersistance(_dbo);
 		var ba:ByteArray = new ByteArray(); 
 		_dbo.data 			= asByteArray( ba );
 	}
 
 	private function fromByteArray( $ba:ByteArray ):void {
-		if ( 0 == $ba.bytesAvailable ) {
-			//addModelTestData();
-			return;
-		}
-		
 		var ownerId:String = $ba.readUTF();
 		_slots.fromByteArray( $ba );
 		_voxels.fromByteArray( $ba );
+		_models.fromByteArray( $ba );
 	}
 	
 	public function asByteArray( $ba:ByteArray ):ByteArray {
 		$ba.writeUTF( _networkId );
 		_slots.asByteArray( $ba );
 		_voxels.asByteArray( $ba );
+		_models.asByteArray( $ba );
 		$ba.compress();
 		return $ba;	
 	}

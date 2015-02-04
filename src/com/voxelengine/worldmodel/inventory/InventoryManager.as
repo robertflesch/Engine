@@ -33,9 +33,13 @@ public class InventoryManager extends EventDispatcher
 	} 
 	
 	public static function save():void {
-		for each ( var inventory:Inventory in s_inventoryManager )
+		for each ( var inventory:Inventory in s_inventoryManager._inventoryByGuid )
 			if ( null != inventory )
 				inventory.save();
+	}
+	
+	public static function init():void {
+		objectInventoryGet("player");		
 	}
 	
 	///////////////// Event handler interface /////////////////////////////
@@ -54,7 +58,9 @@ public class InventoryManager extends EventDispatcher
 	
 	///////////////// Event handler interface /////////////////////////////
 	
-	public function InventoryManager() {}
+	public function InventoryManager() 
+	{
+	}
 	
 	static public function objectInventoryGet( $ownerGuid:String ):Inventory {
 		var inventory:Inventory = inventoryManager._inventoryByGuid[$ownerGuid];
