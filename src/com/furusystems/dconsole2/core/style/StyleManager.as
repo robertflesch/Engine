@@ -17,7 +17,7 @@ package com.furusystems.dconsole2.core.style {
 		private var DEFAULT_THEME_XML:Class;
 		//[Embed(source='themes/default_colors.xml',mimeType='application/octet-stream')]
 		[Embed(source='themes/black/black_colors.xml',mimeType='application/octet-stream')]
-		private var DEFAULT_COLOR_DESC_XML:Class;
+		private var DEFAULT_COLOR_DESC_XML_NEW:Class;
 		
 		private var _colorsLoaded:Boolean;
 		private var _themeLoaded:Boolean;
@@ -94,7 +94,7 @@ package com.furusystems.dconsole2.core.style {
 		private function setColors(input:XML = null):void {
 			_colorsLoaded = true;
 			if (input == null) {
-				input = XML(new DEFAULT_COLOR_DESC_XML());
+				input = XML(new DEFAULT_COLOR_DESC_XML_NEW());
 			} else {
 				DConsole.print("Custom color scheme loaded");
 			}
