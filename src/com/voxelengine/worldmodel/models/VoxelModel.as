@@ -247,13 +247,15 @@ package com.voxelengine.worldmodel.models
 			//Log.out( "VoxelModel.calculateTargetPosition - worldSpaceTargetPosition: " + worldSpaceTargetPosition );
 		}
 		
+		public function VoxelModel( $ii:InstanceInfo ):void {
+			_instanceInfo = $ii;
+		}
 		
-		public function VoxelModel(ii:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata, initializeRoot:Boolean = true):void {
-			_instanceInfo = ii;
-			_modelInfo = mi;
+		public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true):void {
+			_modelInfo = $mi;
 			_metadata = $vmm;
 			
-			if (initializeRoot)
+			if ($initializeRoot)
 				initialize_root_oxel(0 < instanceInfo.grainSize ? instanceInfo.grainSize : modelInfo.grainSize);
 			
 			if ( null == _metadata )
@@ -304,7 +306,8 @@ package com.voxelengine.worldmodel.models
 				repeat--;
 			ii._repeat = repeat;
 			
-			var vm:VoxelModel = new VoxelModel(ii, mi, null, false);
+			var vm:VoxelModel = new VoxelModel(ii);
+			vm.init( mi, null, false )
 			return vm;
 		}
 		
@@ -1127,7 +1130,8 @@ package com.voxelengine.worldmodel.models
 			var ii:InstanceInfo = instanceInfo.explosionClone();
 			ii.guid = "ExplosionFragment";
 			var mi:ModelInfo = new ModelInfo();
-			var vm:VoxelModel = new VoxelModel(ii, mi, null, false);
+			var vm:VoxelModel = new VoxelModel(ii);
+			vm.init( mi, null, false )
 			vm.version = Globals.VERSION;
 			vm.instanceInfo.dynamicObject = true;
 			vm.oxel = childOxel;

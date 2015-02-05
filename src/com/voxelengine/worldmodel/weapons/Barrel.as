@@ -25,13 +25,17 @@ package com.voxelengine.worldmodel.weapons
 		// Types of ammo
 		// Size of ammo
 		// Velocity of ammo
-		public function Barrel( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
+		public function Barrel( instanceInfo:InstanceInfo ) 
 		{ 
-			super( instanceInfo, mi, $vmm );
+			super( instanceInfo );
+		}
+		
+		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+			super.init( $mi, $vmm );
 			
-			if ( mi.json && mi.json.model && mi.json.model.barrel )
+			if ( $mi.json && $mi.json.model && $mi.json.model.barrel )
 			{
-				var BarrelInfo:Object = mi.json.model.barrel;
+				var BarrelInfo:Object = $mi.json.model.barrel;
 				if ( BarrelInfo.reloadSpeed )
 					trace( "Barrel - json - reloadSpeed: " + BarrelInfo.reloadSpeed );
 			}
@@ -40,5 +44,7 @@ package com.voxelengine.worldmodel.weapons
 			
 				
 		}
+		
+		
 	}
 }

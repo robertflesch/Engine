@@ -51,9 +51,14 @@ public class Player extends Avatar
 	static private const 	AVATAR_CLIP_FACTOR:Number 	= 0.90;
 	static private var  	STEP_UP_MAX:int 			= 16;
 		
-	public function Player( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
+	public function Player( instanceInfo:InstanceInfo ) { 
 		Log.out( "Player.contruct guid: " + instanceInfo.guid + "  --------------------------------------------------------------------------------------------------------------------" );
-		super( instanceInfo, mi, $vmm );
+		super( instanceInfo );
+		
+	}
+	
+	override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+		super.init( $mi, $vmm );
 		
 		instanceInfo.usesCollision = true;
 		clipVelocityFactor = AVATAR_CLIP_FACTOR;

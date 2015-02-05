@@ -10,10 +10,15 @@
 
     public class Avatar extends ControllableVoxelModel
     {
-		public function Avatar( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
+		public function Avatar( instanceInfo:InstanceInfo ) 
 		{ 
 			trace( "Avatar CREATED" );
-			super( instanceInfo, mi, $vmm );
+			super( instanceInfo );
 		}
+		
+		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+			super.init( $mi, $vmm );
+		}
+		
 	}
 }

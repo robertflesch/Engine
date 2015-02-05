@@ -37,18 +37,24 @@ package com.voxelengine.worldmodel.weapons
 		//Barrel
 		//Stand
 		//Sight
-		public function Gun( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
+		public function Gun( instanceInfo:InstanceInfo ) 
 		{ 
-			super( instanceInfo, mi, $vmm );
-			var centerLoc:int = 2 << (mi.grainSize - 2);
+			super( instanceInfo );
+		}
+		
+		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+			super.init( $mi, $vmm );
+			
+			var centerLoc:int = 2 << ( $mi.grainSize - 2);
 			calculateCenter( centerLoc );
 			
 			// Process the gun specific info
 			processJsonInfo();
 			
-			var script:Script = instanceInfo.addScript( "FireProjectileScript" );
+			var script:Script = _instanceInfo.addScript( "FireProjectileScript" );
 			//script.processJsonInfo( modelInfo );
 		}
+		
 
 		public function fire():void
 		{

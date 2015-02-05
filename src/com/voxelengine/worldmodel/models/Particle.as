@@ -22,9 +22,13 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class Particle extends VoxelModel 
 	{
-		public function Particle( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
+		public function Particle( instanceInfo:InstanceInfo ) 
 		{ 
-			super( instanceInfo, mi, $vmm );
+			super( instanceInfo );
+		}
+		
+		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+			super.init( $mi, $vmm );
 		}
 
 		override public function update(context:Context3D, elapsedTimeMS:int):void 

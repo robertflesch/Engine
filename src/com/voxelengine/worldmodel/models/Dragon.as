@@ -27,8 +27,12 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class Dragon extends Beast 
 	{
-		public function Dragon( ii:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
-			super( ii, mi, $vmm );
+		public function Dragon( ii:InstanceInfo ) { 
+			super( ii );
+		}
+		
+		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+			super.init( $mi, $vmm );
 			
 			// TODO reimplement in handler
 			//MouseKeyboardHandler.backwardEnabled = false;
@@ -39,7 +43,7 @@ package com.voxelengine.worldmodel.models
 			//usesGravity = true;
 			collisionMarkers = true;
 		}
-
+		
 		private	function processJsonInfo():void {
 			if ( modelInfo.json && modelInfo.json.model )
 			{

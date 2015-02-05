@@ -39,10 +39,13 @@ package com.voxelengine.worldmodel.models
 		protected var _bombs:Vector.<VoxelModel> = new Vector.<VoxelModel>;
 		
 
-		public function Ship( ii:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
+		public function Ship( ii:InstanceInfo ) 
 		{ 
-			super( ii, mi, $vmm );
-			
+			super( ii );
+		}
+		
+		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+			super.init( $mi, $vmm );
 			// TODO These should be loading from the json file
 			clipVelocityFactor = SHIP_CLIP_FACTOR;
 			//_turnRate = 20;
@@ -51,7 +54,6 @@ package com.voxelengine.worldmodel.models
 			Globals.g_app.addEventListener( ShipEvent.ALTITUDE_CHANGED, altitudeEvent, false, 0, true );
 			Globals.g_app.addEventListener( ShipEvent.DIRECTION_CHANGED, directionEvent, false, 0, true );
 		}
-		
 		override protected function collisionPointsAdd():void {
 			// TO DO Should define this in meta data??? RSF or using extents?
 			

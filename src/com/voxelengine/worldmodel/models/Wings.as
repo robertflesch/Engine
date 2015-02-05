@@ -21,19 +21,24 @@ package com.voxelengine.worldmodel.models
 		// Todo: This needs to be global?
 		static private const SHIP_WINGS:String 		= "Wings"
 		
-		public function Wings( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
+		public function Wings( instanceInfo:InstanceInfo ) 
 		{ 
-			super( instanceInfo, mi, $vmm );
+			super( instanceInfo );
 			
-			if ( mi.json && mi.json.model && mi.json.model.engine )
+		}
+		
+		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+			super.init( $mi, $vmm );
+			if ( $mi.json && $mi.json.model && $mi.json.model.engine )
 			{
-				var EngineInfo:Object = mi.json.model.engine;
+				var EngineInfo:Object = $mi.json.model.engine;
 				//if ( EngineInfo )
 				//	_rotationRate = EngineInfo.WingsRotationRate;
 			}
 			else
 				trace( "Wings - NO Wings INFO FOUND - Setting to default rotation rate " );
 		}
+		
 
 		override public function start( $val:Number, $parentModel:VoxelModel, $useThrust:Boolean = true ):void 
 		{

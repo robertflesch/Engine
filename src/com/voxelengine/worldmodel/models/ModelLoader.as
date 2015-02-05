@@ -72,10 +72,11 @@ package com.voxelengine.worldmodel.models
 				if ( null != Globals.player )
 					return Globals.player;
 			}
-			var vm:* = new modelClass( $ii, $modelInfo, $vmm );
+			var vm:* = new modelClass( $ii );
 			if ( null == vm )
 				throw new Error( "ModelLoader.instantiate - Model failed in creation - modelClass: " + modelClass );
-			
+				
+			vm.init( $modelInfo, $vmm );
 			// if we were given metadata, use it.
 			if ( null != $vmm )
 				vm.metadata = $vmm;

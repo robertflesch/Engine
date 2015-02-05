@@ -55,8 +55,12 @@ package com.voxelengine.worldmodel.models
 		static protected 	const 	FOOT:String					= "FOOT";
 		static protected 	const 	FALL:String					= "FALL";
 		
-		public function Beast( ii:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) { 
-			super( ii, mi, $vmm );
+		public function Beast( ii:InstanceInfo ) { 
+			super( ii );
+		}
+		
+		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+			super.init( $mi, $vmm );
 			
 			//MouseKeyboardHandler.backwardEnabled = false;
 			
@@ -65,7 +69,7 @@ package com.voxelengine.worldmodel.models
 			instanceInfo.usesCollision = true;
 			//usesGravity = true;
 			collisionMarkers = true;
-		}
+		}		
 
 		private	function processJsonInfo():void {
 			if ( modelInfo.json && modelInfo.json.model )

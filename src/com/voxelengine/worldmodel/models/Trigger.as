@@ -31,10 +31,14 @@ package com.voxelengine.worldmodel.models
 		private var _was_selected:Boolean = false;
 		private var _ba:ByteArray = null;
 		
-		public function Trigger( instanceInfo:InstanceInfo, mi:ModelInfo, $vmm:VoxelModelMetadata ) 
-		{ 
-			super( instanceInfo, mi, $vmm );
+		public function Trigger( $ii:InstanceInfo ) { 
+			super( $ii );
 		}
+		
+		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+			super.init( $mi, $vmm );
+		}
+		
 
 		override public function update(context:Context3D, elapsedTimeMS:int):void 
 		{
