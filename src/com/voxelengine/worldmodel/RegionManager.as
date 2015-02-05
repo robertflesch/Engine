@@ -71,10 +71,8 @@ public class RegionManager
 		Globals.g_app.addEventListener( RegionLoadedEvent.REGION_CREATED, regionCreatedHandler ); 
 		
 		
-		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED
-									  ,  function( me:ModelEvent ):void { if ( currentRegion ){ currentRegion.changed = true;}} );
-		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_REMOVED
-									  ,  function( me:ModelEvent ):void { if ( currentRegion ) { currentRegion.changed = true; }} );
+		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED,  regionChanged );
+		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_REMOVED, regionChanged );
 									  
 		Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_FAILURE, removeFailedObjectFromRegion );									  
 		Globals.g_app.addEventListener( LoadingEvent.LOAD_CONFIG_COMPLETE, requestStartingRegionFile );
@@ -87,6 +85,12 @@ public class RegionManager
 		PlanManager.addEvents();
 		// This causes the to load its caches and listeners
 		InventoryManager.init();
+	}
+	
+	private function regionChanged( me:ModelEvent ):void { 
+		var region:Region = currentRegion;
+		if ( region && region.loaded )
+			currentRegion.changed = true;
 	}
 	
 

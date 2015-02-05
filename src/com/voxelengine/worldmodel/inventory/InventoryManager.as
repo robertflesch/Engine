@@ -34,7 +34,7 @@ public class InventoryManager extends EventDispatcher
 	
 	public static function save():void {
 		for each ( var inventory:Inventory in s_inventoryManager._inventoryByGuid )
-			if ( null != inventory )
+			if ( null != inventory && inventory.networkId != "player" )
 				inventory.save();
 	}
 	
@@ -65,7 +65,7 @@ public class InventoryManager extends EventDispatcher
 	static public function objectInventoryGet( $ownerGuid:String ):Inventory {
 		var inventory:Inventory = inventoryManager._inventoryByGuid[$ownerGuid];
 		if ( null == inventory && null != $ownerGuid ) {
-			Log.out( "InventoryManager.objectInventoryGet creating inventory for: " + $ownerGuid , Log.WARN );
+			//Log.out( "InventoryManager.objectInventoryGet creating inventory for: " + $ownerGuid , Log.WARN );
 			inventory = new Inventory( $ownerGuid );
 			inventoryManager._inventoryByGuid[$ownerGuid] = inventory;
 			inventory.load();

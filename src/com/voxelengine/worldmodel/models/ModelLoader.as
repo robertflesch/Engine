@@ -90,7 +90,8 @@ package com.voxelengine.worldmodel.models
 		// Persistant model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		static private function loadPersistant( $ii:InstanceInfo ):void {
-			Log.out( "ModelLoader.loadPersistant - InstanceInfo: " + $ii.toString(), Log.DEBUG );
+			Log.out( "ModelLoader.loadPersistant - Adding task for InstanceInfo: " + $ii.toString(), Log.WARN );
+			
 			// land task controller, this tells task controller not to run until it is done loading all tasks
 //			Globals.g_landscapeTaskController.activeTaskLimit = 0;
 			// Create task group
@@ -105,6 +106,8 @@ package com.voxelengine.worldmodel.models
 			//taskGroup.addTask(task);
 			
 			Globals.g_landscapeTaskController.addTask( taskGroup );
+			
+			//PlanManager.templateGet( $ii.guid );
 		}
 		
 		static public function loadFromManifestByteArray( $vmm:VoxelModelMetadata, $ba:ByteArray, controllingModelGuid:String = "" ):VoxelModel {
@@ -317,7 +320,7 @@ package com.voxelengine.worldmodel.models
 					vm.instanceInfo.guid = vm.metadata.guid = Globals.getUID();
 					_s_mmd = null;
 					vm.save();
-					PlanManager.templateAdd( vm.metadata );
+//					PlanManager.templateAdd( vm.metadata );
 					Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.TEMPLATE_MODEL_COMPLETE, vm.metadata.guid ) );
 					// clear out any evidence that we loaded this model (modelInfo too?)
 					Globals.markDead( e.guid );

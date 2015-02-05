@@ -24,8 +24,8 @@ public class PersistInventory extends Persistance
 	//static private const DB_INVENTORY_INDEX_OWNER:String = "owner";
 	
 	static public function addEvents():void {
-		Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_REQUEST, load );
-		Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_SAVE_REQUEST, save );
+		Persistance.addListener( InventoryPersistanceEvent.INVENTORY_LOAD_REQUEST, load );
+		Persistance.addListener( InventoryPersistanceEvent.INVENTORY_SAVE_REQUEST, save );
 	}
 	
 	static private function load( $ie:InventoryPersistanceEvent ):void { 
@@ -37,16 +37,16 @@ public class PersistInventory extends Persistance
 									  , loadSuccess
 									  , function (e:PlayerIOError):void {
 										  Log.out( "PersistInventory.load.failed - guid: " + $ie.guid + "  error data: " + e, Log.ERROR, e ) 
-										  Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, $ie.guid ) );
+										  Persistance.dispatch( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, $ie.guid ) );
 										} );
 		if ( false == result )		
-			Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, $ie.guid ) );
+			Persistance.dispatch( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, $ie.guid ) );
 										
 		function loadSuccess( $dbo:DatabaseObject ):void {
 			if ( !$dbo )
 			{
-				// This seems to be the failure case, not the error handler
-				Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, $ie.guid ) );
+				// This seems to be the case where no record exists, not the error handler
+				Persistance.dispatch( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_NOT_FOUND, $ie.guid ) );
 				Log.out( "PersistInventory.load.loadSuccess - NULL DatabaseObject for guid:" + $ie.guid, Log.DEBUG );
 				return;
 			}
@@ -57,7 +57,7 @@ public class PersistInventory extends Persistance
 
 	// use one extra level here in case I want to load an array of dbo object
 	static private function loadFromDBO( $dbo:DatabaseObject ):void {
-		Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, $dbo.key, $dbo ) );
+		Persistance.dispatch( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, $dbo.key, $dbo ) );
 	}
 
 	static private function save( $ie:InventoryPersistanceEvent ):void {
@@ -70,10 +70,10 @@ public class PersistInventory extends Persistance
 						, false
 						, function ():void  {  
 							Log.out( "PersistInventory.save - Success - guid: " + $ie.guid, Log.DEBUG );
-							Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_SAVE_SUCCEED, $ie.guid ) ); }
+							Persistance.dispatch( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_SAVE_SUCCEED, $ie.guid ) ); }
 						, function (e:PlayerIOError):void { 
 							Log.out( "PersistInventory.save - Failed - guid: " + $ie.guid + "  error data: " + e, Log.ERROR, e ) 
-							Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_SAVE_FAILED, $ie.guid ) ); } );
+							Persistance.dispatch( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_SAVE_FAILED, $ie.guid ) ); } );
 		}
 		else
 		{
@@ -84,9 +84,9 @@ public class PersistInventory extends Persistance
 						, metadata
 						, function ($dbo:DatabaseObject):void  {  
 							Log.out( "PersistInventory.save - CREATE Success - guid: " + $ie.guid, Log.DEBUG );
-							Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_CREATE_SUCCEED, $ie.guid, $dbo ) ); }
+							Persistance.dispatch( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_CREATE_SUCCEED, $ie.guid, $dbo ) ); }
 						, function (e:PlayerIOError):void { 
-							Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_CREATE_FAILED, $ie.guid ) ); 
+							Persistance.dispatch( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_CREATE_FAILED, $ie.guid ) ); 
 							Log.out( "PersistInventory.save - CREATE FAILED error saving: " + $ie.guid + " error data: " + e, Log.ERROR, e);  }
 						);
 		}

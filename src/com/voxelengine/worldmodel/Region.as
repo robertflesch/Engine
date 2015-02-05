@@ -129,15 +129,8 @@ package com.voxelengine.worldmodel
 		public function get gravity():Boolean { return _gravity; }
 		public function set gravity(val:Boolean):void { _gravity = val; }
 		public function get changed():Boolean { return _changed; }
-		public function set changed(val:Boolean):void 
-		{ 
-			if ( !_loaded )
-				return;
-			_changed = val; 
-		}
-		public function set changedForce(val:Boolean):void { 
-			_changed = val; 
-		}
+		public function set changed(val:Boolean):void { _changed = val; }
+		public function set changedForce(val:Boolean):void { _changed = val; }
 		
 		private var _criticalModelDetected:Boolean = false;
 		public function get criticalModelDetected():Boolean { return  _criticalModelDetected; } 
@@ -153,6 +146,7 @@ package com.voxelengine.worldmodel
 		public function get modified():Date  { return _modified; }
 		public function set modified(value:Date):void  { _modified = value; }
 		public function get modelManager():ModelManager  { return _modelManager; }
+		public function get loaded():Boolean { return _loaded; }
 		
 		private function onCriticalModelDetected( me:ModelEvent ):void
 		{
@@ -406,7 +400,7 @@ package com.voxelengine.worldmodel
 		}
 		
 		public function applyRegionInfoToPlayer( $avatar:Player ):void {
-			Log.out( "Region.applyRegionInfoToPlayer" );
+			//Log.out( "Region.applyRegionInfoToPlayer" );
 			if ( playerPosition )
 			{
 				//Log.out( "Player.onLoadingPlayerComplete - setting position to  - x: "  + playerPosition.x + "   y: " + playerPosition.y + "   z: " + playerPosition.z );

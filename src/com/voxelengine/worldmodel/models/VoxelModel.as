@@ -697,6 +697,7 @@ package com.voxelengine.worldmodel.models
 			
 			if (0 < _modelInfo.children.length)
 			{
+				Log.out( "VoxelModel.internal_initialize - loading child models START" );
 				for each (var child:InstanceInfo in _modelInfo.children)
 				{
 					// Add the parent model info to the child.
@@ -708,6 +709,7 @@ package com.voxelengine.worldmodel.models
 					//Log.out( "VoxelModel.internal_initialize - create child of parent.instance: " + instanceInfo.guid + "  - child.instanceGuid: " + child.instanceGuid );					
 					ModelLoader.load(child);
 				}
+				Log.out( "VoxelModel.internal_initialize - loading child models END" );
 			}
 			
 			if (0 < _modelInfo.scripts.length)
@@ -1113,6 +1115,7 @@ package com.voxelengine.worldmodel.models
 			oxelLoaded();
 		}
 		
+		// acts as stub for overloading
 		protected function oxelLoaded():void
 		{
 			calculateCenter();

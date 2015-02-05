@@ -20,7 +20,7 @@ public class VVContainer extends Container
 	
 	protected function onResized(e:UIOEvent):void 
 	{
-		trace( "VVContainer.onResize" );
+		//trace( "VVContainer.onResize" );
 		if ( _parent )
 			_parent.onResized( e );
 		//_barUpper.setButtonsWidth( width / _barUpper.length, 36 );

@@ -663,8 +663,6 @@ package org.flashapi.swing {
 		spas_internal static function init(target:DisplayObject, newDocument:Boolean = true):Boolean {
 			if(_initialized) return false;
 			else {
-				trace( "UIManager.init - not initialized" );
-
 				UIDescriptor.spas_internal::initDescriptor( UIManager );
 				_initialized = true;
 				_stage = target.stage;
@@ -675,7 +673,6 @@ package org.flashapi.swing {
 				_topLevelManager = TopLevelManager.spas_internal::getInstance();
 				_libManager = LibraryManager.spas_internal::getInstance();
 				_cssManager = CSSManager.spas_internal::getInstance();
-				trace( "UIManager.init - just after _cssManager" );
 				_focusManager = FocusManager.spas_internal::getInstance();
 				if (newDocument) 
 					_document =  new Application();
@@ -683,21 +680,15 @@ package org.flashapi.swing {
 					_document = target as Application;
 					_hasMainContainer = true;
 				}
-				trace( "UIManager.init - just b4 hasUIManagerDocument()" );
 				if (!UIManagerUtil.spas_internal::hasUIManagerDocument())
 					UIManagerUtil.spas_internal::setUIManagerDocument(_document);
-				trace( "UIManager.init - after hasUIManagerDocument()" );
 				_cursor = Cursor.spas_internal::getInstance();
-				trace( "UIManager.init - b4 drag manager" );
 				_dragManager = DnDManager.spas_internal::getInstance();
-				trace( "UIManager.init - after drag manager" );
 				_keyboardManager = KeyboardManager.spas_internal::getInstance();
-				trace( "UIManager.init - just b4 target.root.loaderInfo" );
 				_loader = target.root.loaderInfo;
 				UIManager.quality = Quality.HIGH;
 				initStage();
 				initJavaScript();
-				trace( "UIManager.init - exit" );
 			}
 			return true;
 		}

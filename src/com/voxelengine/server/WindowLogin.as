@@ -237,7 +237,7 @@ package com.voxelengine.server
 			else
 				Log.out("WindowLogin.loginSuccess - Unable to save user email", Log.WARN );
 				
-			Log.out("WindowLogin.loginSuccess - Closing Login Window" );
+			//Log.out("WindowLogin.loginSuccess - Closing Login Window" );
 			
 			remove();
 		}

@@ -67,7 +67,7 @@ public class Slots
 	}
 	
 	public function fromPersistance( $dbo:DatabaseObject ):void {	
-		if ( $dbo.slot0 ) {
+		if ( $dbo && $dbo.slot0 ) {
 			_items[0] = createObjectFromInventoryString( $dbo.slot0 );
 			_items[1] = createObjectFromInventoryString( $dbo.slot1 );
 			_items[2] = createObjectFromInventoryString( $dbo.slot2 );

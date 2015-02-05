@@ -20,6 +20,7 @@ package com.voxelengine.events
 		static public const INVENTORY_LOAD_REQUEST:String  	= "INVENTORY_LOAD_REQUEST";
 		static public const INVENTORY_LOAD_SUCCEED:String  	= "INVENTORY_LOAD_SUCCEED";
 		static public const INVENTORY_LOAD_FAILED:String  	= "INVENTORY_LOAD_FAILED";
+		static public const INVENTORY_LOAD_NOT_FOUND:String = "INVENTORY_LOAD_NOT_FOUND";
 		
 		static public const INVENTORY_SAVE_REQUEST:String  	= "INVENTORY_SAVE_REQUEST";
 		static public const INVENTORY_CREATE_SUCCEED:String	= "INVENTORY_CREATE_SUCCEED";

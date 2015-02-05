@@ -16,6 +16,8 @@ import flash.utils.Dictionary;
 
 import playerio.DatabaseObject;
 
+import org.flashapi.swing.Alert;
+	
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.server.Persistance;
@@ -38,10 +40,12 @@ public class Inventory
 	private var _dbo:DatabaseObject  = null;							
 	private var _createdDate:Date;
 	private var _modifiedDate:Date;
+	private var _generateNewInventory:Boolean;
 
 	public function get slots():Slots  { return _slots; }
 	public function get voxels():Voxels  { return _voxels; }
 	public function get models():Models  { return _models; }
+	public function get networkId():String { return _networkId; }
 	
 	public function Inventory( $networkId:String ) {
 		_slots = new Slots( $networkId );
@@ -53,8 +57,8 @@ public class Inventory
 	public function load():void {
 		if ( Globals.online ) {
 			addLoadEvents();
-			Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_REQUEST, _networkId ) );
-		}
+			Persistance.dispatch( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_REQUEST, _networkId ) );
+	}
 	}
 	
 	private function changed():Boolean {
@@ -65,7 +69,7 @@ public class Inventory
 	
 	public function save():void {
 		if ( Globals.online && changed() ) {
-			Log.out( "Inventory.save - Saving User Inventory", Log.WARN );
+			Log.out( "Inventory.save - Saving User Inventory networkId: " + networkId, Log.WARN );
 			if ( _dbo )
 				toPersistance();
 			else {
@@ -73,21 +77,39 @@ public class Inventory
 				ba = asByteArray( ba );
 			}
 			addSaveEvents();
-			Persistance.eventDispatcher.dispatchEvent( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_SAVE_REQUEST, _networkId, _dbo, ba ) );
+			Persistance.addListener( InventoryPersistanceEvent.INVENTORY_CREATE_SUCCEED, inventoryCreateSuccess );
+			Persistance.addListener( InventoryPersistanceEvent.INVENTORY_SAVE_SUCCEED, inventorySaveSuccess );
+			Persistance.dispatch( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_SAVE_REQUEST, _networkId, _dbo, ba ) );
 		}
 		else
-			Log.out( "Inventory.save - NOT Saving User Inventory, either offline or NOT changed", Log.DEBUG );
-
+			Log.out( "Inventory.save - NOT Saving User Inventory, either offline or NOT changed - networkId: " + networkId, Log.DEBUG );
+	}
+	
+	private function inventorySaveSuccess(e:InventoryPersistanceEvent):void 
+	{
+		Persistance.removeListener( InventoryPersistanceEvent.INVENTORY_CREATE_SUCCEED, inventoryCreateSuccess );
+		Persistance.removeListener( InventoryPersistanceEvent.INVENTORY_SAVE_SUCCEED, inventorySaveSuccess );
+	}
+	
+	private function inventoryCreateSuccess(e:InventoryPersistanceEvent):void 
+	{
+		Log.out( "Inventory.inventoryCreateSuccess - setting dbo for - networkId: " + networkId, Log.DEBUG );
+		_dbo = e.dbo;
+		Persistance.removeListener( InventoryPersistanceEvent.INVENTORY_CREATE_SUCCEED, inventoryCreateSuccess );
+		Persistance.removeListener( InventoryPersistanceEvent.INVENTORY_SAVE_SUCCEED, inventorySaveSuccess );
 	}
 	
 	//////////////////////////////////////////////////////////////////
 	// Persistance
 	//////////////////////////////////////////////////////////////////
+	
 	private function fromPersistance( $dbo:DatabaseObject ):void {
 		
-		_createdDate	= $dbo.createdDate;
-		_modifiedDate   = $dbo.modifiedDate;
-		_dbo 			= $dbo;
+		if ( $dbo ) {
+			_createdDate	= $dbo.createdDate;
+			_modifiedDate   = $dbo.modifiedDate;
+			_dbo 			= $dbo;
+		}
 		
 		// Slot data is stored as fields for easy analysis
 		// we can know what user carry around
@@ -95,12 +117,16 @@ public class Inventory
 		_voxels.fromPersistance( $dbo );
 		_models.fromPersistance( $dbo);
 		
-		if ( $dbo.data ) {
+		if ( $dbo && $dbo.data ) {
 			var ba:ByteArray = $dbo.data 
 			if ( ba && 0 < ba.bytesAvailable ) {
 				ba.uncompress();
 				fromByteArray( ba );
 			}
+		}
+		else {
+			_voxels.addTestData();
+			_models.addTestData();
 		}
 	}
 	
@@ -129,41 +155,50 @@ public class Inventory
 	}
 	
 	private function addLoadEvents():void {
-			Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, InventoryLoadSuccess );
-			Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, InventoryLoadFailed );
+		Persistance.addListener( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, inventoryLoadSuccess );
+		Persistance.addListener( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, inventoryLoadFailed );
+		Persistance.addListener( InventoryPersistanceEvent.INVENTORY_LOAD_NOT_FOUND, inventoryNotFound );
 	}
 	
 	private function removeLoadEvents():void {
-		Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, InventoryLoadSuccess );
-		Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, InventoryLoadFailed );
-		
+		Persistance.removeListener( InventoryPersistanceEvent.INVENTORY_LOAD_SUCCEED, inventoryLoadSuccess );
+		Persistance.removeListener( InventoryPersistanceEvent.INVENTORY_LOAD_FAILED, inventoryLoadFailed );
+		Persistance.removeListener( InventoryPersistanceEvent.INVENTORY_LOAD_NOT_FOUND, inventoryNotFound );
 	}
 	
-	private function InventoryLoadSuccess( $inve:InventoryPersistanceEvent ):void
+	private function inventoryNotFound(e:InventoryPersistanceEvent):void 
+	{
+		// this occurs on first time logging in.
+		removeLoadEvents();
+		fromPersistance( null );
+		InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_LOADED, _networkId, this ) );
+	}
+	
+	private function inventoryLoadSuccess( $inve:InventoryPersistanceEvent ):void
 	{
 		removeLoadEvents();
 		fromPersistance( $inve.dbo );
 		InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_LOADED, _networkId, this ) );
 	}
 	
-	private var _generateNewInventory:Boolean;
-	private function InventoryLoadFailed( $inve:InventoryPersistanceEvent ):void
+	private function inventoryLoadFailed( $inve:InventoryPersistanceEvent ):void
 	{
 		removeLoadEvents();
+		(new Alert( "ERROR LOADING USER INVENTORY - Please post on forums" )).display();
 	}
 	
 	private function addSaveEvents():void {
-		Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_SAVE_SUCCEED, saveSucceed );
-		Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_SAVE_FAILED, saveFailed );
-		Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_CREATE_SUCCEED, saveSucceed );
-		Persistance.eventDispatcher.addEventListener( InventoryPersistanceEvent.INVENTORY_CREATE_FAILED, createFailed );
+		Persistance.addListener( InventoryPersistanceEvent.INVENTORY_SAVE_SUCCEED, saveSucceed );
+		Persistance.addListener( InventoryPersistanceEvent.INVENTORY_SAVE_FAILED, saveFailed );
+		Persistance.addListener( InventoryPersistanceEvent.INVENTORY_CREATE_SUCCEED, saveSucceed );
+		Persistance.addListener( InventoryPersistanceEvent.INVENTORY_CREATE_FAILED, createFailed );
 	}
 	
 	private function removeSaveEvents():void {
-		Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_SAVE_SUCCEED, saveSucceed );
-		Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_SAVE_FAILED, saveFailed );
-		Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_CREATE_SUCCEED, saveSucceed );
-		Persistance.eventDispatcher.removeEventListener( InventoryPersistanceEvent.INVENTORY_CREATE_FAILED, createFailed );
+		Persistance.removeListener( InventoryPersistanceEvent.INVENTORY_SAVE_SUCCEED, saveSucceed );
+		Persistance.removeListener( InventoryPersistanceEvent.INVENTORY_SAVE_FAILED, saveFailed );
+		Persistance.removeListener( InventoryPersistanceEvent.INVENTORY_CREATE_SUCCEED, saveSucceed );
+		Persistance.removeListener( InventoryPersistanceEvent.INVENTORY_CREATE_FAILED, createFailed );
 	}
 	
 	private function saveSucceed( $inve:InventoryPersistanceEvent ):void

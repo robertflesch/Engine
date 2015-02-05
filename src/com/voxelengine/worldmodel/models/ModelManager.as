@@ -230,14 +230,14 @@ package com.voxelengine.worldmodel.models
 						if ( !$removePlayer )
 							continue;
 						else {
-							Log.out( "ModelManager.removeAllModelInstances - Removing player" );
+							//Log.out( "ModelManager.removeAllModelInstances - Removing player" );
 							//Globals.player.loseControl( vm );
 							//Globals.player = null;
 							markDead( vm.instanceInfo.guid );
 						}
 					}
 					else {
-						Log.out( "ModelManager.removeAllModelInstances - marking as dead: " + vm.instanceInfo.guid );
+						//Log.out( "ModelManager.removeAllModelInstances - marking as dead: " + vm.instanceInfo.guid );
 						markDead( vm.instanceInfo.guid );
 					}
 				}
@@ -294,8 +294,15 @@ package com.voxelengine.worldmodel.models
 			}
 			else
 			{
-				_modelInstances[vm.instanceInfo.guid] = vm;
-				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.guid ) );
+				if ( vm is Avatar ) {
+					// need to seperate these out into their own catagory
+					_modelInstances[vm.instanceInfo.guid] = vm;
+					Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.guid ) );
+				}
+				else {
+					_modelInstances[vm.instanceInfo.guid] = vm;
+					Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.guid ) );
+				}
 			}
 		}
 		
@@ -478,8 +485,8 @@ package com.voxelengine.worldmodel.models
 			}
 			modelTime = getTimer() - modelTime;
 			totalTime = getTimer() - totalTime;
-			if ( 1 < taskTime || 1 < modelTime || 5 < totalTime )
-				Log.out( "ModelManager.update - taskTime: " + taskTime  + "  totalTime: " + totalTime  + "  modelTime: " + modelTime + "  wsTime: " + wsTime + " editableTime: " + editableTime  );
+//			if ( 1 < taskTime || 1 < modelTime || 15 < totalTime )
+//				Log.out( "ModelManager.update - taskTime: " + taskTime  + "  totalTime: " + totalTime  + "  modelTime: " + modelTime + "  wsTime: " + wsTime + " editableTime: " + editableTime  );
 		}
 		
 		public function dispose():void 	{

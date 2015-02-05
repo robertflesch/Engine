@@ -35,7 +35,7 @@ public class BoxInventory extends VVBox
 		autoSize = false;
 		dragEnabled = true;
 		data = $item;
-		_count = new Label( "", 64 );
+		_count = new Label( "", $widthParam );
 		_count.fontColor = 0xffffff;
 		_count.textAlign = TextAlign.CENTER
 		//_count.x = 16;
@@ -66,7 +66,7 @@ public class BoxInventory extends VVBox
 	private function modelCount(e:InventoryModelEvent):void 
 	{
 		if ( _objectInfo.guid == e.itemGuid ) {
-			var modelsOfThisGuid:String = String( e.result.toFixed(5) );
+			var modelsOfThisGuid:String = String( e.result.toFixed(0) );
 			if ( 8 < modelsOfThisGuid.length )
 				_count.text = "LOTS";
 			else

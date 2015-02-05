@@ -728,7 +728,9 @@ package com.voxelengine.worldmodel.oxel
 			// if type == air then I am removing x amount of newType from inventory
 			const EDIT_CURSOR_MIN:int = 990;
 			// we dont want to add edit cursor to our inventory
-			if ( EditCursor.EDIT_CURSOR != $modelGuid )
+			// also if we have a scripts that generates blocks, not sure how to handle that.
+			// TODO how do we handle scripts the generate blocks, need to take inventory status first?
+			if ( EditCursor.EDIT_CURSOR != $modelGuid && false == $onlyChangeType )
 				updateInventory( $newType );
 			
 			// kill any existing family, you can be parent type OR physical type, not both

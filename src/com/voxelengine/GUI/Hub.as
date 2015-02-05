@@ -63,7 +63,7 @@ public class Hub extends VVCanvas
 	}
 	
 	private function inventoryLoaded(e:InventoryEvent):void {
-		Log.out( "Hub.inventoryLoaded - populate from here" , Log.WARN );
+		//Log.out( "Hub.inventoryLoaded - populate from here" , Log.WARN );
 		var outline:Image = new Image( Globals.appPath + "assets/textures/" + "hub.png");
 		addElement( outline );
 		

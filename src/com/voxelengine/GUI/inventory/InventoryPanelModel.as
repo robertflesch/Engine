@@ -24,45 +24,59 @@ public class InventoryPanelModel extends VVContainer
 	static public const MODEL_CAT_FURNITURE:String = "Furniture";
 	static public const MODEL_CAT_ALL:String = "ALL";
 	
+	static private const MODEL_CONTAINER_WIDTH:int = 512;
+	static private const MODEL_IMAGE_WIDTH:int = 128;
+	
 	private var _barLeft:TabBar
 	// This hold the items to be displayed
-	private var _itemContainer:Container;
+	private var _itemContainer:Container = new Container( MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH);
 	
 	public function InventoryPanelModel( $parent:VVContainer ) {
 		super( $parent );
 		autoSize = true;
-		layout.orientation = LayoutOrientation.VERTICAL;
+		layout.orientation = LayoutOrientation.HORIZONTAL;
 		
 		upperTabsAdd();
 		addItemContainer();
+		displaySelectedCategory( "all" );
+		
+		// This forces the window into a multiple of MODEL_IMAGE_WIDTH width
+		var count:int = width / MODEL_IMAGE_WIDTH;
+		width = count * MODEL_IMAGE_WIDTH;
+		
+		//eventCollector.addEvent( _dragOp, DnDEvent.DND_DROP_ACCEPTED, dropMaterial );
 	}
 	
 	private function upperTabsAdd():void {
 		_barLeft = new TabBar();
 		_barLeft.orientation = ButtonBarOrientation.VERTICAL;
-		_barLeft.name = "upper";
+		_barLeft.name = "left";
 		// TODO I should really iterate thru the types and collect the categories - RSF
 		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_ARCHITECTURE ), MODEL_CAT_ARCHITECTURE );
 		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_CHARACTERS ), MODEL_CAT_CHARACTERS );
 		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_PLANTS ), MODEL_CAT_PLANTS );
 		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_FURNITURE ), MODEL_CAT_FURNITURE );
-		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_ALL ), MODEL_CAT_ALL );
-		_barLeft.setButtonsWidth( 128 );
-		_barLeft.selectedIndex = 4;
+		var li:ListItem = _barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_ALL ), MODEL_CAT_ALL );
+		_barLeft.setButtonsWidth( 96, 32 );
+		_barLeft.selectedIndex = li.index;
 		eventCollector.addEvent( _barLeft, ListEvent.ITEM_CLICKED, selectCategory );
 		addGraphicElements( _barLeft );
 	}
 
 	private function addItemContainer():void {
-		_itemContainer = new Container();
+		addElement( _itemContainer );
 		_itemContainer.autoSize = true;
 		_itemContainer.layout.orientation = LayoutOrientation.VERTICAL;
-		addElement( _itemContainer );
 	}
 	
 	private function selectCategory(e:ListEvent):void 
 	{			
-		displaySelectedCategory( e.target.value );	
+		var test:String = e.target.value;
+		while ( 1 <= _itemContainer.numElements )
+			_itemContainer.removeElementAt( 0 );
+		_barLeft.selectedIndex = -1;
+			
+		displaySelectedCategory( "All" );	
 	}
 	
 	// TODO I see problem here when langauge is different then what is in TypeInfo RSF - 11.16.14
@@ -75,11 +89,9 @@ public class InventoryPanelModel extends VVContainer
 	
 	private function populateModels(e:InventoryModelEvent):void 
 	{
-		//var results:Vector.<SecureInt> = e.result as Vector.<SecureInt>;
+		var results:Array = e.result as Array;
 		InventoryManager.removeListener( InventoryModelEvent.INVENTORY_MODEL_LIST_RESULT, populateModels );
 		
-		var MODEL_CONTAINER_WIDTH:int = 512;
-		const MODEL_IMAGE_WIDTH:int = 128;
 		var count:int = 0;
 		var pc:Container = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
 		pc.layout = new AbsoluteLayout();
@@ -88,30 +100,25 @@ public class InventoryPanelModel extends VVContainer
 		var box:BoxInventory;
 		var item:ObjectInfo;
 		
-		//for (var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
-		//{
-			//item = TypeInfo.typeInfo[typeId];
-			//if ( null == item )
-				//continue;
-			//var voxelCount:int = results[typeId].val;
-			//if ( item.placeable && 0 < voxelCount)
-			//{
-				//// Add the filled bar to the container and create a new container
-				//if ( countMax == count )
-				//{
-					//_itemContainer.addElement( pc );
-					//pc = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
-					//pc.layout = new AbsoluteLayout();
-					//count = 0;		
-				//}
-				//box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE, item );
-				//box.x = count * MODEL_IMAGE_WIDTH;
-				//pc.addElement( box );
-				//eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
-//
-				//count++
-			//}
-		//}
+		for ( var key:String in results ) {	
+			item = new ObjectInfo( ObjectInfo.OBJECTINFO_MODEL, key );
+			item.image = "blank128.png";
+			var itemCount:int = results[key].val;
+			//// Add the filled bar to the container and create a new container
+			if ( countMax == count )
+			{
+				_itemContainer.addElement( pc );
+				pc = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
+				pc.layout = new AbsoluteLayout();
+				count = 0;		
+			}
+			box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE, item );
+			box.x = count * MODEL_IMAGE_WIDTH;
+			pc.addElement( box );
+			eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
+
+			count++
+		}
 		_itemContainer.addElement( pc );
 	}
 	

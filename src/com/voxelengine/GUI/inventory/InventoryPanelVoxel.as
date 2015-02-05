@@ -46,11 +46,14 @@ public class InventoryPanelVoxel extends VVContainer
 	static private const VOXEL_CAT_AVATAR:String 	= "Avatar";
 	static private const VOXEL_CAT_LIGHT:String 	= "Light";
 	static private const VOXEL_CAT_CRAFTING:String 	= "Crafting";
+
+	static private const VOXEL_CONTAINER_WIDTH:int = 512;
+	static private const VOXEL_IMAGE_WIDTH:int = 64;
 	
 	private var _dragOp:DnDOperation = new DnDOperation();
 	private var _barUpper:TabBar;
 	private var _barLower:TabBar;
-	private var _itemContainer:Container = new Container( 64, 64);
+	private var _itemContainer:Container = new Container( VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_WIDTH);
 	
 	public function InventoryPanelVoxel( $parent:VVContainer )
 	{
@@ -156,12 +159,11 @@ public class InventoryPanelVoxel extends VVContainer
 		var results:Vector.<SecureInt> = e.result as Vector.<SecureInt>;
 		InventoryManager.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, populateVoxels );
 		
-		var VOXEL_CONTAINER_WIDTH:int = 512;
 		var count:int = 0;
-		var pc:Container = new Container( VOXEL_CONTAINER_WIDTH, 64 );
+		var pc:Container = new Container( VOXEL_CONTAINER_WIDTH, VOXEL_IMAGE_WIDTH );
 		pc.layout = new AbsoluteLayout();
 
-		var countMax:int = VOXEL_CONTAINER_WIDTH / 64;
+		var countMax:int = VOXEL_CONTAINER_WIDTH / VOXEL_IMAGE_WIDTH;
 		var box:BoxInventory;
 		var item:TypeInfo;
 		
@@ -177,12 +179,12 @@ public class InventoryPanelVoxel extends VVContainer
 				if ( countMax == count )
 				{
 					_itemContainer.addElement( pc );
-					pc = new Container( VOXEL_CONTAINER_WIDTH, 64 );
+					pc = new Container( VOXEL_CONTAINER_WIDTH, VOXEL_IMAGE_WIDTH );
 					pc.layout = new AbsoluteLayout();
 					count = 0;		
 				}
-				box = new BoxInventory(64, 64, BorderStyle.NONE, item );
-				box.x = count * 64;
+				box = new BoxInventory(VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_WIDTH, BorderStyle.NONE, item );
+				box.x = count * VOXEL_IMAGE_WIDTH;
 				pc.addElement( box );
 				eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
 

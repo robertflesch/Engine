@@ -25,12 +25,12 @@ public class InventoryModelEvent extends Event
 	
 	private var _networkId:String; // Guid of model which is implementing this action
 	private var _itemGuid:String;
-	private var _result:int;
+	private var _result:*;
 	
 	public function get networkId():String { return _networkId; }
 	public function get itemGuid():String { return _itemGuid; }
 	
-	public function get result():int { return _result; }
+	public function get result():* { return _result; }
 
 	public function InventoryModelEvent( $type:String, $ownerGuid:String, $itemGuid:String, $result:*, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{

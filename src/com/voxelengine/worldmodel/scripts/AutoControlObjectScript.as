@@ -1,3 +1,10 @@
+/*==============================================================================
+Copyright 2011-2015 Robert Flesch
+All rights reserved.  This product contains computer programs, screen
+displays and printed documentation which are original works of
+authorship protected under United States Copyright Act.
+Unauthorized reproduction, translation, or display is prohibited.
+==============================================================================*/
 package com.voxelengine.worldmodel.scripts 
 {
 	/**
@@ -15,15 +22,16 @@ package com.voxelengine.worldmodel.scripts
 	{
 		public function AutoControlObjectScript() 
 		{
-			Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED, onModelEvent, false, 0, true );
+			Globals.g_app.addEventListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent, false, 0, true );
 		}
 		
 		public function onModelEvent( $event:ModelEvent ):void 
 		{
-			if ( $event.type == ModelEvent.PARENT_MODEL_ADDED )
+			if ( $event.type == ModelEvent.AVATAR_MODEL_ADDED )
 			{
 				if ( $event.instanceGuid == instanceGuid )
 				{
+					Globals.g_app.removeEventListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent );
 					if ( Globals.player ) {
 						var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
 						vm.takeControl( Globals.player );
