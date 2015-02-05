@@ -35,7 +35,7 @@ import com.voxelengine.worldmodel.models.ModelLoader;
 import com.voxelengine.worldmodel.models.ModelManager;
 import com.voxelengine.worldmodel.models.VoxelModel;
 import com.voxelengine.utils.CustomURLLoader;
-import com.voxelengine.worldmodel.models.PlanManager;
+import com.voxelengine.worldmodel.models.MetadataManager;
 
 import com.voxelengine.GUI.WindowSplash;
 /**
@@ -82,7 +82,7 @@ public class RegionManager
 		
 		// This adds the event handlers
 		// Is there a central place to do this?
-		PlanManager.addEvents();
+		MetadataManager.addEvents();
 		// This causes the to load its caches and listeners
 		InventoryManager.init();
 	}

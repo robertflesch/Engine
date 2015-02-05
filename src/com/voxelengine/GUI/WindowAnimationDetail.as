@@ -40,7 +40,7 @@
 package com.voxelengine.GUI
 {
 	import com.voxelengine.worldmodel.animation.Animation;
-	import com.voxelengine.worldmodel.models.PlanManager;
+	import com.voxelengine.worldmodel.models.MetadataManager;
 	import flash.geom.Vector3D;
 	import flash.net.FileReference;
 	import flash.events.Event;
