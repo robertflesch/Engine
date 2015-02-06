@@ -58,8 +58,10 @@ public class BoxInventory extends VVBox
 			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST, Network.userId, ($item as TypeInfo).type, -1 ) );
 		}
 		else if ( $item is ObjectInfo )  {
-			InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, modelCount ) ;
-			InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_REQUEST, Network.userId, $item.guid, -1 ) );
+			if ( "" != $item.guid ) {
+				InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, modelCount ) ;
+				InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_REQUEST, Network.userId, $item.guid, -1 ) );
+			}
 		}
 	}
 	

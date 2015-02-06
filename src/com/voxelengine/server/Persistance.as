@@ -1,5 +1,5 @@
 ﻿/*==============================================================================
-Copyright 2011-2014 Robert Flesch
+Copyright 2011-2015 Robert Flesch
 All rights reserved.  This product contains computer programs, screen
 displays and printed documentation which are original works of
 authorship protected under United States Copyright Act.
@@ -14,26 +14,13 @@ import playerio.Client;
 import playerio.BigDB;
 	
 // This class wraps the bigDB class, registers event handlers, and checks for valid connections
-public class Persistance extends EventDispatcher
+public class Persistance
 {
-	private static var s_persistance:Persistance;
-
-	private static function get persistance():Persistance { 
-		if ( null == s_persistance )
-			s_persistance = new Persistance(); 
-			
-		return s_persistance;
-	} 
-
 	static public function addEventHandlers():void {
 		PersistRegion.addEvents();
 		PersistInventory.addEvents();
 		PersistAnimation.addEvents();
 	}
-	
-	// Used to distribue all persistance messages
-	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
-	static public function get eventDispatcher():EventDispatcher { return _eventDispatcher; }
 	
 	static public function loadMyPlayerObject( $success:Function, $failure:Function ):Boolean {
 		if ( !Network.client || !Network.client.bigDB )
@@ -80,16 +67,19 @@ public class Persistance extends EventDispatcher
 	
 	///////////////// Event handler interface /////////////////////////////
 
+	// Used to distribue all persistance messages
+	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
+	
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
-		persistance.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
+		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
 	}
 
 	static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
-		persistance.removeEventListener( $type, $listener, $useCapture );
+		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 	
 	static public function dispatch( $event:Event) : Boolean {
-		return persistance.dispatchEvent( $event );
+		return _eventDispatcher.dispatchEvent( $event );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

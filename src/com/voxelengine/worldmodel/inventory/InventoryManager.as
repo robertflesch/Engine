@@ -15,63 +15,58 @@ import com.voxelengine.Log;
 
 	/**
 	 * The inventory manager is a static object that hold the inventory of different objects
+	 * It also acts as the event dispatcher for InventoryEvents
 	 * @author Bob
 	 */
 	
 	 
-public class InventoryManager extends EventDispatcher
+public class InventoryManager
 {
-	private var  _inventoryByGuid:Array = [];
-	
-	private static var s_inventoryManager:InventoryManager;
-	
-	private static function get inventoryManager():InventoryManager { 
-		if ( null == s_inventoryManager )
-			s_inventoryManager = new InventoryManager(); 
-			
-		return s_inventoryManager;
-	} 
+	// There is still some confustion here, do I use network id? that would mean only avatars can have intentory
+	// really I want any model to be able to have inventory. so this can be networkid OR guid ?? both are unique.
+	static private var  _s_inventoryByGuid:Array = [];
 	
 	public static function save():void {
-		for each ( var inventory:Inventory in s_inventoryManager._inventoryByGuid )
+		for each ( var inventory:Inventory in _s_inventoryByGuid )
 			if ( null != inventory && inventory.networkId != "player" )
 				inventory.save();
 	}
 	
 	public static function init():void {
+		// This creates a inventory object for login.
 		objectInventoryGet("player");		
 	}
 	
-	///////////////// Event handler interface /////////////////////////////
-
-	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
-		inventoryManager.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
-	}
-
-	static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
-		inventoryManager.removeEventListener( $type, $listener, $useCapture );
-	}
-	
-	static public function dispatch( $event:Event) : Boolean {
-		return inventoryManager.dispatchEvent( $event );
-	}
-	
-	///////////////// Event handler interface /////////////////////////////
-	
-	public function InventoryManager() 
-	{
-	}
-	
 	static public function objectInventoryGet( $ownerGuid:String ):Inventory {
-		var inventory:Inventory = inventoryManager._inventoryByGuid[$ownerGuid];
+		var inventory:Inventory = _s_inventoryByGuid[$ownerGuid];
 		if ( null == inventory && null != $ownerGuid ) {
 			//Log.out( "InventoryManager.objectInventoryGet creating inventory for: " + $ownerGuid , Log.WARN );
 			inventory = new Inventory( $ownerGuid );
-			inventoryManager._inventoryByGuid[$ownerGuid] = inventory;
+			_s_inventoryByGuid[$ownerGuid] = inventory;
 			inventory.load();
 		}
 		
 		return inventory;	
 	}
+	
+	///////////////// Event handler interface /////////////////////////////
+
+	// Used to distribue all persistance messages
+	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
+	
+	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
+		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
+	}
+
+	static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
+		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
+	}
+	
+	static public function dispatch( $event:Event) : Boolean {
+		return _eventDispatcher.dispatchEvent( $event );
+	}
+	
+	///////////////// Event handler interface /////////////////////////////
+	
 }
 }

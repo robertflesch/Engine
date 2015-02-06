@@ -57,7 +57,6 @@ package com.voxelengine.GUI
 	import com.voxelengine.Log;
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.events.ModelMetadataEvent;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.server.PersistModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;

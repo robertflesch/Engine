@@ -1,5 +1,14 @@
-﻿package com.voxelengine.server 
+﻿/*==============================================================================
+  Copyright 2011-2015 Robert Flesch
+  All rights reserved.  This product contains computer programs, screen
+  displays and printed documentation which are original works of
+  authorship protected under United States Copyright Act.
+  Unauthorized reproduction, translation, or display is prohibited.
+==============================================================================*/
+
+package com.voxelengine.server 
 {
+	import com.voxelengine.worldmodel.models.MetadataManager;
 	import playerio.PlayerIOError;
 	import playerio.DatabaseObject;
 	
@@ -80,7 +89,7 @@
 					continue;
 				}
 				
-				Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm ) );
+				MetadataManager.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm ) );
 			}
 		}
 	}	

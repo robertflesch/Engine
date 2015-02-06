@@ -45,7 +45,7 @@ package com.voxelengine.worldmodel.models
 		static private var _s_mmd:VoxelModelMetadata;
 		
 		public function ModelLoader():void {
-			Globals.g_app.addEventListener( ModelMetadataEvent.INFO_COLLECTED, localModelReadyToBeCreated );
+			MetadataManager.addListener( ModelMetadataEvent.INFO_COLLECTED, localModelReadyToBeCreated );
 		}
 		
 		static public function load( $ii:InstanceInfo, $vmm:VoxelModelMetadata = null ):void {
@@ -107,10 +107,17 @@ package com.voxelengine.worldmodel.models
 			//taskGroup.addTask(task);
 			
 			Globals.g_landscapeTaskController.addTask( taskGroup );
-			
-			//PlanManager.templateGet( $ii.guid );
 		}
 		
+		static private function loadPersistantNew( $ii:InstanceInfo ):void {
+			Log.out( "ModelLoader.loadPersistant - Adding task for InstanceInfo: " + $ii.toString(), Log.WARN );
+			
+			var vmm:VoxelModelMetadata = MetadataManager.metadataGet( $ii.guid );
+			if ( null == vmm )
+				var mm:ModelMaker = new ModelMaker( $ii );
+			//var vm:VoxelModel = 
+		}
+
 		static public function loadFromManifestByteArray( $vmm:VoxelModelMetadata, $ba:ByteArray, controllingModelGuid:String = "" ):VoxelModel {
 				
 			if ( null == $ba )
@@ -458,4 +465,15 @@ package com.voxelengine.worldmodel.models
 		
 		
 	}
+}
+
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.Globals;
+internal class ModelMaker {
+	
+	public function ModelMaker( $ii:InstanceInfo ) {
+		//MetadataManager.addListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, makeMe ) );		
+	}
+	
 }

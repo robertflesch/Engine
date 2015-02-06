@@ -77,7 +77,7 @@ package com.voxelengine.GUI
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 			
-			Globals.g_app.addEventListener( ModelMetadataEvent.INFO_TEMPLATE_REPO, modelLoaded );
+			MetadataManager.addListener( ModelMetadataEvent.INFO_TEMPLATE_REPO, modelLoaded );
 			Globals.g_app.addEventListener( LoadingEvent.TEMPLATE_MODEL_COMPLETE, newTemplateLoaded );
 			populateModels();
         }

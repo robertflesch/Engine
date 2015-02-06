@@ -1,8 +1,16 @@
+/*==============================================================================
+  Copyright 2011-2015 Robert Flesch
+  All rights reserved.  This product contains computer programs, screen
+  displays and printed documentation which are original works of
+  authorship protected under United States Copyright Act.
+  Unauthorized reproduction, translation, or display is prohibited.
+==============================================================================*/
 
 package com.voxelengine.GUI 
 {
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.models.MetadataManager;
 import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
@@ -126,7 +134,7 @@ public class WindowModelMetadata extends VVPopup
 		_vmm.copyCount = parseInt( _copies.label, 10 );
 		_vmm.createdDate = new Date();
 		_vmm.modifiedDate = new Date();
-		Globals.g_app.dispatchEvent( new ModelMetadataEvent( ModelMetadataEvent.INFO_COLLECTED, _vmm ) );
+		MetadataManager.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_COLLECTED, _vmm ) );
 		remove();
 	}
 }

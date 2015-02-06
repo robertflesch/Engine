@@ -73,13 +73,10 @@ public class Models
 			return;
 		if ( e.networkId == _networkId ) {
 			var itemGuid:String = e.itemGuid
+			var si:SecureInt = _items[itemGuid]
 			var modelCount:int;
-			var item:ObjectInfo = _items[itemGuid];
-			if ( item )
-				modelCount = _items[itemGuid].val;
-			else
-				modelCount = 0
-				
+			if ( si )
+				modelCount = si.val;
 			InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, _networkId, e.itemGuid, modelCount ) );
 			return;
 		}
