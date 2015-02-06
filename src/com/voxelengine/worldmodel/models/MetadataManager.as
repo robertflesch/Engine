@@ -49,8 +49,9 @@ public class MetadataManager
 	static private var _modifiedDate:Date; // The date range used for loading from persistance, this is the oldest model to get. Gets updated each time it is used
 	static private var _guidError:String;
 	
-	// this acts as a holding spot for templates models in game
-	static private var _metadata:Dictionary = new Dictionary(true);
+	// this acts as a holding spot for all model objects loaded from persistance
+	// dont use weak keys since this is THE spot that holds things.
+	static private var _metadata:Dictionary = new Dictionary(false);
 	
 	static private function metadataAdd( $vmm:VoxelModelMetadata ):void 
 	{ 
@@ -65,10 +66,12 @@ public class MetadataManager
 		// This should get any new models
 		if ( null == _modifiedDate )
 			_modifiedDate = new Date( 2000, 1, 1, 12, 0, 0, 0 );
+		else
+			_modifiedDate = new Date();
+
 		Log.out( "MetadataManager.metadataLoad _modifiedDate: " + _modifiedDate.toString(), Log.DEBUG );
 		PersistModel.loadModelTemplates( Network.userId, _modifiedDate );
 		PersistModel.loadModelTemplates( Network.PUBLIC, _modifiedDate );
-		_modifiedDate = new Date();
 		
 		// This will return models already loaded.
 		for each ( var vmm:VoxelModelMetadata in _metadata ) {
