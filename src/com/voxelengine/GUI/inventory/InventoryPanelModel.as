@@ -13,7 +13,7 @@ import com.voxelengine.GUI.*;
 import com.voxelengine.events.InventoryModelEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
-import com.voxelengine.worldmodel.ObjectInfo;
+import com.voxelengine.worldmodel.*;
 
 public class InventoryPanelModel extends VVContainer
 {
@@ -33,6 +33,8 @@ public class InventoryPanelModel extends VVContainer
 	
 	public function InventoryPanelModel( $parent:VVContainer ) {
 		super( $parent );
+		FunctionRegistry.functionAdd( createNewObjectIPM, "createNewObjectIPM" );
+		
 		autoSize = true;
 		layout.orientation = LayoutOrientation.HORIZONTAL;
 		
@@ -100,9 +102,17 @@ public class InventoryPanelModel extends VVContainer
 		var box:BoxInventory;
 		var item:ObjectInfo;
 		
+		item = new ObjectAction( "createNewObjectIPM", "NewModel128.png", "Click to create new model" );
+		box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE, item );
+		box.x = count * MODEL_IMAGE_WIDTH;
+		pc.addElement( box );
+		//eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
+		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack() } );
+		count++;
+
 		for ( var key:String in results ) {	
-			item = new ObjectInfo( ObjectInfo.OBJECTINFO_MODEL, key );
-			item.image = "blank128.png";
+			item = new ObjectModel( key );
+			//item.image = "blank128.png";
 			var itemCount:int = results[key].val;
 			//// Add the filled bar to the container and create a new container
 			if ( countMax == count )
@@ -120,6 +130,10 @@ public class InventoryPanelModel extends VVContainer
 			count++
 		}
 		_itemContainer.addElement( pc );
+	}
+	
+	static private function createNewObjectIPM():void {
+		new WindowModelChoice();
 	}
 	
 	private function dropMaterial(e:DnDEvent):void 

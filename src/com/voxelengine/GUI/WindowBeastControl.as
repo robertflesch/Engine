@@ -12,7 +12,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.worldmodel.ObjectInfo;
 	import com.voxelengine.worldmodel.weapons.Ammo;
 	import com.voxelengine.worldmodel.weapons.Gun;
-	import com.voxelengine.worldmodel.TypeInfo;
+	import com.voxelengine.worldmodel.*;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.KeyboardEvent;
@@ -72,6 +72,8 @@ package com.voxelengine.GUI
 			
 			//visible = false;
 			//_windowHeading.visible = false;
+			FunctionRegistry.functionAdd( loseControlBeastWindow, "loseControlBeastWindow" );
+			FunctionRegistry.functionAdd( fireBeastWindow, "fireBeastWindow" );
 		} 
 		
 		// This function sets the underlying data to the selected info. But does not act on that info.
@@ -81,11 +83,11 @@ package com.voxelengine.GUI
 				return;
 				
 			var actionItem:Object = box.data;
-			if ( actionItem.callback == loseControl )
+			if ( actionItem.callback == loseControlBeastWindow )
 			{
 				return;
 			}
-			else if ( actionItem.callback == fireGun )
+			else if ( actionItem.callback == fireBeastWindow )
 			{
 				var gun:Gun = Globals.getModelInstance( actionItem.modelGuid ) as Gun;
 				gun.ammo = actionItem.ammo;
@@ -98,11 +100,11 @@ package com.voxelengine.GUI
 			var actionItem:Object = box.data as Object;
 			if ( actionItem )
 			{
-					if ( actionItem.callback == loseControl )
+					if ( actionItem.callback == loseControlBeastWindow )
 					{
-						loseControl();
+						loseControlBeastWindow();
 					}
-					else if ( actionItem.callback == fireGun )
+					else if ( actionItem.callback == fireBeastWindow )
 					{
 						var gmInstanceGuid:String = actionItem.modelGuid;
 						var gun:Gun = Globals.getModelInstance( gmInstanceGuid ) as Gun;
@@ -112,19 +114,6 @@ package com.voxelengine.GUI
 			}
 		}
 		
-		private function fireGun():void {
-			// placeholder ONLY
-			// TODO will be used to act as reload timer
-
-			//event.target.enabled = false;
-			//var reloadTimer:DataTimer = new DataTimer( 5000, 1 );
-			//reloadTimer.label = event.target.label;
-			//reloadTimer.button = event.target as Button;
-			//event.target.label = "Reloading";
-			//reloadTimer.addEventListener(TimerEvent.TIMER, onRepeat);
-			//reloadTimer.start();
-		}
-		
 		// This is called when the toolbar image is loaded.
 		override public function buildActions():void {
 			Log.out( "WindowBeastControl.buildActions" );
@@ -132,10 +121,7 @@ package com.voxelengine.GUI
 			
 			var box:Box = null;
 			var count:int = 0;
-			var dismountItem:ObjectInfo = new ObjectInfo( ObjectInfo.OBJECTINFO_ACTION, "HOW TO USE HERE?" );
-			dismountItem["image"] = "dismount.png";
-			dismountItem["callback"] = loseControl;
-			dismountItem["category"] = "action";
+			var dismountItem:ObjectAction = new ObjectAction( "loseControlBeast", "dismount.png", "Dismount" );
 			box = buildAction( dismountItem, count++ );
 			
 			var beast:VoxelModel = Globals.getModelInstance( _beastInstanceGuid );
@@ -148,10 +134,12 @@ package com.voxelengine.GUI
 						var gm:Gun = cm as Gun;
 						for each ( var ammo:Ammo in gm.armory )
 						{
-							var actionItem:ObjectInfo = new ObjectInfo( ObjectInfo.OBJECTINFO_ACTION, "HOW TO USE HERE?" );
-							actionItem["image"] = ammo.name + ".png";
+							var actionItem:ObjectInfo = new ObjectAction( 
+								"fireBeastWindow",
+								ammo.name + ".png",
+								"Fire " + ammo.name
+							);
 							actionItem["ammo"] = ammo;
-							actionItem["callback"] = fireGun;
 							actionItem["modelGuid"] = gm.instanceInfo.guid;
 							box = buildAction( actionItem, count++ );
 						}
@@ -184,18 +172,33 @@ package com.voxelengine.GUI
 		
 		private function loseControlKey(e:KeyboardEvent):void {
 			if ( Keyboard.F == e.keyCode )
-				loseControl();
+				loseControlBeastWindow();
 		}
 		
-		private function loseControl():void {
-			var vm:VoxelModel = Globals.getModelInstance( _beastInstanceGuid );
+		static private function fireBeastWindow():void {
+			// placeholder ONLY
+			// TODO will be used to act as reload timer
+
+			//event.target.enabled = false;
+			//var reloadTimer:DataTimer = new DataTimer( 5000, 1 );
+			//reloadTimer.label = event.target.label;
+			//reloadTimer.button = event.target as Button;
+			//event.target.label = "Reloading";
+			//reloadTimer.addEventListener(TimerEvent.TIMER, onRepeat);
+			//reloadTimer.start();
+		}
+		
+		static private function loseControlBeastWindow():void {
+			var vm:VoxelModel = Globals.getModelInstance( Globals.controlledModel.instanceInfo.guid );
 			if ( vm )
 				vm.loseControl( Globals.player );
 			else
-				Log.out( "WindowBeastControl.loseControl - VM not found: " + _beastInstanceGuid, Log.ERROR );
+				Log.out( "WindowBeastControl.loseControl - VM not found: " + Globals.controlledModel.instanceInfo.guid, Log.ERROR );
 				
-			_windowHeading.remove();
-			remove();
+// TODO
+Log.out( "WindowBeastControl.loseControl - NEED WAY TO REMOVE SUPPORT WINDOWS", Log.ERROR );
+//			_windowHeading.remove();
+//			remove();
 		}
 		
 		// Window events

@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+import com.voxelengine.worldmodel.models.MetadataManager;
 import flash.utils.ByteArray;
 import com.voxelengine.Log;
 
@@ -23,54 +24,36 @@ public class ObjectInfo
 	static public const OBJECTINFO_MODEL:int = 3;
 	static public const OBJECTINFO_ACTION:int = 4;
 	static public const OBJECTINFO_GRAIN:int = 5;
+	static public const OBJECTINFO_TOOL:int = 6;
 	
-	protected var _image:String				= "blank.png";
-	protected var _name:String 				= "Empty";
-	protected var _guid:String 				= "INVALID";
 	protected var _objectType:int 			= OBJECTINFO_INVALID;
 	
-	public function get image():String 						{ return _image; }
-	public function set image(value:String):void 			{ _image = value; }
-	public function get name():String 						{ return _name; }
-	public function set name(value:String):void 			{ _name = value; }
-	public function get guid():String 						{ return _guid; }
-	public function set guid(value:String):void 			{ _guid = value; }
 	public function get objectType():int 					{ return _objectType; }
 	
-	public function ObjectInfo( $type:int, $guid:String ):void {
-		_objectType = $type;
-		_guid = $guid;
+	public function ObjectInfo( $objectType:int ):void {
+		_objectType = $objectType;
 	}
 	
 	public function asByteArray( $ba:ByteArray ):ByteArray 	{ return $ba; }
 	public function fromByteArray( $ba:ByteArray ):ByteArray{ return $ba; }
 	
 	public function asInventoryString():String {
-		return _objectType + ";" + _guid + ";" + _image + ";" + _name;
+		return String( _objectType );
 	}
-	
+
 	public function fromInventoryString( $data:String ): ObjectInfo {
 		var values:Array = $data.split(";");
-		if ( values.length != 4 ) {
+		if ( values.length != 1 ) {
 			Log.out( "TypeInfo.fromInventoryString - not equal to 4 tokens found, length is: " + values.length, Log.WARN );
-			reset( "Loading Error" );
+			reset();
 			return this;
 		}
-		_objectType = ObjectInfo.OBJECTINFO_MODEL;
-		_guid = values[1];
-		_image = values[2];
-		_name = values[3];
-		
 		return this;
 	}
 	
-	public function reset( $newName:String ):void {
+	public function reset():void {
 		_objectType = ObjectInfo.OBJECTINFO_EMPTY;
-		_guid = "";
-		_image = "blank.png";
-		_name = $newName;
 	}
-	
 }
 
 }

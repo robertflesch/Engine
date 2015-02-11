@@ -27,6 +27,13 @@ import com.voxelengine.server.PersistModel;
  */
 public class MetadataManager
 {
+	static private var _modifiedDate:Date; // The date range used for loading from persistance, this is the oldest model to get. Gets updated each time it is used
+	static private var _guidError:String;
+	
+	// this acts as a holding spot for all model objects loaded from persistance
+	// dont use weak keys since this is THE spot that holds things.
+	static private var _metadata:Dictionary = new Dictionary(false);
+	
 	// Used to distribue all persistance messages
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 	
@@ -45,20 +52,17 @@ public class MetadataManager
 	}
 	
 	///////////////// Event handler interface /////////////////////////////
-	
-	static private var _modifiedDate:Date; // The date range used for loading from persistance, this is the oldest model to get. Gets updated each time it is used
-	static private var _guidError:String;
-	
-	// this acts as a holding spot for all model objects loaded from persistance
-	// dont use weak keys since this is THE spot that holds things.
-	static private var _metadata:Dictionary = new Dictionary(false);
+
+	static public function init():void {
+		
+	}
 	
 	static private function metadataAdd( $vmm:VoxelModelMetadata ):void 
 	{ 
 		if ( $vmm && null ==  _metadata[$vmm.guid] ) {
-			Log.out( "MetadataManager.metadataAdd vmm: " + $vmm.toString(), Log.WARN );
+			//Log.out( "MetadataManager.metadataAdd vmm: " + $vmm.toString(), Log.WARN );
 			_metadata[$vmm.guid] = $vmm; 
-			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_TEMPLATE_REPO, $vmm ) );
+			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_TEMPLATE_REPO, $vmm, $vmm.guid ) );
 		}
 	}
 
@@ -75,17 +79,22 @@ public class MetadataManager
 		
 		// This will return models already loaded.
 		for each ( var vmm:VoxelModelMetadata in _metadata ) {
-			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_TEMPLATE_REPO, vmm ) );
+			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_TEMPLATE_REPO, vmm, vmm.guid ) );
 		}
 	}
 	
 	static public function metadataGetAll():Dictionary { return _metadata; }
 	static public function metadataGet( $guid:String ):VoxelModelMetadata 
 	{   
-		Log.out( "MetadataManager.metadataGet guid: " + $guid, Log.WARN );
+		if ( null == $guid ) {
+			Log.out( "MetadataManager.metadataGet guid rquested is NULL: ", Log.WARN );
+			return null;
+		}
+		//Log.out( "MetadataManager.metadataGet guid: " + $guid, Log.WARN );
 		var vmm:VoxelModelMetadata = _metadata[$guid]; 
 		if ( null == vmm ) {
 			_guidError = $guid;
+			//Log.out( "MetadataManager.metadataGet - did not find info for: " + $guid + " requesting...", Log.WARN );
 			PersistModel.loadModel( $guid, loadSuccess, loadFailure );
 		}
 		return vmm; 
@@ -97,21 +106,21 @@ public class MetadataManager
 		if ( dbo ) {
 			vmm.fromPersistance( dbo );
 			metadataAdd( vmm );
-			Log.out( "MetadataManager.templateLoadSuccess vmm: " + vmm.toString(), Log.WARN );
-			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm ) );
+			//Log.out( "MetadataManager.loadSuccess vmm: " + vmm.toString(), Log.WARN );
+			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm, vmm.guid ) );
 		}
 		else {
 			vmm.guid = _guidError;
-			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm ) );
+			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm, vmm.guid ) );
 		}
 	}
 	
 	static private function loadFailure( $error:PlayerIOError ):void {
 		
-		Log.out( "MetadataManager.templateLoadFailure - error: " + $error.message, Log.ERROR, $error );
+		Log.out( "MetadataManager.loadFailure - error: " + $error.message, Log.ERROR, $error );
 		var vmm:VoxelModelMetadata = new VoxelModelMetadata();
 		vmm.guid = _guidError;
-		dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm ) );
+		dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm, vmm.guid ) );
 	}
 }
 }

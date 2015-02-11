@@ -9,6 +9,7 @@ package com.voxelengine.GUI.inventory {
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.models.SecureInt;
 import com.voxelengine.worldmodel.ObjectInfo;
+import com.voxelengine.worldmodel.ObjectVoxel;
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
 import org.flashapi.swing.containers.UIContainer;
@@ -212,7 +213,11 @@ public class InventoryPanelVoxel extends VVContainer
 			else if ( e.dropTarget.target is QuickInventory ) {
 				if ( e.dropTarget is BoxInventory ) {
 					var bi:BoxInventory = e.dropTarget as BoxInventory;
-					var item:ObjectInfo = e.dragOperation.initiator.data;
+					var item:ObjectInfo;
+					if ( e.dragOperation.initiator.data is TypeInfo )
+						item = new ObjectVoxel( e.dragOperation.initiator.data.type );
+					else
+						Log.out( "InventoryPanelVoxel.dropMaterial - unknow type: " + (e.dragOperation.initiator.data).toString(), Log.ERROR );
 					bi.updateObjectInfo( item );
 					var slotId:int = int( bi.name );
 					InventoryManager.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, item ) );

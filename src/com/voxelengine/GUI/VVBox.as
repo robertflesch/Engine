@@ -17,18 +17,21 @@ public class VVBox extends Box
 {
 	private var _boxhelp:BoxHelp;
 	
-	public function VVBox( $widthParam:Number, $heightParam:Number, $borderStyle:String, $help:String = "" )
+	public function VVBox( $widthParam:Number, $heightParam:Number, $borderStyle:String )
 	{
 		super( $widthParam, $heightParam, $borderStyle );
-		_boxhelp = new BoxHelp( $help );
-		eventCollector.addEvent( this, UIMouseEvent.ROLL_OVER, function (e:UIMouseEvent):void { _boxhelp.display(); } );
-		eventCollector.addEvent( this, UIMouseEvent.ROLL_OUT, function (e:UIMouseEvent):void { _boxhelp.remove(); } );					
 		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
 	}		
 	
 	protected function onRemoved( event:UIOEvent ):void
 	{
 		eventCollector.removeAllEvents();
+	}
+	
+	public function setHelp( $text:String ):void {
+		_boxhelp = new BoxHelp( $text );
+		eventCollector.addEvent( this, UIMouseEvent.ROLL_OVER, function (e:UIMouseEvent):void { _boxhelp.display(); } );
+		eventCollector.addEvent( this, UIMouseEvent.ROLL_OUT, function (e:UIMouseEvent):void { _boxhelp.remove(); } );					
 	}
 }
 }

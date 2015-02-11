@@ -32,7 +32,7 @@ import com.voxelengine.GUI.inventory.BoxInventory;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.models.EditCursor;
-import com.voxelengine.worldmodel.ObjectInfo;
+import com.voxelengine.worldmodel.*;
 
 public class QuickInventory extends VVCanvas
 {
@@ -84,10 +84,17 @@ public class QuickInventory extends VVCanvas
 		_dragOp.initiator = e.target as UIObject;
 		_dragOp.dragImage = e.target as DisplayObject;
 		// this adds a drop format, which is checked again what the target is expecting
-		if ( e.target.data && e.target.data.category ) {
-			_dragOp.resetDropFormat();
-			var dndFmt:DnDFormat = new DnDFormat( e.target.data.category, e.target.data.subCat );
-			_dragOp.addDropFormat( dndFmt );
+		if ( e.target.data is TypeInfo ) {
+			if ( e.target.data.category ) {
+				_dragOp.resetDropFormat();
+				var dndFmt:DnDFormat = new DnDFormat( e.target.data.category, e.target.data.subCat );
+				_dragOp.addDropFormat( dndFmt );
+			}
+			else
+				Log.out( "QuickInventory.doDrag - didnt find category for: " + e.target.data, Log.WARN );
+		}
+		else if ( e.target.data is ObjectInfo ) {		
+			Log.out( "QuickInventory.doDrag - What do I need to do here? ", Log.WARN );
 		}
 		
 		UIManager.dragManager.startDragDrop(_dragOp);
@@ -140,10 +147,11 @@ public class QuickInventory extends VVCanvas
 		box.x = IMAGE_SIZE * count;
 		box.y = 0;
 		box.name = String( count );
-		if ( actionItem && actionItem.image )
+		if ( actionItem )
 		{
 			box.data = actionItem;
-			box.backgroundTexture = "assets/textures/" + actionItem.image;
+			if ( actionItem is ObjectVoxel )
+				box.backgroundTexture = "assets/textures/" + (actionItem as TypeInfo).image;
 		}
 		else
 		{
@@ -165,7 +173,7 @@ public class QuickInventory extends VVCanvas
 	}
 	
 	
-	public function buildGrain( item:ObjectInfo, count:int, shortCutImage:String):Object {
+	public function buildGrain( item:ObjectGrain, count:int, shortCutImage:String):Object {
 		var box:Box = new Box(IMAGE_SIZE, IMAGE_SIZE);
 		var hk:Label = new Label("", 20);
 		box.x = IMAGE_SIZE * (count - 1);

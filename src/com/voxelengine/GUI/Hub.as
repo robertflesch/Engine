@@ -8,13 +8,6 @@
 
 package com.voxelengine.GUI
 {
-import com.voxelengine.events.InventoryEvent;
-import com.voxelengine.events.VVWindowEvent;
-import com.voxelengine.GUI.inventory.BoxInventory;
-import com.voxelengine.worldmodel.inventory.Inventory;
-import com.voxelengine.worldmodel.inventory.InventoryManager;
-import com.voxelengine.worldmodel.inventory.Slots;
-import com.voxelengine.worldmodel.ObjectInfo;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.events.Event;
@@ -32,9 +25,16 @@ import org.flashapi.swing.Container;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.GUIEvent;
+import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.VVWindowEvent;
+import com.voxelengine.GUI.inventory.BoxInventory;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.models.EditCursor;
+import com.voxelengine.worldmodel.inventory.Inventory;
+import com.voxelengine.worldmodel.inventory.InventoryManager;
+import com.voxelengine.worldmodel.inventory.Slots;
+import com.voxelengine.worldmodel.*;
  
 public class Hub extends VVCanvas
 {
@@ -177,7 +177,7 @@ public class Hub extends VVCanvas
 		resizeHub(null);
 	}
 
-	private function buildGrain( ti:ObjectInfo, count:int ):Box
+	private function buildGrain( ti:ObjectGrain, count:int ):Box
 	{
 		var buildResult:Object = _toolSize.buildGrain( ti, count, "F" + String(count) + ".png" );
 		_evtColl.addEvent( buildResult.box, UIMouseEvent.PRESS, pressGrain );
@@ -192,39 +192,25 @@ public class Hub extends VVCanvas
 		_toolSize.name = "GrainSelector";
 
 		var count:int = 1;
-		var ti:ObjectInfo = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "0" );
-		ti.image = "0.0625meter.png";
-		ti.name = "0";
+		var ti:ObjectGrain = new ObjectGrain( "0", "0.0625meter.png" );
 		buildGrain( ti, count++ );
 		
-		ti = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "1" );
-		ti.image = "0.125meter.png";
-		ti.name = "1";
+		ti = new ObjectGrain( "1", "0.125meter.png" );
 		buildGrain( ti, count++ );
 		
-		ti = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "2" );
-		ti.image = "0.25meter.png";
-		ti.name = "2";
+		ti = new ObjectGrain( "2", "0.25meter.png" );
 		buildGrain( ti, count++ );
 		
-		ti = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "3" );
-		ti.image = "0.5meter.png";
-		ti.name = "3";
+		ti = new ObjectGrain( "3", "0.5meter.png" );
 		buildGrain( ti, count++ );
 		
-		ti = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "4" );
-		ti.image = "1meter.png";
-		ti.name = "4";
+		ti = new ObjectGrain( "4", "1meter.png" );
 		var meterBox:Box = buildGrain( ti, count++ );
 		
-		ti = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "5" );
-		ti.image = "2meter.png";
-		ti.name = "5";
+		ti = new ObjectGrain( "5", "2meter.png" );
 		buildGrain( ti, count++ );
 		
-		ti = new ObjectInfo( ObjectInfo.OBJECTINFO_GRAIN, "6" );
-		ti.image = "4meter.png";
-		ti.name = "6";
+		ti = new ObjectGrain( "6", "4meter.png" );
 		buildGrain( ti, count++ );
 		
 		_toolSize.width = 7 * 64;
@@ -267,7 +253,7 @@ public class Hub extends VVCanvas
 	
 	public function processGrainSelection( box:UIObject ):void 
 	{
-		var ti:ObjectInfo = box.data as ObjectInfo;
+		var ti:ObjectGrain = box.data as ObjectGrain;
 		EditCursor.editCursorSize = int ( ti.name.toLowerCase() );
 		_toolSize.moveSelector( box.x );
 
@@ -294,24 +280,29 @@ public class Hub extends VVCanvas
 	public function processItemSelection( box:UIObject ):void 
 	{
 		_itemInventory.moveSelector( box.x );
-		
-		var oi:ObjectInfo = box.data as ObjectInfo;
 		var itemIndex:int = int( box.name );
-		var name:String
-		if ( oi )
-			name = oi.name.toLowerCase();
-		else 
-			name = "none";
 		
 		Globals.g_app.editing = false;
 		Globals.g_app.toolOrBlockEnabled = false;
-		if ( "none" == name )
-		{
+		var oi:ObjectInfo = box.data as ObjectInfo;
+		if ( oi is ObjectVoxel ) {
+			var ti:ObjectVoxel = oi as ObjectVoxel;
+			var selectedTypeId:int = ti.type;
+			
+			if ( TypeInfo.INVALID != selectedTypeId ) {
+				EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
+				EditCursor.cursorColor = selectedTypeId; 
+				_itemMaterialSelection = itemIndex;
+				Globals.g_app.editing = true;
+				Globals.g_app.toolOrBlockEnabled = true;
+			}
+		}
+		else if ( oi is ObjectAction ) {
+			Log.out( "Hub.processItemSelection - ObjectAction");
+			var oa:ObjectAction = oi as ObjectAction;
 			if ( _lastItemSelection != itemIndex )
 			{   // We are selecting none when it was previously on another item
-				EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
-				Globals.g_app.editing = false;
-				Globals.g_app.toolOrBlockEnabled = false;
+				oa.callBack();
 			}
 			else if ( - 1 != _itemMaterialSelection )// We are selecting the pick again when that is what we have already.
 			{	// go back to previously used material
@@ -321,42 +312,26 @@ public class Hub extends VVCanvas
 				return;
 			}
 		}
-		else if ( "pick" == name )
-		{
-			Globals.g_app.editing = true;
-			Globals.g_app.toolOrBlockEnabled = true;
+		else if ( oi is ObjectTool ) {
+			Log.out( "Hub.processItemSelection - ObjectTool");
+			var ot:ObjectTool = oi as ObjectTool;
 			if ( _lastItemSelection != itemIndex )
 			{   // We are selecting the pick when it was previously on another item
-				EditCursor.cursorOperation = EditCursor.CURSOR_OP_DELETE;
-				EditCursor.setPickColorFromType( EditCursor.cursorType )
+				ot.callBack();
 			}
 			else if ( - 1 != _itemMaterialSelection ) 
 			{	// go back to previously used material
+				Globals.g_app.editing = true;
+				Globals.g_app.toolOrBlockEnabled = true;
 				EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
 				var lastBoxPick:Box = _itemInventory.getBoxFromIndex( _itemMaterialSelection );
 				processItemSelection( lastBoxPick );
 				return;
 			}
 		}
-		else
-		{
-			if ( oi is TypeInfo ) {
-				EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
-				var selectedTypeId:int = TypeInfo.getTypeId( name );
-				if ( TypeInfo.INVALID != selectedTypeId ) {
-					EditCursor.cursorColor = selectedTypeId; 
-					_itemMaterialSelection = itemIndex;
-					Globals.g_app.editing = true;
-					Globals.g_app.toolOrBlockEnabled = true;
-				}
-			}
-			else {
-				EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
-				Globals.g_app.editing = false;
-				Globals.g_app.toolOrBlockEnabled = false;
-				Log.out( "Hub.processItemSelection - How do we handle actions here?", Log.WARN );
-			}
-		}
+		else if ( oi is ObjectInfo )
+			Log.out( "Hub.processItemSelection - ObjectInfo");
+		
 		_lastItemSelection = itemIndex;
 	}
 	

@@ -54,7 +54,7 @@ package com.voxelengine.worldmodel.models
 			if ( !Globals.isGuid( $ii.guid ) && $ii.guid != "LoadModelFromBigDB" )
 				loadLocal( $ii, $vmm )
 			else
-				loadPersistant( $ii );
+				loadPersistantNew( $ii );
 		}
 		
 		// If we want to preload the modelInfo, we dont need to block on it
@@ -110,12 +110,13 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		static private function loadPersistantNew( $ii:InstanceInfo ):void {
-			Log.out( "ModelLoader.loadPersistant - Adding task for InstanceInfo: " + $ii.toString(), Log.WARN );
+			Log.out( "ModelLoader.loadPersistantNew - retriving metadata for: " + $ii.toString() );
 			
 			var vmm:VoxelModelMetadata = MetadataManager.metadataGet( $ii.guid );
+			// a modelMaker listen for the metadata loaded event, then creates the object from it.
+			// and goes away, its kept in memory by its listener.
 			if ( null == vmm )
 				var mm:ModelMaker = new ModelMaker( $ii );
-			//var vm:VoxelModel = 
 		}
 
 		static public function loadFromManifestByteArray( $vmm:VoxelModelMetadata, $ba:ByteArray, controllingModelGuid:String = "" ):VoxelModel {
@@ -173,6 +174,50 @@ package com.voxelengine.worldmodel.models
 			vm.complete = true;
 			return vm;
 		}
+		
+		static public function loadFromManifestByteArrayNew( $ii:InstanceInfo, $vmm:VoxelModelMetadata ):VoxelModel {
+				
+			var $ba:ByteArray = $vmm.data;
+			if ( null == $ba )
+			{
+				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad data in VoxelModelMetadata: " + $vmm.guid, Log.ERROR );
+				return null;
+			}
+			$ba.position = 0;
+			
+			var versionInfo:Object = modelMetaInfoRead( $ba );
+			if ( MANIFEST_VERSION != versionInfo.manifestVersion )
+			{
+				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
+				return null;
+			}
+			
+			// how many bytes is the modelInfo
+			var strLen:int = $ba.readInt();
+			// read off that many bytes
+			var modelInfoJson:String = $ba.readUTFBytes( strLen );
+			
+			// create the modelInfo object from embedded metadata
+			modelInfoJson = decodeURI(modelInfoJson);
+			var jsonResult:Object = JSON.parse(modelInfoJson);
+			var mi:ModelInfo = new ModelInfo();
+			mi.initJSON( $vmm.guid, jsonResult );
+			
+			// add the modelInfo to the repo
+			// is the still needed TODO - RSF 9.23.14
+			Globals.modelInfoAdd( mi );
+			// needs to be name + guid??
+			
+			var vm:* = instantiate( $ii, mi, $vmm );
+			if ( vm ) {
+				vm.version = versionInfo.version;
+				vm.loadOxelFromByteArray( $ba );
+			}
+
+			vm.complete = true;
+			return vm;
+		}
+		
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// END Persistant model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -465,15 +510,4 @@ package com.voxelengine.worldmodel.models
 		
 		
 	}
-}
-
-import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.Globals;
-internal class ModelMaker {
-	
-	public function ModelMaker( $ii:InstanceInfo ) {
-		//MetadataManager.addListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, makeMe ) );		
-	}
-	
 }

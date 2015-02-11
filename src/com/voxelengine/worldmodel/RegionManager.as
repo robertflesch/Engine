@@ -81,7 +81,7 @@ public class RegionManager
 		
 		// This adds the event handlers
 		// Is there a central place to do this?
-		//MetadataManager.addEvents();
+		MetadataManager.init();
 		// This causes the to load its caches and listeners
 		InventoryManager.init();
 	}

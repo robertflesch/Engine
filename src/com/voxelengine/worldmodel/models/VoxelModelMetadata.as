@@ -7,12 +7,18 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.server.PersistModel;
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
+	import flash.display.JPEGEncoderOptions;
+	import flash.display.Loader;
+	import flash.display.LoaderInfo
+	import flash.events.Event;
+	import flash.geom.Rectangle;
 	import flash.utils.ByteArray;
 	import playerio.DatabaseObject;
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	
+	import com.voxelengine.server.PersistModel;
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF
@@ -20,12 +26,17 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class VoxelModelMetadata
 	{
+		private var _topImage:Bitmap;
+		[Embed(source='../../../../../../Resources/bin/assets/textures/NoImage128.png')]
+		private var _topImageClass:Class;
+		
 		private static const COPY_COUNT_INFINITE:int = -1;
 		private var _guid:String			= "";
 		private var _name:String			= "";
 		private var _description:String		= "";
 		private var _owner:String			= "";
 		private var _data:ByteArray
+		private var _image:BitmapData;
 		private var _dbo:DatabaseObject;
 		private var _createdDate:Date;
 		private var _modifiedDate:Date;
@@ -42,6 +53,12 @@ package com.voxelengine.worldmodel.models
 
 		public function toString():String {
 			return "name: " + _name + "  description: " + _description + "  guid: " + _guid + "  owner: " + _owner;
+		}
+		
+		public function VoxelModelMetadata() {
+			//var rect:Rectangle = new Rectangle(0,0,128,128);
+			//var bmp:Bitmap = (new _topImageClass() as Bitmap);
+			//_image = bmp.bitmapData; // .getPixels(rect);
 		}
 		/*
 		public function clone():VoxelModelMetadata {
@@ -80,8 +97,7 @@ package com.voxelengine.worldmodel.models
 			newVmm.name 			= new String( _name );
 			newVmm.description 		= new String( _description );
 			newVmm.owner 			= new String( _owner );
-			
-			// instances dont have data, they use the template data
+			newVmm.image 			= null;
 			newVmm.data				= null;
 			
 			// how to copy this?
@@ -111,7 +127,8 @@ package com.voxelengine.worldmodel.models
 				   , transfer: _transfer
 				   , createdDate: _createdDate
 				   , modifiedDate: _modifiedDate
-				   , data: data } 			
+				   , data: data
+				   , image: image }
 		}
 		
 		public function toJSONString():String {
@@ -142,6 +159,15 @@ package com.voxelengine.worldmodel.models
 			}
 			else
 				_data 		= null;
+				
+			if ( $dbo.imageData ) {
+				var loader:Loader = new Loader();
+				loader.contentLoaderInfo.addEventListener(Event.INIT, function(event:Event):void { image = Bitmap( LoaderInfo(event.target).content).bitmapData; } );
+				loader.loadBytes( $dbo.imageData );			
+			}
+			else
+				_image 		= null;
+	
 		}
 		
 		public function toPersistance():void {
@@ -158,6 +184,10 @@ package com.voxelengine.worldmodel.models
 			_dbo.createdDate	= _createdDate;
 			_dbo.modifiedDate   = new Date();
 			_dbo.data 			= _data;
+			if ( image )
+				_dbo.imageData 		= image.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
+			else
+				_dbo.imageData = null;
 		}
 		
 		public function save( $save:Function, $fail:Function, $created:Function ):void {
@@ -213,6 +243,20 @@ package com.voxelengine.worldmodel.models
 			_data = value; 
 			if ( _dbo )
 				_dbo.data = _data;
+		}
+		
+		//public function get image():ByteArray 				{ return _image; }
+		//public function set image(value:ByteArray):void  	
+		//{ 
+			//_image = value; 
+			//if ( _dbo )
+				//_dbo.image = _image;
+		//}
+		
+		public function get image():BitmapData 				{ return _image; }
+		public function set image(value:BitmapData):void  	
+		{ 
+			_image = value; 
 		}
 		
 		public function get databaseObject():DatabaseObject 		{ return _dbo; }

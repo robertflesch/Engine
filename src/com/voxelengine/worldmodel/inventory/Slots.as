@@ -7,15 +7,17 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
+import com.voxelengine.worldmodel.models.EditCursor;
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
+import com.voxelengine.Globals;
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.InventoryPersistanceEvent;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.ObjectInfo;
+import com.voxelengine.worldmodel.*;
 
 public class Slots
 {
@@ -34,13 +36,15 @@ public class Slots
 		// Do I need to unregister this?
 		InventoryManager.addListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
 		_networkId = $networkId;
+		FunctionRegistry.functionAdd( noneSlots, "noneSlots" );
+		FunctionRegistry.functionAdd( pickToolSlots, "pickToolSlots" );
 	}
 	
 	public function slotChange(e:InventorySlotEvent):void {
 		Log.out( "SlotsManager.slotChange slot: " + e.slotId + "  item: " + e.item );
 		if ( _items ) {
 			if ( null == e.item )
-				_items[e.slotId].reset( "" );
+				_items[e.slotId] = new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY );
 			else
 				_items[e.slotId] = e.item;
 			changed = true;
@@ -53,17 +57,21 @@ public class Slots
 		// find the first comma so we can get the substring with the object type
 		var type:int = int( $data.charAt(0) );
 		if ( type == 1 )
-			return new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY, "" );		
+			return new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY );		
 		else if ( type == 2 )
-			return new TypeInfo( 0 ).fromInventoryString( $data ); 
+			return new ObjectVoxel( 0 ).fromInventoryString( $data ); 
 		else if ( type == 3 )
-			return new ObjectInfo( ObjectInfo.OBJECTINFO_MODEL, "" ).fromInventoryString( $data );
+			return new ObjectModel( "" ).fromInventoryString( $data );
 		else if ( type == 4 )
-			return new ObjectInfo( ObjectInfo.OBJECTINFO_ACTION, "" ).fromInventoryString( $data );
+			return new ObjectAction( "", "", "" ).fromInventoryString( $data );
 		else if ( type == 5 )
-			return new ObjectInfo( ObjectInfo.OBJECTINFO_ACTION, "" ).fromInventoryString( $data );
+			return new ObjectGrain( "", "" ).fromInventoryString( $data );
+		else if ( type == 6 )
+			return new ObjectTool( "", "", "", "" ).fromInventoryString( $data );
+		else
+			Log.out( "Slots.createObjectFromInventoryString - type: " + type + "  NOT FOUND", Log.ERROR );
 		
-		return new ObjectInfo( ObjectInfo.OBJECTINFO_INVALID, "" );
+		return new ObjectInfo( ObjectInfo.OBJECTINFO_INVALID );
 	}
 	
 	public function fromPersistance( $dbo:DatabaseObject ):void {	
@@ -103,22 +111,33 @@ public class Slots
 		initializeSlots();
 		Log.out( "Slots.addSlotDefaultData - Loading default data into slots" , Log.WARN );
 		
-		var pickItem:ObjectInfo = new ObjectInfo( ObjectInfo.OBJECTINFO_MODEL, "pickItem" );
-		pickItem.image = "pick.png";
-		pickItem.name = "pick";
+		var pickItem:ObjectTool = new ObjectTool( "295D920F-6363-E3A1-9AAB-91125BBEAA95", "pickToolSlots", "pick.png", "pick" );
 		_items[0] = pickItem;
 		
-		var noneItem:ObjectInfo = new ObjectInfo( ObjectInfo.OBJECTINFO_ACTION, "" );
-		noneItem.image = "none.png";
-		noneItem.name = "none";
+		var noneItem:ObjectAction = new ObjectAction( "noneSlots", "none.png", "Do nothing" );
 		_items[1] = noneItem;
 		
 		changed = true;
 	}
+	
+	
+	static private function pickToolSlots():void {
+		EditCursor.cursorOperation = EditCursor.CURSOR_OP_DELETE;
+		EditCursor.setPickColorFromType( EditCursor.cursorType )
+		Globals.g_app.editing = true;
+		Globals.g_app.toolOrBlockEnabled = true;
+	}
+	
+	static private function noneSlots():void {
+		EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
+		Globals.g_app.editing = false;
+		Globals.g_app.toolOrBlockEnabled = false;
+	}
+	
 
 	private function initializeSlots():void {
 		for ( var i:int; i < ITEM_COUNT; i++ ) {
-			_items[i] = new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY, "" );
+			_items[i] = new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY );
 		}
 	}
 
