@@ -15,6 +15,8 @@ package {
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
+	import flash.events.ErrorEvent;	
+	import flash.events.UncaughtErrorEvent;	
 	import flash.external.ExternalInterface;
 	import flash.ui.Keyboard;
 	import flash.utils.getTimer;
@@ -133,6 +135,7 @@ package {
 				WindowSplash.create();
 				
 			Log.out( "VoxelVerse.init exit init" );
+            loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
 		}
 		
 		private function addStaticListeners():void {
@@ -327,7 +330,24 @@ package {
 					break;
 			}
 		}
-		
-		
+		////////////////////////////
+        
+        private function uncaughtErrorHandler(event:UncaughtErrorEvent):void
+        {
+            if (event.error is Error)
+            {
+                var error:Error = event.error as Error;
+                Log.out( "VoxelVerse.uncaughtErrorHandler name: " + error.name + " message: " + error.message + "  stackTrace: " + error.getStackTrace(), Log.ERROR )
+            }
+            else if (event.error is ErrorEvent)
+            {
+                var errorEvent:ErrorEvent = event.error as ErrorEvent;
+                Log.out( "VoxelVerse.uncaughtErrorHandler name: " + error.name + " message: " + error.message + "  stackTrace: " + error.getStackTrace(), Log.ERROR )
+            }
+            else
+            {
+                Log.out( "VoxelVerse.uncaughtErrorHandler something was caught: " + event.toString(), Log.WARN )
+            }
+        }
 	}
 }
