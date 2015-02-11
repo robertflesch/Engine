@@ -112,6 +112,13 @@ package com.voxelengine.renderer
 			_startingHeight = _height;
 		}
 		
+		public function modelShot():BitmapData {
+			var tmp : BitmapData = new BitmapData( _width, _height, false );
+			// this draws the stage3D on the bitmap.
+			render(tmp);
+			return tmp;
+		}
+		
 		public function screenShot( drawUI:Boolean ):void
 		{
 			var tmp : BitmapData = new BitmapData( _width, _height, false );
