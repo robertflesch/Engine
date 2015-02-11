@@ -148,7 +148,8 @@ package com.voxelengine.worldmodel
 		private var _durability:Number			= 1;
 		private var _luck:Number				= 1;
 		private var _countColor:uint			= 0x00ffffff; // the color to be used to show how many of this object exist
-		
+		private var _name:String				= "";
+		private var _image:String				= "Invalid.png";
 		
 		public function get interactions():Interactions { return _interactions; }
 		public function get type():uint 		{ return _typeId; }
@@ -189,10 +190,12 @@ package com.voxelengine.worldmodel
 		public function get durability():Number { return _durability; }
 		public function get luck():Number { return _luck; }
 		public function get countColor():uint {return _countColor;}
+		public function get name():String { return _name; }
+		public function get image():String { return _image; }
 		
 		public function TypeInfo( $typeId:int ):void { 
 			_typeId = $typeId;
-			super( ObjectInfo.OBJECTINFO_VOXEL, String( $typeId ) );
+			super( ObjectInfo.OBJECTINFO_VOXEL );
 		}
 		
 		public function getJSON():String
@@ -273,8 +276,9 @@ package com.voxelengine.worldmodel
 				throw new Error( "TypeInfo.init - WARNING - unable to find name: " + JSON.stringify($json) );					
 			_name = $json.name;
 			
-			if ( $json.image  )
-				_image = $json.image;
+			if ( !$json.image  )
+				throw new Error( "TypeInfo.init - WARNING - unable to find name: " + JSON.stringify($json) );					
+			_image = $json.image;
 
 			if ( $json.countColor  )
 				_countColor = $json.countColor;
@@ -385,28 +389,6 @@ package com.voxelengine.worldmodel
 				else
 					_flame = false;
 			}
-		}
-		
-		override public function asInventoryString():String {
-			return _objectType + ";" + _typeId + ";" + _image + ";" + _name;
-		}
-		
-		override public function fromInventoryString( $data:String ): ObjectInfo {
-			var values:Array = $data.split(";");
-			if ( values.length != 4 ) {
-				Log.out( "TypeInfo.fromInventoryString - not equal to 4 tokens found, length is: " + values.length, Log.WARN );
-				_objectType = ObjectInfo.OBJECTINFO_VOXEL;
-				_typeId = TypeInfo.RED;
-				_image = "invalid.png";
-				_name = "LoadingError";
-				return this;
-			}
-			_objectType = ObjectInfo.OBJECTINFO_VOXEL;
-			_typeId = values[1];
-			_image = values[2];
-			_name = values[3];
-			
-			return this;
 		}
 	}
 }
