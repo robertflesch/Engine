@@ -23,26 +23,33 @@ package com.voxelengine.events
 		static public const INFO_COLLECTED:String  			= "INFO_COLLECTED";
 		
 		private var _vmm:VoxelModelMetadata;
+		private var _itemGuid:String;
 
-		public function ModelMetadataEvent( $type:String, $vmm:VoxelModelMetadata, $bubbles:Boolean = true, $cancellable:Boolean = false )
+		public function ModelMetadataEvent( $type:String, $vmm:VoxelModelMetadata, $itemGuid:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false )
 		{
 			super( $type, $bubbles, $cancellable );
 			_vmm = $vmm;
+			_itemGuid = $itemGuid;
 		}
 		
 		public override function clone():Event
 		{
-			return new ModelMetadataEvent(type, _vmm, bubbles, cancelable);
+			return new ModelMetadataEvent(type, _vmm, _itemGuid, bubbles, cancelable);
 		}
 	   
 		public override function toString():String
 		{
-			return formatToString("ModelMetadataEvent", "bubbles", "cancelable") + " VoxelModelMetadata: " + _vmm.toString();
+			return formatToString("ModelMetadataEvent", "bubbles", "cancelable") + " VoxelModelMetadata: " + _vmm.toString() + "  itemGuid: " + _itemGuid;
 		}
 		
 		public function get vmm():VoxelModelMetadata 
 		{
 			return _vmm;
+		}
+		
+		public function get itemGuid():String 
+		{
+			return _itemGuid;
 		}
 		
 		
