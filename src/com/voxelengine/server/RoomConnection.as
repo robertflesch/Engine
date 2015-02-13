@@ -1,4 +1,11 @@
-﻿package com.voxelengine.server {
+﻿/*==============================================================================
+  Copyright 2011-2015 Robert Flesch
+  All rights reserved.  This product contains computer programs, screen
+  displays and printed documentation which are original works of
+  authorship protected under United States Copyright Act.
+  Unauthorized reproduction, translation, or display is prohibited.
+==============================================================================*/
+package com.voxelengine.server {
 
 	import flash.geom.Vector3D;
 	import playerio.Connection;
@@ -85,7 +92,7 @@
 		
 		static private function sourceMovementEvent( event:ModelEvent ):void
 		{
-			//trace("EventHandler.handleMovementEvent - Received move event: " + event)
+			//trace("RoomConnection.handleMovementEvent - Received move event: " + event)
 			var msg:Message = _connection.createMessage( MOVE_MESSAGE );
 			msg.add( Network.userId );
 			msg.add( event.position.x, event.position.y, event.position.z );
@@ -128,7 +135,7 @@
 		
 		static private function addMeMessage(m:Message):void
 		{
-			Log.out("EventHandler.addMeMessage - avatar for :" + m, Log.DEBUG );
+			Log.out("RoomConnection.addMeMessage - avatar for :" + m, Log.DEBUG );
 			createAvatar( m.getString(1) );
 		}
 		
@@ -139,7 +146,7 @@
 			ii.guid = "Player";
 			//ii.name = userid;
 			ModelLoader.load( ii );
-			Log.out("EventHandler.createPlayer - create player model for :" + userid, Log.DEBUG );
+			Log.out("RoomConnection.createPlayer - create player model for :" + userid, Log.DEBUG );
 		}
 		
 		static private function createAvatar( userid:String ):void
@@ -149,15 +156,15 @@
 			ii.guid = "Player"; // Avatar
 			//ii.name = userid;
 			ModelLoader.load( ii );
-			Log.out("EventHandler.createAvatar - create avatar for :" + userid, Log.DEBUG );
+			Log.out("RoomConnection.createAvatar - create avatar for :" + userid, Log.DEBUG );
 		}
 		
 		static private function userJoinedMessage( $m:Message, $userid:String):void
 		{
-			//trace("EventHandler.userJoinedMessage - Player with the userid", userid, "just joined the room -- Network.userId: " + Network.userId );
+			//trace("RoomConnection.userJoinedMessage - Player with the userid", userid, "just joined the room -- Network.userId: " + Network.userId );
 			if ( Network.userId != $userid )
 			{
-				Log.out("EventHandler.userJoinedMessage - ANOTHER PLAYER LOGGED ON", Log.DEBUG );
+				Log.out("RoomConnection.userJoinedMessage - ANOTHER PLAYER LOGGED ON", Log.DEBUG );
 				createPlayer( $userid );
 				
 				var addMe:Message = _connection.createMessage( ADD_ME );
@@ -176,16 +183,16 @@
 			else 
 			{
 				// This is ME!
-				Log.out("EventHandler.userJoinedMessage - Recieved message that I logged on " + $userid, Log.DEBUG );	
+				Log.out("RoomConnection.userJoinedMessage - Recieved message that I logged on " + $userid, Log.DEBUG );	
 				if ( !Globals.player ) {
-					Log.out("EventHandler.userJoinedMessage - NO player object creating new one " + $userid, Log.DEBUG );	
+					Log.out("RoomConnection.userJoinedMessage - NO player object creating new one " + $userid, Log.DEBUG );	
 					Globals.createPlayer();
 				}
 						//Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
 					//if ( false == Globals.createPlayer() )
 						//Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
 				else	
-					Log.out("EventHandler.userJoinedMessage - MY GHOST IS ALREADY ON!!!" + $userid, Log.DEBUG );	
+					Log.out("RoomConnection.userJoinedMessage - MY GHOST IS ALREADY ON!!!" + $userid, Log.DEBUG );	
 			}
 		}
 		
@@ -198,7 +205,7 @@
 		{
 			var userid:String = m.getString(0);
 			if ( Network.userId != userid ) {
-				//trace("EventHandler.handleMoveMessage - Received move message", m);
+				//trace("RoomConnection.handleMoveMessage - Received move message", m);
 				var am:Avatar = Globals.getModelInstance( userid ) as Avatar;
 				if ( am )
 				{
@@ -207,7 +214,7 @@
 				}
 			}
 			//else	
-			//	trace("EventHandler.handleMoveMessage - Ignoring move messages for self")
+			//	trace("RoomConnection.handleMoveMessage - Ignoring move messages for self")
 		}
 	}	
 }
