@@ -126,7 +126,7 @@ public class Inventory
 		}
 		else {
 			_voxels.addTestData();
-			_models.addTestData();
+//			_models.addTestData();
 		}
 	}
 	

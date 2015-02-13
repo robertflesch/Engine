@@ -127,9 +127,12 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			_count--;				
 			if ( 0 == _count )
 			{
-				Log.out( "LoadModelFromBigDB.successHandler - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _guid, Log.DEBUG );
+				Log.out( "LoadModelFromBigDB.finish - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _guid, Log.DEBUG );
 				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 			}
+			else
+				Log.out( "LoadModelFromBigDB.finish - MODEL LOADED - vm: " + _guid + "  this many left: " + _count, Log.DEBUG );
+			
 			
 			_vmmBase = null;
 			_guidTemplate = null;

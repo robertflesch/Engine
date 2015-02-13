@@ -56,11 +56,7 @@ package com.voxelengine.GUI
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize );
 			
-			var loadingTimer:Timer = null;
-			if ( Globals.g_debug )
-				loadingTimer = new Timer( 100, 1 );
-			else
-				loadingTimer = new Timer( 500, 1 );
+			var loadingTimer:Timer = new Timer( 500, 1 );
 			loadingTimer.addEventListener(TimerEvent.TIMER, onSplashLoaded );
 			loadingTimer.start();
 		} 
@@ -79,7 +75,7 @@ package com.voxelengine.GUI
 
 		private function onLoadingComplete( le:LoadingEvent ):void
 		{
-			//Log.out( "WindowSplash.onLoadingComplete" );
+			Log.out( "WindowSplash.onLoadingComplete", Log.WARN );
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			if ( WindowSplash.isActive )
 			{

@@ -85,7 +85,7 @@ package com.voxelengine.worldmodel.models
 		protected var 	_selected:Boolean 				= false; // INSTANCE NOT EXPORTED
 		private var 	_onSolidGround:Boolean			= false; // INSTANCE NOT EXPORTED
 		private var 	_keyboardControl:Boolean		= false; // INSTANCE NOT EXPORTED
-		private var 	_dead:Boolean 					= false; // INSTANCE NOT EXPORTED
+		protected var 	_dead:Boolean 					= false; // INSTANCE NOT EXPORTED
 		
 		private var 	_usesGravity:Boolean 			= false; // Should be exported/ move to instance
 		private var 	_visible:Boolean 				= true;  // Should be exported/ move to instance
@@ -672,6 +672,9 @@ package com.voxelengine.worldmodel.models
 		
 		public function internal_initialize($context:Context3D):void
 		{
+			if (!_modelInfo)
+				return;
+				//throw new Error("VoxelModel.internal_initialize - modelInfo not found: " + instanceInfo.guid);
 			
 			//Log.out( "VoxelModel.internal_initialize - enter - instanceGuid: " + instanceInfo.guid );					
 			_timer = getTimer();
@@ -680,8 +683,6 @@ package com.voxelengine.worldmodel.models
 			
 			createShaders($context);
 			
-			if (!_modelInfo)
-				throw new Error("VoxelModel.internal_initialize - modelInfo not found: " + instanceInfo.guid);
 			
 			// idea here was if I already have it loaded, why bother to load it again from disk.
 			// sort of works, but I never see the model,
@@ -736,7 +737,7 @@ package com.voxelengine.worldmodel.models
 			//Log.out( "VoxelModel.set_camera_data - setting view offset to : " + -max + ", " + -max + ", " + -max + ", " );
 		}
 		
-		private function initialize_root_oxel(grainSize:int):void
+		public function initialize_root_oxel(grainSize:int):void
 		{
 			try {
 			var gc:GrainCursor = GrainCursorPool.poolGet(grainSize);

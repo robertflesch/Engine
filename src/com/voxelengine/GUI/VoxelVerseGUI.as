@@ -329,10 +329,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		//Log.out( "VVGui.onModelLoadingComplete" );
 		Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 		addKeyboardListeners( event );
-		if ( Globals.g_debug )
-			new WindowLogin( "robertflesch@yahoo.com", "redparrot" );
-		else	
-			new WindowLogin( "", "" );
+		new WindowLogin( "", "" );
 	}
 	
 	private function onKeyPressed( e : KeyboardEvent) : void {
@@ -346,7 +343,8 @@ public class VoxelVerseGUI extends EventDispatcher
 		if ( !Log.showing )
 		{
 			if ( Keyboard.T == e.keyCode )
-				Globals.player.torchToggle();
+				if ( Globals.player )
+					Globals.player.torchToggle();
 				
 			if ( Keyboard.F11 == e.keyCode )
 				Globals.g_renderer.screenShot( true );

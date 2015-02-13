@@ -107,7 +107,7 @@ public class InventoryPanelModel extends VVContainer
 		box.x = count * MODEL_IMAGE_WIDTH;
 		pc.addElement( box );
 		//eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
-		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack() } );
+		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		count++;
 
 		for ( var key:String in results ) {	
@@ -134,6 +134,7 @@ public class InventoryPanelModel extends VVContainer
 	
 	static private function createNewObjectIPM():void {
 		new WindowModelChoice();
+		
 	}
 	
 	private function dropMaterial(e:DnDEvent):void 

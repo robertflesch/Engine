@@ -48,6 +48,14 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
  					vm.complete = true;
 					vm.calculateCenter();
 
+					if ( Globals.online ) {
+						vm.metadata.initialize( "GeneratedObject-" + int(Math.random() * 10000) );
+						vm.instanceInfo.guid = vm.metadata.guid;
+						vm.modelInfo.biomes.layers[0].replaceData( vm.metadata.guid );
+						Globals.g_regionManager.currentRegion.changed = true;
+						vm.changed = true;
+					}
+						
 					if ( vm is Player )
 					{
 //						Globals.player = vm as Player;
@@ -80,6 +88,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _guid );
 				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 			}
+			
 			
 			super.complete(); // This MUST be called for tasks to continue
 		}

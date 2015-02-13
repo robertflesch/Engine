@@ -36,6 +36,7 @@ import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.scripts.Script;
 import com.voxelengine.worldmodel.weapons.Gun;
 import com.voxelengine.worldmodel.weapons.Bomb;
 
@@ -52,9 +53,9 @@ public class Player extends Avatar
 	static private var  	STEP_UP_MAX:int 			= 16;
 		
 	public function Player( instanceInfo:InstanceInfo ) { 
-		Log.out( "Player.contruct guid: " + instanceInfo.guid + "  --------------------------------------------------------------------------------------------------------------------" );
+		Log.out( "Player.construct guid: " + instanceInfo.guid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super( instanceInfo );
-		
+		Globals.player = this;
 	}
 	
 	override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
@@ -63,7 +64,33 @@ public class Player extends Avatar
 		instanceInfo.usesCollision = true;
 		clipVelocityFactor = AVATAR_CLIP_FACTOR;
 		//metadata.modify = false;
+		addEventHandlers();
 		
+		takeControl( null );
+		
+		//_ct.markersAdd();
+		
+		torchToggle();
+	}
+	
+	override public function set dead(val:Boolean):void 					{ 
+		_dead = val; 
+		
+		if ( Globals.controlledModel && Globals.controlledModel == this )
+			loseControl( Globals.player );
+			
+		if (0 < instanceInfo.scripts.length)
+		{
+			for each (var script:Script in instanceInfo.scripts)
+			{
+				script.instanceGuid = instanceInfo.guid;
+			}
+		}
+		
+		removeEventHandlers();
+	}
+	
+	private function addEventHandlers():void {
 		Globals.g_app.addEventListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		
 		Globals.g_app.addEventListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
@@ -75,12 +102,20 @@ public class Player extends Avatar
 		
 		Globals.g_app.addEventListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
 		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, onRegionLoad );
+	}
+
+	private function removeEventHandlers():void {
+		Globals.g_app.removeEventListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		
-		takeControl( null );
+		Globals.g_app.removeEventListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
+		Globals.g_app.removeEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		
-		//_ct.markersAdd();
+		Globals.g_app.removeEventListener( LoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
+		Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
+		Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
-		torchToggle();
+		Globals.g_app.removeEventListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
+		Globals.g_app.removeEventListener( RegionEvent.REGION_LOAD, onRegionLoad );
 	}
 	
 	private function onLogin( $event:LoginEvent ):void {
@@ -92,7 +127,10 @@ public class Player extends Avatar
 	private function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
 		
 		if ( $dbo ) {
-			Globals.player = null;
+			if ( Globals.player ) {
+				Globals.player.dead = true;
+				Globals.player = null;
+			}
 			if ( null == $dbo.modelGuid ) {
 				// Assign the player the default avatar
 				$dbo.modelGuid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
@@ -100,7 +138,10 @@ public class Player extends Avatar
 				var userName:String = $dbo.key.substring( 6 );
 				var firstChar:String = userName.substr(0, 1); 
 				var restOfString:String = userName.substr(1, userName.length); 
-				$dbo.userName = firstChar.toUpperCase() + restOfString.toLowerCase(); 
+				$dbo.userName = firstChar.toUpperCase() + restOfString.toLowerCase();
+				$dbo.description = "New Player Avatar";
+				$dbo.modifiedDate = new Date();
+				$dbo.createdDate = new Date();
 				$dbo.save();
 				
 				// now assign a starting region
@@ -109,6 +150,11 @@ public class Player extends Avatar
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			instanceInfo.grainSize = 4;
 			instanceInfo.guid = $dbo.modelGuid;
+			metadata.guid = $dbo.modelGuid;
+			metadata.name = $dbo.userName;
+			metadata.owner = Network.userId;
+			metadata.modifiedDate =	$dbo.modifiedDate;
+			metadata.createdDate = $dbo.createdDate;
 			ModelLoader.load( instanceInfo );
 			var inv:Inventory = InventoryManager.objectInventoryGet( Network.userId );
 		}
@@ -352,7 +398,6 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		calculateCenter();
 		if ( Globals.player )
 			Globals.player.loseControl( null );
-		Globals.player = this;
 		Globals.player.takeControl( null );
 		//Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		// TODO  - this forces inventory load, should I let it load lazily?

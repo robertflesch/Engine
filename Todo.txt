@@ -2,6 +2,8 @@ https://gamesnet.yahoo.net/documentation/tutorials/flashcombopackage
 https://www.airpair.com/aws/posts/building-a-scalable-web-app-on-amazon-web-services-p1?wed
 http://blog.worddata.com/app-store-optimization/app-development-app-marketing-tools/
 http://venturebeat.com/2015/01/14/zuckerbergs-3-predictions-for-what-social-networks-will-look-like-in-10-years/
+http://cdixon.org/2010/01/03/the-next-big-thing-will-start-out-looking-like-a-toy/
+http://fourhourworkweek.com/2012/12/18/hacking-kickstarter-how-to-raise-100000-in-10-days-includes-successful-templates-e-mails-etc/
 
 cr403986537
 
@@ -149,9 +151,11 @@ located in lower cost and area with tax breaks for game dev
 licenseing opportunities
 Designed from start to be mobile ready
 Emerging market space.
+Emergent behavior
 Data driven design
+Reactive Design
 Browser based
-International market possibilities
+Written with localization build in.
 Encourages user driven content
 
 Weaknesses:
@@ -186,6 +190,7 @@ http://venturebeat.com/2014/09/16/is-mindfulness-and-less-stress-worth-299-the-m
 http://gamasutra.com/blogs/MariosMouratidis/20141001/226838/Indie_Game_Marketing_Guide_Part_1__How_to_create_Landing_Pages.php
 http://techcrunch.com/2014/09/17/indiegogo-forever-funding/
 http://www.redblobgames.com/pathfinding/a-star/introduction.html
+https://news.ycombinator.com/item?id=8997844
 
 machine learning and vectors math
 http://metacademy.org/roadmaps/cjrd/level-up-your-ml

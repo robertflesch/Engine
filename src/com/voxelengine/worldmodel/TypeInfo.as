@@ -73,7 +73,9 @@ package com.voxelengine.worldmodel
 			else if ( type is String )
 			{
 				var typeString:String = type.toUpperCase();
-				 return typeInfoByName[ typeString ].type;
+				var ti:TypeInfo = typeInfoByName[ typeString ];
+				if ( ti ) 
+					return ti.type;
 				//for ( var i:int = TypeInfo.MIN_TYPE_INFO; i < TypeInfo.MAX_TYPE_INFO; i++ )
 				//{
 					//

@@ -7,6 +7,7 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import com.voxelengine.server.Network;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.JPEGEncoderOptions;
@@ -90,6 +91,25 @@ package com.voxelengine.worldmodel.models
 			return newVmm;
 		}
 		*/
+		public function initialize( $name:String, $description:String = null ):void {
+			guid 			= Globals.getUID();
+			name 			= $name
+			description 	= $description ? $description: $name;
+			owner 			= Network.userId;
+			image 			= null;
+			data			= null;
+			
+			_dbo			= null;
+			createdDate		= new Date();
+			modifiedDate	= new Date();
+			template		= false
+			templateGuid	= null
+			copy			= true;
+			copyCount		= -1;
+			modify			= true;
+			transfer		= true;
+		}
+		
 		public function createInstanceOfTemplate():VoxelModelMetadata {
 			
 			var newVmm:VoxelModelMetadata = new VoxelModelMetadata();	

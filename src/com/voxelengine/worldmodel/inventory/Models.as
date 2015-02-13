@@ -123,7 +123,6 @@ public class Models
 	
 	public function addTestData():void {
 		_items["DC6055B8-13A7-C598-2D46-6B78A23669D2"] = new SecureInt( 99 );
-		_items["INVALID"] = new SecureInt( 666 );
 		changed = true;
 	}
 	

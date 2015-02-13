@@ -1,7 +1,11 @@
 
 package com.voxelengine.GUI
 {
+	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.worldmodel.models.ModelLoader;
+	import com.voxelengine.worldmodel.models.ModelManager;
+	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.accessibility.Accessibility;
 	import flash.geom.Vector3D;
@@ -18,7 +22,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	
-	public class WindowModelChoice extends ModalPopup
+	public class WindowModelChoice extends VVPopup
 	{
 		private var _rbGroup:RadioButtonGroup = null;
 		private var _cbSize:ComboBox;
@@ -80,12 +84,7 @@ package com.voxelengine.GUI
 			eventCollector.addEvent( button, UIMouseEvent.CLICK, create );
 			addElement( button );
 			
-			
-//			_modalObj = new ModalObject( this );
-//			_modalObj.display();
 			display();
-			
-			addEventListener(UIOEvent.REMOVED, onRemoved );
         }
 		
 		private function create( e:UIMouseEvent ):void
@@ -133,53 +132,19 @@ package com.voxelengine.GUI
 			ii.type = type;
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75 - (1<<size)/2 );
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-			ModelLoader.load( ii );
-			//_modalObj.remove();
+			Globals.g_app.addEventListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
+			var vm:VoxelModel = new VoxelModel( ii );
+			vm.metadata = new VoxelModelMetadata();
+			Globals.modelAdd( vm );
+			new WindowModelDetail( vm );
 		}
-
-		/*
-		private function createWindow( id:int ):void
+		
+		private function modelDetailChanged(e:ModelEvent):void 
 		{
-			var alert:Alert;
-			switch ( id )
-			{
-				case 0: // My Models
-					alert = new Alert( "Not implemented" );
-					break;
-				case 1: // All Models
-					alert = new Alert( "Not implemented" );
-					break;
-				case 2: // From Cube
-					var ii:InstanceInfo = new InstanceInfo();
-					ii.guid = "GenerateCube";
-					ii.name = "New Object";
-					// preload the modelInfo for the GenerateCube
-					Globals.modelInfoPreload( ii.guid );
-					_modalObj.remove();
-					new WindowNewModelGenerateCube( ii );
-					return;
-					break;
-				case 3: // From Model Template
-					alert = new Alert( "Not implemented" );
-					break;
-				case 4: // New Model Template
-					new WindowModelTemplate( new ModelInfo() );
-					break;
-			}
-			if ( alert )
-				alert.display();
-				
-			_modalObj.remove();
-		}
-		*/
-		override protected function onRemoved( event:UIOEvent ):void
- 		{
-			super.onRemoved( event );
-			removeEventListener(UIOEvent.REMOVED, onRemoved );
-			//if ( _modalObj ) {
-				//_modalObj.remove();
-				//_modalObj = null;
-			//}
+			Globals.g_app.removeEventListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
+			// now I want to apply the script to the oxels in the vm.
+			var vm:VoxelModel = Globals.getModelInstance( e.instanceGuid );
+			ModelLoader.load( vm.instanceInfo );
 		}
   }
 }

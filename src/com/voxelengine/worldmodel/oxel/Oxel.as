@@ -1259,7 +1259,14 @@ package com.voxelengine.worldmodel.oxel
 				_lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
 				if ( _lighting.lightHas( Lighting.DEFAULT_LIGHT_ID ) ) {
 					var li:LightInfo = _lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-					var rootAttn:uint = root_get()._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg
+					// break down for debugging
+					//var rootAttn:uint = root_get()._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg
+					var rootAttn:uint = Lighting.defaultBaseLightAttn
+					var root:Oxel = root_get();
+					if ( root && root._lighting )
+						rootAttn = root._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg
+					else
+						Log.out( "Oxel.quadAmbient - root or root lightig not found", Log.WARN );
 					li.setAll( rootAttn );
 				}
 				_lighting.materialFallOffFactor = $ti.lightInfo.fallOffFactor;

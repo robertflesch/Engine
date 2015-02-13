@@ -19,6 +19,5 @@
 		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
 			super.init( $mi, $vmm );
 		}
-		
 	}
 }

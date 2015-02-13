@@ -7,6 +7,8 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.Globals;
+import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.MetadataManager;
@@ -19,10 +21,14 @@ import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 	 * it then removes its listener, which should cause it be to be garbage collected.
 	 */
 public class ModelMaker {
+	static public var _makerCount:int;
+	
 	private var _ii:InstanceInfo;
+	
 	public function ModelMaker( $ii:InstanceInfo ) {
 		_ii = $ii;
 		MetadataManager.addListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, makeMe );		
+		_makerCount++;
 	}
 	
 	private function makeMe(e:ModelMetadataEvent):void 
@@ -31,7 +37,11 @@ public class ModelMaker {
 			MetadataManager.removeListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, makeMe );		
 			var vmm:VoxelModelMetadata = e.vmm;
 			ModelLoader.loadFromManifestByteArrayNew( _ii, vmm );
+			_makerCount--;
 		}
+		if ( 0 == _makerCount )
+			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
+		
 	}
 }	
 }

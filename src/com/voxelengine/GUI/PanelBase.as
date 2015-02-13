@@ -43,7 +43,7 @@ package com.voxelengine.GUI
 		
 		// Override if additional clean up is needed
 		public function close():void {
-			Log.out( "PanelBase.close for: " + this, Log.WARN );
+			//Log.out( "PanelBase.close for: " + this, Log.WARN );
 		}
 	}
 }

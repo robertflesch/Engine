@@ -63,6 +63,7 @@ public class BoxInventory extends VVBox
 		switch ( $item.objectType ) {
 		case ObjectInfo.OBJECTINFO_EMPTY:
 			backgroundTexture = "assets/textures/blank.png";
+			setHelp( "" );			
 			break;
 		case ObjectInfo.OBJECTINFO_MODEL:
 			with ( $item as ObjectModel ) {
@@ -85,10 +86,12 @@ public class BoxInventory extends VVBox
 		case ObjectInfo.OBJECTINFO_ACTION:
 			var oa:ObjectAction = $item as ObjectAction;
 			backgroundTexture = "assets/textures/" + oa.image;
+			setHelp( oa.name );			
 			break;
 		case ObjectInfo.OBJECTINFO_TOOL:
 			var ot:ObjectTool = $item as ObjectTool;
 			backgroundTexture = "assets/textures/" + ot.image;
+			setHelp( ot.name );			
 			break;
 		case ObjectInfo.OBJECTINFO_VOXEL:
 		default:
@@ -126,6 +129,7 @@ public class BoxInventory extends VVBox
 			$vmm.image = drawScaled( bmpd, bmpd.width, bmpd.height );
 		}
 		
+		setHelp( $vmm.name );			
 		backgroundTexture = $vmm.image;
 	}
 	

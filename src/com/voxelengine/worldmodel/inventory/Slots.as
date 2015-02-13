@@ -111,8 +111,8 @@ public class Slots
 		initializeSlots();
 		Log.out( "Slots.addSlotDefaultData - Loading default data into slots" , Log.WARN );
 		
-		var pickItem:ObjectTool = new ObjectTool( "295D920F-6363-E3A1-9AAB-91125BBEAA95", "pickToolSlots", "pick.png", "pick" );
-		_items[0] = pickItem;
+//		var pickItem:ObjectTool = new ObjectTool( "295D920F-6363-E3A1-9AAB-91125BBEAA95", "pickToolSlots", "pick.png", "pick" );
+//		_items[0] = pickItem;
 		
 		var noneItem:ObjectAction = new ObjectAction( "noneSlots", "none.png", "Do nothing" );
 		_items[1] = noneItem;

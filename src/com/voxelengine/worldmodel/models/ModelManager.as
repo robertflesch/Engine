@@ -893,6 +893,8 @@ package com.voxelengine.worldmodel.models
 			var modelList:Vector.<VoxelModel> = new Vector.<VoxelModel>;
 			for each ( var collideCandidate:VoxelModel in _modelInstances )
 			{
+				if ( collideCandidate is Avatar )
+					continue;
 				// I suspect there is a way faster way to eliminate models that are far away.
 				// TODO - optimize RSF
 				if ( collideCandidate && collideCandidate.complete && collideCandidate != vm )

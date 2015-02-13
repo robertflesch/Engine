@@ -74,7 +74,7 @@ package com.voxelengine.server
 			
 			infoPanel.addElement( new Spacer( width, 10 ) );
 			
-			var password:String = _userInfo.data.password ?  _userInfo.data.password : "";
+			var password:String = _userInfo.data.password ?  _userInfo.data.password : $password;
 			_passwordInput = new LabelInput( " Password", password, width );
 			_passwordInput.labelControl.width = 80;
 			infoPanel.addElement( _passwordInput );

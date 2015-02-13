@@ -57,9 +57,11 @@ package com.voxelengine.worldmodel.biomes
 			var taskGroup:TaskGroup = new TaskGroup("Generate Model for " + guid, 2);
         
 			// This loads the tasks into the LandscapeTaskQueue
-			var task:ITask = null;
-			for each ( var layer:LayerInfo in layers ) 
+			var task:ITask;
+			var layer:LayerInfo
+			for ( var i:int; i < layers.length; i++ ) 
 			{
+				layer = layers[i];
 				// instanceInfo can override type
 				if ( -1 != instanceInfo.type )
 					layer.type = instanceInfo.type;
@@ -70,7 +72,23 @@ package com.voxelengine.worldmodel.biomes
 				//Log.out( "Biomes.add_to_task_controller - creating task: " + layer.task );
 				taskGroup.addTask(task);
 				task = null;
+				if ( layer.functionName && ( ( layer.functionName != "LoadModelFromIVM" ) || ( layer.functionName != "LoadModelFromBigDB" ) ) )
+					layers[i] = null;
 			}
+			
+			var newLayers:Vector.<LayerInfo> = new Vector.<LayerInfo>;
+			for each ( var layer1:LayerInfo in layers ) 
+			{
+				if ( null != layer1 ) {
+					newLayers.push( layer1 );
+				}
+			}
+			if ( 0 == newLayers.length && Globals.online ) {
+				var loadingLayer:LayerInfo = new LayerInfo( "LoadModelFromBigDB", "NEEDS TO BE UPDATED" ); 
+				newLayers.push( loadingLayer );
+			}
+			_layers = null;
+			_layers = newLayers;
 
 			//task =  new OutlineBoundries( guid, null );
 			//taskGroup.addTask(task);
