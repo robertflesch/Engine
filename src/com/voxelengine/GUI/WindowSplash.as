@@ -1,10 +1,17 @@
-
+/*==============================================================================
+  Copyright 2011-2015 Robert Flesch
+  All rights reserved.  This product contains computer programs, screen
+  displays and printed documentation which are original works of
+  authorship protected under United States Copyright Act.
+  Unauthorized reproduction, translation, or display is prohibited.
+==============================================================================*/
 package com.voxelengine.GUI
 {
+	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.worldmodel.RegionManager;
+	import flash.display.Bitmap;
 	import com.voxelengine.events.LoadingEvent;
-	import flash.events.TimerEvent;
 	import flash.events.Event;
-	import flash.utils.Timer;
 	
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
@@ -25,12 +32,18 @@ package com.voxelengine.GUI
 		}
 		
 		private var _outline:Image;
+		private var _splashImage:Bitmap;
+		[Embed(source='../../../../../Resources/bin/assets/textures/splash.png')]
+		private var _splashImageClass:Class;
 
+		
 		public function WindowSplash():void 
 		{ 
 			super( Globals.g_renderer.width, Globals.g_renderer.height );
 
-			_outline = new Image( Globals.appPath + "assets/textures/splash.png");
+			_splashImage = (new _splashImageClass() as Bitmap);
+			_outline = new Image( _splashImage );
+			
 			if ( Globals.g_debug )
 			{
 				// this scale the window down, so we can see it, but it shows we are in debug
@@ -53,12 +66,11 @@ package com.voxelengine.GUI
 				display( 0, 0 );
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
-			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+			RegionManager.addListener( RegionEvent.REGION_LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize );
 			
-			var loadingTimer:Timer = new Timer( 500, 1 );
-			loadingTimer.addEventListener(TimerEvent.TIMER, onSplashLoaded );
-			loadingTimer.start();
+			VoxelVerseGUI.currentInstance.hideGUI()
+			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.SPLASH_LOAD_COMPLETE ) );			
 		} 
 		
         protected function onResize(event:Event):void
@@ -67,17 +79,10 @@ package com.voxelengine.GUI
 			_outline.scaleY = Globals.g_renderer.height/592;
 		}
 		
-		protected function onSplashLoaded(event:TimerEvent):void
+		private function onLoadingComplete( le:RegionEvent ):void
 		{
-			// We want this to happen before everyone else knows we are done
-			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.SPLASH_LOAD_COMPLETE ) );			
-		}
-
-		private function onLoadingComplete( le:LoadingEvent ):void
-		{
-			Log.out( "WindowSplash.onLoadingComplete", Log.WARN );
-			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
-			if ( WindowSplash.isActive )
+			Globals.g_app.removeEventListener( RegionEvent.REGION_LOAD_COMPLETE, onLoadingComplete );
+			if ( WindowSplash.isActive && Globals.online )
 			{
 				WindowSplash._s_currentInstance.remove();
 				WindowSplash._s_currentInstance = null;
@@ -87,9 +92,9 @@ package com.voxelengine.GUI
 		// Window events
 		private function onRemoved( event:UIOEvent ):void
  		{
-			//Log.out( "WindowSplash.onRemoved" );
 			removeEventListener(UIOEvent.REMOVED, onRemoved );
 			_s_currentInstance = null;
+			VoxelVerseGUI.currentInstance.showGUI();
 		}
 
 	}

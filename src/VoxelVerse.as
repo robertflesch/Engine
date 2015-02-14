@@ -41,11 +41,11 @@ package {
 	public class VoxelVerse extends Sprite 
 	{
 		private var _timePrevious:int = getTimer();
-		private var _configManager:ConfigManager = null;
-		private var _poolManager:PoolManager = null;
+		private var _configManager:ConfigManager;
+		private var _poolManager:PoolManager;
 		
-		private var _showConsole:Boolean = false;
-		private var _toolOrBlockEnabled: Boolean = false;
+		private var _showConsole:Boolean;
+		private var _toolOrBlockEnabled:Boolean;
 		private var _editing: Boolean = true;
 		private var _displayGuid:String;
 		
@@ -120,21 +120,10 @@ package {
 			
 			addEventListener(LoadingEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
 			
-			Log.out( "VoxelVerse.init add addEventListeners" );
-			stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
-			stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
-			stage.addEventListener(MouseEvent.RIGHT_CLICK, onMouseRightClick);
-			stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, mouseDownRight);
-			stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, mouseUpRight);
-			
-			
-			Log.out( "VoxelVerse.init b4 VoxelVerseGUI.currentInstance.init" );
 			VoxelVerseGUI.currentInstance.init();
 			
-			if ( false == WindowSplash.isActive )
-				WindowSplash.create();
+			WindowSplash.create();
 				
-			Log.out( "VoxelVerse.init exit init" );
             loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
 		}
 		
@@ -147,6 +136,8 @@ package {
 
 		// after the splash and config have been loaded
 		public function onSplashLoaded( event : LoadingEvent ):void	{
+			
+			//Log.out( "VoxelVerse.onSplashLoaded" );
 			// TODO I dont like that some objects are created in globals, others are created here - RSF
 			removeEventListener(LoadingEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
 			
@@ -157,6 +148,13 @@ package {
 			addEventListener(Event.ENTER_FRAME, enterFrame);
 			addEventListener(Event.DEACTIVATE, deactivate);
 			addEventListener(Event.ACTIVATE, activate);
+			
+			//Log.out( "VoxelVerse.onSplashLoaded - stage.addEventListener" );
+			stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+			stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
+			stage.addEventListener(MouseEvent.RIGHT_CLICK, onMouseRightClick);
+			stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, mouseDownRight);
+			stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, mouseUpRight);
 			
 			VoxelVerseGUI.currentInstance.buildGUI();	
 		}
@@ -173,12 +171,12 @@ package {
 			Globals.g_regionManager.update( elapsed );
 			timeUpdate = getTimer() - timeUpdate;
 			
+			if ( showConsole )
+				toggleConsole();
+				
 			var timeRender:int = getTimer();
 			Globals.g_renderer.render();
 			timeRender = getTimer() - timeRender;
-			
-			if ( showConsole )
-				toggleConsole();
 				
 //			if ( 5 < timeRender || 1 < timeUpdate )	
 //				Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed );
