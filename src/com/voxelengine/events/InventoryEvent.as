@@ -16,6 +16,7 @@ import flash.events.Event;
 public class InventoryEvent extends Event
 {
 	static public const INVENTORY_LOADED:String  		= "INVENTORY_LOADED";
+	static public const INVENTORY_UNLOAD_REQUEST:String = "INVENTORY_UNLOAD_REQUEST";
 	static public const INVENTORY_SLOT_REQUEST:String  	= "INVENTORY_SLOT_REQUEST";
 	static public const INVENTORY_SLOT_RESULT:String  	= "INVENTORY_SLOT_RESULT";
 	

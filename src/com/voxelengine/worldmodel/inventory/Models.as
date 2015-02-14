@@ -30,7 +30,6 @@ public class Models
 	public function Models( $networkId:String ) {
 		_networkId = $networkId;
 		
-		//Log.out( "Models.constructor - registering change event for: " + $networkId , Log.WARN );
 		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_CHANGE,			change );
 		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_REQUEST,	count );
 		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_LIST_REQUEST,		types );
@@ -86,9 +85,10 @@ public class Models
 	
 
 	public function change(e:InventoryModelEvent):void {
-		Log.out( "Models.modelsChange This object owned by: " + _networkId + " event container " + e.toString(), Log.WARN );
+		Log.out( "Models.modelsChange This object owned by: " + _networkId + " event container " + e.toString(), Log.DEBUG );
 		
 		if ( e.networkId == _networkId ) {
+			Log.out( "Models.modelsChange - found a model of ours that changed, change count: " + int( e.result ) );
 			var itemGuid:String = e.itemGuid;
 			var changeAmount:int = e.result as int;
 			var modelCount:int
@@ -103,8 +103,6 @@ public class Models
 			InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, _networkId, itemGuid, modelCount ) );
 			changed = true;
 		}
-		else
-			Log.out( "Models.modelsChange - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
 	}
 	
 	public function fromPersistance( $dbo:DatabaseObject ):void {}
@@ -138,23 +136,6 @@ public class Models
 		}
 		changed = false;
 		return $ba; 
-	}
-	
-	public function modelCount(e:InventoryModelEvent):void 
-	{
-		//var modelId:String = e.guid;
-		//var modelCount:int = _models[modelId];
-		//InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, _networkId, modelId, modelCount ) );
-	}
-	
-	public function modelIncrement(e:InventoryModelEvent):void 
-	{
-		
-	}
-	
-	public function modelDecrement(e:InventoryModelEvent):void 
-	{
-		
 	}
 }
 }

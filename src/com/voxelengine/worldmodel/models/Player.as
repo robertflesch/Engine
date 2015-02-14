@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import flash.display3D.Context3D;
@@ -75,7 +76,7 @@ public class Player extends Avatar
 	
 	override public function set dead(val:Boolean):void { 
 		super.dead = val;
-		
+		InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_UNLOAD_REQUEST, _instanceInfo.guid, null ) );
 		removeEventHandlers();
 	}
 	

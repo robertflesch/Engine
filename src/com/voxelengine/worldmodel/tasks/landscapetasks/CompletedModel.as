@@ -42,16 +42,23 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			try
 			{
 				var vm:VoxelModel = getVoxelModel();
-//				var vm:VoxelModel = Globals.getModelInstance( _guid );
 				if ( vm ) {
 //					Log.out( "CompletedModel.start - VoxelModel marked as complete: " + _guid );
  					vm.complete = true;
 					vm.calculateCenter();
 
+					// This is only called when executing a script or series of scripts on an object
 					if ( Globals.online ) {
-						vm.metadata.initialize( "GeneratedObject-" + int(Math.random() * 10000) );
+						// This fills in the metadata with dates and permissions.
+						vm.metadata.initialize( vm.metadata.name, vm.metadata.description ); // "GeneratedObject-" + int(Math.random() * 10000)
+						// now I need to propgate the guid to the instanceInfo and the modelInfo for reloading.
+						// TODO I dont like that this is in 3 different locations, but I dont see a way around it.
 						vm.instanceInfo.guid = vm.metadata.guid;
-						vm.modelInfo.biomes.layers[0].replaceData( vm.metadata.guid );
+						// now update the loader with method and guid
+						var loadingLayer:LayerInfo = new LayerInfo( "LoadModelFromBigDB", vm.metadata.guid ); 
+						vm.modelInfo.biomes.layers[0] = loadingLayer;
+						
+						// mark the region and model as changed so that the info is stored.
 						Globals.g_regionManager.currentRegion.changed = true;
 						vm.changed = true;
 					}

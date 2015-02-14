@@ -54,11 +54,15 @@ public class Inventory
 		_models = new Models( $networkId );
 	}
 	
+	public function unload():void {
+		Log.out( "Inventory.unload - networkId: " + _networkId, Log.WARN );
+	}
+		
 	public function load():void {
 		if ( Globals.online ) {
 			addLoadEvents();
 			Persistance.dispatch( new InventoryPersistanceEvent( InventoryPersistanceEvent.INVENTORY_LOAD_REQUEST, _networkId ) );
-	}
+		}
 	}
 	
 	private function changed():Boolean {

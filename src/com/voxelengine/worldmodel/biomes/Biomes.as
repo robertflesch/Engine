@@ -72,6 +72,7 @@ package com.voxelengine.worldmodel.biomes
 				//Log.out( "Biomes.add_to_task_controller - creating task: " + layer.task );
 				taskGroup.addTask(task);
 				task = null;
+				// If this is loading data leave it along, otherwise erase the layer once it is used.
 				if ( layer.functionName && ( ( layer.functionName != "LoadModelFromIVM" ) || ( layer.functionName != "LoadModelFromBigDB" ) ) )
 					layers[i] = null;
 			}
@@ -82,10 +83,6 @@ package com.voxelengine.worldmodel.biomes
 				if ( null != layer1 ) {
 					newLayers.push( layer1 );
 				}
-			}
-			if ( 0 == newLayers.length && Globals.online ) {
-				var loadingLayer:LayerInfo = new LayerInfo( "LoadModelFromBigDB", "NEEDS TO BE UPDATED" ); 
-				newLayers.push( loadingLayer );
 			}
 			_layers = null;
 			_layers = newLayers;

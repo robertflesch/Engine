@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
+import com.voxelengine.events.InventoryEvent;
 import flash.events.Event;
 import flash.events.EventDispatcher;
 
@@ -34,7 +35,33 @@ public class InventoryManager
 	
 	public static function init():void {
 		// This creates a inventory object for login.
-		objectInventoryGet("player");		
+		objectInventoryGet("player");	
+		addListener( InventoryEvent.INVENTORY_UNLOAD_REQUEST, unloadInventory );
+	}
+	
+	static private function unloadInventory(e:InventoryEvent):void 
+	{
+		var inventory:Inventory = _s_inventoryByGuid[ e.ownerGuid ];
+		if ( inventory ) {
+			var tempArray:Array = [];
+			for each ( var inv:Inventory in _s_inventoryByGuid )
+			{
+				if ( e.ownerGuid == inv.networkId ) {
+					_s_inventoryByGuid[ e.ownerGuid ] = null;
+					inv.unload();
+					// could I just use a delete here, rather then creating new dictionary? See Dictionary class for details - RSF
+				}
+				else
+				{
+					if ( inv )
+						tempArray[inv.networkId] = inv;
+					else
+						Log.out( "InventoryManager.unloadInventory - Null found", Log.ERROR );
+				}
+			}
+			_s_inventoryByGuid = null;
+			_s_inventoryByGuid = tempArray;	
+		}
 	}
 	
 	static public function objectInventoryGet( $ownerGuid:String ):Inventory {
