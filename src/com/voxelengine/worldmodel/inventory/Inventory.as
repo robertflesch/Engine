@@ -56,6 +56,9 @@ public class Inventory
 	
 	public function unload():void {
 		Log.out( "Inventory.unload - networkId: " + _networkId, Log.WARN );
+		_slots.unload();
+		_voxels.unload();
+		_models.unload();
 	}
 		
 	public function load():void {

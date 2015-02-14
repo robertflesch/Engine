@@ -40,6 +40,12 @@ public class Voxels
 		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST,	types );
 	}
 
+	public function unload():void {
+		InventoryManager.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, 		change );
+		InventoryManager.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST,	count );
+		InventoryManager.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST,	types );
+	}
+	
 	// This returns an Array which holds the typeId and the count of those voxels
 	public function types(e:InventoryVoxelEvent):void 
 	{

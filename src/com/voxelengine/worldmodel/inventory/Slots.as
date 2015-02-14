@@ -40,6 +40,10 @@ public class Slots
 		FunctionRegistry.functionAdd( pickToolSlots, "pickToolSlots" );
 	}
 	
+	public function unload():void {
+		InventoryManager.removeListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
+	}
+	
 	public function slotChange(e:InventorySlotEvent):void {
 		Log.out( "SlotsManager.slotChange slot: " + e.slotId + "  item: " + e.item );
 		if ( _items ) {
