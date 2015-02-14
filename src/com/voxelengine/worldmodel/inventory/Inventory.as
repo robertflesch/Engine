@@ -22,7 +22,7 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.server.Persistance;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.ObjectInfo;
+import com.voxelengine.worldmodel.inventory.ObjectInfo;
 
 import com.voxelengine.events.InventoryModelEvent;
 import com.voxelengine.events.InventoryVoxelEvent;

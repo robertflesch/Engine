@@ -1,6 +1,7 @@
 
 package com.voxelengine.GUI
 {
+	import com.voxelengine.worldmodel.RegionManager;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
 	import org.flashapi.collector.EventCollector;
@@ -117,7 +118,7 @@ package com.voxelengine.GUI
 			_s_currentInstance = null;
 			
 			Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.MODEL_MODIFIED, _ii.guid ) );
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_MODIFIED, "" ) );
+			RegionManager.dispatch( new RegionEvent( RegionEvent.REGION_MODIFIED, "" ) );
 		}
 		
 

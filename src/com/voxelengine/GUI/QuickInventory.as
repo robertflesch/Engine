@@ -8,6 +8,9 @@
 
 package com.voxelengine.GUI
 {
+import com.voxelengine.worldmodel.inventory.ObjectGrain;
+import com.voxelengine.worldmodel.inventory.ObjectInfo;
+import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 import flash.display.Sprite;
 import flash.display.DisplayObject;
 import flash.filters.GlowFilter;

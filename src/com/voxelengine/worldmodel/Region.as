@@ -7,7 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-	import com.voxelengine.worldmodel.models.Player;
 	import flash.geom.Vector3D;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
@@ -36,6 +35,7 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.server.PersistRegion;
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.ModelManager;
+	import com.voxelengine.worldmodel.models.Player;
 	
 	//{
 	   //"region":[
@@ -176,13 +176,14 @@ package com.voxelengine.worldmodel
 			Log.out( "Region.onLoadingComplete: regionId: " + guid, Log.DEBUG );
 			_loaded = true;
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+			RegionManager.dispatch( new RegionEvent( RegionEvent.REGION_LOAD_COMPLETE, guid ) );
 		}
 
 		public function unload():void
 		{
 			Log.out( "Region.unloadRegion: " + guid, Log.DEBUG );
 			// Removes anonymous function
-			Globals.g_app.removeEventListener( RegionEvent.REGION_MODIFIED, handleRegionModified );
+			RegionManager.removeListener( RegionEvent.REGION_MODIFIED, handleRegionModified );
 			//Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_ADDED, function( me:ModelEvent ):void { ; } );
 			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_REMOVED, function( me:ModelEvent ):void { ; } );
 			Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
@@ -200,12 +201,12 @@ package com.voxelengine.worldmodel
 		public function load():void
 		{
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
-			Globals.g_app.addEventListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
+			RegionManager.addListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.addEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
-			Globals.g_app.addEventListener( RegionEvent.REGION_MODIFIED, handleRegionModified);
+			RegionManager.addListener( RegionEvent.REGION_MODIFIED, handleRegionModified);
 			
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REGION_LOAD_BEGUN, guid ) );
+			RegionManager.dispatch( new RegionEvent( RegionEvent.REGION_LOAD_BEGUN, guid ) );
 
 			var count:int = ModelLoader.loadRegionObjects(_JSON.region);
 			if ( 0 < count )

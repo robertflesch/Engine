@@ -8,7 +8,7 @@
 package com.voxelengine.worldmodel.inventory {
 	
 import com.voxelengine.worldmodel.models.SecureInt;
-import com.voxelengine.worldmodel.ObjectInfo;
+import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;

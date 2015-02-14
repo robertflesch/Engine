@@ -9,7 +9,7 @@
 package com.voxelengine.GUI
 {
 	import com.voxelengine.events.LoadingEvent;
-	import com.voxelengine.worldmodel.ObjectInfo;
+	import com.voxelengine.worldmodel.inventory.ObjectInfo;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;

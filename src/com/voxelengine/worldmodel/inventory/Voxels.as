@@ -14,7 +14,7 @@ import playerio.DatabaseObject;
 import com.voxelengine.Log;
 import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.ObjectInfo;
+import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import com.voxelengine.worldmodel.models.SecureInt;
 
 public class Voxels

@@ -1266,7 +1266,7 @@ package com.voxelengine.worldmodel.oxel
 					if ( root && root._lighting )
 						rootAttn = root._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg
 					else
-						Log.out( "Oxel.quadAmbient - root or root lightig not found", Log.WARN );
+						Log.out( "Oxel.quadAmbient - root or root lighting not found", Log.WARN );
 					li.setAll( rootAttn );
 				}
 				_lighting.materialFallOffFactor = $ti.lightInfo.fallOffFactor;
@@ -1963,7 +1963,7 @@ package com.voxelengine.worldmodel.oxel
 				else
 					flowInfo = TypeInfo.typeInfo[type].flowInfo.clone();
 			}
-				
+			
 			if ( $stats )
 				vm_initialize( $stats );
 		}

@@ -25,7 +25,8 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.ShipEvent;
-	
+	import com.voxelengine.worldmodel.scripts.Script;
+
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF 
@@ -80,6 +81,17 @@ package com.voxelengine.worldmodel.models
 			_ct = new CollisionTest( this );
 		}
 		
+		override public function set dead(val:Boolean):void { 
+			super.dead = val;
+			
+			if ( Globals.controlledModel && Globals.controlledModel == this )
+				loseControl( Globals.player );
+				
+			Globals.g_app.removeEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent );
+			Globals.g_app.removeEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
+			Globals.g_app.removeEventListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
+			Globals.g_app.removeEventListener( GUIEvent.APP_ACTIVATE, onActivate );
+		}
 
 		protected function onDeactivate( e:GUIEvent ):void 
 		{
@@ -94,10 +106,6 @@ package com.voxelengine.worldmodel.models
 		override public function release():void
 		{
 			super.release();
-			Globals.g_app.removeEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent );
-			Globals.g_app.removeEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
-			Globals.g_app.removeEventListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
-			Globals.g_app.removeEventListener( GUIEvent.APP_ACTIVATE, onActivate );
 			
 		}
 		protected function collisionPointsAdd():void {

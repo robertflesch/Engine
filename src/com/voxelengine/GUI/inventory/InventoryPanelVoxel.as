@@ -8,8 +8,8 @@
 package com.voxelengine.GUI.inventory {
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.models.SecureInt;
-import com.voxelengine.worldmodel.ObjectInfo;
-import com.voxelengine.worldmodel.ObjectVoxel;
+import com.voxelengine.worldmodel.inventory.ObjectInfo;
+import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
 import org.flashapi.swing.containers.UIContainer;

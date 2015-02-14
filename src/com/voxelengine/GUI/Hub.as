@@ -8,6 +8,11 @@
 
 package com.voxelengine.GUI
 {
+import com.voxelengine.worldmodel.inventory.ObjectAction;
+import com.voxelengine.worldmodel.inventory.ObjectGrain;
+import com.voxelengine.worldmodel.inventory.ObjectInfo;
+import com.voxelengine.worldmodel.inventory.ObjectTool;
+import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.events.Event;
@@ -41,9 +46,11 @@ public class Hub extends VVCanvas
 	private var TOOLBAROUTLINE_WIDTH:int = 748;
 	private var TOOLBAROUTLINE_HEIGHT:int = 172;
 	
-	private var _itemInventory:QuickInventory = null;
-	private var _toolSize:QuickInventory = null;
-	private var _shape:ShapeSelector = null;
+	
+	private var _outline:Image;
+	private var _itemInventory:QuickInventory;
+	private var _toolSize:QuickInventory;
+	private var _shape:ShapeSelector;
 	
 	private static var _lastItemSelection:int = -1;
 	private static var _lastGrainSelection:int = -1;
@@ -64,8 +71,9 @@ public class Hub extends VVCanvas
 	
 	private function inventoryLoaded(e:InventoryEvent):void {
 		//Log.out( "Hub.inventoryLoaded - populate from here" , Log.WARN );
-		var outline:Image = new Image( Globals.appPath + "assets/textures/" + "hub.png");
-		addElement( outline );
+		_outline = new Image( Globals.appPath + "assets/textures/" + "hub.png");
+		_outline.visible = false;
+		addElement( _outline );
 		
 		_itemInventory = new QuickInventory();
 		_itemInventory.visible = false;
@@ -138,6 +146,7 @@ public class Hub extends VVCanvas
 	public function show():void
 	{
 		this.visible = true;
+		_outline.visible = true;
 		_itemInventory.visible = true;
 		_toolSize.visible = true;
 		_shape.visible = true;
@@ -149,6 +158,7 @@ public class Hub extends VVCanvas
 	{
 		Globals.g_app.editing = false;
 		this.visible = false;
+		_outline.visible = false;
 		_itemInventory.visible = false;
 		_toolSize.visible = false;
 		_shape.visible = false;

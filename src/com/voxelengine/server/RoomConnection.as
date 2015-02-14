@@ -188,16 +188,16 @@ package com.voxelengine.server {
 					Log.out("RoomConnection.userJoinedMessage - NO player object creating new one " + $userid, Log.DEBUG );	
 					Globals.createPlayer();
 				}
-						//Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
+						//RegionManager.addListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
 					//if ( false == Globals.createPlayer() )
-						//Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
+						//RegionManager.addListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
 				else	
 					Log.out("RoomConnection.userJoinedMessage - MY GHOST IS ALREADY ON!!!" + $userid, Log.DEBUG );	
 			}
 		}
 		
 		//static private function createPlayerAfterRegionLoad( $e:RegionEvent ):void {
-			//Globals.g_app.removeEventListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
+			//RegionManager.removeListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
 			//Globals.createPlayer();
 		//}
 				

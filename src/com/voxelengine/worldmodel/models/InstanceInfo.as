@@ -137,7 +137,7 @@ public class InstanceInfo extends Location	{
 	
 	public function InstanceInfo() 
 	{ 
-		//Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_COMPLETE, onLoadingComplete );
+		//RegionManager.addListener( RegionEvent.REGION_LOAD_COMPLETE, onLoadingComplete );
 		Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 	}
 

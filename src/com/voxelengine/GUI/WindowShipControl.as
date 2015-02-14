@@ -9,6 +9,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.worldmodel.models.Ship;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.models.Engine;
+	import com.voxelengine.worldmodel.RegionManager;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import org.flashapi.swing.*;
@@ -89,7 +90,7 @@ package com.voxelengine.GUI
 
 			display( Globals.g_renderer.width/2 - (width + fudgeFactor)/2, Globals.g_renderer.height - height - 128 );
             Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
-			Globals.g_app.addEventListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
+			RegionManager.addListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 		} 
 		

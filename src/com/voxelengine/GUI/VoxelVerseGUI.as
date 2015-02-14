@@ -51,6 +51,7 @@ import com.voxelengine.server.RoomConnection;
 
 import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.VoxelModel;
+import com.voxelengine.worldmodel.RegionManager;
 //	import com.voxelengine.worldmodel.scripts.FireProjectileScript;
 
 public class VoxelVerseGUI extends EventDispatcher
@@ -260,7 +261,8 @@ public class VoxelVerseGUI extends EventDispatcher
 		}
 	}
 	
-	public function buildGUI():void {
+	public function showGUI():void {
+		trace( "VoxelVerseGUI.showGUI" ); 
 		if ( _built )
 		{
 			if ( _debugMenu )
@@ -270,21 +272,29 @@ public class VoxelVerseGUI extends EventDispatcher
 			if ( _hub )
 				_hub.visible = true;
 			crossHairShow();
-			return;	
 		}
-		
-		_releaseMenu = addReleaseMenu();
-		if ( true == Globals.g_debug )
-			_debugMenu = new WindowDebugMenu();
-		
-		if ( !Globals.g_renderer.hardwareAccelerated )
-			 new WindowNotHardware( "WARNING", "Hardware acceleration is not enabled in your browser, this is happening in Chrome on some machines, try FireFox or Internet Explorer" );
+	}
+	
+	
+	public function buildGUI():void {
+		if ( !_built ) {
+			_releaseMenu = addReleaseMenu();
+			_releaseMenu.visible = false;
+			if ( true == Globals.g_debug ) {
+				_debugMenu = new WindowDebugMenu();
+				_debugMenu.visible = false;
+			}
+			
+			if ( !Globals.g_renderer.hardwareAccelerated )
+				 new WindowNotHardware( "WARNING", "Hardware acceleration is not enabled in your browser, this is happening in Chrome on some machines, try FireFox or Internet Explorer" );
+			_built = true;
+		}
 	}
 
 	public function init():void {
 		UIManager.initialize( Globals.g_app.stage );
 		UIManager.debugger = new FDTrace();
-		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD_BEGUN, onRegionLoadingComplete );
+		RegionManager.addListener( RegionEvent.REGION_LOAD_BEGUN, onRegionLoadingComplete );
 		Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 		Globals.g_app.addEventListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
 		Globals.g_app.addEventListener( GUIEvent.TOOLBAR_SHOW, guiEventHandler );

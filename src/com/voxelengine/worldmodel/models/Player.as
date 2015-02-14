@@ -36,9 +36,9 @@ import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.scripts.Script;
 import com.voxelengine.worldmodel.weapons.Gun;
 import com.voxelengine.worldmodel.weapons.Bomb;
+import com.voxelengine.worldmodel.RegionManager;
 
 public class Player extends Avatar
 {
@@ -73,19 +73,8 @@ public class Player extends Avatar
 		torchToggle();
 	}
 	
-	override public function set dead(val:Boolean):void 					{ 
-		_dead = val; 
-		
-		if ( Globals.controlledModel && Globals.controlledModel == this )
-			loseControl( Globals.player );
-			
-		if (0 < instanceInfo.scripts.length)
-		{
-			for each (var script:Script in instanceInfo.scripts)
-			{
-				script.instanceGuid = instanceInfo.guid;
-			}
-		}
+	override public function set dead(val:Boolean):void { 
+		super.dead = val;
 		
 		removeEventHandlers();
 	}
@@ -100,8 +89,8 @@ public class Player extends Avatar
 		Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
-		Globals.g_app.addEventListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
-		Globals.g_app.addEventListener( RegionEvent.REGION_LOAD, onRegionLoad );
+		RegionManager.addListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
+		RegionManager.addListener( RegionEvent.REGION_LOAD, onRegionLoad );
 	}
 
 	private function removeEventHandlers():void {
@@ -114,8 +103,8 @@ public class Player extends Avatar
 		Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
-		Globals.g_app.removeEventListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
-		Globals.g_app.removeEventListener( RegionEvent.REGION_LOAD, onRegionLoad );
+		RegionManager.removeListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
+		RegionManager.removeListener( RegionEvent.REGION_LOAD, onRegionLoad );
 	}
 	
 	private function onLogin( $event:LoginEvent ):void {

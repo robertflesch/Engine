@@ -1,5 +1,9 @@
 package com.voxelengine.GUI.inventory {
 
+import com.voxelengine.worldmodel.inventory.FunctionRegistry;
+import com.voxelengine.worldmodel.inventory.ObjectAction;
+import com.voxelengine.worldmodel.inventory.ObjectInfo;
+import com.voxelengine.worldmodel.inventory.ObjectModel;
 import org.flashapi.swing.*
 import org.flashapi.swing.core.UIObject;
 import org.flashapi.swing.event.*;

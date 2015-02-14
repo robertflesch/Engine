@@ -8,11 +8,9 @@
 
 package com.voxelengine.GUI
 {
-	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.worldmodel.ObjectInfo;
-	import com.voxelengine.worldmodel.weapons.Ammo;
-	import com.voxelengine.worldmodel.weapons.Gun;
-	import com.voxelengine.worldmodel.*;
+	import com.voxelengine.worldmodel.inventory.FunctionRegistry;
+	import com.voxelengine.worldmodel.inventory.ObjectAction;
+	import com.voxelengine.worldmodel.inventory.ObjectInfo;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.KeyboardEvent;
@@ -27,8 +25,12 @@ package com.voxelengine.GUI
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.events.GUIEvent;
+	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.worldmodel.*;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.animation.Animation;
+	import com.voxelengine.worldmodel.weapons.Ammo;
+	import com.voxelengine.worldmodel.weapons.Gun;
 
 	public class WindowBeastControl extends ToolBar
 	{

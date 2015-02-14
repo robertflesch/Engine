@@ -31,6 +31,8 @@ package com.voxelengine.events
 		static public const REGION_UNLOAD:String					= "REGION_UNLOAD";
 		// dispatched when a region is modified in the UI
 		static public const REGION_MODIFIED:String					= "REGION_MODIFIED";
+		// tells the region manager this region had finished loading
+		static public const REGION_LOAD_COMPLETE:String				= "REGION_LOAD_COMPLETE";
 
 		private var _guid:String;
 		

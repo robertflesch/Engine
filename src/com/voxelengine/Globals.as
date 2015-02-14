@@ -187,9 +187,7 @@ package com.voxelengine {
 		
 		private static var g_player:Player = null;
 		public static function get player():Player { return g_player; }
-		public static function set player( val:Player ):void { 
-			trace( "Globals.player set to : " + player );
-			g_player = val; }
+		public static function set player( val:Player ):void { g_player = val; }
 		
 		private static var g_controlledModel:VoxelModel = null;
 		public static function get controlledModel():VoxelModel { return g_controlledModel; }

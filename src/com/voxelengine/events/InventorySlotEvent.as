@@ -7,7 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.events
 {
-import com.voxelengine.worldmodel.ObjectInfo;
+import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import flash.events.Event;
 
 /**

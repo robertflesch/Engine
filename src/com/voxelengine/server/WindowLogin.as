@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.server
 {
+	import com.voxelengine.GUI.VoxelVerseGUI;
 	import flash.display.Bitmap;
 	import flash.events.KeyboardEvent;
 	import flash.events.Event;
@@ -247,5 +248,11 @@ package com.voxelengine.server
 			
 			remove();
 		}
+		
+		override protected function onRemoved( event:UIOEvent ):void {
+			super.onRemoved( event );
+			VoxelVerseGUI.currentInstance.showGUI();
+		}
+
 	}
 }

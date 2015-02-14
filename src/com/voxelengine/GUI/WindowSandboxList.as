@@ -9,7 +9,6 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.VVWindowEvent;
-import com.voxelengine.worldmodel.RegionManager;
 import flash.events.Event;
 
 import org.flashapi.collector.EventCollector;
@@ -27,6 +26,7 @@ import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.RegionLoadedEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.RegionManager;
 
 public class WindowSandboxList extends VVPopup
 {
@@ -138,7 +138,7 @@ public class WindowSandboxList extends VVPopup
 			}
 			
 			if ( li.data )
-				Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REQUEST_JOIN, li.data ) ); 
+				RegionManager.dispatch( new RegionEvent( RegionEvent.REQUEST_JOIN, li.data ) ); 
 			else
 				Log.out( "WindowSandboxList.loadthisRegion - NO REGION GUID FOUND", Log.ERROR );
 		}
@@ -151,16 +151,16 @@ public class WindowSandboxList extends VVPopup
 		Globals.mode = type;
 		if ( Globals.MODE_PRIVATE == type )
 		{
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REQUEST_PRIVATE, "" ) );
+			RegionManager.dispatch( new RegionEvent( RegionEvent.REQUEST_PRIVATE, "" ) );
 		}
 		else if ( Globals.MODE_PUBLIC == type )
 		{
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REQUEST_PUBLIC, "" ) );
+			RegionManager.dispatch( new RegionEvent( RegionEvent.REQUEST_PUBLIC, "" ) );
 		}
 		else
 		{
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REQUEST_PUBLIC, "" ) );
-			Globals.g_app.dispatchEvent( new RegionEvent( RegionEvent.REQUEST_PRIVATE, "" ) );
+			RegionManager.dispatch( new RegionEvent( RegionEvent.REQUEST_PUBLIC, "" ) );
+			RegionManager.dispatch( new RegionEvent( RegionEvent.REQUEST_PRIVATE, "" ) );
 		}
 	}
 

@@ -24,8 +24,8 @@ import com.voxelengine.events.InventoryModelEvent;
 import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.GUI.*;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.*;
-import com.voxelengine.worldmodel.inventory.InventoryManager;
+import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.inventory.*;
 import com.voxelengine.worldmodel.models.MetadataManager;
 import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 

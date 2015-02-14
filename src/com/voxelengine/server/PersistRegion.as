@@ -1,5 +1,6 @@
 ﻿package com.voxelengine.server 
 {
+	import com.voxelengine.worldmodel.RegionManager;
 	import flash.utils.ByteArray;
 	
 	import playerio.BigDB;
@@ -18,8 +19,8 @@
 		static public const DB_TABLE_REGIONS:String = "regions";
 		
 		static public function addEvents():void {
-			Globals.g_app.addEventListener( RegionEvent.REQUEST_PUBLIC, cacheRequestPublic ); 
-			Globals.g_app.addEventListener( RegionEvent.REQUEST_PRIVATE, cacheRequestPrivate ); 
+			RegionManager.addListener( RegionEvent.REQUEST_PUBLIC, cacheRequestPublic ); 
+			RegionManager.addListener( RegionEvent.REQUEST_PRIVATE, cacheRequestPrivate ); 
 		}
 		
 		static private function cacheRequestPrivate( e:RegionEvent ):void { loadRegions( Network.userId ); }

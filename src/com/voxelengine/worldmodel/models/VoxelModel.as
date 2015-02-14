@@ -102,9 +102,6 @@ package com.voxelengine.worldmodel.models
 		public function set dead(val:Boolean):void 					{ 
 			_dead = val; 
 			
-			if ( Globals.controlledModel && Globals.controlledModel == this )
-				loseControl( Globals.player );
-				
 			if (0 < instanceInfo.scripts.length)
 			{
 				for each (var script:Script in instanceInfo.scripts)
@@ -137,7 +134,10 @@ package com.voxelengine.worldmodel.models
 		public function get children():Vector.<VoxelModel>			{ return _children; }
 		public function 	childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
 		public function get changed():Boolean						{ return _changed; }
-		public function set changed( $val:Boolean):void				{ _changed = $val; }
+		public function set changed( $val:Boolean):void				{ 
+			Log.out( "VoxelModel.changed setting to: " + $val, Log.WARN );
+			_changed = $val; 
+		}
 		public function get selected():Boolean 						{ return _selected; }
 		public function set selected(val:Boolean):void  			{ _selected = val; }
 		public function get onSolidGround():Boolean 				{ return _onSolidGround; }
@@ -739,16 +739,19 @@ package com.voxelengine.worldmodel.models
 		
 		public function initialize_root_oxel(grainSize:int):void
 		{
+			Log.out( "VoxelModel.initialize_root_oxel: " + toString(), Log.WARN );
 			try {
-			var gc:GrainCursor = GrainCursorPool.poolGet(grainSize);
-			gc.grain = grainSize;
-			oxelReset();
-			oxel = OxelPool.poolGet();
-			oxel.initialize(null, gc, 0, TypeInfo.AIR, _statisics);
-			// The VM gets an empty oxel as a place holder when it first loads.
-			// this replaces the placeholder and replaces it with a new root.
-			oxel.type = TypeInfo.AIR;
-			GrainCursorPool.poolDispose(gc);
+				var gc:GrainCursor = GrainCursorPool.poolGet(grainSize);
+				gc.grain = grainSize;
+				oxelReset();
+				oxel = OxelPool.poolGet();
+				Lighting.defaultBaseLightAttn = instanceInfo.baseLightLevel;
+				oxel.lighting = LightingPool.poolGet( instanceInfo.baseLightLevel );
+				oxel.initialize(null, gc, 0, TypeInfo.AIR, _statisics);
+				// The VM gets an empty oxel as a place holder when it first loads.
+				// this replaces the placeholder and replaces it with a new root.
+				oxel.type = TypeInfo.AIR;
+				GrainCursorPool.poolDispose(gc);
 			}
 			catch (e:Error) {
 				Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.guid: " + instanceInfo.guid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + TypeInfo.typeInfo[oxel.type].name );					
@@ -1098,10 +1101,12 @@ package com.voxelengine.worldmodel.models
 			gct.grain = rootGrainSize;
 			_statisics.gather( version, $ba, rootGrainSize);
 			
-			oxelReset();
-			oxel = OxelPool.poolGet();
-			Lighting.defaultBaseLightAttn = instanceInfo.baseLightLevel;
-			oxel.lighting = LightingPool.poolGet( instanceInfo.baseLightLevel );
+			initialize_root_oxel(rootGrainSize)
+			
+			//oxelReset();
+			//oxel = OxelPool.poolGet();
+			//Lighting.defaultBaseLightAttn = instanceInfo.baseLightLevel;
+			//oxel.lighting = LightingPool.poolGet( instanceInfo.baseLightLevel );
 			
 			registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);	
 			registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);	

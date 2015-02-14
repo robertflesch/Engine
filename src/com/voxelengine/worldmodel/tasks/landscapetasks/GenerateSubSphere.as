@@ -33,43 +33,40 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 			var timer:int = getTimer();
 			
-			var vm:VoxelModel = Globals.getModelInstance( _guid );
-			if ( vm )
+			//////////////////////////////////////////////////////////
+			// Builds Solid Cube of any grain size
+			//////////////////////////////////////////////////////////
+			var vm:VoxelModel = getVoxelModel();
+			if ( null == vm.oxel )
+				vm.initialize_root_oxel( vm.instanceInfo.grainSize );
+			var root_grain_size:uint = vm.oxel.gc.bound;
+			var min_grain_size:int = root_grain_size - _layer.range;
+			if ( 0 > min_grain_size || min_grain_size > root_grain_size || ( 8 < (root_grain_size - min_grain_size)) )
 			{
-				var root_grain_size:uint = vm.oxel.gc.bound
-				var min_grain_size:int = root_grain_size - _layer.range;
-				if ( 0 > min_grain_size || min_grain_size > (root_grain_size - 2) || ( 8 < (root_grain_size - min_grain_size)) )
-				{
-					min_grain_size = Math.max( 0, root_grain_size - 6 );
-					Log.out( "GenerateSubSphere.start - WARNING - Adjusting range: " + min_grain_size, Log.INFO );
-				}
+				min_grain_size = Math.max( 0, root_grain_size - 4 );
+				Log.out( "GenerateSubSphere.start - WARNING - Adjusting range: " + min_grain_size, Log.WARN );
+			}
 				
-				var c:int = vm.oxel.size_in_world_coordinates() / 2;
-				//vm.oxel.write_sphere( c, c, c, c - 1, _layer.type, min_grain_size );
-				// sphere
+			var c:int = vm.oxel.size_in_world_coordinates() / 2;
+			//vm.oxel.write_sphere( c, c, c, c - 1, _layer.type, min_grain_size );
+			// sphere
 //				vm.oxel.write_sphere( c, c, c, c, _layer.type, min_grain_size );
-				// 3/4 sphere
+			// 3/4 sphere
 //				vm.oxel.write_sphere( c, c/2, c, c, _layer.type, min_grain_size );
-				// 1/2 sphere
-				vm.oxel.write_sphere( _guid, c, c, c, c/2, _layer.type, min_grain_size );
-				/* 
-				// 8 spheres 
-				var type:int = TypeInfo.GRASS;
-				vm.write_sphere( c/2, c/2, c/2, c/2 - 1, type++, min_grain_size );
-				vm.write_sphere( c/2, c/2, c/2 + c, c/2 - 1, type++, min_grain_size );
-				vm.write_sphere( c/2, c/2 + c, c/2, c/2 - 1, type++, min_grain_size );
-				vm.write_sphere( c/2, c/2 + c, c/2 + c, c/2 - 1, type++, min_grain_size );
-				vm.write_sphere( c/2 + c, c/2, c/2, c/2 - 1, type++, min_grain_size );
-				vm.write_sphere( c/2 + c, c/2, c/2 + c, c/2 - 1, type++, min_grain_size );
-				vm.write_sphere( c/2 + c, c/2 + c, c/2, c/2 - 1, --type, min_grain_size );
-				vm.write_sphere( c/2 + c, c/2 + c, c/2 + c, c/2 - 1, --type, min_grain_size );
-				*/
-			}
-			else
-			{
-				Log.out("GenerateSubSphere.start - Didnt find model for: " + _guid, Log.ERROR );
-			}
-
+			// 1/2 sphere
+			vm.oxel.write_sphere( _guid, c, c, c, c/2, _layer.type, min_grain_size );
+			/* 
+			// 8 spheres 
+			var type:int = TypeInfo.GRASS;
+			vm.write_sphere( c/2, c/2, c/2, c/2 - 1, type++, min_grain_size );
+			vm.write_sphere( c/2, c/2, c/2 + c, c/2 - 1, type++, min_grain_size );
+			vm.write_sphere( c/2, c/2 + c, c/2, c/2 - 1, type++, min_grain_size );
+			vm.write_sphere( c/2, c/2 + c, c/2 + c, c/2 - 1, type++, min_grain_size );
+			vm.write_sphere( c/2 + c, c/2, c/2, c/2 - 1, type++, min_grain_size );
+			vm.write_sphere( c/2 + c, c/2, c/2 + c, c/2 - 1, type++, min_grain_size );
+			vm.write_sphere( c/2 + c, c/2 + c, c/2, c/2 - 1, --type, min_grain_size );
+			vm.write_sphere( c/2 + c, c/2 + c, c/2 + c, c/2 - 1, --type, min_grain_size );
+			*/
 			//Log.out( "GenerateSubSphere.start - completed layer of type: " + (Globals.Info[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
 			super.complete() // AbstractTask will send event
 		}
