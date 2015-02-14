@@ -5,9 +5,11 @@
   authorship protected under United States Copyright Act.
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
-package com.voxelengine.worldmodel
+package com.voxelengine.worldmodel.inventory
 {
 import com.voxelengine.Log;
+import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.inventory.ObjectInfo;
 
 /**
  * ...
