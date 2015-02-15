@@ -46,6 +46,8 @@ package com.voxelengine.worldmodel.models
 		
 		public function get animations():Vector.<Animation> 	{ return _animations; }
 		public function get childCount():int 					{ return _childCount; }
+		
+		public function set biomes(value:Biomes):void  			{ _biomes = value; }
 
 		public function ModelInfo():void  { ; }
 		
@@ -180,10 +182,11 @@ package com.voxelengine.worldmodel.models
 				var biomes:Object = json.biomes;
 				if ( !biomes  )
 				{
-					throw new Error( "ModelInfo.init - WARNING - unable to find biomesXML: " + fileName );					
+					throw new Error( "ModelInfo.init - WARNING - unable to find biomes in json file: " + fileName );					
 					return;
 				}
 				
+				// TODO this should only be true for new terrain models.
 				const createHeightMap:Boolean = true;
 				_biomes = new Biomes( createHeightMap  );
 				if (  !json.biomes.layers )

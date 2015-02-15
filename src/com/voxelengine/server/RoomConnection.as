@@ -161,7 +161,7 @@ package com.voxelengine.server {
 		
 		static private function userJoinedMessage( $m:Message, $userid:String):void
 		{
-			//trace("RoomConnection.userJoinedMessage - Player with the userid", userid, "just joined the room -- Network.userId: " + Network.userId );
+			Log.out("RoomConnection.userJoinedMessage - Player with the userid: " + $userid + "  just joined the room -- Network.userId: " + Network.userId );
 			if ( Network.userId != $userid )
 			{
 				Log.out("RoomConnection.userJoinedMessage - ANOTHER PLAYER LOGGED ON", Log.DEBUG );
@@ -182,17 +182,15 @@ package com.voxelengine.server {
 			}
 			else 
 			{
-				// This is ME!
-				Log.out("RoomConnection.userJoinedMessage - Recieved message that I logged on " + $userid, Log.DEBUG );	
+				// This is the notice that the players avatar has joined the room
+				//Log.out("RoomConnection.userJoinedMessage - Recieved message that I logged on " + $userid, Log.DEBUG );	
 				if ( !Globals.player ) {
-					Log.out("RoomConnection.userJoinedMessage - NO player object creating new one " + $userid, Log.DEBUG );	
+					Log.out("RoomConnection.userJoinedMessage - NO player object creating new one " + $userid, Log.ERROR );	
 					Globals.createPlayer();
 				}
-						//RegionManager.addListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
-					//if ( false == Globals.createPlayer() )
-						//RegionManager.addListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
-				else	
-					Log.out("RoomConnection.userJoinedMessage - MY GHOST IS ALREADY ON!!!" + $userid, Log.DEBUG );	
+				// The info for the player was loaded at log in time, but we MAY need to add the avatar to the region model manager
+				// The players avatar information is loaded in the player object in the onRegionLoad( $re:RegionEvent ):void 
+//				Globals.modelAdd( Globals.player );
 			}
 		}
 		

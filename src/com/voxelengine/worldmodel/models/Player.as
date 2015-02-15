@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.biomes.Biomes;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import flash.display3D.Context3D;
 import flash.events.KeyboardEvent;
@@ -32,14 +33,15 @@ import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.renderer.lamps.*;
 import com.voxelengine.server.Persistance;
 
+import com.voxelengine.worldmodel.RegionManager;
+import com.voxelengine.worldmodel.MouseKeyboardHandler;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.inventory.Inventory;
 import com.voxelengine.worldmodel.models.*;
-import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.weapons.Gun;
 import com.voxelengine.worldmodel.weapons.Bomb;
-import com.voxelengine.worldmodel.RegionManager;
 
 public class Player extends Avatar
 {
@@ -108,13 +110,13 @@ public class Player extends Avatar
 		RegionManager.removeListener( RegionEvent.REGION_LOAD, onRegionLoad );
 	}
 	
-	private function onLogin( $event:LoginEvent ):void {
+	static private function onLogin( $event:LoginEvent ):void {
 		Log.out( "Player.onLogin - retrieve player info from Persistance", Log.DEBUG );
 		Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
 	}
 	
 	
-	private function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
+	static private function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
 		
 		if ( $dbo ) {
 			if ( Globals.player ) {
@@ -137,15 +139,28 @@ public class Player extends Avatar
 				// now assign a starting region
 				Log.out( "Player.onPlayerLoadedAction - ASSIGN STARTING REGION IF NULL", Log.WARN  );
 			}
-			var instanceInfo:InstanceInfo = new InstanceInfo();
-			instanceInfo.grainSize = 4;
-			instanceInfo.guid = $dbo.modelGuid;
-			metadata.guid = $dbo.modelGuid;
-			metadata.name = $dbo.userName;
-			metadata.owner = Network.userId;
-			metadata.modifiedDate =	$dbo.modifiedDate;
-			metadata.createdDate = $dbo.createdDate;
-			ModelLoader.load( instanceInfo );
+			
+			var ii:InstanceInfo = new InstanceInfo();
+			ii.grainSize = 4;
+			ii.guid = $dbo.modelGuid;
+			var newPlayer:Player = new Player( ii );
+			
+			var md:VoxelModelMetadata = new VoxelModelMetadata();
+			md.guid = $dbo.modelGuid;
+			md.name = $dbo.userName;
+			md.owner = Network.userId;
+			md.modifiedDate =	$dbo.modifiedDate;
+			md.createdDate = $dbo.createdDate;
+			
+			var mi:ModelInfo = new ModelInfo();
+			mi.biomes = new Biomes();
+			var newLayerInfo:LayerInfo = new LayerInfo( "LoadModelFromBigDB", $dbo.modelGuid );
+			mi.biomes.add_layer( newLayerInfo );
+			mi.jsonReset();
+			
+			newPlayer.init( mi, md );
+			
+			ModelLoader.load( ii );
 			var inv:Inventory = InventoryManager.objectInventoryGet( Network.userId );
 		}
 		else {
@@ -153,7 +168,7 @@ public class Player extends Avatar
 		}
 	}
 	
-	private function onPlayerLoadError(error:PlayerIOError):void {
+	static private function onPlayerLoadError(error:PlayerIOError):void {
 		Log.out("ModelManager.onPlayerLoadError", Log.ERROR, error );
 	}			
 	

@@ -88,7 +88,8 @@ package com.voxelengine.worldmodel.models
 			if ( null != $vmm )
 				vm.metadata = $vmm;
 
-			Globals.modelAdd( vm );
+			if ( !(vm is Avatar) )
+				Globals.modelAdd( vm );
 
 			//Log.out( "ModelLoader.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
 			return vm;
