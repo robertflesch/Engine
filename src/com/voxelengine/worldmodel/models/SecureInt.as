@@ -1,9 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
-  All rights reserved.  This product contains computer programs, screen
-  displays and printed documentation which are original works of
-  authorship protected under United States Copyright Act.
-  Unauthorized reproduction, translation, or display is prohibited.
+  NO Copyright claimed - Robert Flesch
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
@@ -31,30 +27,22 @@ package com.voxelengine.worldmodel.models
 		private var _vec:Vector.<int> = new Vector.<int>(VECTOR_SIZE);
 		
 		// the $ sign is a style used to differeinate function params from local vars
-		public function SecureInt( $value:int = 1 ):void
-		{
-			val = $value;
-		}
+		public function SecureInt( $value:int = 1 ):void { val = $value; }
 		
 		// get allows the function to use a speed = attribute.val style
-		public function get val():int 
-		{
-			return _vec[_index];
-		}
+		public function get val():int { return _vec[_index]; }
 		
 		// set allows the function to use a attribute.val = 5 style
 		// changes all of the values in the vector then set the true value
 		// to a random location
 		public function set val( $value:int ):void 
 		{
-			if ( isNaN( $value ) )
-			{
+			if ( isNaN( $value ) ) {
 				// Could this be exploited?
 				Log.out( "SecureInt.set - value is NaN: " + $value + " setting to 1", Log.ERROR );
 				_vec[_index] = 1;
 			}
-			else
-			{
+			else {
 				generateNewRandomIndex();
 				randomizeVectorValues();
 				_vec[_index] = $value;
@@ -62,8 +50,7 @@ package com.voxelengine.worldmodel.models
 			
 			// This is an internal function only used by this function
 			// Create a new index value which is not equal to the old index
-			function generateNewRandomIndex():void 
-			{
+			function generateNewRandomIndex():void {
 				var newIndex:int = int( Math.random() * VECTOR_SIZE );
 				if ( newIndex != _index )
 					_index = newIndex;
@@ -72,18 +59,15 @@ package com.voxelengine.worldmodel.models
 			}
 			
 			// Randomize all of the values in the array
-			function randomizeVectorValues():void
-			{
-				for ( var i:int = 0; i < VECTOR_SIZE; i++ )
-				{
+			function randomizeVectorValues():void {
+				for ( var i:int = 0; i < VECTOR_SIZE; i++ ) {
 					_vec[i] = int( Math.random() * RANDOM_NUMBER_RANGE );
 				}
 			}
 		}
 			
 		// For testing 
-		public function printAllVectorValues():void
-		{
+		public function printAllVectorValues():void {
 			Log.out( "Attribute.printAllVectorValues ---------- index: " + _index );
 			for ( var i:int = 0; i < VECTOR_SIZE; i++ )
 			{
