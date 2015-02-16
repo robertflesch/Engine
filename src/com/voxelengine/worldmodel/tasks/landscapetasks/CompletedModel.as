@@ -65,7 +65,6 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 						
 					if ( vm is Player )
 					{
-//						Globals.player = vm as Player;
 						Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, _guid ) );
 					}
 					else {

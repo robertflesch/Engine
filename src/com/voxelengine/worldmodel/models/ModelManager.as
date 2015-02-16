@@ -229,9 +229,6 @@ package com.voxelengine.worldmodel.models
 						if ( !$removePlayer )
 							continue;
 						else {
-							//Log.out( "ModelManager.removeAllModelInstances - Removing player" );
-							//Globals.player.loseControl( vm );
-							//Globals.player = null;
 							markDead( vm.instanceInfo.guid );
 						}
 					}

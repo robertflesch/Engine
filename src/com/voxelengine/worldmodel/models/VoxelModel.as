@@ -739,7 +739,7 @@ package com.voxelengine.worldmodel.models
 		
 		public function initialize_root_oxel(grainSize:int):void
 		{
-			Log.out( "VoxelModel.initialize_root_oxel: " + toString(), Log.WARN );
+//			Log.out( "VoxelModel.initialize_root_oxel: " + toString(), Log.WARN );
 			try {
 				var gc:GrainCursor = GrainCursorPool.poolGet(grainSize);
 				gc.grain = grainSize;

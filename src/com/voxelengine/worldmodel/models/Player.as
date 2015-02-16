@@ -58,7 +58,6 @@ public class Player extends Avatar
 	public function Player( instanceInfo:InstanceInfo ) { 
 		Log.out( "Player.construct guid: " + instanceInfo.guid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super( instanceInfo );
-		Globals.player = this;
 	}
 	
 	override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
@@ -144,6 +143,8 @@ public class Player extends Avatar
 			ii.grainSize = 4;
 			ii.guid = $dbo.modelGuid;
 			var newPlayer:Player = new Player( ii );
+			Globals.player = newPlayer;
+			newPlayer.takeControl( null );
 			
 			var md:VoxelModelMetadata = new VoxelModelMetadata();
 			md.guid = $dbo.modelGuid;

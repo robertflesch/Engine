@@ -178,8 +178,8 @@ package {
 			Globals.g_renderer.render();
 			timeRender = getTimer() - timeRender;
 				
-//			if ( 5 < timeRender || 1 < timeUpdate )	
-//				Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed );
+			if ( 10 < timeRender || 10 < timeUpdate )	
+				Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed );
 			_timePrevious = getTimer();
 		}
 		

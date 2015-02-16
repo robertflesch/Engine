@@ -188,7 +188,6 @@ package com.voxelengine.worldmodel
 			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_REMOVED, function( me:ModelEvent ):void { ; } );
 			Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
 //			_modelManager.removeAllModelInstances( true );
-//			Globals.player = null;
 			_modelManager.removeAllModelInstances( false ); // dont delete player object.
 			_modelManager.bringOutYourDead();
 		}
