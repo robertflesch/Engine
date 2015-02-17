@@ -8,11 +8,6 @@
 
 package com.voxelengine.GUI
 {
-import com.voxelengine.worldmodel.inventory.ObjectAction;
-import com.voxelengine.worldmodel.inventory.ObjectGrain;
-import com.voxelengine.worldmodel.inventory.ObjectInfo;
-import com.voxelengine.worldmodel.inventory.ObjectTool;
-import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.events.Event;
@@ -39,6 +34,7 @@ import com.voxelengine.worldmodel.models.EditCursor;
 import com.voxelengine.worldmodel.inventory.Inventory;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.inventory.Slots;
+import com.voxelengine.worldmodel.inventory.*;
 import com.voxelengine.worldmodel.*;
  
 public class Hub extends VVCanvas
@@ -338,6 +334,23 @@ public class Hub extends VVCanvas
 				processItemSelection( lastBoxPick );
 				return;
 			}
+		}
+		else if ( oi is ObjectModel ) {
+			Log.out( "Hub.processItemSelection - ObjectModel - what do I do here?");
+			var om:ObjectModel = oi as ObjectModel;
+			//if ( _lastItemSelection != itemIndex )
+			//{   // We are selecting the a model when it was previously on another item
+				//ot.callBack();
+			//}
+			//else if ( - 1 != _itemMaterialSelection ) 
+			//{	// go back to previously used material
+				//Globals.g_app.editing = true;
+				//Globals.g_app.toolOrBlockEnabled = true;
+				//EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
+				//var lastBoxPick:Box = _itemInventory.getBoxFromIndex( _itemMaterialSelection );
+				//processItemSelection( lastBoxPick );
+				//return;
+			//}
 		}
 		else if ( oi is ObjectInfo )
 			Log.out( "Hub.processItemSelection - ObjectInfo");

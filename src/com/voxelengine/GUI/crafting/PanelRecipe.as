@@ -9,7 +9,7 @@ import org.flashapi.swing.constants.*;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.GUI.PanelBase;
+import com.voxelengine.GUI.voxelModels.PanelBase;
 import com.voxelengine.GUI.VoxelVerseGUI;
 import com.voxelengine.worldmodel.crafting.Recipe;
 import com.voxelengine.GUI.LanguageManager;

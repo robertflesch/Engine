@@ -6,10 +6,6 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
-import com.voxelengine.worldmodel.inventory.InventoryManager;
-import com.voxelengine.worldmodel.models.SecureInt;
-import com.voxelengine.worldmodel.inventory.ObjectInfo;
-import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
 import org.flashapi.swing.containers.UIContainer;
@@ -25,13 +21,17 @@ import org.flashapi.swing.layout.AbsoluteLayout;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
+import com.voxelengine.events.CraftingItemEvent;
 import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.GUI.crafting.*;
 import com.voxelengine.GUI.*;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.events.CraftingItemEvent;
+import com.voxelengine.worldmodel.models.SecureInt;
+import com.voxelengine.worldmodel.inventory.InventoryManager;
+import com.voxelengine.worldmodel.inventory.ObjectInfo;
+import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 
 public class InventoryPanelVoxel extends VVContainer
 {

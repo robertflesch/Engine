@@ -45,6 +45,8 @@ import com.voxelengine.events.RoomEvent;
 import com.voxelengine.GUI.crafting.WindowCrafting;
 import com.voxelengine.GUI.inventory.WindowInventory;
 import com.voxelengine.GUI.inventory.WindowInventoryNew;
+import com.voxelengine.GUI.voxelModels.WindowModelDetail;
+import com.voxelengine.GUI.voxelModels.WindowRegionModels;
 
 import com.voxelengine.server.WindowLogin;
 import com.voxelengine.server.RoomConnection;

@@ -7,7 +7,7 @@ package com.voxelengine.GUI.crafting {
     import org.flashapi.swing.constants.*;
 	
 	import com.voxelengine.Globals;
-	import com.voxelengine.GUI.PanelBase;
+	import com.voxelengine.GUI.voxelModels.PanelBase;
 	import com.voxelengine.worldmodel.crafting.Recipe;
 	
 	// all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
