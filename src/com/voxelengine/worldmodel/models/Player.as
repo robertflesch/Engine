@@ -58,6 +58,11 @@ public class Player extends Avatar
 	public function Player( instanceInfo:InstanceInfo ) { 
 		Log.out( "Player.construct guid: " + instanceInfo.guid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super( instanceInfo );
+		if ( Globals.player ) {
+			Globals.player.dead = true;
+			Globals.player = null;
+		}
+		Globals.player = this;
 	}
 	
 	override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
@@ -118,10 +123,6 @@ public class Player extends Avatar
 	static private function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
 		
 		if ( $dbo ) {
-			if ( Globals.player ) {
-				Globals.player.dead = true;
-				Globals.player = null;
-			}
 			if ( null == $dbo.modelGuid ) {
 				// Assign the player the default avatar
 				$dbo.modelGuid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
@@ -143,7 +144,6 @@ public class Player extends Avatar
 			ii.grainSize = 4;
 			ii.guid = $dbo.modelGuid;
 			var newPlayer:Player = new Player( ii );
-			Globals.player = newPlayer;
 			newPlayer.takeControl( null );
 			
 			var md:VoxelModelMetadata = new VoxelModelMetadata();
