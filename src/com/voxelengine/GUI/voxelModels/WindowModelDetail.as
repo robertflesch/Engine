@@ -1,22 +1,24 @@
 
-package com.voxelengine.GUI
+package com.voxelengine.GUI.voxelModels
 {
-	import com.voxelengine.worldmodel.RegionManager;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
+	
 	import org.flashapi.collector.EventCollector;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
 	
-	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.Globals;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.GUI.*;
+	import com.voxelengine.GUI.components.*;
 	import com.voxelengine.worldmodel.Region;
+	import com.voxelengine.worldmodel.RegionManager;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.VoxelModel;
-	import com.voxelengine.GUI.components.*;
 
 	
 	public class WindowModelDetail extends VVPopup
@@ -63,7 +65,7 @@ package com.voxelengine.GUI
 			addElement( new ComponentSpacer( width ) );
 			addElement( new ComponentTextInput( "Name"
 			                                  , function ($e:TextEvent):void { _vm.metadata.name = $e.target.text; }
-											  , _vm.metadata.name
+											  , _vm.metadata.name ? _vm.metadata.name : "No Name"
 											  , width ) );
 			addElement( new ComponentTextArea( "Desc"
 											 , function ($e:TextEvent):void { _vm.metadata.description = $e.target.text; }
@@ -72,7 +74,7 @@ package com.voxelengine.GUI
 
 			// TODO need to be able to handle an array of scipts.
 			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { _ii.scriptName = $e.target.text; }, _ii.scriptName, width ) );
-			addElement( new ComponentLabel( "Grain Size", String(_ii.grainSize), width ) );
+			addElement( new ComponentLabel( "Size in Meters", String(_ii.grainSize), width ) );
 			addElement( new ComponentLabel( "Instance GUID",  _ii.guid, width ) );
 			if ( _vm.anim )
 				// TODO add a drop down of available states

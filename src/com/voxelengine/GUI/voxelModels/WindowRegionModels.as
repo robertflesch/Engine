@@ -1,5 +1,5 @@
 
-package com.voxelengine.GUI
+package com.voxelengine.GUI.voxelModels
 {
 	import com.voxelengine.events.InventoryVoxelEvent;
 	import org.flashapi.swing.*;
@@ -10,6 +10,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.GUI.*;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	
 	public class WindowRegionModels extends VVPopup
