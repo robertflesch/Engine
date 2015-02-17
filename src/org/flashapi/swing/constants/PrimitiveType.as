@@ -87,5 +87,9 @@ package org.flashapi.swing.constants {
 		 * 	Indicates that the primitive value for this object is <code>"number"</code>.
 		 */
 		public static const NUMBER:String = "number";
+		/**
+		 * 	Indicates that the primitive value for this object is <code>"int"</code>.
+		 */
+		public static const INT:String = "int";
 	}
 }

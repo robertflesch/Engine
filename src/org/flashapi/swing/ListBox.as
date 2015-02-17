@@ -831,6 +831,12 @@ package org.flashapi.swing {
 				case PrimitiveType.STRING :
 					obj = { label:value };
 					break;
+				case PrimitiveType.NUMBER :
+					obj = { label:value };
+					break;
+				case PrimitiveType.INT :
+					obj = { label:value };
+					break;
 				
 			}
 			
