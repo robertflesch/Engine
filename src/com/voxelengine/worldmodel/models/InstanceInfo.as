@@ -39,8 +39,8 @@ public class InstanceInfo extends Location	{
 	private var _transforms:Vector.<ModelTransform> = new Vector.<ModelTransform>;	// toJSON
 	private var _shader:String 						= "ShaderOxel";					// toJSON
 	private var _guid:String 						= null;                         // toJSON
-	private var _scriptName:String 					= "";                           // toJSON
 	private var _grainSize:int 						= 0;                            // toJSON
+	private var _detailSize:int 					= 0;                            // INSTANCE NOT EXPORTED
 	private var _type:int 							= -1;                           // toJSON - This type overrides a native task type.
 	
 	private var _dynamicObject:Boolean 				= false;						// INSTANCE NOT EXPORTED
@@ -83,6 +83,8 @@ public class InstanceInfo extends Location	{
 		_guid = val; 
 	}
 	public function get grainSize():int  						{ return _grainSize; }
+	public function get detailSize():int  						{ return _detailSize; }
+	public function set detailSize(val:int):void				{ _detailSize = val; }  // This is used in the generation of spheres only
 	public function get type():int  							{ return _type; }
 	public function set type( val:int):void  					{ _type = val; }
 	public function set grainSize(val:int):void					{ _grainSize = val; }
@@ -127,7 +129,7 @@ public class InstanceInfo extends Location	{
 				transforms:		_transforms,
 //				shader:			_shader,
 				collision:		_usesCollision,
-				script: 		_scriptName,
+				script: 		_scripts,
 				collidable:     _collidable,
 				critical:     	_critical,
 				state:			_state,
@@ -247,8 +249,7 @@ public class InstanceInfo extends Location	{
 	{
 		if ( json.script )
 		{
-			_scriptName = json.script;
-			addScript( _scriptName );
+			addScript( json.script );
 		}
 	}
 	
