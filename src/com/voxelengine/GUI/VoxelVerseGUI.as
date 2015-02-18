@@ -8,6 +8,7 @@
 
 package com.voxelengine.GUI
 {
+import com.voxelengine.GUI.actionBars.WindowBeastControl;
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.display.Stage;
@@ -75,7 +76,6 @@ public class VoxelVerseGUI extends EventDispatcher
 	private var _releaseMenu:WindowReleaseMenu = null;
 	private var _fileReference:FileReference = new FileReference();
 	private var _projectileEnabled:Boolean = true;
-	private var _hub:Hub = null;
 	
 	static private var _currentInstance:VoxelVerseGUI = null;
 	static public function get currentInstance():VoxelVerseGUI { return ( _currentInstance ? _currentInstance : _currentInstance = new VoxelVerseGUI() ); }
@@ -105,8 +105,6 @@ public class VoxelVerseGUI extends EventDispatcher
 		else
 			Globals.g_app.stage.displayState =	StageDisplayState.NORMAL;
 	}
-	
-	public function get toolBar(): Hub { return _hub; }
 	
 	private function createProjectile( vm:VoxelModel ):void  {
 		/*
@@ -160,9 +158,6 @@ public class VoxelVerseGUI extends EventDispatcher
 			_crossHairVertical.y = halfRH - _crossHairVertical.height / 2;
 			
 		}
-		
-		if ( _hub )
-			_hub.resizeHub( event );
 	}
 	
 	public function crossHairActive():void {
@@ -230,25 +225,6 @@ public class VoxelVerseGUI extends EventDispatcher
 		_crossHairHide = true;	
 	}
 	
-	private function guiEventHandler( e:GUIEvent ):void {
-		if ( GUIEvent.TOOLBAR_HIDE == e.type )
-		{
-			if ( _hub ) 
-				_hub.hide();
-			crossHairHide();
-
-		}
-		else if ( GUIEvent.TOOLBAR_SHOW == e.type )
-		{
-			if ( !_hub ) {
-				_hub = new Hub();
-			}
-				
-			//_hub.show();
-			crossHairShow()
-		}
-	}
-	
 	public function hideGUI():void {
 		trace( "VoxelVerseGUI.hideGUI" ); 
 		if ( _built )
@@ -257,8 +233,6 @@ public class VoxelVerseGUI extends EventDispatcher
 				_debugMenu.visible = false;
 			if ( _releaseMenu )
 				_releaseMenu.visible = false;
-			if ( _hub )
-				_hub.visible = false;
 			crossHairHide();
 		}
 	}
@@ -271,8 +245,6 @@ public class VoxelVerseGUI extends EventDispatcher
 				_debugMenu.visible = true;
 			if ( _releaseMenu )
 				_releaseMenu.visible = true;
-			if ( _hub )
-				_hub.visible = true;
 			crossHairShow();
 		}
 	}
@@ -298,8 +270,6 @@ public class VoxelVerseGUI extends EventDispatcher
 		UIManager.debugger = new FDTrace();
 		RegionManager.addListener( RegionEvent.REGION_LOAD_BEGUN, onRegionLoadingComplete );
 		Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
-		Globals.g_app.addEventListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
-		Globals.g_app.addEventListener( GUIEvent.TOOLBAR_SHOW, guiEventHandler );
 //			Globals.g_app.addEventListener(Event.DEACTIVATE, deactivate);
 //			Globals.g_app.addEventListener(Event.ACTIVATE, activate);
 //			Globals.g_app.stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);

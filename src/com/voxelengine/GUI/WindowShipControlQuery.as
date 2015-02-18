@@ -2,6 +2,8 @@
 package com.voxelengine.GUI
 {
 	import com.voxelengine.Globals;
+	import com.voxelengine.GUI.actionBars.WindowGunControl;
+	import com.voxelengine.GUI.actionBars.WindowShipControl;
 	import com.voxelengine.Log;
 	import com.voxelengine.worldmodel.models.Ship;
 	import com.voxelengine.worldmodel.models.VoxelModel;

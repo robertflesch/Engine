@@ -58,11 +58,6 @@ public class WindowBeastControlQuery extends VVCanvas
 			Globals.g_app.addEventListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
 			Globals.g_app.addEventListener( GUIEvent.TOOLBAR_SHOW, guiEventHandler );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
-			
-			if ( VoxelVerseGUI.currentInstance.toolBar && VoxelVerseGUI.currentInstance.toolBar.visible )
-				window_offset = TOOL_BAR_HEIGHT;
-			else	
-				window_offset = 0;
 				
 			display();
 			onResize( null );

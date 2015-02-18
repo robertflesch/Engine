@@ -1,12 +1,16 @@
 package com.voxelengine.GUI.inventory {
 
-import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.GUI.actionBars.QuickInventory;
 import flash.display.DisplayObject;
+import flash.net.FileReference;
+import flash.events.Event;
+import flash.net.FileFilter;
 import org.flashapi.swing.*
 import org.flashapi.swing.core.UIObject;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.dnd.*;
+import org.flashapi.swing.framework.flashdevelop.FlashConnect;
 import org.flashapi.swing.list.ListItem;
 import org.flashapi.swing.layout.AbsoluteLayout;
 
@@ -17,6 +21,7 @@ import com.voxelengine.events.InventoryModelEvent;
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.*;
+import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.inventory.FunctionRegistry;
 import com.voxelengine.worldmodel.inventory.ObjectAction;
@@ -42,8 +47,10 @@ public class InventoryPanelModel extends VVContainer
 	
 	public function InventoryPanelModel( $parent:VVContainer ) {
 		super( $parent );
-		FunctionRegistry.functionAdd( createNewObjectIPM, "createNewObjectIPM" );
 		
+		FunctionRegistry.functionAdd( createNewObjectIPM, "createNewObjectIPM" );
+		FunctionRegistry.functionAdd( importObjectIPM, "importObjectIPM" );
+			
 		autoSize = true;
 		layout.orientation = LayoutOrientation.HORIZONTAL;
 		
@@ -113,8 +120,16 @@ public class InventoryPanelModel extends VVContainer
 		
 		item = new ObjectAction( "createNewObjectIPM", "NewModel128.png", "Click to create new model" );
 		box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE, item );
-		box.x = count * MODEL_IMAGE_WIDTH;
+		box.x = count++ * MODEL_IMAGE_WIDTH;
 		pc.addElement( box );
+		
+		if ( Globals.g_debug ) {
+			item = new ObjectAction( "importObjectIPM", "import128.png", "Click to import local model" );
+			box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE, item );
+			box.x = count++ * MODEL_IMAGE_WIDTH;
+			pc.addElement( box );
+		}
+		
 		//eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
 		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		count++;
@@ -143,8 +158,32 @@ public class InventoryPanelModel extends VVContainer
 	
 	static private function createNewObjectIPM():void {
 		new WindowModelChoice();
-		
 	}
+	
+	static private function importObjectIPM():void {
+		addDesktopModelHandler( null );
+	}
+	
+	static private function addDesktopModelHandler(event:UIMouseEvent):void 
+	{
+		var fr:FileReference = new FileReference();
+		fr.addEventListener(Event.SELECT, onDesktopModelFileSelected );
+		var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
+		fr.browse([swfTypeFilter]);
+	}
+	
+	static public function onDesktopModelFileSelected(e:Event):void
+	{
+		Log.out( "onDesktopModelFileSelected : " + e.toString() );
+		
+		//if ( selectedModel
+		var fileName:String = e.currentTarget.name;
+		fileName = fileName.substr( 0, fileName.indexOf( "." ) );
+
+		new WindowModelMetadata( fileName );
+	//	remove();
+	}
+	
 	
 	private function dropMaterial(e:DnDEvent):void 
 	{

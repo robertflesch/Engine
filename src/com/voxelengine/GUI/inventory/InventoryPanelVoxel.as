@@ -6,6 +6,7 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
+import com.voxelengine.GUI.actionBars.QuickInventory;
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
 import org.flashapi.swing.containers.UIContainer;
