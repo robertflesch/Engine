@@ -8,7 +8,6 @@
 package com.voxelengine.worldmodel.models
 {
 	import com.voxelengine.events.GUIEvent;
-	import com.voxelengine.GUI.QuickInventory;
 	import com.voxelengine.pools.LightingPool;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import com.voxelengine.worldmodel.oxel.Oxel;
@@ -666,15 +665,16 @@ package com.voxelengine.worldmodel.models
 			var foundModel:VoxelModel;
 			switch (e.keyCode) 
 			{
-				case Keyboard.F:
-					if ( true == Globals.g_app.editing && true == Globals.g_app.toolOrBlockEnabled )
-					{
-						if ( 0 == QuickInventory.currentItemSelection )
-							deleteOxel();
-						else if ( 1 < QuickInventory.currentItemSelection )
-							insertOxel();
-					}
-					break;
+				// No idea what case F does, and since it causes a link to GUI, I am removing it.
+				//case Keyboard.F:
+					//if ( true == Globals.g_app.editing && true == Globals.g_app.toolOrBlockEnabled )
+					//{
+						//if ( 0 == QuickInventory.currentItemSelection )
+							//deleteOxel();
+						//else if ( 1 < QuickInventory.currentItemSelection )
+							//insertOxel();
+					//}
+					//break;
 				case 107: case Keyboard.NUMPAD_ADD:
 				case 45: case Keyboard.INSERT:
 						insertOxel();

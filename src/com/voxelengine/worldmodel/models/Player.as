@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.biomes.Biomes;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
@@ -54,7 +55,7 @@ public class Player extends Avatar
 	static private const 	MIN_TURN_AMOUNT:Number 		= 0.09;
 	static private const 	AVATAR_CLIP_FACTOR:Number 	= 0.90;
 	static private var  	STEP_UP_MAX:int 			= 16;
-		
+	private var _userInventory:UserInventory;		
 	public function Player( instanceInfo:InstanceInfo ) { 
 		Log.out( "Player.construct guid: " + instanceInfo.guid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super( instanceInfo );
@@ -144,7 +145,6 @@ public class Player extends Avatar
 			ii.grainSize = 4;
 			ii.guid = $dbo.modelGuid;
 			var newPlayer:Player = new Player( ii );
-			newPlayer.takeControl( null );
 			
 			var md:VoxelModelMetadata = new VoxelModelMetadata();
 			md.guid = $dbo.modelGuid;
@@ -355,7 +355,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		if ( $modelLosingControl )
 			instanceInfo.rotationSet = $modelLosingControl.instanceInfo.rotationGet;
 
-		Globals.g_app.dispatchEvent(new GUIEvent(GUIEvent.TOOLBAR_SHOW));
+		//Globals.g_app.dispatchEvent(new GUIEvent(GUIEvent.TOOLBAR_SHOW));
 	}
 
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
@@ -394,6 +394,8 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	private function onRegionLoad( $re:RegionEvent ):void {
 		// add the player to this regions model list.
 		Globals.modelAdd( this );
+		if ( null == _userInventory && Globals.online )
+			_userInventory = new UserInventory();
 		// apply this regions location, position, etc setting to the player
 		Globals.g_regionManager.currentRegion.applyRegionInfoToPlayer( this );
 	}
@@ -407,7 +409,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		Globals.player.takeControl( null );
 		//Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		// TODO  - this forces inventory load, should I let it load lazily?
-		MouseKeyboardHandler.addInputListeners();
+//		MouseKeyboardHandler.addInputListeners();
 		collisionPointsAdd();
 	}
 
@@ -426,7 +428,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	private function onCriticalModelLoaded( le:ModelEvent ):void {
 		//Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
 		Log.out( "Player.onCriticalModelLoaded - CRITICAL model" );
-		MouseKeyboardHandler.addInputListeners();
+//		MouseKeyboardHandler.addInputListeners();
 		collisionPointsAdd();
 		gravityOn()
 	}

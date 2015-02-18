@@ -115,7 +115,7 @@ package com.voxelengine.worldmodel
 			return val;
 		}
 		
-		static public function addInputListeners():void 
+		static private function addInputListeners():void 
 		{
 			if ( false == _s_handlersAdded )
 			{
@@ -126,7 +126,7 @@ package com.voxelengine.worldmodel
 			}
 		}
 		
-		static public function removeInputListeners():void 
+		static private function removeInputListeners():void 
 		{
 			if ( true == _s_handlersAdded )
 			{

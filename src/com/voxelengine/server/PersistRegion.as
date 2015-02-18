@@ -115,7 +115,7 @@
 				
 				$dbo.save( false
 					     , false
-					     , function ():void  {  Log.out( "PersistRegion.saveRegionSuccess - guid: " + $metadata.guid, Log.DEBUG ); }	
+					     , function ():void  {  Log.out( "PersistRegion.saveRegionSuccess - guid: " + $guid, Log.DEBUG ); }	
 					     , function (e:PlayerIOError):void { 
 										Globals.g_app.dispatchEvent( new RegionPersistanceEvent( RegionPersistanceEvent.REGION_SAVE_FAILURE, $metadata.guid ) ); 
 										Log.out( "PersistRegion.saveRegionFailed - error data: " + e, Log.ERROR, e ) } );

@@ -39,7 +39,7 @@ package com.voxelengine.worldmodel.scripts
 			}
 			catch ( error:Error )
 			{
-				Log.out( "ScriptLibrary.getAsset - ERROR - ERROR - ERROR: " + error, Log.ERROR );
+				Log.out( "ScriptLibrary.getAsset - ERROR - ERROR - ERROR: " + error + " not found: " + assetLinkageID, Log.ERROR );
 			}
 			
             return asset;

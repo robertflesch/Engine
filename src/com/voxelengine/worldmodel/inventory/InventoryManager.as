@@ -37,6 +37,14 @@ public class InventoryManager
 		// This creates a inventory object for login.
 		objectInventoryGet("player");	
 		addListener( InventoryEvent.INVENTORY_UNLOAD_REQUEST, unloadInventory );
+		addListener( InventoryEvent.INVENTORY_REQUEST, requestInventory );
+	}
+	
+	static private function requestInventory(e:InventoryEvent):void 
+	{
+		var inv:Inventory = objectInventoryGet( e.ownerGuid );
+		if ( inv )
+			dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, e.ownerGuid, inv ) );
 	}
 	
 	static private function unloadInventory(e:InventoryEvent):void 

@@ -103,6 +103,7 @@ public class RegionManager
 		MetadataManager.init();
 		// This causes the to load its caches and listeners
 		InventoryManager.init();
+		MouseKeyboardHandler.init();
 	}
 	
 	private function regionChanged( me:ModelEvent ):void { 

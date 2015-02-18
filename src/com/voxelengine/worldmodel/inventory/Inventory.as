@@ -8,7 +8,6 @@
 package com.voxelengine.worldmodel.inventory {
 	
 import com.voxelengine.events.InventoryEvent;
-import com.voxelengine.GUI.Hub;
 import flash.events.EventDispatcher;
 import flash.net.registerClassAlias;
 import flash.utils.ByteArray;

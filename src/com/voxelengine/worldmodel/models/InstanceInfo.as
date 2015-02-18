@@ -247,7 +247,7 @@ public class InstanceInfo extends Location	{
 	
 	public function setScriptInfo( json:Object ):void
 	{
-		if ( json.script )
+		if ( json.script && ( 0 < json.script.length ) )
 		{
 			addScript( json.script );
 		}

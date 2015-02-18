@@ -6,7 +6,7 @@ package com.voxelengine.worldmodel.scripts
 	 */
 	import com.voxelengine.Globals;
 	import com.voxelengine.GUI.WindowBeastControlQuery;
-	import com.voxelengine.GUI.WindowBeastControl;
+	import com.voxelengine.GUI.actionBars.WindowBeastControl;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.events.OxelEvent;

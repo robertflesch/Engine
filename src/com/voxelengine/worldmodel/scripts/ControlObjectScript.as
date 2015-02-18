@@ -5,8 +5,8 @@ package com.voxelengine.worldmodel.scripts
 	 * @author Bob
 	 */
 	import com.voxelengine.Globals;
-	import com.voxelengine.GUI.WindowShipControl;
-	import com.voxelengine.GUI.WindowGunControl;
+	import com.voxelengine.GUI.actionBars.WindowShipControl;
+	import com.voxelengine.GUI.actionBars.WindowGunControl;
 	import com.voxelengine.GUI.WindowShipControlQuery;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.events.OxelEvent;
