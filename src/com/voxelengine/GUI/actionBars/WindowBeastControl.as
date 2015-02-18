@@ -6,8 +6,10 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
-package com.voxelengine.GUI
+package com.voxelengine.GUI.actionBars
 {
+	import com.voxelengine.GUI.WindowBeastControlQuery;
+	import com.voxelengine.GUI.WindowHeading;
 	import com.voxelengine.worldmodel.inventory.FunctionRegistry;
 	import com.voxelengine.worldmodel.inventory.ObjectAction;
 	import com.voxelengine.worldmodel.inventory.ObjectInfo;
@@ -56,14 +58,14 @@ package com.voxelengine.GUI
 				}
 			}
 		}
-		
+
 		public function WindowBeastControl( $beastInstanceGuid:String ):void 
 		{ 
 			_s_currentInstance = this;
 			_beastInstanceGuid = $beastInstanceGuid;
 			super( "beastToolbar.png" );
 			
-			addEventListener(UIOEvent.REMOVED, onRemoved );
+//			addEventListener(UIOEvent.REMOVED, onRemoved );
 			
 			_windowHeading = new WindowHeading( _beastInstanceGuid );
 		
@@ -74,10 +76,17 @@ package com.voxelengine.GUI
 			
 			//visible = false;
 			//_windowHeading.visible = false;
-			FunctionRegistry.functionAdd( loseControlBeastWindow, "loseControlBeastWindow" );
-			FunctionRegistry.functionAdd( fireBeastWindow, "fireBeastWindow" );
+//			FunctionRegistry.functionAdd( loseControlBeastWindow, "loseControlBeastWindow" );
+//			FunctionRegistry.functionAdd( fireBeastWindow, "fireBeastWindow" );
 		} 
-		
+		/* THIS NEEDS TO BE REFACTORED SO THAT IT EXTENDS THE QUICKINVENTORY - THAT GIVES IT ALL OF THE DRAG AND DROP AND CLEANER INTERFACE 
+		/* THIS NEEDS TO BE REFACTORED SO THAT IT EXTENDS THE QUICKINVENTORY - THAT GIVES IT ALL OF THE DRAG AND DROP AND CLEANER INTERFACE 
+		/* THIS NEEDS TO BE REFACTORED SO THAT IT EXTENDS THE QUICKINVENTORY - THAT GIVES IT ALL OF THE DRAG AND DROP AND CLEANER INTERFACE 
+		/* THIS NEEDS TO BE REFACTORED SO THAT IT EXTENDS THE QUICKINVENTORY - THAT GIVES IT ALL OF THE DRAG AND DROP AND CLEANER INTERFACE 
+		/* THIS NEEDS TO BE REFACTORED SO THAT IT EXTENDS THE QUICKINVENTORY - THAT GIVES IT ALL OF THE DRAG AND DROP AND CLEANER INTERFACE 
+		/* THIS NEEDS TO BE REFACTORED SO THAT IT EXTENDS THE QUICKINVENTORY - THAT GIVES IT ALL OF THE DRAG AND DROP AND CLEANER INTERFACE 
+		/* THIS NEEDS TO BE REFACTORED SO THAT IT EXTENDS THE QUICKINVENTORY - THAT GIVES IT ALL OF THE DRAG AND DROP AND CLEANER INTERFACE 
+		/* THIS NEEDS TO BE REFACTORED SO THAT IT EXTENDS THE QUICKINVENTORY - THAT GIVES IT ALL OF THE DRAG AND DROP AND CLEANER INTERFACE 
 		// This function sets the underlying data to the selected info. But does not act on that info.
 		override public function processItemSelection( box:UIObject ):void 	{
 			
@@ -210,5 +219,7 @@ Log.out( "WindowBeastControl.loseControl - NEED WAY TO REMOVE SUPPORT WINDOWS", 
 				_windowHeading.remove();
 			_s_currentInstance = null;
 		}
+		*/
 	}
+	
 }

@@ -1,11 +1,10 @@
 
 
-package com.voxelengine.GUI
+package com.voxelengine.GUI.actionBars
 {
-	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.GUI.VVCanvas;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
-	import com.voxelengine.events.OxelEvent;
 	import com.voxelengine.events.WeaponEvent;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import flash.events.Event;
@@ -16,82 +15,62 @@ package com.voxelengine.GUI
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
-	public class WindowBombControl extends VVCanvas
+	public class WindowGunControl extends VVCanvas
 	{
-		static private var _s_currentInstance:WindowBombControl = null;
+		static private var _s_currentInstance:WindowGunControl = null;
 
-		private var _vm:VoxelModel;
+//		private var _vm:VoxelModel;
+		private var _instanceGuid:String = "";
 		private var fudgeFactor:int = 30;
-		static public function get currentInstance():WindowBombControl { return _s_currentInstance; }
+		static public function get currentInstance():WindowGunControl { return _s_currentInstance; }
 
-		public function WindowBombControl( $vm:VoxelModel ):void 
-		{ 
-			super();
-			_s_currentInstance = this;
-			_vm = $vm;
-			
-			layout.orientation = LayoutOrientation.VERTICAL;
-			padding = 0;
-			
-			for each ( var vm1:VoxelModel in _vm.children )
-			{
-				if ( "Bomb" == vm1.modelInfo.modelClass )
+		public function WindowGunControl( $instanceGuid:String ):void 
+			{ 
+				super();
+				_s_currentInstance = this;
+				_instanceGuid = $instanceGuid;
+				
+				layout.orientation = LayoutOrientation.VERTICAL;
+				padding = 0;
+				
+				// find all the "Gun" models and add a button for each
+				var vm:VoxelModel = Globals.getModelInstance( _instanceGuid );
+				if ( vm )
 				{
-					//var BombName:String = "";
-					//if ( "Default Name" != vm1.instanceInfo.name )
-						//BombName = vm1.instanceInfo.name
-					//else 
-						//BombName = vm1.modelInfo.name
-						
-					var cannon:Button = new Button( "BombName" );
-					
-					cannon.width = 120;
-					cannon.addEventListener(MouseEvent.CLICK, fire );
-					cannon.data = vm1;
+					for each ( var cm:VoxelModel in vm.children )
+					{
+						if ( "Gun" == cm.modelInfo.modelClass )
+						{
+							//var gunName:String = "";
+							//if ( "Default Name" != cm.instanceInfo.name )
+								//gunName = cm.instanceInfo.name
+							//else 
+								//gunName = cm.modelInfo.name
+								
+							var cannon:Button = new Button( "gunName" );
+							
+							cannon.width = 120;
+							cannon.addEventListener(MouseEvent.CLICK, fire );
+							cannon.data = cm.instanceInfo.guid;
 
-					addElement( cannon );
+							addElement( cannon );
+						}
+					}
 				}
-			}
-			
-			autoSize = true;
-			shadow = true;
-			
-			display( Globals.g_renderer.width - (width + fudgeFactor), 0 );
-	
-			Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
-			Globals.g_app.addEventListener( ModelEvent.DETACH, detachEventHandler );
-			addEventListener(UIOEvent.REMOVED, onRemoved );
-		} 
+				
+				autoSize = true;
+				shadow = true;
+				
+				display( Globals.g_renderer.width - (width + fudgeFactor), 322 );
 		
-		private function detachEventHandler( ee:WeaponEvent ):void 
-		{
-			removeElements();
-			for each ( var vm1:VoxelModel in _vm.children )
-			{
-				if ( "Bomb" == vm1.modelInfo.modelClass )
-				{
-					//var BombName:String = "";
-					//if ( "Default Name" != vm1.instanceInfo.name )
-						//BombName = vm1.instanceInfo.name
-					//else 
-						//BombName = vm1.modelInfo.name
-						
-					var cannon:Button = new Button( "BombName" );
-					
-					cannon.width = 120;
-					cannon.addEventListener(MouseEvent.CLICK, fire );
-					cannon.data = vm1;
-
-					addElement( cannon );
-				}
-			}
-		}
-		
+				Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
+				addEventListener(UIOEvent.REMOVED, onRemoved );
+			} 
 
 		private function fire(event:UIMouseEvent):void 
 		{
-			var vm:VoxelModel = (event.target.data) as VoxelModel;
-			Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, vm.instanceInfo.guid, null ) );
+			var instanceGuid:String = (event.target.data) as String;
+			Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, instanceGuid, null ) );
 
 			event.target.enabled = false;
 			var reloadTimer:DataTimer = new DataTimer( 5000, 1 );

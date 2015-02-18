@@ -6,9 +6,10 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
-package com.voxelengine.GUI
+package com.voxelengine.GUI.actionBars
 {
 	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.GUI.VVCanvas;
 	import com.voxelengine.worldmodel.inventory.ObjectInfo;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
@@ -42,7 +43,7 @@ package com.voxelengine.GUI
 			outline.addEventListener(ImageEvent.IMAGE_LOADED, imageLoaded );
 			addElement( outline );
 			
-			_itemInventory = new QuickInventory();
+			_itemInventory = new QuickInventory(800,126, 64, "beastToolbar.png");
 			addChild(_itemInventory);
 
 			display( 0, Globals.g_renderer.height - TOOLBAROUTLINE_HEIGHT );
@@ -116,13 +117,13 @@ package com.voxelengine.GUI
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Inventory and ToolSize
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		public function buildAction( actionItem:ObjectInfo, count:int ):Box
-		{
-			var buildResult:Object = _itemInventory.buildActionItem( actionItem, count );
-			eventCollector.addEvent( buildResult.box, UIMouseEvent.PRESS, pressItem );
-			eventCollector.addEvent( buildResult.hotkey, UIMouseEvent.PRESS, pressItem );
-			return buildResult.box;
-		}
+		//public function buildAction( actionItem:ObjectInfo, count:int ):Box
+		//{
+			//var buildResult:Object = _itemInventory.buildItem( actionItem, count, "" );
+			//eventCollector.addEvent( buildResult.box, UIMouseEvent.PRESS, pressItem );
+			//eventCollector.addEvent( buildResult.hotkey, UIMouseEvent.PRESS, pressItem );
+			//return buildResult.box;
+		//}
 		
 		public function show():void
 		{
@@ -147,7 +148,7 @@ package com.voxelengine.GUI
 		private function selectItemByIndex( index:int ):void
 		{
 			//Log.out( "ToolBar.selectItemByIndex: " + index );
-			var box:Box = _itemInventory.getBoxFromIndex( index )
+			var box:Box = _itemInventory.boxes[ index ];
 			_itemInventory.moveSelector( box.x );
 			processItemSelection( box );
 		}
@@ -158,10 +159,10 @@ package com.voxelengine.GUI
 				return;
 				
 			//Log.out( "ToolBar.hotKeyItem: " + (e.keyCode - 49) );
-			if ( 49 <= e.keyCode && e.keyCode <= 58 )
+			if ( 48 <= e.keyCode && e.keyCode <= 58 )
 			{
-				var selectedItem:int = e.keyCode - 49;
-				var box:Box = _itemInventory.getBoxFromIndex( selectedItem );
+				var selectedItem:int = e.keyCode - 48;
+				var box:Box = _itemInventory.boxes[ index ];
 				_itemInventory.moveSelector( box.x );
 				processItemSelection( box );
 				activateItemSelection( box );

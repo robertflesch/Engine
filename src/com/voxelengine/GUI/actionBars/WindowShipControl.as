@@ -1,8 +1,10 @@
 
-package com.voxelengine.GUI
+package com.voxelengine.GUI.actionBars
 {
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.events.ShipEvent;
+	import com.voxelengine.GUI.VVCanvas;
+	import com.voxelengine.GUI.WindowHeading;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.models.ModelTransform;
