@@ -9,7 +9,7 @@ import org.flashapi.swing.plaf.spas.SpasUI;
 
 public class ComponentLabel extends Box
 {
-	public function ComponentLabel( $label:String, $initialValue:String, $width:int, $height:int = 50, $padding:int = 15 )
+	public function ComponentLabel( $label:String, $initialValue:String, $width:int, $height:int = 30, $padding:int = 8 )
 	{
 		super( $width, $height );
 		

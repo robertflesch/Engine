@@ -22,10 +22,12 @@ public class ComponentVector3D extends Box
 		super();
 		_ii = $ii;
 		width = 300;
+		height = 50;
 		padding = 15;
 		title = $title;
 		borderStyle = BorderStyle.GROOVE;
 		backgroundColor = SpasUI.DEFAULT_COLOR;
+		layout.orientation = LayoutOrientation.HORIZONTAL;
 		
 		if ( null == $changeFunction )
 			$changeFunction = ComponentVector3D.updateVal;
@@ -42,8 +44,6 @@ public class ComponentVector3D extends Box
 					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $vect.y, $changeFunction($e) ); if ( _ii )_ii.changed = true }
 					, function($e:TextEvent):void       { $vect.setTo( $vect.x, $vect.y, int( $e.target.text ) ); if ( _ii )_ii.changed = true }
 					, $vect.z.toFixed($decimalPlaces) );
-					
-		layout.orientation = LayoutOrientation.VERTICAL;
 	}
 	
 	static private function updateVal( $e:SpinButtonEvent ):int {
@@ -57,7 +57,7 @@ public class ComponentVector3D extends Box
 	private function addSpinLabel( label:String, clickHandler:Function, textChanged:Function, initialValue:String ):TextInput
 	{
 		var lbl:Label = new Label(label);
-		lbl.width = 150;
+		lbl.width = 15;
 		lbl.height = 20;
 		lbl.textAlign = TextAlign.CENTER;
 		
@@ -71,7 +71,7 @@ public class ComponentVector3D extends Box
 		sb.addEventListener( SpinButtonEvent.CLICK_UP, clickHandler );
 		sb.data = src;
 
-		var panel:Container = new Container( 300, 20 );
+		var panel:Container = new Container( 90, 20 );
 		panel.layout.orientation = LayoutOrientation.HORIZONTAL;
 		
 		panel.addElement( lbl );
