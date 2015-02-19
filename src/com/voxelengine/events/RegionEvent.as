@@ -23,6 +23,8 @@ package com.voxelengine.events
 		// Used by the sandbox list to request a join of a server region
 		static public const REQUEST_JOIN:String						= "REQUEST_JOIN";
 
+		// data or meta data about this region has changed
+		static public const REGION_CHANGED:String					= "REGION_CHANGED";
 		// tells the region manager to load this region
 		static public const REGION_LOAD:String						= "REGION_LOAD";
 		// dispatched at the begining of a region load
