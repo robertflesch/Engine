@@ -162,7 +162,7 @@ public class Player extends Avatar
 			newPlayer.init( mi, md );
 			
 			ModelLoader.load( ii );
-			var inv:Inventory = InventoryManager.objectInventoryGet( Network.userId );
+			InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_REQUEST, Network.userId, null ) );
 		}
 		else {
 			Log.out( "Player.onPlayerLoadedAction - ERROR, failed to create new record for ?" );

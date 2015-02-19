@@ -41,7 +41,7 @@
 				var newRegion:Region = new Region( $guid );
 				newRegion.createEmptyRegion();
 				// Now that we have a fully formed region, inform the region manager
-				Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
+				RegionManager.dispatch( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
 			}
 		}
 
@@ -96,7 +96,7 @@
 			newRegion.initJSON( regionJson );
 			
 			// Now that we have a fully formed region, inform the region manager
-			Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
+			RegionManager.dispatch( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
 		}
 
 		static public function save( $guid:String, $metadata:Object, $dbo:DatabaseObject, $createSuccess:Function ):void {

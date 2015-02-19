@@ -1,6 +1,8 @@
 
 package com.voxelengine.GUI 
 {
+import com.voxelengine.events.RegionEvent;
+import com.voxelengine.worldmodel.RegionManager;
 import flash.geom.Vector3D;
 import flash.events.Event;
 import flash.display.Bitmap;
@@ -80,13 +82,13 @@ public class WindowRegionDetail extends VVPopup
 		var gravArray:Array = [ { label:"Use Gravity" }, { label:"NO Gravity. " } ];
 		addElement( new ComponentRadioButtonGroup( "Gravity", gravArray, gravChange,  _region.gravity ? 0 : 1, WIDTH ) );
 		
-		var playerStartingPosition:ComponentVector3D = new ComponentVector3D( "Player Starting Location", "X: ", "Y: ", "Z: ",  _region.playerPosition );
+		var playerStartingPosition:ComponentVector3D = new ComponentVector3D( "Player Starting Location", "X: ", "Y: ", "Z: ",  _region.playerPosition, updateVal );
 		addElement( playerStartingPosition );
 		
-		var playerStartingRotation:ComponentVector3D = new ComponentVector3D( "Player Starting Rotation", "X: ", "Y: ", "Z: ",  _region.playerRotation );
+		var playerStartingRotation:ComponentVector3D = new ComponentVector3D( "Player Starting Rotation", "X: ", "Y: ", "Z: ",  _region.playerRotation, updateVal );
 		addElement( playerStartingRotation );
 		
-		var skyColor:ComponentVector3D = new ComponentVector3D( "Sky Color", "Red: ", "Green: ", "Blue: ",  _region.getSkyColor() );
+		var skyColor:ComponentVector3D = new ComponentVector3D( "Sky Color", "R: ", "G: ", "B: ",  _region.getSkyColor(), updateVal );
 		addElement( skyColor );
 		
 		/// Buttons /////////////////////////////////////////////
@@ -119,12 +121,21 @@ public class WindowRegionDetail extends VVPopup
 		//display();
 	}
 	
+	private function updateVal( $e:SpinButtonEvent ):int {
+		var ival:int = int( $e.target.data.text );
+		if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival--;
+		else 											ival++;
+		$e.target.data.text = ival.toString();
+		_region.changed = true;
+		return ival;
+	}
+	
 	private function create( e:UIMouseEvent ):void {
 		
 		if ( _create )
-			Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, _region ) );
+			RegionManager.dispatch( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, _region ) );
 		else {
-			_region.saveEdit();
+			RegionManager.dispatch( new RegionEvent( RegionEvent.REGION_CHANGED, _region.guid ) );
 		}
 			
 		remove();
@@ -139,20 +150,24 @@ public class WindowRegionDetail extends VVPopup
 	
 	private function gravChange(event:ButtonsGroupEvent):void {  
 		_region.gravity = (0 == event.target.index ?  true : false );
+		_region.changed = true;
 	} 
 	
 	private function ownerChange(event:ButtonsGroupEvent):void {  
 		_region.owner = (0 == event.target.index ?  Network.PUBLIC : Network.userId );
+		_region.changed = true;
 	} 
 	
 	private function changeNameHandler(event:TextEvent):void
 	{
 		_region.name = event.target.text;
+		_region.changed = true;
 	}
 	
 	private function changeDescHandler(event:TextEvent):void
 	{
 		_region.desc = event.target.text;
+		_region.changed = true;
 	}
 	
 

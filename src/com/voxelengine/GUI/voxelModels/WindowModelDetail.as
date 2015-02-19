@@ -30,7 +30,6 @@ package com.voxelengine.GUI.voxelModels
 		private var _panelAdvanced:Panel;
 		
 		private var _vm:VoxelModel = null;
-		private var _ii:InstanceInfo = null;
 		
 		private static const BORDER_WIDTH:int = 4;
 		private static const BORDER_WIDTH_2:int = BORDER_WIDTH * 2;
@@ -54,7 +53,7 @@ package com.voxelengine.GUI.voxelModels
 			_s_currentInstance = this;
 			
 			_vm = $vm;
-			_ii	= _vm.instanceInfo;
+			var ii:InstanceInfo = _vm.instanceInfo; // short cut for brevity
 			
 			onCloseFunction = closeFunction;
 			defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION;
@@ -73,20 +72,20 @@ package com.voxelengine.GUI.voxelModels
 											 , width ) );
 
 			// TODO need to be able to handle an array of scipts.
-			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { _ii.scriptName = $e.target.text; }, _ii.scriptName, width ) );
-			addElement( new ComponentLabel( "Size in Meters", String(_ii.grainSize), width ) );
-			addElement( new ComponentLabel( "Instance GUID",  _ii.guid, width ) );
+			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { ii.scriptName = $e.target.text; }, ii.scriptName, width ) );
+			addElement( new ComponentLabel( "Size in Meters", String(ii.grainSize), width ) );
+			addElement( new ComponentLabel( "Instance GUID",  ii.guid, width ) );
 			if ( _vm.anim )
 				// TODO add a drop down of available states
 				addElement( new ComponentLabel( "State", _vm.anim ? _vm.anim.name : "", width ) );
 				
-			if ( _ii.controllingModel )
-				addElement( new ComponentLabel( "Parent GUID",  _ii.controllingModel ? _ii.controllingModel.instanceInfo.guid : "", width ) );
+			if ( ii.controllingModel )
+				addElement( new ComponentLabel( "Parent GUID",  ii.controllingModel ? ii.controllingModel.instanceInfo.guid : "", width ) );
 //
-			addElement( new ComponentVector3D( "Position", "X: ", "Y: ", "Z: ",  _ii.positionGet, _ii ) );
-			addElement( new ComponentVector3D( "Rotation", "X: ", "Y: ", "Z: ",  _ii.rotationGet, _ii ) );
-			addElement( new ComponentVector3D( "Center", "X: ", "Y: ", "Z: ",  _ii.center, _ii ) );
-			addElement( new ComponentVector3D( "Scale", "X: ", "Y: ", "Z: ",  _ii.scale, _ii, updateScaleVal, 5 ) );
+			addElement( new ComponentVector3D( "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, updateVal ) );
+			addElement( new ComponentVector3D( "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, updateVal ) );
+			addElement( new ComponentVector3D( "Center", "X: ", "Y: ", "Z: ",  ii.center, updateVal ) );
+			addElement( new ComponentVector3D( "Scale", "X: ", "Y: ", "Z: ",  ii.scale, updateScaleVal, 5 ) );
 			
 //			if ( true == Globals.g_debug )
 //			{
@@ -99,14 +98,23 @@ package com.voxelengine.GUI.voxelModels
 			display( 600, 20 );
         }
 		
-		static private function updateScaleVal( $e:SpinButtonEvent ):Number {
+		private function updateScaleVal( $e:SpinButtonEvent ):Number {
 			var ival:Number = Number( $e.target.data.text );
 			if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival = ival/2;
 			else 											ival = ival*2;
 			$e.target.data.text = ival.toString();
+			_vm.changed = true;
 			return ival;
 		}
 		
+		private function updateVal( $e:SpinButtonEvent ):int {
+			var ival:int = int( $e.target.data.text );
+			if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival--;
+			else 											ival++;
+			$e.target.data.text = ival.toString();
+			_vm.changed = true;
+			return ival;
+		}
 		
 		private function oxelUtilsHandler(event:UIMouseEvent):void  {
 
@@ -119,25 +127,17 @@ package com.voxelengine.GUI.voxelModels
 			_s_inExistance--;
 			_s_currentInstance = null;
 			
-			Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.MODEL_MODIFIED, _ii.guid ) );
+			Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.guid ) );
 			RegionManager.dispatch( new RegionEvent( RegionEvent.REGION_MODIFIED, "" ) );
 		}
 		
 
 		private function changeStateHandler(event:TextEvent):void {
-			var vm:VoxelModel = Globals.getModelInstance( _ii.guid )
+			var vm:VoxelModel = Globals.getModelInstance( _vm.instanceInfo.guid )
 			var state:String = event.target.text;
 			vm.stateLock( false );
 			vm.stateSet( state );
 			vm.stateLock( true );
-		}
-
-		private function updateVal( $e:SpinButtonEvent ):int {
-			var ival:int = int( $e.target.data.text );
-			if ( "clickDown" == $e.type ) 	ival--;
-			else 								ival++;
-			$e.target.data.text = ival.toString();
-			return ival;
 		}
 
         private function close(e:MouseEvent):void { setHeight(0); }

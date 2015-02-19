@@ -27,18 +27,20 @@ public class InventoryManager
 	// really I want any model to be able to have inventory. so this can be networkid OR guid ?? both are unique.
 	static private var  _s_inventoryByGuid:Array = [];
 	
-	public static function save():void {
+	static public function init():void {
+		// This creates a inventory object for login.
+//		objectInventoryGet("player");	
+		addListener( InventoryEvent.INVENTORY_UNLOAD_REQUEST, unloadInventory );
+		addListener( InventoryEvent.INVENTORY_REQUEST, requestInventory );
+		addListener( InventoryEvent.INVENTORY_SAVE_REQUEST, save );
+	}
+
+	static private function save( e:InventoryEvent ):void {
 		for each ( var inventory:Inventory in _s_inventoryByGuid )
 			if ( null != inventory && inventory.networkId != "player" )
 				inventory.save();
 	}
 	
-	public static function init():void {
-		// This creates a inventory object for login.
-		objectInventoryGet("player");	
-		addListener( InventoryEvent.INVENTORY_UNLOAD_REQUEST, unloadInventory );
-		addListener( InventoryEvent.INVENTORY_REQUEST, requestInventory );
-	}
 	
 	static private function requestInventory(e:InventoryEvent):void 
 	{
@@ -72,7 +74,7 @@ public class InventoryManager
 		}
 	}
 	
-	static public function objectInventoryGet( $ownerGuid:String ):Inventory {
+	static private function objectInventoryGet( $ownerGuid:String ):Inventory {
 		var inventory:Inventory = _s_inventoryByGuid[$ownerGuid];
 		if ( null == inventory && null != $ownerGuid ) {
 			//Log.out( "InventoryManager.objectInventoryGet creating inventory for: " + $ownerGuid , Log.WARN );

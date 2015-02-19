@@ -58,6 +58,7 @@ package com.voxelengine.GUI
 			grainContainer.addElement( new Label( "Size in Meters" ) );
 			grainContainer.addElement( _cbSize );
 			eventCollector.addEvent( _cbSize, ListEvent.LIST_CHANGED, sizeChange );
+			
 			var detailContainer:Container = new Container( width / 2, 50 );
 			detailContainer.layout.orientation = LayoutOrientation.VERTICAL;
 			detailContainer.addElement( new Label( "Smallest Block in Meters" ) );
@@ -66,21 +67,18 @@ package com.voxelengine.GUI
 			sizeContainer.addElement( detailContainer );
 			panel.addElement(sizeContainer);
 			
-			var madeOfType:Label = new Label( "Made of Type" )
-			madeOfType.fontSize = 14;
-			panel.addElement( madeOfType );
-			_cbType = new ComboBox( "Made Of" );
-			
+			panel.addElement( new Label( "Made of Type" ) );
+			_cbType = new ComboBox();
 			var item:TypeInfo;
 			for ( var i:int = TypeInfo.MIN_TYPE_INFO; i < TypeInfo.MAX_TYPE_INFO; i++ )
 			{
 				item = TypeInfo.typeInfo[i];
 				if ( null == item )
 					continue;
-				if ( "INVALID" != item.name && "AIR" != item.name && "BRAND" != item.name && -1 == item.name.indexOf( "EDIT" ) && item.placeable )
-				{
+				if ( "INVALID" != item.name && "BRAND" != item.name && -1 == item.name.indexOf( "EDIT" ) && item.placeable )
 					_cbType.addItem( item.name, item.type );
-				}
+				else	
+					Log.out( "WindowModelChoice.construct - rejecting: " + item.name, Log.WARN );
 			}
 			
 			_cbType.selectedIndex = 0;
@@ -111,12 +109,12 @@ package com.voxelengine.GUI
 			{
 				_cbDetail.addItem( (1<<j)/16, j );
 			}
-			_cbDetail.selectedIndex = 3;
+			_cbDetail.selectedIndex = 2;
 		}
 		
 		private function updateDetail( selectedIndex:int ):void {
 			if ( 1 < selectedIndex )
-				_cbDetail.selectedIndex = selectedIndex - 2;
+				_cbDetail.selectedIndex = ( 0 <  selectedIndex - 3 ? selectedIndex - 3 : 0 );
 			else	
 				_cbDetail.selectedIndex = 0;
 		}
@@ -177,9 +175,9 @@ package com.voxelengine.GUI
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
 			Globals.g_app.addEventListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
 			var vm:VoxelModel = new VoxelModel( ii );
-			vm.metadata = new VoxelModelMetadata();
+//			vm.metadata = new VoxelModelMetadata();
 			Globals.modelAdd( vm );
-			new WindowModelDetail( vm );
+			new WindowModelMetadata( ii.guid );
 		}
 		
 		private function modelDetailChanged(e:ModelEvent):void 

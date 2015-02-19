@@ -98,8 +98,8 @@ public class WindowSandboxList extends VVPopup
 		eventCollector.addEvent( this, UIMouseEvent.PRESS, pressWindow );
 		
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
-		//Globals.g_app.addEventListener( RegionLoadedEvent.REGION_LOADED, regionLoadedEvent );
-		Globals.g_app.addEventListener( RegionLoadedEvent.REGION_CREATED, regionLoadedEvent ); 
+		//RegionManager.addListener( RegionLoadedEvent.REGION_LOADED, regionLoadedEvent );
+		RegionManager.addListener( RegionLoadedEvent.REGION_CREATED, regionLoadedEvent ); 
 		
 		displaySelectedRegionList( openType );
 		

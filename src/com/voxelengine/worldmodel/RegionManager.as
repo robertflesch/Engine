@@ -56,24 +56,6 @@ public class RegionManager
 		Log.out("RegionManager.currentRegion - set to: " + val.guid, Log.DEBUG ) 
 	}
 	
-	// Used to distribue all persistance messages
-	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
-	
-	///////////////// Event handler interface /////////////////////////////
-
-	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
-		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
-	}
-
-	static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
-		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
-	}
-	
-	static public function dispatch( $event:Event) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
-	}
-	
-	///////////////// Event handler interface /////////////////////////////
 	public function get regions():Vector.<Region> { return _regions; }
 	
 	public function get modelLoader():ModelLoader { return _modelLoader; }
@@ -86,11 +68,12 @@ public class RegionManager
 		Globals.g_app.addEventListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
 		
 		RegionManager.addListener( RegionEvent.REQUEST_JOIN, requestServerJoin ); 
-		Globals.g_app.addEventListener( RegionLoadedEvent.REGION_CREATED, regionCreatedHandler ); 
+		RegionManager.addListener( RegionEvent.REGION_CHANGED, regionChanged );	
 		
+		RegionManager.addListener( RegionLoadedEvent.REGION_CREATED, regionCreatedHandler ); 
 		
-		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED,  regionChanged );
-		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_REMOVED, regionChanged );
+		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED,  regionModelChanged );
+		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_REMOVED, regionModelChanged );
 									  
 		Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_FAILURE, removeFailedObjectFromRegion );									  
 		Globals.g_app.addEventListener( LoadingEvent.LOAD_CONFIG_COMPLETE, requestStartingRegionFile );
@@ -106,7 +89,17 @@ public class RegionManager
 		MouseKeyboardHandler.init();
 	}
 	
-	private function regionChanged( me:ModelEvent ):void { 
+	private function regionChanged( $re:RegionEvent):void 
+	{
+		var region:Region = regionGet( $re.guid );
+		if ( region )
+			region.save();
+		else	
+			Log.out( "RegionManager.regionChanged- did not find: " + $re.guid + " in order to save", Log.ERROR );
+	}
+	
+	
+	private function regionModelChanged( me:ModelEvent ):void { 
 		var region:Region = currentRegion;
 		if ( region && region.loaded )
 			currentRegion.changed = true;
@@ -148,7 +141,7 @@ public class RegionManager
 		var jsonString:String = StringUtil.trim(String(event.target.data));
 		newRegion.initJSON( jsonString );
 		// This adds it to the list of regions
-		Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
+		RegionManager.dispatch( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
 		// This tells the config manager that the local region was loaded and is ready to load rest of data.
 		dispatch( new RegionEvent( RegionEvent.REGION_LOAD, guid ) ); 
 	}
@@ -174,14 +167,14 @@ public class RegionManager
 		
 		var region:Region = regionGet( e.guid );
 		if ( null == region ) {
-			Globals.g_app.addEventListener( RegionLoadedEvent.REGION_LOADED, regionLoadedFromPersistance );
+			RegionManager.addListener( RegionLoadedEvent.REGION_LOADED, regionLoadedFromPersistance );
 			return;
 		}
 		dispatch( new RegionEvent( RegionEvent.REGION_LOAD, e.guid ) );
 	}
 	
 	private function regionLoadedFromPersistance( $rle:RegionLoadedEvent ):void {
-		Globals.g_app.removeEventListener( RegionLoadedEvent.REGION_LOADED, regionLoadedFromPersistance );
+		RegionManager.removeListener( RegionLoadedEvent.REGION_LOADED, regionLoadedFromPersistance );
 		dispatch( new RegionEvent( RegionEvent.REGION_LOAD, $rle.region.guid ) );
 	}
 	
@@ -213,7 +206,7 @@ public class RegionManager
 				
 		_regions.push( e.region );
 		
-		Globals.g_app.dispatchEvent( new RegionLoadedEvent( RegionLoadedEvent.REGION_LOADED, e.region ) );
+		RegionManager.dispatch( new RegionLoadedEvent( RegionLoadedEvent.REGION_LOADED, e.region ) );
 	}
 	
 	/**
@@ -275,5 +268,25 @@ public class RegionManager
 			fr.save( currentRegion.getJSON(), currentRegion.guid );
 		}
 	}
+	
+	// Used to distribue all persistance messages
+	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
+	
+	///////////////// Event handler interface /////////////////////////////
+
+	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
+		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
+	}
+
+	static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
+		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
+	}
+	
+	static public function dispatch( $event:Event) : Boolean {
+		return _eventDispatcher.dispatchEvent( $event );
+	}
+	
+	///////////////// Event handler interface /////////////////////////////
+	
 } // RegionManager
 } // Package

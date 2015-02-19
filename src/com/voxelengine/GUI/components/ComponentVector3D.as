@@ -1,6 +1,5 @@
 
 package com.voxelengine.GUI.components {
-import com.voxelengine.worldmodel.models.InstanceInfo;
 import flash.geom.ColorTransform;
 import flash.geom.Vector3D;
 import org.flashapi.swing.color.Color;
@@ -16,11 +15,15 @@ import com.voxelengine.Log;
 
 public class ComponentVector3D extends Box
 {
-	private var _ii:InstanceInfo;
-	public function ComponentVector3D( $title:String, $s1Label:String, $s2Label:String, $s3Label:String, $vect:Vector3D, $ii:InstanceInfo = null,  $changeFunction:Function = null, $decimalPlaces:int = 0 )
+	public function ComponentVector3D( $title:String
+	                                 , $s1Label:String
+									 , $s2Label:String
+									 , $s3Label:String
+									 , $vect:Vector3D
+									 , $changeFunction:Function = null
+									 , $decimalPlaces:int = 0 )
 	{
 		super();
-		_ii = $ii;
 		width = 300;
 		height = 50;
 		padding = 15;
@@ -33,16 +36,16 @@ public class ComponentVector3D extends Box
 			$changeFunction = ComponentVector3D.updateVal;
 		
 		addSpinLabel( $s1Label
-					, function($e:SpinButtonEvent):void { $vect.setTo( $changeFunction($e), $vect.y, $vect.z ); if ( _ii )_ii.changed = true }
-					, function($e:TextEvent):void       { $vect.setTo( int( $e.target.text ), $vect.y, $vect.z ); if ( _ii )_ii.changed = true }
+					, function($e:SpinButtonEvent):void { $vect.setTo( $changeFunction($e), $vect.y, $vect.z ); }
+					, function($e:TextEvent):void       { $vect.setTo( int( $e.target.text ), $vect.y, $vect.z );  }
 					, $vect.x.toFixed($decimalPlaces) );
 		addSpinLabel( $s2Label
-					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $changeFunction($e), $vect.z ); if ( _ii )_ii.changed = true }
-					, function($e:TextEvent):void       { $vect.setTo( $vect.x, int( $e.target.text ), $vect.z ); if ( _ii )_ii.changed = true }
+					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $changeFunction($e), $vect.z );  }
+					, function($e:TextEvent):void       { $vect.setTo( $vect.x, int( $e.target.text ), $vect.z );  }
 					, $vect.y.toFixed($decimalPlaces) );
 		addSpinLabel( $s3Label
-					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $vect.y, $changeFunction($e) ); if ( _ii )_ii.changed = true }
-					, function($e:TextEvent):void       { $vect.setTo( $vect.x, $vect.y, int( $e.target.text ) ); if ( _ii )_ii.changed = true }
+					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $vect.y, $changeFunction($e) );  }
+					, function($e:TextEvent):void       { $vect.setTo( $vect.x, $vect.y, int( $e.target.text ) );  }
 					, $vect.z.toFixed($decimalPlaces) );
 	}
 	
