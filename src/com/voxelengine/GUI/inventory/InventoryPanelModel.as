@@ -121,17 +121,18 @@ public class InventoryPanelModel extends VVContainer
 		item = new ObjectAction( "createNewObjectIPM", "NewModel128.png", "Click to create new model" );
 		box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE, item );
 		box.x = count++ * MODEL_IMAGE_WIDTH;
+		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		pc.addElement( box );
 		
 		if ( Globals.g_debug ) {
 			item = new ObjectAction( "importObjectIPM", "import128.png", "Click to import local model" );
 			box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE, item );
 			box.x = count++ * MODEL_IMAGE_WIDTH;
+			eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 			pc.addElement( box );
 		}
 		
 		//eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
-		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		count++;
 
 		for ( var key:String in results ) {	
