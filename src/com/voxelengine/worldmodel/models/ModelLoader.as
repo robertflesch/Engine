@@ -236,7 +236,7 @@ package com.voxelengine.worldmodel.models
 		static private function loadLocal( $ii:InstanceInfo, $vmm:VoxelModelMetadata ):void {
 			Log.out( "ModelLoader.loadLocal - InstanceInfo: " + $ii.toString(), Log.DEBUG );
 			var modelInfo:ModelInfo = modelInfoFindOrCreate( $ii.guid, $ii.guid );
-			if ( Globals.online && modelInfo.biomes.layers[0].functionName == "LoadModelFromIVM" )
+			if ( Globals.online && modelInfo && modelInfo.biomes.layers[0].functionName == "LoadModelFromIVM" )
 				Log.out( "ModelLoader.loadLocal - LOADING LOCAL WHEN ONLINE - InstanceInfo: " + $ii.toString(), Log.ERROR );
 			if ( modelInfo )
 			{
