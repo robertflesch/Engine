@@ -56,7 +56,8 @@ public class ShapeSelector extends VVCanvas
 		
 		
 		var hk:Label = new Label("", 20);
-//			hk.x = -20;
+		hk.x = 33;
+		hk.y = -4;
 		hk.fontColor = 0xffffff;
 		hk.text = "F8";
 		addElement(hk);

@@ -97,6 +97,7 @@ public class GrainSelector extends QuickInventory
 		
 		hk.data = item;
 		hk.x = _imageSize * count + _selectorXOffset + 5;
+		hk.y = -4;
 		hk.fontColor = 0xffffff;
 		hk.text = "F" + String( count  + 1 );  // 0 box is F1 key
 		addElement(hk);
