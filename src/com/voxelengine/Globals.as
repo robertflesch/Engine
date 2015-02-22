@@ -258,12 +258,12 @@ package com.voxelengine {
 		};
 		
 		public static function addIVM( $guid:String, $ba:ByteArray ):void {
-			return g_regionManager.currentRegion.modelManager.addIVM( $guid, $ba );
+			g_regionManager.currentRegion.modelManager.addIVM( $guid, $ba );
 		};
 		
 		public static function reinitialize( $context:Context3D ):void {
 			if ( g_regionManager && g_regionManager.currentRegion )
-				return g_regionManager.currentRegion.modelManager.reinitialize( $context );
+				g_regionManager.currentRegion.modelManager.reinitialize( $context );
 		}
 		
 		public static function createPlayer():Boolean {
@@ -276,19 +276,19 @@ package com.voxelengine {
 		}
 		
 		public static function draw( $mvp:Matrix3D, $context:Context3D ):void {
-			return g_regionManager.currentRegion.modelManager.draw( $mvp, $context )
+			g_regionManager.currentRegion.modelManager.draw( $mvp, $context )
 		}
 		
 		public static function modelAdd( $vm:VoxelModel ):void {
-			return g_regionManager.currentRegion.modelManager.modelAdd( $vm )
+			g_regionManager.currentRegion.modelManager.modelAdd( $vm )
 		}
 		
 		public static function modelInfoAdd( $modelInfo:ModelInfo ):void {
-			return g_regionManager.currentRegion.modelManager.modelInfoAdd( $modelInfo )
+			g_regionManager.currentRegion.modelManager.modelInfoAdd( $modelInfo )
 		}
 		
 		public static function instanceInfoAdd( $val:InstanceInfo ):void {
-			return g_regionManager.currentRegion.modelManager.instanceInfoAdd( $val );
+			g_regionManager.currentRegion.modelManager.instanceInfoAdd( $val );
 		};
 
 		public static function instanceInfoGet( $guid:String ):InstanceInfo {
@@ -300,7 +300,7 @@ package com.voxelengine {
 		}
 
 		public static function changeFromParentToChild( $vm:VoxelModel ):void {
-			return g_regionManager.currentRegion.modelManager.changeFromParentToChild( $vm )
+			g_regionManager.currentRegion.modelManager.changeFromParentToChild( $vm )
 		}
 		
 		public static function whichModelsIsThisInfluencedBy( $vm:VoxelModel ):Vector.<VoxelModel>  {
@@ -308,7 +308,7 @@ package com.voxelengine {
 		}
 
 		public static function markDead( $guid:String ):void {
-			return g_regionManager.currentRegion.modelManager.markDead( $guid );
+			g_regionManager.currentRegion.modelManager.markDead( $guid );
 		};
 		
 		public static function modelInstancesGetDictionary():Dictionary {
@@ -325,7 +325,7 @@ package com.voxelengine {
 		
 		public static function dispose():void {
 			g_textureBank.dispose();
-			return g_regionManager.currentRegion.modelManager.dispose();
+			g_regionManager.currentRegion.modelManager.dispose();
 		};
 		
 		public static function gci():GrainCursorIntersection {
@@ -341,7 +341,7 @@ package com.voxelengine {
 		};
 		
 		public static function TestCheckForFlow():void {
-			return g_regionManager.currentRegion.modelManager.TestCheckForFlow();
+			g_regionManager.currentRegion.modelManager.TestCheckForFlow();
 		};
 		
 		public static function worldSpaceStartPoint():Vector3D {
@@ -353,7 +353,7 @@ package com.voxelengine {
 		};
 		
 		public static function modelInstancesChangeGuid( $oldGuid:String, $newGuid:String ):void { 
-			return g_regionManager.currentRegion.modelManager.modelInstancesChangeGuid( $oldGuid, $newGuid );
+			g_regionManager.currentRegion.modelManager.modelInstancesChangeGuid( $oldGuid, $newGuid );
 		};
 	}
 }
