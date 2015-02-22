@@ -7,6 +7,8 @@
 ==============================================================================*/
 
 package {
+	import com.voxelengine.events.InventoryEvent;
+	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.server.Persistance;
 	import com.voxelengine.worldmodel.inventory.InventoryManager;
 	import flash.display.Sprite;
@@ -247,9 +249,11 @@ package {
 				stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 				stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp);
 					
-				Globals.g_regionManager.currentRegion.save();
-				if ( Globals.online )
-					InventoryManager.save();
+
+				if ( Globals.online ) {
+					RegionManager.dispatch( new RegionEvent( RegionEvent.REGION_CHANGED, Globals.g_regionManager.currentRegion.guid ) );
+					InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_SAVE_REQUEST, null, null ) );
+				}
 				
 				dispatchEvent( new GUIEvent( GUIEvent.APP_DEACTIVATE ) );
 			}
