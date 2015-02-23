@@ -19,7 +19,7 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.server.PersistModel;
+import com.voxelengine.persistance.PersistModel;
 
 /**
  * ...
@@ -74,8 +74,8 @@ public class MetadataManager
 			_modifiedDate = new Date();
 
 		Log.out( "MetadataManager.metadataLoad _modifiedDate: " + _modifiedDate.toString(), Log.DEBUG );
-		PersistModel.loadModelTemplates( Network.userId, _modifiedDate );
-		PersistModel.loadModelTemplates( Network.PUBLIC, _modifiedDate );
+//		PersistModel.loadModels( Network.userId, _modifiedDate );
+//		PersistModel.loadModels( Network.PUBLIC, _modifiedDate );
 		
 		// This will return models already loaded.
 		for each ( var vmm:VoxelModelMetadata in _metadata ) {
@@ -95,23 +95,41 @@ public class MetadataManager
 		if ( null == vmm ) {
 			_guidError = $guid;
 			//Log.out( "MetadataManager.metadataGet - did not find info for: " + $guid + " requesting...", Log.WARN );
-			PersistModel.loadModel( $guid, loadSuccess, loadFailure );
+			PersistModel.loadModel( $guid, loadSuccessMetadata, loadFailure );
 		}
 		return vmm; 
 	}
 	
-	static private function loadSuccess( dbo:DatabaseObject ):void {
+	static private function loadSuccessMetadata( dbo:DatabaseObject ):void {
 		
 		var vmm:VoxelModelMetadata = new VoxelModelMetadata();
 		if ( dbo ) {
-			vmm.fromPersistance( dbo );
+			vmm.fromPersistanceMetadata( dbo );
 			metadataAdd( vmm );
-			//Log.out( "MetadataManager.loadSuccess vmm: " + vmm.toString(), Log.WARN );
+			Log.out( "MetadataManager.loadSuccessMetadata vmm: " + vmm.toString(), Log.WARN );
 			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm, vmm.guid ) );
 		}
 		else {
 			vmm.guid = _guidError;
 			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm, vmm.guid ) );
+		}
+	}
+	
+	static private function loadSuccessData( dbo:DatabaseObject ):void {
+		
+		if ( dbo ) {
+			var vmm:VoxelModelMetadata = metadataGet( dbo.key );
+			if ( vmm ) {
+				vmm.fromPersistanceData( dbo );
+				Log.out( "MetadataManager.loadSuccessData vmm: " + vmm.toString(), Log.WARN );
+				dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm, vmm.guid ) );
+			}
+			else
+				dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_DATA_PERSISTANCE, null, dbo.key ) );
+
+		}
+		else {
+			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_DATA_PERSISTANCE, null, _guidError ) );
 		}
 	}
 	

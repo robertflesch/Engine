@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+	import com.voxelengine.events.LoadingEvent;
 	import flash.geom.Vector3D;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
@@ -26,13 +27,13 @@ package com.voxelengine.worldmodel
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.events.PersistanceEvent;
 	import com.voxelengine.events.RegionPersistanceEvent;
-	import com.voxelengine.events.LoadingEvent;
+	//import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.RegionEvent;
-	import com.voxelengine.events.RegionLoadedEvent;
 	import com.voxelengine.server.Network;
-	import com.voxelengine.server.PersistRegion;
+	import com.voxelengine.persistance.PersistRegion;
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.ModelManager;
 	import com.voxelengine.worldmodel.models.Player;
@@ -157,8 +158,53 @@ package com.voxelengine.worldmodel
 		public function Region( $guid:String ):void 
 		{
 			_guid = $guid;
-			_created = new Date();
-			_modified = _created;
+		}
+		
+		private function loadFail(e:RegionPersistanceEvent):void 
+		{
+			
+		}
+		
+		public function loadFromDBO( dbo:DatabaseObject ):void 
+		{
+			admin = cvsToVector( dbo.admin );
+			databaseObject = dbo;
+			desc = dbo.description;
+			name = dbo.name;
+			owner = dbo.owner
+			worldId = dbo.world;
+			editors = cvsToVector( dbo.editors );
+			created = dbo.created;
+			modified = dbo.modified;
+			
+			Log.out( "Region.loadSucceed - region Name: " + name + "  owner: " + owner + "  guid: " + guid, Log.DEBUG );
+			
+			var $ba:ByteArray = dbo.data as ByteArray;
+			$ba.uncompress();
+			$ba.position = 0;
+			// how many bytes is the modelInfo
+			var strLen:int = $ba.readInt();
+			// read off that many bytes
+			var regionJson:String = $ba.readUTFBytes( strLen );
+			//regionJson = decodeURI(regionJson);
+			initJSON( regionJson );
+			
+			// comma seperated variables
+			function cvsToVector( value:String ):Vector.<String> {
+				var v:Vector.<String> = new Vector.<String>;
+				var start:int = 0;
+				var end:int = value.indexOf( ",", 0 );
+				while ( -1 < end ) {
+					v.push( value.substring( start, end ) );
+					start = end + 1;
+					end = value.indexOf( ",", start );
+				}
+				// there is only one, or this is the last one
+				if ( -1 == end && start < value.length ) {
+					v.push( value.substring( start, value.length ) );
+				}
+				return v;
+			}
 		}
 		
 		public function update( $elapsed:int ):void {
@@ -176,14 +222,13 @@ package com.voxelengine.worldmodel
 			Log.out( "Region.onLoadingComplete: regionId: " + guid, Log.DEBUG );
 			_loaded = true;
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
-			RegionManager.dispatch( new RegionEvent( RegionEvent.REGION_LOAD_COMPLETE, guid ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_LOAD_COMPLETE, guid ) );
 		}
 
 		public function unload():void
 		{
 			Log.out( "Region.unloadRegion: " + guid, Log.DEBUG );
 			// Removes anonymous function
-			RegionManager.removeListener( RegionEvent.REGION_MODIFIED, handleRegionModified );
 			//Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_ADDED, function( me:ModelEvent ):void { ; } );
 			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_REMOVED, function( me:ModelEvent ):void { ; } );
 			Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
@@ -192,20 +237,14 @@ package com.voxelengine.worldmodel
 			_modelManager.bringOutYourDead();
 		}
 		
-		private function handleRegionModified( $re:RegionEvent ):void {
-			changed = true;	
-			save();
-		}
-				
 		public function load():void
 		{
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
-			RegionManager.addListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
+			RegionEvent.addListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.addEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
-			RegionManager.addListener( RegionEvent.REGION_MODIFIED, handleRegionModified);
 			
-			RegionManager.dispatch( new RegionEvent( RegionEvent.REGION_LOAD_BEGUN, guid ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_LOAD_BEGUN, guid ) );
 
 			var count:int = ModelLoader.loadRegionObjects(_JSON.region);
 			if ( 0 < count )
@@ -323,7 +362,9 @@ package com.voxelengine.worldmodel
 			ba.writeUTFBytes( regionJson );
 			ba.compress();
 			
-			PersistRegion.save( guid, metadata( ba ), databaseObject, createSuccess );
+			RegionPersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
+			RegionPersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, saveFail );
+			RegionPersistanceEvent.dispatch( new RegionPersistanceEvent( PersistanceEvent.SAVE_REQUEST, guid, _databaseObject, ba ) );
 
 			changed = false;
 		}
@@ -355,10 +396,29 @@ package com.voxelengine.worldmodel
 			ba.writeUTFBytes( regionJson );
 			ba.compress();
 			
-			PersistRegion.save( guid, metadata( ba ), databaseObject, createSuccess );
+			RegionPersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
+			RegionPersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, saveFail );
+			RegionPersistanceEvent.dispatch( new RegionPersistanceEvent( PersistanceEvent.SAVE_REQUEST, guid, _databaseObject, ba ) );
 
 			changed = false;
 		}
+
+		private function saveSucceed( $rpe:RegionPersistanceEvent ):void 
+		{ 
+			RegionPersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
+			RegionPersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, saveFail );
+			if ( $rpe.dbo )
+				databaseObject = $rpe.dbo;
+//			Globals.g_app.dispatchEvent( new RegionPersistanceEvent( RegionEvent.REGION_LOAD_COMPLETE, guid ) ); 
+			Log.out( "Region.createSuccess - created: " + guid, Log.DEBUG ); 
+		}	
+		
+		private function saveFail( $rpe:RegionPersistanceEvent ):void 
+		{ 
+			RegionPersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
+			RegionPersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, saveFail );
+			Log.out( "Region.saveFail - ", Log.DEBUG ); 
+		}	
 
 		public function saveLocal():void {
 			var fr:FileReference = new FileReference();
@@ -381,14 +441,6 @@ package com.voxelengine.worldmodel
 					};
 		}
 
-		private function createSuccess(o:DatabaseObject):void 
-		{ 
-			if ( o )
-				databaseObject = o;
-			Globals.g_app.dispatchEvent( new RegionPersistanceEvent( RegionPersistanceEvent.REGION_CREATE_SUCCESS, guid ) ); 
-			Log.out( "Region.createSuccess - created: " + guid, Log.DEBUG ); 
-		}	
-		
 		static public function resetPosition():void
 		{
 			if ( Globals.controlledModel )
@@ -425,5 +477,8 @@ package com.voxelengine.worldmodel
 		public function createEmptyRegion():void { initJSON( BLANK_REGION_TEMPLETE ); }
 		private function GetEditorsList():String { return _editors.toString(); }
 		private function GetAdminList():String { return _admin.toString(); }
+		
+		
+		
 	} // Region
 } // Package

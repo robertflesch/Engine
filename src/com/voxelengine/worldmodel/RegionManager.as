@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.RegionPersistanceEvent;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import flash.events.Event;
 import flash.events.EventDispatcher;
@@ -25,11 +27,10 @@ import com.voxelengine.Log;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.RegionEvent;
-import com.voxelengine.events.RegionLoadedEvent;
 import com.voxelengine.events.RoomEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.Room;
-import com.voxelengine.server.PersistRegion;
+import com.voxelengine.persistance.PersistRegion;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelLoader;
 import com.voxelengine.worldmodel.models.ModelManager;
@@ -47,6 +48,7 @@ public class RegionManager
 	private var _regions:Vector.<Region> = null
 	private var _currentRegion:Region = null
 	private var _modelLoader:ModelLoader = new ModelLoader();
+	private var _initialized:Boolean;
 	
 	public function get size():int { return _regions.length; }
 	
@@ -64,22 +66,23 @@ public class RegionManager
 	{
 		_regions = new Vector.<Region>;
 
-		RegionManager.addListener( RegionEvent.REGION_LOAD, regionLoad ); 
-		Globals.g_app.addEventListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
+		RegionEvent.addListener( RegionEvent.REGION_LOAD, regionLoad ); 
+		RegionEvent.addListener( RegionEvent.REQUEST_JOIN, requestServerJoin ); 
+		RegionEvent.addListener( RegionEvent.REGION_CHANGED, regionChanged );	
+		RegionEvent.addListener( RegionEvent.REGION_TYPE_REQUEST, regionTypeRequest );
 		
-		RegionManager.addListener( RegionEvent.REQUEST_JOIN, requestServerJoin ); 
-		RegionManager.addListener( RegionEvent.REGION_CHANGED, regionChanged );	
+		RoomEvent.addListener( RoomEvent.ROOM_DISCONNECT, requestDefaultRegionLoad );
+		RoomEvent.addListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
 		
-		RegionManager.addListener( RegionLoadedEvent.REGION_CREATED, regionCreatedHandler ); 
+		RegionPersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
+		RegionPersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFail );			
+		RegionPersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED , regionCreatedHandler ); 
 		
 		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED,  regionModelChanged );
 		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_REMOVED, regionModelChanged );
 									  
 		Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_FAILURE, removeFailedObjectFromRegion );									  
-		Globals.g_app.addEventListener( LoadingEvent.LOAD_CONFIG_COMPLETE, requestStartingRegionFile );
-		
-		Globals.g_app.addEventListener( RoomEvent.ROOM_DISCONNECT, requestDefaultRegionLoad );
-		
+		Globals.g_app.addEventListener( LoadingEvent.LOAD_CONFIG_COMPLETE, configComplete );
 		
 		// This adds the event handlers
 		// Is there a central place to do this?
@@ -87,6 +90,46 @@ public class RegionManager
 		// This causes the to load its caches and listeners
 		InventoryManager.init();
 		MouseKeyboardHandler.init();
+	}
+	
+	private function regionTypeRequest(e:RegionEvent):void 
+	{
+		if ( false == _initialized ) {
+			RegionPersistanceEvent.dispatch( new RegionPersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Network.PUBLIC ) );			
+			RegionPersistanceEvent.dispatch( new RegionPersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Network.userId ) );			
+		}
+			
+		_initialized = true;
+		// Get a list of what we currently have
+		for each ( var region:Region in _regions ) {
+			if ( region && region.owner == e.guid )
+				RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_ADDED, region.guid, region ) );
+		}
+	}
+	
+	private function loadFail( $rpe:RegionPersistanceEvent ):void 
+	{
+		Log.out( "RegionManager.loadFail - region: " + $rpe.guid, Log.ERROR );
+	}
+	
+	private function loadSucceed( $rpe:RegionPersistanceEvent ):void 
+	{
+		Log.out( "RegionManager.loadSucceed - region: " + $rpe.guid, Log.WARN );
+		if ( regionHas( $rpe.guid ) ) {
+			Log.out( "RegionManager.loadSucceed - NOT loading duplicate region: " + $rpe.guid, Log.DEBUG );
+			return;
+		}
+			
+		Log.out( "RegionManager.loadSucceed - creating new region: " + $rpe.guid, Log.DEBUG );
+		var newRegion:Region = new Region( $rpe.guid );
+		newRegion.loadFromDBO( $rpe.dbo );
+		regionAdd( newRegion );
+	}
+	
+	private function regionAdd( $region:Region ):void {
+		Log.out( "RegionManager.regionAdd - adding region: " + $region.guid, Log.DEBUG );
+		_regions.push( $region );
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_ADDED, $region.guid, $region ) );
 	}
 	
 	private function regionChanged( $re:RegionEvent):void 
@@ -118,15 +161,23 @@ public class RegionManager
 		//currentRegion.save();
 	}
 	
-	public function requestStartingRegionFile( $e:LoadingEvent ):void
+	public function configComplete( $e:LoadingEvent ):void
 	{
-		var fileNamePathWithExt:String = Globals.regionPath + $e.guid + ".rjson"
-		Log.out( "RegionManager.requestStartingRegionFile - downloading: " + fileNamePathWithExt, Log.DEBUG );
-		var _urlLoader:CustomURLLoader = new CustomURLLoader(new URLRequest( fileNamePathWithExt ));
-		_urlLoader.addEventListener(Event.COMPLETE, onStartingRegionLoadedActionFromFile );
-		_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onRegionLoadError );			
+		var startingRegion:Region = new Region( $e.guid );
+		startingRegion.createEmptyRegion();
+		regionAdd( startingRegion );
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_LOAD, startingRegion.guid ) ); 
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_LOAD_COMPLETE, startingRegion.guid ) );
+		// This tells the config manager that the local region was loaded and is ready to load rest of data.
+		
+		//var fileNamePathWithExt:String = Globals.regionPath + $e.guid + ".rjson"
+		//Log.out( "RegionManager.requestStartingRegionFile - downloading: " + fileNamePathWithExt, Log.DEBUG );
+		//var _urlLoader:CustomURLLoader = new CustomURLLoader(new URLRequest( fileNamePathWithExt ));
+		//_urlLoader.addEventListener(Event.COMPLETE, onStartingRegionLoadedActionFromFile );
+		//_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onRegionLoadError );			
 	}
 	
+	/*
 	private function onRegionLoadError(error:IOErrorEvent):void
 	{
 		Log.out("RegionManager.onRegionLoadError - ERROR: " + error.toString(), Log.ERROR );
@@ -141,10 +192,11 @@ public class RegionManager
 		var jsonString:String = StringUtil.trim(String(event.target.data));
 		newRegion.initJSON( jsonString );
 		// This adds it to the list of regions
-		RegionManager.dispatch( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, newRegion ) );
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_LOAD_COMPLETE, newRegion.guid ) );
 		// This tells the config manager that the local region was loaded and is ready to load rest of data.
-		dispatch( new RegionEvent( RegionEvent.REGION_LOAD, guid ) ); 
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_LOAD, guid ) ); 
 	}
+	*/
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -165,17 +217,17 @@ public class RegionManager
 	public function onJoinRoomEvent( e:RoomEvent ):void {
 		Log.out( "RegionManager.onJoinRoomEvent - guid: " + e.guid, Log.DEBUG );
 		
-		var region:Region = regionGet( e.guid );
-		if ( null == region ) {
-			RegionManager.addListener( RegionLoadedEvent.REGION_LOADED, regionLoadedFromPersistance );
-			return;
-		}
-		dispatch( new RegionEvent( RegionEvent.REGION_LOAD, e.guid ) );
+		//var region:Region = regionGet( e.guid );
+		//if ( null == region ) {
+			//RegionPersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, regionLoadedFromPersistance );
+			//return;
+		//}
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_LOAD, e.guid ) );
 	}
 	
-	private function regionLoadedFromPersistance( $rle:RegionLoadedEvent ):void {
-		RegionManager.removeListener( RegionLoadedEvent.REGION_LOADED, regionLoadedFromPersistance );
-		dispatch( new RegionEvent( RegionEvent.REGION_LOAD, $rle.region.guid ) );
+	private function regionLoadedFromPersistance( $rpe:RegionPersistanceEvent ):void {
+		RegionPersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, regionLoadedFromPersistance );
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_LOAD, $rpe.guid ) );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -187,32 +239,21 @@ public class RegionManager
 			currentRegion.update( $elapsed );
 	}
 	
-	// This adds both local and remote region to the _regions list.
-	private function regionCreatedHandler( e:RegionLoadedEvent ):void {
-
-//		Log.out( "RegionManager.regionCreatedHandler: " + e.region.toString() );
+	// Just assign the dbo from the create to the region
+	private function regionCreatedHandler( e:RegionPersistanceEvent ):void {
+		Log.out( "RegionManager.regionCreatedHandler: " + e.guid );
 		// check for duplicates
-		for each ( var region:Region in _regions ) {
-			if ( region.guid == e.region.guid ) {
-				Log.out( "RegionManager.regionCreatedHandler - DUPS FOUND: " + e.region.toString(), Log.WARN );
-				return;
-			}
-		}
-		
-		// if this is a newly created region, save it.
-		if ( Globals.online )
-			if ( null == e.region.databaseObject )
-				e.region.save();
-				
-		_regions.push( e.region );
-		
-		RegionManager.dispatch( new RegionLoadedEvent( RegionLoadedEvent.REGION_LOADED, e.region ) );
+		var region:Region = regionGet( e.guid )
+		if ( region )
+			region.databaseObject = e.dbo;
+		else	
+			Log.out( "RegionManager.regionCreatedHandler: ERROR region not found for returned guid: " + e.guid );
 	}
 	
 	/**
 	 * @param  - guid of region
-	 * @return - region or null, if null tries to load it from persistance
-	 * Generates Event RegionLoadedEvent.REGION_LOADED when region is loaded
+	 * @return - region or null
+	 * 
 	*/
 	public function regionGet( $guid:String ):Region
 	{
@@ -221,40 +262,48 @@ public class RegionManager
 				return region;
 			}
 		}
-		
-		// if not found load it
-		PersistRegion.loadRegion( $guid );
-		
 		return null;
 	}
 	
+	public function regionHas( $guid:String ):Boolean
+	{
+		for each ( var region:Region in _regions ) {
+			if ( region && region.guid == $guid ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * @param  - RegionEvent generated by a region when it has 
 	 * @return - region or null, if null tries to load it from persistance
 	 * Generates Event RegionLoadedEvent.REGION_LOADED when region is loaded
 	*/
-	private function regionLoad( e:RegionEvent ):void
+	private function regionLoad( $re:RegionEvent ):void
 	{
-		Log.out( "RegionManager.load - region: " + e.guid, Log.DEBUG );
+		Log.out( "RegionManager.load - region: " + $re.guid, Log.DEBUG );
 		if ( !WindowSplash.isActive )
 			WindowSplash.create();
 		
 		if ( currentRegion )
-			dispatch( new RegionEvent( RegionEvent.REGION_UNLOAD, currentRegion.guid ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_UNLOAD, currentRegion.guid ) );
 
-		var region:Region = regionGet( e.guid );
+		var region:Region = regionGet( $re.guid );
 		if ( region ) {
 			currentRegion = region;
 			region.load();
 			return;
 		}
+		else
+			RegionPersistanceEvent.dispatch( new RegionPersistanceEvent( PersistanceEvent.LOAD_REQUEST, $re.guid ) );		
 		
 		// Should never get here
 		// No matching region found, so we have to go load it
 		var newRegion:Region = new Region( "ERROR_ID" );
 		newRegion.createEmptyRegion();
 		currentRegion = newRegion;
-		Log.out( "RegionManager.loadRegion - ERROR creating new region: " + e.guid, Log.ERROR );
+		Log.out( "RegionManager.loadRegion - ERROR creating new region: " + $re.guid, Log.ERROR );
 	}
 	
 	public function save():void
@@ -268,25 +317,6 @@ public class RegionManager
 			fr.save( currentRegion.getJSON(), currentRegion.guid );
 		}
 	}
-	
-	// Used to distribue all persistance messages
-	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
-	
-	///////////////// Event handler interface /////////////////////////////
-
-	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
-		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
-	}
-
-	static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
-		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
-	}
-	
-	static public function dispatch( $event:Event) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
-	}
-	
-	///////////////// Event handler interface /////////////////////////////
 	
 } // RegionManager
 } // Package

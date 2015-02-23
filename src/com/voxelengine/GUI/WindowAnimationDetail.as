@@ -58,7 +58,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.server.Network;
-	import com.voxelengine.server.PersistModel;
+	import com.voxelengine.persistance.PersistModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.worldmodel.models.ModelLoader;

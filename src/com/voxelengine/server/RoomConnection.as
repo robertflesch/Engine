@@ -195,7 +195,7 @@ package com.voxelengine.server {
 		}
 		
 		//static private function createPlayerAfterRegionLoad( $e:RegionEvent ):void {
-			//RegionManager.removeListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
+			//RegionEvent.removeListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
 			//Globals.createPlayer();
 		//}
 				

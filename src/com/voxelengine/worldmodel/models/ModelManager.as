@@ -28,7 +28,7 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.pools.*;
-	import com.voxelengine.server.Persistance;
+	import com.voxelengine.persistance.Persistance;
 	import com.voxelengine.utils.CustomURLLoader;
 	import com.voxelengine.worldmodel.models.*;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.CompletedModel;

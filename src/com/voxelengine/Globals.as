@@ -16,7 +16,7 @@ package com.voxelengine {
 	
 	import com.developmentarc.core.tasks.TaskController;
 	
-	import com.voxelengine.server.PersistRegion;
+	import com.voxelengine.persistance.PersistRegion;
 	import com.voxelengine.worldmodel.crafting.CraftingManager;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import com.voxelengine.worldmodel.RegionManager;

@@ -7,7 +7,7 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.server.PersistModel;
+	import com.voxelengine.persistance.PersistModel;
 	import flash.display3D.Context3D;
 	import flash.events.TimerEvent;
 	import flash.events.KeyboardEvent;
@@ -20,9 +20,6 @@ package com.voxelengine.worldmodel.models
 	import flash.utils.Timer;
 	import flash.utils.getQualifiedClassName;
 
-	import playerio.DatabaseObject;
-	import playerio.PlayerIOError;
-	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	
@@ -689,8 +686,11 @@ package com.voxelengine.worldmodel.models
 			//if ( 1 == _modelInfo.biomes.layers.length && "LoadModelFromIVM" == _modelInfo.biomes.layers[0].functionName && null != Globals.g_modelManager.modelByteArrays[_modelInfo.biomes.layers[0].data] )	
 			//	byteArrayLoad( Globals.g_modelManager.modelByteArrays[_modelInfo.biomes.layers[0].data] );
 			//else 
-			if (_modelInfo.biomes && false == complete && null == metadata.databaseObject )
+			//if (_modelInfo.biomes && false == complete && false == metadata.hasDataObject )
+			if (_modelInfo.biomes && false == complete && Globals.online ? metadata.hasDataObject : true ) {
+				Log.out( "VoxelModel.internal_initialize - adding task for: " + _modelInfo.biomes );
 				_modelInfo.biomes.add_to_task_controller(instanceInfo);
+			}
 			
 			// This unblocks the landscape task controller when all terrain tasks have been added
 			if (0 == Globals.g_landscapeTaskController.activeTaskLimit)
@@ -968,7 +968,7 @@ package com.voxelengine.worldmodel.models
 				editCursor.release();
 		}
 		
-		public function removeFromBigDB():void
+		public function removePermanantly():void
 		{
 			/**
 			 * Delete a set of DatabaseObjects from a table
@@ -978,28 +978,12 @@ package com.voxelengine.worldmodel.models
 			 * @param errorHandler Function executed if an error occurs while deleting the DatabaseObjects
 			 *
 			 */
-			if ( metadata.databaseObject )
-			{
-				//function deleteKeys(table:String, keys:Array, callback:Function=null, errorHandler:Function=null):void;
-				trace("VoxelModel.delete - delete object: " + instanceInfo.guid);
-				PersistModel.deleteModel( metadata.guid );
-			}
-			else
-			{
-				// not save yet, so nothing to do.
-			}
+//			MetadataManager.deleteModel( metadata.guid );
+			Log.out("VoxelModel.delete - delete object: " + instanceInfo.guid, Log.ERROR );
 			
-			_changed = false;
+			_changed = true;
 		}
 		
-		private function created(o:DatabaseObject):void 
-		{ 
-			if ( o )
-				metadata.databaseObject = o;
-			//Globals.g_app.dispatchEvent( new PersistanceEvent( PersistanceEvent.PERSISTANCE_CREATE_SUCCESS ) ); 
-			Log.out( "VoxelModel.created: " + instanceInfo.guid ); 
-		}	
-
 		// Force save is used ONLY when creating instances from templates.
 		public function save( forceSave:Boolean = false ):void
 		{
@@ -1020,19 +1004,7 @@ package com.voxelengine.worldmodel.models
 			}
 				
 			_changed = false;
-			metadata.save( saved , failed, created );
-			
-			function saved():void 
-			{ 
-				Log.out("VoxelModel.saved - saving changes to: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.guid: " + instanceInfo.guid  );
-			}	
-			
-			function failed( $e:PlayerIOError ):void 
-			{ 
-				Log.out( "VoxelModel.save error saving: " + metadata.name + " error: " + $e.message, Log.ERROR, $e )
-				// seems like this MIGHT throw it in an endless loop
-				//_changed = true;
-			} 
+			metadata.save();
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////

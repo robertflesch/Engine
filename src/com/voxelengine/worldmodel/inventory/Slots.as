@@ -15,7 +15,6 @@ import playerio.DatabaseObject;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.InventorySlotEvent;
-import com.voxelengine.events.InventoryPersistanceEvent;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.*;
 

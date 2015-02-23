@@ -8,12 +8,6 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
-	import com.voxelengine.events.LoadingEvent;
-	import com.voxelengine.events.ModelMetadataEvent;
-	import com.voxelengine.worldmodel.models.ModelLoader;
-	import com.voxelengine.worldmodel.models.Player;
-	import com.voxelengine.worldmodel.models.MetadataManager;
-	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 	import playerio.DatabaseObject;
 	import playerio.PlayerIOError;
 	
@@ -24,10 +18,17 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.server.PersistModel;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 
+	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.events.ModelMetadataEvent;
+	import com.voxelengine.persistance.PersistModel;
+	import com.voxelengine.worldmodel.models.ModelLoader;
+	import com.voxelengine.worldmodel.models.Player;
+	import com.voxelengine.worldmodel.models.MetadataManager;
+	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
+	
 	/**
 	 * ...
 	 * @author Robert Flesch
@@ -70,7 +71,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			}
 
 			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
-			vmm.fromPersistance( $dbo );
+			vmm.fromPersistanceMetadata( $dbo );
 			
 			var vm:VoxelModel;
 			// is this model using a template? if so them the model doesnt have oxel data itsself, 

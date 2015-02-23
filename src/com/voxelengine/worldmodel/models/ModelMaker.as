@@ -36,7 +36,8 @@ public class ModelMaker {
 		if ( _ii.guid == e.vmm.guid ) {
 			MetadataManager.removeListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, makeMe );		
 			var vmm:VoxelModelMetadata = e.vmm;
-			ModelLoader.loadFromManifestByteArrayNew( _ii, vmm );
+			if ( vmm.hasDataObject )
+				ModelLoader.loadFromManifestByteArrayNew( _ii, vmm );
 			_makerCount--;
 		}
 		if ( 0 == _makerCount )

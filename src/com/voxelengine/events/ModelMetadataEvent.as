@@ -17,11 +17,14 @@ package com.voxelengine.events
 	 */
 	public class ModelMetadataEvent extends Event
 	{
-		static public const INFO_TEMPLATE_REPO:String  		= "INFO_TEMPLATE_REPO";
-		static public const INFO_LOADED_PERSISTANCE:String  = "INFO_LOADED_PERSISTANCE";
-		static public const INFO_FAILED_PERSISTANCE:String  = "INFO_FAILED_PERSISTANCE";
-		static public const INFO_COLLECTED:String  			= "INFO_COLLECTED";
+		static public const INFO_TEMPLATE_REPO:String  				= "INFO_TEMPLATE_REPO";
+		static public const INFO_LOADED_DATA_PERSISTANCE:String  	= "INFO_LOADED_DATA_PERSISTANCE";
+		static public const INFO_FAILED_DATA_PERSISTANCE:String  	= "INFO_FAILED_DATA_PERSISTANCE";
+		static public const INFO_LOADED_PERSISTANCE:String 			= "INFO_LOADED_PERSISTANCE";
+		static public const INFO_FAILED_PERSISTANCE:String 			= "INFO_FAILED_PERSISTANCE";
+		static public const INFO_COLLECTED:String  					= "INFO_COLLECTED";
 		
+//		private var _dbo:DatabaseObject;
 		private var _vmm:VoxelModelMetadata;
 		private var _itemGuid:String;
 

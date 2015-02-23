@@ -46,8 +46,6 @@ public class  UserInventory extends QuickInventory
 		_selectorXOffset = 20; // From image of "userInventory.png"
 		eventCollector.addEvent(_dragOp, DnDEvent.DND_DROP_ACCEPTED, dropMaterial );
 		eventCollector.addEvent(_dragOp, DnDEvent.DND_DROP_CANCELED, dropInAir );
-		InventoryManager.addListener( InventoryEvent.INVENTORY_RESPONSE, inventoryLoaded );
-		InventoryManager.addListener( InventoryEvent.INVENTORY_LOADED, inventoryLoaded );
 		buildItems();
 		_toolSize = new GrainSelector();
 		addChild(_toolSize);
@@ -58,6 +56,7 @@ public class  UserInventory extends QuickInventory
 		display();
 		show();
 		resizeObject( null );
+		InventoryManager.addListener( InventoryEvent.INVENTORY_RESPONSE, inventoryLoaded );
 		InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_REQUEST, Network.userId, null ) );
 	}
 

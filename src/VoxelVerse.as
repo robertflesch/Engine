@@ -7,9 +7,6 @@
 ==============================================================================*/
 
 package {
-	import com.voxelengine.events.InventoryEvent;
-	import com.voxelengine.events.RegionEvent;
-	import com.voxelengine.server.Persistance;
 	import com.voxelengine.worldmodel.inventory.InventoryManager;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
@@ -27,16 +24,18 @@ package {
 	import com.voxelengine.Log;
 	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.events.InventoryEvent;
+	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.events.LightEvent;
 	import com.voxelengine.GUI.VoxelVerseGUI;
 	import com.voxelengine.GUI.WindowSplash;
 	import com.voxelengine.renderer.Renderer;
+	import com.voxelengine.persistance.Persistance;
 	import com.voxelengine.pools.PoolManager;
 	import com.voxelengine.worldmodel.ConfigManager;
 	import com.voxelengine.worldmodel.MemoryManager;
 	import com.voxelengine.worldmodel.MouseKeyboardHandler;
 	import com.voxelengine.worldmodel.RegionManager;
-
-	import com.voxelengine.events.LightEvent;
 	import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
 	import com.voxelengine.worldmodel.tasks.lighting.LightRemove;
 	
@@ -251,7 +250,7 @@ package {
 					
 
 				if ( Globals.online ) {
-					RegionManager.dispatch( new RegionEvent( RegionEvent.REGION_CHANGED, Globals.g_regionManager.currentRegion.guid ) );
+					RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_CHANGED, Globals.g_regionManager.currentRegion.guid ) );
 					InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_SAVE_REQUEST, null, null ) );
 				}
 				

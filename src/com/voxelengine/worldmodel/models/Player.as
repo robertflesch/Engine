@@ -32,7 +32,7 @@ import com.voxelengine.events.RegionEvent;
 import com.voxelengine.renderer.lamps.ShaderLight;
 import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.renderer.lamps.*;
-import com.voxelengine.server.Persistance;
+import com.voxelengine.persistance.Persistance;
 
 import com.voxelengine.worldmodel.RegionManager;
 import com.voxelengine.worldmodel.MouseKeyboardHandler;
@@ -97,8 +97,8 @@ public class Player extends Avatar
 		Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
-		RegionManager.addListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
-		RegionManager.addListener( RegionEvent.REGION_LOAD, onRegionLoad );
+		RegionEvent.addListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
+		RegionEvent.addListener( RegionEvent.REGION_LOAD, onRegionLoad );
 	}
 
 	private function removeEventHandlers():void {
@@ -111,8 +111,8 @@ public class Player extends Avatar
 		Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
-		RegionManager.removeListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
-		RegionManager.removeListener( RegionEvent.REGION_LOAD, onRegionLoad );
+		RegionEvent.removeListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
+		RegionEvent.removeListener( RegionEvent.REGION_LOAD, onRegionLoad );
 	}
 	
 	static private function onLogin( $event:LoginEvent ):void {

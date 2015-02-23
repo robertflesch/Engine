@@ -19,7 +19,6 @@ import org.flashapi.swing.containers.*;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.events.RegionLoadedEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.GUI.components.*;
@@ -133,9 +132,9 @@ public class WindowRegionDetail extends VVPopup
 	private function create( e:UIMouseEvent ):void {
 		
 		if ( _create )
-			RegionManager.dispatch( new RegionLoadedEvent( RegionLoadedEvent.REGION_CREATED, _region ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_CHANGED, _region.guid ) );
 		else {
-			RegionManager.dispatch( new RegionEvent( RegionEvent.REGION_CHANGED, _region.guid ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_CHANGED, _region.guid ) );
 		}
 			
 		remove();

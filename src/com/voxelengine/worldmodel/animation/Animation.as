@@ -9,7 +9,7 @@ package com.voxelengine.worldmodel.animation
 {
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.server.Network;
-	import com.voxelengine.server.PersistAnimation;
+	import com.voxelengine.persistance.PersistAnimation;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;

@@ -37,7 +37,7 @@ package com.voxelengine.events
 	   
 		public override function toString():String
 		{
-			return formatToString("RegionLoadedEvent", "bubbles", "cancelable") + " animId: " + _anim.guid;
+			return formatToString("AnimationLoadedEvent", "bubbles", "cancelable") + " animId: " + _anim.guid;
 		}
 		
 	}

@@ -15,13 +15,15 @@ import flash.events.Event;
  */
 public class InventoryEvent extends Event
 {
-	static public const INVENTORY_SAVE_REQUEST:String  	= "INVENTORY_SAVE_REQUEST";
-	static public const INVENTORY_RESPONSE:String  		= "INVENTORY_RESPONSE";
+	// Asks for the inventory
 	static public const INVENTORY_REQUEST:String  		= "INVENTORY_REQUEST";
-	static public const INVENTORY_LOADED:String  		= "INVENTORY_LOADED";
+	// Returns the inventory object
+	static public const INVENTORY_RESPONSE:String  		= "INVENTORY_RESPONSE";
+	
+	// Save request no response needed
+	static public const INVENTORY_SAVE_REQUEST:String  	= "INVENTORY_SAVE_REQUEST";
+	// User/NP is logging/leaving system out, so remove inventory
 	static public const INVENTORY_UNLOAD_REQUEST:String = "INVENTORY_UNLOAD_REQUEST";
-	static public const INVENTORY_SLOT_REQUEST:String  	= "INVENTORY_SLOT_REQUEST";
-	static public const INVENTORY_SLOT_RESULT:String  	= "INVENTORY_SLOT_RESULT";
 	
 	private var _ownerGuid:String; // Guid of model which is implementing this action
 	private var _result:*;	

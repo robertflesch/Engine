@@ -66,7 +66,7 @@ package com.voxelengine.GUI
 				display( 0, 0 );
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
-			RegionManager.addListener( RegionEvent.REGION_LOAD_COMPLETE, onLoadingComplete );
+			RegionEvent.addListener( RegionEvent.REGION_LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize );
 			
 			VoxelVerseGUI.currentInstance.hideGUI()

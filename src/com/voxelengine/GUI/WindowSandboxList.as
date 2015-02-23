@@ -8,6 +8,8 @@
 package com.voxelengine.GUI
 {
 import com.voxelengine.events.LoginEvent;
+import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.RegionPersistanceEvent;
 import com.voxelengine.events.VVWindowEvent;
 import flash.events.Event;
 
@@ -23,7 +25,6 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 
 import com.voxelengine.events.RegionEvent;
-import com.voxelengine.events.RegionLoadedEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.RegionManager;
@@ -98,8 +99,8 @@ public class WindowSandboxList extends VVPopup
 		eventCollector.addEvent( this, UIMouseEvent.PRESS, pressWindow );
 		
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
-		//RegionManager.addListener( RegionLoadedEvent.REGION_LOADED, regionLoadedEvent );
-		RegionManager.addListener( RegionLoadedEvent.REGION_CREATED, regionLoadedEvent ); 
+		
+		RegionEvent.addListener( RegionEvent.REGION_ADDED, regionLoadedEvent );
 		
 		displaySelectedRegionList( openType );
 		
@@ -132,13 +133,14 @@ public class WindowSandboxList extends VVPopup
 		if ( li )
 		{
 			if ( Globals.MODE_PRIVATE != Globals.mode && Globals.MODE_PUBLIC != Globals.mode ) {
-				new WindowRegionDetail( Globals.g_regionManager.regionGet( li.data ) );
+				var region:Region = Globals.g_regionManager.regionGet( li.data )
+				new WindowRegionDetail( region );
 				remove();
 				return;
 			}
 			
 			if ( li.data )
-				RegionManager.dispatch( new RegionEvent( RegionEvent.REQUEST_JOIN, li.data ) ); 
+				RegionEvent.dispatch( new RegionEvent( RegionEvent.REQUEST_JOIN, li.data ) ); 
 			else
 				Log.out( "WindowSandboxList.loadthisRegion - NO REGION GUID FOUND", Log.ERROR );
 		}
@@ -151,24 +153,24 @@ public class WindowSandboxList extends VVPopup
 		Globals.mode = type;
 		if ( Globals.MODE_PRIVATE == type )
 		{
-			RegionManager.dispatch( new RegionEvent( RegionEvent.REQUEST_PRIVATE, "" ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_TYPE_REQUEST, Network.userId ) );
 		}
 		else if ( Globals.MODE_PUBLIC == type )
 		{
-			RegionManager.dispatch( new RegionEvent( RegionEvent.REQUEST_PUBLIC, "" ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_TYPE_REQUEST, Network.PUBLIC ) );
 		}
 		else
 		{
-			RegionManager.dispatch( new RegionEvent( RegionEvent.REQUEST_PUBLIC, "" ) );
-			RegionManager.dispatch( new RegionEvent( RegionEvent.REQUEST_PRIVATE, "" ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_TYPE_REQUEST, Network.userId ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_TYPE_REQUEST, Network.PUBLIC ) );
 		}
 	}
 
-	private function regionLoadedEvent( e: RegionLoadedEvent ):void
+	private function regionLoadedEvent( $re: RegionEvent ):void
 	{
-		var region:Region = e.region;
+		var region:Region  = $re.region;
 		
-//		Log.out( "WindowSandboxList.regionLoadedEvent - adding regionId: " + region.toString() );
+		Log.out( "WindowSandboxList.regionLoadedEvent - adding regionId: " + region.toString() );
 		if ( Globals.MODE_PRIVATE == Globals.mode )
 		{
 			if ( Network.userId == region.owner )
@@ -176,7 +178,7 @@ public class WindowSandboxList extends VVPopup
 		}
 		else if ( Globals.MODE_PUBLIC == Globals.mode )
 		{
-			if ( Network.PUBLIC == e.region.owner )
+			if ( Network.PUBLIC == region.owner )
 				_listbox1.addItem( region.name, region.guid );
 		}
 		else

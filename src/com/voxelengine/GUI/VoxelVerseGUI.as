@@ -268,7 +268,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	public function init():void {
 		UIManager.initialize( Globals.g_app.stage );
 		UIManager.debugger = new FDTrace();
-		RegionManager.addListener( RegionEvent.REGION_LOAD_BEGUN, onRegionLoadingComplete );
+		RegionEvent.addListener( RegionEvent.REGION_LOAD_BEGUN, onRegionLoadingComplete );
 		Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 //			Globals.g_app.addEventListener(Event.DEACTIVATE, deactivate);
 //			Globals.g_app.addEventListener(Event.ACTIVATE, activate);

@@ -1,60 +1,87 @@
 /*==============================================================================
-  Copyright 2011-2014 Robert Flesch
-  All rights reserved.  This product contains computer programs, screen
-  displays and printed documentation which are original works of
-  authorship protected under United States Copyright Act.
-  Unauthorized reproduction, translation, or display is prohibited.
+Copyright 2011-2014 Robert Flesch
+All rights reserved.  This product contains computer programs, screen
+displays and printed documentation which are original works of
+authorship protected under United States Copyright Act.
+Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.events
 {
-	import flash.events.Event;
+import flash.events.Event;
+import flash.events.EventDispatcher;
+
+import com.voxelengine.worldmodel.Region;
+/**
+ * ...
+ * @author Robert Flesch - RSF 
+ * 
+ */
+public class RegionEvent extends Event
+{
+	// data or meta data about this region has changed
+	static public const REGION_CHANGED:String					= "REGION_CHANGED";
 	
-	/**
-	 * ...
-	 * @author Robert Flesch - RSF 
-	 * 
-	 */
-	public class RegionEvent extends Event
+	// dispatched when a region is unloaded
+	static public const REGION_UNLOAD:String					= "REGION_UNLOAD";
+	// tells the region manager to load this region
+	static public const REGION_LOAD:String						= "REGION_LOAD";
+	// dispatched after jobs for all process have been added
+	static public const REGION_LOAD_BEGUN:String				= "REGION_LOAD_BEGUN";
+	// tells the region manager this region had finished loading
+	static public const REGION_LOAD_COMPLETE:String				= "REGION_LOAD_COMPLETE";
+	
+	// tells us the region manager has add this region from persistance
+	static public const REGION_ADDED:String						= "REGION_ADDED";
+	
+	// tells the region manager to load this region
+	static public const REGION_TYPE_REQUEST:String				= "REGION_TYPE_REQUEST";
+	// the response to this is the loaded message
+	
+	// Used by the sandbox list and config manager to request a join of a server region
+	static public const REQUEST_JOIN:String						= "REQUEST_JOIN";
+
+	private var _guid:String;
+	private var _region:Region;
+	
+	public function get guid():String { return _guid; } 
+	
+	public function get region():Region  { return _region; }
+	
+	public function RegionEvent( $type:String, $guid:String, $region:Region = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
-		// Used to request public and private regions from persistance
-		static public const REQUEST_PRIVATE:String					= "REQUEST_PRIVATE";
-		static public const REQUEST_PUBLIC:String					= "REQUEST_PUBLIC";
-		
-		// Used by the sandbox list to request a join of a server region
-		static public const REQUEST_JOIN:String						= "REQUEST_JOIN";
-
-		// data or meta data about this region has changed
-		static public const REGION_CHANGED:String					= "REGION_CHANGED";
-		// tells the region manager to load this region
-		static public const REGION_LOAD:String						= "REGION_LOAD";
-		// dispatched at the begining of a region load
-		static public const REGION_LOAD_BEGUN:String				= "REGION_LOAD_BEGUN";
-		// dispatched when a region is unloaded
-		static public const REGION_UNLOAD:String					= "REGION_UNLOAD";
-		// dispatched when a region is modified in the UI
-		static public const REGION_MODIFIED:String					= "REGION_MODIFIED";
-		// tells the region manager this region had finished loading
-		static public const REGION_LOAD_COMPLETE:String				= "REGION_LOAD_COMPLETE";
-
-		private var _guid:String;
-		
-		public function get guid():String { return _guid; } 
-		
-		public function RegionEvent( $type:String, $guid:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false )
-		{
-			super( $type, $bubbles, $cancellable );
-			_guid = $guid;
-		}
-		
-		public override function clone():Event
-		{
-			return new RegionEvent(type, _guid, bubbles, cancelable);
-		}
-	   
-		public override function toString():String
-		{
-			return formatToString("RegionEvent", "bubbles", "cancelable") + " regionId: " + _guid;
-		}
-		
+		super( $type, $bubbles, $cancellable );
+		_guid = $guid;
+		_region = $region;
 	}
+	
+	public override function clone():Event
+	{
+		return new RegionEvent(type, _guid, _region, bubbles, cancelable);
+	}
+   
+	public override function toString():String
+	{
+		return formatToString("RegionEvent", "bubbles", "cancelable") + " regionId: " + _guid;
+	}
+
+	///////////////// Event handler interface /////////////////////////////
+
+	// Used to distribue all persistance messages
+	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
+
+	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
+		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
+	}
+
+	static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
+		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
+	}
+
+	static public function dispatch( $event:RegionEvent ) : Boolean {
+		return _eventDispatcher.dispatchEvent( $event );
+	}
+
+	///////////////// Event handler interface /////////////////////////////
+	
+}
 }

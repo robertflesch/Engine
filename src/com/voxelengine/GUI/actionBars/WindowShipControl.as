@@ -92,7 +92,7 @@ package com.voxelengine.GUI.actionBars
 
 			display( Globals.g_renderer.width/2 - (width + fudgeFactor)/2, Globals.g_renderer.height - height - 128 );
             Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
-			RegionManager.addListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
+			RegionEvent.addListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 		} 
 		
