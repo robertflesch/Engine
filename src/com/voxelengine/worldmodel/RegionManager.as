@@ -217,11 +217,7 @@ public class RegionManager
 	public function onJoinRoomEvent( e:RoomEvent ):void {
 		Log.out( "RegionManager.onJoinRoomEvent - guid: " + e.guid, Log.DEBUG );
 		
-		//var region:Region = regionGet( e.guid );
-		//if ( null == region ) {
-			//RegionPersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, regionLoadedFromPersistance );
-			//return;
-		//}
+//		var region:Region = regionGet( e.guid );
 		RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_LOAD, e.guid ) );
 	}
 	

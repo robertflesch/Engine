@@ -55,14 +55,14 @@
 				
 				RoomConnection.addEventHandlers( _connection );
 				Globals.inRoom = true;
-				Globals.g_app.dispatchEvent( new RoomEvent( RoomEvent.ROOM_JOIN_SUCCESS, null, _guid ) );
+				RoomEvent.dispatch( new RoomEvent( RoomEvent.ROOM_JOIN_SUCCESS, null, _guid ) );
 				
 				// This disconnection from room server - Tested - RSF 9.6.14
 				function handleDisconnect():void {
 					Log.out ("Room.handleDisconnect - Disconnected from server", Log.WARN );
 					RoomConnection.removeEventHandlers( _connection );
 					Globals.inRoom = false;
-					Globals.g_app.dispatchEvent( new RoomEvent( RoomEvent.ROOM_DISCONNECT, null, _guid ) );
+					RoomEvent.dispatch( new RoomEvent( RoomEvent.ROOM_DISCONNECT, null, _guid ) );
 				}
 			}
 			
@@ -70,7 +70,7 @@
 			{
 				Log.out( "Room.handleJoinError - Join Room Error: " + error.message, Log.ERROR, error );
 				Globals.inRoom = false;
-				Globals.g_app.dispatchEvent( new RoomEvent( RoomEvent.ROOM_JOIN_FAILURE, error, _guid ) );
+				RoomEvent.dispatch( new RoomEvent( RoomEvent.ROOM_JOIN_FAILURE, error, _guid ) );
 			}
 		}
 		
