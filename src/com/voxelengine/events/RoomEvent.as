@@ -58,7 +58,7 @@ public class RoomEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:Event) : Boolean {
+	static public function dispatch( $event:RoomEvent) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 

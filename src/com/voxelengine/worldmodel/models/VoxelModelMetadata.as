@@ -228,7 +228,7 @@ public class VoxelModelMetadata
 			var obj:Object = toObject();
 		}
 		addMetadataSaveEvents();
-		MetadataManager.dispatch( new ModelPersistanceEvent( ModelPersistanceEvent.MODEL_METADATA_SAVE_REQUEST, guid, _dboMetadata, obj ) );
+		ModelPersistanceEvent..dispatch( new ModelPersistanceEvent( ModelPersistanceEvent.MODEL_METADATA_SAVE_REQUEST, guid, _dboMetadata, obj ) );
 	}
 	
 	private function saveData():void {
@@ -239,14 +239,14 @@ public class VoxelModelMetadata
 				var ba:ByteArray = _data;
 			}
 			addDataSaveEvents();
-			MetadataManager.dispatch( new ModelPersistanceEvent( ModelPersistanceEvent.MODEL_METADATA_SAVE_REQUEST, guid, _dboData, ba ) );
+			ModelPersistanceEvent.dispatch( new ModelPersistanceEvent( ModelPersistanceEvent.MODEL_METADATA_SAVE_REQUEST, guid, _dboData, ba ) );
 	}
 
 	private function addMetadataSaveEvents():void {
-		MetadataManager.addListener( ModelPersistanceEvent.MODEL_METADATA_CREATE_SUCCEED, metadataCreateSuccess );
-		MetadataManager.addListener( ModelPersistanceEvent.MODEL_METADATA_SAVE_SUCCEED, metadataSaveSuccess );
-		MetadataManager.addListener( ModelPersistanceEvent.MODEL_METADATA_SAVE_FAILED, metadataSaveFailure );
-		MetadataManager.addListener( ModelPersistanceEvent.MODEL_METADATA_CREATE_FAILED, metadataCreateFailure );
+		ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_METADATA_CREATE_SUCCEED, metadataCreateSuccess );
+		ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_METADATA_SAVE_SUCCEED, metadataSaveSuccess );
+		ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_METADATA_SAVE_FAILED, metadataSaveFailure );
+		ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_METADATA_CREATE_FAILED, metadataCreateFailure );
 	}
 	
 	private function metadataCreateFailure(e:ModelPersistanceEvent):void 
@@ -270,10 +270,10 @@ public class VoxelModelMetadata
 	}
 
 	private function addDataSaveEvents():void {
-			MetadataManager.addListener( ModelPersistanceEvent.MODEL_DATA_CREATE_SUCCEED, dataCreateSuccess );
-			MetadataManager.addListener( ModelPersistanceEvent.MODEL_DATA_SAVE_SUCCEED, dataSaveSuccess );
-			MetadataManager.addListener( ModelPersistanceEvent.MODEL_DATA_SAVE_FAILED, dataSaveFailure );
-			MetadataManager.addListener( ModelPersistanceEvent.MODEL_DATA_CREATE_FAILED, dataCreateFailure );
+			ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_DATA_CREATE_SUCCEED, dataCreateSuccess );
+			ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_DATA_SAVE_SUCCEED, dataSaveSuccess );
+			ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_DATA_SAVE_FAILED, dataSaveFailure );
+			ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_DATA_CREATE_FAILED, dataCreateFailure );
 	}
 	
 	private function dataCreateFailure(e:ModelPersistanceEvent):void 

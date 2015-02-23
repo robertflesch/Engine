@@ -35,23 +35,23 @@ public class MetadataManager
 	static private var _metadata:Dictionary = new Dictionary(false);
 	
 	// Used to distribue all persistance messages
-	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
-	
-	///////////////// Event handler interface /////////////////////////////
-
-	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
-		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
-	}
-
-	static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
-		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
-	}
-	
-	static public function dispatch( $event:Event) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
-	}
-	
-	///////////////// Event handler interface /////////////////////////////
+	//static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
+	//
+	/////////////////// Event handler interface /////////////////////////////
+//
+	//static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
+		//_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
+	//}
+//
+	//static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
+		//_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
+	//}
+	//
+	//static public function dispatch( $event:Event) : Boolean {
+		//return _eventDispatcher.dispatchEvent( $event );
+	//}
+	//
+	/////////////////// Event handler interface /////////////////////////////
 
 	static public function init():void {
 		
@@ -62,7 +62,7 @@ public class MetadataManager
 		if ( $vmm && null ==  _metadata[$vmm.guid] ) {
 			//Log.out( "MetadataManager.metadataAdd vmm: " + $vmm.toString(), Log.WARN );
 			_metadata[$vmm.guid] = $vmm; 
-			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_TEMPLATE_REPO, $vmm, $vmm.guid ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_TEMPLATE_REPO, $vmm, $vmm.guid ) );
 		}
 	}
 
@@ -79,7 +79,7 @@ public class MetadataManager
 		
 		// This will return models already loaded.
 		for each ( var vmm:VoxelModelMetadata in _metadata ) {
-			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_TEMPLATE_REPO, vmm, vmm.guid ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_TEMPLATE_REPO, vmm, vmm.guid ) );
 		}
 	}
 	
@@ -107,11 +107,11 @@ public class MetadataManager
 			vmm.fromPersistanceMetadata( dbo );
 			metadataAdd( vmm );
 			Log.out( "MetadataManager.loadSuccessMetadata vmm: " + vmm.toString(), Log.WARN );
-			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm, vmm.guid ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm, vmm.guid ) );
 		}
 		else {
 			vmm.guid = _guidError;
-			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm, vmm.guid ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm, vmm.guid ) );
 		}
 	}
 	
@@ -122,14 +122,14 @@ public class MetadataManager
 			if ( vmm ) {
 				vmm.fromPersistanceData( dbo );
 				Log.out( "MetadataManager.loadSuccessData vmm: " + vmm.toString(), Log.WARN );
-				dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm, vmm.guid ) );
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm, vmm.guid ) );
 			}
 			else
-				dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_DATA_PERSISTANCE, null, dbo.key ) );
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_DATA_PERSISTANCE, null, dbo.key ) );
 
 		}
 		else {
-			dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_DATA_PERSISTANCE, null, _guidError ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_DATA_PERSISTANCE, null, _guidError ) );
 		}
 	}
 	
@@ -138,7 +138,7 @@ public class MetadataManager
 		Log.out( "MetadataManager.loadFailure - error: " + $error.message, Log.ERROR, $error );
 		var vmm:VoxelModelMetadata = new VoxelModelMetadata();
 		vmm.guid = _guidError;
-		dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm, vmm.guid ) );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm, vmm.guid ) );
 	}
 }
 }

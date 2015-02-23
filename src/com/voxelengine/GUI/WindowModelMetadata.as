@@ -134,7 +134,7 @@ public class WindowModelMetadata extends VVPopup
 		_vmm.copyCount = parseInt( _copies.label, 10 );
 		_vmm.createdDate = new Date();
 		_vmm.modifiedDate = new Date();
-		MetadataManager.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_COLLECTED, _vmm ) );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_COLLECTED, _vmm ) );
 		remove();
 	}
 }

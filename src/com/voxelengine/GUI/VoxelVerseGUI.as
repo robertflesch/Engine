@@ -278,7 +278,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		Globals.g_app.addEventListener(ModelEvent.RELEASE_CONTROL, WindowBeastControl.handleModelEvents );
 		Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
 		Globals.g_app.addEventListener(LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
-		Globals.g_app.addEventListener(RoomEvent.ROOM_JOIN_FAILURE, joinRoomFailureHandler );
+		RoomEvent.addListener(RoomEvent.ROOM_JOIN_FAILURE, joinRoomFailureHandler );
 		
 		LanguageManager.init();
 	}

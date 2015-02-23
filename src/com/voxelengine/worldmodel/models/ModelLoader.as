@@ -45,7 +45,7 @@ package com.voxelengine.worldmodel.models
 		static private var _s_mmd:VoxelModelMetadata;
 		
 		public function ModelLoader():void {
-			MetadataManager.addListener( ModelMetadataEvent.INFO_COLLECTED, localModelReadyToBeCreated );
+			ModelMetadataEvent.addListener( ModelMetadataEvent.INFO_COLLECTED, localModelReadyToBeCreated );
 		}
 		
 		static public function load( $ii:InstanceInfo, $vmm:VoxelModelMetadata = null ):void {

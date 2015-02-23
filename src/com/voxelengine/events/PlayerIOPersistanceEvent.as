@@ -48,7 +48,7 @@ public class PlayerIOPersistanceEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:Event) : Boolean {
+	static public function dispatch( $event:PlayerIOPersistanceEvent) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 

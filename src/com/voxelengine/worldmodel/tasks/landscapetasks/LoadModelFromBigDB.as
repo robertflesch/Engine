@@ -89,8 +89,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 					// We need to hold onto this data with the template loades
 					_guidTemplate = vmm.templateGuid;
 					_vmmBase = vmm;
-					MetadataManager.addListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, templateLoaded );
-					MetadataManager.addListener( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, templateLoadFailed );
+					ModelMetadataEvent.addListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, templateLoaded );
+					ModelMetadataEvent.addListener( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, templateLoadFailed );
 				}
 			}
 			else {
@@ -144,8 +144,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private function templateLoaded( $e:ModelMetadataEvent ):void {
 			
 			if ( _guidTemplate == $e.vmm.guid ) {
-				MetadataManager.removeListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, templateLoaded );
-				MetadataManager.removeListener( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, templateLoadFailed );
+				ModelMetadataEvent.removeListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, templateLoaded );
+				ModelMetadataEvent.removeListener( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, templateLoadFailed );
 				// load the byte data from the template
 				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( _vmmBase, $e.vmm.data );
 				finish( vm );
@@ -157,8 +157,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			Log.out( "LoadModelFromBigDB.templateLoadFailed - guid: " + _guid, Log.ERROR );
 			// The event data hold an emtpy voxelmodelMetadata object that only has the guid filled in,
 			if ( _guidTemplate == $e.vmm.guid ) {
-				MetadataManager.removeListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, templateLoaded );
-				MetadataManager.removeListener( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, templateLoadFailed );
+				ModelMetadataEvent.removeListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, templateLoaded );
+				ModelMetadataEvent.removeListener( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, templateLoadFailed );
 				finish( null );
 			}
 		}

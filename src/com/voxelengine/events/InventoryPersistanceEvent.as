@@ -59,7 +59,7 @@ public class InventoryPersistanceEvent extends PersistanceEvent
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:Event) : Boolean {
+	static public function dispatch( $event:InventoryPersistanceEvent) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 

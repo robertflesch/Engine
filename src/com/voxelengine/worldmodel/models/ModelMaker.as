@@ -27,14 +27,14 @@ public class ModelMaker {
 	
 	public function ModelMaker( $ii:InstanceInfo ) {
 		_ii = $ii;
-		MetadataManager.addListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, makeMe );		
+		ModelMetadataEvent.addListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, makeMe );		
 		_makerCount++;
 	}
 	
 	private function makeMe(e:ModelMetadataEvent):void 
 	{
 		if ( _ii.guid == e.vmm.guid ) {
-			MetadataManager.removeListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, makeMe );		
+			ModelMetadataEvent.removeListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, makeMe );		
 			var vmm:VoxelModelMetadata = e.vmm;
 			if ( vmm.hasDataObject )
 				ModelLoader.loadFromManifestByteArrayNew( _ii, vmm );
