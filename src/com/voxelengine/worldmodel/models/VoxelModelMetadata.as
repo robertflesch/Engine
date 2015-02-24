@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.PersistanceEvent;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.JPEGEncoderOptions;
@@ -22,9 +23,8 @@ import playerio.PlayerIOError;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.ModelPersistanceEvent;
+import com.voxelengine.events.ModelMetadataPersistanceEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.persistance.PersistModel;
 /**
  * ...
  * @author Robert Flesch - RSF
@@ -41,10 +41,8 @@ public class VoxelModelMetadata
 	private var _name:String			= "";
 	private var _description:String		= "";
 	private var _owner:String			= "";
-	private var _data:ByteArray
 	private var _image:BitmapData;
-	private var _dboData:DatabaseObject;
-	private var _dboMetadata:DatabaseObject;
+	private var _dbo:DatabaseObject;
 	private var _createdDate:Date;
 	private var _modifiedDate:Date;
 
@@ -82,19 +80,11 @@ public class VoxelModelMetadata
 	public function get guid():String 					{ return _guid; }
 	public function set guid(value:String):void  		{ _guid = value; }
 	
-	public function get data():ByteArray 				{ return _data; }
-	public function set data(value:ByteArray):void  	
-	{ 
-		_data = value; 
-	}
-	
 	public function get image():BitmapData 				{ return _image; }
 	public function set image(value:BitmapData):void  	
 	{ 
 		_image = value; 
 	}
-	
-	public function get hasDataObject():Boolean 		{ return null != _dboData; }
 	
 	public function get copyCount():int  { return _copyCount; }
 	public function set copyCount(value:int):void  { _copyCount = value; }
@@ -112,18 +102,23 @@ public class VoxelModelMetadata
 		return "name: " + _name + "  description: " + _description + "  guid: " + _guid + "  owner: " + _owner;
 	}
 	
-	public function VoxelModelMetadata() {}
+	public function VoxelModelMetadata() {
+		ModelMetadataEvent.addListener( ModelMetadataEvent.SAVE, save );
+	}
 
+	public function release():void {
+		ModelMetadataEvent.removeListener( ModelMetadataEvent.SAVE, save );
+		
+	}
+	
 	public function initialize( $name:String, $description:String = null ):void {
 		guid 			= Globals.getUID();
 		name 			= $name
 		description 	= $description ? $description: $name;
 		owner 			= Network.userId;
 		image 			= null;
-		data			= null;
 		
-		_dboData		= null;
-		_dboMetadata	= null;
+		_dbo			= null;
 		createdDate		= new Date();
 		modifiedDate	= new Date();
 		template		= false
@@ -142,11 +137,8 @@ public class VoxelModelMetadata
 		newVmm.description 		= new String( _description );
 		newVmm.owner 			= new String( _owner );
 		newVmm.image 			= null;
-		newVmm.data				= null;
 		
-		// how to copy this?
-		newVmm._dboData			= null;
-		newVmm._dboMetadata		= null;
+		newVmm._dbo				= null;
 		newVmm.createdDate		= new Date( _createdDate );
 		newVmm.modifiedDate		= new Date();
 		newVmm.template			= false
@@ -184,134 +176,38 @@ public class VoxelModelMetadata
 	// TO Persistance
 	//////////////////////////////////////////////////////////////////
 	
-	public function save():void {
-		if ( Globals.online  ) {
-			saveMetadata();
-			saveData();
-		}
-		else
-			Log.out( "VoxelModelMetadata.save - NOT Saving Model, app is offline - guid: " + guid, Log.DEBUG );
-	}
-	
-	public function toPersistanceData():void {
-		
-		if ( _data )
-			_dboData._data = _data;
-		else
-			_dboData._data = null;
-	}
-	
-	public function toPersistanceMetadata():void {
-		
-		_dboMetadata.name 			= _name;
-		_dboMetadata.description	= _description;
-		_dboMetadata.owner			= _owner;
-		_dboMetadata.template		= _template
-		_dboMetadata.templateGuid	= _templateGuid
-		_dboMetadata.copy			= _copy;
-		_dboMetadata.copyCount		= _copyCount;
-		_dboMetadata.modify			= _modify;
-		_dboMetadata.transfer		= _transfer;
-		_dboMetadata.createdDate	= _createdDate;
-		_dboMetadata.modifiedDate   = new Date();
-		if ( image )
-			_dboMetadata.imageData 		= image.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
-		else
-			_dboMetadata.imageData = null;
-	}
-	
-	private function saveMetadata():void {
+	private function save( $vmd:ModelMetadataEvent ):void {
 		Log.out( "VoxelModelMetadata.save - Saving Model Metadata: " + guid, Log.WARN );
-		if ( _dboMetadata )
+		if ( _dbo )
 			toPersistanceMetadata();
 		else {
 			var obj:Object = toObject();
 		}
-		addMetadataSaveEvents();
-		ModelPersistanceEvent..dispatch( new ModelPersistanceEvent( ModelPersistanceEvent.MODEL_METADATA_SAVE_REQUEST, guid, _dboMetadata, obj ) );
+		ModelMetadataPersistanceEvent.dispatch( new ModelMetadataPersistanceEvent( PersistanceEvent.SAVE_REQUEST, guid, _dbo ) );
 	}
 	
-	private function saveData():void {
-			Log.out( "VoxelModelMetadata.save - Saving Model Data: " + guid, Log.WARN );
-			if ( _dboData )
-				toPersistanceData();
-			else {
-				var ba:ByteArray = _data;
-			}
-			addDataSaveEvents();
-			ModelPersistanceEvent.dispatch( new ModelPersistanceEvent( ModelPersistanceEvent.MODEL_METADATA_SAVE_REQUEST, guid, _dboData, ba ) );
-	}
-
-	private function addMetadataSaveEvents():void {
-		ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_METADATA_CREATE_SUCCEED, metadataCreateSuccess );
-		ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_METADATA_SAVE_SUCCEED, metadataSaveSuccess );
-		ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_METADATA_SAVE_FAILED, metadataSaveFailure );
-		ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_METADATA_CREATE_FAILED, metadataCreateFailure );
-	}
-	
-	private function metadataCreateFailure(e:ModelPersistanceEvent):void 
-	{
+	public function toPersistanceMetadata():void {
 		
-	}
-	
-	private function metadataSaveFailure(e:ModelPersistanceEvent):void 
-	{
-		
-	}
-	
-	private function metadataSaveSuccess(e:ModelPersistanceEvent):void 
-	{
-		
-	}
-	
-	private function metadataCreateSuccess(e:ModelPersistanceEvent):void 
-	{
-		
-	}
-
-	private function addDataSaveEvents():void {
-			ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_DATA_CREATE_SUCCEED, dataCreateSuccess );
-			ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_DATA_SAVE_SUCCEED, dataSaveSuccess );
-			ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_DATA_SAVE_FAILED, dataSaveFailure );
-			ModelPersistanceEvent.addListener( ModelPersistanceEvent.MODEL_DATA_CREATE_FAILED, dataCreateFailure );
-	}
-	
-	private function dataCreateFailure(e:ModelPersistanceEvent):void 
-	{
-		
-	}
-	
-	private function dataSaveFailure(e:ModelPersistanceEvent):void 
-	{
-		
-	}
-	
-	private function dataSaveSuccess(e:ModelPersistanceEvent):void 
-	{
-		
-	}
-	
-	private function dataCreateSuccess(e:ModelPersistanceEvent):void 
-	{
-		
+		_dbo.name 			= _name;
+		_dbo.description	= _description;
+		_dbo.owner			= _owner;
+		_dbo.template		= _template
+		_dbo.templateGuid	= _templateGuid
+		_dbo.copy			= _copy;
+		_dbo.copyCount		= _copyCount;
+		_dbo.modify			= _modify;
+		_dbo.transfer		= _transfer;
+		_dbo.createdDate	= _createdDate;
+		_dbo.modifiedDate   = new Date();
+		if ( image )
+			_dbo.imageData 		= image.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
+		else
+			_dbo.imageData = null;
 	}
 	
 	////////////////////////////////////////////////////////////////
 	// FROM Persistance
 	////////////////////////////////////////////////////////////////
-	
-	public function fromPersistanceData( $dbo:DatabaseObject ):void {
-		
-		_dboData = $dbo;
-		if ( $dbo.data ) {
-			
-			var ba:ByteArray= $dbo.data 
-			ba.uncompress();
-			_data 		= ba;
-		}
-		else
-			_data 		= null;
-	}
 	
 	public function fromPersistanceMetadata( $dbo:DatabaseObject ):void {
 		
@@ -327,7 +223,7 @@ public class VoxelModelMetadata
 		_guid 			= $dbo.key;
 		_createdDate	= $dbo.createdDate;
 		_modifiedDate   = $dbo.modifiedDate;
-		_dboMetadata	= $dbo;
+		_dbo			= $dbo;
 		
 		if ( $dbo.imageData ) {
 			var loader:Loader = new Loader();

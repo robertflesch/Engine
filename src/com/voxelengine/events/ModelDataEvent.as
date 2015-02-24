@@ -8,52 +8,58 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.events
 {
 import flash.events.Event;
+import flash.utils.ByteArray;
+import com.voxelengine.worldmodel.models.VoxelModelData;
+import flash.events.EventDispatcher;
 
 /**
  * ...
  * @author Robert Flesch - RSF 
  */
-public class PersistanceEvent extends Event
+public class ModelDataEvent extends Event
 {
-	static public const LOAD_REQUEST:String  	= "LOAD_REQUEST";
-	static public const LOAD_REQUEST_TYPE:String = "LOAD_REQUEST_TYPE";
-	static public const LOAD_REQUEST_ALL:String = "LOAD_REQUEST_ALL";
-	static public const LOAD_SUCCEED:String  	= "LOAD_SUCCEED";
-	static public const LOAD_FAILED:String  	= "LOAD_FAILED";
-	static public const LOAD_NOT_FOUND:String 	= "LOAD_NOT_FOUND";
+	//// tells us the manager has add this from persistance
+	static public const ADDED:String						= "ADDED";
+	//
+	//// tells the manager to load this type of model
+	static public const TYPE_REQUEST:String					= "TYPE_REQUEST";
+	//// the response to this is the added message
 	
-	static public const SAVE_REQUEST:String  	= "SAVE_REQUEST";
-	static public const CREATE_SUCCEED:String	= "CREATE_SUCCEED";
-	static public const SAVE_SUCCEED:String  	= "SAVE_SUCCEED";
-	static public const CREATE_FAILED:String	= "CREATE_FAILED";
-	static public const SAVE_FAILED:String  	= "SAVE_FAILED";
-
+	//// tells the manager to load this model
+	static public const REQUEST:String						= "REQUEST";
+		
+	static public const FAILED:String						= "FAILED";
+	static public const SAVE:String							= "SAVE";
+	
+	private var _vmd:VoxelModelData;
 	private var _guid:String;
-	private var _dbo:DatabaseObject;
-	private var _data:*;
-	
-	public function get guid():String  { return _guid; }
-	public function get dbo():DatabaseObject { return _dbo; }
-	public function get data():* { return _data; }
 
-	public function PersistanceEvent( $type:String, $guid:String, $dbo:DatabaseObject = null, $data:* = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelDataEvent( $type:String, $guid:String, $vmd:VoxelModelData, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
+		_vmd = $vmd;
 		_guid = $guid;
-		_dbo = $dbo;
-		_data = $data;
 	}
 	
 	public override function clone():Event
 	{
-		return new PersistanceEvent(type, _guid, _dbo, _data, bubbles, cancelable);
+		return new ModelDataEvent(type, _guid, _vmd, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString("ModelPersistanceEvent", "bubbles", "cancelable") + " Model: " + ( _dbo ? _dbo.toString(): "no database object" );
+		return formatToString("ModelDataEvent", "bubbles", "cancelable") +  " guid: " + _guid;
 	}
 	
+	public function get vmd():VoxelModelData 
+	{
+		return _vmd;
+	}
+	
+	public function get guid():String 
+	{
+		return _guid;
+	}
 	///////////////// Event handler interface /////////////////////////////
 
 	// Used to distribue all persistance messages
@@ -67,12 +73,10 @@ public class PersistanceEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:PersistanceEvent ) : Boolean {
+	static public function dispatch( $event:ModelDataEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////
-}
-	
 }
 }

@@ -144,24 +144,26 @@ public class Player extends Avatar
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.grainSize = 4;
 			ii.guid = $dbo.modelGuid;
-			var newPlayer:Player = new Player( ii );
-			
-			var md:VoxelModelMetadata = new VoxelModelMetadata();
-			md.guid = $dbo.modelGuid;
-			md.name = $dbo.userName;
-			md.owner = Network.userId;
-			md.modifiedDate =	$dbo.modifiedDate;
-			md.createdDate = $dbo.createdDate;
-			
-			var mi:ModelInfo = new ModelInfo();
-			mi.biomes = new Biomes();
-			var newLayerInfo:LayerInfo = new LayerInfo( "LoadModelFromBigDB", $dbo.modelGuid );
-			mi.biomes.add_layer( newLayerInfo );
-			mi.jsonReset();
-			
-			newPlayer.init( mi, md );
-			
-			ModelLoader.load( ii );
+			Log.out( "Player.onPlayerLoadedAction - creating player with guid: " + ii.guid, Log.WARN  );
+			new ModelMaker( ii );
+			//var newPlayer:Player = new Player( ii );
+			//
+			//var md:VoxelModelMetadata = new VoxelModelMetadata();
+			//md.guid = $dbo.modelGuid;
+			//md.name = $dbo.userName;
+			//md.owner = Network.userId;
+			//md.modifiedDate =	$dbo.modifiedDate;
+			//md.createdDate = $dbo.createdDate;
+			//
+			//var mi:ModelInfo = new ModelInfo();
+			//mi.biomes = new Biomes();
+			//var newLayerInfo:LayerInfo = new LayerInfo( "LoadModelFromBigDB", $dbo.modelGuid );
+			//mi.biomes.add_layer( newLayerInfo );
+			//mi.jsonReset();
+			//
+			//newPlayer.init( mi, md );
+			//
+			//ModelLoader.load( ii );
 			InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_REQUEST, Network.userId, null ) );
 		}
 		else {

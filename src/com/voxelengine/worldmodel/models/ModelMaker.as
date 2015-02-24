@@ -10,39 +10,65 @@ package com.voxelengine.worldmodel.models
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.MetadataManager;
+import com.voxelengine.worldmodel.models.VoxelModelData;
 import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF
-	 * This class is used to load a model once its metadata has been loaded from persistance
-	 * it then removes its listener, which should cause it be to be garbage collected.
+	 * This class is used to load a model once its metadata AND data has been loaded from persistance
+	 * it then removes its listeners, which should cause it be to be garbage collected.
+	 * Might I need to add a timeout on this object in case if never completes.
 	 */
 public class ModelMaker {
+	
+	// keeps track of how many makers there currently are.
 	static public var _makerCount:int;
 	
 	private var _ii:InstanceInfo;
+	private var _vmd:VoxelModelData;
+	private var _vmm:VoxelModelMetadata;
 	
 	public function ModelMaker( $ii:InstanceInfo ) {
 		_ii = $ii;
-		ModelMetadataEvent.addListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, makeMe );		
+		ModelMetadataEvent.addListener( ModelMetadataEvent.ADDED, retriveMetadata );		
+		ModelDataEvent.addListener( ModelDataEvent.ADDED, retriveData );		
+
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.REQUEST, _ii.guid, null ) );		
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.REQUEST, _ii.guid, null ) );		
+
 		_makerCount++;
 	}
 	
-	private function makeMe(e:ModelMetadataEvent):void 
+	private function retriveMetadata(e:ModelMetadataEvent):void 
 	{
-		if ( _ii.guid == e.vmm.guid ) {
-			ModelMetadataEvent.removeListener( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, makeMe );		
-			var vmm:VoxelModelMetadata = e.vmm;
-			if ( vmm.hasDataObject )
-				ModelLoader.loadFromManifestByteArrayNew( _ii, vmm );
+		if ( _ii.guid == e.guid ) {
+			ModelMetadataEvent.removeListener( ModelMetadataEvent.ADDED, retriveMetadata );
+			_vmm = e.vmm;
+			attemptMake();
+		}
+	}
+	
+	private function retriveData(e:ModelDataEvent):void 
+	{
+		if ( _ii.guid == e.guid ) {
+			ModelDataEvent.removeListener( ModelDataEvent.ADDED, retriveData );		
+			_vmd = e.vmd;
+			attemptMake();
+		}
+	}
+	
+	// once they both have been retrived, we can make the object
+	private function attemptMake():void {
+		if ( null != _vmm && null != _vmd ) {
+			ModelLoader.loadFromManifestByteArrayNew( _ii, _vmd );
 			_makerCount--;
 		}
 		if ( 0 == _makerCount )
 			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
-		
 	}
 }	
 }

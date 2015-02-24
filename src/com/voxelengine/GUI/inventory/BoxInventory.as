@@ -118,7 +118,7 @@ public class BoxInventory extends VVBox
 	
 	private function metadataRetrived(e:ModelMetadataEvent):void 
 	{
-		if ( e.itemGuid == ( _objectInfo as ObjectModel ).guid )
+		if ( e.guid == ( _objectInfo as ObjectModel ).guid )
 			updateObjectDisplayData( e.vmm );	
 	}
 	

@@ -18,32 +18,55 @@ import flash.events.EventDispatcher;
  */
 public class ModelMetadataEvent extends Event
 {
-	static public const INFO_TEMPLATE_REPO:String  				= "INFO_TEMPLATE_REPO";
-	static public const INFO_LOADED_DATA_PERSISTANCE:String  	= "INFO_LOADED_DATA_PERSISTANCE";
-	static public const INFO_FAILED_DATA_PERSISTANCE:String  	= "INFO_FAILED_DATA_PERSISTANCE";
-	static public const INFO_LOADED_PERSISTANCE:String 			= "INFO_LOADED_PERSISTANCE";
-	static public const INFO_FAILED_PERSISTANCE:String 			= "INFO_FAILED_PERSISTANCE";
-	static public const INFO_COLLECTED:String  					= "INFO_COLLECTED";
+	//// tells us the manager has add this from persistance
+	static public const ADDED:String						= "ADDED";
+	//
+	//// tells the manager to load this type of model
+	static public const TYPE_REQUEST:String					= "TYPE_REQUEST";
+	//// the response to this is the added message
+	
+	//// tells the manager to load this model
+	static public const REQUEST:String						= "REQUEST";
+		
+	static public const FAILED:String						= "FAILED";
+	static public const SAVE:String							= "SAVE";
+	//
+	
+	//// data or meta data about this region has changed
+	//static public const REGION_CHANGED:String					= "REGION_CHANGED";
+	//
+	//// dispatched when a region is unloaded
+	//static public const REGION_UNLOAD:String					= "REGION_UNLOAD";
+	//// tells the region manager to load this region
+	//static public const REGION_LOAD:String						= "REGION_LOAD";
+	//// dispatched after jobs for all process have been added
+	//static public const REGION_LOAD_BEGUN:String				= "REGION_LOAD_BEGUN";
+	//// tells the region manager this region had finished loading
+	//static public const REGION_LOAD_COMPLETE:String				= "REGION_LOAD_COMPLETE";
+	//
+	//
+	//// Used by the sandbox list and config manager to request a join of a server region
+	//static public const REQUEST_JOIN:String						= "REQUEST_JOIN";
 	
 //		private var _dbo:DatabaseObject;
 	private var _vmm:VoxelModelMetadata;
-	private var _itemGuid:String;
+	private var _guid:String;
 
-	public function ModelMetadataEvent( $type:String, $vmm:VoxelModelMetadata, $itemGuid:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelMetadataEvent( $type:String, $guid:String, $vmm:VoxelModelMetadata, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
 		_vmm = $vmm;
-		_itemGuid = $itemGuid;
+		_guid = $guid;
 	}
 	
 	public override function clone():Event
 	{
-		return new ModelMetadataEvent(type, _vmm, _itemGuid, bubbles, cancelable);
+		return new ModelMetadataEvent(type, _guid, _vmm, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString("ModelMetadataEvent", "bubbles", "cancelable") + " VoxelModelMetadata: " + _vmm.toString() + "  itemGuid: " + _itemGuid;
+		return formatToString("ModelMetadataEvent", "bubbles", "cancelable") + " VoxelModelMetadata: " + _vmm.toString() + "  itemGuid: " + _guid;
 	}
 	
 	public function get vmm():VoxelModelMetadata 
@@ -51,9 +74,9 @@ public class ModelMetadataEvent extends Event
 		return _vmm;
 	}
 	
-	public function get itemGuid():String 
+	public function get guid():String 
 	{
-		return _itemGuid;
+		return _guid;
 	}
 	///////////////// Event handler interface /////////////////////////////
 

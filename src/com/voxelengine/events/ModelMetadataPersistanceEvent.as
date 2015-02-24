@@ -8,26 +8,15 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.events
 {
 import flash.events.Event;
+import playerio.DatabaseObject;
+import flash.events.EventDispatcher;
 
 /**
  * ...
  * @author Robert Flesch - RSF 
  */
-public class PersistanceEvent extends Event
+public class ModelMetadataPersistanceEvent extends PersistanceEvent
 {
-	static public const LOAD_REQUEST:String  	= "LOAD_REQUEST";
-	static public const LOAD_REQUEST_TYPE:String = "LOAD_REQUEST_TYPE";
-	static public const LOAD_REQUEST_ALL:String = "LOAD_REQUEST_ALL";
-	static public const LOAD_SUCCEED:String  	= "LOAD_SUCCEED";
-	static public const LOAD_FAILED:String  	= "LOAD_FAILED";
-	static public const LOAD_NOT_FOUND:String 	= "LOAD_NOT_FOUND";
-	
-	static public const SAVE_REQUEST:String  	= "SAVE_REQUEST";
-	static public const CREATE_SUCCEED:String	= "CREATE_SUCCEED";
-	static public const SAVE_SUCCEED:String  	= "SAVE_SUCCEED";
-	static public const CREATE_FAILED:String	= "CREATE_FAILED";
-	static public const SAVE_FAILED:String  	= "SAVE_FAILED";
-
 	private var _guid:String;
 	private var _dbo:DatabaseObject;
 	private var _data:*;
@@ -36,7 +25,7 @@ public class PersistanceEvent extends Event
 	public function get dbo():DatabaseObject { return _dbo; }
 	public function get data():* { return _data; }
 
-	public function PersistanceEvent( $type:String, $guid:String, $dbo:DatabaseObject = null, $data:* = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelMetadataPersistanceEvent( $type:String, $guid:String, $dbo:DatabaseObject = null, $data:* = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
 		_guid = $guid;
@@ -46,7 +35,7 @@ public class PersistanceEvent extends Event
 	
 	public override function clone():Event
 	{
-		return new PersistanceEvent(type, _guid, _dbo, _data, bubbles, cancelable);
+		return new ModelMetadataPersistanceEvent(type, _guid, _dbo, _data, bubbles, cancelable);
 	}
    
 	public override function toString():String
@@ -67,12 +56,10 @@ public class PersistanceEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:PersistanceEvent ) : Boolean {
+	static public function dispatch( $event:ModelMetadataPersistanceEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////
-}
-	
 }
 }

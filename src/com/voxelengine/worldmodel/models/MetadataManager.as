@@ -7,6 +7,11 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.ModelDataEvent;
+import com.voxelengine.events.ModelMetadataPersistanceEvent;
+import com.voxelengine.events.ModelDataPersistanceEvent;
+import com.voxelengine.events.PersistanceEvent;
+import flash.utils.ByteArray;
 import flash.utils.Dictionary;
 
 import flash.events.Event;
@@ -19,7 +24,6 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.persistance.PersistModel;
 
 /**
  * ...
@@ -27,118 +31,146 @@ import com.voxelengine.persistance.PersistModel;
  */
 public class MetadataManager
 {
-	static private var _modifiedDate:Date; // The date range used for loading from persistance, this is the oldest model to get. Gets updated each time it is used
-	static private var _guidError:String;
+	//static private var _modifiedDate:Date; // The date range used for loading from persistance, this is the oldest model to get. Gets updated each time it is used
+	//static private var _guidError:String;
+	static private var _initialized:Boolean;
 	
 	// this acts as a holding spot for all model objects loaded from persistance
 	// dont use weak keys since this is THE spot that holds things.
 	static private var _metadata:Dictionary = new Dictionary(false);
+	static private var _data:Dictionary = new Dictionary(false);
 	
-	// Used to distribue all persistance messages
-	//static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
-	//
-	/////////////////// Event handler interface /////////////////////////////
-//
-	//static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
-		//_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
-	//}
-//
-	//static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
-		//_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
-	//}
-	//
-	//static public function dispatch( $event:Event) : Boolean {
-		//return _eventDispatcher.dispatchEvent( $event );
-	//}
-	//
-	/////////////////// Event handler interface /////////////////////////////
-
-	static public function init():void {
+	public function MetadataManager() {
 		
+	}
+	
+	static public function init():void {
+		//ModelMetadataEvent.addListener( ModelMetadataEvent.REGION_LOAD, regionLoad ); 
+		//ModelMetadataEvent.addListener( ModelMetadataEvent.REQUEST_JOIN, requestServerJoin ); 
+		//ModelMetadataEvent.addListener( ModelMetadataEvent.REGION_CHANGED, regionChanged );	
+		ModelMetadataEvent.addListener( ModelMetadataEvent.TYPE_REQUEST, modelMetadataTypeRequest );
+		ModelMetadataEvent.addListener( ModelMetadataEvent.REQUEST, modelMetadataRequest );
+		
+		ModelMetadataPersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, metadataLoadSucceed );
+		ModelMetadataPersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, metadataLoadFailed );
+		
+		ModelDataPersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, dataLoadSucceed );
+		ModelDataPersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, dataLoadFailed );
+		
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//  METADATA
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	static private function modelMetadataRequest( $mme:ModelMetadataEvent ):void 
+	{   
+		if ( null == $mme.guid ) {
+			Log.out( "MetadataManager.modelMetadataRequest guid rquested is NULL: ", Log.WARN );
+			return;
+		}
+		Log.out( "MetadataManager.modelMetadataRequest guid: " + $mme.guid, Log.WARN );
+		var vmm:VoxelModelMetadata = _metadata[$mme.guid]; 
+		if ( null == vmm )
+			ModelMetadataPersistanceEvent.dispatch( new ModelMetadataPersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mme.guid ) );
+		else
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.ADDED, vmm.guid, vmm ) );
+	}
+	
+	// This loads the first 100 objects from the users inventory and the public inventory
+	static private function modelMetadataTypeRequest( $mme:ModelMetadataEvent ):void {
+		
+		if ( false == _initialized ) {
+			ModelMetadataPersistanceEvent.dispatch( new ModelMetadataPersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Network.userId ) );
+			ModelMetadataPersistanceEvent.dispatch( new ModelMetadataPersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Network.PUBLIC ) );
+		}
+			
+		_initialized = true;
+		
+		// This will return models already loaded.
+		for each ( var vmm:VoxelModelMetadata in _metadata ) {
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.ADDED, vmm.guid, vmm ) );
+		}
 	}
 	
 	static private function metadataAdd( $vmm:VoxelModelMetadata ):void 
 	{ 
-		if ( $vmm && null ==  _metadata[$vmm.guid] ) {
+		if ( null == $vmm || null == $vmm.guid ) {
+			Log.out( "MetadataManager.metadataAdd trying to add NULL metadata or guid", Log.WARN );
+			return;
+		}
+		// check to make sure is not already there
+		if ( null ==  _metadata[$vmm.guid] ) {
 			//Log.out( "MetadataManager.metadataAdd vmm: " + $vmm.toString(), Log.WARN );
 			_metadata[$vmm.guid] = $vmm; 
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_TEMPLATE_REPO, $vmm, $vmm.guid ) );
-		}
-	}
-
-	static public function metadataLoad():void {
-		// This should get any new models
-		if ( null == _modifiedDate )
-			_modifiedDate = new Date( 2000, 1, 1, 12, 0, 0, 0 );
-		else
-			_modifiedDate = new Date();
-
-		Log.out( "MetadataManager.metadataLoad _modifiedDate: " + _modifiedDate.toString(), Log.DEBUG );
-//		PersistModel.loadModels( Network.userId, _modifiedDate );
-//		PersistModel.loadModels( Network.PUBLIC, _modifiedDate );
-		
-		// This will return models already loaded.
-		for each ( var vmm:VoxelModelMetadata in _metadata ) {
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_TEMPLATE_REPO, vmm, vmm.guid ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.ADDED, $vmm.guid, $vmm ) );
 		}
 	}
 	
-	static public function metadataGetAll():Dictionary { return _metadata; }
-	static public function metadataGet( $guid:String ):VoxelModelMetadata 
-	{   
-		if ( null == $guid ) {
-			Log.out( "MetadataManager.metadataGet guid rquested is NULL: ", Log.WARN );
-			return null;
-		}
-		//Log.out( "MetadataManager.metadataGet guid: " + $guid, Log.WARN );
-		var vmm:VoxelModelMetadata = _metadata[$guid]; 
-		if ( null == vmm ) {
-			_guidError = $guid;
-			//Log.out( "MetadataManager.metadataGet - did not find info for: " + $guid + " requesting...", Log.WARN );
-			PersistModel.loadModel( $guid, loadSuccessMetadata, loadFailure );
-		}
-		return vmm; 
-	}
-	
-	static private function loadSuccessMetadata( dbo:DatabaseObject ):void {
-		
+	static private function metadataLoadSucceed( $mmpe:ModelMetadataPersistanceEvent):void 
+	{
+		Log.out( "MetadataManager.metadataLoadSucceed $mmpe: " + $mmpe.guid, Log.WARN );
 		var vmm:VoxelModelMetadata = new VoxelModelMetadata();
-		if ( dbo ) {
-			vmm.fromPersistanceMetadata( dbo );
+		if ( $mmpe.dbo ) {
+			vmm.fromPersistanceMetadata( $mmpe.dbo );
 			metadataAdd( vmm );
-			Log.out( "MetadataManager.loadSuccessMetadata vmm: " + vmm.toString(), Log.WARN );
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm, vmm.guid ) );
 		}
 		else {
-			vmm.guid = _guidError;
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm, vmm.guid ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.FAILED, null, null ) );
 		}
 	}
 	
-	static private function loadSuccessData( dbo:DatabaseObject ):void {
+	static private function metadataLoadFailed( $mmpe:ModelMetadataPersistanceEvent ):void 
+	{
+		Log.out( "MetadataManager.metadataLoadFailed vmm: ", Log.ERROR );
+	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//  DATA
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	static private function modelDataRequest( $mde:ModelDataEvent ):void 
+	{   
+		if ( null == $mde.guid ) {
+			Log.out( "MetadataManager.modelDataRequest guid rquested is NULL: ", Log.WARN );
+			return;
+		}
 		
-		if ( dbo ) {
-			var vmm:VoxelModelMetadata = metadataGet( dbo.key );
-			if ( vmm ) {
-				vmm.fromPersistanceData( dbo );
-				Log.out( "MetadataManager.loadSuccessData vmm: " + vmm.toString(), Log.WARN );
-				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_PERSISTANCE, vmm, vmm.guid ) );
-			}
-			else
-				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_DATA_PERSISTANCE, null, dbo.key ) );
+		var vmd:VoxelModelData = _data[$mde.guid]; 
+		if ( null == vmd )
+			ModelDataPersistanceEvent.dispatch( new ModelDataPersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mde.guid ) );
+		else
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.ADDED, vmd.guid, vmd ) );
+	}
+	
+	static private function dataAdd( $vmd:VoxelModelData ):void 
+	{ 
+		if ( null == $vmd || null == $vmd.guid || null == $vmd.dbo ) {
+			Log.out( "MetadataManager.dataAdd trying to add VoxelModelData", Log.WARN );
+			return;
+		}
+		// check to make sure is not already there
+		if ( null ==  _data[$vmd.guid] ) {
+			Log.out( "MetadataManager.dataAdd vmd: " + $vmd.guid, Log.WARN );
+			_metadata[$vmd.guid] = $vmd; 
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.ADDED, $vmd.guid, $vmd ) );
+		}
+	}
+	
+	static private function dataLoadSucceed(e:ModelDataPersistanceEvent):void 
+	{
+		Log.out( "MetadataManager.dataLoadSucceed guid: " + e.dbo , Log.WARN );
+		if ( e.dbo ) {
+			var vmd:VoxelModelData = new VoxelModelData( e.dbo.key, e.dbo );
+			dataAdd( vmd );
+		}
+		else {
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.FAILED, null, null ) );
+		}
+	}
+	
+	static private function dataLoadFailed(e:ModelDataPersistanceEvent):void 
+	{
+		Log.out( "MetadataManager.metadataLoadFailed vmm: ", Log.ERROR );
+	}
 
-		}
-		else {
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_DATA_PERSISTANCE, null, _guidError ) );
-		}
-	}
-	
-	static private function loadFailure( $error:PlayerIOError ):void {
-		
-		Log.out( "MetadataManager.loadFailure - error: " + $error.message, Log.ERROR, $error );
-		var vmm:VoxelModelMetadata = new VoxelModelMetadata();
-		vmm.guid = _guidError;
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_FAILED_PERSISTANCE, vmm, vmm.guid ) );
-	}
 }
 }

@@ -8,7 +8,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.persistance 
 {
-import com.voxelengine.events.ModelPersistanceEvent;
+import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PlayerIOPersistanceEvent;
+import com.voxelengine.events.ModelMetadataPersistanceEvent;
 import com.voxelengine.persistance.Persistance;
 import com.voxelengine.worldmodel.models.MetadataManager;
 import flash.utils.ByteArray;
@@ -20,13 +22,75 @@ import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 
-public class PersistModel
+public class PersistModelMetadata
 {
 	static public const DB_TABLE_MODELS:String = "voxelModels";
 	static public const DB_TABLE_MODELS_DATA:String = "voxelModelsData";
 	static public const DB_INDEX_MODEL_OWNER:String = "voxelModelOwner";
 	static public const DB_INDEX_OWNER_TEMPLATE:String = "ownerTemplate"
 	static private var _modifedDate:Date;
+	
+	static public function addEvents():void {
+		//ModelMetadataPersistanceEvent.addListener( PersistanceEvent.LOAD_REQUEST_TYPE,	loadType );
+		ModelMetadataPersistanceEvent.addListener( PersistanceEvent.LOAD_REQUEST, 		load );
+		//ModelMetadataPersistanceEvent.addListener( PersistanceEvent.SAVE_REQUEST, 		save );
+	}
+	
+	static private function load( $mmpe:ModelMetadataPersistanceEvent ):void {
+	
+		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT, 	errorNoClientLoad );
+		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, 		errorNoDBLoad );
+		
+		Log.out( "PersistModelMetadata.load - guid: " + $mmpe.guid, Log.DEBUG ); 
+		Persistance.loadObject( DB_TABLE_MODELS
+							  , $mmpe.guid
+							  , succeedLoad
+							  , failLoad );
+					
+		PlayerIOPersistanceEvent.removeListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT, 	errorNoClientLoad );
+		PlayerIOPersistanceEvent.removeListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, 		errorNoDBLoad );
+				
+		function succeedLoad( dbo:DatabaseObject ):void {
+			Log.out( "PersistModelMetadata.load.succeed - loaded guid: " + $mmpe.guid ); 
+			if ( dbo )
+				ModelMetadataPersistanceEvent.dispatch( new ModelMetadataPersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $mmpe.guid, dbo ) );
+			else	
+				ModelMetadataPersistanceEvent.dispatch( new ModelMetadataPersistanceEvent( PersistanceEvent.LOAD_FAILED, $mmpe.guid ) );
+		}
+		
+		function failLoad(e:PlayerIOError):void 
+		{  
+			Log.out( "PersistModelMetadata.load.fail - guid: " + $mmpe.guid + " error: " + e.message, Log.ERROR, e ); 
+			ModelMetadataPersistanceEvent.dispatch( new ModelMetadataPersistanceEvent( PersistanceEvent.LOAD_FAILED, $mmpe.guid ) );
+		}
+		
+		function errorNoClientLoad($pe:PlayerIOPersistanceEvent):void {
+			Log.out( "PersistModelMetadata.load.errorNoClient - guid: " + $mmpe.guid + "  error data: NOT CONNECTED TO THE INTERNET", Log.ERROR ) 
+			ModelMetadataPersistanceEvent.dispatch( new ModelMetadataPersistanceEvent( PersistanceEvent.LOAD_FAILED, $mmpe.guid ) );
+		}		
+		
+		function errorNoDBLoad($pe:PlayerIOPersistanceEvent):void {
+			Log.out( "PersistModelMetadata.load.errorNoDB - guid: " + $mmpe.guid + "  error data: DATABASE NOT FOUND", Log.ERROR ) 
+			ModelMetadataPersistanceEvent.dispatch( new ModelMetadataPersistanceEvent( PersistanceEvent.LOAD_FAILED, $mmpe.guid ) );
+		}		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+/*	
 	
 	//////////////////////////////////////////////////////////////////////
 	// TO PERSISTANCE
@@ -81,6 +145,7 @@ public class PersistModel
 			// seems like this MIGHT throw it in an endless loop
 		} 
 	}
+	*/
 	/*
 	static public function createModelData( $guid:String, $data:ByteArray, $success:Function, $error:Function ):void {
 			Persistance.createObject( DB_TABLE_MODELS_DATA
@@ -94,6 +159,7 @@ public class PersistModel
 	//////////////////////////////////////////////////////////////////////
 	// FROM PERSISTANCE
 	//////////////////////////////////////////////////////////////////////
+/*	
 	static public function loadModel( $guid:String, $success:Function, $error:Function ):void {
 
 		Persistance.loadObject( DB_TABLE_MODELS, $guid, $success, $error );
@@ -114,6 +180,7 @@ public class PersistModel
 			Log.out( "PersistModel.loadModelsError - e: " + e, Log.ERROR );
 		}
 	}
+	*/
 /*
 	static public function loadModelTemplates( $userName:String, $modifiedDate:Date ):void {
 		
@@ -129,7 +196,7 @@ public class PersistModel
 					
 	}
 */
-
+/*
 	static private function loadObjectsData( dba:Array ):void {
 		
 		for each ( var dbo:DatabaseObject in dba )
@@ -138,10 +205,10 @@ public class PersistModel
 			var vmm:VoxelModelMetadata = MetadataManager.metadataGet( key );
 			if ( vmm ) {
 				vmm.fromPersistanceData( dbo );
-				ModelMetadataEvent..dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_DATA_PERSISTANCE, vmm ) );
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_DATA_PERSISTANCE, vmm ) );
 			}
 			else
-				ModelMetadataEvent..dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_DATA_PERSISTANCE, vmm ) );
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.INFO_LOADED_DATA_PERSISTANCE, vmm ) );
 		}
 	}
 	
@@ -174,6 +241,6 @@ public class PersistModel
 								//}
 							  //);
 	//}
-	
+	*/
 }	
 }

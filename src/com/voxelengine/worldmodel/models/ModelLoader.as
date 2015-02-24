@@ -45,7 +45,7 @@ package com.voxelengine.worldmodel.models
 		static private var _s_mmd:VoxelModelMetadata;
 		
 		public function ModelLoader():void {
-			ModelMetadataEvent.addListener( ModelMetadataEvent.INFO_COLLECTED, localModelReadyToBeCreated );
+			ModelMetadataEvent.addListener( ModelMetadataEvent.ADDED, localModelReadyToBeCreated );
 		}
 		
 		static public function load( $ii:InstanceInfo, $vmm:VoxelModelMetadata = null ):void {
@@ -120,11 +120,9 @@ package com.voxelengine.worldmodel.models
 		static private function loadPersistantNew( $ii:InstanceInfo ):void {
 			Log.out( "ModelLoader.loadPersistantNew - retriving metadata for: " + $ii.toString() );
 			
-			var vmm:VoxelModelMetadata = MetadataManager.metadataGet( $ii.guid );
 			// a modelMaker listen for the metadata loaded event, then creates the object from it.
 			// and goes away, its kept in memory by its listener.
-			if ( null == vmm )
-				var mm:ModelMaker = new ModelMaker( $ii );
+			new ModelMaker( $ii );
 		}
 
 		static public function loadFromManifestByteArray( $vmm:VoxelModelMetadata, $ba:ByteArray, controllingModelGuid:String = "" ):VoxelModel {
@@ -183,12 +181,12 @@ package com.voxelengine.worldmodel.models
 			return vm;
 		}
 		
-		static public function loadFromManifestByteArrayNew( $ii:InstanceInfo, $vmm:VoxelModelMetadata ):VoxelModel {
+		static public function loadFromManifestByteArrayNew( $ii:InstanceInfo, $vmd:VoxelModelData ):VoxelModel {
 				
-			var $ba:ByteArray = $vmm.data;
+			var $ba:ByteArray = $vmd.dbo.ba;
 			if ( null == $ba )
 			{
-				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad data in VoxelModelMetadata: " + $vmm.guid, Log.ERROR );
+				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad data in VoxelModelMetadata: " + $vmd.guid, Log.ERROR );
 				return null;
 			}
 			$ba.position = 0;
@@ -209,14 +207,15 @@ package com.voxelengine.worldmodel.models
 			modelInfoJson = decodeURI(modelInfoJson);
 			var jsonResult:Object = JSON.parse(modelInfoJson);
 			var mi:ModelInfo = new ModelInfo();
-			mi.initJSON( $vmm.guid, jsonResult );
+			mi.initJSON( $vmd.guid, jsonResult );
 			
 			// add the modelInfo to the repo
 			// is the still needed TODO - RSF 9.23.14
 			Globals.modelInfoAdd( mi );
 			// needs to be name + guid??
 			
-			var vm:* = instantiate( $ii, mi, $vmm );
+			//var vm:* = instantiate( $ii, mi, $vmm );
+			var vm:* = instantiate( $ii, mi, null );
 			if ( vm ) {
 				vm.version = versionInfo.version;
 				vm.loadOxelFromByteArray( $ba );

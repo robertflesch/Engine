@@ -7,7 +7,8 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.persistance.PersistModel;
+	import com.voxelengine.events.ModelDataEvent;
+	import com.voxelengine.events.ModelMetadataEvent;
 	import flash.display3D.Context3D;
 	import flash.events.TimerEvent;
 	import flash.events.KeyboardEvent;
@@ -61,6 +62,7 @@ package com.voxelengine.worldmodel.models
 	public class VoxelModel
 	{
 		private var 	_metadata:VoxelModelMetadata;
+		private var 	_data:VoxelModelData;
 		protected var 	_modelInfo:ModelInfo 			= null; // INSTANCE NOT EXPORTED
 		protected var 	_instanceInfo:InstanceInfo 		= null; // INSTANCE NOT EXPORTED
 		private var 	_oxel:Oxel 						= null; // INSTANCE NOT EXPORTED
@@ -93,6 +95,8 @@ package com.voxelengine.worldmodel.models
 		protected var 	_turnRate:Number 				= 20; // 2.5 for ship
 		protected var 	_accelRate:Number 				= 2.5;
 		
+		public function get data():VoxelModelData    				{ return _data; }
+		public function set data(val:VoxelModelData):void   		{ _data = val; }
 		public function get metadata():VoxelModelMetadata    		{ return _metadata; }
 		public function set metadata(val:VoxelModelMetadata):void   { _metadata = val; }
 		public function get dead():Boolean 							{ return _dead; }
@@ -687,7 +691,12 @@ package com.voxelengine.worldmodel.models
 			//	byteArrayLoad( Globals.g_modelManager.modelByteArrays[_modelInfo.biomes.layers[0].data] );
 			//else 
 			//if (_modelInfo.biomes && false == complete && false == metadata.hasDataObject )
-			if (_modelInfo.biomes && false == complete && Globals.online ? metadata.hasDataObject : true ) {
+			if ( _modelInfo.biomes && false == complete ) {
+				if ( _modelInfo.biomes.layers[0].functionName == "LoadModelFromBigDB" ) {
+					Log.out( "VoxelModel.internal_initialize - GET RID OF THESE", Log.ERROR );
+					return;
+				}
+					
 				Log.out( "VoxelModel.internal_initialize - adding task for: " + _modelInfo.biomes );
 				_modelInfo.biomes.add_to_task_controller(instanceInfo);
 			}
@@ -993,18 +1002,15 @@ package com.voxelengine.worldmodel.models
 			}
 				
 			Log.out("VoxelModel.save - saving changes to: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.guid: " + instanceInfo.guid  );
-			if ( forceSave ) {
-				metadata.data = null;
-			}
-			else {
-				if ( "" != metadata.templateGuid )
-					metadata.templateGuid = "";
+			if ( "" != metadata.templateGuid )
+				metadata.templateGuid = "";
 					
-				metadata.data = toByteArray();
-			}
+			data.dbo.ba = toByteArray();
 				
 			_changed = false;
-			metadata.save();
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.SAVE, metadata.guid, metadata ) );
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.SAVE, metadata.guid, data ) );
+			
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////

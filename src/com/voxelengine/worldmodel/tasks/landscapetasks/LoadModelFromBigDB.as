@@ -23,7 +23,6 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelMetadataEvent;
-	import com.voxelengine.persistance.PersistModel;
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.Player;
 	import com.voxelengine.worldmodel.models.MetadataManager;
@@ -42,14 +41,14 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private var _vmmBase:VoxelModelMetadata;
 		
 		public function LoadModelFromBigDB( $guid:String, $layer:LayerInfo = null ) {
-			//Log.out( "LoadModelFromBigDB.construct " );
+			Log.out( "LoadModelFromBigDB.construct ", Log.ERROR );
 			_guid = $guid
 			_startTime = getTimer();
 			//public function AbstractTask(type:String, priority:int = 5, uid:Object = null, selfOverride:Boolean = false, blocking:Boolean = false)
 			super( _guid );
 			_count++;
 		}
-		
+		/*
 		override public function start():void
 		{
 			//Log.out( "LoadModelFromBigDB.start for guid:" + _guid );
@@ -162,5 +161,6 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				finish( null );
 			}
 		}
+		*/
 	}
 }
