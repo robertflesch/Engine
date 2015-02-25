@@ -34,7 +34,7 @@ public class PersistanceEvent extends Event
 	private var _dbo:DatabaseObject;
 	private var _data:*;
 	private var _table:*;
-	private var _format:String;
+	private var _format:String; // only used in local file access PersistLocal
 	
 	public function get guid():String  { return _guid; }
 	public function get dbo():DatabaseObject { return _dbo; }

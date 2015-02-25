@@ -120,7 +120,7 @@ package {
 			// adds handlers for persistance of regions
 			Persistance.addEventHandlers();
 			
-			addEventListener(LoadingEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
+			WindowSplashEvent.addListener( WindowSplashEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
 			
 			VoxelVerseGUI.currentInstance.init();
 			
@@ -139,11 +139,11 @@ package {
 		}
 
 		// after the splash and config have been loaded
-		public function onSplashLoaded( event : LoadingEvent ):void	{
+		public function onSplashLoaded( event : WindowSplashEvent ):void	{
 			
 			//Log.out( "VoxelVerse.onSplashLoaded" );
 			// TODO I dont like that some objects are created in globals, others are created here - RSF
-			removeEventListener(LoadingEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
+			WindowSplashEvent.removeListener( WindowSplashEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
 			
 			Globals.g_regionManager = new RegionManager();
 			_configManager = new ConfigManager( _displayGuid );
@@ -182,8 +182,8 @@ package {
 			Globals.g_renderer.render();
 			timeRender = getTimer() - timeRender;
 				
-			if ( 10 < timeRender || 10 < timeUpdate )	
-				Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed );
+			if ( ( 10 < timeRender || 10 < timeUpdate ) && Globals.active )	
+				Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed, Log.INFO );
 			_timePrevious = getTimer();
 		}
 		

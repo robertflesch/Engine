@@ -140,7 +140,7 @@ public class InstanceInfo extends Location	{
 	public function InstanceInfo() 
 	{ 
 		//RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, onLoadingComplete );
-		Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+		LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 	}
 
 	public function clone():InstanceInfo
@@ -168,7 +168,7 @@ public class InstanceInfo extends Location	{
 
 	private function onLoadingComplete( le:LoadingEvent ):void
 	{
-		Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+		LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 	}
 	
 	public function topmostGuid():String {

@@ -33,13 +33,13 @@ public final class ProjectilePool
 		GROWTH_VALUE = $growthValue; 
 		_counter = $initialPoolSize; 
 		// We have to wait until types are loading before we can start our process
-		Globals.g_app.addEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
+		LoadingEvent.addListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 	} 
 	
 	private static function onTypesLoaded( $event:LoadingEvent ):void
 	{
 		// So types are done, now we have to preload the CLASS_NAME.mjson file
-		Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
+		LoadingEvent.removeListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 		// Preload the modelInfo for the CLASS_NAME
 //		ModelLoader.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
 		// Listen for it being loaded

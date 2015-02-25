@@ -217,7 +217,7 @@ package com.voxelengine.worldmodel
 		{
 			Log.out( "Region.onLoadingComplete: regionId: " + guid, Log.DEBUG );
 			_loaded = true;
-			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, guid ) );
 		}
 
@@ -237,7 +237,7 @@ package com.voxelengine.worldmodel
 		{
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
 			RegionEvent.addListener( RegionEvent.UNLOAD, onRegionUnload );
-			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+			LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.addEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
 			
 			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_BEGUN, guid ) );

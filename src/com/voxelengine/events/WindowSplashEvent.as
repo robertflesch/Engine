@@ -19,6 +19,8 @@ public class WindowSplashEvent extends Event
 	static public const CREATE:String  	= "CREATE";
 	static public const DESTORY:String	= "DESTORY";
 	static public const ANNIHILATE:String	= "ANNIHILATE"; // This closes regardless of online state
+	static public const SPLASH_LOAD_COMPLETE:String	= "SPLASH_LOAD_COMPLETE";
+	
 
 	public function WindowSplashEvent( $type:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{

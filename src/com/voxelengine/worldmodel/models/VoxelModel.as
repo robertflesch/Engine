@@ -1704,7 +1704,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		private function onModelLoadComplete( event:LoadingEvent):void
 		{
 			Log.out( "VoxelModel.onModelLoadComplete: " + modelInfo.fileName  );
-			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
+			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
 			stateSet( instanceInfo.state );
 		}
 		

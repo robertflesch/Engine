@@ -112,23 +112,23 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			if ( $vm ) {
 				if ( $vm is Player )
 				{
-					Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, _guid ) );
+					LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, _guid ) );
 				}
 				else {
 					if ( $vm.instanceInfo.critical )
-						Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.CRITICAL_MODEL_LOADED, _guid ));
+						LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.CRITICAL_MODEL_LOADED, _guid ));
 					else
-						Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.MODEL_LOAD_COMPLETE, _guid ) );
+						LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_COMPLETE, _guid ) );
 				}
 			}
 			else 
-				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.MODEL_LOAD_FAILURE, _guid ) );
+				LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_FAILURE, _guid ) );
 			
 			_count--;				
 			if ( 0 == _count )
 			{
 				Log.out( "LoadModelFromBigDB.finish - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _guid, Log.DEBUG );
-				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
+				LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 			}
 			else
 				Log.out( "LoadModelFromBigDB.finish - MODEL LOADED - vm: " + _guid + "  this many left: " + _count, Log.DEBUG );

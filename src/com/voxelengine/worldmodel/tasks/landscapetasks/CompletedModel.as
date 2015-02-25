@@ -65,13 +65,13 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 						
 					if ( vm is Player )
 					{
-						Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, _guid ) );
+						LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, _guid ) );
 					}
 					else {
 						if ( vm.instanceInfo.critical )
-							Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.CRITICAL_MODEL_LOADED, _guid ));
+							LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.CRITICAL_MODEL_LOADED, _guid ));
 						else
-							Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.MODEL_LOAD_COMPLETE, _guid ) );
+							LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_COMPLETE, _guid ) );
 					}
 				}
 				else
@@ -92,7 +92,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			if ( 0 == _count  ) // && _playerLoaded  should I add ( null != Globals.player )
 			{
 				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _guid );
-				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
+				LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 			}
 			
 			

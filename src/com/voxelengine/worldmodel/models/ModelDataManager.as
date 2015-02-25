@@ -45,7 +45,7 @@ public class ModelDataManager
 			Log.out( "ModelDataManager.modelDataRequest guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "ModelDataManager.modelDataRequest guid: " + $mie.guid, Log.INFO );
+		Log.out( "ModelDataManager.request guid: " + $mie.guid, Log.INFO );
 		var mi:VoxelModelData = _modelData[$mie.guid]; 
 		if ( null == mi ) {
 			if ( true == Globals.online )
@@ -74,20 +74,22 @@ public class ModelDataManager
 	{
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		Log.out( "ModelDataManager.modelDataLoadSucceed guid: " + $pe.guid, Log.INFO );
 		if ( $pe.data ) {
+			Log.out( "ModelDataManager.loadSucceed guid: " + $pe.guid, Log.INFO );
 			var vmd:VoxelModelData = new VoxelModelData( $pe.guid, null, $pe.data );
 			modelDataAdd( $pe.guid, vmd );
 		}
-		else
+		else {
+			Log.out( "ModelDataManager.loadSucceed ERROR NO DBO " + $pe.toString(), Log.ERROR );
 			ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.FAILED, null, null ) );
+		}
 	}
 	
 	static private function loadFailed( $pe:PersistanceEvent ):void 
 	{
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		Log.out( "ModelDataManager.modelDataLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		Log.out( "ModelDataManager.loadFailed " + $pe.toString(), Log.ERROR );
 		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.FAILED, null, null ) );
 	}
 	
@@ -95,7 +97,7 @@ public class ModelDataManager
 	{
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		Log.out( "ModelDataManager.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		Log.out( "ModelDataManager.loadNotFound " + $pe.toString(), Log.ERROR );
 		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.FAILED, null, null ) );
 	}
 	

@@ -108,7 +108,7 @@ public class ModelMakerLocal {
 		}
 		
 		if ( 0 == _makerCount )
-			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
+			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 	}
 	
 	/*

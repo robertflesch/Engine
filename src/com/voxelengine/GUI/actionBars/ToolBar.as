@@ -69,7 +69,7 @@ package com.voxelengine.GUI.actionBars
 		
 		private function onModelLoadComplete( event:LoadingEvent):void
 		{
-			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
+			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
 			buildActions();
 		}
 		

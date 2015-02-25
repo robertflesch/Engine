@@ -46,13 +46,13 @@ public class ModelMaker {
 		_makerCount++;
 	}
 	
-	private function failedMetadata(e:ModelMetadataEvent):void {
-		Log.out( "ModelMaker.failedMetadata - ii: " + _ii.toString() );
+	private function failedMetadata( $mme:ModelMetadataEvent):void {
+		Log.out( "ModelMaker.failedMetadata - ii: " + _ii.toString() + " ModelMetadataEvent: " + $mme.toString(), Log.WARN );
 		markComplete();
 	}
 	
-	private function failedData(e:ModelDataEvent):void  {
-		Log.out( "ModelMaker.failedData - ii: " + _ii.toString() );
+	private function failedData( $mde:ModelDataEvent):void  {
+		Log.out( "ModelMaker.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
 		markComplete()
 	}
 	
@@ -90,8 +90,8 @@ public class ModelMaker {
 		ModelDataEvent.removeListener( ModelDataEvent.FAILED, failedData );		
 		_makerCount--;
 		if ( 0 == _makerCount )
-			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
-		
+			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
+		Log.out( "ModelMaker.markComplete - makerCount: " + _makerCount );
 	}
 }	
 }

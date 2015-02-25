@@ -134,7 +134,7 @@ package com.voxelengine.worldmodel.animation
 				}
 			}
 			
-			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.ANIMATION_LOAD_COMPLETE, name ) );
+			//LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.ANIMATION_LOAD_COMPLETE, name ) );
 		}
 		
 		/*

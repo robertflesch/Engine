@@ -91,11 +91,11 @@ package com.voxelengine.GUI
 				display( 0, 0 );
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
-			RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, onLoadingComplete );
+			LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize );
 			
 			VoxelVerseGUI.currentInstance.hideGUI()
-			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.SPLASH_LOAD_COMPLETE ) );			
+			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.SPLASH_LOAD_COMPLETE ) );			
 		} 
 		
         protected function onResize(event:Event):void
@@ -104,9 +104,9 @@ package com.voxelengine.GUI
 			_outline.scaleY = Globals.g_renderer.height/592;
 		}
 		
-		private function onLoadingComplete( le:RegionEvent ):void
+		private function onLoadingComplete( le:LoadingEvent ):void
 		{
-			Globals.g_app.removeEventListener( RegionEvent.LOAD_COMPLETE, onLoadingComplete );
+			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		}
 		
 		// Window events

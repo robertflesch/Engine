@@ -37,13 +37,13 @@ public final class ParticlePool
 		_currentPoolSize = $maxPoolSize; 
 		GROWTH_VALUE = $growthValue; 
 		_counter = $maxPoolSize; 
-		Globals.g_app.addEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
+		LoadingEvent.addListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 
 	} 
 	
 	private static function onTypesLoaded( e:LoadingEvent ):void
 	{
-		Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
+		LoadingEvent.removeListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 		// Preload the modelInfo for the cannonBall
 //ModelLoader.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
 		// Listen for it being loaded

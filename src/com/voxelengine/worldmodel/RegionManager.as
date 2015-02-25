@@ -66,8 +66,8 @@ public class RegionManager
 		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED,	regionModelChanged );
 		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_REMOVED,regionModelChanged );
 									  
-		Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_FAILURE,removeFailedObjectFromRegion );									  
-		Globals.g_app.addEventListener( LoadingEvent.LOAD_CONFIG_COMPLETE, configComplete );
+		LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_FAILURE,removeFailedObjectFromRegion );									  
+		LoadingEvent.addListener( LoadingEvent.LOAD_CONFIG_COMPLETE, configComplete );
 		
 		
 		
@@ -109,7 +109,7 @@ public class RegionManager
 			Log.out( "RegionManager.regionRequest guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "RegionManager.regionRequest guid: " + $re.guid, Log.WARN );
+		Log.out( "RegionManager.regionRequest guid: " + $re.guid, Log.INFO );
 		var region:Region = regionGet( $re.guid );
 		if ( region ) {
 			RegionEvent.dispatch( new RegionEvent( RegionEvent.ADDED, region.guid, region ) );

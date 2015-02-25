@@ -64,20 +64,20 @@ package com.voxelengine.worldmodel
 			_showEditMenu = _defaultRegionJson.config.showEditMenu;
 			_showButtons = _defaultRegionJson.config.showButtons;
 			
-			Globals.g_app.addEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
+			LoadingEvent.addListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 			TypeInfo.loadTypeData(type);
 		}   
 		
 		private function onTypesLoaded( $e:LoadingEvent ):void
 		{
 			// This gives the engine a chance to load up the typeInfo file
-			Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
+			LoadingEvent.removeListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 			if ( false ) {
 				LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, listenForLoginSuccess );
 				Network.autoLogin( _defaultRegionJson.config.region.startingRegion );
 			}
 			else // loading local
-				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_CONFIG_COMPLETE, _defaultRegionJson.config.region.startingRegion ) );
+				LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_CONFIG_COMPLETE, _defaultRegionJson.config.region.startingRegion ) );
 		}
 		
 		private function listenForLoginSuccess( $event:LoginEvent ):void {

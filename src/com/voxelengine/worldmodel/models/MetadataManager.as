@@ -38,8 +38,8 @@ public class MetadataManager
 		ModelMetadataEvent.addListener( ModelMetadataEvent.TYPE_REQUEST, modelMetadataTypeRequest );
 		ModelMetadataEvent.addListener( ModelMetadataEvent.REQUEST, modelMetadataRequest );
 		
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, metadataLoadSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, metadataLoadFailed );
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadNotFound );		
 	}
 	
@@ -95,22 +95,23 @@ public class MetadataManager
 		}
 	}
 	
-	static private function metadataLoadSucceed( $pe:PersistanceEvent):void 
+	static private function loadSucceed( $pe:PersistanceEvent):void 
 	{
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
-		Log.out( "MetadataManager.metadataLoadSucceed guid: " + $pe.guid, Log.WARN );
 		if ( $pe.dbo ) {
+			Log.out( "MetadataManager.loadSucceed guid: " + $pe.guid, Log.INFO );
 			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
 			vmm.fromPersistanceMetadata( $pe.dbo );
 			add( vmm );
 		}
 		else {
+			Log.out( "MetadataManager.loadSucceed FAILED no DBO PersistanceEvent: " + $pe.toString(), Log.WARN );
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.FAILED, $pe.guid, null ) );
 		}
 	}
 	
-	static private function metadataLoadFailed( $pe:PersistanceEvent ):void 
+	static private function loadFailed( $pe:PersistanceEvent ):void 
 	{
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
@@ -120,7 +121,7 @@ public class MetadataManager
 
 	static private function loadNotFound( $pe:PersistanceEvent):void 
 	{
-		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
+		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
 		Log.out( "MetadataManager.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.FAILED, $pe.guid, null ) );

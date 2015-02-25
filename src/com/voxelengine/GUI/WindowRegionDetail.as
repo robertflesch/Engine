@@ -72,6 +72,7 @@ public class WindowRegionDetail extends VVPopup
 	
 	private function collectRegionInfo( $re:RegionEvent):void 
 	{
+		RegionEvent.removeListener( RegionEvent.ADDED, collectRegionInfo );
 		_region =  $re.region;
 
 		//_background = (new _backgroundImage() as Bitmap);
@@ -118,12 +119,15 @@ public class WindowRegionDetail extends VVPopup
 //		buttonPanel.addElement( cancelRegionButton );
 		addElement( buttonPanel );
 		/// Buttons /////////////////////////////////////////////
-		defaultCloseOperation = ClosableProperties.DO_NOTHING_ON_CLOSE;
+		//defaultCloseOperation = ClosableProperties.DO_NOTHING_ON_CLOSE;
 		
-		$evtColl.addEvent( this, WindowEvent.CLOSE_BUTTON_CLICKED, cancel );
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
 		
+		defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION;
+		// calls the close function when window shuts down, which closes the splash screen in debug.
+		onCloseFunction = closeFunction;
+
 		// This auto centers
 		//_modalObj.display();
 		// this does not...
@@ -148,14 +152,14 @@ public class WindowRegionDetail extends VVPopup
 			RegionEvent.dispatch( new RegionEvent( RegionEvent.CHANGED, _region.guid ) );
 		}
 			
-		remove();
 		new WindowSandboxList();
+		remove();
 	}
 	
-	private function cancel( e:WindowEvent ):void {
+	private function closeFunction():void {
 		
-		remove();
 		new WindowSandboxList();
+		remove();
 	}
 	
 	private function gravChange(event:ButtonsGroupEvent):void {  

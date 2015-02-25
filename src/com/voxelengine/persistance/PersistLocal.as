@@ -25,7 +25,7 @@ import com.voxelengine.utils.StringUtils;
 public class PersistLocal
 {
 	static public function addEvents():void {
-		Log.out( "PersistLocal.addEvents", Log.WARN );
+//		Log.out( "PersistLocal.addEvents", Log.WARN );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_REQUEST, load );
 	}
 	

@@ -259,7 +259,7 @@ package com.voxelengine.worldmodel
 				TypeInfo.typeInfoByName[ti.name.toUpperCase()] = ti;
 			}
 			
-			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_TYPES_COMPLETE ) );
+			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_TYPES_COMPLETE ) );
 		}
 
 		public function init( $json:Object ):void 

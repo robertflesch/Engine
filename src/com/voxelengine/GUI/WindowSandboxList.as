@@ -169,7 +169,7 @@ public class WindowSandboxList extends VVPopup
 	{
 		var region:Region  = $re.region;
 		
-		Log.out( "WindowSandboxList.regionLoadedEvent - adding regionId: " + region.toString() );
+		//Log.out( "WindowSandboxList.regionLoadedEvent - adding regionId: " + region.toString() );
 		if ( Globals.MODE_PRIVATE == Globals.mode )
 		{
 			if ( Network.userId == region.owner )
@@ -180,7 +180,7 @@ public class WindowSandboxList extends VVPopup
 			if ( Network.PUBLIC == region.owner )
 				_listbox1.addItem( region.name, region.guid );
 		}
-		else
+		else // ManageMode
 		{
 			_listbox1.addItem( region.name, region.guid );
 		}

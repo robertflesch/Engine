@@ -38,15 +38,15 @@ package com.voxelengine.worldmodel.scripts
 						Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.metadata.name );
 					}
 					else {
-						Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
-						//Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingPlayerComplete );
+						LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
+						//LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingPlayerComplete );
 					}
 				}
 			}
 		}
 		
 		private function onLoadingPlayerComplete( le:LoadingEvent ):void {
-			Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
+			LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 			
 			var player:VoxelModel = Globals.player;
 			if ( !player ) 

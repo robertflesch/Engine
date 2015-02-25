@@ -115,7 +115,7 @@ package com.voxelengine.worldmodel.models
 			// why is defaultRegion special?
 			//if ( 0 == count && name != "defaultRegion" ) {
 			if ( 0 == count )
-				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE ) );
+				LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE ) );
 			else	
 				Globals.g_landscapeTaskController.activeTaskLimit = 1;
 				
@@ -335,8 +335,8 @@ package com.voxelengine.worldmodel.models
 			ii.guid = $e.vmm.guid; // Since it used the file name to load locally, this has to be the same 
 			
 			// this will occur after the oxel data has been loaded
-			Globals.g_app.addEventListener( LoadingEvent.MODEL_LOAD_COMPLETE, localModelLoaded );
-			Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, localModelLoaded );
+			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_COMPLETE, localModelLoaded );
+			LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, localModelLoaded );
 			
 			load( ii, _s_mmd );
 		}
@@ -363,7 +363,7 @@ package com.voxelengine.worldmodel.models
 					_s_mmd = null;
 					vm.save();
 //					PlanManager.templateAdd( vm.metadata );
-					Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.TEMPLATE_MODEL_COMPLETE, vm.metadata.guid ) );
+					LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.TEMPLATE_MODEL_COMPLETE, vm.metadata.guid ) );
 					// clear out any evidence that we loaded this model (modelInfo too?)
 					Globals.markDead( e.guid );
 					Globals.instanceInfoRemove( e.guid );

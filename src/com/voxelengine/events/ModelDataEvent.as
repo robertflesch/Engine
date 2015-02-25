@@ -9,9 +9,9 @@ package com.voxelengine.events
 {
 import flash.events.Event;
 import flash.utils.ByteArray;
-import com.voxelengine.worldmodel.models.VoxelModelData;
 import flash.events.EventDispatcher;
 
+import com.voxelengine.worldmodel.models.VoxelModelData;
 /**
  * ...
  * @author Robert Flesch - RSF 

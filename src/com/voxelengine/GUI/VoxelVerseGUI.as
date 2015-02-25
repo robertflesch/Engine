@@ -269,7 +269,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		UIManager.initialize( Globals.g_app.stage );
 		UIManager.debugger = new FDTrace();
 		RegionEvent.addListener( RegionEvent.LOAD_BEGUN, onRegionLoadingComplete );
-		Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
+		LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 //			Globals.g_app.addEventListener(Event.DEACTIVATE, deactivate);
 //			Globals.g_app.addEventListener(Event.ACTIVATE, activate);
 //			Globals.g_app.stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
@@ -309,7 +309,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	
 	private function onModelLoadingComplete(event : LoadingEvent ) : void {
 		//Log.out( "VVGui.onModelLoadingComplete" );
-		Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
+		LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 		addKeyboardListeners( event );
 		new WindowLogin( "", "" );
 	}

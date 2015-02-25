@@ -93,9 +93,9 @@ public class Player extends Avatar
 		Globals.g_app.addEventListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
 		Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		
-		Globals.g_app.addEventListener( LoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
-		Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
-		Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+		LoadingEvent.addListener( LoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
+		LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
+		LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
 		RegionEvent.addListener( RegionEvent.UNLOAD, onRegionUnload );
 		RegionEvent.addListener( RegionEvent.LOAD, onRegionLoad );
@@ -107,9 +107,9 @@ public class Player extends Avatar
 		Globals.g_app.removeEventListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
 		Globals.g_app.removeEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		
-		Globals.g_app.removeEventListener( LoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
-		Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
-		Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+		LoadingEvent.removeListener( LoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
+		LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
+		LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
 		RegionEvent.removeListener( RegionEvent.UNLOAD, onRegionUnload );
 		RegionEvent.removeListener( RegionEvent.LOAD, onRegionLoad );
@@ -409,7 +409,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		if ( Globals.player )
 			Globals.player.loseControl( null );
 		Globals.player.takeControl( null );
-		//Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
+		//LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		// TODO  - this forces inventory load, should I let it load lazily?
 //		MouseKeyboardHandler.addInputListeners();
 		collisionPointsAdd();
@@ -417,7 +417,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 
 	private function onLoadingComplete( le:LoadingEvent ):void {
 		//Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_LOADED, onLoadingComplete );
-		//Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+		//LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		//if ( !Globals.g_regionManager.currentRegion.criticalModelDetected )
 		//{
 			////Log.out( "Player.onLoadingComplete - no critical model" );
