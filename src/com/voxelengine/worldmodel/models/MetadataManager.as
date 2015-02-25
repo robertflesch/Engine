@@ -10,8 +10,8 @@ package com.voxelengine.worldmodel.models
 import flash.utils.ByteArray;
 import flash.utils.Dictionary;
 
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
+import com.voxelengine.Globals;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.server.Network;
@@ -22,18 +22,14 @@ import com.voxelengine.server.Network;
  */
 public class MetadataManager
 {
-	//static private var _modifiedDate:Date; // The date range used for loading from persistance, this is the oldest model to get. Gets updated each time it is used
-	//static private var _guidError:String;
-	static private var _initialized:Boolean;
+	static private var _initializedPublic:Boolean;
+	static private var _initializedPrivate:Boolean;
 	
-	// this acts as a holding spot for all model objects loaded from persistance
+	// this acts as a cache for all model objects loaded from persistance
 	// dont use weak keys since this is THE spot that holds things.
 	static private var _metadata:Dictionary = new Dictionary(false);
-	static private var _data:Dictionary = new Dictionary(false);
 	
-	public function MetadataManager() {
-		
-	}
+	public function MetadataManager() {	}
 	
 	static public function init():void {
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.LOAD, regionLoad ); 
@@ -44,18 +40,16 @@ public class MetadataManager
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, metadataLoadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, metadataLoadFailed );
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadNotFound );		
 	}
 	
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  METADATA
-	/////////////////////////////////////////////////////////////////////////////////////////////
 	static private function modelMetadataRequest( $mme:ModelMetadataEvent ):void 
 	{   
 		if ( null == $mme.guid ) {
 			Log.out( "MetadataManager.modelMetadataRequest guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "MetadataManager.modelMetadataRequest guid: " + $mme.guid, Log.WARN );
+		Log.out( "MetadataManager.modelMetadataRequest guid: " + $mme.guid, Log.INFO );
 		var vmm:VoxelModelMetadata = _metadata[$mme.guid]; 
 		if ( null == vmm )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.DB_TABLE_MODELS, $mme.guid ) );
@@ -63,26 +57,34 @@ public class MetadataManager
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.ADDED, vmm.guid, vmm ) );
 	}
 	
-	// This loads the first 100 objects from the users inventory and the public inventory
+	// This loads the first 100 objects from the users inventory OR the public inventory
 	static private function modelMetadataTypeRequest( $mme:ModelMetadataEvent ):void {
 		
-		if ( false == _initialized ) {
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Globals.DB_TABLE_MODELS, Network.userId, null, Globals.DB_INDEX_VOXEL_MODEL_OWNER ) );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Globals.DB_TABLE_MODELS, Network.PUBLIC, null, Globals.DB_INDEX_VOXEL_MODEL_OWNER ) );
+		if ( Network.PUBLIC == $mme.guid ) {
+			if ( false == _initializedPublic ) {
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Globals.DB_TABLE_MODELS, Network.PUBLIC, null, Globals.DB_INDEX_VOXEL_MODEL_OWNER ) );
+				_initializedPublic = true;
+			}
 		}
 			
-		_initialized = true;
-		
+		if ( Network.userId == $mme.guid ) {
+			if ( false == _initializedPrivate ) {
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Globals.DB_TABLE_MODELS, Network.userId, null, Globals.DB_INDEX_VOXEL_MODEL_OWNER ) );
+				_initializedPrivate = true;
+			}
+		}
+			
 		// This will return models already loaded.
 		for each ( var vmm:VoxelModelMetadata in _metadata ) {
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.ADDED, vmm.guid, vmm ) );
+			if ( vmm.owner == $mme.guid )
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.ADDED, vmm.guid, vmm ) );
 		}
 	}
 	
-	static private function metadataAdd( $vmm:VoxelModelMetadata ):void 
+	static private function add( $vmm:VoxelModelMetadata ):void 
 	{ 
 		if ( null == $vmm || null == $vmm.guid ) {
-			Log.out( "MetadataManager.metadataAdd trying to add NULL metadata or guid", Log.WARN );
+			Log.out( "MetadataManager.add trying to add NULL metadata or guid", Log.WARN );
 			return;
 		}
 		// check to make sure is not already there
@@ -97,14 +99,14 @@ public class MetadataManager
 	{
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
-		Log.out( "MetadataManager.metadataLoadSucceed $pe: " + $pe.guid, Log.WARN );
-		var vmm:VoxelModelMetadata = new VoxelModelMetadata();
+		Log.out( "MetadataManager.metadataLoadSucceed guid: " + $pe.guid, Log.WARN );
 		if ( $pe.dbo ) {
+			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
 			vmm.fromPersistanceMetadata( $pe.dbo );
-			metadataAdd( vmm );
+			add( vmm );
 		}
 		else {
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.FAILED, null, null ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.FAILED, $pe.guid, null ) );
 		}
 	}
 	
@@ -112,7 +114,16 @@ public class MetadataManager
 	{
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
-		Log.out( "MetadataManager.metadataLoadFailed vmm: ", Log.ERROR );
+		Log.out( "MetadataManager.metadataLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.FAILED, $pe.guid, null ) );
+	}
+
+	static private function loadNotFound( $pe:PersistanceEvent):void 
+	{
+		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
+			return;
+		Log.out( "MetadataManager.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.FAILED, $pe.guid, null ) );
 	}
 	
 }

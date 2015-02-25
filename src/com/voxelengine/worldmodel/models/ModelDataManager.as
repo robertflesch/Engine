@@ -10,7 +10,6 @@ package com.voxelengine.worldmodel.models
 import flash.utils.ByteArray;
 import flash.utils.Dictionary;
 import flash.net.URLLoaderDataFormat;
-//import mx.utils.StringUtil;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -46,7 +45,7 @@ public class ModelDataManager
 			Log.out( "ModelDataManager.modelDataRequest guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "ModelDataManager.modelDataRequest guid: " + $mie.guid, Log.WARN );
+		Log.out( "ModelDataManager.modelDataRequest guid: " + $mie.guid, Log.INFO );
 		var mi:VoxelModelData = _modelData[$mie.guid]; 
 		if ( null == mi ) {
 			if ( true == Globals.online )
@@ -64,12 +63,9 @@ public class ModelDataManager
 			Log.out( "ModelDataManager.modelDataAdd trying to add NULL modelData or guid", Log.WARN );
 			return;
 		}
-		// check to make sure is not already there
+		// check to make sure this is new data
 		if ( null ==  _modelData[$guid] ) {
-			//Log.out( "ModelDataManager.modelDataAdd vmm: " + $vmm.toString(), Log.WARN );
 			_modelData[$guid] = $mi; 
-			
-			//var result:Boolean = ModelDataEvent.hasEventListener( ModelDataEvent.ADDED );
 			ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.ADDED, $guid, $mi ) );
 		}
 	}
@@ -78,7 +74,7 @@ public class ModelDataManager
 	{
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		Log.out( "ModelDataManager.modelDataLoadSucceed $pe: " + $pe.guid, Log.WARN );
+		Log.out( "ModelDataManager.modelDataLoadSucceed guid: " + $pe.guid, Log.INFO );
 		if ( $pe.data ) {
 			var vmd:VoxelModelData = new VoxelModelData( $pe.guid, null, $pe.data );
 			modelDataAdd( $pe.guid, vmd );
@@ -91,7 +87,7 @@ public class ModelDataManager
 	{
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		Log.out( "ModelDataManager.modelDataLoadFailed ", Log.ERROR );
+		Log.out( "ModelDataManager.modelDataLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.FAILED, null, null ) );
 	}
 	
@@ -99,7 +95,7 @@ public class ModelDataManager
 	{
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		Log.out( "ModelDataManager.loadNotFound : ", Log.ERROR );
+		Log.out( "ModelDataManager.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.FAILED, null, null ) );
 	}
 	
