@@ -59,7 +59,12 @@ package com.voxelengine.server
 				Log.out( "WindowLogin.constructor - unable to open local shared object" );
 			}
 
-			if ( !Globals.g_debug ) {
+			if ( Globals.g_debug ) {
+				defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION;
+				// calls the close function when window shuts down, which closes the splash screen in debug.
+				onCloseFunction = closeFunction;
+			}
+			else {
 				showCloseButton = false;
 			}
 
@@ -136,12 +141,10 @@ package com.voxelengine.server
 			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
 
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
-			
-			defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION;
-			onCloseFunction = closeFunction;
 		}
 		
 		private function closeFunction():void {
+			// This forces the shutdown of the spalsh screen.
 			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );
 		}
 		

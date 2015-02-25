@@ -13,7 +13,7 @@ package com.voxelengine.worldmodel
 	import flash.events.ProgressEvent;
 	import flash.events.IOErrorEvent;
 	
-	import mx.utils.StringUtil;
+	import com.voxelengine.utils.StringUtils;
 
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
@@ -57,7 +57,7 @@ package com.voxelengine.worldmodel
 		
 		public function onConfigLoadedAction(event:Event):void
 		{
-			var jsonString:String = StringUtil.trim(String(event.target.data));
+			var jsonString:String = StringUtils.trim(String(event.target.data));
 			_defaultRegionJson = JSON.parse(jsonString);
 			var type:String = _defaultRegionJson.config.typeName;
 			_showHelp = _defaultRegionJson.config.showHelp;

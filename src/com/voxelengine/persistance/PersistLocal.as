@@ -17,6 +17,7 @@ import flash.utils.ByteArray;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.utils.StringUtils;
 
 /*
  * This class JUST loads the objects from the database, it doesnt care what is in them.
@@ -59,8 +60,10 @@ public class PersistLocal
 				var ba:ByteArray = event.target.data;			
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.table, $pe.guid, null, ba ) );
 			}
-			else 
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.table, $pe.guid, null, event.target.data ) );
+			else {
+				
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.table, $pe.guid, null, StringUtils.trim(event.target.data) ) );
+			}
 		}       
 
 		function loadError(event:IOErrorEvent):void {

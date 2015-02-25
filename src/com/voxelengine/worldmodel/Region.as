@@ -20,8 +20,6 @@ package com.voxelengine.worldmodel
     import flash.utils.Timer;
 	import flash.net.FileReference;
 	
-	import mx.utils.StringUtil;
-	
 	import playerio.DatabaseObject;
 	import playerio.PlayerIOError;
 	

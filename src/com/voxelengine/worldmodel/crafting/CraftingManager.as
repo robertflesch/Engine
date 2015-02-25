@@ -11,7 +11,6 @@ import flash.events.EventDispatcher;
 import flash.events.IOErrorEvent;
 import flash.net.URLRequest;
 import flash.utils.getDefinitionByName;
-import mx.utils.StringUtil;
 
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
@@ -23,6 +22,7 @@ import com.voxelengine.Log;
 import com.voxelengine.events.CraftingEvent;
 import com.voxelengine.worldmodel.crafting.Recipe;
 import com.voxelengine.utils.CustomURLLoader;
+import com.voxelengine.utils.StringUtils;
 import com.voxelengine.worldmodel.crafting.items.*;
 
 	/**
@@ -73,7 +73,7 @@ public class CraftingManager extends EventDispatcher
 	static private function onRecipeLoaded(event:Event):void {
 		var fileName:String = CustomURLLoader(event.target).fileName;			
 		var fileData:String = String(event.target.data);
-		var jsonString:String = StringUtil.trim(fileData);
+		var jsonString:String = StringUtils.trim(fileData);
 		
 		try {
 			var jsonResult:Object = JSON.parse(jsonString);

@@ -121,7 +121,7 @@ package org.flashapi.swing.plaf.spas {
 		public static const DEFAULT_BUTTON_FONT_COLOR:uint = 0x000000;
 		
 		public static const DISABLED_BUTTON_FONT_COLOR:uint = 0xBDB9aa;
-		public static const UP_BUTTON_FONT_COLOR:uint = 0x9B9788;
+		public static const UP_BUTTON_FONT_COLOR:uint = 0x8A8677;
 
 		/**
 		 *  A constant string that defines the default color color value.

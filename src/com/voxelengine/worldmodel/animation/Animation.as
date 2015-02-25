@@ -16,7 +16,7 @@ package com.voxelengine.worldmodel.animation
 	import flash.utils.Dictionary;
 	import playerio.DatabaseObject;
 	
-	import mx.utils.StringUtil;
+	import com.voxelengine.utils.StringUtils;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
@@ -328,7 +328,7 @@ package com.voxelengine.worldmodel.animation
 			//Log.out( "Animation.onLoadedAction - LOADED: " + name );
 			try 
 			{
-				var jsonString:String = StringUtil.trim( String(event.target.data) );
+				var jsonString:String = StringUtils.trim( String(event.target.data) );
 				var jsonResult:Object = JSON.parse(jsonString);
 			}
 			catch ( error:Error )

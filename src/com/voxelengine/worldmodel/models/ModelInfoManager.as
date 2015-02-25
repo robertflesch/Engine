@@ -10,7 +10,7 @@ package com.voxelengine.worldmodel.models
 import flash.utils.ByteArray;
 import flash.utils.Dictionary;
 
-import mx.utils.StringUtil;
+import com.voxelengine.utils.StringUtils;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -78,7 +78,7 @@ public class ModelInfoManager
 		Log.out( "ModelInfoManager.modelInfoLoadSucceed $pe: " + $pe.guid, Log.WARN );
 		if ( $pe.data ) {
 				var fileData:String = String( $pe.data );
-				var jsonString:String = StringUtil.trim(fileData);
+				var jsonString:String = StringUtils.trim(fileData);
 				
 				try {
 					var jsonResult:Object = JSON.parse(jsonString);

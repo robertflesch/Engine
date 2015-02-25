@@ -7,24 +7,24 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-	import com.voxelengine.events.LoadingEvent;
-	import com.voxelengine.Globals;
-	import com.voxelengine.Log;
-	import com.voxelengine.utils.ColorUtils;
-	import com.voxelengine.worldmodel.inventory.ObjectInfo;
-	import com.voxelengine.worldmodel.oxel.Lighting;
-	import com.voxelengine.worldmodel.oxel.FlowInfo;
 	import flash.geom.Vector3D;
 
 	import flash.events.IOErrorEvent;
-	import mx.utils.StringUtil;
-	
 	import flash.text.TextField; 
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	import flash.net.URLLoaderDataFormat;
+	
+	import com.voxelengine.Log;
+	import com.voxelengine.Globals;
+	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.utils.ColorUtils;
+	import com.voxelengine.utils.StringUtils;	
+	import com.voxelengine.worldmodel.inventory.ObjectInfo;
+	import com.voxelengine.worldmodel.oxel.Lighting;
+	import com.voxelengine.worldmodel.oxel.FlowInfo;
 	/**
 	 * ...
 	 * @author Bob
@@ -241,7 +241,7 @@ package com.voxelengine.worldmodel
 			TypeInfo.typeInfoByName[ti.name.toUpperCase()] = ti;
 			
 			
-			var jsonString:String = StringUtil.trim(String(event.target.data));
+			var jsonString:String = StringUtils.trim(String(event.target.data));
 			try
 			{
 				var result:Object = JSON.parse(jsonString);
