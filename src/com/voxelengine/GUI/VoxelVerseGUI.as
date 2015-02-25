@@ -268,7 +268,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	public function init():void {
 		UIManager.initialize( Globals.g_app.stage );
 		UIManager.debugger = new FDTrace();
-		RegionEvent.addListener( RegionEvent.REGION_LOAD_BEGUN, onRegionLoadingComplete );
+		RegionEvent.addListener( RegionEvent.LOAD_BEGUN, onRegionLoadingComplete );
 		Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 //			Globals.g_app.addEventListener(Event.DEACTIVATE, deactivate);
 //			Globals.g_app.addEventListener(Event.ACTIVATE, activate);
@@ -277,7 +277,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControl.handleModelEvents );
 		Globals.g_app.addEventListener(ModelEvent.RELEASE_CONTROL, WindowBeastControl.handleModelEvents );
 		Globals.g_app.addEventListener(ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
-		Globals.g_app.addEventListener(LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
+		LoginEvent.addListener(LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
 		RoomEvent.addListener(RoomEvent.ROOM_JOIN_FAILURE, joinRoomFailureHandler );
 		
 		LanguageManager.init();
@@ -294,7 +294,7 @@ public class VoxelVerseGUI extends EventDispatcher
 
 	
 	private function onRegionLoadingComplete(event : RegionEvent ) : void {
-		Globals.g_app.removeEventListener(RegionEvent.REGION_LOAD_BEGUN, onRegionLoadingComplete);
+		Globals.g_app.removeEventListener(RegionEvent.LOAD_BEGUN, onRegionLoadingComplete);
 		
 		if ( false == Globals.inRoom )
 		{

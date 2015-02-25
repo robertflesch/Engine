@@ -16,7 +16,6 @@ package com.voxelengine {
 	
 	import com.developmentarc.core.tasks.TaskController;
 	
-	import com.voxelengine.persistance.PersistRegion;
 	import com.voxelengine.worldmodel.crafting.CraftingManager;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import com.voxelengine.worldmodel.RegionManager;
@@ -33,6 +32,18 @@ package com.voxelengine {
 	import com.voxelengine.utils.GUID;
 
 	public class Globals  {
+		
+		static public const DB_TABLE_MODELS:String = "voxelModels";
+		static public const DB_INDEX_VOXEL_MODEL_OWNER:String = "voxelModelOwner";
+		static public const DB_TABLE_MODELS_DATA:String = "voxelModelsData";
+		
+		static public const DB_TABLE_REGIONS:String = "regions";
+		static public const DB_TABLE_INDEX_OWNER:String = "regionOwner";
+		static public const REGION_EXT:String = ".rjson";
+		static public const IVM_EXT:String = ".ivm";
+		static public const MODEL_INFO_EXT:String = ".mjson";
+
+
 		public static var g_app:VoxelVerse = null;
 		
 		public static var g_textureBank:TextureBank = new TextureBank();

@@ -36,33 +36,103 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class ModelLoader 
 	{
-		static private const MODEL_MANAGER_MODEL_EXT:String = ".mjson";
-		static private const MANIFEST_VERSION:int = 100;
-		
 		// objects that are waiting on model data to load
 		static private var _blocks:Dictionary = new Dictionary(true);
 		// This is used only for loading local models into persistance
 		static private var _s_mmd:VoxelModelMetadata;
 		
 		public function ModelLoader():void {
-			ModelMetadataEvent.addListener( ModelMetadataEvent.ADDED, localModelReadyToBeCreated );
+			// replaced by ModelMaker
+			//ModelMetadataEvent.addListener( ModelMetadataEvent.ADDED, localModelReadyToBeCreated );
 		}
+		
+		// Make sense, called from Region
+		static public function modelMetaInfoRead( $ba:ByteArray ):Object
+		{
+			$ba.position = 0;
+			// Read off first 3 bytes, the data format
+			var format:String = readFormat($ba);
+			if ("ivm" != format)
+				throw new Error("ModelLoader.modelMetaInfoRead - Exception - unsupported format: " + format );
+			
+			var metaInfo:Object = new Object();
+			// Read off next 3 bytes, the data version
+			metaInfo.version = readVersion($ba);
+
+			// Read off next byte, the manifest version
+			metaInfo.manifestVersion = $ba.readByte();
+			//Log.out("VoxelModel.readMetaInfo - version: " + metaInfo.version + "  manifestVersion: " + metaInfo.manifestVersion );
+			return metaInfo;
+
+			// This reads the format info and advances position on byteArray
+			function readFormat($ba:ByteArray):String
+			{
+				var format:String;
+				var byteRead:int = 0;
+				byteRead = $ba.readByte();
+				format = String.fromCharCode(byteRead);
+				byteRead = $ba.readByte();
+				format += String.fromCharCode(byteRead);
+				byteRead = $ba.readByte();
+				format += String.fromCharCode(byteRead);
+				
+				return format;
+			}
+			
+			// This reads the version info and advances position on byteArray
+			function readVersion($ba:ByteArray):int
+			{
+				var version:String;
+				var byteRead:int = 0;
+				byteRead = $ba.readByte();
+				version = String.fromCharCode(byteRead);
+				byteRead = $ba.readByte();
+				version += String.fromCharCode(byteRead);
+				byteRead = $ba.readByte();
+				version += String.fromCharCode(byteRead);
+				
+				return int(version);
+			}
+		}
+		
+		// Make sense, called from Region
+		static public function loadRegionObjects( objects:Array ):int {
+			Log.out( "ModelLoader.loadRegionObjects - START =============================" );
+			
+			var count:int = 0;
+			for each ( var v:Object in objects )		   
+			{
+				if ( v.model ) {
+					var instance:InstanceInfo = new InstanceInfo();
+					instance.initJSON( v.model );
+					load( instance );
+					count++;
+				}
+			}
+
+			Log.out( "ModelLoader.loadRegionObjects - END =============================" );
+
+			// why is defaultRegion special?
+			//if ( 0 == count && name != "defaultRegion" ) {
+			if ( 0 == count )
+				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE ) );
+			else	
+				Globals.g_landscapeTaskController.activeTaskLimit = 1;
+				
+			return count;
+		}
+		
 		
 		static public function load( $ii:InstanceInfo, $vmm:VoxelModelMetadata = null ):void {
 			//Log.out( "ModelLoader.load - InstanceInfo: " + $ii.toString(), Log.DEBUG );
 			Globals.instanceInfoAdd( $ii ); // Uses a name + guid as identifier
 			if ( !Globals.isGuid( $ii.guid ) && $ii.guid != "LoadModelFromBigDB" )
-				loadLocal( $ii, $vmm )
+				new ModelMakerLocal( $ii );
 			else
-				loadPersistantNew( $ii );
+				new ModelMaker( $ii );
 		}
 		
-		// If we want to preload the modelInfo, we dont need to block on it
-		static public function modelInfoPreload( $fileName:String ):void {
-			modelInfoFindOrCreate( $fileName, "", false );
-		}
-		
-		static private function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:VoxelModelMetadata ):* {
+		static public function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:VoxelModelMetadata ):* {
 			if ( !$ii )
 				throw new Error( "ModelLoader.instantiate - InstanceInfo null" );
 
@@ -95,36 +165,20 @@ package com.voxelengine.worldmodel.models
 			return vm;
 		}
 		
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// MAY BE NEEDED
+		static public function modelInfoPreload( $fileName:String ):void {
+			throw new Error( "This is not needed online" );
+			modelInfoFindOrCreate( $fileName, "", false );
+		}
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// If we want to preload the modelInfo, we dont need to block on it
+		
+		
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// Persistant model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
-		static private function loadPersistant( $ii:InstanceInfo ):void {
-			Log.out( "ModelLoader.loadPersistant - Adding task for InstanceInfo: " + $ii.toString(), Log.WARN );
-			
-			// land task controller, this tells task controller not to run until it is done loading all tasks
-//			Globals.g_landscapeTaskController.activeTaskLimit = 0;
-			// Create task group
-			var taskGroup:TaskGroup = new TaskGroup("Download Model for " + $ii.guid, 2);
-		
-			// This loads the tasks into the LandscapeTaskQueue
-			//var layer:LayerInfo = new LayerInfo( "LoadModelFromBigDB", $ii.guid ); 
-			var task:ITask = new LoadModelFromBigDB( $ii.guid, null );
-			taskGroup.addTask(task);
-			
-			//task = new CompletedPersistantModel( $ii.guid, null );
-			//taskGroup.addTask(task);
-			
-			Globals.g_landscapeTaskController.addTask( taskGroup );
-		}
-		
-		static private function loadPersistantNew( $ii:InstanceInfo ):void {
-			Log.out( "ModelLoader.loadPersistantNew - retriving metadata for: " + $ii.toString() );
-			
-			// a modelMaker listen for the metadata loaded event, then creates the object from it.
-			// and goes away, its kept in memory by its listener.
-			new ModelMaker( $ii );
-		}
-
 		static public function loadFromManifestByteArray( $vmm:VoxelModelMetadata, $ba:ByteArray, controllingModelGuid:String = "" ):VoxelModel {
 				
 			if ( null == $ba )
@@ -135,7 +189,7 @@ package com.voxelengine.worldmodel.models
 			$ba.position = 0;
 			
 			var versionInfo:Object = modelMetaInfoRead( $ba );
-			if ( MANIFEST_VERSION != versionInfo.manifestVersion )
+			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
 			{
 				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
 				return null;
@@ -183,7 +237,7 @@ package com.voxelengine.worldmodel.models
 		
 		static public function loadFromManifestByteArrayNew( $ii:InstanceInfo, $vmd:VoxelModelData ):VoxelModel {
 				
-			var $ba:ByteArray = $vmd.dbo.ba;
+			var $ba:ByteArray = $vmd.ba;
 			if ( null == $ba )
 			{
 				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad data in VoxelModelMetadata: " + $vmd.guid, Log.ERROR );
@@ -192,7 +246,7 @@ package com.voxelengine.worldmodel.models
 			$ba.position = 0;
 			
 			var versionInfo:Object = modelMetaInfoRead( $ba );
-			if ( MANIFEST_VERSION != versionInfo.manifestVersion )
+			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
 			{
 				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
 				return null;
@@ -225,6 +279,7 @@ package com.voxelengine.worldmodel.models
 			return vm;
 		}
 		
+
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// END Persistant model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -232,78 +287,6 @@ package com.voxelengine.worldmodel.models
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// local model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
-		static private function loadLocal( $ii:InstanceInfo, $vmm:VoxelModelMetadata ):void {
-			Log.out( "ModelLoader.loadLocal - InstanceInfo: " + $ii.toString(), Log.DEBUG );
-			var modelInfo:ModelInfo = modelInfoFindOrCreate( $ii.guid, $ii.guid );
-			if ( Globals.online && modelInfo && modelInfo.biomes.layers[0].functionName == "LoadModelFromIVM" )
-				Log.out( "ModelLoader.loadLocal - LOADING LOCAL WHEN ONLINE - InstanceInfo: " + $ii.toString(), Log.ERROR );
-			if ( modelInfo )
-			{
-				instantiate( $ii, modelInfo, $vmm );
-			}		
-		}
-		
-		static public function modelInfoFindOrCreate( $guid:String, $name:String, $block:Boolean = true ):ModelInfo {
-			var modelInfo:ModelInfo = Globals.modelInfoGet( $name );
-			
-			if ( null == $name || null == $guid )
-				Log.out( "ModelLoader.modelInfoFindOrCreate - ERROR fileName or guid is NULL", Log.ERROR );
-			
-			// if no model info found, we have to load a copy
-			if ( !modelInfo )
-			{
-				// if we are already waiting for a copy to load, then add a $block if shouldBlock is true, else add a loader.
-				if ( !_blocks[$name] )
-				{
-					Log.out( "ModelLoader.modelInfoFindOrCreate - loading: " + ( Globals.modelPath + $guid + MODEL_MANAGER_MODEL_EXT ), Log.INFO );
-					var loader:CustomURLLoader = new CustomURLLoader( new URLRequest( Globals.modelPath + $guid + MODEL_MANAGER_MODEL_EXT ) );
-					loader.addEventListener(Event.COMPLETE, onModelInfoLoaded);
-					loader.addEventListener(IOErrorEvent.IO_ERROR, onModelInfoLoadError);
-				}
-				// If we want to preload the modelInfo, we dont need to block on it
-				if ( $block )
-					addBlock( $guid, $name );
-			}
-			
-			return modelInfo;
-			
-			function onModelInfoLoadError(event:IOErrorEvent):void {
-				Log.out("ModelLoader.onModelInfoLoadError: ERROR: " + event.formatToString, Log.ERROR );
-				var req:URLRequest = CustomURLLoader(event.target).request;			
-				var fileName:String = CustomURLLoader(event.target).fileName;			
-				var guid:String = fileName.substr( 0, fileName.lastIndexOf( "." ) );
-				clearBlock( guid, true );
-			}	
-				
-			function onModelInfoLoaded(event:Event):void {
-				//var req:URLRequest = CustomURLLoader(event.target).request;			
-				var fileName:String = CustomURLLoader(event.target).fileName;			
-				var fileData:String = String(event.target.data);
-				var jsonString:String = StringUtil.trim(fileData);
-				
-				try {
-					var jsonResult:Object = JSON.parse(jsonString);
-				}
-				catch ( error:Error ) {
-					Log.out("----------------------------------------------------------------------------------" );
-					Log.out("ModelLoader.onModelInfoLoaded - ERROR PARSING: fileName: " + fileName + "  data: " + fileData, Log.ERROR, error );
-					Log.out("----------------------------------------------------------------------------------" );
-					return;
-				}
-				var mi:ModelInfo = new ModelInfo();
-				var guid:String = fileName.substr( 0, fileName.lastIndexOf( "." ) );
-				
-				mi.initJSON( guid, jsonResult );
-				Globals.modelInfoAdd( mi );
-				
-				//Log.out("ModelLoader.onModelInfoLoaded - loaded model $guid: " + mi.guid + MODEL_MANAGER_MODEL_EXT );
-
-				clearBlock( guid );
-				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.INFO_LOADED, guid ) );
-			}       
-			
-		}
-		
 		// This is the last part of reading a local model
 		static public function loadLocalModelFromByteArray( $vm:VoxelModel, $ba:ByteArray):void 	{
 			
@@ -394,79 +377,6 @@ package com.voxelengine.worldmodel.models
 		// END local TO Persistant model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		static public function modelMetaInfoRead( $ba:ByteArray ):Object
-		{
-			$ba.position = 0;
-			// Read off first 3 bytes, the data format
-			var format:String = readFormat($ba);
-			if ("ivm" != format)
-				throw new Error("ModelLoader.modelMetaInfoRead - Exception - unsupported format: " + format );
-			
-			var metaInfo:Object = new Object();
-			// Read off next 3 bytes, the data version
-			metaInfo.version = readVersion($ba);
-
-			// Read off next byte, the manifest version
-			metaInfo.manifestVersion = $ba.readByte();
-			//Log.out("VoxelModel.readMetaInfo - version: " + metaInfo.version + "  manifestVersion: " + metaInfo.manifestVersion );
-			return metaInfo;
-
-			// This reads the format info and advances position on byteArray
-			function readFormat($ba:ByteArray):String
-			{
-				var format:String;
-				var byteRead:int = 0;
-				byteRead = $ba.readByte();
-				format = String.fromCharCode(byteRead);
-				byteRead = $ba.readByte();
-				format += String.fromCharCode(byteRead);
-				byteRead = $ba.readByte();
-				format += String.fromCharCode(byteRead);
-				
-				return format;
-			}
-			
-			// This reads the version info and advances position on byteArray
-			function readVersion($ba:ByteArray):int
-			{
-				var version:String;
-				var byteRead:int = 0;
-				byteRead = $ba.readByte();
-				version = String.fromCharCode(byteRead);
-				byteRead = $ba.readByte();
-				version += String.fromCharCode(byteRead);
-				byteRead = $ba.readByte();
-				version += String.fromCharCode(byteRead);
-				
-				return int(version);
-			}
-		}
-		
-		static public function loadRegionObjects( objects:Array ):int {
-			Log.out( "ModelLoader.loadRegionObjects - START =============================" );
-			
-			var count:int = 0;
-			for each ( var v:Object in objects )		   
-			{
-				if ( v.model ) {
-					var instance:InstanceInfo = new InstanceInfo();
-					instance.initJSON( v.model );
-					load( instance );
-					count++;
-				}
-			}
-
-			Log.out( "ModelLoader.loadRegionObjects - END =============================" );
-
-			// why is defaultRegion special?
-			//if ( 0 == count && name != "defaultRegion" ) {
-			if ( 0 == count )
-				Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE ) );
-			else	
-				Globals.g_landscapeTaskController.activeTaskLimit = 1;
-				
-			return count;
-		}
 		
 		static private function addBlock( $guid:String, $name:String ):void {
 			//Log.out( "ModelLoader.addBlock - instanceGIUD: " + $guid + "  fileName: " + fileName );

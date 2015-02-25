@@ -7,7 +7,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.voxelengine.events.PersistanceEvent;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.JPEGEncoderOptions;
@@ -23,7 +22,7 @@ import playerio.PlayerIOError;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.ModelMetadataPersistanceEvent;
+import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.server.Network;
 /**
  * ...
@@ -172,6 +171,12 @@ public class VoxelModelMetadata
 		return JSON.stringify( this );
 	}
 
+	static public const DB_TABLE_MODELS:String = "voxelModels";
+	static public const DB_TABLE_MODELS_DATA:String = "voxelModelsData";
+	static public const DB_INDEX_MODEL_OWNER:String = "voxelModelOwner";
+	static public const DB_INDEX_OWNER_TEMPLATE:String = "ownerTemplate"
+	
+
 	//////////////////////////////////////////////////////////////////
 	// TO Persistance
 	//////////////////////////////////////////////////////////////////
@@ -183,7 +188,7 @@ public class VoxelModelMetadata
 		else {
 			var obj:Object = toObject();
 		}
-		ModelMetadataPersistanceEvent.dispatch( new ModelMetadataPersistanceEvent( PersistanceEvent.SAVE_REQUEST, guid, _dbo ) );
+		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, DB_TABLE_MODELS, guid, _dbo ) );
 	}
 	
 	public function toPersistanceMetadata():void {

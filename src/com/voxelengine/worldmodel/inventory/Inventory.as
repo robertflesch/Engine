@@ -27,6 +27,8 @@ import com.voxelengine.events.*;
 
 public class Inventory
 {
+	static private const DB_INVENTORY_TABLE:String = "inventory";
+	
 	private var  _slots:Slots
 	private var _voxels:Voxels;
 	private var _models:Models;
@@ -77,9 +79,9 @@ public class Inventory
 				ba = asByteArray( ba );
 			}
 			addSaveEvents();
-			InventoryPersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, inventoryCreateSuccess );
-			InventoryPersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, inventorySaveSuccess );
-			InventoryPersistanceEvent.dispatch( new InventoryPersistanceEvent( PersistanceEvent.SAVE_REQUEST, _networkId, _dbo, ba ) );
+			PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, inventoryCreateSuccess );
+			PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, inventorySaveSuccess );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, DB_INVENTORY_TABLE, _networkId, _dbo, ba ) );
 		}
 		else
 			Log.out( "Inventory.save - NOT Saving User Inventory, either offline or NOT changed - networkId: " + networkId, Log.DEBUG );
@@ -102,18 +104,22 @@ public class Inventory
 		return $ba;	
 	}
 	
-	private function inventorySaveSuccess(e:InventoryPersistanceEvent):void 
+	private function inventorySaveSuccess($pe:PersistanceEvent):void 
 	{
-		InventoryPersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, inventoryCreateSuccess );
-		InventoryPersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, inventorySaveSuccess );
+		if ( DB_INVENTORY_TABLE != $pe.table )
+			return;
+		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, inventoryCreateSuccess );
+		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, inventorySaveSuccess );
 	}
 	
-	private function inventoryCreateSuccess(e:InventoryPersistanceEvent):void 
+	private function inventoryCreateSuccess( $pe:PersistanceEvent):void 
 	{
+		if ( DB_INVENTORY_TABLE != $pe.table )
+			return;
 		Log.out( "Inventory.inventoryCreateSuccess - setting dbo for - networkId: " + networkId, Log.DEBUG );
-		_dbo = e.dbo;
-		InventoryPersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, inventoryCreateSuccess );
-		InventoryPersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, inventorySaveSuccess );
+		_dbo = $pe.dbo;
+		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, inventoryCreateSuccess );
+		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, inventorySaveSuccess );
 	}
 	
 	////////////////////////////////////////////////////////////////
@@ -122,7 +128,7 @@ public class Inventory
 	public function load():void {
 		if ( Globals.online ) {
 			addLoadEvents();
-			InventoryPersistanceEvent.dispatch( new InventoryPersistanceEvent( PersistanceEvent.LOAD_REQUEST, _networkId ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, DB_INVENTORY_TABLE, _networkId ) );
 		}
 	}
 
@@ -162,66 +168,78 @@ public class Inventory
 	}
 	
 	private function addLoadEvents():void {
-		InventoryPersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, inventoryLoadSuccess );
-		InventoryPersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, inventoryLoadFailed );
-		InventoryPersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, inventoryNotFound );
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, inventoryLoadSuccess );
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, inventoryLoadFailed );
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, inventoryNotFound );
 	}
 	
 	private function removeLoadEvents():void {
-		InventoryPersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, inventoryLoadSuccess );
-		InventoryPersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, inventoryLoadFailed );
-		InventoryPersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, inventoryNotFound );
+		PersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, inventoryLoadSuccess );
+		PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, inventoryLoadFailed );
+		PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, inventoryNotFound );
 	}
 	
-	private function inventoryNotFound(e:InventoryPersistanceEvent):void 
+	private function inventoryNotFound($pe:PersistanceEvent):void 
 	{
+		if ( DB_INVENTORY_TABLE != $pe.table )
+			return;
 		// this occurs on first time logging in.
 		removeLoadEvents();
 		fromPersistance( null );
 		InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, _networkId, this ) );
 	}
 	
-	private function inventoryLoadSuccess( $inve:InventoryPersistanceEvent ):void
+	private function inventoryLoadSuccess( $pe:PersistanceEvent ):void
 	{
+		if ( DB_INVENTORY_TABLE != $pe.table )
+			return;
 		removeLoadEvents();
-		fromPersistance( $inve.dbo );
+		fromPersistance( $pe.dbo );
 		InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, _networkId, this ) );
 	}
 	
-	private function inventoryLoadFailed( $inve:InventoryPersistanceEvent ):void
+	private function inventoryLoadFailed( $pe:PersistanceEvent ):void
 	{
+		if ( DB_INVENTORY_TABLE != $pe.table )
+			return;
 		removeLoadEvents();
 		(new Alert( "ERROR LOADING USER INVENTORY - Please post on forums" )).display();
 	}
 	
 	private function addSaveEvents():void {
-		InventoryPersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
-		InventoryPersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, saveFailed );
-		InventoryPersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, saveSucceed );
-		InventoryPersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, createFailed );
+		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
+		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, saveFailed );
+		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, saveSucceed );
+		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, createFailed );
 	}
 	
 	private function removeSaveEvents():void {
-		InventoryPersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
-		InventoryPersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, saveFailed );
-		InventoryPersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, saveSucceed );
-		InventoryPersistanceEvent.removeListener( PersistanceEvent.CREATE_FAILED, createFailed );
+		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
+		PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, saveFailed );
+		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, saveSucceed );
+		PersistanceEvent.removeListener( PersistanceEvent.CREATE_FAILED, createFailed );
 	}
 	
-	private function saveSucceed( $inve:InventoryPersistanceEvent ):void
+	private function saveSucceed( $pe:PersistanceEvent ):void
 	{
+		if ( DB_INVENTORY_TABLE != $pe.table )
+			return;
 		removeSaveEvents();
 		Log.out( "Inventory.saveSucceed" );
 	}
 	
-	private function saveFailed( $inve:InventoryPersistanceEvent ):void
+	private function saveFailed( $pe:PersistanceEvent ):void
 	{
+		if ( DB_INVENTORY_TABLE != $pe.table )
+			return;
 		removeSaveEvents();
 		Log.out( "Inventory.saveFailed - MAY BE (error #2032)  The method SaveObjectChanges can only be called when connected to a game", Log.ERROR );
 	}
 	
-	private function createFailed( $inve:InventoryPersistanceEvent ):void
+	private function createFailed( $pe:PersistanceEvent ):void
 	{
+		if ( DB_INVENTORY_TABLE != $pe.table )
+			return;
 		removeSaveEvents();
 		Log.out( "Inventory.createFailed - Failed to create new Inventory object for this avatar.", Log.ERROR );
 	}

@@ -28,12 +28,9 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.events.PersistanceEvent;
-	import com.voxelengine.events.RegionPersistanceEvent;
-	//import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.server.Network;
-	import com.voxelengine.persistance.PersistRegion;
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.ModelManager;
 	import com.voxelengine.worldmodel.models.Player;
@@ -92,6 +89,7 @@ package com.voxelengine.worldmodel
 	{
 		static public const DEFAULT_REGION_ID:String = "000000-000000-000000";
 		static private const BLANK_REGION_TEMPLETE:String = "{\"region\":[],\"skyColor\": {\"r\":92,\"g\":172,\"b\":238 },\"gravity\":false }";
+		static private const TABLE_REGIONS:String = "regions";
 		private var _name:String = "";
 		private var _desc:String = "";
 		private var _worldId:String = "VoxelVerse";
@@ -160,7 +158,7 @@ package com.voxelengine.worldmodel
 			_guid = $guid;
 		}
 		
-		private function loadFail(e:RegionPersistanceEvent):void 
+		private function loadFail(e:PersistanceEvent):void 
 		{
 			
 		}
@@ -222,7 +220,7 @@ package com.voxelengine.worldmodel
 			Log.out( "Region.onLoadingComplete: regionId: " + guid, Log.DEBUG );
 			_loaded = true;
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_LOAD_COMPLETE, guid ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, guid ) );
 		}
 
 		public function unload():void
@@ -240,11 +238,11 @@ package com.voxelengine.worldmodel
 		public function load():void
 		{
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
-			RegionEvent.addListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
+			RegionEvent.addListener( RegionEvent.UNLOAD, onRegionUnload );
 			Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.addEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
 			
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_LOAD_BEGUN, guid ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_BEGUN, guid ) );
 
 			var count:int = ModelLoader.loadRegionObjects(_JSON.region);
 			if ( 0 < count )
@@ -362,9 +360,9 @@ package com.voxelengine.worldmodel
 			ba.writeUTFBytes( regionJson );
 			ba.compress();
 			
-			RegionPersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
-			RegionPersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, saveFail );
-			RegionPersistanceEvent.dispatch( new RegionPersistanceEvent( PersistanceEvent.SAVE_REQUEST, guid, _databaseObject, ba ) );
+			PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
+			PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, saveFail );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, TABLE_REGIONS, guid, _databaseObject, ba ) );
 
 			changed = false;
 		}
@@ -396,27 +394,31 @@ package com.voxelengine.worldmodel
 			ba.writeUTFBytes( regionJson );
 			ba.compress();
 			
-			RegionPersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
-			RegionPersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, saveFail );
-			RegionPersistanceEvent.dispatch( new RegionPersistanceEvent( PersistanceEvent.SAVE_REQUEST, guid, _databaseObject, ba ) );
+			PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
+			PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, saveFail );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, TABLE_REGIONS, guid, _databaseObject, ba ) );
 
 			changed = false;
 		}
 
-		private function saveSucceed( $rpe:RegionPersistanceEvent ):void 
+		private function saveSucceed( $pe:PersistanceEvent ):void 
 		{ 
-			RegionPersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
-			RegionPersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, saveFail );
-			if ( $rpe.dbo )
-				databaseObject = $rpe.dbo;
-//			Globals.g_app.dispatchEvent( new RegionPersistanceEvent( RegionEvent.REGION_LOAD_COMPLETE, guid ) ); 
+			if ( TABLE_REGIONS != $pe.table )
+				return;
+			PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
+			PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, saveFail );
+			if ( $pe.dbo )
+				databaseObject = $pe.dbo;
+//			Globals.g_app.dispatchEvent( new PersistanceEvent( RegionEvent.LOAD_COMPLETE, guid ) ); 
 			Log.out( "Region.createSuccess - created: " + guid, Log.DEBUG ); 
 		}	
 		
-		private function saveFail( $rpe:RegionPersistanceEvent ):void 
+		private function saveFail( $pe:PersistanceEvent ):void 
 		{ 
-			RegionPersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
-			RegionPersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, saveFail );
+			if ( TABLE_REGIONS != $pe.table )
+				return;
+			PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
+			PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, saveFail );
 			Log.out( "Region.saveFail - ", Log.DEBUG ); 
 		}	
 

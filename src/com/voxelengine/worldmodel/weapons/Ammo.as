@@ -87,7 +87,7 @@ public class Ammo
 		SoundBank.getSound( _impactSoundFile ); // Preload the sound file
 		SoundBank.getSound( _launchSoundFile );
 		//ModelLoader.modelInfoFindOrCreate( _model, null, false );
-		ModelLoader.modelInfoFindOrCreate( _model, _model, false );
+//		ModelLoader.modelInfoFindOrCreate( _model, _model, false );
 	}
 	
 	public function clone():Ammo {

@@ -7,50 +7,70 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.events
 {
+import com.voxelengine.worldmodel.models.VoxelModelData;
 import flash.events.Event;
-import flash.events.EventDispatcher;
-
 import flash.utils.ByteArray;
-import playerio.DatabaseObject;
+import com.voxelengine.worldmodel.models.ModelInfo;
+import flash.events.EventDispatcher;
 
 /**
  * ...
  * @author Robert Flesch - RSF 
  */
-public class InventoryPersistanceEvent extends PersistanceEvent
+public class ModelInfoEvent extends Event
 {
-	private var _guid:String;
-	private var _dbo:DatabaseObject;
-	private var _ba:ByteArray;
+	//// tells us the manager has add this from persistance
+	static public const ADDED:String						= "ADDED";
+	//
+	//// tells the manager to load this type of model
+	static public const TYPE_REQUEST:String					= "TYPE_REQUEST";
+	//// the response to this is the added message
 	
-	public function get guid():String  { return _guid; }
-	public function get dbo():DatabaseObject { return _dbo; }
-	public function get ba():ByteArray { return _ba; }
+	//// tells the manager to load this model
+	static public const REQUEST:String						= "REQUEST";
+		
+	static public const FAILED:String						= "FAILED";
+	static public const SAVE:String							= "SAVE";
+	//
+	
+	private var _vmi:ModelInfo;
+	private var _guid:String;
 
-	// This acts as a two way conduit passing info to the db and retrieving DB objects from it.
-	public function InventoryPersistanceEvent( $type:String, $guid:String, $dbo:DatabaseObject = null, $ba:ByteArray = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelInfoEvent( $type:String, $guid:String, $vmi:ModelInfo, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
+		_vmi = $vmi;
 		_guid = $guid;
-		_dbo = $dbo;
-		_ba = $ba;
 	}
 	
 	public override function clone():Event
 	{
-		return new InventoryPersistanceEvent(type, _guid, _dbo, _ba, bubbles, cancelable);
+		return new ModelInfoEvent(type, _guid, _vmi, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString("InventoryEvent", "bubbles", "cancelable") + " Inventory: " + ( _dbo ? _dbo.toString(): "no database object" );
+		return formatToString("ModelInfoEvent", "guid", "vmi" );
 	}
 	
+	public function get vmi():ModelInfo 
+	{
+		return _vmi;
+	}
+	
+	public function get guid():String 
+	{
+		return _guid;
+	}
 	///////////////// Event handler interface /////////////////////////////
 
 	// Used to distribue all persistance messages
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
+	static public function hasEventListener( $type:String ) : Boolean {
+		return _eventDispatcher.hasEventListener( $type );
+	}
+	
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
 		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
 	}
@@ -59,12 +79,10 @@ public class InventoryPersistanceEvent extends PersistanceEvent
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:InventoryPersistanceEvent) : Boolean {
+	static public function dispatch( $event:ModelInfoEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
-
+	
 	///////////////// Event handler interface /////////////////////////////
-	
-	
 }
 }

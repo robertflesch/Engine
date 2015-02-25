@@ -1005,7 +1005,7 @@ package com.voxelengine.worldmodel.models
 			if ( "" != metadata.templateGuid )
 				metadata.templateGuid = "";
 					
-			data.dbo.ba = toByteArray();
+			data.ba = toByteArray();
 				
 			_changed = false;
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.SAVE, metadata.guid, metadata ) );

@@ -7,12 +7,12 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.MetadataManager;
 import com.voxelengine.worldmodel.models.VoxelModelData;
 import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 
@@ -34,13 +34,26 @@ public class ModelMaker {
 	
 	public function ModelMaker( $ii:InstanceInfo ) {
 		_ii = $ii;
+		Log.out( "ModelMaker - ii: " + _ii.toString() );
 		ModelMetadataEvent.addListener( ModelMetadataEvent.ADDED, retriveMetadata );		
+		ModelMetadataEvent.addListener( ModelMetadataEvent.FAILED, failedMetadata );		
 		ModelDataEvent.addListener( ModelDataEvent.ADDED, retriveData );		
+		ModelDataEvent.addListener( ModelDataEvent.FAILED, failedData );		
 
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.REQUEST, _ii.guid, null ) );		
 		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.REQUEST, _ii.guid, null ) );		
 
 		_makerCount++;
+	}
+	
+	private function failedMetadata(e:ModelMetadataEvent):void {
+		Log.out( "ModelMaker.failedMetadata - ii: " + _ii.toString() );
+		markComplete();
+	}
+	
+	private function failedData(e:ModelDataEvent):void  {
+		Log.out( "ModelMaker.failedData - ii: " + _ii.toString() );
+		markComplete()
 	}
 	
 	private function retriveMetadata(e:ModelMetadataEvent):void 
@@ -64,11 +77,21 @@ public class ModelMaker {
 	// once they both have been retrived, we can make the object
 	private function attemptMake():void {
 		if ( null != _vmm && null != _vmd ) {
+			Log.out( "ModelMaker.attemptMake - ii: " + _ii.toString() );
 			ModelLoader.loadFromManifestByteArrayNew( _ii, _vmd );
-			_makerCount--;
+			markComplete();
 		}
+	}
+	
+	private function markComplete():void {
+		ModelMetadataEvent.removeListener( ModelMetadataEvent.ADDED, retriveMetadata );		
+		ModelMetadataEvent.removeListener( ModelMetadataEvent.FAILED, failedMetadata );		
+		ModelDataEvent.removeListener( ModelDataEvent.ADDED, retriveData );		
+		ModelDataEvent.removeListener( ModelDataEvent.FAILED, failedData );		
+		_makerCount--;
 		if ( 0 == _makerCount )
 			Globals.g_app.dispatchEvent( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
+		
 	}
 }	
 }

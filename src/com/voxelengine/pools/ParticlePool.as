@@ -45,7 +45,7 @@ public final class ParticlePool
 	{
 		Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 		// Preload the modelInfo for the cannonBall
-		ModelLoader.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
+//ModelLoader.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
 		// Listen for it being loaded
 		Globals.g_app.addEventListener( ModelEvent.INFO_LOADED, onModelInfoLoaded );
 	}

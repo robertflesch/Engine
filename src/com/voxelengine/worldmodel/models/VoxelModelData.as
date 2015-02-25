@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import flash.utils.ByteArray;
 import playerio.DatabaseObject;
 /**
  * ...
@@ -17,10 +18,12 @@ public class VoxelModelData
 {
 	private var _guid:String			= "";
 	private var _dbo:DatabaseObject;
+	private var _ba:ByteArray;
 	
-	public function VoxelModelData( $guid:String, $dbo:DatabaseObject ) {
+	public function VoxelModelData( $guid:String, $dbo:DatabaseObject, $ba:ByteArray = null ) {
 		_guid = $guid;
 		_dbo = $dbo;
+		_ba = $ba;
 	}
 	
 	public function get guid():String 
@@ -28,14 +31,19 @@ public class VoxelModelData
 		return _guid;
 	}
 	
+	public function get ba():ByteArray 
+	{
+		return _ba;
+	}
+	
 	public function get dbo():DatabaseObject 
 	{
 		return _dbo;
 	}
 	
-	public function set dbo(value:DatabaseObject):void 
+	public function set ba(value:ByteArray):void 
 	{
-		_dbo = value;
+		_ba = value;
 	}
 }
 }

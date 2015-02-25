@@ -73,7 +73,7 @@ package com.voxelengine.worldmodel
 			// This gives the engine a chance to load up the typeInfo file
 			Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 			if ( false ) {
-				Globals.g_app.addEventListener(LoginEvent.LOGIN_SUCCESS, listenForLoginSuccess );
+				LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, listenForLoginSuccess );
 				Network.autoLogin( _defaultRegionJson.config.region.startingRegion );
 			}
 			else // loading local
@@ -81,8 +81,8 @@ package com.voxelengine.worldmodel
 		}
 		
 		private function listenForLoginSuccess( $event:LoginEvent ):void {
-			Globals.g_app.removeEventListener(LoginEvent.LOGIN_SUCCESS, listenForLoginSuccess );
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.REQUEST_JOIN, _defaultRegionJson.config.region.startingRegion ) ); 
+			LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, listenForLoginSuccess );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.JOIN, _defaultRegionJson.config.region.startingRegion ) ); 
 		}
 
 		public function errorAction(e:IOErrorEvent):void

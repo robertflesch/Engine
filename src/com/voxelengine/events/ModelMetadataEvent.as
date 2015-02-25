@@ -33,20 +33,20 @@ public class ModelMetadataEvent extends Event
 	//
 	
 	//// data or meta data about this region has changed
-	//static public const REGION_CHANGED:String					= "REGION_CHANGED";
+	//static public const CHANGED:String					= "CHANGED";
 	//
 	//// dispatched when a region is unloaded
-	//static public const REGION_UNLOAD:String					= "REGION_UNLOAD";
+	//static public const UNLOAD:String					= "UNLOAD";
 	//// tells the region manager to load this region
-	//static public const REGION_LOAD:String						= "REGION_LOAD";
+	//static public const LOAD:String						= "LOAD";
 	//// dispatched after jobs for all process have been added
-	//static public const REGION_LOAD_BEGUN:String				= "REGION_LOAD_BEGUN";
+	//static public const LOAD_BEGUN:String				= "LOAD_BEGUN";
 	//// tells the region manager this region had finished loading
-	//static public const REGION_LOAD_COMPLETE:String				= "REGION_LOAD_COMPLETE";
+	//static public const LOAD_COMPLETE:String				= "LOAD_COMPLETE";
 	//
 	//
 	//// Used by the sandbox list and config manager to request a join of a server region
-	//static public const REQUEST_JOIN:String						= "REQUEST_JOIN";
+	//static public const JOIN:String						= "JOIN";
 	
 //		private var _dbo:DatabaseObject;
 	private var _vmm:VoxelModelMetadata;

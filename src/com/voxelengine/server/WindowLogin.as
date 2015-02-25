@@ -7,7 +7,10 @@
 ==============================================================================*/
 package com.voxelengine.server
 {
+	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.events.WindowSplashEvent;
 	import com.voxelengine.GUI.VoxelVerseGUI;
+	//import com.voxelengine.GUI.WindowSplash;
 	import flash.display.Bitmap;
 	import flash.events.KeyboardEvent;
 	import flash.events.Event;
@@ -56,8 +59,9 @@ package com.voxelengine.server
 				Log.out( "WindowLogin.constructor - unable to open local shared object" );
 			}
 
-			if ( !Globals.g_debug )
+			if ( !Globals.g_debug ) {
 				showCloseButton = false;
+			}
 
 			_topImage = (new _topImageClass() as Bitmap);
 			var pic:Image = new Image( _topImage, width, 189 );
@@ -130,8 +134,15 @@ package com.voxelengine.server
 			addElement( buttonPanel );
 
 			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
-			
+
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
+			
+			defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION;
+			onCloseFunction = closeFunction;
+		}
+		
+		private function closeFunction():void {
+			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );
 		}
 		
 		// Allows the enter key to activate the login key.
@@ -151,13 +162,13 @@ package com.voxelengine.server
 		}
 
 		private function addRecoveryEventHandlers():void {
-			Globals.g_app.addEventListener( LoginEvent.PASSWORD_RECOVERY_SUCCESS, recoverySuccess );
-			Globals.g_app.addEventListener( LoginEvent.PASSWORD_RECOVERY_FAILURE, recoveryFailure );
+			LoginEvent.addListener( LoginEvent.PASSWORD_RECOVERY_SUCCESS, recoverySuccess );
+			LoginEvent.addListener( LoginEvent.PASSWORD_RECOVERY_FAILURE, recoveryFailure );
 		}
 		
 		private function removeRecoveryEventHandlers():void {
-			Globals.g_app.removeEventListener( LoginEvent.PASSWORD_RECOVERY_SUCCESS, recoverySuccess );
-			Globals.g_app.removeEventListener( LoginEvent.PASSWORD_RECOVERY_FAILURE, recoveryFailure );
+			LoginEvent.removeListener( LoginEvent.PASSWORD_RECOVERY_SUCCESS, recoverySuccess );
+			LoginEvent.removeListener( LoginEvent.PASSWORD_RECOVERY_FAILURE, recoveryFailure );
 		}
 		
 		private function recoverySuccess( $e:LoginEvent ):void 
@@ -195,17 +206,17 @@ package com.voxelengine.server
 		}
 		
 		private function addLoginEventHandlers():void {
-			Globals.g_app.addEventListener( LoginEvent.LOGIN_SUCCESS, loginSuccess );
-			Globals.g_app.addEventListener( LoginEvent.LOGIN_FAILURE, onUnknownFailure );
-			Globals.g_app.addEventListener( LoginEvent.LOGIN_FAILURE_PASSWORD, onPasswordFailure );
-			Globals.g_app.addEventListener( LoginEvent.LOGIN_FAILURE_EMAIL, onEmailFailure );
+			LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, loginSuccess );
+			LoginEvent.addListener( LoginEvent.LOGIN_FAILURE, onUnknownFailure );
+			LoginEvent.addListener( LoginEvent.LOGIN_FAILURE_PASSWORD, onPasswordFailure );
+			LoginEvent.addListener( LoginEvent.LOGIN_FAILURE_EMAIL, onEmailFailure );
 		}
 		
 		private function removeLoginEventHandlers():void {
-			Globals.g_app.removeEventListener( LoginEvent.LOGIN_SUCCESS, loginSuccess );
-			Globals.g_app.removeEventListener( LoginEvent.LOGIN_FAILURE, onUnknownFailure );
-			Globals.g_app.removeEventListener( LoginEvent.LOGIN_FAILURE_PASSWORD, onPasswordFailure );
-			Globals.g_app.removeEventListener( LoginEvent.LOGIN_FAILURE_EMAIL, onEmailFailure );
+			LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, loginSuccess );
+			LoginEvent.removeListener( LoginEvent.LOGIN_FAILURE, onUnknownFailure );
+			LoginEvent.removeListener( LoginEvent.LOGIN_FAILURE_PASSWORD, onPasswordFailure );
+			LoginEvent.removeListener( LoginEvent.LOGIN_FAILURE_EMAIL, onEmailFailure );
 		}
 		
 		private const BAD_EMAIL_PASSWORD:String = "Bad email or password";

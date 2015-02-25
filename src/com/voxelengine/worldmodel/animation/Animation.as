@@ -9,7 +9,6 @@ package com.voxelengine.worldmodel.animation
 {
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.server.Network;
-	import com.voxelengine.persistance.PersistAnimation;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
@@ -107,7 +106,7 @@ package com.voxelengine.worldmodel.animation
 		}
 		
 		public function loadFromPersistance():void {
-			PersistAnimation.loadAnims( Network.userId );
+			//PersistAnimation.loadAnims( Network.userId );
 		}
 		
 		public function initJSON( $json:Object ):void 
@@ -352,7 +351,7 @@ package com.voxelengine.worldmodel.animation
 		public function save():void {
 			var ba:ByteArray = new ByteArray;
 			writeToByteArray( ba );
-			PersistAnimation.saveAnim( metadata( ba ), databaseObject, createSuccess );
+			//PersistAnimation.saveAnim( metadata( ba ), databaseObject, createSuccess );
 			
 		}
 		private	function writeToByteArray( $ba:ByteArray ):void {

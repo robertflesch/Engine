@@ -8,39 +8,31 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.events
 {
 import flash.events.Event;
-import playerio.DatabaseObject;
 import flash.events.EventDispatcher;
 
 /**
  * ...
  * @author Robert Flesch - RSF 
  */
-public class ModelMetadataPersistanceEvent extends PersistanceEvent
+public class WindowSplashEvent extends Event
 {
-	private var _guid:String;
-	private var _dbo:DatabaseObject;
-	private var _data:*;
-	
-	public function get guid():String  { return _guid; }
-	public function get dbo():DatabaseObject { return _dbo; }
-	public function get data():* { return _data; }
+	static public const CREATE:String  	= "CREATE";
+	static public const DESTORY:String	= "DESTORY";
+	static public const ANNIHILATE:String	= "ANNIHILATE"; // This closes regardless of online state
 
-	public function ModelMetadataPersistanceEvent( $type:String, $guid:String, $dbo:DatabaseObject = null, $data:* = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function WindowSplashEvent( $type:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
-		_guid = $guid;
-		_dbo = $dbo;
-		_data = $data;
 	}
 	
 	public override function clone():Event
 	{
-		return new ModelMetadataPersistanceEvent(type, _guid, _dbo, _data, bubbles, cancelable);
+		return new WindowSplashEvent(type, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString("ModelPersistanceEvent", "bubbles", "cancelable") + " Model: " + ( _dbo ? _dbo.toString(): "no database object" );
+		return formatToString("WindowSplashEvent");
 	}
 	
 	///////////////// Event handler interface /////////////////////////////
@@ -56,7 +48,7 @@ public class ModelMetadataPersistanceEvent extends PersistanceEvent
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:ModelMetadataPersistanceEvent ) : Boolean {
+	static public function dispatch( $event:WindowSplashEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 	

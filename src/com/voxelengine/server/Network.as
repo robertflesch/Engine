@@ -21,11 +21,9 @@ public class Network
 	
 	static private var _client:Client;	
 	static public function get client():Client { return _client; };
-	static public function set client( val:Client ):void { _client = val; };
 	
 	static private var _userId:String = "player";
 	static public function get userId():String { return _userId; };
-	static public function set userId( val:String ):void { _userId = val; };
 	
 	// This was a test to see if I could make a client that didnt need user interaction.
 	// This will allow me to do things like post to Facebook things that users create.
@@ -37,17 +35,17 @@ public class Network
 										   , connectSuccess
 										   , function (error:PlayerIOError):void { 
 												Log.out( "Network.autoLogin - FAILED TO AUTOLOGIN: " + error.message, Log.ERROR, error );
-												Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.LOGIN_FAILURE ) ); }
+												LoginEvent.dispatch( new LoginEvent( LoginEvent.LOGIN_FAILURE ) ); }
 										   );
 										   
 		function connectSuccess( $client:Client):void
 		{
 			Log.out("Network.autoLogin.connectSuccess - connection to server established using AUTOLOGIN", Log.DEBUG );
-			Network.userId = $client.connectUserId;
-			Network.client = $client
+			_userId = $client.connectUserId;
+			_client = $client
 			Globals.online = true;
 			
-			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.LOGIN_SUCCESS, $startingRegionGuid ) );
+			LoginEvent.dispatch( new LoginEvent( LoginEvent.LOGIN_SUCCESS, $startingRegionGuid ) );
 		}
 	}
 	
@@ -67,20 +65,20 @@ public class Network
 		{
 			var errorMsg:String = $error.name + ": " + $error.message;
 			if ( 0 < errorMsg.indexOf( "user" ) )
-				Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.LOGIN_FAILURE_EMAIL, errorMsg ) );
+				LoginEvent.dispatch( new LoginEvent( LoginEvent.LOGIN_FAILURE_EMAIL, errorMsg ) );
 			else if ( 0 < errorMsg.indexOf( "password" ) )
-				Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.LOGIN_FAILURE_PASSWORD, errorMsg ) );
+				LoginEvent.dispatch( new LoginEvent( LoginEvent.LOGIN_FAILURE_PASSWORD, errorMsg ) );
 			else
-				Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.LOGIN_FAILURE, errorMsg ) );
+				LoginEvent.dispatch( new LoginEvent( LoginEvent.LOGIN_FAILURE, errorMsg ) );
 		}
 		
 		function connectSuccess( $client:Client):void
 		{
 			Log.out("Network.login - connection to server established", Log.DEBUG );
-			Network.userId = $client.connectUserId;
-			Network.client = $client
+			_userId = $client.connectUserId;
+			_client = $client
 			Globals.online = true;
-			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.LOGIN_SUCCESS ) );
+			LoginEvent.dispatch( new LoginEvent( LoginEvent.LOGIN_SUCCESS ) );
 		}
 	}
 	
@@ -91,11 +89,11 @@ public class Network
 													, recoveryFailure );
 
 		function recoverySuccess():void { 
-			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.PASSWORD_RECOVERY_SUCCESS ) );
+			LoginEvent.dispatch( new LoginEvent( LoginEvent.PASSWORD_RECOVERY_SUCCESS ) );
 		}
 
 		function recoveryFailure( error:PlayerIOError ):void { 
-			Globals.g_app.dispatchEvent( new LoginEvent( LoginEvent.PASSWORD_RECOVERY_FAILURE ) );
+			LoginEvent.dispatch( new LoginEvent( LoginEvent.PASSWORD_RECOVERY_FAILURE ) );
 		}
 	}
 }	

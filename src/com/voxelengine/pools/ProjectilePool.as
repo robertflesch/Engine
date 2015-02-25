@@ -41,7 +41,7 @@ public final class ProjectilePool
 		// So types are done, now we have to preload the CLASS_NAME.mjson file
 		Globals.g_app.removeEventListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 		// Preload the modelInfo for the CLASS_NAME
-		ModelLoader.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
+//		ModelLoader.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
 		// Listen for it being loaded
 		Globals.g_app.addEventListener( ModelEvent.INFO_LOADED, onModelInfoLoaded );
 	}

@@ -16,7 +16,6 @@ package com.voxelengine.server {
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.events.LoginEvent;
 	import com.voxelengine.events.ProjectileEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.worldmodel.models.Avatar;
@@ -195,7 +194,7 @@ package com.voxelengine.server {
 		}
 		
 		//static private function createPlayerAfterRegionLoad( $e:RegionEvent ):void {
-			//RegionEvent.removeListener( RegionEvent.REGION_LOAD_BEGUN, createPlayerAfterRegionLoad );
+			//RegionEvent.removeListener( RegionEvent.LOAD_BEGUN, createPlayerAfterRegionLoad );
 			//Globals.createPlayer();
 		//}
 				

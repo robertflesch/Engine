@@ -7,10 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.GUI
 {
-	import com.voxelengine.events.RegionEvent;
-	import com.voxelengine.worldmodel.RegionManager;
 	import flash.display.Bitmap;
-	import com.voxelengine.events.LoadingEvent;
 	import flash.events.Event;
 	
 	import org.flashapi.swing.*;
@@ -19,17 +16,45 @@ package com.voxelengine.GUI
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
+	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.events.WindowSplashEvent;
+	import com.voxelengine.worldmodel.RegionManager;
 	
 	public class WindowSplash extends VVCanvas
 	{
-		static private var _s_currentInstance:WindowSplash = null;
-		static public function get isActive():Boolean { return _s_currentInstance ? true: false; }
-		static public function create():WindowSplash 
-		{  
+		static public function init():void {
+			WindowSplashEvent.addListener( WindowSplashEvent.CREATE, create );
+			WindowSplashEvent.addListener( WindowSplashEvent.DESTORY, destroy );
+			WindowSplashEvent.addListener( WindowSplashEvent.ANNIHILATE, annihilate );
+		}
+		
+		static private function annihilate(e:WindowSplashEvent):void 
+		{
+			if ( WindowSplash.isActive )
+			{
+				WindowSplash._s_currentInstance.remove();
+				WindowSplash._s_currentInstance = null;
+			}
+		}
+		
+		static private function create(e:WindowSplashEvent):void 
+		{
 			if ( null == _s_currentInstance )
 				new WindowSplash();
-			return _s_currentInstance; 
 		}
+		
+		static private function destroy(e:WindowSplashEvent):void 
+		{
+			if ( WindowSplash.isActive && Globals.online )
+			{
+				WindowSplash._s_currentInstance.remove();
+				WindowSplash._s_currentInstance = null;
+			}
+		}
+		
+		static private var _s_currentInstance:WindowSplash = null;
+		static public function get isActive():Boolean { return _s_currentInstance ? true: false; }
 		
 		private var _outline:Image;
 		private var _splashImage:Bitmap;
@@ -66,7 +91,7 @@ package com.voxelengine.GUI
 				display( 0, 0 );
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
-			RegionEvent.addListener( RegionEvent.REGION_LOAD_COMPLETE, onLoadingComplete );
+			RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize );
 			
 			VoxelVerseGUI.currentInstance.hideGUI()
@@ -81,12 +106,7 @@ package com.voxelengine.GUI
 		
 		private function onLoadingComplete( le:RegionEvent ):void
 		{
-			Globals.g_app.removeEventListener( RegionEvent.REGION_LOAD_COMPLETE, onLoadingComplete );
-			if ( WindowSplash.isActive && Globals.online )
-			{
-				WindowSplash._s_currentInstance.remove();
-				WindowSplash._s_currentInstance = null;
-			}
+			Globals.g_app.removeEventListener( RegionEvent.LOAD_COMPLETE, onLoadingComplete );
 		}
 		
 		// Window events

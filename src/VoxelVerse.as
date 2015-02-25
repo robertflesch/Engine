@@ -7,6 +7,7 @@
 ==============================================================================*/
 
 package {
+	import com.voxelengine.events.WindowSplashEvent;
 	import com.voxelengine.worldmodel.inventory.InventoryManager;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
@@ -123,7 +124,9 @@ package {
 			
 			VoxelVerseGUI.currentInstance.init();
 			
-			WindowSplash.create();
+			WindowSplash.init();
+			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.CREATE ) );
+			
 				
             loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
 		}
@@ -250,7 +253,7 @@ package {
 					
 
 				if ( Globals.online ) {
-					RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_CHANGED, Globals.g_regionManager.currentRegion.guid ) );
+					RegionEvent.dispatch( new RegionEvent( RegionEvent.CHANGED, Globals.g_regionManager.currentRegion.guid ) );
 					InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_SAVE_REQUEST, null, null ) );
 				}
 				

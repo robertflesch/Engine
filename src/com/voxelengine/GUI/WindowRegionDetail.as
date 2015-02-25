@@ -40,26 +40,21 @@ public class WindowRegionDetail extends VVPopup
 	//[Embed(source='../../../../../Resources/bin/assets/textures/black.jpg')]
 	//private var _backgroundImage:Class;
 	
-	public function WindowRegionDetail( $region:Region )
+	// Null for RegionId causes a new region to be created
+	public function WindowRegionDetail( $regionID:String )
 	{
 		var title:String;
-		if ( $region ) 	title = "Edit Region";
-		else			title = "New Region";
+		if ( $regionID )
+			title = "Edit Region";	
+		else
+			title = "New Region";
+			
 		super( title );	
-		
-		//_background = (new _backgroundImage() as Bitmap);
-		//texture = _background;
-		//backgroundTexture = _background;
-
-		autoSize = true;
-		layout.orientation = LayoutOrientation.VERTICAL;
-		//closeButtonEnabled = false; // this show it enabled, but doesnt allow it to be clicked
-		//closeButtonActive = false;  // this greys it out, and doesnt allow it to be clicked
-		
-		if ( $region ) {
-			_region = $region;
+		if ( $regionID ) {	
+			RegionEvent.addListener( RegionEvent.ADDED, collectRegionInfo );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.REQUEST, $regionID ) );
 		}
-		else {
+		else {			
 			_create = true
 			_region = new Region( Globals.getUID() );
 			_region.createEmptyRegion();
@@ -70,8 +65,24 @@ public class WindowRegionDetail extends VVPopup
 			_region.changed = true;
 			_region.admin.push( Network.userId );
 			_region.editors.push( Network.userId );
+			collectRegionInfo( new RegionEvent( RegionEvent.ADDED, _region.guid, _region ) );
 		}
+		
+	}
+	
+	private function collectRegionInfo( $re:RegionEvent):void 
+	{
+		_region =  $re.region;
 
+		//_background = (new _backgroundImage() as Bitmap);
+		//texture = _background;
+		//backgroundTexture = _background;
+
+		autoSize = true;
+		layout.orientation = LayoutOrientation.VERTICAL;
+		//closeButtonEnabled = false; // this show it enabled, but doesnt allow it to be clicked
+		//closeButtonActive = false;  // this greys it out, and doesnt allow it to be clicked
+		
 		addElement( new Spacer( WIDTH, 10 ) );
 		addElement( new ComponentTextInput( "Name", changeNameHandler, _region.name, WIDTH ) );
 		addElement( new ComponentTextArea( "Desc", changeDescHandler, _region.desc ? _region.desc : "No Description", WIDTH ) );
@@ -132,9 +143,9 @@ public class WindowRegionDetail extends VVPopup
 	private function create( e:UIMouseEvent ):void {
 		
 		if ( _create )
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_CHANGED, _region.guid ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.CHANGED, _region.guid ) );
 		else {
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_CHANGED, _region.guid ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.CHANGED, _region.guid ) );
 		}
 			
 		remove();

@@ -9,7 +9,7 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.PersistanceEvent;
-import com.voxelengine.events.RegionPersistanceEvent;
+import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.VVWindowEvent;
 import flash.events.Event;
 
@@ -100,7 +100,7 @@ public class WindowSandboxList extends VVPopup
 		
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 		
-		RegionEvent.addListener( RegionEvent.REGION_ADDED, regionLoadedEvent );
+		RegionEvent.addListener( RegionEvent.ADDED, regionLoadedEvent );
 		
 		displaySelectedRegionList( openType );
 		
@@ -133,14 +133,13 @@ public class WindowSandboxList extends VVPopup
 		if ( li )
 		{
 			if ( Globals.MODE_PRIVATE != Globals.mode && Globals.MODE_PUBLIC != Globals.mode ) {
-				var region:Region = Globals.g_regionManager.regionGet( li.data )
-				new WindowRegionDetail( region );
+				new WindowRegionDetail( li.data );
 				remove();
 				return;
 			}
 			
 			if ( li.data )
-				RegionEvent.dispatch( new RegionEvent( RegionEvent.REQUEST_JOIN, li.data ) ); 
+				RegionEvent.dispatch( new RegionEvent( RegionEvent.JOIN, li.data ) ); 
 			else
 				Log.out( "WindowSandboxList.loadthisRegion - NO REGION GUID FOUND", Log.ERROR );
 		}
@@ -153,16 +152,16 @@ public class WindowSandboxList extends VVPopup
 		Globals.mode = type;
 		if ( Globals.MODE_PRIVATE == type )
 		{
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_TYPE_REQUEST, Network.userId ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.TYPE_REQUEST, Network.userId ) );
 		}
 		else if ( Globals.MODE_PUBLIC == type )
 		{
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_TYPE_REQUEST, Network.PUBLIC ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.TYPE_REQUEST, Network.PUBLIC ) );
 		}
 		else
 		{
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_TYPE_REQUEST, Network.userId ) );
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.REGION_TYPE_REQUEST, Network.PUBLIC ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.TYPE_REQUEST, Network.userId ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.TYPE_REQUEST, Network.PUBLIC ) );
 		}
 	}
 

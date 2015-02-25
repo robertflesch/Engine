@@ -29,7 +29,9 @@ public class PersistRegion
 	}
 	
 	static private function load( $rpe:RegionPersistanceEvent ):void {
-	
+		if ( false == Globals.online )
+			return;
+			
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT, errorNoClientLoad );
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDBLoad );
 		
@@ -69,6 +71,8 @@ public class PersistRegion
 	}
 
 	static private function loadType( $rpe:RegionPersistanceEvent ):void {
+		if ( false == Globals.online )
+			return;
 	
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT, errorNoClient );
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
@@ -114,7 +118,8 @@ public class PersistRegion
 	
 	
 	static private function save( $rpe:RegionPersistanceEvent ):void {
-		
+		if ( false == Globals.online )
+			return;
 		
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT, errorNoClient );
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );

@@ -88,7 +88,7 @@ public class Player extends Avatar
 	}
 	
 	private function addEventHandlers():void {
-		Globals.g_app.addEventListener( LoginEvent.LOGIN_SUCCESS, onLogin );
+		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		
 		Globals.g_app.addEventListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
 		Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
@@ -97,12 +97,12 @@ public class Player extends Avatar
 		Globals.g_app.addEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		Globals.g_app.addEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
-		RegionEvent.addListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
-		RegionEvent.addListener( RegionEvent.REGION_LOAD, onRegionLoad );
+		RegionEvent.addListener( RegionEvent.UNLOAD, onRegionUnload );
+		RegionEvent.addListener( RegionEvent.LOAD, onRegionLoad );
 	}
 
 	private function removeEventHandlers():void {
-		Globals.g_app.removeEventListener( LoginEvent.LOGIN_SUCCESS, onLogin );
+		LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		
 		Globals.g_app.removeEventListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
 		Globals.g_app.removeEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
@@ -111,8 +111,8 @@ public class Player extends Avatar
 		Globals.g_app.removeEventListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		Globals.g_app.removeEventListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
-		RegionEvent.removeListener( RegionEvent.REGION_UNLOAD, onRegionUnload );
-		RegionEvent.removeListener( RegionEvent.REGION_LOAD, onRegionLoad );
+		RegionEvent.removeListener( RegionEvent.UNLOAD, onRegionUnload );
+		RegionEvent.removeListener( RegionEvent.LOAD, onRegionLoad );
 	}
 	
 	static private function onLogin( $event:LoginEvent ):void {
