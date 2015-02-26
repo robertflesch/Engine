@@ -9,6 +9,7 @@
 package com.voxelengine.renderer 
 {
 	import com.voxelengine.renderer.shaders.Shader;
+	import com.voxelengine.worldmodel.Region;
 	import flash.display.Stage3D;
 	import flash.display.BitmapData;
 	import flash.display.Stage;
@@ -273,9 +274,9 @@ package com.voxelengine.renderer
 		
 		private function backgroundColor():void 
 		{
-			if ( Globals.g_regionManager && Globals.g_regionManager.currentRegion )
+			if ( Globals.g_regionManager && Region.currentRegion )
 			{
-				var skyColor:Vector3D = Globals.g_regionManager.currentRegion.getSkyColor();
+				var skyColor:Vector3D = Region.currentRegion.getSkyColor();
 				// Not only does this set the color, but it appears to clear the "BackBuffer"
 				setBackgroundColor( skyColor.x, skyColor.y, skyColor.z );
 			}

@@ -8,6 +8,8 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
+	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.RegionEvent;
 	import flash.utils.getTimer;
 	import flash.geom.Vector3D;
 	
@@ -59,7 +61,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 						vm.modelInfo.biomes.layers[0] = loadingLayer;
 						
 						// mark the region and model as changed so that the info is stored.
-						Globals.g_regionManager.currentRegion.changed = true;
+						RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, null ) );
 						vm.changed = true;
 					}
 						

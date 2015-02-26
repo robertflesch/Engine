@@ -14,7 +14,6 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.MetadataManager;
 import com.voxelengine.worldmodel.models.ModelData;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import flash.utils.ByteArray;
@@ -29,7 +28,7 @@ import flash.utils.ByteArray;
 public class ModelMakerLocal {
 	
 	// keeps track of how many makers there currently are.
-	static public var _makerCount:int;
+	static private var _makerCount:int;
 	
 	private var _ii:InstanceInfo;
 	private var _vmd:ModelData;
@@ -37,7 +36,8 @@ public class ModelMakerLocal {
 	
 	public function ModelMakerLocal( $ii:InstanceInfo ) {
 		_ii = $ii;
-		Log.out( "ModelMakerLocal - ii: " + _ii.toString() );
+		_makerCount++;
+		Log.out( "ModelMakerLocal - ii: " + _ii.toString() + "  count: " + _makerCount );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
 		ModelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
@@ -46,7 +46,6 @@ public class ModelMakerLocal {
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
 		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.REQUEST, _ii.guid, null ) );		
 
-		_makerCount++;
 	}
 	
 	private function failedInfo( $mie:ModelInfoEvent):void {
@@ -95,18 +94,8 @@ public class ModelMakerLocal {
 			
 			// how many bytes is the modelInfo
 			var strLen:int = $ba.readInt();
-			// read off that many bytes
+			// read off that many bytes, even though we are using the data from the modelInfo file
 			var modelInfoJson:String = $ba.readUTFBytes( strLen );
-			// create the modelInfo object from embedded metadata
-			//modelInfoJson = decodeURI(modelInfoJson);
-			//var jsonResult:Object = JSON.parse(modelInfoJson);
-			//var mi:ModelInfo = new ModelInfo();
-			//mi.initJSON( $vmm.guid, jsonResult );
-
-			//if ( "" != controllingModelGuid ) {
-				//var cvm:VoxelModel = Globals.getModelInstance( controllingModelGuid );
-				//ii.controllingModel = cvm;
-			//}
 				
 			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
 			vmm.guid = _ii.guid;
@@ -118,8 +107,6 @@ public class ModelMakerLocal {
 
 			vm.complete = true;
 			
-			
-			_makerCount--;
 			markComplete();
 		}
 	}
@@ -134,7 +121,7 @@ public class ModelMakerLocal {
 		_makerCount--;
 		if ( 0 == _makerCount )
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
-		Log.out( "ModelMakerLocal.markComplete - makerCount: " + _makerCount );
+		Log.out( "ModelMakerLocal.markComplete - makerCount: " + _makerCount + "  ii: " + _ii );
 	}
 	
 	

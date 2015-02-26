@@ -1,11 +1,14 @@
 
 package com.voxelengine.GUI 
 {
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.RegionManager;
 import flash.geom.Vector3D;
 import flash.events.Event;
 import flash.display.Bitmap;
+import playerio.DatabaseObject;
 
 import org.flashapi.swing.*
 import org.flashapi.swing.core.UIObject;
@@ -51,8 +54,8 @@ public class WindowRegionDetail extends VVPopup
 			
 		super( title );	
 		if ( $regionID ) {	
-			RegionEvent.addListener( RegionEvent.ADDED, collectRegionInfo );
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.REQUEST, $regionID ) );
+			RegionEvent.addListener( ModelBaseEvent.ADDED, collectRegionInfo );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST, $regionID ) );
 		}
 		else {			
 			_create = true
@@ -65,14 +68,14 @@ public class WindowRegionDetail extends VVPopup
 			_region.changed = true;
 			_region.admin.push( Network.userId );
 			_region.editors.push( Network.userId );
-			collectRegionInfo( new RegionEvent( RegionEvent.ADDED, _region.guid, _region ) );
+			collectRegionInfo( new RegionEvent( ModelBaseEvent.ADDED, _region.guid, _region ) );
 		}
 		
 	}
 	
 	private function collectRegionInfo( $re:RegionEvent):void 
 	{
-		RegionEvent.removeListener( RegionEvent.ADDED, collectRegionInfo );
+		RegionEvent.removeListener( ModelBaseEvent.ADDED, collectRegionInfo );
 		_region =  $re.region;
 
 		//_background = (new _backgroundImage() as Bitmap);
@@ -146,10 +149,18 @@ public class WindowRegionDetail extends VVPopup
 	
 	private function create( e:UIMouseEvent ):void {
 		
-		if ( _create )
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.CHANGED, _region.guid ) );
+		if ( _create ) {
+			var dboTemp:DatabaseObject = new DatabaseObject( Globals.DB_TABLE_REGIONS, _region.guid, "1", 0, true, null );
+			_region.databaseObject = dboTemp;
+			_region.toPersistance();
+			// This tell the region manager to add it to the region list
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, Globals.DB_TABLE_REGIONS, _region.guid, dboTemp ) );			
+			//_region.databaseObject = null;
+			// This tell the region to save itself!
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, _region.guid ) );
+		}
 		else {
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.CHANGED, _region.guid ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, _region.guid ) );
 		}
 			
 		new WindowSandboxList();

@@ -22,13 +22,13 @@ import com.voxelengine.events.PersistanceEvent;
  * ...
  * @author Bob
  */
-public class ModelInfoManager
+public class ModelInfoCache
 {
 	// this only loaded ModelInfo from the local files system.
 	// for the online system this information is embedded in the data segment.
 	static private var _modelInfo:Dictionary = new Dictionary(false);
 	
-	public function ModelInfoManager() {}
+	public function ModelInfoCache() {}
 	
 	static public function init():void {
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST, 			request );

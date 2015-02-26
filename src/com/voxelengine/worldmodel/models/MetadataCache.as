@@ -21,7 +21,7 @@ import com.voxelengine.server.Network;
  * ...
  * @author Bob
  */
-public class MetadataManager
+public class MetadataCache
 {
 	static private var _initializedPublic:Boolean;
 	static private var _initializedPrivate:Boolean;
@@ -30,7 +30,7 @@ public class MetadataManager
 	// dont use weak keys since this is THE spot that holds things.
 	static private var _metadata:Dictionary = new Dictionary(false);
 	
-	public function MetadataManager() {	}
+	public function MetadataCache() {	}
 	
 	static public function init():void {
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.LOAD, regionLoad ); 

@@ -25,6 +25,8 @@ public class ModelBaseEvent extends Event
 	static public const ADDED:String						= "ADDED";
 	static public const REQUEST_FAILED:String				= "REQUEST_FAILED";
 	
+	// data or meta data about this region has changed
+	static public const CHANGED:String						= "CHANGED";
 	static public const SAVE:String							= "SAVE";
 	
 	

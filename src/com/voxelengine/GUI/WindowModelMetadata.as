@@ -11,7 +11,7 @@ package com.voxelengine.GUI
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.MetadataManager;
+import com.voxelengine.worldmodel.models.MetadataCache;
 import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;

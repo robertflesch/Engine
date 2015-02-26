@@ -7,6 +7,7 @@
 ==============================================================================*/
 
 package com.voxelengine {
+	import com.voxelengine.worldmodel.Region;
 	import flash.display3D.Context3D;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
@@ -261,110 +262,110 @@ package com.voxelengine {
 		
 //////////////////////////////////////////////////////////////////////////////////		
 		public static function getModelInstance( $guid:String ):VoxelModel {
-			return g_regionManager.currentRegion.modelManager.getModelInstance( $guid );
+			return Region.currentRegion.modelManager.getModelInstance( $guid );
 		};
 		
 		public static function findIVM( $guid:String ):ByteArray {
-			return g_regionManager.currentRegion.modelManager.findIVM( $guid );
+			return Region.currentRegion.modelManager.findIVM( $guid );
 		};
 		
 		public static function addIVM( $guid:String, $ba:ByteArray ):void {
-			g_regionManager.currentRegion.modelManager.addIVM( $guid, $ba );
+			Region.currentRegion.modelManager.addIVM( $guid, $ba );
 		};
 		
 		public static function reinitialize( $context:Context3D ):void {
-			if ( g_regionManager && g_regionManager.currentRegion )
-				g_regionManager.currentRegion.modelManager.reinitialize( $context );
+			if ( g_regionManager && Region.currentRegion )
+				Region.currentRegion.modelManager.reinitialize( $context );
 		}
 		
 		public static function createPlayer():Boolean {
-			if ( null == g_regionManager.currentRegion ) {
+			if ( null == Region.currentRegion ) {
 				Log.out( "Globals.createPlayer - current region null", Log.WARN );
 				return false;
 			}
 			else 	
-				return g_regionManager.currentRegion.modelManager.createPlayer();
+				return Region.currentRegion.modelManager.createPlayer();
 		}
 		
 		public static function draw( $mvp:Matrix3D, $context:Context3D ):void {
-			g_regionManager.currentRegion.modelManager.draw( $mvp, $context )
+			Region.currentRegion.modelManager.draw( $mvp, $context )
 		}
 		
 		public static function modelAdd( $vm:VoxelModel ):void {
-			g_regionManager.currentRegion.modelManager.modelAdd( $vm )
+			Region.currentRegion.modelManager.modelAdd( $vm )
 		}
 		
 		public static function modelInfoAdd( $modelInfo:ModelInfo ):void {
-			g_regionManager.currentRegion.modelManager.modelInfoAdd( $modelInfo )
+			Region.currentRegion.modelManager.modelInfoAdd( $modelInfo )
 		}
 		
 		public static function instanceInfoAdd( $val:InstanceInfo ):void {
-			g_regionManager.currentRegion.modelManager.instanceInfoAdd( $val );
+			Region.currentRegion.modelManager.instanceInfoAdd( $val );
 		};
 
 		public static function instanceInfoGet( $guid:String ):InstanceInfo {
-			return g_regionManager.currentRegion.modelManager.instanceInfoGet( $guid )
+			return Region.currentRegion.modelManager.instanceInfoGet( $guid )
 		}
 		
 		public static function instanceInfoRemove( $guid:String ):void {
-			g_regionManager.currentRegion.modelManager.instanceInfoRemove( $guid )
+			Region.currentRegion.modelManager.instanceInfoRemove( $guid )
 		}
 
 		public static function changeFromParentToChild( $vm:VoxelModel ):void {
-			g_regionManager.currentRegion.modelManager.changeFromParentToChild( $vm )
+			Region.currentRegion.modelManager.changeFromParentToChild( $vm )
 		}
 		
 		public static function whichModelsIsThisInfluencedBy( $vm:VoxelModel ):Vector.<VoxelModel>  {
-			return g_regionManager.currentRegion.modelManager.whichModelsIsThisInfluencedBy( $vm )
+			return Region.currentRegion.modelManager.whichModelsIsThisInfluencedBy( $vm )
 		}
 
 		public static function markDead( $guid:String ):void {
-			g_regionManager.currentRegion.modelManager.markDead( $guid );
+			Region.currentRegion.modelManager.markDead( $guid );
 		};
 		
 		public static function modelInstancesGetDictionary():Dictionary {
-			return g_regionManager.currentRegion.modelManager.modelInstancesGetDictionary();
+			return Region.currentRegion.modelManager.modelInstancesGetDictionary();
 		};
 		
 		public static function modelInfoGet( $name:String ):ModelInfo {
-			return g_regionManager.currentRegion.modelManager.modelInfoGet( $name );
+			return Region.currentRegion.modelManager.modelInfoGet( $name );
 		};
 		
 		public static function modelInfoGetDictionary():Dictionary {
-			return g_regionManager.currentRegion.modelManager.modelInfoGetDictionary();
+			return Region.currentRegion.modelManager.modelInfoGetDictionary();
 		};
 		
 		public static function dispose():void {
 			g_textureBank.dispose();
-			g_regionManager.currentRegion.modelManager.dispose();
+			Region.currentRegion.modelManager.dispose();
 		};
 		
 		public static function gci():GrainCursorIntersection {
-			return g_regionManager.currentRegion.modelManager._gci;
+			return Region.currentRegion.modelManager._gci;
 		};
 		
 		public static function viewVectorNormalizedGet():Vector3D {
-			return g_regionManager.currentRegion.modelManager.viewVectorNormalizedGet();
+			return Region.currentRegion.modelManager.viewVectorNormalizedGet();
 		};
 		
 		public static function modelInstancesGetFirst():VoxelModel {
-			return g_regionManager.currentRegion.modelManager.modelInstancesGetFirst();
+			return Region.currentRegion.modelManager.modelInstancesGetFirst();
 		};
 		
 		public static function TestCheckForFlow():void {
-			g_regionManager.currentRegion.modelManager.TestCheckForFlow();
+			Region.currentRegion.modelManager.TestCheckForFlow();
 		};
 		
 		public static function worldSpaceStartPoint():Vector3D {
-			return g_regionManager.currentRegion.modelManager.worldSpaceStartPoint;
+			return Region.currentRegion.modelManager.worldSpaceStartPoint;
 		};
 		
 		public static function whichModelsIsThisInsideOfNew( $vm:VoxelModel ):Vector.<VoxelModel> {
-			return g_regionManager.currentRegion.modelManager.whichModelsIsThisInsideOfNew( $vm );
+			return Region.currentRegion.modelManager.whichModelsIsThisInsideOfNew( $vm );
 		};
 		
 		public static function modelInstancesChangeGuid( $oldGuid:String, $newGuid:String ):void { 
-			g_regionManager.currentRegion.modelManager.modelInstancesChangeGuid( $oldGuid, $newGuid );
+			Region.currentRegion.modelManager.modelInstancesChangeGuid( $oldGuid, $newGuid );
 		};
 	}
 }

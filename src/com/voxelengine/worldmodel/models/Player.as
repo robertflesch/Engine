@@ -401,7 +401,8 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		if ( null == _userInventory && Globals.online )
 			_userInventory = new UserInventory();
 		// apply this regions location, position, etc setting to the player
-		Globals.g_regionManager.currentRegion.applyRegionInfoToPlayer( this );
+		if ( Region.currentRegion )
+			Region.currentRegion.applyRegionInfoToPlayer( this );
 	}
 	
 	
@@ -438,7 +439,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 
 	private function gravityOn():void {
-		if ( true == Globals.g_regionManager.currentRegion.gravity )
+		if ( true == Region.currentRegion.gravity )
 			usesGravity = true;
 		else		
 			usesGravity = false;

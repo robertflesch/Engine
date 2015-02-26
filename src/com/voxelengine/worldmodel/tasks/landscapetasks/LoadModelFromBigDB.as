@@ -25,7 +25,6 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.events.ModelMetadataEvent;
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.Player;
-	import com.voxelengine.worldmodel.models.MetadataManager;
 	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 	
 	/**

@@ -16,14 +16,16 @@ import com.voxelengine.worldmodel.Region;
  * @author Robert Flesch - RSF 
  * 
  */
-public class RegionEvent extends Event
+public class RegionEvent extends ModelBaseEvent
 {
-	// request from persistance
-	static public const REQUEST:String						= "REQUEST";
+	// INHERITS static public const from ModelBaseEvent
+	//static public const REQUEST:String						= "REQUEST";
+	//static public const REQUEST_TYPE:String					= "REQUEST_TYPE";
+	//static public const ADDED:String							= "ADDED";
+	//static public const REQUEST_FAILED:String					= "REQUEST_FAILED";
+	//static public const SAVE:String							= "SAVE";
 	
-	// data or meta data about this region has changed
-	static public const CHANGED:String						= "CHANGED";
-	
+	// These are the region specific events
 	// dispatched when a region is unloaded
 	static public const UNLOAD:String						= "UNLOAD";
 	// tells the region manager to load this region
@@ -32,13 +34,6 @@ public class RegionEvent extends Event
 	static public const LOAD_BEGUN:String					= "LOAD_BEGUN";
 	// tells the region manager this region had finished loading
 	static public const LOAD_COMPLETE:String				= "LOAD_COMPLETE";
-	
-	// tells us the region manager has add this region from persistance
-	static public const ADDED:String						= "ADDED";
-	
-	// tells the region manager to load this region
-	static public const TYPE_REQUEST:String					= "TYPE_REQUEST";
-	// the response to this is the loaded message
 	
 	// Used by the sandbox list and config manager to request a join of a server region
 	static public const JOIN:String							= "JOIN";

@@ -26,7 +26,7 @@ import com.voxelengine.GUI.*;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.inventory.*;
-import com.voxelengine.worldmodel.models.MetadataManager;
+import com.voxelengine.worldmodel.models.MetadataCache;
 import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 
 
@@ -71,10 +71,10 @@ public class BoxInventory extends VVBox
 					InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, modelCount ) ;
 					InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_REQUEST, Network.userId, $item.guid, -1 ) );
 					
-					if ( MetadataManager.metadataGet( $item.guid ) )
-						updateObjectDisplayData( MetadataManager.metadataGet( $item.guid ) );	
+					if ( MetadataCache.metadataGet( $item.guid ) )
+						updateObjectDisplayData( MetadataCache.metadataGet( $item.guid ) );	
 					else {
-						MetadataManager.addListener( ModelMetadataEvent.INFO_TEMPLATE_REPO, metadataRetrived );
+						MetadataCache.addListener( ModelMetadataEvent.INFO_TEMPLATE_REPO, metadataRetrived );
 						return;
 					}
 				}

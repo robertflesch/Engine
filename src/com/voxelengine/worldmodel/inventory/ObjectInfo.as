@@ -7,7 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory
 {
-import com.voxelengine.worldmodel.models.MetadataManager;
 import flash.utils.ByteArray;
 import com.voxelengine.Log;
 

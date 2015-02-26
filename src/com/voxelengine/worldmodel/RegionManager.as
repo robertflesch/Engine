@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -19,9 +20,9 @@ import com.voxelengine.server.Network;
 import com.voxelengine.server.Room;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.models.ModelLoader;
-import com.voxelengine.worldmodel.models.ModelDataManager;
-import com.voxelengine.worldmodel.models.MetadataManager;
-import com.voxelengine.worldmodel.models.ModelInfoManager;
+import com.voxelengine.worldmodel.models.ModelDataCache;
+import com.voxelengine.worldmodel.models.MetadataCache;
+import com.voxelengine.worldmodel.models.ModelInfoCache;
 
 /**
  * ...
@@ -30,17 +31,10 @@ import com.voxelengine.worldmodel.models.ModelInfoManager;
 public class RegionManager 
 {
 	private var _regions:Vector.<Region> = null
-	private var _currentRegion:Region = null
 	private var _modelLoader:ModelLoader = new ModelLoader();
 	private var _initialized:Boolean;
 	
 	public function get size():int { return _regions.length; }
-	
-	public function get currentRegion():Region { return _currentRegion; }
-	public function set currentRegion(val:Region):void { 
-		_currentRegion = val; 
-		Log.out("RegionManager.currentRegion - set to: " + val.guid, Log.DEBUG ) 
-	}
 	
 	public function get regions():Vector.<Region> { return _regions; }
 	
@@ -50,11 +44,10 @@ public class RegionManager
 	{
 		_regions = new Vector.<Region>;
 
-		RegionEvent.addListener( RegionEvent.LOAD, 			regionLoad ); 
+		//RegionEvent.addListener( RegionEvent.LOAD, 			regionLoad ); 
 		RegionEvent.addListener( RegionEvent.JOIN, 			requestServerJoin ); 
-		RegionEvent.addListener( RegionEvent.CHANGED, 		regionChanged );	
-		RegionEvent.addListener( RegionEvent.TYPE_REQUEST, 	regionTypeRequest );
-		RegionEvent.addListener( RegionEvent.REQUEST, 		regionRequest );	
+		RegionEvent.addListener( ModelBaseEvent.REQUEST_TYPE, 	regionTypeRequest );
+		RegionEvent.addListener( ModelBaseEvent.REQUEST, 		regionRequest );	
 		
 		RoomEvent.addListener( RoomEvent.ROOM_DISCONNECT, 	requestDefaultRegionLoad );
 		RoomEvent.addListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
@@ -62,20 +55,16 @@ public class RegionManager
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );			
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFail );			
 		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	regionCreatedHandler ); 
-		
-		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED,	regionModelChanged );
-		Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_REMOVED,regionModelChanged );
 									  
-		LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_FAILURE,removeFailedObjectFromRegion );									  
 		LoadingEvent.addListener( LoadingEvent.LOAD_CONFIG_COMPLETE, configComplete );
 		
 		
 		
 		// This adds the event handlers
 		// Is there a central place to do this?
-		MetadataManager.init();
-		ModelInfoManager.init();
-		ModelDataManager.init();
+		MetadataCache.init();
+		ModelInfoCache.init();
+		ModelDataCache.init();
 		// This causes the to load its caches and listeners
 		InventoryManager.init();
 		MouseKeyboardHandler.init();
@@ -91,16 +80,8 @@ public class RegionManager
 		Log.out( "RegionManager.load - region: " + $re.guid, Log.DEBUG );
 		WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.CREATE ) );
 		
-		if ( currentRegion )
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.UNLOAD, currentRegion.guid ) );
-
-		var region:Region = regionGet( $re.guid );
-		if ( region ) {
-			currentRegion = region;
-			region.load();
-		}
-		else
-			throw new Error( "RegionManager.regionLoad - trying to load I region I don't have in cache", Log.WARN );
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.UNLOAD, null ) );
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, $re.guid ) );
 	}
 	
 	private function regionRequest( $re:RegionEvent):void 	{
@@ -112,7 +93,7 @@ public class RegionManager
 		Log.out( "RegionManager.regionRequest guid: " + $re.guid, Log.INFO );
 		var region:Region = regionGet( $re.guid );
 		if ( region ) {
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.ADDED, region.guid, region ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.ADDED, region.guid, region ) );
 			return;
 		}
 		
@@ -132,7 +113,7 @@ public class RegionManager
 		// Get a list of what we currently have
 		for each ( var region:Region in _regions ) {
 			if ( region && region.owner == e.guid )
-				RegionEvent.dispatch( new RegionEvent( RegionEvent.ADDED, region.guid, region ) );
+				RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.ADDED, region.guid, region ) );
 		}
 	}
 	
@@ -150,15 +131,14 @@ public class RegionManager
 		if ( Globals.DB_TABLE_REGIONS == $pe.table ) {
 			Log.out( "RegionManager.loadSucceed - creating new region: " + $pe.guid, Log.DEBUG );
 			var newRegion:Region = new Region( $pe.guid );
-			newRegion.loadFromDBO( $pe.dbo );
+			newRegion.fromPersistance( $pe.dbo );
 			regionAdd( newRegion );
 		}
+		// Bad thing about this is it ignores all the metadata
 		else if ( Globals.REGION_EXT == $pe.table ) {
-			var startingRegion:Region = new Region( $pe.guid );
-			startingRegion.initJSON( $pe.data );
-			regionAdd( startingRegion );
-			
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, $pe.guid, startingRegion ) );
+			var region:Region = new Region( $pe.guid );
+			region.initJSON( $pe.data );
+			regionAdd( region );
 		}
 	}
 	
@@ -166,34 +146,10 @@ public class RegionManager
 		Log.out( "RegionManager.regionAdd - adding region: " + $region.guid, Log.DEBUG );
 		if ( false == regionHas( $region.guid ) ) {
 			_regions.push( $region );
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.ADDED, $region.guid, $region ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.ADDED, $region.guid, $region ) );
 		}
 		else
 			Log.out( "RegionManager.regionAdd - NOT loading duplicate region: " + $region.guid, Log.DEBUG );
-	}
-	
-	private function regionChanged( $re:RegionEvent):void 
-	{
-		var region:Region = regionGet( $re.guid );
-		if ( region )
-			region.save();
-		else	
-			Log.out( "RegionManager.regionChanged- did not find: " + $re.guid + " in order to save", Log.ERROR );
-	}
-	
-	
-	private function regionModelChanged( me:ModelEvent ):void { 
-		var region:Region = currentRegion;
-		if ( region && region.loaded )
-			currentRegion.changed = true;
-	}
-	
-	private function removeFailedObjectFromRegion( $e:LoadingEvent):void {
-		// Do I need to remove this failed load?
-		Log.out( "RegionManager.removeFailedObjectFromRegion - failed to load: " + $e.guid, Log.ERROR );
-		currentRegion.changedForce = true;
-		// Dont want to save if partially loaded
-		//currentRegion.save();
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////
@@ -202,7 +158,9 @@ public class RegionManager
 	public function configComplete( $e:LoadingEvent ):void
 	{
 		//startWithEmptyRegion( $e.guid );
+		
 		// This is used for testing
+		// This tells the engine to load a local file
 		loadRegionFromLocal( $e.guid )
 	}
 	public function startWithEmptyRegion( $guid:String ):void
@@ -217,7 +175,18 @@ public class RegionManager
 	
 	public function loadRegionFromLocal( $guid:String ):void
 	{
-		RegionEvent.dispatch( new RegionEvent( RegionEvent.REQUEST, $guid ) );
+		// Add a listener to tell when file has been loaded
+		RegionEvent.addListener( ModelBaseEvent.ADDED, startingRegionLoaded );
+		// now request the file be loaded
+		RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST, $guid ) );
+	}
+	
+	private function startingRegionLoaded( $re:RegionEvent):void 
+	{
+		// remove this handler
+		RegionEvent.removeListener( ModelBaseEvent.ADDED, startingRegionLoaded );
+		// now load the file that was designated as the starting region
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, $re.guid, $re.region ) );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -244,8 +213,8 @@ public class RegionManager
 	
 	// this calls the region and its model manager to update
 	public function update( $elapsed:int ):void {
-		if ( currentRegion )
-			currentRegion.update( $elapsed );
+		if ( Region.currentRegion )
+			Region.currentRegion.update( $elapsed );
 	}
 	
 	// Just assign the dbo from the create to the region
@@ -287,13 +256,5 @@ public class RegionManager
 		return false;
 	}
 
-	public function save():void
-	{
-		Log.out( "RegionManager.save", Log.DEBUG );
-		if ( true == Globals.online && true == Globals.inRoom ) {
-			currentRegion.save()
-		}
-	}
-	
 } // RegionManager
 } // Package

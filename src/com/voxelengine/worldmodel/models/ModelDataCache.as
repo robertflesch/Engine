@@ -20,13 +20,13 @@ import com.voxelengine.events.PersistanceEvent;
  * ...
  * @author Bob
  */
-public class ModelDataManager
+public class ModelDataCache
 {
 	// this acts as a holding spot for all model objects loaded from persistance
 	// dont use weak keys since this is THE spot that holds things.
 	static private var _modelData:Dictionary = new Dictionary(false);
 	
-	public function ModelDataManager() {}
+	public function ModelDataCache() {}
 	
 	static public function init():void {
 		ModelDataEvent.addListener( ModelDataEvent.REQUEST, request );

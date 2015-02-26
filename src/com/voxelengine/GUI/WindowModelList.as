@@ -7,7 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.GUI
 {
-	import com.voxelengine.worldmodel.models.MetadataManager;
+	import com.voxelengine.worldmodel.models.MetadataCache;
 	import flash.geom.Vector3D;
 	import flash.net.FileReference;
 	import flash.events.Event;
@@ -77,7 +77,7 @@ package com.voxelengine.GUI
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 			
-			MetadataManager.addListener( ModelMetadataEvent.INFO_TEMPLATE_REPO, modelLoaded );
+			MetadataCache.addListener( ModelMetadataEvent.INFO_TEMPLATE_REPO, modelLoaded );
 			LoadingEvent.addListener( LoadingEvent.TEMPLATE_MODEL_COMPLETE, newTemplateLoaded );
 			populateModels();
         }
@@ -137,7 +137,7 @@ package com.voxelengine.GUI
 		}
 		
 		private function newTemplateLoaded( $e:LoadingEvent ):void {
-			var vmm:VoxelModelMetadata = MetadataManager.metadataGet( $e.guid );
+			var vmm:VoxelModelMetadata = MetadataCache.metadataGet( $e.guid );
 			Log.out( "WindowModelList.newTemplateLoaded name: " + vmm.name + " - " + vmm.description );
 			_listbox1.addItem( vmm.name + " - " + vmm.description, vmm );
 		}
@@ -148,7 +148,7 @@ package com.voxelengine.GUI
 		private function populateModels():void
 		{
 			_listbox1.removeAll();
-			MetadataManager.metadataLoad();
+			MetadataCache.metadataLoad();
 
 			//PersistModel.loadModels( Network.PUBLIC );
 			//PersistModel.loadModels( Network.userId );

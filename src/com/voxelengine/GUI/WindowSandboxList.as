@@ -8,6 +8,7 @@
 package com.voxelengine.GUI
 {
 import com.voxelengine.events.LoginEvent;
+import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.VVWindowEvent;
@@ -100,7 +101,7 @@ public class WindowSandboxList extends VVPopup
 		
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 		
-		RegionEvent.addListener( RegionEvent.ADDED, regionLoadedEvent );
+		RegionEvent.addListener( ModelBaseEvent.ADDED, regionLoadedEvent );
 		
 		displaySelectedRegionList( openType );
 		
@@ -152,16 +153,16 @@ public class WindowSandboxList extends VVPopup
 		Globals.mode = type;
 		if ( Globals.MODE_PRIVATE == type )
 		{
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.TYPE_REQUEST, Network.userId ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, Network.userId ) );
 		}
 		else if ( Globals.MODE_PUBLIC == type )
 		{
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.TYPE_REQUEST, Network.PUBLIC ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, Network.PUBLIC ) );
 		}
 		else
 		{
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.TYPE_REQUEST, Network.userId ) );
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.TYPE_REQUEST, Network.PUBLIC ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, Network.userId ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, Network.PUBLIC ) );
 		}
 	}
 

@@ -7,6 +7,7 @@
 ==============================================================================*/
 
 package {
+	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.events.WindowSplashEvent;
 	import com.voxelengine.worldmodel.inventory.InventoryManager;
 	import flash.display.Sprite;
@@ -253,7 +254,7 @@ package {
 					
 
 				if ( Globals.online ) {
-					RegionEvent.dispatch( new RegionEvent( RegionEvent.CHANGED, Globals.g_regionManager.currentRegion.guid ) );
+					RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, null ) );
 					InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_SAVE_REQUEST, null, null ) );
 				}
 				
