@@ -235,7 +235,7 @@ package com.voxelengine.worldmodel.models
 			return vm;
 		}
 		
-		static public function loadFromManifestByteArrayNew( $ii:InstanceInfo, $vmd:VoxelModelData ):VoxelModel {
+		static public function loadFromManifestByteArrayNew( $ii:InstanceInfo, $vmd:ModelData ):VoxelModel {
 				
 			var $ba:ByteArray = $vmd.ba;
 			if ( null == $ba )

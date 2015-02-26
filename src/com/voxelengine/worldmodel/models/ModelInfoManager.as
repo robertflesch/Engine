@@ -14,6 +14,7 @@ import com.voxelengine.utils.StringUtils;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 
+import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.PersistanceEvent;
 
@@ -30,7 +31,7 @@ public class ModelInfoManager
 	public function ModelInfoManager() {}
 	
 	static public function init():void {
-		ModelInfoEvent.addListener( ModelInfoEvent.REQUEST, 			request );
+		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST, 			request );
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
@@ -47,7 +48,7 @@ public class ModelInfoManager
 		if ( null == mi )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.MODEL_INFO_EXT, $mie.guid ) );
 		else
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelInfoEvent.ADDED, $mie.guid, mi ) );
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $mie.guid, mi ) );
 	}
 	
 	static private function add( $guid:String, $mi:ModelInfo ):void { 
@@ -60,8 +61,8 @@ public class ModelInfoManager
 			//Log.out( "ModelInfoManager.modelInfoAdd vmm: " + $vmm.toString(), Log.WARN );
 			_modelInfo[$guid] = $mi; 
 			
-			var result:Boolean = ModelInfoEvent.hasEventListener( ModelInfoEvent.ADDED );
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelInfoEvent.ADDED, $guid, $mi ) );
+			var result:Boolean = ModelInfoEvent.hasEventListener( ModelBaseEvent.ADDED );
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $guid, $mi ) );
 		}
 	}
 	
@@ -89,7 +90,7 @@ public class ModelInfoManager
 				add( $pe.guid, mi );
 		}
 		else {
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelInfoEvent.FAILED, null, null ) );
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, null, null ) );
 		}
 	}
 	
@@ -103,7 +104,7 @@ public class ModelInfoManager
 		if ( Globals.MODEL_INFO_EXT != $pe.table )
 			return;
 		Log.out( "ModelInfoManager.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelInfoEvent.FAILED, $pe.guid, null ) );
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.guid, null ) );
 	}
 }
 }

@@ -7,6 +7,7 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.events.ModelDataEvent;
 	import com.voxelengine.events.ModelMetadataEvent;
 	import flash.display3D.Context3D;
@@ -62,7 +63,7 @@ package com.voxelengine.worldmodel.models
 	public class VoxelModel
 	{
 		private var 	_metadata:VoxelModelMetadata;
-		private var 	_data:VoxelModelData;
+		private var 	_data:ModelData;
 		protected var 	_modelInfo:ModelInfo 			= null; // INSTANCE NOT EXPORTED
 		protected var 	_instanceInfo:InstanceInfo 		= null; // INSTANCE NOT EXPORTED
 		private var 	_oxel:Oxel 						= null; // INSTANCE NOT EXPORTED
@@ -95,8 +96,8 @@ package com.voxelengine.worldmodel.models
 		protected var 	_turnRate:Number 				= 20; // 2.5 for ship
 		protected var 	_accelRate:Number 				= 2.5;
 		
-		public function get data():VoxelModelData    				{ return _data; }
-		public function set data(val:VoxelModelData):void   		{ _data = val; }
+		public function get data():ModelData    				{ return _data; }
+		public function set data(val:ModelData):void   		{ _data = val; }
 		public function get metadata():VoxelModelMetadata    		{ return _metadata; }
 		public function set metadata(val:VoxelModelMetadata):void   { _metadata = val; }
 		public function get dead():Boolean 							{ return _dead; }
@@ -1008,8 +1009,8 @@ package com.voxelengine.worldmodel.models
 			data.ba = toByteArray();
 				
 			_changed = false;
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.SAVE, metadata.guid, metadata ) );
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.SAVE, metadata.guid, data ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.SAVE, metadata.guid, metadata ) );
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.SAVE, metadata.guid, data ) );
 			
 		}
 		

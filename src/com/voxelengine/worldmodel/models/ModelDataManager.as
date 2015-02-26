@@ -46,7 +46,7 @@ public class ModelDataManager
 			return;
 		}
 		Log.out( "ModelDataManager.request guid: " + $mie.guid, Log.INFO );
-		var mi:VoxelModelData = _modelData[$mie.guid]; 
+		var mi:ModelData = _modelData[$mie.guid]; 
 		if ( null == mi ) {
 			if ( true == Globals.online )
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.DB_TABLE_MODELS_DATA, $mie.guid ) );
@@ -57,7 +57,7 @@ public class ModelDataManager
 			ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.ADDED, $mie.guid, mi ) );
 	}
 	
-	static private function modelDataAdd( $guid:String, $mi:VoxelModelData ):void 
+	static private function modelDataAdd( $guid:String, $mi:ModelData ):void 
 	{ 
 		if ( null == $mi || null == $guid ) {
 			Log.out( "ModelDataManager.modelDataAdd trying to add NULL modelData or guid", Log.WARN );
@@ -76,12 +76,12 @@ public class ModelDataManager
 			return;
 		if ( $pe.data ) {
 			Log.out( "ModelDataManager.loadSucceed guid: " + $pe.guid, Log.INFO );
-			var vmd:VoxelModelData = new VoxelModelData( $pe.guid, null, $pe.data );
+			var vmd:ModelData = new ModelData( $pe.guid, null, $pe.data );
 			modelDataAdd( $pe.guid, vmd );
 		}
 		else {
 			Log.out( "ModelDataManager.loadSucceed ERROR NO DBO " + $pe.toString(), Log.ERROR );
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.FAILED, null, null ) );
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.REQUEST_FAILED, null, null ) );
 		}
 	}
 	
@@ -90,7 +90,7 @@ public class ModelDataManager
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
 		Log.out( "ModelDataManager.loadFailed " + $pe.toString(), Log.ERROR );
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.FAILED, null, null ) );
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.REQUEST_FAILED, null, null ) );
 	}
 	
 	static private function loadNotFound( $pe:PersistanceEvent):void 
@@ -98,7 +98,7 @@ public class ModelDataManager
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
 		Log.out( "ModelDataManager.loadNotFound " + $pe.toString(), Log.ERROR );
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.FAILED, null, null ) );
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.REQUEST_FAILED, null, null ) );
 	}
 	
 }

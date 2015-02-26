@@ -11,12 +11,12 @@ import flash.events.Event;
 import flash.utils.ByteArray;
 import flash.events.EventDispatcher;
 
-import com.voxelengine.worldmodel.models.VoxelModelData;
+import com.voxelengine.worldmodel.models.ModelData;
 /**
  * ...
  * @author Robert Flesch - RSF 
  */
-public class ModelDataEvent extends Event
+public class ModelDataEvent extends ModelBaseEvent
 {
 	//// tells us the manager has add this from persistance
 	static public const ADDED:String						= "ADDED";
@@ -27,14 +27,15 @@ public class ModelDataEvent extends Event
 	
 	//// tells the manager to load this model
 	static public const REQUEST:String						= "REQUEST";
-		
-	static public const FAILED:String						= "FAILED";
-	static public const SAVE:String							= "SAVE";
+	static public const REQUEST_FAILED:String				= "REQUEST_FAILED";
 	
-	private var _vmd:VoxelModelData;
+	static public const SAVE:String							= "SAVE";
+	static public const SAVE_FAILED:String					= "SAVE_FAILED";
+	
+	private var _vmd:ModelData;
 	private var _guid:String;
 
-	public function ModelDataEvent( $type:String, $guid:String, $vmd:VoxelModelData, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelDataEvent( $type:String, $guid:String, $vmd:ModelData, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
 		_vmd = $vmd;
@@ -51,7 +52,7 @@ public class ModelDataEvent extends Event
 		return formatToString("ModelDataEvent", "bubbles", "cancelable") +  " guid: " + _guid;
 	}
 	
-	public function get vmd():VoxelModelData 
+	public function get vmd():ModelData 
 	{
 		return _vmd;
 	}

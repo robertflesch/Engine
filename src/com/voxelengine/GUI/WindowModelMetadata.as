@@ -8,6 +8,7 @@
 
 package com.voxelengine.GUI 
 {
+import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.MetadataManager;
@@ -134,7 +135,7 @@ public class WindowModelMetadata extends VVPopup
 		_vmm.copyCount = parseInt( _copies.label, 10 );
 		_vmm.createdDate = new Date();
 		_vmm.modifiedDate = new Date();
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.SAVE, _vmm.guid, _vmm ) );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.SAVE, _vmm.guid, _vmm ) );
 		remove();
 	}
 }

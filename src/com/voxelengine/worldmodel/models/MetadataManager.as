@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.ModelBaseEvent;
 import flash.utils.ByteArray;
 import flash.utils.Dictionary;
 
@@ -35,8 +36,8 @@ public class MetadataManager
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.LOAD, regionLoad ); 
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.JOIN, requestServerJoin ); 
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.CHANGED, regionChanged );	
-		ModelMetadataEvent.addListener( ModelMetadataEvent.TYPE_REQUEST, modelMetadataTypeRequest );
-		ModelMetadataEvent.addListener( ModelMetadataEvent.REQUEST, modelMetadataRequest );
+		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, modelMetadataTypeRequest );
+		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, modelMetadataRequest );
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFailed );
@@ -54,7 +55,7 @@ public class MetadataManager
 		if ( null == vmm )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.DB_TABLE_MODELS, $mme.guid ) );
 		else
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.ADDED, vmm.guid, vmm ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, vmm.guid, vmm ) );
 	}
 	
 	// This loads the first 100 objects from the users inventory OR the public inventory
@@ -77,7 +78,7 @@ public class MetadataManager
 		// This will return models already loaded.
 		for each ( var vmm:VoxelModelMetadata in _metadata ) {
 			if ( vmm.owner == $mme.guid )
-				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.ADDED, vmm.guid, vmm ) );
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, vmm.guid, vmm ) );
 		}
 	}
 	
@@ -91,7 +92,7 @@ public class MetadataManager
 		if ( null ==  _metadata[$vmm.guid] ) {
 			//Log.out( "MetadataManager.metadataAdd vmm: " + $vmm.toString(), Log.WARN );
 			_metadata[$vmm.guid] = $vmm; 
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.ADDED, $vmm.guid, $vmm ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, $vmm.guid, $vmm ) );
 		}
 	}
 	
@@ -107,7 +108,7 @@ public class MetadataManager
 		}
 		else {
 			Log.out( "MetadataManager.loadSucceed FAILED no DBO PersistanceEvent: " + $pe.toString(), Log.WARN );
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.FAILED, $pe.guid, null ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.guid, null ) );
 		}
 	}
 	
@@ -116,7 +117,7 @@ public class MetadataManager
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
 		Log.out( "MetadataManager.metadataLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.FAILED, $pe.guid, null ) );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.guid, null ) );
 	}
 
 	static private function loadNotFound( $pe:PersistanceEvent):void 
@@ -124,7 +125,7 @@ public class MetadataManager
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
 		Log.out( "MetadataManager.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.FAILED, $pe.guid, null ) );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.guid, null ) );
 	}
 	
 }

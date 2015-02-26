@@ -7,32 +7,18 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.events
 {
-import com.voxelengine.worldmodel.models.VoxelModelData;
 import flash.events.Event;
 import flash.utils.ByteArray;
-import com.voxelengine.worldmodel.models.ModelInfo;
 import flash.events.EventDispatcher;
+
+import com.voxelengine.worldmodel.models.ModelInfo;
 
 /**
  * ...
  * @author Robert Flesch - RSF 
  */
-public class ModelInfoEvent extends Event
+public class ModelInfoEvent extends ModelBaseEvent
 {
-	//// tells us the manager has add this from persistance
-	static public const ADDED:String						= "ADDED";
-	//
-	//// tells the manager to load this type of model
-	static public const TYPE_REQUEST:String					= "TYPE_REQUEST";
-	//// the response to this is the added message
-	
-	//// tells the manager to load this model
-	static public const REQUEST:String						= "REQUEST";
-		
-	static public const FAILED:String						= "FAILED";
-	static public const SAVE:String							= "SAVE";
-	//
-	
 	private var _vmi:ModelInfo;
 	private var _guid:String;
 

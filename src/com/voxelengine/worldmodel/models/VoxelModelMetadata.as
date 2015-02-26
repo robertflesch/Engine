@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.ModelBaseEvent;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.JPEGEncoderOptions;
@@ -102,11 +103,11 @@ public class VoxelModelMetadata
 	}
 	
 	public function VoxelModelMetadata() {
-		ModelMetadataEvent.addListener( ModelMetadataEvent.SAVE, save );
+		ModelMetadataEvent.addListener( ModelBaseEvent.SAVE, save );
 	}
 
 	public function release():void {
-		ModelMetadataEvent.removeListener( ModelMetadataEvent.SAVE, save );
+		ModelMetadataEvent.removeListener( ModelBaseEvent.SAVE, save );
 		
 	}
 	

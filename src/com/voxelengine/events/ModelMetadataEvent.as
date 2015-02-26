@@ -9,46 +9,16 @@ package com.voxelengine.events
 {
 import flash.events.Event;
 import flash.utils.ByteArray;
-import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 import flash.events.EventDispatcher;
+
+import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 
 /**
  * ...
  * @author Robert Flesch - RSF 
  */
-public class ModelMetadataEvent extends Event
+public class ModelMetadataEvent extends ModelBaseEvent
 {
-	//// tells us the manager has add this from persistance
-	static public const ADDED:String						= "ADDED";
-	//
-	//// tells the manager to load this type of model
-	static public const TYPE_REQUEST:String					= "TYPE_REQUEST";
-	//// the response to this is the added message
-	
-	//// tells the manager to load this model
-	static public const REQUEST:String						= "REQUEST";
-		
-	static public const FAILED:String						= "FAILED";
-	static public const SAVE:String							= "SAVE";
-	//
-	
-	//// data or meta data about this region has changed
-	//static public const CHANGED:String					= "CHANGED";
-	//
-	//// dispatched when a region is unloaded
-	//static public const UNLOAD:String					= "UNLOAD";
-	//// tells the region manager to load this region
-	//static public const LOAD:String						= "LOAD";
-	//// dispatched after jobs for all process have been added
-	//static public const LOAD_BEGUN:String				= "LOAD_BEGUN";
-	//// tells the region manager this region had finished loading
-	//static public const LOAD_COMPLETE:String				= "LOAD_COMPLETE";
-	//
-	//
-	//// Used by the sandbox list and config manager to request a join of a server region
-	//static public const JOIN:String						= "JOIN";
-	
-//		private var _dbo:DatabaseObject;
 	private var _vmm:VoxelModelMetadata;
 	private var _guid:String;
 

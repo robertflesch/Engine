@@ -7,13 +7,14 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.VoxelModelData;
+import com.voxelengine.worldmodel.models.ModelData;
 import com.voxelengine.worldmodel.models.VoxelModelMetadata;
 
 	/**
@@ -29,18 +30,18 @@ public class ModelMaker {
 	static public var _makerCount:int;
 	
 	private var _ii:InstanceInfo;
-	private var _vmd:VoxelModelData;
+	private var _vmd:ModelData;
 	private var _vmm:VoxelModelMetadata;
 	
 	public function ModelMaker( $ii:InstanceInfo ) {
 		_ii = $ii;
 		Log.out( "ModelMaker - ii: " + _ii.toString() );
-		ModelMetadataEvent.addListener( ModelMetadataEvent.ADDED, retriveMetadata );		
-		ModelMetadataEvent.addListener( ModelMetadataEvent.FAILED, failedMetadata );		
-		ModelDataEvent.addListener( ModelDataEvent.ADDED, retriveData );		
-		ModelDataEvent.addListener( ModelDataEvent.FAILED, failedData );		
+		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retriveMetadata );		
+		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
+		ModelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
+		ModelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.REQUEST, _ii.guid, null ) );		
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
 		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.REQUEST, _ii.guid, null ) );		
 
 		_makerCount++;
@@ -59,7 +60,7 @@ public class ModelMaker {
 	private function retriveMetadata(e:ModelMetadataEvent):void 
 	{
 		if ( _ii.guid == e.guid ) {
-			ModelMetadataEvent.removeListener( ModelMetadataEvent.ADDED, retriveMetadata );
+			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retriveMetadata );
 			_vmm = e.vmm;
 			attemptMake();
 		}
@@ -68,7 +69,7 @@ public class ModelMaker {
 	private function retriveData(e:ModelDataEvent):void 
 	{
 		if ( _ii.guid == e.guid ) {
-			ModelDataEvent.removeListener( ModelDataEvent.ADDED, retriveData );		
+			ModelDataEvent.removeListener( ModelBaseEvent.ADDED, retriveData );		
 			_vmd = e.vmd;
 			attemptMake();
 		}
@@ -84,10 +85,10 @@ public class ModelMaker {
 	}
 	
 	private function markComplete():void {
-		ModelMetadataEvent.removeListener( ModelMetadataEvent.ADDED, retriveMetadata );		
-		ModelMetadataEvent.removeListener( ModelMetadataEvent.FAILED, failedMetadata );		
-		ModelDataEvent.removeListener( ModelDataEvent.ADDED, retriveData );		
-		ModelDataEvent.removeListener( ModelDataEvent.FAILED, failedData );		
+		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retriveMetadata );		
+		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
+		ModelDataEvent.removeListener( ModelBaseEvent.ADDED, retriveData );		
+		ModelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 		_makerCount--;
 		if ( 0 == _makerCount )
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
