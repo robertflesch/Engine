@@ -2,7 +2,6 @@
 package com.voxelengine.GUI.layerDataComponents
 {
 
-	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import org.flashapi.swing.*;

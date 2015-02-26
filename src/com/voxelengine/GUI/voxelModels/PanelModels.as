@@ -20,7 +20,6 @@ import org.flashapi.swing.dnd.DnDOperation;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.InventoryModelEvent;
-import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.UIRegionModelEvent;
 import com.voxelengine.GUI.*;
 import com.voxelengine.GUI.inventory.WindowInventoryNew;

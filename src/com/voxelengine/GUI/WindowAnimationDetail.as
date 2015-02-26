@@ -55,7 +55,6 @@ package com.voxelengine.GUI
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.events.LoadingEvent;
-	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;

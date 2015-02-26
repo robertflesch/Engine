@@ -20,7 +20,6 @@ package com.voxelengine.worldmodel.animation
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.utils.CustomURLLoader;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 

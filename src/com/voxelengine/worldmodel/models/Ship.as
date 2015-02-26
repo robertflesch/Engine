@@ -13,7 +13,6 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.worldmodel.models.CollisionPoint;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.SoundBank;
-	import com.voxelengine.events.ModelEvent;
 	import flash.display3D.Context3D;
 	import flash.geom.Vector3D;
 	
