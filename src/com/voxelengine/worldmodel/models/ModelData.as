@@ -14,13 +14,13 @@ import playerio.DatabaseObject;
  * @author Robert Flesch - RSF
  * The world model holds the active oxels
  */
-public class VoxelModelData
+public class ModelData
 {
 	private var _guid:String			= "";
 	private var _dbo:DatabaseObject;
 	private var _ba:ByteArray;
 	
-	public function VoxelModelData( $guid:String, $dbo:DatabaseObject, $ba:ByteArray = null ) {
+	public function ModelData( $guid:String, $dbo:DatabaseObject, $ba:ByteArray = null ) {
 		_guid = $guid;
 		_dbo = $dbo;
 		_ba = $ba;
