@@ -22,7 +22,7 @@ package com.voxelengine.worldmodel.scripts
 	{
 		public function AutoControlObjectScript() 
 		{
-			Globals.g_app.addEventListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent, false, 0, true );
+			ModelEvent.addListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent, false, 0, true );
 		}
 		
 		public function onModelEvent( $event:ModelEvent ):void 
@@ -31,7 +31,7 @@ package com.voxelengine.worldmodel.scripts
 			{
 				if ( $event.instanceGuid == instanceGuid )
 				{
-					Globals.g_app.removeEventListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent );
+					ModelEvent.removeListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent );
 					if ( Globals.player ) {
 						var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
 						vm.takeControl( Globals.player );

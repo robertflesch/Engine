@@ -166,9 +166,9 @@ package com.voxelengine.worldmodel
 			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, 	onLoadingComplete );
 			LoadingEvent.removeListener( LoadingEvent.MODEL_LOAD_FAILURE,removeFailedObjectFromRegion );									  
 			// Removes anonymous function
-			Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
-			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_ADDED,	regionChanged );
-			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_REMOVED,regionChanged );
+			ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
+			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED,	regionChanged );
+			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED,regionChanged );
 			
 //			_modelManager.removeAllModelInstances( true );
 			_modelManager.removeAllModelInstances( false ); // dont delete player object.
@@ -207,13 +207,13 @@ package com.voxelengine.worldmodel
 			RegionEvent.addListener( ModelBaseEvent.SAVE, 		save );	
 			RegionEvent.addListener( RegionEvent.UNLOAD, 		unload );
 			
-			Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED,	regionChanged );
-			Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_REMOVED,regionChanged );
+			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED,	regionChanged );
+			ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED,regionChanged );
 			
 			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_FAILURE,removeFailedObjectFromRegion );									  
 			LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			
-			Globals.g_app.addEventListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
+			ModelEvent.addListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
 			
 			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_BEGUN, guid ) );
 

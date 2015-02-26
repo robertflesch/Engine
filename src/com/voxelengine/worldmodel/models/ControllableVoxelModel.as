@@ -75,7 +75,7 @@ package com.voxelengine.worldmodel.models
 		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
 			super.init( $mi, $vmm );
 			Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent, false, 0, true );
-			Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
+			ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 			Globals.g_app.addEventListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
 			Globals.g_app.addEventListener( GUIEvent.APP_ACTIVATE, onActivate );
 			_ct = new CollisionTest( this );
@@ -88,7 +88,7 @@ package com.voxelengine.worldmodel.models
 				loseControl( Globals.player );
 				
 			Globals.g_app.removeEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent );
-			Globals.g_app.removeEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
+			ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 			Globals.g_app.removeEventListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
 			Globals.g_app.removeEventListener( GUIEvent.APP_ACTIVATE, onActivate );
 		}

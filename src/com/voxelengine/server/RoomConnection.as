@@ -57,7 +57,7 @@ package com.voxelengine.server {
 					Log.out("Player with the userid: " + userid + "just left the room", Log.DEBUG ); } );
 					
 				// Only need this if we are online
-				Globals.g_app.addEventListener( ModelEvent.MOVED, sourceMovementEvent );
+				ModelEvent.addListener( ModelEvent.MOVED, sourceMovementEvent );
 			}
 				
 			Globals.g_app.addEventListener( ProjectileEvent.PROJECTILE_SHOT, sourceProjectileEvent );
@@ -83,7 +83,7 @@ package com.voxelengine.server {
 					Log.out("Player with the userid: " + userid + "just left the room", Log.DEBUG ); } );
 					
 				// Only need this if we are online
-				Globals.g_app.removeEventListener( ModelEvent.MOVED, sourceMovementEvent );
+				ModelEvent.removeListener( ModelEvent.MOVED, sourceMovementEvent );
 			}
 				
 			Globals.g_app.removeEventListener( ProjectileEvent.PROJECTILE_SHOT, sourceProjectileEvent );

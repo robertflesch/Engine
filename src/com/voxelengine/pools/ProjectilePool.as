@@ -43,7 +43,7 @@ public final class ProjectilePool
 		// Preload the modelInfo for the CLASS_NAME
 //		ModelLoader.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
 		// Listen for it being loaded
-		Globals.g_app.addEventListener( ModelEvent.INFO_LOADED, onModelInfoLoaded );
+		ModelEvent.addListener( ModelEvent.INFO_LOADED, onModelInfoLoaded );
 	}
 	
 	private static function onModelInfoLoaded( $event:ModelEvent ):void
@@ -51,7 +51,7 @@ public final class ProjectilePool
 		// if our CLASS_NAME.mjson has loaded, so now we can create all of the instances
 		if ( CLASS_NAME == $event.instanceGuid )
 		{
-			Globals.g_app.removeEventListener( ModelEvent.INFO_LOADED, onTypesLoaded );
+			ModelEvent.removeListener( ModelEvent.INFO_LOADED, onTypesLoaded );
 			var i:uint = _counter; 
 			_pool = new Vector.<Projectile>(_counter);
 			_counter = 0;

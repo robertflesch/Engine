@@ -281,23 +281,23 @@ package com.voxelengine.worldmodel.models
 			if ( vm.instanceInfo.controllingModel )
 			{
 				vm.instanceInfo.controllingModel.childAdd( vm );
-				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.CHILD_MODEL_ADDED, vm.instanceInfo.guid, null, null, vm.instanceInfo.controllingModel.instanceInfo.guid ) );
+				ModelEvent.dispatch( new ModelEvent( ModelEvent.CHILD_MODEL_ADDED, vm.instanceInfo.guid, null, null, vm.instanceInfo.controllingModel.instanceInfo.guid ) );
 			}
 			else if ( vm.instanceInfo.dynamicObject )
 			{
 				_modelDynamicInstances[vm.instanceInfo.guid] = vm;
-				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.DYNAMIC_MODEL_ADDED, vm.instanceInfo.guid ) );
+				ModelEvent.dispatch( new ModelEvent( ModelEvent.DYNAMIC_MODEL_ADDED, vm.instanceInfo.guid ) );
 			}
 			else
 			{
 				if ( vm is Avatar ) {
 					// need to seperate these out into their own catagory
 					_modelInstances[vm.instanceInfo.guid] = vm;
-					Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.guid ) );
+					ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.guid ) );
 				}
 				else {
 					_modelInstances[vm.instanceInfo.guid] = vm;
-					Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.guid ) );
+					ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.guid ) );
 				}
 			}
 		}
@@ -311,7 +311,7 @@ package com.voxelengine.worldmodel.models
 			var vm:VoxelModel = modelInstancesGet(guid);
 			if ( vm )
 			{
-				Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, vm.instanceInfo.guid ) );
+				ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, vm.instanceInfo.guid ) );
 				vm.dead = true;
 			}
 		}

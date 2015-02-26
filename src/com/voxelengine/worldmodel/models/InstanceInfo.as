@@ -73,7 +73,7 @@ public class InstanceInfo extends Location	{
 	public function set critical(val:Boolean):void 				
 	{ 
 		_critical = val; 
-		Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.CRITICAL_MODEL_DETECTED, guid ) );
+		ModelEvent.dispatch( new ModelEvent( ModelEvent.CRITICAL_MODEL_DETECTED, guid ) );
 	}
 	public function 	guidGet():String 						{ return _guid; } // used by debug menu to monitor selected model
 	public function get guid():String 							{ return _guid; }

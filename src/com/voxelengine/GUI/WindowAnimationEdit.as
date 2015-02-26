@@ -276,7 +276,7 @@ public class WindowAnimationEdit extends VVPopup
 			_s_inExistance--;
 			_s_currentInstance = null;
 			
-			Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.MODEL_MODIFIED, _ii.guid ) );
+			ModelEvent.dispatch( new ModelEvent( ModelEvent.MODEL_MODIFIED, _ii.guid ) );
 			RegionManger.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, "" ) );
 		}
 		

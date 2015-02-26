@@ -173,7 +173,7 @@ package com.voxelengine.GUI
 			ii.scripts
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75 - (1<<size)/2 );
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-			Globals.g_app.addEventListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
+			ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
 			var vm:VoxelModel = new VoxelModel( ii );
 //			vm.metadata = new VoxelModelMetadata();
 			Globals.modelAdd( vm );
@@ -182,7 +182,7 @@ package com.voxelengine.GUI
 		
 		private function modelDetailChanged(e:ModelEvent):void 
 		{
-			Globals.g_app.removeEventListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
+			ModelEvent.removeListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
 			// now I want to apply the script to the oxels in the vm.
 			var vm:VoxelModel = Globals.getModelInstance( e.instanceGuid );
 			ModelLoader.load( vm.instanceInfo );

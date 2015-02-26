@@ -60,7 +60,7 @@ package com.voxelengine.GUI.actionBars
 			display( Globals.g_renderer.width - (width + fudgeFactor), 0 );
 	
 			Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
-			Globals.g_app.addEventListener( ModelEvent.DETACH, detachEventHandler );
+			ModelEvent.addListener( ModelEvent.DETACH, detachEventHandler );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 		} 
 		

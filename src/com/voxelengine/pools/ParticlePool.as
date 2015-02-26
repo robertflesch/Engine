@@ -47,7 +47,7 @@ public final class ParticlePool
 		// Preload the modelInfo for the cannonBall
 //ModelLoader.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
 		// Listen for it being loaded
-		Globals.g_app.addEventListener( ModelEvent.INFO_LOADED, onModelInfoLoaded );
+		ModelEvent.addListener( ModelEvent.INFO_LOADED, onModelInfoLoaded );
 	}
 	
 	private static function onModelInfoLoaded( e:ModelEvent ):void
@@ -55,7 +55,7 @@ public final class ParticlePool
 		// so cannonBall.mjson has loaded, so now we can create all of the instances
 		if ( CLASS_NAME == e.instanceGuid )
 		{
-			Globals.g_app.removeEventListener( ModelEvent.INFO_LOADED, onTypesLoaded );
+			ModelEvent.removeListener( ModelEvent.INFO_LOADED, onTypesLoaded );
 			var i:uint = _currentPoolSize; 
 			_pool = new Vector.<Particle>(_currentPoolSize); 
 			_counter = 0;

@@ -26,7 +26,7 @@ package com.voxelengine.GUI.voxelModels
 			createTopLevel();
 			display();
 			
-			Globals.g_app.addEventListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelAdded );
+			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelAdded );
         }
 		
 		private function onParentModelAdded(event:ModelEvent):void {
@@ -41,7 +41,7 @@ package com.voxelengine.GUI.voxelModels
 		{
 			Log.out( "WindowRegionModels.onRemoved", Log.WARN );
 			super.onRemoved(event);
-			Globals.g_app.removeEventListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelAdded );
+			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelAdded );
 			
 			_modelPanel.close();
 		}

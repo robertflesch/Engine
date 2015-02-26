@@ -97,7 +97,7 @@ package com.voxelengine.worldmodel.animation
 			_instanceInfo.controllingModel = $owner;
 			if ( null == _voxelModel )
 			{
-				Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onAttachmentCreated );
+				ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onAttachmentCreated );
 				ModelLoader.load( _instanceInfo );
 			}
 			else
@@ -124,7 +124,7 @@ package com.voxelengine.worldmodel.animation
 				// must be listening for it already.
 //				_voxelModel = Globals.getModelInstance( instanceInfo.guid );
 //				_owner.childAdd( _voxelModel );
-				Globals.g_app.removeEventListener( ModelEvent.CHILD_MODEL_ADDED, onAttachmentCreated );			
+				ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onAttachmentCreated );			
 			}
 				
 		}

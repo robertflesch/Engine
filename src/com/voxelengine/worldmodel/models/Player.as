@@ -90,8 +90,8 @@ public class Player extends Avatar
 	private function addEventHandlers():void {
 		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		
-		Globals.g_app.addEventListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
-		Globals.g_app.addEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
+		ModelEvent.addListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
+		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		
 		LoadingEvent.addListener( LoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
 		LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
@@ -104,8 +104,8 @@ public class Player extends Avatar
 	private function removeEventHandlers():void {
 		LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		
-		Globals.g_app.removeEventListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
-		Globals.g_app.removeEventListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
+		ModelEvent.removeListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
+		ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		
 		LoadingEvent.removeListener( LoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
 		LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
@@ -419,7 +419,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 
 	private function onLoadingComplete( le:LoadingEvent ):void {
-		//Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_LOADED, onLoadingComplete );
+		//ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_LOADED, onLoadingComplete );
 		//LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		//if ( !Globals.g_regionManager.currentRegion.criticalModelDetected )
 		//{
@@ -431,7 +431,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 	
 	private function onCriticalModelLoaded( le:ModelEvent ):void {
-		//Globals.g_app.removeEventListener( ModelEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
+		//ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
 		Log.out( "Player.onCriticalModelLoaded - CRITICAL model" );
 //		MouseKeyboardHandler.addInputListeners();
 		collisionPointsAdd();

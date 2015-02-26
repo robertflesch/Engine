@@ -86,7 +86,7 @@ public class ModelInfoCache
 				var mi:ModelInfo = new ModelInfo();
 				
 				mi.initJSON( $pe.guid, jsonResult );
-				//Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.INFO_LOADED, guid ) );
+				//ModelEvent.dispatch( new ModelEvent( ModelEvent.INFO_LOADED, guid ) );
 				add( $pe.guid, mi );
 		}
 		else {

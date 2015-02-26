@@ -55,14 +55,14 @@ package com.voxelengine.worldmodel.animation
 		
 		public function play( $owner:VoxelModel, $val:Number ):void
 		{
-			Globals.g_app.addEventListener( ModelEvent.MOVED, onModelMoved );
+			ModelEvent.addListener( ModelEvent.MOVED, onModelMoved );
 			_pitch = SoundBank.playSoundWithPitch( $val, _soundFile, _pitch  );
 			_owner = $owner
 		}
 		
 		public function stop():void
 		{
-			Globals.g_app.removeEventListener( ModelEvent.MOVED, onModelMoved );
+			ModelEvent.removeListener( ModelEvent.MOVED, onModelMoved );
 			SoundBank.stopSoundWithPitch( _pitch );
 			_pitch = null;
 			_owner = null;

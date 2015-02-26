@@ -273,7 +273,7 @@ package com.voxelengine.worldmodel.models
 			{
 				if ( metadata.modify )
 				{
-					Globals.g_app.addEventListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
+					ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, handleModelEvents);
 					
 					Globals.g_app.addEventListener(ImpactEvent.EXPLODE, impactEventHandler);
 					Globals.g_app.addEventListener(ImpactEvent.DFIRE, impactEventHandler);
@@ -962,7 +962,7 @@ package com.voxelengine.worldmodel.models
 			
 			if ( metadata.modify )
 			{
-				Globals.g_app.removeEventListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
+				ModelEvent.removeListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
 				
 				Globals.g_app.removeEventListener(ImpactEvent.EXPLODE, impactEventHandler);
 				Globals.g_app.removeEventListener(ImpactEvent.DFIRE, impactEventHandler);
@@ -1549,7 +1549,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 			
 			// Pass in the name of the class that is taking control.
 			var className:String = getQualifiedClassName(this)
-			Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.guid, null, null, className ) );
+			ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.guid, null, null, className ) );
 		}
 		
 		public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void
@@ -1563,7 +1563,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 				childDetach($modelDetaching);
 			camera.index = 0;
 			var className:String = getQualifiedClassName(this)
-			Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.RELEASE_CONTROL, instanceInfo.guid, null, null, className ) );
+			ModelEvent.dispatch( new ModelEvent( ModelEvent.RELEASE_CONTROL, instanceInfo.guid, null, null, className ) );
 		}
 		
 		// these are overriden in subclasses to allow for custom movement

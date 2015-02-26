@@ -128,7 +128,7 @@ package com.voxelengine.GUI.voxelModels
 			_s_inExistance--;
 			_s_currentInstance = null;
 			
-			Globals.g_app.dispatchEvent( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.guid ) );
+			ModelEvent.dispatch( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.guid ) );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, null ) );
 		}
 		
