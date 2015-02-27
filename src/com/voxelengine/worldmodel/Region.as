@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+	import com.voxelengine.events.WindowSplashEvent;
 	import flash.geom.Vector3D;
 	import flash.events.Event;
     import flash.events.TimerEvent;
@@ -67,10 +68,6 @@ package com.voxelengine.worldmodel
 	{
 		static public const DEFAULT_REGION_ID:String = "000000-000000-000000";
 		static private const BLANK_REGION_TEMPLETE:String = "{\"region\":[],\"skyColor\": {\"r\":92,\"g\":172,\"b\":238 },\"gravity\":false }";
-		static private const TABLE_REGIONS:String = "regions";
-
-	
-
 		
 		static public var _s_currentRegion:Region;
 		static public function get currentRegion():Region { return _s_currentRegion; }
@@ -175,14 +172,25 @@ package com.voxelengine.worldmodel
 			if ( guid != $re.guid )
 				return;
 				
+			if ( _s_currentRegion )
+				_s_currentRegion.unload( null );
 			_s_currentRegion = this;
 			
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
 			
 			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_BEGUN, guid ) );
 			var count:int = ModelLoader.loadRegionObjects(_JSON.region);
-			if ( 0 < count )
+			
+
+			if ( 0 == count ) {
+				_loaded = true;
+				LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
+				WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.DESTORY ) );
+			}
+			else {
 				_loaded = false;
+				Globals.g_landscapeTaskController.activeTaskLimit = 1;
+			}
 				
 			if ( !Globals.online && !Globals.player )
 				Globals.createPlayer();
@@ -350,7 +358,7 @@ package com.voxelengine.worldmodel
 			
 			// The null owner check makes it to we dont save local loaded regions to persistance
 			if ( Globals.online && changed && null != owner && false == _lockDB ) {
-				Log.out( "Region.save - Saving region id: " + guid + "  name: " + name + "  and locking", Log.WARN );
+				Log.out( "Region.save - Saving region id: " + guid + "  name: " + name + "  and locking", Log.INFO );
 				addSaveEvents();
 				
 				if ( _dbo )
@@ -360,7 +368,7 @@ package com.voxelengine.worldmodel
 					ba = asByteArray( ba );
 				}
 				//Log.out( "Region.save - PersistanceEvent.dispatch region id: " + guid + "  name: " + name + "  locking status: " + _lockDB, Log.WARN );
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, TABLE_REGIONS, guid, _dbo, metadata(ba) ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, Globals.DB_TABLE_REGIONS, guid, _dbo, metadata(ba) ) );
 				// or could do this in the suceed, but if it fails do I want to keep retrying?
 				changed = false;
 			}
@@ -369,14 +377,14 @@ package com.voxelengine.worldmodel
 		}
 		
 		private function saveSucceed( $pe:PersistanceEvent ):void { 
-			if ( TABLE_REGIONS != $pe.table )
+			if ( Globals.DB_TABLE_REGIONS != $pe.table )
 				return;
 			removeSaveEvents();
 			Log.out( "Region.saveSucceed - created: " + guid, Log.DEBUG ); 
 		}	
 		
 		private function createSucceed( $pe:PersistanceEvent ):void { 
-			if ( TABLE_REGIONS != $pe.table )
+			if ( Globals.DB_TABLE_REGIONS != $pe.table )
 				return;
 			if ( $pe.dbo )
 				dbo = $pe.dbo;
@@ -385,7 +393,7 @@ package com.voxelengine.worldmodel
 		}	
 		
 		private function saveFail( $pe:PersistanceEvent ):void { 
-			if ( TABLE_REGIONS != $pe.table )
+			if ( Globals.DB_TABLE_REGIONS != $pe.table )
 				return;
 			removeSaveEvents();
 			Log.out( "Region.saveFail - ", Log.ERROR ); 

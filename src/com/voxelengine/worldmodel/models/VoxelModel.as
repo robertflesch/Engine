@@ -976,6 +976,8 @@ package com.voxelengine.worldmodel.models
 			
 			if (editCursor)
 				editCursor.release();
+				
+			metadata.release();	
 		}
 		
 		public function removePermanantly():void

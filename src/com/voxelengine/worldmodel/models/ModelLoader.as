@@ -97,10 +97,8 @@ package com.voxelengine.worldmodel.models
 		// Make sense, called from Region
 		static public function loadRegionObjects( objects:Array ):int {
 			Log.out( "ModelLoader.loadRegionObjects - START =============================" );
-			
 			var count:int = 0;
-			for each ( var v:Object in objects )		   
-			{
+			for each ( var v:Object in objects ) {
 				if ( v.model ) {
 					var instance:InstanceInfo = new InstanceInfo();
 					instance.initJSON( v.model );
@@ -108,16 +106,7 @@ package com.voxelengine.worldmodel.models
 					count++;
 				}
 			}
-
-			Log.out( "ModelLoader.loadRegionObjects - END =============================" );
-
-			// why is defaultRegion special?
-			//if ( 0 == count && name != "defaultRegion" ) {
-			if ( 0 == count )
-				LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE ) );
-			else	
-				Globals.g_landscapeTaskController.activeTaskLimit = 1;
-				
+			Log.out( "ModelLoader.loadRegionObjects - END " + "  count: " + count + "=============================" );
 			return count;
 		}
 		

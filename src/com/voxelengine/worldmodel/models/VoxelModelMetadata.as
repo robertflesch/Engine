@@ -172,27 +172,67 @@ public class VoxelModelMetadata
 		return JSON.stringify( this );
 	}
 
-	static public const DB_TABLE_MODELS:String = "voxelModels";
-	static public const DB_TABLE_MODELS_DATA:String = "voxelModelsData";
-	static public const DB_INDEX_MODEL_OWNER:String = "voxelModelOwner";
-	static public const DB_INDEX_OWNER_TEMPLATE:String = "ownerTemplate"
-	
-
 	//////////////////////////////////////////////////////////////////
 	// TO Persistance
 	//////////////////////////////////////////////////////////////////
 	
 	private function save( $vmd:ModelMetadataEvent ):void {
-		Log.out( "VoxelModelMetadata.save - Saving Model Metadata: " + guid, Log.WARN );
-		if ( _dbo )
-			toPersistanceMetadata();
-		else {
-			var obj:Object = toObject();
+		if ( guid != $vmd.guid ) {
+			Log.out( "VoxelModelMetadata.save - Ignoring save meant for other model my guid: " + guid + " target guid: " + $vmd.guid, Log.WARN );
+			return;
 		}
-		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, DB_TABLE_MODELS, guid, _dbo ) );
+		if ( Globals.online ) {
+			Log.out( "VoxelModelMetadata.save - Saving Model Metadata: " + guid + " vmd: " + $vmd.toString(), Log.WARN );
+			addSaveEvents();
+			if ( _dbo )
+				toPersistance();
+			else {
+				var obj:Object = toObject();
+			}
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, Globals.DB_TABLE_MODELS, guid, _dbo, obj ) );
+			//changed = false;
+		}
+		else
+			Log.out( "ModelMetadata.save - Not saving metadata, either offline or NOT changed or locked - guid: " + guid + "  name: " + name, Log.WARN );
 	}
 	
-	public function toPersistanceMetadata():void {
+	private function addSaveEvents():void {
+		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
+		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
+		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, 	saveFail );
+	}
+	
+	private function removeSaveEvents():void {
+		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
+		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
+		PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, 		saveFail );
+	}
+	
+	private function saveSucceed( $pe:PersistanceEvent ):void { 
+		if ( Globals.DB_TABLE_MODELS != $pe.table )
+			return;
+		removeSaveEvents();
+		Log.out( "Region.saveSucceed - created: " + guid, Log.DEBUG ); 
+	}	
+	
+	private function createSucceed( $pe:PersistanceEvent ):void { 
+		if ( Globals.DB_TABLE_MODELS != $pe.table )
+			return;
+		if ( $pe.dbo )
+			_dbo = $pe.dbo;
+		removeSaveEvents();
+		Log.out( "Region.createSuccess - created: " + guid, Log.DEBUG ); 
+	}	
+	
+	private function saveFail( $pe:PersistanceEvent ):void { 
+		if ( Globals.DB_TABLE_MODELS != $pe.table )
+			return;
+		removeSaveEvents();
+		Log.out( "Region.saveFail - ", Log.ERROR ); 
+	}	
+
+	
+	public function toPersistance():void {
 		
 		_dbo.name 			= _name;
 		_dbo.description	= _description;

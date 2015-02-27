@@ -31,8 +31,10 @@ package com.voxelengine.GUI
 		
 		static private function annihilate(e:WindowSplashEvent):void 
 		{
+			Log.out( "windowSplash.annihilate", Log.WARN );
 			if ( WindowSplash.isActive )
 			{
+				Log.out( "windowSplash.annihilate - TERMINATED", Log.WARN );
 				WindowSplash._s_currentInstance.remove();
 				WindowSplash._s_currentInstance = null;
 			}
@@ -46,8 +48,10 @@ package com.voxelengine.GUI
 		
 		static private function destroy(e:WindowSplashEvent):void 
 		{
+			Log.out( "windowSplash.destroy", Log.WARN );
 			if ( WindowSplash.isActive && Globals.online )
 			{
+				Log.out( "windowSplash.destroy - TERMINATED", Log.WARN );
 				WindowSplash._s_currentInstance.remove();
 				WindowSplash._s_currentInstance = null;
 			}
@@ -91,7 +95,6 @@ package com.voxelengine.GUI
 				display( 0, 0 );
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
-			LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize );
 			
 			VoxelVerseGUI.currentInstance.hideGUI()
@@ -102,11 +105,6 @@ package com.voxelengine.GUI
         {
 			_outline.scaleX = Globals.g_renderer.width/791;
 			_outline.scaleY = Globals.g_renderer.height/592;
-		}
-		
-		private function onLoadingComplete( le:LoadingEvent ):void
-		{
-			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		}
 		
 		// Window events
