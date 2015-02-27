@@ -10,6 +10,7 @@ package {
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.events.WindowSplashEvent;
 	import com.voxelengine.worldmodel.inventory.InventoryManager;
+	import com.voxelengine.worldmodel.Region;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
@@ -254,7 +255,7 @@ package {
 					
 
 				if ( Globals.online ) {
-					RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, null ) );
+					RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, Region.currentRegion.guid ) );
 					InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_SAVE_REQUEST, null, null ) );
 				}
 				

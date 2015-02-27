@@ -132,6 +132,10 @@ public class RegionManager
 			Log.out( "RegionManager.loadSucceed - creating new region: " + $pe.guid, Log.DEBUG );
 			var newRegion:Region = new Region( $pe.guid );
 			newRegion.fromPersistance( $pe.dbo );
+			// When I create a new region I have to create a temporary DBO to transfer metadata and data.
+			// otherwise the $pe.data will be false or null. This temporary DBO must be removed before the region is saved.
+			if ( $pe.data && true == $pe.data )
+				newRegion.dbo = null;
 			regionAdd( newRegion );
 		}
 		// Bad thing about this is it ignores all the metadata
@@ -226,7 +230,7 @@ public class RegionManager
 		// check for duplicates
 		var region:Region = regionGet( $pe.guid )
 		if ( region )
-			region.databaseObject = $pe.dbo;
+			region.dbo = $pe.dbo;
 		else	
 			Log.out( "RegionManager.regionCreatedHandler: ERROR region not found for returned guid: " + $pe.guid );
 	}

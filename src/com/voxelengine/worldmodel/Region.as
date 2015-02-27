@@ -76,7 +76,7 @@ package com.voxelengine.worldmodel
 		static public function get currentRegion():Region { return _s_currentRegion; }
 		//public function set currentRegion(val:Region):void { 
 			//_s_currentRegion = val; 
-			//Log.out("RegionManager.currentRegion - set to: " + val.guid, Log.DEBUG ) 
+			//Log.out("Region.currentRegion - set to: " + val.guid, Log.DEBUG ) 
 		//}
 		
 		private var _name:String = "";
@@ -93,14 +93,15 @@ package com.voxelengine.worldmodel
 		private var _changed:Boolean;								// INSTANCE NOT EXPORTED
 		private var _playerPosition:Vector3D = new Vector3D();
 		private var _playerRotation:Vector3D = new Vector3D();
-		private var _loaded:Boolean = true;							// INSTANCE NOT EXPORTED
+		private var _loaded:Boolean = false;							// INSTANCE NOT EXPORTED
 		private var _guestAllow:Boolean = true;
 		private var _modelManager:ModelManager = new ModelManager();
 		private var _skyColor:Vector3D = new Vector3D(92, 	172, 	238);
 		private var _gravity:Boolean = true;
+		private var _lockDB:Boolean = false; // This keeps a second save or create from happening until first one clears.
 
-		public function get databaseObject():DatabaseObject { return _dbo; }
-		public function set databaseObject(val:DatabaseObject):void { _dbo = val; }
+		public function get dbo():DatabaseObject { return _dbo; }
+		public function set dbo(val:DatabaseObject):void { _dbo = val; }
 		
 		
 		public function get worldId():String { return _worldId; }
@@ -136,14 +137,30 @@ package com.voxelengine.worldmodel
 		public function get modelManager():ModelManager  { return _modelManager; }
 		public function get loaded():Boolean { return _loaded; }
 		
-		public function Region( $guid:String ):void 
-		{
+		public function getSkyColor():Vector3D { return _skyColor; }
+		public function setSkyColor( r:int, g:int, b:int ):void { _skyColor.setTo( r, g, b ); }
+		
+		private function editorsListGet():String { return _editors.toString(); }
+		private function adminListGet():String { return _admin.toString(); }
+
+		public function createEmptyRegion():void { initJSON( BLANK_REGION_TEMPLETE ); }
+		
+		public function Region( $guid:String ):void {
 			_guid = $guid;
-			RegionEvent.addListener( RegionEvent.LOAD, 				load );
+			// all regions listen to be loaded and saved, 
+			// but those are the only region messages they listen to.
+			// unless they are loaded
+			RegionEvent.addListener( RegionEvent.LOAD, 		load );
+			RegionEvent.addListener( ModelBaseEvent.SAVE, 	save );	
 		}
 		
-		private function onCriticalModelDetected( me:ModelEvent ):void
-		{
+		// allows me to release the listeners for temporary regions
+		public function release():void {
+			RegionEvent.removeListener( RegionEvent.LOAD, 		load );
+			RegionEvent.removeListener( ModelBaseEvent.SAVE, 	save );	
+		}
+		
+		private function onCriticalModelDetected( me:ModelEvent ):void {
 			_criticalModelDetected = true;
 			Log.out( "Region.criticalModelDetected" );
 		}
@@ -153,70 +170,16 @@ package com.voxelengine.worldmodel
 			_modelManager.update( $elapsed );
 		}
 			
-		private function unload( $re:RegionEvent ):void
-		{
-			if ( guid != $re.guid )
-				return;
-				
-			Log.out( "Region.unload: " + guid, Log.DEBUG );
-			RegionEvent.removeListener( ModelBaseEvent.CHANGED, 		regionChanged );	
-			RegionEvent.removeListener( ModelBaseEvent.SAVE, 			save );	
-			RegionEvent.removeListener( RegionEvent.LOAD, 				load );
-			RegionEvent.removeListener( RegionEvent.UNLOAD, 			unload );
-			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, 	onLoadingComplete );
-			LoadingEvent.removeListener( LoadingEvent.MODEL_LOAD_FAILURE,removeFailedObjectFromRegion );									  
-			// Removes anonymous function
-			ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
-			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED,	regionChanged );
-			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED,regionChanged );
-			
-//			_modelManager.removeAllModelInstances( true );
-			_modelManager.removeAllModelInstances( false ); // dont delete player object.
-			_modelManager.bringOutYourDead();
-		}
-		
-		private function regionChanged( $re:RegionEvent):void 
-		{
-			changed = true;
-		}
-		
-		private function removeFailedObjectFromRegion( $e:LoadingEvent):void {
-			// Do I need to remove this failed load?
-			Log.out( "RegionManager.removeFailedObjectFromRegion - failed to load: " + $e.guid, Log.ERROR );
-			//currentRegion.changedForce = true;
-		}
-	
-		private function onLoadingComplete( le:LoadingEvent ):void
-		{
-			Log.out( "Region.onLoadingComplete: regionId: " + guid, Log.DEBUG );
-			_loaded = true;
-			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, guid ) );
-		}
-
-		
-		private function load( $re:RegionEvent ):void
-		{
+		private function load( $re:RegionEvent ):void {
+			// all regions listen to be loaded, but that is the only region message they listen to.
 			if ( guid != $re.guid )
 				return;
 				
 			_s_currentRegion = this;
 			
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
-			RegionEvent.addListener( ModelBaseEvent.CHANGED, 	regionChanged );	
-			RegionEvent.addListener( ModelBaseEvent.SAVE, 		save );	
-			RegionEvent.addListener( RegionEvent.UNLOAD, 		unload );
-			
-			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED,	regionChanged );
-			ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED,regionChanged );
-			
-			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_FAILURE,removeFailedObjectFromRegion );									  
-			LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
-			
-			ModelEvent.addListener( ModelEvent.CRITICAL_MODEL_DETECTED, onCriticalModelDetected );
 			
 			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_BEGUN, guid ) );
-
 			var count:int = ModelLoader.loadRegionObjects(_JSON.region);
 			if ( 0 < count )
 				_loaded = false;
@@ -227,20 +190,56 @@ package com.voxelengine.worldmodel
 			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name, Log.DEBUG );
 		}		
 
-		public function getSkyColor():Vector3D
-		{
-			return _skyColor;
+		private function addEventListeners():void {
+			RegionEvent.addListener( ModelBaseEvent.CHANGED, 				regionChanged );	
+			RegionEvent.addListener( RegionEvent.UNLOAD, 					unload );
+				
+			LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, 			onLoadingComplete );
+			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_FAILURE,		removeFailedObjectFromRegion );									  
+				
+			ModelEvent.addListener( ModelEvent.CRITICAL_MODEL_DETECTED,		onCriticalModelDetected );
+			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED,			regionChanged );
+			ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED,		regionChanged );
 		}
 		
-		public function setSkyColor( r:int, g:int, b:int ):void
-		{
-			_skyColor.x = r;
-			_skyColor.y = g;
-			_skyColor.z = b;
+		private function unload( $re:RegionEvent ):void {
+			Log.out( "Region.unload: " + guid, Log.DEBUG );
+			removeEventListeners();
+			
+			_modelManager.removeAllModelInstances( false ); // dont delete player object.
+			_modelManager.bringOutYourDead();
 		}
 		
-		public function initJSON( $regionJson:String ):void
-		{
+		private function removeEventListeners():void {
+			RegionEvent.removeListener( ModelBaseEvent.CHANGED, 			regionChanged );	
+			RegionEvent.removeListener( RegionEvent.UNLOAD, 				unload );
+			
+			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, 		onLoadingComplete );
+			LoadingEvent.removeListener( LoadingEvent.MODEL_LOAD_FAILURE,	removeFailedObjectFromRegion );									  
+			
+			ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_DETECTED, 	onCriticalModelDetected );
+			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED,		regionChanged );
+			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED,		regionChanged );
+		}
+		
+		// Since either a ModelEvent OR a RegionEvent can call this function
+		// Use the generic Event
+		private function regionChanged( $re:Event):void  { changed = true;}
+		
+		private function removeFailedObjectFromRegion( $e:LoadingEvent):void {
+			// Do I need to remove this failed load?
+			Log.out( "Region.removeFailedObjectFromRegion - failed to load: " + $e.guid, Log.ERROR );
+			//currentRegion.changedForce = true;
+		}
+	
+		private function onLoadingComplete( le:LoadingEvent ):void {
+			Log.out( "Region.onLoadingComplete: regionId: " + guid, Log.DEBUG );
+			_loaded = true;
+			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, guid ) );
+		}
+		
+		public function initJSON( $regionJson:String ):void {
 			//Log.out( "Region.processRegionJson: " + $regionJson );
 			_JSON = JSON.parse($regionJson);
 			if ( _JSON.skyColor ) {
@@ -289,8 +288,7 @@ package com.voxelengine.worldmodel
 			return outString;
 		}
 		
-		public function getJSON():String
-		{
+		public function getJSON():String {
 			var outString:String = "{\"region\":[";
 			outString = _modelManager.getModelJson(outString);
 			outString += "],"
@@ -306,8 +304,7 @@ package com.voxelengine.worldmodel
 			return outString;
 		}
 
-		static public function resetPosition():void
-		{
+		static public function resetPosition():void {
 			if ( Globals.controlledModel )
 			{
 				Globals.controlledModel.instanceInfo.positionSet = currentRegion.playerPosition;
@@ -337,53 +334,57 @@ package com.voxelengine.worldmodel
 			$avatar.usesGravity = gravity;
 		}
 		
-		
-		public function createEmptyRegion():void { initJSON( BLANK_REGION_TEMPLETE ); }
-		
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		// toPersistance
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		private function save( $re:RegionEvent ):void {
 			
+			if ( guid != $re.guid ) {
+				//Log.out( "Region.save - Ignoring save meant for other region my guid: " + guid + " target guid: " + $re.guid, Log.WARN );
+				return;
+			}
+			
 			// Models might have changes not seen in the region file
 			_modelManager.save();
 			
-			if ( Globals.online && changed ) {
-				Log.out( "Region.save - Saving region id: " + guid, Log.WARN );
+			// The null owner check makes it to we dont save local loaded regions to persistance
+			if ( Globals.online && changed && null != owner && false == _lockDB ) {
+				Log.out( "Region.save - Saving region id: " + guid + "  name: " + name + "  and locking", Log.WARN );
+				addSaveEvents();
+				
 				if ( _dbo )
 					toPersistance();
 				else {
 					var ba:ByteArray = new ByteArray();	
 					ba = asByteArray( ba );
 				}
-				addSaveEvents();
+				//Log.out( "Region.save - PersistanceEvent.dispatch region id: " + guid + "  name: " + name + "  locking status: " + _lockDB, Log.WARN );
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, TABLE_REGIONS, guid, _dbo, metadata(ba) ) );
+				// or could do this in the suceed, but if it fails do I want to keep retrying?
+				changed = false;
 			}
 			else
-				Log.out( "Region.save - Saving Region, either offline or NOT changed - guid: " + guid, Log.DEBUG );
+				Log.out( "Region.save - Saving Region, either offline or NOT changed or locked - guid: " + guid + "  name: " + name + "  locked: " + _lockDB, Log.DEBUG );
 		}
 		
-		private function saveSucceed( $pe:PersistanceEvent ):void 
-		{ 
+		private function saveSucceed( $pe:PersistanceEvent ):void { 
 			if ( TABLE_REGIONS != $pe.table )
 				return;
 			removeSaveEvents();
 			Log.out( "Region.saveSucceed - created: " + guid, Log.DEBUG ); 
 		}	
 		
-		private function createSucceed( $pe:PersistanceEvent ):void 
-		{ 
+		private function createSucceed( $pe:PersistanceEvent ):void { 
 			if ( TABLE_REGIONS != $pe.table )
 				return;
-			removeSaveEvents();
 			if ( $pe.dbo )
-				databaseObject = $pe.dbo;
+				dbo = $pe.dbo;
+			removeSaveEvents();
 			Log.out( "Region.createSuccess - created: " + guid, Log.DEBUG ); 
 		}	
 		
-		private function saveFail( $pe:PersistanceEvent ):void 
-		{ 
+		private function saveFail( $pe:PersistanceEvent ):void { 
 			if ( TABLE_REGIONS != $pe.table )
 				return;
 			removeSaveEvents();
@@ -392,6 +393,7 @@ package com.voxelengine.worldmodel
 		
 		
 		private function addSaveEvents():void {
+			_lockDB = true;
 			PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
 			PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
 			PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, 	saveFail );
@@ -401,11 +403,11 @@ package com.voxelengine.worldmodel
 			PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
 			PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
 			PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, 		saveFail );
+			_lockDB = false;
 		}
 	
 		
-		public function toPersistance():void 
-		{
+		public function toPersistance():void {
 			_dbo.admin = adminListGet();
 			_dbo.description = desc;
 			_dbo.name = name;
@@ -435,10 +437,11 @@ package com.voxelengine.worldmodel
 		}
 		
 		private function metadata( ba: ByteArray ):Object {
-			Log.out( "Region.metadata userId: " + Network.userId + "  this region is owned by: " + _owner, Log.DEBUG );
+			Log.out( "Region.metadata userId: " + Network.userId + "  name: " + name + "  this region is owned by: " + _owner, Log.DEBUG );
 			return {
 					admin: 			adminListGet(),
-					created: 		_created ? _created : new Date(),
+					created: 		_created ? _created : _created = new Date(),
+					modified: 		_modified = new Date(),
 					data: 			ba,
 					description: 	_desc,
 					editors: 		editorsListGet(),
@@ -448,17 +451,13 @@ package com.voxelengine.worldmodel
 					};
 		}
 		
-		private function editorsListGet():String { return _editors.toString(); }
-		private function adminListGet():String { return _admin.toString(); }
-
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		// fromPersistance
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		public function fromPersistance( $dbo:DatabaseObject ):void 
-		{
+		public function fromPersistance( $dbo:DatabaseObject ):void {
 			admin = cvsToVector( $dbo.admin );
-			databaseObject = $dbo;
+			dbo = $dbo;
 			desc = $dbo.description;
 			name = $dbo.name;
 			owner = $dbo.owner
@@ -467,15 +466,17 @@ package com.voxelengine.worldmodel
 			created = $dbo.created;
 			modified = $dbo.modified;
 			
-			Log.out( "Region.loadSucceed - region Name: " + name + "  owner: " + owner + "  guid: " + guid, Log.DEBUG );
+			Log.out( "Region.fromPersistance - region Name: " + name + "  owner: " + owner + "  guid: " + guid, Log.DEBUG );
 			
 			if ( $dbo && $dbo.data ) {
 				var ba:ByteArray = $dbo.data 
+				ba.position = 0;
 				if ( ba && 0 < ba.bytesAvailable ) {
 					ba.uncompress();
 					fromByteArray( ba );
 				}
 			}
+			changed = true;
 			// comma seperated variables
 			function cvsToVector( value:String ):Vector.<String> {
 				var v:Vector.<String> = new Vector.<String>;

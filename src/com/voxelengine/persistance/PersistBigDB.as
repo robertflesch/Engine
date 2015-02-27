@@ -53,7 +53,7 @@ public class PersistBigDB
 				return;
 			}
 			
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.table, $dbo.key, $dbo ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.table, $dbo.key, $dbo, false ) );
 		}
 		
 		function loadFail( $pioe:PlayerIOError ):void {
@@ -97,7 +97,7 @@ public class PersistBigDB
 			Log.out( "PersistRegion.loadType.succeed - regions loaded: " + dba.length, Log.DEBUG );
 			for each ( var $dbo:DatabaseObject in dba )
 			{
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.table, $dbo.key, $dbo ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.table, $dbo.key, $dbo, false ) );
 			}
 		}
 		
@@ -130,12 +130,8 @@ public class PersistBigDB
 			$pe.dbo.modified = new Date();
 			
 			Persistance.saveObject( $pe.dbo
-			                      , function ():void  {  
-										Log.out( "PersistBigDB.save - Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
-										PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_SUCCEED, $pe.table, $pe.guid ) ); }
-								  , function (e:PlayerIOError):void { 
-										Log.out( "PersistBigDB.save - Failed - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: " + e, Log.ERROR, e ) 
-										PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_FAILED, $pe.table, $pe.guid ) ); } );
+			                      , saveSucceed
+								  , saveFailure );
 		}
 		else
 		{
@@ -145,17 +141,33 @@ public class PersistBigDB
 			Persistance.createObject( $pe.table
 									, $pe.guid
 									, metadata
-									, function ($dbo:DatabaseObject):void  {  
-										Log.out( "PersistBigDB.save - CREATE Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
-										PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.CREATE_SUCCEED, $pe.table, $pe.guid, $dbo ) ); }
-									, function (e:PlayerIOError):void { 
-										PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.CREATE_FAILED, $pe.table, $pe.guid ) ); 
-										Log.out( "PersistBigDB.save - CREATE FAILED error saving table: " + $pe.table + "  guid:" + $pe.guid + " error data: " + e, Log.ERROR, e);  }
+									, createSucceed
+									, createFail
 									);
 		}
 		
 		PlayerIOPersistanceEvent.removeListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT, errorNoClient );
 		PlayerIOPersistanceEvent.removeListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
+		
+		function createSucceed($dbo:DatabaseObject):void  {  
+			Log.out( "PersistBigDB.save - CREATE Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.CREATE_SUCCEED, $pe.table, $pe.guid, $dbo ) ); 
+		}
+		
+		function createFail(e:PlayerIOError):void { 
+			Log.out( "PersistBigDB.save - CREATE FAILED error saving table: " + $pe.table + "  guid:" + $pe.guid + " error data: " + e, Log.ERROR, e);  
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.CREATE_FAILED, $pe.table, $pe.guid ) ); 
+		}
+
+		function saveSucceed():void  {  
+			Log.out( "PersistBigDB.save - Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_SUCCEED, $pe.table, $pe.guid ) ); 
+		}
+		
+		function saveFailure(e:PlayerIOError):void { 
+			Log.out( "PersistBigDB.save - Failed - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: " + e, Log.ERROR, e ) 
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_FAILED, $pe.table, $pe.guid ) ); 
+		}
 		
 		function errorNoClient($piope:PlayerIOPersistanceEvent):void {
 			Log.out( "PersistBigDB.load.errorNoClient - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: NOT CONNECTED TO THE INTERNET", Log.ERROR ) 
