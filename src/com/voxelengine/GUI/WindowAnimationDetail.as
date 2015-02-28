@@ -61,7 +61,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.Player;
 	import com.voxelengine.worldmodel.models.VoxelModel;
-	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
+	import com.voxelengine.worldmodel.models.ModelMetadata;
 	
 	public class WindowAnimationDetail extends VVPopup
 	{

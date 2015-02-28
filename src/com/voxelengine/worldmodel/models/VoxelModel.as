@@ -62,7 +62,7 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class VoxelModel
 	{
-		private var 	_metadata:VoxelModelMetadata;
+		private var 	_metadata:ModelMetadata;
 		private var 	_data:ModelData;
 		protected var 	_modelInfo:ModelInfo 			= null; // INSTANCE NOT EXPORTED
 		protected var 	_instanceInfo:InstanceInfo 		= null; // INSTANCE NOT EXPORTED
@@ -96,10 +96,10 @@ package com.voxelengine.worldmodel.models
 		protected var 	_turnRate:Number 				= 20; // 2.5 for ship
 		protected var 	_accelRate:Number 				= 2.5;
 		
-		public function get data():ModelData    				{ return _data; }
-		public function set data(val:ModelData):void   		{ _data = val; }
-		public function get metadata():VoxelModelMetadata    		{ return _metadata; }
-		public function set metadata(val:VoxelModelMetadata):void   { _metadata = val; }
+		public function get data():ModelData    					{ return _data; }
+		public function set data(val:ModelData):void   				{ _data = val; }
+		public function get metadata():ModelMetadata    		{ return _metadata; }
+		public function set metadata(val:ModelMetadata):void   { _metadata = val; }
 		public function get dead():Boolean 							{ return _dead; }
 		public function set dead(val:Boolean):void 					{ 
 			_dead = val; 
@@ -253,15 +253,16 @@ package com.voxelengine.worldmodel.models
 			_instanceInfo = $ii;
 		}
 		
-		public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true):void {
+		public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true):void {
 			_modelInfo = $mi;
 			_metadata = $vmm;
+			//_data = new ModelData()
 			
 			if ($initializeRoot)
 				initialize_root_oxel(0 < instanceInfo.grainSize ? instanceInfo.grainSize : modelInfo.grainSize);
 			
 			if ( null == _metadata )
-				metadata = new VoxelModelMetadata();
+				metadata = new ModelMetadata( instanceInfo.guid );
 			else 
 				metadata = $vmm;
 			
@@ -275,10 +276,10 @@ package com.voxelengine.worldmodel.models
 				{
 					ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, handleModelEvents);
 					
-					Globals.g_app.addEventListener(ImpactEvent.EXPLODE, impactEventHandler);
-					Globals.g_app.addEventListener(ImpactEvent.DFIRE, impactEventHandler);
-					Globals.g_app.addEventListener(ImpactEvent.DICE, impactEventHandler);
-					Globals.g_app.addEventListener(ImpactEvent.ACID, impactEventHandler);
+					ImpactEvent.addListener(ImpactEvent.EXPLODE, impactEventHandler);
+					ImpactEvent.addListener(ImpactEvent.DFIRE, impactEventHandler);
+					ImpactEvent.addListener(ImpactEvent.DICE, impactEventHandler);
+					ImpactEvent.addListener(ImpactEvent.ACID, impactEventHandler);
 				}
 //				trace( "VoxelModel - added ImpactEvent.EXPLODE for " + _modelInfo.modelClass );
 			}
@@ -964,10 +965,10 @@ package com.voxelengine.worldmodel.models
 			{
 				ModelEvent.removeListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
 				
-				Globals.g_app.removeEventListener(ImpactEvent.EXPLODE, impactEventHandler);
-				Globals.g_app.removeEventListener(ImpactEvent.DFIRE, impactEventHandler);
-				Globals.g_app.removeEventListener(ImpactEvent.DICE, impactEventHandler);
-				Globals.g_app.removeEventListener(ImpactEvent.ACID, impactEventHandler);
+				ImpactEvent.removeListener( ImpactEvent.EXPLODE, impactEventHandler);
+				ImpactEvent.removeListener( ImpactEvent.DFIRE, impactEventHandler);
+				ImpactEvent.removeListener( ImpactEvent.DICE, impactEventHandler);
+				ImpactEvent.removeListener( ImpactEvent.ACID, impactEventHandler);
 			}
 			
 			
@@ -997,10 +998,14 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		// Force save is used ONLY when creating instances from templates.
-		public function save( forceSave:Boolean = false ):void
+		public function save():void
 		{
-			if ( !changed && !forceSave ) {
-				//Log.out( "VoxelModel.save - NOT SAVING: " + metadata.name );
+			if ( !changed ) {
+				Log.out( "VoxelModel.save - NOT changed, NOT SAVING: " + metadata.name );
+				return;
+			}
+			if ( !Globals.online ) {
+				Log.out( "VoxelModel.save - NOT online, NOT SAVING: " + metadata.name );
 				return;
 			}
 				
@@ -1008,12 +1013,9 @@ package com.voxelengine.worldmodel.models
 			if ( "" != metadata.templateGuid )
 				metadata.templateGuid = "";
 					
-			data.ba = toByteArray();
-				
 			_changed = false;
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.SAVE, metadata.guid, metadata ) );
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.SAVE, metadata.guid, data ) );
-			
+			metadata.save();
+			data.save();
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1074,7 +1076,7 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		
-		public function loadOxelFromByteArray($ba:ByteArray):void
+		public function fromByteArray($ba:ByteArray):void
 		{
 			// Read off 1 bytes, the root size
 			var rootGrainSize:int = $ba.readByte();

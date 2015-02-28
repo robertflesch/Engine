@@ -11,7 +11,7 @@ import flash.events.Event;
 import flash.utils.ByteArray;
 import flash.events.EventDispatcher;
 
-import com.voxelengine.worldmodel.models.VoxelModelMetadata;
+import com.voxelengine.worldmodel.models.ModelMetadata;
 
 /**
  * ...
@@ -19,10 +19,10 @@ import com.voxelengine.worldmodel.models.VoxelModelMetadata;
  */
 public class ModelMetadataEvent extends ModelBaseEvent
 {
-	private var _vmm:VoxelModelMetadata;
+	private var _vmm:ModelMetadata;
 	private var _guid:String;
 
-	public function ModelMetadataEvent( $type:String, $guid:String, $vmm:VoxelModelMetadata, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelMetadataEvent( $type:String, $guid:String, $vmm:ModelMetadata, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
 		_vmm = $vmm;
@@ -39,7 +39,7 @@ public class ModelMetadataEvent extends ModelBaseEvent
 		return formatToString("ModelMetadataEvent", "bubbles", "cancelable") + " VoxelModelMetadata: " + _vmm.toString() + "  itemGuid: " + _guid;
 	}
 	
-	public function get vmm():VoxelModelMetadata 
+	public function get vmm():ModelMetadata 
 	{
 		return _vmm;
 	}

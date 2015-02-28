@@ -31,7 +31,7 @@ public class AcidScript extends ImpactScript
 
 		Log.out( "AcidScript.impact - at x: " + $wsLoc.x + " y: " + $wsLoc.y + "  z: " + $wsLoc.z );
 		
-		Globals.g_app.dispatchEvent( new ImpactEvent( ImpactEvent.ACID, $wsLoc, _ammo.grain * 4, _ammo.grain * 2, instanceGuid ) );
+		ImpactEvent.dispatch( new ImpactEvent( ImpactEvent.ACID, $wsLoc, _ammo.grain * 4, _ammo.grain * 2, instanceGuid ) );
 		
 		impactSound();
 	}

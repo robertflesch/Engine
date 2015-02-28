@@ -148,10 +148,10 @@ package com.voxelengine.GUI.inventory {
 				e.dropTarget.data = e.dragOperation.initiator.data;
 				
 				if ( e.dropTarget.target is PanelMaterials ) {
-					Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.MATERIAL_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
+					CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.MATERIAL_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
 				}
 				else if ( e.dropTarget.target is PanelBonuses ) {
-					Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.BONUS_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
+					CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.BONUS_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
 					e.dropTarget.backgroundTextureManager.resize( 32, 32 );
 				}
 			}

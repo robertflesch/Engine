@@ -21,7 +21,7 @@ import com.voxelengine.server.Room;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.models.ModelLoader;
 import com.voxelengine.worldmodel.models.ModelDataCache;
-import com.voxelengine.worldmodel.models.MetadataCache;
+import com.voxelengine.worldmodel.models.ModelMetadataCache;
 import com.voxelengine.worldmodel.models.ModelInfoCache;
 
 /**
@@ -62,7 +62,7 @@ public class RegionManager
 		
 		// This adds the event handlers
 		// Is there a central place to do this?
-		MetadataCache.init();
+		ModelMetadataCache.init();
 		ModelInfoCache.init();
 		ModelDataCache.init();
 		// This causes the to load its caches and listeners

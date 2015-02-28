@@ -7,6 +7,7 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.GUI.WindowModelMetadata;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
@@ -25,7 +26,7 @@ import flash.utils.ByteArray;
 	 * it then removes its listeners, which should cause it be to be garbage collected.
 	 * Might I need to add a timeout on this object in case if never completes.
 	 */
-public class ModelMakerLocal {
+public class ModelMakerGenerated {
 	
 	// keeps track of how many makers there currently are.
 	static private var _makerCount:int;
@@ -33,28 +34,32 @@ public class ModelMakerLocal {
 	private var _ii:InstanceInfo;
 	private var _vmd:ModelData;
 	private var _vmi:ModelInfo;
+	private var _vmm:ModelMetadata;
 	
-	public function ModelMakerLocal( $ii:InstanceInfo ) {
+	public function ModelMakerGenerated( $ii:InstanceInfo ) {
+		
+		throw new Error( "Not implemented yet" );
 		_ii = $ii;
 		_makerCount++;
-		Log.out( "ModelMakerLocal - ii: " + _ii.toString() + "  count: " + _makerCount );
+		Log.out( "ModelMakerGenerated - ii: " + _ii.toString() + "  count: " + _makerCount );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
 		ModelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
 		ModelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.REQUEST, _ii.guid, null ) );		
 
+		new WindowModelMetadata( _ii.guid );		
 	}
 	
 	private function failedInfo( $mie:ModelInfoEvent):void {
-		Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
+		Log.out( "ModelMakerGenerated.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
 		markComplete();
 	}
 	
 	private function failedData( $mde:ModelDataEvent):void  {
-		Log.out( "ModelMaker.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
+		Log.out( "ModelMakerGenerated.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
 		markComplete()
 	}
 	
@@ -120,7 +125,7 @@ public class ModelMakerLocal {
 		_makerCount--;
 		if ( 0 == _makerCount )
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
-		Log.out( "ModelMakerLocal.markComplete - makerCount: " + _makerCount + "  ii: " + _ii );
+		Log.out( "ModelMakerGenerated.markComplete - makerCount: " + _makerCount + "  ii: " + _ii );
 	}
 	
 	

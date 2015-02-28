@@ -12,7 +12,7 @@ package com.voxelengine.worldmodel.models
 	
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ControllableVoxelModel;
-	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
+	import com.voxelengine.worldmodel.models.ModelMetadata;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 
     public class Avatar extends ControllableVoxelModel
@@ -23,7 +23,7 @@ package com.voxelengine.worldmodel.models
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
 			super.init( $mi, $vmm );
 		}
 	}

@@ -21,7 +21,7 @@ import com.voxelengine.server.Network;
  * ...
  * @author Bob
  */
-public class MetadataCache
+public class ModelMetadataCache
 {
 	static private var _initializedPublic:Boolean;
 	static private var _initializedPrivate:Boolean;
@@ -30,7 +30,7 @@ public class MetadataCache
 	// dont use weak keys since this is THE spot that holds things.
 	static private var _metadata:Dictionary = new Dictionary(false);
 	
-	public function MetadataCache() {	}
+	public function ModelMetadataCache() {	}
 	
 	static public function init():void {
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.LOAD, regionLoad ); 
@@ -38,10 +38,28 @@ public class MetadataCache
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.CHANGED, regionChanged );	
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, modelMetadataTypeRequest );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, modelMetadataRequest );
+		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE, update );
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadNotFound );		
+	}
+	
+	static private function update($mme:ModelMetadataEvent):void 
+	{
+		if ( null == $mme || null == $mme.guid ) {
+			Log.out( "MetadataManager.update trying to add NULL metadata or guid", Log.WARN );
+			return;
+		}
+		// check to make sure is not already there
+		var vmm:ModelMetadata = _metadata[$mme.guid];
+		if ( null ==  vmm ) {
+			Log.out( "MetadataManager.update trying update NULL metadata or guid, adding instead", Log.WARN );
+			add( $mme.vmm );
+		} else {
+			vmm.update( $mme.vmm );
+		}
+		
 	}
 	
 	static private function modelMetadataRequest( $mme:ModelMetadataEvent ):void 
@@ -51,7 +69,7 @@ public class MetadataCache
 			return;
 		}
 		Log.out( "MetadataManager.modelMetadataRequest guid: " + $mme.guid, Log.INFO );
-		var vmm:VoxelModelMetadata = _metadata[$mme.guid]; 
+		var vmm:ModelMetadata = _metadata[$mme.guid]; 
 		if ( null == vmm )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.DB_TABLE_MODELS, $mme.guid ) );
 		else
@@ -76,13 +94,13 @@ public class MetadataCache
 		}
 			
 		// This will return models already loaded.
-		for each ( var vmm:VoxelModelMetadata in _metadata ) {
+		for each ( var vmm:ModelMetadata in _metadata ) {
 			if ( vmm.owner == $mme.guid )
 				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, vmm.guid, vmm ) );
 		}
 	}
 	
-	static private function add( $vmm:VoxelModelMetadata ):void 
+	static private function add( $vmm:ModelMetadata ):void 
 	{ 
 		if ( null == $vmm || null == $vmm.guid ) {
 			Log.out( "MetadataManager.add trying to add NULL metadata or guid", Log.WARN );
@@ -102,8 +120,10 @@ public class MetadataCache
 			return;
 		if ( $pe.dbo ) {
 			Log.out( "MetadataManager.loadSucceed guid: " + $pe.guid, Log.INFO );
-			var vmm:VoxelModelMetadata = new VoxelModelMetadata();
-			vmm.fromPersistanceMetadata( $pe.dbo );
+			var vmm:ModelMetadata = new ModelMetadata( $pe.guid );
+			vmm.fromPersistance( $pe.dbo );
+			if ( $pe.data && true == $pe.data )
+				vmm.dbo = null;
 			add( vmm );
 		}
 		else {

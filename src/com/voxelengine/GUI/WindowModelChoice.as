@@ -4,9 +4,10 @@ package com.voxelengine.GUI
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 	import com.voxelengine.worldmodel.models.ModelLoader;
+	import com.voxelengine.worldmodel.models.ModelMakerGenerated;
 	import com.voxelengine.worldmodel.models.ModelManager;
 	import com.voxelengine.worldmodel.models.VoxelModel;
-	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
+	import com.voxelengine.worldmodel.models.ModelMetadata;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.accessibility.Accessibility;
 	import flash.geom.Vector3D;
@@ -174,10 +175,11 @@ package com.voxelengine.GUI
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75 - (1<<size)/2 );
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
 			ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
-			var vm:VoxelModel = new VoxelModel( ii );
+			//var vm:VoxelModel = new VoxelModel( ii );
 //			vm.metadata = new VoxelModelMetadata();
-			Globals.modelAdd( vm );
-			new WindowModelMetadata( ii.guid );
+			//Globals.modelAdd( vm );
+			new ModelMakerGenerated( ii );
+			//new WindowModelMetadata( ii.guid );
 		}
 		
 		private function modelDetailChanged(e:ModelEvent):void 

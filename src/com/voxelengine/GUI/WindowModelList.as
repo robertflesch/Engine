@@ -7,7 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.GUI
 {
-	import com.voxelengine.worldmodel.models.MetadataCache;
+	import com.voxelengine.worldmodel.models.ModelMetadataCache;
 	import flash.geom.Vector3D;
 	import flash.net.FileReference;
 	import flash.events.Event;
@@ -31,7 +31,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.Player;
 	import com.voxelengine.worldmodel.models.VoxelModel;
-	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
+	import com.voxelengine.worldmodel.models.ModelMetadata;
 	
 	public class WindowModelList extends VVPopup
 	{
@@ -76,7 +76,7 @@ package com.voxelengine.GUI
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 			
-			MetadataCache.addListener( ModelMetadataEvent.INFO_TEMPLATE_REPO, modelLoaded );
+			ModelMetadataCache.addListener( ModelMetadataEvent.INFO_TEMPLATE_REPO, modelLoaded );
 			LoadingEvent.addListener( LoadingEvent.TEMPLATE_MODEL_COMPLETE, newTemplateLoaded );
 			populateModels();
         }
@@ -120,8 +120,8 @@ package com.voxelengine.GUI
 			var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
 			if ( li && li.data )
 			{
-				var tvmm:VoxelModelMetadata = li.data as VoxelModelMetadata;
-				var vmm:VoxelModelMetadata = tvmm.createInstanceOfTemplate();
+				var tvmm:ModelMetadata = li.data as ModelMetadata;
+				var vmm:ModelMetadata = tvmm.createInstanceOfTemplate();
 				var vm:VoxelModel = ModelLoader.loadFromManifestByteArray( vmm, tvmm.data, _parentGuid );				
 				vm.changed = true;
 				vm.save( true );
@@ -136,7 +136,7 @@ package com.voxelengine.GUI
 		}
 		
 		private function newTemplateLoaded( $e:LoadingEvent ):void {
-			var vmm:VoxelModelMetadata = MetadataCache.metadataGet( $e.guid );
+			var vmm:ModelMetadata = ModelMetadataCache.metadataGet( $e.guid );
 			Log.out( "WindowModelList.newTemplateLoaded name: " + vmm.name + " - " + vmm.description );
 			_listbox1.addItem( vmm.name + " - " + vmm.description, vmm );
 		}
@@ -147,7 +147,7 @@ package com.voxelengine.GUI
 		private function populateModels():void
 		{
 			_listbox1.removeAll();
-			MetadataCache.metadataLoad();
+			ModelMetadataCache.metadataLoad();
 
 			//PersistModel.loadModels( Network.PUBLIC );
 			//PersistModel.loadModels( Network.userId );

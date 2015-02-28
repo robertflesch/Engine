@@ -28,6 +28,8 @@ public class ModelBaseEvent extends Event
 	// data or meta data about this region has changed
 	static public const CHANGED:String						= "CHANGED";
 	static public const SAVE:String							= "SAVE";
+	static public const UPDATE:String						= "UPDATE";
+	static public const SAVE_FAILED:String					= "SAVE_FAILED";
 	
 	
 	public function ModelBaseEvent( $type:String, $bubbles:Boolean = true, $cancellable:Boolean = false )

@@ -47,7 +47,7 @@ package com.voxelengine.GUI.crafting {
 			var mb:Box = e.target as Box;
 			mb.backgroundTexture = null;
 			var ti:TypeInfo = mb.data;
-			Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.MATERIAL_REMOVED, ti ) );	
+			CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.MATERIAL_REMOVED, ti ) );	
 		}			
 		
 		private function onDrop(e:DnDEvent):void 

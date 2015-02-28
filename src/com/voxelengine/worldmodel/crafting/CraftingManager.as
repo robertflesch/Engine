@@ -31,7 +31,7 @@ import com.voxelengine.worldmodel.crafting.items.*;
 	 */
 	
 	 
-public class CraftingManager extends EventDispatcher
+public class CraftingManager
 {
 	// Adding these makes the event available in MXML
 	// http://help.adobe.com/en_US/flex/using/WS2db454920e96a9e51e63e3d11c0bf69084-7ab2.html
@@ -41,7 +41,7 @@ public class CraftingManager extends EventDispatcher
 	static private var _recipes:Vector.<Recipe> = new Vector.<Recipe>;
 	
 	public function CraftingManager() {
-		addEventListener( CraftingEvent.RECIPE_LOAD_PUBLIC, loadRecipes );
+		CraftingEvent.addListener( CraftingEvent.RECIPE_LOAD_PUBLIC, loadRecipes );
 	}
 	
 	static private function loadRecipes(e:CraftingEvent):void 
@@ -53,7 +53,7 @@ public class CraftingManager extends EventDispatcher
 		}
 		else {
 			for each ( var recipe:Recipe in _recipes ) {
-				Globals.craftingManager.dispatchEvent( new CraftingEvent( CraftingEvent.RECIPE_LOADED, recipe.name, recipe ) );	
+				CraftingEvent.dispatch( new CraftingEvent( CraftingEvent.RECIPE_LOADED, recipe.name, recipe ) );	
 			}
 		}
 		
@@ -89,7 +89,7 @@ public class CraftingManager extends EventDispatcher
 		if ( jsonResult.recipe ) {
 			_r.fromJSON( jsonResult.recipe );
 			_recipes.push( _r );
-			Globals.craftingManager.dispatchEvent( new CraftingEvent( CraftingEvent.RECIPE_LOADED, _r.name, _r ) );	
+			CraftingEvent.dispatch( new CraftingEvent( CraftingEvent.RECIPE_LOADED, _r.name, _r ) );	
 		}
 		else	
 			Log.out("CraftingManager.onRecipeLoaded - ERROR recipe data not found in fileName: " + fileName + "  data: " + fileData, Log.ERROR );

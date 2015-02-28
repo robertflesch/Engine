@@ -35,7 +35,7 @@ package com.voxelengine.worldmodel.weapons
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
 			super.init( $mi, $vmm );
 			
 			_bombHolder = _instanceInfo.controllingModel;
@@ -83,7 +83,7 @@ package com.voxelengine.worldmodel.weapons
 
 			Log.out( "Bomb.update - MODEL + WORLD BANG at x: " + center.x + " y: " + center.y + "  z: " + center.z );
 			
-			Globals.g_app.dispatchEvent( new ImpactEvent( ImpactEvent.EXPLODE, center, oxel.gc.grain * 16, oxel.gc.grain, instanceInfo.guid ) );
+			ImpactEvent.dispatch( new ImpactEvent( ImpactEvent.EXPLODE, center, oxel.gc.grain * 16, oxel.gc.grain, instanceInfo.guid ) );
 			
 			SoundBank.playSound( SoundBank.getSound( _soundFile ) );
 		}

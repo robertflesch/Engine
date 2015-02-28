@@ -15,7 +15,7 @@ import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelData;
-import com.voxelengine.worldmodel.models.VoxelModelMetadata;
+import com.voxelengine.worldmodel.models.ModelMetadata;
 
 	/**
 	 * ...
@@ -31,7 +31,7 @@ public class ModelMaker {
 	
 	private var _ii:InstanceInfo;
 	private var _vmd:ModelData;
-	private var _vmm:VoxelModelMetadata;
+	private var _vmm:ModelMetadata;
 	
 	public function ModelMaker( $ii:InstanceInfo ) {
 		_ii = $ii;
@@ -42,7 +42,7 @@ public class ModelMaker {
 		ModelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.REQUEST, _ii.guid, null ) );		
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
 
 		_makerCount++;
 	}

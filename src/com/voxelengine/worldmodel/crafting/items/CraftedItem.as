@@ -27,18 +27,18 @@ public class CraftedItem extends Recipe
 	public function CraftedItem( $recipe:Recipe ):void {
 		super();
 		copy( $recipe );
-		Globals.craftingManager.addEventListener( CraftingItemEvent.MATERIAL_DROPPED, onMaterialDropped );	
-		Globals.craftingManager.addEventListener( CraftingItemEvent.MATERIAL_REMOVED, onMaterialRemoved );	
+		CraftingItemEvent.addListener( CraftingItemEvent.MATERIAL_DROPPED, onMaterialDropped );	
+		CraftingItemEvent.addListener( CraftingItemEvent.MATERIAL_REMOVED, onMaterialRemoved );	
 		
-		Globals.craftingManager.addEventListener( CraftingItemEvent.BONUS_DROPPED, onBonusDropped );	
-		Globals.craftingManager.addEventListener( CraftingItemEvent.BONUS_REMOVED, onBonusRemoved );	
+		CraftingItemEvent.addListener( CraftingItemEvent.BONUS_DROPPED, onBonusDropped );	
+		CraftingItemEvent.addListener( CraftingItemEvent.BONUS_REMOVED, onBonusRemoved );	
 	}
 	
 	override public function cancel():void {
-		Globals.craftingManager.removeEventListener( CraftingItemEvent.MATERIAL_DROPPED, onMaterialDropped );	
-		Globals.craftingManager.removeEventListener( CraftingItemEvent.MATERIAL_REMOVED, onMaterialRemoved );	
-		Globals.craftingManager.removeEventListener( CraftingItemEvent.BONUS_DROPPED, onBonusDropped );	
-		Globals.craftingManager.removeEventListener( CraftingItemEvent.BONUS_REMOVED, onBonusRemoved );	
+		CraftingItemEvent.removeListener( CraftingItemEvent.MATERIAL_DROPPED, onMaterialDropped );	
+		CraftingItemEvent.removeListener( CraftingItemEvent.MATERIAL_REMOVED, onMaterialRemoved );	
+		CraftingItemEvent.removeListener( CraftingItemEvent.BONUS_DROPPED, onBonusDropped );	
+		CraftingItemEvent.removeListener( CraftingItemEvent.BONUS_REMOVED, onBonusRemoved );	
 		_materialsUsed = null;
 		_bonusesUsed = null;
 		super.cancel();
@@ -100,13 +100,13 @@ public class CraftedItem extends Recipe
 			var bonus:TypeInfo = _bonusesUsed[i];
 			if ( bonus.subCat == $typeInfo.subCat ) {
 				_bonusesUsed[i] = $typeInfo;
-				Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
 				return;
 			}
 		}
 		
 		_bonusesUsed.push( $typeInfo );
-		Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+		CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
 	}
 	
 	public function materialAdd( $typeInfo:TypeInfo ):void {
@@ -115,13 +115,13 @@ public class CraftedItem extends Recipe
 			var mat:TypeInfo = _materialsUsed[i];
 			if ( mat.category == $typeInfo.category ) {
 				_materialsUsed[i] = $typeInfo;
-				Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
 				return;
 			}
 		}
 		
 		_materialsUsed.push( $typeInfo );
-		Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+		CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
 	}
 	
 	public function materialRemove( $typeInfo:TypeInfo ):void {
@@ -130,7 +130,7 @@ public class CraftedItem extends Recipe
 			var mat:TypeInfo = _materialsUsed[i];
 			if ( mat.category == $typeInfo.category ) {
 				_materialsUsed.splice( i, 1 );
-				Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
 				return;
 			}
 		}
@@ -143,7 +143,7 @@ public class CraftedItem extends Recipe
 			var bonus:TypeInfo = _bonusesUsed[i];
 			if ( bonus.subCat == $typeInfo.subCat ) {
 				_bonusesUsed.splice( i, 1 );
-				Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
 				return;
 			}
 		}

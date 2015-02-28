@@ -24,30 +24,38 @@ import com.voxelengine.utils.StringUtils;
  */
 public class PersistLocal
 {
+	static private var _filePath:String;
+	
 	static public function addEvents():void {
 //		Log.out( "PersistLocal.addEvents", Log.WARN );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_REQUEST, load );
 	}
 	
+	static private function isSupportedTable( $pe:PersistanceEvent ):Boolean {
+		//if ( true == Globals.online )
+		//	return;
+		
+		if ( Globals.REGION_EXT == $pe.table )
+			_filePath = Globals.regionPath + $pe.guid + $pe.table
+		else if ( Globals.IVM_EXT == $pe.table )	
+			_filePath = Globals.modelPath + $pe.guid + $pe.table
+		else if ( Globals.MODEL_INFO_EXT == $pe.table )	
+			_filePath = Globals.modelPath + $pe.guid + $pe.table
+		else
+			return false;
+		
+		return true;
+	}
+	
 	static private function load( $pe:PersistanceEvent ):void { 
 		
-		if ( true == Globals.online )
+		if ( !isSupportedTable( $pe ) )
 			return;
-		
-		var filePath:String
-		if ( Globals.REGION_EXT == $pe.table )
-			filePath = Globals.regionPath + $pe.guid + $pe.table
-		else if ( Globals.IVM_EXT == $pe.table )	
-			filePath = Globals.modelPath + $pe.guid + $pe.table
-		else if ( Globals.MODEL_INFO_EXT == $pe.table )	
-			filePath = Globals.modelPath + $pe.guid + $pe.table
-		else
-			throw new Error( "PersistLocal.load - EXTENSION NOT SUPPORTED: " + $pe.table );
 			
-		Log.out( "PersistLocal.load - file: " + filePath, Log.DEBUG );
+		Log.out( "PersistLocal.load - file: " + _filePath, Log.DEBUG );
 		
 		var urlLoader:URLLoader = new URLLoader();
-		urlLoader.load(new URLRequest( filePath ));
+		urlLoader.load(new URLRequest( _filePath ));
 		urlLoader.dataFormat = $pe.format;
 		urlLoader.addEventListener(Event.COMPLETE, loadSuccess );
 		urlLoader.addEventListener(IOErrorEvent.IO_ERROR, loadError);			

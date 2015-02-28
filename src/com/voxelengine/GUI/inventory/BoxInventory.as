@@ -26,8 +26,8 @@ import com.voxelengine.GUI.*;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.inventory.*;
-import com.voxelengine.worldmodel.models.MetadataCache;
-import com.voxelengine.worldmodel.models.VoxelModelMetadata;
+import com.voxelengine.worldmodel.models.ModelMetadataCache;
+import com.voxelengine.worldmodel.models.ModelMetadata;
 
 
 public class BoxInventory extends VVBox
@@ -71,10 +71,10 @@ public class BoxInventory extends VVBox
 					InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, modelCount ) ;
 					InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_REQUEST, Network.userId, $item.guid, -1 ) );
 					
-					if ( MetadataCache.metadataGet( $item.guid ) )
-						updateObjectDisplayData( MetadataCache.metadataGet( $item.guid ) );	
+					if ( ModelMetadataCache.metadataGet( $item.guid ) )
+						updateObjectDisplayData( ModelMetadataCache.metadataGet( $item.guid ) );	
 					else {
-						MetadataCache.addListener( ModelMetadataEvent.INFO_TEMPLATE_REPO, metadataRetrived );
+						ModelMetadataCache.addListener( ModelMetadataEvent.INFO_TEMPLATE_REPO, metadataRetrived );
 						return;
 					}
 				}
@@ -122,7 +122,7 @@ public class BoxInventory extends VVBox
 			updateObjectDisplayData( e.vmm );	
 	}
 	
-	private function updateObjectDisplayData( $vmm:VoxelModelMetadata ):void {
+	private function updateObjectDisplayData( $vmm:ModelMetadata ):void {
 		Log.out( "BoxInventory.updateOBjectDisplayData vmm: " + $vmm.toString() );
 		if ( null == $vmm.image ) {
 			var bmpd:BitmapData = Globals.g_renderer.modelShot();

@@ -43,7 +43,7 @@ package com.voxelengine.worldmodel.models
 			super( ii );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
 			super.init( $mi, $vmm );
 			// TODO These should be loading from the json file
 			clipVelocityFactor = SHIP_CLIP_FACTOR;

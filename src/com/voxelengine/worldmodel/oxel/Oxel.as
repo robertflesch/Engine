@@ -36,7 +36,7 @@ package com.voxelengine.worldmodel.oxel
 	import com.voxelengine.worldmodel.models.ModelStatisics;
 	import com.voxelengine.worldmodel.models.EditCursor;
 	import com.voxelengine.worldmodel.models.VoxelModel;
-	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
+	import com.voxelengine.worldmodel.models.ModelMetadata;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.TreeGenerator;
 	import com.voxelengine.worldmodel.tasks.lighting.LightRemove;
 	import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
@@ -1158,7 +1158,7 @@ package com.voxelengine.worldmodel.oxel
 			faces_mark_all_dirty();
 		}
 		
-		public function cleanup( $md:VoxelModelMetadata ):void {
+		public function cleanup( $md:ModelMetadata ):void {
 			var timer:int = getTimer();
 			//Log.out( "Oxel.cleanup - name: " + $md.name + " - guid: " + $md.guid );					
 			_s_oxelsCreated = 0;

@@ -31,7 +31,7 @@ public class ExplosionScript extends ImpactScript
 		
 		Log.out( "ExplosionScript.impact - at x: " + $wsLoc.x + " y: " + $wsLoc.y + "  z: " + $wsLoc.z );
 		
-		Globals.g_app.dispatchEvent( new ImpactEvent( ImpactEvent.EXPLODE, $wsLoc, _ammo.grain * 4, _ammo.grain * 2, instanceGuid ) );
+		ImpactEvent.dispatch( new ImpactEvent( ImpactEvent.EXPLODE, $wsLoc, _ammo.grain * 4, _ammo.grain * 2, instanceGuid ) );
 		
 		impactSound();
 	}

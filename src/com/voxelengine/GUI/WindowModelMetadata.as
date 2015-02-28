@@ -8,50 +8,70 @@
 
 package com.voxelengine.GUI 
 {
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.MetadataCache;
-import com.voxelengine.worldmodel.models.VoxelModelMetadata;
-import org.flashapi.swing.*;
-import org.flashapi.swing.event.*;
-import org.flashapi.swing.constants.*;
-import org.flashapi.swing.list.ListItem;
+import com.voxelengine.events.PersistanceEvent;
 import flash.events.Event;
+import playerio.DatabaseObject;
 
 import org.flashapi.collector.EventCollector;
 import org.flashapi.swing.*
 import org.flashapi.swing.core.UIObject;
 import org.flashapi.swing.event.*;
-import org.flashapi.swing.constants.*;
+//import org.flashapi.swing.constants.*;
 import org.flashapi.swing.list.ListItem;
 import org.flashapi.swing.constants.BorderStyle;
+import org.flashapi.swing.constants.LayoutOrientation;
 import org.flashapi.swing.button.RadioButtonGroup;
 import org.flashapi.swing.databinding.DataProvider;
 
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
+import com.voxelengine.Globals;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.models.ModelMetadataCache;
+import com.voxelengine.worldmodel.models.ModelMetadata;
 
 public class WindowModelMetadata extends VVPopup
 {
 	private var _name:LabelInput;
 	private var _desc:LabelInput;
 	private var _copies:LabelInput;
-	private var _vmm:VoxelModelMetadata;
+	private var _vmm:ModelMetadata;
+	private var _type:int;
 	
-	public function WindowModelMetadata( $guid:String )
+	public static const TYPE_IMPORT:int = 0;
+	public static const TYPE_EDIT:int = 1;
+	
+	public function WindowModelMetadata( $guid:String, windowType:int )
 	{
-		_vmm = new VoxelModelMetadata();
+		_type = windowType;
 		super("Model Metadata Detail");
 		autoSize = true;
 		layout.orientation = LayoutOrientation.VERTICAL;
-
-		_vmm.guid = $guid
 		
-		_name = new LabelInput( "Name: ", $guid );
+		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, dataReceived );
+		
+		if ( TYPE_IMPORT == windowType ) {
+			_vmm = new ModelMetadata( $guid );
+			_vmm.name = $guid + "-IMPORTED";
+			_vmm.description = $guid + "-IMPORTED";
+			dataReceived( new ModelMetadataEvent( ModelBaseEvent.REQUEST, $guid, _vmm ) )
+		}
+		else {
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, $guid, null ) );
+		}
+	}
+	
+	private function dataReceived( $mme:ModelMetadataEvent ):void {
+		
+		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, dataReceived );
+		
+		_vmm = $mme.vmm;
+		
+		_name = new LabelInput( "Name: ", _vmm.name );
 		addElement( _name );
 
-		_desc = new LabelInput( "Description: ", $guid );
+		_desc = new LabelInput( "Description: ", _vmm.description );
 		addElement( _desc );
 		
 		addElement( new HorizontalSeparator( width ) );		
@@ -135,8 +155,28 @@ public class WindowModelMetadata extends VVPopup
 		_vmm.copyCount = parseInt( _copies.label, 10 );
 		_vmm.createdDate = new Date();
 		_vmm.modifiedDate = new Date();
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.SAVE, _vmm.guid, _vmm ) );
+		if ( _type == TYPE_EDIT ) {
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.UPDATE, _vmm.guid, _vmm ) );
+		} else { // TYPE_IMPORT so new data
+			var dboTemp:DatabaseObject = new DatabaseObject( Globals.DB_TABLE_MODELS, _vmm.guid, "1", 0, true, null );
+			_vmm.dbo = dboTemp;
+			_vmm.toPersistance();
+			_vmm.dbo = null;
+			_vmm.release();
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, Globals.DB_TABLE_MODELS, _vmm.guid, dboTemp, true ) );			
+		}
 		remove();
 	}
+	
+			//var dboTemp:DatabaseObject = new DatabaseObject( Globals.DB_TABLE_REGIONS, _region.guid, "1", 0, true, null );
+			//_region.dbo = dboTemp;
+			//_region.toPersistance();
+			//// remove the event listeners on this temporary object
+			//_region.release();
+			//// This tell the region manager to add it to the region list
+			//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, Globals.DB_TABLE_REGIONS, _region.guid, dboTemp, true ) );			
+			//// This tell the region to save itself!
+			//RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, _region.guid ) );
+	//
 }
 }

@@ -44,7 +44,7 @@ package com.voxelengine.GUI.crafting {
 			var mb:Box = e.target as Box;
 			mb.backgroundTexture = null;
 			var ti:TypeInfo = mb.data;
-			Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.BONUS_REMOVED, ti ) );	
+			CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.BONUS_REMOVED, ti ) );	
 		}			
 
 		private function buildBonusBox( bonus:Bonus ):Box 

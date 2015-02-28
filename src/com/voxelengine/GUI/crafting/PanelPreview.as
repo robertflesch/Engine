@@ -21,7 +21,7 @@ package com.voxelengine.GUI.crafting {
 		{
 			super( $parent, $widthParam, $heightParam );
 			
-			Globals.craftingManager.addEventListener( CraftingItemEvent.STATS_UPDATED, onStatsUpdated );	
+			CraftingItemEvent.addListener( CraftingItemEvent.STATS_UPDATED, onStatsUpdated );	
 			
 			addElement( new Label( "Preview" ) );
 			if ( $recipe ) {
@@ -39,7 +39,7 @@ package com.voxelengine.GUI.crafting {
 		
 		override public function close():void 
 		{
-			Globals.craftingManager.removeEventListener( CraftingItemEvent.STATS_UPDATED, onStatsUpdated );	
+			CraftingItemEvent.removeListener( CraftingItemEvent.STATS_UPDATED, onStatsUpdated );	
 		}
 		
 		private function onStatsUpdated(e:CraftingItemEvent):void 

@@ -42,7 +42,7 @@ package com.voxelengine.worldmodel.weapons
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
 			super.init( $mi, $vmm );
 			
 			var centerLoc:int = 2 << ( $mi.grainSize - 2);

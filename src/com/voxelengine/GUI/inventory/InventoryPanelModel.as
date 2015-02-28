@@ -1,6 +1,8 @@
 package com.voxelengine.GUI.inventory {
 
 import com.voxelengine.GUI.actionBars.QuickInventory;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelMakerImport;
 import flash.display.DisplayObject;
 import flash.net.FileReference;
 import flash.events.Event;
@@ -181,7 +183,9 @@ public class InventoryPanelModel extends VVContainer
 		var fileName:String = e.currentTarget.name;
 		fileName = fileName.substr( 0, fileName.indexOf( "." ) );
 
-		new WindowModelMetadata( fileName );
+		var ii:InstanceInfo = new InstanceInfo();
+		ii.guid = fileName;
+		new ModelMakerImport( ii );
 	//	remove();
 	}
 	
@@ -194,10 +198,10 @@ public class InventoryPanelModel extends VVContainer
 			//e.dropTarget.data = e.dragOperation.initiator.data;
 			//
 			//if ( e.dropTarget.target is PanelMaterials ) {
-				//Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.MATERIAL_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
+				//CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.MATERIAL_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
 			//}
 			//else if ( e.dropTarget.target is PanelBonuses ) {
-				//Globals.craftingManager.dispatchEvent( new CraftingItemEvent( CraftingItemEvent.BONUS_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
+				//CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.BONUS_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
 				//e.dropTarget.backgroundTextureManager.resize( 32, 32 );
 			//}
 			//else if ( e.dropTarget.target is QuickInventory ) {

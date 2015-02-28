@@ -26,9 +26,23 @@ public class PersistBigDB
 		PersistanceEvent.addListener( PersistanceEvent.SAVE_REQUEST, save );
 	}
 	
+	static private function isSupportedTable( $pe:PersistanceEvent ):Boolean {
+		if ( false == Globals.online )
+			return false;
+			
+		if ( Globals.DB_TABLE_MODELS == $pe.table )
+			return true;
+		else if ( Globals.DB_TABLE_MODELS_DATA == $pe.table )	
+			return true;
+		else if ( Globals.DB_TABLE_REGIONS == $pe.table )	
+			return true;
+		else
+			return false;
+	}
+	
 	static private function load( $pe:PersistanceEvent ):void { 
 		
-		if ( false == Globals.online )
+		if ( !isSupportedTable( $pe ) )
 			return;
 			
 		Log.out( "PersistBigDB.load - table: " + $pe.table + " for user: " + $pe.guid, Log.DEBUG );

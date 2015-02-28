@@ -51,6 +51,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 					// This is only called when executing a script or series of scripts on an object
 					if ( Globals.online ) {
+						throw new Error( "CompletedModel.start - Should not be used" );
+						/*
 						// This fills in the metadata with dates and permissions.
 						vm.metadata.initialize( vm.metadata.name, vm.metadata.description ); // "GeneratedObject-" + int(Math.random() * 10000)
 						// now I need to propgate the guid to the instanceInfo and the modelInfo for reloading.
@@ -63,6 +65,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 						// mark the region and model as changed so that the info is stored.
 						RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, null ) );
 						vm.changed = true;
+						*/
 					}
 						
 					if ( vm is Player )

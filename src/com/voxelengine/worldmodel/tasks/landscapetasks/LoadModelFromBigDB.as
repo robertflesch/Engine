@@ -25,7 +25,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.events.ModelMetadataEvent;
 	import com.voxelengine.worldmodel.models.ModelLoader;
 	import com.voxelengine.worldmodel.models.Player;
-	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
+	import com.voxelengine.worldmodel.models.ModelMetadata;
 	
 	/**
 	 * ...
@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private var _guid:String;
 		private var _startTime:int;
 		private var _guidTemplate:String;
-		private var _vmmBase:VoxelModelMetadata;
+		private var _vmmBase:ModelMetadata;
 		
 		public function LoadModelFromBigDB( $guid:String, $layer:LayerInfo = null ) {
 			Log.out( "LoadModelFromBigDB.construct ", Log.ERROR );

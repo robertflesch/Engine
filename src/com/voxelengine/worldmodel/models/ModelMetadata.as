@@ -30,7 +30,7 @@ import com.voxelengine.server.Network;
  * @author Robert Flesch - RSF
  * The world model holds the active oxels
  */
-public class VoxelModelMetadata
+public class ModelMetadata
 {
 	private var _topImage:Bitmap;
 	[Embed(source='../../../../../../Resources/bin/assets/textures/NoImage128.png')]
@@ -98,45 +98,67 @@ public class VoxelModelMetadata
 	public function get modifiedDate():Date { return _modifiedDate; }
 	public function set modifiedDate(value:Date):void  { _modifiedDate = value; }
 	
+	public function get dbo():DatabaseObject { return _dbo; }
+	public function set dbo(value:DatabaseObject):void { _dbo = value; }
+	
 	public function toString():String {
 		return "name: " + _name + "  description: " + _description + "  guid: " + _guid + "  owner: " + _owner;
 	}
 	
-	public function VoxelModelMetadata() {
-		ModelMetadataEvent.addListener( ModelBaseEvent.SAVE, save );
+	public function ModelMetadata( $guid:String ) {
+		if ( null == $guid || "" == $guid )
+			throw new Error( "VoxelModelMetadata - Missing guid in constructor" );
+		_guid = $guid;
+		if ( "EditCursor" != $guid )
+			ModelMetadataEvent.addListener( ModelBaseEvent.SAVE, saveEvent );
 	}
 
 	public function release():void {
-		ModelMetadataEvent.removeListener( ModelBaseEvent.SAVE, save );
+		ModelMetadataEvent.removeListener( ModelBaseEvent.SAVE, saveEvent );
+		//ModelMetadataEvent.removeListener( ModelBaseEvent.LOAD, 		load );
 		
 	}
 	
-	public function initialize( $name:String, $description:String = null ):void {
-		guid 			= Globals.getUID();
-		name 			= $name
-		description 	= $description ? $description: $name;
-		owner 			= Network.userId;
-		image 			= null;
+	public function update( $vmm:ModelMetadata ):void {
+		name 			= $vmm.name;
+		description 	= $vmm.description;
+		owner 			= $vmm.owner;
+		image 			= $vmm.image;
 		
-		_dbo			= null;
-		createdDate		= new Date();
-		modifiedDate	= new Date();
-		template		= false
-		templateGuid	= null
-		copy			= true;
-		copyCount		= -1;
-		modify			= true;
-		transfer		= true;
+		template		= $vmm.template;
+		templateGuid	= $vmm.templateGuid;
+		copy			= $vmm.copy;
+		copyCount		= $vmm.copyCount;
+		modify			= $vmm.modify;
+		transfer		= $vmm.transfer;
+		
 	}
 	
-	public function createInstanceOfTemplate():VoxelModelMetadata {
+	//public function initialize( $name:String, $description:String = null ):void {
+		//guid 			= Globals.getUID();
+		//name 			= $name
+		//description 	= $description ? $description: $name;
+		//owner 			= Network.userId;
+		//image 			= null;
+		//
+		//_dbo			= null;
+		//createdDate		= new Date();
+		//modifiedDate	= new Date();
+		//template		= false
+		//templateGuid	= null
+		//copy			= true;
+		//copyCount		= -1;
+		//modify			= true;
+		//transfer		= true;
+	//}
+	
+	public function createInstanceOfTemplate():ModelMetadata {
 		
-		var newVmm:VoxelModelMetadata = new VoxelModelMetadata();	
-		newVmm.guid 			= Globals.getUID();
+		var newVmm:ModelMetadata = new ModelMetadata( Globals.getUID() );	
 		newVmm.name 			= new String( _name );
 		newVmm.description 		= new String( _description );
 		newVmm.owner 			= new String( _owner );
-		newVmm.image 			= null;
+		newVmm.image 			= newVmm.image;
 		
 		newVmm._dbo				= null;
 		newVmm.createdDate		= new Date( _createdDate );
@@ -176,13 +198,19 @@ public class VoxelModelMetadata
 	// TO Persistance
 	//////////////////////////////////////////////////////////////////
 	
-	private function save( $vmd:ModelMetadataEvent ):void {
+	// This was private, force a message to be sent to it. 
+	// But the voxelModel has a handle to it, seems silly to have to propgate it every where, so its public
+	private function saveEvent( $vmd:ModelMetadataEvent ):void {
 		if ( guid != $vmd.guid ) {
-			Log.out( "VoxelModelMetadata.save - Ignoring save meant for other model my guid: " + guid + " target guid: " + $vmd.guid, Log.WARN );
+			Log.out( "VoxelModelMetadata.saveEvent - Ignoring save meant for other model my guid: " + guid + " target guid: " + $vmd.guid, Log.WARN );
 			return;
 		}
+		save();
+	}
+	
+	public function save():void {
 		if ( Globals.online ) {
-			Log.out( "VoxelModelMetadata.save - Saving Model Metadata: " + guid + " vmd: " + $vmd.toString(), Log.WARN );
+			Log.out( "VoxelModelMetadata.save - Saving Model Metadata: " + guid ); // + " vmd: " + $vmd.toString(), Log.WARN );
 			addSaveEvents();
 			if ( _dbo )
 				toPersistance();
@@ -190,7 +218,6 @@ public class VoxelModelMetadata
 				var obj:Object = toObject();
 			}
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, Globals.DB_TABLE_MODELS, guid, _dbo, obj ) );
-			//changed = false;
 		}
 		else
 			Log.out( "ModelMetadata.save - Not saving metadata, either offline or NOT changed or locked - guid: " + guid + "  name: " + name, Log.WARN );
@@ -255,7 +282,7 @@ public class VoxelModelMetadata
 	// FROM Persistance
 	////////////////////////////////////////////////////////////////
 	
-	public function fromPersistanceMetadata( $dbo:DatabaseObject ):void {
+	public function fromPersistance( $dbo:DatabaseObject ):void {
 		
 		_name 			= $dbo.name;
 		_description	= $dbo.description;

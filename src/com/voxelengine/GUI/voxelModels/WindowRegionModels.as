@@ -2,6 +2,9 @@
 package com.voxelengine.GUI.voxelModels
 {
 	import com.voxelengine.events.InventoryVoxelEvent;
+	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.worldmodel.Region;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
@@ -42,6 +45,7 @@ package com.voxelengine.GUI.voxelModels
 			Log.out( "WindowRegionModels.onRemoved", Log.WARN );
 			super.onRemoved(event);
 			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelAdded );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, null ));
 			
 			_modelPanel.close();
 		}

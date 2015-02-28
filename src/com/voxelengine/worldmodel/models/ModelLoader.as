@@ -38,7 +38,7 @@ package com.voxelengine.worldmodel.models
 		// objects that are waiting on model data to load
 		static private var _blocks:Dictionary = new Dictionary(true);
 		// This is used only for loading local models into persistance
-		static private var _s_mmd:VoxelModelMetadata;
+		static private var _s_mmd:ModelMetadata;
 		
 		public function ModelLoader():void {
 			// replaced by ModelMaker
@@ -111,7 +111,7 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		
-		static public function load( $ii:InstanceInfo, $vmm:VoxelModelMetadata = null ):void {
+		static public function load( $ii:InstanceInfo, $vmm:ModelMetadata = null ):void {
 			//Log.out( "ModelLoader.load - InstanceInfo: " + $ii.toString(), Log.DEBUG );
 			Globals.instanceInfoAdd( $ii ); // Uses a name + guid as identifier
 			if ( !Globals.isGuid( $ii.guid ) && $ii.guid != "LoadModelFromBigDB" )
@@ -120,7 +120,9 @@ package com.voxelengine.worldmodel.models
 				new ModelMaker( $ii );
 		}
 		
-		static public function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:VoxelModelMetadata ):* {
+		// This is the final step in model creation. All of the info needed to create the model is here.
+		// the oxel is still not build, but all of the other information is complete.
+		static public function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:ModelMetadata ):* {
 			if ( !$ii )
 				throw new Error( "ModelLoader.instantiate - InstanceInfo null" );
 
@@ -142,9 +144,6 @@ package com.voxelengine.worldmodel.models
 				throw new Error( "ModelLoader.instantiate - Model failed in creation - modelClass: " + modelClass );
 				
 			vm.init( $modelInfo, $vmm );
-			// if we were given metadata, use it.
-			if ( null != $vmm )
-				vm.metadata = $vmm;
 
 			if ( !(vm is Avatar) )
 				Globals.modelAdd( vm );
@@ -167,7 +166,7 @@ package com.voxelengine.worldmodel.models
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// Persistant model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
-		static public function loadFromManifestByteArray( $vmm:VoxelModelMetadata, $ba:ByteArray, controllingModelGuid:String = "" ):VoxelModel {
+		static public function loadFromManifestByteArray( $vmm:ModelMetadata, $ba:ByteArray, controllingModelGuid:String = "" ):VoxelModel {
 				
 			if ( null == $ba )
 			{
@@ -216,7 +215,7 @@ package com.voxelengine.worldmodel.models
 			var vm:* = instantiate( ii, mi, $vmm );
 			if ( vm ) {
 				vm.version = versionInfo.version;
-				vm.loadOxelFromByteArray( $ba );
+				vm.fromByteArray( $ba );
 			}
 
 			vm.complete = true;
@@ -260,7 +259,7 @@ package com.voxelengine.worldmodel.models
 			var vm:* = instantiate( $ii, mi, null );
 			if ( vm ) {
 				vm.version = versionInfo.version;
-				vm.loadOxelFromByteArray( $ba );
+				vm.fromByteArray( $ba );
 			}
 
 			vm.complete = true;
@@ -305,7 +304,7 @@ package com.voxelengine.worldmodel.models
 			$vm.metadata.name = $vm.modelInfo.fileName;
 			
 			// now just load the model like any other
-			$vm.loadOxelFromByteArray($ba);
+			$vm.fromByteArray($ba);
 		}
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// END local model

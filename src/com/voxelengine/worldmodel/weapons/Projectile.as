@@ -11,7 +11,7 @@ package com.voxelengine.worldmodel.weapons
 	import com.voxelengine.Log;
 	import com.voxelengine.pools.ParticlePool;
 	import com.voxelengine.pools.ProjectilePool;
-	import com.voxelengine.worldmodel.models.VoxelModelMetadata;
+	import com.voxelengine.worldmodel.models.ModelMetadata;
 	import com.voxelengine.worldmodel.scripts.ImpactScript;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.events.ImpactEvent;
@@ -50,7 +50,7 @@ package com.voxelengine.worldmodel.weapons
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
 			super.init( $mi, $vmm );
 			
 			instanceInfo.dynamicObject = true;

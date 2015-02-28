@@ -143,6 +143,7 @@ package org.flashapi.swing {
 		 */
 		public function Alert(title:String = "", width:Number = 250) {
 			super();
+			autoSize = true;
 			initObj(title, width);
 		}
 		

@@ -30,7 +30,7 @@ package com.voxelengine.worldmodel.weapons
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
 			super.init( $mi, $vmm );
 			
 			if ( $mi.json && $mi.json.model && $mi.json.model.barrel )

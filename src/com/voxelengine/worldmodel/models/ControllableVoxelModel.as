@@ -72,7 +72,7 @@ package com.voxelengine.worldmodel.models
 			super( ii );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:VoxelModelMetadata, $initializeRoot:Boolean = true ):void {
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
 			super.init( $mi, $vmm );
 			Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent, false, 0, true );
 			ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );

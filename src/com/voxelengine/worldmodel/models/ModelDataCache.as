@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.ModelBaseEvent;
 import flash.utils.ByteArray;
 import flash.utils.Dictionary;
 import flash.net.URLLoaderDataFormat;
@@ -29,11 +30,11 @@ public class ModelDataCache
 	public function ModelDataCache() {}
 	
 	static public function init():void {
-		ModelDataEvent.addListener( ModelDataEvent.REQUEST, request );
+		ModelDataEvent.addListener( ModelBaseEvent.REQUEST, request );
 		
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFailed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadNotFound );		
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -48,16 +49,16 @@ public class ModelDataCache
 		Log.out( "ModelDataManager.request guid: " + $mie.guid, Log.INFO );
 		var mi:ModelData = _modelData[$mie.guid]; 
 		if ( null == mi ) {
-			if ( true == Globals.online )
+			if ( true == Globals.online && $mie.fromTables )
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.DB_TABLE_MODELS_DATA, $mie.guid ) );
 			else	
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.IVM_EXT, $mie.guid, null, null, URLLoaderDataFormat.BINARY ) );
 		}
 		else
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.ADDED, $mie.guid, mi ) );
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.ADDED, $mie.guid, mi ) );
 	}
 	
-	static private function modelDataAdd( $guid:String, $mi:ModelData ):void 
+	static private function add( $guid:String, $mi:ModelData ):void 
 	{ 
 		if ( null == $mi || null == $guid ) {
 			Log.out( "ModelDataManager.modelDataAdd trying to add NULL modelData or guid", Log.WARN );
@@ -66,7 +67,7 @@ public class ModelDataCache
 		// check to make sure this is new data
 		if ( null ==  _modelData[$guid] ) {
 			_modelData[$guid] = $mi; 
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.ADDED, $guid, $mi ) );
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.ADDED, $guid, $mi ) );
 		}
 	}
 	
@@ -76,12 +77,16 @@ public class ModelDataCache
 			return;
 		if ( $pe.data ) {
 			Log.out( "ModelDataManager.loadSucceed guid: " + $pe.guid, Log.INFO );
-			var vmd:ModelData = new ModelData( $pe.guid, null, $pe.data );
-			modelDataAdd( $pe.guid, vmd );
+			var vmd:ModelData = new ModelData( $pe.guid );
+			if ( $pe.dbo )
+				vmd.fromPersistance( $pe.dbo );
+			else
+				vmd.ba = $pe.data;
+			add( $pe.guid, vmd );
 		}
 		else {
 			Log.out( "ModelDataManager.loadSucceed ERROR NO DBO " + $pe.toString(), Log.ERROR );
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.REQUEST_FAILED, null, null ) );
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, null, null ) );
 		}
 	}
 	
@@ -90,7 +95,7 @@ public class ModelDataCache
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
 		Log.out( "ModelDataManager.loadFailed " + $pe.toString(), Log.ERROR );
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.REQUEST_FAILED, null, null ) );
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, null, null ) );
 	}
 	
 	static private function loadNotFound( $pe:PersistanceEvent):void 
@@ -98,7 +103,7 @@ public class ModelDataCache
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
 		Log.out( "ModelDataManager.loadNotFound " + $pe.toString(), Log.ERROR );
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelDataEvent.REQUEST_FAILED, null, null ) );
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, null, null ) );
 	}
 	
 }
