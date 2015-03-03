@@ -7,27 +7,11 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import flash.events.Event;
-	import flash.events.IOErrorEvent;
 	import flash.geom.Vector3D;
-	import flash.net.URLRequest;
-	import flash.utils.Dictionary;
 	import flash.utils.ByteArray;
 	
-	import mx.utils.StringUtil;
-	
-	import com.developmentarc.core.tasks.tasks.ITask;
-	import com.developmentarc.core.tasks.groups.TaskGroup;
-	
-	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.events.LoadingEvent;
-	import com.voxelengine.events.ModelMetadataEvent;
-	import com.voxelengine.server.Network;
-	import com.voxelengine.utils.CustomURLLoader;
-	import com.voxelengine.worldmodel.biomes.LayerInfo;
-	import com.voxelengine.worldmodel.tasks.landscapetasks.CompletedModel;
-	import com.voxelengine.worldmodel.tasks.landscapetasks.LoadModelFromBigDB;
+	import com.voxelengine.Globals;
 	
 	/**
 	 * ...
@@ -36,18 +20,10 @@ package com.voxelengine.worldmodel.models
 	public class ModelLoader 
 	{
 		// objects that are waiting on model data to load
-		static private var _blocks:Dictionary = new Dictionary(true);
-		// This is used only for loading local models into persistance
-		static private var _s_mmd:ModelMetadata;
-		
-		public function ModelLoader():void {
-			// replaced by ModelMaker
-			//ModelMetadataEvent.addListener( ModelMetadataEvent.ADDED, localModelReadyToBeCreated );
-		}
+		//static private var _blocks:Dictionary = new Dictionary(true);
 		
 		// Make sense, called from Region
-		static public function modelMetaInfoRead( $ba:ByteArray ):Object
-		{
+		static public function modelMetaInfoRead( $ba:ByteArray ):Object {
 			$ba.position = 0;
 			// Read off first 3 bytes, the data format
 			var format:String = readFormat($ba);
@@ -120,6 +96,89 @@ package com.voxelengine.worldmodel.models
 				new ModelMaker( $ii );
 		}
 		
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		// persistent model
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		static public function loadFromManifestByteArrayNew( $ii:InstanceInfo, $vmd:ModelData ):VoxelModel {
+				
+			var $ba:ByteArray = $vmd.ba;
+			if ( null == $ba )
+			{
+				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad data in VoxelModelMetadata: " + $vmd.guid, Log.ERROR );
+				return null;
+			}
+			$ba.position = 0;
+			
+			var versionInfo:Object = modelMetaInfoRead( $ba );
+			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
+			{
+				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
+				return null;
+			}
+			
+			// how many bytes is the modelInfo
+			var strLen:int = $ba.readInt();
+			// read off that many bytes
+			var modelInfoJson:String = $ba.readUTFBytes( strLen );
+			
+			// create the modelInfo object from embedded metadata
+			modelInfoJson = decodeURI(modelInfoJson);
+			var jsonResult:Object = JSON.parse(modelInfoJson);
+			var mi:ModelInfo = new ModelInfo();
+			mi.initJSON( $vmd.guid, jsonResult );
+			
+			// add the modelInfo to the repo
+			// is the still needed TODO - RSF 9.23.14
+//			Globals.modelInfoAdd( mi );
+			// needs to be name + guid??
+			
+			//var vm:* = instantiate( $ii, mi, $vmm );
+			var vm:* = instantiate( $ii, mi, null );
+			if ( vm ) {
+				vm.version = versionInfo.version;
+				vm.fromByteArray( $ba );
+			}
+
+			vm.complete = true;
+			return vm;
+		}
+		
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		// local model
+		///////////////////////////////////////////////////////////////////////////////////////////////////
+		// This is the last part of reading a local model
+		static public function loadLocalModelFromByteArray( $vm:VoxelModel, $ba:ByteArray):void 	{
+			
+			// the try catch here allows me to treat all models as compressed
+			// if the uncompress fails, it simply continues
+			// This sequence of bytes shows it is compressed ???
+			try {  $ba.uncompress(); }
+			catch (error:Error) { ; }
+			$ba.position = 0;
+
+			var versionInfo:Object = modelMetaInfoRead( $ba );
+			$vm.version = versionInfo.version;
+			//Log.out( "VoxelModel.IVMLoadUncompressed version: " + _version + "  manifestVersion: " + versionInfo.manifestVersion );
+			if ( 0 != versionInfo.manifestVersion ) {
+				// this local file has manifest information
+				// so load it but throw away the embedded info
+				// how should I handle if there is a mismatch?
+				// do I use the local or the network? hm...
+				
+				// how many bytes is the modelInfo
+				var strLen:int = $ba.readInt();
+				// read off that many bytes
+				var modelInfoJson:String = $ba.readUTFBytes( strLen );
+				modelInfoJson = decodeURI( modelInfoJson );
+				//Log.out( "VoxelModel.IVMLoadUncompressed - modelInfoJson: " + modelInfoJson );
+			}
+			
+			$vm.metadata.name = $vm.modelInfo.fileName;
+			
+			// now just load the model like any other
+			$vm.fromByteArray($ba);
+		}
+		
 		// This is the final step in model creation. All of the info needed to create the model is here.
 		// the oxel is still not build, but all of the other information is complete.
 		static public function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:ModelMetadata ):* {
@@ -166,6 +225,7 @@ package com.voxelengine.worldmodel.models
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// Persistant model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
+		/*
 		static public function loadFromManifestByteArray( $vmm:ModelMetadata, $ba:ByteArray, controllingModelGuid:String = "" ):VoxelModel {
 				
 			if ( null == $ba )
@@ -221,144 +281,15 @@ package com.voxelengine.worldmodel.models
 			vm.complete = true;
 			return vm;
 		}
-		
-		static public function loadFromManifestByteArrayNew( $ii:InstanceInfo, $vmd:ModelData ):VoxelModel {
-				
-			var $ba:ByteArray = $vmd.ba;
-			if ( null == $ba )
-			{
-				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad data in VoxelModelMetadata: " + $vmd.guid, Log.ERROR );
-				return null;
-			}
-			$ba.position = 0;
-			
-			var versionInfo:Object = modelMetaInfoRead( $ba );
-			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
-			{
-				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
-				return null;
-			}
-			
-			// how many bytes is the modelInfo
-			var strLen:int = $ba.readInt();
-			// read off that many bytes
-			var modelInfoJson:String = $ba.readUTFBytes( strLen );
-			
-			// create the modelInfo object from embedded metadata
-			modelInfoJson = decodeURI(modelInfoJson);
-			var jsonResult:Object = JSON.parse(modelInfoJson);
-			var mi:ModelInfo = new ModelInfo();
-			mi.initJSON( $vmd.guid, jsonResult );
-			
-			// add the modelInfo to the repo
-			// is the still needed TODO - RSF 9.23.14
-			Globals.modelInfoAdd( mi );
-			// needs to be name + guid??
-			
-			//var vm:* = instantiate( $ii, mi, $vmm );
-			var vm:* = instantiate( $ii, mi, null );
-			if ( vm ) {
-				vm.version = versionInfo.version;
-				vm.fromByteArray( $ba );
-			}
-
-			vm.complete = true;
-			return vm;
-		}
-		
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// END Persistant model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		///////////////////////////////////////////////////////////////////////////////////////////////////
-		// local model
-		///////////////////////////////////////////////////////////////////////////////////////////////////
-		// This is the last part of reading a local model
-		static public function loadLocalModelFromByteArray( $vm:VoxelModel, $ba:ByteArray):void 	{
-			
-			// the try catch here allows me to treat all models as compressed
-			// if the uncompress fails, it simply continues
-			// This sequence of bytes shows it is compressed ???
-			try {  $ba.uncompress(); }
-			catch (error:Error) { ; }
-			$ba.position = 0;
-
-			var versionInfo:Object = modelMetaInfoRead( $ba );
-			$vm.version = versionInfo.version;
-			//Log.out( "VoxelModel.IVMLoadUncompressed version: " + _version + "  manifestVersion: " + versionInfo.manifestVersion );
-			if ( 0 != versionInfo.manifestVersion ) {
-				// this local file has manifest information
-				// so load it but throw away the embedded info
-				// how should I handle if there is a mismatch?
-				// do I use the local or the network? hm...
-				
-				// how many bytes is the modelInfo
-				var strLen:int = $ba.readInt();
-				// read off that many bytes
-				var modelInfoJson:String = $ba.readUTFBytes( strLen );
-				modelInfoJson = decodeURI( modelInfoJson );
-				//Log.out( "VoxelModel.IVMLoadUncompressed - modelInfoJson: " + modelInfoJson );
-			}
-			
-			$vm.metadata.name = $vm.modelInfo.fileName;
-			
-			// now just load the model like any other
-			$vm.fromByteArray($ba);
-		}
-		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// END local model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
-		///////////////////////////////////////////////////////////////////////////////////////////////////
-		// local TO Persistant model
-		///////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		static private function localModelReadyToBeCreated( $e:ModelMetadataEvent ):void {
-			
-			Log.out( "ModelLoader.localModelReadyToBeCreated - " + $e.toString() );
-			var ii:InstanceInfo = new InstanceInfo();
-			// no easy way to pass the VoxelModelMetadata thru loader, so save it off here, and reapply after it is loaded
-			_s_mmd = $e.vmm;
-			ii.guid = $e.vmm.guid; // Since it used the file name to load locally, this has to be the same 
-			
-			// this will occur after the oxel data has been loaded
-			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_COMPLETE, localModelLoaded );
-			LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, localModelLoaded );
-			
-			load( ii, _s_mmd );
-		}
-		
-		// We have to wait for the oxel data to be loaded before we can convert this to a template.
-		static private function localModelLoaded( e:LoadingEvent ):void {
-			
-			if ( null == _s_mmd )
-				Log.out( "ModelLoader.localModelLoaded - _s_mmd is null " + e.toString() );
-				
-			if ( _s_mmd.guid == e.guid ) {
-				Log.out( "ModelLoader.localModelLoaded - " + e.toString() );
-				//var vm:VoxelModel = TemplateManager.templateGet( e.guid );
-				var vm:VoxelModel = Globals.modelGet( e.guid );
-				
-				if ( vm ) {
-					// Convert this from a locally loaded model, to a persistance loaded model
-					var newLayerInfo:LayerInfo = new LayerInfo( "LoadModelFromBigDB", vm.instanceInfo.guid );
-					vm.modelInfo.biomes.layerReset();
-					vm.modelInfo.biomes.add_layer( newLayerInfo );
-					vm.modelInfo.jsonReset();
-					vm.changed = true;
-					vm.instanceInfo.guid = vm.metadata.guid = Globals.getUID();
-					_s_mmd = null;
-					vm.save();
-//					PlanManager.templateAdd( vm.metadata );
-					LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.TEMPLATE_MODEL_COMPLETE, vm.metadata.guid ) );
-					// clear out any evidence that we loaded this model (modelInfo too?)
-					Globals.markDead( e.guid );
-					Globals.instanceInfoRemove( e.guid );
-				}
-				else
-					Log.out( "ModelLoader.localModelLoaded - Failed to find template in template manager guid: " + vm.metadata.guid );
-			}
-		}
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// END local TO Persistant model
@@ -410,7 +341,7 @@ package com.voxelengine.worldmodel.models
 				_blocks[$guid] = null;
 			}
 		}
-		
+		*/
 		
 	}
 }
