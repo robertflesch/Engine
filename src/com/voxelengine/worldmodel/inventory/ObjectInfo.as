@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.inventory
 {
 import flash.utils.ByteArray;
 import com.voxelengine.Log;
+import com.voxelengine.GUI.inventory.BoxInventory;
 
 /**
  * ...
@@ -26,12 +27,14 @@ public class ObjectInfo
 	static public const OBJECTINFO_TOOL:int = 6;
 	
 	protected var _objectType:int 			= OBJECTINFO_INVALID;
+	protected var _box:BoxInventory;
 	
 	public function get objectType():int 					{ return _objectType; }
 	
-	public function ObjectInfo( $objectType:int ):void {
-		_objectType = $objectType;
-	}
+	public function get box():BoxInventory { return _box; }
+	public function set box(value:BoxInventory):void  { _box = value; }
+	
+	public function ObjectInfo( $owner:BoxInventory, $objectType:int ):void { _objectType = $objectType; }
 	
 	public function asByteArray( $ba:ByteArray ):ByteArray 	{ return $ba; }
 	public function fromByteArray( $ba:ByteArray ):ByteArray{ return $ba; }

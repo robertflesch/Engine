@@ -155,7 +155,7 @@ package {
 			addEventListener(Event.ACTIVATE, activate);
 			
 			//Log.out( "VoxelVerse.onSplashLoaded - stage.addEventListener" );
-			stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+//			stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 			stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
 			stage.addEventListener(MouseEvent.RIGHT_CLICK, onMouseRightClick);
 			stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, mouseDownRight);

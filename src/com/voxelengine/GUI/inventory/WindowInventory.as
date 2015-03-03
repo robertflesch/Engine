@@ -1,4 +1,5 @@
 package com.voxelengine.GUI.inventory {
+	import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
 	import flash.events.Event;
@@ -129,7 +130,9 @@ package com.voxelengine.GUI.inventory {
 						pc.layout = new AbsoluteLayout();
 						count = 0;		
 					}
-					box = new BoxInventory(64, 64, BorderStyle.NONE, item );
+					box = new BoxInventory(64, 64, BorderStyle.NONE );
+					var ov:ObjectVoxel = new ObjectVoxel( box, item.type );
+					box.updateObjectInfo( ov );
 					box.x = count * 64;
 					pc.addElement( box );
 					eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);

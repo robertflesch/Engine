@@ -184,7 +184,8 @@ public class  UserInventory extends QuickInventory
 	/////////// end drag and drop //////////////////////////////////////////////////////
 	
 	private function buildItem( actionItem:ObjectInfo, count:int ):Object {
-		var box:BoxInventory = new BoxInventory(_imageSize, _imageSize, BorderStyle.NONE, actionItem );
+		var box:BoxInventory = new BoxInventory(_imageSize, _imageSize, BorderStyle.NONE );
+		// actionItem
 		eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
 
 		_boxes[count] = box;

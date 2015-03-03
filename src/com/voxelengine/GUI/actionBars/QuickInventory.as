@@ -23,6 +23,7 @@ import org.flashapi.swing.layout.AbsoluteLayout;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
+import com.voxelengine.GUI.inventory.BoxInventory;
 import com.voxelengine.worldmodel.*;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
 
@@ -37,8 +38,8 @@ public class QuickInventory extends VVCanvas
 	private var _selector:Sprite;
 	protected var _selectorXOffset:int;
 	protected var _offsetFromBottom:int;
-	protected var _boxes:Vector.<Box> = new Vector.<Box>(10,true);
-	public function get boxes():Vector.<Box> { return _boxes;}
+	protected var _boxes:Vector.<BoxInventory> = new Vector.<BoxInventory>(10,true);
+	public function get boxes():Vector.<BoxInventory> { return _boxes;}
 	
 	public function QuickInventory($width:int, $height:int, $imageSize:int, $outlineName:String, $offsetFromBottom:int = 0 ) {
 		super( $width, $height );

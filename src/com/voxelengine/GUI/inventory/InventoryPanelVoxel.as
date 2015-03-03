@@ -175,7 +175,8 @@ public class InventoryPanelVoxel extends VVContainer
 			if ( null == item )
 				continue;
 			var voxelCount:int = results[typeId].val;
-			if ( item.placeable && 0 < voxelCount)
+			//if ( item.placeable && 0 < voxelCount)
+			if ( item.placeable )
 			{
 				// Add the filled bar to the container and create a new container
 				if ( countMax == count )
@@ -185,7 +186,8 @@ public class InventoryPanelVoxel extends VVContainer
 					pc.layout = new AbsoluteLayout();
 					count = 0;		
 				}
-				box = new BoxInventory(VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_WIDTH, BorderStyle.NONE, item );
+				box = new BoxInventory(VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_WIDTH, BorderStyle.NONE );
+				box.updateObjectInfo( new ObjectVoxel( box, typeId ) );
 				box.x = count * VOXEL_IMAGE_WIDTH;
 				pc.addElement( box );
 				eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
@@ -216,7 +218,7 @@ public class InventoryPanelVoxel extends VVContainer
 					var bi:BoxInventory = e.dropTarget as BoxInventory;
 					var item:ObjectInfo;
 					if ( e.dragOperation.initiator.data is TypeInfo )
-						item = new ObjectVoxel( e.dragOperation.initiator.data.type );
+						item = new ObjectVoxel( bi, e.dragOperation.initiator.data.type );
 					else
 						Log.out( "InventoryPanelVoxel.dropMaterial - unknow type: " + (e.dragOperation.initiator.data).toString(), Log.ERROR );
 					bi.updateObjectInfo( item );

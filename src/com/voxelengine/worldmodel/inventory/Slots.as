@@ -45,36 +45,36 @@ public class Slots
 	
 	public function slotChange(e:InventorySlotEvent):void {
 		Log.out( "SlotsManager.slotChange slot: " + e.slotId + "  item: " + e.item );
-		if ( _items ) {
-			if ( null == e.item )
-				_items[e.slotId] = new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY );
-			else
-				_items[e.slotId] = e.item;
-			changed = true;
-		}
-		else
-			Log.out( "SlotsManager.slotChange _slots container not initialized", Log.WARN );
+		//if ( _items ) {
+			//if ( null == e.item )
+				//_items[e.slotId] = new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY );
+			//else
+				//_items[e.slotId] = e.item;
+			//changed = true;
+		//}
+		//else
+			//Log.out( "SlotsManager.slotChange _slots container not initialized", Log.WARN );
 	}
 	
 	private function createObjectFromInventoryString( $data:String ):ObjectInfo {
 		// find the first comma so we can get the substring with the object type
 		var type:int = int( $data.charAt(0) );
 		if ( type == 1 )
-			return new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY );		
+			return new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );		
 		else if ( type == 2 )
-			return new ObjectVoxel( 0 ).fromInventoryString( $data ); 
+			return new ObjectVoxel( null, 0 ).fromInventoryString( $data ); 
 		else if ( type == 3 )
-			return new ObjectModel( "" ).fromInventoryString( $data );
+			return new ObjectModel( null, "" ).fromInventoryString( $data );
 		else if ( type == 4 )
-			return new ObjectAction( "", "", "" ).fromInventoryString( $data );
+			return new ObjectAction( null, "", "", "" ).fromInventoryString( $data );
 		else if ( type == 5 )
-			return new ObjectGrain( "", "" ).fromInventoryString( $data );
+			return new ObjectGrain( null, "", "" ).fromInventoryString( $data );
 		else if ( type == 6 )
-			return new ObjectTool( "", "", "", "" ).fromInventoryString( $data );
+			return new ObjectTool( null, "", "", "", "" ).fromInventoryString( $data );
 		else
 			Log.out( "Slots.createObjectFromInventoryString - type: " + type + "  NOT FOUND", Log.ERROR );
 		
-		return new ObjectInfo( ObjectInfo.OBJECTINFO_INVALID );
+		return new ObjectInfo( null, ObjectInfo.OBJECTINFO_INVALID );
 	}
 	
 	public function fromPersistance( $dbo:DatabaseObject ):void {	
@@ -114,10 +114,10 @@ public class Slots
 		initializeSlots();
 		Log.out( "Slots.addSlotDefaultData - Loading default data into slots" , Log.WARN );
 		
-		var pickItem:ObjectTool = new ObjectTool( "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );
+		var pickItem:ObjectTool = new ObjectTool( null, "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );
 		_items[0] = pickItem;
 		
-		var noneItem:ObjectAction = new ObjectAction( "noneSlots", "none.png", "Do nothing" );
+		var noneItem:ObjectAction = new ObjectAction( null, "noneSlots", "none.png", "Do nothing" );
 		_items[1] = noneItem;
 		
 		changed = true;
@@ -140,7 +140,7 @@ public class Slots
 
 	private function initializeSlots():void {
 		for ( var i:int; i < ITEM_COUNT; i++ ) {
-			_items[i] = new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY );
+			_items[i] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );
 		}
 	}
 

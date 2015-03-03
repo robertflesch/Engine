@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.inventory
 {
 import com.voxelengine.Log;
+import com.voxelengine.GUI.inventory.BoxInventory;
 
 /**
  * ...
@@ -19,8 +20,8 @@ public class ObjectGrain extends ObjectInfo
 	private var _image:String	= "";
 	private var _name:String	= "";
 	
-	public function ObjectGrain( $name:String, $image:String ):void {
-		super( ObjectInfo.OBJECTINFO_GRAIN );
+	public function ObjectGrain( $owner:BoxInventory, $name:String, $image:String ):void {
+		super( $owner, ObjectInfo.OBJECTINFO_GRAIN );
 		_image = $image;
 		_name = $name;
 	}

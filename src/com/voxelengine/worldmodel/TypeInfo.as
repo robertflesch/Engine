@@ -29,7 +29,7 @@ package com.voxelengine.worldmodel
 	 * ...
 	 * @author Bob
 	 */
-	public class TypeInfo extends ObjectInfo
+	public class TypeInfo
 	{
 		public static const INVALID:uint						= 0;	//  0
 		private static var  enum_val:uint						= 100; // TypeInfo.MIN_TYPE_INFO
@@ -198,7 +198,7 @@ package com.voxelengine.worldmodel
 		
 		public function TypeInfo( $typeId:int ):void { 
 			_typeId = $typeId;
-			super( ObjectInfo.OBJECTINFO_VOXEL );
+			//super( ObjectInfo.OBJECTINFO_VOXEL );
 		}
 		
 		public function getJSON():String

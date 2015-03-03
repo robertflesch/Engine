@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.inventory
 {
 import com.voxelengine.Log;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
+import com.voxelengine.GUI.inventory.BoxInventory;
 
 /**
  * ...
@@ -26,8 +27,8 @@ public class ObjectTool extends ObjectInfo
 	public function get image():String { return _image; }
 	public function get name():String  { return _name; }
 
-	public function ObjectTool( $guid:String, $callBackName:String, $image:String, $name:String ):void {
-		super( ObjectInfo.OBJECTINFO_TOOL );
+	public function ObjectTool( $owner:BoxInventory, $guid:String, $callBackName:String, $image:String, $name:String ):void {
+		super( $owner, ObjectInfo.OBJECTINFO_TOOL );
 		_guid = $guid;
 		_callBackName = $callBackName;
 		if ( "" != $callBackName )

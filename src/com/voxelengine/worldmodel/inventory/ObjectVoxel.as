@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.inventory
 import com.voxelengine.Log;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
+import com.voxelengine.GUI.inventory.BoxInventory;
 
 /**
  * ...
@@ -21,8 +22,8 @@ public class ObjectVoxel extends ObjectInfo
 	private var _typeId:int;
 	public function get type():int { return _typeId; }
 
-	public function ObjectVoxel( $typeId:int ):void {
-		super( ObjectInfo.OBJECTINFO_VOXEL );
+	public function ObjectVoxel( $owner:BoxInventory, $typeId:int ):void {
+		super( $owner, ObjectInfo.OBJECTINFO_VOXEL );
 		_typeId = $typeId;
 	}
 	

@@ -19,6 +19,7 @@ import org.flashapi.swing.event.UIMouseEvent;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
+import com.voxelengine.GUI.inventory.BoxInventory;
 import com.voxelengine.worldmodel.models.EditCursor;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.inventory.ObjectGrain;
@@ -84,9 +85,9 @@ public class GrainSelector extends QuickInventory
 	}
 	
 	
-	private function buildItem( $item:ObjectInfo, count:int ):Box {
+	private function buildItem( $item:ObjectInfo, count:int ):BoxInventory {
 		var item:ObjectGrain = $item as ObjectGrain;
-		var box:Box = new Box(_imageSize, _imageSize);
+		var box:BoxInventory = new BoxInventory(_imageSize, _imageSize);
 		var hk:Label = new Label("", 20);
 		box.x = _imageSize * count  + _selectorXOffset;
 		box.y = height - _imageSize;
@@ -116,26 +117,33 @@ public class GrainSelector extends QuickInventory
 		name = "GrainSelector";
 
 		var count:int = 0;
-		var ti:ObjectGrain = new ObjectGrain( "0", "0.0625meter.png" );
-		boxes[count] = buildItem( ti, count++ );
+		var ti:ObjectGrain = new ObjectGrain( null, "0", "0.0625meter.png" );
+		boxes[count] = buildItem( ti, count );
+		ti.box = boxes[count++];
 		
-		ti = new ObjectGrain( "1", "0.125meter.png" );
-		boxes[count] = buildItem( ti, count++ );
+		ti = new ObjectGrain( null, "1", "0.125meter.png" );
+		boxes[count] = buildItem( ti, count );
+		ti.box = boxes[count++];
 		
-		ti = new ObjectGrain( "2", "0.25meter.png" );
-		boxes[count] = buildItem( ti, count++ );
+		ti = new ObjectGrain( null, "2", "0.25meter.png" );
+		boxes[count] = buildItem( ti, count );
+		ti.box = boxes[count++];
 		
-		ti = new ObjectGrain( "3", "0.5meter.png" );
-		boxes[count] = buildItem( ti, count++ );
+		ti = new ObjectGrain( null, "3", "0.5meter.png" );
+		boxes[count] = buildItem( ti, count );
+		ti.box = boxes[count++];
 		
-		ti = new ObjectGrain( "4", "1meter.png" );
-		boxes[count] = buildItem( ti, count++ );
+		ti = new ObjectGrain( null, "4", "1meter.png" );
+		boxes[count] = buildItem( ti, count );
+		ti.box = boxes[count++];
 		
-		ti = new ObjectGrain( "5", "2meter.png" );
-		boxes[count] = buildItem( ti, count++ );
+		ti = new ObjectGrain( null, "5", "2meter.png" );
+		boxes[count] = buildItem( ti, count );
+		ti.box = boxes[count++];
 		
-		ti = new ObjectGrain( "6", "4meter.png" );
-		boxes[count] = buildItem( ti, count++ );
+		ti = new ObjectGrain( null, "6", "4meter.png" );
+		boxes[count] = buildItem( ti, count );
+		ti.box = boxes[count++];
 		
 		//width = 7 * 64;
 		//grainAction( 4 );

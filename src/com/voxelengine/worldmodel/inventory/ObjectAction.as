@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.inventory
 {
 import com.voxelengine.Log;
+import com.voxelengine.GUI.inventory.BoxInventory;
 
 /**
  * ...
@@ -24,8 +25,8 @@ public class ObjectAction extends ObjectInfo
 	public function get image():String { return _image; }
 	public function get name():String  { return _name; }
 
-	public function ObjectAction( $callBackName:String, $image:String, $name:String ):void {
-		super( ObjectInfo.OBJECTINFO_ACTION );
+	public function ObjectAction( $owner:BoxInventory, $callBackName:String, $image:String, $name:String ):void {
+		super( $owner, ObjectInfo.OBJECTINFO_ACTION );
 		_callBackName = $callBackName;
 		if ( "" != $callBackName )
 			_callBack = FunctionRegistry.functionGet( $callBackName );

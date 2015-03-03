@@ -37,13 +37,12 @@ public class BoxInventory extends VVBox
 	private var _objectInfo:ObjectInfo;
 	public function get objectInfo():ObjectInfo { return _objectInfo; }
 	
-	public function BoxInventory( $widthParam:Number, $heightParam:Number, $borderStyle:String = BorderStyle.NONE, $item:ObjectInfo = null )
+	public function BoxInventory( $widthParam:Number, $heightParam:Number, $borderStyle:String = BorderStyle.NONE )
 	{
 		super( $widthParam, $heightParam, $borderStyle );
 		layout = new AbsoluteLayout();
 		autoSize = false;
 		dragEnabled = true;
-		data = $item;
 		_count = new Label( "", $widthParam );
 		_count.fontColor = 0xffffff;
 		_count.textAlign = TextAlign.CENTER
@@ -51,7 +50,7 @@ public class BoxInventory extends VVBox
 		_count.y = 20;
 		addElement(_count);
 		
-		updateObjectInfo( $item );
+//		updateObjectInfo( $item );
 	}	
 	
 	public function updateObjectInfo( $item:ObjectInfo ):void {
@@ -67,7 +66,23 @@ public class BoxInventory extends VVBox
 			setHelp( "" );			
 			break;
 		case ObjectInfo.OBJECTINFO_MODEL:
-			// Not used here, instead data is set via direct metadata retrived call.
+			var om:ObjectModel = _objectInfo as ObjectModel;
+			if ( om.vmm ) {
+				if ( null == om.vmm.image ) {
+					var bmpd:BitmapData = Globals.g_renderer.modelShot();
+					om.vmm.image = drawScaled( bmpd, bmpd.width, bmpd.height );
+				}
+				
+				//var modelsOfThisGuid:String = String( e.result.toFixed(0) );
+				var modelsOfThisGuid:int = om.vmm.copyCount;
+				if ( 99999 < modelsOfThisGuid )
+					_count.text = "LOTS";
+				else
+					_count.text = String( modelsOfThisGuid );
+					
+				setHelp( om.vmm.name );			
+				backgroundTexture = om.vmm.image;
+			}
 			break;
 		case ObjectInfo.OBJECTINFO_ACTION:
 			var oa:ObjectAction = $item as ObjectAction;
@@ -101,38 +116,6 @@ public class BoxInventory extends VVBox
 			break;
 		}
 	}
-	
-	public function updateObjectDisplayData( $vmm:ModelMetadata ):void {
-		Log.out( "BoxInventory.updateOBjectDisplayData vmm: " + $vmm.toString() );
-		if ( $vmm.guid == ( _objectInfo as ObjectModel ).guid ) {
-		
-			if ( null == $vmm.image ) {
-				var bmpd:BitmapData = Globals.g_renderer.modelShot();
-				$vmm.image = drawScaled( bmpd, bmpd.width, bmpd.height );
-			}
-			
-			//var modelsOfThisGuid:String = String( e.result.toFixed(0) );
-			var modelsOfThisGuid:int = $vmm.copyCount;
-			if ( 99999 < modelsOfThisGuid )
-				_count.text = "LOTS";
-			else
-				_count.text = String( modelsOfThisGuid );
-				
-			setHelp( $vmm.name );			
-			backgroundTexture = $vmm.image;
-		}
-	}
-	
-	//private function modelCount(e:InventoryModelEvent):void 
-	//{
-		//if ( e.itemGuid == ( _objectInfo as ObjectModel ).guid ) {
-			//var modelsOfThisGuid:String = String( e.result.toFixed(0) );
-			//if ( 8 < modelsOfThisGuid.length )
-				//_count.text = "LOTS";
-			//else
-				//_count.text = modelsOfThisGuid;
-		//}
-	//}
 	
 	private function voxelCount(e:InventoryVoxelEvent):void 
 	{
