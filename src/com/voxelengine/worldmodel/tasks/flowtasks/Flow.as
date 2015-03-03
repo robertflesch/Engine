@@ -69,7 +69,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			
 			super.start();
 			
-			var vm:VoxelModel = Globals.getModelInstance( _guid );
+			var vm:VoxelModel = Globals.modelGet( _guid );
 			main:if ( vm )
 			{
 				var flowOxel:Oxel = vm.oxel.childGetOrCreate( _gc );

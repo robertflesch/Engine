@@ -8,6 +8,11 @@
 
 package com.voxelengine.GUI.actionBars
 {
+import com.voxelengine.events.ModelEvent;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelMaker;
+import com.voxelengine.worldmodel.models.ModelManager;
+import com.voxelengine.worldmodel.models.VoxelModel;
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
 import flash.events.KeyboardEvent;
@@ -56,6 +61,7 @@ public class  UserInventory extends QuickInventory
 		display();
 		show();
 		resizeObject( null );
+		// this gets the already initialized inventory from the inventory manager
 		InventoryEvent.addListener( InventoryEvent.INVENTORY_RESPONSE, inventoryLoaded );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_REQUEST, Network.userId, null ) );
 	}
@@ -262,7 +268,7 @@ public class  UserInventory extends QuickInventory
 		processItemSelection( boxes[$index] );
 	}
 	
-	
+	private var _editCursorModelGuid:String = null;
 	public function processItemSelection( box:UIObject ):void 
 	{
 		moveSelector( box.x );
@@ -270,6 +276,12 @@ public class  UserInventory extends QuickInventory
 		
 		Globals.g_app.editing = false;
 		Globals.g_app.toolOrBlockEnabled = false;
+		hideGrainTools();
+		if ( null != _editCursorModelGuid ) {
+			var ecm:VoxelModel = Region.currentRegion.modelManager.modelGet( _editCursorModelGuid );
+			ecm.dead = true;
+			_editCursorModelGuid = null;
+		}
 		var oi:ObjectInfo = box.data as ObjectInfo;
 		if ( oi is ObjectVoxel ) {
 			var ti:ObjectVoxel = oi as ObjectVoxel;
@@ -287,7 +299,6 @@ public class  UserInventory extends QuickInventory
 		else if ( oi is ObjectAction ) {
 			Log.out( "UserInventory.processItemSelection - ObjectAction");
 			var oa:ObjectAction = oi as ObjectAction;
-			hideGrainTools();
 			if ( lastItemSelection != itemIndex )
 			{   // We are selecting none when it was previously on another item
 				oa.callBack();
@@ -321,20 +332,10 @@ public class  UserInventory extends QuickInventory
 		else if ( oi is ObjectModel ) {
 			Log.out( "UserInventory.processItemSelection - ObjectModel - what do I do here?");
 			var om:ObjectModel = oi as ObjectModel;
-			hideGrainTools();
-			//if ( lastItemSelection != itemIndex )
-			//{   // We are selecting the a model when it was previously on another item
-				//ot.callBack();
-			//}
-			//else if ( - 1 != _itemMaterialSelection ) 
-			//{	// go back to previously used material
-				//Globals.g_app.editing = true;
-				//Globals.g_app.toolOrBlockEnabled = true;
-				//EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
-				//var lastBoxPick:Box = getBoxFromIndex( _itemMaterialSelection );
-				//processItemSelection( lastBoxPick );
-				//return;
-			//}
+			var ii:InstanceInfo = new InstanceInfo();
+			_editCursorModelGuid = ii.guid = om.guid;
+			new ModelMaker( ii );
+			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED, cursorReady );
 		}
 		else if ( oi is ObjectInfo ) {
 			Log.out( "UserInventory.processItemSelection - ObjectInfo");
@@ -342,6 +343,11 @@ public class  UserInventory extends QuickInventory
 		}
 		
 		lastItemSelection = itemIndex;
+	}
+	
+	private function cursorReady(e:ModelEvent):void 
+	{
+		Log.out( "UserInventory.cursorReady - ObjectModel guid: " + e.instanceGuid, Log.WARN );
 	}
 	
 	public function onMouseWheel(event:MouseEvent):void

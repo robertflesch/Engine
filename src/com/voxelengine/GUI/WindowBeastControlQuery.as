@@ -88,7 +88,7 @@ public class WindowBeastControlQuery extends VVCanvas
 
 		private function takeControl():void 
 		{
-			var vm:VoxelModel = Globals.getModelInstance( _beastInstanceGuid );
+			var vm:VoxelModel = Globals.modelGet( _beastInstanceGuid );
 			if ( vm )
 			{
 				remove();

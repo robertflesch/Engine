@@ -186,7 +186,7 @@ package com.voxelengine.GUI
 		{
 			ModelEvent.removeListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
 			// now I want to apply the script to the oxels in the vm.
-			var vm:VoxelModel = Globals.getModelInstance( e.instanceGuid );
+			var vm:VoxelModel = Globals.modelGet( e.instanceGuid );
 			ModelLoader.load( vm.instanceInfo );
 		}
   }

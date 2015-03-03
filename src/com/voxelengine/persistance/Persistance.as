@@ -32,12 +32,8 @@ import com.voxelengine.events.PlayerIOPersistanceEvent
 public class Persistance
 {
 	static public function addEventHandlers():void {
-		//PersistModelMetadata.addEvents();
-		//PersistModelData.addEvents();
-		//PersistRegion.addEvents();
 		PersistBigDB.addEvents();
 		PersistLocal.addEvents();
-		//PersistAnimation.addEvents();
 	}
 	
 	static private function validateConnection():Boolean {

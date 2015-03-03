@@ -25,7 +25,7 @@ public class IceScript extends ImpactScript
 	
 	override public function impact( $wsLoc:Vector3D ):void
 	{
-		var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
+		var vm:VoxelModel = Globals.modelGet( instanceGuid );
 		if ( vm )
 			vm.dead = true;
 

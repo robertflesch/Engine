@@ -43,7 +43,7 @@ package com.voxelengine.worldmodel.models
 			if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
 				return;
 				
-			var vm:VoxelModel = Globals.getModelInstance( me.instanceGuid );
+			var vm:VoxelModel = Globals.modelGet( me.instanceGuid );
 			if ( vm is Engine )
 				_engines.push( vm );
 			if ( vm is Gun )

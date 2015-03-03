@@ -28,7 +28,7 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.pools.*;
-	import com.voxelengine.persistance.Persistance;
+	//import com.voxelengine.persistance.Persistance;
 	import com.voxelengine.utils.CustomURLLoader;
 	import com.voxelengine.worldmodel.models.*;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.CompletedModel;
@@ -136,7 +136,7 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 
-		public function getModelInstance( guid:String ):VoxelModel {
+		public function modelGet( guid:String ):VoxelModel {
 			// This tried to get the model directly
 			var vm:VoxelModel = modelInstancesGet(guid);
 			// if not found, perhaps it is a child model.

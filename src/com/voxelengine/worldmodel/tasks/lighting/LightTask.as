@@ -49,7 +49,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 		
 		static protected function isValidOxel( $le:LightEvent ):Oxel {
 			
-			var vm:VoxelModel = Globals.getModelInstance( $le.instanceGuid );
+			var vm:VoxelModel = Globals.modelGet( $le.instanceGuid );
 			if ( vm ) {
 				var lo:Oxel = vm.oxel.childFind( $le.gc );
 				if ( lo && valid( lo ) )

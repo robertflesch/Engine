@@ -132,7 +132,7 @@ package com.voxelengine.worldmodel.models
 			if ( me.parentInstanceGuid != instanceInfo.guid )
 				return;
 				
-//			var vm:VoxelModel = Globals.getModelInstance( me.ownerGuid );
+//			var vm:VoxelModel = Globals.modelGet( me.ownerGuid );
 		}
 		
 		protected function throttleEvent( event:ShipEvent ):void

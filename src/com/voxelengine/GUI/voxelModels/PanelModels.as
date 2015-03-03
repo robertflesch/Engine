@@ -19,7 +19,6 @@ import org.flashapi.swing.dnd.DnDOperation;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.events.InventoryModelEvent;
 import com.voxelengine.events.UIRegionModelEvent;
 import com.voxelengine.GUI.*;
 import com.voxelengine.GUI.inventory.WindowInventoryNew;
@@ -151,7 +150,7 @@ public class PanelModels extends PanelBase
 			{
 				// move this item to the players INVENTORY so that is it not "lost"
 				Log.out( "PanelModels.deleteModel - " + _selectedModel.toString(), Log.WARN );
-				InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_CHANGE, Network.userId, _selectedModel.instanceInfo.guid, 1 ) );
+//				InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_CHANGE, Network.userId, _selectedModel.instanceInfo.guid, 1 ) );
 
 				Globals.markDead( _selectedModel.instanceInfo.guid );
 				_selectedModel = null;

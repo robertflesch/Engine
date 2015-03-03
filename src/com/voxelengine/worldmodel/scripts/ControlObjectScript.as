@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.scripts
 			{
 				if ( !WindowShipControl.currentInstance && !WindowGunControl.currentInstance )
 				{
-					var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
+					var vm:VoxelModel = Globals.modelGet( instanceGuid );
 					if ( vm )
 					{
 						var controllingModel:VoxelModel = vm.instanceInfo.controllingModel;	

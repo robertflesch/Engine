@@ -21,7 +21,6 @@ import org.flashapi.swing.layout.AbsoluteLayout;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.InventoryModelEvent;
 import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.GUI.*;
 import com.voxelengine.server.Network;
@@ -49,8 +48,6 @@ public class BoxInventory extends VVBox
 		//_count.x = 16;
 		_count.y = 20;
 		addElement(_count);
-		
-//		updateObjectInfo( $item );
 	}	
 	
 	public function updateObjectInfo( $item:ObjectInfo ):void {
@@ -77,6 +74,8 @@ public class BoxInventory extends VVBox
 				var modelsOfThisGuid:int = om.vmm.copyCount;
 				if ( 99999 < modelsOfThisGuid )
 					_count.text = "LOTS";
+				else if ( -1 < modelsOfThisGuid )
+					_count.text = "∞";
 				else
 					_count.text = String( modelsOfThisGuid );
 					

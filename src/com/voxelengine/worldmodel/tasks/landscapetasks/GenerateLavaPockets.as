@@ -89,7 +89,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
             super.start() // AbstractTask will send event
 			trace( "GenerateLavaPockets - enter - creating " +_layer.offset + " pockets of type " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );					
 			var timer:int = getTimer();
-            var vm:VoxelModel = Globals.getModelInstance( _guid );
+            var vm:VoxelModel = Globals.modelGet( _guid );
 			
             var numberOfTunnels:int =_layer.offset;
 			var tunnelLength:int = Math.random() * 200;

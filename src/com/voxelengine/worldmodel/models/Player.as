@@ -148,24 +148,7 @@ public class Player extends Avatar
 			Log.out( "Player.onPlayerLoadedAction - creating player with guid: " + ii.guid, Log.WARN  );
 			//new ModelMaker( ii );
 			new ModelMakerLocal( ii );
-			//var newPlayer:Player = new Player( ii );
-			//
-			//var md:VoxelModelMetadata = new VoxelModelMetadata();
-			//md.guid = $dbo.modelGuid;
-			//md.name = $dbo.userName;
-			//md.owner = Network.userId;
-			//md.modifiedDate =	$dbo.modifiedDate;
-			//md.createdDate = $dbo.createdDate;
-			//
-			//var mi:ModelInfo = new ModelInfo();
-			//mi.biomes = new Biomes();
-			//var newLayerInfo:LayerInfo = new LayerInfo( "LoadModelFromBigDB", $dbo.modelGuid );
-			//mi.biomes.add_layer( newLayerInfo );
-			//mi.jsonReset();
-			//
-			//newPlayer.init( mi, md );
-			//
-			//ModelLoader.load( ii );
+			
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_REQUEST, Network.userId, null ) );
 		}
 		else {
@@ -190,7 +173,7 @@ public class Player extends Avatar
 		if ( !vm ) {
 			Log.out( "Player.onChildAdded ERROR FIND CHILD MODEL: " + me.instanceGuid );
 		}
-		//var vm:VoxelModel = Globals.getModelInstance( me.instanceGuid );
+		//var vm:VoxelModel = Globals.modelGet( me.instanceGuid );
 //Log.out( "Player.onChildAdded model: " + vm.toString() );
 		if ( vm is Engine )
 Log.out( "Player.onChildAdded - Player has ENGINE" )

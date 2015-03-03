@@ -75,7 +75,7 @@ public class ModelDataCache
 	{
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		if ( $pe.data ) {
+		if ( $pe.dbo || $pe.data ) {
 			Log.out( "ModelDataManager.loadSucceed guid: " + $pe.guid, Log.INFO );
 			var vmd:ModelData = new ModelData( $pe.guid );
 			if ( $pe.dbo )
@@ -85,7 +85,7 @@ public class ModelDataCache
 			add( $pe.guid, vmd );
 		}
 		else {
-			Log.out( "ModelDataManager.loadSucceed ERROR NO DBO " + $pe.toString(), Log.ERROR );
+			Log.out( "ModelDataManager.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR );
 			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, null, null ) );
 		}
 	}

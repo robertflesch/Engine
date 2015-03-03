@@ -262,8 +262,8 @@ package com.voxelengine {
 		}
 		
 //////////////////////////////////////////////////////////////////////////////////		
-		public static function getModelInstance( $guid:String ):VoxelModel {
-			return Region.currentRegion.modelManager.getModelInstance( $guid );
+		public static function modelGet( $guid:String ):VoxelModel {
+			return Region.currentRegion.modelManager.modelGet( $guid );
 		};
 		
 		public static function findIVM( $guid:String ):ByteArray {

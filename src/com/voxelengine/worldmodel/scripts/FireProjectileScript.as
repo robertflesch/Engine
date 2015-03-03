@@ -56,7 +56,7 @@ package com.voxelengine.worldmodel.scripts
 			// That is determined by the guns location, and rotation, and by its parents location and rotation
 			
 			// first we calculate the location of the end of the barrel
-			const gunModel:VoxelModel = Globals.getModelInstance( instanceGuid );
+			const gunModel:VoxelModel = Globals.modelGet( instanceGuid );
 			if ( gunModel )
 			{
 				// What was I thinking here?
@@ -111,7 +111,7 @@ package com.voxelengine.worldmodel.scripts
 		static public function createProjectile( pe:ProjectileEvent ):void
 		{
 			var ownerGuid:String = pe.owner;
-			var gunModel:VoxelModel = Globals.getModelInstance( ownerGuid );
+			var gunModel:VoxelModel = Globals.modelGet( ownerGuid );
 			if ( gunModel && gunModel.instanceInfo.controllingModel )
 			{
 				var cm:VoxelModel = gunModel.instanceInfo.controllingModel;

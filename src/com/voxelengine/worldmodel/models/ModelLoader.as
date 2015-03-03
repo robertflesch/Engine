@@ -126,7 +126,7 @@ package com.voxelengine.worldmodel.models
 			if ( !$ii )
 				throw new Error( "ModelLoader.instantiate - InstanceInfo null" );
 
-			var vm:VoxelModel = Globals.getModelInstance( $ii.guid );
+			var vm:VoxelModel = Globals.modelGet( $ii.guid );
 			if ( null != vm ) {
 				// a pre model was made. copy over the modelInfo.
 				vm.modelInfo = $modelInfo;
@@ -208,7 +208,7 @@ package com.voxelengine.worldmodel.models
 			}
 			
 			if ( "" != controllingModelGuid ) {
-				var cvm:VoxelModel = Globals.getModelInstance( controllingModelGuid );
+				var cvm:VoxelModel = Globals.modelGet( controllingModelGuid );
 				ii.controllingModel = cvm;
 			}
 				
@@ -337,7 +337,7 @@ package com.voxelengine.worldmodel.models
 			if ( _s_mmd.guid == e.guid ) {
 				Log.out( "ModelLoader.localModelLoaded - " + e.toString() );
 				//var vm:VoxelModel = TemplateManager.templateGet( e.guid );
-				var vm:VoxelModel = Globals.getModelInstance( e.guid );
+				var vm:VoxelModel = Globals.modelGet( e.guid );
 				
 				if ( vm ) {
 					// Convert this from a locally loaded model, to a persistance loaded model

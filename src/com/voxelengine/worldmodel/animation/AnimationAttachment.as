@@ -122,7 +122,7 @@ package com.voxelengine.worldmodel.animation
 				_voxelModel = _owner.childModelFind( event.instanceGuid );	
 				// locks like this is no longer needed, not sure why not RSF
 				// must be listening for it already.
-//				_voxelModel = Globals.getModelInstance( instanceInfo.guid );
+//				_voxelModel = Globals.modelGet( instanceInfo.guid );
 //				_owner.childAdd( _voxelModel );
 				ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onAttachmentCreated );			
 			}

@@ -80,7 +80,7 @@ package com.voxelengine.worldmodel.models
 			{
 				if ( null == _vm )
 				{
-					_vm = Globals.getModelInstance( _instanceGuid );
+					_vm = Globals.modelGet( _instanceGuid );
 					if ( !_vm )
 						return; // not ready yet.
 				}

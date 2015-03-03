@@ -7,30 +7,23 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
-import com.voxelengine.events.InventoryEvent;
-import flash.events.EventDispatcher;
-import flash.net.registerClassAlias;
 import flash.utils.ByteArray;
-import flash.utils.Dictionary;
 
 import playerio.DatabaseObject;
 
 import org.flashapi.swing.Alert;
 	
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.persistance.Persistance;
-import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.Globals;
+import com.voxelengine.events.*;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
 
-import com.voxelengine.events.*;
 
 public class Inventory
 {
 	
 	private var  _slots:Slots
 	private var _voxels:Voxels;
-	//private var _models:Models;
 	private var _networkId:String;
 
 	// support data for persistance
@@ -41,25 +34,21 @@ public class Inventory
 
 	public function get slots():Slots  { return _slots; }
 	public function get voxels():Voxels  { return _voxels; }
-	//public function get models():Models  { return _models; }
 	public function get networkId():String { return _networkId; }
 	
 	public function Inventory( $networkId:String ) {
 		_slots = new Slots( $networkId );
 		_networkId = $networkId;
 		_voxels = new Voxels( $networkId );
-		//_models = new Models( $networkId );
 	}
 	
 	public function unload():void {
 		Log.out( "Inventory.unload - networkId: " + _networkId, Log.WARN );
 		_slots.unload();
 		_voxels.unload();
-		//_models.unload();
 	}
 		
 	private function changed():Boolean {
-		//if ( _slots.changed || _voxels.changed || _models.changed )
 		if ( _slots.changed || _voxels.changed )
 			return true;
 		return false;
@@ -90,7 +79,6 @@ public class Inventory
 	private function toPersistance():void {
 		_slots.toPersistance(_dbo);
 		_voxels.toPersistance(_dbo);
-		//_models.toPersistance(_dbo);
 		var ba:ByteArray = new ByteArray(); 
 		_dbo.data 			= asByteArray( ba );
 	}
@@ -99,7 +87,6 @@ public class Inventory
 		$ba.writeUTF( _networkId );
 		_slots.asByteArray( $ba );
 		_voxels.asByteArray( $ba );
-		//_models.asByteArray( $ba );
 		$ba.compress();
 		return $ba;	
 	}
@@ -145,7 +132,6 @@ public class Inventory
 		// we can know what user carry around
 		_slots.fromPersistance( $dbo );
 		_voxels.fromPersistance( $dbo );
-		//_models.fromPersistance( $dbo);
 		
 		if ( $dbo && $dbo.data ) {
 			var ba:ByteArray = $dbo.data 
@@ -156,7 +142,6 @@ public class Inventory
 		}
 		else {
 			_voxels.addTestData();
-//			_models.addTestData();
 		}
 	}
 	
@@ -164,7 +149,6 @@ public class Inventory
 		var ownerId:String = $ba.readUTF();
 		_slots.fromByteArray( $ba );
 		_voxels.fromByteArray( $ba );
-		//_models.fromByteArray( $ba );
 	}
 	
 	private function addLoadEvents():void {

@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.tasks
 
 			var timer:int = getTimer();
 			
-			var vm:VoxelModel = Globals.getModelInstance( _guid );
+			var vm:VoxelModel = Globals.modelGet( _guid );
 
 			trace( "LoadSky.start - completed layer of type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
 			super.complete() // AbstractTask will send event

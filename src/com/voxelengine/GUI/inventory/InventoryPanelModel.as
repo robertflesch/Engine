@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
+import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import flash.display.DisplayObject;
 import flash.events.Event;
@@ -31,7 +32,6 @@ import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelMakerImport;
 import com.voxelengine.worldmodel.inventory.FunctionRegistry;
@@ -55,6 +55,7 @@ public class InventoryPanelModel extends VVContainer
 	private var _dragOp:DnDOperation = new DnDOperation();
 	private var _barLeft:TabBar
 	// This hold the items to be displayed
+	// http://www.flashapi.org/spas-doc/org/flashapi/swing/ScrollPane.html
 	private var _itemContainer:ScrollPane;
 	private var _currentRow:Container;
 	
@@ -118,8 +119,7 @@ public class InventoryPanelModel extends VVContainer
 	// That is if I use the target "Name"
 	private function displaySelectedCategory( $category:String ):void
 	{	
-//		InventoryModelEvent.addListener( InventoryModelEvent.INVENTORY_MODEL_LIST_RESULT, populateModels );
-//		InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_LIST_REQUEST, Network.userId, "", $category ) );
+		Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_TYPE, Network.userId, null ) );
 	}
 
@@ -130,7 +130,7 @@ public class InventoryPanelModel extends VVContainer
 		addModel( om );
 	}
 	
-	private function addModel( $oi:ObjectInfo ):BoxInventory {
+	private function addModel( $oi:ObjectInfo, allowDrag:Boolean = true ):BoxInventory {
 		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
 		//// Add the filled bar to the container and create a new container
 		if ( countMax == _currentRow.numElements )
@@ -144,7 +144,8 @@ public class InventoryPanelModel extends VVContainer
 		box.updateObjectInfo( $oi );
 		box.x = _currentRow.numElements * MODEL_IMAGE_WIDTH;
 		_currentRow.addElement( box );
-		eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
+		if ( allowDrag )
+			eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
 		return box;
 	}
 	
@@ -159,17 +160,17 @@ public class InventoryPanelModel extends VVContainer
 		var box:BoxInventory;
 		
 		item = new ObjectAction( box, "createNewObjectIPM", "NewModel128.png", "Click to create new model" );
-		box = addModel( item );
+		box = addModel( item, false );
 		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		
 		if ( Globals.g_debug ) {
 			item = new ObjectAction( box, "importObjectIPM", "import128.png", "Click to import local model" );
-			box = addModel( item );
+			box = addModel( item, false );
 			eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		}
 
 		item = new ObjectAction( box, "createNewObjectIPM", "NewModel128.png", "Click to create new model" );
-		box = addModel( item );
+		box = addModel( item, false );
 		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 	}
 	
@@ -200,7 +201,6 @@ public class InventoryPanelModel extends VVContainer
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.guid = fileName;
 		new ModelMakerImport( ii );
-	//	remove();
 	}
 	
 	
@@ -226,6 +226,8 @@ public class InventoryPanelModel extends VVContainer
 					bi.updateObjectInfo( item );
 					var slotId:int = int( bi.name );
 					InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, item ) );
+					// we are going to need the data to build the model for this.
+					ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, item.guid, null ) );
 				}
 			}
 		}

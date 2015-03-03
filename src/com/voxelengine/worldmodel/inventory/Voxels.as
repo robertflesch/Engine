@@ -7,7 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
-import com.voxelengine.events.InventoryModelEvent;
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;

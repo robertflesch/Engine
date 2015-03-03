@@ -64,7 +64,7 @@ package com.voxelengine.worldmodel.scripts
 			var snd:Sound = SoundBank.getSound( _soundFile );
 			_channel = snd.play();
 			
-			var bomb:Bomb = Globals.getModelInstance( instanceGuid ) as Bomb;
+			var bomb:Bomb = Globals.modelGet( instanceGuid ) as Bomb;
 			if ( bomb )
 			{
 				var ship:VoxelModel = bomb.instanceInfo.controllingModel;
@@ -87,7 +87,7 @@ package com.voxelengine.worldmodel.scripts
 		public function createReplacementBomb( ii:InstanceInfo, shipGuid:String ):void
 		{
 			// this was important, dont recall why
-			var newShip:VoxelModel = Globals.getModelInstance( shipGuid );
+			var newShip:VoxelModel = Globals.modelGet( shipGuid );
 			ii.controllingModel = newShip;
 
 			ModelLoader.load( ii );    

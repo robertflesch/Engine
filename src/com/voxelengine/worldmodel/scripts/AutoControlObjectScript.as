@@ -33,7 +33,7 @@ package com.voxelengine.worldmodel.scripts
 				{
 					ModelEvent.removeListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent );
 					if ( Globals.player ) {
-						var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
+						var vm:VoxelModel = Globals.modelGet( instanceGuid );
 						vm.takeControl( Globals.player );
 						Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.metadata.name );
 					}
@@ -50,9 +50,9 @@ package com.voxelengine.worldmodel.scripts
 			
 			var player:VoxelModel = Globals.player;
 			if ( !player ) 
-				player = Globals.getModelInstance( le.guid );
+				player = Globals.modelGet( le.guid );
 				
-			var vm:VoxelModel = Globals.getModelInstance( instanceGuid );
+			var vm:VoxelModel = Globals.modelGet( instanceGuid );
 			if ( player && vm ) {
 				vm.takeControl( player );
 			}
