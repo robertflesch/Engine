@@ -9,6 +9,7 @@ package com.voxelengine.events
 {
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import flash.events.Event;
+import flash.events.EventDispatcher;
 
 /**
  * ...
@@ -51,5 +52,23 @@ public class InventorySlotEvent extends Event
 	{
 		return _item;
 	}
+	///////////////// Event handler interface /////////////////////////////
+
+	// Used to distribue all persistance messages
+	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
+
+	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
+		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
+	}
+
+	static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
+		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
+	}
+
+	static public function dispatch( $event:InventorySlotEvent ) : Boolean {
+		return _eventDispatcher.dispatchEvent( $event );
+	}
+
+	///////////////// Event handler interface /////////////////////////////
 }
 }

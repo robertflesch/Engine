@@ -717,7 +717,7 @@ package com.voxelengine.worldmodel.oxel
 				amountInGrain0 = -amountInGrain0;
 			}
 				
-			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, typeIdToUse, amountInGrain0 ) );
+			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, typeIdToUse, amountInGrain0 ) );
 		}
 		
 		private function writeInternal( $modelGuid:String, $newType:int, $onlyChangeType:Boolean ):Oxel {

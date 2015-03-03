@@ -1,34 +1,42 @@
+/*==============================================================================
+Copyright 2011-2015 Robert Flesch
+All rights reserved.  This product contains computer programs, screen
+displays and printed documentation which are original works of
+authorship protected under United States Copyright Act.
+Unauthorized reproduction, translation, or display is prohibited.
+==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
-import com.voxelengine.GUI.actionBars.QuickInventory;
-import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.ModelMakerImport;
 import flash.display.DisplayObject;
-import flash.net.FileReference;
 import flash.events.Event;
+import flash.net.FileReference;
 import flash.net.FileFilter;
+
 import org.flashapi.swing.*
 import org.flashapi.swing.core.UIObject;
-import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
+import org.flashapi.swing.event.*;
 import org.flashapi.swing.dnd.*;
-import org.flashapi.swing.framework.flashdevelop.FlashConnect;
-import org.flashapi.swing.list.ListItem;
 import org.flashapi.swing.layout.AbsoluteLayout;
+import org.flashapi.swing.list.ListItem;
 
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.GUI.*;
-import com.voxelengine.events.InventoryModelEvent;
+import com.voxelengine.Globals;
+import com.voxelengine.GUI.VVContainer;
+import com.voxelengine.GUI.WindowModelChoice;
+import com.voxelengine.GUI.LanguageManager;
 import com.voxelengine.events.InventorySlotEvent;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.*;
 import com.voxelengine.worldmodel.models.ModelInfo;
-import com.voxelengine.worldmodel.inventory.InventoryManager;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelMakerImport;
 import com.voxelengine.worldmodel.inventory.FunctionRegistry;
 import com.voxelengine.worldmodel.inventory.ObjectAction;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import com.voxelengine.worldmodel.inventory.ObjectModel;
+import com.voxelengine.GUI.actionBars.QuickInventory;
 
 public class InventoryPanelModel extends VVContainer
 {
@@ -46,12 +54,14 @@ public class InventoryPanelModel extends VVContainer
 	private var _barLeft:TabBar
 	// This hold the items to be displayed
 	private var _itemContainer:Container = new Container( MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH);
+	private var _currentRow:Container;
 	
 	public function InventoryPanelModel( $parent:VVContainer ) {
 		super( $parent );
 		
 		FunctionRegistry.functionAdd( createNewObjectIPM, "createNewObjectIPM" );
 		FunctionRegistry.functionAdd( importObjectIPM, "importObjectIPM" );
+		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, addModel )
 			
 		autoSize = true;
 		layout.orientation = LayoutOrientation.HORIZONTAL;
@@ -59,6 +69,7 @@ public class InventoryPanelModel extends VVContainer
 		upperTabsAdd();
 		addItemContainer();
 		displaySelectedCategory( "all" );
+		populateModels();
 		
 		// This forces the window into a multiple of MODEL_IMAGE_WIDTH width
 		var count:int = width / MODEL_IMAGE_WIDTH;
@@ -103,18 +114,36 @@ public class InventoryPanelModel extends VVContainer
 	// That is if I use the target "Name"
 	private function displaySelectedCategory( $category:String ):void
 	{	
-		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_LIST_RESULT, populateModels );
-		InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_LIST_REQUEST, Network.userId, "", $category ) );
+//		InventoryModelEvent.addListener( InventoryModelEvent.INVENTORY_MODEL_LIST_RESULT, populateModels );
+//		InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_LIST_REQUEST, Network.userId, "", $category ) );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_TYPE, Network.userId, null ) );
+	}
+
+	private function addModel($mme:ModelMetadataEvent):void {
+		
+		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
+		var count:int = _currentRow.numElements
+		//// Add the filled bar to the container and create a new container
+		if ( countMax == count )
+		{
+			_itemContainer.addElement( _currentRow );
+			_currentRow = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
+			_currentRow.layout = new AbsoluteLayout();
+			count = 0;		
+		}
+		var item:ObjectInfo = new ObjectModel( $mme.guid );
+		var box:BoxInventory = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE, item );
+		box.updateObjectDisplayData( $mme.vmm );
+		box.x = count * MODEL_IMAGE_WIDTH;
+		_currentRow.addElement( box );
+		eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
 	}
 	
-	private function populateModels(e:InventoryModelEvent):void 
+	private function populateModels():void 
 	{
-		var results:Array = e.result as Array;
-		InventoryManager.removeListener( InventoryModelEvent.INVENTORY_MODEL_LIST_RESULT, populateModels );
-		
 		var count:int = 0;
-		var pc:Container = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
-		pc.layout = new AbsoluteLayout();
+		_currentRow = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
+		_currentRow.layout = new AbsoluteLayout();
 
 		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
 		var box:BoxInventory;
@@ -124,39 +153,16 @@ public class InventoryPanelModel extends VVContainer
 		box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE, item );
 		box.x = count++ * MODEL_IMAGE_WIDTH;
 		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
-		pc.addElement( box );
+		_currentRow.addElement( box );
 		
 		if ( Globals.g_debug ) {
 			item = new ObjectAction( "importObjectIPM", "import128.png", "Click to import local model" );
 			box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE, item );
 			box.x = count++ * MODEL_IMAGE_WIDTH;
 			eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
-			pc.addElement( box );
+			_currentRow.addElement( box );
 		}
-		
-		//eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
-		count++;
-
-		for ( var key:String in results ) {	
-			item = new ObjectModel( key );
-			//item.image = "blank128.png";
-			var itemCount:int = results[key].val;
-			//// Add the filled bar to the container and create a new container
-			if ( countMax == count )
-			{
-				_itemContainer.addElement( pc );
-				pc = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
-				pc.layout = new AbsoluteLayout();
-				count = 0;		
-			}
-			box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE, item );
-			box.x = count * MODEL_IMAGE_WIDTH;
-			pc.addElement( box );
-			eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
-
-			count++
-		}
-		_itemContainer.addElement( pc );
+		_itemContainer.addElement( _currentRow );
 	}
 	
 	static private function createNewObjectIPM():void {
@@ -211,7 +217,7 @@ public class InventoryPanelModel extends VVContainer
 					var item:ObjectModel = e.dragOperation.initiator.data;
 					bi.updateObjectInfo( item );
 					var slotId:int = int( bi.name );
-					InventoryManager.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, item ) );
+					InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, item ) );
 				}
 			}
 		}
@@ -228,5 +234,9 @@ public class InventoryPanelModel extends VVContainer
 		
 		UIManager.dragManager.startDragDrop(_dragOp);
 	}			
+	
+	override protected function onRemoved( event:UIOEvent ):void {
+		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, addModel )
+	}
 }
 }

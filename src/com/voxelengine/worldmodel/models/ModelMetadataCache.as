@@ -36,8 +36,8 @@ public class ModelMetadataCache
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.LOAD, regionLoad ); 
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.JOIN, requestServerJoin ); 
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.CHANGED, regionChanged );	
-		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, modelMetadataTypeRequest );
-		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, modelMetadataRequest );
+		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, typeRequest );
+		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, request );
 		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE, update );
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );
@@ -62,13 +62,13 @@ public class ModelMetadataCache
 		
 	}
 	
-	static private function modelMetadataRequest( $mme:ModelMetadataEvent ):void 
+	static private function request( $mme:ModelMetadataEvent ):void 
 	{   
 		if ( null == $mme.guid ) {
-			Log.out( "MetadataManager.modelMetadataRequest guid rquested is NULL: ", Log.WARN );
+			Log.out( "MetadataManager.request guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "MetadataManager.modelMetadataRequest guid: " + $mme.guid, Log.INFO );
+		Log.out( "MetadataManager.request guid: " + $mme.guid, Log.INFO );
 		var vmm:ModelMetadata = _metadata[$mme.guid]; 
 		if ( null == vmm )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.DB_TABLE_MODELS, $mme.guid ) );
@@ -77,8 +77,9 @@ public class ModelMetadataCache
 	}
 	
 	// This loads the first 100 objects from the users inventory OR the public inventory
-	static private function modelMetadataTypeRequest( $mme:ModelMetadataEvent ):void {
+	static private function typeRequest( $mme:ModelMetadataEvent ):void {
 		
+		// For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $vmm.guid, $vmm ) event
 		if ( Network.PUBLIC == $mme.guid ) {
 			if ( false == _initializedPublic ) {
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Globals.DB_TABLE_MODELS, Network.PUBLIC, null, Globals.DB_INDEX_VOXEL_MODEL_OWNER ) );

@@ -7,6 +7,9 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.SecureInt;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import flash.utils.ByteArray;
@@ -23,6 +26,7 @@ public class Models
 	private var  _items:Array = [];
 	private var _networkId:String;
 	private var _changed:Boolean;
+	private var _initialized:Boolean;
 	
 	public function get changed():Boolean { return _changed; }
 	public function set changed(value:Boolean):void  { _changed = value; }
@@ -30,25 +34,34 @@ public class Models
 	public function Models( $networkId:String ) {
 		_networkId = $networkId;
 		
-		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_CHANGE,			change );
-		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_REQUEST,	count );
-		InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_LIST_REQUEST,		types );
+		InventoryModelEvent.addListener( InventoryModelEvent.INVENTORY_MODEL_CHANGE,			change );
+		InventoryModelEvent.addListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_REQUEST,	count );
+		InventoryModelEvent.addListener( InventoryModelEvent.INVENTORY_MODEL_LIST_REQUEST,		types );
+		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, modelAddedToCache )
 	}
 	
 	public function unload():void {
-		InventoryManager.removeListener( InventoryModelEvent.INVENTORY_MODEL_CHANGE,			change );
-		InventoryManager.removeListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_REQUEST,	count );
-		InventoryManager.removeListener( InventoryModelEvent.INVENTORY_MODEL_LIST_REQUEST,		types );
+		InventoryModelEvent.removeListener( InventoryModelEvent.INVENTORY_MODEL_CHANGE,			change );
+		InventoryModelEvent.removeListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_REQUEST,	count );
+		InventoryModelEvent.removeListener( InventoryModelEvent.INVENTORY_MODEL_LIST_REQUEST,		types );
 	}
 	
+	public function modelAddedToCache(e:ModelMetadataEvent):void {
+		
+	}
 	
 	// This returns an Array which holds the typeId and the count of those voxels
 	public function types(e:InventoryModelEvent):void 
 	{
+		if ( false == _initialized ) {
+			_initialized = true;
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_TYPE, Network.userId, null ) );
+		}
+
 		if ( e.networkId == _networkId ) {
 			const cat:String = (e.result as String).toUpperCase();
 			if ( cat == "ALL" ) {
-				InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_LIST_RESULT, _networkId, "", _items ) );
+				InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_LIST_RESULT, _networkId, "", _items ) );
 				return;
 			}
 				
@@ -69,7 +82,7 @@ public class Models
 				//}
 			//}
 //
-			//InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, result ) );
+			//InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, result ) );
 		}
 	}
 	
@@ -83,7 +96,7 @@ public class Models
 			var modelCount:int;
 			if ( si )
 				modelCount = si.val;
-			InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, _networkId, e.itemGuid, modelCount ) );
+			InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, _networkId, e.itemGuid, modelCount ) );
 			return;
 		}
 		//Log.out( "Models.count - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
@@ -107,7 +120,7 @@ public class Models
 				_items[itemGuid] = new SecureInt();
 				modelCount = 1
 			}
-			InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, _networkId, itemGuid, modelCount ) );
+			InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, _networkId, itemGuid, modelCount ) );
 			changed = true;
 		}
 	}

@@ -151,7 +151,7 @@ public class PanelModels extends PanelBase
 			{
 				// move this item to the players INVENTORY so that is it not "lost"
 				Log.out( "PanelModels.deleteModel - " + _selectedModel.toString(), Log.WARN );
-				InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_CHANGE, Network.userId, _selectedModel.instanceInfo.guid, 1 ) );
+				InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_CHANGE, Network.userId, _selectedModel.instanceInfo.guid, 1 ) );
 
 				Globals.markDead( _selectedModel.instanceInfo.guid );
 				_selectedModel = null;

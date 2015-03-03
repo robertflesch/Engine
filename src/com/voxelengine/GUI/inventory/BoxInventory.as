@@ -8,6 +8,7 @@
 
 package com.voxelengine.GUI.inventory {
 	
+import com.voxelengine.events.ModelBaseEvent;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.geom.Matrix;
@@ -66,22 +67,7 @@ public class BoxInventory extends VVBox
 			setHelp( "" );			
 			break;
 		case ObjectInfo.OBJECTINFO_MODEL:
-			with ( $item as ObjectModel ) {
-				if ( null != $item.guid && "" != $item.guid ) {
-					InventoryManager.addListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, modelCount ) ;
-					InventoryManager.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_COUNT_REQUEST, Network.userId, $item.guid, -1 ) );
-					
-					if ( ModelMetadataCache.metadataGet( $item.guid ) )
-						updateObjectDisplayData( ModelMetadataCache.metadataGet( $item.guid ) );	
-					else {
-						ModelMetadataCache.addListener( ModelMetadataEvent.INFO_TEMPLATE_REPO, metadataRetrived );
-						return;
-					}
-				}
-				else {
-					backgroundTexture = "assets/textures/NoImage128.png";
-				}
-			}
+			// Not used here, instead data is set via direct metadata retrived call.
 			break;
 		case ObjectInfo.OBJECTINFO_ACTION:
 			var oa:ObjectAction = $item as ObjectAction;
@@ -106,8 +92,8 @@ public class BoxInventory extends VVBox
 				backgroundTexture = "assets/textures/" + typeInfo.image;
 				setHelp( typeInfo.name );			
 				
-				InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, voxelCount ) ;
-				InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST, Network.userId, typeId, -1 ) );
+				InventoryVoxelEvent.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, voxelCount ) ;
+				InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST, Network.userId, typeId, -1 ) );
 			}
 			else
 				Log.out( "BoxInventory.updateObjectInfo typeInfo not found for typeId: " + typeId );
@@ -116,33 +102,37 @@ public class BoxInventory extends VVBox
 		}
 	}
 	
-	private function metadataRetrived(e:ModelMetadataEvent):void 
-	{
-		if ( e.guid == ( _objectInfo as ObjectModel ).guid )
-			updateObjectDisplayData( e.vmm );	
-	}
-	
-	private function updateObjectDisplayData( $vmm:ModelMetadata ):void {
+	public function updateObjectDisplayData( $vmm:ModelMetadata ):void {
 		Log.out( "BoxInventory.updateOBjectDisplayData vmm: " + $vmm.toString() );
-		if ( null == $vmm.image ) {
-			var bmpd:BitmapData = Globals.g_renderer.modelShot();
-			$vmm.image = drawScaled( bmpd, bmpd.width, bmpd.height );
-		}
+		if ( $vmm.guid == ( _objectInfo as ObjectModel ).guid ) {
 		
-		setHelp( $vmm.name );			
-		backgroundTexture = $vmm.image;
-	}
-	
-	private function modelCount(e:InventoryModelEvent):void 
-	{
-		if ( e.itemGuid == ( _objectInfo as ObjectModel ).guid ) {
-			var modelsOfThisGuid:String = String( e.result.toFixed(0) );
-			if ( 8 < modelsOfThisGuid.length )
+			if ( null == $vmm.image ) {
+				var bmpd:BitmapData = Globals.g_renderer.modelShot();
+				$vmm.image = drawScaled( bmpd, bmpd.width, bmpd.height );
+			}
+			
+			//var modelsOfThisGuid:String = String( e.result.toFixed(0) );
+			var modelsOfThisGuid:int = $vmm.copyCount;
+			if ( 99999 < modelsOfThisGuid )
 				_count.text = "LOTS";
 			else
-				_count.text = modelsOfThisGuid;
+				_count.text = String( modelsOfThisGuid );
+				
+			setHelp( $vmm.name );			
+			backgroundTexture = $vmm.image;
 		}
 	}
+	
+	//private function modelCount(e:InventoryModelEvent):void 
+	//{
+		//if ( e.itemGuid == ( _objectInfo as ObjectModel ).guid ) {
+			//var modelsOfThisGuid:String = String( e.result.toFixed(0) );
+			//if ( 8 < modelsOfThisGuid.length )
+				//_count.text = "LOTS";
+			//else
+				//_count.text = modelsOfThisGuid;
+		//}
+	//}
 	
 	private function voxelCount(e:InventoryVoxelEvent):void 
 	{
@@ -170,13 +160,11 @@ public class BoxInventory extends VVBox
 	override protected function onRemoved( event:UIOEvent ):void {
 		super.onRemoved( event );
 		// while it is active we want to monitor the count of oxels as they change
-		InventoryManager.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, voxelCount ) ;
-		InventoryManager.removeListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, modelCount ) ;
+		InventoryVoxelEvent.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, voxelCount ) ;
 	}
 	
 	public function reset():void {
-		InventoryManager.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, voxelCount ) ;
-		InventoryManager.removeListener( InventoryModelEvent.INVENTORY_MODEL_COUNT_RESULT, modelCount ) ;
+		InventoryVoxelEvent.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, voxelCount ) ;
 		_count.text = "";
 		backgroundTexture = "assets/textures/blank.png";
 		data = null;

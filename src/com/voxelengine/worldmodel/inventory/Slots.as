@@ -33,14 +33,14 @@ public class Slots
 
 	public function Slots( $networkId:String ) {
 		// Do I need to unregister this?
-		InventoryManager.addListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
+		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
 		_networkId = $networkId;
 		FunctionRegistry.functionAdd( noneSlots, "noneSlots" );
 		FunctionRegistry.functionAdd( pickToolSlots, "pickToolSlots" );
 	}
 	
 	public function unload():void {
-		InventoryManager.removeListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
+		InventorySlotEvent.removeListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
 	}
 	
 	public function slotChange(e:InventorySlotEvent):void {

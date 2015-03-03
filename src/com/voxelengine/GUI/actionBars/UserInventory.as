@@ -56,8 +56,8 @@ public class  UserInventory extends QuickInventory
 		display();
 		show();
 		resizeObject( null );
-		InventoryManager.addListener( InventoryEvent.INVENTORY_RESPONSE, inventoryLoaded );
-		InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_REQUEST, Network.userId, null ) );
+		InventoryEvent.addListener( InventoryEvent.INVENTORY_RESPONSE, inventoryLoaded );
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_REQUEST, Network.userId, null ) );
 	}
 
 	public function show():void
@@ -143,7 +143,7 @@ public class  UserInventory extends QuickInventory
 			var bi:BoxInventory = e.dragOperation.initiator as BoxInventory;
 			var slotId:int = int( bi.name );
 			bi.reset();
-			InventoryManager.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, null ) );
+			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, null ) );
 			// sets edit cursor to none
 			EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
 			Globals.g_app.editing = false;

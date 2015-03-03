@@ -30,9 +30,9 @@ public class InventoryManager
 	static public function init():void {
 		// This creates a inventory object for login.
 //		objectInventoryGet("player");	
-		addListener( InventoryEvent.INVENTORY_UNLOAD_REQUEST, unloadInventory );
-		addListener( InventoryEvent.INVENTORY_REQUEST, requestInventory );
-		addListener( InventoryEvent.INVENTORY_SAVE_REQUEST, save );
+		InventoryEvent.addListener( InventoryEvent.INVENTORY_UNLOAD_REQUEST, unloadInventory );
+		InventoryEvent.addListener( InventoryEvent.INVENTORY_REQUEST, requestInventory );
+		InventoryEvent.addListener( InventoryEvent.INVENTORY_SAVE_REQUEST, save );
 	}
 
 	static private function save( e:InventoryEvent ):void {
@@ -46,7 +46,7 @@ public class InventoryManager
 	{
 		var inv:Inventory = objectInventoryGet( e.ownerGuid );
 		if ( inv )
-			dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, e.ownerGuid, inv ) );
+			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, e.ownerGuid, inv ) );
 	}
 	
 	static private function unloadInventory(e:InventoryEvent):void 
@@ -85,25 +85,5 @@ public class InventoryManager
 		
 		return inventory;	
 	}
-	
-	///////////////// Event handler interface /////////////////////////////
-
-	// Used to distribue all persistance messages
-	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
-	
-	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
-		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
-	}
-
-	static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
-		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
-	}
-	
-	static public function dispatch( $event:Event) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
-	}
-	
-	///////////////// Event handler interface /////////////////////////////
-	
 }
 }

@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
+import com.voxelengine.events.InventoryModelEvent;
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
@@ -35,15 +36,15 @@ public class Voxels
 		for ( var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
 			_items[typeId] = new SecureInt( 0 );
 			
-		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, 			change );
-		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST,	count );
-		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST,	types );
+		InventoryVoxelEvent.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, 			change );
+		InventoryVoxelEvent.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST,	count );
+		InventoryVoxelEvent.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST,	types );
 	}
 
 	public function unload():void {
-		InventoryManager.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, 		change );
-		InventoryManager.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST,	count );
-		InventoryManager.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST,	types );
+		InventoryVoxelEvent.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, 		change );
+		InventoryVoxelEvent.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST,	count );
+		InventoryVoxelEvent.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST,	types );
 	}
 	
 	// This returns an Array which holds the typeId and the count of those voxels
@@ -52,7 +53,7 @@ public class Voxels
 		if ( e.networkId == _networkId ) {
 			const cat:String = (e.result as String).toUpperCase();
 			if ( cat == "ALL" ) {
-				InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, _items ) );
+				InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, _items ) );
 				return;
 			}
 				
@@ -73,7 +74,7 @@ public class Voxels
 				}
 			}
 
-			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, result ) );
+			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, _networkId, -1, result ) );
 		}
 	}
 	
@@ -84,7 +85,7 @@ public class Voxels
 		if ( e.networkId == _networkId ) {
 			var typeId:int = e.typeId;
 			var voxelCount:int = _items[typeId].val;
-			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, _networkId, typeId, voxelCount ) );
+			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, _networkId, typeId, voxelCount ) );
 			return;
 		}
 		//Log.out( "Voxels.voxelCount - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
@@ -99,7 +100,7 @@ public class Voxels
 	}
 	
 	public function change(e:InventoryVoxelEvent):void {
-		//InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, typeIdToUse, amountInGrain0 ) );		
+		//InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, typeIdToUse, amountInGrain0 ) );		
 		if ( e.networkId == _networkId ) {
 			if ( null == _items ) {
 				Log.out( "Voxels.change - ITEMS NULL", Log.WARN );
@@ -111,7 +112,7 @@ public class Voxels
 			voxelCount += changeAmount;
 			_items[typeId].val = voxelCount;
 			//Log.out( "Voxels.change - Succeeded test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
-			InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, _networkId, typeId, voxelCount ) );
+			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, _networkId, typeId, voxelCount ) );
 			changed = true;
 			return;
 		}

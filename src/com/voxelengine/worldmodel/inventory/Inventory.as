@@ -186,7 +186,7 @@ public class Inventory
 		// this occurs on first time logging in.
 		removeLoadEvents();
 		fromPersistance( null );
-		InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, _networkId, this ) );
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, _networkId, this ) );
 	}
 	
 	private function inventoryLoadSuccess( $pe:PersistanceEvent ):void
@@ -195,7 +195,7 @@ public class Inventory
 			return;
 		removeLoadEvents();
 		fromPersistance( $pe.dbo );
-		InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, _networkId, this ) );
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, _networkId, this ) );
 	}
 	
 	private function inventoryLoadFailed( $pe:PersistanceEvent ):void

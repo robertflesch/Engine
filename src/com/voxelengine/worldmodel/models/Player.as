@@ -83,7 +83,7 @@ public class Player extends Avatar
 	
 	override public function set dead(val:Boolean):void { 
 		super.dead = val;
-		InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_UNLOAD_REQUEST, _instanceInfo.guid, null ) );
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_UNLOAD_REQUEST, _instanceInfo.guid, null ) );
 		removeEventHandlers();
 	}
 	
@@ -166,7 +166,7 @@ public class Player extends Avatar
 			//newPlayer.init( mi, md );
 			//
 			//ModelLoader.load( ii );
-			InventoryManager.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_REQUEST, Network.userId, null ) );
+			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_REQUEST, Network.userId, null ) );
 		}
 		else {
 			Log.out( "Player.onPlayerLoadedAction - ERROR, failed to create new record for ?" );

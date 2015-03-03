@@ -81,14 +81,14 @@ public class InventoryPanelVoxel extends VVContainer
 	
 	private function inventoryTestListeners():void { 
 		
-		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, testInventoryVoxelResult ) ;
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST, Network.userId, TypeInfo.STONE, -1 ) );
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST, Network.userId, TypeInfo.IRON, -1 ) );
+		InventoryVoxelEvent.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, testInventoryVoxelResult ) ;
+		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST, Network.userId, TypeInfo.STONE, -1 ) );
+		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST, Network.userId, TypeInfo.IRON, -1 ) );
 		
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, TypeInfo.STONE, 1 ) );
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, TypeInfo.STONE, 100 ) );
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, TypeInfo.STONE, 1000 ) );
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, TypeInfo.STONE, 10000 ) );
+		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, TypeInfo.STONE, 1 ) );
+		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, TypeInfo.STONE, 100 ) );
+		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, TypeInfo.STONE, 1000 ) );
+		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_CHANGE, Network.userId, TypeInfo.STONE, 10000 ) );
 	}
 
 	private function testInventoryVoxelResult(e:InventoryVoxelEvent):void 
@@ -152,14 +152,14 @@ public class InventoryPanelVoxel extends VVContainer
 	}
 	
 	private function displaySelectedCategory( $category:String ):void {
-		InventoryManager.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, populateVoxels );
-		InventoryManager.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST, Network.userId, -1, $category ) );
+		InventoryVoxelEvent.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, populateVoxels );
+		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_REQUEST, Network.userId, -1, $category ) );
 	}
 	
 	private function populateVoxels(e:InventoryVoxelEvent):void {
 		
 		var results:Vector.<SecureInt> = e.result as Vector.<SecureInt>;
-		InventoryManager.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, populateVoxels );
+		InventoryVoxelEvent.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_TYPES_RESULT, populateVoxels );
 		
 		var count:int = 0;
 		var pc:Container = new Container( VOXEL_CONTAINER_WIDTH, VOXEL_IMAGE_WIDTH );
@@ -221,7 +221,7 @@ public class InventoryPanelVoxel extends VVContainer
 						Log.out( "InventoryPanelVoxel.dropMaterial - unknow type: " + (e.dragOperation.initiator.data).toString(), Log.ERROR );
 					bi.updateObjectInfo( item );
 					var slotId:int = int( bi.name );
-					InventoryManager.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, item ) );
+					InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, item ) );
 				}
 			}
 		}

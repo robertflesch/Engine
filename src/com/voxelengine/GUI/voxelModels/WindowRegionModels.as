@@ -1,7 +1,6 @@
 
 package com.voxelengine.GUI.voxelModels
 {
-	import com.voxelengine.events.InventoryVoxelEvent;
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.worldmodel.Region;
