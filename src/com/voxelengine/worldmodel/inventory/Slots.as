@@ -45,15 +45,15 @@ public class Slots
 	
 	public function slotChange(e:InventorySlotEvent):void {
 		Log.out( "SlotsManager.slotChange slot: " + e.slotId + "  item: " + e.item );
-		//if ( _items ) {
-			//if ( null == e.item )
-				//_items[e.slotId] = new ObjectInfo( ObjectInfo.OBJECTINFO_EMPTY );
-			//else
-				//_items[e.slotId] = e.item;
-			//changed = true;
-		//}
-		//else
-			//Log.out( "SlotsManager.slotChange _slots container not initialized", Log.WARN );
+		if ( _items ) {
+			if ( null == e.item )
+				_items[e.slotId] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );
+			else
+				_items[e.slotId] = e.item;
+			changed = true;
+		}
+		else
+			Log.out( "SlotsManager.slotChange _slots container not initialized", Log.WARN );
 	}
 	
 	private function createObjectFromInventoryString( $data:String ):ObjectInfo {

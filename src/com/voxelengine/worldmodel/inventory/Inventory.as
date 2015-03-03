@@ -27,7 +27,6 @@ import com.voxelengine.events.*;
 
 public class Inventory
 {
-	static private const DB_INVENTORY_TABLE:String = "inventory";
 	
 	private var  _slots:Slots
 	private var _voxels:Voxels;
@@ -82,7 +81,7 @@ public class Inventory
 			addSaveEvents();
 			PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, inventoryCreateSuccess );
 			PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, inventorySaveSuccess );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, DB_INVENTORY_TABLE, _networkId, _dbo, ba ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, Globals.DB_INVENTORY_TABLE, _networkId, _dbo, ba ) );
 		}
 		else
 			Log.out( "Inventory.save - NOT Saving User Inventory, either offline or NOT changed - networkId: " + networkId, Log.DEBUG );
@@ -107,7 +106,7 @@ public class Inventory
 	
 	private function inventorySaveSuccess($pe:PersistanceEvent):void 
 	{
-		if ( DB_INVENTORY_TABLE != $pe.table )
+		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
 		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, inventoryCreateSuccess );
 		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, inventorySaveSuccess );
@@ -115,7 +114,7 @@ public class Inventory
 	
 	private function inventoryCreateSuccess( $pe:PersistanceEvent):void 
 	{
-		if ( DB_INVENTORY_TABLE != $pe.table )
+		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
 		Log.out( "Inventory.inventoryCreateSuccess - setting dbo for - networkId: " + networkId, Log.DEBUG );
 		_dbo = $pe.dbo;
@@ -129,7 +128,7 @@ public class Inventory
 	public function load():void {
 		if ( Globals.online ) {
 			addLoadEvents();
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, DB_INVENTORY_TABLE, _networkId ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.DB_INVENTORY_TABLE, _networkId ) );
 		}
 	}
 
@@ -182,7 +181,7 @@ public class Inventory
 	
 	private function inventoryNotFound($pe:PersistanceEvent):void 
 	{
-		if ( DB_INVENTORY_TABLE != $pe.table )
+		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
 		// this occurs on first time logging in.
 		removeLoadEvents();
@@ -192,7 +191,7 @@ public class Inventory
 	
 	private function inventoryLoadSuccess( $pe:PersistanceEvent ):void
 	{
-		if ( DB_INVENTORY_TABLE != $pe.table )
+		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
 		removeLoadEvents();
 		fromPersistance( $pe.dbo );
@@ -201,7 +200,7 @@ public class Inventory
 	
 	private function inventoryLoadFailed( $pe:PersistanceEvent ):void
 	{
-		if ( DB_INVENTORY_TABLE != $pe.table )
+		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
 		removeLoadEvents();
 		(new Alert( "ERROR LOADING USER INVENTORY - Please post on forums" )).display();
@@ -223,7 +222,7 @@ public class Inventory
 	
 	private function saveSucceed( $pe:PersistanceEvent ):void
 	{
-		if ( DB_INVENTORY_TABLE != $pe.table )
+		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
 		removeSaveEvents();
 		Log.out( "Inventory.saveSucceed" );
@@ -231,7 +230,7 @@ public class Inventory
 	
 	private function saveFailed( $pe:PersistanceEvent ):void
 	{
-		if ( DB_INVENTORY_TABLE != $pe.table )
+		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
 		removeSaveEvents();
 		Log.out( "Inventory.saveFailed - MAY BE (error #2032)  The method SaveObjectChanges can only be called when connected to a game", Log.ERROR );
@@ -239,7 +238,7 @@ public class Inventory
 	
 	private function createFailed( $pe:PersistanceEvent ):void
 	{
-		if ( DB_INVENTORY_TABLE != $pe.table )
+		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
 		removeSaveEvents();
 		Log.out( "Inventory.createFailed - Failed to create new Inventory object for this avatar.", Log.ERROR );

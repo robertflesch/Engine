@@ -34,6 +34,7 @@ package com.voxelengine {
 
 	public class Globals  {
 		
+		static public const DB_INVENTORY_TABLE:String = "inventory";
 		static public const DB_TABLE_MODELS:String = "voxelModels";
 		static public const DB_INDEX_VOXEL_MODEL_OWNER:String = "voxelModelOwner";
 		static public const DB_TABLE_MODELS_DATA:String = "voxelModelsData";

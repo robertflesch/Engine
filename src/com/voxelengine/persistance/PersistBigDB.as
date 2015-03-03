@@ -36,8 +36,12 @@ public class PersistBigDB
 			return true;
 		else if ( Globals.DB_TABLE_REGIONS == $pe.table )	
 			return true;
-		else
+		else if ( Globals.DB_INVENTORY_TABLE == $pe.table )	
+			return true;
+		else {
+			Log.out( "PersistBigDB.isSupportedTable - FAILED table: " + $pe.table + " is not supported", Log.ERROR );
 			return false;
+		}
 	}
 	
 	static private function load( $pe:PersistanceEvent ):void { 

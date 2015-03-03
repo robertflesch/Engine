@@ -201,7 +201,7 @@ public class InventoryPanelVoxel extends VVContainer
 	
 	private function dropMaterial(e:DnDEvent):void 
 	{
-		if ( e.dragOperation.initiator.data is TypeInfo )
+		if ( e.dragOperation.initiator.data is ObjectVoxel )
 		{
 			e.dropTarget.backgroundTexture = e.dragOperation.initiator.backgroundTexture;
 			e.dropTarget.data = e.dragOperation.initiator.data;
@@ -216,12 +216,8 @@ public class InventoryPanelVoxel extends VVContainer
 			else if ( e.dropTarget.target is QuickInventory ) {
 				if ( e.dropTarget is BoxInventory ) {
 					var bi:BoxInventory = e.dropTarget as BoxInventory;
-					var item:ObjectInfo;
-					if ( e.dragOperation.initiator.data is TypeInfo )
-						item = new ObjectVoxel( bi, e.dragOperation.initiator.data.type );
-					else
-						Log.out( "InventoryPanelVoxel.dropMaterial - unknow type: " + (e.dragOperation.initiator.data).toString(), Log.ERROR );
-					bi.updateObjectInfo( item );
+					var item:ObjectVoxel = e.dragOperation.initiator.data as ObjectVoxel;
+					bi.updateObjectInfo( item ); // 
 					var slotId:int = int( bi.name );
 					InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, item ) );
 				}
@@ -235,7 +231,9 @@ public class InventoryPanelVoxel extends VVContainer
 		_dragOp.dragImage = e.target as DisplayObject;
 		// this adds a drop format, which is checked again what the target is expecting
 		_dragOp.resetDropFormat();
-		var dndFmt:DnDFormat = new DnDFormat( e.target.data.category, e.target.data.subCat );
+		var typeId:int = e.target.data.type;
+		var ti:TypeInfo = TypeInfo.typeInfo[typeId];
+		var dndFmt:DnDFormat = new DnDFormat( ti.category, ti.subCat );
 		_dragOp.addDropFormat( dndFmt );
 		
 		UIManager.dragManager.startDragDrop(_dragOp);

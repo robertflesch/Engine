@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
+import com.voxelengine.worldmodel.models.ModelMetadata;
 import flash.display.DisplayObject;
 import flash.events.Event;
 import flash.net.FileReference;
@@ -59,16 +60,11 @@ public class InventoryPanelModel extends VVContainer
 	
 	public function InventoryPanelModel( $parent:VVContainer ) {
 		super( $parent );
+		layout.orientation = LayoutOrientation.HORIZONTAL;
 		
 		FunctionRegistry.functionAdd( createNewObjectIPM, "createNewObjectIPM" );
 		FunctionRegistry.functionAdd( importObjectIPM, "importObjectIPM" );
-		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, addModel );
-		
-		_itemContainer = new ScrollPane();
-		_itemContainer.scrollPolicy = ScrollPolicy.VERTICAL;
-		
-		//autoSize = true;
-		layout.orientation = LayoutOrientation.HORIZONTAL;
+		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, addModelMetadataEvent );
 		
 		upperTabsAdd();
 		addItemContainer();
@@ -99,9 +95,13 @@ public class InventoryPanelModel extends VVContainer
 	}
 
 	private function addItemContainer():void {
-		addElement( _itemContainer );
-		_itemContainer.autoSize = true;
+		_itemContainer = new ScrollPane();
+		_itemContainer.autoSize = false;
+		_itemContainer.width = MODEL_CONTAINER_WIDTH + 15;
+		_itemContainer.height = MODEL_IMAGE_WIDTH;
+		_itemContainer.scrollPolicy = ScrollPolicy.VERTICAL;
 		_itemContainer.layout.orientation = LayoutOrientation.VERTICAL;
+		addElement( _itemContainer );
 	}
 	
 	private function selectCategory(e:ListEvent):void 
@@ -123,25 +123,29 @@ public class InventoryPanelModel extends VVContainer
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_TYPE, Network.userId, null ) );
 	}
 
-	private function addModel($mme:ModelMetadataEvent):void {
+	private function addModelMetadataEvent($mme:ModelMetadataEvent):void {
 		
+		var om:ObjectModel = new ObjectModel( null, $mme.guid );
+		om.vmm = $mme.vmm;
+		addModel( om );
+	}
+	
+	private function addModel( $oi:ObjectInfo ):BoxInventory {
 		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
-		var count:int = _currentRow.numElements
 		//// Add the filled bar to the container and create a new container
-		if ( countMax == count )
+		if ( countMax == _currentRow.numElements )
 		{
-			_itemContainer.addElement( _currentRow );
 			_currentRow = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
 			_currentRow.layout = new AbsoluteLayout();
-			count = 0;		
+			_itemContainer.addElement( _currentRow );
+			_itemContainer.height = _itemContainer.numElements * MODEL_IMAGE_WIDTH;
 		}
 		var box:BoxInventory = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE );
-		var item:ObjectModel = new ObjectModel( box, $mme.guid );
-		item.vmm = $mme.vmm;
-		box.updateObjectInfo( item );
-		box.x = count * MODEL_IMAGE_WIDTH;
+		box.updateObjectInfo( $oi );
+		box.x = _currentRow.numElements * MODEL_IMAGE_WIDTH;
 		_currentRow.addElement( box );
 		eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
+		return box;
 	}
 	
 	private function populateModels():void 
@@ -149,35 +153,24 @@ public class InventoryPanelModel extends VVContainer
 		var count:int = 0;
 		_currentRow = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
 		_currentRow.layout = new AbsoluteLayout();
+		_itemContainer.addElement( _currentRow );
 
-		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
-		var box:BoxInventory;
 		var item:ObjectInfo;
+		var box:BoxInventory;
 		
-		box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE );
 		item = new ObjectAction( box, "createNewObjectIPM", "NewModel128.png", "Click to create new model" );
-		box.updateObjectInfo( item );
-		box.x = count++ * MODEL_IMAGE_WIDTH;
+		box = addModel( item );
 		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
-		_currentRow.addElement( box );
 		
 		if ( Globals.g_debug ) {
-			box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE );
 			item = new ObjectAction( box, "importObjectIPM", "import128.png", "Click to import local model" );
-			box.updateObjectInfo( item );
-			box.x = count++ * MODEL_IMAGE_WIDTH;
+			box = addModel( item );
 			eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
-			_currentRow.addElement( box );
 		}
 
-		box = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE );
 		item = new ObjectAction( box, "createNewObjectIPM", "NewModel128.png", "Click to create new model" );
-		box.updateObjectInfo( item );
-		box.x = count++ * MODEL_IMAGE_WIDTH;
+		box = addModel( item );
 		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
-		_currentRow.addElement( box );
-		
-		_itemContainer.addElement( _currentRow );
 	}
 	
 	static private function createNewObjectIPM():void {
@@ -251,7 +244,7 @@ public class InventoryPanelModel extends VVContainer
 	}			
 	
 	override protected function onRemoved( event:UIOEvent ):void {
-		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, addModel )
+		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, addModelMetadataEvent )
 	}
 }
 }
