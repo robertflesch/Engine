@@ -55,6 +55,8 @@ public class WindowModelMetadata extends VVPopup
 			_vmm = new ModelMetadata( $guid );
 			_vmm.name = $guid + "-IMPORTED";
 			_vmm.description = $guid + "-IMPORTED";
+			_vmm.creator = "simpleBob";
+			// fake an event to populate the window
 			dataReceived( new ModelMetadataEvent( ModelBaseEvent.REQUEST, $guid, _vmm ) )
 		}
 		else {
@@ -67,6 +69,10 @@ public class WindowModelMetadata extends VVPopup
 		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, dataReceived );
 		
 		_vmm = $mme.vmm;
+		
+		var creator:LabelInput = new LabelInput( "Creator: ", _vmm.creator );
+		creator.editable = false;
+		addElement( creator );
 		
 		_name = new LabelInput( "Name: ", _vmm.name );
 		addElement( _name );
@@ -102,7 +108,7 @@ public class WindowModelMetadata extends VVPopup
 		eventCollector.addEvent( rbTransferGroup, ButtonsGroupEvent.GROUP_CHANGED
 		                       , function (event:ButtonsGroupEvent):void {  _vmm.transfer = (0 == event.target.index ?  true :  false ) } );
 		var rbTransferDP:DataProvider = new DataProvider();
-		rbTransferDP.addAll( { label:"All this object to be transferred" }
+		rbTransferDP.addAll( { label:"Allow this object to be transferred" }
 		                   , { label:"Bind this object to user" } );
 		rbTransferGroup.dataProvider = rbTransferDP;
 		rbTransferGroup.index = 0;
@@ -113,7 +119,7 @@ public class WindowModelMetadata extends VVPopup
 		eventCollector.addEvent( rbModifyGroup, ButtonsGroupEvent.GROUP_CHANGED
 		                       , function (event:ButtonsGroupEvent):void {  _vmm.modify = (0 == event.target.index ?  true :  false ) } );
 		var rbModifyDP:DataProvider = new DataProvider();
-		rbModifyDP.addAll( { label:"All this object to be modified" }
+		rbModifyDP.addAll( { label:"Allow this object to be modified" }
 		                   , { label:"This objects shape is set" } );
 		rbModifyGroup.dataProvider = rbModifyDP;
 		rbModifyGroup.index = 0;

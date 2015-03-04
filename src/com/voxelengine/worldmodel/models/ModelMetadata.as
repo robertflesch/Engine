@@ -37,6 +37,7 @@ public class ModelMetadata
 	private var _name:String			= "";
 	private var _description:String		= "";
 	private var _owner:String			= "";
+	private var _creator:String			= "";
 	private var _thumbnail:BitmapData;
 	private var _dbo:DatabaseObject;
 	private var _createdDate:Date;
@@ -79,20 +80,23 @@ public class ModelMetadata
 	public function get thumbnail():BitmapData 			{ return _thumbnail; }
 	public function set thumbnail(value:BitmapData):void{ _thumbnail = value; }
 	
-	public function get copyCount():int  { return _copyCount; }
-	public function set copyCount(value:int):void  { _copyCount = value; }
+	public function get copyCount():int  				{ return _copyCount; }
+	public function set copyCount(value:int):void  		{ _copyCount = value; }
 	
-	public function get transfer():Boolean  { return _transfer; }
-	public function set transfer(value:Boolean):void  { _transfer = value; }
+	public function get transfer():Boolean  			{ return _transfer; }
+	public function set transfer(value:Boolean):void  	{ _transfer = value; }
 	
-	public function get createdDate():Date { return _createdDate; }
-	public function set createdDate(value:Date):void { _createdDate = value; }
+	public function get createdDate():Date 				{ return _createdDate; }
+	public function set createdDate(value:Date):void 	{ _createdDate = value; }
 	
-	public function get modifiedDate():Date { return _modifiedDate; }
-	public function set modifiedDate(value:Date):void  { _modifiedDate = value; }
+	public function get modifiedDate():Date 			{ return _modifiedDate; }
+	public function set modifiedDate(value:Date):void  	{ _modifiedDate = value; }
 	
-	public function get dbo():DatabaseObject { return _dbo; }
-	public function set dbo(value:DatabaseObject):void { _dbo = value; }
+	public function get dbo():DatabaseObject 			{ return _dbo; }
+	public function set dbo(value:DatabaseObject):void 	{ _dbo = value; }
+	
+	public function get creator():String 				{ return _creator; }
+	public function set creator(value:String):void  	{ _creator = value; }
 	
 	public function toString():String {
 		return "name: " + _name + "  description: " + _description + "  guid: " + _guid + "  owner: " + _owner;
@@ -116,6 +120,7 @@ public class ModelMetadata
 		name 			= $vmm.name;
 		description 	= $vmm.description;
 		owner 			= $vmm.owner;
+		creator 		= $vmm.creator;
 		thumbnail 		= $vmm.thumbnail;
 		
 		template		= $vmm.template;
@@ -133,7 +138,8 @@ public class ModelMetadata
 		newVmm.name 			= new String( _name );
 		newVmm.description 		= new String( _description );
 		newVmm.owner 			= new String( _owner );
-		newVmm.thumbnail		= newVmm.thumbnail;
+		newVmm.creator			= creator
+		newVmm.thumbnail		= thumbnail;
 		
 		newVmm._dbo				= null;
 		newVmm.createdDate		= new Date( _createdDate );
@@ -153,6 +159,7 @@ public class ModelMetadata
 		return { name: _name
 			   , description: _description
 			   , owner: _owner
+			   , creator: _creator
 			   , template: _template
 			   , templateGuid: _templateGuid
 			   , copy: _copy
@@ -239,8 +246,9 @@ public class ModelMetadata
 		_dbo.name 			= _name;
 		_dbo.description	= _description;
 		_dbo.owner			= _owner;
-		_dbo.template		= _template
-		_dbo.templateGuid	= _templateGuid
+		_dbo.creator		= _creator;
+		_dbo.template		= _template;
+		_dbo.templateGuid	= _templateGuid;
 		_dbo.copy			= _copy;
 		_dbo.copyCount		= _copyCount;
 		_dbo.modify			= _modify;
@@ -262,8 +270,9 @@ public class ModelMetadata
 		_name 			= $dbo.name;
 		_description	= $dbo.description;
 		_owner			= $dbo.owner;
-		_template		= $dbo.template
-		_templateGuid	= $dbo.templateGuid
+		_creator		= $dbo.creator;
+		_template		= $dbo.template;
+		_templateGuid	= $dbo.templateGuid;
 		_copy			= $dbo.copy;
 		_copyCount		= $dbo.copyCount;
 		_modify			= $dbo.modify;
@@ -280,11 +289,7 @@ public class ModelMetadata
 		}
 		else
 			thumbnail 		= null;
-
 	}
-	
-	//
-	
 }
 }
 
