@@ -104,6 +104,7 @@ package org.flashapi.swing.plaf.spas {
 		 */
 		//public static const DEFAULT_FONT_SIZE:uint = 12;
 		public static const DEFAULT_FONT_SIZE:uint = 11;
+		public static const LABEL_FONT_COLOR:uint = 0x8c8c8c;
 		
 		/**
 		 *  A constant string that defines the default font face value.
