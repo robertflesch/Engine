@@ -232,7 +232,9 @@ package com.voxelengine.worldmodel
 		
 		// Since either a ModelEvent OR a RegionEvent can call this function
 		// Use the generic Event
-		private function regionChanged( $re:Event):void  { changed = true;}
+		private function regionChanged( $re:Event):void  { 
+			Log.out( "Region.regionChanged", Log.WARN );
+			changed = true;}
 		
 		private function removeFailedObjectFromRegion( $e:LoadingEvent):void {
 			// Do I need to remove this failed load?

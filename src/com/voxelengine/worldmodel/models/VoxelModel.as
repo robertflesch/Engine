@@ -136,10 +136,7 @@ package com.voxelengine.worldmodel.models
 		public function get children():Vector.<VoxelModel>			{ return _children; }
 		public function 	childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
 		public function get changed():Boolean						{ return _changed; }
-		public function set changed( $val:Boolean):void				{ 
-			Log.out( "VoxelModel.changed setting to: " + $val, Log.WARN );
-			_changed = $val; 
-		}
+		public function set changed( $val:Boolean):void				{ _changed = $val; }
 		public function get selected():Boolean 						{ return _selected; }
 		public function set selected(val:Boolean):void  			{ _selected = val; }
 		public function get onSolidGround():Boolean 				{ return _onSolidGround; }
