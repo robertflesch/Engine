@@ -154,11 +154,11 @@ package com.voxelengine.worldmodel.models
 					{
 						return null;
 						//return Globals.player;
-						//Log.out("ModelManager.getModelInstance - parent model not found: " + guid, Log.ERROR );	
+						//Log.out("ModelManager.modelGet - parent model not found: " + guid, Log.ERROR );	
 					}
 				}
 				else
-					Log.out("ModelManager.getModelInstance - model not found: " + guid, Log.ERROR );	
+					Log.out("ModelManager.modelGet - model not found: " + guid, Log.ERROR );	
 			}
 				
 			return vm;	
