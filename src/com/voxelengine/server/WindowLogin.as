@@ -35,7 +35,8 @@ package com.voxelengine.server
 	public class WindowLogin extends VVPopup
 	{
 		private var _emailInput:LabelInput;
-		private var _passwordInput:LabelInput;
+		//private var _passwordInput:LabelInput;
+		private var _passwordInput:TextInput;
 		private var _errorText:Label;
 		private var _userInfo:SharedObject;
 		private var _savePW:CheckBox;
@@ -90,10 +91,21 @@ package com.voxelengine.server
 			
 			infoPanel.addElement( new Spacer( width, 10 ) );
 			
+			var pwContainer:Container = new Container( width, 20 );
+			pwContainer.padding = 0;
+			infoPanel.addElement( pwContainer );
+			var labelPW:Label = new Label( " Password", 110 );
+			labelPW.fontColor = SpasUI.LABEL_FONT_COLOR;
+			labelPW.boldFace = true;
+			pwContainer.addElement( labelPW );
+			
 			var password:String = _userInfo.data.password ?  _userInfo.data.password : $password;
-			_passwordInput = new LabelInput( " Password", password, width );
-			_passwordInput.labelControl.width = 80;
-			infoPanel.addElement( _passwordInput );
+			//_passwordInput = new LabelInput( " Password", password, width );
+			_passwordInput = new TextInput( password, width );
+			_passwordInput.displayAsPassword = true;
+			
+			//_passwordInput.labelControl.width = 80;
+			pwContainer.addElement( _passwordInput );
 			
 			addElement( infoPanel );
 			
@@ -205,7 +217,7 @@ package com.voxelengine.server
 			_passwordInput.glow = false;
 			addLoginEventHandlers();
 			Log.out("WindowLogin.loginButtonHandler - Trying to establish connection to server", Log.DEBUG );
-			Network.login( _emailInput.label, _passwordInput.label );
+			Network.login( _emailInput.label, _passwordInput.text );
 		}
 		
 		private function addLoginEventHandlers():void {
@@ -250,7 +262,7 @@ package com.voxelengine.server
 			if ( _userInfo ) {
 				_userInfo.data.email = _emailInput.label;
 				if ( _savePW.selected )
-					_userInfo.data.password = _passwordInput.label;
+					_userInfo.data.password = _passwordInput.text;
 				else
 					_userInfo.data.password = null;
 				_userInfo.flush();
