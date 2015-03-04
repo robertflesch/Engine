@@ -98,6 +98,8 @@ public class ModelMakerLocal {
 			var modelInfoJson:String = $ba.readUTFBytes( strLen );
 				
 			var vmm:ModelMetadata = new ModelMetadata( _ii.guid );
+			vmm.name = _vmi.fileName;
+			vmm.description = _vmi.fileName;
 			var vm:* = ModelLoader.instantiate( _ii, _vmi, vmm );
 			if ( vm ) {
 				vm.version = versionInfo.version;
@@ -105,6 +107,7 @@ public class ModelMakerLocal {
 			}
 
 			vm.complete = true;
+			vm.data = _vmd;
 			
 			markComplete();
 		}

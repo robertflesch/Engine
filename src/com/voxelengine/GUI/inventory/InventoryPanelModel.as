@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.inventory {
 
 import com.voxelengine.events.ModelDataEvent;
+import com.voxelengine.worldmodel.models.ModelMaker;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import flash.display.DisplayObject;
 import flash.events.Event;
@@ -146,7 +147,16 @@ public class InventoryPanelModel extends VVContainer
 		_currentRow.addElement( box );
 		if ( allowDrag )
 			eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
+		if ( $oi is ObjectModel )
+			eventCollector.addEvent( box, UIMouseEvent.CLICK, addAsParentModel );
 		return box;
+	}
+	
+	private function addAsParentModel( e:UIMouseEvent ):void {
+		var item:ObjectModel = e.target.objectInfo as ObjectModel;
+		var ii:InstanceInfo = new InstanceInfo();
+		ii.guid = item.guid;
+		new ModelMaker( ii );
 	}
 	
 	private function populateModels():void 

@@ -279,7 +279,8 @@ public class  UserInventory extends QuickInventory
 		hideGrainTools();
 		if ( null != _editCursorModelGuid ) {
 			var ecm:VoxelModel = Region.currentRegion.modelManager.modelGet( _editCursorModelGuid );
-			ecm.dead = true;
+			if ( ecm )
+				ecm.dead = true;
 			_editCursorModelGuid = null;
 		}
 		var oi:ObjectInfo = box.data as ObjectInfo;

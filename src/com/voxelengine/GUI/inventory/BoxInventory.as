@@ -65,91 +65,79 @@ public class BoxInventory extends VVBox
 		case ObjectInfo.OBJECTINFO_MODEL:
 			var om:ObjectModel = _objectInfo as ObjectModel;
 			if ( om.vmm ) {
-				if ( null == om.vmm.image ) {
+				if ( null == om.vmm.thumbnail ) {
 					var bmpd:BitmapData = Globals.g_renderer.modelShot();
-					om.vmm.image = drawScaled( bmpd, bmpd.width, bmpd.height );
+					om.vmm.thumbnail = drawScaled( bmpd, bmpd.width, bmpd.height );
 				}
 				
 				//var modelsOfThisGuid:String = String( e.result.toFixed(0) );
 				var modelsOfThisGuid:int = om.vmm.copyCount;
 				if ( 99999 < modelsOfThisGuid )
 					_count.text = "LOTS";
-				else if ( -1 < modelsOfThisGuid )
+				else if ( -1 == modelsOfThisGuid )
 					_count.text = "∞";
 				else
 					_count.text = String( modelsOfThisGuid );
 					
 				setHelp( om.vmm.name );			
-				backgroundTexture = om.vmm.image;
+				backgroundTexture = om.vmm.thumbnail;
 			}
 			break;
 		case ObjectInfo.OBJECTINFO_ACTION:
 			var oa:ObjectAction = $item as ObjectAction;
-			backgroundTexture = "assets/textures/" + oa.image;
+			backgroundTexture = "assets/textures/" + oa.thumbnail;
 			setHelp( oa.name );			
 			break;
 		case ObjectInfo.OBJECTINFO_TOOL:
 			var ot:ObjectTool = $item as ObjectTool;
-			backgroundTexture = "assets/textures/" + ot.image;
+			backgroundTexture = "assets/textures/" + ot.thumbnail;
 			setHelp( ot.name );			
 			break;
 		case ObjectInfo.OBJECTINFO_VOXEL:
 		default:
-			var typeId:int;
-			if ( $item is TypeInfo )
-				typeId = ($item as TypeInfo).type;
-			else
-				typeId = ($item as ObjectVoxel).type;
+			if ( $item is TypeInfo ) {
+				throw new Error( "BoxInventory.updateObjectInfo - Deprecated type", Log.ERROR );
+				return;
+			}
+			var ov:ObjectVoxel = $item as ObjectVoxel;
+			var typeId:int = ov.type;
 			
 			var typeInfo:TypeInfo = TypeInfo.typeInfo[typeId];
 			if ( typeInfo ) {
 				backgroundTexture = "assets/textures/" + typeInfo.image;
 				setHelp( typeInfo.name );			
-				
-				InventoryVoxelEvent.addListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, voxelCount ) ;
-				InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_REQUEST, Network.userId, typeId, -1 ) );
 			}
-			else
-				Log.out( "BoxInventory.updateObjectInfo typeInfo not found for typeId: " + typeId );
+			else {
+				throw new Error( "BoxInventory.updateObjectInfo typeInfo not found for typeId: " + typeId, Log.ERROR );
+				return;
+			}
 
-			break;
-		}
-	}
-	
-	private function voxelCount(e:InventoryVoxelEvent):void 
-	{
-		var typeId:int;
-		if ( _objectInfo is TypeInfo )
-			typeId = (_objectInfo as TypeInfo).type;
-		else
-			typeId = (_objectInfo as ObjectVoxel).type;
-			
-		var ti:TypeInfo = TypeInfo.typeInfo[typeId];
-		if ( ti.type == e.typeId ) {
-			var totalOxelsOfThisTypeCount:Number = e.result / 4096;
+			var totalOxelsOfThisTypeCount:Number = ov.count / 4096;
 			var totalOxelsOfThisType:String = String( totalOxelsOfThisTypeCount.toFixed(0) );
-			_count.fontColor = ti.countColor;
+			_count.fontColor = typeInfo.countColor;
 			if ( totalOxelsOfThisTypeCount < 1 )
 				_count.text = "< 1";
+			else if ( -1 == totalOxelsOfThisTypeCount )
+				_count.text = "∞";
 			else if ( 8 < totalOxelsOfThisType.length ) {
 				_count.text = "LOTS";
 			}
 			else
 				_count.text = totalOxelsOfThisType;
+				
+			break;
 		}
 	}
-	
 	override protected function onRemoved( event:UIOEvent ):void {
 		super.onRemoved( event );
 		// while it is active we want to monitor the count of oxels as they change
-		InventoryVoxelEvent.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, voxelCount ) ;
 	}
 	
 	public function reset():void {
-		InventoryVoxelEvent.removeListener( InventoryVoxelEvent.INVENTORY_VOXEL_COUNT_RESULT, voxelCount ) ;
 		_count.text = "";
 		backgroundTexture = "assets/textures/blank.png";
 		data = null;
+		_objectInfo = new ObjectInfo( this, ObjectInfo.OBJECTINFO_EMPTY );
 	}
 	
 	public function drawScaled(obj:BitmapData, srcWidth:int, srcHeight:int):BitmapData {

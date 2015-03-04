@@ -7,10 +7,12 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory
 {
+import com.voxelengine.events.InventorySlotEvent;
+import com.voxelengine.Log;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.GUI.inventory.BoxInventory;
-import com.voxelengine.Log;
+import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 
@@ -36,10 +38,14 @@ public class ObjectModel extends ObjectInfo
 	}
 	
 	override public function asInventoryString():String {
-		return String( _objectType + ";" + _guid );
+		if ( ObjectInfo.OBJECTINFO_MODEL == _objectType )
+			return String( _objectType + ";" + _guid );
+			
+		return String( _objectType );	
 	}
 	
-	override public function fromInventoryString( $data:String ): ObjectInfo {
+	override public function fromInventoryString( $data:String, $slotId:int ): ObjectInfo {
+		super.fromInventoryString( $data, $slotId );
 		var values:Array = $data.split(";");
 		if ( values.length != 2 ) {
 			Log.out( "ObjectModel.fromInventoryString - not equal to 2 tokens found, length is: " + values.length, Log.WARN );
@@ -49,21 +55,40 @@ public class ObjectModel extends ObjectInfo
 		_objectType = values[0];
 		_guid = values[1];
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, metadataAdded );
+		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, _guid, null ) );
 		return this;
+	}
+	
+	private function metadataFailed(e:ModelMetadataEvent):void 
+	{
+		if ( _guid == e.guid ) {
+			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded );
+			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
+			//_owner remove me!
+			reset();
+			if ( box )
+				box.reset();
+			Log.out( "ObjectModel.metadataFailed - guid: " + e.guid, Log.WARN );
+			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, _slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) ) );
+		}
 	}
 	
 	private function metadataAdded(e:ModelMetadataEvent):void 
 	{
 		if ( _guid == e.guid ) {
+			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded );
+			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
 			_vmm = e.vmm;
+			if ( box )
+				box.updateObjectInfo( this );
 		}
 	}
-
-	override public function reset():void {
-		_objectType = ObjectInfo.OBJECTINFO_EMPTY;
-		_guid	= "";
-	}
 	
+	override public function reset():void {
+		super.reset();
+		_guid = null;
+		_vmm = null;
+	}
 }
 }

@@ -66,8 +66,8 @@ public class PersistBigDB
 		function loadSuccess( $dbo:DatabaseObject ):void {
 			if ( !$dbo ) {
 				// This seems to be the case where no record exists, not the error handler
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_NOT_FOUND, $pe.table, $pe.guid ) );
 				Log.out( "PersistBigDB.load.loadSuccess - NULL DatabaseObject table: " + $pe.table + "  guid:" + $pe.guid, Log.WARN );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_NOT_FOUND, $pe.table, $pe.guid ) );
 				return;
 			}
 			

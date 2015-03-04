@@ -79,7 +79,7 @@ public class ModelMaker {
 	private function attemptMake():void {
 		if ( null != _vmm && null != _vmd ) {
 			Log.out( "ModelMaker.attemptMake - ii: " + _ii.toString() );
-			ModelLoader.loadFromManifestByteArrayNew( _ii, _vmd );
+			ModelLoader.createFromMakerInfo( _ii, _vmd, _vmm );
 			markComplete();
 		}
 	}

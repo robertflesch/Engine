@@ -99,7 +99,7 @@ package com.voxelengine.worldmodel.models
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// persistent model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
-		static public function loadFromManifestByteArrayNew( $ii:InstanceInfo, $vmd:ModelData ):VoxelModel {
+		static public function createFromMakerInfo( $ii:InstanceInfo, $vmd:ModelData, $mmd:ModelMetadata = null ):VoxelModel {
 				
 			var $ba:ByteArray = $vmd.ba;
 			if ( null == $ba )
@@ -133,12 +133,13 @@ package com.voxelengine.worldmodel.models
 			// needs to be name + guid??
 			
 			//var vm:* = instantiate( $ii, mi, $vmm );
-			var vm:* = instantiate( $ii, mi, null );
+			var vm:* = instantiate( $ii, mi, $mmd );
 			if ( vm ) {
 				vm.version = versionInfo.version;
 				vm.fromByteArray( $ba );
 			}
 
+			vm.data = $vmd;
 			vm.complete = true;
 			return vm;
 		}

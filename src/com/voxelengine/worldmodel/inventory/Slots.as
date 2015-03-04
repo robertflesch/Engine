@@ -56,21 +56,21 @@ public class Slots
 			Log.out( "SlotsManager.slotChange _slots container not initialized", Log.WARN );
 	}
 	
-	private function createObjectFromInventoryString( $data:String ):ObjectInfo {
+	private function createObjectFromInventoryString( $data:String, $slotId:int ):ObjectInfo {
 		// find the first comma so we can get the substring with the object type
 		var type:int = int( $data.charAt(0) );
 		if ( type == 1 )
 			return new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );		
 		else if ( type == 2 )
-			return new ObjectVoxel( null, 0 ).fromInventoryString( $data ); 
+			return new ObjectVoxel( null, 0 ).fromInventoryString( $data, $slotId ); 
 		else if ( type == 3 )
-			return new ObjectModel( null, "" ).fromInventoryString( $data );
+			return new ObjectModel( null, "" ).fromInventoryString( $data, $slotId );
 		else if ( type == 4 )
-			return new ObjectAction( null, "", "", "" ).fromInventoryString( $data );
+			return new ObjectAction( null, "", "", "" ).fromInventoryString( $data, $slotId );
 		else if ( type == 5 )
-			return new ObjectGrain( null, "", "" ).fromInventoryString( $data );
+			return new ObjectGrain( null, "", "" ).fromInventoryString( $data, $slotId );
 		else if ( type == 6 )
-			return new ObjectTool( null, "", "", "", "" ).fromInventoryString( $data );
+			return new ObjectTool( null, "", "", "", "" ).fromInventoryString( $data, $slotId );
 		else
 			Log.out( "Slots.createObjectFromInventoryString - type: " + type + "  NOT FOUND", Log.ERROR );
 		
@@ -79,16 +79,17 @@ public class Slots
 	
 	public function fromPersistance( $dbo:DatabaseObject ):void {	
 		if ( $dbo && $dbo.slot0 ) {
-			_items[0] = createObjectFromInventoryString( $dbo.slot0 );
-			_items[1] = createObjectFromInventoryString( $dbo.slot1 );
-			_items[2] = createObjectFromInventoryString( $dbo.slot2 );
-			_items[3] = createObjectFromInventoryString( $dbo.slot3 );
-			_items[4] = createObjectFromInventoryString( $dbo.slot4 );
-			_items[5] = createObjectFromInventoryString( $dbo.slot5 );
-			_items[6] = createObjectFromInventoryString( $dbo.slot6 );
-			_items[7] = createObjectFromInventoryString( $dbo.slot7 );
-			_items[8] = createObjectFromInventoryString( $dbo.slot8 );
-			_items[9] = createObjectFromInventoryString( $dbo.slot9 );
+			var index:int;
+			_items[index] = createObjectFromInventoryString( $dbo.slot0, index++ );
+			_items[index] = createObjectFromInventoryString( $dbo.slot1, index++ );
+			_items[index] = createObjectFromInventoryString( $dbo.slot2, index++ );
+			_items[index] = createObjectFromInventoryString( $dbo.slot3, index++ );
+			_items[index] = createObjectFromInventoryString( $dbo.slot4, index++ );
+			_items[index] = createObjectFromInventoryString( $dbo.slot5, index++ );
+			_items[index] = createObjectFromInventoryString( $dbo.slot6, index++ );
+			_items[index] = createObjectFromInventoryString( $dbo.slot7, index++ );
+			_items[index] = createObjectFromInventoryString( $dbo.slot8, index++ );
+			_items[index] = createObjectFromInventoryString( $dbo.slot9, index++ );
 		}
 		else {
 			addSlotDefaultData();		

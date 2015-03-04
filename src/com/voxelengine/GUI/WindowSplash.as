@@ -29,29 +29,21 @@ package com.voxelengine.GUI
 			WindowSplashEvent.addListener( WindowSplashEvent.ANNIHILATE, annihilate );
 		}
 		
-		static private function annihilate(e:WindowSplashEvent):void 
-		{
-			Log.out( "windowSplash.annihilate", Log.WARN );
-			if ( WindowSplash.isActive )
-			{
-				Log.out( "windowSplash.annihilate - TERMINATED", Log.WARN );
+		static private function annihilate(e:WindowSplashEvent):void {
+			if ( WindowSplash.isActive ) {
 				WindowSplash._s_currentInstance.remove();
 				WindowSplash._s_currentInstance = null;
 			}
 		}
 		
-		static private function create(e:WindowSplashEvent):void 
-		{
+		static private function create(e:WindowSplashEvent):void {
 			if ( null == _s_currentInstance )
 				new WindowSplash();
 		}
 		
-		static private function destroy(e:WindowSplashEvent):void 
-		{
-			Log.out( "windowSplash.destroy", Log.WARN );
+		static private function destroy(e:WindowSplashEvent):void {
 			if ( WindowSplash.isActive && Globals.online )
 			{
-				Log.out( "windowSplash.destroy - TERMINATED", Log.WARN );
 				WindowSplash._s_currentInstance.remove();
 				WindowSplash._s_currentInstance = null;
 			}
@@ -66,8 +58,7 @@ package com.voxelengine.GUI
 		private var _splashImageClass:Class;
 
 		
-		public function WindowSplash():void 
-		{ 
+		public function WindowSplash():void { 
 			super( Globals.g_renderer.width, Globals.g_renderer.height );
 
 			_splashImage = (new _splashImageClass() as Bitmap);
@@ -101,15 +92,13 @@ package com.voxelengine.GUI
 			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.SPLASH_LOAD_COMPLETE ) );			
 		} 
 		
-        protected function onResize(event:Event):void
-        {
+        protected function onResize(event:Event):void {
 			_outline.scaleX = Globals.g_renderer.width/791;
 			_outline.scaleY = Globals.g_renderer.height/592;
 		}
 		
 		// Window events
-		private function onRemoved( event:UIOEvent ):void
- 		{
+		private function onRemoved( event:UIOEvent ):void {
 			removeEventListener(UIOEvent.REMOVED, onRemoved );
 			_s_currentInstance = null;
 			VoxelVerseGUI.currentInstance.showGUI();

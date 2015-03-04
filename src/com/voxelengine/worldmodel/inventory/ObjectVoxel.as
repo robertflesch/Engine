@@ -8,9 +8,10 @@
 package com.voxelengine.worldmodel.inventory
 {
 import com.voxelengine.Log;
-import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import com.voxelengine.GUI.inventory.BoxInventory;
+import com.voxelengine.events.InventoryVoxelEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.inventory.ObjectInfo;
 
 /**
  * ...
@@ -20,7 +21,9 @@ import com.voxelengine.GUI.inventory.BoxInventory;
 public class ObjectVoxel extends ObjectInfo 
 {
 	private var _typeId:int;
+	private var _count:int;
 	public function get type():int { return _typeId; }
+	public function get count():int { return _count; }
 
 	public function ObjectVoxel( $owner:BoxInventory, $typeId:int ):void {
 		super( $owner, ObjectInfo.OBJECTINFO_VOXEL );
@@ -31,24 +34,32 @@ public class ObjectVoxel extends ObjectInfo
 		return _objectType + ";" + _typeId;
 	}
 	
-	override public function fromInventoryString( $data:String ): ObjectInfo {
+	override public function fromInventoryString( $data:String, $slotId:int ): ObjectInfo {
+		super.fromInventoryString( $data, $slotId );
 		var values:Array = $data.split(";");
 		if ( values.length != 2 ) {
 			Log.out( "TypeInfo.fromInventoryString - not equal to 4 tokens found, length is: " + values.length, Log.WARN );
 			_objectType = ObjectInfo.OBJECTINFO_VOXEL;
-			_typeId = TypeInfo.RED;
+			_typeId = 0;
 			return this;
 		}
 		_objectType = ObjectInfo.OBJECTINFO_VOXEL;
 		_typeId = values[1];
-		
+		updateCount();
 		return this;
 	}
-
-	override public function reset():void {
-		_objectType = ObjectInfo.OBJECTINFO_VOXEL;
-		_typeId = TypeInfo.RED;
-	}
 	
+	private function updateCount():void {
+		InventoryVoxelEvent.addListener( InventoryVoxelEvent.COUNT_RESULT, voxelCount ) ;
+		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_REQUEST, Network.userId, _typeId, -1 ) );
+	}
+
+	private function voxelCount(e:InventoryVoxelEvent):void 
+	{
+		InventoryVoxelEvent.removeListener( InventoryVoxelEvent.COUNT_RESULT, voxelCount ) ;
+		_count = e.result as int;
+		if ( box )
+			box.updateObjectInfo( this );
+	}
 }
 }

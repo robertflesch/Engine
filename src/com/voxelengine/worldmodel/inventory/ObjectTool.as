@@ -18,31 +18,32 @@ import com.voxelengine.GUI.inventory.BoxInventory;
  */
 public class ObjectTool extends ObjectInfo 
 {
-	private var _image:String;
+	private var _thumbnail:String;
 	private var _name:String;
 	private var _guid:String;
 	private var _callBackName:String;
 	private var _callBack:Function 		= null;
 	public function get callBack():Function 				{ return _callBack; }
-	public function get image():String { return _image; }
+	public function get thumbnail():String { return _thumbnail; }
 	public function get name():String  { return _name; }
 
-	public function ObjectTool( $owner:BoxInventory, $guid:String, $callBackName:String, $image:String, $name:String ):void {
+	public function ObjectTool( $owner:BoxInventory, $guid:String, $callBackName:String, $thumbnail:String, $name:String ):void {
 		super( $owner, ObjectInfo.OBJECTINFO_TOOL );
 		_guid = $guid;
 		_callBackName = $callBackName;
 		if ( "" != $callBackName )
 			_callBack = FunctionRegistry.functionGet( $callBackName );
-		_image = $image;
+		_thumbnail = $thumbnail;
 		_name = $name;
 	}
 	
 	override public function asInventoryString():String {
 		
-		return String( _objectType + ";" + _image + ";" + _name + ";" + _callBackName + ";" + _guid );
+		return String( _objectType + ";" + _thumbnail + ";" + _name + ";" + _callBackName + ";" + _guid );
 	}
 	
-	override public function fromInventoryString( $data:String ): ObjectInfo {
+	override public function fromInventoryString( $data:String, $slotId:int ): ObjectInfo {
+		super.fromInventoryString( $data, $slotId );
 		var values:Array = $data.split(";");
 		if ( values.length != 5 ) {
 			Log.out( "ObjectTool.fromInventoryString - not equal to 4 tokens found, length is: " + values.length, Log.WARN );
@@ -50,7 +51,7 @@ public class ObjectTool extends ObjectInfo
 			return this;
 		}
 		_objectType = values[0];
-		_image = values[1];
+		_thumbnail = values[1];
 		_name = values[2];
 		_callBackName = values[3];
 		_guid = values[4];
@@ -60,7 +61,7 @@ public class ObjectTool extends ObjectInfo
 
 	override public function reset():void {
 		_objectType = ObjectInfo.OBJECTINFO_EMPTY;
-		_image	= "";
+		_thumbnail	= "";
 		_name	= "";
 		_guid 	= "";
 		_callBackName = null;

@@ -17,29 +17,30 @@ import com.voxelengine.GUI.inventory.BoxInventory;
  */
 public class ObjectAction extends ObjectInfo 
 {
-	private var _image:String;
+	private var _thumbnail:String;
 	private var _name:String;
 	private var _callBackName:String;
 	private var _callBack:Function 		= null;
 	public function get callBack():Function 				{ return _callBack; }
-	public function get image():String { return _image; }
+	public function get thumbnail():String { return _thumbnail; }
 	public function get name():String  { return _name; }
 
-	public function ObjectAction( $owner:BoxInventory, $callBackName:String, $image:String, $name:String ):void {
+	public function ObjectAction( $owner:BoxInventory, $callBackName:String, $thumbnail:String, $name:String ):void {
 		super( $owner, ObjectInfo.OBJECTINFO_ACTION );
 		_callBackName = $callBackName;
 		if ( "" != $callBackName )
 			_callBack = FunctionRegistry.functionGet( $callBackName );
-		_image = $image;
+		_thumbnail = $thumbnail;
 		_name = $name;
 	}
 	
 	override public function asInventoryString():String {
 		
-		return String( _objectType + ";" + _image + ";" + _name + ";" + _callBackName );
+		return String( _objectType + ";" + _thumbnail + ";" + _name + ";" + _callBackName );
 	}
 	
-	override public function fromInventoryString( $data:String ): ObjectInfo {
+	override public function fromInventoryString( $data:String, $slotId:int ): ObjectInfo {
+		super.fromInventoryString( $data, $slotId );
 		var values:Array = $data.split(";");
 		if ( values.length != 4 ) {
 			Log.out( "ObjectAction.fromInventoryString - not equal to 4 tokens found, length is: " + values.length, Log.WARN );
@@ -47,7 +48,7 @@ public class ObjectAction extends ObjectInfo
 			return this;
 		}
 		_objectType = values[0];
-		_image = values[1];
+		_thumbnail = values[1];
 		_name = values[2];
 		_callBackName = values[3];
 		_callBack = FunctionRegistry.functionGet( _callBackName );
@@ -56,7 +57,7 @@ public class ObjectAction extends ObjectInfo
 
 	override public function reset():void {
 		_objectType = ObjectInfo.OBJECTINFO_EMPTY;
-		_image	= "";
+		_thumbnail	= "";
 		_name	= "";
 		_callBackName = null;
 		_callBack = null

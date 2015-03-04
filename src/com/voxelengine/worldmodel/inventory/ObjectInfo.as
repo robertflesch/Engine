@@ -28,13 +28,18 @@ public class ObjectInfo
 	
 	protected var _objectType:int 			= OBJECTINFO_INVALID;
 	protected var _box:BoxInventory;
+	protected var _slotId:int;
 	
 	public function get objectType():int 					{ return _objectType; }
 	
 	public function get box():BoxInventory { return _box; }
 	public function set box(value:BoxInventory):void  { _box = value; }
 	
-	public function ObjectInfo( $owner:BoxInventory, $objectType:int ):void { _objectType = $objectType; }
+	public function ObjectInfo( $owner:BoxInventory, $objectType:int ):void 
+	{ 
+		_box = $owner;
+		_objectType = $objectType; 
+	}
 	
 	public function asByteArray( $ba:ByteArray ):ByteArray 	{ return $ba; }
 	public function fromByteArray( $ba:ByteArray ):ByteArray{ return $ba; }
@@ -43,13 +48,8 @@ public class ObjectInfo
 		return String( _objectType );
 	}
 
-	public function fromInventoryString( $data:String ): ObjectInfo {
-		var values:Array = $data.split(";");
-		if ( values.length != 1 ) {
-			Log.out( "TypeInfo.fromInventoryString - not equal to 4 tokens found, length is: " + values.length, Log.WARN );
-			reset();
-			return this;
-		}
+	public function fromInventoryString( $data:String, $slotId:int ): ObjectInfo {
+		_slotId = $slotId;
 		return this;
 	}
 	

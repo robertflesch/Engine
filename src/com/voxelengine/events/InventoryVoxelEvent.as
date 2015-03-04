@@ -16,12 +16,12 @@ import flash.events.EventDispatcher;
  */
 public class InventoryVoxelEvent extends Event
 {
-	static public const INVENTORY_VOXEL_CHANGE:String  			= "INVENTORY_VOXEL_CHANGE";
-	static public const INVENTORY_VOXEL_COUNT_REQUEST:String  	= "INVENTORY_VOXEL_COUNT_REQUEST";
-	static public const INVENTORY_VOXEL_COUNT_RESULT:String  	= "INVENTORY_VOXEL_COUNT_RESULT";
-	static public const INVENTORY_VOXEL_TYPES_REQUEST:String  	= "INVENTORY_VOXEL_TYPES_REQUEST";
-	static public const INVENTORY_VOXEL_TYPES_RESULT:String  	= "INVENTORY_VOXEL_TYPES_RESULT";
-//		static public const INVENTORY_PRIM_REMOVE:String  			= "INVENTORY_VOXEL_REMOVE";
+	static public const CHANGE:String  			= "CHANGE";
+	static public const COUNT_REQUEST:String  	= "COUNT_REQUEST";
+	static public const COUNT_RESULT:String  	= "COUNT_RESULT";
+	static public const TYPES_REQUEST:String  	= "TYPES_REQUEST";
+	static public const TYPES_RESULT:String  	= "TYPES_RESULT";
+//		static public const INVENTORY_PRIM_REMOVE:String  			= "REMOVE";
 	
 	private var _networkId:String; // Guid of model which is implementing this action
 	private var _typeId:int;	  // Voxel Type ID

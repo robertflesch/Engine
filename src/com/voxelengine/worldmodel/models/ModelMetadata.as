@@ -32,16 +32,12 @@ import com.voxelengine.server.Network;
  */
 public class ModelMetadata
 {
-	private var _topImage:Bitmap;
-	[Embed(source='../../../../../../Resources/bin/assets/textures/NoImage128.png')]
-	private var _topImageClass:Class;
-	
 	private static const COPY_COUNT_INFINITE:int = -1;
 	private var _guid:String			= "";
 	private var _name:String			= "";
 	private var _description:String		= "";
 	private var _owner:String			= "";
-	private var _image:BitmapData;
+	private var _thumbnail:BitmapData;
 	private var _dbo:DatabaseObject;
 	private var _createdDate:Date;
 	private var _modifiedDate:Date;
@@ -80,11 +76,8 @@ public class ModelMetadata
 	public function get guid():String 					{ return _guid; }
 	public function set guid(value:String):void  		{ _guid = value; }
 	
-	public function get image():BitmapData 				{ return _image; }
-	public function set image(value:BitmapData):void  	
-	{ 
-		_image = value; 
-	}
+	public function get thumbnail():BitmapData 			{ return _thumbnail; }
+	public function set thumbnail(value:BitmapData):void{ _thumbnail = value; }
 	
 	public function get copyCount():int  { return _copyCount; }
 	public function set copyCount(value:int):void  { _copyCount = value; }
@@ -123,7 +116,7 @@ public class ModelMetadata
 		name 			= $vmm.name;
 		description 	= $vmm.description;
 		owner 			= $vmm.owner;
-		image 			= $vmm.image;
+		thumbnail 		= $vmm.thumbnail;
 		
 		template		= $vmm.template;
 		templateGuid	= $vmm.templateGuid;
@@ -134,31 +127,13 @@ public class ModelMetadata
 		
 	}
 	
-	//public function initialize( $name:String, $description:String = null ):void {
-		//guid 			= Globals.getUID();
-		//name 			= $name
-		//description 	= $description ? $description: $name;
-		//owner 			= Network.userId;
-		//image 			= null;
-		//
-		//_dbo			= null;
-		//createdDate		= new Date();
-		//modifiedDate	= new Date();
-		//template		= false
-		//templateGuid	= null
-		//copy			= true;
-		//copyCount		= -1;
-		//modify			= true;
-		//transfer		= true;
-	//}
-	
 	public function createInstanceOfTemplate():ModelMetadata {
 		
 		var newVmm:ModelMetadata = new ModelMetadata( Globals.getUID() );	
 		newVmm.name 			= new String( _name );
 		newVmm.description 		= new String( _description );
 		newVmm.owner 			= new String( _owner );
-		newVmm.image 			= newVmm.image;
+		newVmm.thumbnail		= newVmm.thumbnail;
 		
 		newVmm._dbo				= null;
 		newVmm.createdDate		= new Date( _createdDate );
@@ -186,7 +161,7 @@ public class ModelMetadata
 			   , transfer: _transfer
 			   , createdDate: _createdDate
 			   , modifiedDate: _modifiedDate
-			   , image: image }
+			   , thumbnail: thumbnail }
 	}
 	
 	public function toJSONString():String {
@@ -272,10 +247,10 @@ public class ModelMetadata
 		_dbo.transfer		= _transfer;
 		_dbo.createdDate	= _createdDate;
 		_dbo.modifiedDate   = new Date();
-		if ( image )
-			_dbo.imageData 		= image.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
+		if ( thumbnail )
+			_dbo.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
 		else
-			_dbo.imageData = null;
+			_dbo.thumbnail = null;
 	}
 	
 	////////////////////////////////////////////////////////////////
@@ -298,13 +273,13 @@ public class ModelMetadata
 		_modifiedDate   = $dbo.modifiedDate;
 		_dbo			= $dbo;
 		
-		if ( $dbo.imageData ) {
+		if ( $dbo.thumbnail ) {
 			var loader:Loader = new Loader();
-			loader.contentLoaderInfo.addEventListener(Event.INIT, function(event:Event):void { image = Bitmap( LoaderInfo(event.target).content).bitmapData; } );
-			loader.loadBytes( $dbo.imageData );			
+			loader.contentLoaderInfo.addEventListener(Event.INIT, function(event:Event):void { thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData; } );
+			loader.loadBytes( $dbo.thumbnail );			
 		}
 		else
-			_image 		= null;
+			thumbnail 		= null;
 
 	}
 	

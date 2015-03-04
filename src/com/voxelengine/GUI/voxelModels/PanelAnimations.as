@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.voxelModels
 {
+import com.voxelengine.GUI.animation.WindowAnimationDetail;
 import com.voxelengine.worldmodel.animation.AnimationAttachment;
 import com.voxelengine.worldmodel.MemoryManager;
 import flash.display.Bitmap;
