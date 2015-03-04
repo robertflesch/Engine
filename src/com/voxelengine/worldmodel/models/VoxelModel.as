@@ -998,15 +998,15 @@ package com.voxelengine.worldmodel.models
 		public function save():void
 		{
 			if ( !changed ) {
-				Log.out( "VoxelModel.save - NOT changed, NOT SAVING: " + metadata.name );
+				Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.guid: " + instanceInfo.guid  );
 				return;
 			}
 			if ( !Globals.online ) {
-				Log.out( "VoxelModel.save - NOT online, NOT SAVING: " + metadata.name );
+				Log.out( "VoxelModel.save - NOT online, NOT SAVING name: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.guid: " + instanceInfo.guid  );
 				return;
 			}
 				
-			Log.out("VoxelModel.save - saving changes to: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.guid: " + instanceInfo.guid  );
+			Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.guid: " + instanceInfo.guid  );
 			if ( "" != metadata.templateGuid )
 				metadata.templateGuid = "";
 					

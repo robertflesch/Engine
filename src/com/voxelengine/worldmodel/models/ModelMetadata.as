@@ -221,7 +221,7 @@ public class ModelMetadata
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "Region.saveSucceed - created: " + guid, Log.DEBUG ); 
+		Log.out( "ModelMetadata.saveSucceed - created: " + guid, Log.DEBUG ); 
 	}	
 	
 	private function createSucceed( $pe:PersistanceEvent ):void { 
@@ -230,14 +230,14 @@ public class ModelMetadata
 		if ( $pe.dbo )
 			_dbo = $pe.dbo;
 		removeSaveEvents();
-		Log.out( "Region.createSuccess - created: " + guid, Log.DEBUG ); 
+		Log.out( "ModelMetadata.createSuccess - created: " + guid, Log.DEBUG ); 
 	}	
 	
 	private function saveFail( $pe:PersistanceEvent ):void { 
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "Region.saveFail - ", Log.ERROR ); 
+		Log.out( "ModelMetadata.saveFail - ", Log.ERROR ); 
 	}	
 
 	

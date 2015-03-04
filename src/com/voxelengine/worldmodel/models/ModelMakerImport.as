@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.RegionEvent;
 import com.voxelengine.GUI.WindowModelMetadata;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -18,6 +19,7 @@ import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelData;
 import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.worldmodel.Region;
 import flash.utils.ByteArray;
 import org.flashapi.swing.Alert;
 
@@ -30,9 +32,6 @@ import org.flashapi.swing.Alert;
 	 */
 public class ModelMakerImport {
 	
-	// keeps track of how many makers there currently are.
-	static private var _makerCount:int;
-	
 	private var _ii:InstanceInfo;
 	private var _vmd:ModelData;
 	private var _vmi:ModelInfo;
@@ -40,8 +39,7 @@ public class ModelMakerImport {
 	
 	public function ModelMakerImport( $ii:InstanceInfo ) {
 		_ii = $ii;
-		_makerCount++;
-		Log.out( "ModelMakerImport - ii: " + _ii.toString() + "  count: " + _makerCount );
+		Log.out( "ModelMakerImport - ii: " + _ii.toString() );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
 		ModelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retriveMetadata );		
@@ -55,24 +53,47 @@ public class ModelMakerImport {
 		new WindowModelMetadata( _ii.guid, WindowModelMetadata.TYPE_IMPORT );		
 	}
 	
-	private function retriveMetadata(e:ModelMetadataEvent):void {
-		if ( _ii.guid == e.guid ) {
-			_vmm = e.vmm;
+	private function retriveMetadata( $mme:ModelMetadataEvent ):void {
+		if ( _ii.guid == $mme.guid ) {
+			_vmm = $mme.vmm;
 			attemptMake();
 		}
 	}
 	
-	private function retriveInfo(e:ModelInfoEvent):void {
-		if ( _ii.guid == e.guid ) {
-			_vmi = e.vmi;
+	private function failedMetadata( $mme:ModelMetadataEvent ):void {
+		if ( _ii.guid == $mme.guid ) {
+			Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelMetadataEvent: " + $mme.toString(), Log.WARN );
+			markComplete();
+		}
+	}
+	
+	private function retriveInfo( $mie:ModelInfoEvent ):void {
+		if ( _ii.guid == $mie.guid ) {
+			_vmi = $mie.vmi;
 			attemptMake();
 		}
 	}
 	
-	private function retriveData(e:ModelDataEvent):void  {
-		if ( _ii.guid == e.guid ) {
-			_vmd = e.vmd;
+	private function failedInfo( $mie:ModelInfoEvent ):void {
+		if ( _ii.guid == $mie.guid ) {
+			Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
+			markComplete();
+		}
+	}
+	
+	private function retriveData($mde:ModelDataEvent):void  {
+		if ( _ii.guid == $mde.guid ) {
+			_vmd = $mde.vmd;
 			attemptMake();
+		}
+	}
+	
+	private function failedData( $mde:ModelDataEvent):void  {
+		if ( _ii.guid == $mde.guid ) {
+			Log.out( "ModelMaker.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
+			(new Alert( "Failed to import model: " + _ii.guid + " data not found" ).display() );
+			// TODO need some sort of shut down message for the WindowModelMetadata
+			markComplete();
 		}
 	}
 	
@@ -98,8 +119,9 @@ public class ModelMakerImport {
 			// read off that many bytes, even though we are using the data from the modelInfo file
 			var modelInfoJson:String = $ba.readUTFBytes( strLen );
 			// reset the file name that it was loaded from and assign a new guid
-			_vmm.guid = _vmd.guid = Globals.getUID();
+			_ii.guid = _vmm.guid = _vmd.guid = Globals.getUID();
 			_vmi.fileName = "";
+			
 			var vm:* = ModelLoader.instantiate( _ii, _vmi, _vmm );
 			if ( vm ) {
 				vm.version = versionInfo.version;
@@ -112,24 +134,8 @@ public class ModelMakerImport {
 			vm.save();
 			
 			markComplete();
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, Region.currentRegion.guid ) );
 		}
-	}
-	
-	private function failedMetadata( $mme:ModelMetadataEvent):void {
-		Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelMetadataEvent: " + $mme.toString(), Log.WARN );
-		markComplete();
-	}
-	
-	private function failedInfo( $mie:ModelInfoEvent):void {
-		Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
-		markComplete();
-	}
-	
-	private function failedData( $mde:ModelDataEvent):void  {
-		Log.out( "ModelMaker.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
-		(new Alert( "Failed to import model: " + _ii.guid + " data not found" ).display() );
-		// TODO need some sort of shut down message for the WindowModelMetadata
-		markComplete();
 	}
 	
 	private function markComplete():void {
@@ -141,10 +147,7 @@ public class ModelMakerImport {
 		ModelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, retriveMetadata );		
 		
-		_makerCount--;
-		if ( 0 == _makerCount )
-			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
-		Log.out( "ModelMakerImport.markComplete - makerCount: " + _makerCount + "  ii: " + _ii );
+		Log.out( "ModelMakerImport.markComplete - ii: " + _ii );
 	}
 }	
 }

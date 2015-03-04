@@ -959,7 +959,7 @@ package com.voxelengine.worldmodel.models
 		return {x:this.x, y:this.y, z:this.z};
 		} 	
 
-		public function getModelJson( outString:String ):String {
+		public function getJSON( outString:String ):String {
 			var count:int = 0;
 			//for each ( var vm:VoxelModel in _modelInstances )
 			//	count++;
@@ -971,6 +971,7 @@ package com.voxelengine.worldmodel.models
 				{
 					if ( instance is Player )
 						continue;
+					Log.out( "ModelManager.getJSON - instance: " + instance.getJSON() );
 					instanceData.push( instance.getJSON() );	
 				}
 			}

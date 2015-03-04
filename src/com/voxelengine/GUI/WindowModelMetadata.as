@@ -72,6 +72,8 @@ public class WindowModelMetadata extends VVPopup
 		
 		var creator:LabelInput = new LabelInput( "Creator: ", _vmm.creator );
 		creator.editable = false;
+		creator.selectable = false;
+		creator.enabled = false;
 		addElement( creator );
 		
 		_name = new LabelInput( "Name: ", _vmm.name );
@@ -137,7 +139,8 @@ public class WindowModelMetadata extends VVPopup
 		
 		addElement( new HorizontalSeparator( width ) );
 		
-		_copies = new LabelInput( "Num of copies: ", "1" );
+		_copies = new LabelInput( "Num of copies(-1 = infinite): ", "-1" );
+		_copies.labelControl.width = 40;
 		addElement( _copies );
 		
 		addElement( new HorizontalSeparator( width ) );

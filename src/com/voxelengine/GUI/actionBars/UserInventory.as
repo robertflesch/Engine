@@ -124,8 +124,6 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function inventoryLoaded(e:InventoryEvent):void {
-		Log.out( "UserInventory.inventoryLoaded - populate from here" , Log.WARN );
-		
 		var inv:Inventory = e.result as Inventory;
 		var slots:Slots = inv.slots;
 		

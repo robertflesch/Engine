@@ -186,12 +186,12 @@ package com.voxelengine.worldmodel.models
 			if ( !$ii )
 				throw new Error( "ModelLoader.instantiate - InstanceInfo null" );
 
-			var vm:VoxelModel = Globals.modelGet( $ii.guid );
-			if ( null != vm ) {
-				// a pre model was made. copy over the modelInfo.
-				vm.modelInfo = $modelInfo;
-				return vm;
-			}
+			//var vm:VoxelModel = Globals.modelGet( $ii.guid );
+			//if ( null != vm ) {
+				//// a pre model was made. copy over the modelInfo.
+				//vm.modelInfo = $modelInfo;
+				//return vm;
+			//}
 				
 			var modelAsset:String = $modelInfo.modelClass;
 			var modelClass:Class = ModelLibrary.getAsset( modelAsset )
@@ -199,7 +199,7 @@ package com.voxelengine.worldmodel.models
 				if ( null != Globals.player )
 					return Globals.player;
 			}
-			vm = new modelClass( $ii );
+			var vm:VoxelModel = new modelClass( $ii );
 			if ( null == vm )
 				throw new Error( "ModelLoader.instantiate - Model failed in creation - modelClass: " + modelClass );
 				

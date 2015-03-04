@@ -178,6 +178,7 @@ package com.voxelengine.worldmodel
 			
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
 			
+			addEventListeners();
 			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_BEGUN, guid ) );
 			var count:int = ModelLoader.loadRegionObjects(_JSON.region);
 			
@@ -206,8 +207,18 @@ package com.voxelengine.worldmodel
 			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_FAILURE,		removeFailedObjectFromRegion );									  
 				
 			ModelEvent.addListener( ModelEvent.CRITICAL_MODEL_DETECTED,		onCriticalModelDetected );
-			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED,			regionChanged );
-			ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED,		regionChanged );
+			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED,			modelChanged );
+			ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED,		modelChanged );
+		}
+		
+		private function regionChanged( $re:RegionEvent):void  { 
+			Log.out( "Region.regionChanged", Log.WARN );
+			changed = true;
+		}
+		
+		private function modelChanged(e:ModelEvent):void {
+			Log.out( "Region.modelChanged", Log.WARN );
+			changed = true;
 		}
 		
 		private function unload( $re:RegionEvent ):void {
@@ -229,12 +240,6 @@ package com.voxelengine.worldmodel
 			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED,		regionChanged );
 			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED,		regionChanged );
 		}
-		
-		// Since either a ModelEvent OR a RegionEvent can call this function
-		// Use the generic Event
-		private function regionChanged( $re:Event):void  { 
-			Log.out( "Region.regionChanged", Log.WARN );
-			changed = true;}
 		
 		private function removeFailedObjectFromRegion( $e:LoadingEvent):void {
 			// Do I need to remove this failed load?
@@ -300,7 +305,7 @@ package com.voxelengine.worldmodel
 		
 		public function getJSON():String {
 			var outString:String = "{\"region\":[";
-			outString = _modelManager.getModelJson(outString);
+			outString = _modelManager.getJSON(outString);
 			outString += "],"
 			// if you dont do it this way, there is a null at begining of string
 			outString += "\"skyColor\":" + JSON.stringify( _skyColor );
@@ -360,7 +365,7 @@ package com.voxelengine.worldmodel
 			
 			// The null owner check makes it to we dont save local loaded regions to persistance
 			if ( Globals.online && changed && null != owner && false == _lockDB ) {
-				Log.out( "Region.save - Saving region id: " + guid + "  name: " + name + "  and locking", Log.INFO );
+				Log.out( "Region.save - SAVING region id: " + guid + "  name: " + name + "  and locking", Log.INFO );
 				addSaveEvents();
 				
 				if ( _dbo )
@@ -375,14 +380,14 @@ package com.voxelengine.worldmodel
 				changed = false;
 			}
 			else
-				Log.out( "Region.save - Saving Region, either offline or NOT changed or locked - guid: " + guid + "  name: " + name + "  locked: " + _lockDB, Log.DEBUG );
+				Log.out( "Region.save - NOT online:" + Globals.online + "  changed:" + changed + "  owner:" + owner + "  locked:" + _lockDB + "  name: " + name + "  - guid: " + guid, Log.DEBUG );
 		}
 		
 		private function saveSucceed( $pe:PersistanceEvent ):void { 
 			if ( Globals.DB_TABLE_REGIONS != $pe.table )
 				return;
 			removeSaveEvents();
-			Log.out( "Region.saveSucceed - created: " + guid, Log.DEBUG ); 
+			Log.out( "Region.saveSucceed - guid: " + guid, Log.DEBUG ); 
 		}	
 		
 		private function createSucceed( $pe:PersistanceEvent ):void { 
@@ -391,7 +396,7 @@ package com.voxelengine.worldmodel
 			if ( $pe.dbo )
 				dbo = $pe.dbo;
 			removeSaveEvents();
-			Log.out( "Region.createSuccess - created: " + guid, Log.DEBUG ); 
+			Log.out( "Region.createSuccess - guid: " + guid, Log.DEBUG ); 
 		}	
 		
 		private function saveFail( $pe:PersistanceEvent ):void { 
@@ -438,7 +443,8 @@ package com.voxelengine.worldmodel
 			_JSON.skyColor = _skyColor;
 			_JSON.gravity = _gravity;
 			
-			var regionJson:String = JSON.stringify(_JSON);
+			//var regionJson:String = JSON.stringify(_JSON);
+			var regionJson:String = getJSON();
 			$ba.writeInt( regionJson.length );
 			$ba.writeUTFBytes( regionJson );
 			$ba.compress();

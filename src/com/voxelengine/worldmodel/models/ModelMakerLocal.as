@@ -49,13 +49,17 @@ public class ModelMakerLocal {
 	}
 	
 	private function failedInfo( $mie:ModelInfoEvent):void {
-		Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
-		markComplete();
+		if ( _ii.guid == $mie.guid ) {
+			Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
+			markComplete();
+		}
 	}
 	
 	private function failedData( $mde:ModelDataEvent):void  {
-		Log.out( "ModelMaker.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
-		markComplete()
+		if ( _ii.guid == $mde.guid ) {
+			Log.out( "ModelMaker.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
+			markComplete()
+		}
 	}
 	
 	

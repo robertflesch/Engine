@@ -39,7 +39,7 @@ public class PersistBigDB
 		else if ( Globals.DB_INVENTORY_TABLE == $pe.table )	
 			return true;
 		else {
-			Log.out( "PersistBigDB.isSupportedTable - FAILED table: " + $pe.table + " is not supported", Log.ERROR );
+			//Log.out( "PersistBigDB.isSupportedTable - FAILED table: " + $pe.table + " is not supported", Log.ERROR );
 			return false;
 		}
 	}
@@ -145,7 +145,6 @@ public class PersistBigDB
 		if ( $pe.dbo )
 		{
 			Log.out( "PersistBigDB.save - saving inventory: " + $pe.guid );
-			$pe.dbo.modified = new Date();
 			
 			Persistance.saveObject( $pe.dbo
 			                      , saveSucceed

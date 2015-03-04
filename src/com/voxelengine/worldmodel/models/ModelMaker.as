@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
@@ -90,8 +91,10 @@ public class ModelMaker {
 		ModelDataEvent.removeListener( ModelBaseEvent.ADDED, retriveData );		
 		ModelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 		_makerCount--;
-		if ( 0 == _makerCount )
+		if ( 0 == _makerCount ) {
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
+			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );
+		}
 		Log.out( "ModelMaker.markComplete - makerCount: " + _makerCount );
 	}
 }	
