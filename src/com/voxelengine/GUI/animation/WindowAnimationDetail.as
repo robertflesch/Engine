@@ -37,7 +37,7 @@
   authorship protected under United States Copyright Act.
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
-package com.voxelengine.GUI
+package com.voxelengine.GUI.animation
 {
 	import com.voxelengine.worldmodel.animation.Animation;
 	import flash.geom.Vector3D;
@@ -55,6 +55,8 @@ package com.voxelengine.GUI
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.GUI.VVPopup;
+	import com.voxelengine.GUI.LanguageManager;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;

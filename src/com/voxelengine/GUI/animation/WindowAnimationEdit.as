@@ -1,5 +1,5 @@
 
-package com.voxelengine.GUI
+package com.voxelengine.GUI.animation
 {
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.RegionEvent;
