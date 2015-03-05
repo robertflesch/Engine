@@ -7,8 +7,11 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory
 {
-import com.voxelengine.events.InventorySlotEvent;
+import flash.events.TimerEvent;
+import flash.utils.Timer;
+
 import com.voxelengine.Log;
+import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.GUI.inventory.BoxInventory;
@@ -82,9 +85,22 @@ public class ObjectModel extends ObjectInfo
 			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, metadataAdded );
 			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
 			_vmm = e.vmm;
-			if ( box )
-				box.updateObjectInfo( this );
+			// a delay is needed since the metadata loads the thumbnail on a seperate thread.
+			delayedUpdate();
 		}
+	}
+	
+	private function delayedUpdate():void
+	{
+		var pt:Timer = new Timer( 2000, 1 );
+		pt.addEventListener(TimerEvent.TIMER, delayOver );
+		pt.start();
+	}
+
+	private function delayOver(event:TimerEvent):void
+	{
+		if ( box )
+			box.updateObjectInfo( this );
 	}
 	
 	override public function reset():void {
