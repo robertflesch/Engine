@@ -216,8 +216,8 @@ package org.flashapi.swing {
 		 * 	@see #respectRatio
 		 */
 		public function get fitContentToFrame():Boolean {
-			return _fitContentToFrame;
 			setRefresh();
+			return _fitContentToFrame;
 		}
 		public function set fitContentToFrame(value:Boolean):void {
 			_fitContentToFrame = value;
