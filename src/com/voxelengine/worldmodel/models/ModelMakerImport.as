@@ -30,25 +30,20 @@ import org.flashapi.swing.Alert;
 	 * it then removes its listeners, which should cause it be to be garbage collected.
 	 * Might I need to add a timeout on this object in case if never completes.
 	 */
-public class ModelMakerImport {
+public class ModelMakerImport extends ModelMakerBase {
 	
-	private var _ii:InstanceInfo;
-	private var _vmd:ModelData;
 	private var _vmi:ModelInfo;
 	private var _vmm:ModelMetadata;
 	
 	public function ModelMakerImport( $ii:InstanceInfo ) {
-		_ii = $ii;
+		super( _ii );
 		Log.out( "ModelMakerImport - ii: " + _ii.toString() );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
-		ModelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retriveMetadata );		
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
-		ModelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
 
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, _ii.guid, null, false ) );		
 
 		new WindowModelMetadata( _ii.guid, WindowModelMetadata.TYPE_IMPORT );		
 	}
@@ -81,24 +76,8 @@ public class ModelMakerImport {
 		}
 	}
 	
-	private function retriveData($mde:ModelDataEvent):void  {
-		if ( _ii.guid == $mde.guid ) {
-			_vmd = $mde.vmd;
-			attemptMake();
-		}
-	}
-	
-	private function failedData( $mde:ModelDataEvent):void  {
-		if ( _ii.guid == $mde.guid ) {
-			Log.out( "ModelMaker.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
-			(new Alert( "Failed to import model: " + _ii.guid + " data not found" ).display() );
-			// TODO need some sort of shut down message for the WindowModelMetadata
-			markComplete();
-		}
-	}
-	
 	// once they both have been retrived, we can make the object
-	private function attemptMake():void {
+	override protected function attemptMake():void {
 		if ( null != _vmi && null != _vmd && null != _vmm ) {
 			
 			var $ba:ByteArray = _vmd.ba;
@@ -138,13 +117,11 @@ public class ModelMakerImport {
 		}
 	}
 	
-	private function markComplete():void {
-		
+	override protected function markComplete():void {
+		super.markComplete();
 		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retriveInfo );		
-		ModelDataEvent.removeListener( ModelBaseEvent.ADDED, retriveData );		
 		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retriveMetadata );		
 		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
-		ModelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, retriveMetadata );		
 		
 		Log.out( "ModelMakerImport.markComplete - ii: " + _ii );

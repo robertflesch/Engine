@@ -25,27 +25,21 @@ import flash.utils.ByteArray;
 	 * it then removes its listeners, which should cause it be to be garbage collected.
 	 * Might I need to add a timeout on this object in case if never completes.
 	 */
-public class ModelMakerLocal {
+public class ModelMakerLocal extends ModelMakerBase {
 	
 	// keeps track of how many makers there currently are.
 	static private var _makerCount:int;
 	
-	private var _ii:InstanceInfo;
-	private var _vmd:ModelData;
 	private var _vmi:ModelInfo;
 	
 	public function ModelMakerLocal( $ii:InstanceInfo ) {
-		_ii = $ii;
+		super( $ii );
 		_makerCount++;
 		Log.out( "ModelMakerLocal - ii: " + _ii.toString() + "  count: " + _makerCount );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
-		ModelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
-		ModelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
-
 	}
 	
 	private function failedInfo( $mie:ModelInfoEvent):void {
@@ -55,14 +49,6 @@ public class ModelMakerLocal {
 		}
 	}
 	
-	private function failedData( $mde:ModelDataEvent):void  {
-		if ( _ii.guid == $mde.guid ) {
-			Log.out( "ModelMaker.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
-			markComplete()
-		}
-	}
-	
-	
 	private function retriveInfo(e:ModelInfoEvent):void {
 		if ( _ii.guid == e.guid ) {
 			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retriveInfo );
@@ -71,16 +57,8 @@ public class ModelMakerLocal {
 		}
 	}
 	
-	private function retriveData(e:ModelDataEvent):void  {
-		if ( _ii.guid == e.guid ) {
-			ModelDataEvent.removeListener( ModelBaseEvent.ADDED, retriveData );		
-			_vmd = e.vmd;
-			attemptMake();
-		}
-	}
-	
 	// once they both have been retrived, we can make the object
-	private function attemptMake():void {
+	override protected function attemptMake():void {
 		if ( null != _vmi && null != _vmd ) {
 			
 			var $ba:ByteArray = _vmd.ba;
@@ -118,11 +96,10 @@ public class ModelMakerLocal {
 	}
 	//////////////////////////////////////
 	
-	private function markComplete():void {
+	override protected function markComplete():void {
+		super.markComplete();
 		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retriveInfo );		
 		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
-		ModelDataEvent.removeListener( ModelBaseEvent.ADDED, retriveData );		
-		ModelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 		
 		_makerCount--;
 		if ( 0 == _makerCount )

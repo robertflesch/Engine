@@ -4,7 +4,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 	import com.voxelengine.worldmodel.models.ModelLoader;
-	import com.voxelengine.worldmodel.models.ModelMakerGenerated;
+	//import com.voxelengine.worldmodel.models.ModelMakerGenerated;
 	import com.voxelengine.worldmodel.models.ModelManager;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.models.ModelMetadata;
@@ -178,7 +178,7 @@ package com.voxelengine.GUI
 			//var vm:VoxelModel = new VoxelModel( ii );
 //			vm.metadata = new VoxelModelMetadata();
 			//Globals.modelAdd( vm );
-			new ModelMakerGenerated( ii );
+			//new ModelMakerGenerated( ii );
 			//new WindowModelMetadata( ii.guid );
 		}
 		
