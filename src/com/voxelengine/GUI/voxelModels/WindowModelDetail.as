@@ -2,8 +2,12 @@
 package com.voxelengine.GUI.voxelModels
 {
 	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.ModelMetadataEvent;
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.events.MouseEvent;
 	import flash.geom.Vector3D;
+	import flash.geom.Matrix;
 	
 	import org.flashapi.collector.EventCollector;
 	import org.flashapi.swing.*;
@@ -29,7 +33,8 @@ package com.voxelengine.GUI.voxelModels
 		
 		private var _eventCollector:EventCollector = new EventCollector();
 		private var _panelAdvanced:Panel;
-		
+		private var _pic:Image;
+		private var _photoContainer:Container
 		private var _vm:VoxelModel = null;
 		
 		private static const BORDER_WIDTH:int = 4;
@@ -87,6 +92,7 @@ package com.voxelengine.GUI.voxelModels
 			addElement( new ComponentVector3D( "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, updateVal ) );
 			addElement( new ComponentVector3D( "Center", "X: ", "Y: ", "Z: ",  ii.center, updateVal ) );
 			addElement( new ComponentVector3D( "Scale", "X: ", "Y: ", "Z: ",  ii.scale, updateScaleVal, 5 ) );
+			addPhoto()
 			
 //			if ( true == Globals.g_debug )
 //			{
@@ -99,6 +105,40 @@ package com.voxelengine.GUI.voxelModels
 			display( 600, 20 );
         }
 		
+		private function newPhoto( $me:UIMouseEvent ):void {
+			var bmpd:BitmapData = Globals.g_renderer.modelShot();
+			_vm.metadata.thumbnail = drawScaled( bmpd, 128, 128 );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CHANGED, _vm.metadata.guid, null ) );
+			updatePhoto();
+			
+			function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
+				var m:Matrix = new Matrix();
+				m.scale(destWidth/obj.width, destHeight/obj.height);
+				var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
+				bmpd.draw(obj, m);
+				return bmpd;
+			}	
+		}
+		
+		private function addPhoto():void {
+			_photoContainer = new Container( width, 128 );
+			_photoContainer.name = "pc";
+			addElement(_photoContainer);
+			
+			var btn:Button = new Button( "Take New Picture", width - 128 , 128 );
+			$evtColl.addEvent( btn, UIMouseEvent.CLICK, newPhoto );
+			_photoContainer.addElement(btn);
+			
+			_pic = new Image( new Bitmap( _vm.metadata.thumbnail ), 128, 128 );
+			_photoContainer.addElement( _pic );
+		}
+		
+		private function updatePhoto():void {
+			_photoContainer.removeElementAt( 1 );
+			_pic = new Image( new Bitmap( _vm.metadata.thumbnail ), 128, 128 );
+			_photoContainer.addElementAt( _pic, 1 );
+		}
+
 		private function updateScaleVal( $e:SpinButtonEvent ):Number {
 			var ival:Number = Number( $e.target.data.text );
 			if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival = ival/2;
