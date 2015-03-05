@@ -130,8 +130,8 @@ public class  UserInventory extends QuickInventory
 		var items:Vector.<ObjectInfo> = slots.items;
 		for ( var i:int; i < Slots.ITEM_COUNT; i++ ) {
 			var item:ObjectInfo = items[i];
+			item.box = (boxes[i] as BoxInventory);
 			(boxes[i] as BoxInventory).updateObjectInfo( item );
-			
 		}
 		
 		resizeObject( null );
