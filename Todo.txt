@@ -17,6 +17,9 @@ John Carmack on VR
 http://fortune.com/2014/12/29/oculus-vr-john-carmack-extended/
 
 GENERAL CRITICAL:
+IMPLEMENT: LOD
+IMPLEMENT: BURNING MATS
+IMPLEMENT: MODEL PLACEMENT
 IMPROVE: Lava Flow should stop at X when flowing straight down? Break into rock emitter?
 IMPROVE: Water Flow should stop at X when flowing straight down? Break into mist and then mist emitter?
 TODO: Camera collision - ideally the camera will want to go back to its default distance and height, but collision with things around it can cause it to move closer to avatar at minimum, and ideally to move up and closers as needed
@@ -201,7 +204,7 @@ https://www.khanacademy.org/math/linear-algebra/vectors_and_spaces/dot_cross_pro
 Support for business idea
 http://motherboard.vice.com/read/minecraft-25-billion-and-the-founder-who-never-meant-to-make-a-hit?trk_source=popular
 http://recode.net/2014/09/17/minecraft-shows-why-game-cloning-can-be-a-good-thing/?utm_source=newsletter&&mkt_tok=3RkMMJWWfF9wsRonu6nPZKXonjHpfsX57uolT%2Frn28M3109ad%2BrmPBy%2B2oMFWp8na%2BqWCgseOrQ8mFkIV8izUs0TrKM%3D#038;utm_medium=email&#038;utm_campaign=rc_email_daily&#038;utm_content=minecraft-shows-why-game-cloning-can-be-a-good-thing
-http://recode.net/2014/09/16/will-minecrafts-power-users-stick-around-for-minecrosoft-wait-and-see/?utm_source=newsletter&&mkt_tok=3RkMMJWWfF9wsRonu6nPZKXonjHpfsX57uolT%2Frn28M3109ad%2BrmPBy%2B2oMFWp8na%2BqWCgseOrQ8mFkIV8izUs0TrKM%3D#038;utm_medium=email&#038;utm_campaign=rc_email_daily&#038;utm_content=will-minecrafts-power-users-stick-around-for-minecrosoft-wait-and-see
+http://recode.net/2014/09/16/will-minecrafts-power-users-stick-around-for-minecrosoft-wait-and-see/
 Minecraft 2: 10 things it needs
 http://www.redbull.com/en/games/stories/1331708927549/minecraft-2-10-things-it-needs
 he greatest Minecraft game remakes ever
@@ -223,3 +226,7 @@ http://steamcommunity.com/sharedfiles/filedetails/?id=185301069#ig_bottom
 http://recode.net/2014/11/21/some-of-robloxs-young-developers-are-making-good-money
 http://techcrunch.com/2015/02/07/first-rule-of-vr-dont-break-the-presence/
 http://foundersatwork.posthaven.com/the-social-radar-what-i-did-at-y-combinator
+
+http://careers.stackoverflow.com/jobs/location/Atlanta%2C%20Georgia?a=94ColCo&&utm_source=stackoverflow.com&utm_medium=ad&utm_campaign=jobs-small-sidebar-blue-nearyou
+http://careers.stackoverflow.com/company/appriver?c=d9UkhfdxgHKDA4Yo
+http://careers.stackoverflow.com/jobs/62594/senior-software-architect-tdd-agile-cinemassive-displays?a=kZvzW1yMut2

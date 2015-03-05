@@ -50,6 +50,7 @@ public class WindowModelMetadata extends VVPopup
 		layout.orientation = LayoutOrientation.VERTICAL;
 		
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, dataReceived );
+		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, dataReceived );
 		
 		if ( TYPE_IMPORT == windowType ) {
 			_vmm = new ModelMetadata( $guid );
@@ -66,6 +67,7 @@ public class WindowModelMetadata extends VVPopup
 	
 	private function dataReceived( $mme:ModelMetadataEvent ):void {
 		
+		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, dataReceived );
 		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, dataReceived );
 		
 		_vmm = $mme.vmm;

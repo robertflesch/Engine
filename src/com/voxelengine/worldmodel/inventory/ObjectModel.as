@@ -55,6 +55,7 @@ public class ObjectModel extends ObjectInfo
 		_objectType = values[0];
 		_guid = values[1];
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, metadataAdded );
+		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, metadataAdded );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, _guid, null ) );
 		return this;
@@ -78,6 +79,7 @@ public class ObjectModel extends ObjectInfo
 	{
 		if ( _guid == e.guid ) {
 			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded );
+			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, metadataAdded );
 			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
 			_vmm = e.vmm;
 			if ( box )

@@ -102,6 +102,7 @@ public class WindowSandboxList extends VVPopup
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 		
 		RegionEvent.addListener( ModelBaseEvent.ADDED, regionLoadedEvent );
+		RegionEvent.addListener( ModelBaseEvent.RESULT, regionLoadedEvent );
 		
 		displaySelectedRegionList( openType );
 		
@@ -110,7 +111,7 @@ public class WindowSandboxList extends VVPopup
 	
 	private function createRegion(e:UIMouseEvent):void
 	{
-		new WindowRegionDetail( null );
+		new WindowRegionDetail( null, WindowSandboxList );
 		remove();
 	}
 	
@@ -121,6 +122,9 @@ public class WindowSandboxList extends VVPopup
 	
 	override protected function onRemoved( event:UIOEvent ):void {
 		super.onRemoved( event );
+		RegionEvent.removeListener( ModelBaseEvent.ADDED, regionLoadedEvent );
+		RegionEvent.removeListener( ModelBaseEvent.RESULT, regionLoadedEvent );
+		
 		Globals.g_app.dispatchEvent( new VVWindowEvent( VVWindowEvent.WINDOW_CLOSING, label ) );
 		_s_currentInstance = null;
 	}
@@ -134,7 +138,7 @@ public class WindowSandboxList extends VVPopup
 		if ( li )
 		{
 			if ( Globals.MODE_PRIVATE != Globals.mode && Globals.MODE_PUBLIC != Globals.mode ) {
-				new WindowRegionDetail( li.data );
+				new WindowRegionDetail( li.data, WindowSandboxList );
 				remove();
 				return;
 			}

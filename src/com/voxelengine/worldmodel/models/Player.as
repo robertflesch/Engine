@@ -67,6 +67,7 @@ public class Player extends Avatar
 	}
 	
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
+		Log.out( "Player.init guid: " + instanceInfo.guid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super.init( $mi, $vmm );
 		
 		instanceInfo.usesCollision = true;
@@ -381,6 +382,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	private function onRegionLoad( $re:RegionEvent ):void {
 		// add the player to this regions model list.
 		Globals.modelAdd( this );
+		
 		if ( null == _userInventory && Globals.online )
 			_userInventory = new UserInventory();
 		// apply this regions location, position, etc setting to the player
@@ -402,6 +404,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 
 	private function onLoadingComplete( le:LoadingEvent ):void {
+		Log.out( "Player.onLoadingComplete" );
 		//ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_LOADED, onLoadingComplete );
 		//LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		//if ( !Globals.g_regionManager.currentRegion.criticalModelDetected )

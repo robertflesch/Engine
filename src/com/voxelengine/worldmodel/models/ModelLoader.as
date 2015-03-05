@@ -183,30 +183,16 @@ package com.voxelengine.worldmodel.models
 		// This is the final step in model creation. All of the info needed to create the model is here.
 		// the oxel is still not build, but all of the other information is complete.
 		static public function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:ModelMetadata ):* {
-			if ( !$ii )
-				throw new Error( "ModelLoader.instantiate - InstanceInfo null" );
-
-			//var vm:VoxelModel = Globals.modelGet( $ii.guid );
-			//if ( null != vm ) {
-				//// a pre model was made. copy over the modelInfo.
-				//vm.modelInfo = $modelInfo;
-				//return vm;
-			//}
-				
 			var modelAsset:String = $modelInfo.modelClass;
 			var modelClass:Class = ModelLibrary.getAsset( modelAsset )
-			if ( "Player" == modelAsset ) {
-				if ( null != Globals.player )
-					return Globals.player;
-			}
 			var vm:VoxelModel = new modelClass( $ii );
 			if ( null == vm )
 				throw new Error( "ModelLoader.instantiate - Model failed in creation - modelClass: " + modelClass );
 				
 			vm.init( $modelInfo, $vmm );
 
-			if ( !(vm is Avatar) )
-				Globals.modelAdd( vm );
+			// The avatar is loaded outside of the region
+			Globals.modelAdd( vm );
 
 			//Log.out( "ModelLoader.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
 			return vm;

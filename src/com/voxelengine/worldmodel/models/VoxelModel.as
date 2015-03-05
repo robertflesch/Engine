@@ -11,16 +11,16 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.events.ModelDataEvent;
 	import com.voxelengine.events.ModelMetadataEvent;
 	import flash.display3D.Context3D;
-	import flash.events.TimerEvent;
 	import flash.events.KeyboardEvent;
+	import flash.events.TimerEvent;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	import flash.net.registerClassAlias;
 	import flash.ui.Keyboard;
 	import flash.utils.ByteArray;
+	import flash.utils.getQualifiedClassName;
 	import flash.utils.getTimer;
 	import flash.utils.Timer;
-	import flash.utils.getQualifiedClassName;
 
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;

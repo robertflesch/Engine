@@ -27,7 +27,6 @@ import com.voxelengine.worldmodel.models.Player;
 import com.voxelengine.worldmodel.models.VoxelModel;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.inventory.Inventory;
-import com.voxelengine.worldmodel.inventory.InventoryObject;
 
 // all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
 public class PanelModels extends PanelBase

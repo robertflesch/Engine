@@ -39,8 +39,11 @@ public class ModelMakerImport extends ModelMakerBase {
 		super( _ii );
 		Log.out( "ModelMakerImport - ii: " + _ii.toString() );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
-		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retriveMetadata );		
+		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retriveInfo );		
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
+		
+		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retriveMetadata );		
+		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retriveMetadata );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
 
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
@@ -119,10 +122,15 @@ public class ModelMakerImport extends ModelMakerBase {
 	
 	override protected function markComplete():void {
 		super.markComplete();
+		
 		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retriveInfo );		
-		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retriveMetadata );		
+		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retriveInfo );		
 		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
-		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, retriveMetadata );		
+		
+		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retriveMetadata );		
+		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retriveMetadata );		
+		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
+		
 		
 		Log.out( "ModelMakerImport.markComplete - ii: " + _ii );
 	}

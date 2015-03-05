@@ -23,6 +23,8 @@ public class ModelBaseEvent extends Event
 	//// the response to a REQUEST or REQUEST_TYPE is one or mode ADDED messages
 	//// tells us the manager has add this from persistance
 	static public const ADDED:String						= "ADDED";
+	static public const RESULT:String						= "RESULT";
+	static public const RESULT_COMPLETE:String				= "RESULT_COMPLETE";
 	static public const REQUEST_FAILED:String				= "REQUEST_FAILED";
 	
 	// data or meta data about this region has changed

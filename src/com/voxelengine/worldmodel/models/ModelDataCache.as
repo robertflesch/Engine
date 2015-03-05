@@ -55,7 +55,7 @@ public class ModelDataCache
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.IVM_EXT, $mie.guid, null, null, URLLoaderDataFormat.BINARY ) );
 		}
 		else
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.ADDED, $mie.guid, mi ) );
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.RESULT, $mie.guid, mi ) );
 	}
 	
 	static private function add( $guid:String, $mi:ModelData ):void 

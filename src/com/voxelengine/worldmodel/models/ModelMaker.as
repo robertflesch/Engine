@@ -38,8 +38,10 @@ public class ModelMaker {
 		_ii = $ii;
 		Log.out( "ModelMaker - ii: " + _ii.toString() );
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retriveMetadata );		
+		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retriveMetadata );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
 		ModelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
+		ModelDataEvent.addListener( ModelBaseEvent.RESULT, retriveData );		
 		ModelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
@@ -87,8 +89,10 @@ public class ModelMaker {
 	
 	private function markComplete():void {
 		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retriveMetadata );		
+		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retriveMetadata );		
 		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
 		ModelDataEvent.removeListener( ModelBaseEvent.ADDED, retriveData );		
+		ModelDataEvent.removeListener( ModelBaseEvent.RESULT, retriveData );		
 		ModelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 		_makerCount--;
 		if ( 0 == _makerCount ) {

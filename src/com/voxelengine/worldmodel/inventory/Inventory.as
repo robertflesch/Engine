@@ -77,16 +77,16 @@ public class Inventory
 	}
 	
 	private function toPersistance():void {
-		_slots.toPersistance(_dbo);
 		_voxels.toPersistance(_dbo);
+		_slots.toPersistance(_dbo);
 		var ba:ByteArray = new ByteArray(); 
 		_dbo.data 			= asByteArray( ba );
 	}
 
 	public function asByteArray( $ba:ByteArray ):ByteArray {
 		$ba.writeUTF( _networkId );
-		_slots.asByteArray( $ba );
 		_voxels.asByteArray( $ba );
+		_slots.asByteArray( $ba );
 		$ba.compress();
 		return $ba;	
 	}
@@ -128,10 +128,12 @@ public class Inventory
 			_dbo 			= $dbo;
 		}
 		
+		// This tells me how many of each kind I have
+		// Since the slots use voxel data, get it first
+		_voxels.fromPersistance( $dbo );
 		// Slot data is stored as fields for easy analysis
 		// we can know what user carry around
 		_slots.fromPersistance( $dbo );
-		_voxels.fromPersistance( $dbo );
 		
 		if ( $dbo && $dbo.data ) {
 			var ba:ByteArray = $dbo.data 
@@ -147,8 +149,8 @@ public class Inventory
 	
 	private function fromByteArray( $ba:ByteArray ):void {
 		var ownerId:String = $ba.readUTF();
-		_slots.fromByteArray( $ba );
 		_voxels.fromByteArray( $ba );
+		_slots.fromByteArray( $ba );
 	}
 	
 	private function addLoadEvents():void {

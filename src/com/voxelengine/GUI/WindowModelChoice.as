@@ -175,9 +175,9 @@ package com.voxelengine.GUI
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75 - (1<<size)/2 );
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
 			ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
+			throw new Error( "WindowModelChoice - FINISH" );
 			//var vm:VoxelModel = new VoxelModel( ii );
 //			vm.metadata = new VoxelModelMetadata();
-			//Globals.modelAdd( vm );
 			//new ModelMakerGenerated( ii );
 			//new WindowModelMetadata( ii.guid );
 		}

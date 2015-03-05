@@ -176,7 +176,7 @@ public class InventoryPanelVoxel extends VVContainer
 				continue;
 			var voxelCount:int = results[typeId].val;
 			//if ( item.placeable && 0 < voxelCount)
-			if ( item.placeable )
+			if ( item.placeable && -1 < voxelCount )
 			{
 				// Add the filled bar to the container and create a new container
 				if ( countMax == count )

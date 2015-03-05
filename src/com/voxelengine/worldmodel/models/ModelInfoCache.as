@@ -48,7 +48,7 @@ public class ModelInfoCache
 		if ( null == mi )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.MODEL_INFO_EXT, $mie.guid ) );
 		else
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $mie.guid, mi ) );
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.RESULT, $mie.guid, mi ) );
 	}
 	
 	static private function add( $guid:String, $mi:ModelInfo ):void { 
@@ -61,7 +61,6 @@ public class ModelInfoCache
 			//Log.out( "ModelInfoManager.modelInfoAdd vmm: " + $vmm.toString(), Log.WARN );
 			_modelInfo[$guid] = $mi; 
 			
-			var result:Boolean = ModelInfoEvent.hasEventListener( ModelBaseEvent.ADDED );
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $guid, $mi ) );
 		}
 	}

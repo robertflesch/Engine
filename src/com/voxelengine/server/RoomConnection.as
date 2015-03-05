@@ -179,18 +179,6 @@ package com.voxelengine.server {
 							   , Globals.player.instanceInfo.rotationGet );
 				sourceMovementEvent( ae );			   
 			}
-			else 
-			{
-				// This is the notice that the players avatar has joined the room
-				//Log.out("RoomConnection.userJoinedMessage - Recieved message that I logged on " + $userid, Log.DEBUG );	
-				if ( !Globals.player ) {
-					Log.out("RoomConnection.userJoinedMessage - NO player object creating new one " + $userid, Log.ERROR );	
-					Globals.createPlayer();
-				}
-				// The info for the player was loaded at log in time, but we MAY need to add the avatar to the region model manager
-				// The players avatar information is loaded in the player object in the onRegionLoad( $re:RegionEvent ):void 
-//				Globals.modelAdd( Globals.player );
-			}
 		}
 		
 		//static private function createPlayerAfterRegionLoad( $e:RegionEvent ):void {

@@ -37,6 +37,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 		_makerCount++;
 		Log.out( "ModelMakerLocal - ii: " + _ii.toString() + "  count: " + _makerCount );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
+		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retriveInfo );		
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
 
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
@@ -99,6 +100,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 	override protected function markComplete():void {
 		super.markComplete();
 		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retriveInfo );		
+		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retriveInfo );		
 		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
 		
 		_makerCount--;

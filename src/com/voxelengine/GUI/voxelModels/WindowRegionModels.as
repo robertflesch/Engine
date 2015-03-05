@@ -37,6 +37,7 @@ package com.voxelengine.GUI.voxelModels
 			Log.out( "WindowRegionModels.onParentModelAdded - NEED A HANDLER SOMEWHERE?", Log.WARN );
 			if ( _modelPanel )
 				_modelPanel.updateChildren( Globals.modelInstancesGetDictionary, null );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, Region.currentRegion.guid ) );
 		}
 		
 		override protected function onRemoved(event:UIOEvent):void 

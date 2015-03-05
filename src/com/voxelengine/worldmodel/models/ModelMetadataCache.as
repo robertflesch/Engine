@@ -73,7 +73,7 @@ public class ModelMetadataCache
 		if ( null == vmm )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.DB_TABLE_MODELS, $mme.guid ) );
 		else
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, vmm.guid, vmm ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, vmm.guid, vmm ) );
 	}
 	
 	// This loads the first 100 objects from the users inventory OR the public inventory
@@ -97,7 +97,7 @@ public class ModelMetadataCache
 		// This will return models already loaded.
 		for each ( var vmm:ModelMetadata in _metadata ) {
 			if ( vmm.owner == $mme.guid )
-				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, vmm.guid, vmm ) );
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, vmm.guid, vmm ) );
 		}
 	}
 	

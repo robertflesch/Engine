@@ -38,23 +38,30 @@ public class WindowRegionDetail extends VVPopup
 	private var _rbGroup:RadioButtonGroup;
 	private var _rbPPGroup:RadioButtonGroup;
 	private var _create:Boolean;
+	private var _callBack:Class;
+	private var _params:String;
 	
 	//private var _background:Bitmap;
 	//[Embed(source='../../../../../Resources/bin/assets/textures/black.jpg')]
 	//private var _backgroundImage:Class;
 	
 	// Null for RegionId causes a new region to be created
-	public function WindowRegionDetail( $regionID:String )
+	public function WindowRegionDetail( $regionID:String, $callBack:Class, $params:String = null )
 	{
+		_callBack = $callBack;
+		_params = $params;
+		
+		// have to break this into 2 step for the super to work.
 		var title:String;
 		if ( $regionID )
 			title = "Edit Region";	
 		else
 			title = "New Region";
-			
 		super( title );	
+
 		if ( $regionID ) {	
 			RegionEvent.addListener( ModelBaseEvent.ADDED, collectRegionInfo );
+			RegionEvent.addListener( ModelBaseEvent.RESULT, collectRegionInfo );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST, $regionID ) );
 		}
 		else {			
@@ -76,6 +83,7 @@ public class WindowRegionDetail extends VVPopup
 	private function collectRegionInfo( $re:RegionEvent):void 
 	{
 		RegionEvent.removeListener( ModelBaseEvent.ADDED, collectRegionInfo );
+		RegionEvent.removeListener( ModelBaseEvent.RESULT, collectRegionInfo );
 		_region =  $re.region;
 
 		//_background = (new _backgroundImage() as Bitmap);
@@ -114,7 +122,7 @@ public class WindowRegionDetail extends VVPopup
 			_createRegionButton = new Button( "Create", WIDTH - 10 );
 		else
 			_createRegionButton = new Button( "Save", WIDTH - 10 );
-		eventCollector.addEvent( _createRegionButton , UIMouseEvent.CLICK ,create );
+		eventCollector.addEvent( _createRegionButton , UIMouseEvent.CLICK ,save );
 		buttonPanel.addElement( _createRegionButton );
 
 //		var cancelRegionButton:Button = new Button( "Cancel" );
@@ -147,7 +155,7 @@ public class WindowRegionDetail extends VVPopup
 		return ival;
 	}
 	
-	private function create( e:UIMouseEvent ):void {
+	private function save( e:UIMouseEvent ):void {
 		
 		if ( _create ) {
 			var dboTemp:DatabaseObject = new DatabaseObject( Globals.DB_TABLE_REGIONS, _region.guid, "1", 0, true, null );
@@ -162,15 +170,21 @@ public class WindowRegionDetail extends VVPopup
 		}
 		else {
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, _region.guid ) );
+			// This is not the active region, so we have to save it.
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, _region.guid ) );
 		}
 			
-		new WindowSandboxList();
-		remove();
+		closeFunction();
 	}
 	
 	private function closeFunction():void {
 		
-		new WindowSandboxList();
+		if ( _callBack ) {
+			if ( _params )
+				new _callBack( _params );
+			else	
+				new _callBack();
+		}
 		remove();
 	}
 	

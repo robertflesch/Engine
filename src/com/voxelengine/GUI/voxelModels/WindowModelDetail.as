@@ -130,6 +130,7 @@ package com.voxelengine.GUI.voxelModels
 			
 			ModelEvent.dispatch( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.guid ) );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, null ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, Region.currentRegion.guid ) );
 		}
 		
 

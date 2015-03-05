@@ -7,6 +7,9 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory
 {
+import flash.events.TimerEvent;
+import flash.utils.Timer;
+
 import com.voxelengine.Log;
 import com.voxelengine.GUI.inventory.BoxInventory;
 import com.voxelengine.events.InventoryVoxelEvent;
@@ -28,6 +31,8 @@ public class ObjectVoxel extends ObjectInfo
 	public function ObjectVoxel( $owner:BoxInventory, $typeId:int ):void {
 		super( $owner, ObjectInfo.OBJECTINFO_VOXEL );
 		_typeId = $typeId;
+		if ( 0 < _typeId )
+			updateCount();
 	}
 	
 	override public function asInventoryString():String {
@@ -45,8 +50,20 @@ public class ObjectVoxel extends ObjectInfo
 		}
 		_objectType = ObjectInfo.OBJECTINFO_VOXEL;
 		_typeId = values[1];
-		updateCount();
+		delayedUpdateCount();
 		return this;
+	}
+	
+	private function delayedUpdateCount():void
+	{
+		var pt:Timer = new Timer( 100, 1 );
+		pt.addEventListener(TimerEvent.TIMER, delayOver );
+		pt.start();
+	}
+
+	private function delayOver(event:TimerEvent):void
+	{
+		updateCount();
 	}
 	
 	private function updateCount():void {
@@ -56,10 +73,12 @@ public class ObjectVoxel extends ObjectInfo
 
 	private function voxelCount(e:InventoryVoxelEvent):void 
 	{
-		InventoryVoxelEvent.removeListener( InventoryVoxelEvent.COUNT_RESULT, voxelCount ) ;
-		_count = e.result as int;
-		if ( box )
-			box.updateObjectInfo( this );
+		if ( e.typeId == _typeId ) {
+			InventoryVoxelEvent.removeListener( InventoryVoxelEvent.COUNT_RESULT, voxelCount ) ;
+			_count = e.result as int;
+			if ( box )
+				box.updateObjectInfo( this );
+		}
 	}
 }
 }

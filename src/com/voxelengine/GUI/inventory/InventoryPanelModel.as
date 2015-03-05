@@ -67,6 +67,7 @@ public class InventoryPanelModel extends VVContainer
 		FunctionRegistry.functionAdd( createNewObjectIPM, "createNewObjectIPM" );
 		FunctionRegistry.functionAdd( importObjectIPM, "importObjectIPM" );
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, addModelMetadataEvent );
+		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, addModelMetadataEvent );
 		
 		upperTabsAdd();
 		addItemContainer();
@@ -172,6 +173,7 @@ public class InventoryPanelModel extends VVContainer
 		item = new ObjectAction( box, "createNewObjectIPM", "NewModel128.png", "Click to create new model" );
 		box = addModel( item, false );
 		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
+		
 		
 		if ( Globals.g_debug ) {
 			item = new ObjectAction( box, "importObjectIPM", "import128.png", "Click to import local model" );

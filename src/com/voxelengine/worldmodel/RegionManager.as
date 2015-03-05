@@ -32,7 +32,10 @@ public class RegionManager
 {
 	private var _regions:Vector.<Region> = null
 	private var _modelLoader:ModelLoader = new ModelLoader();
-	private var _initialized:Boolean;
+	private var _requestPublic:Boolean;
+	//private var _resultsPublic:Boolean;
+	private var _requestPrivate:Boolean;
+	//private var _resultsPrivate:Boolean;
 	
 	public function get size():int { return _regions.length; }
 	
@@ -93,7 +96,7 @@ public class RegionManager
 		Log.out( "RegionManager.regionRequest guid: " + $re.guid, Log.INFO );
 		var region:Region = regionGet( $re.guid );
 		if ( region ) {
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.ADDED, region.guid, region ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.RESULT, region.guid, region ) );
 			return;
 		}
 		
@@ -104,16 +107,20 @@ public class RegionManager
 	}
 	
 	private function regionTypeRequest(e:RegionEvent):void {
-		if ( false == _initialized ) {
+		
+		if ( Network.PUBLIC == e.guid && false == _requestPublic ) {
+			_requestPublic = true;
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Globals.DB_TABLE_REGIONS, Network.PUBLIC, null, Globals.DB_TABLE_INDEX_OWNER ) );			
+		}
+		if ( Network.userId == e.guid && false == _requestPrivate ) {
+			_requestPrivate = true;
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Globals.DB_TABLE_REGIONS, Network.userId, null, Globals.DB_TABLE_INDEX_OWNER ) );			
 		}
 			
-		_initialized = true;
 		// Get a list of what we currently have
 		for each ( var region:Region in _regions ) {
 			if ( region && region.owner == e.guid )
-				RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.ADDED, region.guid, region ) );
+				RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.RESULT, region.guid, region ) );
 		}
 	}
 	
