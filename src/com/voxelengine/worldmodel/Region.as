@@ -212,7 +212,7 @@ package com.voxelengine.worldmodel
 		}
 		
 		private function regionChanged( $re:RegionEvent):void  { 
-			Log.out( "Region.regionChanged", Log.WARN );
+			Log.out( "Region.regionChanged" );
 			changed = true;
 		}
 		

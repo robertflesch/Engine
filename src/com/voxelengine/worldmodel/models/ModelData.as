@@ -84,7 +84,7 @@ public class ModelData
 		if ( Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "ModelData.saveSucceed - created: " + guid, Log.DEBUG ); 
+		Log.out( "ModelData.saveSucceed - save: " + guid, Log.DEBUG ); 
 	}	
 	
 	private function createSucceed( $pe:PersistanceEvent ):void { 
