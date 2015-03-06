@@ -1,16 +1,9 @@
 
 package com.voxelengine.GUI
 {
-	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.GUI.voxelModels.WindowModelDetail;
-	import com.voxelengine.worldmodel.models.ModelLoader;
-	//import com.voxelengine.worldmodel.models.ModelMakerGenerated;
-	import com.voxelengine.worldmodel.models.ModelManager;
-	import com.voxelengine.worldmodel.models.VoxelModel;
-	import com.voxelengine.worldmodel.models.ModelMetadata;
-	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.accessibility.Accessibility;
 	import flash.geom.Vector3D;
+	
 	import org.flashapi.swing.*;
 	import org.flashapi.swing.button.RadioButtonGroup;
 	import org.flashapi.swing.databinding.DataProvider;
@@ -19,10 +12,17 @@ package com.voxelengine.GUI
 	import org.flashapi.swing.list.ListItem;
 	import org.flashapi.swing.containers.*;
 	
-	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.Globals;
+	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.GUI.voxelModels.WindowModelDetail;
+	import com.voxelengine.worldmodel.TypeInfo;
+	import com.voxelengine.worldmodel.models.ModelLoader;
+	//import com.voxelengine.worldmodel.models.ModelMakerGenerated;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
+	import com.voxelengine.worldmodel.models.ModelMetadata;
+	import com.voxelengine.worldmodel.models.VoxelModel;
 	
 	public class WindowModelChoice extends VVPopup
 	{

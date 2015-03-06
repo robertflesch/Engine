@@ -3,6 +3,8 @@ package com.voxelengine.GUI.voxelModels
 {
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.worldmodel.models.ModelCache;
+	import com.voxelengine.worldmodel.models.ModelCacheUtils;
 	import com.voxelengine.worldmodel.Region;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
@@ -36,7 +38,7 @@ package com.voxelengine.GUI.voxelModels
 			// TODO - Handle new models being added to system
 			Log.out( "WindowRegionModels.onParentModelAdded - NEED A HANDLER SOMEWHERE?", Log.WARN );
 			if ( _modelPanel )
-				_modelPanel.updateChildren( Globals.modelInstancesGetDictionary, null );
+				_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
 		}
 		
@@ -61,7 +63,7 @@ package com.voxelengine.GUI.voxelModels
 			addElement( panelCanvas );
 			
 			_modelPanel = new PanelModelAnimations( panelCanvas );
-			_modelPanel.updateChildren( Globals.modelInstancesGetDictionary, null );
+			_modelPanel.updateChildren( Globals.modelsGet, null );
 			panelCanvas.addElement( _modelPanel );
 		}
 	}

@@ -128,23 +128,23 @@ public class VoxelVerseGUI extends EventDispatcher
 		_projectileEnabled = true;
 	}
 	
-	public function saveModelIVM():void {
-		trace("VoxelVerseGUI.saveModel - Saving model to FILE");
-		 //three steps
-		 //save updated model meta data with new guid
-		 //save updated model ivm
-		 //update the model manager, removing old guid and adding new guid
-		var vm:VoxelModel = Globals.selectedModel;
-		if ( !vm )
-			vm = Globals.modelInstancesGetFirst();
-		if ( vm )
-		{
-			var ba:ByteArray = vm.toByteArray();
-			_fileReference.save( ba, vm.modelInfo.fileName + "_new.ivm");
-		}
-		else
-			Log.out( "VoxelVerseGUI.saveModelIVM - No VoxelModel selected", Log.ERROR );
-	}
+	//public function saveModelIVM():void {
+		//trace("VoxelVerseGUI.saveModel - Saving model to FILE");
+		 ////three steps
+		 ////save updated model meta data with new guid
+		 ////save updated model ivm
+		 ////update the model manager, removing old guid and adding new guid
+		//var vm:VoxelModel = Globals.selectedModel;
+		//if ( !vm )
+			//vm = Globals.modelInstancesGetFirst();
+		//if ( vm )
+		//{
+			//var ba:ByteArray = vm.toByteArray();
+			//_fileReference.save( ba, vm.modelInfo.fileName + "_new.ivm");
+		//}
+		//else
+			//Log.out( "VoxelVerseGUI.saveModelIVM - No VoxelModel selected", Log.ERROR );
+	//}
 	
 	private function crossHairResize(event:Event):void {
 		//trace( "VoxelVerseGUI.crossHairResize" );

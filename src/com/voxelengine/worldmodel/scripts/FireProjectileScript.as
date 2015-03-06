@@ -11,9 +11,6 @@ package com.voxelengine.worldmodel.scripts
 	 * ...
 	 * @author Bob
 	 */
-	import com.voxelengine.pools.ProjectilePool;
-	import com.voxelengine.worldmodel.models.ModelManager;
-	import com.voxelengine.worldmodel.oxel.Oxel;
 	import flash.geom.Vector3D;
 	
 	import com.voxelengine.Log;
@@ -29,6 +26,8 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;
+	import com.voxelengine.pools.ProjectilePool;
+	import com.voxelengine.worldmodel.oxel.Oxel;
 	//import org.flintparticles.common.events.ParticleEvent;
 
 	public class FireProjectileScript extends Script 

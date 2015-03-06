@@ -8,6 +8,7 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
+	import com.voxelengine.worldmodel.models.ModelCacheUtils;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.geom.Vector3D;
 	import flash.utils.getTimer;
@@ -117,7 +118,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				startLoc.z += view.z + rndOffset( tunnelRadius );
 				if ( 0.90 < Math.random() ) {
 					trace( "CarveTunnels.start - Carve SIDE TUNNEL ---------------------------------------------------------------" );					
-					var vv:Vector3D = Globals.viewVectorNormalizedGet();
+					var vv:Vector3D = ModelCacheUtils.viewVectorNormalizedGet();
 					vv = vv.crossProduct( crossListGet() );
 					CarveTunnels.contructor( _guid
 								 , startLoc

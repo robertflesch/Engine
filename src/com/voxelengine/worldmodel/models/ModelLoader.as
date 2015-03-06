@@ -89,7 +89,7 @@ package com.voxelengine.worldmodel.models
 		
 		static public function load( $ii:InstanceInfo, $vmm:ModelMetadata = null ):void {
 			//Log.out( "ModelLoader.load - InstanceInfo: " + $ii.toString(), Log.DEBUG );
-			Globals.instanceInfoAdd( $ii ); // Uses a name + guid as identifier
+//			Globals.instanceInfoAdd( $ii ); // Uses a name + guid as identifier
 			if ( !Globals.isGuid( $ii.guid ) && $ii.guid != "LoadModelFromBigDB" )
 				new ModelMakerLocal( $ii );
 			else

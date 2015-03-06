@@ -74,9 +74,9 @@ public class PanelModels extends PanelBase
 		_selectedModel = null;
 	}
 	
-	public function populateModels( $dictionarySource:Function, $parentModel:VoxelModel ):int
+	public function populateModels( $source:Function, $parentModel:VoxelModel ):int
 	{
-		_dictionarySource = $dictionarySource;
+		_dictionarySource = $source;
 		_parentModel = $parentModel;
 		_selectedModel = null;
 		_listModels.removeAll();
@@ -151,7 +151,7 @@ public class PanelModels extends PanelBase
 				Log.out( "PanelModels.deleteModel - " + _selectedModel.toString(), Log.WARN );
 //				InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_CHANGE, Network.userId, _selectedModel.instanceInfo.guid, 1 ) );
 
-				Globals.markDead( _selectedModel.instanceInfo.guid );
+				Globals.markDead( _selectedModel );
 				_selectedModel = null;
 				populateModels( _dictionarySource, _parentModel );
 			}

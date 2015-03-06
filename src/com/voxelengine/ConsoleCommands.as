@@ -13,6 +13,7 @@ package com.voxelengine
 	import com.furusystems.logging.slf4as.Logging;
 	import com.furusystems.logging.slf4as.ILogger;
 	import com.voxelengine.pools.LightingPool;
+	import com.voxelengine.worldmodel.models.ModelCacheUtils;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.models.ControllableVoxelModel;
@@ -193,14 +194,14 @@ package com.voxelengine
 				return;
 			}
 
-			if ( !Globals.gci() ) {
+			if ( !ModelCacheUtils.gci ) {
 				Log.out( "ConsoleCommands.carveTunnel  No location selected", Log.WARN );
 				return;
 			}
 				
 			CarveTunnel.contructor( Globals.selectedModel.instanceInfo.guid
-			                      , Globals.gci().point
-			                      , Globals.viewVectorNormalizedGet()
+			                      , ModelCacheUtils.gci.point
+			                      , ModelCacheUtils.viewVectorNormalizedGet()
 			                      , TypeInfo.AIR
 			                      , 2048
 			                      , 64 );
@@ -219,14 +220,14 @@ package com.voxelengine
 				return;
 			}
 
-			if ( !Globals.gci() ) {
+			if ( !ModelCacheUtils.gci ) {
 				Log.out( "ConsoleCommands.CarveTunnels  No location selected", Log.WARN );
 				return;
 			}
 				
 			CarveTunnels.contructor( Globals.selectedModel.instanceInfo.guid
-								   , Globals.gci().point
-								   , Globals.viewVectorNormalizedGet()
+								   , ModelCacheUtils.gci.point
+								   , ModelCacheUtils.viewVectorNormalizedGet()
 								   , TypeInfo.AIR
 								   , 2048
 								   , 64 );
@@ -238,7 +239,7 @@ package com.voxelengine
 		private static function lavaSphere():void
 		{
 			
-			var loc:Vector3D = Globals.gci().point;
+			var loc:Vector3D = ModelCacheUtils.gci.point;
 			var vm:VoxelModel = Globals.selectedModel;
 			if ( !vm )
 				{ Log.out( "ConsoleCommands.lavaSpheresCarve  No model selected", Log.WARN ); return; }
@@ -248,7 +249,7 @@ package com.voxelengine
 		
 		private static function waterSphere():void
 		{
-			var loc:Vector3D = Globals.gci().point;
+			var loc:Vector3D = ModelCacheUtils.gci.point;
 			var vm:VoxelModel = Globals.selectedModel;
 			if ( !vm )
 				{ Log.out( "ConsoleCommands.waterSpheresCarve  No model selected", Log.WARN ); return; }

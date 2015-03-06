@@ -37,6 +37,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			_layer = $layer;
 			_startTime = getTimer();
 			super( $guid, $layer, $taskType, $taskPriority );
+			throw new Error( "LoadModelFromIVM - not implemented" );
+
 		}
 		
 		// use data = for model guid
@@ -44,32 +46,32 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var timer:int = getTimer();
 			super.start() // AbstractTask will send event
 
-			var fileName:String = _layer.data;
-			var index:int = fileName.indexOf( '*' );
-			if ( -1 != index )
-			{
-				var rand:int = Math.random() * 4 + 1;
-				fileName = fileName.replace( "*", String( rand ) );
-				_layer.replaceData( fileName );
-			}
-				
-			var ba:ByteArray = Globals.findIVM( fileName );
-			if ( ba )
-			{
-				loadByteArray( ba );
-				return;
-			}
-			
-			if ( !Globals.isGuid( fileName ) )
-			{
-				loadFromFile( fileName )
-			}
-			else
-			{
-				// ModelManager is already loading this
-				Log.out( "LoadModelFromIVM.start - How do I end up here?", Log.ERROR );
-				super.complete() // AbstractTask will send event
-			}
+			//var fileName:String = _layer.data;
+			//var index:int = fileName.indexOf( '*' );
+			//if ( -1 != index )
+			//{
+				//var rand:int = Math.random() * 4 + 1;
+				//fileName = fileName.replace( "*", String( rand ) );
+				//_layer.replaceData( fileName );
+			//}
+				//
+			//var ba:ByteArray = Globals.findIVM( fileName );
+			//if ( ba )
+			//{
+				//loadByteArray( ba );
+				//return;
+			//}
+			//
+			//if ( !Globals.isGuid( fileName ) )
+			//{
+				//loadFromFile( fileName )
+			//}
+			//else
+			//{
+				//// ModelManager is already loading this
+				//Log.out( "LoadModelFromIVM.start - How do I end up here?", Log.ERROR );
+				//super.complete() // AbstractTask will send event
+			//}
 		}
 		
 		private	function loadFromFile( fileName:String ):void { 	

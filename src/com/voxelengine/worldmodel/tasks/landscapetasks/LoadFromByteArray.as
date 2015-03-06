@@ -29,23 +29,24 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			_layer = $layer;
 			_startTime = getTimer();
 			super( $guid, $layer, $taskType, $taskPriority );
+			throw new Error( "LoadFromByteArray - not implemented" );
 		}
 		
 		
 		override public function start():void
 		{
-			super.start() // AbstractTask will send event
-			var timer:int = getTimer();
-			
-			var vm:VoxelModel = getVoxelModel();
-			var ba:ByteArray = Globals.findIVM( _layer.data );
-			if ( vm && ba )		
-			{
-				ModelLoader.loadLocalModelFromByteArray( vm, ba );
-			}
-			else
-				Log.out( "LoadFromByteArray.loadByteArray - FAILED to find either voxel model or byte array: guid: " + _guid + "  data: " + _layer.data , Log.ERROR );
-
+			//super.start() // AbstractTask will send event
+			//var timer:int = getTimer();
+			//
+			//var vm:VoxelModel = getVoxelModel();
+			//var ba:ByteArray = Globals.findIVM( _layer.data );
+			//if ( vm && ba )		
+			//{
+				//ModelLoader.loadLocalModelFromByteArray( vm, ba );
+			//}
+			//else
+				//Log.out( "LoadFromByteArray.loadByteArray - FAILED to find either voxel model or byte array: guid: " + _guid + "  data: " + _layer.data , Log.ERROR );
+//
 			super.complete() // AbstractTask will send event
 		}
 		

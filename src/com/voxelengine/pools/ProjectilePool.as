@@ -93,15 +93,17 @@ public final class ProjectilePool
 		pi.usesCollision = true;
 		pi.dynamicObject = true;
 		pi.baseLightLevel = 255;
-		
-		var mi:ModelInfo = Globals.modelInfoGet(pi.guid);
-		var modelAsset:String = mi.modelClass;
-		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
-		var vm:* = new modelClass( pi, mi );
-		// the task of replacing the oxel is placed 
-		vm.modelInfo.biomes.addParticleTaskToController( vm );
 
-		return vm;
+		throw new Error( "ProjectilePool.newModel" );
+		//var mi:ModelInfo = Globals.modelInfoGet(pi.guid);
+		//var modelAsset:String = mi.modelClass;
+		//var modelClass:Class = ModelLibrary.getAsset( modelAsset )
+		//var vm:* = new modelClass( pi, mi );
+		//// the task of replacing the oxel is placed 
+		//vm.modelInfo.biomes.addParticleTaskToController( vm );
+//
+		//return vm;
+		return null;
 	}
 
 } 

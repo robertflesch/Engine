@@ -19,6 +19,7 @@ import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.Room;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
+import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.ModelLoader;
 import com.voxelengine.worldmodel.models.ModelDataCache;
 import com.voxelengine.worldmodel.models.ModelMetadataCache;
@@ -71,6 +72,7 @@ public class RegionManager
 		// This causes the to load its caches and listeners
 		InventoryManager.init();
 		MouseKeyboardHandler.init();
+		ModelCacheUtils.init();
 	}
 	
 	/**

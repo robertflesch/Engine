@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel
 {
 	import com.voxelengine.events.WindowSplashEvent;
+	import com.voxelengine.worldmodel.models.ModelCache;
 	import flash.geom.Vector3D;
 	import flash.events.Event;
     import flash.events.TimerEvent;
@@ -25,7 +26,7 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.worldmodel.models.ModelLoader;
-	import com.voxelengine.worldmodel.models.ModelManager;
+	//import com.voxelengine.worldmodel.models.ModelManager;
 	import com.voxelengine.worldmodel.models.Player;
 	
 	//{
@@ -92,10 +93,12 @@ package com.voxelengine.worldmodel
 		private var _playerRotation:Vector3D = new Vector3D();
 		private var _loaded:Boolean = false;							// INSTANCE NOT EXPORTED
 		private var _guestAllow:Boolean = true;
-		private var _modelManager:ModelManager = new ModelManager();
+		//private var _modelManager:ModelManager = new ModelManager();
 		private var _skyColor:Vector3D = new Vector3D(92, 	172, 	238);
 		private var _gravity:Boolean = true;
 		private var _lockDB:Boolean = false; // This keeps a second save or create from happening until first one clears.
+		
+		private var _modelCache:ModelCache;
 
 		public function get dbo():DatabaseObject { return _dbo; }
 		public function set dbo(val:DatabaseObject):void { _dbo = val; }
@@ -131,8 +134,10 @@ package com.voxelengine.worldmodel
 		public function set created(value:Date):void  { _created = value; }
 		public function get modified():Date  { return _modified; }
 		public function set modified(value:Date):void  { _modified = value; }
-		public function get modelManager():ModelManager  { return _modelManager; }
+		//public function get modelManager():ModelManager  { return _modelManager; }
 		public function get loaded():Boolean { return _loaded; }
+		
+		public function get modelCache():ModelCache  { return _modelCache; }
 		
 		public function getSkyColor():Vector3D { return _skyColor; }
 		public function setSkyColor( r:int, g:int, b:int ):void { _skyColor.setTo( r, g, b ); }
@@ -164,7 +169,8 @@ package com.voxelengine.worldmodel
 		
 		
 		public function update( $elapsed:int ):void {
-			_modelManager.update( $elapsed );
+			_modelCache.update( $elapsed );
+			//_modelManager.update( $elapsed );
 		}
 			
 		private function load( $re:RegionEvent ):void {
@@ -175,6 +181,8 @@ package com.voxelengine.worldmodel
 			if ( _s_currentRegion )
 				_s_currentRegion.unload( null );
 			_s_currentRegion = this;
+			
+			_modelCache = new ModelCache( this );
 			
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
 			
@@ -225,8 +233,10 @@ package com.voxelengine.worldmodel
 			Log.out( "Region.unload: " + guid, Log.DEBUG );
 			removeEventListeners();
 			
-			_modelManager.removeAllModelInstances( false ); // dont delete player object.
-			_modelManager.bringOutYourDead();
+			_modelCache.unload();
+			
+//			_modelManager.removeAllModelInstances( false ); // dont delete player object.
+//			_modelManager.bringOutYourDead();
 		}
 		
 		private function removeEventListeners():void {
@@ -305,7 +315,8 @@ package com.voxelengine.worldmodel
 		
 		public function getJSON():String {
 			var outString:String = "{\"region\":[";
-			outString = _modelManager.getJSON(outString);
+			//outString = _modelManager.getJSON(outString);
+			outString = _modelCache.getJSON(outString);
 			outString += "],"
 			// if you dont do it this way, there is a null at begining of string
 			outString += "\"skyColor\":" + JSON.stringify( _skyColor );
@@ -361,7 +372,8 @@ package com.voxelengine.worldmodel
 			}
 			
 			// Models might have changes not seen in the region file
-			_modelManager.save();
+			//_modelManager.save();
+			_modelCache.save();
 			
 			// The null owner check makes it to we dont save local loaded regions to persistance
 			if ( Globals.online && changed && null != owner && false == _lockDB ) {

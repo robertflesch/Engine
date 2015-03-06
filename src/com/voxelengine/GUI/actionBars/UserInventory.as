@@ -11,7 +11,6 @@ package com.voxelengine.GUI.actionBars
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelMaker;
-import com.voxelengine.worldmodel.models.ModelManager;
 import com.voxelengine.worldmodel.models.VoxelModel;
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
@@ -269,6 +268,9 @@ public class  UserInventory extends QuickInventory
 	private var _editCursorModelGuid:String = null;
 	public function processItemSelection( box:UIObject ):void 
 	{
+		if ( 0 < Globals.openWindowCount )
+			return;
+			
 		moveSelector( box.x );
 		var itemIndex:int = int( box.name );
 		
@@ -276,9 +278,9 @@ public class  UserInventory extends QuickInventory
 		Globals.g_app.toolOrBlockEnabled = false;
 		hideGrainTools();
 		if ( null != _editCursorModelGuid ) {
-			var ecm:VoxelModel = Region.currentRegion.modelManager.modelGet( _editCursorModelGuid );
-			if ( ecm )
-				ecm.dead = true;
+			//var ecm:VoxelModel = Globals.modelGet( _editCursorModelGuid );
+			//if ( ecm )
+				//ecm.dead = true;
 			_editCursorModelGuid = null;
 		}
 		var oi:ObjectInfo = box.data as ObjectInfo;

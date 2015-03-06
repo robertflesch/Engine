@@ -582,6 +582,7 @@ package com.voxelengine.worldmodel.models
 				//oxel.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
 				oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
 				
+				//Log.out( "VoxelModel.draw - Globals.g_app.editing: " + Globals.g_app.editing + " editCursor.visible: " + (editCursor?editCursor.visible:false) );
 				if (Globals.g_app.editing && editCursor && editCursor.visible)
 					editCursor.draw(viewMatrix, $context, $isChild );
 			}

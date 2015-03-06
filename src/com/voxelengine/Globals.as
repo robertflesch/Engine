@@ -263,20 +263,14 @@ package com.voxelengine {
 		
 //////////////////////////////////////////////////////////////////////////////////		
 		public static function modelGet( $guid:String ):VoxelModel {
-			return Region.currentRegion.modelManager.modelGet( $guid );
-		};
-		
-		public static function findIVM( $guid:String ):ByteArray {
-			return Region.currentRegion.modelManager.findIVM( $guid );
-		};
-		
-		public static function addIVM( $guid:String, $ba:ByteArray ):void {
-			Region.currentRegion.modelManager.addIVM( $guid, $ba );
+			throw new Error( "Globals.modelGet - not implemented" );
+			return null;
+//			return Region.currentRegion.modelCache.modelGet( $guid );
 		};
 		
 		public static function reinitialize( $context:Context3D ):void {
-			if ( g_regionManager && Region.currentRegion )
-				Region.currentRegion.modelManager.reinitialize( $context );
+			if ( Region.currentRegion )
+				Region.currentRegion.modelCache.reinitialize( $context );
 		}
 		
 		public static function createPlayer():Boolean {
@@ -285,88 +279,36 @@ package com.voxelengine {
 				return false;
 			}
 			else 	
-				return Region.currentRegion.modelManager.createPlayer();
+				return Region.currentRegion.modelCache.createPlayer();
+				//return Region.currentRegion.modelCache.createPlayer();
 		}
 		
 		public static function draw( $mvp:Matrix3D, $context:Context3D ):void {
-			Region.currentRegion.modelManager.draw( $mvp, $context )
+			//Region.currentRegion.modelCache.draw( $mvp, $context );
+			Region.currentRegion.modelCache.draw( $mvp, $context );
 		}
 		
 		public static function modelAdd( $vm:VoxelModel ):void {
-			Region.currentRegion.modelManager.modelAdd( $vm )
+			Region.currentRegion.modelCache.modelAdd( $vm );
+			//Region.currentRegion.modelCache.modelAdd( $vm );
 		}
 		
-		public static function modelInfoAdd( $modelInfo:ModelInfo ):void {
-			Region.currentRegion.modelManager.modelInfoAdd( $modelInfo )
-		}
-		
-		public static function instanceInfoAdd( $val:InstanceInfo ):void {
-			Region.currentRegion.modelManager.instanceInfoAdd( $val );
-		};
-
-		public static function instanceInfoGet( $guid:String ):InstanceInfo {
-			return Region.currentRegion.modelManager.instanceInfoGet( $guid )
-		}
-		
-		public static function instanceInfoRemove( $guid:String ):void {
-			Region.currentRegion.modelManager.instanceInfoRemove( $guid )
-		}
-
 		public static function changeFromParentToChild( $vm:VoxelModel ):void {
-			Region.currentRegion.modelManager.changeFromParentToChild( $vm )
+			throw new Error( "Globals.changeFromParentToChild - not implemented" );
+			//Region.currentRegion.modelCache.changeFromParentToChild( $vm )
 		}
 		
-		public static function whichModelsIsThisInfluencedBy( $vm:VoxelModel ):Vector.<VoxelModel>  {
-			return Region.currentRegion.modelManager.whichModelsIsThisInfluencedBy( $vm )
-		}
+		public static function markDead( $vm:VoxelModel ):void {
+			Region.currentRegion.modelCache.markDead( $vm );
+		};
+		
+		public static function modelsGet():Vector.<VoxelModel> {
+			return Region.currentRegion.modelCache.models;
+		};
 
-		public static function markDead( $guid:String ):void {
-			Region.currentRegion.modelManager.markDead( $guid );
-		};
-		
-		public static function modelInstancesGetDictionary():Dictionary {
-			return Region.currentRegion.modelManager.modelInstancesGetDictionary();
-		};
-		
-		public static function modelInfoGet( $name:String ):ModelInfo {
-			return Region.currentRegion.modelManager.modelInfoGet( $name );
-		};
-		
-		public static function modelInfoGetDictionary():Dictionary {
-			return Region.currentRegion.modelManager.modelInfoGetDictionary();
-		};
-		
 		public static function dispose():void {
 			g_textureBank.dispose();
-			Region.currentRegion.modelManager.dispose();
-		};
-		
-		public static function gci():GrainCursorIntersection {
-			return Region.currentRegion.modelManager._gci;
-		};
-		
-		public static function viewVectorNormalizedGet():Vector3D {
-			return Region.currentRegion.modelManager.viewVectorNormalizedGet();
-		};
-		
-		public static function modelInstancesGetFirst():VoxelModel {
-			return Region.currentRegion.modelManager.modelInstancesGetFirst();
-		};
-		
-		public static function TestCheckForFlow():void {
-			Region.currentRegion.modelManager.TestCheckForFlow();
-		};
-		
-		public static function worldSpaceStartPoint():Vector3D {
-			return Region.currentRegion.modelManager.worldSpaceStartPoint;
-		};
-		
-		public static function whichModelsIsThisInsideOfNew( $vm:VoxelModel ):Vector.<VoxelModel> {
-			return Region.currentRegion.modelManager.whichModelsIsThisInsideOfNew( $vm );
-		};
-		
-		public static function modelInstancesChangeGuid( $oldGuid:String, $newGuid:String ):void { 
-			Region.currentRegion.modelManager.modelInstancesChangeGuid( $oldGuid, $newGuid );
+			Region.currentRegion.modelCache.dispose();
 		};
 	}
 }

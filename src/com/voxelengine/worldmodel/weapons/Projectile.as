@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.weapons
 	import com.voxelengine.Log;
 	import com.voxelengine.pools.ParticlePool;
 	import com.voxelengine.pools.ProjectilePool;
+	import com.voxelengine.worldmodel.models.ModelCacheUtils;
 	import com.voxelengine.worldmodel.models.ModelMetadata;
 	import com.voxelengine.worldmodel.scripts.ImpactScript;
 	import com.voxelengine.worldmodel.scripts.Script;
@@ -99,7 +100,7 @@ package com.voxelengine.worldmodel.weapons
 		*/
 		override public function collisionTest( $elapsedTimeMS:Number ):Boolean {
 			
-			var modelList:Vector.<VoxelModel> = Globals.whichModelsIsThisInsideOfNew( this )
+			var modelList:Vector.<VoxelModel> = ModelCacheUtils.whichModelsIsThisInsideOfNew( this )
 			for each ( var collisionCandidate:VoxelModel in modelList )
 			{
 				if ( _thatWhichCreatedYou && _thatWhichCreatedYou.isInParentChain( collisionCandidate ) )

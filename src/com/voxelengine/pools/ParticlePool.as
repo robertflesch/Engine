@@ -102,16 +102,18 @@ public final class ParticlePool
 		pi.usesCollision = false;
 		pi.dynamicObject = true;
 		
-		var mi:ModelInfo = Globals.modelInfoGet(pi.guid);
-		var modelAsset:String = mi.modelClass;
-		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
-		var vm:* = new modelClass( pi, mi );
-		// At this point the Particle just has a placeholder oxel
-		// Still need to figure out how to load the actual ivm
-		// being on as a task on a low priority thread
-		vm.modelInfo.biomes.addParticleTaskToController( vm );
-
-		return vm;
+		throw new Error( "ParticlePool.newModel" );
+		//var mi:ModelInfo = Globals.modelInfoGet(pi.guid);
+		//var modelAsset:String = mi.modelClass;
+		//var modelClass:Class = ModelLibrary.getAsset( modelAsset )
+		//var vm:* = new modelClass( pi, mi );
+		//// At this point the Particle just has a placeholder oxel
+		//// Still need to figure out how to load the actual ivm
+		//// being on as a task on a low priority thread
+		//vm.modelInfo.biomes.addParticleTaskToController( vm );
+//
+		//return vm;
+		return null;
 	}
 
 } 

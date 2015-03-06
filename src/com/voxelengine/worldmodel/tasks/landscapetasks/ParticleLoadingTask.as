@@ -33,33 +33,34 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		public function ParticleLoadingTask( $vm:VoxelModel, $taskType:String = "ParticleLoadingTask", $taskPriority:int = TASK_PRIORITY ):void {
 			//Log.out( "ParticleLoadingTask.construct " );
 			super( $vm, $taskType, $taskPriority );
+			throw new Error( "ParticleLoadingTask - NEED TO REWRITE" );
 		}
 		
 		// use data = for model guid
 		override public function start():void {
-			var timer:int = getTimer();
-			super.start() // AbstractTask will send event
-			var fileName:String = _vm.modelInfo.fileName;
-			var ba:ByteArray = Globals.findIVM( fileName );
-			if ( ba )
-			{
-				loadByteArray( ba );
-				//Log.out("ParticleLoadingTask.start - loadByteArray: " + fileName + " took: " + (getTimer() - timer) );
-				return;
-			}
-			loadFromFile( fileName );
-			//Log.out("ParticleLoadingTask.start - loadFromFile: " + fileName + " took: " + (getTimer() - timer));
-		}
-		
-		private	function loadFromFile( fileName:String ):void { 	
-			Log.out( "ParticleLoadingTask.loadFromFile" );
-			var path:String = Globals.modelPath + fileName + ".ivm";
-			
-			var urlLoader:URLLoader = new URLLoader();
-			urlLoader.load(new URLRequest( path ));
-			urlLoader.dataFormat = URLLoaderDataFormat.BINARY;
-			urlLoader.addEventListener(Event.COMPLETE, onIVMLoad);
-			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, errorAction);			
+			//var timer:int = getTimer();
+			//super.start() // AbstractTask will send event
+			//var fileName:String = _vm.modelInfo.fileName;
+			//var ba:ByteArray = Globals.findIVM( fileName );
+			//if ( ba )
+			//{
+				//loadByteArray( ba );
+				////Log.out("ParticleLoadingTask.start - loadByteArray: " + fileName + " took: " + (getTimer() - timer) );
+				//return;
+			//}
+			//loadFromFile( fileName );
+			////Log.out("ParticleLoadingTask.start - loadFromFile: " + fileName + " took: " + (getTimer() - timer));
+		//}
+		//
+		//private	function loadFromFile( fileName:String ):void { 	
+			//Log.out( "ParticleLoadingTask.loadFromFile" );
+			//var path:String = Globals.modelPath + fileName + ".ivm";
+			//
+			//var urlLoader:URLLoader = new URLLoader();
+			//urlLoader.load(new URLRequest( path ));
+			//urlLoader.dataFormat = URLLoaderDataFormat.BINARY;
+			//urlLoader.addEventListener(Event.COMPLETE, onIVMLoad);
+			//urlLoader.addEventListener(IOErrorEvent.IO_ERROR, errorAction);			
 		}
 		
 		/*
@@ -70,34 +71,34 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		// byte array data has been successfully loaded
 		private function onIVMLoad(event:Event):void	{
 			
-			var ba:ByteArray = event.target.data;
-			Globals.addIVM( _vm.modelInfo.fileName, ba );
-			loadCompressedByteArray( ba );
+			//var ba:ByteArray = event.target.data;
+			//Globals.addIVM( _vm.modelInfo.fileName, ba );
+			//loadCompressedByteArray( ba );
 		}
 		
 		private function loadCompressedByteArray( $ba:ByteArray ):void {
-			if ( _vm && $ba )		
-			{
-				ModelLoader.loadLocalModelFromByteArray( _vm, $ba );
-				//Log.out( "ParticleLoadingTask.start - completed - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) + " guid: " + _guid);
-			}
-			else
-				Log.out( "ParticleLoadingTask.loadByteArray - FAILED to find either voxel model or byte array: ", Log.ERROR );
-			_vm.complete = true;
-			super.complete() // AbstractTask will send event
+			//if ( _vm && $ba )		
+			//{
+				//ModelLoader.loadLocalModelFromByteArray( _vm, $ba );
+				////Log.out( "ParticleLoadingTask.start - completed - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) + " guid: " + _guid);
+			//}
+			//else
+				//Log.out( "ParticleLoadingTask.loadByteArray - FAILED to find either voxel model or byte array: ", Log.ERROR );
+			//_vm.complete = true;
+			//super.complete() // AbstractTask will send event
 		}
 		
 		private function loadByteArray( $ba:ByteArray ):void {
-			if ( _vm && $ba )		
-			{
-				//_vm.fromByteArray( $ba );
-				ModelLoader.loadLocalModelFromByteArray( _vm, $ba );
-				//Log.out( "ParticleLoadingTask.start - completed - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) + " guid: " + _guid);
-			}
-			else
-				Log.out( "ParticleLoadingTask.loadByteArray - FAILED to find either voxel model or byte array: ", Log.ERROR );
-			_vm.complete = true;
-			super.complete() // AbstractTask will send event
+			//if ( _vm && $ba )		
+			//{
+				////_vm.fromByteArray( $ba );
+				//ModelLoader.loadLocalModelFromByteArray( _vm, $ba );
+				////Log.out( "ParticleLoadingTask.start - completed - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) + " guid: " + _guid);
+			//}
+			//else
+				//Log.out( "ParticleLoadingTask.loadByteArray - FAILED to find either voxel model or byte array: ", Log.ERROR );
+			//_vm.complete = true;
+			//super.complete() // AbstractTask will send event
 		}
 
 		private function errorAction(e:IOErrorEvent):void {

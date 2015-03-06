@@ -57,7 +57,7 @@ package com.voxelengine.worldmodel.weapons
 			if ( null !=  instanceInfo.controllingModel )
 				return;
 		
-			var modelList:Vector.<VoxelModel> = Globals.whichModelsIsThisInsideOfNew( this )
+			var modelList:Vector.<VoxelModel> = ModelCacheUtils.whichModelsIsThisInsideOfNew( this )
 			for each ( var collisionCandidate:VoxelModel in modelList )
 			{
 				if (  !_bombHolder.isInParentChain( collisionCandidate ) )

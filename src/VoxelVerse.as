@@ -49,7 +49,7 @@ package {
 		
 		private var _showConsole:Boolean;
 		private var _toolOrBlockEnabled:Boolean;
-		private var _editing: Boolean = true;
+		private var _editing: Boolean;
 		private var _displayGuid:String;
 		
 		public function get editing():Boolean { return _editing; }

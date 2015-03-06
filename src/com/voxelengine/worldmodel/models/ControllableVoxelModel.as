@@ -319,7 +319,7 @@ package com.voxelengine.worldmodel.models
 //				Log.out("CVM.test - findClosestIntersectionInDirection took: " + (getTimer() - timer));
 				
 				
-				_collisionCandidates = Globals.whichModelsIsThisInfluencedBy( this )
+				_collisionCandidates = ModelCacheUtils.whichModelsIsThisInfluencedBy( this )
 				//trace( "collisionTest: " + _collisionCandidates.length )
 				if ( 0 == _collisionCandidates.length )
 				{

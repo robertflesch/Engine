@@ -109,18 +109,19 @@ public class WindowOxelUtils extends VVPopup
 	
 	private function statsHandler(event:UIMouseEvent):void 
 	{
-		var ba:ByteArray = Globals.findIVM( _vm.modelInfo.biomes.layers[0].data );
-		// this positions the ba pointer to the oxel data, which is what the statisics needs
-		var versionInfo:Object = ModelLoader.modelMetaInfoRead( ba );
-		if ( 0 != versionInfo.manifestVersion ) {
-			// how many bytes is the modelInfo
-			var strLen:int = ba.readInt();
-			// read off that many bytes
-			var modelInfoJson:String = ba.readUTFBytes( strLen );
-		}
-		
-		_vm.statisics.gather( Globals.VERSION, ba, _vm.oxel.gc.grain );
-		_vm.statisics.statsPrint();
+		throw new Error( "ParticleLoadingTask - NEED TO REWRITE" );
+		//var ba:ByteArray = Globals.findIVM( _vm.modelInfo.biomes.layers[0].data );
+		//// this positions the ba pointer to the oxel data, which is what the statisics needs
+		//var versionInfo:Object = ModelLoader.modelMetaInfoRead( ba );
+		//if ( 0 != versionInfo.manifestVersion ) {
+			//// how many bytes is the modelInfo
+			//var strLen:int = ba.readInt();
+			//// read off that many bytes
+			//var modelInfoJson:String = ba.readUTFBytes( strLen );
+		//}
+		//
+		//_vm.statisics.gather( Globals.VERSION, ba, _vm.oxel.gc.grain );
+		//_vm.statisics.statsPrint();
 	}
 	
 	

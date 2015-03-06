@@ -35,7 +35,6 @@ public class ModelMakerLocal extends ModelMakerBase {
 	public function ModelMakerLocal( $ii:InstanceInfo ) {
 		super( $ii );
 		_makerCount++;
-		Log.out( "ModelMakerLocal - ii: " + _ii.toString() + "  count: " + _makerCount );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retriveInfo );		
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		

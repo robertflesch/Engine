@@ -59,10 +59,10 @@ package com.voxelengine.GUI.voxelModels
 			}
 		}
 		
-		public function updateChildren( $dictionarySource:Function, $parentModel:VoxelModel ):void {
+		public function updateChildren( $source:Function, $parentModel:VoxelModel ):void {
 			_parentModel = $parentModel;
 			if ( null != _listModels ) {
-				var countAdded:int = _listModels.populateModels( $dictionarySource, $parentModel );
+				var countAdded:int = _listModels.populateModels( $source, $parentModel );
 				if ( 0 == countAdded )
 					childPanelRemove();
 			}
