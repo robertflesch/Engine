@@ -268,6 +268,11 @@ package com.voxelengine {
 //			return Region.currentRegion.modelCache.modelGet( $guid );
 		};
 		
+		public static function dispose():void {
+			g_textureBank.dispose();
+			Region.currentRegion.modelCache.dispose();
+		};
+		
 		public static function reinitialize( $context:Context3D ):void {
 			if ( Region.currentRegion )
 				Region.currentRegion.modelCache.reinitialize( $context );
@@ -280,17 +285,10 @@ package com.voxelengine {
 			}
 			else 	
 				return Region.currentRegion.modelCache.createPlayer();
-				//return Region.currentRegion.modelCache.createPlayer();
-		}
-		
-		public static function draw( $mvp:Matrix3D, $context:Context3D ):void {
-			//Region.currentRegion.modelCache.draw( $mvp, $context );
-			Region.currentRegion.modelCache.draw( $mvp, $context );
 		}
 		
 		public static function modelAdd( $vm:VoxelModel ):void {
 			Region.currentRegion.modelCache.modelAdd( $vm );
-			//Region.currentRegion.modelCache.modelAdd( $vm );
 		}
 		
 		public static function changeFromParentToChild( $vm:VoxelModel ):void {
@@ -302,13 +300,5 @@ package com.voxelengine {
 			Region.currentRegion.modelCache.markDead( $vm );
 		};
 		
-		public static function modelsGet():Vector.<VoxelModel> {
-			return Region.currentRegion.modelCache.models;
-		};
-
-		public static function dispose():void {
-			g_textureBank.dispose();
-			Region.currentRegion.modelCache.dispose();
-		};
 	}
 }

@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import com.voxelengine.worldmodel.Region;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	import flash.utils.ByteArray;
@@ -249,7 +250,7 @@ package com.voxelengine.worldmodel.models
 		static public function findRayIntersections():Vector.<GrainCursorIntersection> {
 			// We should only use the models in the view frustrum - TODO - RSF
 			var cm:VoxelModel = Globals.controlledModel;
-			var models:Vector.<VoxelModel> = Globals.modelsGet();
+			var models:Vector.<VoxelModel> = Region.currentRegion.modelCache.models;
 			for each ( var vm:VoxelModel in models )
 			{
 				if ( vm == cm )
@@ -275,7 +276,7 @@ package com.voxelengine.worldmodel.models
 			var scenter:Vector3D = $testObject.modelToWorld( $testObject.instanceInfo.center );
 			var radius:int = $testObject.oxel.gc.size() / 8; //2
 			var collidingModels:Vector.<VoxelModel> = new Vector.<VoxelModel>;
-			var models:Vector.<VoxelModel> = Globals.modelsGet();
+			var models:Vector.<VoxelModel> = Region.currentRegion.modelCache.models;
 			for each ( var vm:VoxelModel in models )
 			{
 				if ( vm && vm.complete && vm != $testObject && vm.instanceInfo.collidable )
@@ -339,7 +340,7 @@ package com.voxelengine.worldmodel.models
 			points[7] = vm.modelToWorld( origin.add( scratch ) );
 
 			var modelList:Vector.<VoxelModel> = new Vector.<VoxelModel>;
-			var models:Vector.<VoxelModel> = Globals.modelsGet();
+			var models:Vector.<VoxelModel> = Region.currentRegion.modelCache.models;
 			var testPoint:Vector3D = null;
 			for each ( var instance:VoxelModel in models )
 			{
@@ -372,7 +373,7 @@ package com.voxelengine.worldmodel.models
 			worldSpaceStartPointCorner.z = worldSpaceStartPointCorner.z + vm.oxel.gc.size();
 
 			var modelList:Vector.<VoxelModel> = new Vector.<VoxelModel>;
-			var models:Vector.<VoxelModel> = Globals.modelsGet();
+			var models:Vector.<VoxelModel> = Region.currentRegion.modelCache.models;
 			for each ( var collideCandidate:VoxelModel in models )
 			{
 				if ( collideCandidate is Avatar )
@@ -419,7 +420,7 @@ package com.voxelengine.worldmodel.models
 			worldSpaceStartPointCorner.z = worldSpaceStartPointCorner.z + vm.oxel.gc.size();
 
 			var modelList:Vector.<VoxelModel> = new Vector.<VoxelModel>;
-			var models:Vector.<VoxelModel> = Globals.modelsGet();
+			var models:Vector.<VoxelModel> = Region.currentRegion.modelCache.models;
 			for each ( var collideCandidate:VoxelModel in models )
 			{
 				// I suspect there is a way faster way to eliminate models that are far away.

@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			GenerateSphere;
 			GenerateSubSphere;
 			LandscapeError;
-			//LoadModelFromIVM;
+			LoadModelFromIVM;
 			AddAxes;
 			GenerateClouds;
 			CarveCloudOutside;

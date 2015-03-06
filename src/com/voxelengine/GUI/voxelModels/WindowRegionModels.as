@@ -63,7 +63,7 @@ package com.voxelengine.GUI.voxelModels
 			addElement( panelCanvas );
 			
 			_modelPanel = new PanelModelAnimations( panelCanvas );
-			_modelPanel.updateChildren( Globals.modelsGet, null );
+			_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null );
 			panelCanvas.addElement( _modelPanel );
 		}
 	}

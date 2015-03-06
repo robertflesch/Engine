@@ -85,9 +85,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			
 			// byte array data has been successfully loaded from the local IVM file
 			function onIVMLoad(event:Event):void	{
-				var ba:ByteArray = event.target.data;
-				Globals.addIVM( _layer.data, ba );
-				loadByteArray( ba );
+				//var ba:ByteArray = event.target.data;
+				//Globals.addIVM( _layer.data, ba );
+				//loadByteArray( ba );
 			}
 
 		}

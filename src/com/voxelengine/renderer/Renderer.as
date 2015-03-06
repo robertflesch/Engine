@@ -243,7 +243,7 @@ package com.voxelengine.renderer
 			
 			_mvp.append( perspectiveProjection(90, _width/_height, Globals.g_nearplane, Globals.g_farplane) );
 
-			Globals.draw( _mvp, _context );
+			Region.currentRegion.modelCache.draw( _mvp, _context );
 
 			if ( screenShot )
 				_context.drawToBitmapData( screenShot );
