@@ -92,9 +92,9 @@ public class InventoryPanelRegions extends VVContainer
 		_listbox1.removeAll();
 		RegionEvent.addListener( ModelBaseEvent.ADDED, regionLoadedEvent );
 		RegionEvent.addListener( ModelBaseEvent.RESULT, regionLoadedEvent );
-		RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, Network.userId ) );
+		RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId ) );
 		if ( true == Globals.g_debug )
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, Network.PUBLIC ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC ) );
 	}
 
 	private function regionLoadedEvent( $re: RegionEvent ):void

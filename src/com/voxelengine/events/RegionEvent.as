@@ -45,21 +45,21 @@ public class RegionEvent extends ModelBaseEvent
 	
 	public function get region():Region  { return _region; }
 	
-	public function RegionEvent( $type:String, $guid:String, $region:Region = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function RegionEvent( $type:String, $series:int, $guid:String, $region:Region = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
-		super( $type, $bubbles, $cancellable );
+		super( $type, $series, $bubbles, $cancellable );
 		_guid = $guid;
 		_region = $region;
 	}
 	
 	public override function clone():Event
 	{
-		return new RegionEvent(type, _guid, _region, bubbles, cancelable);
+		return new RegionEvent(type, series, _guid, _region, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString("RegionEvent", "bubbles", "cancelable") + " regionId: " + _guid;
+		return formatToString("RegionEvent", "series", "guid", "region");
 	}
 
 	///////////////// Event handler interface /////////////////////////////

@@ -50,24 +50,24 @@ public class ModelDataCache
 		var mi:ModelData = _modelData[$mie.guid]; 
 		if ( null == mi ) {
 			if ( true == Globals.online && $mie.fromTables )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.DB_TABLE_MODELS_DATA, $mie.guid ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.DB_TABLE_MODELS_DATA, $mie.guid ) );
 			else	
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.IVM_EXT, $mie.guid, null, null, URLLoaderDataFormat.BINARY ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.IVM_EXT, $mie.guid, null, null, URLLoaderDataFormat.BINARY ) );
 		}
 		else
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.RESULT, $mie.guid, mi ) );
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.RESULT, $mie.series, $mie.guid, mi ) );
 	}
 	
-	static private function add( $guid:String, $mi:ModelData ):void 
+	static private function add( $pe:PersistanceEvent, $md:ModelData ):void 
 	{ 
-		if ( null == $mi || null == $guid ) {
+		if ( null == $md || null == $pe.guid ) {
 			Log.out( "ModelDataManager.modelDataAdd trying to add NULL modelData or guid", Log.WARN );
 			return;
 		}
 		// check to make sure this is new data
-		if ( null ==  _modelData[$guid] ) {
-			_modelData[$guid] = $mi; 
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.ADDED, $guid, $mi ) );
+		if ( null ==  _modelData[$pe.guid] ) {
+			_modelData[$pe.guid] = $md; 
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $md ) );
 		}
 	}
 	
@@ -82,11 +82,11 @@ public class ModelDataCache
 				vmd.fromPersistance( $pe.dbo );
 			else
 				vmd.ba = $pe.data;
-			add( $pe.guid, vmd );
+			add( $pe, vmd );
 		}
 		else {
 			Log.out( "ModelDataManager.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR );
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, null, null ) );
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 		}
 	}
 	
@@ -95,7 +95,7 @@ public class ModelDataCache
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
 		Log.out( "ModelDataManager.loadFailed " + $pe.toString(), Log.ERROR );
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, null, null ) );
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 	}
 	
 	static private function loadNotFound( $pe:PersistanceEvent):void 
@@ -103,7 +103,7 @@ public class ModelDataCache
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
 		Log.out( "ModelDataManager.loadNotFound " + $pe.toString(), Log.ERROR );
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, null, null ) );
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 	}
 	
 }

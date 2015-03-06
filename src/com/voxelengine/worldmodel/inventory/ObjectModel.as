@@ -60,7 +60,7 @@ public class ObjectModel extends ObjectInfo
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, metadataAdded );
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, metadataAdded );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, _guid, null ) );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, _guid, null ) );
 		return this;
 	}
 	

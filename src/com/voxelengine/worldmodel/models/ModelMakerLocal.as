@@ -40,7 +40,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retriveInfo );		
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
 
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.guid, null ) );		
 	}
 	
 	private function failedInfo( $mie:ModelInfoEvent):void {

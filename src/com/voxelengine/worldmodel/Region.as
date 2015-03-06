@@ -179,7 +179,7 @@ package com.voxelengine.worldmodel
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
 			
 			addEventListeners();
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_BEGUN, guid ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_BEGUN, 0, guid ) );
 			var count:int = ModelLoader.loadRegionObjects(_JSON.region);
 			
 
@@ -251,7 +251,7 @@ package com.voxelengine.worldmodel
 			Log.out( "Region.onLoadingComplete: regionId: " + guid, Log.DEBUG );
 			_loaded = true;
 			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, guid ) );
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, 0, guid ) );
 		}
 		
 		public function initJSON( $regionJson:String ):void {
@@ -375,7 +375,7 @@ package com.voxelengine.worldmodel
 					ba = asByteArray( ba );
 				}
 				//Log.out( "Region.save - PersistanceEvent.dispatch region id: " + guid + "  name: " + name + "  locking status: " + _lockDB, Log.WARN );
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, Globals.DB_TABLE_REGIONS, guid, _dbo, metadata(ba) ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_REGIONS, guid, _dbo, metadata(ba) ) );
 				// or could do this in the suceed, but if it fails do I want to keep retrying?
 				changed = false;
 			}

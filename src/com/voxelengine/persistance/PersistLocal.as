@@ -66,17 +66,17 @@ public class PersistLocal
 			Log.out( "PersistLocal.loadSuccess - event: " + event.toString(), Log.DEBUG );
 			if ( URLLoaderDataFormat.BINARY == $pe.format ) {
 				var ba:ByteArray = event.target.data;			
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.table, $pe.guid, null, ba ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, $pe.table, $pe.guid, null, ba ) );
 			}
 			else {
 				
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.table, $pe.guid, null, StringUtils.trim(event.target.data) ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, $pe.table, $pe.guid, null, StringUtils.trim(event.target.data) ) );
 			}
 		}       
 
 		function loadError(event:IOErrorEvent):void {
 			Log.out( "PersistLocal.loadError - event: " + event.toString(), Log.WARN );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.table, $pe.guid, null, $pe.data ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, 0, $pe.table, $pe.guid, null, $pe.data ) );
 		}	
 	}
 }	

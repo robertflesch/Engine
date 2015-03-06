@@ -46,7 +46,7 @@ public class ModelMakerImport extends ModelMakerBase {
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retriveMetadata );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
 
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, _ii.guid, null ) );		
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.guid, null ) );		
 
 		new WindowModelMetadata( _ii.guid, WindowModelMetadata.TYPE_IMPORT );		
 	}
@@ -116,7 +116,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			vm.save();
 			
 			markComplete();
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, Region.currentRegion.guid ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, 0, Region.currentRegion.guid ) );
 		}
 	}
 	

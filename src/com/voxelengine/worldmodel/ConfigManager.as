@@ -82,7 +82,7 @@ package com.voxelengine.worldmodel
 		
 		private function listenForLoginSuccess( $event:LoginEvent ):void {
 			LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, listenForLoginSuccess );
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.JOIN, _defaultRegionJson.config.region.startingRegion ) ); 
+			RegionEvent.dispatch( new RegionEvent( RegionEvent.JOIN, 0, _defaultRegionJson.config.region.startingRegion ) ); 
 		}
 
 		public function errorAction(e:IOErrorEvent):void

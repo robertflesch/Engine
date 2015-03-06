@@ -35,16 +35,20 @@ public class PersistanceEvent extends Event
 	private var _data:*;
 	private var _table:*;
 	private var _format:String; // only used in local file access PersistLocal
+	private var _series:int;
 	
+	public function get series():int { return _series; }
+	public function set series(value:int):void { _series = value; }
 	public function get guid():String  { return _guid; }
 	public function get dbo():DatabaseObject { return _dbo; }
 	public function get data():* { return _data; }
 	public function get table():String  { return _table; }
 	public function get format():String { return _format;}
 
-	public function PersistanceEvent( $type:String, $table:String, $guid:String, $dbo:DatabaseObject = null, $data:* = null, $format:String = URLLoaderDataFormat.TEXT, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function PersistanceEvent( $type:String, $series:int, $table:String, $guid:String, $dbo:DatabaseObject = null, $data:* = null, $format:String = URLLoaderDataFormat.TEXT, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
+		_series = $series;
 		_guid = $guid;
 		_table = $table
 		_dbo = $dbo;
@@ -54,12 +58,12 @@ public class PersistanceEvent extends Event
 	
 	public override function clone():Event
 	{
-		return new PersistanceEvent(type, table, guid, dbo, data, format, bubbles, cancelable);
+		return new PersistanceEvent(type, series, table, guid, dbo, data, format, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString("PersistanceEvent", "table", "guid", "dbo", "data", "format" );
+		return formatToString("PersistanceEvent", "series", "table", "guid", "dbo", "data", "format" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

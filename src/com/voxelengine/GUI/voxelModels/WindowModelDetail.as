@@ -108,7 +108,7 @@ package com.voxelengine.GUI.voxelModels
 		private function newPhoto( $me:UIMouseEvent ):void {
 			var bmpd:BitmapData = Globals.g_renderer.modelShot();
 			_vm.metadata.thumbnail = drawScaled( bmpd, 128, 128 );
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CHANGED, _vm.metadata.guid, null ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CHANGED, 0, _vm.metadata.guid, null ) );
 			updatePhoto();
 			
 			function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
@@ -169,8 +169,8 @@ package com.voxelengine.GUI.voxelModels
 			_s_currentInstance = null;
 			
 			ModelEvent.dispatch( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.guid ) );
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, null ) );
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, Region.currentRegion.guid ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, 0, null ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
 		}
 		
 

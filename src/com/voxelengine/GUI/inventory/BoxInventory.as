@@ -78,7 +78,7 @@ public class BoxInventory extends VVBox
 					_count.text = "∞";
 				else
 					_count.text = String( modelsOfThisGuid );
-					
+
 				setHelp( om.vmm.name );			
 				backgroundTexture = drawScaled( om.vmm.thumbnail, width, height );
 			}

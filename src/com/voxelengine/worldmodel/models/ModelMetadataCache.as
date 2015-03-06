@@ -36,7 +36,7 @@ public class ModelMetadataCache
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.LOAD, regionLoad ); 
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.JOIN, requestServerJoin ); 
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.CHANGED, regionChanged );	
-		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, typeRequest );
+		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, requestType );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, request );
 		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE, update );
 		
@@ -55,7 +55,7 @@ public class ModelMetadataCache
 		var vmm:ModelMetadata = _metadata[$mme.guid];
 		if ( null ==  vmm ) {
 			Log.out( "MetadataManager.update trying update NULL metadata or guid, adding instead", Log.WARN );
-			add( $mme.vmm );
+			add( null, $mme.vmm );
 		} else {
 			vmm.update( $mme.vmm );
 		}
@@ -71,25 +71,25 @@ public class ModelMetadataCache
 		Log.out( "MetadataManager.request guid: " + $mme.guid, Log.INFO );
 		var vmm:ModelMetadata = _metadata[$mme.guid]; 
 		if ( null == vmm )
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.DB_TABLE_MODELS, $mme.guid ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mme.series, Globals.DB_TABLE_MODELS, $mme.guid ) );
 		else
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, vmm.guid, vmm ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm ) );
 	}
 	
 	// This loads the first 100 objects from the users inventory OR the public inventory
-	static private function typeRequest( $mme:ModelMetadataEvent ):void {
+	static private function requestType( $mme:ModelMetadataEvent ):void {
 		
 		// For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $vmm.guid, $vmm ) event
 		if ( Network.PUBLIC == $mme.guid ) {
 			if ( false == _initializedPublic ) {
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Globals.DB_TABLE_MODELS, Network.PUBLIC, null, Globals.DB_INDEX_VOXEL_MODEL_OWNER ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.DB_TABLE_MODELS, Network.PUBLIC, null, Globals.DB_INDEX_VOXEL_MODEL_OWNER ) );
 				_initializedPublic = true;
 			}
 		}
 			
 		if ( Network.userId == $mme.guid ) {
 			if ( false == _initializedPrivate ) {
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Globals.DB_TABLE_MODELS, Network.userId, null, Globals.DB_INDEX_VOXEL_MODEL_OWNER ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.DB_TABLE_MODELS, Network.userId, null, Globals.DB_INDEX_VOXEL_MODEL_OWNER ) );
 				_initializedPrivate = true;
 			}
 		}
@@ -97,11 +97,11 @@ public class ModelMetadataCache
 		// This will return models already loaded.
 		for each ( var vmm:ModelMetadata in _metadata ) {
 			if ( vmm.owner == $mme.guid )
-				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, vmm.guid, vmm ) );
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm ) );
 		}
 	}
 	
-	static private function add( $vmm:ModelMetadata ):void 
+	static private function add( $pe:PersistanceEvent, $vmm:ModelMetadata ):void 
 	{ 
 		if ( null == $vmm || null == $vmm.guid ) {
 			Log.out( "MetadataManager.add trying to add NULL metadata or guid", Log.WARN );
@@ -111,7 +111,7 @@ public class ModelMetadataCache
 		if ( null ==  _metadata[$vmm.guid] ) {
 			//Log.out( "MetadataManager.metadataAdd vmm: " + $vmm.toString(), Log.WARN );
 			_metadata[$vmm.guid] = $vmm; 
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, $vmm.guid, $vmm ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, ($pe ? $pe.series : 0), $vmm.guid, $vmm ) );
 		}
 	}
 	
@@ -125,11 +125,11 @@ public class ModelMetadataCache
 			vmm.fromPersistance( $pe.dbo );
 			if ( $pe.data && true == $pe.data )
 				vmm.dbo = null;
-			add( vmm );
+			add( $pe, vmm );
 		}
 		else {
 			Log.out( "MetadataManager.loadSucceed FAILED no DBO PersistanceEvent: " + $pe.toString(), Log.WARN );
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.guid, null ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 		}
 	}
 	
@@ -138,7 +138,7 @@ public class ModelMetadataCache
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
 		Log.out( "MetadataManager.metadataLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.guid, null ) );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 
 	static private function loadNotFound( $pe:PersistanceEvent):void 
@@ -146,7 +146,7 @@ public class ModelMetadataCache
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
 		Log.out( "MetadataManager.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.guid, null ) );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
 }

@@ -62,7 +62,7 @@ public class ModelData
 			else {
 				var obj:Object = toObject();
 			}
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, Globals.DB_TABLE_MODELS_DATA, guid, _dbo, obj ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS_DATA, guid, _dbo, obj ) );
 		}
 		else
 			Log.out( "ModelData.save - Not saving data, either offline or NOT changed or locked - guid: " + guid, Log.WARN );

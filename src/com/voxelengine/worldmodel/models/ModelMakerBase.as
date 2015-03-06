@@ -34,7 +34,7 @@ public class ModelMakerBase {
 		ModelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
 		ModelDataEvent.addListener( ModelBaseEvent.RESULT, retriveData );		
 		ModelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, _ii.guid, null, false ) );		
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, _ii.guid, null, false ) );		
 	}
 	
 	private function retriveData($mde:ModelDataEvent):void  {

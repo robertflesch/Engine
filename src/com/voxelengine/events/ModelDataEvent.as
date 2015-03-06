@@ -26,20 +26,20 @@ public class ModelDataEvent extends ModelBaseEvent
 	public function get guid():String  { return _guid; }
 	public function get fromTables():Boolean  { return _fromTables; }
 	
-	public function ModelDataEvent( $type:String, $guid:String, $vmd:ModelData, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelDataEvent( $type:String, $series:int, $guid:String, $vmd:ModelData, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
-		super( $type, $bubbles, $cancellable );
+		super( $type, $series, $bubbles, $cancellable );
 		_vmd = $vmd;
 		_guid = $guid;
 		_fromTables = $fromTable;
 	}
 	
 	public override function clone():Event {
-		return new ModelDataEvent(type, _guid, _vmd, bubbles, cancelable);
+		return new ModelDataEvent(type, series, _guid, _vmd, bubbles, cancelable);
 	}
    
 	public override function toString():String {
-		return formatToString("ModelDataEvent", "bubbles", "cancelable") +  " guid: " + _guid;
+		return formatToString("ModelDataEvent", "series", "guid" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

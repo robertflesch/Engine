@@ -67,26 +67,26 @@ public class PersistBigDB
 			if ( !$dbo ) {
 				// This seems to be the case where no record exists, not the error handler
 				Log.out( "PersistBigDB.load.loadSuccess - NULL DatabaseObject table: " + $pe.table + "  guid:" + $pe.guid, Log.WARN );
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_NOT_FOUND, $pe.table, $pe.guid ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_NOT_FOUND, $pe.series, $pe.table, $pe.guid ) );
 				return;
 			}
 			
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.table, $dbo.key, $dbo, false ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $dbo.key, $dbo, false ) );
 		}
 		
 		function loadFail( $pioe:PlayerIOError ):void {
 			Log.out( "PersistBigDB.load.failed - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: " + $pioe, Log.ERROR, $pioe ) 
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.table, $pe.guid, null, $pe.data ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
 		}		
 		
 		function errorNoClient( $piope:PlayerIOPersistanceEvent ):void {
 			Log.out( "PersistBigDB.load.errorNoClient - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: NOT CONNECTED TO THE INTERNET", Log.ERROR ) 
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.table, $pe.guid, null, $pe.data ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
 		}		
 		
 		function errorNoDB( $piope:PlayerIOPersistanceEvent ):void {
 			Log.out( "PersistBigDB.load.errorNoDB - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: DATABASE NOT FOUND", Log.ERROR ) 
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.table, $pe.guid, null, $pe.data ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
 		}		
 	}
 	
@@ -115,23 +115,23 @@ public class PersistBigDB
 			Log.out( "PersistRegion.loadType.succeed - regions loaded: " + dba.length, Log.DEBUG );
 			for each ( var $dbo:DatabaseObject in dba )
 			{
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.table, $dbo.key, $dbo, false ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $dbo.key, $dbo, false ) );
 			}
 		}
 		
 		function loadTypeFail( $pioe:PlayerIOError ):void {
 			Log.out( "PersistBigDB.loadTypeFail - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: " + $pioe, Log.ERROR, $pioe ) 
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.table, $pe.guid, null, $pe.data ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
 		}		
 		
 		function loadTypeNoClient( $piope:PlayerIOPersistanceEvent ):void {
 			Log.out( "PersistBigDB.loadTypeNoClient - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: NOT CONNECTED TO THE INTERNET", Log.ERROR ) 
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.table, $pe.guid, null, $pe.data ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
 		}		
 		
 		function loadTypeNoDB( $piope:PlayerIOPersistanceEvent ):void {
 			Log.out( "PersistBigDB.loadTypeNoDB - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: DATABASE NOT FOUND", Log.ERROR ) 
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.table, $pe.guid, null, $pe.data ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
 		}		
 	}
 	
@@ -168,32 +168,32 @@ public class PersistBigDB
 		
 		function createSucceed($dbo:DatabaseObject):void  {  
 			Log.out( "PersistBigDB.save - CREATE Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.CREATE_SUCCEED, $pe.table, $pe.guid, $dbo ) ); 
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.CREATE_SUCCEED, $pe.series, $pe.table, $pe.guid, $dbo ) ); 
 		}
 		
 		function createFail(e:PlayerIOError):void { 
 			Log.out( "PersistBigDB.save - CREATE FAILED error saving table: " + $pe.table + "  guid:" + $pe.guid + " error data: " + e, Log.ERROR, e);  
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.CREATE_FAILED, $pe.table, $pe.guid ) ); 
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.CREATE_FAILED, $pe.series, $pe.table, $pe.guid ) ); 
 		}
 
 		function saveSucceed():void  {  
 			Log.out( "PersistBigDB.save - Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_SUCCEED, $pe.table, $pe.guid ) ); 
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_SUCCEED, $pe.series, $pe.table, $pe.guid ) ); 
 		}
 		
 		function saveFailure(e:PlayerIOError):void { 
 			Log.out( "PersistBigDB.save - Failed - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: " + e, Log.ERROR, e ) 
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_FAILED, $pe.table, $pe.guid ) ); 
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_FAILED, $pe.series, $pe.table, $pe.guid ) ); 
 		}
 		
 		function errorNoClient($piope:PlayerIOPersistanceEvent):void {
 			Log.out( "PersistBigDB.load.errorNoClient - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: NOT CONNECTED TO THE INTERNET", Log.ERROR ) 
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.table, $pe.guid, null, $pe.data ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
 		}		
 		
 		function errorNoDB($piope:PlayerIOPersistanceEvent):void {
 			Log.out( "PersistBigDB.load.errorNoDB - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: DATABASE NOT FOUND", Log.ERROR ) 
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.table, $pe.guid, null, $pe.data ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
 		}		
 	}
 }	

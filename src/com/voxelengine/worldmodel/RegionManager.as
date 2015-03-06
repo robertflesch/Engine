@@ -83,8 +83,8 @@ public class RegionManager
 		Log.out( "RegionManager.load - region: " + $re.guid, Log.DEBUG );
 		WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.CREATE ) );
 		
-		RegionEvent.dispatch( new RegionEvent( RegionEvent.UNLOAD, null ) );
-		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, $re.guid ) );
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.UNLOAD, 0, null ) );
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, $re.guid ) );
 	}
 	
 	private function regionRequest( $re:RegionEvent):void 	{
@@ -96,31 +96,31 @@ public class RegionManager
 		Log.out( "RegionManager.regionRequest guid: " + $re.guid, Log.INFO );
 		var region:Region = regionGet( $re.guid );
 		if ( region ) {
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.RESULT, region.guid, region ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.RESULT, 0, region.guid, region ) );
 			return;
 		}
 		
 		if ( true == Globals.online )
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.DB_TABLE_REGIONS, $re.guid ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $re.series, Globals.DB_TABLE_REGIONS, $re.guid ) );
 		else	
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.REGION_EXT, $re.guid, null, null ) );			
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $re.series, Globals.REGION_EXT, $re.guid, null, null ) );			
 	}
 	
 	private function regionTypeRequest(e:RegionEvent):void {
 		
 		if ( Network.PUBLIC == e.guid && false == _requestPublic ) {
 			_requestPublic = true;
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Globals.DB_TABLE_REGIONS, Network.PUBLIC, null, Globals.DB_TABLE_INDEX_OWNER ) );			
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, e.series, Globals.DB_TABLE_REGIONS, Network.PUBLIC, null, Globals.DB_TABLE_INDEX_OWNER ) );			
 		}
 		if ( Network.userId == e.guid && false == _requestPrivate ) {
 			_requestPrivate = true;
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, Globals.DB_TABLE_REGIONS, Network.userId, null, Globals.DB_TABLE_INDEX_OWNER ) );			
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, e.series, Globals.DB_TABLE_REGIONS, Network.userId, null, Globals.DB_TABLE_INDEX_OWNER ) );			
 		}
 			
 		// Get a list of what we currently have
 		for each ( var region:Region in _regions ) {
 			if ( region && region.owner == e.guid )
-				RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.RESULT, region.guid, region ) );
+				RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.RESULT, 0, region.guid, region ) );
 		}
 	}
 	
@@ -143,21 +143,21 @@ public class RegionManager
 			// otherwise the $pe.data will be false or null. This temporary DBO must be removed before the region is saved.
 			if ( $pe.data && true == $pe.data )
 				newRegion.dbo = null;
-			regionAdd( newRegion );
+			regionAdd( $pe, newRegion );
 		}
 		// Bad thing about this is it ignores all the metadata
 		else if ( Globals.REGION_EXT == $pe.table ) {
 			var region:Region = new Region( $pe.guid );
 			region.initJSON( $pe.data );
-			regionAdd( region );
+			regionAdd( null, region );
 		}
 	}
 	
-	private function regionAdd( $region:Region ):void {
+	private function regionAdd( $pe:PersistanceEvent, $region:Region ):void {
 		Log.out( "RegionManager.regionAdd - adding region: " + $region.guid, Log.DEBUG );
 		if ( false == regionHas( $region.guid ) ) {
 			_regions.push( $region );
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.ADDED, $region.guid, $region ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.ADDED, ($pe ? $pe.series: 0), $region.guid, $region ) );
 		}
 		else
 			Log.out( "RegionManager.regionAdd - NOT loading duplicate region: " + $region.guid, Log.DEBUG );
@@ -178,9 +178,9 @@ public class RegionManager
 	{
 		var startingRegion:Region = new Region( $guid );
 		startingRegion.createEmptyRegion();
-		regionAdd( startingRegion );
-		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, startingRegion.guid ) ); 
-		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, startingRegion.guid ) );
+		regionAdd( null, startingRegion );
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, startingRegion.guid ) ); 
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, 0, startingRegion.guid ) );
 		// This tells the config manager that the local region was loaded and is ready to load rest of data.
 	}
 	
@@ -189,7 +189,7 @@ public class RegionManager
 		// Add a listener to tell when file has been loaded
 		RegionEvent.addListener( ModelBaseEvent.ADDED, startingRegionLoaded );
 		// now request the file be loaded
-		RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST, $guid ) );
+		RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST, 0, $guid ) );
 	}
 	
 	private function startingRegionLoaded( $re:RegionEvent):void 
@@ -197,7 +197,7 @@ public class RegionManager
 		// remove this handler
 		RegionEvent.removeListener( ModelBaseEvent.ADDED, startingRegionLoaded );
 		// now load the file that was designated as the starting region
-		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, $re.guid, $re.region ) );
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, $re.guid, $re.region ) );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -216,7 +216,7 @@ public class RegionManager
 	
 	public function onJoinRoomEvent( e:RoomEvent ):void {
 		Log.out( "RegionManager.onJoinRoomEvent - guid: " + e.guid, Log.DEBUG );
-		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, e.guid ) );
+		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, e.guid ) );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////

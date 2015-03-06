@@ -46,22 +46,22 @@ public class ModelInfoCache
 		Log.out( "ModelInfoManager.modelInfoRequest guid: " + $mie.guid, Log.INFO );
 		var mi:ModelInfo = _modelInfo[$mie.guid]; 
 		if ( null == mi )
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, Globals.MODEL_INFO_EXT, $mie.guid ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.guid ) );
 		else
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.RESULT, $mie.guid, mi ) );
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.RESULT, $mie.series, $mie.guid, mi ) );
 	}
 	
-	static private function add( $guid:String, $mi:ModelInfo ):void { 
-		if ( null == $mi || null == $guid ) {
+	static private function add( $pe:PersistanceEvent, $mi:ModelInfo ):void { 
+		if ( null == $mi || null == $pe.guid ) {
 			Log.out( "ModelInfoManager.modelInfoAdd trying to add NULL modelInfo or guid", Log.WARN );
 			return;
 		}
 		// check to make sure is not already there
-		if ( null ==  _modelInfo[$guid] ) {
+		if ( null ==  _modelInfo[$pe.guid] ) {
 			//Log.out( "ModelInfoManager.modelInfoAdd vmm: " + $vmm.toString(), Log.WARN );
-			_modelInfo[$guid] = $mi; 
+			_modelInfo[$pe.guid] = $mi; 
 			
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $guid, $mi ) );
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $mi ) );
 		}
 	}
 	
@@ -86,10 +86,10 @@ public class ModelInfoCache
 				
 				mi.initJSON( $pe.guid, jsonResult );
 				//ModelEvent.dispatch( new ModelEvent( ModelEvent.INFO_LOADED, guid ) );
-				add( $pe.guid, mi );
+				add( $pe, mi );
 		}
 		else {
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, null, null ) );
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 		}
 	}
 	
@@ -103,7 +103,7 @@ public class ModelInfoCache
 		if ( Globals.MODEL_INFO_EXT != $pe.table )
 			return;
 		Log.out( "ModelInfoManager.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.guid, null ) );
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 }
 }

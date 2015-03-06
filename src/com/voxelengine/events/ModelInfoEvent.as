@@ -22,16 +22,16 @@ public class ModelInfoEvent extends ModelBaseEvent
 	private var _vmi:ModelInfo;
 	private var _guid:String;
 
-	public function ModelInfoEvent( $type:String, $guid:String, $vmi:ModelInfo, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelInfoEvent( $type:String, $series:int, $guid:String, $vmi:ModelInfo, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
-		super( $type, $bubbles, $cancellable );
+		super( $type, $series, $bubbles, $cancellable );
 		_vmi = $vmi;
 		_guid = $guid;
 	}
 	
 	public override function clone():Event
 	{
-		return new ModelInfoEvent(type, _guid, _vmi, bubbles, cancelable);
+		return new ModelInfoEvent(type, series, _guid, _vmi, bubbles, cancelable);
 	}
    
 	public override function toString():String

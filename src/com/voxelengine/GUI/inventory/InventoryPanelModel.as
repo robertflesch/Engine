@@ -59,6 +59,7 @@ public class InventoryPanelModel extends VVContainer
 	// http://www.flashapi.org/spas-doc/org/flashapi/swing/ScrollPane.html
 	private var _itemContainer:ScrollPane;
 	private var _currentRow:Container;
+	private var _seriesModelMetadataEvent:int;
 	
 	public function InventoryPanelModel( $parent:VVContainer ) {
 		super( $parent );
@@ -122,14 +123,20 @@ public class InventoryPanelModel extends VVContainer
 	private function displaySelectedCategory( $category:String ):void
 	{	
 		Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_TYPE, Network.userId, null ) );
+		var mme:ModelMetadataEvent = new ModelMetadataEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId, null )
+		// The series makes it so that I dont see results from other objects requests
+		_seriesModelMetadataEvent = mme.series;
+		ModelMetadataEvent.dispatch( mme );
 	}
 
 	private function addModelMetadataEvent($mme:ModelMetadataEvent):void {
 		
-		var om:ObjectModel = new ObjectModel( null, $mme.guid );
-		om.vmm = $mme.vmm;
-		addModel( om );
+		// I only want the results from the series I asked for
+		if ( _seriesModelMetadataEvent == $mme.series ) {
+			var om:ObjectModel = new ObjectModel( null, $mme.guid );
+			om.vmm = $mme.vmm;
+			addModel( om );
+		}
 	}
 	
 	private function addModel( $oi:ObjectInfo, allowDrag:Boolean = true ):BoxInventory {
@@ -239,7 +246,7 @@ public class InventoryPanelModel extends VVContainer
 					var slotId:int = int( bi.name );
 					InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, item ) );
 					// we are going to need the data to build the model for this.
-					ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, item.guid, null ) );
+					ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, item.guid, null ) );
 				}
 			}
 		}

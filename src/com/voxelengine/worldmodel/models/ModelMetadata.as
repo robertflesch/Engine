@@ -199,7 +199,7 @@ public class ModelMetadata
 			else {
 				var obj:Object = toObject();
 			}
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, Globals.DB_TABLE_MODELS, guid, _dbo, obj ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS, guid, _dbo, obj ) );
 		}
 		else
 			Log.out( "ModelMetadata.save - Not saving metadata, either offline or NOT changed or locked - guid: " + guid + "  name: " + name, Log.WARN );

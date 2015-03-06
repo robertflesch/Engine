@@ -22,21 +22,21 @@ public class ModelMetadataEvent extends ModelBaseEvent
 	private var _vmm:ModelMetadata;
 	private var _guid:String;
 
-	public function ModelMetadataEvent( $type:String, $guid:String, $vmm:ModelMetadata, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelMetadataEvent( $type:String, $series:int, $guid:String, $vmm:ModelMetadata, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
-		super( $type, $bubbles, $cancellable );
+		super( $type, $series, $bubbles, $cancellable );
 		_vmm = $vmm;
 		_guid = $guid;
 	}
 	
 	public override function clone():Event
 	{
-		return new ModelMetadataEvent(type, _guid, _vmm, bubbles, cancelable);
+		return new ModelMetadataEvent(type, series, _guid, _vmm, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString("ModelMetadataEvent", "bubbles", "cancelable") + " VoxelModelMetadata: " + _vmm.toString() + "  itemGuid: " + _guid;
+		return formatToString("ModelMetadataEvent", "guid", "vmm" );
 	}
 	
 	public function get vmm():ModelMetadata 
