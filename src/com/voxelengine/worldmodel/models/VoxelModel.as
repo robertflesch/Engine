@@ -893,7 +893,7 @@ package com.voxelengine.worldmodel.models
 					return cvm;
 			}
 			
-			Log.out(  "VoxelModel.childFind - not found for guid: " + guid, Log.WARN );
+			//Log.out(  "VoxelModel.childFind - not found for guid: " + guid, Log.WARN );
 			return null
 		}
 		

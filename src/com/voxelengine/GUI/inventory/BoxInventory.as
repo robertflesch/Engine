@@ -67,7 +67,7 @@ public class BoxInventory extends VVBox
 			if ( om.vmm ) {
 				if ( null == om.vmm.thumbnail ) {
 					var bmpd:BitmapData = Globals.g_renderer.modelShot();
-					om.vmm.thumbnail = drawScaled( bmpd, bmpd.width, bmpd.height );
+					om.vmm.thumbnail = drawScaled( bmpd, width, height );
 				}
 				
 				//var modelsOfThisGuid:String = String( e.result.toFixed(0) );
@@ -80,7 +80,7 @@ public class BoxInventory extends VVBox
 					_count.text = String( modelsOfThisGuid );
 					
 				setHelp( om.vmm.name );			
-				backgroundTexture = om.vmm.thumbnail;
+				backgroundTexture = drawScaled( om.vmm.thumbnail, width, height );
 			}
 			break;
 		case ObjectInfo.OBJECTINFO_ACTION:
@@ -140,13 +140,14 @@ public class BoxInventory extends VVBox
 		_objectInfo = new ObjectInfo( this, ObjectInfo.OBJECTINFO_EMPTY );
 	}
 	
-	public function drawScaled(obj:BitmapData, srcWidth:int, srcHeight:int):BitmapData {
+	private function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
 		var m:Matrix = new Matrix();
-		m.scale(width/srcWidth, height/srcHeight);
-		var bmpd:BitmapData = new BitmapData(width, height, false);
+		m.scale(destWidth/obj.width, destHeight/obj.height);
+		var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
 		bmpd.draw(obj, m);
 		return bmpd;
 	}	
+	
 	
 }	
 
