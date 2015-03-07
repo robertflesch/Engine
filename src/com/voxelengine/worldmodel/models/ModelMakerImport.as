@@ -7,21 +7,18 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.RegionEvent;
-import com.voxelengine.GUI.WindowModelMetadata;
+import flash.utils.ByteArray;
+import org.flashapi.swing.Alert;
+
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelDataEvent;
-import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.ModelData;
-import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
-import flash.utils.ByteArray;
-import org.flashapi.swing.Alert;
+import com.voxelengine.GUI.WindowModelMetadata;
 
 	/**
 	 * ...
@@ -36,7 +33,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	private var _vmm:ModelMetadata;
 	
 	public function ModelMakerImport( $ii:InstanceInfo ) {
-		super( _ii );
+		super( $ii );
 		Log.out( "ModelMakerImport - ii: " + _ii.toString() );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retriveInfo );		

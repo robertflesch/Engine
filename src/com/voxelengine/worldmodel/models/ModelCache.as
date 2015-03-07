@@ -44,7 +44,6 @@ package com.voxelengine.worldmodel.models
 		}
 
 		public function save():void {
-			
 			if ( false == Globals.online || false == Globals.inRoom )
 				return;
 			
@@ -53,16 +52,24 @@ package com.voxelengine.worldmodel.models
 				vm.save();
 		}
 		
-		
 		public function unload():void {
+			var vm:VoxelModel;
+			for ( var i:int = 0; i < _models.length; i++ ) {
+				vm = _models[i];
+				vm.dead = true;	
+			}
 			
+			for ( i = 0; i < _modelsDynamic.length; i++ ) {
+				vm = _modelsDynamic[i];
+				vm.dead = true;
+			}
 		}
 		
-		public function modelAdd( vm:VoxelModel ):void {
+		public function add( vm:VoxelModel ):void {
 			// if this is a child model, give it to parent, 
 			// next check to see if its a dynamic model
 			//otherwise add it to ModelCache list.
-			Log.out( "ModelCache.modelAdd - guid: " + vm.instanceInfo.guid );			
+			Log.out( "ModelCache.add - guid: " + vm.instanceInfo.guid );			
 			if ( vm.instanceInfo.controllingModel )
 			{
 				vm.instanceInfo.controllingModel.childAdd( vm );
@@ -91,32 +98,35 @@ package com.voxelengine.worldmodel.models
 			
 			// TODO Could optimize here by only making the calls needed for this shader.
 			// Since only one shader is used for each, this could save a LOT OF TIME for large number of models.
-			var model:VoxelModel;
-			for each ( model in _models )
-			{
-				if ( model && model.complete && model.visible )
-					model.draw( $mvp, $context, false );	
+			var vm:VoxelModel;
+			for ( var i:int = 0; i < _models.length; i++ ) {
+				vm = _models[i];
+				if ( vm && vm.complete && vm.visible )
+					vm.draw( $mvp, $context, false );	
 			}
 			
 			// TODO - should sort models based on distance, and view frustrum - RSF
-			for each ( model in _modelsDynamic )
-			{
-				if ( model && model.complete && model.visible )
-					model.draw( $mvp, $context, false );	
+			for ( i = 0; i < _modelsDynamic.length; i++ ) {
+				vm = _modelsDynamic[i];
+				if ( vm && vm.complete && vm.visible )
+					vm.draw( $mvp, $context, false );	
 			}
 			
-			for each ( model in _models )
-			{
-				if ( model && model.complete && model.visible )
-					model.drawAlpha( $mvp, $context, false );	
+			for ( i = 0; i < _models.length; i++ ) {
+				vm = _models[i];
+				if ( vm && vm.complete && vm.visible )
+					vm.drawAlpha( $mvp, $context, false );	
 			}
 			
 			// TODO - This is expensive and not needed if I dont have projectiles without alpha.. RSF
-			for each ( model in _modelsDynamic )
-			{
-				if ( model && model.complete && model.visible )
-					model.drawAlpha( $mvp, $context, false );	
+			for ( i = 0; i < _modelsDynamic.length; i++ ) {
+				vm = _modelsDynamic[i];
+				if ( vm && vm.complete && vm.visible )
+					vm.drawAlpha( $mvp, $context, false );	
 			}
+			
+			bringOutYourDead();
+			bringOutYourDeadDynamic();
 		}
 			
 		public function update( $elapsedTimeMS:int ):void {
@@ -134,18 +144,21 @@ package com.voxelengine.worldmodel.models
 			taskTime = getTimer() - taskTime;
 
 			var dynModelTime:int = getTimer();
-			var model:VoxelModel;
-			for each ( model in _modelsDynamic )
-			{
-				model.update( Globals.g_renderer.context,  $elapsedTimeMS );	
+			
+			var vm:VoxelModel
+			for ( var i:int; i < _modelsDynamic.length; i++ ) {
+				vm = _modelsDynamic[i];
+				vm.update( Globals.g_renderer.context,  $elapsedTimeMS );	
 			}
+			
 			dynModelTime = getTimer() - dynModelTime;
 			
 			var modelTime:int = getTimer();
-			for each ( model in _models )
-			{
-				model.update( Globals.g_renderer.context, $elapsedTimeMS );	
+			for ( i = 0; i < _models.length;  i++ ) {
+				vm = _models[i];
+				vm.update( Globals.g_renderer.context,  $elapsedTimeMS );	
 			}
+			
 			modelTime = getTimer() - modelTime;
 			
 			if ( Globals.g_app.toolOrBlockEnabled )
@@ -196,28 +209,38 @@ package com.voxelengine.worldmodel.models
 			//Log.out("ModelManager.reinitialize" );
 			Globals.g_textureBank.reinitialize( $context );
 			
-			for each ( var dm:VoxelModel in _modelsDynamic )
-			{
-				dm.reinitialize( $context );
+			var vm:VoxelModel
+			for ( var i:int; i < _modelsDynamic.length; i++ ) {
+				vm = _modelsDynamic[i];
+				vm.reinitialize( $context );
 			}
 			
-			for each ( var vm:VoxelModel in _models )
-			{
+			for ( i = 0; i < _models.length; i++ ) {
+				vm = _models[i];
 				vm.reinitialize( $context );	
 			}
 		}
 		
-		public function markDead( $vm:VoxelModel ):void {
-			// This works on both dyamanic and regular instances
-			for each ( var vm:VoxelModel in _models )
-			{
-				if ( vm == $vm ) {
-					vm.dead = true;
-					ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, vm.instanceInfo.guid ) );
-				}
+		public function bringOutYourDead():void {
+			var vm:VoxelModel
+			for ( var i:int; i < _models.length; ) {
+				vm = _models[i];
+				if ( vm && true == vm.dead )
+					_models.splice( i, 1 );
+				else 
+					i++
 			}
 		}
-
 		
+		public function bringOutYourDeadDynamic():void {
+			var vm:VoxelModel;
+			for ( var i:int; i < _modelsDynamic.length; ) {
+				vm = _modelsDynamic[i];
+				if ( vm && true == vm.dead )
+					_modelsDynamic.splice( i, 1 );
+				else 
+					i++
+			}
+		}
 	}
 }

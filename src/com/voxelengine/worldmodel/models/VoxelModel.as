@@ -111,6 +111,7 @@ package com.voxelengine.worldmodel.models
 					script.instanceGuid = instanceInfo.guid;
 				}
 			}
+			ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, instanceInfo.guid ) );
 		}
 
 		public function get usesGravity():Boolean 					{ return _usesGravity; }
@@ -859,7 +860,8 @@ package com.voxelengine.worldmodel.models
 			// this make it belong to the world
 			vm.instanceInfo.controllingModel = null;
 			//if ( !(vm is Player) )
-			Globals.modelAdd(vm);
+			Region.currentRegion.modelCache.add( vm );
+
 			
 			// now give it correct world space position and velocity
 			//////////////////////////////////////////////////////
@@ -1167,7 +1169,7 @@ package com.voxelengine.worldmodel.models
 			   vm.complete = true;
 			   vm.instanceInfo.position = position;
 			 */
-			Globals.modelAdd(vm);
+			Region.currentRegion.modelCache.add( vm );
 			return vm;
 		
 			//var ms:ModelStatisics = new ModelStatisics();

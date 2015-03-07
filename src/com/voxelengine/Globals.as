@@ -287,18 +287,9 @@ package com.voxelengine {
 				return Region.currentRegion.modelCache.createPlayer();
 		}
 		
-		public static function modelAdd( $vm:VoxelModel ):void {
-			Region.currentRegion.modelCache.modelAdd( $vm );
-		}
-		
 		public static function changeFromParentToChild( $vm:VoxelModel ):void {
 			throw new Error( "Globals.changeFromParentToChild - not implemented" );
 			//Region.currentRegion.modelCache.changeFromParentToChild( $vm )
 		}
-		
-		public static function markDead( $vm:VoxelModel ):void {
-			Region.currentRegion.modelCache.markDead( $vm );
-		};
-		
 	}
 }

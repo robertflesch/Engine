@@ -65,63 +65,6 @@ public class  UserInventory extends QuickInventory
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_REQUEST, Network.userId, null ) );
 	}
 
-	public function show():void
-	{
-		_outline.visible = true;
-		visible = true;
-		Globals.g_app.editing = true;
-		addListeners();
-	}
-	
-	public function hide():void
-	{
-		Globals.g_app.editing = false;
-		_outline.visible = false;
-		visible = false;
-		removeListeners();
-	}
-	
-	private function showGrainTools():void {
-		_toolSize.show();
-		_shape.show();
-	}
-	
-	private function hideGrainTools():void {
-		_toolSize.hide();
-		_shape.hide();
-	}
-
-	public function addListeners():void
-	{
-		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
-	}
-	
-	public function removeListeners():void
-	{
-		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
-		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
-	}
-
-	public function hotKeyInventory(e:KeyboardEvent):void 
-	{
-		if  ( !Globals.active )
-			return;
-			
-		if ( 48 <= e.keyCode && e.keyCode <= 58 )
-		{
-			var selectedItem:int = e.keyCode - 48;
-			if ( 0 < selectedItem )
-				selectByIndex( selectedItem - 1 ); // 1 is index 0
-			else	
-				selectByIndex( 9 ); // index 9 is key 0
-		}
-		//else if ( 119 == e.keyCode )
-		//{
-			//_shape.pressShapeHotKey(e);
-		//}
-	}
-	
 	private function inventoryLoaded(e:InventoryEvent):void {
 		var inv:Inventory = e.result as Inventory;
 		var slots:Slots = inv.slots;
@@ -137,10 +80,8 @@ public class  UserInventory extends QuickInventory
 //		Globals.g_app.addEventListener( VVWindowEvent.WINDOW_CLOSING, shouldDisplay );			
 	}
 	
-		
 	/////////// start drag and drop //////////////////////////////////////////////////////
-	private function dropInAir(e:DnDEvent):void 
-	{
+	private function dropInAir(e:DnDEvent):void  {
 		if ( e.dragOperation.initiator is BoxInventory )
 		{
 			var bi:BoxInventory = e.dragOperation.initiator as BoxInventory;
@@ -154,8 +95,7 @@ public class  UserInventory extends QuickInventory
 		}
 	}
 	
-	private function dropMaterial(e:DnDEvent):void 
-	{
+	private function dropMaterial(e:DnDEvent):void  {
 		if ( e.dropTarget is BoxInventory && e.dragOperation.initiator is BoxInventory )
 		{
 			(e.dropTarget as BoxInventory).updateObjectInfo( e.dragOperation.initiator.data );
@@ -164,8 +104,7 @@ public class  UserInventory extends QuickInventory
 		}
 	}
 	
-	private function doDrag(e:UIMouseEvent):void 
-	{
+	private function doDrag(e:UIMouseEvent):void  {
 		_dragOp.initiator = e.target as UIObject;
 		_dragOp.dragImage = e.target as DisplayObject;
 		// this adds a drop format, which is checked again what the target is expecting
@@ -228,8 +167,7 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	// Dont call this until 
-	override public function buildItems():void
-	{
+	override public function buildItems():void {
 		name = "ItemSelector";
 		
 		var count:int = 0;
@@ -250,24 +188,20 @@ public class  UserInventory extends QuickInventory
 //		resize(null);
 	}
 
-	private function pressItem(e:UIMouseEvent):void 
-	{
+	private function pressItem(e:UIMouseEvent):void  {
 		var box:UIObject = e.target as UIObject;
 		processItemSelection( box );
 	}			
 	
-	private function releaseItem(e:UIMouseEvent):void 
-	{
+	private function releaseItem(e:UIMouseEvent):void {
 	}			
 	
-	public function selectByIndex( $index:int ):void
-	{
+	public function selectByIndex( $index:int ):void {
 		processItemSelection( boxes[$index] );
 	}
 	
 	private var _editCursorModelGuid:String = null;
-	public function processItemSelection( box:UIObject ):void 
-	{
+	public function processItemSelection( box:UIObject ):void {
 		if ( 0 < Globals.openWindowCount )
 			return;
 			
@@ -346,13 +280,11 @@ public class  UserInventory extends QuickInventory
 		lastItemSelection = itemIndex;
 	}
 	
-	private function cursorReady(e:ModelEvent):void 
-	{
+	private function cursorReady(e:ModelEvent):void  {
 		Log.out( "UserInventory.cursorReady - ObjectModel guid: " + e.instanceGuid, Log.WARN );
 	}
 	
-	public function onMouseWheel(event:MouseEvent):void
-	{
+	public function onMouseWheel(event:MouseEvent):void {
 		if ( 0 < event.delta ) {
 			if ( lastItemSelection < (Slots.ITEM_COUNT - 1)  )
 			{
@@ -372,15 +304,63 @@ public class  UserInventory extends QuickInventory
 				selectByIndex( lastItemSelection - 1 );
 			}
 	}	
-	static public function get lastItemSelection():int 
-	{
-		return _lastItemSelection;
+	
+	static public function get lastItemSelection():int  { return _lastItemSelection; }
+	static public function set lastItemSelection(value:int):void { _lastItemSelection = value; }
+
+	public function show():void {
+		_outline.visible = true;
+		visible = true;
+		Globals.g_app.editing = true;
+		addListeners();
 	}
 	
-	static public function set lastItemSelection(value:int):void 
-	{
-		_lastItemSelection = value;
+	public function hide():void {
+		Globals.g_app.editing = false;
+		_outline.visible = false;
+		visible = false;
+		removeListeners();
 	}
+	
+	private function showGrainTools():void {
+		_toolSize.show();
+		_shape.show();
+	}
+	
+	private function hideGrainTools():void {
+		_toolSize.hide();
+		_shape.hide();
+	}
+
+	public function addListeners():void {
+		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
+		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+	}
+	
+	public function removeListeners():void {
+		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
+		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+	}
+
+	public function hotKeyInventory(e:KeyboardEvent):void {
+		if  ( !Globals.active )
+			return;
+			
+		if ( 48 <= e.keyCode && e.keyCode <= 58 )
+		{
+			var selectedItem:int = e.keyCode - 48;
+			if ( 0 < selectedItem )
+				selectByIndex( selectedItem - 1 ); // 1 is index 0
+			else	
+				selectByIndex( 9 ); // index 9 is key 0
+		}
+		//else if ( 119 == e.keyCode )
+		//{
+			//_shape.pressShapeHotKey(e);
+		//}
+	}
+	
+	
 	//public function onMouseWheel(event:MouseEvent):void
 	//{
 		//if ( -1 != _lastItemSelection )

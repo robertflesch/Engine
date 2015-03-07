@@ -151,7 +151,7 @@ public class PanelModels extends PanelBase
 				Log.out( "PanelModels.deleteModel - " + _selectedModel.toString(), Log.WARN );
 //				InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_CHANGE, Network.userId, _selectedModel.instanceInfo.guid, 1 ) );
 
-				Globals.markDead( _selectedModel );
+				_selectedModel.dead = true;
 				_selectedModel = null;
 				populateModels( _dictionarySource, _parentModel );
 			}

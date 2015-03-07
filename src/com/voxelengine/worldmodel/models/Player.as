@@ -381,7 +381,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	
 	private function onRegionLoad( $re:RegionEvent ):void {
 		// add the player to this regions model list.
-		Globals.modelAdd( this );
+		Region.currentRegion.modelCache.add( this );
 		
 		if ( null == _userInventory && Globals.online )
 			_userInventory = new UserInventory();
@@ -612,7 +612,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		else if ( head && body && foot )
 		{
 			// Wall crawling
-			Log.out( "Player.collisionCheckNew - EVERYTHING failed to clear" );
+			//Log.out( "Player.collisionCheckNew - EVERYTHING failed to clear" );
 			return 0;
 		}
 		else if ( head || body || foot )

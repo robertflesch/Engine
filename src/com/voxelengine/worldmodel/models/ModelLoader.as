@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import com.voxelengine.worldmodel.Region;
 	import flash.geom.Vector3D;
 	import flash.utils.ByteArray;
 	
@@ -192,7 +193,8 @@ package com.voxelengine.worldmodel.models
 			vm.init( $modelInfo, $vmm );
 
 			// The avatar is loaded outside of the region
-			Globals.modelAdd( vm );
+			Region.currentRegion.modelCache.add( vm );
+
 
 			//Log.out( "ModelLoader.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
 			return vm;

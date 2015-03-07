@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.scripts
 	 * ...
 	 * @author Bob
 	 */
+	import com.voxelengine.worldmodel.Region;
 	import flash.geom.Vector3D;
 	
 	import com.voxelengine.Log;
@@ -186,8 +187,7 @@ package com.voxelengine.worldmodel.scripts
 			//pm.instanceInfo.addTransform( 0, 0, 0.1, ModelTransform.INFINITE_TIME, ModelTransform.ROTATION_STRING );
 			
 			// add this particle to the system, it will get returned to pool when it dies.
-			Globals.modelAdd( pm );
-			
+			Region.currentRegion.modelCache.add( pm );
 		}
 	}
 }
