@@ -56,6 +56,8 @@ package com.voxelengine.worldmodel.models
 			var vm:VoxelModel;
 			for ( var i:int = 0; i < _models.length; i++ ) {
 				vm = _models[i];
+				if ( vm is Player )
+					continue;
 				vm.dead = true;	
 			}
 			
