@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.GUI
 {
+	import com.voxelengine.events.LoadingImageEvent;
 	import flash.display.Bitmap;
 	import flash.events.Event;
 	
@@ -33,6 +34,7 @@ package com.voxelengine.GUI
 			if ( WindowSplash.isActive ) {
 				WindowSplash._s_currentInstance.remove();
 				WindowSplash._s_currentInstance = null;
+				LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTORY ) );			
 			}
 		}
 		
@@ -46,6 +48,7 @@ package com.voxelengine.GUI
 			{
 				WindowSplash._s_currentInstance.remove();
 				WindowSplash._s_currentInstance = null;
+				//LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTORY ) );			
 			}
 		}
 		
@@ -89,7 +92,9 @@ package com.voxelengine.GUI
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize );
 			
 			VoxelVerseGUI.currentInstance.hideGUI()
-			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.SPLASH_LOAD_COMPLETE ) );			
+			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.SPLASH_LOAD_COMPLETE ) );	
+			
+			//LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );			
 		} 
 		
         protected function onResize(event:Event):void {

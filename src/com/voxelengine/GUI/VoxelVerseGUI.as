@@ -84,6 +84,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	//	----------------------------------------------------------------
 	public function VoxelVerseGUI(title : String = null) { 
 		Globals.g_app.stage.addEventListener( FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
+		LoadingImage.init();
 	}
 	
 	private function fullScreenEvent(event:FullScreenEvent):void {
