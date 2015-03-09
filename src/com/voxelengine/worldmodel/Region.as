@@ -225,7 +225,7 @@ package com.voxelengine.worldmodel
 		}
 		
 		private function modelChanged(e:ModelEvent):void {
-			Log.out( "Region.modelChanged", Log.WARN );
+			Log.out( "Region.modelChanged" );
 			changed = true;
 		}
 		

@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -16,6 +16,7 @@ public class Torch extends ShaderLight {
 	private var _base:Number = 100;
 	private var _range:Number = 100;
 	private var _flicker:Boolean = true;
+	private var _count:int; // used to slow the flicker rate
 	
 	public function Torch( r:Number = 1, g:Number = 0.9, b:Number = 0 ) {
 		color.setTo( r, g, b );
@@ -28,10 +29,12 @@ public class Torch extends ShaderLight {
 		// They suggest changing the color and endDistance
 		// I am not alterng color, just adding a flicker by changing range of light
 		// Could also move the origin around.
-		if ( flicker ) {
+		if ( flicker && 5 < _count ) {
+			_count = 0;
 			_phase += 0.03;
 			endDistance = _base + _range * Math.abs( Math.sin( _phase ) * 0.6 + Math.random() * 0.6 );
 		}
+		_count++;
 	}
 	
 	public function set range(value:Number):void  { _range = value; }
