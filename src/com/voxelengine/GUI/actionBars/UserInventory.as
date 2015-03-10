@@ -8,10 +8,6 @@
 
 package com.voxelengine.GUI.actionBars
 {
-import com.voxelengine.events.ModelEvent;
-import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.ModelMaker;
-import com.voxelengine.worldmodel.models.VoxelModel;
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
 import flash.events.KeyboardEvent;
@@ -25,16 +21,23 @@ import org.flashapi.swing.event.DnDEvent;
 import org.flashapi.swing.event.UIMouseEvent;
 import org.flashapi.swing.core.UIObject;
 
-//import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.ModelEvent;
+import com.voxelengine.events.LoadingEvent;
+import com.voxelengine.events.LoadingImageEvent;
+import com.voxelengine.GUI.LoadingImage;
 import com.voxelengine.GUI.inventory.BoxInventory;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.*;
 import com.voxelengine.worldmodel.inventory.*;
+import com.voxelengine.worldmodel.models.ModelCacheUtils;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelMaker;
+import com.voxelengine.worldmodel.models.VoxelModel;
 import com.voxelengine.worldmodel.models.EditCursor;
 
 public class  UserInventory extends QuickInventory
@@ -269,8 +272,10 @@ public class  UserInventory extends QuickInventory
 			var om:ObjectModel = oi as ObjectModel;
 			var ii:InstanceInfo = new InstanceInfo();
 			_editCursorModelGuid = ii.guid = om.guid;
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
+			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_COMPLETE, cursorReady );
 			new ModelMaker( ii );
-			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED, cursorReady );
+			Log.out( "GCI: " + ModelCacheUtils.gci );
 		}
 		else if ( oi is ObjectInfo ) {
 			Log.out( "UserInventory.processItemSelection - ObjectInfo");
@@ -280,8 +285,9 @@ public class  UserInventory extends QuickInventory
 		lastItemSelection = itemIndex;
 	}
 	
-	private function cursorReady(e:ModelEvent):void  {
-		Log.out( "UserInventory.cursorReady - ObjectModel guid: " + e.instanceGuid, Log.WARN );
+	private function cursorReady(e:LoadingEvent):void  {
+		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTORY ) );
+		Log.out( "UserInventory.cursorReady - ObjectModel guid: " + e.guid, Log.WARN );
 	}
 	
 	public function onMouseWheel(event:MouseEvent):void {

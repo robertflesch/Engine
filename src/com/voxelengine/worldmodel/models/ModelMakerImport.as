@@ -33,7 +33,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	private var _vmm:ModelMetadata;
 	
 	public function ModelMakerImport( $ii:InstanceInfo ) {
-		super( $ii );
+		super( $ii, false );
 		Log.out( "ModelMakerImport - ii: " + _ii.toString() );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retriveInfo );		
@@ -58,7 +58,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	private function failedMetadata( $mme:ModelMetadataEvent ):void {
 		if ( _ii.guid == $mme.guid ) {
 			Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelMetadataEvent: " + $mme.toString(), Log.WARN );
-			markComplete();
+			markComplete(false);
 		}
 	}
 	
@@ -72,7 +72,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	private function failedInfo( $mie:ModelInfoEvent ):void {
 		if ( _ii.guid == $mie.guid ) {
 			Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
-			markComplete();
+			markComplete(false);
 		}
 	}
 	
@@ -117,7 +117,7 @@ public class ModelMakerImport extends ModelMakerBase {
 		}
 	}
 	
-	override protected function markComplete():void {
+	override protected function markComplete( $success:Boolean = true ):void {
 		super.markComplete();
 		
 		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retriveInfo );		
@@ -128,6 +128,7 @@ public class ModelMakerImport extends ModelMakerBase {
 		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retriveMetadata );		
 		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
 		
+		LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_COMPLETE, _vmm.guid ) );
 		
 		Log.out( "ModelMakerImport.markComplete - ii: " + _ii );
 	}

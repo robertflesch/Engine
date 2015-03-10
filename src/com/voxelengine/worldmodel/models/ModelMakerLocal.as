@@ -33,7 +33,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 	private var _vmi:ModelInfo;
 	
 	public function ModelMakerLocal( $ii:InstanceInfo ) {
-		super( $ii );
+		super( $ii, false );
 		_makerCount++;
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retriveInfo );		
@@ -45,7 +45,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 	private function failedInfo( $mie:ModelInfoEvent):void {
 		if ( _ii.guid == $mie.guid ) {
 			Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
-			markComplete();
+			markComplete( false );
 		}
 	}
 	
@@ -96,8 +96,8 @@ public class ModelMakerLocal extends ModelMakerBase {
 	}
 	//////////////////////////////////////
 	
-	override protected function markComplete():void {
-		super.markComplete();
+	override protected function markComplete( $success:Boolean = true ):void {
+		super.markComplete( $success );
 		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retriveInfo );		
 		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retriveInfo );		
 		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
