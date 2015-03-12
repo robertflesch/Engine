@@ -149,6 +149,7 @@ package com.voxelengine.worldmodel.models
 		// local model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// This is the last part of reading a local model
+		/*
 		static public function loadLocalModelFromByteArray( $vm:VoxelModel, $ba:ByteArray):void 	{
 			
 			// the try catch here allows me to treat all models as compressed
@@ -180,7 +181,7 @@ package com.voxelengine.worldmodel.models
 			// now just load the model like any other
 			$vm.fromByteArray($ba);
 		}
-		
+		*/
 		// This is the final step in model creation. All of the info needed to create the model is here.
 		// the oxel is still not build, but all of the other information is complete.
 		static public function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:ModelMetadata ):* {

@@ -1029,8 +1029,6 @@ package com.voxelengine.worldmodel.models
 			writeManifest( ba );
 			oxel.toByteArray( ba );
 			
-			ba.compress();
-			
 			return ba;
 			
 			function writeVersionedHeader( $ba:ByteArray):void

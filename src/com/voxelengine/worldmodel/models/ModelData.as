@@ -38,9 +38,9 @@ public class ModelData
 	
 	public function get guid():String  { return _guid; }
 	public function set guid(value:String):void { _guid = value; }
-	public function get ba():ByteArray  { return _ba; }
 	public function get dbo():DatabaseObject { return _dbo; }
-	public function set ba(value:ByteArray):void { _ba = value; }
+	public function get ba():ByteArray  { return _ba;  }
+	public function set ba( $ba:ByteArray ):void  { _ba = $ba; }
 	
 	
 	// This was private, force a message to be sent to it. 
@@ -102,15 +102,19 @@ public class ModelData
 		removeSaveEvents();
 		Log.out( "ModelData.saveFail - ", Log.ERROR ); 
 	}	
-
 	
 	public function toPersistance():void {
-		_dbo.ba			= _ba;
+		var ba:ByteArray = _ba;
+		try {  ba.compress(); }
+		catch (error:Error) { ; }
+		_dbo.ba			= ba;
 	}
 	
 	private function toObject():Object {
-		
-		return { ba: _ba }
+		var ba:ByteArray = _ba;
+		try {  ba.compress(); }
+		catch (error:Error) { ; }
+		return { ba: ba }
 	}
 
 	////////////////////////////////////////////////////////////////
@@ -119,7 +123,12 @@ public class ModelData
 	
 	public function fromPersistance( $dbo:DatabaseObject ):void {
 		_dbo			= $dbo;
-		_ba				= $dbo.ba;
+		
+		var ba:ByteArray = $dbo.ba;
+		try {  ba.uncompress(); }
+		catch (error:Error) { ; }
+		ba.position = 0;
+		_ba = ba;
 	}
 	
 }

@@ -80,8 +80,15 @@ public class ModelDataCache
 			var vmd:ModelData = new ModelData( $pe.guid );
 			if ( $pe.dbo )
 				vmd.fromPersistance( $pe.dbo );
-			else
-				vmd.ba = $pe.data;
+			else {
+				// loading from file data
+				var ba:ByteArray = $pe.data;
+				try {  ba.uncompress(); }
+				catch (error:Error) { ; }
+				ba.position = 0;
+				vmd.ba = ba;
+			}
+				
 			add( $pe, vmd );
 		}
 		else {

@@ -89,11 +89,11 @@ public class WindowModelMetadata extends VVPopup
 		var rbGroup:RadioButtonGroup = new RadioButtonGroup( this );
 		var radioButtons:DataProvider = new DataProvider();
 		radioButtons.addAll( { label:"Template for other models" }
-		                   , { label:"Unique Instance (careful here)" } );
+		                   , { label:"Unique Instance" } );
 		eventCollector.addEvent( rbGroup, ButtonsGroupEvent.GROUP_CHANGED
 		                       , function (event:ButtonsGroupEvent):void {  _vmm.template = (0 == event.target.index ?  true : false) } );
 		rbGroup.dataProvider = radioButtons;
-		rbGroup.index = 0;
+		rbGroup.index = 1;
 
 		addElement( new HorizontalSeparator( width ) );		
 		

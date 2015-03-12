@@ -78,16 +78,16 @@ package com.voxelengine
 					//L.info( $msg );
 					break;
 				case WARN:
-					trace( String(ERROR) + ":" + $msg );	// I hate the warning color
+					//trace( String(ERROR) + ":" + $msg );	// I hate the warning color
 					L.warn( $msg );
 					break;
 				case ERROR:
-					trace( String(FATAL) + ":" + $msg );	
+					//trace( String(FATAL) + ":" + $msg );	
 					L.error( $msg );
 					writeErrorToServer( "Error", $msg, $error );
 					break;
 				case FATAL:
-					trace( String(FATAL) + ":"+ $msg );	
+					//trace( String(FATAL) + ":"+ $msg );	
 					L.fatal( $msg );
 					writeErrorToServer( "Error", $msg, $error );
 					break;

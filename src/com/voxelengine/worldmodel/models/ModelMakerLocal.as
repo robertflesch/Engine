@@ -63,10 +63,6 @@ public class ModelMakerLocal extends ModelMakerBase {
 			
 			var $ba:ByteArray = _vmd.ba;
 			
-			try {  $ba.uncompress(); }
-			catch (error:Error) { ; }
-			$ba.position = 0;
-			
 			var versionInfo:Object = ModelLoader.modelMetaInfoRead( $ba );
 			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
 			{
