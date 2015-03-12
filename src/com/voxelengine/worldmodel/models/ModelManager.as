@@ -437,7 +437,7 @@ package com.voxelengine.worldmodel.models
 			
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			Log.out( "ModelManager.createPlayer - creating from LOCAL", Log.DEBUG );
-			instanceInfo.guid = "player";
+			instanceInfo.guid = "Player";
 			instanceInfo.grainSize = 4;
 			ModelLoader.load( instanceInfo );
 			

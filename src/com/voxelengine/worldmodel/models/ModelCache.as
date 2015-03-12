@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.models
 		public function createPlayer():Boolean	{
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			Log.out( "ModelCache.createPlayer - creating from LOCAL", Log.DEBUG );
-			instanceInfo.guid = "player";
+			instanceInfo.guid = "Player";
 			instanceInfo.grainSize = 4;
 			ModelLoader.load( instanceInfo );
 			return true

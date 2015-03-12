@@ -128,7 +128,7 @@ public class Player extends Avatar
 			if ( null == $dbo.modelGuid ) {
 				// Assign the player the default avatar
 				//$dbo.modelGuid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
-				$dbo.modelGuid = "player"
+				$dbo.modelGuid = "Player"
 				
 				var userName:String = $dbo.key.substring( 6 );
 				var firstChar:String = userName.substr(0, 1); 
@@ -145,7 +145,8 @@ public class Player extends Avatar
 			
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.grainSize = 4;
-			ii.guid = $dbo.modelGuid;
+			//ii.guid = $dbo.modelGuid;
+			ii.guid = "Player";
 			Log.out( "Player.onPlayerLoadedAction - creating player with guid: " + ii.guid, Log.WARN  );
 			//new ModelMaker( ii );
 			new ModelMakerLocal( ii );

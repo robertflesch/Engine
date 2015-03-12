@@ -42,7 +42,7 @@ package com.voxelengine.worldmodel.models
 		
 		static public	const CURSOR_TYPE_GRAIN:int 		= 0;
 		static public	const CURSOR_TYPE_SPHERE:int 		= 1;		
-		static public	const CURSOR_TYPE_SQUARE:int 		= 2;		
+		static public	const CURSOR_TYPE_MODEL:int 		= 2;		
 		static public	const CURSOR_TYPE_CYLINDER:int 		= 3;		
 		
 		static public	const CURSOR_OP_NONE:int 			= 0;
@@ -344,13 +344,13 @@ package com.voxelengine.worldmodel.models
 				{
 					sphereOperation();				 
 				}
-				else if ( CURSOR_TYPE_SQUARE == cursorType )
-				{
-					Log.out( "EditCursor.InsertOxel - CURSOR_TYPE_SQUARE not supported yet" );
-				}
 				else if ( CURSOR_TYPE_CYLINDER == cursorType )
 				{
 					cylinderOperation();				 
+				}
+				else if ( CURSOR_TYPE_MODEL == cursorType )
+				{
+					Log.out( "EditCursor.insertOxel - CURSOR_TYPE_MODEL not supported yet", Log.WARN );
 				}
 			}
 		}
@@ -523,13 +523,14 @@ package com.voxelengine.worldmodel.models
 											, gci.gc.size() / 2
 											, 0 );
 				}
-				else if ( CURSOR_TYPE_SQUARE == cursorType )
+				else if ( CURSOR_TYPE_MODEL == cursorType )
 				{
-					foundModel.empty_square( int(foundModel.editCursor.gciData.point.x)
-												, int(foundModel.editCursor.gciData.point.y)
-												, int(foundModel.editCursor.gciData.point.z)
-												, foundModel.editCursor.gciData.gc.size() / 2
-												, 0 );
+					Log.out( "EditCursor.delete - NOT IMPLEMENTED", Log.WARN );
+					//foundModel.empty_square( int(foundModel.editCursor.gciData.point.x)
+												//, int(foundModel.editCursor.gciData.point.y)
+												//, int(foundModel.editCursor.gciData.point.z)
+												//, foundModel.editCursor.gciData.gc.size() / 2
+												//, 0 );
 				}
 				else if ( CURSOR_TYPE_CYLINDER == cursorType )
 				{

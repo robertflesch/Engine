@@ -42,6 +42,7 @@ package com.voxelengine {
 		static public const DB_TABLE_REGIONS:String = "regions";
 		static public const DB_TABLE_INDEX_OWNER:String = "regionOwner";
 		static public const REGION_EXT:String = ".rjson";
+		static public const APP_EXT:String = ".json";
 		static public const IVM_EXT:String = ".ivm";
 		static public const MODEL_INFO_EXT:String = ".mjson";
 
@@ -49,7 +50,8 @@ package com.voxelengine {
 		public static var g_app:VoxelVerse = null;
 		
 		public static var g_textureBank:TextureBank = new TextureBank();
-		public static var g_regionManager:RegionManager = null;
+		public static var g_regionManager:RegionManager;
+		public static var g_configManager:ConfigManager;
 		public static var g_renderer:Renderer = new Renderer();
 		
 		private static var g_craftingManager:CraftingManager;

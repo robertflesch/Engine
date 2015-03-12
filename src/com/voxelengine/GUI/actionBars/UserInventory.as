@@ -203,7 +203,8 @@ public class  UserInventory extends QuickInventory
 		processItemSelection( boxes[$index] );
 	}
 	
-	private var _editCursorModelGuid:String = null;
+	private var _editCursorModelGuid:String;
+	private var _lastCursorType:int
 	public function processItemSelection( box:UIObject ):void {
 		if ( 0 < Globals.openWindowCount )
 			return;
@@ -214,6 +215,9 @@ public class  UserInventory extends QuickInventory
 		Globals.g_app.editing = false;
 		Globals.g_app.toolOrBlockEnabled = false;
 		hideGrainTools();
+		// reset the cursor type to what was selected in the shape selector
+		EditCursor.cursorType = _lastCursorType;
+		
 		if ( null != _editCursorModelGuid ) {
 			//var ecm:VoxelModel = Globals.modelGet( _editCursorModelGuid );
 			//if ( ecm )
@@ -269,8 +273,12 @@ public class  UserInventory extends QuickInventory
 		}
 		else if ( oi is ObjectModel ) {
 			Log.out( "UserInventory.processItemSelection - ObjectModel - what do I do here?");
+			if ( EditCursor.cursorType != EditCursor.CURSOR_TYPE_MODEL )
+				_lastCursorType = EditCursor.cursorType;
+			EditCursor.cursorType = EditCursor.CURSOR_TYPE_MODEL;
 			var om:ObjectModel = oi as ObjectModel;
 			var ii:InstanceInfo = new InstanceInfo();
+
 			_editCursorModelGuid = ii.guid = om.guid;
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_COMPLETE, cursorReady );

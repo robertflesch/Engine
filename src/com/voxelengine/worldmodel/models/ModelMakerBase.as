@@ -31,7 +31,7 @@ public class ModelMakerBase {
 	
 	public function ModelMakerBase( $ii:InstanceInfo, $fromTables:Boolean = true ) {
 		_ii = $ii;
-		Log.out( "ModelMakerBase - ii: " + _ii.toString() );
+		Log.out( "ModelMakerBase - ii: " + _ii.toString(), Log.DEBUG );
 		ModelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
 		ModelDataEvent.addListener( ModelBaseEvent.RESULT, retriveData );		
 		ModelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
@@ -60,7 +60,7 @@ public class ModelMakerBase {
 		ModelDataEvent.removeListener( ModelBaseEvent.ADDED, retriveData );		
 		ModelDataEvent.removeListener( ModelBaseEvent.RESULT, retriveData );		
 		ModelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
-		Log.out( "ModelMakerBase.markComplete - ii: " + _ii + "  success: " + $success );
+		Log.out( "ModelMakerBase.markComplete - ii: " + _ii + "  success: " + $success, Log.DEBUG );
 		if ( $success )
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_COMPLETE, _ii.guid ) );
 		else	

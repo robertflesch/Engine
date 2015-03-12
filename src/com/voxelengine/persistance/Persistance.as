@@ -33,7 +33,7 @@ public class Persistance
 {
 	static public function addEventHandlers():void {
 		PersistBigDB.addEvents();
-		PersistLocal.addEvents();
+		PersistURL.addEvents();
 	}
 	
 	static private function validateConnection():Boolean {

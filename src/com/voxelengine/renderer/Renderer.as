@@ -81,6 +81,7 @@ package com.voxelengine.renderer
 
 		public function init( stage:Stage ):void 
 		{
+			Log.out( "Renderer.init", Log.DEBUG );			
 			setStageSize( stage.stageWidth, stage.stageHeight );
 			addStageListeners();
 			
@@ -92,7 +93,9 @@ package com.voxelengine.renderer
 			
 			// This allows flash to run on older video drivers.
 			//Context3DProfile.BASELINE_CONSTRAINED
+			Log.out( "Renderer.init - requestContext3D", Log.DEBUG );			
 			_stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE_CONSTRAINED);
+			Log.out( "Renderer.init - requestContext3D AFTER", Log.DEBUG );			
 			//_stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE);
 			
 		}
@@ -144,7 +147,7 @@ package com.voxelengine.renderer
 		
 		// This handles the event created in the init function
 		public function onContextCreated(e:Event):void {
-			//Log.out( "Renderer.onContextCreated" + e.toString() );
+			Log.out( "Renderer.onContextCreated - " + e.type, Log.DEBUG );
 
 			// If new context and its not null, dispose of what we have
 			if ( null != _context ) {
@@ -156,7 +159,7 @@ package com.voxelengine.renderer
 
  			//Log.out("Renderer.onContextCreated " + Capabilities.version);
 			if ( null == _context && "context3DCreate" == e.type ) {
-				Log.out("Renderer.onContextCreated - reinitialize context: " + _stage3D.context3D );
+				Log.out("Renderer.onContextCreated - reinitialize context: " + _stage3D.context3D, Log.DEBUG );
 				_context = _stage3D.context3D;
 				if ( Globals.g_debug )
 					_context.enableErrorChecking = true;
@@ -172,7 +175,7 @@ package com.voxelengine.renderer
 				// 4	High-quality antialiasing.
 				// 16	Very high-quality antialiasing.
 				const antiAlias:int = 0;
-				Log.out( "Renderer.onContextCreated - ANTI_ALIAS set to: " + antiAlias );
+				Log.out( "Renderer.onContextCreated - ANTI_ALIAS set to: " + antiAlias, Log.DEBUG );
 				
 				// false indicates no depth or stencil buffer is created, true creates a depth and a stencil buffer. 
 				const enableDepthAndStencil:Boolean = true;
@@ -185,7 +188,7 @@ package com.voxelengine.renderer
 				if ( !_isHW )
 					Log.out( "Renderer.onContextCreated - SOFTWARE RENDERING - driverInfo: " + _context.driverInfo, Log.WARN );
 				else
-					Log.out( "Renderer.onContextCreated - driverInfo: " + _context.driverInfo );
+					Log.out( "Renderer.onContextCreated - driverInfo: " + _context.driverInfo, Log.DEBUG );
 					
 				_context.clear();
 			}

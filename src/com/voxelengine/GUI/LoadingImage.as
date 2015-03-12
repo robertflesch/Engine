@@ -41,7 +41,7 @@ package com.voxelengine.GUI
 		}
 		
 		static private function destroy(e:LoadingImageEvent):void {
-			Log.out( "LoadingImage.destroy called", Log.WARN );
+//			Log.out( "LoadingImage.destroy called", Log.WARN );
 			if ( LoadingImage.isActive && Globals.online )
 			{
 				Log.out( "LoadingImage.DESTROYED", Log.WARN );

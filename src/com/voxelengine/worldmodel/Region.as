@@ -68,7 +68,7 @@ package com.voxelengine.worldmodel
 	public class Region 
 	{
 		static public const DEFAULT_REGION_ID:String = "000000-000000-000000";
-		static private const BLANK_REGION_TEMPLETE:String = "{\"region\":[],\"skyColor\": {\"r\":92,\"g\":172,\"b\":238 },\"gravity\":false }";
+		static private const BLANK_REGION_TEMPLATE:String = "{\"region\":[],\"skyColor\": {\"r\":92,\"g\":172,\"b\":238 },\"gravity\":false }";
 		
 		static public var _s_currentRegion:Region;
 		static public function get currentRegion():Region { return _s_currentRegion; }
@@ -145,7 +145,7 @@ package com.voxelengine.worldmodel
 		private function editorsListGet():String { return _editors.toString(); }
 		private function adminListGet():String { return _admin.toString(); }
 
-		public function createEmptyRegion():void { initJSON( BLANK_REGION_TEMPLETE ); }
+		public function createEmptyRegion():void { initJSON( BLANK_REGION_TEMPLATE ); }
 		
 		public function Region( $guid:String ):void {
 			_guid = $guid;

@@ -15,12 +15,11 @@ package {
 	import flash.events.MouseEvent;
 	import flash.events.ErrorEvent;	
 	import flash.events.UncaughtErrorEvent;	
-	import flash.external.ExternalInterface;
 	import flash.ui.Keyboard;
 	import flash.utils.getTimer;
 	
-	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.Globals;
 	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.events.InventoryEvent;
 	import com.voxelengine.events.RegionEvent;
@@ -28,24 +27,17 @@ package {
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.events.WindowSplashEvent;
 	import com.voxelengine.GUI.VoxelVerseGUI;
-	import com.voxelengine.GUI.WindowSplash;
-	import com.voxelengine.renderer.Renderer;
-	import com.voxelengine.persistance.Persistance;
-	import com.voxelengine.pools.PoolManager;
 	import com.voxelengine.worldmodel.ConfigManager;
 	import com.voxelengine.worldmodel.MemoryManager;
 	import com.voxelengine.worldmodel.MouseKeyboardHandler;
 	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.RegionManager;
-	import com.voxelengine.worldmodel.inventory.InventoryManager;
-	import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
-	import com.voxelengine.worldmodel.tasks.lighting.LightRemove;
+//	import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
+//	import com.voxelengine.worldmodel.tasks.lighting.LightRemove;
 	
 	public class VoxelVerse extends Sprite 
 	{
 		private var _timePrevious:int = getTimer();
-		private var _configManager:ConfigManager;
-		private var _poolManager:PoolManager;
 		
 		private var _showConsole:Boolean;
 		private var _toolOrBlockEnabled:Boolean;
@@ -56,7 +48,6 @@ package {
 		public function set editing(val:Boolean):void { _editing = val; }
 		public function get toolOrBlockEnabled():Boolean { return _toolOrBlockEnabled; }
 		public function set toolOrBlockEnabled(val:Boolean):void { _toolOrBlockEnabled = val; }
-		public function get configManager():ConfigManager { return _configManager; }
 		
 		public function get showConsole():Boolean { return _showConsole; }
 		public function set showConsole(value:Boolean):void { _showConsole = value; }
@@ -70,85 +61,24 @@ package {
 		private function init(e:Event = null):void {
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			
-			var parameters:Object = stage.loaderInfo.parameters;
-			if ( parameters.guid ) {
-				Log.out( "VoxelVerse.init - single model found: " + parameters.guid, Log.DEBUG );
-				//_displayGuid = parameters.guid;			
-			}
+            loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
 			
 			stage.scaleMode = StageScaleMode.NO_SCALE;
 			stage.align = StageAlign.TOP_LEFT;
 			
-			//var strUserAgent:String = String(ExternalInterface.call("function() {return navigator.userAgent;}")).toLowerCase();			
+			VVInitializer.initialize( stage );
 			
-			// expect an exception to be thrown and caught here, the best way I know of to find out of we are in debug or release mode
-			try
-			{
-				var result : Boolean = new Error().getStackTrace().search(/:[0-9]+]$/m) > -1;
-				Globals.g_debug = result;
-			}
-			catch ( error:Error )
-			{
-				Globals.g_debug = false;
-			}
-			
-			try
-			{
-				// This doesnt work in chrome, so I need someway to detect chrome and do it differently
-				// Globals.appPath = "file:///C:/dev/VoxelVerse/resources/bin/";
-				var urlPath:String = ExternalInterface.call("window.location.href.toString");
-				Log.out( "VoxelVerse.swf loaded from: " + urlPath, Log.DEBUG );
-				var index:int = urlPath.indexOf( "index.html" );
-				if ( -1 == index )
-				{
-					index = urlPath.lastIndexOf( "/" );
-					var gap:String = urlPath.substr( 0, index + 1 );
-					Globals.appPath = gap;
-				}
-				else {
-					//if ( Globals.g_debug ) 
-						Globals.appPath = urlPath.substr( 0, index );
-				}
-				Log.out( "VoxelVerse.init set appPath to: " + Globals.appPath );
-			}
-			catch ( error:Error )
-			{
-				Log.out("VoxelVerse.init - ExternalInterface not found, using default location", Log.ERROR, error );
-				//Globals.appPath = 
-			}
-			
-			Globals.g_renderer.init( stage );
-			// adds handlers for persistance of regions
-			Persistance.addEventHandlers();
-			
-			WindowSplashEvent.addListener( WindowSplashEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
-			
-			VoxelVerseGUI.currentInstance.init();
-			
-			WindowSplash.init();
-			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.CREATE ) );
-			
-				
-            loaderInfo.uncaughtErrorEvents.addEventListener(UncaughtErrorEvent.UNCAUGHT_ERROR, uncaughtErrorHandler);
+			//var parameters:Object = stage.loaderInfo.parameters;
+			//if ( parameters.guid ) {
+				//Log.out( "VVInitializer.initialize - single model found: " + parameters.guid, Log.DEBUG );
+				//new LoadSynchronizer( parameters.guid );
+			//}
+			//else
+				new LoadSynchronizer();
 		}
 		
-		private function addStaticListeners():void {
-			addEventListener( LightEvent.ADD, LightAdd.handleLightEvents );
-			addEventListener( LightEvent.SOLID_TO_ALPHA, LightAdd.handleLightEvents );
-			addEventListener( LightEvent.ALPHA_TO_SOLID, LightRemove.handleLightEvents );
-			addEventListener( LightEvent.REMOVE, LightRemove.handleLightEvents );
-		}
-
 		// after the splash and config have been loaded
-		public function onSplashLoaded( event : WindowSplashEvent ):void	{
-			
-			//Log.out( "VoxelVerse.onSplashLoaded" );
-			// TODO I dont like that some objects are created in globals, others are created here - RSF
-			WindowSplashEvent.removeListener( WindowSplashEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded);
-			
-			Globals.g_regionManager = new RegionManager();
-			_configManager = new ConfigManager( _displayGuid );
-			_poolManager = new PoolManager();
+		public function readyToGo():void	{
 			
 			addEventListener(Event.ENTER_FRAME, enterFrame);
 			addEventListener(Event.DEACTIVATE, deactivate);
@@ -162,6 +92,7 @@ package {
 			stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, mouseUpRight);
 			
 			VoxelVerseGUI.currentInstance.buildGUI();	
+			Log.out( "VoxelVerse.readyToGo", Log.DEBUG );
 		}
 
 		private function enterFrame(e:Event):void {
@@ -183,8 +114,8 @@ package {
 			Globals.g_renderer.render();
 			timeRender = getTimer() - timeRender;
 				
-			if ( ( 10 < timeRender || 10 < timeUpdate ) && Globals.active )	
-				Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed, Log.INFO );
+//			if ( ( 10 < timeRender || 10 < timeUpdate ) && Globals.active )	
+//				Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed, Log.INFO );
 			_timePrevious = getTimer();
 		}
 		

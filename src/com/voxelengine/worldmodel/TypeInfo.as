@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+	import com.voxelengine.events.PersistanceEvent;
 	import flash.geom.Vector3D;
 
 	import flash.events.IOErrorEvent;
@@ -214,11 +215,36 @@ package com.voxelengine.worldmodel
 			return "TypeInfo - TYPE: " + _typeId + " CLASS: " + _category + " NAME: " + _name + " color:" + color + " Solid: " + solid + " MAXPIX: " + _maxpix + " UT: " + _ut + " VT: " + _vt + " Image: " + image;
 		}
 
+		
+		static public function load( $fileName:String ):void {
+			PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
+			PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFail );			
+			PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
+			
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.APP_EXT, $fileName, null, null ) );
+				
+			function loadSucceed(e:PersistanceEvent):void {
+				PersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
+				PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFail );			
+				PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
+				
+				Log.out("TypeInfo.load.loadSucceed: " + $fileName + Globals.APP_EXT );
+				loadTypeDataFromJSON( e.data as String );
+			}
+			
+			function loadFail(e:PersistanceEvent):void {
+				PersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
+				PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFail );			
+				PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
+				Log.out("TypeInfo.load.loadFail: " + e.toString(), Log.ERROR);
+			}
+		}
+		
 		static public function loadTypeData( typeName:String ):void
 		{
 			var urlLoader:URLLoader = new URLLoader();
 			//Log.out( "TypeInfo.loadTypeData - loading: " + Globals.appPath + typeName, Log.WARN );
-			urlLoader.load(new URLRequest( Globals.appPath + typeName ));
+			urlLoader.load(new URLRequest( Globals.appPath + typeName + ".json" ));
 			urlLoader.addEventListener(Event.COMPLETE, onTypesLoadedAction);
 			urlLoader.addEventListener(IOErrorEvent.IO_ERROR, errorAction);			
 		}
@@ -230,6 +256,11 @@ package com.voxelengine.worldmodel
 		
 		static private function onTypesLoadedAction(event:Event):void 
 		{
+			var jsonString:String = StringUtils.trim(String(event.target.data));
+			loadTypeDataFromJSON( jsonString );
+		}
+		
+		static private function loadTypeDataFromJSON( $data:String ):void {
 			//Log.out( "TypeInfo.onTypesLoadedAction - loading", Log.WARN );
 			var ti:TypeInfo = new TypeInfo( 0 );
 			ti._typeId = 0;
@@ -241,10 +272,9 @@ package com.voxelengine.worldmodel
 			TypeInfo.typeInfoByName[ti.name.toUpperCase()] = ti;
 			
 			
-			var jsonString:String = StringUtils.trim(String(event.target.data));
 			try
 			{
-				var result:Object = JSON.parse(jsonString);
+				var result:Object = JSON.parse( $data );
 			}
 			catch ( error:Error )
 			{

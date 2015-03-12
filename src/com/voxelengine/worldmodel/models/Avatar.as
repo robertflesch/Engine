@@ -19,7 +19,7 @@ package com.voxelengine.worldmodel.models
     {
 		public function Avatar( instanceInfo:InstanceInfo ) 
 		{ 
-			trace( "Avatar CREATED" );
+			//Log.out( "Avatar CREATED" );
 			super( instanceInfo );
 		}
 		

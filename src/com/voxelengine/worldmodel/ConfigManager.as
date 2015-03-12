@@ -7,11 +7,11 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-	import flash.net.URLLoader;
-	import flash.net.URLRequest;
+	import com.voxelengine.events.PersistanceEvent;
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
 	import flash.events.IOErrorEvent;
+	import org.flashapi.swing.Alert;
 	
 	import com.voxelengine.utils.StringUtils;
 
@@ -28,6 +28,20 @@ package com.voxelengine.worldmodel
 	 */
 	public class ConfigManager 
 	{
+		static private function create( $startingModel:String ):void {
+			if ( null == _s_currentInstance )
+				new ConfigManager( $startingModel );
+		}
+		
+		static private function destroy():void {
+			ConfigManager._s_currentInstance = null;
+		}
+		
+		static private var _s_currentInstance:ConfigManager = null;
+		static public function get isActive():Boolean { return _s_currentInstance ? true: false; }
+
+		/////////////////////////////////////////////////////////////////////////////////////////
+		
 		private var _showHelp:Boolean = true;
 		private var _showEditMenu:Boolean = true;
 		private var _showButtons:Boolean = true;
@@ -44,29 +58,47 @@ package com.voxelengine.worldmodel
 			if ( null != $optionalGuid ) {
 				// need to log onto network. has Gui been initialized at this point?
 				// this is the guid of a model to be loaded into a blank region.
-				Log.out( "ConfigManager.new - individual model to be loaded: " + $optionalGuid, Log.DEBUG );
+				Log.out( "ConfigManager.new - individual model to be loaded: " + $optionalGuid, Log.ERROR );
+				// So we need to use autologin
+				// then load the model into display, center, etc
 			}
 			else {
-				var _urlLoader:URLLoader = new URLLoader();
-				Log.out( "ConfigManager.new - loading: " + Globals.appPath + "config.json", Log.DEBUG );
-				_urlLoader.load(new URLRequest(Globals.appPath + "config.json"));
-				_urlLoader.addEventListener(Event.COMPLETE, onConfigLoadedAction);
-				_urlLoader.addEventListener(IOErrorEvent.IO_ERROR, errorAction);			
+				PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
+				PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFail );			
+				PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
+				
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.APP_EXT, "config", null, null ) );
 			}
 		}
 		
-		public function onConfigLoadedAction(event:Event):void
-		{
-			var jsonString:String = StringUtils.trim(String(event.target.data));
-			_defaultRegionJson = JSON.parse(jsonString);
-			var type:String = _defaultRegionJson.config.typeName;
+		private function loadSucceed(e:PersistanceEvent):void {
+			PersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
+			PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFail );			
+			PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
+			
+			_defaultRegionJson = JSON.parse( e.data );
 			_showHelp = _defaultRegionJson.config.showHelp;
 			_showEditMenu = _defaultRegionJson.config.showEditMenu;
 			_showButtons = _defaultRegionJson.config.showButtons;
 			
 			LoadingEvent.addListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
-			TypeInfo.loadTypeData(type);
-		}   
+			var typeInfoFile:String = _defaultRegionJson.config.typeName;
+			//TypeInfo.loadTypeData( typeInfoFile );
+			TypeInfo.load( typeInfoFile );
+		}
+		
+		private function loadFail(e:PersistanceEvent):void {
+			PersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
+			PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFail );			
+			PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
+			var errorMsg:String = (e.data as String);
+			Log.out( "ConfigManager.loadFail - error: " + errorMsg, Log.ERROR )
+			// the Alert does not work here ???
+			//(new Alert( "ConfigManager" ) ).display();
+			//(new Alert( "ConfigManager.loadFail - error: " + errorMsg ) ).display();
+			//var t:Alert = new Alert( "ConfigManager.loadFail" );
+			//t.display();
+		}
 		
 		private function onTypesLoaded( $e:LoadingEvent ):void
 		{
@@ -84,11 +116,5 @@ package com.voxelengine.worldmodel
 			LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, listenForLoginSuccess );
 			RegionEvent.dispatch( new RegionEvent( RegionEvent.JOIN, 0, _defaultRegionJson.config.region.startingRegion ) ); 
 		}
-
-		public function errorAction(e:IOErrorEvent):void
-		{
-			Log.out( "ConfigManager.errorAction - Config failed to load: " + e.toString(), Log.ERROR );
-		}	
-		
 	} // ConfigManager
 } // Package

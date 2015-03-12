@@ -71,28 +71,30 @@ package com.voxelengine
 			{ 
 				case DEBUG:
 					trace( String(DEBUG) + ":" + $msg );	
+					//L.debug( $msg );
 					break;
 				case INFO:
 					trace( String(INFO) + ":" + $msg );	
+					//L.info( $msg );
 					break;
 				case WARN:
 					trace( String(ERROR) + ":" + $msg );	// I hate the warning color
-					//L.warn( $msg );
+					L.warn( $msg );
 					break;
 				case ERROR:
 					trace( String(FATAL) + ":" + $msg );	
-					//L.error( $msg );
+					L.error( $msg );
 					writeErrorToServer( "Error", $msg, $error );
 					break;
 				case FATAL:
 					trace( String(FATAL) + ":"+ $msg );	
-					//L.fatal( $msg );
+					L.fatal( $msg );
 					writeErrorToServer( "Error", $msg, $error );
 					break;
 			}
 			
 			
-			if ( ERROR < $type )
+			if ( ERROR <= $type )
 				show();
 		}
 	}

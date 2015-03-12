@@ -7,23 +7,17 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
-import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.RoomEvent;
 import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.Room;
-import com.voxelengine.worldmodel.inventory.InventoryManager;
-import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.ModelLoader;
-import com.voxelengine.worldmodel.models.ModelDataCache;
-import com.voxelengine.worldmodel.models.ModelMetadataCache;
-import com.voxelengine.worldmodel.models.ModelInfoCache;
 
 /**
  * ...
@@ -61,18 +55,6 @@ public class RegionManager
 		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	regionCreatedHandler ); 
 									  
 		LoadingEvent.addListener( LoadingEvent.LOAD_CONFIG_COMPLETE, configComplete );
-		
-		
-		
-		// This adds the event handlers
-		// Is there a central place to do this?
-		ModelMetadataCache.init();
-		ModelInfoCache.init();
-		ModelDataCache.init();
-		// This causes the to load its caches and listeners
-		InventoryManager.init();
-		MouseKeyboardHandler.init();
-		ModelCacheUtils.init();
 	}
 	
 	/**
@@ -170,15 +152,16 @@ public class RegionManager
 	
 	public function configComplete( $e:LoadingEvent ):void
 	{
-		//startWithEmptyRegion( $e.guid );
+		startWithEmptyRegion();
 		
-		// This is used for testing
-		// This tells the engine to load a local file
-		loadRegionFromLocal( $e.guid )
+		// Add a listener to tell when file has been loaded
+//		RegionEvent.addListener( ModelBaseEvent.ADDED, startingRegionLoaded );
+		// now request the file be loaded
+//		RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST, 0, $guid ) );
 	}
-	public function startWithEmptyRegion( $guid:String ):void
+	public function startWithEmptyRegion():void
 	{
-		var startingRegion:Region = new Region( $guid );
+		var startingRegion:Region = new Region( "Blank" );
 		startingRegion.createEmptyRegion();
 		regionAdd( null, startingRegion );
 		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, startingRegion.guid ) ); 
@@ -186,13 +169,6 @@ public class RegionManager
 		// This tells the config manager that the local region was loaded and is ready to load rest of data.
 	}
 	
-	public function loadRegionFromLocal( $guid:String ):void
-	{
-		// Add a listener to tell when file has been loaded
-		RegionEvent.addListener( ModelBaseEvent.ADDED, startingRegionLoaded );
-		// now request the file be loaded
-		RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST, 0, $guid ) );
-	}
 	
 	private function startingRegionLoaded( $re:RegionEvent):void 
 	{
@@ -211,7 +187,7 @@ public class RegionManager
 	
 	static public function requestDefaultRegionLoad( e:RoomEvent ):void {
 		Log.out( "RegionManager.requestDefaultRegionLoad", Log.DEBUG );
-		var defaultRegionJSON:Object = Globals.g_app.configManager.defaultRegionJson;
+		var defaultRegionJSON:Object = Globals.g_configManager.defaultRegionJson;
 		var defaultRegionID:String = defaultRegionJSON.config.region.startingRegion;
 		Room.createJoinRoom( defaultRegionID );	
 	}

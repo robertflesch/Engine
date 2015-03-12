@@ -130,7 +130,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	//public function saveModelIVM():void {
-		//trace("VoxelVerseGUI.saveModel - Saving model to FILE");
+		//Log.out("VoxelVerseGUI.saveModel - Saving model to FILE");
 		 ////three steps
 		 ////save updated model meta data with new guid
 		 ////save updated model ivm
@@ -148,7 +148,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	//}
 	
 	private function crossHairResize(event:Event):void {
-		//trace( "VoxelVerseGUI.crossHairResize" );
+		//Log.out( "VoxelVerseGUI.crossHairResize" );
 		if ( _crossHairHorizontal )
 		{
 			var halfRW:int = Globals.g_renderer.width / 2;
@@ -172,7 +172,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	private function addReleaseMenu():WindowReleaseMenu {
-		if ( Globals.g_app.configManager.showButtons && Globals.g_app.configManager.showEditMenu )
+		if ( Globals.g_configManager.showButtons && Globals.g_configManager.showEditMenu )
 		{
 			crossHairAdd();
 		}
@@ -198,7 +198,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	private function crossHairChange():void {
 		if ( !_crossHairAdded )
 		{
-			//trace( "VoxelVerseGUI.changeCrossHairs - _crossHairAdded not yet added" );
+			//Log.out( "VoxelVerseGUI.changeCrossHairs - _crossHairAdded not yet added" );
 			return;
 		}
 			
@@ -227,7 +227,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	public function hideGUI():void {
-		trace( "VoxelVerseGUI.hideGUI" ); 
+		//Log.out( "VoxelVerseGUI.hideGUI" ); 
 		if ( _built )
 		{
 			if ( _debugMenu )
@@ -239,7 +239,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	public function showGUI():void {
-		trace( "VoxelVerseGUI.showGUI" ); 
+		//Log.out( "VoxelVerseGUI.showGUI" ); 
 		if ( _built )
 		{
 			if ( _debugMenu )
@@ -252,13 +252,14 @@ public class VoxelVerseGUI extends EventDispatcher
 	
 	
 	public function buildGUI():void {
+		Log.out( "VoxelVerseGUI.buildGUI", Log.DEBUG ); 
 		if ( !_built ) {
 			_releaseMenu = addReleaseMenu();
 			_releaseMenu.visible = false;
-			if ( true == Globals.g_debug ) {
-				_debugMenu = new WindowDebugMenu();
-				_debugMenu.visible = false;
-			}
+			//if ( true == Globals.g_debug ) {
+				//_debugMenu = new WindowDebugMenu();
+				//_debugMenu.visible = false;
+			//}
 			
 			if ( !Globals.g_renderer.hardwareAccelerated )
 				 new WindowNotHardware( "WARNING", "Hardware acceleration is not enabled in your browser, this is happening in Chrome on some machines, try FireFox or Internet Explorer" );
@@ -381,7 +382,7 @@ public class VoxelVerseGUI extends EventDispatcher
 				
 		}
 		
-		if  ( Globals.g_app.configManager.showEditMenu )
+		if  ( Globals.g_configManager.showEditMenu )
 		{
 			if ( Keyboard.I == e.keyCode ) {
 				var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );

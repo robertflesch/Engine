@@ -83,6 +83,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			var $ba:ByteArray = _vmd.ba;
 			
 			try {  $ba.uncompress(); }
+			// just in case it was not compressed
 			catch (error:Error) { ; }
 			$ba.position = 0;
 			

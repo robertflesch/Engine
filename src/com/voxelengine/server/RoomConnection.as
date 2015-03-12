@@ -140,6 +140,7 @@ package com.voxelengine.server {
 		
 		static private function createPlayer( userid:String ):void
 		{
+			throw new Error( "RoomConnection.createPlayer - NOT IMPLMENTED" );
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.guid = userid;
 			ii.guid = "Player";
@@ -150,6 +151,7 @@ package com.voxelengine.server {
 		
 		static private function createAvatar( userid:String ):void
 		{
+			throw new Error( "RoomConnection.createAvatar - NOT IMPLMENTED" );
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.guid = userid;
 			ii.guid = "Player"; // Avatar
