@@ -50,6 +50,8 @@ package com.voxelengine.server
 			super( "Login" );
 			width = 309;
 			height = 336;
+			tabEnabled = false;
+			tabIndex = -1;
 			layout.orientation = LayoutOrientation.VERTICAL;
 
 			try {
@@ -87,6 +89,7 @@ package com.voxelengine.server
 			var emailAddy:String = _userInfo.data.email ?  _userInfo.data.email : $email;
 			_emailInput = new LabelInput( " Email", emailAddy, width );
 			_emailInput.labelControl.width = 80;
+			_emailInput.tabIndex = 0;
 			infoPanel.addElement( _emailInput );
 			
 			infoPanel.addElement( new Spacer( width, 10 ) );
@@ -103,6 +106,7 @@ package com.voxelengine.server
 			//_passwordInput = new LabelInput( " Password", password, width );
 			_passwordInput = new TextInput( password, width );
 			_passwordInput.displayAsPassword = true;
+			_passwordInput.tabIndex = 1;
 			
 			//_passwordInput.labelControl.width = 80;
 			pwContainer.addElement( _passwordInput );
@@ -124,6 +128,7 @@ package com.voxelengine.server
 			_savePW = new CheckBox( "Save Password", 110, 20 );
 			if ( "" != password )
 				_savePW.selected = true;
+			_savePW.tabIndex = 2;
 			otherPanel.addElement( _savePW );
 			
 			addElement( otherPanel );
@@ -133,6 +138,7 @@ package com.voxelengine.server
 			var buttonPanel:Container = new Container( width, buttonHeight );
 			buttonPanel.padding = 7.5;
 			var loginButton:Button = new Button( "Login", buttonWidth, buttonHeight - 15 );
+			loginButton.tabIndex = 4;
 			loginButton.addEventListener(UIMouseEvent.CLICK, loginButtonHandler );
 //			loginButton.shadow = true;
 			buttonPanel.addElement( loginButton );
@@ -140,16 +146,18 @@ package com.voxelengine.server
 			var registerButton:Button = new Button( "Register..", buttonWidth, buttonHeight - 15 );
 			registerButton.addEventListener(UIMouseEvent.CLICK, registerButtonHandler );
 			registerButton.shadow = true;
+			registerButton.tabIndex = 5;
 			buttonPanel.addElement( registerButton );
 			
 			var lostPasswordButton:Button = new Button( "Lost Password", buttonWidth, buttonHeight - 15 );
 			lostPasswordButton.fontSize = 9;
 			lostPasswordButton.shadow = true;
 			lostPasswordButton.addEventListener(UIMouseEvent.CLICK, lostPasswordHandler );
+			lostPasswordButton.tabIndex = 6;
 			buttonPanel.addElement( lostPasswordButton );
 			
 			addElement( buttonPanel );
-
+			
 			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
 
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);

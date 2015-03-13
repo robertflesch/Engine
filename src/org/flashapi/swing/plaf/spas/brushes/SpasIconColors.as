@@ -73,7 +73,7 @@ package org.flashapi.swing.plaf.spas.brushes {
 		 * 	The default LAF icon color for the "out" state.
 		 */
 		//public static const OUT:uint = 0xFFFFFF;
-		public static const OUT:uint = 0xBBBBBB;
+		public static const OUT:uint = 0x000000;
 		
 		/**
 		 * 	The default LAF icon color for the "pressed" state.

@@ -31,7 +31,7 @@ package com.voxelengine.server
 	public class WindowRegister extends VVPopup
 	{
 		private const LI_WIDTH:int = 160;
-		private const LABEL_WIDTH:int = 80;
+		private const LABEL_WIDTH:int = 112;
 		private const CAPTCHA_WIDTH:int = 160;
 		private const CAPTCHA_HEIGHT:int = 64;
 		
@@ -60,9 +60,9 @@ package com.voxelengine.server
 		public function WindowRegister()
 		{
 			super( "Register" );
-			padding = 15;
+			padding = 5;
 			width = 280;
-			height = 340;
+			height = 320;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			
 			_refresh = (new _refreshImageTest() as Bitmap);
@@ -70,8 +70,11 @@ package com.voxelengine.server
 
 			var unc:Container = new Container( width, 30 );
 			{
-				unc.addElement( new Label( "User Name", LABEL_WIDTH ) );
+				var un:Label = new Label( "User Name: ", LABEL_WIDTH );
+				un.textAlign = TextAlign.RIGHT;
+				unc.addElement( un );
 				_unInput = new TextInput( _userName );
+				_unInput.tabIndex = 0;
 				_unInput.width = LI_WIDTH;
 				_unInput.addEventListener( TextEvent.EDITED, 
 											function( $event:TextEvent ):void 
@@ -82,8 +85,11 @@ package com.voxelengine.server
 
 			var ec:Container = new Container( width, 30 );
 			{
-				ec.addElement( new Label( "Email", LABEL_WIDTH ) );
+				var em:Label = new Label( "Email: ", LABEL_WIDTH );
+				em.textAlign = TextAlign.RIGHT;
+				ec.addElement( em );
 				_eInput = new TextInput( _email );
+				_eInput.tabIndex = 1;
 				_eInput.width = LI_WIDTH;
 				_eInput.addEventListener( TextEvent.EDITED, 
 											function( $event:TextEvent ):void 
@@ -94,9 +100,12 @@ package com.voxelengine.server
 			
 			var pwc1:Container = new Container( width, 30 );
 			{
-				pwc1.addElement( new Label( "Password", LABEL_WIDTH ) );
+				var pw:Label = new Label( "Password: ", LABEL_WIDTH );
+				pw.textAlign = TextAlign.RIGHT;
+				pwc1.addElement( pw );
 				_passwordInput = new TextInput( _password );
 				_passwordInput.width = LI_WIDTH;
+				_passwordInput.tabIndex = 3;
 				_passwordInput.password = true;
 				_passwordInput.addEventListener( TextEvent.EDITED, 
 												function( $event:TextEvent ):void 
@@ -107,11 +116,14 @@ package com.voxelengine.server
 			
 			var pwc2:Container = new Container( width, 30 );
 			{
-				pwc2.addElement( new Label( "Password", LABEL_WIDTH ) );
+				var cp:Label = new Label( "Confirm Password: ", LABEL_WIDTH );
+				cp.textAlign = TextAlign.RIGHT;
+				pwc2.addElement( cp );
 				_password2 = "";
 				_passwordInput2 = new TextInput( _password2 );
 				_passwordInput2.width = LI_WIDTH;
 				_passwordInput2.password = true;
+				_passwordInput2.tabIndex = 3;
 				_passwordInput2.addEventListener( TextEvent.EDITED, 
 												function( $event:TextEvent ):void 
 												{ _password2 = $event.target.text; } );
@@ -123,6 +135,8 @@ package com.voxelengine.server
 			_errorText.backgroundColor = 0xC0C0C0;
 			_errorText.scrollPolicy = ScrollPolicy.NONE;
 			_errorText.fontColor = 0xff0000;
+			_errorText.tabEnabled = false;
+			_errorText.editable = false;
 			//_errorText.text = "Test Message"
 			
 			defaultCloseOperation = ClosableProperties.DO_NOTHING_ON_CLOSE;
@@ -143,7 +157,7 @@ package com.voxelengine.server
 		
 		private function captchaLoad():void {
 			addElement( new Image( _retrievingCaptcha, 270, 108, true ) ); // element 5
-			PlayerIO.quickConnect.simpleGetCaptcha( Globals.g_gamesNetworkID, CAPTCHA_WIDTH, CAPTCHA_HEIGHT, captchaReceive, captchaFailure );
+			PlayerIO.quickConnect.simpleGetCaptcha( Globals.GAME_ID, CAPTCHA_WIDTH, CAPTCHA_HEIGHT, captchaReceive, captchaFailure );
 		}
 		
 		private var _ci:Container
@@ -151,6 +165,7 @@ package com.voxelengine.server
 		{
 			_captchaKey = $captchaKey
 			var loader:Loader = new Loader();
+			loader
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onCaptchaLoadComplete );
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onCaptchaLoadError );
 			loader.load(new URLRequest( $captchaImageUrl ));
@@ -163,7 +178,7 @@ package com.voxelengine.server
 				{
 					_ci.layout.orientation = LayoutOrientation.HORIZONTAL;
 					//ci.padding = 10;
-
+					_ci.addElement( new Spacer( 30, CAPTCHA_HEIGHT ) );
 					var refreshButton:Image = new Image( _refresh, CAPTCHA_HEIGHT, CAPTCHA_HEIGHT, true );
 					refreshButton.addEventListener( UIMouseEvent.CLICK, captchaReload );
 					_ci.addElement( refreshButton );
@@ -180,7 +195,9 @@ package com.voxelengine.server
 				
 				var c:Container = new Container( width, 30 );
 				{
-					c.addElement( new Label( "Captcha", LABEL_WIDTH ) );
+					var cl:Label = new Label( "Captcha: ", LABEL_WIDTH );
+					cl.textAlign = TextAlign.RIGHT;
+					c.addElement( cl );
 					var captchaText:TextInput = new TextInput( _captchaText  );
 					captchaText..width = LI_WIDTH;
 					captchaText.addEventListener( TextEvent.EDITED, 
@@ -192,7 +209,7 @@ package com.voxelengine.server
 				
 				addElement( _errorText );
 				
-				var createAccountButton:Button = new Button( "Create Account", 240, 40 );
+				var createAccountButton:Button = new Button( "Create Account", 265, 40 );
 				createAccountButton.addEventListener(UIMouseEvent.CLICK, createAccountButtonHandler );
 				addElement( createAccountButton );
 			}
@@ -227,7 +244,7 @@ package com.voxelengine.server
 		}		
 		
 		private function captchaReload($event:UIMouseEvent):void {
-			PlayerIO.quickConnect.simpleGetCaptcha( Globals.g_gamesNetworkID, CAPTCHA_WIDTH, CAPTCHA_HEIGHT, captchaReReceive, captchaFailure );
+			PlayerIO.quickConnect.simpleGetCaptcha( Globals.GAME_ID, CAPTCHA_WIDTH, CAPTCHA_HEIGHT, captchaReReceive, captchaFailure );
 
 		}		
 		
@@ -247,7 +264,7 @@ package com.voxelengine.server
 			Log.out( "userName: " + _userName + "  password: " + _password + "  email:" + _email, Log.DEBUG );
 			PlayerIO.quickConnect.simpleRegister(
 									Globals.g_app.stage,
-									Globals.g_gamesNetworkID,
+									Globals.GAME_ID,
 									_userName,
 									_password,
 									_email,

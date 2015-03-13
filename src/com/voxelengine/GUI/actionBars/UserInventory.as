@@ -295,7 +295,7 @@ public class  UserInventory extends QuickInventory
 	
 	private function cursorReady(e:LoadingEvent):void  {
 		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTORY ) );
-		Log.out( "UserInventory.cursorReady - ObjectModel guid: " + e.guid, Log.WARN );
+		//Log.out( "UserInventory.cursorReady - ObjectModel guid: " + e.guid, Log.WARN );
 	}
 	
 	public function onMouseWheel(event:MouseEvent):void {

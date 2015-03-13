@@ -29,7 +29,7 @@ public class Network
 	// This will allow me to do things like post to Facebook things that users create.
 	static public function autoLogin( $startingRegionGuid:String ):void {
 		PlayerIO.quickConnect.simpleConnect( Globals.g_app.stage
-										   , Globals.g_gamesNetworkID
+										   , Globals.GAME_ID
 										   , "bob@me.com"
 										   , "bob"
 										   , connectSuccess
@@ -55,7 +55,7 @@ public class Network
 		// Need to run some timing tests on this to assess performance hit
 		//PlayerIO.useSecureApiRequests = true;
 		PlayerIO.quickConnect.simpleConnect( Globals.g_app.stage
-										   , Globals.g_gamesNetworkID
+										   , Globals.GAME_ID
 										   , $email
 										   , $password
 										   , connectSuccess
@@ -83,7 +83,7 @@ public class Network
 	}
 	
 	static public function recoverPassword( $email:String ):void {
-		PlayerIO.quickConnect.simpleRecoverPassword( Globals.g_gamesNetworkID
+		PlayerIO.quickConnect.simpleRecoverPassword( Globals.GAME_ID
 													, $email
 													, recoverySuccess
 													, recoveryFailure );

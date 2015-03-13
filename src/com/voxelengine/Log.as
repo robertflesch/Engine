@@ -78,11 +78,11 @@ package com.voxelengine
 					//L.info( $msg );
 					break;
 				case WARN:
-					//trace( String(ERROR) + ":" + $msg );	// I hate the warning color
+					trace( String(WARN) + ":" + $msg );	// I hate the warning color
 					L.warn( $msg );
 					break;
 				case ERROR:
-					//trace( String(FATAL) + ":" + $msg );	
+					trace( String(ERROR) + ":" + $msg );	
 					L.error( $msg );
 					writeErrorToServer( "Error", $msg, $error );
 					break;
@@ -94,7 +94,7 @@ package com.voxelengine
 			}
 			
 			
-			if ( ERROR <= $type )
+			if ( ERROR < $type )
 				show();
 		}
 	}

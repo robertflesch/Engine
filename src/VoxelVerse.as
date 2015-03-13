@@ -15,6 +15,10 @@ package {
 	import flash.events.MouseEvent;
 	import flash.events.ErrorEvent;	
 	import flash.events.UncaughtErrorEvent;	
+	import flash.system.LoaderContext;
+	import flash.system.Security;
+	import flash.system.SecurityDomain;
+	import flash.system.ApplicationDomain;	
 	import flash.ui.Keyboard;
 	import flash.utils.getTimer;
 	
@@ -91,6 +95,10 @@ package {
 			stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, mouseDownRight);
 			stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, mouseUpRight);
 			
+			Security.loadPolicyFile( "http://cdn.playerio.com/crossdomain.xml" );
+//			var ctxt:LoaderContext = new LoaderContext( true );
+//			ctxt.securityDomain = SecurityDomain.currentDomain;
+			Security.allowDomain( "*" );
 			VoxelVerseGUI.currentInstance.buildGUI();	
 			Log.out( "VoxelVerse.readyToGo", Log.DEBUG );
 		}
