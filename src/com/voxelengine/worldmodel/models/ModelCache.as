@@ -181,24 +181,20 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 
-		public function getJSON( outString:String ):String {
-			var count:int = 0;
-			//for each ( var vm:VoxelModel in _modelInstances )
-			//	count++;
+		public function getJSON():String {
 			var instanceData:Vector.<String> = new Vector.<String>;
-				
-			var model:VoxelModel;
-			for each ( model in _models )
-			{
+			for each ( var model:VoxelModel in _models ) {
 				if ( model is Player )
 					continue;
 				Log.out( "ModelCache.getJSON - instance: " + model.getJSON() );
 				instanceData.push( model.getJSON() );	
 			}
 			
+			var outString:String = "";
 			var len:int = instanceData.length;
 			for ( var index:int; index < len; index++ ) {
 				outString += instanceData[index];
+				// if this is NOT the last element in the array, add a comma to it.
 				if ( index == len - 1 )
 					continue;
 				outString += ",";
