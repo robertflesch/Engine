@@ -50,17 +50,6 @@ package com.voxelengine.worldmodel
 	   //]
 	//}	
 	
-	//name: friendly name
-	//world: guid
-	//region: 000000-000000-000000
-	//template: guid
-	//owner: user Id1
-	//editors: { user Id1:role, user id2:role... }
-	//admin: { user Id1:role, user id2:role... }
-	//created: date
-	//modified: date
-	//data: encoded jsonString
-	//
 	/**
 	 * ...
 	 * @author Bob
@@ -72,13 +61,8 @@ package com.voxelengine.worldmodel
 		
 		static public var _s_currentRegion:Region;
 		static public function get currentRegion():Region { return _s_currentRegion; }
-		//public function set currentRegion(val:Region):void { 
-			//_s_currentRegion = val; 
-			//Log.out("Region.currentRegion - set to: " + val.guid, Log.DEBUG ) 
-		//}
-		
-		private var _name:String = "";
-		private var _desc:String = "";
+		private var _name:String;
+		private var _desc:String;
 		private var _worldId:String = "VoxelVerse";
 		private var _guid:String = DEFAULT_REGION_ID;
 		private var _owner:String;
@@ -87,23 +71,20 @@ package com.voxelengine.worldmodel
 		private var _created:Date;
 		private var _modified:Date;
 		private var _JSON:Object;
-		private var _dbo:DatabaseObject  = null;							
+		private var _dbo:DatabaseObject;							
 		private var _changed:Boolean;								// INSTANCE NOT EXPORTED
 		private var _playerPosition:Vector3D = new Vector3D();
 		private var _playerRotation:Vector3D = new Vector3D();
-		private var _loaded:Boolean = false;							// INSTANCE NOT EXPORTED
+		private var _loaded:Boolean;							// INSTANCE NOT EXPORTED
 		private var _guestAllow:Boolean = true;
-		//private var _modelManager:ModelManager = new ModelManager();
 		private var _skyColor:Vector3D = new Vector3D(92, 	172, 	238);
 		private var _gravity:Boolean = true;
 		private var _lockDB:Boolean = false; // This keeps a second save or create from happening until first one clears.
-		
+		private var _criticalModelDetected:Boolean = false;
 		private var _modelCache:ModelCache;
 
 		public function get dbo():DatabaseObject { return _dbo; }
 		public function set dbo(val:DatabaseObject):void { _dbo = val; }
-		
-		
 		public function get worldId():String { return _worldId; }
 		public function set worldId(val:String):void { _worldId = val; }
 		public function get owner():String { return _owner; }
@@ -114,16 +95,13 @@ package com.voxelengine.worldmodel
 		public function set name(val:String):void { _name = val; }
 		public function get guid():String { return _guid; }
 		public function set guid(val:String):void { _guid = val; }
-//		public function get regionJson():String { return _regionJson; }
 		public function get gravity():Boolean { return _gravity; }
 		public function set gravity(val:Boolean):void { _gravity = val; }
 		public function get changed():Boolean { return _changed; }
 		public function set changed(val:Boolean):void { _changed = val; }
 		public function set changedForce(val:Boolean):void { _changed = val; }
 		
-		private var _criticalModelDetected:Boolean = false;
 		public function get criticalModelDetected():Boolean { return  _criticalModelDetected; } 
-		
 		public function get playerPosition():Vector3D { return _playerPosition; }
 		public function get playerRotation():Vector3D {return _playerRotation; }
 		public function get admin():Vector.<String>  { return _admin; }
@@ -134,14 +112,10 @@ package com.voxelengine.worldmodel
 		public function set created(value:Date):void  { _created = value; }
 		public function get modified():Date  { return _modified; }
 		public function set modified(value:Date):void  { _modified = value; }
-		//public function get modelManager():ModelManager  { return _modelManager; }
 		public function get loaded():Boolean { return _loaded; }
-		
 		public function get modelCache():ModelCache  { return _modelCache; }
-		
 		public function getSkyColor():Vector3D { return _skyColor; }
 		public function setSkyColor( r:int, g:int, b:int ):void { _skyColor.setTo( r, g, b ); }
-		
 		private function editorsListGet():String { return _editors.toString(); }
 		private function adminListGet():String { return _admin.toString(); }
 
@@ -170,7 +144,6 @@ package com.voxelengine.worldmodel
 		
 		public function update( $elapsed:int ):void {
 			_modelCache.update( $elapsed );
-			//_modelManager.update( $elapsed );
 		}
 			
 		private function load( $re:RegionEvent ):void {
@@ -232,11 +205,7 @@ package com.voxelengine.worldmodel
 		private function unload( $re:RegionEvent ):void {
 			Log.out( "Region.unload: " + guid, Log.DEBUG );
 			removeEventListeners();
-			
 			_modelCache.unload();
-			
-//			_modelManager.removeAllModelInstances( false ); // dont delete player object.
-//			_modelManager.bringOutYourDead();
 		}
 		
 		private function removeEventListeners():void {
@@ -313,23 +282,6 @@ package com.voxelengine.worldmodel
 			return outString;
 		}
 		
-		public function getJSON():String {
-			var outString:String = "{\"region\":[";
-			//outString = _modelManager.getJSON(outString);
-			outString = _modelCache.getJSON(outString);
-			outString += "],"
-			// if you dont do it this way, there is a null at begining of string
-			outString += "\"skyColor\":" + JSON.stringify( _skyColor );
-			outString += ","
-			outString += "\"playerPosition\":" + JSON.stringify( _playerPosition );
-			outString += ","
-			outString += "\"playerRotation\":" + JSON.stringify( _playerRotation );
-			outString += ","
-			outString += "\"gravity\":" + JSON.stringify(gravity);
-			outString += "}"
-			return outString;
-		}
-
 		static public function resetPosition():void {
 			if ( Globals.controlledModel )
 			{
@@ -372,8 +324,9 @@ package com.voxelengine.worldmodel
 			}
 			
 			// Models might have changes not seen in the region file
-			//_modelManager.save();
-			_modelCache.save();
+			if ( _modelCache )
+				_modelCache.save();
+			
 			
 			// The null owner check makes it to we dont save local loaded regions to persistance
 			if ( Globals.online && changed && null != owner && false == _lockDB ) {
@@ -386,6 +339,8 @@ package com.voxelengine.worldmodel
 					var ba:ByteArray = new ByteArray();	
 					ba = asByteArray( ba );
 				}
+//Log.out( "Region.save - NOT SAVING NOT SAVING NOT SAVING", Log.WARN );
+//return;	
 				//Log.out( "Region.save - PersistanceEvent.dispatch region id: " + guid + "  name: " + name + "  locking status: " + _lockDB, Log.WARN );
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_REGIONS, guid, _dbo, metadata(ba) ) );
 				// or could do this in the suceed, but if it fails do I want to keep retrying?
@@ -448,14 +403,32 @@ package com.voxelengine.worldmodel
 			_dbo.data 			= asByteArray( ba );
 		}
 		
+		public function getJSON():String {
+			var outString:String = "{\"region\":";
+			if ( _modelCache ) {
+				outString += "[";
+				outString += _modelCache.getJSON();
+				outString += "],"
+			}
+			else {
+				// If the region has not been loaded yet, just copy the props over.
+				outString += JSON.stringify( _JSON.region );
+				outString += ","
+			}
+			// if you dont do it this way, there is a null at begining of string
+			outString += "\"skyColor\":" + JSON.stringify( _skyColor );
+			outString += ","
+			outString += "\"playerPosition\":" + JSON.stringify( _playerPosition );
+			outString += ","
+			outString += "\"playerRotation\":" + JSON.stringify( _playerRotation );
+			outString += ","
+			outString += "\"gravity\":" + JSON.stringify(gravity);
+			outString += "}"
+			return outString;
+		}
+
+
 		public function asByteArray( $ba:ByteArray ):ByteArray {
-			// Lets see if this updates the _JSON object.
-			_JSON.playerPosition = _playerPosition;
-			_JSON.playerRotation = _playerRotation;
-			_JSON.skyColor = _skyColor;
-			_JSON.gravity = _gravity;
-			
-			//var regionJson:String = JSON.stringify(_JSON);
 			var regionJson:String = getJSON();
 			$ba.writeInt( regionJson.length );
 			$ba.writeUTFBytes( regionJson );
