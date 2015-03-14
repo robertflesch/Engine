@@ -29,11 +29,11 @@ package com.furusystems.dconsole2.logging {
 		
 		/* INTERFACE com.furusystems.logging.slf4as.bindings.ILogBinding */
 		
-		public function print(owner:Object, level:String, str:String):void {
+		public function print(owner:Object, level:int, str:String):void {
 			if (String(owner) == "Logging")
 				owner = DConsole.TAG;
 			var l:String = ConsoleMessageTypes.DEBUG;
-			switch (LevelInfo.getID(level)) {
+			switch (LevelInfo.getID(String(level))) {
 				case Levels.ERROR:
 					l = ConsoleMessageTypes.ERROR;
 					break;

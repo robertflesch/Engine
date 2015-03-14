@@ -49,7 +49,7 @@ package com.furusystems.logging.slf4as {
 			_nativeTrace = value;
 		}
 		
-		static public function print(owner:Object, level:String, str:String):void {
+		static public function print(owner:Object, level:int, str:String):void {
 			if (_logBinding) {
 				if (_blankWhiteList) {
 					_logBinding.print(owner, level, str);

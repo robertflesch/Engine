@@ -56,9 +56,9 @@ package com.furusystems.logging.slf4as.loggers {
 			if (Logging.getLevel() > level || !_enabled)
 				return;
 			var time:Number = getTimer();
-			var levelStr:String = LevelInfo.getName(level);
+			//var levelStr:String = LevelInfo.getName(level);
 			var out:String = PatternResolver.resolve(getPatternType(), args);
-			Logging.print(getTag(), levelStr, out);
+			Logging.print(getTag(), level, out);
 		}
 		
 		private function getTag():String {

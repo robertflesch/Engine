@@ -70,19 +70,19 @@ package com.voxelengine
 			switch ( $type )
 			{ 
 				case DEBUG:
-					trace( String(DEBUG) + ":" + $msg );	
-					//L.debug( $msg );
+					//trace( String(DEBUG) + ":" + $msg );	
+					L.debug( $msg );
 					break;
 				case INFO:
-					trace( String(INFO) + ":" + $msg );	
-					//L.info( $msg );
+					//trace( String(INFO) + ":" + $msg );	
+					L.info( $msg );
 					break;
 				case WARN:
-					trace( String(WARN) + ":" + $msg );	// I hate the warning color
+					//trace( String(WARN) + ":" + $msg );	// I hate the warning color
 					L.warn( $msg );
 					break;
 				case ERROR:
-					trace( String(ERROR) + ":" + $msg );	
+					//trace( String(ERROR) + ":" + $msg );	
 					L.error( $msg );
 					writeErrorToServer( "Error", $msg, $error );
 					break;
