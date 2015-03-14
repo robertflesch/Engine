@@ -34,6 +34,14 @@ package com.voxelengine.GUI.actionBars
 	import com.voxelengine.worldmodel.weapons.Ammo;
 	import com.voxelengine.worldmodel.weapons.Gun;
 
+	// -----------------------------------------------------------
+	//  WindowBeastControl.as
+	// -----------------------------------------------------------
+
+	/**
+	 *  @author Robert Flesch
+	 */
+	
 	public class WindowBeastControl extends ToolBar
 	{
 		static private var _s_currentInstance:WindowBeastControl = null;
@@ -59,7 +67,7 @@ package com.voxelengine.GUI.actionBars
 			}
 		}
 
-		public function WindowBeastControl( $beastInstanceGuid:String ):void 
+		public function WindowBeastControl( $beastInstanceGuid:String ) 
 		{ 
 			_s_currentInstance = this;
 			_beastInstanceGuid = $beastInstanceGuid;
@@ -71,7 +79,8 @@ package com.voxelengine.GUI.actionBars
 		
 			if ( WindowBeastControlQuery.currentInstance )
 				WindowBeastControlQuery.currentInstance.remove();
-				
+			
+			// TODO An event is dispatched in a constructor. This is pointless, since event listeners cannot be attached to an object before it has been constructed, so nothing can ever hear the event	
 			Globals.g_app.dispatchEvent(new GUIEvent(GUIEvent.TOOLBAR_HIDE));
 			
 			//visible = false;

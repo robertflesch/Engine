@@ -31,8 +31,6 @@ public class GrainSelector extends QuickInventory
 	public static function get currentItemSelection():int { return s_currentItemSelection }
 	public static function set currentItemSelection(val:int):void { s_currentItemSelection = val; }
 	
-	private static var _lastGrainSelection:int = -1;
-	
 	public function GrainSelector() {
 		// These numbers come from the size of the artwork, and from the size of the toolbar below it.
 		super( 244, 42, 32, "grainSelector.png", 84 );
