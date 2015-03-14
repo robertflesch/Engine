@@ -264,21 +264,12 @@ package com.voxelengine {
 		}
 		
 //////////////////////////////////////////////////////////////////////////////////		
-		public static function modelGet( $guid:String ):VoxelModel {
-			throw new Error( "Globals.modelGet - not implemented" );
-			return null;
-//			return Region.currentRegion.modelCache.modelGet( $guid );
-		};
+		//public static function modelGet( $guid:String ):VoxelModel {
+			//throw new Error( "Globals.modelGet - not implemented" );
+			//return null;
+////			return Region.currentRegion.modelCache.modelGet( $guid );
+		//};
 		
-		public static function dispose():void {
-			g_textureBank.dispose();
-			Region.currentRegion.modelCache.dispose();
-		};
-		
-		public static function reinitialize( $context:Context3D ):void {
-			if ( Region.currentRegion )
-				Region.currentRegion.modelCache.reinitialize( $context );
-		}
 		
 		public static function createPlayer():Boolean {
 			if ( null == Region.currentRegion ) {
@@ -287,11 +278,6 @@ package com.voxelengine {
 			}
 			else 	
 				return Region.currentRegion.modelCache.createPlayer();
-		}
-		
-		public static function changeFromParentToChild( $vm:VoxelModel ):void {
-			throw new Error( "Globals.changeFromParentToChild - not implemented" );
-			//Region.currentRegion.modelCache.changeFromParentToChild( $vm )
 		}
 	}
 }

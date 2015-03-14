@@ -7,6 +7,7 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.LoadingImageEvent;
 import flash.utils.getTimer;
 
 import com.voxelengine.Log;
@@ -35,6 +36,8 @@ public class ModelMaker extends ModelMakerBase {
 	public function ModelMaker( $ii:InstanceInfo ) {
 		_time = getTimer();
 		super( $ii );
+		if ( 0 == _makerCount )
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 		_makerCount++;
 		Log.out( "ModelMaker - makerCount: " + _makerCount );
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retriveMetadata );		
@@ -75,6 +78,7 @@ public class ModelMaker extends ModelMakerBase {
 		_makerCount--;
 		if ( 0 == _makerCount ) {
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
 			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );
 		}
 		Log.out( "ModelMaker.markComplete - makerCount: " + _makerCount + " time: " + (getTimer()-_time) );

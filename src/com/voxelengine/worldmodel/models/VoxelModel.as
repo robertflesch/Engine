@@ -805,7 +805,7 @@ package com.voxelengine.worldmodel.models
 			changed = true;
 			//Log.out(  "-------------- VoxelModel.childAdd - VM: " + vm.toString() );
 			// remove parent level model
-			Globals.changeFromParentToChild(vm);
+			Region.currentRegion.modelCache.changeFromParentToChild(vm);
 			_children.push(vm);
 			//vm.instanceInfo.baseLightLevel = instanceInfo.baseLightLevel;
 			modelInfo.childAdd(vm.instanceInfo);
@@ -1218,47 +1218,51 @@ package com.voxelengine.worldmodel.models
 			return instanceInfo.modelToWorld(v);
 		}
 		
-		public function lineIntersect(worldSpaceStartPoint:Vector3D, worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>):void
+		public function lineIntersect( $worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>):void
 		{
-			var modelSpaceStartPoint:Vector3D = worldToModel(worldSpaceStartPoint);
-			var modelSpaceEndPoint:Vector3D = worldToModel(worldSpaceEndPoint);
+			var modelSpaceStartPoint:Vector3D = worldToModel( $worldSpaceStartPoint );
+			var modelSpaceEndPoint:Vector3D   = worldToModel( $worldSpaceEndPoint );
 			
 			// if I was inside of a large oxel, the ray would not intersect any of the planes.
 			// So this does a check quick check to see if worldSpaceStart point is inside of the model
 			var gct:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
-			if ( isInside( modelSpaceStartPoint.x, modelSpaceStartPoint.y, modelSpaceStartPoint.z, gct ) )
+			//if ( isInside( modelSpaceStartPoint.x, modelSpaceStartPoint.y, modelSpaceStartPoint.z, gct ) )
+			//{
+				//oxel.lineIntersect
+				///*
+				//var newGci:GrainCursorIntersection = new GrainCursorIntersection();
+				//newGci.point = modelSpaceStartPoint;
+				//newGci.wsPoint = $worldSpaceStartPoint;
+				//newGci.oxel = oxel; // This is the root oxel of the model
+				//newGci.model = this;
+				//newGci.gc.copyFrom( gct );
+				////public var axis:int;
+				////public var near:Boolean = true;
+				//*/
+				//
+				//worldSpaceIntersections.push( newGci );
+			//}
+			//else
 			{
-				var newGci:GrainCursorIntersection = new GrainCursorIntersection();
-				newGci.point = modelSpaceStartPoint;
-				newGci.oxel = oxel; // This is the root oxel of the model
-				newGci.model = this;
-				newGci.gc.copyFrom( gct );
-				//public var axis:int;
-				//public var near:Boolean = true;
-				
-				worldSpaceIntersections.push( newGci );
-			}
-			else
-			{
+				// this is returning model space intersections
 				oxel.lineIntersect(modelSpaceStartPoint, modelSpaceEndPoint, worldSpaceIntersections);
 			
-				for each (var gci:GrainCursorIntersection in worldSpaceIntersections)
-				{
-					gci.point = modelToWorld(gci.point);
+				for each (var gci:GrainCursorIntersection in worldSpaceIntersections) {
+					gci.wsPoint = modelToWorld(gci.point);
 					gci.model = this;
 				}
 			}
 			GrainCursorPool.poolDispose( gct );
 		}
 		
-		public function lineIntersectWithChildren($wsStartPoint:Vector3D, $wsEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>, minSize:int):void
+		public function lineIntersectWithChildren($worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>, minSize:int):void
 		{
-			var msStartPoint:Vector3D = worldToModel($wsStartPoint);
-			var msEndPoint:Vector3D = worldToModel($wsEndPoint);
+			var msStartPoint:Vector3D = worldToModel( $worldSpaceStartPoint );
+			var msEndPoint:Vector3D   = worldToModel( $worldSpaceEndPoint );
 			oxel.lineIntersectWithChildren( msStartPoint, msEndPoint, worldSpaceIntersections, minSize );
 			// lineIntersect returns modelSpaceIntersections, convert to world space.
 			for each (var gci:GrainCursorIntersection in worldSpaceIntersections)
-				gci.point = modelToWorld(gci.point);
+				gci.wsPoint = modelToWorld(gci.point);
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -7,6 +7,7 @@ import com.voxelengine.worldmodel.models.VoxelModel;
 public class GrainCursorIntersection
 {
 	public var point:Vector3D = new Vector3D();
+	public var wsPoint:Vector3D = new Vector3D();
 	public var oxel:Oxel = null;
 	public var model:VoxelModel = null;
 	public var gc:GrainCursor = new GrainCursor();
@@ -16,11 +17,11 @@ public class GrainCursorIntersection
 	public final function toString():String
 	{
 		if ( gc && model )
-			return " GCI Info: point: " + point + " gc: " + gc + " model: " + model.instanceInfo.guid; 
+			return " GCI Info: point: " + point + "   wsPoint: " + wsPoint + " gc: " + gc + " model: " + model.instanceInfo.guid; 
 		if ( gc )
-			return " GCI Info: point: " + point + " gc: " + gc; 
+			return " GCI Info: point: " + point + "   wsPoint: " + wsPoint + " gc: " + gc; 
 		else			
-			return " GCI Info: point: " + point; 
+			return " GCI Info: point: " + point + "   wsPoint: " + wsPoint;
 	}
 }
 }

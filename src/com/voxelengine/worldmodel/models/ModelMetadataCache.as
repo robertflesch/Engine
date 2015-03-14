@@ -109,7 +109,7 @@ public class ModelMetadataCache
 		}
 		// check to make sure is not already there
 		if ( null ==  _metadata[$vmm.guid] ) {
-			Log.out( "ModelMetadataCache.add vmm: " + $vmm.toString(), Log.WARN );
+			//Log.out( "ModelMetadataCache.add vmm: " + $vmm.toString(), Log.WARN );
 			_metadata[$vmm.guid] = $vmm; 
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, ($pe ? $pe.series : 0), $vmm.guid, $vmm ) );
 		}

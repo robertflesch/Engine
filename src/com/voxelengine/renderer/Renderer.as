@@ -145,6 +145,17 @@ package com.voxelengine.renderer
 			_context.clear( r/255, g/255, b/ 255, 0);
 		}
 		
+		
+		private static function dispose():void {
+			Globals.g_textureBank.dispose();
+			Region.currentRegion.modelCache.dispose();
+		};
+		
+		private static function reinitialize( $context:Context3D ):void {
+			if ( Region.currentRegion )
+				Region.currentRegion.modelCache.reinitialize( $context );
+		}
+		
 		// This handles the event created in the init function
 		public function onContextCreated(e:Event):void {
 			Log.out( "Renderer.onContextCreated - " + e.type, Log.DEBUG );
@@ -152,7 +163,7 @@ package com.voxelengine.renderer
 			// If new context and its not null, dispose of what we have
 			if ( null != _context ) {
 				Log.out("Renderer.onContextCreated - dispose" );
-				Globals.dispose();
+				dispose();
 				_context.dispose();
 				_context = null;
 			}
@@ -165,7 +176,7 @@ package com.voxelengine.renderer
 					_context.enableErrorChecking = true;
 				else	
 					_context.enableErrorChecking = false;
-				Globals.reinitialize( _context );
+				reinitialize( _context );
 			}
 
 			if ( _context )

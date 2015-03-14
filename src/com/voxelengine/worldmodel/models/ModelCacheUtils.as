@@ -85,8 +85,9 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		static private function sortIntersectionsGeneral( pointModel1:Object, pointModel2:Object ):Number	{
-			var point1Rel:Number = _worldSpaceStartPoint.subtract( pointModel1.point ).length;
-			var point2Rel:Number = _worldSpaceStartPoint.subtract( pointModel2.point ).length;
+			// CHECK WORLD SPACE DATA HERE in pointModels
+			var point1Rel:Number = _worldSpaceStartPoint.subtract( pointModel1.wsPoint ).length;
+			var point2Rel:Number = _worldSpaceStartPoint.subtract( pointModel2.wsPoint ).length;
 			if ( point1Rel < point2Rel )
 				return -1;
 			else if ( point1Rel > point2Rel ) 
@@ -96,8 +97,8 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		static private function sortIntersections( pointModel1:GrainCursorIntersection, pointModel2:GrainCursorIntersection ):Number {
-			var point1Rel:Number = _worldSpaceStartPoint.subtract( pointModel1.point ).length;
-			var point2Rel:Number = _worldSpaceStartPoint.subtract( pointModel2.point ).length;
+			var point1Rel:Number = _worldSpaceStartPoint.subtract( pointModel1.wsPoint ).length;
+			var point2Rel:Number = _worldSpaceStartPoint.subtract( pointModel2.wsPoint ).length;
 			if ( point1Rel < point2Rel )
 				return -1;
 			else if ( point1Rel > point2Rel ) 
@@ -141,7 +142,7 @@ package com.voxelengine.worldmodel.models
 					/////////////////////////////////////////
 					if ( _gci )
 					{
-						_gci.point = editableModel.worldToModel( _gci.point );
+						//_gci.point = editableModel.worldToModel( _gci.point );
 						editableModel.editCursor.setGCIData( _gci );
 					}
 					else	
@@ -186,7 +187,9 @@ package com.voxelengine.worldmodel.models
 
 		static private	function findEditableModel():VoxelModel {
 			var foundModel:VoxelModel = null;
-			var intersections:Vector.<GrainCursorIntersection> = findRayIntersections();
+			var intersections:Vector.<GrainCursorIntersection> = findRayIntersections( Region.currentRegion.modelCache.models, true );
+			intersections.sort( sortIntersections );
+			// get first (closest) interesction
 			var intersection:GrainCursorIntersection = intersections.shift();
 			if ( intersection && intersection.point.length )
 			{
@@ -244,18 +247,18 @@ package com.voxelengine.worldmodel.models
 		
 		static private	function worldSpaceIntersectionsClear():void { _worldSpaceIntersections.splice(0, _worldSpaceIntersections.length ); }
 		static private	function totalIntersectionsClear():void { _totalIntersections.splice(0, _totalIntersections.length ); }
-		
+
 		// TODO RSF - If the closest model has a hole in it, that the ray should pass thru
 		// it still stops and identifies that as the closest model.
-		static public function findRayIntersections():Vector.<GrainCursorIntersection> {
+		static public function findRayIntersections( $candidateModels:Vector.<VoxelModel>, $checkChildModels:Boolean = false ):Vector.<GrainCursorIntersection> {
 			// We should only use the models in the view frustrum - TODO - RSF
-			var cm:VoxelModel = Globals.controlledModel;
-			var models:Vector.<VoxelModel> = Region.currentRegion.modelCache.models;
-			for each ( var vm:VoxelModel in models )
+			var controlledModel:VoxelModel = Globals.controlledModel;
+			for each ( var vm:VoxelModel in $candidateModels )
 			{
-				if ( vm == cm )
+				if ( vm == controlledModel )
 					continue;
 					
+				worldSpaceIntersectionsClear();
 				// finds up to two intersecting planes per model
 				if ( vm && vm.complete && vm.metadata.modify )
 				{
@@ -264,14 +267,16 @@ package com.voxelengine.worldmodel.models
 					for each ( var gcIntersection:GrainCursorIntersection in _worldSpaceIntersections )
 						_totalIntersections.push( gcIntersection );
 					
-					worldSpaceIntersectionsClear()
+					// did I intersect this model, and do I need to check its children?
+					// this will add any intersection with the child model to the totalIntersections list
+					if ( true == $checkChildModels && 0 < _worldSpaceIntersections.length && 0 < vm.children.length )
+						findRayIntersections( vm.childrenGet(), true );
 				}
 			}
 			
-			_totalIntersections.sort( sortIntersections );
 			return _totalIntersections;
 		}
-				
+
 		static public function sphereCollideWithModels( $testObject:VoxelModel ):Vector.<VoxelModel> {
 			var scenter:Vector3D = $testObject.modelToWorld( $testObject.instanceInfo.center );
 			var radius:int = $testObject.oxel.gc.size() / 8; //2

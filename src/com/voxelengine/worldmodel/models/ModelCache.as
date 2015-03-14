@@ -240,5 +240,19 @@ package com.voxelengine.worldmodel.models
 					i++
 			}
 		}
+		
+		// Models removed this way are not dead, just no longer part of the parent model loop
+		public function changeFromParentToChild( $vm:VoxelModel ):void {
+
+			var vm:VoxelModel
+			for ( var i:int; i < _models.length; i++ ) {
+				vm = _models[i];
+				if ( vm && $vm == vm )
+				{
+					_modelsDynamic.splice( i, 1 );
+					break;
+				}
+			}
+		}
 	}
 }

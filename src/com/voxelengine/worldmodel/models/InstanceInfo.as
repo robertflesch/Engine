@@ -480,5 +480,32 @@ public class InstanceInfo extends Location	{
 			Globals.controlledModel.instanceInfo.rotationSet = new Vector3D( 0,0,0 );
 		}
 	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// WorldToModel and ModelToWorld
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	override public function worldToModel( v:Vector3D ):Vector3D
+	{
+		if ( changed )
+			recalculateMatrix();
+		if ( _controllingModel )
+			return modelMatrix.transformVector( _controllingModel.worldToModel( v ) );
+		else
+			return modelMatrix.transformVector( v );
+	}
+	
+	override public function modelToWorld( v:Vector3D ):Vector3D
+	{
+		if ( changed )
+			recalculateMatrix();
+		if ( _controllingModel ) {
+			var parentMS:Vector3D = _controllingModel.modelToWorld( v );
+			var wsLoc:Vector3D = worldSpaceMatrix.transformVector( parentMS );
+			
+			return wsLoc;
+		}
+		else
+			return worldSpaceMatrix.transformVector( v );
+	}
 }
 }
