@@ -7,7 +7,7 @@
 ==============================================================================*/
 
 package com.voxelengine {
-	import com.voxelengine.worldmodel.Region;
+	import flash.display.StageDisplayState;
 	import flash.display3D.Context3D;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
@@ -17,6 +17,7 @@ package com.voxelengine {
 	
 	import com.developmentarc.core.tasks.TaskController;
 	
+	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.crafting.CraftingManager;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import com.voxelengine.worldmodel.RegionManager;
@@ -244,8 +245,6 @@ package com.voxelengine {
 		public static function get autoFlow():Boolean { return g_autoFlow }
 		public static function set autoFlow(val:Boolean):void { g_autoFlow = val; }
 
-		
-		import flash.display.StageDisplayState;
 		private static var _openWindowCount:int = 0;
 		static public function get openWindowCount():int { return _openWindowCount; }
 		static public function set openWindowCount(value:int):void  
@@ -264,20 +263,10 @@ package com.voxelengine {
 		}
 		
 //////////////////////////////////////////////////////////////////////////////////		
-		//public static function modelGet( $guid:String ):VoxelModel {
-			//throw new Error( "Globals.modelGet - not implemented" );
-			//return null;
-////			return Region.currentRegion.modelCache.modelGet( $guid );
-		//};
-		
-		
-		public static function createPlayer():Boolean {
-			if ( null == Region.currentRegion ) {
-				Log.out( "Globals.createPlayer - current region null", Log.WARN );
-				return false;
-			}
-			else 	
-				return Region.currentRegion.modelCache.createPlayer();
-		}
+		public static function modelGet( $guid:String ):VoxelModel {
+			throw new Error( "Globals.modelGet - not implemented" );
+			return null;
+//			return Region.currentRegion.modelCache.modelGet( $guid );
+		};
 	}
 }

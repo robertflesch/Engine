@@ -41,6 +41,7 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class ModelManager 
 	{
+		/*
 		static public const FRONT:int = 0;
 		static public const BACK:int = 1;
 		static public const LEFT:int = 2;
@@ -332,7 +333,7 @@ package com.voxelengine.worldmodel.models
 				_modelDynamicInstances = clearDictionaryOfNullsAndDead( _modelDynamicInstances );
 			}
 		}
-			
+			*/
 		/*
 		private function clearInstanceInfoOfNullsAndDead( oldDic:Dictionary ):Dictionary {
 			var tempDic:Dictionary = new Dictionary(true);
@@ -355,7 +356,7 @@ package com.voxelengine.worldmodel.models
 			return tempDic;
 		}
 		*/
-		
+		/*
 		private function countDict( oldDic:Dictionary ):int {
 			var count:int = 0;
 			for each ( var instance:InstanceInfo in oldDic )
@@ -651,6 +652,7 @@ package com.voxelengine.worldmodel.models
 		
 		private var _cameraMatrix:Matrix3D = new Matrix3D();
 		public	function worldSpaceStartAndEndPointCalculate( $direction:int = FRONT, $editRange:int = EDIT_RANGE ):void {
+		*/
 /*
 			var cm:VoxelModel = Globals.controlledModel;
 			var wsPositionCamera:Vector3D = cm.instanceInfo.worldSpaceMatrix.transformVector( cm.camera.current.position );
@@ -688,7 +690,7 @@ package com.voxelengine.worldmodel.models
 			msCamPos = msCamPos.add( viewDistance );
 			_worldSpaceEndPoint = _cameraMatrix.transformVector( msCamPos );
 			*/
-			
+/*			
 			//////////////////////////////////////
 			// This works for camera at 0,0,0
 			//////////////////////////////////////
@@ -722,7 +724,7 @@ package com.voxelengine.worldmodel.models
 				msCamPos = msCamPos.add( viewDistance );
 				_worldSpaceEndPoint = _cameraMatrix.transformVector( msCamPos );
 			}
-			
+	*/		
 /*
 			var cm:VoxelModel = Globals.controlledModel;
 			_worldSpaceStartPoint = cm.instanceInfo.worldSpaceMatrix.transformVector( cm.camera.current.position );
@@ -739,7 +741,7 @@ package com.voxelengine.worldmodel.models
 			viewDistance.scaleBy( $editRange );
 			viewDistance = viewDistance.add( cm.camera.current.position );
 			_worldSpaceEndPoint = cm.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-*/			
+*/			/*
 		}
 		
 		private	function worldSpaceIntersectionsClear():void { _worldSpaceIntersections.splice(0, _worldSpaceIntersections.length ); }
@@ -996,6 +998,6 @@ package com.voxelengine.worldmodel.models
 				vm.flow( 6, 9 );	
 			}
 			
-		}
+		}*/
 	}
 }

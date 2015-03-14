@@ -204,7 +204,7 @@ package com.voxelengine.worldmodel.models
 		
 		public function reinitialize( $context:Context3D ):void 	{
 			
-			//Log.out("ModelManager.reinitialize" );
+			//Log.out("ModelCache.reinitialize" );
 			Globals.g_textureBank.reinitialize( $context );
 			
 			var vm:VoxelModel

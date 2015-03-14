@@ -26,7 +26,6 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.worldmodel.models.ModelLoader;
-	//import com.voxelengine.worldmodel.models.ModelManager;
 	import com.voxelengine.worldmodel.models.Player;
 	
 	//{
@@ -174,11 +173,12 @@ package com.voxelengine.worldmodel
 				Globals.g_landscapeTaskController.activeTaskLimit = 1;
 			}
 				
+			// for local use only
 			if ( !Globals.online && !Globals.player )
-				Globals.createPlayer();
+				Region.currentRegion.modelCache.createPlayer();
 				
 			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name, Log.DEBUG );
-		}		
+		}	
 
 		private function addEventListeners():void {
 			RegionEvent.addListener( ModelBaseEvent.CHANGED, 				regionChanged );	

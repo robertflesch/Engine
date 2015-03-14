@@ -67,7 +67,7 @@ public class PersistURL
 		try {
 			urlLoader.load(new URLRequest( _filePath ));
         } catch (error:Error) {
-            Log.out("Unable to load requested document." + error.getStackTrace(), Log.WARN );
+            Log.out("PersistURL.load - Unable to load requested document." + error.getStackTrace(), Log.WARN );
         }		
 		
 
@@ -91,26 +91,26 @@ public class PersistURL
 		}	
 		
 		function configureListeners(dispatcher:URLLoader):void {
-			dispatcher.addEventListener(Event.OPEN, openHandler);
-			dispatcher.addEventListener(ProgressEvent.PROGRESS, progressHandler);
+			//dispatcher.addEventListener(Event.OPEN, openHandler);
+			//dispatcher.addEventListener(ProgressEvent.PROGRESS, progressHandler);
 			dispatcher.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
 			dispatcher.addEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatusHandler);
 		}
 
 		function openHandler(event:Event):void {
-			Log.out("openHandler guid: " + $pe.guid + $pe.table + " event: " + event, Log.DEBUG);
+			Log.out("PersistURL.openHandler guid: " + $pe.guid + $pe.table + " event: " + event, Log.DEBUG);
 		}
 
 		function progressHandler(event:ProgressEvent):void {
-			Log.out("progressHandler guid: " + $pe.guid + $pe.table + "  loaded:" + event.bytesLoaded + " total: " + event.bytesTotal, Log.DEBUG );
+			Log.out("PersistURL.progressHandler guid: " + $pe.guid + $pe.table + "  loaded:" + event.bytesLoaded + " total: " + event.bytesTotal, Log.DEBUG );
 		}
 
 		function securityErrorHandler(event:SecurityErrorEvent):void {
-			Log.out("securityErrorHandler: guid: " + $pe.guid + $pe.table + "  event " + event, Log.WARN );
+			Log.out("PersistURL.securityErrorHandler: guid: " + $pe.guid + $pe.table + "  event " + event, Log.WARN );
 		}
 
 		function httpStatusHandler(event:HTTPStatusEvent):void {
-			Log.out("httpStatusHandler: " + event, Log.DEBUG );
+			Log.out( "PersistURL.httpStatusHandler: " + event, Log.DEBUG );
 		}
 	}
 }	

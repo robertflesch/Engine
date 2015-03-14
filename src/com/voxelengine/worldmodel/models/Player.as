@@ -159,7 +159,7 @@ public class Player extends Avatar
 	}
 	
 	static private function onPlayerLoadError(error:PlayerIOError):void {
-		Log.out("ModelManager.onPlayerLoadError", Log.ERROR, error );
+		Log.out("Player.onPlayerLoadError", Log.ERROR, error );
 	}			
 	
 	override public function release():void {
