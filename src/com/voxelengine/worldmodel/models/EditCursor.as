@@ -89,13 +89,13 @@ package com.voxelengine.worldmodel.models
 		
 		override public function get visible():Boolean
 		{
-			Globals.g_app.addEventListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
+			GUIEvent.addListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
 			return super.visible;
 		}
 		
 		override public function set visible( $val:Boolean ):void
 		{
-			Globals.g_app.removeEventListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
+			GUIEvent.removeListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
 			super.visible = $val;
 		}
 		

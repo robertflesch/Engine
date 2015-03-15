@@ -167,7 +167,7 @@ package {
 				stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 				stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 				
-				dispatchEvent( new GUIEvent( GUIEvent.APP_ACTIVATE ) );
+				GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_ACTIVATE ) );
 			}
 			//else
 				//Log.out( "VoxelVerse.activateApp - ignoring" );
@@ -198,7 +198,7 @@ package {
 					InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_SAVE_REQUEST, null, null ) );
 				}
 				
-				dispatchEvent( new GUIEvent( GUIEvent.APP_DEACTIVATE ) );
+				GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_DEACTIVATE ) );
 			}
 			//else
 			//	Log.out( "VoxelVerse.activateApp - ignoring", Log.WARN );

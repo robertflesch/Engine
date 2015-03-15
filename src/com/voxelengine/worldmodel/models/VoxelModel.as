@@ -1586,9 +1586,9 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 				
 //				if (CameraLocation.FIRST_PERSON == camera.index && this is Player)
 				if ( currentCamera.toolBarVisible )
-					Globals.g_app.dispatchEvent(new GUIEvent(GUIEvent.TOOLBAR_SHOW));
+					GUIEvent.dispatch( new GUIEvent(GUIEvent.TOOLBAR_SHOW));
 				else
-					Globals.g_app.dispatchEvent(new GUIEvent(GUIEvent.TOOLBAR_HIDE));
+					GUIEvent.dispatch( new GUIEvent(GUIEvent.TOOLBAR_HIDE));
 			}
 		}
 		

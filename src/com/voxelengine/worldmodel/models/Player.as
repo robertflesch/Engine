@@ -344,7 +344,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		if ( $modelLosingControl )
 			instanceInfo.rotationSet = $modelLosingControl.instanceInfo.rotationGet;
 
-		//Globals.g_app.dispatchEvent(new GUIEvent(GUIEvent.TOOLBAR_SHOW));
+		//GUIEvent.dispatch( new GUIEvent(GUIEvent.TOOLBAR_SHOW));
 	}
 
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {

@@ -55,8 +55,8 @@ public class WindowBeastControlQuery extends VVCanvas
 			
             Globals.g_app.stage.addEventListener(Event.RESIZE, onResize );
 			RegionEvent.addListener( RegionEvent.UNLOAD, onRegionUnload );
-			Globals.g_app.addEventListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
-			Globals.g_app.addEventListener( GUIEvent.TOOLBAR_SHOW, guiEventHandler );
+			GUIEvent.addListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
+			GUIEvent.addListener( GUIEvent.TOOLBAR_SHOW, guiEventHandler );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 				
 			display();
@@ -81,8 +81,8 @@ public class WindowBeastControlQuery extends VVCanvas
             Globals.g_app.stage.removeEventListener(Event.RESIZE, onResize );
 			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, takeControlKey );
 			RegionEvent.removeListener( RegionEvent.UNLOAD, onRegionUnload );
-			Globals.g_app.removeEventListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
-			Globals.g_app.removeEventListener( GUIEvent.TOOLBAR_SHOW, guiEventHandler );
+			GUIEvent.removeListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
+			GUIEvent.removeListener( GUIEvent.TOOLBAR_SHOW, guiEventHandler );
 			_s_currentInstance = null;
 		}
 

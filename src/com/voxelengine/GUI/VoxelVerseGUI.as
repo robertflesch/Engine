@@ -36,7 +36,6 @@ import org.flashapi.swing.UIManager;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 
-import com.voxelengine.events.GUIEvent;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.ModelEvent;

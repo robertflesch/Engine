@@ -81,7 +81,7 @@ package com.voxelengine.GUI.actionBars
 				WindowBeastControlQuery.currentInstance.remove();
 			
 			// TODO An event is dispatched in a constructor. This is pointless, since event listeners cannot be attached to an object before it has been constructed, so nothing can ever hear the event	
-			Globals.g_app.dispatchEvent(new GUIEvent(GUIEvent.TOOLBAR_HIDE));
+			GUIEvent.dispatch(new GUIEvent(GUIEvent.TOOLBAR_HIDE));
 			
 			//visible = false;
 			//_windowHeading.visible = false;

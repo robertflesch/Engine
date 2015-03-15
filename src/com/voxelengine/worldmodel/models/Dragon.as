@@ -7,7 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.worldmodel.models.CameraLocation;
 	import com.voxelengine.worldmodel.models.CollisionPoint;
 	import com.voxelengine.worldmodel.MouseKeyboardHandler;

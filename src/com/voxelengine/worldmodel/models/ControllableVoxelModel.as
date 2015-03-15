@@ -76,8 +76,8 @@ package com.voxelengine.worldmodel.models
 			super.init( $mi, $vmm );
 			Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent, false, 0, true );
 			ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
-			Globals.g_app.addEventListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
-			Globals.g_app.addEventListener( GUIEvent.APP_ACTIVATE, onActivate );
+			GUIEvent.addListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
+			GUIEvent.addListener( GUIEvent.APP_ACTIVATE, onActivate );
 			_ct = new CollisionTest( this );
 		}
 		
@@ -89,8 +89,8 @@ package com.voxelengine.worldmodel.models
 				
 			Globals.g_app.removeEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent );
 			ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
-			Globals.g_app.removeEventListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
-			Globals.g_app.removeEventListener( GUIEvent.APP_ACTIVATE, onActivate );
+			GUIEvent.removeListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
+			GUIEvent.removeListener( GUIEvent.APP_ACTIVATE, onActivate );
 		}
 
 		protected function onDeactivate( e:GUIEvent ):void 

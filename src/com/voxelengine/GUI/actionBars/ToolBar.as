@@ -25,7 +25,6 @@ package com.voxelengine.GUI.actionBars
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.events.GUIEvent;
 	 
 	public class ToolBar extends VVCanvas	
 	{

@@ -7,7 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.worldmodel.models.*;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import flash.display3D.Context3D;
