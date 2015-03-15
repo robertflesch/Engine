@@ -69,9 +69,7 @@ package com.voxelengine.worldmodel.models
 						//Log.out( "Trigger.update - INSIDE" );
 						for each ( var iscript:Script in instanceInfo.scripts )
 						{
-							var oe:OxelEvent = new OxelEvent( OxelEvent.INSIDE, instanceInfo.guid )
-							//trace( "Trigger.update - inside: " + oe );
-							Globals.g_app.dispatchEvent( oe );
+							OxelEvent.dispatch( new OxelEvent( OxelEvent.INSIDE, instanceInfo.guid ) );
 						}
 					}
 				} 
@@ -83,9 +81,7 @@ package com.voxelengine.worldmodel.models
 						//Log.out( "Trigger.update - OUTSIDE" );
 						for each ( var oscript:Script in instanceInfo.scripts )
 						{
-							var oe1:OxelEvent = new OxelEvent( OxelEvent.OUTSIDE, instanceInfo.guid )
-							//trace( "Trigger.update - outside: " + oe1 );
-							Globals.g_app.dispatchEvent( oe1 );
+							OxelEvent.dispatch( new OxelEvent( OxelEvent.OUTSIDE, instanceInfo.guid ) );
 						}
 					}
 				}

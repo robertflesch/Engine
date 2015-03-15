@@ -19,8 +19,8 @@ package com.voxelengine.worldmodel.scripts
 				
 		public function ControlObjectScript() 
 		{
-			Globals.g_app.stage.addEventListener(OxelEvent.INSIDE, onInsideEvent, true, 0, true);
-			Globals.g_app.stage.addEventListener(OxelEvent.OUTSIDE, onOutsideEvent, true, 0, true);
+			OxelEvent.addListener( OxelEvent.INSIDE, onInsideEvent, true, 0, true);
+			OxelEvent.addListener( OxelEvent.OUTSIDE, onOutsideEvent, true, 0, true);
 		}
 		
 		public function onInsideEvent( $event:OxelEvent ):void 
@@ -62,6 +62,11 @@ package com.voxelengine.worldmodel.scripts
 				_wt.remove();
 				_wt = null;
 			}
+		}
+		
+		override public function dispose():void { 
+			OxelEvent.addListener( OxelEvent.INSIDE, onInsideEvent, true, 0, true);
+			OxelEvent.addListener( OxelEvent.OUTSIDE, onOutsideEvent, true, 0, true);
 		}
 	}
 

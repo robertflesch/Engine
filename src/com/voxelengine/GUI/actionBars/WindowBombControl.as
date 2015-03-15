@@ -6,7 +6,6 @@ package com.voxelengine.GUI.actionBars
 	import com.voxelengine.GUI.VVCanvas;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
-	import com.voxelengine.events.OxelEvent;
 	import com.voxelengine.events.WeaponEvent;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import flash.events.Event;

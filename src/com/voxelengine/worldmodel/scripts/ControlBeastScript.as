@@ -19,8 +19,8 @@ package com.voxelengine.worldmodel.scripts
 				
 		public function ControlBeastScript() 
 		{
-			Globals.g_app.stage.addEventListener(OxelEvent.INSIDE, onInsideEvent, true, 0, true);
-			Globals.g_app.stage.addEventListener(OxelEvent.OUTSIDE, onOutsideEvent, true, 0, true);
+			OxelEvent.addListener( OxelEvent.INSIDE, onInsideEvent, true, 0, true);
+			OxelEvent.addListener( OxelEvent.OUTSIDE, onOutsideEvent, true, 0, true);
 		}
 		
 		public function onInsideEvent( $event:OxelEvent ):void 
@@ -66,6 +66,12 @@ package com.voxelengine.worldmodel.scripts
 			if ( WindowBeastControl.currentInstance )
 				WindowBeastControl.currentInstance.remove();
 		}
+		
+		override public function dispose():void { 
+			OxelEvent.addListener( OxelEvent.INSIDE, onInsideEvent, true, 0, true);
+			OxelEvent.addListener( OxelEvent.OUTSIDE, onOutsideEvent, true, 0, true);
+		}
+		
 	}
 
 }

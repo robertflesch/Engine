@@ -28,7 +28,6 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.events.LightEvent;
 	import com.voxelengine.events.ImpactEvent;
 	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.events.OxelEvent;
 	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.events.LoadingEvent;
 	
