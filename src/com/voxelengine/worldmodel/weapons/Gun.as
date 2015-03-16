@@ -23,7 +23,7 @@ package com.voxelengine.worldmodel.weapons
 	 * @author Robert Flesch - RSF 
 	 * The world model holds the active oxels
 	 */
-	public class Gun extends VoxelModel 
+	public class Gun extends ControllableVoxelModel 
 	{
 		protected var _armory:Vector.<Ammo> = new Vector.<Ammo>;
 		protected var _ammo:Ammo;

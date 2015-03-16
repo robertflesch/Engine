@@ -54,8 +54,23 @@ package com.voxelengine.worldmodel.models
 		private var		_maxFallRate:SecureNumber 					= new SecureNumber( 5 );
 		private var   	_maxSpeed:SecureNumber 					= new SecureNumber( 15 );
 		private var   	_speedMultiplier:Number 				= 0.5;
-
 		
+		private var 	_lastCollisionModel:VoxelModel; 											// INSTANCE NOT EXPORTED
+		// This should be at the controllable model leve			
+		private var 	_clipVelocityFactor:SecureNumber			= new SecureNumber(95); 		// INSTANCE NOT EXPORTED
+		protected var 	_turnRate:Number 							= 20; // 2.5 for ship
+		protected var 	_accelRate:Number 							= 2.5;
+		private var 	_onSolidGround:Boolean														// INSTANCE NOT EXPORTED
+		private var 	_keyboardControl:Boolean													// INSTANCE NOT EXPORTED
+		
+		public function get 	onSolidGround():Boolean 				{ return _onSolidGround; }
+		public function set 	onSolidGround(val:Boolean):void 		{ _onSolidGround = val; }
+		public function get		accelRate():Number 						{ return _accelRate; }
+		public function get		clipVelocityFactor():Number 			{ return _clipVelocityFactor.val; }
+		public function set		clipVelocityFactor($val:Number):void 	{ _clipVelocityFactor.val = $val; }
+		public function get		lastCollisionModel():VoxelModel 		{ return _lastCollisionModel; }
+		public function set		lastCollisionModel(val:VoxelModel):void { _lastCollisionModel = val; }
+		public function 		lastCollisionModelReset():void 				{ _lastCollisionModel = null; }
 		public function get 	mMaxSpeed():Number 						{ return (_maxSpeed.val * _speedMultiplier); }
 		public function set 	mMaxSpeed($value:Number):void 			{ _maxSpeed.val = $value; }
 		protected function get 	mSpeedMultiplier():Number 				{ return _speedMultiplier; }
@@ -80,6 +95,37 @@ package com.voxelengine.worldmodel.models
 			GUIEvent.addListener( GUIEvent.APP_ACTIVATE, onActivate );
 			_ct = new CollisionTest( this );
 		}
+		
+		override protected function internal_update($context:Context3D, $elapsedTimeMS:int):void
+		{
+			if (!initialized)
+				initialize($context);
+			
+			if (complete)
+			{
+				// this was inside of the the controlled model if...
+				updateVelocity($elapsedTimeMS, clipVelocityFactor );
+				
+				instanceInfo.update($elapsedTimeMS);
+				
+				
+				if (oxel && oxel.dirty)
+				{
+					oxel.cleanup( metadata );
+				}
+			}
+		}
+		
+		public function get keyboardControl():Boolean { return _keyboardControl; }
+		public function set keyboardControl(val:Boolean):void
+		{
+			if (val)
+				Log.out("ControllableVoxelModel.keyboardControl is NOW: " + instanceInfo.guid);
+			else
+				Log.out("ControllableVoxelModel.keyboardControl WAS: " + instanceInfo.guid);
+			_keyboardControl = val;
+		}
+		
 		
 		override public function set dead(val:Boolean):void { 
 			super.dead = val;

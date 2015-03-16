@@ -7,9 +7,6 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.events.ModelBaseEvent;
-	import com.voxelengine.events.ModelDataEvent;
-	import com.voxelengine.events.ModelMetadataEvent;
 	import flash.display3D.Context3D;
 	import flash.events.KeyboardEvent;
 	import flash.events.TimerEvent;
@@ -25,11 +22,11 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	
+	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.events.LightEvent;
 	import com.voxelengine.events.ImpactEvent;
-	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.events.ModelEvent;
 	
 	import com.voxelengine.pools.LightingPool;
 	import com.voxelengine.pools.GrainCursorPool;
@@ -41,6 +38,7 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.worldmodel.animation.*;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.oxel.Lighting;
+	import com.voxelengine.worldmodel.oxel.FlowInfo;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import com.voxelengine.worldmodel.oxel.LightInfo;
@@ -51,9 +49,6 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.worldmodel.weapons.Projectile;
 	
-	import com.voxelengine.server.Network;
-	
-	import com.voxelengine.worldmodel.oxel.FlowInfo;
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF
@@ -61,73 +56,60 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class VoxelModel
 	{
-		private var 	_data:ModelData;
-		private var 	_metadata:ModelMetadata;
-		protected var 	_modelInfo:ModelInfo; 												// INSTANCE NOT EXPORTED
-		protected var 	_instanceInfo:InstanceInfo; 										// INSTANCE NOT EXPORTED
-		private var 	_oxel:Oxel; 														// INSTANCE NOT EXPORTED
-		private var 	_editCursor:EditCursor; 											// INSTANCE NOT EXPORTED
-		protected var 	_shaders:Vector.<Shader>        	= new Vector.<Shader>;			// INSTANCE NOT EXPORTED
-		protected var 	_children:Vector.<VoxelModel> 		= new Vector.<VoxelModel>; 		// INSTANCE NOT EXPORTED
-		private var 	_statisics:ModelStatisics 			= new ModelStatisics(); 		// INSTANCE NOT EXPORTED
-		private var 	_camera:Camera						= new Camera();
-		private var 	_timer:int 							= getTimer(); 					// INSTANCE NOT EXPORTED
-		private var 	_version:int; 														// INSTANCE NOT EXPORTED
-		private var 	_anim:Animation;
-
-		private var 	_lightIDNext:uint 					= 1024; // TODO FIX reserve space for ?
+		private 	var _data:ModelData;
+		private 	var	_metadata:ModelMetadata;
+		protected 	var	_modelInfo:ModelInfo; 													// INSTANCE NOT EXPORTED
+		protected 	var	_instanceInfo:InstanceInfo; 											// INSTANCE NOT EXPORTED
+		private 	var	_oxel:Oxel; 															// INSTANCE NOT EXPORTED
+		private 	var	_editCursor:EditCursor; 												// INSTANCE NOT EXPORTED
+		protected 	var	_shaders:Vector.<Shader>        			= new Vector.<Shader>;		// INSTANCE NOT EXPORTED
+		protected 	var	_children:Vector.<VoxelModel> 				= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
+		private		var	_statisics:ModelStatisics 					= new ModelStatisics(); 	// INSTANCE NOT EXPORTED
+		private		var	_camera:Camera								= new Camera();
+		private		var	_timer:int 									= getTimer(); 				// INSTANCE NOT EXPORTED
+		private		var	_version:int; 															// INSTANCE NOT EXPORTED
 		
-		private var 	_initialized:Boolean 												// INSTANCE NOT EXPORTED
-		private var 	_stateLock:Boolean 													// INSTANCE NOT EXPORTED
-		protected var 	_changed:Boolean 													// INSTANCE NOT EXPORTED
-		protected var 	_complete:Boolean 													// INSTANCE NOT EXPORTED
-		protected var 	_selected:Boolean 													// INSTANCE NOT EXPORTED
-		private var 	_onSolidGround:Boolean												// INSTANCE NOT EXPORTED
-		private var 	_keyboardControl:Boolean											// INSTANCE NOT EXPORTED
-		protected var 	_dead:Boolean 														// INSTANCE NOT EXPORTED
-		
-		private var 	_usesGravity:Boolean; 												
-		private var 	_visible:Boolean 					= true;  // Should be exported/ move to instance
-		
-		// TODO this should be moved to controlled model
-		private var 	_lastCollisionModel:VoxelModel; 									// INSTANCE NOT EXPORTED
-		// This should be at the controllable model level
-		private var 	_clipVelocityFactor:SecureNumber 	= new SecureNumber(95); 		// INSTANCE NOT EXPORTED
-		protected var 	_turnRate:Number 					= 20; // 2.5 for ship
-		protected var 	_accelRate:Number 					= 2.5;
-		
-		public function get data():ModelData    					{ return _data; }
-		public function set data(val:ModelData):void   				{ _data = val; }
-		public function get metadata():ModelMetadata    			{ return _metadata; }
-		public function set metadata(val:ModelMetadata):void   		{ _metadata = val; }
-		public function get usesGravity():Boolean 					{ return _usesGravity; }
-		public function set usesGravity(val:Boolean):void 			{ _usesGravity = val; }
-		public function get getPerModelLightID():uint 				{ return _lightIDNext++ }
-		public function get camera():Camera							{ return _camera; }
+		private		var	_anim:Animation;			
+		private		var	_stateLock:Boolean 														// INSTANCE NOT EXPORTED
+				
+		private		var	_lightIDNext:uint 							= 1024; // TODO FIX reserve space for ?
+							
+		private		var	_initialized:Boolean 													// INSTANCE NOT EXPORTED
+		protected	var	_changed:Boolean 														// INSTANCE NOT EXPORTED
+		protected	var	_complete:Boolean 														// INSTANCE NOT EXPORTED
+		protected	var	_selected:Boolean 														// INSTANCE NOT EXPORTED
+		protected	var	_dead:Boolean 															// INSTANCE NOT EXPORTED
+						
+		private		var	_usesGravity:Boolean; 														
+		private		var	_visible:Boolean 							= true;  // Should be exported/ move to instance
+					
+		public	function get data():ModelData    					{ return _data; }
+		public	function set data(val:ModelData):void   			{ _data = val; }
+		public	function get metadata():ModelMetadata    			{ return _metadata; }
+		public	function set metadata(val:ModelMetadata):void   	{ _metadata = val; }
+		public	function get usesGravity():Boolean 					{ return _usesGravity; }
+		public	function set usesGravity(val:Boolean):void 			{ _usesGravity = val; }
+		public	function get getPerModelLightID():uint 				{ return _lightIDNext++ }
+		public	function get camera():Camera						{ return _camera; }
 		protected function get initialized():Boolean 				{ return _initialized; }
-		public function get anim():Animation 						{ return _anim; }
-		public function get accelRate():Number 						{ return _accelRate; }
-		public function get clipVelocityFactor():Number 			{ return _clipVelocityFactor.val; }
-		public function set clipVelocityFactor($val:Number):void 	{ _clipVelocityFactor.val = $val; }
-		public function get lastCollisionModel():VoxelModel 		{ return _lastCollisionModel; }
-		public function set lastCollisionModel(val:VoxelModel):void { _lastCollisionModel = val; }
-		public function lastCollisionModelReset():void 				{ _lastCollisionModel = null; }
-		public function get statisics():ModelStatisics				{ return _statisics; }
-		public function get instanceInfo():InstanceInfo				{ return _instanceInfo; }
-		public function get editCursor():EditCursor 				{ return _editCursor; }
-		public function set editCursor(val:EditCursor):void 		{ _editCursor = val; }
-		public function get visible():Boolean 						{ return _visible; }
-		public function set visible(val:Boolean):void 				{ _visible = val; }
-		public function get modelInfo():ModelInfo 					{ return _modelInfo; }
-		public function set modelInfo(val:ModelInfo):void			{ _modelInfo = val; }
-		public function get children():Vector.<VoxelModel>			{ return _children; }
-		public function 	childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
-		public function get changed():Boolean						{ return _changed; }
-		public function set changed( $val:Boolean):void				{ _changed = $val; }
-		public function get selected():Boolean 						{ return _selected; }
-		public function set selected(val:Boolean):void  			{ _selected = val; }
-		public function get onSolidGround():Boolean 				{ return _onSolidGround; }
-		public function set onSolidGround(val:Boolean):void 		{ _onSolidGround = val; }
+		public	function get anim():Animation 						{ return _anim; }
+		public	function get statisics():ModelStatisics				{ return _statisics; }
+		public	function get instanceInfo():InstanceInfo			{ return _instanceInfo; }
+		public	function get editCursor():EditCursor 				{ return _editCursor; }
+		public	function set editCursor(val:EditCursor):void 		{ _editCursor = val; }
+		public	function get visible():Boolean 						{ return _visible; }
+		public	function set visible(val:Boolean):void 				{ _visible = val; }
+		public	function get modelInfo():ModelInfo 					{ return _modelInfo; }
+		public	function set modelInfo(val:ModelInfo):void			{ _modelInfo = val; }
+		public	function get children():Vector.<VoxelModel>			{ return _children; }
+		public	function 	childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
+		public	function get changed():Boolean						{ return _changed; }
+		public	function set changed( $val:Boolean):void			{ _changed = $val; }
+		public	function get selected():Boolean 					{ return _selected; }
+		public	function set selected(val:Boolean):void  			{ _selected = val; }
+		public	function set version(value:int):void  				{ _version = value; }
+		public	function get version():int  						{ return _version; }
+		
 		public function get dead():Boolean 							{ return _dead; }
 		public function set dead(val:Boolean):void 					{ 
 			_dead = val; 
@@ -143,7 +125,6 @@ package com.voxelengine.worldmodel.models
 		}
 
 		public function get complete():Boolean						{ return _complete; }
-		
 		public function set complete(val:Boolean):void
 		{
 			//Log.out( "VoxelModel.complete: " + modelInfo.fileName );
@@ -156,23 +137,8 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
-		public function get keyboardControl():Boolean { return _keyboardControl; }
-		
-		public function set keyboardControl(val:Boolean):void
-		{
-			if (val)
-				Log.out("VoxelModel.keyboardControl is NOW: " + instanceInfo.guid);
-			else
-				Log.out("VoxelModel.keyboardControl WAS: " + instanceInfo.guid);
-			_keyboardControl = val;
-		}
-		
-		public function set version(value:int):void  	{ _version = value; }
-		public function get version():int  				{ return _version; }
-		
-		public function toString():String 				{ return instanceInfo.toString(); }
+		public function toString():String 				{ return metadata.toString + " ii: " + instanceInfo.toString(); }
 		public function get oxel():Oxel { return _oxel; }
-		
 		public function set oxel(val:Oxel):void
 		{
 			// This test for someone trying to overwrite an oxel with another value
@@ -658,11 +624,7 @@ package com.voxelengine.worldmodel.models
 			
 			if (complete)
 			{
-				// this was inside of the the controlled model if...
-				updateVelocity($elapsedTimeMS, clipVelocityFactor );
-				
 				instanceInfo.update($elapsedTimeMS);
-				
 				
 				if (oxel && oxel.dirty)
 				{
