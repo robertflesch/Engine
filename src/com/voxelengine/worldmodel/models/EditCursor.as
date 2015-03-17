@@ -79,8 +79,7 @@ package com.voxelengine.worldmodel.models
 		public function get gciData():GrainCursorIntersection { return _gciData; }
 		public function set gciData(value:GrainCursorIntersection):void { _gciData = value; }
 		
-		static public function create():EditCursor 
-		{
+		static public function create():EditCursor {
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			instanceInfo.guid = EDIT_CURSOR
 
@@ -93,28 +92,24 @@ package com.voxelengine.worldmodel.models
 			return ed;
 		}
 		
-		override public function get visible():Boolean
-		{
+		override public function get visible():Boolean {
 			GUIEvent.addListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
 			return super.visible;
 		}
 		
-		override public function set visible( $val:Boolean ):void
-		{
+		override public function set visible( $val:Boolean ):void {
 			GUIEvent.removeListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
 			super.visible = $val;
 		}
 		
 		
-		protected function onDeactivate( e:GUIEvent ):void 
-		{
+		protected function onDeactivate( e:GUIEvent ):void  {
 			//Log.out( "onDeactivate - disabling repeat" );
 			// We dont want the repeat on if app loses focus
 			mouseUp( null );
 		}
 		
-		public function EditCursor( instanceInfo:InstanceInfo ):void 
-		{
+		public function EditCursor( instanceInfo:InstanceInfo ):void {
 			super( instanceInfo );
 		}
 
@@ -124,15 +119,22 @@ package com.voxelengine.worldmodel.models
 			visible = false;
 		}
 		
-		public function clearGCIData():void 
-		{
+		public function clearGCIData():void {
 			gciData = null;
 		}
 		
-		public function setGCIDataNew( $gciData:GrainCursorIntersection ):void 
-		{
+		public function setGCIData( $gciData:GrainCursorIntersection ):void {
 			gciData = $gciData;
 			visible = true;
+			
+			// This cleans up (int) the location of the gc
+			var gct:GrainCursor = GrainCursorPool.poolGet( gciData.model.oxel.gc.bound );
+			GrainCursor.getFromPoint( gciData.point.x, gciData.point.y, gciData.point.z, gct );
+			// we have to make the grain scale up to the size of the edit cursor
+			gct.become_ancestor( oxel.gc.grain );
+			_gciData.gc.copyFrom( gct );
+			GrainCursorPool.poolDispose( gct );
+			
 			if ( CURSOR_OP_INSERT == cursorOperation ) {
 				configureInsertOxel();
 			}
@@ -144,41 +146,18 @@ package com.voxelengine.worldmodel.models
 		
 		private function configureInsertOxel():void {
 			
-			var gct:GrainCursor = GrainCursorPool.poolGet( gciData.model.oxel.gc.bound );
-			GrainCursor.getFromPoint( gciData.point.x, gciData.point.y, gciData.point.z, gct );
-			// we have to make the grain scale up to the size of the edit cursor
-			gct.become_ancestor( oxel.gc.grain );
-			instanceInfo.positionSetComp( gct.getModelX(), gct.getModelY(), gct.getModelZ() );
-			_gciData.gc.copyFrom( gct );
-			GrainCursorPool.poolDispose( gct );
+			
+			var pl:PlacementLocation = getPlacementLocation( gciData.model );
+			if ( PlacementLocation.INVALID == pl.state ) {
+				editCursorIcon = EDITCURSOR_INVALID; // ;
+				instanceInfo.positionSetComp( _gciData.gc.getModelX(), _gciData.gc.getModelY(), _gciData.gc.getModelZ() );
+			} else {
+				instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
+			}
+
 			oxel.quadsDeleteAll();
 			oxel.faces_clear_all();
 			oxel.faces_mark_all_clean();
-			var gcCursor:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
-			if ( !oxel.lighting )
-				oxel.lighting = LightingPool.poolGet( 0xff );
-			var li:LightInfo = oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-			var pl:PlacementLocation = getPlacementLocation( gciData.model );
-			if ( PlacementLocation.INVALID == pl.state )
-				editCursorIcon = 1004; // EDITCURSOR_INVALID;
-
-			// We have to manually delete all of the quads so that they can be rebuilt
-			// This method shows only the two faces aligned with axis
-			switch ( gciData.axis )
-			{
-				case 0:
-					oxel.face_set( Globals.POSX );
-					oxel.face_set( Globals.NEGX );
-					break;
-				case 1:
-					oxel.face_set( Globals.POSY );
-					oxel.face_set( Globals.NEGY );
-					break;
-				case 2:
-					oxel.face_set( Globals.POSZ );
-					oxel.face_set( Globals.NEGZ );
-					break;
-			}
 			
 			oxel.face_set( Globals.POSX );
 			oxel.face_set( Globals.NEGX );
@@ -187,164 +166,29 @@ package com.voxelengine.worldmodel.models
 			oxel.face_set( Globals.POSZ );
 			oxel.face_set( Globals.NEGZ );
 			
-			if ( editCursorIcon == 1004 ) {
-				li.color = 0x00ff0000;
-			}
-			else {
-				li.color = 0xffffffff;
-			}
+			if ( !oxel.lighting )
+				oxel.lighting = LightingPool.poolGet( 0xff );
+			var li:LightInfo = oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+			if ( EDITCURSOR_INVALID == editCursorIcon ) li.color = 0x00ff0000;
+			else 										li.color = 0xffffffff;
 			oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
-			gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
-			oxel.write( EDIT_CURSOR, gcCursor, editCursorIcon, true );
+			oxel.write( EDIT_CURSOR, oxel.gc, editCursorIcon, true );
 			oxel.quadsBuild();
-			GrainCursorPool.poolDispose( gcCursor );
-			
-				/*
-			var oxelToBeModified:Oxel = getHighlightedOxel( false );
-			oxel.gc.copyFrom( oxelToBeModified.gc );
-			if ( Globals.BAD_OXEL == oxelToBeModified )
-				editCursorIcon = EDITCURSOR_INVALID; // ;
-
-			//// We have to manually delete all of the quads so that they can be rebuilt
-			//// This method shows only the two faces aligned with axis
-			//switch ( gciData.axis )
-			//{
-				//case 0:
-					//oxel.face_set( Globals.POSX );
-					//oxel.face_set( Globals.NEGX );
-					//break;
-				//case 1:
-					//oxel.face_set( Globals.POSY );
-					//oxel.face_set( Globals.NEGY );
-					//break;
-				//case 2:
-					//oxel.face_set( Globals.POSZ );
-					//oxel.face_set( Globals.NEGZ );
-					//break;
-			//}
-			
-			oxel.face_set( Globals.POSX );
-			oxel.face_set( Globals.NEGX );
-			oxel.face_set( Globals.POSY );
-			oxel.face_set( Globals.NEGY );
-			oxel.face_set( Globals.POSZ );
-			oxel.face_set( Globals.NEGZ );
-			
-			//var li:LightInfo = oxelToBeModified.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-			//if ( editCursorIcon == EDITCURSOR_INVALID ) {
-				//li.color = 0x00ff0000;
-			//}
-			//else {
-				//li.color = 0xffffffff;
-			//}
-			//oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
-//			gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
-			if ( !oxel.lighting )
-				oxel.lighting = LightingPool.poolGet( 0xff );
-			var li:LightInfo = oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-			if ( editCursorIcon == 1004 ) li.color = 0x00ff0000;
-			else li.color = 0xffffffff;
-			var gcCursor:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
-			gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
-			oxel.write( EDIT_CURSOR, gcCursor, editCursorIcon, true );
-			*/
 		}
 		
 		private function configureDeleteOxel():void {
 			
-			var gct:GrainCursor = GrainCursorPool.poolGet( gciData.model.oxel.gc.bound );
-			GrainCursor.getFromPoint( gciData.point.x, gciData.point.y, gciData.point.z, gct );
-			// we have to make the grain scale up to the size of the edit cursor
-			gct.become_ancestor( oxel.gc.grain );
-			instanceInfo.positionSetComp( gct.getModelX(), gct.getModelY(), gct.getModelZ() );
-			_gciData.gc.copyFrom( gct );
-			GrainCursorPool.poolDispose( gct );
+			instanceInfo.positionSetComp( _gciData.gc.getModelX(), _gciData.gc.getModelY(), _gciData.gc.getModelZ() );
 			oxel.quadsDeleteAll();
 			oxel.faces_clear_all();
 			oxel.faces_mark_all_clean();
-			var gcCursor:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
 			if ( !oxel.lighting )
 				oxel.lighting = LightingPool.poolGet( 0xff );
 			var li:LightInfo = oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
 			oxel.faces_set_all();
-			gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
-			oxel.write( EDIT_CURSOR, gcCursor, editCursorIcon, true );
+			oxel.write( EDIT_CURSOR, oxel.gc, editCursorIcon, true );
 			li.color = cursorColorRainbow();
 			oxel.quadsBuild();
-			GrainCursorPool.poolDispose( gcCursor );
-		}
-		
-		
-		public function setGCIData( $gciData:GrainCursorIntersection ):void 
-		{
-			gciData = $gciData;
-			visible = true;
-
-			var gct:GrainCursor = GrainCursorPool.poolGet( $gciData.model.oxel.gc.bound );
-			GrainCursor.getFromPoint( $gciData.point.x, $gciData.point.y, $gciData.point.z, gct );
-			// we have to make the grain scale up to the size of the edit cursor
-			gct.become_ancestor( oxel.gc.grain );
-			instanceInfo.positionSetComp( gct.getModelX(), gct.getModelY(), gct.getModelZ() );
-			_gciData.gc.copyFrom( gct );
-			GrainCursorPool.poolDispose( gct );
-			oxel.quadsDeleteAll();
-			oxel.faces_clear_all();
-			oxel.faces_mark_all_clean();
-			var gcCursor:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
-			if ( !oxel.lighting )
-				oxel.lighting = LightingPool.poolGet( 0xff );
-			var li:LightInfo = oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-			if ( CURSOR_OP_INSERT == cursorOperation ) {
-				
-				var pl:PlacementLocation = getPlacementLocation( gciData.model );
-				if ( PlacementLocation.INVALID == pl.state )
-					editCursorIcon = 1004; // EDITCURSOR_INVALID;
-
-				// We have to manually delete all of the quads so that they can be rebuilt
-				// This method shows only the two faces aligned with axis
-				switch ( gciData.axis )
-				{
-					case 0:
-						oxel.face_set( Globals.POSX );
-						oxel.face_set( Globals.NEGX );
-						break;
-					case 1:
-						oxel.face_set( Globals.POSY );
-						oxel.face_set( Globals.NEGY );
-						break;
-					case 2:
-						oxel.face_set( Globals.POSZ );
-						oxel.face_set( Globals.NEGZ );
-						break;
-				}
-				
-				oxel.face_set( Globals.POSX );
-				oxel.face_set( Globals.NEGX );
-				oxel.face_set( Globals.POSY );
-				oxel.face_set( Globals.NEGY );
-				oxel.face_set( Globals.POSZ );
-				oxel.face_set( Globals.NEGZ );
-				
-				if ( editCursorIcon == 1004 ) {
-					li.color = 0x00ff0000;
-				}
-				else {
-					li.color = 0xffffffff;
-				}
-				oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
-				gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
-				oxel.write( EDIT_CURSOR, gcCursor, editCursorIcon, true );
-			}
-			else
-			{
-				oxel.faces_set_all();
-				gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
-				oxel.write( EDIT_CURSOR, gcCursor, editCursorIcon, true );
-				li.color = cursorColorRainbow();
-			}
-			
-			oxel.quadsBuild();
-			GrainCursorPool.poolDispose( gcCursor );
 		}
 		
 		private var _phase:Number = 0;
@@ -375,8 +219,7 @@ package com.voxelengine.worldmodel.models
 			oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
 		}
 		
-		override public function drawAlpha( mvp:Matrix3D,$context:Context3D, $isChild:Boolean ):void 
-		{
+		override public function drawAlpha( mvp:Matrix3D,$context:Context3D, $isChild:Boolean ):void {
 			var t:Number = oxel.gc.size() * SCALE_FACTOR/2;
 			
 			var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
@@ -388,8 +231,7 @@ package com.voxelengine.worldmodel.models
 			oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
 		}
 		
-		override public function update($context:Context3D, elapsedTimeMS:int ):void
-		{
+		override public function update($context:Context3D, elapsedTimeMS:int ):void {
 			// the grain should never be larger then the bound
 			if ( oxel.gc.bound < editCursorSize )
 			{
@@ -404,8 +246,7 @@ package com.voxelengine.worldmodel.models
 			internal_update($context, elapsedTimeMS );
 		}
 		
-		override public function initialize($context:Context3D ):void 
-		{
+		override public function initialize($context:Context3D ):void {
 			internal_initialize($context );
 			visible = false;
 			// these are all static calls, should only be added once.
@@ -425,8 +266,7 @@ package com.voxelengine.worldmodel.models
 				shrinkCursor();
 		}
 
-		override public function release():void 
-		{
+		override public function release():void {
 			if ( oxel )
 				oxel.release();
 				
@@ -435,8 +275,7 @@ package com.voxelengine.worldmodel.models
 			Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 		}
 		
-		static private function isAvatarInsideThisOxel( vm:VoxelModel, oxel:Oxel ):Boolean
-		{
+		static private function isAvatarInsideThisOxel( vm:VoxelModel, oxel:Oxel ):Boolean {
 			var mp:Vector3D = vm.worldToModel( ModelCacheUtils.worldSpaceStartPoint );
 			// check head
 			var result:Boolean = oxel.gc.is_point_inside( mp );
@@ -463,7 +302,7 @@ package com.voxelengine.worldmodel.models
 				if ( recurse )
 					return Globals.BAD_OXEL;
 					
-				if ( placementResult && null == placementResult.gci )
+				if ( placementResult )
 					return Globals.BAD_OXEL;
 					
 				if ( foundModel.editCursor.gciData )
@@ -479,8 +318,7 @@ package com.voxelengine.worldmodel.models
 			return oxelToBeModified;
 		}
 		
-		static private function insertOxel(recurse:Boolean = false):void
-		{
+		static private function insertOxel(recurse:Boolean = false):void {
 			if ( CURSOR_OP_INSERT != _s_cursorOperation )
 				return;
 
@@ -519,103 +357,56 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
-		static private function getPlacementLocation( foundModel:VoxelModel ):PlacementLocation
-		{
+		static private function getPlacementLocation( foundModel:VoxelModel ):PlacementLocation {
 			var gci:GrainCursorIntersection = foundModel.editCursor.gciData;
 			var pl:PlacementLocation = new PlacementLocation();
-			if ( gci )
-			{
-				// to determine whether a block can be placed
-				// first get the camera position, and change the coordinates from world to model
-				// then use the axis of the active face, to step a block forward and backward along that axis
-				// watch the results of the step, to see if a blocks has been sent out of bounds.
-				// now for valid steps (not oob), choose the one which is the lesser distance from the camera.
-				//var startPoint:Vector3D = gci.model.worldToModel( Globals.controlledModel.instanceInfo.positionGet );
-				// This seems to fix problem with distance calculation not working correct when using avatar origin ONCE in a while
-				var startPoint:Vector3D = gci.model.worldToModel( ModelCacheUtils.worldSpaceStartPoint );
-				var placedGC:GrainCursor = GrainCursorPool.poolGet( foundModel.oxel.gc.bound );
-				var negPlacedGC:GrainCursor = GrainCursorPool.poolGet( foundModel.oxel.gc.bound );
-				var posMove:Boolean = false;
-				var negMove:Boolean = false;
-				var posxDist:Number = 0.0;
-				var negxDist:Number = 0.0;
-				switch ( gci.axis )
-				{
-					case 0:
-						placedGC.copyFrom( gci.gc );
-						posMove = placedGC.move_posx();
-						posxDist = placedGC.GetDistance( startPoint );
-						
-						negPlacedGC.copyFrom( gci.gc );
-						negMove = negPlacedGC.move_negx();
-						negxDist = negPlacedGC.GetDistance( startPoint );
-						break;
-					case 1:
-						placedGC.copyFrom( gci.gc );
-						posMove = placedGC.move_posy();
-						posxDist = placedGC.GetDistance( startPoint );
-						
-						negPlacedGC.copyFrom( gci.gc );
-						negMove = negPlacedGC.move_negy();
-						negxDist = negPlacedGC.GetDistance( startPoint );
-						break;
-					case 2:
-						placedGC.copyFrom( gci.gc );
-						posMove = placedGC.move_posz();
-						posxDist = placedGC.GetDistance( startPoint );
-						
-						negPlacedGC.copyFrom( gci.gc );
-						negMove = negPlacedGC.move_negz();
-						negxDist = negPlacedGC.GetDistance( startPoint );
-						break;
-				}
+			if ( !gci )
+				return pl;
 				
-				placedGC.copyFrom( gci.gc );
-				if ( posxDist > negxDist ) 
-				{
-					if ( negMove )
-					{
-						switch ( gci.axis )
-						{
-							case 0: placedGC.move_negx(); break;
-							case 1: placedGC.move_negy(); break;
-							case 2: placedGC.move_negz(); break;
-						}
-						pl.state = PlacementLocation.VALID
-					}
-					else
-						pl.state = PlacementLocation.INVALID
-				}
-				else
-				{
-					if ( posMove )
-					{
-						switch ( gci.axis )
-						{
-							case 0: placedGC.move_posx(); break;
-							case 1: placedGC.move_posy(); break;
-							case 2: placedGC.move_posz(); break;
-						}
-						pl.state = PlacementLocation.VALID
-					}
-					else
-						pl.state = PlacementLocation.INVALID
-				}
-				if ( PlacementLocation.VALID == pl.state ) {
-					pl.gci = gci;
-					pl.negative = negMove;
-					pl.positive = posMove;
-					pl.gc.copyFrom( placedGC );
-				}
-				GrainCursorPool.poolDispose( placedGC );
-				GrainCursorPool.poolDispose( negPlacedGC );
-			}
+			// determines whether a block can be placed
+			// calculate difference between avatar location and intersection point
+			var diffPos:Vector3D = Globals.player.wsPositionGet().clone();
+			diffPos = diffPos.subtract( gci.wsPoint );
 			
+			pl.state = PlacementLocation.VALID;
+			// copy the location of the cursor in the larger model
+			// since we are testing on this, we need to use a copy
+			pl.gc.copyFrom( gci.gc );
+			// test the results of the step, to see if a blocks has been sent out of bounds.
+			switch ( gci.axis ) {
+			case 0:
+				if ( 0 < diffPos.x ) {
+					if ( !pl.gc.move_posx() ) pl.state = PlacementLocation.INVALID;
+					pl.positive = true;
+				} else {
+					if ( !pl.gc.move_negx() ) pl.state = PlacementLocation.INVALID;
+					pl.negative = true;
+				}
+				break;
+			case 1:
+				if ( 0 < diffPos.y ) {
+					if ( !pl.gc.move_posy() ) pl.state = PlacementLocation.INVALID;
+					pl.positive = true;
+				} else {
+					if ( !pl.gc.move_negy() ) pl.state = PlacementLocation.INVALID;
+					pl.negative = true;
+				}
+				break;
+			case 2:
+				if ( 0 < diffPos.z ) {
+					if ( !pl.gc.move_posz() ) pl.state = PlacementLocation.INVALID;
+					pl.positive = true;
+				} else {	
+					if ( !pl.gc.move_negz() ) pl.state = PlacementLocation.INVALID;
+					pl.negative = true;
+				}
+				break;
+			}
+				
 			return pl;
 		}
 		
-		static private function getOxelFromPoint( vm:VoxelModel, gci:GrainCursorIntersection ):Oxel
-		{
+		static private function getOxelFromPoint( vm:VoxelModel, gci:GrainCursorIntersection ):Oxel {
 			var gcDelete:GrainCursor = GrainCursorPool.poolGet( vm.oxel.gc.bound );
 			// This is where it intersects with a grain 0
 			gcDelete.grainX = int( vm.editCursor.instanceInfo.positionGet.x + 0.05 );
@@ -628,8 +419,7 @@ package com.voxelengine.worldmodel.models
 			return oxelToBeDeleted;
 		}
 		
-		static private function deleteOxel():void
-		{
+		static private function deleteOxel():void {
 			if ( CURSOR_OP_DELETE != _s_cursorOperation )
 				return;
 
@@ -707,8 +497,7 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 
-		static private function sphereOperation():void
-		{
+		static private function sphereOperation():void {
 			var foundModel:VoxelModel = Globals.selectedModel;
 			if ( foundModel )
 			{
@@ -754,8 +543,7 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
-		static private function cylinderOperation():void
-		{
+		static private function cylinderOperation():void {
 			var foundModel:VoxelModel = Globals.selectedModel;
 			if ( foundModel && foundModel.editCursor.gciData )
 			{
@@ -822,8 +610,7 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
-		static private function keyDown(e:KeyboardEvent):void 
-		{
+		static private function keyDown(e:KeyboardEvent):void  {
 			if ( Globals.openWindowCount || !Globals.clicked )
 				return;
 				
@@ -861,8 +648,7 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
-		static public function growCursor():void
-		{
+		static public function growCursor():void {
 			if ( Globals.selectedModel )
 			{
 				Globals.selectedModel.editCursor.oxel.gc.bound = Globals.selectedModel.oxel.gc.bound;
@@ -884,8 +670,7 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
-		static public function shrinkCursor():void
-		{
+		static public function shrinkCursor():void {
 			if ( Globals.selectedModel )
 			{
 				var gcShrink:GrainCursor = Globals.selectedModel.editCursor.oxel.gc;
@@ -900,8 +685,7 @@ package com.voxelengine.worldmodel.models
 			}	
 		}
 		
-		static protected function onRepeat(event:TimerEvent):void
-		{
+		static protected function onRepeat(event:TimerEvent):void {
 			if ( Globals.openWindowCount )
 				return;
 				
@@ -915,8 +699,7 @@ package com.voxelengine.worldmodel.models
 			_count++;
 		}
 
-		static private function mouseUp(e:MouseEvent):void 
-		{
+		static private function mouseUp(e:MouseEvent):void  {
 			if ( _repeatTimer )
 				_repeatTimer.removeEventListener( TimerEvent.TIMER, onRepeat );
 			_count = 0;	
@@ -925,8 +708,7 @@ package com.voxelengine.worldmodel.models
 		import com.voxelengine.worldmodel.MouseKeyboardHandler;
 		private static var _s_dy:Number = 0;
 		private static var _s_dx:Number = 0;
-		private function mouseMove(e:MouseEvent):void 
-		{
+		private function mouseMove(e:MouseEvent):void {
 			if ( MouseKeyboardHandler.ctrl ) {
 				if ( 0 == _s_dx && 0 == _s_dy ) {
 					_s_dy = Globals.g_app.stage.mouseY;
@@ -947,8 +729,7 @@ package com.voxelengine.worldmodel.models
 				Globals.selectedModel.instanceInfo.positionSetComp( t.x, t.y, t.z );
 			}
 		}
-		static private function mouseDown(e:MouseEvent):void 
-		{
+		static private function mouseDown(e:MouseEvent):void {
 			if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey )
 				return;
 				
@@ -967,13 +748,11 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
-		static private function mouseClick(e:MouseEvent):void 
-		{
+		static private function mouseClick(e:MouseEvent):void  {
 			//Log.out( "initialize - mouseClick mouseClick mouseClick" );
 		}
 		
-		static public function setPickColorFromType( type:int ):void
-		{
+		static public function setPickColorFromType( type:int ):void {
 			switch ( type )
 			{
 				case CURSOR_TYPE_CYLINDER:
@@ -987,8 +766,6 @@ package com.voxelengine.worldmodel.models
 					break;
 			} 
 		}
-		
-		
 	}
 }
 
@@ -1001,9 +778,7 @@ internal class PlacementLocation
 {
 	static public const INVALID:int = 0;
 	static public const VALID:int = 1;
-//	public var oxel:Oxel = Globals.BAD_OXEL
 	public var gc:GrainCursor = new GrainCursor();
-	public var gci:GrainCursorIntersection
 	public var positive:Boolean;
 	public var negative:Boolean;
 	public var state:int = INVALID;

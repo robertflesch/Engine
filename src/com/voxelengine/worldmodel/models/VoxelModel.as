@@ -165,8 +165,19 @@ package com.voxelengine.worldmodel.models
 			var totalPosition:Vector3D = null;
 			if (instanceInfo.controllingModel)
 				totalPosition = instanceInfo.positionGet.add(instanceInfo.controllingModel.msPositionGet());
+			else	
+				totalPosition = worldToModel( instanceInfo.positionGet );
 			
 			return totalPosition;
+		}
+		
+		// returns the location of this model in the model space
+		public function wsPositionGet():Vector3D
+		{
+			if (instanceInfo.controllingModel)
+				return modelToWorld( msPositionGet() );
+			else	
+				return instanceInfo.positionGet;
 		}
 		
 		// returns the root model in the model space chain
