@@ -347,11 +347,13 @@ public class  UserInventory extends QuickInventory
 	}
 
 	public function addListeners():void {
+		//Log.out( "UserInventory.addListeners " + this + "==============================================================================" );
 		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
 	}
 	
 	public function removeListeners():void {
+		//Log.out( "UserInventory.removeListeners " + this + "==============================================================================" );
 		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
 	}
@@ -362,6 +364,7 @@ public class  UserInventory extends QuickInventory
 			
 		if ( 48 <= e.keyCode && e.keyCode <= 58 )
 		{
+			Log.out( "UserInventory.hotKeyInventory - e.keyCode: " + e.keyCode );
 			var selectedItem:int = e.keyCode - 48;
 			if ( 0 < selectedItem )
 				selectByIndex( selectedItem - 1 ); // 1 is index 0

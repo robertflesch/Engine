@@ -99,7 +99,7 @@ public class Player extends Avatar
 		LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
 		RegionEvent.addListener( RegionEvent.UNLOAD, onRegionUnload );
-		RegionEvent.addListener( RegionEvent.LOAD, onRegionLoad );
+		RegionEvent.addListener( RegionEvent.LOAD_BEGUN, onRegionLoad );
 	}
 
 	private function removeEventHandlers():void {
@@ -113,7 +113,7 @@ public class Player extends Avatar
 		LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
 		RegionEvent.removeListener( RegionEvent.UNLOAD, onRegionUnload );
-		RegionEvent.removeListener( RegionEvent.LOAD, onRegionLoad );
+		RegionEvent.removeListener( RegionEvent.LOAD_BEGUN, onRegionLoad );
 	}
 	
 	static private function onLogin( $event:LoginEvent ):void {
@@ -325,7 +325,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 
 	override protected function cameraAddLocations():void {
-//			camera.addLocation( new CameraLocation( true, 0, 0, 0 ) );
+			camera.addLocation( new CameraLocation( true, 0, 0, 0 ) );
 //			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, 0 ) );
 //			camera.addLocation( new CameraLocation( true, 0, Globals.AVATAR_HEIGHT - 4, 0) );
 		//camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, Globals.AVATAR_WIDTH/2) );
@@ -381,6 +381,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 	
 	private function onRegionLoad( $re:RegionEvent ):void {
+		Log.out( "Player.onRegionLoad - add player to model cache, and applying region info =============================================" );
 		// add the player to this regions model list.
 		Region.currentRegion.modelCache.add( this );
 		
