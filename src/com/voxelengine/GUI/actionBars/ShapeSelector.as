@@ -95,8 +95,8 @@ public class ShapeSelector extends VVCanvas
 			_butCurrent.backgroundTexture = "assets/textures/cylinder.jpg";
 			EditCursor.cursorType = EditCursor.CURSOR_TYPE_CYLINDER;
 			if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-				EditCursor.cursorColor = TypeInfo.EDITCURSOR_CYLINDER;
-			//EditCursor.cursorColor = TypeInfo.EDITCURSOR_CYLINDER_ANIMATED;
+				EditCursor.editCursorIcon = EditCursor.EDITCURSOR_CYLINDER;
+			//EditCursor.editCursorIcon = TypeInfo.EDITCURSOR_CYLINDER_ANIMATED;
 		} 
 		else if ( "cylinder" == _butCurrent.data)
 		{
@@ -104,7 +104,7 @@ public class ShapeSelector extends VVCanvas
 			_butCurrent.backgroundTexture = "assets/textures/sphere.jpg";
 			EditCursor.cursorType = EditCursor.CURSOR_TYPE_SPHERE;
 			if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-				EditCursor.cursorColor = TypeInfo.EDITCURSOR_ROUND;
+				EditCursor.editCursorIcon = EditCursor.EDITCURSOR_ROUND;
 		} 
 		else if ( "sphere" == _butCurrent.data)
 		{
@@ -112,7 +112,7 @@ public class ShapeSelector extends VVCanvas
 			_butCurrent.backgroundTexture = "assets/textures/square.jpg";
 			EditCursor.cursorType = EditCursor.CURSOR_TYPE_GRAIN;
 			if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-				EditCursor.cursorColor = TypeInfo.EDITCURSOR_SQUARE;
+				EditCursor.editCursorIcon = EditCursor.EDITCURSOR_SQUARE;
 		}
 	}
 	

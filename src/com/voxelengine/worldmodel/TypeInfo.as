@@ -59,10 +59,6 @@ package com.voxelengine.worldmodel
 		public static const BRONZE:uint							= enum_val++;	// 122
 		public static const STEEL:uint							= enum_val++;	// 123
 		public static const GLASS:uint							= enum_val++;	// 124
-		public static const EDITCURSOR_SQUARE:uint				= 1000;
-		public static const EDITCURSOR_ROUND:uint				= 1001;
-		public static const EDITCURSOR_CYLINDER:uint			= 1002;
-		public static const EDITCURSOR_CYLINDER_ANIMATED:uint	= 1003;
 		// NO MORE!!
 		
 		// WARNING use sparingly

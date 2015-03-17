@@ -232,7 +232,7 @@ public class  UserInventory extends QuickInventory
 			
 			if ( TypeInfo.INVALID != selectedTypeId ) {
 				EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
-				EditCursor.cursorColor = selectedTypeId; 
+				EditCursor.editCursorIcon = selectedTypeId; 
 				_itemMaterialSelection = itemIndex;
 				Globals.g_app.editing = true;
 				Globals.g_app.toolOrBlockEnabled = true;

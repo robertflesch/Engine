@@ -52,16 +52,22 @@ package com.voxelengine.worldmodel.models
 		static 	private	const SCALE_FACTOR:Number 			= 0.01;
 		
 		static 	private var   _s_editCursorSize:int			 = 0;			// this allows me to go from model to model with the same size cursor.
-		static  private var   _s_cursorColor:int			 = 1000; 		// Globals.EDITCURSOR_SQUARE;
+		static  private var   _s_editCursorIcon:int			 = 1000; 		// Globals.EDITCURSOR_SQUARE;
 		static 	private var   _s_cursorType:int = CURSOR_TYPE_GRAIN;		// round, square, cylinder
 		static 	private var   _s_cursorOperation:int = CURSOR_OP_NONE;		// none, insert, delete
+		
+		static public const EDITCURSOR_SQUARE:uint				= 1000;
+		static public const EDITCURSOR_ROUND:uint				= 1001;
+		static public const EDITCURSOR_CYLINDER:uint			= 1002;
+		static public const EDITCURSOR_CYLINDER_ANIMATED:uint	= 1003;
+		static public const EDITCURSOR_INVALID:uint				= 1004;
 		
         static private 	var	  _repeatTime:int = 100;
 		static private 	var   _repeatTimer:Timer;
 		static private  var   _count:int = 0;
 		
-		static public function get cursorColor():int { return _s_cursorColor; }
-		static public function set cursorColor(val:int):void { _s_cursorColor = val; }
+		static public function get editCursorIcon():int { return _s_editCursorIcon; }
+		static public function set editCursorIcon(val:int):void { _s_editCursorIcon = val; }
 		static public function get cursorType():int { return _s_cursorType; }
 		static public function set cursorType(val:int):void { _s_cursorType = val; }
 		static public function get cursorOperation():int { return _s_cursorOperation; }
@@ -123,6 +129,152 @@ package com.voxelengine.worldmodel.models
 			gciData = null;
 		}
 		
+		public function setGCIDataNew( $gciData:GrainCursorIntersection ):void 
+		{
+			gciData = $gciData;
+			visible = true;
+			if ( CURSOR_OP_INSERT == cursorOperation ) {
+				configureInsertOxel();
+			}
+			else {
+				configureDeleteOxel();
+			}
+
+		}
+		
+		private function configureInsertOxel():void {
+			
+			var gct:GrainCursor = GrainCursorPool.poolGet( gciData.model.oxel.gc.bound );
+			GrainCursor.getFromPoint( gciData.point.x, gciData.point.y, gciData.point.z, gct );
+			// we have to make the grain scale up to the size of the edit cursor
+			gct.become_ancestor( oxel.gc.grain );
+			instanceInfo.positionSetComp( gct.getModelX(), gct.getModelY(), gct.getModelZ() );
+			_gciData.gc.copyFrom( gct );
+			GrainCursorPool.poolDispose( gct );
+			oxel.quadsDeleteAll();
+			oxel.faces_clear_all();
+			oxel.faces_mark_all_clean();
+			var gcCursor:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
+			if ( !oxel.lighting )
+				oxel.lighting = LightingPool.poolGet( 0xff );
+			var li:LightInfo = oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+			var pl:PlacementLocation = getPlacementLocation( gciData.model );
+			if ( PlacementLocation.INVALID == pl.state )
+				editCursorIcon = 1004; // EDITCURSOR_INVALID;
+
+			// We have to manually delete all of the quads so that they can be rebuilt
+			// This method shows only the two faces aligned with axis
+			switch ( gciData.axis )
+			{
+				case 0:
+					oxel.face_set( Globals.POSX );
+					oxel.face_set( Globals.NEGX );
+					break;
+				case 1:
+					oxel.face_set( Globals.POSY );
+					oxel.face_set( Globals.NEGY );
+					break;
+				case 2:
+					oxel.face_set( Globals.POSZ );
+					oxel.face_set( Globals.NEGZ );
+					break;
+			}
+			
+			oxel.face_set( Globals.POSX );
+			oxel.face_set( Globals.NEGX );
+			oxel.face_set( Globals.POSY );
+			oxel.face_set( Globals.NEGY );
+			oxel.face_set( Globals.POSZ );
+			oxel.face_set( Globals.NEGZ );
+			
+			if ( editCursorIcon == 1004 ) {
+				li.color = 0x00ff0000;
+			}
+			else {
+				li.color = 0xffffffff;
+			}
+			oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
+			gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
+			oxel.write( EDIT_CURSOR, gcCursor, editCursorIcon, true );
+			oxel.quadsBuild();
+			GrainCursorPool.poolDispose( gcCursor );
+			
+				/*
+			var oxelToBeModified:Oxel = getHighlightedOxel( false );
+			oxel.gc.copyFrom( oxelToBeModified.gc );
+			if ( Globals.BAD_OXEL == oxelToBeModified )
+				editCursorIcon = EDITCURSOR_INVALID; // ;
+
+			//// We have to manually delete all of the quads so that they can be rebuilt
+			//// This method shows only the two faces aligned with axis
+			//switch ( gciData.axis )
+			//{
+				//case 0:
+					//oxel.face_set( Globals.POSX );
+					//oxel.face_set( Globals.NEGX );
+					//break;
+				//case 1:
+					//oxel.face_set( Globals.POSY );
+					//oxel.face_set( Globals.NEGY );
+					//break;
+				//case 2:
+					//oxel.face_set( Globals.POSZ );
+					//oxel.face_set( Globals.NEGZ );
+					//break;
+			//}
+			
+			oxel.face_set( Globals.POSX );
+			oxel.face_set( Globals.NEGX );
+			oxel.face_set( Globals.POSY );
+			oxel.face_set( Globals.NEGY );
+			oxel.face_set( Globals.POSZ );
+			oxel.face_set( Globals.NEGZ );
+			
+			//var li:LightInfo = oxelToBeModified.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+			//if ( editCursorIcon == EDITCURSOR_INVALID ) {
+				//li.color = 0x00ff0000;
+			//}
+			//else {
+				//li.color = 0xffffffff;
+			//}
+			//oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
+//			gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
+			if ( !oxel.lighting )
+				oxel.lighting = LightingPool.poolGet( 0xff );
+			var li:LightInfo = oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+			if ( editCursorIcon == 1004 ) li.color = 0x00ff0000;
+			else li.color = 0xffffffff;
+			var gcCursor:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
+			gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
+			oxel.write( EDIT_CURSOR, gcCursor, editCursorIcon, true );
+			*/
+		}
+		
+		private function configureDeleteOxel():void {
+			
+			var gct:GrainCursor = GrainCursorPool.poolGet( gciData.model.oxel.gc.bound );
+			GrainCursor.getFromPoint( gciData.point.x, gciData.point.y, gciData.point.z, gct );
+			// we have to make the grain scale up to the size of the edit cursor
+			gct.become_ancestor( oxel.gc.grain );
+			instanceInfo.positionSetComp( gct.getModelX(), gct.getModelY(), gct.getModelZ() );
+			_gciData.gc.copyFrom( gct );
+			GrainCursorPool.poolDispose( gct );
+			oxel.quadsDeleteAll();
+			oxel.faces_clear_all();
+			oxel.faces_mark_all_clean();
+			var gcCursor:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
+			if ( !oxel.lighting )
+				oxel.lighting = LightingPool.poolGet( 0xff );
+			var li:LightInfo = oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+			oxel.faces_set_all();
+			gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
+			oxel.write( EDIT_CURSOR, gcCursor, editCursorIcon, true );
+			li.color = cursorColorRainbow();
+			oxel.quadsBuild();
+			GrainCursorPool.poolDispose( gcCursor );
+		}
+		
+		
 		public function setGCIData( $gciData:GrainCursorIntersection ):void 
 		{
 			gciData = $gciData;
@@ -135,7 +287,6 @@ package com.voxelengine.worldmodel.models
 			instanceInfo.positionSetComp( gct.getModelX(), gct.getModelY(), gct.getModelZ() );
 			_gciData.gc.copyFrom( gct );
 			GrainCursorPool.poolDispose( gct );
-			var selectedCursor:int = cursorColor;
 			oxel.quadsDeleteAll();
 			oxel.faces_clear_all();
 			oxel.faces_mark_all_clean();
@@ -147,7 +298,7 @@ package com.voxelengine.worldmodel.models
 				
 				var pl:PlacementLocation = getPlacementLocation( gciData.model );
 				if ( PlacementLocation.INVALID == pl.state )
-					selectedCursor = 1004; // EDITCURSOR_INVALID;
+					editCursorIcon = 1004; // EDITCURSOR_INVALID;
 
 				// We have to manually delete all of the quads so that they can be rebuilt
 				// This method shows only the two faces aligned with axis
@@ -166,16 +317,29 @@ package com.voxelengine.worldmodel.models
 						oxel.face_set( Globals.NEGZ );
 						break;
 				}
+				
+				oxel.face_set( Globals.POSX );
+				oxel.face_set( Globals.NEGX );
+				oxel.face_set( Globals.POSY );
+				oxel.face_set( Globals.NEGY );
+				oxel.face_set( Globals.POSZ );
+				oxel.face_set( Globals.NEGZ );
+				
+				if ( editCursorIcon == 1004 ) {
+					li.color = 0x00ff0000;
+				}
+				else {
+					li.color = 0xffffffff;
+				}
 				oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
-				li.color = 0xffffffff;
 				gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
-				oxel.write( EDIT_CURSOR, gcCursor, selectedCursor, true );
+				oxel.write( EDIT_CURSOR, gcCursor, editCursorIcon, true );
 			}
 			else
 			{
 				oxel.faces_set_all();
 				gcCursor.set_values( 0, 0, 0, oxel.gc.grain )
-				oxel.write( EDIT_CURSOR, gcCursor, selectedCursor, true );
+				oxel.write( EDIT_CURSOR, gcCursor, editCursorIcon, true );
 				li.color = cursorColorRainbow();
 			}
 			
@@ -338,7 +502,7 @@ package com.voxelengine.worldmodel.models
 				
 				if ( CURSOR_TYPE_GRAIN == cursorType )
 				{
-					foundModel.write( oxelToBeModified.gc, cursorColor );
+					foundModel.write( oxelToBeModified.gc, editCursorIcon );
 				}
 				else if ( CURSOR_TYPE_SPHERE == cursorType )
 				{
@@ -553,7 +717,7 @@ package com.voxelengine.worldmodel.models
 				
 				var radius:int = gciCyl.gc.size()/2;
 				
-				var what:int = cursorColor;
+				var what:int = editCursorIcon;
 				if ( CURSOR_OP_INSERT == _s_cursorOperation )
 				{
 					var placementResult:PlacementLocation = getPlacementLocation( foundModel );
@@ -621,7 +785,7 @@ package com.voxelengine.worldmodel.models
 					cuttingPointCyl.z = gciCyl.point.z + offset;
 				}
 				
-				var what:int = cursorColor;
+				var what:int = editCursorIcon;
 				if ( CURSOR_OP_INSERT == _s_cursorOperation )
 				{
 					offset = gciCyl.gc.size();
@@ -813,13 +977,13 @@ package com.voxelengine.worldmodel.models
 			switch ( type )
 			{
 				case CURSOR_TYPE_CYLINDER:
-					cursorColor = TypeInfo.EDITCURSOR_CYLINDER;
+					editCursorIcon = EditCursor.EDITCURSOR_CYLINDER;
 					break;
 				case CURSOR_TYPE_SPHERE:
-					cursorColor = TypeInfo.EDITCURSOR_ROUND;
+					editCursorIcon = EditCursor.EDITCURSOR_ROUND;
 					break;
 				case CURSOR_TYPE_GRAIN:
-					cursorColor = TypeInfo.EDITCURSOR_SQUARE;
+					editCursorIcon = EditCursor.EDITCURSOR_SQUARE;
 					break;
 			} 
 		}

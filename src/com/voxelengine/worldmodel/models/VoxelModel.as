@@ -83,6 +83,7 @@ package com.voxelengine.worldmodel.models
 		private		var	_usesGravity:Boolean; 														
 		private		var	_visible:Boolean 							= true;  // Should be exported/ move to instance
 					
+		protected function get initialized():Boolean 				{ return _initialized; }
 		public	function get data():ModelData    					{ return _data; }
 		public	function set data(val:ModelData):void   			{ _data = val; }
 		public	function get metadata():ModelMetadata    			{ return _metadata; }
@@ -91,7 +92,6 @@ package com.voxelengine.worldmodel.models
 		public	function set usesGravity(val:Boolean):void 			{ _usesGravity = val; }
 		public	function get getPerModelLightID():uint 				{ return _lightIDNext++ }
 		public	function get camera():Camera						{ return _camera; }
-		protected function get initialized():Boolean 				{ return _initialized; }
 		public	function get anim():Animation 						{ return _anim; }
 		public	function get statisics():ModelStatisics				{ return _statisics; }
 		public	function get instanceInfo():InstanceInfo			{ return _instanceInfo; }
@@ -102,7 +102,7 @@ package com.voxelengine.worldmodel.models
 		public	function get modelInfo():ModelInfo 					{ return _modelInfo; }
 		public	function set modelInfo(val:ModelInfo):void			{ _modelInfo = val; }
 		public	function get children():Vector.<VoxelModel>			{ return _children; }
-		public	function 	childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
+		public	function 	 childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
 		public	function get changed():Boolean						{ return _changed; }
 		public	function set changed( $val:Boolean):void			{ _changed = $val; }
 		public	function get selected():Boolean 					{ return _selected; }
