@@ -264,8 +264,6 @@ package com.voxelengine {
 		
 //////////////////////////////////////////////////////////////////////////////////		
 		public static function modelGet( $guid:String ):VoxelModel {
-//			throw new Error( "Globals.modelGet - not implemented" );
-//			return null;
 			return Region.currentRegion.modelCache.modelGet( $guid );
 		};
 	}

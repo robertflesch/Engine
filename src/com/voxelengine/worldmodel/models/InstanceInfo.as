@@ -127,8 +127,8 @@ public class InstanceInfo extends Location	{
 	{ 
 		return {
 				grainSize: 		_grainSize,
-				modelGuid: 			_modelGuid,
-				instanceGuid: 	_instanceGuid,
+				modelGuid: 		modelGuid,
+				instanceGuid: 	instanceGuid,
 				velocity: 		velocityGet,
 				location: 		positionGet,
 				rotation: 		rotationGet,
@@ -190,21 +190,21 @@ public class InstanceInfo extends Location	{
 		
 		// fileName == templateName == guid ALL THE SAME
 		if ( json.fileName ) {
-			_modelGuid = json.fileName;
+			modelGuid = json.fileName;
 		}
 		if ( json.modelGuid ) {
-			_modelGuid = json.modelGuid;
+			modelGuid = json.modelGuid;
 		}
 		
 		if ( json.instanceGuid ) {
-			_instanceGuid = json.instanceGuid;
+			instanceGuid = json.instanceGuid;
 		}
 			
 		if ( json.name )
 		{
 			if ( owner && owner.metadata ) {
 				owner.metadata.name = json.name;
-				Log.out( "InstanceInfo.initJSON - Setting Metadata Name from instance data: " + json.name + "  guid: " + _modelGuid );
+				Log.out( "InstanceInfo.initJSON - Setting Metadata Name from instance data: " + json.name + "  guid: " + modelGuid );
 			}
 		}
 		
@@ -244,7 +244,7 @@ public class InstanceInfo extends Location	{
 		
 		if ( script )
 		{
-			script.instanceGuid = modelGuid;
+			script.instanceGuid = instanceGuid;
 			//script.event( OxelEvent.CREATE );
 			// Only person using this is the AutoControlObjectScript
 		}
