@@ -33,23 +33,23 @@ package com.furusystems.logging.slf4as.loggers {
 		/* INTERFACE com.furusystems.logging.slf4as.ILogger */
 		
 		public function info(... args:Array):void {
-			log.apply(this, [Levels.INFO].concat(args));
+			log.apply(this, [DEBUG_COLORS.INFO].concat(args));
 		}
 		
 		public function debug(... args:Array):void {
-			log.apply(this, [Levels.DEBUG].concat(args));
+			log.apply(this, [DEBUG_COLORS.DEBUG].concat(args));
 		}
 		
 		public function error(... args:Array):void {
-			log.apply(this, [Levels.ERROR].concat(args));
+			log.apply(this, [DEBUG_COLORS.ERROR].concat(args));
 		}
 		
 		public function warn(... args:Array):void {
-			log.apply(this, [Levels.WARN].concat(args));
+			log.apply(this, [DEBUG_COLORS.WARN].concat(args));
 		}
 		
 		public function fatal(... args:Array):void {
-			log.apply(this, [Levels.FATAL].concat(args));
+			log.apply(this, [DEBUG_COLORS.FATAL].concat(args));
 		}
 		
 		public function log(level:int, ... args:Array):void {
@@ -92,4 +92,14 @@ package com.furusystems.logging.slf4as.loggers {
 	
 	}
 
+}
+
+
+final class DEBUG_COLORS {
+	public static const INFO:int = 0;
+	public static const DEBUG:int = 1;
+	public static const WARN:int = 3;
+	public static const ERROR:int = 4;
+	public static const FATAL:int = 5;
+	public static const UGLY:int = 2; // This is an unreadable color
 }
