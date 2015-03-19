@@ -69,7 +69,7 @@ package com.voxelengine.worldmodel.models
 						//Log.out( "Trigger.update - INSIDE" );
 						for each ( var iscript:Script in instanceInfo.scripts )
 						{
-							OxelEvent.dispatch( new OxelEvent( OxelEvent.INSIDE, instanceInfo.guid ) );
+							OxelEvent.dispatch( new OxelEvent( OxelEvent.INSIDE, instanceInfo.instanceGuid ) );
 						}
 					}
 				} 
@@ -81,7 +81,7 @@ package com.voxelengine.worldmodel.models
 						//Log.out( "Trigger.update - OUTSIDE" );
 						for each ( var oscript:Script in instanceInfo.scripts )
 						{
-							OxelEvent.dispatch( new OxelEvent( OxelEvent.OUTSIDE, instanceInfo.guid ) );
+							OxelEvent.dispatch( new OxelEvent( OxelEvent.OUTSIDE, instanceInfo.instanceGuid ) );
 						}
 					}
 				}
@@ -102,10 +102,10 @@ package com.voxelengine.worldmodel.models
 				
 				var loco:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
 				// this prunes the children oxel
-				oxel.write( instanceInfo.guid, loco.set_values( 0, 0, 0, oxel.gc.grain ), TypeInfo.LEAF, true );
+				oxel.write( instanceInfo.instanceGuid, loco.set_values( 0, 0, 0, oxel.gc.grain ), TypeInfo.LEAF, true );
 				GrainCursorPool.poolDispose( loco );
 				oxel.faces_set_all();
-				oxel.faces_rebuild( instanceInfo.guid );
+				oxel.faces_rebuild( instanceInfo.instanceGuid );
 				oxel.quadsBuild();
 				_was_selected = true;
 			}
@@ -119,7 +119,7 @@ package com.voxelengine.worldmodel.models
 				oxel.readData( null, loco1, _ba, statisics );
 				GrainCursorPool.poolDispose( loco1 );
 				// this cleans up outside, but saddle is gone
-				oxel.faces_rebuild( instanceInfo.guid );
+				oxel.faces_rebuild( instanceInfo.instanceGuid );
 				oxel.faces_clean_all_face_bits();
 				oxel.dirty = true;
 				oxel.quadsBuild();

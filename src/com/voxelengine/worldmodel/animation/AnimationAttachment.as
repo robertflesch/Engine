@@ -117,7 +117,7 @@ package com.voxelengine.worldmodel.animation
 		private function onAttachmentCreated( event:ModelEvent ):void
 		{
 			//Log.out( "AnimationAttachment.onAttachmentCreated owner: " + _owner.toString() );
-			if ( event.instanceGuid == instanceInfo.guid )
+			if ( event.instanceGuid == instanceInfo.instanceGuid )
 			{
 				_voxelModel = _owner.childModelFind( event.instanceGuid );	
 				// locks like this is no longer needed, not sure why not RSF

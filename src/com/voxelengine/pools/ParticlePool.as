@@ -96,7 +96,7 @@ public final class ParticlePool
 	private static function newModel():Particle
 	{
 		var pi:InstanceInfo = new InstanceInfo();
-		pi.guid = CLASS_NAME;
+		pi.modelGuid = CLASS_NAME;
 		//pi.name = CLASS_NAME;
 		pi.grainSize = 2;
 		pi.usesCollision = false;

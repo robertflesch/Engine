@@ -70,7 +70,7 @@ public class ConsoleCommands {
 	{
 		if ( Globals.selectedModel )
 		{
-			Globals.selectedModel.oxel.growTreesOn( Globals.selectedModel.instanceInfo.guid, TypeInfo.GRASS );
+			Globals.selectedModel.oxel.growTreesOn( Globals.selectedModel.instanceInfo.instanceGuid, TypeInfo.GRASS );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -87,7 +87,7 @@ public class ConsoleCommands {
 				return;
 			}
 
-			TreeGenerator.generateTree( Globals.selectedModel.instanceInfo.guid, oxel, 1 );
+			TreeGenerator.generateTree( Globals.selectedModel.instanceInfo.instanceGuid, oxel, 1 );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -108,7 +108,7 @@ public class ConsoleCommands {
 	{
 		if ( Globals.selectedModel )
 		{
-			Globals.selectedModel.oxel.vines( Globals.selectedModel.instanceInfo.guid );
+			Globals.selectedModel.oxel.vines( Globals.selectedModel.instanceInfo.instanceGuid );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -152,7 +152,7 @@ public class ConsoleCommands {
 	{
 		if ( Globals.selectedModel )
 		{
-			Globals.selectedModel.oxel.harvestTrees( Globals.selectedModel.instanceInfo.guid );
+			Globals.selectedModel.oxel.harvestTrees( Globals.selectedModel.instanceInfo.instanceGuid );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -194,7 +194,7 @@ public class ConsoleCommands {
 			return;
 		}
 			
-		CarveTunnel.contructor( Globals.selectedModel.instanceInfo.guid
+		CarveTunnel.contructor( Globals.selectedModel.instanceInfo.instanceGuid
 							  , ModelCacheUtils.gci.point
 							  , ModelCacheUtils.viewVectorNormalizedGet()
 							  , TypeInfo.AIR
@@ -220,7 +220,7 @@ public class ConsoleCommands {
 			return;
 		}
 			
-		CarveTunnels.contructor( Globals.selectedModel.instanceInfo.guid
+		CarveTunnels.contructor( Globals.selectedModel.instanceInfo.instanceGuid
 							   , ModelCacheUtils.gci.point
 							   , ModelCacheUtils.viewVectorNormalizedGet()
 							   , TypeInfo.AIR
@@ -275,7 +275,7 @@ public class ConsoleCommands {
 	private static function spheresCarve( $vm:VoxelModel, $loc:Vector3D, $type:int, $radius:int = 32, $minGrain:int = 2 ):void {
 		var timer:int = getTimer();
 		Oxel.nodes = 0;
-		$vm.oxel.write_sphere( $vm.instanceInfo.guid
+		$vm.oxel.write_sphere( $vm.instanceInfo.instanceGuid
 											   , $loc.x
 											   , $loc.y
 											   , $loc.z
@@ -284,7 +284,7 @@ public class ConsoleCommands {
 											   , $minGrain );
 		Log.out( "ConsoleCommands.waterSpheresCarve  carve AIR time: " + (getTimer() - timer) + "  change count: " + Oxel.nodes );
 		timer = getTimer();
-		$vm.oxel.writeHalfSphere( $vm.instanceInfo.guid
+		$vm.oxel.writeHalfSphere( $vm.instanceInfo.instanceGuid
 											   , $loc.x
 											   , $loc.y
 											   , $loc.z

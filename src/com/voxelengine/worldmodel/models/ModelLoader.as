@@ -20,10 +20,7 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class ModelLoader 
 	{
-		// objects that are waiting on model data to load
-		//static private var _blocks:Dictionary = new Dictionary(true);
-		
-		// Make sense, called from Region
+		// Make sense, called from for Makers
 		static public function modelMetaInfoRead( $ba:ByteArray ):Object {
 			$ba.position = 0;
 			// Read off first 3 bytes, the data format
@@ -71,7 +68,24 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
-		// Make sense, called from Region
+		// Makes sense
+		static public function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:ModelMetadata ):* {
+			var modelAsset:String = $modelInfo.modelClass;
+			var modelClass:Class = ModelLibrary.getAsset( modelAsset )
+			var vm:VoxelModel = new modelClass( $ii );
+			if ( null == vm )
+				throw new Error( "ModelLoader.instantiate - Model failed in creation - modelClass: " + modelClass );
+				
+			vm.init( $modelInfo, $vmm );
+
+			// The avatar is loaded outside of the region
+//			Region.currentRegion.modelCache.add( vm );
+
+			//Log.out( "ModelLoader.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
+			return vm;
+		}
+
+		// Makes sense, called from Region
 		static public function loadRegionObjects( objects:Array ):int {
 			Log.out( "ModelLoader.loadRegionObjects - START =============================" );
 			var count:int = 0;
@@ -79,6 +93,8 @@ package com.voxelengine.worldmodel.models
 				if ( v.model ) {
 					var instance:InstanceInfo = new InstanceInfo();
 					instance.initJSON( v.model );
+					if ( !instance.instanceGuid )
+						instance.instanceGuid = Globals.getUID();
 					load( instance );
 					count++;
 				}
@@ -86,65 +102,21 @@ package com.voxelengine.worldmodel.models
 			Log.out( "ModelLoader.loadRegionObjects - END " + "  count: " + count + "=============================" );
 			return count;
 		}
-		
-		
-		static public function load( $ii:InstanceInfo, $vmm:ModelMetadata = null ):void {
-			//Log.out( "ModelLoader.load - InstanceInfo: " + $ii.toString(), Log.DEBUG );
-//			Globals.instanceInfoAdd( $ii ); // Uses a name + guid as identifier
-			if ( !Globals.isGuid( $ii.guid ) && $ii.guid != "LoadModelFromBigDB" )
+
+		static public function load( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true ):void {
+			if ( !Globals.isGuid( $ii.modelGuid ) && $ii.modelGuid != "LoadModelFromBigDB" )
 				new ModelMakerLocal( $ii );
 			else
-				new ModelMaker( $ii );
+				new ModelMaker( $ii, $addToRegionWhenComplete );
 		}
-		
-		///////////////////////////////////////////////////////////////////////////////////////////////////
-		// persistent model
-		///////////////////////////////////////////////////////////////////////////////////////////////////
-		static public function createFromMakerInfo( $ii:InstanceInfo, $vmd:ModelData, $mmd:ModelMetadata = null ):VoxelModel {
-				
-			var $ba:ByteArray = $vmd.ba;
-			if ( null == $ba )
-			{
-				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad data in VoxelModelMetadata: " + $vmd.guid, Log.ERROR );
-				return null;
-			}
-			$ba.position = 0;
-			
-			var versionInfo:Object = modelMetaInfoRead( $ba );
-			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
-			{
-				Log.out( "VoxelModel.loadFromManifestByteArray - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
-				return null;
-			}
-			
-			// how many bytes is the modelInfo
-			var strLen:int = $ba.readInt();
-			// read off that many bytes
-			var modelInfoJson:String = $ba.readUTFBytes( strLen );
-			
-			// create the modelInfo object from embedded metadata
-			modelInfoJson = decodeURI(modelInfoJson);
-			var jsonResult:Object = JSON.parse(modelInfoJson);
-			var mi:ModelInfo = new ModelInfo();
-			mi.initJSON( $vmd.guid, jsonResult );
-			
-			// add the modelInfo to the repo
-			// is the still needed TODO - RSF 9.23.14
-//			Globals.modelInfoAdd( mi );
-			// needs to be name + guid??
-			
-			//var vm:* = instantiate( $ii, mi, $vmm );
-			var vm:* = instantiate( $ii, mi, $mmd );
-			if ( vm ) {
-				vm.version = versionInfo.version;
-				vm.fromByteArray( $ba );
-			}
 
-			vm.data = $vmd;
-			vm.complete = true;
-			return vm;
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// MAY BE NEEDED
+		static public function modelInfoPreload( $fileName:String ):void {
+			throw new Error( "This is not needed online" );
+			modelInfoFindOrCreate( $fileName, "", false );
 		}
-		
+
 		///////////////////////////////////////////////////////////////////////////////////////////////////
 		// local model
 		///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -184,37 +156,11 @@ package com.voxelengine.worldmodel.models
 		*/
 		// This is the final step in model creation. All of the info needed to create the model is here.
 		// the oxel is still not build, but all of the other information is complete.
-		static public function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:ModelMetadata ):* {
-			var modelAsset:String = $modelInfo.modelClass;
-			var modelClass:Class = ModelLibrary.getAsset( modelAsset )
-			var vm:VoxelModel = new modelClass( $ii );
-			if ( null == vm )
-				throw new Error( "ModelLoader.instantiate - Model failed in creation - modelClass: " + modelClass );
-				
-			vm.init( $modelInfo, $vmm );
-
-			// The avatar is loaded outside of the region
-			Region.currentRegion.modelCache.add( vm );
-
-
-			//Log.out( "ModelLoader.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
-			return vm;
-		}
 		
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// MAY BE NEEDED
-		static public function modelInfoPreload( $fileName:String ):void {
-			throw new Error( "This is not needed online" );
-			modelInfoFindOrCreate( $fileName, "", false );
-		}
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// If we want to preload the modelInfo, we dont need to block on it
 		
-		
-		///////////////////////////////////////////////////////////////////////////////////////////////////
-		// Persistant model
-		///////////////////////////////////////////////////////////////////////////////////////////////////
 		/*
 		static public function loadFromManifestByteArray( $vmm:ModelMetadata, $ba:ByteArray, controllingModelGuid:String = "" ):VoxelModel {
 				
@@ -272,18 +218,9 @@ package com.voxelengine.worldmodel.models
 			return vm;
 		}
 
-		///////////////////////////////////////////////////////////////////////////////////////////////////
-		// END Persistant model
-		///////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		///////////////////////////////////////////////////////////////////////////////////////////////////
-		// END local model
-		///////////////////////////////////////////////////////////////////////////////////////////////////
-		
-
-		///////////////////////////////////////////////////////////////////////////////////////////////////
-		// END local TO Persistant model
-		///////////////////////////////////////////////////////////////////////////////////////////////////
+		// objects that are waiting on model data to load
+		//static private var _blocks:Dictionary = new Dictionary(true);
 		
 		
 		static private function addBlock( $guid:String, $name:String ):void {

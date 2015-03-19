@@ -81,7 +81,7 @@ package com.voxelengine.worldmodel.models
 		
 		static public function create():EditCursor {
 			var instanceInfo:InstanceInfo = new InstanceInfo();
-			instanceInfo.guid = EDIT_CURSOR
+			instanceInfo.modelGuid = EDIT_CURSOR
 
 			var modelInfo:ModelInfo = new ModelInfo();
 			modelInfo.fileName = EDIT_CURSOR;
@@ -533,7 +533,7 @@ package com.voxelengine.worldmodel.models
 				//SphereOperation( gc:GrainCursor, what:int, guid:String,	cx:int, cy:int, cz:int, radius:int, currentGrain:int, gmin:uint = 0  ):void 				
 				new SphereOperation( where
 									 , what
-									 , foundModel.instanceInfo.guid
+									 , foundModel.instanceInfo.instanceGuid
 									 , cuttingPointCyl.x
 									 , cuttingPointCyl.y
 									 , cuttingPointCyl.z
@@ -598,7 +598,7 @@ package com.voxelengine.worldmodel.models
 				{
 					new CylinderOperation( where
 										 , what
-										 , foundModel.instanceInfo.guid
+										 , foundModel.instanceInfo.instanceGuid
 										 , cuttingPointCyl.x
 										 , cuttingPointCyl.y
 										 , cuttingPointCyl.z

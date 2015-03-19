@@ -35,18 +35,18 @@ public class ModelMakerBase {
 		ModelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
 		ModelDataEvent.addListener( ModelBaseEvent.RESULT, retriveData );		
 		ModelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, _ii.guid, null, $fromTables ) );		
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null, $fromTables ) );		
 	}
 	
 	private function retriveData($mde:ModelDataEvent):void  {
-		if ( _ii.guid == $mde.guid ) {
+		if ( _ii.modelGuid == $mde.guid ) {
 			_vmd = $mde.vmd;
 			attemptMake();
 		}
 	}
 	
 	private function failedData( $mde:ModelDataEvent):void  {
-		if ( _ii.guid == $mde.guid ) {
+		if ( _ii.modelGuid == $mde.guid ) {
 			Log.out( "ModelMakerBase.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
 			//(new Alert( "Failed to import model: " + _ii.guid + " data not found" ).display() );
 			markComplete( false );
@@ -62,9 +62,9 @@ public class ModelMakerBase {
 		ModelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 		Log.out( "ModelMakerBase.markComplete - ii: " + _ii + "  success: " + $success, Log.DEBUG );
 		if ( $success )
-			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_COMPLETE, _ii.guid ) );
+			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid ) );
 		else	
-			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_FAILURE, _ii.guid ) );
+			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_FAILURE, _ii.modelGuid ) );
 		
 	}
 }	

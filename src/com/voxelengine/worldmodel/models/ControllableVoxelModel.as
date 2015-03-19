@@ -120,9 +120,9 @@ package com.voxelengine.worldmodel.models
 		public function set keyboardControl(val:Boolean):void
 		{
 			if (val)
-				Log.out("ControllableVoxelModel.keyboardControl is NOW: " + instanceInfo.guid);
+				Log.out("ControllableVoxelModel.keyboardControl is NOW: " + instanceInfo.instanceGuid );
 			else
-				Log.out("ControllableVoxelModel.keyboardControl WAS: " + instanceInfo.guid);
+				Log.out("ControllableVoxelModel.keyboardControl WAS: " + instanceInfo.instanceGuid );
 			_keyboardControl = val;
 		}
 		
@@ -175,7 +175,7 @@ package com.voxelengine.worldmodel.models
 		
 		protected function onChildAdded( me:ModelEvent ):void
 		{
-			if ( me.parentInstanceGuid != instanceInfo.guid )
+			if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
 				return;
 				
 //			var vm:VoxelModel = Globals.modelGet( me.ownerGuid );
@@ -183,7 +183,7 @@ package com.voxelengine.worldmodel.models
 		
 		protected function throttleEvent( event:ShipEvent ):void
 		{
-			if ( event.instanceGuid != instanceInfo.guid )
+			if ( event.instanceGuid != instanceInfo.instanceGuid )
 				return;
 				
 			//Log.out( "Ship.throttleEvent - val: " + event.value );
@@ -258,7 +258,7 @@ package com.voxelengine.worldmodel.models
 		
 		protected function collidedHandler( event:CollisionEvent ):void
 		{
-			if ( event.instanceGuid != this.instanceInfo.guid )
+			if ( event.instanceGuid != this.instanceInfo.instanceGuid )
 				return;
 		
 			if ( this == Globals.controlledModel )
@@ -387,7 +387,7 @@ package com.voxelengine.worldmodel.models
 						var restorePoint:int = collisionCheckNew( $elapsedTimeMS, loc, collisionCandidate, STEP_UP_CHECK )
 						if ( -1 < restorePoint )
 						{
-							Globals.g_app.dispatchEvent( new CollisionEvent( CollisionEvent.COLLIDED, this.instanceInfo.guid ) );
+							Globals.g_app.dispatchEvent( new CollisionEvent( CollisionEvent.COLLIDED, this.instanceInfo.instanceGuid ) );
 							instanceInfo.restoreOld( restorePoint );
 							instanceInfo.velocityReset();
 							return false;
@@ -452,10 +452,10 @@ package com.voxelengine.worldmodel.models
 			super.onKeyDown( e );
 			switch (e.keyCode) {
 				case 87: case Keyboard.UP:
-					throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, instanceInfo.guid, _accelRate ) );
+					throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, instanceInfo.instanceGuid, _accelRate ) );
 					break;
 				case 83: case Keyboard.DOWN: 
-					throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, instanceInfo.guid, -_accelRate ) );
+					throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, instanceInfo.instanceGuid, -_accelRate ) );
 					break;
 			}
         }
@@ -472,7 +472,7 @@ package com.voxelengine.worldmodel.models
 				var wsCenter:Vector3D =  offsetMatrix.position;
 				
 				var trailMarker:InstanceInfo = new InstanceInfo();
-				trailMarker.guid = "1MeterRedBlock";
+				trailMarker.modelGuid = "1MeterRedBlock";
 				trailMarker.dynamicObject = true;
 				trailMarker.scale = new Vector3D( 0.25, 0.25, 0.25 );
 				trailMarker.positionSet = wsCenter;

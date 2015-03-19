@@ -87,7 +87,7 @@ public final class ProjectilePool
 	private static function newModel():Projectile
 	{
 		var pi:InstanceInfo = new InstanceInfo();
-		pi.guid = CLASS_NAME;
+		pi.modelGuid = CLASS_NAME;
 		//pi.name = "Projectile";
 		pi.grainSize = 2;
 		pi.usesCollision = true;

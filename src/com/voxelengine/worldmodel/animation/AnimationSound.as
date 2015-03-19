@@ -75,7 +75,7 @@ package com.voxelengine.worldmodel.animation
 		
 		private function onModelMoved( event:ModelEvent ):void
 		{
-			if ( event.instanceGuid == Globals.player.instanceInfo.guid && null != _pitch )
+			if ( event.instanceGuid == Globals.player.instanceInfo.instanceGuid && null != _pitch )
 			{
 				//trace( "AnimationSound.onModelMoved - Player moved" );
 				// dont want to do this more then once per frame, really once every ten would be ok ??

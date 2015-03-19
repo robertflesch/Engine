@@ -51,7 +51,7 @@ package com.voxelengine.worldmodel.biomes
 		{
 			// land task controller
 			Globals.g_landscapeTaskController.activeTaskLimit = 0;
-			var guid:String = instanceInfo.guid;
+			var guid:String = instanceInfo.instanceGuid;
 
 			// Create task group
 			var taskGroup:TaskGroup = new TaskGroup("Generate Model for " + guid, 2);
@@ -103,7 +103,7 @@ package com.voxelengine.worldmodel.biomes
 		public function addParticleTaskToController( $vm:VoxelModel ):void 
 		{
 			Globals.g_landscapeTaskController.activeTaskLimit = 0;
-			var guid:String = $vm.instanceInfo.guid;
+			var guid:String = $vm.instanceInfo.instanceGuid;
 
 			// Create task group
 			var taskGroup:TaskGroup = new TaskGroup("addParticleTaskToController: " + guid, 15);

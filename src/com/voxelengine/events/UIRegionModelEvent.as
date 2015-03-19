@@ -38,7 +38,7 @@ package com.voxelengine.events
 	   
 		public override function toString():String
 		{
-			return formatToString("UIRegionModelEvent", "bubbles", "cancelable") + " instanceGuid: " + _voxelModel.instanceInfo.guid + "  parentInfo: " + _parentVM ? _parentVM.instanceInfo.guid : "No parent";
+			return formatToString("UIRegionModelEvent", "bubbles", "cancelable") + " instanceGuid: " + _voxelModel.instanceInfo.instanceGuid + "  parentInfo: " + _parentVM ? _parentVM.instanceInfo.modelGuid : "No parent";
 		}
 		
 		

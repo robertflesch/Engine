@@ -8,7 +8,9 @@
 package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.LoadingImageEvent;
+import com.voxelengine.worldmodel.Region;
 import flash.utils.getTimer;
+import flash.utils.ByteArray;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -32,8 +34,11 @@ public class ModelMaker extends ModelMakerBase {
 	static public var _makerCount:int;
 	
 	private var _vmm:ModelMetadata;
+	private var _addToRegionWhenComplete:Boolean;
 	private var _time:int;
-	public function ModelMaker( $ii:InstanceInfo ) {
+	
+	public function ModelMaker( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean ) {
+		_addToRegionWhenComplete = $addToRegionWhenComplete;
 		_time = getTimer();
 		super( $ii );
 		if ( 0 == _makerCount )
@@ -44,7 +49,7 @@ public class ModelMaker extends ModelMakerBase {
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retriveMetadata );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
 
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, _ii.guid, null ) );		
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null ) );		
 	}
 	
 	private function failedMetadata( $mme:ModelMetadataEvent):void {
@@ -53,7 +58,7 @@ public class ModelMaker extends ModelMakerBase {
 	}
 	
 	private function retriveMetadata(e:ModelMetadataEvent):void {
-		if ( _ii.guid == e.guid ) {
+		if ( _ii.modelGuid == e.guid ) {
 			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retriveMetadata );
 			_vmm = e.vmm;
 			attemptMake();
@@ -64,7 +69,10 @@ public class ModelMaker extends ModelMakerBase {
 	override protected function attemptMake():void {
 		if ( null != _vmm && null != _vmd ) {
 			Log.out( "ModelMaker.attemptMake - ii: " + _ii.toString() );
-			ModelLoader.createFromMakerInfo( _ii, _vmd, _vmm );
+			var vm:VoxelModel = createFromMakerInfo();
+			if ( vm )
+				Region.currentRegion.modelCache.add( vm );
+				
 			markComplete();
 		}
 	}
@@ -82,6 +90,50 @@ public class ModelMaker extends ModelMakerBase {
 			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );
 		}
 		Log.out( "ModelMaker.markComplete - makerCount: " + _makerCount + " time: " + (getTimer()-_time) );
+	}
+	
+	private function createFromMakerInfo():VoxelModel {
+		var $ba:ByteArray = _vmd.ba;
+		if ( null == $ba )
+		{
+			Log.out( "ModelMaker.createFromMakerInfo - Exception - bad data in VoxelModelMetadata: " + _vmd.guid, Log.ERROR );
+			return null;
+		}
+		$ba.position = 0;
+		
+		var versionInfo:Object = ModelLoader.modelMetaInfoRead( $ba );
+		if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
+		{
+			Log.out( "ModelMaker.createFromMakerInfo - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
+			return null;
+		}
+		
+		// how many bytes is the modelInfo
+		var strLen:int = $ba.readInt();
+		// read off that many bytes
+		var modelInfoJson:String = $ba.readUTFBytes( strLen );
+		
+		// create the modelInfo object from embedded metadata
+		modelInfoJson = decodeURI(modelInfoJson);
+		var jsonResult:Object = JSON.parse(modelInfoJson);
+		var mi:ModelInfo = new ModelInfo();
+		mi.initJSON( _vmd.guid, jsonResult );
+		
+		// add the modelInfo to the repo
+		// is the still needed TODO - RSF 9.23.14
+//			Globals.modelInfoAdd( mi );
+		// needs to be name + guid??
+		
+		//var vm:* = instantiate( $ii, mi, $vmm );
+		var vm:* = ModelLoader.instantiate( _ii, mi, _vmm );
+		if ( vm ) {
+			vm.version = versionInfo.version;
+			vm.fromByteArray( $ba );
+			vm.complete = true;
+		}
+
+		vm.data = _vmd;
+		return vm;
 	}
 }	
 }

@@ -84,68 +84,71 @@ public class WindowModelMetadata extends VVPopup
 		_desc = new LabelInput( "Description: ", _vmm.description );
 		addElement( _desc );
 		
-		addElement( new HorizontalSeparator( width ) );		
+		if ( TYPE_EDIT == _type ) {
 		
-		var rbGroup:RadioButtonGroup = new RadioButtonGroup( this );
-		var radioButtons:DataProvider = new DataProvider();
-		radioButtons.addAll( { label:"Template for other models" }
-		                   , { label:"Unique Instance" } );
-		eventCollector.addEvent( rbGroup, ButtonsGroupEvent.GROUP_CHANGED
-		                       , function (event:ButtonsGroupEvent):void {  _vmm.template = (0 == event.target.index ?  true : false) } );
-		rbGroup.dataProvider = radioButtons;
-		rbGroup.index = 1;
+			addElement( new HorizontalSeparator( width ) );		
+			
+			var rbGroup:RadioButtonGroup = new RadioButtonGroup( this );
+			var radioButtons:DataProvider = new DataProvider();
+			radioButtons.addAll( { label:"Template for other models" }
+							   , { label:"Unique Instance" } );
+			eventCollector.addEvent( rbGroup, ButtonsGroupEvent.GROUP_CHANGED
+								   , function (event:ButtonsGroupEvent):void {  _vmm.template = (0 == event.target.index ?  true : false) } );
+			rbGroup.dataProvider = radioButtons;
+			rbGroup.index = 1;
 
-		addElement( new HorizontalSeparator( width ) );		
-		
-		var rbOwnerGroup:RadioButtonGroup = new RadioButtonGroup( this );
-		eventCollector.addEvent( rbOwnerGroup, ButtonsGroupEvent.GROUP_CHANGED
-		                       , function (event:ButtonsGroupEvent):void {  _vmm.owner = (0 == event.target.index ?  Network.userId :  Network.PUBLIC ) } );
-		var radioButtonsOwner:DataProvider = new DataProvider();
-		radioButtonsOwner.addAll( { label:"Owned by " + Network.userId }
-		                        , { label:"Public Object" } );
-		rbOwnerGroup.dataProvider = radioButtonsOwner;
-		rbOwnerGroup.index = 0;
-		
-		addElement( new HorizontalSeparator( width ) );		
-		
-		var rbTransferGroup:RadioButtonGroup = new RadioButtonGroup( this );
-		eventCollector.addEvent( rbTransferGroup, ButtonsGroupEvent.GROUP_CHANGED
-		                       , function (event:ButtonsGroupEvent):void {  _vmm.transfer = (0 == event.target.index ?  true :  false ) } );
-		var rbTransferDP:DataProvider = new DataProvider();
-		rbTransferDP.addAll( { label:"Allow this object to be transferred" }
-		                   , { label:"Bind this object to user" } );
-		rbTransferGroup.dataProvider = rbTransferDP;
-		rbTransferGroup.index = 0;
-		
-		addElement( new HorizontalSeparator( width ) );		
-		
-		var rbModifyGroup:RadioButtonGroup = new RadioButtonGroup( this );
-		eventCollector.addEvent( rbModifyGroup, ButtonsGroupEvent.GROUP_CHANGED
-		                       , function (event:ButtonsGroupEvent):void {  _vmm.modify = (0 == event.target.index ?  true :  false ) } );
-		var rbModifyDP:DataProvider = new DataProvider();
-		rbModifyDP.addAll( { label:"Allow this object to be modified" }
-		                   , { label:"This objects shape is set" } );
-		rbModifyGroup.dataProvider = rbModifyDP;
-		rbModifyGroup.index = 0;
+			addElement( new HorizontalSeparator( width ) );		
+			
+			var rbOwnerGroup:RadioButtonGroup = new RadioButtonGroup( this );
+			eventCollector.addEvent( rbOwnerGroup, ButtonsGroupEvent.GROUP_CHANGED
+								   , function (event:ButtonsGroupEvent):void {  _vmm.owner = (0 == event.target.index ?  Network.userId :  Network.PUBLIC ) } );
+			var radioButtonsOwner:DataProvider = new DataProvider();
+			radioButtonsOwner.addAll( { label:"Owned by " + Network.userId }
+									, { label:"Public Object" } );
+			rbOwnerGroup.dataProvider = radioButtonsOwner;
+			rbOwnerGroup.index = 0;
+			
+			addElement( new HorizontalSeparator( width ) );		
+			
+			var rbTransferGroup:RadioButtonGroup = new RadioButtonGroup( this );
+			eventCollector.addEvent( rbTransferGroup, ButtonsGroupEvent.GROUP_CHANGED
+								   , function (event:ButtonsGroupEvent):void {  _vmm.transfer = (0 == event.target.index ?  true :  false ) } );
+			var rbTransferDP:DataProvider = new DataProvider();
+			rbTransferDP.addAll( { label:"Allow this object to be transferred" }
+							   , { label:"Bind this object to user" } );
+			rbTransferGroup.dataProvider = rbTransferDP;
+			rbTransferGroup.index = 0;
+			
+			addElement( new HorizontalSeparator( width ) );		
+			
+			var rbModifyGroup:RadioButtonGroup = new RadioButtonGroup( this );
+			eventCollector.addEvent( rbModifyGroup, ButtonsGroupEvent.GROUP_CHANGED
+								   , function (event:ButtonsGroupEvent):void {  _vmm.modify = (0 == event.target.index ?  true :  false ) } );
+			var rbModifyDP:DataProvider = new DataProvider();
+			rbModifyDP.addAll( { label:"Allow this object to be modified" }
+							   , { label:"This objects shape is set" } );
+			rbModifyGroup.dataProvider = rbModifyDP;
+			rbModifyGroup.index = 0;
 
-		addElement( new HorizontalSeparator( width ) );		
-		
-		var rbCopyGroup:RadioButtonGroup = new RadioButtonGroup( this );
-		eventCollector.addEvent( rbCopyGroup, ButtonsGroupEvent.GROUP_CHANGED
-		                       , function (event:ButtonsGroupEvent):void {  _vmm.copy = (0 == event.target.index ?  true :  false ) } );
-		var rbCopyDP:DataProvider = new DataProvider();
-		rbCopyDP.addAll( { label:"Allow this object to be copied freely" }
-		               , { label:"Allow how many copies - below (1) min" } );
-		rbCopyGroup.dataProvider = rbCopyDP;
-		rbCopyGroup.index = 0;
-		
-		addElement( new HorizontalSeparator( width ) );
-		
-		_copies = new LabelInput( "Num of copies(-1 = infinite): ", "-1" );
-		_copies.labelControl.width = 40;
-		addElement( _copies );
-		
-		addElement( new HorizontalSeparator( width ) );
+			addElement( new HorizontalSeparator( width ) );		
+			
+			var rbCopyGroup:RadioButtonGroup = new RadioButtonGroup( this );
+			eventCollector.addEvent( rbCopyGroup, ButtonsGroupEvent.GROUP_CHANGED
+								   , function (event:ButtonsGroupEvent):void {  _vmm.copy = (0 == event.target.index ?  true :  false ) } );
+			var rbCopyDP:DataProvider = new DataProvider();
+			rbCopyDP.addAll( { label:"Allow this object to be copied freely" }
+						   , { label:"Allow how many copies - below (1) min" } );
+			rbCopyGroup.dataProvider = rbCopyDP;
+			rbCopyGroup.index = 0;
+			
+			addElement( new HorizontalSeparator( width ) );
+			
+			_copies = new LabelInput( "Num of copies(-1 = infinite): ", "-1" );
+			_copies.labelControl.width = 40;
+			addElement( _copies );
+			
+			addElement( new HorizontalSeparator( width ) );
+		}
 		
 		var saveMetadata:Button = new Button( "Save" );
 		eventCollector.addEvent( saveMetadata, UIMouseEvent.CLICK, save );
@@ -163,10 +166,10 @@ public class WindowModelMetadata extends VVPopup
 	private function save( e:UIMouseEvent ):void { 
 		_vmm.name = _name.label;
 		_vmm.description = _desc.label;
-		_vmm.copyCount = parseInt( _copies.label, 10 );
 		_vmm.createdDate = new Date();
 		_vmm.modifiedDate = new Date();
 		if ( _type == TYPE_EDIT ) {
+			_vmm.copyCount = parseInt( _copies.label, 10 );
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.UPDATE, 0, _vmm.guid, _vmm ) );
 		} else { // TYPE_IMPORT so new data
 			var dboTemp:DatabaseObject = new DatabaseObject( Globals.DB_TABLE_MODELS, _vmm.guid, "1", 0, true, null );

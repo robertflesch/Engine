@@ -143,18 +143,18 @@ package com.voxelengine.GUI
 			switch ( id )
 			{
 				case 0: // From Cube
-					ii.guid = "GenerateCube";
-					ModelLoader.modelInfoPreload( ii.guid );
+					ii.modelGuid = "GenerateCube";
+					ModelLoader.modelInfoPreload( ii.modelGuid );
 					break;
 				case 1: // From Sphere
-					ii.guid = "GenerateSphere";
-					ModelLoader.modelInfoPreload( ii.guid );
+					ii.modelGuid = "GenerateSphere";
+					ModelLoader.modelInfoPreload( ii.modelGuid );
 					li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
 					detailSize = li.data;			
 					break;
 				case 2: // From Sphere
-					ii.guid = "GenerateSubSphere";
-					ModelLoader.modelInfoPreload( ii.guid );
+					ii.modelGuid = "GenerateSubSphere";
+					ModelLoader.modelInfoPreload( ii.modelGuid );
 					li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
 					detailSize = li.data;			
 					break;

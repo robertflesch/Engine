@@ -70,7 +70,7 @@ package com.voxelengine.worldmodel.scripts
 				var ship:VoxelModel = bomb.instanceInfo.controllingModel;
 				if ( ship )
 				{
-					createReplacementBomb( bomb.instanceInfo.clone() , ship.instanceInfo.guid );
+					createReplacementBomb( bomb.instanceInfo.clone() , ship.instanceInfo.instanceGuid );
 			
 					ship.childDetach( bomb );
 

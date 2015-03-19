@@ -17,7 +17,7 @@ public class GrainCursorIntersection
 	public final function toString():String
 	{
 		if ( gc && model )
-			return " GCI Info: point: " + point + "   wsPoint: " + wsPoint + " gc: " + gc + " model: " + model.instanceInfo.guid; 
+			return " GCI Info: point: " + point + "   wsPoint: " + wsPoint + " gc: " + gc + " model: " + model.instanceInfo.instanceGuid; 
 		if ( gc )
 			return " GCI Info: point: " + point + "   wsPoint: " + wsPoint + " gc: " + gc; 
 		else			

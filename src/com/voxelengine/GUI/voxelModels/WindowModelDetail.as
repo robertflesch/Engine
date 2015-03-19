@@ -80,13 +80,14 @@ package com.voxelengine.GUI.voxelModels
 			// TODO need to be able to handle an array of scipts.
 			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { ii.scriptName = $e.target.text; }, ii.scriptName, width ) );
 			addElement( new ComponentLabel( "Size in Meters", String(ii.grainSize), width ) );
-			addElement( new ComponentLabel( "Instance GUID",  ii.guid, width ) );
+			addElement( new ComponentLabel( "Model GUID",  ii.modelGuid, width ) );
+			addElement( new ComponentLabel( "Instance GUID",  ii.instanceGuid, width ) );
 			if ( _vm.anim )
 				// TODO add a drop down of available states
 				addElement( new ComponentLabel( "State", _vm.anim ? _vm.anim.name : "", width ) );
 				
 			if ( ii.controllingModel )
-				addElement( new ComponentLabel( "Parent GUID",  ii.controllingModel ? ii.controllingModel.instanceInfo.guid : "", width ) );
+				addElement( new ComponentLabel( "Parent GUID",  ii.controllingModel ? ii.controllingModel.instanceInfo.instanceGuid : "", width ) );
 //
 			addElement( new ComponentVector3D( "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, updateVal ) );
 			addElement( new ComponentVector3D( "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, updateVal ) );
@@ -168,14 +169,14 @@ package com.voxelengine.GUI.voxelModels
 			_s_inExistance--;
 			_s_currentInstance = null;
 			
-			ModelEvent.dispatch( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.guid ) );
+			ModelEvent.dispatch( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.instanceGuid ) );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, 0, null ) );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
 		}
 		
 
 		private function changeStateHandler(event:TextEvent):void {
-			var vm:VoxelModel = Globals.modelGet( _vm.instanceInfo.guid )
+			var vm:VoxelModel = Globals.modelGet( _vm.instanceInfo.instanceGuid )
 			var state:String = event.target.text;
 			vm.stateLock( false );
 			vm.stateSet( state );

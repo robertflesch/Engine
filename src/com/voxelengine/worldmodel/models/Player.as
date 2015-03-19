@@ -57,7 +57,7 @@ public class Player extends Avatar
 	static private var  	STEP_UP_MAX:int 			= 16;
 	private var _userInventory:UserInventory;		
 	public function Player( instanceInfo:InstanceInfo ) { 
-		Log.out( "Player.construct guid: " + instanceInfo.guid + "  --------------------------------------------------------------------------------------------------------------------" );
+		Log.out( "Player.construct guid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super( instanceInfo );
 		if ( Globals.player ) {
 			Globals.player.dead = true;
@@ -67,7 +67,7 @@ public class Player extends Avatar
 	}
 	
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
-		Log.out( "Player.init guid: " + instanceInfo.guid + "  --------------------------------------------------------------------------------------------------------------------" );
+		Log.out( "Player.init guid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super.init( $mi, $vmm );
 		
 		instanceInfo.usesCollision = true;
@@ -84,7 +84,7 @@ public class Player extends Avatar
 	
 	override public function set dead(val:Boolean):void { 
 		super.dead = val;
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_UNLOAD_REQUEST, _instanceInfo.guid, null ) );
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_UNLOAD_REQUEST, _instanceInfo.instanceGuid, null ) );
 		removeEventHandlers();
 	}
 	
@@ -146,7 +146,7 @@ public class Player extends Avatar
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.grainSize = 4;
 			//ii.guid = $dbo.modelGuid;
-			ii.guid = "Player";
+			ii.modelGuid = "Player";
 			//Log.out( "Player.onPlayerLoadedAction - creating player with guid: " + ii.guid, Log.WARN  );
 			//new ModelMaker( ii );
 			new ModelMakerLocal( ii );
@@ -168,7 +168,7 @@ public class Player extends Avatar
 	}
 	
 	override protected function onChildAdded( me:ModelEvent ):void	{
-		if ( me.parentInstanceGuid != instanceInfo.guid )
+		if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
 			return;
 			
 		var vm:VoxelModel = childModelFind( me.instanceGuid );	

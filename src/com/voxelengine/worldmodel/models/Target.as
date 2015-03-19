@@ -36,7 +36,7 @@ package com.voxelengine.worldmodel.models
 		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
 			super.init( $mi, $vmm );
 			
-			Globals.g_app.dispatchEvent( new TargetEvent( TargetEvent.CREATED, instanceInfo.guid, _pointValue ) );
+			Globals.g_app.dispatchEvent( new TargetEvent( TargetEvent.CREATED, instanceInfo.instanceGuid, _pointValue ) );
 		}
 
 		// I removed the responses, not sure what should be done here.

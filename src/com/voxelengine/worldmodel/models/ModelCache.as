@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.models
 	import flash.display3D.Context3D;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
+	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
 	
 	import com.voxelengine.Log;
@@ -20,12 +21,16 @@ package com.voxelengine.worldmodel.models
 	public class ModelCache 
 	{
 		// these are the active parent objects or dynamic objects
+		// We do double entry here so that models can be retrived by guid
 		private var _models:Vector.<VoxelModel> = new Vector.<VoxelModel>();
+		private var _modelsGuid:Dictionary = new Dictionary();
 		private var _modelsDynamic:Vector.<VoxelModel> = new Vector.<VoxelModel>();
+		private var _modelsDynamicGuid:Dictionary = new Dictionary();
 		private var _region:Region;
 		
 		public function get models():Vector.<VoxelModel> { return _models; }
 		public function modelsGet():Vector.<VoxelModel> { return _models; }
+		public function modelGet( $instanceGuid:String ):VoxelModel  { return _modelsGuid[$instanceGuid]; }
 		public function get modelsDynamic():Vector.<VoxelModel> { return _modelsDynamic; }
 		
 		private var m:ModelCacheUtils;
@@ -37,7 +42,7 @@ package com.voxelengine.worldmodel.models
 		public function createPlayer():Boolean	{
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			Log.out( "ModelCache.createPlayer - creating from LOCAL", Log.DEBUG );
-			instanceInfo.guid = "Player";
+			instanceInfo.modelGuid = "Player";
 			instanceInfo.grainSize = 4;
 			ModelLoader.load( instanceInfo );
 			return true
@@ -71,27 +76,35 @@ package com.voxelengine.worldmodel.models
 			// if this is a child model, give it to parent, 
 			// next check to see if its a dynamic model
 			//otherwise add it to ModelCache list.
-			Log.out( "ModelCache.add - guid: " + vm.instanceInfo.guid );			
+			Log.out( "ModelCache.add - guid: " + vm.instanceInfo.modelGuid + "  instanceGuid: " + vm.instanceInfo.instanceGuid, Log.WARN );			
 			if ( vm.instanceInfo.controllingModel )
 			{
 				vm.instanceInfo.controllingModel.childAdd( vm );
-				ModelEvent.dispatch( new ModelEvent( ModelEvent.CHILD_MODEL_ADDED, vm.instanceInfo.guid, null, null, vm.instanceInfo.controllingModel.instanceInfo.guid ) );
+				ModelEvent.dispatch( new ModelEvent( ModelEvent.CHILD_MODEL_ADDED, vm.instanceInfo.instanceGuid, null, null, vm.instanceInfo.controllingModel.instanceInfo.instanceGuid ) );
 			}
 			else if ( vm.instanceInfo.dynamicObject )
 			{
+				if ( null == vm.instanceInfo.instanceGuid )
+					vm.instanceInfo.instanceGuid = Globals.getUID();
 				_modelsDynamic.push(vm);
-				ModelEvent.dispatch( new ModelEvent( ModelEvent.DYNAMIC_MODEL_ADDED, vm.instanceInfo.guid ) );
+				_modelsDynamicGuid[vm.instanceInfo.instanceGuid] = vm;
+				ModelEvent.dispatch( new ModelEvent( ModelEvent.DYNAMIC_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
 			}
 			else
 			{
 				if ( vm is Avatar ) {
 					// need to seperate these out into their own catagory
+					vm.instanceInfo.instanceGuid = vm.instanceInfo.modelGuid;
+					_modelsGuid[vm.instanceInfo.instanceGuid] = vm;
 					_models.push(vm);
-					ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.guid ) );
+					ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
 				}
 				else {
+					if ( null == vm.instanceInfo.instanceGuid )
+						vm.instanceInfo.instanceGuid = Globals.getUID();
+					_modelsGuid[vm.instanceInfo.instanceGuid] = vm;
 					_models.push(vm);
-					ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.guid ) );
+					ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
 				}
 			}
 		}
@@ -223,8 +236,10 @@ package com.voxelengine.worldmodel.models
 			var vm:VoxelModel
 			for ( var i:int; i < _models.length; ) {
 				vm = _models[i];
-				if ( vm && true == vm.dead )
+				if ( vm && true == vm.dead ) {
 					_models.splice( i, 1 );
+					_modelsGuid[vm.instanceInfo.instanceGuid] = null;
+				}
 				else 
 					i++
 			}
@@ -234,8 +249,10 @@ package com.voxelengine.worldmodel.models
 			var vm:VoxelModel;
 			for ( var i:int; i < _modelsDynamic.length; ) {
 				vm = _modelsDynamic[i];
-				if ( vm && true == vm.dead )
+				if ( vm && true == vm.dead ) {
 					_modelsDynamic.splice( i, 1 );
+					_modelsDynamicGuid[vm.instanceInfo.instanceGuid] = null;
+				}
 				else 
 					i++
 			}
@@ -249,7 +266,8 @@ package com.voxelengine.worldmodel.models
 				vm = _models[i];
 				if ( vm && $vm == vm )
 				{
-					_modelsDynamic.splice( i, 1 );
+					_models.splice( i, 1 );
+					_modelsGuid[vm.instanceInfo.instanceGuid] = null;
 					break;
 				}
 			}

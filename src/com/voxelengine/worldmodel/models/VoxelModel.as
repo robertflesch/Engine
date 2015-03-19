@@ -118,10 +118,10 @@ package com.voxelengine.worldmodel.models
 			{
 				for each (var script:Script in instanceInfo.scripts)
 				{
-					script.instanceGuid = instanceInfo.guid;
+					script.instanceGuid = instanceInfo.instanceGuid;
 				}
 			}
-			ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, instanceInfo.guid ) );
+			ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, instanceInfo.instanceGuid ) );
 		}
 
 		public function get complete():Boolean						{ return _complete; }
@@ -236,7 +236,7 @@ package com.voxelengine.worldmodel.models
 				initialize_root_oxel(0 < instanceInfo.grainSize ? instanceInfo.grainSize : modelInfo.grainSize);
 			
 			if ( null == _metadata )
-				metadata = new ModelMetadata( instanceInfo.guid );
+				metadata = new ModelMetadata( instanceInfo.modelGuid );
 			else 
 				metadata = $vmm;
 			
@@ -278,7 +278,7 @@ package com.voxelengine.worldmodel.models
 			// Get old value since this is wiped out in the instanceInfo clone
 			var repeat:int = this.instanceInfo._repeat;
 			var ii:InstanceInfo = instanceInfo.clone();
-			ii.guid = mi.fileName;
+			ii.modelGuid = mi.fileName;
 			if (0 < repeat)
 				repeat--;
 			ii._repeat = repeat;
@@ -290,7 +290,7 @@ package com.voxelengine.worldmodel.models
 		
 		private function impactEventHandler(ie:ImpactEvent):void {
 			// Is the explosion event close enough to me to cause me to explode?
-			if (ie.instanceGuid == instanceInfo.guid)
+			if (ie.instanceGuid == instanceInfo.instanceGuid )
 				return;
 			
 			if (oxel)
@@ -440,7 +440,7 @@ package com.voxelengine.worldmodel.models
 		
 		public function flow( $countDown:int = 8, $countOut:int = 8 ):void
 		{
-			oxel.flowFindCandidates( instanceInfo.guid, $countDown, $countOut );	
+			oxel.flowFindCandidates( instanceInfo.instanceGuid, $countDown, $countOut );	
 		}
 		
 		// This function writes to the root oxel, and lets the root find the correct target
@@ -465,7 +465,7 @@ package com.voxelengine.worldmodel.models
 			}
 			
 			var result:Boolean;
-			var changedOxel:Oxel = oxel.write( instanceInfo.guid, $gc, $type, $onlyChangeType );
+			var changedOxel:Oxel = oxel.write( instanceInfo.instanceGuid, $gc, $type, $onlyChangeType );
 			
 			if ( Globals.BAD_OXEL != changedOxel )
 			{
@@ -478,9 +478,9 @@ package com.voxelengine.worldmodel.models
 					if ( null == changedOxel.flowInfo ) // if it doesnt have flow info, get some! This is from placement of flowable oxels
 						changedOxel.flowInfo = typeInfo.flowInfo.clone();
 						
-					if ( Globals.autoFlow && EditCursor.EDIT_CURSOR != instanceInfo.guid )
+					if ( Globals.autoFlow && EditCursor.EDIT_CURSOR != instanceInfo.instanceGuid )
 					{
-						Flow.addTask( instanceInfo.guid, changedOxel.gc, changedOxel.type, changedOxel.flowInfo, 1 );
+						Flow.addTask( instanceInfo.instanceGuid, changedOxel.gc, changedOxel.type, changedOxel.flowInfo, 1 );
 					}
 				}
 				else
@@ -491,12 +491,12 @@ package com.voxelengine.worldmodel.models
 					
 				if ( oldTypeInfo.lightInfo.lightSource )
 				{
-					var rle:LightEvent = new LightEvent( LightEvent.REMOVE, instanceInfo.guid, $gc, oldLightID );
+					var rle:LightEvent = new LightEvent( LightEvent.REMOVE, instanceInfo.instanceGuid, $gc, oldLightID );
 					Globals.g_app.dispatchEvent( rle );
 				}
 				if ( typeInfo.lightInfo.lightSource )
 				{
-					var le:LightEvent = new LightEvent( LightEvent.ADD, instanceInfo.guid, $gc, getPerModelLightID );
+					var le:LightEvent = new LightEvent( LightEvent.ADD, instanceInfo.instanceGuid, $gc, getPerModelLightID );
 					Globals.g_app.dispatchEvent( le );
 				}
 				
@@ -504,13 +504,13 @@ package com.voxelengine.worldmodel.models
 					
 					// we removed a solid block, and are replacing it with air or transparent
 					if ( changedOxel.lighting && changedOxel.lighting.valuesHas() )
-						Globals.g_app.dispatchEvent( new LightEvent( LightEvent.SOLID_TO_ALPHA, instanceInfo.guid, changedOxel.gc ) );
+						Globals.g_app.dispatchEvent( new LightEvent( LightEvent.SOLID_TO_ALPHA, instanceInfo.instanceGuid, changedOxel.gc ) );
 				} 
 				else if ( TypeInfo.isSolid( $type ) && TypeInfo.hasAlpha( oldType ) ) {
 					
 					// we added a solid block, and are replacing the transparent block that was there
 					if ( changedOxel.lighting && changedOxel.lighting.valuesHas() )
-						Globals.g_app.dispatchEvent( new LightEvent( LightEvent.ALPHA_TO_SOLID, instanceInfo.guid, changedOxel.gc ) );
+						Globals.g_app.dispatchEvent( new LightEvent( LightEvent.ALPHA_TO_SOLID, instanceInfo.instanceGuid, changedOxel.gc ) );
 				}
 			}
 			
@@ -520,26 +520,26 @@ package com.voxelengine.worldmodel.models
 		public function write_sphere(cx:int, cy:int, cz:int, radius:int, what:int, gmin:uint = 0):void
 		{
 			_changed = true;
-			oxel.write_sphere( instanceInfo.guid, cx, cy, cz, radius, what, gmin);
+			oxel.write_sphere( instanceInfo.instanceGuid, cx, cy, cz, radius, what, gmin);
 		}
 		
 		public function empty_square(cx:int, cy:int, cz:int, radius:int, gmin:uint = 0):void
 		{
 			_changed = true;
-			oxel.empty_square( instanceInfo.guid, cx, cy, cz, radius, gmin);
+			oxel.empty_square( instanceInfo.instanceGuid, cx, cy, cz, radius, gmin);
 		}
 		
 		public function effect_sphere(cx:int, cy:int, cz:int, ie:ImpactEvent ):void {
 			_timer = getTimer();
 			_changed = true;
-			oxel.effect_sphere( instanceInfo.guid, cx, cy, cz, ie );
+			oxel.effect_sphere( instanceInfo.instanceGuid, cx, cy, cz, ie );
 			//Log.out( "VoxelModel.effect_sphere - radius: " + ie.radius + " gmin: " + ie.detail + " took: " + (getTimer() - _timer) );
 			//oxel.mergeRecursive(); // Causes bad things to happen since we dont regen faces!
 		}
 		public function empty_sphere(cx:int, cy:int, cz:int, radius:Number, gmin:uint = 0):void {
 			_timer = getTimer();
 			_changed = true;
-			oxel.write_sphere( instanceInfo.guid, cx, cy - 1, cz, radius - 1.5, TypeInfo.AIR, gmin);
+			oxel.write_sphere( instanceInfo.instanceGuid, cx, cy - 1, cz, radius - 1.5, TypeInfo.AIR, gmin);
 			
 			//Log.out( "VoxelModel.empty_sphere - radius: " + radius + " gmin: " + gmin + " took: " + (getTimer() - _timer) );
 			//oxel.mergeRecursive(); // Causes bad things to happen since we dont regen faces!
@@ -693,6 +693,10 @@ package com.voxelengine.worldmodel.models
 					//_modelInfo.removeChild( child );
 					
 					//Log.out( "VoxelModel.internal_initialize - create child of parent.instance: " + instanceInfo.guid + "  - child.instanceGuid: " + child.instanceGuid );					
+					if ( null == child.modelGuid )
+						continue;
+					if ( null == child.instanceGuid )
+						child.instanceGuid = Globals.getUID();
 					ModelLoader.load(child);
 				}
 				Log.out( "VoxelModel.internal_initialize - loading child models END" );
@@ -736,7 +740,7 @@ package com.voxelengine.worldmodel.models
 				GrainCursorPool.poolDispose(gc);
 			}
 			catch (e:Error) {
-				Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.guid: " + instanceInfo.guid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + TypeInfo.typeInfo[oxel.type].name );					
+				Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.instanceGuid: " + instanceInfo.instanceGuid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + TypeInfo.typeInfo[oxel.type].name );					
 			}
 		
 			//Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.guid: " + instanceInfo.guid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + Globals.Info[type].name );					
@@ -788,7 +792,7 @@ package com.voxelengine.worldmodel.models
 			var index:int = 0;
 			for each (var child:VoxelModel in _children)
 			{
-				if (child.instanceInfo.guid ==  $instanceInfo.guid )
+				if (child.instanceInfo.instanceGuid ==  $instanceInfo.instanceGuid )
 				{
 					_children.splice(index, 1);
 					break;
@@ -849,7 +853,7 @@ package com.voxelengine.worldmodel.models
 			vm.instanceInfo.velocitySet = instanceInfo.velocityGet;
 			
 			// This model (vm.instanceInfo.guid) is detaching (ModelEvent.DETACH) from root model (instanceInfo.guid)
-			var me:ModelEvent = new ModelEvent(ModelEvent.DETACH, vm.instanceInfo.guid, null, null, instanceInfo.guid);
+			var me:ModelEvent = new ModelEvent(ModelEvent.DETACH, vm.instanceInfo.instanceGuid, null, null, instanceInfo.instanceGuid);
 			Globals.g_app.dispatchEvent(me);
 		}
 		
@@ -857,7 +861,7 @@ package com.voxelengine.worldmodel.models
 		{
 			for each (var child:VoxelModel in _children)
 			{
-				if (child.instanceInfo.guid == guid)
+				if (child.instanceInfo.instanceGuid == guid)
 					return child;
 			}
 			// didnt find it at first level, lets look recurvsivly
@@ -884,7 +888,9 @@ package com.voxelengine.worldmodel.models
 		
 		public function print():void
 		{
-			Log.out("----------------------- Print VoxelModel instanceInfo.guid: " + instanceInfo.guid + " -------------------------------");
+			Log.out("----------------------- Print VoxelModel -------------------------------");
+			Log.out("----------------------- instanceInfo.instanceGuid: " + instanceInfo.instanceGuid + " -------------------------------");
+			Log.out("----------------------- instanceInfo.modelGuid:       " + instanceInfo.modelGuid + " -------------------------------");
 			oxel.print();
 			Log.out("------------------------------------------------------------------------------");
 		}
@@ -964,7 +970,7 @@ package com.voxelengine.worldmodel.models
 			 *
 			 */
 //			MetadataManager.deleteModel( metadata.guid );
-			Log.out("VoxelModel.delete - delete object: " + instanceInfo.guid, Log.ERROR );
+			Log.out("VoxelModel.delete - delete object: " + instanceInfo.instanceGuid, Log.ERROR );
 			
 			_changed = true;
 		}
@@ -973,15 +979,15 @@ package com.voxelengine.worldmodel.models
 		public function save():void
 		{
 			if ( !changed ) {
-				Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.guid: " + instanceInfo.guid  );
+				Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 				return;
 			}
 			if ( !Globals.online ) {
-				Log.out( "VoxelModel.save - NOT online, NOT SAVING name: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.guid: " + instanceInfo.guid  );
+				Log.out( "VoxelModel.save - NOT online, NOT SAVING name: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 				return;
 			}
 				
-			Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.guid: " + instanceInfo.guid  );
+			Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.guid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 			if ( "" != metadata.templateGuid )
 				metadata.templateGuid = "";
 					
@@ -1087,7 +1093,7 @@ package com.voxelengine.worldmodel.models
 		public function cloneFromChild(childOxel:Oxel):VoxelModel
 		{
 			var ii:InstanceInfo = instanceInfo.explosionClone();
-			ii.guid = "ExplosionFragment";
+			ii.modelGuid = "ExplosionFragment";
 			var mi:ModelInfo = new ModelInfo();
 			var vm:VoxelModel = new VoxelModel(ii);
 			vm.init( mi, null, false )
@@ -1499,9 +1505,9 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.RELEASE_CONTROL called on: "
 				
 			}
 			else if ( ModelEvent.MODEL_MODIFIED ) {
-Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on instance: " + $me.instanceGuid + "  my guid: " + instanceInfo.guid, Log.DEBUG );								
+Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on instance: " + $me.instanceGuid + "  my guid: " + instanceInfo.instanceGuid, Log.DEBUG );								
 //				$me.instanceGuid
-				if ( $me.instanceGuid == instanceInfo.guid ) 
+				if ( $me.instanceGuid == instanceInfo.instanceGuid ) 
 					changed = true;
 				else if ( childModelFind( $me.instanceGuid ) )
 					changed = true;
@@ -1527,7 +1533,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 			
 			// Pass in the name of the class that is taking control.
 			var className:String = getQualifiedClassName(this)
-			ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.guid, null, null, className ) );
+			ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
 		}
 		
 		public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void
@@ -1541,7 +1547,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 				childDetach($modelDetaching);
 			camera.index = 0;
 			var className:String = getQualifiedClassName(this)
-			ModelEvent.dispatch( new ModelEvent( ModelEvent.RELEASE_CONTROL, instanceInfo.guid, null, null, className ) );
+			ModelEvent.dispatch( new ModelEvent( ModelEvent.RELEASE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
 		}
 		
 		// these are overriden in subclasses to allow for custom movement
@@ -1570,7 +1576,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		
 		protected function dispatchMovementEvent():void
 		{
-			var me:ModelEvent = new ModelEvent(ModelEvent.MOVED, instanceInfo.guid, instanceInfo.positionGet, instanceInfo.rotationGet);
+			var me:ModelEvent = new ModelEvent(ModelEvent.MOVED, instanceInfo.instanceGuid, instanceInfo.positionGet, instanceInfo.rotationGet);
 			Globals.g_app.dispatchEvent(me);
 		}
 		

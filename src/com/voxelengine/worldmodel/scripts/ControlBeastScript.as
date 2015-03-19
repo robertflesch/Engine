@@ -44,7 +44,7 @@ package com.voxelengine.worldmodel.scripts
 						if ( Globals.player && Globals.player.instanceInfo ) {
 							var ii:InstanceInfo = Globals.player.instanceInfo;
 							if ( controllingModel && null == Globals.player.instanceInfo.controllingModel )
-								new WindowBeastControlQuery( controllingModel.instanceInfo.guid );
+								new WindowBeastControlQuery( controllingModel.instanceInfo.instanceGuid );
 						}
 						else
 							Log.out( "ControlBeastScript.onInsideEvent - NO PLAYER defined" );

@@ -83,7 +83,7 @@ package com.voxelengine.worldmodel.weapons
 
 			Log.out( "Bomb.update - MODEL + WORLD BANG at x: " + center.x + " y: " + center.y + "  z: " + center.z );
 			
-			ImpactEvent.dispatch( new ImpactEvent( ImpactEvent.EXPLODE, center, oxel.gc.grain * 16, oxel.gc.grain, instanceInfo.guid ) );
+			ImpactEvent.dispatch( new ImpactEvent( ImpactEvent.EXPLODE, center, oxel.gc.grain * 16, oxel.gc.grain, instanceInfo.instanceGuid ) );
 			
 			SoundBank.playSound( SoundBank.getSound( _soundFile ) );
 		}

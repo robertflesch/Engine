@@ -163,8 +163,9 @@ public class InventoryPanelModel extends VVContainer
 	private function addAsParentModel( e:UIMouseEvent ):void {
 		var item:ObjectModel = e.target.objectInfo as ObjectModel;
 		var ii:InstanceInfo = new InstanceInfo();
-		ii.guid = item.guid;
-		new ModelMaker( ii );
+		ii.modelGuid = item.guid;
+		ii.instanceGuid = Globals.getUID();
+		new ModelMaker( ii, true );
 	}
 	
 	private function populateModels():void 
@@ -218,7 +219,7 @@ public class InventoryPanelModel extends VVContainer
 		fileName = fileName.substr( 0, fileName.indexOf( "." ) );
 
 		var ii:InstanceInfo = new InstanceInfo();
-		ii.guid = fileName;
+		ii.modelGuid = fileName;
 		new ModelMakerImport( ii );
 	}
 	

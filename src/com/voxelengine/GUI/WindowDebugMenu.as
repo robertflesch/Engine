@@ -311,7 +311,7 @@ class StaticMemoryStringDisplay extends StaticMemoryDisplay
 	override public function updateFunction():void
 	{
 		if ( Globals.selectedModel && Globals.selectedModel.instanceInfo )
-			_data.text = Globals.selectedModel.instanceInfo.guid;
+			_data.text = Globals.selectedModel.instanceInfo.instanceGuid;
 		else	
 			_data.text = "";
 	}

@@ -16,6 +16,7 @@ import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelData;
 import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.worldmodel.Region;
 import flash.utils.ByteArray;
 
 	/**
@@ -39,18 +40,18 @@ public class ModelMakerLocal extends ModelMakerBase {
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retriveInfo );		
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
 
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.guid, null ) );		
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null ) );		
 	}
 	
 	private function failedInfo( $mie:ModelInfoEvent):void {
-		if ( _ii.guid == $mie.guid ) {
+		if ( _ii.modelGuid == $mie.guid ) {
 			Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
 			markComplete( false );
 		}
 	}
 	
 	private function retriveInfo(e:ModelInfoEvent):void {
-		if ( _ii.guid == e.guid ) {
+		if ( _ii.modelGuid == e.guid ) {
 			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retriveInfo );
 			_vmi = e.vmi;
 			attemptMake();
@@ -75,7 +76,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 			// read off that many bytes, even though we are using the data from the modelInfo file
 			var modelInfoJson:String = $ba.readUTFBytes( strLen );
 				
-			var vmm:ModelMetadata = new ModelMetadata( _ii.guid );
+			var vmm:ModelMetadata = new ModelMetadata( _ii.modelGuid );
 			vmm.name = _vmi.fileName;
 			vmm.description = _vmi.fileName;
 			var vm:* = ModelLoader.instantiate( _ii, _vmi, vmm );
@@ -83,6 +84,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 				vm.version = versionInfo.version;
 				vm.fromByteArray( $ba );
 			}
+			Region.currentRegion.modelCache.add( vm );
 
 			vm.complete = true;
 			vm.data = _vmd;

@@ -205,6 +205,7 @@ public class  UserInventory extends QuickInventory
 	
 	private var _editCursorModelGuid:String;
 	private var _lastCursorType:int
+	
 	public function processItemSelection( box:UIObject ):void {
 		if ( 0 < Globals.openWindowCount )
 			return;
@@ -279,7 +280,8 @@ public class  UserInventory extends QuickInventory
 			var om:ObjectModel = oi as ObjectModel;
 			var ii:InstanceInfo = new InstanceInfo();
 
-			_editCursorModelGuid = ii.guid = om.guid;
+			throw new Error( "UserInventory.processItemSelection - what is needed here for guid?" );
+			_editCursorModelGuid = ii.modelGuid = om.guid;
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_COMPLETE, cursorReady );
 			new ModelMaker( ii );

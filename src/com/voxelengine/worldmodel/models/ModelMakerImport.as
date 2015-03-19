@@ -43,34 +43,34 @@ public class ModelMakerImport extends ModelMakerBase {
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retriveMetadata );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
 
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.guid, null ) );		
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null ) );		
 
-		new WindowModelMetadata( _ii.guid, WindowModelMetadata.TYPE_IMPORT );		
+		new WindowModelMetadata( _ii.modelGuid, WindowModelMetadata.TYPE_IMPORT );		
 	}
 	
 	private function retriveMetadata( $mme:ModelMetadataEvent ):void {
-		if ( _ii.guid == $mme.guid ) {
+		if ( _ii.modelGuid == $mme.guid ) {
 			_vmm = $mme.vmm;
 			attemptMake();
 		}
 	}
 	
 	private function failedMetadata( $mme:ModelMetadataEvent ):void {
-		if ( _ii.guid == $mme.guid ) {
+		if ( _ii.modelGuid == $mme.guid ) {
 			Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelMetadataEvent: " + $mme.toString(), Log.WARN );
 			markComplete(false);
 		}
 	}
 	
 	private function retriveInfo( $mie:ModelInfoEvent ):void {
-		if ( _ii.guid == $mie.guid ) {
+		if ( _ii.modelGuid == $mie.guid ) {
 			_vmi = $mie.vmi;
 			attemptMake();
 		}
 	}
 	
 	private function failedInfo( $mie:ModelInfoEvent ):void {
-		if ( _ii.guid == $mie.guid ) {
+		if ( _ii.modelGuid == $mie.guid ) {
 			Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
 			markComplete(false);
 		}
@@ -94,7 +94,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			// read off that many bytes, even though we are using the data from the modelInfo file
 			var modelInfoJson:String = $ba.readUTFBytes( strLen );
 			// reset the file name that it was loaded from and assign a new guid
-			_ii.guid = _vmm.guid = _vmd.guid = Globals.getUID();
+			_ii.modelGuid = _vmm.guid = _vmd.guid = Globals.getUID();
 			_vmi.fileName = "";
 			
 			var vm:* = ModelLoader.instantiate( _ii, _vmi, _vmm );
@@ -102,6 +102,7 @@ public class ModelMakerImport extends ModelMakerBase {
 				vm.version = versionInfo.version;
 				vm.fromByteArray( $ba );
 			}
+			Region.currentRegion.modelCache.add( vm );
 
 			vm.data = _vmd;
 			vm.complete = true;

@@ -41,14 +41,13 @@ package com.voxelengine.worldmodel.models
 		public function markerAdd( $owner:VoxelModel ):void {
 			
 			var collisionPointMarker:InstanceInfo 	= new InstanceInfo();
-			collisionPointMarker.guid		= "1MeterRedBlock";
+			collisionPointMarker.modelGuid			= "1MeterRedBlock";
+			instanceGuid = collisionPointMarker.instanceGuid		= Globals.getUID();
 			collisionPointMarker.scale 				= new Vector3D( 1/16, 1/16, 1/16 );
 			collisionPointMarker.positionSet 		= point;
 			collisionPointMarker.controllingModel 	= $owner;
 			//collisionPointMarker.name				= "CollisionPoint";
 			ModelLoader.load( collisionPointMarker );
-			
-			instanceGuid = collisionPointMarker.guid;
 		}
 		
 		public function markerRemove( $owner:VoxelModel ):void {

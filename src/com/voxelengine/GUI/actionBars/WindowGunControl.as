@@ -51,7 +51,7 @@ package com.voxelengine.GUI.actionBars
 							
 							cannon.width = 120;
 							cannon.addEventListener(MouseEvent.CLICK, fire );
-							cannon.data = cm.instanceInfo.guid;
+							cannon.data = cm.instanceInfo.instanceGuid;
 
 							addElement( cannon );
 						}

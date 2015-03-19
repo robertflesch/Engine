@@ -86,7 +86,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			}
 			catch ( error:Error )
 			{
-				if ( Globals.player.instanceInfo.guid == _guid )
+				if ( Globals.player.instanceInfo.instanceGuid == _guid )
 					Globals.player.complete = true;
 				else
 					Log.out( "CompletedModel.start - exception was thrown for model guid: " + _guid, Log.ERROR );

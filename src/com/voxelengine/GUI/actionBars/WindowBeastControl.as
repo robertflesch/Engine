@@ -109,7 +109,7 @@ package com.voxelengine.GUI.actionBars
 			}
 			else if ( actionItem.callback == fireBeastWindow )
 			{
-				var gun:Gun = Globals.modelGet( actionItem.modelGuid ) as Gun;
+				var gun:Gun = Globals.modelGet( actionItem.instanceGuid ) as Gun;
 				gun.ammo = actionItem.ammo;
 				//Log.out( "WindowBeastControl.processItemSelection - setting Ammo to: " + actionItem.ammo.name );
 			}
@@ -126,7 +126,7 @@ package com.voxelengine.GUI.actionBars
 					}
 					else if ( actionItem.callback == fireBeastWindow )
 					{
-						var gmInstanceGuid:String = actionItem.modelGuid;
+						var gmInstanceGuid:String = actionItem.instanceGuid;
 						var gun:Gun = Globals.modelGet( gmInstanceGuid ) as Gun;
 						if ( gun )
 							gun.fire();
@@ -160,7 +160,7 @@ package com.voxelengine.GUI.actionBars
 								"Fire " + ammo.name
 							);
 							actionItem["ammo"] = ammo;
-							actionItem["modelGuid"] = gm.instanceInfo.guid;
+							actionItem["instanceGuid"] = gm.instanceInfo.guid;
 							box = buildAction( actionItem, count++ );
 						}
 					}

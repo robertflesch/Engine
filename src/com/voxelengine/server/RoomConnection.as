@@ -141,22 +141,12 @@ package com.voxelengine.server {
 		static private function createPlayer( userid:String ):void
 		{
 			throw new Error( "RoomConnection.createPlayer - NOT IMPLMENTED" );
-			var ii:InstanceInfo = new InstanceInfo();
-			ii.guid = userid;
-			ii.guid = "Player";
-			//ii.name = userid;
-			ModelLoader.load( ii );
 			Log.out("RoomConnection.createPlayer - create player model for :" + userid, Log.DEBUG );
 		}
 		
 		static private function createAvatar( userid:String ):void
 		{
 			throw new Error( "RoomConnection.createAvatar - NOT IMPLMENTED" );
-			var ii:InstanceInfo = new InstanceInfo();
-			ii.guid = userid;
-			ii.guid = "Player"; // Avatar
-			//ii.name = userid;
-			ModelLoader.load( ii );
 			Log.out("RoomConnection.createAvatar - create avatar for :" + userid, Log.DEBUG );
 		}
 		

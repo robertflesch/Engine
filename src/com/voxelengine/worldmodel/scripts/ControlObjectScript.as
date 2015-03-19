@@ -41,7 +41,7 @@ package com.voxelengine.worldmodel.scripts
 					if ( vm )
 					{
 						var controllingModel:VoxelModel = vm.instanceInfo.controllingModel;	
-						_wt = new WindowShipControlQuery( controllingModel.instanceInfo.guid );
+						_wt = new WindowShipControlQuery( controllingModel.instanceInfo.instanceGuid );
 					}
 				}
 			}

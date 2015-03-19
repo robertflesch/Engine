@@ -38,7 +38,9 @@ public class InstanceInfo extends Location	{
 	private var	_moveSpeed:SecureNumber 				= new SecureNumber( 0.01 );
 	private var _transforms:Vector.<ModelTransform> = new Vector.<ModelTransform>;	// toJSON
 	private var _shader:String 						= "ShaderOxel";					// toJSON
-	private var _guid:String 						= null;                         // toJSON
+	private var _modelGuid:String;								                        // toJSON
+	private var _instanceGuid:String;												// toJSON
+	
 	private var _grainSize:int 						= 0;                            // toJSON
 	private var _detailSize:int 					= 0;                            // INSTANCE NOT EXPORTED
 	private var _type:int 							= -1;                           // toJSON - This type overrides a native task type.
@@ -73,15 +75,19 @@ public class InstanceInfo extends Location	{
 	public function set critical(val:Boolean):void 				
 	{ 
 		_critical = val; 
-		ModelEvent.dispatch( new ModelEvent( ModelEvent.CRITICAL_MODEL_DETECTED, guid ) );
+		ModelEvent.dispatch( new ModelEvent( ModelEvent.CRITICAL_MODEL_DETECTED, modelGuid ) );
 	}
-	public function 	guidGet():String 						{ return _guid; } // used by debug menu to monitor selected model
-	public function get guid():String 							{ return _guid; }
+	public function 	modelGuidGet():String 						{ return _modelGuid; } // used by debug menu to monitor selected model
+	public function get modelGuid():String 							{ return _modelGuid; }
 	//public function set guid(val:String):void					{ _guid = val; }
-	public function set guid(val:String):void { 
+	public function set modelGuid(val:String):void { 
 		//Log.out( "InstanceInfo.GUID was: " + _guid + " is now: " + val );
-		_guid = val; 
+		_modelGuid = val; 
 	}
+	public function get instanceGuid():String 					{ return _instanceGuid; }
+	//public function set instanceGuid(val:String):void			{ _instanceGuid = val; }
+	public function set instanceGuid(val:String):void 			{ _instanceGuid = val; }
+	
 	public function get grainSize():int  						{ return _grainSize; }
 	public function get detailSize():int  						{ return _detailSize; }
 	public function set detailSize(val:int):void				{ _detailSize = val; }  // This is used in the generation of spheres only
@@ -121,7 +127,8 @@ public class InstanceInfo extends Location	{
 	{ 
 		return {
 				grainSize: 		_grainSize,
-				guid: 			_guid,
+				modelGuid: 			_modelGuid,
+				instanceGuid: 	_instanceGuid,
 				velocity: 		velocityGet,
 				location: 		positionGet,
 				rotation: 		rotationGet,
@@ -163,7 +170,7 @@ public class InstanceInfo extends Location	{
 
 	public function toString():String
 	{
-		return " GUID: " + guid + " pos: " + positionGet + " controllingModel: " + (controllingModel ? controllingModel.instanceInfo.guid : "None" );
+		return " GUID: " + modelGuid + " pos: " + positionGet + " controllingModel: " + (controllingModel ? controllingModel.instanceInfo.modelGuid : "None" );
 	}
 
 	private function onLoadingComplete( le:LoadingEvent ):void
@@ -174,7 +181,7 @@ public class InstanceInfo extends Location	{
 	public function topmostGuid():String {
 		if ( controllingModel )
 			return controllingModel.instanceInfo.topmostGuid();
-		return guid;	
+		return modelGuid;	
 	}
 	
 	public function initJSON( json:Object ):void {
@@ -183,19 +190,22 @@ public class InstanceInfo extends Location	{
 		
 		// fileName == templateName == guid ALL THE SAME
 		if ( json.fileName ) {
-			guid = json.fileName;
+			_modelGuid = json.fileName;
 		}
-		if ( json.guid ) {
-			guid = json.guid;
+		if ( json.modelGuid ) {
+			_modelGuid = json.modelGuid;
+		}
+		
+		if ( json.instanceGuid ) {
+			_instanceGuid = json.instanceGuid;
 		}
 			
 		if ( json.name )
 		{
 			if ( owner && owner.metadata ) {
 				owner.metadata.name = json.name;
-				Log.out( "InstanceInfo.initJSON - Setting Metadata Name from instance data: " + json.name + "  guid: " + _guid );
+				Log.out( "InstanceInfo.initJSON - Setting Metadata Name from instance data: " + json.name + "  guid: " + _modelGuid );
 			}
-				
 		}
 		
 		if ( json.state )
@@ -207,9 +217,6 @@ public class InstanceInfo extends Location	{
 		if ( json.baseLightLevel )
 			baseLightLevel = json.baseLightLevel;
 					
-		//if ( json.modelClass )
-		//	Log.out( "InstanceInfo.initJSON - found modelClass in guid: " + instanceGuid );
-			
 		setPositionalInfo( json );
 		setScaleInfo( json );
 		setCenterInfo( json );
@@ -237,7 +244,7 @@ public class InstanceInfo extends Location	{
 		
 		if ( script )
 		{
-			script.instanceGuid = guid;
+			script.instanceGuid = modelGuid;
 			//script.event( OxelEvent.CREATE );
 			// Only person using this is the AutoControlObjectScript
 		}
