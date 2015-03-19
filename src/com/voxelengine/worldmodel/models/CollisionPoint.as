@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import com.voxelengine.worldmodel.models.makers.ModelLoader;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import flash.geom.Vector3D;
 	

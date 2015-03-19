@@ -4,6 +4,7 @@ package com.voxelengine.worldmodel.scripts
 	 * ...
 	 * @author Bob
 	 */
+	import com.voxelengine.worldmodel.models.makers.ModelLoader;
 	import com.voxelengine.worldmodel.weapons.Bomb;
 	import com.voxelengine.worldmodel.SoundBank;
 	import com.voxelengine.worldmodel.models.*;

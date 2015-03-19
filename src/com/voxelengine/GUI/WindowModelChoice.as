@@ -17,7 +17,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 	import com.voxelengine.worldmodel.TypeInfo;
-	import com.voxelengine.worldmodel.models.ModelLoader;
+	import com.voxelengine.worldmodel.models.makers.ModelLoader;
 	//import com.voxelengine.worldmodel.models.ModelMakerGenerated;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.worldmodel.models.InstanceInfo;

@@ -7,6 +7,8 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import com.voxelengine.worldmodel.models.makers.ModelLoader;
+	import com.voxelengine.worldmodel.models.types.EditCursor;
 	import flash.display3D.Context3D;
 	import flash.events.KeyboardEvent;
 	import flash.events.TimerEvent;

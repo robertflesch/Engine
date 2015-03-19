@@ -14,7 +14,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.events.GUIEvent;
-	import com.voxelengine.worldmodel.models.Ship;
+	import com.voxelengine.worldmodel.models.types.Ship;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.worldmodel.RegionManager;

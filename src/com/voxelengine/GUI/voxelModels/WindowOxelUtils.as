@@ -18,7 +18,7 @@ import org.flashapi.swing.constants.*;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.worldmodel.models.VoxelModel;
-import com.voxelengine.worldmodel.models.ModelLoader;
+import com.voxelengine.worldmodel.models.makers.ModelLoader;
 
 public class WindowOxelUtils extends VVPopup
 {

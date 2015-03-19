@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import com.voxelengine.worldmodel.models.makers.ModelLoader;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import flash.display3D.Context3D;
     import flash.geom.Vector3D;

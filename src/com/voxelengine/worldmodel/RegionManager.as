@@ -17,7 +17,7 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.Room;
-import com.voxelengine.worldmodel.models.ModelLoader;
+import com.voxelengine.worldmodel.models.makers.ModelLoader;
 
 /**
  * ...

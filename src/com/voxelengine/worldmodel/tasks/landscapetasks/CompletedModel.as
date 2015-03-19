@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 {
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.worldmodel.models.types.Player;
 	import flash.utils.getTimer;
 	import flash.geom.Vector3D;
 	

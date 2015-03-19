@@ -25,8 +25,8 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.server.Network;
-	import com.voxelengine.worldmodel.models.ModelLoader;
-	import com.voxelengine.worldmodel.models.Player;
+	import com.voxelengine.worldmodel.models.makers.ModelLoader;
+	import com.voxelengine.worldmodel.models.types.Player;
 	
 	//{
 	   //"region":[
@@ -185,7 +185,7 @@ package com.voxelengine.worldmodel
 			RegionEvent.addListener( RegionEvent.UNLOAD, 					unload );
 				
 			LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, 			onLoadingComplete );
-			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_FAILURE,		removeFailedObjectFromRegion );									  
+			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_FAILURE,		removeFailedObjectFromRegion );
 				
 			ModelEvent.addListener( ModelEvent.CRITICAL_MODEL_DETECTED,		onCriticalModelDetected );
 			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED,			modelChanged );

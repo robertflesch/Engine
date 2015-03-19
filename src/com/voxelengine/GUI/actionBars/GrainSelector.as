@@ -20,7 +20,7 @@ import org.flashapi.swing.event.UIMouseEvent;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.GUI.inventory.BoxInventory;
-import com.voxelengine.worldmodel.models.EditCursor;
+import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.inventory.ObjectGrain;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;

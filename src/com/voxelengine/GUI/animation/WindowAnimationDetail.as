@@ -60,8 +60,8 @@ package com.voxelengine.GUI.animation
 	import com.voxelengine.server.Network;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;
-	import com.voxelengine.worldmodel.models.ModelLoader;
-	import com.voxelengine.worldmodel.models.Player;
+	import com.voxelengine.worldmodel.models.makers.ModelLoader;
+	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.models.ModelMetadata;
 	

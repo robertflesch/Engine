@@ -8,9 +8,9 @@ package com.voxelengine.GUI.actionBars
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.models.ModelTransform;
-	import com.voxelengine.worldmodel.models.Ship;
+	import com.voxelengine.worldmodel.models.types.Ship;
 	import com.voxelengine.worldmodel.models.VoxelModel;
-	import com.voxelengine.worldmodel.models.Engine;
+	import com.voxelengine.worldmodel.models.types.Engine;
 	import com.voxelengine.worldmodel.RegionManager;
 	import flash.events.Event;
 	import flash.events.MouseEvent;

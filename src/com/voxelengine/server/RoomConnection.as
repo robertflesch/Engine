@@ -18,9 +18,9 @@ package com.voxelengine.server {
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.ProjectileEvent;
 	import com.voxelengine.events.RegionEvent;
-	import com.voxelengine.worldmodel.models.Avatar;
+	import com.voxelengine.worldmodel.models.types.Avatar;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
-	import com.voxelengine.worldmodel.models.ModelLoader;
+	import com.voxelengine.worldmodel.models.makers.ModelLoader;
 	
 	public class RoomConnection
 	{

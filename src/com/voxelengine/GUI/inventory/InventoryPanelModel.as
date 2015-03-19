@@ -8,7 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.inventory {
 
 import com.voxelengine.events.ModelDataEvent;
-import com.voxelengine.worldmodel.models.ModelMaker;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import flash.display.DisplayObject;
 import flash.events.Event;
@@ -34,7 +34,7 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.ModelMakerImport;
+import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 import com.voxelengine.worldmodel.inventory.FunctionRegistry;
 import com.voxelengine.worldmodel.inventory.ObjectAction;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;

@@ -13,11 +13,10 @@ import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.worldmodel.models.ModelLoader;
-import com.voxelengine.worldmodel.models.Particle;
+import com.voxelengine.worldmodel.models.makers.ModelLoader;
+import com.voxelengine.worldmodel.models.types.Particle;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.ModelLibrary;
 
 public final class ParticlePool 
 { 

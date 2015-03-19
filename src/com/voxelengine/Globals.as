@@ -28,6 +28,7 @@ package com.voxelengine {
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.oxel.OxelBad;
+	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.ConfigManager;
 	import com.voxelengine.worldmodel.MouseKeyboardHandler;
 	import com.voxelengine.renderer.Renderer;

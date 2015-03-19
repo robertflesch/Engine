@@ -7,7 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
-import com.voxelengine.worldmodel.models.EditCursor;
+import com.voxelengine.worldmodel.models.types.EditCursor;
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;

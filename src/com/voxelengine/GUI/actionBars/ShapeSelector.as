@@ -15,7 +15,7 @@ import org.flashapi.swing.layout.AbsoluteLayout;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.worldmodel.models.EditCursor;
+import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.TypeInfo;
 
 public class ShapeSelector extends VVCanvas

@@ -11,7 +11,7 @@ package com.voxelengine.worldmodel.weapons
  * ...
  * @author Bob
  */
-import com.voxelengine.worldmodel.models.ModelLoader;
+import com.voxelengine.worldmodel.models.makers.ModelLoader;
 import com.voxelengine.worldmodel.TypeInfo;
 import playerio.Message;
 

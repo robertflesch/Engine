@@ -9,7 +9,7 @@
 package com.voxelengine.worldmodel.tasks.flowtasks
 {
 	import com.developmentarc.core.tasks.tasks.AbstractTask;
-	import com.voxelengine.worldmodel.models.EditCursor;
+	import com.voxelengine.worldmodel.models.types.EditCursor;
 	import com.voxelengine.worldmodel.TypeInfo;
 	
 	import flash.utils.getTimer;

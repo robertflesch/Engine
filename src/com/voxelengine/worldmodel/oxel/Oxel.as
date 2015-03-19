@@ -34,7 +34,7 @@ package com.voxelengine.worldmodel.oxel
 	import com.voxelengine.worldmodel.TypeInfo;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.worldmodel.models.ModelStatisics;
-	import com.voxelengine.worldmodel.models.EditCursor;
+	import com.voxelengine.worldmodel.models.types.EditCursor;
 	import com.voxelengine.worldmodel.models.VoxelModel;
 	import com.voxelengine.worldmodel.models.ModelMetadata;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.TreeGenerator;

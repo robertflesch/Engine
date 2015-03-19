@@ -352,18 +352,14 @@ class VVInitializer
 		//var strUserAgent:String = String(ExternalInterface.call("function() {return navigator.userAgent;}")).toLowerCase();			
 		
 		// expect an exception to be thrown and caught here, the best way I know of to find out of we are in debug or release mode
-		try
-		{
+		try {
 			var result : Boolean = new Error().getStackTrace().search(/:[0-9]+]$/m) > -1;
 			Globals.g_debug = result;
-		}
-		catch ( error:Error )
-		{
+		} catch ( error:Error ) {
 			Globals.g_debug = false;
 		}
 		
-		try
-		{
+		try {
 			// This doesnt work in chrome, so I need someway to detect chrome and do it differently
 			// Globals.appPath = "file:///C:/dev/VVInitializer/resources/bin/";
 			var urlPath:String = ExternalInterface.call("window.location.href.toString");
@@ -380,9 +376,7 @@ class VVInitializer
 					Globals.appPath = urlPath.substr( 0, index );
 			}
 			Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG );
-		}
-		catch ( error:Error )
-		{
+		} catch ( error:Error ) {
 			Log.out("VVInitializer.initialize - ExternalInterface not found, using default location", Log.ERROR, error );
 		}
 		

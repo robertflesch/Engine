@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import com.voxelengine.worldmodel.models.types.Avatar;
 	import com.voxelengine.worldmodel.Region;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
