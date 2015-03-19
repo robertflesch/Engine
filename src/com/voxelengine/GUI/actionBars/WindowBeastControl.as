@@ -56,6 +56,7 @@ package com.voxelengine.GUI.actionBars
 		static public function handleModelEvents( $me:ModelEvent ):void {
 			if ( ModelEvent.TAKE_CONTROL == $me.type ) {
 				var classCalled:String = $me.parentInstanceGuid;
+				// TODO - This does not seem like a good way to check
 				if ( classCalled != "com.voxelengine.worldmodel.models.types::Player" )
 					new WindowBeastControl( $me.instanceGuid );
 			}
