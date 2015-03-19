@@ -56,7 +56,7 @@ package com.voxelengine.GUI.actionBars
 		static public function handleModelEvents( $me:ModelEvent ):void {
 			if ( ModelEvent.TAKE_CONTROL == $me.type ) {
 				var classCalled:String = $me.parentInstanceGuid;
-				if ( classCalled != "com.voxelengine.worldmodel.models::Player" )
+				if ( classCalled != "com.voxelengine.worldmodel.models.types::Player" )
 					new WindowBeastControl( $me.instanceGuid );
 			}
 			else if ( ModelEvent.RELEASE_CONTROL == $me.type ) {
