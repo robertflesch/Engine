@@ -50,10 +50,11 @@ public class ModelData
 			Log.out( "ModelData.saveEvent - Ignoring save meant for other model my guid: " + guid + " target guid: " + $mde.guid, Log.WARN );
 			return;
 		}
-		save();
+		save( _ba );
 	}
 	
-	public function save():void {
+	public function save( $ba:ByteArray ):void {
+		_ba = $ba;
 		if ( Globals.online ) {
 			Log.out( "ModelData.save - Saving Model Metadata: " + guid ); // + " vmd: " + $vmd.toString(), Log.WARN );
 			addSaveEvents();

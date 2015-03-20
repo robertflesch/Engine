@@ -4,11 +4,6 @@ package com.voxelengine.worldmodel.scripts
 	 * ...
 	 * @author Bob
 	 */
-	import com.voxelengine.worldmodel.models.makers.ModelLoader;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
-	import com.voxelengine.worldmodel.weapons.Bomb;
-	import com.voxelengine.worldmodel.SoundBank;
-	import com.voxelengine.worldmodel.models.*;
 	import flash.media.Sound;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -21,6 +16,13 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.events.WeaponEvent;
 	import com.voxelengine.Globals;
+	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+	import com.voxelengine.worldmodel.models.makers.ModelLoader;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
+	import com.voxelengine.worldmodel.weapons.Bomb;
+	import com.voxelengine.worldmodel.SoundBank;
+	import com.voxelengine.worldmodel.models.*;
+
 
 	public class BombScript extends Script 
 	{
@@ -92,7 +94,7 @@ package com.voxelengine.worldmodel.scripts
 			var newShip:VoxelModel = Globals.modelGet( shipGuid );
 			ii.controllingModel = newShip;
 
-			ModelLoader.load( ii );    
+			ModelMakerBase.load( ii );    
 		}
 		
 		

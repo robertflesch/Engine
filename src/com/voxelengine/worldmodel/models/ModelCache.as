@@ -7,10 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.worldmodel.models.makers.ModelLoader;
-	import com.voxelengine.worldmodel.models.types.Avatar;
-	import com.voxelengine.worldmodel.models.types.Player;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.display3D.Context3D;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
@@ -21,6 +17,8 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.worldmodel.Region;
+	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+	import com.voxelengine.worldmodel.models.types.*;
 	
 	public class ModelCache 
 	{
@@ -48,7 +46,7 @@ package com.voxelengine.worldmodel.models
 			Log.out( "ModelCache.createPlayer - creating from LOCAL", Log.DEBUG );
 			instanceInfo.modelGuid = "Player";
 			instanceInfo.grainSize = 4;
-			ModelLoader.load( instanceInfo );
+			ModelMakerBase.load( instanceInfo );
 			return true
 		}
 
@@ -203,19 +201,21 @@ package com.voxelengine.worldmodel.models
 			for each ( var model:VoxelModel in _models ) {
 				if ( model is Player )
 					continue;
-				Log.out( "ModelCache.getJSON - instance: " + model.getJSON() );
 				instanceData.push( model.getJSON() );	
 			}
 			
 			var outString:String = "";
 			var len:int = instanceData.length;
+			Log.out( "ModelCache.getJSON ---------------------------------------------------" );
 			for ( var index:int; index < len; index++ ) {
 				outString += instanceData[index];
+				Log.out( "ModelCache.getJSON - instance: " + instanceData[index] );
 				// if this is NOT the last element in the array, add a comma to it.
 				if ( index == len - 1 )
 					continue;
 				outString += ",";
 			}
+			Log.out( "ModelCache.getJSON ---------------------------------------------------" );
 			return outString;
 		}
 		

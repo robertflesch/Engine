@@ -18,7 +18,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import com.voxelengine.worldmodel.models.makers.ModelLoader;
-	//import com.voxelengine.worldmodel.models.ModelMakerGenerated;
+	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelMetadata;
@@ -144,17 +144,17 @@ package com.voxelengine.GUI
 			{
 				case 0: // From Cube
 					ii.modelGuid = "GenerateCube";
-					ModelLoader.modelInfoPreload( ii.modelGuid );
+					ModelMakerBase.modelInfoPreload( ii.modelGuid );
 					break;
 				case 1: // From Sphere
 					ii.modelGuid = "GenerateSphere";
-					ModelLoader.modelInfoPreload( ii.modelGuid );
+					ModelMakerBase.modelInfoPreload( ii.modelGuid );
 					li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
 					detailSize = li.data;			
 					break;
 				case 2: // From Sphere
 					ii.modelGuid = "GenerateSubSphere";
-					ModelLoader.modelInfoPreload( ii.modelGuid );
+					ModelMakerBase.modelInfoPreload( ii.modelGuid );
 					li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
 					detailSize = li.data;			
 					break;
@@ -187,7 +187,7 @@ package com.voxelengine.GUI
 			ModelEvent.removeListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
 			// now I want to apply the script to the oxels in the vm.
 			var vm:VoxelModel = Globals.modelGet( e.instanceGuid );
-			ModelLoader.load( vm.instanceInfo );
+			ModelMakerBase.load( vm.instanceInfo );
 		}
   }
 }

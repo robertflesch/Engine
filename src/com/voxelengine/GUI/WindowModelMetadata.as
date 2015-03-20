@@ -52,11 +52,12 @@ public class WindowModelMetadata extends VVPopup
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, dataReceived );
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, dataReceived );
 		
+		// Only prompt for imports of parent models
 		if ( TYPE_IMPORT == windowType ) {
 			_vmm = new ModelMetadata( $guid );
-			_vmm.name = $guid + "-IMPORTED";
+			_vmm.name = $guid;
 			_vmm.description = $guid + "-IMPORTED";
-			_vmm.creator = "simpleBob";
+			_vmm.creator = Network.userId;
 			// fake an event to populate the window
 			dataReceived( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, $guid, _vmm ) )
 		}
@@ -72,19 +73,31 @@ public class WindowModelMetadata extends VVPopup
 		
 		_vmm = $mme.vmm;
 		
-		var creator:LabelInput = new LabelInput( "Creator: ", _vmm.creator );
-		creator.editable = false;
-		creator.selectable = false;
-		creator.enabled = false;
-		addElement( creator );
-		
-		_name = new LabelInput( "Name: ", _vmm.name );
-		addElement( _name );
+		if ( TYPE_IMPORT == _type ) {
+			var creatorI:LabelInput = new LabelInput( "Creator: ", _vmm.creator );
+			creatorI.editable = false;
+			creatorI.selectable = false;
+			creatorI.enabled = false;
+			addElement( creatorI );
+			
+			_name = new LabelInput( "Name: ", _vmm.name );
+			addElement( _name );
 
-		_desc = new LabelInput( "Description: ", _vmm.description );
-		addElement( _desc );
+			_desc = new LabelInput( "Description: ", _vmm.description );
+			addElement( _desc );
 		
-		if ( TYPE_EDIT == _type ) {
+		} else {
+			var creator:LabelInput = new LabelInput( "Creator: ", _vmm.creator );
+			creator.editable = false;
+			creator.selectable = false;
+			creator.enabled = false;
+			addElement( creator );
+			
+			_name = new LabelInput( "Name: ", _vmm.name );
+			addElement( _name );
+
+			_desc = new LabelInput( "Description: ", _vmm.description );
+			addElement( _desc );
 		
 			addElement( new HorizontalSeparator( width ) );		
 			

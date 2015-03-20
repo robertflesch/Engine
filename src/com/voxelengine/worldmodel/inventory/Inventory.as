@@ -73,7 +73,7 @@ public class Inventory
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_INVENTORY_TABLE, _networkId, _dbo, ba ) );
 		}
 		else
-			Log.out( "Inventory.save - NOT Saving User Inventory, either offline or NOT changed - networkId: " + networkId, Log.DEBUG );
+			Log.out( "Inventory.save - NOT Saving - status online: " + Globals.online + "  changed: " + changed() + "  networkId: " + networkId, Log.DEBUG );
 	}
 	
 	private function toPersistance():void {

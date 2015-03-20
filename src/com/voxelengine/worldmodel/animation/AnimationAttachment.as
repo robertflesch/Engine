@@ -9,12 +9,13 @@ package com.voxelengine.worldmodel.animation
 {
 	import flash.geom.Vector3D;
 	
+	import com.voxelengine.Log;
+	import com.voxelengine.Globals;
 	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 	import com.voxelengine.worldmodel.models.makers.ModelLoader;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
-	import com.voxelengine.Globals;
-	import com.voxelengine.Log;
 	
 	/**
 	 * ...
@@ -98,7 +99,7 @@ package com.voxelengine.worldmodel.animation
 			if ( null == _voxelModel )
 			{
 				ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onAttachmentCreated );
-				ModelLoader.load( _instanceInfo );
+				ModelMakerBase.load( _instanceInfo );
 			}
 			else
 			{

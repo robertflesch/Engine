@@ -7,9 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.worldmodel.models.makers.ModelLoader;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
-	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import flash.display3D.Context3D;
     import flash.geom.Vector3D;
 	import flash.utils.getTimer;
@@ -27,6 +24,10 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.ShipEvent;
+	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
+	import com.voxelengine.worldmodel.models.makers.ModelLoader;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
+	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 	import com.voxelengine.worldmodel.scripts.Script;
 
 	/**
@@ -480,7 +481,7 @@ package com.voxelengine.worldmodel.models
 				trailMarker.positionSet = wsCenter;
 				trailMarker.addTransform( 0, 0, 0, 10, ModelTransform.LIFE );
 				
-				ModelLoader.load( trailMarker );
+				ModelMakerBase.load( trailMarker );
 			}
 			count++;
 		}

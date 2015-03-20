@@ -94,7 +94,7 @@ public class PersistURL
 			//dispatcher.addEventListener(Event.OPEN, openHandler);
 			//dispatcher.addEventListener(ProgressEvent.PROGRESS, progressHandler);
 			dispatcher.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
-			dispatcher.addEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatusHandler);
+			//dispatcher.addEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatusHandler);
 		}
 
 		function openHandler(event:Event):void {

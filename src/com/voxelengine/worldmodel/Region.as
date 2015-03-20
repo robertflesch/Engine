@@ -7,8 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-	import com.voxelengine.events.WindowSplashEvent;
-	import com.voxelengine.worldmodel.models.ModelCache;
 	import flash.geom.Vector3D;
 	import flash.events.Event;
     import flash.events.TimerEvent;
@@ -24,9 +22,12 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.WindowSplashEvent;
 	import com.voxelengine.server.Network;
-	import com.voxelengine.worldmodel.models.makers.ModelLoader;
+	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 	import com.voxelengine.worldmodel.models.types.Player;
+	import com.voxelengine.worldmodel.models.InstanceInfo;
+	import com.voxelengine.worldmodel.models.ModelCache;
 	
 	//{
 	   //"region":[
@@ -160,7 +161,7 @@ package com.voxelengine.worldmodel
 			
 			addEventListeners();
 			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_BEGUN, 0, guid ) );
-			var count:int = ModelLoader.loadRegionObjects(_JSON.region);
+			var count:int = loadRegionObjects(_JSON.region);
 			
 
 			if ( 0 == count ) {
@@ -179,6 +180,26 @@ package com.voxelengine.worldmodel
 				
 			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name, Log.DEBUG );
 		}	
+		
+		// Makes sense, called from Region
+		public function loadRegionObjects( objects:Array ):int {
+			Log.out( "Region.loadRegionObjects - START =============================" );
+			var count:int = 0;
+			for each ( var v:Object in objects ) {
+				if ( v.model ) {
+					var instance:InstanceInfo = new InstanceInfo();
+					instance.initJSON( v.model );
+					if ( !instance.instanceGuid )
+						instance.instanceGuid = Globals.getUID();
+					ModelMakerBase.load( instance );
+					count++;
+				}
+			}
+			Log.out( "Region.loadRegionObjects - END " + "  count: " + count + "=============================" );
+			return count;
+		}
+
+		
 
 		private function addEventListeners():void {
 			RegionEvent.addListener( ModelBaseEvent.CHANGED, 				regionChanged );	
@@ -347,7 +368,7 @@ package com.voxelengine.worldmodel
 				changed = false;
 			}
 			else
-				Log.out( "Region.save - NOT online:" + Globals.online + "  changed:" + changed + "  owner:" + owner + "  locked:" + _lockDB + "  name: " + name + "  - guid: " + guid, Log.DEBUG );
+				Log.out( "Region.save FAILED CONDITION - online:" + Globals.online + "  changed:" + changed + "  owner:" + owner + "  locked:" + _lockDB + "  name: " + name + "  - guid: " + guid, Log.DEBUG );
 		}
 		
 		private function saveSucceed( $pe:PersistanceEvent ):void { 

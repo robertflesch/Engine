@@ -7,12 +7,12 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.worldmodel.models.makers.ModelLoader;
-	import com.voxelengine.worldmodel.oxel.Oxel;
 	import flash.geom.Vector3D;
 	
-	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.Globals;
+	import com.voxelengine.worldmodel.oxel.Oxel;
+	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;
@@ -48,7 +48,7 @@ package com.voxelengine.worldmodel.models
 			collisionPointMarker.positionSet 		= point;
 			collisionPointMarker.controllingModel 	= $owner;
 			//collisionPointMarker.name				= "CollisionPoint";
-			ModelLoader.load( collisionPointMarker );
+			ModelMakerBase.load( collisionPointMarker );
 		}
 		
 		public function markerRemove( $owner:VoxelModel ):void {
