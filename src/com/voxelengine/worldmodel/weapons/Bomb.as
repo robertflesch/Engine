@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.weapons
 	import com.voxelengine.events.ImpactEvent;
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.worldmodel.models.*;
 	import com.voxelengine.pools.GrainCursorPool;

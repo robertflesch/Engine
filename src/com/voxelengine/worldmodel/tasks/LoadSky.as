@@ -16,7 +16,7 @@ package com.voxelengine.worldmodel.tasks
 	import com.voxelengine.worldmodel.NoiseGenerator;
 	import com.voxelengine.worldmodel.PerlinNoise2D;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.display.BitmapData;
 	import flash.utils.getTimer;
 	

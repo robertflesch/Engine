@@ -52,7 +52,7 @@ import com.voxelengine.server.WindowLogin;
 import com.voxelengine.server.RoomConnection;
 
 import com.voxelengine.worldmodel.biomes.LayerInfo;
-import com.voxelengine.worldmodel.models.VoxelModel;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.RegionManager;
 //	import com.voxelengine.worldmodel.scripts.FireProjectileScript;
 

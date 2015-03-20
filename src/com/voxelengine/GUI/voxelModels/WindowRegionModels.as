@@ -15,7 +15,7 @@ package com.voxelengine.GUI.voxelModels
 	import com.voxelengine.Log;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.GUI.*;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	public class WindowRegionModels extends VVPopup
 	{

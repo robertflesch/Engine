@@ -13,7 +13,7 @@ package com.voxelengine.worldmodel.tasks.tests
 	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.oxel.Oxel;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 	import flash.utils.Timer;
 	import flash.utils.getTimer;

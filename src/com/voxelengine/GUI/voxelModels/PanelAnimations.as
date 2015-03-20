@@ -23,7 +23,7 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.GUI.*;
 import com.voxelengine.worldmodel.animation.Animation;
-import com.voxelengine.worldmodel.models.VoxelModel;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 // all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
 public class PanelAnimations extends PanelBase

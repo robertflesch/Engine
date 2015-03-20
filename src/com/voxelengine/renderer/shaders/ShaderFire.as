@@ -8,7 +8,7 @@
 
 package com.voxelengine.renderer.shaders 
 {
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.display3D.Context3D;
 	import flash.display3D.Context3DBlendFactor;
 	import flash.display3D.Context3DProgramType;

@@ -12,7 +12,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	
 	import com.developmentarc.core.tasks.tasks.AbstractTask;
 	
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.Log;

@@ -37,7 +37,7 @@ import com.voxelengine.worldmodel.inventory.*;
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
-import com.voxelengine.worldmodel.models.VoxelModel;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 
 public class  UserInventory extends QuickInventory

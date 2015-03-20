@@ -22,7 +22,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelMetadata;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	public class WindowModelChoice extends VVPopup
 	{

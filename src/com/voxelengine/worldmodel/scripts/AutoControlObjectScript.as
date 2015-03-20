@@ -16,7 +16,7 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	public class AutoControlObjectScript extends Script 
 	{

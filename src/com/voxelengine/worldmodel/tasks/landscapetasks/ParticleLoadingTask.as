@@ -21,7 +21,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 	/**
 	 * ...

@@ -4,7 +4,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.events.TargetEvent;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.events.Event;
 	import flash.utils.Timer;
 	import org.flashapi.swing.*;

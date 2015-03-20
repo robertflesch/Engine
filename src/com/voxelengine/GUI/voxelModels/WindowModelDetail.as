@@ -23,7 +23,7 @@ package com.voxelengine.GUI.voxelModels
 	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.RegionManager;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 	
 	public class WindowModelDetail extends VVPopup

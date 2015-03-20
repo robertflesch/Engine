@@ -13,7 +13,7 @@ package com.voxelengine.worldmodel.tasks.tests
 	import com.voxelengine.worldmodel.biomes.*;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.display.BitmapData;
 	import flash.utils.getTimer;

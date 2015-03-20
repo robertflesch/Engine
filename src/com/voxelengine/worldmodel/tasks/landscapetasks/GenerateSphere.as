@@ -12,7 +12,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.Log;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.utils.getTimer;
 	

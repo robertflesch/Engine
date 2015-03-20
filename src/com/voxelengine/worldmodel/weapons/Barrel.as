@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.weapons
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.worldmodel.models.*;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.display3D.Context3D;
 	import flash.geom.Vector3D;
 	import flash.events.KeyboardEvent;

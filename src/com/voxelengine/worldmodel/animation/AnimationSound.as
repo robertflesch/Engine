@@ -10,7 +10,7 @@ package com.voxelengine.worldmodel.animation
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.SoundBank;
 	import com.voxelengine.utils.MP3Pitch;
 		

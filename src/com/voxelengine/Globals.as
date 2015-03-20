@@ -7,6 +7,7 @@
 ==============================================================================*/
 
 package com.voxelengine {
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.display.StageDisplayState;
 	import flash.display3D.Context3D;
 	import flash.geom.Matrix3D;

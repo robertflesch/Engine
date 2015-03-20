@@ -7,7 +7,7 @@ package com.voxelengine.GUI.actionBars
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.WeaponEvent;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import org.flashapi.swing.*;

@@ -10,7 +10,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 {
 	import com.developmentarc.core.tasks.tasks.AbstractTask;
 	import com.voxelengine.events.LightEvent;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;

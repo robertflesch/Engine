@@ -17,7 +17,7 @@ import mx.utils.NameUtil;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.models.VoxelModel;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.pools.VertexIndexBuilderPool;

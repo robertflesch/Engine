@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.LoadingEvent;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.Region;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;

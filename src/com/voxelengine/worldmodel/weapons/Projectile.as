@@ -18,7 +18,7 @@ package com.voxelengine.worldmodel.weapons
 	import com.voxelengine.events.ImpactEvent;
 	import com.voxelengine.worldmodel.scripts.ScriptLibrary;
 	
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.worldmodel.SoundBank;

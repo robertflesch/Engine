@@ -6,7 +6,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.GUI.actionBars.WindowShipControl;
 	import com.voxelengine.Log;
 	import com.voxelengine.worldmodel.models.types.Ship;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import org.flashapi.swing.*;

@@ -5,7 +5,7 @@ package com.voxelengine.GUI
     import org.flashapi.swing.event.UIOEvent;
     import org.flashapi.swing.constants.LayoutOrientation;
 	
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	public class WindowModelTemplate extends VVPopup
 	{

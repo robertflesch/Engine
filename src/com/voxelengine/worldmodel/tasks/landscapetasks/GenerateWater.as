@@ -17,7 +17,7 @@ import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.pools.GrainCursorPool;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.models.VoxelModel;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 
 /**

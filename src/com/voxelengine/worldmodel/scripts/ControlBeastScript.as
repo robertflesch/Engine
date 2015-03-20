@@ -11,7 +11,7 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.events.OxelEvent;
 	import com.voxelengine.Log;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	public class ControlBeastScript extends Script 
 	{

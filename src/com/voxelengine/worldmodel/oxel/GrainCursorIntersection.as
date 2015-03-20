@@ -2,7 +2,7 @@ package com.voxelengine.worldmodel.oxel
 {
 import com.voxelengine.Globals;
 import flash.geom.Vector3D;
-import com.voxelengine.worldmodel.models.VoxelModel;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class GrainCursorIntersection
 {

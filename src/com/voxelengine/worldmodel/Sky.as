@@ -8,7 +8,7 @@
 package com.voxelengine.worldmodel
 {
 	import com.voxelengine.Globals;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.renderer.VertexIndexBuilder;
 	import com.voxelengine.renderer.Quad;
 	import flash.display.Bitmap;

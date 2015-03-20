@@ -29,7 +29,7 @@ package com.voxelengine.GUI.actionBars
 	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.worldmodel.*;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.animation.Animation;
 	import com.voxelengine.worldmodel.weapons.Ammo;
 	import com.voxelengine.worldmodel.weapons.Gun;

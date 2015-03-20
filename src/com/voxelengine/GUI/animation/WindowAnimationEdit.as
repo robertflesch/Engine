@@ -18,7 +18,7 @@ import flash.events.Event;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 public class WindowAnimationEdit extends VVPopup
 {

@@ -18,7 +18,7 @@ import org.flashapi.swing.constants.*;
 import com.voxelengine.Globals;
 import com.voxelengine.GUI.VVPopup;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.models.VoxelModel;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 public class WindowChangeBaseLightLevel extends VVPopup
 	{

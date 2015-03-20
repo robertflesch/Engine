@@ -18,7 +18,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 	import com.voxelengine.pools.LightingPool;
 	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.TypeInfo;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.oxel.Lighting;

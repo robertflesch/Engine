@@ -14,7 +14,7 @@ package com.voxelengine.renderer.shaders
 	import flash.geom.Matrix3D;
 
 	import com.voxelengine.renderer.shaders.Shader;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	public class ShaderAlpha extends Shader {
 

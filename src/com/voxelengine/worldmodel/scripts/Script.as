@@ -9,7 +9,7 @@ package com.voxelengine.worldmodel.scripts
 {
 	import com.voxelengine.Log;
 	import com.voxelengine.worldmodel.models.ModelInfo;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	/**
 	 * ...

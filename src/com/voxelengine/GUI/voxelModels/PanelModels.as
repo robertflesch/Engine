@@ -24,7 +24,7 @@ import com.voxelengine.GUI.*;
 import com.voxelengine.GUI.inventory.WindowInventoryNew;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.types.Player;
-import com.voxelengine.worldmodel.models.VoxelModel;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.inventory.Inventory;
 

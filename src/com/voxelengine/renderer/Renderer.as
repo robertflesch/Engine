@@ -35,7 +35,7 @@ package com.voxelengine.renderer
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.Location;
 	import com.voxelengine.worldmodel.MouseKeyboardHandler;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	public class Renderer extends EventDispatcher 
 	{

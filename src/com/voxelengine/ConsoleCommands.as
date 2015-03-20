@@ -18,7 +18,7 @@ import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.ControllableVoxelModel;
 import com.voxelengine.worldmodel.models.types.EditCursor;
-import com.voxelengine.worldmodel.models.VoxelModel;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.oxel.Lighting;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.tasks.landscapetasks.*;

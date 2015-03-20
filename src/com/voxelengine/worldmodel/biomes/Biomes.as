@@ -16,7 +16,7 @@ package com.voxelengine.worldmodel.biomes
 
 	import com.developmentarc.core.tasks.tasks.ITask;
 	import com.developmentarc.core.tasks.groups.TaskGroup;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.TypeInfo;
 

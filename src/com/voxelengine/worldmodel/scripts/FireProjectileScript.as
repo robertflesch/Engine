@@ -24,7 +24,7 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.worldmodel.models.ModelTransform;
 	import com.voxelengine.worldmodel.SoundBank;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.pools.ProjectilePool;

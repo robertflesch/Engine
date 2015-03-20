@@ -8,7 +8,7 @@
 package com.voxelengine.events
 {
 	import flash.events.Event;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	/**
 	 * ...

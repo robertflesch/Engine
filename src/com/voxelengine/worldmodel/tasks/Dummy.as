@@ -11,7 +11,7 @@ package com.voxelengine.worldmodel.tasks
 	import com.voxelengine.worldmodel.Biomes;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	/**
 	 * ...

@@ -7,7 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.biomes
 {
-	import com.voxelengine.worldmodel.models.VoxelModel;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.display.BitmapData;
 	import flash.display.BitmapDataChannel;
 	import flash.geom.Point;
