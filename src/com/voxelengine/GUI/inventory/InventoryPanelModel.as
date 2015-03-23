@@ -133,7 +133,7 @@ public class InventoryPanelModel extends VVContainer
 		
 		// I only want the results from the series I asked for
 		if ( _seriesModelMetadataEvent == $mme.series ) {
-			var om:ObjectModel = new ObjectModel( null, $mme.guid );
+			var om:ObjectModel = new ObjectModel( null, $mme.modelGuid );
 			om.vmm = $mme.vmm;
 			addModel( om );
 		}
@@ -163,7 +163,7 @@ public class InventoryPanelModel extends VVContainer
 	private function addAsParentModel( e:UIMouseEvent ):void {
 		var item:ObjectModel = e.target.objectInfo as ObjectModel;
 		var ii:InstanceInfo = new InstanceInfo();
-		ii.modelGuid = item.guid;
+		ii.modelGuid = item.modelGuid;
 		ii.instanceGuid = Globals.getUID();
 		new ModelMaker( ii, true );
 	}
@@ -242,7 +242,7 @@ public class InventoryPanelModel extends VVContainer
 					var slotId:int = int( bi.name );
 					InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, item ) );
 					// we are going to need the data to build the model for this.
-					ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, item.guid, null ) );
+					ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, item.modelGuid, null ) );
 				}
 			}
 		}

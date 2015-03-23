@@ -35,8 +35,6 @@ package com.voxelengine.worldmodel.models
 		public function modelGet( $instanceGuid:String ):VoxelModel  { return _modelsGuid[$instanceGuid]; }
 		public function get modelsDynamic():Vector.<VoxelModel> { return _modelsDynamic; }
 		
-		private var m:ModelCacheUtils;
-		
 		public function ModelCache( $region:Region ) {
 			_region = $region;
 		}
@@ -45,6 +43,7 @@ package com.voxelengine.worldmodel.models
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			Log.out( "ModelCache.createPlayer - creating from LOCAL", Log.DEBUG );
 			instanceInfo.modelGuid = "Player";
+			instanceInfo.instanceGuid = "Player";
 			instanceInfo.grainSize = 4;
 			ModelMakerBase.load( instanceInfo );
 			return true
@@ -78,7 +77,7 @@ package com.voxelengine.worldmodel.models
 			// if this is a child model, give it to parent, 
 			// next check to see if its a dynamic model
 			//otherwise add it to ModelCache list.
-			Log.out( "ModelCache.add - guid: " + vm.instanceInfo.modelGuid + "  instanceGuid: " + vm.instanceInfo.instanceGuid, Log.WARN );			
+			//Log.out( "ModelCache.add - guid: " + vm.instanceInfo.modelGuid + "  instanceGuid: " + vm.instanceInfo.instanceGuid, Log.WARN );			
 			if ( vm.instanceInfo.controllingModel )
 			{
 				vm.instanceInfo.controllingModel.childAdd( vm );

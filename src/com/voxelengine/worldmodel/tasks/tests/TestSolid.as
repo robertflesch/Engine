@@ -38,7 +38,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			//////////////////////////////////////////////////////////
 			// Builds Solid Cube of any grain size
 			//////////////////////////////////////////////////////////
-			var vm:VoxelModel = Globals.modelGet( _guid );
+			var vm:VoxelModel = Globals.modelGet( _instanceGuid );
 			var root_grain_size:uint = vm.oxel.gc.bound;
 			var min_grain_size:int = root_grain_size - _layer.range;
 			if ( 0 > min_grain_size || min_grain_size > root_grain_size || ( 8 < (root_grain_size - min_grain_size)) )
@@ -55,7 +55,7 @@ package com.voxelengine.worldmodel.tasks.tests
 				for ( var y:int = 0; y < size; y++ ) {
 					for ( var z:int = 0; z < size; z++ ) {
 						loco.set_values( x, y, z, min_grain_size )
-						vm.oxel.write( _guid, loco, _layer.type );
+						vm.oxel.write( _instanceGuid, loco, _layer.type );
 						//vm.write( loco, _layer.type, true );
 					}
 				}

@@ -7,11 +7,11 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-	import com.voxelengine.events.PersistanceEvent;
+	import com.voxelengine.utils.JSONUtil;
 	import flash.events.Event;
 	import flash.events.ProgressEvent;
 	import flash.events.IOErrorEvent;
-	import org.flashapi.swing.Alert;
+	//import org.flashapi.swing.Alert;
 	
 	import com.voxelengine.utils.StringUtils;
 
@@ -19,6 +19,7 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.Log;
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.LoginEvent;
+	import com.voxelengine.events.PersistanceEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.server.Network;
 	
@@ -76,7 +77,13 @@ package com.voxelengine.worldmodel
 			PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFail );			
 			PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
 			
-			_defaultRegionJson = JSON.parse( e.data );
+			_defaultRegionJson = JSONUtil.parse( e.data, "config" + Globals.APP_EXT, "ConfigManager.loadSucceed" );
+			if ( null == _defaultRegionJson ) {
+				// TODO App needs to communicate that something is wrong.
+				//(new Alert( "VoxelVerse.configManager PLEASE EXIT PROGRAM - Error Parsing: config" + Globals.APP_EXT, 500 ) ).display();
+				return;
+			}
+			
 			_showHelp = _defaultRegionJson.config.showHelp;
 			_showEditMenu = _defaultRegionJson.config.showEditMenu;
 			_showButtons = _defaultRegionJson.config.showButtons;

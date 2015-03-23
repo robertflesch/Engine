@@ -20,34 +20,20 @@ import com.voxelengine.worldmodel.models.ModelMetadata;
 public class ModelMetadataEvent extends ModelBaseEvent
 {
 	private var _vmm:ModelMetadata;
-	private var _guid:String;
+	private var _modelGuid:String;
 
-	public function ModelMetadataEvent( $type:String, $series:int, $guid:String, $vmm:ModelMetadata, $bubbles:Boolean = true, $cancellable:Boolean = false )
-	{
+	public function get vmm():ModelMetadata { return _vmm; }
+	public function get modelGuid():String { return _modelGuid; }
+	
+	public override function clone():Event { return new ModelMetadataEvent(type, series, _modelGuid, _vmm, bubbles, cancelable); }
+	public override function toString():String { return formatToString("ModelMetadataEvent", "modelGuid", "vmm" ); }
+	
+	public function ModelMetadataEvent( $type:String, $series:int, $modelGuid:String, $vmm:ModelMetadata, $bubbles:Boolean = true, $cancellable:Boolean = false ) {
 		super( $type, $series, $bubbles, $cancellable );
 		_vmm = $vmm;
-		_guid = $guid;
+		_modelGuid = $modelGuid;
 	}
 	
-	public override function clone():Event
-	{
-		return new ModelMetadataEvent(type, series, _guid, _vmm, bubbles, cancelable);
-	}
-   
-	public override function toString():String
-	{
-		return formatToString("ModelMetadataEvent", "guid", "vmm" );
-	}
-	
-	public function get vmm():ModelMetadata 
-	{
-		return _vmm;
-	}
-	
-	public function get guid():String 
-	{
-		return _guid;
-	}
 	///////////////// Event handler interface /////////////////////////////
 
 	// Used to distribue all persistance messages

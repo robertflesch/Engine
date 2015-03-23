@@ -34,9 +34,6 @@ package com.voxelengine.GUI.voxelModels
         }
 		
 		private function onParentModelAdded(event:ModelEvent):void {
-			
-			// TODO - Handle new models being added to system
-			Log.out( "WindowRegionModels.onParentModelAdded - NEED A HANDLER SOMEWHERE?", Log.WARN );
 			if ( _modelPanel )
 				_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );

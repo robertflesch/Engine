@@ -42,20 +42,20 @@ public class ModelDataCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	static private function request( $mie:ModelDataEvent ):void 
 	{   
-		if ( null == $mie.guid ) {
+		if ( null == $mie.modelGuid ) {
 			Log.out( "ModelDataManager.modelDataRequest guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "ModelDataManager.request guid: " + $mie.guid, Log.INFO );
-		var mi:ModelData = _modelData[$mie.guid]; 
+		Log.out( "ModelDataManager.request guid: " + $mie.modelGuid, Log.INFO );
+		var mi:ModelData = _modelData[$mie.modelGuid]; 
 		if ( null == mi ) {
 			if ( true == Globals.online && $mie.fromTables )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.DB_TABLE_MODELS_DATA, $mie.guid ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.DB_TABLE_MODELS_DATA, $mie.modelGuid ) );
 			else	
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.IVM_EXT, $mie.guid, null, null, URLLoaderDataFormat.BINARY ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.IVM_EXT, $mie.modelGuid, null, null, URLLoaderDataFormat.BINARY ) );
 		}
 		else
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.RESULT, $mie.series, $mie.guid, mi ) );
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.RESULT, $mie.series, $mie.modelGuid, mi ) );
 	}
 	
 	static private function add( $pe:PersistanceEvent, $md:ModelData ):void 

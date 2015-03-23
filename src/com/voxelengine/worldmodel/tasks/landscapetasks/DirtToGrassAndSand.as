@@ -39,7 +39,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				vm.oxel.dirtToGrassAndSand();
 			}
 			else
-				Log.out( "GrowTreesOn.start - VM not found for guid: " + _guid );
+				Log.out( "GrowTreesOn.start - VM not found for guid: " + _instanceGuid );
 			
 			Log.out( "DirtToGrassAndSand.start - complete - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) );	
 			

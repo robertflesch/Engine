@@ -91,7 +91,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 							to = vm.oxel.childFind( gct );
 							if ( Globals.BAD_OXEL != to )
 							{
-								to.write( _guid, gct, TypeInfo.AIR )
+								to.write( _instanceGuid, gct, TypeInfo.AIR )
 							}
 						}
 					}

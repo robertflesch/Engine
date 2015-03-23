@@ -54,51 +54,37 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 					// This is only called when executing a script or series of scripts on an object
 					if ( Globals.online ) {
 						throw new Error( "CompletedModel.start - Should not be used" );
-						/*
-						// This fills in the metadata with dates and permissions.
-						vm.metadata.initialize( vm.metadata.name, vm.metadata.description ); // "GeneratedObject-" + int(Math.random() * 10000)
-						// now I need to propgate the guid to the instanceInfo and the modelInfo for reloading.
-						// TODO I dont like that this is in 3 different locations, but I dont see a way around it.
-						vm.instanceInfo.guid = vm.metadata.guid;
-						// now update the loader with method and guid
-						var loadingLayer:LayerInfo = new LayerInfo( "LoadModelFromBigDB", vm.metadata.guid ); 
-						vm.modelInfo.biomes.layers[0] = loadingLayer;
-						
-						// mark the region and model as changed so that the info is stored.
-						RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, null ) );
-						vm.changed = true;
-						*/
 					}
 						
 					if ( vm is Player )
 					{
-						LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, _guid ) );
+						LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, _instanceGuid ) );
 					}
 					else {
 						if ( vm.instanceInfo.critical )
-							LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.CRITICAL_MODEL_LOADED, _guid ));
+							LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.CRITICAL_MODEL_LOADED, _instanceGuid ));
 						else
-							LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_COMPLETE, _guid ) );
+							LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_COMPLETE, _instanceGuid ) );
 					}
 				}
 				else
 				{
-					Log.out( "CompletedModel.start - VoxelModel Not found: " + _guid, Log.WARN );
+					Log.out( "CompletedModel.start - VoxelModel Not found: " + _instanceGuid, Log.WARN );
 				}
 			}
 			catch ( error:Error )
 			{
-				if ( Globals.player.instanceInfo.instanceGuid == _guid )
+				if ( Globals.player.instanceInfo.instanceGuid == _instanceGuid )
 					Globals.player.complete = true;
 				else
-					Log.out( "CompletedModel.start - exception was thrown for model guid: " + _guid, Log.ERROR );
+					Log.out( "CompletedModel.start - exception was thrown for model guid: " + _instanceGuid, Log.ERROR );
 			}
 			
 			//Log.out( "CompletedModel.start - completedModel: " + _guid + "  count: " + _count );
 				
 			if ( 0 == _count  ) // && _playerLoaded  should I add ( null != Globals.player )
 			{
-				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _guid );
+				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _instanceGuid );
 				LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 			}
 			

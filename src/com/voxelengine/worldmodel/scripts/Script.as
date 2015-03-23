@@ -27,7 +27,7 @@ package com.voxelengine.worldmodel.scripts
 		{ 
 		}
 		
-		public function processJsonInfo( modelInfo:ModelInfo ):void {		
+		public function processClassJson( modelInfo:ModelInfo ):void {		
 			
 		}
 		

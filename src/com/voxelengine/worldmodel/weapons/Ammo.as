@@ -55,7 +55,7 @@ public class Ammo
 	
 	public function Ammo() {}
 	
-	public function processJsonInfo( $ammoJson:Object ):void {		
+	public function processClassJson( $ammoJson:Object ):void {		
 
 		if ( $ammoJson.name )
 			_name = $ammoJson.name;
@@ -83,7 +83,7 @@ public class Ammo
 			_contactScript = $ammoJson.contactScript;
 		if ( $ammoJson.name )
 			_name = $ammoJson.name;
-		//Log.out( "Ammo.processJsonInfo" );
+		//Log.out( "Ammo.processClassJson" );
 		SoundBank.getSound( _impactSoundFile ); // Preload the sound file
 		SoundBank.getSound( _launchSoundFile );
 		//ModelLoader.modelInfoFindOrCreate( _model, null, false );

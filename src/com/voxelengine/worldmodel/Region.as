@@ -12,6 +12,8 @@ package com.voxelengine.worldmodel
     import flash.events.TimerEvent;
 	import flash.utils.ByteArray;
     import flash.utils.Timer;
+
+	import org.flashapi.swing.Alert;
 	
 	import playerio.DatabaseObject;
 	
@@ -23,6 +25,7 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.events.WindowSplashEvent;
+	import com.voxelengine.utils.JSONUtil;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 	import com.voxelengine.worldmodel.models.types.Player;
@@ -243,7 +246,7 @@ package com.voxelengine.worldmodel
 		
 		private function removeFailedObjectFromRegion( $e:LoadingEvent):void {
 			// Do I need to remove this failed load?
-			Log.out( "Region.removeFailedObjectFromRegion - failed to load: " + $e.guid, Log.ERROR );
+			Log.out( "Region.removeFailedObjectFromRegion - failed to load: " + $e.modelGuid, Log.ERROR );
 			//currentRegion.changedForce = true;
 		}
 	
@@ -256,7 +259,12 @@ package com.voxelengine.worldmodel
 		
 		public function initJSON( $regionJson:String ):void {
 			//Log.out( "Region.processRegionJson: " + $regionJson );
-			_JSON = JSON.parse($regionJson);
+			_JSON = JSONUtil.parse( $regionJson, name + Globals.REGION_EXT, "Region.initJSON" );
+			if ( null == _JSON ) {
+				(new Alert( "Region.initJSON - Error Parsing: " + name + Globals.APP_EXT, 500 ) ).display();
+				return;
+			}
+			
 			if ( _JSON.skyColor ) {
 				// legacy < v008 has rgb values
 				if ( _JSON.skyColor.r )
@@ -291,6 +299,7 @@ package com.voxelengine.worldmodel
 		
 		public function toString():String {
 
+			// This does not generate valid JSON
 			var outString:String = "  name:" + JSON.stringify(name);
 			outString += "  owner:" + JSON.stringify( _owner );
 			outString += "  gravity:" + JSON.stringify(gravity);

@@ -68,8 +68,8 @@ public class Inventory
 				ba = asByteArray( ba );
 			}
 			addSaveEvents();
-			PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, inventoryCreateSuccess );
-			PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, inventorySaveSuccess );
+			PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, createSuccess );
+			PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSuccess );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_INVENTORY_TABLE, _networkId, _dbo, ba ) );
 		}
 		else
@@ -91,22 +91,22 @@ public class Inventory
 		return $ba;	
 	}
 	
-	private function inventorySaveSuccess($pe:PersistanceEvent):void 
+	private function saveSuccess($pe:PersistanceEvent):void 
 	{
 		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
-		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, inventoryCreateSuccess );
-		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, inventorySaveSuccess );
+		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, createSuccess );
+		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSuccess );
 	}
 	
-	private function inventoryCreateSuccess( $pe:PersistanceEvent):void 
+	private function createSuccess( $pe:PersistanceEvent):void 
 	{
 		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
-		Log.out( "Inventory.inventoryCreateSuccess - setting dbo for - networkId: " + networkId, Log.DEBUG );
+		Log.out( "Inventory.createSuccess - setting dbo for - networkId: " + networkId, Log.DEBUG );
 		_dbo = $pe.dbo;
-		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, inventoryCreateSuccess );
-		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, inventorySaveSuccess );
+		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, createSuccess );
+		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSuccess );
 	}
 	
 	////////////////////////////////////////////////////////////////
@@ -154,18 +154,18 @@ public class Inventory
 	}
 	
 	private function addLoadEvents():void {
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, inventoryLoadSuccess );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, inventoryLoadFailed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, inventoryNotFound );
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSuccess );
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFailed );
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, notFound );
 	}
 	
 	private function removeLoadEvents():void {
-		PersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, inventoryLoadSuccess );
-		PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, inventoryLoadFailed );
-		PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, inventoryNotFound );
+		PersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, loadSuccess );
+		PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFailed );
+		PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, notFound );
 	}
 	
-	private function inventoryNotFound($pe:PersistanceEvent):void 
+	private function notFound($pe:PersistanceEvent):void 
 	{
 		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
@@ -175,7 +175,7 @@ public class Inventory
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, _networkId, this ) );
 	}
 	
-	private function inventoryLoadSuccess( $pe:PersistanceEvent ):void
+	private function loadSuccess( $pe:PersistanceEvent ):void
 	{
 		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
@@ -184,7 +184,7 @@ public class Inventory
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, _networkId, this ) );
 	}
 	
-	private function inventoryLoadFailed( $pe:PersistanceEvent ):void
+	private function loadFailed( $pe:PersistanceEvent ):void
 	{
 		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;

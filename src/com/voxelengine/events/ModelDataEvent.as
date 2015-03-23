@@ -19,23 +19,23 @@ import com.voxelengine.worldmodel.models.ModelData;
 public class ModelDataEvent extends ModelBaseEvent
 {
 	private var _vmd:ModelData;
-	private var _guid:String;
+	private var _modelGuid:String;
 	private var _fromTables:Boolean;
 
 	public function get vmd():ModelData { return _vmd; }
-	public function get guid():String  { return _guid; }
+	public function get modelGuid():String  { return _modelGuid; }
 	public function get fromTables():Boolean  { return _fromTables; }
 	
 	public function ModelDataEvent( $type:String, $series:int, $guid:String, $vmd:ModelData, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $series, $bubbles, $cancellable );
 		_vmd = $vmd;
-		_guid = $guid;
+		_modelGuid = $guid;
 		_fromTables = $fromTable;
 	}
 	
 	public override function clone():Event {
-		return new ModelDataEvent(type, series, _guid, _vmd, bubbles, cancelable);
+		return new ModelDataEvent(type, series, _modelGuid, _vmd, bubbles, cancelable);
 	}
    
 	public override function toString():String {

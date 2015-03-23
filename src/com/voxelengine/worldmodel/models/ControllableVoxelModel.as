@@ -85,8 +85,7 @@ package com.voxelengine.worldmodel.models
 		protected function set 	mForward($val:Boolean):void 			{ _forward = $val; }
 		
 		
-		public function ControllableVoxelModel( ii:InstanceInfo ):void 
-		{
+		public function ControllableVoxelModel( ii:InstanceInfo ):void {
 			super( ii );
 		}
 		
@@ -99,8 +98,45 @@ package com.voxelengine.worldmodel.models
 			_ct = new CollisionTest( this );
 		}
 		
-		override protected function internal_update($context:Context3D, $elapsedTimeMS:int):void
-		{
+		override protected function processClassJson():void {
+			super.processClassJson();
+			if ( modelInfo.json && modelInfo.json.controllableVoxelModel )
+			{
+				var cmInfo:Object = modelInfo.json.controllableVoxelModel;
+				if ( null == cmInfo ) {
+					Log.out( "ControllableVoxelModel.processClassJson - no controllable model JSON info found", Log.DEBUG );
+					return;
+				}
+				
+				if ( cmInfo.clipFactor )
+				{
+					clipVelocityFactor = cmInfo.clipFactor/100;
+				}
+				else
+					clipVelocityFactor = clipVelocityFactor/100;
+					
+				if ( cmInfo.maxSpeed )
+				{
+					mMaxSpeed = cmInfo.maxSpeed;
+				}
+					
+			}
+			else
+				Log.out( "ControllableVoxelModel.processClassJson - no modelInfo JSON info found", Log.DEBUG );
+		}
+		
+		override protected function addClassJson():String {
+			var jsonString:String = super.addClassJson();
+			jsonString += ",";
+			jsonString += "\"controllableVoxelModel\": { "
+			jsonString += "\"clipFactor\" : " + clipVelocityFactor + ",";
+			jsonString += "\"maxSpeed\" : " + mMaxSpeed;
+			jsonString += "}"
+			return jsonString
+		}
+		
+		
+		override protected function internal_update($context:Context3D, $elapsedTimeMS:int):void {
 			if (!initialized)
 				initialize($context);
 			
@@ -172,8 +208,8 @@ package com.voxelengine.worldmodel.models
 		override protected function oxelLoaded():void
 		{
 			collisionPointsAdd();
-			if ( _displayCollisionMarkers )
-				_ct.markersAdd();
+//			if ( _displayCollisionMarkers )
+//				_ct.markersAdd();
 		}		
 		
 		protected function onChildAdded( me:ModelEvent ):void

@@ -58,6 +58,7 @@ public class WindowModelMetadata extends VVPopup
 			_vmm.name = $guid;
 			_vmm.description = $guid + "-IMPORTED";
 			_vmm.creator = Network.userId;
+			_vmm.owner = Network.userId;
 			// fake an event to populate the window
 			dataReceived( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, $guid, _vmm ) )
 		}
@@ -183,14 +184,14 @@ public class WindowModelMetadata extends VVPopup
 		_vmm.modifiedDate = new Date();
 		if ( _type == TYPE_EDIT ) {
 			_vmm.copyCount = parseInt( _copies.label, 10 );
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.UPDATE, 0, _vmm.guid, _vmm ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.UPDATE, 0, _vmm.modelGuid, _vmm ) );
 		} else { // TYPE_IMPORT so new data
-			var dboTemp:DatabaseObject = new DatabaseObject( Globals.DB_TABLE_MODELS, _vmm.guid, "1", 0, true, null );
+			var dboTemp:DatabaseObject = new DatabaseObject( Globals.DB_TABLE_MODELS, _vmm.modelGuid, "1", 0, true, null );
 			_vmm.dbo = dboTemp;
 			_vmm.toPersistance();
 			_vmm.dbo = null;
 			_vmm.release();
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.DB_TABLE_MODELS, _vmm.guid, dboTemp, true ) );			
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.DB_TABLE_MODELS, _vmm.modelGuid, dboTemp, true ) );			
 		}
 		remove();
 	}

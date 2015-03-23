@@ -281,7 +281,7 @@ public class  UserInventory extends QuickInventory
 			var ii:InstanceInfo = new InstanceInfo();
 
 			throw new Error( "UserInventory.processItemSelection - what is needed here for guid?" );
-			_editCursorModelGuid = ii.modelGuid = om.guid;
+			_editCursorModelGuid = ii.modelGuid = om.modelGuid;
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_COMPLETE, cursorReady );
 			new ModelMaker( ii );

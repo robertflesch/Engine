@@ -35,7 +35,7 @@ package com.voxelengine.worldmodel.tasks.tests
 
 			var timer:int = getTimer();
 			
-			var vm:VoxelModel = Globals.modelGet( _guid );
+			var vm:VoxelModel = Globals.modelGet( _instanceGuid );
 			if ( vm )
 			{
 				var root_grain_size:uint = vm.oxel.gc.bound
@@ -49,7 +49,7 @@ package com.voxelengine.worldmodel.tasks.tests
 				var c:int = vm.oxel.size_in_world_coordinates() / 2;
 				// 1 large spheres 
 				//vm.oxel.write_sphere( c, c, c, c - 1, _layer.type, min_grain_size );
-				vm.oxel.write_sphere( _guid, c, c/2, c, c - 1, _layer.type, min_grain_size );
+				vm.oxel.write_sphere( _instanceGuid, c, c/2, c, c - 1, _layer.type, min_grain_size );
 				/* 
 				// 8 spheres 
 				var type:int = TypeInfo.GRASS;
@@ -65,7 +65,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			}
 			else
 			{
-				throw new Error("Didnt find model for: " + _guid );
+				throw new Error("Didnt find model for: " + _instanceGuid );
 			}
 
 			trace( "TestSphere.start - completed layer of type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));

@@ -47,12 +47,12 @@ public class ModelMetadataCache
 	
 	static private function update($mme:ModelMetadataEvent):void 
 	{
-		if ( null == $mme || null == $mme.guid ) {
+		if ( null == $mme || null == $mme.modelGuid ) {
 			Log.out( "MetadataManager.update trying to add NULL metadata or guid", Log.WARN );
 			return;
 		}
 		// check to make sure is not already there
-		var vmm:ModelMetadata = _metadata[$mme.guid];
+		var vmm:ModelMetadata = _metadata[$mme.modelGuid];
 		if ( null ==  vmm ) {
 			Log.out( "MetadataManager.update trying update NULL metadata or guid, adding instead", Log.WARN );
 			add( null, $mme.vmm );
@@ -64,30 +64,30 @@ public class ModelMetadataCache
 	
 	static private function request( $mme:ModelMetadataEvent ):void 
 	{   
-		if ( null == $mme.guid ) {
+		if ( null == $mme.modelGuid ) {
 			Log.out( "MetadataManager.request guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "MetadataManager.request guid: " + $mme.guid, Log.INFO );
-		var vmm:ModelMetadata = _metadata[$mme.guid]; 
+		Log.out( "MetadataManager.request guid: " + $mme.modelGuid, Log.INFO );
+		var vmm:ModelMetadata = _metadata[$mme.modelGuid]; 
 		if ( null == vmm )
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mme.series, Globals.DB_TABLE_MODELS, $mme.guid ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mme.series, Globals.DB_TABLE_MODELS, $mme.modelGuid ) );
 		else
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.modelGuid, vmm ) );
 	}
 	
 	// This loads the first 100 objects from the users inventory OR the public inventory
 	static private function requestType( $mme:ModelMetadataEvent ):void {
 		
 		// For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $vmm.guid, $vmm ) event
-		if ( Network.PUBLIC == $mme.guid ) {
+		if ( Network.PUBLIC == $mme.modelGuid ) {
 			if ( false == _initializedPublic ) {
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.DB_TABLE_MODELS, Network.PUBLIC, null, Globals.DB_INDEX_VOXEL_MODEL_OWNER ) );
 				_initializedPublic = true;
 			}
 		}
 			
-		if ( Network.userId == $mme.guid ) {
+		if ( Network.userId == $mme.modelGuid ) {
 			if ( false == _initializedPrivate ) {
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.DB_TABLE_MODELS, Network.userId, null, Globals.DB_INDEX_VOXEL_MODEL_OWNER ) );
 				_initializedPrivate = true;
@@ -96,22 +96,22 @@ public class ModelMetadataCache
 			
 		// This will return models already loaded.
 		for each ( var vmm:ModelMetadata in _metadata ) {
-			if ( vmm.owner == $mme.guid )
-				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm ) );
+			if ( vmm.owner == $mme.modelGuid )
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.modelGuid, vmm ) );
 		}
 	}
 	
 	static private function add( $pe:PersistanceEvent, $vmm:ModelMetadata ):void 
 	{ 
-		if ( null == $vmm || null == $vmm.guid ) {
+		if ( null == $vmm || null == $vmm.modelGuid ) {
 			Log.out( "MetadataManager.add trying to add NULL metadata or guid", Log.WARN );
 			return;
 		}
 		// check to make sure is not already there
-		if ( null ==  _metadata[$vmm.guid] ) {
+		if ( null ==  _metadata[$vmm.modelGuid] ) {
 			//Log.out( "ModelMetadataCache.add vmm: " + $vmm.toString(), Log.WARN );
-			_metadata[$vmm.guid] = $vmm; 
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, ($pe ? $pe.series : 0), $vmm.guid, $vmm ) );
+			_metadata[$vmm.modelGuid] = $vmm; 
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, ($pe ? $pe.series : 0), $vmm.modelGuid, $vmm ) );
 		}
 	}
 	

@@ -171,7 +171,15 @@ public class InstanceInfo extends Location	{
 
 	public function toString():String
 	{
-		return " GUID: " + modelGuid + " pos: " + positionGet + " controllingModel: " + (controllingModel ? controllingModel.instanceInfo.modelGuid : "None" );
+		var cmString:String = "";
+		if ( null != controllingModel) 
+			cmString = "   controllingModel: " + controllingModel.instanceInfo.toString();
+		 
+		return " modelGuid: " + modelGuid + 
+		       "   instanceGuid: " + instanceGuid + 
+			   //" pos: " + positionGet + 
+			   cmString
+			   ;
 	}
 
 	private function onLoadingComplete( le:LoadingEvent ):void
@@ -198,7 +206,7 @@ public class InstanceInfo extends Location	{
 		}
 		
 		if ( json.instanceGuid ) {
-			instanceGuid = json.instanceGuid;
+			_instanceGuid = json.instanceGuid;
 		}
 			
 		if ( json.name )

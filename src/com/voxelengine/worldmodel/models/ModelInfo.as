@@ -115,11 +115,8 @@ package com.voxelengine.worldmodel.models
 		
 		public function getJSON():String
 		{
-			var json:String = "{\"model\":";
-			json += JSON.stringify( this );			
-			json +=  "}"
-
-			return json;
+			var jsonString:String = JSON.stringify( this );			
+			return jsonString;
 		}
 	
 		public function toJSON(k:*):* 

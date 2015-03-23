@@ -55,7 +55,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			// 3/4 sphere
 //				vm.oxel.write_sphere( c, c/2, c, c, _layer.type, min_grain_size );
 			// 1/2 sphere
-			vm.oxel.write_sphere( _guid, c, c, c, c, _layer.type, min_grain_size );
+			vm.oxel.write_sphere( _instanceGuid, c, c, c, c, _layer.type, min_grain_size );
 			/* 
 			// 8 spheres 
 			var type:int = TypeInfo.GRASS;

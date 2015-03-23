@@ -20,34 +20,21 @@ import com.voxelengine.worldmodel.models.ModelInfo;
 public class ModelInfoEvent extends ModelBaseEvent
 {
 	private var _vmi:ModelInfo;
-	private var _guid:String;
+	private var _modelGuid:String;
 
+	public function get vmi():ModelInfo { return _vmi; }
+	public function get modelGuid():String { return _modelGuid; }
+	
 	public function ModelInfoEvent( $type:String, $series:int, $guid:String, $vmi:ModelInfo, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $series, $bubbles, $cancellable );
 		_vmi = $vmi;
-		_guid = $guid;
+		_modelGuid = $guid;
 	}
 	
-	public override function clone():Event
-	{
-		return new ModelInfoEvent(type, series, _guid, _vmi, bubbles, cancelable);
-	}
-   
-	public override function toString():String
-	{
-		return formatToString("ModelInfoEvent", "guid", "vmi" );
-	}
+	public override function toString():String { return formatToString("ModelInfoEvent", "modelGuid", "vmi" ); }
+	public override function clone():Event { return new ModelInfoEvent(type, series, _modelGuid, _vmi, bubbles, cancelable); }
 	
-	public function get vmi():ModelInfo 
-	{
-		return _vmi;
-	}
-	
-	public function get guid():String 
-	{
-		return _guid;
-	}
 	///////////////// Event handler interface /////////////////////////////
 
 	// Used to distribue all persistance messages

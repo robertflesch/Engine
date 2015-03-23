@@ -99,7 +99,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 		private function loadByteArray( $ba:ByteArray ):void {
 			
-			var task:ITask = new LoadFromByteArray( _guid, _layer );
+			var task:ITask = new LoadFromByteArray( _instanceGuid, _layer );
 			Globals.g_landscapeTaskController.addTask( task );
 
 			super.complete() // AbstractTask will send event

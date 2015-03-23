@@ -28,27 +28,17 @@ public class LoadingEvent extends Event
 	static public const LOAD_TYPES_COMPLETE:String		= "LOAD_TYPES_COMPLETE";
 	static public const LOAD_CONFIG_COMPLETE:String		= "LOAD_CONFIG_COMPLETE";
 	
-	private var _guid:String = "";
-	public function LoadingEvent( $type:String, $guid:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false )
-	{
+	private var _modelGuid:String = "";
+	public function get modelGuid():String { return _modelGuid; }
+
+	public override function clone():Event { return new LoadingEvent(type, _modelGuid, bubbles, cancelable); }
+	public override function toString():String { return formatToString("LoadingEvent", "modelGuid"); }
+	
+	public function LoadingEvent( $type:String, $modelGuid:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false ) {
 		super( $type, $bubbles, $cancellable );
-		_guid = $guid;
+		_modelGuid = $modelGuid;
 	}
 	
-	public override function clone():Event
-	{
-		return new LoadingEvent(type, _guid, bubbles, cancelable);
-	}
-   
-	public override function toString():String
-	{
-		return formatToString("LoadingEvent", "guid", "bubbles", "cancelable");
-	}
-	
-	public function get guid():String 
-	{
-		return _guid;
-	}
 	
 	///////////////// Event handler interface /////////////////////////////
 

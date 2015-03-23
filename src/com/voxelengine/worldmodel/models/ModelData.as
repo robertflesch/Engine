@@ -22,12 +22,12 @@ import com.voxelengine.Globals;
  */
 public class ModelData
 {
-	private var _guid:String;
+	private var _modelGuid:String;
 	private var _dbo:DatabaseObject;
 	private var _ba:ByteArray;
 	
 	public function ModelData( $guid:String ) {
-		_guid = $guid;
+		_modelGuid = $guid;
 		if ( "EditCursor" != $guid )
 			ModelDataEvent.addListener( ModelBaseEvent.SAVE, saveEvent );
 	}
@@ -36,8 +36,8 @@ public class ModelData
 		ModelDataEvent.removeListener( ModelBaseEvent.SAVE, saveEvent );
 	}
 	
-	public function get guid():String  { return _guid; }
-	public function set guid(value:String):void { _guid = value; }
+	public function get modelGuid():String  { return _modelGuid; }
+	public function set modelGuid(value:String):void { _modelGuid = value; }
 	public function get dbo():DatabaseObject { return _dbo; }
 	public function get ba():ByteArray  { return _ba;  }
 	public function set ba( $ba:ByteArray ):void  { _ba = $ba; }
@@ -46,8 +46,8 @@ public class ModelData
 	// This was private, force a message to be sent to it. 
 	// But the voxelModel has a handle to it, seems silly to have to propgate it every where, so its public
 	private function saveEvent( $mde:ModelDataEvent ):void {
-		if ( guid != $mde.guid ) {
-			Log.out( "ModelData.saveEvent - Ignoring save meant for other model my guid: " + guid + " target guid: " + $mde.guid, Log.WARN );
+		if ( modelGuid != $mde.modelGuid ) {
+			Log.out( "ModelData.saveEvent - Ignoring save meant for other model my guid: " + modelGuid + " target guid: " + $mde.modelGuid, Log.WARN );
 			return;
 		}
 		save( _ba );
@@ -56,17 +56,17 @@ public class ModelData
 	public function save( $ba:ByteArray ):void {
 		_ba = $ba;
 		if ( Globals.online ) {
-			Log.out( "ModelData.save - Saving Model Metadata: " + guid ); // + " vmd: " + $vmd.toString(), Log.WARN );
+			Log.out( "ModelData.save - Saving Model Metadata: " + modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
 			addSaveEvents();
 			if ( _dbo )
 				toPersistance();
 			else {
 				var obj:Object = toObject();
 			}
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS_DATA, guid, _dbo, obj ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS_DATA, modelGuid, _dbo, obj ) );
 		}
 		else
-			Log.out( "ModelData.save - Not saving data, either offline or NOT changed or locked - guid: " + guid, Log.WARN );
+			Log.out( "ModelData.save - Not saving data, either offline or NOT changed or locked - guid: " + modelGuid, Log.WARN );
 	}
 	
 	private function addSaveEvents():void {
@@ -85,7 +85,7 @@ public class ModelData
 		if ( Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "ModelData.saveSucceed - save: " + guid, Log.DEBUG ); 
+		Log.out( "ModelData.saveSucceed - save: " + modelGuid, Log.DEBUG ); 
 	}	
 	
 	private function createSucceed( $pe:PersistanceEvent ):void { 
@@ -94,7 +94,7 @@ public class ModelData
 		if ( $pe.dbo )
 			_dbo = $pe.dbo;
 		removeSaveEvents();
-		Log.out( "ModelData.createSuccess - created: " + guid, Log.DEBUG ); 
+		Log.out( "ModelData.createSuccess - created: " + modelGuid, Log.DEBUG ); 
 	}	
 	
 	private function saveFail( $pe:PersistanceEvent ):void { 

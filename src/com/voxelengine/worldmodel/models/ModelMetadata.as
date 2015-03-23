@@ -33,7 +33,7 @@ import com.voxelengine.server.Network;
 public class ModelMetadata
 {
 	private static const COPY_COUNT_INFINITE:int = -1;
-	private var _guid:String			= "";
+	private var _modelGuid:String			= "";
 	private var _name:String			= "";
 	private var _description:String		= "";
 	private var _owner:String			= "";
@@ -74,8 +74,8 @@ public class ModelMetadata
 	public function get modify():Boolean 				{ return _modify; }
 	public function set modify(value:Boolean):void 		{ _modify = value; }
 	
-	public function get guid():String 					{ return _guid; }
-	public function set guid(value:String):void  		{ _guid = value; }
+	public function get modelGuid():String 					{ return _modelGuid; }
+	public function set modelGuid(value:String):void  		{ _modelGuid = value; }
 	
 	public function get thumbnail():BitmapData 			{ return _thumbnail; }
 	public function set thumbnail(value:BitmapData):void{ _thumbnail = value; }
@@ -99,13 +99,13 @@ public class ModelMetadata
 	public function set creator(value:String):void  	{ _creator = value; }
 	
 	public function toString():String {
-		return "name: " + _name + "  description: " + _description + "  guid: " + _guid + "  owner: " + _owner;
+		return "name: " + _name + "  description: " + _description + "  guid: " + _modelGuid + "  owner: " + _owner;
 	}
 	
 	public function ModelMetadata( $guid:String ) {
 		if ( null == $guid || "" == $guid )
-			throw new Error( "VoxelModelMetadata - Missing guid in constructor" );
-		_guid = $guid;
+			throw new Error( "ModelMetadata - Missing guid in constructor" );
+		_modelGuid = $guid;
 		if ( "EditCursor" != $guid )
 			ModelMetadataEvent.addListener( ModelBaseEvent.SAVE, saveEvent );
 	}
@@ -145,7 +145,7 @@ public class ModelMetadata
 		newVmm.createdDate		= new Date( _createdDate );
 		newVmm.modifiedDate		= new Date();
 		newVmm.template			= false
-		newVmm.templateGuid		= new String ( _guid );
+		newVmm.templateGuid		= new String ( _modelGuid );
 		newVmm.copy				= copy;
 		newVmm.copyCount		= copyCount;
 		newVmm.modify			= modify;
@@ -153,6 +153,11 @@ public class ModelMetadata
 		
 		return newVmm;
 	}
+	
+
+	//////////////////////////////////////////////////////////////////
+	// TO Persistance
+	//////////////////////////////////////////////////////////////////
 	
 	public function toObject():Object {
 		
@@ -171,20 +176,16 @@ public class ModelMetadata
 			   , thumbnail: thumbnail }
 	}
 	
-	public function toJSONString():String {
-		
-		return JSON.stringify( this );
-	}
+	//public function toJSONString():String {
+		//
+		//return JSON.stringify( this );
+	//}
 
-	//////////////////////////////////////////////////////////////////
-	// TO Persistance
-	//////////////////////////////////////////////////////////////////
-	
 	// This was private, force a message to be sent to it. 
 	// But the voxelModel has a handle to it, seems silly to have to propgate it every where, so its public
 	private function saveEvent( $vmd:ModelMetadataEvent ):void {
-		if ( guid != $vmd.guid ) {
-			Log.out( "VoxelModelMetadata.saveEvent - Ignoring save meant for other model my guid: " + guid + " target guid: " + $vmd.guid, Log.WARN );
+		if ( modelGuid != $vmd.modelGuid ) {
+			Log.out( "ModelMetadata.saveEvent - Ignoring save meant for other model my guid: " + modelGuid + " target guid: " + $vmd.modelGuid, Log.WARN );
 			return;
 		}
 		save();
@@ -192,17 +193,17 @@ public class ModelMetadata
 	
 	public function save():void {
 		if ( Globals.online ) {
-			Log.out( "VoxelModelMetadata.save - Saving Model Metadata: " + guid ); // + " vmd: " + $vmd.toString(), Log.WARN );
+			Log.out( "ModelMetadata.save - Saving Model Metadata: " + modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
 			addSaveEvents();
 			if ( _dbo )
 				toPersistance();
 			else {
 				var obj:Object = toObject();
 			}
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS, guid, _dbo, obj ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS, modelGuid, _dbo, obj ) );
 		}
 		else
-			Log.out( "ModelMetadata.save - Not saving metadata, either offline or NOT changed or locked - guid: " + guid + "  name: " + name, Log.WARN );
+			Log.out( "ModelMetadata.save - Not saving metadata, either offline or NOT changed or locked - guid: " + modelGuid + "  name: " + name, Log.WARN );
 	}
 	
 	private function addSaveEvents():void {
@@ -221,7 +222,7 @@ public class ModelMetadata
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "ModelMetadata.saveSucceed - created: " + guid, Log.DEBUG ); 
+		Log.out( "ModelMetadata.saveSucceed - created: " + modelGuid, Log.DEBUG ); 
 	}	
 	
 	private function createSucceed( $pe:PersistanceEvent ):void { 
@@ -230,7 +231,7 @@ public class ModelMetadata
 		if ( $pe.dbo )
 			_dbo = $pe.dbo;
 		removeSaveEvents();
-		Log.out( "ModelMetadata.createSuccess - created: " + guid, Log.DEBUG ); 
+		Log.out( "ModelMetadata.createSuccess - created: " + modelGuid, Log.DEBUG ); 
 	}	
 	
 	private function saveFail( $pe:PersistanceEvent ):void { 
@@ -277,7 +278,7 @@ public class ModelMetadata
 		_copyCount		= $dbo.copyCount;
 		_modify			= $dbo.modify;
 		_transfer		= $dbo.transfer;
-		_guid 			= $dbo.key;
+		_modelGuid 			= $dbo.key;
 		_createdDate	= $dbo.createdDate;
 		_modifiedDate   = $dbo.modifiedDate;
 		_dbo			= $dbo;

@@ -24,7 +24,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	 */
 	public class LandscapeTask extends AbstractTask 
 	{		
-		protected var _guid:String;
+		protected var _instanceGuid:String;
 		protected var _layer:LayerInfo;
 		protected var _startTime:int;
 		static protected var _autoFlowState:Boolean;
@@ -34,7 +34,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
         public static const TASK_PRIORITY:int = 1;
 		
 		public function LandscapeTask( guid:String, layer:LayerInfo, taskType:String = TASK_TYPE, taskPriority:int = TASK_PRIORITY ):void {
-			_guid = guid;
+			_instanceGuid = guid;
 			_layer = layer;
 			_startTime = getTimer();
 			// turn off autoflow during landscape, turn it back on when all are complete.
@@ -63,15 +63,15 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				if ( "" != topMostParentGuid ) {
 					vm = Globals.modelGet( topMostParentGuid );
 					if ( vm )
-						vm = vm.childModelFind( _guid );
+						vm = vm.childModelFind( _instanceGuid );
 					else 	
 						Log.out( "LandscapeTask.getVoxelModel - FAILED voxel model for parent guid " + topMostParentGuid + "  data: " + _layer.data , Log.ERROR );
 				}
 				else
-					vm = Globals.modelGet( _guid );
+					vm = Globals.modelGet( _instanceGuid );
 			}
 			else
-				vm = Globals.modelGet( _guid );
+				vm = Globals.modelGet( _instanceGuid );
 			
 			return vm;	
 		}
@@ -84,15 +84,15 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				if ( "" != topMostParentGuid ) {
 					vm = Globals.modelGet( topMostParentGuid );
 					if ( vm )
-						vm = vm.childModelFind( _guid );
+						vm = vm.childModelFind( _instanceGuid );
 					else 	
 						Log.out( "LandscapeTask.getVoxelModel - FAILED voxel model for parent guid " + topMostParentGuid + "  data: " + _layer.data , Log.ERROR );
 				}
 				else
-					vm = Globals.modelGet( _guid );
+					vm = Globals.modelGet( _instanceGuid );
 			}
 			else
-				vm = Globals.modelGet( _guid );
+				vm = Globals.modelGet( _instanceGuid );
 			
 			return vm;	
 		}

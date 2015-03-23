@@ -7,7 +7,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.utils.JSONUtil;
 import flash.utils.Dictionary;
+import org.flashapi.swing.Alert;
 
 import com.voxelengine.utils.StringUtils;
 
@@ -39,16 +41,16 @@ public class ModelInfoCache
 	}
 	
 	static private function request( $mie:ModelInfoEvent ):void {   
-		if ( null == $mie.guid ) {
+		if ( null == $mie.modelGuid ) {
 			Log.out( "ModelInfoManager.modelInfoRequest guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "ModelInfoManager.modelInfoRequest guid: " + $mie.guid, Log.INFO );
-		var mi:ModelInfo = _modelInfo[$mie.guid]; 
+		Log.out( "ModelInfoManager.modelInfoRequest guid: " + $mie.modelGuid, Log.INFO );
+		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
 		if ( null == mi )
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.guid ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.modelGuid ) );
 		else
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.RESULT, $mie.series, $mie.guid, mi ) );
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.RESULT, $mie.series, $mie.modelGuid, mi ) );
 	}
 	
 	static private function add( $pe:PersistanceEvent, $mi:ModelInfo ):void { 
@@ -72,18 +74,15 @@ public class ModelInfoCache
 		if ( $pe.data ) {
 				var fileData:String = String( $pe.data );
 				var jsonString:String = StringUtils.trim(fileData);
-				
-				try {
-					var jsonResult:Object = JSON.parse(jsonString);
-				}
-				catch ( error:Error ) {
-					Log.out("----------------------------------------------------------------------------------" );
-					Log.out("ModelInfoManager.modelInfoLoadSucceed - ERROR PARSING: fileName: " + $pe.guid + "  data: " + fileData, Log.ERROR, error );
-					Log.out("----------------------------------------------------------------------------------" );
+
+				var jsonResult:Object = JSONUtil.parse( jsonString, $pe.guid + $pe.table, "ModelInfoCache.loadSucceed" );
+				if ( null == jsonResult ) {
+					(new Alert( "VoxelVerse - Error Parsing: " + $pe.guid + $pe.table, 500 ) ).display();
+					ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 					return;
 				}
-				var mi:ModelInfo = new ModelInfo();
 				
+				var mi:ModelInfo = new ModelInfo();
 				mi.initJSON( $pe.guid, jsonResult );
 				//ModelEvent.dispatch( new ModelEvent( ModelEvent.INFO_LOADED, guid ) );
 				add( $pe, mi );

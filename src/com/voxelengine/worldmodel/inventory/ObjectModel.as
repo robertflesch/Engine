@@ -26,23 +26,23 @@ import com.voxelengine.worldmodel.models.ModelMetadata;
  */
 public class ObjectModel extends ObjectInfo 
 {
-	protected var _guid:String 				= null;
+	protected var _modelGuid:String 				= null;
 	protected var _vmm:ModelMetadata;
 	
-	public function get guid():String 						{ return _guid; }
-	public function set guid(value:String):void 			{ _guid = value; }
+	public function get modelGuid():String 						{ return _modelGuid; }
+	public function set modelGuid(value:String):void 			{ _modelGuid = value; }
 	
 	public function get vmm():ModelMetadata { return _vmm; }
 	public function set vmm(value:ModelMetadata):void { _vmm = value; }
 	
 	public function ObjectModel( $owner:BoxInventory, $guid:String ):void {
 		super( $owner, ObjectInfo.OBJECTINFO_MODEL );
-		_guid = $guid;
+		_modelGuid = $guid;
 	}
 	
 	override public function asInventoryString():String {
 		if ( ObjectInfo.OBJECTINFO_MODEL == _objectType )
-			return String( _objectType + ";" + _guid );
+			return String( _objectType + ";" + _modelGuid );
 			
 		return String( _objectType );	
 	}
@@ -56,31 +56,31 @@ public class ObjectModel extends ObjectInfo
 			return this;
 		}
 		_objectType = values[0];
-		_guid = values[1];
+		_modelGuid = values[1];
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, metadataAdded );
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, metadataAdded );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, _guid, null ) );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
 		return this;
 	}
 	
 	private function metadataFailed(e:ModelMetadataEvent):void 
 	{
-		if ( _guid == e.guid ) {
+		if ( _modelGuid == e.modelGuid ) {
 			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded );
 			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
 			//_owner remove me!
 			reset();
 			if ( box )
 				box.reset();
-			Log.out( "ObjectModel.metadataFailed - guid: " + e.guid, Log.WARN );
+			Log.out( "ObjectModel.metadataFailed - guid: " + e.modelGuid, Log.WARN );
 			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, _slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) ) );
 		}
 	}
 	
 	private function metadataAdded(e:ModelMetadataEvent):void 
 	{
-		if ( _guid == e.guid ) {
+		if ( _modelGuid == e.modelGuid ) {
 			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded );
 			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, metadataAdded );
 			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
@@ -105,7 +105,7 @@ public class ObjectModel extends ObjectInfo
 	
 	override public function reset():void {
 		super.reset();
-		_guid = null;
+		_modelGuid = null;
 		_vmm = null;
 	}
 }

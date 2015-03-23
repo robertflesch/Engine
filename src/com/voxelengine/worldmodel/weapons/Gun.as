@@ -49,10 +49,8 @@ package com.voxelengine.worldmodel.weapons
 			calculateCenter( centerLoc );
 			
 			// Process the gun specific info
-			processJsonInfo();
-			
 			var script:Script = _instanceInfo.addScript( "FireProjectileScript" );
-			//script.processJsonInfo( modelInfo );
+			//script.processClassJson( modelInfo );
 		}
 		
 
@@ -61,8 +59,8 @@ package com.voxelengine.worldmodel.weapons
 			Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, instanceInfo.instanceGuid, ammo ) );			
 		}
 		
-		private	function processJsonInfo():void {
-			
+		override protected function processClassJson():void {
+			super.processClassJson();
 			if ( modelInfo.json && modelInfo.json.model && modelInfo.json.model.gun )
 			{
 				var gunInfo:Object = modelInfo.json.model.gun;
@@ -75,7 +73,7 @@ package com.voxelengine.worldmodel.weapons
 					for each ( var ammoInfo:Object in ammosJson )
 					{
 						var ammo:Ammo = new Ammo();
-						ammo.processJsonInfo( ammoInfo );
+						ammo.processClassJson( ammoInfo );
 						_armory.push( ammo );
 					}
 				}

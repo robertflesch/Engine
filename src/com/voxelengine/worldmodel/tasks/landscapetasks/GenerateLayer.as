@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			
 			//Globals.g_seed = 0;
 			
-			var vm:VoxelModel = Globals.modelGet( _guid );
+			var vm:VoxelModel = Globals.modelGet( _instanceGuid );
 			var masterMapSize:uint = Math.min( vm.oxel.size_in_world_coordinates(), 1024 );
 			
 			var octaves:int  = ( Math.random() * 144 ) % (Math.random() * 12);
@@ -86,7 +86,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var ignoreSolid:Boolean = false;
 			if ( TypeInfo.AIR == _layer.type || TypeInfo.RED == _layer.type )
 				ignoreSolid = true;
-			vm.oxel.write_height_map( _guid, _layer.type, minHeightMapArray, maxHeightMapArray, minGrain, arrayOffset, ignoreSolid );
+			vm.oxel.write_height_map( _instanceGuid, _layer.type, minHeightMapArray, maxHeightMapArray, minGrain, arrayOffset, ignoreSolid );
 			Log.out( "GenerateLayer - completed layer of type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer() - timer) ); // + " in queue for: " + (timer - _startTime));
 			//timer = getTimer();
 			//Log.out( "GenerateLayer - merging: ");

@@ -109,7 +109,7 @@ package com.voxelengine.GUI.voxelModels
 		private function newPhoto( $me:UIMouseEvent ):void {
 			var bmpd:BitmapData = Globals.g_renderer.modelShot();
 			_vm.metadata.thumbnail = drawScaled( bmpd, 128, 128 );
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CHANGED, 0, _vm.metadata.guid, null ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CHANGED, 0, _vm.metadata.modelGuid, null ) );
 			updatePhoto();
 			
 			function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {

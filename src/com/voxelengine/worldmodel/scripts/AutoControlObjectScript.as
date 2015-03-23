@@ -49,9 +49,6 @@ package com.voxelengine.worldmodel.scripts
 			LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 			
 			var player:VoxelModel = Globals.player;
-			if ( !player ) 
-				player = Globals.modelGet( le.guid );
-				
 			var vm:VoxelModel = Globals.modelGet( instanceGuid );
 			if ( player && vm ) {
 				vm.takeControl( player );

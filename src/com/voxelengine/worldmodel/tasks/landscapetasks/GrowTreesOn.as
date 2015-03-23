@@ -42,10 +42,10 @@ public class GrowTreesOn extends LandscapeTask
 			// 100 is 100
 			// 1 is 2000
 			var outOf:int = 81 + 1900/_layer.range;
-			vm.oxel.growTreesOn( _guid, _layer.type, outOf ? outOf : 1000 );
+			vm.oxel.growTreesOn( _instanceGuid, _layer.type, outOf ? outOf : 1000 );
 		}
 		else
-			Log.out( "GrowTreesOn.start - VM not found for guid: " + _guid );
+			Log.out( "GrowTreesOn.start - VM not found for guid: " + _instanceGuid );
 
 		Log.out( "GrowTreesOn.start - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) );	
 		
