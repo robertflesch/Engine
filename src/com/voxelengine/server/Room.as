@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.server 
 {
+import com.voxelengine.events.LoadingImageEvent;
 import playerio.Connection;
 import playerio.PlayerIOError;
 
@@ -24,6 +25,7 @@ public class Room
 	static public function createJoinRoom( $guid:String ):void
 	{
 		// Reset the connection
+		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 		RoomConnection.removeEventHandlers( _connection );
 		
 		//Set developmentsever (Comment out to connect to your server online)
@@ -65,6 +67,7 @@ public class Room
 				Globals.inRoom = false;
 				RoomEvent.dispatch( new RoomEvent( RoomEvent.ROOM_DISCONNECT, null, _guid ) );
 			}
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTORY ) );						
 		}
 		
 		function handleJoinError(error:PlayerIOError):void
@@ -72,6 +75,7 @@ public class Room
 			Log.out( "Room.handleJoinError - Join Room Error: " + error.message, Log.ERROR, error );
 			Globals.inRoom = false;
 			RoomEvent.dispatch( new RoomEvent( RoomEvent.ROOM_JOIN_FAILURE, error, _guid ) );
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTORY ) );						
 		}
 	}
 	

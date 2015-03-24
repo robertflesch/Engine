@@ -59,6 +59,8 @@ public class WindowModelMetadata extends VVPopup
 			_vmm.description = $guid + "-IMPORTED";
 			_vmm.creator = Network.userId;
 			_vmm.owner = Network.userId;
+			_vmm.createdDate = new Date();
+			_vmm.modifiedDate = new Date();
 			// fake an event to populate the window
 			dataReceived( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, $guid, _vmm ) )
 		}

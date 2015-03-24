@@ -17,9 +17,11 @@ John Carmack on VR
 http://fortune.com/2014/12/29/oculus-vr-john-carmack-extended/
 
 GENERAL CRITICAL:
+IMPLEMENT: MODEL PLACEMENT
+TODO: Child parts are loading in general inventory, is that desirable?
+
 IMPLEMENT: LOD
 IMPLEMENT: BURNING MATS
-IMPLEMENT: MODEL PLACEMENT
 IMPROVE: Lava Flow should stop at X when flowing straight down? Break into rock emitter?
 IMPROVE: Water Flow should stop at X when flowing straight down? Break into mist and then mist emitter?
 TODO: Camera collision - ideally the camera will want to go back to its default distance and height, but collision with things around it can cause it to move closer to avatar at minimum, and ideally to move up and closers as needed

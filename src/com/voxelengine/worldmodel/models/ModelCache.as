@@ -196,19 +196,20 @@ package com.voxelengine.worldmodel.models
 		}
 
 		public function getJSON():String {
-			var instanceData:Vector.<String> = new Vector.<String>;
+			var models:Vector.<String> = new Vector.<String>;
 			for each ( var model:VoxelModel in _models ) {
 				if ( model is Player )
 					continue;
-				instanceData.push( model.getJSON() );	
+				Log.out( "ModelCache.getJSON metadata.name: " + model.metadata.name + " json: " + model.getJSON() );
+				models.push( model.getJSON() );	
 			}
 			
 			var outString:String = "";
-			var len:int = instanceData.length;
+			var len:int = models.length;
 			Log.out( "ModelCache.getJSON ---------------------------------------------------" );
 			for ( var index:int; index < len; index++ ) {
-				outString += instanceData[index];
-				Log.out( "ModelCache.getJSON - instance: " + instanceData[index] );
+				outString += models[index];
+				Log.out( "ModelCache.getJSON - model: " + models[index] );
 				// if this is NOT the last element in the array, add a comma to it.
 				if ( index == len - 1 )
 					continue;

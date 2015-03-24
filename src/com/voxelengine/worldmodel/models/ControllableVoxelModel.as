@@ -37,11 +37,18 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class ControllableVoxelModel extends VoxelModel 
 	{
-		static protected const SHIP_VELOCITY:String 			= "velocity"
-		static protected const SHIP_ALTITUDE:String 			= "altitude"
-		static protected const SHIP_ROTATION:String 			= "rotation"
+		static protected const SHIP_VELOCITY:String 			= "velocity";
+		static protected const SHIP_ALTITUDE:String 			= "altitude";
+		static protected const SHIP_ROTATION:String 			= "rotation";
 		static protected const MIN_COLLISION_GRAIN:int 			= 2;
 		static public 	const 	BODY:String						= "BODY";
+		static protected    const DEFAULT_CLIP_VELOCITY:int		= 95;
+		static protected    const DEFAULT_FALL_RATE:int			= 5;
+		static protected    const DEFAULT_SPEED_MAX:int			= 15;
+		static protected    const DEFAULT_SPEED_X:Number		= 0.5;
+		static protected    const DEFAULT_TURN_RATE:Number		= 20;
+		static protected    const DEFAULT_ACCEL_RATE:Number		= 0.5;
+		
 		// scratch objects to save on allocation of memory
 		//private static const _sZERO_VEC:Vector3D 				= new Vector3D();
 		protected static var _sScratchVector:Vector3D			= new Vector3D();
@@ -54,15 +61,15 @@ package com.voxelengine.worldmodel.models
 		protected var _leaveTrail:Boolean 						= false
 		protected var _forward:Boolean 							= false
 
-		private var		_maxFallRate:SecureNumber 					= new SecureNumber( 5 );
-		private var   	_maxSpeed:SecureNumber 					= new SecureNumber( 15 );
-		private var   	_speedMultiplier:Number 				= 0.5;
+		private var		_maxFallRate:SecureNumber 				= new SecureNumber( DEFAULT_FALL_RATE );
+		private var   	_maxSpeed:SecureNumber 					= new SecureNumber( DEFAULT_SPEED_MAX );
+		private var   	_speedMultiplier:Number 				= DEFAULT_SPEED_X;
 		
 		private var 	_lastCollisionModel:VoxelModel; 											// INSTANCE NOT EXPORTED
 		// This should be at the controllable model leve			
-		private var 	_clipVelocityFactor:SecureNumber			= new SecureNumber(95); 		// INSTANCE NOT EXPORTED
-		protected var 	_turnRate:Number 							= 20; // 2.5 for ship
-		protected var 	_accelRate:Number 							= 2.5;
+		private var 	_clipVelocityFactor:SecureNumber		= new SecureNumber(DEFAULT_CLIP_VELOCITY); 		// INSTANCE NOT EXPORTED
+		protected var 	_turnRate:Number 						= DEFAULT_TURN_RATE; // 2.5 for ship
+		protected var 	_accelRate:Number 						= DEFAULT_ACCEL_RATE;
 		private var 	_onSolidGround:Boolean														// INSTANCE NOT EXPORTED
 		private var 	_keyboardControl:Boolean													// INSTANCE NOT EXPORTED
 		
@@ -113,7 +120,7 @@ package com.voxelengine.worldmodel.models
 					clipVelocityFactor = cmInfo.clipFactor/100;
 				}
 				else
-					clipVelocityFactor = clipVelocityFactor/100;
+					clipVelocityFactor = DEFAULT_CLIP_VELOCITY/100;
 					
 				if ( cmInfo.maxSpeed )
 				{

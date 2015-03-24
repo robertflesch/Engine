@@ -127,21 +127,22 @@ public class InstanceInfo extends Location	{
 	public function toJSON(k:*):* 
 	{ 
 		return {
-				grainSize: 		_grainSize,
-				modelGuid: 		modelGuid,
-				instanceGuid: 	instanceGuid,
-				velocity: 		velocityGet,
-				location: 		positionGet,
-				rotation: 		rotationGet,
-				scale: 			scale,
-				transforms:		_transforms,
-//				shader:			_shader,
+				center: 		center,
 				collision:		_usesCollision,
-				script: 		_scripts,
 				collidable:     _collidable,
 				critical:     	_critical,
+				baseLightLevel: baseLightLevel,
+				grainSize: 		_grainSize,
+				instanceGuid: 	instanceGuid,
+				location: 		positionGet,
+				modelGuid: 		modelGuid,
+				rotation: 		rotationGet,
+				velocity: 		velocityGet,
+				scale: 			scale,
+				script: 		_scripts,
 				state:			_state,
-				baseLightLevel: baseLightLevel
+				transforms:		_transforms
+//				shader:			_shader,
 				};
 	} 	
 	
@@ -195,48 +196,51 @@ public class InstanceInfo extends Location	{
 	
 	public function initJSON( json:Object ):void {
 		// Save off a copy of this in case we need multiple instances
-		_creationJSON = json;
+		if ( json.model )
+			_creationJSON = json.model;
+		else
+			_creationJSON = json;
 		
 		// fileName == templateName == guid ALL THE SAME
-		if ( json.fileName ) {
-			modelGuid = json.fileName;
+		if ( _creationJSON.fileName ) {
+			modelGuid = _creationJSON.fileName;
 		}
-		if ( json.modelGuid ) {
-			modelGuid = json.modelGuid;
+		if ( _creationJSON.modelGuid ) {
+			modelGuid = _creationJSON.modelGuid;
 		}
 		
-		if ( json.instanceGuid ) {
-			_instanceGuid = json.instanceGuid;
+		if ( _creationJSON.instanceGuid ) {
+			_instanceGuid = _creationJSON.instanceGuid;
 		}
 			
-		if ( json.name )
+		if ( _creationJSON.name )
 		{
 			if ( owner && owner.metadata ) {
-				owner.metadata.name = json.name;
-				Log.out( "InstanceInfo.initJSON - Setting Metadata Name from instance data: " + json.name + "  guid: " + modelGuid );
+				owner.metadata.name = _creationJSON.name;
+				Log.out( "InstanceInfo.initJSON - Setting Metadata Name from instance data: " + _creationJSON.name + "  guid: " + modelGuid );
 			}
 		}
 		
-		if ( json.state )
-			_state = json.state;
+		if ( _creationJSON.state )
+			_state = _creationJSON.state;
 
-		if ( json.repeat )
-			_repeat = json.repeat;
+		if ( _creationJSON.repeat )
+			_repeat = _creationJSON.repeat;
 			
-		if ( json.baseLightLevel )
-			baseLightLevel = json.baseLightLevel;
+		if ( _creationJSON.baseLightLevel )
+			baseLightLevel = _creationJSON.baseLightLevel;
 					
-		setPositionalInfo( json );
-		setScaleInfo( json );
-		setCenterInfo( json );
-		setTypeInfo( json );
-		setTransformInfo( json );
+		setPositionalInfo( _creationJSON );
+		setScaleInfo( _creationJSON );
+		setCenterInfo( _creationJSON );
+		setTypeInfo( _creationJSON );
+		setTransformInfo( _creationJSON );
 		// moved to shader
-//			setTextureInfo( json );
-		setShaderInfo( json );
-		setScriptInfo( json );
-		setCollisionInfo( json );
-		setCriticalInfo( json );
+//			setTextureInfo( _creationJSON );
+		setShaderInfo( _creationJSON );
+		setScriptInfo( _creationJSON );
+		setCollisionInfo( _creationJSON );
+		setCriticalInfo( _creationJSON );
 	}
 	
 	public function addScript( scriptName:String, params:* = null ):Script
