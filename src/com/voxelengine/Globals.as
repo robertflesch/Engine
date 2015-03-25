@@ -41,6 +41,7 @@ package com.voxelengine {
 		static public const DB_TABLE_MODELS:String = "voxelModels";
 		static public const DB_INDEX_VOXEL_MODEL_OWNER:String = "voxelModelOwner";
 		static public const DB_TABLE_MODELS_DATA:String = "voxelModelsData";
+		static public const DB_TABLE_ANIMATIONS:String = "animations";
 		
 		static public const DB_TABLE_REGIONS:String = "regions";
 		static public const DB_TABLE_INDEX_OWNER:String = "regionOwner";
@@ -48,6 +49,7 @@ package com.voxelengine {
 		static public const APP_EXT:String = ".json";
 		static public const IVM_EXT:String = ".ivm";
 		static public const MODEL_INFO_EXT:String = ".mjson";
+		static public const ANI_EXT:String = ".ajson";
 
 
 		public static var g_app:VoxelVerse = null;

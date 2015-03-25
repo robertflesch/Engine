@@ -72,7 +72,7 @@ public class WindowRegionDetail extends VVPopup
 			_region.gravity = true;
 			_region.name = Network.userId + "-" + int( Math.random() * 1000 );
 			_region.desc = "Please enter something meaningful here";
-			_region.changed = true;
+			markDirty();
 			_region.admin.push( Network.userId );
 			_region.editors.push( Network.userId );
 			collectRegionInfo( new RegionEvent( ModelBaseEvent.ADDED, 0, _region.guid, _region ) );
@@ -104,13 +104,13 @@ public class WindowRegionDetail extends VVPopup
 		var gravArray:Array = [ { label:"Use Gravity" }, { label:"NO Gravity. " } ];
 		addElement( new ComponentRadioButtonGroup( "Gravity", gravArray, gravChange,  _region.gravity ? 0 : 1, WIDTH ) );
 		
-		var playerStartingPosition:ComponentVector3D = new ComponentVector3D( "Player Starting Location", "X: ", "Y: ", "Z: ",  _region.playerPosition, updateVal );
+		var playerStartingPosition:ComponentVector3D = new ComponentVector3D( markDirty, "Player Starting Location", "X: ", "Y: ", "Z: ",  _region.playerPosition, updateVal );
 		addElement( playerStartingPosition );
 		
-		var playerStartingRotation:ComponentVector3D = new ComponentVector3D( "Player Starting Rotation", "X: ", "Y: ", "Z: ",  _region.playerRotation, updateVal );
+		var playerStartingRotation:ComponentVector3D = new ComponentVector3D( markDirty, "Player Starting Rotation", "X: ", "Y: ", "Z: ",  _region.playerRotation, updateVal );
 		addElement( playerStartingRotation );
 		
-		var skyColor:ComponentVector3D = new ComponentVector3D( "Sky Color", "R: ", "G: ", "B: ",  _region.getSkyColor(), updateVal );
+		var skyColor:ComponentVector3D = new ComponentVector3D( markDirty, "Sky Color", "R: ", "G: ", "B: ",  _region.getSkyColor(), updateVal );
 		addElement( skyColor );
 		
 		/// Buttons /////////////////////////////////////////////
@@ -151,8 +151,12 @@ public class WindowRegionDetail extends VVPopup
 		if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival--;
 		else 											ival++;
 		$e.target.data.text = ival.toString();
-		_region.changed = true;
+		markDirty();
 		return ival;
+	}
+	
+	private function markDirty():void {
+		_region.changed = true;
 	}
 	
 	private function save( e:UIMouseEvent ):void {
@@ -190,24 +194,24 @@ public class WindowRegionDetail extends VVPopup
 	
 	private function gravChange(event:ButtonsGroupEvent):void {  
 		_region.gravity = (0 == event.target.index ?  true : false );
-		_region.changed = true;
+		markDirty();
 	} 
 	
 	private function ownerChange(event:ButtonsGroupEvent):void {  
 		_region.owner = (0 == event.target.index ?  Network.PUBLIC : Network.userId );
-		_region.changed = true;
+		markDirty();
 	} 
 	
 	private function changeNameHandler(event:TextEvent):void
 	{
 		_region.name = event.target.text;
-		_region.changed = true;
+		markDirty();
 	}
 	
 	private function changeDescHandler(event:TextEvent):void
 	{
 		_region.desc = event.target.text;
-		_region.changed = true;
+		markDirty();
 	}
 	
 

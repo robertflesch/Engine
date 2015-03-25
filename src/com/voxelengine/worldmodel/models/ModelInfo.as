@@ -7,6 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import com.voxelengine.events.AnimationEvent;
+	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.worldmodel.animation.Animation;
 	import com.voxelengine.worldmodel.biomes.Biomes;
 	import com.voxelengine.Globals;
@@ -116,7 +118,7 @@ package com.voxelengine.worldmodel.models
 					children:		"REPLACE_ME",
 					grainSize:		_grainSize,
 					modelClass:		_modelClass,
-					scripts:		_scripts
+					script:			_scripts
 					};
 		} 	
 		
@@ -125,22 +127,22 @@ package com.voxelengine.worldmodel.models
 			_childCount = 0;
 		}
 		
-		public function initJSON( $modelNameNoExt:String, $json:Object ):void  {
+		public function initJSON( $modelGuid:String, $json:Object ):void  {
 			
-			//Log.out( "ModelInfo.init - fileName: " + $modelNameNoExt + "  $json: " + JSON.stringify( $json.model ) );
+			//Log.out( "ModelInfo.init - fileName: " + $modelGuid + "  $json: " + JSON.stringify( $json.model ) );
 			if ( !$json.model  ) {
-				Log.out( "ModelInfo.init - ERROR - unable to find model Info in : " + $modelNameNoExt + "  containing: " + JSON.stringify($json), Log.ERROR );					
+				Log.out( "ModelInfo.init - ERROR - unable to find model Info in : " + $modelGuid + "  containing: " + JSON.stringify($json), Log.ERROR );					
 				return;
 			}
 				
-			_fileName = $modelNameNoExt;
+			_fileName = $modelGuid;
 			_modelJson = $json;
 			
 			// this is the json just for modelInfo
 			var modelInfoJson:Object = $json.model;
 			
 			if ( modelInfoJson && modelInfoJson.guid  )
-				Log.out( "ModelInfo.init - WARNING - FOUND OLD modelGuid in file: " + $modelNameNoExt );					
+				Log.out( "ModelInfo.init - WARNING - FOUND OLD modelGuid in file: " + $modelGuid );					
 				
 			
 			if ( modelInfoJson.grainSize )
@@ -199,11 +201,14 @@ package com.voxelengine.worldmodel.models
 				// i.e. animData = { "name": "Glide", "type": "state OR action", "guid":"Glide.ajson" }
 				for each ( var animData:Object in animationsObj )		   
 				{
+					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST, 0, $modelGuid, animData.guid, null, false ) );
+					/*
 					var animation:Animation = new Animation();
-					throw new Error( "ModelInfo.initJSON - This needs to be modified to load the animation from persistance" );
+//					throw new Error( "ModelInfo.initJSON - This needs to be modified to load the animation from persistance" );
 					animation.loadFromLocalFile( animData, modelClass );
 					// This adds the instanceInfo for the child models to our child list which is processed when object is initialized
 					_animations.push( animation )
+					*/
 				}
 			}
 		}

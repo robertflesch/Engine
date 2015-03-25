@@ -49,7 +49,7 @@ package com.voxelengine.worldmodel.weapons
 			calculateCenter( centerLoc );
 			
 			// Process the gun specific info
-			var script:Script = _instanceInfo.addScript( "FireProjectileScript" );
+			var script:Script = _instanceInfo.addScript( "FireProjectileScript", true );
 			//script.processClassJson( modelInfo );
 		}
 		

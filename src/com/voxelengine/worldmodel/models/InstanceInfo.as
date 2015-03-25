@@ -139,12 +139,36 @@ public class InstanceInfo extends Location	{
 				rotation: 		rotationGet,
 				velocity: 		velocityGet,
 				scale: 			scale,
-				script: 		_scripts,
+				script: 		instanceScriptOnly,
 				state:			_state,
 				transforms:		_transforms
 //				shader:			_shader,
 				};
 	} 	
+	
+	private function instanceScriptOnly():String {
+		
+		var scripts:Vector.<String> = new Vector.<String>;
+		for each ( var script:Script in _scripts ) {
+			if ( !script.modelScript )
+				scripts.push( JSON.stringify( script ) );	
+		}
+		
+		var outString:String = "";
+		var len:int = scripts.length;
+		Log.out( "InstanceInfo.instanceScriptOnly ---------------------------------------------------" );
+		for ( var index:int; index < len; index++ ) {
+			outString += scripts[index];
+			Log.out( "InstanceInfo.instanceScriptOnly - script: " + scripts[index] );
+			// if this is NOT the last element in the array, add a comma to it.
+			if ( index == len - 1 )
+				continue;
+			outString += ",";
+		}
+		Log.out( "InstanceInfo.instanceScriptOnly ---------------------------------------------------" );
+		return outString;
+		
+	}
 	
 	public function InstanceInfo() 
 	{ 
@@ -243,7 +267,7 @@ public class InstanceInfo extends Location	{
 		setCriticalInfo( _creationJSON );
 	}
 	
-	public function addScript( scriptName:String, params:* = null ):Script
+	public function addScript( scriptName:String, $modelScript:Boolean, params:* = null ):Script
 	{
 		//Log.out( "InstanceInfo.addScript - " + scriptName );
 		var scriptClass:Class = ScriptLibrary.getAsset( scriptName );
@@ -253,6 +277,7 @@ public class InstanceInfo extends Location	{
 		else
 			script = new scriptClass();
 		
+		script.modelScript = $modelScript;
 		_scripts.push( script );
 		
 		if ( script )
@@ -269,7 +294,13 @@ public class InstanceInfo extends Location	{
 	{
 		if ( json.script && ( 0 < json.script.length ) )
 		{
-			addScript( json.script );
+			for each ( var scriptObject:Object in json.script ) {
+				if ( scriptObject.name ) {
+					//trace( "ModelInfo.init - Model GUID:" + fileName + "  adding script: " + scriptObject.name );
+					addScript( scriptObject.name, false );
+				}
+			}
+			
 		}
 	}
 	

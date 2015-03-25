@@ -69,11 +69,11 @@ package com.voxelengine.GUI.voxelModels
 			
 			addElement( new ComponentSpacer( width ) );
 			addElement( new ComponentTextInput( "Name"
-			                                  , function ($e:TextEvent):void { _vm.metadata.name = $e.target.text; }
+			                                  , function ($e:TextEvent):void { _vm.metadata.name = $e.target.text; setChanged(); }
 											  , _vm.metadata.name ? _vm.metadata.name : "No Name"
 											  , width ) );
 			addElement( new ComponentTextArea( "Desc"
-											 , function ($e:TextEvent):void { _vm.metadata.description = $e.target.text; }
+											 , function ($e:TextEvent):void { _vm.metadata.description = $e.target.text; setChanged(); }
 											 , _vm.metadata.description ? _vm.metadata.description : "No Description"
 											 , width ) );
 
@@ -89,10 +89,10 @@ package com.voxelengine.GUI.voxelModels
 			if ( ii.controllingModel )
 				addElement( new ComponentLabel( "Parent GUID",  ii.controllingModel ? ii.controllingModel.instanceInfo.instanceGuid : "", width ) );
 //
-			addElement( new ComponentVector3D( "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, updateVal ) );
-			addElement( new ComponentVector3D( "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, updateVal ) );
-			addElement( new ComponentVector3D( "Center", "X: ", "Y: ", "Z: ",  ii.center, updateVal ) );
-			addElement( new ComponentVector3D( "Scale", "X: ", "Y: ", "Z: ",  ii.scale, updateScaleVal, 5 ) );
+			addElement( new ComponentVector3D( setChanged, "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, updateVal ) );
+			addElement( new ComponentVector3D( setChanged, "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, updateVal ) );
+			addElement( new ComponentVector3D( setChanged, "Center", "X: ", "Y: ", "Z: ",  ii.center, updateVal ) );
+			addElement( new ComponentVector3D( setChanged, "Scale", "X: ", "Y: ", "Z: ",  ii.scale, updateScaleVal, 5 ) );
 			addPhoto()
 			
 //			if ( true == Globals.g_debug )
@@ -132,6 +132,7 @@ package com.voxelengine.GUI.voxelModels
 			
 			_pic = new Image( new Bitmap( _vm.metadata.thumbnail ), 128, 128 );
 			_photoContainer.addElement( _pic );
+			setChanged();
 		}
 		
 		private function updatePhoto():void {
@@ -145,7 +146,7 @@ package com.voxelengine.GUI.voxelModels
 			if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival = ival/2;
 			else 											ival = ival*2;
 			$e.target.data.text = ival.toString();
-			_vm.changed = true;
+			setChanged();
 			return ival;
 		}
 		
@@ -153,9 +154,16 @@ package com.voxelengine.GUI.voxelModels
 			var ival:int = int( $e.target.data.text );
 			if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival--;
 			else 											ival++;
+			setChanged();
 			$e.target.data.text = ival.toString();
-			_vm.changed = true;
 			return ival;
+		}
+		
+		private function setChanged():void {
+			_vm.changed = true;
+			_vm.instanceInfo.changed = true;
+			if ( _vm.instanceInfo.controllingModel )
+				_vm.instanceInfo.controllingModel.changed = true;
 		}
 		
 		private function oxelUtilsHandler(event:UIMouseEvent):void  {

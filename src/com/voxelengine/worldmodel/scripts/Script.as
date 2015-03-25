@@ -19,9 +19,13 @@ package com.voxelengine.worldmodel.scripts
 	public class Script
 	{
 		protected var _instanceGuid:String = null;
+		protected var _modelScript:Boolean; // true if add from modelInfo, false is added from instanceInfo
 		
 		public function get instanceGuid():String  					{ return _instanceGuid; }
 		public function set instanceGuid(val:String ):void 				{ _instanceGuid = val; }
+		
+		public function get modelScript():Boolean  { return _modelScript; }
+		public function set modelScript(value:Boolean):void  { _modelScript = value; }
 
 		public function Script() 
 		{ 
@@ -32,5 +36,23 @@ package com.voxelengine.worldmodel.scripts
 		}
 		
 		public function dispose():void { ; }
-	}
+		
+		public function toJSON(k:*):* {
+			
+			var className:String = getCurrentClassName(this);
+			return { name : className }
+		}
+		
+		public static function getCurrentClassName(c:Object):String
+			{
+				var cString:String = c.toString();
+				var cSplittedFirst:Array = cString.split('[object ');
+				var cFirstString:String = String(cSplittedFirst[1]);
+				var cSplittedLast:Array = cFirstString.split(']');
+				var cName:String = cSplittedLast.join('');
+
+				return cName;
+			}		
+			
+		}
 }

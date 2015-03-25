@@ -43,10 +43,10 @@ public class ModelDataCache
 	static private function request( $mie:ModelDataEvent ):void 
 	{   
 		if ( null == $mie.modelGuid ) {
-			Log.out( "ModelDataManager.modelDataRequest guid rquested is NULL: ", Log.WARN );
+			Log.out( "ModelDataCache.modelDataRequest guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "ModelDataManager.request guid: " + $mie.modelGuid, Log.INFO );
+		Log.out( "ModelDataCache.request guid: " + $mie.modelGuid, Log.INFO );
 		var mi:ModelData = _modelData[$mie.modelGuid]; 
 		if ( null == mi ) {
 			if ( true == Globals.online && $mie.fromTables )
@@ -61,7 +61,7 @@ public class ModelDataCache
 	static private function add( $pe:PersistanceEvent, $md:ModelData ):void 
 	{ 
 		if ( null == $md || null == $pe.guid ) {
-			Log.out( "ModelDataManager.modelDataAdd trying to add NULL modelData or guid", Log.WARN );
+			Log.out( "ModelDataCache.modelDataAdd trying to add NULL modelData or guid", Log.WARN );
 			return;
 		}
 		// check to make sure this is new data
@@ -76,7 +76,7 @@ public class ModelDataCache
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
 		if ( $pe.dbo || $pe.data ) {
-			Log.out( "ModelDataManager.loadSucceed guid: " + $pe.guid, Log.INFO );
+			Log.out( "ModelDataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
 			var vmd:ModelData = new ModelData( $pe.guid );
 			if ( $pe.dbo )
 				vmd.fromPersistance( $pe.dbo );
@@ -92,7 +92,7 @@ public class ModelDataCache
 			add( $pe, vmd );
 		}
 		else {
-			Log.out( "ModelDataManager.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR );
+			Log.out( "ModelDataCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR );
 			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 		}
 	}
@@ -101,7 +101,7 @@ public class ModelDataCache
 	{
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		Log.out( "ModelDataManager.loadFailed " + $pe.toString(), Log.ERROR );
+		Log.out( "ModelDataCache.loadFailed " + $pe.toString(), Log.ERROR );
 		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 	}
 	
@@ -109,7 +109,7 @@ public class ModelDataCache
 	{
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		Log.out( "ModelDataManager.loadNotFound " + $pe.toString(), Log.ERROR );
+		Log.out( "ModelDataCache.loadNotFound " + $pe.toString(), Log.ERROR );
 		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 	}
 	

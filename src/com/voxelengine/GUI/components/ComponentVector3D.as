@@ -15,7 +15,8 @@ import com.voxelengine.Log;
 
 public class ComponentVector3D extends Box
 {
-	public function ComponentVector3D( $title:String
+	public function ComponentVector3D( $markDirty:Function
+									 , $title:String
 	                                 , $s1Label:String
 									 , $s2Label:String
 									 , $s3Label:String
@@ -37,7 +38,7 @@ public class ComponentVector3D extends Box
 		
 		addSpinLabel( $s1Label
 					, function($e:SpinButtonEvent):void { $vect.setTo( $changeFunction($e), $vect.y, $vect.z ); }
-					, function($e:TextEvent):void       { $vect.setTo( int( $e.target.text ), $vect.y, $vect.z );  }
+					, function($e:TextEvent):void       { $vect.setTo( int( $e.target.text ), $vect.y, $vect.z ); $markDirty() }
 					, $vect.x.toFixed($decimalPlaces) );
 		addSpinLabel( $s2Label
 					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $changeFunction($e), $vect.z );  }

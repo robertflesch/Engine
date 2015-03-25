@@ -300,6 +300,7 @@ package {
 import com.voxelengine.Globals;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.pools.PoolManager;
+import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.ConfigManager;
 import com.voxelengine.worldmodel.RegionManager;
 
@@ -393,6 +394,7 @@ class VVInitializer
 		ModelMetadataCache.init();
 		ModelInfoCache.init();
 		ModelDataCache.init();
+		AnimationCache.init();
 		// This causes the to load its caches and listeners
 		InventoryManager.init();
 		MouseKeyboardHandler.init();

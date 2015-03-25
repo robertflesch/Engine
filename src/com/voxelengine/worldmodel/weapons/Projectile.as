@@ -132,7 +132,7 @@ package com.voxelengine.worldmodel.weapons
 						var mpv:Vector3D = new Vector3D( msp.x + instanceInfo.center.x, msp.y + instanceInfo.center.y, msp.z + instanceInfo.center.z );
 						var wsLoc:Vector3D = collisionCandidate.modelToWorld( mpv );
 						if ( _ammo ) {
-							var script:ImpactScript = instanceInfo.addScript( _ammo.contactScript, _ammo ) as ImpactScript;
+							var script:ImpactScript = instanceInfo.addScript( _ammo.contactScript, true, _ammo ) as ImpactScript;
 							script.impact( wsLoc );
 						}
 
