@@ -45,6 +45,8 @@ public class PersistURL
 			_filePath = Globals.modelPath + $pe.guid + $pe.table
 		else if ( Globals.APP_EXT == $pe.table )	
 			_filePath = Globals.appPath + $pe.guid + $pe.table
+		else if ( Globals.ANI_EXT == $pe.table )	
+			_filePath = Globals.modelPath + $pe.data + "/" + $pe.guid + $pe.table
 			
 		else
 			return false;

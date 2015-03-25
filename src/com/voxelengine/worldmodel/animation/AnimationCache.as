@@ -56,7 +56,7 @@ public class AnimationCache
 			if ( true == Globals.online && $ame.fromTables )
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.DB_TABLE_ANIMATIONS, $ame.aniGuid ) );
 			else	
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.modelGuid, null, $ame.aniGuid ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.aniGuid, null, $ame.modelGuid ) );
 		}
 		else
 			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.RESULT, $ame.series, $ame.modelGuid, $ame.aniGuid, ani ) );
@@ -64,6 +64,7 @@ public class AnimationCache
 	
 	static private function loadSucceed( $pe:PersistanceEvent):void 
 	{
+Log.out( "AnimationCache.loadSucceed - TODO I dont have the name for this animation", Log.WARN );				
 		if ( Globals.ANI_EXT != $pe.table && Globals.DB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		if ( $pe.dbo || $pe.data ) {
@@ -79,6 +80,7 @@ public class AnimationCache
 					return;
 				}
 				ani.initJSON( jsonResult );
+Log.out( "AnimationCache.loadSucceed - TODO need to fill in all of the metadata for this animation", Log.WARN );				
 			}
 				
 			add( $pe, ani );
@@ -97,13 +99,14 @@ public class AnimationCache
 		}
 		// check to make sure this is new data
 		var modelAnimations:Array =  _animatedModels[$pe.guid]
-		var animationGuid:String = $pe.data as String;
+		var animationGuid:String = $pe.guid;
+		var modelGuid:String = $pe.table;
 		if ( null ==  modelAnimations ) {
 			// we need to create a new array for this model
 			modelAnimations = new Array();
 			_animatedModels[$pe.guid] = modelAnimations;
 			modelAnimations[animationGuid] = $ani; 
-			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $pe.data as String, $ani ) );
+			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $pe.data, $ani ) );
 		}
 		else {
 			// model already has a list of animations, check to make sure this one is not already in it.

@@ -201,7 +201,7 @@ package com.voxelengine.worldmodel.models
 				// i.e. animData = { "name": "Glide", "type": "state OR action", "guid":"Glide.ajson" }
 				for each ( var animData:Object in animationsObj )		   
 				{
-					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST, 0, $modelGuid, animData.guid, null, false ) );
+					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST, 0, $modelGuid, animData.name, null, false ) );
 					/*
 					var animation:Animation = new Animation();
 //					throw new Error( "ModelInfo.initJSON - This needs to be modified to load the animation from persistance" );

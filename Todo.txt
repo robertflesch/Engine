@@ -86,8 +86,6 @@ FINISH: WORKING - directional component of lighting
 FINISH: WORKING - per material attenuation
 FIX: HOLD - Still bug in propogation by light enclousure
 FIX: In ambient Occlusion - quads need to be flipped some times to show lighting correctly
-
-
 DYNAMIC
 TODO: Add lighting manager for dynamic lights, so the closest X lights can be retrived
 
@@ -154,22 +152,31 @@ Goal: to become a profitable game studio in 1 year
 SWOT:
 Strengths:
 14 years of experience designing and leading virtual worlds projects, leading successful software projects for 25 years.
-Product in alpha stage so dev risk is lower
+Product in pre beta stage so dev risk is low
 located in lower cost and area with tax breaks for game dev
 licenseing opportunities
-Designed from start to be mobile ready
 Emerging market space.
 Emergent behavior
 Data driven design
 Reactive Design
 Browser based
 Written with localization build in.
-Encourages user driven content
+Built on user created content
+Designed and written for Flash/AIR from start to be mobile ready
++ 2.5 BILLION AIR application installs over the past year and a half.
++ 145,000 mobile apps build with AIR.
++ AIR supports both Android Lollipop and the new Apple iOS 64-bit requirements.
++ Flash Player is updated 1.5 BILLION times a month from adobe.com.
+http://www.streamingmedia.com/Articles/Editorial/Featured-Articles/Pumping-AIR-into-the-Flash-Debate-102849.aspx
+Virtual Goods market 4.1 billion
+http://research.gigaom.com/report/the-evolution-of-the-virtual-goods-market/
+Virtual Reality market 5.2 billion by 2018
+http://www.kzero.co.uk/blog/consumer-virtual-reality-market-worth-13bn-2018/
 
 Weaknesses:
 Single person studio
-No connections to online publications
-limited testing at scale
+Limited marketing connection
+No testing at scale yet
 some dependancy on online service providers (player.io aka yahoo game network)
 
 Opportunities
@@ -177,7 +184,6 @@ Minecraft exposed a 250 (2.5 billion) million opportunity which could be a billi
 steam punk space under targeted.
 
 Threats
-Adobe Flash is 5-10 years from end of lifecycle
 While other next generation voxel engines exist. None are targeted toward this space currently.
 
 Marketing
@@ -234,3 +240,6 @@ http://foundersatwork.posthaven.com/the-social-radar-what-i-did-at-y-combinator
 http://careers.stackoverflow.com/jobs/location/Atlanta%2C%20Georgia?a=94ColCo&&utm_source=stackoverflow.com&utm_medium=ad&utm_campaign=jobs-small-sidebar-blue-nearyou
 http://careers.stackoverflow.com/company/appriver?c=d9UkhfdxgHKDA4Yo
 http://careers.stackoverflow.com/jobs/62594/senior-software-architect-tdd-agile-cinemassive-displays?a=kZvzW1yMut2
+
+Website
+http://primercss.io/buttons/
