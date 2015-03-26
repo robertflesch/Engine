@@ -81,7 +81,7 @@ public class PanelAnimations extends PanelBase
 		var anims:Vector.<Animation> = $vm.modelInfo.animations;
 		for each ( var anim:Animation in anims )
 		{
-			_listAnimations.addItem( anim.name + " - " + anim.guid, anim );
+			_listAnimations.addItem( anim.metadata.name + " - " + anim.metadata.guid, anim );
 		}
 	}
 	

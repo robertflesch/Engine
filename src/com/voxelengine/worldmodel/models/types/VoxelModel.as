@@ -1670,7 +1670,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		{
 			if ( _stateLock )
 				return;
-			if ( (_anim && _anim.name == $state) || 0 == modelInfo.animations.length )
+			if ( (_anim && _anim.metadata.name == $state) || 0 == modelInfo.animations.length )
 				return;
 				
 			if ( _modelInfo.childCount > _children.length ) {
@@ -1682,7 +1682,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 			//Log.out( "VoxelModel.stateSet setTo: " + $state + "  current: " + (_anim ? _anim.name : "No current state") ); 
 			if (_anim)
 			{
-				Log.out( "VoxelModel.stateSet - Stopping anim: " + _anim.name + "  starting: " + $state ); 
+				Log.out( "VoxelModel.stateSet - Stopping anim: " + _anim.metadata.name + "  starting: " + $state ); 
 				_anim.stop( this );
 				_anim = null;
 			}
@@ -1692,7 +1692,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 			const useInitializer:Boolean = true;
 			for each (var anim:Animation in aniVector)
 			{
-				if (anim.name == $state)
+				if (anim.metadata.name == $state)
 				{
 					if (!anim.loaded)
 					{
@@ -1788,13 +1788,13 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 					//Log.out( "VoxelModel.updateAnimations - stateSet on anim: " + _anim.name ); 
 			}
 			// changing anim	
-			else if (_anim.name != $state)
+			else if (_anim.metadata.name != $state)
 			{
 				stateSet($state, $val);
 					//Log.out( "VoxelModel.updateAnimations - stateSet on NEW anim: " + _anim.name ); 
 			}
 			// updating existing anim
-			else if (_anim.name == $state)
+			else if (_anim.metadata.name == $state)
 			{
 				//Log.out( "VoxelModel.updateAnimations - updating transform on anim: " + _anim.name + " val: " + $val ); 
 				for each (var at:AnimationTransform in _anim.transforms)

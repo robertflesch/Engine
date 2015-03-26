@@ -51,8 +51,8 @@ package com.voxelengine {
 		static public const MODEL_INFO_EXT:String = ".mjson";
 		static public const ANI_EXT:String = ".ajson";
 
-
-		public static var g_app:VoxelVerse = null;
+		static public const VOXELVERSE:String 	= "VoxelVerse";
+		public static var g_app:VoxelVerse;
 		
 		public static var g_textureBank:TextureBank = new TextureBank();
 		public static var g_regionManager:RegionManager;

@@ -56,7 +56,7 @@ public class AnimationCache
 			if ( true == Globals.online && $ame.fromTables )
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.DB_TABLE_ANIMATIONS, $ame.aniGuid ) );
 			else	
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.aniGuid, null, $ame.modelGuid ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
 		}
 		else
 			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.RESULT, $ame.series, $ame.modelGuid, $ame.aniGuid, ani ) );
@@ -64,7 +64,6 @@ public class AnimationCache
 	
 	static private function loadSucceed( $pe:PersistanceEvent):void 
 	{
-Log.out( "AnimationCache.loadSucceed - TODO I dont have the name for this animation", Log.WARN );				
 		if ( Globals.ANI_EXT != $pe.table && Globals.DB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		if ( $pe.dbo || $pe.data ) {
@@ -79,8 +78,8 @@ Log.out( "AnimationCache.loadSucceed - TODO I dont have the name for this animat
 					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
 					return;
 				}
-				ani.initJSON( jsonResult );
-Log.out( "AnimationCache.loadSucceed - TODO need to fill in all of the metadata for this animation", Log.WARN );				
+				ani.fromImport( jsonResult, $pe.guid, $pe.other );
+				ani.save();
 			}
 				
 			add( $pe, ani );
@@ -98,22 +97,19 @@ Log.out( "AnimationCache.loadSucceed - TODO need to fill in all of the metadata 
 			return;
 		}
 		// check to make sure this is new data
-		var modelAnimations:Array =  _animatedModels[$pe.guid]
-		var animationGuid:String = $pe.guid;
-		var modelGuid:String = $pe.table;
+		var animationGuid:String = $ani.metadata.guid;
+		var modelGuid:String = $ani.metadata.modelGuid;
+		var modelAnimations:Array =  _animatedModels[modelGuid];
 		if ( null ==  modelAnimations ) {
 			// we need to create a new array for this model
 			modelAnimations = new Array();
-			_animatedModels[$pe.guid] = modelAnimations;
-			modelAnimations[animationGuid] = $ani; 
-			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $pe.data, $ani ) );
+			_animatedModels[modelGuid] = modelAnimations;
 		}
-		else {
-			// model already has a list of animations, check to make sure this one is not already in it.
-			
-			if ( null == modelAnimations[animationGuid] )
-				modelAnimations[animationGuid] = $ani;
-			
+		
+		// model already has a list of animations, check to make sure this one is not already in it.
+		if ( null == modelAnimations[animationGuid] ) {
+			modelAnimations[animationGuid] = $ani;
+			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $pe.data, $ani ) );
 		}
 	}
 	

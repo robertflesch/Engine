@@ -46,7 +46,7 @@ public class PersistURL
 		else if ( Globals.APP_EXT == $pe.table )	
 			_filePath = Globals.appPath + $pe.guid + $pe.table
 		else if ( Globals.ANI_EXT == $pe.table )	
-			_filePath = Globals.modelPath + $pe.data + "/" + $pe.guid + $pe.table
+			_filePath = Globals.modelPath + $pe.other + "/" + $pe.guid + $pe.table
 			
 		else
 			return false;
@@ -78,11 +78,11 @@ public class PersistURL
 			Log.out( "PersistURL.loadSuccess - guid: " + $pe.guid + $pe.table, Log.DEBUG );
 			if ( URLLoaderDataFormat.BINARY == $pe.format ) {
 				var ba:ByteArray = event.target.data;			
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, $pe.table, $pe.guid, null, ba ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, $pe.table, $pe.guid, null, ba, $pe.format, $pe.other ) );
 			}
 			else {
 				
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, $pe.table, $pe.guid, null, StringUtils.trim(event.target.data) ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, $pe.table, $pe.guid, null, StringUtils.trim(event.target.data), $pe.format, $pe.other ) );
 			}
 		}       
 

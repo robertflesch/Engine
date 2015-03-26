@@ -11,6 +11,7 @@ import com.voxelengine.events.AnimationMetadataEvent;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.server.Network;
+import com.voxelengine.utils.JSONUtil;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
 import flash.net.URLRequest;
@@ -50,69 +51,29 @@ public class Animation
 	private var _type:String;
 	// For loading local files only
 	public var ownerGuid:String;
-
-	/// META DATA for DB
-	public var guid:String; // File name if used locally, GUID from DB
-	public var model:String = MODEL_BIPEDAL_10;  // What class of models does this apply do BIPEDAL_10, DRAGON_9, PROPELLER
-	public var databaseObject:DatabaseObject;
-	public var name:String;
-	public var desc:String;
-	public var world:String;
-	//public var model:String;
-	public var created:Date;
-	public var modified:Date;
+	
+	private var _metadata:AnimationMetadata;
 
 	public function get attachments():Vector.<AnimationAttachment> { return _attachments; }
 
 	public function get transforms():Vector.<AnimationTransform> { return _transforms; }
 	public function get loaded():Boolean { return _loaded; }
+	public function get metadata():AnimationMetadata { return _metadata; }
 	
-	public function Animation() {}
+	public function Animation() { _metadata = new AnimationMetadata() }
 	
-	public function createBlank():void {
-		initJSON( BLANK_ANIMATION_TEMPLATE );
+	public function loadFromPersistance( $dbo:DatabaseObject ):void {
+		metadata.fromPersistance( $dbo );
 	}
 	
-	// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
-	public function loadFromLocalFile( $animData:Object, $ownerGuid:String ):void {
-		  
-		ownerGuid = $ownerGuid;
-		if ( $animData.name )
-		{
-			name = $animData.name;
-		}
-		else
-			Log.out( "Animation.loadFromLocalFile - No animation name", Log.ERROR );	
-			
-		if ( $animData.guid )
-		{
-			guid = $animData.guid;
-		}
-		else
-			Log.out( "Animation.loadFromLocalFile - No animation guid", Log.ERROR );	
-			
-		if ( $animData.type )
-		{
-			_type = ( "action" == $animData.type ? ANIMATION_ACTION : ANIMATION_STATE );
-		}
-		else
-			_type = ANIMATION_STATE;
-
-		var fileName:String = name + ANIMATION_FILE_EXT
-		load( fileName, onLoadedAction );
-	}
-	
-	public function loadForImport( $nameAndLoc:String ):void {
-		load( $nameAndLoc, onLoadForImport );
-	}
-	
-	public function loadFromPersistance():void {
-		//PersistAnimation.loadAnims( Network.userId );
-	}
-	
-	public function initJSON( $json:Object ):void 
+	public function fromImport( $json:Object, $guid:String, $modelGuid:String ):void 
 	{
-		//Log.out( "Animation.init - fileName: " + _name );
+		_metadata.fromImport( $guid, $modelGuid );
+		fromJSON( $json );
+	}
+	
+	public function fromJSON( $json:Object ):void 
+	{
 		if ( $json.sound )
 		{
 			_sound = new AnimationSound();
@@ -136,6 +97,16 @@ public class Animation
 		}
 		
 		//LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.ANIMATION_LOAD_COMPLETE, name ) );
+	}
+	
+	public function fromPersistance( $dbo:DatabaseObject ):void {	
+		var ba:ByteArray = _metadata.fromPersistance( $dbo );
+		ba.position = 0;
+		// how many bytes is the animation
+		var strLen:int = ba.readInt();
+		// read off that many bytes
+		var json:String = ba.readUTFBytes( strLen );
+		fromJSON( json );
 	}
 	
 	/*
@@ -230,29 +201,7 @@ public class Animation
 		}
 		return outString;
 	}
-/*		
-		
-		
-		
-		var outString:String = "{\"region\":[";
-		outString = _modelManager.getModelJson(outString);
-		outString += "],"
-		// if you dont do it this way, there is a null at begining of string
-		outString += "\"skyColor\": {" + "\"r\":" + _skyColor.x  + ",\"g\":" + _skyColor.y + ",\"b\":" + _skyColor.z + "}";
-		outString += ","
-		outString += "\"gravity\":" + JSON.stringify(gravity);
-		outString += "}"
-		return outString;
-	}
-	*/
-/*
-	public function toJSON(k:*):* {
-		return {
-			sound: _sound.toJSON(k),
-			animation: _attachments.toJSON(k)
-		}
-	}
-*/
+	
 	public function play( $owner:VoxelModel, $val:Number ):void
 	{
 		//Log.out( "Animation.play - name: " + _name );
@@ -296,291 +245,42 @@ public class Animation
 			_sound.update( $val / 3 );
 	}
 	
-	static private const ANIMATION_FILE_EXT:String = ".ajson"
-	private function load( $fileName:String, $successAction:Function ):void
-	{
-		var aniNameAndLoc:String = Globals.modelPath + ownerGuid + "/" + $fileName;
-		//Log.out( "Animation.load - loading: " + aniNameAndLoc );
-		var request:URLRequest = new URLRequest( aniNameAndLoc );
-		var loader:CustomURLLoader = new CustomURLLoader(request);
-		loader.addEventListener(Event.COMPLETE, $successAction );
-		loader.addEventListener(IOErrorEvent.IO_ERROR, onLoadErrorAction);
+	public function save():void {
+		var ba:ByteArray = new ByteArray();
+		ba = asByteArray( ba );
+		metadata.save( ba );
 	}
 	
-	private function onLoadErrorAction(event:IOErrorEvent):void
-	{
-		Log.out( "Animation.onLoadErrorAction: ERROR LOADING ANIMATION: ", Log.WARN );
-	}	
-		
-	private function onLoadForImport(event:Event):void
-	{
-		onLoadedAction( event );
-		save();
+	public function asByteArray( $ba:ByteArray ):ByteArray {
+		var json:String = getJSON();
+		// is this needed?
+Log.out( "Animation.asByteArray - is STRINGIFY NEEDED?", Log.WARN );		
+		$ba.writeInt( json.length );
+		$ba.writeUTFBytes( json );
+		$ba.compress();
+		return $ba;	
 	}
 
-	//private function onLoadFromPersistance():void
-	//{
-		//Log.out( "Animation.onLoadFromPersistance - NOT SUPPOERTED YET", Log.ERROR );
-	//}
-	
-	private function onLoadedAction(event:Event):void
-	{
-		_loaded = true;
-		//Log.out( "Animation.onLoadedAction - LOADED: " + name );
-		try 
-		{
-			var jsonString:String = StringUtils.trim( String(event.target.data) );
-			var jsonResult:Object = JSON.parse(jsonString);
-		}
-		catch ( error:Error )
-		{
-			Log.out( "Animation.onLoadedAction - ERROR PARSING: " );
-		}
-		
-		initJSON( jsonResult );
-		
-		/// TEST TEST TEST ONLY
-		//var ba:ByteArray = new ByteArray();
-		//writeToByteArray( ba );
-	}
-	
-	public function importAnimation():void {
-		guid = Globals.getUID();
-		save();
-	}
-	
-	public function save():void {
-		var ba:ByteArray = new ByteArray;
-		writeToByteArray( ba );
-		//PersistAnimation.saveAnim( metadata( ba ), databaseObject, createSuccess );
-		
-	}
-	private	function writeToByteArray( $ba:ByteArray ):void {
-			var rawJSON:String = getJSON();
-			var animJson:String = JSON.stringify( rawJSON );
-			$ba.writeInt( animJson.length );
-			$ba.writeUTFBytes( animJson );
-			$ba.compress();
-		}
-		
-	private	function metadata( $ba: ByteArray ):Object {
-			Log.out( "Animation.metadata userId: " + Network.userId );
-			return {
-					created: created ? created : new Date(),
-					data: $ba,
-					description: desc ? desc : "No Description",
-					model: model ? model : "No Description",
-					guid: guid ? guid : Globals.getUID(),
-					modified: modified ? modified : new Date(),
-					name: name ? name : "No name",
-					owner:  Network.PUBLIC,
-					world: world ? world : "VoxelVerse"
-					};
-		}
+	//private	function metadata( $ba: ByteArray ):Object {
+			//Log.out( "Animation.metadata userId: " + Network.userId );
+			//return {
+					//created: created ? created : new Date(),
+					//data: $ba,
+					//description: desc ? desc : "No Description",
+					//model: model ? model : "No Description",
+					//guid: guid ? guid : Globals.getUID(),
+					//modified: modified ? modified : new Date(),
+					//name: name ? name : "No name",
+					//owner:  Network.PUBLIC,
+					//world: world ? world : "VoxelVerse"
+					//};
+		//}
 		
 	private	function createSuccess(o:DatabaseObject):void 
 		{ 
 			if ( o ) {
-				databaseObject = o;
+				metadata.dbo = o;
 			}
 		}
-		
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	// fromPersistance
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	public function fromPersistance( $dbo:DatabaseObject ):void {
-
-	}
-	/*
-	public function fromPersistance( $dbo:DatabaseObject ):void {
-		admin = cvsToVector( $dbo.admin );
-		dbo = $dbo;
-		desc = $dbo.description;
-		name = $dbo.name;
-		owner = $dbo.owner
-		worldId = $dbo.world;
-		editors = cvsToVector( $dbo.editors );
-		created = $dbo.created;
-		modified = $dbo.modified;
-		
-		Log.out( "Animation.fromPersistance - region Name: " + name + "  owner: " + owner + "  guid: " + guid, Log.DEBUG );
-		
-		if ( $dbo && $dbo.data ) {
-			var ba:ByteArray = $dbo.data 
-			ba.position = 0;
-			if ( ba && 0 < ba.bytesAvailable ) {
-				ba.uncompress();
-				fromByteArray( ba );
-			}
-		}
-		changed = true;
-		// comma seperated variables
-		function cvsToVector( value:String ):Vector.<String> {
-			var v:Vector.<String> = new Vector.<String>;
-			var start:int = 0;
-			var end:int = value.indexOf( ",", 0 );
-			while ( -1 < end ) {
-				v.push( value.substring( start, end ) );
-				start = end + 1;
-				end = value.indexOf( ",", start );
-			}
-			// there is only one, or this is the last one
-			if ( -1 == end && start < value.length ) {
-				v.push( value.substring( start, value.length ) );
-			}
-			return v;
-		}
-	}
-	
-	private function fromByteArray( $ba:ByteArray ):void {
-		$ba.position = 0;
-		// how many bytes is the modelInfo
-		var strLen:int = $ba.readInt();
-		// read off that many bytes
-		var regionJson:String = $ba.readUTFBytes( strLen );
-		initJSON( regionJson );
-	}
-		*/
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-	// toPersistance
-	////////////////////////////////////////////////////////////////////////////////////////////////////
-/*
-	private function save( $re:RegionEvent ):void {
-		
-		if ( guid != $re.guid ) {
-			//Log.out( "Region.save - Ignoring save meant for other region my guid: " + guid + " target guid: " + $re.guid, Log.WARN );
-			return;
-		}
-		
-		// Models might have changes not seen in the region file
-		if ( _modelCache )
-			_modelCache.save();
-		
-		
-		// The null owner check makes it to we dont save local loaded regions to persistance
-		if ( Globals.online && changed && null != owner && false == _lockDB ) {
-			Log.out( "Region.save - SAVING region id: " + guid + "  name: " + name + "  and locking", Log.INFO );
-			addSaveEvents();
-			
-			if ( _dbo )
-				toPersistance();
-			else {
-				var ba:ByteArray = new ByteArray();	
-				ba = asByteArray( ba );
-			}
-//Log.out( "Region.save - NOT SAVING NOT SAVING NOT SAVING", Log.WARN );
-//return;	
-			//Log.out( "Region.save - PersistanceEvent.dispatch region id: " + guid + "  name: " + name + "  locking status: " + _lockDB, Log.WARN );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_REGIONS, guid, _dbo, metadata(ba) ) );
-			// or could do this in the suceed, but if it fails do I want to keep retrying?
-			changed = false;
-		}
-		else
-			Log.out( "Region.save FAILED CONDITION - online:" + Globals.online + "  changed:" + changed + "  owner:" + owner + "  locked:" + _lockDB + "  name: " + name + "  - guid: " + guid, Log.DEBUG );
-	}
-	
-	private function saveSucceed( $pe:PersistanceEvent ):void { 
-		if ( Globals.DB_TABLE_REGIONS != $pe.table )
-			return;
-		removeSaveEvents();
-		Log.out( "Region.saveSucceed - guid: " + guid, Log.DEBUG ); 
-	}	
-	
-	private function createSucceed( $pe:PersistanceEvent ):void { 
-		if ( Globals.DB_TABLE_REGIONS != $pe.table )
-			return;
-		if ( $pe.dbo )
-			dbo = $pe.dbo;
-		removeSaveEvents();
-		Log.out( "Region.createSuccess - guid: " + guid, Log.DEBUG ); 
-	}	
-	
-	private function saveFail( $pe:PersistanceEvent ):void { 
-		if ( Globals.DB_TABLE_REGIONS != $pe.table )
-			return;
-		removeSaveEvents();
-		Log.out( "Region.saveFail - ", Log.ERROR ); 
-	}	
-	
-	
-	private function addSaveEvents():void {
-		_lockDB = true;
-		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, 	saveFail );
-	}
-	
-	private function removeSaveEvents():void {
-		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
-		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
-		PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, 		saveFail );
-		_lockDB = false;
-	}
-
-	
-	public function toPersistance():void {
-		_dbo.admin = adminListGet();
-		_dbo.description = desc;
-		_dbo.name = name;
-		_dbo.owner = owner;
-		_dbo.world = worldId;
-		_dbo.editors = editorsListGet();
-		_dbo.created = created;
-		_dbo.modified = new Date();
-		
-		var ba:ByteArray = new ByteArray(); 
-		_dbo.data 			= asByteArray( ba );
-	}
-	
-	public function getJSON():String {
-		var outString:String = "{\"region\":";
-		if ( _modelCache ) {
-			outString += "[";
-			outString += _modelCache.getJSON();
-			outString += "],"
-		}
-		else {
-			// If the region has not been loaded yet, just copy the props over.
-			outString += JSON.stringify( _JSON.region );
-			outString += ","
-		}
-		// if you dont do it this way, there is a null at begining of string
-		outString += "\"skyColor\":" + JSON.stringify( _skyColor );
-		outString += ","
-		outString += "\"playerPosition\":" + JSON.stringify( _playerPosition );
-		outString += ","
-		outString += "\"playerRotation\":" + JSON.stringify( _playerRotation );
-		outString += ","
-		outString += "\"gravity\":" + JSON.stringify(gravity);
-		outString += "}"
-		return outString;
-	}
-
-
-	public function asByteArray( $ba:ByteArray ):ByteArray {
-		var regionJson:String = getJSON();
-		$ba.writeInt( regionJson.length );
-		$ba.writeUTFBytes( regionJson );
-		$ba.compress();
-		
-		return $ba;	
-	}
-	
-	private function metadata( ba: ByteArray ):Object {
-		Log.out( "Region.metadata userId: " + Network.userId + "  name: " + name + "  this region is owned by: " + _owner, Log.DEBUG );
-		return {
-				admin: 			adminListGet(),
-				created: 		_created ? _created : _created = new Date(),
-				modified: 		_modified = new Date(),
-				data: 			ba,
-				description: 	_desc,
-				editors: 		editorsListGet(),
-				name: 			_name,
-				owner:  		_owner,
-				world: 			_worldId
-				};
-	}
-	*/
 }
 }
