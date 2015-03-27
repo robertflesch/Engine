@@ -68,6 +68,11 @@ package com.voxelengine.GUI.actionBars
 			}
 		}
 
+		// Dont call this until after bar is displayed
+		override public function buildActions():void	{
+			Log.out( "WindowBeastControl.buildActions - Must be overriden", Log.WARN );
+		}
+		
 		public function WindowBeastControl( $beastInstanceGuid:String ) 
 		{ 
 			_s_currentInstance = this;

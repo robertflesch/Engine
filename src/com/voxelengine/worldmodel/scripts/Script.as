@@ -20,22 +20,25 @@ package com.voxelengine.worldmodel.scripts
 	{
 		protected var _instanceGuid:String = null;
 		protected var _modelScript:Boolean; // true if add from modelInfo, false is added from instanceInfo
+		protected var _vm:VoxelModel; // I hate to add direct link to model, but it saves a ton of searching.
 		
 		public function get instanceGuid():String  					{ return _instanceGuid; }
 		public function set instanceGuid(val:String ):void 				{ _instanceGuid = val; }
 		
 		public function get modelScript():Boolean  { return _modelScript; }
 		public function set modelScript(value:Boolean):void  { _modelScript = value; }
+		
+		public function get vm():VoxelModel { return _vm; }
+		public function set vm(value:VoxelModel):void { _vm = value; }
 
 		public function Script() 
 		{ 
 		}
 		
-		public function processClassJson( modelInfo:ModelInfo ):void {		
-			
+		public function dispose():void { 
+			_vm = null; 
+			_instanceGuid = null;
 		}
-		
-		public function dispose():void { ; }
 		
 		public function toJSON(k:*):* {
 			

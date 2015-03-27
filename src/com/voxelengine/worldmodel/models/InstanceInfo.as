@@ -280,6 +280,7 @@ public class InstanceInfo extends Location	{
 		if ( script )
 		{
 			script.instanceGuid = instanceGuid;
+			script.vm		= owner;
 			//script.event( OxelEvent.CREATE );
 			// Only person using this is the AutoControlObjectScript
 		}

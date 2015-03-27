@@ -35,10 +35,9 @@ public class ControlBeastScript extends Script
 		{
 			if ( null == WindowBeastControlQuery.currentInstance && null == WindowBeastControl.currentInstance )
 			{
-				var trigger:VoxelModel = Globals.modelGet( instanceGuid );
-				if ( trigger )
+				if ( vm )
 				{
-					var controllingModel:VoxelModel = trigger.instanceInfo.controllingModel;
+					var controllingModel:VoxelModel = vm.instanceInfo.controllingModel;
 					if ( Globals.player && Globals.player.instanceInfo ) {
 						var ii:InstanceInfo = Globals.player.instanceInfo;
 						if ( controllingModel && null == Globals.player.instanceInfo.controllingModel )

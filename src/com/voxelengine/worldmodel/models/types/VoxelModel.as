@@ -342,6 +342,7 @@ public class VoxelModel
 	public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true):void {
 		_modelInfo = $mi;
 		_metadata = $vmm;
+		instanceInfo.owner = this; // This tells the instanceInfo that this voxel model is its owner.
 
 		//_data = new ModelData()
 		
@@ -385,7 +386,6 @@ public class VoxelModel
 			
 		processClassJson();
 		
-		instanceInfo.owner = this; // This tells the instanceInfo that this voxel model is its owner.
 	}
 	
 	private function childLoadingComplete(e:ModelLoadingEvent):void {
