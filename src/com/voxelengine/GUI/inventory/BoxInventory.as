@@ -71,7 +71,7 @@ public class BoxInventory extends VVBox
 				}
 				
 				//var modelsOfThisGuid:String = String( e.result.toFixed(0) );
-				var modelsOfThisGuid:int = om.vmm.copyCount;
+				var modelsOfThisGuid:int = om.vmm.permissions.copyCount;
 				if ( 99999 < modelsOfThisGuid )
 					_count.text = "LOTS";
 				else if ( -1 == modelsOfThisGuid )

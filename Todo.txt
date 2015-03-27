@@ -21,7 +21,7 @@ https://github.com/adobe-flash/graphicscorelib
 GENERAL CRITICAL:
 IMPLEMENT: MODEL PLACEMENT
 TODO: Child parts are loading in general inventory, is that desirable?
-
+IMPLEMENT: CIRCULAR MODEL LOADING BREAK.
 IMPLEMENT: LOD
 IMPLEMENT: BURNING MATS
 IMPROVE: Lava Flow should stop at X when flowing straight down? Break into rock emitter?

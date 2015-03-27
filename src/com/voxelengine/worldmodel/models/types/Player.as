@@ -84,6 +84,11 @@ public class Player extends Avatar
 		torchToggle();
 	}
 	
+	override public function buildExportObject( obj:Object ):Object {
+		obj = super.buildExportObject( obj )
+		return obj;
+	}
+	
 	override protected function processClassJson():void {
 		super.processClassJson();
 	}

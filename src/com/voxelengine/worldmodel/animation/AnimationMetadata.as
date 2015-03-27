@@ -12,6 +12,7 @@ import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.Permissions;
 import flash.events.Event;
 import flash.utils.ByteArray;
 import playerio.DatabaseObject;

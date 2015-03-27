@@ -50,12 +50,12 @@ package com.voxelengine.worldmodel.models.types
 			// no unique items at this level
 		}
 		
-		override protected function addClassJson():String {
-			var jsonString:String = super.addClassJson();
-			jsonString += ",";
-			jsonString += "\"dragon\": { }";
-			return jsonString;
-		}
+		//override protected function addClassJson():String {
+			//var jsonString:String = super.addClassJson();
+			//jsonString += ",";
+			//jsonString += "\"dragon\": { }";
+			//return jsonString;
+		//}
 		
 		
 		override protected function collisionPointsAdd():void {

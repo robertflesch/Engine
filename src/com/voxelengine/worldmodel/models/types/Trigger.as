@@ -66,8 +66,8 @@ package com.voxelengine.worldmodel.models.types
 					{
 						_inside = true;
 						// Send OxelEvent?
-						//Log.out( "Trigger.update - INSIDE" );
-						for each ( var iscript:Script in instanceInfo.scripts )
+						Log.out( "Trigger.update - INSIDE" );
+						//for each ( var iscript:Script in instanceInfo.scripts )
 						{
 							OxelEvent.dispatch( new OxelEvent( OxelEvent.INSIDE, instanceInfo.instanceGuid ) );
 						}
@@ -78,8 +78,8 @@ package com.voxelengine.worldmodel.models.types
 					if ( _inside )
 					{
 						_inside = false;
-						//Log.out( "Trigger.update - OUTSIDE" );
-						for each ( var oscript:Script in instanceInfo.scripts )
+						Log.out( "Trigger.update - OUTSIDE" );
+						//for each ( var oscript:Script in instanceInfo.scripts )
 						{
 							OxelEvent.dispatch( new OxelEvent( OxelEvent.OUTSIDE, instanceInfo.instanceGuid ) );
 						}

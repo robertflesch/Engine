@@ -9,10 +9,12 @@ package com.voxelengine.worldmodel.models
 {
 	import com.voxelengine.events.AnimationEvent;
 	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.utils.transitions.properties.SoundShortcuts;
 	import com.voxelengine.worldmodel.animation.Animation;
 	import com.voxelengine.worldmodel.biomes.Biomes;
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.worldmodel.scripts.Script;
 	
 	/**
 	 * ...
@@ -106,10 +108,10 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
-		public function getJSON():String {
-			return JSON.stringify( this );			
+		public function buildExportObject( obj:Object ):Object {
+			return toJSON(obj);
 		}
-	
+		
 		// this is called by the stringify method
 		public function toJSON(k:*):*  { 
 			return {
@@ -118,9 +120,23 @@ package com.voxelengine.worldmodel.models
 					children:		"REPLACE_ME",
 					grainSize:		_grainSize,
 					modelClass:		_modelClass,
-					script:			_scripts
+					script:			modelsScriptOnly()
 					};
 		} 	
+		
+		private function modelsScriptOnly():Vector.<Object> {
+			
+			var oa:Vector.<Object> = new Vector.<Object>();
+			var len:int = _scripts.length;
+			for ( var index:int; index < len; index++ ) {
+				var so:Object = new Object();
+				so.name = _scripts[index];
+				Log.out( "ModelInfo.modelsScriptOnly - script: " + _scripts[index] );
+				oa.push( so );
+			}
+			return oa;
+		}
+		
 		
 		public function childrenReset():void {
 			_children = null;
@@ -166,12 +182,7 @@ package com.voxelengine.worldmodel.models
 			
 			if ( modelInfoJson.biomes )
 			{
-				var biomes:Object = modelInfoJson.biomes;
-				if ( !biomes  ) {
-					throw new Error( "ModelInfo.init - WARNING - unable to find biomes in json file: " + fileName );					
-					return;
-				}
-				
+				var biomesObj:Object = modelInfoJson.biomes;
 				// TODO this should only be true for new terrain models.
 				const createHeightMap:Boolean = true;
 				_biomes = new Biomes( createHeightMap  );

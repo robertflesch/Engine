@@ -1,619 +1,628 @@
 /*==============================================================================
-  Copyright 2011-2015 Robert Flesch
-  All rights reserved.  This product contains computer programs, screen
-  displays and printed documentation which are original works of
-  authorship protected under United States Copyright Act.
-  Unauthorized reproduction, translation, or display is prohibited.
+Copyright 2011-2015 Robert Flesch
+All rights reserved.  This product contains computer programs, screen
+displays and printed documentation which are original works of
+authorship protected under United States Copyright Act.
+Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import flash.display3D.Context3D;
-    import flash.geom.Vector3D;
-	import flash.utils.getTimer;
-	import flash.geom.Matrix3D;
-	
-	import flash.events.KeyboardEvent;
-	import flash.ui.Keyboard;	
-	
-	
-	import com.voxelengine.Globals;
-	import com.voxelengine.Log;
-	import com.voxelengine.worldmodel.*;
-	import com.voxelengine.worldmodel.models.*
-	import com.voxelengine.events.CollisionEvent;
-	import com.voxelengine.events.GUIEvent;
-	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.events.ShipEvent;
-	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
-	import com.voxelengine.worldmodel.models.makers.ModelLoader;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
-	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-	import com.voxelengine.worldmodel.scripts.Script;
+import flash.display3D.Context3D;
+import flash.geom.Vector3D;
+import flash.utils.getTimer;
+import flash.geom.Matrix3D;
 
-	/**
-	 * ...
-	 * @author Robert Flesch - RSF 
-	 * The world model holds the active oxels
-	 */
-	public class ControllableVoxelModel extends VoxelModel 
+import flash.events.KeyboardEvent;
+import flash.ui.Keyboard;	
+
+
+import com.voxelengine.Globals;
+import com.voxelengine.Log;
+import com.voxelengine.worldmodel.*;
+import com.voxelengine.worldmodel.models.*
+import com.voxelengine.events.CollisionEvent;
+import com.voxelengine.events.GUIEvent;
+import com.voxelengine.events.ModelEvent;
+import com.voxelengine.events.ShipEvent;
+import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
+import com.voxelengine.worldmodel.models.makers.ModelLoader;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+import com.voxelengine.worldmodel.scripts.Script;
+
+/**
+ * ...
+ * @author Robert Flesch - RSF 
+ * The world model holds the active oxels
+ */
+public class ControllableVoxelModel extends VoxelModel 
+{
+	static protected const SHIP_VELOCITY:String 			= "velocity";
+	static protected const SHIP_ALTITUDE:String 			= "altitude";
+	static protected const SHIP_ROTATION:String 			= "rotation";
+	static protected const MIN_COLLISION_GRAIN:int 			= 2;
+	static public 	const 	BODY:String						= "BODY";
+	static protected    const DEFAULT_CLIP_VELOCITY:int		= 95;
+	static protected    const DEFAULT_FALL_RATE:int			= 5;
+	static protected    const DEFAULT_SPEED_MAX:int			= 15;
+	static protected    const DEFAULT_SPEED_X:Number		= 0.5;
+	static protected    const DEFAULT_TURN_RATE:Number		= 20;
+	static protected    const DEFAULT_ACCEL_RATE:Number		= 0.5;
+	
+	// scratch objects to save on allocation of memory
+	//private static const _sZERO_VEC:Vector3D 				= new Vector3D();
+	protected static var _sScratchVector:Vector3D			= new Vector3D();
+	protected static var _sScratchMatrix:Matrix3D			= new Matrix3D();
+	
+	protected var _gravityScalar:Vector3D 					= new Vector3D(0, -1, 0);
+	protected var _ct:CollisionTest							= null;
+	protected var _collisionCandidates:Vector.<VoxelModel> 	= null;
+	protected var _displayCollisionMarkers:Boolean 			= false
+	protected var _leaveTrail:Boolean 						= false
+	protected var _forward:Boolean 							= false
+
+	private var		_maxFallRate:SecureNumber 				= new SecureNumber( DEFAULT_FALL_RATE );
+	private var   	_maxSpeed:SecureNumber 					= new SecureNumber( DEFAULT_SPEED_MAX );
+	private var   	_speedMultiplier:Number 				= DEFAULT_SPEED_X;
+	
+	private var 	_lastCollisionModel:VoxelModel; 											// INSTANCE NOT EXPORTED
+	// This should be at the controllable model leve			
+	private var 	_clipVelocityFactor:SecureNumber		= new SecureNumber(DEFAULT_CLIP_VELOCITY); 		// INSTANCE NOT EXPORTED
+	protected var 	_turnRate:Number 						= DEFAULT_TURN_RATE; // 2.5 for ship
+	protected var 	_accelRate:Number 						= DEFAULT_ACCEL_RATE;
+	private var 	_onSolidGround:Boolean														// INSTANCE NOT EXPORTED
+	private var 	_keyboardControl:Boolean													// INSTANCE NOT EXPORTED
+	
+	public function get 	onSolidGround():Boolean 				{ return _onSolidGround; }
+	public function set 	onSolidGround(val:Boolean):void 		{ _onSolidGround = val; }
+	public function get		accelRate():Number 						{ return _accelRate; }
+	public function get		clipVelocityFactor():Number 			{ return _clipVelocityFactor.val; }
+	public function set		clipVelocityFactor($val:Number):void 	{ _clipVelocityFactor.val = $val; }
+	public function get		lastCollisionModel():VoxelModel 		{ return _lastCollisionModel; }
+	public function set		lastCollisionModel(val:VoxelModel):void { _lastCollisionModel = val; }
+	public function 		lastCollisionModelReset():void 				{ _lastCollisionModel = null; }
+	public function get 	mMaxSpeed():Number 						{ return (_maxSpeed.val * _speedMultiplier); }
+	public function set 	mMaxSpeed($value:Number):void 			{ _maxSpeed.val = $value; }
+	protected function get 	mSpeedMultiplier():Number 				{ return _speedMultiplier; }
+	protected function set 	mSpeedMultiplier($value:Number):void	{ _speedMultiplier = $value; }
+	protected function get 	mMaxFallRate():Number 					{ return _maxFallRate.val; }
+	protected function set 	mMaxFallRate($value:Number):void 		{ _maxFallRate.val = $value; }
+	
+	protected function get 	mForward():Boolean 						{ return _forward; }
+	protected function set 	mForward($val:Boolean):void 			{ _forward = $val; }
+	
+	
+	public function ControllableVoxelModel( ii:InstanceInfo ):void {
+		super( ii );
+	}
+	
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
+		super.init( $mi, $vmm );
+		Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent, false, 0, true );
+		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
+		GUIEvent.addListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
+		GUIEvent.addListener( GUIEvent.APP_ACTIVATE, onActivate );
+		_ct = new CollisionTest( this );
+	}
+	
+	override protected function processClassJson():void {
+		super.processClassJson();
+		if ( modelInfo.json && modelInfo.json.controllableVoxelModel )
+		{
+			var cmInfo:Object = modelInfo.json.controllableVoxelModel;
+			if ( null == cmInfo ) {
+				Log.out( "ControllableVoxelModel.processClassJson - no controllable model JSON info found", Log.DEBUG );
+				return;
+			}
+			
+			if ( cmInfo.clipFactor )
+			{
+				clipVelocityFactor = cmInfo.clipFactor/100;
+			}
+			else
+				clipVelocityFactor = DEFAULT_CLIP_VELOCITY/100;
+				
+			if ( cmInfo.maxSpeed )
+			{
+				mMaxSpeed = cmInfo.maxSpeed;
+			}
+				
+		}
+		else
+			Log.out( "ControllableVoxelModel.processClassJson - no modelInfo JSON info found", Log.DEBUG );
+	}
+	
+	override public function buildExportObject( obj:Object ):Object {
+		obj = super.buildExportObject( obj )
+		var exportData:Object = new Object();
+		exportData.clipFactor = clipVelocityFactor;
+		exportData.maxSpeed = mMaxSpeed;
+		obj.controllableVoxelModel = exportData
+		return obj;
+	}
+	/*
+	override protected function addClassJson():String {
+		var jsonString:String = super.addClassJson();
+		jsonString += ",";
+		jsonString += "\"controllableVoxelModel\": { "
+		jsonString += "\"clipFactor\" : " + clipVelocityFactor + ",";
+		jsonString += "\"maxSpeed\" : " + mMaxSpeed;
+		jsonString += "}"
+		return jsonString
+	}
+	*/
+	
+	override protected function internal_update($context:Context3D, $elapsedTimeMS:int):void {
+		if (!initialized)
+			initialize($context);
+		
+		if (complete)
+		{
+			// this was inside of the the controlled model if...
+			updateVelocity($elapsedTimeMS, clipVelocityFactor );
+			
+			instanceInfo.update($elapsedTimeMS);
+			
+			
+			if (oxel && oxel.dirty)
+			{
+				oxel.cleanup( metadata );
+			}
+		}
+	}
+	
+	public function get keyboardControl():Boolean { return _keyboardControl; }
+	public function set keyboardControl(val:Boolean):void
 	{
-		static protected const SHIP_VELOCITY:String 			= "velocity";
-		static protected const SHIP_ALTITUDE:String 			= "altitude";
-		static protected const SHIP_ROTATION:String 			= "rotation";
-		static protected const MIN_COLLISION_GRAIN:int 			= 2;
-		static public 	const 	BODY:String						= "BODY";
-		static protected    const DEFAULT_CLIP_VELOCITY:int		= 95;
-		static protected    const DEFAULT_FALL_RATE:int			= 5;
-		static protected    const DEFAULT_SPEED_MAX:int			= 15;
-		static protected    const DEFAULT_SPEED_X:Number		= 0.5;
-		static protected    const DEFAULT_TURN_RATE:Number		= 20;
-		static protected    const DEFAULT_ACCEL_RATE:Number		= 0.5;
+		if (val)
+			Log.out("ControllableVoxelModel.keyboardControl is NOW: " + instanceInfo.instanceGuid );
+		else
+			Log.out("ControllableVoxelModel.keyboardControl WAS: " + instanceInfo.instanceGuid );
+		_keyboardControl = val;
+	}
+	
+	
+	override public function set dead(val:Boolean):void { 
+		super.dead = val;
 		
-		// scratch objects to save on allocation of memory
-		//private static const _sZERO_VEC:Vector3D 				= new Vector3D();
-		protected static var _sScratchVector:Vector3D			= new Vector3D();
-		protected static var _sScratchMatrix:Matrix3D			= new Matrix3D();
-		
-		protected var _gravityScalar:Vector3D 					= new Vector3D(0, -1, 0);
-		protected var _ct:CollisionTest							= null;
-		protected var _collisionCandidates:Vector.<VoxelModel> 	= null;
-		protected var _displayCollisionMarkers:Boolean 			= false
-		protected var _leaveTrail:Boolean 						= false
-		protected var _forward:Boolean 							= false
+		if ( Globals.controlledModel && Globals.controlledModel == this )
+			loseControl( Globals.player );
+			
+		Globals.g_app.removeEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent );
+		ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
+		GUIEvent.removeListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
+		GUIEvent.removeListener( GUIEvent.APP_ACTIVATE, onActivate );
+	}
 
-		private var		_maxFallRate:SecureNumber 				= new SecureNumber( DEFAULT_FALL_RATE );
-		private var   	_maxSpeed:SecureNumber 					= new SecureNumber( DEFAULT_SPEED_MAX );
-		private var   	_speedMultiplier:Number 				= DEFAULT_SPEED_X;
+	protected function onDeactivate( e:GUIEvent ):void 
+	{
 		
-		private var 	_lastCollisionModel:VoxelModel; 											// INSTANCE NOT EXPORTED
-		// This should be at the controllable model leve			
-		private var 	_clipVelocityFactor:SecureNumber		= new SecureNumber(DEFAULT_CLIP_VELOCITY); 		// INSTANCE NOT EXPORTED
-		protected var 	_turnRate:Number 						= DEFAULT_TURN_RATE; // 2.5 for ship
-		protected var 	_accelRate:Number 						= DEFAULT_ACCEL_RATE;
-		private var 	_onSolidGround:Boolean														// INSTANCE NOT EXPORTED
-		private var 	_keyboardControl:Boolean													// INSTANCE NOT EXPORTED
+	}
+	protected function onActivate( e:GUIEvent ):void 
+	{
+		stateLock( false );
+		stateSet( "" );
+	}
+	
+	override public function release():void
+	{
+		super.release();
 		
-		public function get 	onSolidGround():Boolean 				{ return _onSolidGround; }
-		public function set 	onSolidGround(val:Boolean):void 		{ _onSolidGround = val; }
-		public function get		accelRate():Number 						{ return _accelRate; }
-		public function get		clipVelocityFactor():Number 			{ return _clipVelocityFactor.val; }
-		public function set		clipVelocityFactor($val:Number):void 	{ _clipVelocityFactor.val = $val; }
-		public function get		lastCollisionModel():VoxelModel 		{ return _lastCollisionModel; }
-		public function set		lastCollisionModel(val:VoxelModel):void { _lastCollisionModel = val; }
-		public function 		lastCollisionModelReset():void 				{ _lastCollisionModel = null; }
-		public function get 	mMaxSpeed():Number 						{ return (_maxSpeed.val * _speedMultiplier); }
-		public function set 	mMaxSpeed($value:Number):void 			{ _maxSpeed.val = $value; }
-		protected function get 	mSpeedMultiplier():Number 				{ return _speedMultiplier; }
-		protected function set 	mSpeedMultiplier($value:Number):void	{ _speedMultiplier = $value; }
-		protected function get 	mMaxFallRate():Number 					{ return _maxFallRate.val; }
-		protected function set 	mMaxFallRate($value:Number):void 		{ _maxFallRate.val = $value; }
+	}
+	protected function collisionPointsAdd():void {
+		// TO DO Should define this in meta data??? RSF or using extents?
 		
-		protected function get 	mForward():Boolean 						{ return _forward; }
-		protected function set 	mForward($val:Boolean):void 			{ _forward = $val; }
-		
-		
-		public function ControllableVoxelModel( ii:InstanceInfo ):void {
-			super( ii );
-		}
-		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
-			super.init( $mi, $vmm );
-			Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent, false, 0, true );
-			ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
-			GUIEvent.addListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
-			GUIEvent.addListener( GUIEvent.APP_ACTIVATE, onActivate );
-			_ct = new CollisionTest( this );
-		}
-		
-		override protected function processClassJson():void {
-			super.processClassJson();
-			if ( modelInfo.json && modelInfo.json.controllableVoxelModel )
-			{
-				var cmInfo:Object = modelInfo.json.controllableVoxelModel;
-				if ( null == cmInfo ) {
-					Log.out( "ControllableVoxelModel.processClassJson - no controllable model JSON info found", Log.DEBUG );
-					return;
-				}
-				
-				if ( cmInfo.clipFactor )
-				{
-					clipVelocityFactor = cmInfo.clipFactor/100;
-				}
-				else
-					clipVelocityFactor = DEFAULT_CLIP_VELOCITY/100;
-					
-				if ( cmInfo.maxSpeed )
-				{
-					mMaxSpeed = cmInfo.maxSpeed;
-				}
-					
-			}
-			else
-				Log.out( "ControllableVoxelModel.processClassJson - no modelInfo JSON info found", Log.DEBUG );
-		}
-		
-		override protected function addClassJson():String {
-			var jsonString:String = super.addClassJson();
-			jsonString += ",";
-			jsonString += "\"controllableVoxelModel\": { "
-			jsonString += "\"clipFactor\" : " + clipVelocityFactor + ",";
-			jsonString += "\"maxSpeed\" : " + mMaxSpeed;
-			jsonString += "}"
-			return jsonString
-		}
-		
-		
-		override protected function internal_update($context:Context3D, $elapsedTimeMS:int):void {
-			if (!initialized)
-				initialize($context);
-			
-			if (complete)
-			{
-				// this was inside of the the controlled model if...
-				updateVelocity($elapsedTimeMS, clipVelocityFactor );
-				
-				instanceInfo.update($elapsedTimeMS);
-				
-				
-				if (oxel && oxel.dirty)
-				{
-					oxel.cleanup( metadata );
-				}
-			}
-		}
-		
-		public function get keyboardControl():Boolean { return _keyboardControl; }
-		public function set keyboardControl(val:Boolean):void
-		{
-			if (val)
-				Log.out("ControllableVoxelModel.keyboardControl is NOW: " + instanceInfo.instanceGuid );
-			else
-				Log.out("ControllableVoxelModel.keyboardControl WAS: " + instanceInfo.instanceGuid );
-			_keyboardControl = val;
-		}
-		
-		
-		override public function set dead(val:Boolean):void { 
-			super.dead = val;
-			
-			if ( Globals.controlledModel && Globals.controlledModel == this )
-				loseControl( Globals.player );
-				
-			Globals.g_app.removeEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent );
-			ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
-			GUIEvent.removeListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
-			GUIEvent.removeListener( GUIEvent.APP_ACTIVATE, onActivate );
-		}
+		var sizeOxel:Number = oxel.gc.size() / 2;
+		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, 0 ) ) );
+		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, sizeOxel*2 ) ) );
+		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 0, sizeOxel, sizeOxel ) ) );
+		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel*2, sizeOxel, sizeOxel ) ) );
+		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, 0, sizeOxel ) ) );
+		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel*2, sizeOxel ) ) );
+	}
 
-		protected function onDeactivate( e:GUIEvent ):void 
-		{
-			
-		}
-		protected function onActivate( e:GUIEvent ):void 
-		{
-			stateLock( false );
-			stateSet( "" );
-		}
-		
-		override public function release():void
-		{
-			super.release();
-			
-		}
-		protected function collisionPointsAdd():void {
-			// TO DO Should define this in meta data??? RSF or using extents?
-			
-			var sizeOxel:Number = oxel.gc.size() / 2;
-			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, 0 ) ) );
-			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, sizeOxel*2 ) ) );
-			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 0, sizeOxel, sizeOxel ) ) );
-			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel*2, sizeOxel, sizeOxel ) ) );
-			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, 0, sizeOxel ) ) );
-			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel*2, sizeOxel ) ) );
-		}
-
-		override protected function oxelLoaded():void
-		{
-			collisionPointsAdd();
+	override protected function oxelLoaded():void
+	{
+		collisionPointsAdd();
 //			if ( _displayCollisionMarkers )
 //				_ct.markersAdd();
-		}		
-		
-		protected function onChildAdded( me:ModelEvent ):void
-		{
-			if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
-				return;
-				
+	}		
+	
+	protected function onChildAdded( me:ModelEvent ):void
+	{
+		if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
+			return;
+			
 //			var vm:VoxelModel = Globals.modelGet( me.ownerGuid );
-		}
-		
-		protected function throttleEvent( event:ShipEvent ):void
-		{
-			if ( event.instanceGuid != instanceInfo.instanceGuid )
-				return;
-				
-			//Log.out( "Ship.throttleEvent - val: " + event.value );
+	}
+	
+	protected function throttleEvent( event:ShipEvent ):void
+	{
+		if ( event.instanceGuid != instanceInfo.instanceGuid )
+			return;
 			
-			var val:Number = -event.value;
-			if ( -0.05 < val && val < 0.05 )
+		//Log.out( "Ship.throttleEvent - val: " + event.value );
+		
+		var val:Number = -event.value;
+		if ( -0.05 < val && val < 0.05 )
+		{
+			stopEngines();
+		}
+		else
+		{
+			startEngines( val );
+		}
+	}
+	
+	override public function collisionTest( $elapsedTimeMS:Number ):Boolean {
+		
+		//if ( this === Globals.controlledModel )
+		if ( instanceInfo.usesCollision )
+		{
+			// check to make sure the ship or object you were on was not destroyed or removed
+			//if ( lastCollisionModel && lastCollisionModel.instanceInfo.dead )
+				//lastCollisionModelReset();
+			
+			if ( false == controlledModelChecks( $elapsedTimeMS ) )
 			{
-				stopEngines();
+				setAnimation();
+				return false;
 			}
 			else
-			{
-				startEngines( val );
-			}
+				setAnimation();
 		}
 		
-		override public function collisionTest( $elapsedTimeMS:Number ):Boolean {
-			
-			//if ( this === Globals.controlledModel )
-			if ( instanceInfo.usesCollision )
-			{
-				// check to make sure the ship or object you were on was not destroyed or removed
-				//if ( lastCollisionModel && lastCollisionModel.instanceInfo.dead )
-					//lastCollisionModelReset();
-				
-				if ( false == controlledModelChecks( $elapsedTimeMS ) )
-				{
-					setAnimation();
-					return false;
-				}
-				else
-					setAnimation();
-			}
-			
-			return true;
-		}
+		return true;
+	}
+	
+	protected function setAnimation():void
+	{
+	}
+	
+	protected function handleMouseMovement( $elapsedTimeMS:int ):void {
+		throw new Error( "ControllableVoxelModel.handleMouseMovement - NEEDS TO BE OVERRIDEN" );
+	}
+	
+	//static var temp:int = 0;
+	override public function update($context:Context3D, $elapsedTimeMS:int):void {
 		
-		protected function setAnimation():void
+		if ( this === Globals.controlledModel )
 		{
+			handleMouseMovement( $elapsedTimeMS );
 		}
+		super.update($context, $elapsedTimeMS);
 		
-		protected function handleMouseMovement( $elapsedTimeMS:int ):void {
-			throw new Error( "ControllableVoxelModel.handleMouseMovement - NEEDS TO BE OVERRIDEN" );
-		}
+		camera.positionSet = instanceInfo.positionGet;
+		//camera.scale = instanceInfo.scale;
+		// track not copied intentionally
+		// Y Axis ok, X is wrong
+		camera.center.setTo( instanceInfo.center.x, instanceInfo.center.y, instanceInfo.center.z );
+		//var ccenter:Vector3D = camera.current.position;
+		//camera.center.setTo( instanceInfo.center.x + ccenter.x, instanceInfo.center.y + ccenter.y, instanceInfo.center.z + ccenter.z );
 		
-		//static var temp:int = 0;
-		override public function update($context:Context3D, $elapsedTimeMS:int):void {
+		if ( leaveTrail )
+			leaveTrailMarkers();
 			
-			if ( this === Globals.controlledModel )
-			{
-				handleMouseMovement( $elapsedTimeMS );
-			}
-			super.update($context, $elapsedTimeMS);
+		//if ( 20 <= temp )
+		//{
+			//Log.out( "ControllableVoxelModel.update - ii position: " + instanceInfo.positionGet + "  cam position: " + camera.positionGet );
+			//temp = 0;
+		//}
+		//temp++;
+	}
+	
+	protected function collidedHandler( event:CollisionEvent ):void
+	{
+		if ( event.instanceGuid != this.instanceInfo.instanceGuid )
+			return;
+	
+		if ( this == Globals.controlledModel )
+			return;
 			
-			camera.positionSet = instanceInfo.positionGet;
-			//camera.scale = instanceInfo.scale;
-			// track not copied intentionally
-			// Y Axis ok, X is wrong
-			camera.center.setTo( instanceInfo.center.x, instanceInfo.center.y, instanceInfo.center.z );
-			//var ccenter:Vector3D = camera.current.position;
-			//camera.center.setTo( instanceInfo.center.x + ccenter.x, instanceInfo.center.y + ccenter.y, instanceInfo.center.z + ccenter.z );
-			
-			if ( leaveTrail )
-				leaveTrailMarkers();
-				
-			//if ( 20 <= temp )
-			//{
-				//Log.out( "ControllableVoxelModel.update - ii position: " + instanceInfo.positionGet + "  cam position: " + camera.positionGet );
-				//temp = 0;
-			//}
-			//temp++;
-		}
-		
-		protected function collidedHandler( event:CollisionEvent ):void
-		{
-			if ( event.instanceGuid != this.instanceInfo.instanceGuid )
-				return;
-		
-			if ( this == Globals.controlledModel )
-				return;
-				
-			//turn off collision, figure a safe route out, take it!
-			escapeHandler();
-		}
-		
-		protected function escapeHandler():void
-		{
-			Log.out( "ControllableVoxelModel.escapeHandler - GET THE HELL OUT OF HERE" );
-		}
-		
-		override public function setTargetLocation( $loc:Location ):void 
-		{
-			/*
-			 * This is all current broken - not sure what it does, but I think it transfers the motion of the collision model to the player
-			if ( lastCollisionModel )
-			{
-				// Add into your position, the change due to the change in ships position
-				// this takes into account gravity. I am really only trying to maintain the x,z here.
-				// except for when I have a UP transform.
-				loc.positionSet = lastCollisionModel.modelToWorld( positionGetOld );
-				// if we dont use this, then we dont get benifit of gravity
-				//worldSpaceTargetPosition.y = _worldSpacePosition.y;
-				
-				// Add into your rotation, the change due to the change in ships rotation
-				var rotDiff:Vector3D = lastCollisionModel.instanceInfo.rotationGet.subtract( rotationGetOld );
-				if ( false == _sZERO_VEC.nearEquals( rotDiff, 0.01 ) )
-					rotationSet = rotationGet.subtract( rotDiff );
-			}
-			*/
-			
-			// clamp player mouse rotation
-			if ( $loc.rotationGet.x >= 90 )
-				$loc.rotationSet = new Vector3D( 89.99, $loc.rotationGet.y, $loc.rotationGet.z );
-			else if ( $loc.rotationGet.x <= -90 )
-				$loc.rotationSet = new Vector3D( -89.99, $loc.rotationGet.y, $loc.rotationGet.z );
-			
-			// If you are are on solid ground, you cant change the angle of the avatar( or controlled object ) 
-			// other then turning right and left
-			_sScratchMatrix.identity();
-			if ( !onSolidGround )
-				_sScratchMatrix.appendRotation( -$loc.rotationGet.x, Vector3D.X_AXIS );
-			_sScratchMatrix.appendRotation( -$loc.rotationGet.y,   Vector3D.Y_AXIS );
-			
-			var dvMyVelocity:Vector3D = _sScratchMatrix.transformVector( $loc.velocityGet );
-			if ( dvMyVelocity.length )
-			{
-				_sScratchVector.setTo( $loc.positionGet.x, $loc.positionGet.y, $loc.positionGet.z );
-				_sScratchVector.decrementBy( dvMyVelocity );
-				$loc.positionSet = _sScratchVector;
-			}
-			
-			//Log.out( "ControllableVoxelModel.calculateTargetPosition - worldSpaceTargetPosition: " + worldSpaceTargetPosition );
-		}
-		
-		public function fall( $loc:Location, $elapsedTimeMS:int ):void
-		{
-			//Log.out( "Fall PRE: " + $loc.velocityGet.y );
-			if ( mMaxFallRate > $loc.velocityGet.y )
-				$loc.velocitySetComp( $loc.velocityGet.x, $loc.velocityGet.y + (0.0033333333333333 * $elapsedTimeMS) + 0.5, $loc.velocityGet.z );
-			//Log.out( "Fall PST: " + $loc.velocityGet.y );
-		}
-
-		public function jump( mutliplier:Number = 1 ):void
-		{
-			//Log.out( "Jump PRE: " + instanceInfo.velocityGet.y );
-			instanceInfo.addTransform( 0, -8 * mutliplier, 0, 0.1, ModelTransform.VELOCITY );
-			//Log.out( "Jump PST: " + instanceInfo.velocityGet.y );
-		}
-
-		protected function controlledModelChecks( $elapsedTimeMS:Number ):Boolean {
-			// set our next position by adding in velocities
-			// If there is no collision or gravity, this is where the model would end up.
-			var loc:Location = new Location();
-			loc.setTo( instanceInfo );
-			setTargetLocation( loc );
-			//Log.out( "CVM.controlledModelChecks - loc.positionSet: " + loc.positionGet );
-			
-			const STEP_UP_CHECK:Boolean = true;
-			// does model have collision, if no collision, then why bother with gravity
-			if ( instanceInfo.usesCollision )
-			{
-				var timer:int = getTimer();
-				var test:GrainCursorIntersection;
-				//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.FRONT);
-				//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
-				//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.BACK);
-				//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
-				//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.LEFT);
-				//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
-				//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.RIGHT);
-				//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
-				//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.UP);
-				//if ( test )
-					//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
-				//else	
-					//Log.out("CVM.test - findClosestIntersectionInDirection NO MODEL: " );
-				//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.DOWN);
-				//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
-					
-//				Log.out("CVM.test - findClosestIntersectionInDirection took: " + (getTimer() - timer));
-				
-				
-				_collisionCandidates = ModelCacheUtils.whichModelsIsThisInfluencedBy( this )
-				//trace( "collisionTest: " + _collisionCandidates.length )
-				if ( 0 == _collisionCandidates.length )
-				{
-					if ( usesGravity )
-					{
-						fall( loc, $elapsedTimeMS );	
-					}
-					onSolidGround = false;
-					instanceInfo.setTo( loc );
-				}
-				else
-				{
-					for each ( var collisionCandidate:VoxelModel in _collisionCandidates )
-					{
-						// if it collided or failed to step up
-						// restore the previous position
-
-						
-						var restorePoint:int = collisionCheckNew( $elapsedTimeMS, loc, collisionCandidate, STEP_UP_CHECK )
-						if ( -1 < restorePoint )
-						{
-							Globals.g_app.dispatchEvent( new CollisionEvent( CollisionEvent.COLLIDED, this.instanceInfo.instanceGuid ) );
-							instanceInfo.restoreOld( restorePoint );
-							instanceInfo.velocityReset();
-							return false;
-						}
-						// New position is valid
-						else
-							instanceInfo.setTo( loc );
-					}
-				}
-			}
-			else
-				instanceInfo.setTo( loc );
-			
-			return true;
-		}
-		
+		//turn off collision, figure a safe route out, take it!
+		escapeHandler();
+	}
+	
+	protected function escapeHandler():void
+	{
+		Log.out( "ControllableVoxelModel.escapeHandler - GET THE HELL OUT OF HERE" );
+	}
+	
+	override public function setTargetLocation( $loc:Location ):void 
+	{
 		/*
-		 * Checks whether this $loc is valid, meaning none of the object's collision points
-		 * are in a solid oxel. This is the most basic approach. The model just stops if it collides.
-		 * $loc: 				Copy of the avatar's location object
-		 * $collisionCandidate: The voxel model to collide with
-		 * $stepUpCheck: 		True if the model should try to step up after colliding (Player Only)
-		 * returns -1 if new position is valid, returns 0-2 if there was collision
-		 * 0-2 is the number of steps back to take in position queue
-		*/ 
-		
-		protected function collisionCheckNew( $elapsedTimeMS:Number, $loc:Location, $collisionCandidate:VoxelModel, $stepUpCheck:Boolean = false ):int {
-			//Log.out( "ControllableVoxelModel.collisionCheckNew - ENTER" );
-			// reset all the points to be in a non collided state
-			if ( _ct.hasPoints() )
-			{
-				_ct.setValid();
-				var points:Vector.<CollisionPoint> = _ct.collisionPoints();
-				for each ( var cp:CollisionPoint in points )
-				{
-					// takes the CollisionPoint's point which is in model space, and puts it in world space
-					var posWs:Vector3D = $loc.modelToWorld( cp.point );
-					// pass in the world space coordinate to get back whether the oxel at the location is solid
-					$collisionCandidate.isSolidAtWorldSpace( cp, posWs, MIN_COLLISION_GRAIN );
-					// if collided, increment the count on that collision point set
-					if ( true == cp.collided )
-					{
-						return 1;
-					}
-				}
-			}
-			// if no points or no collision, return -1 success!
-			return -1;
-		}
-		
-		protected function startEngines( val:Number, name:String = "" ):void
+		 * This is all current broken - not sure what it does, but I think it transfers the motion of the collision model to the player
+		if ( lastCollisionModel )
 		{
-		}
-		
-		protected function stopEngines():void
-		{
-		}
-		
-		// This is for direct control of model, such as in the voxel bomber.
-		override protected function onKeyDown(e:KeyboardEvent):void 
-		{
-			super.onKeyDown( e );
-			switch (e.keyCode) {
-				case 87: case Keyboard.UP:
-					throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, instanceInfo.instanceGuid, _accelRate ) );
-					break;
-				case 83: case Keyboard.DOWN: 
-					throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, instanceInfo.instanceGuid, -_accelRate ) );
-					break;
-			}
-        }
-		
-		private var  	count:int 			= 0;
-		private function leaveTrailMarkers():void
-		{
-			if ( 0 == count % 20 )
-			{
-				// Take the center of the oxel, and collide around it
-				var offsetMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone()
-				var centerLoc:Vector3D = instanceInfo.center;
-				offsetMatrix.prependTranslation( centerLoc.x, 0, centerLoc.z );
-				var wsCenter:Vector3D =  offsetMatrix.position;
-				
-				var trailMarker:InstanceInfo = new InstanceInfo();
-				trailMarker.modelGuid = "1MeterRedBlock";
-				trailMarker.dynamicObject = true;
-				trailMarker.scale = new Vector3D( 0.25, 0.25, 0.25 );
-				trailMarker.positionSet = wsCenter;
-				trailMarker.addTransform( 0, 0, 0, 10, ModelTransform.LIFE );
-				
-				ModelMakerBase.load( trailMarker );
-			}
-			count++;
-		}
-		
-		public function get leaveTrail():Boolean 
-		{
-			return _leaveTrail;
-		}
-		
-		public function set leaveTrail(value:Boolean):void 
-		{
-			_leaveTrail = value;
-		}
-		
-		public function get collisionMarkers():Boolean 
-		{
-			return _displayCollisionMarkers;
-		}
-		
-		public function set collisionMarkers($value:Boolean):void 
-		{
-			if ( $value )
-				_ct.markersAdd();
-			else
-				_ct.markersRemove();
-
-			_displayCollisionMarkers = $value;
-		}
-		
-		override public function updateVelocity( $elapsedTimeMS:int, $clipFactor:Number ):Boolean
-		{
-			var changed:Boolean = false;
+			// Add into your position, the change due to the change in ships position
+			// this takes into account gravity. I am really only trying to maintain the x,z here.
+			// except for when I have a UP transform.
+			loc.positionSet = lastCollisionModel.modelToWorld( positionGetOld );
+			// if we dont use this, then we dont get benifit of gravity
+			//worldSpaceTargetPosition.y = _worldSpacePosition.y;
 			
-			// if app is not active, we still need to clip velocitys, but we dont need keyboard or mouse movement
-			if ( this == Globals.controlledModel && Globals.active )
+			// Add into your rotation, the change due to the change in ships rotation
+			var rotDiff:Vector3D = lastCollisionModel.instanceInfo.rotationGet.subtract( rotationGetOld );
+			if ( false == _sZERO_VEC.nearEquals( rotDiff, 0.01 ) )
+				rotationSet = rotationGet.subtract( rotDiff );
+		}
+		*/
+		
+		// clamp player mouse rotation
+		if ( $loc.rotationGet.x >= 90 )
+			$loc.rotationSet = new Vector3D( 89.99, $loc.rotationGet.y, $loc.rotationGet.z );
+		else if ( $loc.rotationGet.x <= -90 )
+			$loc.rotationSet = new Vector3D( -89.99, $loc.rotationGet.y, $loc.rotationGet.z );
+		
+		// If you are are on solid ground, you cant change the angle of the avatar( or controlled object ) 
+		// other then turning right and left
+		_sScratchMatrix.identity();
+		if ( !onSolidGround )
+			_sScratchMatrix.appendRotation( -$loc.rotationGet.x, Vector3D.X_AXIS );
+		_sScratchMatrix.appendRotation( -$loc.rotationGet.y,   Vector3D.Y_AXIS );
+		
+		var dvMyVelocity:Vector3D = _sScratchMatrix.transformVector( $loc.velocityGet );
+		if ( dvMyVelocity.length )
+		{
+			_sScratchVector.setTo( $loc.positionGet.x, $loc.positionGet.y, $loc.positionGet.z );
+			_sScratchVector.decrementBy( dvMyVelocity );
+			$loc.positionSet = _sScratchVector;
+		}
+		
+		//Log.out( "ControllableVoxelModel.calculateTargetPosition - worldSpaceTargetPosition: " + worldSpaceTargetPosition );
+	}
+	
+	public function fall( $loc:Location, $elapsedTimeMS:int ):void
+	{
+		//Log.out( "Fall PRE: " + $loc.velocityGet.y );
+		if ( mMaxFallRate > $loc.velocityGet.y )
+			$loc.velocitySetComp( $loc.velocityGet.x, $loc.velocityGet.y + (0.0033333333333333 * $elapsedTimeMS) + 0.5, $loc.velocityGet.z );
+		//Log.out( "Fall PST: " + $loc.velocityGet.y );
+	}
+
+	public function jump( mutliplier:Number = 1 ):void
+	{
+		//Log.out( "Jump PRE: " + instanceInfo.velocityGet.y );
+		instanceInfo.addTransform( 0, -8 * mutliplier, 0, 0.1, ModelTransform.VELOCITY );
+		//Log.out( "Jump PST: " + instanceInfo.velocityGet.y );
+	}
+
+	protected function controlledModelChecks( $elapsedTimeMS:Number ):Boolean {
+		// set our next position by adding in velocities
+		// If there is no collision or gravity, this is where the model would end up.
+		var loc:Location = new Location();
+		loc.setTo( instanceInfo );
+		setTargetLocation( loc );
+		//Log.out( "CVM.controlledModelChecks - loc.positionSet: " + loc.positionGet );
+		
+		const STEP_UP_CHECK:Boolean = true;
+		// does model have collision, if no collision, then why bother with gravity
+		if ( instanceInfo.usesCollision )
+		{
+			var timer:int = getTimer();
+			var test:GrainCursorIntersection;
+			//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.FRONT);
+			//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
+			//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.BACK);
+			//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
+			//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.LEFT);
+			//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
+			//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.RIGHT);
+			//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
+			//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.UP);
+			//if ( test )
+				//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
+			//else	
+				//Log.out("CVM.test - findClosestIntersectionInDirection NO MODEL: " );
+			//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.DOWN);
+			//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
+				
+//				Log.out("CVM.test - findClosestIntersectionInDirection took: " + (getTimer() - timer));
+			
+			
+			_collisionCandidates = ModelCacheUtils.whichModelsIsThisInfluencedBy( this )
+			//trace( "collisionTest: " + _collisionCandidates.length )
+			if ( 0 == _collisionCandidates.length )
 			{
-				var vel:Vector3D = instanceInfo.velocityGet;
-				var speedVal:Number = instanceInfo.speed( $elapsedTimeMS ) / 4;
-				
-				// Add in movement factors
-				if ( MouseKeyboardHandler.forward )	{ 
-					if ( instanceInfo.velocityGet.length < mMaxSpeed ) {
-						instanceInfo.velocitySetComp( vel.x, vel.y, vel.z + speedVal ); 
-						changed = true; 
-						mForward = true; 
-					}
-				}
-				else { 
-					mForward = false; 
-				}
-				
-				if ( MouseKeyboardHandler.backward )	{ instanceInfo.velocitySetComp( vel.x, vel.y, vel.z - speedVal ); changed = true; }
-				if ( MouseKeyboardHandler.leftSlide )	{ instanceInfo.velocitySetComp( vel.x + speedVal, vel.y, vel.z ); changed = true; }
-				if ( MouseKeyboardHandler.rightSlide )	{ instanceInfo.velocitySetComp( vel.x - speedVal, vel.y, vel.z ); changed = true; }
-				if ( MouseKeyboardHandler.down )	  	{ instanceInfo.velocitySetComp( vel.x, vel.y + speedVal, vel.z ); changed = true; }
-				if ( MouseKeyboardHandler.up )
+				if ( usesGravity )
 				{
-					if ( Globals.controlledModel && Globals.controlledModel.usesGravity )
+					fall( loc, $elapsedTimeMS );	
+				}
+				onSolidGround = false;
+				instanceInfo.setTo( loc );
+			}
+			else
+			{
+				for each ( var collisionCandidate:VoxelModel in _collisionCandidates )
+				{
+					// if it collided or failed to step up
+					// restore the previous position
+
+					
+					var restorePoint:int = collisionCheckNew( $elapsedTimeMS, loc, collisionCandidate, STEP_UP_CHECK )
+					if ( -1 < restorePoint )
 					{
-						// Idea here is to keep the player from jumping unless their feet are on the ground.
-						// If you wanted to add rocket boots, this is where is what it would effect
-						if ( onSolidGround )
-						{
-							jump( 2 );
-							changed = true;
-						}
+						Globals.g_app.dispatchEvent( new CollisionEvent( CollisionEvent.COLLIDED, this.instanceInfo.instanceGuid ) );
+						instanceInfo.restoreOld( restorePoint );
+						instanceInfo.velocityReset();
+						return false;
 					}
-					else 
+					// New position is valid
+					else
+						instanceInfo.setTo( loc );
+				}
+			}
+		}
+		else
+			instanceInfo.setTo( loc );
+		
+		return true;
+	}
+	
+	/*
+	 * Checks whether this $loc is valid, meaning none of the object's collision points
+	 * are in a solid oxel. This is the most basic approach. The model just stops if it collides.
+	 * $loc: 				Copy of the avatar's location object
+	 * $collisionCandidate: The voxel model to collide with
+	 * $stepUpCheck: 		True if the model should try to step up after colliding (Player Only)
+	 * returns -1 if new position is valid, returns 0-2 if there was collision
+	 * 0-2 is the number of steps back to take in position queue
+	*/ 
+	
+	protected function collisionCheckNew( $elapsedTimeMS:Number, $loc:Location, $collisionCandidate:VoxelModel, $stepUpCheck:Boolean = false ):int {
+		//Log.out( "ControllableVoxelModel.collisionCheckNew - ENTER" );
+		// reset all the points to be in a non collided state
+		if ( _ct.hasPoints() )
+		{
+			_ct.setValid();
+			var points:Vector.<CollisionPoint> = _ct.collisionPoints();
+			for each ( var cp:CollisionPoint in points )
+			{
+				// takes the CollisionPoint's point which is in model space, and puts it in world space
+				var posWs:Vector3D = $loc.modelToWorld( cp.point );
+				// pass in the world space coordinate to get back whether the oxel at the location is solid
+				$collisionCandidate.isSolidAtWorldSpace( cp, posWs, MIN_COLLISION_GRAIN );
+				// if collided, increment the count on that collision point set
+				if ( true == cp.collided )
+				{
+					return 1;
+				}
+			}
+		}
+		// if no points or no collision, return -1 success!
+		return -1;
+	}
+	
+	protected function startEngines( val:Number, name:String = "" ):void
+	{
+	}
+	
+	protected function stopEngines():void
+	{
+	}
+	
+	// This is for direct control of model, such as in the voxel bomber.
+	override protected function onKeyDown(e:KeyboardEvent):void 
+	{
+		super.onKeyDown( e );
+		switch (e.keyCode) {
+			case 87: case Keyboard.UP:
+				throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, instanceInfo.instanceGuid, _accelRate ) );
+				break;
+			case 83: case Keyboard.DOWN: 
+				throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, instanceInfo.instanceGuid, -_accelRate ) );
+				break;
+		}
+	}
+	
+	private var  	count:int 			= 0;
+	private function leaveTrailMarkers():void
+	{
+		if ( 0 == count % 20 )
+		{
+			// Take the center of the oxel, and collide around it
+			var offsetMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone()
+			var centerLoc:Vector3D = instanceInfo.center;
+			offsetMatrix.prependTranslation( centerLoc.x, 0, centerLoc.z );
+			var wsCenter:Vector3D =  offsetMatrix.position;
+			
+			var trailMarker:InstanceInfo = new InstanceInfo();
+			trailMarker.modelGuid = "1MeterRedBlock";
+			trailMarker.dynamicObject = true;
+			trailMarker.scale = new Vector3D( 0.25, 0.25, 0.25 );
+			trailMarker.positionSet = wsCenter;
+			trailMarker.addTransform( 0, 0, 0, 10, ModelTransform.LIFE );
+			
+			ModelMakerBase.load( trailMarker );
+		}
+		count++;
+	}
+	
+	public function get leaveTrail():Boolean 
+	{
+		return _leaveTrail;
+	}
+	
+	public function set leaveTrail(value:Boolean):void 
+	{
+		_leaveTrail = value;
+	}
+	
+	public function get collisionMarkers():Boolean 
+	{
+		return _displayCollisionMarkers;
+	}
+	
+	public function set collisionMarkers($value:Boolean):void 
+	{
+		if ( $value )
+			_ct.markersAdd();
+		else
+			_ct.markersRemove();
+
+		_displayCollisionMarkers = $value;
+	}
+	
+	override public function updateVelocity( $elapsedTimeMS:int, $clipFactor:Number ):Boolean
+	{
+		var changed:Boolean = false;
+		
+		// if app is not active, we still need to clip velocitys, but we dont need keyboard or mouse movement
+		if ( this == Globals.controlledModel && Globals.active )
+		{
+			var vel:Vector3D = instanceInfo.velocityGet;
+			var speedVal:Number = instanceInfo.speed( $elapsedTimeMS ) / 4;
+			
+			// Add in movement factors
+			if ( MouseKeyboardHandler.forward )	{ 
+				if ( instanceInfo.velocityGet.length < mMaxSpeed ) {
+					instanceInfo.velocitySetComp( vel.x, vel.y, vel.z + speedVal ); 
+					changed = true; 
+					mForward = true; 
+				}
+			}
+			else { 
+				mForward = false; 
+			}
+			
+			if ( MouseKeyboardHandler.backward )	{ instanceInfo.velocitySetComp( vel.x, vel.y, vel.z - speedVal ); changed = true; }
+			if ( MouseKeyboardHandler.leftSlide )	{ instanceInfo.velocitySetComp( vel.x + speedVal, vel.y, vel.z ); changed = true; }
+			if ( MouseKeyboardHandler.rightSlide )	{ instanceInfo.velocitySetComp( vel.x - speedVal, vel.y, vel.z ); changed = true; }
+			if ( MouseKeyboardHandler.down )	  	{ instanceInfo.velocitySetComp( vel.x, vel.y + speedVal, vel.z ); changed = true; }
+			if ( MouseKeyboardHandler.up )
+			{
+				if ( Globals.controlledModel && Globals.controlledModel.usesGravity )
+				{
+					// Idea here is to keep the player from jumping unless their feet are on the ground.
+					// If you wanted to add rocket boots, this is where is what it would effect
+					if ( onSolidGround )
 					{
-						instanceInfo.velocitySetComp( vel.x, vel.y - speedVal, vel.z )
+						jump( 2 );
 						changed = true;
 					}
 				}
+				else 
+				{
+					instanceInfo.velocitySetComp( vel.x, vel.y - speedVal, vel.z )
+					changed = true;
+				}
 			}
-			
-			// clip factor can scale quickly when diving.
-			// so if it increases the speed, make sure speed is not over max
-			if ( $clipFactor < 1 )
-				instanceInfo.velocityScaleBy( $clipFactor );
-			else
-			{
-				if ( instanceInfo.velocityGet.length < mMaxSpeed ) 				
-					instanceInfo.velocityScaleBy( $clipFactor );
-			}
-			
-			instanceInfo.velocityClip();
-			
-			//trace( "InstanceInfo.updateVelocity: " + velocity );
-			return changed;	
 		}
+		
+		// clip factor can scale quickly when diving.
+		// so if it increases the speed, make sure speed is not over max
+		if ( $clipFactor < 1 )
+			instanceInfo.velocityScaleBy( $clipFactor );
+		else
+		{
+			if ( instanceInfo.velocityGet.length < mMaxSpeed ) 				
+				instanceInfo.velocityScaleBy( $clipFactor );
+		}
+		
+		instanceInfo.velocityClip();
+		
+		//trace( "InstanceInfo.updateVelocity: " + velocity );
+		return changed;	
 	}
+}
 }

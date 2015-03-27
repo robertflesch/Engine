@@ -123,8 +123,13 @@ public class InstanceInfo extends Location	{
 		}
 	}
 	
+	public function buildExportObject( obj:Object ):Object {
+		var instObject:Object = new Object();
+		instObject.model = getJSON();
+		return instObject;
+	}
 	
-	public function toJSON(k:*):* 
+	public function getJSON():Object 
 	{ 
 		return {
 				center: 		center,
@@ -139,36 +144,28 @@ public class InstanceInfo extends Location	{
 				rotation: 		rotationGet,
 				velocity: 		velocityGet,
 				scale: 			scale,
-				script: 		instanceScriptOnly,
+				script: 		instanceScriptOnly(),
 				state:			_state,
 				transforms:		_transforms
 //				shader:			_shader,
 				};
 	} 	
 	
-	private function instanceScriptOnly():String {
+	private function instanceScriptOnly():Vector.<Object> {
 		
-		var scripts:Vector.<String> = new Vector.<String>;
+		var oa:Vector.<Object> = new Vector.<Object>();
+		var len:int = _scripts.length;
 		for each ( var script:Script in _scripts ) {
-			if ( !script.modelScript )
-				scripts.push( JSON.stringify( script ) );	
+		if ( !script.modelScript ) {
+				var so:Object = new Object();
+				so.name = Script.getCurrentClassName( script );
+				Log.out( "InstanceInfo.instanceScriptOnly - script: " + script );
+				oa.push( so );
+			}
 		}
-		
-		var outString:String = "";
-		var len:int = scripts.length;
-		Log.out( "InstanceInfo.instanceScriptOnly ---------------------------------------------------" );
-		for ( var index:int; index < len; index++ ) {
-			outString += scripts[index];
-			Log.out( "InstanceInfo.instanceScriptOnly - script: " + scripts[index] );
-			// if this is NOT the last element in the array, add a comma to it.
-			if ( index == len - 1 )
-				continue;
-			outString += ",";
-		}
-		Log.out( "InstanceInfo.instanceScriptOnly ---------------------------------------------------" );
-		return outString;
-		
+		return oa;
 	}
+	
 	
 	public function InstanceInfo() 
 	{ 

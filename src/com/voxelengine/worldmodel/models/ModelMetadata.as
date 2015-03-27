@@ -25,6 +25,8 @@ import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.Permissions;
+
 /**
  * ...
  * @author Robert Flesch - RSF
@@ -42,17 +44,11 @@ public class ModelMetadata
 	private var _dbo:DatabaseObject;
 	private var _createdDate:Date;
 	private var _modifiedDate:Date;
+	private var _permissions:Permissions = new Permissions();
 
-	// Permissions
-	// http://wiki.secondlife.com/wiki/Permission
-	// move is more of a region type permission
-	private var _template:Boolean       = false;
-	private var _templateGuid:String	= "";
-	private var _copy:Boolean			= true;
-	private var _copyCount:int 			= COPY_COUNT_INFINITE;
-	private var _modify:Boolean 		= true;
-	private var _transfer:Boolean 		= true;
-
+	public function get permissions():Permissions 		{ return _permissions; }
+	public function set permissions( val:Permissions):void	{ _permissions = val; }
+	
 	public function get name():String  					{ return _name; }
 	public function set name(value:String):void  		{ _name = value; }
 	
@@ -62,41 +58,17 @@ public class ModelMetadata
 	public function get owner():String  				{ return _owner; }
 	public function set owner(value:String):void  		{ _owner = value; }
 	
-	public function get template():Boolean  			{ return _template; }
-	public function set template(value:Boolean):void  	{ _template = value; }
-	
-	public function get templateGuid():String  			{ return _templateGuid; }
-	public function set templateGuid(value:String):void { _templateGuid = value; }
-
-	public function get copy():Boolean 					{ return _copy; }
-	public function set copy(val:Boolean):void			{ _copy = val; }
-	
-	public function get modify():Boolean 				{ return _modify; }
-	public function set modify(value:Boolean):void 		{ _modify = value; }
-	
-	public function get modelGuid():String 					{ return _modelGuid; }
-	public function set modelGuid(value:String):void  		{ _modelGuid = value; }
+	public function get modelGuid():String 				{ return _modelGuid; }
+	public function set modelGuid(value:String):void  	{ _modelGuid = value; }
 	
 	public function get thumbnail():BitmapData 			{ return _thumbnail; }
-	public function set thumbnail(value:BitmapData):void{ _thumbnail = value; }
-	
-	public function get copyCount():int  				{ return _copyCount; }
-	public function set copyCount(value:int):void  		{ _copyCount = value; }
-	
-	public function get transfer():Boolean  			{ return _transfer; }
-	public function set transfer(value:Boolean):void  	{ _transfer = value; }
-	
-	public function get createdDate():Date 				{ return _createdDate; }
-	public function set createdDate(value:Date):void 	{ _createdDate = value; }
+	public function set thumbnail(value:BitmapData):void { _thumbnail = value; }
 	
 	public function get modifiedDate():Date 			{ return _modifiedDate; }
 	public function set modifiedDate(value:Date):void  	{ _modifiedDate = value; }
 	
 	public function get dbo():DatabaseObject 			{ return _dbo; }
 	public function set dbo(value:DatabaseObject):void 	{ _dbo = value; }
-	
-	public function get creator():String 				{ return _creator; }
-	public function set creator(value:String):void  	{ _creator = value; }
 	
 	public function toString():String {
 		return "name: " + _name + "  description: " + _description + "  guid: " + _modelGuid + "  owner: " + _owner;
@@ -120,16 +92,15 @@ public class ModelMetadata
 		name 			= $vmm.name;
 		description 	= $vmm.description;
 		owner 			= $vmm.owner;
-		creator 		= $vmm.creator;
 		thumbnail 		= $vmm.thumbnail;
-		
-		template		= $vmm.template;
-		templateGuid	= $vmm.templateGuid;
-		copy			= $vmm.copy;
-		copyCount		= $vmm.copyCount;
-		modify			= $vmm.modify;
-		transfer		= $vmm.transfer;
-		
+Log.out( "ModelMetadata.update - How do I handler permissions here?", Log.WARN );
+		//creator 		= $vmm.creator;
+		//template		= $vmm.template;
+		//templateGuid	= $vmm.templateGuid;
+		//copy			= $vmm.copy;
+		//copyCount		= $vmm.copyCount;
+		//modify		= $vmm.modify;
+		//transfer		= $vmm.transfer;
 	}
 	
 	public function createInstanceOfTemplate():ModelMetadata {
@@ -138,18 +109,10 @@ public class ModelMetadata
 		newVmm.name 			= new String( _name );
 		newVmm.description 		= new String( _description );
 		newVmm.owner 			= new String( _owner );
-		newVmm.creator			= creator
 		newVmm.thumbnail		= thumbnail;
 		
 		newVmm._dbo				= null;
-		newVmm.createdDate		= new Date( _createdDate );
-		newVmm.modifiedDate		= new Date();
-		newVmm.template			= false
-		newVmm.templateGuid		= new String ( _modelGuid );
-		newVmm.copy				= copy;
-		newVmm.copyCount		= copyCount;
-		newVmm.modify			= modify;
-		newVmm.transfer			= transfer;
+		newVmm.permissions		= _permissions.clone();
 		
 		return newVmm;
 	}
@@ -161,25 +124,18 @@ public class ModelMetadata
 	
 	public function toObject():Object {
 		
-		return { name: _name
-			   , description: _description
-			   , owner: _owner
-			   , creator: _creator
-			   , template: _template
-			   , templateGuid: _templateGuid
-			   , copy: _copy
-			   , copyCount: _copyCount
-			   , modify: _modify
-			   , transfer: _transfer
-			   , createdDate: _createdDate
-			   , modifiedDate: _modifiedDate
-			   , thumbnail: thumbnail }
+		var metadataObj:Object =  { name: _name
+								  , description: _description
+								  , owner: _owner
+								  , creator: _creator
+								  , createdDate: _createdDate
+								  , modifiedDate: _modifiedDate
+								  , thumbnail: thumbnail }
+								  
+		metadataObj = _permissions.addToObject( metadataObj );
+		return metadataObj;						   
 	}
 	
-	//public function toJSONString():String {
-		//
-		//return JSON.stringify( this );
-	//}
 
 	// This was private, force a message to be sent to it. 
 	// But the voxelModel has a handle to it, seems silly to have to propgate it every where, so its public
@@ -248,14 +204,9 @@ public class ModelMetadata
 		_dbo.description	= _description;
 		_dbo.owner			= _owner;
 		_dbo.creator		= _creator;
-		_dbo.template		= _template;
-		_dbo.templateGuid	= _templateGuid;
-		_dbo.copy			= _copy;
-		_dbo.copyCount		= _copyCount;
-		_dbo.modify			= _modify;
-		_dbo.transfer		= _transfer;
 		_dbo.createdDate	= _createdDate;
 		_dbo.modifiedDate   = new Date();
+		_permissions.dboSetInfo( _dbo );
 		if ( thumbnail )
 			_dbo.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
 		else
@@ -272,12 +223,7 @@ public class ModelMetadata
 		_description	= $dbo.description;
 		_owner			= $dbo.owner;
 		_creator		= $dbo.creator;
-		_template		= $dbo.template;
-		_templateGuid	= $dbo.templateGuid;
-		_copy			= $dbo.copy;
-		_copyCount		= $dbo.copyCount;
-		_modify			= $dbo.modify;
-		_transfer		= $dbo.transfer;
+		_permissions.fromDbo( $dbo );
 		_modelGuid 			= $dbo.key;
 		_createdDate	= $dbo.createdDate;
 		_modifiedDate   = $dbo.modifiedDate;

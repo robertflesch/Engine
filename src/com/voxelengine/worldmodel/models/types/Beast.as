@@ -114,18 +114,18 @@ package com.voxelengine.worldmodel.models.types
 				trace( "Beast - NO Beast Json INFO FOUND" );
 		}
 		
-		override protected function addClassJson():String {
-			var jsonString:String = super.addClassJson();
-			jsonString += ",";
-			jsonString += "\"beast\": { "
-			jsonString += "\"moveSpeed\" : " + (mMoveSpeed * 10000) + ",";
-			jsonString += "\"maxTurnRate\" : " + (mMaxTurnRate / 100) + ",";
-			jsonString += "\"maxClimbAngle\" : " + mMaxClimbAngle + ",";
-			jsonString += "\"climbRate\" : " + (mClimbRate * 100) + ",";
-			jsonString += "\"seatLocation\" : " + JSON.stringify( _seatLocation );
-			jsonString += "}";
-			return jsonString;
-		}
+		//override protected function addClassJson():String {
+			//var jsonString:String = super.addClassJson();
+			//jsonString += ",";
+			//jsonString += "\"beast\": { "
+			//jsonString += "\"moveSpeed\" : " + (mMoveSpeed * 10000) + ",";
+			//jsonString += "\"maxTurnRate\" : " + (mMaxTurnRate / 100) + ",";
+			//jsonString += "\"maxClimbAngle\" : " + mMaxClimbAngle + ",";
+			//jsonString += "\"climbRate\" : " + (mClimbRate * 100) + ",";
+			//jsonString += "\"seatLocation\" : " + JSON.stringify( _seatLocation );
+			//jsonString += "}";
+			//return jsonString;
+		//}
 		
 		
 		override protected function collisionPointsAdd():void {

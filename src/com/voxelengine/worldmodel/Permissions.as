@@ -5,11 +5,11 @@ displays and printed documentation which are original works of
 authorship protected under United States Copyright Act.
 Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
-package com.voxelengine.worldmodel.animation
+package com.voxelengine.worldmodel
 {
-	import com.voxelengine.server.Network;
-	import playerio.DatabaseObject;
+import playerio.DatabaseObject;
 
+import com.voxelengine.server.Network;
 /**
  * ...
  * @author Robert Flesch - RSF 
@@ -35,6 +35,43 @@ public class Permissions
 	private var _creator:String 		= Network.userId;;	// The guid of the original creator
 	private var _created:Date			= new Date();		// Date created
 	private var _binding:String			= BIND_NONE;		// Bind type (see above)
+	private var _blueprint:Boolean		= false;			// is this only a blue print for other objects.
+	
+	public function get templateGuid():String  			{ return _templateGuid; }
+	public function set templateGuid(value:String):void { _templateGuid = value; }
+
+	public function get modify():Boolean 				{ return _modify; }
+	public function set modify(value:Boolean):void 		{ _modify = value; }
+	
+	public function get copyCount():int  				{ return _copyCount; }
+	public function set copyCount(value:int):void  		{ _copyCount = value; }
+	
+	public function get created():Date 					{ return _created; }
+	public function set created(value:Date):void 		{ _created = value; }
+	
+	public function get creator():String 				{ return _creator; }
+	public function set creator(value:String):void  	{ _creator = value; }
+	
+	public function get binding():String 				{ return _binding; }
+	public function set binding(value:String):void  	{ _binding = value; }
+	
+	public function get blueprint():Boolean 				{ return _blueprint; }
+	public function set blueprint(value:Boolean):void 		{ _blueprint = value; }
+	
+	public function Permissions() {
+		
+	}
+	
+	public function clone():Permissions {
+		var newP:Permissions = new Permissions();
+		newP.copyCount 		= _copyCount;
+		newP.modify			= _modify;
+		newP.templateGuid	= new String( _templateGuid );
+		newP.creator		= new String( _creator );
+		newP.created		= new Date( _created );
+		newP.binding		= new String( _binding );
+		return newP;
+	}
 	
 	public function dboSetInfo( _dbo:DatabaseObject ):void {
 		_dbo.copyCount 		= _copyCount;

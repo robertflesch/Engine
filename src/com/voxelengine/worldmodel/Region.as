@@ -164,7 +164,9 @@ package com.voxelengine.worldmodel
 			
 			addEventListeners();
 			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_BEGUN, 0, guid ) );
+			// old style uses region.
 			var count:int = loadRegionObjects(_JSON.region);
+			count += loadRegionObjects(_JSON.models);
 			
 
 			if ( 0 == count ) {
@@ -433,35 +435,29 @@ package com.voxelengine.worldmodel
 			_dbo.data 			= asByteArray( ba );
 		}
 		
-		public function getJSON():String {
-			var outString:String = "{\"region\":";
+		public function buildExportObject( obj:Object ):Object {
 			if ( _modelCache ) {
-				outString += "[";
-				outString += _modelCache.getJSON();
-				outString += "],"
+				obj = _modelCache.buildExportObject( obj );
 			}
 			else {
 				// If the region has not been loaded yet, just copy the props over.
-				outString += JSON.stringify( _JSON.region );
-				outString += ","
+				obj.models = _JSON.models
 			}
 			// if you dont do it this way, there is a null at begining of string
-			outString += "\"skyColor\":" + JSON.stringify( _skyColor );
-			outString += ","
-			outString += "\"playerPosition\":" + JSON.stringify( _playerPosition );
-			outString += ","
-			outString += "\"playerRotation\":" + JSON.stringify( _playerRotation );
-			outString += ","
-			outString += "\"gravity\":" + JSON.stringify(gravity);
-			outString += "}"
-			return outString;
+			obj.skyColor = _skyColor;
+			obj.playerPosition = _playerPosition;
+			obj.playerRotation = _playerRotation;
+			obj.gravity = gravity;
+			return obj;
 		}
 
 
 		public function asByteArray( $ba:ByteArray ):ByteArray {
-			var regionJson:String = getJSON();
-			$ba.writeInt( regionJson.length );
-			$ba.writeUTFBytes( regionJson );
+			var obj:Object = new Object();
+			obj = buildExportObject( obj );
+			var json:String = JSON.stringify( obj );
+			$ba.writeInt( json.length );
+			$ba.writeUTFBytes( json );
 			$ba.compress();
 			
 			return $ba;	

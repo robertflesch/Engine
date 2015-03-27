@@ -1,5 +1,5 @@
 /*==============================================================================
-Copyright 2011-2013 Robert Flesch
+Copyright 2011-2015 Robert Flesch
 All rights reserved.  This product contains computer programs, screen
 displays and printed documentation which are original works of
 authorship protected under United States Copyright Act.
@@ -7,29 +7,18 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.animation
 {
-import com.voxelengine.events.AnimationMetadataEvent;
-import com.voxelengine.events.LoadingEvent;
-import com.voxelengine.events.PersistanceEvent;
-import com.voxelengine.server.Network;
-import com.voxelengine.utils.JSONUtil;
-import flash.events.Event;
-import flash.events.IOErrorEvent;
-import flash.net.URLRequest;
 import flash.utils.ByteArray;
-import flash.utils.Dictionary;
 import playerio.DatabaseObject;
 
-import com.voxelengine.utils.StringUtils;
-
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.utils.CustomURLLoader;
+import com.voxelengine.Globals;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.events.AnimationMetadataEvent;
 
 /**
  * ...
  * @author Robert Flesch - RSF 
- * The world model holds the active oxels
+ * 
  */
 public class Animation
 {
@@ -47,55 +36,44 @@ public class Animation
 	private var _loaded:Boolean = false;
 	private var _transforms:Vector.<AnimationTransform>;
 	private var _attachments:Vector.<AnimationAttachment>;
+	private var _metadata:AnimationMetadata = new AnimationMetadata();
 	private var _sound:AnimationSound;
-	private var _type:String;
-	// For loading local files only
-	public var ownerGuid:String;
-	
-	private var _metadata:AnimationMetadata;
 
 	public function get attachments():Vector.<AnimationAttachment> { return _attachments; }
-
 	public function get transforms():Vector.<AnimationTransform> { return _transforms; }
 	public function get loaded():Boolean { return _loaded; }
 	public function get metadata():AnimationMetadata { return _metadata; }
 	
-	public function Animation() { _metadata = new AnimationMetadata() }
+	public function Animation() {  }
 	
 	public function loadFromPersistance( $dbo:DatabaseObject ):void {
 		metadata.fromPersistance( $dbo );
 	}
 	
-	public function fromImport( $json:Object, $guid:String, $modelGuid:String ):void 
-	{
+	public function fromImport( $json:Object, $guid:String, $modelGuid:String ):void  {
 		_metadata.fromImport( $guid, $modelGuid );
 		fromJSON( $json );
 	}
 	
-	public function fromJSON( $json:Object ):void 
-	{
-		if ( $json.sound )
-		{
+	public function fromJSON( $json:Object ):void  {
+		if ( $json.sound ) {
 			_sound = new AnimationSound();
 			_sound.init( $json.sound );
 		}
-		if ( $json.attachment )
-		{
+		if ( $json.attachment ) {
 			_attachments = new Vector.<AnimationAttachment>;
 			for each ( var attachmentJson:Object in $json.attachment )
 			{
 				_attachments.push( new AnimationAttachment( attachmentJson ) );				
 			}
 		}
-		if ( $json.animation )
-		{
+		if ( $json.animation ) {
 			_transforms = new Vector.<AnimationTransform>;
 			for each ( var transformJson:Object in $json.animation )
 			{
 				_transforms.push( new AnimationTransform( transformJson ) );				
 			}
 		}
-		
 		//LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.ANIMATION_LOAD_COMPLETE, name ) );
 	}
 	
@@ -109,34 +87,6 @@ public class Animation
 		fromJSON( json );
 	}
 	
-	/*
-	public function getModelJson( outString:String ):String {
-		var count:int = 0;
-		//for each ( var vm:VoxelModel in _modelInstances )
-		//	count++;
-		var instanceData:Vector.<String> = new Vector.<String>;
-			
-		for each ( var instance:VoxelModel in _modelInstances )
-		{
-			if ( instance  )
-			{
-				if ( instance is Player )
-					continue;
-				instanceData.push( instance.getJSON() );	
-			}
-		}
-		
-		var len:int = instanceData.length;
-		for ( var index:int; index < len; index++ ) {
-			outString += instanceData[index];
-			if ( index == len - 1 )
-				continue;
-			outString += ",";
-		}
-		return outString;
-	}
-	*/
-
 	private function getJSON():String
 	{
 		var jsonString:String = "{";
@@ -158,7 +108,6 @@ public class Animation
 			jsonString += animationsToJSON();
 			jsonString += "]"
 		}
-
 		jsonString += "}";
 		//Log.out( Animation.getJSON - name + " = " + jsonString );
 		return jsonString;
@@ -202,45 +151,34 @@ public class Animation
 		return outString;
 	}
 	
-	public function play( $owner:VoxelModel, $val:Number ):void
-	{
+	public function play( $owner:VoxelModel, $val:Number ):void {
 		//Log.out( "Animation.play - name: " + _name );
 		if ( _sound )
 			_sound.play( $owner, $val );
 			
-		if ( _attachments && 0 < _attachments.length )
-		{
-			for each ( var aa:AnimationAttachment in _attachments )
-			{
+		if ( _attachments && 0 < _attachments.length ) {
+			for each ( var aa:AnimationAttachment in _attachments ) {
 				var cm:VoxelModel = $owner.childFindByName( aa.attachsTo );
 				if ( cm )
-				{
 					aa.create( cm );
-				}
 			}
 		}
 	}
 	
-	public function stop( $owner:VoxelModel ):void
-	{
+	public function stop( $owner:VoxelModel ):void {
 		if ( _sound )
 			_sound.stop();
 			
-		if ( _attachments && 0 < _attachments.length )
-		{
-			for each ( var aa:AnimationAttachment in _attachments )
-			{
+		if ( _attachments && 0 < _attachments.length ) {
+			for each ( var aa:AnimationAttachment in _attachments ) {
 				var cm:VoxelModel = $owner.childFindByName( aa.attachsTo );
 				if ( cm )
-				{
 					aa.detach();
-				}
 			}
 		}
 	}
 	
-	public function update( $val:Number ):void
-	{
+	public function update( $val:Number ):void {
 		if ( _sound )
 			_sound.update( $val / 3 );
 	}
@@ -253,34 +191,15 @@ public class Animation
 	
 	public function asByteArray( $ba:ByteArray ):ByteArray {
 		var json:String = getJSON();
-		// is this needed?
-Log.out( "Animation.asByteArray - is STRINGIFY NEEDED?", Log.WARN );		
 		$ba.writeInt( json.length );
 		$ba.writeUTFBytes( json );
 		$ba.compress();
 		return $ba;	
 	}
 
-	//private	function metadata( $ba: ByteArray ):Object {
-			//Log.out( "Animation.metadata userId: " + Network.userId );
-			//return {
-					//created: created ? created : new Date(),
-					//data: $ba,
-					//description: desc ? desc : "No Description",
-					//model: model ? model : "No Description",
-					//guid: guid ? guid : Globals.getUID(),
-					//modified: modified ? modified : new Date(),
-					//name: name ? name : "No name",
-					//owner:  Network.PUBLIC,
-					//world: world ? world : "VoxelVerse"
-					//};
-		//}
-		
-	private	function createSuccess(o:DatabaseObject):void 
-		{ 
-			if ( o ) {
-				metadata.dbo = o;
-			}
-		}
+	private	function createSuccess( dbo:DatabaseObject):void { 
+		if ( dbo ) 
+			metadata.dbo = dbo;
+	}
 }
 }

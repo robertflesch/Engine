@@ -9,7 +9,6 @@ package com.voxelengine.worldmodel.animation
 {
 import com.voxelengine.utils.JSONUtil;
 import flash.utils.ByteArray;
-import flash.utils.Dictionary;
 import flash.net.URLLoaderDataFormat;
 
 import com.voxelengine.Log;

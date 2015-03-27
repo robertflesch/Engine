@@ -195,28 +195,16 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 
-		public function getJSON():String {
-			var models:Vector.<String> = new Vector.<String>;
+		public function buildExportObject( obj:Object ):Object {
+			
+			var oa:Vector.<Object> = new Vector.<Object>();
 			for each ( var model:VoxelModel in _models ) {
 				if ( model is Player )
 					continue;
-				Log.out( "ModelCache.getJSON metadata.name: " + model.metadata.name + " json: " + model.getJSON() );
-				models.push( model.getJSON() );	
+				oa.push( model.instanceInfo.buildExportObject( obj ) );
 			}
-			
-			var outString:String = "";
-			var len:int = models.length;
-			Log.out( "ModelCache.getJSON ---------------------------------------------------" );
-			for ( var index:int; index < len; index++ ) {
-				outString += models[index];
-				Log.out( "ModelCache.getJSON - model: " + models[index] );
-				// if this is NOT the last element in the array, add a comma to it.
-				if ( index == len - 1 )
-					continue;
-				outString += ",";
-			}
-			Log.out( "ModelCache.getJSON ---------------------------------------------------" );
-			return outString;
+			obj.models = oa;
+			return obj;
 		}
 		
 		public function reinitialize( $context:Context3D ):void 	{

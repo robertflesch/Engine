@@ -56,9 +56,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			_vmm = new ModelMetadata( _ii.modelGuid );
 			_vmm.name = _ii.modelGuid;
 			_vmm.description = _ii.modelGuid + "-IMPORTED";
-			_vmm.creator = Network.userId;
 			_vmm.owner = Network.userId;
-			_vmm.createdDate = new Date();
 			_vmm.modifiedDate = new Date();
 			attemptMake();
 		}

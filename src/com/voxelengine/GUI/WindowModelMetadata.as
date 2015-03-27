@@ -9,6 +9,7 @@
 package com.voxelengine.GUI 
 {
 import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.worldmodel.Permissions;
 import flash.events.Event;
 import playerio.DatabaseObject;
 
@@ -57,9 +58,7 @@ public class WindowModelMetadata extends VVPopup
 			_vmm = new ModelMetadata( $guid );
 			_vmm.name = $guid;
 			_vmm.description = $guid + "-IMPORTED";
-			_vmm.creator = Network.userId;
 			_vmm.owner = Network.userId;
-			_vmm.createdDate = new Date();
 			_vmm.modifiedDate = new Date();
 			// fake an event to populate the window
 			dataReceived( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, $guid, _vmm ) )
@@ -77,7 +76,7 @@ public class WindowModelMetadata extends VVPopup
 		_vmm = $mme.vmm;
 		
 		if ( TYPE_IMPORT == _type ) {
-			var creatorI:LabelInput = new LabelInput( "Creator: ", _vmm.creator );
+			var creatorI:LabelInput = new LabelInput( "Creator: ", _vmm.permissions.creator );
 			creatorI.editable = false;
 			creatorI.selectable = false;
 			creatorI.enabled = false;
@@ -90,7 +89,7 @@ public class WindowModelMetadata extends VVPopup
 			addElement( _desc );
 		
 		} else {
-			var creator:LabelInput = new LabelInput( "Creator: ", _vmm.creator );
+			var creator:LabelInput = new LabelInput( "Creator: ", _vmm.permissions.creator );
 			creator.editable = false;
 			creator.selectable = false;
 			creator.enabled = false;
@@ -109,7 +108,7 @@ public class WindowModelMetadata extends VVPopup
 			radioButtons.addAll( { label:"Template for other models" }
 							   , { label:"Unique Instance" } );
 			eventCollector.addEvent( rbGroup, ButtonsGroupEvent.GROUP_CHANGED
-								   , function (event:ButtonsGroupEvent):void {  _vmm.template = (0 == event.target.index ?  true : false) } );
+								   , function (event:ButtonsGroupEvent):void {  _vmm.permissions.blueprint = (0 == event.target.index ?  true : false) } );
 			rbGroup.dataProvider = radioButtons;
 			rbGroup.index = 1;
 
@@ -126,9 +125,10 @@ public class WindowModelMetadata extends VVPopup
 			
 			addElement( new HorizontalSeparator( width ) );		
 			
+Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );			
 			var rbTransferGroup:RadioButtonGroup = new RadioButtonGroup( this );
 			eventCollector.addEvent( rbTransferGroup, ButtonsGroupEvent.GROUP_CHANGED
-								   , function (event:ButtonsGroupEvent):void {  _vmm.transfer = (0 == event.target.index ?  true :  false ) } );
+								   , function (event:ButtonsGroupEvent):void {  _vmm.permissions.binding = (0 == event.target.index ?  Permissions.BIND_MODIFY :  Permissions.BIND_NONE ) } );
 			var rbTransferDP:DataProvider = new DataProvider();
 			rbTransferDP.addAll( { label:"Allow this object to be transferred" }
 							   , { label:"Bind this object to user" } );
@@ -139,7 +139,7 @@ public class WindowModelMetadata extends VVPopup
 			
 			var rbModifyGroup:RadioButtonGroup = new RadioButtonGroup( this );
 			eventCollector.addEvent( rbModifyGroup, ButtonsGroupEvent.GROUP_CHANGED
-								   , function (event:ButtonsGroupEvent):void {  _vmm.modify = (0 == event.target.index ?  true :  false ) } );
+								   , function (event:ButtonsGroupEvent):void {  _vmm.permissions.modify = (0 == event.target.index ?  true :  false ) } );
 			var rbModifyDP:DataProvider = new DataProvider();
 			rbModifyDP.addAll( { label:"Allow this object to be modified" }
 							   , { label:"This objects shape is set" } );
@@ -150,7 +150,7 @@ public class WindowModelMetadata extends VVPopup
 			
 			var rbCopyGroup:RadioButtonGroup = new RadioButtonGroup( this );
 			eventCollector.addEvent( rbCopyGroup, ButtonsGroupEvent.GROUP_CHANGED
-								   , function (event:ButtonsGroupEvent):void {  _vmm.copy = (0 == event.target.index ?  true :  false ) } );
+								   , function (event:ButtonsGroupEvent):void {  _vmm.permissions.copyCount = (0 == event.target.index ?  -1 :  1 ) } );
 			var rbCopyDP:DataProvider = new DataProvider();
 			rbCopyDP.addAll( { label:"Allow this object to be copied freely" }
 						   , { label:"Allow how many copies - below (1) min" } );
@@ -159,7 +159,7 @@ public class WindowModelMetadata extends VVPopup
 			
 			addElement( new HorizontalSeparator( width ) );
 			
-			_copies = new LabelInput( "Num of copies(-1 = infinite): ", "-1" );
+			_copies = new LabelInput( "Num of copies : ", "1" );
 			_copies.labelControl.width = 40;
 			addElement( _copies );
 			
@@ -182,10 +182,10 @@ public class WindowModelMetadata extends VVPopup
 	private function save( e:UIMouseEvent ):void { 
 		_vmm.name = _name.label;
 		_vmm.description = _desc.label;
-		_vmm.createdDate = new Date();
 		_vmm.modifiedDate = new Date();
 		if ( _type == TYPE_EDIT ) {
-			_vmm.copyCount = parseInt( _copies.label, 10 );
+			// this field only exists when I am editting
+			_vmm.permissions.copyCount = parseInt( _copies.label, 10 );
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.UPDATE, 0, _vmm.modelGuid, _vmm ) );
 		} else { // TYPE_IMPORT so new data
 			var dboTemp:DatabaseObject = new DatabaseObject( Globals.DB_TABLE_MODELS, _vmm.modelGuid, "1", 0, true, null );
