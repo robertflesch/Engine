@@ -149,7 +149,7 @@ public class AnimationMetadata
 		_dbo.modelGuid		= _modelGuid;
 		_dbo.world			= _world;
 		_dbo.data			= $ba;
-		_permissions.dboSetInfo( _dbo );
+		_permissions.toPersistance( _dbo );
 	}
 	
 	////////////////////////////////////////////////////////////////
@@ -167,7 +167,7 @@ public class AnimationMetadata
 		_world			= $dbo.world;
 		_dbo			= $dbo;
 						
-		_permissions.fromDbo( $dbo );
+		_permissions.fromPersistance( $dbo );
 		
 		var ba:ByteArray = $dbo.data;
 		try { ba.uncompress(); }

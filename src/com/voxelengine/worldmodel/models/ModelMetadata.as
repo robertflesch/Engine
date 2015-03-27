@@ -42,7 +42,6 @@ public class ModelMetadata
 	private var _creator:String			= "";
 	private var _thumbnail:BitmapData;
 	private var _dbo:DatabaseObject;
-	private var _createdDate:Date;
 	private var _modifiedDate:Date;
 	private var _permissions:Permissions = new Permissions();
 
@@ -128,7 +127,6 @@ Log.out( "ModelMetadata.update - How do I handler permissions here?", Log.WARN )
 								  , description: _description
 								  , owner: _owner
 								  , creator: _creator
-								  , createdDate: _createdDate
 								  , modifiedDate: _modifiedDate
 								  , thumbnail: thumbnail }
 								  
@@ -204,9 +202,8 @@ Log.out( "ModelMetadata.update - How do I handler permissions here?", Log.WARN )
 		_dbo.description	= _description;
 		_dbo.owner			= _owner;
 		_dbo.creator		= _creator;
-		_dbo.createdDate	= _createdDate;
 		_dbo.modifiedDate   = new Date();
-		_permissions.dboSetInfo( _dbo );
+		_permissions.toPersistance( _dbo );
 		if ( thumbnail )
 			_dbo.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
 		else
@@ -223,11 +220,10 @@ Log.out( "ModelMetadata.update - How do I handler permissions here?", Log.WARN )
 		_description	= $dbo.description;
 		_owner			= $dbo.owner;
 		_creator		= $dbo.creator;
-		_permissions.fromDbo( $dbo );
-		_modelGuid 			= $dbo.key;
-		_createdDate	= $dbo.createdDate;
+		_modelGuid 		= $dbo.key;
 		_modifiedDate   = $dbo.modifiedDate;
 		_dbo			= $dbo;
+		_permissions.fromPersistance( $dbo );
 		
 		if ( $dbo.thumbnail ) {
 			var loader:Loader = new Loader();

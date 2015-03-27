@@ -165,7 +165,7 @@ public class VoxelModel
 //				Globals.g_landscapeTaskController.activeTaskLimit = 1;
 		
 		// if we have no children, let this stand
-		_childrenLoaded	= true;
+		_childrenLoaded	= false;
 		if ( _modelInfo.children && 0 < _modelInfo.children.length)
 		{
 			Log.out( "VoxelModel.processClassJson name: " + metadata.name + " - loading child models START" );
@@ -186,7 +186,6 @@ public class VoxelModel
 				// to test if we are in the bar mode, we test of instanceGuid.
 				// Since this is a child object, it automatically get added to the parent.
 				// So add to cache just adds it to parent instance.
-				_childrenLoaded	= false;
 				Log.out( "VoxelModel.processClassJson - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid );
 				ModelMakerBase.load( childInstanceInfo, true, false, instanceInfo.modelGuid );
 			}
@@ -194,6 +193,8 @@ public class VoxelModel
 			_modelInfo.childrenReset();
 			Log.out( "VoxelModel.processClassJson - loading child models END" );
 		}
+		else
+			_childrenLoaded	= true;
 		
 		// Both instanceInfo and modelInfo can have scripts. With each being persisted in correct location.
 		// Currently both are persisted to instanceInfo, which is very bad...
@@ -216,19 +217,18 @@ public class VoxelModel
 		Log.out( "VoxelModel.addClassJson " + metadata.name + "  merged: " + jsonString );
 		return jsonString;
 	}
-	
-	public function getChildJSON( obj:Object ):Object {
+	*/
+	public function getChildJSON():Object {
 		
 		// Same code that is in modelCache to build models in region
 		// this is just models in models
 		var oa:Vector.<Object> = new Vector.<Object>();
-		for each ( var model:VoxelModel in _models ) {
+		for each ( var model:VoxelModel in _children ) {
 			if ( model is Player )
 				continue;
-			oa.push( model.instanceInfo.buildExportObject( so ) );
+			oa.push( model.instanceInfo.buildExportObject() );
 		}
-		obj.models = oa;
-		return obj;
+		return oa;
 		
 		
 		
@@ -252,10 +252,11 @@ public class VoxelModel
 		//Log.out( "VoxelModel.getChildJSON ---------------------------------------------------" );
 		//return outString;
 	}
-	*/
+	
 	public function buildExportObject( obj:Object ):Object {
-		obj = super.buildExportObject( obj )
 		obj.model = modelInfo.buildExportObject( obj );
+		if ( obj.model.children )
+			obj.model.children = getChildJSON();
 		return obj;
 	}
 	
@@ -393,7 +394,8 @@ public class VoxelModel
 			ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			// if we save the model, before it is complete, we put bad child data into model info
 			_childrenLoaded = true;
-			save();
+			changed = false;
+//			save();
 		}
 	}
 	
@@ -585,7 +587,7 @@ public class VoxelModel
 		
 		if ( Globals.BAD_OXEL != changedOxel )
 		{
-			_changed = true;
+			changed = true;
 			result = true;
 			var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
 		
@@ -635,26 +637,26 @@ public class VoxelModel
 	
 	public function write_sphere(cx:int, cy:int, cz:int, radius:int, what:int, gmin:uint = 0):void
 	{
-		_changed = true;
+		changed = true;
 		oxel.write_sphere( instanceInfo.instanceGuid, cx, cy, cz, radius, what, gmin);
 	}
 	
 	public function empty_square(cx:int, cy:int, cz:int, radius:int, gmin:uint = 0):void
 	{
-		_changed = true;
+		changed = true;
 		oxel.empty_square( instanceInfo.instanceGuid, cx, cy, cz, radius, gmin);
 	}
 	
 	public function effect_sphere(cx:int, cy:int, cz:int, ie:ImpactEvent ):void {
 		_timer = getTimer();
-		_changed = true;
+		changed = true;
 		oxel.effect_sphere( instanceInfo.instanceGuid, cx, cy, cz, ie );
 		//Log.out( "VoxelModel.effect_sphere - radius: " + ie.radius + " gmin: " + ie.detail + " took: " + (getTimer() - _timer) );
 		//oxel.mergeRecursive(); // Causes bad things to happen since we dont regen faces!
 	}
 	public function empty_sphere(cx:int, cy:int, cz:int, radius:Number, gmin:uint = 0):void {
 		_timer = getTimer();
-		_changed = true;
+		changed = true;
 		oxel.write_sphere( instanceInfo.instanceGuid, cx, cy - 1, cz, radius - 1.5, TypeInfo.AIR, gmin);
 		
 		//Log.out( "VoxelModel.empty_sphere - radius: " + radius + " gmin: " + gmin + " took: " + (getTimer() - _timer) );
@@ -780,7 +782,7 @@ public class VoxelModel
 		//	byteArrayLoad( Globals.g_modelManager.modelByteArrays[_modelInfo.biomes.layers[0].data] );
 		//else 
 		//if (_modelInfo.biomes && false == complete && false == metadata.hasDataObject )
-		processClassJson();
+		//processClassJson();
 	
 		//Log.out( "VoxelModel.internal_initialize - exit - instanceGuid: " + instanceInfo.guid + " took: " + (getTimer() - _timer) );					
 	}
@@ -853,7 +855,7 @@ public class VoxelModel
 	public function childAdd(vm:VoxelModel):void
 	{
 		changed = true;
-		//Log.out(  "-------------- VoxelModel.childAdd - VM: " + vm.toString() );
+		Log.out(  "-------------- VoxelModel.childAdd - VM: " + vm.toString() );
 		// remove parent level model
 		Region.currentRegion.modelCache.changeFromParentToChild(vm);
 		_children.push(vm);
@@ -1038,7 +1040,7 @@ public class VoxelModel
 //			MetadataManager.deleteModel( metadata.modelGuid );
 		Log.out("VoxelModel.delete - delete object: " + instanceInfo.instanceGuid, Log.ERROR );
 		
-		_changed = true;
+		changed = true;
 	}
 	
 	// Force save is used ONLY when creating instances from templates.
@@ -1053,7 +1055,7 @@ public class VoxelModel
 			return;
 		}
 		
-		if ( !_childrenLoaded ) {
+		if (  false == _childrenLoaded ) {
 			Log.out( "VoxelModel.save - children not loaded"  );
 			return;
 		}
@@ -1062,7 +1064,7 @@ public class VoxelModel
 		//if ( null != metadata.permissions.templateGuid )
 			//metadata.permissions.templateGuid = "";
 				
-		_changed = false;
+		changed = false;
 		metadata.save();
 		data.save( toByteArray() );
 	}

@@ -123,7 +123,7 @@ public class InstanceInfo extends Location	{
 		}
 	}
 	
-	public function buildExportObject( obj:Object ):Object {
+	public function buildExportObject():Object {
 		var instObject:Object = new Object();
 		instObject.model = getJSON();
 		return instObject;

@@ -437,7 +437,7 @@ package com.voxelengine.worldmodel
 		
 		public function buildExportObject( obj:Object ):Object {
 			if ( _modelCache ) {
-				obj = _modelCache.buildExportObject( obj );
+				obj.models = _modelCache.buildExportObject();
 			}
 			else {
 				// If the region has not been loaded yet, just copy the props over.

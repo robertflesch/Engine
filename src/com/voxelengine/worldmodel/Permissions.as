@@ -33,7 +33,7 @@ public class Permissions
 	private var _modify:Boolean			= true;				// Can this object be modified
 	private var _templateGuid:String 	= null;				// Is this object based on something else? if so track the guid of original object
 	private var _creator:String 		= Network.userId;;	// The guid of the original creator
-	private var _created:Date			= new Date();		// Date created
+	private var _createdDate:Date		= new Date();		// Date created
 	private var _binding:String			= BIND_NONE;		// Bind type (see above)
 	private var _blueprint:Boolean		= false;			// is this only a blue print for other objects.
 	
@@ -46,8 +46,8 @@ public class Permissions
 	public function get copyCount():int  				{ return _copyCount; }
 	public function set copyCount(value:int):void  		{ _copyCount = value; }
 	
-	public function get created():Date 					{ return _created; }
-	public function set created(value:Date):void 		{ _created = value; }
+	public function get createdDate():Date 					{ return _createdDate; }
+	public function set createdDate(value:Date):void 		{ _createdDate = value; }
 	
 	public function get creator():String 				{ return _creator; }
 	public function set creator(value:String):void  	{ _creator = value; }
@@ -68,26 +68,26 @@ public class Permissions
 		newP.modify			= _modify;
 		newP.templateGuid	= new String( _templateGuid );
 		newP.creator		= new String( _creator );
-		newP.created		= new Date( _created );
+		newP.createdDate	= new Date( _createdDate );
 		newP.binding		= new String( _binding );
 		return newP;
 	}
 	
-	public function dboSetInfo( _dbo:DatabaseObject ):void {
+	public function toPersistance( _dbo:DatabaseObject ):void {
 		_dbo.copyCount 		= _copyCount;
 		_dbo.modify			= _modify;
 		_dbo.templateGuid	= _templateGuid;
 		_dbo.creator		= _creator;
-		_dbo.created		= _created;
+		_dbo.createdDate	= _createdDate;
 		_dbo.binding		= _binding;
 	}
 	
-	public function fromDbo( _dbo:DatabaseObject ):void {
+	public function fromPersistance( _dbo:DatabaseObject ):void {
 		_copyCount		= _dbo.copyCount;
 		_modify			= _dbo.modify;		
 		_templateGuid	= _dbo.templateGuid;
 		_creator		= _dbo.creator;
-		_created		= _dbo.created;
+		_createdDate	= _dbo._createdDate;
 		_binding		= _dbo.binding;
 	}
 	
@@ -96,7 +96,7 @@ public class Permissions
 		metadataObj.modify		= _modify;
 		metadataObj.templateGuid= _templateGuid;
 		metadataObj.creator		= _creator;
-		metadataObj.created		= _created;
+		metadataObj.createdDate		= _createdDate;
 		metadataObj.binding		= _binding;
 		return metadataObj;
 	}
