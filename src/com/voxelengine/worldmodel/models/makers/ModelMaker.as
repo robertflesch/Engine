@@ -44,7 +44,7 @@ public class ModelMaker extends ModelMakerBase {
 		if ( 0 == _makerCount )
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 		_makerCount++;
-		Log.out( "ModelMaker - makerCount: " + _makerCount );
+		//Log.out( "ModelMaker - makerCount: " + _makerCount );
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retriveMetadata );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retriveMetadata );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
@@ -68,7 +68,7 @@ public class ModelMaker extends ModelMakerBase {
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
 		if ( null != _vmm && null != _vmd ) {
-			Log.out( "ModelMaker.attemptMake - ii: " + _ii.toString() );
+			//Log.out( "ModelMaker.attemptMake - ii: " + _ii.toString() );
 			var vm:VoxelModel = createFromMakerInfo();
 			markComplete();
 			if ( vm && _addToRegionWhenComplete )
@@ -84,13 +84,13 @@ public class ModelMaker extends ModelMakerBase {
 		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
 		_makerCount--;
 		if ( 0 == _makerCount ) {
-			Log.out( "ModelMaker.markComplete - makerCount: 0, SHUTTING DOWN SPLASH", Log.WARN );
+			//Log.out( "ModelMaker.markComplete - makerCount: 0, SHUTTING DOWN SPLASH", Log.WARN );
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
 			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );
 		}
-		else
-			Log.out( "ModelMaker.markComplete - makerCount: " + _makerCount );
+		//else
+		//	Log.out( "ModelMaker.markComplete - makerCount: " + _makerCount );
 	}
 	
 	private function createFromMakerInfo():VoxelModel {

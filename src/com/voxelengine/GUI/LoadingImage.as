@@ -44,7 +44,7 @@ package com.voxelengine.GUI
 //			Log.out( "LoadingImage.destroy called", Log.WARN );
 			if ( LoadingImage.isActive && Globals.online )
 			{
-				Log.out( "LoadingImage.DESTROYED", Log.WARN );
+				//Log.out( "LoadingImage.DESTROYED", Log.WARN );
 				LoadingImage._s_currentInstance.remove();
 				LoadingImage._s_currentInstance = null;
 			}
@@ -62,7 +62,7 @@ package com.voxelengine.GUI
 
 		
 		public function LoadingImage():void { 
-			Log.out( "LoadingImage.constructor", Log.WARN );
+			//Log.out( "LoadingImage.constructor", Log.WARN );
 			super( Globals.g_renderer.width, Globals.g_renderer.height );
 
 			_splashImage = (new _splashImageClass() as Bitmap);

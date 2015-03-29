@@ -82,16 +82,16 @@ package com.voxelengine.GUI.actionBars
 		
 		public function addListeners():void
 		{
-			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyItem );
-			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+			Globals.g_app.stage.addEventListener( KeyboardEvent.KEY_DOWN, hotKeyItem );
+			Globals.g_app.stage.addEventListener( MouseEvent.MOUSE_WHEEL, onMouseWheel );	
 			Globals.g_app.stage.addEventListener( Event.RESIZE, resizeToolBar );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 		}
 		
 		public function removeListeners():void
 		{
-			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyItem );
-			Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+			Globals.g_app.stage.removeEventListener( KeyboardEvent.KEY_DOWN, hotKeyItem );
+			Globals.g_app.stage.removeEventListener( MouseEvent.MOUSE_WHEEL, onMouseWheel );	
 			Globals.g_app.stage.removeEventListener( Event.RESIZE, resizeToolBar );
 			removeEventListener(UIOEvent.REMOVED, onRemoved );
 		}

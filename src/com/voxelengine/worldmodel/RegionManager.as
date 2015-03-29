@@ -120,7 +120,7 @@ public class RegionManager
 	private function loadSucceed( $pe:PersistanceEvent ):void 
 	{
 		if ( Globals.DB_TABLE_REGIONS == $pe.table ) {
-			Log.out( "RegionManager.loadSucceed - creating new region: " + $pe.guid, Log.DEBUG );
+			//Log.out( "RegionManager.loadSucceed - creating new region: " + $pe.guid, Log.DEBUG );
 			var newRegion:Region = new Region( $pe.guid );
 			newRegion.fromPersistance( $pe.dbo );
 			// When I create a new region I have to create a temporary DBO to transfer metadata and data.
@@ -138,7 +138,7 @@ public class RegionManager
 	}
 	
 	private function regionAdd( $pe:PersistanceEvent, $region:Region ):void {
-		Log.out( "RegionManager.regionAdd - adding region: " + $region.guid, Log.DEBUG );
+		//Log.out( "RegionManager.regionAdd - adding region: " + $region.guid, Log.DEBUG );
 		if ( false == regionHas( $region.guid ) ) {
 			_regions.push( $region );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.ADDED, ($pe ? $pe.series: 0), $region.guid, $region ) );

@@ -24,47 +24,47 @@ import com.voxelengine.Log;
 public class InventoryManager
 {
 	// There is still some confustion here, do I use network id? that would mean only avatars can have intentory
-	// really I want any model to be able to have inventory. so this can be networkid OR guid ?? both are unique.
+	// really I want any model to be able to have inventory. so this is instanceInfo.instanceGuid.
 	static private var  _s_inventoryByGuid:Array = [];
 	
 	static public function init():void {
 		// This creates a inventory object for login.
 //		objectInventoryGet("player");	
-		InventoryEvent.addListener( InventoryEvent.INVENTORY_UNLOAD_REQUEST, unloadInventory );
-		InventoryEvent.addListener( InventoryEvent.INVENTORY_REQUEST, requestInventory );
-		InventoryEvent.addListener( InventoryEvent.INVENTORY_SAVE_REQUEST, save );
+		InventoryEvent.addListener( InventoryEvent.UNLOAD_REQUEST, unloadInventory );
+		InventoryEvent.addListener( InventoryEvent.REQUEST, requestInventory );
+		InventoryEvent.addListener( InventoryEvent.SAVE_REQUEST, save );
 	}
 
 	static private function save( e:InventoryEvent ):void {
 		for each ( var inventory:Inventory in _s_inventoryByGuid )
-			if ( null != inventory && inventory.networkId != "player" )
+			if ( null != inventory && inventory.owner != "player" )
 				inventory.save();
 	}
 	
 	
 	static private function requestInventory(e:InventoryEvent):void 
 	{
-		var inv:Inventory = objectInventoryGet( e.ownerGuid );
-		if ( inv )
-			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, e.ownerGuid, inv ) );
+		var inv:Inventory = objectInventoryGet( e.owner );
+		if ( inv && inv.loaded )
+			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, e.owner, inv ) );
 	}
 	
 	static private function unloadInventory(e:InventoryEvent):void 
 	{
-		var inventory:Inventory = _s_inventoryByGuid[ e.ownerGuid ];
+		var inventory:Inventory = _s_inventoryByGuid[ e.owner ];
 		if ( inventory ) {
 			var tempArray:Array = [];
 			for each ( var inv:Inventory in _s_inventoryByGuid )
 			{
-				if ( e.ownerGuid == inv.networkId ) {
-					_s_inventoryByGuid[ e.ownerGuid ] = null;
+				if ( e.owner == inv.owner ) {
+					_s_inventoryByGuid[ e.owner ] = null;
 					inv.unload();
 					// could I just use a delete here, rather then creating new dictionary? See Dictionary class for details - RSF
 				}
 				else
 				{
 					if ( inv )
-						tempArray[inv.networkId] = inv;
+						tempArray[inv.owner] = inv;
 					else
 						Log.out( "InventoryManager.unloadInventory - Null found", Log.ERROR );
 				}

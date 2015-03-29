@@ -68,7 +68,7 @@ public class ModelMetadataCache
 			Log.out( "MetadataManager.request guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "MetadataManager.request guid: " + $mme.modelGuid, Log.INFO );
+		//Log.out( "MetadataManager.request guid: " + $mme.modelGuid, Log.INFO );
 		var vmm:ModelMetadata = _metadata[$mme.modelGuid]; 
 		if ( null == vmm )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mme.series, Globals.DB_TABLE_MODELS, $mme.modelGuid ) );
@@ -120,7 +120,7 @@ public class ModelMetadataCache
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
 		if ( $pe.dbo ) {
-			Log.out( "MetadataManager.loadSucceed guid: " + $pe.guid, Log.INFO );
+			//Log.out( "MetadataManager.loadSucceed guid: " + $pe.guid, Log.INFO );
 			var vmm:ModelMetadata = new ModelMetadata( $pe.guid );
 			vmm.fromPersistance( $pe.dbo );
 			if ( $pe.data && true == $pe.data )

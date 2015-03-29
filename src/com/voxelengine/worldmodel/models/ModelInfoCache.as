@@ -45,7 +45,7 @@ public class ModelInfoCache
 			Log.out( "ModelInfoManager.modelInfoRequest guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "ModelInfoManager.modelInfoRequest guid: " + $mie.modelGuid, Log.INFO );
+		//Log.out( "ModelInfoManager.modelInfoRequest guid: " + $mie.modelGuid, Log.INFO );
 		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
 		if ( null == mi )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.modelGuid ) );
@@ -70,7 +70,7 @@ public class ModelInfoCache
 	static private function loadSucceed( $pe:PersistanceEvent):void {
 		if ( Globals.MODEL_INFO_EXT != $pe.table )
 			return;
-		Log.out( "ModelInfoManager.modelInfoLoadSucceed guid: " + $pe.guid, Log.INFO );
+		//Log.out( "ModelInfoManager.modelInfoLoadSucceed guid: " + $pe.guid, Log.INFO );
 		if ( $pe.data ) {
 				var fileData:String = String( $pe.data );
 				var jsonString:String = StringUtils.trim(fileData);

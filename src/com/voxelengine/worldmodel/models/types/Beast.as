@@ -13,6 +13,8 @@ package com.voxelengine.worldmodel.models.types
 	import flash.geom.Vector3D;
 	import flash.geom.Matrix3D;
 	
+	import com.voxelengine.GUI.actionBars.UserInventory;
+	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.events.ShipEvent;
@@ -29,13 +31,13 @@ package com.voxelengine.worldmodel.models.types
 		static private const MIN_TURN_AMOUNT:Number = 0.02;
 		
 		// Trying to keep these numbers between 1 and 100
-		private var   _climbRate:SecureNumber = new SecureNumber( 70 );
-		private var   _moveSpeed:SecureNumber = new SecureNumber( 20 );
-		private var	  _maxClimbAngle:SecureNumber = new SecureNumber( 45 );
-		private var   _maxTurnRate:SecureNumber = new SecureNumber( 100 );
-		private var   _stallSpeed:SecureNumber = new SecureNumber( 2 );
+		private var _climbRate:SecureNumber = new SecureNumber( 70 );
+		private var _moveSpeed:SecureNumber = new SecureNumber( 20 );
+		private var	_maxClimbAngle:SecureNumber = new SecureNumber( 45 );
+		private var _maxTurnRate:SecureNumber = new SecureNumber( 100 );
+		private var _stallSpeed:SecureNumber = new SecureNumber( 2 );
 		
-		protected var   _seatLocation:Vector3D =  new Vector3D( 8, 12, 13 );
+		protected var _seatLocation:Vector3D =  new Vector3D( 8, 12, 13 );
 
 		public function get mClimbRate():Number  				{ return _climbRate.val; }
 		public function set mClimbRate($value:Number):void  	{ _climbRate.val = $value; }

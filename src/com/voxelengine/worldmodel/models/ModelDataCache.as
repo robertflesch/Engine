@@ -46,7 +46,7 @@ public class ModelDataCache
 			Log.out( "ModelDataCache.modelDataRequest guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "ModelDataCache.request guid: " + $mie.modelGuid, Log.INFO );
+		//Log.out( "ModelDataCache.request guid: " + $mie.modelGuid, Log.INFO );
 		var mi:ModelData = _modelData[$mie.modelGuid]; 
 		if ( null == mi ) {
 			if ( true == Globals.online && $mie.fromTables )
@@ -76,7 +76,7 @@ public class ModelDataCache
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
 		if ( $pe.dbo || $pe.data ) {
-			Log.out( "ModelDataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
+			//Log.out( "ModelDataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
 			var vmd:ModelData = new ModelData( $pe.guid );
 			if ( $pe.dbo )
 				vmd.fromPersistance( $pe.dbo );

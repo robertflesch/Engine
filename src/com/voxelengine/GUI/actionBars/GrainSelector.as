@@ -110,7 +110,7 @@ public class GrainSelector extends QuickInventory
 		return box;
 	}
 	
-	override public function buildItems():void
+	override protected function buildItems():void
 	{
 		name = "GrainSelector";
 

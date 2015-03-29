@@ -59,7 +59,7 @@ public class PersistURL
 		if ( !isSupportedTable( $pe ) )
 			return;
 			
-		Log.out( "PersistURL.load - file: " + _filePath );
+		//Log.out( "PersistURL.load - file: " + _filePath );
 		
 		var urlLoader:URLLoader = new URLLoader();
 		configureListeners(urlLoader);
@@ -75,7 +75,7 @@ public class PersistURL
 
 		function loadSuccess(event:Event):void {
 			
-			Log.out( "PersistURL.loadSuccess - guid: " + $pe.guid + $pe.table, Log.DEBUG );
+			//Log.out( "PersistURL.loadSuccess - guid: " + $pe.guid + $pe.table, Log.DEBUG );
 			if ( URLLoaderDataFormat.BINARY == $pe.format ) {
 				var ba:ByteArray = event.target.data;			
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, $pe.table, $pe.guid, null, ba, $pe.format, $pe.other ) );

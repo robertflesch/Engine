@@ -40,7 +40,7 @@ public class ModelMakerBase {
 			var count:int = _s_parentChildCount[_parentModelGuid];
 			_s_parentChildCount[_parentModelGuid] = ++count;
 		}
-		Log.out( "ModelMakerBase - ii: " + _ii.toString(), Log.DEBUG );
+		//Log.out( "ModelMakerBase - ii: " + _ii.toString(), Log.DEBUG );
 		ModelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
 		ModelDataEvent.addListener( ModelBaseEvent.RESULT, retriveData );		
 		ModelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
@@ -73,7 +73,7 @@ public class ModelMakerBase {
 		else	
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_FAILURE, _ii.modelGuid ) );
 		
-		Log.out( "ModelMakerBase.markComplete - " + ($success ? "SUCCESS" : "FAILURE" ) + "  ii: " + _ii + "  success: " + $success, Log.DEBUG );
+		//Log.out( "ModelMakerBase.markComplete - " + ($success ? "SUCCESS" : "FAILURE" ) + "  ii: " + _ii + "  success: " + $success, Log.DEBUG );
 		
 		if ( _parentModelGuid ) {
 			var count:int = _s_parentChildCount[_parentModelGuid];
@@ -150,7 +150,7 @@ public class ModelMakerBase {
 	}
 	
 	static public function load( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true, $prompt:Boolean = true, $parentModelGuid:String = null ):void {
-		Log.out( "ModelMakerBase.load ii: " + $ii.toString() );
+		//Log.out( "ModelMakerBase.load ii: " + $ii.toString() );
 		if ( !Globals.isGuid( $ii.modelGuid ) && $ii.modelGuid != "LoadModelFromBigDB" )
 			if ( Globals.online )
 				new ModelMakerImport( $ii, $prompt, $parentModelGuid );

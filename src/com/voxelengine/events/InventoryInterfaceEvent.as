@@ -14,39 +14,32 @@ import flash.events.EventDispatcher;
  * ...
  * @author Robert Flesch - RSF 
  */
-public class InventoryEvent extends Event
+public class InventoryInterfaceEvent extends Event
 {
-	// Asks for the inventory
-	static public const REQUEST:String  		= "REQUEST";
-	// Returns the inventory object
-	static public const RESPONSE:String  		= "RESPONSE";
-	
-	// Save request no response needed
-	static public const SAVE_REQUEST:String  	= "SAVE_REQUEST";
-	// User/NP is logging/leaving system out, so remove inventory
-	static public const UNLOAD_REQUEST:String 	= "UNLOAD_REQUEST";
+	static public const DISPLAY:String  = "DISPLAY";
+	static public const HIDE:String  	= "HIDE";
+	static public const CLOSE:String  	= "CLOSE";
 	
 	private var _owner:String; // Guid of model which is implementing this action
-	private var _result:*;	
-	
+	private var _image:String; // Guid of model which is implementing this action
 	public function get owner():String { return _owner; }
-	public function get result():*  { return _result; }
+	public function get image():String { return _image; }
 
-	public function InventoryEvent( $type:String, $owner:String, $result:*, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function InventoryInterfaceEvent( $type:String, $owner:String, $image:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
 		_owner = $owner;
-		_result = $result;
+		_image = $image;
 	}
 	
 	public override function clone():Event
 	{
-		return new InventoryEvent( type, _owner, _result, bubbles, cancelable);
+		return new InventoryInterfaceEvent( type, _owner, _image, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString("InventoryEvent", "bubbles", "cancelable") + " ownerGuid: " + _owner + " _result: " + _result;
+		return formatToString("InventoryInterfaceEvent", "owner", "image" );
 	}
 	///////////////// Event handler interface /////////////////////////////
 
@@ -61,10 +54,10 @@ public class InventoryEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:InventoryEvent ) : Boolean {
+	static public function dispatch( $event:InventoryInterfaceEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
-
+	
 	///////////////// Event handler interface /////////////////////////////
 }
 }

@@ -68,7 +68,7 @@ public class AnimationMetadata
 
 	public function save( $ba:ByteArray ):void {
 		if ( Globals.online ) {
-			Log.out( "Animation.save - Saving Animation Metadata guid: " + _guid + "  modelGuid: " + _modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
+			//Log.out( "AnimationMetadata.save - Saving Animation Metadata guid: " + _guid + "  modelGuid: " + _modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
 			addSaveEvents();
 			if ( _dbo )
 				toPersistance( $ba );
@@ -78,7 +78,7 @@ public class AnimationMetadata
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_ANIMATIONS, _guid, _dbo, obj ) );
 		}
 		else
-			Log.out( "ModelMetadata.save - Not saving metadata, either offline or NOT changed or locked - guid: " + modelGuid + "  name: " + name, Log.WARN );
+			Log.out( "AnimationMetadata.save - Not saving metadata, either offline or NOT changed or locked - guid: " + modelGuid + "  name: " + name, Log.WARN );
 	}
 	
 	//////////////////////////////////////////////////////////////////

@@ -105,7 +105,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 		_makerCount--;
 		if ( 0 == _makerCount )
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
-		Log.out( "ModelMakerLocal.markComplete - makerCount: " + _makerCount + "  ii: " + _ii );
+		//Log.out( "ModelMakerLocal.markComplete - makerCount: " + _makerCount + "  ii: " + _ii );
 	}
 	
 	

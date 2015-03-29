@@ -7,9 +7,12 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+	import com.voxelengine.events.InventoryInterfaceEvent;
+	import com.voxelengine.events.ModelEvent;
 	import flash.display3D.Context3D;
 	import flash.geom.Vector3D;
 	import flash.geom.Matrix3D;
+import flash.utils.getQualifiedClassName;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
@@ -49,14 +52,14 @@ package com.voxelengine.worldmodel.models.types
 			}
 			// no unique items at this level
 		}
-		
-		//override protected function addClassJson():String {
-			//var jsonString:String = super.addClassJson();
-			//jsonString += ",";
-			//jsonString += "\"dragon\": { }";
-			//return jsonString;
-		//}
-		
+/*		
+		override protected function addClassJson():String {
+			var jsonString:String = super.addClassJson();
+			jsonString += ",";
+			jsonString += "\"dragon\": { }";
+			return jsonString;
+		}
+	*/	
 		
 		override protected function collisionPointsAdd():void {
 			// TO DO Should define this in meta data??? RSF or using extents?
@@ -135,13 +138,19 @@ package com.voxelengine.worldmodel.models.types
 		}
 
 		override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
+			Globals.player.loseControl( null );
+			Log.out( "Dragon.takeControl --------------------------------------------------------------------------------------------------------------------", Log.WARN );
 			//Log.out( "Dragon.takeControl - starting position: " + $vm.instanceInfo.positionGet );
 			super.takeControl( $modelLosingControl, $addAsChild );
 			$modelLosingControl.stateSet( "Ride");
 			$modelLosingControl.stateLock( true );
+			var className:String = getQualifiedClassName( topmostControllingModel() );
+			ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
+			InventoryInterfaceEvent.dispatch( new InventoryInterfaceEvent( InventoryInterfaceEvent.DISPLAY, instanceInfo.instanceGuid, "beastToolbar.png" ) );
 		}
 	
 		override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
+			Log.out( "Dragon.loseControl --------------------------------------------------------------------------------------------------------------------", Log.WARN );
 			super.loseControl( $modelDetaching, $detachChild );
 			$modelDetaching.stateLock( false );
 		}

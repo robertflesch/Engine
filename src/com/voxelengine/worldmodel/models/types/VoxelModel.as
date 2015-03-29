@@ -168,7 +168,7 @@ public class VoxelModel
 		_childrenLoaded	= false;
 		if ( _modelInfo.children && 0 < _modelInfo.children.length)
 		{
-			Log.out( "VoxelModel.processClassJson name: " + metadata.name + " - loading child models START" );
+			//Log.out( "VoxelModel.processClassJson name: " + metadata.name + " - loading child models START" );
 			for each (var childInstanceInfo:InstanceInfo in _modelInfo.children)
 			{
 				// Add the parent model info to the child.
@@ -186,12 +186,12 @@ public class VoxelModel
 				// to test if we are in the bar mode, we test of instanceGuid.
 				// Since this is a child object, it automatically get added to the parent.
 				// So add to cache just adds it to parent instance.
-				Log.out( "VoxelModel.processClassJson - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid );
+				//Log.out( "VoxelModel.processClassJson - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid );
 				ModelMakerBase.load( childInstanceInfo, true, false, instanceInfo.modelGuid );
 			}
 			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			_modelInfo.childrenReset();
-			Log.out( "VoxelModel.processClassJson - loading child models END" );
+			//Log.out( "VoxelModel.processClassJson - loading child models END" );
 		}
 		else
 			_childrenLoaded	= true;
@@ -362,7 +362,7 @@ public class VoxelModel
 		{
 			if ( metadata.permissions.modify )
 			{
-				ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, handleModelEvents);
+				//ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, handleModelEvents);
 				
 				ImpactEvent.addListener(ImpactEvent.EXPLODE, impactEventHandler);
 				ImpactEvent.addListener(ImpactEvent.DFIRE, impactEventHandler);
@@ -390,7 +390,7 @@ public class VoxelModel
 	
 	private function childLoadingComplete(e:ModelLoadingEvent):void {
 		if ( e.modelGuid == instanceInfo.modelGuid ) {
-			Log.out("VoxelModel.childLoadingComplete - modelGuid: " + instanceInfo.modelGuid );
+			//Log.out("VoxelModel.childLoadingComplete - modelGuid: " + instanceInfo.modelGuid );
 			ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			// if we save the model, before it is complete, we put bad child data into model info
 			_childrenLoaded = true;
@@ -771,7 +771,7 @@ public class VoxelModel
 		initialized = true;
 		visible = true;
 		
-		Log.out( "VoxelModel.internal_initialize - enter - instanceGuid: " + instanceInfo.instanceGuid + " name: " + metadata.name );					
+		//Log.out( "VoxelModel.internal_initialize - enter - instanceGuid: " + instanceInfo.instanceGuid + " name: " + metadata.name );					
 		_timer = getTimer();
 		
 		createShaders($context);
@@ -855,7 +855,7 @@ public class VoxelModel
 	public function childAdd(vm:VoxelModel):void
 	{
 		changed = true;
-		Log.out(  "-------------- VoxelModel.childAdd - VM: " + vm.toString() );
+		//Log.out(  "-------------- VoxelModel.childAdd - VM: " + vm.toString() );
 		// remove parent level model
 		Region.currentRegion.modelCache.changeFromParentToChild(vm);
 		_children.push(vm);
@@ -1009,7 +1009,7 @@ public class VoxelModel
 		
 		if ( metadata.permissions.modify )
 		{
-			ModelEvent.removeListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
+			//ModelEvent.removeListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
 			
 			ImpactEvent.removeListener( ImpactEvent.EXPLODE, impactEventHandler);
 			ImpactEvent.removeListener( ImpactEvent.DFIRE, impactEventHandler);
@@ -1568,6 +1568,7 @@ public class VoxelModel
 		return false;
 	}
 	
+	/*
 	// So if you release control of any model but the player, the player is back in control
 	// Now if there are multiple players (or is this not the case, is Player a special case of Avatar)
 	public function handleModelEvents( $me:ModelEvent ):void {
@@ -1589,7 +1590,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 				changed = true;
 		}
 	}
-	
+	*/
 	public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void
 	{
 		//if ( $modelLosingControl )
@@ -1608,13 +1609,12 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		camera.index = 0;
 		
 		// Pass in the name of the class that is taking control.
-		var className:String = getQualifiedClassName(this)
-		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
+//		var className:String = getQualifiedClassName(this)
+//		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
 	}
 	
 	public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void
 	{
-		
 		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 		
@@ -1622,8 +1622,8 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		if ( $detachChild )
 			childDetach($modelDetaching);
 		camera.index = 0;
-		var className:String = getQualifiedClassName(this)
-		ModelEvent.dispatch( new ModelEvent( ModelEvent.RELEASE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
+		//var className:String = getQualifiedClassName(this)
+		//ModelEvent.dispatch( new ModelEvent( ModelEvent.RELEASE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
 	}
 	
 	// these are overriden in subclasses to allow for custom movement

@@ -8,6 +8,7 @@
 
 package com.voxelengine.GUI.actionBars
 {
+import com.developmentarc.core.utils.logging.ExternalInterfaceDebugLogger;
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
 import flash.events.KeyboardEvent;
@@ -25,6 +26,7 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 
 import com.voxelengine.events.InventorySlotEvent;
+import com.voxelengine.events.InventoryInterfaceEvent;
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.LoadingEvent;
@@ -43,13 +45,29 @@ import com.voxelengine.worldmodel.models.types.EditCursor;
 public class  UserInventory extends QuickInventory
 {
 	private var _dragOp:DnDOperation = new DnDOperation();
-	private static var _itemMaterialSelection:int = -1;
-	private static var _lastItemSelection:int = -1;
+	private var _itemMaterialSelection:int = -1;
+	private var _lastItemSelection:int = -1;
 	private var _toolSize:GrainSelector;
 	private var _shape:ShapeSelector;
+	private var _remove:Boolean;
+	private var _owner:String;
+	private var _inventoryLoaded:Boolean;
 	
-	public function UserInventory() {
-		super( 680, 84, 64, "userInventory.png" );
+	private function get lastItemSelection():int  { return _lastItemSelection; }
+	private function set lastItemSelection(value:int):void { _lastItemSelection = value; }
+	
+	static private var _s_currentInstance:UserInventory;
+
+	static public function init():void {	
+		InventoryInterfaceEvent.addListener( InventoryInterfaceEvent.CLOSE, closeEvent );
+		InventoryInterfaceEvent.addListener( InventoryInterfaceEvent.DISPLAY, displayEvent );
+		InventoryInterfaceEvent.addListener( InventoryInterfaceEvent.HIDE, hideEvent );
+	}
+	
+	public function UserInventory( $owner:String, $image:String ) {
+		_owner = $owner;
+		Log.out( "UserInventory.create ===================== <<<<<<<<< " + _owner + " <<<<<<<<<<<< ========================", Log.WARN );
+		super( 680, 84, 64, $image );
 		_selectorXOffset = 20; // From image of "userInventory.png"
 		eventCollector.addEvent(_dragOp, DnDEvent.DND_DROP_ACCEPTED, dropMaterial );
 		eventCollector.addEvent(_dragOp, DnDEvent.DND_DROP_CANCELED, dropInAir );
@@ -59,16 +77,74 @@ public class  UserInventory extends QuickInventory
 		
 		_shape = new ShapeSelector();
 		addChild(_shape);
+		hideGrainTools();
+		_s_currentInstance = this;
+		InventoryEvent.addListener( InventoryEvent.RESPONSE, inventoryLoaded );
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, _owner, null ) );
+	}
+	
+	override public function remove():void {
+		Globals.g_app.editing = false;
+		removeListeners();
+		//Log.out( "UserInventory.remove ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
+		InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
 		
-		display();
-		show();
-		resizeObject( null );
-		// this gets the already initialized inventory from the inventory manager
-		InventoryEvent.addListener( InventoryEvent.INVENTORY_RESPONSE, inventoryLoaded );
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_REQUEST, Network.userId, null ) );
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.UNLOAD_REQUEST, _owner, null ) );
+		super.remove();
 	}
 
+	static private function hideEvent(e:InventoryInterfaceEvent):void {
+		if ( null == _s_currentInstance )
+			return;
+		else if ( _s_currentInstance && _s_currentInstance._owner != e.owner ) {
+			_s_currentInstance.remove();
+			_s_currentInstance = null;
+		}
+			
+		with ( _s_currentInstance ) {
+			Globals.g_app.editing = false;
+			_outline.visible = false;
+			visible = false;
+			removeListeners();
+		}
+	}
+	
+	static private function displayEvent(e:InventoryInterfaceEvent):void {
+		// build it the first time
+		if ( null == _s_currentInstance )
+			_s_currentInstance = new UserInventory( e.owner, e.image );
+		// it exists, but belongs to a different controllable object
+		// close it and open new one
+		else if ( _s_currentInstance && _s_currentInstance._owner != e.owner ) {
+			_s_currentInstance.remove();
+			_s_currentInstance = null;
+			_s_currentInstance = new UserInventory( e.owner, e.image );
+		}
+		
+		with ( _s_currentInstance ) {
+			// display it!
+			_outline.visible = true;
+			visible = true;
+			Globals.g_app.editing = true;
+			addListeners();
+			display();
+			resizeObject( null );
+		}
+	}
+	
+	static private function closeEvent(e:InventoryInterfaceEvent):void {
+		if ( null == _s_currentInstance )
+			return;
+		with ( _s_currentInstance ) {
+			remove();
+		}
+		//Log.out( "UserInventory.closeEvent ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
+	}
+	
 	private function inventoryLoaded(e:InventoryEvent):void {
+		InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
+
+		_inventoryLoaded = true;
 		var inv:Inventory = e.result as Inventory;
 		var slots:Slots = inv.slots;
 		
@@ -78,9 +154,6 @@ public class  UserInventory extends QuickInventory
 			item.box = (boxes[i] as BoxInventory);
 			(boxes[i] as BoxInventory).updateObjectInfo( item );
 		}
-		
-		resizeObject( null );
-//		Globals.g_app.addEventListener( VVWindowEvent.WINDOW_CLOSING, shouldDisplay );			
 	}
 	
 	/////////// start drag and drop //////////////////////////////////////////////////////
@@ -90,7 +163,7 @@ public class  UserInventory extends QuickInventory
 			var bi:BoxInventory = e.dragOperation.initiator as BoxInventory;
 			var slotId:int = int( bi.name );
 			bi.reset();
-			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, null ) );
+			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, _owner, slotId, null ) );
 			// sets edit cursor to none
 			EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
 			Globals.g_app.editing = false;
@@ -170,7 +243,7 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	// Dont call this until 
-	override public function buildItems():void {
+	override protected function buildItems():void {
 		name = "ItemSelector";
 		
 		var count:int = 0;
@@ -184,11 +257,6 @@ public class  UserInventory extends QuickInventory
 		lastItemSelection = 0;
 		
 		width = Slots.ITEM_COUNT * 64;
-		display();
-		
-		//processItemSelection( noneBox );
-		
-//		resize(null);
 	}
 
 	private function pressItem(e:UIMouseEvent):void  {
@@ -199,14 +267,14 @@ public class  UserInventory extends QuickInventory
 	private function releaseItem(e:UIMouseEvent):void {
 	}			
 	
-	public function selectByIndex( $index:int ):void {
+	private function selectByIndex( $index:int ):void {
 		processItemSelection( boxes[$index] );
 	}
 	
 	private var _editCursorModelGuid:String;
 	private var _lastCursorType:int
 	
-	public function processItemSelection( box:UIObject ):void {
+	private function processItemSelection( box:UIObject ):void {
 		if ( 0 < Globals.openWindowCount )
 			return;
 			
@@ -300,7 +368,7 @@ public class  UserInventory extends QuickInventory
 		//Log.out( "UserInventory.cursorReady - ObjectModel guid: " + e.guid, Log.WARN );
 	}
 	
-	public function onMouseWheel(event:MouseEvent):void {
+	private function onMouseWheel(event:MouseEvent):void {
 		if ( 0 < event.delta ) {
 			if ( lastItemSelection < (Slots.ITEM_COUNT - 1)  )
 			{
@@ -320,24 +388,7 @@ public class  UserInventory extends QuickInventory
 				selectByIndex( lastItemSelection - 1 );
 			}
 	}	
-	
-	static public function get lastItemSelection():int  { return _lastItemSelection; }
-	static public function set lastItemSelection(value:int):void { _lastItemSelection = value; }
 
-	public function show():void {
-		_outline.visible = true;
-		visible = true;
-		Globals.g_app.editing = true;
-		addListeners();
-	}
-	
-	public function hide():void {
-		Globals.g_app.editing = false;
-		_outline.visible = false;
-		visible = false;
-		removeListeners();
-	}
-	
 	private function showGrainTools():void {
 		_toolSize.show();
 		_shape.show();
@@ -348,19 +399,24 @@ public class  UserInventory extends QuickInventory
 		_shape.hide();
 	}
 
-	public function addListeners():void {
-		//Log.out( "UserInventory.addListeners " + this + "==============================================================================" );
-		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+	private var _listenersAdded:Boolean;
+	private function addListeners():void {
+		//Log.out( "UserInventory.addListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
+		if ( false == _listenersAdded ) {
+			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
+			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+			_listenersAdded = true
+		}
 	}
 	
-	public function removeListeners():void {
-		//Log.out( "UserInventory.removeListeners " + this + "==============================================================================" );
+	private function removeListeners():void {
+		//Log.out( "UserInventory.removeListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+		_listenersAdded = false;
 	}
 
-	public function hotKeyInventory(e:KeyboardEvent):void {
+	private function hotKeyInventory(e:KeyboardEvent):void {
 		if  ( !Globals.active )
 			return;
 			

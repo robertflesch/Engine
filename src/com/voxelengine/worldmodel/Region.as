@@ -493,7 +493,7 @@ package com.voxelengine.worldmodel
 			created = $dbo.created;
 			modified = $dbo.modified;
 			
-			Log.out( "Region.fromPersistance - region Name: " + name + "  owner: " + owner + "  guid: " + guid, Log.DEBUG );
+			//Log.out( "Region.fromPersistance - region Name: " + name + "  owner: " + owner + "  guid: " + guid, Log.DEBUG );
 			
 			if ( $dbo && $dbo.data ) {
 				var ba:ByteArray = $dbo.data 

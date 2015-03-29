@@ -8,6 +8,7 @@
 
 package com.voxelengine.GUI
 {
+import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.GUI.actionBars.WindowBeastControl;
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
@@ -84,6 +85,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	public function VoxelVerseGUI(title : String = null) { 
 		Globals.g_app.stage.addEventListener( FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
 		LoadingImage.init();
+		UserInventory.init();
 	}
 	
 	private function fullScreenEvent(event:FullScreenEvent):void {
@@ -275,8 +277,6 @@ public class VoxelVerseGUI extends EventDispatcher
 //			Globals.g_app.addEventListener(Event.ACTIVATE, activate);
 //			Globals.g_app.stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
 		
-		ModelEvent.addListener( ModelEvent.TAKE_CONTROL, WindowBeastControl.handleModelEvents );
-		ModelEvent.addListener( ModelEvent.RELEASE_CONTROL, WindowBeastControl.handleModelEvents );
 		ModelEvent.addListener( ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
 		LoginEvent.addListener(LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
 		RoomEvent.addListener(RoomEvent.ROOM_JOIN_FAILURE, joinRoomFailureHandler );

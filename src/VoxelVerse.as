@@ -195,7 +195,7 @@ package {
 				if ( Globals.online ) {
 					//Log.out( "VoxelVerse.deactivateApp - NOT SAVING REGION AND INVENTORY", Log.WARN );
 					RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
-					InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_SAVE_REQUEST, null, null ) );
+					InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, null, null ) );
 				}
 				
 				GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_DEACTIVATE ) );

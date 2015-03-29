@@ -49,7 +49,7 @@ public class PersistBigDB
 		if ( !isSupportedTable( $pe ) )
 			return;
 			
-		Log.out( "PersistBigDB.load - table: " + $pe.table + " for user: " + $pe.guid, Log.DEBUG );
+		//Log.out( "PersistBigDB.load - table: " + $pe.table + " for user: " + $pe.guid, Log.DEBUG );
 		
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT, errorNoClient );
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
@@ -98,7 +98,7 @@ public class PersistBigDB
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT, loadTypeNoClient );
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, loadTypeNoDB );
 		
-		Log.out( "PersistRegion.loadType - table: " + $pe.table + "  index: " + ($pe.data as String) + "  type: " + $pe.guid, Log.DEBUG ); 
+		//Log.out( "PersistRegion.loadType - table: " + $pe.table + "  index: " + ($pe.data as String) + "  type: " + $pe.guid, Log.DEBUG ); 
 		Persistance.loadRange( $pe.table
 							 , ($pe.data as String)
 							 , [$pe.guid]
@@ -112,7 +112,7 @@ public class PersistBigDB
 		PlayerIOPersistanceEvent.removeListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, loadTypeNoDB );
 				
 		function loadTypeSucceed( dba:Array ):void {
-			Log.out( "PersistRegion.loadType.succeed - regions loaded: " + dba.length, Log.DEBUG );
+			//Log.out( "PersistRegion.loadType.succeed - regions loaded: " + dba.length, Log.DEBUG );
 			for each ( var $dbo:DatabaseObject in dba )
 			{
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $dbo.key, $dbo, false ) );
@@ -144,7 +144,7 @@ public class PersistBigDB
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
 		if ( $pe.dbo )
 		{
-			Log.out( "PersistBigDB.save - saving inventory: " + $pe.guid );
+			//Log.out( "PersistBigDB.save - saving inventory: " + $pe.guid );
 			
 			Persistance.saveObject( $pe.dbo
 			                      , saveSucceed
@@ -152,7 +152,7 @@ public class PersistBigDB
 		}
 		else
 		{
-			Log.out( "PersistBigDB.create - creating table: " + $pe.table + "  guid:" + $pe.guid + "" );
+			Log.out( "PersistBigDB.create - creating object in table: " + $pe.table + "  guid:" + $pe.guid + "" );
 			//var metadata:Object = { created: new Date(), modified: new Date(), data: $pe.data };
 			var metadata:Object = $pe.data as Object;
 			Persistance.createObject( $pe.table
@@ -167,7 +167,7 @@ public class PersistBigDB
 		PlayerIOPersistanceEvent.removeListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
 		
 		function createSucceed($dbo:DatabaseObject):void  {  
-			Log.out( "PersistBigDB.save - CREATE Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
+			//Log.out( "PersistBigDB.save - CREATE Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.CREATE_SUCCEED, $pe.series, $pe.table, $pe.guid, $dbo ) ); 
 		}
 		
@@ -177,7 +177,7 @@ public class PersistBigDB
 		}
 
 		function saveSucceed():void  {  
-			Log.out( "PersistBigDB.save - Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
+			//Log.out( "PersistBigDB.save - Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_SUCCEED, $pe.series, $pe.table, $pe.guid ) ); 
 		}
 		

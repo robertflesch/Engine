@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models.types
 {
 import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.InventoryInterfaceEvent;
 import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.biomes.Biomes;
@@ -18,6 +19,8 @@ import flash.display3D.Context3D;
 import flash.events.KeyboardEvent;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
+import flash.utils.getQualifiedClassName;
+
 
 import playerio.PlayerIOError;
 import playerio.DatabaseObject;
@@ -57,7 +60,8 @@ public class Player extends Avatar
 	static private const 	MIN_TURN_AMOUNT:Number 		= 0.09;
 	static private const 	AVATAR_CLIP_FACTOR:Number 	= 0.90;
 	static private var  	STEP_UP_MAX:int 			= 16;
-	private var _userInventory:UserInventory;		
+	
+	
 	public function Player( instanceInfo:InstanceInfo ) { 
 		Log.out( "Player.construct instanceGuid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super( instanceInfo );
@@ -95,14 +99,12 @@ public class Player extends Avatar
 		
 	override public function set dead(val:Boolean):void { 
 		super.dead = val;
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_UNLOAD_REQUEST, _instanceInfo.instanceGuid, null ) );
 		removeEventHandlers();
 	}
 	
 	private function addEventHandlers():void {
 		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		
-		ModelEvent.addListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		
 		LoadingEvent.addListener( LoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
@@ -116,7 +118,6 @@ public class Player extends Avatar
 	private function removeEventHandlers():void {
 		LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		
-		ModelEvent.removeListener( ModelEvent.RELEASE_CONTROL, handleModelEvents );
 		ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		
 		LoadingEvent.removeListener( LoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
@@ -162,7 +163,7 @@ public class Player extends Avatar
 			//new ModelMaker( ii );
 			new ModelMakerLocal( ii );
 			
-			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_REQUEST, Network.userId, null ) );
+			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, Network.userId, null ) );
 		}
 		else {
 			Log.out( "Player.onPlayerLoadedAction - ERROR, failed to create new record for ?" );
@@ -348,7 +349,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 
 	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
-		Log.out( "Player.takeControl --------------------------------------------------------------------------------------------------------------------" );
+		Log.out( "Player.takeControl --------------------------------------------------------------------------------------------------------------------", Log.WARN );
 		super.takeControl( $modelLosingControl, false );
 		instanceInfo.usesCollision = true;
 		// We need to grab the rotation of the old parent, otherwise we get rotated back to 0 since last rotation is 0
@@ -356,10 +357,12 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 			instanceInfo.rotationSet = $modelLosingControl.instanceInfo.rotationGet;
 
 		//GUIEvent.dispatch( new GUIEvent(GUIEvent.TOOLBAR_SHOW));
+		var className:String = getQualifiedClassName( topmostControllingModel() );
+		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
 	}
 
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
-		Log.out( "Player.loseControl--------------------------------------------------------------------------------------------------------------------" );
+		Log.out( "Player.loseControl --------------------------------------------------------------------------------------------------------------------", Log.WARN );
 		super.loseControl( $modelDetaching, false );
 		instanceInfo.usesCollision = false;
 	}
@@ -396,11 +399,14 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		// add the player to this regions model list.
 		Region.currentRegion.modelCache.add( this );
 		
-		if ( null == _userInventory && Globals.online )
-			_userInventory = new UserInventory();
-		// apply this regions location, position, etc setting to the player
 		if ( Region.currentRegion )
 			Region.currentRegion.applyRegionInfoToPlayer( this );
+			
+//		ModelEvent.dispatch( new ModelEvent( ModelEvent.RELEASE_CONTROL, instanceInfo.instanceGuid ) );
+//		var className:String = getQualifiedClassName( topmostControllingModel() );
+//		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
+		
+		InventoryInterfaceEvent.dispatch( new InventoryInterfaceEvent( InventoryInterfaceEvent.DISPLAY, instanceInfo.instanceGuid, "userInventory.png" ) );
 	}
 	
 	

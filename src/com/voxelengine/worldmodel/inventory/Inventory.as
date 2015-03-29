@@ -21,29 +21,30 @@ import com.voxelengine.worldmodel.inventory.ObjectInfo;
 
 public class Inventory
 {
-	
-	private var  _slots:Slots
-	private var _voxels:Voxels;
-	private var _networkId:String;
-
 	// support data for persistance
 	private var _dbo:DatabaseObject  = null;							
 	private var _createdDate:Date;
 	private var _modifiedDate:Date;
 	private var _generateNewInventory:Boolean;
+	private var _loaded:Boolean;
 
+	private var  _slots:Slots
+	private var _voxels:Voxels;
+	private var _owner:String;
 	public function get slots():Slots  { return _slots; }
 	public function get voxels():Voxels  { return _voxels; }
-	public function get networkId():String { return _networkId; }
+	public function get owner():String { return _owner; }
 	
-	public function Inventory( $networkId:String ) {
-		_slots = new Slots( $networkId );
-		_networkId = $networkId;
-		_voxels = new Voxels( $networkId );
+	public function get loaded():Boolean { return _loaded; }
+	
+	public function Inventory( $owner:String ) {
+		_slots = new Slots( $owner );
+		_owner = $owner;
+		_voxels = new Voxels( $owner );
 	}
 	
 	public function unload():void {
-		Log.out( "Inventory.unload - networkId: " + _networkId, Log.WARN );
+		//Log.out( "Inventory.unload - owner: " + _owner, Log.WARN );
 		_slots.unload();
 		_voxels.unload();
 	}
@@ -60,7 +61,7 @@ public class Inventory
 	
 	public function save():void {
 		if ( Globals.online && changed() ) {
-			Log.out( "Inventory.save - Saving User Inventory networkId: " + networkId, Log.WARN );
+			Log.out( "Inventory.save - Saving User Inventory owner: " + owner, Log.WARN );
 			if ( _dbo )
 				toPersistance();
 			else {
@@ -70,10 +71,10 @@ public class Inventory
 			addSaveEvents();
 			PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, createSuccess );
 			PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSuccess );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_INVENTORY_TABLE, _networkId, _dbo, ba ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_INVENTORY_TABLE, _owner, _dbo, ba ) );
 		}
 		else
-			Log.out( "Inventory.save - NOT Saving - status online: " + Globals.online + "  changed: " + changed() + "  networkId: " + networkId, Log.DEBUG );
+			Log.out( "Inventory.save - NOT Saving - status online: " + Globals.online + "  changed: " + changed() + "  owner: " + owner, Log.DEBUG );
 	}
 	
 	private function toPersistance():void {
@@ -84,7 +85,7 @@ public class Inventory
 	}
 
 	public function asByteArray( $ba:ByteArray ):ByteArray {
-		$ba.writeUTF( _networkId );
+		$ba.writeUTF( _owner );
 		_voxels.asByteArray( $ba );
 		_slots.asByteArray( $ba );
 		$ba.compress();
@@ -103,7 +104,7 @@ public class Inventory
 	{
 		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
-		Log.out( "Inventory.createSuccess - setting dbo for - networkId: " + networkId, Log.DEBUG );
+		Log.out( "Inventory.createSuccess - setting dbo for - owner: " + owner, Log.DEBUG );
 		_dbo = $pe.dbo;
 		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, createSuccess );
 		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSuccess );
@@ -115,7 +116,7 @@ public class Inventory
 	public function load():void {
 		if ( Globals.online ) {
 			addLoadEvents();
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.DB_INVENTORY_TABLE, _networkId ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.DB_INVENTORY_TABLE, _owner ) );
 		}
 	}
 
@@ -172,7 +173,7 @@ public class Inventory
 		// this occurs on first time logging in.
 		removeLoadEvents();
 		fromPersistance( null );
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, _networkId, this ) );
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, _owner, this ) );
 	}
 	
 	private function loadSuccess( $pe:PersistanceEvent ):void
@@ -181,7 +182,8 @@ public class Inventory
 			return;
 		removeLoadEvents();
 		fromPersistance( $pe.dbo );
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.INVENTORY_RESPONSE, _networkId, this ) );
+		_loaded = true;
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, _owner, this ) );
 	}
 	
 	private function loadFailed( $pe:PersistanceEvent ):void

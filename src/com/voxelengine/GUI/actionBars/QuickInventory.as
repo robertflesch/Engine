@@ -86,7 +86,7 @@ public class QuickInventory extends VVCanvas
 		//Log.out( "QuickInventory index of selected: " + QuickInventory.currentItemSelection );
 	}
 	
-	public function buildItems():void { }
+	protected function buildItems():void { }
 	
 	public function resizeObject(event:Event):void 
 	{

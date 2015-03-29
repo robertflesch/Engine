@@ -7,6 +7,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.InventoryInterfaceEvent;
+import com.voxelengine.GUI.actionBars.UserInventory;
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.utils.getTimer;
@@ -103,6 +106,8 @@ public class ControllableVoxelModel extends VoxelModel
 		GUIEvent.addListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
 		GUIEvent.addListener( GUIEvent.APP_ACTIVATE, onActivate );
 		_ct = new CollisionTest( this );
+		
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, instanceInfo.instanceGuid, null ) );
 	}
 	
 	override protected function processClassJson():void {
@@ -111,7 +116,7 @@ public class ControllableVoxelModel extends VoxelModel
 		{
 			var cmInfo:Object = modelInfo.json.controllableVoxelModel;
 			if ( null == cmInfo ) {
-				Log.out( "ControllableVoxelModel.processClassJson - no controllable model JSON info found", Log.DEBUG );
+				//Log.out( "ControllableVoxelModel.processClassJson - no controllable model JSON info found", Log.DEBUG );
 				return;
 			}
 			
@@ -128,8 +133,8 @@ public class ControllableVoxelModel extends VoxelModel
 			}
 				
 		}
-		else
-			Log.out( "ControllableVoxelModel.processClassJson - no modelInfo JSON info found", Log.DEBUG );
+		//else
+		//	Log.out( "ControllableVoxelModel.processClassJson - no modelInfo JSON info found", Log.DEBUG );
 	}
 	
 	override public function buildExportObject( obj:Object ):Object {
@@ -457,6 +462,19 @@ public class ControllableVoxelModel extends VoxelModel
 			instanceInfo.setTo( loc );
 		
 		return true;
+	}
+	
+	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
+		super.takeControl( $modelLosingControl, $addAsChild );
+	}
+	
+	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
+		super.loseControl( $modelDetaching, $detachChild );
+		// save inventory
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, instanceInfo.instanceGuid, null ) );
+		// no longer controlling this model
+		// shut down the toolbar
+		InventoryInterfaceEvent.dispatch( new InventoryInterfaceEvent( InventoryInterfaceEvent.CLOSE, instanceInfo.instanceGuid, null ) );
 	}
 	
 	/*
