@@ -135,6 +135,8 @@ public class VoxelModel
 		if ( metadata.permissions.modify && Globals.g_configManager.showEditMenu) {
 			if ( null == editCursor )
 				editCursor = EditCursor.create();
+			//if ( null == editCursor.oxel.vm_get() )
+				editCursor.oxel.vm_initialize( _statisics );
 			editCursor.oxel.gc.bound = oxel.gc.bound;
 		}
 	}
@@ -759,7 +761,7 @@ public class VoxelModel
 			
 			if (oxel && oxel.dirty)
 			{
-				oxel.cleanup( metadata );
+				oxel.cleanup();
 			}
 		}
 	}

@@ -160,7 +160,7 @@ public class ControllableVoxelModel extends VoxelModel
 			
 			if (oxel && oxel.dirty)
 			{
-				oxel.cleanup( metadata );
+				oxel.cleanup();
 			}
 		}
 	}

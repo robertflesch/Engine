@@ -1176,7 +1176,7 @@ package com.voxelengine.worldmodel.oxel
 			faces_mark_all_dirty();
 		}
 		
-		public function cleanup( $md:ModelMetadata ):void {
+		public function cleanup():void {
 			var timer:int = getTimer();
 			//Log.out( "Oxel.cleanup - name: " + $md.name + " - guid: " + $md.guid );					
 			_s_oxelsCreated = 0;
@@ -1188,10 +1188,10 @@ package com.voxelengine.worldmodel.oxel
 //			Log.out( "Oxel.cleanup - facesBuild - took: " + (getTimer() - timer) );					
 //			timer = getTimer();
 			quadsBuild();
-//			Log.out( "Oxel.cleanup - quadsBuild -  took: " + (getTimer() - timer) );					
+			Log.out( "Oxel.cleanup - quadsBuild -  took: " + (getTimer() - timer) );					
 		}
 		
-		private function facesBuildWater():void {
+		public function facesBuildWater():void {
 			if ( dirty ) {
 				if ( childrenHas())
 				{

@@ -66,6 +66,12 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				}
 			}
 			oxel.dirty = true;
+			// CRITICAL STEP. when restoring the oxel, it expects to have faces, not dirty faces
+			// So this step turns the dirty faces into real faces.
+			// for multistep builds I will have to ponder this more.
+			oxel.facesBuildWater();
+			oxel.facesBuild();
+
 			
 			GrainCursorPool.poolDispose( loco );
 			var ba:ByteArray = VoxelModel.oxelAsBasicModel( oxel );
