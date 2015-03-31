@@ -144,7 +144,10 @@ package com.voxelengine.server
 			eventCollector.addEvent( this, WindowEvent.CLOSE_BUTTON_CLICKED, cancel );
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize);
 			
-			captchaLoad();
+			// have to enenable the captcha in playerio in quick connect
+			Log.out( "WindowRegister - BYPASSING CAPTCHA until fixed by PlayerIO", Log.WARN );
+			//captchaLoad();
+			bypassCaptcha();
 			
 			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
 		}
@@ -219,6 +222,13 @@ package com.voxelengine.server
 			}		
 		}
 		
+		private function bypassCaptcha():void {
+			addElement( _errorText );
+			var createAccountButton:Button = new Button( "Create Account", 265, 40 );
+				createAccountButton.addEventListener(UIMouseEvent.CLICK, createAccountButtonHandlerNoCaptcha );
+				addElement( createAccountButton );
+		}
+		
 		private function captchaReReceive( $captchaKey:String, $captchaImageUrl:String):void
 		{
 			_captchaKey = $captchaKey;
@@ -248,6 +258,40 @@ package com.voxelengine.server
 
 		}		
 		
+		private function createAccountButtonHandlerNoCaptcha( $event:UIMouseEvent):void {
+			_passwordInput.glow = false;
+			_passwordInput2.glow = false;
+			_eInput.glow = false;
+			_unInput.glow = false;
+			_errorText.text = "";
+			
+			if ( 5 > _unInput.text.length ) {
+				var pwe:PlayerIORegistrationError = new PlayerIORegistrationError( "Username length error: ", 1, null, "Username must be 5 characters or longer", null, null );
+				registrationError( pwe );
+				return;
+				
+			} else if ( _password != _password2 ) {
+				var pwe1:PlayerIORegistrationError = new PlayerIORegistrationError( "Password error: ", 1, null, "Passwords don't match", null, null );
+				registrationError( pwe1 );
+				return;
+			}
+			
+			Log.out( "userName: " + _userName + "  password: " + _password + "  email:" + _email, Log.DEBUG );
+			PlayerIO.quickConnect.simpleRegister(
+									Globals.g_app.stage,
+									Globals.GAME_ID,
+									_userName,
+									_password,
+									_email,
+									null,  // the captcha key from the simpleGetCaptcha() method
+									null, // the captcha text entered by the user
+									null, 	// Extra data attached to the user on creation
+									"", 	// String that identifies a possible affiliate partner.
+									registrationSuccess,
+									registrationError
+								);
+		}
+		
 		private function createAccountButtonHandler( $event:UIMouseEvent):void {
 			_passwordInput.glow = false;
 			_passwordInput2.glow = false;
@@ -255,9 +299,14 @@ package com.voxelengine.server
 			_unInput.glow = false;
 			_errorText.text = "";
 			
-			if ( _password != _password2 ) {
-				var pwe:PlayerIORegistrationError = new PlayerIORegistrationError( "Password error: ", 1, null, "Passwords don't match", null, null );
+			if ( 5 > _unInput.text.length ) {
+				var pwe:PlayerIORegistrationError = new PlayerIORegistrationError( "Username length error: ", 1, "Username must be 5 characters or longer", null, null, null );
 				registrationError( pwe );
+				return;
+				
+			} else if ( _password != _password2 ) {
+				var pwe1:PlayerIORegistrationError = new PlayerIORegistrationError( "Password error: ", 1, null, "Passwords don't match", null, null );
+				registrationError( pwe1 );
 				return;
 			}
 			

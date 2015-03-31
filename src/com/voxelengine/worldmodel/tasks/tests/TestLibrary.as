@@ -9,6 +9,7 @@
 package com.voxelengine.worldmodel.tasks.tests
 {
 	import com.voxelengine.Globals;
+	import com.voxelengine.worldmodel.tasks.landscapetasks.*;
 	import com.voxelengine.worldmodel.tasks.tests.*;
 	import flash.utils.getDefinitionByName;
     
@@ -22,7 +23,7 @@ package com.voxelengine.worldmodel.tasks.tests
         public static function getAsset ( assetLinkageID : String ) : Class
         {
 			TestSphere;	
-			TestSolid;
+			GenerateCube;
 			TestError;
 			TestDebugMacro;
 			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.tasks.tests.TestError" ) ) ;;
@@ -32,9 +33,17 @@ package com.voxelengine.worldmodel.tasks.tests
 			}
 			catch ( error:Error )
 			{
-				trace( "----------------------------------------" );
-				trace( "TestLibrary.getAsset - ERROR: " + error );
-				trace( "----------------------------------------" );
+				asset = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.tasks.landscape." + assetLinkageID ) ) ;
+				try 
+				{
+					asset = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.tasks.tests." + assetLinkageID ) ) ;
+				}
+				catch ( error:Error )
+				{
+					trace( "----------------------------------------" );
+					trace( "TestLibrary.getAsset - ERROR: " + error );
+					trace( "----------------------------------------" );
+				}
 			}
 
             //var asset : Class = Class ( getDefinitionByName ( "VoxelVerse" ) ) ;

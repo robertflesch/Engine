@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.server
 {
+	import com.voxelengine.events.LoadingImageEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.events.WindowSplashEvent;
 	import com.voxelengine.GUI.VoxelVerseGUI;
@@ -40,6 +41,7 @@ package com.voxelengine.server
 		private var _errorText:Label;
 		private var _userInfo:SharedObject;
 		private var _savePW:CheckBox;
+		private var _loginButton:Button
 
 		private var _topImage:Bitmap;
 		[Embed(source='../../../../../Resources/bin/assets/textures/loginImage.png')]
@@ -137,11 +139,11 @@ package com.voxelengine.server
 			const buttonHeight:int = 45;
 			var buttonPanel:Container = new Container( width, buttonHeight );
 			buttonPanel.padding = 7.5;
-			var loginButton:Button = new Button( "Login", buttonWidth, buttonHeight - 15 );
-			loginButton.tabIndex = 4;
-			loginButton.addEventListener(UIMouseEvent.CLICK, loginButtonHandler );
-//			loginButton.shadow = true;
-			buttonPanel.addElement( loginButton );
+			_loginButton = new Button( "Login", buttonWidth, buttonHeight - 15 );
+			_loginButton.tabIndex = 4;
+			_loginButton.addEventListener(UIMouseEvent.CLICK, loginButtonHandler );
+//			_loginButton.shadow = true;
+			buttonPanel.addElement( _loginButton );
 			
 			var registerButton:Button = new Button( "Register..", buttonWidth, buttonHeight - 15 );
 			registerButton.addEventListener(UIMouseEvent.CLICK, registerButtonHandler );
@@ -220,6 +222,8 @@ package com.voxelengine.server
 		////////////////////////////////////////////////////////////////////////////////
 		private function loginButtonHandler(event:UIMouseEvent):void 
 		{
+			_loginButton.enabled = false;
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 			_errorText.text = "";
 			_emailInput.glow = false;
 			_passwordInput.glow = false;
@@ -240,6 +244,8 @@ package com.voxelengine.server
 			LoginEvent.removeListener( LoginEvent.LOGIN_FAILURE, onUnknownFailure );
 			LoginEvent.removeListener( LoginEvent.LOGIN_FAILURE_PASSWORD, onPasswordFailure );
 			LoginEvent.removeListener( LoginEvent.LOGIN_FAILURE_EMAIL, onEmailFailure );
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
+			_loginButton.enabled = true;
 		}
 		
 		private const BAD_EMAIL_PASSWORD:String = "Bad email or password";

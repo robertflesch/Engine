@@ -173,6 +173,7 @@ public class Inventory
 		// this occurs on first time logging in.
 		removeLoadEvents();
 		fromPersistance( null );
+		Log.out( "Inventory.notFound - OWNER: " + _owner, Log.WARN );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, _owner, this ) );
 	}
 	
@@ -183,6 +184,7 @@ public class Inventory
 		removeLoadEvents();
 		fromPersistance( $pe.dbo );
 		_loaded = true;
+		Log.out( "Inventory.loadSuccess - OWNER: " + _owner, Log.WARN );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, _owner, this ) );
 	}
 	
@@ -229,7 +231,7 @@ public class Inventory
 		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "Inventory.createFailed - Failed to create new Inventory object for this avatar.", Log.ERROR );
+		Log.out( "Inventory.createFailed - Failed to create new Inventory object for this object.", Log.ERROR );
 	}
 }
 }

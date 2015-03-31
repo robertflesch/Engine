@@ -135,7 +135,7 @@ public class ModelMetadataCache
 	
 	static private function loadFailed( $pe:PersistanceEvent ):void 
 	{
-		if ( Globals.DB_TABLE_MODELS != $pe.table )
+		if ( Globals.DB_TABLE_MODELS != $pe.table || Globals.MODEL_INFO_EXT != $pe.table )
 			return;
 		Log.out( "MetadataManager.metadataLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
@@ -143,7 +143,7 @@ public class ModelMetadataCache
 
 	static private function loadNotFound( $pe:PersistanceEvent):void 
 	{
-		if ( Globals.DB_TABLE_MODELS != $pe.table )
+		if ( Globals.DB_TABLE_MODELS != $pe.table || Globals.MODEL_INFO_EXT != $pe.table )
 			return;
 		Log.out( "MetadataManager.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );

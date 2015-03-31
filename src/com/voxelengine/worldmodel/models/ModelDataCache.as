@@ -92,8 +92,8 @@ public class ModelDataCache
 			add( $pe, vmd );
 		}
 		else {
-			Log.out( "ModelDataCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR );
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
+			Log.out( "ModelDataCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.WARN );
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 		}
 	}
 	
@@ -101,16 +101,16 @@ public class ModelDataCache
 	{
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		Log.out( "ModelDataCache.loadFailed " + $pe.toString(), Log.ERROR );
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
+		Log.out( "ModelDataCache.loadFailed " + $pe.toString(), Log.WARN );
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
 	static private function loadNotFound( $pe:PersistanceEvent):void 
 	{
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		Log.out( "ModelDataCache.loadNotFound " + $pe.toString(), Log.ERROR );
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
+		Log.out( "ModelDataCache.loadNotFound " + $pe.toString(), Log.WARN );
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
 }

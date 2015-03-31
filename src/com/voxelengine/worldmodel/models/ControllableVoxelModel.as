@@ -145,17 +145,6 @@ public class ControllableVoxelModel extends VoxelModel
 		obj.controllableVoxelModel = exportData
 		return obj;
 	}
-	/*
-	override protected function addClassJson():String {
-		var jsonString:String = super.addClassJson();
-		jsonString += ",";
-		jsonString += "\"controllableVoxelModel\": { "
-		jsonString += "\"clipFactor\" : " + clipVelocityFactor + ",";
-		jsonString += "\"maxSpeed\" : " + mMaxSpeed;
-		jsonString += "}"
-		return jsonString
-	}
-	*/
 	
 	override protected function internal_update($context:Context3D, $elapsedTimeMS:int):void {
 		if (!initialized)

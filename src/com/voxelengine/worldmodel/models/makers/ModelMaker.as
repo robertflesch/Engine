@@ -33,18 +33,16 @@ import com.voxelengine.worldmodel.models.ModelInfo;
 public class ModelMaker extends ModelMakerBase {
 	
 	// keeps track of how many makers there currently are.
-	static public var _makerCount:int;
-	
 	private var _vmm:ModelMetadata;
 	private var _addToRegionWhenComplete:Boolean;
 	
 	public function ModelMaker( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean, $parentModelGuid:String = null ) {
+		Log.out( "ModelMaker", Log.WARN );
 		_addToRegionWhenComplete = $addToRegionWhenComplete;
 		super( $ii, true, $parentModelGuid );
-		if ( 0 == _makerCount )
+		if ( 0 == makerCountGet() )
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
-		_makerCount++;
-		//Log.out( "ModelMaker - makerCount: " + _makerCount );
+		makerCountIncrement();
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retriveMetadata );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retriveMetadata );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
@@ -74,6 +72,8 @@ public class ModelMaker extends ModelMakerBase {
 			if ( vm && _addToRegionWhenComplete )
 				Region.currentRegion.modelCache.add( vm );
 		}
+		else if ( null != _vmm && true == _vmdFailed )
+			markComplete( false );
 	}
 	
 	override protected function markComplete( $success:Boolean = true ):void {
@@ -82,15 +82,13 @@ public class ModelMaker extends ModelMakerBase {
 		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retriveMetadata );		
 		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retriveMetadata );		
 		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
-		_makerCount--;
-		if ( 0 == _makerCount ) {
-			//Log.out( "ModelMaker.markComplete - makerCount: 0, SHUTTING DOWN SPLASH", Log.WARN );
+		makerCountDecrement();
+		if ( 0 == makerCountGet() ) {
+			Log.out( "ModelMaker.markComplete - makerCount: 0, SHUTTING DOWN SPLASH", Log.WARN );
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
 			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );
 		}
-		//else
-		//	Log.out( "ModelMaker.markComplete - makerCount: " + _makerCount );
 	}
 	
 	private function createFromMakerInfo():VoxelModel {

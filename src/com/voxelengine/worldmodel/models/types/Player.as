@@ -159,11 +159,10 @@ public class Player extends Avatar
 			ii.grainSize = 4;
 			//ii.guid = $dbo.modelGuid;
 			ii.modelGuid = "Player";
+			ii.instanceGuid = Network.userId;
 			//Log.out( "Player.onPlayerLoadedAction - creating player with guid: " + ii.guid, Log.WARN  );
 			//new ModelMaker( ii );
 			new ModelMakerLocal( ii );
-			
-			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, Network.userId, null ) );
 		}
 		else {
 			Log.out( "Player.onPlayerLoadedAction - ERROR, failed to create new record for ?" );
@@ -706,6 +705,21 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 			instanceInfo.velocityReset();
 		}
 	}		
+	
+	import com.voxelengine.worldmodel.inventory.*;
+	override public function getDefaultSlotData():Vector.<ObjectInfo> {
+		
+		Log.out( "Player.getDefaultSlotData - Loading default data into slots" , Log.WARN );
+		var slots:Vector.<ObjectInfo> = new Vector.<ObjectInfo>( Slots.ITEM_COUNT );
+		for ( var i:int; i < Slots.ITEM_COUNT; i++ ) 
+			slots[i] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );
+		
+		slots[0] = new ObjectTool( null, "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );
+		slots[1] = new ObjectAction( null, "noneSlots", "none.png", "Do nothing" );
+		
+		return slots;
+	}
+	
 	/* applyGravityNew
 	private	function applyGravityNew( $elapsedTimeMS:int ):void
 	{

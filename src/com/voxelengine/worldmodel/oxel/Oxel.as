@@ -201,6 +201,7 @@ package com.voxelengine.worldmodel.oxel
 		
 		public function get vertMan():VertexManager { return _vertMan; }
 		
+		
 		// Intentionally empty, since these are allocated enmase in pool
 		public function Oxel() {
 		}
@@ -216,6 +217,23 @@ package com.voxelengine.worldmodel.oxel
 			}
 
 			return true;
+		}
+		
+		static public function initializeRoot( $grainSize:int, $baseLightLevel:int ):Oxel
+		{
+			try {
+				var oxel:Oxel = OxelPool.poolGet();
+				var gct:GrainCursor = GrainCursorPool.poolGet($grainSize)
+				gct.grain = $grainSize;
+				oxel.initialize(null, gct, 0, TypeInfo.AIR, null);
+				oxel.lighting = LightingPool.poolGet( $baseLightLevel );
+				Lighting.defaultBaseLightAttn = $baseLightLevel;
+			}
+			catch (e:Error) {
+				Log.out( "Oxel.initialize_root_oxel - grain: " + oxel.gc.grain );					
+			}
+			return oxel;
+			//Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.guid: " + instanceInfo.guid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + Globals.Info[type].name );					
 		}
 		
 		public function validate():void

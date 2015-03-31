@@ -81,14 +81,30 @@ public class Ammo
 			_impactSoundFile = $ammoJson.impactSoundFile;
 		if ( $ammoJson.contactScript )
 			_contactScript = $ammoJson.contactScript;
-		if ( $ammoJson.name )
-			_name = $ammoJson.name;
 		//Log.out( "Ammo.processClassJson" );
 		SoundBank.getSound( _impactSoundFile ); // Preload the sound file
 		SoundBank.getSound( _launchSoundFile );
 		//ModelLoader.modelInfoFindOrCreate( _model, null, false );
 //		ModelLoader.modelInfoFindOrCreate( _model, _model, false );
 	}
+	
+	public function buildExportObject():Object {
+		var ammoData:Object = new Object();
+		ammoData.name				= _name;
+		ammoData.accuracy			= _accuracy;
+		ammoData.velocity			= _velocity;
+		ammoData.type				= _type;
+		ammoData.count				= _count;
+		ammoData.oxelType			= _oxelType;
+		ammoData.life				= _life;
+		ammoData.grain				= _grain;
+		ammoData.model				= _model;
+		ammoData.launchSoundFile	= _launchSoundFile;
+		ammoData.impactSoundFile 	= _impactSoundFile;
+		ammoData.contactScript		= _contactScript;
+		return ammoData;
+	}
+	
 	
 	public function clone():Ammo {
 		var ammo:Ammo = new Ammo();

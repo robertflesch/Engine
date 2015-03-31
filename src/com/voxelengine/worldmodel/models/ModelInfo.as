@@ -51,6 +51,12 @@ package com.voxelengine.worldmodel.models
 
 		public function ModelInfo():void  { ; }
 		
+		public function boimeHas():Boolean {
+			if ( _biomes && _biomes.layers && 0 < _biomes.layers.length )
+				return true;
+			return false;
+		}
+		
 		public function clone( newGuid:String = "" ):ModelInfo
 		{
 			throw new Error( "ModelInfo.clone - VERIFY THIS FUNCTION" );
@@ -191,7 +197,7 @@ package com.voxelengine.worldmodel.models
 					return;
 				}
 				var layers:Object = modelInfoJson.biomes.layers;
-				_biomes.load_biomes_data(layers);
+				_biomes.layersLoad(layers);
 			}
 			
 			if ( modelInfoJson.children ) {

@@ -8,6 +8,7 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
+	import com.voxelengine.events.PersistanceEvent;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
@@ -16,6 +17,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
 	
 	/**
@@ -38,10 +40,12 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			//////////////////////////////////////////////////////////
 			// Builds Solid Cube of any grain size
 			//////////////////////////////////////////////////////////
-			var vm:VoxelModel = getVoxelModel();
-			if ( null == vm.oxel )
-				vm.initialize_root_oxel( vm.instanceInfo.grainSize );
-			var root_grain_size:uint = vm.oxel.gc.bound;
+			const root_grain_size:int = 4;
+			const baseLightLevel:int = 51;
+			var oxel:Oxel = Oxel.initializeRoot( root_grain_size, baseLightLevel );
+			//
+			//var root_grain_size:uint = vm.oxel.gc.bound;
+			Log.out( "GenerateCube.start - HOW DO I PASS IN THE GRAIN SIZE NOW", Log.WARN );
 			var min_grain_size:int = root_grain_size - _layer.range;
 			if ( 0 > min_grain_size || min_grain_size > root_grain_size || ( 8 < (root_grain_size - min_grain_size)) )
 			{
@@ -49,18 +53,23 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				Log.out( "GenerateCube.start - WARNING - Adjusting range: " + min_grain_size, Log.WARN );
 			}
 
-			//Log.out("GenerateCube.start on rootGrain of max size: " + root_grain_size + "  Filling with grain of size: " + min_grain_size + " of type: " + Globals.Info[_layer.type].name );
-			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
-			
+			//trace("GenerateCube.start on rootGrain of max size: " + root_grain_size + "  Filling with grain of size: " + min_grain_size + " of type: " + Globals.Info[_layer.type].name );
+			var loco:GrainCursor = GrainCursorPool.poolGet(root_grain_size);
 			var size:int = 1 << (root_grain_size - min_grain_size);
 			for ( var x:int = 0; x < size; x++ ) {
 				for ( var y:int = 0; y < size; y++ ) {
 					for ( var z:int = 0; z < size; z++ ) {
-						vm.write( loco.set_values( x, y, z, min_grain_size ), _layer.type, true );
+						loco.set_values( x, y, z, min_grain_size )
+						oxel.write( _instanceGuid, loco, _layer.type );
+						//vm.write( loco, _layer.type, true );
 					}
 				}
 			}
+			oxel.dirty = true;
+			
 			GrainCursorPool.poolDispose( loco );
+			var ba:ByteArray = VoxelModel.oxelAsBasicModel( oxel );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _instanceGuid, null, ba ) );
 			
 			//Log.out( "GenerateCube.start - took: "  + (getTimer() - timer) );					
             super.complete() // AbstractTask will send event

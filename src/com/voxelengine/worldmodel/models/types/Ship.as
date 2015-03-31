@@ -16,6 +16,7 @@ package com.voxelengine.worldmodel.models.types
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.ShipEvent;
 	import com.voxelengine.worldmodel.models.types.Engine;
+	import com.voxelengine.worldmodel.weapons.Gun;
 	import com.voxelengine.worldmodel.models.*;
 	import com.voxelengine.worldmodel.SoundBank;
 	
@@ -34,7 +35,7 @@ package com.voxelengine.worldmodel.models.types
 //		private const MAX_ROTATION_RATE:int = 1440;
 
 		protected var _engines:Vector.<VoxelModel> = new Vector.<VoxelModel>;
-		protected var _guns:Vector.<VoxelModel> = new Vector.<VoxelModel>;
+		protected var _guns:Vector.<Gun> = new Vector.<Gun>;
 		protected var _bombs:Vector.<VoxelModel> = new Vector.<VoxelModel>;
 		
 

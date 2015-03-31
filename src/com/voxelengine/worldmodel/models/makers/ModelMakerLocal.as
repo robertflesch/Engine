@@ -7,12 +7,15 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
+import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelDataEvent;
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.ModelData;
@@ -31,13 +34,13 @@ import flash.utils.ByteArray;
 public class ModelMakerLocal extends ModelMakerBase {
 	
 	// keeps track of how many makers there currently are.
-	static private var _makerCount:int;
 	
 	private var _vmi:ModelInfo;
 	
 	public function ModelMakerLocal( $ii:InstanceInfo, $parentModelGuid:String = null ) {
+		Log.out( "ModelMakerLocal", Log.WARN );
 		super( $ii, false, $parentModelGuid );
-		_makerCount++;
+		makerCountIncrement();
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retriveInfo );		
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
@@ -102,10 +105,13 @@ public class ModelMakerLocal extends ModelMakerBase {
 		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retriveInfo );		
 		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
 		
-		_makerCount--;
-		if ( 0 == _makerCount )
+		makerCountDecrement();
+		if ( 0 == makerCountGet() ) {
+			Log.out( "ModelMakerLocal.markComplete - makerCount: 0, SHUTTING DOWN SPLASH", Log.WARN );
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
-		//Log.out( "ModelMakerLocal.markComplete - makerCount: " + _makerCount + "  ii: " + _ii );
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
+			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );
+		}
 	}
 	
 	

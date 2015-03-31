@@ -23,7 +23,6 @@ import com.voxelengine.server.Network;
 public class Permissions
 {
 	static public const LARGEST_INT:int			= 2147483647;
-	static public const TEMPLATE_NONE:String	= "NONE";
 	static public const BIND_NONE:String 		= "BIND_NONE";
 	static public const BIND_PICKUP:String 		= "BIND_PICKUP";
 	static public const BIND_USE:String 		= "BIND_USE";
@@ -31,14 +30,14 @@ public class Permissions
 	
 	private var _copyCount:int 			= LARGEST_INT;		// Can this object be copied? -1 is no copy 0 - n is the number of copies remaining.
 	private var _modify:Boolean			= true;				// Can this object be modified
-	private var _templateGuid:String 	= null;				// Is this object based on something else? if so track the guid of original object
 	private var _creator:String 		= Network.userId;;	// The guid of the original creator
 	private var _createdDate:Date		= new Date();		// Date created
 	private var _binding:String			= BIND_NONE;		// Bind type (see above)
 	private var _blueprint:Boolean		= false;			// is this only a blue print for other objects.
+	private var _blueprintGuid:String 	= null;				// Is this object based on something else? if so track the guid of original object
 	
-	public function get templateGuid():String  			{ return _templateGuid; }
-	public function set templateGuid(value:String):void { _templateGuid = value; }
+	public function get blueprintGuid():String  			{ return _blueprintGuid; }
+	public function set blueprintGuid(value:String):void { _blueprintGuid = value; }
 
 	public function get modify():Boolean 				{ return _modify; }
 	public function set modify(value:Boolean):void 		{ _modify = value; }
@@ -66,7 +65,7 @@ public class Permissions
 		var newP:Permissions = new Permissions();
 		newP.copyCount 		= _copyCount;
 		newP.modify			= _modify;
-		newP.templateGuid	= new String( _templateGuid );
+		newP.blueprintGuid	= new String( _blueprintGuid );
 		newP.creator		= new String( _creator );
 		newP.createdDate	= new Date( _createdDate );
 		newP.binding		= new String( _binding );
@@ -76,7 +75,7 @@ public class Permissions
 	public function toPersistance( _dbo:DatabaseObject ):void {
 		_dbo.copyCount 		= _copyCount;
 		_dbo.modify			= _modify;
-		_dbo.templateGuid	= _templateGuid;
+		_dbo.templateGuid	= _blueprintGuid;
 		_dbo.creator		= _creator;
 		_dbo.createdDate	= _createdDate;
 		_dbo.binding		= _binding;
@@ -85,7 +84,7 @@ public class Permissions
 	public function fromPersistance( _dbo:DatabaseObject ):void {
 		_copyCount		= _dbo.copyCount;
 		_modify			= _dbo.modify;		
-		_templateGuid	= _dbo.templateGuid;
+		_blueprintGuid	= _dbo.templateGuid;
 		_creator		= _dbo.creator;
 		_createdDate	= _dbo._createdDate;
 		_binding		= _dbo.binding;
@@ -94,7 +93,7 @@ public class Permissions
 	public function addToObject( metadataObj:Object ):Object {
 		metadataObj.copyCount 	= _copyCount;
 		metadataObj.modify		= _modify;
-		metadataObj.templateGuid= _templateGuid;
+		metadataObj.templateGuid= _blueprintGuid;
 		metadataObj.creator		= _creator;
 		metadataObj.createdDate		= _createdDate;
 		metadataObj.binding		= _binding;

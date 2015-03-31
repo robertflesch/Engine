@@ -257,6 +257,8 @@ public class VoxelModel
 		obj.model = modelInfo.buildExportObject( obj );
 		if ( obj.model.children )
 			obj.model.children = getChildJSON();
+		//obj.model.editable = metadata.permissions.
+		//obj.model.template = metadata.permissions.templateGuid
 		return obj;
 	}
 	
@@ -347,7 +349,7 @@ public class VoxelModel
 		//_data = new ModelData()
 		
 		if ($initializeRoot)
-			initialize_root_oxel(0 < instanceInfo.grainSize ? instanceInfo.grainSize : modelInfo.grainSize);
+			oxel = Oxel.initializeRoot( (0 < instanceInfo.grainSize ? instanceInfo.grainSize : modelInfo.grainSize), instanceInfo.baseLightLevel );
 		
 		if ( null == _metadata )
 			metadata = new ModelMetadata( instanceInfo.modelGuid );
@@ -799,29 +801,6 @@ public class VoxelModel
 		//Log.out( "VoxelModel.set_camera_data - setting view offset to : " + -max + ", " + -max + ", " + -max + ", " );
 	}
 	
-	public function initialize_root_oxel(grainSize:int):void
-	{
-//			Log.out( "VoxelModel.initialize_root_oxel: " + toString(), Log.WARN );
-		try {
-			var gc:GrainCursor = GrainCursorPool.poolGet(grainSize);
-			gc.grain = grainSize;
-			oxelReset();
-			oxel = OxelPool.poolGet();
-			Lighting.defaultBaseLightAttn = instanceInfo.baseLightLevel;
-			oxel.lighting = LightingPool.poolGet( instanceInfo.baseLightLevel );
-			oxel.initialize(null, gc, 0, TypeInfo.AIR, _statisics);
-			// The VM gets an empty oxel as a place holder when it first loads.
-			// this replaces the placeholder and replaces it with a new root.
-			oxel.type = TypeInfo.AIR;
-			GrainCursorPool.poolDispose(gc);
-		}
-		catch (e:Error) {
-			Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.instanceGuid: " + instanceInfo.instanceGuid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + TypeInfo.typeInfo[oxel.type].name );					
-		}
-	
-		//Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.guid: " + instanceInfo.guid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + Globals.Info[type].name );					
-	}
-	
 	private function createShaders($context:Context3D):void
 	{
 		var shader:Shader = null;
@@ -1072,6 +1051,29 @@ public class VoxelModel
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Loading and Saving Voxel Models
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	static public function oxelAsBasicModel( $oxel:Oxel ):ByteArray {
+		var ba:ByteArray = new ByteArray();
+		
+		writeVersionedHeader( ba );
+		writeEmptyManifest( ba );
+		$oxel.toByteArray( ba );
+		
+		return ba;
+		
+		function writeEmptyManifest( $ba:ByteArray ):void {
+			
+			// Always write the manifest into the IVM.
+			/* ------------------------------------------
+			   0 unsigned char model info version - 100 currently
+			   next byte is size of model json
+			   n+1...  is model json
+			   ------------------------------------------ */
+			$ba.writeByte(Globals.MANIFEST_VERSION);
+			$ba.writeInt( 0 );
+			//$ba.writeUTFBytes( json );
+		}
+	}
+
 	private function toByteArray():ByteArray
 	{
 		var ba:ByteArray = new ByteArray();
@@ -1082,31 +1084,6 @@ public class VoxelModel
 		
 		return ba;
 		
-		function writeVersionedHeader( $ba:ByteArray):void
-		{
-			/* ------------------------------------------
-			   0 char 'i'
-			   1 char 'v'
-			   2 char 'm'
-			   3 char '0' (zero) major version
-			   4 char '' (0-9) minor version
-			   5 char '' (0-9) lesser version
-			   ------------------------------------------ */
-			$ba.writeByte('i'.charCodeAt());
-			$ba.writeByte('v'.charCodeAt());
-			$ba.writeByte('m'.charCodeAt());
-			var outVersion:String = zeroPad( Globals.VERSION, 3 );
-			$ba.writeByte(outVersion.charCodeAt(0));
-			$ba.writeByte(outVersion.charCodeAt(1));
-			$ba.writeByte(outVersion.charCodeAt(2));
-
-			function zeroPad(number:int, width:int):String {
-			   var ret:String = ""+number;
-			   while( ret.length < width )
-				   ret="0" + ret;
-			   return ret;
-			}
-		}
 		
 		function writeManifest( $ba:ByteArray ):void {
 			
@@ -1130,6 +1107,32 @@ public class VoxelModel
 		}
 	}
 	
+	static private function writeVersionedHeader( $ba:ByteArray):void
+	{
+		/* ------------------------------------------
+		   0 char 'i'
+		   1 char 'v'
+		   2 char 'm'
+		   3 char '0' (zero) major version
+		   4 char '' (0-9) minor version
+		   5 char '' (0-9) lesser version
+		   ------------------------------------------ */
+		$ba.writeByte('i'.charCodeAt());
+		$ba.writeByte('v'.charCodeAt());
+		$ba.writeByte('m'.charCodeAt());
+		var outVersion:String = zeroPad( Globals.VERSION, 3 );
+		$ba.writeByte(outVersion.charCodeAt(0));
+		$ba.writeByte(outVersion.charCodeAt(1));
+		$ba.writeByte(outVersion.charCodeAt(2));
+
+		function zeroPad(number:int, width:int):String {
+		   var ret:String = ""+number;
+		   while( ret.length < width )
+			   ret="0" + ret;
+		   return ret;
+		}
+	}
+		
 	public function fromByteArray($ba:ByteArray):void
 	{
 		// Read off 1 bytes, the root size
@@ -1138,7 +1141,7 @@ public class VoxelModel
 		gct.grain = rootGrainSize;
 		_statisics.gather( version, $ba, rootGrainSize);
 		
-		initialize_root_oxel(rootGrainSize)
+//		oxel = Oxel.initializeRoot(rootGrainSize, instanceInfo.baseLightLevel);
 		
 		//oxelReset();
 		//oxel = OxelPool.poolGet();
@@ -1862,7 +1865,18 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		instanceInfo.baseLightLevel = $attn;
 		oxel.lightsStaticSetDefault( $attn );
 	}
+
 	
+	import com.voxelengine.worldmodel.inventory.*;
+	public function getDefaultSlotData():Vector.<ObjectInfo> {
+		
+		Log.out( "VoxelModel.getDefaultSlotData - Loading default data into slots" , Log.WARN );
+		var slots:Vector.<ObjectInfo> = new Vector.<ObjectInfo>( Slots.ITEM_COUNT );
+		for ( var i:int; i < Slots.ITEM_COUNT; i++ ) 
+			slots[i] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );
+		
+		return slots;
+	}
 }
 }
 

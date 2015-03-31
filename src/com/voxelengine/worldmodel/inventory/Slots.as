@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.inventory {
 	
 import com.voxelengine.worldmodel.models.types.EditCursor;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
@@ -23,7 +24,7 @@ public class Slots
 	static public const ITEM_COUNT:int = 10;
 	
 	private var _items:Vector.<ObjectInfo> = new Vector.<ObjectInfo>(10, true);
-	private var _networkId:String;
+	private var _owner:String;
 	private var _changed:Boolean;
 	
 	public function get changed():Boolean { return _changed; }
@@ -31,10 +32,10 @@ public class Slots
 	
 	public function get items():Vector.<ObjectInfo>  { return _items; }
 
-	public function Slots( $networkId:String ) {
+	public function Slots( $owner:String ) {
 		// Do I need to unregister this?
 		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
-		_networkId = $networkId;
+		_owner = $owner;
 		FunctionRegistry.functionAdd( noneSlots, "noneSlots" );
 		FunctionRegistry.functionAdd( pickToolSlots, "pickToolSlots" );
 	}
@@ -110,17 +111,24 @@ public class Slots
 		changed = false;
 	}
 	
+	import flash.utils.getQualifiedClassName;
 	public function addSlotDefaultData():void {
 
-		initializeSlots();
-		Log.out( "Slots.addSlotDefaultData - Loading default data into slots" , Log.WARN );
+		var model:VoxelModel = Region.currentRegion.modelCache.modelGet( _owner );
+		var defaultData:Vector.<ObjectInfo> = model.getDefaultSlotData();
 		
+		initializeSlots();
+		
+		Log.out( "Slots.addSlotDefaultData - Loading default data into slots" , Log.WARN );
+		for ( var i:int; i < Slots.ITEM_COUNT; i++ )
+			items[i] = defaultData[i];
+		/*
 		var pickItem:ObjectTool = new ObjectTool( null, "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );
 		_items[0] = pickItem;
 		
 		var noneItem:ObjectAction = new ObjectAction( null, "noneSlots", "none.png", "Do nothing" );
 		_items[1] = noneItem;
-		
+		*/
 		changed = true;
 	}
 	

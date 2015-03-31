@@ -46,12 +46,24 @@ package com.voxelengine.worldmodel.biomes
 				
 			return newBiomes;	
 		}
+		public function toString():String {
+			var outString:String = "";
+			for ( var i:int; i < layers.length; i++ ) 
+			{
+				outString += layers[i].toString();
+				if ( (i + 1) < layers.length )
+					outString += "/n";
+			}
+			return outString
+		}
 		
-		public function add_to_task_controller( instanceInfo:InstanceInfo ):void 
+		public function addToTaskController( $instanceInfo:InstanceInfo ):void 
 		{
 			// land task controller
 			Globals.g_landscapeTaskController.activeTaskLimit = 0;
-			var guid:String = instanceInfo.instanceGuid;
+			var guid:String = $instanceInfo.instanceGuid;
+			if ( null == guid )
+				guid = $instanceInfo.modelGuid;
 
 			// Create task group
 			var taskGroup:TaskGroup = new TaskGroup("Generate Model for " + guid, 2);
@@ -63,17 +75,17 @@ package com.voxelengine.worldmodel.biomes
 			{
 				layer = layers[i];
 				// instanceInfo can override type
-				if ( -1 != instanceInfo.type )
-					layer.type = instanceInfo.type;
-				if ( instanceInfo.controllingModel )
-					layer.optionalString = instanceInfo.topmostGuid();
+				if ( -1 != $instanceInfo.type )
+					layer.type = $instanceInfo.type;
+				if ( $instanceInfo.controllingModel )
+					layer.optionalString = $instanceInfo.topmostGuid();
 					
 				task = new layer.task( guid, layer );
 				//Log.out( "Biomes.add_to_task_controller - creating task: " + layer.task );
 				taskGroup.addTask(task);
 				task = null;
 				// If this is loading data leave it along, otherwise erase the layer once it is used.
-				if ( layer.functionName && ( ( layer.functionName != "LoadModelFromIVM" ) || ( layer.functionName != "LoadModelFromBigDB" ) ) )
+				if ( layer.functionName && ( ( layer.functionName != "LoadModelFromIVM" ) ) )
 					layers[i] = null;
 			}
 			
@@ -91,7 +103,7 @@ package com.voxelengine.worldmodel.biomes
 			//taskGroup.addTask(task);
 			
 			//Log.out( "Biomes.add_to_task_controller - adding completedTask" );
-			if ( instanceInfo.dynamicObject )
+			if ( $instanceInfo.dynamicObject )
 				task = new DynamicCompletedModel( guid, null );
 			else
 				task = new CompletedModel( guid, layer );
@@ -115,7 +127,7 @@ package com.voxelengine.worldmodel.biomes
 		}
 
 		
-		public function	load_biomes_data( layers:Object):void
+		public function	layersLoad( layers:Object):void
 		{
 			for each ( var layerObject:Object in layers )
 			{
@@ -165,7 +177,7 @@ package com.voxelengine.worldmodel.biomes
 		
 		public static function testSolid( biomes:Biomes ):void {
 			//biomes.add_layer( new LayerInfo( TestSingleOxelFaces,  TypeInfo.GRASS,   1, 0 ) );
-			biomes.add_layer( new LayerInfo( "TestSolid", "",  TypeInfo.GRAVEL,   1, 0 ) );
+			biomes.add_layer( new LayerInfo( "GenerateCube", "",  TypeInfo.GRAVEL,   1, 0 ) );
 			//biomes.add_layer( new LayerInfo( TestRemoveSequential,  TypeInfo.INVALID,   0, 0 ) );
 		}
 		

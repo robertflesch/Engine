@@ -87,7 +87,7 @@ public class  UserInventory extends QuickInventory
 		Globals.g_app.editing = false;
 		removeListeners();
 		//Log.out( "UserInventory.remove ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
-		InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
+		//InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
 		
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.UNLOAD_REQUEST, _owner, null ) );
 		super.remove();
@@ -142,18 +142,20 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function inventoryLoaded(e:InventoryEvent):void {
-		InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
-
-		_inventoryLoaded = true;
-		var inv:Inventory = e.result as Inventory;
-		var slots:Slots = inv.slots;
-		
-		var items:Vector.<ObjectInfo> = slots.items;
-		for ( var i:int; i < Slots.ITEM_COUNT; i++ ) {
-			var item:ObjectInfo = items[i];
-			item.box = (boxes[i] as BoxInventory);
-			(boxes[i] as BoxInventory).updateObjectInfo( item );
+		if ( e.owner == _owner ) {
+			_inventoryLoaded = true;
+			var inv:Inventory = e.result as Inventory;
+			var slots:Slots = inv.slots;
+			
+			var items:Vector.<ObjectInfo> = slots.items;
+			for ( var i:int; i < Slots.ITEM_COUNT; i++ ) {
+				var item:ObjectInfo = items[i];
+				item.box = (boxes[i] as BoxInventory);
+				(boxes[i] as BoxInventory).updateObjectInfo( item );
+			}
 		}
+		else
+			Log.out( "UserInventory.inventoryLoaded - for non active guid: " + e.owner, Log.WARN );
 	}
 	
 	/////////// start drag and drop //////////////////////////////////////////////////////

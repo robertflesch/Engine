@@ -30,7 +30,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		override public function start():void
 		{
 			super.start() // AbstractTask will send event
-
+/*
 			var timer:int = getTimer();
 			
 			//////////////////////////////////////////////////////////
@@ -56,6 +56,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 //				vm.oxel.write_sphere( c, c/2, c, c, _layer.type, min_grain_size );
 			// 1/2 sphere
 			vm.oxel.write_sphere( _instanceGuid, c, c, c, c/2, _layer.type, min_grain_size );
+			*/
 			/* 
 			// 8 spheres 
 			var type:int = TypeInfo.GRASS;

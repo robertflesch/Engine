@@ -56,7 +56,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 		
 		protected function getVoxelModel():VoxelModel {
-
+			Log.out( "LandscapeTask.getVoxelModel - NO LONGER VALID", Log.ERROR );
+			return null;
+			
 			var vm:VoxelModel;
 			if ( _layer ) {
 				var topMostParentGuid:String = _layer.optionalString;

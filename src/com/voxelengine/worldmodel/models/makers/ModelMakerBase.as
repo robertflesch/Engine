@@ -30,8 +30,12 @@ public class ModelMakerBase {
 	
 	protected var _ii:InstanceInfo;
 	protected var _vmd:ModelData;
-	private var _parentModelGuid:String
+	protected var _vmdFailed:Boolean;
+	static private var _makerCount:int;
+	private var   _parentModelGuid:String;
+	
 	static private var _s_parentChildCount:Array = new Array();
+
 	
 	public function ModelMakerBase( $ii:InstanceInfo, $fromTables:Boolean = true, $parentModelGuid:String = null ) {
 		_ii = $ii;
@@ -50,6 +54,7 @@ public class ModelMakerBase {
 	private function retriveData($mde:ModelDataEvent):void  {
 		if ( _ii.modelGuid == $mde.modelGuid ) {
 			_vmd = $mde.vmd;
+			_vmdFailed = false;
 			attemptMake();
 		}
 	}
@@ -57,7 +62,8 @@ public class ModelMakerBase {
 	private function failedData( $mde:ModelDataEvent):void  {
 		if ( _ii.modelGuid == $mde.modelGuid ) {
 			Log.out( "ModelMakerBase.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
-			markComplete( false );
+			_vmdFailed = true;
+//			markComplete( false );
 		}
 	}
 	
@@ -165,6 +171,23 @@ public class ModelMakerBase {
 	static public function modelInfoPreload( $fileName:String ):void {
 		throw new Error( "This is not needed online" );
 		modelInfoFindOrCreate( $fileName, "", false );
+	}
+	
+	
+	static public function makerCountGet():int 
+	{
+		return _makerCount;
+	}
+	static public function makerCountIncrement():void 
+	{
+		_makerCount++;
+		Log.out( "ModelMaker.makerCountIncrement - makerCount: " + _makerCount, Log.ERROR );
+	}
+	
+	static public function makerCountDecrement():void 
+	{
+		_makerCount--;
+		Log.out( "ModelMaker.makerCountDecrement - makerCount: " + _makerCount, Log.ERROR );
 	}
 }	
 }

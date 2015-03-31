@@ -95,7 +95,6 @@ package com.voxelengine.worldmodel.models
 			{
 				if ( vm is Avatar ) {
 					// need to seperate these out into their own catagory
-					vm.instanceInfo.instanceGuid = vm.instanceInfo.modelGuid;
 					_modelsGuid[vm.instanceInfo.instanceGuid] = vm;
 					_models.push(vm);
 					ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );

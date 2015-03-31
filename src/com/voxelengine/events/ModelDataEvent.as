@@ -39,7 +39,7 @@ public class ModelDataEvent extends ModelBaseEvent
 	}
    
 	public override function toString():String {
-		return formatToString("ModelDataEvent", "series", "guid" );
+		return formatToString( "ModelDataEvent", "series", "modelGuid", "vmd" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

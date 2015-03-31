@@ -44,9 +44,12 @@ public class InventoryManager
 	
 	static private function requestInventory(e:InventoryEvent):void 
 	{
+		Log.out( "InventoryManager.requestInventory - OWNER: " + e.owner, Log.WARN );
 		var inv:Inventory = objectInventoryGet( e.owner );
-		if ( inv && inv.loaded )
+		if ( inv && inv.loaded ) {
+			Log.out( "InventoryManager.requestInventory - InventoryEvent.RESPONSE - OWNER: " + e.owner, Log.WARN );
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, e.owner, inv ) );
+		}
 	}
 	
 	static private function unloadInventory(e:InventoryEvent):void 

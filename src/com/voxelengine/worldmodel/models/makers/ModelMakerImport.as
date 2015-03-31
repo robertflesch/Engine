@@ -7,7 +7,9 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
+import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import flash.utils.ByteArray;
 import org.flashapi.swing.Alert;
@@ -90,8 +92,25 @@ public class ModelMakerImport extends ModelMakerBase {
 		}
 	}
 	
+	private function processBiome():void { 
+		// this should generate the VMD
+		Log.out( "ModelMakerImport.processBiome biome: " + _vmi.biomes.toString(), Log.WARN );
+		var layer1:LayerInfo = _vmi.biomes.layers[0];
+		if ( "LoadModelFromIVM" == layer1.functionName )
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, layer1.data, null, false ) );		
+		else
+			_vmi.biomes.addToTaskController( _ii );
+			
+		// This unblocks the landscape task controller when all terrain tasks have been added
+		if (0 == Globals.g_landscapeTaskController.activeTaskLimit)
+			Globals.g_landscapeTaskController.activeTaskLimit = 1;
+	}
+	
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
+		if ( true == _vmdFailed && null != _vmi && true == _vmi.boimeHas() )
+			processBiome();
+			
 		if ( null != _vmi && null != _vmd && null != _vmm ) {
 			
 			var $ba:ByteArray = _vmd.ba;
