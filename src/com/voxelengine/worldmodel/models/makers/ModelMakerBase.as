@@ -53,8 +53,12 @@ public class ModelMakerBase {
 	
 	private function retriveData($mde:ModelDataEvent):void  {
 		if ( _ii.modelGuid == $mde.modelGuid ) {
+			Log.out( "ModelMakerBase.retriveData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
 			_vmd = $mde.vmd;
-			_vmdFailed = false;
+			if ( true ==  _vmdFailed ) {
+				Log.out( "ModelMakerBase.retriveData - RESETTING VMDFAILED", Log.WARN );
+				_vmdFailed = false;
+			}
 			attemptMake();
 		}
 	}

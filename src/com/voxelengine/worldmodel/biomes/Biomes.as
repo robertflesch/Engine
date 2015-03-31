@@ -57,6 +57,55 @@ package com.voxelengine.worldmodel.biomes
 			return outString
 		}
 		
+		// Removed the completed task
+		public function addToTaskControllerUsingNewStyle( $instanceInfo:InstanceInfo ):void 
+		{
+			// land task controller
+			Globals.g_landscapeTaskController.activeTaskLimit = 0;
+			var guid:String = $instanceInfo.instanceGuid;
+			if ( null == guid )
+				guid = $instanceInfo.modelGuid;
+
+			// Create task group
+			var taskGroup:TaskGroup = new TaskGroup("Generate Model for " + guid, 2);
+        
+			// This loads the tasks into the LandscapeTaskQueue
+			var task:ITask;
+			var layer:LayerInfo
+			for ( var i:int; i < layers.length; i++ ) 
+			{
+				layer = layers[i];
+				// instanceInfo can override type
+				if ( -1 != $instanceInfo.type )
+					layer.type = $instanceInfo.type;
+				if ( $instanceInfo.controllingModel )
+					layer.optionalString = $instanceInfo.topmostGuid();
+					
+				task = new layer.task( guid, layer );
+				//Log.out( "Biomes.add_to_task_controller - creating task: " + layer.task );
+				taskGroup.addTask(task);
+				task = null;
+				// If this is loading data leave it along, otherwise erase the layer once it is used.
+				if ( layer.functionName && ( ( layer.functionName != "LoadModelFromIVM" ) ) )
+					layers[i] = null;
+			}
+			
+			var newLayers:Vector.<LayerInfo> = new Vector.<LayerInfo>;
+			for each ( var layer1:LayerInfo in layers ) 
+			{
+				if ( null != layer1 ) {
+					newLayers.push( layer1 );
+				}
+			}
+			_layers = null;
+			_layers = newLayers;
+
+			//task =  new OutlineBoundries( guid, null );
+			//taskGroup.addTask(task);
+			
+			Globals.g_landscapeTaskController.addTask( taskGroup );
+		}
+		
 		public function addToTaskController( $instanceInfo:InstanceInfo ):void 
 		{
 			// land task controller

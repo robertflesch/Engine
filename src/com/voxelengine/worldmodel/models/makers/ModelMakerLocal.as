@@ -38,7 +38,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 	private var _vmi:ModelInfo;
 	
 	public function ModelMakerLocal( $ii:InstanceInfo, $parentModelGuid:String = null ) {
-		Log.out( "ModelMakerLocal", Log.WARN );
+		Log.out( "ModelMakerLocal ii.modelGuid: " + $ii.modelGuid, Log.WARN );
 		super( $ii, false, $parentModelGuid );
 		makerCountIncrement();
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		

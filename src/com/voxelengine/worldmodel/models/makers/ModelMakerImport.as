@@ -99,7 +99,7 @@ public class ModelMakerImport extends ModelMakerBase {
 		if ( "LoadModelFromIVM" == layer1.functionName )
 			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, layer1.data, null, false ) );		
 		else
-			_vmi.biomes.addToTaskController( _ii );
+			_vmi.biomes.addToTaskControllerUsingNewStyle( _ii );
 			
 		// This unblocks the landscape task controller when all terrain tasks have been added
 		if (0 == Globals.g_landscapeTaskController.activeTaskLimit)
@@ -108,8 +108,10 @@ public class ModelMakerImport extends ModelMakerBase {
 	
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
-		if ( true == _vmdFailed && null != _vmi && true == _vmi.boimeHas() )
+		if ( true == _vmdFailed && null != _vmi && true == _vmi.boimeHas() ) {
+			Log.out( "ModelMakerImport.attemptMake - failed to load guid, try biome", Log.ERROR );
 			processBiome();
+		}
 			
 		if ( null != _vmi && null != _vmd && null != _vmm ) {
 			
@@ -118,7 +120,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			var versionInfo:Object = modelMetaInfoRead( $ba );
 			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
 			{
-				Log.out( "VoxelModel.test - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
+				Log.out( "ModelMakerImport.attemptMake - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
 				return;
 			}
 			
@@ -156,8 +158,6 @@ public class ModelMakerImport extends ModelMakerBase {
 		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrivedMetadata );		
 		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrivedMetadata );		
 		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
-		
-		LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_COMPLETE, _vmm.modelGuid ) );
 		
 		super.markComplete( $success );
 	}

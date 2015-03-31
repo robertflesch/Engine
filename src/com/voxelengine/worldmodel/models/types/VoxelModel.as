@@ -129,13 +129,14 @@ public class VoxelModel
 	public function get complete():Boolean						{ return _complete; }
 	public function set complete(val:Boolean):void
 	{
-		//Log.out( "VoxelModel.complete: " + modelInfo.fileName );
+		Log.out( "VoxelModel.complete: " + modelInfo.fileName );
 		_complete = val;
 		
 		if ( metadata.permissions.modify && Globals.g_configManager.showEditMenu) {
 			if ( null == editCursor )
 				editCursor = EditCursor.create();
-			//if ( null == editCursor.oxel.vm_get() )
+			//	I could reduce vertex manager utilization if I used a lazy evaluation pattern for edit cursor vertex managers
+			if ( null == editCursor.oxel.vm_get() )
 				editCursor.oxel.vm_initialize( _statisics );
 			editCursor.oxel.gc.bound = oxel.gc.bound;
 		}
@@ -180,8 +181,6 @@ public class VoxelModel
 				//Log.out( "VoxelModel.internal_initialize - create child of parent.instance: " + instanceInfo.guid + "  - child.instanceGuid: " + child.instanceGuid );					
 				if ( null == childInstanceInfo.modelGuid )
 					continue;
-				if ( null == childInstanceInfo.instanceGuid )
-					childInstanceInfo.instanceGuid = Globals.getUID();
 				// now load the child, this might load from the persistance
 				// or it could be an import, or it could be a model for the toolbar.
 				// we never want to prompt for imported children, since this only happens in dev mode.
@@ -398,8 +397,13 @@ public class VoxelModel
 			ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			// if we save the model, before it is complete, we put bad child data into model info
 			_childrenLoaded = true;
-			changed = false;
-//			save();
+			// save the new or imported models
+			if ( null == _metadata.dbo || null == _data.dbo ) {
+				changed = true;
+				save();
+			}
+			else	
+				changed = false;
 		}
 	}
 	
@@ -833,15 +837,16 @@ public class VoxelModel
 		}
 	}
 	
-	public function childAdd(vm:VoxelModel):void
+	public function childAdd( $child:VoxelModel):void
 	{
+		if ( null ==  $child.instanceInfo.instanceGuid )
+			 $child.instanceInfo.instanceGuid = Globals.getUID();
 		changed = true;
-		//Log.out(  "-------------- VoxelModel.childAdd - VM: " + vm.toString() );
+		//Log.out(  "-------------- VoxelModel.childAdd -  $child: " +  $child.toString() );
 		// remove parent level model
-		Region.currentRegion.modelCache.changeFromParentToChild(vm);
-		_children.push(vm);
-		//vm.instanceInfo.baseLightLevel = instanceInfo.baseLightLevel;
-		//modelInfo.childAdd(vm.instanceInfo);
+		Region.currentRegion.modelCache.changeFromParentToChild( $child);
+		_children.push( $child);
+		// $child.instanceInfo.baseLightLevel = instanceInfo.baseLightLevel;
 	}
 	
 	public function childRemoveByInstanceInfo( $instanceInfo:InstanceInfo ):void {
@@ -1037,7 +1042,7 @@ public class VoxelModel
 		}
 		
 		if (  false == _childrenLoaded ) {
-			Log.out( "VoxelModel.save - children not loaded"  );
+			Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name );
 			return;
 		}
 			

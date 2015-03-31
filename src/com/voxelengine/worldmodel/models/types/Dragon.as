@@ -267,9 +267,10 @@ public class Dragon extends Beast
 		if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
 			return;
 			
-		var vm:VoxelModel = Globals.modelGet( me.instanceGuid );
-		if ( vm is Gun )
-			_guns.push( vm );
+		for each ( var child:VoxelModel in _children ) {
+			if ( child is Gun )
+				_guns.push( child );
+		}
 	}
 	
 }
