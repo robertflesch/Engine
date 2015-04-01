@@ -21,11 +21,11 @@ public class AnimationEvent extends ModelBaseEvent
 	private var _aniGuid:String;
 	private var _modelGuid:String;
 	private var _ani:Animation;
-	private var _fromTables:Boolean;
+	private var _fromTable:Boolean;
 
 	public function get aniGuid():String  { return _aniGuid; }
 	public function get modelGuid():String  { return _modelGuid; }
-	public function get fromTables():Boolean  { return _fromTables; }
+	public function get fromTable():Boolean  { return _fromTable; }
 	public function get ani():Animation  { return _ani; }
 	
 	public function AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
@@ -33,7 +33,7 @@ public class AnimationEvent extends ModelBaseEvent
 		super( $type, $series, $bubbles, $cancellable );
 		_modelGuid = $modelGuid;
 		_aniGuid = $aniGuid;
-		_fromTables = $fromTable;
+		_fromTable = $fromTable;
 		_ani = $ani;
 	}
 	

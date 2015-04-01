@@ -38,6 +38,8 @@ public class PersistBigDB
 			return true;
 		else if ( Globals.DB_INVENTORY_TABLE == $pe.table )	
 			return true;
+		else if ( Globals.DB_TABLE_AMMO == $pe.table )	
+			return true;
 		else {
 			//Log.out( "PersistBigDB.isSupportedTable - FAILED table: " + $pe.table + " is not supported", Log.ERROR );
 			return false;
@@ -46,8 +48,11 @@ public class PersistBigDB
 	
 	static private function load( $pe:PersistanceEvent ):void { 
 		
-		if ( !isSupportedTable( $pe ) )
+		if ( !isSupportedTable( $pe ) ) {
+            //Log.out("PersistBigDB.load - TABLE IS NOT SUPPORTED EXT:" + $pe.table , Log.ERROR );
+			//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
 			return;
+		}
 			
 		//Log.out( "PersistBigDB.load - table: " + $pe.table + " for user: " + $pe.guid, Log.DEBUG );
 		

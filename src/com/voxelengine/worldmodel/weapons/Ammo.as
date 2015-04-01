@@ -11,16 +11,23 @@ package com.voxelengine.worldmodel.weapons
  * ...
  * @author Bob
  */
-import com.voxelengine.worldmodel.models.makers.ModelLoader;
-import com.voxelengine.worldmodel.TypeInfo;
+import playerio.DatabaseObject;
 import playerio.Message;
+
+import org.flashapi.swing.Alert;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.worldmodel.SoundBank;
+import com.voxelengine.events.AmmoEvent;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.worldmodel.models.makers.ModelLoader;
+import com.voxelengine.worldmodel.TypeInfo;
 
 public class Ammo
 {
+	protected var _dbo:DatabaseObject;
 	protected var _type:int = 1;
 	protected var _count:int = 1;
 	protected var _grain:int = 2;
@@ -53,7 +60,9 @@ public class Ammo
 	public function get name():String 				{ return _name; }
 	public function get oxelType():int 				{ return _oxelType; }
 	
-	public function Ammo() {}
+	public function Ammo( $name:String ) {
+		_name = $name;
+	}
 	
 	public function processClassJson( $ammoJson:Object ):void {		
 
@@ -107,7 +116,7 @@ public class Ammo
 	
 	
 	public function clone():Ammo {
-		var ammo:Ammo = new Ammo();
+		var ammo:Ammo = new Ammo( _name );
 		
 		ammo._type = _type;
 		ammo._count = _count;
@@ -120,7 +129,6 @@ public class Ammo
 		ammo._launchSoundFile = _launchSoundFile;
 		ammo._impactSoundFile = _impactSoundFile;
 		ammo._contactScript = _contactScript;
-		ammo._name = _name;
 		
 		return ammo;
 	}
@@ -175,6 +183,111 @@ public class Ammo
 		return ammos;
 	}
 	
-
+	////////////////////////////////////////////////////////////////
+	// FROM Persistance
+	////////////////////////////////////////////////////////////////
+	
+	public function fromPersistance( $dbo:DatabaseObject ):void {
+		
+		_name 				= $dbo.key;
+		_type				= $dbo.type;
+		_count				= $dbo.count;
+		_grain				= $dbo.grain;
+		_accuracy			= $dbo.accuracy;
+		_velocity			= $dbo.velocity;
+		_life				= $dbo.life;
+		_oxelType			= $dbo.oxelType;
+		_model				= $dbo.model;
+		_launchSoundFile	= $dbo.launchSoundFile;
+		_impactSoundFile	= $dbo.impactSoundFile;
+		_contactScript		= $dbo.contactScript;
+	}
+	
+	public function save():void {
+		if ( Globals.online ) {
+			//Log.out( "AnimationMetadata.save - Saving Animation Metadata guid: " + _guid + "  modelGuid: " + _modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
+			addSaveEvents();
+			if ( _dbo )
+				toPersistance();
+			else {
+				var obj:Object = toObject();
+			}
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_AMMO, name, _dbo, obj ) );
+		}
+		else
+			Log.out( "Ammo.save - Not saving ammo, offline", Log.WARN );
+	}
+	
+	public function toPersistance():void {
+		
+		//_dbo.key = _name;
+		_dbo.type = _type;
+		_dbo.count = _count;
+		_dbo.grain = _grain;
+		_dbo.accuracy = _accuracy;
+		_dbo.velocity = _velocity;
+		_dbo.life = _life;
+		_dbo.oxelType = _oxelType;
+		_dbo.model = _model;
+		_dbo.launchSoundFile = _launchSoundFile;
+		_dbo.impactSoundFile = _impactSoundFile;
+		_dbo.contactScript = _contactScript;
+	}
+	
+	public function toObject():Object {
+		
+		var metadataObj:Object =   { type:			    _type			
+								   , count:			    _count			
+								   , grain:			    _grain			
+								   , accuracy:		    _accuracy		
+								   , velocity:		    _velocity		
+								   , life:			    _life			
+								   , oxelType:		    _oxelType		
+								   , model:			    _model			
+								   , launchSoundFile:   _launchSoundFile
+								   , impactSoundFile:   _impactSoundFile
+								   , contactScript:	    _contactScript	};
+		return metadataObj;						   
+	}
+	
+	private function addSaveEvents():void {
+		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
+		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, saveFailed );
+		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, saveSucceed );
+		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, createFailed );
+	}
+	
+	private function removeSaveEvents():void {
+		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
+		PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, saveFailed );
+		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, saveSucceed );
+		PersistanceEvent.removeListener( PersistanceEvent.CREATE_FAILED, createFailed );
+	}
+	
+	private function saveSucceed( $pe:PersistanceEvent ):void
+	{
+		if ( Globals.DB_TABLE_AMMO != $pe.table )
+			return;
+		removeSaveEvents();
+		Log.out( "Ammo.saveSucceed" );
+	}
+	
+	private function saveFailed( $pe:PersistanceEvent ):void
+	{
+		if ( Globals.DB_TABLE_AMMO != $pe.table )
+			return;
+		removeSaveEvents();
+		Log.out( "Ammo.saveFailed - MAY BE (error #2032)  The method SaveObjectChanges can only be called when connected to a game", Log.ERROR );
+	}
+	
+	private function createFailed( $pe:PersistanceEvent ):void
+	{
+		if ( Globals.DB_TABLE_AMMO != $pe.table )
+			return;
+		removeSaveEvents();
+		Log.out( "Ammo.createFailed - Failed to create new Ammo object for this object.", Log.ERROR );
+	}	
+	
+	
 }
 }

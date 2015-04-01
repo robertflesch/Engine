@@ -47,6 +47,8 @@ public class PersistURL
 			_filePath = Globals.appPath + $pe.guid + $pe.table
 		else if ( Globals.ANI_EXT == $pe.table )	
 			_filePath = Globals.modelPath + $pe.other + "/" + $pe.guid + $pe.table
+		else if ( Globals.AMMO_EXT == $pe.table )	
+			_filePath = Globals.modelPath + $pe.guid + $pe.table
 			
 		else
 			return false;
@@ -56,8 +58,11 @@ public class PersistURL
 	
 	static private function load( $pe:PersistanceEvent ):void { 
 		
-		if ( !isSupportedTable( $pe ) )
+		if ( !isSupportedTable( $pe ) ) {
+            //Log.out("PersistURL.load - EXTENSION IS NOT SUPPORTED EXT:" + $pe.table , Log.ERROR );
+			//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
 			return;
+		}
 			
 		//Log.out( "PersistURL.load - file: " + _filePath );
 		

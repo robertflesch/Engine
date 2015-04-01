@@ -303,6 +303,7 @@ import com.voxelengine.pools.PoolManager;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.ConfigManager;
 import com.voxelengine.worldmodel.RegionManager;
+import com.voxelengine.worldmodel.weapons.AmmoCache;
 
 // This class simply makes sure the startup happens in the right order. And listens for the splash screen to finish loading
 class StartupSynchronizer 
@@ -393,6 +394,7 @@ class VVInitializer
 		// Is there a central place to do this?
 		ModelMetadataCache.init();
 		ModelInfoCache.init();
+		AmmoCache.init();
 		ModelDataCache.init();
 		AnimationCache.init();
 		// This causes the to load its caches and listeners

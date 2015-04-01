@@ -32,11 +32,16 @@ package com.voxelengine.worldmodel.models
 		
 		public function get models():Vector.<VoxelModel> { return _models; }
 		public function modelsGet():Vector.<VoxelModel> { return _models; }
-		public function modelGet( $instanceGuid:String ):VoxelModel  { return _modelsGuid[$instanceGuid]; }
 		public function get modelsDynamic():Vector.<VoxelModel> { return _modelsDynamic; }
 		
 		public function ModelCache( $region:Region ) {
 			_region = $region;
+		}
+		
+		// need to do a recurvsive search here
+		public function modelGet( $instanceGuid:String ):VoxelModel
+		{ 
+			return _modelsGuid[$instanceGuid];
 		}
 		
 		public function createPlayer():Boolean	{
@@ -81,6 +86,7 @@ package com.voxelengine.worldmodel.models
 			if ( vm.instanceInfo.controllingModel )
 			{
 				vm.instanceInfo.controllingModel.childAdd( vm );
+				_modelsGuid[vm.instanceInfo.instanceGuid] = vm;
 				ModelEvent.dispatch( new ModelEvent( ModelEvent.CHILD_MODEL_ADDED, vm.instanceInfo.instanceGuid, null, null, vm.instanceInfo.controllingModel.instanceInfo.instanceGuid ) );
 			}
 			else if ( vm.instanceInfo.dynamicObject )

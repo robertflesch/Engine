@@ -7,6 +7,9 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
+import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.Region;
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
@@ -144,7 +147,9 @@ public class Inventory
 			}
 		}
 		else {
-			_voxels.addTestData();
+			var ownerModel:VoxelModel = Region.currentRegion.modelCache.modelGet( _owner );
+			if ( ownerModel && ownerModel is Player )
+				_voxels.addTestData();
 		}
 	}
 	

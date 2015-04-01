@@ -7,8 +7,10 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory
 {
+import com.voxelengine.ConsoleCommands;
 import com.voxelengine.Log;
 import com.voxelengine.GUI.inventory.BoxInventory;
+import com.voxelengine.worldmodel.weapons.Ammo;
 
 /**
  * ...
@@ -20,30 +22,38 @@ public class ObjectAction extends ObjectInfo
 	private var _thumbnail:String;
 	private var _name:String;
 	private var _callBackName:String;
-	private var _callBack:Function 		= null;
-	public function get callBack():Function 				{ return _callBack; }
+	//private var _callBack:Function;
+	private var _ammoName:String;
+	private var _instanceGuid:String;
+	public function get callBack():Function 				{ return FunctionRegistry.functionGet( _callBackName ); }
 	public function get thumbnail():String { return _thumbnail; }
 	public function get name():String  { return _name; }
+	
+	public function get instanceGuid():String { return _instanceGuid; }
+	public function set instanceGuid(value:String):void { _instanceGuid = value; }
+	
+	public function get ammoName():String { return _ammoName; }
+	public function set ammoName(value:String):void { _ammoName = value; }
 
 	public function ObjectAction( $owner:BoxInventory, $callBackName:String, $thumbnail:String, $name:String ):void {
 		super( $owner, ObjectInfo.OBJECTINFO_ACTION );
 		_callBackName = $callBackName;
-		if ( "" != $callBackName )
-			_callBack = FunctionRegistry.functionGet( $callBackName );
+		//if ( "" != $callBackName )
+		//	_callBack = FunctionRegistry.functionGet( $callBackName );
 		_thumbnail = $thumbnail;
 		_name = $name;
 	}
 	
 	override public function asInventoryString():String {
 		
-		return String( _objectType + ";" + _thumbnail + ";" + _name + ";" + _callBackName );
+		return String( _objectType + ";" + _thumbnail + ";" + _name + ";" + _callBackName + ";" + _ammoName + ";" + _instanceGuid );
 	}
 	
 	override public function fromInventoryString( $data:String, $slotId:int ): ObjectInfo {
 		super.fromInventoryString( $data, $slotId );
 		var values:Array = $data.split(";");
-		if ( values.length != 4 ) {
-			Log.out( "ObjectAction.fromInventoryString - not equal to 4 tokens found, length is: " + values.length, Log.WARN );
+		if ( values.length != 6 ) {
+			Log.out( "ObjectAction.fromInventoryString - not equal to 6 tokens found, length is: " + values.length, Log.WARN );
 			reset();
 			return this;
 		}
@@ -51,7 +61,9 @@ public class ObjectAction extends ObjectInfo
 		_thumbnail = values[1];
 		_name = values[2];
 		_callBackName = values[3];
-		_callBack = FunctionRegistry.functionGet( _callBackName );
+		_ammoName = values[4];
+		_instanceGuid = values[5]
+		//_callBack = ;
 		return this;
 	}
 
@@ -59,8 +71,10 @@ public class ObjectAction extends ObjectInfo
 		_objectType = ObjectInfo.OBJECTINFO_EMPTY;
 		_thumbnail	= "";
 		_name	= "";
+		_ammoName = "";
+		_instanceGuid = "";
 		_callBackName = null;
-		_callBack = null
+		//_callBack = null
 	}
 }
 }

@@ -41,7 +41,7 @@ public class ModelBaseEvent extends Event
 	
 	public function ModelBaseEvent( $type:String, $series:int, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
-		if ( $type == REQUEST || $type == REQUEST_TYPE )
+		if ( ( $type == REQUEST || $type == REQUEST_TYPE ) && 0 == $series )
 			_series = _seriesCounter++; // start of a new series, inc counter
 		else
 			_series = $series;

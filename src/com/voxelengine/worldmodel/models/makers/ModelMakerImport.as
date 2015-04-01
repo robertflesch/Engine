@@ -137,7 +137,6 @@ public class ModelMakerImport extends ModelMakerBase {
 				vm.version = versionInfo.version;
 				vm.fromByteArray( $ba );
 			}
-			Region.currentRegion.modelCache.add( vm );
 
 			vm.data = _vmd;
 			vm.complete = true;
@@ -145,6 +144,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			vm.save();
 			vm.stateLock( true, 10000 );
 			
+			Region.currentRegion.modelCache.add( vm );
 			markComplete();
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, 0, Region.currentRegion.guid ) );
 		}

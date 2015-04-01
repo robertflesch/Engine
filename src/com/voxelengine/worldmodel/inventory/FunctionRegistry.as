@@ -17,7 +17,7 @@ import com.voxelengine.Log;
 	{
 		static private var _nameToFunction:Dictionary = new Dictionary();
 		static public function functionAdd( $func:Function, $name:String ):void {
-			//Log.out( "FunctionRegistry.functionAdd - adding: " + $name, Log.WARN );
+			Log.out( "FunctionRegistry.functionAdd - adding: " + $name, Log.WARN );
 			_nameToFunction[$name] = $func;
 		}
 		

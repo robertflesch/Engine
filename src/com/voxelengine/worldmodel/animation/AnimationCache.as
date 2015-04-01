@@ -7,12 +7,12 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.animation
 {
-import com.voxelengine.utils.JSONUtil;
 import flash.utils.ByteArray;
 import flash.net.URLLoaderDataFormat;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
+import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.events.AnimationEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistanceEvent;
@@ -52,7 +52,7 @@ public class AnimationCache
 		if ( modelAnis )
 			ani = modelAnis[$ame.aniGuid];
 		if ( null == ani ) {
-			if ( true == Globals.online && $ame.fromTables )
+			if ( true == Globals.online && $ame.fromTable )
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.DB_TABLE_ANIMATIONS, $ame.aniGuid ) );
 			else	
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );

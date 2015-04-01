@@ -45,6 +45,8 @@ public class Dragon extends Beast
 		//usesGravity = true;
 		collisionMarkers = true;
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
+		FunctionRegistry.functionAdd( loseControlHandler, "loseControlHandler" );
+		FunctionRegistry.functionAdd( fire, "fire" );
 	}
 	
 	override protected function processClassJson():void {
@@ -224,8 +226,6 @@ public class Dragon extends Beast
 	override public function getDefaultSlotData():Vector.<ObjectInfo> {
 		
 		Log.out( "Dragon.getDefaultSlotData - Loading default data into slots" , Log.WARN );
-		FunctionRegistry.functionAdd( loseControlHandler, "loseControlHandler" );
-		FunctionRegistry.functionAdd( fire, "fire" );
 		var slots:Vector.<ObjectInfo> = new Vector.<ObjectInfo>( Slots.ITEM_COUNT );
 		for ( var i:int; i < Slots.ITEM_COUNT; i++ ) 
 			slots[i] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );
@@ -234,13 +234,13 @@ public class Dragon extends Beast
 		
 		var slotIndex:int = 1;
 		for each ( var gun:Gun in _guns ) {
-			for each ( var ammo:Ammo in gun.armory ) {
+			for each ( var ammo:String in gun.armory ) {
 				var actionItem:ObjectAction = new ObjectAction( null,
 																"fire",
-																ammo.name + ".png",
-																"Fire " + ammo.name );
-				actionItem["ammo"] = ammo;
-				actionItem["instanceGuid"] = gun.instanceInfo.instanceGuid;
+																ammo + ".png",
+																"Fire " + ammo );
+				actionItem.ammoName = ammo;
+				actionItem.instanceGuid = gun.instanceInfo.instanceGuid;
 				
 				slots[slotIndex++] = actionItem;
 			}
@@ -249,15 +249,19 @@ public class Dragon extends Beast
 		return slots;
 	}
 
-	static private function fire( objectAction:ObjectAction ):void {
+	static private function fire():void {
+		Log.out( "Dragon.fire");
+		/*
 		var gmInstanceGuid:String = (objectAction as Object).instanceGuid;
 		var gun:Gun = Globals.modelGet( gmInstanceGuid ) as Gun;
 		if ( gun )
 			gun.fire();
+			*/
 	}
 	
-	private function loseControlHandler():void {
-		loseControl( Globals.player );
+	static private function loseControlHandler():void {
+		Globals.controlledModel.loseControl( Globals.player );
+		Globals.player.takeControl( null, false );
 	}
 	
 	import com.voxelengine.worldmodel.weapons.Gun;
@@ -268,7 +272,7 @@ public class Dragon extends Beast
 			return;
 			
 		for each ( var child:VoxelModel in _children ) {
-			if ( child is Gun )
+			if ( child is Gun && me.instanceGuid == child.instanceInfo.instanceGuid )
 				_guns.push( child );
 		}
 	}

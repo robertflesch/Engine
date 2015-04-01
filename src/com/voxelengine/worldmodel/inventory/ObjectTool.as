@@ -22,8 +22,8 @@ public class ObjectTool extends ObjectInfo
 	private var _name:String;
 	private var _guid:String;
 	private var _callBackName:String;
-	private var _callBack:Function 		= null;
-	public function get callBack():Function 				{ return _callBack; }
+	//private var _callBack:Function 		= null;
+	public function get callBack():Function 				{ return FunctionRegistry.functionGet( _callBackName ); }
 	public function get thumbnail():String { return _thumbnail; }
 	public function get name():String  { return _name; }
 
@@ -31,8 +31,8 @@ public class ObjectTool extends ObjectInfo
 		super( $owner, ObjectInfo.OBJECTINFO_TOOL );
 		_guid = $guid;
 		_callBackName = $callBackName;
-		if ( "" != $callBackName )
-			_callBack = FunctionRegistry.functionGet( $callBackName );
+		//if ( "" != $callBackName )
+		//	_callBack = FunctionRegistry.functionGet( $callBackName );
 		_thumbnail = $thumbnail;
 		_name = $name;
 	}
@@ -55,7 +55,7 @@ public class ObjectTool extends ObjectInfo
 		_name = values[2];
 		_callBackName = values[3];
 		_guid = values[4];
-		_callBack = FunctionRegistry.functionGet( _callBackName );
+		//_callBack = FunctionRegistry.functionGet( _callBackName );
 		return this;
 	}
 
@@ -65,7 +65,7 @@ public class ObjectTool extends ObjectInfo
 		_name	= "";
 		_guid 	= "";
 		_callBackName = null;
-		_callBack = null
+		//_callBack = null
 	}
 }
 }
