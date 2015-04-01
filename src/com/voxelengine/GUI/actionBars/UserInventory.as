@@ -66,7 +66,7 @@ public class  UserInventory extends QuickInventory
 	
 	public function UserInventory( $owner:String, $image:String ) {
 		_owner = $owner;
-		Log.out( "UserInventory.create ===================== <<<<<<<<< " + _owner + " <<<<<<<<<<<< ========================", Log.WARN );
+		//Log.out( "UserInventory.create ===================== <<<<<<<<< " + _owner + " <<<<<<<<<<<< ========================", Log.WARN );
 		super( 680, 84, 64, $image );
 		_selectorXOffset = 20; // From image of "userInventory.png"
 		eventCollector.addEvent(_dragOp, DnDEvent.DND_DROP_ACCEPTED, dropMaterial );

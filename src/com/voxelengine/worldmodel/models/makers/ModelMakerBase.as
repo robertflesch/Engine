@@ -53,7 +53,7 @@ public class ModelMakerBase {
 	
 	private function retriveData($mde:ModelDataEvent):void  {
 		if ( _ii.modelGuid == $mde.modelGuid ) {
-			Log.out( "ModelMakerBase.retriveData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
+			//Log.out( "ModelMakerBase.retriveData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
 			_vmd = $mde.vmd;
 			if ( true ==  _vmdFailed ) {
 				Log.out( "ModelMakerBase.retriveData - RESETTING VMDFAILED", Log.WARN );
@@ -185,13 +185,13 @@ public class ModelMakerBase {
 	static public function makerCountIncrement():void 
 	{
 		_makerCount++;
-		Log.out( "ModelMaker.makerCountIncrement - makerCount: " + _makerCount, Log.ERROR );
+		//Log.out( "ModelMakerBase.makerCountIncrement - makerCount: " + _makerCount, Log.ERROR );
 	}
 	
 	static public function makerCountDecrement():void 
 	{
 		_makerCount--;
-		Log.out( "ModelMaker.makerCountDecrement - makerCount: " + _makerCount, Log.ERROR );
+		//Log.out( "ModelMakerBase.makerCountDecrement - makerCount: " + _makerCount, Log.ERROR );
 	}
 }	
 }

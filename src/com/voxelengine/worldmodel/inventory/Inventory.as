@@ -64,7 +64,7 @@ public class Inventory
 	
 	public function save():void {
 		if ( Globals.online && changed() ) {
-			Log.out( "Inventory.save - Saving User Inventory owner: " + owner, Log.WARN );
+			Log.out( "Inventory.save - Saving User Inventory owner: " + owner, Log.DEBUG );
 			if ( _dbo )
 				toPersistance();
 			else {
@@ -77,7 +77,7 @@ public class Inventory
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_INVENTORY_TABLE, _owner, _dbo, ba ) );
 		}
 		else
-			Log.out( "Inventory.save - NOT Saving - status online: " + Globals.online + "  changed: " + changed() + "  owner: " + owner, Log.DEBUG );
+			Log.out( "Inventory.save - NOT Saving - status online: " + Globals.online + "  changed: " + changed() + "  owner: " + owner, Log.INFO );
 	}
 	
 	private function toPersistance():void {
@@ -177,8 +177,8 @@ public class Inventory
 			return;
 		// this occurs on first time logging in.
 		removeLoadEvents();
-		fromPersistance( null );
 		Log.out( "Inventory.notFound - OWNER: " + _owner, Log.WARN );
+		fromPersistance( null );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, _owner, this ) );
 	}
 	

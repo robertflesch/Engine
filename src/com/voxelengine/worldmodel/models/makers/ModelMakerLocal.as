@@ -7,10 +7,12 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-import com.voxelengine.events.LoadingImageEvent;
+import flash.utils.ByteArray;
+
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
+import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelDataEvent;
@@ -18,16 +20,14 @@ import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.models.ModelData;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.Region;
-import flash.utils.ByteArray;
 
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF
-	 * This class is used to load a model once its metadata AND data has been loaded from persistance
+	 * This class is used to load a model once its model AND data has been loaded from persistance
 	 * it then removes its listeners, which should cause it be to be garbage collected.
 	 * Might I need to add a timeout on this object in case if never completes.
 	 */
@@ -38,7 +38,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 	private var _vmi:ModelInfo;
 	
 	public function ModelMakerLocal( $ii:InstanceInfo, $parentModelGuid:String = null ) {
-		Log.out( "ModelMakerLocal ii.modelGuid: " + $ii.modelGuid, Log.WARN );
+		//Log.out( "ModelMakerLocal ii.modelGuid: " + $ii.modelGuid, Log.WARN );
 		super( $ii, false, $parentModelGuid );
 		makerCountIncrement();
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
@@ -50,7 +50,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 	
 	private function failedInfo( $mie:ModelInfoEvent):void {
 		if ( _ii.modelGuid == $mie.modelGuid ) {
-			Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
+			Log.out( "ModelMakerLocal.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
 			markComplete( false );
 		}
 	}
@@ -72,7 +72,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 			var versionInfo:Object = modelMetaInfoRead( $ba );
 			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
 			{
-				Log.out( "VoxelModel.test - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
+				Log.out( "ModelMakerLocal.attemptMake - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
 				return;
 			}
 			
@@ -107,7 +107,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 		
 		makerCountDecrement();
 		if ( 0 == makerCountGet() ) {
-			Log.out( "ModelMakerLocal.markComplete - makerCount: 0, SHUTTING DOWN SPLASH", Log.WARN );
+			//Log.out( "ModelMakerLocal.markComplete - makerCount: 0, SHUTTING DOWN SPLASH", Log.WARN );
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
 			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );

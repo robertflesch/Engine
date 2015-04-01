@@ -44,10 +44,10 @@ public class InventoryManager
 	
 	static private function requestInventory(e:InventoryEvent):void 
 	{
-		Log.out( "InventoryManager.requestInventory - OWNER: " + e.owner, Log.WARN );
+		Log.out( "InventoryManager.requestInventory - OWNER: " + e.owner, Log.DEBUG );
 		var inv:Inventory = objectInventoryGet( e.owner );
 		if ( inv && inv.loaded ) {
-			Log.out( "InventoryManager.requestInventory - InventoryEvent.RESPONSE - OWNER: " + e.owner, Log.WARN );
+			Log.out( "InventoryManager.requestInventory - InventoryEvent.RESPONSE - OWNER: " + e.owner, Log.DEBUG );
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, e.owner, inv ) );
 		}
 	}

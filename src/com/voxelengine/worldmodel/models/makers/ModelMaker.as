@@ -37,7 +37,7 @@ public class ModelMaker extends ModelMakerBase {
 	private var _addToRegionWhenComplete:Boolean;
 	
 	public function ModelMaker( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean, $parentModelGuid:String = null ) {
-		Log.out( "ModelMaker", Log.WARN );
+		Log.out( "ModelMaker.constructor", Log.WARN );
 		_addToRegionWhenComplete = $addToRegionWhenComplete;
 		super( $ii, true, $parentModelGuid );
 		if ( 0 == makerCountGet() )
@@ -84,7 +84,7 @@ public class ModelMaker extends ModelMakerBase {
 		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
 		makerCountDecrement();
 		if ( 0 == makerCountGet() ) {
-			Log.out( "ModelMaker.markComplete - makerCount: 0, SHUTTING DOWN SPLASH", Log.WARN );
+			//Log.out( "ModelMaker.markComplete - makerCount: 0, SHUTTING DOWN SPLASH", Log.WARN );
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
 			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );
@@ -93,20 +93,18 @@ public class ModelMaker extends ModelMakerBase {
 	
 	private function createFromMakerInfo():VoxelModel {
 		var $ba:ByteArray = _vmd.ba;
-		if ( null == $ba )
-		{
+		if ( null == $ba ) {
 			Log.out( "ModelMaker.createFromMakerInfo - Exception - bad data in VoxelModelMetadata: " + _vmd.modelGuid, Log.ERROR );
 			return null;
 		}
-		$ba.position = 0;
 		
 		var versionInfo:Object = modelMetaInfoRead( $ba );
-		if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
-		{
+		if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion ) {
 			Log.out( "ModelMaker.createFromMakerInfo - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
 			return null;
 		}
 		
+		$ba.position = 0;
 		// how many bytes is the modelInfo
 		var strLen:int = $ba.readInt();
 		// read off that many bytes
