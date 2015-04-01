@@ -38,8 +38,10 @@ public class ModelMakerImport extends ModelMakerBase {
 	
 	private var _vmi:ModelInfo;
 	private var _vmm:ModelMetadata;
+	private var _prompt:Boolean;
 	
 	public function ModelMakerImport( $ii:InstanceInfo, $prompt:Boolean = true, $parentModelGuid:String = null ) {
+		_prompt = $prompt;
 		super( $ii, false, $parentModelGuid );
 		Log.out( "ModelMakerImport - ii: " + _ii.toString() );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retrivedInfo );		
@@ -51,17 +53,6 @@ public class ModelMakerImport extends ModelMakerBase {
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
 
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null ) );		
-
-		if ( $prompt )
-			new WindowModelMetadata( _ii.modelGuid, WindowModelMetadata.TYPE_IMPORT );
-		else {
-			_vmm = new ModelMetadata( _ii.modelGuid );
-			_vmm.name = _ii.modelGuid;
-			_vmm.description = _ii.modelGuid + "-IMPORTED";
-			_vmm.owner = Network.userId;
-			_vmm.modifiedDate = new Date();
-			attemptMake();
-		}
 	}
 	
 	private function retrivedMetadata( $mme:ModelMetadataEvent ):void {
@@ -94,10 +85,13 @@ public class ModelMakerImport extends ModelMakerBase {
 	
 	private function processBiome():void { 
 		// this should generate the VMD
-		Log.out( "ModelMakerImport.processBiome biome: " + _vmi.biomes.toString(), Log.WARN );
+		Log.out( "ModelMakerImport.processBiome biome: " + _vmi.biomes.toString(), Log.DEBUG );
 		var layer1:LayerInfo = _vmi.biomes.layers[0];
-		if ( "LoadModelFromIVM" == layer1.functionName )
+		if ( "LoadModelFromIVM" == layer1.functionName ) {
+			_ii.modelGuid = layer1.data;
+			Log.out( "ModelMakerImport.processBiome retrying to load model from : " + layer1.data, Log.DEBUG );
 			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, layer1.data, null, false ) );		
+		}
 		else
 			_vmi.biomes.addToTaskControllerUsingNewStyle( _ii );
 			
@@ -109,9 +103,23 @@ public class ModelMakerImport extends ModelMakerBase {
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
 		if ( true == _vmdFailed && null != _vmi && true == _vmi.boimeHas() ) {
-			Log.out( "ModelMakerImport.attemptMake - failed to load guid, try biome", Log.ERROR );
+			Log.out( "ModelMakerImport.attemptMake - failed to load guid, try biome", Log.DEBUG );
 			processBiome();
 		}
+		
+		if ( null != _vmi && null != _vmd && null == _vmm ) {
+			if ( _prompt )
+				new WindowModelMetadata( _ii.modelGuid, WindowModelMetadata.TYPE_IMPORT );
+			else {
+				_vmm = new ModelMetadata( _ii.modelGuid );
+				_vmm.name = _ii.modelGuid;
+				_vmm.description = _ii.modelGuid + "-IMPORTED";
+				_vmm.owner = Network.userId;
+				_vmm.modifiedDate = new Date();
+				attemptMake();
+			}
+		}
+		
 			
 		if ( null != _vmi && null != _vmd && null != _vmm ) {
 			

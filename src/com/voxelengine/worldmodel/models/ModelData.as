@@ -62,6 +62,7 @@ public class ModelData
 				toPersistance();
 			else {
 				var obj:Object = toObject();
+				Log.out( "ModelData.save ============= toObject size: " + _ba.length + " bytes ==================  ", Log.WARN );
 			}
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS_DATA, modelGuid, _dbo, obj ) );
 		}
@@ -71,12 +72,14 @@ public class ModelData
 	
 	private function addSaveEvents():void {
 		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
+		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, 	createFailed );
 		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, 	saveFail );
 	}
 	
 	private function removeSaveEvents():void {
 		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
+		PersistanceEvent.removeListener( PersistanceEvent.CREATE_FAILED, 	createFailed );
 		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
 		PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, 		saveFail );
 	}
@@ -96,6 +99,15 @@ public class ModelData
 		removeSaveEvents();
 		Log.out( "ModelData.createSuccess - created: " + modelGuid, Log.DEBUG ); 
 	}	
+	
+	private function createFailed( $pe:PersistanceEvent ):void  {
+		if ( Globals.DB_TABLE_MODELS_DATA != $pe.table )
+			return;
+		removeSaveEvents();
+		// TODO How do I handle the metadata for failed object?
+		Log.out( "ModelData.createFailed - created: " + modelGuid, Log.ERROR ); 
+		
+	}
 	
 	private function saveFail( $pe:PersistanceEvent ):void { 
 		if ( Globals.DB_TABLE_MODELS_DATA != $pe.table )

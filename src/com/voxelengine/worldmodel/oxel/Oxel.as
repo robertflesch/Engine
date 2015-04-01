@@ -1188,7 +1188,9 @@ package com.voxelengine.worldmodel.oxel
 //			Log.out( "Oxel.cleanup - facesBuild - took: " + (getTimer() - timer) );					
 //			timer = getTimer();
 			quadsBuild();
-			Log.out( "Oxel.cleanup - quadsBuild -  took: " + (getTimer() - timer) );					
+			var time:int = (getTimer() - timer);
+			if ( 3 < time )
+				Log.out( "Oxel.cleanup - quadsBuild -  took: " + time );					
 		}
 		
 		public function facesBuildWater():void {

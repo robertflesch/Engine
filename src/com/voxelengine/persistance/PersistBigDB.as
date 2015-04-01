@@ -172,7 +172,7 @@ public class PersistBigDB
 		PlayerIOPersistanceEvent.removeListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
 		
 		function createSucceed($dbo:DatabaseObject):void  {  
-			//Log.out( "PersistBigDB.save - CREATE Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
+			Log.out( "PersistBigDB.save - CREATE Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.CREATE_SUCCEED, $pe.series, $pe.table, $pe.guid, $dbo ) ); 
 		}
 		
