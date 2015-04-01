@@ -97,6 +97,7 @@ public class ModelMaker extends ModelMakerBase {
 			Log.out( "ModelMaker.createFromMakerInfo - Exception - bad data in VoxelModelMetadata: " + _vmd.modelGuid, Log.ERROR );
 			return null;
 		}
+		$ba.position = 0;
 		
 		var versionInfo:Object = modelMetaInfoRead( $ba );
 		if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion ) {
@@ -104,7 +105,6 @@ public class ModelMaker extends ModelMakerBase {
 			return null;
 		}
 		
-		$ba.position = 0;
 		// how many bytes is the modelInfo
 		var strLen:int = $ba.readInt();
 		// read off that many bytes
