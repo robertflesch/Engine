@@ -67,9 +67,16 @@ public class ModelMakerLocal extends ModelMakerBase {
 	override protected function attemptMake():void {
 		if ( null != _vmi && null != _vmd ) {
 			
-			var $ba:ByteArray = _vmd.ba;
-			
-			var versionInfo:Object = modelMetaInfoRead( $ba );
+			var ba:ByteArray = new ByteArray();
+			ba.writeBytes( _vmd.compressedBA, 0, _vmd.compressedBA.length );
+			try { ba.uncompress(); }
+			catch (error:Error) { ; }
+			if ( null == ba ) {
+				Log.out( "ModelMakerLocal.attemptMake - Exception - NO data in VoxelModelMetadata: " + _vmd.modelGuid, Log.ERROR );
+				return;
+			}
+
+			var versionInfo:Object = modelMetaInfoRead( ba );
 			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
 			{
 				Log.out( "ModelMakerLocal.attemptMake - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
@@ -77,9 +84,9 @@ public class ModelMakerLocal extends ModelMakerBase {
 			}
 			
 			// how many bytes is the modelInfo
-			var strLen:int = $ba.readInt();
+			var strLen:int = ba.readInt();
 			// read off that many bytes, even though we are using the data from the modelInfo file
-			var modelInfoJson:String = $ba.readUTFBytes( strLen );
+			var modelInfoJson:String = ba.readUTFBytes( strLen );
 				
 			var vmm:ModelMetadata = new ModelMetadata( _ii.modelGuid );
 			vmm.name = _vmi.fileName;
@@ -87,7 +94,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 			var vm:* = instantiate( _ii, _vmi, vmm );
 			if ( vm ) {
 				vm.version = versionInfo.version;
-				vm.fromByteArray( $ba );
+				vm.fromByteArray( ba );
 			}
 			Region.currentRegion.modelCache.add( vm );
 

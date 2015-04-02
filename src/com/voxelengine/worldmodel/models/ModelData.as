@@ -24,45 +24,46 @@ public class ModelData
 {
 	private var _modelGuid:String;
 	private var _dbo:DatabaseObject;
-	private var _ba:ByteArray;
+	private var _compressedBA:ByteArray;
 	
 	public function ModelData( $guid:String ) {
 		_modelGuid = $guid;
-		if ( "EditCursor" != $guid )
-			ModelDataEvent.addListener( ModelBaseEvent.SAVE, saveEvent );
+//		if ( "EditCursor" != $guid )
+//			ModelDataEvent.addListener( ModelBaseEvent.SAVE, saveEvent );
 	}
 
 	public function release():void {
-		ModelDataEvent.removeListener( ModelBaseEvent.SAVE, saveEvent );
+//		ModelDataEvent.removeListener( ModelBaseEvent.SAVE, saveEvent );
 	}
 	
 	public function get modelGuid():String  { return _modelGuid; }
 	public function set modelGuid(value:String):void { _modelGuid = value; }
 	public function get dbo():DatabaseObject { return _dbo; }
-	public function get ba():ByteArray  { return _ba;  }
-	public function set ba( $ba:ByteArray ):void  { _ba = $ba; }
+	public function get compressedBA():ByteArray  { return _compressedBA;  }
+	public function set compressedBA( $ba:ByteArray ):void  { _compressedBA = $ba; }
 	
 	
-	// This was private, force a message to be sent to it. 
-	// But the voxelModel has a handle to it, seems silly to have to propgate it every where, so its public
-	private function saveEvent( $mde:ModelDataEvent ):void {
-		if ( modelGuid != $mde.modelGuid ) {
-			Log.out( "ModelData.saveEvent - Ignoring save meant for other model my guid: " + modelGuid + " target guid: " + $mde.modelGuid, Log.WARN );
-			return;
-		}
-		save( _ba );
-	}
+	//// This was private, force a message to be sent to it. 
+	//// But the voxelModel has a handle to it, seems silly to have to propgate it every where, so its public
+	//private function saveEvent( $mde:ModelDataEvent ):void {
+		//if ( modelGuid != $mde.modelGuid ) {
+			//Log.out( "ModelData.saveEvent - Ignoring save meant for other model my guid: " + modelGuid + " target guid: " + $mde.modelGuid, Log.WARN );
+			//return;
+		//}
+		//save();
+	//}
 	
-	public function save( $ba:ByteArray ):void {
-		_ba = $ba;
+	public function save( ba:ByteArray ):void {
+		_compressedBA = ba;
+		_compressedBA.compress();
 		if ( Globals.online ) {
 			Log.out( "ModelData.save - Saving Model Metadata: " + modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
 			addSaveEvents();
+			Log.out( "ModelData.save ============= data size: " + _compressedBA.length + " bytes ==================  ", Log.WARN );
 			if ( _dbo )
 				toPersistance();
 			else {
 				var obj:Object = toObject();
-				Log.out( "ModelData.save ============= toObject size: " + _ba.length + " bytes ==================  ", Log.WARN );
 			}
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS_DATA, modelGuid, _dbo, obj ) );
 		}
@@ -117,17 +118,11 @@ public class ModelData
 	}	
 	
 	public function toPersistance():void {
-		var ba:ByteArray = _ba;
-		try {  ba.compress(); }
-		catch (error:Error) { ; }
-		_dbo.ba			= ba;
+		_dbo.ba			= _compressedBA;
 	}
 	
 	private function toObject():Object {
-		var ba:ByteArray = _ba;
-		try {  ba.compress(); }
-		catch (error:Error) { ; }
-		return { ba: ba }
+		return { ba: _compressedBA }
 	}
 
 	////////////////////////////////////////////////////////////////
@@ -136,12 +131,7 @@ public class ModelData
 	
 	public function fromPersistance( $dbo:DatabaseObject ):void {
 		_dbo			= $dbo;
-		
-		var ba:ByteArray = $dbo.ba;
-		try {  ba.uncompress(); }
-		catch (error:Error) { ; }
-		ba.position = 0;
-		_ba = ba;
+		_compressedBA = $dbo.ba;
 	}
 	
 }

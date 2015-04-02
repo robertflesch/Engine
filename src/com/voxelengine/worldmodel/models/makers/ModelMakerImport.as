@@ -123,9 +123,16 @@ public class ModelMakerImport extends ModelMakerBase {
 			
 		if ( null != _vmi && null != _vmd && null != _vmm ) {
 			
-			var $ba:ByteArray = _vmd.ba;
+			var ba:ByteArray = new ByteArray();
+			ba.writeBytes( _vmd.compressedBA, 0, _vmd.compressedBA.length );
+			try { ba.uncompress(); }
+			catch (error:Error) { ; }
+			if ( null == ba ) {
+				Log.out( "ModelMakerImport.createFromMakerInfo - Exception - NO data in VoxelModelMetadata: " + _vmd.modelGuid, Log.ERROR );
+				return;
+			}
 			
-			var versionInfo:Object = modelMetaInfoRead( $ba );
+			var versionInfo:Object = modelMetaInfoRead( ba );
 			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
 			{
 				Log.out( "ModelMakerImport.attemptMake - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
@@ -133,9 +140,9 @@ public class ModelMakerImport extends ModelMakerBase {
 			}
 			
 			// how many bytes is the modelInfo
-			var strLen:int = $ba.readInt();
+			var strLen:int = ba.readInt();
 			// read off that many bytes, even though we are using the data from the modelInfo file
-			var modelInfoJson:String = $ba.readUTFBytes( strLen );
+			var modelInfoJson:String = ba.readUTFBytes( strLen );
 			// reset the file name that it was loaded from and assign a new guid
 			_ii.modelGuid = _vmm.modelGuid = _vmd.modelGuid = Globals.getUID();
 			_vmi.fileName = "";
@@ -143,7 +150,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			var vm:* = instantiate( _ii, _vmi, _vmm );
 			if ( vm ) {
 				vm.version = versionInfo.version;
-				vm.fromByteArray( $ba );
+				vm.fromByteArray( ba );
 			}
 
 			vm.data = _vmd;

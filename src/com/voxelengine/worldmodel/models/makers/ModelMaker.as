@@ -90,25 +90,28 @@ public class ModelMaker extends ModelMakerBase {
 			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );
 		}
 	}
-	
+
 	private function createFromMakerInfo():VoxelModel {
-		var $ba:ByteArray = _vmd.ba;
-		if ( null == $ba ) {
-			Log.out( "ModelMaker.createFromMakerInfo - Exception - bad data in VoxelModelMetadata: " + _vmd.modelGuid, Log.ERROR );
+		
+		var ba:ByteArray = new ByteArray();
+		ba.writeBytes( _vmd.compressedBA, 0, _vmd.compressedBA.length );
+		try { ba.uncompress(); }
+		catch (error:Error) { ; }
+		if ( null == ba ) {
+			Log.out( "ModelMaker.createFromMakerInfo - Exception - NO data in VoxelModelMetadata: " + _vmd.modelGuid, Log.ERROR );
 			return null;
 		}
-		$ba.position = 0;
 		
-		var versionInfo:Object = modelMetaInfoRead( $ba );
+		var versionInfo:Object = modelMetaInfoRead( ba );
 		if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion ) {
 			Log.out( "ModelMaker.createFromMakerInfo - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
 			return null;
 		}
 		
 		// how many bytes is the modelInfo
-		var strLen:int = $ba.readInt();
+		var strLen:int = ba.readInt();
 		// read off that many bytes
-		var modelInfoJson:String = $ba.readUTFBytes( strLen );
+		var modelInfoJson:String = ba.readUTFBytes( strLen );
 		
 		// create the modelInfo object from embedded metadata
 		modelInfoJson = decodeURI(modelInfoJson);
@@ -119,12 +122,13 @@ public class ModelMaker extends ModelMakerBase {
 		var vm:* = instantiate( _ii, mi, _vmm );
 		if ( vm ) {
 			vm.version = versionInfo.version;
-			vm.fromByteArray( $ba );
+			vm.fromByteArray( ba );
 			vm.complete = true;
 		}
 
 		vm.data = _vmd;
 		return vm;
 	}
+	
 }	
 }

@@ -82,11 +82,7 @@ public class ModelDataCache
 				vmd.fromPersistance( $pe.dbo );
 			else {
 				// loading from file data
-				var ba:ByteArray = $pe.data;
-				try {  ba.uncompress(); }
-				catch (error:Error) { ; }
-				ba.position = 0;
-				vmd.ba = ba;
+				vmd.compressedBA = $pe.data;
 			}
 				
 			add( $pe, vmd );

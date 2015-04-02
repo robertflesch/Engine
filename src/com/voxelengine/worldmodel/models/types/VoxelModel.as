@@ -1063,7 +1063,9 @@ public class VoxelModel
 		
 		writeVersionedHeader( ba );
 		writeEmptyManifest( ba );
-		$oxel.toByteArray( ba );
+		
+		var oxelBA:ByteArray = $oxel.toByteArray();
+		ba.writeBytes( oxelBA, 0, oxelBA.length );
 		
 		return ba;
 		
@@ -1087,7 +1089,9 @@ public class VoxelModel
 		
 		writeVersionedHeader( ba );
 		writeManifest( ba );
-		oxel.toByteArray( ba );
+
+		var oxelBA:ByteArray = oxel.toByteArray();
+		ba.writeBytes( oxelBA, 0, oxelBA.length );
 		
 		return ba;
 		

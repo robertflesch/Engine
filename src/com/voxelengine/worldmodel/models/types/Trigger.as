@@ -96,8 +96,7 @@ package com.voxelengine.worldmodel.models.types
 				// so we have to save the byte array from what was inside.
 				if ( !_was_selected && null == _ba )
 				{
-					_ba = new ByteArray();
-					oxel.toByteArray( _ba );
+					_ba = oxel.toByteArray();
 				}
 				
 				var loco:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);

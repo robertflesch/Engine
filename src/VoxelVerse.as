@@ -334,7 +334,7 @@ class StartupSynchronizer
 }
 
 import flash.display.Stage;
-import flash.external.ExternalInterface;
+import flash.display.LoaderInfo
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -361,27 +361,13 @@ class VVInitializer
 			Globals.g_debug = false;
 		}
 		
-		try {
-			// This doesnt work in chrome, so I need someway to detect chrome and do it differently
-			// Globals.appPath = "file:///C:/dev/VVInitializer/resources/bin/";
-			var urlPath:String = ExternalInterface.call("window.location.href.toString");
-			Log.out( "VVInitializer.initialize - swf loaded from: " + urlPath );
-			var index:int = urlPath.indexOf( "index.html" );
-			if ( -1 == index )
-			{
-				index = urlPath.lastIndexOf( "/" );
-				var gap:String = urlPath.substr( 0, index + 1 );
-				Globals.appPath = gap;
-			}
-			else {
-				//if ( Globals.g_debug ) 
-					Globals.appPath = urlPath.substr( 0, index );
-			}
-			Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG );
-		} catch ( error:Error ) {
-			Log.out("VVInitializer.initialize - ExternalInterface not found, using default location", Log.ERROR, error );
-		}
+		Log.out("VVInitializer.initialize this is " + (Globals.g_debug ? "debug" : "release") + " build", Log.DEBUG );
 		
+		var url:String = $stage.loaderInfo.loaderURL;
+		//url = "file:///C:/dev/VoxelVerse/resources/bin/VoxelVerse.swf"
+		var index:int = url.lastIndexOf( "VoxelVerse.swf" );
+		Globals.appPath = url.substring( 0, index );
+		Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG );
 		
 		Globals.g_renderer.init( $stage );
 		// adds handlers for persistance of regions
