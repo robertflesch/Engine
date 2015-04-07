@@ -96,6 +96,7 @@ package com.voxelengine.worldmodel.models.types
 				// so we have to save the byte array from what was inside.
 				if ( !_was_selected && null == _ba )
 				{
+					// this is a raw byte array, just oxel data.
 					_ba = oxel.toByteArray();
 				}
 				

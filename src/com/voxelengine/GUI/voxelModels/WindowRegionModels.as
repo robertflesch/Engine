@@ -1,21 +1,16 @@
 
 package com.voxelengine.GUI.voxelModels
 {
-	import com.voxelengine.events.ModelBaseEvent;
-	import com.voxelengine.events.RegionEvent;
-	import com.voxelengine.worldmodel.models.ModelCache;
-	import com.voxelengine.worldmodel.models.ModelCacheUtils;
-	import com.voxelengine.worldmodel.Region;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
-	import org.flashapi.swing.list.ListItem;
 	
-	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.GUI.*;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
+	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.worldmodel.Region;
 	
 	public class WindowRegionModels extends VVPopup
 	{
