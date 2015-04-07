@@ -774,11 +774,11 @@ package org.flashapi.swing {
 		}
 		
 		private static function JSAvailable():Boolean {
-			if (ExternalInterface.available) {
-				if (ExternalInterface.call("Function(\"return true;\")")) {
-					return true;
-				}
-			}           
+			//if (ExternalInterface.available) {
+				//if (ExternalInterface.call("Function(\"return true;\")")) {
+					//return true;
+				//}
+			//}           
 
 			return false;
 		}
