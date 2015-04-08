@@ -96,6 +96,7 @@ public class InstanceInfo extends Location	{
 	public function set type( val:int):void  					{ _type = val; }
 	public function set grainSize(val:int):void					{ _grainSize = val; }
 	public function get shader():String 						{ return _shader; }
+	// this is the voxel model which controls the parent of the instanceInfo.
 	public function get controllingModel():VoxelModel  			{ return _controllingModel; }
 	public function set controllingModel(val:VoxelModel):void 	
 	{ 
@@ -103,6 +104,8 @@ public class InstanceInfo extends Location	{
 			Log.out( "Instance	Info.controllingModel SET - trying to set this to itself" );
 		_controllingModel = val; 
 	}
+	// this is the VoxelModel that the instanceInfo belongs to.
+	// mainly used to identify owner and send info backup the chain.
 	public function get owner():VoxelModel  					{ return _owner; }
 	public function set owner(val:VoxelModel):void 				
 	{ 
@@ -114,13 +117,26 @@ public class InstanceInfo extends Location	{
 	public function get state():String 							{ return _state; }
 	public function set state(val:String):void						{ _state = val; }
 	// I dont like that sometimes this is in World Space, and sometimes in Model Space
+	// example?
 	public function get transforms():Vector.<ModelTransform>	{ return _transforms; }
 	public function set transforms(val:Vector.<ModelTransform>):void
 	{ 
 		for each ( var mt:ModelTransform in val )
-		{
 			addTransformMT( mt );
-		}
+	}
+
+	public function release():void {
+		_moveSpeed 			= null;
+		_transforms 		= null;
+		_shader				= null;
+		_modelGuid			= null;			                    
+		_instanceGuid		= null;							
+		_scripts			= null;
+		_controllingModel	= null;    						
+		_owner				= null;               			
+		_creationJSON		= null;                         
+		_state				= null;
+		_life				= null;		
 	}
 	
 	public function buildExportObject():Object {

@@ -40,9 +40,9 @@ public class ModelMakerImport extends ModelMakerBase {
 	private var _vmm:ModelMetadata;
 	private var _prompt:Boolean;
 	
-	public function ModelMakerImport( $ii:InstanceInfo, $prompt:Boolean = true, $parentModelGuid:String = null ) {
+	public function ModelMakerImport( $ii:InstanceInfo, $prompt:Boolean = true ) {
 		_prompt = $prompt;
-		super( $ii, false, $parentModelGuid );
+		super( $ii, false );
 		Log.out( "ModelMakerImport - ii: " + _ii.toString() );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retrivedInfo );		
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retrivedInfo );		

@@ -67,7 +67,7 @@ public class Permissions
 		newP.modify			= _modify;
 		newP.blueprintGuid	= new String( _blueprintGuid );
 		newP.creator		= new String( _creator );
-		newP.createdDate	= new Date( _createdDate );
+		newP.createdDate	= _createdDate;
 		newP.binding		= new String( _binding );
 		return newP;
 	}
@@ -77,7 +77,7 @@ public class Permissions
 		_dbo.modify			= _modify;
 		_dbo.templateGuid	= _blueprintGuid;
 		_dbo.creator		= _creator;
-		_dbo.createdDate	= _createdDate;
+		_dbo.createdDate	= _dbo._createdDate ? _dbo._createdDate : new Date();
 		_dbo.binding		= _binding;
 	}
 	
@@ -86,7 +86,7 @@ public class Permissions
 		_modify			= _dbo.modify;		
 		_blueprintGuid	= _dbo.templateGuid;
 		_creator		= _dbo.creator;
-		_createdDate	= _dbo._createdDate;
+		_createdDate	= _dbo._createdDate ? _dbo._createdDate : new Date();
 		_binding		= _dbo.binding;
 	}
 	
@@ -95,7 +95,7 @@ public class Permissions
 		metadataObj.modify		= _modify;
 		metadataObj.templateGuid= _blueprintGuid;
 		metadataObj.creator		= _creator;
-		metadataObj.createdDate		= _createdDate;
+		metadataObj.createdDate	= _createdDate ? _createdDate : new Date();
 		metadataObj.binding		= _binding;
 		return metadataObj;
 	}

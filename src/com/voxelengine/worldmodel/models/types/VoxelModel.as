@@ -187,8 +187,8 @@ public class VoxelModel
 				// to test if we are in the bar mode, we test of instanceGuid.
 				// Since this is a child object, it automatically get added to the parent.
 				// So add to cache just adds it to parent instance.
-				//Log.out( "VoxelModel.processClassJson - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid );
-				ModelMakerBase.load( childInstanceInfo, true, false, instanceInfo.modelGuid );
+				Log.out( "VoxelModel.processClassJson - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
+				ModelMakerBase.load( childInstanceInfo, false, false );
 			}
 			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			_modelInfo.childrenReset();
@@ -949,32 +949,26 @@ public class VoxelModel
 		Log.out("------------------------------------------------------------------------------");
 	}
 	
-	public function oxelReset():void
-	{
-		if (oxel)
-		{
+	public function oxelReset():void {
+		if (oxel) {
 			oxel.release();
 			oxel = null;
 		}
 	}
 	
-	public function reinitialize( $context:Context3D ):void
-	{
+	public function reinitialize( $context:Context3D ):void {
 		//trace("VoxelModel.reinitialize - modelInfo: " + modelInfo.fileName );
 		for each ( var shader:Shader in _shaders )
 			shader.createProgram( $context );
 			
 		for each (var child:VoxelModel in _children)
-		{
 			child.reinitialize( $context );
-		}
 
 		if ( editCursor )
 			editCursor.reinitialize( $context );
 	}
 	
-	public function dispose():void
-	{
+	public function dispose():void {
 		for each ( var shader:Shader in _shaders )
 			shader.dispose();
 			
@@ -988,21 +982,16 @@ public class VoxelModel
 			editCursor.dispose();
 	}
 	
-	public function release():void
-	{
-		//trace("VoxelModel.release - removing listeners and deleting oxel");
+	public function release():void {
+		instanceInfo.release();
 		
-		
-		if ( metadata.permissions.modify )
-		{
+		if ( metadata.permissions.modify ) {
 			//ModelEvent.removeListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
-			
 			ImpactEvent.removeListener( ImpactEvent.EXPLODE, impactEventHandler);
 			ImpactEvent.removeListener( ImpactEvent.DFIRE, impactEventHandler);
 			ImpactEvent.removeListener( ImpactEvent.DICE, impactEventHandler);
 			ImpactEvent.removeListener( ImpactEvent.ACID, impactEventHandler);
 		}
-		
 		
 		//trace( "VoxelModel.release: " + instanceInfo.fileName );
 		oxelReset();
@@ -1013,8 +1002,7 @@ public class VoxelModel
 		metadata.release();	
 	}
 	
-	public function removePermanantly():void
-	{
+	public function removePermanantly():void {
 		/**
 		 * Delete a set of DatabaseObjects from a table
 		 * @param table The table to delete the DatabaseObjects from

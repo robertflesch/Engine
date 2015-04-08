@@ -36,10 +36,10 @@ public class ModelMaker extends ModelMakerBase {
 	private var _vmm:ModelMetadata;
 	private var _addToRegionWhenComplete:Boolean;
 	
-	public function ModelMaker( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean, $parentModelGuid:String = null ) {
+	public function ModelMaker( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean ) {
 		Log.out( "ModelMaker.constructor", Log.WARN );
 		_addToRegionWhenComplete = $addToRegionWhenComplete;
-		super( $ii, true, $parentModelGuid );
+		super( $ii, true );
 		if ( 0 == makerCountGet() )
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 		makerCountIncrement();

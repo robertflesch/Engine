@@ -37,10 +37,10 @@ public class ModelMakerBase {
 	static private var _s_parentChildCount:Array = new Array();
 
 	
-	public function ModelMakerBase( $ii:InstanceInfo, $fromTables:Boolean = true, $parentModelGuid:String = null ) {
+	public function ModelMakerBase( $ii:InstanceInfo, $fromTables:Boolean = true ) {
 		_ii = $ii;
-		_parentModelGuid = $parentModelGuid;
-		if ( _parentModelGuid ) {
+		if ( $ii.controllingModel ) {
+			_parentModelGuid = $ii.controllingModel.instanceInfo.instanceGuid;
 			var count:int = _s_parentChildCount[_parentModelGuid];
 			_s_parentChildCount[_parentModelGuid] = ++count;
 		}
@@ -159,15 +159,15 @@ public class ModelMakerBase {
 		return vm;
 	}
 	
-	static public function load( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true, $prompt:Boolean = true, $parentModelGuid:String = null ):void {
+	static public function load( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true, $prompt:Boolean = true ):void {
 		//Log.out( "ModelMakerBase.load ii: " + $ii.toString() );
 		if ( !Globals.isGuid( $ii.modelGuid ) && $ii.modelGuid != "LoadModelFromBigDB" )
 			if ( Globals.online )
-				new ModelMakerImport( $ii, $prompt, $parentModelGuid );
+				new ModelMakerImport( $ii, $prompt );
 			else
-				new ModelMakerLocal( $ii, $parentModelGuid );
+				new ModelMakerLocal( $ii );
 		else
-			new ModelMaker( $ii, $addToRegionWhenComplete, $parentModelGuid );
+			new ModelMaker( $ii, $addToRegionWhenComplete );
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

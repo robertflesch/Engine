@@ -80,8 +80,10 @@ package com.voxelengine.GUI.voxelModels
 			// TODO need to be able to handle an array of scipts.
 			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { ii.scriptName = $e.target.text; }, ii.scriptName, width ) );
 			addElement( new ComponentLabel( "Size in Meters", String(ii.grainSize), width ) );
-			addElement( new ComponentLabel( "Model GUID",  ii.modelGuid, width ) );
-			addElement( new ComponentLabel( "Instance GUID",  ii.instanceGuid, width ) );
+			if ( Globals.g_debug ) {
+				addElement( new ComponentLabel( "Model GUID",  ii.modelGuid, width ) );
+				addElement( new ComponentLabel( "Instance GUID",  ii.instanceGuid, width ) );
+			}
 			if ( _vm.anim )
 				// TODO add a drop down of available states
 				addElement( new ComponentLabel( "State", _vm.anim ? _vm.anim.metadata.name : "", width ) );
@@ -95,13 +97,13 @@ package com.voxelengine.GUI.voxelModels
 			addElement( new ComponentVector3D( setChanged, "Scale", "X: ", "Y: ", "Z: ",  ii.scale, updateScaleVal, 5 ) );
 			addPhoto()
 			
-//			if ( true == Globals.g_debug )
-//			{
+			if ( Globals.g_debug )
+			{
 				var oxelUtils:Button = new Button( LanguageManager.localizedStringGet( "Oxel_Utils" ) );
 				oxelUtils.addEventListener(UIMouseEvent.CLICK, oxelUtilsHandler );
 				//oxelUtils.width = pbWidth - 2 * pbPadding;
 				addElement( oxelUtils );
-//			}
+			}
 			
 			display( 600, 20 );
         }

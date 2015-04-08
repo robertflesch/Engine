@@ -155,18 +155,18 @@ public class InventoryPanelModel extends VVContainer
 		_currentRow.addElement( box );
 		if ( allowDrag )
 			eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
-		if ( $oi is ObjectModel )
-			eventCollector.addEvent( box, UIMouseEvent.CLICK, addAsParentModel );
+//		if ( $oi is ObjectModel )
+//			eventCollector.addEvent( box, UIMouseEvent.CLICK, addAsParentModel );
 		return box;
 	}
 	
-	private function addAsParentModel( e:UIMouseEvent ):void {
-		var item:ObjectModel = e.target.objectInfo as ObjectModel;
-		var ii:InstanceInfo = new InstanceInfo();
-		ii.modelGuid = item.modelGuid;
-		ii.instanceGuid = Globals.getUID();
-		new ModelMaker( ii, true );
-	}
+	//private function addAsParentModel( e:UIMouseEvent ):void {
+		//var item:ObjectModel = e.target.objectInfo as ObjectModel;
+		//var ii:InstanceInfo = new InstanceInfo();
+		//ii.modelGuid = item.modelGuid;
+		//ii.instanceGuid = Globals.getUID();
+		//new ModelMaker( ii, true );
+	//}
 	
 	private function populateModels():void 
 	{

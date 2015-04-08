@@ -48,9 +48,9 @@ public class Slots
 		Log.out( "SlotsManager.slotChange slot: " + e.slotId + "  item: " + e.item );
 		if ( _items ) {
 			if ( null == e.item )
-				_items[e.slotId] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );
+				setItemData( e.slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) );
 			else
-				_items[e.slotId] = e.item;
+				setItemData( e.slotId, e.item );
 			changed = true;
 		}
 		else
@@ -81,16 +81,16 @@ public class Slots
 	public function fromPersistance( $dbo:DatabaseObject ):void {	
 		if ( $dbo && $dbo.slot0 ) {
 			var index:int;
-			_items[index] = createObjectFromInventoryString( $dbo.slot0, index++ );
-			_items[index] = createObjectFromInventoryString( $dbo.slot1, index++ );
-			_items[index] = createObjectFromInventoryString( $dbo.slot2, index++ );
-			_items[index] = createObjectFromInventoryString( $dbo.slot3, index++ );
-			_items[index] = createObjectFromInventoryString( $dbo.slot4, index++ );
-			_items[index] = createObjectFromInventoryString( $dbo.slot5, index++ );
-			_items[index] = createObjectFromInventoryString( $dbo.slot6, index++ );
-			_items[index] = createObjectFromInventoryString( $dbo.slot7, index++ );
-			_items[index] = createObjectFromInventoryString( $dbo.slot8, index++ );
-			_items[index] = createObjectFromInventoryString( $dbo.slot9, index++ );
+			setItemData( index, createObjectFromInventoryString( $dbo.slot0, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $dbo.slot1, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $dbo.slot2, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $dbo.slot3, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $dbo.slot4, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $dbo.slot5, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $dbo.slot6, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $dbo.slot7, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $dbo.slot8, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $dbo.slot9, index++ ) );
 		}
 		else {
 			addSlotDefaultData();		
@@ -111,6 +111,18 @@ public class Slots
 		changed = false;
 	}
 	
+	private function setItemData( $slot:int, $data:ObjectInfo ):void {
+		if ( 0 > $slot || 9 < $slot ) {
+			Log.out( "Slots.setItemData - invalid slot: " + $slot, Log.ERROR );
+			throw new Error( "Slots.setItemData - invalid slot: " + $slot );
+		}
+		if ( null == $data ) {
+			Log.out( "Slots.setItemData - invalid data: " + $data, Log.ERROR );
+			throw new Error( "Slots.setItemData - invalid data: " + $data );
+		}
+		_items[$slot] = $data;
+	}
+	
 	import flash.utils.getQualifiedClassName;
 	public function addSlotDefaultData():void {
 
@@ -121,14 +133,8 @@ public class Slots
 		
 		Log.out( "Slots.addSlotDefaultData - Loading default data into slots" , Log.WARN );
 		for ( var i:int; i < Slots.ITEM_COUNT; i++ )
-			items[i] = defaultData[i];
-		/*
-		var pickItem:ObjectTool = new ObjectTool( null, "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );
-		_items[0] = pickItem;
-		
-		var noneItem:ObjectAction = new ObjectAction( null, "noneSlots", "none.png", "Do nothing" );
-		_items[1] = noneItem;
-		*/
+			setItemData( i, defaultData[i] );
+
 		changed = true;
 	}
 	
@@ -149,7 +155,7 @@ public class Slots
 
 	private function initializeSlots():void {
 		for ( var i:int; i < ITEM_COUNT; i++ ) {
-			_items[i] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );
+			setItemData( i, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) );
 		}
 	}
 
