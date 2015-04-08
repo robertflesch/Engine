@@ -204,14 +204,14 @@ public class Inventory
 	private function addSaveEvents():void {
 		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, saveFailed );
-		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, saveSucceed );
+		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, createSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, createFailed );
 	}
 	
 	private function removeSaveEvents():void {
 		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
 		PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, saveFailed );
-		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, saveSucceed );
+		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, createSucceed );
 		PersistanceEvent.removeListener( PersistanceEvent.CREATE_FAILED, createFailed );
 	}
 	
@@ -229,6 +229,15 @@ public class Inventory
 			return;
 		removeSaveEvents();
 		Log.out( "Inventory.saveFailed - MAY BE (error #2032)  The method SaveObjectChanges can only be called when connected to a game", Log.ERROR );
+	}
+	
+	private function createSucceed( $pe:PersistanceEvent ):void
+	{
+		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
+			return;
+		removeSaveEvents();
+		_dbo = $pe.dbo;
+		Log.out( "Inventory.createSucceed" );
 	}
 	
 	private function createFailed( $pe:PersistanceEvent ):void

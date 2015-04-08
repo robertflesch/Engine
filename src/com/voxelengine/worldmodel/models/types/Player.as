@@ -99,6 +99,7 @@ public class Player extends Avatar
 		
 	override public function set dead(val:Boolean):void { 
 		super.dead = val;
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.UNLOAD_REQUEST, instanceInfo.instanceGuid, null ) );
 		removeEventHandlers();
 	}
 	

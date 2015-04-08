@@ -273,7 +273,6 @@ public class  UserInventory extends QuickInventory
 		processItemSelection( boxes[$index] );
 	}
 	
-	private var _editCursorModelGuid:String;
 	private var _lastCursorType:int
 	
 	private function processItemSelection( box:UIObject ):void {
@@ -289,18 +288,12 @@ public class  UserInventory extends QuickInventory
 		// reset the cursor type to what was selected in the shape selector
 		EditCursor.cursorType = _lastCursorType;
 		
-		if ( null != _editCursorModelGuid ) {
-			//var ecm:VoxelModel = Globals.modelGet( _editCursorModelGuid );
-			//if ( ecm )
-				//ecm.dead = true;
-			_editCursorModelGuid = null;
-		}
 		var oi:ObjectInfo = box.data as ObjectInfo;
 		if ( oi is ObjectVoxel ) {
 			var ti:ObjectVoxel = oi as ObjectVoxel;
 			var selectedTypeId:int = ti.type;
 			showGrainTools();
-			
+			EditCursor.objectModelClear();
 			if ( TypeInfo.INVALID != selectedTypeId ) {
 				EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
 				EditCursor.editCursorIcon = selectedTypeId; 
@@ -312,6 +305,7 @@ public class  UserInventory extends QuickInventory
 		else if ( oi is ObjectAction ) {
 			Log.out( "UserInventory.processItemSelection - ObjectAction");
 			var oa:ObjectAction = oi as ObjectAction;
+			EditCursor.objectModelClear();
 			if ( lastItemSelection != itemIndex )
 			{   // We are selecting none when it was previously on another item
 				oa.callBack();
@@ -328,6 +322,7 @@ public class  UserInventory extends QuickInventory
 			Log.out( "UserInventory.processItemSelection - ObjectTool");
 			var ot:ObjectTool = oi as ObjectTool;
 			showGrainTools();
+			EditCursor.objectModelClear();
 			if ( lastItemSelection != itemIndex )
 			{   // We are selecting the pick when it was previously on another item
 				ot.callBack();
@@ -343,19 +338,19 @@ public class  UserInventory extends QuickInventory
 			}
 		}
 		else if ( oi is ObjectModel ) {
-			Log.out( "UserInventory.processItemSelection - ObjectModel - what do I do here?");
-			if ( EditCursor.cursorType != EditCursor.CURSOR_TYPE_MODEL )
-				_lastCursorType = EditCursor.cursorType;
-			EditCursor.cursorType = EditCursor.CURSOR_TYPE_MODEL;
+			
+			if ( lastItemSelection != itemIndex )
+				EditCursor.objectModelClear(); // clear the previously draw model
+			
+			EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
+			var ti1:TypeInfo = TypeInfo.typeInfoByName[ "CLEAR GLASS" ];
+			EditCursor.editCursorIcon = ti1.type;
+			//_itemMaterialSelection = itemIndex;
+			Globals.g_app.editing = true;
+			Globals.g_app.toolOrBlockEnabled = true;
+			
 			var om:ObjectModel = oi as ObjectModel;
-			var ii:InstanceInfo = new InstanceInfo();
-
-			throw new Error( "UserInventory.processItemSelection - what is needed here for guid?" );
-			_editCursorModelGuid = ii.modelGuid = om.modelGuid;
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
-			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_COMPLETE, cursorReady );
-			new ModelMaker( ii );
-			Log.out( "GCI: " + ModelCacheUtils.gci );
+			EditCursor.objectModelAdd( om );
 		}
 		else if ( oi is ObjectInfo ) {
 			Log.out( "UserInventory.processItemSelection - ObjectInfo");

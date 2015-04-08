@@ -141,12 +141,13 @@ package com.voxelengine.server
 			buttonPanel.padding = 7.5;
 			_loginButton = new Button( "Login", buttonWidth, buttonHeight - 15 );
 			_loginButton.tabIndex = 4;
-			_loginButton.addEventListener(UIMouseEvent.CLICK, loginButtonHandler );
+			$evtColl.addEvent( _loginButton, UIMouseEvent.CLICK, loginButtonHandler );
+
 //			_loginButton.shadow = true;
 			buttonPanel.addElement( _loginButton );
 			
 			var registerButton:Button = new Button( "Register..", buttonWidth, buttonHeight - 15 );
-			registerButton.addEventListener(UIMouseEvent.CLICK, registerButtonHandler );
+			$evtColl.addEvent( registerButton, UIMouseEvent.CLICK, registerButtonHandler );
 			registerButton.shadow = true;
 			registerButton.tabIndex = 5;
 			buttonPanel.addElement( registerButton );
@@ -154,7 +155,7 @@ package com.voxelengine.server
 			var lostPasswordButton:Button = new Button( "Lost Password", buttonWidth, buttonHeight - 15 );
 			lostPasswordButton.fontSize = 9;
 			lostPasswordButton.shadow = true;
-			lostPasswordButton.addEventListener(UIMouseEvent.CLICK, lostPasswordHandler );
+			$evtColl.addEvent( lostPasswordButton, UIMouseEvent.CLICK, lostPasswordHandler );
 			lostPasswordButton.tabIndex = 6;
 			buttonPanel.addElement( lostPasswordButton );
 			
@@ -290,6 +291,7 @@ package com.voxelengine.server
 		}
 		
 		override protected function onRemoved( event:UIOEvent ):void {
+			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
 			super.onRemoved( event );
 			VoxelVerseGUI.currentInstance.showGUI();
 		}

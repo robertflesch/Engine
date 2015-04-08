@@ -9,6 +9,8 @@ package com.voxelengine.worldmodel.models.types
 {
 	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.pools.LightingPool;
+	import com.voxelengine.worldmodel.inventory.ObjectModel;
+	import com.voxelengine.worldmodel.models.makers.ModelMakerCursor;
 	import com.voxelengine.worldmodel.models.ModelCacheUtils;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import com.voxelengine.worldmodel.oxel.Oxel;
@@ -146,6 +148,27 @@ package com.voxelengine.worldmodel.models.types
 
 		}
 		
+		static private var _s_objectModel:VoxelModel;
+		static public function objectModelClear():void {
+			_s_objectModel = null;
+		}
+		
+		static public function objectModelSet( $cm:VoxelModel ):void {
+			_s_objectModel = $cm;
+			editCursorSize = $cm.oxel.gc.bound;
+		}
+		
+		static public function objectModelAdd( $om:ObjectModel ):void {
+			var ii:InstanceInfo = new InstanceInfo();
+			// How can I tell if I am adding this to parent, or it is independant?
+			// when it is placed?
+			// Add the parent model info to the child.
+//			ii.controllingModel = this;
+			ii.baseLightLevel = Lighting.MAX_LIGHT_LEVEL;
+			ii.modelGuid = $om.modelGuid;
+			var mm:ModelMakerCursor = new ModelMakerCursor( ii, $om.vmm );
+		}
+		
 		private function configureInsertOxel():void {
 			
 			
@@ -176,6 +199,9 @@ package com.voxelengine.worldmodel.models.types
 			oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
 			oxel.write( EDIT_CURSOR, oxel.gc, editCursorIcon, true );
 			oxel.quadsBuild();
+			
+			if ( _s_objectModel )
+				_s_objectModel.instanceInfo.positionSet = instanceInfo.positionGet;
 		}
 		
 		private function configureDeleteOxel():void {
@@ -219,6 +245,9 @@ package com.voxelengine.worldmodel.models.types
 			viewMatrix.append(mvp);
 			
 			oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
+			
+			if ( _s_objectModel )
+				_s_objectModel.draw( mvp, $context, true );
 		}
 		
 		override public function drawAlpha( mvp:Matrix3D,$context:Context3D, $isChild:Boolean ):void {
@@ -231,6 +260,9 @@ package com.voxelengine.worldmodel.models.types
 			viewMatrix.append(mvp);
 			
 			oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
+			
+			if ( _s_objectModel )
+				_s_objectModel.drawAlpha( mvp, $context, true );
 		}
 		
 		override public function update($context:Context3D, elapsedTimeMS:int ):void {
@@ -246,6 +278,9 @@ package com.voxelengine.worldmodel.models.types
 			}
 			
 			internal_update($context, elapsedTimeMS );
+			
+			if ( _s_objectModel )
+				_s_objectModel.update($context, elapsedTimeMS );
 		}
 		
 		override public function initialize($context:Context3D ):void {

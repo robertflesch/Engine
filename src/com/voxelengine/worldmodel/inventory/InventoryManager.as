@@ -37,7 +37,7 @@ public class InventoryManager
 
 	static private function save( e:InventoryEvent ):void {
 		for each ( var inventory:Inventory in _s_inventoryByGuid )
-			if ( null != inventory && inventory.owner != "player" )
+			if ( null != inventory && inventory.owner != "Player" )
 				inventory.save();
 	}
 	
