@@ -366,8 +366,8 @@ package com.voxelengine.worldmodel.models.types
 			var foundModel:VoxelModel = Globals.selectedModel;
 			if ( foundModel )
 			{
+				// same model, new instance.
 				var newChild:VoxelModel = _s_objectModel.clone();
-				newChild.complete = true;
 				foundModel.childAdd( newChild );
 			}
 		}
