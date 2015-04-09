@@ -1904,8 +1904,6 @@ package com.voxelengine.worldmodel.oxel
 				// the baseLightLevel gets overridden by data from byte array.
 				// so if there is no parent, I need to save off the baseLightLevel
 				// and restore it after the data has been read.
-				if ( null == $parent )
-					var baseLightLevel:uint = lighting.avg;
 				if ( !lighting )
 					lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
 				$ba = lighting.fromByteArray( $version, $ba );
@@ -1918,6 +1916,7 @@ package com.voxelengine.worldmodel.oxel
 						li.setAll( avgLight );
 				}
 				else {
+					var baseLightLevel:uint = lighting.avg;
 					lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).setAll( baseLightLevel );
 				}
 				lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;

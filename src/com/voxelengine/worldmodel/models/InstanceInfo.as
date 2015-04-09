@@ -52,7 +52,6 @@ public class InstanceInfo extends Location	{
 	private var _owner:VoxelModel 					= null;               			// INSTANCE NOT EXPORTED
 	private var _creationJSON:Object 				= null;                         // INSTANCE NOT EXPORTED
 	private var _state:String 						= "";							// INSTANCE NOT EXPORTED
-	public var	_repeat:int = 0;
 	
 	private var _life:Vector3D 						= new Vector3D(1, 1, 1);		// INSTANCE NOT EXPORTED
 	
@@ -192,7 +191,8 @@ public class InstanceInfo extends Location	{
 	public function clone():InstanceInfo
 	{
 		var ii:InstanceInfo = new InstanceInfo();
-		ii.initJSON( _creationJSON );
+		var obj:Object = getJSON();
+		ii.initJSON( obj );
 		return ii;
 	}
 	
@@ -261,9 +261,6 @@ public class InstanceInfo extends Location	{
 		if ( _creationJSON.state )
 			_state = _creationJSON.state;
 
-		if ( _creationJSON.repeat )
-			_repeat = _creationJSON.repeat;
-			
 		if ( _creationJSON.baseLightLevel )
 			baseLightLevel = _creationJSON.baseLightLevel;
 					
@@ -339,7 +336,7 @@ public class InstanceInfo extends Location	{
 			collideable = json.collidable;
 			if ( "false" == collideable.toLowerCase() )
 				_collidable = false;
-		}
+		}	
 		if ( json.collideable )
 		{
 			collideable = json.collideable;

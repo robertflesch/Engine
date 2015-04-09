@@ -375,13 +375,6 @@ public class VoxelModel
 //				trace( "VoxelModel - added ImpactEvent.EXPLODE for " + _modelInfo.modelClass );
 		}
 		
-		if (0 < instanceInfo._repeat)
-		{
-			var vm:VoxelModel = this.clone();
-			//childAdd( vm );
-			Log.out("VoxelModel.construct - REPEAT");
-		}
-		
 		cameraAddLocations();
 		
 		if (instanceInfo.state != "")
@@ -410,15 +403,17 @@ public class VoxelModel
 	public function clone():VoxelModel {
 		var mi:ModelInfo = modelInfo.clone();
 		// Get old value since this is wiped out in the instanceInfo clone
-		var repeat:int = this.instanceInfo._repeat;
 		var ii:InstanceInfo = instanceInfo.clone();
 		ii.modelGuid = mi.fileName;
-		if (0 < repeat)
-			repeat--;
-		ii._repeat = repeat;
+		var ba:ByteArray = oxel.toByteArray();
 		
 		var vm:VoxelModel = new VoxelModel(ii);
-		vm.init( mi, null, false )
+		vm.init( mi, null, false );
+		vm.version = version;
+		vm.oxel = OxelPool.poolGet();
+		ba.position = 0;
+		vm.fromByteArray( ba );
+		vm.save();
 		return vm;
 	}
 	

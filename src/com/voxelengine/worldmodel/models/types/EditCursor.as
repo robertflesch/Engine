@@ -104,6 +104,10 @@ package com.voxelengine.worldmodel.models.types
 		override public function set visible( $val:Boolean ):void {
 			GUIEvent.removeListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
 			super.visible = $val;
+			if ( visible )
+				Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+			else
+				Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
 		}
 		
 		
@@ -354,6 +358,20 @@ package com.voxelengine.worldmodel.models.types
 			
 			return oxelToBeModified;
 		}
+		
+		static private function insertModel():void {
+			if ( CURSOR_OP_INSERT != _s_cursorOperation )
+				return;
+
+			var foundModel:VoxelModel = Globals.selectedModel;
+			if ( foundModel )
+			{
+				var newChild:VoxelModel = _s_objectModel.clone();
+				newChild.complete = true;
+				foundModel.childAdd( newChild );
+			}
+		}
+		
 		
 		static private function insertOxel(recurse:Boolean = false):void {
 			if ( CURSOR_OP_INSERT != _s_cursorOperation )
@@ -779,6 +797,8 @@ package com.voxelengine.worldmodel.models.types
 				case "mouseDown": case Keyboard.NUMPAD_ADD:
 					if ( CURSOR_OP_DELETE == _s_cursorOperation )
 						deleteOxel();
+					else if ( CURSOR_OP_INSERT == _s_cursorOperation && _s_objectModel )
+						insertModel();						
 					else if ( CURSOR_OP_INSERT == _s_cursorOperation )
 						insertOxel();
 					break;
@@ -803,6 +823,21 @@ package com.voxelengine.worldmodel.models.types
 					break;
 			} 
 		}
+		
+		private function onMouseWheel(event:MouseEvent):void {
+			
+			if ( true != event.shiftKey || null == _s_objectModel )
+				return;
+				
+			var rot:Vector3D = _s_objectModel.instanceInfo.rotationGet;
+			if ( 0 < event.delta )
+				rot.y += 90;
+			 else
+				rot.y -= 90;
+
+			_s_objectModel.instanceInfo.rotationSet = rot
+		}	
+		
 	}
 }
 

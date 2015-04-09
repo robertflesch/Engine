@@ -15,6 +15,8 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.worldmodel.scripts.Script;
+	import flash.sampler.NewObjectSample;
+	import flash.utils.ByteArray;
 	
 	/**
 	 * ...
@@ -59,7 +61,6 @@ package com.voxelengine.worldmodel.models
 		
 		public function clone( newGuid:String = "" ):ModelInfo
 		{
-			throw new Error( "ModelInfo.clone - VERIFY THIS FUNCTION" );
 			var newModelInfo:ModelInfo = new ModelInfo();
 			if ( "" == newGuid )
 				newModelInfo.fileName 			= Globals.getUID();
@@ -69,7 +70,7 @@ package com.voxelengine.worldmodel.models
 			newModelInfo._modelClass	= this.modelClass;
 			newModelInfo._grainSize		= this.grainSize;
 			// need to copy this?
-			newModelInfo._modelJson		= this._modelJson;
+			newModelInfo._modelJson		= cloneObject( this._modelJson );
 			newModelInfo._childCount	= this._childCount;
 			
 			if ( _biomes )
@@ -90,6 +91,14 @@ package com.voxelengine.worldmodel.models
 			
 				
 			return newModelInfo;
+		}
+		
+		private function cloneObject( obj:Object ):Object {
+			var ba:ByteArray = new ByteArray();
+			ba.writeObject( obj );
+			ba.position = 0;
+			var newObj:Object = ba.readObject();
+			return newObj;
 		}
 		
 		public function childAdd( $instanceInfo:InstanceInfo):void {

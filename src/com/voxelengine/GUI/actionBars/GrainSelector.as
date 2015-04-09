@@ -195,17 +195,14 @@ public class GrainSelector extends QuickInventory
 		if ( event.ctrlKey ) {
 			var curSelection:int = QuickInventory.currentItemSelection;
 			if ( 0 > event.delta )
-			{
 				curSelection--;
-				if ( curSelection < 0 )
-					curSelection = 0;
-			}
 			else
-			{
 				curSelection++;
-				if ( 6 < curSelection )
-					curSelection = 6;
-			}
+
+			if ( curSelection < 0 )
+				curSelection = 0;
+			if ( 6 < curSelection )
+				curSelection = 6;	
 			processGrainSelection( boxes[ curSelection ] );
 		}
 	}		

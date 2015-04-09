@@ -366,6 +366,10 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function onMouseWheel(event:MouseEvent):void {
+		
+		if ( event.ctrlKey || event.shiftKey || event.altKey )
+			return;
+			
 		if ( 0 < event.delta ) {
 			if ( lastItemSelection < (Slots.ITEM_COUNT - 1)  )
 			{
