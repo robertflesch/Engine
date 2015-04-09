@@ -94,14 +94,11 @@ public class ModelMakerCursor extends ModelMakerBase {
 		var mi:ModelInfo = new ModelInfo();
 		mi.initJSON( _vmd.modelGuid, jsonResult );
 		
-		var vm:* = instantiate( _ii, mi, _vmm );
+		var vm:* = instantiate( _ii, mi, _vmm, ba, versionInfo );
 		if ( vm ) {
-			vm.version = versionInfo.version;
-			vm.fromByteArray( ba );
-			vm.complete = true;
+			vm.data = _vmd;
 		}
 
-		vm.data = _vmd;
 		return vm;
 	}
 }	

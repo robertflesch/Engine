@@ -73,11 +73,11 @@ public class ModelMetadata
 		return "name: " + _name + "  description: " + _description + "  guid: " + _modelGuid + "  owner: " + _owner;
 	}
 	
-	public function ModelMetadata( $guid:String ) {
-		if ( null == $guid || "" == $guid )
+	public function ModelMetadata( $modelGuid:String ) {
+		if ( null == $modelGuid || "" == $modelGuid )
 			throw new Error( "ModelMetadata - Missing guid in constructor" );
-		_modelGuid = $guid;
-		if ( "EditCursor" != $guid )
+		_modelGuid = $modelGuid;
+		if ( "EditCursor" != $modelGuid )
 			ModelMetadataEvent.addListener( ModelBaseEvent.SAVE, saveEvent );
 	}
 
@@ -92,7 +92,7 @@ public class ModelMetadata
 		description 	= $vmm.description;
 		owner 			= $vmm.owner;
 		thumbnail 		= $vmm.thumbnail;
-Log.out( "ModelMetadata.update - How do I handler permissions here?", Log.WARN );
+Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		//creator 		= $vmm.creator;
 		//template		= $vmm.template;
 		//templateGuid	= $vmm.templateGuid;
@@ -102,9 +102,9 @@ Log.out( "ModelMetadata.update - How do I handler permissions here?", Log.WARN )
 		//transfer		= $vmm.transfer;
 	}
 	
-	public function createInstanceOfTemplate():ModelMetadata {
+	public function clone():ModelMetadata {
 		
-		var newVmm:ModelMetadata = new ModelMetadata( Globals.getUID() );	
+		var newVmm:ModelMetadata = new ModelMetadata( modelGuid );	
 		newVmm.name 			= new String( _name );
 		newVmm.description 		= new String( _description );
 		newVmm.owner 			= new String( _owner );

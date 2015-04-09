@@ -166,7 +166,18 @@ public class VoxelModel
 		// This unblocks the landscape task controller when all terrain tasks have been added
 //			if (0 == Globals.g_landscapeTaskController.activeTaskLimit)
 //				Globals.g_landscapeTaskController.activeTaskLimit = 1;
+		childrenLoad();
 		
+		// Both instanceInfo and modelInfo can have scripts. With each being persisted in correct location.
+		// Currently both are persisted to instanceInfo, which is very bad...
+		if (0 < _modelInfo.scripts.length)
+		{
+			for each (var scriptName:String in _modelInfo.scripts)
+				instanceInfo.addScript( scriptName, true );
+		}
+	}
+	
+	private function childrenLoad():void {
 		// if we have no children, let this stand
 		_childrenLoaded	= false;
 		if ( _modelInfo.children && 0 < _modelInfo.children.length)
@@ -187,8 +198,8 @@ public class VoxelModel
 				// to test if we are in the bar mode, we test of instanceGuid.
 				// Since this is a child object, it automatically get added to the parent.
 				// So add to cache just adds it to parent instance.
-				Log.out( "VoxelModel.processClassJson - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
-				ModelMakerBase.load( childInstanceInfo, false, false );
+				//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
+				ModelMakerBase.load( childInstanceInfo, true, false );
 			}
 			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			_modelInfo.childrenReset();
@@ -197,13 +208,6 @@ public class VoxelModel
 		else
 			_childrenLoaded	= true;
 		
-		// Both instanceInfo and modelInfo can have scripts. With each being persisted in correct location.
-		// Currently both are persisted to instanceInfo, which is very bad...
-		if (0 < _modelInfo.scripts.length)
-		{
-			for each (var scriptName:String in _modelInfo.scripts)
-				instanceInfo.addScript( scriptName, true );
-		}
 	}
 /*
 	protected function addClassJson():String {
@@ -385,7 +389,7 @@ public class VoxelModel
 	}
 	
 	private function childLoadingComplete(e:ModelLoadingEvent):void {
-		if ( e.modelGuid == instanceInfo.modelGuid ) {
+		if ( e.parentModelGuid == instanceInfo.instanceGuid ) {
 			//Log.out("VoxelModel.childLoadingComplete - modelGuid: " + instanceInfo.modelGuid );
 			ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			// if we save the model, before it is complete, we put bad child data into model info
@@ -402,18 +406,18 @@ public class VoxelModel
 	
 	public function clone():VoxelModel {
 		var mi:ModelInfo = modelInfo.clone();
-		// Get old value since this is wiped out in the instanceInfo clone
 		var ii:InstanceInfo = instanceInfo.clone();
-		ii.modelGuid = mi.fileName;
 		var ba:ByteArray = oxel.toByteArray();
+		var vmm:ModelMetadata = metadata.clone();
 		
 		var vm:VoxelModel = new VoxelModel(ii);
-		vm.init( mi, null, false );
+		vm.init( mi, vmm, false );
 		vm.version = version;
 		vm.oxel = OxelPool.poolGet();
 		ba.position = 0;
 		vm.fromByteArray( ba );
-		vm.save();
+		vm.data = new ModelData( ii.modelGuid );
+		vm.complete = true;
 		return vm;
 	}
 	

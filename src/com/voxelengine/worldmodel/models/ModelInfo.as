@@ -62,10 +62,10 @@ package com.voxelengine.worldmodel.models
 		public function clone( newGuid:String = "" ):ModelInfo
 		{
 			var newModelInfo:ModelInfo = new ModelInfo();
-			if ( "" == newGuid )
-				newModelInfo.fileName 			= Globals.getUID();
-			else	
-				newModelInfo.fileName 			= newGuid;
+			//if ( "" == newGuid )
+				//newModelInfo.fileName 			= Globals.getUID();
+			//else	
+				//newModelInfo.fileName 			= newGuid;
 				
 			newModelInfo._modelClass	= this.modelClass;
 			newModelInfo._grainSize		= this.grainSize;

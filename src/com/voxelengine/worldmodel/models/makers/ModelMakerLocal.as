@@ -91,15 +91,11 @@ public class ModelMakerLocal extends ModelMakerBase {
 			var vmm:ModelMetadata = new ModelMetadata( _ii.modelGuid );
 			vmm.name = _vmi.fileName;
 			vmm.description = _vmi.fileName;
-			var vm:* = instantiate( _ii, _vmi, vmm );
+			var vm:* = instantiate( _ii, _vmi, vmm, ba, versionInfo );
 			if ( vm ) {
-				vm.version = versionInfo.version;
-				vm.fromByteArray( ba );
+				vm.data = _vmd;
+				Region.currentRegion.modelCache.add( vm );
 			}
-			Region.currentRegion.modelCache.add( vm );
-
-			vm.complete = true;
-			vm.data = _vmd;
 			
 			markComplete();
 		}

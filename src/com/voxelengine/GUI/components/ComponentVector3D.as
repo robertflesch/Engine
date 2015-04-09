@@ -42,11 +42,11 @@ public class ComponentVector3D extends Box
 					, $vect.x.toFixed($decimalPlaces) );
 		addSpinLabel( $s2Label
 					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $changeFunction($e), $vect.z );  }
-					, function($e:TextEvent):void       { $vect.setTo( $vect.x, int( $e.target.text ), $vect.z );  }
+					, function($e:TextEvent):void       { $vect.setTo( $vect.x, int( $e.target.text ), $vect.z ); $markDirty()  }
 					, $vect.y.toFixed($decimalPlaces) );
 		addSpinLabel( $s3Label
 					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $vect.y, $changeFunction($e) );  }
-					, function($e:TextEvent):void       { $vect.setTo( $vect.x, $vect.y, int( $e.target.text ) );  }
+					, function($e:TextEvent):void       { $vect.setTo( $vect.x, $vect.y, int( $e.target.text ) ); $markDirty()  }
 					, $vect.z.toFixed($decimalPlaces) );
 	}
 	

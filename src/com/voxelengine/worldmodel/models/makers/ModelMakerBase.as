@@ -90,7 +90,7 @@ public class ModelMakerBase {
 			_s_parentChildCount[_parentModelGuid] = --count;
 			// This tells the PARENT that it is ready to move forward (save in particular)
 			if ( 0 == count )
-				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _parentModelGuid ) );
+				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _ii.instanceGuid, _parentModelGuid ) );
 		}
 
 	}
@@ -146,15 +146,21 @@ public class ModelMakerBase {
 	}
 	
 	// Makes sense
-	static protected function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:ModelMetadata ):* {
+	static protected function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:ModelMetadata, $ba:ByteArray, $versionInfo:Object ):* {
 		var modelAsset:String = $modelInfo.modelClass;
 		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
 		var vm:VoxelModel = new modelClass( $ii );
-		if ( null == vm )
+		if ( null == vm ) {
 			throw new Error( "ModelMakerBase.instantiate - Model failed in creation - modelClass: " + modelClass );
+			return null;
+		}
 			
 		vm.init( $modelInfo, $vmm );
 
+		vm.version = $versionInfo.version;
+		vm.fromByteArray( $ba );
+		vm.complete = true;
+		
 		//Log.out( "ModelMakerBase.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
 		return vm;
 	}

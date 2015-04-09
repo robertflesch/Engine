@@ -79,7 +79,8 @@ package com.voxelengine.GUI.voxelModels
 
 			// TODO need to be able to handle an array of scipts.
 			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { ii.scriptName = $e.target.text; }, ii.scriptName, width ) );
-			addElement( new ComponentLabel( "Size in Meters", String(ii.grainSize), width ) );
+			const GRAINS_PER_METER:int = 16;
+			addElement( new ComponentLabel( "Size in Meters", String( $vm.oxel.gc.size()/GRAINS_PER_METER ), width ) );
 			if ( Globals.g_debug ) {
 				addElement( new ComponentLabel( "Model GUID",  ii.modelGuid, width ) );
 				addElement( new ComponentLabel( "Instance GUID",  ii.instanceGuid, width ) );

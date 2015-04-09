@@ -193,6 +193,7 @@ public class InstanceInfo extends Location	{
 		var ii:InstanceInfo = new InstanceInfo();
 		var obj:Object = getJSON();
 		ii.initJSON( obj );
+		ii.instanceGuid = Globals.getUID();
 		return ii;
 	}
 	
