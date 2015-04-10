@@ -7,31 +7,26 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
+import flash.utils.ByteArray;
+
+import com.voxelengine.Log;
+import com.voxelengine.Globals;
+import com.voxelengine.events.LoadingImageEvent;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.biomes.LayerInfo;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.models.ModelData;
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
-import flash.utils.ByteArray;
-import org.flashapi.swing.Alert;
-
-import com.voxelengine.Log;
-import com.voxelengine.Globals;
-import com.voxelengine.events.LoadingEvent;
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.GUI.WindowModelMetadata;
+import com.voxelengine.worldmodel.biomes.LayerInfo;
+import com.voxelengine.worldmodel.models.ModelData;
+import com.voxelengine.worldmodel.tasks.landscapetasks.TaskLibrary;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.tasks.landscapetasks.TaskLibrary;
-import com.voxelengine.events.LoadingImageEvent;
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF
@@ -59,15 +54,10 @@ public class ModelMakerGenerate {
 		
 		_vmi = new ModelInfo();
 		var functionClass:* = TaskLibrary.getAsset( $ii.modelGuid );
-		var obj:Object = GenerateCube.script();
-		_vmi.initJSON( "modelGuid", obj );
+		var json:Object = functionClass.script();
+		_vmi.initJSON( "modelGuid", json );
 		var layer:LayerInfo = _vmi.biomes.layers[0];
-		//= new LayerInfo( _ii.modelGuid, "", _ii.type, _ii.grainSize, _ii.detailSize )
-		layer.type = _ii.type;
-		layer.offset = _ii.grainSize;
-		layer.range = _ii.detailSize;
-		
-		Log.out( "ModelMakerGenerate: " + _vmi.biomes.toString(), Log.DEBUG );
+		// the layer details are passed in via the ii;
 		_vmi.biomes.addToTaskControllerUsingNewStyle( _ii );
 			
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );

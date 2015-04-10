@@ -130,8 +130,6 @@ package com.voxelengine.GUI
 		
 		private function create( e:UIMouseEvent ):void
 		{
-			//_modalObj.remove();
-			//_modalObj = null;
 			createWindow( _rbGroup.index );
 			remove();
 		}
@@ -174,21 +172,7 @@ package com.voxelengine.GUI
 			ii.type = type;
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75 - (1<<size)/2 );
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-			ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );	
 			new ModelMakerGenerate( ii );
-			//new ModelMakerImport( ii, false );
-			//var vm:VoxelModel = new VoxelModel( ii );
-//			vm.metadata = new VoxelModelMetadata();
-			//new ModelMakerGenerated( ii );
-			//new WindowModelMetadata( ii.guid );
 		}
-		
-		private function modelDetailChanged(e:ModelEvent):void 
-		{
-			ModelEvent.removeListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
-			// now I want to apply the script to the oxels in the vm.
-			var vm:VoxelModel = Globals.modelGet( e.instanceGuid );
-			ModelMakerBase.load( vm.instanceInfo );
-		}
-  }
+	}
 }

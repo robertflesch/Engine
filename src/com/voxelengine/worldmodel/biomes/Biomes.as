@@ -78,6 +78,10 @@ package com.voxelengine.worldmodel.biomes
 				// instanceInfo can override type
 				if ( -1 != $ii.type )
 					layer.type = $ii.type;
+				if ( -1 != $ii.grainSize )
+					layer.offset = $ii.grainSize;
+				if ( -1 != $ii.detailSize )
+					layer.range = $ii.detailSize;
 				if ( $ii.controllingModel )
 					layer.optionalString = $ii.topmostGuid();
 					
