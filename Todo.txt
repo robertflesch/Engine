@@ -1,3 +1,10 @@
+New Bugs observed
+Dynamic lighting on placed models is not right.
+I can place the same object over another of the same kind
+Objects inside holes of other objects not right doesnt allow me to place them correctly
+Once the object placement cursor goes invalid, it never goes back to valid.
+
+
 https://gamesnet.yahoo.net/documentation/tutorials/flashcombopackage
 https://www.airpair.com/aws/posts/building-a-scalable-web-app-on-amazon-web-services-p1?wed
 http://blog.worddata.com/app-store-optimization/app-development-app-marketing-tools/

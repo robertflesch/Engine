@@ -19,10 +19,7 @@ public class LoadingEvent extends Event
 {
 	static public const LOAD_COMPLETE:String			= "LOAD_COMPLETE";
 	static public const PLAYER_LOAD_COMPLETE:String		= "PLAYER_LOAD_COMPLETE";
-	static public const CRITICAL_MODEL_LOADED:String	= "CRITICAL_MODEL_LOADED";
 // MOVE TO MODEL EVENT		
-	static public const MODEL_LOAD_COMPLETE:String		= "MODEL_LOAD_COMPLETE";
-	static public const MODEL_LOAD_FAILURE:String		= "MODEL_LOAD_FAILURE";
 	static public const TEMPLATE_MODEL_COMPLETE:String	= "TEMPLATE_MODEL_COMPLETE";
 	
 	static public const LOAD_TYPES_COMPLETE:String		= "LOAD_TYPES_COMPLETE";

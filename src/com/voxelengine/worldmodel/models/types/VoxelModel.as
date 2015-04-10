@@ -63,7 +63,7 @@ public class VoxelModel
 	private 	var	_oxel:Oxel; 															// INSTANCE NOT EXPORTED
 	private 	var	_editCursor:EditCursor; 												// INSTANCE NOT EXPORTED
 	protected 	var	_shaders:Vector.<Shader>        			= new Vector.<Shader>;		// INSTANCE NOT EXPORTED
-	protected 	var	_childrenLoaded:Boolean;
+	protected 	var	_childrenLoaded:Boolean						= true;
 	protected 	var	_children:Vector.<VoxelModel> 				= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
 	private		var	_statisics:ModelStatisics 					= new ModelStatisics(); 	// INSTANCE NOT EXPORTED
 	private		var	_camera:Camera								= new Camera();
@@ -179,9 +179,11 @@ public class VoxelModel
 	
 	private function childrenLoad():void {
 		// if we have no children, let this stand
-		_childrenLoaded	= false;
+		
 		if ( _modelInfo.children && 0 < _modelInfo.children.length)
 		{
+			Log.out( "VoxelModel.childrenLoad - loading " + _modelInfo.children.length + " children for model name: " + _metadata.name );
+			_childrenLoaded	= false;
 			//Log.out( "VoxelModel.processClassJson name: " + metadata.name + " - loading child models START" );
 			for each (var childInstanceInfo:InstanceInfo in _modelInfo.children)
 			{
@@ -201,13 +203,11 @@ public class VoxelModel
 				//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
 				ModelMakerBase.load( childInstanceInfo, true, false );
 			}
+			Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + _metadata.name );
 			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			_modelInfo.childrenReset();
 			//Log.out( "VoxelModel.processClassJson - loading child models END" );
 		}
-		else
-			_childrenLoaded	= true;
-		
 	}
 /*
 	protected function addClassJson():String {
@@ -402,6 +402,8 @@ public class VoxelModel
 			else	
 				changed = false;
 		}
+		else
+			Log.out( "VoxelModel.childLoadingComplete - got message for other model", Log.WARN );
 	}
 	
 	public function clone():VoxelModel {
@@ -1029,7 +1031,7 @@ public class VoxelModel
 		}
 		
 		if (  false == _childrenLoaded ) {
-			Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name );
+			Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name, Log.WARN );
 			return;
 		}
 			

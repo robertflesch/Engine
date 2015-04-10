@@ -16,7 +16,10 @@ import flash.events.EventDispatcher;
  */
 public class ModelLoadingEvent extends Event
 {
+	static public const MODEL_LOAD_COMPLETE:String		= "MODEL_LOAD_COMPLETE";
+	static public const MODEL_LOAD_FAILURE:String		= "MODEL_LOAD_FAILURE";
 	static public const CHILD_LOADING_COMPLETE:String	= "CHILD_LOADING_COMPLETE";
+	static public const CRITICAL_MODEL_LOADED:String	= "CRITICAL_MODEL_LOADED";
 	
 	private var _parentModelGuid:String;
 	public function get parentModelGuid():String { return _parentModelGuid; }

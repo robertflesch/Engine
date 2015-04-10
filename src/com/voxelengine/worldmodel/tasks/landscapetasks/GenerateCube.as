@@ -25,7 +25,29 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	 * @author Robert Flesch
 	 */
 	public class GenerateCube extends LandscapeTask 
-	{		
+	{	
+		static public function script():Object {
+			var obj:Object = new Object();
+			var model:Object = new Object();
+			var biomes:Object = new Object();
+			var layers:Vector.<Object> = new Vector.<Object>();
+			var layer:Object = new Object();
+			
+			obj.model = model;
+			model.editable = true;
+			model.template = true;
+			model.grainSize = 4;
+			model.biomes = biomes;
+			biomes.layers = layers;
+			layers[0] = layer;
+			layer.functionName = "GenerateCube";
+			layer.type = "SAND"
+			layer.range = 0;
+			layer.offset = 0;
+			
+			return obj;
+		}
+		
 		public function GenerateCube( guid:String, layer:LayerInfo ):void {
 			//Log.out( "GenerateCube.construct of type: " + (Globals.Info[layer.type].name.toUpperCase()) );					
 			super(guid, layer, "GenerateCube");
@@ -40,12 +62,10 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			//////////////////////////////////////////////////////////
 			// Builds Solid Cube of any grain size
 			//////////////////////////////////////////////////////////
-			const root_grain_size:int = 4;
+			const root_grain_size:int = _layer.offset;
 			const baseLightLevel:int = 51;
 			var oxel:Oxel = Oxel.initializeRoot( root_grain_size, baseLightLevel );
 			//
-			//var root_grain_size:uint = vm.oxel.gc.bound;
-			Log.out( "GenerateCube.start - HOW DO I PASS IN THE GRAIN SIZE NOW", Log.WARN );
 			var min_grain_size:int = root_grain_size - _layer.range;
 			if ( 0 > min_grain_size || min_grain_size > root_grain_size || ( 8 < (root_grain_size - min_grain_size)) )
 			{

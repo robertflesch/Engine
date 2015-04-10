@@ -67,7 +67,7 @@ public class ModelMakerBase {
 		if ( _ii.modelGuid == $mde.modelGuid ) {
 			Log.out( "ModelMakerBase.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
 			_vmdFailed = true;
-//			markComplete( false );
+			markComplete( false );
 		}
 	}
 	
@@ -79,9 +79,9 @@ public class ModelMakerBase {
 		ModelDataEvent.removeListener( ModelBaseEvent.RESULT, retriveData );		
 		ModelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 		if ( $success )
-			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid ) );
+			ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid ) );
 		else	
-			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.MODEL_LOAD_FAILURE, _ii.modelGuid ) );
+			ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_FAILURE, _ii.modelGuid ) );
 		
 		//Log.out( "ModelMakerBase.markComplete - " + ($success ? "SUCCESS" : "FAILURE" ) + "  ii: " + _ii + "  success: " + $success, Log.DEBUG );
 		
@@ -98,7 +98,7 @@ public class ModelMakerBase {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	// Make sense, called from for Makers
-	static protected function modelMetaInfoRead( $ba:ByteArray ):Object {
+	static public function modelMetaInfoRead( $ba:ByteArray ):Object {
 		$ba.position = 0;
 		// Read off first 3 bytes, the data format
 		var format:String = readFormat($ba);
@@ -146,7 +146,7 @@ public class ModelMakerBase {
 	}
 	
 	// Makes sense
-	static protected function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:ModelMetadata, $ba:ByteArray, $versionInfo:Object ):* {
+	static public function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:ModelMetadata, $ba:ByteArray, $versionInfo:Object ):* {
 		var modelAsset:String = $modelInfo.modelClass;
 		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
 		var vm:VoxelModel = new modelClass( $ii );

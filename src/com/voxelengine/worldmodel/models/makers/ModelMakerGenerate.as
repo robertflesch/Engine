@@ -1,0 +1,137 @@
+/*==============================================================================
+   Copyright 2011-2015 Robert Flesch
+   All rights reserved.  This product contains computer programs, screen
+   displays and printed documentation which are original works of
+   authorship protected under United States Copyright Act.
+   Unauthorized reproduction, translation, or display is prohibited.
+ ==============================================================================*/
+package com.voxelengine.worldmodel.models.makers
+{
+import com.voxelengine.events.ModelDataEvent;
+import com.voxelengine.events.ModelLoadingEvent;
+import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.biomes.LayerInfo;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+import com.voxelengine.worldmodel.models.ModelData;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
+import flash.utils.ByteArray;
+import org.flashapi.swing.Alert;
+
+import com.voxelengine.Log;
+import com.voxelengine.Globals;
+import com.voxelengine.events.LoadingEvent;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.RegionEvent;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.GUI.WindowModelMetadata;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelMetadata;
+import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.worldmodel.tasks.landscapetasks.TaskLibrary;
+import com.voxelengine.events.LoadingImageEvent;
+	/**
+	 * ...
+	 * @author Robert Flesch - RSF
+	 * This class is used to load a model once its metadata AND data has been loaded from persistance
+	 * it then removes its listeners, which should cause it be to be garbage collected.
+	 * Might I need to add a timeout on this object in case if never completes.
+	 */
+public class ModelMakerGenerate {
+	
+	private var _vmi:ModelInfo;
+	private var _vmm:ModelMetadata;
+	private var _ii:InstanceInfo;
+	private var _vmd:ModelData;
+	
+	public function ModelMakerGenerate( $ii:InstanceInfo ) {
+		_ii = $ii;
+		Log.out( "ModelMakerGenerate - ii: " + _ii.toString() );
+		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
+
+		_vmm = new ModelMetadata( _ii.modelGuid );
+		_vmm.name = _ii.modelGuid;
+		_vmm.description = _ii.modelGuid + "-GENERATED";
+		_vmm.owner = Network.userId;
+		_vmm.modifiedDate = new Date();
+		
+		_vmi = new ModelInfo();
+		var functionClass:* = TaskLibrary.getAsset( $ii.modelGuid );
+		var obj:Object = GenerateCube.script();
+		_vmi.initJSON( "modelGuid", obj );
+		var layer:LayerInfo = _vmi.biomes.layers[0];
+		//= new LayerInfo( _ii.modelGuid, "", _ii.type, _ii.grainSize, _ii.detailSize )
+		layer.type = _ii.type;
+		layer.offset = _ii.grainSize;
+		layer.range = _ii.detailSize;
+		
+		Log.out( "ModelMakerGenerate: " + _vmi.biomes.toString(), Log.DEBUG );
+		_vmi.biomes.addToTaskControllerUsingNewStyle( _ii );
+			
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );
+
+		// This unblocks the landscape task controller when all terrain tasks have been added
+		if (0 == Globals.g_landscapeTaskController.activeTaskLimit)
+			Globals.g_landscapeTaskController.activeTaskLimit = 1;
+	}
+	
+	private function loadSucceed(e:PersistanceEvent):void 
+	{
+		if ( e.guid == _ii.modelGuid ) {
+			_vmd = new ModelData( _ii.modelGuid );
+			try {  e.data.compress(); }
+			catch (error:Error) { ; }
+			_vmd.compressedBA = e.data;
+			attemptMake();
+		}
+	}
+	
+	// once they both have been retrived, we can make the object
+	protected function attemptMake():void {
+		
+		if ( null != _vmi && null != _vmd && null != _vmm ) {
+			
+			var ba:ByteArray = new ByteArray();
+			ba.writeBytes( _vmd.compressedBA, 0, _vmd.compressedBA.length );
+			try { ba.uncompress(); }
+			catch (error:Error) { ; }
+			if ( null == ba ) {
+				Log.out( "ModelMakerGenerate.createFromMakerInfo - Exception - NO data in VoxelModelMetadata: " + _vmd.modelGuid, Log.ERROR );
+				return;
+			}
+			
+			var versionInfo:Object =  ModelMakerBase.modelMetaInfoRead( ba );
+			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
+			{
+				Log.out( "ModelMakerGenerate.attemptMake - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
+				return;
+			}
+			
+			// how many bytes is the modelInfo
+			var strLen:int = ba.readInt();
+			// read off that many bytes, even though we are using the data from the modelInfo file
+			var modelInfoJson:String = ba.readUTFBytes( strLen );
+			// reset the file name that it was loaded from and assign a new guid
+			_ii.modelGuid = _vmm.modelGuid = _vmd.modelGuid = Globals.getUID();
+			_vmi.fileName = "";
+			
+			var vm:* = ModelMakerBase.instantiate( _ii, _vmi, _vmm, ba, versionInfo );
+			if ( vm ) {
+				vm.data = _vmd;
+				vm.changed = true;
+				vm.stateLock( true, 10000 );
+				vm.save();
+				Region.currentRegion.modelCache.add( vm );
+			}
+			markComplete();
+		}
+	}
+	
+	protected function markComplete( $success:Boolean = true ):void {
+		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
+		ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid ) );
+	}
+}	
+}

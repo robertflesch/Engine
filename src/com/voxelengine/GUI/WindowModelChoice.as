@@ -1,7 +1,7 @@
 
 package com.voxelengine.GUI
 {
-	import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
+	import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 	import flash.accessibility.Accessibility;
 	import flash.geom.Vector3D;
 	
@@ -174,8 +174,9 @@ package com.voxelengine.GUI
 			ii.type = type;
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75 - (1<<size)/2 );
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-			ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
-			new ModelMakerImport( ii, false );
+			ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );	
+			new ModelMakerGenerate( ii );
+			//new ModelMakerImport( ii, false );
 			//var vm:VoxelModel = new VoxelModel( ii );
 //			vm.metadata = new VoxelModelMetadata();
 			//new ModelMakerGenerated( ii );

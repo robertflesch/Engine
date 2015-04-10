@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+	import com.voxelengine.events.ModelLoadingEvent;
 	import flash.geom.Vector3D;
 	import flash.events.Event;
     import flash.events.TimerEvent;
@@ -211,7 +212,7 @@ package com.voxelengine.worldmodel
 			RegionEvent.addListener( RegionEvent.UNLOAD, 					unload );
 				
 			LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, 			onLoadingComplete );
-			LoadingEvent.addListener( LoadingEvent.MODEL_LOAD_FAILURE,		removeFailedObjectFromRegion );
+			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_FAILURE,		removeFailedObjectFromRegion );
 				
 			ModelEvent.addListener( ModelEvent.CRITICAL_MODEL_DETECTED,		onCriticalModelDetected );
 			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED,			modelChanged );
@@ -239,14 +240,15 @@ package com.voxelengine.worldmodel
 			RegionEvent.removeListener( RegionEvent.UNLOAD, 				unload );
 			
 			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, 		onLoadingComplete );
-			LoadingEvent.removeListener( LoadingEvent.MODEL_LOAD_FAILURE,	removeFailedObjectFromRegion );									  
+			
+			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_FAILURE,	removeFailedObjectFromRegion );									  
 			
 			ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_DETECTED, 	onCriticalModelDetected );
 			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED,		regionChanged );
 			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED,		regionChanged );
 		}
 		
-		private function removeFailedObjectFromRegion( $e:LoadingEvent):void {
+		private function removeFailedObjectFromRegion( $e:ModelLoadingEvent ):void {
 			// Do I need to remove this failed load?
 			Log.out( "Region.removeFailedObjectFromRegion - failed to load: " + $e.modelGuid, Log.ERROR );
 			//currentRegion.changedForce = true;

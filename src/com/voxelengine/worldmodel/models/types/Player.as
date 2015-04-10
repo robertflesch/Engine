@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models.types
 {
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.InventoryInterfaceEvent;
+import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.biomes.Biomes;
@@ -108,9 +109,10 @@ public class Player extends Avatar
 		
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		
-		LoadingEvent.addListener( LoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
-		LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+		
+		ModelLoadingEvent.addListener( ModelLoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
+		LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		
 		RegionEvent.addListener( RegionEvent.UNLOAD, onRegionUnload );
 		RegionEvent.addListener( RegionEvent.LOAD_BEGUN, onRegionLoad );
@@ -121,7 +123,7 @@ public class Player extends Avatar
 		
 		ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		
-		LoadingEvent.removeListener( LoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
+		ModelLoadingEvent.removeListener( ModelLoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
 		LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
@@ -435,7 +437,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		//}
 	}
 	
-	private function onCriticalModelLoaded( le:ModelEvent ):void {
+	private function onCriticalModelLoaded( le:ModelLoadingEvent ):void {
 		//ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
 		Log.out( "Player.onCriticalModelLoaded - CRITICAL model" );
 //		MouseKeyboardHandler.addInputListeners();

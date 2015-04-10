@@ -43,6 +43,9 @@ package com.voxelengine.worldmodel.biomes
 		public function set optionalString( $val:String ):void  { _optionalString = $val; }
 		public function get optionalInt():int { return _optionalInt; }
 		
+		public function set offset(value:int):void { _offset = value; }
+		public function set range(value:int):void { _range = value; }
+		
 		public function replaceData( val:String ):void { _data = val; }
 		
 		public function clone():LayerInfo

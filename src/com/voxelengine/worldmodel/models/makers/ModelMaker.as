@@ -37,7 +37,7 @@ public class ModelMaker extends ModelMakerBase {
 	private var _addToRegionWhenComplete:Boolean;
 	
 	public function ModelMaker( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean ) {
-		Log.out( "ModelMaker.constructor", Log.WARN );
+		Log.out( "ModelMaker.constructor model:" + ($ii.modelGuid ? $ii.modelGuid : $ii.instanceGuid), Log.DEBUG );
 		_addToRegionWhenComplete = $addToRegionWhenComplete;
 		super( $ii, true );
 		if ( 0 == makerCountGet() )

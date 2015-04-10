@@ -90,6 +90,8 @@ package com.voxelengine.worldmodel.biomes
 					layers[i] = null;
 			}
 			
+			// what purpose does this play? 
+			// it removes generation layers
 			var newLayers:Vector.<LayerInfo> = new Vector.<LayerInfo>;
 			for each ( var layer1:LayerInfo in layers ) 
 			{
