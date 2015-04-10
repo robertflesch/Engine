@@ -1,6 +1,7 @@
 
 package com.voxelengine.GUI
 {
+	import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 	import flash.accessibility.Accessibility;
 	import flash.geom.Vector3D;
 	
@@ -144,17 +145,17 @@ package com.voxelengine.GUI
 			{
 				case 0: // From Cube
 					ii.modelGuid = "GenerateCube";
-					ModelMakerBase.modelInfoPreload( ii.modelGuid );
+					//ModelMakerBase.modelInfoPreload( ii.modelGuid );
 					break;
 				case 1: // From Sphere
 					ii.modelGuid = "GenerateSphere";
-					ModelMakerBase.modelInfoPreload( ii.modelGuid );
+					//ModelMakerBase.modelInfoPreload( ii.modelGuid );
 					li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
 					detailSize = li.data;			
 					break;
 				case 2: // From Sphere
 					ii.modelGuid = "GenerateSubSphere";
-					ModelMakerBase.modelInfoPreload( ii.modelGuid );
+					//ModelMakerBase.modelInfoPreload( ii.modelGuid );
 					li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
 					detailSize = li.data;			
 					break;
@@ -171,11 +172,10 @@ package com.voxelengine.GUI
 			ii.grainSize = size;
 			ii.detailSize = detailSize;
 			ii.type = type;
-			ii.scripts
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75 - (1<<size)/2 );
 			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
 			ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, modelDetailChanged );			
-			throw new Error( "WindowModelChoice - FINISH" );
+			new ModelMakerImport( ii, false );
 			//var vm:VoxelModel = new VoxelModel( ii );
 //			vm.metadata = new VoxelModelMetadata();
 			//new ModelMakerGenerated( ii );

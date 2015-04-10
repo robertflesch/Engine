@@ -113,10 +113,12 @@ public class ModelMakerImport extends ModelMakerBase {
 			else {
 				_vmm = new ModelMetadata( _ii.modelGuid );
 				_vmm.name = _ii.modelGuid;
-				_vmm.description = _ii.modelGuid + "-IMPORTED";
+				if ( _vmdFailed )
+					_vmm.description = _ii.modelGuid + "-GENERATED";
+				else
+					_vmm.description = _ii.modelGuid + "-IMPORTED";
 				_vmm.owner = Network.userId;
 				_vmm.modifiedDate = new Date();
-				attemptMake();
 			}
 		}
 		

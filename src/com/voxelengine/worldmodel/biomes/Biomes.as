@@ -58,13 +58,13 @@ package com.voxelengine.worldmodel.biomes
 		}
 		
 		// Removed the completed task
-		public function addToTaskControllerUsingNewStyle( $instanceInfo:InstanceInfo ):void 
+		public function addToTaskControllerUsingNewStyle( $ii:InstanceInfo ):void 
 		{
 			// land task controller
 			Globals.g_landscapeTaskController.activeTaskLimit = 0;
-			var guid:String = $instanceInfo.instanceGuid;
+			var guid:String = $ii.instanceGuid;
 			if ( null == guid )
-				guid = $instanceInfo.modelGuid;
+				guid = $ii.modelGuid;
 
 			// Create task group
 			var taskGroup:TaskGroup = new TaskGroup("Generate Model for " + guid, 2);
@@ -76,10 +76,10 @@ package com.voxelengine.worldmodel.biomes
 			{
 				layer = layers[i];
 				// instanceInfo can override type
-				if ( -1 != $instanceInfo.type )
-					layer.type = $instanceInfo.type;
-				if ( $instanceInfo.controllingModel )
-					layer.optionalString = $instanceInfo.topmostGuid();
+				if ( -1 != $ii.type )
+					layer.type = $ii.type;
+				if ( $ii.controllingModel )
+					layer.optionalString = $ii.topmostGuid();
 					
 				task = new layer.task( guid, layer );
 				//Log.out( "Biomes.add_to_task_controller - creating task: " + layer.task );
@@ -106,13 +106,13 @@ package com.voxelengine.worldmodel.biomes
 			Globals.g_landscapeTaskController.addTask( taskGroup );
 		}
 		
-		public function addToTaskController( $instanceInfo:InstanceInfo ):void 
+		public function addToTaskController( $ii:InstanceInfo ):void 
 		{
 			// land task controller
 			Globals.g_landscapeTaskController.activeTaskLimit = 0;
-			var guid:String = $instanceInfo.instanceGuid;
+			var guid:String = $ii.instanceGuid;
 			if ( null == guid )
-				guid = $instanceInfo.modelGuid;
+				guid = $ii.modelGuid;
 
 			// Create task group
 			var taskGroup:TaskGroup = new TaskGroup("Generate Model for " + guid, 2);
@@ -124,10 +124,10 @@ package com.voxelengine.worldmodel.biomes
 			{
 				layer = layers[i];
 				// instanceInfo can override type
-				if ( -1 != $instanceInfo.type )
-					layer.type = $instanceInfo.type;
-				if ( $instanceInfo.controllingModel )
-					layer.optionalString = $instanceInfo.topmostGuid();
+				if ( -1 != $ii.type )
+					layer.type = $ii.type;
+				if ( $ii.controllingModel )
+					layer.optionalString = $ii.topmostGuid();
 					
 				task = new layer.task( guid, layer );
 				//Log.out( "Biomes.add_to_task_controller - creating task: " + layer.task );
@@ -152,7 +152,7 @@ package com.voxelengine.worldmodel.biomes
 			//taskGroup.addTask(task);
 			
 			//Log.out( "Biomes.add_to_task_controller - adding completedTask" );
-			if ( $instanceInfo.dynamicObject )
+			if ( $ii.dynamicObject )
 				task = new DynamicCompletedModel( guid, null );
 			else
 				task = new CompletedModel( guid, layer );
