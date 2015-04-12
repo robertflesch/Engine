@@ -143,17 +143,14 @@ package com.voxelengine.GUI
 			{
 				case 0: // From Cube
 					ii.modelGuid = "GenerateCube";
-					//ModelMakerBase.modelInfoPreload( ii.modelGuid );
 					break;
 				case 1: // From Sphere
 					ii.modelGuid = "GenerateSphere";
-					//ModelMakerBase.modelInfoPreload( ii.modelGuid );
 					li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
 					detailSize = li.data;			
 					break;
 				case 2: // From Sphere
 					ii.modelGuid = "GenerateSubSphere";
-					//ModelMakerBase.modelInfoPreload( ii.modelGuid );
 					li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
 					detailSize = li.data;			
 					break;

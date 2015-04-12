@@ -106,7 +106,14 @@ public class VoxelModel
 	public	function get children():Vector.<VoxelModel>			{ return _children; }
 	public	function 	 childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
 	public	function get changed():Boolean						{ return _changed; }
-	public	function set changed( $val:Boolean):void			{ _changed = $val; }
+	public	function set changed( $val:Boolean):void			
+	{ 
+		_changed = $val; 
+		//if ( _changed )
+			//Log.out( "VoxelModel.changed = TRUE - name: " + metadata.name, Log.WARN );
+		//else	
+			//Log.out( "VoxelModel.changed = FALSE - name: " + metadata.name, Log.WARN );
+	}
 	public	function get selected():Boolean 					{ return _selected; }
 	public	function set selected(val:Boolean):void  			{ _selected = val; }
 	public	function set version(value:int):void  				{ _version = value; }
@@ -152,6 +159,13 @@ public class VoxelModel
 		_oxel = val;
 	}
 	
+	public function get childrenLoaded():Boolean { return _childrenLoaded; }
+	public function set childrenLoaded(value:Boolean):void 
+	{
+		Log.out( "VoxelModel.childrenLoaded - modelGuid: " + instanceInfo.modelGuid + " setting to: " + value, Log.WARN );
+		_childrenLoaded = value;
+	}
+	
 	protected function processClassJson():void {
 		//if ( _modelInfo.biomes && false == complete && 0 < _modelInfo.biomes.layers.length ) {
 			//if ( _modelInfo.biomes.layers[0].functionName == "LoadModelFromBigDB" ) {
@@ -183,7 +197,7 @@ public class VoxelModel
 		if ( _modelInfo.children && 0 < _modelInfo.children.length)
 		{
 			Log.out( "VoxelModel.childrenLoad - loading " + _modelInfo.children.length + " children for model name: " + _metadata.name );
-			_childrenLoaded	= false;
+			childrenLoaded	= false;
 			//Log.out( "VoxelModel.processClassJson name: " + metadata.name + " - loading child models START" );
 			for each (var childInstanceInfo:InstanceInfo in _modelInfo.children)
 			{
@@ -361,21 +375,16 @@ public class VoxelModel
 		else 
 			metadata = $vmm;
 		
-		if ((this is EditCursor) || null != instanceInfo.controllingModel || true == instanceInfo.dynamicObject)
-		{
+		if ((this is EditCursor) || null != instanceInfo.controllingModel || true == instanceInfo.dynamicObject) {
 //				trace( "VoxelModel - Not added ImpactEvent.EXPLODE for childObject " + _modelInfo.modelClass );
 		}
-		else
-		{
-			if ( metadata.permissions.modify )
-			{
-				//ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, handleModelEvents);
-				
-				ImpactEvent.addListener(ImpactEvent.EXPLODE, impactEventHandler);
-				ImpactEvent.addListener(ImpactEvent.DFIRE, impactEventHandler);
-				ImpactEvent.addListener(ImpactEvent.DICE, impactEventHandler);
-				ImpactEvent.addListener(ImpactEvent.ACID, impactEventHandler);
-			}
+		else if ( metadata.permissions.modify ) {
+			//ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, handleModelEvents);
+			
+			ImpactEvent.addListener(ImpactEvent.EXPLODE, impactEventHandler);
+			ImpactEvent.addListener(ImpactEvent.DFIRE, impactEventHandler);
+			ImpactEvent.addListener(ImpactEvent.DICE, impactEventHandler);
+			ImpactEvent.addListener(ImpactEvent.ACID, impactEventHandler);
 //				trace( "VoxelModel - added ImpactEvent.EXPLODE for " + _modelInfo.modelClass );
 		}
 		
@@ -389,11 +398,12 @@ public class VoxelModel
 	}
 	
 	private function childLoadingComplete(e:ModelLoadingEvent):void {
-		if ( e.parentModelGuid == instanceInfo.instanceGuid ) {
-			//Log.out("VoxelModel.childLoadingComplete - modelGuid: " + instanceInfo.modelGuid );
+//		Log.out( "VoxelModel.childLoadingComplete - e: " + e, Log.WARN );
+		if ( e.parentModelGuid == instanceInfo.modelGuid ) {
+			//Log.out( "VoxelModel.childLoadingComplete - for modelGuid: " + instanceInfo.modelGuid, Log.WARN );
 			ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			// if we save the model, before it is complete, we put bad child data into model info
-			_childrenLoaded = true;
+			childrenLoaded = true;
 			// save the new or imported models
 			if ( null == _metadata.dbo || null == _data.dbo ) {
 				changed = true;
@@ -1021,6 +1031,12 @@ public class VoxelModel
 	// Force save is used ONLY when creating instances from templates.
 	public function save():void
 	{
+		Log.out( "VoxelModel.save - name: " + metadata.name );
+		for ( var i:int; i < _children.length; i++ ) {
+			var child:VoxelModel = _children[i];
+			child.save();
+		}
+		
 		if ( !changed ) {
 			Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.modelGuid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 			return;
@@ -1030,7 +1046,7 @@ public class VoxelModel
 			return;
 		}
 		
-		if (  false == _childrenLoaded ) {
+		if (  false == childrenLoaded ) {
 			Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name, Log.WARN );
 			return;
 		}

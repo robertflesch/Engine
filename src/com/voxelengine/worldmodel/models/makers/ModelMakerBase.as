@@ -40,7 +40,10 @@ public class ModelMakerBase {
 	public function ModelMakerBase( $ii:InstanceInfo, $fromTables:Boolean = true ) {
 		_ii = $ii;
 		if ( $ii.controllingModel ) {
-			_parentModelGuid = $ii.controllingModel.instanceInfo.instanceGuid;
+			// Using modelGuid rather then instanceGuid since imported models have no instanceGuid at this point.
+			// No sure if using model guid has a down side or not.
+			//Log.out( "ModelMakerBase has controlling model - modelGuid of parent: " + $ii.controllingModel.instanceInfo.modelGuid, Log.WARN );
+			_parentModelGuid = $ii.controllingModel.instanceInfo.modelGuid;
 			var count:int = _s_parentChildCount[_parentModelGuid];
 			_s_parentChildCount[_parentModelGuid] = ++count;
 		}
@@ -86,11 +89,15 @@ public class ModelMakerBase {
 		//Log.out( "ModelMakerBase.markComplete - " + ($success ? "SUCCESS" : "FAILURE" ) + "  ii: " + _ii + "  success: " + $success, Log.DEBUG );
 		
 		if ( _parentModelGuid ) {
+			//Log.out( "ModelMakerBase.markComplete has controlling model - instanceGuid of parent: " + _parentModelGuid, Log.WARN );
 			var count:int = _s_parentChildCount[_parentModelGuid];
 			_s_parentChildCount[_parentModelGuid] = --count;
 			// This tells the PARENT that it is ready to move forward (save in particular)
-			if ( 0 == count )
-				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _ii.instanceGuid, _parentModelGuid ) );
+			//Log.out( "ModelMakerBase.markComplete count: " + count, Log.WARN );
+			if ( 0 == count ) {
+				//Log.out( "ModelMakerBase.markComplete _ii.modelGuid: " + _ii.modelGuid + "  _parentModelGuid: " +  _parentModelGuid, Log.WARN );
+				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _ii.modelGuid, _parentModelGuid ) );
+			}
 		}
 
 	}
@@ -177,12 +184,6 @@ public class ModelMakerBase {
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// MAY BE NEEDED
-	static public function modelInfoPreload( $fileName:String ):void {
-		throw new Error( "This is not needed online" );
-		modelInfoFindOrCreate( $fileName, "", false );
-	}
-	
 	
 	static public function makerCountGet():int 
 	{

@@ -1,10 +1,13 @@
 Known Issues
-The default screen shot of new models is useless
+The default screen shot of new models is has to be hand made.
 There needs an indication of which model is selected.
 When the model or voxel moves into invalid region, the cursor is not restored correctly
+When editting an instance of a model, it does not ask you if you want to change just this instance, or all instances. And doesnt save correctly
+Toolbar loses pictures of model when loading.
+The close icon sometimes acts as acancel, other times as a save.
 
 New Bugs observed
-Dynamic lighting on placed models is not right.
+Dynamic lighting on placed models is not correct.
 I can place the same object over another of the same kind
 Objects placement and editing inside holes of other objects not right doesnt allow me to place them correctly
 Once the object placement cursor goes invalid, it never goes back to valid.
@@ -22,7 +25,6 @@ http://upstart.bizjournals.com/money/loot/2015/02/23/7-factors-that-get-angel-in
 cr403986537
 
 Check out
-Global Games Fund ( 25 million investment from Tango messaging app )
 http://www.uploadvr.com/the-river-flows-through-rothenberg-ventures-new-accelerator-looks-to-help-facilitate-the-future-of-vr/
 Top five block games
 https://www.youtube.com/watch?v=JM_0nR-tLF0
