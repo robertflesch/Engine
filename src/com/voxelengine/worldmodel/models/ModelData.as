@@ -60,9 +60,12 @@ public class ModelData
 			Log.out( "ModelData.save - Saving Model Metadata: " + modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
 			addSaveEvents();
 			Log.out( "ModelData.save ============= data size: " + _compressedBA.length + " bytes ==================  ", Log.WARN );
-			if ( _dbo )
+			if ( _dbo ) {
+				Log.out( "ModelData.save dbo found: " + modelGuid, Log.WARN );
 				toPersistance();
+			}
 			else {
+				Log.out( "ModelData.save NO NO NO dbo found: " + modelGuid, Log.WARN );
 				var obj:Object = toObject();
 			}
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS_DATA, modelGuid, _dbo, obj ) );
@@ -95,10 +98,13 @@ public class ModelData
 	private function createSucceed( $pe:PersistanceEvent ):void { 
 		if ( Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		if ( $pe.dbo )
+		if ( $pe.dbo ) {
 			_dbo = $pe.dbo;
+			Log.out( "ModelData.createSuccess - created: " + modelGuid + "  DBO FOUND", Log.DEBUG ); 
+		}
+		else
+			Log.out( "ModelData.createSuccess - created: " + modelGuid + "  NO NO NO DBO FOUND <<<<<<<<<<<<<<<<<<<<<<<<<<", Log.DEBUG ); 
 		removeSaveEvents();
-		Log.out( "ModelData.createSuccess - created: " + modelGuid, Log.DEBUG ); 
 	}	
 	
 	private function createFailed( $pe:PersistanceEvent ):void  {

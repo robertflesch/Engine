@@ -29,11 +29,19 @@ public class ObjectInfo
 	protected var _objectType:int 			= OBJECTINFO_INVALID;
 	protected var _box:BoxInventory;
 	protected var _slotId:int;
+	private var _backgroundTexture:String;
 	
 	public function get objectType():int 					{ return _objectType; }
 	
 	public function get box():BoxInventory { return _box; }
 	public function set box(value:BoxInventory):void  { _box = value; }
+	
+	public function backgroundTexture( size:int = 64 ):String { 
+		if ( 64 == size )
+			return "assets/textures/blank.png";
+			
+		return "assets/textures/blank128.png";
+	}
 	
 	public function ObjectInfo( $owner:BoxInventory, $objectType:int ):void 
 	{ 

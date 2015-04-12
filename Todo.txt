@@ -1,8 +1,14 @@
+Known Issues
+The default screen shot of new models is useless
+There needs an indication of which model is selected.
+When the model or voxel moves into invalid region, the cursor is not restored correctly
+
 New Bugs observed
 Dynamic lighting on placed models is not right.
 I can place the same object over another of the same kind
-Objects inside holes of other objects not right doesnt allow me to place them correctly
+Objects placement and editing inside holes of other objects not right doesnt allow me to place them correctly
 Once the object placement cursor goes invalid, it never goes back to valid.
+Voxel Model list for region requires you to click on something twice after the deleting
 
 
 https://gamesnet.yahoo.net/documentation/tutorials/flashcombopackage

@@ -30,6 +30,10 @@ public class PersistanceEvent extends Event
 	static public const CREATE_FAILED:String	= "CREATE_FAILED";
 	static public const SAVE_FAILED:String  	= "SAVE_FAILED";
 
+	static public const DELETE_REQUEST:String  	= "DELETE_REQUEST";
+	static public const DELETE_SUCCEED:String  	= "DELETE_SUCCEED";
+	static public const DELETE_FAILED:String  	= "DELETE_FAILED";
+
 	private var _guid:String;
 	private var _dbo:DatabaseObject;
 	private var _data:*;

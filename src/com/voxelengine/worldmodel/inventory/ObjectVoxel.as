@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory
 {
+import com.voxelengine.worldmodel.TypeInfo;
 import flash.events.TimerEvent;
 import flash.utils.Timer;
 
@@ -34,6 +35,15 @@ public class ObjectVoxel extends ObjectInfo
 		if ( 0 < _typeId )
 			updateCount();
 	}
+	
+	override public function backgroundTexture( size:int = 64 ):String { 
+		var typeInfo:TypeInfo = TypeInfo.typeInfo[_typeId];
+		if ( typeInfo )
+			return "assets/textures/" + typeInfo.image;
+			
+		return "assets/textures/invalid.png";
+	}
+	
 	
 	override public function asInventoryString():String {
 		return _objectType + ";" + _typeId;

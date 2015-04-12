@@ -32,12 +32,14 @@ public class ModelBaseEvent extends Event
 	static public const RESULT_COMPLETE:String				= "RESULT_COMPLETE";
 	static public const REQUEST_FAILED:String				= "REQUEST_FAILED";
 	
-	// data or meta data about this region has changed
+	// data or meta data about this object has changed
+	static public const CREATED:String						= "CREATED";
 	static public const CHANGED:String						= "CHANGED";
 	static public const SAVE:String							= "SAVE";
 	static public const UPDATE:String						= "UPDATE";
 	static public const SAVE_FAILED:String					= "SAVE_FAILED";
 	
+	static public const DELETE:String						= "DELETE";
 	
 	public function ModelBaseEvent( $type:String, $series:int, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{

@@ -122,6 +122,9 @@ public class ModelMakerGenerate {
 	protected function markComplete( $success:Boolean = true ):void {
 		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
 		ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid ) );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CREATED, 0, _ii.modelGuid, _vmm ) );
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.CREATED, 0, _ii.modelGuid, _vmd ) );
+		
 	}
 }	
 }

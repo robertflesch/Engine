@@ -39,11 +39,26 @@ public class ModelMetadataCache
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, requestType );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, request );
 		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE, update );
+		ModelMetadataEvent.addListener( ModelBaseEvent.CREATED, created );
+		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, deleteHandler );
+
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadNotFound );		
 	}
+	
+	static private function deleteHandler( $mde:ModelMetadataEvent ):void {
+		var mmd:ModelMetadata = _metadata[$mde.modelGuid];
+		if ( null != mmd ) {
+			_metadata[$mde.modelGuid] = null; 
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mde.series, Globals.DB_TABLE_MODELS, $mde.modelGuid, mmd.dbo ) );
+			mmd = null;
+			// TODO need to clean up eventually
+		}
+	}
+	
+	static private function created($mme:ModelMetadataEvent):void  { add( 0, $mme.vmm ); }
 	
 	static private function update($mme:ModelMetadataEvent):void 
 	{
@@ -55,7 +70,7 @@ public class ModelMetadataCache
 		var vmm:ModelMetadata = _metadata[$mme.modelGuid];
 		if ( null ==  vmm ) {
 			Log.out( "MetadataManager.update trying update NULL metadata or guid, adding instead", Log.WARN );
-			add( null, $mme.vmm );
+			add( 0, $mme.vmm );
 		} else {
 			vmm.update( $mme.vmm );
 		}
@@ -96,12 +111,12 @@ public class ModelMetadataCache
 			
 		// This will return models already loaded.
 		for each ( var vmm:ModelMetadata in _metadata ) {
-			if ( vmm.owner == $mme.modelGuid )
+			if ( vmm && vmm.owner == $mme.modelGuid )
 				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.modelGuid, vmm ) );
 		}
 	}
 	
-	static private function add( $pe:PersistanceEvent, $vmm:ModelMetadata ):void 
+	static private function add( $series:int, $vmm:ModelMetadata ):void 
 	{ 
 		if ( null == $vmm || null == $vmm.modelGuid ) {
 			Log.out( "MetadataManager.add trying to add NULL metadata or guid", Log.WARN );
@@ -111,7 +126,7 @@ public class ModelMetadataCache
 		if ( null ==  _metadata[$vmm.modelGuid] ) {
 			//Log.out( "ModelMetadataCache.add vmm: " + $vmm.toString(), Log.WARN );
 			_metadata[$vmm.modelGuid] = $vmm; 
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, ($pe ? $pe.series : 0), $vmm.modelGuid, $vmm ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, $series, $vmm.modelGuid, $vmm ) );
 		}
 	}
 	
@@ -125,7 +140,7 @@ public class ModelMetadataCache
 			vmm.fromPersistance( $pe.dbo );
 			if ( $pe.data && true == $pe.data )
 				vmm.dbo = null;
-			add( $pe, vmm );
+			add( $pe.series, vmm );
 		}
 		else {
 			Log.out( "MetadataManager.loadSucceed FAILED no DBO PersistanceEvent: " + $pe.toString(), Log.WARN );

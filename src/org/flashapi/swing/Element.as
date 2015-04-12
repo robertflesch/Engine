@@ -80,6 +80,10 @@ package org.flashapi.swing {
 			initObj();
 		}
 		
+		public function getElement():* {
+			return _element;
+		}
+		
 		//--------------------------------------------------------------------------
 		//
 		//  Public methods

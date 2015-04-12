@@ -31,43 +31,59 @@ public class ModelDataCache
 	
 	static public function init():void {
 		ModelDataEvent.addListener( ModelBaseEvent.REQUEST, request );
+		ModelDataEvent.addListener( ModelBaseEvent.CREATED, created );
+		ModelDataEvent.addListener( ModelBaseEvent.DELETE, deleteHandler );
+		// do I need ne of these?
+		//ModelDataEvent.addListener( ModelBaseEvent.UPDATE, update );
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
 	}
 	
+	static private function deleteHandler( $mde:ModelDataEvent ):void {
+		var md:ModelData = _modelData[$mde.modelGuid];
+		if ( null != md ) {
+			_modelData[$mde.modelGuid] = null; 
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mde.series, Globals.DB_TABLE_MODELS_DATA, $mde.modelGuid, md.dbo ) );
+			md = null;
+			// TODO need to clean up eventually
+		}
+	}
+	
+	static private function created( $mde:ModelDataEvent):void 	{ add( 0, $mde.vmd ); }
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  modelData
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	static private function request( $mie:ModelDataEvent ):void 
+	static private function request( $mde:ModelDataEvent ):void 
 	{   
-		if ( null == $mie.modelGuid ) {
+		if ( null == $mde.modelGuid ) {
 			Log.out( "ModelDataCache.modelDataRequest guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		//Log.out( "ModelDataCache.request guid: " + $mie.modelGuid, Log.INFO );
-		var mi:ModelData = _modelData[$mie.modelGuid]; 
+		//Log.out( "ModelDataCache.request guid: " + $mde.modelGuid, Log.INFO );
+		var mi:ModelData = _modelData[$mde.modelGuid]; 
 		if ( null == mi ) {
-			if ( true == Globals.online && $mie.fromTables )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.DB_TABLE_MODELS_DATA, $mie.modelGuid ) );
+			if ( true == Globals.online && $mde.fromTables )
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mde.series, Globals.DB_TABLE_MODELS_DATA, $mde.modelGuid ) );
 			else	
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.IVM_EXT, $mie.modelGuid, null, null, URLLoaderDataFormat.BINARY ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mde.series, Globals.IVM_EXT, $mde.modelGuid, null, null, URLLoaderDataFormat.BINARY ) );
 		}
 		else
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.RESULT, $mie.series, $mie.modelGuid, mi ) );
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.RESULT, $mde.series, $mde.modelGuid, mi ) );
 	}
 	
-	static private function add( $pe:PersistanceEvent, $md:ModelData ):void 
+	static private function add( $series:int, $md:ModelData ):void 
 	{ 
-		if ( null == $md || null == $pe.guid ) {
+		if ( null == $md || null == $md.modelGuid ) {
 			Log.out( "ModelDataCache.modelDataAdd trying to add NULL modelData or guid", Log.WARN );
 			return;
 		}
 		// check to make sure this is new data
-		if ( null ==  _modelData[$pe.guid] ) {
-			_modelData[$pe.guid] = $md; 
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $md ) );
+		if ( null ==  _modelData[$md.modelGuid] ) {
+			_modelData[$md.modelGuid] = $md; 
+			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.ADDED, $series, $md.modelGuid, $md ) );
 		}
 	}
 	
@@ -85,7 +101,7 @@ public class ModelDataCache
 				vmd.compressedBA = $pe.data;
 			}
 				
-			add( $pe, vmd );
+			add( $pe.series, vmd );
 		}
 		else {
 			Log.out( "ModelDataCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.WARN );

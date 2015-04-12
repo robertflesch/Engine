@@ -36,15 +36,13 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			obj.model = model;
 			model.editable = true;
 			model.template = true;
-			model.grainSize = 6;
 			model.biomes = biomes;
 			biomes.layers = layers;
 			layers[0] = layer;
 			layer.functionName = "GenerateSphere";
 			layer.type = "SAND"
-			layer.range = 40; // what does this do?
-			layer.offset = 45; // what does this do?
-			layer.optionalInt = 6; // what does this do?
+			layer.range = 3; // min_grain_size
+			layer.offset = 7; // root_grain_size
 			
 			return obj;
 		}
@@ -67,37 +65,20 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			const baseLightLevel:int = 51;
 			var oxel:Oxel = Oxel.initializeRoot( root_grain_size, baseLightLevel );
 			//
-			var min_grain_size:int = root_grain_size - _layer.range;
-			if ( 0 > min_grain_size || min_grain_size > root_grain_size || ( 8 < (root_grain_size - min_grain_size)) )
+			var min_grain_size:int = _layer.range;
+			if ( 0 > min_grain_size || min_grain_size > (root_grain_size - 3) || ( 8 < (root_grain_size - min_grain_size)) )
 			{
-				min_grain_size = Math.max( 0, root_grain_size - 4 );
+				min_grain_size = Math.max( 0, root_grain_size - 5 );
 				Log.out( "GenerateSphere.start - WARNING - Adjusting range: " + min_grain_size, Log.WARN );
 			}
 
 			var c:int = oxel.size_in_world_coordinates() / 2;
-			//vm.oxel.write_sphere( c, c, c, c - 1, _layer.type, min_grain_size );
-			// sphere
-//				vm.oxel.write_sphere( c, c, c, c, _layer.type, min_grain_size );
-			// 3/4 sphere
-//				vm.oxel.write_sphere( c, c/2, c, c, _layer.type, min_grain_size );
-			// 1/2 sphere
+
+			Log.out( "GenerateSphere.using params oxel.gc.bound: " + oxel.gc.bound + "  c: " + c + " min grain: " + min_grain_size, Log.WARN );
 			oxel.write_sphere( _instanceGuid, c, c, c, c, _layer.type, min_grain_size );
 
-			/* 
-			// 8 spheres 
-			var type:int = TypeInfo.GRASS;
-			vm.write_sphere( c/2, c/2, c/2, c/2 - 1, type++, min_grain_size );
-			vm.write_sphere( c/2, c/2, c/2 + c, c/2 - 1, type++, min_grain_size );
-			vm.write_sphere( c/2, c/2 + c, c/2, c/2 - 1, type++, min_grain_size );
-			vm.write_sphere( c/2, c/2 + c, c/2 + c, c/2 - 1, type++, min_grain_size );
-			vm.write_sphere( c/2 + c, c/2, c/2, c/2 - 1, type++, min_grain_size );
-			vm.write_sphere( c/2 + c, c/2, c/2 + c, c/2 - 1, type++, min_grain_size );
-			vm.write_sphere( c/2 + c, c/2 + c, c/2, c/2 - 1, --type, min_grain_size );
-			vm.write_sphere( c/2 + c, c/2 + c, c/2 + c, c/2 - 1, --type, min_grain_size );
-			*/
-
 			oxel.dirty = true;
-			// CRITICAL STEP. when restoring the oxel, it expects to have faces, not dirty faces
+			// CRITICAL STEP FOR GENERATION TASKS. when drawing the oxel, it expects to have faces, not dirty faces
 			// So this step turns the dirty faces into real faces.
 			// for multistep builds I will have to ponder this more.
 			oxel.facesBuildWater();

@@ -116,7 +116,7 @@ package com.voxelengine.GUI
 		
 		private function updateDetail( selectedIndex:int ):void {
 			if ( 1 < selectedIndex )
-				_cbDetail.selectedIndex = ( 0 <  selectedIndex - 3 ? selectedIndex - 3 : 0 );
+				_cbDetail.selectedIndex = Math.max( 0 , selectedIndex - 4 );
 			else	
 				_cbDetail.selectedIndex = 0;
 		}

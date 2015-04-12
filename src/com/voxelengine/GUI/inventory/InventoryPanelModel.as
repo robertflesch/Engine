@@ -58,6 +58,7 @@ public class InventoryPanelModel extends VVContainer
 	// This hold the items to be displayed
 	// http://www.flashapi.org/spas-doc/org/flashapi/swing/ScrollPane.html
 	private var _itemContainer:ScrollPane;
+	private var _infoContainer:Container;
 	private var _currentRow:Container;
 	private var _seriesModelMetadataEvent:int;
 	
@@ -72,6 +73,7 @@ public class InventoryPanelModel extends VVContainer
 		
 		upperTabsAdd();
 		addItemContainer();
+		addTrashCan();
 		populateModels();
 		displaySelectedCategory( "all" );
 		
@@ -106,6 +108,16 @@ public class InventoryPanelModel extends VVContainer
 		_itemContainer.scrollPolicy = ScrollPolicy.VERTICAL;
 		_itemContainer.layout.orientation = LayoutOrientation.VERTICAL;
 		addElement( _itemContainer );
+	}
+	
+	private function addTrashCan():void {
+		_infoContainer = new Container();
+		_infoContainer.autoSize = true;
+		addElement( _infoContainer );
+		var b:BoxTrashCan = new BoxTrashCan(100, 100, BorderStyle.RIDGE );
+		b.backgroundTexture = "assets/textures/ash_burning.png";
+		b.dropEnabled = true;
+		_infoContainer.addElement( b );
 	}
 	
 	private function selectCategory(e:ListEvent):void 
@@ -149,6 +161,7 @@ public class InventoryPanelModel extends VVContainer
 			_itemContainer.addElement( _currentRow );
 			_itemContainer.height = _itemContainer.numElements * MODEL_IMAGE_WIDTH;
 		}
+		
 		var box:BoxInventory = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE );
 		box.updateObjectInfo( $oi );
 		box.x = _currentRow.numElements * MODEL_IMAGE_WIDTH;
@@ -168,8 +181,7 @@ public class InventoryPanelModel extends VVContainer
 		//new ModelMaker( ii, true );
 	//}
 	
-	private function populateModels():void 
-	{
+	private function populateModels():void {
 		var count:int = 0;
 		_currentRow = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
 		_currentRow.layout = new AbsoluteLayout();
@@ -197,16 +209,14 @@ public class InventoryPanelModel extends VVContainer
 		addDesktopModelHandler( null );
 	}
 	
-	static private function addDesktopModelHandler(event:UIMouseEvent):void 
-	{
+	static private function addDesktopModelHandler(event:UIMouseEvent):void {
 		var fr:FileReference = new FileReference();
 		fr.addEventListener(Event.SELECT, onDesktopModelFileSelected );
 		var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
 		fr.browse([swfTypeFilter]);
 	}
 	
-	static public function onDesktopModelFileSelected(e:Event):void
-	{
+	static public function onDesktopModelFileSelected(e:Event):void {
 		Log.out( "onDesktopModelFileSelected : " + e.toString() );
 		
 		//if ( selectedModel
@@ -218,9 +228,37 @@ public class InventoryPanelModel extends VVContainer
 		new ModelMakerImport( ii );
 	}
 	
+	private function removeModel( $modelGuid:String ):void {
+		
+		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
+		var column:int = 0
+		var rows:int = _itemContainer.numElements;
+		for ( var row:int; row < rows; row++ ) {
+			var rowElement:Element = _itemContainer.getElementAt( row );
+			var rowCont:* = rowElement.getElement();
+			for ( column = 0; column < countMax; column++ ) {
+				var bie:* = rowCont.getElementAt( column );
+				var bi:* = bie.getElement();
+				var box:BoxInventory = bi as BoxInventory;
+				var oi:ObjectInfo = box.objectInfo;
+				if ( oi.objectType != ObjectInfo.OBJECTINFO_MODEL )
+					continue;
+				var om:ObjectModel = bi.objectInfo as ObjectModel;
+				if ( om.modelGuid == $modelGuid ) {
+					var newOI:ObjectInfo = new ObjectInfo(null, ObjectInfo.OBJECTINFO_EMPTY)
+					box.updateObjectInfo( newOI );
+					ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.DELETE, 0, $modelGuid, null ) );
+					ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $modelGuid, null ) );
+					
+					Log.out( "InventoryPanelModels.removeModel found model: " + $modelGuid );
+					return;
+				}
+			}
+		}
+		Log.out( "InventoryPanelModels.removeModel DID NOT NOT find model: " + $modelGuid );
+	}
 	
-	private function dropMaterial(e:DnDEvent):void 
-	{
+	private function dropMaterial(e:DnDEvent):void  {
 		if ( e.dragOperation.initiator.data is ObjectModel )
 		{
 			//e.dropTarget.backgroundTexture = e.dragOperation.initiator.backgroundTexture;
@@ -234,6 +272,17 @@ public class InventoryPanelModel extends VVContainer
 				//e.dropTarget.backgroundTextureManager.resize( 32, 32 );
 			//}
 			//else if ( e.dropTarget.target is QuickInventory ) {
+			if ( e.dropTarget is BoxTrashCan ) {
+				var btc:BoxTrashCan = e.dropTarget as BoxTrashCan;
+				var droppedItem:ObjectModel = e.dragOperation.initiator.data;
+				removeModel( droppedItem.modelGuid );
+				// So now I need to remove it from Models List
+				// and ModelDataCache and ModelMetadataCache
+				
+				// we are going to need the data to build the model for this.
+				//ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, item.modelGuid, null ) );
+			}
+			
 			if ( e.dropTarget.target is QuickInventory ) {
 				if ( e.dropTarget is BoxInventory ) {
 					var bi:BoxInventory = e.dropTarget as BoxInventory;
@@ -248,8 +297,7 @@ public class InventoryPanelModel extends VVContainer
 		}
 	}
 	
-	private function doDrag(e:UIMouseEvent):void 
-	{
+	private function doDrag(e:UIMouseEvent):void {
 		_dragOp.initiator = e.target as UIObject;
 		_dragOp.dragImage = e.target as DisplayObject;
 		// this adds a drop format, which is checked again what the target is expecting

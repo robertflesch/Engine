@@ -24,6 +24,7 @@ public class PersistBigDB
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_REQUEST_TYPE, loadType );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_REQUEST, load );
 		PersistanceEvent.addListener( PersistanceEvent.SAVE_REQUEST, save );
+		PersistanceEvent.addListener( PersistanceEvent.DELETE_REQUEST, deleteHandler );
 	}
 	
 	static private function isSupportedTable( $pe:PersistanceEvent ):Boolean {
@@ -201,5 +202,51 @@ public class PersistBigDB
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
 		}		
 	}
+	
+	static private function deleteHandler( $pe:PersistanceEvent ):void {
+		if ( false == Globals.online )
+			return;
+			
+		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT, errorNoClient );
+		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
+		if ( $pe.dbo )
+		{
+			//Log.out( "PersistBigDB.save - saving inventory: " + $pe.guid );
+			
+			// deleteKeys( $table:String, $keys:Array, $successHandler:Function, $errorHandler:Function ):Boolean {
+			Persistance.deleteKeys( $pe.table
+								  ,	[ $pe.guid ]
+			                      , deleteSucceed
+								  , deleteFailure );
+		}
+		else
+		{
+			// if no DBO, nothing to do here
+		}
+		
+		PlayerIOPersistanceEvent.removeListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT, errorNoClient );
+		PlayerIOPersistanceEvent.removeListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
+		
+		function deleteSucceed():void  {  
+			Log.out( "PersistBigDB.deleteRequest.deleteSucceed - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_SUCCEED, $pe.series, $pe.table, $pe.guid ) ); 
+		}
+		
+		function deleteFailure(e:PlayerIOError):void { 
+			Log.out( "PersistBigDB.deleteRequest.deleteFailure - Failed - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: " + e, Log.ERROR, e ) 
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_FAILED, $pe.series, $pe.table, $pe.guid ) ); 
+		}
+		
+		function errorNoClient($piope:PlayerIOPersistanceEvent):void {
+			Log.out( "PersistBigDB.load.errorNoClient - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: NOT CONNECTED TO THE INTERNET", Log.ERROR ) 
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
+		}		
+		
+		function errorNoDB($piope:PlayerIOPersistanceEvent):void {
+			Log.out( "PersistBigDB.load.errorNoDB - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: DATABASE NOT FOUND", Log.ERROR ) 
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
+		}		
+	}
+	
 }	
 }

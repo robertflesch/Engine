@@ -44,6 +44,13 @@ public class ObjectAction extends ObjectInfo
 		_name = $name;
 	}
 	
+	override public function backgroundTexture( size:int = 64 ):String { 
+		if ( 64 == size )
+			return "assets/textures/" + thumbnail;
+			
+		return "assets/textures/" + thumbnail;
+	}
+	
 	override public function asInventoryString():String {
 		
 		return String( _objectType + ";" + _thumbnail + ";" + _name + ";" + _callBackName + ";" + _ammoName + ";" + _instanceGuid );
