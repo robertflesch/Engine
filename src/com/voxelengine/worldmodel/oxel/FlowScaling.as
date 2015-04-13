@@ -22,6 +22,7 @@ public class FlowScaling
 {
 	private const CORNER_MIN:Number = 1;
 	private const DEFAULT_SCALE:Number = 16;
+	private const DEFAULT_TOTAL_SCALE:uint = 0xffffffff;
 	
 	// has scaling for this oxel be calcualted
 	private var _calculated:Boolean = false
@@ -63,7 +64,7 @@ public class FlowScaling
 	}
 	
 	private function reset():void {
-		_scale = 0xffffffff;	
+		_scale = DEFAULT_TOTAL_SCALE;	
 	}
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray {
@@ -122,7 +123,7 @@ public class FlowScaling
 	
 	
 	public function scalingHas():Boolean {
-		return ( _scale != 0xffffffff );
+		return ( _scale != DEFAULT_TOTAL_SCALE );
 	}
 	
 	public function scaleRecalculate( $oxel:Oxel ):void	{

@@ -12,9 +12,9 @@ import flash.geom.Vector3D;
 	
 public class Lamp extends ShaderLight {
 	
-	public function Lamp( r:Number = 1, g:Number = 0.9, b:Number = 0 ) {
+	public function Lamp( r:Number = 1.0, g:Number = 1.0, b:Number = 1.0 ) {
 		color.setTo( r, g, b );
-		endDistance = 200;
+		endDistance = 300;
 	}
 }
 }

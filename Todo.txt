@@ -6,6 +6,7 @@ When editting an instance of a model, it does not ask you if you want to change 
 Toolbar loses pictures of model when loading.
 The close icon sometimes acts as acancel, other times as a save.
 When you place a model, you can not stack another on top of it.
+Water edges don't allow merge perfectly
 
 New Bugs observed
 Dynamic lighting on placed models is not correct.
