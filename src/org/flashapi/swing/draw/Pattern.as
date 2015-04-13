@@ -158,6 +158,11 @@ package org.flashapi.swing.draw {
 			return _texture;
 		}
 		public function set texture(value:*):void {
+			// There is a race condition with the background texture.
+			// if I load a url to a background texture, then I load bitmapData into that texture
+			// before the url has loaded, the loaded url overwrites the bmp data.
+			// so I am simply removing the event handler before that can happen.
+			_eventCollector.removeEvent(_target, LoaderEvent.GRAPHIC_COMPLETE, completeEvent);
 			_texture = value;
 			createPattern();
 		}
