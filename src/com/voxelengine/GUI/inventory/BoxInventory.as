@@ -60,7 +60,7 @@ public class BoxInventory extends VVBox
 		switch ( $item.objectType ) {
 		case ObjectInfo.OBJECTINFO_EMPTY:
 			backgroundTexture = $item.backgroundTexture( width );
-			setHelp( "" );		
+			setHelp( "Empty" );		
 			_count.text = "";
 			break;
 		case ObjectInfo.OBJECTINFO_MODEL:
@@ -71,10 +71,9 @@ public class BoxInventory extends VVBox
 					om.vmm.thumbnail = drawScaled( bmpd, width, height );
 				}
 				
-				//var modelsOfThisGuid:String = String( e.result.toFixed(0) );
 				var modelsOfThisGuid:int = om.vmm.permissions.copyCount;
 				if ( 99999 < modelsOfThisGuid )
-					_count.text = "LOTS";
+					_count.text = "lots";
 				else if ( -1 == modelsOfThisGuid )
 					_count.text = "∞";
 				else
@@ -84,24 +83,23 @@ public class BoxInventory extends VVBox
 				backgroundTexture = drawScaled( om.vmm.thumbnail, width, height );
 			}
 			break;
+			
 		case ObjectInfo.OBJECTINFO_ACTION:
 			var oa:ObjectAction = $item as ObjectAction;
 			backgroundTexture = $item.backgroundTexture( width );
 			setHelp( oa.name );
 			_count.text = "";
 			break;
+			
 		case ObjectInfo.OBJECTINFO_TOOL:
 			var ot:ObjectTool = $item as ObjectTool;
 			backgroundTexture = $item.backgroundTexture( width );
 			setHelp( ot.name );			
 			_count.text = "";
 			break;
+			
 		case ObjectInfo.OBJECTINFO_VOXEL:
 		default:
-			if ( $item is TypeInfo ) {
-				throw new Error( "BoxInventory.updateObjectInfo - Deprecated type", Log.ERROR );
-				return;
-			}
 			var ov:ObjectVoxel = $item as ObjectVoxel;
 			var typeId:int = ov.type;
 			
@@ -123,7 +121,7 @@ public class BoxInventory extends VVBox
 			else if ( -1 == totalOxelsOfThisTypeCount )
 				_count.text = "∞";
 			else if ( 8 < totalOxelsOfThisType.length ) {
-				_count.text = "LOTS";
+				_count.text = "lots";
 			}
 			else
 				_count.text = totalOxelsOfThisType;

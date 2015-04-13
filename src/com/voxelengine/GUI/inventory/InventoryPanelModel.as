@@ -74,7 +74,7 @@ public class InventoryPanelModel extends VVContainer
 		upperTabsAdd();
 		addItemContainer();
 		addTrashCan();
-		populateModels();
+		addTools();
 		displaySelectedCategory( "all" );
 		
 		// This forces the window into a multiple of MODEL_IMAGE_WIDTH width
@@ -115,7 +115,7 @@ public class InventoryPanelModel extends VVContainer
 		_infoContainer.autoSize = true;
 		addElement( _infoContainer );
 		var b:BoxTrashCan = new BoxTrashCan(100, 100, BorderStyle.RIDGE );
-		b.backgroundTexture = "assets/textures/ash_burning.png";
+		b.backgroundTexture = "assets/textures/trashCan.png";
 		b.dropEnabled = true;
 		_infoContainer.addElement( b );
 	}
@@ -152,51 +152,57 @@ public class InventoryPanelModel extends VVContainer
 	}
 	
 	private function addModel( $oi:ObjectInfo, allowDrag:Boolean = true ):BoxInventory {
-		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
 		//// Add the filled bar to the container and create a new container
-		if ( countMax == _currentRow.numElements )
-		{
-			_currentRow = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
-			_currentRow.layout = new AbsoluteLayout();
-			_itemContainer.addElement( _currentRow );
-			_itemContainer.height = _itemContainer.numElements * MODEL_IMAGE_WIDTH;
-		}
 		
-		var box:BoxInventory = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE );
-		box.updateObjectInfo( $oi );
-		box.x = _currentRow.numElements * MODEL_IMAGE_WIDTH;
-		_currentRow.addElement( box );
-		if ( allowDrag )
-			eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
-//		if ( $oi is ObjectModel )
-//			eventCollector.addEvent( box, UIMouseEvent.CLICK, addAsParentModel );
-		return box;
+		var box:BoxInventory = findFirstEmpty();	
+		if ( box ) {
+			box.updateObjectInfo( $oi );
+			if ( allowDrag )
+				eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
+			return box;
+		}
+		Log.out( "InventoryPanelModel.addModel - Failed to addModel: " + $oi );
+		return null
 	}
 	
-	//private function addAsParentModel( e:UIMouseEvent ):void {
-		//var item:ObjectModel = e.target.objectInfo as ObjectModel;
-		//var ii:InstanceInfo = new InstanceInfo();
-		//ii.modelGuid = item.modelGuid;
-		//ii.instanceGuid = Globals.getUID();
-		//new ModelMaker( ii, true );
-	//}
-	
-	private function populateModels():void {
-		var count:int = 0;
+	private function addEmptyRow( $countMax:int ):void {
 		_currentRow = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
 		_currentRow.layout = new AbsoluteLayout();
 		_itemContainer.addElement( _currentRow );
+		_itemContainer.height = _itemContainer.numElements * MODEL_IMAGE_WIDTH;
+		for ( var i:int; i < $countMax; i++ ) {
+			var box:BoxInventory = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE );
+			box.updateObjectInfo( new ObjectInfo( box, ObjectInfo.OBJECTINFO_EMPTY ) );
+			box.x = i * MODEL_IMAGE_WIDTH;
+			_currentRow.addElement( box );
+		}
+	}
+	
+	private function findFirstEmpty():BoxInventory {
+		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
+		if ( null == _currentRow )
+			addEmptyRow( countMax );
+		for ( var i:int; i < countMax; i++ ) {
+			var bie:* = _currentRow.getElementAt( i );
+			var bi:* = bie.getElement();
+			var box:BoxInventory = bi as BoxInventory;
+			var oi:ObjectInfo = box.objectInfo;
+			if ( ObjectInfo.OBJECTINFO_EMPTY == oi.objectType )
+				return box;
+		}
+		addEmptyRow( countMax );
+		return findFirstEmpty();
+	}
+	
+	private function addTools():void {
 
-		var item:ObjectInfo;
 		var box:BoxInventory;
 		
-		item = new ObjectAction( box, "createNewObjectIPM", "NewModel128.png", "Click to create new model" );
-		box = addModel( item, false );
+		box = addModel( new ObjectAction( box, "createNewObjectIPM", "NewModel128.png", "Click to create new model" ), false );
 		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		
 		if ( Globals.g_debug ) {
-			item = new ObjectAction( box, "importObjectIPM", "import128.png", "Click to import local model" );
-			box = addModel( item, false );
+			box = addModel( new ObjectAction( box, "importObjectIPM", "import128.png", "Click to import local model" ), false );
 			eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		}
 	}
@@ -255,7 +261,7 @@ public class InventoryPanelModel extends VVContainer
 				}
 			}
 		}
-		Log.out( "InventoryPanelModels.removeModel DID NOT NOT find model: " + $modelGuid );
+		Log.out( "InventoryPanelModels.removeModel DID NOT NOT find model: " + $modelGuid, Log.WARN );
 	}
 	
 	private function dropMaterial(e:DnDEvent):void  {
