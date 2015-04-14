@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	import com.developmentarc.core.tasks.tasks.AbstractTask;
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.worldmodel.oxel.GrainCursorUtils;
 	import com.voxelengine.worldmodel.oxel.Oxel;
@@ -64,7 +65,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			
 			var timer:int = getTimer();
 	
-			var vm:VoxelModel = Globals.modelGet( _guid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _guid );
 			var guid:String = vm.instanceInfo.instanceGuid;
 			if ( vm )
 			{

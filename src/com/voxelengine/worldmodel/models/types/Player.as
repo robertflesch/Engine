@@ -184,7 +184,7 @@ public class Player extends Avatar
 		if ( !vm ) {
 			Log.out( "Player.onChildAdded ERROR FIND CHILD MODEL: " + me.instanceGuid );
 		}
-		//var vm:VoxelModel = Globals.modelGet( me.instanceGuid );
+		//var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( me.instanceGuid );
 //Log.out( "Player.onChildAdded model: " + vm.toString() );
 		if ( vm is Engine )
 Log.out( "Player.onChildAdded - Player has ENGINE" )

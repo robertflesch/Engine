@@ -33,7 +33,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			super.start();
 			var timer:int = getTimer();
 
-			var vm:VoxelModel = Globals.modelGet( _guid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _guid );
 			var grainSize:uint = vm.oxel.size_of_grain();	
 			var gc:GrainCursor = GrainCursorPool.poolGet();
 			vm.oxel.cursor_copy_to( gc );

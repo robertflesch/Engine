@@ -44,7 +44,7 @@ package com.voxelengine.worldmodel.models.types
 			if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
 				return;
 				
-			var vm:VoxelModel = Globals.modelGet( me.instanceGuid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( me.instanceGuid );
 			if ( vm is Engine )
 				_engines.push( vm );
 			if ( vm is Gun )

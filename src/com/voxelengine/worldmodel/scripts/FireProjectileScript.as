@@ -20,6 +20,7 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.events.ProjectileEvent;
 	import com.voxelengine.events.WeaponEvent;
 	import com.voxelengine.pools.ParticlePool;
+	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.weapons.*;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.worldmodel.models.ModelTransform;
@@ -56,7 +57,7 @@ package com.voxelengine.worldmodel.scripts
 			// That is determined by the guns location, and rotation, and by its parents location and rotation
 			
 			// first we calculate the location of the end of the barrel
-			const gunModel:VoxelModel = Globals.modelGet( instanceGuid );
+			const gunModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
 			if ( gunModel )
 			{
 				// What was I thinking here?
@@ -111,7 +112,7 @@ package com.voxelengine.worldmodel.scripts
 		static public function createProjectile( pe:ProjectileEvent ):void
 		{
 			var ownerGuid:String = pe.owner;
-			var gunModel:VoxelModel = Globals.modelGet( ownerGuid );
+			var gunModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( ownerGuid );
 			if ( gunModel && gunModel.instanceInfo.controllingModel )
 			{
 				var cm:VoxelModel = gunModel.instanceInfo.controllingModel;

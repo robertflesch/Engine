@@ -9,6 +9,7 @@
 package com.voxelengine.GUI 
 {
 import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.Permissions;
 import flash.events.Event;
 import playerio.DatabaseObject;
@@ -43,7 +44,7 @@ public class WindowModelMetadata extends VVPopup
 	public static const TYPE_IMPORT:int = 0;
 	public static const TYPE_EDIT:int = 1;
 	
-	public function WindowModelMetadata( $guid:String, windowType:int )
+	public function WindowModelMetadata( $ii:InstanceInfo, windowType:int )
 	{
 		_type = windowType;
 		super("Model Metadata Detail");
@@ -55,16 +56,18 @@ public class WindowModelMetadata extends VVPopup
 		
 		// Only prompt for imports of parent models
 		if ( TYPE_IMPORT == windowType ) {
-			_vmm = new ModelMetadata( $guid );
-			_vmm.name = $guid;
-			_vmm.description = $guid + "-IMPORTED";
+			_vmm = new ModelMetadata( $ii.modelGuid );
+			_vmm.name = $ii.modelGuid;
+			_vmm.description = $ii.modelGuid + "-IMPORTED";
+			if ( $ii.controllingModel )
+				_vmm.parentModelGuid = $ii.controllingModel.instanceInfo.modelGuid
 			_vmm.owner = Network.userId;
 			_vmm.modifiedDate = new Date();
 			// fake an event to populate the window
-			dataReceived( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, $guid, _vmm ) )
+			dataReceived( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, $ii.modelGuid, _vmm ) )
 		}
 		else {
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, $guid, null ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, $ii.modelGuid, null ) );
 		}
 	}
 	

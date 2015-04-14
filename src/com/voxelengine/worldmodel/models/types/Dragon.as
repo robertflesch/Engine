@@ -253,7 +253,7 @@ public class Dragon extends Beast
 		Log.out( "Dragon.fire");
 		/*
 		var gmInstanceGuid:String = (objectAction as Object).instanceGuid;
-		var gun:Gun = Globals.modelGet( gmInstanceGuid ) as Gun;
+		var gun:Gun = Region.currentRegion.modelCache.instanceGet( gmInstanceGuid ) as Gun;
 		if ( gun )
 			gun.fire();
 			*/

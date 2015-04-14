@@ -36,7 +36,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 			{
 				// This could effect more then one model...
 				// TODO make this work for multiple models. Maybe just use a world location like the explosion code does.
-				var vm:VoxelModel = Globals.modelGet( $le.instanceGuid );
+				var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( $le.instanceGuid );
 				if ( vm ) {
 					var lo:Oxel = vm.oxel.childFind( $le.gc );
 					if ( Oxel.validLightable( lo ) )
@@ -55,7 +55,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 			}
 			else if ( LightEvent.SOLID_TO_ALPHA == $le.type )
 			{
-				var vmc:VoxelModel = Globals.modelGet( $le.instanceGuid );
+				var vmc:VoxelModel = Region.currentRegion.modelCache.instanceGet( $le.instanceGuid );
 				if ( vmc ) {
 					var co:Oxel = vmc.oxel.childFind( $le.gc );
 					if ( co && Oxel.validLightable( co ) )
@@ -106,7 +106,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 		override public function start():void {
 			super.start();
 			
-			var vm:VoxelModel = Globals.modelGet( _guid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _guid );
 			if ( vm ) {
 			
 				try {

@@ -35,7 +35,8 @@ import com.voxelengine.worldmodel.Permissions;
 public class ModelMetadata
 {
 	private static const COPY_COUNT_INFINITE:int = -1;
-	private var _modelGuid:String			= "";
+	private var _modelGuid:String		= "";
+	private var _parentModelGuid:String;
 	private var _name:String			= "";
 	private var _description:String		= "";
 	private var _owner:String			= "";
@@ -59,6 +60,9 @@ public class ModelMetadata
 	
 	public function get modelGuid():String 				{ return _modelGuid; }
 	public function set modelGuid(value:String):void  	{ _modelGuid = value; }
+	
+	public function get parentModelGuid():String 				{ return _parentModelGuid; }
+	public function set parentModelGuid(value:String):void  	{ _parentModelGuid = value; }
 	
 	public function get thumbnail():BitmapData 			{ return _thumbnail; }
 	public function set thumbnail(value:BitmapData):void { _thumbnail = value; }
@@ -92,6 +96,7 @@ public class ModelMetadata
 		description 	= $vmm.description;
 		owner 			= $vmm.owner;
 		thumbnail 		= $vmm.thumbnail;
+		parentModelGuid = $vmm.parentModelGuid;
 Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		//creator 		= $vmm.creator;
 		//template		= $vmm.template;
@@ -109,7 +114,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		newVmm.description 		= new String( _description );
 		newVmm.owner 			= new String( _owner );
 		newVmm.thumbnail		= thumbnail;
-		
+		newVmm.parentModelGuid  = parentModelGuid;
 		newVmm._dbo				= null;
 		newVmm.permissions		= _permissions.clone();
 		
@@ -128,6 +133,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 								  , owner: _owner
 								  , creator: _creator
 								  , modifiedDate: _modifiedDate
+								  , parentModelGuid: parentModelGuid
 								  , thumbnail: thumbnail }
 								  
 		metadataObj = _permissions.addToObject( metadataObj );
@@ -203,6 +209,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		_dbo.owner			= _owner;
 		_dbo.creator		= _creator;
 		_dbo.modifiedDate   = new Date();
+		_dbo.parentModelGuid= parentModelGuid;
 		_permissions.toPersistance( _dbo );
 		if ( thumbnail )
 			_dbo.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
@@ -222,6 +229,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		_creator		= $dbo.creator;
 		_modelGuid 		= $dbo.key;
 		_modifiedDate   = $dbo.modifiedDate;
+		_parentModelGuid = $dbo.parentModelGuid;
 		_dbo			= $dbo;
 		_permissions.fromPersistance( $dbo );
 		

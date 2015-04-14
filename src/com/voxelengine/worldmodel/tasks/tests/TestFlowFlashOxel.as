@@ -34,7 +34,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			var timer:int = getTimer();
 
 
-			var vm:VoxelModel = Globals.modelGet( _guid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _guid );
 			var size:uint = vm.oxel.size_of_grain();						
 			_gc.grain = 0;
 			var oxel:Oxel = vm.oxel.childFind( _gc );

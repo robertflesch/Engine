@@ -16,6 +16,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.worldmodel.models.types.Ship;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
+	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.worldmodel.RegionManager;
 	
@@ -88,7 +89,7 @@ public class WindowBeastControlQuery extends VVCanvas
 
 		private function takeControl():void 
 		{
-			var vm:VoxelModel = Globals.modelGet( _beastInstanceGuid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _beastInstanceGuid );
 			if ( vm )
 			{
 				remove();

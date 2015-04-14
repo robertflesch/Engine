@@ -124,6 +124,19 @@ public class InstanceInfo extends Location	{
 			addTransformMT( mt );
 	}
 
+	public function InstanceInfo() 
+	{ 
+	}
+
+	public function clone():InstanceInfo
+	{
+		var ii:InstanceInfo = new InstanceInfo();
+		var obj:Object = getJSON();
+		ii.initJSON( obj );
+		ii.instanceGuid = Globals.getUID();
+		return ii;
+	}
+	
 	public function release():void {
 		_moveSpeed 			= null;
 		_transforms 		= null;
@@ -182,21 +195,6 @@ public class InstanceInfo extends Location	{
 	}
 	
 	
-	public function InstanceInfo() 
-	{ 
-		//RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, onLoadingComplete );
-		LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
-	}
-
-	public function clone():InstanceInfo
-	{
-		var ii:InstanceInfo = new InstanceInfo();
-		var obj:Object = getJSON();
-		ii.initJSON( obj );
-		ii.instanceGuid = Globals.getUID();
-		return ii;
-	}
-	
 	public function explosionClone():InstanceInfo
 	{
 		var ii:InstanceInfo = new InstanceInfo();
@@ -223,7 +221,6 @@ public class InstanceInfo extends Location	{
 
 	private function onLoadingComplete( le:LoadingEvent ):void
 	{
-		LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 	}
 	
 	public function topmostGuid():String {

@@ -109,9 +109,11 @@ public class ModelMakerImport extends ModelMakerBase {
 		
 		if ( null != _vmi && null != _vmd && null == _vmm ) {
 			if ( _prompt )
-				new WindowModelMetadata( _ii.modelGuid, WindowModelMetadata.TYPE_IMPORT );
+				new WindowModelMetadata( _ii, WindowModelMetadata.TYPE_IMPORT );
 			else {
 				_vmm = new ModelMetadata( _ii.modelGuid );
+				if ( _parentModelGuid )
+					_vmm.parentModelGuid = _parentModelGuid;
 				_vmm.name = _ii.modelGuid;
 				if ( _vmdFailed )
 					_vmm.description = _ii.modelGuid + "-GENERATED";

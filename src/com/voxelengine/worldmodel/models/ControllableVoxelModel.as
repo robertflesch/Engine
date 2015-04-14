@@ -226,7 +226,7 @@ public class ControllableVoxelModel extends VoxelModel
 		if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
 			return;
 			
-//			var vm:VoxelModel = Globals.modelGet( me.ownerGuid );
+//			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( me.ownerGuid );
 	}
 	
 	protected function throttleEvent( event:ShipEvent ):void

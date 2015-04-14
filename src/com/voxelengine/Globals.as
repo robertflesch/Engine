@@ -267,10 +267,5 @@ package com.voxelengine {
 			}
 			//Log.out( "VoxelVerseGui.openWindowCount - adjust - current count: " + _openWindowCount );
 		}
-		
-//////////////////////////////////////////////////////////////////////////////////		
-		public static function modelGet( $guid:String ):VoxelModel {
-			return Region.currentRegion.modelCache.modelGet( $guid );
-		};
 	}
 }

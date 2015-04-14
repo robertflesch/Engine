@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.ModelDataEvent;
 import flash.utils.ByteArray;
 import flash.utils.Dictionary;
 
@@ -36,6 +37,9 @@ public class ModelMetadataCache
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.LOAD, regionLoad ); 
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.JOIN, requestServerJoin ); 
 		//ModelMetadataEvent.addListener( ModelMetadataEvent.CHANGED, regionChanged );	
+		ModelMetadataEvent.addListener( ModelMetadataEvent.REQUEST_CHILDREN, requestChildren );
+		ModelMetadataEvent.addListener( ModelMetadataEvent.DELETE_RECURSIVE, deleteRecursive );
+		
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, requestType );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, request );
 		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE, update );
@@ -46,6 +50,28 @@ public class ModelMetadataCache
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadNotFound );		
+	}
+	
+	static private function deleteRecursive(e:ModelMetadataEvent):void 
+	{
+		// This delete this object
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, e.modelGuid, null ) );
+		// Since the data doesnt know about children, I have to delete those from here too.
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.DELETE, 0, e.modelGuid, null ) );
+		// now I need to delete any children
+		for each ( var mmd:ModelMetadata in _metadata ) {
+			if ( mmd && mmd.parentModelGuid == e.modelGuid )
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.DELETE_RECURSIVE, 0, mmd.modelGuid, null ) );		
+		}
+	}
+	
+	static private function requestChildren( $mme:ModelMetadataEvent):void {
+		for each ( var mmd:ModelMetadata in _metadata ) {
+			if ( mmd && mmd.parentModelGuid == $mme.modelGuid )
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.RESULT_CHILDREN, $mme.series, $mme.modelGuid, mmd ) );		
+		}
+		// this is the end of series message
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.RESULT_CHILDREN, $mme.series, $mme.modelGuid, null ) );		
 	}
 	
 	static private function deleteHandler( $mde:ModelMetadataEvent ):void {
@@ -124,7 +150,7 @@ public class ModelMetadataCache
 		}
 		// check to make sure is not already there
 		if ( null ==  _metadata[$vmm.modelGuid] ) {
-			//Log.out( "ModelMetadataCache.add vmm: " + $vmm.toString(), Log.WARN );
+			Log.out( "ModelMetadataCache.add vmm: " + $vmm.modelGuid, Log.WARN );
 			_metadata[$vmm.modelGuid] = $vmm; 
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, $series, $vmm.modelGuid, $vmm ) );
 		}

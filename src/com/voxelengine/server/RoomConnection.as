@@ -18,6 +18,7 @@ package com.voxelengine.server {
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.ProjectileEvent;
 	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.models.types.Avatar;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	
@@ -182,7 +183,7 @@ package com.voxelengine.server {
 			var userid:String = m.getString(0);
 			if ( Network.userId != userid ) {
 				//trace("RoomConnection.handleMoveMessage - Received move message", m);
-				var am:Avatar = Globals.modelGet( userid ) as Avatar;
+				var am:Avatar = Region.currentRegion.modelCache.instanceGet( userid ) as Avatar;
 				if ( am )
 				{
 					var pos:Vector3D = new Vector3D( m.getNumber( 1 ), m.getNumber( 2 ), m.getNumber( 3 ) );

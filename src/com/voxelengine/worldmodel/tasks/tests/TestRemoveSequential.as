@@ -33,7 +33,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			var timer:int = getTimer();
 
 			//trace( "TestRemove.start" );
-			var vm:VoxelModel = Globals.modelGet( _guid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _guid );
 			var gc:GrainCursor = GrainCursorPool.poolGet( vm.oxel.size_of_grain() );
 			addFlowTask( gc );
 			super.complete();

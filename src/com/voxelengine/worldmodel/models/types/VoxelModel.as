@@ -1856,17 +1856,6 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		return slots;
 	}
 	
-	static public function deleteModel( $modelGuid:String, $recursive:Boolean ):void {
-				// So now I need to remove it from Models List
-				// and ModelDataCache and ModelMetadataCache
-				
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.DELETE, 0, $modelGuid, null ) );
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $modelGuid, null ) );
-		//if ( $recursive ) {
-			//for each ( var childModel:VoxelModel in children )
-				//childModel.deleteModel( $recursive );
-		//}
-	}
 	
 
 }

@@ -12,6 +12,7 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.oxel.Oxel;
+	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
@@ -80,7 +81,7 @@ package com.voxelengine.worldmodel.models
 			{
 				if ( null == _vm )
 				{
-					_vm = Globals.modelGet( _instanceGuid );
+					_vm = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
 					if ( !_vm )
 						return; // not ready yet.
 				}

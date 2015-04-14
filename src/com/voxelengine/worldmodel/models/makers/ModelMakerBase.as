@@ -32,7 +32,7 @@ public class ModelMakerBase {
 	protected var _vmd:ModelData;
 	protected var _vmdFailed:Boolean;
 	static private var _makerCount:int;
-	private var   _parentModelGuid:String;
+	protected var _parentModelGuid:String;
 	
 	static private var _s_parentChildCount:Array = new Array();
 

@@ -18,6 +18,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	import com.voxelengine.Log;
 	
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
+	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
@@ -69,7 +70,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			
 			var timer:int = getTimer();
 	
-			var vm:VoxelModel = Globals.modelGet( _guid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _guid );
 			if ( vm && 0 < _runCount )
 			{
 				_runCount--;

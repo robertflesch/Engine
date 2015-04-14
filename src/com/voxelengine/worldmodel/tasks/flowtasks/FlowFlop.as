@@ -88,7 +88,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		override public function start():void {
 			super.start();
 			
-			var vm:VoxelModel = Globals.modelGet( _guid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _guid );
 			main:if ( vm )
 			{
 				var flowOxel:Oxel = vm.oxel.childGetOrCreate( _gc );

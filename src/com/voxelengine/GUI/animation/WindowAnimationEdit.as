@@ -255,7 +255,7 @@ public class WindowAnimationEdit extends VVPopup
 			if ( parentModel )
 				vm = parentModel.childModelFind( _ii.guid );
 			else	
-				vm = Globals.modelGet( _ii.guid );
+				vm = Region.currentRegion.modelCache.instanceGet( _ii.guid );
 				
 							addLabel( _panelAdvanced, "State:", changeStateHandler, vm.anim ? vm.anim.name : "" );
 							addLabel( _panelAdvanced, "Name:", changeNameHandler, _ii.name );
@@ -284,7 +284,7 @@ public class WindowAnimationEdit extends VVPopup
 		private function changeNameHandler(event:TextEvent):void { _ii.name = event.target.text; }
 		
 		private function changeStateHandler(event:TextEvent):void {
-			var vm:VoxelModel = Globals.modelGet( _ii.guid )
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _ii.guid )
 			var state:String = event.target.text;
 			vm.stateLock( false );
 			vm.stateSet( state );

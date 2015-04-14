@@ -187,7 +187,7 @@ package com.voxelengine.GUI.voxelModels
 		
 
 		private function changeStateHandler(event:TextEvent):void {
-			var vm:VoxelModel = Globals.modelGet( _vm.instanceInfo.instanceGuid )
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _vm.instanceInfo.instanceGuid )
 			var state:String = event.target.text;
 			vm.stateLock( false );
 			vm.stateSet( state );

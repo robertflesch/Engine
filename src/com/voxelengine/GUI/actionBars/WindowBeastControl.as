@@ -115,7 +115,7 @@ package com.voxelengine.GUI.actionBars
 			}
 			else if ( actionItem.callback == fireBeastWindow )
 			{
-				var gun:Gun = Globals.modelGet( actionItem.instanceGuid ) as Gun;
+				var gun:Gun = Region.currentRegion.modelCache.instanceGet( actionItem.instanceGuid ) as Gun;
 				gun.ammo = actionItem.ammo;
 				//Log.out( "WindowBeastControl.processItemSelection - setting Ammo to: " + actionItem.ammo.name );
 			}
@@ -133,7 +133,7 @@ package com.voxelengine.GUI.actionBars
 					else if ( actionItem.callback == fireBeastWindow )
 					{
 						var gmInstanceGuid:String = actionItem.instanceGuid;
-						var gun:Gun = Globals.modelGet( gmInstanceGuid ) as Gun;
+						var gun:Gun = Region.currentRegion.modelCache.instanceGet( gmInstanceGuid ) as Gun;
 						if ( gun )
 							gun.fire();
 					}
@@ -150,7 +150,7 @@ package com.voxelengine.GUI.actionBars
 			var dismountItem:ObjectAction = new ObjectAction( "loseControlBeast", "dismount.png", "Dismount" );
 			box = buildAction( dismountItem, count++ );
 			
-			var beast:VoxelModel = Globals.modelGet( _beastInstanceGuid );
+			var beast:VoxelModel = Region.currentRegion.modelCache.instanceGet( _beastInstanceGuid );
 			if ( beast )
 			{
 				for each ( var cm:VoxelModel in beast.children )
@@ -215,7 +215,7 @@ package com.voxelengine.GUI.actionBars
 		}
 		
 		static private function loseControlBeastWindow():void {
-			var vm:VoxelModel = Globals.modelGet( Globals.controlledModel.instanceInfo.guid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( Globals.controlledModel.instanceInfo.guid );
 			if ( vm )
 				vm.loseControl( Globals.player );
 			else

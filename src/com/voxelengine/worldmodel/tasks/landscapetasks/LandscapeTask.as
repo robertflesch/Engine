@@ -15,6 +15,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.oxel.Oxel;
+	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	
@@ -63,17 +64,17 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			if ( _layer ) {
 				var topMostParentGuid:String = _layer.optionalString;
 				if ( "" != topMostParentGuid ) {
-					vm = Globals.modelGet( topMostParentGuid );
+					vm = Region.currentRegion.modelCache.instanceGet( topMostParentGuid );
 					if ( vm )
 						vm = vm.childModelFind( _instanceGuid );
 					else 	
 						Log.out( "LandscapeTask.getVoxelModel - FAILED voxel model for parent guid " + topMostParentGuid + "  data: " + _layer.data , Log.ERROR );
 				}
 				else
-					vm = Globals.modelGet( _instanceGuid );
+					vm = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
 			}
 			else
-				vm = Globals.modelGet( _instanceGuid );
+				vm = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
 			
 			return vm;	
 		}
@@ -84,17 +85,17 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			if ( _layer ) {
 				var topMostParentGuid:String = _layer.optionalString;
 				if ( "" != topMostParentGuid ) {
-					vm = Globals.modelGet( topMostParentGuid );
+					vm = Region.currentRegion.modelCache.instanceGet( topMostParentGuid );
 					if ( vm )
 						vm = vm.childModelFind( _instanceGuid );
 					else 	
 						Log.out( "LandscapeTask.getVoxelModel - FAILED voxel model for parent guid " + topMostParentGuid + "  data: " + _layer.data , Log.ERROR );
 				}
 				else
-					vm = Globals.modelGet( _instanceGuid );
+					vm = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
 			}
 			else
-				vm = Globals.modelGet( _instanceGuid );
+				vm = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
 			
 			return vm;	
 		}

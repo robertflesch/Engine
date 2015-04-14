@@ -7,6 +7,7 @@ import com.voxelengine.Log;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.weapons.Ammo;
 import com.voxelengine.events.ImpactEvent;
+	import com.voxelengine.worldmodel.Region;
 
 
 /**
@@ -25,7 +26,7 @@ public class IceScript extends ImpactScript
 	
 	override public function impact( $wsLoc:Vector3D ):void
 	{
-		var vm:VoxelModel = Globals.modelGet( instanceGuid );
+		var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
 		if ( vm )
 			vm.dead = true;
 

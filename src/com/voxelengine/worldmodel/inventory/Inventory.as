@@ -147,7 +147,7 @@ public class Inventory
 			}
 		}
 		else {
-			var ownerModel:VoxelModel = Region.currentRegion.modelCache.modelGet( _owner );
+			var ownerModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( _owner );
 			if ( ownerModel && ownerModel is Player )
 				_voxels.addTestData();
 		}

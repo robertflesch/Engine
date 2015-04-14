@@ -10,6 +10,7 @@ package com.voxelengine.GUI.inventory {
 import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import flash.display.DisplayObject;
 import flash.events.Event;
@@ -169,6 +170,13 @@ public class InventoryPanelModel extends VVContainer
 	private function addModel( $oi:ObjectInfo, allowDrag:Boolean = true ):BoxInventory {
 		//// Add the filled bar to the container and create a new container
 		
+		if ( ObjectInfo.OBJECTINFO_MODEL == $oi.objectType ) {
+			var om:ObjectModel = $oi as ObjectModel;
+			// dont show child models
+			if ( null != om.vmm.parentModelGuid )
+				return null;
+		}
+				
 		var box:BoxInventory = findFirstEmpty();	
 		if ( box ) {
 			box.updateObjectInfo( $oi );
@@ -246,7 +254,7 @@ public class InventoryPanelModel extends VVContainer
 
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.modelGuid = fileName;
-		new ModelMakerImport( ii );
+		ModelMakerBase.load( ii );
 	}
 	
 	private function removeModel( $modelGuid:String ):void {

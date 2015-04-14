@@ -126,7 +126,7 @@ public class Slots
 	import flash.utils.getQualifiedClassName;
 	public function addSlotDefaultData():void {
 
-		var model:VoxelModel = Region.currentRegion.modelCache.modelGet( _owner );
+		var model:VoxelModel = Region.currentRegion.modelCache.instanceGet( _owner );
 		var defaultData:Vector.<ObjectInfo> = model.getDefaultSlotData();
 		
 		initializeSlots();

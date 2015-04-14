@@ -16,6 +16,7 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
+	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	public class AutoControlObjectScript extends Script 
@@ -33,7 +34,7 @@ package com.voxelengine.worldmodel.scripts
 				{
 					ModelEvent.removeListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent );
 					if ( Globals.player ) {
-						var vm:VoxelModel = Globals.modelGet( instanceGuid );
+						var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
 						vm.takeControl( Globals.player );
 						Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.metadata.name );
 					}
@@ -49,7 +50,7 @@ package com.voxelengine.worldmodel.scripts
 			LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 			
 			var player:VoxelModel = Globals.player;
-			var vm:VoxelModel = Globals.modelGet( instanceGuid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
 			if ( player && vm ) {
 				vm.takeControl( player );
 			}

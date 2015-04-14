@@ -14,6 +14,7 @@ package com.voxelengine.GUI
     import org.flashapi.swing.constants.*;
 	import flash.events.KeyboardEvent;
 	import flash.ui.Keyboard;
+	import com.voxelengine.worldmodel.Region;
 	
 	
 public class WindowShipControlQuery extends VVCanvas
@@ -70,7 +71,7 @@ public class WindowShipControlQuery extends VVCanvas
 
 		private function takeControl():void 
 		{
-			var vm:VoxelModel = Globals.modelGet( _instanceGuid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
 			if ( vm )
 			{
 				addControlWindows( vm );

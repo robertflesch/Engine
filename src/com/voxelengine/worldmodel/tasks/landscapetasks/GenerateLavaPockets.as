@@ -14,6 +14,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 	import com.voxelengine.worldmodel.biomes.*;
 	import com.voxelengine.worldmodel.TypeInfo;
+	import com.voxelengine.worldmodel.Region;
 
 	import flash.utils.getTimer;
 
@@ -89,7 +90,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
             super.start() // AbstractTask will send event
 			trace( "GenerateLavaPockets - enter - creating " +_layer.offset + " pockets of type " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );					
 			var timer:int = getTimer();
-            var vm:VoxelModel = Globals.modelGet( _instanceGuid );
+            var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
 			
             var numberOfTunnels:int =_layer.offset;
 			var tunnelLength:int = Math.random() * 200;

@@ -14,6 +14,7 @@ package com.voxelengine.GUI.actionBars
     import org.flashapi.swing.constants.*;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
+	import com.voxelengine.worldmodel.Region;
 	
 	public class WindowGunControl extends VVCanvas
 	{
@@ -34,7 +35,7 @@ package com.voxelengine.GUI.actionBars
 				padding = 0;
 				
 				// find all the "Gun" models and add a button for each
-				var vm:VoxelModel = Globals.modelGet( _instanceGuid );
+				var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
 				if ( vm )
 				{
 					for each ( var cm:VoxelModel in vm.children )

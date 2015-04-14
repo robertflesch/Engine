@@ -16,6 +16,7 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.events.WeaponEvent;
 	import com.voxelengine.Globals;
+	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.weapons.Bomb;
@@ -67,7 +68,7 @@ package com.voxelengine.worldmodel.scripts
 			var snd:Sound = SoundBank.getSound( _soundFile );
 			_channel = snd.play();
 			
-			var bomb:Bomb = Globals.modelGet( instanceGuid ) as Bomb;
+			var bomb:Bomb = Region.currentRegion.modelCache.instanceGet( instanceGuid ) as Bomb;
 			if ( bomb )
 			{
 				var ship:VoxelModel = bomb.instanceInfo.controllingModel;
@@ -90,7 +91,7 @@ package com.voxelengine.worldmodel.scripts
 		public function createReplacementBomb( ii:InstanceInfo, shipGuid:String ):void
 		{
 			// this was important, dont recall why
-			var newShip:VoxelModel = Globals.modelGet( shipGuid );
+			var newShip:VoxelModel = Region.currentRegion.modelCache.instanceGet( shipGuid );
 			ii.controllingModel = newShip;
 
 			ModelMakerBase.load( ii );    

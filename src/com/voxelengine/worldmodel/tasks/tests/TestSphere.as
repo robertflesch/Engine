@@ -17,6 +17,7 @@ package com.voxelengine.worldmodel.tasks.tests
 	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.display.BitmapData;
 	import flash.utils.getTimer;
+	import com.voxelengine.worldmodel.Region;
 	
 	/**
 	 * ...
@@ -35,7 +36,7 @@ package com.voxelengine.worldmodel.tasks.tests
 
 			var timer:int = getTimer();
 			
-			var vm:VoxelModel = Globals.modelGet( _instanceGuid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
 			if ( vm )
 			{
 				var root_grain_size:uint = vm.oxel.gc.bound

@@ -77,11 +77,12 @@ public class ModelDataCache
 	static private function add( $series:int, $md:ModelData ):void 
 	{ 
 		if ( null == $md || null == $md.modelGuid ) {
-			Log.out( "ModelDataCache.modelDataAdd trying to add NULL modelData or guid", Log.WARN );
+			Log.out( "ModelDataCache.Add trying to add NULL modelData or guid", Log.WARN );
 			return;
 		}
 		// check to make sure this is new data
 		if ( null ==  _modelData[$md.modelGuid] ) {
+Log.out( "ModelDataCache.add adding: $md.modelGuid" , Log.WARN );
 			_modelData[$md.modelGuid] = $md; 
 			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.ADDED, $series, $md.modelGuid, $md ) );
 		}

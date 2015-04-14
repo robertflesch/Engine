@@ -18,6 +18,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.display.BitmapData;
 	import flash.utils.getTimer;
+	import com.voxelengine.worldmodel.Region;
 	
 	/**
 	 * ...
@@ -37,7 +38,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			
 			//Globals.g_seed = 0;
 			
-			var vm:VoxelModel = Globals.modelGet( _instanceGuid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
 			var masterMapSize:uint = Math.min( vm.oxel.size_in_world_coordinates(), 1024 );
 			
 			var octaves:int  = ( Math.random() * 144 ) % (Math.random() * 12);

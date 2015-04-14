@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.events.OxelEvent;
 	import com.voxelengine.Log;
+	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	public class ControlObjectScript extends Script 
@@ -37,7 +38,7 @@ package com.voxelengine.worldmodel.scripts
 			{
 				if ( !WindowShipControl.currentInstance && !WindowGunControl.currentInstance )
 				{
-					var vm:VoxelModel = Globals.modelGet( instanceGuid );
+					var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
 					if ( vm )
 					{
 						var controllingModel:VoxelModel = vm.instanceInfo.controllingModel;	

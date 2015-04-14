@@ -24,26 +24,37 @@ package com.voxelengine.worldmodel.models
 	{
 		// these are the active parent objects or dynamic objects
 		// We do double entry here so that models can be retrived by guid
-		private var _models:Vector.<VoxelModel> = new Vector.<VoxelModel>();
-		private var _modelsGuid:Dictionary = new Dictionary();
-		private var _modelsDynamic:Vector.<VoxelModel> = new Vector.<VoxelModel>();
-		private var _modelsDynamicGuid:Dictionary = new Dictionary();
+		private var _instances:Vector.<VoxelModel> = new Vector.<VoxelModel>();
+		private var _instanceByGuid:Dictionary = new Dictionary();
+		private var _instancesDynamic:Vector.<VoxelModel> = new Vector.<VoxelModel>();
+		private var _instanceByGuidDynamic:Dictionary = new Dictionary();
 		private var _region:Region;
 		
-		public function get models():Vector.<VoxelModel> { return _models; }
-		public function modelsGet():Vector.<VoxelModel> { return _models; }
-		public function get modelsDynamic():Vector.<VoxelModel> { return _modelsDynamic; }
+		public function get models():Vector.<VoxelModel> { return _instances; }
+		public function modelsGet():Vector.<VoxelModel> { return _instances; }
+		public function get modelsDynamic():Vector.<VoxelModel> { return _instancesDynamic; }
 		
 		public function ModelCache( $region:Region ) {
 			_region = $region;
 		}
 		
 		// need to do a recurvsive search here
-		public function modelGet( $instanceGuid:String ):VoxelModel
+		public function instanceGet( $instanceGuid:String ):VoxelModel
 		{ 
-			return _modelsGuid[$instanceGuid];
+			return _instanceByGuid[$instanceGuid];
 		}
-		
+
+		public function modelGet( $modelGuid:String ):Vector.<VoxelModel>
+		{ 
+			var results:Vector.<VoxelModel> = new Vector.<VoxelModel>();
+			for ( var i:int; i < _instances.length; i++ ) {
+				var vm:VoxelModel = _instances[i];
+				if ( vm && vm.metadata.modelGuid == $modelGuid )
+					results.push( vm );
+			}
+			return results;
+		}
+
 		public function createPlayer():Boolean	{
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			Log.out( "ModelCache.createPlayer - creating from LOCAL", Log.DEBUG );
@@ -59,21 +70,21 @@ package com.voxelengine.worldmodel.models
 				return;
 			
 			// check all models to see if they have changed, if so save them to server.
-			for each ( var vm:VoxelModel in _models )
+			for each ( var vm:VoxelModel in _instances )
 				vm.save();
 		}
 		
 		public function unload():void {
 			var vm:VoxelModel;
-			for ( var i:int = 0; i < _models.length; i++ ) {
-				vm = _models[i];
+			for ( var i:int = 0; i < _instances.length; i++ ) {
+				vm = _instances[i];
 				if ( vm is Player )
 					continue;
 				vm.dead = true;	
 			}
 			
-			for ( i = 0; i < _modelsDynamic.length; i++ ) {
-				vm = _modelsDynamic[i];
+			for ( i = 0; i < _instancesDynamic.length; i++ ) {
+				vm = _instancesDynamic[i];
 				vm.dead = true;
 			}
 		}
@@ -86,30 +97,30 @@ package com.voxelengine.worldmodel.models
 			if ( vm.instanceInfo.controllingModel )
 			{
 				vm.instanceInfo.controllingModel.childAdd( vm );
-				_modelsGuid[vm.instanceInfo.instanceGuid] = vm;
+				_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
 				ModelEvent.dispatch( new ModelEvent( ModelEvent.CHILD_MODEL_ADDED, vm.instanceInfo.instanceGuid, null, null, vm.instanceInfo.controllingModel.instanceInfo.instanceGuid ) );
 			}
 			else if ( vm.instanceInfo.dynamicObject )
 			{
 				if ( null == vm.instanceInfo.instanceGuid )
 					vm.instanceInfo.instanceGuid = Globals.getUID();
-				_modelsDynamic.push(vm);
-				_modelsDynamicGuid[vm.instanceInfo.instanceGuid] = vm;
+				_instancesDynamic.push(vm);
+				_instanceByGuidDynamic[vm.instanceInfo.instanceGuid] = vm;
 				ModelEvent.dispatch( new ModelEvent( ModelEvent.DYNAMIC_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
 			}
 			else
 			{
 				if ( vm is Avatar ) {
 					// need to seperate these out into their own catagory
-					_modelsGuid[vm.instanceInfo.instanceGuid] = vm;
-					_models.push(vm);
+					_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
+					_instances.push(vm);
 					ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
 				}
 				else {
 					if ( null == vm.instanceInfo.instanceGuid )
 						vm.instanceInfo.instanceGuid = Globals.getUID();
-					_modelsGuid[vm.instanceInfo.instanceGuid] = vm;
-					_models.push(vm);
+					_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
+					_instances.push(vm);
 					ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
 				}
 			}
@@ -120,28 +131,28 @@ package com.voxelengine.worldmodel.models
 			// TODO Could optimize here by only making the calls needed for this shader.
 			// Since only one shader is used for each, this could save a LOT OF TIME for large number of models.
 			var vm:VoxelModel;
-			for ( var i:int = 0; i < _models.length; i++ ) {
-				vm = _models[i];
+			for ( var i:int = 0; i < _instances.length; i++ ) {
+				vm = _instances[i];
 				if ( vm && vm.complete && vm.visible )
 					vm.draw( $mvp, $context, false );	
 			}
 			
 			// TODO - should sort models based on distance, and view frustrum - RSF
-			for ( i = 0; i < _modelsDynamic.length; i++ ) {
-				vm = _modelsDynamic[i];
+			for ( i = 0; i < _instancesDynamic.length; i++ ) {
+				vm = _instancesDynamic[i];
 				if ( vm && vm.complete && vm.visible )
 					vm.draw( $mvp, $context, false );	
 			}
 			
-			for ( i = 0; i < _models.length; i++ ) {
-				vm = _models[i];
+			for ( i = 0; i < _instances.length; i++ ) {
+				vm = _instances[i];
 				if ( vm && vm.complete && vm.visible )
 					vm.drawAlpha( $mvp, $context, false );	
 			}
 			
 			// TODO - This is expensive and not needed if I dont have projectiles without alpha.. RSF
-			for ( i = 0; i < _modelsDynamic.length; i++ ) {
-				vm = _modelsDynamic[i];
+			for ( i = 0; i < _instancesDynamic.length; i++ ) {
+				vm = _instancesDynamic[i];
 				if ( vm && vm.complete && vm.visible )
 					vm.drawAlpha( $mvp, $context, false );	
 			}
@@ -167,16 +178,16 @@ package com.voxelengine.worldmodel.models
 			var dynModelTime:int = getTimer();
 			
 			var vm:VoxelModel
-			for ( var i:int; i < _modelsDynamic.length; i++ ) {
-				vm = _modelsDynamic[i];
+			for ( var i:int; i < _instancesDynamic.length; i++ ) {
+				vm = _instancesDynamic[i];
 				vm.update( Globals.g_renderer.context,  $elapsedTimeMS );	
 			}
 			
 			dynModelTime = getTimer() - dynModelTime;
 			
 			var modelTime:int = getTimer();
-			for ( i = 0; i < _models.length;  i++ ) {
-				vm = _models[i];
+			for ( i = 0; i < _instances.length;  i++ ) {
+				vm = _instances[i];
 				vm.update( Globals.g_renderer.context,  $elapsedTimeMS );	
 			}
 			
@@ -189,12 +200,12 @@ package com.voxelengine.worldmodel.models
 		public function dispose():void 	{
 			Log.out("ModelCache.dispose" );
 			var model:VoxelModel;
-			for each ( model in _modelsDynamic )
+			for each ( model in _instancesDynamic )
 			{
 				model.dispose();
 			}
 			
-			for each ( model in _models )
+			for each ( model in _instances )
 			{
 				model.dispose();	
 			}
@@ -203,7 +214,7 @@ package com.voxelengine.worldmodel.models
 		public function buildExportObject():Object {
 			
 			var oa:Vector.<Object> = new Vector.<Object>();
-			for each ( var model:VoxelModel in _models ) {
+			for each ( var model:VoxelModel in _instances ) {
 				if ( model is Player )
 					continue;
 				oa.push( model.instanceInfo.buildExportObject() );
@@ -217,24 +228,24 @@ package com.voxelengine.worldmodel.models
 			Globals.g_textureBank.reinitialize( $context );
 			
 			var vm:VoxelModel
-			for ( var i:int; i < _modelsDynamic.length; i++ ) {
-				vm = _modelsDynamic[i];
+			for ( var i:int; i < _instancesDynamic.length; i++ ) {
+				vm = _instancesDynamic[i];
 				vm.reinitialize( $context );
 			}
 			
-			for ( i = 0; i < _models.length; i++ ) {
-				vm = _models[i];
+			for ( i = 0; i < _instances.length; i++ ) {
+				vm = _instances[i];
 				vm.reinitialize( $context );	
 			}
 		}
 		
 		public function bringOutYourDead():void {
 			var vm:VoxelModel
-			for ( var i:int; i < _models.length; ) {
-				vm = _models[i];
+			for ( var i:int; i < _instances.length; ) {
+				vm = _instances[i];
 				if ( vm && true == vm.dead ) {
-					_models.splice( i, 1 );
-					_modelsGuid[vm.instanceInfo.instanceGuid] = null;
+					_instances.splice( i, 1 );
+					_instanceByGuid[vm.instanceInfo.instanceGuid] = null;
 				}
 				else 
 					i++
@@ -243,11 +254,11 @@ package com.voxelengine.worldmodel.models
 		
 		public function bringOutYourDeadDynamic():void {
 			var vm:VoxelModel;
-			for ( var i:int; i < _modelsDynamic.length; ) {
-				vm = _modelsDynamic[i];
+			for ( var i:int; i < _instancesDynamic.length; ) {
+				vm = _instancesDynamic[i];
 				if ( vm && true == vm.dead ) {
-					_modelsDynamic.splice( i, 1 );
-					_modelsDynamicGuid[vm.instanceInfo.instanceGuid] = null;
+					_instancesDynamic.splice( i, 1 );
+					_instanceByGuidDynamic[vm.instanceInfo.instanceGuid] = null;
 				}
 				else 
 					i++
@@ -258,12 +269,12 @@ package com.voxelengine.worldmodel.models
 		public function changeFromParentToChild( $vm:VoxelModel ):void {
 
 			var vm:VoxelModel
-			for ( var i:int; i < _models.length; i++ ) {
-				vm = _models[i];
+			for ( var i:int; i < _instances.length; i++ ) {
+				vm = _instances[i];
 				if ( vm && $vm == vm )
 				{
-					_models.splice( i, 1 );
-					_modelsGuid[vm.instanceInfo.instanceGuid] = null;
+					_instances.splice( i, 1 );
+					_instanceByGuid[vm.instanceInfo.instanceGuid] = null;
 					break;
 				}
 			}

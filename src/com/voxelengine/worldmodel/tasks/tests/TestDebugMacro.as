@@ -17,6 +17,7 @@ package com.voxelengine.worldmodel.tasks.tests
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.Globals;
 	import flash.utils.getTimer;
+	import com.voxelengine.worldmodel.Region;
 	
 	/**
 	 * ...
@@ -37,7 +38,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			//////////////////////////////////////////////////////////
 			// Builds Solid Cube of any grain size
 			//////////////////////////////////////////////////////////
-			var vm:VoxelModel = Globals.modelGet( _instanceGuid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
 			var gc:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
 			gc.copyFrom(vm.oxel.gc);
 			//GrainCursorUtils.debug_macro( gc, _layer.data, vm.oxel );

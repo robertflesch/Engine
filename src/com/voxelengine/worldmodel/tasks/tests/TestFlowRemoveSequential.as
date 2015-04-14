@@ -35,7 +35,7 @@ package com.voxelengine.worldmodel.tasks.tests
 
 			if ( count > 0 )
 			{
-			var vm:VoxelModel = Globals.modelGet( _guid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _guid );
 			var grainSize:uint = vm.oxel.size_of_grain();						
 			_gc.grain = 2;
 			//trace( "TestFlowRemoveSequential.start - removing face of size:" + _gc.grain );
