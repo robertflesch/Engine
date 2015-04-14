@@ -8,7 +8,6 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
-	import com.voxelengine.worldmodel.models.makers.ModelLoader;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 

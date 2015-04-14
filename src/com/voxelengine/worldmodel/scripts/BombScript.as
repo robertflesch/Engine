@@ -17,7 +17,6 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.events.WeaponEvent;
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-	import com.voxelengine.worldmodel.models.makers.ModelLoader;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.weapons.Bomb;
 	import com.voxelengine.worldmodel.SoundBank;

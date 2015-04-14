@@ -13,7 +13,6 @@ package com.voxelengine.worldmodel.animation
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-	import com.voxelengine.worldmodel.models.makers.ModelLoader;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	

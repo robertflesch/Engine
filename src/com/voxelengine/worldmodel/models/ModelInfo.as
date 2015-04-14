@@ -78,8 +78,9 @@ package com.voxelengine.worldmodel.models
 			
 			// This clone is important, and it creates a unique instance for each child
 			// otherwise the children all share the same instanceInfo, which is not good
-			for each ( var ii:InstanceInfo in _children )
+			for each ( var ii:InstanceInfo in _children ) {
 				newModelInfo.childAdd( ii.clone() );
+			}
 			// The cloning here was overwriting changes I made during the repeat stage
 			// I think that each ii is already unique, or SHOULD be.
 
@@ -103,6 +104,9 @@ package com.voxelengine.worldmodel.models
 		
 		public function childAdd( $instanceInfo:InstanceInfo):void {
 			// Dont add child that already exist
+			
+			Log.out( "ModelInfo.childAdd  fileName: " + fileName + "  ii: " + $instanceInfo, Log.WARN );
+			
 			for each ( var child:InstanceInfo in _children ) {
 				if ( child === $instanceInfo ) {
 					return;

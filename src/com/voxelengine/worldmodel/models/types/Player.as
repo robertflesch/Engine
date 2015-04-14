@@ -153,9 +153,6 @@ public class Player extends Avatar
 				$dbo.modifiedDate = new Date();
 				$dbo.createdDate = new Date();
 				$dbo.save();
-				
-				// now assign a starting region
-				//Log.out( "Player.onPlayerLoadedAction - ASSIGN STARTING REGION IF NULL", Log.WARN  );
 			}
 			
 			var ii:InstanceInfo = new InstanceInfo();
@@ -163,8 +160,6 @@ public class Player extends Avatar
 			//ii.guid = $dbo.modelGuid;
 			ii.modelGuid = "Player";
 			ii.instanceGuid = Network.userId;
-			//Log.out( "Player.onPlayerLoadedAction - creating player with guid: " + ii.guid, Log.WARN  );
-			//new ModelMaker( ii );
 			new ModelMakerLocal( ii );
 		}
 		else {

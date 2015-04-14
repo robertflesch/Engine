@@ -20,7 +20,6 @@ package com.voxelengine.server {
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.worldmodel.models.types.Avatar;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
-	import com.voxelengine.worldmodel.models.makers.ModelLoader;
 	
 	public class RoomConnection
 	{

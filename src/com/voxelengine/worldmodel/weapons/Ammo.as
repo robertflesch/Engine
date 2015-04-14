@@ -22,7 +22,6 @@ import com.voxelengine.worldmodel.SoundBank;
 import com.voxelengine.events.AmmoEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistanceEvent;
-import com.voxelengine.worldmodel.models.makers.ModelLoader;
 import com.voxelengine.worldmodel.TypeInfo;
 
 public class Ammo

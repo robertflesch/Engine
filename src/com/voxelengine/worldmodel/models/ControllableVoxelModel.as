@@ -28,7 +28,6 @@ import com.voxelengine.events.GUIEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.ShipEvent;
 import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
-import com.voxelengine.worldmodel.models.makers.ModelLoader;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.scripts.Script;

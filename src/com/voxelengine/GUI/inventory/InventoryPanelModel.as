@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.inventory {
 
 import com.voxelengine.events.ModelDataEvent;
+import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import flash.display.DisplayObject;
@@ -82,6 +83,20 @@ public class InventoryPanelModel extends VVContainer
 		width = count * MODEL_IMAGE_WIDTH;
 		
 		eventCollector.addEvent( _dragOp, DnDEvent.DND_DROP_ACCEPTED, dropMaterial );
+		
+		//eventCollector.addEvent( _dragOp, DnDEvent.DND_MOUSE_DOWN, dndTest );
+		//eventCollector.addEvent( _dragOp, DnDEvent.DND_MOUSE_MOVE, dndTest );
+		//eventCollector.addEvent( _dragOp, DnDEvent.DND_ENTER, dndTest );
+		//eventCollector.addEvent( _dragOp, DnDEvent.DND_MOVE_OVER, dndTest );
+		//eventCollector.addEvent( _dragOp, DnDEvent.DND_EXIT, dndTest );
+		//eventCollector.addEvent( _dragOp, DnDEvent.DND_DROP, dndTest );
+		//eventCollector.addEvent( _dragOp, DnDEvent.DND_COMPLETE, dndTest );
+		//eventCollector.addEvent( _dragOp, DnDEvent.DND_FINISH, dndTest );
+		//eventCollector.addEvent( _dragOp, DnDEvent.DND_START, dndTest );
+		//function dndTest(e:DnDEvent):void 
+		//{
+			//Log.out( "InventoryPanelModel.dndTest msg: " + e );
+		//}		
 	}
 	
 	private function upperTabsAdd():void {
@@ -253,9 +268,6 @@ public class InventoryPanelModel extends VVContainer
 				if ( om.modelGuid == $modelGuid ) {
 					var newOI:ObjectInfo = new ObjectInfo(null, ObjectInfo.OBJECTINFO_EMPTY)
 					box.updateObjectInfo( newOI );
-					ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.DELETE, 0, $modelGuid, null ) );
-					ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $modelGuid, null ) );
-					
 					Log.out( "InventoryPanelModels.removeModel found model: " + $modelGuid );
 					return;
 				}
@@ -281,12 +293,8 @@ public class InventoryPanelModel extends VVContainer
 			if ( e.dropTarget is BoxTrashCan ) {
 				var btc:BoxTrashCan = e.dropTarget as BoxTrashCan;
 				var droppedItem:ObjectModel = e.dragOperation.initiator.data;
-				removeModel( droppedItem.modelGuid );
-				// So now I need to remove it from Models List
-				// and ModelDataCache and ModelMetadataCache
 				
-				// we are going to need the data to build the model for this.
-				//ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, item.modelGuid, null ) );
+				new WindowModelDeleteChildrenQuery( droppedItem.modelGuid, removeModel );				
 			}
 			
 			if ( e.dropTarget.target is QuickInventory ) {

@@ -17,7 +17,6 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.Room;
-import com.voxelengine.worldmodel.models.makers.ModelLoader;
 
 /**
  * ...
@@ -26,7 +25,6 @@ import com.voxelengine.worldmodel.models.makers.ModelLoader;
 public class RegionManager 
 {
 	private var _regions:Vector.<Region> = null
-	private var _modelLoader:ModelLoader = new ModelLoader();
 	private var _requestPublic:Boolean;
 	//private var _resultsPublic:Boolean;
 	private var _requestPrivate:Boolean;
@@ -36,7 +34,7 @@ public class RegionManager
 	
 	public function get regions():Vector.<Region> { return _regions; }
 	
-	public function get modelLoader():ModelLoader { return _modelLoader; }
+	//public function get modelLoader():ModelLoader { return _modelLoader; }
 	
 	public function RegionManager():void 
 	{

@@ -174,7 +174,7 @@ public class ModelMakerBase {
 	
 	static public function load( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true, $prompt:Boolean = true ):void {
 		//Log.out( "ModelMakerBase.load ii: " + $ii.toString() );
-		if ( !Globals.isGuid( $ii.modelGuid ) && $ii.modelGuid != "LoadModelFromBigDB" )
+		if ( !Globals.isGuid( $ii.modelGuid ) )
 			if ( Globals.online )
 				new ModelMakerImport( $ii, $prompt );
 			else

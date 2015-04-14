@@ -13,7 +13,6 @@ import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.worldmodel.models.makers.ModelLoader;
 import com.voxelengine.worldmodel.models.types.Particle;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.InstanceInfo;

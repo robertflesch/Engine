@@ -42,7 +42,6 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.oxel.OxelData;
 import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.models.makers.ModelLoader;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.tasks.flowtasks.Flow;
 import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
@@ -223,53 +222,19 @@ public class VoxelModel
 			//Log.out( "VoxelModel.processClassJson - loading child models END" );
 		}
 	}
-/*
-	protected function addClassJson():String {
-		// This is always first thing written.
-		var jsonString:String = "\"model\":";
-		jsonString += JSON.stringify(modelInfo);
-		// now we need to replace the children in the modelInfo with the current children.
-		var childList:String = getChildJSON();
-		Log.out( "VoxelModel.addClassJson " + metadata.name + "  childList: " + childList );
-		Log.out( "VoxelModel.addClassJson " + metadata.name + "  jsonString: " + jsonString );
-		jsonString = jsonString.replace( "\"REPLACE_ME\"", childList );
-		Log.out( "VoxelModel.addClassJson " + metadata.name + "  merged: " + jsonString );
-		return jsonString;
-	}
-	*/
+
 	public function getChildJSON():Object {
 		
 		// Same code that is in modelCache to build models in region
 		// this is just models in models
 		var oa:Vector.<Object> = new Vector.<Object>();
-		for each ( var model:VoxelModel in _children ) {
-			if ( model is Player )
+		for each ( var vm:VoxelModel in _children ) {
+			if ( vm is Player )
 				continue;
-			oa.push( model.instanceInfo.buildExportObject() );
+			oa.push( vm.instanceInfo.buildExportObject() );
+			Log.out( "VoxelModel.getChildJSON  - my modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
 		}
 		return oa;
-		
-		
-		
-		//var instanceData:Vector.<String> = new Vector.<String>;
-		//for each ( var model:VoxelModel in _children ) {
-			//instanceData.push( model.getJSON() );	
-		//}
-		//
-		//var outString:String = "[";
-		//var len:int = instanceData.length;
-		//Log.out( "VoxelModel.getChildJSON ---------------------------------------------------" );
-		//for ( var index:int; index < len; index++ ) {
-			//outString += instanceData[index];
-			//Log.out( "VoxelModel.getChildJSON - instance: " + instanceData[index] );
-			//// if this is NOT the last element in the array, add a comma to it.
-			//if ( index == len - 1 )
-				//continue;
-			//outString += ",";
-		//}
-		//outString += "]";
-		//Log.out( "VoxelModel.getChildJSON ---------------------------------------------------" );
-		//return outString;
 	}
 	
 	public function buildExportObject( obj:Object ):Object {
@@ -770,14 +735,11 @@ public class VoxelModel
 		if (!initialized)
 			initialize($context);
 		
-		if (complete)
-		{
+		if (complete) {
 			instanceInfo.update($elapsedTimeMS);
 			
 			if (oxel && oxel.dirty)
-			{
 				oxel.cleanup();
-			}
 		}
 	}
 	
@@ -1031,7 +993,6 @@ public class VoxelModel
 	// Force save is used ONLY when creating instances from templates.
 	public function save():void
 	{
-		Log.out( "VoxelModel.save - name: " + metadata.name );
 		for ( var i:int; i < _children.length; i++ ) {
 			var child:VoxelModel = _children[i];
 			child.save();
@@ -1055,6 +1016,7 @@ public class VoxelModel
 		//if ( null != metadata.permissions.templateGuid )
 			//metadata.permissions.templateGuid = "";
 				
+		Log.out( "VoxelModel.save - name: " + metadata.name );
 		changed = false;
 		metadata.save();
 		data.save( toByteArray() );
@@ -1893,6 +1855,20 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		
 		return slots;
 	}
+	
+	static public function deleteModel( $modelGuid:String, $recursive:Boolean ):void {
+				// So now I need to remove it from Models List
+				// and ModelDataCache and ModelMetadataCache
+				
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.DELETE, 0, $modelGuid, null ) );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $modelGuid, null ) );
+		//if ( $recursive ) {
+			//for each ( var childModel:VoxelModel in children )
+				//childModel.deleteModel( $recursive );
+		//}
+	}
+	
+
 }
 }
 

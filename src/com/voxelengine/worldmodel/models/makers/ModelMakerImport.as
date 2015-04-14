@@ -162,7 +162,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	}
 	
 	override protected function markComplete( $success:Boolean = true ):void {
-		if ( false == $success && _vmi.boimeHas() ) {
+		if ( false == $success && _vmi && _vmi.boimeHas() ) {
 			Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + _vmi.biomes.toString(), Log.WARN );
 			return;
 		}
