@@ -77,6 +77,7 @@ public class ModelMetadataCache
 	}
 	
 	static private function deleteHandler( $mde:ModelMetadataEvent ):void {
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.DELETE, 0, $mde.modelGuid, null ) );
 		var mmd:ModelMetadata = _metadata[$mde.modelGuid];
 		if ( null != mmd ) {
 			_metadata[$mde.modelGuid] = null; 

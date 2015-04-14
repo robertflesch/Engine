@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI
 {
+import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.worldmodel.Region;
@@ -72,7 +73,10 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 			vm.dead = true;
 		
 		// Let MetadataCache handle the recursive delete
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.DELETE_RECURSIVE, 0, _modelGuid, null ) );
+		if ( _recursive )
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.DELETE_RECURSIVE, 0, _modelGuid, null ) );
+		else
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
 		remove();
 	}
 }
