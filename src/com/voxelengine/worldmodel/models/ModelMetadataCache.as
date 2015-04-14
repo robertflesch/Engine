@@ -52,9 +52,11 @@ public class ModelMetadataCache
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadNotFound );		
 	}
 	
+	// NOTE: This doesnt not work the first time the object is imported
+	// You have to close app and restart to get guids correct.
 	static private function deleteRecursive(e:ModelMetadataEvent):void 
 	{
-		// This delete this object
+		// This delete this objects metadata
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, e.modelGuid, null ) );
 		// Since the data doesnt know about children, I have to delete those from here too.
 		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.DELETE, 0, e.modelGuid, null ) );

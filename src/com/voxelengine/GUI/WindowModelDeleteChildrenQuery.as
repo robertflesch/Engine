@@ -73,6 +73,7 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 		
 		// Let MetadataCache handle the recursive delete
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.DELETE_RECURSIVE, 0, _modelGuid, null ) );
+		remove();
 	}
 }
 }
