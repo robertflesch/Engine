@@ -24,7 +24,7 @@ package com.voxelengine.worldmodel.models
 		private var _positions:Vector.<Vector3D> 				= new Vector.<Vector3D>(3); // INSTANCE NOT EXPORTED
 		private var _scale:Vector3D 							= new Vector3D(1, 1, 1);	// toJSON
 		private var _center:Vector3D 							= new Vector3D();			// INSTANCE NOT EXPORTED
-		private var _centerConst:Vector3D 						= new Vector3D();			// INSTANCE NOT EXPORTED
+		private var _centerNotScaled:Vector3D 					= new Vector3D();			// INSTANCE NOT EXPORTED
 		private var _velocity:Vector3D 							= new Vector3D();			// INSTANCE NOT EXPORTED
 
 		private var _modelMatrix:Matrix3D 						= new Matrix3D();			// INSTANCE NOT EXPORTED
@@ -40,10 +40,11 @@ package com.voxelengine.worldmodel.models
 		public function set center($val:Vector3D):void			{ centerSetComp( $val.x, $val.y, $val.z ); }			
 		public function 	centerSetComp( $x:Number, $y:Number, $z:Number ):void { 
 			_changed = true;
-			_centerConst.setTo( $x, $y, $z ); 
-			_center.setTo( _centerConst.x * _scale.x, _centerConst.y * _scale.y, _centerConst.z * _scale.z );
-			//Log.out( "set center - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerConst );
+			_centerNotScaled.setTo( $x, $y, $z ); 
+			_center.setTo( _centerNotScaled.x * _scale.x, _centerNotScaled.y * _scale.y, _centerNotScaled.z * _scale.z );
+			//Log.out( "set center - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
 		}
+		public function get centerNotScaled():Vector3D 					{ return _centerNotScaled };
 				
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Scale
@@ -52,13 +53,13 @@ package com.voxelengine.worldmodel.models
 		public function 	scaleSetComp( $x:Number, $y:Number, $z:Number ):void { 
 			_changed = true;
 			_scale.setTo( $x, $y, $z ); 
-			_center.setTo( _centerConst.x * $x, _centerConst.y * $y, _centerConst.z * $z );
+			_center.setTo( _centerNotScaled.x * $x, _centerNotScaled.y * $y, _centerNotScaled.z * $z );
 		}
 		public function set scale($val:Vector3D):void 			{ 
 			_changed = true;
 			_scale.setTo( $val.x, $val.y, $val.z ); 
-			_center.setTo( _centerConst.x * $val.x, _centerConst.y * $val.y, _centerConst.z * $val.z );
-			//Log.out( "set scale - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerConst );
+			_center.setTo( _centerNotScaled.x * $val.x, _centerNotScaled.y * $val.y, _centerNotScaled.z * $val.z );
+			//Log.out( "set scale - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
 		}
 				
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +163,7 @@ package com.voxelengine.worldmodel.models
 			if ( changed || force )
 			{
 				_modelMatrix.identity();
-				//Log.out( "recalculateMatrix - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerConst );
+				//Log.out( "recalculateMatrix - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
 				
 				_modelMatrix.prependRotation( rotationGet.x, Vector3D.X_AXIS, _center );
 				_modelMatrix.prependRotation( rotationGet.y,  Vector3D.Y_AXIS, _center );
@@ -272,8 +273,11 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		public function setCenterInfo( json:Object ):void {
-			if ( json.center )
+			if ( json.center ) {
+				Log.out( "setCenterInfo center x: " + json.center.x + "  y: " + json.center.y  + "  z: " +  json.center.z, Log.WARN );
+
 				centerSetComp( json.center.x, json.center.y, json.center.z );
+			}
 
 		}
 		

@@ -159,8 +159,9 @@ public class InstanceInfo extends Location	{
 	
 	public function getJSON():Object 
 	{ 
+		Log.out( "InstanceInfo.getJSON center: " + center, Log.WARN );
 		return {
-				center: 		center,
+				center: 		centerNotScaled, // the non scaled center
 				collision:		_usesCollision,
 				collidable:     _collidable,
 				critical:     	_critical,
