@@ -52,6 +52,7 @@ public class ModelMakerGenerate {
 		_vmm.owner = Network.userId;
 		_vmm.modifiedDate = new Date();
 		
+		// This is a special case for modelInfo, the modelInfo its self is contained in the generate script
 		_vmi = new ModelInfo();
 		var functionClass:* = TaskLibrary.getAsset( $ii.modelGuid );
 		var json:Object = functionClass.script();

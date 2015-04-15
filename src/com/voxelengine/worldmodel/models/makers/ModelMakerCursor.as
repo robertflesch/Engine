@@ -83,16 +83,7 @@ public class ModelMakerCursor extends ModelMakerBase {
 			return null;
 		}
 		
-		// how many bytes is the modelInfo
-		var strLen:int = ba.readInt();
-		// read off that many bytes
-		var modelInfoJson:String = ba.readUTFBytes( strLen );
-		
-		// create the modelInfo object from embedded metadata
-		modelInfoJson = decodeURI(modelInfoJson);
-		var jsonResult:Object = JSON.parse(modelInfoJson);
-		var mi:ModelInfo = new ModelInfo();
-		mi.initJSON( _vmd.modelGuid, jsonResult );
+		var mi:ModelInfo = modelInfoFromByteArray( ba );
 		
 		var vm:* = instantiate( _ii, mi, _vmm, ba, versionInfo );
 		if ( vm ) {

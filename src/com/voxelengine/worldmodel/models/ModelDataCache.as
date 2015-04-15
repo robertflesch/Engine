@@ -82,7 +82,7 @@ public class ModelDataCache
 		}
 		// check to make sure this is new data
 		if ( null ==  _modelData[$md.modelGuid] ) {
-Log.out( "ModelDataCache.add adding: $md.modelGuid" , Log.WARN );
+Log.out( "ModelDataCache.add adding: " + $md.modelGuid, Log.WARN );
 			_modelData[$md.modelGuid] = $md; 
 			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.ADDED, $series, $md.modelGuid, $md ) );
 		}

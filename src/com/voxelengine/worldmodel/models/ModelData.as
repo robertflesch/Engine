@@ -57,15 +57,15 @@ public class ModelData
 		_compressedBA = ba;
 		_compressedBA.compress();
 		if ( Globals.online ) {
-			Log.out( "ModelData.save - Saving Model Metadata: " + modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
+			//Log.out( "ModelData.save - Saving Model Metadata: " + modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
 			addSaveEvents();
-			Log.out( "ModelData.save ============= data size: " + _compressedBA.length + " bytes ==================  ", Log.WARN );
+			//Log.out( "ModelData.save ============= data size: " + _compressedBA.length + " bytes ==================  ", Log.WARN );
 			if ( _dbo ) {
-				Log.out( "ModelData.save dbo found: " + modelGuid, Log.WARN );
+				//Log.out( "ModelData.save dbo found: " + modelGuid, Log.WARN );
 				toPersistance();
 			}
 			else {
-				Log.out( "ModelData.save NO NO NO dbo found: " + modelGuid, Log.WARN );
+				//Log.out( "ModelData.save NO NO NO dbo found: " + modelGuid, Log.WARN );
 				var obj:Object = toObject();
 			}
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS_DATA, modelGuid, _dbo, obj ) );
@@ -92,7 +92,7 @@ public class ModelData
 		if ( Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "ModelData.saveSucceed - save: " + modelGuid, Log.DEBUG ); 
+		//Log.out( "ModelData.saveSucceed - save: " + modelGuid, Log.DEBUG ); 
 	}	
 	
 	private function createSucceed( $pe:PersistanceEvent ):void { 
@@ -100,7 +100,7 @@ public class ModelData
 			return;
 		if ( $pe.dbo ) {
 			_dbo = $pe.dbo;
-			Log.out( "ModelData.createSuccess - created: " + modelGuid + "  DBO FOUND", Log.DEBUG ); 
+			//Log.out( "ModelData.createSuccess - created: " + modelGuid + "  DBO FOUND", Log.DEBUG ); 
 		}
 		else
 			Log.out( "ModelData.createSuccess - created: " + modelGuid + "  NO NO NO DBO FOUND <<<<<<<<<<<<<<<<<<<<<<<<<<", Log.DEBUG ); 

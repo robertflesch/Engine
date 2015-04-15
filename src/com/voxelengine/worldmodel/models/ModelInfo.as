@@ -105,7 +105,7 @@ package com.voxelengine.worldmodel.models
 		public function childAdd( $instanceInfo:InstanceInfo):void {
 			// Dont add child that already exist
 			
-			Log.out( "ModelInfo.childAdd  fileName: " + fileName + "  ii: " + $instanceInfo, Log.WARN );
+			Log.out( "ModelInfo.childAdd  fileName: " + fileName + " child ii: " + $instanceInfo, Log.WARN );
 			
 			for each ( var child:InstanceInfo in _children ) {
 				if ( child === $instanceInfo ) {

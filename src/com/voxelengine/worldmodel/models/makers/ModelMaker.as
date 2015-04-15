@@ -66,7 +66,7 @@ public class ModelMaker extends ModelMakerBase {
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
 		if ( null != _vmm && null != _vmd ) {
-			//Log.out( "ModelMaker.attemptMake - ii: " + _ii.toString() );
+			Log.out( "ModelMaker.attemptMake - ii: " + _ii.toString() );
 			///////////////////////////////////////
 			var ba:ByteArray = new ByteArray();
 			ba.writeBytes( _vmd.compressedBA, 0, _vmd.compressedBA.length );
@@ -84,16 +84,7 @@ public class ModelMaker extends ModelMakerBase {
 				return;
 			}
 			
-			// how many bytes is the modelInfo
-			var strLen:int = ba.readInt();
-			// read off that many bytes
-			var modelInfoJson:String = ba.readUTFBytes( strLen );
-			
-			// create the modelInfo object from embedded metadata
-			modelInfoJson = decodeURI(modelInfoJson);
-			var jsonResult:Object = JSON.parse(modelInfoJson);
-			var mi:ModelInfo = new ModelInfo();
-			mi.initJSON( _vmd.modelGuid, jsonResult );
+			var mi:ModelInfo = modelInfoFromByteArray( ba );
 			
 			var vm:* = instantiate( _ii, mi, _vmm, ba, versionInfo );
 			if ( vm ) {

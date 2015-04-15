@@ -173,7 +173,7 @@ public class ModelMakerBase {
 	}
 	
 	static public function load( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true, $prompt:Boolean = true ):void {
-		//Log.out( "ModelMakerBase.load ii: " + $ii.toString() );
+		Log.out( "ModelMakerBase.load ii: " + $ii.toString() );
 		if ( !Globals.isGuid( $ii.modelGuid ) )
 			if ( Globals.online )
 				new ModelMakerImport( $ii, $prompt );
@@ -183,6 +183,21 @@ public class ModelMakerBase {
 			new ModelMaker( $ii, $addToRegionWhenComplete );
 	}
 
+	protected function modelInfoFromByteArray( $ba:ByteArray ):ModelInfo {
+
+		// how many bytes is the modelInfo
+		var strLen:int = $ba.readInt();
+		// read off that many bytes
+		var modelInfoJson:String = $ba.readUTFBytes( strLen );
+Log.out( "ModelMakerBase.modelInfoFromByteArray - STRING modelInfo: " + modelInfoJson,	Log.WARN );
+		// create the modelInfo object from embedded metadata
+		modelInfoJson = decodeURI(modelInfoJson);
+		var jsonResult:Object = JSON.parse(modelInfoJson);
+		var mi:ModelInfo = new ModelInfo();
+		mi.initJSON( _vmd.modelGuid, jsonResult );
+		return mi;		
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	static public function makerCountGet():int 

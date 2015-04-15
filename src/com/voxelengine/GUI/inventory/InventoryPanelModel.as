@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.inventory {
 
 import com.voxelengine.events.ModelDataEvent;
+import com.voxelengine.events.ModelEvent;
 import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
@@ -160,7 +161,7 @@ public class InventoryPanelModel extends VVContainer
 	private function addModelMetadataEvent($mme:ModelMetadataEvent):void {
 		
 		// I only want the results from the series I asked for
-		if ( _seriesModelMetadataEvent == $mme.series ) {
+		if ( _seriesModelMetadataEvent == $mme.series || 0 == $mme.series ) {
 			var om:ObjectModel = new ObjectModel( null, $mme.modelGuid );
 			om.vmm = $mme.vmm;
 			addModel( om );

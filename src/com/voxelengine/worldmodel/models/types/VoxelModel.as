@@ -214,6 +214,7 @@ public class VoxelModel
 				// Since this is a child object, it automatically get added to the parent.
 				// So add to cache just adds it to parent instance.
 				//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
+				Log.out( "VoxelModel.childrenLoad - calling load on ii: " + childInstanceInfo );
 				ModelMakerBase.load( childInstanceInfo, true, false );
 			}
 			Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + _metadata.name );
@@ -231,8 +232,8 @@ public class VoxelModel
 		for each ( var vm:VoxelModel in _children ) {
 			if ( vm is Player )
 				continue;
+			Log.out( "VoxelModel.getChildJSON - name: " + metadata.name + "  modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
 			oa.push( vm.instanceInfo.buildExportObject() );
-			Log.out( "VoxelModel.getChildJSON  - my modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
 		}
 		return oa;
 	}
@@ -819,7 +820,7 @@ public class VoxelModel
 		// remove parent level model
 		Region.currentRegion.modelCache.changeFromParentToChild( $child);
 		_children.push( $child);
-		// $child.instanceInfo.baseLightLevel = instanceInfo.baseLightLevel;
+		$child.instanceInfo.baseLightLevel = instanceInfo.baseLightLevel;
 	}
 	
 	public function childRemoveByInstanceInfo( $instanceInfo:InstanceInfo ):void {
@@ -990,7 +991,6 @@ public class VoxelModel
 		changed = true;
 	}
 	
-	// Force save is used ONLY when creating instances from templates.
 	public function save():void
 	{
 		for ( var i:int; i < _children.length; i++ ) {
@@ -999,7 +999,7 @@ public class VoxelModel
 		}
 		
 		if ( !changed ) {
-			Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.modelGuid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
+			//Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.modelGuid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 			return;
 		}
 		if ( !Globals.online ) {
@@ -1074,12 +1074,8 @@ public class VoxelModel
 			$ba.writeByte(Globals.MANIFEST_VERSION);
 			var obj:Object = new Object();
 			obj = buildExportObject( obj );
-			//var json:String = "{" ;
-			//json += addClassJson();
-			//json +=  "}"
-//Log.out( "VoxelModel.writeManifest - jsonData: " + json, Log.WARN );				
-			//json = encodeURI( json );
 			var json:String = JSON.stringify( obj );
+Log.out( "VoxelModel.writeManifest json: " + json );			
 			$ba.writeInt( json.length );
 			$ba.writeUTFBytes( json );
 		}

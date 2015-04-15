@@ -198,7 +198,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "ModelMetadata.saveFail - ", Log.ERROR ); 
+		Log.out( "ModelMetadata.saveFail modelGuid: " + modelGuid, Log.ERROR ); 
 	}	
 
 	
