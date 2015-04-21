@@ -37,6 +37,7 @@ import com.voxelengine.worldmodel.models.ModelInfo;
 public class ModelMakerImport extends ModelMakerBase {
 	
 	private var _vmi:ModelInfo;
+	private var _vmiFailed:Boolean;
 	private var _vmm:ModelMetadata;
 	private var _prompt:Boolean;
 	
@@ -79,6 +80,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	private function failedInfo( $mie:ModelInfoEvent ):void {
 		if ( _ii.modelGuid == $mie.modelGuid ) {
 			Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
+			_vmiFailed = true;
 			markComplete(false);
 		}
 	}
@@ -170,6 +172,9 @@ public class ModelMakerImport extends ModelMakerBase {
 			Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + _vmi.biomes.toString(), Log.WARN );
 			return;
 		}
+		if ( false == $success && false == _vmiFailed )
+			return; // wait for vmi to fail or succeed
+		
 		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retrivedInfo );		
 		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retrivedInfo );		
 		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
