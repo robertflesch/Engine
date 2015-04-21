@@ -228,11 +228,20 @@ package com.voxelengine.worldmodel.models
 			if ( modelInfoJson.modelClass )
 				_modelClass = modelInfoJson.modelClass;
 
+			// This is an artifact from the old mjson files, new system saves all as "scripts"
 			if ( modelInfoJson.script ) {
 				for each ( var scriptObject:Object in modelInfoJson.script ) {
 					if ( scriptObject.name ) {
 						//trace( "ModelInfo.init - Model GUID:" + fileName + "  adding script: " + scriptObject.name );
 						_scripts.push( scriptObject.name );
+					}
+				}
+			}
+			if ( modelInfoJson.scripts ) {
+				for each ( var so:Object in modelInfoJson.scripts ) {
+					if ( so.name ) {
+						//trace( "ModelInfo.init - Model GUID:" + fileName + "  adding script: " + scriptObject.name );
+						_scripts.push( so.name );
 					}
 				}
 			}
