@@ -47,7 +47,6 @@ public class ControllableVoxelModel extends VoxelModel
 	static protected    const DEFAULT_CLIP_VELOCITY:int		= 95;
 	static protected    const DEFAULT_FALL_RATE:int			= 5;
 	static protected    const DEFAULT_SPEED_MAX:int			= 15;
-	static protected    const DEFAULT_SPEED_X:Number		= 0.5;
 	static protected    const DEFAULT_TURN_RATE:Number		= 20;
 	static protected    const DEFAULT_ACCEL_RATE:Number		= 0.5;
 	
@@ -63,9 +62,8 @@ public class ControllableVoxelModel extends VoxelModel
 	protected var _leaveTrail:Boolean 						= false
 	protected var _forward:Boolean 							= false
 
-	private var		_maxFallRate:SecureNumber 				= new SecureNumber( DEFAULT_FALL_RATE );
-	private var   	_maxSpeed:SecureNumber 					= new SecureNumber( DEFAULT_SPEED_MAX );
-	private var   	_speedMultiplier:Number 				= DEFAULT_SPEED_X;
+	protected var _maxFallRate:SecureNumber 				= new SecureNumber( DEFAULT_FALL_RATE );
+	protected var _maxSpeed:SecureNumber 					= new SecureNumber( DEFAULT_SPEED_MAX );
 	
 	private var 	_lastCollisionModel:VoxelModel; 											// INSTANCE NOT EXPORTED
 	// This should be at the controllable model leve			
@@ -83,10 +81,8 @@ public class ControllableVoxelModel extends VoxelModel
 	public function get		lastCollisionModel():VoxelModel 		{ return _lastCollisionModel; }
 	public function set		lastCollisionModel(val:VoxelModel):void { _lastCollisionModel = val; }
 	public function 		lastCollisionModelReset():void 				{ _lastCollisionModel = null; }
-	public function get 	mMaxSpeed():Number 						{ return (_maxSpeed.val * _speedMultiplier); }
-	public function set 	mMaxSpeed($value:Number):void 			{ _maxSpeed.val = $value; }
-	protected function get 	mSpeedMultiplier():Number 				{ return _speedMultiplier; }
-	protected function set 	mSpeedMultiplier($value:Number):void	{ _speedMultiplier = $value; }
+	public function get 	maxSpeed():Number 						{ return _maxSpeed.val; }
+	public function set 	maxSpeed($value:Number):void 			{ _maxSpeed.val = $value; }
 	protected function get 	mMaxFallRate():Number 					{ return _maxFallRate.val; }
 	protected function set 	mMaxFallRate($value:Number):void 		{ _maxFallRate.val = $value; }
 	
@@ -128,7 +124,7 @@ public class ControllableVoxelModel extends VoxelModel
 				
 			if ( cmInfo.maxSpeed )
 			{
-				mMaxSpeed = cmInfo.maxSpeed;
+				maxSpeed = cmInfo.maxSpeed;
 			}
 				
 		}
@@ -140,7 +136,7 @@ public class ControllableVoxelModel extends VoxelModel
 		super.buildExportObject( obj )
 		obj.controllableVoxelModel = new Object();
 		obj.controllableVoxelModel.clipFactor = clipVelocityFactor * 100;
-		obj.controllableVoxelModel.maxSpeed = mMaxSpeed;
+		obj.controllableVoxelModel.maxSpeed = maxSpeed;
 	}
 	
 	override protected function internal_update($context:Context3D, $elapsedTimeMS:int):void {
@@ -579,7 +575,7 @@ public class ControllableVoxelModel extends VoxelModel
 			
 			// Add in movement factors
 			if ( MouseKeyboardHandler.forward )	{ 
-				if ( instanceInfo.velocityGet.length < mMaxSpeed ) {
+				if ( instanceInfo.velocityGet.length < maxSpeed ) {
 					instanceInfo.velocitySetComp( vel.x, vel.y, vel.z + speedVal ); 
 					changed = true; 
 					mForward = true; 
@@ -619,7 +615,7 @@ public class ControllableVoxelModel extends VoxelModel
 			instanceInfo.velocityScaleBy( $clipFactor );
 		else
 		{
-			if ( instanceInfo.velocityGet.length < mMaxSpeed ) 				
+			if ( instanceInfo.velocityGet.length < maxSpeed ) 				
 				instanceInfo.velocityScaleBy( $clipFactor );
 		}
 		

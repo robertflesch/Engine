@@ -309,6 +309,7 @@ package com.voxelengine.worldmodel.models
 				_animationCount--;
 				if ( 0 == _animationCount ) {
 					_owner.animationsLoaded = true;
+					Log.out( "ModelInfo.addAnimation calling save on owner: " + _owner.metadata.name, Log.WARN );
 					_owner.save();
 				}
 			}
@@ -318,7 +319,7 @@ package com.voxelengine.worldmodel.models
 			
 			for each ( var animData:Object in _animationInfo ) {
 				// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $aniType:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
-				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, _modelGuid, animData.name, animData.type, null ) );
+				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, _modelGuid, animData.guid, animData.type, null ) );
 			}
 		}
 	}

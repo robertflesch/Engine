@@ -38,6 +38,11 @@ package com.voxelengine.worldmodel.models.types
 		private var _stallSpeed:SecureNumber = new SecureNumber( 2 );
 		
 		protected var _seatLocation:Vector3D =  new Vector3D( 8, 12, 13 );
+		
+		static protected    const DEFAULT_SPEED_X:Number		= 0.5;
+		private var   	_speedMultiplier:Number 				= DEFAULT_SPEED_X;
+		protected function get 	mSpeedMultiplier():Number 				{ return _speedMultiplier; }
+		protected function set 	mSpeedMultiplier($value:Number):void	{ _speedMultiplier = $value; }
 
 		public function get mClimbRate():Number  				{ return _climbRate.val; }
 		public function set mClimbRate($value:Number):void  	{ _climbRate.val = $value; }

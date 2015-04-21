@@ -66,6 +66,7 @@ package com.voxelengine.worldmodel.models
 		}
 
 		public function save():void {
+			Log.out( "ModelCache.save - Saving all models", Log.WARN );
 			if ( false == Globals.online || false == Globals.inRoom )
 				return;
 			

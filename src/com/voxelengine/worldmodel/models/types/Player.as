@@ -62,6 +62,13 @@ public class Player extends Avatar
 	static private const 	AVATAR_CLIP_FACTOR:Number 	= 0.90;
 	static private var  	STEP_UP_MAX:int 			= 16;
 	
+	static protected    const DEFAULT_SPEED_X:Number		= 0.5;
+	private var   	_speedMultiplier:Number 				= DEFAULT_SPEED_X;
+	protected function get 	mSpeedMultiplier():Number 				{ return _speedMultiplier; }
+	protected function set 	mSpeedMultiplier($value:Number):void	{ _speedMultiplier = $value; }
+	
+	override public function get 	maxSpeed():Number 						{ return (_maxSpeed.val * _speedMultiplier); }
+
 	
 	public function Player( instanceInfo:InstanceInfo ) { 
 		Log.out( "Player.construct instanceGuid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );

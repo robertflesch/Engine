@@ -66,16 +66,9 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 		// remove from inventory panel
 		_removeModelFunction( _modelGuid );
 		
-		// Let MetadataCache handle the recursive delete
-		if ( _cb.selected )
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.DELETE_RECURSIVE, 0, _modelGuid, null ) );
-		else
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
-		remove();
-		
 		// remove inventory
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.DELETE, _modelGuid, null ) );
-		// remove animations
+		// request the ModelData so that we can get the modelInfo from it.
 		ModelDataEvent.addListener( ModelBaseEvent.RESULT, dataResult );
 		ModelDataEvent.addListener( ModelBaseEvent.ADDED, dataResult );
 		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
@@ -88,6 +81,7 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 	
 	private function dataResult(e:ModelDataEvent):void 
 	{
+		// Now that we have the modelData, we can extract the modelInfo
 		ModelDataEvent.removeListener( ModelBaseEvent.RESULT, dataResult );
 		ModelDataEvent.removeListener( ModelBaseEvent.ADDED, dataResult );
 		// So I need to extract the animation data.
@@ -99,8 +93,16 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 		// dont care, just need to step up the correct number of bytes
 		ModelMakerBase.modelMetaInfoRead( ba );
 		var mi:ModelInfo = ModelMakerBase.modelInfoFromByteArray( e.modelGuid, ba );
+		// now tell the modelData to remove all of the guids associated with this model.
 		mi.deleteAnimations();
 
+		// Let MetadataCache handle the recursive delete
+		if ( _cb.selected )
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.DELETE_RECURSIVE, 0, _modelGuid, null ) );
+		else
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
+		remove();
+		
 	}
 }
 }

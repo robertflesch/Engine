@@ -44,7 +44,7 @@ public class AnimationCache
 		var ani:Animation;
 		if ( modelAnis ) {
 			ani = modelAnis[$ae.aniGuid];
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.DB_TABLE_ANIMATIONS, $ae.aniGuid ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.DB_TABLE_ANIMATIONS, $ae.aniGuid, ani.metadata.dbo ) );
 			ani = null;
 			// TODO need to clean up eventually
 		}

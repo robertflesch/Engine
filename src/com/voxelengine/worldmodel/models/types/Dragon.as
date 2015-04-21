@@ -177,7 +177,7 @@ public class Dragon extends Beast
 			
 			// Add in movement factors
 			if ( MouseKeyboardHandler.forward )	{ 
-				if ( instanceInfo.velocityGet.length < mMaxSpeed )
+				if ( instanceInfo.velocityGet.length < maxSpeed )
 				{
 					instanceInfo.velocitySetComp( 0, 0, vel.z + speedVal ); 
 					changed = true; 
@@ -217,7 +217,7 @@ public class Dragon extends Beast
 			instanceInfo.velocityScaleBy( $clipFactor );
 		else
 		{
-			if ( instanceInfo.velocityGet.length < mMaxSpeed ) 				
+			if ( instanceInfo.velocityGet.length < maxSpeed ) 				
 				instanceInfo.velocityScaleBy( $clipFactor );
 		}
 		
