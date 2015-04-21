@@ -84,11 +84,12 @@ public class ModelMaker extends ModelMakerBase {
 				return;
 			}
 			
-			var mi:ModelInfo = modelInfoFromByteArray( ba );
+			var mi:ModelInfo = modelInfoFromByteArray( _vmd.modelGuid, ba );
 			
 			var vm:* = instantiate( _ii, mi, _vmm, ba, versionInfo );
 			if ( vm ) {
 				vm.data = _vmd;
+				vm.modelInfo.loadAnimations( vm );
 			}
 			
 			markComplete();

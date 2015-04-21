@@ -14,6 +14,7 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.worldmodel.biomes.Biomes;
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import flash.sampler.NewObjectSample;
 	import flash.utils.ByteArray;
@@ -27,15 +28,18 @@ package com.voxelengine.worldmodel.models
 		private var _fileName:String 					= "INVALID";				// Used for local loading and import of data from local file system
 		private var _biomes:Biomes;													// used to generate terrain and apply other functions to oxel
 		private var _modelClass:String 					= "VoxelModel";				// Class used to instaniate model
+		private var _modelGuid:String;                                              // Assigned after object is created                   
 		private var _children:Vector.<InstanceInfo> 	= new Vector.<InstanceInfo>;// Child models and their relative positions
 		private var _scripts:Vector.<String> 			= new Vector.<String>;		// Default scripts to be used with this model
 		private var _grainSize:int = 0;												// Used in model generatation
 		private var _modelJson:Object;												// copy of json object used to create this
 		private var _animations:Vector.<Animation> 		= new Vector.<Animation>();	// Animations that this model has
+		private var _animationInfo:Vector.<Object> 		= new Vector.<Object>();	// ID and name of animations that this model has, before loading
 		private var _childCount:int // number of children this model has at start. Used to determine if animation can be played.
+		private var _owner:VoxelModel;
+		private var _animationCount:int;
 		
 		public function get json():Object 						{ return _modelJson; }
-		public function 	jsonReset():void 					{ _modelJson = toJSON(null); }
 		public function get fileName():String 					{ return _fileName; }
 		public function set fileName(val:String):void 			{ _fileName = val; }
 		public function get biomes():Biomes 					{ return _biomes; }
@@ -50,6 +54,8 @@ package com.voxelengine.worldmodel.models
 		public function get childCount():int 					{ return _childCount; }
 		
 		public function set biomes(value:Biomes):void  			{ _biomes = value; }
+		
+		private function get owner():VoxelModel { return _owner; }
 
 		public function ModelInfo():void  { ; }
 		
@@ -59,8 +65,19 @@ package com.voxelengine.worldmodel.models
 			return false;
 		}
 		
+		public function release():void {
+			_owner = null
+			_biomes = null;
+			_children = null;
+			_scripts = null;
+			_modelJson = null;
+			_animations = null;
+			_animationInfo = null;
+		}
+		
 		public function clone( newGuid:String = "" ):ModelInfo
 		{
+			throw new Error( "ModelInfo.clone - what context is this used in?" );
 			var newModelInfo:ModelInfo = new ModelInfo();
 			//if ( "" == newGuid )
 				//newModelInfo.fileName 			= Globals.getUID();
@@ -127,41 +144,62 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
-		public function buildExportObject( obj:Object ):Object {
-			return toJSON(obj);
-		}
-		
-		// this is called by the stringify method
-		public function toJSON(k:*):*  { 
-			return {
-					animations:		_animations,
-//					biomes:			_biomes,
-					children:		"REPLACE_ME",
-					grainSize:		_grainSize,
-					modelClass:		_modelClass,
-					script:			modelsScriptOnly()
-					};
+		public function buildExportObject( obj:Object ):void {
+			obj.model = new Object();
+			animationsGet( obj.model );
+//			biomes:			_biomes,      // Biomes are only used in object generation, once the object has been completed they are removed.
+//					children:		"REPLACE_ME",
+			if ( _grainSize )
+				obj.model.grainSize =  _grainSize,
+			obj.model.modelClass = _modelClass,
+			modelsScriptOnly( obj.model );
+			
+					
+			function animationsGet( obj:Object ):void {
+				
+				var len:int = _animations.length;
+				var oa:Vector.<Object> = new Vector.<Object>();
+				for ( var index:int; index < len; index++ ) {
+					var ao:Object = new Object();
+					ao.name = _animations[index].metadata.name;
+					ao.type = _animations[index].metadata.aniType;
+					ao.guid = _animations[index].metadata.guid;
+					Log.out( "ModelInfo.animationsGet - animation.metadata: " + _animations[index].metadata );
+					oa.push( ao );
+				}
+				
+				if ( 0 < oa.length )
+					obj.animations = oa;
+				else
+					oa = null;
+			}
+			
+			function modelsScriptOnly( obj:Object ):void {
+				
+				var oa:Vector.<Object> = new Vector.<Object>();
+				var len:int = _scripts.length;
+				for ( var index:int; index < len; index++ ) {
+					var so:Object = new Object();
+					so.name = _scripts[index];
+					Log.out( "ModelInfo.modelsScriptOnly - script: " + _scripts[index] );
+					oa.push( so );
+				}
+				if ( 0 < oa.length )
+					obj.scripts = oa;
+				else
+					oa = null;
+			}
 		} 	
 		
-		private function modelsScriptOnly():Vector.<Object> {
-			
-			var oa:Vector.<Object> = new Vector.<Object>();
-			var len:int = _scripts.length;
-			for ( var index:int; index < len; index++ ) {
-				var so:Object = new Object();
-				so.name = _scripts[index];
-				Log.out( "ModelInfo.modelsScriptOnly - script: " + _scripts[index] );
-				oa.push( so );
-			}
-			return oa;
-		}
-		
-		
+		// remove the children after they are loaded, so that when the object is saved
+		// the active children from the voxel model are used.
+		// Applies to the "REPLACE_ME" above
 		public function childrenReset():void {
 			_children = null;
 			_childCount = 0;
 		}
 		
+		// From JSON to modelInfo
 		public function initJSON( $modelGuid:String, $json:Object ):void  {
 			
 			//Log.out( "ModelInfo.init - fileName: " + $modelGuid + "  $json: " + JSON.stringify( $json.model ) );
@@ -226,20 +264,61 @@ package com.voxelengine.worldmodel.models
 			}
 			
 			if ( modelInfoJson.animations ) {
-				//Log.out( "ModelInfo.init - animations found" );
+				Log.out( "ModelInfo.init - animations found" );
 				var animationsObj:Object = modelInfoJson.animations;
+				
 				// i.e. animData = { "name": "Glide", "type": "state OR action", "guid":"Glide.ajson" }
-				for each ( var animData:Object in animationsObj )		   
-				{
-					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST, 0, $modelGuid, animData.name, null, false ) );
-					/*
-					var animation:Animation = new Animation();
-//					throw new Error( "ModelInfo.initJSON - This needs to be modified to load the animation from persistance" );
-					animation.loadFromLocalFile( animData, modelClass );
-					// This adds the instanceInfo for the child models to our child list which is processed when object is initialized
-					_animations.push( animation )
-					*/
+				for each ( var animData:Object in animationsObj ) {
+					Log.out( "ModelInfo.init - _animationInfo.push animData: " + animData );	
+					_animationInfo.push( animData );
 				}
+			}
+		}
+		
+		// Dont load the animations until the model is instaniated
+		public function loadAnimations( $owner:VoxelModel ):void {
+			_owner = $owner;
+			_modelGuid = $owner.instanceInfo.modelGuid;
+			if ( 0 == _animationInfo.length ) {
+				owner.animationsLoaded = true;
+				return;
+			}
+				
+			AnimationEvent.addListener( ModelBaseEvent.ADDED, addAnimation );
+			for each ( var animData:Object in _animationInfo ) {
+				_animationCount++; 
+				
+				// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $aniType:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+				var ae:AnimationEvent;
+				if ( Globals.isGuid( animData.guid ) )
+					ae = new AnimationEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, animData.guid, animData.type, null, true );
+				else
+					ae = new AnimationEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, animData.name, animData.type, null, false );
+					
+				_series = ae.series;
+				AnimationEvent.dispatch( ae );
+			}
+		}
+				
+		private var _series:int
+		public function addAnimation( $ae:AnimationEvent ):void {
+			Log.out( "ModelInfo.addAnimation $ae: " + $ae, Log.WARN );
+			if ( _series == $ae.series ) {
+				$ae.ani.metadata.modelGuid = _modelGuid;
+				_animations.push( $ae.ani );
+				_animationCount--;
+				if ( 0 == _animationCount ) {
+					_owner.animationsLoaded = true;
+					_owner.save();
+				}
+			}
+		}
+		
+		public function deleteAnimations():void {
+			
+			for each ( var animData:Object in _animationInfo ) {
+				// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $aniType:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, _modelGuid, animData.name, animData.type, null ) );
 			}
 		}
 	}

@@ -26,6 +26,7 @@ public class AnimationMetadata
 	static private const INVALID:String = "INVALID"
 	private var _name:String 		= INVALID;
 	private var _guid:String 		= INVALID;
+	private var _aniType:String 	= INVALID;
 	private var _description:String = INVALID;
 	private var _owner:String 		= INVALID;
 	private var _dbo:DatabaseObject;
@@ -37,10 +38,12 @@ public class AnimationMetadata
 
 	////////////
 	public function get name():String { return _name; }
+	public function get aniType():String { return _aniType; }
 	public function get guid():String { return _guid; }
 	public function set guid( $val:String):void { _guid = $val; }
 	public function get modelGuid():String { return _modelGuid; }
 	public function set modelGuid( $val:String):void { _modelGuid = $val; }
+	public function get modelClass():String { return _modelClass; }
 	public function get description():String { return _description; }
 	public function get owner():String { return _owner; }
 	public function get dbo():DatabaseObject { return _dbo; }
@@ -49,20 +52,22 @@ public class AnimationMetadata
 	public function AnimationMetadata() {
 	}
 	
-	public function fromImport( $guid:String, $modelGuid:String ):void {
+	public function fromImport( $guid:String, $aniType:String ):void {
 		_name = $guid;
+		_aniType = $aniType;
 		_description = $guid + " - IMPORTED";
-		guid = Globals.getUID();
+		_guid = Globals.getUID();
 		_owner = Network.userId;
-		if ( "Dragon" == $modelGuid )
-			_modelClass = Animation.MODEL_DRAGON_9;
-		else if ( "Player" == $modelGuid )
-			_modelClass	= Animation.MODEL_BIPEDAL_10;
-		else if ( "Propeller" == $modelGuid )
-			_modelClass	= Animation.MODEL_PROPELLER;
+		//if ( "Dragon" == $modelGuid )
+Log.out( "AnimationMetadata.fromImport - SETTING MODEL CLASS TO Animation.MODEL_DRAGON_9", Log.WARN );
+_modelClass = Animation.MODEL_DRAGON_9;
+		//else if ( "Player" == $modelGuid )
+			//_modelClass	= Animation.MODEL_BIPEDAL_10;
+		//else if ( "Propeller" == $modelGuid )
+			//_modelClass	= Animation.MODEL_PROPELLER;
 		
 		//	Do I want model NAME or GUID?
-		_modelGuid = $modelGuid;
+//		_modelGuid = $modelGuid;
 		_modifiedDate = new Date();
 	}
 
@@ -87,11 +92,9 @@ public class AnimationMetadata
 	
 	public function toObject( $ba:ByteArray ):Object {
 		
-		try {  $ba.compress(); }
-		catch (error:Error) { ; }
-
 		var metadataObj:Object =   { name: 			_name
 								   , description: 	_description
+								   , aniType: 		_aniType
 								   , owner: 		_owner
 								   , modifiedDate: 	_modifiedDate
 								   , modelClass:	 _modelClass
@@ -138,11 +141,9 @@ public class AnimationMetadata
 	}	
 
 	public function toPersistance( $ba:ByteArray ):void {
-		try { $ba.compress(); }
-		catch (error:Error) { ; }
-		
 		_dbo.name 			= _name;
 		_dbo.description	= _description;
+		_dbo.aniType		= _aniType
 		_dbo.owner			= _owner;
 		_dbo.modifiedDate   = new Date();
 		_dbo.modelClass 	= _modelClass;
@@ -160,11 +161,13 @@ public class AnimationMetadata
 		
 		_name 			= $dbo.name;
 		_description	= $dbo.description;
+		_aniType		= $dbo.aniType;
 		_owner			= $dbo.owner;
 		_modifiedDate   = $dbo.modifiedDate;
-		_modelGuid 		= $dbo.key;
+		_modelGuid 		= $dbo.modelGuid;
 		_modelClass		= $dbo.modelClass;
 		_world			= $dbo.world;
+		_guid			= $dbo.key;
 		_dbo			= $dbo;
 						
 		_permissions.fromPersistance( $dbo );

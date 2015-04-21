@@ -380,8 +380,8 @@ package com.voxelengine.worldmodel
 				// or could do this in the suceed, but if it fails do I want to keep retrying?
 				changed = false;
 			}
-			else
-				Log.out( "Region.save FAILED CONDITION - online:" + Globals.online + "  changed:" + changed + "  owner:" + owner + "  locked:" + _lockDB + "  name: " + name + "  - guid: " + guid, Log.DEBUG );
+//			else
+//				Log.out( "Region.save FAILED CONDITION - online:" + Globals.online + "  changed:" + changed + "  owner:" + owner + "  locked:" + _lockDB + "  name: " + name + "  - guid: " + guid, Log.DEBUG );
 		}
 		
 		private function saveSucceed( $pe:PersistanceEvent ):void { 
@@ -437,9 +437,9 @@ package com.voxelengine.worldmodel
 			_dbo.data 			= asByteArray( ba );
 		}
 		
-		public function buildExportObject( obj:Object ):Object {
+		public function buildExportObject( obj:Object ):void {
 			if ( _modelCache ) {
-				obj.models = _modelCache.buildExportObject();
+				_modelCache.buildExportObject( obj );
 			}
 			else {
 				// If the region has not been loaded yet, just copy the props over.
@@ -450,13 +450,12 @@ package com.voxelengine.worldmodel
 			obj.playerPosition = _playerPosition;
 			obj.playerRotation = _playerRotation;
 			obj.gravity = gravity;
-			return obj;
 		}
 
 
 		public function asByteArray( $ba:ByteArray ):ByteArray {
 			var obj:Object = new Object();
-			obj = buildExportObject( obj );
+			buildExportObject( obj );
 			var json:String = JSON.stringify( obj );
 			$ba.writeInt( json.length );
 			$ba.writeUTFBytes( json );

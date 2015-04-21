@@ -33,22 +33,36 @@ public class InventoryManager
 		InventoryEvent.addListener( InventoryEvent.UNLOAD_REQUEST, unloadInventory );
 		InventoryEvent.addListener( InventoryEvent.REQUEST, requestInventory );
 		InventoryEvent.addListener( InventoryEvent.SAVE_REQUEST, save );
+		InventoryEvent.addListener( InventoryEvent.DELETE, deleteInventory );
 	}
 
+
 	static private function save( e:InventoryEvent ):void {
-		for each ( var inventory:Inventory in _s_inventoryByGuid )
-			if ( null != inventory && inventory.owner != "Player" )
-				inventory.save();
+		if ( Globals.online ) {
+			for each ( var inventory:Inventory in _s_inventoryByGuid )
+				if ( null != inventory && inventory.owner != "Player" )
+					inventory.save();
+		}
 	}
 	
 	
 	static private function requestInventory(e:InventoryEvent):void 
 	{
-		Log.out( "InventoryManager.requestInventory - OWNER: " + e.owner, Log.DEBUG );
+		Log.out( "InventoryManager.requestInventory - OWNER: " + e.owner, Log.WARN );
 		var inv:Inventory = objectInventoryGet( e.owner );
 		if ( inv && inv.loaded ) {
 			Log.out( "InventoryManager.requestInventory - InventoryEvent.RESPONSE - OWNER: " + e.owner, Log.DEBUG );
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, e.owner, inv ) );
+		}
+	}
+	
+	static private function deleteInventory(e:InventoryEvent):void 
+	{
+		Log.out( "InventoryManager.deleteInventory - OWNER: " + e.owner, Log.DEBUG );
+		var inv:Inventory = _s_inventoryByGuid[e.owner];
+		if ( inv ) {
+			Log.out( "InventoryManager.deleteInventory - InventoryEvent.DELETE - OWNER: " + e.owner, Log.DEBUG );
+			inv.deleteInventory();
 		}
 	}
 	
@@ -80,7 +94,7 @@ public class InventoryManager
 	static private function objectInventoryGet( $ownerGuid:String ):Inventory {
 		var inventory:Inventory = _s_inventoryByGuid[$ownerGuid];
 		if ( null == inventory && null != $ownerGuid ) {
-			//Log.out( "InventoryManager.objectInventoryGet creating inventory for: " + $ownerGuid , Log.WARN );
+			Log.out( "InventoryManager.objectInventoryGet creating inventory for: " + $ownerGuid , Log.WARN );
 			inventory = new Inventory( $ownerGuid );
 			_s_inventoryByGuid[$ownerGuid] = inventory;
 			inventory.load();

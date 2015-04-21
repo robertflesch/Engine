@@ -38,7 +38,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 	private var _vmi:ModelInfo;
 	
 	public function ModelMakerLocal( $ii:InstanceInfo ) {
-		Log.out( "ModelMakerLocal ii.modelGuid: " + $ii.modelGuid, Log.WARN );
+		//Log.out( "ModelMakerLocal ii.modelGuid: " + $ii.modelGuid, Log.WARN );
 		super( $ii, false );
 		makerCountIncrement();
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
@@ -94,6 +94,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 			var vm:* = instantiate( _ii, _vmi, vmm, ba, versionInfo );
 			if ( vm ) {
 				vm.data = _vmd;
+				vm.modelInfo.loadAnimations( vm );			
 				Region.currentRegion.modelCache.add( vm );
 			}
 			

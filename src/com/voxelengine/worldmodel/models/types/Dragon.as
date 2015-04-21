@@ -49,6 +49,11 @@ public class Dragon extends Beast
 		FunctionRegistry.functionAdd( fire, "fire" );
 	}
 	
+	override public function buildExportObject( obj:Object ):void {
+		super.buildExportObject( obj )
+		obj.dragon = new Object();
+	}
+	
 	override protected function processClassJson():void {
 		super.processClassJson();
 		if ( modelInfo.json && modelInfo.json.dragon )

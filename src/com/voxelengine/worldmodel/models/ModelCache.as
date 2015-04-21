@@ -211,15 +211,18 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 
-		public function buildExportObject():Object {
+		public function buildExportObject( obj:Object ):void {
 			
 			var oa:Vector.<Object> = new Vector.<Object>();
-			for each ( var model:VoxelModel in _instances ) {
-				if ( model is Player )
+			for each ( var vm:VoxelModel in _instances ) {
+				if ( vm is Player )
 					continue;
-				oa.push( model.instanceInfo.buildExportObject() );
+				var io:Object = new Object();
+				vm.instanceInfo.buildExportObject( io );
+				oa.push( io );
 			}
-			return oa;
+			if ( oa.length )
+				obj.models = oa;
 		}
 		
 		public function reinitialize( $context:Context3D ):void 	{

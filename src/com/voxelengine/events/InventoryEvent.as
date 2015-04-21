@@ -26,6 +26,8 @@ public class InventoryEvent extends Event
 	// User/NP is logging/leaving system out, so remove inventory
 	static public const UNLOAD_REQUEST:String 	= "UNLOAD_REQUEST";
 	
+	static public const DELETE:String 			= "DELETE";
+
 	private var _owner:String; // Guid of model which is implementing this action
 	private var _result:*;	
 	

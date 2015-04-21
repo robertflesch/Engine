@@ -82,7 +82,7 @@ public class ModelDataCache
 		}
 		// check to make sure this is new data
 		if ( null ==  _modelData[$md.modelGuid] ) {
-Log.out( "ModelDataCache.add adding: " + $md.modelGuid, Log.WARN );
+			//Log.out( "ModelDataCache.add adding: " + $md.modelGuid, Log.WARN );
 			_modelData[$md.modelGuid] = $md; 
 			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.ADDED, $series, $md.modelGuid, $md ) );
 		}
@@ -122,7 +122,7 @@ Log.out( "ModelDataCache.add adding: " + $md.modelGuid, Log.WARN );
 	{
 		if ( Globals.IVM_EXT != $pe.table && Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		Log.out( "ModelDataCache.loadNotFound " + $pe.toString(), Log.WARN );
+		//Log.out( "ModelDataCache.loadNotFound " + $pe.toString(), Log.WARN );
 		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	

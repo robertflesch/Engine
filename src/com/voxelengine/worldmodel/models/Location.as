@@ -274,7 +274,7 @@ package com.voxelengine.worldmodel.models
 		
 		public function setCenterInfo( json:Object ):void {
 			if ( json.center ) {
-				Log.out( "setCenterInfo center x: " + json.center.x + "  y: " + json.center.y  + "  z: " +  json.center.z, Log.WARN );
+				//Log.out( "setCenterInfo center x: " + json.center.x + "  y: " + json.center.y  + "  z: " +  json.center.z, Log.WARN );
 
 				centerSetComp( json.center.x, json.center.y, json.center.z );
 			}

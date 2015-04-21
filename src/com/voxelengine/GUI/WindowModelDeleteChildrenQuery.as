@@ -8,10 +8,15 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI
 {
+import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.Region;
+import flash.events.DataEvent;
+import flash.utils.ByteArray;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
@@ -26,7 +31,6 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 {
 	private var _cb:CheckBox;
 	private var _modelGuid:String;
-	private var _recursive:Boolean;
 	private var _removeModelFunction:Function;
 	
 	public function WindowModelDeleteChildrenQuery( $modelGuid:String, $removeModelFunction:Function )
@@ -41,9 +45,9 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 		addElement( new Spacer( width, 20 ) );
 		addElement( new Label( "Are you sure you want to delete this model?" ) );
 		addElement( new Label( "click the close window button to cancel" ) );
-		var cb:CheckBox = new CheckBox( "Delete all child models too?" );
-		$evtColl.addEvent( cb, UIMouseEvent.CLICK, deleteRecursive );
-		addElement( cb );
+		_cb = new CheckBox( "Delete all child models too?" );
+		_cb.selected = true;
+		addElement( _cb );
 		
 		addElement( new Spacer( width, 20 ) );
 		
@@ -57,27 +61,46 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 		display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
 	}
 	
-	private function deleteRecursive( e:UIMouseEvent ):void
-	{
-		_recursive = !_recursive;
-	}
-
 	private function deleteModel( e:UIMouseEvent ):void
 	{
 		// remove from inventory panel
 		_removeModelFunction( _modelGuid );
 		
-		// this removes the on screen instances
-		var modelOnScreen:Vector.<VoxelModel> = Region.currentRegion.modelCache.modelGet( _modelGuid );
-		for each ( var vm:VoxelModel in modelOnScreen )
-			vm.dead = true;
-		
 		// Let MetadataCache handle the recursive delete
-		if ( _recursive )
+		if ( _cb.selected )
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.DELETE_RECURSIVE, 0, _modelGuid, null ) );
 		else
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
 		remove();
+		
+		// remove inventory
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.DELETE, _modelGuid, null ) );
+		// remove animations
+		ModelDataEvent.addListener( ModelBaseEvent.RESULT, dataResult );
+		ModelDataEvent.addListener( ModelBaseEvent.ADDED, dataResult );
+		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
+
+		// this removes the on screen instances
+		var modelOnScreen:Vector.<VoxelModel> = Region.currentRegion.modelCache.modelGet( _modelGuid );
+		for each ( var vm:VoxelModel in modelOnScreen )
+			vm.dead = true;
+	}
+	
+	private function dataResult(e:ModelDataEvent):void 
+	{
+		ModelDataEvent.removeListener( ModelBaseEvent.RESULT, dataResult );
+		ModelDataEvent.removeListener( ModelBaseEvent.ADDED, dataResult );
+		// So I need to extract the animation data.
+		var ba:ByteArray = new ByteArray();
+		ba.writeBytes( e.vmd.compressedBA, 0, e.vmd.compressedBA.length );
+		try { ba.uncompress(); }
+		catch (error:Error) { ; }
+		
+		// dont care, just need to step up the correct number of bytes
+		ModelMakerBase.modelMetaInfoRead( ba );
+		var mi:ModelInfo = ModelMakerBase.modelInfoFromByteArray( e.modelGuid, ba );
+		mi.deleteAnimations();
+
 	}
 }
 }

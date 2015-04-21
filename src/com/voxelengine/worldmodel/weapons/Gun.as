@@ -107,8 +107,8 @@ public class Gun extends ControllableVoxelModel
 			//Log.out( "Gun.resultFailed - No ammo information found for name: " + e.name );
 	//}
 	
-	override public function buildExportObject( obj:Object ):Object {
-		obj = super.buildExportObject( obj )
+	override public function buildExportObject( obj:Object ):void {
+		super.buildExportObject( obj )
 		var gunData:Object = new Object();
 		gunData.reloadSpeed = _reloadSpeed;
 		
@@ -118,7 +118,6 @@ public class Gun extends ControllableVoxelModel
 		}
 		gunData.ammos = oa;
 		obj.gun = gunData;
-		return obj;
 	}
 	
 	

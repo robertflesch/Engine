@@ -128,15 +128,6 @@ public class InstanceInfo extends Location	{
 	{ 
 	}
 
-	public function clone():InstanceInfo
-	{
-		var ii:InstanceInfo = new InstanceInfo();
-		var obj:Object = getJSON();
-		ii.initJSON( obj );
-		ii.instanceGuid = Globals.getUID();
-		return ii;
-	}
-	
 	public function release():void {
 		_moveSpeed 			= null;
 		_transforms 		= null;
@@ -151,49 +142,60 @@ public class InstanceInfo extends Location	{
 		_life				= null;		
 	}
 	
-	public function buildExportObject():Object {
-		var instObject:Object = new Object();
-		instObject.model = getJSON();
-		return instObject;
+	public function clone():InstanceInfo
+	{
+		var ii:InstanceInfo = new InstanceInfo();
+		var obj:Object = new Object();
+		buildExportObject( obj );
+		ii.initJSON( obj );
+		ii.instanceGuid = Globals.getUID();
+		return ii;
 	}
 	
-	public function getJSON():Object 
-	{ 
-		Log.out( "InstanceInfo.getJSON center: " + center, Log.WARN );
-		return {
-				center: 		centerNotScaled, // the non scaled center
-				collision:		_usesCollision,
-				collidable:     _collidable,
-				critical:     	_critical,
-				baseLightLevel: baseLightLevel,
-				grainSize: 		_grainSize,
-				instanceGuid: 	instanceGuid,
-				location: 		positionGet,
-				modelGuid: 		modelGuid,
-				rotation: 		rotationGet,
-				velocity: 		velocityGet,
-				scale: 			scale,
-				script: 		instanceScriptOnly(),
-				state:			_state,
-				transforms:		_transforms
-//				shader:			_shader,
-				};
-	} 	
-	
-	private function instanceScriptOnly():Vector.<Object> {
+	public function buildExportObject( obj:Object ):void {	
 		
-		var oa:Vector.<Object> = new Vector.<Object>();
-		var len:int = _scripts.length;
-		for each ( var script:Script in _scripts ) {
-		if ( !script.modelScript ) {
-				var so:Object = new Object();
-				so.name = Script.getCurrentClassName( script );
-				Log.out( "InstanceInfo.instanceScriptOnly - script: " + script );
-				oa.push( so );
+		obj.model = new Object();
+		obj.model.instanceGuid		= instanceGuid; 
+		obj.model.modelGuid 		= modelGuid;
+		obj.model.location			= positionGet;
+		obj.model.rotation 			= rotationGet;
+		obj.model.center 			= centerNotScaled;
+		obj.model.collision 		= _collidable;
+		obj.model.baseLightLevel 	= baseLightLevel;
+		
+		if ( _usesCollision )
+			obj.model.collision 	= _usesCollision;
+		if ( _critical )
+			obj.model.critical		= _critical;
+		if ( _grainSize )
+			obj.model.grainSize		= _grainSize;
+		if ( velocityGet.length )
+			obj.model.velocity			= velocityGet;
+		if ( 3 != scale.lengthSquared )
+			obj.model.scale 			= scale;
+		if ( "" != _state )
+			obj.model.state				= _state;
+		if ( _transforms && 0 < _transforms.length )
+			obj.model.transforms		= _transforms;
+		instanceScriptOnly( obj.model );  //
+		
+		function instanceScriptOnly( obj:Object ):void {
+			
+			var oa:Vector.<Object> = new Vector.<Object>();
+			var len:int = _scripts.length;
+			for each ( var script:Script in _scripts ) {
+			if ( !script.modelScript ) {
+					var so:Object = new Object();
+					so.name = Script.getCurrentClassName( script );
+					Log.out( "InstanceInfo.instanceScriptOnly - script: " + script );
+					oa.push( so );
+				}
 			}
+			if ( oa.length )
+				obj.scripts = oa;
 		}
-		return oa;
 	}
+	
 	
 	
 	public function explosionClone():InstanceInfo
@@ -241,6 +243,7 @@ public class InstanceInfo extends Location	{
 		if ( _creationJSON.fileName ) {
 			modelGuid = _creationJSON.fileName;
 		}
+		
 		if ( _creationJSON.modelGuid ) {
 			modelGuid = _creationJSON.modelGuid;
 		}

@@ -74,8 +74,8 @@ public class ModelInfoCache
 		if ( $pe.data ) {
 				var fileData:String = String( $pe.data );
 				var modelInfoJson:String = StringUtils.trim(fileData);
-				// modelInfoJson = decodeURI(modelInfoJson);
-Log.out( "ModelInfoCache.loadSucceed - STRING modelInfo: " + modelInfoJson,	Log.WARN );
+				// modelInfoJson = decodeURI(fileData);
+				//Log.out( "ModelInfoCache.loadSucceed - STRING modelInfo: " + modelInfoJson,	Log.WARN );
 				var jsonResult:Object = JSONUtil.parse( modelInfoJson, $pe.guid + $pe.table, "ModelInfoCache.loadSucceed" );
 				if ( null == jsonResult ) {
 					(new Alert( "VoxelVerse - Error Parsing: " + $pe.guid + $pe.table, 500 ) ).display();

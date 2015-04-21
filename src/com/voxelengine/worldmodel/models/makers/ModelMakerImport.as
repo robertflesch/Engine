@@ -155,10 +155,12 @@ public class ModelMakerImport extends ModelMakerBase {
 			if ( vm ) {
 				vm.data = _vmd;
 				vm.changed = true;
+				vm.modelInfo.loadAnimations( vm );			
 				vm.stateLock( true, 10000 );
 				vm.save();
 				Region.currentRegion.modelCache.add( vm );
 			}
+			
 			markComplete();
 		}
 	}

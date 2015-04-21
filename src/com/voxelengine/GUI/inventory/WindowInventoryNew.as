@@ -33,7 +33,6 @@ package com.voxelengine.GUI.inventory {
         static public const INVENTORY_CAT_MODELS:String = "Models";
         static public const INVENTORY_CAT_REGIONS:String = "Regions";
 		
-		
         private var _ownedVsStore:TabBar;
 		private var _panelContainer:Container;
 		private var _rbGroup:RadioButtonGroup;

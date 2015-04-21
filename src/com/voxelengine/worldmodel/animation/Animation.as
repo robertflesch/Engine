@@ -12,6 +12,7 @@ import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
+import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.events.AnimationMetadataEvent;
 
@@ -33,7 +34,7 @@ public class Animation
 	static private const ANIMATION_STATE:String = "ANIMATION_STATE";
 	static private const ANIMATION_ACTION:String = "ANIMATION_ACTION";
 	
-	private var _loaded:Boolean = false;
+	//private var _loaded:Boolean = false;
 	private var _transforms:Vector.<AnimationTransform>;
 	private var _attachments:Vector.<AnimationAttachment>;
 	private var _metadata:AnimationMetadata = new AnimationMetadata();
@@ -41,7 +42,7 @@ public class Animation
 
 	public function get attachments():Vector.<AnimationAttachment> { return _attachments; }
 	public function get transforms():Vector.<AnimationTransform> { return _transforms; }
-	public function get loaded():Boolean { return _loaded; }
+	//public function get loaded():Boolean { return _loaded; }
 	public function get metadata():AnimationMetadata { return _metadata; }
 	
 	public function Animation() {  }
@@ -50,8 +51,8 @@ public class Animation
 		metadata.fromPersistance( $dbo );
 	}
 	
-	public function fromImport( $json:Object, $guid:String, $modelGuid:String ):void  {
-		_metadata.fromImport( $guid, $modelGuid );
+	public function fromImport( $json:Object, $guid:String, $aniType:String ):void  {
+		_metadata.fromImport( $guid, $aniType );
 		fromJSON( $json );
 	}
 	
@@ -84,7 +85,8 @@ public class Animation
 		var strLen:int = ba.readInt();
 		// read off that many bytes
 		var json:String = ba.readUTFBytes( strLen );
-		fromJSON( json );
+		var jsonResult:Object = JSONUtil.parse( json, _metadata.guid, "Animation.fromPersistance" );
+		fromJSON( jsonResult );
 	}
 	
 	private function getJSON():String

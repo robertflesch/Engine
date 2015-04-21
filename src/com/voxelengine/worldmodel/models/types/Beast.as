@@ -70,6 +70,17 @@ package com.voxelengine.worldmodel.models.types
 			collisionMarkers = true;
 		}		
 
+		override public function buildExportObject( obj:Object ):void {
+			super.buildExportObject( obj )
+			obj.beast 					= new Object();
+			obj.beast.moveSpeed 		= mMoveSpeed * 10000;
+			obj.beast.maxTurnRate 		= mMaxTurnRate / 100;
+			obj.beast.maxClimbAngle		= mMaxClimbAngle;
+			obj.beast.climbRate 		= mClimbRate * 100;
+			if ( 0 != _seatLocation.length )
+				obj.beast.seatLocation = _seatLocation;
+		}
+		
 		override protected function processClassJson():void {
 			super.processClassJson();
 			if ( modelInfo.json && modelInfo.json.beast )

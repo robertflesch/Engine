@@ -41,8 +41,11 @@ public class PersistBigDB
 			return true;
 		else if ( Globals.DB_TABLE_AMMO == $pe.table )	
 			return true;
+		else if ( Globals.DB_TABLE_ANIMATIONS == $pe.table )	
+			return true;
 		else {
-			//Log.out( "PersistBigDB.isSupportedTable - FAILED table: " + $pe.table + " is not supported", Log.ERROR );
+			if ( Globals.isGuid( $pe.guid ) )
+				Log.out( "PersistBigDB.isSupportedTable - FAILED table: " + $pe.table + " is not supported", Log.ERROR );
 			return false;
 		}
 	}
@@ -72,7 +75,7 @@ public class PersistBigDB
 		function loadSuccess( $dbo:DatabaseObject ):void {
 			if ( !$dbo ) {
 				// This seems to be the case where no record exists, not the error handler
-				Log.out( "PersistBigDB.load.loadSuccess - NULL DatabaseObject -  table: " + $pe.table + "  guid:" + $pe.guid, Log.WARN );
+				//Log.out( "PersistBigDB.load.loadSuccess - NULL DatabaseObject -  table: " + $pe.table + "  guid:" + $pe.guid, Log.WARN );
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_NOT_FOUND, $pe.series, $pe.table, $pe.guid ) );
 				return;
 			}

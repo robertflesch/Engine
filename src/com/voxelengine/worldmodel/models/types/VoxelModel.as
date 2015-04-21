@@ -62,7 +62,8 @@ public class VoxelModel
 	private 	var	_oxel:Oxel; 															// INSTANCE NOT EXPORTED
 	private 	var	_editCursor:EditCursor; 												// INSTANCE NOT EXPORTED
 	protected 	var	_shaders:Vector.<Shader>        			= new Vector.<Shader>;		// INSTANCE NOT EXPORTED
-	protected 	var	_childrenLoaded:Boolean						= true;
+	protected 	var	_childrenLoaded:Boolean;
+	protected 	var	_animationsLoaded:Boolean;
 	protected 	var	_children:Vector.<VoxelModel> 				= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
 	private		var	_statisics:ModelStatisics 					= new ModelStatisics(); 	// INSTANCE NOT EXPORTED
 	private		var	_camera:Camera								= new Camera();
@@ -165,6 +166,13 @@ public class VoxelModel
 		_childrenLoaded = value;
 	}
 	
+	public function get animationsLoaded():Boolean { return _animationsLoaded; }
+	public function set animationsLoaded(value:Boolean):void 
+	{
+		Log.out( "VoxelModel.animationsLoaded - modelGuid: " + instanceInfo.modelGuid + " setting to: " + value, Log.WARN );
+		_animationsLoaded = value;
+	}
+	
 	protected function processClassJson():void {
 		//if ( _modelInfo.biomes && false == complete && 0 < _modelInfo.biomes.layers.length ) {
 			//if ( _modelInfo.biomes.layers[0].functionName == "LoadModelFromBigDB" ) {
@@ -193,6 +201,7 @@ public class VoxelModel
 	private function childrenLoad():void {
 		// if we have no children, let this stand
 		
+		childrenLoaded	= true;
 		if ( _modelInfo.children && 0 < _modelInfo.children.length)
 		{
 			Log.out( "VoxelModel.childrenLoad - loading " + _modelInfo.children.length + " children for model name: " + _metadata.name );
@@ -224,27 +233,31 @@ public class VoxelModel
 		}
 	}
 
-	public function getChildJSON():Object {
+	// The export object is a combination of modelInfo and instanceInfo
+	public function buildExportObject( obj:Object ):void {
+		modelInfo.buildExportObject( obj );
+
+		// child are added from the instanceInfo.
+		getChildJSON( obj.model );
 		
-		// Same code that is in modelCache to build models in region
-		// this is just models in models
-		var oa:Vector.<Object> = new Vector.<Object>();
-		for each ( var vm:VoxelModel in _children ) {
-			if ( vm is Player )
-				continue;
-			Log.out( "VoxelModel.getChildJSON - name: " + metadata.name + "  modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
-			oa.push( vm.instanceInfo.buildExportObject() );
-		}
-		return oa;
-	}
-	
-	public function buildExportObject( obj:Object ):Object {
-		obj.model = modelInfo.buildExportObject( obj );
-		if ( obj.model.children )
-			obj.model.children = getChildJSON();
 		//obj.model.editable = metadata.permissions.
 		//obj.model.template = metadata.permissions.templateGuid
-		return obj;
+		
+		function getChildJSON( obj:Object ):void {
+		// Same code that is in modelCache to build models in region
+		// this is just models in models
+			var oa:Vector.<Object> = new Vector.<Object>();
+			for each ( var vm:VoxelModel in _children ) {
+				if ( vm is Player )
+					continue;
+				Log.out( "VoxelModel.getChildJSON - name: " + metadata.name + "  modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
+				var io:Object = new Object();
+				vm.instanceInfo.buildExportObject( io );
+				oa.push( io );
+			}
+			if ( 0 < oa.length )
+				obj.children = oa;
+		}
 	}
 	
 	protected function cameraAddLocations():void
@@ -957,7 +970,6 @@ public class VoxelModel
 	}
 	
 	public function release():void {
-		instanceInfo.release();
 		
 		if ( metadata.permissions.modify ) {
 			//ModelEvent.removeListener(ModelEvent.MODEL_MODIFIED, handleModelEvents);
@@ -973,22 +985,9 @@ public class VoxelModel
 		if (editCursor)
 			editCursor.release();
 			
+		modelInfo.release();
+		instanceInfo.release();
 		metadata.release();	
-	}
-	
-	public function removePermanantly():void {
-		/**
-		 * Delete a set of DatabaseObjects from a table
-		 * @param table The table to delete the DatabaseObjects from
-		 * @param keys The keys of the DatabaseObjects to delete
-		 * @param callback Function executed when the DatabaseObjects are successfully deleted. No arguments are passed to the the callback methoh.
-		 * @param errorHandler Function executed if an error occurs while deleting the DatabaseObjects
-		 *
-		 */
-//			MetadataManager.deleteModel( metadata.modelGuid );
-		Log.out("VoxelModel.delete - delete object: " + instanceInfo.instanceGuid, Log.ERROR );
-		
-		changed = true;
 	}
 	
 	public function save():void
@@ -1012,6 +1011,10 @@ public class VoxelModel
 			return;
 		}
 			
+		if (  false == animationsLoaded ) {
+			Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name, Log.WARN );
+			return;
+		}
 		//Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.modelGuid: " + metadata.modelGuid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 		//if ( null != metadata.permissions.templateGuid )
 			//metadata.permissions.templateGuid = "";
@@ -1025,6 +1028,37 @@ public class VoxelModel
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Loading and Saving Voxel Models
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	private function toByteArray():ByteArray
+	{
+		var ba:ByteArray = new ByteArray();
+		
+		writeVersionedHeader( ba );
+		writeManifest( ba );
+
+		var oxelBA:ByteArray = oxel.toByteArray();
+		ba.writeBytes( oxelBA, 0, oxelBA.length );
+		
+		return ba;
+		
+		
+		function writeManifest( $ba:ByteArray ):void {
+			
+			// Always write the manifest into the IVM.
+			/* ------------------------------------------
+			   0 unsigned char model info version - 100 currently
+			   next byte is size of model json
+			   n+1...  is model json
+			   ------------------------------------------ */
+			$ba.writeByte(Globals.MANIFEST_VERSION);
+			var obj:Object = new Object();
+			buildExportObject( obj );
+			var json:String = JSON.stringify( obj );
+Log.out( "VoxelModel.writeManifest json: " + json, Log.WARN );			
+			$ba.writeInt( json.length );
+			$ba.writeUTFBytes( json );
+		}
+	}
+	
 	static public function oxelAsBasicModel( $oxel:Oxel ):ByteArray {
 		var ba:ByteArray = new ByteArray();
 		
@@ -1050,37 +1084,6 @@ public class VoxelModel
 		}
 	}
 
-	private function toByteArray():ByteArray
-	{
-		var ba:ByteArray = new ByteArray();
-		
-		writeVersionedHeader( ba );
-		writeManifest( ba );
-
-		var oxelBA:ByteArray = oxel.toByteArray();
-		ba.writeBytes( oxelBA, 0, oxelBA.length );
-		
-		return ba;
-		
-		
-		function writeManifest( $ba:ByteArray ):void {
-			
-			// Always write the manifest into the IVM.
-			/* ------------------------------------------
-			   0 unsigned char model info version - 100 currently
-			   next byte is size of model json
-			   n+1...  is model json
-			   ------------------------------------------ */
-			$ba.writeByte(Globals.MANIFEST_VERSION);
-			var obj:Object = new Object();
-			obj = buildExportObject( obj );
-			var json:String = JSON.stringify( obj );
-Log.out( "VoxelModel.writeManifest json: " + json );			
-			$ba.writeInt( json.length );
-			$ba.writeUTFBytes( json );
-		}
-	}
-	
 	static private function writeVersionedHeader( $ba:ByteArray):void
 	{
 		/* ------------------------------------------
@@ -1687,14 +1690,14 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		{
 			if (anim.metadata.name == $state)
 			{
-				if (!anim.loaded)
-				{
-					Log.out("VoxelModel.stateSet - ANIMATION NOT LOADED name: " + $state, Log.INFO);
-					instanceInfo.state = $state;
-					Globals.g_app.addEventListener(LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
-					return;
-				}
-				
+				//if (!anim.loaded)
+				//{
+					//Log.out("VoxelModel.stateSet - ANIMATION NOT LOADED name: " + $state, Log.INFO);
+					//instanceInfo.state = $state;
+					//Globals.g_app.addEventListener(LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
+					//return;
+				//}
+				//
 				for each (var at:AnimationTransform in anim.transforms)
 				{
 					//Log.out( "VoxelModel.stateSet - have AnimationTransform looking for child : " + at.attachmentName );

@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.animation
 {
+import flash.events.DataEvent;
 import flash.utils.ByteArray;
 import flash.net.URLLoaderDataFormat;
 
@@ -31,11 +32,25 @@ public class AnimationCache
 	
 	static public function init():void {
 		AnimationEvent.addListener( ModelBaseEvent.REQUEST, request );
+		AnimationEvent.addListener( ModelBaseEvent.DELETE, deleteHandler );
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
 	}
+	
+	static private function deleteHandler( $ae:AnimationEvent ):void {
+		var modelAnis:Array = _animatedModels[$ae.modelGuid]; 
+		var ani:Animation;
+		if ( modelAnis ) {
+			ani = modelAnis[$ae.aniGuid];
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.DB_TABLE_ANIMATIONS, $ae.aniGuid ) );
+			ani = null;
+			// TODO need to clean up eventually
+		}
+	}
+	
+	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  public function AnimationEvent( $type:String, $series:int, $modelGuid:String, , $aniGuid:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
@@ -53,12 +68,12 @@ public class AnimationCache
 			ani = modelAnis[$ame.aniGuid];
 		if ( null == ani ) {
 			if ( true == Globals.online && $ame.fromTable )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.DB_TABLE_ANIMATIONS, $ame.aniGuid ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.DB_TABLE_ANIMATIONS, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.aniType ) );
 			else	
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.aniType ) );
 		}
 		else
-			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.RESULT, $ame.series, $ame.modelGuid, $ame.aniGuid, ani ) );
+			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.RESULT, $ame.series, $ame.modelGuid, $ame.aniGuid, $ame.aniType, ani ) );
 	}
 	
 	static private function loadSucceed( $pe:PersistanceEvent):void 
@@ -74,10 +89,11 @@ public class AnimationCache
 				var jsonResult:Object = JSONUtil.parse( $pe.data, $pe.guid + $pe.table, "AnimationCache.loadSucceed" );
 				if ( null == jsonResult ) {
 					//(new Alert( "VoxelVerse - Error Parsing: " + $pe.guid + $pe.table, 500 ) ).display();
-					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
+					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, $pe.other, null ) );
 					return;
 				}
 				ani.fromImport( jsonResult, $pe.guid, $pe.other );
+				//ani.loaded = true;
 				ani.save();
 			}
 				
@@ -85,7 +101,7 @@ public class AnimationCache
 		}
 		else {
 			Log.out( "AnimationCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR );
-			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
+			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, $pe.other, null ) );
 		}
 	}
 	
@@ -108,7 +124,8 @@ public class AnimationCache
 		// model already has a list of animations, check to make sure this one is not already in it.
 		if ( null == modelAnimations[animationGuid] ) {
 			modelAnimations[animationGuid] = $ani;
-			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $pe.data, $ani ) );
+			// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $aniType:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.ADDED, $pe.series, "", $ani.metadata.guid, $pe.other, $ani ) );
 		}
 	}
 	
@@ -117,7 +134,7 @@ public class AnimationCache
 		if ( Globals.ANI_EXT != $pe.table && Globals.DB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		Log.out( "AnimationCache.loadFailed " + $pe.toString(), Log.ERROR );
-		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
+		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, $pe.other, null ) );
 	}
 	
 	static private function loadNotFound( $pe:PersistanceEvent):void 
@@ -125,7 +142,7 @@ public class AnimationCache
 		if ( Globals.ANI_EXT != $pe.table && Globals.DB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		Log.out( "AnimationCache.loadNotFound " + $pe.toString(), Log.ERROR );
-		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
+		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, $pe.other, null ) );
 	}
 	
 }

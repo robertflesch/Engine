@@ -183,7 +183,7 @@ public class ModelMakerBase {
 			new ModelMaker( $ii, $addToRegionWhenComplete );
 	}
 
-	protected function modelInfoFromByteArray( $ba:ByteArray ):ModelInfo {
+	static public function modelInfoFromByteArray( $modelGuid:String, $ba:ByteArray ):ModelInfo {
 
 		// how many bytes is the modelInfo
 		var strLen:int = $ba.readInt();
@@ -194,7 +194,7 @@ Log.out( "ModelMakerBase.modelInfoFromByteArray - STRING modelInfo: " + modelInf
 		modelInfoJson = decodeURI(modelInfoJson);
 		var jsonResult:Object = JSON.parse(modelInfoJson);
 		var mi:ModelInfo = new ModelInfo();
-		mi.initJSON( _vmd.modelGuid, jsonResult );
+		mi.initJSON( $modelGuid, jsonResult );
 		return mi;		
 	}
 	

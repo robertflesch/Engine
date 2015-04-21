@@ -136,13 +136,11 @@ public class ControllableVoxelModel extends VoxelModel
 		//	Log.out( "ControllableVoxelModel.processClassJson - no modelInfo JSON info found", Log.DEBUG );
 	}
 	
-	override public function buildExportObject( obj:Object ):Object {
-		obj = super.buildExportObject( obj )
-		var exportData:Object = new Object();
-		exportData.clipFactor = clipVelocityFactor;
-		exportData.maxSpeed = mMaxSpeed;
-		obj.controllableVoxelModel = exportData
-		return obj;
+	override public function buildExportObject( obj:Object ):void {
+		super.buildExportObject( obj )
+		obj.controllableVoxelModel = new Object();
+		obj.controllableVoxelModel.clipFactor = clipVelocityFactor * 100;
+		obj.controllableVoxelModel.maxSpeed = mMaxSpeed;
 	}
 	
 	override protected function internal_update($context:Context3D, $elapsedTimeMS:int):void {
