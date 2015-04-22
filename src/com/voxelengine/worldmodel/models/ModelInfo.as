@@ -146,13 +146,14 @@ package com.voxelengine.worldmodel.models
 		
 		public function buildExportObject( obj:Object ):void {
 			obj.model = new Object();
-			animationsGet( obj.model );
-//			biomes:			_biomes,      // Biomes are only used in object generation, once the object has been completed they are removed.
-//					children:		"REPLACE_ME",
-			if ( _grainSize )
-				obj.model.grainSize =  _grainSize,
-			obj.model.modelClass = _modelClass,
+			obj.model.modelClass = _modelClass;
 			modelsScriptOnly( obj.model );
+			animationsGet( obj.model );
+			// biomes:			_biomes,      // Biomes are only used in object generation, once the object has been completed they are removed.
+			// children:		_children   // We want the currect children, not the ones loaded in the modelInfo. So we get that from instanceInfo later.
+			if ( _grainSize ) {
+				obj.model.grainSize =  _grainSize;
+			}
 			
 					
 			function animationsGet( obj:Object ):void {
