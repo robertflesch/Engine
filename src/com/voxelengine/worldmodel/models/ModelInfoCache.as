@@ -34,6 +34,7 @@ public class ModelInfoCache
 	
 	static public function init():void {
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST, 			request );
+		ModelInfoEvent.addListener( ModelBaseEvent.DELETE, 				deleteHandler );
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
@@ -52,6 +53,17 @@ public class ModelInfoCache
 		else
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.RESULT, $mie.series, $mie.modelGuid, mi ) );
 	}
+	
+	static private function deleteHandler( $mie:ModelInfoEvent ):void {
+		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
+		if ( null != mi ) {
+			_modelInfo[$mie.modelGuid] = null; 
+			mi = null;
+			// TODO need to clean up eventually
+		}
+	}
+	
+	
 	
 	static private function add( $pe:PersistanceEvent, $mi:ModelInfo ):void { 
 		if ( null == $mi || null == $pe.guid ) {
