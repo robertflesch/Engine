@@ -63,6 +63,7 @@ package com.voxelengine.worldmodel.models.types
 		
 		public function Beast( ii:InstanceInfo ) { 
 			super( ii );
+			inventoryBitmap = "beastToolbar.png";
 		}
 		
 		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {

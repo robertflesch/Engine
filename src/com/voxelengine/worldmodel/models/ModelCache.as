@@ -16,6 +16,7 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.events.InventoryEvent;
 	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 	import com.voxelengine.worldmodel.models.types.*;
@@ -66,7 +67,7 @@ package com.voxelengine.worldmodel.models
 		}
 
 		public function save():void {
-			Log.out( "ModelCache.save - Saving all models", Log.WARN );
+			//Log.out( "ModelCache.save - Saving all models", Log.WARN );
 			if ( false == Globals.online || false == Globals.inRoom )
 				return;
 			
@@ -98,6 +99,8 @@ package com.voxelengine.worldmodel.models
 			if ( vm.instanceInfo.controllingModel )
 			{
 				vm.instanceInfo.controllingModel.childAdd( vm );
+				// ah, this is the instance by guid, basically the look up spot for things...
+				// not the instances, which are used to draw everything.
 				_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
 				ModelEvent.dispatch( new ModelEvent( ModelEvent.CHILD_MODEL_ADDED, vm.instanceInfo.instanceGuid, null, null, vm.instanceInfo.controllingModel.instanceInfo.instanceGuid ) );
 			}
@@ -125,6 +128,10 @@ package com.voxelengine.worldmodel.models
 					ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
 				}
 			}
+			
+			// This prefetches the data, so it is ready when requested
+			if ( vm.modelInfo.hasInventory )
+				InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, vm.instanceInfo.instanceGuid, null ) );
 		}
 		
 		public function draw( $mvp:Matrix3D, $context:Context3D ):void {

@@ -78,12 +78,15 @@ public class Player extends Avatar
 			Globals.player = null;
 		}
 		Globals.player = this;
+		inventoryBitmap = "userInventory.png";
+
 	}
 	
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
 		Log.out( "Player.init instanceGuid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super.init( $mi, $vmm );
 		
+		modelInfo.hasInventory = true;
 		instanceInfo.usesCollision = true;
 		clipVelocityFactor = AVATAR_CLIP_FACTOR;
 		//metadata.modify = false;
@@ -408,8 +411,6 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 //		ModelEvent.dispatch( new ModelEvent( ModelEvent.RELEASE_CONTROL, instanceInfo.instanceGuid ) );
 //		var className:String = getQualifiedClassName( topmostControllingModel() );
 //		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
-		
-		InventoryInterfaceEvent.dispatch( new InventoryInterfaceEvent( InventoryInterfaceEvent.DISPLAY, instanceInfo.instanceGuid, "userInventory.png" ) );
 	}
 	
 	

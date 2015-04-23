@@ -194,10 +194,12 @@ public class Inventory
 	{
 		if ( Globals.DB_INVENTORY_TABLE != $pe.table )
 			return;
+		if ( owner != $pe.guid )
+			return;
 		removeLoadEvents();
 		fromPersistance( $pe.dbo );
 		_loaded = true;
-		Log.out( "Inventory.loadSuccess - OWNER: " + _owner, Log.WARN );
+		Log.out( "Inventory.loadSuccess - OWNER: " + _owner + "  guid: " + $pe.guid, Log.WARN );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, _owner, this ) );
 	}
 	

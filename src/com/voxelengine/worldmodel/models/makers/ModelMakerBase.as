@@ -189,7 +189,7 @@ public class ModelMakerBase {
 		var strLen:int = $ba.readInt();
 		// read off that many bytes
 		var modelInfoJson:String = $ba.readUTFBytes( strLen );
-Log.out( "ModelMakerBase.modelInfoFromByteArray - STRING modelInfo: " + modelInfoJson,	Log.WARN );
+		//Log.out( "ModelMakerBase.modelInfoFromByteArray - STRING modelInfo: " + modelInfoJson,	Log.WARN );
 		// create the modelInfo object from embedded metadata
 		modelInfoJson = decodeURI(modelInfoJson);
 		var jsonResult:Object = JSON.parse(modelInfoJson);

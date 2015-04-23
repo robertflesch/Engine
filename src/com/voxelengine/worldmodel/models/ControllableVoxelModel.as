@@ -61,6 +61,7 @@ public class ControllableVoxelModel extends VoxelModel
 	protected var _displayCollisionMarkers:Boolean 			= false
 	protected var _leaveTrail:Boolean 						= false
 	protected var _forward:Boolean 							= false
+	protected var _inventoryBitmap:String					= "";
 
 	protected var _maxFallRate:SecureNumber 				= new SecureNumber( DEFAULT_FALL_RATE );
 	protected var _maxSpeed:SecureNumber 					= new SecureNumber( DEFAULT_SPEED_MAX );
@@ -101,8 +102,6 @@ public class ControllableVoxelModel extends VoxelModel
 		GUIEvent.addListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
 		GUIEvent.addListener( GUIEvent.APP_ACTIVATE, onActivate );
 		_ct = new CollisionTest( this );
-		
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, instanceInfo.instanceGuid, null ) );
 	}
 	
 	override protected function processClassJson():void {
@@ -116,17 +115,12 @@ public class ControllableVoxelModel extends VoxelModel
 			}
 			
 			if ( cmInfo.clipFactor )
-			{
 				clipVelocityFactor = cmInfo.clipFactor/100;
-			}
 			else
 				clipVelocityFactor = DEFAULT_CLIP_VELOCITY/100;
 				
 			if ( cmInfo.maxSpeed )
-			{
 				maxSpeed = cmInfo.maxSpeed;
-			}
-				
 		}
 		//else
 		//	Log.out( "ControllableVoxelModel.processClassJson - no modelInfo JSON info found", Log.DEBUG );
@@ -448,6 +442,7 @@ public class ControllableVoxelModel extends VoxelModel
 	
 	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
 		super.takeControl( $modelLosingControl, $addAsChild );
+		InventoryInterfaceEvent.dispatch( new InventoryInterfaceEvent( InventoryInterfaceEvent.DISPLAY, instanceInfo.instanceGuid, inventoryBitmap ) );
 	}
 	
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
@@ -538,21 +533,9 @@ public class ControllableVoxelModel extends VoxelModel
 		count++;
 	}
 	
-	public function get leaveTrail():Boolean 
-	{
-		return _leaveTrail;
-	}
-	
-	public function set leaveTrail(value:Boolean):void 
-	{
-		_leaveTrail = value;
-	}
-	
-	public function get collisionMarkers():Boolean 
-	{
-		return _displayCollisionMarkers;
-	}
-	
+	public function get leaveTrail():Boolean { return _leaveTrail; }
+	public function set leaveTrail(value:Boolean):void { _leaveTrail = value; }
+	public function get collisionMarkers():Boolean { return _displayCollisionMarkers; }
 	public function set collisionMarkers($value:Boolean):void 
 	{
 		if ( $value )
@@ -562,6 +545,9 @@ public class ControllableVoxelModel extends VoxelModel
 
 		_displayCollisionMarkers = $value;
 	}
+	
+	public function get inventoryBitmap():String { return _inventoryBitmap; }
+	public function set inventoryBitmap(value:String):void { _inventoryBitmap = value; }
 	
 	override public function updateVelocity( $elapsedTimeMS:int, $clipFactor:Number ):Boolean
 	{

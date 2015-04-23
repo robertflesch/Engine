@@ -162,14 +162,14 @@ public class VoxelModel
 	public function get childrenLoaded():Boolean { return _childrenLoaded; }
 	public function set childrenLoaded(value:Boolean):void 
 	{
-		Log.out( "VoxelModel.childrenLoaded - modelGuid: " + instanceInfo.modelGuid + " setting to: " + value, Log.WARN );
+		//Log.out( "VoxelModel.childrenLoaded - modelGuid: " + instanceInfo.modelGuid + " setting to: " + value, Log.WARN );
 		_childrenLoaded = value;
 	}
 	
 	public function get animationsLoaded():Boolean { return _animationsLoaded; }
 	public function set animationsLoaded(value:Boolean):void 
 	{
-		Log.out( "VoxelModel.animationsLoaded - modelGuid: " + instanceInfo.modelGuid + " setting to: " + value, Log.WARN );
+		//Log.out( "VoxelModel.animationsLoaded - modelGuid: " + instanceInfo.modelGuid + " setting to: " + value, Log.WARN );
 		_animationsLoaded = value;
 	}
 	
@@ -250,7 +250,7 @@ public class VoxelModel
 			for each ( var vm:VoxelModel in _children ) {
 				if ( vm is Player )
 					continue;
-				Log.out( "VoxelModel.getChildJSON - name: " + metadata.name + "  modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
+				//Log.out( "VoxelModel.getChildJSON - name: " + metadata.name + "  modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
 				var io:Object = new Object();
 				vm.instanceInfo.buildExportObject( io );
 				oa.push( io );
@@ -1053,7 +1053,7 @@ public class VoxelModel
 			var obj:Object = new Object();
 			buildExportObject( obj );
 			var json:String = JSON.stringify( obj );
-Log.out( "VoxelModel.writeManifest json: " + json, Log.WARN );			
+			//Log.out( "VoxelModel.writeManifest json: " + json, Log.WARN );			
 			$ba.writeInt( json.length );
 			$ba.writeUTFBytes( json );
 		}

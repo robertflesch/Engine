@@ -8,7 +8,6 @@
 
 package com.voxelengine.GUI.actionBars
 {
-import com.developmentarc.core.utils.logging.ExternalInterfaceDebugLogger;
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
 import flash.events.KeyboardEvent;
@@ -31,6 +30,7 @@ import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.LoadingImageEvent;
+import com.voxelengine.events.RoomEvent;
 import com.voxelengine.GUI.LoadingImage;
 import com.voxelengine.GUI.inventory.BoxInventory;
 import com.voxelengine.server.Network;
@@ -61,12 +61,12 @@ public class  UserInventory extends QuickInventory
 	static public function init():void {	
 		InventoryInterfaceEvent.addListener( InventoryInterfaceEvent.CLOSE, closeEvent );
 		InventoryInterfaceEvent.addListener( InventoryInterfaceEvent.DISPLAY, displayEvent );
-		InventoryInterfaceEvent.addListener( InventoryInterfaceEvent.HIDE, hideEvent );
+//		InventoryInterfaceEvent.addListener( InventoryInterfaceEvent.HIDE, hideEvent );
 	}
 	
 	public function UserInventory( $owner:String, $image:String ) {
 		_owner = $owner;
-		//Log.out( "UserInventory.create ===================== <<<<<<<<< " + _owner + " <<<<<<<<<<<< ========================", Log.WARN );
+		Log.out( "UserInventory.create ===================== <<<<<<<<< " + _owner + " <<<<<<<<<<<< ========================", Log.WARN );
 		super( 680, 84, 64, $image );
 		_selectorXOffset = 20; // From image of "userInventory.png"
 		eventCollector.addEvent(_dragOp, DnDEvent.DND_DROP_ACCEPTED, dropMaterial );
@@ -79,17 +79,27 @@ public class  UserInventory extends QuickInventory
 		addChild(_shape);
 		hideGrainTools();
 		_s_currentInstance = this;
+
+		RoomEvent.addListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
 		InventoryEvent.addListener( InventoryEvent.RESPONSE, inventoryLoaded );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, _owner, null ) );
+	}
+
+	
+	private function onJoinRoomEvent(e:RoomEvent):void 
+	{
+		displayEvent(null);
 	}
 	
 	override public function remove():void {
 		Globals.g_app.editing = false;
 		removeListeners();
-		//Log.out( "UserInventory.remove ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
-		//InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
-		
+		Log.out( "UserInventory.remove ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
+		RoomEvent.removeListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
+		InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
+
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.UNLOAD_REQUEST, _owner, null ) );
+		_s_currentInstance = null;
 		super.remove();
 	}
 
@@ -111,24 +121,26 @@ public class  UserInventory extends QuickInventory
 	
 	static private function displayEvent(e:InventoryInterfaceEvent):void {
 		// build it the first time
-		if ( null == _s_currentInstance )
+		if ( null == _s_currentInstance && e )
 			_s_currentInstance = new UserInventory( e.owner, e.image );
 		// it exists, but belongs to a different controllable object
 		// close it and open new one
-		else if ( _s_currentInstance && _s_currentInstance._owner != e.owner ) {
+		else if ( _s_currentInstance && e && _s_currentInstance._owner != e.owner ) {
 			_s_currentInstance.remove();
 			_s_currentInstance = null;
 			_s_currentInstance = new UserInventory( e.owner, e.image );
 		}
 		
-		with ( _s_currentInstance ) {
-			// display it!
-			_outline.visible = true;
-			visible = true;
-			Globals.g_app.editing = true;
-			addListeners();
-			display();
-			resizeObject( null );
+		if ( Globals.inRoom ) {
+			with ( _s_currentInstance ) {
+				// display it!
+				_outline.visible = true;
+				visible = true;
+				Globals.g_app.editing = true;
+				addListeners();
+				display();
+				resizeObject( null );
+			}
 		}
 	}
 	
@@ -142,7 +154,9 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function inventoryLoaded(e:InventoryEvent):void {
+		Log.out( "UserInventory.inventoryLoaded - ENTER - owner: " + _owner + "  e.owner: " + e.owner, Log.WARN );
 		if ( e.owner == _owner ) {
+			InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
 			_inventoryLoaded = true;
 			var inv:Inventory = e.result as Inventory;
 			var slots:Slots = inv.slots;
@@ -154,8 +168,8 @@ public class  UserInventory extends QuickInventory
 				(boxes[i] as BoxInventory).updateObjectInfo( item );
 			}
 		}
-		else
-			Log.out( "UserInventory.inventoryLoaded - for non active guid: " + e.owner, Log.WARN );
+//		else
+//			Log.out( "UserInventory.inventoryLoaded - for non active guid: " + e.owner, Log.WARN );
 	}
 	
 	/////////// start drag and drop //////////////////////////////////////////////////////
@@ -256,7 +270,7 @@ public class  UserInventory extends QuickInventory
 		}
 		
 		addSelector();			
-		lastItemSelection = 0;
+//		lastItemSelection = 0;
 		
 		width = Slots.ITEM_COUNT * 64;
 	}
@@ -402,7 +416,7 @@ public class  UserInventory extends QuickInventory
 
 	private var _listenersAdded:Boolean;
 	private function addListeners():void {
-		//Log.out( "UserInventory.addListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
+		Log.out( "UserInventory.addListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 		if ( false == _listenersAdded ) {
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
@@ -411,7 +425,7 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function removeListeners():void {
-		//Log.out( "UserInventory.removeListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
+		Log.out( "UserInventory.removeListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
 		_listenersAdded = false;

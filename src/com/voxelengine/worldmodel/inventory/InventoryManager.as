@@ -7,12 +7,11 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
-import com.voxelengine.events.InventoryEvent;
-import flash.events.Event;
-import flash.events.EventDispatcher;
-
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
+import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 	/**
 	 * The inventory manager is a static object that hold the inventory of different objects
@@ -49,6 +48,8 @@ public class InventoryManager
 	static private function requestInventory(e:InventoryEvent):void 
 	{
 		Log.out( "InventoryManager.requestInventory - OWNER: " + e.owner, Log.WARN );
+		if ( e.owner == "Player" )
+			return;
 		var inv:Inventory = objectInventoryGet( e.owner );
 		if ( inv && inv.loaded ) {
 			Log.out( "InventoryManager.requestInventory - InventoryEvent.RESPONSE - OWNER: " + e.owner, Log.DEBUG );
@@ -94,7 +95,7 @@ public class InventoryManager
 	static private function objectInventoryGet( $ownerGuid:String ):Inventory {
 		var inventory:Inventory = _s_inventoryByGuid[$ownerGuid];
 		if ( null == inventory && null != $ownerGuid ) {
-			Log.out( "InventoryManager.objectInventoryGet creating inventory for: " + $ownerGuid , Log.WARN );
+			Log.out( "InventoryManager.objectInventoryGet building inventory object for: " + $ownerGuid , Log.WARN );
 			inventory = new Inventory( $ownerGuid );
 			_s_inventoryByGuid[$ownerGuid] = inventory;
 			inventory.load();

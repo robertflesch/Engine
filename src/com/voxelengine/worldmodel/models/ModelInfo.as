@@ -121,9 +121,7 @@ package com.voxelengine.worldmodel.models
 		
 		public function childAdd( $instanceInfo:InstanceInfo):void {
 			// Dont add child that already exist
-			
-			Log.out( "ModelInfo.childAdd  fileName: " + fileName + " child ii: " + $instanceInfo, Log.WARN );
-			
+			//Log.out( "ModelInfo.childAdd  fileName: " + fileName + " child ii: " + $instanceInfo, Log.WARN );
 			for each ( var child:InstanceInfo in _children ) {
 				if ( child === $instanceInfo ) {
 					return;
@@ -192,6 +190,11 @@ package com.voxelengine.worldmodel.models
 			}
 		} 	
 		
+		public function get hasInventory():Boolean { return _hasInventory; }
+		public function set hasInventory(value:Boolean):void  { _hasInventory = value; }
+		protected var _hasInventory:Boolean 					= false
+		
+		
 		// remove the children after they are loaded, so that when the object is saved
 		// the active children from the voxel model are used.
 		// Applies to the "REPLACE_ME" above
@@ -229,6 +232,9 @@ package com.voxelengine.worldmodel.models
 			if ( modelInfoJson.modelClass )
 				_modelClass = modelInfoJson.modelClass;
 
+			if ( modelInfoJson.hasInventory )
+				hasInventory = true;
+				
 			// This is an artifact from the old mjson files, new system saves all as "scripts"
 			if ( modelInfoJson.script ) {
 				for each ( var scriptObject:Object in modelInfoJson.script ) {

@@ -42,6 +42,7 @@ public class Dragon extends Beast
 		//MouseKeyboardHandler.backwardEnabled = false;
 		
 		instanceInfo.usesCollision = true;
+		modelInfo.hasInventory = true;
 		//usesGravity = true;
 		collisionMarkers = true;
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
@@ -156,7 +157,6 @@ public class Dragon extends Beast
 		$modelLosingControl.stateLock( true );
 		var className:String = getQualifiedClassName( topmostControllingModel() );
 		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
-		InventoryInterfaceEvent.dispatch( new InventoryInterfaceEvent( InventoryInterfaceEvent.DISPLAY, instanceInfo.instanceGuid, "beastToolbar.png" ) );
 	}
 
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
