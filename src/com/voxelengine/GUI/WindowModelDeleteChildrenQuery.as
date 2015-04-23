@@ -67,7 +67,6 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 		_removeModelFunction( _modelGuid );
 		
 		// remove inventory
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.DELETE, _modelGuid, null ) );
 		// request the ModelData so that we can get the modelInfo from it.
 		ModelDataEvent.addListener( ModelBaseEvent.RESULT, dataResult );
 		ModelDataEvent.addListener( ModelBaseEvent.ADDED, dataResult );
@@ -75,8 +74,11 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 
 		// this removes the on screen instances
 		var modelOnScreen:Vector.<VoxelModel> = Region.currentRegion.modelCache.modelGet( _modelGuid );
-		for each ( var vm:VoxelModel in modelOnScreen )
+		// only instances have inventory, not models
+		for each ( var vm:VoxelModel in modelOnScreen ) {
 			vm.dead = true;
+			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.DELETE, vm.instanceInfo.instanceGuid, null ) );
+		}
 	}
 	
 	private function dataResult(e:ModelDataEvent):void 
