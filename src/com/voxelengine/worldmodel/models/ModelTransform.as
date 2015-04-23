@@ -74,7 +74,7 @@ package com.voxelengine.worldmodel.models
 		public function ModelTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" )
 		{
 			if ( 0 == $time )
-				Log.out( "InstanceInfo.addTransform - No time defined", Log.ERROR );
+				Log.out( "InstanceInfo.addTransform - No time defined name: " + $name + " x: " + $x + " y: " + $y + " z: " + $z, Log.ERROR );
 
 			if ( 0 == $x && 0 == $y && 0 == $z && 0 == $time && ModelTransform.LIFE != $type )
 				Log.out( "InstanceInfo.addTransform - No values defined", Log.ERROR );
