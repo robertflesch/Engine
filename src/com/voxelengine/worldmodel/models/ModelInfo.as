@@ -38,6 +38,7 @@ package com.voxelengine.worldmodel.models
 		private var _childCount:int // number of children this model has at start. Used to determine if animation can be played.
 		private var _owner:VoxelModel;
 		private var _animationCount:int;
+		private var _series:int														// used to make sure animation is part of same series when loading
 		
 		public function get json():Object 						{ return _modelJson; }
 		public function get fileName():String 					{ return _fileName; }
@@ -57,6 +58,10 @@ package com.voxelengine.worldmodel.models
 		
 		private function get owner():VoxelModel { return _owner; }
 
+		public function get hasInventory():Boolean { return _hasInventory; }
+		public function set hasInventory(value:Boolean):void  { _hasInventory = value; }
+		protected var _hasInventory:Boolean 					= false
+		
 		public function ModelInfo():void  { ; }
 		
 		public function boimeHas():Boolean {
@@ -111,37 +116,6 @@ package com.voxelengine.worldmodel.models
 			return newModelInfo;
 		}
 		
-		private function cloneObject( obj:Object ):Object {
-			var ba:ByteArray = new ByteArray();
-			ba.writeObject( obj );
-			ba.position = 0;
-			var newObj:Object = ba.readObject();
-			return newObj;
-		}
-		
-		public function childAdd( $instanceInfo:InstanceInfo):void {
-			// Dont add child that already exist
-			//Log.out( "ModelInfo.childAdd  fileName: " + fileName + " child ii: " + $instanceInfo, Log.WARN );
-			for each ( var child:InstanceInfo in _children ) {
-				if ( child === $instanceInfo ) {
-					return;
-				}
-			}
-			_children.push( $instanceInfo );
-		}
-			
-		public function childRemove( $instanceInfo:InstanceInfo):void {
-			var index:int = 0;
-			for each ( var child:InstanceInfo in _children ) {
-				if ( child === $instanceInfo ) {
-					_children.splice( index, 1 );
-					return;
-				}
-				
-				index++;
-			}
-		}
-		
 		public function buildExportObject( obj:Object ):void {
 			obj.model = new Object();
 			obj.model.modelClass = _modelClass;
@@ -189,11 +163,6 @@ package com.voxelengine.worldmodel.models
 					oa = null;
 			}
 		} 	
-		
-		public function get hasInventory():Boolean { return _hasInventory; }
-		public function set hasInventory(value:Boolean):void  { _hasInventory = value; }
-		protected var _hasInventory:Boolean 					= false
-		
 		
 		// remove the children after they are loaded, so that when the object is saved
 		// the active children from the voxel model are used.
@@ -291,8 +260,39 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
+		private function cloneObject( obj:Object ):Object {
+			var ba:ByteArray = new ByteArray();
+			ba.writeObject( obj );
+			ba.position = 0;
+			var newObj:Object = ba.readObject();
+			return newObj;
+		}
+		
+		public function childAdd( $instanceInfo:InstanceInfo):void {
+			// Dont add child that already exist
+			//Log.out( "ModelInfo.childAdd  fileName: " + fileName + " child ii: " + $instanceInfo, Log.WARN );
+			for each ( var child:InstanceInfo in _children ) {
+				if ( child === $instanceInfo ) {
+					return;
+				}
+			}
+			_children.push( $instanceInfo );
+		}
+			
+		public function childRemove( $instanceInfo:InstanceInfo):void {
+			var index:int = 0;
+			for each ( var child:InstanceInfo in _children ) {
+				if ( child === $instanceInfo ) {
+					_children.splice( index, 1 );
+					return;
+				}
+				
+				index++;
+			}
+		}
+		
 		// Dont load the animations until the model is instaniated
-		public function loadAnimations( $owner:VoxelModel ):void {
+		public function animationsLoad( $owner:VoxelModel ):void {
 			_owner = $owner;
 			_modelGuid = $owner.instanceInfo.modelGuid;
 			if ( 0 == _animationInfo.length ) {
@@ -300,24 +300,24 @@ package com.voxelengine.worldmodel.models
 				return;
 			}
 				
-			AnimationEvent.addListener( ModelBaseEvent.ADDED, addAnimation );
+			AnimationEvent.addListener( ModelBaseEvent.ADDED, animationAdd );
+			_series = 0;
 			for each ( var animData:Object in _animationInfo ) {
 				_animationCount++; 
 				
 				// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $aniType:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 				var ae:AnimationEvent;
 				if ( Globals.isGuid( animData.guid ) )
-					ae = new AnimationEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, animData.guid, animData.type, null, true );
+					ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, _modelGuid, animData.guid, animData.type, null, true );
 				else
-					ae = new AnimationEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, animData.name, animData.type, null, false );
+					ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, _modelGuid, animData.name, animData.type, null, false );
 					
 				_series = ae.series;
 				AnimationEvent.dispatch( ae );
 			}
 		}
 				
-		private var _series:int
-		public function addAnimation( $ae:AnimationEvent ):void {
+		public function animationAdd( $ae:AnimationEvent ):void {
 			Log.out( "ModelInfo.addAnimation $ae: " + $ae, Log.WARN );
 			if ( _series == $ae.series ) {
 				$ae.ani.metadata.modelGuid = _modelGuid;
@@ -331,7 +331,7 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
-		public function deleteAnimations():void {
+		public function animationsDelete():void {
 			
 			for each ( var animData:Object in _animationInfo ) {
 				// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $aniType:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )

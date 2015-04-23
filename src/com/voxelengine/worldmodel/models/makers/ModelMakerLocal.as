@@ -94,7 +94,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 			var vm:* = instantiate( _ii, _vmi, vmm, ba, versionInfo );
 			if ( vm ) {
 				vm.data = _vmd;
-				vm.modelInfo.loadAnimations( vm );			
+				vm.modelInfo.animationsLoad( vm );			
 				Region.currentRegion.modelCache.add( vm );
 			}
 			

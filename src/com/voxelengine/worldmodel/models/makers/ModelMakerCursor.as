@@ -88,7 +88,7 @@ public class ModelMakerCursor extends ModelMakerBase {
 		var vm:* = instantiate( _ii, mi, _vmm, ba, versionInfo );
 		if ( vm ) {
 			vm.data = _vmd;
-			vm.modelInfo.loadAnimations( vm );
+			vm.modelInfo.animationsLoad( vm );
 		}
 
 		return vm;

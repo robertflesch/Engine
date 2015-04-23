@@ -1053,7 +1053,7 @@ public class VoxelModel
 			var obj:Object = new Object();
 			buildExportObject( obj );
 			var json:String = JSON.stringify( obj );
-			//Log.out( "VoxelModel.writeManifest json: " + json, Log.WARN );			
+			Log.out( "VoxelModel.writeManifest json: " + json, Log.WARN );			
 			$ba.writeInt( json.length );
 			$ba.writeUTFBytes( json );
 		}

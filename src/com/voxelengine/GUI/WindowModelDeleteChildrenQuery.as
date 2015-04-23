@@ -94,7 +94,7 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 		ModelMakerBase.modelMetaInfoRead( ba );
 		var mi:ModelInfo = ModelMakerBase.modelInfoFromByteArray( e.modelGuid, ba );
 		// now tell the modelData to remove all of the guids associated with this model.
-		mi.deleteAnimations();
+		mi.animationsDelete();
 
 		// Let MetadataCache handle the recursive delete
 		if ( _cb.selected )
