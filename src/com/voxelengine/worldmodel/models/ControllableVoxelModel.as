@@ -106,6 +106,7 @@ public class ControllableVoxelModel extends VoxelModel
 	
 	override protected function processClassJson():void {
 		super.processClassJson();
+		clipVelocityFactor = DEFAULT_CLIP_VELOCITY/100; // setting it to 0.95
 		if ( modelInfo.json && modelInfo.json.controllableVoxelModel )
 		{
 			var cmInfo:Object = modelInfo.json.controllableVoxelModel;
@@ -116,8 +117,6 @@ public class ControllableVoxelModel extends VoxelModel
 			
 			if ( cmInfo.clipFactor )
 				clipVelocityFactor = cmInfo.clipFactor/100;
-			else
-				clipVelocityFactor = DEFAULT_CLIP_VELOCITY/100;
 				
 			if ( cmInfo.maxSpeed )
 				maxSpeed = cmInfo.maxSpeed;
