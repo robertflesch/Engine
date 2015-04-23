@@ -392,7 +392,7 @@ public class VoxelModel
 				changed = false;
 		}
 		else
-			Log.out( "VoxelModel.childLoadingComplete - got message for other model", Log.WARN );
+			Log.out( "VoxelModel.childLoadingComplete - got message for other model I am: " + metadata.name + "  got message for: " + e.modelGuid, Log.WARN );
 	}
 	
 	public function clone():VoxelModel {
@@ -1007,12 +1007,12 @@ public class VoxelModel
 		}
 		
 		if (  false == childrenLoaded ) {
-			Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name, Log.WARN );
+			//Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name, Log.DEBUG );
 			return;
 		}
 			
 		if (  false == animationsLoaded ) {
-			Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name, Log.WARN );
+			//Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name, Log.DEBUG );
 			return;
 		}
 		//Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.modelGuid: " + metadata.modelGuid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );

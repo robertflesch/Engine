@@ -254,7 +254,7 @@ package com.voxelengine.worldmodel.models
 				
 				// i.e. animData = { "name": "Glide", "type": "state OR action", "guid":"Glide.ajson" }
 				for each ( var animData:Object in animationsObj ) {
-					Log.out( "ModelInfo.init - _animationInfo.push animData: " + animData );	
+					Log.out( "ModelInfo.init - _animationInfo.push animData: " + animData.name );	
 					_animationInfo.push( animData );
 				}
 			}

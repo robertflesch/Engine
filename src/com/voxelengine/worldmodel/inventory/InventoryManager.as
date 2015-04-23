@@ -47,7 +47,7 @@ public class InventoryManager
 	
 	static private function requestInventory(e:InventoryEvent):void 
 	{
-		Log.out( "InventoryManager.requestInventory - OWNER: " + e.owner, Log.WARN );
+		Log.out( "InventoryManager.requestInventory - OWNER: " + e.owner, Log.DEBUG );
 		if ( e.owner == "Player" )
 			return;
 		var inv:Inventory = objectInventoryGet( e.owner );
@@ -64,6 +64,7 @@ public class InventoryManager
 		if ( inv ) {
 			Log.out( "InventoryManager.deleteInventory - InventoryEvent.DELETE - OWNER: " + e.owner, Log.DEBUG );
 			inv.deleteInventory();
+			_s_inventoryByGuid[e.owner] = null;
 		}
 	}
 	
