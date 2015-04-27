@@ -191,7 +191,11 @@ package com.voxelengine.worldmodel.models
 					{
 						if ( ROTATION_REPEATING == type || LOCATION_REPEATING == type )
 						{
-							_time = _originalTime;
+							if ( ModelTransform.INFINITE_TIME == _originalTime )
+								_time = ModelTransform.INFINITE_TIME;
+							else
+								_time = _originalTime * 1000;
+							
 							_delta.negate();
 							_inverse = !_inverse;
 						}
@@ -199,7 +203,7 @@ package com.voxelengine.worldmodel.models
 						{
 							channelRunTime = _time;
 							_time = 0;
-							Globals.g_app.dispatchEvent( new TransformEvent( TransformEvent.ENDED, _guid, name ) );
+							TransformEvent.dispatch( new TransformEvent( TransformEvent.ENDED, _guid, name ) );
 						}
 					}
 					else
