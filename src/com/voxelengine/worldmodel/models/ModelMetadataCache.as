@@ -79,15 +79,15 @@ public class ModelMetadataCache
 	}
 	
 	static private function deleteHandler( $mde:ModelMetadataEvent ):void {
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.DELETE, 0, $mde.modelGuid, null ) );
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, $mde.modelGuid, null ) );
+//		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.DELETE, 0, $mde.modelGuid, null ) );
+//		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, $mde.modelGuid, null ) );
 		var mmd:ModelMetadata = _metadata[$mde.modelGuid];
 		if ( null != mmd ) {
 			_metadata[$mde.modelGuid] = null; 
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mde.series, Globals.DB_TABLE_MODELS, $mde.modelGuid, mmd.dbo ) );
 			mmd = null;
 			// TODO need to clean up eventually
 		}
+		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mde.series, Globals.DB_TABLE_MODELS, $mde.modelGuid, null ) );
 	}
 	
 	static private function created($mme:ModelMetadataEvent):void  { add( 0, $mme.vmm ); }

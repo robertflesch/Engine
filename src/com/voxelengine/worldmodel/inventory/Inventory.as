@@ -60,7 +60,7 @@ public class Inventory
 	
 	public function deleteInventory():void {
 		
-		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.DB_INVENTORY_TABLE, _owner, _dbo ) );
+		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.DB_INVENTORY_TABLE, _owner, null ) );
 		_slots = null;
 		_voxels = null;
 	}

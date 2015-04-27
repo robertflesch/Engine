@@ -34,6 +34,7 @@ public class PanelAnimations extends PanelBase
 	private var _addButton:					Button;
 	private var _deleteButton:				Button;
 	private var _detailButton:				Button;
+	private var _selectedModel:				VoxelModel;
 	
 	public function PanelAnimations( $parent:PanelModelAnimations, $widthParam:Number, $elementHeight:Number, $heightParam:Number )
 	{
@@ -59,6 +60,7 @@ public class PanelAnimations extends PanelBase
 		_listAnimations = null;
 		_selectedAnimation = null;
 		_buttonContainer = null;
+		_selectedModel = null;
 	}
 	
 	private function rollOverHandler(e:UIMouseEvent):void 
@@ -77,6 +79,7 @@ public class PanelAnimations extends PanelBase
 	
 	public function populateAnimations( $vm:VoxelModel ):void
 	{
+		_selectedModel = $vm;
 		_listAnimations.removeAll();
 		var anims:Vector.<Animation> = $vm.modelInfo.animations;
 		for each ( var anim:Animation in anims )
@@ -132,6 +135,9 @@ public class PanelAnimations extends PanelBase
 		_selectedAnimation = event.target.data;
 		if ( _selectedAnimation )
 		{
+			_selectedModel.stateLock( false );
+			_selectedModel.stateSet( _selectedAnimation.metadata.name ); 
+			_selectedModel.stateLock( true );
 			_detailButton.enabled = true;
 			_detailButton.active = true;
 			_deleteButton.enabled = true;

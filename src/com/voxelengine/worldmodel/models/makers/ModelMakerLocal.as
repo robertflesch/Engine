@@ -76,7 +76,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 				return;
 			}
 
-			var versionInfo:Object = modelMetaInfoRead( ba );
+			var versionInfo:Object = extractVersionInfo( ba );
 			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
 			{
 				Log.out( "ModelMakerLocal.attemptMake - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );

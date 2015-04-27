@@ -93,7 +93,7 @@ public class ModelMakerGenerate {
 				return;
 			}
 			
-			var versionInfo:Object =  ModelMakerBase.modelMetaInfoRead( ba );
+			var versionInfo:Object =  ModelMakerBase.extractVersionInfo( ba );
 			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
 			{
 				Log.out( "ModelMakerGenerate.attemptMake - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );

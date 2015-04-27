@@ -44,10 +44,11 @@ public class AnimationCache
 		var ani:Animation;
 		if ( modelAnis ) {
 			ani = modelAnis[$ae.aniGuid];
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.DB_TABLE_ANIMATIONS, $ae.aniGuid, ani.metadata.dbo ) );
 			ani = null;
 			// TODO need to clean up eventually
 		}
+		//else if its not in the cache, we can still delete it.
+		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.DB_TABLE_ANIMATIONS, $ae.aniGuid, null ) );
 	}
 	
 	
@@ -86,6 +87,7 @@ public class AnimationCache
 			if ( $pe.dbo )
 				ani.fromPersistance( $pe.dbo );
 			else {
+				Log.out( "AnimationCache.loadSucceed - IMPORT - name: " + $pe.guid + "   "  + $pe.data );
 				var jsonResult:Object = JSONUtil.parse( $pe.data, $pe.guid + $pe.table, "AnimationCache.loadSucceed" );
 				if ( null == jsonResult ) {
 					//(new Alert( "VoxelVerse - Error Parsing: " + $pe.guid + $pe.table, 500 ) ).display();

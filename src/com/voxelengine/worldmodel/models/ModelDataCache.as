@@ -45,10 +45,10 @@ public class ModelDataCache
 		var md:ModelData = _modelData[$mde.modelGuid];
 		if ( null != md ) {
 			_modelData[$mde.modelGuid] = null; 
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mde.series, Globals.DB_TABLE_MODELS_DATA, $mde.modelGuid, md.dbo ) );
 			md = null;
 			// TODO need to clean up eventually
 		}
+		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mde.series, Globals.DB_TABLE_MODELS_DATA, $mde.modelGuid, null ) );
 	}
 	
 	static private function created( $mde:ModelDataEvent):void 	{ add( 0, $mde.vmd ); }

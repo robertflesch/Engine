@@ -391,8 +391,8 @@ public class VoxelModel
 			else	
 				changed = false;
 		}
-		else
-			Log.out( "VoxelModel.childLoadingComplete - got message for other model I am: " + metadata.name + "  got message for: " + e.modelGuid, Log.WARN );
+//		else
+//			Log.out( "VoxelModel.childLoadingComplete - got message for other model I am: " + metadata.name + "  got message for: " + e.modelGuid, Log.WARN );
 	}
 	
 	public function clone():VoxelModel {
@@ -435,6 +435,7 @@ public class VoxelModel
 		}
 	}
 	
+/*
 	public function explode($grainRange:int):void {
 		// lets assume grainRange is 1 for now.
 		// so I want to break apart the top level oxel into each of its children.
@@ -474,6 +475,7 @@ public class VoxelModel
 		oxel.neighborsInvalidate();
 		oxel.dirty = false;
 	}
+*/
 	
 	public function collisionTest($elapsedTimeMS:Number):Boolean {
 		// I dont think this is needed
@@ -1147,73 +1149,6 @@ public class VoxelModel
 		calculateCenter();
 	}
 	
-	// This is not working correctly
-	public function cloneFromChild(childOxel:Oxel):VoxelModel
-	{
-		var ii:InstanceInfo = instanceInfo.explosionClone();
-		ii.modelGuid = "ExplosionFragment";
-		var mi:ModelInfo = new ModelInfo();
-		var vm:VoxelModel = new VoxelModel(ii);
-		vm.init( mi, null, false )
-		vm.version = Globals.VERSION;
-		vm.instanceInfo.dynamicObject = true;
-		vm.oxel = childOxel;
-		vm.oxel.breakFromParent();
-		vm.complete = true;
-		//vm.instanceInfo.positionSet = positionGetWithParent;
-		/*
-		   var ba:ByteArray = new ByteArray();
-		
-		   // pad with eight bytes for header
-		   ba.writeByte('i'.charCodeAt());
-		   ba.writeByte('v'.charCodeAt());
-		   ba.writeByte('m'.charCodeAt());
-		   ba.writeByte(VERSION.charCodeAt(0));
-		   ba.writeByte(VERSION.charCodeAt(1));
-		   ba.writeByte(VERSION.charCodeAt(2));
-		   ba.writeByte(0);
-		   ba.writeByte( childOxel.gc.grain );
-		
-		   childOxel.writeData( ba );
-		 */ /*
-		   var ii:InstanceInfo = instanceInfo.explosionClone();
-		   // what to do about scripts?
-		   //ii.scripts
-		   ii.fileName = "ExplosionFragment";
-		   var mi:ModelInfo = new ModelInfo();
-		   var vm:VoxelModel = new VoxelModel( ii, mi );
-		   vm.version = Globals.VERSION;
-		   ba.position = 0;
-		   vm.IVMLoad( ba );
-		   //			vm.oxel.rebuildAll();
-		   vm.complete = true;
-		   vm.instanceInfo.position = position;
-		 */
-		
-		/*
-		 *
-		   var ii:InstanceInfo = instanceInfo.explosionClone();
-		   ii.fileName = "ExplosionFragment";
-		   var mi:ModelInfo = new ModelInfo();
-		   var vm:VoxelModel = new VoxelModel( ii, mi, false );
-		   vm.version = Globals.VERSION;
-		   vm.oxel = OxelPool.oxel_get();
-		   ba.position = 8;
-		   vm.oxel.byteArrayLoad( null,childOxel.gc, ba, _statisics );
-		   vm.complete = true;
-		   vm.instanceInfo.position = position;
-		 */
-		Region.currentRegion.modelCache.add( vm );
-		return vm;
-	
-		//var ms:ModelStatisics = new ModelStatisics();
-		//var clonedGC:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
-		//clonedGC.grain = gc.grain;
-		//clonedGC.bound = gc.bound;
-		//byteArrayLoad( clonedOxel, clonedGC, ba, ms );
-		//GrainCursorPool.poolDispose( clonedGC );
-	}
-	
 	// This was used to read Tox's
 	private function getKeyValuePair($ba:ByteArray):Object
 	{
@@ -1646,12 +1581,14 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 	}
 	
 	
-	public function stateLock( $val:Boolean, time:int = 0 ):void
+	public function stateLock( $val:Boolean, $lockTime:int = 0 ):void
 	{
+		Log.out("VoxelModel.stateLock - stateLock: " + $val );
 		_stateLock = $val;
-		if ( time )
+		// if $lockTime then unlock after that amount of time.
+		if ( $lockTime )
 		{
-			var pt:Timer = new Timer( time, 1 );
+			var pt:Timer = new Timer( $lockTime, 1 );
 			pt.addEventListener(TimerEvent.TIMER, onStateLockRemove );
 			pt.start();
 		}
@@ -1662,7 +1599,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		_stateLock = false;
 	}
 	
-	public function stateSet($state:String, $val:Number = 1):void
+	public function stateSet($state:String, $lockTime:Number = 1):void
 	{
 		if ( _stateLock )
 			return;
@@ -1675,7 +1612,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 			return; // not all children have loaded yet
 		}
 		
-		//Log.out( "VoxelModel.stateSet setTo: " + $state + "  current: " + (_anim ? _anim.name : "No current state") ); 
+		Log.out( "VoxelModel.stateSet setTo: " + $state + "  current: " + (_anim ? _anim.metadata.name : "No current state") ); 
 		if (_anim)
 		{
 			Log.out( "VoxelModel.stateSet - Stopping anim: " + _anim.metadata.name + "  starting: " + $state ); 
@@ -1683,9 +1620,9 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 			_anim = null;
 		}
 		
-		var aniVector:Vector.<Animation> = modelInfo.animations;
 		var result:Boolean = false;
 		const useInitializer:Boolean = true;
+		var aniVector:Vector.<Animation> = modelInfo.animations;
 		for each (var anim:Animation in aniVector)
 		{
 			if (anim.metadata.name == $state)
@@ -1694,6 +1631,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 				//{
 					//Log.out("VoxelModel.stateSet - ANIMATION NOT LOADED name: " + $state, Log.INFO);
 					//instanceInfo.state = $state;
+					// This should be redone as animationLoadComplete, and use an animation event
 					//Globals.g_app.addEventListener(LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
 					//return;
 				//}
@@ -1701,24 +1639,24 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 				for each (var at:AnimationTransform in anim.transforms)
 				{
 					//Log.out( "VoxelModel.stateSet - have AnimationTransform looking for child : " + at.attachmentName );
-					if (addAnimationsInChildren(children, at, useInitializer, $val))
+					if (addAnimationsInChildren(children, at, useInitializer, $lockTime))
 						result = true;
 				}
 				break;
 			}
 		}
-		
+
 		if (true == result)
 		{
 			_anim = anim;
 			//Log.out( "VoxelModel.stateSet - Playing anim: " + _anim.name ); 
-			_anim.play(this, $val);
+			_anim.play(this, $lockTime);
 		}
 //			else
 //				Log.out("VoxelModel.stateSet - addAnimationsInChildren returned false for: " + $state);
 		
 		// if any of the children load, then it succeeds, which is slightly problematic
-		function addAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $useInitializer:Boolean, $val:Number):Boolean
+		function addAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $useInitializer:Boolean, $lockTime:Number):Boolean
 		{
 			//Log.out( "VoxelModel.checkChildren - have AnimationTransform looking for child : " + $at.attachmentName );
 			var result:Boolean = false;
@@ -1727,13 +1665,13 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 				//Log.out( "VoxelModel.stateSet - addAnimationsInChildren - child: " + child.metadata.name );
 				if (child.metadata.name == $at.attachmentName)
 				{
-					child.stateSetData($at, $useInitializer, $val);
+					child.stateSetData($at, $useInitializer, $lockTime);
 					result = true;
 				}
 				else if (0 < child.children.length)
 				{
 					//Log.out( "VoxelModel.stateSet - addAnimationsInChildren - looking in children of child for: " + $at.attachmentName );
-					if (addAnimationsInChildren(child.children, $at, $useInitializer, $val))
+					if (addAnimationsInChildren(child.children, $at, $useInitializer, $lockTime))
 						result = true;
 				}
 			}
@@ -1742,14 +1680,14 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 	}
 	
 	// This is currently only used by the stateSet function
-	private function onModelLoadComplete( event:LoadingEvent):void
-	{
-		Log.out( "VoxelModel.onModelLoadComplete: " + modelInfo.fileName  );
-		LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
-		stateSet( instanceInfo.state );
-	}
+	//private function onModelLoadComplete( event:LoadingEvent):void
+	//{
+		//Log.out( "VoxelModel.onModelLoadComplete: " + modelInfo.fileName  );
+		//LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
+		//stateSet( instanceInfo.state );
+	//}
 	
-	private function stateSetData($at:AnimationTransform, $useInitializer:Boolean, $val:Number):void
+	private function stateSetData($at:AnimationTransform, $useInitializer:Boolean, $lockTime:Number):void
 	{
 		//Log.out( "VoxelModel.stateSet - attachment found: " + modelInfo.fileName + " initializer: " + $useInitializer + "  setting data " + $at );
 		if ($useInitializer)
@@ -1768,42 +1706,54 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 			for each (var mt:ModelTransform in $at.transforms)
 			{
 				if ($at.notNamed)
-					instanceInfo.addTransformMT(mt.clone($val));
+					instanceInfo.addTransformMT(mt.clone($lockTime));
 				else
-					instanceInfo.addNamedTransformMT(mt.clone($val));
+					instanceInfo.addNamedTransformMT(mt.clone($lockTime));
 			}
 		}
 	}
 	
-	public function updateAnimations($state:String, $val:Number):void
+	public function updateAnimationsOld($state:String, $percentage:Number):void
 	{
 		// No anim set
 		if (null == _anim)
 		{
-			stateSet($state, $val);
+			stateSet($state, $percentage);
 				//Log.out( "VoxelModel.updateAnimations - stateSet on anim: " + _anim.name ); 
 		}
 		// changing anim	
 		else if (_anim.metadata.name != $state)
 		{
-			stateSet($state, $val);
+			stateSet($state, $percentage);
 				//Log.out( "VoxelModel.updateAnimations - stateSet on NEW anim: " + _anim.name ); 
 		}
 		// updating existing anim
 		else if (_anim.metadata.name == $state)
 		{
-			//Log.out( "VoxelModel.updateAnimations - updating transform on anim: " + _anim.name + " val: " + $val ); 
+			//Log.out( "VoxelModel.updateAnimations - updating transform on anim: " + _anim.name + " val: " + $percentage ); 
 			for each (var at:AnimationTransform in _anim.transforms)
 			{
-				updateAnimationsInChildren(children, at, $val);
+				updateAnimationsInChildren(children, at, $percentage);
 			}
-			_anim.update($val);
+			_anim.update($percentage);
 		}
 		else
-			Log.out("VoxelModel.updateAnimations - what state gets me here?: " + $state + " val: " + $val);
+			Log.out("VoxelModel.updateAnimations - what state gets me here?: " + $state + " val: " + $percentage);
 	}
 	
-	private function updateAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $val:Number):Boolean
+	public function updateAnimations($state:String, $percentage:Number):void
+	{
+		if ( _anim ) {
+			//Log.out( "VoxelModel.updateAnimations - updating transform on anim: " + _anim.name + " val: " + $percentage ); 
+			for each (var at:AnimationTransform in _anim.transforms)
+			{
+				updateAnimationsInChildren(children, at, $percentage);
+			}
+			_anim.update($percentage);
+		}
+	}
+	
+	private function updateAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $percentage:Number):Boolean
 	{
 		//Log.out( "VoxelModel.updateAnimationsInChildren - have AnimationTransform looking for child : " + $at.attachmentName );
 		var result:Boolean = false;
@@ -1815,14 +1765,14 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 			{
 				for each (var mt:ModelTransform in $at.transforms)
 				{
-					child.instanceInfo.updateNamedTransform(mt, $val);
+					child.instanceInfo.updateNamedTransform(mt, $percentage);
 				}
 			}
 			// If this child has children, check them also.
 			else if (0 < child.children.length)
 			{
 				//Log.out( "VoxelModel.updateAnimationsInChildren - looking in children of child for: " + $at.attachmentName );
-				if (updateAnimationsInChildren(child.children, $at, $val))
+				if (updateAnimationsInChildren(child.children, $at, $percentage))
 					result = true;
 			}
 		}

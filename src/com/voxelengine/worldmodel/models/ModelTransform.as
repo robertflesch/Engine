@@ -47,7 +47,8 @@ package com.voxelengine.worldmodel.models
 		static private const TIMELEFT_INFINITE:int = -1;
 		
 		private var _time:int = 0;
-		private var _originalTime:int = 0;
+		private var _originalTime:Number = 0;
+		private var _originalDelta:Vector3D = new Vector3D();
 		private var _delta:Vector3D = new Vector3D();
 		private var _transformTarget:Vector3D;
 		private var _type:int;
@@ -56,12 +57,7 @@ package com.voxelengine.worldmodel.models
 		private var _inverse:Boolean = false;  // REPEATING ROTATIONS change the sign on the delta every cycle.
 		
 		public function get time():int { return _time; }
-		public function set time(val:int):void 
-		{ 
-			if ( 0 == time ) 
-				_originalTime = val;  
-			_time = val; 
-		}
+		public function set time(val:int):void {  _time = val; }
 		public function get type():int { return _type; }
 		public function set type(val:int):void { _type = val; }
 		private function get transformTarget():Vector3D { return _transformTarget; }
@@ -73,6 +69,8 @@ package com.voxelengine.worldmodel.models
 		
 		public function ModelTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" )
 		{
+			_originalDelta.setTo( $x, $y, $z );
+			_originalTime = $time;
 			if ( 0 == $time )
 				Log.out( "InstanceInfo.addTransform - No time defined name: " + $name + " x: " + $x + " y: " + $y + " z: " + $z, Log.ERROR );
 
@@ -101,7 +99,7 @@ package com.voxelengine.worldmodel.models
 			}
 			
 			if ( ModelTransform.INFINITE_TIME == $time )
-				time = $time;
+				time = ModelTransform.INFINITE_TIME;
 			else
 				time = $time * 1000;
 				
@@ -112,7 +110,12 @@ package com.voxelengine.worldmodel.models
 		// Animations use these as throw aways, when scaling animations
 		public function clone( $val:Number ):ModelTransform
 		{
-			var mt:ModelTransform = new ModelTransform( 0, 0, 0, time, type, name );
+			var mt:ModelTransform = new ModelTransform( _originalDelta.x
+			                                          , _originalDelta.y
+													  , _originalDelta.z
+													  , _originalTime
+													  , type
+													  , name );
 			mt._delta.setTo( _delta.x * $val, _delta.y * $val, _delta.z * $val );
 			mt._time = _time;
 			mt._originalTime = _originalTime;
@@ -254,23 +257,11 @@ package com.voxelengine.worldmodel.models
 			return false;
 		}
 		
-		public function toJSON(k:*):* 
-		{ 
-			var outTime:int = -1;
-			if ( TIMELEFT_INFINITE != _originalTime )
-				outTime = _originalTime / 1000;
-				
-			var outDelta:Vector3D = _delta.clone();
-			outDelta.scaleBy( 1000 );
-			
-			var outType:String = typeToString(_type);
-			
-			return {
-					delta:		outDelta,
-					time:		outTime,
-					type:		outType
-				};
-		} 			
+		public function buildExportObject( obj:Object ):void {			
+			obj.time 	= _originalTime;
+			obj.delta	= _originalDelta;
+			obj.type 	= typeToString( _type );
+		}
 		
 		static public function stringToType( val:String ):int
 		{

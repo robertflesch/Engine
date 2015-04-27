@@ -47,32 +47,12 @@ package com.voxelengine.worldmodel.animation
 			_instanceInfo.initJSON( $json );
 		}
 
-		private function vectorToJSON( v:Vector3D ):String {  return JSON.stringify( {x:v.x, y:v.y, z:v.z} ); } 	
-
-		
-		public function getJSON():String {
-			
-			var outString:String = "{";
-			outString += "\"fileName\": ";
-			outString += "\"" + _fileName + "\"";
-			outString += ",";
-			outString += "\"attachsTo\": ";
-			outString += "\"" + _attachsTo + "\"";
-			outString += ",";
-			outString += "\"location\": ";
-			outString += vectorToJSON( _instanceInfo.positionGet );
-			outString += ",";
-			outString += "\"rotation\": ";
-			outString += vectorToJSON( _instanceInfo.rotationGet );
-			
-			outString += "}";
-			
-			// TEST TEST TEST
-			//JSON.parse( outString );
-			
-			return outString;
+		public function buildExportObject( obj:Object ):void {			
+			obj.fileName 		= _fileName;
+			obj.attachsTo 		= _attachsTo;
+			obj.location		= _instanceInfo.positionGet;
+			obj.rotation		= _instanceInfo.rotationGet;
 		}
-		
 		
 		public function get instanceInfo():InstanceInfo 
 		{

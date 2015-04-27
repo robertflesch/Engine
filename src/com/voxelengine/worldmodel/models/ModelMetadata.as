@@ -191,7 +191,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		if ( $pe.dbo )
 			_dbo = $pe.dbo;
 		removeSaveEvents();
-		Log.out( "ModelMetadata.createSuccess - created: " + modelGuid, Log.DEBUG ); 
+		//Log.out( "ModelMetadata.createSuccess - created: " + modelGuid, Log.DEBUG ); 
 	}	
 	
 	private function saveFail( $pe:PersistanceEvent ):void { 

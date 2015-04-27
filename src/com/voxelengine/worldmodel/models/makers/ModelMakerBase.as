@@ -105,7 +105,7 @@ public class ModelMakerBase {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	// Make sense, called from for Makers
-	static public function modelMetaInfoRead( $ba:ByteArray ):Object {
+	static public function extractVersionInfo( $ba:ByteArray ):Object {
 		$ba.position = 0;
 		// Read off first 3 bytes, the data format
 		var format:String = readFormat($ba);
@@ -183,7 +183,7 @@ public class ModelMakerBase {
 			new ModelMaker( $ii, $addToRegionWhenComplete );
 	}
 
-	static public function modelInfoFromByteArray( $modelGuid:String, $ba:ByteArray ):ModelInfo {
+	static public function extractModelInfo( $ba:ByteArray ):Object {
 
 		// how many bytes is the modelInfo
 		var strLen:int = $ba.readInt();
@@ -193,9 +193,8 @@ public class ModelMakerBase {
 		// create the modelInfo object from embedded metadata
 		modelInfoJson = decodeURI(modelInfoJson);
 		var jsonResult:Object = JSON.parse(modelInfoJson);
-		var mi:ModelInfo = new ModelInfo();
-		mi.initJSON( $modelGuid, jsonResult );
-		return mi;		
+		return jsonResult;		
+		
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

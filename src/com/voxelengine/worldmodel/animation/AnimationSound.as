@@ -44,13 +44,11 @@ package com.voxelengine.worldmodel.animation
 			}
 		}
 		
-		public function getJSON():String {
-			var outString:String = JSON.stringify( {
-					name: 			_soundFile,
-					soundRangeMax: 	_soundRangeMax,
-					soundRangeMax: 	_soundRangeMin
-			} );
-			return outString;
+		public function getJSON( obj:Object ):void {
+			obj.sound = new Object();
+			obj.sound.name 			= _soundFile;
+			obj.sound.soundRangeMax	= _soundRangeMax;
+			obj.sound.soundRangeMin	= _soundRangeMin;
 		}
 		
 		public function play( $owner:VoxelModel, $val:Number ):void

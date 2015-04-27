@@ -93,10 +93,10 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 		catch (error:Error) { ; }
 		
 		// dont care, just need to step up the correct number of bytes
-		ModelMakerBase.modelMetaInfoRead( ba );
-		var mi:ModelInfo = ModelMakerBase.modelInfoFromByteArray( e.modelGuid, ba );
+		ModelMakerBase.extractVersionInfo( ba );
+		var modelInfoObject:Object = ModelMakerBase.extractModelInfo( ba );
 		// now tell the modelData to remove all of the guids associated with this model.
-		mi.animationsDelete();
+		ModelInfo.animationsDelete( modelInfoObject, e.modelGuid );
 
 		// Let MetadataCache handle the recursive delete
 		if ( _cb.selected )

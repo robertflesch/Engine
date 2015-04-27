@@ -87,13 +87,13 @@ package com.voxelengine.worldmodel
 			Log.out("----------------------------------------------------------------------------------" );
 		}	
 		
-		static public function playSoundWithPitch( $val:Number, $soundFile:String, $pitch:MP3Pitch  ):MP3Pitch
+		static public function playSoundWithPitch( $pitchRate:Number, $soundFile:String, $pitch:MP3Pitch  ):MP3Pitch
 		{
 			if ( null == $soundFile || "INVALID" == $soundFile )
 				return null;
 				
 			// pitch is 0 to 1, but I find that values less then 0.5 dont work
-			var pitchRate:Number = 0.5 + Math.abs($val) * 2 ;
+			var pitchRate:Number = 0.5 + Math.abs($pitchRate) * 2 ;
 			if ( $pitch )
 			{
 				//_pitch.volume = volume;

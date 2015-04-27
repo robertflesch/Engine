@@ -331,11 +331,14 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
-		public function animationsDelete():void {
-			
-			for each ( var animData:Object in _animationInfo ) {
-				// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $aniType:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
-				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, _modelGuid, animData.guid, animData.type, null ) );
+		static public function animationsDelete( modelInfoObject:Object, $modelGuid:String ):void {
+			if ( modelInfoObject.model.animations ) {
+				Log.out( "ModelInfo.animationsDelete - animations found" );
+				var animationsObj:Object = modelInfoObject.model.animations;
+				
+				for each ( var animData:Object in animationsObj ) {
+					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, $modelGuid, animData.guid, animData.type, null ) );
+				}
 			}
 		}
 	}

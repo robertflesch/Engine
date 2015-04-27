@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.furusystems.dconsole2.core.commands.IntrospectionCommand;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.Region;
@@ -175,8 +176,10 @@ public class InstanceInfo extends Location	{
 			obj.model.scale 			= scale;
 		if ( "" != _state )
 			obj.model.state				= _state;
-		if ( _transforms && 0 < _transforms.length )
-			obj.model.transforms		= _transforms;
+// This is saving the animation transforms into the instanceInfotransforms			
+// do I add transforms in the instanceInfo? RSF - 4.27.15
+//		if ( _transforms && 0 < _transforms.length )
+//			obj.model.transforms		= _transforms;
 		instanceScriptOnly( obj.model );  //
 		
 		function instanceScriptOnly( obj:Object ):void {
@@ -390,7 +393,13 @@ public class InstanceInfo extends Location	{
 		{
 			for each ( var modelTransform:Object in json.transforms )
 			{
-				var transformType:int = ModelTransform.stringToType( modelTransform.type.toLowerCase() );
+				Log.out( "InstanceInfo.setTransformInfo - modelTransform.type: " + modelTransform.type , Log.WARN );
+				var transformType:int
+				if ( modelTransform.type is String )
+					transformType = ModelTransform.stringToType( modelTransform.type );
+				else	
+					transformType = modelTransform.type;
+					
 				if ( "life" == modelTransform.type.toLowerCase() )
 					addTransform( 0
 								, 0
@@ -460,6 +469,7 @@ public class InstanceInfo extends Location	{
 	
 	public function removeAllNamedTransforms():void 
 	{
+		Log.out( "InstanceInfo.removeAllNamedTransforms", Log.WARN );
 		var index:int = 0;
 		// see if the transformations contain one already with this name.
 		for each ( var mt:ModelTransform in transforms )

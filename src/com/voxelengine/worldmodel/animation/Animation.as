@@ -47,10 +47,6 @@ public class Animation
 	
 	public function Animation() {  }
 	
-	public function loadFromPersistance( $dbo:DatabaseObject ):void {
-		metadata.fromPersistance( $dbo );
-	}
-	
 	public function fromImport( $json:Object, $guid:String, $aniType:String ):void  {
 		_metadata.fromImport( $guid, $aniType );
 		fromJSON( $json );
@@ -61,16 +57,16 @@ public class Animation
 			_sound = new AnimationSound();
 			_sound.init( $json.sound );
 		}
-		if ( $json.attachment ) {
+		if ( $json.attachments ) {
 			_attachments = new Vector.<AnimationAttachment>;
 			for each ( var attachmentJson:Object in $json.attachment )
 			{
 				_attachments.push( new AnimationAttachment( attachmentJson ) );				
 			}
 		}
-		if ( $json.animation ) {
+		if ( $json.animations ) {
 			_transforms = new Vector.<AnimationTransform>;
-			for each ( var transformJson:Object in $json.animation )
+			for each ( var transformJson:Object in $json.animations )
 			{
 				_transforms.push( new AnimationTransform( transformJson ) );				
 			}
@@ -85,72 +81,40 @@ public class Animation
 		var strLen:int = ba.readInt();
 		// read off that many bytes
 		var json:String = ba.readUTFBytes( strLen );
+		Log.out( "Animation.fromPersistance - name: " + metadata.name + "   "  + json );
 		var jsonResult:Object = JSONUtil.parse( json, _metadata.guid, "Animation.fromPersistance" );
 		fromJSON( jsonResult );
 	}
 	
-	private function getJSON():String
-	{
-		var jsonString:String = "{";
-		if ( _sound ) {
-			jsonString += "\"sound\":";
-			jsonString += _sound.getJSON();
-		}
-		if ( _attachments ) {
-			if ( _sound )
-				jsonString += ","
-			jsonString += "\"attachment\":[";
-			jsonString += attachmentsToJSON();
-			jsonString += "]"
-		}
-		if ( _transforms ) {
-			if ( _sound || _attachments )
-				jsonString += ","
-			jsonString += "\"animation\":[";
-			jsonString += animationsToJSON();
-			jsonString += "]"
-		}
-		jsonString += "}";
-		//Log.out( Animation.getJSON - name + " = " + jsonString );
-		return jsonString;
-	}
+	private function getJSON( obj:Object ):void {
+		if ( _sound )
+			_sound.getJSON( obj );
+		if ( _attachments )
+			getAttachmentsJSON( obj );
+		if ( _transforms )
+			getTransformsJSON( obj );
 
-	private function animationsToJSON():String {
-		var animations:Vector.<String> = new Vector.<String>;
-		var outString:String = new String();
-		
-		for each ( var at:AnimationTransform in _transforms ) {
-			if ( at )
-				animations.push( at.getJSON() );	
+		function getAttachmentsJSON( obj:Object ):void {
+			var oa:Vector.<Object> = new Vector.<Object>();
+			for each ( var aa:AnimationAttachment in _attachments ) {
+				var ao:Object = new Object();
+				aa.buildExportObject( ao );
+				oa.push( ao );
+			}
+			if ( oa.length )
+				obj.attachments = oa;
 		}
 		
-		var len:int = animations.length;
-		for ( var index:int; index < len; index++ ) {
-			outString += animations[index];
-			if ( index == len - 1 )
-				continue;
-			outString += ",";
+		function getTransformsJSON( obj:Object ):void {
+			var ot:Vector.<Object> = new Vector.<Object>();
+			for each ( var at:AnimationTransform in _transforms ) {
+				var ao:Object = new Object();
+				at.buildExportObject( ao );
+				ot.push( ao );
+			}
+			if ( ot.length )
+				obj.animations = ot;
 		}
-		return outString;
-	}
-
-	private function attachmentsToJSON():String {
-		var attachments:Vector.<String> = new Vector.<String>;
-		var outString:String = new String();
-		
-		for each ( var aa:AnimationAttachment in _attachments ) {
-			if ( aa  )
-				attachments.push( aa.getJSON() );	
-		}
-		
-		var len:int = attachments.length;
-		for ( var index:int; index < len; index++ ) {
-			outString += attachments[index];
-			if ( index == len - 1 )
-				continue;
-			outString += ",";
-		}
-		return outString;
 	}
 	
 	public function play( $owner:VoxelModel, $val:Number ):void {
@@ -192,7 +156,9 @@ public class Animation
 	}
 	
 	public function asByteArray( $ba:ByteArray ):ByteArray {
-		var json:String = getJSON();
+		var obj:Object = new Object();
+		getJSON( obj );
+		var json:String = JSON.stringify( obj );
 		$ba.writeInt( json.length );
 		$ba.writeUTFBytes( json );
 		$ba.compress();

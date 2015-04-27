@@ -130,7 +130,7 @@ _modelClass = Animation.MODEL_DRAGON_9;
 		if ( $pe.dbo )
 			_dbo = $pe.dbo;
 		removeSaveEvents();
-		Log.out( "AnimationMetadata.createSuccess - created: " + modelGuid, Log.DEBUG ); 
+		//Log.out( "AnimationMetadata.createSuccess - created: " + modelGuid, Log.DEBUG ); 
 	}	
 	
 	private function saveFail( $pe:PersistanceEvent ):void { 
