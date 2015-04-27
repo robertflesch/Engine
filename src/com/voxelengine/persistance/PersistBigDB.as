@@ -176,7 +176,7 @@ public class PersistBigDB
 		PlayerIOPersistanceEvent.removeListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
 		
 		function createSucceed($dbo:DatabaseObject):void  {  
-			Log.out( "PersistBigDB.save - CREATE Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
+			//Log.out( "PersistBigDB.save - CREATE Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.CREATE_SUCCEED, $pe.series, $pe.table, $pe.guid, $dbo ) ); 
 		}
 		
@@ -212,20 +212,12 @@ public class PersistBigDB
 			
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT, errorNoClient );
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
-		if ( $pe.dbo )
-		{
-			//Log.out( "PersistBigDB.save - saving inventory: " + $pe.guid );
-			
-			// deleteKeys( $table:String, $keys:Array, $successHandler:Function, $errorHandler:Function ):Boolean {
-			Persistance.deleteKeys( $pe.table
-								  ,	[ $pe.guid ]
-			                      , deleteSucceed
-								  , deleteFailure );
-		}
-		else
-		{
-			// if no DBO, nothing to do here
-		}
+		
+		// deleteKeys( $table:String, $keys:Array, $successHandler:Function, $errorHandler:Function ):Boolean {
+		Persistance.deleteKeys( $pe.table
+							  ,	[ $pe.guid ]
+							  , deleteSucceed
+							  , deleteFailure );
 		
 		PlayerIOPersistanceEvent.removeListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT, errorNoClient );
 		PlayerIOPersistanceEvent.removeListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
