@@ -469,7 +469,7 @@ public class InstanceInfo extends Location	{
 	
 	public function removeAllNamedTransforms():void 
 	{
-		Log.out( "InstanceInfo.removeAllNamedTransforms", Log.WARN );
+		//Log.out( "InstanceInfo.removeAllNamedTransforms", Log.WARN );
 		var index:int = 0;
 		// see if the transformations contain one already with this name.
 		for each ( var mt:ModelTransform in transforms )

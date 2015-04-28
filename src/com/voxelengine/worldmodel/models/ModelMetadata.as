@@ -157,9 +157,9 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 			addSaveEvents();
 			if ( _dbo )
 				toPersistance();
-			else {
+			else
 				var obj:Object = toObject();
-			}
+
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS, modelGuid, _dbo, obj ) );
 		}
 		else
@@ -168,12 +168,14 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	
 	private function addSaveEvents():void {
 		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
+		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, 	createFailed );
 		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, 	saveFail );
 	}
 	
 	private function removeSaveEvents():void {
 		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
+		PersistanceEvent.removeListener( PersistanceEvent.CREATE_FAILED, 	createFailed );
 		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
 		PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, 		saveFail );
 	}
@@ -182,25 +184,33 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "ModelMetadata.saveSucceed - created: " + modelGuid, Log.DEBUG ); 
-	}	
-	
-	private function createSucceed( $pe:PersistanceEvent ):void { 
-		if ( Globals.DB_TABLE_MODELS != $pe.table )
-			return;
-		if ( $pe.dbo )
-			_dbo = $pe.dbo;
-		removeSaveEvents();
-		//Log.out( "ModelMetadata.createSuccess - created: " + modelGuid, Log.DEBUG ); 
+		Log.out( "ModelMetadata.saveSucceed - modelGuid: " + modelGuid + "  name: " + name, Log.DEBUG ); 
 	}	
 	
 	private function saveFail( $pe:PersistanceEvent ):void { 
 		if ( Globals.DB_TABLE_MODELS != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "ModelMetadata.saveFail modelGuid: " + modelGuid, Log.ERROR ); 
+		Log.out( "ModelMetadata.saveFail - modelGuid: " + modelGuid, Log.ERROR ); 
 	}	
 
+	private function createSucceed( $pe:PersistanceEvent ):void { 
+		if ( Globals.DB_TABLE_MODELS != $pe.table )
+			return;
+		if ( $pe.dbo )
+			_dbo = $pe.dbo;
+		removeSaveEvents();
+		Log.out( "ModelMetadata.createSuccess - modelGuid: " + modelGuid, Log.DEBUG ); 
+	}	
+	
+	private function createFailed( $pe:PersistanceEvent ):void  {
+		if ( Globals.DB_TABLE_MODELS_DATA != $pe.table )
+			return;
+		removeSaveEvents();
+		// TODO How do I handle the metadata for failed object?
+		Log.out( "ModelData.createFailed  - modelGuid: " + modelGuid, Log.ERROR ); 
+		
+	}
 	
 	public function toPersistance():void {
 		

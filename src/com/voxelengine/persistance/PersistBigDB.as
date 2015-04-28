@@ -223,7 +223,7 @@ public class PersistBigDB
 		PlayerIOPersistanceEvent.removeListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
 		
 		function deleteSucceed():void  {  
-			Log.out( "PersistBigDB.deleteRequest.deleteSucceed - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
+			//Log.out( "PersistBigDB.deleteRequest.deleteSucceed - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_SUCCEED, $pe.series, $pe.table, $pe.guid ) ); 
 		}
 		

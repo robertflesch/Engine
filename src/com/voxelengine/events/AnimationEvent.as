@@ -7,10 +7,10 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.events
 {
-import com.voxelengine.worldmodel.animation.Animation;
 import flash.events.Event;
 import flash.events.EventDispatcher;
 
+import com.voxelengine.worldmodel.animation.Animation;
 import com.voxelengine.worldmodel.models.ModelData;
 /**
  * ...
@@ -19,7 +19,6 @@ import com.voxelengine.worldmodel.models.ModelData;
 public class AnimationEvent extends ModelBaseEvent
 {
 	private var _aniGuid:String; // animation guid or fileName
-	private var _aniType:String; // State or Action
 	private var _modelGuid:String; // Owners guid
 	private var _ani:Animation;
 	private var _fromTable:Boolean;
@@ -28,24 +27,22 @@ public class AnimationEvent extends ModelBaseEvent
 	public function get modelGuid():String  { return _modelGuid; }
 	public function get fromTable():Boolean  { return _fromTable; }
 	public function get ani():Animation  { return _ani; }
-	public function get aniType():String  { return _aniType; }
 	
-	public function AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $aniType:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $series, $bubbles, $cancellable );
 		_modelGuid = $modelGuid;
 		_aniGuid = $aniGuid;
 		_fromTable = $fromTable;
 		_ani = $ani;
-		_aniType = $aniType
 	}
 	
 	public override function clone():Event {
-		return new AnimationEvent(type, series, _modelGuid, _aniGuid, _aniType, _ani, bubbles, cancelable);
+		return new AnimationEvent(type, series, _modelGuid, _aniGuid, _ani, bubbles, cancelable);
 	}
    
 	public override function toString():String {
-		return formatToString("AnimationEvent", "series", "modelGuid", "aniGuid", "aniType", "ani" );
+		return formatToString("AnimationEvent", "series", "modelGuid", "aniGuid", "ani" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

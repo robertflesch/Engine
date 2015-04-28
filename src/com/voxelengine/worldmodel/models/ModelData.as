@@ -54,20 +54,16 @@ public class ModelData
 	//}
 	
 	public function save( ba:ByteArray ):void {
-		_compressedBA = ba;
-		_compressedBA.compress();
 		if ( Globals.online ) {
-			//Log.out( "ModelData.save - Saving Model Metadata: " + modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
+			Log.out( "ModelData.save - Saving ModelData: " + modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
+			_compressedBA = ba;
+			_compressedBA.compress();
 			addSaveEvents();
-			//Log.out( "ModelData.save ============= data size: " + _compressedBA.length + " bytes ==================  ", Log.WARN );
-			if ( _dbo ) {
-				//Log.out( "ModelData.save dbo found: " + modelGuid, Log.WARN );
+			if ( _dbo )
 				toPersistance();
-			}
-			else {
-				//Log.out( "ModelData.save NO NO NO dbo found: " + modelGuid, Log.WARN );
+			else
 				var obj:Object = toObject();
-			}
+				
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS_DATA, modelGuid, _dbo, obj ) );
 		}
 		else

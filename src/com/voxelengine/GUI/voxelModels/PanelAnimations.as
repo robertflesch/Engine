@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.voxelModels
 {
+import com.voxelengine.events.AnimationEvent;
+import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.GUI.animation.WindowAnimationDetail;
 import com.voxelengine.worldmodel.animation.AnimationAttachment;
 import com.voxelengine.worldmodel.MemoryManager;
@@ -122,7 +124,12 @@ public class PanelAnimations extends PanelBase
 		function deleteAnimationHandler(event:UIMouseEvent):void  {
 			if ( _selectedAnimation )
 			{
-				(new Alert( LanguageManager.localizedStringGet( "NOT IMPLEMENTED" ) )).display();
+				var anim:Animation = _selectedAnimation;
+				//(new Alert( LanguageManager.localizedStringGet( "NOT IMPLEMENTED" ) )).display();
+				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, _selectedModel.instanceInfo.modelGuid, anim.metadata.guid, null ) );
+				populateAnimations( _selectedModel );
+				_selectedModel.changed = true;
+				_selectedModel.save();
 			}
 			else
 				noAnimationSelected();

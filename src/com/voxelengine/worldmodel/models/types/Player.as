@@ -355,7 +355,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 
 	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
-		Log.out( "Player.takeControl --------------------------------------------------------------------------------------------------------------------", Log.WARN );
+		Log.out( "Player.takeControl --------------------------------------------------------------------------------------------------------------------", Log.DEBUG );
 		super.takeControl( $modelLosingControl, false );
 		instanceInfo.usesCollision = true;
 		// We need to grab the rotation of the old parent, otherwise we get rotated back to 0 since last rotation is 0
@@ -368,7 +368,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
-		Log.out( "Player.loseControl --------------------------------------------------------------------------------------------------------------------", Log.WARN );
+		Log.out( "Player.loseControl --------------------------------------------------------------------------------------------------------------------", Log.DEBUG );
 		super.loseControl( $modelDetaching, false );
 		instanceInfo.usesCollision = false;
 	}

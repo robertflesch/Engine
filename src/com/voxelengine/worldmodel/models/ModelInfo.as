@@ -300,17 +300,18 @@ package com.voxelengine.worldmodel.models
 				return;
 			}
 				
+			AnimationEvent.addListener( ModelBaseEvent.DELETE, deleteHandler );
 			AnimationEvent.addListener( ModelBaseEvent.ADDED, animationAdd );
 			_series = 0;
 			for each ( var animData:Object in _animationInfo ) {
 				_animationCount++; 
 				
-				// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $aniType:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+				// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 				var ae:AnimationEvent;
 				if ( Globals.isGuid( animData.guid ) )
-					ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, _modelGuid, animData.guid, animData.type, null, true );
+					ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, _modelGuid, animData.guid, null, true );
 				else
-					ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, _modelGuid, animData.name, animData.type, null, false );
+					ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, _modelGuid, animData.name, null, false );
 					
 				_series = ae.series;
 				AnimationEvent.dispatch( ae );
@@ -318,7 +319,7 @@ package com.voxelengine.worldmodel.models
 		}
 				
 		public function animationAdd( $ae:AnimationEvent ):void {
-			Log.out( "ModelInfo.addAnimation $ae: " + $ae, Log.WARN );
+			Log.out( "ModelInfo.addAnimation " + $ae, Log.WARN );
 			if ( _series == $ae.series ) {
 				$ae.ani.metadata.modelGuid = _modelGuid;
 				_animations.push( $ae.ani );
@@ -331,13 +332,36 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 		
+		public function deleteHandler( $ae:AnimationEvent ):void {
+			//Log.out( "ModelInfo.animationDelete $ae: " + $ae, Log.WARN );
+			if ( $ae.modelGuid == _modelGuid ) {
+				for ( var i:int; i < _animations.length; i++ ) {
+					var anim:Animation = _animations[i];
+					if ( anim.metadata.guid == $ae.aniGuid ) {
+						_animations.splice( i, 1 );
+						return;
+					}
+				}
+			}
+		}
+		
+		public function animationGet( $animName:String ):Animation {
+			for ( var i:int; i < _animations.length; i++ ) {
+				var anim:Animation = _animations[i];
+				if ( anim.metadata.name == $animName ) {
+					return anim;
+				}
+			}
+			return null;
+		}
+		
 		static public function animationsDelete( modelInfoObject:Object, $modelGuid:String ):void {
 			if ( modelInfoObject.model.animations ) {
 				Log.out( "ModelInfo.animationsDelete - animations found" );
 				var animationsObj:Object = modelInfoObject.model.animations;
 				
 				for each ( var animData:Object in animationsObj ) {
-					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, $modelGuid, animData.guid, animData.type, null ) );
+					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, $modelGuid, animData.guid, null ) );
 				}
 			}
 		}

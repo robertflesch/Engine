@@ -71,7 +71,7 @@ public class VoxelModel
 	private		var	_version:int; 															// INSTANCE NOT EXPORTED
 	
 	private		var	_anim:Animation;			
-	private		var	_stateLock:Boolean 														// INSTANCE NOT EXPORTED
+	protected	var	_stateLock:Boolean 														// INSTANCE NOT EXPORTED
 			
 	private		var	_lightIDNext:uint 							= 1024; // TODO FIX reserve space for ?
 						
@@ -1622,27 +1622,22 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		
 		var result:Boolean = false;
 		const useInitializer:Boolean = true;
-		var aniVector:Vector.<Animation> = modelInfo.animations;
-		for each (var anim:Animation in aniVector)
-		{
-			if (anim.metadata.name == $state)
+		var anim:Animation = modelInfo.animationGet( $state );
+		if ( anim ) {
+			//if (!anim.loaded)
+			//{
+				//Log.out("VoxelModel.stateSet - ANIMATION NOT LOADED name: " + $state, Log.INFO);
+				//instanceInfo.state = $state;
+				// This should be redone as animationLoadComplete, and use an animation event
+				//Globals.g_app.addEventListener(LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
+				//return;
+			//}
+			//
+			for each (var at:AnimationTransform in anim.transforms)
 			{
-				//if (!anim.loaded)
-				//{
-					//Log.out("VoxelModel.stateSet - ANIMATION NOT LOADED name: " + $state, Log.INFO);
-					//instanceInfo.state = $state;
-					// This should be redone as animationLoadComplete, and use an animation event
-					//Globals.g_app.addEventListener(LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
-					//return;
-				//}
-				//
-				for each (var at:AnimationTransform in anim.transforms)
-				{
-					//Log.out( "VoxelModel.stateSet - have AnimationTransform looking for child : " + at.attachmentName );
-					if (addAnimationsInChildren(children, at, useInitializer, $lockTime))
-						result = true;
-				}
-				break;
+				//Log.out( "VoxelModel.stateSet - have AnimationTransform looking for child : " + at.attachmentName );
+				if (addAnimationsInChildren(children, at, useInitializer, $lockTime))
+					result = true;
 			}
 		}
 
@@ -1662,7 +1657,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 			var result:Boolean = false;
 			for each (var child:VoxelModel in $children)
 			{
-				//Log.out( "VoxelModel.stateSet - addAnimationsInChildren - child: " + child.metadata.name );
+				Log.out( "VoxelModel.addAnimationsInChildren - is child.metadata.name: " + child.metadata.name + " equal to $at.attachmentName: " + $at.attachmentName );
 				if (child.metadata.name == $at.attachmentName)
 				{
 					child.stateSetData($at, $useInitializer, $lockTime);
@@ -1689,6 +1684,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 	
 	private function stateSetData($at:AnimationTransform, $useInitializer:Boolean, $lockTime:Number):void
 	{
+		instanceInfo.removeAllNamedTransforms();
 		//Log.out( "VoxelModel.stateSet - attachment found: " + modelInfo.fileName + " initializer: " + $useInitializer + "  setting data " + $at );
 		if ($useInitializer)
 		{
@@ -1700,7 +1696,6 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 				instanceInfo.scale = $at.scale;
 		}
 		
-		instanceInfo.removeAllNamedTransforms();
 		if ($at.hasTransform)
 		{
 			for each (var mt:ModelTransform in $at.transforms)

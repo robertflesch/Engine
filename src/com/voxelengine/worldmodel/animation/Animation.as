@@ -169,5 +169,12 @@ public class Animation
 		if ( dbo ) 
 			metadata.dbo = dbo;
 	}
+	
+	public function toString():String {
+		var obj:Object = new Object();
+		getJSON( obj );
+		return 	_metadata.name + "  " + JSON.stringify( obj );
+
+	}
 }
 }

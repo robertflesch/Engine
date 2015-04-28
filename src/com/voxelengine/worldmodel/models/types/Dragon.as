@@ -106,6 +106,9 @@ public class Dragon extends Beast
 	
 	override protected function setAnimation():void	{
 		
+		if ( _stateLock )
+			return;
+			
 		clipVelocityFactor = 0.995;
 		var climbFactor:Number = ( mMaxClimbAngle + instanceInfo.rotationGet.x) / mMaxClimbAngle;
 		if ( onSolidGround )
