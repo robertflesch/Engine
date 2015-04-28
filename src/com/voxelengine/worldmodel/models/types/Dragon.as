@@ -111,6 +111,7 @@ public class Dragon extends Beast
 			
 		clipVelocityFactor = 0.995;
 		var climbFactor:Number = ( mMaxClimbAngle + instanceInfo.rotationGet.x) / mMaxClimbAngle;
+		
 		if ( onSolidGround )
 		{
 			updateAnimations( "Walk", 0.5 );

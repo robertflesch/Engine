@@ -1657,7 +1657,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 			var result:Boolean = false;
 			for each (var child:VoxelModel in $children)
 			{
-				Log.out( "VoxelModel.addAnimationsInChildren - is child.metadata.name: " + child.metadata.name + " equal to $at.attachmentName: " + $at.attachmentName );
+				//Log.out( "VoxelModel.addAnimationsInChildren - is child.metadata.name: " + child.metadata.name + " equal to $at.attachmentName: " + $at.attachmentName );
 				if (child.metadata.name == $at.attachmentName)
 				{
 					child.stateSetData($at, $useInitializer, $lockTime);
@@ -1708,7 +1708,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		}
 	}
 	
-	public function updateAnimationsOld($state:String, $percentage:Number):void
+	public function updateAnimations($state:String, $percentage:Number):void
 	{
 		// No anim set
 		if (null == _anim)
@@ -1734,18 +1734,6 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		}
 		else
 			Log.out("VoxelModel.updateAnimations - what state gets me here?: " + $state + " val: " + $percentage);
-	}
-	
-	public function updateAnimations($state:String, $percentage:Number):void
-	{
-		if ( _anim ) {
-			//Log.out( "VoxelModel.updateAnimations - updating transform on anim: " + _anim.name + " val: " + $percentage ); 
-			for each (var at:AnimationTransform in _anim.transforms)
-			{
-				updateAnimationsInChildren(children, at, $percentage);
-			}
-			_anim.update($percentage);
-		}
 	}
 	
 	private function updateAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $percentage:Number):Boolean

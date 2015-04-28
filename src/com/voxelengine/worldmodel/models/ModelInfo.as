@@ -319,7 +319,7 @@ package com.voxelengine.worldmodel.models
 		}
 				
 		public function animationAdd( $ae:AnimationEvent ):void {
-			Log.out( "ModelInfo.addAnimation " + $ae, Log.WARN );
+			//Log.out( "ModelInfo.addAnimation " + $ae, Log.WARN );
 			if ( _series == $ae.series ) {
 				$ae.ani.metadata.modelGuid = _modelGuid;
 				_animations.push( $ae.ani );
