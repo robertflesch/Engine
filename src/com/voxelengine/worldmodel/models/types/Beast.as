@@ -305,7 +305,7 @@ package com.voxelengine.worldmodel.models.types
 		
 		private var _dy:Number = 0;
 		override protected function handleMouseMovement( $elapsedTimeMS:int ):void {
-			if ( !Globals.mouseView && Globals.active && Globals.clicked ) 
+			if ( 0 == Globals.openWindowCount && Globals.active && Globals.clicked ) 
 			{
 				var climbFactor:Number = ( mMaxClimbAngle + instanceInfo.rotationGet.x) / mMaxClimbAngle;
 				var scaleFactor:Number = mClimbRate + climbFactor;
