@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
+	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.display3D.Context3D;
 
 	import com.voxelengine.Globals;
