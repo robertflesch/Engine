@@ -37,6 +37,7 @@ public class VertexIndexBuilder
 
 	private static const BUFFER_LIMIT:int = 65535;
 	private static const BYTES_PER_WORD:uint = 4
+	private static const MAX_QUADS:int = (BUFFER_LIMIT + 1) / 4; // Buffer limit is max number of vertexes, and each quad has 4
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//     Static Functions
@@ -208,8 +209,6 @@ public class VertexIndexBuilder
 			
 			if ( 0 < remainingOxels )
 				addComponentData();
-			
-			const MAX_QUADS:int = BUFFER_LIMIT / 4; // Buffer limit is max number of vertexes, and each quad has 4
 			
 			while ( 0 < remainingOxels ) {
 				var quadsProcessed:int = 0;
