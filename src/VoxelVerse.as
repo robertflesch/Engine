@@ -90,10 +90,10 @@ package {
 			
 			//Log.out( "VoxelVerse.onSplashLoaded - stage.addEventListener" );
 //			stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+//			stage.addEventListener(MouseEvent.RIGHT_CLICK, mouseRightClick); // Not supporting right click
 			stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
-			stage.addEventListener(MouseEvent.RIGHT_CLICK, onMouseRightClick);
-			stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, mouseDownRight);
-			stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, mouseUpRight);
+//			stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, mouseDownRight);
+//			stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, mouseUpRight);
 			
 			Security.loadPolicyFile( "http://cdn.playerio.com/crossdomain.xml" );
 //			var ctxt:LoaderContext = new LoaderContext( true );
@@ -102,7 +102,7 @@ package {
 			VoxelVerseGUI.currentInstance.buildGUI();	
 			Log.out( "VoxelVerse.readyToGo", Log.DEBUG );
 		}
-
+		
 		private function enterFrame(e:Event):void {
 			//Log.out( "VoxelVerse.enterFrame" );
 			const timeEntered:int = getTimer();
@@ -179,7 +179,6 @@ package {
 			if ( true == Globals.active ) {
 				//Log.out( "VoxelVerse.deactivateApp with active app", Log.WARN );
 				Globals.active = false;
-				Globals.mouseView = false;
 				Globals.clicked = false;
 				VoxelVerseGUI.currentInstance.crossHairInactive();
 				
@@ -216,22 +215,6 @@ package {
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			activateApp();
 		}
-		
-		private function mouseDownRight(e:MouseEvent):void {
-//			Log.out("VoxelVerse.mouseDownRight" );
-			Globals.mouseView = true;
-		}
-		
-		private function mouseUpRight(e:MouseEvent):void {
-//			Log.out("VoxelVerse.mouseUpRight" );
-			Globals.mouseView = false;
-		}
-		
-		private function onMouseRightClick(e:MouseEvent):void 
-		{
-			//trace ( "VoxelVerse.onMouseRightClick - Right click functions enabled" )
-		}
-		
 		
 		private function toggleConsole():void 
 		{
