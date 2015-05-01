@@ -449,9 +449,5 @@ package com.voxelengine.worldmodel.models
 			
 			return modelList;
 		}
-		
-		flash.geom.Vector3D.prototype.toJSON = function (k:*):* { 
-		return {x:this.x, y:this.y, z:this.z};
-		} 	
 	}
 }
