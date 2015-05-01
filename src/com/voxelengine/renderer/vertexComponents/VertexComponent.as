@@ -25,13 +25,11 @@ public class VertexComponent {
 	
 	public function writeToByteArray( ba:ByteArray ):void {}
 	
-	public function type():String {
-		return _type;
-	}
+	[inline]
+	final public function type():String { return _type; }
 	
-	public function size():uint {
-		return _size;
-	}
+	[inline]
+	final public function size():uint { return _size; }
 	
 	public function clone():VertexComponent {
 		return new VertexComponent( _type, _size );
