@@ -122,7 +122,6 @@ public class  UserInventory extends QuickInventory
 			
 		with ( _s_currentInstance ) {
 			Globals.g_app.editing = false;
-			_outline.visible = false;
 			visible = false;
 			removeListeners();
 		}
@@ -143,7 +142,6 @@ public class  UserInventory extends QuickInventory
 		if ( Globals.inRoom ) {
 			with ( _s_currentInstance ) {
 				// display it!
-				_outline.visible = true;
 				visible = true;
 				Globals.g_app.editing = true;
 				addListeners();
