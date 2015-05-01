@@ -49,6 +49,9 @@ public class  UserInventory extends QuickInventory
 	private var _lastItemSelection:int = -1;
 	private var _toolSize:GrainSelector;
 	private var _shape:ShapeSelector;
+	
+	private var _modelTools:ModelPlacementType;
+		
 	private var _remove:Boolean;
 	private var _owner:String;
 	private var _inventoryLoaded:Boolean;
@@ -77,7 +80,13 @@ public class  UserInventory extends QuickInventory
 		
 		_shape = new ShapeSelector();
 		addChild(_shape);
+		
+		_modelTools = new ModelPlacementType();
+		addChild(_modelTools);
+		
 		hideGrainTools();
+		hideModelTools();
+		
 		_s_currentInstance = this;
 
 		RoomEvent.addListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
@@ -299,6 +308,7 @@ public class  UserInventory extends QuickInventory
 		Globals.g_app.editing = false;
 		Globals.g_app.toolOrBlockEnabled = false;
 		hideGrainTools();
+		hideModelTools();
 		// reset the cursor type to what was selected in the shape selector
 		EditCursor.cursorType = _lastCursorType;
 		
@@ -356,6 +366,8 @@ public class  UserInventory extends QuickInventory
 			if ( lastItemSelection != itemIndex )
 				EditCursor.objectModelClear(); // clear the previously draw model
 			
+			showModelTools();
+			
 			EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
 			var ti1:TypeInfo = TypeInfo.typeInfoByName[ "CLEAR GLASS" ];
 			EditCursor.editCursorIcon = ti1.type;
@@ -412,6 +424,14 @@ public class  UserInventory extends QuickInventory
 	private function hideGrainTools():void {
 		_toolSize.hide();
 		_shape.hide();
+	}
+
+	private function showModelTools():void {
+		_modelTools.show();
+	}
+	
+	private function hideModelTools():void {
+		_modelTools.hide();
 	}
 
 	private var _listenersAdded:Boolean;

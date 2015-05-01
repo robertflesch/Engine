@@ -33,6 +33,7 @@ package org.flashapi.swing {
 	import flash.display.DisplayObject;
 	import flash.display.Shape;
 	import flash.display.Sprite;
+	import flash.display3D.IndexBuffer3D;
 	import flash.events.KeyboardEvent;
 	import flash.geom.Rectangle;
 	import flash.ui.Keyboard;
@@ -1134,6 +1135,10 @@ package org.flashapi.swing {
 			setScrollBarProps();
 			_borderDecorator.drawBorders();
 			setEffects();
+		}
+		
+		public function itemGet( i:int ):ListItem {
+			return $objList.get(i) as ListItem;
 		}
 		
 		private function currentItemChanged(caller:SelectableItem):void {

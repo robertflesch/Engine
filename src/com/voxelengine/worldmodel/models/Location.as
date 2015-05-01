@@ -225,6 +225,15 @@ package com.voxelengine.worldmodel.models
 			return _modelMatrix.deltaTransformVector( new Vector3D( 0, 0, length ) );
 		}
 
+		public function placeAt( length:int ):Vector3D
+		{
+			if ( changed )
+				recalculateMatrix();
+			var newPos:Vector3D = _modelMatrix.deltaTransformVector( new Vector3D( 0, 0, length ) );
+			//
+			newPos = newPos.add( positionGet );
+			return newPos;
+		}
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// WorldToModel and ModelToWorld
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////

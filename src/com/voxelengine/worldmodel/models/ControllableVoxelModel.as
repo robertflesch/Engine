@@ -180,8 +180,9 @@ public class ControllableVoxelModel extends VoxelModel
 	}
 	protected function onActivate( e:GUIEvent ):void 
 	{
-		stateLock( false );
-		stateSet( "" );
+		//Log.out( "ControllableVoxelModel.onActivate - REMOVED STATELOCK AND STATESET", Log.WARN );
+//		stateLock( false );
+//		stateSet( "" );
 	}
 	
 	override public function release():void

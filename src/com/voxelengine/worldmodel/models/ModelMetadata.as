@@ -117,6 +117,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		newVmm.parentModelGuid  = parentModelGuid;
 		newVmm._dbo				= null;
 		newVmm.permissions		= _permissions.clone();
+		newVmm.modifiedDate		= modifiedDate;
 		
 		return newVmm;
 	}

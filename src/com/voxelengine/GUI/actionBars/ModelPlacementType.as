@@ -18,23 +18,29 @@ import com.voxelengine.Log;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.TypeInfo;
 
-public class ShapeSelector extends VVCanvas
+public class ModelPlacementType extends VVCanvas
 {
 	protected var _outline:Image;
 	private const IMAGE_SIZE:int = 64;
 	private var _butCurrent:Box;
+	static private var _s_placementType:String;
 	
-	public function ShapeSelector()
+	static public const PLACEMENT_TYPE_PARENT:String = "PLACEMENT_TYPE_PARENT";
+	static public const PLACEMENT_TYPE_CHILD:String = "PLACEMENT_TYPE_CHILD";
+	
+	static public function modelPlacementTypeGet():String { return _s_placementType;  }
+	
+	public function ModelPlacementType()
 	{
 		super( 84, 74 );
+		_s_placementType = PLACEMENT_TYPE_CHILD;
 		layout = new AbsoluteLayout();
 		_outline = new Image( Globals.appPath + "assets/textures/toolSelector.png" );
 		addElement( _outline );
 		display();
 		show();
-		addShapeSelector();
+		addModelPlacementType();
 		resizeObject( null );
-		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 	}
 	
 	public function resizeObject(event:Event):void 
@@ -45,13 +51,13 @@ public class ShapeSelector extends VVCanvas
 		x = halfRW - (width / 2);
 	}
 	
-	public function addShapeSelector():void
+	public function addModelPlacementType():void
 	{
 		_butCurrent = new Box(IMAGE_SIZE, IMAGE_SIZE);
 		_butCurrent.x = 10;
 		_butCurrent.y = 10;
-		_butCurrent.data = "square";
-		_butCurrent.backgroundTexture = "assets/textures/square.jpg";
+		_butCurrent.data = "child";
+		_butCurrent.backgroundTexture = "assets/textures/child.jpg";
 		addElement( _butCurrent );
 		
 		
@@ -63,9 +69,9 @@ public class ShapeSelector extends VVCanvas
 		addElement(hk);
 		
 		eventCollector.addEvent( _butCurrent, UIMouseEvent.PRESS, pressShape );
-//		eventCollector.addEvent( _butCurrent, UIMouseEvent.RELEASE, releaseShape );
+		//eventCollector.addEvent( _butCurrent, UIMouseEvent.RELEASE, releaseShape );
 		eventCollector.addEvent( hk, UIMouseEvent.PRESS, pressShape );
-//		eventCollector.addEvent( hk, UIMouseEvent.RELEASE, pressShape );
+		//eventCollector.addEvent( hk, UIMouseEvent.RELEASE, pressShape );
 	}
 	
 	public function hotKeyInventory(e:KeyboardEvent):void 
@@ -87,33 +93,21 @@ public class ShapeSelector extends VVCanvas
 	{
 		nextShape();
 	}
+	
 	private function nextShape():void
 	{
-		if ( "square" == _butCurrent.data)
+		if ( "child" == _butCurrent.data)
 		{
-			_butCurrent.data = "cylinder";	
-			_butCurrent.backgroundTexture = "assets/textures/cylinder.jpg";
-			EditCursor.cursorType = EditCursor.CURSOR_TYPE_CYLINDER;
-			if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-				EditCursor.editCursorIcon = EditCursor.EDITCURSOR_CYLINDER;
-			//EditCursor.editCursorIcon = TypeInfo.EDITCURSOR_CYLINDER_ANIMATED;
+			_butCurrent.data = "parent";	
+			_butCurrent.backgroundTexture = "assets/textures/parent.jpg";
+			_s_placementType = PLACEMENT_TYPE_PARENT;
 		} 
-		else if ( "cylinder" == _butCurrent.data)
+		else if ( "parent" == _butCurrent.data)
 		{
-			_butCurrent.data = "sphere";	
-			_butCurrent.backgroundTexture = "assets/textures/sphere.jpg";
-			EditCursor.cursorType = EditCursor.CURSOR_TYPE_SPHERE;
-			if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-				EditCursor.editCursorIcon = EditCursor.EDITCURSOR_ROUND;
+			_butCurrent.data = "child";	
+			_butCurrent.backgroundTexture = "assets/textures/child.jpg";
+			_s_placementType = PLACEMENT_TYPE_CHILD;
 		} 
-		else if ( "sphere" == _butCurrent.data)
-		{
-			_butCurrent.data = "square";	
-			_butCurrent.backgroundTexture = "assets/textures/square.jpg";
-			EditCursor.cursorType = EditCursor.CURSOR_TYPE_GRAIN;
-			if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-				EditCursor.editCursorIcon = EditCursor.EDITCURSOR_SQUARE;
-		}
 	}
 	
 	public function show():void
@@ -131,5 +125,6 @@ public class ShapeSelector extends VVCanvas
 			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 		visible = false;
 	}
+	
 }
 }

@@ -7,8 +7,6 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-import com.voxelengine.events.LoadingImageEvent;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.Region;
 import flash.utils.getTimer;
 import flash.utils.ByteArray;
@@ -19,10 +17,13 @@ import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.WindowSplashEvent;
+import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF

@@ -60,7 +60,11 @@ package com.voxelengine.worldmodel.models
 
 		public function get hasInventory():Boolean { return _hasInventory; }
 		public function set hasInventory(value:Boolean):void  { _hasInventory = value; }
+		
 		protected var _hasInventory:Boolean 					= false
+		
+		public function get modelGuid():String { return _modelGuid; }
+		public function set modelGuid(value:String):void  { _modelGuid = value; }
 		
 		public function ModelInfo():void  { ; }
 		
@@ -80,15 +84,17 @@ package com.voxelengine.worldmodel.models
 			_animationInfo = null;
 		}
 		
-		public function clone( newGuid:String = "" ):ModelInfo
+		public function clone( $newGuid:String = null ):ModelInfo
 		{
-			throw new Error( "ModelInfo.clone - what context is this used in?" );
+			//throw new Error( "ModelInfo.clone - what context is this used in?" );
 			var newModelInfo:ModelInfo = new ModelInfo();
-			//if ( "" == newGuid )
-				//newModelInfo.fileName 			= Globals.getUID();
-			//else	
-				//newModelInfo.fileName 			= newGuid;
+
+			if ( $newGuid )
+				newModelInfo._modelGuid		= $newGuid;
+			else	
+				newModelInfo._modelGuid		= this._modelGuid;
 				
+			newModelInfo._owner			= this._owner;
 			newModelInfo._modelClass	= this.modelClass;
 			newModelInfo._grainSize		= this.grainSize;
 			// need to copy this?
@@ -182,14 +188,11 @@ package com.voxelengine.worldmodel.models
 			}
 				
 			_fileName = $modelGuid;
+			_modelGuid = $modelGuid;
 			_modelJson = $json;
 			
 			// this is the json just for modelInfo
 			var modelInfoJson:Object = $json.model;
-			
-			if ( modelInfoJson && modelInfoJson.guid  )
-				Log.out( "ModelInfo.init - WARNING - FOUND OLD modelGuid in file: " + $modelGuid );					
-				
 			
 			if ( modelInfoJson.grainSize )
 				_grainSize = 	modelInfoJson.grainSize;

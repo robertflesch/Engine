@@ -53,7 +53,7 @@ public class PanelModels extends PanelBase
 		_listModels.dragEnabled = true;
 		_listModels.draggable = true;
 
-		_listModels.eventCollector.addEvent( _listModels, ListEvent.LIST_CHANGED, selectModel );		
+		_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, selectModel );		
 		
 		buttonsCreate();
 		addElement( _listModels );
@@ -154,6 +154,7 @@ public class PanelModels extends PanelBase
 				_selectedModel.dead = true;
 				_selectedModel = null;
 				populateModels( _dictionarySource, _parentModel );
+				buttonsDisable();
 			}
 			else
 				noModelSelected();
@@ -165,10 +166,7 @@ public class PanelModels extends PanelBase
 		_selectedModel = event.target.data;
 		if ( _selectedModel )
 		{
-			_detailButton.enabled = true;
-			_detailButton.active = true;
-			_deleteButton.enabled = true;
-			_deleteButton.active = true;
+			buttonsEnable();
 			//Globals.selectedModel = _selectedModel;
 			// TO DO this is the right path, but probably need a custom event for this...
 			Globals.g_app.dispatchEvent( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, _selectedModel, _parentModel ) );
@@ -176,11 +174,22 @@ public class PanelModels extends PanelBase
 			//_parent.animationPanelAdd( _selectedModel );
 		}
 		else {
-			_detailButton.enabled = false;
-			_detailButton.active = false;
-			_deleteButton.enabled = false;
-			_deleteButton.active = false;
+			buttonsDisable();
 		}
+	}
+	
+	private function buttonsDisable():void {
+		_detailButton.enabled = false;
+		_detailButton.active = false;
+		_deleteButton.enabled = false;
+		_deleteButton.active = false;
+	}
+	
+	private function buttonsEnable():void {
+		_detailButton.enabled = true;
+		_detailButton.active = true;
+		_deleteButton.enabled = true;
+		_deleteButton.active = true;
 	}
 	
 	private function noModelSelected():void

@@ -8,12 +8,14 @@
 package com.voxelengine.worldmodel.models.types
 {
 	import com.voxelengine.events.GUIEvent;
+	import com.voxelengine.GUI.actionBars.ModelPlacementType;
 	import com.voxelengine.pools.LightingPool;
 	import com.voxelengine.worldmodel.inventory.ObjectModel;
 	import com.voxelengine.worldmodel.models.makers.ModelMakerCursor;
 	import com.voxelengine.worldmodel.models.ModelCacheUtils;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import com.voxelengine.worldmodel.oxel.Oxel;
+	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.display3D.Context3D;
 	import flash.geom.Matrix3D;
@@ -368,7 +370,13 @@ package com.voxelengine.worldmodel.models.types
 			{
 				// same model, new instance.
 				var newChild:VoxelModel = _s_objectModel.clone();
-				foundModel.childAdd( newChild );
+				if ( ModelPlacementType.PLACEMENT_TYPE_CHILD == ModelPlacementType.modelPlacementTypeGet() )
+					foundModel.childAdd( newChild );
+				else {
+					var newPos:Vector3D = Globals.player.instanceInfo.modelToWorld( new Vector3D( 0,0, -(newChild.oxel.gc.size() * 2) ) );
+					newChild.instanceInfo.positionSet = newPos;
+					Region.currentRegion.modelCache.add( newChild );
+				}
 			}
 		}
 		

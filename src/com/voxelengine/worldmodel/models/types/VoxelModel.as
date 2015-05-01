@@ -399,6 +399,7 @@ public class VoxelModel
 		var mi:ModelInfo = modelInfo.clone();
 		var ii:InstanceInfo = instanceInfo.clone();
 		var ba:ByteArray = oxel.toByteArray();
+		// need modified date
 		var vmm:ModelMetadata = metadata.clone();
 		
 		var vm:VoxelModel = new VoxelModel(ii);
