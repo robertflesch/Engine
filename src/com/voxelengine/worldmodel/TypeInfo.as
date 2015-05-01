@@ -84,36 +84,26 @@ package com.voxelengine.worldmodel
 
    			Log.out( "TypeInfo.getTypeId - WARNING - INVALID type found: " + type, Log.WARN );
 			
-			return AIR
+			return AIR;
 		}
 		
 		public static var typeInfo:Vector.<TypeInfo> = new Vector.<TypeInfo>(1024);
 		public static var typeInfoByName:Array = new Array;
 		
-		static public function drawable( type:int ):Boolean
-		{
-			if ( typeInfo[type].solid || typeInfo[type].alpha )
-				return true;
-			return false;
-		}
+		[inline]
+		static public function flowable( type:int ):Boolean { return typeInfo[type].flowable; }
 		
-		// This ideally should be define by texture, but then it is very hard to operate on programattically
-		static public function hasAlpha( type:int ):Boolean
-		{
-			if ( typeInfo[type].alpha || AIR == type )
-				return true;
-			return false;	
-		}
+		[inline]
+		static public function drawable( type:int ):Boolean { return (( typeInfo[type].solid || typeInfo[type].alpha ) ? true: false); }
+		
+		[inline]
+		static public function hasAlpha( type:int ):Boolean {  return (( typeInfo[type].alpha || AIR == type ) ?  true : false); }	
 
-		// solid is a collidable object
-		static public function isSolid( type:int ):Boolean
-		{
-			if ( typeInfo[type].solid )
-				return true;
-			return false;	
-		}
+		[inline] // solid is a collidable object
+		static public function isSolid( type:int ):Boolean { return  typeInfo[type].solid;	}
 		
-		
+		[inline]
+		static public function isLight( type:int ):Boolean { return (typeInfo[type].lightInfo.lightSource) }
 		
 		static public const MIN_TYPE_INFO:uint = 100;
 		static public const MAX_TYPE_INFO:uint = 1024;

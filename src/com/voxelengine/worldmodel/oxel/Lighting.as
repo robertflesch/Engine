@@ -1803,7 +1803,7 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 		if ( Globals.BAD_OXEL == no )
 			return;
 		// if the neighbor is solid, return
-		if ( false == no.hasAlpha )
+		if ( false == TypeInfo.hasAlpha( no.type ) )
 			return;
 			
 		if ( $o.gc.grain < no.gc.grain )
@@ -1854,7 +1854,7 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 		if ( Globals.BAD_OXEL == no )
 			return;
 		// if the neighbor is solid, return
-		if ( false == no.hasAlpha )
+		if ( false == TypeInfo.hasAlpha( no.type ) )
 			return;
 			
 		//		var childId:uint = $o.gc.childId();

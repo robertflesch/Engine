@@ -158,6 +158,7 @@ package com.voxelengine.worldmodel.oxel
 			if ( null == _parent )
 			{
 				//Log.out( "Oxel.vm_initialize - This should only happen ONCE PER MODEL --------------------------------------" );
+				// TODO a pool for these makes sense, but doesnt happen that often.
 				_vertMan = new VertexManager( gc, null );
 				// Only set minGrain for root oxel
 				if ( 8 < gc.bound  )
@@ -194,10 +195,7 @@ package com.voxelengine.worldmodel.oxel
 		//     Member Functions 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		public function get hasAlpha():Boolean { return TypeInfo.hasAlpha( type ); }
-		public function get isFlowable():Boolean { return TypeInfo.typeInfo[type].flowable; }
-		public function get isSolid():Boolean { return TypeInfo.typeInfo[type].solid; }
-		public function get isLight():Boolean { return TypeInfo.typeInfo[type].lightInfo.lightSource; }
+//		public function get isLight():Boolean { return TypeInfo.typeInfo[type].lightInfo.lightSource; }
 		
 		public function get vertMan():VertexManager { return _vertMan; }
 		
@@ -340,6 +338,7 @@ package com.voxelengine.worldmodel.oxel
 		// 3) BAD_OXEL - not found for some reason
 		
 		// this could be called childGetClosest
+		[inline]
 		public function childFind( $gc:GrainCursor ):Oxel {
 			if ( $gc.grain > gc.grain )
 			{
@@ -367,20 +366,7 @@ package com.voxelengine.worldmodel.oxel
 
 			return Globals.BAD_OXEL;
 		}
-/*/////////////
-				if ( Globals.POSX == $af ) {
-				}
-				else if ( Globals.NEGX == $af ) {
-				}
-				else if ( Globals.POSY == $af ) {
-				}
-				else if ( Globals.NEGY == $af ) {
-				}
-				else if ( Globals.POSZ == $af ) {
-				}
-				else if ( Globals.NEGZ == $af ) {
-				}
-//////////////*/
+
 		public function childrenForKittyCorner( $face:int, $af:int ):Object {
 			var oxelPair:Object = new Object();
 			
@@ -887,7 +873,7 @@ package com.voxelengine.worldmodel.oxel
 				for each ( var childForBrightness:Oxel in _children ) 
 				{
 					if ( childForBrightness._lighting ) {
-						_lighting.mergeChildren( childForBrightness.gc.childId(), childForBrightness._lighting, childForBrightness.gc.size(), hasAlpha );
+						_lighting.mergeChildren( childForBrightness.gc.childId(), childForBrightness._lighting, childForBrightness.gc.size(), TypeInfo.hasAlpha( type ) );
 						// Need to set this from a valid child
 						// Parent should have same brightness attn as children did.
 						_lighting.materialFallOffFactor = childForBrightness.lighting.materialFallOffFactor;
@@ -1089,7 +1075,7 @@ package com.voxelengine.worldmodel.oxel
 				no.faceMarkDirty( $instanceGuid, Oxel.face_get_opposite( face ), $propogateCount );
 				// now test if we need to propagate it.
 				// Why do alpha faces have to propagate? Is it because of light changes?
-				if ( no.hasAlpha ) {
+				if ( TypeInfo.hasAlpha( no.type ) ) {
 					// So now I can mark my neighbors dirty, decrementing each time.
 					if ( 0 < $size && 0 < $propogateCount )
 						no.neighborsMarkDirtyFaces( $instanceGuid, $size, $propogateCount );
@@ -1349,7 +1335,7 @@ package com.voxelengine.worldmodel.oxel
 							// so I am a larger face looking to see if there is visability to me.
 							// if I am solid, and any neighbors has alpha, then I am visible.
 							var rface:int;
-							if ( !hasAlpha ) {
+							if ( !TypeInfo.hasAlpha( type ) ) {
 								rface = Oxel.face_get_opposite( face );
 								// get the children of my neighbor, that touch me.
 								const dchildren:Vector.<Oxel> = no.childrenForDirection( rface );
@@ -1377,7 +1363,7 @@ package com.voxelengine.worldmodel.oxel
 						// no children, so just check against type
 						else
 						{
-							if ( ( no.hasAlpha ) )
+							if ( ( TypeInfo.hasAlpha( no.type ) ) )
 								face_set( face );
 							else if ( flowInfo ) // All water and lava have flow info.
 							{ 
@@ -1436,7 +1422,7 @@ package com.voxelengine.worldmodel.oxel
 			//	If no children, then is this an opaque type
 			if ( !childrenHas() )
 			{
-  				return hasAlpha;
+  				return TypeInfo.hasAlpha( type );
 			}
 			else // I have children, so check each child on that face
 			{
@@ -1480,7 +1466,7 @@ package com.voxelengine.worldmodel.oxel
 
 			//	we only need a face here is the nieghbor is alpha of a different type
 			if ( !$no.childrenHas() ) {
-				if ( $no.hasAlpha )
+				if ( TypeInfo.hasAlpha( $no.type ) )
 					return !( $type == $no.type );
 				else
 					return false;
@@ -1537,7 +1523,7 @@ package com.voxelengine.worldmodel.oxel
 			}
 			else
 			{
-				if ( isLight ) // had & quads, but that doesnt matter with this style
+				if ( TypeInfo.isLight( type ) ) // had & quads, but that doesnt matter with this style
 					_s_lightsFound++;
 			}
 		}
@@ -1663,7 +1649,7 @@ package com.voxelengine.worldmodel.oxel
 			{
 				quadAmbient( $face, $ti );				
 				quad = QuadPool.poolGet();
-				if ( flowInfo && isFlowable ) {
+				if ( flowInfo && TypeInfo.flowable( type ) ) {
 					if ( !quad.buildScaled( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $grain, _lighting, flowInfo ) ) {
 						QuadPool.poolDispose( quad );
 						return 0;
@@ -1810,7 +1796,7 @@ package com.voxelengine.worldmodel.oxel
 			}
 			else
 			{
-				if ( TypeInfo.typeInfo[type].flowable )
+				if ( TypeInfo.flowable( type ) )
 				{
 					Log.out( "Oxel.flowFindCandidates - gc: " + gc.toString() );
 					//flowTerminal();
@@ -1977,7 +1963,7 @@ package com.voxelengine.worldmodel.oxel
 			if ( facesHas() )
 				dirty = true;
 			
-			if ( TypeInfo.typeInfo[type].flowable )
+			if ( TypeInfo.flowable( type ) )
 			{
 				if ( $parent && $parent.flowInfo )
 					flowInfo = $parent.flowInfo.clone();
@@ -2089,7 +2075,7 @@ package com.voxelengine.worldmodel.oxel
 				// so if the grain has children or it has an opaque type it will be selected
 				if(false
 					|| true == childrenHas()
-					|| true == hasAlpha
+					|| true == TypeInfo.hasAlpha( type )
 				)
 				the_list.push(this);
 				return;
@@ -2106,7 +2092,7 @@ package com.voxelengine.worldmodel.oxel
 				{
 					// leaf grain with no children
 					// add it to the list if it is an opaque material type
-					if ( hasAlpha)
+					if ( TypeInfo.hasAlpha( type ) )
 						the_list.push(this);
 					return;
 				}
@@ -2142,7 +2128,7 @@ package com.voxelengine.worldmodel.oxel
 			{
 				// leaf grain with no children
 				// add it to the list if it is an opaque material type
-				if ( hasAlpha )
+				if ( TypeInfo.hasAlpha( type ) )
 					the_list.push(this);
 				return;
 			}
@@ -2924,7 +2910,7 @@ package com.voxelengine.worldmodel.oxel
 						//trace( "light it has hole - notype: " + no.type + "  gc: " + gc.toString() + "  no.gc: " + no.gc.toString() );
 					}
 				}
-				else if ( !no.isSolid )	{
+				else if ( !TypeInfo.isSolid( no.type ) )	{
 					ol.push( this );
 					//trace( "light it - notype: " + no.type + "  gc: " + gc.toString() + "  no.gc: " + no.gc.toString() );
 				}
