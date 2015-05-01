@@ -29,8 +29,10 @@ public class GrainCursor
 	public static var v3_static:Vector3D = new Vector3D;
 	public static var gc_static:GrainCursor = new GrainCursor();	
 
+	[inline]
 	public function get grain( ):uint { return _data & 0x0000ffff; }
 //	public function set grain( val:uint ):void { _data &= 0xffff0000; _data |= val; }
+	[inline]
 	public function set grain( val:uint ):void 
 	{ 
 		if ( bound < val )
@@ -39,14 +41,22 @@ public class GrainCursor
 		_data |= val; 
 	}
 
+	[inline]
 	public function get bound():uint { return (_data & 0xffff0000)>>16; }
+	[inline]
 	public function set bound(val:uint):void { _data &= 0x0000ffff; _data |= val << 16; }
 	
+	[inline]
 	public function get grainX( ):uint { return _gx; }
+	[inline]
 	public function set grainX( val:uint ):void { _gx = val; }
+	[inline]
 	public function get grainY( ):uint { return _gy; }
+	[inline]
 	public function set grainY( val:uint ):void { _gy = val; }
+	[inline]
 	public function get grainZ( ):uint { return _gz; }
+	[inline]
 	public function set grainZ( val:uint ):void { _gz = val; }
 	
 	private static var _s_axes:Vector.<int> = null;
@@ -54,6 +64,7 @@ public class GrainCursor
 	// Static functions
 	////////////////////////////////////////////////////////////////////
 
+	[inline]
 	public static function two_to_the_g( g:uint ):uint
 	{
 		// 2 raised to the power of g
@@ -61,6 +72,7 @@ public class GrainCursor
 		return (1 << g);
 	}
 
+	[inline]
 	public static function two_to_the_g_minus_1( g:uint ):uint
 	{
 		// 2 raised to the power of g minus 1
@@ -68,12 +80,14 @@ public class GrainCursor
 		return ((1 << g) - 1);
 	}
 	
+	[inline]
 	public static function get_the_g0_size_for_grain( g:uint ):uint
 	{
 		// the size of any grain g in g0 units is:
 		// 2 raised to the power of g
 		return two_to_the_g(g);
 	}
+	[inline]
 	public static function get_the_g0_edge_for_grain( g:uint ):uint
 	{
 		// the edge of any grain g in g0 units is:
@@ -107,6 +121,7 @@ public class GrainCursor
 		}
 	}
 	
+	[inline]
 	public static function getFromPoint( x:Number, y:Number, z:Number, gct:GrainCursor ):void
 	{
 		// This is where it intersects with a grain 0
@@ -115,6 +130,7 @@ public class GrainCursor
 		gct.grainZ = int( z );
 	}
 	
+	[inline]
 	public static function getGrainFromPoint( x:Number, y:Number, z:Number, gct:GrainCursor, desiredGrain:int ):Boolean
 	{
 		// This is where it intersects with a grain 0
@@ -125,6 +141,7 @@ public class GrainCursor
 		return gct.become_ancestor( desiredGrain );
 	}
 
+	[inline]
 	public function getGrainFromVector( $pos:Vector3D, $desiredGrain:int ):Boolean
 	{
 		// This is where it intersects with a grain 0
@@ -138,6 +155,7 @@ public class GrainCursor
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// http://stackoverflow.com/questions/3106666/intersection-of-line-segment-with-axis-aligned-box-in-c-sharp
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	[inline]
 	public static function GetCoordinate(  vector:Vector3D,  axis:int ):Number
 	{
 		switch (axis)
@@ -153,6 +171,7 @@ public class GrainCursor
 		}
 	}	
 	
+	[inline]
 	public static function SetCoordinate(  vector:Vector3D,  axis:int,  adjustment:Number ):void
 	{
 		switch (axis)
@@ -171,6 +190,7 @@ public class GrainCursor
 		}
 	}	
 	
+	[inline]
 	public function GetDistance( v:Vector3D ):Number 
 	{
 		// using static speeds it up by 40%
@@ -184,6 +204,7 @@ public class GrainCursor
 		return v3_static.length;
 	}
 	
+	[inline]
 	public function GetWorldCoordinate( axis:int ):int 
 	{
 		switch (axis)
@@ -200,12 +221,14 @@ public class GrainCursor
 		
 	}
 
+	[inline]
 	private function RoundNumber( numIn:Number, decimalPlaces:int ):Number 
 	{
 		var nExp:int = Math.pow(10,decimalPlaces) ;
 		return Math.round(numIn * nExp) / nExp;
 	} 
 	
+	[inline]
 	public function RoundVector( v:Vector3D, places:int = 4 ):void
 	{
 		v.x = RoundNumber(v.x,places);
@@ -320,6 +343,7 @@ public class GrainCursor
 		return true;
 	}	
 
+	[inline]
 	public function childId():uint {
 		var x:uint = grainX % 2; // ?? grainX >> (grain - 1);
 		var y:uint = grainY % 2;
@@ -334,6 +358,7 @@ public class GrainCursor
 		return c;
 	}
 	
+	[inline]
 	public function child_inc():void {
 		if ( !move_posx() )
 		{
@@ -347,6 +372,7 @@ public class GrainCursor
 		}
 	}
 	
+	[inline]
 	public function reset():void
 	{
 		_gx = 0;
@@ -355,6 +381,7 @@ public class GrainCursor
 		_data = 0;
 	}
 
+	[inline]
 	public function size():uint { return get_the_g0_size_for_grain(grain); }
 
 	public function getModelX():uint { return _gx << grain; }
@@ -374,6 +401,7 @@ public class GrainCursor
 		_data = param_gc._data;
 	}
 
+	[inline]
 	public function g0_edgeval():uint
 	{
 		/*
@@ -386,6 +414,7 @@ public class GrainCursor
 		return get_the_g0_edge_for_grain( bound );
 	}
 	
+	[inline]
 	public function gn_edgeval( g:uint ):uint
 	{
 		/*
@@ -400,18 +429,21 @@ public class GrainCursor
 		return (g0_edgeval() >> g);
 	}
 	
+	[inline]
 	public function edgeval():uint
 	{
 		// need to know the edge coord for this grain
 		return gn_edgeval(grain );
 	}
 
+	[inline]
 	public function is_oob( val:uint ):Boolean
 	{
 		// the edgeval is in bounds
 		return ( val > edgeval() );
 	}
 
+	[inline]
 	public function is_inb( val:uint ):Boolean
 	{
 		//trace( "GrainCursor.is_inb val: " + val + " bg: " +bg + " edgeval( bg ): " + edgeval( bg ) );
@@ -419,12 +451,14 @@ public class GrainCursor
 		return ( val <= edgeval() );
 	}
 	
+	[inline]
 	public function is_edge( val:uint ):Boolean
 	{
 		// the edgeval is in bounds
 		return ( val == edgeval() );
 	}
 		
+	[inline]
 	public function become_ancestor( k:uint ):Boolean
 	{
 		//trace( "become_ancestor: - was \t" + this.toString() );
@@ -443,6 +477,7 @@ public class GrainCursor
 		return true;
 	}
 
+	[inline]
 	public function become_decendant( k:uint ):Boolean
 	{
 		if ( grain - k < 0) 
@@ -459,12 +494,14 @@ public class GrainCursor
 		return true;
 	}
 
+	[inline]
 	public function become_parent():void
 	{
 		become_ancestor(1);
 	}
 
 	// values from 0-7 specifies which child to become
+	[inline]
 	public function become_child( n:uint = 0 ):Boolean
 	{
 		//trace( "become_child: - was \t" + this.toString() );
@@ -489,6 +526,7 @@ public class GrainCursor
 		return true;
 	}
 	
+	[inline]
 	public function get_ancestor( k:uint ):GrainCursor
 	{
 		gc_static.copyFrom(this);
@@ -496,6 +534,7 @@ public class GrainCursor
 		return gc_static;
 	}	
 
+	[inline]
 	public function is_inside( param_gc:GrainCursor ):Boolean
 	{
 		///////////////////////////////
@@ -511,6 +550,7 @@ public class GrainCursor
 		return param_gc.is_equal(gc_static);
 	}
 	
+	[inline]
 	public function is_point_inside( point:Vector3D ):Boolean
 	{
 		///////////////////////////////
