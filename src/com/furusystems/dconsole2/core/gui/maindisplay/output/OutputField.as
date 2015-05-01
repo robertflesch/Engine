@@ -412,8 +412,6 @@ package com.furusystems.dconsole2.core.gui.maindisplay.output {
 		 * @param	string
 		 * @param	format
 		 */
-		[Inline]
-		
 		private function appendWithFormat(string:String, format:TextFormat):void {
 			var idx:int = textOutput.length;
 			textOutput.appendText(string);
