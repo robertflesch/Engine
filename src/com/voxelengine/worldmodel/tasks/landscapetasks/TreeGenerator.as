@@ -90,23 +90,23 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			*/
 		}
 
-		private static function roomToGrow( gct:GrainCursor, $oxel:Oxel, trunk:int ):Boolean {
+		private static function roomToGrow( $oxel:Oxel, trunk:int ):Boolean {
 
 			// Todo - check to make sure we are not growing into something?
 			var gct:GrainCursor = GrainCursorPool.poolGet( $oxel.gc.bound );
 			gct.copyFrom( $oxel.gc );
-			var roomToGrow:Boolean = true;
+			var hasRoomToGrow:Boolean = true;
 			test: for ( var i:int = 0; i < trunk; i ++ )
 			{
-				roomToGrow = gct.move_posy();
-				if ( !roomToGrow )
+				hasRoomToGrow = gct.move_posy();
+				if ( !hasRoomToGrow )
 				{
 					break test;
 				}
 			}
 			
 			GrainCursorPool.poolDispose( gct );
-			return roomToGrow;
+			return hasRoomToGrow;
 		}
 		
 		private static function buildTraditionalTree( $guid:String, $oxel:Oxel ):void
@@ -115,7 +115,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var trunk:int = 7 + Math.random() * 5;
 			
 			// Make sure top is not cut off AND
-			if ( !roomToGrow( gct, $oxel, trunk ) )
+			if ( !roomToGrow( $oxel, trunk ) )
 				return;
 			
 			var gct:GrainCursor = GrainCursorPool.poolGet( $oxel.gc.bound );
@@ -147,7 +147,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			
 			// Make sure top is not cut off AND
 			// check to make sure we are not growing INTO something
-			if ( !roomToGrow( gct, oxel, trunk ) )
+			if ( !roomToGrow( oxel, trunk ) )
 				return;
 			
 			var gct:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
