@@ -194,13 +194,9 @@ public class GrainCursor
 	public function GetDistance( v:Vector3D ):Number 
 	{
 		// using static speeds it up by 40%
-		var pos:int = getModelX()
-		v3_static.x = v.x - pos;
-		pos = getModelY()
-		v3_static.y = v.y - pos;
-		pos = getModelZ()
-		v3_static.z = v.z - pos;
-		
+		v3_static.x = v.x - getModelX();
+		v3_static.y = v.y - getModelY();
+		v3_static.z = v.z - getModelZ();
 		return v3_static.length;
 	}
 	
@@ -384,8 +380,11 @@ public class GrainCursor
 	[inline]
 	public function size():uint { return get_the_g0_size_for_grain(grain); }
 
+	[inline]
 	public function getModelX():uint { return _gx << grain; }
+	[inline]
 	public function getModelY():uint { return _gy << grain; }
+	[inline]
 	public function getModelZ():uint { return _gz << grain; }
 
 	public function getModelVector():Vector3D
