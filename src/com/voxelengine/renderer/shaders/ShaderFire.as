@@ -24,6 +24,9 @@ package com.voxelengine.renderer.shaders
 		private	var		_textureOffsetFireU:Number = 0.0
 		private	var		_textureOffsetFireV:Number = 0.0
 		
+		static private	var	_vertexShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
+		static private	var _fragmentAssembler:AGALMiniAssembler = new AGALMiniAssembler();
+		
 		public function ShaderFire( $context:Context3D ) {
 			super( $context );
 			createProgram( $context );
@@ -75,49 +78,50 @@ package com.voxelengine.renderer.shaders
 			// and two constant values
 			// vc0-3 hold the transform matrix for the camera
 			// vc4 holds the UV offsets for the texture
-			var vertexShader:Array =
-			[
-				"m44 op, va0, vc0", // transform vertex positions (va0) by the world camera data (vc0)
-				"add v0, va1, vc4.xy",	// add in the UV offset (va1) and the animated offset (vc12) (may be 0 for non animated), and put in v0 which holds the UV offset
-				"mov v1, va3",        	// pass texture color and brightness (va3) to the fragment shader via v1
-				"mov v2, va2",        	// need to pass normals to keep shader compiler happy
-				"m44 v3, va0, vc8",  	// the transformed vertices with out the camera data, works great for default AND for translated cube, rotated cube broken still
-				"mov v4, va4",        	// pass light color and brightness (va4) to the fragment shader via v4
-			];
-			var vertexShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
-			vertexShaderAssembler.assemble(Context3DProgramType.VERTEX, vertexShader.join("\n"));
+			if ( null == _vertexShaderAssembler.agalcode ) {
+				var vertexShader:Array =
+				[
+					"m44 op, va0, vc0", // transform vertex positions (va0) by the world camera data (vc0)
+					"add v0, va1, vc4.xy",	// add in the UV offset (va1) and the animated offset (vc12) (may be 0 for non animated), and put in v0 which holds the UV offset
+					"mov v1, va3",        	// pass texture color and brightness (va3) to the fragment shader via v1
+					"mov v2, va2",        	// need to pass normals to keep shader compiler happy
+					"m44 v3, va0, vc8",  	// the transformed vertices with out the camera data, works great for default AND for translated cube, rotated cube broken still
+					"mov v4, va4",        	// pass light color and brightness (va4) to the fragment shader via v4
+				];
+				_vertexShaderAssembler.assemble(Context3DProgramType.VERTEX, vertexShader.join("\n"));
+			}
 			
 			// This uses 4 peices of data from vertex shader
 			// v0 holds the offset UV data
 			// v1 holds the texture color and brightness
 			// temp registers
 			// ft0 holds the texture data
-			var fragmentShader:Array =
-			[
-				// Texture
-				// texture dimension. Options: 2d, cube
-				// mip mapping. Options: nomip (or mipnone , they are the same) , mipnearest, miplinear
-				// texture filtering. Options: nearest, linear
-				// texture repeat. Options: repeat, wrap, clamp
-				"tex ft0, v0, fs0 <2d,clamp,mipnearest>", // v0 is passed in from vertex, UV coordinates
-				
-				/////////////////////////////////////////////////
-				// TINT on base texture
-				/////////////////////////////////////////////////
-				"mul ft0, v1.xyz, ft0", // mutliply by texture tint - v1.xyz
-				
-				
-				// should this or light from dynamic source take greater value?
-				"mul ft0, ft0, v1.w",   // brightness - v3.w
-				"mov oc ft0"
-				
-			];
-			
-			var fragmentAssembler:AGALMiniAssembler = new AGALMiniAssembler();
-			fragmentAssembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader.join("\n"));
+			if ( null == _fragmentAssembler.agalcode ) {
+				var fragmentShader:Array =
+				[
+					// Texture
+					// texture dimension. Options: 2d, cube
+					// mip mapping. Options: nomip (or mipnone , they are the same) , mipnearest, miplinear
+					// texture filtering. Options: nearest, linear
+					// texture repeat. Options: repeat, wrap, clamp
+					"tex ft0, v0, fs0 <2d,clamp,mipnearest>", // v0 is passed in from vertex, UV coordinates
+					
+					/////////////////////////////////////////////////
+					// TINT on base texture
+					/////////////////////////////////////////////////
+					"mul ft0, v1.xyz, ft0", // mutliply by texture tint - v1.xyz
+					
+					
+					// should this or light from dynamic source take greater value?
+					"mul ft0, ft0, v1.w",   // brightness - v3.w
+					"mov oc ft0"
+					
+				];
+				_fragmentAssembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader.join("\n"));
+			}
 			
 			_program3D = $context.createProgram();
-			_program3D.upload(vertexShaderAssembler.agalcode, fragmentAssembler.agalcode);
+			_program3D.upload(_vertexShaderAssembler.agalcode, _fragmentAssembler.agalcode);
 		}
 		
 	}

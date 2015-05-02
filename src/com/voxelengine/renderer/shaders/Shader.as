@@ -36,6 +36,9 @@ package com.voxelengine.renderer.shaders
 		protected			var		_textureName:String = "assets/textures/oxel.png";
 		protected			var		_textureScale:Number = 2048; 
 		protected			var		_isAnimated:Boolean = false;
+		static private		var 	_vertexShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
+		static private		var 	_fragmentAssembler:AGALMiniAssembler = new AGALMiniAssembler();
+
 						
 		protected 			var 	_offsets:Vector.<Number> = Vector.<Number>([0,0,0,0]);
 		protected 			var 	_constants:Vector.<Number> = Vector.<Number>([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -82,33 +85,34 @@ package com.voxelengine.renderer.shaders
 			// and two constant values
 			// vc0-3 hold the transform matrix for the camera
 			// vc4 holds the UV offsets for the texture
-			var vertexShader:Array =
-			[
-				"m44 vt0, va0, vc0", // transform vertex positions (va0) by the world camera data (vc0)
-				// this result has the camera angle as part of the matrix, which is not good when calculating light
-				"mov op, vt0",       // move the transformed vertex data (vt0) in output position (op)
+			if ( null == _vertexShaderAssembler.agalcode ) {
+				var vertexShader:Array =
+				[
+					"m44 vt0, va0, vc0", // transform vertex positions (va0) by the world camera data (vc0)
+					// this result has the camera angle as part of the matrix, which is not good when calculating light
+					"mov op, vt0",       // move the transformed vertex data (vt0) in output position (op)
 
-				"div vt1, vc12.xy, va1.z",        // grain
-				"add v0, va1.xy, vt1.xy", // add in the UV offset (va1) and the animated offset (vc12) (may be 0 for non animated), and put in v0 which holds the UV offset
-//				"add v0, va1.xy, vc12.xy", // add in the UV offset (va1) and the animated offset (vc12) (may be 0 for non animated), and put in v0 which holds the UV offset
-				"mov v1, va3",        	// pass texture color and brightness (va3) to the fragment shader via v1
-				"m44 v2, va2, vc4",  	// transform vertex normal, send to fragment shader
-				
-				// the transformed vertices without the camera data
-//				"mov v3, vt0",       	// no no no
-//				"mov v3, va0",       	// works great for default. Not for translated cube
-//				"m44 v3, va0, vc0",  	// works great for default. Not for translated cube
-//				"m44 v3, va0, vc4",  	// works great for default. Not for translated cube
-				"m44 v3, va0, vc8",  	// the transformed vertices with out the camera data, works great for default AND for translated cube, rotated cube broken still
-				"mov v4, va4",        	// pass light color and brightness (va4) to the fragment shader via v4
-				
-				// A non working method for a generated normal
-				//"nrm vt1.xyz, va0.xyz",	// normalize the vertex (va0) into vt1. we need to mask the W component as the normalize operation only work for Vector3D
-				//"mov vt1.w, va0.w",		// Set the w component back to its original value from va0 into vt1
-				//"mov v2, vt1"			// Interpolate the normal (vt1) into variable register v1
-			];
-			var vertexShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
-			vertexShaderAssembler.assemble(Context3DProgramType.VERTEX, vertexShader.join("\n"));
+					"div vt1, vc12.xy, va1.z",        // grain
+					"add v0, va1.xy, vt1.xy", // add in the UV offset (va1) and the animated offset (vc12) (may be 0 for non animated), and put in v0 which holds the UV offset
+	//				"add v0, va1.xy, vc12.xy", // add in the UV offset (va1) and the animated offset (vc12) (may be 0 for non animated), and put in v0 which holds the UV offset
+					"mov v1, va3",        	// pass texture color and brightness (va3) to the fragment shader via v1
+					"m44 v2, va2, vc4",  	// transform vertex normal, send to fragment shader
+					
+					// the transformed vertices without the camera data
+	//				"mov v3, vt0",       	// no no no
+	//				"mov v3, va0",       	// works great for default. Not for translated cube
+	//				"m44 v3, va0, vc0",  	// works great for default. Not for translated cube
+	//				"m44 v3, va0, vc4",  	// works great for default. Not for translated cube
+					"m44 v3, va0, vc8",  	// the transformed vertices with out the camera data, works great for default AND for translated cube, rotated cube broken still
+					"mov v4, va4",        	// pass light color and brightness (va4) to the fragment shader via v4
+					
+					// A non working method for a generated normal
+					//"nrm vt1.xyz, va0.xyz",	// normalize the vertex (va0) into vt1. we need to mask the W component as the normalize operation only work for Vector3D
+					//"mov vt1.w, va0.w",		// Set the w component back to its original value from va0 into vt1
+					//"mov v2, vt1"			// Interpolate the normal (vt1) into variable register v1
+				];
+				_vertexShaderAssembler.assemble(Context3DProgramType.VERTEX, vertexShader.join("\n"));
+			}
 			
 			// This uses 4 peices of data from vertex shader
 			// v0 holds the offset UV data
@@ -125,96 +129,97 @@ package com.voxelengine.renderer.shaders
 			// ft2 lambert lighting data
 			// ft3 distance calculations
 			// ft4 base texture time brightness
-			var fragmentShader:Array =
-			[
-				// Texture
-				// texture dimension. Options: 2d, cube
-				// mip mapping. Options: nomip (or mipnone , they are the same) , mipnearest, miplinear
-				// texture filtering. Options: nearest, linear
-				// texture repeat. Options: repeat, wrap, clamp
-				// 0.125 is texture bias for adjusting the mipmap distance
-				"tex ft0, v0, fs0 <2d,clamp,mipnearest,0.125>", // v0 is passed in from vertex, UV coordinates
-				
-				/////////////////////////////////////////////////
-				// TINT on base texture
-				"mul ft0.xyz, v1.xyz, ft0.xyz", // mutliply by texture tint - v1.xyz
-				/////////////////////////////////////////////////
-				
-				/////////////////////////////////////////////////
-				// light from brightness
-				"mul ft4.xyz, v4.xyz, ft0.xyz", // modify the texture by multipling by the light color
-				/////////////////////////////////////////////////
-				
-				/////////////////////////////////////////////////
-				// ALPHA VALUES --------------------------------
-				// take the smallest value from the tint and the source texture
-				"min ft4.w, v1.w, ft0.w",
-				// END ALPHA VALUES --------------------------------
-				/////////////////////////////////////////////////
-				
-"mul ft4, v4.w, ft4", 	// Ambient Occlusion - multiply by texture brightness ColorUINT.w
-				
-				/////////////////////////////////////////////////
-				// light from dynamic lights
-				/////////////////////////////////////////////////
-				// normalize the light position
-				"sub ft1, v3, fc0",		// subtract the light position from the transformed vertex postion
-				
-				"nrm ft1.xyz, ft1",     // normalize the light position (ft1)
-														 
-				// non flat shading
-				"dp3 ft2, ft1, v2",     // dot the transformed normal with light direction
-				"sat ft2, ft2",     	// Clamp ft2 between 1 and 0, put result in ft2.
-				"mul ft2, ft2, ft0",    // multiply colorized texture by light amount
-				
-				// calculate the distance from the vertex
-				// ft3.w holds the total distance
-				"sub ft3, v3, fc0",		// subtract the light position from the transformed vertex postion
-				"mul ft3, ft3, ft3", 	// square it
-				"add ft3.w, ft3.x, ft3.y", // add w = x^2 + y ^2
-				"add ft3.w, ft3.w, ft3.z", // add w + z^2
-				"mov ft3.xyz, fc2.w", // set other components to 0 (fc2.w)
-				"sqt ft3.w, ft3.w", // take sqr root - gives us distance to this vertex
-				
-				// now that we have the distance to the vertex
-				// we use the rEnd - distance / rEnd - rStart formula to calcuate light influence
-				// ft5 holds the light value for personal light
-				"sub ft5.x, fc1.z, ft3.w", // rend - distance
-				"mov ft3.z, fc1.z", // have to move rend to a non constant register (ft3.z) before I can operate on it
-				"sub ft5.y, ft3.z, fc1.y", // rend - rstart
-				"div ft5.z, ft5.x, ft5.y",  // rend - r / rend - rstart
-				"mov ft5.xyw, fc2.w", // clear out other components to 0
-				"mul ft2, ft0, ft5.z",  // multiple the UNlit texture, with the attenuated light effect !Critical Change, otherwise the torch is dependant on the static texture color.
-				"mul ft2.xyz, ft2.xyz, fc2.xyz",  // take result and multiple by light color
-				
-"mul ft2, v4.w, ft2", 	// Ambient Occlusion - take result and multiple vertex brightness
-				// END light from dynamic lights
-				/////////////////////////////////////////////////
-				
-				////////////////////////////////////////////////////////////////////////////
-				// FOG
-				//"mul ft6",
-				// END FOG
-				////////////////////////////////////////////////////////////////////////////
-				"max ft3, ft2.xyz, ft4.xyz",    // take the larger value between the dynamic light and static light, for the RGB values
-				// grab the alpha value from the min of original texture and tint value.
-				"max ft3.w, ft4.w, ft4.w",
-				"sat ft2, ft3",     	// Clamp ft2 between 1 and 0, put result in ft2.
+			if ( null == _fragmentAssembler.agalcode ) {
+				var fragmentShader:Array =
+				[
+					// Texture
+					// texture dimension. Options: 2d, cube
+					// mip mapping. Options: nomip (or mipnone , they are the same) , mipnearest, miplinear
+					// texture filtering. Options: nearest, linear
+					// texture repeat. Options: repeat, wrap, clamp
+					// 0.125 is texture bias for adjusting the mipmap distance
+					"tex ft0, v0, fs0 <2d,clamp,mipnearest,0.125>", // v0 is passed in from vertex, UV coordinates
+					
+					/////////////////////////////////////////////////
+					// TINT on base texture
+					"mul ft0.xyz, v1.xyz, ft0.xyz", // mutliply by texture tint - v1.xyz
+					/////////////////////////////////////////////////
+					
+					/////////////////////////////////////////////////
+					// light from brightness
+					"mul ft4.xyz, v4.xyz, ft0.xyz", // modify the texture by multipling by the light color
+					/////////////////////////////////////////////////
+					
+					/////////////////////////////////////////////////
+					// ALPHA VALUES --------------------------------
+					// take the smallest value from the tint and the source texture
+					"min ft4.w, v1.w, ft0.w",
+					// END ALPHA VALUES --------------------------------
+					/////////////////////////////////////////////////
+					
+	"mul ft4, v4.w, ft4", 	// Ambient Occlusion - multiply by texture brightness ColorUINT.w
+					
+					/////////////////////////////////////////////////
+					// light from dynamic lights
+					/////////////////////////////////////////////////
+					// normalize the light position
+					"sub ft1, v3, fc0",		// subtract the light position from the transformed vertex postion
+					
+					"nrm ft1.xyz, ft1",     // normalize the light position (ft1)
+															 
+					// non flat shading
+					"dp3 ft2, ft1, v2",     // dot the transformed normal with light direction
+					"sat ft2, ft2",     	// Clamp ft2 between 1 and 0, put result in ft2.
+					"mul ft2, ft2, ft0",    // multiply colorized texture by light amount
+					
+					// calculate the distance from the vertex
+					// ft3.w holds the total distance
+					"sub ft3, v3, fc0",		// subtract the light position from the transformed vertex postion
+					"mul ft3, ft3, ft3", 	// square it
+					"add ft3.w, ft3.x, ft3.y", // add w = x^2 + y ^2
+					"add ft3.w, ft3.w, ft3.z", // add w + z^2
+					"mov ft3.xyz, fc2.w", // set other components to 0 (fc2.w)
+					"sqt ft3.w, ft3.w", // take sqr root - gives us distance to this vertex
+					
+					// now that we have the distance to the vertex
+					// we use the rEnd - distance / rEnd - rStart formula to calcuate light influence
+					// ft5 holds the light value for personal light
+					"sub ft5.x, fc1.z, ft3.w", // rend - distance
+					"mov ft3.z, fc1.z", // have to move rend to a non constant register (ft3.z) before I can operate on it
+					"sub ft5.y, ft3.z, fc1.y", // rend - rstart
+					"div ft5.z, ft5.x, ft5.y",  // rend - r / rend - rstart
+					"mov ft5.xyw, fc2.w", // clear out other components to 0
+					"mul ft2, ft0, ft5.z",  // multiple the UNlit texture, with the attenuated light effect !Critical Change, otherwise the torch is dependant on the static texture color.
+					"mul ft2.xyz, ft2.xyz, fc2.xyz",  // take result and multiple by light color
+					
+	"mul ft2, v4.w, ft2", 	// Ambient Occlusion - take result and multiple vertex brightness
+					// END light from dynamic lights
+					/////////////////////////////////////////////////
+					
+					////////////////////////////////////////////////////////////////////////////
+					// FOG
+					//"mul ft6",
+					// END FOG
+					////////////////////////////////////////////////////////////////////////////
+					"max ft3, ft2.xyz, ft4.xyz",    // take the larger value between the dynamic light and static light, for the RGB values
+					// grab the alpha value from the min of original texture and tint value.
+					"max ft3.w, ft4.w, ft4.w",
+					"sat ft2, ft3",     	// Clamp ft2 between 1 and 0, put result in ft2.
 
-				////////////////////////////////////////////////////////////////////////////
-				// OUTPUT
-				// mixed static and dynamic values
-				"mov oc ft2"
-				// static only values
-				// "mov oc ft4"
-				////////////////////////////////////////////////////////////////////////////
-			];
-			
-			var fragmentAssembler:AGALMiniAssembler = new AGALMiniAssembler();
-			fragmentAssembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader.join("\n"));
+					////////////////////////////////////////////////////////////////////////////
+					// OUTPUT
+					// mixed static and dynamic values
+					"mov oc ft2"
+					// static only values
+					// "mov oc ft4"
+					////////////////////////////////////////////////////////////////////////////
+				];
+				
+				_fragmentAssembler.assemble(Context3DProgramType.FRAGMENT, fragmentShader.join("\n"));
+			}
 			
 			_program3D = $context.createProgram();
-			_program3D.upload(vertexShaderAssembler.agalcode, fragmentAssembler.agalcode);
+			_program3D.upload( _vertexShaderAssembler.agalcode, _fragmentAssembler.agalcode);
 		}
 		
 		protected function constantsReset():void {
@@ -287,8 +292,8 @@ package com.voxelengine.renderer.shaders
 			$context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, invmat, true); // aka vc4
 			
 			// and the inverted model matrix, which is world position ( free from camera data )
-			var wsmat:Matrix3D = $vm.instanceInfo.worldSpaceMatrix.clone();
-			$context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, wsmat, true); // aka vc8
+			//var wsmat:Matrix3D = $vm.instanceInfo.worldSpaceMatrix.clone();
+			$context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, $vm.instanceInfo.worldSpaceMatrix, true); // aka vc8
 			
 			if ( _isAnimated ) 
 			{
