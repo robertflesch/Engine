@@ -177,7 +177,7 @@ public class GrainSelector extends QuickInventory
 		
 		if ( null != Globals.selectedModel )
 		{
-			var current:GrainCursor = Globals.selectedModel.editCursor.oxel.gc;
+			var current:GrainCursor = EditCursor.currentInstance.oxel.gc;
 			if ( current.grain > EditCursor.editCursorSize )
 				EditCursor.shrinkCursor();
 			else if ( current.grain < EditCursor.editCursorSize )

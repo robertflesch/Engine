@@ -44,6 +44,8 @@ package com.voxelengine.worldmodel.models.types
 	 */
 	public class EditCursor extends VoxelModel
 	{
+		static private var _s_currentInstance:EditCursor;
+
 		static public const EDIT_CURSOR:String 		= "EditCursor";
 		
 		static public	const CURSOR_TYPE_GRAIN:int 		= 0;
@@ -85,17 +87,27 @@ package com.voxelengine.worldmodel.models.types
 		public function get gciData():GrainCursorIntersection { return _gciData; }
 		public function set gciData(value:GrainCursorIntersection):void { _gciData = value; }
 		
-		static public function create():EditCursor {
-			var instanceInfo:InstanceInfo = new InstanceInfo();
-			instanceInfo.modelGuid = EDIT_CURSOR
+		static private 	var 	_s_editing:Boolean;
+		static public function get editing():Boolean { return _s_editing; }
+		static public function set editing(val:Boolean):void { _s_editing = val; }
+		
+		static private 	var 	_s_toolOrBlockEnabled:Boolean;
+		static public function get toolOrBlockEnabled():Boolean { return _s_toolOrBlockEnabled; }
+		static public function set toolOrBlockEnabled(val:Boolean):void { _s_toolOrBlockEnabled = val; }
+		
+		static public function get currentInstance():EditCursor {
+			if ( null == _s_currentInstance ) {
+				var instanceInfo:InstanceInfo = new InstanceInfo();
+				instanceInfo.modelGuid = EDIT_CURSOR
 
-			var modelInfo:ModelInfo = new ModelInfo();
-			modelInfo.fileName = EDIT_CURSOR;
-			modelInfo.modelClass = EDIT_CURSOR;
+				var modelInfo:ModelInfo = new ModelInfo();
+				modelInfo.fileName = EDIT_CURSOR;
+				modelInfo.modelClass = EDIT_CURSOR;
 
-			var ed:EditCursor = new EditCursor( instanceInfo );
-			ed.init( modelInfo, null );
-			return ed;
+				_s_currentInstance = new EditCursor( instanceInfo );
+				_s_currentInstance.init( modelInfo, null );
+			}
+			return _s_currentInstance;
 		}
 		
 		override public function get visible():Boolean {
@@ -127,6 +139,7 @@ package com.voxelengine.worldmodel.models.types
 			super.init( $mi, $vmm );
 			oxel.gc.bound = 4;
 			visible = false;
+			oxel.vm_initialize( statisics );
 		}
 		
 		public function clearGCIData():void {
@@ -154,17 +167,20 @@ package com.voxelengine.worldmodel.models.types
 
 		}
 		
-		static private var _s_objectModel:VoxelModel;
-		static public function objectModelClear():void {
-			_s_objectModel = null;
+		static private var _objectModel:VoxelModel;
+		public function objectModelGet( ):VoxelModel { return _objectModel;}
+		public function objectModelClear():void { _objectModel = null; }
+		
+		public function objectModelSet( $cm:VoxelModel ):void {
+			_objectModel = $cm;
+			editCursorSize = oxel.gc.bound = $cm.oxel.gc.bound;
+			if ( null == oxel.vm_get() )
+				oxel.vm_initialize( statisics );
+			if ( null == _objectModel.oxel.vm_get() )
+				_objectModel.oxel.vm_initialize( _objectModel.statisics );
 		}
 		
-		static public function objectModelSet( $cm:VoxelModel ):void {
-			_s_objectModel = $cm;
-			editCursorSize = $cm.oxel.gc.bound;
-		}
-		
-		static public function objectModelAdd( $om:ObjectModel ):void {
+		public function objectModelAdd( $om:ObjectModel ):void {
 			var ii:InstanceInfo = new InstanceInfo();
 			// How can I tell if I am adding this to parent, or it is independant?
 			// when it is placed?
@@ -176,8 +192,6 @@ package com.voxelengine.worldmodel.models.types
 		}
 		
 		private function configureInsertOxel():void {
-			
-			
 			var pl:PlacementLocation = getPlacementLocation( gciData.model );
 			if ( PlacementLocation.INVALID == pl.state ) {
 				editCursorIcon = EDITCURSOR_INVALID; // ;
@@ -206,8 +220,8 @@ package com.voxelengine.worldmodel.models.types
 			oxel.write( EDIT_CURSOR, oxel.gc, editCursorIcon, true );
 			oxel.quadsBuild();
 			
-			if ( _s_objectModel )
-				_s_objectModel.instanceInfo.positionSet = instanceInfo.positionGet;
+			if ( _objectModel )
+				_objectModel.instanceInfo.positionSet = instanceInfo.positionGet;
 		}
 		
 		private function configureDeleteOxel():void {
@@ -252,8 +266,8 @@ package com.voxelengine.worldmodel.models.types
 			
 			oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
 			
-			if ( _s_objectModel )
-				_s_objectModel.draw( mvp, $context, true );
+			if ( _objectModel )
+				_objectModel.draw( mvp, $context, true );
 		}
 		
 		override public function drawAlpha( mvp:Matrix3D,$context:Context3D, $isChild:Boolean ):void {
@@ -267,8 +281,8 @@ package com.voxelengine.worldmodel.models.types
 			
 			oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
 			
-			if ( _s_objectModel )
-				_s_objectModel.drawAlpha( mvp, $context, true );
+			if ( _objectModel )
+				_objectModel.drawAlpha( mvp, $context, true );
 		}
 		
 		override public function update($context:Context3D, elapsedTimeMS:int ):void {
@@ -285,8 +299,11 @@ package com.voxelengine.worldmodel.models.types
 			
 			internal_update($context, elapsedTimeMS );
 			
-			if ( _s_objectModel )
-				_s_objectModel.update($context, elapsedTimeMS );
+			if ( _objectModel ) {
+				var newPos:Vector3D = Globals.player.instanceInfo.modelToWorld( new Vector3D( 0,0, -(_objectModel.oxel.gc.size() * 2) ) );
+				_objectModel.instanceInfo.positionSet = newPos;
+				_objectModel.update($context, elapsedTimeMS );
+			}
 		}
 		
 		override public function initialize($context:Context3D ):void {
@@ -348,9 +365,9 @@ package com.voxelengine.worldmodel.models.types
 				if ( placementResult )
 					return Globals.BAD_OXEL;
 					
-				if ( foundModel.editCursor.gciData )
+				if ( EditCursor.currentInstance.gciData )
 				{
-					Log.out( "EditCursor.getHighlightedOxel BAD OXEL NEW gciData.point" + foundModel.editCursor.gciData.point + "  gciData.gc: " + foundModel.editCursor.gciData.gc );
+					Log.out( "EditCursor.getHighlightedOxel BAD OXEL NEW gciData.point" + EditCursor.currentInstance.gciData.point + "  gciData.gc: " + EditCursor.currentInstance.gciData.gc );
 					// What does this do?
 					insertOxel( true );
 					return Globals.BAD_OXEL;
@@ -369,7 +386,7 @@ package com.voxelengine.worldmodel.models.types
 			if ( foundModel )
 			{
 				// same model, new instance.
-				var newChild:VoxelModel = _s_objectModel.clone();
+				var newChild:VoxelModel = _objectModel.clone();
 				if ( ModelPlacementType.PLACEMENT_TYPE_CHILD == ModelPlacementType.modelPlacementTypeGet() )
 					foundModel.childAdd( newChild );
 				else {
@@ -421,7 +438,7 @@ package com.voxelengine.worldmodel.models.types
 		}
 		
 		static private function getPlacementLocation( foundModel:VoxelModel ):PlacementLocation {
-			var gci:GrainCursorIntersection = foundModel.editCursor.gciData;
+			var gci:GrainCursorIntersection = EditCursor.currentInstance.gciData;
 			var pl:PlacementLocation = new PlacementLocation();
 			if ( !gci )
 				return pl;
@@ -472,11 +489,11 @@ package com.voxelengine.worldmodel.models.types
 		static private function getOxelFromPoint( vm:VoxelModel, gci:GrainCursorIntersection ):Oxel {
 			var gcDelete:GrainCursor = GrainCursorPool.poolGet( vm.oxel.gc.bound );
 			// This is where it intersects with a grain 0
-			gcDelete.grainX = int( vm.editCursor.instanceInfo.positionGet.x + 0.05 );
-			gcDelete.grainY = int( vm.editCursor.instanceInfo.positionGet.y + 0.05 );
-			gcDelete.grainZ = int( vm.editCursor.instanceInfo.positionGet.z + 0.05 );
+			gcDelete.grainX = int( EditCursor.currentInstance.instanceInfo.positionGet.x + 0.05 );
+			gcDelete.grainY = int( EditCursor.currentInstance.instanceInfo.positionGet.y + 0.05 );
+			gcDelete.grainZ = int( EditCursor.currentInstance.instanceInfo.positionGet.z + 0.05 );
 			// we have to make the grain scale up to the size of the edit cursor
-			gcDelete.become_ancestor( vm.editCursor.oxel.gc.grain );
+			gcDelete.become_ancestor( EditCursor.currentInstance.oxel.gc.grain );
 			var oxelToBeDeleted:Oxel = vm.oxel.childFind( gcDelete );
 			GrainCursorPool.poolDispose( gcDelete );
 			return oxelToBeDeleted;
@@ -489,7 +506,7 @@ package com.voxelengine.worldmodel.models.types
 			var foundModel:VoxelModel;
 			if ( Globals.selectedModel )
 			{
-				if ( Globals.g_app.toolOrBlockEnabled )
+				if ( EditCursor.toolOrBlockEnabled )
 				{
 					Globals.player.stateSet( "Pick", 1 );
 					Globals.player.stateLock( true, 300 );
@@ -502,11 +519,11 @@ package com.voxelengine.worldmodel.models.types
 				{
 					var gcDelete:GrainCursor = GrainCursorPool.poolGet(foundModel.oxel.gc.bound);
 					// This is where it intersects with a grain 0
-					gcDelete.grainX = int( foundModel.editCursor.instanceInfo.positionGet.x + 0.05 );
-					gcDelete.grainY = int( foundModel.editCursor.instanceInfo.positionGet.y + 0.05 );
-					gcDelete.grainZ = int( foundModel.editCursor.instanceInfo.positionGet.z + 0.05 );
+					gcDelete.grainX = int( EditCursor.currentInstance.instanceInfo.positionGet.x + 0.05 );
+					gcDelete.grainY = int( EditCursor.currentInstance.instanceInfo.positionGet.y + 0.05 );
+					gcDelete.grainZ = int( EditCursor.currentInstance.instanceInfo.positionGet.z + 0.05 );
 					// we have to make the grain scale up to the size of the edit cursor
-					gcDelete.become_ancestor( foundModel.editCursor.oxel.gc.grain );
+					gcDelete.become_ancestor( EditCursor.currentInstance.oxel.gc.grain );
 					var oxelToBeDeleted:Oxel = foundModel.oxel.childGetOrCreate( gcDelete );
 					if ( Globals.BAD_OXEL != oxelToBeDeleted )
 						foundModel.write( gcDelete, TypeInfo.AIR );
@@ -514,7 +531,7 @@ package com.voxelengine.worldmodel.models.types
 				}
 				else if ( CURSOR_TYPE_SPHERE == cursorType )
 				{
-					var gci:GrainCursorIntersection = foundModel.editCursor.gciData;
+					var gci:GrainCursorIntersection = EditCursor.currentInstance.gciData;
 					var cuttingPoint:Vector3D = new Vector3D();
 					if ( 0 == gci.axis ) // x
 					{
@@ -543,10 +560,10 @@ package com.voxelengine.worldmodel.models.types
 				else if ( CURSOR_TYPE_MODEL == cursorType )
 				{
 					Log.out( "EditCursor.delete - NOT IMPLEMENTED", Log.WARN );
-					//foundModel.empty_square( int(foundModel.editCursor.gciData.point.x)
-												//, int(foundModel.editCursor.gciData.point.y)
-												//, int(foundModel.editCursor.gciData.point.z)
-												//, foundModel.editCursor.gciData.gc.size() / 2
+					//foundModel.empty_square( int(EditCursor.currentInstance.gciData.point.x)
+												//, int(EditCursor.currentInstance.gciData.point.y)
+												//, int(EditCursor.currentInstance.gciData.point.z)
+												//, EditCursor.currentInstance.gciData.gc.size() / 2
 												//, 0 );
 				}
 				else if ( CURSOR_TYPE_CYLINDER == cursorType )
@@ -564,7 +581,7 @@ package com.voxelengine.worldmodel.models.types
 			var foundModel:VoxelModel = Globals.selectedModel;
 			if ( foundModel )
 			{
-				var gciCyl:GrainCursorIntersection = foundModel.editCursor.gciData;
+				var gciCyl:GrainCursorIntersection = EditCursor.currentInstance.gciData;
 				var where:GrainCursor = null;
 				
 				var radius:int = gciCyl.gc.size()/2;
@@ -591,8 +608,8 @@ package com.voxelengine.worldmodel.models.types
 				cuttingPointCyl.y = where.getModelY() + radius
 				cuttingPointCyl.z = where.getModelZ() + radius
 				
-				var minGrain:int = Math.max( foundModel.editCursor.oxel.gc.grain - 4, 0 );
-				var startingGrain:int = foundModel.editCursor.oxel.gc.grain - 1;
+				var minGrain:int = Math.max( EditCursor.currentInstance.oxel.gc.grain - 4, 0 );
+				var startingGrain:int = EditCursor.currentInstance.oxel.gc.grain - 1;
 				//SphereOperation( gc:GrainCursor, what:int, guid:String,	cx:int, cy:int, cz:int, radius:int, currentGrain:int, gmin:uint = 0  ):void 				
 				new SphereOperation( where
 									 , what
@@ -608,9 +625,9 @@ package com.voxelengine.worldmodel.models.types
 		
 		static private function cylinderOperation():void {
 			var foundModel:VoxelModel = Globals.selectedModel;
-			if ( foundModel && foundModel.editCursor.gciData )
+			if ( foundModel && EditCursor.currentInstance.gciData )
 			{
-				var gciCyl:GrainCursorIntersection = foundModel.editCursor.gciData;
+				var gciCyl:GrainCursorIntersection = EditCursor.currentInstance.gciData;
 				var where:GrainCursor = null;
 				
 				var offset:int = 0;
@@ -655,8 +672,8 @@ package com.voxelengine.worldmodel.models.types
 					what = TypeInfo.AIR;
 				}
 					
-				var minGrain:int = Math.max( foundModel.editCursor.oxel.gc.grain - 5, 0 );
-				var startingGrain:int = foundModel.editCursor.oxel.gc.grain - 1;
+				var minGrain:int = Math.max( EditCursor.currentInstance.oxel.gc.grain - 5, 0 );
+				var startingGrain:int = EditCursor.currentInstance.oxel.gc.grain - 1;
 				if ( where )
 				{
 					new CylinderOperation( where
@@ -682,7 +699,7 @@ package com.voxelengine.worldmodel.models.types
 			{
 				// No idea what case F does, and since it causes a link to GUI, I am removing it.
 				//case Keyboard.F:
-					//if ( true == Globals.g_app.editing && true == Globals.g_app.toolOrBlockEnabled )
+					//if ( true == EditCursor.editing && true == EditCursor.toolOrBlockEnabled )
 					//{
 						//if ( 0 == QuickInventory.currentItemSelection )
 							//deleteOxel();
@@ -714,8 +731,8 @@ package com.voxelengine.worldmodel.models.types
 		static public function growCursor():void {
 			if ( Globals.selectedModel )
 			{
-				Globals.selectedModel.editCursor.oxel.gc.bound = Globals.selectedModel.oxel.gc.bound;
-				var gcGrow:GrainCursor = Globals.selectedModel.editCursor.oxel.gc;
+				EditCursor.currentInstance.oxel.gc.bound = Globals.selectedModel.oxel.gc.bound;
+				var gcGrow:GrainCursor = EditCursor.currentInstance.oxel.gc;
 				
 				// If edit cursor wants to be larger the the size of the selected object
 				// then set it to the size of the selected object
@@ -728,7 +745,7 @@ package com.voxelengine.worldmodel.models.types
 						gcGrow.grain = ++gcGrow.grain;
 						
 					editCursorSize = gcGrow.grain;
-					Globals.selectedModel.editCursor.oxel.faces_rebuild( EDIT_CURSOR );
+					EditCursor.currentInstance.oxel.faces_rebuild( EDIT_CURSOR );
 				}
 			}
 		}
@@ -736,14 +753,14 @@ package com.voxelengine.worldmodel.models.types
 		static public function shrinkCursor():void {
 			if ( Globals.selectedModel )
 			{
-				var gcShrink:GrainCursor = Globals.selectedModel.editCursor.oxel.gc;
+				var gcShrink:GrainCursor = EditCursor.currentInstance.oxel.gc;
 				if ( 0 < gcShrink.grain )
 				{
 					var currentSize:int = gcShrink.grain;
 					for ( var i:int = editCursorSize; i < currentSize; i++ )
 						gcShrink.grain = --gcShrink.grain;
 					editCursorSize = gcShrink.grain;
-					Globals.selectedModel.editCursor.oxel.faces_rebuild( EDIT_CURSOR );
+					EditCursor.currentInstance.oxel.faces_rebuild( EDIT_CURSOR );
 				}
 			}	
 		}
@@ -805,7 +822,7 @@ package com.voxelengine.worldmodel.models.types
 				case "mouseDown": case Keyboard.NUMPAD_ADD:
 					if ( CURSOR_OP_DELETE == _s_cursorOperation )
 						deleteOxel();
-					else if ( CURSOR_OP_INSERT == _s_cursorOperation && _s_objectModel )
+					else if ( CURSOR_OP_INSERT == _s_cursorOperation && _objectModel )
 						insertModel();						
 					else if ( CURSOR_OP_INSERT == _s_cursorOperation )
 						insertOxel();
@@ -834,16 +851,16 @@ package com.voxelengine.worldmodel.models.types
 		
 		private function onMouseWheel(event:MouseEvent):void {
 			
-			if ( true != event.shiftKey || null == _s_objectModel )
+			if ( true != event.shiftKey || null == _objectModel )
 				return;
 				
-			var rot:Vector3D = _s_objectModel.instanceInfo.rotationGet;
+			var rot:Vector3D = _objectModel.instanceInfo.rotationGet;
 			if ( 0 < event.delta )
 				rot.y += 90;
 			 else
 				rot.y -= 90;
 
-			_s_objectModel.instanceInfo.rotationSet = rot
+			_objectModel.instanceInfo.rotationSet = rot
 		}	
 		
 	}

@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.GUI
 {
+	import com.voxelengine.worldmodel.models.types.EditCursor;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import flash.events.Event;
 	import org.flashapi.swing.*;
@@ -180,10 +181,10 @@ package com.voxelengine.GUI
 
 		private function updateGC():void
 		{
-			if (Globals.g_app && Globals.g_app.editing ) {
-				if ( Globals.selectedModel &&Globals.selectedModel.editCursor && Globals.selectedModel.editCursor.gciData )
+			if (Globals.g_app && EditCursor.editing ) {
+				if ( Globals.selectedModel && EditCursor.currentInstance.gciData )
 				{
-					var gci:GrainCursorIntersection = Globals.selectedModel.editCursor.gciData;
+					var gci:GrainCursorIntersection = EditCursor.currentInstance.gciData;
 					var rot:Vector3D = Globals.controlledModel.instanceInfo.rotationGet;
 					_gcLabel.text = "grain: " + gci.gc.grain + " x: " + int( gci.gc.grainX ) + "  y: " + int( gci.gc.grainY ) + "  z: " + int( gci.gc.grainZ ); 
 				}

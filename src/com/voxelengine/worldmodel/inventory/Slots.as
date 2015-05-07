@@ -142,14 +142,14 @@ public class Slots
 	static private function pickToolSlots():void {
 		EditCursor.cursorOperation = EditCursor.CURSOR_OP_DELETE;
 		EditCursor.setPickColorFromType( EditCursor.cursorType )
-		Globals.g_app.editing = true;
-		Globals.g_app.toolOrBlockEnabled = true;
+		EditCursor.editing = true;
+		EditCursor.toolOrBlockEnabled = true;
 	}
 	
 	static private function noneSlots():void {
 		EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
-		Globals.g_app.editing = false;
-		Globals.g_app.toolOrBlockEnabled = false;
+		EditCursor.editing = false;
+		EditCursor.toolOrBlockEnabled = false;
 	}
 	
 

@@ -96,17 +96,17 @@ public class ModelPlacementType extends VVCanvas
 	
 	private function nextShape():void
 	{
-		if ( "child" == _butCurrent.data)
-		{
+		if ( "child" == _butCurrent.data) {
 			_butCurrent.data = "parent";	
 			_butCurrent.backgroundTexture = "assets/textures/parent.jpg";
 			_s_placementType = PLACEMENT_TYPE_PARENT;
+			Globals.selectedModel = EditCursor.currentInstance.objectModelGet();
 		} 
-		else if ( "parent" == _butCurrent.data)
-		{
+		else if ( "parent" == _butCurrent.data) {
 			_butCurrent.data = "child";	
 			_butCurrent.backgroundTexture = "assets/textures/child.jpg";
 			_s_placementType = PLACEMENT_TYPE_CHILD;
+			Globals.selectedModel = null;
 		} 
 	}
 	

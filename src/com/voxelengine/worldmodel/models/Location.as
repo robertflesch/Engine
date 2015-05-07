@@ -29,6 +29,7 @@ package com.voxelengine.worldmodel.models
 
 		private var _modelMatrix:Matrix3D 						= new Matrix3D();			// INSTANCE NOT EXPORTED
 		private var _worldMatrix:Matrix3D 						= new Matrix3D();			// INSTANCE NOT EXPORTED
+		private var _invModelMatrix:Matrix3D 					= new Matrix3D();			// INSTANCE NOT EXPORTED
 				
 		public function get changed():Boolean 					{ return _changed; }
 		public function set changed($val:Boolean):void			{ _changed = $val; }
@@ -175,7 +176,9 @@ package com.voxelengine.worldmodel.models
 											  , wsp.y
 											  , wsp.z );
 				
-				_modelMatrix.appendScale( 1/_scale.x, 1/_scale.y, 1/_scale.z );
+				_modelMatrix.appendScale( 1 / _scale.x, 1 / _scale.y, 1 / _scale.z );
+				_invModelMatrix.copyFrom( _modelMatrix )
+				_invModelMatrix.transpose();
 												  
 				_worldMatrix.copyFrom( _modelMatrix );
 				_worldMatrix.invert();
@@ -186,6 +189,7 @@ package com.voxelengine.worldmodel.models
 		
 		public function get worldSpaceMatrix():Matrix3D 		{ recalculateMatrix(); return _worldMatrix; }
 		public function get modelMatrix():Matrix3D 				{ recalculateMatrix(); return _modelMatrix; }
+		public function get invModelMatrix():Matrix3D 			{ return _invModelMatrix; }
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Look At

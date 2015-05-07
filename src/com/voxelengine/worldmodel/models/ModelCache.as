@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+	import com.voxelengine.GUI.actionBars.ModelPlacementType;
 	import flash.display3D.Context3D;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
@@ -152,6 +153,9 @@ package com.voxelengine.worldmodel.models
 					vm.draw( $mvp, $context, false );	
 			}
 			
+			if (EditCursor.editing && ModelPlacementType.PLACEMENT_TYPE_PARENT == ModelPlacementType.modelPlacementTypeGet() )
+				EditCursor.currentInstance.draw( $mvp, $context, false );
+				
 			for ( i = 0; i < _instances.length; i++ ) {
 				vm = _instances[i];
 				if ( vm && vm.complete && vm.visible )
@@ -165,6 +169,9 @@ package com.voxelengine.worldmodel.models
 					vm.drawAlpha( $mvp, $context, false );	
 			}
 			
+			if (EditCursor.editing && ModelPlacementType.PLACEMENT_TYPE_PARENT == ModelPlacementType.modelPlacementTypeGet() )
+				EditCursor.currentInstance.drawAlpha( $mvp, $context, false );
+			
 			bringOutYourDead();
 			bringOutYourDeadDynamic();
 		}
@@ -172,6 +179,8 @@ package com.voxelengine.worldmodel.models
 		public function update( $elapsedTimeMS:int ):void {
 			
 			ModelCacheUtils.worldSpaceStartAndEndPointCalculate();
+			if ( EditCursor.toolOrBlockEnabled )
+				ModelCacheUtils.highLightEditableOxel();
 
 			var taskTime:int = getTimer();
 			// Make sure to call this before the model update, so that models have time to repair them selves.
@@ -200,9 +209,9 @@ package com.voxelengine.worldmodel.models
 			}
 			
 			modelTime = getTimer() - modelTime;
-			
-			if ( Globals.g_app.toolOrBlockEnabled )
-				ModelCacheUtils.highLightEditableOxel();
+				
+			if (EditCursor.editing && ModelPlacementType.PLACEMENT_TYPE_PARENT == ModelPlacementType.modelPlacementTypeGet() )
+				EditCursor.currentInstance.update( Globals.g_renderer.context, $elapsedTimeMS);
 		}
 		
 		public function dispose():void 	{

@@ -11,6 +11,7 @@ package com.voxelengine.GUI.actionBars
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.GUI.VVCanvas;
 	import com.voxelengine.worldmodel.inventory.ObjectInfo;
+	import com.voxelengine.worldmodel.models.types.EditCursor;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
@@ -128,12 +129,12 @@ package com.voxelengine.GUI.actionBars
 		{
 			this.visible = true;
 			_itemInventory.visible = true;
-			Globals.g_app.editing = true;
+			EditCursor.editing = true;
 		}
 		
 		public function hide():void
 		{
-			Globals.g_app.editing = false;
+			EditCursor.editing = false;
 			this.visible = false;
 			_itemInventory.visible = false;
 		}

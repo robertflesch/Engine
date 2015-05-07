@@ -278,7 +278,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	
 	override protected function setAnimation():void	{
 		
-		/*if ( Globals.g_app.toolOrBlockEnabled )
+		/*if ( EditCursor.toolOrBlockEnabled )
 		{
 			stateSet( "Pick", 1 );
 		}*/

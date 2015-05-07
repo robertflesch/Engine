@@ -7,7 +7,6 @@
 ==============================================================================*/
 
 package com.voxelengine {
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.display.StageDisplayState;
 	import flash.display3D.Context3D;
 	import flash.geom.Matrix3D;
@@ -18,6 +17,7 @@ package com.voxelengine {
 	
 	import com.developmentarc.core.tasks.TaskController;
 	
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.crafting.CraftingManager;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
@@ -203,7 +203,7 @@ package com.voxelengine {
 		private static var g_regionPath:String;
 		public static function get regionPath():String { return g_regionPath; }
 		
-		private static var g_player:Player = null;
+		private static var g_player:Player;
 		public static function get player():Player { return g_player; }
 		public static function set player( val:Player ):void { g_player = val; }
 		
@@ -213,7 +213,10 @@ package com.voxelengine {
 		
 		private static var g_selectedModel:VoxelModel = null;
 		public static function get selectedModel():VoxelModel { return g_selectedModel; }
-		public static function set selectedModel( val:VoxelModel ):void { g_selectedModel = val; }
+		public static function set selectedModel( val:VoxelModel ):void { 
+			Log.out( "Globals.selectedModel: " + val.toString(), Log.WARN );
+			g_selectedModel = val; 
+		}
 		
 		public static function isGuid(val:String):Boolean { return 30 < val.length; }
 		public static function getUID():String { return GUID.create() }

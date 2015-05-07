@@ -9,6 +9,7 @@
 package com.voxelengine.renderer 
 {
 	import com.voxelengine.renderer.shaders.Shader;
+	import com.voxelengine.worldmodel.models.types.EditCursor;
 	import com.voxelengine.worldmodel.Region;
 	import flash.display.Stage3D;
 	import flash.display.BitmapData;
@@ -152,8 +153,10 @@ package com.voxelengine.renderer
 		};
 		
 		private static function reinitialize( $context:Context3D ):void {
-			if ( Region.currentRegion )
+			if ( Region.currentRegion ) {
 				Region.currentRegion.modelCache.reinitialize( $context );
+				EditCursor.currentInstance.reinitialize( $context );
+			}
 		}
 		
 		// This handles the event created in the init function

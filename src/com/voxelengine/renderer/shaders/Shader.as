@@ -140,6 +140,11 @@ package com.voxelengine.renderer.shaders
 					// 0.125 is texture bias for adjusting the mipmap distance
 					"tex ft0, v0, fs0 <2d,clamp,mipnearest,0.125>", // v0 is passed in from vertex, UV coordinates
 					
+					// http://pgstudios.org/old_tut_archive.html
+					// Fix for Pre-Multiplied Alpha in PNGs
+					// Wow, gives really strange effect
+					//"div ft0.rgb, ft0.rgb, ft0.a",  // un-premultiply png
+					
 					/////////////////////////////////////////////////
 					// TINT on base texture
 					"mul ft0.xyz, v1.xyz, ft0.xyz", // mutliply by texture tint - v1.xyz
@@ -286,13 +291,9 @@ package com.voxelengine.renderer.shaders
 			// send down the view matrix
 			$context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 0, mvp, true); // aka vc0
 			
-			// now the model matrix so I can get the normals
-			var invmat:Matrix3D = $vm.instanceInfo.modelMatrix.clone();
-			invmat.transpose();
-			$context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, invmat, true); // aka vc4
-			
 			// and the inverted model matrix, which is world position ( free from camera data )
-			//var wsmat:Matrix3D = $vm.instanceInfo.worldSpaceMatrix.clone();
+			$context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 4, $vm.instanceInfo.invModelMatrix, true); // aka vc4
+			
 			$context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, $vm.instanceInfo.worldSpaceMatrix, true); // aka vc8
 			
 			if ( _isAnimated ) 

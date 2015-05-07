@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models.makers
 {
 import com.voxelengine.events.LoadingImageEvent;
+import com.voxelengine.GUI.actionBars.ModelPlacementType;
 import com.voxelengine.worldmodel.models.makers.ModelMakerCursor;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.EditCursor;
@@ -52,7 +53,7 @@ public class ModelMakerCursor extends ModelMakerBase {
 			//Log.out( "ModelMakerCursor.attemptMake - ii: " + _ii.toString() );
 			var vm:VoxelModel = createFromMakerInfo();
 			markComplete();
-			EditCursor.objectModelSet( vm );
+			EditCursor.currentInstance.objectModelSet( vm );
 		}
 		else if ( null != _vmm && true == _vmdFailed )
 			markComplete( false );

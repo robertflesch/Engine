@@ -101,7 +101,7 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	override public function remove():void {
-		Globals.g_app.editing = false;
+		EditCursor.editing = false;
 		removeListeners();
 		Log.out( "UserInventory.remove ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 		RoomEvent.removeListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
@@ -121,7 +121,7 @@ public class  UserInventory extends QuickInventory
 		}
 			
 		with ( _s_currentInstance ) {
-			Globals.g_app.editing = false;
+			EditCursor.editing = false;
 			visible = false;
 			removeListeners();
 		}
@@ -143,7 +143,7 @@ public class  UserInventory extends QuickInventory
 			with ( _s_currentInstance ) {
 				// display it!
 				visible = true;
-				Globals.g_app.editing = true;
+				EditCursor.editing = true;
 				addListeners();
 				display();
 				resizeObject( null );
@@ -189,8 +189,8 @@ public class  UserInventory extends QuickInventory
 			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, _owner, slotId, null ) );
 			// sets edit cursor to none
 			EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
-			Globals.g_app.editing = false;
-			Globals.g_app.toolOrBlockEnabled = false;
+			EditCursor.editing = false;
+			EditCursor.toolOrBlockEnabled = false;
 		}
 	}
 	
@@ -303,31 +303,31 @@ public class  UserInventory extends QuickInventory
 		moveSelector( box.x );
 		var itemIndex:int = int( box.name );
 		
-		Globals.g_app.editing = false;
-		Globals.g_app.toolOrBlockEnabled = false;
+		EditCursor.editing = false;
+		EditCursor.toolOrBlockEnabled = false;
 		hideGrainTools();
 		hideModelTools();
 		// reset the cursor type to what was selected in the shape selector
-		EditCursor.cursorType = _lastCursorType;
+		//EditCursor.cursorType = _lastCursorType;
 		
 		var oi:ObjectInfo = box.data as ObjectInfo;
 		if ( oi is ObjectVoxel ) {
 			var ti:ObjectVoxel = oi as ObjectVoxel;
 			var selectedTypeId:int = ti.type;
 			showGrainTools();
-			EditCursor.objectModelClear();
+			EditCursor.currentInstance.objectModelClear();
 			if ( TypeInfo.INVALID != selectedTypeId ) {
 				EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
 				EditCursor.editCursorIcon = selectedTypeId; 
 				_itemMaterialSelection = itemIndex;
-				Globals.g_app.editing = true;
-				Globals.g_app.toolOrBlockEnabled = true;
+				EditCursor.editing = true;
+				EditCursor.toolOrBlockEnabled = true;
 			}
 		}
 		else if ( oi is ObjectAction ) {
 			Log.out( "UserInventory.processItemSelection - ObjectAction");
 			var oa:ObjectAction = oi as ObjectAction;
-			EditCursor.objectModelClear();
+			EditCursor.currentInstance.objectModelClear();
 			if ( lastItemSelection != itemIndex )
 			{   // We are selecting none when it was previously on another item
 				oa.callBack();
@@ -344,15 +344,15 @@ public class  UserInventory extends QuickInventory
 			Log.out( "UserInventory.processItemSelection - ObjectTool");
 			var ot:ObjectTool = oi as ObjectTool;
 			showGrainTools();
-			EditCursor.objectModelClear();
+			EditCursor.currentInstance.objectModelClear();
 			if ( lastItemSelection != itemIndex )
 			{   // We are selecting the pick when it was previously on another item
 				ot.callBack();
 			}
 			else if ( - 1 != _itemMaterialSelection ) 
 			{	// go back to previously used material
-				Globals.g_app.editing = true;
-				Globals.g_app.toolOrBlockEnabled = true;
+				EditCursor.editing = true;
+				EditCursor.toolOrBlockEnabled = true;
 				EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
 				var lastBoxPick:Box = boxes[_itemMaterialSelection ];
 				processItemSelection( lastBoxPick );
@@ -361,27 +361,25 @@ public class  UserInventory extends QuickInventory
 		}
 		else if ( oi is ObjectModel ) {
 			
-			if ( lastItemSelection != itemIndex )
-				EditCursor.objectModelClear(); // clear the previously draw model
-			
 			showModelTools();
 			
 			EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
 			var ti1:TypeInfo = TypeInfo.typeInfoByName[ "CLEAR GLASS" ];
 			EditCursor.editCursorIcon = ti1.type;
-			//_itemMaterialSelection = itemIndex;
-			Globals.g_app.editing = true;
-			Globals.g_app.toolOrBlockEnabled = true;
+			EditCursor.editing = true;
+			EditCursor.toolOrBlockEnabled = true;
 			
 			var om:ObjectModel = oi as ObjectModel;
-			EditCursor.objectModelAdd( om );
+			EditCursor.currentInstance.objectModelAdd( om );
 		}
 		else if ( oi is ObjectInfo ) {
 			Log.out( "UserInventory.processItemSelection - ObjectInfo");
-			hideGrainTools();
+			EditCursor.currentInstance.objectModelClear();
+			EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
 		}
 		
 		lastItemSelection = itemIndex;
+		_itemMaterialSelection = itemIndex;
 	}
 	
 	private function cursorReady(e:LoadingEvent):void  {
@@ -424,13 +422,8 @@ public class  UserInventory extends QuickInventory
 		_shape.hide();
 	}
 
-	private function showModelTools():void {
-		_modelTools.show();
-	}
-	
-	private function hideModelTools():void {
-		_modelTools.hide();
-	}
+	private function showModelTools():void { _modelTools.show(); }
+	private function hideModelTools():void { _modelTools.hide(); }
 
 	private var _listenersAdded:Boolean;
 	private function addListeners():void {
@@ -467,48 +460,5 @@ public class  UserInventory extends QuickInventory
 			//_shape.pressShapeHotKey(e);
 		//}
 	}
-	
-	
-	//public function onMouseWheel(event:MouseEvent):void
-	//{
-		//if ( -1 != _lastItemSelection )
-		//{
-			//if ( 0 < event.delta && _lastItemSelection < (Slots.ITEM_COUNT - 1)  )
-			//{
-				//selectByIndex( _lastItemSelection + 1 );
-			//}
-			//else if ( 0 < event.delta && ( Slots.ITEM_COUNT -1 ) == _lastItemSelection )
-			//{
-				//selectByIndex( 0 );
-			//}
-			//else if ( 0 > event.delta && 0 == _lastItemSelection )
-			//{
-				//selectByIndex( Slots.ITEM_COUNT - 1 );
-			//}
-			//else if ( 0 < _lastItemSelection )
-			//{
-				//selectByIndex( _lastItemSelection - 1 );
-			//}
-		//}
-	//}	
-	//public function onMouseWheel(event:MouseEvent):void
-	//{
-		//var curSelection:int = QuickInventory.currentItemSelection;
-		//if ( 0 > event.delta )
-		//{
-			//curSelection--;
-			//if ( curSelection < 0 )
-				//curSelection = 9;
-		//}
-		//else
-		//{
-			//curSelection++;
-			//if ( 9 < curSelection )
-				//curSelection = 0;
-		//}
-		//processItemSelection( getBoxFromIndex( curSelection ) );
-	//}		
-	//
-	//
 }
 }

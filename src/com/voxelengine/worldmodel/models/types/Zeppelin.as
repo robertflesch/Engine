@@ -128,7 +128,7 @@ package com.voxelengine.worldmodel.models.types
 			
 			// Do the things that just a voxel model does
 			// update the edit cursor
-			if ( Globals.g_app.editing && editCursor && Globals.selectedModel == this )
+			if ( EditCursor.editing && editCursor && Globals.selectedModel == this )
 				editCursor.update( context, $elapsedTimeMS );
 				
 			// Changed first param inside from false to true ( calculateTargetPosition )

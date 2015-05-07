@@ -68,6 +68,7 @@ public class VertexIndexBuilder
 	private var _dirty:Boolean = false;
 
 	private var _sortCount:int;
+	private var _sortEvery:int;
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//     Getters/Setters
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,7 +82,7 @@ public class VertexIndexBuilder
 	
 	public function VertexIndexBuilder()
 	{
-		_sortCount = int( Math.random() * 30 );
+		_sortEvery = 45 + int( Math.random() * 30 );
 	}
 
 	public function release():void
@@ -99,8 +100,8 @@ public class VertexIndexBuilder
 			return -1;
 
 		// this could be speed up for sure	
-		var xdist:Number = x.gc.GetDistance( _s_compareVec );
-		var ydist:Number = y.gc.GetDistance( _s_compareVec );
+		var xdist:Number = x.gc.getDistance( _s_compareVec );
+		var ydist:Number = y.gc.getDistance( _s_compareVec );
 		
 		if ( xdist == ydist ) return 0;
 		if ( xdist < ydist ) return -1;
@@ -109,10 +110,9 @@ public class VertexIndexBuilder
 	
 	public function sort() : void {
 		_sortCount++;
-		if ( _sortCount < 30 )
+		if ( _sortCount < _sortEvery )
 			return;
 			
-		_sortCount = 0;	
 		var timer:int = getTimer();
 
 		if ( _oxels && 0 < _oxels.length ) {
@@ -122,10 +122,11 @@ public class VertexIndexBuilder
 				_s_compareVec = Globals.controlledModel.modelToWorld( Globals.controlledModel.camera.center );
 				//Log.out( "VertexIndexBuilder.sort - _s_compareVec: " + _s_compareVec );
 				_oxels.sort( compareFunction );	
-				//trace( "VertexIndexBuilder - sorted: " + _oxels.length + " - took: "  + (getTimer() - timer) );					
+				trace( "VertexIndexBuilder - sorted: " + _oxels.length + " - took: "  + (getTimer() - timer) );					
 				_sorted = true;
 			}
 		}
+		_sortCount = 0;
 	}
 
 	public static function resetStatics():void {

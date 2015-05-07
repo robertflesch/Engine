@@ -27,32 +27,17 @@ package {
 	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.events.InventoryEvent;
 	import com.voxelengine.events.RegionEvent;
-	import com.voxelengine.events.LightEvent;
 	import com.voxelengine.events.ModelBaseEvent;
-	import com.voxelengine.events.WindowSplashEvent;
 	import com.voxelengine.GUI.VoxelVerseGUI;
-	import com.voxelengine.worldmodel.ConfigManager;
 	import com.voxelengine.worldmodel.MemoryManager;
 	import com.voxelengine.worldmodel.MouseKeyboardHandler;
 	import com.voxelengine.worldmodel.Region;
-	import com.voxelengine.worldmodel.RegionManager;
-//	import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
-//	import com.voxelengine.worldmodel.tasks.lighting.LightRemove;
 	
 	public class VoxelVerse extends Sprite 
 	{
 		private var _timePrevious:int = getTimer();
 		
 		private var _showConsole:Boolean;
-		private var _toolOrBlockEnabled:Boolean;
-		private var _editing: Boolean;
-		private var _displayGuid:String;
-		
-		public function get editing():Boolean { return _editing; }
-		public function set editing(val:Boolean):void { _editing = val; }
-		public function get toolOrBlockEnabled():Boolean { return _toolOrBlockEnabled; }
-		public function set toolOrBlockEnabled(val:Boolean):void { _toolOrBlockEnabled = val; }
-		
 		public function get showConsole():Boolean { return _showConsole; }
 		public function set showConsole(value:Boolean):void { _showConsole = value; }
 

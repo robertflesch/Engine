@@ -1,23 +1,8 @@
-/*
-	author		:		Ray E. Bornert II
-	date		:		2012-JAN-22 SUN
-	copyright	:		(c) 2012-present
-	comments	:
-		
-		A generic grain cursor class
-		within the unsigned int 32 bit space.
-		
-		The object can be manipulated with 
-		various useful primitives and then 
-		used and a spatial reference within
-		a grain tree object
-		
-*/
 package com.voxelengine.worldmodel.oxel
 {
-	//import com.voxelengine.Log;
-	import flash.geom.Vector3D;
-	import com.voxelengine.Globals;
+//import com.voxelengine.Log;
+import flash.geom.Vector3D;
+import com.voxelengine.Globals;
 
 public class GrainCursor
 {
@@ -26,8 +11,9 @@ public class GrainCursor
 	protected var _gz:uint = 0;
 	protected var _data:uint = 0;
 
-	public static var v3_static:Vector3D = new Vector3D;
-	public static var gc_static:GrainCursor = new GrainCursor();	
+	private static var _s_v3:Vector3D = new Vector3D;
+	private static var _s_gc:GrainCursor = new GrainCursor();	
+	private static var _s_axes:Vector.<int> = null;
 
 	[inline]
 	public function get grain( ):uint { return _data & 0x0000ffff; }
@@ -59,37 +45,33 @@ public class GrainCursor
 	[inline]
 	public function set grainZ( val:uint ):void { _gz = val; }
 	
-	private static var _s_axes:Vector.<int> = null;
 	////////////////////////////////////////////////////////////////////
 	// Static functions
 	////////////////////////////////////////////////////////////////////
 
 	[inline]
-	public static function two_to_the_g( g:uint ):uint
-	{
+	public static function two_to_the_g( g:uint ):uint {
 		// 2 raised to the power of g
 		// 2^8 = 256
 		return (1 << g);
 	}
 
 	[inline]
-	public static function two_to_the_g_minus_1( g:uint ):uint
-	{
+	public static function two_to_the_g_minus_1( g:uint ):uint {
 		// 2 raised to the power of g minus 1
 		// 2^8-1 = 255
 		return ((1 << g) - 1);
 	}
 	
 	[inline]
-	public static function get_the_g0_size_for_grain( g:uint ):uint
-	{
+	public static function get_the_g0_size_for_grain( g:uint ):uint {
 		// the size of any grain g in g0 units is:
 		// 2 raised to the power of g
 		return two_to_the_g(g);
 	}
+	
 	[inline]
-	public static function get_the_g0_edge_for_grain( g:uint ):uint
-	{
+	public static function get_the_g0_edge_for_grain( g:uint ):uint {
 		// the edge of any grain g in g0 units is:
 		// 2 raised to the power of g - 1
 		return two_to_the_g_minus_1(g);
@@ -99,8 +81,7 @@ public class GrainCursor
 	// Member functions
 	////////////////////////////////////////////////////////////////////
 	
-	public function GrainCursor( gx:uint=0, gy:uint=0, gz:uint=0, g:uint=0 )
-	{
+	public function GrainCursor( gx:uint=0, gy:uint=0, gz:uint=0, g:uint=0 ) {
 		// keeps you from creating root...
 		//if ( g >= s_max_grain ) {
 			//trace("GrainCursor - ERROR - grain is over max grain size, desired: " + g + " max: " + s_max_grain );
@@ -156,7 +137,7 @@ public class GrainCursor
 	// http://stackoverflow.com/questions/3106666/intersection-of-line-segment-with-axis-aligned-box-in-c-sharp
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	[inline]
-	public static function GetCoordinate(  vector:Vector3D,  axis:int ):Number
+	private static function getCoordinate(  vector:Vector3D,  axis:int ):Number
 	{
 		switch (axis)
 		{
@@ -172,7 +153,7 @@ public class GrainCursor
 	}	
 	
 	[inline]
-	public static function SetCoordinate(  vector:Vector3D,  axis:int,  adjustment:Number ):void
+	private static function setCoordinate(  vector:Vector3D,  axis:int,  adjustment:Number ):void
 	{
 		switch (axis)
 		{
@@ -191,17 +172,17 @@ public class GrainCursor
 	}	
 	
 	[inline]
-	public function GetDistance( v:Vector3D ):Number 
+	public function getDistance( v:Vector3D ):Number 
 	{
 		// using static speeds it up by 40%
-		v3_static.x = v.x - getModelX();
-		v3_static.y = v.y - getModelY();
-		v3_static.z = v.z - getModelZ();
-		return v3_static.length;
+		_s_v3.x = v.x - getModelX();
+		_s_v3.y = v.y - getModelY();
+		_s_v3.z = v.z - getModelZ();
+		return _s_v3.length;
 	}
 	
 	[inline]
-	public function GetWorldCoordinate( axis:int ):int 
+	public function getWorldCoordinate( axis:int ):int 
 	{
 		switch (axis)
 		{
@@ -218,18 +199,18 @@ public class GrainCursor
 	}
 
 	[inline]
-	private function RoundNumber( numIn:Number, decimalPlaces:int ):Number 
+	private function roundNumber( numIn:Number, decimalPlaces:int ):Number 
 	{
 		var nExp:int = Math.pow(10,decimalPlaces) ;
 		return Math.round(numIn * nExp) / nExp;
 	} 
 	
 	[inline]
-	public function RoundVector( v:Vector3D, places:int = 4 ):void
+	public function roundVector( v:Vector3D, places:int = 4 ):void
 	{
-		v.x = RoundNumber(v.x,places);
-		v.y = RoundNumber(v.y,places);
-		v.z = RoundNumber(v.z,places);
+		v.x = roundNumber(v.x,places);
+		v.y = roundNumber(v.y,places);
+		v.z = roundNumber(v.z,places);
 		
 		//return v;
 	}
@@ -253,15 +234,15 @@ public class GrainCursor
 		var tFarAxis:int = -1;
 		for each ( var axis:int in _s_axes )
 		{
-			if ( GetCoordinate(beginToEnd, axis) == 0) // parallel
+			if ( getCoordinate(beginToEnd, axis) == 0) // parallel
 			{
-				if ( GetCoordinate( beginToMin, axis) > 0 || GetCoordinate(beginToMax,axis) < 0)
+				if ( getCoordinate( beginToMin, axis) > 0 || getCoordinate(beginToMax,axis) < 0)
 					return false; // segment is not between planes, return empty set
 			}
 			else
 			{
-				var t1:Number = GetCoordinate(beginToMin, axis) / (GetCoordinate(beginToEnd,axis));
-				var t2:Number = GetCoordinate(beginToMax, axis) / (GetCoordinate(beginToEnd,axis));
+				var t1:Number = getCoordinate(beginToMin, axis) / (getCoordinate(beginToEnd,axis));
+				var t2:Number = getCoordinate(beginToMax, axis) / (getCoordinate(beginToEnd,axis));
 				var tMin:Number = Math.min(t1, t2);
 				var tMax:Number = Math.max(t1, t2);
 				if (tMin > tNear)
@@ -286,18 +267,18 @@ public class GrainCursor
 			gciNear.point.copyFrom( beginToEnd );
 			gciNear.point.scaleBy( tNear );
 			gciNear.point = modelSpaceStartPoint.add( gciNear.point );
-			RoundVector( gciNear.point );
+			roundVector( gciNear.point );
 			gciNear.gc.copyFrom( this );
 			gciNear.near = true;
 			gciNear.axis = tNearAxis;
-			var ipoint:Number = GrainCursor.GetCoordinate( gciNear.point, gciNear.axis );
-			if ( ((1 << gciNear.gc.grain) + GetWorldCoordinate( gciNear.axis)) == GrainCursor.GetCoordinate( gciNear.point, gciNear.axis ) )
+			var ipoint:Number = GrainCursor.getCoordinate( gciNear.point, gciNear.axis );
+			if ( ((1 << gciNear.gc.grain) + getWorldCoordinate( gciNear.axis)) == GrainCursor.getCoordinate( gciNear.point, gciNear.axis ) )
 			{
-				GrainCursor.SetCoordinate( gciNear.point, gciNear.axis, 0.001 );
+				GrainCursor.setCoordinate( gciNear.point, gciNear.axis, 0.001 );
 			}
-			if ( GetWorldCoordinate( gciNear.axis) == GrainCursor.GetCoordinate( gciNear.point, gciNear.axis ) )
+			if ( getWorldCoordinate( gciNear.axis) == GrainCursor.getCoordinate( gciNear.point, gciNear.axis ) )
 			{
-				GrainCursor.SetCoordinate( gciNear.point, gciNear.axis, -0.001 );
+				GrainCursor.setCoordinate( gciNear.point, gciNear.axis, -0.001 );
 			}
 			modelSpaceIntersections.push( gciNear );
 			
@@ -318,19 +299,19 @@ public class GrainCursor
 			gciFar.point.copyFrom( beginToEnd );
 			gciFar.point.scaleBy( tFar );
 			gciFar.point = modelSpaceStartPoint.add( gciFar.point );
-			RoundVector( gciFar.point );
+			roundVector( gciFar.point );
 			gciFar.gc.copyFrom( this );
 			gciFar.near = false;
 			gciFar.axis = tFarAxis;
-			if ( ((1 << gciFar.gc.grain) + GetWorldCoordinate( gciFar.axis)) == GrainCursor.GetCoordinate( gciFar.point, gciFar.axis ) )
+			if ( ((1 << gciFar.gc.grain) + getWorldCoordinate( gciFar.axis)) == GrainCursor.getCoordinate( gciFar.point, gciFar.axis ) )
 			{
 				// test for add vs subtract...
-				GrainCursor.SetCoordinate( gciFar.point, gciFar.axis, 0.001 );
+				GrainCursor.setCoordinate( gciFar.point, gciFar.axis, 0.001 );
 			}
-			if ( GetWorldCoordinate( gciFar.axis) == GrainCursor.GetCoordinate( gciFar.point, gciFar.axis ) )
+			if ( getWorldCoordinate( gciFar.axis) == GrainCursor.getCoordinate( gciFar.point, gciFar.axis ) )
 			{
 				// test for add vs subtract...
-				GrainCursor.SetCoordinate( gciFar.point, gciFar.axis, -0.001 );
+				GrainCursor.setCoordinate( gciFar.point, gciFar.axis, -0.001 );
 			}
 			modelSpaceIntersections.push( gciFar );
 			//trace( "GrainCursor.lineIntersectTest3 - intersection far " + gciFar.toString() );
@@ -392,12 +373,12 @@ public class GrainCursor
 		return new Vector3D( getModelX(), getModelY(), getModelZ() );
 	}
 	
-	public function copyFrom( param_gc:GrainCursor ):void
+	public function copyFrom( $gc:GrainCursor ):void
 	{
-		_gx = param_gc._gx;
-		_gy = param_gc._gy;
-		_gz = param_gc._gz;
-		_data = param_gc._data;
+		_gx = $gc._gx;
+		_gy = $gc._gy;
+		_gz = $gc._gz;
+		_data = $gc._data;
 	}
 
 	[inline]
@@ -477,8 +458,7 @@ public class GrainCursor
 	}
 
 	[inline]
-	public function become_decendant( k:uint ):Boolean
-	{
+	public function become_decendant( k:uint ):Boolean {
 		if ( grain - k < 0) 
 		{ 
 			trace( "GrainCursor.become_decendant - Error - trying to make a child of grain0" );
@@ -494,15 +474,11 @@ public class GrainCursor
 	}
 
 	[inline]
-	public function become_parent():void
-	{
-		become_ancestor(1);
-	}
+	public function become_parent():void { become_ancestor(1); }
 
 	// values from 0-7 specifies which child to become
 	[inline]
-	public function become_child( n:uint = 0 ):Boolean
-	{
+	public function become_child( n:uint = 0 ):Boolean {
 		//trace( "become_child: - was \t" + this.toString() );
 		if (grain == 0) 
 		{ 
@@ -526,42 +502,39 @@ public class GrainCursor
 	}
 	
 	[inline]
-	public function get_ancestor( k:uint ):GrainCursor
-	{
-		gc_static.copyFrom(this);
-		gc_static.become_ancestor( k );
-		return gc_static;
+	public function get_ancestor( k:uint ):GrainCursor {
+		_s_gc.copyFrom(this);
+		_s_gc.become_ancestor( k );
+		return _s_gc;
 	}	
 
 	[inline]
-	public function is_inside( param_gc:GrainCursor ):Boolean
-	{
+	public function is_inside( $gc:GrainCursor ):Boolean {
 		///////////////////////////////
 		// true if this inside gc
 		///////////////////////////////
 		
-		// we cannot be inside of param_gc if we are larger
-		if (grain > param_gc.grain) 		return false;
-		if ( is_equal( param_gc ) ) return true;
+		// we cannot be inside of $gc if we are larger
+		if (grain > $gc.grain) 		return false;
+		if ( is_equal( $gc ) ) return true;
 		
-		gc_static.copyFrom(this);
-		gc_static.become_ancestor( param_gc.grain - gc_static.grain );
-		return param_gc.is_equal(gc_static);
+		_s_gc.copyFrom(this);
+		_s_gc.become_ancestor( $gc.grain - _s_gc.grain );
+		return $gc.is_equal(_s_gc);
 	}
 	
 	[inline]
-	public function is_point_inside( point:Vector3D ):Boolean
-	{
+	public function is_point_inside( point:Vector3D ):Boolean {
 		///////////////////////////////
 		// true if this inside gc
 		///////////////////////////////
-		getGrainFromPoint( point.x, point.y, point.z, gc_static, 0 );
-		gc_static.become_ancestor( grain - gc_static.grain );
-		return gc_static.is_equal(this);
+		getGrainFromPoint( point.x, point.y, point.z, _s_gc, 0 );
+		_s_gc.become_ancestor( grain - _s_gc.grain );
+		return _s_gc.is_equal(this);
 	}
 	
-	public function move( face:int ):Boolean
-	{
+	[inline]
+	public function move( face:int ):Boolean {
 		if ( Globals.POSX == face )
 			return move_posx();
 		else if ( Globals.NEGX == face )
@@ -579,8 +552,8 @@ public class GrainCursor
 		return false;
 	}
 	
-	public function move_posz():Boolean	
-	{ 
+	[inline]
+	public function move_posz():Boolean	{ 
 		if (is_inb( _gz + 1 )) 
 		{
 			_gz += 1; 
@@ -589,8 +562,8 @@ public class GrainCursor
 		return false;
 	}
 	
-	public function move_negz():Boolean	
-	{ 
+	[inline]
+	public function move_negz():Boolean	{ 
 		if (is_inb( _gz - 1 )) 
 		{
 			_gz -= 1; 
@@ -599,8 +572,8 @@ public class GrainCursor
 		return false;
 	}
 	
-	public function move_posx():Boolean	
-	{ 
+	[inline]
+	public function move_posx():Boolean	{ 
 		if (is_inb( _gx + 1 )) 
 		{
 			_gx += 1; 
@@ -609,8 +582,8 @@ public class GrainCursor
 		return false;
 	}
 	
-	public function move_negx():Boolean	
-	{ 
+	[inline]
+	public function move_negx():Boolean	{ 
 		if (is_inb( _gx - 1 )) 
 		{
 			_gx -= 1; 
@@ -619,8 +592,8 @@ public class GrainCursor
 		return false;
 	}
 	
-	public function move_posy():Boolean	
-	{ 
+	[inline]
+	public function move_posy():Boolean	{ 
 		if (is_inb( _gy + 1 ))
 		{
 			_gy += 1; 
@@ -629,8 +602,8 @@ public class GrainCursor
 		return false;
 	}
 	
-	public function move_negy():Boolean	
-	{ 
+	[inline]
+	public function move_negy():Boolean	{ 
 		if (is_inb( _gy - 1 ))
 		{
 			_gy -= 1; 
@@ -639,34 +612,33 @@ public class GrainCursor
 		return false;
 	}
 	
-	public function is_equal( param_gc:GrainCursor ):Boolean
-	{
-		//trace( "is_equal: g: " + grain + " = " + param_gc.grain  + "  x: " + _gx + " = " + param_gc._gx + "  y: "  + _gy + " = " + param_gc._gy + "  z: "  + _gz + " = " + param_gc._gz   );
-
+	[inline]
+	public function is_equal( $gc:GrainCursor ):Boolean {
+		//trace( "is_equal: g: " + grain + " = " + $gc.grain  + "  x: " + _gx + " = " + $gc._gx + "  y: "  + _gy + " = " + $gc._gy + "  z: "  + _gz + " = " + $gc._gz   );
 		return ( true
-			&& grain == param_gc.grain
-			&& _gx == param_gc._gx
-			&& _gy == param_gc._gy
-			&& _gz == param_gc._gz
+			&& grain == $gc.grain
+			&& _gx == $gc._gx
+			&& _gy == $gc._gy
+			&& _gz == $gc._gz
 		);
 	}
 
-	public function is_outside( param_gc:GrainCursor ):Boolean
-	{
+	[inline]
+	public function is_outside( $gc:GrainCursor ):Boolean {
 		///////////////////////////////
-		// true if this outside param_gc
+		// true if this outside $gc
 		///////////////////////////////
 		return(true
-			&& is_inside( param_gc )	== false
-			&& param_gc.is_inside( this )	== false
+			&& is_inside( $gc )	== false
+			&& $gc.is_inside( this )	== false
 		);
 	}
 
 	public function toString():String { return " x: " + _gx + "\t y: " + _gy + "\t z: "  + _gz + "\t grain: " + grain + " (" + size() + ")" + " bound: " + bound; }
 	public function toID():String { return ((String(_gx) + _gy) + _gz) + grain; }
 	
-	public function set_values( x:uint, y:uint, z:uint, g:uint ):GrainCursor
-	{
+	[inline]
+	public function set_values( x:uint, y:uint, z:uint, g:uint ):GrainCursor {
 		_gx = x;
 		_gy = y;
 		_gz = z;
@@ -675,8 +647,8 @@ public class GrainCursor
 		return this;
 	}
 
-	public function contains_g0_point( x:int, y:int, z:int ):Boolean
-	{
+	[inline]
+	public function contains_g0_point( x:int, y:int, z:int ):Boolean {
 		// return true if the parameter point (g0 units) is inside this grain
 		return(true
 			&& _gx == (x >> grain)
@@ -685,8 +657,7 @@ public class GrainCursor
 		);
 	}
 	
-	public function containsModelSpacePoint( point:Vector3D ):Boolean
-	{
+	public function containsModelSpacePoint( point:Vector3D ):Boolean {
 		// return true if the parameter point (g0 units) is inside this grain
 		return(true
 			&& _gx == ( point.x >> grain)
@@ -701,8 +672,5 @@ public class GrainCursor
 		else
 			return false;
 	}
-
-
-	
 }
 }

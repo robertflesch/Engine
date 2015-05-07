@@ -2610,20 +2610,20 @@ package com.voxelengine.worldmodel.oxel
 					_o_min = gc.grain;
 				if ( _o_max < gc.grain )
 					_o_max = gc.grain;
-				if ( _x_min > gc.GetWorldCoordinate( 0 ) )
-					_x_min = gc.GetWorldCoordinate( 0 );
-				if ( _x_max < gc.GetWorldCoordinate( 0 ) + gc.size() )
-					_x_max = gc.GetWorldCoordinate( 0 ) + gc.size();
+				if ( _x_min > gc.getWorldCoordinate( 0 ) )
+					_x_min = gc.getWorldCoordinate( 0 );
+				if ( _x_max < gc.getWorldCoordinate( 0 ) + gc.size() )
+					_x_max = gc.getWorldCoordinate( 0 ) + gc.size();
 					
-				if ( _y_min > gc.GetWorldCoordinate( 1 ) )
-					_y_min = gc.GetWorldCoordinate( 1 );
-				if ( _y_max < gc.GetWorldCoordinate( 1 ) + gc.size() )
-					_y_max = gc.GetWorldCoordinate( 1 ) + gc.size();
+				if ( _y_min > gc.getWorldCoordinate( 1 ) )
+					_y_min = gc.getWorldCoordinate( 1 );
+				if ( _y_max < gc.getWorldCoordinate( 1 ) + gc.size() )
+					_y_max = gc.getWorldCoordinate( 1 ) + gc.size();
 					
-				if ( _z_min > gc.GetWorldCoordinate( 2 ) )
-					_z_min = gc.GetWorldCoordinate( 2 );
-				if ( _z_max < gc.GetWorldCoordinate( 2 ) + gc.size() )
-					_z_max = gc.GetWorldCoordinate( 2 ) + gc.size();
+				if ( _z_min > gc.getWorldCoordinate( 2 ) )
+					_z_min = gc.getWorldCoordinate( 2 );
+				if ( _z_max < gc.getWorldCoordinate( 2 ) + gc.size() )
+					_z_max = gc.getWorldCoordinate( 2 ) + gc.size();
 			}
 			// otherwise its air and doest not count
 		}

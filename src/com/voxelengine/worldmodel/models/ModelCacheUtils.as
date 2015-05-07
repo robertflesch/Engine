@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models
 {
 	import com.voxelengine.worldmodel.models.types.Avatar;
+	import com.voxelengine.worldmodel.models.types.EditCursor;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.Region;
 	import flash.geom.Matrix3D;
@@ -122,14 +123,14 @@ package com.voxelengine.worldmodel.models
 			_worldSpaceIntersections.length = 0;
 			if ( editableModel )
 			{
-				if ( _lastFoundModel != editableModel && _lastFoundModel )
-					_lastFoundModel.editCursor.visible = false;	
+				//if ( _lastFoundModel != editableModel && _lastFoundModel )
+					//EditCursor.currentInstance.visible = false;	
 				
 				Globals.selectedModel = editableModel;
 				
-				if ( Globals.g_app.editing && editableModel.editCursor )
+				if ( EditCursor.editing )
 				{
-					const minSize:int = editableModel.editCursor.oxel.gc.grain;
+					const minSize:int = EditCursor.currentInstance.oxel.gc.grain;
 					
 					editableModel.lineIntersectWithChildren( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections, minSize )
 						
@@ -145,12 +146,12 @@ package com.voxelengine.worldmodel.models
 					if ( _gci )
 					{
 						//_gci.point = editableModel.worldToModel( _gci.point );
-						editableModel.editCursor.setGCIData( _gci );
+						EditCursor.currentInstance.setGCIData( _gci );
 					}
 					else	
 					{
-						editableModel.editCursor.visible = false;	
-						editableModel.editCursor.clearGCIData();
+						EditCursor.currentInstance.visible = false;	
+						EditCursor.currentInstance.clearGCIData();
 					}
 					_lastFoundModel = editableModel;
 				}
@@ -203,7 +204,7 @@ package com.voxelengine.worldmodel.models
 			
 			if ( null == foundModel && null != _lastFoundModel )
 			{
-				_lastFoundModel.editCursor.visible = false;
+				EditCursor.currentInstance.visible = false;
 				_lastFoundModel	= null;
 			}
 			

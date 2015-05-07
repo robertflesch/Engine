@@ -42,7 +42,6 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.oxel.OxelData;
 import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.tasks.flowtasks.Flow;
 import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
 import com.voxelengine.worldmodel.scripts.Script;
@@ -60,7 +59,6 @@ public class VoxelModel
 	protected 	var	_modelInfo:ModelInfo; 													// INSTANCE NOT EXPORTED
 	protected 	var	_instanceInfo:InstanceInfo; 											// INSTANCE NOT EXPORTED
 	private 	var	_oxel:Oxel; 															// INSTANCE NOT EXPORTED
-	private 	var	_editCursor:EditCursor; 												// INSTANCE NOT EXPORTED
 	protected 	var	_shaders:Vector.<Shader>        			= new Vector.<Shader>;		// INSTANCE NOT EXPORTED
 	protected 	var	_childrenLoaded:Boolean;
 	protected 	var	_animationsLoaded:Boolean;
@@ -97,8 +95,6 @@ public class VoxelModel
 	public	function get anim():Animation 						{ return _anim; }
 	public	function get statisics():ModelStatisics				{ return _statisics; }
 	public	function get instanceInfo():InstanceInfo			{ return _instanceInfo; }
-	public	function get editCursor():EditCursor 				{ return _editCursor; }
-	public	function set editCursor(val:EditCursor):void 		{ _editCursor = val; }
 	public	function get visible():Boolean 						{ return _visible; }
 	public	function set visible(val:Boolean):void 				{ _visible = val; }
 	public	function get modelInfo():ModelInfo 					{ return _modelInfo; }
@@ -138,18 +134,9 @@ public class VoxelModel
 	{
 		Log.out( "VoxelModel.complete: " + modelInfo.fileName );
 		_complete = val;
-		
-		if ( metadata.permissions.modify && Globals.g_configManager.showEditMenu) {
-			if ( null == editCursor )
-				editCursor = EditCursor.create();
-			//	I could reduce vertex manager utilization if I used a lazy evaluation pattern for edit cursor vertex managers
-			if ( null == editCursor.oxel.vm_get() )
-				editCursor.oxel.vm_initialize( _statisics );
-			editCursor.oxel.gc.bound = oxel.gc.bound;
-		}
 	}
 	
-	public function toString():String 				{ return metadata.toString + " ii: " + instanceInfo.toString(); }
+	public function toString():String 				{ return metadata.toString() + " ii: " + instanceInfo.toString(); }
 	public function get oxel():Oxel { return _oxel; }
 	public function set oxel(val:Oxel):void
 	{
@@ -354,7 +341,8 @@ public class VoxelModel
 		else 
 			metadata = $vmm;
 		
-		if ((this is EditCursor) || null != instanceInfo.controllingModel || true == instanceInfo.dynamicObject) {
+		//if ((this is EditCursor) || null != instanceInfo.controllingModel || true == instanceInfo.dynamicObject) {
+		if ( null != instanceInfo.controllingModel || true == instanceInfo.dynamicObject ) {
 //				trace( "VoxelModel - Not added ImpactEvent.EXPLODE for childObject " + _modelInfo.modelClass );
 		}
 		else if ( metadata.permissions.modify ) {
@@ -597,7 +585,8 @@ public class VoxelModel
 				if ( null == changedOxel.flowInfo ) // if it doesnt have flow info, get some! This is from placement of flowable oxels
 					changedOxel.flowInfo = typeInfo.flowInfo.clone();
 					
-				if ( Globals.autoFlow && EditCursor.EDIT_CURSOR != instanceInfo.instanceGuid )
+				//if ( Globals.autoFlow && EditCursor.EDIT_CURSOR != instanceInfo.instanceGuid )
+				if ( Globals.autoFlow  )
 				{
 					Flow.addTask( instanceInfo.instanceGuid, changedOxel.gc, changedOxel.type, changedOxel.flowInfo, 1 );
 				}
@@ -677,10 +666,6 @@ public class VoxelModel
 			var selected:Boolean = Globals.selectedModel == this ? true : false;
 			//oxel.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
 			oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
-			
-			//Log.out( "VoxelModel.draw - Globals.g_app.editing: " + Globals.g_app.editing + " editCursor.visible: " + (editCursor?editCursor.visible:false) );
-			if (Globals.g_app.editing && editCursor && editCursor.visible)
-				editCursor.draw(viewMatrix, $context, $isChild );
 		}
 		
 		for each (var vm:VoxelModel in _children)
@@ -706,9 +691,6 @@ public class VoxelModel
 			//oxel.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
 			// this method is TWICE as fast in the render cycle
 			oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
-			
-			if (Globals.g_app.editing && editCursor && editCursor.visible)
-				editCursor.drawAlpha(viewMatrix, $context, $isChild );
 		}
 		
 		for each (var vm:VoxelModel in _children)
@@ -723,9 +705,6 @@ public class VoxelModel
 		
 		if (!complete)
 			return;
-		
-		if (Globals.g_app.editing && editCursor && Globals.selectedModel == this)
-			editCursor.update($context, $elapsedTimeMS);
 		
 		collisionTest($elapsedTimeMS);
 		
@@ -953,9 +932,6 @@ public class VoxelModel
 			
 		for each (var child:VoxelModel in _children)
 			child.reinitialize( $context );
-
-		if ( editCursor )
-			editCursor.reinitialize( $context );
 	}
 	
 	public function dispose():void {
@@ -968,8 +944,8 @@ public class VoxelModel
 		for each (var child:VoxelModel in _children)
 			child.dispose();
 		
-		if ( editCursor )
-			editCursor.dispose();
+//		if ( editCursor )
+//			editCursor.dispose();
 	}
 	
 	public function release():void {
@@ -985,9 +961,6 @@ public class VoxelModel
 		//trace( "VoxelModel.release: " + instanceInfo.fileName );
 		oxelReset();
 		
-		if (editCursor)
-			editCursor.release();
-			
 		modelInfo.release();
 		instanceInfo.release();
 		metadata.release();	

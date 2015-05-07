@@ -249,7 +249,7 @@ package com.voxelengine.worldmodel.models.types
 						if ( no != Globals.BAD_OXEL )
 						{
 							//Log.out( "Beast.collisionCheckNew - Adjusting foot position" );
-							var msCoord:int = no.gc.GetWorldCoordinate( Globals.AXIS_Y );
+							var msCoord:int = no.gc.getWorldCoordinate( Globals.AXIS_Y );
 							var wsCoord:Vector3D = $collisionCandidate.modelToWorld( new Vector3D( 0, msCoord, 0 ) );
 							$loc.positionSetComp( $loc.positionGet.x, wsCoord.y - points[0].point.y, $loc.positionGet.z );	
 							return -1;
@@ -369,8 +369,8 @@ package com.voxelengine.worldmodel.models.types
 				
 				oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
 				
-				if (Globals.g_app.editing && editCursor && editCursor.visible)
-					editCursor.draw(viewMatrix, $context, false );
+				if ( selected && EditCursor.editing && EditCursor.currentInstance.visible)
+					EditCursor.currentInstance.draw(viewMatrix, $context, false );
 			}
 			
 			for each ( var vm:VoxelModel in _children )
@@ -396,8 +396,8 @@ package com.voxelengine.worldmodel.models.types
 				var selected:Boolean = Globals.selectedModel == this ? true : false;
 				oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
 				
-				if (Globals.g_app.editing && editCursor && editCursor.visible)
-					editCursor.draw(viewMatrix, $context, false );
+				if (EditCursor.editing && EditCursor.currentInstance.visible)
+					EditCursor.currentInstance.draw(viewMatrix, $context, false );
 			}
 			
 			for each (var vm:VoxelModel in _children)
