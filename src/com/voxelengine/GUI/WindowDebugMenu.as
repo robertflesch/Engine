@@ -8,6 +8,8 @@
 package com.voxelengine.GUI
 {
 	import com.voxelengine.worldmodel.models.types.EditCursor;
+	import com.voxelengine.worldmodel.models.types.Player;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	import flash.events.Event;
 	import org.flashapi.swing.*;
@@ -169,9 +171,9 @@ package com.voxelengine.GUI
 			if ( _modelLoc )
 			{
 				_modelLoc.text = ""; 
-				if ( Globals.player )
+				if ( Player.player )
 				{
-					var loc:Vector3D = Globals.controlledModel.instanceInfo.positionGet
+					var loc:Vector3D = VoxelModel.controlledModel.instanceInfo.positionGet
 					_modelLoc.text = "x: " + int( loc.x ) + "  y: " + int( loc.y ) + "  z: " + int( loc.z ); 
 				}
 			}
@@ -182,10 +184,10 @@ package com.voxelengine.GUI
 		private function updateGC():void
 		{
 			if (Globals.g_app && EditCursor.editing ) {
-				if ( Globals.selectedModel && EditCursor.currentInstance.gciData )
+				if ( VoxelModel.selectedModel && EditCursor.currentInstance.gciData )
 				{
 					var gci:GrainCursorIntersection = EditCursor.currentInstance.gciData;
-					var rot:Vector3D = Globals.controlledModel.instanceInfo.rotationGet;
+					var rot:Vector3D = VoxelModel.controlledModel.instanceInfo.rotationGet;
 					_gcLabel.text = "grain: " + gci.gc.grain + " x: " + int( gci.gc.grainX ) + "  y: " + int( gci.gc.grainY ) + "  z: " + int( gci.gc.grainZ ); 
 				}
 			}
@@ -199,6 +201,7 @@ package com.voxelengine.GUI
 	}
 }
 
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import org.flashapi.swing.Canvas;
 import org.flashapi.swing.Label;
 import org.flashapi.swing.constants.*;
@@ -311,8 +314,8 @@ class StaticMemoryStringDisplay extends StaticMemoryDisplay
 	
 	override public function updateFunction():void
 	{
-		if ( Globals.selectedModel && Globals.selectedModel.instanceInfo )
-			_data.text = Globals.selectedModel.instanceInfo.instanceGuid;
+		if ( VoxelModel.selectedModel && VoxelModel.selectedModel.instanceInfo )
+			_data.text = VoxelModel.selectedModel.instanceInfo.instanceGuid;
 		else	
 			_data.text = "";
 	}

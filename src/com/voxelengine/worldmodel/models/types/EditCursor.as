@@ -124,7 +124,6 @@ package com.voxelengine.worldmodel.models.types
 				Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
 		}
 		
-		
 		protected function onDeactivate( e:GUIEvent ):void  {
 			//Log.out( "onDeactivate - disabling repeat" );
 			// We dont want the repeat on if app loses focus
@@ -256,11 +255,16 @@ package com.voxelengine.worldmodel.models.types
 		
 		override public function draw(mvp:Matrix3D, $context:Context3D, $isChild:Boolean ):void	{
 
-			var t:Number = oxel.gc.size() * SCALE_FACTOR/2;
+			if ( VoxelModel.selectedModel ) {
+				var viewMatrixParent:Matrix3D = VoxelModel.selectedModel.instanceInfo.worldSpaceMatrix.clone();
+				viewMatrixParent.append(mvp);
+				mvp = viewMatrixParent;
+			}
 			
 			var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
 			viewMatrix.prependScale( 1 + SCALE_FACTOR, 1 + SCALE_FACTOR, 1 + SCALE_FACTOR ); 
 			var positionscaled:Vector3D = viewMatrix.position;
+			const t:Number = oxel.gc.size() * SCALE_FACTOR/2;
 			viewMatrix.prependTranslation( -t, -t, -t)
 			viewMatrix.append(mvp);
 			
@@ -270,12 +274,25 @@ package com.voxelengine.worldmodel.models.types
 				_objectModel.draw( mvp, $context, true );
 		}
 		
-		override public function drawAlpha( mvp:Matrix3D,$context:Context3D, $isChild:Boolean ):void {
-			var t:Number = oxel.gc.size() * SCALE_FACTOR/2;
+		override public function drawAlpha( mvp:Matrix3D, $context:Context3D, $isChild:Boolean ):void {
+			
+			var viewMatrixParent:Matrix3D;
+			if ( _objectModel ) {
+				viewMatrixParent = _objectModel.instanceInfo.worldSpaceMatrix.clone();
+				viewMatrixParent.append(mvp);
+				mvp = viewMatrixParent;
+			} else if ( VoxelModel.selectedModel ) {
+				viewMatrixParent = VoxelModel.selectedModel.instanceInfo.worldSpaceMatrix.clone();
+				viewMatrixParent.append(mvp);
+				mvp = viewMatrixParent;
+			} else {
+				Log.out( "EditCursor.drawAlpha - no object model or selected model", Log.WARN );
+			}
 			
 			var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
 			viewMatrix.prependScale( 1 + SCALE_FACTOR, 1 + SCALE_FACTOR, 1 + SCALE_FACTOR ); 
 			var positionscaled:Vector3D = viewMatrix.position;
+			const t:Number = oxel.gc.size() * SCALE_FACTOR/2;
 			viewMatrix.prependTranslation( -t, -t, -t)
 			viewMatrix.append(mvp);
 			
@@ -300,9 +317,12 @@ package com.voxelengine.worldmodel.models.types
 			internal_update($context, elapsedTimeMS );
 			
 			if ( _objectModel ) {
-				var newPos:Vector3D = Globals.player.instanceInfo.modelToWorld( new Vector3D( 0,0, -(_objectModel.oxel.gc.size() * 2) ) );
+				var newPos:Vector3D = Player.player.instanceInfo.modelToWorld( new Vector3D( 0,0, -(_objectModel.oxel.gc.size() * 2) ) );
 				_objectModel.instanceInfo.positionSet = newPos;
 				_objectModel.update($context, elapsedTimeMS );
+			}
+			else {
+				
 			}
 		}
 		
@@ -347,7 +367,7 @@ package com.voxelengine.worldmodel.models.types
 		
 		static public function getHighlightedOxel(recurse:Boolean = false):Oxel {
 			
-			var foundModel:VoxelModel = Globals.selectedModel;
+			var foundModel:VoxelModel = VoxelModel.selectedModel;
 			// placementResult - { oxel:Globals.BAD_OXEL, gci:gci, positive:posMove, negative:negMove };
 			var placementResult:PlacementLocation = getPlacementLocation( foundModel );
 			if ( PlacementLocation.INVALID == placementResult.state )
@@ -382,18 +402,19 @@ package com.voxelengine.worldmodel.models.types
 			if ( CURSOR_OP_INSERT != _s_cursorOperation )
 				return;
 
-			var foundModel:VoxelModel = Globals.selectedModel;
-			if ( foundModel )
-			{
+			if ( ModelPlacementType.PLACEMENT_TYPE_CHILD == ModelPlacementType.modelPlacementTypeGet() ) {
+				var foundModel:VoxelModel = VoxelModel.selectedModel;
+				if ( foundModel )
+					foundModel.childAdd( newChild );
+				else 
+					Log.out( "EditCursor.insertModel - no parent model found", Log.WARN );
+			}
+			else {
 				// same model, new instance.
 				var newChild:VoxelModel = _objectModel.clone();
-				if ( ModelPlacementType.PLACEMENT_TYPE_CHILD == ModelPlacementType.modelPlacementTypeGet() )
-					foundModel.childAdd( newChild );
-				else {
-					var newPos:Vector3D = Globals.player.instanceInfo.modelToWorld( new Vector3D( 0,0, -(newChild.oxel.gc.size() * 2) ) );
-					newChild.instanceInfo.positionSet = newPos;
-					Region.currentRegion.modelCache.add( newChild );
-				}
+				var newPos:Vector3D = Player.player.instanceInfo.modelToWorld( new Vector3D( 0,0, -(newChild.oxel.gc.size() * 2) ) );
+				newChild.instanceInfo.positionSet = newPos;
+				Region.currentRegion.modelCache.add( newChild );
 			}
 		}
 		
@@ -402,7 +423,7 @@ package com.voxelengine.worldmodel.models.types
 			if ( CURSOR_OP_INSERT != _s_cursorOperation )
 				return;
 
-			var foundModel:VoxelModel = Globals.selectedModel;
+			var foundModel:VoxelModel = VoxelModel.selectedModel;
 			if ( foundModel )
 			{
 				var oxelToBeModified:Oxel = getHighlightedOxel( recurse );
@@ -445,7 +466,7 @@ package com.voxelengine.worldmodel.models.types
 				
 			// determines whether a block can be placed
 			// calculate difference between avatar location and intersection point
-			var diffPos:Vector3D = Globals.player.wsPositionGet().clone();
+			var diffPos:Vector3D = Player.player.wsPositionGet().clone();
 			diffPos = diffPos.subtract( gci.wsPoint );
 			
 			pl.state = PlacementLocation.VALID;
@@ -504,16 +525,16 @@ package com.voxelengine.worldmodel.models.types
 				return;
 
 			var foundModel:VoxelModel;
-			if ( Globals.selectedModel )
+			if ( VoxelModel.selectedModel )
 			{
 				if ( EditCursor.toolOrBlockEnabled )
 				{
-					Globals.player.stateSet( "Pick", 1 );
-					Globals.player.stateLock( true, 300 );
+					Player.player.stateSet( "Pick", 1 );
+					Player.player.stateLock( true, 300 );
 				}
 				
 				
-				foundModel = Globals.selectedModel;
+				foundModel = VoxelModel.selectedModel;
 				var fmRoot:Oxel = foundModel.oxel;
 				if ( CURSOR_TYPE_GRAIN == cursorType )
 				{
@@ -578,7 +599,7 @@ package com.voxelengine.worldmodel.models.types
 		}
 
 		static private function sphereOperation():void {
-			var foundModel:VoxelModel = Globals.selectedModel;
+			var foundModel:VoxelModel = VoxelModel.selectedModel;
 			if ( foundModel )
 			{
 				var gciCyl:GrainCursorIntersection = EditCursor.currentInstance.gciData;
@@ -624,7 +645,7 @@ package com.voxelengine.worldmodel.models.types
 		}
 		
 		static private function cylinderOperation():void {
-			var foundModel:VoxelModel = Globals.selectedModel;
+			var foundModel:VoxelModel = VoxelModel.selectedModel;
 			if ( foundModel && EditCursor.currentInstance.gciData )
 			{
 				var gciCyl:GrainCursorIntersection = EditCursor.currentInstance.gciData;
@@ -729,17 +750,17 @@ package com.voxelengine.worldmodel.models.types
 		}
 		
 		static public function growCursor():void {
-			if ( Globals.selectedModel )
+			if ( VoxelModel.selectedModel )
 			{
-				EditCursor.currentInstance.oxel.gc.bound = Globals.selectedModel.oxel.gc.bound;
+				EditCursor.currentInstance.oxel.gc.bound = VoxelModel.selectedModel.oxel.gc.bound;
 				var gcGrow:GrainCursor = EditCursor.currentInstance.oxel.gc;
 				
 				// If edit cursor wants to be larger the the size of the selected object
 				// then set it to the size of the selected object
-				if ( Globals.selectedModel.oxel.gc.grain < editCursorSize )
-					editCursorSize = Globals.selectedModel.oxel.gc.grain;
+				if ( VoxelModel.selectedModel.oxel.gc.grain < editCursorSize )
+					editCursorSize = VoxelModel.selectedModel.oxel.gc.grain;
 					
-				if ( gcGrow.grain < Globals.selectedModel.oxel.gc.grain )
+				if ( gcGrow.grain < VoxelModel.selectedModel.oxel.gc.grain )
 				{
 					for ( var i:int = gcGrow.grain; i < editCursorSize; i++ )
 						gcGrow.grain = ++gcGrow.grain;
@@ -751,7 +772,7 @@ package com.voxelengine.worldmodel.models.types
 		}
 		
 		static public function shrinkCursor():void {
-			if ( Globals.selectedModel )
+			if ( VoxelModel.selectedModel )
 			{
 				var gcShrink:GrainCursor = EditCursor.currentInstance.oxel.gc;
 				if ( 0 < gcShrink.grain )
@@ -803,10 +824,10 @@ package com.voxelengine.worldmodel.models.types
 				
 			// do I need to add axis models?	
 			//	this.childAdd();
-				var t:Vector3D = Globals.selectedModel.instanceInfo.positionGet;
+				var t:Vector3D = VoxelModel.selectedModel.instanceInfo.positionGet;
 				t.z += dy/4;
 				t.x += dx/4;
-				Globals.selectedModel.instanceInfo.positionSetComp( t.x, t.y, t.z );
+				VoxelModel.selectedModel.instanceInfo.positionSetComp( t.x, t.y, t.z );
 			}
 		}
 		static private function mouseDown(e:MouseEvent):void {

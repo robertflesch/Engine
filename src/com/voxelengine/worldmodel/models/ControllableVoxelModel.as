@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.models
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.InventoryInterfaceEvent;
 import com.voxelengine.GUI.actionBars.UserInventory;
+import com.voxelengine.worldmodel.models.types.Player;
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.utils.getTimer;
@@ -165,8 +166,8 @@ public class ControllableVoxelModel extends VoxelModel
 	override public function set dead(val:Boolean):void { 
 		super.dead = val;
 		
-		if ( Globals.controlledModel && Globals.controlledModel == this )
-			loseControl( Globals.player );
+		if ( VoxelModel.controlledModel && VoxelModel.controlledModel == this )
+			loseControl( Player.player );
 			
 		Globals.g_app.removeEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent );
 		ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
@@ -237,7 +238,7 @@ public class ControllableVoxelModel extends VoxelModel
 	
 	override public function collisionTest( $elapsedTimeMS:Number ):Boolean {
 		
-		//if ( this === Globals.controlledModel )
+		//if ( this === VoxelModel.controlledModel )
 		if ( instanceInfo.usesCollision )
 		{
 			// check to make sure the ship or object you were on was not destroyed or removed
@@ -267,7 +268,7 @@ public class ControllableVoxelModel extends VoxelModel
 	//static var temp:int = 0;
 	override public function update($context:Context3D, $elapsedTimeMS:int):void {
 		
-		if ( this === Globals.controlledModel )
+		if ( this === VoxelModel.controlledModel )
 		{
 			handleMouseMovement( $elapsedTimeMS );
 		}
@@ -297,7 +298,7 @@ public class ControllableVoxelModel extends VoxelModel
 		if ( event.instanceGuid != this.instanceInfo.instanceGuid )
 			return;
 	
-		if ( this == Globals.controlledModel )
+		if ( this == VoxelModel.controlledModel )
 			return;
 			
 		//turn off collision, figure a safe route out, take it!
@@ -554,7 +555,7 @@ public class ControllableVoxelModel extends VoxelModel
 		var changed:Boolean = false;
 		
 		// if app is not active, we still need to clip velocitys, but we dont need keyboard or mouse movement
-		if ( this == Globals.controlledModel && Globals.active )
+		if ( this == VoxelModel.controlledModel && Globals.active )
 		{
 			var vel:Vector3D = instanceInfo.velocityGet;
 			var speedVal:Number = instanceInfo.speed( $elapsedTimeMS ) / 4;
@@ -577,7 +578,7 @@ public class ControllableVoxelModel extends VoxelModel
 			if ( MouseKeyboardHandler.down )	  	{ instanceInfo.velocitySetComp( vel.x, vel.y + speedVal, vel.z ); changed = true; }
 			if ( MouseKeyboardHandler.up )
 			{
-				if ( Globals.controlledModel && Globals.controlledModel.usesGravity )
+				if ( VoxelModel.controlledModel && VoxelModel.controlledModel.usesGravity )
 				{
 					// Idea here is to keep the player from jumping unless their feet are on the ground.
 					// If you wanted to add rocket boots, this is where is what it would effect

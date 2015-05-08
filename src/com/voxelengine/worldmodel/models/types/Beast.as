@@ -297,7 +297,7 @@ package com.voxelengine.worldmodel.models.types
 		
 		override public function update( $context:Context3D, $elapsedTimeMS:int):void {
 			
-			if ( this == Globals.controlledModel )
+			if ( this == VoxelModel.controlledModel )
 				handleMouseMovement( $elapsedTimeMS );
 			
 			super.update( $context, $elapsedTimeMS );
@@ -365,7 +365,7 @@ package com.voxelengine.worldmodel.models.types
 			
 			if ( oxel )
 			{
-				var selected:Boolean = Globals.selectedModel == this ? true : false;
+				var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
 				
 				oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
 				
@@ -393,7 +393,7 @@ package com.voxelengine.worldmodel.models.types
 			if ( oxel )
 			{
 				// We have to draw all of the non alpha first, otherwise parts of the tree might get drawn after the alpha does
-				var selected:Boolean = Globals.selectedModel == this ? true : false;
+				var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
 				oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
 				
 				if (EditCursor.editing && EditCursor.currentInstance.visible)

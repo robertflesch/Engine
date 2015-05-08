@@ -215,11 +215,11 @@ package com.voxelengine.GUI.actionBars
 		}
 		
 		static private function loseControlBeastWindow():void {
-			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( Globals.controlledModel.instanceInfo.guid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( VoxelModel.controlledModel.instanceInfo.guid );
 			if ( vm )
-				vm.loseControl( Globals.player );
+				vm.loseControl( Player.player );
 			else
-				Log.out( "WindowBeastControl.loseControl - VM not found: " + Globals.controlledModel.instanceInfo.guid, Log.ERROR );
+				Log.out( "WindowBeastControl.loseControl - VM not found: " + VoxelModel.controlledModel.instanceInfo.guid, Log.ERROR );
 				
 // TODO
 Log.out( "WindowBeastControl.loseControl - NEED WAY TO REMOVE SUPPORT WINDOWS", Log.ERROR );

@@ -21,6 +21,7 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.GUI.inventory.BoxInventory;
 import com.voxelengine.worldmodel.models.types.EditCursor;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.inventory.ObjectGrain;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
@@ -41,34 +42,29 @@ public class GrainSelector extends QuickInventory
 		resizeObject( null );
 	}
 	
-	public function addListeners():void
-	{
+	public function addListeners():void {
 		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
 	}
 	
-	public function removeListeners():void
-	{
+	public function removeListeners():void {
 		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
 	}
 
-	public function show():void
-	{
+	public function show():void {
 		_outline.visible = true;
 		visible = true;
 		addListeners();
 	}
 	
-	public function hide():void
-	{
+	public function hide():void {
 		_outline.visible = false;
 		visible = false;
 		removeListeners();
 	}
 	
-	public function hotKeyInventory(e:KeyboardEvent):void 
-	{
+	public function hotKeyInventory(e:KeyboardEvent):void {
 		if  ( !Globals.active )
 			return;
 		if ( 112 <= e.keyCode && e.keyCode <= 118 )
@@ -102,18 +98,13 @@ public class GrainSelector extends QuickInventory
 		addElement(hk);
 		
 		eventCollector.addEvent( box, UIMouseEvent.PRESS, pressGrain );
-		eventCollector.addEvent( box, UIMouseEvent.RELEASE, releaseGrain );
 		eventCollector.addEvent( hk, UIMouseEvent.PRESS, pressGrain );
-		eventCollector.addEvent( hk, UIMouseEvent.RELEASE, releaseGrain );
 		
 		//return { box: box, hotkey:hk };
 		return box;
 	}
 	
-	override protected function buildItems():void
-	{
-		name = "GrainSelector";
-
+	override protected function buildItems():void {
 		var count:int = 0;
 		var ti:ObjectGrain = new ObjectGrain( null, "0", "0.0625meter.png" );
 		boxes[count] = buildItem( ti, count );
@@ -143,55 +134,15 @@ public class GrainSelector extends QuickInventory
 		boxes[count] = buildItem( ti, count );
 		ti.box = boxes[count++];
 		
-		//width = 7 * 64;
-		//grainAction( 4 );
 		addSelector();			
+		// start off highlighting 1 meter
 		processGrainSelection( boxes[4] );
 	}
 	
-	private function pressGrain(e:UIMouseEvent):void 
-	{
-		var box:UIObject = e.target as UIObject;
-		processGrainSelection( box );
-	}			
-		
-	private function releaseGrain(e:UIMouseEvent):void 
-	{
-	}			
+	private function pressGrain(e:UIMouseEvent):void { processGrainSelection( e.target as UIObject ); }			
+	public function selectByIndex( index:int ):void { processGrainSelection( boxes[ index ] ); }
 	
-	public function processGrainSelection( box:UIObject ):void 
-	{
-		var ti:ObjectGrain = box.data as ObjectGrain;
-		EditCursor.editCursorSize = int ( ti.name.toLowerCase() );
-		moveSelector( box.x );
-
-		
-		if ( Globals.controlledModel )
-		{
-			// don't want movement speed to be 0, so set it to 0.5
-			if ( 0 == EditCursor.editCursorSize )
-				Globals.controlledModel.instanceInfo.setSpeedMultipler( 0.5 ); 
-			else
-				Globals.controlledModel.instanceInfo.setSpeedMultipler( EditCursor.editCursorSize * 1.5 ); 
-		}
-		
-		if ( null != Globals.selectedModel )
-		{
-			var current:GrainCursor = EditCursor.currentInstance.oxel.gc;
-			if ( current.grain > EditCursor.editCursorSize )
-				EditCursor.shrinkCursor();
-			else if ( current.grain < EditCursor.editCursorSize )
-				EditCursor.growCursor();
-		}
-	}
-	
-	public function selectByIndex( index:int ):void
-	{
-		processGrainSelection( boxes[ index ] );
-	}
-	
-	public function onMouseWheel(event:MouseEvent):void
-	{
+	public function onMouseWheel(event:MouseEvent):void {
 		if ( event.ctrlKey ) {
 			var curSelection:int = QuickInventory.currentItemSelection;
 			if ( 0 > event.delta )
@@ -206,5 +157,27 @@ public class GrainSelector extends QuickInventory
 			processGrainSelection( boxes[ curSelection ] );
 		}
 	}		
+	
+	public function processGrainSelection( box:UIObject ):void {
+		var ti:ObjectGrain = box.data as ObjectGrain;
+		EditCursor.editCursorSize = int ( ti.name.toLowerCase() );
+		moveSelector( box.x );
+
+		if ( null != VoxelModel.controlledModel ) {
+			// don't want movement speed to be 0, so set it to 0.5
+			if ( 0 == EditCursor.editCursorSize )
+				VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( 0.5 ); 
+			else
+				VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( EditCursor.editCursorSize * 1.5 ); 
+		}
+		
+		if ( null != VoxelModel.selectedModel ) {
+			var current:GrainCursor = EditCursor.currentInstance.oxel.gc;
+			if ( current.grain > EditCursor.editCursorSize )
+				EditCursor.shrinkCursor();
+			else if ( current.grain < EditCursor.editCursorSize )
+				EditCursor.growCursor();
+		}
+	}
 }
 }

@@ -111,7 +111,7 @@ package com.voxelengine.worldmodel.models
 		}
 
 		static public function highLightEditableOxel():void {
-			if ( !Globals.controlledModel )
+			if ( !VoxelModel.controlledModel )
 				return;
 			
 			_totalIntersections.length = 0;
@@ -126,7 +126,7 @@ package com.voxelengine.worldmodel.models
 				//if ( _lastFoundModel != editableModel && _lastFoundModel )
 					//EditCursor.currentInstance.visible = false;	
 				
-				Globals.selectedModel = editableModel;
+				VoxelModel.selectedModel = editableModel;
 				
 				if ( EditCursor.editing )
 				{
@@ -156,12 +156,15 @@ package com.voxelengine.worldmodel.models
 					_lastFoundModel = editableModel;
 				}
 			}
+			else
+				VoxelModel.selectedModel = null;
+			
 			totalIntersectionsClear();
 			worldSpaceIntersectionsClear()
 		}
 		
 		static public function findClosestIntersectionInDirection( $dir:int = UP ):GrainCursorIntersection	{
-			if ( !Globals.controlledModel )
+			if ( !VoxelModel.controlledModel )
 				return null;
 			
 			worldSpaceStartAndEndPointCalculate( $dir );
@@ -217,7 +220,7 @@ package com.voxelengine.worldmodel.models
 			// This works for camera at 0,0,0
 			//////////////////////////////////////
 			// Empty starting matrix
-			var cm:VoxelModel = Globals.controlledModel;
+			var cm:VoxelModel = VoxelModel.controlledModel;
 			if ( cm )
 			{
 				
@@ -255,7 +258,7 @@ package com.voxelengine.worldmodel.models
 		// it still stops and identifies that as the closest model.
 		static public function findRayIntersections( $candidateModels:Vector.<VoxelModel>, $checkChildModels:Boolean = false ):Vector.<GrainCursorIntersection> {
 			// We should only use the models in the view frustrum - TODO - RSF
-			var controlledModel:VoxelModel = Globals.controlledModel;
+			var controlledModel:VoxelModel = VoxelModel.controlledModel;
 			for each ( var vm:VoxelModel in $candidateModels )
 			{
 				if ( vm == controlledModel )
@@ -302,7 +305,7 @@ package com.voxelengine.worldmodel.models
 		static public function presetBoundBoxCollide( testModel:VoxelModel ):Boolean {
 			var modelList:Vector.<VoxelModel> = whichModelsIsThisInsideOfNew( testModel );
 			var result:Boolean = false;
-			var cm:VoxelModel = Globals.controlledModel;
+			var cm:VoxelModel = VoxelModel.controlledModel;
 			if ( modelList.length )
 			{
 				for each ( var vm:VoxelModel in modelList )

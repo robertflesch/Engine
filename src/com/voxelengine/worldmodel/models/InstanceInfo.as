@@ -549,9 +549,9 @@ public class InstanceInfo extends Location	{
 	
 	static private function resetCamera():void
 	{
-		if ( Globals.controlledModel )
+		if ( VoxelModel.controlledModel )
 		{
-			Globals.controlledModel.instanceInfo.rotationSet = new Vector3D( 0,0,0 );
+			VoxelModel.controlledModel.instanceInfo.rotationSet = new Vector3D( 0,0,0 );
 		}
 	}
 	

@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.server {
 
+	import com.voxelengine.worldmodel.models.types.Player;
 	import flash.geom.Vector3D;
 	import playerio.Connection;
 	import playerio.PlayerIO;
@@ -167,8 +168,8 @@ package com.voxelengine.server {
 				var ae:ModelEvent = new ModelEvent( 
 				                 ModelEvent.MOVED
 							   , Network.userId
-							   , Globals.player.instanceInfo.positionGet
-							   , Globals.player.instanceInfo.rotationGet );
+							   , Player.player.instanceInfo.positionGet
+							   , Player.player.instanceInfo.rotationGet );
 				sourceMovementEvent( ae );			   
 			}
 		}

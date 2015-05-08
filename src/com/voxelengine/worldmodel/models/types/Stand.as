@@ -24,8 +24,7 @@ package com.voxelengine.worldmodel.models.types
 		//Sight
 		public function Stand( $ii:InstanceInfo ) 
 		{ 
-			super( instanceInfo );
-			
+			super( $ii );
 		}
 		
 		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {

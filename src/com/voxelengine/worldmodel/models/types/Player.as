@@ -69,15 +69,18 @@ public class Player extends Avatar
 	
 	override public function get 	maxSpeed():Number 						{ return (_maxSpeed.val * _speedMultiplier); }
 
+	private static var g_player:Player;
+	public static function get player():Player { return g_player; }
+	public static function set player( val:Player ):void { g_player = val; }
 	
 	public function Player( instanceInfo:InstanceInfo ) { 
 		Log.out( "Player.construct instanceGuid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super( instanceInfo );
-		if ( Globals.player ) {
-			Globals.player.dead = true;
-			Globals.player = null;
+		if ( Player.player ) {
+			Player.player.dead = true;
+			Player.player = null;
 		}
-		Globals.player = this;
+		Player.player = this;
 		inventoryBitmap = "userInventory.png";
 
 	}
@@ -258,7 +261,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	
 	override public function collisionTest( $elapsedTimeMS:Number ):Boolean {
 		
-		if ( this === Globals.controlledModel )
+		if ( this === VoxelModel.controlledModel )
 		{
 			// check to make sure the ship or object you were on was not destroyed or removed
 			//if ( lastCollisionModel && lastCollisionModel.instanceInfo.dead )
@@ -377,8 +380,8 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 
 		if ( 0 < Shader.lightCount() ) {
 			var sl:ShaderLight = Shader.lights(0);
-			if ( Globals.controlledModel != this ) {
-				sl.position = Globals.controlledModel.instanceInfo.positionGet.clone();
+			if ( VoxelModel.controlledModel != this ) {
+				sl.position = VoxelModel.controlledModel.instanceInfo.positionGet.clone();
 				sl.position.y += 30;
 				sl.position.x += 4;
 			}
@@ -417,9 +420,9 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	private function onLoadingPlayerComplete( le:LoadingEvent ):void {
 		//Log.out( "Player.onLoadingPlayerComplete - PLAYER LOADED =============================================" );
 		calculateCenter();
-		if ( Globals.player )
-			Globals.player.loseControl( null );
-		Globals.player.takeControl( null );
+		if ( Player.player )
+			Player.player.loseControl( null );
+		Player.player.takeControl( null );
 		//LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		// TODO  - this forces inventory load, should I let it load lazily?
 //		MouseKeyboardHandler.addInputListeners();

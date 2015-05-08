@@ -44,9 +44,9 @@ package com.voxelengine.worldmodel.models.types
 		{
 			super.update(context, elapsedTimeMS);
 			
-			if ( Globals.controlledModel )
+			if ( VoxelModel.controlledModel )
 			{
-				var wsPositionCenter:Vector3D = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( Globals.controlledModel.instanceInfo.center );
+				var wsPositionCenter:Vector3D = VoxelModel.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( VoxelModel.controlledModel.instanceInfo.center );
 				
 				var msPos:Vector3D;
 				if ( instanceInfo.controllingModel )
@@ -89,7 +89,7 @@ package com.voxelengine.worldmodel.models.types
 				GrainCursorPool.poolDispose( gct );
 			}
 
-			var selected:Boolean = Globals.selectedModel == this ? true : false;
+			var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
 			if ( selected )
 			{
 				// the oxel.write prunes all of the children

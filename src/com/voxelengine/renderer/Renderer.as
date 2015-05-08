@@ -231,7 +231,7 @@ package com.voxelengine.renderer
 			
 			// New in Flash 16
 			// Context3D's setFillMode()  "wireframe" or "solid".
-			var cm:VoxelModel = Globals.controlledModel;
+			var cm:VoxelModel = VoxelModel.controlledModel;
 			// Very early in render cycle the controlled model may not be instantitated yet.
 			if ( !cm )
 				return;

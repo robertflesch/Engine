@@ -75,15 +75,15 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			}
 			catch ( error:Error )
 			{
-				if ( Globals.player.instanceInfo.instanceGuid == _instanceGuid )
-					Globals.player.complete = true;
+				if ( Player.player.instanceInfo.instanceGuid == _instanceGuid )
+					Player.player.complete = true;
 				else
 					Log.out( "CompletedModel.start - exception was thrown for model guid: " + _instanceGuid, Log.ERROR );
 			}
 			
 			//Log.out( "CompletedModel.start - completedModel: " + _guid + "  count: " + _count );
 				
-			if ( 0 == _count  ) // && _playerLoaded  should I add ( null != Globals.player )
+			if ( 0 == _count  ) // && _playerLoaded  should I add ( null != Player.player )
 			{
 				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _instanceGuid );
 				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _instanceGuid ) );

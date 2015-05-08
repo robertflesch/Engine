@@ -663,7 +663,7 @@ public class VoxelModel
 		if ( oxel )
 		{
 			// We have to draw all of the non alpha first, otherwise parts of the tree might get drawn after the alpha does
-			var selected:Boolean = Globals.selectedModel == this ? true : false;
+			var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
 			//oxel.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
 			oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
 		}
@@ -686,7 +686,7 @@ public class VoxelModel
 		if ( oxel )
 		{
 			// We have to draw all of the non alpha first, otherwise parts of the tree might get drawn after the alpha does
-			var selected:Boolean = Globals.selectedModel == this ? true : false;
+			var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
 			
 			//oxel.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
 			// this method is TWICE as fast in the render cycle
@@ -721,7 +721,7 @@ public class VoxelModel
 		}
 		
 //			changed is used internally - need a new way to determine if an event needs to be sent out when a model has moved
-//			if (instanceInfo.changed && this == Globals.controlledModel)
+//			if (instanceInfo.changed && this == VoxelModel.controlledModel)
 //				dispatchMovementEvent();
 	}
 	
@@ -1465,7 +1465,7 @@ public class VoxelModel
 			var classCalled:String = $me.parentInstanceGuid;
 Log.out( "VoxelModel.handleModelEvents - ModelEvent.RELEASE_CONTROL called on: " + classCalled, Log.DEBUG );				
 			if ( classCalled != "com.voxelengine.worldmodel.models::Player" )
-				Globals.player.takeControl( null, false );
+				Player.player.takeControl( null, false );
 				// TODO Need something here to determine which model
 				//if ( $me.instanceGuid
 			
@@ -1490,7 +1490,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
 		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 		
-		Globals.controlledModel = this;
+		VoxelModel.controlledModel = this;
 		
 		// adds the player to the child list
 		if ( $modelLosingControl )
@@ -1523,8 +1523,8 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 			camera.next();
 			
 			// I want the camera for the controlled object, not the avatar.
-			var currentCamera:CameraLocation = Globals.controlledModel.camera.current;
-			//Globals.player.visible = currentCamera.toolBarVisible;
+			var currentCamera:CameraLocation = VoxelModel.controlledModel.camera.current;
+			//Player.player.visible = currentCamera.toolBarVisible;
 			trace("VoxelModel.keyDown cameraLocation: " + currentCamera.position + "  " + currentCamera.rotation);
 			
 //				if (CameraLocation.FIRST_PERSON == camera.index && this is Player)
@@ -1763,7 +1763,16 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 	}
 	
 	
-
+	private static var g_controlledModel:VoxelModel = null;
+	public static function get controlledModel():VoxelModel { return g_controlledModel; }
+	public static function set controlledModel( val:VoxelModel ):void { g_controlledModel = val; }
+	
+	private static var g_selectedModel:VoxelModel = null;
+	public static function get selectedModel():VoxelModel { return g_selectedModel; }
+	public static function set selectedModel( val:VoxelModel ):void { 
+		//Log.out( "VoxelModel.selectedModel: " + ( val ? val.toString() : "null") , Log.WARN );
+		g_selectedModel = val; 
+	}
 }
 }
 

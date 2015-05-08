@@ -1,6 +1,7 @@
 
 package com.voxelengine.GUI
 {
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.utils.getQualifiedClassName;
 	import flash.events.Event;
 	import org.flashapi.swing.*;
@@ -112,11 +113,11 @@ package com.voxelengine.GUI
 		
 		private function updateLocation():void
 		{
-			if ( Globals.controlledModel )
+			if ( VoxelModel.controlledModel )
 			{
-				var loc:Vector3D = Globals.controlledModel.instanceInfo.positionGet;
+				var loc:Vector3D = VoxelModel.controlledModel.instanceInfo.positionGet;
 				_locLabel.text = "Loc x: " + int( loc.x ) + "  y: " + int( loc.y ) + "  z: " + int( loc.z ); 
-				var rot:Vector3D = Globals.controlledModel.instanceInfo.rotationGet;
+				var rot:Vector3D = VoxelModel.controlledModel.instanceInfo.rotationGet;
 				_rotLabel.text = "Rot x: " + int( rot.x ) + "  y: " + int( rot.y ) + "  z: " + int( rot.z ); 
 			}
 		}

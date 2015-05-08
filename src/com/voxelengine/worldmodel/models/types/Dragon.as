@@ -153,7 +153,7 @@ public class Dragon extends Beast
 	}
 
 	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
-		Globals.player.loseControl( null );
+		Player.player.loseControl( null );
 		Log.out( "Dragon.takeControl --------------------------------------------------------------------------------------------------------------------", Log.WARN );
 		//Log.out( "Dragon.takeControl - starting position: " + $vm.instanceInfo.positionGet );
 		super.takeControl( $modelLosingControl, $addAsChild );
@@ -174,7 +174,7 @@ public class Dragon extends Beast
 		var changed:Boolean = false;
 		
 		// if app is not active, we still need to clip velocitys, but we dont need keyboard or mouse movement
-		if ( this == Globals.controlledModel && Globals.active )
+		if ( this == VoxelModel.controlledModel && Globals.active )
 		{
 			var vel:Vector3D = instanceInfo.velocityGet;
 			var speedVal:Number = instanceInfo.speed( $elapsedTimeMS ) / 4;
@@ -204,7 +204,7 @@ public class Dragon extends Beast
 		}
 		
 		/*
-		if ( !onSolidGround && instanceInfo.usesCollision && this == Globals.controlledModel )
+		if ( !onSolidGround && instanceInfo.usesCollision && this == VoxelModel.controlledModel )
 		{
 			if ( mStallSpeed > instanceInfo.velocityGet.z && instanceInfo.velocityGet.length < mMaxSpeed  )
 			{
@@ -269,8 +269,8 @@ public class Dragon extends Beast
 	}
 	
 	static private function loseControlHandler():void {
-		Globals.controlledModel.loseControl( Globals.player );
-		Globals.player.takeControl( null, false );
+		VoxelModel.controlledModel.loseControl( Player.player );
+		Player.player.takeControl( null, false );
 	}
 	
 	import com.voxelengine.worldmodel.weapons.Gun;

@@ -10,6 +10,7 @@ import com.voxelengine.events.OxelEvent;
 import com.voxelengine.GUI.WindowBeastControlQuery;
 import com.voxelengine.GUI.actionBars.WindowBeastControl;
 import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.scripts.Script;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
@@ -38,9 +39,9 @@ public class ControlBeastScript extends Script
 				if ( vm )
 				{
 					var controllingModel:VoxelModel = vm.instanceInfo.controllingModel;
-					if ( Globals.player && Globals.player.instanceInfo ) {
-						var ii:InstanceInfo = Globals.player.instanceInfo;
-						if ( controllingModel && null == Globals.player.instanceInfo.controllingModel )
+					if ( Player.player && Player.player.instanceInfo ) {
+						var ii:InstanceInfo = Player.player.instanceInfo;
+						if ( controllingModel && null == Player.player.instanceInfo.controllingModel )
 							new WindowBeastControlQuery( controllingModel.instanceInfo.instanceGuid );
 					}
 					else

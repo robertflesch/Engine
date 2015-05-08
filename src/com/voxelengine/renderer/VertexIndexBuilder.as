@@ -8,6 +8,7 @@
 package com.voxelengine.renderer 
 {
 
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.display3D.VertexBuffer3D;
 import flash.display3D.IndexBuffer3D;
 import flash.display3D.Context3D;
@@ -119,7 +120,7 @@ public class VertexIndexBuilder
 			// this causes a major bottleneck if done each frame.
 			if ( false == _sorted ) 
 			{
-				_s_compareVec = Globals.controlledModel.modelToWorld( Globals.controlledModel.camera.center );
+				_s_compareVec = VoxelModel.controlledModel.modelToWorld( VoxelModel.controlledModel.camera.center );
 				//Log.out( "VertexIndexBuilder.sort - _s_compareVec: " + _s_compareVec );
 				_oxels.sort( compareFunction );	
 				trace( "VertexIndexBuilder - sorted: " + _oxels.length + " - took: "  + (getTimer() - timer) );					

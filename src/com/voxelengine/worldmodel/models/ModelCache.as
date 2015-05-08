@@ -153,7 +153,7 @@ package com.voxelengine.worldmodel.models
 					vm.draw( $mvp, $context, false );	
 			}
 			
-			if (EditCursor.editing && ModelPlacementType.PLACEMENT_TYPE_PARENT == ModelPlacementType.modelPlacementTypeGet() )
+			if ( EditCursor.editing )
 				EditCursor.currentInstance.draw( $mvp, $context, false );
 				
 			for ( i = 0; i < _instances.length; i++ ) {
@@ -169,7 +169,7 @@ package com.voxelengine.worldmodel.models
 					vm.drawAlpha( $mvp, $context, false );	
 			}
 			
-			if (EditCursor.editing && ModelPlacementType.PLACEMENT_TYPE_PARENT == ModelPlacementType.modelPlacementTypeGet() )
+			if ( EditCursor.editing ) //  && ModelPlacementType.PLACEMENT_TYPE_PARENT == ModelPlacementType.modelPlacementTypeGet()
 				EditCursor.currentInstance.drawAlpha( $mvp, $context, false );
 			
 			bringOutYourDead();
@@ -210,8 +210,9 @@ package com.voxelengine.worldmodel.models
 			
 			modelTime = getTimer() - modelTime;
 				
-			if (EditCursor.editing && ModelPlacementType.PLACEMENT_TYPE_PARENT == ModelPlacementType.modelPlacementTypeGet() )
+			if ( EditCursor.editing )
 				EditCursor.currentInstance.update( Globals.g_renderer.context, $elapsedTimeMS);
+
 		}
 		
 		public function dispose():void 	{

@@ -203,21 +203,6 @@ package com.voxelengine {
 		private static var g_regionPath:String;
 		public static function get regionPath():String { return g_regionPath; }
 		
-		private static var g_player:Player;
-		public static function get player():Player { return g_player; }
-		public static function set player( val:Player ):void { g_player = val; }
-		
-		private static var g_controlledModel:VoxelModel = null;
-		public static function get controlledModel():VoxelModel { return g_controlledModel; }
-		public static function set controlledModel( val:VoxelModel ):void { g_controlledModel = val; }
-		
-		private static var g_selectedModel:VoxelModel = null;
-		public static function get selectedModel():VoxelModel { return g_selectedModel; }
-		public static function set selectedModel( val:VoxelModel ):void { 
-			Log.out( "Globals.selectedModel: " + val.toString(), Log.WARN );
-			g_selectedModel = val; 
-		}
-		
 		public static function isGuid(val:String):Boolean { return 30 < val.length; }
 		public static function getUID():String { return GUID.create() }
 		

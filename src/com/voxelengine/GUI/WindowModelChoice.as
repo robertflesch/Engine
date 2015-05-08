@@ -174,7 +174,7 @@ package com.voxelengine.GUI
 			ii.detailSize = detailSize;
 			ii.type = type;
 			var viewDistance:Vector3D = new Vector3D(0, 0, -75 - (1<<size)/2 );
-			ii.positionSet = Globals.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
+			ii.positionSet = VoxelModel.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
 			new ModelMakerGenerate( ii );
 		}
 	}

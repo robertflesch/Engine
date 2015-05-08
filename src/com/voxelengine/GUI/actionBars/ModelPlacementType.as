@@ -2,6 +2,7 @@
 package com.voxelengine.GUI.actionBars
 {
 import com.voxelengine.GUI.VVCanvas;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.events.Event;
@@ -100,13 +101,13 @@ public class ModelPlacementType extends VVCanvas
 			_butCurrent.data = "parent";	
 			_butCurrent.backgroundTexture = "assets/textures/parent.jpg";
 			_s_placementType = PLACEMENT_TYPE_PARENT;
-			Globals.selectedModel = EditCursor.currentInstance.objectModelGet();
+			VoxelModel.selectedModel = EditCursor.currentInstance.objectModelGet();
 		} 
 		else if ( "parent" == _butCurrent.data) {
 			_butCurrent.data = "child";	
 			_butCurrent.backgroundTexture = "assets/textures/child.jpg";
 			_s_placementType = PLACEMENT_TYPE_CHILD;
-			Globals.selectedModel = null;
+			VoxelModel.selectedModel = null;
 		} 
 	}
 	

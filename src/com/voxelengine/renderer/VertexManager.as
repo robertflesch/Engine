@@ -160,7 +160,7 @@ public class VertexManager {
 		{
 			if ( $shaders[2].update( $mvp, $vm, $context, $selected, $isChild ) )
 			{
-				var xdist:Number = _gc.getDistance( Globals.controlledModel.modelToWorld( Globals.controlledModel.camera.center ) );
+				var xdist:Number = _gc.getDistance( VoxelModel.controlledModel.modelToWorld( VoxelModel.controlledModel.camera.center ) );
 				if (  xdist < 512 ) {
 					_vertBufAlpha.sorted = false;
 					//Log.out( "xdist: " + xdist );

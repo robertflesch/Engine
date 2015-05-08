@@ -5,6 +5,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.GUI.actionBars.WindowGunControl;
 	import com.voxelengine.GUI.actionBars.WindowShipControl;
 	import com.voxelengine.Log;
+	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.types.Ship;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.events.Event;
@@ -77,7 +78,7 @@ public class WindowShipControlQuery extends VVCanvas
 				addControlWindows( vm );
 				remove();
 				
-				Globals.player.instanceInfo.controllingModel = vm;
+				Player.player.instanceInfo.controllingModel = vm;
 			}
 		}
 		

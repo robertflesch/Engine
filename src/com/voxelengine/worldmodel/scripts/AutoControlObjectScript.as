@@ -12,6 +12,7 @@ package com.voxelengine.worldmodel.scripts
 	 * @author Bob
 	 */
 	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.Log;
@@ -33,9 +34,9 @@ package com.voxelengine.worldmodel.scripts
 				if ( $event.instanceGuid == instanceGuid )
 				{
 					ModelEvent.removeListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent );
-					if ( Globals.player ) {
+					if ( Player.player ) {
 						var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
-						vm.takeControl( Globals.player );
+						vm.takeControl( Player.player );
 						Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.metadata.name );
 					}
 					else {
@@ -49,7 +50,7 @@ package com.voxelengine.worldmodel.scripts
 		private function onLoadingPlayerComplete( le:LoadingEvent ):void {
 			LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 			
-			var player:VoxelModel = Globals.player;
+			var player:VoxelModel = Player.player;
 			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
 			if ( player && vm ) {
 				vm.takeControl( player );

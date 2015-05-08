@@ -10,6 +10,7 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.GUI.actionBars.WindowBeastControl;
+import com.voxelengine.worldmodel.models.types.Player;
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
 import flash.display.Stage;
@@ -115,7 +116,7 @@ public class VoxelVerseGUI extends EventDispatcher
 			var ps:FireProjectileScript = new FireProjectileScript( _bulletSize );
 			ps.accuracy = 0;
 			ps.velocity = 1200;
-			ps.owner = Globals.player.instanceInfo.instanceGuid;
+			ps.owner = Player.player.instanceInfo.instanceGuid;
 			ps.onModelEvent( new ModelEvent( WeaponEvent.FIRE, "" ) );
 			
 			_projectileEnabled = false;
@@ -136,7 +137,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		 ////save updated model meta data with new guid
 		 ////save updated model ivm
 		 ////update the model manager, removing old guid and adding new guid
-		//var vm:VoxelModel = Globals.selectedModel;
+		//var vm:VoxelModel = VoxelModel.selectedModel;
 		//if ( !vm )
 			//vm = Globals.modelInstancesGetFirst();
 		//if ( vm )
@@ -326,8 +327,8 @@ public class VoxelVerseGUI extends EventDispatcher
 		if ( !Log.showing )
 		{
 			if ( Keyboard.T == e.keyCode )
-				if ( Globals.player )
-					Globals.player.torchToggle();
+				if ( Player.player )
+					Player.player.torchToggle();
 				
 			if ( Keyboard.F11 == e.keyCode )
 				Globals.g_renderer.screenShot( true );
@@ -340,7 +341,7 @@ public class VoxelVerseGUI extends EventDispatcher
 				
 			//if ( Keyboard.F == e.keyCode )
 			//{
-				//createProjectile( Globals.controlledModel );
+				//createProjectile( VoxelModel.controlledModel );
 				//return;
 			//}
 				
@@ -360,14 +361,14 @@ public class VoxelVerseGUI extends EventDispatcher
 			//}
 				
 			if ( Keyboard.F == e.keyCode )
-				createProjectile( Globals.controlledModel )
+				createProjectile( VoxelModel.controlledModel )
 			
 			if ( Keyboard.P == e.keyCode )
 				new WindowSandboxList();
 				
 			if ( Keyboard.M == e.keyCode )
-				if ( Globals.selectedModel )
-					new WindowModelDetail( Globals.selectedModel );
+				if ( VoxelModel.selectedModel )
+					new WindowModelDetail( VoxelModel.selectedModel );
 				//saveModelIVM();
 
 			if ( Keyboard.N == e.keyCode )

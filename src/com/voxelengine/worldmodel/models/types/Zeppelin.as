@@ -128,7 +128,7 @@ package com.voxelengine.worldmodel.models.types
 			
 			// Do the things that just a voxel model does
 			// update the edit cursor
-			if ( EditCursor.editing && editCursor && Globals.selectedModel == this )
+			if ( EditCursor.editing && editCursor && VoxelModel.selectedModel == this )
 				editCursor.update( context, $elapsedTimeMS );
 				
 			// Changed first param inside from false to true ( calculateTargetPosition )
@@ -139,7 +139,7 @@ package com.voxelengine.worldmodel.models.types
 			for each ( var vm:VoxelModel in _children )
 				vm.update( context, $elapsedTimeMS );
 				
-			if ( instanceInfo.changed && this == Globals.controlledModel )
+			if ( instanceInfo.changed && this == VoxelModel.controlledModel )
 				dispatchMovementEvent();
 		}
 		

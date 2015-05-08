@@ -3,6 +3,7 @@ package com.voxelengine.GUI
 {
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
+	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.events.Event;
 	import flash.utils.Timer;
@@ -72,14 +73,14 @@ package com.voxelengine.GUI
 
 		protected function onRepeat(event:TimerEvent):void
 		{
-			if ( Globals.player.instanceInfo.controllingModel )
+			if ( Player.player.instanceInfo.controllingModel )
 			{
-				var loc:Vector3D = Globals.player.instanceInfo.controllingModel.instanceInfo.positionGet;
+				var loc:Vector3D = Player.player.instanceInfo.controllingModel.instanceInfo.positionGet;
 				_loc.text = "x: " + int( loc.x ) + "  y: " + int( loc.y ) + "  z: " + int( loc.z ); 
-				var vel:Vector3D = Globals.player.instanceInfo.controllingModel.instanceInfo.velocityGet;
+				var vel:Vector3D = Player.player.instanceInfo.controllingModel.instanceInfo.velocityGet;
 				_vel.text = "x: " + int( vel.x ) + "  y: " + int( vel.y ) + "  z: " + int( vel.z ); 
 				
-				var rot:Number = -Globals.player.instanceInfo.controllingModel.instanceInfo.rotationGet.y % 360;
+				var rot:Number = -Player.player.instanceInfo.controllingModel.instanceInfo.rotationGet.y % 360;
 				var calRot:Number = 0;
 				if ( 180 < rot )
 					calRot = 50 - ( ( rot - 180 ) * 100 / 360 );

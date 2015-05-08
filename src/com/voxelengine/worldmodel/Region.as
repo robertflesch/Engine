@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel
 {
 	import com.voxelengine.events.ModelLoadingEvent;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.geom.Vector3D;
 	import flash.events.Event;
     import flash.events.TimerEvent;
@@ -181,7 +182,7 @@ package com.voxelengine.worldmodel
 			}
 				
 			// for local use only
-			if ( !Globals.online && !Globals.player )
+			if ( !Globals.online && !Player.player )
 				Region.currentRegion.modelCache.createPlayer();
 				
 			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name, Log.DEBUG );
@@ -317,11 +318,11 @@ package com.voxelengine.worldmodel
 		}
 		
 		static public function resetPosition():void {
-			if ( Globals.controlledModel )
+			if ( VoxelModel.controlledModel )
 			{
-				Globals.controlledModel.instanceInfo.positionSet = currentRegion.playerPosition;
-				Globals.controlledModel.instanceInfo.rotationSet = currentRegion.playerRotation;
-				//Globals.controlledModel.instanceInfo.positionSetComp(0,0,0);
+				VoxelModel.controlledModel.instanceInfo.positionSet = currentRegion.playerPosition;
+				VoxelModel.controlledModel.instanceInfo.rotationSet = currentRegion.playerRotation;
+				//VoxelModel.controlledModel.instanceInfo.positionSetComp(0,0,0);
 			}
 		}
 		

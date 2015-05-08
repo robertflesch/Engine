@@ -38,7 +38,7 @@ package com.voxelengine.GUI
             Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 			
-			_ship.takeControl( Globals.player );
+			_ship.takeControl( Player.player );
 		} 
 		
 		private function loseControl(event:UIMouseEvent):void 
@@ -62,7 +62,7 @@ package com.voxelengine.GUI
 
 			remove();
 			
-			Globals.player.instanceInfo.controllingModel = null;
+			Player.player.instanceInfo.controllingModel = null;
 			
 			_ship.loseControl();
 		}
@@ -80,7 +80,7 @@ package com.voxelengine.GUI
 			removeEventListener(UIOEvent.REMOVED, onRemoved );
 			
 			_s_currentInstance = null;
-			Globals.player.instanceInfo.controllingModel = null;
+			Player.player.instanceInfo.controllingModel = null;
 			if ( _ship )
 				_ship.loseControl();
 		}

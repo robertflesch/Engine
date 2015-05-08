@@ -167,7 +167,7 @@ public class PanelModels extends PanelBase
 		if ( _selectedModel )
 		{
 			buttonsEnable();
-			//Globals.selectedModel = _selectedModel;
+			//VoxelModel.selectedModel = _selectedModel;
 			// TO DO this is the right path, but probably need a custom event for this...
 			Globals.g_app.dispatchEvent( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, _selectedModel, _parentModel ) );
 			//_parent.childPanelAdd( _selectedModel );

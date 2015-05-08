@@ -8,6 +8,7 @@ package com.voxelengine.GUI.actionBars
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.models.ModelTransform;
+	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.types.Ship;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.models.types.Engine;
@@ -122,7 +123,7 @@ package com.voxelengine.GUI.actionBars
 
 			remove();
 			
-			Globals.player.instanceInfo.controllingModel = null;
+			Player.player.instanceInfo.controllingModel = null;
 		}
 		
 		public function onTextureLoadComplete (event:Event):void 

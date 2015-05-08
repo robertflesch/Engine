@@ -19,6 +19,7 @@ import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.ControllableVoxelModel;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.oxel.Lighting;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.tasks.landscapetasks.*;
@@ -27,15 +28,15 @@ public class ConsoleCommands {
 	
 	private static function reset():void
 	{
-		if ( Globals.player )
-			Globals.player.instanceInfo.reset();
+		if ( Player.player )
+			Player.player.instanceInfo.reset();
 	}
 	
 	private static function trail():void
 	{
-		if ( Globals.controlledModel )
+		if ( VoxelModel.controlledModel )
 		{
-			var vm:ControllableVoxelModel = Globals.controlledModel as ControllableVoxelModel;
+			var vm:ControllableVoxelModel = VoxelModel.controlledModel as ControllableVoxelModel;
 			vm.leaveTrail = ! vm.leaveTrail;
 			Log.out( "Trail is " + (vm.leaveTrail ? "ON" : "OFF"), Log.WARN );
 		}
@@ -45,9 +46,9 @@ public class ConsoleCommands {
 	
 	private static function markers():void
 	{
-		if ( Globals.controlledModel )
+		if ( VoxelModel.controlledModel )
 		{
-			var vm:ControllableVoxelModel = Globals.controlledModel as ControllableVoxelModel;
+			var vm:ControllableVoxelModel = VoxelModel.controlledModel as ControllableVoxelModel;
 			vm.collisionMarkers = ! vm.collisionMarkers;
 			Log.out( "CollisionPoints are " + (vm.collisionMarkers ? "ON" : "OFF"), Log.WARN );
 		}
@@ -57,10 +58,10 @@ public class ConsoleCommands {
 	
 	private static function gravity():void
 	{
-		if ( Globals.controlledModel )
+		if ( VoxelModel.controlledModel )
 		{
-			Globals.controlledModel.usesGravity = ! Globals.controlledModel.usesGravity;
-			Log.out( "Gravity is " + (Globals.controlledModel.usesGravity ? "ON" : "OFF"), Log.WARN );
+			VoxelModel.controlledModel.usesGravity = ! VoxelModel.controlledModel.usesGravity;
+			Log.out( "Gravity is " + (VoxelModel.controlledModel.usesGravity ? "ON" : "OFF"), Log.WARN );
 		}
 		else
 			Log.out( "No model is under control to use gravity on", Log.WARN );
@@ -68,9 +69,9 @@ public class ConsoleCommands {
 	
 	private static function trees():void
 	{
-		if ( Globals.selectedModel )
+		if ( VoxelModel.selectedModel )
 		{
-			Globals.selectedModel.oxel.growTreesOn( Globals.selectedModel.instanceInfo.instanceGuid, TypeInfo.GRASS );
+			VoxelModel.selectedModel.oxel.growTreesOn( VoxelModel.selectedModel.instanceInfo.instanceGuid, TypeInfo.GRASS );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -78,7 +79,7 @@ public class ConsoleCommands {
 	
 	private static function tree():void
 	{
-		if ( Globals.selectedModel )
+		if ( VoxelModel.selectedModel )
 		{
 			var oxel:Oxel = EditCursor.getHighlightedOxel();
 			if ( Globals.BAD_OXEL == oxel )
@@ -87,7 +88,7 @@ public class ConsoleCommands {
 				return;
 			}
 
-			TreeGenerator.generateTree( Globals.selectedModel.instanceInfo.instanceGuid, oxel, 1 );
+			TreeGenerator.generateTree( VoxelModel.selectedModel.instanceInfo.instanceGuid, oxel, 1 );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -96,9 +97,9 @@ public class ConsoleCommands {
 	
 	private static function sand():void
 	{
-		if ( Globals.selectedModel )
+		if ( VoxelModel.selectedModel )
 		{
-			Globals.selectedModel.oxel.dirtToGrassAndSand();
+			VoxelModel.selectedModel.oxel.dirtToGrassAndSand();
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -106,9 +107,9 @@ public class ConsoleCommands {
 	
 	private static function vines():void
 	{
-		if ( Globals.selectedModel )
+		if ( VoxelModel.selectedModel )
 		{
-			Globals.selectedModel.oxel.vines( Globals.selectedModel.instanceInfo.instanceGuid );
+			VoxelModel.selectedModel.oxel.vines( VoxelModel.selectedModel.instanceInfo.instanceGuid );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -117,10 +118,10 @@ public class ConsoleCommands {
 	private static function lightingSun():void
 	{
 		/*
-		if ( Globals.selectedModel )
+		if ( VoxelModel.selectedModel )
 		{
 			var ol:Vector.<Oxel> = new Vector.<Oxel>();
-			Globals.selectedModel.oxel.lightingSunGatherList( ol );
+			VoxelModel.selectedModel.oxel.lightingSunGatherList( ol );
 		}
 		else {
 			Log.out( "No selected model" );
@@ -131,7 +132,7 @@ public class ConsoleCommands {
 		for each ( var oxel:Oxel in ol )
 		{
 			//if ( count < 200 )
-				LightSunCheck.addTask( Globals.selectedModel.instanceInfo.guid, oxel.gc, 1, Globals.POSY );
+				LightSunCheck.addTask( VoxelModel.selectedModel.instanceInfo.guid, oxel.gc, 1, Globals.POSY );
 			//count++;
 		}
 		*/
@@ -139,10 +140,10 @@ public class ConsoleCommands {
 	
 	private static function lightingReset():void
 	{
-		if ( Globals.selectedModel )
+		if ( VoxelModel.selectedModel )
 		{
-			Globals.selectedModel.oxel.lightingReset();
-			Globals.selectedModel.oxel.rebuildAll();
+			VoxelModel.selectedModel.oxel.lightingReset();
+			VoxelModel.selectedModel.oxel.rebuildAll();
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -150,9 +151,9 @@ public class ConsoleCommands {
 	
 	private static function harvestTrees():void
 	{
-		if ( Globals.selectedModel )
+		if ( VoxelModel.selectedModel )
 		{
-			Globals.selectedModel.oxel.harvestTrees( Globals.selectedModel.instanceInfo.instanceGuid );
+			VoxelModel.selectedModel.oxel.harvestTrees( VoxelModel.selectedModel.instanceInfo.instanceGuid );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -161,10 +162,10 @@ public class ConsoleCommands {
 	
 	private static function collide():void
 	{
-		if ( Globals.controlledModel )
+		if ( VoxelModel.controlledModel )
 		{
-			Globals.controlledModel.instanceInfo.usesCollision = !Globals.controlledModel.instanceInfo.usesCollision;
-			Log.out( "Collide is " + (Globals.controlledModel.instanceInfo.usesCollision ? "ON" : "OFF"), Log.WARN );
+			VoxelModel.controlledModel.instanceInfo.usesCollision = !VoxelModel.controlledModel.instanceInfo.usesCollision;
+			Log.out( "Collide is " + (VoxelModel.controlledModel.instanceInfo.usesCollision ? "ON" : "OFF"), Log.WARN );
 		}
 	}
 	
@@ -179,12 +180,12 @@ public class ConsoleCommands {
 	private static function tunnel():void
 	{
 //			Globals.g_landscapeTaskController.activeTaskLimit = 0;
-		if ( !Globals.selectedModel ) {
+		if ( !VoxelModel.selectedModel ) {
 			Log.out( "ConsoleCommands.carveTunnel  No model selected", Log.WARN );
 			return;
 		}
 		
-		if ( !Globals.selectedModel.instanceInfo ) {
+		if ( !VoxelModel.selectedModel.instanceInfo ) {
 			Log.out( "ConsoleCommands.carveTunnel  No instanceInfo for selected model", Log.WARN );
 			return;
 		}
@@ -194,7 +195,7 @@ public class ConsoleCommands {
 			return;
 		}
 			
-		CarveTunnel.contructor( Globals.selectedModel.instanceInfo.instanceGuid
+		CarveTunnel.contructor( VoxelModel.selectedModel.instanceInfo.instanceGuid
 							  , ModelCacheUtils.gci.point
 							  , ModelCacheUtils.viewVectorNormalizedGet()
 							  , TypeInfo.AIR
@@ -205,12 +206,12 @@ public class ConsoleCommands {
 	private static function tunnelNetwork():void
 	{
 //			Globals.g_landscapeTaskController.activeTaskLimit = 0;
-		if ( !Globals.selectedModel ) {
+		if ( !VoxelModel.selectedModel ) {
 			Log.out( "ConsoleCommands.CarveTunnels  No model selected", Log.WARN );
 			return;
 		}
 		
-		if ( !Globals.selectedModel.instanceInfo ) {
+		if ( !VoxelModel.selectedModel.instanceInfo ) {
 			Log.out( "ConsoleCommands.CarveTunnels  No instanceInfo for selected model", Log.WARN );
 			return;
 		}
@@ -220,7 +221,7 @@ public class ConsoleCommands {
 			return;
 		}
 			
-		CarveTunnels.contructor( Globals.selectedModel.instanceInfo.instanceGuid
+		CarveTunnels.contructor( VoxelModel.selectedModel.instanceInfo.instanceGuid
 							   , ModelCacheUtils.gci.point
 							   , ModelCacheUtils.viewVectorNormalizedGet()
 							   , TypeInfo.AIR
@@ -235,7 +236,7 @@ public class ConsoleCommands {
 	{
 		
 		var loc:Vector3D = ModelCacheUtils.gci.point;
-		var vm:VoxelModel = Globals.selectedModel;
+		var vm:VoxelModel = VoxelModel.selectedModel;
 		if ( !vm )
 			{ Log.out( "ConsoleCommands.lavaSpheresCarve  No model selected", Log.WARN ); return; }
 		
@@ -245,7 +246,7 @@ public class ConsoleCommands {
 	private static function waterSphere():void
 	{
 		var loc:Vector3D = ModelCacheUtils.gci.point;
-		var vm:VoxelModel = Globals.selectedModel;
+		var vm:VoxelModel = VoxelModel.selectedModel;
 		if ( !vm )
 			{ Log.out( "ConsoleCommands.waterSpheresCarve  No model selected", Log.WARN ); return; }
 
@@ -254,7 +255,7 @@ public class ConsoleCommands {
 	
 	private static function lavaSpheres( $count:int = 10 ):void
 	{
-		var vm:VoxelModel = Globals.selectedModel;
+		var vm:VoxelModel = VoxelModel.selectedModel;
 		if ( !vm )
 			{ Log.out( "ConsoleCommands.lavaSpheresCarve  No model selected", Log.WARN ); return; }
 		
@@ -264,7 +265,7 @@ public class ConsoleCommands {
 	
 	private static function waterSpheres( $count:int = 10 ):void
 	{
-		var vm:VoxelModel = Globals.selectedModel;
+		var vm:VoxelModel = VoxelModel.selectedModel;
 		if ( !vm )
 			{ Log.out( "ConsoleCommands.waterSpheresCarve  No model selected", Log.WARN ); return; }
 

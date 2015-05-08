@@ -2,6 +2,7 @@
 package com.voxelengine.GUI
 {
 	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.worldmodel.models.types.Player;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.KeyboardEvent;
@@ -93,7 +94,7 @@ public class WindowBeastControlQuery extends VVCanvas
 			if ( vm )
 			{
 				remove();
-				vm.takeControl( Globals.player );
+				vm.takeControl( Player.player );
 			}
 		}
 		

@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.animation
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.events.ModelEvent;
+	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.SoundBank;
 	import com.voxelengine.utils.MP3Pitch;
@@ -73,7 +74,7 @@ package com.voxelengine.worldmodel.animation
 		
 		private function onModelMoved( event:ModelEvent ):void
 		{
-			if ( event.instanceGuid == Globals.player.instanceInfo.instanceGuid && null != _pitch )
+			if ( event.instanceGuid == Player.player.instanceInfo.instanceGuid && null != _pitch )
 			{
 				//trace( "AnimationSound.onModelMoved - Player moved" );
 				// dont want to do this more then once per frame, really once every ten would be ok ??
@@ -83,9 +84,9 @@ package com.voxelengine.worldmodel.animation
 				if (  _owner.instanceInfo.controllingModel )
 				{
 					var totalModelRotation:Number = _owner.getAccumulatedYRotation( _owner.instanceInfo.rotationGet.y );
-					var effectiveRotation:Number = totalModelRotation + Globals.controlledModel.instanceInfo.rotationGet.y;
+					var effectiveRotation:Number = totalModelRotation + VoxelModel.controlledModel.instanceInfo.rotationGet.y;
 					
-					_pitch.adjustVolumeAndPan( _owner.instanceInfo.controllingModel.worldToModel( Globals.controlledModel.instanceInfo.positionGet )
+					_pitch.adjustVolumeAndPan( _owner.instanceInfo.controllingModel.worldToModel( VoxelModel.controlledModel.instanceInfo.positionGet )
 											 , effectiveRotation
 											 , _owner.instanceInfo.positionGet.clone()
 											 , _soundRangeMax
