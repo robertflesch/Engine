@@ -7,7 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.worldmodel.models.ModelPlacementType;
 	import flash.display3D.Context3D;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
@@ -19,6 +18,7 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.InventoryEvent;
 	import com.voxelengine.worldmodel.Region;
+	import com.voxelengine.worldmodel.models.ModelPlacementType;
 	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 	import com.voxelengine.worldmodel.models.types.*;
 	

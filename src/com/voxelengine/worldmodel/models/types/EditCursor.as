@@ -12,32 +12,29 @@ package com.voxelengine.worldmodel.models.types
 	import flash.geom.Vector3D;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
-	import flash.ui.Keyboard;
 	import flash.events.TimerEvent;
+	import flash.ui.Keyboard;
 	import flash.utils.Timer;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.events.GUIEvent;
+	import com.voxelengine.pools.LightingPool;
+	import com.voxelengine.pools.GrainCursorPool;
+	import com.voxelengine.worldmodel.Region;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import com.voxelengine.worldmodel.oxel.*;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
+	import com.voxelengine.worldmodel.inventory.ObjectModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
+	import com.voxelengine.worldmodel.models.ModelCacheUtils;
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.worldmodel.models.ModelMetadata;
-	import com.voxelengine.pools.GrainCursorPool;
+	import com.voxelengine.worldmodel.models.ModelPlacementType;
+	import com.voxelengine.worldmodel.models.makers.ModelMakerCursor;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.tasks.flowtasks.CylinderOperation;
 	import com.voxelengine.worldmodel.tasks.flowtasks.SphereOperation;
 	
-	import com.voxelengine.worldmodel.models.ModelPlacementType;
-	import com.voxelengine.pools.LightingPool;
-	import com.voxelengine.worldmodel.inventory.ObjectModel;
-	import com.voxelengine.worldmodel.models.makers.ModelMakerCursor;
-	import com.voxelengine.worldmodel.models.ModelCacheUtils;
-	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
-	import com.voxelengine.worldmodel.oxel.Oxel;
-	import com.voxelengine.worldmodel.Region;
-	import com.voxelengine.worldmodel.TypeInfo;
-
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF 
