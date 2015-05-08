@@ -8,7 +8,7 @@
 package com.voxelengine.worldmodel.models.makers
 {
 import com.voxelengine.events.LoadingImageEvent;
-import com.voxelengine.GUI.actionBars.ModelPlacementType;
+import com.voxelengine.worldmodel.models.ModelPlacementType;
 import com.voxelengine.worldmodel.models.makers.ModelMakerCursor;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.EditCursor;

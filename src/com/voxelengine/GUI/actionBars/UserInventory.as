@@ -8,6 +8,7 @@
 
 package com.voxelengine.GUI.actionBars
 {
+import com.voxelengine.worldmodel.models.ModelPlacementType;
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
 import flash.events.KeyboardEvent;

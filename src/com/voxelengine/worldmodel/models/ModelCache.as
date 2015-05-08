@@ -7,7 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.GUI.actionBars.ModelPlacementType;
+	import com.voxelengine.worldmodel.models.ModelPlacementType;
 	import flash.display3D.Context3D;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;

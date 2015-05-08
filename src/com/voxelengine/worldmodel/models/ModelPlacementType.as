@@ -1,5 +1,5 @@
 
-package com.voxelengine.GUI.actionBars
+package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.GUI.VVCanvas;
 import com.voxelengine.worldmodel.models.types.VoxelModel;

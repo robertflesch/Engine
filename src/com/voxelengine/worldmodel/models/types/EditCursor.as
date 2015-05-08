@@ -7,16 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-	import com.voxelengine.events.GUIEvent;
-	import com.voxelengine.GUI.actionBars.ModelPlacementType;
-	import com.voxelengine.pools.LightingPool;
-	import com.voxelengine.worldmodel.inventory.ObjectModel;
-	import com.voxelengine.worldmodel.models.makers.ModelMakerCursor;
-	import com.voxelengine.worldmodel.models.ModelCacheUtils;
-	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
-	import com.voxelengine.worldmodel.oxel.Oxel;
-	import com.voxelengine.worldmodel.Region;
-	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.display3D.Context3D;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
@@ -28,6 +18,7 @@ package com.voxelengine.worldmodel.models.types
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.events.GUIEvent;
 	import com.voxelengine.worldmodel.oxel.*;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
@@ -37,6 +28,16 @@ package com.voxelengine.worldmodel.models.types
 	import com.voxelengine.worldmodel.tasks.flowtasks.CylinderOperation;
 	import com.voxelengine.worldmodel.tasks.flowtasks.SphereOperation;
 	
+	import com.voxelengine.worldmodel.models.ModelPlacementType;
+	import com.voxelengine.pools.LightingPool;
+	import com.voxelengine.worldmodel.inventory.ObjectModel;
+	import com.voxelengine.worldmodel.models.makers.ModelMakerCursor;
+	import com.voxelengine.worldmodel.models.ModelCacheUtils;
+	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
+	import com.voxelengine.worldmodel.oxel.Oxel;
+	import com.voxelengine.worldmodel.Region;
+	import com.voxelengine.worldmodel.TypeInfo;
+
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF 
