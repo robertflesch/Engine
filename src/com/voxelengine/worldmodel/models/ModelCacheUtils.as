@@ -128,7 +128,7 @@ package com.voxelengine.worldmodel.models
 				
 				VoxelModel.selectedModel = editableModel;
 				
-				if ( EditCursor.editing )
+				if ( EditCursor.currentInstance.editing )
 				{
 					const minSize:int = EditCursor.currentInstance.oxel.gc.grain;
 					
@@ -146,12 +146,12 @@ package com.voxelengine.worldmodel.models
 					if ( _gci )
 					{
 						//_gci.point = editableModel.worldToModel( _gci.point );
-						EditCursor.currentInstance.setGCIData( _gci );
+						EditCursor.currentInstance.gciDataSet( _gci );
 					}
 					else	
 					{
 						EditCursor.currentInstance.visible = false;	
-						EditCursor.currentInstance.clearGCIData();
+						EditCursor.currentInstance.gciDataClear();
 					}
 					_lastFoundModel = editableModel;
 				}

@@ -42,7 +42,7 @@ public class GenerateWater extends LandscapeTask
 			var rangeInG0:int = vm.oxel.size_in_world_coordinates() * _layer.offset / 100;
 			var gct:GrainCursor = GrainCursorPool.poolGet( vm.oxel.gc.bound );
 			// this finds a g0 at that point
-			GrainCursor.getFromPoint( 0, rangeInG0, 0, gct );
+			GrainCursor.roundToInt( 0, rangeInG0, 0, gct );
 			// this gives us the minGrain loction that holds the g0
 			var minGrain:int = 4; // make it to the closest meter
 			gct.become_ancestor( minGrain );

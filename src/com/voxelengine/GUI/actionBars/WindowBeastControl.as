@@ -184,7 +184,7 @@ package com.voxelengine.GUI.actionBars
 			
 			if ( box )
 			{
-				_itemInventory.moveSelector( box.x );
+				_itemInventory.moveSelector( box );
 				processItemSelection( box );
 			}
 			else

@@ -1168,11 +1168,11 @@ package com.voxelengine.worldmodel.oxel
 			_s_oxelsCreated = 0;
 			_s_oxelsEvaluated = 0;
 			facesBuildWater();
-//			Log.out( "Oxel.cleanup - facesBuildWater took: " + (getTimer() - timer) + "  oxels eval: " + _s_oxelsEvaluated + "  oxels created: " + _s_oxelsCreated );					
-//			timer = getTimer();
+			Log.out( "Oxel.cleanup - facesBuildWater took: " + (getTimer() - timer) + "  oxels eval: " + _s_oxelsEvaluated + "  oxels created: " + _s_oxelsCreated );					
+			timer = getTimer();
 			facesBuild();
-//			Log.out( "Oxel.cleanup - facesBuild - took: " + (getTimer() - timer) );					
-//			timer = getTimer();
+			Log.out( "Oxel.cleanup - facesBuild - took: " + (getTimer() - timer) );					
+			timer = getTimer();
 			quadsBuild();
 			var time:int = (getTimer() - timer);
 			if ( 3 < time )

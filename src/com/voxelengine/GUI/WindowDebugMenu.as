@@ -183,7 +183,8 @@ package com.voxelengine.GUI
 
 		private function updateGC():void
 		{
-			if (Globals.g_app && EditCursor.editing ) {
+			// TO DO I dont like this direct call into the EditCursor
+			if (Globals.g_app && EditCursor.currentInstance.editing ) {
 				if ( VoxelModel.selectedModel && EditCursor.currentInstance.gciData )
 				{
 					var gci:GrainCursorIntersection = EditCursor.currentInstance.gciData;

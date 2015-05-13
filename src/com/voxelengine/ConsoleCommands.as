@@ -81,7 +81,7 @@ public class ConsoleCommands {
 	{
 		if ( VoxelModel.selectedModel )
 		{
-			var oxel:Oxel = EditCursor.getHighlightedOxel();
+			var oxel:Oxel = EditCursor.currentInstance.getHighlightedOxel();
 			if ( Globals.BAD_OXEL == oxel )
 			{
 				Log.out( "Invalid location", Log.WARN );

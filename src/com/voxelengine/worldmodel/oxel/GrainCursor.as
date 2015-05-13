@@ -103,7 +103,7 @@ public class GrainCursor
 	}
 	
 	[inline]
-	public static function getFromPoint( x:Number, y:Number, z:Number, gct:GrainCursor ):void
+	public static function roundToInt( x:Number, y:Number, z:Number, gct:GrainCursor ):void
 	{
 		// This is where it intersects with a grain 0
 		gct.grainX = int( x );

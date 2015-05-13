@@ -60,8 +60,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			_what = what;
 			_runCount = runCount;
 			_startTime = getTimer();
-			if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-				EditCursor.editCursorIcon = EditCursor.EDITCURSOR_CYLINDER_ANIMATED;
+//			if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
+//				EditCursor.editCursorIcon = EditCursor.EDITCURSOR_CYLINDER_ANIMATED;
 			Globals.g_landscapeTaskController.addTask( this );
 		}
 		
@@ -97,8 +97,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					else
 					{
 						Log.out( "CylinderOperation - END: took: " + (getTimer() - timer) );
-						if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-							EditCursor.editCursorIcon = EditCursor.EDITCURSOR_CYLINDER;
+//						if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
+//							EditCursor.editCursorIcon = EditCursor.EDITCURSOR_CYLINDER;
 
 						//if ( EditCursor.editCursorIcon == TypeInfo.EDITCURSOR_CYLINDER_ANIMATED )
 						//{

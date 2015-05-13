@@ -1,10 +1,12 @@
 
 package com.voxelengine.GUI.actionBars
 {
+import com.voxelengine.events.CursorShapeEvent;
 import com.voxelengine.GUI.VVCanvas;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.events.Event;
+import org.flashapi.swing.cursor.Cursor;
 
 import org.flashapi.swing.Box;
 import org.flashapi.swing.Label;
@@ -31,10 +33,9 @@ public class ShapeSelector extends VVCanvas
 		_outline = new Image( Globals.appPath + "assets/textures/toolSelector.png" );
 		addElement( _outline );
 		display();
-		show();
 		addShapeSelector();
 		resizeObject( null );
-		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
+		visible = false;
 	}
 	
 	public function resizeObject(event:Event):void 
@@ -63,9 +64,7 @@ public class ShapeSelector extends VVCanvas
 		addElement(hk);
 		
 		eventCollector.addEvent( _butCurrent, UIMouseEvent.PRESS, pressShape );
-//		eventCollector.addEvent( _butCurrent, UIMouseEvent.RELEASE, releaseShape );
 		eventCollector.addEvent( hk, UIMouseEvent.PRESS, pressShape );
-//		eventCollector.addEvent( hk, UIMouseEvent.RELEASE, pressShape );
 	}
 	
 	public function hotKeyInventory(e:KeyboardEvent):void 
@@ -74,46 +73,30 @@ public class ShapeSelector extends VVCanvas
 			return;
 			
 		if ( 119 == e.keyCode )
-		{
 			pressShapeHotKey(e);
-		}
 	}
 	
-	public function pressShapeHotKey(e:KeyboardEvent):void 
-	{
-		nextShape();
-	}
-	private function pressShape(event:UIMouseEvent):void 
-	{
-		nextShape();
-	}
+	public function pressShapeHotKey(e:KeyboardEvent):void  { nextShape(); }
+	private function pressShape(event:UIMouseEvent):void  { nextShape(); }
+	
 	private function nextShape():void
 	{
 		if ( "square" == _butCurrent.data)
 		{
 			_butCurrent.data = "cylinder";	
 			_butCurrent.backgroundTexture = "assets/textures/cylinder.jpg";
-			EditCursor.cursorType = EditCursor.CURSOR_TYPE_CYLINDER;
-			if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-				EditCursor.editCursorIcon = EditCursor.EDITCURSOR_CYLINDER;
-			//EditCursor.editCursorIcon = TypeInfo.EDITCURSOR_CYLINDER_ANIMATED;
 		} 
 		else if ( "cylinder" == _butCurrent.data)
 		{
 			_butCurrent.data = "sphere";	
 			_butCurrent.backgroundTexture = "assets/textures/sphere.jpg";
-			EditCursor.cursorType = EditCursor.CURSOR_TYPE_SPHERE;
-			if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-				EditCursor.editCursorIcon = EditCursor.EDITCURSOR_ROUND;
 		} 
 		else if ( "sphere" == _butCurrent.data)
 		{
 			_butCurrent.data = "square";	
 			_butCurrent.backgroundTexture = "assets/textures/square.jpg";
-			EditCursor.cursorType = EditCursor.CURSOR_TYPE_GRAIN;
-			if ( EditCursor.CURSOR_OP_DELETE == EditCursor.cursorOperation )
-				EditCursor.editCursorIcon = EditCursor.EDITCURSOR_SQUARE;
 		}
+		show();
 	}
 	
 	public function show():void
@@ -122,6 +105,12 @@ public class ShapeSelector extends VVCanvas
 		if ( false == visible )
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 		visible = true;
+		if ( "square" == _butCurrent.data)
+			CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.SQUARE ) );
+		else if ( "cylinder" == _butCurrent.data)
+			CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.CYLINDER ) );
+		else if ( "sphere" == _butCurrent.data)
+			CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.SPHERE ) );
 	}
 	
 	public function hide():void

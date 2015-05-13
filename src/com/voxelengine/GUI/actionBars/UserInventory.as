@@ -8,6 +8,7 @@
 
 package com.voxelengine.GUI.actionBars
 {
+import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.worldmodel.models.ModelPlacementType;
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
@@ -102,7 +103,6 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	override public function remove():void {
-		EditCursor.editing = false;
 		removeListeners();
 		Log.out( "UserInventory.remove ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 		RoomEvent.removeListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
@@ -189,9 +189,10 @@ public class  UserInventory extends QuickInventory
 			bi.reset();
 			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, _owner, slotId, null ) );
 			// sets edit cursor to none
-			EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
-			EditCursor.editing = false;
-			EditCursor.toolOrBlockEnabled = false;
+//			EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
+//			EditCursor.editing = false;
+//			EditCursor.toolOrBlockEnabled = false;
+			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) );
 		}
 	}
 	
@@ -301,41 +302,33 @@ public class  UserInventory extends QuickInventory
 		if ( 0 < Globals.openWindowCount )
 			return;
 			
-		moveSelector( box.x );
+		moveSelector( box );
 		var itemIndex:int = int( box.name );
 		
-		EditCursor.editing = false;
-		EditCursor.toolOrBlockEnabled = false;
 		hideGrainTools();
 		hideModelTools();
-		// reset the cursor type to what was selected in the shape selector
-		//EditCursor.cursorType = _lastCursorType;
 		
 		var oi:ObjectInfo = box.data as ObjectInfo;
 		if ( oi is ObjectVoxel ) {
 			var ti:ObjectVoxel = oi as ObjectVoxel;
 			var selectedTypeId:int = ti.type;
-			showGrainTools();
-			EditCursor.currentInstance.objectModelClear();
 			if ( TypeInfo.INVALID != selectedTypeId ) {
-				EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
-				EditCursor.editCursorIcon = selectedTypeId; 
 				_itemMaterialSelection = itemIndex;
-				EditCursor.editing = true;
-				EditCursor.toolOrBlockEnabled = true;
+				CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.INSERT_OXEL, selectedTypeId ) ); 
 			}
+			showGrainTools();
 		}
 		else if ( oi is ObjectAction ) {
 			Log.out( "UserInventory.processItemSelection - ObjectAction");
 			var oa:ObjectAction = oi as ObjectAction;
-			EditCursor.currentInstance.objectModelClear();
 			if ( lastItemSelection != itemIndex )
 			{   // We are selecting none when it was previously on another item
 				oa.callBack();
 			}
 			else if ( - 1 != _itemMaterialSelection )// We are selecting the pick again when that is what we have already.
 			{	// go back to previously used material
-				EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
+				throw new Error( "UserInventory - processItemSelection - HOW DO I GET HERE?" );
+//				CursorEvent.dispatch( new CursorEvent( CursorEvent.CURSOR_OP_INSERT, selectedTypeId, true ) ); 
 				var lastBoxNone:Box = boxes[_itemMaterialSelection ];
 				processItemSelection( lastBoxNone )
 				return;
@@ -344,39 +337,29 @@ public class  UserInventory extends QuickInventory
 		else if ( oi is ObjectTool ) {
 			Log.out( "UserInventory.processItemSelection - ObjectTool");
 			var ot:ObjectTool = oi as ObjectTool;
-			showGrainTools();
-			EditCursor.currentInstance.objectModelClear();
 			if ( lastItemSelection != itemIndex )
 			{   // We are selecting the pick when it was previously on another item
 				ot.callBack();
 			}
 			else if ( - 1 != _itemMaterialSelection ) 
 			{	// go back to previously used material
-				EditCursor.editing = true;
-				EditCursor.toolOrBlockEnabled = true;
-				EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
-				var lastBoxPick:Box = boxes[_itemMaterialSelection ];
-				processItemSelection( lastBoxPick );
+				throw new Error( "UserInventory - processItemSelection - HOW DO I GET HERE?" );
+				
+				//var lastBoxPick:Box = boxes[_itemMaterialSelection ];
+				//processItemSelection( lastBoxPick );
 				return;
 			}
+			showGrainTools();
 		}
 		else if ( oi is ObjectModel ) {
-			
-			showModelTools();
-			
-			EditCursor.cursorOperation = EditCursor.CURSOR_OP_INSERT;
 			var ti1:TypeInfo = TypeInfo.typeInfoByName[ "CLEAR GLASS" ];
-			EditCursor.editCursorIcon = ti1.type;
-			EditCursor.editing = true;
-			EditCursor.toolOrBlockEnabled = true;
-			
 			var om:ObjectModel = oi as ObjectModel;
-			EditCursor.currentInstance.objectModelAdd( om );
+			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.INSERT_MODEL, ti1.type, om ) ); 
+			showModelTools();
 		}
 		else if ( oi is ObjectInfo ) {
 			Log.out( "UserInventory.processItemSelection - ObjectInfo");
-			EditCursor.currentInstance.objectModelClear();
-			EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
+			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) ); 
 		}
 		
 		lastItemSelection = itemIndex;

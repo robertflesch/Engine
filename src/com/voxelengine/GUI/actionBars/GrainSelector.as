@@ -8,6 +8,7 @@
 
 package com.voxelengine.GUI.actionBars
 {
+import com.voxelengine.events.CursorSizeEvent;
 import flash.events.MouseEvent;
 import flash.events.KeyboardEvent;
 
@@ -28,9 +29,7 @@ import com.voxelengine.worldmodel.inventory.ObjectInfo;
 
 public class GrainSelector extends QuickInventory
 {
-	private static var s_currentItemSelection:int = -1;
-	public static function get currentItemSelection():int { return s_currentItemSelection }
-	public static function set currentItemSelection(val:int):void { s_currentItemSelection = val; }
+	private var _currentSize:int = 4;
 	
 	public function GrainSelector() {
 		// These numbers come from the size of the artwork, and from the size of the toolbar below it.
@@ -38,24 +37,39 @@ public class GrainSelector extends QuickInventory
 		_selectorXOffset = 10; // From image of "grainSelector.png"
 		buildItems();
 		display();
-		show();
 		resizeObject( null );
 	}
 	
 	public function addListeners():void {
 		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+		CursorSizeEvent.addListener( CursorSizeEvent.SET, onSizeSet );
 	}
 	
 	public function removeListeners():void {
 		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+		CursorSizeEvent.removeListener( CursorSizeEvent.SET, onSizeSet );
+	}
+	
+	private function onSizeSet(e:CursorSizeEvent):void 
+	{
+		var cursorSize:String = String( e.size );
+		for each ( 	var box:BoxInventory in _boxes )
+			if ( box && box.name == cursorSize ) {
+				_selector.x = box.x;
+				_selector.y = height - _imageSize;
+				currentItemSelection = ( x - _selectorXOffset) / _imageSize;
+				break;
+			}
+		//Log.out( "QuickInventory index of selected: " + QuickInventory.currentItemSelection );
 	}
 
 	public function show():void {
 		_outline.visible = true;
 		visible = true;
 		addListeners();
+		CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, _currentSize ) ); 
 	}
 	
 	public function hide():void {
@@ -158,26 +172,21 @@ public class GrainSelector extends QuickInventory
 		}
 	}		
 	
-	public function processGrainSelection( box:UIObject ):void {
-		var ti:ObjectGrain = box.data as ObjectGrain;
-		EditCursor.editCursorSize = int ( ti.name.toLowerCase() );
-		moveSelector( box.x );
-
+	public function processGrainSelection( $box:UIObject ):void {
+		
+		var ti:ObjectGrain = $box.data as ObjectGrain;
+		_currentSize = int ( ti.name.toLowerCase() );
+		
+		CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, _currentSize ) ); 
+		
 		if ( null != VoxelModel.controlledModel ) {
 			// don't want movement speed to be 0, so set it to 0.5
-			if ( 0 == EditCursor.editCursorSize )
+			if ( 0 == _currentSize )
 				VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( 0.5 ); 
 			else
-				VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( EditCursor.editCursorSize * 1.5 ); 
+				VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( _currentSize * 1.5 ); 
 		}
-		
-		if ( null != VoxelModel.selectedModel ) {
-			var current:GrainCursor = EditCursor.currentInstance.oxel.gc;
-			if ( current.grain > EditCursor.editCursorSize )
-				EditCursor.shrinkCursor();
-			else if ( current.grain < EditCursor.editCursorSize )
-				EditCursor.growCursor();
-		}
+
 	}
 }
 }

@@ -125,16 +125,12 @@ package com.voxelengine.GUI.actionBars
 			//return buildResult.box;
 		//}
 		
-		public function show():void
-		{
+		public function show():void {
 			this.visible = true;
 			_itemInventory.visible = true;
-			EditCursor.editing = true;
 		}
 		
-		public function hide():void
-		{
-			EditCursor.editing = false;
+		public function hide():void {
 			this.visible = false;
 			_itemInventory.visible = false;
 		}
@@ -149,7 +145,7 @@ package com.voxelengine.GUI.actionBars
 		{
 			//Log.out( "ToolBar.selectItemByIndex: " + index );
 			var box:Box = _itemInventory.boxes[ index ];
-			_itemInventory.moveSelector( box.x );
+			_itemInventory.moveSelector( box );
 			processItemSelection( box );
 		}
 		
@@ -163,7 +159,7 @@ package com.voxelengine.GUI.actionBars
 			{
 				var selectedItem:int = e.keyCode - 48;
 				var box:Box = _itemInventory.boxes[ index ];
-				_itemInventory.moveSelector( box.x );
+				_itemInventory.moveSelector( box );
 				processItemSelection( box );
 				activateItemSelection( box );
 			}

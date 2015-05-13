@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
+import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.utils.ByteArray;
@@ -140,16 +141,18 @@ public class Slots
 	
 	
 	static private function pickToolSlots():void {
-		EditCursor.cursorOperation = EditCursor.CURSOR_OP_DELETE;
-		EditCursor.setPickColorFromType( EditCursor.cursorType )
-		EditCursor.editing = true;
-		EditCursor.toolOrBlockEnabled = true;
+//		EditCursor.cursorOperation = EditCursor.CURSOR_OP_DELETE;
+//		EditCursor.setPickColorFromType( EditCursor.cursorType )
+//		EditCursor.editing = true;
+//		EditCursor.toolOrBlockEnabled = true;
+		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.DELETE_OXEL ) );
 	}
 	
 	static private function noneSlots():void {
-		EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
-		EditCursor.editing = false;
-		EditCursor.toolOrBlockEnabled = false;
+//		EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
+//		EditCursor.editing = false;
+//		EditCursor.toolOrBlockEnabled = false;
+		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) );
 	}
 	
 

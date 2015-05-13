@@ -87,7 +87,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 						var voxelDistToCenter:Number = Math.sqrt( (center - x * minGrainInG0 ) * (center - x* minGrainInG0) + (center - z* minGrainInG0) * (center - z* minGrainInG0) )	
 						if ( voxelDistToCenter > (center * 0.9) )
 						{
-							GrainCursor.getFromPoint( x, y, z, gct );
+							GrainCursor.roundToInt( x, y, z, gct );
 							to = vm.oxel.childFind( gct );
 							if ( Globals.BAD_OXEL != to )
 							{

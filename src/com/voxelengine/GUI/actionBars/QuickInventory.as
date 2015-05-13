@@ -17,6 +17,7 @@ import flash.filters.GlowFilter;
 import org.flashapi.swing.Image;
 import org.flashapi.swing.Canvas;
 import org.flashapi.swing.Box;
+import org.flashapi.swing.core.UIObject;
 import org.flashapi.swing.event.UIOEvent;
 
 import org.flashapi.swing.layout.AbsoluteLayout;
@@ -35,7 +36,7 @@ public class QuickInventory extends VVCanvas
 	
 	protected var _outline:Image;
 	protected var _imageSize:int;
-	private var _selector:Sprite;
+	protected var _selector:Sprite;
 	protected var _selectorXOffset:int;
 	protected var _offsetFromBottom:int;
 	protected var _boxes:Vector.<BoxInventory> = new Vector.<BoxInventory>(10,true);
@@ -79,11 +80,10 @@ public class QuickInventory extends VVCanvas
 		addElement(_selector);
 	}
 	
-	public function moveSelector( x:int ):void {
-		_selector.x = x;
+	public function moveSelector( $box:UIObject ):void {
+		_selector.x = $box.x;
 		_selector.y = height - _imageSize;
-		currentItemSelection = ( x - _selectorXOffset)/_imageSize;
-		//Log.out( "QuickInventory index of selected: " + QuickInventory.currentItemSelection );
+		currentItemSelection = ( x - _selectorXOffset) / _imageSize;
 	}
 	
 	protected function buildItems():void { }
