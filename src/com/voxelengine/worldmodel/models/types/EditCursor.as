@@ -77,9 +77,10 @@ public class EditCursor extends VoxelModel
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// instance data
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private 			var	  _repeatTime:int = 100;
-	private 			var   _repeatTimer:Timer;
-	private  			var   _count:int = 0;
+	private 			var	_repeatTime:int = 100;
+	private 			var _repeatTimer:Timer;
+	private  			var _count:int = 0;
+	private 			var _phase:Number = 0; // used by the rainbow cursor
 	
 	private 			var _listenersAdded:Boolean;
 	
@@ -128,21 +129,25 @@ public class EditCursor extends VoxelModel
 	
 	////////////////////////////////////////////////
 	// CursorSizeEvents
-	private function sizeGetRequestEvent(e:CursorSizeEvent):void {
-		CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.GET_RESPONSE, oxel.gc.grain ) );
-	}
 	private function sizeSetEvent(e:CursorSizeEvent):void {
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation
 		  || CursorOperationEvent.INSERT_OXEL == cursorOperation ) {
-//			if ( VoxelModel.selectedModel )
-//				if ( e.size < VoxelModel.selectedModel.oxel.gc.bound && 0 <= e.size )
+			if ( VoxelModel.selectedModel )
+				if ( e.size < VoxelModel.selectedModel.oxel.gc.bound && 0 <= e.size )
 					oxel.gc.grain = e.size;
+				else {	
+					// reseting so I have to inform others
+					oxel.gc.grain = 4;
+					CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, oxel.gc.grain ) );
+				}
+			else	
+				oxel.gc.grain = e.size;
 		}
 	}
 	private function sizeGrowEvent(e:CursorSizeEvent):void {
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation || CursorOperationEvent.INSERT_OXEL == cursorOperation ) {
-			if ( oxel.gc.grain < 8 )
-			oxel.gc.grain++;
+			if ( oxel.gc.grain < 6 )
+				oxel.gc.grain++;
 			CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, oxel.gc.grain ) );
 		}
 	}
@@ -187,6 +192,8 @@ public class EditCursor extends VoxelModel
 		_editing = true;
 		cursorShape = CursorShapeEvent.MODEL_CHILD;
 		cursorOperation = e.type;
+		oxelTexture = e.oxelType;
+		objectModelAdd( e.om );
 	}
 	
 	////////////////////////////////////////////////
@@ -233,9 +240,7 @@ public class EditCursor extends VoxelModel
 	override public function release():void {
 		super.release();
 		
-		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
-		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+		removeListeners();
 		
 		GUIEvent.removeListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
 		GUIEvent.removeListener( GUIEvent.APP_ACTIVATE, onActivate );
@@ -258,7 +263,6 @@ public class EditCursor extends VoxelModel
 		CursorSizeEvent.removeListener( CursorSizeEvent.SET, 			sizeSetEvent );
 		CursorSizeEvent.removeListener( CursorSizeEvent.GROW, 			sizeGrowEvent );
 		CursorSizeEvent.removeListener( CursorSizeEvent.SHRINK, 		sizeShrinkEvent );
-		CursorSizeEvent.removeListener( CursorSizeEvent.GET_REQUEST, 	sizeGetRequestEvent );
 
 		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_UP, 	mouseUp);
@@ -287,7 +291,6 @@ public class EditCursor extends VoxelModel
 		CursorSizeEvent.addListener( CursorSizeEvent.SET, 			sizeSetEvent );
 		CursorSizeEvent.addListener( CursorSizeEvent.GROW, 			sizeGrowEvent );
 		CursorSizeEvent.addListener( CursorSizeEvent.SHRINK, 		sizeShrinkEvent );
-		CursorSizeEvent.addListener( CursorSizeEvent.GET_REQUEST, 	sizeGetRequestEvent );
 		
 		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_UP, 	 mouseUp);
@@ -296,7 +299,8 @@ public class EditCursor extends VoxelModel
 	}
 	
 	////////////////////////////////////////////////
-	// EditCursor creation/removal
+	// EditCursor positioning
+	public function gciDataClear():void { gciData = null; }
 	public function gciDataSet( $gciData:GrainCursorIntersection ):void {
 		_gciData = $gciData;
 		oxel.gc.bound = $gciData.model.oxel.gc.bound;
@@ -307,43 +311,8 @@ public class EditCursor extends VoxelModel
 		gct.become_ancestor( oxel.gc.grain );
 		_gciData.gc.copyFrom( gct );
 		GrainCursorPool.poolDispose( gct );
-		//
-		//if ( CursorOperationEvent.INSERT_OXEL == cursorOperation ) {
-			//configureInsertOxel();
-		//}
-		//else {
-			//configureDeleteOxel();
-		//}
 	}
 	
-	public function gciDataClear():void { gciData = null; }
-	
-/*
-	private function configureInsertOxel():void {
-		
-		var pl:PlacementLocation = getPlacementLocation( gciData.model );
-		if ( PlacementLocation.INVALID == pl.state ) {
-			oxelTexture = EDITCURSOR_INVALID; // ;
-			instanceInfo.positionSetComp( _gciData.gc.getModelX(), _gciData.gc.getModelY(), _gciData.gc.getModelZ() );
-		} else {
-			instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
-		}
-	}
-	
-	private function configureDeleteOxel():void {
-		
-		instanceInfo.positionSetComp( _gciData.gc.getModelX(), _gciData.gc.getModelY(), _gciData.gc.getModelZ() );
-		oxel.quadsDeleteAll();
-		oxel.faces_clear_all();
-		oxel.faces_mark_all_clean();
-		if ( !oxel.lighting )
-			oxel.lighting = LightingPool.poolGet( 0xff );
-		var li:LightInfo = oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-		oxel.faces_set_all();
-		oxel.write( EDIT_CURSOR, oxel.gc, oxelTexture, true );
-		li.color = cursorColorRainbow();
-		oxel.quadsBuild();
-	}*/
 	
 	public function objectModelSet( $cm:VoxelModel ):void {
 		_objectModel = $cm;
@@ -363,39 +332,24 @@ public class EditCursor extends VoxelModel
 		var mm:ModelMakerCursor = new ModelMakerCursor( ii, $om.vmm );
 	}
 	
-	private var _phase:Number = 0;
-	private function cursorColorRainbow():uint {
-		var frequency:Number = 2.4;
-		var red:uint = Math.max( 0, Math.sin( frequency + 2 + _phase ) ) * 255;
-		var green:uint = Math.max( 0, Math.sin( frequency + 0 + _phase ) ) * 255;
-		var blue:uint = Math.max( 0, Math.sin( frequency + 4 + _phase ) ) * 255;
-		var color:uint;
-		color |= red << 16;
-		color |= green << 8;
-		color |= blue << 0;
-		_phase += 0.03;
-		return color;
-	}
-	
-	
 	public function drawCursor($mvp:Matrix3D, $context:Context3D, $isChild:Boolean, $alpha:Boolean ):void	{
 
 		var viewMatrixParent:Matrix3D;
-		// if we just have an object model, and no parent.
+		// if there is a parent, adjust matrix for it first
+		if ( VoxelModel.selectedModel ) { // This means type cursor
+			viewMatrixParent = VoxelModel.selectedModel.instanceInfo.worldSpaceMatrix.clone();
+			viewMatrixParent.append($mvp);
+			$mvp = viewMatrixParent;
+		}
+		// now if there is an objectModel, adjust matrix for its data
+		/*
 		if ( _objectModel ) {
 //				Log.out( "EditCursor.drawCursor - _objectModel", Log.WARN );
 			viewMatrixParent = _objectModel.instanceInfo.worldSpaceMatrix.clone();
 			viewMatrixParent.append($mvp);
 			$mvp = viewMatrixParent;
-		} else if ( VoxelModel.selectedModel ) { // This means type cursor
-//				Log.out( "EditCursor.drawCursor - selected model", Log.WARN );
-			viewMatrixParent = VoxelModel.selectedModel.instanceInfo.worldSpaceMatrix.clone();
-			viewMatrixParent.append($mvp);
-			$mvp = viewMatrixParent;
-		} else {
-			//Log.out( "EditCursor.draw - no object model or selected model", Log.WARN );
-			return;
-		}
+		} 
+		*/
 		
 		var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
 		viewMatrix.prependScale( 1 + SCALE_FACTOR, 1 + SCALE_FACTOR, 1 + SCALE_FACTOR ); 
@@ -404,16 +358,17 @@ public class EditCursor extends VoxelModel
 		viewMatrix.prependTranslation( -t, -t, -t)
 		viewMatrix.append($mvp);
 		
+		if ( _objectModel )
+			_objectModel.draw( $mvp, $context, true );
+			
 		if ( $alpha )
 			oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
 		else	
 			oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
-		
-		if ( _objectModel )
-			_objectModel.draw( $mvp, $context, true );
 	}
 	
 	override public function update($context:Context3D, elapsedTimeMS:int ):void {
+		super.update( $context, elapsedTimeMS );
 		
 		gciData = null;
 		if ( _cursorOperation == CursorOperationEvent.INSERT_OXEL || _cursorOperation == CursorOperationEvent.DELETE_OXEL )
@@ -433,7 +388,8 @@ public class EditCursor extends VoxelModel
 				} else {
 					instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
 					if ( cursorShape == CursorShapeEvent.MODEL_CHILD )
-						_objectModel.instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
+						if ( _objectModel )
+							_objectModel.instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
 				}
 			}
 			else if ( _cursorOperation == CursorOperationEvent.DELETE_OXEL || _cursorOperation == CursorOperationEvent.DELETE_MODEL ) {
@@ -448,20 +404,8 @@ public class EditCursor extends VoxelModel
 
 		buildCursorModel();	
 		
-		if ( _objectModel )
-			_objectModel.instanceInfo.positionSet = instanceInfo.positionGet;
-		
 		internal_update($context, elapsedTimeMS );
 		
-	}
-	
-	override protected function internal_update($context:Context3D, $elapsedTimeMS:int):void
-	{
-		if (!initialized)
-			initialize($context);
-		
-		if (oxel && oxel.dirty)
-			oxel.cleanup();
 	}
 	
 	private function buildCursorModel():void {	
@@ -493,6 +437,19 @@ public class EditCursor extends VoxelModel
 			li.color = 0xffffffff;
 		
 		oxel.quadsBuild();
+		
+		function cursorColorRainbow():uint {
+			var frequency:Number = 2.4;
+			var red:uint = Math.max( 0, Math.sin( frequency + 2 + _phase ) ) * 255;
+			var green:uint = Math.max( 0, Math.sin( frequency + 0 + _phase ) ) * 255;
+			var blue:uint = Math.max( 0, Math.sin( frequency + 4 + _phase ) ) * 255;
+			var color:uint;
+			color |= red << 16;
+			color |= green << 8;
+			color |= blue << 0;
+			_phase += 0.03;
+			return color;
+		}
 	}
 		
 	

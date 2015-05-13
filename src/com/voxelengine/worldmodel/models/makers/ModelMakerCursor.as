@@ -93,6 +93,7 @@ public class ModelMakerCursor extends ModelMakerBase {
 			vm.data = _vmd;
 			vm.modelInfo.animationsLoad( vm );
 		}
+		markComplete();
 
 		return vm;
 	}

@@ -21,8 +21,6 @@ public class CursorSizeEvent extends Event
 	static public	const GROW:String 			= "GROW";
 	static public	const SHRINK:String 		= "SHRINK";
 	static public	const SET:String 			= "SET";
-	static public	const GET_REQUEST:String 	= "GET_REQUEST";
-	static public	const GET_RESPONSE:String 	= "GET_RESPONSE";
 
 	private var _size:int
 	public function get size():int  { return _size; }
