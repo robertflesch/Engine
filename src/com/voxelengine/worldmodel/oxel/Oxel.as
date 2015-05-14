@@ -2702,7 +2702,7 @@ package com.voxelengine.worldmodel.oxel
 			// depending on what axis, and what movement it was, we choose which child to replace.
 			switch ( result.gci.axis )
 			{
-				case 0: // x
+				case Globals.AXIS_X: // x
 					if ( 0 == result.gci.gc.grainX ) // going off neg side
 					{
 						this.gc.copyFrom( newOxel._children[1].gc );
@@ -2715,7 +2715,7 @@ package com.voxelengine.worldmodel.oxel
 						newOxel._children[0] = this;
 					}
 					break;
-				case 1: // y
+				case Globals.AXIS_Y: // y
 					if ( 0 == result.gci.gc.grainY ) // going off neg side
 					{
 						this.gc.copyFrom( newOxel._children[2].gc );
@@ -2728,7 +2728,7 @@ package com.voxelengine.worldmodel.oxel
 						newOxel._children[0] = this;
 					}
 					break;
-				case 2: // z
+				case Globals.AXIS_Z: // z
 					if ( 0 == result.gci.gc.grainZ ) // going off neg side
 					{
 						this.gc.copyFrom( newOxel._children[4].gc );

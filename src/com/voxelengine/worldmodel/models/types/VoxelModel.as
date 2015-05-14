@@ -522,19 +522,19 @@ public class VoxelModel
 		switch (placementResult.gci.axis)
 		{
 			// only have to reposition with growing the in negative direction
-			case 0: // x
+			case Globals.AXIS_X: // x
 				if (0 == placementResult.gci.gc.grainX)
 				{
 					currentPosition.x = currentPosition.x - oxel.gc.size() / 2
 				}
 				break;
-			case 1: // y
+			case Globals.AXIS_Y: // y
 				if (0 == placementResult.gci.gc.grainY) // going off neg side
 				{
 					currentPosition.y = currentPosition.y - oxel.gc.size() / 2
 				}
 				break;
-			case 2: // z
+			case Globals.AXIS_Z: // z
 				if (0 == placementResult.gci.gc.grainZ) // going off neg side
 				{
 					currentPosition.x = currentPosition.x - oxel.gc.size() / 2
@@ -1422,21 +1422,21 @@ public class VoxelModel
 			// reverse on the plane that intersects
 			switch (gci.axis)
 			{
-				case 0: // x
+				case Globals.AXIS_X: // x
 					trace("VoxelModel.bounce X PLANE velocity: " + model.instanceInfo.velocityGet);
 					model.instanceInfo.velocitySetComp( model.instanceInfo.velocityGet.x, model.instanceInfo.velocityGet.y, -model.instanceInfo.velocityGet.z );
 					trace("VoxelModel.bounce X PLANE velocity inverted: " + model.instanceInfo.velocityGet);
 					if (toBeReflected)
 						toBeReflected.delta.z = -toBeReflected.delta.z;
 					break;
-				case 1: 
+				case Globals.AXIS_Y: 
 					trace("VoxelModel.bounce Y PLANE velocity: " + model.instanceInfo.velocityGet);
 					model.instanceInfo.velocitySetComp( model.instanceInfo.velocityGet.x, -model.instanceInfo.velocityGet.y, model.instanceInfo.velocityGet.z );
 					trace("VoxelModel.bounce Y PLANE velocity inverted: " + model.instanceInfo.velocityGet);
 					if (toBeReflected)
 						toBeReflected.delta.y = -toBeReflected.delta.y;
 					break;
-				case 2: 
+				case Globals.AXIS_Z: 
 					trace("VoxelModel.bounce Z PLANE velocity: " + model.instanceInfo.velocityGet);
 					model.instanceInfo.velocitySetComp( -model.instanceInfo.velocityGet.x, model.instanceInfo.velocityGet.y, model.instanceInfo.velocityGet.z );
 					trace("VoxelModel.bounce Z PLANE velocity inverted: " + model.instanceInfo.velocityGet);

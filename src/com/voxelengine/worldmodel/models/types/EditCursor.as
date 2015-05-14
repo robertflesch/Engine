@@ -351,20 +351,22 @@ public class EditCursor extends VoxelModel
 		} 
 		*/
 		
-		var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
-		viewMatrix.prependScale( 1 + SCALE_FACTOR, 1 + SCALE_FACTOR, 1 + SCALE_FACTOR ); 
-		var positionscaled:Vector3D = viewMatrix.position;
-		var t:Number = oxel.gc.size() * SCALE_FACTOR/2;
-		viewMatrix.prependTranslation( -t, -t, -t)
-		viewMatrix.append($mvp);
-		
 		if ( _objectModel )
 			_objectModel.draw( $mvp, $context, true );
+
+		if ( gciData ) {
+			var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
+			viewMatrix.prependScale( 1 + SCALE_FACTOR, 1 + SCALE_FACTOR, 1 + SCALE_FACTOR ); 
+			var positionscaled:Vector3D = viewMatrix.position;
+			var t:Number = oxel.gc.size() * SCALE_FACTOR/2;
+			viewMatrix.prependTranslation( -t, -t, -t)
+			viewMatrix.append($mvp);
 			
-		if ( $alpha )
-			oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
-		else	
-			oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
+			if ( $alpha )
+				oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
+			else	
+				oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
+		}
 	}
 	
 	override public function update($context:Context3D, elapsedTimeMS:int ):void {
@@ -416,12 +418,27 @@ public class EditCursor extends VoxelModel
 		oxel.faces_clear_all();
 		oxel.faces_mark_all_clean();
 		
-		oxel.face_set( Globals.POSX );
-		oxel.face_set( Globals.NEGX );
-		oxel.face_set( Globals.POSY );
-		oxel.face_set( Globals.NEGY );
-		oxel.face_set( Globals.POSZ );
-		oxel.face_set( Globals.NEGZ );
+		if ( CursorShapeEvent.CYLINDER == cursorShape || CursorShapeEvent.SPHERE == cursorShape ) {
+			// I could use gciData.near to determine which single face to use, but seems like overkill
+			if ( Globals.AXIS_X == _gciData.axis ) {
+				oxel.face_set( Globals.POSX );
+				oxel.face_set( Globals.NEGX );
+			} else if ( Globals.AXIS_Y == _gciData.axis ) {
+				oxel.face_set( Globals.POSY );
+				oxel.face_set( Globals.NEGY );
+			} else {
+				oxel.face_set( Globals.POSZ );
+				oxel.face_set( Globals.NEGZ );
+			}
+			
+		} else {	
+			oxel.face_set( Globals.POSX );
+			oxel.face_set( Globals.NEGX );
+			oxel.face_set( Globals.POSY );
+			oxel.face_set( Globals.NEGY );
+			oxel.face_set( Globals.POSZ );
+			oxel.face_set( Globals.NEGZ );
+		}
 		
 		if ( !oxel.lighting )
 			oxel.lighting = LightingPool.poolGet( 0xff );
@@ -569,7 +586,7 @@ public class EditCursor extends VoxelModel
 		pl.gc.copyFrom( gci.gc );
 		// test the results of the step, to see if a blocks has been sent out of bounds.
 		switch ( gci.axis ) {
-		case 0:
+		case Globals.AXIS_X:
 			if ( 0 < diffPos.x ) {
 				if ( !pl.gc.move_posx() ) pl.state = PlacementLocation.INVALID;
 				pl.positive = true;
@@ -578,7 +595,7 @@ public class EditCursor extends VoxelModel
 				pl.negative = true;
 			}
 			break;
-		case 1:
+		case Globals.AXIS_Y:
 			if ( 0 < diffPos.y ) {
 				if ( !pl.gc.move_posy() ) pl.state = PlacementLocation.INVALID;
 				pl.positive = true;
@@ -587,7 +604,7 @@ public class EditCursor extends VoxelModel
 				pl.negative = true;
 			}
 			break;
-		case 2:
+		case Globals.AXIS_Z:
 			if ( 0 < diffPos.z ) {
 				if ( !pl.gc.move_posz() ) pl.state = PlacementLocation.INVALID;
 				pl.positive = true;
@@ -644,13 +661,13 @@ public class EditCursor extends VoxelModel
 			{
 				var gci:GrainCursorIntersection = EditCursor.currentInstance.gciData;
 				var cuttingPoint:Vector3D = new Vector3D();
-				if ( 0 == gci.axis ) // x
+				if ( Globals.AXIS_X == gci.axis ) // x
 				{
 					cuttingPoint.x = gci.point.x;
 					cuttingPoint.y = gci.gc.getModelY() + gci.gc.size() / 2;
 					cuttingPoint.z = gci.gc.getModelZ() + gci.gc.size() / 2;
 				}
-				else if ( 1 == gci.axis )  // y
+				else if ( Globals.AXIS_X == gci.axis )  // y
 				{
 					cuttingPoint.x = gci.gc.getModelX() + gci.gc.size() / 2;
 					cuttingPoint.y = gci.point.y;
@@ -735,13 +752,13 @@ public class EditCursor extends VoxelModel
 			var offset:int = 0;
 			var radius:int = gciCyl.gc.size()/2;
 			var cuttingPointCyl:Vector3D = new Vector3D();
-			if ( 0 == gciCyl.axis ) // x
+			if ( Globals.AXIS_X == gciCyl.axis ) // x
 			{
 				cuttingPointCyl.x = gciCyl.point.x + offset;
 				cuttingPointCyl.y = gciCyl.gc.getModelY() + radius;
 				cuttingPointCyl.z = gciCyl.gc.getModelZ() + radius;
 			}
-			else if ( 1 == gciCyl.axis )  // y
+			else if ( Globals.AXIS_Y == gciCyl.axis )  // y
 			{
 				cuttingPointCyl.x = gciCyl.gc.getModelX() + radius;
 				cuttingPointCyl.y = gciCyl.gc.getModelY();
