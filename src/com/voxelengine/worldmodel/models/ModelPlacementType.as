@@ -50,8 +50,8 @@ public class ModelPlacementType extends VVCanvas
 		_butCurrent = new Box(IMAGE_SIZE, IMAGE_SIZE);
 		_butCurrent.x = 10;
 		_butCurrent.y = 10;
-		_butCurrent.data = "child";
-		_butCurrent.backgroundTexture = "assets/textures/child.jpg";
+		_butCurrent.data = "auto";
+		_butCurrent.backgroundTexture = "assets/textures/auto.jpg";
 		addElement( _butCurrent );
 		
 		
@@ -81,34 +81,44 @@ public class ModelPlacementType extends VVCanvas
 	private function nextShape():void
 	{
 		if ( "child" == _butCurrent.data) {
-			_butCurrent.data = "parent";	
-			_butCurrent.backgroundTexture = "assets/textures/parent.jpg";
+			_butCurrent.data = "auto";	
+			_butCurrent.backgroundTexture = "assets/textures/auto.jpg";
 		} 
 		else if ( "parent" == _butCurrent.data) {
 			_butCurrent.data = "child";	
 			_butCurrent.backgroundTexture = "assets/textures/child.jpg";
+		} 
+		else if ( "auto" == _butCurrent.data) {
+			_butCurrent.data = "parent";	
+			_butCurrent.backgroundTexture = "assets/textures/parent.jpg";
 		} 
 		show();
 	}
 	
 	public function show():void
 	{
-		_outline.visible = true;
+		// only add listener when going from invisible to visible
 		if ( false == visible )
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
+			
 		visible = true;
+		_outline.visible = true;
+		
 		if ( "child" == _butCurrent.data)
 			CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_CHILD ) );
-		else	
+		else if ( "parent" == _butCurrent.data)	
 			CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_PARENT ) );
+		else if ( "auto" == _butCurrent.data)	
+			CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_AUTO ) );
 	}
 	
 	public function hide():void
 	{
-		_outline.visible = false;
+		// only remove listener when going from visible to invisible
 		if ( true == visible )
 			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 		visible = false;
+		_outline.visible = false;
 	}
 	
 }

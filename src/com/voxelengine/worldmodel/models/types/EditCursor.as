@@ -195,12 +195,12 @@ public class EditCursor extends VoxelModel
 	}
 	private function deleteModelEvent(e:CursorOperationEvent):void {
 		_editing = true;
-		cursorShape = CursorShapeEvent.MODEL_CHILD;
+		cursorShape = CursorShapeEvent.MODEL_AUTO;
 		cursorOperation = e.type;
 	}
 	private function insertModelEvent(e:CursorOperationEvent):void {
 		_editing = true;
-		cursorShape = CursorShapeEvent.MODEL_CHILD;
+		cursorShape = CursorShapeEvent.MODEL_AUTO;
 		cursorOperation = e.type;
 		oxelTextureValid = oxelTexture = e.oxelType;
 		objectModelAdd( e.om );
@@ -267,6 +267,7 @@ public class EditCursor extends VoxelModel
 		CursorShapeEvent.removeListener( CursorShapeEvent.CYLINDER, 	shapeSetEvent );
 		CursorShapeEvent.removeListener( CursorShapeEvent.MODEL_CHILD, 	shapeSetEvent );
 		CursorShapeEvent.removeListener( CursorShapeEvent.MODEL_PARENT, shapeSetEvent );
+		CursorShapeEvent.removeListener( CursorShapeEvent.MODEL_AUTO, 	shapeSetEvent );
 		CursorShapeEvent.removeListener( CursorShapeEvent.SPHERE, 		shapeSetEvent );
 		CursorShapeEvent.removeListener( CursorShapeEvent.SQUARE, 		shapeSetEvent );
 		
@@ -295,6 +296,7 @@ public class EditCursor extends VoxelModel
 		CursorShapeEvent.addListener( CursorShapeEvent.CYLINDER, 		shapeSetEvent );
 		CursorShapeEvent.addListener( CursorShapeEvent.MODEL_CHILD, 	shapeSetEvent );
 		CursorShapeEvent.addListener( CursorShapeEvent.MODEL_PARENT, 	shapeSetEvent );
+		CursorShapeEvent.addListener( CursorShapeEvent.MODEL_AUTO, 		shapeSetEvent );
 		CursorShapeEvent.addListener( CursorShapeEvent.SPHERE, 			shapeSetEvent );
 		CursorShapeEvent.addListener( CursorShapeEvent.SQUARE, 			shapeSetEvent );
 		
@@ -354,7 +356,9 @@ public class EditCursor extends VoxelModel
 		}
 		
 		if ( objectModel ) {
-			if ( ( CursorShapeEvent.MODEL_CHILD == _cursorShape && gciData ) || CursorShapeEvent.MODEL_PARENT == _cursorShape ) {
+			if ( ( CursorShapeEvent.MODEL_CHILD == _cursorShape && gciData ) 
+			    || CursorShapeEvent.MODEL_PARENT == _cursorShape
+				|| CursorShapeEvent.MODEL_AUTO == _cursorShape ) {
 				if ( oxelTexture != EDITCURSOR_INVALID ) {
 					if ( $alpha )
 						objectModel.drawAlpha( $mvp, $context, true );
@@ -387,10 +391,10 @@ public class EditCursor extends VoxelModel
 		if ( _cursorOperation == CursorOperationEvent.INSERT_OXEL || _cursorOperation == CursorOperationEvent.DELETE_OXEL )
 			ModelCacheUtils.highLightEditableOxel();
 		else if ( _cursorOperation == CursorOperationEvent.INSERT_MODEL || _cursorOperation == CursorOperationEvent.DELETE_MODEL )
-			if ( _cursorShape == CursorShapeEvent.MODEL_CHILD )
+			if ( CursorShapeEvent.MODEL_CHILD == _cursorShape || CursorShapeEvent.MODEL_AUTO == _cursorShape )
 				ModelCacheUtils.highLightEditableOxel();
 		
-		// We generate gci data for INSERT_MODEL with cursorShape == MODEL_CHILD
+		// We generate gci data for INSERT_MODEL with cursorShape == MODEL_CHILD || MODEL_AUTO
 		if ( gciData ) {
 			if ( _cursorOperation == CursorOperationEvent.INSERT_OXEL || _cursorOperation == CursorOperationEvent.INSERT_MODEL ) {
 				// This gets the closest open oxel along the ray
@@ -401,7 +405,7 @@ public class EditCursor extends VoxelModel
 				} else {
 					oxelTexture = oxelTextureValid;
 					instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
-					if ( cursorShape == CursorShapeEvent.MODEL_CHILD )
+					if ( cursorShape == CursorShapeEvent.MODEL_CHILD || cursorShape == CursorShapeEvent.MODEL_AUTO )
 						if ( objectModel )
 							objectModel.instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
 				}
@@ -521,16 +525,21 @@ public class EditCursor extends VoxelModel
 		if ( CursorOperationEvent.INSERT_MODEL != cursorOperation )
 			return;
 
-		var newChild:VoxelModel = objectModel.clone();
+		var newChild:VoxelModel
 		if ( CursorShapeEvent.MODEL_CHILD == _cursorShape ) {
 			var foundModel:VoxelModel = VoxelModel.selectedModel;
-			if ( foundModel )
+			if ( foundModel ) {
+				newChild = objectModel.clone();
 				foundModel.childAdd( newChild );
+				Log.out( "EditCursor.insertModel - adding as CHILD", Log.WARN );
+			}
 			else 
 				Log.out( "EditCursor.insertModel - no parent model found", Log.WARN );
 		}
-		else {
+		else {  //  CursorShapeEvent.MODEL_PARENT || CursorShapeEvent.MODEL_AUTO == _cursorShape
 			// same model, new instance.
+			Log.out( "EditCursor.insertModel - adding as PARENT", Log.WARN );
+			newChild = objectModel.clone();
 			var newPos:Vector3D = Player.player.instanceInfo.modelToWorld( new Vector3D( 0,0, -(newChild.oxel.gc.size() * 2) ) );
 			newChild.instanceInfo.positionSet = newPos;
 			Region.currentRegion.modelCache.add( newChild );

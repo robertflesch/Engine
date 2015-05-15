@@ -27,7 +27,10 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF
-	 * This class is used to load a model once its metadata AND data has been loaded from persistance
+	 * This class is the base class of the model makers, 
+	 * model makers are temporary objects which go away after the model has loaded of failed.
+	 * As the base class of makers, its responsibility is to load the models metadata.
+	 * once its metadata AND data has been loaded from persistance
 	 * it then removes its listeners, which should cause it be to be garbage collected.
 	 * Might I need to add a timeout on this object in case if never completes.
 	 */
