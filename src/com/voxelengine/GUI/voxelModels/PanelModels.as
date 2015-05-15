@@ -155,6 +155,7 @@ public class PanelModels extends PanelBase
 				_selectedModel = null;
 				populateModels( _dictionarySource, _parentModel );
 				buttonsDisable();
+				Globals.g_app.dispatchEvent( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, null ) );
 			}
 			else
 				noModelSelected();

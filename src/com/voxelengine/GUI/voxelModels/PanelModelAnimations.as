@@ -52,8 +52,10 @@ package com.voxelengine.GUI.voxelModels
 		
 		private function selectedModelChanged(e:UIRegionModelEvent):void 
 		{
+			if ( null == e.voxelModel && _parentModel == e.parentVM )
+				childPanelRemove();
 			// true if our child changed the model
-			if ( e.parentVM == _parentModel ) {
+			else if ( e.parentVM == _parentModel ) {
 				childPanelAdd( e.voxelModel );
 				animationPanelAdd( e.voxelModel );
 			}
