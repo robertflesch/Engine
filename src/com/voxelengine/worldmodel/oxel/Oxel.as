@@ -2872,6 +2872,16 @@ package com.voxelengine.worldmodel.oxel
 			}
 		}
 		
+		public function reset():void {
+			if ( _lighting )
+				_lighting.reset()
+			if ( _flowInfo )
+				_flowInfo.reset( this );			
+			quadsDeleteAll();
+			faces_clear_all();
+			faces_mark_all_clean();
+		}
+		
 		public function lightingReset():void {
 
 			if ( childrenHas() )
