@@ -161,7 +161,7 @@ package com.voxelengine.worldmodel
 			
 			//if ( Keyboard.HOME == $ke.keyCode ) 									resetCamera();
 			//if ( Keyboard.KEYNAME_BREAK == $ke.keyCode ) 							resetPosition()
-			//if ( 69 == $ke.keyCode || Keyboard.SPACE == $ke.keyCode )				_s_up = true; 
+			if ( 69 == $ke.keyCode || Keyboard.SPACE == $ke.keyCode )				_s_up = true; 
 		}
 		
 		static private function keyUp( $ke:KeyboardEvent ):void 
