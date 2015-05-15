@@ -108,11 +108,13 @@ public class ModelMakerGenerate {
 			_ii.modelGuid = _vmm.modelGuid = _vmd.modelGuid = Globals.getUID();
 			_vmi.fileName = "";
 			
-			var vm:* = ModelMakerBase.instantiate( _ii, _vmi, _vmm, ba, versionInfo );
+			var vm:* = ModelMakerBase.instantiate( _ii, _vmi );
 			if ( vm ) {
 				vm.data = _vmd;
+				vm.version = versionInfo.version;
+				vm.init( _vmi, _vmm );
+				vm.fromByteArray( ba );
 				vm.changed = true;
-				vm.stateLock( true, 10000 );
 				vm.save();
 				Region.currentRegion.modelCache.add( vm );
 			}

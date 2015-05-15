@@ -153,12 +153,16 @@ public class ModelMakerImport extends ModelMakerBase {
 			_ii.modelGuid = _vmm.modelGuid = _vmd.modelGuid = Globals.getUID();
 			_vmi.fileName = "";
 			
-			var vm:* = instantiate( _ii, _vmi, _vmm, ba, versionInfo );
+			var vm:* = instantiate( _ii, _vmi ) //, _vmm, ba, versionInfo );
 			if ( vm ) {
 				vm.data = _vmd;
-				vm.changed = true;
+				vm.version = versionInfo.version;
+				vm.init( _vmi, _vmm );
+				vm.fromByteArray( ba );
 				vm.modelInfo.animationsLoad( vm );			
 				vm.stateLock( true, 10000 );
+				vm.complete = true;
+				vm.changed = true;
 				vm.save();
 				Region.currentRegion.modelCache.add( vm );
 			}

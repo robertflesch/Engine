@@ -153,7 +153,7 @@ public class ModelMakerBase {
 	}
 	
 	// Makes sense
-	static public function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo, $vmm:ModelMetadata, $ba:ByteArray, $versionInfo:Object ):* {
+	static public function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo ):VoxelModel {
 		var modelAsset:String = $modelInfo.modelClass;
 		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
 		var vm:VoxelModel = new modelClass( $ii );
@@ -161,12 +161,6 @@ public class ModelMakerBase {
 			throw new Error( "ModelMakerBase.instantiate - Model failed in creation - modelClass: " + modelClass );
 			return null;
 		}
-			
-		vm.init( $modelInfo, $vmm );
-
-		vm.version = $versionInfo.version;
-		vm.fromByteArray( $ba );
-		vm.complete = true;
 		
 		//Log.out( "ModelMakerBase.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
 		return vm;
