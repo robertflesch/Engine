@@ -94,13 +94,10 @@ public class ModelData
 	private function createSucceed( $pe:PersistanceEvent ):void { 
 		if ( Globals.DB_TABLE_MODELS_DATA != $pe.table )
 			return;
-		if ( $pe.dbo ) {
+		if ( $pe.dbo )
 			_dbo = $pe.dbo;
-			//Log.out( "ModelData.createSuccess - created: " + modelGuid + "  DBO FOUND", Log.DEBUG ); 
-		}
-		else
-			Log.out( "ModelData.createSuccess - created: " + modelGuid + "  NO NO NO DBO FOUND <<<<<<<<<<<<<<<<<<<<<<<<<<", Log.DEBUG ); 
 		removeSaveEvents();
+		Log.out( "ModelData.createSuccess - created: " + modelGuid + "  DBO FOUND", Log.DEBUG ); 
 	}	
 	
 	private function createFailed( $pe:PersistanceEvent ):void  {

@@ -85,8 +85,8 @@ package com.voxelengine.GUI
 					continue;
 				if ( "INVALID" != item.name && "BRAND" != item.name && -1 == item.name.indexOf( "EDIT" ) && item.placeable )
 					_cbType.addItem( item.name, item.type );
-				else	
-					Log.out( "WindowModelChoice.construct - rejecting: " + item.name, Log.WARN );
+//				else	
+//					Log.out( "WindowModelChoice.construct - rejecting: " + item.name, Log.WARN );
 			}
 			
 			_cbType.selectedIndex = 0;
