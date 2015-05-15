@@ -60,8 +60,8 @@ public class VoxelModel
 	protected 	var	_instanceInfo:InstanceInfo; 											// INSTANCE NOT EXPORTED
 	private 	var	_oxel:Oxel; 															// INSTANCE NOT EXPORTED
 	protected 	var	_shaders:Vector.<Shader>        			= new Vector.<Shader>;		// INSTANCE NOT EXPORTED
-	protected 	var	_childrenLoaded:Boolean;
-	protected 	var	_animationsLoaded:Boolean;
+	protected 	var	_childrenLoaded:Boolean						= true;
+	protected 	var	_animationsLoaded:Boolean					= true;
 	protected 	var	_children:Vector.<VoxelModel> 				= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
 	private		var	_statisics:ModelStatisics 					= new ModelStatisics(); 	// INSTANCE NOT EXPORTED
 	private		var	_camera:Camera								= new Camera();
@@ -193,6 +193,7 @@ public class VoxelModel
 		{
 			Log.out( "VoxelModel.childrenLoad - loading " + _modelInfo.children.length + " children for model name: " + _metadata.name );
 			childrenLoaded	= false;
+			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			//Log.out( "VoxelModel.processClassJson name: " + metadata.name + " - loading child models START" );
 			for each (var childInstanceInfo:InstanceInfo in _modelInfo.children)
 			{
@@ -214,7 +215,6 @@ public class VoxelModel
 				ModelMakerBase.load( childInstanceInfo, true, false );
 			}
 			Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + _metadata.name );
-			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			_modelInfo.childrenReset();
 			//Log.out( "VoxelModel.processClassJson - loading child models END" );
 		}
@@ -974,7 +974,7 @@ public class VoxelModel
 		}
 		
 		if ( !changed ) {
-			//Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.modelGuid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
+			Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.modelGuid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 			return;
 		}
 		if ( !Globals.online ) {
@@ -983,15 +983,15 @@ public class VoxelModel
 		}
 		
 		if (  false == childrenLoaded ) {
-			//Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name, Log.DEBUG );
+			Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name, Log.DEBUG );
 			return;
 		}
 			
 		if (  false == animationsLoaded ) {
-			//Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name, Log.DEBUG );
+			Log.out( "VoxelModel.save - animations not loaded name: " + _metadata.name, Log.DEBUG );
 			return;
 		}
-		//Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.modelGuid: " + metadata.modelGuid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
+		Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.modelGuid: " + metadata.modelGuid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 		//if ( null != metadata.permissions.templateGuid )
 			//metadata.permissions.templateGuid = "";
 				

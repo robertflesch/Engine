@@ -297,16 +297,14 @@ package com.voxelengine.worldmodel.models
 		// Dont load the animations until the model is instaniated
 		public function animationsLoad( $owner:VoxelModel ):void {
 			_owner = $owner;
+			owner.animationsLoaded = true;
 			_modelGuid = $owner.instanceInfo.modelGuid;
-			if ( 0 == _animationInfo.length ) {
-				owner.animationsLoaded = true;
-				return;
-			}
-				
+			
 			AnimationEvent.addListener( ModelBaseEvent.DELETE, deleteHandler );
 			AnimationEvent.addListener( ModelBaseEvent.ADDED, animationAdd );
 			_series = 0;
 			for each ( var animData:Object in _animationInfo ) {
+				owner.animationsLoaded = false;
 				_animationCount++; 
 				
 				// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
