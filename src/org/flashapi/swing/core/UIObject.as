@@ -2888,7 +2888,7 @@ package org.flashapi.swing.core {
 			super.addEventListener(type, listener, useCapture, priority, useWeakReference);
 			switch(type) {
 				case UIOEvent.INITIALIZED :
-					if (_isInitialized = true) dispatchUIOEvent(UIOEvent.INITIALIZED);
+					if (true ==_isInitialized) dispatchUIOEvent(UIOEvent.INITIALIZED);
 					break;
 				case UIMouseEvent.CLICK :
 					$evtColl.addEvent(spas_internal::uioSprite, MouseEvent.CLICK, onClick);
@@ -3978,7 +3978,8 @@ package org.flashapi.swing.core {
 			else if (!$uiManager.spas_internal::isInitialized()) $uiManager.initialize(this.stage);
 			if (!isNull(this.stage)) {
 				spas_internal::isComponent = true;
-				$target = $parent = super;
+//				$target = $parent = super;
+				$target = $parent;
 				spas_internal::lafDTO.width = $width = super.width;
 				spas_internal::lafDTO.height = $height = super.height;
 				super.scaleX = super.scaleY = 1;

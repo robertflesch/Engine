@@ -933,6 +933,7 @@ package org.flashapi.swing {
 			this.reset();
 			$objList.clear();
 			_dataLength = 0;
+			$selectedIndex = -1;
 			var l:int = _selectItemNum - 1;
 			for (;  l >= 0;  l--) resetSelectItem(l);
 			_vScroll.value = _currentDataCursor = 0;
