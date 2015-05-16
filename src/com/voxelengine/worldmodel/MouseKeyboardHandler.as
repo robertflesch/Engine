@@ -59,36 +59,27 @@ package com.voxelengine.worldmodel
 		static public function get alt():Boolean 						{ return _s_alt; }
 		
 		
-		public function MouseKeyboardHandler() 
-		{
-		}
+		public function MouseKeyboardHandler()  {}
 		
-		static public function fullScreenEvent(event:FullScreenEvent):void {
+		static public function fullScreenEvent(event:FullScreenEvent):void { 
 			if ( event.fullScreen )
-			{
 				Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMove );
-			}
 			else if ( !event.fullScreen )
-			{
 				Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMove );
-			}			
 		}
 		
 		// this is only used in full screen mode
-		static private function onMove( event: MouseEvent) : void
-		{
+		static private function onMove( event: MouseEvent) : void {
 			_s_x += event.movementX;
 			_s_y += event.movementY;
 		}
 		
-		static public function getMouseXChange():int
-		{
+		static public function getMouseXChange():int {
 			if ( (Globals.openWindowCount || Log.showing) )
 				return 0;
 				
 			var val:Number = 0;
-			if ( Globals.g_app.stage.mouseLock )
-			{
+			if ( Globals.g_app.stage.mouseLock ) {
 				val = _s_x * 50;
 				_s_x = 0;
 			}
@@ -98,14 +89,12 @@ package com.voxelengine.worldmodel
 			return val ;
 		}
 		
-		static public function getMouseYChange():int
-		{
+		static public function getMouseYChange():int {
 			if ( (Globals.openWindowCount || Log.showing) )
 				return 0;
 				
 			var val:Number = 0;
-			if ( Globals.g_app.stage.mouseLock )
-			{
+			if ( Globals.g_app.stage.mouseLock ) {
 				val = _s_y * 50;
 				_s_y = 0;
 			}
@@ -115,10 +104,8 @@ package com.voxelengine.worldmodel
 			return val;
 		}
 		
-		static private function addInputListeners():void 
-		{
-			if ( false == _s_handlersAdded )
-			{
+		static private function addInputListeners():void {
+			if ( false == _s_handlersAdded ) {
 				_s_handlersAdded = true;
 				Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 				Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
@@ -126,10 +113,8 @@ package com.voxelengine.worldmodel
 			}
 		}
 		
-		static private function removeInputListeners():void 
-		{
-			if ( true == _s_handlersAdded )
-			{
+		static private function removeInputListeners():void {
+			if ( true == _s_handlersAdded ) {
 				_s_handlersAdded = false;
 				Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 				Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp);
@@ -137,13 +122,9 @@ package com.voxelengine.worldmodel
 			}
 		}
 		
-		static public function init():void 
-		{
-			addInputListeners();
-		}
+		static public function init():void  { addInputListeners(); }
 		
-		static public function reset():void
-		{
+		static public function reset():void {
 			_s_forward = false;		
 			_s_backward = false;			
 			_s_left = false;			
@@ -155,28 +136,24 @@ package com.voxelengine.worldmodel
 			_s_alt = false;			
 		}
 		
-		static private function keyDown( $ke:KeyboardEvent):void 
-		{
+		static private function keyDown( $ke:KeyboardEvent):void {
 			processKey( $ke, true );
 			
 			//if ( Keyboard.HOME == $ke.keyCode ) 									resetCamera();
 			//if ( Keyboard.KEYNAME_BREAK == $ke.keyCode ) 							resetPosition()
-			if ( 69 == $ke.keyCode || Keyboard.SPACE == $ke.keyCode )				_s_up = true; 
 		}
 		
-		static private function keyUp( $ke:KeyboardEvent ):void 
-		{
+		static private function keyUp( $ke:KeyboardEvent ):void  {
 			processKey( $ke, false );
 		}
 		
-		static private function processKey( $ke:KeyboardEvent, $setter:Boolean):void 
-		{
+		static private function processKey( $ke:KeyboardEvent, $setter:Boolean):void  {
 			switch ($ke.keyCode) {
 				case Keyboard.CONTROL: 					_s_ctrl = $setter; break;
 				case Keyboard.SHIFT: 					_s_shift = $setter; 
 				case Keyboard.ALTERNATE: 				_s_alt = $setter; break;
 				case Keyboard.Q: 						_s_down = $setter; break;
-				case Keyboard.E: 						_s_up = $setter; break;
+				case Keyboard.E: case Keyboard.SPACE:	_s_up = $setter; break;
 				case Keyboard.W: case Keyboard.UP: 		_s_forward = $setter; break;
 				// individual use case need to disable backward
 				case Keyboard.S: case Keyboard.DOWN: 	_s_backward = $setter; break;
