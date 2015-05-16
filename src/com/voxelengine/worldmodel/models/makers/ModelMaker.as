@@ -82,17 +82,17 @@ public class ModelMaker extends ModelMakerBase {
 				return;
 			}
 			
-			var versionInfo:Object = ModelMakerBase.extractVersionInfo( ba );
+			var versionInfo:Object = extractVersionInfo( ba );
 			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion ) {
 				Log.out( "ModelMaker.createFromMakerInfo - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
 				return;
 			}
 			
-			var modelInfoObject:Object = ModelMakerBase.extractModelInfo( ba );
+			var modelInfoObject:Object = extractModelInfo( ba );
 			var mi:ModelInfo = new ModelInfo();
 			mi.initJSON( _ii.modelGuid, modelInfoObject );
 			
-			var vm:* = instantiate( _ii, mi ) //, _vmm, ba, versionInfo );
+			var vm:* = instantiate( _ii, mi );
 			if ( vm ) {
 				vm.data = _vmd;
 				vm.version = versionInfo.version;

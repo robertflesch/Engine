@@ -1811,13 +1811,13 @@ package com.voxelengine.worldmodel.oxel
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Saving and Restoring from File
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		public function toByteArray():ByteArray {
+		public function toByteArray( $ba:ByteArray ):ByteArray {
 			//  n unsigned char root grain size
-			var ba:ByteArray =  new ByteArray();
-			ba.writeByte( gc.bound );
+			$ba.writeByte( gc.bound );
 			//  n+1 oxel data
-			toByteArrayRecursive( ba );
-			return ba;
+			toByteArrayRecursive( $ba );
+			$ba.position = 0;
+			return $ba;
 		}
 		
 		private function toByteArrayRecursive( $ba:ByteArray ):void 

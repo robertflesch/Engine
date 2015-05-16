@@ -29,6 +29,7 @@ import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.*;
 import com.voxelengine.worldmodel.inventory.ObjectModel;
 import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelCache;
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
@@ -359,12 +360,12 @@ public class EditCursor extends VoxelModel
 			if ( ( CursorShapeEvent.MODEL_CHILD == _cursorShape && gciData ) 
 			    || CursorShapeEvent.MODEL_PARENT == _cursorShape
 				|| CursorShapeEvent.MODEL_AUTO == _cursorShape ) {
-				if ( oxelTexture != EDITCURSOR_INVALID ) {
+				//if ( oxelTexture != EDITCURSOR_INVALID ) {
 					if ( $alpha )
 						objectModel.drawAlpha( $mvp, $context, true );
 					else	
 						objectModel.draw( $mvp, $context, true );
-				}
+				//}
 			}
 		}
 
@@ -401,14 +402,14 @@ public class EditCursor extends VoxelModel
 				var pl:PlacementLocation = insertLocationCalculate( gciData.model );
 				if ( PlacementLocation.INVALID == pl.state ) {
 					oxelTexture = EDITCURSOR_INVALID; // ;
-					instanceInfo.positionSetComp( _gciData.gc.getModelX(), _gciData.gc.getModelY(), _gciData.gc.getModelZ() );
+//					instanceInfo.positionSetComp( _gciData.gc.getModelX(), _gciData.gc.getModelY(), _gciData.gc.getModelZ() );
 				} else {
 					oxelTexture = oxelTextureValid;
-					instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
-					if ( cursorShape == CursorShapeEvent.MODEL_CHILD || cursorShape == CursorShapeEvent.MODEL_AUTO )
-						if ( objectModel )
-							objectModel.instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
 				}
+				instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
+				if ( cursorShape == CursorShapeEvent.MODEL_CHILD || cursorShape == CursorShapeEvent.MODEL_AUTO )
+					if ( objectModel )
+						objectModel.instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
 			}
 			else if ( _cursorOperation == CursorOperationEvent.DELETE_OXEL || _cursorOperation == CursorOperationEvent.DELETE_MODEL ) {
 				instanceInfo.positionSetComp( _gciData.gc.getModelX(), _gciData.gc.getModelY(), _gciData.gc.getModelZ() );
@@ -416,10 +417,13 @@ public class EditCursor extends VoxelModel
 			buildCursorModel();	
 		} 
 		else if ( objectModel ) { // this is the INSERT_MODEL with cursorShape == MODEL_PARENT
-			var newPos:Vector3D = Player.player.instanceInfo.modelToWorld( new Vector3D( 0,0, -(objectModel.oxel.gc.size() * 2) ) );
-			objectModel.instanceInfo.positionSet = newPos;
+			oxelTexture = oxelTextureValid;
+			var vv:Vector3D = ModelCacheUtils.viewVectorNormalizedGet();
+			vv.scaleBy( objectModel.oxel.gc.size() * 2 );
+			vv = vv.add( VoxelModel.controlledModel.instanceInfo.positionGet );
+			objectModel.instanceInfo.positionSet = vv;
+			instanceInfo.positionSet = vv;
 			objectModel.update($context, elapsedTimeMS );
-			instanceInfo.positionSet = newPos;
 		}
 		
 		internal_update($context, elapsedTimeMS );
@@ -458,6 +462,8 @@ public class EditCursor extends VoxelModel
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
 			li.color = cursorColorRainbow();
 		else if ( CursorOperationEvent.INSERT_OXEL == cursorOperation && EDITCURSOR_INVALID == oxelTexture )
+			li.color = 0x00ff0000; // RED for invalid
+		else if ( CursorOperationEvent.INSERT_MODEL == cursorOperation && EDITCURSOR_INVALID == oxelTexture )
 			li.color = 0x00ff0000; // RED for invalid
 		else
 			li.color = 0xffffffff;
@@ -524,26 +530,18 @@ public class EditCursor extends VoxelModel
 	private function insertModel():void {
 		if ( CursorOperationEvent.INSERT_MODEL != cursorOperation )
 			return;
-
-		var newChild:VoxelModel
-		if ( CursorShapeEvent.MODEL_CHILD == _cursorShape ) {
-			var foundModel:VoxelModel = VoxelModel.selectedModel;
-			if ( foundModel ) {
-				newChild = objectModel.clone();
-				foundModel.childAdd( newChild );
-				Log.out( "EditCursor.insertModel - adding as CHILD", Log.WARN );
-			}
-			else 
-				Log.out( "EditCursor.insertModel - no parent model found", Log.WARN );
+		if ( EDITCURSOR_INVALID == oxelTexture )
+			return;
+			
+		if ( VoxelModel.selectedModel && ( CursorShapeEvent.MODEL_CHILD == _cursorShape || CursorShapeEvent.MODEL_AUTO == _cursorShape ) ) {
+			VoxelModel.selectedModel.childAdd( objectModel.clone() );
+			Log.out( "EditCursor.insertModel - adding as CHILD", Log.WARN );
 		}
-		else {  //  CursorShapeEvent.MODEL_PARENT || CursorShapeEvent.MODEL_AUTO == _cursorShape
-			// same model, new instance.
+		else {  
+			Region.currentRegion.modelCache.add( objectModel.clone() );
 			Log.out( "EditCursor.insertModel - adding as PARENT", Log.WARN );
-			newChild = objectModel.clone();
-			var newPos:Vector3D = Player.player.instanceInfo.modelToWorld( new Vector3D( 0,0, -(newChild.oxel.gc.size() * 2) ) );
-			newChild.instanceInfo.positionSet = newPos;
-			Region.currentRegion.modelCache.add( newChild );
 		}
+		
 	}
 	
 	private function insertOxel(recurse:Boolean = false):void {
