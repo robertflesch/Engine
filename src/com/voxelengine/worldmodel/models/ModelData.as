@@ -53,6 +53,15 @@ public class ModelData
 		//save();
 	//}
 	
+	public function clone():ModelData {
+		var vmd:ModelData = new ModelData( _modelGuid );
+		vmd._dbo = dbo; // Can I just reference this? They are pointing to same object
+		var ba:ByteArray = new ByteArray();
+		ba.writeBytes( _compressedBA, 0, _compressedBA.length );
+		vmd._compressedBA = ba;
+		return vmd;
+	}
+	
 	public function save( ba:ByteArray ):void {
 		if ( Globals.online ) {
 			Log.out( "ModelData.save - Saving ModelData: " + modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );

@@ -384,20 +384,27 @@ public class VoxelModel
 	}
 	
 	public function clone():VoxelModel {
-		var mi:ModelInfo = modelInfo.clone();
+
+		// same model guid
+		var mi:ModelInfo = modelInfo.clone( this );
+		// new instance guid
 		var ii:InstanceInfo = instanceInfo.clone();
-		var ba:ByteArray = oxel.toByteArray();
-		// need modified date
+		// get the current oxels config
+		var ba:ByteArray = new ByteArray();
+		ba = oxel.toByteArray( ba );
+		// should clone decrement the copy count? TODO
 		var vmm:ModelMetadata = metadata.clone();
+		var vmd:ModelData = data.clone();
 		
-		var vm:VoxelModel = new VoxelModel(ii);
-		vm.init( mi, vmm, false );
-		vm.version = version;
-		vm.oxel = OxelPool.poolGet();
-		ba.position = 0;
-		vm.fromByteArray( ba );
-		vm.data = new ModelData( ii.modelGuid );
-		vm.complete = true;
+		var vm:* = ModelMakerBase.instantiate( ii, mi );
+		if ( vm ) {
+			vm.data = vmd;
+			vm.version = version;
+			vm.init( mi, vmm );
+			vm.fromByteArray( ba );
+			vm.modelInfo.animationsLoad( vm );
+			vm.complete = true;
+		}
 		return vm;
 	}
 	
@@ -1004,18 +1011,12 @@ public class VoxelModel
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Loading and Saving Voxel Models
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private function toByteArray():ByteArray
-	{
+	private function toByteArray():ByteArray {
 		var ba:ByteArray = new ByteArray();
-		
 		writeVersionedHeader( ba );
 		writeManifest( ba );
-
-		var oxelBA:ByteArray = oxel.toByteArray();
-		ba.writeBytes( oxelBA, 0, oxelBA.length );
-		
+		ba = oxel.toByteArray( ba );
 		return ba;
-		
 		
 		function writeManifest( $ba:ByteArray ):void {
 			
@@ -1035,15 +1036,12 @@ public class VoxelModel
 		}
 	}
 	
+	// used by the generate functions.
 	static public function oxelAsBasicModel( $oxel:Oxel ):ByteArray {
 		var ba:ByteArray = new ByteArray();
-		
 		writeVersionedHeader( ba );
 		writeEmptyManifest( ba );
-		
-		var oxelBA:ByteArray = $oxel.toByteArray();
-		ba.writeBytes( oxelBA, 0, oxelBA.length );
-		
+		ba = $oxel.toByteArray( ba );
 		return ba;
 		
 		function writeEmptyManifest( $ba:ByteArray ):void {

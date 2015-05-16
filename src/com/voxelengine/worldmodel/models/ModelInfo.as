@@ -84,42 +84,13 @@ package com.voxelengine.worldmodel.models
 			_animationInfo = null;
 		}
 		
-		public function clone( $newGuid:String = null ):ModelInfo
+		public function clone( $vm:VoxelModel ):ModelInfo
 		{
-			//throw new Error( "ModelInfo.clone - what context is this used in?" );
-			var newModelInfo:ModelInfo = new ModelInfo();
-
-			if ( $newGuid )
-				newModelInfo._modelGuid		= $newGuid;
-			else	
-				newModelInfo._modelGuid		= this._modelGuid;
-				
-			newModelInfo._owner			= this._owner;
-			newModelInfo._modelClass	= this.modelClass;
-			newModelInfo._grainSize		= this.grainSize;
-			// need to copy this?
-			newModelInfo._modelJson		= cloneObject( this._modelJson );
-			newModelInfo._childCount	= this._childCount;
-			
-			if ( _biomes )
-				newModelInfo._biomes 		= _biomes.clone();
-			
-			// This clone is important, and it creates a unique instance for each child
-			// otherwise the children all share the same instanceInfo, which is not good
-			for each ( var ii:InstanceInfo in _children ) {
-				newModelInfo.childAdd( ii.clone() );
-			}
-			// The cloning here was overwriting changes I made during the repeat stage
-			// I think that each ii is already unique, or SHOULD be.
-
-			for each ( var script:String in _scripts )
-				newModelInfo._scripts.push( script );
-			
-			for each ( var animation:Animation in _animations )
-				newModelInfo._animations.push( animation );
-			
-				
-			return newModelInfo;
+			var obj:Object = new Object();
+			$vm.buildExportObject( obj );
+			var mi:ModelInfo = new ModelInfo();
+			mi.initJSON( $vm.modelInfo.modelGuid, obj );
+			return mi;
 		}
 		
 		public function buildExportObject( obj:Object ):void {
@@ -132,10 +103,8 @@ package com.voxelengine.worldmodel.models
 			if ( _grainSize ) {
 				obj.model.grainSize =  _grainSize;
 			}
-			
 					
 			function animationsGet( obj:Object ):void {
-				
 				var len:int = _animations.length;
 				var oa:Vector.<Object> = new Vector.<Object>();
 				for ( var index:int; index < len; index++ ) {
@@ -146,15 +115,11 @@ package com.voxelengine.worldmodel.models
 					Log.out( "ModelInfo.animationsGet - animation.metadata: " + _animations[index].metadata );
 					oa.push( ao );
 				}
-				
-				if ( 0 < oa.length )
-					obj.animations = oa;
-				else
-					oa = null;
+				if ( 0 < oa.length ) obj.animations = oa;
+				else                 oa = null;
 			}
 			
 			function modelsScriptOnly( obj:Object ):void {
-				
 				var oa:Vector.<Object> = new Vector.<Object>();
 				var len:int = _scripts.length;
 				for ( var index:int; index < len; index++ ) {
@@ -163,10 +128,8 @@ package com.voxelengine.worldmodel.models
 					Log.out( "ModelInfo.modelsScriptOnly - script: " + _scripts[index] );
 					oa.push( so );
 				}
-				if ( 0 < oa.length )
-					obj.scripts = oa;
-				else
-					oa = null;
+				if ( 0 < oa.length ) obj.scripts = oa;
+				else                 oa = null;
 			}
 		} 	
 		
