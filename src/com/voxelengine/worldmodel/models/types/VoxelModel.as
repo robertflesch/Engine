@@ -1092,13 +1092,6 @@ public class VoxelModel
 		gct.grain = rootGrainSize;
 		_statisics.gather( version, $ba, rootGrainSize);
 		
-//		oxel = Oxel.initializeRoot(rootGrainSize, instanceInfo.baseLightLevel);
-		
-		//oxelReset();
-		//oxel = OxelPool.poolGet();
-		//Lighting.defaultBaseLightAttn = instanceInfo.baseLightLevel;
-		//oxel.lighting = LightingPool.poolGet( instanceInfo.baseLightLevel );
-		
 		registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);	
 		registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);	
 		if (Globals.VERSION_000 == version)

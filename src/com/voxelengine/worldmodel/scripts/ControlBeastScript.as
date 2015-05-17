@@ -6,7 +6,7 @@ package com.voxelengine.worldmodel.scripts
  */
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.events.OxelEvent;
+import com.voxelengine.events.TriggerEvent;
 import com.voxelengine.GUI.WindowBeastControlQuery;
 import com.voxelengine.GUI.actionBars.WindowBeastControl;
 import com.voxelengine.worldmodel.models.InstanceInfo;
@@ -18,11 +18,11 @@ public class ControlBeastScript extends Script
 {
 	public function ControlBeastScript() 
 	{
-		OxelEvent.addListener( OxelEvent.INSIDE, onInsideEvent );
-		OxelEvent.addListener( OxelEvent.OUTSIDE, onOutsideEvent );
+		TriggerEvent.addListener( TriggerEvent.INSIDE, onInsideEvent );
+		TriggerEvent.addListener( TriggerEvent.OUTSIDE, onOutsideEvent );
 	}
 	
-	public function onInsideEvent( $event:OxelEvent ):void 
+	public function onInsideEvent( $event:TriggerEvent ):void 
 	{
 		if ( instanceGuid != $event.instanceGuid )
 		{
@@ -32,7 +32,7 @@ public class ControlBeastScript extends Script
 			
 		//Log.out( "ControlObjectScript.onInsideEvent: " + $event );
 
-		if ( $event.type == OxelEvent.INSIDE )
+		if ( $event.type == TriggerEvent.INSIDE )
 		{
 			if ( null == WindowBeastControlQuery.currentInstance && null == WindowBeastControl.currentInstance )
 			{
@@ -51,7 +51,7 @@ public class ControlBeastScript extends Script
 		}
 	}
 	
-	public function onOutsideEvent( $event:OxelEvent ):void 
+	public function onOutsideEvent( $event:TriggerEvent ):void 
 	{
 		if ( instanceGuid != $event.instanceGuid )
 		{
@@ -66,8 +66,8 @@ public class ControlBeastScript extends Script
 	}
 	
 	override public function dispose():void { 
-		OxelEvent.removeListener( OxelEvent.INSIDE, onInsideEvent );
-		OxelEvent.removeListener( OxelEvent.OUTSIDE, onOutsideEvent );
+		TriggerEvent.removeListener( TriggerEvent.INSIDE, onInsideEvent );
+		TriggerEvent.removeListener( TriggerEvent.OUTSIDE, onOutsideEvent );
 	}
 	
 }

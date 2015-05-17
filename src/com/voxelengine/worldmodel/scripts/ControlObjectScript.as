@@ -9,7 +9,7 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.GUI.actionBars.WindowGunControl;
 	import com.voxelengine.GUI.WindowShipControlQuery;
 	import com.voxelengine.worldmodel.scripts.Script;
-	import com.voxelengine.events.OxelEvent;
+	import com.voxelengine.events.TriggerEvent;
 	import com.voxelengine.Log;
 	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -20,11 +20,11 @@ package com.voxelengine.worldmodel.scripts
 				
 		public function ControlObjectScript() 
 		{
-			OxelEvent.addListener( OxelEvent.INSIDE, onInsideEvent, true, 0, true);
-			OxelEvent.addListener( OxelEvent.OUTSIDE, onOutsideEvent, true, 0, true);
+			TriggerEvent.addListener( TriggerEvent.INSIDE, onInsideEvent, true, 0, true);
+			TriggerEvent.addListener( TriggerEvent.OUTSIDE, onOutsideEvent, true, 0, true);
 		}
 		
-		public function onInsideEvent( $event:OxelEvent ):void 
+		public function onInsideEvent( $event:TriggerEvent ):void 
 		{
 			if ( instanceGuid != $event.instanceGuid )
 			{
@@ -34,7 +34,7 @@ package com.voxelengine.worldmodel.scripts
 				
 			//Log.out( "ControlObjectScript.onInsideEvent: " + $event );
 
-			if ( $event.type == OxelEvent.INSIDE )
+			if ( $event.type == TriggerEvent.INSIDE )
 			{
 				if ( !WindowShipControl.currentInstance && !WindowGunControl.currentInstance )
 				{
@@ -48,7 +48,7 @@ package com.voxelengine.worldmodel.scripts
 			}
 		}
 		
-		public function onOutsideEvent( $event:OxelEvent ):void 
+		public function onOutsideEvent( $event:TriggerEvent ):void 
 		{
 			if ( instanceGuid != $event.instanceGuid )
 			{
@@ -66,8 +66,8 @@ package com.voxelengine.worldmodel.scripts
 		}
 		
 		override public function dispose():void { 
-			OxelEvent.addListener( OxelEvent.INSIDE, onInsideEvent, true, 0, true);
-			OxelEvent.addListener( OxelEvent.OUTSIDE, onOutsideEvent, true, 0, true);
+			TriggerEvent.addListener( TriggerEvent.INSIDE, onInsideEvent, true, 0, true);
+			TriggerEvent.addListener( TriggerEvent.OUTSIDE, onOutsideEvent, true, 0, true);
 		}
 	}
 

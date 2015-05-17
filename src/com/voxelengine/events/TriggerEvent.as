@@ -7,7 +7,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.events
 {
-import com.voxelengine.worldmodel.oxel.Oxel;
 import flash.events.Event;
 import flash.events.EventDispatcher;
 
@@ -16,13 +15,16 @@ import flash.events.EventDispatcher;
  * @author Robert Flesch - RSF 
  * 
  */
-public class OxelEvent extends ModelBaseEvent
+public class TriggerEvent extends Event
 {
-	private var _oxel:Oxel;
-
-	public function get oxel():String { return _oxel; }
+	static public const INSIDE:String 			= "INSIDE";
+	static public const OUTSIDE:String 			= "OUTSIDE";
 	
-	public function OxelEvent( $type:String, $series:int, oxel:Oxel = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	private var _instanceGuid:String = "";
+
+	public function get instanceGuid():String { return _instanceGuid; }
+	
+	public function TriggerEvent( $type:String, $owner:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
 		_instanceGuid = $owner;
@@ -30,12 +32,12 @@ public class OxelEvent extends ModelBaseEvent
 	
 	public override function clone():Event
 	{
-		return new OxelEvent(type, _oxel, bubbles, cancelable);
+		return new TriggerEvent(type, _instanceGuid, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString( "type", "oxel" );
+		return formatToString( "type", "instanceGuid" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////
@@ -51,7 +53,7 @@ public class OxelEvent extends ModelBaseEvent
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:OxelEvent ) : Boolean {
+	static public function dispatch( $event:TriggerEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 	

@@ -13,7 +13,7 @@ package com.voxelengine.worldmodel.models.types
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.worldmodel.models.*;
 	import com.voxelengine.worldmodel.*;
-	import com.voxelengine.events.OxelEvent;
+	import com.voxelengine.events.TriggerEvent;
 	import com.voxelengine.pools.GrainCursorPool;
 	import flash.display3D.Context3D;
 	import flash.geom.Vector3D;
@@ -69,7 +69,7 @@ package com.voxelengine.worldmodel.models.types
 						Log.out( "Trigger.update - INSIDE" );
 						//for each ( var iscript:Script in instanceInfo.scripts )
 						{
-							OxelEvent.dispatch( new OxelEvent( OxelEvent.INSIDE, instanceInfo.instanceGuid ) );
+							TriggerEvent.dispatch( new TriggerEvent( TriggerEvent.INSIDE, instanceInfo.instanceGuid ) );
 						}
 					}
 				} 
@@ -81,7 +81,7 @@ package com.voxelengine.worldmodel.models.types
 						Log.out( "Trigger.update - OUTSIDE" );
 						//for each ( var oscript:Script in instanceInfo.scripts )
 						{
-							OxelEvent.dispatch( new OxelEvent( OxelEvent.OUTSIDE, instanceInfo.instanceGuid ) );
+							TriggerEvent.dispatch( new TriggerEvent( TriggerEvent.OUTSIDE, instanceInfo.instanceGuid ) );
 						}
 					}
 				}
