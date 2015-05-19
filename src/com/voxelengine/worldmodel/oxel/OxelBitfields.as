@@ -12,7 +12,7 @@ package com.voxelengine.worldmodel.oxel
 	 * ...
 	 * @author Robert Flesch RSF hides the bit masking of the raw data
 	 */
-	public class OxelData
+	public class OxelBitfields
 	{
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//     Static Variables

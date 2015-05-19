@@ -47,7 +47,7 @@ package com.voxelengine.worldmodel.oxel
 	 * ...
 	 * @author Robert Flesch RSF Oxel - An OctTree / Voxel - model
 	 */
-	public class Oxel extends OxelData
+	public class Oxel extends OxelBitfields
 	{
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//     Static Variables
@@ -1866,7 +1866,7 @@ package com.voxelengine.worldmodel.oxel
 		{
 			var faceData:uint = $ba.readUnsignedInt();
 			if ( $version <= Globals.VERSION_006 )
-				initialize( $parent, $gc, OxelData.dataFromRawDataOld( faceData ), OxelData.typeFromRawDataOld( faceData ), $stats );	
+				initialize( $parent, $gc, OxelBitfields.dataFromRawDataOld( faceData ), OxelBitfields.typeFromRawDataOld( faceData ), $stats );	
 			else {
 				var typeData:uint = $ba.readUnsignedInt();
 				initialize( $parent, $gc, faceData, typeData, $stats );	
@@ -1874,13 +1874,13 @@ package com.voxelengine.worldmodel.oxel
 				
 			
 			// Bad data check
-			if ( OxelData.data_is_parent( faceData ) && TypeInfo.AIR != type )
+			if ( OxelBitfields.data_is_parent( faceData ) && TypeInfo.AIR != type )
 			{
 				Log.out( "Oxel.readVersionedData - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
 				type = TypeInfo.AIR;
 			}
 			// Check for flow and brightnessInfo
-			if ( OxelData.dataHasAdditional( faceData ) )
+			if ( OxelBitfields.dataHasAdditional( faceData ) )
 			{
 				if ( !flowInfo )
 					flowInfo = new FlowInfo();
@@ -1908,7 +1908,7 @@ package com.voxelengine.worldmodel.oxel
 				lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
 			}
 			
-			if ( OxelData.data_is_parent( faceData ) )
+			if ( OxelBitfields.data_is_parent( faceData ) )
 			{
 				_children = ChildOxelPool.poolGet();
 				var gct:GrainCursor = GrainCursorPool.poolGet( $stats.largest );
@@ -1929,13 +1929,13 @@ package com.voxelengine.worldmodel.oxel
 		{
 			var oxelData:uint = $ba.readInt();
 			//trace( intToHexString() + "  " + oxelData );
-			initialize( $parent, $gc, oxelData, OxelData.typeFromRawDataOld( oxelData ), $stats );
-			if ( OxelData.data_is_parent( oxelData ) && TypeInfo.AIR != type )
+			initialize( $parent, $gc, oxelData, OxelBitfields.typeFromRawDataOld( oxelData ), $stats );
+			if ( OxelBitfields.data_is_parent( oxelData ) && TypeInfo.AIR != type )
 			{
 				Log.out( "Oxel.readData - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
 				type = TypeInfo.AIR;
 			}
-			if ( OxelData.data_is_parent( oxelData ) )
+			if ( OxelBitfields.data_is_parent( oxelData ) )
 			{
 				_children = ChildOxelPool.poolGet();
 				var gct:GrainCursor = GrainCursorPool.poolGet( $stats.rootSize );

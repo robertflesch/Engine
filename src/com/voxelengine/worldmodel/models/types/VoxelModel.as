@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.worldmodel.oxel.OxelBitfields;
 import flash.display3D.Context3D;
 import flash.events.KeyboardEvent;
 import flash.events.TimerEvent;
@@ -39,7 +40,6 @@ import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 import com.voxelengine.worldmodel.oxel.LightInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.oxel.OxelData;
 import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.tasks.flowtasks.Flow;
@@ -54,7 +54,7 @@ import com.voxelengine.worldmodel.weapons.Projectile;
  */
 public class VoxelModel
 {
-	private 	var _data:ModelData;
+	private 	var _data:OxelData;
 	private 	var	_metadata:ModelMetadata;
 	protected 	var	_modelInfo:ModelInfo; 													// INSTANCE NOT EXPORTED
 	protected 	var	_instanceInfo:InstanceInfo; 											// INSTANCE NOT EXPORTED
@@ -86,8 +86,8 @@ public class VoxelModel
 				
 	protected function get initialized():Boolean 				{ return _initialized; }
 	protected function set initialized( val:Boolean ):void		{ _initialized = val; }
-	public	function get data():ModelData    					{ return _data; }
-	public	function set data(val:ModelData):void   			{ _data = val; }
+	public	function get data():OxelData    					{ return _data; }
+	public	function set data(val:OxelData):void   				{ _data = val; }
 	public	function get metadata():ModelMetadata    			{ return _metadata; }
 	public	function set metadata(val:ModelMetadata):void   	{ _metadata = val; }
 	public	function get usesGravity():Boolean 					{ return _usesGravity; }
@@ -396,7 +396,7 @@ public class VoxelModel
 		ba = oxel.toByteArray( ba );
 		// should clone decrement the copy count? TODO
 		var vmm:ModelMetadata = metadata.clone();
-		var vmd:ModelData = data.clone();
+		var vmd:OxelData = data.clone();
 		
 		var vm:* = ModelMakerBase.instantiate( ii, mi );
 		if ( vm ) {
@@ -1327,13 +1327,13 @@ public class VoxelModel
 		var faceData:uint = $ba.readUnsignedInt();
 		var type:uint;
 		if ( version <= Globals.VERSION_006 )
-			type = OxelData.typeFromRawDataOld(faceData);
+			type = OxelBitfields.typeFromRawDataOld(faceData);
 		else {  //_version > Globals.VERSION_006
 			var typeData:uint = $ba.readUnsignedInt();
-			type = OxelData.type1FromData(typeData);
+			type = OxelBitfields.type1FromData(typeData);
 		}
 		
-		if (OxelData.data_is_parent(faceData))
+		if (OxelBitfields.data_is_parent(faceData))
 		{
 			$currentGrain--;
 			for (var i:int = 0; i < 8; i++)
