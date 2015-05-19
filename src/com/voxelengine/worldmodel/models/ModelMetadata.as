@@ -161,7 +161,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 			else
 				var obj:Object = toObject();
 
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS, modelGuid, _dbo, obj ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.BIGDB_TABLE_MODEL_METADATA, modelGuid, _dbo, obj ) );
 		}
 		else
 			Log.out( "ModelMetadata.save - Not saving metadata, either offline or NOT changed or locked - guid: " + modelGuid + "  name: " + name, Log.WARN );
@@ -182,21 +182,21 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	}
 	
 	private function saveSucceed( $pe:PersistanceEvent ):void { 
-		if ( Globals.DB_TABLE_MODELS != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		removeSaveEvents();
 		Log.out( "ModelMetadata.saveSucceed - modelGuid: " + modelGuid + "  name: " + name, Log.DEBUG ); 
 	}	
 	
 	private function saveFail( $pe:PersistanceEvent ):void { 
-		if ( Globals.DB_TABLE_MODELS != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		removeSaveEvents();
 		Log.out( "ModelMetadata.saveFail - modelGuid: " + modelGuid, Log.ERROR ); 
 	}	
 
 	private function createSucceed( $pe:PersistanceEvent ):void { 
-		if ( Globals.DB_TABLE_MODELS != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		if ( $pe.dbo )
 			_dbo = $pe.dbo;
@@ -205,7 +205,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	}	
 	
 	private function createFailed( $pe:PersistanceEvent ):void  {
-		if ( Globals.DB_TABLE_MODELS_DATA != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA != $pe.table )
 			return;
 		removeSaveEvents();
 		// TODO How do I handle the metadata for failed object?

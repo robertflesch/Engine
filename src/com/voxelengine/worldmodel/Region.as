@@ -377,7 +377,7 @@ package com.voxelengine.worldmodel
 //Log.out( "Region.save - NOT SAVING NOT SAVING NOT SAVING", Log.WARN );
 //return;	
 				//Log.out( "Region.save - PersistanceEvent.dispatch region id: " + guid + "  name: " + name + "  locking status: " + _lockDB, Log.WARN );
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_REGIONS, guid, _dbo, metadata(ba) ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.BIGDB_TABLE_REGIONS, guid, _dbo, metadata(ba) ) );
 				// or could do this in the suceed, but if it fails do I want to keep retrying?
 				changed = false;
 			}
@@ -386,14 +386,14 @@ package com.voxelengine.worldmodel
 		}
 		
 		private function saveSucceed( $pe:PersistanceEvent ):void { 
-			if ( Globals.DB_TABLE_REGIONS != $pe.table )
+			if ( Globals.BIGDB_TABLE_REGIONS != $pe.table )
 				return;
 			removeSaveEvents();
 			Log.out( "Region.saveSucceed - guid: " + guid, Log.DEBUG ); 
 		}	
 		
 		private function createSucceed( $pe:PersistanceEvent ):void { 
-			if ( Globals.DB_TABLE_REGIONS != $pe.table )
+			if ( Globals.BIGDB_TABLE_REGIONS != $pe.table )
 				return;
 			if ( $pe.dbo )
 				dbo = $pe.dbo;
@@ -402,7 +402,7 @@ package com.voxelengine.worldmodel
 		}	
 		
 		private function saveFail( $pe:PersistanceEvent ):void { 
-			if ( Globals.DB_TABLE_REGIONS != $pe.table )
+			if ( Globals.BIGDB_TABLE_REGIONS != $pe.table )
 				return;
 			removeSaveEvents();
 			Log.out( "Region.saveFail - ", Log.ERROR ); 

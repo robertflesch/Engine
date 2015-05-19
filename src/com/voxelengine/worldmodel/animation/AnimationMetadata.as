@@ -80,7 +80,7 @@ _modelClass = Animation.MODEL_DRAGON_9;
 			else {
 				var obj:Object = toObject( $ba );
 			}
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_ANIMATIONS, _guid, _dbo, obj ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.BIGDB_TABLE_ANIMATIONS, _guid, _dbo, obj ) );
 		}
 		else
 			Log.out( "AnimationMetadata.save - Not saving metadata, either offline or NOT changed or locked - guid: " + modelGuid + "  name: " + name, Log.WARN );
@@ -118,14 +118,14 @@ _modelClass = Animation.MODEL_DRAGON_9;
 	}
 	
 	private function saveSucceed( $pe:PersistanceEvent ):void { 
-		if ( Globals.DB_TABLE_ANIMATIONS != $pe.table )
+		if ( Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		removeSaveEvents();
 		Log.out( "AnimationMetadata.saveSucceed - created: " + modelGuid, Log.DEBUG ); 
 	}	
 	
 	private function createSucceed( $pe:PersistanceEvent ):void { 
-		if ( Globals.DB_TABLE_ANIMATIONS != $pe.table )
+		if ( Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		if ( $pe.dbo )
 			_dbo = $pe.dbo;
@@ -134,7 +134,7 @@ _modelClass = Animation.MODEL_DRAGON_9;
 	}	
 	
 	private function saveFail( $pe:PersistanceEvent ):void { 
-		if ( Globals.DB_TABLE_ANIMATIONS != $pe.table )
+		if ( Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		removeSaveEvents();
 		Log.out( "AnimationMetadata.saveFail - ", Log.ERROR ); 

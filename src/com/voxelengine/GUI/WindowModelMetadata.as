@@ -191,12 +191,12 @@ Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );
 			_vmm.permissions.copyCount = parseInt( _copies.label, 10 );
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.UPDATE, 0, _vmm.modelGuid, _vmm ) );
 		} else { // TYPE_IMPORT so new data
-			var dboTemp:DatabaseObject = new DatabaseObject( Globals.DB_TABLE_MODELS, _vmm.modelGuid, "1", 0, true, null );
+			var dboTemp:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, _vmm.modelGuid, "1", 0, true, null );
 			_vmm.dbo = dboTemp;
 			_vmm.toPersistance();
 			_vmm.dbo = null;
 			_vmm.release();
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.DB_TABLE_MODELS, _vmm.modelGuid, dboTemp, true ) );			
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, _vmm.modelGuid, dboTemp, true ) );			
 		}
 		remove();
 	}

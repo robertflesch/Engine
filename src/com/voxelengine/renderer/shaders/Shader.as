@@ -10,6 +10,7 @@ package com.voxelengine.renderer.shaders
 {
 	import com.voxelengine.renderer.lamps.ShaderLight;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
+	import com.voxelengine.worldmodel.TextureBank;
 	import flash.display3D.textures.Texture;
 
 	import flash.display3D.Context3D;
@@ -318,8 +319,8 @@ package com.voxelengine.renderer.shaders
 		
 		protected function update_texture( $context:Context3D ): Boolean {
 			
-			var tex0:Texture = Globals.g_textureBank.getTexture( $context, textureName );
-			//var tex1:Texture = Globals.g_textureBank.getTexture( "assets/textures/x.png" );
+			var tex0:Texture = TextureBank.instance.getTexture( $context, textureName );
+			//var tex1:Texture = TextureBank.instance.getTexture( "assets/textures/x.png" );
 			if ( !tex0 )
 			{
 				//Log.out( "Shader.update_texture - not ready textureName: " + textureName );

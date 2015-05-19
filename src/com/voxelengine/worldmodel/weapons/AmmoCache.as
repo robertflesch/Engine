@@ -51,7 +51,7 @@ public class AmmoCache
 		var ammo:Ammo = _ammoData[$ae.name]; 
 		if ( null == ammo ) {
 			if ( true == Globals.online && $ae.fromTable )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.DB_TABLE_AMMO, $ae.name ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.BIGDB_TABLE_AMMO, $ae.name ) );
 			else	
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.AMMO_EXT, $ae.name ) );
 		}
@@ -74,7 +74,7 @@ public class AmmoCache
 	
 	static private function loadSucceed( $pe:PersistanceEvent):void 
 	{
-		if ( Globals.AMMO_EXT != $pe.table && Globals.DB_TABLE_AMMO != $pe.table )
+		if ( Globals.AMMO_EXT != $pe.table && Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
 		if ( $pe.dbo || $pe.data ) {
 			//Log.out( "AmmoCache.loadSucceed guid: " + $pe.guid, Log.INFO );
@@ -102,7 +102,7 @@ public class AmmoCache
 	
 	static private function loadFailed( $pe:PersistanceEvent ):void 
 	{
-		if ( Globals.AMMO_EXT != $pe.table && Globals.DB_TABLE_AMMO != $pe.table )
+		if ( Globals.AMMO_EXT != $pe.table && Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
 		Log.out( "AmmoCache.loadNotFound this means the table is missing!" + $pe.toString(), Log.ERROR );
 		AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
@@ -110,11 +110,11 @@ public class AmmoCache
 	
 	static private function loadNotFound( $pe:PersistanceEvent):void 
 	{
-		if ( Globals.AMMO_EXT != $pe.table && Globals.DB_TABLE_AMMO != $pe.table )
+		if ( Globals.AMMO_EXT != $pe.table && Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
 		// maybe this ammo has not been loaded into the table yet, try loading it from json file
 		Log.out( "AmmoCache.loadNotFound - retrying from json " + $pe.toString(), Log.WARN );
-		if ( Globals.DB_TABLE_AMMO == $pe.table )
+		if ( Globals.BIGDB_TABLE_AMMO == $pe.table )
 			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST, $pe.series, $pe.guid, null, false ) );
 		else	
 			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );

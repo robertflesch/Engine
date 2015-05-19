@@ -1,21 +1,19 @@
 Where do I start?
 
 Known Issues
-The default screen shot of new models is has to be hand made.
-There needs an indication of which model is selected.
-When the model or voxel moves into invalid region, the cursor is not restored correctly
-When editting an instance of a model, it does not ask you if you want to change just this instance, or all instances. And doesnt save correctly
-Toolbar loses pictures of model when loading.
-The close icon sometimes acts as acancel, other times as a save.
-When you place a model, you can not stack another on top of it.
-Water edges don't allow merge perfectly
-
-New Bugs observed
-Dynamic lighting on placed models is not correct.
-I can place the same object over another of the same kind
-Objects placement and editing inside holes of other objects not right doesnt allow me to place them correctly
-Once the object placement cursor goes invalid, it never goes back to valid.
-Voxel Model list for region requires you to click on something twice after the deleting
+Model placement
+	The default screen shot of new models is has to be hand made.
+	Nice to have an indication of which model is selected.
+	When I change a model, do all the models change, or is a new instance created? not clearly in one of the other situations right now.
+	Toolbar loses pictures of model when loading.
+	When you place a model, you can not stack another on top of it. It needs to have a placeholder inserted into the oxel.
+	Dynamic lighting on placed models is not correct.
+	Object editing inside holes of other objects not correct
+GUI
+	The close icon sometimes acts as acancel, other times as a save.
+	App does not get focus when starting, so I have to click it to use enter key to log in.
+Oxel
+	Water edges don't allow merge perfectly
 
 
 https://gamesnet.yahoo.net/documentation/tutorials/flashcombopackage

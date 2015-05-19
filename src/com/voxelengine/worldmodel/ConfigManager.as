@@ -29,20 +29,6 @@ package com.voxelengine.worldmodel
 	 */
 	public class ConfigManager 
 	{
-		static private function create( $startingModel:String ):void {
-			if ( null == _s_currentInstance )
-				new ConfigManager( $startingModel );
-		}
-		
-		static private function destroy():void {
-			ConfigManager._s_currentInstance = null;
-		}
-		
-		static private var _s_currentInstance:ConfigManager = null;
-		static public function get isActive():Boolean { return _s_currentInstance ? true: false; }
-
-		/////////////////////////////////////////////////////////////////////////////////////////
-		
 		private var _showHelp:Boolean = true;
 		private var _showEditMenu:Boolean = true;
 		private var _showButtons:Boolean = true;
@@ -54,8 +40,14 @@ package com.voxelengine.worldmodel
 		
 		public function get defaultRegionJson():Object  { return _defaultRegionJson; }
 
-		public function ConfigManager( $optionalGuid:String ):void 
-		{
+		static private var _s_instance:ConfigManager;
+		static public function get instance():ConfigManager {
+			if ( null == _s_instance )
+				_s_instance = new ConfigManager();		
+			return _s_instance	
+		}
+		
+		public function init( $optionalGuid:String ):void {
 			if ( null != $optionalGuid ) {
 				// need to log onto network. has Gui been initialized at this point?
 				// this is the guid of a model to be loaded into a blank region.
@@ -63,13 +55,15 @@ package com.voxelengine.worldmodel
 				// So we need to use autologin
 				// then load the model into display, center, etc
 			}
-			else {
-				PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
-				PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFail );			
-				PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
-				
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.APP_EXT, "config", null, null ) );
-			}
+		}
+		
+		public function ConfigManager( ):void 
+		{
+			PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
+			PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFail );			
+			PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
+			
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.APP_EXT, "config", null, null ) );
 		}
 		
 		private function loadSucceed(e:PersistanceEvent):void {

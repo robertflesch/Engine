@@ -50,6 +50,13 @@ package com.voxelengine.worldmodel
 
 		private var _timer:int = getTimer();
 		
+		static private var _s_instance:TextureBank;
+		static public function get instance():TextureBank {
+			if ( null == _s_instance )
+				_s_instance = new TextureBank();		
+			return _s_instance	
+		}
+		
 		public function TextureBank( ):void 
 		{
 		}
@@ -203,6 +210,5 @@ package com.voxelengine.worldmodel
 			
 			dest.uploadFromBitmapData(src, 0);			
 		}
-		
 	}
 }

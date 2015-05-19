@@ -48,7 +48,7 @@ public class AnimationCache
 			// TODO need to clean up eventually
 		}
 		//else if its not in the cache, we can still delete it.
-		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.DB_TABLE_ANIMATIONS, $ae.aniGuid, null ) );
+		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_ANIMATIONS, $ae.aniGuid, null ) );
 	}
 	
 	
@@ -69,7 +69,7 @@ public class AnimationCache
 			ani = modelAnis[$ame.aniGuid];
 		if ( null == ani ) {
 			if ( true == Globals.online && $ame.fromTable )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.DB_TABLE_ANIMATIONS, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.BIGDB_TABLE_ANIMATIONS, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT ) );
 			else	
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT ) );
 		}
@@ -79,7 +79,7 @@ public class AnimationCache
 	
 	static private function loadSucceed( $pe:PersistanceEvent):void 
 	{
-		if ( Globals.ANI_EXT != $pe.table && Globals.DB_TABLE_ANIMATIONS != $pe.table )
+		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		if ( $pe.dbo || $pe.data ) {
 			Log.out( "AnimationCache.loadSucceed guid: " + $pe.guid, Log.INFO );
@@ -133,7 +133,7 @@ public class AnimationCache
 	
 	static private function loadFailed( $pe:PersistanceEvent ):void 
 	{
-		if ( Globals.ANI_EXT != $pe.table && Globals.DB_TABLE_ANIMATIONS != $pe.table )
+		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		Log.out( "AnimationCache.loadFailed " + $pe.toString(), Log.ERROR );
 		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
@@ -141,7 +141,7 @@ public class AnimationCache
 	
 	static private function loadNotFound( $pe:PersistanceEvent):void 
 	{
-		if ( Globals.ANI_EXT != $pe.table && Globals.DB_TABLE_ANIMATIONS != $pe.table )
+		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		Log.out( "AnimationCache.loadNotFound " + $pe.toString(), Log.ERROR );
 		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );

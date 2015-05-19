@@ -8,9 +8,7 @@
 
 package com.voxelengine.renderer 
 {
-	import com.voxelengine.renderer.shaders.Shader;
-	import com.voxelengine.worldmodel.models.types.EditCursor;
-	import com.voxelengine.worldmodel.Region;
+	import com.voxelengine.worldmodel.TextureBank;
 	import flash.display.Stage3D;
 	import flash.display.BitmapData;
 	import flash.display.Stage;
@@ -31,6 +29,10 @@ package com.voxelengine.renderer
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 
+	import com.voxelengine.renderer.shaders.Shader;
+	import com.voxelengine.worldmodel.models.types.EditCursor;
+	import com.voxelengine.worldmodel.Region;
+//	import com.voxelengine.worldmodel.TextureBank;
 	import com.voxelengine.worldmodel.models.Camera;
 	import com.voxelengine.worldmodel.models.CameraLocation;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
@@ -98,7 +100,6 @@ package com.voxelengine.renderer
 			_stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE_CONSTRAINED);
 			Log.out( "Renderer.init - requestContext3D AFTER", Log.DEBUG );			
 			//_stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE);
-			
 		}
 		
 		public function resizeEvent(event:Event):void 
@@ -148,11 +149,12 @@ package com.voxelengine.renderer
 		
 		
 		private static function dispose():void {
-			Globals.g_textureBank.dispose();
+			TextureBank.instance.dispose();
 			Region.currentRegion.modelCache.dispose();
 		};
 		
 		private static function reinitialize( $context:Context3D ):void {
+			TextureBank.instance.reinitialize( $context );
 			if ( Region.currentRegion ) {
 				Region.currentRegion.modelCache.reinitialize( $context );
 				EditCursor.currentInstance.reinitialize( $context );
@@ -291,7 +293,7 @@ package com.voxelengine.renderer
 		
 		private function backgroundColor():void 
 		{
-			if ( Globals.g_regionManager && Region.currentRegion )
+			if ( Region.currentRegion )
 			{
 				var skyColor:Vector3D = Region.currentRegion.getSkyColor();
 				// Not only does this set the color, but it appears to clear the "BackBuffer"

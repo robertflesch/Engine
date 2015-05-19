@@ -73,7 +73,7 @@ public class ModelData
 			else
 				var obj:Object = toObject();
 				
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_MODELS_DATA, modelGuid, _dbo, obj ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA, modelGuid, _dbo, obj ) );
 		}
 		else
 			Log.out( "ModelData.save - Not saving data, either offline or NOT changed or locked - guid: " + modelGuid, Log.WARN );
@@ -94,14 +94,14 @@ public class ModelData
 	}
 	
 	private function saveSucceed( $pe:PersistanceEvent ):void { 
-		if ( Globals.DB_TABLE_MODELS_DATA != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA != $pe.table )
 			return;
 		removeSaveEvents();
 		//Log.out( "ModelData.saveSucceed - save: " + modelGuid, Log.DEBUG ); 
 	}	
 	
 	private function createSucceed( $pe:PersistanceEvent ):void { 
-		if ( Globals.DB_TABLE_MODELS_DATA != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA != $pe.table )
 			return;
 		if ( $pe.dbo )
 			_dbo = $pe.dbo;
@@ -110,7 +110,7 @@ public class ModelData
 	}	
 	
 	private function createFailed( $pe:PersistanceEvent ):void  {
-		if ( Globals.DB_TABLE_MODELS_DATA != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA != $pe.table )
 			return;
 		removeSaveEvents();
 		// TODO How do I handle the metadata for failed object?
@@ -119,7 +119,7 @@ public class ModelData
 	}
 	
 	private function saveFail( $pe:PersistanceEvent ):void { 
-		if ( Globals.DB_TABLE_MODELS_DATA != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA != $pe.table )
 			return;
 		removeSaveEvents();
 		Log.out( "ModelData.saveFail - ", Log.ERROR ); 

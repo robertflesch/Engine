@@ -162,13 +162,13 @@ public class WindowRegionDetail extends VVPopup
 	private function save( e:UIMouseEvent ):void {
 		
 		if ( _create ) {
-			var dboTemp:DatabaseObject = new DatabaseObject( Globals.DB_TABLE_REGIONS, _region.guid, "1", 0, true, null );
+			var dboTemp:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_REGIONS, _region.guid, "1", 0, true, null );
 			_region.dbo = dboTemp;
 			_region.toPersistance();
 			// remove the event listeners on this temporary object
 			_region.release();
 			// This tell the region manager to add it to the region list
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.DB_TABLE_REGIONS, _region.guid, dboTemp, true ) );			
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, dboTemp, true ) );			
 			// This tell the region to save itself!
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, _region.guid ) );
 		}

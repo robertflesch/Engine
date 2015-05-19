@@ -44,7 +44,7 @@ public class WindowCrafting extends VVPopup
 		addElement( _recipeList );
 		
 		// This makes sure the crafting manager is running
-		Globals.craftingManagerCreate();
+		CraftingManager.instance;
 		
 		display();
 		

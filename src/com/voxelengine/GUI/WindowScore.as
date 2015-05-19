@@ -25,13 +25,11 @@ package com.voxelengine.GUI
 		private var _heading:Slider = null;
 		private var _loc:Text = null;
 		private var _repeatTimer:Timer = null;
-		static public function get instance():WindowScore
-		{ 
+		static public function get instance():WindowScore { 
 			if ( null == _s_currentInstance )
 				_s_currentInstance = new WindowScore();
-				
-			return _s_currentInstance; }
-			
+			return _s_currentInstance; 
+		}
 
 		public function WindowScore():void 
 		{ 

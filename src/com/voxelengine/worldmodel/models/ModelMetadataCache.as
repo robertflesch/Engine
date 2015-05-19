@@ -87,7 +87,7 @@ public class ModelMetadataCache
 			mmd = null;
 			// TODO need to clean up eventually
 		}
-		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mde.series, Globals.DB_TABLE_MODELS, $mde.modelGuid, null ) );
+		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mde.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mde.modelGuid, null ) );
 	}
 	
 	static private function created($mme:ModelMetadataEvent):void  { add( 0, $mme.vmm ); }
@@ -118,7 +118,7 @@ public class ModelMetadataCache
 		//Log.out( "MetadataManager.request guid: " + $mme.modelGuid, Log.INFO );
 		var vmm:ModelMetadata = _metadata[$mme.modelGuid]; 
 		if ( null == vmm )
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mme.series, Globals.DB_TABLE_MODELS, $mme.modelGuid ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid ) );
 		else
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.modelGuid, vmm ) );
 	}
@@ -129,14 +129,14 @@ public class ModelMetadataCache
 		// For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $vmm.guid, $vmm ) event
 		if ( Network.PUBLIC == $mme.modelGuid ) {
 			if ( false == _initializedPublic ) {
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.DB_TABLE_MODELS, Network.PUBLIC, null, Globals.DB_INDEX_VOXEL_MODEL_OWNER ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, Network.PUBLIC, null, Globals.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
 				_initializedPublic = true;
 			}
 		}
 			
 		if ( Network.userId == $mme.modelGuid ) {
 			if ( false == _initializedPrivate ) {
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.DB_TABLE_MODELS, Network.userId, null, Globals.DB_INDEX_VOXEL_MODEL_OWNER ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, Network.userId, null, Globals.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
 				_initializedPrivate = true;
 			}
 		}
@@ -164,7 +164,7 @@ public class ModelMetadataCache
 	
 	static private function loadSucceed( $pe:PersistanceEvent):void 
 	{
-		if ( Globals.DB_TABLE_MODELS != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		if ( $pe.dbo ) {
 			//Log.out( "MetadataManager.loadSucceed guid: " + $pe.guid, Log.INFO );
@@ -182,7 +182,7 @@ public class ModelMetadataCache
 	
 	static private function loadFailed( $pe:PersistanceEvent ):void 
 	{
-		if ( Globals.DB_TABLE_MODELS != $pe.table || Globals.MODEL_INFO_EXT != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table || Globals.MODEL_INFO_EXT != $pe.table )
 			return;
 		Log.out( "MetadataManager.metadataLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
@@ -190,7 +190,7 @@ public class ModelMetadataCache
 
 	static private function loadNotFound( $pe:PersistanceEvent):void 
 	{
-		if ( Globals.DB_TABLE_MODELS != $pe.table || Globals.MODEL_INFO_EXT != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table || Globals.MODEL_INFO_EXT != $pe.table )
 			return;
 		Log.out( "MetadataManager.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );

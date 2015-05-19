@@ -35,6 +35,12 @@ public class RegionManager
 	public function get regions():Vector.<Region> { return _regions; }
 	
 	//public function get modelLoader():ModelLoader { return _modelLoader; }
+	static private var _s_instance:RegionManager;
+	static public function get instance():RegionManager {
+		if ( null == _s_instance )
+			_s_instance = new RegionManager();		
+		return _s_instance	
+	}
 	
 	public function RegionManager():void 
 	{
@@ -83,7 +89,7 @@ public class RegionManager
 		}
 		
 		if ( true == Globals.online )
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $re.series, Globals.DB_TABLE_REGIONS, $re.guid ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $re.series, Globals.BIGDB_TABLE_REGIONS, $re.guid ) );
 		else	
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $re.series, Globals.REGION_EXT, $re.guid, null, null ) );			
 	}
@@ -92,11 +98,11 @@ public class RegionManager
 		
 		if ( Network.PUBLIC == e.guid && false == _requestPublic ) {
 			_requestPublic = true;
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, e.series, Globals.DB_TABLE_REGIONS, Network.PUBLIC, null, Globals.DB_TABLE_INDEX_OWNER ) );			
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, e.series, Globals.BIGDB_TABLE_REGIONS, Network.PUBLIC, null, Globals.BIGDB_TABLE_REGIONS_INDEX_OWNER ) );			
 		}
 		if ( Network.userId == e.guid && false == _requestPrivate ) {
 			_requestPrivate = true;
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, e.series, Globals.DB_TABLE_REGIONS, Network.userId, null, Globals.DB_TABLE_INDEX_OWNER ) );			
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, e.series, Globals.BIGDB_TABLE_REGIONS, Network.userId, null, Globals.BIGDB_TABLE_REGIONS_INDEX_OWNER ) );			
 		}
 			
 		// Get a list of what we currently have
@@ -108,7 +114,7 @@ public class RegionManager
 	
 	private function loadFail( $pe:PersistanceEvent ):void 
 	{
-		if ( Globals.DB_TABLE_REGIONS != $pe.table && Globals.REGION_EXT != $pe.table )
+		if ( Globals.BIGDB_TABLE_REGIONS != $pe.table && Globals.REGION_EXT != $pe.table )
 			return;
 			
 		Log.out( "RegionManager.loadFail - region: " + $pe.guid, Log.ERROR );
@@ -117,7 +123,7 @@ public class RegionManager
 	
 	private function loadSucceed( $pe:PersistanceEvent ):void 
 	{
-		if ( Globals.DB_TABLE_REGIONS == $pe.table ) {
+		if ( Globals.BIGDB_TABLE_REGIONS == $pe.table ) {
 			//Log.out( "RegionManager.loadSucceed - creating new region: " + $pe.guid, Log.DEBUG );
 			var newRegion:Region = new Region( $pe.guid );
 			newRegion.fromPersistance( $pe.dbo );
@@ -185,7 +191,7 @@ public class RegionManager
 	
 	static public function requestDefaultRegionLoad( e:RoomEvent ):void {
 		Log.out( "RegionManager.requestDefaultRegionLoad", Log.DEBUG );
-		var defaultRegionJSON:Object = Globals.g_configManager.defaultRegionJson;
+		var defaultRegionJSON:Object = ConfigManager.instance.defaultRegionJson;
 		var defaultRegionID:String = defaultRegionJSON.config.region.startingRegion;
 		Room.createJoinRoom( defaultRegionID );	
 	}
@@ -206,7 +212,7 @@ public class RegionManager
 	
 	// Just assign the dbo from the create to the region
 	private function regionCreatedHandler( $pe:PersistanceEvent ):void {
-		if ( Globals.DB_TABLE_REGIONS != $pe.table )
+		if ( Globals.BIGDB_TABLE_REGIONS != $pe.table )
 			return;
 		
 		Log.out( "RegionManager.regionCreatedHandler: " + $pe.guid );

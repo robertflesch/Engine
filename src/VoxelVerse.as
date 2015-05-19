@@ -29,6 +29,7 @@ package {
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.GUI.VoxelVerseGUI;
+	import com.voxelengine.worldmodel.RegionManager;
 	import com.voxelengine.worldmodel.MemoryManager;
 	import com.voxelengine.worldmodel.MouseKeyboardHandler;
 	import com.voxelengine.worldmodel.Region;
@@ -97,7 +98,8 @@ package {
 			MemoryManager.update();
 			
 			var timeUpdate:int = getTimer();
-			Globals.g_regionManager.update( elapsed );
+			
+			RegionManager.instance.update( elapsed );
 			timeUpdate = getTimer() - timeUpdate;
 			
 			if ( showConsole )
@@ -283,8 +285,9 @@ class StartupSynchronizer
 		WindowSplashEvent.addListener( WindowSplashEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded );
 		WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.CREATE ) );
 		
-		Globals.g_regionManager = new RegionManager();
-		Globals.g_configManager = new ConfigManager( $startingModelToDisplay );
+		RegionManager.instance;
+		ConfigManager.instance;
+		//ConfigManager.instance.init( $startingModelToDisplay );
 		new PoolManager();
 		_complete = true;
 		startApp();

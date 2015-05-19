@@ -17,31 +17,32 @@ package com.voxelengine {
 	
 	import com.developmentarc.core.tasks.TaskController;
 	
-	import com.voxelengine.worldmodel.crafting.CraftingManager;
-	import com.voxelengine.worldmodel.RegionManager;
+	import com.voxelengine.renderer.Renderer;
+	import com.voxelengine.worldmodel.MouseKeyboardHandler;
 	import com.voxelengine.worldmodel.Sky;
-	import com.voxelengine.worldmodel.TextureBank;
 	import com.voxelengine.worldmodel.TypeInfo;
+	import com.voxelengine.worldmodel.crafting.CraftingManager;
 	import com.voxelengine.worldmodel.models.*;
+	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.oxel.OxelBad;
-	import com.voxelengine.worldmodel.models.types.Player;
-	import com.voxelengine.worldmodel.ConfigManager;
-	import com.voxelengine.worldmodel.MouseKeyboardHandler;
-	import com.voxelengine.renderer.Renderer;
 	import com.voxelengine.utils.GUID;
 
 	public class Globals  {
 		
-		static public const DB_INVENTORY_TABLE:String = "inventory";
-		static public const DB_TABLE_MODELS:String = "voxelModels";
-		static public const DB_INDEX_VOXEL_MODEL_OWNER:String = "voxelModelOwner";
-		static public const DB_TABLE_MODELS_DATA:String = "voxelModelsData";
-		static public const DB_TABLE_ANIMATIONS:String = "animations";
-		static public const DB_TABLE_AMMO:String = "ammo";
+		// Yahoo Game Networks Big DB table names
+		static public const BIGDB_TABLE_INVENTORY:String = "inventory";
+		static public const BIGDB_TABLE_MODEL_METADATA:String = "modelMetadata";
+		static public const BIGDB_TABLE_MODEL_AND_OXEL_DATA:String = "modelAndOxelData";
+		static public const BIGDB_TABLE_ANIMATIONS:String = "animations";
+		static public const BIGDB_TABLE_AMMO:String = "ammo";
+		static public const BIGDB_TABLE_REGIONS:String = "regions";
 		
-		static public const DB_TABLE_REGIONS:String = "regions";
-		static public const DB_TABLE_INDEX_OWNER:String = "regionOwner";
+		// Yahoo Game Networks Big DB table indexs
+		static public const BIGDB_TABLE_REGIONS_INDEX_OWNER:String = "owner";
+		static public const BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER:String = "owner";
+		
+		// Local file names for import
 		static public const REGION_EXT:String = ".rjson";
 		static public const APP_EXT:String = ".json";
 		static public const IVM_EXT:String = ".ivm";
@@ -52,18 +53,7 @@ package com.voxelengine {
 		static public const VOXELVERSE:String 	= "VoxelVerse";
 		public static var g_app:VoxelVerse;
 		
-		public static var g_textureBank:TextureBank = new TextureBank();
-		public static var g_regionManager:RegionManager;
-		public static var g_configManager:ConfigManager;
 		public static var g_renderer:Renderer = new Renderer();
-		
-		private static var g_craftingManager:CraftingManager;
-		public static function get craftingManager():CraftingManager { return g_craftingManager; } 
-		public static function craftingManagerCreate():void 
-		{ 
-			if ( null == g_craftingManager )
-				g_craftingManager = new CraftingManager(); 
-		} 
 		
 		public static var g_mouseKeyboardHandler:MouseKeyboardHandler = new MouseKeyboardHandler();
 
@@ -221,7 +211,6 @@ package com.voxelengine {
 		public static const MODE_PUBLIC:String = "Public";
 		public static const MODE_PRIVATE:String = "Private";
 		public static const MODE_MANAGE:String = "Manage";
-		
 		
 		private static var g_mode:String = MODE_PUBLIC;
 		public static function get mode():String { return g_mode }

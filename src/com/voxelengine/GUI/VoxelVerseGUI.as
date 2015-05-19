@@ -10,6 +10,7 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.GUI.actionBars.WindowBeastControl;
+import com.voxelengine.worldmodel.ConfigManager;
 import com.voxelengine.worldmodel.models.types.Player;
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
@@ -174,7 +175,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	private function addReleaseMenu():WindowReleaseMenu {
-		if ( Globals.g_configManager.showButtons && Globals.g_configManager.showEditMenu )
+		if ( ConfigManager.instance.showButtons && ConfigManager.instance.showEditMenu )
 		{
 			crossHairAdd();
 		}
@@ -382,7 +383,7 @@ public class VoxelVerseGUI extends EventDispatcher
 				
 		}
 		
-		if  ( Globals.g_configManager.showEditMenu )
+		if  ( ConfigManager.instance.showEditMenu )
 		{
 			if ( Keyboard.I == e.keyCode ) {
 				var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );

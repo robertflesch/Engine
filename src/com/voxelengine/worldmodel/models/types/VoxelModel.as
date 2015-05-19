@@ -59,28 +59,30 @@ public class VoxelModel
 	protected 	var	_modelInfo:ModelInfo; 													// INSTANCE NOT EXPORTED
 	protected 	var	_instanceInfo:InstanceInfo; 											// INSTANCE NOT EXPORTED
 	private 	var	_oxel:Oxel; 															// INSTANCE NOT EXPORTED
+	
 	protected 	var	_shaders:Vector.<Shader>        			= new Vector.<Shader>;		// INSTANCE NOT EXPORTED
-	protected 	var	_childrenLoaded:Boolean						= true;
-	protected 	var	_animationsLoaded:Boolean					= true;
 	protected 	var	_children:Vector.<VoxelModel> 				= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
-	private		var	_statisics:ModelStatisics 					= new ModelStatisics(); 	// INSTANCE NOT EXPORTED
-	private		var	_camera:Camera								= new Camera();
-	private		var	_timer:int 									= getTimer(); 				// INSTANCE NOT EXPORTED
-	private		var	_version:int; 															// INSTANCE NOT EXPORTED
 	
 	private		var	_anim:Animation;			
+	private		var	_camera:Camera								= new Camera();
+	
+	protected 	var	_childrenLoaded:Boolean						= true;
+	protected 	var	_animationsLoaded:Boolean					= true;
+	private		var	_statisics:ModelStatisics 					= new ModelStatisics(); 	// INSTANCE NOT EXPORTED
 	protected	var	_stateLock:Boolean 														// INSTANCE NOT EXPORTED
-			
-	private		var	_lightIDNext:uint 							= 1024; // TODO FIX reserve space for ?
-						
+
 	private		var	_initialized:Boolean 													// INSTANCE NOT EXPORTED
 	protected	var	_changed:Boolean 														// INSTANCE NOT EXPORTED
 	protected	var	_complete:Boolean 														// INSTANCE NOT EXPORTED
 	protected	var	_selected:Boolean 														// INSTANCE NOT EXPORTED
 	protected	var	_dead:Boolean 															// INSTANCE NOT EXPORTED
-					
 	private		var	_usesGravity:Boolean; 														
 	private		var	_visible:Boolean 							= true;  // Should be exported/ move to instance
+	
+	private		var	_timer:int 									= getTimer(); 				// INSTANCE NOT EXPORTED
+	private		var	_version:int; 															// INSTANCE NOT EXPORTED
+			
+	private		var	_lightIDNext:uint 							= 1024; // TODO FIX reserve space for ?
 				
 	protected function get initialized():Boolean 				{ return _initialized; }
 	protected function set initialized( val:Boolean ):void		{ _initialized = val; }

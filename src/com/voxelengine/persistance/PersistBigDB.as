@@ -31,17 +31,17 @@ public class PersistBigDB
 		if ( false == Globals.online )
 			return false;
 			
-		if ( Globals.DB_TABLE_MODELS == $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_METADATA == $pe.table )
 			return true;
-		else if ( Globals.DB_TABLE_MODELS_DATA == $pe.table )	
+		else if ( Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA == $pe.table )	
 			return true;
-		else if ( Globals.DB_TABLE_REGIONS == $pe.table )	
+		else if ( Globals.BIGDB_TABLE_REGIONS == $pe.table )	
 			return true;
-		else if ( Globals.DB_INVENTORY_TABLE == $pe.table )	
+		else if ( Globals.BIGDB_TABLE_INVENTORY == $pe.table )	
 			return true;
-		else if ( Globals.DB_TABLE_AMMO == $pe.table )	
+		else if ( Globals.BIGDB_TABLE_AMMO == $pe.table )	
 			return true;
-		else if ( Globals.DB_TABLE_ANIMATIONS == $pe.table )	
+		else if ( Globals.BIGDB_TABLE_ANIMATIONS == $pe.table )	
 			return true;
 		else {
 			if ( Globals.isGuid( $pe.guid ) )

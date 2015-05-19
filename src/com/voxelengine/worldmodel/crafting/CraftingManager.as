@@ -33,6 +33,13 @@ import com.voxelengine.worldmodel.crafting.items.*;
 	 
 public class CraftingManager
 {
+		private static var _s_craftingManager:CraftingManager;
+		static public function get instance():CraftingManager { 
+			if ( null == _s_craftingManager )
+				_s_craftingManager = new CraftingManager(); 
+			return _s_craftingManager;
+		} 
+	
 	// Adding these makes the event available in MXML
 	// http://help.adobe.com/en_US/flex/using/WS2db454920e96a9e51e63e3d11c0bf69084-7ab2.html
 	// [Event(name = "complete", type = "com.voxelengine.events.CraftingEvent")]

@@ -211,7 +211,7 @@ public class Ammo
 			else {
 				var obj:Object = toObject();
 			}
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.DB_TABLE_AMMO, name, _dbo, obj ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.BIGDB_TABLE_AMMO, name, _dbo, obj ) );
 		}
 		else
 			Log.out( "Ammo.save - Not saving ammo, offline", Log.WARN );
@@ -265,7 +265,7 @@ public class Ammo
 	
 	private function saveSucceed( $pe:PersistanceEvent ):void
 	{
-		if ( Globals.DB_TABLE_AMMO != $pe.table )
+		if ( Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
 		removeSaveEvents();
 		Log.out( "Ammo.saveSucceed" );
@@ -273,7 +273,7 @@ public class Ammo
 	
 	private function saveFailed( $pe:PersistanceEvent ):void
 	{
-		if ( Globals.DB_TABLE_AMMO != $pe.table )
+		if ( Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
 		removeSaveEvents();
 		Log.out( "Ammo.saveFailed - MAY BE (error #2032)  The method SaveObjectChanges can only be called when connected to a game", Log.ERROR );
@@ -281,7 +281,7 @@ public class Ammo
 	
 	private function createFailed( $pe:PersistanceEvent ):void
 	{
-		if ( Globals.DB_TABLE_AMMO != $pe.table )
+		if ( Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
 		removeSaveEvents();
 		Log.out( "Ammo.createFailed - Failed to create new Ammo object for this object.", Log.ERROR );
