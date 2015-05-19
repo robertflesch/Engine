@@ -10,12 +10,12 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.pools.LightingPool;
 	import com.voxelengine.worldmodel.oxel.Lighting;
 	import com.voxelengine.worldmodel.oxel.FlowInfo;
+	import com.voxelengine.worldmodel.oxel.OxelBitfields;
 	import flash.utils.ByteArray;
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.TypeInfo;
-	import com.voxelengine.worldmodel.oxel.OxelData;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	
 	/**
@@ -97,18 +97,18 @@ package com.voxelengine.worldmodel.models
 			var faceData:uint = $ba.readUnsignedInt();
 			var type:uint;
 			if ( $version <= Globals.VERSION_006 )
-				type = OxelData.typeFromRawDataOld(faceData);
+				type = OxelBitfields.typeFromRawDataOld(faceData);
 			else {  //_version > Globals.VERSION_006
 				var typeData:uint = $ba.readUnsignedInt();
-				type = OxelData.type1FromData(typeData);
+				type = OxelBitfields.type1FromData(typeData);
 			}
 			
-			if ( OxelData.dataHasAdditional( faceData ) ) {
+			if ( OxelBitfields.dataHasAdditional( faceData ) ) {
 				$ba = _TempFlowInfo.fromByteArray( $version, $ba );
 				$ba = _TempBrightness.fromByteArray( $version, $ba, 0 );
 			}
 			
-			if ( OxelData.data_is_parent( faceData ) ) {
+			if ( OxelBitfields.data_is_parent( faceData ) ) {
 				currentGrain--;
 				for ( var i:int = 0; i < 8; i++ )
 				{

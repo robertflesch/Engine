@@ -11,22 +11,22 @@ import flash.events.Event;
 import flash.utils.ByteArray;
 import flash.events.EventDispatcher;
 
-import com.voxelengine.worldmodel.models.ModelData;
+import com.voxelengine.worldmodel.models.OxelData;
 /**
  * ...
  * @author Robert Flesch - RSF 
  */
 public class ModelDataEvent extends ModelBaseEvent
 {
-	private var _vmd:ModelData;
+	private var _vmd:OxelData;
 	private var _modelGuid:String;
 	private var _fromTables:Boolean;
 
-	public function get vmd():ModelData { return _vmd; }
+	public function get vmd():OxelData { return _vmd; }
 	public function get modelGuid():String  { return _modelGuid; }
 	public function get fromTables():Boolean  { return _fromTables; }
 	
-	public function ModelDataEvent( $type:String, $series:int, $guid:String, $vmd:ModelData, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelDataEvent( $type:String, $series:int, $guid:String, $vmd:OxelData, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $series, $bubbles, $cancellable );
 		_vmd = $vmd;

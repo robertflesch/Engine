@@ -20,13 +20,13 @@ import com.voxelengine.Globals;
  * @author Robert Flesch - RSF
  * The world model holds the active oxels
  */
-public class ModelData
+public class OxelData
 {
 	private var _modelGuid:String;
 	private var _dbo:DatabaseObject;
 	private var _compressedBA:ByteArray;
 	
-	public function ModelData( $guid:String ) {
+	public function OxelData( $guid:String ) {
 		_modelGuid = $guid;
 //		if ( "EditCursor" != $guid )
 //			ModelDataEvent.addListener( ModelBaseEvent.SAVE, saveEvent );
@@ -42,8 +42,8 @@ public class ModelData
 	public function get compressedBA():ByteArray  { return _compressedBA;  }
 	public function set compressedBA( $ba:ByteArray ):void  { _compressedBA = $ba; }
 	
-	public function clone():ModelData {
-		var vmd:ModelData = new ModelData( _modelGuid );
+	public function clone():OxelData {
+		var vmd:OxelData = new OxelData( _modelGuid );
 		vmd._dbo = dbo; // Can I just reference this? They are pointing to same object
 		var ba:ByteArray = new ByteArray();
 		ba.writeBytes( _compressedBA, 0, _compressedBA.length );

@@ -42,7 +42,7 @@ public class ModelDataCache
 	}
 	
 	static private function deleteHandler( $mde:ModelDataEvent ):void {
-		var md:ModelData = _modelData[$mde.modelGuid];
+		var md:OxelData = _modelData[$mde.modelGuid];
 		if ( null != md ) {
 			_modelData[$mde.modelGuid] = null; 
 			md = null;
@@ -63,7 +63,7 @@ public class ModelDataCache
 			return;
 		}
 		//Log.out( "ModelDataCache.request guid: " + $mde.modelGuid, Log.INFO );
-		var mi:ModelData = _modelData[$mde.modelGuid]; 
+		var mi:OxelData = _modelData[$mde.modelGuid]; 
 		if ( null == mi ) {
 			if ( true == Globals.online && $mde.fromTables )
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mde.series, Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA, $mde.modelGuid ) );
@@ -74,7 +74,7 @@ public class ModelDataCache
 			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.RESULT, $mde.series, $mde.modelGuid, mi ) );
 	}
 	
-	static private function add( $series:int, $md:ModelData ):void 
+	static private function add( $series:int, $md:OxelData ):void 
 	{ 
 		if ( null == $md || null == $md.modelGuid ) {
 			Log.out( "ModelDataCache.Add trying to add NULL modelData or guid", Log.WARN );
@@ -94,7 +94,7 @@ public class ModelDataCache
 			return;
 		if ( $pe.dbo || $pe.data ) {
 			//Log.out( "ModelDataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
-			var vmd:ModelData = new ModelData( $pe.guid );
+			var vmd:OxelData = new OxelData( $pe.guid );
 			if ( $pe.dbo )
 				vmd.fromPersistance( $pe.dbo );
 			else {

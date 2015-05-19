@@ -29,7 +29,7 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 public class ModelMakerBase {
 	
 	protected var _ii:InstanceInfo;
-	protected var _vmd:ModelData;
+	protected var _vmd:OxelData;
 	protected var _vmdFailed:Boolean;
 	static private var _makerCount:int;
 	protected var _parentModelGuid:String;

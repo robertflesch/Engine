@@ -21,7 +21,7 @@ import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
-import com.voxelengine.worldmodel.models.ModelData;
+import com.voxelengine.worldmodel.models.OxelData;
 import com.voxelengine.worldmodel.tasks.landscapetasks.TaskLibrary;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
@@ -39,7 +39,7 @@ public class ModelMakerGenerate {
 	private var _vmi:ModelInfo;
 	private var _vmm:ModelMetadata;
 	private var _ii:InstanceInfo;
-	private var _vmd:ModelData;
+	private var _vmd:OxelData;
 	
 	public function ModelMakerGenerate( $ii:InstanceInfo ) {
 		_ii = $ii;
@@ -71,7 +71,7 @@ public class ModelMakerGenerate {
 	private function loadSucceed(e:PersistanceEvent):void 
 	{
 		if ( e.guid == _ii.modelGuid ) {
-			_vmd = new ModelData( _ii.modelGuid );
+			_vmd = new OxelData( _ii.modelGuid );
 			try {  e.data.compress(); }
 			catch (error:Error) { ; }
 			_vmd.compressedBA = e.data;
