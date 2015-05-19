@@ -241,7 +241,7 @@ public class EditCursor extends VoxelModel
 		super.init( $mi, $vmm );
 		oxel.gc.bound = 4;
 		visible = false;
-		oxel.vm_initialize( statisics );
+		oxel.vertexMangerAssign( statisics );
 		GUIEvent.addListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
 		GUIEvent.addListener( GUIEvent.APP_ACTIVATE, onActivate );
 		
@@ -332,9 +332,9 @@ public class EditCursor extends VoxelModel
 		oxel.gc.bound = $cm.oxel.gc.bound;
 		oxel.gc.grain = $cm.oxel.gc.bound;
 		if ( null == oxel.vm_get() )
-			oxel.vm_initialize( statisics );
+			oxel.vertexMangerAssign( statisics );
 		if ( null == objectModel.oxel.vm_get() )
-			objectModel.oxel.vm_initialize( objectModel.statisics );
+			objectModel.oxel.vertexMangerAssign( objectModel.statisics );
 	}
 	
 	private function objectModelAdd( $om:ObjectModel ):void {

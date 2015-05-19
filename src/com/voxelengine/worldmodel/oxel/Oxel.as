@@ -154,7 +154,7 @@ package com.voxelengine.worldmodel.oxel
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		public function vm_get():VertexManager { return _vertMan ? _vertMan : _parent ? _parent.vm_get() : null; }
 		
-		public function vm_initialize( $stats:ModelStatisics ):void {
+		public function vertexMangerAssign( $stats:ModelStatisics ):void {
 			if ( null == _parent )
 			{
 				//Log.out( "Oxel.vm_initialize - This should only happen ONCE PER MODEL --------------------------------------" );
@@ -1972,7 +1972,7 @@ package com.voxelengine.worldmodel.oxel
 			}
 			
 			if ( $stats )
-				vm_initialize( $stats );
+				vertexMangerAssign( $stats );
 		}
 		
 		private function intToHexString( $val:int ):String

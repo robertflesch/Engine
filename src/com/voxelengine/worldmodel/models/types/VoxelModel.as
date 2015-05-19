@@ -333,8 +333,6 @@ public class VoxelModel
 		_metadata = $vmm;
 		instanceInfo.owner = this; // This tells the instanceInfo that this voxel model is its owner.
 
-		//_data = new ModelData()
-		
 		if ($initializeRoot)
 			oxel = Oxel.initializeRoot( (0 < instanceInfo.grainSize ? instanceInfo.grainSize : modelInfo.grainSize), instanceInfo.baseLightLevel );
 		

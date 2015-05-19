@@ -54,17 +54,6 @@ public class ModelInfoCache
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.RESULT, $mie.series, $mie.modelGuid, mi ) );
 	}
 	
-	static private function deleteHandler( $mie:ModelInfoEvent ):void {
-		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
-		if ( null != mi ) {
-			_modelInfo[$mie.modelGuid] = null; 
-			mi = null;
-			// TODO need to clean up eventually
-		}
-	}
-	
-	
-	
 	static private function add( $pe:PersistanceEvent, $mi:ModelInfo ):void { 
 		if ( null == $mi || null == $pe.guid ) {
 			Log.out( "ModelInfoManager.modelInfoAdd trying to add NULL modelInfo or guid", Log.WARN );
@@ -76,6 +65,15 @@ public class ModelInfoCache
 			_modelInfo[$pe.guid] = $mi; 
 			
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $mi ) );
+		}
+	}
+	
+	static private function deleteHandler( $mie:ModelInfoEvent ):void {
+		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
+		if ( null != mi ) {
+			_modelInfo[$mie.modelGuid] = null; 
+			mi = null;
+			// TODO need to clean up eventually
 		}
 	}
 	

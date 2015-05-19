@@ -7,18 +7,17 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelDataEvent;
-import com.voxelengine.events.PersistanceEvent;
 import flash.utils.ByteArray;
+
 import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
+import com.voxelengine.events.PersistanceEvent;
 /**
  * ...
  * @author Robert Flesch - RSF
- * The world model holds the active oxels
+ * OxelData is the byte level representation of the oxel
  */
 public class OxelData
 {
@@ -29,11 +28,11 @@ public class OxelData
 	public function OxelData( $guid:String ) {
 		_modelGuid = $guid;
 //		if ( "EditCursor" != $guid )
-//			ModelDataEvent.addListener( ModelBaseEvent.SAVE, saveEvent );
+//			OxelData.addListener( ModelBaseEvent.SAVE, saveEvent );
 	}
 
 	public function release():void {
-//		ModelDataEvent.removeListener( ModelBaseEvent.SAVE, saveEvent );
+//		OxelData.removeListener( ModelBaseEvent.SAVE, saveEvent );
 	}
 	
 	public function get modelGuid():String  { return _modelGuid; }
@@ -53,7 +52,7 @@ public class OxelData
 	
 	public function save( ba:ByteArray ):void {
 		if ( Globals.online ) {
-			Log.out( "ModelData.save - Saving ModelData: " + modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
+			Log.out( "OxelData.save - Saving OxelData: " + modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
 			_compressedBA = ba;
 			_compressedBA.compress();
 			addSaveEvents();
@@ -65,7 +64,7 @@ public class OxelData
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA, modelGuid, _dbo, obj ) );
 		}
 		else
-			Log.out( "ModelData.save - Not saving data, either offline or NOT changed or locked - guid: " + modelGuid, Log.WARN );
+			Log.out( "OxelData.save - Not saving data, either offline or NOT changed or locked - guid: " + modelGuid, Log.WARN );
 	}
 	
 	private function addSaveEvents():void {
@@ -86,7 +85,7 @@ public class OxelData
 		if ( Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA != $pe.table )
 			return;
 		removeSaveEvents();
-		//Log.out( "ModelData.saveSucceed - save: " + modelGuid, Log.DEBUG ); 
+		//Log.out( "OxelData.saveSucceed - save: " + modelGuid, Log.DEBUG ); 
 	}	
 	
 	private function createSucceed( $pe:PersistanceEvent ):void { 
@@ -95,7 +94,7 @@ public class OxelData
 		if ( $pe.dbo )
 			_dbo = $pe.dbo;
 		removeSaveEvents();
-		Log.out( "ModelData.createSuccess - created: " + modelGuid + "  DBO FOUND", Log.DEBUG ); 
+		Log.out( "OxelData.createSuccess - created: " + modelGuid + "  DBO FOUND", Log.DEBUG ); 
 	}	
 	
 	private function createFailed( $pe:PersistanceEvent ):void  {
@@ -103,7 +102,7 @@ public class OxelData
 			return;
 		removeSaveEvents();
 		// TODO How do I handle the metadata for failed object?
-		Log.out( "ModelData.createFailed - created: " + modelGuid, Log.ERROR ); 
+		Log.out( "OxelData.createFailed - created: " + modelGuid, Log.ERROR ); 
 		
 	}
 	
@@ -111,7 +110,7 @@ public class OxelData
 		if ( Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "ModelData.saveFail - ", Log.ERROR ); 
+		Log.out( "OxelData.saveFail - ", Log.ERROR ); 
 	}	
 	
 	public function toPersistance():void {
