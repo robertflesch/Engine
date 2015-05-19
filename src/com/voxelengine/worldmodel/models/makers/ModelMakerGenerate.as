@@ -15,7 +15,7 @@ import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.ModelDataEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.server.Network;
@@ -126,7 +126,7 @@ public class ModelMakerGenerate {
 		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
 		ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid ) );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CREATED, 0, _ii.modelGuid, _vmm ) );
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.CREATED, 0, _ii.modelGuid, _vmd ) );
+		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.CREATED, 0, _ii.modelGuid, _vmd ) );
 		
 	}
 }	

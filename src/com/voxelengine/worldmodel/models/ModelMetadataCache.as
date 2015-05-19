@@ -8,7 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelDataEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import flash.utils.ByteArray;
 import flash.utils.Dictionary;
@@ -60,7 +60,7 @@ public class ModelMetadataCache
 		// This delete this objects metadata
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $mde.modelGuid, null ) );
 		// Since the data doesnt know about children, I have to delete those from here too.
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.DELETE, 0, $mde.modelGuid, null ) );
+		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.DELETE, 0, $mde.modelGuid, null ) );
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, $mde.modelGuid, null ) );
 		// now I need to delete any children
 		for each ( var mmd:ModelMetadata in _metadata ) {

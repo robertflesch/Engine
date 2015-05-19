@@ -15,7 +15,6 @@ import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelDataEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;

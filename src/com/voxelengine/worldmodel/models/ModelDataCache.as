@@ -14,7 +14,7 @@ import flash.net.URLLoaderDataFormat;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.events.ModelDataEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.PersistanceEvent;
 
 /**
@@ -30,9 +30,9 @@ public class ModelDataCache
 	public function ModelDataCache() {}
 	
 	static public function init():void {
-		ModelDataEvent.addListener( ModelBaseEvent.REQUEST, request );
-		ModelDataEvent.addListener( ModelBaseEvent.CREATED, created );
-		ModelDataEvent.addListener( ModelBaseEvent.DELETE, deleteHandler );
+		OxelDataEvent.addListener( ModelBaseEvent.REQUEST, request );
+		OxelDataEvent.addListener( ModelBaseEvent.CREATED, created );
+		OxelDataEvent.addListener( ModelBaseEvent.DELETE, deleteHandler );
 		// do I need ne of these?
 		//ModelDataEvent.addListener( ModelBaseEvent.UPDATE, update );
 		
@@ -41,7 +41,7 @@ public class ModelDataCache
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
 	}
 	
-	static private function deleteHandler( $mde:ModelDataEvent ):void {
+	static private function deleteHandler( $mde:OxelDataEvent ):void {
 		var md:OxelData = _modelData[$mde.modelGuid];
 		if ( null != md ) {
 			_modelData[$mde.modelGuid] = null; 
@@ -51,12 +51,12 @@ public class ModelDataCache
 		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mde.series, Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA, $mde.modelGuid, null ) );
 	}
 	
-	static private function created( $mde:ModelDataEvent):void 	{ add( 0, $mde.vmd ); }
+	static private function created( $mde:OxelDataEvent):void 	{ add( 0, $mde.vmd ); }
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  modelData
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	static private function request( $mde:ModelDataEvent ):void 
+	static private function request( $mde:OxelDataEvent ):void 
 	{   
 		if ( null == $mde.modelGuid ) {
 			Log.out( "ModelDataCache.modelDataRequest guid rquested is NULL: ", Log.WARN );
@@ -71,7 +71,7 @@ public class ModelDataCache
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mde.series, Globals.IVM_EXT, $mde.modelGuid, null, null, URLLoaderDataFormat.BINARY ) );
 		}
 		else
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.RESULT, $mde.series, $mde.modelGuid, mi ) );
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT, $mde.series, $mde.modelGuid, mi ) );
 	}
 	
 	static private function add( $series:int, $md:OxelData ):void 
@@ -84,7 +84,7 @@ public class ModelDataCache
 		if ( null ==  _modelData[$md.modelGuid] ) {
 			//Log.out( "ModelDataCache.add adding: " + $md.modelGuid, Log.WARN );
 			_modelData[$md.modelGuid] = $md; 
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.ADDED, $series, $md.modelGuid, $md ) );
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.ADDED, $series, $md.modelGuid, $md ) );
 		}
 	}
 	
@@ -106,7 +106,7 @@ public class ModelDataCache
 		}
 		else {
 			Log.out( "ModelDataCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.WARN );
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 		}
 	}
 	
@@ -115,7 +115,7 @@ public class ModelDataCache
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA != $pe.table )
 			return;
 		Log.out( "ModelDataCache.loadFailed " + $pe.toString(), Log.WARN );
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
+		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
 	static private function loadNotFound( $pe:PersistanceEvent):void 
@@ -123,7 +123,7 @@ public class ModelDataCache
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA != $pe.table )
 			return;
 		//Log.out( "ModelDataCache.loadNotFound " + $pe.toString(), Log.WARN );
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
+		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
 }

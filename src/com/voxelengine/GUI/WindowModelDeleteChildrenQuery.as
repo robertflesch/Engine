@@ -10,7 +10,7 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelDataEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.ModelInfo;
@@ -68,9 +68,9 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 		
 		// remove inventory
 		// request the ModelData so that we can get the modelInfo from it.
-		ModelDataEvent.addListener( ModelBaseEvent.RESULT, dataResult );
-		ModelDataEvent.addListener( ModelBaseEvent.ADDED, dataResult );
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
+		OxelDataEvent.addListener( ModelBaseEvent.RESULT, dataResult );
+		OxelDataEvent.addListener( ModelBaseEvent.ADDED, dataResult );
+		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
 
 		// this removes the on screen instances
 		var modelOnScreen:Vector.<VoxelModel> = Region.currentRegion.modelCache.modelGet( _modelGuid );
@@ -81,11 +81,11 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 		}
 	}
 	
-	private function dataResult(e:ModelDataEvent):void 
+	private function dataResult(e:OxelDataEvent):void 
 	{
 		// Now that we have the modelData, we can extract the modelInfo
-		ModelDataEvent.removeListener( ModelBaseEvent.RESULT, dataResult );
-		ModelDataEvent.removeListener( ModelBaseEvent.ADDED, dataResult );
+		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, dataResult );
+		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, dataResult );
 		// So I need to extract the animation data.
 		var ba:ByteArray = new ByteArray();
 		ba.writeBytes( e.vmd.compressedBA, 0, e.vmd.compressedBA.length );

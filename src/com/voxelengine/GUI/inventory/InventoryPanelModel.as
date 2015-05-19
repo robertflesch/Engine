@@ -7,7 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
-import com.voxelengine.events.ModelDataEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
@@ -314,7 +314,7 @@ public class InventoryPanelModel extends VVContainer
 					var slotId:int = int( bi.name );
 					InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, item ) );
 					// we are going to need the data to build the model for this.
-					ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, item.modelGuid, null ) );
+					OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, item.modelGuid, null ) );
 				}
 			}
 		}

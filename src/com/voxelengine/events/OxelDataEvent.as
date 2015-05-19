@@ -16,7 +16,7 @@ import com.voxelengine.worldmodel.models.OxelData;
  * ...
  * @author Robert Flesch - RSF 
  */
-public class ModelDataEvent extends ModelBaseEvent
+public class OxelDataEvent extends ModelBaseEvent
 {
 	private var _vmd:OxelData;
 	private var _modelGuid:String;
@@ -26,7 +26,7 @@ public class ModelDataEvent extends ModelBaseEvent
 	public function get modelGuid():String  { return _modelGuid; }
 	public function get fromTables():Boolean  { return _fromTables; }
 	
-	public function ModelDataEvent( $type:String, $series:int, $guid:String, $vmd:OxelData, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function OxelDataEvent( $type:String, $series:int, $guid:String, $vmd:OxelData, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $series, $bubbles, $cancellable );
 		_vmd = $vmd;
@@ -35,7 +35,7 @@ public class ModelDataEvent extends ModelBaseEvent
 	}
 	
 	public override function clone():Event {
-		return new ModelDataEvent(type, series, _modelGuid, _vmd, bubbles, cancelable);
+		return new OxelDataEvent(type, series, _modelGuid, _vmd, bubbles, cancelable);
 	}
    
 	public override function toString():String {
@@ -55,7 +55,7 @@ public class ModelDataEvent extends ModelBaseEvent
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:ModelDataEvent ) : Boolean {
+	static public function dispatch( $event:OxelDataEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 	

@@ -7,7 +7,7 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-import com.voxelengine.events.ModelDataEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
@@ -92,7 +92,7 @@ public class ModelMakerImport extends ModelMakerBase {
 		if ( "LoadModelFromIVM" == layer1.functionName ) {
 			_ii.modelGuid = layer1.data;
 			Log.out( "ModelMakerImport.processBiome retrying to load model from : " + layer1.data, Log.DEBUG );
-			ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, layer1.data, null, false ) );		
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, layer1.data, null, false ) );		
 		}
 		else
 			_vmi.biomes.addToTaskControllerUsingNewStyle( _ii );

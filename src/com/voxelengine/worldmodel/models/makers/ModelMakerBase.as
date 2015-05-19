@@ -11,7 +11,7 @@ import flash.utils.ByteArray;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelDataEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.worldmodel.models.*;
@@ -48,13 +48,13 @@ public class ModelMakerBase {
 			_s_parentChildCount[_parentModelGuid] = ++count;
 		}
 		//Log.out( "ModelMakerBase - ii: " + _ii.toString(), Log.DEBUG );
-		ModelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
-		ModelDataEvent.addListener( ModelBaseEvent.RESULT, retriveData );		
-		ModelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
-		ModelDataEvent.dispatch( new ModelDataEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null, $fromTables ) );		
+		OxelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
+		OxelDataEvent.addListener( ModelBaseEvent.RESULT, retriveData );		
+		OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
+		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null, $fromTables ) );		
 	}
 	
-	private function retriveData($mde:ModelDataEvent):void  {
+	private function retriveData($mde:OxelDataEvent):void  {
 		if ( _ii.modelGuid == $mde.modelGuid ) {
 			//Log.out( "ModelMakerBase.retriveData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
 			_vmd = $mde.vmd;
@@ -66,7 +66,7 @@ public class ModelMakerBase {
 		}
 	}
 	
-	private function failedData( $mde:ModelDataEvent):void  {
+	private function failedData( $mde:OxelDataEvent):void  {
 		if ( _ii.modelGuid == $mde.modelGuid ) {
 			Log.out( "ModelMakerBase.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
 			_vmdFailed = true;
@@ -78,9 +78,9 @@ public class ModelMakerBase {
 	protected function attemptMake():void { }
 	protected function markComplete( $success:Boolean = true ):void {
 		
-		ModelDataEvent.removeListener( ModelBaseEvent.ADDED, retriveData );		
-		ModelDataEvent.removeListener( ModelBaseEvent.RESULT, retriveData );		
-		ModelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
+		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, retriveData );		
+		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, retriveData );		
+		OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 		if ( $success )
 			ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid ) );
 		else	
