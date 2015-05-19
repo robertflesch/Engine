@@ -352,7 +352,7 @@ class VVInitializer
 		ModelMetadataCache.init();
 		ModelInfoCache.init();
 		AmmoCache.init();
-		ModelDataCache.init();
+		OxelDataCache.init();
 		AnimationCache.init();
 		// This causes the to load its caches and listeners
 		InventoryManager.init();

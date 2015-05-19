@@ -21,13 +21,13 @@ import com.voxelengine.events.PersistanceEvent;
  * ...
  * @author Bob
  */
-public class ModelDataCache
+public class OxelDataCache
 {
 	// this acts as a holding spot for all model objects loaded from persistance
 	// dont use weak keys since this is THE spot that holds things.
 	static private var _modelData:Dictionary = new Dictionary(false);
 	
-	public function ModelDataCache() {}
+	public function OxelDataCache() {}
 	
 	static public function init():void {
 		OxelDataEvent.addListener( ModelBaseEvent.REQUEST, request );
