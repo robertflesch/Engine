@@ -42,17 +42,6 @@ public class ModelData
 	public function get compressedBA():ByteArray  { return _compressedBA;  }
 	public function set compressedBA( $ba:ByteArray ):void  { _compressedBA = $ba; }
 	
-	
-	//// This was private, force a message to be sent to it. 
-	//// But the voxelModel has a handle to it, seems silly to have to propgate it every where, so its public
-	//private function saveEvent( $mde:ModelDataEvent ):void {
-		//if ( modelGuid != $mde.modelGuid ) {
-			//Log.out( "ModelData.saveEvent - Ignoring save meant for other model my guid: " + modelGuid + " target guid: " + $mde.modelGuid, Log.WARN );
-			//return;
-		//}
-		//save();
-	//}
-	
 	public function clone():ModelData {
 		var vmd:ModelData = new ModelData( _modelGuid );
 		vmd._dbo = dbo; // Can I just reference this? They are pointing to same object

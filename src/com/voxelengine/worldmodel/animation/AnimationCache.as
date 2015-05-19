@@ -110,7 +110,7 @@ public class AnimationCache
 	static private function add( $pe:PersistanceEvent, $ani:Animation ):void 
 	{ 
 		if ( null == $ani || null == $pe.guid ) {
-			Log.out( "AnimationCache.modelDataAdd trying to add NULL modelData or guid", Log.WARN );
+			Log.out( "AnimationCache.Add trying to add NULL animations or guid", Log.WARN );
 			return;
 		}
 		// check to make sure this is new data

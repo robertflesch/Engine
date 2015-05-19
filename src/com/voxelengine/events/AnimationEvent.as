@@ -11,7 +11,6 @@ import flash.events.Event;
 import flash.events.EventDispatcher;
 
 import com.voxelengine.worldmodel.animation.Animation;
-import com.voxelengine.worldmodel.models.ModelData;
 /**
  * ...
  * @author Robert Flesch - RSF 

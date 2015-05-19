@@ -209,7 +209,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 			return;
 		removeSaveEvents();
 		// TODO How do I handle the metadata for failed object?
-		Log.out( "ModelData.createFailed  - modelGuid: " + modelGuid, Log.ERROR ); 
+		Log.out( "ModelMetadata.createFailed  - modelGuid: " + modelGuid, Log.ERROR ); 
 		
 	}
 	
