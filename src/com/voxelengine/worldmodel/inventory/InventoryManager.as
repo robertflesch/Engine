@@ -39,7 +39,7 @@ public class InventoryManager
 	static private function save( e:InventoryEvent ):void {
 		if ( Globals.online ) {
 			for each ( var inventory:Inventory in _s_inventoryByGuid )
-				if ( null != inventory && inventory.owner != "Player" )
+				if ( null != inventory && inventory.guid != "Player" )
 					inventory.save();
 		}
 	}
@@ -75,7 +75,7 @@ public class InventoryManager
 			var tempArray:Array = [];
 			for each ( var inv:Inventory in _s_inventoryByGuid )
 			{
-				if ( e.owner == inv.owner ) {
+				if ( e.owner == inv.guid ) {
 					_s_inventoryByGuid[ e.owner ] = null;
 					inv.unload();
 					// could I just use a delete here, rather then creating new dictionary? See Dictionary class for details - RSF
@@ -83,7 +83,7 @@ public class InventoryManager
 				else
 				{
 					if ( inv )
-						tempArray[inv.owner] = inv;
+						tempArray[inv.guid] = inv;
 					else
 						Log.out( "InventoryManager.unloadInventory - Null found", Log.ERROR );
 				}

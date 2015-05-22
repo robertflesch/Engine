@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
+import com.voxelengine.worldmodel.models.PersistanceObject;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.Region;
@@ -22,10 +23,9 @@ import com.voxelengine.events.*;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
 
 
-public class Inventory
+public class Inventory extends PersistanceObject
 {
 	// support data for persistance
-	private var _dbo:DatabaseObject  = null;							
 	private var _createdDate:Date;
 	private var _modifiedDate:Date;
 	private var _generateNewInventory:Boolean;
@@ -33,21 +33,19 @@ public class Inventory
 
 	private var  _slots:Slots
 	private var _voxels:Voxels;
-	private var _owner:String;
 	public function get slots():Slots  { return _slots; }
 	public function get voxels():Voxels  { return _voxels; }
-	public function get owner():String { return _owner; }
 	
 	public function get loaded():Boolean { return _loaded; }
 	
-	public function Inventory( $owner:String ) {
-		_slots = new Slots( $owner );
-		_owner = $owner;
-		_voxels = new Voxels( $owner );
+	public function Inventory( $guid:String ) {
+		super( $guid, Globals.BIGDB_TABLE_INVENTORY );
+		_slots = new Slots( $guid );
+		_voxels = new Voxels( $guid );
 	}
 	
 	public function unload():void {
-		//Log.out( "Inventory.unload - owner: " + _owner, Log.WARN );
+		//Log.out( "Inventory.unload - owner: " + guid, Log.WARN );
 		_slots.unload();
 		_voxels.unload();
 	}
@@ -60,7 +58,7 @@ public class Inventory
 	
 	public function deleteInventory():void {
 		
-		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, _owner, null ) );
+		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, guid, null ) );
 		_slots = null;
 		_voxels = null;
 	}
@@ -70,55 +68,26 @@ public class Inventory
 	// TO Persistance
 	//////////////////////////////////////////////////////////////////
 	
-	public function save():void {
-		if ( Globals.online && changed() ) {
-			Log.out( "Inventory.save - Saving User Inventory owner: " + owner, Log.DEBUG );
-			if ( _dbo )
-				toPersistance();
-			else {
-				var ba:ByteArray = new ByteArray();	
-				ba = asByteArray( ba );
-			}
-			addSaveEvents();
-			PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, createSuccess );
-			PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSuccess );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, _owner, _dbo, ba ) );
-		}
-		else
-			Log.out( "Inventory.save - NOT Saving - status online: " + Globals.online + "  changed: " + changed() + "  owner: " + owner, Log.INFO );
+	override protected function toObject():Object {
+		var ba:ByteArray = new ByteArray();	
+		var obj:Object = new Object();
+		obj.ba = asByteArray( ba );
+		return obj;
 	}
 	
-	private function toPersistance():void {
+	override protected function toPersistance():void {
 		_voxels.toPersistance(_dbo);
 		_slots.toPersistance(_dbo);
 		var ba:ByteArray = new ByteArray(); 
 		_dbo.data 			= asByteArray( ba );
 	}
 
-	public function asByteArray( $ba:ByteArray ):ByteArray {
-		$ba.writeUTF( _owner );
+	private function asByteArray( $ba:ByteArray ):ByteArray {
+		$ba.writeUTF( guid );
 		_voxels.asByteArray( $ba );
 		_slots.asByteArray( $ba );
 		$ba.compress();
 		return $ba;	
-	}
-	
-	private function saveSuccess($pe:PersistanceEvent):void 
-	{
-		if ( Globals.BIGDB_TABLE_INVENTORY != $pe.table )
-			return;
-		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, createSuccess );
-		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSuccess );
-	}
-	
-	private function createSuccess( $pe:PersistanceEvent):void 
-	{
-		if ( Globals.BIGDB_TABLE_INVENTORY != $pe.table )
-			return;
-		Log.out( "Inventory.createSuccess - setting dbo for - owner: " + owner, Log.DEBUG );
-		_dbo = $pe.dbo;
-		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, createSuccess );
-		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSuccess );
 	}
 	
 	////////////////////////////////////////////////////////////////
@@ -127,12 +96,12 @@ public class Inventory
 	public function load():void {
 		if ( Globals.online ) {
 			addLoadEvents();
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, _owner ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, guid ) );
 		}
 	}
 
 	// If $dbo is null then the default data is loaded
-	private function fromPersistance( $dbo:DatabaseObject ):void {
+	override public function fromPersistance( $dbo:DatabaseObject ):void {
 		
 		if ( $dbo ) {
 			_createdDate	= $dbo.createdDate;
@@ -155,7 +124,7 @@ public class Inventory
 			}
 		}
 		else {
-			var ownerModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( _owner );
+			var ownerModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( guid );
 			if ( ownerModel && ownerModel is Player )
 				_voxels.addTestData();
 		}
@@ -185,22 +154,22 @@ public class Inventory
 			return;
 		// this occurs on first time logging in.
 		removeLoadEvents();
-		Log.out( "Inventory.notFound - OWNER: " + _owner, Log.WARN );
+		Log.out( "Inventory.notFound - OWNER: " + guid, Log.WARN );
 		fromPersistance( null );
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, _owner, this ) );
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, guid, this ) );
 	}
 	
 	private function loadSuccess( $pe:PersistanceEvent ):void
 	{
 		if ( Globals.BIGDB_TABLE_INVENTORY != $pe.table )
 			return;
-		if ( owner != $pe.guid )
+		if ( guid != $pe.guid )
 			return;
 		removeLoadEvents();
 		fromPersistance( $pe.dbo );
 		_loaded = true;
-		Log.out( "Inventory.loadSuccess - OWNER: " + _owner + "  guid: " + $pe.guid, Log.WARN );
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, _owner, this ) );
+		Log.out( "Inventory.loadSuccess - OWNER: " + guid + "  guid: " + $pe.guid, Log.WARN );
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, guid, this ) );
 	}
 	
 	private function loadFailed( $pe:PersistanceEvent ):void
@@ -209,53 +178,6 @@ public class Inventory
 			return;
 		removeLoadEvents();
 		(new Alert( "ERROR LOADING USER INVENTORY - Please post on forums" )).display();
-	}
-	
-	private function addSaveEvents():void {
-		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, saveFailed );
-		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, createSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, createFailed );
-	}
-	
-	private function removeSaveEvents():void {
-		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
-		PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, saveFailed );
-		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, createSucceed );
-		PersistanceEvent.removeListener( PersistanceEvent.CREATE_FAILED, createFailed );
-	}
-	
-	private function saveSucceed( $pe:PersistanceEvent ):void
-	{
-		if ( Globals.BIGDB_TABLE_INVENTORY != $pe.table )
-			return;
-		removeSaveEvents();
-		Log.out( "Inventory.saveSucceed" );
-	}
-	
-	private function saveFailed( $pe:PersistanceEvent ):void
-	{
-		if ( Globals.BIGDB_TABLE_INVENTORY != $pe.table )
-			return;
-		removeSaveEvents();
-		Log.out( "Inventory.saveFailed - MAY BE (error #2032)  The method SaveObjectChanges can only be called when connected to a game", Log.ERROR );
-	}
-	
-	private function createSucceed( $pe:PersistanceEvent ):void
-	{
-		if ( Globals.BIGDB_TABLE_INVENTORY != $pe.table )
-			return;
-		removeSaveEvents();
-		_dbo = $pe.dbo;
-		Log.out( "Inventory.createSucceed" );
-	}
-	
-	private function createFailed( $pe:PersistanceEvent ):void
-	{
-		if ( Globals.BIGDB_TABLE_INVENTORY != $pe.table )
-			return;
-		removeSaveEvents();
-		Log.out( "Inventory.createFailed - Failed to create new Inventory object for this object.", Log.ERROR );
 	}
 }
 }
