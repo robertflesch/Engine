@@ -35,11 +35,11 @@ public class OxelDataEvent extends ModelBaseEvent
 	}
 	
 	public override function clone():Event {
-		return new OxelDataEvent(type, series, _modelGuid, _vmd, bubbles, cancelable);
+		return new OxelDataEvent(type, series, _modelGuid, _vmd, _fromTables, bubbles, cancelable);
 	}
    
 	public override function toString():String {
-		return formatToString( "ModelDataEvent", "series", "modelGuid", "vmd" );
+		return formatToString( "ModelDataEvent", "series", "modelGuid", "vmd", "fromTables" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

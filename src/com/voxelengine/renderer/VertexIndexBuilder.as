@@ -123,7 +123,7 @@ public class VertexIndexBuilder
 				_s_compareVec = VoxelModel.controlledModel.modelToWorld( VoxelModel.controlledModel.camera.center );
 				//Log.out( "VertexIndexBuilder.sort - _s_compareVec: " + _s_compareVec );
 				_oxels.sort( compareFunction );	
-				trace( "VertexIndexBuilder - sorted: " + _oxels.length + " - took: "  + (getTimer() - timer) );					
+				//trace( "VertexIndexBuilder - sorted: " + _oxels.length + " - took: "  + (getTimer() - timer) );					
 				_sorted = true;
 			}
 		}

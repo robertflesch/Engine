@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models.makers
 {
 import com.voxelengine.events.LoadingImageEvent;
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.worldmodel.models.ModelPlacementType;
 import com.voxelengine.worldmodel.models.makers.ModelMakerCursor;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
@@ -37,19 +38,40 @@ public class ModelMakerCursor extends ModelMakerBase {
 	
 	// keeps track of how many makers there currently are.
 	private var _vmm:ModelMetadata;
+	private var _vmi:ModelInfo;
 	
 	public function ModelMakerCursor( $ii:InstanceInfo, $vmm:ModelMetadata ) {
 		Log.out( "ModelMakerCursor.constructor", Log.WARN );
+		super( $ii );
 		_vmm = $vmm;
 		if ( 0 == makerCountGet() )
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 		makerCountIncrement();
-		super( $ii, true );
+		
+		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retrivedInfo );		
+		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retrivedInfo );		
+		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null ) );		
+	}
+	
+	private function retrivedInfo( $mie:ModelInfoEvent ):void {
+		if ( _ii.modelGuid == $mie.modelGuid ) {
+			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retrivedInfo );		
+			_vmi = $mie.vmi;
+			attemptMake();
+		}
+	}
+	
+	private function failedInfo( $mie:ModelInfoEvent ):void {
+		if ( _ii.modelGuid == $mie.modelGuid ) {
+			Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
+			markComplete(false);
+		}
 	}
 	
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
-		if ( null != _vmm && null != _vmd ) {
+		if ( null != _vmm && null != _vmd && null != _vmi ) {
 			//Log.out( "ModelMakerCursor.attemptMake - ii: " + _ii.toString() );
 			var vm:VoxelModel = createFromMakerInfo();
 			markComplete();
@@ -74,25 +96,32 @@ public class ModelMakerCursor extends ModelMakerBase {
 		try { ba.uncompress(); }
 		catch (error:Error) { ; }
 		if ( null == ba ) {
-			Log.out( "ModelMakerCursor.createFromMakerInfo - Exception - NO data in VoxelModelMetadata: " + _vmd.modelGuid, Log.ERROR );
+			Log.out( "ModelMakerCursor.createFromMakerInfo - Exception - NO data in VoxelModelMetadata: " + _vmd.guid, Log.ERROR );
+			markComplete(false);
 			return null;
 		}
 		
 		var versionInfo:Object = ModelMakerBase.extractVersionInfo( ba );
-		if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion ) {
-			Log.out( "ModelMakerCursor.createFromMakerInfo - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
-			return null;
+		//if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion ) {
+			//Log.out( "ModelMakerCursor.createFromMakerInfo - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
+			//return null;
+		//}
+		
+		if ( Globals.VERSION_007 >= versionInfo.version ) {
+			// Just read it for advancing the byteArray
+			var modelInfoObject:Object = extractModelInfo( ba );
+			//var mi:ModelInfo = new ModelInfo( _vmd.guid );
+			//mi.initJSON( _ii.modelGuid, modelInfoObject );
+		} else {
+			// the size of the manifest (0) which is no longer being embedded
+			ba.readInt();
 		}
 		
-		var modelInfoObject:Object = ModelMakerBase.extractModelInfo( ba );
-		var mi:ModelInfo = new ModelInfo();
-		mi.initJSON( _ii.modelGuid, modelInfoObject );
-		
-		var vm:* = instantiate( _ii, mi ) //, _vmm, ba, versionInfo );
+		var vm:* = instantiate( _ii, _vmi ) //, _vmm, ba, versionInfo );
 		if ( vm ) {
 			vm.data = _vmd;
 			vm.version = versionInfo.version;
-			vm.init( mi, _vmm );
+			vm.init( _vmi, _vmm );
 			vm.fromByteArray( ba );
 			vm.modelInfo.animationsLoad( vm );
 			vm.complete = true;

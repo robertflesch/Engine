@@ -55,8 +55,7 @@ public class ModelMetadataCache
 	
 	// NOTE: This doesnt not work the first time the object is imported
 	// You have to close app and restart to get guids correct.
-	static private function deleteRecursive($mde:ModelMetadataEvent):void 
-	{
+	static private function deleteRecursive($mde:ModelMetadataEvent):void {
 		// This delete this objects metadata
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $mde.modelGuid, null ) );
 		// Since the data doesnt know about children, I have to delete those from here too.
@@ -65,7 +64,7 @@ public class ModelMetadataCache
 		// now I need to delete any children
 		for each ( var mmd:ModelMetadata in _metadata ) {
 			if ( mmd && mmd.parentModelGuid == $mde.modelGuid )
-				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.DELETE_RECURSIVE, 0, mmd.modelGuid, null ) );		
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.DELETE_RECURSIVE, 0, mmd.guid, null ) );		
 		}
 	}
 	
@@ -92,8 +91,7 @@ public class ModelMetadataCache
 	
 	static private function created($mme:ModelMetadataEvent):void  { add( 0, $mme.vmm ); }
 	
-	static private function update($mme:ModelMetadataEvent):void 
-	{
+	static private function update($mme:ModelMetadataEvent):void {
 		if ( null == $mme || null == $mme.modelGuid ) {
 			Log.out( "MetadataManager.update trying to add NULL metadata or guid", Log.WARN );
 			return;
@@ -106,11 +104,9 @@ public class ModelMetadataCache
 		} else {
 			vmm.update( $mme.vmm );
 		}
-		
 	}
 	
-	static private function request( $mme:ModelMetadataEvent ):void 
-	{   
+	static private function request( $mme:ModelMetadataEvent ):void {   
 		if ( null == $mme.modelGuid ) {
 			Log.out( "MetadataManager.request guid rquested is NULL: ", Log.WARN );
 			return;
@@ -120,7 +116,7 @@ public class ModelMetadataCache
 		if ( null == vmm )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid ) );
 		else
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.modelGuid, vmm ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm ) );
 	}
 	
 	// This loads the first 100 objects from the users inventory OR the public inventory
@@ -144,26 +140,24 @@ public class ModelMetadataCache
 		// This will return models already loaded.
 		for each ( var vmm:ModelMetadata in _metadata ) {
 			if ( vmm && vmm.owner == $mme.modelGuid )
-				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.modelGuid, vmm ) );
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm ) );
 		}
 	}
 	
-	static private function add( $series:int, $vmm:ModelMetadata ):void 
-	{ 
-		if ( null == $vmm || null == $vmm.modelGuid ) {
+	static private function add( $series:int, $vmm:ModelMetadata ):void { 
+		if ( null == $vmm || null == $vmm.guid ) {
 			Log.out( "MetadataManager.add trying to add NULL metadata or guid", Log.WARN );
 			return;
 		}
 		// check to make sure is not already there
-		if ( null ==  _metadata[$vmm.modelGuid] ) {
+		if ( null ==  _metadata[$vmm.guid] ) {
 			//Log.out( "ModelMetadataCache.add vmm: " + $vmm.modelGuid, Log.WARN );
-			_metadata[$vmm.modelGuid] = $vmm; 
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, $series, $vmm.modelGuid, $vmm ) );
+			_metadata[$vmm.guid] = $vmm; 
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, $series, $vmm.guid, $vmm ) );
 		}
 	}
 	
-	static private function loadSucceed( $pe:PersistanceEvent):void 
-	{
+	static private function loadSucceed( $pe:PersistanceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		if ( $pe.dbo ) {
@@ -180,17 +174,15 @@ public class ModelMetadataCache
 		}
 	}
 	
-	static private function loadFailed( $pe:PersistanceEvent ):void 
-	{
-		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table || Globals.MODEL_INFO_EXT != $pe.table )
+	static private function loadFailed( $pe:PersistanceEvent ):void  {
+		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		Log.out( "MetadataManager.metadataLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 
-	static private function loadNotFound( $pe:PersistanceEvent):void 
-	{
-		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table || Globals.MODEL_INFO_EXT != $pe.table )
+	static private function loadNotFound( $pe:PersistanceEvent):void {
+		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		Log.out( "MetadataManager.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );

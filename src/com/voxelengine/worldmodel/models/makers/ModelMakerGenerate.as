@@ -53,7 +53,7 @@ public class ModelMakerGenerate {
 		_vmm.modifiedDate = new Date();
 		
 		// This is a special case for modelInfo, the modelInfo its self is contained in the generate script
-		_vmi = new ModelInfo();
+		_vmi = new ModelInfo( $ii.modelGuid );
 		var functionClass:* = TaskLibrary.getAsset( $ii.modelGuid );
 		var json:Object = functionClass.script();
 		_vmi.initJSON( "modelGuid", json );
@@ -89,7 +89,7 @@ public class ModelMakerGenerate {
 			try { ba.uncompress(); }
 			catch (error:Error) { ; }
 			if ( null == ba ) {
-				Log.out( "ModelMakerGenerate.createFromMakerInfo - Exception - NO data in VoxelModelMetadata: " + _vmd.modelGuid, Log.ERROR );
+				Log.out( "ModelMakerGenerate.createFromMakerInfo - Exception - NO data in VoxelModelMetadata: " + _vmd.guid, Log.ERROR );
 				return;
 			}
 			
@@ -105,7 +105,7 @@ public class ModelMakerGenerate {
 			// read off that many bytes, even though we are using the data from the modelInfo file
 			var modelInfoJson:String = ba.readUTFBytes( strLen );
 			// reset the file name that it was loaded from and assign a new guid
-			_ii.modelGuid = _vmm.modelGuid = _vmd.modelGuid = Globals.getUID();
+			_ii.modelGuid = _vmm.guid = _vmd.guid = _vmi.guid = Globals.getUID();
 			_vmi.fileName = "";
 			
 			var vm:* = ModelMakerBase.instantiate( _ii, _vmi );

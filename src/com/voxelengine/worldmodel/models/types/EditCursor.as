@@ -65,7 +65,7 @@ public class EditCursor extends VoxelModel
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			instanceInfo.modelGuid = EDIT_CURSOR
 
-			var modelInfo:ModelInfo = new ModelInfo();
+			var modelInfo:ModelInfo = new ModelInfo( EDIT_CURSOR );
 			modelInfo.fileName = EDIT_CURSOR;
 			modelInfo.modelClass = EDIT_CURSOR;
 

@@ -33,7 +33,7 @@ public class PersistBigDB
 			
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA == $pe.table )
 			return true;
-		else if ( Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA == $pe.table )	
+		else if ( Globals.BIGDB_TABLE_OXEL_DATA == $pe.table )	
 			return true;
 		else if ( Globals.BIGDB_TABLE_REGIONS == $pe.table )	
 			return true;
@@ -42,6 +42,8 @@ public class PersistBigDB
 		else if ( Globals.BIGDB_TABLE_AMMO == $pe.table )	
 			return true;
 		else if ( Globals.BIGDB_TABLE_ANIMATIONS == $pe.table )	
+			return true;
+		else if ( Globals.BIGDB_TABLE_MODEL_INFO == $pe.table )	
 			return true;
 		else {
 			if ( Globals.isGuid( $pe.guid ) )

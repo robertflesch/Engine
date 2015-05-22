@@ -44,7 +44,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retriveInfo );		
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
 
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null ) );		
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null, false ) );		
 	}
 	
 	private function failedInfo( $mie:ModelInfoEvent):void {
@@ -71,7 +71,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 			try { ba.uncompress(); }
 			catch (error:Error) { ; }
 			if ( null == ba ) {
-				Log.out( "ModelMakerLocal.attemptMake - Exception - NO data in VoxelModelMetadata: " + _vmd.modelGuid, Log.ERROR );
+				Log.out( "ModelMakerLocal.attemptMake - Exception - NO data in VoxelModelMetadata: " + _vmd.guid, Log.ERROR );
 				return;
 			}
 
@@ -82,10 +82,12 @@ public class ModelMakerLocal extends ModelMakerBase {
 				return;
 			}
 			
-			// how many bytes is the modelInfo
-			var strLen:int = ba.readInt();
-			// read off that many bytes, even though we are using the data from the modelInfo file
-			var modelInfoJson:String = ba.readUTFBytes( strLen );
+			if ( Globals.VERSION_007 >= versionInfo.version ) {
+				// how many bytes is the modelInfo
+				var strLen:int = ba.readInt();
+				// read off that many bytes, even though we are using the data from the modelInfo file
+				var modelInfoJson:String = ba.readUTFBytes( strLen );
+			}
 				
 			var vmm:ModelMetadata = new ModelMetadata( _ii.modelGuid );
 			vmm.name = _vmi.fileName;

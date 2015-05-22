@@ -24,7 +24,7 @@ package com.voxelengine.events
 		
 		private var _position:Vector3D;
 		private var _direction:Vector3D;
-		private var _ammo:Ammo = null;
+		private var _ammo:Ammo;
 		private var _ownerGuid:String = "NOT SET";
 		
 		public function get position():Vector3D { return _position; }

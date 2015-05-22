@@ -33,7 +33,8 @@ package com.voxelengine {
 		// Yahoo Game Networks Big DB table names
 		static public const BIGDB_TABLE_INVENTORY:String = "inventory";
 		static public const BIGDB_TABLE_MODEL_METADATA:String = "modelMetadata";
-		static public const BIGDB_TABLE_MODEL_AND_OXEL_DATA:String = "modelAndOxelData";
+		static public const BIGDB_TABLE_MODEL_INFO:String = "modelInfo";
+		static public const BIGDB_TABLE_OXEL_DATA:String = "oxelData";
 		static public const BIGDB_TABLE_ANIMATIONS:String = "animations";
 		static public const BIGDB_TABLE_AMMO:String = "ammo";
 		static public const BIGDB_TABLE_REGIONS:String = "regions";
@@ -76,7 +77,8 @@ package com.voxelengine {
 		static public const VERSION_005:int 		  = 5;
 		static public const VERSION_006:int 		  = 6;
 		static public const VERSION_007:int 		  = 7;
-		static public const VERSION:int 			  = VERSION_007;
+		static public const VERSION_008:int 		  = 8;
+		static public const VERSION:int 			  = VERSION_008;
 		
 		static public const MANIFEST_VERSION:int = 100;
 		

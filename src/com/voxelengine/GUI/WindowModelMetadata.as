@@ -189,14 +189,15 @@ Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );
 		if ( _type == TYPE_EDIT ) {
 			// this field only exists when I am editting
 			_vmm.permissions.copyCount = parseInt( _copies.label, 10 );
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.UPDATE, 0, _vmm.modelGuid, _vmm ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.UPDATE, 0, _vmm.guid, _vmm ) );
 		} else { // TYPE_IMPORT so new data
-			var dboTemp:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, _vmm.modelGuid, "1", 0, true, null );
+			// need to document why I do this here
+			var dboTemp:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, _vmm.guid, "1", 0, true, null );
 			_vmm.dbo = dboTemp;
-			_vmm.toPersistance();
+			_vmm.hackedSaveToDBO();
 			_vmm.dbo = null;
 			_vmm.release();
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, _vmm.modelGuid, dboTemp, true ) );			
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, _vmm.guid, dboTemp, true ) );			
 		}
 		remove();
 	}

@@ -224,29 +224,24 @@ public class VoxelModel
 
 	// The export object is a combination of modelInfo and instanceInfo
 	public function buildExportObject( obj:Object ):void {
+		
 		modelInfo.buildExportObject( obj );
-
-		// child are added from the instanceInfo.
-		getChildJSON( obj.model );
-		
-		//obj.model.editable = metadata.permissions.
-		//obj.model.template = metadata.permissions.templateGuid
-		
-		function getChildJSON( obj:Object ):void {
-		// Same code that is in modelCache to build models in region
-		// this is just models in models
-			var oa:Vector.<Object> = new Vector.<Object>();
-			for each ( var vm:VoxelModel in _children ) {
-				if ( vm is Player )
-					continue;
-				//Log.out( "VoxelModel.getChildJSON - name: " + metadata.name + "  modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
-				var io:Object = new Object();
-				vm.instanceInfo.buildExportObject( io );
-				oa.push( io );
-			}
-			if ( 0 < oa.length )
-				obj.children = oa;
+		obj.model.children = getChildJSON();
+	}
+	
+	private function getChildJSON():Object {
+	// Same code that is in modelCache to build models in region
+	// this is just models in models
+		var oa:Vector.<Object> = new Vector.<Object>();
+		for each ( var vm:VoxelModel in _children ) {
+			if ( vm is Player )
+				continue;
+			//Log.out( "VoxelModel.getChildJSON - name: " + metadata.name + "  modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
+			var io:Object = new Object();
+			vm.instanceInfo.buildExportObject( io );
+			oa.push( io );
 		}
+		return oa;	
 	}
 	
 	protected function cameraAddLocations():void
@@ -386,7 +381,7 @@ public class VoxelModel
 	public function clone():VoxelModel {
 
 		// same model guid
-		var mi:ModelInfo = modelInfo.clone( this );
+		var mi:ModelInfo = modelInfo.cloneFromVoxelModel( this );
 		// new instance guid
 		var ii:InstanceInfo = instanceInfo.clone();
 		// get the current oxels config
@@ -981,11 +976,11 @@ public class VoxelModel
 		}
 		
 		if ( !changed ) {
-			Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.modelGuid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
+			Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 			return;
 		}
 		if ( !Globals.online ) {
-			Log.out( "VoxelModel.save - NOT online, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.modelGuid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
+			Log.out( "VoxelModel.save - NOT online, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 			return;
 		}
 		
@@ -998,14 +993,15 @@ public class VoxelModel
 			Log.out( "VoxelModel.save - animations not loaded name: " + _metadata.name, Log.DEBUG );
 			return;
 		}
-		Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.modelGuid: " + metadata.modelGuid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
+		Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 		//if ( null != metadata.permissions.templateGuid )
 			//metadata.permissions.templateGuid = "";
 				
 		Log.out( "VoxelModel.save - name: " + metadata.name );
 		changed = false;
 		metadata.save();
-		data.save( toByteArray() );
+		data.saveOxelData( toByteArray() );
+		modelInfo.saveVMData( getChildJSON() );
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1014,7 +1010,9 @@ public class VoxelModel
 	private function toByteArray():ByteArray {
 		var ba:ByteArray = new ByteArray();
 		writeVersionedHeader( ba );
-		writeManifest( ba );
+		//writeManifest( ba );
+		// VERSION_008 no longer uses embedded manifest.
+		writeEmptyManifest( ba );
 		ba = oxel.toByteArray( ba );
 		return ba;
 		
@@ -1044,22 +1042,16 @@ public class VoxelModel
 		ba = $oxel.toByteArray( ba );
 		return ba;
 		
-		function writeEmptyManifest( $ba:ByteArray ):void {
-			
-			// Always write the manifest into the IVM.
-			/* ------------------------------------------
-			   0 unsigned char model info version - 100 currently
-			   next byte is size of model json
-			   n+1...  is model json
-			   ------------------------------------------ */
-			$ba.writeByte(Globals.MANIFEST_VERSION);
-			$ba.writeInt( 0 );
-			//$ba.writeUTFBytes( json );
-		}
 	}
 
-	static private function writeVersionedHeader( $ba:ByteArray):void
-	{
+	static private function writeEmptyManifest( $ba:ByteArray ):void {
+		
+		// Generate an empty manifest for new model and for generated models
+		$ba.writeByte(Globals.MANIFEST_VERSION);
+		$ba.writeInt( 0 );
+	}
+	
+	static private function writeVersionedHeader( $ba:ByteArray):void {
 		/* ------------------------------------------
 		   0 char 'i'
 		   1 char 'v'

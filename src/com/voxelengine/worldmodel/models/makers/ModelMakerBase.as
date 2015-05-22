@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models.makers
 {
 import flash.utils.ByteArray;
+
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
@@ -16,7 +17,6 @@ import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-//import org.flashapi.swing.Alert;
 
 	/**
 	 * ...
@@ -35,7 +35,6 @@ public class ModelMakerBase {
 	protected var _parentModelGuid:String;
 	
 	static private var _s_parentChildCount:Array = new Array();
-
 	
 	public function ModelMakerBase( $ii:InstanceInfo, $fromTables:Boolean = true ) {
 		_ii = $ii;
@@ -115,10 +114,9 @@ public class ModelMakerBase {
 		var metaInfo:Object = new Object();
 		// Read off next 3 bytes, the data version
 		metaInfo.version = readVersion($ba);
-
 		// Read off next byte, the manifest version
 		metaInfo.manifestVersion = $ba.readByte();
-		//Log.out("VoxelModel.readMetaInfo - version: " + metaInfo.version + "  manifestVersion: " + metaInfo.manifestVersion );
+		Log.out("VoxelModel.readMetaInfo - version: " + metaInfo.version + "  manifestVersion: " + metaInfo.manifestVersion );
 		return metaInfo;
 
 		// This reads the format info and advances position on byteArray

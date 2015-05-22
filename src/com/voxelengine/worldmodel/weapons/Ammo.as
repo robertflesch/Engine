@@ -23,10 +23,10 @@ import com.voxelengine.events.AmmoEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.models.PersistanceObject;
 
-public class Ammo
+public class Ammo extends PersistanceObject
 {
-	protected var _dbo:DatabaseObject;
 	protected var _type:int = 1;
 	protected var _count:int = 1;
 	protected var _grain:int = 2;
@@ -38,7 +38,6 @@ public class Ammo
 	protected var _launchSoundFile:String = "Cannon.mp3";		
 	protected var _impactSoundFile:String = "CannonBallExploding.mp3";		
 	protected var _contactScript:String = "";
-	protected var _name:String = "No Name";
 	
 	public function get type():int  				{ return _type; }
 	public function set type(val:int):void			{ _type = val; }
@@ -56,17 +55,17 @@ public class Ammo
 	public function get impactSoundFile():String  	{ return _impactSoundFile; }
 	public function get contactScript():String  	{ return _contactScript; }
 	public function get model():String 				{ return _model; }
-	public function get name():String 				{ return _name; }
+	public function get name():String 				{ return guid; }
 	public function get oxelType():int 				{ return _oxelType; }
 	
 	public function Ammo( $name:String ) {
-		_name = $name;
+		super( $name, Globals.BIGDB_TABLE_AMMO );
 	}
 	
 	public function processClassJson( $ammoJson:Object ):void {		
 
 		if ( $ammoJson.name )
-			_name = $ammoJson.name;
+			guid = $ammoJson.name;
 		if ( $ammoJson.accuracy )
 			_accuracy = $ammoJson.accuracy;
 		if ( $ammoJson.velocity )
@@ -98,7 +97,7 @@ public class Ammo
 	
 	public function buildExportObject():Object {
 		var ammoData:Object = new Object();
-		ammoData.name				= _name;
+		ammoData.name				= guid;
 		ammoData.accuracy			= _accuracy;
 		ammoData.velocity			= _velocity;
 		ammoData.type				= _type;
@@ -114,8 +113,8 @@ public class Ammo
 	}
 	
 	
-	public function clone():Ammo {
-		var ammo:Ammo = new Ammo( _name );
+	override public function clone():* {
+		var ammo:Ammo = new Ammo( name );
 		
 		ammo._type = _type;
 		ammo._count = _count;
@@ -159,7 +158,7 @@ public class Ammo
 		_launchSoundFile 	= $msg.getString( $index++ );
 		_impactSoundFile 	= $msg.getString( $index++ );
 		_contactScript 		= $msg.getString( $index++ );
-		_name 				= $msg.getString( $index++ );
+		guid 				= $msg.getString( $index++ );
 		return $index;
 	}
 	
@@ -178,7 +177,7 @@ public class Ammo
 		ammos += "  launchSoundFile " + _launchSoundFile;
 		ammos += "  impactSoundFile " + _impactSoundFile;
 		ammos += "  contactScript " + _contactScript;
-		ammos += "  name " + _name;
+		ammos += "  name " + guid;
 		return ammos;
 	}
 	
@@ -186,9 +185,9 @@ public class Ammo
 	// FROM Persistance
 	////////////////////////////////////////////////////////////////
 	
-	public function fromPersistance( $dbo:DatabaseObject ):void {
+	override public function fromPersistance( $dbo:DatabaseObject ):void {
 		
-		_name 				= $dbo.key;
+		guid 				= $dbo.key;
 		_type				= $dbo.type;
 		_count				= $dbo.count;
 		_grain				= $dbo.grain;
@@ -202,22 +201,7 @@ public class Ammo
 		_contactScript		= $dbo.contactScript;
 	}
 	
-	public function save():void {
-		if ( Globals.online ) {
-			//Log.out( "AnimationMetadata.save - Saving Animation Metadata guid: " + _guid + "  modelGuid: " + _modelGuid ); // + " vmd: " + $vmd.toString(), Log.WARN );
-			addSaveEvents();
-			if ( _dbo )
-				toPersistance();
-			else {
-				var obj:Object = toObject();
-			}
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.BIGDB_TABLE_AMMO, name, _dbo, obj ) );
-		}
-		else
-			Log.out( "Ammo.save - Not saving ammo, offline", Log.WARN );
-	}
-	
-	public function toPersistance():void {
+	override protected function toPersistance():void {
 		
 		//_dbo.key = _name;
 		_dbo.type = _type;
@@ -233,7 +217,7 @@ public class Ammo
 		_dbo.contactScript = _contactScript;
 	}
 	
-	public function toObject():Object {
+	override protected function toObject():Object {
 		
 		var metadataObj:Object =   { type:			    _type			
 								   , count:			    _count			
@@ -248,45 +232,5 @@ public class Ammo
 								   , contactScript:	    _contactScript	};
 		return metadataObj;						   
 	}
-	
-	private function addSaveEvents():void {
-		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, saveFailed );
-		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, saveSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, createFailed );
-	}
-	
-	private function removeSaveEvents():void {
-		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, saveSucceed );
-		PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, saveFailed );
-		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, saveSucceed );
-		PersistanceEvent.removeListener( PersistanceEvent.CREATE_FAILED, createFailed );
-	}
-	
-	private function saveSucceed( $pe:PersistanceEvent ):void
-	{
-		if ( Globals.BIGDB_TABLE_AMMO != $pe.table )
-			return;
-		removeSaveEvents();
-		Log.out( "Ammo.saveSucceed" );
-	}
-	
-	private function saveFailed( $pe:PersistanceEvent ):void
-	{
-		if ( Globals.BIGDB_TABLE_AMMO != $pe.table )
-			return;
-		removeSaveEvents();
-		Log.out( "Ammo.saveFailed - MAY BE (error #2032)  The method SaveObjectChanges can only be called when connected to a game", Log.ERROR );
-	}
-	
-	private function createFailed( $pe:PersistanceEvent ):void
-	{
-		if ( Globals.BIGDB_TABLE_AMMO != $pe.table )
-			return;
-		removeSaveEvents();
-		Log.out( "Ammo.createFailed - Failed to create new Ammo object for this object.", Log.ERROR );
-	}	
-	
-	
 }
 }

@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -33,13 +33,13 @@ package com.voxelengine.worldmodel.weapons
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF 
-	 * The world model holds the active oxels
+	 * 
 	 */
 	public class Projectile extends VoxelModel 
 	{
 		static public var PROJECTILE_VELOCITY:String = "ProjectileVelocity";
 		
-		private var _ammo:Ammo 						= null;		
+		private var _ammo:Ammo;		
 		//private var _soundFile:String 				= "CannonBallBounce.mp3";		
 		//private var _soundFileExplode:String 		= "CannonBallExploding.mp3";		
 		private var _thatWhichCreatedYou:VoxelModel = null;

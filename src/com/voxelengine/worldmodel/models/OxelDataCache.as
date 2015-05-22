@@ -48,7 +48,7 @@ public class OxelDataCache
 			md = null;
 			// TODO need to clean up eventually
 		}
-		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mde.series, Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA, $mde.modelGuid, null ) );
+		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mde.series, Globals.BIGDB_TABLE_OXEL_DATA, $mde.modelGuid, null ) );
 	}
 	
 	static private function created( $mde:OxelDataEvent):void 	{ add( 0, $mde.vmd ); }
@@ -66,7 +66,7 @@ public class OxelDataCache
 		var mi:OxelData = _modelData[$mde.modelGuid]; 
 		if ( null == mi ) {
 			if ( true == Globals.online && $mde.fromTables )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mde.series, Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA, $mde.modelGuid ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mde.series, Globals.BIGDB_TABLE_OXEL_DATA, $mde.modelGuid ) );
 			else	
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mde.series, Globals.IVM_EXT, $mde.modelGuid, null, null, URLLoaderDataFormat.BINARY ) );
 		}
@@ -76,21 +76,21 @@ public class OxelDataCache
 	
 	static private function add( $series:int, $md:OxelData ):void 
 	{ 
-		if ( null == $md || null == $md.modelGuid ) {
+		if ( null == $md || null == $md.guid ) {
 			Log.out( "ModelDataCache.Add trying to add NULL modelData or guid", Log.WARN );
 			return;
 		}
 		// check to make sure this is new data
-		if ( null ==  _modelData[$md.modelGuid] ) {
+		if ( null ==  _modelData[$md.guid] ) {
 			//Log.out( "ModelDataCache.add adding: " + $md.modelGuid, Log.WARN );
-			_modelData[$md.modelGuid] = $md; 
-			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.ADDED, $series, $md.modelGuid, $md ) );
+			_modelData[$md.guid] = $md; 
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.ADDED, $series, $md.guid, $md ) );
 		}
 	}
 	
 	static private function loadSucceed( $pe:PersistanceEvent):void 
 	{
-		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA != $pe.table )
+		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
 		if ( $pe.dbo || $pe.data ) {
 			//Log.out( "ModelDataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
@@ -112,7 +112,7 @@ public class OxelDataCache
 	
 	static private function loadFailed( $pe:PersistanceEvent ):void 
 	{
-		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA != $pe.table )
+		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
 		Log.out( "ModelDataCache.loadFailed " + $pe.toString(), Log.WARN );
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
@@ -120,7 +120,7 @@ public class OxelDataCache
 	
 	static private function loadNotFound( $pe:PersistanceEvent):void 
 	{
-		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_MODEL_AND_OXEL_DATA != $pe.table )
+		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
 		//Log.out( "ModelDataCache.loadNotFound " + $pe.toString(), Log.WARN );
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );

@@ -51,7 +51,7 @@ package com.voxelengine.worldmodel.models
 			var results:Vector.<VoxelModel> = new Vector.<VoxelModel>();
 			for ( var i:int; i < _instances.length; i++ ) {
 				var vm:VoxelModel = _instances[i];
-				if ( vm && vm.metadata.modelGuid == $modelGuid )
+				if ( vm && vm.metadata.guid == $modelGuid )
 					results.push( vm );
 			}
 			return results;

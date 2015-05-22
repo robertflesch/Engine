@@ -21,19 +21,22 @@ public class ModelInfoEvent extends ModelBaseEvent
 {
 	private var _vmi:ModelInfo;
 	private var _modelGuid:String;
+	private var _fromTables:Boolean;
 
 	public function get vmi():ModelInfo { return _vmi; }
 	public function get modelGuid():String { return _modelGuid; }
+	public function get fromTables():Boolean  { return _fromTables; }
 	
-	public function ModelInfoEvent( $type:String, $series:int, $guid:String, $vmi:ModelInfo, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelInfoEvent( $type:String, $series:int, $guid:String, $vmi:ModelInfo, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $series, $bubbles, $cancellable );
 		_vmi = $vmi;
 		_modelGuid = $guid;
+		_fromTables = $fromTable;
 	}
 	
-	public override function toString():String { return formatToString("ModelInfoEvent", "modelGuid", "vmi" ); }
-	public override function clone():Event { return new ModelInfoEvent(type, series, _modelGuid, _vmi, bubbles, cancelable); }
+	public override function toString():String { return formatToString("ModelInfoEvent", "series", "modelGuid", "vmi", "fromTables" ); }
+	public override function clone():Event { return new ModelInfoEvent(type, series, _modelGuid, _vmi, _fromTables, bubbles, cancelable); }
 	
 	///////////////// Event handler interface /////////////////////////////
 

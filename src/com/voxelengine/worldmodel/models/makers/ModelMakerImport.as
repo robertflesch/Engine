@@ -53,7 +53,7 @@ public class ModelMakerImport extends ModelMakerBase {
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retrivedMetadata );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
 
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null ) );		
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null, false ) );		
 	}
 	
 	private function retrivedMetadata( $mme:ModelMetadataEvent ):void {
@@ -134,7 +134,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			try { ba.uncompress(); }
 			catch (error:Error) { ; }
 			if ( null == ba ) {
-				Log.out( "ModelMakerImport.createFromMakerInfo - Exception - NO data in VoxelModelMetadata: " + _vmd.modelGuid, Log.ERROR );
+				Log.out( "ModelMakerImport.createFromMakerInfo - Exception - NO data in VoxelModelMetadata: " + _vmd.guid, Log.ERROR );
 				return;
 			}
 			
@@ -150,7 +150,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			// read off that many bytes, even though we are using the data from the modelInfo file
 			var modelInfoJson:String = ba.readUTFBytes( strLen );
 			// reset the file name that it was loaded from and assign a new guid
-			_ii.modelGuid = _vmm.modelGuid = _vmd.modelGuid = Globals.getUID();
+			_ii.modelGuid = _vmm.guid = _vmd.guid = Globals.getUID();
 			_vmi.fileName = "";
 			
 			var vm:* = instantiate( _ii, _vmi ) //, _vmm, ba, versionInfo );

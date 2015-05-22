@@ -12,7 +12,7 @@ package com.voxelengine.worldmodel.scripts
 	public class ImpactScript extends Script 
 	{
 		
-		protected var _ammo:Ammo 		= null;
+		protected var _ammo:Ammo;
 		
 		public function ImpactScript( $ammo:Ammo ) 
 		{

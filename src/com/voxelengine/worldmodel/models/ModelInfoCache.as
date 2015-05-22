@@ -48,8 +48,12 @@ public class ModelInfoCache
 		}
 		//Log.out( "ModelInfoManager.modelInfoRequest guid: " + $mie.modelGuid, Log.INFO );
 		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
-		if ( null == mi )
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.modelGuid ) );
+		if ( null == mi ) {
+			if ( true == Globals.online && $mie.fromTables )
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid ) );
+			else	
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.modelGuid ) );
+		}
 		else
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.RESULT, $mie.series, $mie.modelGuid, mi ) );
 	}
@@ -78,10 +82,15 @@ public class ModelInfoCache
 	}
 	
 	static private function loadSucceed( $pe:PersistanceEvent):void {
-		if ( Globals.MODEL_INFO_EXT != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
 		//Log.out( "ModelInfoManager.modelInfoLoadSucceed guid: " + $pe.guid, Log.INFO );
-		if ( $pe.data ) {
+		if ( $pe.dbo || $pe.data ) {
+			var mi:ModelInfo = new ModelInfo( $pe.guid );
+			if ( $pe.dbo ) {
+				mi.fromPersistance( $pe.dbo );
+			}
+			else {
 				var fileData:String = String( $pe.data );
 				var modelInfoJson:String = StringUtils.trim(fileData);
 				// modelInfoJson = decodeURI(fileData);
@@ -92,11 +101,10 @@ public class ModelInfoCache
 					ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 					return;
 				}
-				
-				var mi:ModelInfo = new ModelInfo();
 				mi.initJSON( $pe.guid, jsonResult );
 				//ModelEvent.dispatch( new ModelEvent( ModelEvent.INFO_LOADED, guid ) );
-				add( $pe, mi );
+			}
+			add( $pe, mi );
 		}
 		else {
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
@@ -104,13 +112,14 @@ public class ModelInfoCache
 	}
 	
 	static private function loadFailed( $pe:PersistanceEvent ):void {
-		if ( Globals.MODEL_INFO_EXT != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
-		Log.out( "ModelInfoManager.modelInfoLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		Log.out( "ModelInfoManager.loadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
 	static private function loadNotFound( $pe:PersistanceEvent):void {
-		if ( Globals.MODEL_INFO_EXT != $pe.table )
+		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
 		Log.out( "ModelInfoManager.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
