@@ -115,6 +115,7 @@ public class ModelMakerGenerate {
 				vm.init( _vmi, _vmm );
 				vm.fromByteArray( ba );
 				vm.changed = true;
+				vm.complete = true;
 				vm.save();
 				Region.currentRegion.modelCache.add( vm );
 			}
