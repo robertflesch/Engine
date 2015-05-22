@@ -93,13 +93,13 @@ public class ModelMetadataCache
 	
 	static private function update($mme:ModelMetadataEvent):void {
 		if ( null == $mme || null == $mme.modelGuid ) {
-			Log.out( "MetadataManager.update trying to add NULL metadata or guid", Log.WARN );
+			Log.out( "ModelMetadataCache.update trying to add NULL metadata or guid", Log.WARN );
 			return;
 		}
 		// check to make sure is not already there
 		var vmm:ModelMetadata = _metadata[$mme.modelGuid];
 		if ( null ==  vmm ) {
-			Log.out( "MetadataManager.update trying update NULL metadata or guid, adding instead", Log.WARN );
+			Log.out( "ModelMetadataCache.update trying update NULL metadata or guid, adding instead", Log.WARN );
 			add( 0, $mme.vmm );
 		} else {
 			vmm.update( $mme.vmm );
@@ -108,10 +108,10 @@ public class ModelMetadataCache
 	
 	static private function request( $mme:ModelMetadataEvent ):void {   
 		if ( null == $mme.modelGuid ) {
-			Log.out( "MetadataManager.request guid rquested is NULL: ", Log.WARN );
+			Log.out( "ModelMetadataCache.request guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		//Log.out( "MetadataManager.request guid: " + $mme.modelGuid, Log.INFO );
+		//Log.out( "ModelMetadataCache.request guid: " + $mme.modelGuid, Log.INFO );
 		var vmm:ModelMetadata = _metadata[$mme.modelGuid]; 
 		if ( null == vmm )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid ) );
@@ -146,7 +146,7 @@ public class ModelMetadataCache
 	
 	static private function add( $series:int, $vmm:ModelMetadata ):void { 
 		if ( null == $vmm || null == $vmm.guid ) {
-			Log.out( "MetadataManager.add trying to add NULL metadata or guid", Log.WARN );
+			Log.out( "ModelMetadataCache.add trying to add NULL metadata or guid", Log.WARN );
 			return;
 		}
 		// check to make sure is not already there
@@ -161,7 +161,7 @@ public class ModelMetadataCache
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		if ( $pe.dbo ) {
-			//Log.out( "MetadataManager.loadSucceed guid: " + $pe.guid, Log.INFO );
+			//Log.out( "ModelMetadataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
 			var vmm:ModelMetadata = new ModelMetadata( $pe.guid );
 			vmm.fromPersistance( $pe.dbo );
 			if ( $pe.data && true == $pe.data )
@@ -169,7 +169,7 @@ public class ModelMetadataCache
 			add( $pe.series, vmm );
 		}
 		else {
-			Log.out( "MetadataManager.loadSucceed FAILED no DBO PersistanceEvent: " + $pe.toString(), Log.WARN );
+			Log.out( "ModelMetadataCache.loadSucceed FAILED no DBO PersistanceEvent: " + $pe.toString(), Log.WARN );
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 		}
 	}
@@ -177,14 +177,14 @@ public class ModelMetadataCache
 	static private function loadFailed( $pe:PersistanceEvent ):void  {
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
-		Log.out( "MetadataManager.metadataLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		Log.out( "ModelMetadataCache.metadataLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 
 	static private function loadNotFound( $pe:PersistanceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
-		Log.out( "MetadataManager.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		Log.out( "ModelMetadataCache.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
