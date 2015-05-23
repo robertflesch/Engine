@@ -9,6 +9,9 @@ Model placement
 	When you place a model, you can not stack another on top of it. It needs to have a placeholder inserted into the oxel.
 	Dynamic lighting on placed models is not correct.
 	Object editing inside holes of other objects not correct
+	If you click regional model manager in a child panel, then children should be showing the in inventory window.
+	PersistanceObject - only handles saves, loads, do I have savable and loadable objects? Everything is both by defination, handle as seperate objects?
+	NO WAY TO ADD MODEL FROM MODEL MANAGER "ADD Model"
 GUI
 	The close icon sometimes acts as acancel, other times as a save.
 	App does not get focus when starting, so I have to click it to use enter key to log in.

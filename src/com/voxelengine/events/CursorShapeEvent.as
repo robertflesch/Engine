@@ -20,8 +20,6 @@ public class CursorShapeEvent extends Event
 	static public const SQUARE:String 			= "SQUARE";
 	static public const SPHERE:String 			= "SPHERE";		
 	static public const CYLINDER:String 		= "CYLINDER";		
-	static public const MODEL_PARENT:String 	= "MODEL_PARENT";		
-	static public const MODEL_CHILD:String 		= "MODEL_CHILD";		
 	static public const MODEL_AUTO:String 		= "MODEL_AUTO";		
 
 	public function CursorShapeEvent( $type:String, $bubbles:Boolean = true, $cancellable:Boolean = false )

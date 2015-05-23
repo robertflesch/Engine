@@ -211,11 +211,8 @@ public class EditCursor extends VoxelModel
 	// CursorShapeEvents
 	private function shapeSetEvent(e:CursorShapeEvent):void { 
 		_cursorShape = e.type 
-		if ( CursorShapeEvent.MODEL_CHILD == _cursorShape )
-			VoxelModel.selectedModel = objectModel;
-		else if ( CursorShapeEvent.MODEL_PARENT == _cursorShape )
-			VoxelModel.selectedModel = null;
-		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation ) {	
+
+		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation || CursorOperationEvent.INSERT_MODEL == cursorOperation ) {	
 			if ( CursorShapeEvent.CYLINDER == cursorShape )
 				oxelTextureValid = oxelTexture = EditCursor.EDITCURSOR_CYLINDER;
 			else if ( CursorShapeEvent.SPHERE == cursorShape )
@@ -266,8 +263,6 @@ public class EditCursor extends VoxelModel
 		CursorOperationEvent.removeListener( CursorOperationEvent.INSERT_MODEL, insertModelEvent );
 		
 		CursorShapeEvent.removeListener( CursorShapeEvent.CYLINDER, 	shapeSetEvent );
-		CursorShapeEvent.removeListener( CursorShapeEvent.MODEL_CHILD, 	shapeSetEvent );
-		CursorShapeEvent.removeListener( CursorShapeEvent.MODEL_PARENT, shapeSetEvent );
 		CursorShapeEvent.removeListener( CursorShapeEvent.MODEL_AUTO, 	shapeSetEvent );
 		CursorShapeEvent.removeListener( CursorShapeEvent.SPHERE, 		shapeSetEvent );
 		CursorShapeEvent.removeListener( CursorShapeEvent.SQUARE, 		shapeSetEvent );
@@ -295,8 +290,6 @@ public class EditCursor extends VoxelModel
 		CursorOperationEvent.addListener( CursorOperationEvent.INSERT_MODEL, 	insertModelEvent );
 		
 		CursorShapeEvent.addListener( CursorShapeEvent.CYLINDER, 		shapeSetEvent );
-		CursorShapeEvent.addListener( CursorShapeEvent.MODEL_CHILD, 	shapeSetEvent );
-		CursorShapeEvent.addListener( CursorShapeEvent.MODEL_PARENT, 	shapeSetEvent );
 		CursorShapeEvent.addListener( CursorShapeEvent.MODEL_AUTO, 		shapeSetEvent );
 		CursorShapeEvent.addListener( CursorShapeEvent.SPHERE, 			shapeSetEvent );
 		CursorShapeEvent.addListener( CursorShapeEvent.SQUARE, 			shapeSetEvent );
@@ -348,25 +341,19 @@ public class EditCursor extends VoxelModel
 	
 	public function drawCursor($mvp:Matrix3D, $context:Context3D, $isChild:Boolean, $alpha:Boolean ):void	{
 
-		var viewMatrixParent:Matrix3D;
+		
 		// if there is a parent, adjust matrix for it first
 		if ( VoxelModel.selectedModel ) { // This means type cursor
-			viewMatrixParent = VoxelModel.selectedModel.instanceInfo.worldSpaceMatrix.clone();
+			var viewMatrixParent:Matrix3D = VoxelModel.selectedModel.instanceInfo.worldSpaceMatrix.clone();
 			viewMatrixParent.append($mvp);
 			$mvp = viewMatrixParent;
 		}
 		
 		if ( objectModel ) {
-			if ( ( CursorShapeEvent.MODEL_CHILD == _cursorShape && gciData ) 
-			    || CursorShapeEvent.MODEL_PARENT == _cursorShape
-				|| CursorShapeEvent.MODEL_AUTO == _cursorShape ) {
-				//if ( oxelTexture != EDITCURSOR_INVALID ) {
-					if ( $alpha )
-						objectModel.drawAlpha( $mvp, $context, true );
-					else	
-						objectModel.draw( $mvp, $context, true );
-				//}
-			}
+			if ( $alpha )
+				objectModel.drawAlpha( $mvp, $context, true );
+			else	
+				objectModel.draw( $mvp, $context, true );
 		}
 
 		if ( gciData ) { // if no intersection dont draw
@@ -389,42 +376,36 @@ public class EditCursor extends VoxelModel
 		
 		gciData = null;
 		// this puts the insert/delete location if appropriate into the gciData
-		if ( _cursorOperation == CursorOperationEvent.INSERT_OXEL || _cursorOperation == CursorOperationEvent.DELETE_OXEL )
+		if ( _cursorOperation != CursorOperationEvent.NONE )
 			ModelCacheUtils.highLightEditableOxel();
-		else if ( _cursorOperation == CursorOperationEvent.INSERT_MODEL || _cursorOperation == CursorOperationEvent.DELETE_MODEL )
-			if ( CursorShapeEvent.MODEL_CHILD == _cursorShape || CursorShapeEvent.MODEL_AUTO == _cursorShape )
-				ModelCacheUtils.highLightEditableOxel();
 		
 		// We generate gci data for INSERT_MODEL with cursorShape == MODEL_CHILD || MODEL_AUTO
 		if ( gciData ) {
 			if ( _cursorOperation == CursorOperationEvent.INSERT_OXEL || _cursorOperation == CursorOperationEvent.INSERT_MODEL ) {
 				// This gets the closest open oxel along the ray
 				var pl:PlacementLocation = insertLocationCalculate( gciData.model );
-				if ( PlacementLocation.INVALID == pl.state ) {
-					oxelTexture = EDITCURSOR_INVALID; // ;
-//					instanceInfo.positionSetComp( _gciData.gc.getModelX(), _gciData.gc.getModelY(), _gciData.gc.getModelZ() );
-				} else {
-					oxelTexture = oxelTextureValid;
-				}
+				PlacementLocation.INVALID == pl.state ?  oxelTexture = EDITCURSOR_INVALID : oxelTexture = oxelTextureValid;
+
+				if ( cursorShape == CursorShapeEvent.MODEL_AUTO && objectModel )
+					objectModel.instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
+
 				instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
-				if ( cursorShape == CursorShapeEvent.MODEL_CHILD || cursorShape == CursorShapeEvent.MODEL_AUTO )
-					if ( objectModel )
-						objectModel.instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
 			}
 			else if ( _cursorOperation == CursorOperationEvent.DELETE_OXEL || _cursorOperation == CursorOperationEvent.DELETE_MODEL ) {
 				instanceInfo.positionSetComp( _gciData.gc.getModelX(), _gciData.gc.getModelY(), _gciData.gc.getModelZ() );
 			}
 			buildCursorModel();	
 		} 
-		else if ( objectModel ) { // this is the INSERT_MODEL with cursorShape == MODEL_PARENT
-			oxelTexture = oxelTextureValid;
+		
+		if ( !gciData && objectModel ) { // this is the INSERT_MODEL where its not on a parent model
 			var vv:Vector3D = ModelCacheUtils.viewVectorNormalizedGet();
-			vv.scaleBy( objectModel.oxel.gc.size() * 2 );
+			vv.scaleBy( objectModel.oxel.gc.size() * 4 );
 			vv = vv.add( VoxelModel.controlledModel.instanceInfo.positionGet );
 			objectModel.instanceInfo.positionSet = vv;
-			instanceInfo.positionSet = vv;
-			objectModel.update($context, elapsedTimeMS );
 		}
+		
+		if ( objectModel )
+			objectModel.update($context, elapsedTimeMS );
 		
 		internal_update($context, elapsedTimeMS );
 	}
@@ -533,7 +514,7 @@ public class EditCursor extends VoxelModel
 		if ( EDITCURSOR_INVALID == oxelTexture )
 			return;
 			
-		if ( VoxelModel.selectedModel && ( CursorShapeEvent.MODEL_CHILD == _cursorShape || CursorShapeEvent.MODEL_AUTO == _cursorShape ) ) {
+		if ( VoxelModel.selectedModel ) {
 			VoxelModel.selectedModel.childAdd( objectModel.clone() );
 			Log.out( "EditCursor.insertModel - adding as CHILD", Log.WARN );
 		}
@@ -557,7 +538,7 @@ public class EditCursor extends VoxelModel
 				Log.out( "EditCursor.insertOxel - Invalid location" );
 				return;
 			}
-			
+	
 			if ( isAvatarInsideThisOxel( foundModel, oxelToBeModified ) )
 			{
 				Log.out( "EditCursor.insertOxel - Trying to place an oxel on top of ourself" );

@@ -46,6 +46,9 @@ package com.voxelengine.GUI.inventory {
 			return result;
 		}
 		
+		static public var _s_hackShowChildren:Boolean;
+		static public var _s_hackSupportClick:Boolean;
+		
 		public function WindowInventoryNew( $startingTab:String )
 		{
 			super( LanguageManager.localizedStringGet( ALL_ITEMS ));
@@ -115,6 +118,8 @@ package com.voxelengine.GUI.inventory {
 			}
 			
 			super.onRemoved( event );
+			_s_hackShowChildren = false;
+			_s_hackSupportClick = false;
 		}
 		
 		private function selectCategory(e:ListEvent):void 

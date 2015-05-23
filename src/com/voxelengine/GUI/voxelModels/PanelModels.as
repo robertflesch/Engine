@@ -114,8 +114,7 @@ public class PanelModels extends PanelBase
 
 		var addButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Add" ) + ".."  );
 		//addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
-		var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
-		addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowInventoryNew( startingTab ); } );
+		addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, addModel );
 		
 		addButton.y = 5;			
 		addButton.x = 2;			
@@ -160,6 +159,13 @@ public class PanelModels extends PanelBase
 			else
 				noModelSelected();
 		}
+		
+		function addModel(event:UIMouseEvent):void { 
+			WindowInventoryNew._s_hackShowChildren = true;
+			WindowInventoryNew._s_hackSupportClick = true;
+			var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
+			new WindowInventoryNew( startingTab ); 
+		}
 	}
 
 	private function selectModel(event:ListEvent):void 
@@ -168,7 +174,7 @@ public class PanelModels extends PanelBase
 		if ( _selectedModel )
 		{
 			buttonsEnable();
-			//VoxelModel.selectedModel = _selectedModel;
+			VoxelModel.selectedModel = _selectedModel
 			// TO DO this is the right path, but probably need a custom event for this...
 			Globals.g_app.dispatchEvent( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, _selectedModel, _parentModel ) );
 			//_parent.childPanelAdd( _selectedModel );

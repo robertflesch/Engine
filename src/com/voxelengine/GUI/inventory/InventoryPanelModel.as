@@ -12,7 +12,9 @@ import com.voxelengine.events.ModelEvent;
 import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+import com.voxelengine.worldmodel.models.ModelCache;
 import com.voxelengine.worldmodel.models.ModelMetadata;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.display.DisplayObject;
 import flash.events.Event;
 import flash.net.FileReference;
@@ -174,8 +176,9 @@ public class InventoryPanelModel extends VVContainer
 		if ( ObjectInfo.OBJECTINFO_MODEL == $oi.objectType ) {
 			var om:ObjectModel = $oi as ObjectModel;
 			// dont show child models
-			if ( null != om.vmm.parentModelGuid )
-				return null;
+			if ( !WindowInventoryNew._s_hackShowChildren )
+				if ( null != om.vmm.parentModelGuid )
+					return null;
 		}
 				
 		var box:BoxInventory = findFirstEmpty();	
@@ -183,10 +186,33 @@ public class InventoryPanelModel extends VVContainer
 			box.updateObjectInfo( $oi );
 			if ( allowDrag )
 				eventCollector.addEvent( box, UIMouseEvent.PRESS, doDrag);
+			if ( WindowInventoryNew._s_hackSupportClick	)
+				eventCollector.addEvent( box, UIMouseEvent.CLICK, addModelTo );
+
 			return box;
 		}
 		Log.out( "InventoryPanelModel.addModel - Failed to addModel: " + $oi );
 		return null
+	}
+	
+	private function addModelTo( e:UIMouseEvent ):void {
+		var om:ObjectModel = (e.target.objectInfo as ObjectModel);
+		
+		var ii:InstanceInfo = new InstanceInfo();
+		ii.modelGuid = om.modelGuid;
+		if ( VoxelModel.selectedModel )
+			ii.controllingModel = VoxelModel.selectedModel;
+		ModelMakerBase.load( ii );
+		
+		
+		//if ( VoxelModel.selectedModel ) {
+			//VoxelModel.selectedModel.childAdd( objectModel.clone() );
+			//Log.out( "EditCursor.insertModel - adding as CHILD", Log.WARN );
+		//}
+		//else {  
+			//Region.currentRegion.modelCache.add( objectModel.clone() );
+			//Log.out( "EditCursor.insertModel - adding as PARENT", Log.WARN );
+		//}
 	}
 	
 	private function addEmptyRow( $countMax:int ):void {

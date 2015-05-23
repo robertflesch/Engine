@@ -104,12 +104,14 @@ public class ModelPlacementType extends VVCanvas
 		visible = true;
 		_outline.visible = true;
 		
-		if ( "child" == _butCurrent.data)
-			CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_CHILD ) );
-		else if ( "parent" == _butCurrent.data)	
-			CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_PARENT ) );
-		else if ( "auto" == _butCurrent.data)	
-			CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_AUTO ) );
+		//if ( "child" == _butCurrent.data)
+			//CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_CHILD ) );
+		//else if ( "parent" == _butCurrent.data)	
+			//CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_PARENT ) );
+		//else if ( "auto" == _butCurrent.data)	
+			//CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_AUTO ) );
+			
+		CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_AUTO ) );
 	}
 	
 	public function hide():void
