@@ -9,7 +9,6 @@ package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.utils.JSONUtil;
 import flash.utils.Dictionary;
-import org.flashapi.swing.Alert;
 
 import com.voxelengine.utils.StringUtils;
 
@@ -85,26 +84,34 @@ public class ModelInfoCache
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
 		//Log.out( "ModelInfoManager.modelInfoLoadSucceed guid: " + $pe.guid, Log.INFO );
+		// $pe.dbo is valid for loading from persistance, $pe.data is valid on imports
 		if ( $pe.dbo || $pe.data ) {
-			var mi:ModelInfo = new ModelInfo( $pe.guid );
-			if ( $pe.dbo ) {
-				mi.fromPersistance( $pe.dbo );
+			// need to check we don't have this info already
+			var mi:ModelInfo = _modelInfo[$pe.guid]; 
+			if ( null == mi ) {
+				mi = new ModelInfo( $pe.guid );
+				if ( $pe.dbo ) {
+					mi.fromPersistance( $pe.dbo );
+				}
+				else {
+					// This is for import from local only.
+					var fileData:String = String( $pe.data );
+					var modelInfoJson:String = StringUtils.trim(fileData);
+					var jsonResult:Object = JSONUtil.parse( modelInfoJson, $pe.guid + $pe.table, "ModelInfoCache.loadSucceed" );
+					if ( null == jsonResult ) {
+						Log.out( "ModelInfoCache.loadSucceed - error parsing modelInfo on import. guid: " + $pe.guid, Log.ERROR );
+						ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
+						return;
+					}
+					mi.initJSON( $pe.guid, jsonResult );
+					//ModelEvent.dispatch( new ModelEvent( ModelEvent.INFO_LOADED, guid ) );
+				}
+				add( $pe, mi );
 			}
 			else {
-				var fileData:String = String( $pe.data );
-				var modelInfoJson:String = StringUtils.trim(fileData);
-				// modelInfoJson = decodeURI(fileData);
-				//Log.out( "ModelInfoCache.loadSucceed - STRING modelInfo: " + modelInfoJson,	Log.WARN );
-				var jsonResult:Object = JSONUtil.parse( modelInfoJson, $pe.guid + $pe.table, "ModelInfoCache.loadSucceed" );
-				if ( null == jsonResult ) {
-					(new Alert( "VoxelVerse - Error Parsing: " + $pe.guid + $pe.table, 500 ) ).display();
-					ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
-					return;
-				}
-				mi.initJSON( $pe.guid, jsonResult );
-				//ModelEvent.dispatch( new ModelEvent( ModelEvent.INFO_LOADED, guid ) );
+				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, mi ) );
+				Log.out( "ModelInfoCache.loadSucceed - attempting to add duplicate ModelInfo guid: " + $pe.guid, Log.ERROR );
 			}
-			add( $pe, mi );
 		}
 		else {
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );

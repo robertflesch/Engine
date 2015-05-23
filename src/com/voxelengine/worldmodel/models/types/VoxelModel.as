@@ -378,31 +378,6 @@ public class VoxelModel
 //			Log.out( "VoxelModel.childLoadingComplete - got message for other model I am: " + metadata.name + "  got message for: " + e.modelGuid, Log.WARN );
 	}
 	
-	public function clone():VoxelModel {
-
-		// same model guid
-		var mi:ModelInfo = modelInfo.cloneFromVoxelModel( this );
-		// new instance guid
-		var ii:InstanceInfo = instanceInfo.clone();
-		// get the current oxels config
-		var ba:ByteArray = new ByteArray();
-		ba = oxel.toByteArray( ba );
-		// should clone decrement the copy count? TODO
-		var vmm:ModelMetadata = metadata.clone();
-		var vmd:OxelData = data.clone();
-		
-		var vm:* = ModelMakerBase.instantiate( ii, mi );
-		if ( vm ) {
-			vm.data = vmd;
-			vm.version = version;
-			vm.init( mi, vmm );
-			vm.fromByteArray( ba );
-			vm.modelInfo.animationsLoad( vm );
-			vm.complete = true;
-		}
-		return vm;
-	}
-	
 	private function impactEventHandler(ie:ImpactEvent):void {
 		// Is the explosion event close enough to me to cause me to explode?
 		if (ie.instanceGuid == instanceInfo.instanceGuid )

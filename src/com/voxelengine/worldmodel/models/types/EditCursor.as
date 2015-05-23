@@ -35,6 +35,7 @@ import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.ModelPlacementType;
 import com.voxelengine.worldmodel.models.makers.ModelMakerCursor;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.tasks.flowtasks.CylinderOperation;
 import com.voxelengine.worldmodel.tasks.flowtasks.SphereOperation;
@@ -514,15 +515,10 @@ public class EditCursor extends VoxelModel
 		if ( EDITCURSOR_INVALID == oxelTexture )
 			return;
 			
-		if ( VoxelModel.selectedModel ) {
-			VoxelModel.selectedModel.childAdd( objectModel.clone() );
-			Log.out( "EditCursor.insertModel - adding as CHILD", Log.WARN );
-		}
-		else {  
-			Region.currentRegion.modelCache.add( objectModel.clone() );
-			Log.out( "EditCursor.insertModel - adding as PARENT", Log.WARN );
-		}
-		
+		var ii:InstanceInfo = objectModel.instanceInfo.clone();
+		if ( VoxelModel.selectedModel )
+			ii.controllingModel = VoxelModel.selectedModel;
+		ModelMakerBase.load( ii );
 	}
 	
 	private function insertOxel(recurse:Boolean = false):void {

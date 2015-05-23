@@ -110,8 +110,6 @@ public class ModelMakerCursor extends ModelMakerBase {
 		if ( Globals.VERSION_007 >= versionInfo.version ) {
 			// Just read it for advancing the byteArray
 			var modelInfoObject:Object = extractModelInfo( ba );
-			//var mi:ModelInfo = new ModelInfo( _vmd.guid );
-			//mi.initJSON( _ii.modelGuid, modelInfoObject );
 		} else {
 			// the size of the manifest (0) which is no longer being embedded
 			ba.readInt();

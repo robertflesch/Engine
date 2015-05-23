@@ -90,14 +90,6 @@ public class ModelInfo extends PersistanceObject
 		throw new Error( "ModelInfo.clone - USE CLONE FROM VOXELMODEL METHOD" );
 	}
 
-	public function cloneFromVoxelModel( $vm:VoxelModel ):ModelInfo {
-		var obj:Object = new Object();
-		$vm.buildExportObject( obj );
-		var mi:ModelInfo = new ModelInfo( $vm.instanceInfo.modelGuid );
-		mi.initJSON( $vm.modelInfo.guid, obj );
-		return mi;
-	}
-	
 	// remove the children after they are loaded, so that when the object is saved
 	// the active children from the voxel model are used.
 	// Applies to the "REPLACE_ME" above
