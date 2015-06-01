@@ -7,13 +7,11 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-import com.voxelengine.worldmodel.oxel.OxelBitfields;
 import flash.display3D.Context3D;
 import flash.events.KeyboardEvent;
 import flash.events.TimerEvent;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
-import flash.net.registerClassAlias;
 import flash.ui.Keyboard;
 import flash.utils.ByteArray;
 import flash.utils.getQualifiedClassName;
@@ -29,16 +27,12 @@ import com.voxelengine.pools.LightingPool;
 import com.voxelengine.pools.GrainCursorPool;
 import com.voxelengine.pools.OxelPool;
 
-import com.voxelengine.renderer.shaders.*
-
 import com.voxelengine.worldmodel.*;
 import com.voxelengine.worldmodel.animation.*;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.oxel.Lighting;
-import com.voxelengine.worldmodel.oxel.FlowInfo;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
-import com.voxelengine.worldmodel.oxel.LightInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
@@ -54,21 +48,16 @@ import com.voxelengine.worldmodel.weapons.Projectile;
  */
 public class VoxelModel
 {
-	private 	var _data:OxelData;
 	private 	var	_metadata:ModelMetadata;
 	protected 	var	_modelInfo:ModelInfo; 													// INSTANCE NOT EXPORTED
 	protected 	var	_instanceInfo:InstanceInfo; 											// INSTANCE NOT EXPORTED
-	private 	var	_oxel:Oxel; 															// INSTANCE NOT EXPORTED
 	
-	protected 	var	_shaders:Vector.<Shader>        			= new Vector.<Shader>;		// INSTANCE NOT EXPORTED
 	protected 	var	_children:Vector.<VoxelModel> 				= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
 	
 	private		var	_anim:Animation;			
 	private		var	_camera:Camera								= new Camera();
 	
-	protected 	var	_childrenLoaded:Boolean						= true;
 	protected 	var	_animationsLoaded:Boolean					= true;
-	private		var	_statisics:ModelStatisics 					= new ModelStatisics(); 	// INSTANCE NOT EXPORTED
 	protected	var	_stateLock:Boolean 														// INSTANCE NOT EXPORTED
 
 	private		var	_initialized:Boolean 													// INSTANCE NOT EXPORTED
@@ -80,14 +69,15 @@ public class VoxelModel
 	private		var	_visible:Boolean 							= true;  // Should be exported/ move to instance
 	
 	private		var	_timer:int 									= getTimer(); 				// INSTANCE NOT EXPORTED
-	private		var	_version:int; 															// INSTANCE NOT EXPORTED
 			
 	private		var	_lightIDNext:uint 							= 1024; // TODO FIX reserve space for ?
+	private var _hasInventory:Boolean;
+	
+	public function get hasInventory():Boolean 				{ return _hasInventory; }
+	public function set hasInventory(value:Boolean):void  	{ _hasInventory = value; }
 				
 	protected function get initialized():Boolean 				{ return _initialized; }
 	protected function set initialized( val:Boolean ):void		{ _initialized = val; }
-	public	function get data():OxelData    					{ return _data; }
-	public	function set data(val:OxelData):void   				{ _data = val; }
 	public	function get metadata():ModelMetadata    			{ return _metadata; }
 	public	function set metadata(val:ModelMetadata):void   	{ _metadata = val; }
 	public	function get usesGravity():Boolean 					{ return _usesGravity; }
@@ -95,7 +85,7 @@ public class VoxelModel
 	public	function get getPerModelLightID():uint 				{ return _lightIDNext++ }
 	public	function get camera():Camera						{ return _camera; }
 	public	function get anim():Animation 						{ return _anim; }
-	public	function get statisics():ModelStatisics				{ return _statisics; }
+//	public	function get statisics():ModelStatisics				{ return _statisics; }
 	public	function get instanceInfo():InstanceInfo			{ return _instanceInfo; }
 	public	function get visible():Boolean 						{ return _visible; }
 	public	function set visible(val:Boolean):void 				{ _visible = val; }
@@ -114,8 +104,6 @@ public class VoxelModel
 	}
 	public	function get selected():Boolean 					{ return _selected; }
 	public	function set selected(val:Boolean):void  			{ _selected = val; }
-	public	function set version(value:int):void  				{ _version = value; }
-	public	function get version():int  						{ return _version; }
 	
 	public function get dead():Boolean 							{ return _dead; }
 	public function set dead(val:Boolean):void 					{ 
@@ -134,27 +122,11 @@ public class VoxelModel
 	public function get complete():Boolean						{ return _complete; }
 	public function set complete(val:Boolean):void
 	{
-		Log.out( "VoxelModel.complete: " + modelInfo.fileName );
+		Log.out( "VoxelModel.complete: " + modelInfo.guid );
 		_complete = val;
 	}
 	
 	public function toString():String 				{ return metadata.toString() + " ii: " + instanceInfo.toString(); }
-	public function get oxel():Oxel { return _oxel; }
-	public function set oxel(val:Oxel):void
-	{
-		// This test for someone trying to overwrite an oxel with another value
-		if (null != _oxel && null != val)
-			throw new Error("VoxelModel.oxel SET, old oxel not null")
-		_oxel = val;
-	}
-	
-	public function get childrenLoaded():Boolean { return _childrenLoaded; }
-	public function set childrenLoaded(value:Boolean):void 
-	{
-		//Log.out( "VoxelModel.childrenLoaded - modelGuid: " + instanceInfo.modelGuid + " setting to: " + value, Log.WARN );
-		_childrenLoaded = value;
-	}
-	
 	public function get animationsLoaded():Boolean { return _animationsLoaded; }
 	public function set animationsLoaded(value:Boolean):void 
 	{
@@ -163,20 +135,8 @@ public class VoxelModel
 	}
 	
 	protected function processClassJson():void {
-		//if ( _modelInfo.biomes && false == complete && 0 < _modelInfo.biomes.layers.length ) {
-			//if ( _modelInfo.biomes.layers[0].functionName == "LoadModelFromBigDB" ) {
-				//Log.out( "VoxelModel.processClassJson - GET RID OF THESE", Log.ERROR );
-				//return;
-			//}
-				//
-			//Log.out( "VoxelModel.processClassJson - adding task for: " + _modelInfo.biomes );
-			//_modelInfo.biomes.add_to_task_controller(instanceInfo);
-		//}
-		
-		// This unblocks the landscape task controller when all terrain tasks have been added
-//			if (0 == Globals.g_landscapeTaskController.activeTaskLimit)
-//				Globals.g_landscapeTaskController.activeTaskLimit = 1;
-		childrenLoad();
+		Log.out( "VoxelModel.processClassJson load children for model name: " + _metadata.name, Log.DEBUG ),
+		modelInfo.childrenLoad( this );
 		
 		// Both instanceInfo and modelInfo can have scripts. With each being persisted in correct location.
 		// Currently both are persisted to instanceInfo, which is very bad...
@@ -187,45 +147,13 @@ public class VoxelModel
 		}
 	}
 	
-	private function childrenLoad():void {
-		// if we have no children, let this stand
-		
-		childrenLoaded	= true;
-		if ( _modelInfo.children && 0 < _modelInfo.children.length)
-		{
-			Log.out( "VoxelModel.childrenLoad - loading " + _modelInfo.children.length + " children for model name: " + _metadata.name );
-			childrenLoaded	= false;
-			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
-			//Log.out( "VoxelModel.processClassJson name: " + metadata.name + " - loading child models START" );
-			for each (var childInstanceInfo:InstanceInfo in _modelInfo.children)
-			{
-				// Add the parent model info to the child.
-				childInstanceInfo.controllingModel = this;
-				childInstanceInfo.baseLightLevel = instanceInfo.baseLightLevel;
-				
-				//Log.out( "VoxelModel.internal_initialize - create child of parent.instance: " + instanceInfo.guid + "  - child.instanceGuid: " + child.instanceGuid );					
-				if ( null == childInstanceInfo.modelGuid )
-					continue;
-				// now load the child, this might load from the persistance
-				// or it could be an import, or it could be a model for the toolbar.
-				// we never want to prompt for imported children, since this only happens in dev mode.
-				// to test if we are in the bar mode, we test of instanceGuid.
-				// Since this is a child object, it automatically get added to the parent.
-				// So add to cache just adds it to parent instance.
-				//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
-				Log.out( "VoxelModel.childrenLoad - calling load on ii: " + childInstanceInfo );
-				ModelMakerBase.load( childInstanceInfo, true, false );
-			}
-			Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + _metadata.name );
-			_modelInfo.childrenReset();
-			//Log.out( "VoxelModel.processClassJson - loading child models END" );
-		}
-	}
-
+	public function get oxel():Oxel { return _modelInfo.oxel; }
+	
 	// The export object is a combination of modelInfo and instanceInfo
 	public function buildExportObject( obj:Object ):void {
 		
-		modelInfo.buildExportObject( obj );
+		modelInfo.toObject();
+		obj = modelInfo.obj
 		obj.model.children = getChildJSON();
 	}
 	
@@ -233,7 +161,7 @@ public class VoxelModel
 	// Same code that is in modelCache to build models in region
 	// this is just models in models
 		var oa:Vector.<Object> = new Vector.<Object>();
-		for each ( var vm:VoxelModel in _children ) {
+		for each ( var vm:VoxelModel in children ) {
 			if ( vm is Player )
 				continue;
 			//Log.out( "VoxelModel.getChildJSON - name: " + metadata.name + "  modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
@@ -321,33 +249,25 @@ public class VoxelModel
 	
 	public function VoxelModel( $ii:InstanceInfo ):void {
 		_instanceInfo = $ii;
+		_instanceInfo.owner = this; // This tells the instanceInfo that this voxel model is its owner.
 	}
 	
-	public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true):void {
+	//public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true):void {
+	public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		_modelInfo = $mi;
 		_metadata = $vmm;
-		instanceInfo.owner = this; // This tells the instanceInfo that this voxel model is its owner.
 
-		if ($initializeRoot)
-			oxel = Oxel.initializeRoot( (0 < instanceInfo.grainSize ? instanceInfo.grainSize : modelInfo.grainSize), instanceInfo.baseLightLevel );
-		
 		if ( null == _metadata )
 			metadata = new ModelMetadata( instanceInfo.modelGuid );
 		else 
 			metadata = $vmm;
 		
-		//if ((this is EditCursor) || null != instanceInfo.controllingModel || true == instanceInfo.dynamicObject) {
-		if ( null != instanceInfo.controllingModel || true == instanceInfo.dynamicObject ) {
-//				trace( "VoxelModel - Not added ImpactEvent.EXPLODE for childObject " + _modelInfo.modelClass );
-		}
-		else if ( metadata.permissions.modify ) {
-			//ModelEvent.addListener( ModelEvent.MODEL_MODIFIED, handleModelEvents);
-			
+		if ( metadata.permissions.modify ) {
+//			Log.out( "VoxelModel - added ImpactEvent.EXPLODE for " + _modelInfo.modelClass );
 			ImpactEvent.addListener(ImpactEvent.EXPLODE, impactEventHandler);
 			ImpactEvent.addListener(ImpactEvent.DFIRE, impactEventHandler);
 			ImpactEvent.addListener(ImpactEvent.DICE, impactEventHandler);
 			ImpactEvent.addListener(ImpactEvent.ACID, impactEventHandler);
-//				trace( "VoxelModel - added ImpactEvent.EXPLODE for " + _modelInfo.modelClass );
 		}
 		
 		cameraAddLocations();
@@ -356,26 +276,6 @@ public class VoxelModel
 			stateSet(instanceInfo.state)
 			
 		processClassJson();
-		
-	}
-	
-	private function childLoadingComplete(e:ModelLoadingEvent):void {
-//		Log.out( "VoxelModel.childLoadingComplete - e: " + e, Log.WARN );
-		if ( e.parentModelGuid == instanceInfo.modelGuid ) {
-			//Log.out( "VoxelModel.childLoadingComplete - for modelGuid: " + instanceInfo.modelGuid, Log.WARN );
-			ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
-			// if we save the model, before it is complete, we put bad child data into model info
-			childrenLoaded = true;
-			// save the new or imported models
-			if ( null == _metadata.dbo || null == _data.dbo ) {
-				changed = true;
-				save();
-			}
-			else	
-				changed = false;
-		}
-//		else
-//			Log.out( "VoxelModel.childLoadingComplete - got message for other model I am: " + metadata.name + "  got message for: " + e.modelGuid, Log.WARN );
 	}
 	
 	private function impactEventHandler(ie:ImpactEvent):void {
@@ -492,6 +392,7 @@ public class VoxelModel
 	   return dist_squared > 0;
 	   }
 	 */
+	   /*
 	public function grow(placementResult:Object):void {
 		oxel = oxel.grow(placementResult);
 		// now have to reposition this in logical space.
@@ -521,7 +422,7 @@ public class VoxelModel
 		instanceInfo.positionSet = currentPosition;
 		oxel.rebuildAll();
 	}
-	
+	*/
 	public function flow( $countDown:int = 8, $countOut:int = 8 ):void
 	{
 		oxel.flowFindCandidates( instanceInfo.instanceGuid, $countDown, $countOut );	
@@ -553,6 +454,7 @@ public class VoxelModel
 		
 		if ( Globals.BAD_OXEL != changedOxel )
 		{
+			modelInfo.oxelDataChanged();
 			changed = true;
 			result = true;
 			var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
@@ -630,83 +532,32 @@ public class VoxelModel
 		//oxel.mergeRecursive(); // Causes bad things to happen since we dont regen faces!
 	}
 	
-	public function draw(mvp:Matrix3D, $context:Context3D, $isChild:Boolean ):void	{
+	public function draw(mvp:Matrix3D, $context:Context3D, $isChild:Boolean, $alpha:Boolean ):void	{
 		if ( !visible )
 			return;
 		
 		var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
 		viewMatrix.append(mvp);
 		
-		if ( oxel )
-		{
+		if ( oxel ) {
 			// We have to draw all of the non alpha first, otherwise parts of the tree might get drawn after the alpha does
 			var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
-			//oxel.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
-			oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
+			modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha );
 		}
 		
-		for each (var vm:VoxelModel in _children)
-		{
+		for each (var vm:VoxelModel in _children) {
 			if (vm && vm.complete)
-				vm.draw(viewMatrix, $context, true );
-		}
-		
-//			if ( oxel.childrenHas() || oxel.quads )
-//				lightingFromSun();
-	}
-	
-	public function drawAlpha(mvp:Matrix3D, $context:Context3D, $isChild:Boolean ):void	{
-		
-		var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
-		viewMatrix.append(mvp);
-		
-		if ( oxel )
-		{
-			// We have to draw all of the non alpha first, otherwise parts of the tree might get drawn after the alpha does
-			var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
-			
-			//oxel.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
-			// this method is TWICE as fast in the render cycle
-			oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
-		}
-		
-		for each (var vm:VoxelModel in _children)
-		{
-			if (vm && vm.complete)
-				vm.drawAlpha(viewMatrix, $context, true);
+				vm.draw(viewMatrix, $context, true, $alpha );
 		}
 	}
 	
 	public function update($context:Context3D, $elapsedTimeMS:int):void	{
-		internal_update($context, $elapsedTimeMS);
-		
-		if (!complete)
-			return;
-		
-		collisionTest($elapsedTimeMS);
-		
-		// update each child
-		for each (var vm:VoxelModel in _children)
-		{
-			vm.update($context, $elapsedTimeMS);
+		if (!initialized) {
+			initialized = true;
+			OxelDataEvent.addListener( ModelBaseEvent.RESULT_COMPLETE, oxelComplete );
+			modelInfo.createShaders( $context );
+			modelInfo.oxelLoadData();
 		}
-		
-		for each (var deadCandidate:VoxelModel in _children)
-		{
-			if (true == deadCandidate.dead)
-				childRemove(deadCandidate);
-		}
-		
-//			changed is used internally - need a new way to determine if an event needs to be sent out when a model has moved
-//			if (instanceInfo.changed && this == VoxelModel.controlledModel)
-//				dispatchMovementEvent();
-	}
-	
-	private static const _sZERO_VEC:Vector3D = new Vector3D();
-	protected function internal_update($context:Context3D, $elapsedTimeMS:int):void
-	{
-		if (!initialized)
-			initialize($context);
 		
 		if (complete) {
 			instanceInfo.update($elapsedTimeMS);
@@ -714,65 +565,30 @@ public class VoxelModel
 			if (oxel && oxel.dirty)
 				oxel.cleanup();
 		}
-	}
-	
-	public function internal_initialize($context:Context3D):void
-	{
-		if (!_modelInfo)
+		
+		if (!complete)
 			return;
-			//throw new Error("VoxelModel.internal_initialize - modelInfo not found: " + instanceInfo.guid);
 		
-		initialized = true;
-		visible = true;
+		collisionTest($elapsedTimeMS);
 		
-		//Log.out( "VoxelModel.internal_initialize - enter - instanceGuid: " + instanceInfo.instanceGuid + " name: " + metadata.name );					
-		_timer = getTimer();
+		for each (var vm:VoxelModel in _children) {
+			vm.update($context, $elapsedTimeMS);
+		}
 		
-		createShaders($context);
-		
-		// idea here was if I already have it loaded, why bother to load it again from disk.
-		// sort of works, but I never see the model,
-		//if ( 1 == _modelInfo.biomes.layers.length && "LoadModelFromIVM" == _modelInfo.biomes.layers[0].functionName && null != Globals.g_modelManager.modelByteArrays[_modelInfo.biomes.layers[0].data] )	
-		//	byteArrayLoad( Globals.g_modelManager.modelByteArrays[_modelInfo.biomes.layers[0].data] );
-		//else 
-		//if (_modelInfo.biomes && false == complete && false == metadata.hasDataObject )
-		//processClassJson();
-	
-		//Log.out( "VoxelModel.internal_initialize - exit - instanceGuid: " + instanceInfo.guid + " took: " + (getTimer() - _timer) );					
+		for each (var deadCandidate:VoxelModel in _children) {
+			if (true == deadCandidate.dead)
+				childRemove(deadCandidate);
+		}
 	}
 	
-	public function initialize($context:Context3D):void
-	{
-		internal_initialize($context);
+	private function oxelComplete( $ode:OxelDataEvent ):void {
+		if ( $ode.modelGuid == instanceInfo.modelGuid ) {
+			OxelDataEvent.removeListener( ModelBaseEvent.RESULT_COMPLETE, oxelComplete );
+			Log.out( "VoxelModel.oxelComplete guid: " + $ode.modelGuid );
+			complete = true;
+		}
 	}
-	
-	private function set_camera_data():void
-	{
-		//var max:Number = oxel.size_in_world_coordinates() * 1.05;
-		//Globals.g_renderer.viewOffsetSet( -max, -max, -max );
-		//Log.out( "VoxelModel.set_camera_data - setting view offset to : " + -max + ", " + -max + ", " + -max + ", " );
-	}
-	
-	private function createShaders($context:Context3D):void
-	{
-		var shader:Shader = null;
-		_shaders.push( new ShaderOxel($context) ); // oxel
-		
-		shader = new ShaderOxel($context); // animated oxel
-		shader.isAnimated = true;
-		_shaders.push( shader );
-		
-		_shaders.push( new ShaderAlpha($context) ); // alpha oxel
-		
-		shader = new ShaderAlpha($context); // animated alpha oxel
-		shader.isAnimated = true;
-		_shaders.push( shader );
-		
-		shader = new ShaderFire($context); // fire
-		shader.isAnimated = true;
-		_shaders.push( shader );
-	}
-	
+
 	public function calculateCenter( $oxelCenter:int = 0 ):void
 	{
 		if ( 0 == instanceInfo.center.length )
@@ -783,6 +599,9 @@ public class VoxelModel
 		}
 	}
 	
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//  Children functions
+	/////////////////////////////////////////////////////////////////////////////////////////////
 	public function childAdd( $child:VoxelModel):void
 	{
 		if ( null ==  $child.instanceInfo.instanceGuid )
@@ -885,6 +704,9 @@ public class VoxelModel
 		}
 		throw new Error("VoxelModel.childFindByName - not found for name: " + $name);
 	}
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//  End Children functions
+	/////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public function print():void
 	{
@@ -895,34 +717,18 @@ public class VoxelModel
 		Log.out("------------------------------------------------------------------------------");
 	}
 	
-	public function oxelReset():void {
-		if (oxel) {
-			oxel.release();
-			oxel = null;
-		}
-	}
-	
 	public function reinitialize( $context:Context3D ):void {
-		//trace("VoxelModel.reinitialize - modelInfo: " + modelInfo.fileName );
-		for each ( var shader:Shader in _shaders )
-			shader.createProgram( $context );
+		modelInfo.reinitialize( $context );
 			
 		for each (var child:VoxelModel in _children)
 			child.reinitialize( $context );
 	}
 	
 	public function dispose():void {
-		for each ( var shader:Shader in _shaders )
-			shader.dispose();
-			
-		if (oxel)
-			oxel.dispose();
-			
+		modelInfo.dispose();
+		
 		for each (var child:VoxelModel in _children)
 			child.dispose();
-		
-//		if ( editCursor )
-//			editCursor.dispose();
 	}
 	
 	public function release():void {
@@ -936,13 +742,16 @@ public class VoxelModel
 		}
 		
 		//trace( "VoxelModel.release: " + instanceInfo.fileName );
-		oxelReset();
+		//oxelReset();
 		
 		modelInfo.release();
 		instanceInfo.release();
 		metadata.release();	
 	}
 	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Loading and Saving Voxel Models
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public function save():void
 	{
 		for ( var i:int; i < _children.length; i++ ) {
@@ -959,7 +768,7 @@ public class VoxelModel
 			return;
 		}
 		
-		if (  false == childrenLoaded ) {
+		if (  false == modelInfo.childrenLoaded ) {
 			Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name, Log.DEBUG );
 			return;
 		}
@@ -975,134 +784,10 @@ public class VoxelModel
 		Log.out( "VoxelModel.save - name: " + metadata.name );
 		changed = false;
 		metadata.save();
-		data.saveOxelData( toByteArray() );
-		modelInfo.saveVMData( getChildJSON() );
+		modelInfo.childrenSet( getChildJSON() );
+		modelInfo.save();
 	}
 	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Loading and Saving Voxel Models
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private function toByteArray():ByteArray {
-		var ba:ByteArray = new ByteArray();
-		writeVersionedHeader( ba );
-		//writeManifest( ba );
-		// VERSION_008 no longer uses embedded manifest.
-		writeEmptyManifest( ba );
-		ba = oxel.toByteArray( ba );
-		return ba;
-		
-		function writeManifest( $ba:ByteArray ):void {
-			
-			// Always write the manifest into the IVM.
-			/* ------------------------------------------
-			   0 unsigned char model info version - 100 currently
-			   next byte is size of model json
-			   n+1...  is model json
-			   ------------------------------------------ */
-			$ba.writeByte(Globals.MANIFEST_VERSION);
-			var obj:Object = new Object();
-			buildExportObject( obj );
-			var json:String = JSON.stringify( obj );
-			Log.out( "VoxelModel.writeManifest json: " + json, Log.WARN );			
-			$ba.writeInt( json.length );
-			$ba.writeUTFBytes( json );
-		}
-	}
-	
-	// used by the generate functions.
-	static public function oxelAsBasicModel( $oxel:Oxel ):ByteArray {
-		var ba:ByteArray = new ByteArray();
-		writeVersionedHeader( ba );
-		writeEmptyManifest( ba );
-		ba = $oxel.toByteArray( ba );
-		return ba;
-		
-	}
-
-	static private function writeEmptyManifest( $ba:ByteArray ):void {
-		
-		// Generate an empty manifest for new model and for generated models
-		$ba.writeByte(Globals.MANIFEST_VERSION);
-		$ba.writeInt( 0 );
-	}
-	
-	static private function writeVersionedHeader( $ba:ByteArray):void {
-		/* ------------------------------------------
-		   0 char 'i'
-		   1 char 'v'
-		   2 char 'm'
-		   3 char '0' (zero) major version
-		   4 char '' (0-9) minor version
-		   5 char '' (0-9) lesser version
-		   ------------------------------------------ */
-		$ba.writeByte('i'.charCodeAt());
-		$ba.writeByte('v'.charCodeAt());
-		$ba.writeByte('m'.charCodeAt());
-		var outVersion:String = zeroPad( Globals.VERSION, 3 );
-		$ba.writeByte(outVersion.charCodeAt(0));
-		$ba.writeByte(outVersion.charCodeAt(1));
-		$ba.writeByte(outVersion.charCodeAt(2));
-
-		function zeroPad(number:int, width:int):String {
-		   var ret:String = ""+number;
-		   while( ret.length < width )
-			   ret="0" + ret;
-		   return ret;
-		}
-	}
-		
-	public function fromByteArray($ba:ByteArray):void
-	{
-		// Read off 1 bytes, the root size
-		var rootGrainSize:int = $ba.readByte();
-		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
-		gct.grain = rootGrainSize;
-		_statisics.gather( version, $ba, rootGrainSize);
-		
-		registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);	
-		registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);	
-		if (Globals.VERSION_000 == version)
-			oxel.readData( null, gct, $ba, _statisics );
-		else
-			oxel.readVersionedData( version, null, gct, $ba, _statisics );
-		
-		oxel.gc.bound = rootGrainSize;
-		instanceInfo.grainSize = rootGrainSize;
-		GrainCursorPool.poolDispose(gct);
-		
-		calculateCenter();
-		set_camera_data();
-		oxelLoaded();
-	}
-	
-	// acts as stub for overloading
-	protected function oxelLoaded():void
-	{
-		calculateCenter();
-	}
-	
-	// This was used to read Tox's
-	private function getKeyValuePair($ba:ByteArray):Object
-	{
-		var byteRead:int = 0;
-		byteRead = $ba.readByte();
-		var keyString:String = "";
-		while (String.fromCharCode(byteRead) != ' ')
-		{
-			keyString += String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-		}
-		
-		var valueString:String = "";
-		byteRead = $ba.readByte();
-		while (String.fromCharCode(byteRead) != '\n')
-		{
-			valueString += String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-		}
-		
-		return {key: keyString, value: valueString};
-	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// END - Loading and Saving Voxel Models
@@ -1287,40 +972,6 @@ public class VoxelModel
 		oxel.validate();
 	}
 	
-	private function validateOxel( $ba:ByteArray, $currentGrain:int):ByteArray
-	{
-		var faceData:uint = $ba.readUnsignedInt();
-		var type:uint;
-		if ( version <= Globals.VERSION_006 )
-			type = OxelBitfields.typeFromRawDataOld(faceData);
-		else {  //_version > Globals.VERSION_006
-			var typeData:uint = $ba.readUnsignedInt();
-			type = OxelBitfields.type1FromData(typeData);
-		}
-		
-		if (OxelBitfields.data_is_parent(faceData))
-		{
-			$currentGrain--;
-			for (var i:int = 0; i < 8; i++)
-			{
-				validateOxel($ba, $currentGrain);
-			}
-			$currentGrain++;
-		}
-		else
-		{
-			if (!TypeInfo.typeInfo[type])
-			{
-				trace("unknown grain of - unknown key: " + type);
-				$ba.position -= 4;
-				$ba.writeInt(TypeInfo.RED);
-				trace("set unknown grain to RED: " + type);
-			}
-		}
-		
-		return $ba;
-	}
-	
 	public function changeGrainSize( changeSize:int):void
 	{
 		_timer = getTimer();
@@ -1415,29 +1066,6 @@ public class VoxelModel
 		return false;
 	}
 	
-	/*
-	// So if you release control of any model but the player, the player is back in control
-	// Now if there are multiple players (or is this not the case, is Player a special case of Avatar)
-	public function handleModelEvents( $me:ModelEvent ):void {
-		if ( ModelEvent.RELEASE_CONTROL == $me.type ) {
-			var classCalled:String = $me.parentInstanceGuid;
-Log.out( "VoxelModel.handleModelEvents - ModelEvent.RELEASE_CONTROL called on: " + classCalled, Log.DEBUG );				
-			if ( classCalled != "com.voxelengine.worldmodel.models::Player" )
-				Player.player.takeControl( null, false );
-				// TODO Need something here to determine which model
-				//if ( $me.instanceGuid
-			
-		}
-		else if ( ModelEvent.MODEL_MODIFIED ) {
-Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on instance: " + $me.instanceGuid + "  my guid: " + instanceInfo.instanceGuid, Log.DEBUG );								
-//				$me.instanceGuid
-			if ( $me.instanceGuid == instanceInfo.instanceGuid ) 
-				changed = true;
-			else if ( childModelFind( $me.instanceGuid ) )
-				changed = true;
-		}
-	}
-	*/
 	public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void
 	{
 		//if ( $modelLosingControl )
@@ -1446,7 +1074,6 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 			//Log.out( "VoxelModel.takeControl of : " + modelInfo.fileName );
 		
 		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 		
 		VoxelModel.controlledModel = this;
 		
@@ -1463,7 +1090,6 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 	public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void
 	{
 		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
-		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_UP, onKeyUp);
 		
 		// remove the player to the child list
 		if ( $detachChild )
@@ -1473,19 +1099,13 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		//ModelEvent.dispatch( new ModelEvent( ModelEvent.RELEASE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
 	}
 	
-	// these are overriden in subclasses to allow for custom movement
-	protected function onKeyDown(e:KeyboardEvent):void
-	{
-		if (Keyboard.TAB == e.keyCode && 0 == Globals.openWindowCount )
-		{
+	// handle the tab key event to move camera around, this is only for controlled model
+	protected function onKeyDown(e:KeyboardEvent):void {
+		if (Keyboard.TAB == e.keyCode && 0 == Globals.openWindowCount ) {
 			camera.next();
-			
 			// I want the camera for the controlled object, not the avatar.
 			var currentCamera:CameraLocation = VoxelModel.controlledModel.camera.current;
-			//Player.player.visible = currentCamera.toolBarVisible;
-			trace("VoxelModel.keyDown cameraLocation: " + currentCamera.position + "  " + currentCamera.rotation);
-			
-//				if (CameraLocation.FIRST_PERSON == camera.index && this is Player)
+//			trace("VoxelModel.keyDown cameraLocation: " + currentCamera.position + "  " + currentCamera.rotation);
 			if ( currentCamera.toolBarVisible )
 				GUIEvent.dispatch( new GUIEvent(GUIEvent.TOOLBAR_SHOW));
 			else
@@ -1493,18 +1113,15 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		}
 	}
 	
-	protected function onKeyUp(e:KeyboardEvent):void
-	{
-	}
+	// overridden by decendants
+	protected function onKeyUp(e:KeyboardEvent):void  { }
 	
-	protected function dispatchMovementEvent():void
-	{
+	protected function dispatchMovementEvent():void {
 		var me:ModelEvent = new ModelEvent(ModelEvent.MOVED, instanceInfo.instanceGuid, instanceInfo.positionGet, instanceInfo.rotationGet);
 		Globals.g_app.dispatchEvent(me);
 	}
 	
-	public function getAccumulatedYRotation(rotationY:Number):Number
-	{
+	public function getAccumulatedYRotation(rotationY:Number):Number {
 		rotationY += instanceInfo.rotationGet.y;
 		if (instanceInfo.controllingModel)
 			rotationY = instanceInfo.controllingModel.getAccumulatedYRotation(rotationY);
@@ -1513,8 +1130,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 	}
 	
 	
-	public function stateLock( $val:Boolean, $lockTime:int = 0 ):void
-	{
+	public function stateLock( $val:Boolean, $lockTime:int = 0 ):void {
 		Log.out("VoxelModel.stateLock - stateLock: " + $val );
 		_stateLock = $val;
 		// if $lockTime then unlock after that amount of time.
@@ -1538,7 +1154,7 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		if ( (_anim && _anim.metadata.name == $state) || 0 == modelInfo.animations.length )
 			return;
 			
-		if ( _modelInfo.childCount > _children.length ) {
+		if ( false == modelInfo.childrenLoaded ) {
 			// really need to check if children are complete, not just added
 			Log.out("VoxelModel.stateSet - children not all loaded yet: " + $state );
 			return; // not all children have loaded yet
@@ -1605,14 +1221,6 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 			return result;
 		}
 	}
-	
-	// This is currently only used by the stateSet function
-	//private function onModelLoadComplete( event:LoadingEvent):void
-	//{
-		//Log.out( "VoxelModel.onModelLoadComplete: " + modelInfo.fileName  );
-		//LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
-		//stateSet( instanceInfo.state );
-	//}
 	
 	private function stateSetData($at:AnimationTransform, $useInitializer:Boolean, $lockTime:Number):void
 	{
@@ -1720,6 +1328,11 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 		return slots;
 	}
 	
+	// acts as stub for overloading
+	protected function oxelLoaded():void
+	{
+//		calculateCenter();
+	}
 	
 	private static var g_controlledModel:VoxelModel = null;
 	public static function get controlledModel():VoxelModel { return g_controlledModel; }
@@ -1730,6 +1343,19 @@ Log.out( "VoxelModel.handleModelEvents - ModelEvent.MODEL_MODIFIED called on ins
 	public static function set selectedModel( val:VoxelModel ):void { 
 		//Log.out( "VoxelModel.selectedModel: " + ( val ? val.toString() : "null") , Log.WARN );
 		g_selectedModel = val; 
+	}
+	
+	public function size():int {
+		if ( _modelInfo && _modelInfo.data && _modelInfo.data.loaded )
+			return _modelInfo.data.oxel.size_in_world_coordinates();
+		else
+			return 0;
+	}
+	public function get grain():int {
+		if ( _modelInfo && _modelInfo.data && _modelInfo.data.loaded )
+			return _modelInfo.data.oxel.gc.grain;
+		else
+			return 0;
 	}
 }
 }

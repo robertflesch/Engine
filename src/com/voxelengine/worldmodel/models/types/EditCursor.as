@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.worldmodel.biomes.Biomes;
+import com.voxelengine.worldmodel.models.OxelData;
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
@@ -52,26 +54,33 @@ public class EditCursor extends VoxelModel
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	static private var _s_currentInstance:EditCursor;
 
-	static public const EDIT_CURSOR:String 		= "EditCursor";
-	static 	private	const SCALE_FACTOR:Number 			= 0.01;
+	static public const 		EDIT_CURSOR:String 		= "EditCursor";
+	static 	private	const 		SCALE_FACTOR:Number 			= 0.01;
+		
+	static private const 		EDITCURSOR_SQUARE:uint				= 1000;
+	static private const 		EDITCURSOR_ROUND:uint				= 1001;
+	static private const 		EDITCURSOR_CYLINDER:uint			= 1002;
+	static private const 		EDITCURSOR_CYLINDER_ANIMATED:uint	= 1003;
+	static private const 		EDITCURSOR_INVALID:uint				= 1004;
 	
-	static private const EDITCURSOR_SQUARE:uint				= 1000;
-	static private const EDITCURSOR_ROUND:uint				= 1001;
-	static private const EDITCURSOR_CYLINDER:uint			= 1002;
-	static private const EDITCURSOR_CYLINDER_ANIMATED:uint	= 1003;
-	static private const EDITCURSOR_INVALID:uint				= 1004;
+	static private var 			_editing:Boolean;
+	static public function  get editing():Boolean 					{ return _editing; }
+	static public function  set editing(val:Boolean):void 			{ _editing = val; }
 	
 	static public function get currentInstance():EditCursor {
 		if ( null == _s_currentInstance ) {
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			instanceInfo.modelGuid = EDIT_CURSOR
-
+			_s_currentInstance = new EditCursor( instanceInfo );
+			
+			var metadata:ModelMetadata = new ModelMetadata( EDIT_CURSOR );
+			metadata.permissions.modify = false;
 			var modelInfo:ModelInfo = new ModelInfo( EDIT_CURSOR );
 			modelInfo.fileName = EDIT_CURSOR;
 			modelInfo.modelClass = EDIT_CURSOR;
-
-			_s_currentInstance = new EditCursor( instanceInfo );
-			_s_currentInstance.init( modelInfo, null );
+			
+			_s_currentInstance.init( modelInfo, metadata );
+			_s_currentInstance.modelInfo.createEditCursor( EDIT_CURSOR );
 		}
 		return _s_currentInstance;
 	}
@@ -98,8 +107,6 @@ public class EditCursor extends VoxelModel
 	public function 	get gciData():GrainCursorIntersection 			{ return _gciData; }
 	public function 	set gciData(value:GrainCursorIntersection):void { _gciData = value; }
 	
-	private 		 	var _editing:Boolean;
-	public function  	get editing():Boolean 							{ return _editing; }
 	
 	private 			var _objectModel:VoxelModel;
 	private function 	get	objectModel( ):VoxelModel { return _objectModel;}
@@ -129,6 +136,28 @@ public class EditCursor extends VoxelModel
 		}
 	}
 	
+	////////////////////////////////////////////////
+	// EditCursor creation/removal
+	public function EditCursor( instanceInfo:InstanceInfo ):void {
+		super( instanceInfo );
+	}
+
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
+		super.init( $mi, $vmm );
+		GUIEvent.addListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
+		GUIEvent.addListener( GUIEvent.APP_ACTIVATE, onActivate );
+		
+		addListeners();
+	}
+	
+	override public function release():void {
+		super.release();
+		
+		removeListeners();
+		
+		GUIEvent.removeListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
+		GUIEvent.removeListener( GUIEvent.APP_ACTIVATE, onActivate );
+	}
 	
 	protected function onDeactivate( e:GUIEvent ):void  {
 		//Log.out( "onDeactivate - disabling repeat" );
@@ -201,11 +230,18 @@ public class EditCursor extends VoxelModel
 		cursorOperation = e.type;
 	}
 	private function insertModelEvent(e:CursorOperationEvent):void {
+		Log.out( "EditCursor.insertModelEvent", Log.WARN );
 		_editing = true;
 		cursorShape = CursorShapeEvent.MODEL_AUTO;
 		cursorOperation = e.type;
 		oxelTextureValid = oxelTexture = e.oxelType;
-		objectModelAdd( e.om );
+		
+		var ii:InstanceInfo = new InstanceInfo();
+		// Add the parent model info to the child.
+//			ii.controllingModel = this;
+		ii.baseLightLevel = Lighting.MAX_LIGHT_LEVEL;
+		ii.modelGuid = e.om.modelGuid;
+		var mm:ModelMakerCursor = new ModelMakerCursor( ii, e.om.vmm );
 	}
 	
 	////////////////////////////////////////////////
@@ -223,38 +259,6 @@ public class EditCursor extends VoxelModel
 		}
 	}
 	
-	////////////////////////////////////////////////
-	// EditCursor creation/removal
-	public function EditCursor( instanceInfo:InstanceInfo ):void {
-		super( instanceInfo );
-	}
-
-	override public function initialize($context:Context3D ):void {
-		internal_initialize($context );
-		complete = true;
-		Log.out( "EditCursor.initialize" );
-	}
-	
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
-		super.init( $mi, $vmm );
-		oxel.gc.bound = 4;
-		visible = false;
-		oxel.vertexMangerAssign( statisics );
-		GUIEvent.addListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
-		GUIEvent.addListener( GUIEvent.APP_ACTIVATE, onActivate );
-		
-		addListeners();
-	}
-	
-	override public function release():void {
-		super.release();
-		
-		removeListeners();
-		
-		GUIEvent.removeListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
-		GUIEvent.removeListener( GUIEvent.APP_ACTIVATE, onActivate );
-	}
-
 	private function removeListeners():void {	
 		_listenersAdded = false;
 		CursorOperationEvent.removeListener( CursorOperationEvent.NONE, 		resetEvent );
@@ -321,55 +325,33 @@ public class EditCursor extends VoxelModel
 	}
 	
 	
-	public function objectModelSet( $cm:VoxelModel ):void {
-		_objectModel = $cm;
-		oxel.gc.bound = $cm.oxel.gc.bound;
-		oxel.gc.grain = $cm.oxel.gc.bound;
-		if ( null == oxel.vm_get() )
-			oxel.vertexMangerAssign( statisics );
-		if ( null == objectModel.oxel.vm_get() )
-			objectModel.oxel.vertexMangerAssign( objectModel.statisics );
-	}
-	
-	private function objectModelAdd( $om:ObjectModel ):void {
-		var ii:InstanceInfo = new InstanceInfo();
-		// Add the parent model info to the child.
-//			ii.controllingModel = this;
-		ii.baseLightLevel = Lighting.MAX_LIGHT_LEVEL;
-		ii.modelGuid = $om.modelGuid;
-		var mm:ModelMakerCursor = new ModelMakerCursor( ii, $om.vmm );
+	public function objectModelSet( $om:VoxelModel ):void {
+		Log.out( "EditCursor.objectModelSet - model: " + $om.toString(), Log.DEBUG );
+		_objectModel = $om;
 	}
 	
 	public function drawCursor($mvp:Matrix3D, $context:Context3D, $isChild:Boolean, $alpha:Boolean ):void	{
-
-		
 		// if there is a parent, adjust matrix for it first
-		if ( VoxelModel.selectedModel ) { // This means type cursor
-			var viewMatrixParent:Matrix3D = VoxelModel.selectedModel.instanceInfo.worldSpaceMatrix.clone();
-			viewMatrixParent.append($mvp);
-			$mvp = viewMatrixParent;
-		}
+		//if ( VoxelModel.selectedModel ) { // This means type cursor
+			//var viewMatrixParent:Matrix3D = VoxelModel.selectedModel.instanceInfo.worldSpaceMatrix.clone();
+			//viewMatrixParent.append($mvp);
+			//$mvp = viewMatrixParent;
+		//}
 		
-		if ( objectModel ) {
-			if ( $alpha )
-				objectModel.drawAlpha( $mvp, $context, true );
-			else	
-				objectModel.draw( $mvp, $context, true );
+		if ( objectModel && objectModel.complete ) {
+			objectModel.draw( $mvp, $context, true, $alpha );
 		}
 
-		if ( gciData ) { // if no intersection dont draw
-			var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
-			viewMatrix.prependScale( 1 + SCALE_FACTOR, 1 + SCALE_FACTOR, 1 + SCALE_FACTOR ); 
-			var positionscaled:Vector3D = viewMatrix.position;
-			var t:Number = oxel.gc.size() * SCALE_FACTOR/2;
-			viewMatrix.prependTranslation( -t, -t, -t)
-			viewMatrix.append($mvp);
-			
-			if ( $alpha )
-				oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
-			else if ( null == objectModel )	
-				oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
-		}
+		//if ( gciData ) { // if no intersection dont draw
+			//var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
+			//viewMatrix.prependScale( 1 + SCALE_FACTOR, 1 + SCALE_FACTOR, 1 + SCALE_FACTOR ); 
+			//var positionscaled:Vector3D = viewMatrix.position;
+			//var t:Number = oxel.gc.size() * SCALE_FACTOR/2;
+			//viewMatrix.prependTranslation( -t, -t, -t)
+			//viewMatrix.append($mvp);
+			//
+			//modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha )
+		//}
 	}
 	
 	override public function update($context:Context3D, elapsedTimeMS:int ):void {
@@ -398,7 +380,8 @@ public class EditCursor extends VoxelModel
 			buildCursorModel();	
 		} 
 		
-		if ( !gciData && objectModel ) { // this is the INSERT_MODEL where its not on a parent model
+		if ( !gciData && objectModel && objectModel.complete ) { // this is the INSERT_MODEL where its not on a parent model
+			oxelTexture = oxelTextureValid;
 			var vv:Vector3D = ModelCacheUtils.viewVectorNormalizedGet();
 			vv.scaleBy( objectModel.oxel.gc.size() * 4 );
 			vv = vv.add( VoxelModel.controlledModel.instanceInfo.positionGet );
@@ -407,8 +390,6 @@ public class EditCursor extends VoxelModel
 		
 		if ( objectModel )
 			objectModel.update($context, elapsedTimeMS );
-		
-		internal_update($context, elapsedTimeMS );
 	}
 	
 	private function buildCursorModel():void {	
@@ -803,15 +784,7 @@ public class EditCursor extends VoxelModel
 		var foundModel:VoxelModel;
 		switch (e.keyCode) 
 		{
-			// No idea what case F does, and since it causes a link to GUI, I am removing it.
 			//case Keyboard.F:
-				//if ( true == EditCursor.editing && true == EditCursor.toolOrBlockEnabled )
-				//{
-					//if ( 0 == QuickInventory.currentItemSelection )
-						//deleteOxel();
-					//else if ( 1 < QuickInventory.currentItemSelection )
-						//insertOxel();
-				//}
 				//break;
 			case 107: case Keyboard.NUMPAD_ADD:
 			case 45: case Keyboard.INSERT:

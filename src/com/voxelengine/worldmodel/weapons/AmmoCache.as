@@ -88,7 +88,7 @@ public class AmmoCache
 					AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 					return;
 				}
-				ammo.processClassJson( jsonResult.ammo );
+				ammo.fromObject( jsonResult.ammo, null );
 				ammo.save();
 			}
 				
@@ -119,6 +119,5 @@ public class AmmoCache
 		else	
 			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
-	
 }
 }

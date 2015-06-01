@@ -8,6 +8,8 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
+	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.ModelInfoEvent;
 	import flash.utils.getTimer;
 	
 	import com.developmentarc.core.tasks.tasks.AbstractTask;
@@ -25,7 +27,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	 */
 	public class LandscapeTask extends AbstractTask 
 	{		
-		protected var _instanceGuid:String;
+		protected var _modelGuid:String;
 		protected var _layer:LayerInfo;
 		protected var _startTime:int;
 		static protected var _autoFlowState:Boolean;
@@ -35,7 +37,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
         public static const TASK_PRIORITY:int = 1;
 		
 		public function LandscapeTask( guid:String, layer:LayerInfo, taskType:String = TASK_TYPE, taskPriority:int = TASK_PRIORITY ):void {
-			_instanceGuid = guid;
+			_modelGuid = guid;
 			_layer = layer;
 			_startTime = getTimer();
 			// turn off autoflow during landscape, turn it back on when all are complete.
@@ -54,50 +56,16 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				Globals.autoFlow = true;
 			super.complete();	
 		}
-
 		
 		protected function getVoxelModel():VoxelModel {
-			Log.out( "LandscapeTask.getVoxelModel - NO LONGER VALID", Log.ERROR );
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
+			throw new Error( "LandscapeTask.getVoxelModel - replace with ModelInfo request" );
 			return null;
-			
-			var vm:VoxelModel;
-			if ( _layer ) {
-				var topMostParentGuid:String = _layer.optionalString;
-				if ( "" != topMostParentGuid ) {
-					vm = Region.currentRegion.modelCache.instanceGet( topMostParentGuid );
-					if ( vm )
-						vm = vm.childModelFind( _instanceGuid );
-					else 	
-						Log.out( "LandscapeTask.getVoxelModel - FAILED voxel model for parent guid " + topMostParentGuid + "  data: " + _layer.data , Log.ERROR );
-				}
-				else
-					vm = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
-			}
-			else
-				vm = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
-			
-			return vm;	
 		}
 		
 		protected function getVoxelInstance():VoxelModel {
-
-			var vm:VoxelModel;
-			if ( _layer ) {
-				var topMostParentGuid:String = _layer.optionalString;
-				if ( "" != topMostParentGuid ) {
-					vm = Region.currentRegion.modelCache.instanceGet( topMostParentGuid );
-					if ( vm )
-						vm = vm.childModelFind( _instanceGuid );
-					else 	
-						Log.out( "LandscapeTask.getVoxelModel - FAILED voxel model for parent guid " + topMostParentGuid + "  data: " + _layer.data , Log.ERROR );
-				}
-				else
-					vm = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
-			}
-			else
-				vm = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
-			
-			return vm;	
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
+			return null;
 		}
 	}
 }

@@ -130,7 +130,7 @@ public class Voxels
 		}
 	}
 	
-	public function asByteArray( $ba:ByteArray ):ByteArray { 
+	public function toByteArray( $ba:ByteArray ):ByteArray { 
 		$ba.writeInt( TypeInfo.MAX_TYPE_INFO )
 		for ( var i:int; i < TypeInfo.MAX_TYPE_INFO; i++ ) {
 			$ba.writeInt( _items[i].val )

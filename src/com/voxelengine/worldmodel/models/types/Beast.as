@@ -66,7 +66,7 @@ package com.voxelengine.worldmodel.models.types
 			inventoryBitmap = "beastToolbar.png";
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 			super.init( $mi, $vmm );
 			
 			//MouseKeyboardHandler.backwardEnabled = false;
@@ -344,7 +344,7 @@ package com.voxelengine.worldmodel.models.types
 		
 		private const _smoothingFactor:Number = 0.1;
 		private var   _workingAverage:Number = 0;
-		override public function draw( $mvp:Matrix3D, $context:Context3D, $isChild:Boolean ):void {
+		override public function draw( $mvp:Matrix3D, $context:Context3D, $isChild:Boolean, $alpha:Boolean ):void {
 				
 			var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
 			viewMatrix.append( $mvp );
@@ -366,40 +366,16 @@ package com.voxelengine.worldmodel.models.types
 			if ( oxel )
 			{
 				var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
-				oxel.vertMan.drawNew( viewMatrix, this, $context, _shaders, selected, $isChild );
+				modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha );
 			}
 			
 			for each ( var vm:VoxelModel in _children )
 			{
 				if ( vm && vm.complete )
-					vm.draw( viewMatrix, $context, true );
+					vm.draw( viewMatrix, $context, true, $alpha );
 			}	
 		}
 		
-		override public function drawAlpha(mvp:Matrix3D, $context:Context3D, $isChild:Boolean ):void	{
-			
-			var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
-			viewMatrix.append(mvp);
-			
-			if ( !onSolidGround )
-			{
-				viewMatrix.appendRotation( _workingAverage * -20, Vector3D.Z_AXIS );
-			}
-			
-			if ( oxel )
-			{
-				// We have to draw all of the non alpha first, otherwise parts of the tree might get drawn after the alpha does
-				var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
-				oxel.vertMan.drawNewAlpha( viewMatrix, this, $context, _shaders, selected, $isChild );
-			}
-			
-			for each (var vm:VoxelModel in _children)
-			{
-				if (vm && vm.complete)
-					vm.drawAlpha(viewMatrix, $context, true );
-			}
-		}
-
 		override public function updateVelocity( $elapsedTimeMS:int, $clipFactor:Number ):Boolean 
 		{
 			// TODO What should default behavoir be for a beast?

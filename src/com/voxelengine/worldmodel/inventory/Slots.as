@@ -144,14 +144,12 @@ public class Slots
 //		EditCursor.cursorOperation = EditCursor.CURSOR_OP_DELETE;
 //		EditCursor.setPickColorFromType( EditCursor.cursorType )
 //		EditCursor.editing = true;
-//		EditCursor.toolOrBlockEnabled = true;
 		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.DELETE_OXEL ) );
 	}
 	
 	static private function noneSlots():void {
 //		EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
 //		EditCursor.editing = false;
-//		EditCursor.toolOrBlockEnabled = false;
 		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) );
 	}
 	
@@ -163,6 +161,6 @@ public class Slots
 	}
 
 	public function fromByteArray( $ba:ByteArray ):void {}
-	public function asByteArray( $ba:ByteArray ):ByteArray { return $ba; }
+	public function toByteArray( $ba:ByteArray ):ByteArray { return $ba; }
 }
 }

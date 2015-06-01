@@ -170,16 +170,14 @@ package com.voxelengine.worldmodel
 			var count:int = loadRegionObjects(_JSON.region);
 			count += loadRegionObjects(_JSON.models);
 			
-
+			_loaded = false;
 			if ( 0 == count ) {
 				_loaded = true;
 				LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 				WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.DESTORY ) );
 			}
-			else {
-				_loaded = false;
+			else
 				Globals.g_landscapeTaskController.activeTaskLimit = 1;
-			}
 				
 			// for local use only
 			if ( !Globals.online && !Player.player )
@@ -372,7 +370,7 @@ package com.voxelengine.worldmodel
 					toPersistance();
 				else {
 					var ba:ByteArray = new ByteArray();	
-					ba = asByteArray( ba );
+					ba = toByteArray( ba );
 				}
 //Log.out( "Region.save - NOT SAVING NOT SAVING NOT SAVING", Log.WARN );
 //return;	
@@ -435,7 +433,7 @@ package com.voxelengine.worldmodel
 			_dbo.modified = new Date();
 			
 			var ba:ByteArray = new ByteArray(); 
-			_dbo.data 			= asByteArray( ba );
+			_dbo.data 			= toByteArray( ba );
 		}
 		
 		public function buildExportObject( obj:Object ):void {
@@ -454,7 +452,7 @@ package com.voxelengine.worldmodel
 		}
 
 
-		public function asByteArray( $ba:ByteArray ):ByteArray {
+		public function toByteArray( $ba:ByteArray ):ByteArray {
 			var obj:Object = new Object();
 			buildExportObject( obj );
 			var json:String = JSON.stringify( obj );

@@ -97,7 +97,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 							GrainCursor.roundToInt( x, y, z, gct );
 							to = vm.oxel.childFind( gct );
 							if ( Globals.BAD_OXEL != to )
-								to.write( _instanceGuid, gct, TypeInfo.AIR )
+								to.write( _modelGuid, gct, TypeInfo.AIR )
 						}
 					}
 					if ( offset < (mapIncrement - 1) )

@@ -50,11 +50,12 @@ package com.voxelengine.events
 	   
 		public function changeType( $newType:String ):ProjectileEvent
 		{
+			throw new Error( "ProjectileEvent.changeType - what to do here" );
 			var pe:ProjectileEvent = new ProjectileEvent( $newType, bubbles, cancelable);
-			pe.position = position.clone();
-			pe.ammo = _ammo.clone();
-			pe.direction = direction.clone();
-			pe.owner = owner;
+			//pe.position = position.clone();
+			//pe.ammo = _ammo.clone();
+			//pe.direction = direction.clone();
+			//pe.owner = owner;
 			return pe;
 		}
 	   

@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.weapons
  * ...
  * @author Bob
  */
+import flash.utils.ByteArray;
 import playerio.DatabaseObject;
 import playerio.Message;
 
@@ -24,8 +25,9 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.PersistanceObject;
+import com.voxelengine.worldmodel.models.IPersistance;
 
-public class Ammo extends PersistanceObject
+public class Ammo extends PersistanceObject implements IPersistance
 {
 	protected var _type:int = 1;
 	protected var _count:int = 1;
@@ -62,32 +64,32 @@ public class Ammo extends PersistanceObject
 		super( $name, Globals.BIGDB_TABLE_AMMO );
 	}
 	
-	public function processClassJson( $ammoJson:Object ):void {		
-
-		if ( $ammoJson.name )
-			guid = $ammoJson.name;
-		if ( $ammoJson.accuracy )
-			_accuracy = $ammoJson.accuracy;
-		if ( $ammoJson.velocity )
-			_velocity = $ammoJson.velocity;
-		if ( $ammoJson.type )
-			_type = $ammoJson.type;
-		if ( $ammoJson.count )
-			_count = $ammoJson.count;
-		if ( $ammoJson.oxelType )
-			_oxelType = TypeInfo.getTypeId( $ammoJson.oxelType );
-		if ( $ammoJson.life )
-			_life = $ammoJson.life;
-		if ( $ammoJson.grain )
-			_grain = $ammoJson.grain;
-		if ( $ammoJson.model )
-			_model = $ammoJson.model;
-		if ( $ammoJson.launchSoundFile )
-			_launchSoundFile = $ammoJson.launchSoundFile;
-		if ( $ammoJson.impactSoundFile )
-			_impactSoundFile = $ammoJson.impactSoundFile;
-		if ( $ammoJson.contactScript )
-			_contactScript = $ammoJson.contactScript;
+	public function fromObject( $object:Object, $ba:ByteArray ):void {
+		_obj = $object;
+		if ( _obj.name )
+			guid = _obj.name;
+		if ( _obj.accuracy )
+			_accuracy = _obj.accuracy;
+		if ( _obj.velocity )
+			_velocity = _obj.velocity;
+		if ( _obj.type )
+			_type = _obj.type;
+		if ( _obj.count )
+			_count = _obj.count;
+		if ( _obj.oxelType )
+			_oxelType = TypeInfo.getTypeId( _obj.oxelType );
+		if ( _obj.life )
+			_life = _obj.life;
+		if ( _obj.grain )
+			_grain = _obj.grain;
+		if ( _obj.model )
+			_model = _obj.model;
+		if ( _obj.launchSoundFile )
+			_launchSoundFile = _obj.launchSoundFile;
+		if ( _obj.impactSoundFile )
+			_impactSoundFile = _obj.impactSoundFile;
+		if ( _obj.contactScript )
+			_contactScript = _obj.contactScript;
 		//Log.out( "Ammo.processClassJson" );
 		SoundBank.getSound( _impactSoundFile ); // Preload the sound file
 		SoundBank.getSound( _launchSoundFile );
@@ -113,7 +115,8 @@ public class Ammo extends PersistanceObject
 	}
 	
 	
-	override public function clone():* {
+	override public function clone( $guid:String ):* {
+		throw new Error( "Ammo.clone - what to do here" );
 		var ammo:Ammo = new Ammo( name );
 		
 		ammo._type = _type;
@@ -184,8 +187,22 @@ public class Ammo extends PersistanceObject
 	////////////////////////////////////////////////////////////////
 	// FROM Persistance
 	////////////////////////////////////////////////////////////////
+	public function save():void {
+		if ( Globals.online ) {
+			Log.out( "Ammo.save - Saving Ammo: " + guid  + " in table: " + table );
+			addSaveEvents();
+			if ( _dbo )
+				toPersistance();
+			else
+				toObject();
+				
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
+		}
+		else
+			Log.out( "Ammo.save - Not saving data, either offline or NOT changed or locked - guid: " + guid, Log.WARN );
+	}
 	
-	override public function fromPersistance( $dbo:DatabaseObject ):void {
+	public function fromPersistance( $dbo:DatabaseObject ):void {
 		
 		guid 				= $dbo.key;
 		_type				= $dbo.type;
@@ -201,7 +218,7 @@ public class Ammo extends PersistanceObject
 		_contactScript		= $dbo.contactScript;
 	}
 	
-	override protected function toPersistance():void {
+	public function toPersistance():void {
 		
 		//_dbo.key = _name;
 		_dbo.type = _type;
@@ -217,20 +234,22 @@ public class Ammo extends PersistanceObject
 		_dbo.contactScript = _contactScript;
 	}
 	
-	override protected function toObject():Object {
+	public function toObject():void {
 		
-		var metadataObj:Object =   { type:			    _type			
-								   , count:			    _count			
-								   , grain:			    _grain			
-								   , accuracy:		    _accuracy		
-								   , velocity:		    _velocity		
-								   , life:			    _life			
-								   , oxelType:		    _oxelType		
-								   , model:			    _model			
-								   , launchSoundFile:   _launchSoundFile
-								   , impactSoundFile:   _impactSoundFile
-								   , contactScript:	    _contactScript	};
-		return metadataObj;						   
+		_obj =   { type:			    _type			
+				   , count:			    _count			
+				   , grain:			    _grain			
+				   , accuracy:		    _accuracy		
+				   , velocity:		    _velocity		
+				   , life:			    _life			
+				   , oxelType:		    _oxelType		
+				   , model:			    _model			
+				   , launchSoundFile:   _launchSoundFile
+				   , impactSoundFile:   _impactSoundFile
+				   , contactScript:	    _contactScript	};
 	}
+	
+	public function toByteArray( $ba:ByteArray ):ByteArray { return null; }
+	public function fromByteArray( $ba:ByteArray ):void { ; }
 }
 }

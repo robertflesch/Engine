@@ -115,7 +115,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var ignoreSolid:Boolean = false;
 			if ( TypeInfo.AIR == _layer.type || TypeInfo.RED == _layer.type )
 				ignoreSolid = true;
-			vm.oxel.write_height_map( _instanceGuid, _layer.type, minHeightMapArray, maxHeightMapArray, minGrain, arrayOffset, ignoreSolid );
+			vm.oxel.write_height_map( _modelGuid, _layer.type, minHeightMapArray, maxHeightMapArray, minGrain, arrayOffset, ignoreSolid );
 			Log.out( "GenerateVolcano - completed layer of type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer() - timer) ); // + " in queue for: " + (timer - _startTime));
 			//timer = getTimer();
 			//Log.out( "GenerateVolcano - merging: ");

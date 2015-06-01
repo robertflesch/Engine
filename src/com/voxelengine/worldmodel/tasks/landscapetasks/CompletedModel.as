@@ -59,34 +59,34 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 						
 					if ( vm is Player )
 					{
-						LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, _instanceGuid ) );
+						LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, _modelGuid ) );
 					}
 					else {
 						if ( vm.instanceInfo.critical )
-							ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CRITICAL_MODEL_LOADED, _instanceGuid ));
+							ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CRITICAL_MODEL_LOADED, _modelGuid ));
 						else
-							ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _instanceGuid ) );
+							ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _modelGuid ) );
 					}
 				}
 				else
 				{
-					Log.out( "CompletedModel.start - VoxelModel Not found: " + _instanceGuid, Log.WARN );
+					Log.out( "CompletedModel.start - VoxelModel Not found: " + _modelGuid, Log.WARN );
 				}
 			}
 			catch ( error:Error )
 			{
-				if ( Player.player.instanceInfo.instanceGuid == _instanceGuid )
+				if ( Player.player.instanceInfo.instanceGuid == _modelGuid )
 					Player.player.complete = true;
 				else
-					Log.out( "CompletedModel.start - exception was thrown for model guid: " + _instanceGuid, Log.ERROR );
+					Log.out( "CompletedModel.start - exception was thrown for model guid: " + _modelGuid, Log.ERROR );
 			}
 			
 			//Log.out( "CompletedModel.start - completedModel: " + _guid + "  count: " + _count );
 				
 			if ( 0 == _count  ) // && _playerLoaded  should I add ( null != Player.player )
 			{
-				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _instanceGuid );
-				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _instanceGuid ) );
+				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _modelGuid );
+				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _modelGuid ) );
 			}
 			
 			

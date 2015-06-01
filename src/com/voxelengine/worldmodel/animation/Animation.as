@@ -151,11 +151,11 @@ public class Animation
 	
 	public function save():void {
 		var ba:ByteArray = new ByteArray();
-		ba = asByteArray( ba );
+		ba = toByteArray( ba );
 		metadata.save( ba );
 	}
 	
-	public function asByteArray( $ba:ByteArray ):ByteArray {
+	public function toByteArray( $ba:ByteArray ):ByteArray {
 		var obj:Object = new Object();
 		getJSON( obj );
 		var json:String = JSON.stringify( obj );

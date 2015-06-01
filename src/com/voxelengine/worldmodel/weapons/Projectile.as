@@ -51,7 +51,7 @@ package com.voxelengine.worldmodel.weapons
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 			super.init( $mi, $vmm );
 			
 			instanceInfo.dynamicObject = true;
@@ -116,7 +116,7 @@ package com.voxelengine.worldmodel.weapons
 				
 				//trace( "Projectile.update collisionCandidateWSPosition: " + collisionCandidate.instanceInfo.position + "   with model: " + collisionCandidate.instanceInfo.name );
 				
-				var isPassable:Boolean = collisionCandidate.isPassable( msp.x, msp.y, msp.z, oxel.gc.grain );
+				var isPassable:Boolean = collisionCandidate.isPassable( msp.x, msp.y, msp.z, grain );
 				if ( !isPassable )
 				{
 					// so we hit something, depending on what it is, we will do different things

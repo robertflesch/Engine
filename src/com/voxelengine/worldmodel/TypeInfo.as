@@ -62,8 +62,7 @@ package com.voxelengine.worldmodel
 		// NO MORE!!
 		
 		// WARNING use sparingly
-		static public function getTypeId( type:* ):int
-		{
+		static public function getTypeId( type:* ):int	{
 			if ( type is int )
 				return type;
 			else if ( type is Number )
@@ -89,6 +88,9 @@ package com.voxelengine.worldmodel
 		
 		public static var typeInfo:Vector.<TypeInfo> = new Vector.<TypeInfo>(1024);
 		public static var typeInfoByName:Array = new Array;
+		
+		[inline]
+		static public function name( type:int ):String { return typeInfo[type].name; }
 		
 		[inline]
 		static public function flowable( type:int ):Boolean { return typeInfo[type].flowable; }
@@ -143,8 +145,7 @@ package com.voxelengine.worldmodel
 		
 		public function get interactions():Interactions { return _interactions; }
 		public function get type():uint 		{ return _typeId; }
-		public function get alpha():Boolean 		
-		{ 
+		public function get alpha():Boolean 	{ 
 			if ( ColorUtils.extractAlpha( _color ) != 255 ) 
 				return true 
 			else 

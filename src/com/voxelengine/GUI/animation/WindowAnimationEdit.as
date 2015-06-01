@@ -259,7 +259,7 @@ public class WindowAnimationEdit extends VVPopup
 				
 							addLabel( _panelAdvanced, "State:", changeStateHandler, vm.anim ? vm.anim.name : "" );
 							addLabel( _panelAdvanced, "Name:", changeNameHandler, _ii.name );
-			//_GrainSize = 	addLabel( _panelAdvanced, "GrainSize:", null, _vm.oxel.gc.grain.toString() );
+			//_GrainSize = 	addLabel( _panelAdvanced, "GrainSize:", null, _vm.grain.toString() );
 							addLabel( _panelAdvanced, "GrainSize:", null, String( _ii.grainSize ) );
 			addLabel( _panelAdvanced, "Instance GUID:", null, _ii.guid );
 			addLabel( _panelAdvanced, "Model GUID:", null, _ii.guid );

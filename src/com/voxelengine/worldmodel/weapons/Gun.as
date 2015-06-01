@@ -51,7 +51,7 @@ public class Gun extends ControllableVoxelModel
 		//AmmoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, resultFailed );
 	}
 	
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
 		
 		var centerLoc:int = 2 << ( $mi.grainSize - 2);

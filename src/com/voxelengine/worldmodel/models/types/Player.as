@@ -85,11 +85,11 @@ public class Player extends Avatar
 
 	}
 	
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		Log.out( "Player.init instanceGuid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super.init( $mi, $vmm );
 		
-		modelInfo.hasInventory = true;
+		hasInventory = true;
 		instanceInfo.usesCollision = true;
 		clipVelocityFactor = AVATAR_CLIP_FACTOR;
 		//metadata.modify = false;

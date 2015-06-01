@@ -58,16 +58,13 @@ package com.voxelengine.worldmodel.biomes
 		}
 		
 		// Removed the completed task
-		public function addToTaskControllerUsingNewStyle( $ii:InstanceInfo ):void 
+		public function addToTaskControllerUsingNewStyle( $guid:String ):void 
 		{
 			// land task controller
 			Globals.g_landscapeTaskController.activeTaskLimit = 0;
-			var guid:String = $ii.instanceGuid;
-			if ( null == guid )
-				guid = $ii.modelGuid;
 
 			// Create task group
-			var taskGroup:TaskGroup = new TaskGroup("Generate Model for " + guid, 2);
+			var taskGroup:TaskGroup = new TaskGroup("Generate Model for " + $guid, 2);
         
 			// This loads the tasks into the LandscapeTaskQueue
 			var task:ITask;
@@ -76,16 +73,16 @@ package com.voxelengine.worldmodel.biomes
 			{
 				layer = layers[i];
 				// instanceInfo can override type
-				if ( -1 != $ii.type )
-					layer.type = $ii.type;
-				if ( -1 != $ii.grainSize )
-					layer.offset = $ii.grainSize;
-				if ( -1 != $ii.detailSize )
-					layer.range = $ii.detailSize;
-				if ( $ii.controllingModel )
-					layer.optionalString = $ii.topmostGuid();
+				//if ( -1 != $ii.type )
+					//layer.type = $ii.type;
+				//if ( -1 != $ii.grainSize )
+					//layer.offset = $ii.grainSize;
+				//if ( -1 != $ii.detailSize )
+					//layer.range = $ii.detailSize;
+				//if ( $ii.controllingModel )
+					//layer.optionalString = $ii.topmostGuid();
 					
-				task = new layer.task( guid, layer );
+				task = new layer.task( $guid, layer );
 				//Log.out( "Biomes.add_to_task_controller - creating task: " + layer.task );
 				taskGroup.addTask(task);
 				task = null;
@@ -94,8 +91,7 @@ package com.voxelengine.worldmodel.biomes
 					layers[i] = null;
 			}
 			
-			// what purpose does this play? 
-			// it removes generation layers
+			// remove generation layers
 			var newLayers:Vector.<LayerInfo> = new Vector.<LayerInfo>;
 			for each ( var layer1:LayerInfo in layers ) 
 			{
@@ -106,65 +102,14 @@ package com.voxelengine.worldmodel.biomes
 			_layers = null;
 			_layers = newLayers;
 
-			//task =  new OutlineBoundries( guid, null );
+			//task =  new OutlineBoundries( $guid, null );
 			//taskGroup.addTask(task);
 			
 			Globals.g_landscapeTaskController.addTask( taskGroup );
-		}
-		
-		public function addToTaskController( $ii:InstanceInfo ):void 
-		{
-			// land task controller
-			Globals.g_landscapeTaskController.activeTaskLimit = 0;
-			var guid:String = $ii.instanceGuid;
-			if ( null == guid )
-				guid = $ii.modelGuid;
-
-			// Create task group
-			var taskGroup:TaskGroup = new TaskGroup("Generate Model for " + guid, 2);
-        
-			// This loads the tasks into the LandscapeTaskQueue
-			var task:ITask;
-			var layer:LayerInfo
-			for ( var i:int; i < layers.length; i++ ) 
-			{
-				layer = layers[i];
-				// instanceInfo can override type
-				if ( -1 != $ii.type )
-					layer.type = $ii.type;
-				if ( $ii.controllingModel )
-					layer.optionalString = $ii.topmostGuid();
-					
-				task = new layer.task( guid, layer );
-				//Log.out( "Biomes.add_to_task_controller - creating task: " + layer.task );
-				taskGroup.addTask(task);
-				task = null;
-				// If this is loading data leave it along, otherwise erase the layer once it is used.
-				if ( layer.functionName && ( ( layer.functionName != "LoadModelFromIVM" ) ) )
-					layers[i] = null;
-			}
 			
-			var newLayers:Vector.<LayerInfo> = new Vector.<LayerInfo>;
-			for each ( var layer1:LayerInfo in layers ) 
-			{
-				if ( null != layer1 ) {
-					newLayers.push( layer1 );
-				}
-			}
-			_layers = null;
-			_layers = newLayers;
-
-			//task =  new OutlineBoundries( guid, null );
-			//taskGroup.addTask(task);
-			
-			//Log.out( "Biomes.add_to_task_controller - adding completedTask" );
-			if ( $ii.dynamicObject )
-				task = new DynamicCompletedModel( guid, null );
-			else
-				task = new CompletedModel( guid, layer );
-			taskGroup.addTask(task);
-			
-			Globals.g_landscapeTaskController.addTask( taskGroup );
+			// This unblocks the landscape task controller when all terrain tasks have been added
+			if (0 == Globals.g_landscapeTaskController.activeTaskLimit)
+				Globals.g_landscapeTaskController.activeTaskLimit = 1;
 		}
 		
 		public function addParticleTaskToController( $vm:VoxelModel ):void 
@@ -230,9 +175,10 @@ package com.voxelengine.worldmodel.biomes
 			biomes.add_layer( new LayerInfo( "TestDebugMacro", "",  TypeInfo.GRASS,   4, 0 ) );
 		}
 		
-		public static function testSolid( biomes:Biomes ):void {
+		public static function generateCube( biomes:Biomes ):void {
 			//biomes.add_layer( new LayerInfo( TestSingleOxelFaces,  TypeInfo.GRASS,   1, 0 ) );
-			biomes.add_layer( new LayerInfo( "GenerateCube", "",  TypeInfo.GRAVEL,   1, 0 ) );
+			//public function LayerInfo( functionName:String = null, data:String = "", type:int = 0 , range:int = 0, offset:int = 0, optional1:String = "", optional2:int = 0 )
+			biomes.add_layer( new LayerInfo( "GenerateCube", "",  TypeInfo.STONE,   0, 4 ) );
 			//biomes.add_layer( new LayerInfo( TestRemoveSequential,  TypeInfo.INVALID,   0, 0 ) );
 		}
 		

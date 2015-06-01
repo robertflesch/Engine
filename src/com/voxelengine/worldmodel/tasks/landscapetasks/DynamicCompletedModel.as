@@ -42,13 +42,13 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 					// a hack here since we dont get a region loaded message if it is already loaded...
 				}
 				else
-					Log.out( "DynamicCompletedModel.start - VoxelModel Not found: " + _instanceGuid, Log.WARN );
+					Log.out( "DynamicCompletedModel.start - VoxelModel Not found: " + _modelGuid, Log.WARN );
 					
 				//Log.out( "DynamicCompletedModel.start - VoxelModel marked complete guid: " + _guid );
 			}
 			catch ( error:Error )
 			{
-				Log.out( "DynamicCompletedModel.start - exception was thrown for model guid: " + _instanceGuid, Log.ERROR );
+				Log.out( "DynamicCompletedModel.start - exception was thrown for model guid: " + _modelGuid, Log.ERROR );
 			}
 			
 			super.complete() // This MUST be called for tasks to continue

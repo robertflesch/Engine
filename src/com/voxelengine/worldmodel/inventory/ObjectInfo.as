@@ -49,7 +49,7 @@ public class ObjectInfo
 		_objectType = $objectType; 
 	}
 	
-	public function asByteArray( $ba:ByteArray ):ByteArray 	{ return $ba; }
+	public function toByteArray( $ba:ByteArray ):ByteArray 	{ return $ba; }
 	public function fromByteArray( $ba:ByteArray ):ByteArray{ return $ba; }
 	
 	public function asInventoryString():String {

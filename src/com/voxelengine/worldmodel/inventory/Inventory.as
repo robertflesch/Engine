@@ -7,10 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
 	
-import com.voxelengine.worldmodel.models.PersistanceObject;
-import com.voxelengine.worldmodel.models.types.Player;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.Region;
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
@@ -20,10 +16,14 @@ import org.flashapi.swing.Alert;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.*;
-import com.voxelengine.worldmodel.inventory.ObjectInfo;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.models.IPersistance;
+import com.voxelengine.worldmodel.models.PersistanceObject;
+import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 
-public class Inventory extends PersistanceObject
+public class Inventory extends PersistanceObject implements IPersistance
 {
 	// support data for persistance
 	private var _createdDate:Date;
@@ -63,45 +63,41 @@ public class Inventory extends PersistanceObject
 		_voxels = null;
 	}
 
-	
 	//////////////////////////////////////////////////////////////////
 	// TO Persistance
 	//////////////////////////////////////////////////////////////////
 	
-	override protected function toObject():Object {
+	public function save():void {
+		if ( Globals.online && loaded ) {
+			Log.out( "Inventory.save - Saving Inventory: " + guid  + " in table: " + table );
+			addSaveEvents();
+			if ( _dbo )
+				toPersistance();
+			else
+				toObject();
+				
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
+		}
+		else
+			Log.out( "Inventory.save - Not saving data, either offline or NOT changed or locked - guid: " + guid, Log.WARN );
+	}
+
+	public function toObject():void {
 		var ba:ByteArray = new ByteArray();	
-		var obj:Object = new Object();
-		obj.ba = asByteArray( ba );
-		return obj;
+		_obj.ba = toByteArray( ba );
 	}
 	
-	override protected function toPersistance():void {
+	public function fromObject( $object:Object, $ba:ByteArray ):void { }
+	
+	public function toPersistance():void {
 		_voxels.toPersistance(_dbo);
 		_slots.toPersistance(_dbo);
 		var ba:ByteArray = new ByteArray(); 
-		_dbo.data 			= asByteArray( ba );
-	}
-
-	private function asByteArray( $ba:ByteArray ):ByteArray {
-		$ba.writeUTF( guid );
-		_voxels.asByteArray( $ba );
-		_slots.asByteArray( $ba );
-		$ba.compress();
-		return $ba;	
-	}
-	
-	////////////////////////////////////////////////////////////////
-	// FROM Persistance
-	////////////////////////////////////////////////////////////////
-	public function load():void {
-		if ( Globals.online ) {
-			addLoadEvents();
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, guid ) );
-		}
+		_dbo.data 			= toByteArray( ba );
 	}
 
 	// If $dbo is null then the default data is loaded
-	override public function fromPersistance( $dbo:DatabaseObject ):void {
+	public function fromPersistance( $dbo:DatabaseObject ):void {
 		
 		if ( $dbo ) {
 			_createdDate	= $dbo.createdDate;
@@ -130,27 +126,33 @@ public class Inventory extends PersistanceObject
 		}
 	}
 	
-	private function fromByteArray( $ba:ByteArray ):void {
+	public function toByteArray( $ba:ByteArray ):ByteArray {
+		$ba.writeUTF( guid );
+		_voxels.toByteArray( $ba );
+		_slots.toByteArray( $ba );
+		$ba.compress();
+		return $ba;	
+	}
+	
+	public function fromByteArray( $ba:ByteArray ):void {
 		var ownerId:String = $ba.readUTF();
 		_voxels.fromByteArray( $ba );
 		_slots.fromByteArray( $ba );
 	}
 	
-	private function addLoadEvents():void {
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSuccess );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFailed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, notFound );
+	////////////////////////////////////////////////////////////////
+	// FROM Persistance
+	////////////////////////////////////////////////////////////////
+	public function load():void {
+		if ( Globals.online ) {
+			addLoadEvents();
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, guid ) );
+		}
 	}
 	
-	private function removeLoadEvents():void {
-		PersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, loadSuccess );
-		PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFailed );
-		PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, notFound );
-	}
-	
-	private function notFound($pe:PersistanceEvent):void 
+	override protected function notFound($pe:PersistanceEvent):void 
 	{
-		if ( Globals.BIGDB_TABLE_INVENTORY != $pe.table )
+		if ( table != $pe.table )
 			return;
 		// this occurs on first time logging in.
 		removeLoadEvents();
@@ -159,22 +161,22 @@ public class Inventory extends PersistanceObject
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, guid, this ) );
 	}
 	
-	private function loadSuccess( $pe:PersistanceEvent ):void
+	override protected function loadSuccess( $pe:PersistanceEvent ):void
 	{
-		if ( Globals.BIGDB_TABLE_INVENTORY != $pe.table )
+		if ( table != $pe.table )
 			return;
 		if ( guid != $pe.guid )
 			return;
 		removeLoadEvents();
 		fromPersistance( $pe.dbo );
 		_loaded = true;
-		Log.out( "Inventory.loadSuccess - OWNER: " + guid + "  guid: " + $pe.guid, Log.WARN );
+		//Log.out( "Inventory.loadSuccess - OWNER: " + guid + "  guid: " + $pe.guid, Log.WARN );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, guid, this ) );
 	}
 	
-	private function loadFailed( $pe:PersistanceEvent ):void
+	override protected function loadFailed( $pe:PersistanceEvent ):void
 	{
-		if ( Globals.BIGDB_TABLE_INVENTORY != $pe.table )
+		if ( table != $pe.table )
 			return;
 		removeLoadEvents();
 		(new Alert( "ERROR LOADING USER INVENTORY - Please post on forums" )).display();

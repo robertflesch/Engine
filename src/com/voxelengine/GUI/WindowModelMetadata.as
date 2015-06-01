@@ -193,8 +193,7 @@ Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );
 		} else { // TYPE_IMPORT so new data
 			// need to document why I do this here
 			var dboTemp:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, _vmm.guid, "1", 0, true, null );
-			_vmm.dbo = dboTemp;
-			_vmm.hackedSaveToDBO();
+			_vmm.fromPersistance( dboTemp );
 			_vmm.dbo = null;
 			_vmm.release();
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, _vmm.guid, dboTemp, true ) );			

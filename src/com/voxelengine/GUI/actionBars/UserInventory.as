@@ -71,7 +71,7 @@ public class  UserInventory extends QuickInventory
 	
 	public function UserInventory( $owner:String, $image:String ) {
 		_owner = $owner;
-		Log.out( "UserInventory.create ===================== <<<<<<<<< " + _owner + " <<<<<<<<<<<< ========================", Log.WARN );
+		//Log.out( "UserInventory.create ===================== <<<<<<<<< " + _owner + " <<<<<<<<<<<< ========================", Log.WARN );
 		super( 680, 84, 64, $image );
 		_selectorXOffset = 20; // From image of "userInventory.png"
 		eventCollector.addEvent(_dragOp, DnDEvent.DND_DROP_ACCEPTED, dropMaterial );
@@ -90,6 +90,8 @@ public class  UserInventory extends QuickInventory
 		hideModelTools();
 		
 		_s_currentInstance = this;
+		
+		EditCursor.currentInstance;
 
 		RoomEvent.addListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
 		InventoryEvent.addListener( InventoryEvent.RESPONSE, inventoryLoaded );
@@ -104,7 +106,7 @@ public class  UserInventory extends QuickInventory
 	
 	override public function remove():void {
 		removeListeners();
-		Log.out( "UserInventory.remove ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
+		//Log.out( "UserInventory.remove ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 		RoomEvent.removeListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
 		InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
 
@@ -121,8 +123,8 @@ public class  UserInventory extends QuickInventory
 			_s_currentInstance = null;
 		}
 			
+		EditCursor.editing = false;
 		with ( _s_currentInstance ) {
-			EditCursor.editing = false;
 			visible = false;
 			removeListeners();
 		}
@@ -144,7 +146,7 @@ public class  UserInventory extends QuickInventory
 			with ( _s_currentInstance ) {
 				// display it!
 				visible = true;
-				EditCursor.editing = true;
+//				EditCursor.editing = true;
 				addListeners();
 				display();
 				resizeObject( null );
@@ -162,7 +164,7 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function inventoryLoaded(e:InventoryEvent):void {
-		Log.out( "UserInventory.inventoryLoaded - ENTER - owner: " + _owner + "  e.owner: " + e.owner, Log.WARN );
+		//Log.out( "UserInventory.inventoryLoaded - ENTER - owner: " + _owner + "  e.owner: " + e.owner, Log.WARN );
 		if ( e.owner == _owner ) {
 			InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
 			_inventoryLoaded = true;
@@ -191,7 +193,6 @@ public class  UserInventory extends QuickInventory
 			// sets edit cursor to none
 //			EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
 //			EditCursor.editing = false;
-//			EditCursor.toolOrBlockEnabled = false;
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) );
 		}
 	}
@@ -307,6 +308,7 @@ public class  UserInventory extends QuickInventory
 		
 		hideGrainTools();
 		hideModelTools();
+		EditCursor.editing = false;
 		
 		var oi:ObjectInfo = box.data as ObjectInfo;
 		if ( oi is ObjectVoxel ) {
@@ -327,7 +329,7 @@ public class  UserInventory extends QuickInventory
 			}
 			else if ( - 1 != _itemMaterialSelection )// We are selecting the pick again when that is what we have already.
 			{	// go back to previously used material
-				throw new Error( "UserInventory - processItemSelection - HOW DO I GET HERE?" );
+				//throw new Error( "UserInventory - processItemSelection - HOW DO I GET HERE?" );
 //				CursorEvent.dispatch( new CursorEvent( CursorEvent.CURSOR_OP_INSERT, selectedTypeId, true ) ); 
 				var lastBoxNone:Box = boxes[_itemMaterialSelection ];
 				processItemSelection( lastBoxNone )
@@ -336,6 +338,7 @@ public class  UserInventory extends QuickInventory
 		}
 		else if ( oi is ObjectTool ) {
 			Log.out( "UserInventory.processItemSelection - ObjectTool");
+			EditCursor.editing = true;
 			var ot:ObjectTool = oi as ObjectTool;
 			if ( lastItemSelection != itemIndex )
 			{   // We are selecting the pick when it was previously on another item
@@ -352,9 +355,12 @@ public class  UserInventory extends QuickInventory
 			showGrainTools();
 		}
 		else if ( oi is ObjectModel ) {
+			Log.out( "UserInventory.processItemSelection - ObjectModel", Log.WARN);
+			EditCursor.editing = true;
 			var ti1:TypeInfo = TypeInfo.typeInfoByName[ "CLEAR GLASS" ];
 			var om:ObjectModel = oi as ObjectModel;
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.INSERT_MODEL, ti1.type, om ) ); 
+			
 			showModelTools();
 		}
 		else if ( oi is ObjectInfo ) {
@@ -411,7 +417,7 @@ public class  UserInventory extends QuickInventory
 
 	private var _listenersAdded:Boolean;
 	private function addListeners():void {
-		Log.out( "UserInventory.addListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
+		//Log.out( "UserInventory.addListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 		if ( false == _listenersAdded ) {
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
@@ -420,7 +426,7 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function removeListeners():void {
-		Log.out( "UserInventory.removeListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
+		//Log.out( "UserInventory.removeListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
 		_listenersAdded = false;

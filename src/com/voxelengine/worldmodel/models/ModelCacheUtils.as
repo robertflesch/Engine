@@ -128,9 +128,9 @@ package com.voxelengine.worldmodel.models
 				
 				VoxelModel.selectedModel = editableModel;
 				
-				if ( EditCursor.currentInstance.editing )
+				if ( EditCursor.editing )
 				{
-					const minSize:int = EditCursor.currentInstance.oxel.gc.grain;
+					const minSize:int = EditCursor.currentInstance.grain;
 					
 					editableModel.lineIntersectWithChildren( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections, minSize )
 						
@@ -314,7 +314,7 @@ package com.voxelengine.worldmodel.models
 
 					var msp:Vector3D = vm.worldToModel( wsCenterPointOfModel );
 					// RSF 9.13/13 - Verify that vm.oxel.gc.grain is correct value to pass in.
-					result = vm.isPassable( msp.x, msp.y, msp.z, vm.oxel.gc.grain );
+					result = vm.isPassable( msp.x, msp.y, msp.z, vm.grain );
 					
 					// If any result fails, position is invalid, restore last position
 					if ( !result )
@@ -393,7 +393,8 @@ package com.voxelengine.worldmodel.models
 				// TODO - optimize RSF
 				if ( collideCandidate && collideCandidate.complete && collideCandidate != vm )
 				{
-					var sizeOfInstance:Number = collideCandidate.oxel.gc.size();
+					
+					var sizeOfInstance:Number = collideCandidate.size();
 					if ( sizeOfInstance <= 2 ) 
 						continue;
 					var offset:Vector3D = new Vector3D( sizeOfInstance, sizeOfInstance, sizeOfInstance );

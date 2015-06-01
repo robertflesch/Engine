@@ -39,7 +39,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			//////////////////////////////////////////////////////////
 			var grain_size:int = 1;
 			var oxel:Oxel;
-			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _modelGuid );
 			var gc:GrainCursor = GrainCursorPool.poolGet(vm.oxel.size_of_grain());
 			var bg:uint = vm.oxel.size_of_grain();
 			

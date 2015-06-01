@@ -7,21 +7,14 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-import flash.utils.ByteArray;
-
 import com.voxelengine.Log;
-import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.LoadingImageEvent;
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.WindowSplashEvent;
+import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
-import com.voxelengine.worldmodel.Region;
 
 	/**
 	 * ...
@@ -32,88 +25,30 @@ import com.voxelengine.worldmodel.Region;
 	 */
 public class ModelMakerLocal extends ModelMakerBase {
 	
-	// keeps track of how many makers there currently are.
-	
-	private var _vmi:ModelInfo;
-	
 	public function ModelMakerLocal( $ii:InstanceInfo ) {
 		//Log.out( "ModelMakerLocal ii.modelGuid: " + $ii.modelGuid, Log.WARN );
 		super( $ii, false );
+		// keeps track of how many makers there currently are.
 		makerCountIncrement();
-		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retriveInfo );		
-		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retriveInfo );		
-		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
-
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null, false ) );		
-	}
-	
-	private function failedInfo( $mie:ModelInfoEvent):void {
-		if ( _ii.modelGuid == $mie.modelGuid ) {
-			Log.out( "ModelMakerLocal.failedInfo - ii: " + _ii.toString() + " ModelInfoEvent: " + $mie.toString(), Log.WARN );
-			markComplete( false );
-		}
-	}
-	
-	private function retriveInfo(e:ModelInfoEvent):void {
-		if ( _ii.modelGuid == e.modelGuid ) {
-			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retriveInfo );
-			_vmi = e.vmi;
-			attemptMake();
-		}
+		retrieveBaseInfo();
 	}
 	
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
-		if ( null != _vmi && null != _vmd ) {
-			
-			var ba:ByteArray = new ByteArray();
-			ba.writeBytes( _vmd.compressedBA, 0, _vmd.compressedBA.length );
-			try { ba.uncompress(); }
-			catch (error:Error) { ; }
-			if ( null == ba ) {
-				Log.out( "ModelMakerLocal.attemptMake - Exception - NO data in VoxelModelMetadata: " + _vmd.guid, Log.ERROR );
-				return;
-			}
-
-			var versionInfo:Object = extractVersionInfo( ba );
-			if ( Globals.MANIFEST_VERSION != versionInfo.manifestVersion )
-			{
-				Log.out( "ModelMakerLocal.attemptMake - Exception - bad version: " + versionInfo.manifestVersion, Log.ERROR );
-				return;
-			}
-			
-			if ( Globals.VERSION_007 >= versionInfo.version ) {
-				// how many bytes is the modelInfo
-				var strLen:int = ba.readInt();
-				// read off that many bytes, even though we are using the data from the modelInfo file
-				var modelInfoJson:String = ba.readUTFBytes( strLen );
-			}
-				
+		if ( null != _vmi ) {
 			var vmm:ModelMetadata = new ModelMetadata( _ii.modelGuid );
 			vmm.name = _vmi.fileName;
-			vmm.description = _vmi.fileName;
-			var vm:* = instantiate( _ii, _vmi ) //, vmm, ba, versionInfo );
-			if ( vm ) {
-				vm.data = _vmd;
-				vm.version = versionInfo.version;
-				vm.init( _vmi, vmm );
-				vm.fromByteArray( ba );
-				vm.modelInfo.animationsLoad( vm );			
-				vm.complete = true;
+			vmm.description = _vmi.fileName + " from local data";
+			var vm:* = make();
+			if ( vm )
 				Region.currentRegion.modelCache.add( vm );
-			}
 			
 			markComplete();
 		}
 	}
-	//////////////////////////////////////
 	
 	override protected function markComplete( $success:Boolean = true ):void {
 		super.markComplete( $success );
-		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retriveInfo );		
-		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retriveInfo );		
-		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedInfo );		
-		
 		makerCountDecrement();
 		if ( 0 == makerCountGet() ) {
 			//Log.out( "ModelMakerLocal.markComplete - makerCount: 0, SHUTTING DOWN SPLASH", Log.WARN );
@@ -122,7 +57,5 @@ public class ModelMakerLocal extends ModelMakerBase {
 			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );
 		}
 	}
-	
-	
 }	
 }

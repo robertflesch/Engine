@@ -57,7 +57,7 @@ public class GenerateWater extends LandscapeTask
 
 		}
 		else
-			Log.out( "GenerateWater.start - VM not found for guid: " + _instanceGuid );
+			Log.out( "GenerateWater.start - VM not found for guid: " + _modelGuid );
 		
 		trace( "GenerateWater.start - complete - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime), Log.ERROR );	
 		super.complete();

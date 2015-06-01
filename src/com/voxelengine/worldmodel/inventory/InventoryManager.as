@@ -96,7 +96,7 @@ public class InventoryManager
 	static private function objectInventoryGet( $ownerGuid:String ):Inventory {
 		var inventory:Inventory = _s_inventoryByGuid[$ownerGuid];
 		if ( null == inventory && null != $ownerGuid ) {
-			Log.out( "InventoryManager.objectInventoryGet building inventory object for: " + $ownerGuid , Log.WARN );
+			//Log.out( "InventoryManager.objectInventoryGet building inventory object for: " + $ownerGuid , Log.WARN );
 			inventory = new Inventory( $ownerGuid );
 			_s_inventoryByGuid[$ownerGuid] = inventory;
 			inventory.load();

@@ -112,7 +112,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			for ( var i:int = 1; i < tunnelLength / stepSize; i++ ) {
 				
 				var radius:int = Math.min( tunnelRadius * radiusMultiplierMin, Math.random() * tunnelRadius * radiusMultiplierMax );
-				vm.oxel.write_sphere( _instanceGuid, startLoc.x, startLoc.y, startLoc.z, radius, TypeInfo.AIR, minGrain );
+				vm.oxel.write_sphere( _modelGuid, startLoc.x, startLoc.y, startLoc.z, radius, TypeInfo.AIR, minGrain );
 				startLoc.x += view.x + rndOffset( tunnelRadius );
 				startLoc.y += view.y + rndOffset( tunnelRadius );
 				startLoc.z += view.z + rndOffset( tunnelRadius );
@@ -120,7 +120,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 					trace( "CarveTunnels.start - Carve SIDE TUNNEL ---------------------------------------------------------------" );					
 					var vv:Vector3D = ModelCacheUtils.viewVectorNormalizedGet();
 					vv = vv.crossProduct( crossListGet() );
-					CarveTunnels.contructor( _instanceGuid
+					CarveTunnels.contructor( _modelGuid
 								 , startLoc
 								 , vv
 								 , TypeInfo.AIR

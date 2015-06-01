@@ -97,7 +97,9 @@ package com.voxelengine.worldmodel.scripts
 				
 				// dont handle event directly, since then I will generate event at same times as everyone else.
 				var pe:ProjectileEvent = new ProjectileEvent( ProjectileEvent.PROJECTILE_SHOT );
-				pe.ammo = ammo.clone();
+				
+				throw new Error( "FireProjectileScript.onFire - what to do here" );
+//				pe.ammo = ammo.clone();
 				pe.owner = gunModel.instanceInfo.instanceGuid;
 				pe.position = bulletWSLocation;
 				pe.direction = dr;
@@ -146,7 +148,7 @@ package com.voxelengine.worldmodel.scripts
 			pm.instanceInfo.usesCollision = true;
 			pm.ammo = pe.ammo;
 			
-			var grainChange:int = pe.ammo.grain - pm.oxel.gc.grain;
+			var grainChange:int = pe.ammo.grain - pm.grain;
 			pm.changeGrainSize( grainChange );
 //			trace( "bulletPool: changing type to: " + Globals.Info[pe.ammo.oxelType].name );
 			pm.oxel.changeAllButAirToType( pe.ammo.oxelType );

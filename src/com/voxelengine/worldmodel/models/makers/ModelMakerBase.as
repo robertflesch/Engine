@@ -12,7 +12,7 @@ import flash.utils.ByteArray;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.worldmodel.models.*;
@@ -28,15 +28,17 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 	 */
 public class ModelMakerBase {
 	
-	protected var _ii:InstanceInfo;
-	protected var _vmd:OxelData;
-	protected var _vmdFailed:Boolean;
 	static private var _makerCount:int;
+	
+	protected var _vmm:ModelMetadata;
+	protected var _vmi:ModelInfo;
+	protected var _ii:InstanceInfo;
 	protected var _parentModelGuid:String;
 	
 	static private var _s_parentChildCount:Array = new Array();
 	
 	public function ModelMakerBase( $ii:InstanceInfo, $fromTables:Boolean = true ) {
+		Log.out( "ModelMakerBase - ii: " + $ii.toString(), Log.DEBUG );
 		_ii = $ii;
 		if ( $ii.controllingModel ) {
 			// Using modelGuid rather then instanceGuid since imported models have no instanceGuid at this point.
@@ -46,108 +48,73 @@ public class ModelMakerBase {
 			var count:int = _s_parentChildCount[_parentModelGuid];
 			_s_parentChildCount[_parentModelGuid] = ++count;
 		}
-		//Log.out( "ModelMakerBase - ii: " + _ii.toString(), Log.DEBUG );
-		OxelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
-		OxelDataEvent.addListener( ModelBaseEvent.RESULT, retriveData );		
-		OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
-		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null, $fromTables ) );		
 	}
 	
-	private function retriveData($mde:OxelDataEvent):void  {
-		if ( _ii.modelGuid == $mde.modelGuid ) {
-			//Log.out( "ModelMakerBase.retriveData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
-			_vmd = $mde.vmd;
-			if ( true ==  _vmdFailed ) {
-				Log.out( "ModelMakerBase.retriveData - RESETTING VMDFAILED", Log.WARN );
-				_vmdFailed = false;
-			}
-			attemptMake();
+	protected function retrieveBaseInfo():void {
+		addListeners();	
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null ) );	
+		
+		function addListeners():void {
+			ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retrivedModelInfo );		
+			ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retrivedModelInfo );		
+			ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );		
 		}
 	}
 	
-	private function failedData( $mde:OxelDataEvent):void  {
-		if ( _ii.modelGuid == $mde.modelGuid ) {
-			Log.out( "ModelMakerBase.failedData - ii: " + _ii.toString() + " ModelDataEvent: " + $mde.toString(), Log.WARN );
-			_vmdFailed = true;
+	private function removeListeners():void {
+		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retrivedModelInfo );		
+		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retrivedModelInfo );		
+		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );	
+	}
+	
+	private	function retrivedModelInfo($mie:ModelInfoEvent):void  {
+		if ( _ii.modelGuid == $mie.modelGuid ) {
+			removeListeners();		
+			Log.out( "ModelMakerBase.retrivedModelInfo - ii: " + _ii.toString(), Log.DEBUG );
+			_vmi = $mie.vmi;
+			attemptMake();
+		}
+	}
+		
+	private function failedModelInfo( $mie:ModelInfoEvent):void  {
+		if ( _ii.modelGuid == $mie.modelGuid ) {
+			removeListeners();		
+			Log.out( "ModelMakerBase.failedData - ii: " + _ii.toString(), Log.WARN );
 			markComplete( false );
 		}
 	}
 	
 	// once they both have been retrived, we can make the object
-	protected function attemptMake():void { }
+	protected function attemptMake():void { throw new Error( "ModelMakerBase.attemptMake is an abstract method" ); }
+	
 	protected function markComplete( $success:Boolean = true ):void {
-		
-		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, retriveData );		
-		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, retriveData );		
-		OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );		
 		if ( $success )
 			ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid ) );
 		else	
 			ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_FAILURE, _ii.modelGuid ) );
 		
 		//Log.out( "ModelMakerBase.markComplete - " + ($success ? "SUCCESS" : "FAILURE" ) + "  ii: " + _ii + "  success: " + $success, Log.DEBUG );
-		
 		if ( _parentModelGuid ) {
-			//Log.out( "ModelMakerBase.markComplete has controlling model - instanceGuid of parent: " + _parentModelGuid, Log.WARN );
 			var count:int = _s_parentChildCount[_parentModelGuid];
 			_s_parentChildCount[_parentModelGuid] = --count;
-			// This tells the PARENT that it is ready to move forward (save in particular)
-			//Log.out( "ModelMakerBase.markComplete count: " + count, Log.WARN );
-			if ( 0 == count ) {
-				//Log.out( "ModelMakerBase.markComplete _ii.modelGuid: " + _ii.modelGuid + "  _parentModelGuid: " +  _parentModelGuid, Log.WARN );
+			if ( 0 == count )
 				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _ii.modelGuid, _parentModelGuid ) );
-			}
 		}
-
+		_vmm = null;
+		_vmi = null;
+		_ii = null;
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	// Make sense, called from for Makers
-	static public function extractVersionInfo( $ba:ByteArray ):Object {
-		$ba.position = 0;
-		// Read off first 3 bytes, the data format
-		var format:String = readFormat($ba);
-		if ("ivm" != format)
-			throw new Error("ModelMakerBase.modelMetaInfoRead - Exception - unsupported format: " + format );
-		
-		var metaInfo:Object = new Object();
-		// Read off next 3 bytes, the data version
-		metaInfo.version = readVersion($ba);
-		// Read off next byte, the manifest version
-		metaInfo.manifestVersion = $ba.readByte();
-		Log.out("VoxelModel.readMetaInfo - version: " + metaInfo.version + "  manifestVersion: " + metaInfo.manifestVersion );
-		return metaInfo;
-
-		// This reads the format info and advances position on byteArray
-		function readFormat($ba:ByteArray):String
-		{
-			var format:String;
-			var byteRead:int = 0;
-			byteRead = $ba.readByte();
-			format = String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-			format += String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-			format += String.fromCharCode(byteRead);
-			
-			return format;
-		}
-		
-		// This reads the version info and advances position on byteArray
-		function readVersion($ba:ByteArray):int
-		{
-			var version:String;
-			var byteRead:int = 0;
-			byteRead = $ba.readByte();
-			version = String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-			version += String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-			version += String.fromCharCode(byteRead);
-			
-			return int(version);
-		}
+	protected function make():VoxelModel {
+		var vm:* = instantiate( _ii, _vmi );
+		if ( vm ) {
+			vm.init( _vmi, _vmm );
+			vm.modelInfo.animationsLoad( vm );
+		} else
+			Log.out( "ModelMakerBase.makerCountDecrement - FAILED TO MAKE OBJECT guid: " + _vmi.guid, Log.WARN );
+		return vm;
 	}
 	
 	// Makes sense
@@ -156,7 +123,7 @@ public class ModelMakerBase {
 		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
 		var vm:VoxelModel = new modelClass( $ii );
 		if ( null == vm ) {
-			throw new Error( "ModelMakerBase.instantiate - Model failed in creation - modelClass: " + modelClass );
+			Log.out( "ModelMakerBase.instantiate - Model failed in creation - modelClass: " + modelClass, Log.ERROR );
 			return null;
 		}
 		
@@ -165,7 +132,7 @@ public class ModelMakerBase {
 	}
 	
 	static public function load( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true, $prompt:Boolean = true ):void {
-		Log.out( "ModelMakerBase.load ii: " + $ii.toString() );
+		//Log.out( "ModelMakerBase.load - choose maker ii: " + $ii.toString() );
 		if ( !Globals.isGuid( $ii.modelGuid ) )
 			if ( Globals.online )
 				new ModelMakerImport( $ii, $prompt );
@@ -174,37 +141,11 @@ public class ModelMakerBase {
 		else
 			new ModelMaker( $ii, $addToRegionWhenComplete );
 	}
-
-	static public function extractModelInfo( $ba:ByteArray ):Object {
-
-		// how many bytes is the modelInfo
-		var strLen:int = $ba.readInt();
-		// read off that many bytes
-		var modelInfoJson:String = $ba.readUTFBytes( strLen );
-		//Log.out( "ModelMakerBase.modelInfoFromByteArray - STRING modelInfo: " + modelInfoJson,	Log.WARN );
-		// create the modelInfo object from embedded metadata
-		modelInfoJson = decodeURI(modelInfoJson);
-		var jsonResult:Object = JSON.parse(modelInfoJson);
-		return jsonResult;		
-		
-	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	static public function makerCountGet():int 
-	{
-		return _makerCount;
-	}
-	static public function makerCountIncrement():void 
-	{
-		_makerCount++;
-		//Log.out( "ModelMakerBase.makerCountIncrement - makerCount: " + _makerCount, Log.ERROR );
-	}
-	
-	static public function makerCountDecrement():void 
-	{
-		_makerCount--;
-		//Log.out( "ModelMakerBase.makerCountDecrement - makerCount: " + _makerCount, Log.ERROR );
-	}
+	static public function makerCountGet():int { return _makerCount; }
+	static public function makerCountIncrement():void { _makerCount++; }
+	static public function makerCountDecrement():void { _makerCount--; }
 }	
 }

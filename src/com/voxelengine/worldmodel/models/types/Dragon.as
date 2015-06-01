@@ -35,14 +35,14 @@ public class Dragon extends Beast
 		super( ii );
 	}
 	
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
 		
 		// TODO reimplement in handler
 		//MouseKeyboardHandler.backwardEnabled = false;
 		
 		instanceInfo.usesCollision = true;
-		modelInfo.hasInventory = true;
+		hasInventory = true;
 		//usesGravity = true;
 		collisionMarkers = true;
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );

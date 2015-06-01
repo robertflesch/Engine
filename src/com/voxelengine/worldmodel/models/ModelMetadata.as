@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.PersistanceEvent;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.JPEGEncoderOptions;
@@ -38,33 +39,34 @@ public class ModelMetadata extends PersistanceObject
 	private var _owner:String			= "";
 	private var _creator:String			= "";
 	private var _thumbnail:BitmapData;
-//	private var _dbo:DatabaseObject;
 	private var _modifiedDate:Date;
 	private var _permissions:Permissions = new Permissions();
 
 	public function get permissions():Permissions 		{ return _permissions; }
-	public function set permissions( val:Permissions):void	{ _permissions = val; }
+	public function set permissions( val:Permissions):void	{ _permissions = val; changed = true; }
 	
 	public function get name():String  					{ return _name; }
-	public function set name(value:String):void  		{ _name = value; }
+	public function set name(value:String):void  		{ _name = value; changed = true; }
 	
 	public function get description():String  			{ return _description; }
-	public function set description(value:String):void  { _description = value; }
+	public function set description(value:String):void  { _description = value; changed = true; }
 	
 	public function get owner():String  				{ return _owner; }
-	public function set owner(value:String):void  		{ _owner = value; }
+	public function set owner(value:String):void  		{ _owner = value; changed = true; }
 	
 	public function get parentModelGuid():String 				{ return _parentModelGuid; }
-	public function set parentModelGuid(value:String):void  	{ _parentModelGuid = value; }
+	public function set parentModelGuid(value:String):void  	{ _parentModelGuid = value; changed = true; }
 	
 	public function get thumbnail():BitmapData 			{ return _thumbnail; }
-	public function set thumbnail(value:BitmapData):void { _thumbnail = value; }
+	public function set thumbnail(value:BitmapData):void { _thumbnail = value; changed = true; }
 	
 	public function get modifiedDate():Date 			{ return _modifiedDate; }
-	public function set modifiedDate(value:Date):void  	{ _modifiedDate = value; }
+	public function set modifiedDate(value:Date):void  	{ _modifiedDate = value; changed = true; }
+	
+	public function get creator():String 				{ return _creator; }
 	
 	public function toString():String {
-		return "name: " + _name + "  description: " + _description + "  guid: " + guid + "  owner: " + _owner;
+		return "name: " + name + "  description: " + description + "  guid: " + guid + "  owner: " + owner;
 	}
 	
 	public function ModelMetadata( $guid:String ) {
@@ -95,16 +97,16 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		//transfer		= $vmm.transfer;
 	}
 	
-	override public function clone():* {
+	override public function clone( $guid:String ):* {
 		
-		var newVmm:ModelMetadata = new ModelMetadata( guid );	
-		newVmm.name 			= new String( _name );
-		newVmm.description 		= new String( _description );
-		newVmm.owner 			= new String( _owner );
+		var newVmm:ModelMetadata = new ModelMetadata( $guid );	
+		newVmm.name 			= new String( name );
+		newVmm.description 		= new String( description );
+		newVmm.owner 			= new String( owner );
 		newVmm.thumbnail		= thumbnail;
 		newVmm.parentModelGuid  = parentModelGuid;
 		newVmm._dbo				= dbo;
-		newVmm.permissions		= _permissions.clone();
+		newVmm.permissions		= permissions.clone();
 		newVmm.modifiedDate		= modifiedDate;
 		
 		return newVmm;
@@ -120,15 +122,31 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		save();
 	}
 
+	public function save():void {
+		if ( Globals.online && true == changed ) {
+			Log.out( "ModelMetadata.save - Saving ModelMetadata: " + guid  + " in table: " + table );
+			changed = false;
+			addSaveEvents();
+			if ( _dbo )
+				toPersistance();
+			else
+				toObject();
+				
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
+		}
+		else
+			Log.out( "ModelMetadata.save - Not saving ModelMetadata, either offline or NOT changed or locked - guid: " + guid, Log.WARN );
+	}
+	
 	//////////////////////////////////////////////////////////////////
 	// TO Persistance
 	//////////////////////////////////////////////////////////////////
-	public function hackedSaveToDBO():void {
+	public function toPersistance():void {
 		
-		_dbo.name 			= _name;
-		_dbo.description	= _description;
-		_dbo.owner			= _owner;
-		_dbo.creator		= _creator;
+		_dbo.name 			= name;
+		_dbo.description	= description;
+		_dbo.owner			= owner;
+		_dbo.creator		= creator;
 		_dbo.modifiedDate   = new Date();
 		_dbo.parentModelGuid= parentModelGuid;
 		_permissions.toPersistance( _dbo );
@@ -138,42 +156,28 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 			_dbo.thumbnail = null;
 	}
 	
-	override protected function toPersistance():void {
+	public function toObject():void {
 		
-		_dbo.name 			= _name;
-		_dbo.description	= _description;
-		_dbo.owner			= _owner;
-		_dbo.creator		= _creator;
-		_dbo.modifiedDate   = new Date();
-		_dbo.parentModelGuid= parentModelGuid;
-		_permissions.toPersistance( _dbo );
-		if ( thumbnail )
-			_dbo.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
-		else
-			_dbo.thumbnail = null;
-	}
-	
-	override protected function toObject():Object {
-		
-		var metadataObj:Object =  { name: _name
-								  , description: _description
-								  , owner: _owner
-								  , creator: _creator
-								  , modifiedDate: _modifiedDate
-								  , parentModelGuid: parentModelGuid
-								  , thumbnail: thumbnail }
+		_obj =    { name: 				name
+				  , description: 		description
+				  , owner: 				owner
+				  , creator: 			creator
+				  , modifiedDate: 		modifiedDate
+				  , parentModelGuid: 	parentModelGuid
+				  , thumbnail: 			thumbnail }
 								  
-		metadataObj = _permissions.addToObject( metadataObj );
-		return metadataObj;						   
+		_obj = _permissions.addToObject( _obj );
 	}
 	
 
 	////////////////////////////////////////////////////////////////
 	// FROM Persistance
 	////////////////////////////////////////////////////////////////
+
+	public function fromObject( $object:Object, $ba:ByteArray ):void {}
 	
-	override public function fromPersistance( $dbo:DatabaseObject ):void {
-		
+	public function fromPersistance( $dbo:DatabaseObject ):void {
+		_dbo			= $dbo;
 		_name 			= $dbo.name;
 		_description	= $dbo.description;
 		_owner			= $dbo.owner;
@@ -181,7 +185,6 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		guid 			= $dbo.key;
 		_modifiedDate   = $dbo.modifiedDate;
 		_parentModelGuid = $dbo.parentModelGuid;
-		_dbo			= $dbo;
 		_permissions.fromPersistance( $dbo );
 		
 		if ( $dbo.thumbnail ) {
@@ -191,6 +194,8 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		}
 		else
 			thumbnail 		= null;
+			
+		changed = false;	
 	}
 }
 }

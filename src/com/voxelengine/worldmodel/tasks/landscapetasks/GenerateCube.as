@@ -8,7 +8,11 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
+	import com.adobe.utils.Hex;
+	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.OxelDataEvent;
 	import com.voxelengine.events.PersistanceEvent;
+	import com.voxelengine.worldmodel.models.OxelData;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
@@ -28,22 +32,19 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	{	
 		static public function script():Object {
 			var obj:Object = new Object();
-			var model:Object = new Object();
 			var biomes:Object = new Object();
 			var layers:Vector.<Object> = new Vector.<Object>();
 			var layer:Object = new Object();
 			
-			obj.model = model;
-			model.editable = true;
-			model.template = true;
-			model.grainSize = 4;
-			model.biomes = biomes;
+			obj.guid = "INVALID";
+			obj.grainSize = 4;
+			obj.biomes = biomes;
 			biomes.layers = layers;
 			layers[0] = layer;
 			layer.functionName = "GenerateCube";
 			layer.type = "SAND"
 			layer.range = 0;
-			layer.offset = 0;
+			layer.offset = 0; // used for the root grain size
 			
 			return obj;
 		}
@@ -62,7 +63,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			//////////////////////////////////////////////////////////
 			// Builds Solid Cube of any grain size
 			//////////////////////////////////////////////////////////
-			const root_grain_size:int = _layer.offset;
+			var root_grain_size:int = _layer.offset;
 			const baseLightLevel:int = 51;
 			var oxel:Oxel = Oxel.initializeRoot( root_grain_size, baseLightLevel );
 			//
@@ -80,8 +81,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				for ( var y:int = 0; y < size; y++ ) {
 					for ( var z:int = 0; z < size; z++ ) {
 						loco.set_values( x, y, z, min_grain_size )
-						oxel.write( _instanceGuid, loco, _layer.type );
-						//vm.write( loco, _layer.type, true );
+						oxel.write( _modelGuid, loco, _layer.type, true );
 					}
 				}
 			}
@@ -91,11 +91,16 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			// for multistep builds I will have to ponder this more.
 			oxel.facesBuildWater();
 			oxel.facesBuild();
+			GrainCursorPool.poolDispose( loco );
 
 			
-			GrainCursorPool.poolDispose( loco );
-			var ba:ByteArray = VoxelModel.oxelAsBasicModel( oxel );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _instanceGuid, null, ba ) );
+			var od:OxelData = new OxelData( _modelGuid );
+			var ba:ByteArray = OxelData.fromGeneratedData( oxel );
+			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
+			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
+			od.fromByteArray( ba );
+			
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.GENERATION, 0, _modelGuid, od ) );
 			
 			//Log.out( "GenerateCube.start - took: "  + (getTimer() - timer) );					
             super.complete() // AbstractTask will send event

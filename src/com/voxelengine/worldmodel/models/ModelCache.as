@@ -13,6 +13,8 @@ package com.voxelengine.worldmodel.models
 	import flash.utils.Dictionary;
 	import flash.utils.getTimer;
 	
+	//import com.developmentarc.core.datastructures.utils.HashTable;
+	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.ModelEvent;
@@ -26,6 +28,9 @@ package com.voxelengine.worldmodel.models
 	{
 		// these are the active parent objects or dynamic objects
 		// We do double entry here so that models can be retrived by guid
+		
+		// TODO replace this double entry with a hash table which has it built in.
+		// Speed consideration?
 		private var _instances:Vector.<VoxelModel> = new Vector.<VoxelModel>();
 		private var _instanceByGuid:Dictionary = new Dictionary();
 		private var _instancesDynamic:Vector.<VoxelModel> = new Vector.<VoxelModel>();
@@ -117,21 +122,30 @@ package com.voxelengine.worldmodel.models
 			{
 				if ( vm is Avatar ) {
 					// need to seperate these out into their own catagory
-					_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
-					_instances.push(vm);
-					ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
+					if ( null == _instanceByGuid[vm.instanceInfo.instanceGuid] ) {
+						_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
+						_instances.push(vm);
+						ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
+					}
+					else
+						Log.out( "ModelCache.add - Trying to add a AVATAR with the same MODEL AND INSTANCE for a second time", Log.ERROR );
 				}
 				else {
 					if ( null == vm.instanceInfo.instanceGuid )
 						vm.instanceInfo.instanceGuid = Globals.getUID();
-					_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
-					_instances.push(vm);
-					ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
+					// This keeps us from adding the same model twice
+					if ( null == _instanceByGuid[vm.instanceInfo.instanceGuid] ) {
+						_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
+						_instances.push(vm);
+						ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
+					}
+					else
+						Log.out( "ModelCache.add - Trying to add the same MODEL AND INSTANCE for a second time", Log.ERROR );
 				}
 			}
 			
 			// This prefetches the data, so it is ready when requested
-			if ( vm.modelInfo.hasInventory )
+			if ( vm.hasInventory )
 				InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, vm.instanceInfo.instanceGuid, null ) );
 		}
 		
@@ -143,33 +157,33 @@ package com.voxelengine.worldmodel.models
 			for ( var i:int = 0; i < _instances.length; i++ ) {
 				vm = _instances[i];
 				if ( vm && vm.complete && vm.visible )
-					vm.draw( $mvp, $context, false );	
+					vm.draw( $mvp, $context, false, false );	
 			}
 			
 			// TODO - should sort models based on distance, and view frustrum - RSF
 			for ( i = 0; i < _instancesDynamic.length; i++ ) {
 				vm = _instancesDynamic[i];
 				if ( vm && vm.complete && vm.visible )
-					vm.draw( $mvp, $context, false );	
+					vm.draw( $mvp, $context, false, false );	
 			}
 			
-			if ( EditCursor.currentInstance.editing )
+			if ( EditCursor.editing )
 				EditCursor.currentInstance.drawCursor( $mvp, $context, false, false );
 				
 			for ( i = 0; i < _instances.length; i++ ) {
 				vm = _instances[i];
 				if ( vm && vm.complete && vm.visible )
-					vm.drawAlpha( $mvp, $context, false );	
+					vm.draw( $mvp, $context, false, true );	
 			}
 			
 			// TODO - This is expensive and not needed if I dont have projectiles without alpha.. RSF
 			for ( i = 0; i < _instancesDynamic.length; i++ ) {
 				vm = _instancesDynamic[i];
 				if ( vm && vm.complete && vm.visible )
-					vm.drawAlpha( $mvp, $context, false );	
+					vm.draw( $mvp, $context, false, true );	
 			}
 			
-			if ( EditCursor.currentInstance.editing ) //  && ModelPlacementType.PLACEMENT_TYPE_PARENT == ModelPlacementType.modelPlacementTypeGet()
+			if ( EditCursor.editing ) //  && ModelPlacementType.PLACEMENT_TYPE_PARENT == ModelPlacementType.modelPlacementTypeGet()
 				EditCursor.currentInstance.drawCursor( $mvp, $context, false, true );
 			
 			bringOutYourDead();
@@ -208,7 +222,7 @@ package com.voxelengine.worldmodel.models
 			
 			modelTime = getTimer() - modelTime;
 				
-			if ( EditCursor.currentInstance.editing )
+			if ( EditCursor.editing )
 				EditCursor.currentInstance.update( Globals.g_renderer.context, $elapsedTimeMS);
 
 		}

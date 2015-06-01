@@ -13,7 +13,7 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.ModelInfo;
@@ -39,9 +39,9 @@ public class ModelDestroyer {
 		
 		// remove inventory
 		// request the ModelData so that we can get the modelInfo from it.
-		OxelDataEvent.addListener( ModelBaseEvent.RESULT, dataResult );
-		OxelDataEvent.addListener( ModelBaseEvent.ADDED, dataResult );
-		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
+		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, dataResult );
+		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, dataResult );
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
 
 		// this removes the on screen instances
 		var modelOnScreen:Vector.<VoxelModel> = Region.currentRegion.modelCache.modelGet( _modelGuid );
@@ -52,28 +52,22 @@ public class ModelDestroyer {
 		}
 	}
 	
-	private function dataResult(e:OxelDataEvent):void 
+	private function dataResult(e:ModelInfoEvent):void 
 	{
 		// Now that we have the modelData, we can extract the modelInfo
-		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, dataResult );
-		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, dataResult );
-		// So I need to extract the animation data.
-		var ba:ByteArray = new ByteArray();
-		ba.writeBytes( e.vmd.compressedBA, 0, e.vmd.compressedBA.length );
-		try { ba.uncompress(); }
-		catch (error:Error) { ; }
+		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, dataResult );
+		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, dataResult );
 		
-		// dont care, just need to step up the correct number of bytes
-		ModelMakerBase.extractVersionInfo( ba );
-		var modelInfoObject:Object = ModelMakerBase.extractModelInfo( ba );
 		// now tell the modelData to remove all of the guids associated with this model.
-		ModelInfo.animationsDelete( modelInfoObject, e.modelGuid );
+		if ( e.vmi )
+			e.vmi.animationsDelete();
 
 		// Let MetadataCache handle the recursive delete
 		if ( _recursive )
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.DELETE_RECURSIVE, 0, _modelGuid, null ) );
 		else
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
+		
 	}
 }	
 }

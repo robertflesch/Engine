@@ -23,7 +23,7 @@ package com.voxelengine.worldmodel.models.types
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 			super.init( $mi, $vmm );
 		}
 	}

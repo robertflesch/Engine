@@ -88,6 +88,7 @@ package com.voxelengine {
 		public static var g_lightTaskController:TaskController =  new TaskController();
 
 		public static var GAME_ID:String = "voxelverse-lpeje46xj0krryqaxq0vog";
+		public static var GAME_ID_DEV:String = "voxelversedev-yeiensar20ofthu906l6ma"
 		//public static var g_gamesNetworkID:String = "servertestgame-co3lwnb10a4ytwvxddjtq";
 		
 		public static var g_debug:Boolean  = false;

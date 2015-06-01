@@ -37,10 +37,10 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			if ( vm )
 			{
 				var outOf:int = _layer.range;
-				vm.oxel.growTreesOnAnything( _instanceGuid, outOf ? outOf : 2000 );
+				vm.oxel.growTreesOnAnything( _modelGuid, outOf ? outOf : 2000 );
 			}
 			else
-				Log.out( "GrowTreesOnAnything.start - VM not found for guid: " + _instanceGuid );
+				Log.out( "GrowTreesOnAnything.start - VM not found for guid: " + _modelGuid );
 			Log.out( "GrowTreesOnAnything.start - complete & trees - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) );	
 			
 			super.complete();

@@ -1179,6 +1179,11 @@ package com.voxelengine.worldmodel.oxel
 				Log.out( "Oxel.cleanup - quadsBuild -  took: " + time );					
 		}
 		
+		public function buildQuadsFromLoadedData():void {
+			quadsBuild();
+			Log.out( "Oxel.buildQuadsFromLoadedData - quadsBuild" );					
+		}
+		
 		public function facesBuildWater():void {
 			if ( dirty ) {
 				if ( childrenHas())

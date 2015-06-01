@@ -179,7 +179,6 @@ public class ConsoleCommands {
 	
 	private static function tunnel():void
 	{
-//			Globals.g_landscapeTaskController.activeTaskLimit = 0;
 		if ( !VoxelModel.selectedModel ) {
 			Log.out( "ConsoleCommands.carveTunnel  No model selected", Log.WARN );
 			return;
@@ -205,7 +204,6 @@ public class ConsoleCommands {
 	
 	private static function tunnelNetwork():void
 	{
-//			Globals.g_landscapeTaskController.activeTaskLimit = 0;
 		if ( !VoxelModel.selectedModel ) {
 			Log.out( "ConsoleCommands.CarveTunnels  No model selected", Log.WARN );
 			return;

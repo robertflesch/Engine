@@ -9,6 +9,9 @@
 package com.voxelengine.GUI
 {
 	import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
+	import com.voxelengine.worldmodel.models.ModelCacheUtils;
+	import com.voxelengine.worldmodel.oxel.GrainCursor;
+	import com.voxelengine.worldmodel.tasks.landscapetasks.*;
 	import flash.accessibility.Accessibility;
 	import flash.geom.Vector3D;
 	
@@ -117,7 +120,7 @@ package com.voxelengine.GUI
 			{
 				_cbDetail.addItem( (1<<j)/16, j );
 			}
-			_cbDetail.selectedIndex = 2;
+			_cbDetail.selectedIndex = 0;
 		}
 		
 		private function updateDetail( selectedIndex:int ):void {
@@ -145,37 +148,49 @@ package com.voxelengine.GUI
 			var ii:InstanceInfo = new InstanceInfo();
 			var detailSize:int;		
 			var li:ListItem;
-			switch ( id )
-			{
-				case 0: // From Cube
-					ii.modelGuid = "GenerateCube";
-					break;
-				case 1: // From Sphere
-					ii.modelGuid = "GenerateSphere";
-					li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
-					detailSize = li.data;			
-					break;
-				case 2: // From Sphere
-					ii.modelGuid = "GenerateSubSphere";
-					li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
-					detailSize = li.data;			
-					break;
-			}
-			
+			var miJson:Object;
 			if ( -1 == _cbSize.selectedIndex ) {
 				(new Alert( "Please select a size" ) ).display();
 				return;
 			}
-			li = _cbSize.getItemAt(_cbSize.selectedIndex );
-			var size:int = li.data;			
-			li = _cbType.getItemAt( _cbType.selectedIndex );
-			var type:int = li.data;			
-			ii.grainSize = size;
-			ii.detailSize = detailSize;
-			ii.type = type;
-			var viewDistance:Vector3D = new Vector3D(0, 0, -75 - (1<<size)/2 );
-			ii.positionSet = VoxelModel.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( viewDistance );
-			new ModelMakerGenerate( ii );
+			switch ( id )
+			{
+				case 0: // From Cube
+					// This data really needs to be used to generate the whole window.
+					miJson = GenerateCube.script();
+					
+					li = _cbSize.getItemAt(_cbSize.selectedIndex );
+					miJson.grainSize = li.data;
+					miJson.biomes.layers[0].offset = li.data;
+					
+					li = _cbType.getItemAt( _cbType.selectedIndex );
+					miJson.biomes.layers[0].type = li.data;
+					
+					li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
+					miJson.biomes.layers[0].range = 0;
+					
+					break;
+				case 1: // From Sphere
+					//ii.modelGuid = "GenerateSphere";
+					//li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
+					//detailSize = li.data;			
+					//miJson = GenerateSphere.script();
+					break;
+				case 2: // From Sphere
+					//ii.modelGuid = "GenerateSubSphere";
+					//li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
+					//detailSize = li.data;			
+
+					break;
+			}
+			
+			var vv:Vector3D = ModelCacheUtils.viewVectorNormalizedGet();
+			vv.scaleBy( GrainCursor.two_to_the_g( miJson.grainSize ) * 4 );
+			vv = vv.add( VoxelModel.controlledModel.instanceInfo.positionGet );
+			ii.positionSet = vv;
+			ii.modelGuid = miJson.guid = Globals.getUID();
+			
+			new ModelMakerGenerate( ii, miJson );
 		}
 	}
 }

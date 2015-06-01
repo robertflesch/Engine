@@ -89,7 +89,11 @@ public class PanelModels extends PanelBase
 					if ( vm is Player )
 						continue;
 				}
-				var itemName:String = "" == vm.metadata.name ? vm.modelInfo.fileName : vm.metadata.name;
+				var itemName:String = "";
+				if ( vm.metadata.name )
+					itemName = vm.metadata.name;
+				else	
+					itemName = vm.modelInfo.fileName;
 				//Log.out( "PanelModels.populateModels - adding: " + itemName );
 				
 				_listModels.addItem( itemName, vm );

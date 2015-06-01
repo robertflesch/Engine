@@ -35,7 +35,7 @@ package com.voxelengine.worldmodel.models.types
 			super( $ii );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 			super.init( $mi, $vmm );
 		}
 		
@@ -102,7 +102,7 @@ package com.voxelengine.worldmodel.models.types
 				
 				var loco:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
 				// this prunes the children oxel
-				oxel.write( instanceInfo.instanceGuid, loco.set_values( 0, 0, 0, oxel.gc.grain ), TypeInfo.LEAF, true );
+				oxel.write( instanceInfo.instanceGuid, loco.set_values( 0, 0, 0, grain ), TypeInfo.LEAF, true );
 				GrainCursorPool.poolDispose( loco );
 				oxel.faces_set_all();
 				oxel.faces_rebuild( instanceInfo.instanceGuid );
@@ -113,16 +113,17 @@ package com.voxelengine.worldmodel.models.types
 			{
 				_was_selected = false;
 				var loco1:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
+				throw new Error( "Trigger.update - How to do this with new oxel model?" );
 				// this prunes the children oxel
-				loco1.set_values( 0, 0, 0, oxel.gc.grain );
-				_ba.position = 0;
-				oxel.readData( null, loco1, _ba, statisics );
-				GrainCursorPool.poolDispose( loco1 );
-				// this cleans up outside, but saddle is gone
-				oxel.faces_rebuild( instanceInfo.instanceGuid );
-				oxel.faces_clean_all_face_bits();
-				oxel.dirty = true;
-				oxel.quadsBuild();
+				//loco1.set_values( 0, 0, 0, oxel.gc.grain );
+				//_ba.position = 0;
+				//oxel.readData( null, loco1, _ba, statisics );
+				//GrainCursorPool.poolDispose( loco1 );
+				//// this cleans up outside, but saddle is gone
+				//oxel.faces_rebuild( instanceInfo.instanceGuid );
+				//oxel.faces_clean_all_face_bits();
+				//oxel.dirty = true;
+				//oxel.quadsBuild();
 			}
 		}
 	}

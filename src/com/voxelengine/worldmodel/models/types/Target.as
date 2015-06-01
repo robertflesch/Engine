@@ -34,7 +34,7 @@ package com.voxelengine.worldmodel.models.types
 			super( instanceInfo );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
+		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 			super.init( $mi, $vmm );
 			
 			Globals.g_app.dispatchEvent( new TargetEvent( TargetEvent.CREATED, instanceInfo.instanceGuid, _pointValue ) );
@@ -45,7 +45,7 @@ package com.voxelengine.worldmodel.models.types
 		//{
 			/*
 			var ba:ByteArray = Globals.findIVM( modelInfo.biomes.layers[0].data );
-			statisics.gather( ba, oxel.gc.grain );
+			statisics.gather( ba, grain );
 			statisics.statsPrint();
 			var oldCount:int = statisics.countInMeters;
 			trace( "old count in meters: " + oldCount );
@@ -57,7 +57,7 @@ package com.voxelengine.worldmodel.models.types
 			newBa.clear();
 			oxel.writeData( newBa );
 			newBa.position = 0;
-			statisics.gather( newBa, oxel.gc.grain );
+			statisics.gather( newBa, grain );
 			statisics.statsPrint();
 			var newCount:int = statisics.countInMeters;
 			trace( "new count in meters: " + newCount );

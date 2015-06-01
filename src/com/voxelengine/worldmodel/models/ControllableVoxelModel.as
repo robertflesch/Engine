@@ -96,7 +96,7 @@ public class ControllableVoxelModel extends VoxelModel
 		super( ii );
 	}
 	
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true ):void {
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
 		Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent, false, 0, true );
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
@@ -131,25 +131,6 @@ public class ControllableVoxelModel extends VoxelModel
 		obj.controllableVoxelModel = new Object();
 		obj.controllableVoxelModel.clipFactor = clipVelocityFactor * 100;
 		obj.controllableVoxelModel.maxSpeed = maxSpeed;
-	}
-	
-	override protected function internal_update($context:Context3D, $elapsedTimeMS:int):void {
-		if (!initialized)
-			initialize($context);
-		
-		if (complete)
-		{
-			// this was inside of the the controlled model if...
-			updateVelocity($elapsedTimeMS, clipVelocityFactor );
-			
-			instanceInfo.update($elapsedTimeMS);
-			
-			
-			if (oxel && oxel.dirty)
-			{
-				oxel.cleanup();
-			}
-		}
 	}
 	
 	public function get keyboardControl():Boolean { return _keyboardControl; }
@@ -269,9 +250,11 @@ public class ControllableVoxelModel extends VoxelModel
 	override public function update($context:Context3D, $elapsedTimeMS:int):void {
 		
 		if ( this === VoxelModel.controlledModel )
-		{
 			handleMouseMovement( $elapsedTimeMS );
-		}
+		
+		if (complete)
+			updateVelocity($elapsedTimeMS, clipVelocityFactor );
+			
 		super.update($context, $elapsedTimeMS);
 		
 		camera.positionSet = instanceInfo.positionGet;

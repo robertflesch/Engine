@@ -18,28 +18,28 @@ import com.voxelengine.worldmodel.models.OxelData;
  */
 public class OxelDataEvent extends ModelBaseEvent
 {
-	private var _vmd:OxelData;
+	private var _od:OxelData;
 	private var _modelGuid:String;
 	private var _fromTables:Boolean;
 
-	public function get vmd():OxelData { return _vmd; }
+	public function get oxelData():OxelData { return _od; }
 	public function get modelGuid():String  { return _modelGuid; }
 	public function get fromTables():Boolean  { return _fromTables; }
 	
 	public function OxelDataEvent( $type:String, $series:int, $guid:String, $vmd:OxelData, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $series, $bubbles, $cancellable );
-		_vmd = $vmd;
+		_od = $vmd;
 		_modelGuid = $guid;
 		_fromTables = $fromTable;
 	}
 	
 	public override function clone():Event {
-		return new OxelDataEvent(type, series, _modelGuid, _vmd, _fromTables, bubbles, cancelable);
+		return new OxelDataEvent(type, series, _modelGuid, _od, _fromTables, bubbles, cancelable);
 	}
    
 	public override function toString():String {
-		return formatToString( "ModelDataEvent", "series", "modelGuid", "vmd", "fromTables" );
+		return formatToString( "OxelDataEvent", "series", "modelGuid", "od", "fromTables" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

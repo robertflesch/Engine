@@ -40,6 +40,8 @@ public class ModelBaseEvent extends Event
 	static public const SAVE_FAILED:String					= "SAVE_FAILED";
 	
 	static public const DELETE:String						= "DELETE";
+
+	static public const GENERATION:String					= "GENERATION";
 	
 	public function ModelBaseEvent( $type:String, $series:int, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{

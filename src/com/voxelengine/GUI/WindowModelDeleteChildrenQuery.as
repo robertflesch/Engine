@@ -10,7 +10,6 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.worldmodel.models.makers.ModelDestroyer;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;

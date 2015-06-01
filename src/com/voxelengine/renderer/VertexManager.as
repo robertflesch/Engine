@@ -57,31 +57,23 @@ public class VertexManager {
 	public function release():void
 	{
 		//Log.out( "----------VertexManager.release---------- " );
-		if ( _vertBuf )
-		{
+		if ( _vertBuf ) {
 			VertexIndexBuilderPool.poolDispose( _vertBuf );
 			_vertBuf = null;
 		}
-		if ( _vertBufAlpha )
-		{
+		if ( _vertBufAlpha ) {
 			VertexIndexBuilderPool.poolDispose( _vertBufAlpha );
-			_vertBufAlpha = null;
+			_vertBufAlpha = null; 
 		}
-		
-		if ( _vertBufAnimated )
-		{
+		if ( _vertBufAnimated ) {
 			VertexIndexBuilderPool.poolDispose( _vertBufAnimated );
 			_vertBufAnimated = null;
 		}
-		
-		if ( _vertBufAnimatedAlpha )
-		{
+		if ( _vertBufAnimatedAlpha ) {
 			VertexIndexBuilderPool.poolDispose( _vertBufAnimatedAlpha );
 			_vertBufAnimatedAlpha = null;
 		}
-		
-		if ( _vertBufFire )
-		{
+		if ( _vertBufFire ) {
 			VertexIndexBuilderPool.poolDispose( _vertBufFire );
 			_vertBufFire = null;
 		}

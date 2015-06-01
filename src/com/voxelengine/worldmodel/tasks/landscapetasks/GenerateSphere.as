@@ -13,6 +13,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.Log;
 	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
+	import com.voxelengine.worldmodel.models.OxelData;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -75,7 +76,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var c:int = oxel.size_in_world_coordinates() / 2;
 
 			Log.out( "GenerateSphere.using params oxel.gc.bound: " + oxel.gc.bound + "  c: " + c + " min grain: " + min_grain_size, Log.WARN );
-			oxel.write_sphere( _instanceGuid, c, c, c, c, _layer.type, min_grain_size );
+			oxel.write_sphere( _modelGuid, c, c, c, c, _layer.type, min_grain_size );
 
 			oxel.dirty = true;
 			// CRITICAL STEP FOR GENERATION TASKS. when drawing the oxel, it expects to have faces, not dirty faces
@@ -84,8 +85,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			oxel.facesBuildWater();
 			oxel.facesBuild();
 			
-			var ba:ByteArray = VoxelModel.oxelAsBasicModel( oxel );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _instanceGuid, null, ba ) );
+			var ba:ByteArray = OxelData.fromGeneratedData( oxel );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba ) );
 			
 			//Log.out( "GenerateSphere.start - completed layer of type: " + (Globals.Info[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
 			super.complete() // AbstractTask will send event
