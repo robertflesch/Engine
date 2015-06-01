@@ -46,45 +46,17 @@ public class ModelMakerImport extends ModelMakerBase {
 	}
 
 	override protected function retrieveBaseInfo():void {
-		super.retrieveBaseInfo();
-		addListeners();
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null ) );		
-	}
-	
-	private function addListeners():void {
-		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retriveMetadata );		
-		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retriveMetadata );		
-		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
-	
-	}
-	
-	private function retriveMetadata( $mme:ModelMetadataEvent ):void {
-		if ( _ii.modelGuid == $mme.modelGuid ) {
-			removeListeners();
-			_vmm = $mme.vmm;
-			attemptMake();
-		}
-	}
-	
-	private function failedMetadata( $mme:ModelMetadataEvent ):void {
-		if ( _ii.modelGuid == $mme.modelGuid ) {
-			removeListeners();
-			Log.out( "ModelMaker.failedInfo - ii: " + _ii.toString() + " ModelMetadataEvent: " + $mme.toString(), Log.WARN );
-			markComplete(false);
-		}
-	}
-	
-	private function removeListeners():void {
-		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retriveMetadata );		
-		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retriveMetadata );		
-		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
+		addListeners();	
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null, false ) );	
 	}
 	
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
 		if ( null != _vmi && null == _vmm ) {
-			if ( _prompt )
+			if ( _prompt ) {
+				ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, metadataGenerated );
 				new WindowModelMetadata( _ii, WindowModelMetadata.TYPE_IMPORT );
+			}
 			else {
 				_vmm = new ModelMetadata( _ii.modelGuid );
 				if ( _parentModelGuid )
@@ -94,11 +66,13 @@ public class ModelMakerImport extends ModelMakerBase {
 				_vmm.modifiedDate = new Date();
 			}
 		}
-		
-			
+		completeMake();
+	}
+	
+	private function completeMake():void {
 		if ( null != _vmi && null != _vmm ) {
 			
-			_ii.modelGuid = _vmm.guid = Globals.getUID();
+			_ii.modelGuid = _vmi.guid = _vmm.guid = Globals.getUID();
 			_vmi.fileName = "";
 			
 			var vm:* = make()
@@ -111,6 +85,14 @@ public class ModelMakerImport extends ModelMakerBase {
 			}
 			
 			markComplete();
+		}
+	}
+	
+	private function metadataGenerated( $mme:ModelMetadataEvent):void 
+	{
+		if ( $mme.modelGuid == _vmi.guid ) {
+			_vmm = $mme.vmm;
+			completeMake();
 		}
 	}
 	

@@ -53,21 +53,21 @@ public class ModelMakerBase {
 	protected function retrieveBaseInfo():void {
 		addListeners();	
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null ) );	
-		
-		function addListeners():void {
-			ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retrivedModelInfo );		
-			ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retrivedModelInfo );		
-			ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );		
-		}
 	}
 	
-	private function removeListeners():void {
+	protected function addListeners():void {
+		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retrivedModelInfo );		
+		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retrivedModelInfo );		
+		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );		
+	}
+	
+	protected function removeListeners():void {
 		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retrivedModelInfo );		
 		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retrivedModelInfo );		
 		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );	
 	}
 	
-	private	function retrivedModelInfo($mie:ModelInfoEvent):void  {
+	protected function retrivedModelInfo($mie:ModelInfoEvent):void  {
 		if ( _ii.modelGuid == $mie.modelGuid ) {
 			removeListeners();		
 			Log.out( "ModelMakerBase.retrivedModelInfo - ii: " + _ii.toString(), Log.DEBUG );
@@ -76,7 +76,7 @@ public class ModelMakerBase {
 		}
 	}
 		
-	private function failedModelInfo( $mie:ModelInfoEvent):void  {
+	protected function failedModelInfo( $mie:ModelInfoEvent):void  {
 		if ( _ii.modelGuid == $mie.modelGuid ) {
 			removeListeners();		
 			Log.out( "ModelMakerBase.failedData - ii: " + _ii.toString(), Log.WARN );

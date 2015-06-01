@@ -192,24 +192,16 @@ Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.UPDATE, 0, _vmm.guid, _vmm ) );
 		} else { // TYPE_IMPORT so new data
 			// need to document why I do this here
+			/*
 			var dboTemp:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, _vmm.guid, "1", 0, true, null );
 			_vmm.fromPersistance( dboTemp );
 			_vmm.dbo = null;
 			_vmm.release();
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, _vmm.guid, dboTemp, true ) );			
+			*/
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, _vmm.guid, _vmm ) );
 		}
 		remove();
 	}
-	
-			//var dboTemp:DatabaseObject = new DatabaseObject( Globals.DB_TABLE_REGIONS, _region.guid, "1", 0, true, null );
-			//_region.dbo = dboTemp;
-			//_region.toPersistance();
-			//// remove the event listeners on this temporary object
-			//_region.release();
-			//// This tell the region manager to add it to the region list
-			//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, Globals.DB_TABLE_REGIONS, _region.guid, dboTemp, true ) );			
-			//// This tell the region to save itself!
-			//RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, _region.guid ) );
-	//
 }
 }
