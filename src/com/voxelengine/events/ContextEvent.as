@@ -1,5 +1,5 @@
 /*==============================================================================
-Copyright 2011-2015 Robert Flesch
+Copyright 2011-2013 Robert Flesch
 All rights reserved.  This product contains computer programs, screen
 displays and printed documentation which are original works of
 authorship protected under United States Copyright Act.
@@ -7,47 +7,34 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.events
 {
-import com.voxelengine.worldmodel.crafting.Recipe;
 import flash.events.Event;
 import flash.events.EventDispatcher;
+import flash.display3D.Context3D;
 
 /**
  * ...
  * @author Robert Flesch - RSF 
+ * 
  */
-public class CraftingEvent extends Event
+public class ContextEvent extends Event
 {
-	static public const RECIPE_LOAD_PUBLIC:String			= "RECIPE_LOAD_PUBLIC";
-	static public const RECIPE_LOADED:String				= "RECIPE_LOADED";
+	static public const DISPOSED:String			= "DISPOSED";
+	static public const ACQUIRED:String			= "ACQUIRED";
 	
-	private var _name:String;
-	private var _recipe:Recipe;
+	private var _context3D:Context3D;
+	public function get context3D():Context3D  { return _context3D; }
 	
-	public function CraftingEvent( $type:String, $name:String, $recipe:Recipe, $bubbles:Boolean = true, $cancellable:Boolean = false )
-	{
+	public function ContextEvent( $type:String, $context:Context3D, $bubbles:Boolean = true, $cancellable:Boolean = false ) {
 		super( $type, $bubbles, $cancellable );
-		_recipe = $recipe;
-		_name = $name;
+		_context3D = $context;
 	}
 	
-	public override function clone():Event
-	{
-		return new CraftingEvent(type, _name, _recipe, bubbles, cancelable);
+	public override function clone():Event {
+		return new ContextEvent(type, _context3D, bubbles, cancelable);
 	}
    
-	public override function toString():String
-	{
-		return formatToString("CraftingEvent", "bubbles", "cancelable") + " name: " + _name + " recipe: " + _recipe.toString();
-	}
-	
-	public function get name():String 
-	{
-		return _name;
-	}
-	
-	public function get recipe():Recipe 
-	{
-		return _recipe;
+	public override function toString():String {
+		return formatToString("ContextEvent", "context3D", "bubbles", "cancelable");
 	}
 	
 	///////////////// Event handler interface /////////////////////////////
@@ -63,7 +50,7 @@ public class CraftingEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:CraftingEvent ) : Boolean {
+	static public function dispatch( $event:ContextEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 	

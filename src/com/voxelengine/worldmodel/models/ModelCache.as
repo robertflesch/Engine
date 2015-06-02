@@ -227,19 +227,19 @@ package com.voxelengine.worldmodel.models
 
 		}
 		
-		public function dispose():void 	{
-			Log.out("ModelCache.dispose" );
-			var model:VoxelModel;
-			for each ( model in _instancesDynamic )
-			{
-				model.dispose();
-			}
-			
-			for each ( model in _instances )
-			{
-				model.dispose();	
-			}
-		}
+		//public function dispose():void 	{
+			//Log.out("ModelCache.dispose" );
+			//var model:VoxelModel;
+			//for each ( model in _instancesDynamic )
+			//{
+				//model.dispose();
+			//}
+			//
+			//for each ( model in _instances )
+			//{
+				//model.dispose();	
+			//}
+		//}
 
 		public function buildExportObject( obj:Object ):void {
 			
@@ -253,22 +253,6 @@ package com.voxelengine.worldmodel.models
 			}
 			if ( oa.length )
 				obj.models = oa;
-		}
-		
-		public function reinitialize( $context:Context3D ):void 	{
-			
-			//Log.out("ModelCache.reinitialize" );
-			
-			var vm:VoxelModel
-			for ( var i:int; i < _instancesDynamic.length; i++ ) {
-				vm = _instancesDynamic[i];
-				vm.reinitialize( $context );
-			}
-			
-			for ( i = 0; i < _instances.length; i++ ) {
-				vm = _instances[i];
-				vm.reinitialize( $context );	
-			}
 		}
 		
 		public function bringOutYourDead():void {

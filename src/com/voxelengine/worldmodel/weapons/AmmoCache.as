@@ -115,7 +115,7 @@ public class AmmoCache
 		// maybe this ammo has not been loaded into the table yet, try loading it from json file
 		Log.out( "AmmoCache.loadNotFound - retrying from json " + $pe.toString(), Log.WARN );
 		if ( Globals.BIGDB_TABLE_AMMO == $pe.table )
-			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST, $pe.series, $pe.guid, null, false ) );
+			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST, $pe.series, $pe.guid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );
 		else	
 			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}

@@ -47,7 +47,8 @@ public class ModelMakerImport extends ModelMakerBase {
 
 	override protected function retrieveBaseInfo():void {
 		addListeners();	
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null, false ) );	
+		// Since this is the import, it used the local file system rather then persistance
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );	
 	}
 	
 	// once they both have been retrived, we can make the object
@@ -77,9 +78,11 @@ public class ModelMakerImport extends ModelMakerBase {
 			
 			var vm:* = make()
 			if ( vm ) {
-				vm.stateLock( true, 10000 );
-				vm.complete = true;
+				vm.stateLock( true, 10000 ); // Lock state so that is had time to load animations
 				vm.changed = true;
+				vm.complete = true;
+				_vmi.changed = true;
+				_vmm.changed = true;
 				vm.save();
 				Region.currentRegion.modelCache.add( vm );
 			}
@@ -101,7 +104,6 @@ public class ModelMakerImport extends ModelMakerBase {
 			Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + _vmi.biomes.toString(), Log.WARN );
 			return;
 		}
-		removeListeners();	
 		super.markComplete( $success );
 	}
 }	

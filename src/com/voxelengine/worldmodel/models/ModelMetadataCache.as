@@ -140,7 +140,6 @@ public class ModelMetadataCache
 	
 	static private function generated( $mme:ModelMetadataEvent ):void  {
 		add( 0, $mme.vmm );
-		$mme.vmm.save();
 	}
 
 	/////////////////////////////////////////////////////////////////////////////////////////////

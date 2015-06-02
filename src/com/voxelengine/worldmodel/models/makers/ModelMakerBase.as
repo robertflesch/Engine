@@ -61,15 +61,9 @@ public class ModelMakerBase {
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );		
 	}
 	
-	protected function removeListeners():void {
-		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retrivedModelInfo );		
-		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retrivedModelInfo );		
-		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );	
-	}
 	
 	protected function retrivedModelInfo($mie:ModelInfoEvent):void  {
 		if ( _ii.modelGuid == $mie.modelGuid ) {
-			removeListeners();		
 			Log.out( "ModelMakerBase.retrivedModelInfo - ii: " + _ii.toString(), Log.DEBUG );
 			_vmi = $mie.vmi;
 			attemptMake();
@@ -78,7 +72,6 @@ public class ModelMakerBase {
 		
 	protected function failedModelInfo( $mie:ModelInfoEvent):void  {
 		if ( _ii.modelGuid == $mie.modelGuid ) {
-			removeListeners();		
 			Log.out( "ModelMakerBase.failedData - ii: " + _ii.toString(), Log.WARN );
 			markComplete( false );
 		}
@@ -88,6 +81,7 @@ public class ModelMakerBase {
 	protected function attemptMake():void { throw new Error( "ModelMakerBase.attemptMake is an abstract method" ); }
 	
 	protected function markComplete( $success:Boolean = true ):void {
+		removeListeners();
 		if ( $success )
 			ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid ) );
 		else	
@@ -103,6 +97,12 @@ public class ModelMakerBase {
 		_vmm = null;
 		_vmi = null;
 		_ii = null;
+		
+		function removeListeners():void {
+			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retrivedModelInfo );		
+			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retrivedModelInfo );		
+			ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );	
+		}
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

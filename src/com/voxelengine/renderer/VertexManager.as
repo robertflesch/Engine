@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.renderer {
 
+import com.voxelengine.events.ContextEvent;
 import flash.geom.Matrix3D;
 import flash.display3D.Context3D;
 import flash.utils.getTimer;
@@ -21,7 +22,7 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.pools.VertexIndexBuilderPool;
-import com.voxelengine.renderer.shaders.Shader;
+import com.voxelengine.renderer.shaders.*;
 
 public class VertexManager {
 	
@@ -32,6 +33,7 @@ public class VertexManager {
 	private var _vertBufFire:VertexIndexBuilder = null;
 	private var _subManagers:Vector.<VertexManager> = new Vector.<VertexManager>();
 	private var _gc:GrainCursor;
+	private var _shaders:Vector.<Shader>;
 	
 	//private var _minGrain:uint = 9;
 	private var _minGrain:uint = 10;
@@ -47,7 +49,63 @@ public class VertexManager {
 		
 		//var name:String = NameUtil.createUniqueName( this );
 		//Log.out( "----------VertexManager.construct---------- " + name );
+		ContextEvent.addListener( ContextEvent.DISPOSED, disposeContext );
+		ContextEvent.addListener( ContextEvent.ACQUIRED, acquiredContext );
 	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// start context operations
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public function createShaders($context:Context3D):void	{
+		_shaders = new Vector.<Shader>;
+		var shader:Shader = null;
+		_shaders.push( new ShaderOxel($context) ); // oxel
+		
+		shader = new ShaderOxel($context); // animated oxel
+		shader.isAnimated = true;
+		_shaders.push( shader );
+		
+		_shaders.push( new ShaderAlpha($context) ); // alpha oxel
+		
+		shader = new ShaderAlpha($context); // animated alpha oxel
+		shader.isAnimated = true;
+		_shaders.push( shader );
+		
+		shader = new ShaderFire($context); // fire
+		shader.isAnimated = true;
+		_shaders.push( shader );
+	}
+	
+	public function acquiredContext( $ce:ContextEvent ):void {
+		//trace("VoxelModel.reinitialize - modelInfo: " + modelInfo.fileName );
+		for each ( var shader:Shader in _shaders )
+			shader.createProgram( $ce.context3D );
+	}
+	
+	public function disposeContext( $ce:ContextEvent ):void {
+		for each ( var shader:Shader in _shaders )
+			shader.dispose();
+			
+//		if (oxel)
+//			oxel.dispose();
+		//trace("VertexManager.dispose: " + _name );
+		if ( _vertBuf )
+			_vertBuf.dispose();
+
+		if ( _vertBufAlpha )
+			_vertBufAlpha.dispose();
+		
+		if ( _vertBufAnimated )
+			_vertBufAnimated.dispose();
+		
+		if ( _vertBufAnimatedAlpha )
+			_vertBufAnimatedAlpha.dispose();
+		
+		if ( _vertBufFire )
+			_vertBufFire.dispose();
+	}
+	
+	
 	
 	public function childAdd( $vertMan:VertexManager ):void {
 		_subManagers.push( $vertMan );
@@ -79,30 +137,14 @@ public class VertexManager {
 		}
 	}
 	
-	public function dispose():void
-	{
-		//trace("VertexManager.dispose: " + _name );
-		if ( _vertBuf )
-			_vertBuf.dispose();
-
-		if ( _vertBufAlpha )
-			_vertBufAlpha.dispose();
-		
-		if ( _vertBufAnimated )
-			_vertBufAnimated.dispose();
-		
-		if ( _vertBufAnimatedAlpha )
-			_vertBufAnimatedAlpha.dispose();
-		
-		if ( _vertBufFire )
-			_vertBufFire.dispose();
-	}
-	
-	public function drawNew( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $shaders:Vector.<Shader>, $selected:Boolean, $isChild:Boolean = false ):void {
+	public function drawNew( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean = false ):void {
 		// need to draw ALL of the non alpha oxels first, not just the ones in THIS vertex manager.
+		if ( null == _shaders )
+			createShaders( $context );
+			
 		if ( _vertBuf && _vertBuf.length )
 		{
-			if ( $shaders[0].update( $mvp, $vm, $context, $selected, $isChild ) )
+			if ( _shaders[0].update( $mvp, $vm, $context, $selected, $isChild ) )
 			{
 				_vertBuf.buffersBuildFromOxels( $context );
 				_vertBuf.BufferCopyToGPU( $context );
@@ -111,7 +153,7 @@ public class VertexManager {
 		
 		if ( _vertBufAnimated && _vertBufAnimated.length )
 		{
-			if ( $shaders[1].update( $mvp, $vm, $context, $selected, $isChild ) )
+			if ( _shaders[1].update( $mvp, $vm, $context, $selected, $isChild ) )
 			{
 				_vertBufAnimated.buffersBuildFromOxels( $context );
 				_vertBufAnimated.BufferCopyToGPU( $context );
@@ -120,17 +162,17 @@ public class VertexManager {
 		
 		var count:int = _subManagers.length;
 		for ( var i:int; i < count; i++ ) {
-			_subManagers[i].drawNew( $mvp, $vm, $context, $shaders, $selected, $isChild );
+			_subManagers[i].drawNew( $mvp, $vm, $context, $selected, $isChild );
 		}
 	}
 	
-	public function drawNewAlpha( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $shaders:Vector.<Shader>, $selected:Boolean, $isChild:Boolean = false ):void	{
+	public function drawNewAlpha( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean = false ):void	{
 		// Only update the shaders if they are in use, other wise 
 		// we have all of the costly state changes happening for no good reason.
 		// TODO - RSF - We should probably NOT upload the shaders unless they are being used.
 		if ( _vertBufAnimatedAlpha && _vertBufAnimatedAlpha.length )
 		{
-			if ( $shaders[3].update( $mvp, $vm, $context, $selected, $isChild ) )
+			if ( _shaders[3].update( $mvp, $vm, $context, $selected, $isChild ) )
 			{
 				_vertBufAnimatedAlpha.sort();
 				_vertBufAnimatedAlpha.buffersBuildFromOxels( $context );
@@ -140,7 +182,7 @@ public class VertexManager {
 		
 		if ( _vertBufFire && _vertBufFire.length )
 		{
-			if ( $shaders[4].update( $mvp, $vm, $context, $selected, $isChild ) )
+			if ( _shaders[4].update( $mvp, $vm, $context, $selected, $isChild ) )
 			{
 				_vertBufFire.sort();
 				_vertBufFire.buffersBuildFromOxels( $context );
@@ -150,7 +192,7 @@ public class VertexManager {
 		
 		if ( _vertBufAlpha && _vertBufAlpha.length )
 		{
-			if ( $shaders[2].update( $mvp, $vm, $context, $selected, $isChild ) )
+			if ( _shaders[2].update( $mvp, $vm, $context, $selected, $isChild ) )
 			{
 				var xdist:Number = _gc.getDistance( VoxelModel.controlledModel.modelToWorld( VoxelModel.controlledModel.camera.center ) );
 				if (  xdist < 512 ) {
@@ -165,7 +207,7 @@ public class VertexManager {
 		
 		var count:int = _subManagers.length;
 		for ( var i:int; i < count; i++ ) {
-			_subManagers[i].drawNewAlpha( $mvp, $vm, $context, $shaders, $selected, $isChild );
+			_subManagers[i].drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
 		}
 	}
 	

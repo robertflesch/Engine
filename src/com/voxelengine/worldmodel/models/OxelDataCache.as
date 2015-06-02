@@ -62,8 +62,6 @@ public class OxelDataCache
 	
 	static private function generated( $ode:OxelDataEvent ):void  {
 		add( 0, $ode.oxelData );
-		$ode.oxelData.changed = true;
-		$ode.oxelData.save();
 	}
 	
 	static private function deleteHandler( $ode:OxelDataEvent ):void {

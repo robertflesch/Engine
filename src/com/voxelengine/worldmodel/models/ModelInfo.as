@@ -21,7 +21,6 @@ import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.PersistanceEvent;
-import com.voxelengine.renderer.shaders.*
 import com.voxelengine.pools.OxelPool;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.animation.Animation;
@@ -50,8 +49,8 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	private var _data:OxelData;
 	private var _firstLoadFailed:Boolean;
 	private var _altId:String;													// used to handle loading from biome
-	private	var	_shaders:Vector.<Shader>        			= new Vector.<Shader>;		// INSTANCE NOT EXPORTED
 	
+	private function get owner():VoxelModel 				{ return _owner; }
 	public function get altId():String 						{ return _altId; }
 	public function get json():Object 						{ return _modelJson; }
 	public function get fileName():String 					{ return _fileName; }
@@ -65,12 +64,18 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	public function set grainSize(val:int):void				{ _grainSize = val; }
 	public function get animations():Vector.<Animation> 	{ return _animations; }
 	public function set biomes(value:Biomes):void  			{ _biomes = value; }
-	private function get owner():VoxelModel 				{ return _owner; }
 	public function get oxel():Oxel 						{ return _data.oxel; }
+	public function get data():OxelData  					{ return _data; }
+	
 	
 	public function ModelInfo( $guid:String ):void  { 
 		super( $guid, Globals.BIGDB_TABLE_MODEL_INFO ); 
 		_data = new OxelData( guid );
+	}
+	
+	override public function set guid(value:String):void { 
+		super.guid = value;
+		_data.guid = value;
 	}
 	
 	public function toString():String {
@@ -93,15 +98,15 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		} else { 
 			addListeners();
 			// try to load from tables first
-			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, guid, null, true ) );
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_PERSISTANCE ) );
 		}
 	}
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
 		if ( $isAlpha )
-			_data.oxel.vertMan.drawNewAlpha( $mvp, $vm, $context, _shaders, $selected, $isChild );
+			_data.oxel.vertMan.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
 		else
-			_data.oxel.vertMan.drawNew( $mvp, $vm, $context, _shaders, $selected, $isChild );
+			_data.oxel.vertMan.drawNew( $mvp, $vm, $context, $selected, $isChild );
 	}
 
 	override public function release():void {
@@ -135,61 +140,30 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// start context operations
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public function createShaders($context:Context3D):void	{
-		var shader:Shader = null;
-		_shaders.push( new ShaderOxel($context) ); // oxel
-		
-		shader = new ShaderOxel($context); // animated oxel
-		shader.isAnimated = true;
-		_shaders.push( shader );
-		
-		_shaders.push( new ShaderAlpha($context) ); // alpha oxel
-		
-		shader = new ShaderAlpha($context); // animated alpha oxel
-		shader.isAnimated = true;
-		_shaders.push( shader );
-		
-		shader = new ShaderFire($context); // fire
-		shader.isAnimated = true;
-		_shaders.push( shader );
-	}
-	
-	public function reinitialize( $context:Context3D ):void {
-		//trace("VoxelModel.reinitialize - modelInfo: " + modelInfo.fileName );
-		for each ( var shader:Shader in _shaders )
-			shader.createProgram( $context );
-	}
-	
-	public function dispose():void {
-		for each ( var shader:Shader in _shaders )
-			shader.dispose();
-			
-		if (oxel)
-			oxel.dispose();
-	}
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// start data (oxel) operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private function addListeners():void {
-		OxelDataEvent.addListener( ModelBaseEvent.ADDED, retriveData );		
-		OxelDataEvent.addListener( ModelBaseEvent.RESULT, retriveData );		
+		OxelDataEvent.addListener( ModelBaseEvent.ADDED, retrieveData );		
+		OxelDataEvent.addListener( ModelBaseEvent.RESULT, retrieveData );		
 		OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );
 	}
 	
 	private function removeListeners():void {
-		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, retriveData );		
-		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, retriveData );		
+		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, retrieveData );		
+		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, retrieveData );		
 		OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );
 	}
 	
-	private function retriveData( $ode:OxelDataEvent):void {
+	private function retrieveData( $ode:OxelDataEvent):void {
 		if ( guid == $ode.modelGuid || altId == $ode.modelGuid ) {
 			removeListeners();
-			Log.out( "ModelInfo.retriveData - loaded oxel guid: " + guid );
+			Log.out( "ModelInfo.retrieveData - loaded oxel guid: " + guid );
 			_data = $ode.oxelData;
+			if ( null == _data.dbo ) {
+				_data.changed = true;
+				_data.guid = guid;
+				_data.save();
+			}
 		}
 	}
 	
@@ -209,7 +183,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 					if ( "LoadModelFromIVM" == layer1.functionName ) {
 						_altId = layer1.data;
 						Log.out( "ModelInfo.failedData - trying to load from local file with alternate name - guid: " + layer1.data, Log.DEBUG );
-						OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, layer1.data, null, false ) );		
+						OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, layer1.data, null, ModelBaseEvent.USE_FILE_SYSTEM ) );		
 					}
 					else {
 						Log.out( "ModelInfo.failedData - building bio from layer data", Log.DEBUG );
@@ -237,9 +211,6 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	protected 	var	_childrenLoaded:Boolean						= true;
 	public function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
 	public function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
-	
-	public function get data():OxelData  { return _data; }
-	
 	public function childrenLoad( $vm:VoxelModel ):void {
 		// if we have no children, let this stand
 		
@@ -319,9 +290,9 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 			var ae:AnimationEvent;
 			if ( Globals.isGuid( animData.guid ) )
-				ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, guid, animData.guid, null, true );
+				ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, guid, animData.guid, null, ModelBaseEvent.USE_PERSISTANCE );
 			else
-				ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, guid, animData.name, null, false );
+				ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, guid, animData.name, null, ModelBaseEvent.USE_FILE_SYSTEM );
 				
 			_series = ae.series;
 			AnimationEvent.dispatch( ae );

@@ -72,7 +72,7 @@ public class PersistanceObject
 		if ( _table != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "PersistanceObject.saveSucceed - save: " + guid + " in table: " + $pe.table, Log.DEBUG ); 
+		Log.out( "PersistanceObject.saveSucceed - save: " + guid + " in table: " + $pe.table ); 
 	}	
 	
 	private function createSucceed( $pe:PersistanceEvent ):void { 

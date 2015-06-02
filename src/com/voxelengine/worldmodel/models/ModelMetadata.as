@@ -125,6 +125,9 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	public function save():void {
 		if ( Globals.online && true == changed ) {
 			Log.out( "ModelMetadata.save - Saving ModelMetadata: " + guid  + " in table: " + table );
+			if ( !Globals.isGuid( guid ) )
+				Log.out( "ModelMetadata.save - Saving ModelMetadata: " + guid  + " in table: " + table, Log.ERROR );
+				
 			changed = false;
 			addSaveEvents();
 			if ( _dbo )

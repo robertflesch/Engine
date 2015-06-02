@@ -73,8 +73,6 @@ public class ModelInfoCache
 	
 	static private function generated( $mie:ModelInfoEvent ):void  {
 		add( 0, $mie.vmi );
-		$mie.vmi.changed = true;
-		$mie.vmi.save();
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  ModelInfoEvent

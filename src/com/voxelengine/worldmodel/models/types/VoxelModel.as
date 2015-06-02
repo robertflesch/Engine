@@ -555,7 +555,6 @@ public class VoxelModel
 		if (!initialized) {
 			initialized = true;
 			OxelDataEvent.addListener( ModelBaseEvent.RESULT_COMPLETE, oxelComplete );
-			modelInfo.createShaders( $context );
 			modelInfo.oxelLoadData();
 		}
 		
@@ -715,20 +714,6 @@ public class VoxelModel
 		Log.out("----------------------- instanceInfo.modelGuid:       " + instanceInfo.modelGuid + " -------------------------------");
 		oxel.print();
 		Log.out("------------------------------------------------------------------------------");
-	}
-	
-	public function reinitialize( $context:Context3D ):void {
-		modelInfo.reinitialize( $context );
-			
-		for each (var child:VoxelModel in _children)
-			child.reinitialize( $context );
-	}
-	
-	public function dispose():void {
-		modelInfo.dispose();
-		
-		for each (var child:VoxelModel in _children)
-			child.dispose();
 	}
 	
 	public function release():void {

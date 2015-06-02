@@ -806,21 +806,17 @@ package com.voxelengine.worldmodel.oxel
 			return co.writeInternal( $instanceGuid, $newType, $onlyChangeType );	
 		}
 				
-		public function dispose():void {
-			if ( _vertMan )
-			{
-				_vertMan.dispose();
-			}
-			
-			if ( vm_get().minGrain <= gc.grain )
-			{
-				if ( childrenHas() ) 
-				{
-					for each ( var cchild:Oxel in _children ) 
-						cchild.dispose();
-				}
-			}
-		}
+		//public function dispose():void {
+			//if ( _vertMan ) 
+				//_vertMan.dispose();
+			//
+			//if ( vm_get().minGrain <= gc.grain ) {
+				//if ( childrenHas() ) {
+					//for each ( var cchild:Oxel in _children ) 
+						//cchild.dispose();
+				//}
+			//}
+		//}
 
 		public function mergeAndRebuild():void {
 			var _timer:int = getTimer();

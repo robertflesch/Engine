@@ -191,14 +191,6 @@ Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );
 			_vmm.permissions.copyCount = parseInt( _copies.label, 10 );
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.UPDATE, 0, _vmm.guid, _vmm ) );
 		} else { // TYPE_IMPORT so new data
-			// need to document why I do this here
-			/*
-			var dboTemp:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, _vmm.guid, "1", 0, true, null );
-			_vmm.fromPersistance( dboTemp );
-			_vmm.dbo = null;
-			_vmm.release();
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, _vmm.guid, dboTemp, true ) );			
-			*/
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, _vmm.guid, _vmm ) );
 		}
 		remove();

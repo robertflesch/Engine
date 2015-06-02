@@ -21,6 +21,9 @@ public class ModelBaseEvent extends Event
 	public function get series():int { return _series; }
 	public function set series(value:int):void { _series = value; }
 	
+	static public const USE_FILE_SYSTEM:Boolean = false;
+	static public const USE_PERSISTANCE:Boolean = true;
+	
 	//// tells the manager to load this model
 	static public const REQUEST:String						= "REQUEST";
 	//// tells the manager to load this type of model

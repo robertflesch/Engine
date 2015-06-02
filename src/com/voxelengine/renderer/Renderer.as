@@ -8,6 +8,8 @@
 
 package com.voxelengine.renderer 
 {
+	import com.voxelengine.events.ContextEvent;
+	import com.voxelengine.worldmodel.models.ModelInfoCache;
 	import com.voxelengine.worldmodel.TextureBank;
 	import flash.display.Stage3D;
 	import flash.display.BitmapData;
@@ -125,8 +127,7 @@ package com.voxelengine.renderer
 			return tmp;
 		}
 		
-		public function screenShot( drawUI:Boolean ):void
-		{
+		public function screenShot( drawUI:Boolean ):void {
 			var tmp : BitmapData = new BitmapData( _width, _height, false );
 			// this draws the stage3D on the bitmap.
 			render(tmp);
@@ -147,20 +148,6 @@ package com.voxelengine.renderer
 			_context.clear( r/255, g/255, b/ 255, 0);
 		}
 		
-		
-		private static function dispose():void {
-			TextureBank.instance.dispose();
-			Region.currentRegion.modelCache.dispose();
-		};
-		
-		private static function reinitialize( $context:Context3D ):void {
-			TextureBank.instance.reinitialize( $context );
-			if ( Region.currentRegion ) {
-				Region.currentRegion.modelCache.reinitialize( $context );
-				EditCursor.currentInstance.reinitialize( $context );
-			}
-		}
-		
 		// This handles the event created in the init function
 		public function onContextCreated(e:Event):void {
 			Log.out( "Renderer.onContextCreated - " + e.type, Log.DEBUG );
@@ -168,7 +155,7 @@ package com.voxelengine.renderer
 			// If new context and its not null, dispose of what we have
 			if ( null != _context ) {
 				Log.out("Renderer.onContextCreated - dispose" );
-				dispose();
+				ContextEvent.dispatch( new ContextEvent( ContextEvent.DISPOSED, null ) );
 				_context.dispose();
 				_context = null;
 			}
@@ -181,7 +168,7 @@ package com.voxelengine.renderer
 					_context.enableErrorChecking = true;
 				else	
 					_context.enableErrorChecking = false;
-				reinitialize( _context );
+				ContextEvent.dispatch( new ContextEvent( ContextEvent.ACQUIRED, _context ) );
 			}
 
 			if ( _context )

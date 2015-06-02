@@ -71,8 +71,10 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			
 			var vm:* = make();
 			if ( vm ) {
-				vm.changed = true;
 				vm.complete = true;
+				vm.changed = true;
+				_vmi.changed = true;
+				_vmm.changed = true;
 				vm.save();
 				Region.currentRegion.modelCache.add( vm );
 			}

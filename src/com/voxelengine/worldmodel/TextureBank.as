@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
+	import com.voxelengine.events.ContextEvent;
 	import com.voxelengine.Log;
 	import flash.utils.ByteArray;
 	import flash.utils.Timer;
@@ -57,8 +58,27 @@ package com.voxelengine.worldmodel
 			return _s_instance	
 		}
 		
-		public function TextureBank( ):void 
-		{
+		public function TextureBank( ):void {
+			ContextEvent.addListener( ContextEvent.DISPOSED, disposeContext );
+			ContextEvent.addListener( ContextEvent.ACQUIRED, acquiredContext );
+		}
+		
+		public function disposeContext( $ce:ContextEvent ):void {
+			// TODO RSF
+			// Dont I need to release texture from a when a context is lost?
+			// doesnt appear so.
+		}
+		
+		public function acquiredContext( $ce:ContextEvent ):void {
+			
+			//Log.out("TextureBank.reinitialize" );
+			for ( var key:String in _bitmapData )
+			{
+				_textures[key] = null;
+				var bmp:Bitmap = _bitmapData[key];
+				var tex:Texture = uploadTexture( $ce.context3D, bmp, true );
+				_textures[key] = tex;
+			}
 		}
 		
 		public function getTexture( $context:Context3D, textureNameAndPath:String ):Texture
@@ -159,23 +179,6 @@ package com.voxelengine.worldmodel
 				
 			return tex;
 		}		
-		
-		public function dispose():void {
-			// TODO RSF
-			// Dont I need to release texture from a when a context is lost?
-		}
-		
-		public function reinitialize( $context:Context3D ):void {
-			
-			//Log.out("TextureBank.reinitialize" );
-			for ( var key:String in _bitmapData )
-			{
-				_textures[key] = null;
-				var bmp:Bitmap = _bitmapData[key];
-				var tex:Texture = uploadTexture( $context, bmp, true );
-				_textures[key] = tex;
-			}
-		}
 		
 		private function uploadTextureWithMipmaps(dest:Texture, src:BitmapData):void {
 			var ws:int = src.width;
