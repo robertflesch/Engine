@@ -189,7 +189,7 @@ public class Ammo extends PersistanceObject implements IPersistance
 	////////////////////////////////////////////////////////////////
 	public function save():void {
 		if ( Globals.online ) {
-			Log.out( "Ammo.save - Saving Ammo: " + guid  + " in table: " + table );
+			Log.out( "Ammo.save - Saving Ammo: " + guid  + " in table: " + table, Log.WARN );
 			addSaveEvents();
 			if ( _dbo )
 				toPersistance();
@@ -199,7 +199,7 @@ public class Ammo extends PersistanceObject implements IPersistance
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
 		}
 		else
-			Log.out( "Ammo.save - Not saving data, either offline or NOT changed or locked - guid: " + guid, Log.WARN );
+			Log.out( "Ammo.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
 	}
 	
 	public function fromPersistance( $dbo:DatabaseObject ):void {

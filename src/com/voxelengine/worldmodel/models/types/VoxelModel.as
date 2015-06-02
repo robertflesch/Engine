@@ -432,79 +432,10 @@ public class VoxelModel
 	// it also add flow and lighting
 	public function write( $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean
 	{
-		return oxel.changeOxel( instanceInfo.modelGuid, $gc, $type, $onlyChangeType );
-		/*
-		// pass in the oxel directly here?
-		// requires some refactoring but not hard - RSF
-		var oldOxel:Oxel = oxel.childGetOrCreate( $gc );
-		var oldType:int = oldOxel.type;
-		var oldTypeInfo:TypeInfo = TypeInfo.typeInfo[oldType];
-		if ( oldOxel.lighting ) {
-			if ( oldTypeInfo.lightInfo.lightSource )
-				var oldLightID:uint = oldOxel.lighting.lightIDGet();
-			if ( oldOxel.lighting.ambientOcculsionHas() ) {
-				// We have to do this here before the model changes, this clears out the ambient occulusion from the removed oxel
-				for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
-					if ( oldOxel.quads && oldOxel.quads[face] )
-						oldOxel.lighting.evaluateAmbientOcculusion( oldOxel, face, Lighting.AMBIENT_REMOVE );
-				}
-			}
-		}
-		
-		var result:Boolean;
-		var changedOxel:Oxel = oxel.write( instanceInfo.instanceGuid, $gc, $type, $onlyChangeType );
-		
-		if ( Globals.BAD_OXEL != changedOxel )
-		{
-			modelInfo.oxelDataChanged();
+		var result:Boolean = modelInfo.data.changeOxel( instanceInfo.modelGuid, $gc, $type, $onlyChangeType );
+		if ( result )
 			changed = true;
-			result = true;
-			var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
-		
-			if ( typeInfo.flowable )
-			{
-				if ( null == changedOxel.flowInfo ) // if it doesnt have flow info, get some! This is from placement of flowable oxels
-					changedOxel.flowInfo = typeInfo.flowInfo.clone();
-					
-				//if ( Globals.autoFlow && EditCursor.EDIT_CURSOR != instanceInfo.instanceGuid )
-				if ( Globals.autoFlow  )
-				{
-					Flow.addTask( instanceInfo.instanceGuid, changedOxel.gc, changedOxel.type, changedOxel.flowInfo, 1 );
-				}
-			}
-			else
-			{
-				if ( changedOxel.flowInfo )
-					changedOxel.flowInfo = null;  // If it has flow info, release it, no need to check first
-			}
-				
-			if ( oldTypeInfo.lightInfo.lightSource )
-			{
-				var rle:LightEvent = new LightEvent( LightEvent.REMOVE, instanceInfo.instanceGuid, $gc, oldLightID );
-				Globals.g_app.dispatchEvent( rle );
-			}
-			if ( typeInfo.lightInfo.lightSource )
-			{
-				var le:LightEvent = new LightEvent( LightEvent.ADD, instanceInfo.instanceGuid, $gc, getPerModelLightID );
-				Globals.g_app.dispatchEvent( le );
-			}
-			
-			if ( TypeInfo.isSolid( oldType ) && TypeInfo.hasAlpha( $type ) ) {
-				
-				// we removed a solid block, and are replacing it with air or transparent
-				if ( changedOxel.lighting && changedOxel.lighting.valuesHas() )
-					Globals.g_app.dispatchEvent( new LightEvent( LightEvent.SOLID_TO_ALPHA, instanceInfo.instanceGuid, changedOxel.gc ) );
-			} 
-			else if ( TypeInfo.isSolid( $type ) && TypeInfo.hasAlpha( oldType ) ) {
-				
-				// we added a solid block, and are replacing the transparent block that was there
-				if ( changedOxel.lighting && changedOxel.lighting.valuesHas() )
-					Globals.g_app.dispatchEvent( new LightEvent( LightEvent.ALPHA_TO_SOLID, instanceInfo.instanceGuid, changedOxel.gc ) );
-			}
-		}
-		
 		return result;
-		*/
 	}
 	
 	public function write_sphere(cx:int, cy:int, cz:int, radius:int, what:int, gmin:uint = 0):void
@@ -757,19 +688,19 @@ public class VoxelModel
 		}
 		
 		if (  false == modelInfo.childrenLoaded ) {
-			Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name, Log.DEBUG );
+			Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name );
 			return;
 		}
 			
 		if (  false == animationsLoaded ) {
-			Log.out( "VoxelModel.save - animations not loaded name: " + _metadata.name, Log.DEBUG );
+			Log.out( "VoxelModel.save - animations not loaded name: " + _metadata.name );
 			return;
 		}
 		Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 		//if ( null != metadata.permissions.templateGuid )
 			//metadata.permissions.templateGuid = "";
 				
-		Log.out( "VoxelModel.save - name: " + metadata.name );
+		//Log.out( "VoxelModel.save - name: " + metadata.name, Log.WARN );
 		changed = false;
 		metadata.save();
 		modelInfo.childrenSet( getChildJSON() );

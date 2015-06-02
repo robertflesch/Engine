@@ -12,7 +12,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.events.OxelDataEvent;
 	import com.voxelengine.events.PersistanceEvent;
-	import com.voxelengine.worldmodel.models.OxelData;
+	import com.voxelengine.worldmodel.models.OxelPersistance;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
@@ -94,13 +94,10 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			GrainCursorPool.poolDispose( loco );
 
 			
-			var od:OxelData = new OxelData( _modelGuid );
-			var ba:ByteArray = OxelData.fromGeneratedData( oxel );
+			var ba:ByteArray = OxelPersistance.toByteArray( oxel );
 			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
 			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
-			od.fromByteArray( ba );
-			
-			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.GENERATION, 0, _modelGuid, od ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba ) );
 			
 			//Log.out( "GenerateCube.start - took: "  + (getTimer() - timer) );					
             super.complete() // AbstractTask will send event

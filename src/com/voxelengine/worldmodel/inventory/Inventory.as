@@ -68,8 +68,9 @@ public class Inventory extends PersistanceObject implements IPersistance
 	//////////////////////////////////////////////////////////////////
 	
 	public function save():void {
+		// TODO this needs to detect "changed"
 		if ( Globals.online && loaded ) {
-			Log.out( "Inventory.save - Saving Inventory: " + guid  + " in table: " + table );
+			Log.out( "Inventory.save - Saving Inventory: " + guid  + " in table: " + table, Log.DEBUG );
 			addSaveEvents();
 			if ( _dbo )
 				toPersistance();
@@ -79,7 +80,7 @@ public class Inventory extends PersistanceObject implements IPersistance
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
 		}
 		else
-			Log.out( "Inventory.save - Not saving data, either offline or NOT changed or locked - guid: " + guid, Log.WARN );
+			Log.out( "Inventory.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
 	}
 
 	public function toObject():void {

@@ -7,8 +7,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-import com.voxelengine.worldmodel.biomes.Biomes;
-import com.voxelengine.worldmodel.models.OxelData;
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
@@ -130,11 +128,7 @@ public class EditCursor extends VoxelModel
 	
 	private 		  	var _oxelTexture:int			 				= EDITCURSOR_SQUARE;
 	private  function 	get oxelTexture():int 							{ return _oxelTexture; }
-	private  function 	set oxelTexture(val:int):void 					{
-		if ( _oxelTexture != val ) {
-			_oxelTexture = val;
-		}
-	}
+	private  function 	set oxelTexture(val:int):void 					{ _oxelTexture = val; }
 	
 	////////////////////////////////////////////////
 	// EditCursor creation/removal

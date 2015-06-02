@@ -46,7 +46,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	private var _owner:VoxelModel;
 	private var _animationCount:int;
 	private var _series:int														// used to make sure animation is part of same series when loading
-	private var _data:OxelData;
+	private var _data:OxelPersistance;
 	private var _firstLoadFailed:Boolean;
 	private var _altId:String;													// used to handle loading from biome
 	
@@ -65,12 +65,12 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	public function get animations():Vector.<Animation> 	{ return _animations; }
 	public function set biomes(value:Biomes):void  			{ _biomes = value; }
 	public function get oxel():Oxel 						{ return _data.oxel; }
-	public function get data():OxelData  					{ return _data; }
+	public function get data():OxelPersistance  					{ return _data; }
 	
 	
 	public function ModelInfo( $guid:String ):void  { 
 		super( $guid, Globals.BIGDB_TABLE_MODEL_INFO ); 
-		_data = new OxelData( guid );
+		_data = new OxelPersistance( guid );
 	}
 	
 	override public function set guid(value:String):void { 
@@ -83,7 +83,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	}
 	
 	public function createEditCursor( $guid:String ):void {
-		_data = new OxelData( $guid );
+		_data = new OxelPersistance( $guid );
 		_data.createEditCursor();
 	}
 	
@@ -350,7 +350,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public function save():void {
 		if ( Globals.online && changed ) {
-			Log.out( "ModelInfo.save - Saving ModelInfo: " + guid  + " in table: " + table );
+			Log.out( "ModelInfo.save - Saving ModelInfo: " + guid  + " in table: " + table, Log.WARN );
 			changed = false;
 			addSaveEvents();
 			if ( _dbo )
@@ -361,7 +361,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
 		}
 		else
-			Log.out( "ModelInfo.save - Not saving data, either offline or NOT changed or locked - guid: " + guid, Log.WARN );
+			Log.out( "ModelInfo.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
 			
 		_data.save();	
 	}

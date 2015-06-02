@@ -124,7 +124,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 
 	public function save():void {
 		if ( Globals.online && true == changed ) {
-			Log.out( "ModelMetadata.save - Saving ModelMetadata: " + guid  + " in table: " + table );
+			Log.out( "ModelMetadata.save - Saving ModelMetadata: " + guid  + " in table: " + table, Log.WARN );
 			if ( !Globals.isGuid( guid ) )
 				Log.out( "ModelMetadata.save - Saving ModelMetadata: " + guid  + " in table: " + table, Log.ERROR );
 				
@@ -138,7 +138,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
 		}
 		else
-			Log.out( "ModelMetadata.save - Not saving ModelMetadata, either offline or NOT changed or locked - guid: " + guid, Log.WARN );
+			Log.out( "ModelMetadata.save - Not saving ModelMetadata, either offline or NOT changed or locked - guid: " + guid );
 	}
 	
 	//////////////////////////////////////////////////////////////////

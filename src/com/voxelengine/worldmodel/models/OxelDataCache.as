@@ -49,7 +49,7 @@ public class OxelDataCache
 			return;
 		}
 		//Log.out( "OxelDataCache.request guid: " + $ode.modelGuid, Log.DEBUG );
-		var od:OxelData = _oxelDataDic[$ode.modelGuid]; 
+		var od:OxelPersistance = _oxelDataDic[$ode.modelGuid]; 
 		if ( null == od ) {
 			if ( true == Globals.online && $ode.fromTables )
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ode.series, Globals.BIGDB_TABLE_OXEL_DATA, $ode.modelGuid ) );
@@ -65,7 +65,7 @@ public class OxelDataCache
 	}
 	
 	static private function deleteHandler( $ode:OxelDataEvent ):void {
-		var od:OxelData = _oxelDataDic[$ode.modelGuid];
+		var od:OxelPersistance = _oxelDataDic[$ode.modelGuid];
 		if ( null != od ) {
 			_oxelDataDic[$ode.modelGuid] = null; 
 			// TODO need to clean up eventually
@@ -85,7 +85,7 @@ public class OxelDataCache
 			return;
 		if ( $pe.dbo || $pe.data ) {
 			//Log.out( "OxelDataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
-			var od:OxelData = new OxelData( $pe.guid );
+			var od:OxelPersistance = new OxelPersistance( $pe.guid );
 			if ( $pe.dbo )
 				od.fromPersistance( $pe.dbo );
 			else
@@ -118,7 +118,7 @@ public class OxelDataCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  Internal Methods
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	static private function add( $series:int, $od:OxelData ):void { 
+	static private function add( $series:int, $od:OxelPersistance ):void { 
 		if ( null == $od || null == $od.guid ) {
 			Log.out( "OxelDataCache.Add trying to add NULL OxelData or guid", Log.WARN );
 		} else if ( null == _oxelDataDic[$od.guid] ) { // check to make sure this is new data

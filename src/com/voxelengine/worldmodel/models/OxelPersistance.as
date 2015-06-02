@@ -35,11 +35,11 @@ import com.voxelengine.worldmodel.TypeInfo;
  * @author Robert Flesch - RSF
  * OxelData is the byte level representation of the oxel
  */
-public class OxelData extends PersistanceObject
+public class OxelPersistance extends PersistanceObject
 {
 	// 1 meter stone cube is reference
 	static private const compressedReferenceBA:ByteArray		= Hex.toArray( "78:da:cb:2c:cb:35:30:b0:48:61:00:02:96:7f:0c:60:90:c1:90:c0:c0:f0:1f:0a:18:a0:80:11:42:00:45:8c:a1:00:00:e2:da:10:a2" );
-	static private const referenceBA:ByteArray 					= Hex.toArray( "69:76:6d:30:30:38:64:00:00:00:00:04:fe:00:00:00:00:00:00:68:00:60:00:00:ff:ff:ff:ff:ff:ff:ff:ff:00:00:00:00:00:00:00:00:01:00:00:00:00:01:00:ff:ff:ff:33:33:33:33:33:33:33:33" );
+	//static private const referenceBA:ByteArray 					= Hex.toArray( "69:76:6d:30:30:38:64:00:00:00:00:04:fe:00:00:00:00:00:00:68:00:60:00:00:ff:ff:ff:ff:ff:ff:ff:ff:00:00:00:00:00:00:00:00:01:00:00:00:00:01:00:ff:ff:ff:33:33:33:33:33:33:33:33" );
 	private	var	_statisics:ModelStatisics 						= new ModelStatisics();
 	private var _oxel:Oxel;
 	private var _loaded:Boolean;
@@ -51,14 +51,21 @@ public class OxelData extends PersistanceObject
 	public 	function get loaded():Boolean 						{ return _loaded; }
 	public 	function set loaded(value:Boolean):void 			{ _loaded = value; }
 	
-	public function OxelData( $guid:String ) {
+	public function OxelPersistance( $guid:String ) {
 		super( $guid, Globals.BIGDB_TABLE_OXEL_DATA );
 		_loaded = false;
 	}
 	
+	public function changeOxel( $modelGuid:String, $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
+		var result:Boolean = _oxel.changeOxel( $modelGuid, $gc, $type, $onlyChangeType );
+		if ( result )
+			changed = true;
+		return result;
+	}
+	
 	public function save():void {
 		if ( Globals.online && true == loaded && true == changed ) {
-			Log.out( "OxelData.save - Saving OxelData: " + guid  + " in table: " + table );
+			Log.out( "OxelData.save - Saving OxelData: " + guid  + " in table: " + table, Log.WARN );
 			changed = false;
 			addSaveEvents();
 			if ( _dbo )
@@ -69,7 +76,7 @@ public class OxelData extends PersistanceObject
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
 		}
 		else
-			Log.out( "OxelData.save - Not saving data, either offline or NOT changed or locked - guid: " + guid, Log.WARN );
+			Log.out( "OxelData.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
 	}
 	
 	public function createEditCursor():void {
@@ -78,18 +85,18 @@ public class OxelData extends PersistanceObject
 	
 	// creating a new copy of this
 	override public function clone( $guid:String ):* {
-		var vmd:OxelData = new OxelData( $guid );
+		var vmd:OxelPersistance = new OxelPersistance( $guid );
 		vmd._dbo = null; // Can I just reference this? They are pointing to same object
-		var ba:ByteArray = toByteArray();
+		var ba:ByteArray = toByteArray( oxel );
 		vmd.fromByteArray( ba );
 		return vmd;
 	}
 	
 	public function toPersistance():void { 
-		_dbo.ba			= toByteArray();
+		_dbo.ba			= toByteArray( oxel );
 	}
 	public function toObject():void { 
-		var ba:ByteArray = toByteArray();
+		var ba:ByteArray = toByteArray( oxel );
 		_obj = { ba: ba	}
 	}
 		
@@ -163,25 +170,23 @@ public class OxelData extends PersistanceObject
 		var strLen:int = $ba.readInt();
 		// read off that many bytes, even though we are using the data from the modelInfo file
 		var modelInfoJson:String = $ba.readUTFBytes( strLen );
-		if ( null == _oxel ) {
+		if ( null == _oxel )
 			_oxel = OxelPool.poolGet();
-			// Read off 1 bytes, the root size
-			var rootGrainSize:int = $ba.readByte();
-			_statisics.gather( version, $ba, rootGrainSize);
 			
-			registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);	
-			registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);	
-			var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
-			gct.grain = rootGrainSize;
-			if (Globals.VERSION_000 == version)
-				oxel.readData( null, gct, $ba, _statisics );
-			else
-				oxel.readVersionedData( version, null, gct, $ba, _statisics );
-			
-			GrainCursorPool.poolDispose(gct);
-//			_oxel.fromByteArray( $ba );
-		}
-		//
+		// Read off 1 bytes, the root size
+		var rootGrainSize:int = $ba.readByte();
+		_statisics.gather( version, $ba, rootGrainSize);
+		
+		registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);	
+		registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);	
+		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
+		gct.grain = rootGrainSize;
+		if (Globals.VERSION_000 == version)
+			oxel.readData( null, gct, $ba, _statisics );
+		else
+			oxel.readVersionedData( version, null, gct, $ba, _statisics );
+		
+		GrainCursorPool.poolDispose(gct);
 		oxel.vertexMangerAssign( _statisics );
 		oxel.lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
 		oxel.buildQuadsFromLoadedData();
@@ -189,13 +194,13 @@ public class OxelData extends PersistanceObject
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this ) );
 	}
 	
-	private function toByteArray():ByteArray {
+	static public function toByteArray( $oxel:Oxel ):ByteArray {
 		var ba:ByteArray = new ByteArray();
 		writeVersionedHeader( ba );
 		//writeManifest( ba );
 		// VERSION_008 no longer uses embedded manifest.
-		writeEmptyManifest( ba );
-		ba = oxel.toByteArray( ba );
+		writeManifest( ba );
+		ba = $oxel.toByteArray( ba );
 		ba.compress();
 		return ba;
 		
@@ -208,32 +213,13 @@ public class OxelData extends PersistanceObject
 			   n+1...  is model json
 			   ------------------------------------------ */
 			$ba.writeByte(Globals.MANIFEST_VERSION);
-			var obj:Object = new Object();
+//			var obj:Object = new Object();
 //			buildExportObject( obj );
 //			var json:String = JSON.stringify( obj );
 //			Log.out( "VoxelModel.writeManifest json: " + json, Log.WARN );			
 			$ba.writeInt( 0 );
 //			$ba.writeUTFBytes( json );
 		}
-	}
-	
-	// used by the generate functions to build the meta data
-	// still dont think is right way to do it... RSF
-	static public function fromGeneratedData( $oxel:Oxel ):ByteArray {
-		var ba:ByteArray = new ByteArray();
-		writeVersionedHeader( ba );
-		writeEmptyManifest( ba );
-		ba = $oxel.toByteArray( ba );
-		ba.compress();
-		return ba;
-	}
-	
-	
-	static private function writeEmptyManifest( $ba:ByteArray ):void {
-		
-		// Generate an empty manifest for new model and for generated models
-		$ba.writeByte(Globals.MANIFEST_VERSION);
-		$ba.writeInt( 0 );
 	}
 	
 	static private function writeVersionedHeader( $ba:ByteArray):void {

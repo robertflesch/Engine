@@ -115,14 +115,10 @@ public class Quad {
 	public function copyUV( rhs:Quad ):void {
 		
 		for ( var vindex:int = 0; vindex < QUAD_UV_COUNT; vindex++ )
-		{
 			_v[vindex] = rhs._v[vindex];
-		}
 			
 		for ( var uindex:int = 0; uindex < QUAD_UV_COUNT; uindex++ )
-		{
 			_u[uindex] = rhs._u[uindex];
-		}
 	}
 	
 	private function randomTextureOffset( maxpix:int, scale:Number ):Number	{
@@ -158,45 +154,33 @@ public class Quad {
 		var tilingType:int = TileType.TILE_FIXED;
 		
 		if ( 0 == maxpix || 0 == minpix )
-		{
 			throw new Error("Quad.calculateUV - Maxpix or Minpix is 0, Likely tried to create an AIR, PARENT, or INVALID oxel");
-		}
 		
 		if ( null == typeInfo )
-		{
 			throw new Error("Quad.calculateUV - typeInfo NULL", Log.ERROR );
-		}
 		
 		// First get the right section of the texture, and the tilingtype
-		switch ( face ) 
-		{
+		switch ( face ) {
 			case Globals.POSY:
-			{
 				tilingType = typeInfo.top;
 				_u[0] = typeInfo.ut;
 				_v[0] = typeInfo.vt;
 				break;
-			}
 			case Globals.NEGY:
-			{
 				tilingType = typeInfo.bottom;
 				_u[0] = typeInfo.ub;
 				_v[0] = typeInfo.vb;
 				break;
-			}
-			default:
-			{
+			default: 
 				tilingType = typeInfo.side;
 				_u[0] = typeInfo.us;
 				_v[0] = typeInfo.vs;
 				break;
-			}
 		}
 		
-		if ( typeInfo.category == GLASS )
-		{
-			calculateGlassOffset( typeInfo, face, $grain, $lighting );
-		}
+		//if ( typeInfo.category == GLASS ) {
+			//calculateGlassOffset( typeInfo, face, $grain, $lighting );
+		//}
 
 		// This gets a random placement of the starting corner of the texture
 		// maxpix is the total size of the texture to sample from
@@ -211,28 +195,24 @@ public class Quad {
 		//static public const TILE_RANDOM_16_BOTH:int		= 5;
 
 		var scale:int = 1 << $grain;
-		if ( TileType.TILE_NONE == tilingType )
-		{
-			return false; // I am not suppose to build this quad.
+		if ( TileType.TILE_NONE == tilingType ) {
+			return false; // Ash burning uses this
 		}
 		
-		if ( TileType.TILE_RANDOM_CENTERED == tilingType )
-		{
+		if ( TileType.TILE_RANDOM_CENTERED == tilingType ) {
 			_u[0] += randomTextureOffset( maxpix, scale )/ _s_textureScale;
 			var offset:Number = ((maxpix - scale) / 2);
 			_v[0] += offset / _s_textureScale;
 		}
 		//if ( Globals.WOOD == type && face != Globals.NEGY && face != Globals.POSY && 1 == minpix)
-		else if ( TileType.TILE_RANDOM_8_HORZ == tilingType )
-		{
+		else if ( TileType.TILE_RANDOM_8_HORZ == tilingType ) {
 			_u[0] += randomTextureOffset( maxpix, scale )/ _s_textureScale;
 			var woffset:Number = randomTextureOffset( maxpix, scale );
 			if (  8 <= scale )
 				woffset = int( woffset/8 ) * 8
 			_v[0] += woffset / _s_textureScale;
 		}
-		else if ( TileType.TILE_RANDOM_8_VERT == tilingType )
-		{
+		else if ( TileType.TILE_RANDOM_8_VERT == tilingType ) {
 			var voffset:int = randomTextureOffset( maxpix, scale );
 			if (  8 <= scale )
 				voffset = int( voffset/8 ) * 8
@@ -240,14 +220,11 @@ public class Quad {
 			_v[0] += randomTextureOffset( maxpix, scale )/ _s_textureScale;
 		}
 		//else if ( 16 < maxpix && maxpix != minpix )
-		else if ( TileType.TILE_RANDOM == tilingType || TileType.TILE_RANDOM_NO_ROTATE == tilingType ) 
-		{
+		else if ( TileType.TILE_RANDOM == tilingType || TileType.TILE_RANDOM_NO_ROTATE == tilingType )  {
 			_u[0] += randomTextureOffset( maxpix, scale ) / _s_textureScale;
 			_v[0] += randomTextureOffset( maxpix, scale )/ _s_textureScale;
-			Log.out( "Quad.calculateUV maxpix: " + maxpix + "  scale: " + scale + "  _s_textureScale: " + _s_textureScale + "  _u[0]: " + _u[0] + "   _v[0]: " + _v[0] );
 		}
-		else if ( TileType.TILE_RANDOM_16_BOTH == tilingType )
-		{
+		else if ( TileType.TILE_RANDOM_16_BOTH == tilingType ) {
 			var soffset:Number = randomTextureOffset( maxpix, scale );
 			if (  16 <= scale )
 				soffset = int( soffset/16 ) * 16
@@ -267,41 +244,19 @@ public class Quad {
 		_u[3] = _u[0]							;		_v[3] = _v[0] + tSize;
 		_u[4] = _u[0]							;		_v[4] = _v[0];
 		
-		// idea here was to rotate all of the water textures so that they flowed down
-		// but I get tearing, so I am doing something wrong.
-		//if ( TileType.TILE_FIXED == tilingType )
-		//{
-			//if ( TypeInfo.WATER == typeInfo.type && face != Globals.POSY && face != Globals.NEGY )
-			//{
-				//for (var ii:int = 0; i < 4; i++)
-				//{
-					//_u[ii] = _u[ii + 1];
-					//_v[ii] = _v[ii + 1];
-				//}
-			//}
-		//}
-
-		if ( TileType.TILE_RANDOM == tilingType && 16 < maxpix )
-		{
+		if ( TileType.TILE_RANDOM == tilingType && 16 < maxpix ) {
 			// 50% chance to rotate the texture
 			if (Math.random() < 0.50)
-			{
 				rotateTexture( ROTATE_090 );
-			}
 		}
 		// This makes the sides of water and lava oxels flow downward
-		else if ( TileType.TILE_FIXED == tilingType && 16 <= maxpix && typeInfo.animated )
-		{
+		else if ( TileType.TILE_FIXED == tilingType && 16 <= maxpix && typeInfo.animated ) {
 			//if ( Globals.POSX == face ||  face == Globals.NEGX || face == Globals.POSZ || face == Globals.NEGZ )
-			//{
 				//rotateTexture90();
-			//}
+				
 			// For top and bottom faces, adjust the texture rotation to the direction of the flow
-			//else {
-			if ( $flowInfo )
-			{
-				if ( Globals.POSY == face ||  face == Globals.NEGY )
-				{
+			if ( $flowInfo ) {
+				if ( Globals.POSY == face ||  face == Globals.NEGY ) {
 					// PosX is the default
 					if ( Globals.POSZ == $flowInfo.direction ) {
 						rotateTexture( ROTATE_000 );
