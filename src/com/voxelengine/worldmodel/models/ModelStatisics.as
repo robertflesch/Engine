@@ -89,7 +89,7 @@ package com.voxelengine.worldmodel.models
 				}
 			}
 			
-			//statsPrint();
+			statsPrint();
 		}
 		
 		private function process( $version:int, $ba:ByteArray, currentGrain:int ):ByteArray

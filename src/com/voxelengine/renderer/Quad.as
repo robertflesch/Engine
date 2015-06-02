@@ -32,7 +32,7 @@ public class Quad {
 	//     Static Variables
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	static private var 		_s_textureScale:int = 256;
+	static private var 		_s_textureScale:int = 2048;
 	static private var 		_s_numArgs:Vector.<Number> = new Vector.<Number>(3, true);
 	static private var 		_s_intArgs:Vector.<int> = new Vector.<int>(3, true);
 	static private const 	_s_flowScaling:FlowScaling = new FlowScaling();
@@ -244,6 +244,7 @@ public class Quad {
 		{
 			_u[0] += randomTextureOffset( maxpix, scale ) / _s_textureScale;
 			_v[0] += randomTextureOffset( maxpix, scale )/ _s_textureScale;
+			Log.out( "Quad.calculateUV maxpix: " + maxpix + "  scale: " + scale + "  _s_textureScale: " + _s_textureScale + "  _u[0]: " + _u[0] + "   _v[0]: " + _v[0] );
 		}
 		else if ( TileType.TILE_RANDOM_16_BOTH == tilingType )
 		{
@@ -256,7 +257,7 @@ public class Quad {
 				soffset = int( soffset/16 ) * 16
 			_v[0] += soffset / _s_textureScale
 		}
-		
+
 		// This is the length of the texture in pixels/length
 		var tSize:Number = scale / _s_textureScale;
 		tSize = Math.min( tSize, maxpix / _s_textureScale );
@@ -375,6 +376,7 @@ public class Quad {
 		else
 			fs = _s_flowScaling;
 			
+		//Log.out( "Quad.add type: " + $type );
 		var tint:uint = $lighting.color;
 		switch ( $face ) 
 		{

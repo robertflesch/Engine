@@ -43,13 +43,13 @@ public class OxelData extends PersistanceObject
 	private	var	_statisics:ModelStatisics 						= new ModelStatisics();
 	private var _oxel:Oxel;
 	private var _loaded:Boolean;
+	private	var _version:int;
 	
-	private			 var _version:int;
 	public	function set version(value:int):void  				{ _version = value; }
 	public	function get version():int  						{ return _version; }
-	public function get oxel():Oxel { return _oxel; }
-	public function get loaded():Boolean { return _loaded; }
-	public function set loaded(value:Boolean):void { _loaded = value; }
+	public 	function get oxel():Oxel 							{ return _oxel; }
+	public 	function get loaded():Boolean 						{ return _loaded; }
+	public 	function set loaded(value:Boolean):void 			{ _loaded = value; }
 	
 	public function OxelData( $guid:String ) {
 		super( $guid, Globals.BIGDB_TABLE_OXEL_DATA );

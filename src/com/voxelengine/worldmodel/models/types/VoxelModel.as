@@ -432,6 +432,8 @@ public class VoxelModel
 	// it also add flow and lighting
 	public function write( $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean
 	{
+		return oxel.changeOxel( instanceInfo.modelGuid, $gc, $type, $onlyChangeType );
+		/*
 		// pass in the oxel directly here?
 		// requires some refactoring but not hard - RSF
 		var oldOxel:Oxel = oxel.childGetOrCreate( $gc );
@@ -502,6 +504,7 @@ public class VoxelModel
 		}
 		
 		return result;
+		*/
 	}
 	
 	public function write_sphere(cx:int, cy:int, cz:int, radius:int, what:int, gmin:uint = 0):void
@@ -781,18 +784,10 @@ public class VoxelModel
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// intersection functions
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public function worldToModel(v:Vector3D):Vector3D
-	{
-		return instanceInfo.worldToModel(v);
-	}
+	public function worldToModel(v:Vector3D):Vector3D { return instanceInfo.worldToModel(v); }
+	public function modelToWorld(v:Vector3D):Vector3D { return instanceInfo.modelToWorld(v); }
 	
-	public function modelToWorld(v:Vector3D):Vector3D
-	{
-		return instanceInfo.modelToWorld(v);
-	}
-	
-	public function lineIntersect( $worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>):void
-	{
+	public function lineIntersect( $worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>):void {
 		var modelSpaceStartPoint:Vector3D = worldToModel( $worldSpaceStartPoint );
 		var modelSpaceEndPoint:Vector3D   = worldToModel( $worldSpaceEndPoint );
 		
@@ -828,8 +823,7 @@ public class VoxelModel
 		GrainCursorPool.poolDispose( gct );
 	}
 	
-	public function lineIntersectWithChildren($worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>, minSize:int):void
-	{
+	public function lineIntersectWithChildren($worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>, minSize:int):void {
 		var msStartPoint:Vector3D = worldToModel( $worldSpaceStartPoint );
 		var msEndPoint:Vector3D   = worldToModel( $worldSpaceEndPoint );
 		oxel.lineIntersectWithChildren( msStartPoint, msEndPoint, worldSpaceIntersections, minSize );
@@ -842,8 +836,7 @@ public class VoxelModel
 	// end intersection functions
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public function isInside(x:int, y:int, z:int, gct:GrainCursor):Boolean
-	{
+	public function isInside(x:int, y:int, z:int, gct:GrainCursor):Boolean {
 		GrainCursor.getGrainFromPoint(x, y, z, gct, gct.bound);
 		var fo:Oxel = oxel.childFind(gct);
 		if (Globals.BAD_OXEL == fo)
@@ -856,8 +849,7 @@ public class VoxelModel
 	}
 	
 	// This is a general case, models using different collision schemes need to override it.
-	public function isPositionValid($collidingModel:VoxelModel):PositionTest
-	{
+	public function isPositionValid($collidingModel:VoxelModel):PositionTest {
 		var pt:PositionTest = new PositionTest();
 		pt.setValid();
 		throw new Error("VoxelModel.isPositionValid - NOT IMPLEMENTED - this would be used by a generic model vs another generic model");
@@ -866,8 +858,7 @@ public class VoxelModel
 		return pt;
 	}
 	
-	public function isPassableAvatar(x:int, y:int, z:int, gct:GrainCursor, collideAtGrain:uint, positionResult:PositionTest):Boolean
-	{
+	public function isPassableAvatar(x:int, y:int, z:int, gct:GrainCursor, collideAtGrain:uint, positionResult:PositionTest):Boolean {
 		GrainCursor.getGrainFromPoint(x, y, z, gct, collideAtGrain);
 		var fo:Oxel = oxel.childFind(gct);
 		var result:Boolean = true;
@@ -893,8 +884,7 @@ public class VoxelModel
 		return result;
 	}
 	
-	public function isPassable($x:int, $y:int, $z:int, collideAtGrain:uint):Boolean
-	{
+	public function isPassable($x:int, $y:int, $z:int, collideAtGrain:uint):Boolean {
 		if ( 0 > $x || 0 > $y || 0 > $z )
 			return true;
 		var gct:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
@@ -918,8 +908,7 @@ public class VoxelModel
 		return result;
 	}
 	
-	public function getOxelAtWSPoint($pos:Vector3D, $collideAtGrain:uint):Oxel
-	{
+	public function getOxelAtWSPoint($pos:Vector3D, $collideAtGrain:uint):Oxel {
 		var gct:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
 		var posMs:Vector3D = worldToModel($pos);
 		gct.getGrainFromVector(posMs, $collideAtGrain);
@@ -928,8 +917,7 @@ public class VoxelModel
 		return fo;
 	}
 	
-	public function isSolidAtWorldSpace($cp:CollisionPoint, $pos:Vector3D, $collideAtGrain:uint):void
-	{
+	public function isSolidAtWorldSpace($cp:CollisionPoint, $pos:Vector3D, $collideAtGrain:uint):void {
 		$cp.oxel = getOxelAtWSPoint($pos, $collideAtGrain);
 		if (Globals.BAD_OXEL == $cp.oxel)
 		{
@@ -947,18 +935,10 @@ public class VoxelModel
 		}
 	}
 	
-	public function rotateCCW():void
-	{
-		oxel.rotateCCW();
-	}
+	public function rotateCCW():void { oxel.rotateCCW(); }
+	public function validate():void { oxel.validate(); }
 	
-	public function validate():void
-	{
-		oxel.validate();
-	}
-	
-	public function changeGrainSize( changeSize:int):void
-	{
+	public function changeGrainSize( changeSize:int):void {
 		_timer = getTimer();
 		Oxel.nodes = 0;
 		oxel.changeGrainSize(changeSize, oxel.gc.bound + changeSize);
@@ -967,15 +947,13 @@ public class VoxelModel
 		//Log.out("VoxelModel.changeGrainSize - rebuildAll took: " + (getTimer() - _timer));
 	}
 	
-	public function breakdown(smallest:int = 2):void
-	{
+	public function breakdown(smallest:int = 2):void {
 		var timer:int = getTimer();
 		oxel.breakdown(smallest);
 		Log.out("Oxel.breakdown - took: " + (getTimer() - timer));
 	}
 	
-	public function bounce(collisionCandidate:VoxelModel, model:VoxelModel):void
-	{
+	public function bounce(collisionCandidate:VoxelModel, model:VoxelModel):void {
 		var toBeReflected:ModelTransform = null;
 		for each (var mt:ModelTransform in model.instanceInfo.transforms)
 		{
@@ -1042,8 +1020,7 @@ public class VoxelModel
 		//trace( "VoxelModel.bounce toBeReflected: " + toBeReflected + "  velocity: " + model.instanceInfo.velocityGet );
 	}
 	
-	public function isInParentChain(collisionCandidate:VoxelModel):Boolean
-	{
+	public function isInParentChain(collisionCandidate:VoxelModel):Boolean {
 		if (this == collisionCandidate)
 			return true;
 		if (instanceInfo.controllingModel && instanceInfo.controllingModel.isInParentChain(collisionCandidate))
@@ -1051,8 +1028,7 @@ public class VoxelModel
 		return false;
 	}
 	
-	public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void
-	{
+	public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
 		//if ( $modelLosingControl )
 			//Log.out( "VoxelModel.takeControl of : " + modelInfo.fileName + " by: " + $modelLosingControl.modelInfo.fileName );
 		//else	

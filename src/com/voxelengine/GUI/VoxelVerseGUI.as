@@ -259,10 +259,10 @@ public class VoxelVerseGUI extends EventDispatcher
 		if ( !_built ) {
 			_releaseMenu = addReleaseMenu();
 			_releaseMenu.visible = false;
-			//if ( true == Globals.g_debug ) {
-				//_debugMenu = new WindowDebugMenu();
-				//_debugMenu.visible = false;
-			//}
+			if ( true == Globals.g_debug ) {
+				_debugMenu = new WindowDebugMenu();
+				_debugMenu.visible = false;
+			}
 			
 			if ( !Globals.g_renderer.hardwareAccelerated )
 				 new WindowNotHardware( "WARNING", "Hardware acceleration is not enabled in your browser, this is happening in Chrome on some machines, try FireFox or Internet Explorer" );
