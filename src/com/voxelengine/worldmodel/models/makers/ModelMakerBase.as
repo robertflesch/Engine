@@ -77,9 +77,22 @@ public class ModelMakerBase {
 		}
 	}
 	
-	// once they both have been retrived, we can make the object
+	// check to make sure all of info required is here
 	protected function attemptMake():void { throw new Error( "ModelMakerBase.attemptMake is an abstract method" ); }
 	
+	// once they both have been retrived, we can make the object
+	protected function make():VoxelModel {
+		var modelAsset:String = _vmi.modelClass;
+		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
+		var vm:VoxelModel = new modelClass( _ii );
+		if ( null == vm ) {
+			Log.out( "ModelMakerBase.make - Model failed in creation - modelAsset: " + modelAsset + "  modelClass: " + modelClass, Log.ERROR );
+			return null;
+		}
+		vm.init( _vmi, _vmm );
+		return vm;
+	}
+
 	protected function markComplete( $success:Boolean = true ):void {
 		removeListeners();
 		if ( $success )
@@ -107,30 +120,7 @@ public class ModelMakerBase {
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	protected function make():VoxelModel {
-		var vm:* = instantiate( _ii, _vmi );
-		if ( vm ) {
-			vm.init( _vmi, _vmm );
-			vm.modelInfo.animationsLoad( vm );
-		} else
-			Log.out( "ModelMakerBase.makerCountDecrement - FAILED TO MAKE OBJECT guid: " + _vmi.guid, Log.WARN );
-		return vm;
-	}
-	
-	// Makes sense
-	static public function instantiate( $ii:InstanceInfo, $modelInfo:ModelInfo ):VoxelModel {
-		var modelAsset:String = $modelInfo.modelClass;
-		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
-		var vm:VoxelModel = new modelClass( $ii );
-		if ( null == vm ) {
-			Log.out( "ModelMakerBase.instantiate - Model failed in creation - modelClass: " + modelClass, Log.ERROR );
-			return null;
-		}
-		
-		//Log.out( "ModelMakerBase.instantiate - modelClass: " + modelClass + "  instanceInfo: " + $ii.toString() );
-		return vm;
-	}
-	
+	// A factory method to build the correct object
 	static public function load( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true, $prompt:Boolean = true ):void {
 		//Log.out( "ModelMakerBase.load - choose maker ii: " + $ii.toString() );
 		if ( !Globals.isGuid( $ii.modelGuid ) )

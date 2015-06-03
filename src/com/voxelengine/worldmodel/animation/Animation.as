@@ -124,7 +124,7 @@ public class Animation
 			
 		if ( _attachments && 0 < _attachments.length ) {
 			for each ( var aa:AnimationAttachment in _attachments ) {
-				var cm:VoxelModel = $owner.childFindByName( aa.attachsTo );
+				var cm:VoxelModel = $owner.modelInfo.childFindByName( aa.attachsTo );
 				if ( cm )
 					aa.create( cm );
 			}
@@ -137,7 +137,7 @@ public class Animation
 			
 		if ( _attachments && 0 < _attachments.length ) {
 			for each ( var aa:AnimationAttachment in _attachments ) {
-				var cm:VoxelModel = $owner.childFindByName( aa.attachsTo );
+				var cm:VoxelModel = $owner.modelInfo.childFindByName( aa.attachsTo );
 				if ( cm )
 					aa.detach();
 			}

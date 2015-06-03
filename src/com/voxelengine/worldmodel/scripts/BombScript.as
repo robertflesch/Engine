@@ -76,7 +76,7 @@ package com.voxelengine.worldmodel.scripts
 				{
 					createReplacementBomb( bomb.instanceInfo.clone() , ship.instanceInfo.instanceGuid );
 			
-					ship.childDetach( bomb );
+					ship.modelInfo.childDetach( bomb, ship );
 
 					bomb.instanceInfo.addTransform( 0, -5, 0, ModelTransform.INFINITE_TIME, ModelTransform.VELOCITY, "Gravity" );
 					bomb.instanceInfo.addTransform( 0, 0, 0, 10, ModelTransform.LIFE );

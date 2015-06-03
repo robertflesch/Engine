@@ -57,7 +57,6 @@ public class VoxelModel
 	private		var	_usesGravity:Boolean; 														
 	private		var	_timer:int 									= getTimer(); 				// INSTANCE NOT EXPORTED
 	
-	protected 	var	_animationsLoaded:Boolean					= true;
 	protected	var	_stateLock:Boolean 														// INSTANCE NOT EXPORTED
 	protected	var	_changed:Boolean 														// INSTANCE NOT EXPORTED
 	protected	var	_complete:Boolean 														// INSTANCE NOT EXPORTED
@@ -89,8 +88,6 @@ public class VoxelModel
 	public 	function get complete():Boolean						{ return _complete; }
 	public 	function set complete(val:Boolean):void				{ _complete = val; }
 	public 	function toString():String 							{ return metadata.toString() + " ii: " + instanceInfo.toString(); }
-	public 	function get animationsLoaded():Boolean 				{ return _animationsLoaded; }
-	public 	function set animationsLoaded(value:Boolean):void  	{ _animationsLoaded = value; }
 	public function get oxel():Oxel { return _modelInfo.oxel; }
 	
 	public function get dead():Boolean 							{ return _dead; }
@@ -125,9 +122,9 @@ public class VoxelModel
 		
 		modelInfo.toObject();
 		obj = modelInfo.obj
-		obj.model.children = getChildJSON();
+//		obj.model.children = getChildJSON();
 	}
-	
+/*	
 	private function getChildJSON():Object {
 	// Same code that is in modelCache to build models in region
 	// this is just models in models
@@ -142,14 +139,7 @@ public class VoxelModel
 		}
 		return oa;	
 	}
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// children 
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	protected 	var	_children:Vector.<VoxelModel> 				= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
-	public	function get children():Vector.<VoxelModel>			{ return _children; }
-	public	function 	 childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
-	
+*/	
 	protected function cameraAddLocations():void
 	{
 		camera.addLocation(new CameraLocation(false, 8, Globals.AVATAR_HEIGHT, 0));
@@ -254,6 +244,8 @@ public class VoxelModel
 			stateSet(instanceInfo.state)
 			
 		processClassJson();
+		
+		modelInfo.animationsLoad();
 	}
 	
 	private function impactEventHandler(ie:ImpactEvent):void {
@@ -456,11 +448,6 @@ public class VoxelModel
 			var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
 			modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha );
 		}
-		
-		for each (var vm:VoxelModel in _children) {
-			if (vm && vm.complete)
-				vm.draw(viewMatrix, $context, true, $alpha );
-		}
 	}
 	
 	public function update($context:Context3D, $elapsedTimeMS:int):void	{
@@ -472,7 +459,7 @@ public class VoxelModel
 		
 		if (complete) {
 			instanceInfo.update($elapsedTimeMS);
-			
+			modelInfo.update($context,$elapsedTimeMS);
 			if (oxel && oxel.dirty)
 				oxel.cleanup();
 		}
@@ -482,14 +469,7 @@ public class VoxelModel
 		
 		collisionTest($elapsedTimeMS);
 		
-		for each (var vm:VoxelModel in _children) {
-			vm.update($context, $elapsedTimeMS);
-		}
-		
-		for each (var deadCandidate:VoxelModel in _children) {
-			if (true == deadCandidate.dead)
-				childRemove(deadCandidate);
-		}
+		modelInfo.bringOutYourDead();
 	}
 	
 	private function oxelComplete( $ode:OxelDataEvent ):void {
@@ -509,121 +489,6 @@ public class VoxelModel
 			instanceInfo.centerSetComp( $oxelCenter, $oxelCenter, $oxelCenter ); 
 		}
 	}
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  Children functions
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	public function childAdd( $child:VoxelModel):void
-	{
-		if ( null ==  $child.instanceInfo.instanceGuid )
-			 $child.instanceInfo.instanceGuid = Globals.getUID();
-		//Log.out(  "-------------- VoxelModel.childAdd -  $child: " +  $child.toString() );
-		// remove parent level model
-		Region.currentRegion.modelCache.changeFromParentToChild( $child);
-		_children.push( $child);
-		modelInfo.changed = true;
-		changed = true;
-		$child.instanceInfo.baseLightLevel = instanceInfo.baseLightLevel;
-	}
-	
-	public function childRemoveByInstanceInfo( $instanceInfo:InstanceInfo ):void {
-		
-		var index:int = 0;
-		for each (var child:VoxelModel in _children) {
-			if (child.instanceInfo.instanceGuid ==  $instanceInfo.instanceGuid ) {
-				_children.splice(index, 1);
-				modelInfo.changed = true;
-				changed = true;
-				break;
-			}
-			index++;
-		}
-		
-		//modelInfo.childRemove( $instanceInfo );
-		// Need a message here?
-		//var me:ModelEvent = new ModelEvent( ModelEvent.REMOVE, vm.instanceInfo.guid, instanceInfo.guid );
-		//Globals.g_app.dispatchEvent( me );
-	}
-	
-	public function childRemove(vm:VoxelModel):void {
-		var index:int = 0;
-		for each (var child:VoxelModel in _children) {
-			if (child == vm) {
-				Log.out(  "VoxelModel.childRemove - removing Model: " + child.toString() );
-				_children.splice(index, 1);
-				modelInfo.changed = true;				
-				changed = true;
-				break;
-			}
-			index++;
-		}
-		
-		//modelInfo.childRemove(vm.instanceInfo);
-		// Need a message here?
-		//var me:ModelEvent = new ModelEvent( ModelEvent.REMOVE, vm.instanceInfo.guid, instanceInfo.guid );
-		//Globals.g_app.dispatchEvent( me );
-	}
-	
-	// This leaves the model, but detaches it from parent.
-	public function childDetach(vm:VoxelModel):void
-	{
-		// removethis child from the parents info
-		childRemove(vm);
-		
-		// this make it belong to the world
-		vm.instanceInfo.controllingModel = null;
-		//if ( !(vm is Player) )
-		Region.currentRegion.modelCache.add( vm );
-
-		
-		// now give it correct world space position and velocity
-		//////////////////////////////////////////////////////
-		// get the model space position of the object
-		var newPosition:Vector3D = vm.instanceInfo.positionGet.clone();
-		// position is based on model space, but we want to rotate around the center of the object
-		newPosition = newPosition.subtract(instanceInfo.center);
-		newPosition = instanceInfo.worldSpaceMatrix.deltaTransformVector(newPosition);
-		// add the center back in
-		newPosition = newPosition.add(instanceInfo.center);
-		
-		vm.instanceInfo.positionSet = newPosition.add(instanceInfo.positionGet);
-		vm.instanceInfo.velocitySet = instanceInfo.velocityGet;
-		
-		// This model (vm.instanceInfo.guid) is detaching (ModelEvent.DETACH) from root model (instanceInfo.guid)
-		var me:ModelEvent = new ModelEvent(ModelEvent.DETACH, vm.instanceInfo.instanceGuid, null, null, instanceInfo.instanceGuid);
-		Globals.g_app.dispatchEvent(me);
-		modelInfo.changed = true;				
-		changed = true;
-	}
-	
-	public function childModelFind(guid:String):VoxelModel
-	{
-		for each (var child:VoxelModel in _children) {
-			if (child.instanceInfo.instanceGuid == guid)
-				return child;
-		}
-		// didnt find it at first level, lets look recurvsivly
-		for each ( child in _children) {
-			var cvm:VoxelModel = child.childModelFind( guid );
-			if ( cvm )
-				return cvm;
-		}
-		
-		//Log.out(  "VoxelModel.childFind - not found for guid: " + guid, Log.WARN );
-		return null
-	}
-	
-	public function childFindByName($name:String):VoxelModel
-	{
-		for each (var child:VoxelModel in _children) {
-			if (child.metadata.name == $name)
-				return child;
-		}
-		throw new Error("VoxelModel.childFindByName - not found for name: " + $name);
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  End Children functions
-	/////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public function print():void
 	{
@@ -657,11 +522,6 @@ public class VoxelModel
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public function save():void
 	{
-		for ( var i:int; i < _children.length; i++ ) {
-			var child:VoxelModel = _children[i];
-			child.save();
-		}
-		
 		if ( !changed ) {
 			Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 			return;
@@ -676,10 +536,6 @@ public class VoxelModel
 			return;
 		}
 			
-		if (  false == animationsLoaded ) {
-			Log.out( "VoxelModel.save - animations not loaded name: " + _metadata.name );
-			return;
-		}
 		Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 		//if ( null != metadata.permissions.templateGuid )
 			//metadata.permissions.templateGuid = "";
@@ -687,8 +543,6 @@ public class VoxelModel
 		//Log.out( "VoxelModel.save - name: " + metadata.name, Log.WARN );
 		changed = false;
 		metadata.save();
-		modelInfo.childrenSet( getChildJSON() );
-		modelInfo.save();
 	}
 	
 	
@@ -955,7 +809,7 @@ public class VoxelModel
 		
 		// adds the player to the child list
 		if ( $modelLosingControl )
-			childAdd($modelLosingControl);
+			modelInfo.childAdd($modelLosingControl);
 		camera.index = 0;
 		
 		// Pass in the name of the class that is taking control.
@@ -969,7 +823,7 @@ public class VoxelModel
 		
 		// remove the player to the child list
 		if ( $detachChild )
-			childDetach($modelDetaching);
+			modelInfo.childDetach( $modelDetaching, this );
 		camera.index = 0;
 		//var className:String = getQualifiedClassName(this)
 		//ModelEvent.dispatch( new ModelEvent( ModelEvent.RELEASE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
@@ -1060,7 +914,7 @@ public class VoxelModel
 			for each (var at:AnimationTransform in anim.transforms)
 			{
 				//Log.out( "VoxelModel.stateSet - have AnimationTransform looking for child : " + at.attachmentName );
-				if (addAnimationsInChildren(children, at, useInitializer, $lockTime))
+				if (addAnimationsInChildren(modelInfo.children, at, useInitializer, $lockTime))
 					result = true;
 			}
 		}
@@ -1079,18 +933,18 @@ public class VoxelModel
 		{
 			//Log.out( "VoxelModel.checkChildren - have AnimationTransform looking for child : " + $at.attachmentName );
 			var result:Boolean = false;
-			for each (var child:VoxelModel in $children)
+			for each (var cm:VoxelModel in $children)
 			{
 				//Log.out( "VoxelModel.addAnimationsInChildren - is child.metadata.name: " + child.metadata.name + " equal to $at.attachmentName: " + $at.attachmentName );
-				if (child.metadata.name == $at.attachmentName)
+				if (cm.metadata.name == $at.attachmentName)
 				{
-					child.stateSetData($at, $useInitializer, $lockTime);
+					cm.stateSetData($at, $useInitializer, $lockTime);
 					result = true;
 				}
-				else if (0 < child.children.length)
+				else if (0 < cm.modelInfo.children.length)
 				{
 					//Log.out( "VoxelModel.stateSet - addAnimationsInChildren - looking in children of child for: " + $at.attachmentName );
-					if (addAnimationsInChildren(child.children, $at, $useInitializer, $lockTime))
+					if (addAnimationsInChildren(cm.modelInfo.children, $at, $useInitializer, $lockTime))
 						result = true;
 				}
 			}
@@ -1144,7 +998,7 @@ public class VoxelModel
 			//Log.out( "VoxelModel.updateAnimations - updating transform on anim: " + _anim.name + " val: " + $percentage ); 
 			for each (var at:AnimationTransform in _anim.transforms)
 			{
-				updateAnimationsInChildren(children, at, $percentage);
+				updateAnimationsInChildren(modelInfo.children, at, $percentage);
 			}
 			_anim.update($percentage);
 		}
@@ -1156,22 +1010,22 @@ public class VoxelModel
 	{
 		//Log.out( "VoxelModel.updateAnimationsInChildren - have AnimationTransform looking for child : " + $at.attachmentName );
 		var result:Boolean = false;
-		for each (var child:VoxelModel in $children)
+		for each (var cm:VoxelModel in $children)
 		{
 			//Log.out( "VoxelModel.updateAnimationsInChildren - child: " + child.instanceInfo.name );
 			// Does this child have this name? if so update the transform
-			if (child.metadata.name == $at.attachmentName)
+			if (cm.metadata.name == $at.attachmentName)
 			{
 				for each (var mt:ModelTransform in $at.transforms)
 				{
-					child.instanceInfo.updateNamedTransform(mt, $percentage);
+					cm.instanceInfo.updateNamedTransform(mt, $percentage);
 				}
 			}
 			// If this child has children, check them also.
-			else if (0 < child.children.length)
+			else if (0 < cm.modelInfo.children.length)
 			{
 				//Log.out( "VoxelModel.updateAnimationsInChildren - looking in children of child for: " + $at.attachmentName );
-				if (updateAnimationsInChildren(child.children, $at, $percentage))
+				if (updateAnimationsInChildren(cm.modelInfo.children, $at, $percentage))
 					result = true;
 			}
 		}

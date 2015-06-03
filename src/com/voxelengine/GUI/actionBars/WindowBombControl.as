@@ -33,7 +33,7 @@ package com.voxelengine.GUI.actionBars
 			layout.orientation = LayoutOrientation.VERTICAL;
 			padding = 0;
 			
-			for each ( var vm1:VoxelModel in _vm.children )
+			for each ( var vm1:VoxelModel in _vm.modelInfo.children )
 			{
 				if ( "Bomb" == vm1.modelInfo.modelClass )
 				{
@@ -66,7 +66,7 @@ package com.voxelengine.GUI.actionBars
 		private function detachEventHandler( ee:WeaponEvent ):void 
 		{
 			removeElements();
-			for each ( var vm1:VoxelModel in _vm.children )
+			for each ( var vm1:VoxelModel in _vm.modelInfo.children )
 			{
 				if ( "Bomb" == vm1.modelInfo.modelClass )
 				{

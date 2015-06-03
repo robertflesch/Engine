@@ -54,7 +54,7 @@ package com.voxelengine.worldmodel.models
 		
 		public function markerRemove( $owner:VoxelModel ):void {
 			
-			$owner.childRemove( _vm );
+			$owner.modelInfo.childRemove( _vm );
 			_vm = null;
 			_instanceGuid = null;
 		}

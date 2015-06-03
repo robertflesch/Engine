@@ -369,7 +369,7 @@ package com.voxelengine.worldmodel.models.types
 				modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha );
 			}
 			
-			for each ( var vm:VoxelModel in _children )
+			for each ( var vm:VoxelModel in modelInfo.children )
 			{
 				if ( vm && vm.complete )
 					vm.draw( viewMatrix, $context, true, $alpha );

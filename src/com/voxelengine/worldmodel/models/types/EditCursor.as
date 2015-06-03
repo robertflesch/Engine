@@ -310,8 +310,9 @@ public class EditCursor extends VoxelModel
 	
 	
 	public function objectModelSet( $om:VoxelModel ):void {
-		Log.out( "EditCursor.objectModelSet - model: " + $om.toString(), Log.DEBUG );
+		Log.out( "EditCursor.objectModelSet - model: " + $om.toString() + " grain: " + $om.modelInfo.data.oxel.gc.grain, Log.DEBUG );
 		_objectModel = $om;
+		oxel.gc.grain = _objectModel.oxel.gc.grain;
 	}
 	
 	public function drawCursor($mvp:Matrix3D, $context:Context3D, $isChild:Boolean, $alpha:Boolean ):void	{

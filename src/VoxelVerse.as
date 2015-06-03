@@ -28,6 +28,7 @@ package {
 	import com.voxelengine.events.InventoryEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.ModelInfoEvent;
 	import com.voxelengine.GUI.VoxelVerseGUI;
 	import com.voxelengine.worldmodel.RegionManager;
 	import com.voxelengine.worldmodel.MemoryManager;
@@ -182,6 +183,7 @@ package {
 					//Log.out( "VoxelVerse.deactivateApp - NOT SAVING REGION AND INVENTORY", Log.WARN );
 					RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
 					InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, null, null ) );
+					ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) );
 				}
 				
 				GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_DEACTIVATE ) );

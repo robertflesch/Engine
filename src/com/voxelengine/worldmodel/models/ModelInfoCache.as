@@ -35,10 +35,16 @@ public class ModelInfoCache
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST, 			request );
 		ModelInfoEvent.addListener( ModelBaseEvent.DELETE, 				deleteHandler );
 		ModelInfoEvent.addListener( ModelBaseEvent.GENERATION, 			generated );
+		ModelInfoEvent.addListener( ModelBaseEvent.SAVE, 				save );
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );
+	}
+	
+	static private function save(e:ModelInfoEvent):void {
+		for each ( var modelInfo:ModelInfo in _modelInfo )
+			modelInfo.save();
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////

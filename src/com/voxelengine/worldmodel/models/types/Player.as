@@ -192,7 +192,7 @@ public class Player extends Avatar
 		if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
 			return;
 			
-		var vm:VoxelModel = childModelFind( me.instanceGuid );	
+		var vm:VoxelModel = modelInfo.childModelFind( me.instanceGuid );	
 		if ( !vm ) {
 			Log.out( "Player.onChildAdded ERROR FIND CHILD MODEL: " + me.instanceGuid );
 		}

@@ -83,7 +83,7 @@ package com.voxelengine.worldmodel.animation
 			else
 			{
 				//Log.out( "AnimationAttachment.create owner: " + $owner.toString() + "   attachment: " + _voxelModel.toString() );
-				$owner.childAdd( _voxelModel );
+				$owner.modelInfo.childAdd( _voxelModel );
 			}
 		}
 		
@@ -91,7 +91,7 @@ package com.voxelengine.worldmodel.animation
 		{
 			//Log.out( "AnimationAttachment.detach owner: " + _owner.toString() + "   attachment: " + _voxelModel.toString() );
 			if ( null != _voxelModel && null != _owner )
-				_owner.childRemove( _voxelModel );
+				_owner.modelInfo.childRemove( _voxelModel );
 		}
 		
 		private function onAttachmentCreated( event:ModelEvent ):void
@@ -99,7 +99,7 @@ package com.voxelengine.worldmodel.animation
 			//Log.out( "AnimationAttachment.onAttachmentCreated owner: " + _owner.toString() );
 			if ( event.instanceGuid == instanceInfo.instanceGuid )
 			{
-				_voxelModel = _owner.childModelFind( event.instanceGuid );	
+				_voxelModel = _owner.modelInfo.childModelFind( event.instanceGuid );	
 				// locks like this is no longer needed, not sure why not RSF
 				// must be listening for it already.
 //				_voxelModel = Region.currentRegion.modelCache.instanceGet( instanceInfo.guid );
