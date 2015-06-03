@@ -150,7 +150,7 @@ package com.voxelengine.worldmodel.models
 					}
 					else	
 					{
-						EditCursor.currentInstance.visible = false;	
+						EditCursor.currentInstance.instanceInfo.visible = false;	
 						EditCursor.currentInstance.gciDataClear();
 					}
 					_lastFoundModel = editableModel;
@@ -207,7 +207,7 @@ package com.voxelengine.worldmodel.models
 			
 			if ( null == foundModel && null != _lastFoundModel )
 			{
-				EditCursor.currentInstance.visible = false;
+				EditCursor.currentInstance.instanceInfo.visible = false;
 				_lastFoundModel	= null;
 			}
 			

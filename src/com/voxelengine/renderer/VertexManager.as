@@ -170,30 +170,24 @@ public class VertexManager {
 		// Only update the shaders if they are in use, other wise 
 		// we have all of the costly state changes happening for no good reason.
 		// TODO - RSF - We should probably NOT upload the shaders unless they are being used.
-		if ( _vertBufAnimatedAlpha && _vertBufAnimatedAlpha.length )
-		{
-			if ( _shaders[3].update( $mvp, $vm, $context, $selected, $isChild ) )
-			{
+		if ( _vertBufAnimatedAlpha && _vertBufAnimatedAlpha.length ) {
+			if ( _shaders[3].update( $mvp, $vm, $context, $selected, $isChild ) ) {
 				_vertBufAnimatedAlpha.sort();
 				_vertBufAnimatedAlpha.buffersBuildFromOxels( $context );
 				_vertBufAnimatedAlpha.BufferCopyToGPU( $context );
 			}
 		}
 		
-		if ( _vertBufFire && _vertBufFire.length )
-		{
-			if ( _shaders[4].update( $mvp, $vm, $context, $selected, $isChild ) )
-			{
+		if ( _vertBufFire && _vertBufFire.length ) {
+			if ( _shaders[4].update( $mvp, $vm, $context, $selected, $isChild ) ) {
 				_vertBufFire.sort();
 				_vertBufFire.buffersBuildFromOxels( $context );
 				_vertBufFire.BufferCopyToGPU( $context );
 			}
 		}	
 		
-		if ( _vertBufAlpha && _vertBufAlpha.length )
-		{
-			if ( _shaders[2].update( $mvp, $vm, $context, $selected, $isChild ) )
-			{
+		if ( _vertBufAlpha && _vertBufAlpha.length ) {
+			if ( _shaders[2].update( $mvp, $vm, $context, $selected, $isChild ) ) {
 				var xdist:Number = _gc.getDistance( VoxelModel.controlledModel.modelToWorld( VoxelModel.controlledModel.camera.center ) );
 				if (  xdist < 512 ) {
 					_vertBufAlpha.sorted = false;

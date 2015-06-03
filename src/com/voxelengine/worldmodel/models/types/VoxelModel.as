@@ -52,58 +52,46 @@ public class VoxelModel
 	protected 	var	_modelInfo:ModelInfo; 													// INSTANCE NOT EXPORTED
 	protected 	var	_instanceInfo:InstanceInfo; 											// INSTANCE NOT EXPORTED
 	
-	protected 	var	_children:Vector.<VoxelModel> 				= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
-	
 	private		var	_anim:Animation;			
 	private		var	_camera:Camera								= new Camera();
+	private		var	_usesGravity:Boolean; 														
+	private		var	_timer:int 									= getTimer(); 				// INSTANCE NOT EXPORTED
 	
 	protected 	var	_animationsLoaded:Boolean					= true;
 	protected	var	_stateLock:Boolean 														// INSTANCE NOT EXPORTED
-
-	private		var	_initialized:Boolean 													// INSTANCE NOT EXPORTED
 	protected	var	_changed:Boolean 														// INSTANCE NOT EXPORTED
 	protected	var	_complete:Boolean 														// INSTANCE NOT EXPORTED
 	protected	var	_selected:Boolean 														// INSTANCE NOT EXPORTED
 	protected	var	_dead:Boolean 															// INSTANCE NOT EXPORTED
-	private		var	_usesGravity:Boolean; 														
-	private		var	_visible:Boolean 							= true;  // Should be exported/ move to instance
-	
-	private		var	_timer:int 									= getTimer(); 				// INSTANCE NOT EXPORTED
 			
-	private		var	_lightIDNext:uint 							= 1024; // TODO FIX reserve space for ?
 	private var _hasInventory:Boolean;
-	
 	public function get hasInventory():Boolean 				{ return _hasInventory; }
 	public function set hasInventory(value:Boolean):void  	{ _hasInventory = value; }
 				
+	private		var	_initialized:Boolean 													// INSTANCE NOT EXPORTED
 	protected function get initialized():Boolean 				{ return _initialized; }
 	protected function set initialized( val:Boolean ):void		{ _initialized = val; }
+	
 	public	function get metadata():ModelMetadata    			{ return _metadata; }
 	public	function set metadata(val:ModelMetadata):void   	{ _metadata = val; }
 	public	function get usesGravity():Boolean 					{ return _usesGravity; }
 	public	function set usesGravity(val:Boolean):void 			{ _usesGravity = val; }
-	public	function get getPerModelLightID():uint 				{ return _lightIDNext++ }
 	public	function get camera():Camera						{ return _camera; }
 	public	function get anim():Animation 						{ return _anim; }
 //	public	function get statisics():ModelStatisics				{ return _statisics; }
 	public	function get instanceInfo():InstanceInfo			{ return _instanceInfo; }
-	public	function get visible():Boolean 						{ return _visible; }
-	public	function set visible(val:Boolean):void 				{ _visible = val; }
 	public	function get modelInfo():ModelInfo 					{ return _modelInfo; }
 	public	function set modelInfo(val:ModelInfo):void			{ _modelInfo = val; }
-	public	function get children():Vector.<VoxelModel>			{ return _children; }
-	public	function 	 childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
 	public	function get changed():Boolean						{ return _changed; }
-	public	function set changed( $val:Boolean):void			
-	{ 
-		_changed = $val; 
-		//if ( _changed )
-			//Log.out( "VoxelModel.changed = TRUE - name: " + metadata.name, Log.WARN );
-		//else	
-			//Log.out( "VoxelModel.changed = FALSE - name: " + metadata.name, Log.WARN );
-	}
+	public	function set changed( $val:Boolean):void			{ _changed = $val; }
 	public	function get selected():Boolean 					{ return _selected; }
 	public	function set selected(val:Boolean):void  			{ _selected = val; }
+	public 	function get complete():Boolean						{ return _complete; }
+	public 	function set complete(val:Boolean):void				{ _complete = val; }
+	public 	function toString():String 							{ return metadata.toString() + " ii: " + instanceInfo.toString(); }
+	public 	function get animationsLoaded():Boolean 				{ return _animationsLoaded; }
+	public 	function set animationsLoaded(value:Boolean):void  	{ _animationsLoaded = value; }
+	public function get oxel():Oxel { return _modelInfo.oxel; }
 	
 	public function get dead():Boolean 							{ return _dead; }
 	public function set dead(val:Boolean):void 					{ 
@@ -119,21 +107,6 @@ public class VoxelModel
 		ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, instanceInfo.instanceGuid ) );
 	}
 
-	public function get complete():Boolean						{ return _complete; }
-	public function set complete(val:Boolean):void
-	{
-		Log.out( "VoxelModel.complete: " + modelInfo.guid );
-		_complete = val;
-	}
-	
-	public function toString():String 				{ return metadata.toString() + " ii: " + instanceInfo.toString(); }
-	public function get animationsLoaded():Boolean { return _animationsLoaded; }
-	public function set animationsLoaded(value:Boolean):void 
-	{
-		//Log.out( "VoxelModel.animationsLoaded - modelGuid: " + instanceInfo.modelGuid + " setting to: " + value, Log.WARN );
-		_animationsLoaded = value;
-	}
-	
 	protected function processClassJson():void {
 		Log.out( "VoxelModel.processClassJson load children for model name: " + _metadata.name, Log.DEBUG ),
 		modelInfo.childrenLoad( this );
@@ -146,8 +119,6 @@ public class VoxelModel
 				instanceInfo.addScript( scriptName, true );
 		}
 	}
-	
-	public function get oxel():Oxel { return _modelInfo.oxel; }
 	
 	// The export object is a combination of modelInfo and instanceInfo
 	public function buildExportObject( obj:Object ):void {
@@ -171,6 +142,13 @@ public class VoxelModel
 		}
 		return oa;	
 	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// children 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	protected 	var	_children:Vector.<VoxelModel> 				= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
+	public	function get children():Vector.<VoxelModel>			{ return _children; }
+	public	function 	 childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
 	
 	protected function cameraAddLocations():void
 	{
@@ -467,7 +445,7 @@ public class VoxelModel
 	}
 	
 	public function draw(mvp:Matrix3D, $context:Context3D, $isChild:Boolean, $alpha:Boolean ):void	{
-		if ( !visible )
+		if ( !instanceInfo.visible )
 			return;
 		
 		var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();

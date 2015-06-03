@@ -111,17 +111,6 @@ public class EditCursor extends VoxelModel
 	private function 	get	objectModel( ):VoxelModel { return _objectModel;}
 	private function 		objectModelClear():void { _objectModel = null; }
 	
-	
-	override public function get visible():Boolean { return super.visible; }
-	override public function set visible( $val:Boolean ):void {
-		GUIEvent.removeListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
-		super.visible = $val;
-		if ( visible )
-			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
-		else
-			Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
-	}
-	
 	// This saves the last valid texture that was set.
 	private 		  	var _oxelTextureValid:int		 				= EDITCURSOR_SQUARE;
 	public function 	get oxelTextureValid():int 						{ return _oxelTextureValid; }
@@ -496,6 +485,8 @@ public class EditCursor extends VoxelModel
 			ii.controllingModel = VoxelModel.selectedModel;
 		ModelMakerBase.load( ii );
 		
+		// This places an oxel that is invisible, but collidable at the same location as the model
+		// This should lock the model to that location, otherwise the oxel is invalid.
 		if ( VoxelModel.selectedModel )
 			VoxelModel.selectedModel.write( _pl.gc, 101 );
 	}

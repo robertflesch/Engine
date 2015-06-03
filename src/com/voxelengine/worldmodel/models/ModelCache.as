@@ -156,14 +156,14 @@ package com.voxelengine.worldmodel.models
 			var vm:VoxelModel;
 			for ( var i:int = 0; i < _instances.length; i++ ) {
 				vm = _instances[i];
-				if ( vm && vm.complete && vm.visible )
+				if ( vm && vm.complete && vm.instanceInfo.visible )
 					vm.draw( $mvp, $context, false, false );	
 			}
 			
 			// TODO - should sort models based on distance, and view frustrum - RSF
 			for ( i = 0; i < _instancesDynamic.length; i++ ) {
 				vm = _instancesDynamic[i];
-				if ( vm && vm.complete && vm.visible )
+				if ( vm && vm.complete && vm.instanceInfo.visible )
 					vm.draw( $mvp, $context, false, false );	
 			}
 			
@@ -172,14 +172,14 @@ package com.voxelengine.worldmodel.models
 				
 			for ( i = 0; i < _instances.length; i++ ) {
 				vm = _instances[i];
-				if ( vm && vm.complete && vm.visible )
+				if ( vm && vm.complete && vm.instanceInfo.visible )
 					vm.draw( $mvp, $context, false, true );	
 			}
 			
 			// TODO - This is expensive and not needed if I dont have projectiles without alpha.. RSF
 			for ( i = 0; i < _instancesDynamic.length; i++ ) {
 				vm = _instancesDynamic[i];
-				if ( vm && vm.complete && vm.visible )
+				if ( vm && vm.complete && vm.instanceInfo.visible )
 					vm.draw( $mvp, $context, false, true );	
 			}
 			

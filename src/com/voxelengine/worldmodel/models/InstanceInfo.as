@@ -56,8 +56,10 @@ public class InstanceInfo extends Location	{
 	
 	private var _life:Vector3D 						= new Vector3D(1, 1, 1);		// INSTANCE NOT EXPORTED
 	
+	private		var	_visible:Boolean 							= true;  // Should be exported/ move to instance
+	public	function get visible():Boolean 						{ return _visible; }
+	public	function set visible(val:Boolean):void 				{ _visible = val; }
 	private var	_baseLightLevel:uint				= 0x33;
-	
 	public function get baseLightLevel():uint 					{ return _baseLightLevel; }
 	public function set baseLightLevel(val:uint):void 			{ _baseLightLevel = val; }
 	
