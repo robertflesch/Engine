@@ -368,6 +368,9 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	
 	// have to create a new save name here so that I can pass in the child of the instance
 	public function childrenSet( $children:Object ):void {
+		if ( null == _obj )
+			_obj = new Object();
+			
 		if ( $children.length )
 			_obj.children = $children;
 	}

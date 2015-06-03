@@ -90,6 +90,7 @@ public class EditCursor extends VoxelModel
 	private 			var _repeatTimer:Timer;
 	private  			var _count:int = 0;
 	private 			var _phase:Number = 0; // used by the rainbow cursor
+	private 			var _pl:PlacementLocation 						= new PlacementLocation();	
 	
 	private 			var _listenersAdded:Boolean;
 	
@@ -326,26 +327,26 @@ public class EditCursor extends VoxelModel
 	
 	public function drawCursor($mvp:Matrix3D, $context:Context3D, $isChild:Boolean, $alpha:Boolean ):void	{
 		// if there is a parent, adjust matrix for it first
-		//if ( VoxelModel.selectedModel ) { // This means type cursor
-			//var viewMatrixParent:Matrix3D = VoxelModel.selectedModel.instanceInfo.worldSpaceMatrix.clone();
-			//viewMatrixParent.append($mvp);
-			//$mvp = viewMatrixParent;
-		//}
+		if ( VoxelModel.selectedModel && gciData ) { // This means type cursor
+			var viewMatrixParent:Matrix3D = VoxelModel.selectedModel.instanceInfo.worldSpaceMatrix.clone();
+			viewMatrixParent.append($mvp);
+			$mvp = viewMatrixParent;
+		}
 		
 		if ( objectModel && objectModel.complete ) {
 			objectModel.draw( $mvp, $context, true, $alpha );
 		}
 
-		//if ( gciData ) { // if no intersection dont draw
-			//var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
-			//viewMatrix.prependScale( 1 + SCALE_FACTOR, 1 + SCALE_FACTOR, 1 + SCALE_FACTOR ); 
-			//var positionscaled:Vector3D = viewMatrix.position;
-			//var t:Number = oxel.gc.size() * SCALE_FACTOR/2;
-			//viewMatrix.prependTranslation( -t, -t, -t)
-			//viewMatrix.append($mvp);
-			//
-			//modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha )
-		//}
+		if ( gciData ) { // if no intersection dont draw
+			var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
+			viewMatrix.prependScale( 1 + SCALE_FACTOR, 1 + SCALE_FACTOR, 1 + SCALE_FACTOR ); 
+			var positionscaled:Vector3D = viewMatrix.position;
+			var t:Number = oxel.gc.size() * SCALE_FACTOR/2;
+			viewMatrix.prependTranslation( -t, -t, -t)
+			viewMatrix.append($mvp);
+			
+			modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha )
+		}
 	}
 	
 	override public function update($context:Context3D, elapsedTimeMS:int ):void {
@@ -360,13 +361,13 @@ public class EditCursor extends VoxelModel
 		if ( gciData ) {
 			if ( _cursorOperation == CursorOperationEvent.INSERT_OXEL || _cursorOperation == CursorOperationEvent.INSERT_MODEL ) {
 				// This gets the closest open oxel along the ray
-				var pl:PlacementLocation = insertLocationCalculate( gciData.model );
-				PlacementLocation.INVALID == pl.state ?  oxelTexture = EDITCURSOR_INVALID : oxelTexture = oxelTextureValid;
+				insertLocationCalculate( gciData.model );
+				PlacementLocation.INVALID == _pl.state ?  oxelTexture = EDITCURSOR_INVALID : oxelTexture = oxelTextureValid;
 
 				if ( cursorShape == CursorShapeEvent.MODEL_AUTO && objectModel )
-					objectModel.instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
+					objectModel.instanceInfo.positionSetComp( _pl.gc.getModelX(), _pl.gc.getModelY(), _pl.gc.getModelZ() );
 
-				instanceInfo.positionSetComp( pl.gc.getModelX(), pl.gc.getModelY(), pl.gc.getModelZ() );
+				instanceInfo.positionSetComp( _pl.gc.getModelX(), _pl.gc.getModelY(), _pl.gc.getModelZ() );
 			}
 			else if ( _cursorOperation == CursorOperationEvent.DELETE_OXEL || _cursorOperation == CursorOperationEvent.DELETE_MODEL ) {
 				instanceInfo.positionSetComp( _gciData.gc.getModelX(), _gciData.gc.getModelY(), _gciData.gc.getModelZ() );
@@ -455,20 +456,20 @@ public class EditCursor extends VoxelModel
 		
 		var foundModel:VoxelModel = VoxelModel.selectedModel;
 		// placementResult - { oxel:Globals.BAD_OXEL, gci:gci, positive:posMove, negative:negMove };
-		var placementResult:PlacementLocation = insertLocationCalculate( foundModel );
-		if ( PlacementLocation.INVALID == placementResult.state )
+		insertLocationCalculate( foundModel );
+		if ( PlacementLocation.INVALID == _pl.state )
 		{
 			Log.out( "EditCursor.getHighlightedOxel NO PLACEMENT FOUND" );
 			return Globals.BAD_OXEL;
 		}
-		var oxelToBeModified:Oxel = foundModel.oxel.childGetOrCreate( placementResult.gc );
+		var oxelToBeModified:Oxel = foundModel.oxel.childGetOrCreate( _pl.gc );
 		if ( Globals.BAD_OXEL == oxelToBeModified )
 		{
 			Log.out( "EditCursor.getHighlightedOxel BAD OXEL OLD" );
 			if ( recurse )
 				return Globals.BAD_OXEL;
 				
-			if ( placementResult )
+			if ( _pl )
 				return Globals.BAD_OXEL;
 				
 			if ( EditCursor.currentInstance.gciData )
@@ -478,7 +479,7 @@ public class EditCursor extends VoxelModel
 				insertOxel( true );
 				return Globals.BAD_OXEL;
 			}
-//					foundModel.grow( placementResult );
+//					foundModel.grow( _pl );
 		}
 		
 		return oxelToBeModified;
@@ -494,6 +495,9 @@ public class EditCursor extends VoxelModel
 		if ( VoxelModel.selectedModel )
 			ii.controllingModel = VoxelModel.selectedModel;
 		ModelMakerBase.load( ii );
+		
+		if ( VoxelModel.selectedModel )
+			VoxelModel.selectedModel.write( _pl.gc, 101 );
 	}
 	
 	private function insertOxel(recurse:Boolean = false):void {
@@ -531,53 +535,53 @@ public class EditCursor extends VoxelModel
 		}
 	}
 	
-	static private function insertLocationCalculate( foundModel:VoxelModel ):PlacementLocation {
+	private function insertLocationCalculate( foundModel:VoxelModel ):void {
 		var gci:GrainCursorIntersection = EditCursor.currentInstance.gciData;
-		var pl:PlacementLocation = new PlacementLocation();
 		if ( !gci )
-			return pl;
+			return;
 			
 		// determines whether a block can be placed
 		// calculate difference between avatar location and intersection point
 		var diffPos:Vector3D = Player.player.wsPositionGet().clone();
 		diffPos = diffPos.subtract( gci.wsPoint );
 		
-		pl.state = PlacementLocation.VALID;
+		_pl.reset();
+		_pl.state = PlacementLocation.VALID;
 		// copy the location of the cursor in the larger model
 		// since we are testing on this, we need to use a copy
-		pl.gc.copyFrom( gci.gc );
+		_pl.gc.copyFrom( gci.gc );
 		// test the results of the step, to see if a blocks has been sent out of bounds.
 		switch ( gci.axis ) {
 		case Globals.AXIS_X:
 			if ( 0 < diffPos.x ) {
-				if ( !pl.gc.move_posx() ) pl.state = PlacementLocation.INVALID;
-				pl.positive = true;
+				if ( !_pl.gc.move_posx() ) _pl.state = PlacementLocation.INVALID;
+				_pl.positive = true;
 			} else {
-				if ( !pl.gc.move_negx() ) pl.state = PlacementLocation.INVALID;
-				pl.negative = true;
+				if ( !_pl.gc.move_negx() ) _pl.state = PlacementLocation.INVALID;
+				_pl.negative = true;
 			}
 			break;
 		case Globals.AXIS_Y:
 			if ( 0 < diffPos.y ) {
-				if ( !pl.gc.move_posy() ) pl.state = PlacementLocation.INVALID;
-				pl.positive = true;
+				if ( !_pl.gc.move_posy() ) _pl.state = PlacementLocation.INVALID;
+				_pl.positive = true;
 			} else {
-				if ( !pl.gc.move_negy() ) pl.state = PlacementLocation.INVALID;
-				pl.negative = true;
+				if ( !_pl.gc.move_negy() ) _pl.state = PlacementLocation.INVALID;
+				_pl.negative = true;
 			}
 			break;
 		case Globals.AXIS_Z:
 			if ( 0 < diffPos.z ) {
-				if ( !pl.gc.move_posz() ) pl.state = PlacementLocation.INVALID;
-				pl.positive = true;
+				if ( !_pl.gc.move_posz() ) _pl.state = PlacementLocation.INVALID;
+				_pl.positive = true;
 			} else {	
-				if ( !pl.gc.move_negz() ) pl.state = PlacementLocation.INVALID;
-				pl.negative = true;
+				if ( !_pl.gc.move_negz() ) _pl.state = PlacementLocation.INVALID;
+				_pl.negative = true;
 			}
 			break;
 		}
 			
-		return pl;
+		return;
 	}
 	
 	static private function getOxelFromPoint( vm:VoxelModel, gci:GrainCursorIntersection ):Oxel {
@@ -670,12 +674,12 @@ public class EditCursor extends VoxelModel
 			var what:int = oxelTexture;
 			if ( CursorOperationEvent.INSERT_OXEL == cursorOperation )
 			{
-				var placementResult:PlacementLocation = insertLocationCalculate( foundModel );
-				if ( PlacementLocation.INVALID == placementResult.state )
+				insertLocationCalculate( foundModel );
+				if ( PlacementLocation.INVALID == _pl.state )
 					return;
 				
-				//where = placementResult.gci.gc;
-				where = placementResult.gc;
+				//where = _pl.gci.gc;
+				where = _pl.gc;
 			}
 			else
 			{
@@ -738,12 +742,12 @@ public class EditCursor extends VoxelModel
 			if ( CursorOperationEvent.INSERT_OXEL == cursorOperation )
 			{
 				offset = gciCyl.gc.size();
-				var pl:PlacementLocation = insertLocationCalculate( foundModel );
-				if ( PlacementLocation.INVALID == pl.state )
+				insertLocationCalculate( foundModel );
+				if ( PlacementLocation.INVALID == _pl.state )
 					return;
 				
 				//where = temp.gci.gc;						
-				where = pl.gc;
+				where = _pl.gc;
 			}
 			else // CURSOR_OP_DELETE
 			{
@@ -894,4 +898,11 @@ internal class PlacementLocation
 	public var positive:Boolean;
 	public var negative:Boolean;
 	public var state:int = INVALID;
+	
+	public function reset():void {
+		gc.reset();
+		positive = false;
+		negative = false;
+		state = INVALID;
+	}
 }

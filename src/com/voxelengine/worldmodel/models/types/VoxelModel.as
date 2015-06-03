@@ -539,11 +539,12 @@ public class VoxelModel
 	{
 		if ( null ==  $child.instanceInfo.instanceGuid )
 			 $child.instanceInfo.instanceGuid = Globals.getUID();
-		changed = true;
 		//Log.out(  "-------------- VoxelModel.childAdd -  $child: " +  $child.toString() );
 		// remove parent level model
 		Region.currentRegion.modelCache.changeFromParentToChild( $child);
 		_children.push( $child);
+		modelInfo.changed = true;
+		changed = true;
 		$child.instanceInfo.baseLightLevel = instanceInfo.baseLightLevel;
 	}
 	
@@ -553,6 +554,8 @@ public class VoxelModel
 		for each (var child:VoxelModel in _children) {
 			if (child.instanceInfo.instanceGuid ==  $instanceInfo.instanceGuid ) {
 				_children.splice(index, 1);
+				modelInfo.changed = true;
+				changed = true;
 				break;
 			}
 			index++;
@@ -565,12 +568,13 @@ public class VoxelModel
 	}
 	
 	public function childRemove(vm:VoxelModel):void {
-		changed = true;
 		var index:int = 0;
 		for each (var child:VoxelModel in _children) {
 			if (child == vm) {
 				Log.out(  "VoxelModel.childRemove - removing Model: " + child.toString() );
 				_children.splice(index, 1);
+				modelInfo.changed = true;				
+				changed = true;
 				break;
 			}
 			index++;
@@ -610,6 +614,8 @@ public class VoxelModel
 		// This model (vm.instanceInfo.guid) is detaching (ModelEvent.DETACH) from root model (instanceInfo.guid)
 		var me:ModelEvent = new ModelEvent(ModelEvent.DETACH, vm.instanceInfo.instanceGuid, null, null, instanceInfo.instanceGuid);
 		Globals.g_app.dispatchEvent(me);
+		modelInfo.changed = true;				
+		changed = true;
 	}
 	
 	public function childModelFind(guid:String):VoxelModel
