@@ -111,15 +111,11 @@ package com.voxelengine.GUI
 				{
 					_templateLabel.visible = true;
 					_templateName.visible = true;
-					_mi.template = true;
-					_mi.editable = false;
 				}
 				else
 				{
 					_templateLabel.visible = false;	
 					_templateName.visible = false;
-					_mi.template = false;
-					_mi.editable = true;
 				}
 			}
 		}

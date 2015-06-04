@@ -235,13 +235,10 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	public function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
 	public function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
 	public function childrenLoad( $vm:VoxelModel ):void {
-		// if we have no children, let this stand
-		
-		childrenLoaded	= true;
 		if ( childrenToBeLoaded && 0 < childrenToBeLoaded.length)
 		{
 			Log.out( "ModelInfo.childrenLoad - loading " + childrenToBeLoaded.length );
-//			childrenLoaded	= false;
+			childrenLoaded	= false;
 			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			//Log.out( "VoxelModel.processClassJson name: " + metadata.name + " - loading child models START" );
 			for each (var childInstanceInfo:InstanceInfo in childrenToBeLoaded)
@@ -267,6 +264,8 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			childrenReset();
 			//Log.out( "VoxelModel.processClassJson - loading child models END" );
 		}
+		else
+			childrenLoaded	= true;
 		
 		function childLoadingComplete(e:ModelLoadingEvent):void {
 	//		Log.out( "VoxelModel.childLoadingComplete - e: " + e, Log.WARN );
@@ -373,9 +372,10 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// start persistance
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	public function save():void {
 		if ( Globals.online && changed ) {
-			if (  true == animationsLoaded ) {
+			if (  true == animationsLoaded && true == childrenLoaded ) {
 				Log.out( "ModelInfo.save - Saving ModelInfo: " + guid  + " in table: " + table, Log.WARN );
 				changed = false;
 				addSaveEvents();
@@ -386,9 +386,10 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 					
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
 			}
+			Log.out( "ModelInfo.save - Not saving ModelInfo - children OR animations not loaded - guid: " + guid );
 		}
 		else
-			Log.out( "ModelInfo.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
+			Log.out( "ModelInfo.save - Not saving ModelInfo - either offline or NOT changed - guid: " + guid );
 			
 		_data.save();	
 		

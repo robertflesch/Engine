@@ -530,15 +530,8 @@ public class VoxelModel
 			Log.out( "VoxelModel.save - NOT online, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 			return;
 		}
-		
-		if (  false == modelInfo.childrenLoaded ) {
-			Log.out( "VoxelModel.save - children not loaded name: " + _metadata.name );
-			return;
-		}
 			
 		Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
-		//if ( null != metadata.permissions.templateGuid )
-			//metadata.permissions.templateGuid = "";
 				
 		//Log.out( "VoxelModel.save - name: " + metadata.name, Log.WARN );
 		changed = false;

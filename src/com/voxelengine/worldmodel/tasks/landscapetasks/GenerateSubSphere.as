@@ -34,8 +34,6 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var layer:Object = new Object();
 			
 			obj.model = model;
-			model.editable = true;
-			model.template = true;
 			model.biomes = biomes;
 			biomes.layers = layers;
 			layers[0] = layer;
