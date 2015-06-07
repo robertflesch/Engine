@@ -155,10 +155,9 @@ public class PanelModels extends PanelBase
 //				InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_CHANGE, Network.userId, _selectedModel.instanceInfo.guid, 1 ) );
 
 				_selectedModel.dead = true;
-				_selectedModel = null;
 				populateModels( _dictionarySource, _parentModel );
 				buttonsDisable();
-				Globals.g_app.dispatchEvent( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, null ) );
+				UIRegionModelEvent.dispatch( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, _parentModel ) );
 			}
 			else
 				noModelSelected();
@@ -180,7 +179,7 @@ public class PanelModels extends PanelBase
 			buttonsEnable();
 			VoxelModel.selectedModel = _selectedModel
 			// TO DO this is the right path, but probably need a custom event for this...
-			Globals.g_app.dispatchEvent( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, _selectedModel, _parentModel ) );
+			UIRegionModelEvent.dispatch( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, _selectedModel, _parentModel ) );
 			//_parent.childPanelAdd( _selectedModel );
 			//_parent.animationPanelAdd( _selectedModel );
 		}

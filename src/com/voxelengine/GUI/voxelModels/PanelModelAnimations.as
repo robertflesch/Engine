@@ -28,12 +28,12 @@ package com.voxelengine.GUI.voxelModels
 			
 			modelPanelAdd();
 			
-			Globals.g_app.addEventListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
+			UIRegionModelEvent.addListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
         }
 		
 		override public function close():void {
 			super.close();
-			Globals.g_app.removeEventListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
+			UIRegionModelEvent.removeListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
 			
 			_listModels.close();
 			_listModels = null;
@@ -52,6 +52,7 @@ package com.voxelengine.GUI.voxelModels
 		
 		private function selectedModelChanged(e:UIRegionModelEvent):void 
 		{
+			Log.out( "PanelModelAnimations.selectedModelChanged - parentModel: " + ( _parentModel ? _parentModel.metadata.name : "No parent" ), Log.WARN );
 			if ( null == e.voxelModel && _parentModel == e.parentVM )
 				childPanelRemove();
 			// true if our child changed the model
