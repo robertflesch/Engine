@@ -56,12 +56,13 @@ public class VoxelModel
 	private		var	_camera:Camera								= new Camera();
 	private		var	_usesGravity:Boolean; 														
 	private		var	_timer:int 									= getTimer(); 				// INSTANCE NOT EXPORTED
+	private		var _associatedGrain:GrainCursor;											// if this model is part of a larger model
 	
-	protected	var	_stateLock:Boolean 														// INSTANCE NOT EXPORTED
-	protected	var	_changed:Boolean 														// INSTANCE NOT EXPORTED
-	protected	var	_complete:Boolean 														// INSTANCE NOT EXPORTED
-	protected	var	_selected:Boolean 														// INSTANCE NOT EXPORTED
-	protected	var	_dead:Boolean 															// INSTANCE NOT EXPORTED
+	protected	var	_stateLock:Boolean;														// INSTANCE NOT EXPORTED
+	protected	var	_changed:Boolean; 														// INSTANCE NOT EXPORTED
+	protected	var	_complete:Boolean; 														// INSTANCE NOT EXPORTED
+	protected	var	_selected:Boolean; 														// INSTANCE NOT EXPORTED
+	protected	var	_dead:Boolean; 															// INSTANCE NOT EXPORTED
 			
 	private var _hasInventory:Boolean;
 	public function get hasInventory():Boolean 				{ return _hasInventory; }
@@ -88,6 +89,15 @@ public class VoxelModel
 	public 	function get complete():Boolean						{ return _complete; }
 	public 	function set complete(val:Boolean):void				{ _complete = val; }
 	public 	function toString():String 							{ return metadata.toString() + " ii: " + instanceInfo.toString(); }
+	public  function get associatedGrain():GrainCursor			{ return _associatedGrain; }
+	public  function set associatedGrain( $val:GrainCursor ):void	
+	{  
+		if ( null == _associatedGrain )
+			_associatedGrain = new GrainCursor();
+		_associatedGrain.copyFrom( $val ); 
+	}
+
+// TO DO Decouple this, I dislike having every instance of the OxelData have a listener for oxel events
 	public function get oxel():Oxel { return _modelInfo.oxel; }
 	
 	public function get dead():Boolean 							{ return _dead; }
@@ -402,9 +412,11 @@ public class VoxelModel
 	// it also add flow and lighting
 	public function write( $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean
 	{
-		var result:Boolean = modelInfo.data.changeOxel( instanceInfo.modelGuid, $gc, $type, $onlyChangeType );
+		var result:Boolean = modelInfo.changeOxel( $gc, $type, $onlyChangeType );
 		if ( result )
 			changed = true;
+			
+		
 		return result;
 	}
 	
@@ -515,6 +527,7 @@ public class VoxelModel
 		modelInfo.release();
 		instanceInfo.release();
 		metadata.release();	
+		associatedGrain = null;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////

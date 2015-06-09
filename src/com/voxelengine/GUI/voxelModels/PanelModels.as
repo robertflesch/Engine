@@ -8,6 +8,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.voxelModels
 {
+import com.voxelengine.worldmodel.models.ModelCache;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.TypeInfo;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.event.ListEvent;
@@ -155,6 +158,9 @@ public class PanelModels extends PanelBase
 //				InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_CHANGE, Network.userId, _selectedModel.instanceInfo.guid, 1 ) );
 
 				_selectedModel.dead = true;
+				if ( _selectedModel.associatedGrain && _selectedModel.instanceInfo.controllingModel ) {
+					_selectedModel.instanceInfo.controllingModel.write( _selectedModel.associatedGrain, TypeInfo.AIR );
+				}
 				populateModels( _dictionarySource, _parentModel );
 				buttonsDisable();
 				UIRegionModelEvent.dispatch( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, _parentModel ) );

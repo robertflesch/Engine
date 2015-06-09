@@ -44,7 +44,8 @@ public class ModelInfoCache
 	
 	static private function save(e:ModelInfoEvent):void {
 		for each ( var modelInfo:ModelInfo in _modelInfo )
-			modelInfo.save();
+			if ( modelInfo )
+				modelInfo.save();
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////

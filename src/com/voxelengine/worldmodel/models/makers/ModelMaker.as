@@ -75,15 +75,14 @@ public class ModelMaker extends ModelMakerBase {
 			if ( vm )
 				vm.complete = true;
 			
-			markComplete();
+			markComplete( true, vm );
 			if ( vm && _addToRegionWhenComplete )
 				Region.currentRegion.modelCache.add( vm );
 		}
 	}
 	
-	override protected function markComplete( $success:Boolean = true ):void {
+	override protected function markComplete( $success:Boolean, vm:VoxelModel = null ):void {
 		removeListeners();		
-		super.markComplete( $success );
 		makerCountDecrement();
 		if ( 0 == makerCountGet() ) {
 			//Log.out( "ModelMaker.markComplete - makerCount: 0, SHUTTING DOWN SPLASH", Log.WARN );
@@ -97,6 +96,9 @@ public class ModelMaker extends ModelMakerBase {
 			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrivedMetadata );		
 			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );	
 		}		
+		
+		// do this last as it nulls everything.
+		super.markComplete( $success, vm );
 	}
 }	
 }

@@ -65,7 +65,7 @@ public class OxelPersistance extends PersistanceObject
 	
 	public function save():void {
 		if ( Globals.online && true == loaded && true == changed ) {
-			Log.out( "OxelData.save - Saving OxelData: " + guid  + " in table: " + table, Log.WARN );
+			//Log.out( "OxelData.save - Saving OxelData: " + guid  + " in table: " + table, Log.WARN );
 			changed = false;
 			addSaveEvents();
 			if ( _dbo )

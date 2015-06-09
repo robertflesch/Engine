@@ -31,11 +31,11 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	{		
 		static private var _count:int = 0;
 		
-		public function CompletedModel( instanceGuid:String, layer:LayerInfo, taskType:String = TASK_TYPE, taskPriority:int = TASK_PRIORITY ):void {
+		public function CompletedModel( $modelGuid:String, layer:LayerInfo, taskType:String = TASK_TYPE, taskPriority:int = TASK_PRIORITY ):void {
 //			Log.out( "CompletedModel.construct for guid: " + instanceGuid + "  count: " + _count );
 			_startTime = getTimer();
 			_count++;
-			super( instanceGuid, layer, "CompletedModel" );
+			super( $modelGuid, layer, "CompletedModel" );
 		}
 		
 		override public function start():void
@@ -83,8 +83,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			
 			//Log.out( "CompletedModel.start - completedModel: " + _guid + "  count: " + _count );
 				
-			if ( 0 == _count  ) // && _playerLoaded  should I add ( null != Player.player )
-			{
+			if ( 0 == _count  ) { // && _playerLoaded  should I add ( null != Player.player )
 				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _modelGuid );
 				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _modelGuid ) );
 			}

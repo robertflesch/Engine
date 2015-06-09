@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.events
 {
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.events.Event;
 import flash.events.EventDispatcher;
 
@@ -22,27 +23,29 @@ public class ModelLoadingEvent extends Event
 	static public const CRITICAL_MODEL_LOADED:String	= "CRITICAL_MODEL_LOADED";
 	
 	private var _parentModelGuid:String;
-	public function get parentModelGuid():String { return _parentModelGuid; }
-	
+	private var _vm:VoxelModel;
 	private var _modelGuid:String;
 	
 	public function get modelGuid():String { return _modelGuid; }
+	public function get vm():VoxelModel { return _vm; }
+	public function get parentModelGuid():String { return _parentModelGuid; }
 	
-	public function ModelLoadingEvent( $type:String, $modelGuid:String, $parentModelGuid:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelLoadingEvent( $type:String, $modelGuid:String, $parentModelGuid:String = "", $vm:VoxelModel = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
 		_modelGuid = $modelGuid;
 		_parentModelGuid = $parentModelGuid;
+		_vm = $vm;
 	}
 	
 	public override function clone():Event
 	{
-		return new ModelLoadingEvent(type, _modelGuid, _parentModelGuid, bubbles, cancelable);
+		return new ModelLoadingEvent(type, _modelGuid, _parentModelGuid, _vm, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString("ModelLoadingEvent", "modelGuid", "parentModelGuid" );
+		return formatToString("ModelLoadingEvent", "modelGuid", "parentModelGuid", "vm" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

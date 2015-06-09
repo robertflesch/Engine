@@ -9,7 +9,9 @@ package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.TypeInfo;
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.utils.ByteArray;
@@ -38,47 +40,56 @@ import com.voxelengine.utils.transitions.properties.SoundShortcuts;
 public class ModelInfo extends PersistanceObject implements IPersistance
 {
 	private var _childrenToBeLoaded:Vector.<InstanceInfo> 			= new Vector.<InstanceInfo>;// Child models and their relative positions
-	private var _scripts:Vector.<String> 					= new Vector.<String>;		// Default scripts to be used with this model
-	private var _animations:Vector.<Animation> 				= new Vector.<Animation>();	// Animations that this model has
-			
-	private var _fileName:String 							= "INVALID";				// Used for local loading and import of data from local file system
-	private var _biomes:Biomes;															// used to generate terrain and apply other functions to oxel
-	private var _modelClass:String 							= "VoxelModel";				// Class used to instaniate model
-	private var _grainSize:int = 0;														// Used in model generatation
-	private var _modelJson:Object;														// copy of json object used to create this
-	private var _animationInfo:Vector.<Object> 				= new Vector.<Object>();	// ID and name of animations that this model has, before loading
-	private var _animationCount:int;
-	private var _series:int														// used to make sure animation is part of same series when loading
+	private var _scripts:Vector.<String> 							= new Vector.<String>;		// Default scripts to be used with this model
+	private var _animations:Vector.<Animation> 						= new Vector.<Animation>();	// Animations that this model has
+						
+	private var _fileName:String 									= "INVALID";				// Used for local loading and import of data from local file system
+	private var _biomes:Biomes;																	// used to generate terrain and apply other functions to oxel
+	private var _modelClass:String 									= "VoxelModel";				// Class used to instaniate model
+	private var _grainSize:int = 0;																// Used in model generatation
+	private var _modelJson:Object;																// copy of json object used to create this
+	private var _animationInfo:Vector.<Object> 						= new Vector.<Object>();	// ID and name of animations that this model has, before loading
+	private var _animationCount:int;			
+	private var _series:int											// used to make sure animation is part of same series when loading
 	private var _data:OxelPersistance;
 	private var _firstLoadFailed:Boolean;
-	private var _altId:String;													// used to handle loading from biome
+	private var _altGuid:String;									// used to handle loading from biome
+	private var _associatedGrain:GrainCursor;						// associates the model with a grain in the parent model
 	
-	protected 	var	_animationsLoaded:Boolean					= true;
+	protected 	var	_animationsLoaded:Boolean						= true;
 	public 	function get animationsLoaded():Boolean 				{ return _animationsLoaded; }
-	public 	function set animationsLoaded(value:Boolean):void  	{ _animationsLoaded = value; }
-	
-	public function get altId():String 						{ return _altId; }
-	public function get json():Object 						{ return _modelJson; }
-	public function get fileName():String 					{ return _fileName; }
-	public function set fileName(val:String):void 			{ _fileName = val; }
-	public function get biomes():Biomes 					{ return _biomes; }
+	public 	function set animationsLoaded(value:Boolean):void		{ _animationsLoaded = value; }
+			
+	public function get altGuid():String 							{ return _altGuid; }
+	public function get json():Object 								{ return _modelJson; }
+	public function get fileName():String 							{ return _fileName; }
+	public function set fileName(val:String):void 					{ _fileName = val; }
+	public function get biomes():Biomes 							{ return _biomes; }
 	public function get childrenToBeLoaded():Vector.<InstanceInfo> 	{ return _childrenToBeLoaded; }
-	public function get scripts():Vector.<String> 			{ return _scripts; }
-	public function get modelClass():String					{ return _modelClass; }
-	public function set modelClass(val:String):void 		{ _modelClass ? _modelClass = val : _modelClass = "VoxelModel"; }
-	public function get grainSize():int						{ return _grainSize; }
-	public function set grainSize(val:int):void				{ _grainSize = val; }
-	public function get animations():Vector.<Animation> 	{ return _animations; }
-	public function set biomes(value:Biomes):void  			{ _biomes = value; }
-	public function get oxel():Oxel 						{ return _data.oxel; }
+	public function get scripts():Vector.<String> 					{ return _scripts; }
+	public function get modelClass():String							{ return _modelClass; }
+	public function set modelClass(val:String):void 				{ _modelClass ? _modelClass = val : _modelClass = "VoxelModel"; }
+	public function get grainSize():int								{ return _grainSize; }
+	public function set grainSize(val:int):void						{ _grainSize = val; }
+	public function get animations():Vector.<Animation> 			{ return _animations; }
+	public function set biomes(value:Biomes):void  					{ _biomes = value; }
+	public function get oxel():Oxel 								{ return _data.oxel; }
 	public function get data():OxelPersistance  					{ return _data; }
-	
+	public function get associatedGrain():GrainCursor 				{ return _associatedGrain; }
+	public function set associatedGrain(value:GrainCursor):void 	{ _associatedGrain = value; }
 	
 	public function ModelInfo( $guid:String ):void  { 
 		super( $guid, Globals.BIGDB_TABLE_MODEL_INFO ); 
 		_data = new OxelPersistance( guid );
 	}
 	
+	public function changeOxel( $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
+		var result:Boolean = _data.changeOxel( guid, $gc, $type, $onlyChangeType );
+		if ( TypeInfo.AIR == $type )
+			childRemoveByGC( $gc );
+		return result;
+	}
+
 	override public function set guid(value:String):void { 
 		super.guid = value;
 		_data.guid = value;
@@ -178,7 +189,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	}
 	
 	private function retrieveData( $ode:OxelDataEvent):void {
-		if ( guid == $ode.modelGuid || altId == $ode.modelGuid ) {
+		if ( guid == $ode.modelGuid || altGuid == $ode.modelGuid ) {
 			removeListeners();
 			Log.out( "ModelInfo.retrieveData - loaded oxel guid: " + guid );
 			_data = $ode.oxelData;
@@ -191,34 +202,35 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	}
 	
 	private function failedData( $ode:OxelDataEvent):void {
-		if ( guid == $ode.modelGuid || altId == $ode.modelGuid ) {
+		if ( guid == $ode.modelGuid || altGuid == $ode.modelGuid ) {
 			if ( _firstLoadFailed ) {
 				removeListeners();
 				Log.out( "ModelInfo.failedData - unable to process request for guid: " + guid, Log.ERROR );
 				OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, 0, guid, null ) );		
-				return;
 			}
 			else {
 				_firstLoadFailed = true;
-				// this should generate the VMD
-				if ( biomes ) {
-					var layer1:LayerInfo = biomes.layers[0];
-					if ( "LoadModelFromIVM" == layer1.functionName ) {
-						_altId = layer1.data;
-						Log.out( "ModelInfo.failedData - trying to load from local file with alternate name - guid: " + layer1.data, Log.DEBUG );
-						OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, layer1.data, null, ModelBaseEvent.USE_FILE_SYSTEM ) );		
-					}
-					else {
-						Log.out( "ModelInfo.failedData - building bio from layer data", Log.DEBUG );
-						
-						biomes.addToTaskControllerUsingNewStyle( guid );
-					}
-
-				} else {
+				if ( biomes ) // this should generate the VMD
+					loadFromBiomeData();
+				else {
 					removeListeners();
 					Log.out( "ModelInfo.failedData - no alternative processing method: " + guid, Log.ERROR );
+					OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, 0, guid, null ) );		
 				}
 			}
+		}
+	}
+	
+	private function loadFromBiomeData():void {
+		var layer1:LayerInfo = biomes.layers[0];
+		if ( "LoadModelFromIVM" == layer1.functionName ) {
+			_altGuid = layer1.data;
+			Log.out( "ModelInfo.loadFromBiomeData - trying to load from local file with alternate name - guid: " + _altGuid, Log.DEBUG );
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, _altGuid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );		
+		}
+		else {
+			Log.out( "ModelInfo.loadFromBiomeData - building bio from layer data", Log.DEBUG );
+			biomes.addToTaskControllerUsingNewStyle( guid );
 		}
 	}
 
@@ -226,63 +238,6 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		if ( _biomes && _biomes.layers && 0 < _biomes.layers.length )
 			return true;
 		return false;
-	}
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// start child operations
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	protected 	var	_childrenLoaded:Boolean						= true;
-	public function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
-	public function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
-	public function childrenLoad( $vm:VoxelModel ):void {
-		if ( childrenToBeLoaded && 0 < childrenToBeLoaded.length)
-		{
-			Log.out( "ModelInfo.childrenLoad - loading " + childrenToBeLoaded.length );
-			childrenLoaded	= false;
-			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
-			//Log.out( "VoxelModel.processClassJson name: " + metadata.name + " - loading child models START" );
-			for each (var childInstanceInfo:InstanceInfo in childrenToBeLoaded)
-			{
-				// Add the parent model info to the child.
-				childInstanceInfo.controllingModel = $vm;
-				childInstanceInfo.baseLightLevel = $vm.instanceInfo.baseLightLevel;
-				
-				//Log.out( "VoxelModel.childrenLoad - create child of parent.instance: " + instanceInfo.guid + "  - child.instanceGuid: " + child.instanceGuid );					
-				if ( null == childInstanceInfo.modelGuid )
-					continue;
-				// now load the child, this might load from the persistance
-				// or it could be an import, or it could be a model for the toolbar.
-				// we never want to prompt for imported children, since this only happens in dev mode.
-				// to test if we are in the bar mode, we test of instanceGuid.
-				// Since this is a child object, it automatically get added to the parent.
-				// So add to cache just adds it to parent instance.
-				//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
-				Log.out( "VoxelModel.childrenLoad - calling load on ii: " + childInstanceInfo );
-				ModelMakerBase.load( childInstanceInfo, true, false );
-			}
-			Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
-			childrenReset();
-			//Log.out( "VoxelModel.processClassJson - loading child models END" );
-		}
-		else
-			childrenLoaded	= true;
-		
-		function childLoadingComplete(e:ModelLoadingEvent):void {
-	//		Log.out( "VoxelModel.childLoadingComplete - e: " + e, Log.WARN );
-			if ( e.parentModelGuid == guid ) {
-				//Log.out( "VoxelModel.childLoadingComplete - for modelGuid: " + instanceInfo.modelGuid, Log.WARN );
-				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
-				// if we save the model, before it is complete, we put bad child data into model info
-				childrenLoaded = true;
-			}
-		}
-		
-		// remove the children after they are loaded, so that when the object is saved
-		// the active children from the voxel model are used.
-		// Applies to the "REPLACE_ME" above
-		function childrenReset():void {
-			_childrenToBeLoaded = null;
-		}
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -376,7 +331,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	public function save():void {
 		if ( Globals.online && changed ) {
 			if (  true == animationsLoaded && true == childrenLoaded ) {
-				Log.out( "ModelInfo.save - Saving ModelInfo: " + guid  + " in table: " + table, Log.WARN );
+				//Log.out( "ModelInfo.save - Saving ModelInfo: " + guid  + " in table: " + table, Log.WARN );
 				changed = false;
 				addSaveEvents();
 				if ( _dbo )
@@ -450,6 +405,8 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		_obj.modelClass = _modelClass;
 		// biomes:			_biomes,      // Biomes are only used in object generation, once the object has been completed they are removed.
 		_obj.grainSize =  getGrainSize();
+		if ( null != associatedGrain )
+		_obj.associatedGrain = associatedGrain;
 		
 		childrenGet();
 		modelsScriptOnly();
@@ -595,6 +552,84 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	public	function get children():Vector.<VoxelModel>			{ return _children; }
 	public	function 	 childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
 	
+	protected 	var	_childrenLoaded:Boolean						= true;
+	public function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
+	public function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
+	/////////////////////
+	public function childrenLoad( $vm:VoxelModel ):void {
+		if ( childrenToBeLoaded && 0 < childrenToBeLoaded.length)
+		{
+			Log.out( "ModelInfo.childrenLoad - loading " + childrenToBeLoaded.length );
+			childrenLoaded	= false;
+			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
+			//Log.out( "VoxelModel.processClassJson name: " + metadata.name + " - loading child models START" );
+			for each (var childInstanceInfo:InstanceInfo in childrenToBeLoaded)
+			{
+				// Add the parent model info to the child.
+				childInstanceInfo.controllingModel = $vm;
+				childInstanceInfo.baseLightLevel = $vm.instanceInfo.baseLightLevel;
+				
+				//Log.out( "VoxelModel.childrenLoad - create child of parent.instance: " + instanceInfo.guid + "  - child.instanceGuid: " + child.instanceGuid );					
+				if ( null == childInstanceInfo.modelGuid )
+					continue;
+				// now load the child, this might load from the persistance
+				// or it could be an import, or it could be a model for the toolbar.
+				// we never want to prompt for imported children, since this only happens in dev mode.
+				// to test if we are in the bar mode, we test of instanceGuid.
+				// Since this is a child object, it automatically get added to the parent.
+				// So add to cache just adds it to parent instance.
+				//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
+				Log.out( "VoxelModel.childrenLoad - calling load on ii: " + childInstanceInfo );
+				ModelMakerBase.load( childInstanceInfo, true, false );
+			}
+			Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
+			childrenReset();
+			//Log.out( "VoxelModel.processClassJson - loading child models END" );
+		}
+		else
+			childrenLoaded	= true;
+		
+		function childLoadingComplete(e:ModelLoadingEvent):void {
+	//		Log.out( "VoxelModel.childLoadingComplete - e: " + e, Log.WARN );
+			if ( e.parentModelGuid == guid ) {
+				//Log.out( "VoxelModel.childLoadingComplete - for modelGuid: " + instanceInfo.modelGuid, Log.WARN );
+				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
+				// if we save the model, before it is complete, we put bad child data into model info
+				childrenLoaded = true;
+			}
+		}
+		
+		// remove the children after they are loaded, so that when the object is saved
+		// the active children from the voxel model are used.
+		// Applies to the "REPLACE_ME" above
+		function childrenReset():void {
+			_childrenToBeLoaded = null;
+		}
+	}
+	
+
+	public function childRemoveByGC( $gc:GrainCursor ):Boolean {
+		
+		var index:int = 0;
+		var gc:GrainCursor;
+		var result:Boolean;
+		for each (var child:VoxelModel in _children) {
+			if ( !child || !child.associatedGrain )
+				continue;
+			gc = child.associatedGrain;	
+			if ( gc.is_equal( $gc ) ) {
+				_children.splice(index, 1);
+				result = true;
+				break;
+			}
+			index++;
+		}
+		return result;
+		// Need a message here?
+		//var me:ModelEvent = new ModelEvent( ModelEvent.REMOVE, vm.instanceInfo.guid, instanceInfo.guid );
+		//Globals.g_app.dispatchEvent( me );
+	}
+
 	public function childAdd( $child:VoxelModel):void
 	{
 		if ( null ==  $child.instanceInfo.instanceGuid )
@@ -619,7 +654,6 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			index++;
 		}
 		
-		//modelInfo.childRemove( $instanceInfo );
 		// Need a message here?
 		//var me:ModelEvent = new ModelEvent( ModelEvent.REMOVE, vm.instanceInfo.guid, instanceInfo.guid );
 		//Globals.g_app.dispatchEvent( me );

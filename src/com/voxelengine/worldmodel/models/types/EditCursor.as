@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.ModelLoadingEvent;
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
@@ -310,9 +312,8 @@ public class EditCursor extends VoxelModel
 	
 	
 	public function objectModelSet( $om:VoxelModel ):void {
-		Log.out( "EditCursor.objectModelSet - model: " + $om.toString() + " grain: " + $om.modelInfo.data.oxel.gc.grain, Log.DEBUG );
+		Log.out( "EditCursor.objectModelSet - model: " + $om.toString(), Log.DEBUG );
 		_objectModel = $om;
-		oxel.gc.grain = _objectModel.oxel.gc.grain;
 	}
 	
 	public function drawCursor($mvp:Matrix3D, $context:Context3D, $isChild:Boolean, $alpha:Boolean ):void	{
@@ -346,7 +347,7 @@ public class EditCursor extends VoxelModel
 		// this puts the insert/delete location if appropriate into the gciData
 		if ( _cursorOperation != CursorOperationEvent.NONE )
 			ModelCacheUtils.highLightEditableOxel();
-		
+
 		// We generate gci data for INSERT_MODEL with cursorShape == MODEL_CHILD || MODEL_AUTO
 		if ( gciData ) {
 			if ( _cursorOperation == CursorOperationEvent.INSERT_OXEL || _cursorOperation == CursorOperationEvent.INSERT_MODEL ) {
@@ -380,6 +381,10 @@ public class EditCursor extends VoxelModel
 	private function buildCursorModel():void {	
 		oxel.reset();
 		
+		if ( objectModel ) {
+			oxel.gc.bound = _objectModel.grain;
+			oxel.gc.grain = _objectModel.grain;
+		}
 		if ( CursorShapeEvent.CYLINDER == cursorShape || CursorShapeEvent.SPHERE == cursorShape ) {
 			// I could use gciData.near to determine which single face to use, but seems like overkill
 			if ( Globals.AXIS_X == _gciData.axis ) {
@@ -484,13 +489,25 @@ public class EditCursor extends VoxelModel
 		var ii:InstanceInfo = objectModel.instanceInfo.clone();
 		if ( VoxelModel.selectedModel )
 			ii.controllingModel = VoxelModel.selectedModel;
+			
+		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelInsertComplete );			
 		ModelMakerBase.load( ii );
 		
 		// This places an oxel that is invisible, but collidable at the same location as the model
 		// This should lock the model to that location, otherwise the oxel is invalid.
 		if ( VoxelModel.selectedModel )
 			VoxelModel.selectedModel.write( _pl.gc, 101 );
+			
+		//Now we need to listen for the model to be built, then use associatedGrain to see the location on the new ModelBaseEvent
+		function modelInsertComplete( $mle:ModelLoadingEvent ): void {
+			if ( $mle.modelGuid == ii.modelGuid && $mle.vm.instanceInfo.instanceGuid == ii.instanceGuid ) {
+				Log.out( "EditCursor.insertModel - Set associated grain here", Log.WARN );
+				$mle.vm.associatedGrain = _pl.gc;
+			}
+		}
 	}
+	
+	
 	
 	private function insertOxel(recurse:Boolean = false):void {
 		if ( CursorOperationEvent.INSERT_OXEL != cursorOperation )
