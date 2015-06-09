@@ -11,6 +11,7 @@ import com.voxelengine.Log;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.events.WindowSplashEvent;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
@@ -43,12 +44,12 @@ public class ModelMakerLocal extends ModelMakerBase {
 			if ( vm )
 				Region.currentRegion.modelCache.add( vm );
 			
-			markComplete();
+			markComplete( true, vm );
 		}
 	}
 	
-	override protected function markComplete( $success:Boolean = true ):void {
-		super.markComplete( $success );
+	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
+		super.markComplete( $success, $vm );
 		makerCountDecrement();
 		if ( 0 == makerCountGet() ) {
 			//Log.out( "ModelMakerLocal.markComplete - makerCount: 0, SHUTTING DOWN SPLASH", Log.WARN );

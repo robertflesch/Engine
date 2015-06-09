@@ -93,19 +93,19 @@ public class ModelMakerBase {
 		return vm;
 	}
 
-	protected function markComplete( $success:Boolean = true ):void {
+	protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
 		removeListeners();
 		if ( $success )
-			ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid ) );
+			ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid, _parentModelGuid, $vm ) );
 		else	
-			ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_FAILURE, _ii.modelGuid ) );
+			ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_FAILURE, _ii.modelGuid, _parentModelGuid ) );
 		
 		//Log.out( "ModelMakerBase.markComplete - " + ($success ? "SUCCESS" : "FAILURE" ) + "  ii: " + _ii + "  success: " + $success, Log.DEBUG );
 		if ( _parentModelGuid ) {
 			var count:int = _s_parentChildCount[_parentModelGuid];
 			_s_parentChildCount[_parentModelGuid] = --count;
 			if ( 0 == count )
-				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _ii.modelGuid, _parentModelGuid ) );
+				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _ii.modelGuid, _parentModelGuid, $vm ) );
 		}
 		_vmm = null;
 		_vmi = null;

@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.models.makers
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.utils.ByteArray;
 import org.flashapi.swing.Alert;
 
@@ -87,7 +88,7 @@ public class ModelMakerImport extends ModelMakerBase {
 				Region.currentRegion.modelCache.add( vm );
 			}
 			
-			markComplete();
+			markComplete( true, vm );
 		}
 	}
 	
@@ -99,12 +100,12 @@ public class ModelMakerImport extends ModelMakerBase {
 		}
 	}
 	
-	override protected function markComplete( $success:Boolean = true ):void {
+	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
 		if ( false == $success && _vmi && _vmi.boimeHas() ) {
 			Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + _vmi.biomes.toString(), Log.WARN );
 			return;
 		}
-		super.markComplete( $success );
+		super.markComplete( $success, $vm );
 	}
 }	
 }

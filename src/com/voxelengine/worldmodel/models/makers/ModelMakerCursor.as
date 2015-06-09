@@ -40,12 +40,12 @@ public class ModelMakerCursor extends ModelMakerBase {
 			var vm:* = make();
 			if ( vm )
 				EditCursor.currentInstance.objectModelSet( vm );
-			markComplete();
+			markComplete( true, vm );
 		}
 	}
 	
-	override protected function markComplete( $success:Boolean = true ):void {
-		super.markComplete( $success );
+	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
+		super.markComplete( $success, $vm );
 		makerCountDecrement();
 		if ( 0 == makerCountGet() ) {
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );

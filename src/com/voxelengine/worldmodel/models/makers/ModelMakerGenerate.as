@@ -78,13 +78,8 @@ public class ModelMakerGenerate extends ModelMakerBase {
 				vm.save();
 				Region.currentRegion.modelCache.add( vm );
 			}
-			markComplete();
+			markComplete( true, vm );
 		}
-	}
-	
-	override protected function markComplete( $success:Boolean = true ):void {
-		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
-		ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid ) );
 	}
 }	
 }
