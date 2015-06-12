@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.oxel
 {
 	import com.voxelengine.events.InventoryVoxelEvent;
 	import com.voxelengine.events.LightEvent;
+	import com.voxelengine.renderer.Chunk;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.worldmodel.inventory.InventoryManager;
 	import flash.display3D.Context3D;
@@ -27,7 +28,7 @@ package com.voxelengine.worldmodel.oxel
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.ImpactEvent;
 	import com.voxelengine.utils.Plane;
-	import com.voxelengine.renderer.VertexManager;
+//	import com.voxelengine.renderer.VertexManager;
 	import com.voxelengine.renderer.Quad;
 	import com.voxelengine.renderer.shaders.Shader;
 	import com.voxelengine.pools.*;
@@ -74,22 +75,30 @@ package com.voxelengine.worldmodel.oxel
 		//     Member Variables
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		private var _gc:GrainCursor 			= null; // Object that give us our location allocates memory for the grain
-		private var _parent:Oxel 				= null;	// passed to use when created
-		private var _children:Vector.<Oxel> 	= null; // These are created when needed
-		private var _neighbors:Vector.<Oxel>	= null;	// 8 children but 6 neighbors, created when needed
-		private var _quads:Vector.<Quad> 		= null;	// Quads that are drawn on card, created when needed
-		private var _vertMan:VertexManager 		= null; // created when needed
-		private var _lighting:Lighting			= null;
-		private var _flowInfo:FlowInfo 			= null; // used to count up and out in flowing oxel ( only uses 2 bytes, down, out )
+		private var _childCount:uint;
+		private var _gc:GrainCursor; 			// Object that give us our location allocates memory for the grain
+		private var _parent:Oxel;				// passed to use when created
+		private var _children:Vector.<Oxel>; 	// These are created when needed
+		private var _neighbors:Vector.<Oxel>;	// 8 children but 6 neighbors, created when needed
+		private var _quads:Vector.<Quad>;		// Quads that are drawn on card, created when needed
+		private var _chunk:Chunk; 	// created when needed
+		private var _lighting:Lighting;
+		private var _flowInfo:FlowInfo; 		// used to count up and out in flowing oxel ( only uses 2 bytes, down, out )
+		
 		override public function set dirty( $isDirty:Boolean ):void { 
 			super.dirty = $isDirty;
-			if ( $isDirty )
-			{
-				// recursively mark all the parents as dirty
-				if ( _parent && !_parent.dirty ) 
-					_parent.dirty = true;
+			
+			// if I am an oxel that is part of a larger chunk
+			// then mark myself dirty recurvsively until we hit the chunk
+			if ( null == _chunk ) {
+				if ( $isDirty )	{
+					// recursively mark all the parents as dirty
+					if ( _parent && !_parent.dirty ) 
+						_parent.dirty = true;
+				}
 			}
+			else
+				chunk().dirty = true;
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -153,41 +162,7 @@ package com.voxelengine.worldmodel.oxel
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//     End Online liners
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		public function vm_get():VertexManager { return _vertMan ? _vertMan : _parent ? _parent.vm_get() : null; }
-		
-		public function vertexMangerAssign( $stats:ModelStatisics ):void {
-			if ( null == _parent )
-			{
-				//Log.out( "Oxel.vm_initialize - This should only happen ONCE PER MODEL --------------------------------------" );
-				// TODO a pool for these makes sense, but doesnt happen that often.
-				_vertMan = new VertexManager( gc, null );
-				// Only set minGrain for root oxel
-				if ( 8 < gc.bound  )
-				{
-					if ( 4 <= $stats.range )
-						_vertMan.minGrain = $stats.largest + 1; 
-					else
-						_vertMan.minGrain = $stats.rootSize;
-				}
-				else
-				{
-					if ( 11 < gc.bound )
-						_vertMan.minGrain = gc.bound - 2;
-				}
-			}
-			else if ( vm_get() )
-			{
-				// If this is exactly the same size the the min grain, then give it it's own vertexManager
-				if ( vm_get().minGrain == gc.grain )
-				{
-					// We should inherit the min grain size from our parent
-					var minGrain:int = vm_get().minGrain
-					//Log.out( "Oxel.vm_initialize - Grabbing sub vertex manager: gc.grain: " + gc.grain + "  vm_get().minGrain: " + vm_get().minGrain );
-					_vertMan = new VertexManager( gc, vm_get() );
-					_vertMan.minGrain = minGrain;
-				}
-			}		
-		}
+		public function chunk():Chunk { return _chunk ? _chunk : _parent ? _parent.chunk() : null; }
 
 		// This defines a one (1) meter cube in world
 		public function size_in_world_coordinates():uint { return GrainCursor.get_the_g0_size_for_grain(gc.grain); }
@@ -198,7 +173,15 @@ package com.voxelengine.worldmodel.oxel
 		
 //		public function get isLight():Boolean { return TypeInfo.typeInfo[type].lightInfo.lightSource; }
 		
-		public function get vertMan():VertexManager { return _vertMan; }
+		public function get vertMan():Chunk 				{ return _chunk; }
+		public function set vertMan( $vertMan:Chunk ):void 	{ _chunk = $vertMan; }
+		
+		public function get childCount():uint  						{ return _childCount; }
+		public function set childCount(value:uint):void { 
+			if ( _parent )
+				_parent.childCount = value; 
+			_childCount += value;	
+		}
 		
 		
 		// Intentionally empty, since these are allocated enmase in pool
@@ -218,13 +201,15 @@ package com.voxelengine.worldmodel.oxel
 			return true;
 		}
 		
-		static public function initializeRoot( $grainSize:int, $baseLightLevel:int ):Oxel
+		static public function initializeRoot( $grainBound:int, $baseLightLevel:int ):Oxel
 		{
 			try {
+				var gct:GrainCursor = GrainCursorPool.poolGet( $grainBound )
+				gct.grain = $grainBound;
 				var oxel:Oxel = OxelPool.poolGet();
-				var gct:GrainCursor = GrainCursorPool.poolGet($grainSize)
-				gct.grain = $grainSize;
-				oxel.initialize(null, gct, 0, TypeInfo.AIR, null);
+				oxel.initialize(null, gct, 0, TypeInfo.AIR);
+				GrainCursorPool.poolDispose( gct );
+				
 				oxel.lighting = LightingPool.poolGet( $baseLightLevel );
 				Lighting.defaultBaseLightAttn = $baseLightLevel;
 			}
@@ -235,6 +220,27 @@ package com.voxelengine.worldmodel.oxel
 			//Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.guid: " + instanceInfo.guid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + Globals.Info[type].name );					
 		}
 		
+		// This is used to initialize all oxel nodes that are read from the byte array
+		public function initialize( $parent:Oxel, $gc:GrainCursor, $data:uint, $type:uint ):void {
+
+			_parent = $parent;
+			dataRaw( $data, $type );
+			_gc = GrainCursorPool.poolGet( $gc.bound );
+			_gc.copyFrom( $gc );
+			
+			// Since this is from byteArray, I dont need to perform operations on the chunks.
+			super.dirty = true;
+			
+			if ( TypeInfo.flowable( type ) )
+			{
+				if ( $parent && $parent.flowInfo )
+					flowInfo = $parent.flowInfo.clone();
+				else
+					flowInfo = TypeInfo.typeInfo[type].flowInfo.clone();
+			}
+		}
+		
+
 		public function validate():void
 		{
 			// validate gc?
@@ -282,11 +288,12 @@ package com.voxelengine.worldmodel.oxel
 			// removed the brightness
 			vertManRemoveOxel();
 			
-			if ( _vertMan )
-			{
-				_vertMan.release();
-				_vertMan = null;
-			}
+			Log.out( "Oxel.release - TODO how do I release vertexOctTree node when last oxel is removed?", Log.WARN );
+			//if ( _vertMan )
+			//{
+				//_vertMan.release();
+				//_vertMan = null;
+			//}
 
 			if ( gc )
 			{
@@ -622,7 +629,7 @@ package com.voxelengine.worldmodel.oxel
 				_children[i]  = OxelPool.poolGet();
 				gct.copyFrom( gc );
 				gct.become_child( i );   
-				_children[i].initialize( this, gct, 0, type, null );
+				_children[i].initialize( this, gct, 0, type );
 				// use the super so you dont start a flow event on flowable types.
 				// No longer used, not sure if above comment is valid.
 				//super.faces_mark_all_dirty();
@@ -923,8 +930,6 @@ package com.voxelengine.worldmodel.oxel
 		}
 		
 		public function changeGrainSize( changeSize:int, newBound:int ):void {
-			if ( _vertMan )
-				_vertMan.minGrain =  _vertMan.minGrain + changeSize;
 			if ( childrenHas() )
 			{
 				gc.bound = newBound;
@@ -1164,9 +1169,9 @@ package com.voxelengine.worldmodel.oxel
 			//Log.out( "Oxel.cleanup - name: " + $md.name + " - guid: " + $md.guid );					
 			_s_oxelsCreated = 0;
 			_s_oxelsEvaluated = 0;
-			facesBuildWater();
-			Log.out( "Oxel.cleanup - facesBuildWater took: " + (getTimer() - timer) + "  oxels eval: " + _s_oxelsEvaluated + "  oxels created: " + _s_oxelsCreated );					
-			timer = getTimer();
+//			facesBuildWater();
+//			Log.out( "Oxel.cleanup - facesBuildWater took: " + (getTimer() - timer) + "  oxels eval: " + _s_oxelsEvaluated + "  oxels created: " + _s_oxelsCreated );					
+//			timer = getTimer();
 			facesBuild();
 			Log.out( "Oxel.cleanup - facesBuild - took: " + (getTimer() - timer) );					
 			timer = getTimer();
@@ -1175,12 +1180,7 @@ package com.voxelengine.worldmodel.oxel
 			if ( 3 < time )
 				Log.out( "Oxel.cleanup - quadsBuild -  took: " + time );					
 		}
-		
-		public function buildQuadsFromLoadedData():void {
-			quadsBuild();
-			Log.out( "Oxel.buildQuadsFromLoadedData - quadsBuild" );					
-		}
-		
+		/*
 		public function facesBuildWater():void {
 			if ( dirty ) {
 				if ( childrenHas())
@@ -1225,11 +1225,13 @@ package com.voxelengine.worldmodel.oxel
 				}
 			}
 		}
-		
+		*/
 		public var timeBuilding:int;
 		public function facesBuild():Boolean {
 //			if ( MAX_BUILD_TIME < getTimer() - timeBuilding )
 //				return false;
+
+			//facesBuildWater();
 				
 			var continueProcessing:Boolean = true;
 			if ( dirty )
@@ -1763,18 +1765,19 @@ package com.voxelengine.worldmodel.oxel
 			if ( added_to_vertex )
 			{
 				// Todo - this should just mark the oxels, and clean up should happen later
-				vm_get().oxelRemove( this, type );
+				chunk().oxelRemove( this, type );
 				added_to_vertex = false;
 			}
 		}
 		
 		private function vertManAddOxel():void {
 			added_to_vertex = true;
-			vm_get().oxelAdd( this );
+			chunk().oxelAdd( this );
 		}
 		
 		protected function vertManMarkDirty( oldType:int ):void {
-			vm_get().VIBGet( type, oldType ).dirty = true;
+			//vm_get().VIBGet( type, oldType ).dirty = true;
+			chunk().dirty = true;
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1868,12 +1871,11 @@ package com.voxelengine.worldmodel.oxel
 		{
 			var faceData:uint = $ba.readUnsignedInt();
 			if ( $version <= Globals.VERSION_006 )
-				initialize( $parent, $gc, OxelBitfields.dataFromRawDataOld( faceData ), OxelBitfields.typeFromRawDataOld( faceData ), $stats );	
+				initialize( $parent, $gc, OxelBitfields.dataFromRawDataOld( faceData ), OxelBitfields.typeFromRawDataOld( faceData ) );	
 			else {
 				var typeData:uint = $ba.readUnsignedInt();
-				initialize( $parent, $gc, faceData, typeData, $stats );	
+				initialize( $parent, $gc, faceData, typeData );	
 			}
-				
 			
 			// Bad data check
 			if ( OxelBitfields.data_is_parent( faceData ) && TypeInfo.AIR != type )
@@ -1912,6 +1914,7 @@ package com.voxelengine.worldmodel.oxel
 			
 			if ( OxelBitfields.data_is_parent( faceData ) )
 			{
+				childCount = 8;
 				_children = ChildOxelPool.poolGet();
 				var gct:GrainCursor = GrainCursorPool.poolGet( $stats.largest );
 				for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
@@ -1923,6 +1926,10 @@ package com.voxelengine.worldmodel.oxel
 				}
 				GrainCursorPool.poolDispose( gct );
 			}
+			else {
+				childCount = 1;
+				$stats.statAdd( type, gc.grain );
+			}
 
 			return $ba;
 		}
@@ -1931,7 +1938,7 @@ package com.voxelengine.worldmodel.oxel
 		{
 			var oxelData:uint = $ba.readInt();
 			//trace( intToHexString() + "  " + oxelData );
-			initialize( $parent, $gc, oxelData, OxelBitfields.typeFromRawDataOld( oxelData ), $stats );
+			initialize( $parent, $gc, oxelData, OxelBitfields.typeFromRawDataOld( oxelData ) );
 			if ( OxelBitfields.data_is_parent( oxelData ) && TypeInfo.AIR != type )
 			{
 				Log.out( "Oxel.readData - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
@@ -1940,7 +1947,7 @@ package com.voxelengine.worldmodel.oxel
 			if ( OxelBitfields.data_is_parent( oxelData ) )
 			{
 				_children = ChildOxelPool.poolGet();
-				var gct:GrainCursor = GrainCursorPool.poolGet( $stats.rootSize );
+				var gct:GrainCursor = GrainCursorPool.poolGet( gc.bound );
 				for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
 				{
 					_children[i]  = OxelPool.poolGet();
@@ -1952,29 +1959,6 @@ package com.voxelengine.worldmodel.oxel
 			}
 			
 			return $ba;
-		}
-		
-		// This is used to initialize all oxel nodes that are read from the byte array
-		public function initialize( $parent:Oxel, $gc:GrainCursor, $data:uint, $type:uint, $stats:ModelStatisics ):void {
-
-			_parent = $parent;
-			dataRaw( $data, $type );
-			_gc = GrainCursorPool.poolGet( $gc.bound );
-			_gc.copyFrom( $gc );
-			
-			if ( facesHas() )
-				dirty = true;
-			
-			if ( TypeInfo.flowable( type ) )
-			{
-				if ( $parent && $parent.flowInfo )
-					flowInfo = $parent.flowInfo.clone();
-				else
-					flowInfo = TypeInfo.typeInfo[type].flowInfo.clone();
-			}
-			
-			if ( $stats )
-				vertexMangerAssign( $stats );
 		}
 		
 		private function intToHexString( $val:int ):String
@@ -2676,7 +2660,7 @@ package com.voxelengine.worldmodel.oxel
 				child.reboundAll( newBound );
 			}
 		}
-		
+		/*
 		// { oxel:Globals.BAD_OXEL, gci:gci, positive:posMove, negative:negMove };
 		// RSF - This only works correctly on the + sides, fails for some reason on neg side.
 		public function grow( result:Object ):Oxel {
@@ -2695,11 +2679,11 @@ package com.voxelengine.worldmodel.oxel
 			// TODO - RSF 
 			// This is potential problem - might need to change level _vertexManagers are created at. 
 			// Otherwise all new oxels will be created off this one vertexManager
-			newOxel._vertMan = this._vertMan;
+			newOxel._chunk = this._chunk;
 			newOxel.childrenCreate();
 			
 			this._parent = newOxel;
-			this._vertMan = null;
+			this._chunk = null;
 
 			// depending on what axis, and what movement it was, we choose which child to replace.
 			switch ( result.gci.axis )
@@ -2747,7 +2731,7 @@ package com.voxelengine.worldmodel.oxel
 			
 			return newOxel;
 		}
-		
+		*/
 		public function growTreesOn( $instanceGuid:String, $type:int, $chance:int = 2000 ):void {
 			if ( childrenHas() )
 			{
@@ -3004,7 +2988,7 @@ package com.voxelengine.worldmodel.oxel
 				calculateGC();
 			Log.out( "Oxel.breakFromParent - This should NEVER happen " );
 			// God know what this should be at this point
-			_vertMan = new VertexManager( gc, null );
+//			_vertMan = new VertexManager( gc, null );
 			_parent = null;
 		}
 		
@@ -3181,6 +3165,7 @@ package com.voxelengine.worldmodel.oxel
 			}
 		}
 		
+		facesBuild();		
 		return result;
 	}
 	

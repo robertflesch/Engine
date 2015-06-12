@@ -133,6 +133,18 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
 		if ( $isAlpha )
+			_data._topMostChunk.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
+		else
+			_data._topMostChunk.drawNew( $mvp, $vm, $context, $selected, $isChild );
+			
+		for each (var vm:VoxelModel in _children) {
+			if (vm && vm.complete)
+				vm.draw($mvp, $context, true, $isAlpha );
+		}
+	}
+/*
+	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
+		if ( $isAlpha )
 			_data.oxel.vertMan.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
 		else
 			_data.oxel.vertMan.drawNew( $mvp, $vm, $context, $selected, $isChild );
@@ -141,9 +153,8 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			if (vm && vm.complete)
 				vm.draw($mvp, $context, true, $isAlpha );
 		}
-			
 	}
-
+*/
 	override public function release():void {
 		_biomes = null;
 		_childrenToBeLoaded = null;

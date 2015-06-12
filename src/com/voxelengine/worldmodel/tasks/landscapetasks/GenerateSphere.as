@@ -80,7 +80,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			// CRITICAL STEP FOR GENERATION TASKS. when drawing the oxel, it expects to have faces, not dirty faces
 			// So this step turns the dirty faces into real faces.
 			// for multistep builds I will have to ponder this more.
-			oxel.facesBuildWater();
+			//oxel.facesBuildWater();
 			oxel.facesBuild();
 			
 			var ba:ByteArray = OxelPersistance.toByteArray( oxel );

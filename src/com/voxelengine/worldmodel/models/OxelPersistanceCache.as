@@ -21,13 +21,14 @@ import com.voxelengine.events.PersistanceEvent;
  * ...
  * @author Bob
  */
-public class OxelDataCache
+public class OxelPersistanceCache
 {
 	// this acts as a holding spot for all model objects loaded from persistance
 	// dont use weak keys since this is THE spot that holds things.
 	static private var _oxelDataDic:Dictionary = new Dictionary(false);
+	static private var _block:Block = new Block();
 	
-	public function OxelDataCache() {}
+	public function OxelPersistanceCache() {}
 	
 	static public function init():void {
 		// These are the events that this object listens for.
@@ -48,6 +49,12 @@ public class OxelDataCache
 			Log.out( "OxelDataCache.modelDataRequest guid rquested is NULL: ", Log.WARN );
 			return;
 		}
+		
+		if ( _block.has( $ode.modelGuid ) )	
+			return;
+		else
+			_block.add( $ode.modelGuid );
+		
 		//Log.out( "OxelDataCache.request guid: " + $ode.modelGuid, Log.DEBUG );
 		var od:OxelPersistance = _oxelDataDic[$ode.modelGuid]; 
 		if ( null == od ) {
@@ -103,6 +110,8 @@ public class OxelDataCache
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
 		Log.out( "OxelDataCache.loadFailed " + $pe.toString(), Log.WARN );
+		if ( _block.has( $pe.guid ) )
+			_block.clear( $pe.guid )
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
@@ -110,6 +119,8 @@ public class OxelDataCache
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
 		//Log.out( "OxelDataCache.loadNotFound " + $pe.toString(), Log.WARN );
+		if ( _block.has( $pe.guid ) )
+			_block.clear( $pe.guid )
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,6 +135,8 @@ public class OxelDataCache
 		} else if ( null == _oxelDataDic[$od.guid] ) { // check to make sure this is new data
 			//Log.out( "OxelDataCache.add adding: " + $od.modelGuid, Log.INFO );
 			_oxelDataDic[$od.guid] = $od; 
+			if ( _block.has( $od.guid ) )
+				_block.clear( $od.guid )
 			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.ADDED, $series, $od.guid, $od ) );
 		} else
 			Log.out( "OxelDataCache.Add trying to add duplicate OxelData", Log.WARN );

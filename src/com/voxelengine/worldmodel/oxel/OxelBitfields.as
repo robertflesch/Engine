@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship public     under United States Copyright Act.
@@ -64,9 +64,6 @@ package com.voxelengine.worldmodel.oxel
 		// type 1
 		private static const OXEL_DATA_TYPE_1_MASK_CLEAR:uint 		= 0xffff0000;
 		private static const OXEL_DATA_TYPE_1_MASK:uint				= 0x0000ffff;
-		// type 2
-		private static const OXEL_DATA_TYPE_2_MASK_CLEAR:uint 		= 0x0000ffff;
-		private static const OXEL_DATA_TYPE_2_MASK:uint				= 0xffff0000;
 
 		private var _data:uint = 0;					// holds face data
 		private var _type:uint = 0;					// holds type data
@@ -91,18 +88,12 @@ package com.voxelengine.worldmodel.oxel
 			_type &= OXEL_DATA_TYPE_1_MASK_CLEAR;
 			_type |= (val & OXEL_DATA_TYPE_1_MASK); 
 		}
-		public function get mask():int 							{ return (_type & OXEL_DATA_TYPE_2_MASK); }
-		public function set mask( val:int ):void { 
-			_type &= OXEL_DATA_TYPE_2_MASK_CLEAR;
-			_type |= ( (val << 16) & OXEL_DATA_TYPE_2_MASK); 
-		}
-		
+
 		private static const OXEL_DATA_TYPE_MASK_CLEAR:uint 		= 0xfffffc00;
 		private static const OXEL_DATA_TYPE_OLD_MASK:uint			= 0x000003ff;
 				
 			   protected 	function maskTempData():uint 					{ return _data & OXEL_DATA_TYPE_MASK_TEMP; }
 		static public 		function type1FromData( $data:uint ):uint 		{ return $data & OXEL_DATA_TYPE_1_MASK; }
-		static public 		function type2FromData( $data:uint ):uint 		{ return $data & OXEL_DATA_TYPE_2_MASK; }
 		static public 		function typeFromRawDataOld( $data:uint ):uint	{ return $data & OXEL_DATA_TYPE_OLD_MASK; }
 		static public 		function dataFromRawDataOld( $data:uint ):uint	{ return $data & OXEL_DATA_TYPE_MASK_CLEAR; }
 		
@@ -146,6 +137,30 @@ package com.voxelengine.worldmodel.oxel
 		}
 		
 		public  	function facesHas():Boolean					{  return 0 < (_data & OXEL_DATA_FACES);  }
+		
+		import flash.utils.Dictionary;
+		private static var faceCountLookup:Dictionary = new Dictionary();
+		{
+			 faceCountLookup[0] = 0;
+			 faceCountLookup[1] = 1;
+			 faceCountLookup[2] = 1;
+			 faceCountLookup[3] = 2;
+			 faceCountLookup[4] = 1;
+			 faceCountLookup[5] = 2;
+			 faceCountLookup[6] = 2;
+			 faceCountLookup[7] = 3;
+		}
+		
+		public  	function faceCount():int					{  
+			var faces:uint = _data & OXEL_DATA_FACES; 
+			var lower:int = faces >>> 25;
+			lower &= 0x000111;
+			var higher:int = faces >>> 28;
+			// strip leading bit
+			var count:int = faceCountLookup[lower] + faceCountLookup[higher];
+			return count;
+		}
+		
 		protected  	function face_is_dirty( $face:uint ):Boolean {
 			switch( $face ) {
 				case Globals.POSX:

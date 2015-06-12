@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.models
 import com.adobe.utils.Hex;
 import com.voxelengine.pools.LightingPool;
 import com.voxelengine.pools.OxelPool;
+import com.voxelengine.renderer.Chunk;
 import flash.utils.ByteArray;
 import flash.net.registerClassAlias;
 
@@ -113,7 +114,6 @@ public class OxelPersistance extends PersistanceObject
 		fromByteArray( $ba );
 	}
 	
-	
 	// Make sense, called from for Makers
 	private function extractVersionInfo( $ba:ByteArray ):void {
 		$ba.position = 0;
@@ -159,8 +159,11 @@ public class OxelPersistance extends PersistanceObject
 		}
 	}
 		
+	public var _topMostChunk:Chunk;
 	public function fromByteArray($ba:ByteArray):void {
-	
+
+		Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.WARN );
+		
 		try { $ba.uncompress(); }
 		catch (error:Error) { Log.out( "OxelDataCache.loadSucceed - Was expecting compressed data " + guid, Log.WARN ); }
 		$ba.position = 0;
@@ -170,12 +173,15 @@ public class OxelPersistance extends PersistanceObject
 		var strLen:int = $ba.readInt();
 		// read off that many bytes, even though we are using the data from the modelInfo file
 		var modelInfoJson:String = $ba.readUTFBytes( strLen );
-		if ( null == _oxel )
-			_oxel = OxelPool.poolGet();
-			
+		
 		// Read off 1 bytes, the root size
 		var rootGrainSize:int = $ba.readByte();
-		_statisics.gather( version, $ba, rootGrainSize);
+		if ( null == _oxel )
+			_oxel = Oxel.initializeRoot( rootGrainSize, Lighting.defaultBaseLightAttn );
+		else 
+			Log.out( "OxelPersistance.fromByteArray - Why does oxel exist?", Log.WARN );
+			
+		//_statisics.gather( version, $ba, rootGrainSize);
 		
 		registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);	
 		registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);	
@@ -185,11 +191,11 @@ public class OxelPersistance extends PersistanceObject
 			oxel.readData( null, gct, $ba, _statisics );
 		else
 			oxel.readVersionedData( version, null, gct, $ba, _statisics );
-		
 		GrainCursorPool.poolDispose(gct);
-		oxel.vertexMangerAssign( _statisics );
-		oxel.lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
-		oxel.buildQuadsFromLoadedData();
+		_statisics.gather();
+		_statisics.statsPrint();
+		
+		_topMostChunk = Chunk.parse( oxel, null );
 		_loaded = true;
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this ) );
 	}
@@ -204,7 +210,7 @@ public class OxelPersistance extends PersistanceObject
 		ba.compress();
 		return ba;
 		
-		function writeManifest( $ba:ByteArray ):void {
+		function writeManifest( $ba:ByteArray ):void { 
 			
 			// Always write the manifest into the IVM.
 			/* ------------------------------------------

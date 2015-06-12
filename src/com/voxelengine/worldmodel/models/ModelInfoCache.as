@@ -28,6 +28,7 @@ public class ModelInfoCache
 	// this only loaded ModelInfo from the local files system.
 	// for the online system this information is embedded in the data segment.
 	static private var _modelInfo:Dictionary = new Dictionary(false);
+	static private var _block:Block = new Block();
 	
 	public function ModelInfoCache() {}
 	
@@ -56,8 +57,14 @@ public class ModelInfoCache
 			Log.out( "ModelInfoCache.request requested guid is NULL: ", Log.WARN );
 			return;
 		}
+		
 		//Log.out( "ModelInfoCache.modelInfoRequest guid: " + $mie.modelGuid, Log.INFO );
 		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
+		if ( _block.has( $mie.modelGuid ) )
+			return;
+		else
+			_block.add( $mie.modelGuid );
+		
 		if ( null == mi ) {
 			if ( true == Globals.online && $mie.fromTables )
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid ) );
@@ -130,6 +137,8 @@ public class ModelInfoCache
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
 		Log.out( "ModelInfoCache.loadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		if ( _block.has( $pe.guid ) )
+			_block.clear( $pe.guid )
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
@@ -137,6 +146,8 @@ public class ModelInfoCache
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
 		Log.out( "ModelInfoCache.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		if ( _block.has( $pe.guid ) )
+			_block.clear( $pe.guid )
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
@@ -155,10 +166,11 @@ public class ModelInfoCache
 		if ( null ==  _modelInfo[$mi.guid] ) {
 			Log.out( "ModelInfoCache.add modelInfo: " + $mi.toString(), Log.DEBUG );
 			_modelInfo[$mi.guid] = $mi; 
+			
+			if ( _block.has( $mi.guid ) )
+				_block.clear( $mi.guid )
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $series, $mi.guid, $mi ) );
 		}
 	}
-	
-	
 }
 }

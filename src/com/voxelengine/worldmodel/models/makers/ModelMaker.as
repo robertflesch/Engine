@@ -72,8 +72,8 @@ public class ModelMaker extends ModelMakerBase {
 			Log.out( "ModelMaker.attemptMake - ii: " + _ii.toString() );
 			
 			var vm:* = make();
-			if ( vm )
-				vm.complete = true;
+//			if ( vm )
+//				vm.complete = true;
 			
 			markComplete( true, vm );
 			if ( vm && _addToRegionWhenComplete )

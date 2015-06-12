@@ -31,21 +31,17 @@ public class VertexManager {
 	private var _vertBufAnimated:VertexIndexBuilder = null;
 	private var _vertBufAnimatedAlpha:VertexIndexBuilder = null;
 	private var _vertBufFire:VertexIndexBuilder = null;
-	private var _subManagers:Vector.<VertexManager> = new Vector.<VertexManager>();
+	
 	private var _gc:GrainCursor;
 	private var _shaders:Vector.<Shader>;
-	
-	//private var _minGrain:uint = 9;
-	private var _minGrain:uint = 10;
-	
-	public function set minGrain(val:uint):void {  _minGrain = val;  }
-	public function get minGrain():uint { return _minGrain; }
+
+//	private var _subManagers:Vector.<VertexManager> = new Vector.<VertexManager>();
 	
 	public function VertexManager( $gc:GrainCursor, $parent:VertexManager )
 	{
 		_gc = $gc;
-		if ( null != $parent )
-			$parent.childAdd( this );
+		//if ( null != $parent )
+			//$parent.childAdd( this );
 		
 		//var name:String = NameUtil.createUniqueName( this );
 		//Log.out( "----------VertexManager.construct---------- " + name );
@@ -107,10 +103,10 @@ public class VertexManager {
 	
 	
 	
-	public function childAdd( $vertMan:VertexManager ):void {
-		_subManagers.push( $vertMan );
-		//Log.out( "VertexManager.childAdd: " + _subManagers.length );
-	}
+	//public function childAdd( $vertMan:VertexManager ):void {
+		//_subManagers.push( $vertMan );
+		////Log.out( "VertexManager.childAdd: " + _subManagers.length );
+	//}
 	
 	public function release():void
 	{
@@ -160,10 +156,10 @@ public class VertexManager {
 			}
 		}
 		
-		var count:int = _subManagers.length;
-		for ( var i:int; i < count; i++ ) {
-			_subManagers[i].drawNew( $mvp, $vm, $context, $selected, $isChild );
-		}
+		//var count:int = _subManagers.length;
+		//for ( var i:int; i < count; i++ ) {
+			//_subManagers[i].drawNew( $mvp, $vm, $context, $selected, $isChild );
+		//}
 	}
 	
 	public function drawNewAlpha( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean = false ):void	{
@@ -199,10 +195,10 @@ public class VertexManager {
 			}
 		}
 		
-		var count:int = _subManagers.length;
-		for ( var i:int; i < count; i++ ) {
-			_subManagers[i].drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
-		}
+		//var count:int = _subManagers.length;
+		//for ( var i:int; i < count; i++ ) {
+			//_subManagers[i].drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
+		//}
 	}
 	
 	public function oxelAdd( oxel:Oxel ):void { 	

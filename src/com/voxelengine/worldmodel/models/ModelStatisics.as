@@ -25,7 +25,6 @@ package com.voxelengine.worldmodel.models
 	 */
 	public class ModelStatisics 
 	{
-		private   var 	_rootGrain:int 					= -1;
 		private   var	_count:Number					= -1;
 		private   var 	_stats:Array 					= new Array(256);				// INSTANCE NOT EXPORTED
 		private   const GRAINS_PER_SQUARE_METER:int		= 16 * 16 * 16;
@@ -39,7 +38,6 @@ package com.voxelengine.worldmodel.models
 		private var _solid_max:int = 0;
 		private var _solid_min:int = 31;
 
-		public function get rootSize():int { return _rootGrain };
 		public function get largest():int { return _solid_max };
 		public function get smallest():int { return _solid_min };
 		public function get range():int { return _solid_max - _solid_min };
@@ -59,25 +57,11 @@ package com.voxelengine.worldmodel.models
 			_z_min = 2048;
 			_solid_max = 0;
 			_solid_min = 31;
-			_rootGrain = -1;
 			_count = 0;
 			_stats = new Array(256);				// INSTANCE NOT EXPORTED
 		}
 		
-		public function gather( $version:int, $ba:ByteArray, $rootGrain:int ):void
-		{
-			if ( !$ba )
-				throw new Error( "ModelStatisics.gather - NO ByteArray found" );
-				
-			if ( 8 >= $ba.bytesAvailable )
-				return; //empty
-				
-			var orginalPosition:int  = $ba.position;
-			initialize();
-			_rootGrain = $rootGrain;
-			process( $version, $ba, _rootGrain );
-			$ba.position = orginalPosition;
-			
+		public function gather():void {
 			for ( var key:* in _stats )
 			{
 				if ( !isNaN( key ) )
@@ -88,45 +72,8 @@ package com.voxelengine.worldmodel.models
 						Log.out( "ModelStatisics.gather - key not found key: " + key, Log.WARN );
 				}
 			}
-			
-			statsPrint();
 		}
-		
-		private function process( $version:int, $ba:ByteArray, currentGrain:int ):ByteArray
-		{
-			var faceData:uint = $ba.readUnsignedInt();
-			var type:uint;
-			if ( $version <= Globals.VERSION_006 )
-				type = OxelBitfields.typeFromRawDataOld(faceData);
-			else {  //_version > Globals.VERSION_006
-				var typeData:uint = $ba.readUnsignedInt();
-				type = OxelBitfields.type1FromData(typeData);
-			}
-			
-			if ( OxelBitfields.dataHasAdditional( faceData ) ) {
-				$ba = _TempFlowInfo.fromByteArray( $version, $ba );
-				$ba = _TempBrightness.fromByteArray( $version, $ba, 0 );
-			}
-			
-			if ( OxelBitfields.data_is_parent( faceData ) ) {
-				currentGrain--;
-				for ( var i:int = 0; i < 8; i++ )
-				{
-					process( $version, $ba, currentGrain );
-				}
-				currentGrain++;
-			}
-			else  {
-				statAdd( type, currentGrain );
-				if ( currentGrain < _solid_min && TypeInfo.AIR != type )
-					_solid_min = currentGrain
-				if ( currentGrain > _solid_max && TypeInfo.AIR != type )
-					_solid_max = currentGrain
-			}
-			
-			return $ba;
-		}
-		
+	
 		public function statAdd( type:int, grain:int ):void
 		{
 			if ( type < 100 )
@@ -136,6 +83,10 @@ package com.voxelengine.worldmodel.models
 			var count:int = Math.pow( Math.pow( 2, grain ), 3 );			
 			_stats[type] = _stats[type] + count;
 
+			if ( grain < _solid_min && TypeInfo.AIR != type )
+				_solid_min = grain
+			if ( grain > _solid_max && TypeInfo.AIR != type )
+				_solid_max = grain
 		}
 
 		public function statRemove( type:int, grain:int ):void
@@ -149,7 +100,7 @@ package com.voxelengine.worldmodel.models
 		public function	statsPrint():void
 		{
 			trace( "---------------------" );
-			trace( "root grain: " + _rootGrain );
+//			trace( "root grain: " + _rootGrain );
 			trace( "largest solid grain: " + _solid_max );
 			trace( "smallest solid grain: " + _solid_min );
 			for ( var key:* in _stats )

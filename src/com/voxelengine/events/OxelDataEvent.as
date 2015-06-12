@@ -39,7 +39,7 @@ public class OxelDataEvent extends ModelBaseEvent
 	}
    
 	public override function toString():String {
-		return formatToString( "OxelDataEvent", "series", "modelGuid", "od", "fromTables" );
+		return formatToString( "OxelDataEvent", "series", "modelGuid", "oxelData", "fromTables" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

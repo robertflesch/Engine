@@ -48,40 +48,46 @@ import com.voxelengine.worldmodel.weapons.Projectile;
  */
 public class VoxelModel
 {
+	// This is a reference to the data which is store in the metaDataCache
 	private 	var	_metadata:ModelMetadata;
-	protected 	var	_modelInfo:ModelInfo; 													// INSTANCE NOT EXPORTED
-	protected 	var	_instanceInfo:InstanceInfo; 											// INSTANCE NOT EXPORTED
+	// This is a reference to the data which is store in the modelInfoCache
+	protected 	var	_modelInfo:ModelInfo;
+	// This is a unique instance from the region data or server
+	protected 	var	_instanceInfo:InstanceInfo;
 	
-	private		var	_anim:Animation;			
+	// if this model is a child of a larger model
+	private		var _associatedGrain:GrainCursor;											
+	
+	// state data
+	private		var	_anim:Animation;
 	private		var	_camera:Camera								= new Camera();
 	private		var	_usesGravity:Boolean; 														
-	private		var	_timer:int 									= getTimer(); 				// INSTANCE NOT EXPORTED
-	private		var _associatedGrain:GrainCursor;											// if this model is part of a larger model
-	
-	protected	var	_stateLock:Boolean;														// INSTANCE NOT EXPORTED
-	protected	var	_changed:Boolean; 														// INSTANCE NOT EXPORTED
-	protected	var	_complete:Boolean; 														// INSTANCE NOT EXPORTED
-	protected	var	_selected:Boolean; 														// INSTANCE NOT EXPORTED
-	protected	var	_dead:Boolean; 															// INSTANCE NOT EXPORTED
+	private		var	_timer:int 									= getTimer(); 				
+	private		var	_initialized:Boolean;
+	private 	var _hasInventory:Boolean;
+	protected	var	_stateLock:Boolean
+	protected	var	_changed:Boolean; 
+	protected	var	_complete:Boolean;
+	protected	var	_selected:Boolean;
+	protected	var	_dead:Boolean; 		
 			
-	private var _hasInventory:Boolean;
+	// sub classes of VoxelModel can have inventory
 	public function get hasInventory():Boolean 				{ return _hasInventory; }
 	public function set hasInventory(value:Boolean):void  	{ _hasInventory = value; }
 				
-	private		var	_initialized:Boolean 													// INSTANCE NOT EXPORTED
 	protected function get initialized():Boolean 				{ return _initialized; }
 	protected function set initialized( val:Boolean ):void		{ _initialized = val; }
 	
+	public	function get instanceInfo():InstanceInfo			{ return _instanceInfo; }
+	public	function get modelInfo():ModelInfo 					{ return _modelInfo; }
+	public	function set modelInfo(val:ModelInfo):void			{ _modelInfo = val; }
 	public	function get metadata():ModelMetadata    			{ return _metadata; }
 	public	function set metadata(val:ModelMetadata):void   	{ _metadata = val; }
+	
 	public	function get usesGravity():Boolean 					{ return _usesGravity; }
 	public	function set usesGravity(val:Boolean):void 			{ _usesGravity = val; }
 	public	function get camera():Camera						{ return _camera; }
 	public	function get anim():Animation 						{ return _anim; }
-//	public	function get statisics():ModelStatisics				{ return _statisics; }
-	public	function get instanceInfo():InstanceInfo			{ return _instanceInfo; }
-	public	function get modelInfo():ModelInfo 					{ return _modelInfo; }
-	public	function set modelInfo(val:ModelInfo):void			{ _modelInfo = val; }
 	public	function get changed():Boolean						{ return _changed; }
 	public	function set changed( $val:Boolean):void			{ _changed = $val; }
 	public	function get selected():Boolean 					{ return _selected; }
@@ -90,8 +96,7 @@ public class VoxelModel
 	public 	function set complete(val:Boolean):void				{ _complete = val; }
 	public 	function toString():String 							{ return metadata.toString() + " ii: " + instanceInfo.toString(); }
 	public  function get associatedGrain():GrainCursor			{ return _associatedGrain; }
-	public  function set associatedGrain( $val:GrainCursor ):void	
-	{  
+	public  function set associatedGrain( $val:GrainCursor ):void {  
 		if ( null == _associatedGrain )
 			_associatedGrain = new GrainCursor();
 		_associatedGrain.copyFrom( $val ); 
@@ -132,33 +137,11 @@ public class VoxelModel
 		
 		modelInfo.toObject();
 		obj = modelInfo.obj
-//		obj.model.children = getChildJSON();
 	}
-/*	
-	private function getChildJSON():Object {
-	// Same code that is in modelCache to build models in region
-	// this is just models in models
-		var oa:Vector.<Object> = new Vector.<Object>();
-		for each ( var vm:VoxelModel in children ) {
-			if ( vm is Player )
-				continue;
-			//Log.out( "VoxelModel.getChildJSON - name: " + metadata.name + "  modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
-			var io:Object = new Object();
-			vm.instanceInfo.buildExportObject( io );
-			oa.push( io );
-		}
-		return oa;	
-	}
-*/	
+
 	protected function cameraAddLocations():void
 	{
-		camera.addLocation(new CameraLocation(false, 8, Globals.AVATAR_HEIGHT, 0));
-		camera.addLocation(new CameraLocation(false, 8, Globals.AVATAR_HEIGHT, 40));
-		camera.addLocation(new CameraLocation(false, 8, Globals.AVATAR_HEIGHT, 100));
-		//_cameras.push( new CameraLocation( true, 0, 100, 100, 45 ) );
-		//_cameras.push( new CameraLocation( true, 0, 100, 0, 90 ) );
-		//_cameras.push( new CameraLocation( true, 0, 0, 100) );
-		//_cameras.push( new CameraLocation( false, 0, 0, 0) );
+		_camera.addLocation( new CameraLocation( false, 0, 0, 0) );
 	}
 	
 	// returns the location of this model in the model space
@@ -230,7 +213,6 @@ public class VoxelModel
 		_instanceInfo.owner = this; // This tells the instanceInfo that this voxel model is its owner.
 	}
 	
-	//public function init( $mi:ModelInfo, $vmm:ModelMetadata, $initializeRoot:Boolean = true):void {
 	public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		_modelInfo = $mi;
 		_metadata = $vmm;
@@ -263,20 +245,16 @@ public class VoxelModel
 		if (ie.instanceGuid == instanceInfo.instanceGuid )
 			return;
 		
-		if (oxel)
-		{
-			if (oxel.gc)
+		if (oxel && oxel.gc) {
+			var msLoc:Vector3D = worldToModel(ie.position);
+			if (doesOxelIntersectSphere(msLoc, ie.radius))
 			{
-				var msLoc:Vector3D = worldToModel(ie.position);
-				if (doesOxelIntersectSphere(msLoc, ie.radius))
-				{
-					if ( ImpactEvent.EXPLODE == ie.type )
-						empty_sphere( msLoc.x, msLoc.y, msLoc.z, ie.radius, ie.detail );
-					else if ( ImpactEvent.DFIRE == ie.type )	
-						effect_sphere( msLoc.x, msLoc.y, msLoc.z, ie );
-					else if ( ImpactEvent.DICE == ie.type )	
-						effect_sphere( msLoc.x, msLoc.y, msLoc.z, ie );
-				}
+				if ( ImpactEvent.EXPLODE == ie.type )
+					empty_sphere( msLoc.x, msLoc.y, msLoc.z, ie.radius, ie.detail );
+				else if ( ImpactEvent.DFIRE == ie.type )	
+					effect_sphere( msLoc.x, msLoc.y, msLoc.z, ie );
+				else if ( ImpactEvent.DICE == ie.type )	
+					effect_sphere( msLoc.x, msLoc.y, msLoc.z, ie );
 			}
 		}
 	}
@@ -334,11 +312,6 @@ public class VoxelModel
 		return true;
 	}
 	
-	private function squared(v:Number):Number
-	{
-		return v * v;
-	}
-	
 	public function doesOxelIntersectSphere($center:Vector3D, $radius:Number):Boolean {
 		var dist_squared:Number = squared($radius);
 		var maxDis:int = oxel.size_in_world_coordinates();
@@ -356,6 +329,8 @@ public class VoxelModel
 		else if ($center.z > maxDis)
 			dist_squared -= squared($center.z - maxDis);
 		return dist_squared > 0;
+		
+		function squared(v:Number):Number { return v * v; }		
 	}
 	
 	/*
@@ -472,8 +447,13 @@ public class VoxelModel
 		if (complete) {
 			instanceInfo.update($elapsedTimeMS);
 			modelInfo.update($context,$elapsedTimeMS);
-			if (oxel && oxel.dirty)
-				oxel.cleanup();
+//			if (oxel && oxel.dirty)
+				//oxel.cleanup();
+				// TODO way too long of a calling sequence here.
+			if ( modelInfo.data._topMostChunk.dirty ) {
+				Log.out( "VoxelModel.update - calling refreshQuads", Log.WARN );
+				modelInfo.data._topMostChunk.refreshQuads()
+			}
 		}
 		
 		if (!complete)
