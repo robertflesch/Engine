@@ -388,22 +388,22 @@ public class EditCursor extends VoxelModel
 		if ( CursorShapeEvent.CYLINDER == cursorShape || CursorShapeEvent.SPHERE == cursorShape ) {
 			// I could use gciData.near to determine which single face to use, but seems like overkill
 			if ( Globals.AXIS_X == _gciData.axis ) {
-				oxel.face_set( Globals.POSX );
-				oxel.face_set( Globals.NEGX );
+				oxel.faceSet( Globals.POSX );
+				oxel.faceSet( Globals.NEGX );
 			} else if ( Globals.AXIS_Y == _gciData.axis ) {
-				oxel.face_set( Globals.POSY );
-				oxel.face_set( Globals.NEGY );
+				oxel.faceSet( Globals.POSY );
+				oxel.faceSet( Globals.NEGY );
 			} else {
-				oxel.face_set( Globals.POSZ );
-				oxel.face_set( Globals.NEGZ );
+				oxel.faceSet( Globals.POSZ );
+				oxel.faceSet( Globals.NEGZ );
 			}
 		} else {	
-			oxel.face_set( Globals.POSX );
-			oxel.face_set( Globals.NEGX );
-			oxel.face_set( Globals.POSY );
-			oxel.face_set( Globals.NEGY );
-			oxel.face_set( Globals.POSZ );
-			oxel.face_set( Globals.NEGZ );
+			oxel.faceSet( Globals.POSX );
+			oxel.faceSet( Globals.NEGX );
+			oxel.faceSet( Globals.POSY );
+			oxel.faceSet( Globals.NEGY );
+			oxel.faceSet( Globals.POSZ );
+			oxel.faceSet( Globals.NEGZ );
 		}
 		
 		if ( !oxel.lighting )

@@ -440,34 +440,33 @@ public class VoxelModel
 	public function update($context:Context3D, $elapsedTimeMS:int):void	{
 		if (!initialized) {
 			initialized = true;
+			Log.out( "VoxelModel.update - loading oxel data: " + modelInfo.guid, Log.WARN );
 			OxelDataEvent.addListener( ModelBaseEvent.RESULT_COMPLETE, oxelComplete );
 			modelInfo.oxelLoadData();
 		}
 		
-		if (complete) {
+		if ( complete ) {
 			instanceInfo.update($elapsedTimeMS);
 			modelInfo.update($context,$elapsedTimeMS);
 //			if (oxel && oxel.dirty)
 				//oxel.cleanup();
 				// TODO way too long of a calling sequence here.
 			if ( modelInfo.data._topMostChunk.dirty ) {
-				Log.out( "VoxelModel.update - calling refreshQuads", Log.WARN );
+				if ( modelInfo.guid != EditCursor.EDIT_CURSOR )
+					Log.out( "VoxelModel.update - calling refreshQuads guid: " + modelInfo.guid, Log.WARN );
 				modelInfo.data._topMostChunk.refreshQuads()
 			}
+			
+			collisionTest($elapsedTimeMS);
+			modelInfo.bringOutYourDead();
 		}
-		
-		if (!complete)
-			return;
-		
-		collisionTest($elapsedTimeMS);
-		
-		modelInfo.bringOutYourDead();
 	}
 	
 	private function oxelComplete( $ode:OxelDataEvent ):void {
-		if ( $ode.modelGuid == instanceInfo.modelGuid ) {
+		// add $ode.modelGuid == metadata.name for imported from local file system models.
+		if ( $ode.modelGuid == instanceInfo.modelGuid || $ode.modelGuid == metadata.name ) {
 			OxelDataEvent.removeListener( ModelBaseEvent.RESULT_COMPLETE, oxelComplete );
-			Log.out( "VoxelModel.oxelComplete guid: " + $ode.modelGuid );
+			Log.out( "VoxelModel.oxelComplete guid: " + $ode.modelGuid, Log.WARN );
 			complete = true;
 		}
 	}

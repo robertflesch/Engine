@@ -61,6 +61,10 @@ package com.voxelengine.worldmodel.models
 			_stats = new Array(256);				// INSTANCE NOT EXPORTED
 		}
 		
+		public function release():void {
+			_stats = null;
+		}
+
 		public function gather():void {
 			for ( var key:* in _stats )
 			{

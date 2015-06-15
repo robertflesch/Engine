@@ -57,6 +57,13 @@ public class OxelPersistance extends PersistanceObject
 		_loaded = false;
 	}
 	
+	override public function release():void {
+		_statisics.release();
+		_oxel.release();
+		super.release();
+	}
+	
+	
 	public function changeOxel( $modelGuid:String, $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
 		var result:Boolean = _oxel.changeOxel( $modelGuid, $gc, $type, $onlyChangeType );
 		if ( result )
@@ -263,7 +270,7 @@ public class OxelPersistance extends PersistanceObject
 			type = OxelBitfields.type1FromData(typeData);
 		}
 		
-		if (OxelBitfields.data_is_parent(faceData))
+		if (OxelBitfields.dataIsParent(faceData))
 		{
 			$currentGrain--;
 			for (var i:int = 0; i < 8; i++)

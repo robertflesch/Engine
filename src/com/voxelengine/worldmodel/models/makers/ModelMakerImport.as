@@ -81,7 +81,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			if ( vm ) {
 				vm.stateLock( true, 10000 ); // Lock state so that is had time to load animations
 				vm.changed = true;
-				vm.complete = true;
+//				vm.complete = true;
 				_vmi.changed = true;
 				_vmm.changed = true;
 				vm.save();
@@ -95,6 +95,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	private function metadataGenerated( $mme:ModelMetadataEvent):void 
 	{
 		if ( $mme.modelGuid == _vmi.guid ) {
+			ModelMetadataEvent.removeListener( ModelBaseEvent.GENERATION, metadataGenerated );
 			_vmm = $mme.vmm;
 			completeMake();
 		}

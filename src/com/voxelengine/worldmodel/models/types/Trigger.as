@@ -104,7 +104,7 @@ package com.voxelengine.worldmodel.models.types
 				// this prunes the children oxel
 				oxel.write( instanceInfo.instanceGuid, loco.set_values( 0, 0, 0, grain ), TypeInfo.LEAF, true );
 				GrainCursorPool.poolDispose( loco );
-				oxel.faces_set_all();
+				oxel.facesSetAll();
 				oxel.faces_rebuild( instanceInfo.instanceGuid );
 				oxel.quadsBuild();
 				_was_selected = true;

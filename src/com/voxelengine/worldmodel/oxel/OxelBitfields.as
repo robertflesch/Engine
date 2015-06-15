@@ -75,8 +75,8 @@ package com.voxelengine.worldmodel.oxel
 				_data |= OXEL_DATA_DIRTY; 
 		}
 
-		protected  function get added_to_vertex():Boolean 		{ return 0 < (_data & OXEL_DATA_ADD_VERTEX); }
-		protected  function set added_to_vertex( $val:Boolean ):void { 
+		protected  function get addedToVertex():Boolean 		{ return 0 < (_data & OXEL_DATA_ADD_VERTEX); }
+		protected  function set addedToVertex( $val:Boolean ):void { 
 			_data &= OXEL_DATA_ADD_VERTEX_CLEAR;
 			if ( $val )
 				_data |= OXEL_DATA_ADD_VERTEX; 
@@ -106,13 +106,13 @@ package com.voxelengine.worldmodel.oxel
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		protected	function resetData():void 								{ _data &= OXEL_DATA_CLEAR; }
-		public 		function faces_clean_all_face_bits():void 				{ _data &= OXEL_DATA_FACE_BITS_CLEAR; } //  doesnt touch dirty;
+		public 		function facesCleanAllFaceBits():void 				{ _data &= OXEL_DATA_FACE_BITS_CLEAR; } //  doesnt touch dirty;
 		// faces marked as dirty that need re-evaluation to determine if a face exists there.
-		protected	function faces_has_dirty():Boolean 			{ return 0 < (_data & OXEL_DATA_FACES_DIRTY); }
-		public		function faces_mark_all_clean():void 		{ _data &= OXEL_DATA_FACES_DIRTY_CLEAR; dirty = true; }
-		public		function faces_set_all():void 				{ _data |= OXEL_DATA_FACES;  dirty = true;}
-		public		function faces_clear_all():void 			{ _data &= OXEL_DATA_FACES_CLEAR;  dirty = true;	 }
-		protected	function faces_mark_all_dirty():void 		{ 
+		protected	function faceHasDirtyBits():Boolean 			{ return 0 < (_data & OXEL_DATA_FACES_DIRTY); }
+		public		function facesMarkAllClean():void 		{ _data &= OXEL_DATA_FACES_DIRTY_CLEAR; dirty = true; }
+		public		function facesSetAll():void 				{ _data |= OXEL_DATA_FACES;  dirty = true;}
+		public		function facesClearAll():void 			{ _data &= OXEL_DATA_FACES_CLEAR;  dirty = true;	 }
+		protected	function facesMarkAllDirty():void 		{ 
 			_data |= OXEL_DATA_FACES_DIRTY;
 			dirty = true; 
 		}
@@ -161,7 +161,7 @@ package com.voxelengine.worldmodel.oxel
 			return count;
 		}
 		
-		protected  	function face_is_dirty( $face:uint ):Boolean {
+		protected  	function faceIsDirty( $face:uint ):Boolean {
 			switch( $face ) {
 				case Globals.POSX:
 					return 0 < ( _data & OXEL_DATA_FACES_DIRTY_POSX ); break;
@@ -178,7 +178,7 @@ package com.voxelengine.worldmodel.oxel
 			}
 			return false;
 		}
-		public 		function face_set( $face:uint ):void {
+		public 		function faceSet( $face:uint ):void {
 			switch( $face ) {
 				case Globals.POSX:
 					_data |= OXEL_DATA_FACES_POSX;
@@ -199,9 +199,8 @@ package com.voxelengine.worldmodel.oxel
 					_data |= OXEL_DATA_FACES_NEGZ;
 					break;
 			}
-			dirty = true;
 		}
-		protected  	function face_clear( $face:uint ):void {
+		protected  	function faceClear( $face:uint ):void {
 			switch( $face ) {
 				case Globals.POSX:
 					_data &= OXEL_DATA_FACES_POSX_CLEAR;
@@ -222,7 +221,6 @@ package com.voxelengine.worldmodel.oxel
 					_data &= OXEL_DATA_FACES_NEGZ_CLEAR;
 					break;
 			}
-			dirty = true;
 		}
 		public  	function faceHas( $face:uint ):Boolean {
 			switch( $face ) {
@@ -255,7 +253,7 @@ package com.voxelengine.worldmodel.oxel
 		public      function additionalDataHas():Boolean			{ return 0 < ( _data & OXEL_DATA_ADDITIONAL );  }
 		public      function additionalDataClear():void 			{ _data &= OXEL_DATA_ADDITIONAL_CLEAR; }
 
-		static public function data_is_parent( $data:uint ):Boolean 	{ return 0 < ($data & OXEL_DATA_PARENT); }
+		static public function dataIsParent( $data:uint ):Boolean 	{ return 0 < ($data & OXEL_DATA_PARENT); }
 		static public function dataHasAdditional( $data:uint ):Boolean 	
 		{ 
 			var t:uint = ($data & OXEL_DATA_ADDITIONAL);

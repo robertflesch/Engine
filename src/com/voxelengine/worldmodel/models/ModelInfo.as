@@ -162,6 +162,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		_modelJson = null;
 		_animations = null;
 		_animationInfo = null;
+		_data.release();
 	}
 
 	override public function clone( $guid:String ):* {
@@ -410,8 +411,8 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	}
 	
 	public function toObject():void {
-		if ( null == _obj )
-			_obj = new Object();
+		// create new to make sure we dont have holdovers
+		_obj = new Object();
 			
 		_obj.modelClass = _modelClass;
 		// biomes:			_biomes,      // Biomes are only used in object generation, once the object has been completed they are removed.

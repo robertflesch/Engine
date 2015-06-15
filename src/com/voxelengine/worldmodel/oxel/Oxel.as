@@ -86,19 +86,18 @@ package com.voxelengine.worldmodel.oxel
 		private var _flowInfo:FlowInfo; 		// used to count up and out in flowing oxel ( only uses 2 bytes, down, out )
 		
 		override public function set dirty( $isDirty:Boolean ):void { 
+			// mark oxel as dirty using the super function which just sets the dirty bit.
 			super.dirty = $isDirty;
-			
-			// if I am an oxel that is part of a larger chunk
-			// then mark myself dirty recurvsively until we hit the chunk
-			if ( null == _chunk ) {
-				if ( $isDirty )	{
-					// recursively mark all the parents as dirty
-					if ( _parent && !_parent.dirty ) 
-						_parent.dirty = true;
-				}
+			// also mark parent as dirty recursively until you hit an oxel that has a chunk.
+			// so if null == chunk, mark your parent oxel dirty
+			// but if chunk is not null, just mark the oxel AND chunk dirty
+			if ( true == $isDirty && null == _chunk && _parent && !_parent.dirty ) 
+				_parent.dirty = true;
+			else {
+				var ch:Chunk = chunkGet();
+				if ( ch ) 
+					ch.dirty = $isDirty;
 			}
-			else
-				chunk().dirty = true;
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,19 +125,19 @@ package com.voxelengine.worldmodel.oxel
 					
 				// uses the OLD type since _data has not been set yet
 				if ( TypeInfo.AIR != type )
-					vertManRemoveOxel();
+					chunkRemoveOxel();
 				
 				super.type = $val;
 				
 				if ( TypeInfo.AIR == $val ) 
 				{
-					faces_clean_all_face_bits();
+					facesCleanAllFaceBits();
 					// Todo - this CAN leave behind empty oxels, need to add some kind of flag or check for them.
 					//if ( _parent ) 
 					//	return _parent.mergeRecursive()					
 				}
 				else
-					faces_mark_all_dirty();
+					facesMarkAllDirty();
 			}
 		}
 
@@ -162,7 +161,8 @@ package com.voxelengine.worldmodel.oxel
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//     End Online liners
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		public function chunk():Chunk { return _chunk ? _chunk : _parent ? _parent.chunk() : null; }
+		public function chunkGet():Chunk { return _chunk ? _chunk : _parent ? _parent.chunkGet() : null; }
+		public function set chunk( $chunk:Chunk ):void 	{ _chunk = $chunk; }
 
 		// This defines a one (1) meter cube in world
 		public function size_in_world_coordinates():uint { return GrainCursor.get_the_g0_size_for_grain(gc.grain); }
@@ -173,8 +173,6 @@ package com.voxelengine.worldmodel.oxel
 		
 //		public function get isLight():Boolean { return TypeInfo.typeInfo[type].lightInfo.lightSource; }
 		
-		public function get vertMan():Chunk 				{ return _chunk; }
-		public function set vertMan( $vertMan:Chunk ):void 	{ _chunk = $vertMan; }
 		
 		public function get childCount():uint  						{ return _childCount; }
 		public function set childCount(value:uint):void { 
@@ -286,13 +284,13 @@ package com.voxelengine.worldmodel.oxel
 			
 			// removes all quad and the quads vector
 			// removed the brightness
-			vertManRemoveOxel();
+			chunkRemoveOxel();
 			
-			Log.out( "Oxel.release - TODO how do I release vertexOctTree node when last oxel is removed?", Log.WARN );
-			//if ( _vertMan )
+			Log.out( "Oxel.release - TODO how do I release Chunks node when last oxel is removed?", Log.WARN );
+			//if ( _chunk )
 			//{
-				//_vertMan.release();
-				//_vertMan = null;
+				//_chunk.release();
+				//_chunk = null;
 			//}
 
 			if ( gc )
@@ -622,7 +620,7 @@ package com.voxelengine.worldmodel.oxel
 			//trace( "childrenCreate to grain: " + gc.grain+ " (" + gc.size() + ") to grain: " + (gc.grain- 1) + );
 			_children = ChildOxelPool.poolGet();
 			var gct:GrainCursor = GrainCursorPool.poolGet(root_get().gc.bound );
-			faces_clear_all();
+			facesClearAll();
 
 			for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
 			{
@@ -632,8 +630,8 @@ package com.voxelengine.worldmodel.oxel
 				_children[i].initialize( this, gct, 0, type );
 				// use the super so you dont start a flow event on flowable types.
 				// No longer used, not sure if above comment is valid.
-				//super.faces_mark_all_dirty();
-				_children[i].faces_mark_all_dirty();
+				//super.facesMarkAllDirty();
+				_children[i].facesMarkAllDirty();
 				
 				if ( _lighting )
 				{
@@ -690,7 +688,7 @@ package com.voxelengine.worldmodel.oxel
 				// set our material type
 				type = $type;
 				
-				faces_mark_all_dirty();
+				facesMarkAllDirty();
 				return true;
 			}
 			
@@ -815,8 +813,8 @@ package com.voxelengine.worldmodel.oxel
 		}
 				
 		//public function dispose():void {
-			//if ( _vertMan ) 
-				//_vertMan.dispose();
+			//if ( _chunk ) 
+				//_chunk.dispose();
 			//
 			//if ( vm_get().minGrain <= gc.grain ) {
 				//if ( childrenHas() ) {
@@ -1007,7 +1005,7 @@ package com.voxelengine.worldmodel.oxel
 			}
 			else
 			{
-				faces_mark_all_dirty();
+				facesMarkAllDirty();
 				quadsDeleteAll();
 			}
 		}
@@ -1151,9 +1149,9 @@ package com.voxelengine.worldmodel.oxel
 			}
 		}
 
-		override protected function faces_mark_all_dirty():void { 
-			super.faces_mark_all_dirty();
-			faces_clear_all();
+		override protected function facesMarkAllDirty():void { 
+			super.facesMarkAllDirty();
+			facesClearAll();
 		}
 		
 		public function faces_rebuild( $instanceGuid:String ):void {
@@ -1161,7 +1159,7 @@ package com.voxelengine.worldmodel.oxel
 			
 			// anytime oxel changes, neighbors need to know
 			neighborsMarkDirtyFaces( $instanceGuid, gc.size() );
-			faces_mark_all_dirty();
+			facesMarkAllDirty();
 		}
 		
 		public function cleanup():void {
@@ -1240,7 +1238,7 @@ package com.voxelengine.worldmodel.oxel
 				{
 					// parents dont have faces!
 					if ( facesHas() )
-						faces_clear_all();
+						facesClearAll();
 						
 					dirty = false;
 					
@@ -1293,49 +1291,44 @@ package com.voxelengine.worldmodel.oxel
 			//trace( "Oxel.facesBuildTerminal");
 			if ( TypeInfo.AIR == type )
 			{
-				faces_mark_all_clean();
+				facesMarkAllClean(); dirty = true;
 				return;
 			} else  if ( TypeInfo.LEAF == type )
 			{
-				faces_set_all();
+				facesSetAll(); dirty = true;
 				return;
-			} else if ( faces_has_dirty() )
+			} else if ( faceHasDirtyBits() )
 			{
 				var no:Oxel = null ;
 				for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 				{
 					// only check the faces marked as dirty
-  					if ( face_is_dirty( face ) )
+  					if ( faceIsDirty( face ) )
 					{
 						no = neighbor( face );
-						if ( Globals.BAD_OXEL == no ) 
-						{
+						if ( Globals.BAD_OXEL == no ) {
 							// this is an external face. that is on the edge of the grain space
-							face_set( face );
+							faceSet( face );
 						}
-						else if ( no.type == type )
-						{
+						else if ( no.type == type ) {
 							// nieghbor oxel is the same, we are done? nope, the neighbor might have different scaling.. for flowable type.
 							// do we both have flow info?
-							if ( no.flowInfo && flowInfo )
-							{
+							if ( no.flowInfo && flowInfo ) {
 								// verify both have scaling
-								if ( no.flowInfo.flowScaling && flowInfo.flowScaling )
-								{
+								if ( no.flowInfo.flowScaling && flowInfo.flowScaling ) {
 									// so now I need the equivelent spots on each face to compare.
 									var p1:Point = flowInfo.flowScaling.faceGet( face );
 									var p2:Point = no.flowInfo.flowScaling.faceGet( face_get_opposite( face ) );
 									if ( p1.equals( p2 ) )
-										face_clear( face );
-									else
-										face_set( face );
+										faceClear( face );
+									else 
+										faceSet( face );
 								}
 							}
 							else
-								face_clear( face );
+								faceClear( face );
 						}
-						else if ( no.childrenHas() ) 
-						{
+						else if ( no.childrenHas() ) {
 							// so I am a larger face looking to see if there is visability to me.
 							// if I am solid, and any neighbors has alpha, then I am visible.
 							var rface:int;
@@ -1349,15 +1342,15 @@ package com.voxelengine.worldmodel.oxel
 									// if a neighbor child has alpha, then I need to generate a face
 									// if all neighbors are opaque, that face is not needed
 									if ( true == dchild.faceHasAlpha( rface ) ) {
-										face_set( face );
+										faceSet( face );
 										continue;
 									}
 								}
 							}
 							else {
-								face_clear( face );
+								faceClear( face );
 								if ( faceAlphaNeedsFace( face, type, no ) )
-									face_set( face );
+									faceSet( face );
 							}
 							
 							//var rface:int = Oxel.face_get_opposite( face );
@@ -1368,13 +1361,13 @@ package com.voxelengine.worldmodel.oxel
 						else
 						{
 							if ( ( TypeInfo.hasAlpha( no.type ) ) )
-								face_set( face );
+								faceSet( face );
 							else if ( flowInfo ) // All water and lava have flow info.
 							{ 
 								if ( flowInfo.flowScaling.scalingHas() ) 	// for scaled lava or other non alpha flowing types
-									face_set( face );
+									faceSet( face );
 								else {
-									face_clear( face );
+									faceClear( face );
 									/*
 									if ( TypeInfo.WATER == type ) {
 										//face_set( face ) This adds an interior face, but z buffer conflicts makes it not work well.
@@ -1390,18 +1383,19 @@ package com.voxelengine.worldmodel.oxel
 							else if ( no.flowInfo )	// for scaled lava or other non alpha flowing types
 							{
 								if ( no.flowInfo.flowScaling.scalingHas() )
-									face_set( face );
+									faceSet( face );
 								else
-									face_clear( face );
+									faceClear( face );
 							}
 							else {
-								face_clear( face );
+								faceClear( face );;
 							}
 						}
 					}
 				}
 			}
-			faces_mark_all_clean();
+			facesMarkAllClean();
+			dirty = true;
 		}
 		
 		static public function face_get_opposite( dir:int ):int	{
@@ -1586,9 +1580,9 @@ package com.voxelengine.worldmodel.oxel
 					// parents dont have quads!
 					if ( dirty  && _quads )
 					{
-						vertManRemoveOxel();
+						chunkRemoveOxel();
 					}
-					faces_clean_all_face_bits();
+					facesCleanAllFaceBits();
 					dirty = false;
 
 					for each ( var child:Oxel in _children ) {
@@ -1598,11 +1592,13 @@ package com.voxelengine.worldmodel.oxel
 				}
 				else
 					quadsBuildTerminal( $plane_facing );
+					
 			}
+			
 		}
 		
 		protected function quadsBuildTerminal( $plane_facing:int = 1 ):void {
-			var quadCount:int = 0;
+			var changeCount:int = 0;
 			// Does this oxel have faces
 			if ( facesHas() )
 			{
@@ -1612,26 +1608,21 @@ package com.voxelengine.worldmodel.oxel
 				var ti:TypeInfo = TypeInfo.typeInfo[type];
 				// We have to go thru each one, since some may be added, and others removed.
 				for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
-					quadCount += quadAddOrRemoveFace( face, $plane_facing, gc.grain, ti );
+					changeCount += quadAddOrRemoveFace( face, $plane_facing, gc.grain, ti );
 			}
-			else 
-			{
-				// if no faces release all quads
-				quadsDeleteAll();
-			}
+			else  // if no faces release all quads
+				changeCount = quadsDeleteAll();
 			
 			// did any of the quads change?
-			if ( quadCount )
-			{
+			if ( changeCount ) {
 				// if those this oxel has not been added to vertex manager do it now.
-				if ( !added_to_vertex ) 
-					vertManAddOxel();
-				else
-					vertManMarkDirty( TypeInfo.INVALID );
+				if ( !addedToVertex ) 
+					chunkAddOxel();
+				else // I dont think this is needed.
+					chunkMarkDirty( TypeInfo.INVALID );
 			}
-			// I was added to vertex, but I lost all my face, so remove oxel
-			else if ( added_to_vertex )
-				vertManRemoveOxel();
+			else if ( addedToVertex ) // I was added to vertex, but I lost all my face, so remove oxel
+				chunkRemoveOxel();
 
 			dirty = false;
 		}
@@ -1719,25 +1710,28 @@ package com.voxelengine.worldmodel.oxel
 		}
 		
 		////////////////////////////////////////
-		public function quadsDeleteAll():void {
+		public function quadsDeleteAll():int {
+			var changeCount:int;
 			if  ( _quads )
 			{
 				//Log.out( "Oxel.quadsDeleteAll" );
 				dirty = true;
-				for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
-				{
+				for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
 					var quad:Quad = _quads[face];
-					if ( quad )
+					if ( quad ) {
 						quadDelete( quad, face, type );
+						changeCount++;
+					}
 				}
 			}
+			return changeCount;
 		}
 
 		// TODO, I see some risk here when I am changing oxel type from things like sand to glass
 		// Its going to assume that it was solid, which works for sand to glass
 		// how about water to sand? the oxel would lose all its faces, but never go away.
 		protected function quadDelete( quad:Quad, face:int, type:int ):void {
-			vertManMarkDirty( type );
+			chunkMarkDirty( type );
 			QuadPool.poolDispose( quad );
 			_quads[face] = null;
 		}
@@ -1748,7 +1742,7 @@ package com.voxelengine.worldmodel.oxel
 		// Vertex Manager functions START
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		private function vertManRemoveOxel():void {
+		private function chunkRemoveOxel():void {
 			if ( _quads )
 			{
 				quadsDeleteAll();
@@ -1762,22 +1756,22 @@ package com.voxelengine.worldmodel.oxel
 				//_brightness = null;
 			//}
 			
-			if ( added_to_vertex )
+			if ( addedToVertex )
 			{
 				// Todo - this should just mark the oxels, and clean up should happen later
-				chunk().oxelRemove( this, type );
-				added_to_vertex = false;
+				chunkGet().oxelRemove( this, type );
+				addedToVertex = false;
 			}
 		}
 		
-		private function vertManAddOxel():void {
-			added_to_vertex = true;
-			chunk().oxelAdd( this );
+		private function chunkAddOxel():void {
+			addedToVertex = true;
+			chunkGet().oxelAdd( this );
 		}
 		
-		protected function vertManMarkDirty( oldType:int ):void {
+		protected function chunkMarkDirty( oldType:int ):void {
 			//vm_get().VIBGet( type, oldType ).dirty = true;
-			chunk().dirty = true;
+			chunkGet().dirty = true;
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1878,7 +1872,7 @@ package com.voxelengine.worldmodel.oxel
 			}
 			
 			// Bad data check
-			if ( OxelBitfields.data_is_parent( faceData ) && TypeInfo.AIR != type )
+			if ( OxelBitfields.dataIsParent( faceData ) && TypeInfo.AIR != type )
 			{
 				Log.out( "Oxel.readVersionedData - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
 				type = TypeInfo.AIR;
@@ -1912,7 +1906,7 @@ package com.voxelengine.worldmodel.oxel
 				lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
 			}
 			
-			if ( OxelBitfields.data_is_parent( faceData ) )
+			if ( OxelBitfields.dataIsParent( faceData ) )
 			{
 				childCount = 8;
 				_children = ChildOxelPool.poolGet();
@@ -1939,12 +1933,12 @@ package com.voxelengine.worldmodel.oxel
 			var oxelData:uint = $ba.readInt();
 			//trace( intToHexString() + "  " + oxelData );
 			initialize( $parent, $gc, oxelData, OxelBitfields.typeFromRawDataOld( oxelData ) );
-			if ( OxelBitfields.data_is_parent( oxelData ) && TypeInfo.AIR != type )
+			if ( OxelBitfields.dataIsParent( oxelData ) && TypeInfo.AIR != type )
 			{
 				Log.out( "Oxel.readData - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
 				type = TypeInfo.AIR;
 			}
-			if ( OxelBitfields.data_is_parent( oxelData ) )
+			if ( OxelBitfields.dataIsParent( oxelData ) )
 			{
 				_children = ChildOxelPool.poolGet();
 				var gct:GrainCursor = GrainCursorPool.poolGet( gc.bound );
@@ -2461,7 +2455,7 @@ package com.voxelengine.worldmodel.oxel
 			gc.grainX = x;
 			gc.grainZ = z;
 			
-			faces_mark_all_dirty();
+			facesMarkAllDirty();
 			quadsDeleteAll();
 			
 			if ( _children )
@@ -2631,7 +2625,7 @@ package com.voxelengine.worldmodel.oxel
 					{
 						type = $toType; 
 						// if AIR no quads to delete
-						faces_mark_all_dirty();
+						facesMarkAllDirty();
 					}
 				}
 				else
@@ -2864,8 +2858,8 @@ package com.voxelengine.worldmodel.oxel
 			if ( _flowInfo )
 				_flowInfo.reset( this );			
 			quadsDeleteAll();
-			faces_clear_all();
-			faces_mark_all_clean();
+			facesClearAll();
+			facesMarkAllClean();
 		}
 		
 		public function lightingReset():void {
@@ -3117,42 +3111,30 @@ package com.voxelengine.worldmodel.oxel
 		var result:Boolean;
 		var changedOxel:Oxel = write( $modelGuid, $gc, $type, $onlyChangeType );
 		
-		if ( Globals.BAD_OXEL != changedOxel )
-		{
-			dirty = true;
+		if ( Globals.BAD_OXEL != changedOxel ) {
+			changedOxel.dirty = true;
 			result = true;
 			var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
 		
-			if ( typeInfo.flowable )
-			{
+			if ( typeInfo.flowable ) {
 				if ( null == changedOxel.flowInfo ) // if it doesnt have flow info, get some! This is from placement of flowable oxels
 					changedOxel.flowInfo = typeInfo.flowInfo.clone();
 					
 				//if ( Globals.autoFlow && EditCursor.EDIT_CURSOR != $modelGuid )
 				if ( Globals.autoFlow  )
-				{
 					Flow.addTask( $modelGuid, changedOxel.gc, changedOxel.type, changedOxel.flowInfo, 1 );
-				}
 			}
-			else
-			{
+			else {
 				if ( changedOxel.flowInfo )
 					changedOxel.flowInfo = null;  // If it has flow info, release it, no need to check first
 			}
 				
 			if ( oldTypeInfo.lightInfo.lightSource )
-			{
-				var rle:LightEvent = new LightEvent( LightEvent.REMOVE, $modelGuid, $gc, oldLightID );
-				LightEvent.dispatch( rle );
-			}
+				LightEvent.dispatch( new LightEvent( LightEvent.REMOVE, $modelGuid, $gc, oldLightID ) );
 			if ( typeInfo.lightInfo.lightSource )
-			{
-				var le:LightEvent = new LightEvent( LightEvent.ADD, $modelGuid, $gc, Math.random() * 0xffffffff );
-				LightEvent.dispatch( le );
-			}
+				LightEvent.dispatch( new LightEvent( LightEvent.ADD, $modelGuid, $gc, Math.random() * 0xffffffff ) );
 			
 			if ( TypeInfo.isSolid( oldType ) && TypeInfo.hasAlpha( $type ) ) {
-				
 				// we removed a solid block, and are replacing it with air or transparent
 				if ( changedOxel.lighting && changedOxel.lighting.valuesHas() )
 					LightEvent.dispatch( new LightEvent( LightEvent.SOLID_TO_ALPHA, $modelGuid, changedOxel.gc ) );

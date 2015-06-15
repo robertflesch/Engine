@@ -31,6 +31,8 @@ public class Chunk {
 	public function get dirty():Boolean { return _dirty; }
 	// TODO Should just add dirty chunks to a rebuild queue, which would get me a more incremental build
 	public function set dirty($value:Boolean):void {
+//		if ( _vertMan )
+//			Log.out( "chunk.dirty - marking chunk dirty: " + _oxel.gc + "  dirty: " + $value );
 		_dirty = $value;
 		if ( _parent && !_parent.dirty ) 
 			_parent.dirty = $value;
@@ -47,20 +49,20 @@ public class Chunk {
 	// public function divide():?
 	
 	static public function parse( $oxel:Oxel, $parent:Chunk ):Chunk {
-		var vot:Chunk = new Chunk( $parent );
-		Log.out( "VertexOctTree.parse - new VertexOctTree: " + $oxel.childCount );
+		var ch:Chunk = new Chunk( $parent );
+		Log.out( "chunk.parse - new chunk: " + $oxel.childCount );
 		if ( MAX_CHILDREN < $oxel.childCount ) {
-			vot._children = new Vector.<Chunk>(OCT_TREE_SIZE, true);
+			ch._children = new Vector.<Chunk>(OCT_TREE_SIZE, true);
 			for ( var i:int; i < OCT_TREE_SIZE; i++ )
-				vot._children[i] = parse( $oxel.children[i], vot );
+				ch._children[i] = parse( $oxel.children[i], ch );
 		}
 		else {
-			vot._oxel = $oxel;
-			Log.out( "VertexOctTree.parse - new VertexManager: " + $oxel.childCount + "  oxel.gc: " + $oxel.gc );
-			$oxel.vertMan = vot;
-			vot._vertMan = new VertexManager( $oxel.gc, null );
+			ch._oxel = $oxel;
+			Log.out( "chunk.parse - new VertexManager: " + $oxel.childCount + "  oxel.gc: " + $oxel.gc );
+			$oxel.chunk = ch;
+			ch._vertMan = new VertexManager( $oxel.gc, null );
 		}
-		return vot;	
+		return ch;	
 	}
 	
 	public function drawNew( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean = false ):void {		

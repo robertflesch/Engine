@@ -828,9 +828,9 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 					//if ( lastCollisionModel != collisionCandidate )
 					//{
 						//if ( _lastCollisionModel )
-							//Log.out( "voxelmodel.update - changing collision model from: " + _lastCollisionModel.instanceInfo.modelGuid + " to " + collisionCandidate.instanceInfo.modelGuid );
+							//Log.out( "Player.update - changing collision model from: " + _lastCollisionModel.instanceInfo.modelGuid + " to " + collisionCandidate.instanceInfo.modelGuid );
 						//else	
-							//Log.out( "voxelmodel.update - first collision model: " );
+							//Log.out( "Player.update - first collision model: " );
 		
 							
 						//instanceInfo.lastModelPosition = collisionCandidate.worldToModel( instanceInfo.positionGet );
