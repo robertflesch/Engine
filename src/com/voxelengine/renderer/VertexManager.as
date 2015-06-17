@@ -201,19 +201,66 @@ public class VertexManager {
 		//}
 	}
 	
-	public function oxelAdd( oxel:Oxel ):void { 	
-		var vib:VertexIndexBuilder = VIBGet( oxel.type, oxel.type );
-		vib.dirty = true; 
-		vib.oxelAdd( oxel ); 
+	public function oxelAdd( $oxel:Oxel ):void { 	
+		var vib:VertexIndexBuilder = VIBGet( $oxel.type );
+		vib.oxelAdd( $oxel ); 
 	}
 	
-	public function oxelRemove( oxel:Oxel, oldType:int ):void { 
-		var vib:VertexIndexBuilder = VIBGet( oxel.type, oldType );
-		vib.dirty = true; 
-		vib.oxelRemove( oxel ); 
+	public function oxelRemove( $oxel:Oxel ):void { 
+		var vib:VertexIndexBuilder = VIBGet( $oxel.type );
+		vib.oxelRemove( $oxel ); 
+		// I think answer to this is to not worry about it.
+		// If everything is gone, then next time it is built, it will be empty.
+//		if ( 0 == vib.length )
+//			Log.out( "VertexManger.oxelRemove - TODO how do I release every when last oxel is removed?", Log.WARN );
 	}
 	
-	public function VIBGet( newType:int, oldType:int ):VertexIndexBuilder
+	public function VIBGet( $type:uint ):VertexIndexBuilder
+	{
+		var ti:TypeInfo = TypeInfo.typeInfo[$type];
+		if ( ti.animated  ) 
+		{
+    		if ( ti.alpha )
+			{
+				if ( ti.flame )
+				{
+					if ( !_vertBufFire )
+						_vertBufFire = VertexIndexBuilderPool.poolGet();
+					return _vertBufFire;
+				}
+				else
+				{
+					if ( !_vertBufAnimatedAlpha )
+						_vertBufAnimatedAlpha = VertexIndexBuilderPool.poolGet();
+					return _vertBufAnimatedAlpha;
+				}
+			}	
+			else	
+			{
+				if ( !_vertBufAnimated )
+					_vertBufAnimated = VertexIndexBuilderPool.poolGet();
+				return _vertBufAnimated;
+			}	
+		} 
+		else 
+		{
+    		if ( ti.alpha ) 
+			{
+				if ( !_vertBufAlpha )
+					_vertBufAlpha = VertexIndexBuilderPool.poolGet();
+				return _vertBufAlpha;
+			}	
+			else 
+			{
+				if ( !_vertBuf )
+					_vertBuf = VertexIndexBuilderPool.poolGet();
+				return _vertBuf;
+			}
+		}
+		return null;
+	}
+	
+	public function VIBGetOld( newType:int, oldType:int ):VertexIndexBuilder
 	{
 		var VIBType:int = 0;
 		// We have to remeber what is WAS, so we can remove it form correct buffer

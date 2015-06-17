@@ -91,12 +91,13 @@ package com.voxelengine.worldmodel.oxel
 			// also mark parent as dirty recursively until you hit an oxel that has a chunk.
 			// so if null == chunk, mark your parent oxel dirty
 			// but if chunk is not null, just mark the oxel AND chunk dirty
-			if ( true == $isDirty && null == _chunk && _parent && !_parent.dirty ) 
-				_parent.dirty = true;
-			else {
-				var ch:Chunk = chunkGet();
+			if ( true == $isDirty ) {
+				if ( _parent && !_parent.dirty && null == _chunk ) 
+					_parent.dirty = true;
+					
+				var ch:Chunk = chunkGet(); // Get the parent chunk
 				if ( ch ) 
-					ch.dirty = $isDirty;
+					ch.dirtySet( type );
 			}
 		}
 		
@@ -286,7 +287,6 @@ package com.voxelengine.worldmodel.oxel
 			// removed the brightness
 			chunkRemoveOxel();
 			
-			Log.out( "Oxel.release - TODO how do I release Chunks node when last oxel is removed?", Log.WARN );
 			//if ( _chunk )
 			//{
 				//_chunk.release();
@@ -1086,31 +1086,26 @@ package com.voxelengine.worldmodel.oxel
 		// I am breaking up, so get rid of any reference to me
 		public function neighborsInvalidate():void {
 			// regardless of whether or not I have neighbors, I need to create them so them I can tell them I have changed!
-			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
-			{
+			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
 				var no:Oxel = neighbor(face);
-				if ( no && Globals.BAD_OXEL != no )
+				if ( no && Globals.BAD_OXEL != no ) {
+					no.dirty = true;
 					no.neighborInvalidate( Oxel.face_get_opposite( face ) );
+				}
 			}
 		}
 
 		// set old neighbor to null
 		protected function neighborInvalidate( face:int ):void {
-			if ( _neighbors )
-			{
+			if ( _neighbors ) 
 				_neighbors[face] = null;
-			}
 			
-			if ( childrenHas() )
-			{
+			if ( childrenHas() ) {
 				//const dchildren:Vector.<Oxel> = childrenForDirection( Oxel.face_get_opposite( face ) );
 				const dchildren:Vector.<Oxel> = childrenForDirection( face );
 				for each ( var dchild:Oxel in dchildren ) 
-				{
 					dchild.neighborInvalidate( face );
-				}
 			}
-			
 		}
 
 		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1618,8 +1613,6 @@ package com.voxelengine.worldmodel.oxel
 				// if those this oxel has not been added to vertex manager do it now.
 				if ( !addedToVertex ) 
 					chunkAddOxel();
-				else // I dont think this is needed.
-					chunkMarkDirty( TypeInfo.INVALID );
 			}
 			else if ( addedToVertex ) // I was added to vertex, but I lost all my face, so remove oxel
 				chunkRemoveOxel();
@@ -1731,7 +1724,6 @@ package com.voxelengine.worldmodel.oxel
 		// Its going to assume that it was solid, which works for sand to glass
 		// how about water to sand? the oxel would lose all its faces, but never go away.
 		protected function quadDelete( quad:Quad, face:int, type:int ):void {
-			chunkMarkDirty( type );
 			QuadPool.poolDispose( quad );
 			_quads[face] = null;
 		}
@@ -1759,7 +1751,7 @@ package com.voxelengine.worldmodel.oxel
 			if ( addedToVertex )
 			{
 				// Todo - this should just mark the oxels, and clean up should happen later
-				chunkGet().oxelRemove( this, type );
+				chunkGet().oxelRemove( this );
 				addedToVertex = false;
 			}
 		}
@@ -1767,11 +1759,6 @@ package com.voxelengine.worldmodel.oxel
 		private function chunkAddOxel():void {
 			addedToVertex = true;
 			chunkGet().oxelAdd( this );
-		}
-		
-		protected function chunkMarkDirty( oldType:int ):void {
-			//vm_get().VIBGet( type, oldType ).dirty = true;
-			chunkGet().dirty = true;
 		}
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

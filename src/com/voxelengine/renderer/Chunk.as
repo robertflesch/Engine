@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.renderer {
 
+import com.voxelengine.worldmodel.TypeInfo;
 import flash.geom.Matrix3D;
 import flash.display3D.Context3D;
 import flash.utils.getTimer;
@@ -30,12 +31,21 @@ public class Chunk {
 	
 	public function get dirty():Boolean { return _dirty; }
 	// TODO Should just add dirty chunks to a rebuild queue, which would get me a more incremental build
-	public function set dirty($value:Boolean):void {
-//		if ( _vertMan )
-//			Log.out( "chunk.dirty - marking chunk dirty: " + _oxel.gc + "  dirty: " + $value );
-		_dirty = $value;
+	public function dirtyClear():void { _dirty = false; }
+	public function dirtySet( $type:uint ):void {
+		//if ( _oxel )
+			//Log.out( "chunk.dirty - marking chunk " + _oxel.gc + "  dirty = true" );
+		//else	
+			//Log.out( "chunk.dirty - marking parent chunk as dirty = true" );
+		_dirty = true;
 		if ( _parent && !_parent.dirty ) 
-			_parent.dirty = $value;
+			_parent.dirtySet( $type );
+			
+		if ( _vertMan )			
+			_vertMan.VIBGet( $type ).dirty = true;
+			
+		if ( null == _vertMan && null == _children )
+			Log.out( "chunk.dirty - EMPTY chunk is DIRTY, better get vertMan?" );
 	}
 	public function childrenHas():Boolean { return null != _children; }
 	
@@ -49,20 +59,27 @@ public class Chunk {
 	// public function divide():?
 	
 	static public function parse( $oxel:Oxel, $parent:Chunk ):Chunk {
-		var ch:Chunk = new Chunk( $parent );
+		var chunk:Chunk = new Chunk( $parent );
 		Log.out( "chunk.parse - new chunk: " + $oxel.childCount );
+			
 		if ( MAX_CHILDREN < $oxel.childCount ) {
-			ch._children = new Vector.<Chunk>(OCT_TREE_SIZE, true);
+			chunk._children = new Vector.<Chunk>(OCT_TREE_SIZE, true);
 			for ( var i:int; i < OCT_TREE_SIZE; i++ )
-				ch._children[i] = parse( $oxel.children[i], ch );
+				chunk._children[i] = parse( $oxel.children[i], chunk );
 		}
 		else {
-			ch._oxel = $oxel;
-			Log.out( "chunk.parse - new VertexManager: " + $oxel.childCount + "  oxel.gc: " + $oxel.gc );
-			$oxel.chunk = ch;
-			ch._vertMan = new VertexManager( $oxel.gc, null );
+			chunk._oxel = $oxel;
+			$oxel.chunk = chunk;
+			if ( 1 == $oxel.childCount && false == $oxel.facesHas() ) {
+				Log.out( "chunk.parse - EMPTY CHUNK, no faces" );
+				chunk.dirtyClear();
+			}
+			else {
+				Log.out( "chunk.parse - new VertexManager: " + $oxel.childCount + "  oxel.gc: " + $oxel.gc );
+				chunk._vertMan = new VertexManager( $oxel.gc, null );
+			}
 		}
-		return ch;	
+		return chunk;	
 	}
 	
 	public function drawNew( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean = false ):void {		
@@ -70,7 +87,7 @@ public class Chunk {
 			for ( var i:int; i < OCT_TREE_SIZE; i++ )
 				_children[i].drawNew( $mvp, $vm, $context, $selected, $isChild );
 		}
-		else
+		else if ( _vertMan )
 			_vertMan.drawNew( $mvp, $vm, $context, $selected, $isChild );
 	}
 	
@@ -79,13 +96,13 @@ public class Chunk {
 			for ( var i:int; i < OCT_TREE_SIZE; i++ )
 				_children[i].drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
 		}
-		else
+		else if ( _vertMan )
 			_vertMan.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
 	}
 	
 	public function refreshQuads():void {
 		if ( childrenHas() ) {
-			dirty = false;
+			dirtyClear();
 			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
 				if ( _children[i].dirty )
 					_children[i].refreshQuads();
@@ -93,12 +110,12 @@ public class Chunk {
 		}
 		else {
 			_oxel.quadsBuild();
-			dirty = false;
+			dirtyClear();
 		}
 	}
 	
-	public function oxelRemove( $oxel:Oxel, $type:int ):void {
-		_vertMan.oxelRemove( $oxel, $type );
+	public function oxelRemove( $oxel:Oxel ):void {
+		_vertMan.oxelRemove( $oxel );
 	}
 
 	public function oxelAdd( $oxel:Oxel ):void {
