@@ -8,6 +8,7 @@
 
 package com.voxelengine.worldmodel 
 {
+	import com.voxelengine.events.RegionEvent;
 	import flash.events.KeyboardEvent;
 	import flash.events.FullScreenEvent;
 	import flash.events.MouseEvent;
@@ -23,6 +24,8 @@ package com.voxelengine.worldmodel
 	 */
 	public class MouseKeyboardHandler
 	{
+		static private var _s_active:Boolean  							= false;
+		
 		static private var _s_forward:Boolean  							= false;
 		static private var _s_backward:Boolean 		 					= false;
 		static private var _s_left:Boolean  							= false;
@@ -57,7 +60,8 @@ package com.voxelengine.worldmodel
 		static public function get ctrl():Boolean 						{ return _s_ctrl; }
 		static public function get shift():Boolean 						{ return _s_shift; }
 		static public function get alt():Boolean 						{ return _s_alt; }
-		
+		static public function get active():Boolean						{ return _s_active; }
+		static public function set active($val:Boolean):void			{ _s_active = $val; }
 		
 		public function MouseKeyboardHandler()  {}
 		
@@ -110,7 +114,17 @@ package com.voxelengine.worldmodel
 				Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 				Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 				Globals.g_app.stage.addEventListener( FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
+				RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, regionLoadBegin );
+				RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, regionLoadComplete );
 			}
+		}
+		
+		static private function regionLoadComplete(e:RegionEvent):void  {
+			active = true;
+		}
+		
+		static private function regionLoadBegin(e:RegionEvent):void  {
+			active = false;
 		}
 		
 		static private function removeInputListeners():void {
@@ -119,6 +133,8 @@ package com.voxelengine.worldmodel
 				Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 				Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp);
 				Globals.g_app.stage.removeEventListener( FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
+				RegionEvent.removeListener( RegionEvent.LOAD_COMPLETE, regionLoadBegin );
+				RegionEvent.removeListener( RegionEvent.LOAD_COMPLETE, regionLoadComplete );
 			}
 		}
 		

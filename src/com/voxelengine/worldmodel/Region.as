@@ -254,10 +254,10 @@ package com.voxelengine.worldmodel
 		}
 	
 		private function onLoadingComplete( le:LoadingEvent ):void {
-			Log.out( "Region.onLoadingComplete: regionId: " + guid, Log.DEBUG );
+			Log.out( "Region.onLoadingComplete: regionId: " + guid, Log.WARN );
 			_loaded = true;
 			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, 0, guid ) );
+			//RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, 0, guid ) );
 		}
 		
 		public function initJSON( $regionJson:String ):void {

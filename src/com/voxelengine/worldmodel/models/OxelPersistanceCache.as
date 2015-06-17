@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.RegionEvent;
+import com.voxelengine.worldmodel.Region;
 import flash.utils.ByteArray;
 import flash.utils.Dictionary;
 import flash.net.URLLoaderDataFormat;
@@ -25,6 +27,7 @@ public class OxelPersistanceCache
 {
 	// this acts as a holding spot for all model objects loaded from persistance
 	// dont use weak keys since this is THE spot that holds things.
+	static private var _loadingCount:int;
 	static private var _oxelDataDic:Dictionary = new Dictionary(false);
 	static private var _block:Block = new Block();
 	
@@ -41,6 +44,23 @@ public class OxelPersistanceCache
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
 	}
 	
+	static private function add( $series:int, $od:OxelPersistance ):void { 
+		if ( null == $od || null == $od.guid ) {
+			Log.out( "OxelDataCache.Add trying to add NULL OxelData or guid", Log.WARN );
+		} else if ( null == _oxelDataDic[$od.guid] ) { // check to make sure this is new data
+			//Log.out( "OxelDataCache.add adding: " + $od.modelGuid, Log.INFO );
+			_oxelDataDic[$od.guid] = $od; 
+			if ( _block.has( $od.guid ) )
+				_block.clear( $od.guid )
+			_loadingCount--;
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.ADDED, $series, $od.guid, $od ) );
+			if ( 0 == _loadingCount ) {
+				Log.out( "OxelPersistanceCache.add - done loading oxels: " + $od.guid, Log.WARN );
+				RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid ) );
+			}
+		} else
+			Log.out( "OxelDataCache.Add trying to add duplicate OxelData", Log.WARN );
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  OxelDataEvents
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -58,6 +78,7 @@ public class OxelPersistanceCache
 		//Log.out( "OxelDataCache.request guid: " + $ode.modelGuid, Log.DEBUG );
 		var od:OxelPersistance = _oxelDataDic[$ode.modelGuid]; 
 		if ( null == od ) {
+			_loadingCount++;
 			if ( true == Globals.online && $ode.fromTables )
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ode.series, Globals.BIGDB_TABLE_OXEL_DATA, $ode.modelGuid ) );
 			else	
@@ -126,21 +147,5 @@ public class OxelPersistanceCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End - Persistance Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  Internal Methods
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	static private function add( $series:int, $od:OxelPersistance ):void { 
-		if ( null == $od || null == $od.guid ) {
-			Log.out( "OxelDataCache.Add trying to add NULL OxelData or guid", Log.WARN );
-		} else if ( null == _oxelDataDic[$od.guid] ) { // check to make sure this is new data
-			//Log.out( "OxelDataCache.add adding: " + $od.modelGuid, Log.INFO );
-			_oxelDataDic[$od.guid] = $od; 
-			if ( _block.has( $od.guid ) )
-				_block.clear( $od.guid )
-			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.ADDED, $series, $od.guid, $od ) );
-		} else
-			Log.out( "OxelDataCache.Add trying to add duplicate OxelData", Log.WARN );
-	}
-	
 }
 }

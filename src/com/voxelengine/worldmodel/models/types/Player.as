@@ -458,7 +458,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 
 	override protected function handleMouseMovement( $elapsedTimeMS:int ):void {
-		if ( Globals.active && 0 == Globals.openWindowCount && Globals.clicked && false == MouseKeyboardHandler.ctrl ) 
+		if ( Globals.active && 0 == Globals.openWindowCount && Globals.clicked && false == MouseKeyboardHandler.ctrl && true == MouseKeyboardHandler.active ) 
 		{
 			// up down
 			var dx:Number = 0;

@@ -34,7 +34,6 @@ public class RegionManager
 	
 	public function get regions():Vector.<Region> { return _regions; }
 	
-	//public function get modelLoader():ModelLoader { return _modelLoader; }
 	static private var _s_instance:RegionManager;
 	static public function get instance():RegionManager {
 		if ( null == _s_instance )
@@ -46,13 +45,12 @@ public class RegionManager
 	{
 		_regions = new Vector.<Region>;
 
-		//RegionEvent.addListener( RegionEvent.LOAD, 			regionLoad ); 
-		RegionEvent.addListener( RegionEvent.JOIN, 			requestServerJoin ); 
+		RegionEvent.addListener( RegionEvent.JOIN, 				requestServerJoin ); 
 		RegionEvent.addListener( ModelBaseEvent.REQUEST_TYPE, 	regionTypeRequest );
 		RegionEvent.addListener( ModelBaseEvent.REQUEST, 		regionRequest );	
 		
-		RoomEvent.addListener( RoomEvent.ROOM_DISCONNECT, 	requestDefaultRegionLoad );
-		RoomEvent.addListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
+		RoomEvent.addListener( RoomEvent.ROOM_DISCONNECT, 		requestDefaultRegionLoad );
+		RoomEvent.addListener( RoomEvent.ROOM_JOIN_SUCCESS, 	onJoinRoomEvent );
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );			
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFail );			
@@ -169,7 +167,7 @@ public class RegionManager
 		startingRegion.createEmptyRegion();
 		regionAdd( null, startingRegion );
 		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, startingRegion.guid ) ); 
-		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, 0, startingRegion.guid ) );
+		//RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, 0, startingRegion.guid ) );
 		// This tells the config manager that the local region was loaded and is ready to load rest of data.
 	}
 	
