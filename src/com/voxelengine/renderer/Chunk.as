@@ -20,8 +20,8 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class Chunk {
 	
-	//static private const MAX_CHILDREN:uint = 4096;
-	static private const MAX_CHILDREN:uint = 2048;
+	static private const MAX_CHILDREN:uint = 4096;
+	//static private const MAX_CHILDREN:uint = 2048;
 	static private const OCT_TREE_SIZE:uint = 8;
 	private var _children:Vector.<Chunk>; 	// These are created when needed
 	private var _vertMan:VertexManager
@@ -53,6 +53,20 @@ public class Chunk {
 		_parent = $parent;
 		_dirty = true;
 	}
+	
+	public function release():void {
+		if ( childrenHas() ) {
+			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
+				_children[i].release();
+			}
+		}
+		else {
+			_vertMan.release();
+			_oxel = null;
+			_parent = null;
+		}
+	}
+	
 	
 	// I can see I need two more functions
 	// public function merge():Chunk
@@ -100,6 +114,18 @@ public class Chunk {
 			_vertMan.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
 	}
 	
+	public function  refreshFaces():void {
+		if ( childrenHas() ) {
+			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
+				if ( _children[i].dirty )
+					_children[i].refreshFaces();
+			}
+		}
+		else {
+			_oxel.facesBuild();
+		}
+	}
+
 	public function refreshQuads():void {
 		if ( childrenHas() ) {
 			dirtyClear();
