@@ -120,6 +120,9 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	}
 	
 	public function update( $context:Context3D, $elapsedTimeMS:int ):void {
+		if ( data )
+			data.update();
+			
 		for each (var vm:VoxelModel in _children)
 			vm.update($context, $elapsedTimeMS);
 	}
@@ -132,10 +135,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	}
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
-		if ( $isAlpha )
-			_data._topMostChunk.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
-		else
-			_data._topMostChunk.drawNew( $mvp, $vm, $context, $selected, $isChild );
+		_data.draw( $mvp, $vm, $context, $selected, $isChild, $isAlpha );
 			
 		for each (var vm:VoxelModel in _children) {
 			if (vm && vm.complete)
@@ -546,6 +546,12 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		}
 
 		function childAdd( $instanceInfo:InstanceInfo ):void {
+			if ( guid == $instanceInfo.modelGuid ) {
+				// TODO this needs to examine all of the children in that model guid.
+				// Since this would allow B owns A, and you could add B to A, which would cause a recurvise error
+				Log.out( "ModelInfo.childAdd - Rejecting child with same model guid as parent", Log.ERROR );
+				return;
+			}
 			// Dont add child that already exist
 			//Log.out( "ModelInfo.childAdd  fileName: " + fileName + " child ii: " + $instanceInfo, Log.WARN );
 			for each ( var child:InstanceInfo in _childrenToBeLoaded ) {
