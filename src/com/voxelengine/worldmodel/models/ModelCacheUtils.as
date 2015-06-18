@@ -402,7 +402,10 @@ package com.voxelengine.worldmodel.models
 					
 					var mspOrigin:Vector3D = collideCandidate.worldToModel( worldSpaceStartPointOrigin );
 					mspOrigin.scaleBy( 0.9 );
-					mspOrigin = mspOrigin.add( offset );
+					//mspOrigin = mspOrigin.add( offset );
+					mspOrigin.x += offset.x;
+					mspOrigin.y += offset.y;
+					mspOrigin.z += offset.z;
 //					trace( "whichModelsIsThisInsideOf - mspOrigin: " + mspOrigin );
 					
 					var mspHead:Vector3D = collideCandidate.worldToModel( worldSpaceStartPointCorner );
