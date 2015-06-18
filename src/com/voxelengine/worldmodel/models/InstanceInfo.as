@@ -479,6 +479,18 @@ public class InstanceInfo extends Location	{
 			if ( "" != mt.name )
 			{
 				//Log.out( "InstanceInfo.removeAllNamedTransforms - name:" + name, Log.ERROR );
+				// TODO http://jacksondunstan.com/articles/1279
+				// a way to not allocate more memory
+				//function removePerson(name:String): void
+				//{
+					//var index:int = people.indexOf(name);
+					//if (index >= 0)
+					//{
+						//var len:int = people.length - 1;
+						//people[index] = people[len];
+						//people.length = len;
+					//}
+				//}				
 				transforms.splice( index, 1 );
 			}
 			index++;	
