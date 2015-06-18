@@ -352,10 +352,11 @@ public class ControllableVoxelModel extends VoxelModel
 		//Log.out( "Jump PST: " + instanceInfo.velocityGet.y );
 	}
 
+	private static var _s_scratchLocation:Location = new Location();
 	protected function controlledModelChecks( $elapsedTimeMS:Number ):Boolean {
 		// set our next position by adding in velocities
 		// If there is no collision or gravity, this is where the model would end up.
-		var loc:Location = new Location();
+		var loc:Location = _s_scratchLocation;
 		loc.setTo( instanceInfo );
 		setTargetLocation( loc );
 		//Log.out( "CVM.controlledModelChecks - loc.positionSet: " + loc.positionGet );
