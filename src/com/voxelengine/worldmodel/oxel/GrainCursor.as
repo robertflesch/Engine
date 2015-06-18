@@ -215,16 +215,31 @@ public class GrainCursor
 		//return v;
 	}
 	
+	private static var _s_min:Vector3D = new Vector3D();
+	private static var _s_max:Vector3D = new Vector3D();
+	private static var _s_beginToEnd:Vector3D = new Vector3D();
 	public function lineIntersect( $o:Oxel, modelSpaceStartPoint:Vector3D, modelSpaceEndPoint:Vector3D, modelSpaceIntersections:Vector.<GrainCursorIntersection> ):Boolean
 	{
-		var beginToEnd:Vector3D = modelSpaceEndPoint.subtract( modelSpaceStartPoint );
-		var min:Vector3D = new Vector3D(0,0,0);
-		var max:Vector3D = new Vector3D(size(),size(),size());
-		var beginToMin:Vector3D = min.subtract( modelSpaceStartPoint );
+		// TODO - these subtracts are SLOW
+		//var beginToEnd:Vector3D = modelSpaceEndPoint.subtract( modelSpaceStartPoint );
+		_s_beginToEnd.x = modelSpaceEndPoint.x - modelSpaceStartPoint.x;
+		_s_beginToEnd.y = modelSpaceEndPoint.y - modelSpaceStartPoint.y;
+		_s_beginToEnd.z = modelSpaceEndPoint.z - modelSpaceStartPoint.z;
+		_s_min.setTo(0, 0, 0);
+		_s_max.setTo(size(),size(),size());
+		//var beginToMin:Vector3D = _s_min.subtract( modelSpaceStartPoint );
+		_s_min.x -= modelSpaceStartPoint.x;
+		_s_min.y -= modelSpaceStartPoint.y;
+		_s_min.z -= modelSpaceStartPoint.z;
+		var beginToMin:Vector3D = _s_min;
 		beginToMin.x += getModelX();
 		beginToMin.y += getModelY();
 		beginToMin.z += getModelZ();
-		var beginToMax:Vector3D = max.subtract( modelSpaceStartPoint );
+		//var beginToMax:Vector3D = _s_max.subtract( modelSpaceStartPoint );
+		_s_max.x -= modelSpaceStartPoint.x;
+		_s_max.y -= modelSpaceStartPoint.y;
+		_s_max.z -= modelSpaceStartPoint.z;
+		var beginToMax:Vector3D = _s_max;
 		beginToMax.x += getModelX();
 		beginToMax.y += getModelY();
 		beginToMax.z += getModelZ();
@@ -234,15 +249,15 @@ public class GrainCursor
 		var tFarAxis:int = -1;
 		for each ( var axis:int in _s_axes )
 		{
-			if ( getCoordinate(beginToEnd, axis) == 0) // parallel
+			if ( getCoordinate(_s_beginToEnd, axis) == 0) // parallel
 			{
 				if ( getCoordinate( beginToMin, axis) > 0 || getCoordinate(beginToMax,axis) < 0)
 					return false; // segment is not between planes, return empty set
 			}
 			else
 			{
-				var t1:Number = getCoordinate(beginToMin, axis) / (getCoordinate(beginToEnd,axis));
-				var t2:Number = getCoordinate(beginToMax, axis) / (getCoordinate(beginToEnd,axis));
+				var t1:Number = getCoordinate(beginToMin, axis) / (getCoordinate(_s_beginToEnd,axis));
+				var t2:Number = getCoordinate(beginToMax, axis) / (getCoordinate(_s_beginToEnd,axis));
 				var tMin:Number = Math.min(t1, t2);
 				var tMax:Number = Math.max(t1, t2);
 				if (tMin > tNear)
@@ -264,7 +279,7 @@ public class GrainCursor
 		{
 			var gciNear:GrainCursorIntersection = new GrainCursorIntersection();
 			gciNear.oxel = $o;
-			gciNear.point.copyFrom( beginToEnd );
+			gciNear.point.copyFrom( _s_beginToEnd );
 			gciNear.point.scaleBy( tNear );
 			gciNear.point = modelSpaceStartPoint.add( gciNear.point );
 			roundVector( gciNear.point );
@@ -296,7 +311,7 @@ public class GrainCursor
 		{	
 			var gciFar:GrainCursorIntersection = new GrainCursorIntersection();
 			gciFar.oxel = $o;
-			gciFar.point.copyFrom( beginToEnd );
+			gciFar.point.copyFrom( _s_beginToEnd );
 			gciFar.point.scaleBy( tFar );
 			gciFar.point = modelSpaceStartPoint.add( gciFar.point );
 			roundVector( gciFar.point );

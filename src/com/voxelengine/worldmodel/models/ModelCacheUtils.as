@@ -374,14 +374,18 @@ package com.voxelengine.worldmodel.models
 		// this version effective scales up models, so you show up inside of them
 		// even when you are not physically in the model space. Just close.
 		// This allow us to detect edges of models we are approaching
+		static private var _s_worldSpaceStartPointCorner:Vector3D = new Vector3D();
+		static private var _s_offset:Vector3D = new Vector3D();
+		static private var _s_mspOrigin:Vector3D = new Vector3D();
+		
 		static public function whichModelsIsThisInfluencedBy( vm:VoxelModel ):Vector.<VoxelModel> {
 			var worldSpaceStartPointOrigin:Vector3D = vm.instanceInfo.positionGet;
-			var worldSpaceStartPointCorner:Vector3D = vm.instanceInfo.positionGet.clone();
+			_s_worldSpaceStartPointCorner.setTo( worldSpaceStartPointOrigin.x, worldSpaceStartPointOrigin.y, worldSpaceStartPointOrigin.z );
 			// add size to get corner
 			// might want to do all 8 corners if we need to be through
-			worldSpaceStartPointCorner.x = worldSpaceStartPointCorner.x + vm.oxel.gc.size();
-			worldSpaceStartPointCorner.y = worldSpaceStartPointCorner.y + vm.oxel.gc.size();
-			worldSpaceStartPointCorner.z = worldSpaceStartPointCorner.z + vm.oxel.gc.size();
+			_s_worldSpaceStartPointCorner.x += vm.oxel.gc.size();
+			_s_worldSpaceStartPointCorner.y += vm.oxel.gc.size();
+			_s_worldSpaceStartPointCorner.z += vm.oxel.gc.size();
 
 			var modelList:Vector.<VoxelModel> = new Vector.<VoxelModel>;
 			var models:Vector.<VoxelModel> = Region.currentRegion.modelCache.models;
@@ -397,21 +401,27 @@ package com.voxelengine.worldmodel.models
 					var sizeOfInstance:Number = collideCandidate.size();
 					if ( sizeOfInstance <= 2 ) 
 						continue;
-					var offset:Vector3D = new Vector3D( sizeOfInstance, sizeOfInstance, sizeOfInstance );
-					offset.scaleBy( 0.05 );
+					_s_offset.setTo( sizeOfInstance, sizeOfInstance, sizeOfInstance );
+					_s_offset.scaleBy( 0.05 );
 					
-					var mspOrigin:Vector3D = collideCandidate.worldToModel( worldSpaceStartPointOrigin );
-					mspOrigin.scaleBy( 0.9 );
-					//mspOrigin = mspOrigin.add( offset );
-					mspOrigin.x += offset.x;
-					mspOrigin.y += offset.y;
-					mspOrigin.z += offset.z;
-//					trace( "whichModelsIsThisInsideOf - mspOrigin: " + mspOrigin );
+					//var mspOrigin:Vector3D = collideCandidate.worldToModelNew( worldSpaceStartPointOrigin, _s_mspOrigin );
+					//mspOrigin.scaleBy( 0.9 );
+					//mspOrigin.x += offset.x;
+					//mspOrigin.y += offset.y;
+					//mspOrigin.z += offset.z;
+					collideCandidate.worldToModelNew( worldSpaceStartPointOrigin, _s_mspOrigin );
+					_s_mspOrigin.scaleBy( 0.9 );
+					_s_mspOrigin.x += _s_offset.x;
+					_s_mspOrigin.y += _s_offset.y;
+					_s_mspOrigin.z += _s_offset.z;
 					
-					var mspHead:Vector3D = collideCandidate.worldToModel( worldSpaceStartPointCorner );
+					var mspHead:Vector3D = collideCandidate.worldToModel( _s_worldSpaceStartPointCorner );
 					mspHead.scaleBy( 0.9 );
-					mspHead = mspHead.add( offset );
-					if ( collideCandidate.oxel.gc.containsModelSpacePoint( mspOrigin ) ) 
+					//mspHead = mspHead.add( _s_offset );
+					mspHead.x += _s_offset.x;
+					mspHead.y += _s_offset.y;
+					mspHead.z += _s_offset.z;
+					if ( collideCandidate.oxel.gc.containsModelSpacePoint( _s_mspOrigin ) ) 
 					{
 						modelList.push( collideCandidate );
 					}

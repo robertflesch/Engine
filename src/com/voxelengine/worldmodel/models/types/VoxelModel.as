@@ -531,6 +531,7 @@ public class VoxelModel
 	// intersection functions
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public function worldToModel(v:Vector3D):Vector3D { return instanceInfo.worldToModel(v); }
+	public function worldToModelNew(v:Vector3D,d:Vector3D):void { return instanceInfo.worldToModelNew(v,d); }
 	public function modelToWorld(v:Vector3D):Vector3D { return instanceInfo.modelToWorld(v); }
 	
 	public function lineIntersect( $worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>):void {
