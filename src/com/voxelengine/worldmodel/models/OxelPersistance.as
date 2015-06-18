@@ -7,14 +7,14 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.adobe.utils.Hex;
-import com.voxelengine.pools.LightingPool;
-import com.voxelengine.pools.OxelPool;
-import com.voxelengine.renderer.Chunk;
-import flash.utils.ByteArray;
+import flash.display3D.Context3D;
+import flash.geom.Matrix3D;
 import flash.net.registerClassAlias;
+import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
+
+import com.adobe.utils.Hex;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -22,19 +22,24 @@ import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.pools.GrainCursorPool;
+import com.voxelengine.pools.LightingPool;
+import com.voxelengine.pools.OxelPool;
+import com.voxelengine.renderer.Chunk;
+import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.FlowInfo;
 import com.voxelengine.worldmodel.oxel.LightInfo;
 import com.voxelengine.worldmodel.oxel.OxelBitfields;
 import com.voxelengine.worldmodel.oxel.Lighting;
 import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.models.types.EditCursor;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 
 /**
  * ...
  * @author Robert Flesch - RSF
- * OxelData is the byte level representation of the oxel
+ * OxelPersistance is the persistance wrapper for the oxel level data.
  */
 public class OxelPersistance extends PersistanceObject
 {
@@ -45,9 +50,8 @@ public class OxelPersistance extends PersistanceObject
 	private var _oxel:Oxel;
 	private var _loaded:Boolean;
 	private	var _version:int;
-	
-	public	function set version(value:int):void  				{ _version = value; }
-	public	function get version():int  						{ return _version; }
+	private var _topMostChunk:Chunk;
+		
 	public 	function get oxel():Oxel 							{ return _oxel; }
 	public 	function get loaded():Boolean 						{ return _loaded; }
 	public 	function set loaded(value:Boolean):void 			{ _loaded = value; }
@@ -60,10 +64,47 @@ public class OxelPersistance extends PersistanceObject
 	override public function release():void {
 		_statisics.release();
 		_oxel.release();
+		_topMostChunk.release();
 		super.release();
 	}
 	
+	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
+		if ( $isAlpha )
+			_topMostChunk.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
+		else
+			_topMostChunk.drawNew( $mvp, $vm, $context, $selected, $isChild );
+	}
+
+	public function createEditCursor():void {
+		fromByteArray( compressedReferenceBA );
+	}
 	
+	// creating a new copy of this
+	override public function clone( $guid:String ):* {
+		var vmd:OxelPersistance = new OxelPersistance( $guid );
+		vmd._dbo = null; // Can I just reference this? They are pointing to same object
+		var ba:ByteArray = toByteArray( oxel );
+		vmd.fromByteArray( ba );
+		return vmd;
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Chunk operations
+	public function refreshFaces():void {
+		_topMostChunk.refreshFaces();
+	}
+	
+	public function update():void {
+		if ( _topMostChunk && _topMostChunk.dirty ) {
+			if ( guid != EditCursor.EDIT_CURSOR )
+				Log.out( "ModelInfo.update - calling refreshQuads guid: " + guid, Log.WARN );
+			_topMostChunk.refreshFaces();
+			_topMostChunk.refreshQuads();
+		}
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// oxel operations
 	public function changeOxel( $modelGuid:String, $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
 		var result:Boolean = _oxel.changeOxel( $modelGuid, $gc, $type, $onlyChangeType );
 		if ( result )
@@ -71,6 +112,8 @@ public class OxelPersistance extends PersistanceObject
 		return result;
 	}
 	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// persistance operations
 	public function save():void {
 		if ( Globals.online && true == loaded && true == changed ) {
 			//Log.out( "OxelData.save - Saving OxelData: " + guid  + " in table: " + table, Log.WARN );
@@ -85,19 +128,6 @@ public class OxelPersistance extends PersistanceObject
 		}
 		else
 			Log.out( "OxelData.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
-	}
-	
-	public function createEditCursor():void {
-		fromByteArray( compressedReferenceBA );
-	}
-	
-	// creating a new copy of this
-	override public function clone( $guid:String ):* {
-		var vmd:OxelPersistance = new OxelPersistance( $guid );
-		vmd._dbo = null; // Can I just reference this? They are pointing to same object
-		var ba:ByteArray = toByteArray( oxel );
-		vmd.fromByteArray( ba );
-		return vmd;
 	}
 	
 	public function toPersistance():void { 
@@ -165,8 +195,7 @@ public class OxelPersistance extends PersistanceObject
 			return int(version);
 		}
 	}
-		
-	public var _topMostChunk:Chunk;
+	
 	public function fromByteArray($ba:ByteArray):void {
 
 		Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.WARN );
@@ -194,10 +223,10 @@ public class OxelPersistance extends PersistanceObject
 		registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);	
 		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
 		gct.grain = rootGrainSize;
-		if (Globals.VERSION_000 == version)
+		if (Globals.VERSION_000 == _version)
 			oxel.readData( null, gct, $ba, _statisics );
 		else
-			oxel.readVersionedData( version, null, gct, $ba, _statisics );
+			oxel.readVersionedData( _version, null, gct, $ba, _statisics );
 		GrainCursorPool.poolDispose(gct);
 		_statisics.gather();
 		_statisics.statsPrint();
@@ -263,7 +292,7 @@ public class OxelPersistance extends PersistanceObject
 	private function validateOxel( $ba:ByteArray, $currentGrain:int):ByteArray {
 		var faceData:uint = $ba.readUnsignedInt();
 		var type:uint;
-		if ( version <= Globals.VERSION_006 )
+		if ( _version <= Globals.VERSION_006 )
 			type = OxelBitfields.typeFromRawDataOld(faceData);
 		else {  //_version > Globals.VERSION_006
 			var typeData:uint = $ba.readUnsignedInt();
