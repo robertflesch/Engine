@@ -448,14 +448,6 @@ public class VoxelModel
 		if ( complete ) {
 			instanceInfo.update($elapsedTimeMS);
 			modelInfo.update($context,$elapsedTimeMS);
-//			if (oxel && oxel.dirty)
-				//oxel.cleanup();
-				// TODO way too long of a calling sequence here.
-			if ( modelInfo.data._topMostChunk.dirty ) {
-				if ( modelInfo.guid != EditCursor.EDIT_CURSOR )
-					Log.out( "VoxelModel.update - calling refreshQuads guid: " + modelInfo.guid, Log.WARN );
-				modelInfo.data._topMostChunk.refreshQuads()
-			}
 			
 			collisionTest($elapsedTimeMS);
 			modelInfo.bringOutYourDead();
@@ -1055,10 +1047,11 @@ public class VoxelModel
 	
 	private static var g_selectedModel:VoxelModel = null;
 	public static function get selectedModel():VoxelModel { return g_selectedModel; }
-	public static function set selectedModel( val:VoxelModel ):void { 
-		//Log.out( "VoxelModel.selectedModel: " + ( val ? val.toString() : "null") , Log.WARN );
-		g_selectedModel = val; 
-	}
+	public static function set selectedModel( $val:VoxelModel ):void { g_selectedModel = $val; }
+	//public static function set selectedModel( $val:VoxelModel ):void { 
+		//Log.out( "VoxelModel.selectedModel: " + ( $val ? $val.toString() : "null") , Log.WARN );
+		//g_selectedModel = $val; 
+	//}
 	
 	public function size():int {
 		if ( _modelInfo && _modelInfo.data && _modelInfo.data.loaded )
