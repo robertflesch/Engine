@@ -70,14 +70,15 @@ public class OxelPersistanceCache
 			return;
 		}
 		
-		if ( _block.has( $ode.modelGuid ) )	
-			return;
-		else
-			_block.add( $ode.modelGuid );
 		
 		//Log.out( "OxelDataCache.request guid: " + $ode.modelGuid, Log.DEBUG );
 		var od:OxelPersistance = _oxelDataDic[$ode.modelGuid]; 
 		if ( null == od ) {
+			if ( _block.has( $ode.modelGuid ) )	
+				return;
+			else
+				_block.add( $ode.modelGuid );
+				
 			_loadingCount++;
 			if ( true == Globals.online && $ode.fromTables )
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ode.series, Globals.BIGDB_TABLE_OXEL_DATA, $ode.modelGuid ) );

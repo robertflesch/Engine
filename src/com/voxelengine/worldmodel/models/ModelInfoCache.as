@@ -60,12 +60,12 @@ public class ModelInfoCache
 		
 		//Log.out( "ModelInfoCache.modelInfoRequest guid: " + $mie.modelGuid, Log.INFO );
 		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
-		if ( _block.has( $mie.modelGuid ) )
-			return;
-		else
-			_block.add( $mie.modelGuid );
-		
 		if ( null == mi ) {
+			if ( _block.has( $mie.modelGuid ) )
+				return;
+			else
+				_block.add( $mie.modelGuid );
+				
 			if ( true == Globals.online && $mie.fromTables )
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid ) );
 			else	
@@ -122,6 +122,8 @@ public class ModelInfoCache
 					mi.fromObject( jsonResult.model, null );
 				}
 				add( $pe.series, mi );
+				if ( _block.has( $pe.guid ) )
+					_block.clear( $pe.guid )
 			}
 			else {
 				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, mi ) );
