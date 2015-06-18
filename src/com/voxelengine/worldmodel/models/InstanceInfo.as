@@ -570,6 +570,32 @@ public class InstanceInfo extends Location	{
 			return modelMatrix.transformVector( v );
 	}
 	
+	public function worldToModelNew( v:Vector3D, d:Vector3D ):void
+	{
+		if ( changed )
+			recalculateMatrix();
+		if ( _controllingModel ){ 
+			var test:Vector3D = modelMatrix.transformVector( _controllingModel.worldToModel( v ) );
+			_controllingModel.worldToModelNew( v, d );
+			transformVec( modelMatrix, v, d );
+			if ( test != d )
+				Log.out( "InstanceInfo.worldToModelNew - ERROR" );
+		} else
+			transformVec( modelMatrix, v, d );
+	}
+	
+	// http://blog.bengarney.com/category/flash/
+	final public function transformVec(m:Matrix3D, i:Vector3D, o:Vector3D):void
+	{
+		const x:Number = i.x, y:Number = i.y, z:Number = i.z;
+		const d:Vector.<Number> = m.rawData;
+
+		o.x = x * d[0] + y * d[4] + z * d[8] + d[12];
+		o.y = x * d[1] + y * d[5] + z * d[9] + d[13];
+		o.z = x * d[2] + y * d[6] + z * d[10] + d[14];
+		o.w = x * d[3] + y * d[7] + z * d[11] + d[15];
+	}	
+	
 	override public function modelToWorld( v:Vector3D ):Vector3D
 	{
 		if ( changed )
