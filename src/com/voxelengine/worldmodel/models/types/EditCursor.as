@@ -487,17 +487,17 @@ public class EditCursor extends VoxelModel
 			return;
 			
 		var ii:InstanceInfo = objectModel.instanceInfo.clone();
-		if ( VoxelModel.selectedModel )
+		if ( VoxelModel.selectedModel && PlacementLocation.INVALID != _pl.state) {
 			ii.controllingModel = VoxelModel.selectedModel;
-			
-		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelInsertComplete );			
-		ModelMakerBase.load( ii );
-		
-		// This places an oxel that is invisible, but collidable at the same location as the model
-		// This should lock the model to that location, otherwise the oxel is invalid.
-		if ( VoxelModel.selectedModel )
+			// This places an oxel that is invisible, but collidable at the same location as the model
+			// This should lock the model to that location, otherwise the oxel is invalid.
 			VoxelModel.selectedModel.write( _pl.gc, 101 );
+			// This adds a link from the model to the placement location
+			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelInsertComplete );			
+		}
 			
+		ModelMakerBase.load( ii, true );
+		
 		//Now we need to listen for the model to be built, then use associatedGrain to see the location on the new ModelBaseEvent
 		function modelInsertComplete( $mle:ModelLoadingEvent ): void {
 			if ( $mle.modelGuid == ii.modelGuid && $mle.vm.instanceInfo.instanceGuid == ii.instanceGuid ) {
@@ -506,8 +506,6 @@ public class EditCursor extends VoxelModel
 			}
 		}
 	}
-	
-	
 	
 	private function insertOxel(recurse:Boolean = false):void {
 		if ( CursorOperationEvent.INSERT_OXEL != cursorOperation )
