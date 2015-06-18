@@ -184,11 +184,12 @@ public class VertexManager {
 		
 		if ( _vertBufAlpha && _vertBufAlpha.length ) {
 			if ( _shaders[2].update( $mvp, $vm, $context, $selected, $isChild ) ) {
-				var xdist:Number = _gc.getDistance( VoxelModel.controlledModel.modelToWorld( VoxelModel.controlledModel.camera.center ) );
-				if (  xdist < 512 ) {
-					_vertBufAlpha.sorted = false;
-					//Log.out( "xdist: " + xdist );
-				}
+				// TODO anyway to optimise this? its causing a huge amount of vector allocations
+				//var xdist:Number = _gc.getDistance( VoxelModel.controlledModel.modelToWorld( VoxelModel.controlledModel.camera.center ) );
+				//if (  xdist < 512 ) {
+					//_vertBufAlpha.sorted = false;
+					////Log.out( "xdist: " + xdist );
+				//}
 				_vertBufAlpha.sort();
 				_vertBufAlpha.buffersBuildFromOxels( $context );
 				_vertBufAlpha.BufferCopyToGPU( $context );
