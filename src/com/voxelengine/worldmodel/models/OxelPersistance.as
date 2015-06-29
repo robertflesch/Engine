@@ -98,7 +98,7 @@ public class OxelPersistance extends PersistanceObject
 	public function update():void {
 		if ( _topMostChunk && _topMostChunk.dirty ) {
 			if ( guid != EditCursor.EDIT_CURSOR )
-				Log.out( "ModelInfo.update - calling refreshQuads guid: " + guid, Log.WARN );
+				Log.out( "OxelPersistance.update - calling refreshQuads guid: " + guid, Log.WARN );
 			_topMostChunk.refreshFaces();
 			_topMostChunk.refreshQuads();
 		}

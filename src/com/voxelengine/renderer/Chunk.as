@@ -33,19 +33,12 @@ public class Chunk {
 	// TODO Should just add dirty chunks to a rebuild queue, which would get me a more incremental build
 	public function dirtyClear():void { _dirty = false; }
 	public function dirtySet( $type:uint ):void {
-		//if ( _oxel )
-			//Log.out( "chunk.dirty - marking chunk " + _oxel.gc + "  dirty = true" );
-		//else	
-			//Log.out( "chunk.dirty - marking parent chunk as dirty = true" );
 		_dirty = true;
 		if ( _parent && !_parent.dirty ) 
 			_parent.dirtySet( $type );
 			
 		if ( _vertMan )			
 			_vertMan.VIBGet( $type ).dirty = true;
-			
-		if ( null == _vertMan && null == _children )
-			Log.out( "chunk.dirty - EMPTY chunk is DIRTY, better get vertMan?" );
 	}
 	public function childrenHas():Boolean { return null != _children; }
 	

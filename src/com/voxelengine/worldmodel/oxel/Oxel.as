@@ -1768,19 +1768,11 @@ public class Oxel extends OxelBitfields
 			$ba.writeUnsignedInt( type );
 		}
 		
-		
 		if ( childrenHas() ) {
 			for each ( var child:Oxel in _children ) 
 				child.toByteArrayRecursive( $ba );
 		}
-		
-		validateData( $ba );
 	}
-	
-	private function validateData( $ba:ByteArray ):void {
-		
-	}
-	
 	
 	public function readVersionedData( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $stats:ModelStatisics ):ByteArray 
 	{
