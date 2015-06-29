@@ -160,15 +160,20 @@ public class EditCursor extends VoxelModel
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation
 		  || CursorOperationEvent.INSERT_OXEL == cursorOperation ) {
 			if ( VoxelModel.selectedModel )
-				if ( e.size < VoxelModel.selectedModel.oxel.gc.bound && 0 <= e.size )
+				if ( e.size < VoxelModel.selectedModel.oxel.gc.bound && 0 <= e.size ) {
+					oxel.gc.bound = e.size;
 					oxel.gc.grain = e.size;
+				}
 				else {	
 					// reseting so I have to inform others
+					oxel.gc.bound = 4;
 					oxel.gc.grain = 4;
 					CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, oxel.gc.grain ) );
 				}
-			else	
+			else {
+				oxel.gc.bound = e.size;
 				oxel.gc.grain = e.size;
+			}
 		}
 	}
 	private function sizeGrowEvent(e:CursorSizeEvent):void {
