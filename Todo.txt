@@ -1,6 +1,7 @@
 https://www.boost.vc
 http://rothenbergventures.com/
 https://medium.com/@bashmakov/we-need-more-virtual-reality-content-4eed95e6a1fb
+http://techcrunch.com/2015/06/08/lessons-from-a-study-of-perfect-pitch-decks-vcs-spend-an-average-of-3-minutes-44-seconds-on-them/
 
 Where do I start?
 
@@ -230,6 +231,7 @@ http://techcrunch.com/2014/09/17/indiegogo-forever-funding/
 http://www.redblobgames.com/pathfinding/a-star/introduction.html
 https://news.ycombinator.com/item?id=8997844
 
+
 machine learning and vectors math
 http://metacademy.org/roadmaps/cjrd/level-up-your-ml
 http://metacademy.org/graphs/concepts/logistic_regression#focus=dot_product&mode=learn
@@ -237,17 +239,19 @@ https://www.khanacademy.org/math/linear-algebra/vectors_and_spaces/dot_cross_pro
 
 Support for business idea
 http://motherboard.vice.com/read/minecraft-25-billion-and-the-founder-who-never-meant-to-make-a-hit?trk_source=popular
-http://recode.net/2014/09/17/minecraft-shows-why-game-cloning-can-be-a-good-thing/?utm_source=newsletter&&mkt_tok=3RkMMJWWfF9wsRonu6nPZKXonjHpfsX57uolT%2Frn28M3109ad%2BrmPBy%2B2oMFWp8na%2BqWCgseOrQ8mFkIV8izUs0TrKM%3D#038;utm_medium=email&#038;utm_campaign=rc_email_daily&#038;utm_content=minecraft-shows-why-game-cloning-can-be-a-good-thing
+http://recode.net/2014/09/17/minecraft-shows-why-game-cloning-can-be-a-good-thing
 http://recode.net/2014/09/16/will-minecrafts-power-users-stick-around-for-minecrosoft-wait-and-see/
 Minecraft 2: 10 things it needs
 http://www.redbull.com/en/games/stories/1331708927549/minecraft-2-10-things-it-needs
 he greatest Minecraft game remakes ever
 http://www.redbull.com/en/games/stories/1331688983548/minecraft-the-greatest-game-remakes-ever
 http://www.bloomberg.com/graphics/2015-game-of-war/
+http://recode.net/2015/06/23/virtual-reality-is-still-not-ready-for-primetime/
 Theory of moderation
 http://blog.stackoverflow.com/2009/05/a-theory-of-moderation/
 Should parents worry about minecraft
 http://www.bbc.com/news/magazine-32051153
+http://blog.asmartbear.com/unprofitable-saas-business-model.html
 
 Competitors
 http://oortonline.com/
@@ -272,3 +276,8 @@ http://primercss.io/buttons/
 
 Voxel Utilities
 http://www.cs.princeton.edu/~min/meshconv/
+
+3D viewers
+https://www.oculus.com/
+Requirements
+https://www.oculus.com/en-us/blog/powering-the-rift/

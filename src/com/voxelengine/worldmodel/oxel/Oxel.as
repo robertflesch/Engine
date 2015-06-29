@@ -1117,16 +1117,13 @@ public class Oxel extends OxelBitfields
 	
 	override protected function faceMarkDirty( $instanceGuid:String, $face:uint, $propogateCount:int = 2 ):void {
 		
-		if ( childrenHas() )
-		{
+		if ( childrenHas() ) {
 			const children:Vector.<Oxel> = childrenForDirection( $face );
-			for each ( var child:Oxel in children ) 
-			{
+			for each ( var child:Oxel in children ) {
 				child.faceMarkDirty( $instanceGuid, $face, $propogateCount );
 			}
 		}
-		else
-		{
+		else {
 			var ti:TypeInfo = TypeInfo.typeInfo[type];
 			// TODO This needs to be refactored to remove this from this function, so more likely go in the write function of the voxelModel.
 			// TODO also be nice to pass in the flow direction if possible. We know which face, so we know flow dir...
@@ -1156,144 +1153,60 @@ public class Oxel extends OxelBitfields
 		neighborsMarkDirtyFaces( $instanceGuid, gc.size() );
 		facesMarkAllDirty();
 	}
-	
-	public function cleanup():void {
-		var timer:int = getTimer();
-		//Log.out( "Oxel.cleanup - name: " + $md.name + " - guid: " + $md.guid );					
-		_s_oxelsCreated = 0;
-		_s_oxelsEvaluated = 0;
-//			facesBuildWater();
-//			Log.out( "Oxel.cleanup - facesBuildWater took: " + (getTimer() - timer) + "  oxels eval: " + _s_oxelsEvaluated + "  oxels created: " + _s_oxelsCreated );					
-//			timer = getTimer();
-		facesBuild();
-		Log.out( "Oxel.cleanup - facesBuild - took: " + (getTimer() - timer) );					
-		timer = getTimer();
-		quadsBuild();
-		var time:int = (getTimer() - timer);
-		if ( 3 < time )
-			Log.out( "Oxel.cleanup - quadsBuild -  took: " + time );					
-	}
-	/*
-	public function facesBuildWater():void {
-		if ( dirty ) {
-			if ( childrenHas())
-			{
-				//for each ( var child:Oxel in _children )
-				//	child.facesBuildWater();
-				for ( var childIndex:int = 0; childIndex < OXEL_CHILD_COUNT; childIndex++ )
-					_children[childIndex].facesBuildWater();
-			}
-			else {
-				if ( TypeInfo.WATER == type )
-				{
-					_s_oxelsEvaluated++;
-					var no:Oxel = null;
-					for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
-					{
-						no = neighbor( face );
-						if ( Globals.BAD_OXEL == no ) 
-							continue;
-						if ( !no.childrenHas() )
-							continue;
-						
-						// so the neighbor has children, are all the children facing us water oxels?
-						// if there is anything other then a water oxel facing this face, it needs to break up into smaller oxel
-						const dchildren:Vector.<Oxel> = no.childrenForDirection( Oxel.face_get_opposite( face ) );
-						var breakup:Boolean;
-						for each ( var dchild:Oxel in dchildren ) 
-						{
-							if ( TypeInfo.WATER != dchild.type ) {
-								breakup = true;
-								break;
-							}
-						}
-						if ( breakup ) {
-							childrenCreate();
-							_s_oxelsCreated += 8;
-							facesBuildWater();
-						}
-						
-					}
-				}
-			}
-		}
-	}
-	*/
-	public var timeBuilding:int;
-	public function facesBuild():Boolean {
-//			if ( MAX_BUILD_TIME < getTimer() - timeBuilding )
-//				return false;
 
-		//facesBuildWater();
-			
-		var continueProcessing:Boolean = true;
-		if ( dirty )
-		{
-			if ( childrenHas() )
-			{
+	//private function facesBuildWater():void {
+		//_s_oxelsEvaluated++;
+		//var no:Oxel = null;
+		//for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
+			//no = neighbor( face );
+			//if ( Globals.BAD_OXEL == no ) 
+				//continue;
+			//if ( TypeInfo.WATER == no.type && !no.childrenHas() )
+				//continue;
+			//
+			//// so the neighbor has children, are all the children facing us water oxels?
+			//// if there is anything other then a water oxel facing this face, it needs to break up into smaller oxel
+			//const dchildren:Vector.<Oxel> = no.childrenForDirection( Oxel.face_get_opposite( face ) );
+			//var breakup:Boolean;
+			//for each ( var dchild:Oxel in dchildren ) {
+				//if ( TypeInfo.WATER != dchild.type ) {
+					//breakup = true;
+					//break;
+				//}
+			//}
+			//if ( breakup && 0 < gc.grain  ) {
+				//childrenCreate();
+				//_s_oxelsCreated += 8;
+				//facesBuild();
+			//}
+		//}
+	//}
+
+	public function facesBuild():void {
+		if ( dirty ) {
+			if ( childrenHas() ) {
 				// parents dont have faces!
 				if ( facesHas() )
 					facesClearAll();
 					
-				dirty = false;
-				
-				for each ( var child:Oxel in _children ) {
+				for each ( var child:Oxel in _children )
 					if ( child.dirty )
-					{
-						continueProcessing = child.facesBuild();
-						// We have timed out in one of the children, get out.
-						if ( !continueProcessing )
-							return false;
-					}
-				}
+						child.facesBuild();
 			}
 			else
-			{
 				facesBuildTerminal();
-			}
 		}
-		
-		return continueProcessing;
 	}
 	
-	private function quadAmbient( $face:int, $ti:TypeInfo ):void {
-		
-		if ( !_lighting ) {
-			_lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
-			if ( _lighting.lightHas( Lighting.DEFAULT_LIGHT_ID ) ) {
-				var li:LightInfo = _lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-				// break down for debugging
-				//var rootAttn:uint = root_get()._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg
-				var rootAttn:uint = Lighting.defaultBaseLightAttn
-				var root:Oxel = root_get();
-				if ( root && root._lighting )
-					rootAttn = root._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg
-				else
-					Log.out( "Oxel.quadAmbient - root or root lighting not found", Log.WARN );
-				li.setAll( rootAttn );
-			}
-			_lighting.materialFallOffFactor = $ti.lightInfo.fallOffFactor;
-			_lighting.color = $ti.color;
-		}
-		
-		if ( true == $ti.lightInfo.fullBright && false == $ti.lightInfo.lightSource )
-			_lighting.lightFullBright();
-		
-//			_lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
-	}
-
-	protected function facesBuildTerminal():void {
+	private function facesBuildTerminal():void {
 		//trace( "Oxel.facesBuildTerminal");
 		if ( TypeInfo.AIR == type )
-		{
-			facesMarkAllClean(); dirty = true;
-			return;
-		} else  if ( TypeInfo.LEAF == type )
-		{
-			facesSetAll(); dirty = true;
-			return;
-		} else if ( faceHasDirtyBits() )
-		{
+			facesMarkAllClean();
+		else  if ( TypeInfo.LEAF == type )
+			facesSetAll();
+		//else  if ( TypeInfo.WATER == type )
+		//	facesBuildWater();
+		else if ( faceHasDirtyBits() ) {
 			var no:Oxel = null ;
 			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 			{
@@ -1390,7 +1303,6 @@ public class Oxel extends OxelBitfields
 			}
 		}
 		facesMarkAllClean();
-		dirty = true;
 	}
 	
 	static public function face_get_opposite( dir:int ):int	{
@@ -1488,6 +1400,32 @@ public class Oxel extends OxelBitfields
 	public static var _s_oxelsEvaluated:int = 0;
 	public static var _s_lightsFound:int = 0;
 	
+	private function quadAmbient( $face:int, $ti:TypeInfo ):void {
+		
+		if ( !_lighting ) {
+			_lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
+			if ( _lighting.lightHas( Lighting.DEFAULT_LIGHT_ID ) ) {
+				var li:LightInfo = _lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+				// break down for debugging
+				//var rootAttn:uint = root_get()._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg
+				var rootAttn:uint = Lighting.defaultBaseLightAttn
+				var root:Oxel = root_get();
+				if ( root && root._lighting )
+					rootAttn = root._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg
+				else
+					Log.out( "Oxel.quadAmbient - root or root lighting not found", Log.WARN );
+				li.setAll( rootAttn );
+			}
+			_lighting.materialFallOffFactor = $ti.lightInfo.fallOffFactor;
+			_lighting.color = $ti.color;
+		}
+		
+		if ( true == $ti.lightInfo.fullBright && false == $ti.lightInfo.lightSource )
+			_lighting.lightFullBright();
+		
+//			_lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
+	}
+
 	public function lightingFromSun( $instanceGuid:String, $face:int ):void {
 		if ( childrenHas() )
 		{
@@ -1568,28 +1506,22 @@ public class Oxel extends OxelBitfields
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public function quadsBuild( $plane_facing:int = 1 ):void {
-		if ( dirty )
-		{
-			if ( childrenHas() )
-			{
+		if ( dirty ) {
+			if ( childrenHas() ) {
 				// parents dont have quads!
 				if ( dirty  && _quads )
-				{
 					chunkRemoveOxel();
-				}
-				facesCleanAllFaceBits();
-				dirty = false;
 
-				for each ( var child:Oxel in _children ) {
+				facesCleanAllFaceBits();
+
+				for each ( var child:Oxel in _children )
 					if ( child.dirty )
 						child.quadsBuild( $plane_facing );
-				}
+				dirty = false;
 			}
 			else
 				quadsBuildTerminal( $plane_facing );
-				
 		}
-		
 	}
 	
 	protected function quadsBuildTerminal( $plane_facing:int = 1 ):void {
@@ -1689,9 +1621,7 @@ public class Oxel extends OxelBitfields
 		dirty = true;
 		var quad:Quad = _quads[$face];
 		if ( quad )
-		{
 			quad.dirty = 1;
-		}
 	}
 	
 	public function quadsRebuildAll():void {
@@ -2597,29 +2527,21 @@ public class Oxel extends OxelBitfields
 	}
 	
 	public function changeAllButAirToType( $toType:int, changeAir:Boolean = false ):void {
-		if ( childrenHas() )
-		{
+		if ( childrenHas() ) {
 			for each ( var child:Oxel in _children )
-			{
 				child.changeAllButAirToType( $toType );
-			}
 		}
-		else
-		{
+		else {
 			// dont change the air to solid!
-			if ( TypeInfo.AIR == type ) 
-			{
-				if ( changeAir )
-				{
+			if ( TypeInfo.AIR == type )  {
+				if ( changeAir ) {
 					type = $toType; 
 					// if AIR no quads to delete
 					facesMarkAllDirty();
 				}
 			}
 			else
-			{ 
 				type = $toType; 
-			}
 		}
 	}
 
