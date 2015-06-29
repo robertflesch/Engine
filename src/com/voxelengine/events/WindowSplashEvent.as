@@ -10,6 +10,8 @@ package com.voxelengine.events
 import flash.events.Event;
 import flash.events.EventDispatcher;
 
+import com.voxelengine.Log;
+
 /**
  * ...
  * @author Robert Flesch - RSF 
@@ -22,20 +24,13 @@ public class WindowSplashEvent extends Event
 	static public const SPLASH_LOAD_COMPLETE:String	= "SPLASH_LOAD_COMPLETE";
 	
 
-	public function WindowSplashEvent( $type:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
-	{
+	public function WindowSplashEvent( $type:String, $bubbles:Boolean = true, $cancellable:Boolean = false ) {
 		super( $type, $bubbles, $cancellable );
 	}
 	
-	public override function clone():Event
-	{
-		return new WindowSplashEvent(type, bubbles, cancelable);
-	}
+	public override function clone():Event { return new WindowSplashEvent(type, bubbles, cancelable); }
    
-	public override function toString():String
-	{
-		return formatToString("WindowSplashEvent");
-	}
+	public override function toString():String { return formatToString("WindowSplashEvent: " + type ); }
 	
 	///////////////// Event handler interface /////////////////////////////
 
@@ -51,6 +46,7 @@ public class WindowSplashEvent extends Event
 	}
 
 	static public function dispatch( $event:WindowSplashEvent ) : Boolean {
+		//Log.out( $event.toString(), Log.WARN );
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 	

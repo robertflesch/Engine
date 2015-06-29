@@ -11,6 +11,7 @@ import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.net.registerClassAlias;
 import flash.utils.ByteArray;
+import flash.utils.getTimer;
 
 import playerio.DatabaseObject;
 
@@ -199,6 +200,7 @@ public class OxelPersistance extends PersistanceObject
 	public function fromByteArray($ba:ByteArray):void {
 
 		Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.WARN );
+		var time:int = getTimer();
 		
 		try { $ba.uncompress(); }
 		catch (error:Error) { Log.out( "OxelDataCache.loadSucceed - Was expecting compressed data " + guid, Log.WARN ); }
@@ -228,11 +230,17 @@ public class OxelPersistance extends PersistanceObject
 		else
 			oxel.readVersionedData( _version, null, gct, $ba, _statisics );
 		GrainCursorPool.poolDispose(gct);
+		Log.out( "OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.WARN );
+		
 		_statisics.gather();
 		_statisics.statsPrint();
 		
+		Log.out( "OxelPersistance.fromByteArray - _statisics took: " + (getTimer() - time), Log.WARN );
+		
 		_topMostChunk = Chunk.parse( oxel, null );
 		_loaded = true;
+		Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.WARN );
+		
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this ) );
 	}
 	

@@ -8,6 +8,7 @@
 
 package com.voxelengine.worldmodel.tasks.flowtasks
 {
+	import com.voxelengine.pools.FlowPool;
 	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.oxel.FlowInfo;
 	import com.voxelengine.worldmodel.TypeInfo;
@@ -86,7 +87,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 						flowOxel.flowInfo = _flowInfo; // This oxel has a undefine flow type, so no data in it.
 				}
 				else {	
-					flowOxel.flowInfo = new FlowInfo()
+					flowOxel.flowInfo = FlowPool.poolGet()
 					flowOxel.flowInfo = TypeInfo.typeInfo[_type].flowInfo;
 				}
 					

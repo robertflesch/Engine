@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
+	import com.voxelengine.pools.FlowPool;
 	import flash.utils.ByteArray;
 	
 	import com.voxelengine.Globals;
@@ -103,7 +104,7 @@ public class FlowInfo
 		//Log.out( "FlowInfo.constructor" );
 	}
 	
-	public function reset( $oxel:Oxel ):void {
+	public function reset( $oxel:Oxel = null ):void {
 		direction = Globals.ALL_DIRS;
 		type = FLOW_TYPE_UNDEFINED;
 		_flowScaling.scalingReset( $oxel );
@@ -114,7 +115,7 @@ public class FlowInfo
 	}
 	
 	public function clone( isChild:Boolean = false ):FlowInfo {
-		var fi:FlowInfo = new FlowInfo();
+		var fi:FlowInfo = FlowPool.poolGet();
 		fi._flowInfo = _flowInfo;
 		if ( isChild )
 			out = out * 2;

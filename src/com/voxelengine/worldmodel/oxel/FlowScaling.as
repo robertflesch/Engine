@@ -96,7 +96,7 @@ public class FlowScaling
 	 * This function resets the scale of an oxel, for example if another oxel of same type flows over it.
 	 * There are two phases, reseting of this oxels scale, and the resetting of the oxels around it.
 	 */
-	public function scalingReset( $oxel:Oxel ):void	{
+	public function scalingReset( $oxel:Oxel = null ):void	{
 		//Log.out( "FlowScaling.scalingReset oxel: " + toString() );
 		// This is telling us we dont need no stinking scaling, however our neighbors might
 		_calculated = true;
@@ -104,7 +104,8 @@ public class FlowScaling
 		if ( scalingHas() )
 		{
 			reset();
-			$oxel.rebuildAll();
+			if ( $oxel )
+				$oxel.rebuildAll();
 		}
 	}
 	

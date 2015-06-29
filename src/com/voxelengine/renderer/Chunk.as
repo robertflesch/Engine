@@ -74,7 +74,7 @@ public class Chunk {
 	
 	static public function parse( $oxel:Oxel, $parent:Chunk ):Chunk {
 		var chunk:Chunk = new Chunk( $parent );
-		Log.out( "chunk.parse - new chunk: " + $oxel.childCount );
+		//Log.out( "chunk.parse - new chunk: " + $oxel.childCount );
 			
 		if ( MAX_CHILDREN < $oxel.childCount ) {
 			chunk._children = new Vector.<Chunk>(OCT_TREE_SIZE, true);
@@ -85,11 +85,11 @@ public class Chunk {
 			chunk._oxel = $oxel;
 			$oxel.chunk = chunk;
 			if ( 1 == $oxel.childCount && false == $oxel.facesHas() ) {
-				Log.out( "chunk.parse - EMPTY CHUNK, no faces" );
+				//Log.out( "chunk.parse - EMPTY CHUNK, no faces" );
 				chunk.dirtyClear();
 			}
 			else {
-				Log.out( "chunk.parse - new VertexManager: " + $oxel.childCount + "  oxel.gc: " + $oxel.gc );
+				//Log.out( "chunk.parse - new VertexManager: " + $oxel.childCount + "  oxel.gc: " + $oxel.gc );
 				chunk._vertMan = new VertexManager( $oxel.gc, null );
 			}
 		}

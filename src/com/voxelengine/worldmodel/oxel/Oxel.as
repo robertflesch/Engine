@@ -269,7 +269,10 @@ public class Oxel extends OxelBitfields
 	public function release():void	{
 		//trace( "Oxel.release" + gc.toString() );
 
-		_flowInfo = null; // might need a pool for these.
+		if ( _flowInfo ) { 
+			FlowPool.poolReturn( _flowInfo );
+			_flowInfo = null;
+		}
 		if ( _lighting ) { 
 			LightingPool.poolReturn( _lighting );
 			_lighting = null;
@@ -1752,7 +1755,7 @@ public class Oxel extends OxelBitfields
 			$ba.writeUnsignedInt( type );
 			
 			if ( !flowInfo )
-				flowInfo = new FlowInfo(); 
+				flowInfo = FlowPool.poolGet();
 			flowInfo.toByteArray( $ba );
 			
 			if ( !lighting )
@@ -1778,6 +1781,7 @@ public class Oxel extends OxelBitfields
 		
 	}
 	
+	
 	public function readVersionedData( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $stats:ModelStatisics ):ByteArray 
 	{
 		var faceData:uint = $ba.readUnsignedInt();
@@ -1798,7 +1802,7 @@ public class Oxel extends OxelBitfields
 		if ( OxelBitfields.dataHasAdditional( faceData ) )
 		{
 			if ( !flowInfo )
-				flowInfo = new FlowInfo();
+				flowInfo = FlowPool.poolGet();
 			$ba = flowInfo.fromByteArray( $version, $ba );
 			
 			// hack warning
