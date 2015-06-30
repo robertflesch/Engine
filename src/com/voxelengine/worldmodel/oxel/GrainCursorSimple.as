@@ -201,24 +201,6 @@ public class GrainCursorSimple
 		return ( val == edgeval() );
 	}
 		
-	public function become_ancestor( k:uint ):Boolean
-	{
-		if ( grain + k > bound ) 
-		{
-			trace( "GrainCursor.become_ancestor: - ERROR trying to make ancestor larger then bound grain: " + grain + " change: " + k + " bound: " + bound + " this: " + this.toString() );
-			return false;
-		}
-		
-		//trace( "become_ancestor: - was \t" + this.toString() );
-		_gx >>= k;
-		_gy >>= k;
-		_gz >>= k;
-		grain += k;
-
-		//trace( "become_ancestor: - now \t" + this.toString() );
-		return true;
-	}
-
 	public function become_parent():void
 	{
 		become_ancestor(1);
