@@ -1062,6 +1062,11 @@ public class Oxel extends OxelBitfields
 			
 		return result;
 	}
+
+	private function breakToSize( $levelsToBreak:int ):void {
+		// just doing a single level break for now
+		childrenCreate(true);
+	}
 	
 	// Mark all of the faces opposite this oxel as dirty
 	// propogate count is to keep it from spreading too far, by maybe this should be distance, rather then hard count?
@@ -1073,6 +1078,12 @@ public class Oxel extends OxelBitfields
 			no = neighbor(face);
 			if ( Globals.BAD_OXEL == no )
 				continue;
+				
+			// if I have alpha, then see if neighbor is same size, if not break it up.
+			if ( TypeInfo.hasAlpha( type ) ) {				
+				if ( gc.grain < no.gc.grain  )
+					no.breakToSize( no.gc.grain - gc.grain );
+			}
 				
 			// RSF - 10.2.14 This just got way easier, always mark the neighbor face!
 			no.faceMarkDirty( $instanceGuid, Oxel.face_get_opposite( face ), $propogateCount );
@@ -1403,7 +1414,7 @@ public class Oxel extends OxelBitfields
 	public static var _s_oxelsEvaluated:int = 0;
 	public static var _s_lightsFound:int = 0;
 	
-	private function quadAmbient( $face:int, $ti:TypeInfo ):void {
+	private function quadLighting( $face:int, $ti:TypeInfo ):void {
 		
 		if ( !_lighting ) {
 			_lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
@@ -1416,7 +1427,7 @@ public class Oxel extends OxelBitfields
 				if ( root && root._lighting )
 					rootAttn = root._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg
 				else
-					Log.out( "Oxel.quadAmbient - root or root lighting not found", Log.WARN );
+					Log.out( "Oxel.quadLighting - root or root lighting not found", Log.WARN );
 				li.setAll( rootAttn );
 			}
 			_lighting.materialFallOffFactor = $ti.lightInfo.fallOffFactor;
@@ -1426,7 +1437,7 @@ public class Oxel extends OxelBitfields
 		if ( true == $ti.lightInfo.fullBright && false == $ti.lightInfo.lightSource )
 			_lighting.lightFullBright();
 		
-//			_lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
+		_lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
 	}
 
 	public function lightingFromSun( $instanceGuid:String, $face:int ):void {
@@ -1562,7 +1573,7 @@ public class Oxel extends OxelBitfields
 		// has face and quad
 		if ( validFace && quad ) {
 			if ( quad.dirty ) {
-				quadAmbient( $face, $ti );
+				quadLighting( $face, $ti );
 				quad.rebuild( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $grain, _lighting );
 			}
 			return 1;
@@ -1570,7 +1581,7 @@ public class Oxel extends OxelBitfields
 		// face but no quad
 		else if ( validFace && !quad ) 
 		{
-			quadAmbient( $face, $ti );				
+			quadLighting( $face, $ti );				
 			quad = QuadPool.poolGet();
 			if ( flowInfo && TypeInfo.flowable( type ) ) {
 				if ( !quad.buildScaled( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $grain, _lighting, flowInfo ) ) {

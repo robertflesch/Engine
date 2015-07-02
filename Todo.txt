@@ -42,6 +42,8 @@ John Carmack on VR
 http://fortune.com/2014/12/29/oculus-vr-john-carmack-extended/
 An updated graphic lib for flash include GPUSprites
 https://github.com/adobe-flash/graphicscorelib
+Bitcoin content management system
+https://github.com/ascribe/spool
 
 GENERAL CRITICAL:
 IMPLEMENT: MODEL PLACEMENT
