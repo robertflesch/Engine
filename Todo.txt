@@ -66,6 +66,7 @@ IDEA: Glass, have engine use ambientOcclusion data to draw edges around glass, i
 IDEA: VertexManager sharing, this would allow us to have multiple creatures on the screen, just using one vertexManager
 
 MODELS
+Possible issue. Lets say dragon has a right wing tip, I delete that from the dragons right wing. Under what circumstance, if any, do I delete that from persistance?
 ZEPPELIN
 TODO: Add new hud
 TODO: Add ammo store and ammount

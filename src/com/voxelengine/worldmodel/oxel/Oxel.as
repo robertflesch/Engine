@@ -1065,6 +1065,8 @@ public class Oxel extends OxelBitfields
 
 	private function breakToSize( $levelsToBreak:int ):void {
 		// just doing a single level break for now
+		// pretty sure I wrote a get opposite oxel somewhere in the lighting system.
+		// should use it to continue multi level breakdown.
 		childrenCreate(true);
 	}
 	
@@ -1079,7 +1081,7 @@ public class Oxel extends OxelBitfields
 			if ( Globals.BAD_OXEL == no )
 				continue;
 				
-			// if I have alpha, then see if neighbor is same size, if not break it up.
+			// if I have alpha, then see if neighbor is same size, if no=()t break it up.
 			if ( TypeInfo.hasAlpha( type ) ) {				
 				if ( gc.grain < no.gc.grain  )
 					no.breakToSize( no.gc.grain - gc.grain );

@@ -44,7 +44,7 @@ package com.voxelengine.worldmodel.models.types
 		{
 			super.update(context, elapsedTimeMS);
 			
-			if ( VoxelModel.controlledModel )
+			if ( VoxelModel.controlledModel && oxel )
 			{
 				var wsPositionCenter:Vector3D = VoxelModel.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( VoxelModel.controlledModel.instanceInfo.center );
 				

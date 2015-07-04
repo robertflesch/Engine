@@ -115,6 +115,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		} else { 
 			addListeners();
 			// try to load from tables first
+			Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
 			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_PERSISTANCE ) );
 		}
 	}
@@ -135,26 +136,15 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	}
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
-		_data.draw( $mvp, $vm, $context, $selected, $isChild, $isAlpha );
+		if ( _data )
+			_data.draw(	$mvp, $vm, $context, $selected, $isChild, $isAlpha );
 			
 		for each (var vm:VoxelModel in _children) {
 			if (vm && vm.complete)
 				vm.draw($mvp, $context, true, $isAlpha );
 		}
 	}
-/*
-	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
-		if ( $isAlpha )
-			_data.oxel.vertMan.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
-		else
-			_data.oxel.vertMan.drawNew( $mvp, $vm, $context, $selected, $isChild );
-			
-		for each (var vm:VoxelModel in _children) {
-			if (vm && vm.complete)
-				vm.draw($mvp, $context, true, $isAlpha );
-		}
-	}
-*/
+
 	override public function release():void {
 		_biomes = null;
 		_childrenToBeLoaded = null;
@@ -353,7 +343,8 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 					
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
 			}
-			Log.out( "ModelInfo.save - Not saving ModelInfo - children OR animations not loaded - guid: " + guid );
+			else 
+				Log.out( "ModelInfo.save - Not saving ModelInfo - children OR animations not loaded - guid: " + guid );
 		}
 		else
 			Log.out( "ModelInfo.save - Not saving ModelInfo - either offline or NOT changed - guid: " + guid );
@@ -427,17 +418,18 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		function childrenGet():void {
 		// Same code that is in modelCache to build models in region
 		// this is just models in models
-			var oa:Vector.<Object> = new Vector.<Object>();
+			var oc:Vector.<Object> = new Vector.<Object>();
 			for each ( var vm:VoxelModel in children ) {
 				if ( vm is Player ) // Or Avatar
 					continue;
 				//Log.out( "ModelInfo.childrenGet - name: " + metadata.name + "  modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
 				var io:Object = new Object();
 				vm.instanceInfo.buildExportObject( io );
-				oa.push( io );
+				oc.push( io );
 			}
-			if ( 0 < oa.length ) _obj.children = oa;
-			else                 oa = null;
+			if ( 0 < oc.length )
+				_obj.children = JSON.stringify( oc );
+			oc = null;
 		}
 		
 		function animationsGet():void {
@@ -451,21 +443,23 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 				Log.out( "ModelInfo.animationsGet - animation.metadata: " + _animations[index].metadata );
 				oa.push( ao );
 			}
-			if ( 0 < oa.length ) _obj.animations = oa;
-			else                 oa = null;
+			if ( 0 < oa.length ) 
+				_obj.animations = JSON.stringify( oa );
+			oa = null;
 		}
 		
 		function modelsScriptOnly():void {
-			var oa:Vector.<Object> = new Vector.<Object>();
+			var os:Vector.<Object> = new Vector.<Object>();
 			var len:int = _scripts.length;
 			for ( var index:int; index < len; index++ ) {
 				var so:Object = new Object();
 				so.name = _scripts[index];
 				Log.out( "ModelInfo.modelsScriptOnly - script: " + _scripts[index] );
-				oa.push( so );
+				os.push( so );
 			}
-			if ( 0 < oa.length ) _obj.scripts = oa;
-			else                 oa = null;
+			if ( 0 < os.length ) 
+				_obj.scripts = JSON.stringify( os );
+			os = null;
 		}
 	} 	
 

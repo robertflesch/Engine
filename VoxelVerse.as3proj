@@ -21,11 +21,11 @@
   <!-- Build options -->
   <build>
     <option accessible="False" />
-    <option advancedTelemetry="False" />
+    <option advancedTelemetry="True" />
     <option allowSourcePathOverlap="False" />
     <option benchmark="False" />
     <option es="False" />
-    <option inline="False" />
+    <option inline="True" />
     <option locale="" />
     <option loadConfig="VoxelVerseConfig.xml" />
     <option optimize="True" />

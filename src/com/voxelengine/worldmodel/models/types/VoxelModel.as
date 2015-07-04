@@ -430,7 +430,7 @@ public class VoxelModel
 		var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
 		viewMatrix.append(mvp);
 		
-		if ( oxel ) {
+		if ( modelInfo ) {
 			// We have to draw all of the non alpha first, otherwise parts of the tree might get drawn after the alpha does
 			var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
 			modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha );
@@ -438,6 +438,8 @@ public class VoxelModel
 	}
 	
 	public function update($context:Context3D, $elapsedTimeMS:int):void	{
+		//if ( "DragonTailFirst" == metadata.name )
+		//	Log.out( "VoxelModel.update - name: " + metadata.name, Log.DEBUG );
 		if (!initialized) {
 			initialized = true;
 			Log.out( "VoxelModel.update - loading oxel data: " + modelInfo.guid, Log.WARN );
@@ -455,6 +457,7 @@ public class VoxelModel
 	}
 	
 	private function oxelComplete( $ode:OxelDataEvent ):void {
+		Log.out( "VoxelModel.oxelComplete evalutate - guid: " + $ode.modelGuid, Log.WARN );
 		// add $ode.modelGuid == metadata.name for imported from local file system models.
 		if ( $ode.modelGuid == instanceInfo.modelGuid || $ode.modelGuid == metadata.name ) {
 			OxelDataEvent.removeListener( ModelBaseEvent.RESULT_COMPLETE, oxelComplete );
