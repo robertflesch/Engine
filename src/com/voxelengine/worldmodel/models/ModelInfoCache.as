@@ -7,6 +7,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.utils.Dictionary;
 
 import com.voxelengine.utils.StringUtils;
@@ -37,6 +40,7 @@ public class ModelInfoCache
 		ModelInfoEvent.addListener( ModelBaseEvent.DELETE, 				deleteHandler );
 		ModelInfoEvent.addListener( ModelBaseEvent.GENERATION, 			generated );
 		ModelInfoEvent.addListener( ModelBaseEvent.SAVE, 				save );
+		ModelInfoEvent.addListener( ModelInfoEvent.DELETE_RECURSIVE, 	deleteRecursive );
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
@@ -84,6 +88,37 @@ public class ModelInfoCache
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid, null ) );
 		}
 	}
+	
+	// TODO NOTE: This doesnt not work the first time the object is imported - why?
+	// You have to close app and restart to get guids correct.
+	static private function deleteRecursive( $mie:ModelInfoEvent ):void {
+		Log.out( "ModelInfoCache.deleteRecursive - $mie: " + $mie, Log.WARN )
+		//// first delete any children
+		//for each ( var mi:ModelInfo in _modelInfo ) {
+			//if ( mi && mi.parentModelGuid == $mie.modelGuid ) {
+				//Log.out( "ModelInfoCache.deleteRecursive - deleting child mi: " + mi, Log.WARN )
+				//ModelInfoEvent.dispatch( new ModelInfoEvent( ModelInfoEvent.DELETE_RECURSIVE, 0, mi.guid, null ) );		
+			//}
+		//}
+		// first delete any children
+		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
+		if ( mi ) {
+			for each ( var childModel:VoxelModel in mi.children ) {
+				if ( childModel && childModel.modelInfo ) {
+					Log.out( "ModelInfoCache.deleteRecursive - deleting child cmi: " + childModel.modelInfo, Log.WARN )
+					ModelInfoEvent.dispatch( new ModelInfoEvent( ModelInfoEvent.DELETE_RECURSIVE, 0, childModel.modelInfo.guid, null ) );		
+				}
+			}
+		} else 
+			Log.out( "ModelInfoCache.deleteRecursive - ModelInfo not found $mie" + $mie,Log.ERROR )
+		
+		// Now delete the parents data
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
+		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
+	}
+	
+	
 	
 	static private function generated( $mie:ModelInfoEvent ):void  {
 		add( 0, $mie.vmi );

@@ -39,7 +39,7 @@ import com.voxelengine.utils.transitions.properties.SoundShortcuts;
 
 public class ModelInfo extends PersistanceObject implements IPersistance
 {
-	private var _childrenToBeLoaded:Vector.<InstanceInfo> 			= new Vector.<InstanceInfo>;// Child models and their relative positions
+	private var _childrenInstanceInfo:Vector.<InstanceInfo> 			= new Vector.<InstanceInfo>;// Child models and their relative positions
 	private var _scripts:Vector.<String> 							= new Vector.<String>;		// Default scripts to be used with this model
 	private var _animations:Vector.<Animation> 						= new Vector.<Animation>();	// Animations that this model has
 						
@@ -65,7 +65,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	public function get fileName():String 							{ return _fileName; }
 	public function set fileName(val:String):void 					{ _fileName = val; }
 	public function get biomes():Biomes 							{ return _biomes; }
-	public function get childrenToBeLoaded():Vector.<InstanceInfo> 	{ return _childrenToBeLoaded; }
+	public function get childrenInstanceInfo():Vector.<InstanceInfo>{ return _childrenInstanceInfo; }
 	public function get scripts():Vector.<String> 					{ return _scripts; }
 	public function get modelClass():String							{ return _modelClass; }
 	public function set modelClass(val:String):void 				{ _modelClass ? _modelClass = val : _modelClass = "VoxelModel"; }
@@ -131,7 +131,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	public function bringOutYourDead():void {
 		for each (var deadCandidate:VoxelModel in _children) {
 			if (true == deadCandidate.dead)
-				childRemove(deadCandidate);
+				childRemove(deadCandidate.instanceInfo);
 		}
 	}
 	
@@ -147,7 +147,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 
 	override public function release():void {
 		_biomes = null;
-		_childrenToBeLoaded = null;
+		_childrenInstanceInfo = null;
 		_scripts = null;
 		_modelJson = null;
 		_animations = null;
@@ -325,6 +325,13 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		}
 		return null;
 	}
+
+	public function childRemove( $ii:InstanceInfo ):void	{
+		for ( var i:int; i < _childrenInstanceInfo.length; i++ )
+			if ( $ii == _childrenInstanceInfo[i] );
+				_childrenInstanceInfo[i] = null;
+	}
+	
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// start persistance
@@ -419,14 +426,22 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		// Same code that is in modelCache to build models in region
 		// this is just models in models
 			var oc:Vector.<Object> = new Vector.<Object>();
-			for each ( var vm:VoxelModel in children ) {
-				if ( vm is Player ) // Or Avatar
-					continue;
-				//Log.out( "ModelInfo.childrenGet - name: " + metadata.name + "  modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
-				var io:Object = new Object();
-				vm.instanceInfo.buildExportObject( io );
-				oc.push( io );
+			for ( var i:int; i < _childrenInstanceInfo.length; i++ ) {
+				if ( null != _childrenInstanceInfo[i] ) {
+					var io:Object = new Object();
+					_childrenInstanceInfo[i].buildExportObject( io );
+					oc.push( io );
+				}
 			}
+					
+			//for each ( var vm:VoxelModel in children ) {
+				//if ( vm is Player ) // Or Avatar
+					//continue;
+				////Log.out( "ModelInfo.childrenGet - name: " + metadata.name + "  modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
+				//var io:Object = new Object();
+				//vm.instanceInfo.buildExportObject( io );
+				//oc.push( io );
+			//}
 			if ( 0 < oc.length )
 				_obj.children = JSON.stringify( oc );
 			oc = null;
@@ -548,12 +563,12 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			}
 			// Dont add child that already exist
 			//Log.out( "ModelInfo.childAdd  fileName: " + fileName + " child ii: " + $instanceInfo, Log.WARN );
-			for each ( var child:InstanceInfo in _childrenToBeLoaded ) {
+			for each ( var child:InstanceInfo in _childrenInstanceInfo ) {
 				if ( child === $instanceInfo ) {
 					return;
 				}
 			}
-			_childrenToBeLoaded.push( $instanceInfo );
+			_childrenInstanceInfo.push( $instanceInfo );
 		}
 	}	
 	
@@ -569,13 +584,13 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	public function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
 	/////////////////////
 	public function childrenLoad( $vm:VoxelModel ):void {
-		if ( childrenToBeLoaded && 0 < childrenToBeLoaded.length)
+		if ( childrenInstanceInfo && 0 < childrenInstanceInfo.length)
 		{
-			Log.out( "ModelInfo.childrenLoad - loading " + childrenToBeLoaded.length );
+			Log.out( "ModelInfo.childrenLoad - loading " + childrenInstanceInfo.length );
 			childrenLoaded	= false;
 			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			//Log.out( "VoxelModel.processClassJson name: " + metadata.name + " - loading child models START" );
-			for each (var childInstanceInfo:InstanceInfo in childrenToBeLoaded)
+			for each (var childInstanceInfo:InstanceInfo in childrenInstanceInfo)
 			{
 				// Add the parent model info to the child.
 				childInstanceInfo.controllingModel = $vm;
@@ -595,7 +610,6 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 				ModelMakerBase.load( childInstanceInfo, true, false );
 			}
 			Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
-			childrenReset();
 			//Log.out( "VoxelModel.processClassJson - loading child models END" );
 		}
 		else
@@ -609,13 +623,6 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 				// if we save the model, before it is complete, we put bad child data into model info
 				childrenLoaded = true;
 			}
-		}
-		
-		// remove the children after they are loaded, so that when the object is saved
-		// the active children from the voxel model are used.
-		// Applies to the "REPLACE_ME" above
-		function childrenReset():void {
-			_childrenToBeLoaded = null;
 		}
 	}
 	
@@ -671,29 +678,11 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		//Globals.g_app.dispatchEvent( me );
 	}
 	
-	public function childRemove(vm:VoxelModel):void {
-		var index:int = 0;
-		for each (var child:VoxelModel in _children) {
-			if (child == vm) {
-				Log.out(  "VoxelModel.childRemove - removing Model: " + child.toString() );
-				_children.splice(index, 1);
-				changed = true;				
-				break;
-			}
-			index++;
-		}
-		
-		//modelInfo.childRemove(vm.instanceInfo);
-		// Need a message here?
-		//var me:ModelEvent = new ModelEvent( ModelEvent.REMOVE, vm.instanceInfo.guid, instanceInfo.guid );
-		//Globals.g_app.dispatchEvent( me );
-	}
-	
 	// This leaves the model, but detaches it from parent.
 	public function childDetach( $vm:VoxelModel, $vmParent:VoxelModel ):void
 	{
 		// removethis child from the parents info
-		childRemove($vm);
+		childRemove($vm.instanceInfo);
 		
 		// this make it belong to the world
 		$vm.instanceInfo.controllingModel = null;

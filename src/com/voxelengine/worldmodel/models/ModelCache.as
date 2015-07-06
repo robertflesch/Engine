@@ -51,7 +51,7 @@ package com.voxelengine.worldmodel.models
 			return _instanceByGuid[$instanceGuid];
 		}
 
-		public function modelGet( $modelGuid:String ):Vector.<VoxelModel>
+		public function instancesOfModelGet( $modelGuid:String ):Vector.<VoxelModel>
 		{ 
 			var results:Vector.<VoxelModel> = new Vector.<VoxelModel>();
 			for ( var i:int; i < _instances.length; i++ ) {

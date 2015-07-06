@@ -91,7 +91,7 @@ package com.voxelengine.worldmodel.animation
 		{
 			//Log.out( "AnimationAttachment.detach owner: " + _owner.toString() + "   attachment: " + _voxelModel.toString() );
 			if ( null != _voxelModel && null != _owner )
-				_owner.modelInfo.childRemove( _voxelModel );
+				_owner.modelInfo.childRemove( _voxelModel.instanceInfo );
 		}
 		
 		private function onAttachmentCreated( event:ModelEvent ):void

@@ -131,6 +131,7 @@ public class WindowSandboxList extends VVPopup
 	
 	private function loadthisRegion(event:UIMouseEvent):void 
 	{
+		Log.out( "WindowSandboxList.loadthisRegion - _listbox1.selectedIndex: " + _listbox1.selectedIndex, Log.WARN );
 		if ( -1 == _listbox1.selectedIndex )
 			return;
 			

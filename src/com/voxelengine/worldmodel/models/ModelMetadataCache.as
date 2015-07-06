@@ -35,7 +35,6 @@ public class ModelMetadataCache
 	
 	static public function init():void {
 		ModelMetadataEvent.addListener( ModelMetadataEvent.REQUEST_CHILDREN, requestChildren );
-		ModelMetadataEvent.addListener( ModelMetadataEvent.DELETE_RECURSIVE, deleteRecursive );
 		
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, requestType );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, request );
@@ -58,21 +57,6 @@ public class ModelMetadataCache
 		}
 		// this is the end of series message
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.RESULT_CHILDREN, $mme.series, $mme.modelGuid, null ) );		
-	}
-	
-	// TODO NOTE: This doesnt not work the first time the object is imported - why?
-	// You have to close app and restart to get guids correct.
-	static private function deleteRecursive($mme:ModelMetadataEvent):void {
-		// This delete this objects metadata
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $mme.modelGuid, null ) );
-		// Since the data doesnt know about children, I have to delete those from here too.
-		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.DELETE, 0, $mme.modelGuid, null ) );
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, $mme.modelGuid, null ) );
-		// now I need to delete any children
-		for each ( var mmd:ModelMetadata in _metadata ) {
-			if ( mmd && mmd.parentModelGuid == $mme.modelGuid )
-				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.DELETE_RECURSIVE, 0, mmd.guid, null ) );		
-		}
 	}
 	
 	// This loads the first 100 objects from the users inventory OR the public inventory

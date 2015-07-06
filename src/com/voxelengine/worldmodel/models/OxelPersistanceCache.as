@@ -93,6 +93,7 @@ public class OxelPersistanceCache
 	}
 	
 	static private function deleteHandler( $ode:OxelDataEvent ):void {
+		Log.out( "OxelDataCache.deleteHandler $ode: " + $ode, Log.WARN );
 		var od:OxelPersistance = _oxelDataDic[$ode.modelGuid];
 		if ( null != od ) {
 			_oxelDataDic[$ode.modelGuid] = null; 

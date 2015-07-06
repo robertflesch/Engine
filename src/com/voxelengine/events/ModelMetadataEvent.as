@@ -19,7 +19,6 @@ import com.voxelengine.worldmodel.models.ModelMetadata;
  */
 public class ModelMetadataEvent extends ModelBaseEvent
 {
-	static public const DELETE_RECURSIVE:String					= "DELETE_RECURSIVE";
 	static public const REQUEST_CHILDREN:String					= "REQUEST_CHILDREN";
 	static public const RESULT_CHILDREN:String					= "RESULT_CHILDREN";
 

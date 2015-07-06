@@ -44,29 +44,30 @@ public class ModelDestroyer {
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
 
 		// this removes the on screen instances
-		var modelOnScreen:Vector.<VoxelModel> = Region.currentRegion.modelCache.modelGet( _modelGuid );
+		var modelOnScreen:Vector.<VoxelModel> = Region.currentRegion.modelCache.instancesOfModelGet( _modelGuid );
 		// only instances have inventory, not models
-		for each ( var vm:VoxelModel in modelOnScreen ) {
+		for each ( var vm:VoxelModel in modelOnScreen )
 			vm.dead = true;
-			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.DELETE, vm.instanceInfo.instanceGuid, null ) );
-		}
+
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.DELETE, _modelGuid, null ) );
 	}
 	
-	private function dataResult(e:ModelInfoEvent):void 
+	private function dataResult( $mie:ModelInfoEvent):void 
 	{
+		Log.out( "ModelDestroyer.dataResult - received modelInfo: " + $mie, Log.WARN );
 		// Now that we have the modelData, we can extract the modelInfo
 		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, dataResult );
 		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, dataResult );
 		
 		// now tell the modelData to remove all of the guids associated with this model.
-		if ( e.vmi )
-			e.vmi.animationsDelete();
+		if ( $mie.vmi )
+			$mie.vmi.animationsDelete();
 
 		// Let MetadataCache handle the recursive delete
 		if ( _recursive )
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.DELETE_RECURSIVE, 0, _modelGuid, null ) );
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelInfoEvent.DELETE_RECURSIVE, 0, _modelGuid, null ) );
 		else
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
 		
 	}
 }	
