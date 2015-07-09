@@ -1684,12 +1684,26 @@ package org.flashapi.swing.button.core {
 		}
 		
 		private function mouseDownHandler(e:MouseEvent):void {
-			if($active && $enabled) {
+		//trace( "ABM.mouseDownHandler guid: " + guid + " address: " + DebugUtils.getObjectMemoryHash( this ) + "  " + e );			
+			if($active && $enabled  && doubleMessageHack) {
 				doMouseDownAction();
 				if(_boxhelp != null) _boxhelp.remove();
 				$isPressed = true;
 				dispatchButtonEvent(UIMouseEvent.PRESS);
 			}
+		}
+		
+		import flash.utils.getTimer;
+		private static const WAITING_PERIOD:int = 500;
+		private var doubleMessageHackTime:int = getTimer();
+		private function get doubleMessageHack():Boolean {
+			var newTime:int = getTimer();
+			var result:Boolean = false;
+			if ( doubleMessageHackTime + WAITING_PERIOD < newTime )
+				result = true;
+				
+			doubleMessageHackTime = newTime;
+			return result;
 		}
 		
 		private	function mouseUpHandler(e:MouseEvent):void {
