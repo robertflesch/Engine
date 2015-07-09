@@ -29,7 +29,7 @@ package com.voxelengine.worldmodel.models.types
 	{
 		private var _inside:Boolean = false;
 		private var _was_selected:Boolean = false;
-		private var _ba:ByteArray = null;
+		private var _ba:ByteArray = new ByteArray();
 		
 		public function Trigger( $ii:InstanceInfo ) { 
 			super( $ii );
