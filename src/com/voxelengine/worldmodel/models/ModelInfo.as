@@ -39,7 +39,7 @@ import com.voxelengine.utils.transitions.properties.SoundShortcuts;
 
 public class ModelInfo extends PersistanceObject implements IPersistance
 {
-	private var _childrenInstanceInfo:Vector.<InstanceInfo> 			= new Vector.<InstanceInfo>;// Child models and their relative positions
+	private var _childrenInstanceInfo:Vector.<InstanceInfo> 		= new Vector.<InstanceInfo>;// Child models and their relative positions
 	private var _scripts:Vector.<String> 							= new Vector.<String>;		// Default scripts to be used with this model
 	private var _animations:Vector.<Animation> 						= new Vector.<Animation>();	// Animations that this model has
 						
@@ -253,10 +253,6 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Dont load the animations until the model is instaniated
 	public function animationsLoad():void {
-		if ( true == animationsLoaded )
-			return;
-		//throw new Error( "ModelInfo.animationsLoad - Check this out, why pass in guid here?" );
-		
 		AnimationEvent.addListener( ModelBaseEvent.DELETE, animationDeleteHandler );
 		AnimationEvent.addListener( ModelBaseEvent.ADDED, animationAdd );
 		_series = 0;
@@ -276,8 +272,6 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 				AnimationEvent.dispatch( ae );
 			}
 		}
-		else
-			animationsLoaded = true;
 	}
 			
 	public function animationsDelete():void {
@@ -369,8 +363,11 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		if ( null == $dbo.modelClass )
 			throw new Error( "ModelInfo.fromPersistance - no model class set, make sure its not an empty record" );
 		modelClass			= $dbo.modelClass;
-		if ( $dbo.children )
-			childrenFromObject( JSONUtil.parse( $dbo.children, Globals.BIGDB_TABLE_MODEL_INFO, "fromPersistance.children" ) );
+		var tmp:Object;
+		if ( $dbo.children ) {
+			tmp = JSONUtil.parse( $dbo.children, Globals.BIGDB_TABLE_MODEL_INFO, "fromPersistance.children" );
+			childrenFromObject( tmp );
+		}
 		if ( $dbo.scripts )
 			scriptsFromObject( JSONUtil.parse( $dbo.scripts, Globals.BIGDB_TABLE_MODEL_INFO, "fromPersistance.scripts" ) );
 		if ( $dbo.animations )
@@ -387,21 +384,21 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		
 		if ( _obj.children ) {
 			if ( _obj.children.length )
-				dbo.children = JSON.stringify( _obj.children );
+				dbo.children = _obj.children;
 			else	
 				dbo.children = null;
 		}
 			
 		if ( _obj.animations ) {
 			if ( _obj.animations.length )
-				dbo.animations = JSON.stringify( _obj.animations );
+				dbo.animations = _obj.animations;
 			else	
 				dbo.animations = null;
 		}
 		
 		if ( _obj.scripts ) { 
 			if ( _obj.scripts.length )
-				dbo.scripts = JSON.stringify( _obj.scripts );
+				dbo.scripts = _obj.scripts;  // WAS dbo.scripts = JSON.stringify( _obj.scripts );
 			else	
 				dbo.scripts = null;
 		}
@@ -418,11 +415,17 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		if ( null != associatedGrain )
 		_obj.associatedGrain = associatedGrain;
 		
-		childrenGet();
+		var childrenAdded:int = childrenGet();
+		if ( "Dragon" == modelClass )
+			if ( 3 > childrenAdded ) {
+				trace( "ModelInfo.toObject - DRAGON ERROR", Log.WARN );
+				// lets retry this so I can watch it.
+				childrenGet();
+			}
 		modelsScriptOnly();
 		animationsGet();
 				
-		function childrenGet():void {
+		function childrenGet():int {
 		// Same code that is in modelCache to build models in region
 		// this is just models in models
 			var oc:Vector.<Object> = new Vector.<Object>();
@@ -433,18 +436,12 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 					oc.push( io );
 				}
 			}
-					
-			//for each ( var vm:VoxelModel in children ) {
-				//if ( vm is Player ) // Or Avatar
-					//continue;
-				////Log.out( "ModelInfo.childrenGet - name: " + metadata.name + "  modelGuid: " + instanceInfo.modelGuid + "  child ii: " + vm.instanceInfo, Log.WARN );
-				//var io:Object = new Object();
-				//vm.instanceInfo.buildExportObject( io );
-				//oc.push( io );
-			//}
-			if ( 0 < oc.length )
+
+			var len:int = oc.length;
+			if ( 0 < len )
 				_obj.children = JSON.stringify( oc );
 			oc = null;
+			return len;
 		}
 		
 		function animationsGet():void {
@@ -522,7 +519,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		const createHeightMap:Boolean = true;
 		_biomes = new Biomes( createHeightMap  );
 		if ( !$biomes.layers )
-			throw new Error( "ModelInfo.init - WARNING - unable to find layerInfo: " + fileName );					
+			throw new Error( "ModelInfo.biomesFromObject - WARNING - unable to find layerInfo: " + fileName );					
 		_biomes.layersLoad( $biomes.layers );
 		// now remove the biome data from the object so it is not saved to persistance
 		delete _obj.biomes;	
@@ -540,29 +537,31 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 
 	private function animationsFromObject( $animations:Object ):void {
 	// i.e. animData = { "name": "Glide", "type": "state OR action", "guid":"Glide.ajson" }
+		Log.out( "ModelInfo.animationsFromObject" );	
 		for each ( var animData:Object in $animations ) {
-			Log.out( "ModelInfo.init - _animationInfo.push animData: " + animData.name );	
+			Log.out( "ModelInfo.animationsFromObject - _animationInfo.push animData: " + animData.name );	
 			_animationInfo.push( animData );
 		}
 	}
 	
 	private function childrenFromObject( $children:Object ):void {
+		Log.out( "ModelInfo.childrenFromObject - Rejecting child with same model guid as parent", Log.ERROR );
 		for each ( var v:Object in $children ) {
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.initJSON( v );
 			// This adds the instanceInfo for the child models to our child list which is processed when object is initialized
-			childAdd( ii );
+			childAddInstanceInfo( ii );
 		}
 
-		function childAdd( $instanceInfo:InstanceInfo ):void {
+		function childAddInstanceInfo( $instanceInfo:InstanceInfo ):void {
 			if ( guid == $instanceInfo.modelGuid ) {
 				// TODO this needs to examine all of the children in that model guid.
 				// Since this would allow B owns A, and you could add B to A, which would cause a recurvise error
-				Log.out( "ModelInfo.childAdd - Rejecting child with same model guid as parent", Log.ERROR );
+				Log.out( "ModelInfo.childAddInstanceInfo - Rejecting child with same model guid as parent", Log.ERROR );
 				return;
 			}
 			// Dont add child that already exist
-			//Log.out( "ModelInfo.childAdd  fileName: " + fileName + " child ii: " + $instanceInfo, Log.WARN );
+			//Log.out( "ModelInfo.childAddInstanceInfo  fileName: " + fileName + " child ii: " + $instanceInfo, Log.WARN );
 			for each ( var child:InstanceInfo in _childrenInstanceInfo ) {
 				if ( child === $instanceInfo ) {
 					return;
@@ -655,8 +654,9 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			 $child.instanceInfo.instanceGuid = Globals.getUID();
 		//Log.out(  "-------------- VoxelModel.childAdd -  $child: " +  $child.toString() );
 		// remove parent level model
-		Region.currentRegion.modelCache.changeFromParentToChild( $child);
+//		Region.currentRegion.modelCache.changeFromParentToChild( $child);
 		_children.push( $child);
+		_childrenInstanceInfo.push( $child.instanceInfo );
 		changed = true;
 //		$child.instanceInfo.baseLightLevel = owner.instanceInfo.baseLightLevel;
 	}
