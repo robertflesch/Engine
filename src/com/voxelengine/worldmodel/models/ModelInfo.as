@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.ModelEvent;
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.Region;
@@ -90,9 +91,12 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		return result;
 	}
 
-	override public function set guid(value:String):void { 
-		super.guid = value;
-		_data.guid = value;
+	override public function set guid($newGuid:String):void { 
+		var oldGuid:String = super.guid;
+		super.guid = $newGuid;
+		_data.guid = $newGuid;
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
+		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
 	}
 	
 	public function toString():String {
@@ -198,6 +202,9 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			if ( null == _data.dbo ) {
 				_data.changed = true;
 				_data.guid = guid;
+				// When import objects, we have to update the cache so they have the correct info.
+				if ( null != _altGuid )
+					OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.UPDATE_GUID, 0, altGuid + ":" + guid, null ) );
 				_data.save();
 			}
 		}
@@ -344,11 +351,11 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 					
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
 			}
-			else 
-				Log.out( "ModelInfo.save - Not saving ModelInfo - children OR animations not loaded - guid: " + guid );
+			//else 
+				//Log.out( "ModelInfo.save - Not saving ModelInfo - children OR animations not loaded - guid: " + guid );
 		}
-		else
-			Log.out( "ModelInfo.save - Not saving ModelInfo - either offline or NOT changed - guid: " + guid );
+		//else
+			//Log.out( "ModelInfo.save - Not saving ModelInfo - either offline or NOT changed - guid: " + guid );
 			
 		_data.save();	
 		
@@ -479,9 +486,9 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	public function fromObject( $object:Object, $ba:ByteArray ):void {		
 		_obj = $object;
 		if ( _obj.modelGuid )
-			guid = _fileName = _obj.modelGuid;
+			super.guid = _fileName = _obj.modelGuid;
 		else if ( _obj.guid )
-			guid = _fileName = _obj.guid;
+			super.guid = _fileName = _obj.guid;
 		else
 			Log.out( "ModelInfo.fromObject - no guid assigned", Log.WARN );
 		
@@ -544,32 +551,6 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		}
 	}
 	
-	private function childrenFromObject( $children:Object ):void {
-		Log.out( "ModelInfo.childrenFromObject - Rejecting child with same model guid as parent", Log.ERROR );
-		for each ( var v:Object in $children ) {
-			var ii:InstanceInfo = new InstanceInfo();
-			ii.initJSON( v );
-			// This adds the instanceInfo for the child models to our child list which is processed when object is initialized
-			childAddInstanceInfo( ii );
-		}
-
-		function childAddInstanceInfo( $instanceInfo:InstanceInfo ):void {
-			if ( guid == $instanceInfo.modelGuid ) {
-				// TODO this needs to examine all of the children in that model guid.
-				// Since this would allow B owns A, and you could add B to A, which would cause a recurvise error
-				Log.out( "ModelInfo.childAddInstanceInfo - Rejecting child with same model guid as parent", Log.ERROR );
-				return;
-			}
-			// Dont add child that already exist
-			//Log.out( "ModelInfo.childAddInstanceInfo  fileName: " + fileName + " child ii: " + $instanceInfo, Log.WARN );
-			for each ( var child:InstanceInfo in _childrenInstanceInfo ) {
-				if ( child === $instanceInfo ) {
-					return;
-				}
-			}
-			_childrenInstanceInfo.push( $instanceInfo );
-		}
-	}	
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  Children functions
@@ -582,6 +563,34 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	public function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
 	public function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
 	/////////////////////
+	private function childrenFromObject( $children:Object ):void {
+		Log.out( "ModelInfo.childrenFromObject", Log.DEBUG );
+		for each ( var v:Object in $children ) {
+			var ii:InstanceInfo = new InstanceInfo();
+			ii.initJSON( v );
+			// This adds the instanceInfo for the child models to our child list which is processed when object is initialized
+			childrenInstanceInfoAdd( ii );
+		}
+	}
+	
+	private function childrenInstanceInfoAdd( $instanceInfo:InstanceInfo ):void {
+		if ( guid == $instanceInfo.modelGuid ) {
+			// TODO this needs to examine all of the children in that model guid.
+			// Since this would allow B owns A, and you could add B to A, which would cause a recurvise error
+			Log.out( "ModelInfo.childAddInstanceInfo - Rejecting child with same model guid as parent", Log.ERROR );
+			return;
+		}
+		// Dont add child that already exist
+		//Log.out( "ModelInfo.childAddInstanceInfo  fileName: " + fileName + " child ii: " + $instanceInfo, Log.WARN );
+		for each ( var child:InstanceInfo in _childrenInstanceInfo ) {
+			if ( child === $instanceInfo ) {
+				//Log.out( "ModelInfo.childAddInstanceInfo - Rejecting child with same instance guid as sibling", Log.ERROR );
+				return;
+			}
+		}
+		_childrenInstanceInfo.push( $instanceInfo );
+	}
+	
 	public function childrenLoad( $vm:VoxelModel ):void {
 		if ( childrenInstanceInfo && 0 < childrenInstanceInfo.length)
 		{
@@ -656,7 +665,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		// remove parent level model
 //		Region.currentRegion.modelCache.changeFromParentToChild( $child);
 		_children.push( $child);
-		_childrenInstanceInfo.push( $child.instanceInfo );
+		childrenInstanceInfoAdd( $child.instanceInfo )
 		changed = true;
 //		$child.instanceInfo.baseLightLevel = owner.instanceInfo.baseLightLevel;
 	}

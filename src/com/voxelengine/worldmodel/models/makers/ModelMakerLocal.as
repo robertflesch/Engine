@@ -36,10 +36,10 @@ public class ModelMakerLocal extends ModelMakerBase {
 	
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
-		if ( null != _vmi ) {
-			var vmm:ModelMetadata = new ModelMetadata( _ii.modelGuid );
-			vmm.name = _vmi.fileName;
-			vmm.description = _vmi.fileName + " from local data";
+		if ( null != _modelInfo ) {
+			var vmm:ModelMetadata = new ModelMetadata( ii.modelGuid );
+			vmm.name = _modelInfo.fileName;
+			vmm.description = _modelInfo.fileName + " from local data";
 			var vm:* = make();
 			if ( vm )
 				Region.currentRegion.modelCache.add( vm );

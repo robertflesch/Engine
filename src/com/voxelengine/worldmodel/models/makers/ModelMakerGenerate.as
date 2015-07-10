@@ -43,38 +43,38 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		_type = _creationInfo.biomes.layers[0].type;
 		
 		super( $ii );
-		Log.out( "ModelMakerGenerate - ii: " + _ii.toString() + "  using generation script: " + _creationFunction );
+		Log.out( "ModelMakerGenerate - ii: " + ii.toString() + "  using generation script: " + _creationFunction );
 		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 		
 		// This is a special case for modelInfo, the modelInfo its self is contained in the generate script
-		_vmi = new ModelInfo( $ii.modelGuid );
-		_vmi.fromObject( $miJson, null );
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.GENERATION, 0, $ii.modelGuid, _vmi ) );
+		_modelInfo = new ModelInfo( $ii.modelGuid );
+		_modelInfo.fromObject( $miJson, null );
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.GENERATION, 0, $ii.modelGuid, _modelInfo ) );
 		
 		retrieveBaseInfo();
 		attemptMake();
 	}
 	
 	override protected function retrieveBaseInfo():void {
-		_vmm = new ModelMetadata( _ii.modelGuid );
-		_vmm.name = TypeInfo.name( _type ) + _creationInfo.grainSize + "-" + _creationFunction;
-		_vmm.description = _creationFunction + "- GENERATED";
-		_vmm.owner = Network.userId;
-		_vmm.modifiedDate = new Date();
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, _ii.modelGuid, _vmm ) );
+		_modelMetadata = new ModelMetadata( ii.modelGuid );
+		_modelMetadata.name = TypeInfo.name( _type ) + _creationInfo.grainSize + "-" + _creationFunction;
+		_modelMetadata.description = _creationFunction + "- GENERATED";
+		_modelMetadata.owner = Network.userId;
+		_modelMetadata.modifiedDate = new Date();
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelMetadata ) );
 	}
 	
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
-		if ( null != _vmi && null != _vmm ) {
-			_vmi.fileName = "";
+		if ( null != _modelInfo && null != _modelMetadata ) {
+			_modelInfo.fileName = "";
 			
 			var vm:* = make();
 			if ( vm ) {
 				vm.complete = true;
 				vm.changed = true;
-				_vmi.changed = true;
-				_vmm.changed = true;
+				_modelInfo.changed = true;
+				_modelMetadata.changed = true;
 				vm.save();
 				Region.currentRegion.modelCache.add( vm );
 			}

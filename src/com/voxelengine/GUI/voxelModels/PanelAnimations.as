@@ -101,7 +101,7 @@ public class PanelAnimations extends PanelBase
 		addElement( _buttonContainer );
 
 		_addButton = new Button( LanguageManager.localizedStringGet( "Animation_Add" )  );
-		_addButton.eventCollector.addEvent( _addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowAnimationDetail( null ); } );
+		_addButton.eventCollector.addEvent( _addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowAnimationDetail( _selectedModel.modelInfo.guid, null ); } );
 		_addButton.width = width - 2 * pbPadding;
 		_buttonContainer.addElement( _addButton );
 		_buttonContainer.height += _addButton.height + pbPadding;
@@ -126,7 +126,7 @@ public class PanelAnimations extends PanelBase
 			{
 				var anim:Animation = _selectedAnimation;
 				//(new Alert( LanguageManager.localizedStringGet( "NOT IMPLEMENTED" ) )).display();
-				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, _selectedModel.instanceInfo.modelGuid, anim.metadata.guid, null ) );
+				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, _selectedModel.modelInfo.guid, anim.metadata.guid, null ) );
 				populateAnimations( _selectedModel );
 				_selectedModel.changed = true;
 				_selectedModel.save();
@@ -162,7 +162,7 @@ public class PanelAnimations extends PanelBase
 	private function animationDetailHandler(event:UIMouseEvent):void 
 	{ 
 		//new WindowModelList();
-		new WindowAnimationDetail( _selectedAnimation );	
+		new WindowAnimationDetail( _selectedModel.modelInfo.guid, _selectedAnimation );	
 	}
 		
 	///////////////////////////////////////////////////////////////////////

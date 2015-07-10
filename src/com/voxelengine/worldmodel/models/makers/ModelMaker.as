@@ -49,27 +49,27 @@ public class ModelMaker extends ModelMakerBase {
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retrivedMetadata );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
 	
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null ) );		
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null ) );		
 	}
 	
 	private function failedMetadata( $mme:ModelMetadataEvent):void {
-		if ( _ii.modelGuid == $mme.modelGuid ) {
+		if ( ii.modelGuid == $mme.modelGuid ) {
 			markComplete(false);
 		}
 	}
 	
 	private function retrivedMetadata( $mme:ModelMetadataEvent):void {
-		if ( _ii.modelGuid == $mme.modelGuid ) {
-			Log.out( "ModelMaker.retrivedMetadata - ii: " + _ii.toString() );
-			_vmm = $mme.vmm;
+		if ( ii.modelGuid == $mme.modelGuid ) {
+			Log.out( "ModelMaker.retrivedMetadata - ii: " + ii.toString() );
+			_modelMetadata = $mme.modelMetadata;
 			attemptMake();
 		}
 	}
 	
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
-		if ( null != _vmm && null != _vmi ) {
-			Log.out( "ModelMaker.attemptMake - ii: " + _ii.toString() );
+		if ( null != _modelMetadata && null != _modelInfo ) {
+			Log.out( "ModelMaker.attemptMake - ii: " + ii.toString() );
 			
 			var vm:* = make();
 			

@@ -442,7 +442,7 @@ public class VoxelModel
 		//	Log.out( "VoxelModel.update - name: " + metadata.name, Log.DEBUG );
 		if (!initialized) {
 			initialized = true;
-			Log.out( "VoxelModel.update - loading oxel data: " + modelInfo.guid, Log.WARN );
+			//Log.out( "VoxelModel.update - loading oxel data: " + modelInfo.guid, Log.WARN );
 			OxelDataEvent.addListener( ModelBaseEvent.RESULT_COMPLETE, oxelComplete );
 			modelInfo.oxelLoadData();
 		}
@@ -457,11 +457,11 @@ public class VoxelModel
 	}
 	
 	private function oxelComplete( $ode:OxelDataEvent ):void {
-		Log.out( "VoxelModel.oxelComplete evalutate - guid: " + $ode.modelGuid, Log.WARN );
+		//Log.out( "VoxelModel.oxelComplete evalutate - guid: " + $ode.modelGuid, Log.WARN );
 		// add $ode.modelGuid == metadata.name for imported from local file system models.
 		if ( $ode.modelGuid == instanceInfo.modelGuid || $ode.modelGuid == metadata.name ) {
 			OxelDataEvent.removeListener( ModelBaseEvent.RESULT_COMPLETE, oxelComplete );
-			Log.out( "VoxelModel.oxelComplete guid: " + $ode.modelGuid, Log.WARN );
+			//Log.out( "VoxelModel.oxelComplete guid: " + $ode.modelGuid, Log.WARN );
 			complete = true;
 		}
 	}
@@ -510,16 +510,15 @@ public class VoxelModel
 	public function save():void
 	{
 		if ( !changed ) {
-			Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
+			//Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 			return;
 		}
 		if ( !Globals.online ) {
-			Log.out( "VoxelModel.save - NOT online, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
+			//Log.out( "VoxelModel.save - NOT online, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 			return;
 		}
 			
-		Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
-				
+		//Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 		//Log.out( "VoxelModel.save - name: " + metadata.name, Log.WARN );
 		changed = false;
 		metadata.save();

@@ -165,7 +165,7 @@ public class InventoryPanelModel extends VVContainer
 		// I only want the results from the series I asked for
 		if ( _seriesModelMetadataEvent == $mme.series || 0 == $mme.series ) {
 			var om:ObjectModel = new ObjectModel( null, $mme.modelGuid );
-			om.vmm = $mme.vmm;
+			om.vmm = $mme.modelMetadata;
 			addModel( om );
 		}
 	}
@@ -176,9 +176,9 @@ public class InventoryPanelModel extends VVContainer
 		if ( ObjectInfo.OBJECTINFO_MODEL == $oi.objectType ) {
 			var om:ObjectModel = $oi as ObjectModel;
 			// dont show child models
-			if ( !WindowInventoryNew._s_hackShowChildren )
-				if ( null != om.vmm.parentModelGuid )
-					return null;
+			//if ( !WindowInventoryNew._s_hackShowChildren )
+				//if ( null != om.vmm.animationClass )
+					//return null;
 		}
 				
 		var box:BoxInventory = findFirstEmpty();	

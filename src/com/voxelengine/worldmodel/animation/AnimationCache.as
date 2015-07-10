@@ -24,6 +24,12 @@ import com.voxelengine.events.PersistanceEvent;
  */
 public class AnimationCache
 {
+	// This should be a list so that it can be added to easily, this is hard coded.
+	static public const MODEL_BIPEDAL_10:String = "MODEL_BIPEDAL_10";
+	static public const MODEL_DRAGON_9:String =  "MODEL_DRAGON_9";
+	static public const MODEL_PROPELLER:String =  "MODEL_PROPELLER";
+	static public const MODEL_UNKNOWN:String =  "MODEL_UNKNOWN";
+	
 	// this acts as a holding spot for all model objects loaded from persistance
 	// dont use weak keys since this is THE spot that holds things.
 	static private var _animatedModels:Array = new Array();
@@ -39,6 +45,19 @@ public class AnimationCache
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
 	}
 	
+	static public function requestAnimationClass( $modelClass:String ):String {
+		if ( $modelClass == "Dragon" )
+			return MODEL_DRAGON_9;
+		if ( $modelClass == "Avatar" )
+			return MODEL_BIPEDAL_10;
+		if ( $modelClass == "Player" )
+			return MODEL_BIPEDAL_10;
+		if ( $modelClass == "Propeller" )
+			return MODEL_PROPELLER;
+		
+		return "";
+	}
+
 	static private function deleteHandler( $ae:AnimationEvent ):void {
 		var modelAnis:Array = _animatedModels[$ae.modelGuid]; 
 		var ani:Animation;
@@ -69,9 +88,9 @@ public class AnimationCache
 			ani = modelAnis[$ame.aniGuid];
 		if ( null == ani ) {
 			if ( true == Globals.online && $ame.fromTable )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.BIGDB_TABLE_ANIMATIONS, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.BIGDB_TABLE_ANIMATIONS, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
 			else	
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
 		}
 		else
 			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.RESULT, $ame.series, $ame.modelGuid, $ame.aniGuid, ani ) );
@@ -94,7 +113,8 @@ public class AnimationCache
 					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
 					return;
 				}
-				ani.fromImport( jsonResult, $pe.guid, $pe.other );
+				// check $pe.other is modelGuid
+				ani.fromImport( jsonResult, $pe.guid, $pe.other, $pe.other );
 				//ani.loaded = true;
 				ani.save();
 			}

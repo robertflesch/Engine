@@ -29,15 +29,19 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 public class ModelMakerBase {
 	
 	static private var _makerCount:int;
+	private   var _parentModelGuid:String;
+	private   var _ii:InstanceInfo;
+	protected var _modelMetadata:ModelMetadata;
+	protected var _modelInfo:ModelInfo;
 	
-	protected var _vmm:ModelMetadata;
-	protected var _vmi:ModelInfo;
-	protected var _ii:InstanceInfo;
-	protected var _parentModelGuid:String;
+	public function get ii():InstanceInfo { return _ii; }
+	public function get parentModelGuid():String { return _parentModelGuid; }
 	
 	static private var _s_parentChildCount:Array = new Array();
 	
 	public function ModelMakerBase( $ii:InstanceInfo, $fromTables:Boolean = true ) {
+		if ( null == $ii )
+			throw new Error( "ModelMakerBase - NO instanceInfo recieve in constructor" );
 		Log.out( "ModelMakerBase - ii: " + $ii.toString(), Log.DEBUG );
 		_ii = $ii;
 		if ( $ii.controllingModel ) {
@@ -65,7 +69,7 @@ public class ModelMakerBase {
 	protected function retrivedModelInfo($mie:ModelInfoEvent):void  {
 		if ( _ii.modelGuid == $mie.modelGuid ) {
 			Log.out( "ModelMakerBase.retrivedModelInfo - ii: " + _ii.toString(), Log.DEBUG );
-			_vmi = $mie.vmi;
+			_modelInfo = $mie.vmi;
 			attemptMake();
 		}
 	}
@@ -82,14 +86,14 @@ public class ModelMakerBase {
 	
 	// once they both have been retrived, we can make the object
 	protected function make():VoxelModel {
-		var modelAsset:String = _vmi.modelClass;
+		var modelAsset:String = _modelInfo.modelClass;
 		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
 		var vm:VoxelModel = new modelClass( _ii );
 		if ( null == vm ) {
 			Log.out( "ModelMakerBase.make - Model failed in creation - modelAsset: " + modelAsset + "  modelClass: " + modelClass, Log.ERROR );
 			return null;
 		}
-		vm.init( _vmi, _vmm );
+		vm.init( _modelInfo, _modelMetadata );
 		return vm;
 	}
 
@@ -107,8 +111,8 @@ public class ModelMakerBase {
 			if ( 0 == count )
 				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _ii.modelGuid, _parentModelGuid, $vm ) );
 		}
-		_vmm = null;
-		_vmi = null;
+		_modelMetadata = null;
+		_modelInfo = null;
 		_ii = null;
 		
 		function removeListeners():void {
@@ -137,5 +141,6 @@ public class ModelMakerBase {
 	static public function makerCountGet():int { return _makerCount; }
 	static public function makerCountIncrement():void { _makerCount++; }
 	static public function makerCountDecrement():void { _makerCount--; }
+	
 }	
 }

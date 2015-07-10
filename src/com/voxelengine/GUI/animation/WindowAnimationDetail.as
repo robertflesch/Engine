@@ -71,7 +71,7 @@ package com.voxelengine.GUI.animation
 	private var _ani:Animation;
 	private var _create:Boolean;
 		
-		public function WindowAnimationDetail( $ani:Animation )
+		public function WindowAnimationDetail( $guid:String, $ani:Animation )
 		{
 			var title:String;
 			if ( $ani ) 	title = LanguageManager.localizedStringGet( "Edit_Animation" );

@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.animation
 {
 import com.voxelengine.events.AnimationEvent;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
@@ -30,7 +32,7 @@ public class AnimationMetadata
 	private var _description:String = INVALID;
 	private var _owner:String 		= INVALID;
 	private var _dbo:DatabaseObject;
-	private var _modelClass:String 	= Animation.MODEL_UNKNOWN;
+	private var _animationClass:String 	= AnimationCache.MODEL_UNKNOWN;
 	private var _world:String		= Globals.VOXELVERSE;
 	private var _modelGuid:String;
 	private var _modifiedDate:Date;
@@ -43,7 +45,7 @@ public class AnimationMetadata
 	public function set guid( $val:String):void { _guid = $val; }
 	public function get modelGuid():String { return _modelGuid; }
 	public function set modelGuid( $val:String):void { _modelGuid = $val; }
-	public function get modelClass():String { return _modelClass; }
+	public function get animationClass():String { return _animationClass; }
 	public function get description():String { return _description; }
 	public function get owner():String { return _owner; }
 	public function get dbo():DatabaseObject { return _dbo; }
@@ -52,23 +54,21 @@ public class AnimationMetadata
 	public function AnimationMetadata() {
 	}
 	
-	public function fromImport( $guid:String, $aniType:String ):void {
+	public function fromImport( $guid:String, $aniType:String, $modelGuid:String ):void {
 		_name = $guid;
 		_aniType = $aniType;
 		_description = $guid + " - IMPORTED";
 		_guid = Globals.getUID();
 		_owner = Network.userId;
-		//if ( "Dragon" == $modelGuid )
-Log.out( "AnimationMetadata.fromImport - SETTING MODEL CLASS TO Animation.MODEL_DRAGON_9", Log.WARN );
-_modelClass = Animation.MODEL_DRAGON_9;
-		//else if ( "Player" == $modelGuid )
-			//_modelClass	= Animation.MODEL_BIPEDAL_10;
-		//else if ( "Propeller" == $modelGuid )
-			//_modelClass	= Animation.MODEL_PROPELLER;
-		
-		//	Do I want model NAME or GUID?
-//		_modelGuid = $modelGuid;
 		_modifiedDate = new Date();
+		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoResult );
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, $modelGuid, null ) );
+	}
+	
+	private function modelInfoResult(e:ModelInfoEvent):void {
+		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoResult );
+		var modelClass:String = e.vmi.modelClass;
+		_animationClass = AnimationCache.requestAnimationClass( modelClass );
 	}
 
 	public function save( $ba:ByteArray ):void {
@@ -97,7 +97,7 @@ _modelClass = Animation.MODEL_DRAGON_9;
 								   , aniType: 		_aniType
 								   , owner: 		_owner
 								   , modifiedDate: 	_modifiedDate
-								   , modelClass:	 _modelClass
+								   , animationClass:	 _animationClass
 								   , modelGuid: 	_modelGuid
 								   , world: 		_world
 								   , data: 			$ba }
@@ -146,7 +146,7 @@ _modelClass = Animation.MODEL_DRAGON_9;
 		_dbo.aniType		= _aniType
 		_dbo.owner			= _owner;
 		_dbo.modifiedDate   = new Date();
-		_dbo.modelClass 	= _modelClass;
+		_dbo.animationClass 	= _animationClass;
 		_dbo.modelGuid		= _modelGuid;
 		_dbo.world			= _world;
 		_dbo.data			= $ba;
@@ -165,7 +165,7 @@ _modelClass = Animation.MODEL_DRAGON_9;
 		_owner			= $dbo.owner;
 		_modifiedDate   = $dbo.modifiedDate;
 		_modelGuid 		= $dbo.modelGuid;
-		_modelClass		= $dbo.modelClass;
+		_animationClass		= $dbo.animationClass;
 		_world			= $dbo.world;
 		_guid			= $dbo.key;
 		_dbo			= $dbo;

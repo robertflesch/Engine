@@ -97,8 +97,8 @@ public class OxelPersistance extends PersistanceObject
 	
 	public function update():void {
 		if ( _topMostChunk && _topMostChunk.dirty ) {
-			if ( guid != EditCursor.EDIT_CURSOR )
-				Log.out( "OxelPersistance.update - calling refreshQuads guid: " + guid, Log.WARN );
+			//if ( guid != EditCursor.EDIT_CURSOR )
+			//	Log.out( "OxelPersistance.update - calling refreshQuads guid: " + guid, Log.WARN );
 			_topMostChunk.refreshFaces();
 			_topMostChunk.refreshQuads();
 		}
@@ -127,8 +127,8 @@ public class OxelPersistance extends PersistanceObject
 				
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
 		}
-		else
-			Log.out( "OxelData.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
+		//else
+			//Log.out( "OxelData.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
 	}
 	
 	public function toPersistance():void { 
@@ -164,7 +164,7 @@ public class OxelPersistance extends PersistanceObject
 		_version = readVersion($ba);
 		// Read off next byte, the manifest version
 		$ba.readByte();
-		Log.out("OxelData.extractVersionInfo - version: " + _version );
+		//Log.out("OxelData.extractVersionInfo - version: " + _version );
 
 		// This reads the format info and advances position on byteArray
 		function readFormat($ba:ByteArray):String
@@ -199,7 +199,7 @@ public class OxelPersistance extends PersistanceObject
 	
 	public function fromByteArray($ba:ByteArray):void {
 
-		Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.WARN );
+		//Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.WARN );
 		var time:int = getTimer();
 		
 		try { $ba.uncompress(); }
@@ -230,16 +230,16 @@ public class OxelPersistance extends PersistanceObject
 		else
 			oxel.readVersionedData( _version, null, gct, $ba, _statisics );
 		GrainCursorPool.poolDispose(gct);
-		Log.out( "OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.WARN );
+		//Log.out( "OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.WARN );
 		
 		_statisics.gather();
-		_statisics.statsPrint();
+		//_statisics.statsPrint();
 		
-		Log.out( "OxelPersistance.fromByteArray - _statisics took: " + (getTimer() - time), Log.WARN );
+		//Log.out( "OxelPersistance.fromByteArray - _statisics took: " + (getTimer() - time), Log.WARN );
 		
 		_topMostChunk = Chunk.parse( oxel, null );
 		_loaded = true;
-		Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.WARN );
+		//Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.WARN );
 		
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this ) );
 	}

@@ -41,6 +41,7 @@ public class ModelInfoCache
 		ModelInfoEvent.addListener( ModelBaseEvent.GENERATION, 			generated );
 		ModelInfoEvent.addListener( ModelBaseEvent.SAVE, 				save );
 		ModelInfoEvent.addListener( ModelInfoEvent.DELETE_RECURSIVE, 	deleteRecursive );
+		ModelInfoEvent.addListener( ModelBaseEvent.UPDATE_GUID, 		updateGuid );		
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
@@ -129,6 +130,19 @@ public class ModelInfoCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  Persistance Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
+	static private function updateGuid( $ode:ModelInfoEvent ):void {
+		var guidArray:Array = $ode.modelGuid.split( ":" );
+		var oldGuid:String = guidArray[0];
+		var newGuid:String = guidArray[1];
+		var modelInfoExisting:ModelInfo = _modelInfo[oldGuid];
+		if ( null == modelInfoExisting ) {
+			Log.out( "ModelInfoCache.updateGuid - guid not found: " + oldGuid, Log.ERROR );
+			return; }
+		else {
+			_modelInfo[oldGuid] = null;
+			_modelInfo[newGuid] = modelInfoExisting;
+		}
+	}
 	
 	static private function loadSucceed( $pe:PersistanceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )

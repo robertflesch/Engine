@@ -19,21 +19,20 @@ import com.voxelengine.worldmodel.models.ModelMetadata;
  */
 public class ModelMetadataEvent extends ModelBaseEvent
 {
-	static public const REQUEST_CHILDREN:String					= "REQUEST_CHILDREN";
 	static public const RESULT_CHILDREN:String					= "RESULT_CHILDREN";
 
-	private var _vmm:ModelMetadata;
+	private var _modelMetadata:ModelMetadata;
 	private var _modelGuid:String;
 
-	public function get vmm():ModelMetadata { return _vmm; }
+	public function get modelMetadata():ModelMetadata { return _modelMetadata; }
 	public function get modelGuid():String { return _modelGuid; }
 	
-	public override function clone():Event { return new ModelMetadataEvent(type, series, _modelGuid, _vmm, bubbles, cancelable); }
+	public override function clone():Event { return new ModelMetadataEvent(type, series, _modelGuid, _modelMetadata, bubbles, cancelable); }
 	public override function toString():String { return formatToString("ModelMetadataEvent", "modelGuid", "vmm" ); }
 	
-	public function ModelMetadataEvent( $type:String, $series:int, $modelGuid:String, $vmm:ModelMetadata, $bubbles:Boolean = true, $cancellable:Boolean = false ) {
+	public function ModelMetadataEvent( $type:String, $series:int, $modelGuid:String, $modelMetadata:ModelMetadata, $bubbles:Boolean = true, $cancellable:Boolean = false ) {
 		super( $type, $series, $bubbles, $cancellable );
-		_vmm = $vmm;
+		_modelMetadata = $modelMetadata;
 		_modelGuid = $modelGuid;
 	}
 	

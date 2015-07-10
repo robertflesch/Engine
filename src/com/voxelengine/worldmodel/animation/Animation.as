@@ -23,12 +23,6 @@ import com.voxelengine.events.AnimationMetadataEvent;
  */
 public class Animation
 {
-	// This should be a list so that it can be added to easily, this is hard coded.
-	static public const MODEL_BIPEDAL_10:String = "MODEL_BIPEDAL_10";
-	static public const MODEL_DRAGON_9:String =  "MODEL_DRAGON_9";
-	static public const MODEL_PROPELLER:String =  "MODEL_PROPELLER";
-	static public const MODEL_UNKNOWN:String =  "MODEL_UNKNOWN";
-	
 	static private const BLANK_ANIMATION_TEMPLATE:Object = { "animation":[] };
 
 	static private const ANIMATION_STATE:String = "ANIMATION_STATE";
@@ -47,8 +41,8 @@ public class Animation
 	
 	public function Animation() {  }
 	
-	public function fromImport( $json:Object, $guid:String, $aniType:String ):void  {
-		_metadata.fromImport( $guid, $aniType );
+	public function fromImport( $json:Object, $guid:String, $aniType:String, $modelGuid:String ):void  {
+		_metadata.fromImport( $guid, $aniType, $modelGuid );
 		fromJSON( $json );
 	}
 	

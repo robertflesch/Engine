@@ -34,30 +34,29 @@ public class ModelMetadataCache
 	public function ModelMetadataCache() {	}
 	
 	static public function init():void {
-		ModelMetadataEvent.addListener( ModelMetadataEvent.REQUEST_CHILDREN, requestChildren );
+		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, 	requestType );
+		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, 		request );
+		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE, 			update );
+		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, 			deleteHandler );
+		ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, 		generated );
+		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );		
 		
-		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, requestType );
-		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, request );
-		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE, update );
-		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, deleteHandler );
-		ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, generated );
-		
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFailed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadNotFound );		
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
+		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  ModelMetadataEvent
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	static private function requestChildren( $mme:ModelMetadataEvent):void {
-		for each ( var mmd:ModelMetadata in _metadata ) {
-			if ( mmd && mmd.parentModelGuid == $mme.modelGuid )
-				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.RESULT_CHILDREN, $mme.series, $mme.modelGuid, mmd ) );		
-		}
-		// this is the end of series message
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.RESULT_CHILDREN, $mme.series, $mme.modelGuid, null ) );		
-	}
+	//static private function requestChildren( $mme:ModelMetadataEvent):void {
+		//for each ( var mmd:ModelMetadata in _metadata ) {
+			//if ( mmd && mmd.parentModelGuid == $mme.modelGuid )
+				//ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.RESULT_CHILDREN, $mme.series, $mme.modelGuid, mmd ) );		
+		//}
+		//// this is the end of series message
+		//ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.RESULT_CHILDREN, $mme.series, $mme.modelGuid, null ) );		
+	//}
 	
 	// This loads the first 100 objects from the users inventory OR the public inventory
 	static private function requestType( $mme:ModelMetadataEvent ):void {
@@ -106,9 +105,9 @@ public class ModelMetadataCache
 		var vmm:ModelMetadata = _metadata[$mme.modelGuid];
 		if ( null ==  vmm ) {
 			Log.out( "ModelMetadataCache.update trying update NULL metadata or guid, adding instead", Log.WARN );
-			add( 0, $mme.vmm );
+			add( 0, $mme.modelMetadata );
 		} else {
-			vmm.update( $mme.vmm );
+			vmm.update( $mme.modelMetadata );
 		}
 	}
 	
@@ -123,15 +122,30 @@ public class ModelMetadataCache
 	}
 	
 	static private function generated( $mme:ModelMetadataEvent ):void  {
-		add( 0, $mme.vmm );
+		add( 0, $mme.modelMetadata );
 	}
 
+	static private function updateGuid( $mme:ModelMetadataEvent ):void {
+		var guidArray:Array = $mme.modelGuid.split( ":" );
+		var oldGuid:String = guidArray[0];
+		var newGuid:String = guidArray[1];
+		var modelMetadataExisting:ModelInfo = _metadata[oldGuid];
+		if ( null == modelMetadataExisting ) {
+			Log.out( "ModelMetadataCache.updateGuid - guid not found: " + oldGuid, Log.ERROR );
+			return; }
+		else {
+			_metadata[oldGuid] = null;
+			_metadata[newGuid] = modelMetadataExisting;
+		}
+	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End - ModelMetadataEvent
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  Persistance Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
+	
 	static private function loadSucceed( $pe:PersistanceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;

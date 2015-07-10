@@ -38,6 +38,7 @@ public class OxelPersistanceCache
 		OxelDataEvent.addListener( ModelBaseEvent.REQUEST, 				request );
 		OxelDataEvent.addListener( ModelBaseEvent.GENERATION, 			generated );
 		OxelDataEvent.addListener( ModelBaseEvent.DELETE, 				deleteHandler );
+		OxelDataEvent.addListener( ModelBaseEvent.UPDATE_GUID, 			updateGuid );
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
@@ -55,7 +56,7 @@ public class OxelPersistanceCache
 			_loadingCount--;
 			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.ADDED, $series, $od.guid, $od ) );
 			if ( 0 == _loadingCount ) {
-				Log.out( "OxelPersistanceCache.add - done loading oxels: " + $od.guid, Log.WARN );
+				//Log.out( "OxelPersistanceCache.add - done loading oxels: " + $od.guid, Log.WARN );
 				RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid ) );
 			}
 		} else
@@ -64,6 +65,20 @@ public class OxelPersistanceCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  OxelDataEvents
 	/////////////////////////////////////////////////////////////////////////////////////////////
+	static private function updateGuid( $ode:OxelDataEvent ):void {
+		var guidArray:Array = $ode.modelGuid.split( ":" );
+		var oldGuid:String = guidArray[0];
+		var newGuid:String = guidArray[1];
+		var oxelData:OxelPersistance = _oxelDataDic[oldGuid];
+		if ( null == oxelData ) {
+			Log.out( "OxelPersistanceCache.updateGuid - guid not found: " + oldGuid, Log.ERROR );
+			return; }
+		else {
+			_oxelDataDic[oldGuid] = null;
+			_oxelDataDic[newGuid] = oxelData;
+		}
+	}
+	
 	static private function request( $ode:OxelDataEvent ):void {   
 		if ( null == $ode.modelGuid ) {
 			Log.out( "OxelDataCache.modelDataRequest guid rquested is NULL: ", Log.WARN );

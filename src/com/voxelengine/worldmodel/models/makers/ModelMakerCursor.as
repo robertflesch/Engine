@@ -26,7 +26,7 @@ public class ModelMakerCursor extends ModelMakerBase {
 	public function ModelMakerCursor( $ii:InstanceInfo, $vmm:ModelMetadata ) {
 		Log.out( "ModelMakerCursor.constructor ii: " + $ii.toString(), Log.DEBUG );
 		super( $ii );
-		_vmm = $vmm;
+		_modelMetadata = $vmm;
 		if ( 0 == makerCountGet() )
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 		makerCountIncrement();
@@ -35,8 +35,8 @@ public class ModelMakerCursor extends ModelMakerBase {
 	
 	// once the ModelInfo has been retrieved by base class, we can make the object
 	override protected function attemptMake():void {
-		if ( null != _vmi ) {
-			Log.out( "ModelMakerCursor.attemptMake - ii: " + _ii.toString(), Log.DEBUG );
+		if ( null != _modelInfo ) {
+			Log.out( "ModelMakerCursor.attemptMake - ii: " + ii.toString(), Log.DEBUG );
 			var vm:* = make();
 			if ( vm )
 				EditCursor.currentInstance.objectModelSet( vm );

@@ -8,7 +8,9 @@
 
 package com.voxelengine.GUI 
 {
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.Permissions;
 import flash.events.Event;
@@ -59,16 +61,25 @@ public class WindowModelMetadata extends VVPopup
 			_vmm = new ModelMetadata( $ii.modelGuid );
 			_vmm.name = $ii.modelGuid;
 			_vmm.description = $ii.modelGuid + "-IMPORTED";
-			if ( $ii.controllingModel )
-				_vmm.parentModelGuid = $ii.controllingModel.instanceInfo.modelGuid
 			_vmm.owner = Network.userId;
 			_vmm.modifiedDate = new Date();
 			// fake an event to populate the window
-			dataReceived( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, $ii.modelGuid, _vmm ) )
+			dataReceived( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, $ii.modelGuid, _vmm ) );
+			
+			if ( $ii.controllingModel ) {
+				ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoResult );
+				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, $ii.controllingModel.modelInfo.guid, null ) );
+			}
 		}
 		else {
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, $ii.modelGuid, null ) );
 		}
+	}
+	
+	private function modelInfoResult(e:ModelInfoEvent):void {
+		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoResult );
+		var modelClass:String = e.vmi.modelClass;
+		_vmm.animationClass = AnimationCache.requestAnimationClass( modelClass );
 	}
 	
 	private function dataReceived( $mme:ModelMetadataEvent ):void {
@@ -76,7 +87,7 @@ public class WindowModelMetadata extends VVPopup
 		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, dataReceived );
 		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, dataReceived );
 		
-		_vmm = $mme.vmm;
+		_vmm = $mme.modelMetadata;
 		
 		if ( TYPE_IMPORT == _type ) {
 			var creatorI:LabelInput = new LabelInput( "Creator: ", _vmm.permissions.creator );
