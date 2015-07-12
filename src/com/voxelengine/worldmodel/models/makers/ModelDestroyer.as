@@ -48,8 +48,6 @@ public class ModelDestroyer {
 		// only instances have inventory, not models
 		for each ( var vm:VoxelModel in modelOnScreen )
 			vm.dead = true;
-
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.DELETE, _modelGuid, null ) );
 	}
 	
 	private function dataResult( $mie:ModelInfoEvent):void 

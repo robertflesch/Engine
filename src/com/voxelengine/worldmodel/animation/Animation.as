@@ -8,8 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.animation
 {
 import flash.utils.ByteArray;
-import playerio.DatabaseObject;
 
+import playerio.DatabaseObject;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.utils.JSONUtil;
@@ -25,8 +25,8 @@ public class Animation
 {
 	static private const BLANK_ANIMATION_TEMPLATE:Object = { "animation":[] };
 
-	static private const ANIMATION_STATE:String = "ANIMATION_STATE";
-	static private const ANIMATION_ACTION:String = "ANIMATION_ACTION";
+	static private const ANIMATION_STATE:String = "STATE";
+	static private const ANIMATION_ACTION:String = "ACTION";
 	
 	//private var _loaded:Boolean = false;
 	private var _transforms:Vector.<AnimationTransform>;
@@ -41,12 +41,20 @@ public class Animation
 	
 	public function Animation() {  }
 	
-	public function fromImport( $json:Object, $guid:String, $aniType:String, $modelGuid:String ):void  {
-		_metadata.fromImport( $guid, $aniType, $modelGuid );
-		fromJSON( $json );
+	public function fromImport( $json:Object, $guid:String, $modelGuid:String ):void  {
+		_metadata.fromImport( $guid, fromJSON( $json ), $modelGuid );
 	}
 	
-	public function fromJSON( $json:Object ):void  {
+	public function fromJSON( $json:Object ):String  {
+		var type:String = ANIMATION_STATE;
+		if ( $json.type ) {
+			if ( "action" == $json.type )
+				type = ANIMATION_ACTION;
+			else if ( "state" == $json.type ) 	
+				type = ANIMATION_STATE;
+			else
+				Log.out( "Animation.fromJSON - ERROR unknown type: " + $json.type, Log.ERROR );
+		}
 		if ( $json.sound ) {
 			_sound = new AnimationSound();
 			_sound.init( $json.sound );
@@ -66,6 +74,7 @@ public class Animation
 			}
 		}
 		//LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.ANIMATION_LOAD_COMPLETE, name ) );
+		return type;
 	}
 	
 	public function fromPersistance( $dbo:DatabaseObject ):void {	

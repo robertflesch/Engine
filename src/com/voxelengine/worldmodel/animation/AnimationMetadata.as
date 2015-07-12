@@ -42,7 +42,7 @@ public class AnimationMetadata
 	public function get name():String { return _name; }
 	public function get aniType():String { return _aniType; }
 	public function get guid():String { return _guid; }
-	public function set guid( $val:String):void { _guid = $val; }
+	public function set guid( $newGuid:String):void { _guid = $newGuid; }
 	public function get modelGuid():String { return _modelGuid; }
 	public function set modelGuid( $val:String):void { _modelGuid = $val; }
 	public function get animationClass():String { return _animationClass; }

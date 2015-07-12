@@ -114,7 +114,7 @@ public class AnimationCache
 					return;
 				}
 				// check $pe.other is modelGuid
-				ani.fromImport( jsonResult, $pe.guid, $pe.other, $pe.other );
+				ani.fromImport( jsonResult, $pe.guid, $pe.other );
 				//ani.loaded = true;
 				ani.save();
 			}

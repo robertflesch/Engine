@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -87,6 +88,7 @@ public class ModelInfoCache
 			// TODO need to clean up eventually
 			mi = null;
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid, null ) );
+			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.DELETE, $mie.modelGuid, null ) );
 		}
 	}
 	

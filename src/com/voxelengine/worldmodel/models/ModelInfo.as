@@ -298,7 +298,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			_animationCount--;
 			if ( 0 == _animationCount ) {
 				animationsLoaded = true;
-				Log.out( "ModelInfo.addAnimation safe to save now: " + guid, Log.WARN );
+				//Log.out( "ModelInfo.addAnimation safe to save now: " + guid, Log.WARN );
 			}
 		}
 	}
@@ -543,7 +543,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	}
 
 	private function animationsFromObject( $animations:Object ):void {
-	// i.e. animData = { "name": "Glide", "type": "state OR action", "guid":"Glide.ajson" }
+	// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
 		Log.out( "ModelInfo.animationsFromObject" );	
 		for each ( var animData:Object in $animations ) {
 			Log.out( "ModelInfo.animationsFromObject - _animationInfo.push animData: " + animData.name );	

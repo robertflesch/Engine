@@ -176,9 +176,9 @@ public class InventoryPanelModel extends VVContainer
 		if ( ObjectInfo.OBJECTINFO_MODEL == $oi.objectType ) {
 			var om:ObjectModel = $oi as ObjectModel;
 			// dont show child models
-			//if ( !WindowInventoryNew._s_hackShowChildren )
-				//if ( null != om.vmm.animationClass )
-					//return null;
+			if ( !WindowInventoryNew._s_hackShowChildren )
+				if ( "" != om.vmm.animationClass )
+					return null;
 		}
 				
 		var box:BoxInventory = findFirstEmpty();	

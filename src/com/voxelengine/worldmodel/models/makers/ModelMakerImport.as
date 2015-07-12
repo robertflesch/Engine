@@ -50,7 +50,8 @@ public class ModelMakerImport extends ModelMakerBase {
 
 	override protected function retrieveBaseInfo():void {
 		addListeners();	
-		// Since this is the import, it used the local file system rather then persistance
+		// Since this is the import, it uses the local file system rather then persistance
+		// So we need to override the base handler
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );	
 	}
 	
@@ -79,32 +80,41 @@ public class ModelMakerImport extends ModelMakerBase {
 		}
 	}
 
-	protected function attemptMakeRetrieveParentModelInfo():void {
+	private function attemptMakeRetrieveParentModelInfo():void {
 		if ( parentModelGuid )
 			retrieveParentModelInfo();
 		else
 			completeMake();
 	}
 	
+	private var _topMostGuid:String; // Used to return the modelClass of the topmost guid of the parent chain.
 	private function retrieveParentModelInfo():void {
 		// We need the parents modelClass so we can know what kind of animations are correct for this model.
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, parentModelInfoResult );
+		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, parentModelInfoResult );
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, parentModelGuid, null ) );
+		_topMostGuid = ii.topmostGuid();
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _topMostGuid, null ) );
 	}
 	
-	private function parentModelInfoResult(e:ModelInfoEvent):void {
-		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, parentModelInfoResult );
-		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
-		var modelClass:String = e.vmi.modelClass;
-		_modelMetadata.animationClass = AnimationCache.requestAnimationClass( modelClass );
-		completeMake();
+	private function parentModelInfoResult($mie:ModelInfoEvent):void {
+		if ( $mie.modelGuid == _topMostGuid ) {
+			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, parentModelInfoResult );
+			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, parentModelInfoResult );
+			ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
+			var modelClass:String = $mie.vmi.modelClass;
+			_modelMetadata.animationClass = AnimationCache.requestAnimationClass( modelClass );
+			completeMake();
+		}
 	}
 	
-	private function parentModelInfoResultFailed(e:ModelInfoEvent):void {
-		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, parentModelInfoResult );
-		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
-		markComplete( false );
+	private function parentModelInfoResultFailed($mie:ModelInfoEvent):void {
+		if ( $mie.modelGuid == _modelInfo.guid ) {
+			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, parentModelInfoResult );
+			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, parentModelInfoResult );
+			ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
+			markComplete( false );
+		}
 	}
 	
 	private function completeMake():void {

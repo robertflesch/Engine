@@ -119,7 +119,7 @@ public class WindowSandboxList extends VVPopup
 	{			
 		displaySelectedRegionList( e.target.value );	
 	}
-	
+
 	override protected function onRemoved( event:UIOEvent ):void {
 		super.onRemoved( event );
 		RegionEvent.removeListener( ModelBaseEvent.ADDED, regionLoadedEvent );
@@ -131,7 +131,7 @@ public class WindowSandboxList extends VVPopup
 	
 	private function loadthisRegion(event:UIMouseEvent):void 
 	{
-		Log.out( "WindowSandboxList.loadthisRegion - _listbox1.selectedIndex: " + _listbox1.selectedIndex, Log.WARN );
+		//Log.out( "WindowSandboxList.loadthisRegion - _listbox1.selectedIndex: " + _listbox1.selectedIndex, Log.WARN );
 		if ( -1 == _listbox1.selectedIndex )
 			return;
 			
