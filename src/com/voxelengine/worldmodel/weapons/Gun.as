@@ -1,5 +1,5 @@
 /*==============================================================================
-Copyright 2011-2013 Robert Flesch
+Copyright 2011-2015 Robert Flesch
 All rights reserved.  This product contains computer programs, screen
 displays and printed documentation which are original works of
 authorship protected under United States Copyright Act.
@@ -29,15 +29,15 @@ public class Gun extends ControllableVoxelModel
 {
 	protected var _id:int;
 	protected var _series:int;
-	protected var _armory:Vector.<String> = new Vector.<String>;
+	static protected var _armory:Vector.<String> = new Vector.<String>;
 	protected var _ammo:Ammo;
-	protected var _reloadSpeed:Number;
+	static protected var _reloadSpeed:Number;
 
 	public function get ammo():Ammo { return _ammo; }
 	public function set ammo( $ammo:Ammo ):void { _ammo = $ammo; }
-	public function get armory():Vector.<String>  { return _armory; }
+	static public function get armory():Vector.<String>  { return _armory; }
 	
-	public function get reloadSpeed():Number { return _reloadSpeed; }
+	static public function get reloadSpeed():Number { return _reloadSpeed; }
 	//Barrel
 	//Stand
 	//Sight
@@ -69,9 +69,9 @@ public class Gun extends ControllableVoxelModel
 	
 	override protected function processClassJson():void {
 		super.processClassJson();
-		if ( modelInfo.json && modelInfo.json.gun )
+		if ( modelInfo.obj && modelInfo.obj.gun )
 		{
-			var gunInfo:Object = modelInfo.json.gun;
+			var gunInfo:Object = modelInfo.obj.gun;
 			if ( gunInfo.reloadSpeed )
 				_reloadSpeed = gunInfo.reloadSpeed;
 				
@@ -107,8 +107,8 @@ public class Gun extends ControllableVoxelModel
 			//Log.out( "Gun.resultFailed - No ammo information found for name: " + e.name );
 	//}
 	
-	override public function buildExportObject( obj:Object ):void {
-		super.buildExportObject( obj )
+	static public function buildExportObject( obj:Object ):void {
+		ControllableVoxelModel.buildExportObject( obj )
 		var gunData:Object = new Object();
 		gunData.reloadSpeed = _reloadSpeed;
 		

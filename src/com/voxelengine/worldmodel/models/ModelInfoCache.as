@@ -163,14 +163,14 @@ public class ModelInfoCache
 					// This is for import from local only.
 					var fileData:String = String( $pe.data );
 					var modelInfoJson:String = StringUtils.trim(fileData);
-					var jsonResult:Object = JSONUtil.parse( modelInfoJson, $pe.guid + $pe.table, "ModelInfoCache.loadSucceed" );
-					jsonResult.model.modelGuid = $pe.guid;
-					if ( null == jsonResult ) {
+					mi.obj = JSONUtil.parse( modelInfoJson, $pe.guid + $pe.table, "ModelInfoCache.loadSucceed" );
+					if ( null == mi.obj ) {
 						Log.out( "ModelInfoCache.loadSucceed - error parsing modelInfo on import. guid: " + $pe.guid, Log.ERROR );
 						ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 						return;
 					}
-					mi.fromObject( jsonResult.model, null );
+					mi.guid = $pe.guid;
+					mi.fromObject( null, null );
 				}
 				add( $pe.series, mi );
 				if ( _block.has( $pe.guid ) )

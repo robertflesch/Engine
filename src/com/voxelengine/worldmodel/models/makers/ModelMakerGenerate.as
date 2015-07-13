@@ -38,17 +38,17 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	private var _type:int;
 	
 	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object ) {
-		_creationInfo = $miJson;
-		_creationFunction = $miJson.biomes.layers[0].functionName;
-		_type = _creationInfo.biomes.layers[0].type;
+		_creationFunction 	= $miJson.biomes.layers[0].functionName;
+		_type 				= $miJson.biomes.layers[0].type;
 		
 		super( $ii );
-		Log.out( "ModelMakerGenerate - ii: " + ii.toString() + "  using generation script: " + _creationFunction );
+		Log.out( "ModelMakerGenerate - ii: " + ii.toString() + "  using generation script: " + $miJson.biomes.layers[0].functionName );
 		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 		
 		// This is a special case for modelInfo, the modelInfo its self is contained in the generate script
 		_modelInfo = new ModelInfo( $ii.modelGuid );
-		_modelInfo.fromObject( $miJson, null );
+		_modelInfo.obj = $miJson;
+		_modelInfo.fromObject( null, null );
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.GENERATION, 0, $ii.modelGuid, _modelInfo ) );
 		
 		retrieveBaseInfo();
@@ -57,7 +57,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	
 	override protected function retrieveBaseInfo():void {
 		_modelMetadata = new ModelMetadata( ii.modelGuid );
-		_modelMetadata.name = TypeInfo.name( _type ) + _creationInfo.grainSize + "-" + _creationFunction;
+		_modelMetadata.name = TypeInfo.name( _type ) + _modelInfo.obj.grainSize + "-" + _creationFunction;
 		_modelMetadata.description = _creationFunction + "- GENERATED";
 		_modelMetadata.owner = Network.userId;
 		_modelMetadata.modifiedDate = new Date();

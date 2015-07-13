@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.worldmodel.models.makers.ModelLibrary;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.Region;
@@ -48,7 +49,6 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	private var _biomes:Biomes;																	// used to generate terrain and apply other functions to oxel
 	private var _modelClass:String 									= "VoxelModel";				// Class used to instaniate model
 	private var _grainSize:int = 0;																// Used in model generatation
-	private var _modelJson:Object;																// copy of json object used to create this
 	private var _animationInfo:Vector.<Object> 						= new Vector.<Object>();	// ID and name of animations that this model has, before loading
 	private var _animationCount:int;			
 	private var _series:int											// used to make sure animation is part of same series when loading
@@ -62,7 +62,6 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	public 	function set animationsLoaded(value:Boolean):void		{ _animationsLoaded = value; }
 			
 	public function get altGuid():String 							{ return _altGuid; }
-	public function get json():Object 								{ return _modelJson; }
 	public function get fileName():String 							{ return _fileName; }
 	public function set fileName(val:String):void 					{ _fileName = val; }
 	public function get biomes():Biomes 							{ return _biomes; }
@@ -150,10 +149,10 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	}
 
 	override public function release():void {
+		super.release();
 		_biomes = null;
 		_childrenInstanceInfo = null;
 		_scripts = null;
-		_modelJson = null;
 		_animations = null;
 		_animationInfo = null;
 		_data.release();
@@ -370,15 +369,14 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		if ( null == $dbo.modelClass )
 			throw new Error( "ModelInfo.fromPersistance - no model class set, make sure its not an empty record" );
 		modelClass			= $dbo.modelClass;
-		var tmp:Object;
-		if ( $dbo.children ) {
-			tmp = JSONUtil.parse( $dbo.children, Globals.BIGDB_TABLE_MODEL_INFO, "fromPersistance.children" );
-			childrenFromObject( tmp );
-		}
+		if ( $dbo.children )
+			childrenFromObject( JSONUtil.parse( $dbo.children, Globals.BIGDB_TABLE_MODEL_INFO, "fromPersistance.children" ) );
 		if ( $dbo.scripts )
 			scriptsFromObject( JSONUtil.parse( $dbo.scripts, Globals.BIGDB_TABLE_MODEL_INFO, "fromPersistance.scripts" ) );
 		if ( $dbo.animations )
 			animationsFromObject( JSONUtil.parse( $dbo.animations, Globals.BIGDB_TABLE_MODEL_INFO, "fromPersistance.animations" ) );
+		// Now put the data into the object so that the voxel model and decendances can use it.	
+		toObject();
 	}
 
 	public function toPersistance():void {
@@ -409,12 +407,19 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			else	
 				dbo.scripts = null;
 		}
-			
 	}
 	
 	public function toObject():void {
 		// create new to make sure we dont have holdovers
-		_obj = new Object();
+		// keep the holdovers
+		//_obj = new Object();
+		var modelClassPrototype:Class = ModelLibrary.getAsset( _modelClass );
+		try {
+			modelClassPrototype.buildExportObject( _obj );
+		} catch ( e:Error ) {
+			Log.out( "ModelInfo.toObject - Error with Class: " + _modelClass, Log.ERROR );
+		}
+
 			
 		_obj.modelClass = _modelClass;
 		// biomes:			_biomes,      // Biomes are only used in object generation, once the object has been completed they are removed.
@@ -483,39 +488,40 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	} 	
 
 	// From JSON to modelInfo
-	public function fromObject( $object:Object, $ba:ByteArray ):void {		
-		_obj = $object;
-		if ( _obj.modelGuid )
-			super.guid = _fileName = _obj.modelGuid;
-		else if ( _obj.guid )
-			super.guid = _fileName = _obj.guid;
+	public function fromObject( $object:Object, $ba:ByteArray ):void {
+		//_obj = _obj;
+		if ( _obj.model.modelGuid )
+			super.guid = _fileName = _obj.model.modelGuid;
+		else if ( _obj.model.guid )
+			super.guid = _fileName = _obj.model.guid;
 		else
-			Log.out( "ModelInfo.fromObject - no guid assigned", Log.WARN );
+			if ( null == guid || "" == guid )
+				Log.out( "ModelInfo.fromObject - no guid assigned", Log.WARN );
 		
-		if ( _obj.grainSize )
-			grainSize = _obj.grainSize;
-		else if ( _obj.GrainSize )
+		if ( _obj.model.grainSize )
+			grainSize = _obj.model.grainSize;
+		else if ( _obj.model.GrainSize )
 			Log.out( "ModelInfo.fromObject - invalid spelling on grainSize on import", Log.WARN );
-		else if ( _obj.grainsize )
+		else if ( _obj.model.grainsize )
 			Log.out( "ModelInfo.fromObject - invalid spelling on grainSize on import", Log.WARN );
 		
-		if ( _obj.modelClass )
-			_modelClass = _obj.modelClass;
+		if ( _obj.model.modelClass )
+			_modelClass = _obj.model.modelClass;
 
-		if ( _obj.biomes )
-			biomesFromObject( _obj.biomes );
+		if ( _obj.model.biomes )
+			biomesFromObject( _obj.model.biomes );
 		
-		if ( _obj.scripts )
-			scriptsFromObject( _obj.scripts );
+		if ( _obj.model.scripts )
+			scriptsFromObject( _obj.model.scripts );
 		// This is an artifact from the old mjson files, new system saves all as "scripts"
-		if ( _obj.script )
-			scriptsFromObject( _obj.script );
+		if ( _obj.model.script )
+			scriptsFromObject( _obj.model.script );
 		
-		if ( _obj.children )
-			childrenFromObject( _obj.children );
+		if ( _obj.model.children )
+			childrenFromObject( _obj.model.children );
 		
-		if ( _obj.animations )
-			animationsFromObject( _obj.animations );
+		if ( _obj.model.animations )
+			animationsFromObject( _obj.model.animations );
 	}
 	
 	public function fromByteArray( $ba:ByteArray ):void {;}
@@ -529,7 +535,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			throw new Error( "ModelInfo.biomesFromObject - WARNING - unable to find layerInfo: " + fileName );					
 		_biomes.layersLoad( $biomes.layers );
 		// now remove the biome data from the object so it is not saved to persistance
-		delete _obj.biomes;	
+		delete _obj.model.biomes;	
 		
 	}
 	
@@ -597,7 +603,6 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			Log.out( "ModelInfo.childrenLoad - loading for model: " + guid + childrenInstanceInfo.length );
 			childrenLoaded	= false;
 			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
-			//Log.out( "VoxelModel.processClassJson name: " + metadata.name + " - loading child models START" );
 			for each (var childInstanceInfo:InstanceInfo in childrenInstanceInfo)
 			{
 				// Add the parent model info to the child.
@@ -618,7 +623,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 				ModelMakerBase.load( childInstanceInfo, true, false );
 			}
 			Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
-			//Log.out( "VoxelModel.processClassJson - loading child models END" );
+			//Log.out( "VoxelModel.childrenLoad - loading child models END" );
 		}
 		else
 			childrenLoaded	= true;

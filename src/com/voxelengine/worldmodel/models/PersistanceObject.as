@@ -25,7 +25,7 @@ public class PersistanceObject
 	private var 	_table:String;
 	private var 	_changed:Boolean;
 	protected var 	_dbo:DatabaseObject;
-	protected var 	_obj:Object;
+	protected var	_obj:Object = new Object();
 	
 	public function PersistanceObject( $guid:String, $table:String ) {
 		if ( null == $guid || "" == $guid )
@@ -46,9 +46,11 @@ public class PersistanceObject
 	public function get dbo():DatabaseObject { return _dbo; }
 	public function set dbo(val:DatabaseObject ):void { _dbo = val; }
 	public function get table():String { return _table; }
-	public function get obj():Object  { return _obj; }
 	public function get changed():Boolean { return _changed; }
 	public function set changed(value:Boolean):void { _changed = value; }
+	
+	public function get obj():Object  { return _obj; }
+	public function set obj(value:Object):void { _obj = value; }
 	
 	public function clone( $guid:String ):* {
 		throw new Error( "PersistanceObject.clone - THIS METHOD NEEDS TO BE OVERRIDDEN", Log.ERROR );

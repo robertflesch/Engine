@@ -22,19 +22,21 @@ package com.voxelengine.worldmodel.models.types
 		//Stand
 		//Stand
 		//Sight
+		private var _reloadSpeed:int;
+		
 		public function Stand( $ii:InstanceInfo ) 
 		{ 
 			super( $ii );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-			super.init( $mi, $vmm );
+		override protected function processClassJson():void {
+			super.processClassJson();
 			
-			if ( $mi.json && $mi.json.model && $mi.json.model.Stand )
+			if ( modelInfo.obj && modelInfo.obj.stand )
 			{
-				var StandInfo:Object = $mi.json.model.Stand;
-				if ( StandInfo.reloadSpeed )
-					trace( "Stand - json - reloadSpeed: " + StandInfo.reloadSpeed );
+				var standInfo:Object = modelInfo.obj.stand;
+				if ( standInfo.reloadSpeed )
+					_reloadSpeed = standInfo.reloadSpeed;
 			}
 //			else
 //				trace( "Stand - NO Stand INFO FOUND" );

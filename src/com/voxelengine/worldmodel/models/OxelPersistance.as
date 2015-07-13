@@ -136,7 +136,7 @@ public class OxelPersistance extends PersistanceObject
 	}
 	public function toObject():void { 
 		var ba:ByteArray = toByteArray( oxel );
-		_obj = { ba: ba	}
+		_obj.ba = ba;
 	}
 		
 	// FROM Persistance

@@ -124,7 +124,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 
 	public function save():void {
 		if ( Globals.online && true == changed ) {
-			Log.out( "ModelMetadata.save - Saving ModelMetadata: " + guid  + " in table: " + table, Log.WARN );
+			//Log.out( "ModelMetadata.save - Saving ModelMetadata: " + guid  + " in table: " + table, Log.WARN );
 			if ( !Globals.isGuid( guid ) )
 				Log.out( "ModelMetadata.save - Saving ModelMetadata: " + guid  + " in table: " + table, Log.ERROR );
 				
@@ -137,8 +137,8 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 				
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
 		}
-		else
-			Log.out( "ModelMetadata.save - Not saving ModelMetadata, either offline or NOT changed or locked - guid: " + guid );
+		//else
+		//	Log.out( "ModelMetadata.save - Not saving ModelMetadata, either offline or NOT changed or locked - guid: " + guid );
 	}
 	
 	//////////////////////////////////////////////////////////////////
@@ -161,15 +161,15 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	
 	public function toObject():void {
 		
-		_obj =    { name: 				name
-				  , description: 		description
-				  , owner: 				owner
-				  , creator: 			creator
-				  , modifiedDate: 		modifiedDate
-				  , animationClass: 	animationClass
-				  , thumbnail: 			thumbnail }
+		_obj.name				= name;
+		_obj.description		= description;
+		_obj.owner 				= owner;
+		_obj.creator 			= creator;
+		_obj.modifiedDate 		= modifiedDate;
+		_obj.animationClass		= animationClass;
+		_obj.thumbnail			= thumbnail;
 								  
-		_obj = _permissions.addToObject( _obj );
+		_permissions.addToObject( _obj );
 	}
 	
 

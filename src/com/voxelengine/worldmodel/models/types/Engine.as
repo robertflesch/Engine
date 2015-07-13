@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -49,14 +49,13 @@ package com.voxelengine.worldmodel.models.types
 			super( $ii );
 		}
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-			super.init( $mi, $vmm );
-		
-			if ( $mi.json && $mi.json.model && $mi.json.model.engine )
+		override protected function processClassJson():void {
+			super.processClassJson();
+			if ( modelInfo.obj && modelInfo.obj.engine )
 			{
-				var EngineInfo:Object = $mi.json.model.engine;
-				if ( EngineInfo.maxThrust )
-					_maxThrust = EngineInfo.maxThrust;
+				var engineInfo:Object = modelInfo.obj.engine;
+				if ( engineInfo.maxThrust )
+					_maxThrust = engineInfo.maxThrust;
 			}
 			else
 				trace( "Engine - NO Engine INFO FOUND - Setting to defaults" );

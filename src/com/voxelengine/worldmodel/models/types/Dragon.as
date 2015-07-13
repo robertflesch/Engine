@@ -50,16 +50,15 @@ public class Dragon extends Beast
 		FunctionRegistry.functionAdd( fire, "fire" );
 	}
 	
-	override public function buildExportObject( obj:Object ):void {
-		super.buildExportObject( obj )
+	static public function buildExportObject( obj:Object ):void {
+		Beast.buildExportObject( obj )
 		obj.dragon = new Object();
 	}
 	
 	override protected function processClassJson():void {
 		super.processClassJson();
-		if ( modelInfo.json && modelInfo.json.dragon )
-		{
-			var cmInfo:Object = modelInfo.json.dragon;
+		if ( modelInfo.obj && modelInfo.obj.dragon ) {
+			var cmInfo:Object = modelInfo.obj.dragon;
 		}
 		// no unique items at this level
 	}
@@ -242,17 +241,16 @@ public class Dragon extends Beast
 		slots[0] = new ObjectAction( null, "loseControlHandler", "dismount.png", "Dismount" );
 		
 		var slotIndex:int = 1;
-		for each ( var gun:Gun in _guns ) {
-			for each ( var ammo:String in gun.armory ) {
-				var actionItem:ObjectAction = new ObjectAction( null,
-																"fire",
-																ammo + ".png",
-																"Fire " + ammo );
-				actionItem.ammoName = ammo;
-				actionItem.instanceGuid = gun.instanceInfo.instanceGuid;
-				
-				slots[slotIndex++] = actionItem;
-			}
+		for each ( var ammo:String in Gun.armory ) {
+			var actionItem:ObjectAction = new ObjectAction( null,
+															"fire",
+															ammo + ".png",
+															"Fire " + ammo );
+			actionItem.ammoName = ammo;
+			Log.out( "Dragon.getDefaultSlotData - HACK TODO", Log.WARN );
+			actionItem.instanceGuid = _guns[0].instanceInfo.instanceGuid;
+			
+			slots[slotIndex++] = actionItem;
 		}
 		
 		return slots;

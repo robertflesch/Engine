@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -30,18 +30,20 @@ package com.voxelengine.worldmodel.models.types
 			super( instanceInfo);
 		}
 
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-			super.init( $mi, $vmm );
-			
-			if ( $mi.json && $mi.json.model && $mi.json.model.engine )
+		override protected function processClassJson():void {
+			super.processClassJson();
+			if ( modelInfo.obj && modelInfo.obj.engine )
 			{
-				var EngineInfo:Object = $mi.json.model.engine;
-				if ( EngineInfo.propRotationRate )
-					_rotationRate = EngineInfo.propRotationRate;
+				var engineInfo:Object = modelInfo.obj.engine;
+				if ( engineInfo.propRotationRate )
+					_rotationRate = engineInfo.propRotationRate;
 			}
 			else
-				trace( "Engine - NO Prop INFO FOUND - Setting to default rotation rate " );
+				trace( "Prop.processClassJson - NO Engine INFO FOUND - Setting to defaults" );
+				
+//			SoundBank.getSound( _soundFile ); // Preload the sound file
 		}
+		
 /*
 		override public function start( $val:Number, $parentModel:VoxelModel, $useThrust:Boolean = true ):void 
 		{

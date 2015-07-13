@@ -65,31 +65,30 @@ public class Ammo extends PersistanceObject implements IPersistance
 	}
 	
 	public function fromObject( $object:Object, $ba:ByteArray ):void {
-		_obj = $object;
-		if ( _obj.name )
-			guid = _obj.name;
-		if ( _obj.accuracy )
-			_accuracy = _obj.accuracy;
-		if ( _obj.velocity )
-			_velocity = _obj.velocity;
-		if ( _obj.type )
-			_type = _obj.type;
-		if ( _obj.count )
-			_count = _obj.count;
-		if ( _obj.oxelType )
-			_oxelType = TypeInfo.getTypeId( _obj.oxelType );
-		if ( _obj.life )
-			_life = _obj.life;
-		if ( _obj.grain )
-			_grain = _obj.grain;
-		if ( _obj.model )
-			_model = _obj.model;
-		if ( _obj.launchSoundFile )
-			_launchSoundFile = _obj.launchSoundFile;
-		if ( _obj.impactSoundFile )
-			_impactSoundFile = _obj.impactSoundFile;
-		if ( _obj.contactScript )
-			_contactScript = _obj.contactScript;
+		if ( $object.name )
+			guid = $object.name;
+		if ( $object.accuracy )
+			_accuracy = $object.accuracy;
+		if ( $object.velocity )
+			_velocity = $object.velocity;
+		if ( $object.type )
+			_type = $object.type;
+		if ( $object.count )
+			_count = $object.count;
+		if ( $object.oxelType )
+			_oxelType = TypeInfo.getTypeId( $object.oxelType );
+		if ( $object.life )
+			_life = $object.life;
+		if ( $object.grain )
+			_grain = $object.grain;
+		if ( $object.model )
+			_model = $object.model;
+		if ( $object.launchSoundFile )
+			_launchSoundFile = $object.launchSoundFile;
+		if ( $object.impactSoundFile )
+			_impactSoundFile = $object.impactSoundFile;
+		if ( $object.contactScript )
+			_contactScript = $object.contactScript;
 		//Log.out( "Ammo.processClassJson" );
 		SoundBank.getSound( _impactSoundFile ); // Preload the sound file
 		SoundBank.getSound( _launchSoundFile );
@@ -236,17 +235,17 @@ public class Ammo extends PersistanceObject implements IPersistance
 	
 	public function toObject():void {
 		
-		_obj =   { type:			    _type			
-				   , count:			    _count			
-				   , grain:			    _grain			
-				   , accuracy:		    _accuracy		
-				   , velocity:		    _velocity		
-				   , life:			    _life			
-				   , oxelType:		    _oxelType		
-				   , model:			    _model			
-				   , launchSoundFile:   _launchSoundFile
-				   , impactSoundFile:   _impactSoundFile
-				   , contactScript:	    _contactScript	};
+		_obj.type = 			    _type;
+		_obj.count = 			    _count;
+		_obj.grain = 			    _grain;
+		_obj.accuracy = 		    _accuracy;		
+		_obj.velocity = 		    _velocity;
+		_obj.life = 			    _life;	
+		_obj.oxelType = 		    _oxelType;
+		_obj.model = 			    _model;
+		_obj.launchSoundFile =   	_launchSoundFile;
+		_obj.impactSoundFile =   	_impactSoundFile;
+		_obj.contactScript = 	    _contactScript;
 	}
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray { return null; }

@@ -133,10 +133,8 @@ public class VoxelModel
 	}
 	
 	// The export object is a combination of modelInfo and instanceInfo
-	public function buildExportObject( obj:Object ):void {
-		
-		modelInfo.toObject();
-		obj = modelInfo.obj
+	static public function buildExportObject( obj:Object ):void {
+		Log.out( "VoxelModel.buildExportObject" );
 	}
 
 	protected function cameraAddLocations():void

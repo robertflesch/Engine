@@ -67,7 +67,7 @@ public class Player extends Avatar
 	protected function get 	mSpeedMultiplier():Number 				{ return _speedMultiplier; }
 	protected function set 	mSpeedMultiplier($value:Number):void	{ _speedMultiplier = $value; }
 	
-	override public function get 	maxSpeed():Number 						{ return (_maxSpeed.val * _speedMultiplier); }
+//	override public function get 	maxSpeed():Number 						{ return (_maxSpeed.val * _speedMultiplier); }
 
 	private static var g_player:Player;
 	public static function get player():Player { return g_player; }
@@ -102,8 +102,8 @@ public class Player extends Avatar
 		torchToggle();
 	}
 	
-	override public function buildExportObject( obj:Object ):void {
-		super.buildExportObject( obj )
+	static public function buildExportObject( obj:Object ):void {
+		Avatar.buildExportObject( obj )
 	}
 	
 	override protected function processClassJson():void {
