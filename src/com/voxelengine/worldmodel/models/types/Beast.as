@@ -130,7 +130,7 @@ package com.voxelengine.worldmodel.models.types
 				}
 			}
 			else
-				trace( "Beast - NO Beast Json INFO FOUND" );
+				Log.out( "Beast.processClassJson - NO Beast Json INFO FOUND", Log.WARN );
 		}
 		
 		//override protected function addClassJson():String {
@@ -311,7 +311,9 @@ package com.voxelengine.worldmodel.models.types
 				var scaleFactor:Number = mClimbRate + climbFactor;
 				// When you are climbing you can turn faster because you are going slower
 				var effectiveTurnRate:Number = mMaxTurnRate * ( scaleFactor )
-				instanceInfo.moveSpeed = mMoveSpeed * scaleFactor;
+				Log.out( "Move Speed would be set to: " + mMoveSpeed * scaleFactor + "  instead setting to 0", Log.WARN );
+				//instanceInfo.moveSpeed = mMoveSpeed * scaleFactor;
+				instanceInfo.moveSpeed = 10;
 				var dx:Number
 				dx = MouseKeyboardHandler.getMouseYChange()/effectiveTurnRate;
 				dx *= $elapsedTimeMS;
@@ -330,11 +332,11 @@ package com.voxelengine.worldmodel.models.types
 				}
 				else
 				{
-					instanceInfo.rotationGet.setTo( instanceInfo.rotationGet.x + dx, instanceInfo.rotationGet.y + _dy, instanceInfo.rotationGet.z );
+					instanceInfo.rotationSetComp( instanceInfo.rotationGet.x + dx, instanceInfo.rotationGet.y + _dy, instanceInfo.rotationGet.z );
 					// This sets the max climb angle, different beast could have different climb angles
 					if ( -mMaxClimbAngle > instanceInfo.rotationGet.x )
 					{
-						instanceInfo.rotationGet.setTo( -mMaxClimbAngle, instanceInfo.rotationGet.y + _dy, instanceInfo.rotationGet.z );
+						instanceInfo.rotationSetComp( -mMaxClimbAngle, instanceInfo.rotationGet.y + _dy, instanceInfo.rotationGet.z );
 					}
 				}
 

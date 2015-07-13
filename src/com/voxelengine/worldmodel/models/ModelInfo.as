@@ -594,7 +594,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	public function childrenLoad( $vm:VoxelModel ):void {
 		if ( childrenInstanceInfo && 0 < childrenInstanceInfo.length)
 		{
-			Log.out( "ModelInfo.childrenLoad - loading " + childrenInstanceInfo.length );
+			Log.out( "ModelInfo.childrenLoad - loading for model: " + guid + childrenInstanceInfo.length );
 			childrenLoaded	= false;
 			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 			//Log.out( "VoxelModel.processClassJson name: " + metadata.name + " - loading child models START" );
@@ -614,7 +614,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 				// Since this is a child object, it automatically get added to the parent.
 				// So add to cache just adds it to parent instance.
 				//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
-				Log.out( "VoxelModel.childrenLoad - calling load on ii: " + childInstanceInfo );
+				//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + childInstanceInfo );
 				ModelMakerBase.load( childInstanceInfo, true, false );
 			}
 			Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
@@ -665,8 +665,12 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		// remove parent level model
 //		Region.currentRegion.modelCache.changeFromParentToChild( $child);
 		_children.push( $child);
-		childrenInstanceInfoAdd( $child.instanceInfo )
 		changed = true;
+		// Dont add the player to the instanceInfo, or you end up in a recursive loop
+		if ( $child is Player )
+			return;
+		else
+			childrenInstanceInfoAdd( $child.instanceInfo )
 //		$child.instanceInfo.baseLightLevel = owner.instanceInfo.baseLightLevel;
 	}
 	

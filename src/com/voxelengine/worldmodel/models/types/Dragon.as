@@ -137,7 +137,7 @@ public class Dragon extends Beast
 		// Be fun to make this have the avatar put their arms out to the side
 		else	
 		{
-			Log.out( "Dragon.setAnimation - else ? forward: " + mForward );
+			//Log.out( "Dragon.setAnimation - else ? forward: " + mForward );
 			clipVelocityFactor = 0.995;
 			if ( mForward )
 			{

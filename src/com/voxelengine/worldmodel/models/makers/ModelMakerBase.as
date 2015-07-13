@@ -68,7 +68,7 @@ public class ModelMakerBase {
 	
 	protected function retrivedModelInfo($mie:ModelInfoEvent):void  {
 		if ( _ii.modelGuid == $mie.modelGuid ) {
-			Log.out( "ModelMakerBase.retrivedModelInfo - ii: " + _ii.toString(), Log.DEBUG );
+			//Log.out( "ModelMakerBase.retrivedModelInfo - ii: " + _ii.toString(), Log.DEBUG );
 			_modelInfo = $mie.vmi;
 			attemptMake();
 		}
