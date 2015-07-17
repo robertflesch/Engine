@@ -58,13 +58,16 @@ public class WindowModelMetadata extends VVPopup
 		
 		// Only prompt for imports of parent models
 		if ( TYPE_IMPORT == windowType ) {
+			//_vmm = new ModelMetadata( $ii.modelGuid );
 			_vmm = new ModelMetadata( $ii.modelGuid );
+			var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
+			newDbo.data = new Object();
+			_vmm.fromObjectImport( newDbo );
 			_vmm.name = $ii.modelGuid;
 			_vmm.description = $ii.modelGuid + "-IMPORTED";
 			_vmm.owner = Network.userId;
-			_vmm.modifiedDate = new Date();
 			// fake an event to populate the window
-			dataReceived( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, $ii.modelGuid, _vmm ) );
+			dataReceived( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, Globals.getUID(), _vmm ) );
 			
 			if ( $ii.controllingModel ) {
 				ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoResult );
@@ -196,7 +199,6 @@ Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );
 	private function save( e:UIMouseEvent ):void { 
 		_vmm.name = _name.label;
 		_vmm.description = _desc.label;
-		_vmm.modifiedDate = new Date();
 		if ( _type == TYPE_EDIT ) {
 			// this field only exists when I am editting
 			_vmm.permissions.copyCount = parseInt( _copies.label, 10 );

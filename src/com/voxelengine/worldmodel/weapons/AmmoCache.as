@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.weapons
 import flash.utils.ByteArray;
 import flash.utils.Dictionary;
 import flash.net.URLLoaderDataFormat;
+import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -76,23 +77,28 @@ public class AmmoCache
 	{
 		if ( Globals.AMMO_EXT != $pe.table && Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
+		var imported:Boolean;	
 		if ( $pe.dbo || $pe.data ) {
 			//Log.out( "AmmoCache.loadSucceed guid: " + $pe.guid, Log.INFO );
 			var ammo:Ammo = new Ammo( $pe.guid );
-			if ( $pe.dbo )
-				ammo.fromPersistance( $pe.dbo );
-			else {
-				var jsonResult:Object = JSONUtil.parse( $pe.data, $pe.guid + $pe.table, "AnimationCache.loadSucceed" );
-				if ( null == jsonResult ) {
-					//(new Alert( "VoxelVerse - Error Parsing: " + $pe.guid + $pe.table, 500 ) ).display();
+			if ( !$pe.dbo ) {
+				imported = true;
+				ammo.dbo = new DatabaseObject( Globals.BIGDB_TABLE_AMMO, $pe.guid, "0", 0, true, null );
+				ammo.dbo.ammo = JSONUtil.parse( $pe.data, $pe.guid + $pe.table, "AnimationCache.loadSucceed" );
+				if ( null == ammo.dbo.ammo ) {
+					Log.out( "AmmoCache.loadSucceed - error parsing ammo data on import. guid: " + $pe.guid, Log.ERROR );
 					AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 					return;
 				}
-				ammo.fromObject( jsonResult.ammo, null );
-				ammo.save();
+				ammo.guid = $pe.guid;
 			}
+			else
+				ammo.dbo = $pe.dbo;
 				
+			ammo.fromPersistance( ammo.dbo );
 			add( $pe, ammo );
+			if ( imported )
+				ammo.save();
 		}
 		else {
 			Log.out( "AmmoCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.WARN );
@@ -104,7 +110,7 @@ public class AmmoCache
 	{
 		if ( Globals.AMMO_EXT != $pe.table && Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
-		Log.out( "AmmoCache.loadNotFound this means the table is missing!" + $pe.toString(), Log.ERROR );
+		Log.out( "AmmoCache.loadFailed this means the table is missing!" + $pe.toString(), Log.ERROR );
 		AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
@@ -113,11 +119,14 @@ public class AmmoCache
 		if ( Globals.AMMO_EXT != $pe.table && Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
 		// maybe this ammo has not been loaded into the table yet, try loading it from json file
-		Log.out( "AmmoCache.loadNotFound - retrying from json " + $pe.toString(), Log.WARN );
-		if ( Globals.BIGDB_TABLE_AMMO == $pe.table )
+		if ( Globals.BIGDB_TABLE_AMMO == $pe.table ) {
+			Log.out( "AmmoCache.loadNotFound - retrying from json " + $pe.toString(), Log.WARN );
 			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST, $pe.series, $pe.guid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );
-		else	
+		}
+		else {	
+			Log.out( "AmmoCache.loadNotFound guid: " + $pe.toString(), Log.ERROR );
 			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
+		}
 	}
 }
 }

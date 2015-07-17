@@ -257,6 +257,10 @@ Should parents worry about minecraft
 http://www.bbc.com/news/magazine-32051153
 http://blog.asmartbear.com/unprofitable-saas-business-model.html
 
+
+crafting
+http://www.gamasutra.com/view/news/247908/7_crafting_systems_game_designers_should_study.php
+
 Competitors
 http://oortonline.com/
 https://picroma.com/cubeworld
@@ -290,3 +294,6 @@ https://www.oculus.com/en-us/blog/powering-the-rift/
 http://gamasutra.com/blogs/SamCoster/20150708/248023/Greenlit_in_42_hours__BY_WHAT_FOUL_MAGICKS.php
 http://careers.stackoverflow.com/jobs/92512/flash-and-html5-developer-intersect-digital
 http://jobs.gamasutra.com/job/vp-of-engineering-los-angeles-california-28983
+
+Replacement for PlayerIO
+http://gamua.com/flox/

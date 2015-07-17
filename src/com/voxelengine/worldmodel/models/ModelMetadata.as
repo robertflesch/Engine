@@ -32,39 +32,28 @@ import com.voxelengine.events.ModelBaseEvent;
  */
 public class ModelMetadata extends PersistanceObject
 {
-	private static const COPY_COUNT_INFINITE:int = -1;
-	private var _animationClass:String	= "";
-	private var _name:String			= "";
-	private var _description:String		= "";
-	private var _owner:String			= "";
-	private var _creator:String			= "";
+	private var _permissions:Permissions;
 	private var _thumbnail:BitmapData;
-	private var _modifiedDate:Date;
-	private var _permissions:Permissions = new Permissions();
-
-	public function get permissions():Permissions 		{ return _permissions; }
+	private var _info:Object;
+	
+	public function get permissions():Permissions 			{ return _permissions; }
 	public function set permissions( val:Permissions):void	{ _permissions = val; changed = true; }
 	
-	public function get name():String  					{ return _name; }
-	public function set name(value:String):void  		{ _name = value; changed = true; }
+	public function get name():String  						{ return _info.name; }
+	public function set name(value:String):void  			{ _info.name = value; changed = true; }
 	
-	public function get description():String  			{ return _description; }
-	public function set description(value:String):void  { _description = value; changed = true; }
+	public function get description():String  				{ return _info.description; }
+	public function set description(value:String):void  	{ _info.description = value; changed = true; }
 	
-	public function get owner():String  				{ return _owner; }
-	public function set owner(value:String):void  		{ _owner = value; changed = true; }
+	public function get owner():String  					{ return _info.owner; }
+	public function set owner(value:String):void  			{ _info.owner = value; changed = true; }
 	
-	public function get animationClass():String 			{ return _animationClass; }
-	public function set animationClass(value:String):void  	{ _animationClass = value; changed = true; }
+	public function get animationClass():String 			{ return _info.animationClass; }
+	public function set animationClass(value:String):void  	{ _info.animationClass = value; changed = true; }
 	
-	public function get thumbnail():BitmapData 			{ return _thumbnail; }
-	public function set thumbnail(value:BitmapData):void { _thumbnail = value; changed = true; }
-	
-	public function get modifiedDate():Date 			{ return _modifiedDate; }
-	public function set modifiedDate(value:Date):void  	{ _modifiedDate = value; changed = true; }
-	
-	public function get creator():String 				{ return _creator; }
-	
+	public function get thumbnail():BitmapData 				{ return _thumbnail; }
+	public function set thumbnail(value:BitmapData):void 	{ _thumbnail = value; changed = true; }
+
 	public function toString():String {
 		return "name: " + name + "  description: " + description + "  guid: " + guid + "  owner: " + owner;
 	}
@@ -86,7 +75,7 @@ public class ModelMetadata extends PersistanceObject
 		description 	= $vmm.description;
 		owner 			= $vmm.owner;
 		thumbnail 		= $vmm.thumbnail;
-		animationClass = $vmm.animationClass;
+		animationClass =  $vmm.animationClass;
 Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		//creator 		= $vmm.creator;
 		//template		= $vmm.template;
@@ -95,21 +84,6 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		//copyCount		= $vmm.copyCount;
 		//modify		= $vmm.modify;
 		//transfer		= $vmm.transfer;
-	}
-	
-	override public function clone( $guid:String ):* {
-		
-		var newVmm:ModelMetadata = new ModelMetadata( $guid );	
-		newVmm.name 			= new String( name );
-		newVmm.description 		= new String( description );
-		newVmm.owner 			= new String( owner );
-		newVmm.thumbnail		= thumbnail;
-		newVmm.animationClass  = animationClass;
-		newVmm._dbo				= dbo;
-		newVmm.permissions		= permissions.clone();
-		newVmm.modifiedDate		= modifiedDate;
-		
-		return newVmm;
 	}
 	
 	// This was private, force a message to be sent to it. 
@@ -125,17 +99,15 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	public function save():void {
 		if ( Globals.online && true == changed ) {
 			//Log.out( "ModelMetadata.save - Saving ModelMetadata: " + guid  + " in table: " + table, Log.WARN );
-			if ( !Globals.isGuid( guid ) )
-				Log.out( "ModelMetadata.save - Saving ModelMetadata: " + guid  + " in table: " + table, Log.ERROR );
+			if ( !Globals.isGuid( guid ) ) {
+				Log.out( "ModelMetadata.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
+				return;
+			}
 				
+			toObject();
+			addSaveEvents(); // I dont like that these are added at this level, and removed at a different level.
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, null ) );
 			changed = false;
-			addSaveEvents();
-			if ( _dbo )
-				toPersistance();
-			else
-				toObject();
-				
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
 		}
 		//else
 		//	Log.out( "ModelMetadata.save - Not saving ModelMetadata, either offline or NOT changed or locked - guid: " + guid );
@@ -144,61 +116,45 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	//////////////////////////////////////////////////////////////////
 	// TO Persistance
 	//////////////////////////////////////////////////////////////////
-	public function toPersistance():void {
-		
-		_dbo.name 			= name;
-		_dbo.description	= description;
-		_dbo.owner			= owner;
-		_dbo.creator		= creator;
-		_dbo.modifiedDate   = new Date();
-		_dbo.parentModelClass= animationClass;
-		_permissions.toPersistance( _dbo );
+	private function toObject():void {
 		if ( thumbnail )
-			_dbo.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
+			_info.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
 		else
-			_dbo.thumbnail = null;
+			_info.thumbnail = null;
 	}
 	
-	public function toObject():void {
-		
-		_obj.name				= name;
-		_obj.description		= description;
-		_obj.owner 				= owner;
-		_obj.creator 			= creator;
-		_obj.modifiedDate 		= modifiedDate;
-		_obj.animationClass		= animationClass;
-		_obj.thumbnail			= thumbnail;
-								  
-		_permissions.addToObject( _obj );
-	}
-	
-
 	////////////////////////////////////////////////////////////////
 	// FROM Persistance
 	////////////////////////////////////////////////////////////////
+	public function fromObjectImport( $dbo:DatabaseObject ):void {
+		_dbo = $dbo;
+		if ( !dbo.data || !dbo.data )
+			return;
+			
+		_info = $dbo.data;	
+		loadFromInfo();	
+		changed = true;
+	}
 
-	public function fromObject( $object:Object, $ba:ByteArray ):void {}
-	
-	public function fromPersistance( $dbo:DatabaseObject ):void {
-		_dbo			= $dbo;
-		_name 			= $dbo.name;
-		_description	= $dbo.description;
-		_owner			= $dbo.owner;
-		_creator		= $dbo.creator;
-		guid 			= $dbo.key;
-		_modifiedDate   = $dbo.modifiedDate;
-		_animationClass = $dbo.animationClass;
-		_permissions.fromPersistance( $dbo );
+	public function fromObject( $dbo:DatabaseObject ):void {
+		_dbo = $dbo;
+		_info = $dbo;	
 		
-		if ( $dbo.thumbnail ) {
+		loadFromInfo();	
+		changed = false;
+	}
+	
+	private function loadFromInfo():void {
+		if ( !_info.permissions )
+			_info.permissions = new Object();
+			
+		_permissions = new Permissions( _info.permissions );
+		
+		if ( _info.thumbnail ) {
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.INIT, function(event:Event):void { thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData; } );
-			loader.loadBytes( $dbo.thumbnail );			
+			loader.loadBytes( _info.thumbnail );			
 		}
-		else
-			thumbnail 		= null;
-			
-		changed = false;	
 	}
 }
 }

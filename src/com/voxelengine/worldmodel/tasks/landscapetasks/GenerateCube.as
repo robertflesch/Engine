@@ -23,6 +23,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.Log;
 	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
+	import playerio.DatabaseObject;
 	
 	/**
 	 * ...
@@ -30,13 +31,13 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	 */
 	public class GenerateCube extends LandscapeTask 
 	{	
-		static public function script():Object {
-			var obj:Object = new Object();
+		static public function script():DatabaseObject {
+			//ammo.dbo = new DatabaseObject( Globals.BIGDB_TABLE_AMMO, $pe.guid, "0", 0, true, null );
+			var obj:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_OXEL_DATA, Globals.getUID(), "0", 0, true, null );
 			var biomes:Object = new Object();
 			var layers:Vector.<Object> = new Vector.<Object>();
 			var layer:Object = new Object();
 			
-			obj.guid = "INVALID";
 			obj.grainSize = 4;
 			obj.biomes = biomes;
 			biomes.layers = layers;

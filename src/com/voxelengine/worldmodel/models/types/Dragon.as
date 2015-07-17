@@ -57,8 +57,8 @@ public class Dragon extends Beast
 	
 	override protected function processClassJson():void {
 		super.processClassJson();
-		if ( modelInfo.obj && modelInfo.obj.dragon ) {
-			var cmInfo:Object = modelInfo.obj.dragon;
+		if ( modelInfo.dbo && modelInfo.dbo.dragon ) {
+			var cmInfo:Object = modelInfo.dbo.dragon;
 		}
 		// no unique items at this level
 	}
@@ -241,16 +241,18 @@ public class Dragon extends Beast
 		slots[0] = new ObjectAction( null, "loseControlHandler", "dismount.png", "Dismount" );
 		
 		var slotIndex:int = 1;
-		for each ( var ammo:String in Gun.armory ) {
-			var actionItem:ObjectAction = new ObjectAction( null,
-															"fire",
-															ammo + ".png",
-															"Fire " + ammo );
-			actionItem.ammoName = ammo;
-			Log.out( "Dragon.getDefaultSlotData - HACK TODO", Log.WARN );
-			actionItem.instanceGuid = _guns[0].instanceInfo.instanceGuid;
-			
-			slots[slotIndex++] = actionItem;
+		if ( _guns && _guns.length && _guns[0] && _guns[0].ammo ) {
+			for each ( var ammo:String in Gun.armory ) {
+				var actionItem:ObjectAction = new ObjectAction( null,
+																"fire",
+																ammo + ".png",
+																"Fire " + ammo );
+				actionItem.ammoName = ammo;
+				Log.out( "Dragon.getDefaultSlotData - HACK TODO", Log.WARN );
+				actionItem.instanceGuid = _guns[0].instanceInfo.instanceGuid;
+				
+				slots[slotIndex++] = actionItem;
+			}
 		}
 		
 		return slots;

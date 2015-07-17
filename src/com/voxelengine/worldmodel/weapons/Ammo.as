@@ -41,29 +41,29 @@ public class Ammo extends PersistanceObject implements IPersistance
 	protected var _impactSoundFile:String = "CannonBallExploding.mp3";		
 	protected var _contactScript:String = "";
 	
-	public function get type():int  				{ return _type; }
-	public function set type(val:int):void			{ _type = val; }
-	public function get count():int  				{ return _count; }
-	public function set count(val:int):void			{ _count = val; }
-	public function get grain():int 				{ return _grain; }
-	public function set grain(val:int):void 		{ _grain = val; }
-	public function get accuracy():Number 			{ return _accuracy; }
-	public function set accuracy(val:Number):void 	{ _accuracy = val; }
-	public function get velocity():Number 			{ return _velocity; }
-	public function set velocity(val:Number):void 	{ _velocity = val; }
-	public function get life():Number 				{ return _life; }
-	public function set life(val:Number):void 		{ _life = val; }
-	public function get launchSoundFile():String  	{ return _launchSoundFile; }
-	public function get impactSoundFile():String  	{ return _impactSoundFile; }
-	public function get contactScript():String  	{ return _contactScript; }
-	public function get model():String 				{ return _model; }
+	public function get type():int  				{ return _dbo.type; }
+	public function set type(val:int):void			{ _dbo.type = val; }
+	public function get count():int  				{ return _dbo.count; }
+	public function set count(val:int):void			{ _dbo.count = val; }
+	public function get grain():int 				{ return _dbo.grain; }
+	public function set grain(val:int):void 		{ _dbo.grain = val; }
+	public function get accuracy():Number 			{ return _dbo.accuracy; }
+	public function set accuracy(val:Number):void 	{ _dbo.accuracy = val; }
+	public function get velocity():Number 			{ return _dbo.velocity; }
+	public function set velocity(val:Number):void 	{ _dbo.velocity = val; }
+	public function get life():Number 				{ return _dbo.life; }
+	public function set life(val:Number):void 		{ _dbo.life = val; }
+	public function get launchSoundFile():String  	{ return _dbo.launchSoundFile; }
+	public function get impactSoundFile():String  	{ return _dbo.impactSoundFile; }
+	public function get contactScript():String  	{ return _dbo.contactScript; }
+	public function get model():String 				{ return _dbo.model; }
 	public function get name():String 				{ return guid; }
-	public function get oxelType():int 				{ return _oxelType; }
+	public function get oxelType():int 				{ return _dbo.oxelType; }
 	
 	public function Ammo( $name:String ) {
 		super( $name, Globals.BIGDB_TABLE_AMMO );
 	}
-	
+	/*
 	public function fromObject( $object:Object, $ba:ByteArray ):void {
 		if ( $object.name )
 			guid = $object.name;
@@ -112,8 +112,8 @@ public class Ammo extends PersistanceObject implements IPersistance
 		ammoData.contactScript		= _contactScript;
 		return ammoData;
 	}
-	
-	
+	*/
+	/*
 	override public function clone( $guid:String ):* {
 		throw new Error( "Ammo.clone - what to do here" );
 		var ammo:Ammo = new Ammo( name );
@@ -132,8 +132,9 @@ public class Ammo extends PersistanceObject implements IPersistance
 		
 		return ammo;
 	}
-	
+	*/
 	public function addToMessage( $msg:Message ):void {
+		Log.out( "Ammo.addToMessage - REFACTOR with new DBO scheme", Log.ERROR );
 		$msg.add( type );
 		$msg.add( count );
 		$msg.add( grain );
@@ -149,6 +150,7 @@ public class Ammo extends PersistanceObject implements IPersistance
 	}
 	
 	public function fromMessage( $msg:Message, $index:int ):int	{
+		Log.out( "Ammo.fromMessage - REFACTOR with new DBO scheme", Log.ERROR );
 		type 				= $msg.getInt( $index++ );
 		count 				= $msg.getInt( $index++ );
 		grain 				= $msg.getInt( $index++ );
@@ -190,49 +192,46 @@ public class Ammo extends PersistanceObject implements IPersistance
 		if ( Globals.online ) {
 			Log.out( "Ammo.save - Saving Ammo: " + guid  + " in table: " + table, Log.WARN );
 			addSaveEvents();
-			if ( _dbo )
-				toPersistance();
-			else
-				toObject();
 				
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, null ) );
 		}
 		else
 			Log.out( "Ammo.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
 	}
 	
+	
 	public function fromPersistance( $dbo:DatabaseObject ):void {
-		
-		guid 				= $dbo.key;
-		_type				= $dbo.type;
-		_count				= $dbo.count;
-		_grain				= $dbo.grain;
-		_accuracy			= $dbo.accuracy;
-		_velocity			= $dbo.velocity;
-		_life				= $dbo.life;
-		_oxelType			= $dbo.oxelType;
-		_model				= $dbo.model;
-		_launchSoundFile	= $dbo.launchSoundFile;
-		_impactSoundFile	= $dbo.impactSoundFile;
-		_contactScript		= $dbo.contactScript;
+		_dbo = $dbo;
+		//guid 				= $dbo.key;
+		//_type				= $dbo.type;
+		//_count				= $dbo.count;
+		//_grain				= $dbo.grain;
+		//_accuracy			= $dbo.accuracy;
+		//_velocity			= $dbo.velocity;
+		//_life				= $dbo.life;
+		//_oxelType			= $dbo.oxelType;
+		//_model				= $dbo.model;
+		//_launchSoundFile	= $dbo.launchSoundFile;
+		//_impactSoundFile	= $dbo.impactSoundFile;
+		//_contactScript		= $dbo.contactScript;
 	}
 	
 	public function toPersistance():void {
 		
 		//_dbo.key = _name;
-		_dbo.type = _type;
-		_dbo.count = _count;
-		_dbo.grain = _grain;
-		_dbo.accuracy = _accuracy;
-		_dbo.velocity = _velocity;
-		_dbo.life = _life;
-		_dbo.oxelType = _oxelType;
-		_dbo.model = _model;
-		_dbo.launchSoundFile = _launchSoundFile;
-		_dbo.impactSoundFile = _impactSoundFile;
-		_dbo.contactScript = _contactScript;
+		//_dbo.type = _type;
+		//_dbo.count = _count;
+		//_dbo.grain = _grain;
+		//_dbo.accuracy = _accuracy;
+		//_dbo.velocity = _velocity;
+		//_dbo.life = _life;
+		//_dbo.oxelType = _oxelType;
+		//_dbo.model = _model;
+		//_dbo.launchSoundFile = _launchSoundFile;
+		//_dbo.impactSoundFile = _impactSoundFile;
+		//_dbo.contactScript = _contactScript;
 	}
-	
+	/*
 	public function toObject():void {
 		
 		_obj.type = 			    _type;
@@ -247,8 +246,10 @@ public class Ammo extends PersistanceObject implements IPersistance
 		_obj.impactSoundFile =   	_impactSoundFile;
 		_obj.contactScript = 	    _contactScript;
 	}
-	
+	*/
+	/*
 	public function toByteArray( $ba:ByteArray ):ByteArray { return null; }
 	public function fromByteArray( $ba:ByteArray ):void { ; }
+	*/
 }
 }

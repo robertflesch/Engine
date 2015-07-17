@@ -177,7 +177,7 @@ public class InventoryPanelModel extends VVContainer
 			var om:ObjectModel = $oi as ObjectModel;
 			// dont show child models
 			if ( !WindowInventoryNew._s_hackShowChildren )
-				if ( "" != om.vmm.animationClass )
+				if ( null != om.vmm.animationClass && "" != om.vmm.animationClass )
 					return null;
 		}
 				

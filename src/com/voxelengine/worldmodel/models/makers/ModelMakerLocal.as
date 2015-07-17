@@ -8,14 +8,17 @@
 package com.voxelengine.worldmodel.models.makers
 {
 import com.voxelengine.Log;
+import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.Permissions;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.ModelMetadata;
+import playerio.DatabaseObject;
 
 	/**
 	 * ...
@@ -37,9 +40,12 @@ public class ModelMakerLocal extends ModelMakerBase {
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
 		if ( null != _modelInfo ) {
-			var vmm:ModelMetadata = new ModelMetadata( ii.modelGuid );
-			vmm.name = _modelInfo.fileName;
-			vmm.description = _modelInfo.fileName + " from local data";
+			_modelMetadata = new ModelMetadata( ii.modelGuid );
+			var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
+			newDbo.data = new Object();
+			_modelMetadata.fromObjectImport( newDbo );
+			_modelMetadata.name = _modelInfo.guid;
+			_modelMetadata.description = _modelInfo.fileName + " from local data";
 			var vm:* = make();
 			if ( vm )
 				Region.currentRegion.modelCache.add( vm );

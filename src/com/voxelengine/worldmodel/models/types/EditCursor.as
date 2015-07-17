@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models.types
 {
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelLoadingEvent;
+import com.voxelengine.worldmodel.Permissions;
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
@@ -17,6 +18,7 @@ import flash.events.MouseEvent;
 import flash.events.TimerEvent;
 import flash.ui.Keyboard;
 import flash.utils.Timer;
+import playerio.DatabaseObject;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
@@ -72,12 +74,19 @@ public class EditCursor extends VoxelModel
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			instanceInfo.modelGuid = EDIT_CURSOR
 			_s_currentInstance = new EditCursor( instanceInfo );
-			
+
 			var metadata:ModelMetadata = new ModelMetadata( EDIT_CURSOR );
+			var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
+			newDbo.data = new Object();
+			metadata.fromObjectImport( newDbo );
 			metadata.permissions.modify = false;
+			
 			var modelInfo:ModelInfo = new ModelInfo( EDIT_CURSOR );
-			modelInfo.fileName = EDIT_CURSOR;
-			modelInfo.modelClass = EDIT_CURSOR;
+			var newECDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_INFO, "0", "0", 0, true, null );
+			newECDbo.model = new Object();
+			newECDbo.model.modelClass = EDIT_CURSOR;
+			newECDbo.model.fileName = EDIT_CURSOR;
+			modelInfo.fromObject( newECDbo );
 			
 			_s_currentInstance.init( modelInfo, metadata );
 			_s_currentInstance.modelInfo.createEditCursor( EDIT_CURSOR );

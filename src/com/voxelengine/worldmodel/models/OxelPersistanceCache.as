@@ -12,6 +12,7 @@ import com.voxelengine.worldmodel.Region;
 import flash.utils.ByteArray;
 import flash.utils.Dictionary;
 import flash.net.URLLoaderDataFormat;
+import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -130,12 +131,21 @@ public class OxelPersistanceCache
 		if ( $pe.dbo || $pe.data ) {
 			//Log.out( "OxelDataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
 			var od:OxelPersistance = new OxelPersistance( $pe.guid );
-			if ( $pe.dbo )
-				od.fromPersistance( $pe.dbo );
+			if ( !$pe.dbo ) {
+				var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_OXEL_DATA, "0", "0", 0, true, null );
+				dbo.data = new Object();
+				dbo.data.ba = $pe.data;
+				od.fromObjectImport( dbo );
+				// On import mark it as changed.
+				od.changed = true;
+			}
 			else
-				od.fromObject( null, $pe.data ); // loading from file data
+				od.fromObject( $pe.dbo );
 				
 			add( $pe.series, od );
+			
+			//if ( _block.has( $pe.guid ) )
+				//_block.clear( $pe.guid )
 		}
 		else {
 			Log.out( "OxelDataCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.WARN );

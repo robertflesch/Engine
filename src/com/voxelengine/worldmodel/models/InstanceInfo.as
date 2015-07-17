@@ -86,6 +86,7 @@ public class InstanceInfo extends Location	{
 	public function set modelGuid(val:String):void { 
 		//Log.out( "InstanceInfo.GUID was: " + _guid + " is now: " + val );
 		_modelGuid = val; 
+		changed = true;
 	}
 	public function get instanceGuid():String 					{ return _instanceGuid; }
 	//public function set instanceGuid(val:String):void			{ _instanceGuid = val; }

@@ -8,8 +8,10 @@
 package com.voxelengine.worldmodel.models.makers
 {
 import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.worldmodel.Permissions;
 import com.voxelengine.worldmodel.TypeInfo;
 import flash.utils.ByteArray;
+import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -37,7 +39,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	private var _creationFunction:String;
 	private var _type:int;
 	
-	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object ) {
+	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:DatabaseObject ) {
 		_creationFunction 	= $miJson.biomes.layers[0].functionName;
 		_type 				= $miJson.biomes.layers[0].type;
 		
@@ -47,8 +49,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		
 		// This is a special case for modelInfo, the modelInfo its self is contained in the generate script
 		_modelInfo = new ModelInfo( $ii.modelGuid );
-		_modelInfo.obj = $miJson;
-		_modelInfo.fromObject( null, null );
+		_modelInfo.fromObject( $miJson );
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.GENERATION, 0, $ii.modelGuid, _modelInfo ) );
 		
 		retrieveBaseInfo();
@@ -56,11 +57,15 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	}
 	
 	override protected function retrieveBaseInfo():void {
+		
 		_modelMetadata = new ModelMetadata( ii.modelGuid );
-		_modelMetadata.name = TypeInfo.name( _type ) + _modelInfo.obj.grainSize + "-" + _creationFunction;
+		var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
+		newDbo.data = new Object();
+		_modelMetadata.fromObjectImport( newDbo );
+		
+		_modelMetadata.name = TypeInfo.name( _type ) + _modelInfo.dbo.grainSize + "-" + _creationFunction;
 		_modelMetadata.description = _creationFunction + "- GENERATED";
 		_modelMetadata.owner = Network.userId;
-		_modelMetadata.modifiedDate = new Date();
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelMetadata ) );
 	}
 	

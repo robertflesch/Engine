@@ -21,14 +21,14 @@ public interface IPersistance
 	// TO Persistance
 	////////////////////////////////////////////////////////////////
 	function toPersistance():void;
-	function toObject():void;
-	function toByteArray( $ba:ByteArray ):ByteArray;
+	//function toObject():void;
+	//function toByteArray( $ba:ByteArray ):ByteArray;
 	////////////////////////////////////////////////////////////////
 	// FROM Persistance
 	////////////////////////////////////////////////////////////////
 	function fromPersistance( $dbo:DatabaseObject ):void;
-	function fromObject( $object:Object, $ba:ByteArray ):void;
-	function fromByteArray( $ba:ByteArray ):void;
+	//function fromObject( $object:Object, $ba:ByteArray ):void;
+	//function fromByteArray( $ba:ByteArray ):void;
 }
 }
 

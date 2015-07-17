@@ -28,7 +28,7 @@ public class ModelMetadataEvent extends ModelBaseEvent
 	public function get modelGuid():String { return _modelGuid; }
 	
 	public override function clone():Event { return new ModelMetadataEvent(type, series, _modelGuid, _modelMetadata, bubbles, cancelable); }
-	public override function toString():String { return formatToString("ModelMetadataEvent", "modelGuid", "vmm" ); }
+	public override function toString():String { return formatToString("ModelMetadataEvent", "modelGuid", "modelMetadata" ); }
 	
 	public function ModelMetadataEvent( $type:String, $series:int, $modelGuid:String, $modelMetadata:ModelMetadata, $bubbles:Boolean = true, $cancellable:Boolean = false ) {
 		super( $type, $series, $bubbles, $cancellable );

@@ -25,8 +25,8 @@ package com.voxelengine.worldmodel.weapons
 		override protected function processClassJson():void {
 			super.processClassJson();
 			
-			if ( modelInfo.obj && modelInfo.obj.barrel ) {
-				var barrelInfo:Object = modelInfo.obj.barrel;
+			if ( modelInfo.dbo.barrel ) {
+				var barrelInfo:Object = modelInfo.dbo.barrel;
 			}
 //			else
 //				trace( "Stand - NO Stand INFO FOUND" );

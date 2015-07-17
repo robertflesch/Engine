@@ -69,7 +69,7 @@ public class VoxelModel
 	protected	var	_changed:Boolean; 
 	protected	var	_complete:Boolean;
 	protected	var	_selected:Boolean;
-	protected	var	_dead:Boolean; 		
+	protected	var	_dead:Boolean; 		 
 			
 	// sub classes of VoxelModel can have inventory
 	public function get hasInventory():Boolean 				{ return _hasInventory; }
@@ -122,14 +122,8 @@ public class VoxelModel
 	protected function processClassJson():void {
 		Log.out( "VoxelModel.processClassJson load children for model name: " + _metadata.name, Log.DEBUG ),
 		modelInfo.childrenLoad( this );
+		modelInfo.scriptsLoad( instanceInfo );
 		
-		// Both instanceInfo and modelInfo can have scripts. With each being persisted in correct location.
-		// Currently both are persisted to instanceInfo, which is very bad...
-		if (0 < _modelInfo.scripts.length)
-		{
-			for each (var scriptName:String in _modelInfo.scripts)
-				instanceInfo.addScript( scriptName, true );
-		}
 	}
 	
 	// The export object is a combination of modelInfo and instanceInfo
@@ -216,9 +210,7 @@ public class VoxelModel
 		_metadata = $vmm;
 
 		if ( null == _metadata )
-			metadata = new ModelMetadata( instanceInfo.modelGuid );
-		else 
-			metadata = $vmm;
+			Log.out( "VoxelModel.init - IS NULL ModelMetadata valid?", Log.ERROR );
 		
 		if ( metadata.permissions.modify ) {
 //			Log.out( "VoxelModel - added ImpactEvent.EXPLODE for " + _modelInfo.modelClass );

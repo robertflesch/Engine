@@ -153,7 +153,7 @@ public class PersistBigDB
 			
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT, errorNoClient );
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
-		if ( $pe.dbo )
+		if ( "0" != $pe.dbo.key )
 		{
 			//Log.out( "PersistBigDB.save - saving inventory: " + $pe.guid );
 			
@@ -165,7 +165,7 @@ public class PersistBigDB
 		{
 			Log.out( "PersistBigDB.create - creating object in table: " + $pe.table + "  guid:" + $pe.guid + "" );
 			//var metadata:Object = { created: new Date(), modified: new Date(), data: $pe.data };
-			var metadata:Object = $pe.data as Object;
+			var metadata:Object = $pe.dbo.data;
 			Persistance.createObject( $pe.table
 									, $pe.guid
 									, metadata

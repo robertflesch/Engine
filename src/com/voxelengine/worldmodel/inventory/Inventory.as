@@ -72,17 +72,14 @@ public class Inventory extends PersistanceObject implements IPersistance
 		if ( Globals.online && loaded ) {
 			Log.out( "Inventory.save - Saving Inventory: " + guid  + " in table: " + table, Log.DEBUG );
 			addSaveEvents();
-			if ( _dbo )
-				toPersistance();
-			else
-				toObject();
+			toPersistance();
 				
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, null ) );
 		}
 		else
 			Log.out( "Inventory.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
 	}
-
+/*
 	public function toObject():void {
 		var ba:ByteArray = new ByteArray();	
 		_obj.ba = toByteArray( ba );
@@ -96,8 +93,10 @@ public class Inventory extends PersistanceObject implements IPersistance
 		var ba:ByteArray = new ByteArray(); 
 		_dbo.data 			= toByteArray( ba );
 	}
-
+*/
 	// If $dbo is null then the default data is loaded
+	public function toPersistance():void {}
+
 	public function fromPersistance( $dbo:DatabaseObject ):void {
 		
 		if ( $dbo ) {

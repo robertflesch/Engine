@@ -39,38 +39,25 @@ import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.utils.transitions.properties.SoundShortcuts;
 
-public class ModelInfo extends PersistanceObject implements IPersistance
+public class ModelInfo extends PersistanceObject
 {
 	private var _childrenInstanceInfo:Vector.<InstanceInfo> 		= new Vector.<InstanceInfo>;// Child models and their relative positions
-	private var _scripts:Vector.<String> 							= new Vector.<String>;		// Default scripts to be used with this model
+	//private var _scripts:Vector.<String> 							= new Vector.<String>;		// Default scripts to be used with this model
 	private var _animations:Vector.<Animation> 						= new Vector.<Animation>();	// Animations that this model has
-						
-	private var _fileName:String 									= "INVALID";				// Used for local loading and import of data from local file system
-	private var _biomes:Biomes;																	// used to generate terrain and apply other functions to oxel
-	private var _modelClass:String 									= "VoxelModel";				// Class used to instaniate model
-	private var _grainSize:int = 0;																// Used in model generatation
-	private var _animationInfo:Vector.<Object> 						= new Vector.<Object>();	// ID and name of animations that this model has, before loading
-	private var _animationCount:int;			
-	private var _series:int											// used to make sure animation is part of same series when loading
+	
 	private var _data:OxelPersistance;
-	private var _firstLoadFailed:Boolean;
-	private var _altGuid:String;									// used to handle loading from biome
 	private var _associatedGrain:GrainCursor;						// associates the model with a grain in the parent model
 	
-	protected 	var	_animationsLoaded:Boolean						= true;
-	public 	function get animationsLoaded():Boolean 				{ return _animationsLoaded; }
-	public 	function set animationsLoaded(value:Boolean):void		{ _animationsLoaded = value; }
-			
 	public function get altGuid():String 							{ return _altGuid; }
 	public function get fileName():String 							{ return _fileName; }
 	public function set fileName(val:String):void 					{ _fileName = val; }
 	public function get biomes():Biomes 							{ return _biomes; }
 	public function get childrenInstanceInfo():Vector.<InstanceInfo>{ return _childrenInstanceInfo; }
-	public function get scripts():Vector.<String> 					{ return _scripts; }
-	public function get modelClass():String							{ return _modelClass; }
-	public function set modelClass(val:String):void 				{ _modelClass ? _modelClass = val : _modelClass = "VoxelModel"; }
-	public function get grainSize():int								{ return _grainSize; }
-	public function set grainSize(val:int):void						{ _grainSize = val; }
+	public function get scripts():Vector.<String> 					{ return _info.scripts; }
+	public function get modelClass():String							{ return _info.modelClass; }
+	public function set modelClass(val:String):void 				{ _info.modelClass = val; }
+	public function get grainSize():int								{ return _info.grainSize; }
+	public function set grainSize(val:int):void						{ _info.grainSize = val; }
 	public function get animations():Vector.<Animation> 			{ return _animations; }
 	public function set biomes(value:Biomes):void  					{ _biomes = value; }
 	public function get oxel():Oxel 								{ return _data.oxel; }
@@ -80,22 +67,18 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	
 	public function ModelInfo( $guid:String ):void  { 
 		super( $guid, Globals.BIGDB_TABLE_MODEL_INFO ); 
-		_data = new OxelPersistance( guid );
-	}
-	
-	public function changeOxel( $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
-		var result:Boolean = _data.changeOxel( guid, $gc, $type, $onlyChangeType );
-		if ( TypeInfo.AIR == $type )
-			childRemoveByGC( $gc );
-		return result;
+		//_data = new OxelPersistance( guid );
 	}
 
 	override public function set guid($newGuid:String):void { 
 		var oldGuid:String = super.guid;
 		super.guid = $newGuid;
-		_data.guid = $newGuid;
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
-		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
+		if ( _data ) {
+			_data.guid = $newGuid;
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
+		}
+		changed = true;
 	}
 	
 	public function toString():String {
@@ -107,35 +90,12 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		_data.createEditCursor();
 	}
 	
-	public function oxelDataChanged():void {
-		 _data.changed = true;
-	}
-	
-	public function oxelLoadData():void {
-		if ( _data.loaded ) {
-			Log.out( "ModelInfo.loadOxelData - returning loaded oxel guid: " + guid );
-			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, _data ) );
-		} else { 
-			addListeners();
-			// try to load from tables first
-			Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
-			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_PERSISTANCE ) );
-		}
-	}
-	
 	public function update( $context:Context3D, $elapsedTimeMS:int ):void {
 		if ( data )
 			data.update();
 			
 		for each (var vm:VoxelModel in _children)
 			vm.update($context, $elapsedTimeMS);
-	}
-	
-	public function bringOutYourDead():void {
-		for each (var deadCandidate:VoxelModel in _children) {
-			if (true == deadCandidate.dead)
-				childRemove(deadCandidate.instanceInfo);
-		}
 	}
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
@@ -152,32 +112,24 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		super.release();
 		_biomes = null;
 		_childrenInstanceInfo = null;
-		_scripts = null;
 		_animations = null;
-		_animationInfo = null;
 		_data.release();
 	}
 
-	override public function clone( $guid:String ):* {
-		_data.clone( $guid );
-		throw new Error( "ModelInfo.clone - what to do here" );
-	}
-
-	private function cloneObject( obj:Object ):Object {
-		var ba:ByteArray = new ByteArray();
-		ba.writeObject( obj );
-		ba.position = 0;
-		var newObj:Object = ba.readObject();
-		return newObj;
-	}
-	
 	private function getGrainSize():int {
 		if ( _data && _data.loaded )
 			return _data.oxel.gc.grain;
 		else 
-			return _grainSize;
+			return _info.grainSize;
 	}
 
+	public function bringOutYourDead():void {
+		for each (var deadCandidate:VoxelModel in _children) {
+			if (true == deadCandidate.dead)
+				childRemove(deadCandidate.instanceInfo);
+		}
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// start data (oxel) operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -198,7 +150,7 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			removeListeners();
 			Log.out( "ModelInfo.retrieveData - loaded oxel guid: " + guid );
 			_data = $ode.oxelData;
-			if ( null == _data.dbo ) {
+			if ( "0" == _data.dbo.key ) {
 				_data.changed = true;
 				_data.guid = guid;
 				// When import objects, we have to update the cache so they have the correct info.
@@ -248,6 +200,29 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		return false;
 	}
 	
+	public function changeOxel( $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
+		var result:Boolean = _data.changeOxel( guid, $gc, $type, $onlyChangeType );
+		if ( TypeInfo.AIR == $type )
+			childRemoveByGC( $gc );
+		return result;
+	}
+
+	public function oxelDataChanged():void {
+		 _data.changed = true;
+	}
+	
+	public function oxelLoadData():void {
+		if ( _data && _data.loaded ) {
+			Log.out( "ModelInfo.loadOxelData - returning loaded oxel guid: " + guid );
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, _data ) );
+		} else { 
+			addListeners();
+			// try to load from tables first
+			Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_PERSISTANCE ) );
+		}
+	}
+	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// start script operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -257,13 +232,19 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//  start animation operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	protected 	var	_animationsLoaded:Boolean						= true;
+	public 	function get animationsLoaded():Boolean 				{ return _animationsLoaded; }
+	public 	function set animationsLoaded(value:Boolean):void		{ _animationsLoaded = value; }
+	private var _animationInfo:Vector.<Object> 						= new Vector.<Object>();	// ID and name of animations that this model has, before loading
+	private var _animationCount:int;			
+	
 	// Dont load the animations until the model is instaniated
 	public function animationsLoad():void {
 		AnimationEvent.addListener( ModelBaseEvent.DELETE, animationDeleteHandler );
 		AnimationEvent.addListener( ModelBaseEvent.ADDED, animationAdd );
 		_series = 0;
-		if ( 0 < _animationInfo.length ) {
-			for each ( var animData:Object in _animationInfo ) {
+		if ( _info. animationInfo && 0 < _info.animationInfo.length ) {
+			for each ( var animData:Object in _info.animationInfo ) {
 				animationsLoaded = false;
 				_animationCount++; 
 				
@@ -281,9 +262,9 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	}
 			
 	public function animationsDelete():void {
-		if ( _animationInfo ) {
+		if ( _info.animationInfo ) {
 			Log.out( "ModelInfo.animationsDelete - animations found" );
-			for each ( var animData:Object in _animationInfo ) {
+			for each ( var animData:Object in _info.animationInfo ) {
 				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, guid, animData.guid, null ) );
 			}
 		}
@@ -336,19 +317,25 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// start persistance
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	private static const DEFAULT_CLASS:String		= "VoxelModel";
+	private var _info:Object;
+	private var _fileName:String 					= "INVALID"; 	// Used for local loading and import of data from local file system
+	private var _biomes:Biomes;										// used to generate terrain and apply other functions to oxel
+	private var _series:int											// used to make sure animation is part of same series when loading
+	private var _altGuid:String;									// used to handle loading from biome
+	private var _firstLoadFailed:Boolean;							// true if load from biomes data is needed
 	
 	public function save():void {
 		if ( Globals.online && changed ) {
 			if (  true == animationsLoaded && true == childrenLoaded ) {
-				//Log.out( "ModelInfo.save - Saving ModelInfo: " + guid  + " in table: " + table, Log.WARN );
-				changed = false;
-				addSaveEvents();
-				if ( _dbo )
-					toPersistance();
-				else
+				if ( Globals.isGuid( guid ) ) {
+					//Log.out( "ModelInfo.save - Saving ModelInfo: " + guid  + " in table: " + table, Log.WARN );
+					changed = false;
+					addSaveEvents();
 					toObject();
-					
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
+						
+					PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null ) );
+				}
 			}
 			//else 
 				//Log.out( "ModelInfo.save - Not saving ModelInfo - children OR animations not loaded - guid: " + guid );
@@ -356,7 +343,8 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		//else
 			//Log.out( "ModelInfo.save - Not saving ModelInfo - either offline or NOT changed - guid: " + guid );
 			
-		_data.save();	
+		if ( _data )
+			_data.save();	
 		
 		for ( var i:int; i < _children.length; i++ ) {
 			var child:VoxelModel = _children[i];
@@ -364,68 +352,55 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		}
 	}
 	
-	public function fromPersistance( $dbo:DatabaseObject ):void {
-		_dbo				= $dbo;
-		if ( null == $dbo.modelClass )
-			throw new Error( "ModelInfo.fromPersistance - no model class set, make sure its not an empty record" );
-		modelClass			= $dbo.modelClass;
-		if ( $dbo.children )
-			childrenFromObject( JSONUtil.parse( $dbo.children, Globals.BIGDB_TABLE_MODEL_INFO, "fromPersistance.children" ) );
-		if ( $dbo.scripts )
-			scriptsFromObject( JSONUtil.parse( $dbo.scripts, Globals.BIGDB_TABLE_MODEL_INFO, "fromPersistance.scripts" ) );
-		if ( $dbo.animations )
-			animationsFromObject( JSONUtil.parse( $dbo.animations, Globals.BIGDB_TABLE_MODEL_INFO, "fromPersistance.animations" ) );
-		// Now put the data into the object so that the voxel model and decendances can use it.	
-		toObject();
-	}
-
-	public function toPersistance():void {
+	
+	public function fromObjectImport( $dbo:DatabaseObject ):void {
+		_dbo = $dbo;
+		// The data is needed the first time it saves the object from import, after that it goes away
+		if ( !dbo.data.model )
+			return;
 		
-		// This is complicated build process, let the toObject do the heavy lifting.
-		toObject();
-			
-		dbo.modelClass = _obj.modelClass;
-		dbo.grainSize =  getGrainSize();
-		
-		if ( _obj.children ) {
-			if ( _obj.children.length )
-				dbo.children = _obj.children;
-			else	
-				dbo.children = null;
-		}
-			
-		if ( _obj.animations ) {
-			if ( _obj.animations.length )
-				dbo.animations = _obj.animations;
-			else	
-				dbo.animations = null;
-		}
-		
-		if ( _obj.scripts ) { 
-			if ( _obj.scripts.length )
-				dbo.scripts = _obj.scripts;  // WAS dbo.scripts = JSON.stringify( _obj.scripts );
-			else	
-				dbo.scripts = null;
-		}
+		_info = $dbo.data.model;
+		loadFromInfo();
 	}
 	
-	public function toObject():void {
-		// create new to make sure we dont have holdovers
-		// keep the holdovers
-		//_obj = new Object();
-		var modelClassPrototype:Class = ModelLibrary.getAsset( _modelClass );
+	public function fromObject( $dbo:DatabaseObject ):void {
+		_dbo = $dbo;
+		if ( !dbo.model )
+			return;
+		
+		_info = $dbo.model;
+		loadFromInfo();
+	}
+	
+	private function loadFromInfo():void {
+		if ( !_info.modelClass )
+			_info.modelClass = DEFAULT_CLASS;
+		// Only attributes that need additional handling go here.
+		if ( _info.biomes )
+			biomesFromObject( _info.biomes );
+		
+		if ( _info.scripts )
+			scriptsFromObject( _info.scripts );
+		if ( _info.children )
+			childrenFromObject( _info.children );
+		if ( _info.animations )
+			animationsFromObject( _info.animations );
+	
+	}
+
+		public function toObject():void {
+		// I am faking a heirarchy here, not good object oriented behavior but needs major redesign to do what I want.
+		// so instead I just get the current setting from the class
+		var modelClassPrototype:Class = ModelLibrary.getAsset( _info.modelClass );
 		try {
-			modelClassPrototype.buildExportObject( _obj );
+			modelClassPrototype.buildExportObject( dbo );
 		} catch ( e:Error ) {
-			Log.out( "ModelInfo.toObject - Error with Class: " + _modelClass, Log.ERROR );
+			Log.out( "ModelInfo.toObject - Error with Class: " + _info.modelClass, Log.ERROR );
 		}
 
-			
-		_obj.modelClass = _modelClass;
-		// biomes:			_biomes,      // Biomes are only used in object generation, once the object has been completed they are removed.
-		_obj.grainSize =  getGrainSize();
+		_info.grainSize =  getGrainSize();
 		if ( null != associatedGrain )
-		_obj.associatedGrain = associatedGrain;
+			_info.associatedGrain = associatedGrain;
 		
 		var childrenAdded:int = childrenGet();
 		if ( "Dragon" == modelClass )
@@ -434,9 +409,9 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 				// lets retry this so I can watch it.
 				childrenGet();
 			}
-		modelsScriptOnly();
-		animationsGet();
-				
+		//modelsScriptOnly();
+		//animationsGet();
+		
 		function childrenGet():int {
 		// Same code that is in modelCache to build models in region
 		// this is just models in models
@@ -451,11 +426,11 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 
 			var len:int = oc.length;
 			if ( 0 < len )
-				_obj.children = JSON.stringify( oc );
+				_info.children = JSON.stringify( oc );
 			oc = null;
 			return len;
 		}
-		
+		/*
 		function animationsGet():void {
 			var len:int = _animations.length;
 			var oa:Vector.<Object> = new Vector.<Object>();
@@ -468,10 +443,11 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 				oa.push( ao );
 			}
 			if ( 0 < oa.length ) 
-				_obj.animations = JSON.stringify( oa );
+				_info.animations = JSON.stringify( oa );
 			oa = null;
 		}
-		
+		*/
+		/*
 		function modelsScriptOnly():void {
 			var os:Vector.<Object> = new Vector.<Object>();
 			var len:int = _scripts.length;
@@ -482,51 +458,12 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 				os.push( so );
 			}
 			if ( 0 < os.length ) 
-				_obj.scripts = JSON.stringify( os );
+				_info.scripts = JSON.stringify( os );
 			os = null;
 		}
+		*/
 	} 	
 
-	// From JSON to modelInfo
-	public function fromObject( $object:Object, $ba:ByteArray ):void {
-		//_obj = _obj;
-		if ( _obj.model.modelGuid )
-			super.guid = _fileName = _obj.model.modelGuid;
-		else if ( _obj.model.guid )
-			super.guid = _fileName = _obj.model.guid;
-		else
-			if ( null == guid || "" == guid )
-				Log.out( "ModelInfo.fromObject - no guid assigned", Log.WARN );
-		
-		if ( _obj.model.grainSize )
-			grainSize = _obj.model.grainSize;
-		else if ( _obj.model.GrainSize )
-			Log.out( "ModelInfo.fromObject - invalid spelling on grainSize on import", Log.WARN );
-		else if ( _obj.model.grainsize )
-			Log.out( "ModelInfo.fromObject - invalid spelling on grainSize on import", Log.WARN );
-		
-		if ( _obj.model.modelClass )
-			_modelClass = _obj.model.modelClass;
-
-		if ( _obj.model.biomes )
-			biomesFromObject( _obj.model.biomes );
-		
-		if ( _obj.model.scripts )
-			scriptsFromObject( _obj.model.scripts );
-		// This is an artifact from the old mjson files, new system saves all as "scripts"
-		if ( _obj.model.script )
-			scriptsFromObject( _obj.model.script );
-		
-		if ( _obj.model.children )
-			childrenFromObject( _obj.model.children );
-		
-		if ( _obj.model.animations )
-			animationsFromObject( _obj.model.animations );
-	}
-	
-	public function fromByteArray( $ba:ByteArray ):void {;}
-	public function toByteArray( $ba:ByteArray ):ByteArray { return null };
-	
 	private function biomesFromObject( $biomes:Object ):void {
 		// TODO this should only be true for new terrain models.
 		const createHeightMap:Boolean = true;
@@ -535,19 +472,17 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			throw new Error( "ModelInfo.biomesFromObject - WARNING - unable to find layerInfo: " + fileName );					
 		_biomes.layersLoad( $biomes.layers );
 		// now remove the biome data from the object so it is not saved to persistance
-		delete _obj.model.biomes;	
+		delete _info.biomes;	
 		
 	}
-	
 	private function scriptsFromObject( $scripts:Object ):void {
 		for each ( var so:Object in $scripts ) {
 			if ( so.name ) {
-				//trace( "ModelInfo.init - Model GUID:" + fileName + "  adding script: " + scriptObject.name );
-				_scripts.push( so.name );
+				Log.out( "===== >>> FIX FIX - ModelInfo.init - Model GUID:" + guid + "  adding script: " + so.name, Log.WARN );
+				//_scripts.push( so.name );
 			}
 		}
 	}
-
 	private function animationsFromObject( $animations:Object ):void {
 	// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
 		Log.out( "ModelInfo.animationsFromObject" );	
@@ -556,24 +491,23 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 			_animationInfo.push( animData );
 		}
 	}
-	
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  Children functions
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	protected 	var	_children:Vector.<VoxelModel> 				= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
-	public	function get children():Vector.<VoxelModel>			{ return _children; }
-	public	function 	 childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
+	protected 	var			 _children:Vector.<VoxelModel>			= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
+	public		function get children():Vector.<VoxelModel>			{ return _children; }
+	public		function 	 childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
 	
-	protected 	var	_childrenLoaded:Boolean						= true;
-	public function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
-	public function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
+	protected 	var			_childrenLoaded:Boolean					= true;
+	public 		function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
+	public 		function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
 	/////////////////////
 	private function childrenFromObject( $children:Object ):void {
 		Log.out( "ModelInfo.childrenFromObject", Log.DEBUG );
 		for each ( var v:Object in $children ) {
 			var ii:InstanceInfo = new InstanceInfo();
-			ii.initJSON( v );
+			ii.initJSON( v.instanceInfo );
 			// This adds the instanceInfo for the child models to our child list which is processed when object is initialized
 			childrenInstanceInfoAdd( ii );
 		}
@@ -596,6 +530,17 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 		}
 		_childrenInstanceInfo.push( $instanceInfo );
 	}
+	
+	public function scriptsLoad( $instanceInfo:InstanceInfo ):void {
+		// Both instanceInfo and modelInfo can have scripts. With each being persisted in correct location.
+		// Currently both are persisted to instanceInfo, which is very bad...
+		if ( scripts && 0 < scripts.length)
+		{
+			for each (var scriptName:String in scripts)
+				$instanceInfo.addScript( scriptName, true );
+		}
+	}
+	
 	
 	public function childrenLoad( $vm:VoxelModel ):void {
 		if ( childrenInstanceInfo && 0 < childrenInstanceInfo.length)
@@ -755,6 +700,24 @@ public class ModelInfo extends PersistanceObject implements IPersistance
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End Children functions
 	/////////////////////////////////////////////////////////////////////////////////////////////
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//  Attic
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	/*
+	override public function clone( $guid:String ):* {
+		_data.clone( $guid );
+		throw new Error( "ModelInfo.clone - what to do here" );
+	}
+
+	private function cloneObject( obj:Object ):Object {
+		var ba:ByteArray = new ByteArray();
+		ba.writeObject( obj );
+		ba.position = 0;
+		var newObj:Object = ba.readObject();
+		return newObj;
+	}
+	*/
 	
 }
 }

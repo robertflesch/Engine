@@ -32,9 +32,9 @@ package com.voxelengine.worldmodel.models.types
 
 		override protected function processClassJson():void {
 			super.processClassJson();
-			if ( modelInfo.obj && modelInfo.obj.engine )
+			if ( modelInfo.dbo && modelInfo.dbo.engine )
 			{
-				var engineInfo:Object = modelInfo.obj.engine;
+				var engineInfo:Object = modelInfo.dbo.engine;
 				if ( engineInfo.propRotationRate )
 					_rotationRate = engineInfo.propRotationRate;
 			}

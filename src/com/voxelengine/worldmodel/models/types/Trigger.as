@@ -35,6 +35,10 @@ package com.voxelengine.worldmodel.models.types
 			super( $ii );
 		}
 		
+		static public function buildExportObject( obj:Object ):void {
+			VoxelModel.buildExportObject( obj )
+		}
+		
 		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 			super.init( $mi, $vmm );
 		}

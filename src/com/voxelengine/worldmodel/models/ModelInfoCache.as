@@ -12,6 +12,7 @@ import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.utils.Dictionary;
+import playerio.DatabaseObject;
 
 import com.voxelengine.utils.StringUtils;
 
@@ -95,21 +96,13 @@ public class ModelInfoCache
 	// TODO NOTE: This doesnt not work the first time the object is imported - why?
 	// You have to close app and restart to get guids correct.
 	static private function deleteRecursive( $mie:ModelInfoEvent ):void {
-		Log.out( "ModelInfoCache.deleteRecursive - $mie: " + $mie, Log.WARN )
-		//// first delete any children
-		//for each ( var mi:ModelInfo in _modelInfo ) {
-			//if ( mi && mi.parentModelGuid == $mie.modelGuid ) {
-				//Log.out( "ModelInfoCache.deleteRecursive - deleting child mi: " + mi, Log.WARN )
-				//ModelInfoEvent.dispatch( new ModelInfoEvent( ModelInfoEvent.DELETE_RECURSIVE, 0, mi.guid, null ) );		
-			//}
-		//}
 		// first delete any children
 		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
 		if ( mi ) {
-			for each ( var childModel:VoxelModel in mi.children ) {
-				if ( childModel && childModel.modelInfo ) {
-					Log.out( "ModelInfoCache.deleteRecursive - deleting child cmi: " + childModel.modelInfo, Log.WARN )
-					ModelInfoEvent.dispatch( new ModelInfoEvent( ModelInfoEvent.DELETE_RECURSIVE, 0, childModel.modelInfo.guid, null ) );		
+			for each ( var childii:InstanceInfo in mi.childrenInstanceInfo ) {
+				if ( childii && childii.modelGuid ) {
+					Log.out( "ModelInfoCache.deleteRecursive - deleting child from instanceInfo: " + childii.modelGuid, Log.WARN )
+					ModelInfoEvent.dispatch( new ModelInfoEvent( ModelInfoEvent.DELETE_RECURSIVE, 0, childii.modelGuid, null ) );		
 				}
 			}
 		} else 
@@ -156,22 +149,26 @@ public class ModelInfoCache
 			var mi:ModelInfo = _modelInfo[$pe.guid]; 
 			if ( null == mi ) {
 				mi = new ModelInfo( $pe.guid );
-				if ( $pe.dbo ) {
-					mi.fromPersistance( $pe.dbo );
-				}
+				if ( $pe.dbo )
+					mi.fromObject( $pe.dbo );
 				else {
+					var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_INFO, "0", "0", 0, true, null );
+					dbo.data = new Object();
 					// This is for import from local only.
 					var fileData:String = String( $pe.data );
-					var modelInfoJson:String = StringUtils.trim(fileData);
-					mi.obj = JSONUtil.parse( modelInfoJson, $pe.guid + $pe.table, "ModelInfoCache.loadSucceed" );
-					if ( null == mi.obj ) {
+					fileData = StringUtils.trim(fileData);
+					dbo.data = JSONUtil.parse( fileData, $pe.guid + $pe.table, "ModelInfoCache.loadSucceed" );
+					if ( null == dbo.data ) {
 						Log.out( "ModelInfoCache.loadSucceed - error parsing modelInfo on import. guid: " + $pe.guid, Log.ERROR );
 						ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 						return;
 					}
-					mi.guid = $pe.guid;
-					mi.fromObject( null, null );
+					mi.fromObjectImport( dbo );
+					// On import mark it as changed.
+					mi.changed = true;
+					mi.save();
 				}
+				
 				add( $pe.series, mi );
 				if ( _block.has( $pe.guid ) )
 					_block.clear( $pe.guid )

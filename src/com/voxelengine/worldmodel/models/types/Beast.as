@@ -83,16 +83,16 @@ package com.voxelengine.worldmodel.models.types
 			obj.beast.maxTurnRate 		= mMaxTurnRate / 100;
 			obj.beast.maxClimbAngle		= mMaxClimbAngle;
 			obj.beast.climbRate 		= mClimbRate * 100;
-			obj.beast.seatLocation 		= _seatLocation;
+			obj.beast.seatLocation 		= { x:int(_seatLocation.x), y:int(_seatLocation.y), z:int(_seatLocation.z) };
 		}
 		
 		override protected function processClassJson():void {
 			super.processClassJson();
-			if ( modelInfo.obj && modelInfo.obj.beast )
+			if ( modelInfo.dbo && modelInfo.dbo.beast )
 			{
-				var beastInfo:Object = modelInfo.obj.beast;
+				var beastInfo:Object = modelInfo.dbo.beast;
 				if ( null == beastInfo ) {
-					Log.out( "Beast.processClassJson - beast section not found: " + modelInfo.obj.toString(), Log.ERROR );
+					Log.out( "Beast.processClassJson - beast section not found: " + modelInfo.dbo.toString(), Log.ERROR );
 					return;
 				}
 				
@@ -115,8 +115,15 @@ package com.voxelengine.worldmodel.models.types
 				else
 					mClimbRate = mClimbRate / 100;
 					
-				if ( beastInfo.seatLocation )
-					_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
+				if ( beastInfo.seatLocation ) {
+					if ( beastInfo.seatLocation is Object ) {
+						Log.out( "Beast.processClassJson: " + beastInfo.seatLocation );
+						_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
+					}
+					else
+						_seatLocation.setTo( 0, 0, 0 );
+						//_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
+				}
 				else
 					_seatLocation.setTo( 0, 0, 0 );
 			}

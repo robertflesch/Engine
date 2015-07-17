@@ -32,9 +32,9 @@ package com.voxelengine.worldmodel.models.types
 		override protected function processClassJson():void {
 			super.processClassJson();
 			
-			if ( modelInfo.obj && modelInfo.obj.stand )
+			if ( modelInfo.dbo && modelInfo.dbo.stand )
 			{
-				var standInfo:Object = modelInfo.obj.stand;
+				var standInfo:Object = modelInfo.dbo.stand;
 				if ( standInfo.reloadSpeed )
 					_reloadSpeed = standInfo.reloadSpeed;
 			}

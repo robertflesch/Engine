@@ -46,9 +46,6 @@ public class Gun extends ControllableVoxelModel
 		super( instanceInfo );
 		// give the gun a unique series
 		_series = _id++;
-		//AmmoEvent.addListener( ModelBaseEvent.RESULT, result );
-		//AmmoEvent.addListener( ModelBaseEvent.ADDED, result );
-		//AmmoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, resultFailed );
 	}
 	
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
@@ -69,14 +66,16 @@ public class Gun extends ControllableVoxelModel
 	
 	override protected function processClassJson():void {
 		super.processClassJson();
-		if ( modelInfo.obj && modelInfo.obj.gun )
+		if ( modelInfo.dbo && modelInfo.dbo.gun )
 		{
-			var gunInfo:Object = modelInfo.obj.gun;
+			var gunInfo:Object = modelInfo.dbo.gun;
 			if ( gunInfo.reloadSpeed )
 				_reloadSpeed = gunInfo.reloadSpeed;
 				
-			if ( gunInfo.ammos )
-			{
+			if ( gunInfo.ammos ) {
+				AmmoEvent.addListener( ModelBaseEvent.RESULT, result );
+				AmmoEvent.addListener( ModelBaseEvent.ADDED, result );
+				AmmoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, resultFailed );
 				var ammosJson:Object = gunInfo.ammos;
 				for each ( var ammoInfo:Object in ammosJson )
 					request( ammoInfo.name );
@@ -88,6 +87,21 @@ public class Gun extends ControllableVoxelModel
 			Log.out( "Gun - NO GUN INFO FOUND" );
 	}
 
+	static public function buildExportObject( obj:Object ):void {
+		// For now just use the existing gun data
+		ControllableVoxelModel.buildExportObject( obj )
+		//var gunData:Object = new Object();
+		//gunData.reloadSpeed = _reloadSpeed;
+		//
+		//var oa:Vector.<Object> = new Vector.<Object>();
+		//var ammosJson:Object = modelInfo.dbo.gun.ammos;
+		//for each ( var ammoInfo:Object in ammosJson )
+			//oa.push( { name: ammoInfo.name } );
+//
+		//gunData.ammos = oa;
+//		obj.gun = gunData;
+	}
+
 	public function request( $ammoName:String ):void {
 		
 		//public function PersistanceEvent( $type:String, $series:int, $table:String, $guid:String, $dbo:DatabaseObject = null, $data:* = null, $format:String = URLLoaderDataFormat.TEXT, $other:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false );
@@ -95,33 +109,18 @@ public class Gun extends ControllableVoxelModel
 		AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST, _series, $ammoName, null ) );
 	}
 
-	//private function result(e:AmmoEvent):void 
-	//{
-		//if ( _series == e.series )
-			//_armory.push( e.ammo );
-	//}
-	//
-	//private function resultFailed(e:AmmoEvent):void 
-	//{
-		//if ( _series == e.series )
-			//Log.out( "Gun.resultFailed - No ammo information found for name: " + e.name );
-	//}
-	
-	static public function buildExportObject( obj:Object ):void {
-		ControllableVoxelModel.buildExportObject( obj )
-		var gunData:Object = new Object();
-		gunData.reloadSpeed = _reloadSpeed;
-		
-		var oa:Vector.<Object> = new Vector.<Object>();
-		for each ( var ammo:String in _armory ) {
-			oa.push( { name: ammo } );
-		}
-		gunData.ammos = oa;
-		obj.gun = gunData;
+	private function result(e:AmmoEvent):void 
+	{
+		if ( _series == e.series )
+			_armory.push( e.ammo );
 	}
 	
+	private function resultFailed(e:AmmoEvent):void 
+	{
+		if ( _series == e.series )
+			Log.out( "Gun.resultFailed - No ammo information found for name: " + e.name );
+	}
 	
-
 	override public function update(context:Context3D, elapsedTimeMS:int):void 
 	{
 		super.update(context, elapsedTimeMS);

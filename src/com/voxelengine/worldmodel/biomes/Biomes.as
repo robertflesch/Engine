@@ -133,9 +133,8 @@ package com.voxelengine.worldmodel.biomes
 			{
 				if ( layerObject )
 				{
-					//var layer:Object = layerObject.layer;
 					var layerInfo:LayerInfo = new LayerInfo();
-					layerInfo.fromJSON( layerObject );	
+					layerInfo.fromJSON( layerObject.layer );	
 					add_layer( layerInfo );
 					//Log.out( "Biomes.load_biomes_data - layer data: " + layerInfo.toString() );
 				}

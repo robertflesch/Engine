@@ -14,8 +14,10 @@ import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.Permissions;
 import flash.utils.ByteArray;
 import org.flashapi.swing.Alert;
+import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -63,10 +65,12 @@ public class ModelMakerImport extends ModelMakerBase {
 				ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, metadataFromUI );
 				new WindowModelMetadata( ii, WindowModelMetadata.TYPE_IMPORT ); }
 			else {
-				_modelMetadata = new ModelMetadata( Globals.getUID() );
+				_modelMetadata = new ModelMetadata( ii.modelGuid );
+				var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
+				newDbo.data = new Object();
+				_modelMetadata.fromObjectImport( newDbo );
 				_modelMetadata.name = ii.modelGuid;
 				_modelMetadata.owner = Network.userId;
-				_modelMetadata.modifiedDate = new Date();
 				attemptMakeRetrieveParentModelInfo(); }
 		}	
 	}
@@ -75,6 +79,7 @@ public class ModelMakerImport extends ModelMakerBase {
 		if ( $mme.modelGuid == _modelInfo.guid ) {
 			ModelMetadataEvent.removeListener( ModelBaseEvent.GENERATION, metadataFromUI );
 			_modelMetadata = $mme.modelMetadata;
+			// have to do this after the load calls for the oxel and model info have been called.
 			_modelMetadata.guid = Globals.getUID();
 			attemptMakeRetrieveParentModelInfo(); 
 		}
@@ -132,6 +137,7 @@ public class ModelMakerImport extends ModelMakerBase {
 				_modelInfo.changed = true;
 				_modelMetadata.changed = true;
 				vm.save();
+				_modelInfo.save();
 				Region.currentRegion.modelCache.add( vm );
 			}
 			

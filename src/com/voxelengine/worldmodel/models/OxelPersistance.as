@@ -58,6 +58,7 @@ public class OxelPersistance extends PersistanceObject
 	public 	function set loaded(value:Boolean):void 			{ _loaded = value; }
 	
 	public function OxelPersistance( $guid:String ) {
+		//Log.out( "OxelPersistance: " + $guid, Log.WARN );
 		super( $guid, Globals.BIGDB_TABLE_OXEL_DATA );
 		_loaded = false;
 	}
@@ -79,7 +80,7 @@ public class OxelPersistance extends PersistanceObject
 	public function createEditCursor():void {
 		fromByteArray( compressedReferenceBA );
 	}
-	
+	/*
 	// creating a new copy of this
 	override public function clone( $guid:String ):* {
 		var vmd:OxelPersistance = new OxelPersistance( $guid );
@@ -88,7 +89,7 @@ public class OxelPersistance extends PersistanceObject
 		vmd.fromByteArray( ba );
 		return vmd;
 	}
-	
+	*/
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Chunk operations
 	public function refreshFaces():void {
@@ -117,39 +118,35 @@ public class OxelPersistance extends PersistanceObject
 	// persistance operations
 	public function save():void {
 		if ( Globals.online && true == loaded && true == changed ) {
-			//Log.out( "OxelData.save - Saving OxelData: " + guid  + " in table: " + table, Log.WARN );
+			if ( !Globals.isGuid( guid ) ) {
+				//Log.out( "OxelPersistance.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
+				return;
+			}
+			
+			Log.out( "--------- OxelPersistance.save - Saving OxelPersistance: " + guid  + " in table: " + table, Log.WARN );
 			changed = false;
+			toObject();
 			addSaveEvents();
-			if ( _dbo )
-				toPersistance();
-			else
-				toObject();
-				
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, _obj ) );
+			
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, null ) );
 		}
 		//else
-			//Log.out( "OxelData.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
+		//	Log.out( "OxelPersistance.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
 	}
 	
-	public function toPersistance():void { 
-		_dbo.ba			= toByteArray( oxel );
+	private function toObject():void {
+		_dbo.data.ba			= toByteArray( oxel );
 	}
-	public function toObject():void { 
-		var ba:ByteArray = toByteArray( oxel );
-		_obj.ba = ba;
-	}
-		
+				
 	// FROM Persistance
-	public function fromPersistance( $dbo:DatabaseObject ):void {
+	
+	public function fromObjectImport( $dbo:DatabaseObject ):void {
+		_dbo			= $dbo;
+		fromByteArray( $dbo.data.ba );
+	}
+	public function fromObject( $dbo:DatabaseObject ):void {
 		_dbo			= $dbo;
 		fromByteArray( $dbo.ba );
-	}
-	
-	// loading from file data
-	public function fromObject( $object:Object, $ba:ByteArray ):void {		
-		_dbo			= null;
-		// $object data not used here
-		fromByteArray( $ba );
 	}
 	
 	// Make sense, called from for Makers
@@ -158,13 +155,13 @@ public class OxelPersistance extends PersistanceObject
 		// Read off first 3 bytes, the data format
 		var format:String = readFormat($ba);
 		if ("ivm" != format)
-			throw new Error("OxelData.extractVersionInfo - Exception - unsupported format: " + format );
+			throw new Error("OxelPersistance.extractVersionInfo - Exception - unsupported format: " + format );
 		
 		// Read off next 3 bytes, the data version
 		_version = readVersion($ba);
 		// Read off next byte, the manifest version
 		$ba.readByte();
-		//Log.out("OxelData.extractVersionInfo - version: " + _version );
+		//Log.out("OxelPersistance.extractVersionInfo - version: " + _version );
 
 		// This reads the format info and advances position on byteArray
 		function readFormat($ba:ByteArray):String
@@ -197,13 +194,13 @@ public class OxelPersistance extends PersistanceObject
 		}
 	}
 	
-	public function fromByteArray($ba:ByteArray):void {
+	private function fromByteArray($ba:ByteArray):void {
 
 		//Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.WARN );
 		var time:int = getTimer();
 		
 		try { $ba.uncompress(); }
-		catch (error:Error) { Log.out( "OxelDataCache.loadSucceed - Was expecting compressed data " + guid, Log.WARN ); }
+		catch (error:Error) { Log.out( "OxelPersistanceCache.loadSucceed - Was expecting compressed data " + guid, Log.WARN ); }
 		$ba.position = 0;
 		
 		extractVersionInfo( $ba );
@@ -221,6 +218,7 @@ public class OxelPersistance extends PersistanceObject
 			
 		//_statisics.gather( version, $ba, rootGrainSize);
 		
+		// TODO - do I need to do this everytime? or could I use a static initializer? RSF - 7.16.2015
 		registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);	
 		registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);	
 		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
@@ -263,12 +261,7 @@ public class OxelPersistance extends PersistanceObject
 			   n+1...  is model json
 			   ------------------------------------------ */
 			$ba.writeByte(Globals.MANIFEST_VERSION);
-//			var obj:Object = new Object();
-//			buildExportObject( obj );
-//			var json:String = JSON.stringify( obj );
-//			Log.out( "VoxelModel.writeManifest json: " + json, Log.WARN );			
 			$ba.writeInt( 0 );
-//			$ba.writeUTFBytes( json );
 		}
 	}
 	

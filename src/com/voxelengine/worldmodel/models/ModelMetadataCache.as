@@ -112,11 +112,13 @@ public class ModelMetadataCache
 	}
 	
 	static private function deleteHandler( $mme:ModelMetadataEvent ):void {
+		Log.out( "ModelMetadataCache.deleteHandler $mme: " + $mme, Log.WARN );
 		var mmd:ModelMetadata = _metadata[$mme.modelGuid];
 		if ( null != mmd ) {
 			_metadata[$mme.modelGuid] = null; 
 			// TODO need to clean up eventually
 			mmd = null;
+			Log.out( "ModelMetadataCache.deleteHandler making call to PersistanceEvent", Log.WARN );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid, null ) );
 		}
 	}
@@ -152,9 +154,9 @@ public class ModelMetadataCache
 		if ( $pe.dbo ) {
 			//Log.out( "ModelMetadataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
 			var vmm:ModelMetadata = new ModelMetadata( $pe.guid );
-			vmm.fromPersistance( $pe.dbo );
-			if ( $pe.data && true == $pe.data )
-				vmm.dbo = null;
+			vmm.fromObject( $pe.dbo );
+//			if ( $pe.data && true == $pe.data )
+//				vmm.dbo = null;
 			add( $pe.series, vmm );
 		}
 		else {
