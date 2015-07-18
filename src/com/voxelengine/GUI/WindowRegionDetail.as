@@ -69,12 +69,10 @@ public class WindowRegionDetail extends VVPopup
 			_region = new Region( Globals.getUID() );
 			_region.createEmptyRegion();
 			_region.owner = Network.PUBLIC;
-			_region.gravity = true;
 			_region.name = Network.userId + "-" + int( Math.random() * 1000 );
 			_region.desc = "Please enter something meaningful here";
 			markDirty();
-			_region.admin.push( Network.userId );
-			_region.editors.push( Network.userId );
+
 			collectRegionInfo( new RegionEvent( ModelBaseEvent.ADDED, 0, _region.guid, _region ) );
 		}
 		
@@ -104,10 +102,12 @@ public class WindowRegionDetail extends VVPopup
 		var gravArray:Array = [ { label:"Use Gravity" }, { label:"NO Gravity. " } ];
 		addElement( new ComponentRadioButtonGroup( "Gravity", gravArray, gravChange,  _region.gravity ? 0 : 1, WIDTH ) );
 		
-		var playerStartingPosition:ComponentVector3D = new ComponentVector3D( markDirty, "Player Starting Location", "X: ", "Y: ", "Z: ",  _region.playerPosition, updateVal );
+		var playerPosition:Vector3D = new Vector3D( _region.playerPosition.x, _region.playerPosition.y, _region.playerPosition.z );
+		var playerStartingPosition:ComponentVector3D = new ComponentVector3D( markDirty, "Player Starting Location", "X: ", "Y: ", "Z: ",  playerPosition, updateVal );
 		addElement( playerStartingPosition );
 		
-		var playerStartingRotation:ComponentVector3D = new ComponentVector3D( markDirty, "Player Starting Rotation", "X: ", "Y: ", "Z: ",  _region.playerRotation, updateVal );
+		var playerRotation:Vector3D = new Vector3D( _region.playerRotation.x, _region.playerRotation.y, _region.playerRotation.z );
+		var playerStartingRotation:ComponentVector3D = new ComponentVector3D( markDirty, "Player Starting Rotation", "X: ", "Y: ", "Z: ",  playerRotation, updateVal );
 		addElement( playerStartingRotation );
 		
 		var skyColor:ComponentVector3D = new ComponentVector3D( markDirty, "Sky Color", "R: ", "G: ", "B: ",  _region.getSkyColor(), updateVal );
@@ -162,13 +162,16 @@ public class WindowRegionDetail extends VVPopup
 	private function save( e:UIMouseEvent ):void {
 		
 		if ( _create ) {
-			var dboTemp:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_REGIONS, _region.guid, "1", 0, true, null );
-			_region.dbo = dboTemp;
-			_region.toPersistance();
+//			var dboTemp:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_REGIONS, "0", "0", 0, true, null );
+//			_region.dbo = dboTemp;
+//			_region.toObject();
 			// remove the event listeners on this temporary object
-			_region.release();
+//			_region.release();
+			//
+			var pe:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true )
+			RegionManager.instance.regionAdd( pe, _region );
 			// This tell the region manager to add it to the region list
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, dboTemp, true ) );			
+			//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true ) );			
 			// This tell the region to save itself!
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, _region.guid ) );
 		}

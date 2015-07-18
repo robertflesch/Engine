@@ -149,57 +149,63 @@ public class InstanceInfo extends Location	{
 	public function clone():InstanceInfo
 	{
 		var ii:InstanceInfo = new InstanceInfo();
-		var obj:Object = new Object();
-		buildExportObject( obj );
+		var obj:Object = buildExportObject();
 		ii.initJSON( obj );
 		ii.instanceGuid = Globals.getUID();
 		return ii;
 	}
 	
-	public function buildExportObject( obj:Object ):void {	
+	private function vector3DToObject( $vec:Vector3D ):Object {
+		return { x:int($vec.x), y:int($vec.y), z:int($vec.z) };
+	}
+	
+	public function buildExportObject():Object {	
 		
-		obj.model = new Object();
-		obj.model.instanceGuid		= instanceGuid; 
-		obj.model.modelGuid 		= modelGuid;
-		obj.model.location			= positionGet;
-		obj.model.rotation 			= rotationGet;
-		obj.model.center 			= centerNotScaled;
-		obj.model.collision 		= _collidable;
-		obj.model.baseLightLevel 	= baseLightLevel;
+		var instanceInfo:Object = new Object();
+		instanceInfo.instanceGuid		= instanceGuid; 
+		instanceInfo.modelGuid 			= modelGuid;
+		instanceInfo.location 			= vector3DToObject( positionGet );
+		instanceInfo.collision 			= _collidable;
+		instanceInfo.baseLightLevel 	= baseLightLevel;
 		
-		if ( _usesCollision )
-			obj.model.collision 	= _usesCollision;
-		if ( _critical )
-			obj.model.critical		= _critical;
-		if ( _grainSize )
-			obj.model.grainSize		= _grainSize;
-		if ( velocityGet.length )
-			obj.model.velocity			= velocityGet;
-		if ( 3 != scale.lengthSquared )
-			obj.model.scale 			= scale;
+//		if ( 0 < rotationGet.length )
+			instanceInfo.rotation 		= vector3DToObject( rotationGet );
+//		if ( 0 < centerNotScaled.length )
+			instanceInfo.center 		= vector3DToObject( centerNotScaled );
+//		if ( velocityGet.length )
+			instanceInfo.velocity		= vector3DToObject( velocityGet );
+//		if ( 3 != scale.lengthSquared )
+			instanceInfo.scale 			= vector3DToObject( scale );
+//		if ( _usesCollision )
+			instanceInfo.collision 		= _usesCollision;
+//		if ( _critical )
+			instanceInfo.critical		= _critical;
+//		if ( _grainSize ) // this is only used to override biomes data. So only from a generate script
+//			instanceInfo.grainSize		= _grainSize;
 		if ( "" != _state )
-			obj.model.state				= _state;
+			instanceInfo.state			= _state;
 // This is saving the animation transforms into the instanceInfotransforms			
 // do I add transforms in the instanceInfo? RSF - 4.27.15
 //		if ( _transforms && 0 < _transforms.length )
 //			obj.model.transforms		= _transforms;
-		instanceScriptOnly( obj.model );  //
+//		instanceScriptOnly( obj.model );  //
+		
+		return instanceInfo;
 		
 		function instanceScriptOnly( obj:Object ):void {
-			
-			var oa:Vector.<Object> = new Vector.<Object>();
-			var len:int = _scripts.length;
-			for each ( var script:Script in _scripts ) {
-			if ( !script.modelScript ) {
-					var so:Object = new Object();
-					so.name = Script.getCurrentClassName( script );
-					Log.out( "InstanceInfo.instanceScriptOnly - script: " + script );
-					oa.push( so );
-				}
+			if ( _scripts.length ) {
+				var scripts:Object = new Object();
+				for ( var i:int; i < _scripts.length; i++ ) {
+					if ( _scripts[i]  && !_scripts[i].modelScript ) {
+						Log.out( "InstanceInfo.instanceScriptOnly - script: " + _scripts[i] );
+						scripts["script" + i] = Script.getCurrentClassName( _scripts[i] );
+				}	}
+				obj.scripts = scripts;
 			}
-			if ( oa.length )
-				obj.scripts = oa;
-		}
+			else {
+				if ( obj.scripts )
+					delete obj.scripts
+		}	}
 	}
 	
 	

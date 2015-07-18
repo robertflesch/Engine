@@ -14,7 +14,7 @@ import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.Permissions;
+import com.voxelengine.worldmodel.PermissionsModel;
 import flash.events.Event;
 import flash.utils.ByteArray;
 import playerio.DatabaseObject;
@@ -27,7 +27,7 @@ public class AnimationMetadata
 {
 	static private const INVALID:String = "INVALID"
 	private var _dbo:DatabaseObject;
-	private var _permissions:Permissions;
+	private var _permissions:PermissionsModel;
 /*	private var _name:String 		= INVALID;
 	private var _guid:String 		= INVALID;
 	private var _aniType:String 	= INVALID;
@@ -168,7 +168,7 @@ public class AnimationMetadata
 		if ( !$dbo.permissions )
 			_dbo.permissions = new Object();
 			
-		_permissions = new Permissions( _dbo.permissions );
+		_permissions = new PermissionsModel( _dbo.permissions );
 		
 		var ba:ByteArray = $dbo.data;
 		try { ba.uncompress(); }

@@ -21,7 +21,7 @@ import com.voxelengine.Log;
  * http://wiki.secondlife.com/wiki/Permission
  * 
  */
-public class Permissions
+public class PermissionsModel
 {
 	static public const COPY_COUNT:int			= 2048;
 	static public const BIND_NONE:String 		= "BIND_NONE";
@@ -53,7 +53,7 @@ public class Permissions
 	public function get blueprint():Boolean 				{ return _permissions.blueprint; }
 	public function set blueprint(value:Boolean):void 		{ _permissions.blueprint = value; }
 	
-	public function Permissions( $permissions:Object ) {
+	public function PermissionsModel( $permissions:Object ) {
 		_permissions = $permissions;
 		if ( $permissions.copyCount )
 			return;
@@ -66,17 +66,5 @@ public class Permissions
 		$permissions.createdDate	= new Date();
 		$permissions.binding		= BIND_NONE;
 	}
-	/*
-	public function clone():Permissions {
-		var newP:Permissions = new Permissions();
-		newP.copyCount 		= _copyCount;
-		newP.modify			= _modify;
-		newP.blueprintGuid	= new String( _blueprintGuid );
-		newP.creator		= new String( _creator );
-		newP.createdDate	= _createdDate;
-		newP.binding		= new String( _binding );
-		return newP;
-	}
-	*/
 }
 }

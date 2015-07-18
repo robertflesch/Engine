@@ -415,20 +415,14 @@ public class ModelInfo extends PersistanceObject
 		function childrenGet():int {
 		// Same code that is in modelCache to build models in region
 		// this is just models in models
-			var oc:Vector.<Object> = new Vector.<Object>();
+			var children:Object = new Object();
 			for ( var i:int; i < _childrenInstanceInfo.length; i++ ) {
 				if ( null != _childrenInstanceInfo[i] ) {
-					var io:Object = new Object();
-					_childrenInstanceInfo[i].buildExportObject( io );
-					oc.push( io );
-				}
-			}
+					children["instanceInfo" + i]  = _childrenInstanceInfo[i].buildExportObject();
+			}	}
 
-			var len:int = oc.length;
-			if ( 0 < len )
-				_info.children = JSON.stringify( oc );
-			oc = null;
-			return len;
+			_info.children = children;
+			return i;
 		}
 		/*
 		function animationsGet():void {
@@ -541,7 +535,6 @@ public class ModelInfo extends PersistanceObject
 		}
 	}
 	
-	
 	public function childrenLoad( $vm:VoxelModel ):void {
 		if ( childrenInstanceInfo && 0 < childrenInstanceInfo.length)
 		{
@@ -580,10 +573,8 @@ public class ModelInfo extends PersistanceObject
 				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 				// if we save the model, before it is complete, we put bad child data into model info
 				childrenLoaded = true;
-			}
-		}
+		}	}	
 	}
-	
 
 	public function childRemoveByGC( $gc:GrainCursor ):Boolean {
 		

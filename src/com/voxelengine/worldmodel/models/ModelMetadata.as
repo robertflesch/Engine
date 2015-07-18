@@ -22,7 +22,7 @@ import playerio.DatabaseObject;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.worldmodel.Permissions;
+import com.voxelengine.worldmodel.PermissionsModel;
 import com.voxelengine.events.ModelBaseEvent;
 
 /**
@@ -32,12 +32,12 @@ import com.voxelengine.events.ModelBaseEvent;
  */
 public class ModelMetadata extends PersistanceObject
 {
-	private var _permissions:Permissions;
+	private var _permissions:PermissionsModel;
 	private var _thumbnail:BitmapData;
 	private var _info:Object;
 	
-	public function get permissions():Permissions 			{ return _permissions; }
-	public function set permissions( val:Permissions):void	{ _permissions = val; changed = true; }
+	public function get permissions():PermissionsModel 			{ return _permissions; }
+	public function set permissions( val:PermissionsModel):void	{ _permissions = val; changed = true; }
 	
 	public function get name():String  						{ return _info.name; }
 	public function set name(value:String):void  			{ _info.name = value; changed = true; }
@@ -114,7 +114,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	}
 	
 	//////////////////////////////////////////////////////////////////
-	// TO Persistance
+	// Persistance
 	//////////////////////////////////////////////////////////////////
 	private function toObject():void {
 		if ( thumbnail )
@@ -123,17 +123,19 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 			_info.thumbnail = null;
 	}
 	
-	////////////////////////////////////////////////////////////////
-	// FROM Persistance
-	////////////////////////////////////////////////////////////////
+
+	// These two functions are slighting different in that the import uses
+	// $dbo.data
+	// and the read direct from persistance uses
+	// $dbo directly
+	// I abstract it away using the _info object
+	// it was needed to save the data in an abstract way.
 	public function fromObjectImport( $dbo:DatabaseObject ):void {
 		_dbo = $dbo;
-		if ( !dbo.data || !dbo.data )
-			return;
-			
+		if ( !dbo.data )
+			throw new Error( "ModelMetaData.fromObjectImport - NO DBO or DBO data" );
 		_info = $dbo.data;	
 		loadFromInfo();	
-		changed = true;
 	}
 
 	public function fromObject( $dbo:DatabaseObject ):void {
@@ -141,20 +143,21 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		_info = $dbo;	
 		
 		loadFromInfo();	
-		changed = false;
 	}
 	
 	private function loadFromInfo():void {
 		if ( !_info.permissions )
 			_info.permissions = new Object();
-			
-		_permissions = new Permissions( _info.permissions );
+		
+		// the permission object is just an encapsulation of the permissions section of the object
+		_permissions = new PermissionsModel( _info.permissions );
 		
 		if ( _info.thumbnail ) {
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.INIT, function(event:Event):void { thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData; } );
 			loader.loadBytes( _info.thumbnail );			
 		}
+		changed = false;
 	}
 }
 }

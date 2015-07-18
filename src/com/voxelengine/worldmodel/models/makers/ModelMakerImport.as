@@ -14,7 +14,7 @@ import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.Permissions;
+import com.voxelengine.worldmodel.PermissionsModel;
 import flash.utils.ByteArray;
 import org.flashapi.swing.Alert;
 import playerio.DatabaseObject;

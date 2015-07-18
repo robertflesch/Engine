@@ -124,22 +124,18 @@ public class RegionManager
 		if ( Globals.BIGDB_TABLE_REGIONS == $pe.table ) {
 			//Log.out( "RegionManager.loadSucceed - creating new region: " + $pe.guid, Log.DEBUG );
 			var newRegion:Region = new Region( $pe.guid );
-			newRegion.fromPersistance( $pe.dbo );
-			// When I create a new region I have to create a temporary DBO to transfer metadata and data.
-			// otherwise the $pe.data will be false or null. This temporary DBO must be removed before the region is saved.
-			if ( $pe.data && true == $pe.data )
-				newRegion.dbo = null;
+			newRegion.fromObject( $pe.dbo );
 			regionAdd( $pe, newRegion );
 		}
 		// Bad thing about this is it ignores all the metadata
 		else if ( Globals.REGION_EXT == $pe.table ) {
 			var region:Region = new Region( $pe.guid );
-			region.initJSON( $pe.data );
-			regionAdd( null, region );
+//			region.initJSON( $pe.data );
+//			regionAdd( null, region );
 		}
 	}
 	
-	private function regionAdd( $pe:PersistanceEvent, $region:Region ):void {
+	public function regionAdd( $pe:PersistanceEvent, $region:Region ):void {
 		//Log.out( "RegionManager.regionAdd - adding region: " + $region.guid, Log.DEBUG );
 		if ( false == regionHas( $region.guid ) ) {
 			_regions.push( $region );

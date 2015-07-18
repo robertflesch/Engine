@@ -241,18 +241,14 @@ package com.voxelengine.worldmodel.models
 			//}
 		//}
 
-		public function buildExportObject( obj:Object ):void {
-			
-			var oa:Vector.<Object> = new Vector.<Object>();
-			for each ( var vm:VoxelModel in _instances ) {
+		public function buildExportObject():void {
+			var models:Object = new Object();
+			for ( var i:int; i < _instances.length; i++ ) {
+				var vm:VoxelModel = _instances[i];
 				if ( vm is Player )
 					continue;
-				var io:Object = new Object();
-				vm.instanceInfo.buildExportObject( io );
-				oa.push( io );
+				models["instanceInfo" + i] = vm.instanceInfo.buildExportObject();
 			}
-			if ( oa.length )
-				obj.models = oa;
 		}
 		
 		public function bringOutYourDead():void {

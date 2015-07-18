@@ -9,7 +9,7 @@ package com.voxelengine.worldmodel.models.types
 {
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelLoadingEvent;
-import com.voxelengine.worldmodel.Permissions;
+import com.voxelengine.worldmodel.PermissionsModel;
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;

@@ -13,7 +13,7 @@ import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.Permissions;
+import com.voxelengine.worldmodel.PermissionsModel;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
