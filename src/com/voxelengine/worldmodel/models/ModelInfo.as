@@ -418,7 +418,7 @@ public class ModelInfo extends PersistanceObject
 			var children:Object = new Object();
 			for ( var i:int; i < _childrenInstanceInfo.length; i++ ) {
 				if ( null != _childrenInstanceInfo[i] ) {
-					children["instanceInfo" + i]  = _childrenInstanceInfo[i].buildExportObject();
+					children["instanceInfo" + i]  = _childrenInstanceInfo[i].toObject();
 			}	}
 
 			_info.children = children;

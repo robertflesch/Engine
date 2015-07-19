@@ -79,11 +79,11 @@ public class Inventory extends PersistanceObject implements IPersistance
 		else
 			Log.out( "Inventory.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
 	}
-/*
-	public function toObject():void {
-		var ba:ByteArray = new ByteArray();	
-		_obj.ba = toByteArray( ba );
-	}
+
+	//public function toObject():void {
+		//var ba:ByteArray = new ByteArray();	
+		//_obj.ba = toByteArray( ba );
+	//}
 	
 	public function fromObject( $object:Object, $ba:ByteArray ):void { }
 	
@@ -93,9 +93,7 @@ public class Inventory extends PersistanceObject implements IPersistance
 		var ba:ByteArray = new ByteArray(); 
 		_dbo.data 			= toByteArray( ba );
 	}
-*/
-	// If $dbo is null then the default data is loaded
-	public function toPersistance():void {}
+
 
 	public function fromPersistance( $dbo:DatabaseObject ):void {
 		

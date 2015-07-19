@@ -55,7 +55,8 @@ public class PermissionsModel
 	
 	public function PermissionsModel( $permissions:Object ) {
 		_permissions = $permissions;
-		if ( $permissions.copyCount )
+		// If permissions already exist dont reset them.
+		if ( $permissions.createdDate || $permissions.creator )
 			return;
 			
 		$permissions.copyCount 		= COPY_COUNT;
@@ -64,6 +65,7 @@ public class PermissionsModel
 		$permissions.blueprintGuid	= null;
 		$permissions.creator		= Network.userId;
 		$permissions.createdDate	= new Date();
+		$permissions.modifyDate		= new Date();
 		$permissions.binding		= BIND_NONE;
 	}
 }

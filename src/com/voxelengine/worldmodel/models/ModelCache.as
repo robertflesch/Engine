@@ -247,7 +247,7 @@ package com.voxelengine.worldmodel.models
 				var vm:VoxelModel = _instances[i];
 				if ( vm is Player )
 					continue;
-				models["instanceInfo" + i] = vm.instanceInfo.buildExportObject();
+				models["instanceInfo" + i] = vm.instanceInfo.toObject();
 			}
 			return models;
 		}

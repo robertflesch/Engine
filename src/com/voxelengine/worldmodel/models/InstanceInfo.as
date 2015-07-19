@@ -149,7 +149,7 @@ public class InstanceInfo extends Location	{
 	public function clone():InstanceInfo
 	{
 		var ii:InstanceInfo = new InstanceInfo();
-		var obj:Object = buildExportObject();
+		var obj:Object = toObject();
 		ii.fromObject( obj );
 		ii.instanceGuid = Globals.getUID();
 		return ii;
@@ -159,7 +159,7 @@ public class InstanceInfo extends Location	{
 		return { x:int($vec.x), y:int($vec.y), z:int($vec.z) };
 	}
 	
-	public function buildExportObject():Object {	
+	public function toObject():Object {	
 		
 		var instanceInfo:Object = new Object();
 		instanceInfo.instanceGuid		= instanceGuid; 
@@ -168,22 +168,22 @@ public class InstanceInfo extends Location	{
 		instanceInfo.collision 			= _collidable;
 		instanceInfo.baseLightLevel 	= baseLightLevel;
 		
-//		if ( 0 < rotationGet.length )
+		if ( 0 < rotationGet.length )
 			instanceInfo.rotation 		= vector3DToObject( rotationGet );
-//		if ( 0 < centerNotScaled.length )
+		if ( 0 < centerNotScaled.length )
 			instanceInfo.center 		= vector3DToObject( centerNotScaled );
-//		if ( velocityGet.length )
+		if ( velocityGet.length )
 			instanceInfo.velocity		= vector3DToObject( velocityGet );
-//		if ( 3 != scale.lengthSquared )
+		if ( 3 != scale.lengthSquared )
 			instanceInfo.scale 			= vector3DToObject( scale );
-//		if ( _usesCollision )
+		if ( _usesCollision )
 			instanceInfo.collision 		= _usesCollision;
-//		if ( _critical )
+		if ( _critical )
 			instanceInfo.critical		= _critical;
 //		if ( _grainSize ) // this is only used to override biomes data. So only from a generate script
 //			instanceInfo.grainSize		= _grainSize;
-		if ( "" != _state )
-			instanceInfo.state			= _state;
+//		if ( "" != _state )
+//			instanceInfo.state			= _state;
 // This is saving the animation transforms into the instanceInfotransforms			
 // do I add transforms in the instanceInfo? RSF - 4.27.15
 //		if ( _transforms && 0 < _transforms.length )
