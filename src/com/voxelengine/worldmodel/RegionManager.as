@@ -41,8 +41,7 @@ public class RegionManager
 		return _s_instance	
 	}
 	
-	public function RegionManager():void 
-	{
+	public function RegionManager():void {
 		_regions = new Vector.<Region>;
 
 		RegionEvent.addListener( RegionEvent.JOIN, 				requestServerJoin ); 
@@ -64,8 +63,7 @@ public class RegionManager
 	 * @return - None
 	 * Generates Event RegionEvent.UNLOAD if it is the current region
 	*/
-	private function regionLoad( $re:RegionEvent ):void
-	{
+	private function regionLoad( $re:RegionEvent ):void {
 		Log.out( "RegionManager.load - region: " + $re.guid, Log.DEBUG );
 		WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.CREATE ) );
 		
@@ -73,7 +71,7 @@ public class RegionManager
 		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, $re.guid ) );
 	}
 	
-	private function regionRequest( $re:RegionEvent):void 	{
+	private function regionRequest( $re:RegionEvent):void {
 		
 		if ( null == $re.guid ) {
 			Log.out( "RegionManager.regionRequest guid rquested is NULL: ", Log.WARN );
@@ -110,8 +108,7 @@ public class RegionManager
 		}
 	}
 	
-	private function loadFail( $pe:PersistanceEvent ):void 
-	{
+	private function loadFail( $pe:PersistanceEvent ):void {
 		if ( Globals.BIGDB_TABLE_REGIONS != $pe.table && Globals.REGION_EXT != $pe.table )
 			return;
 			
@@ -119,8 +116,7 @@ public class RegionManager
 		throw new Error( "RegionManager.loadFail - why did I fail to load region PersistanceEvent: " + $pe.toString(), Log.WARN );
 	}
 	
-	private function loadSucceed( $pe:PersistanceEvent ):void 
-	{
+	private function loadSucceed( $pe:PersistanceEvent ):void {
 		if ( Globals.BIGDB_TABLE_REGIONS == $pe.table ) {
 			//Log.out( "RegionManager.loadSucceed - creating new region: " + $pe.guid, Log.DEBUG );
 			var newRegion:Region = new Region( $pe.guid );
@@ -148,8 +144,7 @@ public class RegionManager
 	////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////
 	
-	public function configComplete( $e:LoadingEvent ):void
-	{
+	public function configComplete( $e:LoadingEvent ):void {
 		startWithEmptyRegion();
 		
 		// Add a listener to tell when file has been loaded
@@ -157,8 +152,8 @@ public class RegionManager
 		// now request the file be loaded
 //		RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST, 0, $guid ) );
 	}
-	public function startWithEmptyRegion():void
-	{
+	
+	public function startWithEmptyRegion():void {
 		var startingRegion:Region = new Region( "Blank" );
 		startingRegion.createEmptyRegion();
 		regionAdd( null, startingRegion );
@@ -167,9 +162,7 @@ public class RegionManager
 		// This tells the config manager that the local region was loaded and is ready to load rest of data.
 	}
 	
-	
-	private function startingRegionLoaded( $re:RegionEvent):void 
-	{
+	private function startingRegionLoaded( $re:RegionEvent):void {
 		// remove this handler
 		RegionEvent.removeListener( ModelBaseEvent.ADDED, startingRegionLoaded );
 		// now load the file that was designated as the starting region
@@ -223,8 +216,7 @@ public class RegionManager
 	 * @return - region or null
 	 * 
 	*/
-	private function regionGet( $guid:String ):Region
-	{
+	private function regionGet( $guid:String ):Region {
 		for each ( var region:Region in _regions ) {
 			if ( region && region.guid == $guid ) {
 				return region;
@@ -233,8 +225,7 @@ public class RegionManager
 		return null;
 	}
 	
-	public function regionHas( $guid:String ):Boolean
-	{
+	public function regionHas( $guid:String ):Boolean {
 		for each ( var region:Region in _regions ) {
 			if ( region && region.guid == $guid ) {
 				return true;

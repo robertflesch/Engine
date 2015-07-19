@@ -39,19 +39,19 @@ public class PermissionsRegion
 	public function get guest():Boolean  { return _permissions.guest; }
 	public function set guest(value:Boolean):void  { _permissions.guest = value; }	
 
-	public function PermissionsRegion( $info:Object ) {
-		if ( $info.permissions ) {
-			_permissions = $info.permissions;
+	public function PermissionsRegion( $permissions:Object ) {
+		if ( $permissions ) {
+			_permissions = $permissions;
 			//if ( _permissions.editors )
 				//_editors = cvsToVector( _permissions.editors );
 			//if ( _permissions.admins )
 				//_admins = cvsToVector( _permissions.admins );
 		} else {
-			$info.permissions = new Object();
-			_permissions = $info.permissions;
-			$info.permissions.created = new Date();
-			$info.permissions.modified = new Date();
-			$info.permissions.guests = false;
+			$permissions = new Object();
+			_permissions = $permissions;
+			$permissions.created = new Date();
+			$permissions.modified = new Date();
+			$permissions.guests = false;
 			//$info.permissions.editors = [];
 			//$info.permissions.admins = [];
 		}

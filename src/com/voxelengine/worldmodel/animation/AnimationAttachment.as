@@ -44,7 +44,7 @@ package com.voxelengine.worldmodel.animation
 			
 			Log.out( "AnimationAttachment - _attachsTo: " + _attachsTo + " fileName: " + $json.fileName );
 			_instanceInfo = new InstanceInfo();
-			_instanceInfo.initJSON( $json );
+			_instanceInfo.fromObject( $json );
 		}
 
 		public function buildExportObject( obj:Object ):void {			

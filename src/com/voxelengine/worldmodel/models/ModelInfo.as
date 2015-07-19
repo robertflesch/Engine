@@ -501,7 +501,7 @@ public class ModelInfo extends PersistanceObject
 		Log.out( "ModelInfo.childrenFromObject", Log.DEBUG );
 		for each ( var v:Object in $children ) {
 			var ii:InstanceInfo = new InstanceInfo();
-			ii.initJSON( v.instanceInfo );
+			ii.fromObject( v.instanceInfo );
 			// This adds the instanceInfo for the child models to our child list which is processed when object is initialized
 			childrenInstanceInfoAdd( ii );
 		}

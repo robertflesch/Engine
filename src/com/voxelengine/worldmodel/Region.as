@@ -150,13 +150,13 @@ package com.voxelengine.worldmodel
 		}	
 		
 		// Makes sense, called from Region
-		public function loadRegionObjects( objects:Array ):int {
+		public function loadRegionObjects( $models:Object ):int {
 			Log.out( "Region.loadRegionObjects - START =============================" );
 			var count:int = 0;
-			for each ( var v:Object in objects ) {
-				if ( v.model ) {
+			for each ( var v:Object in $models ) {
+				if ( v ) {
 					var instance:InstanceInfo = new InstanceInfo();
-					instance.initJSON( v.model );
+					instance.fromObject( v );
 					if ( !instance.instanceGuid )
 						instance.instanceGuid = Globals.getUID();
 					ModelMakerBase.load( instance );
@@ -220,41 +220,6 @@ package com.voxelengine.worldmodel
 			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 			//RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, 0, guid ) );
 		}
-		/*
-		public function initJSON( $regionJson:String ):void {
-			//Log.out( "Region.processRegionJson: " + $regionJson );
-			_JSON = JSONUtil.parse( $regionJson, name + Globals.REGION_EXT, "Region.initJSON" );
-			if ( null == _JSON ) {
-				(new Alert( "Region.initJSON - Error Parsing: " + name + Globals.APP_EXT, 500 ) ).display();
-				return;
-			}
-			
-			if ( _JSON.skyColor ) {
-				// legacy < v008 has rgb values
-				if ( _JSON.skyColor.r )
-					setSkyColor( _JSON.skyColor.r, _JSON.skyColor.g, _JSON.skyColor.b );
-				else	
-					_skyColor.setTo( _JSON.skyColor.x, _JSON.skyColor.y, _JSON.skyColor.z );
-			}
-				
-			if ( _JSON.name && "" == _name )
-				_name = _JSON.name;
-
-			if ( _JSON.desc  && "" == _desc )
-				_desc = _JSON.desc;
-				
-			if ( _JSON.gravity )
-				_gravity = true;
-			else		
-				_gravity = false;
-				
-			if ( _JSON.playerPosition )
-				_playerPosition.setTo( _JSON.playerPosition.x, _JSON.playerPosition.y, _JSON.playerPosition.z );
-			
-			if ( _JSON.playerRotation )
-				_playerRotation.setTo( 0, _JSON.playerRotation.y, 0 );
-		}
-		*/
 		public function toString():String {
 
 			// This does not generate valid JSON
@@ -273,8 +238,6 @@ package com.voxelengine.worldmodel
 				//VoxelModel.controlledModel.instanceInfo.positionSetComp(0,0,0);
 			}
 		}
-		
-
 		
 		public function applyRegionInfoToPlayer( $avatar:Player ):void {
 			//Log.out( "Region.applyRegionInfoToPlayer" );
@@ -325,29 +288,13 @@ package com.voxelengine.worldmodel
 		
 		public function toObject():void {
 			if ( _modelCache )
-				_info.models = _modelCache.buildExportObject();
+				_info.models = _modelCache.toObject();
 			else
 				_info.models = [];
 				
 			_permissions.toObject();
 		}
 		
-		/*
-		private function metadata( ba: ByteArray ):Object {
-			Log.out( "Region.metadata userId: " + Network.userId + "  name: " + name + "  this region is owned by: " + _owner, Log.DEBUG );
-			return {
-					admin: 			adminListGet(),
-					created: 		_created ? _created : _created = new Date(),
-					modified: 		_modified = new Date(),
-					data: 			ba,
-					description: 	_desc,
-					editors: 		editorsListGet(),
-					name: 			_name,
-					owner:  		_owner,
-					worldId: 			_worldId
-					};
-		}
-		*/
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		// fromPersistance
 		////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -365,7 +312,7 @@ package com.voxelengine.worldmodel
 			_info = $dbo.data;
 			_info.worldId = Globals.VOXELVERSE;
 			_info.name = "NewRegion";
-			_info.desc = "What is special about this region";
+			_info.desc = "Describe what is special about this region";
 			_info.playerPosition = new Object();
 			_info.playerRotation = new Object();
 			_info.playerPosition.x = _info.playerPosition.y = _info.playerPosition.z = 0;
@@ -379,9 +326,9 @@ package com.voxelengine.worldmodel
 			// push it into the vector3d
 			setSkyColor( _info.skyColor.r, _info.skyColor.g, _info.skyColor.b );
 			
-			for each ( var model:Object in _info.models ) {
+			for each ( var instanceInfo:Object in _info.models ) {
 				var ii:InstanceInfo = new InstanceInfo();
-				ii.initJSON( model.instanceInfo );
+				ii.fromObject( instanceInfo );
 			}
 		}
 		

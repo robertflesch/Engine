@@ -241,7 +241,7 @@ package com.voxelengine.worldmodel.models
 			//}
 		//}
 
-		public function buildExportObject():void {
+		public function toObject():Object {
 			var models:Object = new Object();
 			for ( var i:int; i < _instances.length; i++ ) {
 				var vm:VoxelModel = _instances[i];
@@ -249,6 +249,7 @@ package com.voxelengine.worldmodel.models
 					continue;
 				models["instanceInfo" + i] = vm.instanceInfo.buildExportObject();
 			}
+			return models;
 		}
 		
 		public function bringOutYourDead():void {

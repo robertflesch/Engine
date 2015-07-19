@@ -51,7 +51,7 @@ public class InstanceInfo extends Location	{
 	private var _scripts:Vector.<Script> 			= new Vector.<Script>			// INSTANCE NOT EXPORTED
 	private var _controllingModel:VoxelModel 		= null;    						// INSTANCE NOT EXPORTED
 	private var _owner:VoxelModel 					= null;               			// INSTANCE NOT EXPORTED
-	private var _creationJSON:Object 				= null;                         // INSTANCE NOT EXPORTED
+	private var _info:Object 				= null;                         // INSTANCE NOT EXPORTED
 	private var _state:String 						= "";							// INSTANCE NOT EXPORTED
 	
 	private var _life:Vector3D 						= new Vector3D(1, 1, 1);		// INSTANCE NOT EXPORTED
@@ -141,7 +141,7 @@ public class InstanceInfo extends Location	{
 		_scripts			= null;
 		_controllingModel	= null;    						
 		_owner				= null;               			
-		_creationJSON		= null;                         
+		_info		= null;                         
 		_state				= null;
 		_life				= null;		
 	}
@@ -150,7 +150,7 @@ public class InstanceInfo extends Location	{
 	{
 		var ii:InstanceInfo = new InstanceInfo();
 		var obj:Object = buildExportObject();
-		ii.initJSON( obj );
+		ii.fromObject( obj );
 		ii.instanceGuid = Globals.getUID();
 		return ii;
 	}
@@ -213,8 +213,8 @@ public class InstanceInfo extends Location	{
 	public function explosionClone():InstanceInfo
 	{
 		var ii:InstanceInfo = new InstanceInfo();
-		if ( null != _creationJSON )
-			ii.initJSON( _creationJSON );
+		if ( null != _info )
+			ii.fromObject( _info );
 		
 		ii.dynamicObject = true;
 		
@@ -244,51 +244,51 @@ public class InstanceInfo extends Location	{
 		return modelGuid;	
 	}
 	
-	public function initJSON( json:Object ):void {
+	public function fromObject( $info:Object ):void {
 		// Save off a copy of this in case we need multiple instances
-		if ( json.model )
-			_creationJSON = json.model;
+		if ( $info.model )
+			_info = $info.model;
 		else
-			_creationJSON = json;
+			_info = $info;
 		
 		// fileName == templateName == guid ALL THE SAME
-		if ( _creationJSON.fileName ) {
-			modelGuid = _creationJSON.fileName;
+		if ( _info.fileName ) {
+			modelGuid = _info.fileName;
 		}
 		
-		if ( _creationJSON.modelGuid ) {
-			modelGuid = _creationJSON.modelGuid;
+		if ( _info.modelGuid ) {
+			modelGuid = _info.modelGuid;
 		}
 		
-		if ( _creationJSON.instanceGuid ) {
-			_instanceGuid = _creationJSON.instanceGuid;
+		if ( _info.instanceGuid ) {
+			_instanceGuid = _info.instanceGuid;
 		}
 			
-		if ( _creationJSON.name )
+		if ( _info.name )
 		{
 			if ( owner && owner.metadata ) {
-				owner.metadata.name = _creationJSON.name;
-				Log.out( "InstanceInfo.initJSON - Setting Metadata Name from instance data: " + _creationJSON.name + "  guid: " + modelGuid );
+				owner.metadata.name = _info.name;
+				Log.out( "InstanceInfo.fromObject - Setting Metadata Name from instance data: " + _info.name + "  guid: " + modelGuid );
 			}
 		}
 		
-		if ( _creationJSON.state )
-			_state = _creationJSON.state;
+		if ( _info.state )
+			_state = _info.state;
 
-		if ( _creationJSON.baseLightLevel )
-			baseLightLevel = _creationJSON.baseLightLevel;
+		if ( _info.baseLightLevel )
+			baseLightLevel = _info.baseLightLevel;
 					
-		setPositionalInfo( _creationJSON );
-		setScaleInfo( _creationJSON );
-		setCenterInfo( _creationJSON );
-		setTypeInfo( _creationJSON );
-		setTransformInfo( _creationJSON );
+		setPositionalInfo( _info );
+		setScaleInfo( _info );
+		setCenterInfo( _info );
+		setTypeInfo( _info );
+		setTransformInfo( _info );
 		// moved to shader
 //			setTextureInfo( _creationJSON );
-		setShaderInfo( _creationJSON );
-		setScriptInfo( _creationJSON );
-		setCollisionInfo( _creationJSON );
-		setCriticalInfo( _creationJSON );
+		setShaderInfo( _info );
+		setScriptInfo( _info );
+		setCollisionInfo( _info );
+		setCriticalInfo( _info );
 	}
 	
 	public function addScript( scriptName:String, $modelScript:Boolean, params:* = null ):Script
@@ -315,92 +315,89 @@ public class InstanceInfo extends Location	{
 		return script;
 	}
 	
-	public function setScriptInfo( json:Object ):void
-	{
-		if ( json.script && ( 0 < json.script.length ) )
+	public function setScriptInfo( $info:Object ):void {
+		if ( $info.script && ( 0 < $info.script.length ) )
 		{
-			for each ( var scriptObject:Object in json.script ) {
+			for each ( var scriptObject:Object in $info.script ) {
 				if ( scriptObject.name ) {
-					//trace( "ModelInfo.init - Model GUID:" + fileName + "  adding script: " + scriptObject.name );
+					//trace( "InstanceInfo.setScriptInfo - Model GUID:" + fileName + "  adding script: " + scriptObject.name );
 					addScript( scriptObject.name, false );
 				}
 			}
-			
 		}
 	}
 	
-	public function setCriticalInfo( json:Object ):void
-	{
-		if ( json.critical )
+	public function setCriticalInfo( $info:Object ):void {
+		if ( $info.critical )
 		{
-			var criticalJson:String = json.critical;
+			var criticalJson:String = $info.critical;
 			if ( "true" == criticalJson.toLowerCase() )
 			{
 				critical = true;
 			}
 		}
 	}
-	public function setCollisionInfo( json:Object ):void
-	{
+	
+	public function setCollisionInfo( $info:Object ):void {
 		// is this object able to be collided with 
 		_collidable = true;
 		var collideable:String;
-		if ( json.collidable )
+		if ( $info.collidable )
 		{
-			collideable = json.collidable;
+			collideable = $info.collidable;
 			if ( "false" == collideable.toLowerCase() )
 				_collidable = false;
 		}	
-		if ( json.collideable )
+		if ( $info.collideable )
 		{
-			collideable = json.collideable;
+			collideable = $info.collideable;
 			if ( "false" == collideable.toLowerCase() )
 				_collidable = false;
 		}
 		
 		// does this object attempt to collide with other objects?
 		_usesCollision = false;
-		if ( json.collision )
+		if ( $info.collision )
 		{
-			var collision:String = json.collision;
+			var collision:String = $info.collision;
 			if ( "true" == collision.toLowerCase() )
 				_usesCollision = true;
 		}
 	}
 	
 	
-	public function setShaderInfo( json:Object ):void
-	{
-		if ( json.shader )
-			_shader = json.shader;
+	public function setShaderInfo( $info:Object ):void {
+		if ( $info.shader )
+			_shader = $info.shader;
 	}
 	
-	public function setTypeInfo( json:Object ):void
-	{
+	public function setTypeInfo( $info:Object ):void {
 	
-		if ( json.type )
+		if ( $info.type )
 		{
 			var typeString:String = "INVALID";
-			typeString = json.type.toLowerCase();
+			typeString = $info.type.toLowerCase();
 			_type = TypeInfo.getTypeId( typeString );
 			if ( TypeInfo.INVALID == type )
-				Log.out( "LayerInfo.initJSON - WARNING - INVALID type found: " + typeString, Log.WARN );
+				Log.out( "InstanceInfo.setTypeInfo - WARNING - INVALID type found: " + typeString, Log.WARN );
 		}
 		
-		if ( json.grainSize )
-			_grainSize = 	json.grainSize;
-		else if ( json.GrainSize )
-			_grainSize = 	json.GrainSize;
-		else if ( json.grainsize )
-			_grainSize = 	json.grainsize;
+		if ( $info.grainSize )
+			_grainSize = 	$info.grainSize;
+		else if ( $info.GrainSize )
+			_grainSize = 	$info.GrainSize;
+		else if ( $info.grainsize )
+			_grainSize = 	$info.grainsize;
 	}
 	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Tranformation functions
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO Do I need name for transformation here?
-	public function setTransformInfo( json:Object ):void
-	{
-		if ( json.transforms )
+	public function setTransformInfo( $info:Object ):void {
+		if ( $info.transforms )
 		{
-			for each ( var modelTransform:Object in json.transforms )
+			for each ( var modelTransform:Object in $info.transforms )
 			{
 				Log.out( "InstanceInfo.setTransformInfo - modelTransform.type: " + modelTransform.type , Log.WARN );
 				var transformType:int
@@ -425,8 +422,7 @@ public class InstanceInfo extends Location	{
 		}
 	}
 
-	public function advance( $elapsedTimeMS:int ):Boolean
-	{
+	public function advance( $elapsedTimeMS:int ):Boolean {
 		var index:int = 0;
 		for each ( var trans:ModelTransform in transforms )
 		{
@@ -454,13 +450,9 @@ public class InstanceInfo extends Location	{
 		return false;
 	}
 	
-	public function update( $elapsedTimeMS:int ):Boolean
-	{
-		return advance( $elapsedTimeMS );
-	}
+	public function update( $elapsedTimeMS:int ):Boolean { return advance( $elapsedTimeMS ); }
 	
-	public function removeNamedTransform( type:int, name:String ):void 
-	{
+	public function removeNamedTransform( type:int, name:String ):void {
 		var index:int = 0;
 		// see if the transformations contain one already with this name.
 		for each ( var mt:ModelTransform in transforms )
@@ -476,8 +468,8 @@ public class InstanceInfo extends Location	{
 		}
 	}
 	
-	public function removeAllNamedTransforms():void 
-	{
+	public function removeAllTransforms():void { transforms.length = 0; }
+	public function removeAllNamedTransforms():void {
 		//Log.out( "InstanceInfo.removeAllNamedTransforms", Log.WARN );
 		var index:int = 0;
 		// see if the transformations contain one already with this name.
@@ -504,25 +496,17 @@ public class InstanceInfo extends Location	{
 		}
 	}
 	
-	public function removeAllTransforms():void 
-	{
-		transforms.length = 0;
-	}
-	
-	public function addNamedTransform( x:Number, y:Number, z:Number, time:Number, type:int, name:String = "Default" ):void 
-	{
+	public function addNamedTransform( x:Number, y:Number, z:Number, time:Number, type:int, name:String = "Default" ):void {
 		removeNamedTransform( type, name );
 		addTransform( x, y, z, time, type, name );
 	}
 	
-	public function addNamedTransformMT( $mt:ModelTransform ):void 
-	{
+	public function addNamedTransformMT( $mt:ModelTransform ):void {
 		removeNamedTransform( $mt.type, $mt.name );
 		addTransformMT( $mt );
 	}
 	
-	public function updateNamedTransform( $mt:ModelTransform, $val:Number ):void 
-	{
+	public function updateNamedTransform( $mt:ModelTransform, $val:Number ):void {
 		var index:int = 0;
 		// see if the transformations contain one already with this name.
 		for each ( var mt:ModelTransform in transforms )
@@ -536,42 +520,35 @@ public class InstanceInfo extends Location	{
 		}
 	}
 	
-	public function addTransformMT( $mt:ModelTransform ):void 
-	{
+	public function addTransformMT( $mt:ModelTransform ):void {
 		//Log.out( "InstanceInfo.addTransformMT " + mt.toString() );
 		pushMT( $mt );
 	}
 
-	public function addTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" ):void 
-	{
+	public function addTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" ):void {
 		var mt:ModelTransform = new ModelTransform( $x, $y, $z, $time, $type, $name );
 		pushMT( mt );
 	}
 	
-	private function pushMT( $mt:ModelTransform ):void
-	{
+	private function pushMT( $mt:ModelTransform ):void {
 		$mt.assignToInstanceInfo( this );
 		transforms.push( $mt );
 	}
 	
 
 	// this is a scalar magnitude in g0 units
-	public function setSpeedMultipler ( v:Number ):Number
-	{
+	public function setSpeedMultipler ( v:Number ):Number {
 		Log.out( "InstanceInfo.setSpeedMultiper - was: " + _s_speedMultipler + " will be: " + v );
 		return _s_speedMultipler = v;
 	}
 	
-	public function reset():void
-	{
+	public function reset():void {
 		Region.resetPosition();
 		resetCamera();
 	}
 	
-	static private function resetCamera():void
-	{
-		if ( VoxelModel.controlledModel )
-		{
+	static private function resetCamera():void {
+		if ( VoxelModel.controlledModel ) {
 			VoxelModel.controlledModel.instanceInfo.rotationSet = new Vector3D( 0,0,0 );
 		}
 	}
@@ -579,8 +556,7 @@ public class InstanceInfo extends Location	{
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// WorldToModel and ModelToWorld
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	override public function worldToModel( v:Vector3D ):Vector3D
-	{
+	override public function worldToModel( v:Vector3D ):Vector3D {
 		if ( changed )
 			recalculateMatrix();
 		if ( _controllingModel )
@@ -589,8 +565,7 @@ public class InstanceInfo extends Location	{
 			return modelMatrix.transformVector( v );
 	}
 	
-	public function worldToModelNew( v:Vector3D, d:Vector3D ):void
-	{
+	public function worldToModelNew( v:Vector3D, d:Vector3D ):void {
 		if ( changed )
 			recalculateMatrix();
 		if ( _controllingModel ){ 
@@ -604,8 +579,7 @@ public class InstanceInfo extends Location	{
 	}
 	
 	// http://blog.bengarney.com/category/flash/
-	final public function transformVec(m:Matrix3D, i:Vector3D, o:Vector3D):void
-	{
+	final public function transformVec(m:Matrix3D, i:Vector3D, o:Vector3D):void {
 		const x:Number = i.x, y:Number = i.y, z:Number = i.z;
 		const d:Vector.<Number> = m.rawData;
 
@@ -615,8 +589,7 @@ public class InstanceInfo extends Location	{
 		o.w = x * d[3] + y * d[7] + z * d[11] + d[15];
 	}	
 	
-	override public function modelToWorld( v:Vector3D ):Vector3D
-	{
+	override public function modelToWorld( v:Vector3D ):Vector3D {
 		if ( changed )
 			recalculateMatrix();
 		if ( _controllingModel ) {
