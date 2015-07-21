@@ -189,6 +189,9 @@ public class  UserInventory extends QuickInventory
 			var bi:BoxInventory = e.dragOperation.initiator as BoxInventory;
 			var slotId:int = int( bi.name );
 			bi.reset();
+			hideGrainTools();
+			hideModelTools();
+			
 			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, _owner, slotId, null ) );
 			// sets edit cursor to none
 //			EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
