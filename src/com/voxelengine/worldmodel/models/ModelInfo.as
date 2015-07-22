@@ -42,7 +42,6 @@ import com.voxelengine.utils.transitions.properties.SoundShortcuts;
 public class ModelInfo extends PersistanceObject
 {
 	private var _childrenInstanceInfo:Vector.<InstanceInfo> 		= new Vector.<InstanceInfo>;// Child models and their relative positions
-	//private var _scripts:Vector.<String> 							= new Vector.<String>;		// Default scripts to be used with this model
 	private var _animations:Vector.<Animation> 						= new Vector.<Animation>();	// Animations that this model has
 	
 	private var _data:OxelPersistance;
@@ -227,7 +226,17 @@ public class ModelInfo extends PersistanceObject
 	// start script operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	// TODO add/remove script
+	public function scriptsLoad( $instanceInfo:InstanceInfo ):void {
+		// Both instanceInfo and modelInfo can have scripts. With each being persisted in correct location.
+		// Currently both are loaded into instanceInfo, which is not great, but it is quick, which is needed
+		if ( _info.scripts ) {
+			var len:int = _info.scripts.length;
+			for ( var index:int; index < len; index++ ) {
+				var scriptName:String = _info.scripts[index].name;
+				$instanceInfo.addScript( scriptName, true );
+			}
+		}
+	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//  start animation operations
@@ -379,8 +388,9 @@ public class ModelInfo extends PersistanceObject
 		if ( _info.biomes )
 			biomesFromObject( _info.biomes );
 		
-		if ( _info.scripts )
-			scriptsFromObject( _info.scripts );
+		// scripts are stored in the info object until needed, no more preloading
+		//scriptsFromObject( _info.scripts );
+		
 		if ( _info.children )
 			childrenFromObject( _info.children );
 		if ( _info.animations )
@@ -441,21 +451,6 @@ public class ModelInfo extends PersistanceObject
 			oa = null;
 		}
 		*/
-		/*
-		function modelsScriptOnly():void {
-			var os:Vector.<Object> = new Vector.<Object>();
-			var len:int = _scripts.length;
-			for ( var index:int; index < len; index++ ) {
-				var so:Object = new Object();
-				so.name = _scripts[index];
-				Log.out( "ModelInfo.modelsScriptOnly - script: " + _scripts[index] );
-				os.push( so );
-			}
-			if ( 0 < os.length ) 
-				_info.scripts = JSON.stringify( os );
-			os = null;
-		}
-		*/
 	} 	
 
 	private function biomesFromObject( $biomes:Object ):void {
@@ -468,14 +463,6 @@ public class ModelInfo extends PersistanceObject
 		// now remove the biome data from the object so it is not saved to persistance
 		delete _info.biomes;	
 		
-	}
-	private function scriptsFromObject( $scripts:Object ):void {
-		for each ( var so:Object in $scripts ) {
-			if ( so.name ) {
-				Log.out( "===== >>> FIX FIX - ModelInfo.init - Model GUID:" + guid + "  adding script: " + so.name, Log.WARN );
-				//_scripts.push( so.name );
-			}
-		}
 	}
 	private function animationsFromObject( $animations:Object ):void {
 	// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
@@ -523,16 +510,6 @@ public class ModelInfo extends PersistanceObject
 			}
 		}
 		_childrenInstanceInfo.push( $instanceInfo );
-	}
-	
-	public function scriptsLoad( $instanceInfo:InstanceInfo ):void {
-		// Both instanceInfo and modelInfo can have scripts. With each being persisted in correct location.
-		// Currently both are persisted to instanceInfo, which is very bad...
-		if ( $instanceInfo.scripts && 0 < $instanceInfo.scripts.length)
-		{
-			for each (var scriptName:String in scripts)
-				$instanceInfo.addScript( scriptName, true );
-		}
 	}
 	
 	public function childrenLoad( $vm:VoxelModel ):void {

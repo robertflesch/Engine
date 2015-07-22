@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.models.types
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
+	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.worldmodel.models.*;
 	import com.voxelengine.worldmodel.*;
@@ -48,7 +49,7 @@ package com.voxelengine.worldmodel.models.types
 		{
 			super.update(context, elapsedTimeMS);
 			
-			if ( VoxelModel.controlledModel && oxel )
+			if ( VoxelModel.controlledModel && modelInfo.data )
 			{
 				var wsPositionCenter:Vector3D = VoxelModel.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( VoxelModel.controlledModel.instanceInfo.center );
 				
@@ -61,9 +62,10 @@ package com.voxelengine.worldmodel.models.types
 				else
 					msPos = worldToModel( wsPositionCenter );
 
-				var gct:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
+				var ox:Oxel = modelInfo.data.oxel;
+				var gct:GrainCursor = GrainCursorPool.poolGet( ox.gc.bound );
 				gct.getGrainFromVector( msPos, 0 );
-				if ( gct.is_inside( oxel.gc ) )
+				if ( gct.is_inside( ox.gc ) )
 				{
 					// Only want to dispatch the event once per transition
 					if ( !_inside )
@@ -101,22 +103,22 @@ package com.voxelengine.worldmodel.models.types
 				if ( !_was_selected && null == _ba )
 				{
 					// this is a raw byte array, just oxel data.
-					_ba = oxel.toByteArray(_ba);
+					_ba = ox.toByteArray(_ba);
 				}
 				
-				var loco:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
+				var loco:GrainCursor = GrainCursorPool.poolGet(ox.gc.bound);
 				// this prunes the children oxel
-				oxel.write( instanceInfo.instanceGuid, loco.set_values( 0, 0, 0, grain ), TypeInfo.LEAF, true );
+				ox.write( instanceInfo.instanceGuid, loco.set_values( 0, 0, 0, grain ), TypeInfo.LEAF, true );
 				GrainCursorPool.poolDispose( loco );
-				oxel.facesSetAll();
-				oxel.faces_rebuild( instanceInfo.instanceGuid );
-				oxel.quadsBuild();
+				ox.facesSetAll();
+				ox.faces_rebuild( instanceInfo.instanceGuid );
+				ox.quadsBuild();
 				_was_selected = true;
 			}
 			else if ( _was_selected )
 			{
 				_was_selected = false;
-				var loco1:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
+				var loco1:GrainCursor = GrainCursorPool.poolGet(ox.gc.bound);
 				throw new Error( "Trigger.update - How to do this with new oxel model?" );
 				// this prunes the children oxel
 				//loco1.set_values( 0, 0, 0, oxel.gc.grain );

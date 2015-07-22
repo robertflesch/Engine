@@ -315,6 +315,16 @@ public class InstanceInfo extends Location	{
 		return script;
 	}
 	
+	public function scriptsLoad():void {
+		// Both instanceInfo and modelInfo can have scripts. With each being persisted in correct location.
+		// Currently both are loaded into instanceInfo, which is not great, but it is quick, which is needed
+		if ( scripts && 0 < scripts.length) {
+			for each (var instanceScript:String in scripts )
+				addScript( instanceScript, false );
+		}
+	}
+	
+	
 	public function setScriptInfo( $info:Object ):void {
 		if ( $info.script && ( 0 < $info.script.length ) )
 		{

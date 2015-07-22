@@ -211,7 +211,7 @@ package com.voxelengine.worldmodel
 		private function removeFailedObjectFromRegion( $e:ModelLoadingEvent ):void {
 			// Do I need to remove this failed load?
 			Log.out( "Region.removeFailedObjectFromRegion - failed to load: " + $e.modelGuid, Log.ERROR );
-			//currentRegion.changedForce = true;
+			currentRegion.changedForce = true;
 		}
 	
 		private function onLoadingComplete( le:LoadingEvent ):void {
