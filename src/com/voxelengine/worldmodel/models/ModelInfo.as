@@ -501,7 +501,7 @@ public class ModelInfo extends PersistanceObject
 		Log.out( "ModelInfo.childrenFromObject", Log.DEBUG );
 		for each ( var v:Object in $children ) {
 			var ii:InstanceInfo = new InstanceInfo();
-			ii.fromObject( v.instanceInfo );
+			ii.fromObject( v );
 			// This adds the instanceInfo for the child models to our child list which is processed when object is initialized
 			childrenInstanceInfoAdd( ii );
 		}
@@ -528,7 +528,7 @@ public class ModelInfo extends PersistanceObject
 	public function scriptsLoad( $instanceInfo:InstanceInfo ):void {
 		// Both instanceInfo and modelInfo can have scripts. With each being persisted in correct location.
 		// Currently both are persisted to instanceInfo, which is very bad...
-		if ( scripts && 0 < scripts.length)
+		if ( $instanceInfo.scripts && 0 < $instanceInfo.scripts.length)
 		{
 			for each (var scriptName:String in scripts)
 				$instanceInfo.addScript( scriptName, true );

@@ -125,6 +125,9 @@ public class ModelMakerImport extends ModelMakerBase {
 	private function completeMake():void {
 		if ( null != _modelInfo && null != _modelMetadata ) {
 			
+			if ( !Globals.isGuid( _modelMetadata.guid ) )
+				_modelMetadata.guid = Globals.getUID();
+				
 			_modelInfo.guid = _modelMetadata.guid;
 			ii.modelGuid 	= _modelMetadata.guid;
 			_modelInfo.fileName = "";
@@ -132,12 +135,13 @@ public class ModelMakerImport extends ModelMakerBase {
 			var vm:* = make()
 			if ( vm ) {
 				vm.stateLock( true, 10000 ); // Lock state so that is had time to load animations
-				vm.changed = true;
 //				vm.complete = true;
 				_modelInfo.changed = true;
-				_modelMetadata.changed = true;
-				vm.save();
 				_modelInfo.save();
+				_modelMetadata.changed = true;
+				_modelMetadata.save();
+				vm.changed = true;
+				vm.save();
 				Region.currentRegion.modelCache.add( vm );
 			}
 			

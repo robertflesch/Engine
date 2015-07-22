@@ -112,8 +112,7 @@ package com.voxelengine.worldmodel.biomes
 				Globals.g_landscapeTaskController.activeTaskLimit = 1;
 		}
 		
-		public function addParticleTaskToController( $vm:VoxelModel ):void 
-		{
+		public function addParticleTaskToController( $vm:VoxelModel ):void  {
 			Globals.g_landscapeTaskController.activeTaskLimit = 0;
 			var guid:String = $vm.instanceInfo.instanceGuid;
 
@@ -127,14 +126,11 @@ package com.voxelengine.worldmodel.biomes
 		}
 
 		
-		public function	layersLoad( layers:Object):void
-		{
-			for each ( var layerObject:Object in layers )
-			{
-				if ( layerObject )
-				{
+		public function	layersLoad( layers:Object):void {
+			for each ( var layer:Object in layers ) {
+				if ( layer ) {
 					var layerInfo:LayerInfo = new LayerInfo();
-					layerInfo.fromJSON( layerObject.layer );	
+					layerInfo.fromJSON( layer );	
 					add_layer( layerInfo );
 					//Log.out( "Biomes.load_biomes_data - layer data: " + layerInfo.toString() );
 				}

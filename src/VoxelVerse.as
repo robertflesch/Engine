@@ -70,6 +70,7 @@ package {
 		
 		// after the splash and config have been loaded
 		public function readyToGo():void	{
+			Log.out( "<===============VoxelVerse.readyToGo - ENTER", Log.DEBUG );
 			
 			addEventListener(Event.ENTER_FRAME, enterFrame);
 			addEventListener(Event.DEACTIVATE, deactivate);
@@ -82,13 +83,21 @@ package {
 //			stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, mouseDownRight);
 //			stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, mouseUpRight);
 			
-			Security.loadPolicyFile( "http://cdn.playerio.com/crossdomain.xml" );
+			//Security.loadPolicyFile( "http://cdn.playerio.com/crossdomain.xml" );
+			//Security.loadPolicyFile( "https://content.playerio.com/crossdomain.xml" );
 //			var ctxt:LoaderContext = new LoaderContext( true );
 //			ctxt.securityDomain = SecurityDomain.currentDomain;
-			Security.allowDomain( "*" );
+			//Security.allowDomain( "*" );
 			VoxelVerseGUI.currentInstance.buildGUI();	
 			Log.out( "VoxelVerse.readyToGo", Log.DEBUG );
 		}
+		
+		private function mouseDown(e:MouseEvent):void {
+			Log.out( "VoxelVerse.mouseDown", Log.WARN );
+//			if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active )
+//				return;
+		}
+		
 		
 		private function enterFrame(e:Event):void {
 			//Log.out( "VoxelVerse.enterFrame" );
@@ -155,7 +164,7 @@ package {
 				stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 				stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 				
-				GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_ACTIVATE ) );
+//				GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_ACTIVATE ) );
 			}
 			//else
 				//Log.out( "VoxelVerse.activateApp - ignoring" );
@@ -174,7 +183,7 @@ package {
 				MouseKeyboardHandler.reset();
 				
 				// one way to wake us back up is thru the mouse click
-				stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+				//stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 				stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 				stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp);
 					
@@ -186,17 +195,17 @@ package {
 					ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) );
 				}
 				
-				GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_DEACTIVATE ) );
+	//			GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_DEACTIVATE ) );
 			}
 			//else
 			//	Log.out( "VoxelVerse.activateApp - ignoring", Log.WARN );
 		}
 		
-		private function mouseDown(e:MouseEvent):void 
-		{
-			stage.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
-			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
-		}
+		//private function mouseDown(e:MouseEvent):void 
+		//{
+			//stage.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
+			//stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+		//}
 		
 		private function mouseUp(e:MouseEvent):void 
 		{

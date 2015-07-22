@@ -64,6 +64,8 @@ public class EditCursor extends VoxelModel
 	static private const 		EDITCURSOR_CYLINDER:uint			= 1002;
 	static private const 		EDITCURSOR_CYLINDER_ANIMATED:uint	= 1003;
 	static private const 		EDITCURSOR_INVALID:uint				= 1004;
+	static private var 			_s_listenersAdded:Boolean;
+	
 	
 	static private var 			_editing:Boolean;
 	static public function  get editing():Boolean 					{ return _editing; }
@@ -102,8 +104,6 @@ public class EditCursor extends VoxelModel
 	private  			var _count:int = 0;
 	private 			var _phase:Number = 0; // used by the rainbow cursor
 	private 			var _pl:PlacementLocation 						= new PlacementLocation();	
-	
-	private 			var _listenersAdded:Boolean;
 	
 	private 		  	var _cursorOperation:String 					= CursorOperationEvent.NONE;
 	private  function 	get cursorOperation():String 					{ return _cursorOperation; }
@@ -260,34 +260,35 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function removeListeners():void {	
-		_listenersAdded = false;
-		CursorOperationEvent.removeListener( CursorOperationEvent.NONE, 		resetEvent );
-		CursorOperationEvent.removeListener( CursorOperationEvent.DELETE_OXEL, 	deleteOxelEvent );
-		CursorOperationEvent.removeListener( CursorOperationEvent.DELETE_MODEL, deleteModelEvent );
-		CursorOperationEvent.removeListener( CursorOperationEvent.INSERT_OXEL, 	insertOxelEvent );
-		CursorOperationEvent.removeListener( CursorOperationEvent.INSERT_MODEL, insertModelEvent );
-		
-		CursorShapeEvent.removeListener( CursorShapeEvent.CYLINDER, 	shapeSetEvent );
-		CursorShapeEvent.removeListener( CursorShapeEvent.MODEL_AUTO, 	shapeSetEvent );
-		CursorShapeEvent.removeListener( CursorShapeEvent.SPHERE, 		shapeSetEvent );
-		CursorShapeEvent.removeListener( CursorShapeEvent.SQUARE, 		shapeSetEvent );
-		
-		CursorSizeEvent.removeListener( CursorSizeEvent.SET, 			sizeSetEvent );
-		CursorSizeEvent.removeListener( CursorSizeEvent.GROW, 			sizeGrowEvent );
-		CursorSizeEvent.removeListener( CursorSizeEvent.SHRINK, 		sizeShrinkEvent );
-
-		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_UP, 	mouseUp);
-		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_DOWN, 	mouseDown);
-		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_MOVE, 	mouseMove);
+		//Log.out( "EditCursor.removeListeners", Log.WARN );
+		//_s_listenersAdded = false;
+		//CursorOperationEvent.removeListener( CursorOperationEvent.NONE, 		resetEvent );
+		//CursorOperationEvent.removeListener( CursorOperationEvent.DELETE_OXEL, 	deleteOxelEvent );
+		//CursorOperationEvent.removeListener( CursorOperationEvent.DELETE_MODEL, deleteModelEvent );
+		//CursorOperationEvent.removeListener( CursorOperationEvent.INSERT_OXEL, 	insertOxelEvent );
+		//CursorOperationEvent.removeListener( CursorOperationEvent.INSERT_MODEL, insertModelEvent );
+		//
+		//CursorShapeEvent.removeListener( CursorShapeEvent.CYLINDER, 	shapeSetEvent );
+		//CursorShapeEvent.removeListener( CursorShapeEvent.MODEL_AUTO, 	shapeSetEvent );
+		//CursorShapeEvent.removeListener( CursorShapeEvent.SPHERE, 		shapeSetEvent );
+		//CursorShapeEvent.removeListener( CursorShapeEvent.SQUARE, 		shapeSetEvent );
+		//
+		//CursorSizeEvent.removeListener( CursorSizeEvent.SET, 			sizeSetEvent );
+		//CursorSizeEvent.removeListener( CursorSizeEvent.GROW, 			sizeGrowEvent );
+		//CursorSizeEvent.removeListener( CursorSizeEvent.SHRINK, 		sizeShrinkEvent );
+//
+		//Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
+		//Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_UP, 	mouseUp);
+		//Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_DOWN, 	mouseDown);
+		//Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_MOVE, 	mouseMove);
 	}
 	
 	private function addListeners():void {
 		
-		if ( _listenersAdded )
+		if ( _s_listenersAdded )
 			return;
 			
-		_listenersAdded = true;	
+		_s_listenersAdded = true;	
 		CursorOperationEvent.addListener( CursorOperationEvent.NONE, 			resetEvent );
 		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_OXEL, 	deleteOxelEvent );
 		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_MODEL, 	deleteModelEvent);
@@ -305,9 +306,10 @@ public class EditCursor extends VoxelModel
 		
 		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_UP, 	 mouseUp);
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_DOWN,  mouseDown);
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_MOVE,  mouseMove);
+		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_DOWN, 	mouseDown);
 	}
+
 	
 	////////////////////////////////////////////////
 	// EditCursor positioning
@@ -870,26 +872,42 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function mouseDown(e:MouseEvent):void {
-		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey )
+		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active )
 			return;
+		if ( doubleMessageHack ) {
+			Log.out( "EditCursor.mouseDown", Log.WARN );	
+				
+			//_repeatTimer = new Timer( 200 );
+			//_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
+			//_repeatTimer.start();
 			
-		_repeatTimer = new Timer( 200 );
-		_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
-		_repeatTimer.start();
-		
-		switch (e.type) 
-		{
-			case "mouseDown": case Keyboard.NUMPAD_ADD:
-				if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
-					deleteOxel();
-				else if ( CursorOperationEvent.INSERT_MODEL == cursorOperation )
-					insertModel();						
-				else if ( CursorOperationEvent.INSERT_OXEL == cursorOperation )
-					insertOxel();
-				break;
+			switch (e.type) 
+			{
+				case "mouseDown": case Keyboard.NUMPAD_ADD:
+					if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
+						deleteOxel();
+					else if ( CursorOperationEvent.INSERT_MODEL == cursorOperation )
+						insertModel();						
+					else if ( CursorOperationEvent.INSERT_OXEL == cursorOperation )
+						insertOxel();
+					break;
+			}
 		}
 	}
 	
+	import flash.utils.getTimer;
+	private static const WAITING_PERIOD:int = 50;
+	private var doubleMessageHackTime:int = getTimer();
+	private function get doubleMessageHack():Boolean {
+		var newTime:int = getTimer();
+		var result:Boolean = false;
+		if ( doubleMessageHackTime + WAITING_PERIOD < newTime )
+			result = true;
+			
+		doubleMessageHackTime = newTime;
+		return result;
+	}
+			
 	private function onMouseWheel(event:MouseEvent):void {
 		
 		if ( true != event.shiftKey || null == objectModel )

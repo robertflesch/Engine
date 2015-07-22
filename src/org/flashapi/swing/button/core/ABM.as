@@ -1694,7 +1694,7 @@ package org.flashapi.swing.button.core {
 		}
 		
 		import flash.utils.getTimer;
-		private static const WAITING_PERIOD:int = 500;
+		private static const WAITING_PERIOD:int = 50;
 		private var doubleMessageHackTime:int = getTimer();
 		private function get doubleMessageHack():Boolean {
 			var newTime:int = getTimer();
