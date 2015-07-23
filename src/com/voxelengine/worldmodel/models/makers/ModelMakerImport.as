@@ -79,8 +79,7 @@ public class ModelMakerImport extends ModelMakerBase {
 		if ( $mme.modelGuid == _modelInfo.guid ) {
 			ModelMetadataEvent.removeListener( ModelBaseEvent.GENERATION, metadataFromUI );
 			_modelMetadata = $mme.modelMetadata;
-			// have to do this after the load calls for the oxel and model info have been called.
-			_modelMetadata.guid = Globals.getUID();
+			// Now check if this has a parent model, if so, get the animation class from the parent.
 			attemptMakeRetrieveParentModelInfo(); 
 		}
 	}
@@ -130,7 +129,8 @@ public class ModelMakerImport extends ModelMakerBase {
 				
 			_modelInfo.guid = _modelMetadata.guid;
 			ii.modelGuid 	= _modelMetadata.guid;
-			_modelInfo.fileName = "";
+			// Not saved, might as well keep it around.
+			//_modelInfo.fileName = "";
 			
 			var vm:* = make()
 			if ( vm ) {

@@ -7,37 +7,34 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.voxelengine.events.ModelEvent;
-import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.worldmodel.models.makers.ModelLibrary;
-import com.voxelengine.worldmodel.models.types.Player;
-import com.voxelengine.worldmodel.oxel.GrainCursor;
-import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.TypeInfo;
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
-import flash.utils.ByteArray;
 import flash.geom.Matrix3D;
 
 import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.events.AnimationEvent;
 import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.ModelEvent;
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.pools.OxelPool;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.animation.Animation;
 import com.voxelengine.worldmodel.biomes.Biomes;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.scripts.Script;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.utils.transitions.properties.SoundShortcuts;
+import com.voxelengine.worldmodel.models.makers.ModelLibrary;
+import com.voxelengine.worldmodel.models.types.Player;
 
 public class ModelInfo extends PersistanceObject
 {
@@ -47,22 +44,29 @@ public class ModelInfo extends PersistanceObject
 	private var _data:OxelPersistance;
 	private var _associatedGrain:GrainCursor;						// associates the model with a grain in the parent model
 	
+	// These are temporary used for loading local objects
 	public function get altGuid():String 							{ return _altGuid; }
 	public function get fileName():String 							{ return _fileName; }
 	public function set fileName(val:String):void 					{ _fileName = val; }
 	public function get biomes():Biomes 							{ return _biomes; }
-	public function get childrenInstanceInfo():Vector.<InstanceInfo>{ return _childrenInstanceInfo; }
-	public function get scripts():Vector.<String> 					{ return _info.scripts; }
-	public function get modelClass():String							{ return _info.modelClass; }
-	public function set modelClass(val:String):void 				{ _info.modelClass = val; }
-	public function get grainSize():int								{ return _info.grainSize; }
-	public function set grainSize(val:int):void						{ _info.grainSize = val; }
-	public function get animations():Vector.<Animation> 			{ return _animations; }
 	public function set biomes(value:Biomes):void  					{ _biomes = value; }
+	
 	public function get oxel():Oxel 								{ return _data.oxel; }
 	public function get data():OxelPersistance  					{ return _data; }
+	public function get childrenInstanceInfo():Vector.<InstanceInfo> { return _childrenInstanceInfo; }
+	public function get animationInfo():Vector.<InstanceInfo> 		{ return _info.model.animations; }
+	
+	public function get scripts():Vector.<String> 					{ return _info.model.scripts; }
+	public function get modelClass():String							{ return _info.model.modelClass; }
+	public function set modelClass(val:String):void 				{ _info.model.modelClass = val; }
+	public function get grainSize():int								{ return _info.model.grainSize; }
+	public function set grainSize(val:int):void						{ _info.model.grainSize = val; }
+	
+	public function get animations():Vector.<Animation> 			{ return _animations; }
 	public function get associatedGrain():GrainCursor 				{ return _associatedGrain; }
 	public function set associatedGrain(value:GrainCursor):void 	{ _associatedGrain = value; }
+	
+	public function toString():String {  return "ModelInfo - guid: " + guid; }
 	
 	public function ModelInfo( $guid:String ):void  { 
 		super( $guid, Globals.BIGDB_TABLE_MODEL_INFO ); 
@@ -78,10 +82,6 @@ public class ModelInfo extends PersistanceObject
 			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
 		}
 		changed = true;
-	}
-	
-	public function toString():String {
-		return "ModelInfo - guid: " + guid;
 	}
 	
 	public function createEditCursor( $guid:String ):void {
@@ -119,7 +119,7 @@ public class ModelInfo extends PersistanceObject
 		if ( _data && _data.loaded )
 			return _data.oxel.gc.grain;
 		else 
-			return _info.grainSize;
+			return grainSize;
 	}
 
 	public function bringOutYourDead():void {
@@ -229,10 +229,10 @@ public class ModelInfo extends PersistanceObject
 	public function scriptsLoad( $instanceInfo:InstanceInfo ):void {
 		// Both instanceInfo and modelInfo can have scripts. With each being persisted in correct location.
 		// Currently both are loaded into instanceInfo, which is not great, but it is quick, which is needed
-		if ( _info.scripts ) {
-			var len:int = _info.scripts.length;
+		if ( scripts ) {
+			var len:int = scripts.length;
 			for ( var index:int; index < len; index++ ) {
-				var scriptName:String = _info.scripts[index].name;
+				var scriptName:String = scripts[index].name;
 				$instanceInfo.addScript( scriptName, true );
 			}
 		}
@@ -252,8 +252,8 @@ public class ModelInfo extends PersistanceObject
 		AnimationEvent.addListener( ModelBaseEvent.DELETE, animationDeleteHandler );
 		AnimationEvent.addListener( ModelBaseEvent.ADDED, animationAdd );
 		_series = 0;
-		if ( _info. animationInfo && 0 < _info.animationInfo.length ) {
-			for each ( var animData:Object in _info.animationInfo ) {
+		if ( animationInfo && 0 < animationInfo.length ) {
+			for each ( var animData:Object in animationInfo ) {
 				animationsLoaded = false;
 				_animationCount++; 
 				
@@ -271,9 +271,9 @@ public class ModelInfo extends PersistanceObject
 	}
 			
 	public function animationsDelete():void {
-		if ( _info.animationInfo ) {
+		if ( animationInfo ) {
 			Log.out( "ModelInfo.animationsDelete - animations found" );
-			for each ( var animData:Object in _info.animationInfo ) {
+			for each ( var animData:Object in animationInfo ) {
 				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, guid, animData.guid, null ) );
 			}
 		}
@@ -316,163 +316,6 @@ public class ModelInfo extends PersistanceObject
 		return null;
 	}
 
-	public function childRemove( $ii:InstanceInfo ):void	{
-		for ( var i:int; i < _childrenInstanceInfo.length; i++ )
-			if ( $ii == _childrenInstanceInfo[i] );
-				_childrenInstanceInfo[i] = null;
-	}
-	
-	
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// start persistance
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private static const DEFAULT_CLASS:String		= "VoxelModel";
-	private var _info:Object;
-	private var _fileName:String 					= "INVALID"; 	// Used for local loading and import of data from local file system
-	private var _biomes:Biomes;										// used to generate terrain and apply other functions to oxel
-	private var _series:int											// used to make sure animation is part of same series when loading
-	private var _altGuid:String;									// used to handle loading from biome
-	private var _firstLoadFailed:Boolean;							// true if load from biomes data is needed
-	
-	public function save():void {
-		if ( Globals.online && changed ) {
-			if (  true == animationsLoaded && true == childrenLoaded ) {
-				if ( Globals.isGuid( guid ) ) {
-					//Log.out( "ModelInfo.save - Saving ModelInfo: " + guid  + " in table: " + table, Log.WARN );
-					changed = false;
-					addSaveEvents();
-					toObject();
-						
-					PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null ) );
-				}
-			}
-			//else 
-				//Log.out( "ModelInfo.save - Not saving ModelInfo - children OR animations not loaded - guid: " + guid );
-		}
-		//else
-			//Log.out( "ModelInfo.save - Not saving ModelInfo - either offline or NOT changed - guid: " + guid );
-			
-		if ( _data )
-			_data.save();	
-		
-		for ( var i:int; i < _children.length; i++ ) {
-			var child:VoxelModel = _children[i];
-			child.save();
-		}
-	}
-	
-	
-	public function fromObjectImport( $dbo:DatabaseObject ):void {
-		_dbo = $dbo;
-		// The data is needed the first time it saves the object from import, after that it goes away
-		if ( !dbo.data.model )
-			return;
-		
-		_info = $dbo.data.model;
-		loadFromInfo();
-	}
-	
-	public function fromObject( $dbo:DatabaseObject ):void {
-		_dbo = $dbo;
-		if ( !dbo.model )
-			return;
-		
-		_info = $dbo.model;
-		loadFromInfo();
-	}
-	
-	private function loadFromInfo():void {
-		if ( !_info.modelClass )
-			_info.modelClass = DEFAULT_CLASS;
-		// Only attributes that need additional handling go here.
-		if ( _info.biomes )
-			biomesFromObject( _info.biomes );
-		
-		// scripts are stored in the info object until needed, no more preloading
-		//scriptsFromObject( _info.scripts );
-		
-		if ( _info.children )
-			childrenFromObject( _info.children );
-		if ( _info.animations )
-			animationsFromObject( _info.animations );
-	
-	}
-
-		public function toObject():void {
-		// I am faking a heirarchy here, not good object oriented behavior but needs major redesign to do what I want.
-		// so instead I just get the current setting from the class
-		var modelClassPrototype:Class = ModelLibrary.getAsset( _info.modelClass );
-		try {
-			modelClassPrototype.buildExportObject( dbo );
-		} catch ( e:Error ) {
-			Log.out( "ModelInfo.toObject - Error with Class: " + _info.modelClass, Log.ERROR );
-		}
-
-		_info.grainSize =  getGrainSize();
-		if ( null != associatedGrain )
-			_info.associatedGrain = associatedGrain;
-		
-		var childrenAdded:int = childrenGet();
-		if ( "Dragon" == modelClass )
-			if ( 3 > childrenAdded ) {
-				trace( "ModelInfo.toObject - DRAGON ERROR", Log.WARN );
-				// lets retry this so I can watch it.
-				childrenGet();
-			}
-		//modelsScriptOnly();
-		//animationsGet();
-		
-		function childrenGet():int {
-		// Same code that is in modelCache to build models in region
-		// this is just models in models
-			var children:Object = new Object();
-			for ( var i:int; i < _childrenInstanceInfo.length; i++ ) {
-				if ( null != _childrenInstanceInfo[i] ) {
-					children["instanceInfo" + i]  = _childrenInstanceInfo[i].toObject();
-			}	}
-
-			_info.children = children;
-			return i;
-		}
-		/*
-		function animationsGet():void {
-			var len:int = _animations.length;
-			var oa:Vector.<Object> = new Vector.<Object>();
-			for ( var index:int; index < len; index++ ) {
-				var ao:Object = new Object();
-				ao.name = _animations[index].metadata.name;
-				ao.type = _animations[index].metadata.aniType;
-				ao.guid = _animations[index].metadata.guid;
-				Log.out( "ModelInfo.animationsGet - animation.metadata: " + _animations[index].metadata );
-				oa.push( ao );
-			}
-			if ( 0 < oa.length ) 
-				_info.animations = JSON.stringify( oa );
-			oa = null;
-		}
-		*/
-	} 	
-
-	private function biomesFromObject( $biomes:Object ):void {
-		// TODO this should only be true for new terrain models.
-		const createHeightMap:Boolean = true;
-		_biomes = new Biomes( createHeightMap  );
-		if ( !$biomes.layers )
-			throw new Error( "ModelInfo.biomesFromObject - WARNING - unable to find layerInfo: " + fileName );					
-		_biomes.layersLoad( $biomes.layers );
-		// now remove the biome data from the object so it is not saved to persistance
-		delete _info.biomes;	
-		
-	}
-	private function animationsFromObject( $animations:Object ):void {
-	// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
-		Log.out( "ModelInfo.animationsFromObject" );	
-		for each ( var animData:Object in $animations ) {
-			Log.out( "ModelInfo.animationsFromObject - _animationInfo.push animData: " + animData.name );	
-			_animationInfo.push( animData );
-		}
-	}
-
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  Children functions
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -483,6 +326,7 @@ public class ModelInfo extends PersistanceObject
 	protected 	var			_childrenLoaded:Boolean					= true;
 	public 		function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
 	public 		function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
+	
 	/////////////////////
 	private function childrenFromObject( $children:Object ):void {
 		Log.out( "ModelInfo.childrenFromObject", Log.DEBUG );
@@ -581,7 +425,6 @@ public class ModelInfo extends PersistanceObject
 			 $child.instanceInfo.instanceGuid = Globals.getUID();
 		//Log.out(  "-------------- VoxelModel.childAdd -  $child: " +  $child.toString() );
 		// remove parent level model
-//		Region.currentRegion.modelCache.changeFromParentToChild( $child);
 		_children.push( $child);
 		changed = true;
 		// Dont add the player to the instanceInfo, or you end up in a recursive loop
@@ -589,11 +432,13 @@ public class ModelInfo extends PersistanceObject
 			return;
 		else
 			childrenInstanceInfoAdd( $child.instanceInfo )
+		// do I need the light level?
 //		$child.instanceInfo.baseLightLevel = owner.instanceInfo.baseLightLevel;
+		// Do I need to return to player to a parent model when leaving a ridable.
+//		Region.currentRegion.modelCache.changeFromParentToChild( $child);
 	}
 	
 	public function childRemoveByInstanceInfo( $instanceInfo:InstanceInfo ):void {
-		
 		var index:int = 0;
 		for each (var child:VoxelModel in _children) {
 			if (child.instanceInfo.instanceGuid ==  $instanceInfo.instanceGuid ) {
@@ -665,6 +510,167 @@ public class ModelInfo extends PersistanceObject
 		}
 		throw new Error("VoxelModel.childFindByName - not found for name: " + $name);
 	}
+	
+	public function childRemove( $ii:InstanceInfo ):void	{
+		for ( var i:int; i < _childrenInstanceInfo.length; i++ )
+			if ( $ii == _childrenInstanceInfo[i] );
+				_childrenInstanceInfo[i] = null;
+	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// start persistance
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	private static const DEFAULT_CLASS:String		= "VoxelModel";
+	private var _info:Object;
+	public function get info():Object { return _info; }
+
+	private var _fileName:String 					= "INVALID"; 	// Used for local loading and import of data from local file system
+	private var _biomes:Biomes;										// used to generate terrain and apply other functions to oxel
+	private var _series:int											// used to make sure animation is part of same series when loading
+	private var _altGuid:String;									// used to handle loading from biome
+	private var _firstLoadFailed:Boolean;							// true if load from biomes data is needed
+	
+	public function save():void {
+		if ( Globals.online && changed ) {
+			if (  true == animationsLoaded && true == childrenLoaded ) {
+				if ( Globals.isGuid( guid ) ) {
+					//Log.out( "ModelInfo.save - Saving ModelInfo: " + guid  + " in table: " + table, Log.WARN );
+					changed = false;
+					addSaveEvents();
+					toObject();
+						
+					PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null ) );
+				}
+			}
+			//else 
+				//Log.out( "ModelInfo.save - Not saving ModelInfo - children OR animations not loaded - guid: " + guid );
+		}
+		//else
+			//Log.out( "ModelInfo.save - Not saving ModelInfo - either offline or NOT changed - guid: " + guid );
+			
+		if ( _data )
+			_data.save();	
+		
+		for ( var i:int; i < _children.length; i++ ) {
+			var child:VoxelModel = _children[i];
+			child.save();
+		}
+	}
+	
+	
+	public function fromObjectImport( $dbo:DatabaseObject ):void {
+		_dbo = $dbo;
+		// The data is needed the first time it saves the object from import, after that it goes away
+		if ( !dbo.data.model )
+			return;
+		
+		_info = $dbo.data;
+		loadFromInfo();
+	}
+	
+	public function fromObject( $dbo:DatabaseObject ):void {
+		_dbo = $dbo;
+		if ( !dbo.model )
+			return;
+		
+		_info = $dbo;
+		loadFromInfo();
+	}
+	
+	// Only attributes that need additional handling go here.
+	private function loadFromInfo():void {
+		if ( !info.model ) {
+			info.model = new Object();
+			Log.out( "ModelInfo.loadFromInfo - modelInfo not found: " + JSON.stringify( _info ), Log.ERROR );
+		}
+		var mi:Object = _info.model;
+		if ( !mi.modelClass )
+			mi.modelClass = DEFAULT_CLASS;
+		if ( mi.biomes )
+			biomesFromObject( mi.biomes );
+		
+		// scripts are stored in the info object until needed, no more preloading
+		//scriptsFromObject( mi.scripts );
+		
+		if ( mi.children )
+			childrenFromObject( mi.children );
+		if ( mi.animations )
+			animationsFromObject( mi.animations );
+	
+	}
+
+		public function toObject():void {
+		// I am faking a heirarchy here, not good object oriented behavior but needs major redesign to do what I want.
+		// so instead I just get the current setting from the class
+		var modelClassPrototype:Class = ModelLibrary.getAsset( _info.model.modelClass );
+		try {
+			modelClassPrototype.buildExportObject( dbo );
+		} catch ( e:Error ) {
+			Log.out( "ModelInfo.toObject - Error with Class: " + _info.model.modelClass, Log.ERROR );
+		}
+
+		if ( getGrainSize() )
+			_info.model.grainSize =  getGrainSize();
+		if ( null != associatedGrain )
+			_info.model.associatedGrain = associatedGrain;
+		
+		var childrenAdded:int = childrenGet();
+		//animationsGet();
+		
+		function childrenGet():int {
+			// Same code that is in modelCache to build models in region
+			// this is just models in models
+			if ( _childrenInstanceInfo.length ) {
+				var children:Object = new Object();
+				for ( var i:int; i < _childrenInstanceInfo.length; i++ ) {
+					if ( null != _childrenInstanceInfo[i] ) {
+						children["instanceInfo" + i]  = _childrenInstanceInfo[i].toObject();
+				}	}
+
+				_info.model.children = children;
+				return i;
+			}
+			return 0;
+		}
+		/*
+		function animationsGet():void {
+			var len:int = _animations.length;
+			var oa:Vector.<Object> = new Vector.<Object>();
+			for ( var index:int; index < len; index++ ) {
+				var ao:Object = new Object();
+				ao.name = _animations[index].metadata.name;
+				ao.type = _animations[index].metadata.aniType;
+				ao.guid = _animations[index].metadata.guid;
+				Log.out( "ModelInfo.animationsGet - animation.metadata: " + _animations[index].metadata );
+				oa.push( ao );
+			}
+			if ( 0 < oa.length ) 
+				_info.animations = JSON.stringify( oa );
+			oa = null;
+		}
+		*/
+	} 	
+
+	private function biomesFromObject( $biomes:Object ):void {
+		// TODO this should only be true for new terrain models.
+		const createHeightMap:Boolean = true;
+		_biomes = new Biomes( createHeightMap  );
+		if ( !$biomes.layers )
+			throw new Error( "ModelInfo.biomesFromObject - WARNING - unable to find layerInfo: " + fileName );					
+		_biomes.layersLoad( $biomes.layers );
+		// now remove the biome data from the object so it is not saved to persistance
+		delete info.model.biomes;	
+		
+	}
+	private function animationsFromObject( $animations:Object ):void {
+	// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
+		Log.out( "ModelInfo.animationsFromObject" );	
+		for each ( var animData:Object in $animations ) {
+			Log.out( "ModelInfo.animationsFromObject - _animationInfo.push animData: " + animData.name );	
+			_animationInfo.push( animData );
+		}
+	}
+
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End Children functions
 	/////////////////////////////////////////////////////////////////////////////////////////////

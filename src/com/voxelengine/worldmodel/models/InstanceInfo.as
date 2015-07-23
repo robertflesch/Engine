@@ -245,6 +245,7 @@ public class InstanceInfo extends Location	{
 	}
 	
 	public function fromObject( $info:Object ):void {
+		Log.out( "InstanceInfo.fromObject - data: " + JSON.stringify( $info ) );
 		// Save off a copy of this in case we need multiple instances
 		if ( $info.model )
 			_info = $info.model;
@@ -264,8 +265,10 @@ public class InstanceInfo extends Location	{
 			_instanceGuid = _info.instanceGuid;
 		}
 			
-		if ( _info.name )
-		{
+		if ( !_info.instanceGuid && !_info.modelGuid && !_info.fileName )
+			Log.out( "InstanceInfo.fromObject - INVALID DATA, check: " + JSON.stringify( $info ) );
+		
+		if ( _info.name ) {
 			if ( owner && owner.metadata ) {
 				owner.metadata.name = _info.name;
 				Log.out( "InstanceInfo.fromObject - Setting Metadata Name from instance data: " + _info.name + "  guid: " + modelGuid );

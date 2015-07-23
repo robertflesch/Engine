@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.models
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.worldmodel.models.makers.ModelDestroyer;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.utils.Dictionary;
 import playerio.DatabaseObject;
@@ -97,16 +98,18 @@ public class ModelInfoCache
 	// You have to close app and restart to get guids correct.
 	static private function deleteRecursive( $mie:ModelInfoEvent ):void {
 		// first delete any children
+		// Should always be an entry in the modelInfo table, since a request for it went out first.
+		// And this was called only after the request returned.
 		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
 		if ( mi ) {
 			for each ( var childii:InstanceInfo in mi.childrenInstanceInfo ) {
 				if ( childii && childii.modelGuid ) {
-					Log.out( "ModelInfoCache.deleteRecursive - deleting child from instanceInfo: " + childii.modelGuid, Log.WARN )
-					ModelInfoEvent.dispatch( new ModelInfoEvent( ModelInfoEvent.DELETE_RECURSIVE, 0, childii.modelGuid, null ) );		
+					// Using the fromTables to handle the recursive flag
+					new ModelDestroyer( childii.modelGuid, $mie.fromTables );		
 				}
 			}
 		} else 
-			Log.out( "ModelInfoCache.deleteRecursive - ModelInfo not found $mie" + $mie,Log.ERROR )
+			Log.out( "ModelInfoCache.deleteRecursive - ModelInfo not found $mie" + $mie, Log.ERROR )
 		
 		// Now delete the parents data
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );

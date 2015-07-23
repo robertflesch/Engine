@@ -115,8 +115,8 @@ public class OxelPersistanceCache
 			_oxelDataDic[$ode.modelGuid] = null; 
 			// TODO need to clean up eventually
 			od = null;
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $ode.series, Globals.BIGDB_TABLE_OXEL_DATA, $ode.modelGuid, null ) );
 		}
+		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $ode.series, Globals.BIGDB_TABLE_OXEL_DATA, $ode.modelGuid, null ) );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////

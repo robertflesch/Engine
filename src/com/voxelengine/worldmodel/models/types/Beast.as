@@ -88,47 +88,45 @@ package com.voxelengine.worldmodel.models.types
 		
 		override protected function processClassJson():void {
 			super.processClassJson();
-			if ( modelInfo.dbo && modelInfo.dbo.beast )
-			{
-				var beastInfo:Object = modelInfo.dbo.beast;
+			
+			if ( modelInfo.info )
+				var beastInfo:Object = modelInfo.info;
+			else {
 				if ( null == beastInfo ) {
 					Log.out( "Beast.processClassJson - beast section not found: " + modelInfo.dbo.toString(), Log.ERROR );
 					return;
 				}
+			}
+			if ( beastInfo.moveSpeed)
+				mMoveSpeed = beastInfo.moveSpeed/10000;
+			else
+				mMoveSpeed = mMoveSpeed/10000;
+			
+			if ( beastInfo.maxTurnRate )
+				mMaxTurnRate = beastInfo.maxTurnRate * 100;
+			else
+				// This should be around 10,000
+				mMaxTurnRate = mMaxTurnRate * 100;
+			
+			if ( beastInfo.maxClimbAngle )
+				mMaxClimbAngle = beastInfo.maxClimbAngle;
+			
+			if ( beastInfo.climbRate )
+				mClimbRate = beastInfo.climbRate/100;
+			else
+				mClimbRate = mClimbRate / 100;
 				
-				if ( beastInfo.moveSpeed)
-					mMoveSpeed = beastInfo.moveSpeed/10000;
-				else
-					mMoveSpeed = mMoveSpeed/10000;
-				
-				if ( beastInfo.maxTurnRate )
-					mMaxTurnRate = beastInfo.maxTurnRate * 100;
-				else
-					// This should be around 10,000
-					mMaxTurnRate = mMaxTurnRate * 100;
-				
-				if ( beastInfo.maxClimbAngle )
-					mMaxClimbAngle = beastInfo.maxClimbAngle;
-				
-				if ( beastInfo.climbRate )
-					mClimbRate = beastInfo.climbRate/100;
-				else
-					mClimbRate = mClimbRate / 100;
-					
-				if ( beastInfo.seatLocation ) {
-					if ( beastInfo.seatLocation is Object ) {
-						Log.out( "Beast.processClassJson: " + beastInfo.seatLocation );
-						_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
-					}
-					else
-						_seatLocation.setTo( 0, 0, 0 );
-						//_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
+			if ( beastInfo.seatLocation ) {
+				if ( beastInfo.seatLocation is Object ) {
+					Log.out( "Beast.processClassJson: " + beastInfo.seatLocation );
+					_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
 				}
 				else
 					_seatLocation.setTo( 0, 0, 0 );
+					//_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
 			}
 			else
-				Log.out( "Beast.processClassJson - NO Beast Json INFO FOUND", Log.WARN );
+				_seatLocation.setTo( 0, 0, 0 );
 		}
 		
 		//override protected function addClassJson():String {

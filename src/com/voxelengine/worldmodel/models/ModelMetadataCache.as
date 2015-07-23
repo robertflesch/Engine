@@ -118,9 +118,9 @@ public class ModelMetadataCache
 			_metadata[$mme.modelGuid] = null; 
 			// TODO need to clean up eventually
 			mmd = null;
-			Log.out( "ModelMetadataCache.deleteHandler making call to PersistanceEvent", Log.WARN );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid, null ) );
+			//Log.out( "ModelMetadataCache.deleteHandler making call to PersistanceEvent", Log.WARN );
 		}
+		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid, null ) );
 	}
 	
 	static private function generated( $mme:ModelMetadataEvent ):void  {
@@ -131,7 +131,7 @@ public class ModelMetadataCache
 		var guidArray:Array = $mme.modelGuid.split( ":" );
 		var oldGuid:String = guidArray[0];
 		var newGuid:String = guidArray[1];
-		var modelMetadataExisting:ModelInfo = _metadata[oldGuid];
+		var modelMetadataExisting:ModelMetadata = _metadata[oldGuid];
 		if ( null == modelMetadataExisting ) {
 			Log.out( "ModelMetadataCache.updateGuid - guid not found: " + oldGuid, Log.ERROR );
 			return; }

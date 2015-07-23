@@ -64,6 +64,14 @@ public class ModelMetadata extends PersistanceObject
 			ModelMetadataEvent.addListener( ModelBaseEvent.SAVE, saveEvent );
 	}
 
+	override public function set guid( $newGuid:String ):void { 
+		var oldGuid:String = super.guid;
+		super.guid = $newGuid;
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
+		changed = true;
+	}
+	
+	
 	override public function release():void {
 		ModelMetadataEvent.removeListener( ModelBaseEvent.SAVE, saveEvent );
 		//ModelMetadataEvent.removeListener( ModelBaseEvent.LOAD, 		load );

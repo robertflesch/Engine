@@ -18,6 +18,8 @@ import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.events.AmmoEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.utils.StringUtils;
+
 
 /**
  * ...
@@ -81,24 +83,32 @@ public class AmmoCache
 		if ( $pe.dbo || $pe.data ) {
 			//Log.out( "AmmoCache.loadSucceed guid: " + $pe.guid, Log.INFO );
 			var ammo:Ammo = new Ammo( $pe.guid );
-			if ( !$pe.dbo ) {
-				imported = true;
-				ammo.dbo = new DatabaseObject( Globals.BIGDB_TABLE_AMMO, $pe.guid, "0", 0, true, null );
-				ammo.dbo.ammo = JSONUtil.parse( $pe.data, $pe.guid + $pe.table, "AnimationCache.loadSucceed" );
-				if ( null == ammo.dbo.ammo ) {
-					Log.out( "AmmoCache.loadSucceed - error parsing ammo data on import. guid: " + $pe.guid, Log.ERROR );
+			if ( $pe.dbo ) {
+				ammo.fromObject( $pe.dbo );
+			}
+			else {
+				var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_AMMO, "0", "0", 0, true, null );
+				dbo.data = new Object();
+				// This is for import from local only.
+				var fileData:String = String( $pe.data );
+				fileData = StringUtils.trim(fileData);
+				dbo.data = JSONUtil.parse( fileData, $pe.guid + $pe.table, "AnimationCache.loadSucceed" );
+				if ( null == dbo.data ) {
+					Log.out( "AnimationCache.loadSucceed - error parsing ammoInfo on import. guid: " + $pe.guid, Log.ERROR );
 					AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 					return;
 				}
 				ammo.guid = $pe.guid;
-			}
-			else
-				ammo.dbo = $pe.dbo;
-				
-			ammo.fromPersistance( ammo.dbo );
-			add( $pe, ammo );
-			if ( imported )
+				ammo.fromObjectImport( dbo );
+				// On import mark it as changed.
+				ammo.changed = true;
 				ammo.save();
+			}
+			
+			add( $pe, ammo );
+//			if ( _block.has( $pe.guid ) )
+//				_block.clear( $pe.guid )
+				
 		}
 		else {
 			Log.out( "AmmoCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.WARN );
