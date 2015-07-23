@@ -39,13 +39,17 @@ public class ControlBeastScript extends Script
 				if ( vm )
 				{
 					var controllingModel:VoxelModel = vm.instanceInfo.controllingModel;
-					if ( Player.player && Player.player.instanceInfo ) {
-						var ii:InstanceInfo = Player.player.instanceInfo;
-						if ( controllingModel && null == Player.player.instanceInfo.controllingModel )
-							new WindowBeastControlQuery( controllingModel.instanceInfo.instanceGuid );
+					if ( controllingModel ) { 
+						if ( Player.player && Player.player.instanceInfo ) {
+							var ii:InstanceInfo = Player.player.instanceInfo;
+							if ( controllingModel && null == Player.player.instanceInfo.controllingModel )
+								new WindowBeastControlQuery( controllingModel.instanceInfo.instanceGuid );
+						}
+						else
+							Log.out( "ControlBeastScript.onInsideEvent - NO PLAYER defined", Log.WARN );
 					}
 					else
-						Log.out( "ControlBeastScript.onInsideEvent - NO PLAYER defined" );
+						Log.out( "ControlBeastScript.onInsideEvent - NO BEAST TO CONTROL", Log.WARN );
 				}
 			}
 		}
