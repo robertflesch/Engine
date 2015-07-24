@@ -127,19 +127,23 @@ public class Ammo extends PersistanceObject
 	public function fromObjectImport( $dbo:DatabaseObject ):void {
 		_dbo = $dbo;
 		// The data is needed the first time it saves the object from import, after that it goes away
-		if ( !dbo.data.model )
+		if ( !dbo.data || !dbo.data.ammo ) {
+			Log.out( "Ammo.fromObjectImport - Failed test !dbo.data || !dbo.data.ammo dbo: " + JSON.stringify( dbo ), Log.ERROR );
 			return;
+		}
 		
-		_info = $dbo.data.model;
+		_info = $dbo.data.ammo;
 		loadFromInfo();
 	}
 	
 	public function fromObject( $dbo:DatabaseObject ):void {
 		_dbo = $dbo;
-		if ( !dbo.model )
+		if ( !dbo.ammo ) {
+			Log.out( "Ammo.fromObject - Failed test !dbo.data  dbo: " + JSON.stringify( dbo ), Log.ERROR );
 			return;
+		}
 		
-		_info = $dbo.model;
+		_info = $dbo.ammo;
 		loadFromInfo();
 	}
 	
@@ -165,9 +169,10 @@ public class Ammo extends PersistanceObject
 		if ( !_info.model )
 			_info.model = "CannonBall";
 			
-		if ( _info.oxelType )
+		if ( _info.oxelType ) {
 			if ( _info.oxelTypeId is String )
 				_info.oxelType = TypeInfo.getTypeId( _info.oxelType );
+		}
 		else
 			_info.oxelType = TypeInfo.STEEL;
 			

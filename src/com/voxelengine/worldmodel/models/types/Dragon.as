@@ -57,10 +57,11 @@ public class Dragon extends Beast
 	
 	override protected function processClassJson():void {
 		super.processClassJson();
-		if ( modelInfo.dbo && modelInfo.dbo.dragon ) {
-			var cmInfo:Object = modelInfo.dbo.dragon;
-		}
 		// no unique items at this level
+		if ( modelInfo.info && modelInfo.info.dragon )
+			var dragonInfo:Object = modelInfo.info.dragon;
+		else
+			Log.out( "Dragon.processClassJson - Dragon section not found: " + JSON.stringify( modelInfo.info ), Log.ERROR );
 	}
 /*		
 	override protected function addClassJson():String {

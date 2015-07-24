@@ -108,13 +108,8 @@ public class ControllableVoxelModel extends VoxelModel
 	override protected function processClassJson():void {
 		super.processClassJson();
 		clipVelocityFactor = DEFAULT_CLIP_VELOCITY/100; // setting it to 0.95
-		if ( modelInfo.dbo && modelInfo.dbo.controllableVoxelModel )
-		{
-			var cmInfo:Object = modelInfo.dbo.controllableVoxelModel;
-			if ( null == cmInfo ) {
-				//Log.out( "ControllableVoxelModel.processClassJson - no controllable model JSON info found", Log.DEBUG );
-				return;
-			}
+		if ( modelInfo.info && modelInfo.info.controllableVoxelModel ) {
+			var cmInfo:Object = modelInfo.info.controllableVoxelModel;
 			
 			if ( cmInfo.clipFactor )
 				clipVelocityFactor = cmInfo.clipFactor/100;
@@ -122,8 +117,8 @@ public class ControllableVoxelModel extends VoxelModel
 			if ( cmInfo.maxSpeed )
 				maxSpeed = cmInfo.maxSpeed;
 		}
-		//else
-		//	Log.out( "ControllableVoxelModel.processClassJson - no modelInfo JSON info found", Log.DEBUG );
+		else
+			Log.out( "ControllableVoxelModel.processClassJson - no ControllableModelInfo info found", Log.WARN );
 	}
 	
 	static public function buildExportObject( obj:Object ):void {

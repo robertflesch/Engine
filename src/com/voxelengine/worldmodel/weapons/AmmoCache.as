@@ -98,7 +98,6 @@ public class AmmoCache
 					AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 					return;
 				}
-				ammo.guid = $pe.guid;
 				ammo.fromObjectImport( dbo );
 				// On import mark it as changed.
 				ammo.changed = true;

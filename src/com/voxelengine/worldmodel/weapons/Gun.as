@@ -66,25 +66,27 @@ public class Gun extends ControllableVoxelModel
 	
 	override protected function processClassJson():void {
 		super.processClassJson();
-		if ( modelInfo.dbo && modelInfo.dbo.gun )
-		{
-			var gunInfo:Object = modelInfo.dbo.gun;
-			if ( gunInfo.reloadSpeed )
-				_reloadSpeed = gunInfo.reloadSpeed;
-				
-			if ( gunInfo.ammos ) {
-				AmmoEvent.addListener( ModelBaseEvent.RESULT, result );
-				AmmoEvent.addListener( ModelBaseEvent.ADDED, result );
-				AmmoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, resultFailed );
-				var ammosJson:Object = gunInfo.ammos;
-				for each ( var ammoInfo:Object in ammosJson )
-					request( ammoInfo.name );
-			}
+		
+		if ( modelInfo.info && modelInfo.info.gun )
+			var gunInfo:Object = modelInfo.info.gun;
+		else {
+			Log.out( "Gun.processClassJson - Gun section not found: " + modelInfo.dbo.toString(), Log.ERROR );
+			return;
+		}
+		
+		if ( gunInfo.reloadSpeed )
+			_reloadSpeed = gunInfo.reloadSpeed;
+			
+		if ( gunInfo.ammos ) {
+			AmmoEvent.addListener( ModelBaseEvent.RESULT, result );
+			AmmoEvent.addListener( ModelBaseEvent.ADDED, result );
+			AmmoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, resultFailed );
+			var ammosJson:Object = gunInfo.ammos;
+			for each ( var ammoInfo:Object in ammosJson )
+				request( ammoInfo.name );
+		}
 //			if ( _armory.length )
 //				_ammo = _armory[0];
-		}
-		else
-			Log.out( "Gun - NO GUN INFO FOUND" );
 	}
 
 	static public function buildExportObject( obj:Object ):void {

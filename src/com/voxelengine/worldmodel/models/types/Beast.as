@@ -89,13 +89,11 @@ package com.voxelengine.worldmodel.models.types
 		override protected function processClassJson():void {
 			super.processClassJson();
 			
-			if ( modelInfo.info )
-				var beastInfo:Object = modelInfo.info;
+			if ( modelInfo.info && modelInfo.info.beast )
+				var beastInfo:Object = modelInfo.info.beast;
 			else {
-				if ( null == beastInfo ) {
-					Log.out( "Beast.processClassJson - beast section not found: " + modelInfo.dbo.toString(), Log.ERROR );
-					return;
-				}
+				Log.out( "Beast.processClassJson - beast section not found: " + modelInfo.dbo.toString(), Log.ERROR );
+				return;
 			}
 			if ( beastInfo.moveSpeed)
 				mMoveSpeed = beastInfo.moveSpeed/10000;
