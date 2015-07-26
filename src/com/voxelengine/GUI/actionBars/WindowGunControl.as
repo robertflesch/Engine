@@ -38,7 +38,7 @@ package com.voxelengine.GUI.actionBars
 				var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _instanceGuid );
 				if ( vm )
 				{
-					for each ( var cm:VoxelModel in vm.modelInfo.children )
+					for each ( var cm:VoxelModel in vm.modelInfo.childVoxelModels )
 					{
 						if ( "Gun" == cm.modelInfo.modelClass )
 						{

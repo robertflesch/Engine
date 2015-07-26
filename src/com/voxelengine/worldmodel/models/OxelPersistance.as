@@ -116,36 +116,26 @@ public class OxelPersistance extends PersistanceObject
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// persistance operations
-	public function save():void {
-		if ( Globals.online && true == loaded && true == changed ) {
-			if ( !Globals.isGuid( guid ) ) {
+	override public function save():void {
+		if ( false == loaded || !Globals.isGuid( guid ) ) {
 				//Log.out( "OxelPersistance.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
 				return;
-			}
-			
-			Log.out( "--------- OxelPersistance.save - Saving OxelPersistance: " + guid  + " in table: " + table, Log.WARN );
-			changed = false;
-			toObject();
-			addSaveEvents();
-			
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, null ) );
 		}
-		//else
-		//	Log.out( "OxelPersistance.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
+		super.save();
 	}
 	
 	private function toObject():void {
-		_dbo.data.ba			= toByteArray( oxel );
+		dbo.data.ba			= toByteArray( oxel );
 	}
 				
 	// FROM Persistance
 	
 	public function fromObjectImport( $dbo:DatabaseObject ):void {
-		_dbo			= $dbo;
+		dbo			= $dbo;
 		fromByteArray( $dbo.data.ba );
 	}
 	public function fromObject( $dbo:DatabaseObject ):void {
-		_dbo			= $dbo;
+		dbo			= $dbo;
 		fromByteArray( $dbo.ba );
 	}
 	

@@ -102,7 +102,7 @@ public class ModelInfoCache
 		// And this was called only after the request returned.
 		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
 		if ( mi ) {
-			for each ( var childii:InstanceInfo in mi.childrenInstanceInfo ) {
+			for each ( var childii:InstanceInfo in mi.info.children ) {
 				if ( childii && childii.modelGuid ) {
 					// Using the fromTables to handle the recursive flag
 					new ModelDestroyer( childii.modelGuid, $mie.fromTables );		
@@ -167,8 +167,7 @@ public class ModelInfoCache
 						return;
 					}
 					mi.fromObjectImport( dbo );
-					// On import mark it as changed.
-					mi.changed = true;
+					// On import save it.
 					mi.save();
 				}
 				

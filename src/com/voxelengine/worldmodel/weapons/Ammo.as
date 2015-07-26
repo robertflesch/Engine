@@ -28,25 +28,23 @@ import com.voxelengine.worldmodel.models.IPersistance;
 
 public class Ammo extends PersistanceObject
 {
-	private var _info:Object;
-	
-	public function get type():int  				{ return _info.type; }
-	public function set type(val:int):void			{ _info.type = val; }
-	public function get count():int  				{ return _info.count; }
-	public function set count(val:int):void			{ _info.count = val; }
-	public function get grain():int 				{ return _info.grain; }
-	public function set grain(val:int):void 		{ _info.grain = val; }
-	public function get accuracy():Number 			{ return _info.accuracy; }
-	public function set accuracy(val:Number):void 	{ _info.accuracy = val; }
-	public function get velocity():Number 			{ return _info.velocity; }
-	public function set velocity(val:Number):void 	{ _info.velocity = val; }
-	public function get life():Number 				{ return _info.life; }
-	public function set life(val:Number):void 		{ _info.life = val; }
-	public function get launchSoundFile():String  	{ return _info.launchSoundFile; }
-	public function get impactSoundFile():String  	{ return _info.impactSoundFile; }
-	public function get contactScript():String  	{ return _info.contactScript; }
-	public function get model():String 				{ return _info.model; }
-	public function get oxelType():int 				{ return _info.oxelType; }
+	public function get type():int  				{ return info.type; }
+	public function set type(val:int):void			{ info.type = val; }
+	public function get count():int  				{ return info.count; }
+	public function set count(val:int):void			{ info.count = val; }
+	public function get grain():int 				{ return info.grain; }
+	public function set grain(val:int):void 		{ info.grain = val; }
+	public function get accuracy():Number 			{ return info.accuracy; }
+	public function set accuracy(val:Number):void 	{ info.accuracy = val; }
+	public function get velocity():Number 			{ return info.velocity; }
+	public function set velocity(val:Number):void 	{ info.velocity = val; }
+	public function get life():Number 				{ return info.life; }
+	public function set life(val:Number):void 		{ info.life = val; }
+	public function get launchSoundFile():String  	{ return info.launchSoundFile; }
+	public function get impactSoundFile():String  	{ return info.impactSoundFile; }
+	public function get contactScript():String  	{ return info.contactScript; }
+	public function get model():String 				{ return info.model; }
+	public function get oxelType():int 				{ return info.oxelType; }
 	
 	public function Ammo( $name:String ) {
 		super( $name, Globals.BIGDB_TABLE_AMMO );
@@ -112,38 +110,26 @@ public class Ammo extends PersistanceObject
 	////////////////////////////////////////////////////////////////
 	// FROM Persistance
 	////////////////////////////////////////////////////////////////
-	public function save():void {
-		if ( Globals.online ) {
-			Log.out( "Ammo.save - Saving Ammo: " + guid  + " in table: " + table, Log.WARN );
-			addSaveEvents();
-			toObject();
-				
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null ) );
-		}
-		else
-			Log.out( "Ammo.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
-	}
-	
 	public function fromObjectImport( $dbo:DatabaseObject ):void {
-		_dbo = $dbo;
+		dbo = $dbo;
 		// The data is needed the first time it saves the object from import, after that it goes away
 		if ( !dbo.data || !dbo.data.ammo ) {
 			Log.out( "Ammo.fromObjectImport - Failed test !dbo.data || !dbo.data.ammo dbo: " + JSON.stringify( dbo ), Log.ERROR );
 			return;
 		}
 		
-		_info = $dbo.data.ammo;
+		info = $dbo.data.ammo;
 		loadFromInfo();
 	}
 	
 	public function fromObject( $dbo:DatabaseObject ):void {
-		_dbo = $dbo;
+		dbo = $dbo;
 		if ( !dbo.ammo ) {
 			Log.out( "Ammo.fromObject - Failed test !dbo.data  dbo: " + JSON.stringify( dbo ), Log.ERROR );
 			return;
 		}
 		
-		_info = $dbo.ammo;
+		info = $dbo.ammo;
 		loadFromInfo();
 	}
 	
@@ -153,39 +139,39 @@ public class Ammo extends PersistanceObject
 
 	// Only attributes that need additional handling go here.
 	public function loadFromInfo():void {
-		if ( !_info.type )
-			_info.type = 1;
-		if ( !_info.count )
-			_info.count = 1;
-		if ( !_info.grain )
-			_info.grain = 2;
-		if ( !_info.accuracy )
-			_info.accuracy = 0.1;
-		if ( !_info.velocity )
-			_info.velocity = 200;
-		if ( !_info.life )
-			_info.life = 5;
+		if ( !info.type )
+			info.type = 1;
+		if ( !info.count )
+			info.count = 1;
+		if ( !info.grain )
+			info.grain = 2;
+		if ( !info.accuracy )
+			info.accuracy = 0.1;
+		if ( !info.velocity )
+			info.velocity = 200;
+		if ( !info.life )
+			info.life = 5;
 		
-		if ( !_info.model )
-			_info.model = "CannonBall";
+		if ( !info.model )
+			info.model = "CannonBall";
 			
-		if ( _info.oxelType ) {
-			if ( _info.oxelTypeId is String )
-				_info.oxelType = TypeInfo.getTypeId( _info.oxelType );
+		if ( info.oxelType ) {
+			if ( info.oxelTypeId is String )
+				info.oxelType = TypeInfo.getTypeId( info.oxelType );
 		}
 		else
-			_info.oxelType = TypeInfo.STEEL;
+			info.oxelType = TypeInfo.STEEL;
 			
-		if ( !_info.contactScript )
-			_info.contactScript = "";
+		if ( !info.contactScript )
+			info.contactScript = "";
 			
-		if ( !_info.launchSoundFile )
-			_info.launchSoundFile = "Cannon.mp3";
-		SoundBank.getSound( _info.launchSoundFile ); // Preload the sound file
+		if ( !info.launchSoundFile )
+			info.launchSoundFile = "Cannon.mp3";
+		SoundBank.getSound( info.launchSoundFile ); // Preload the sound file
 		
-		if ( !_info.impactSoundFile )
-			_info.impactSoundFile = "CannonBallExploding.mp3";
-		SoundBank.getSound( _info.impactSoundFile );
+		if ( !info.impactSoundFile )
+			info.impactSoundFile = "CannonBallExploding.mp3";
+		SoundBank.getSound( info.impactSoundFile );
 			
 		//ModelLoader.modelInfoFindOrCreate( _model, null, false );
 		//ModelLoader.modelInfoFindOrCreate( _model, _model, false );

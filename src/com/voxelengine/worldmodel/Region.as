@@ -43,7 +43,6 @@ package com.voxelengine.worldmodel
 	{
 		static public const DEFAULT_REGION_ID:String = "000000-000000-000000";
 		
-		private var _info:Object;
 		private var _permissions:PermissionsRegion;
 		
 		static public var _s_currentRegion:Region;
@@ -54,25 +53,25 @@ package com.voxelengine.worldmodel
 		private var _modelCache:ModelCache;
 		private var _skyColor:Vector3D = new Vector3D();
 
-		public function get worldId():String { return _info.worldId; }
-		public function set worldId(val:String):void { _info.worldId = val; }
-		public function get owner():String { return _info.owner; }
-		public function set owner(val:String):void { _info.owner = val; }
-		public function get desc():String { return _info.desc; }
-		public function set desc(val:String):void { _info.desc = val; }
-		public function get name():String { return _info.name; }
-		public function set name(val:String):void { _info.name = val; }
-		public function get gravity():Boolean { return _info.gravity; }
-		public function set gravity(val:Boolean):void { _info.gravity = val; }
+		public function get worldId():String { return info.worldId; }
+		public function set worldId(val:String):void { info.worldId = val; }
+		public function get owner():String { return info.owner; }
+		public function set owner(val:String):void { info.owner = val; }
+		public function get desc():String { return info.desc; }
+		public function set desc(val:String):void { info.desc = val; }
+		public function get name():String { return info.name; }
+		public function set name(val:String):void { info.name = val; }
+		public function get gravity():Boolean { return info.gravity; }
+		public function set gravity(val:Boolean):void { info.gravity = val; }
 		public function getSkyColor():Vector3D { return _skyColor; }
 		public function setSkyColor( r:int, g:int, b:int ):void { 
-			_info.skyColor.r = r;
-			_info.skyColor.g = g;
-			_info.skyColor.b = b; 
+			info.skyColor.r = r;
+			info.skyColor.g = g;
+			info.skyColor.b = b; 
 			_skyColor.setTo( r, g , b );
 		}
-		public function get playerPosition():Object { return _info.playerPosition; }
-		public function get playerRotation():Object {return _info.playerRotation; }
+		public function get playerPosition():Object { return info.playerPosition; }
+		public function get playerRotation():Object {return info.playerRotation; }
 		
 		public function set changedForce(val:Boolean):void { changed = val; }
 		public function get criticalModelDetected():Boolean { return  _criticalModelDetected; } 
@@ -131,7 +130,7 @@ package com.voxelengine.worldmodel
 			addEventListeners();
 			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_BEGUN, 0, guid ) );
 			// old style uses region.
-			var count:int = loadRegionObjects(_info.models);
+			var count:int = loadRegionObjects(info.models);
 			
 			_loaded = false;
 			if ( 0 == count ) {
@@ -278,7 +277,7 @@ package com.voxelengine.worldmodel
 				toObject();
 				
 				Log.out( "Region.save - PersistanceEvent.dispatch region id: " + guid + "  name: " + name, Log.WARN );
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.BIGDB_TABLE_REGIONS, guid, _dbo, null ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.BIGDB_TABLE_REGIONS, guid, dbo, null ) );
 				// or could do this in the suceed, but if it fails do I want to keep retrying?
 				changed = false;
 			}
@@ -288,9 +287,9 @@ package com.voxelengine.worldmodel
 		
 		public function toObject():void {
 			if ( _modelCache )
-				_info.models = _modelCache.toObject();
+				info.models = _modelCache.toObject();
 			else
-				_info.models = [];
+				info.models = [];
 				
 			_permissions.toObject();
 		}
@@ -300,33 +299,33 @@ package com.voxelengine.worldmodel
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		
 		public function fromObject( $dbo:DatabaseObject ):void {
-			_dbo = $dbo;
-			_info = $dbo;
-			_permissions = new PermissionsRegion( _info.permissions );
+			dbo = $dbo;
+			info = $dbo;
+			_permissions = new PermissionsRegion( info.permissions );
 			fromInfo();
 			changed = false;
 		}
 		
 		public function fromObjectImport( $dbo:DatabaseObject ):void {
-			_dbo = $dbo;
-			_info = $dbo.data;
-			_info.worldId = Globals.VOXELVERSE;
-			_info.name = "NewRegion";
-			_info.desc = "Describe what is special about this region";
-			_info.playerPosition = new Object();
-			_info.playerRotation = new Object();
-			_info.playerPosition.x = _info.playerPosition.y = _info.playerPosition.z = 0;
-			_info.playerRotation.x = _info.playerRotation.y = _info.playerRotation.z = 0;
-			_permissions = new PermissionsRegion( _info );
+			dbo = $dbo;
+			info = $dbo.data;
+			info.worldId = Globals.VOXELVERSE;
+			info.name = "NewRegion";
+			info.desc = "Describe what is special about this region";
+			info.playerPosition = new Object();
+			info.playerRotation = new Object();
+			info.playerPosition.x = info.playerPosition.y = info.playerPosition.z = 0;
+			info.playerRotation.x = info.playerRotation.y = info.playerRotation.z = 0;
+			_permissions = new PermissionsRegion( info );
 			fromInfo();
 			changed = true;
 		}
 		
 		private function fromInfo():void {
 			// push it into the vector3d
-			setSkyColor( _info.skyColor.r, _info.skyColor.g, _info.skyColor.b );
+			setSkyColor( info.skyColor.r, info.skyColor.g, info.skyColor.b );
 			
-			for each ( var instanceInfo:Object in _info.models ) {
+			for each ( var instanceInfo:Object in info.models ) {
 				var ii:InstanceInfo = new InstanceInfo();
 				ii.fromObject( instanceInfo );
 			}

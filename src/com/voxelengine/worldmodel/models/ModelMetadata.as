@@ -34,22 +34,21 @@ public class ModelMetadata extends PersistanceObject
 {
 	private var _permissions:PermissionsModel;
 	private var _thumbnail:BitmapData;
-	private var _info:Object;
 	
 	public function get permissions():PermissionsModel 			{ return _permissions; }
 	public function set permissions( val:PermissionsModel):void	{ _permissions = val; changed = true; }
 	
-	public function get name():String  						{ return _info.name; }
-	public function set name(value:String):void  			{ _info.name = value; changed = true; }
+	public function get name():String  						{ return info.name; }
+	public function set name(value:String):void  			{ info.name = value; changed = true; }
 	
-	public function get description():String  				{ return _info.description; }
-	public function set description(value:String):void  	{ _info.description = value; changed = true; }
+	public function get description():String  				{ return info.description; }
+	public function set description(value:String):void  	{ info.description = value; changed = true; }
 	
-	public function get owner():String  					{ return _info.owner; }
-	public function set owner(value:String):void  			{ _info.owner = value; changed = true; }
+	public function get owner():String  					{ return info.owner; }
+	public function set owner(value:String):void  			{ info.owner = value; changed = true; }
 	
-	public function get animationClass():String 			{ return _info.animationClass; }
-	public function set animationClass(value:String):void  	{ _info.animationClass = value; changed = true; }
+	public function get animationClass():String 			{ return info.animationClass; }
+	public function set animationClass(value:String):void  	{ info.animationClass = value; changed = true; }
 	
 	public function get thumbnail():BitmapData 				{ return _thumbnail; }
 	public function set thumbnail(value:BitmapData):void 	{ _thumbnail = value; changed = true; }
@@ -104,21 +103,13 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		save();
 	}
 
-	public function save():void {
-		if ( Globals.online && true == changed ) {
-			//Log.out( "ModelMetadata.save - Saving ModelMetadata: " + guid  + " in table: " + table, Log.WARN );
-			if ( !Globals.isGuid( guid ) ) {
-				Log.out( "ModelMetadata.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
-				return;
-			}
-				
-			toObject();
-			addSaveEvents(); // I dont like that these are added at this level, and removed at a different level.
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, null ) );
-			changed = false;
+	override public function save():void {
+		if ( !Globals.isGuid( guid ) ) {
+			Log.out( "ModelMetadata.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
+			return;
 		}
-		//else
-		//	Log.out( "ModelMetadata.save - Not saving ModelMetadata, either offline or NOT changed or locked - guid: " + guid );
+		
+		super.save();
 	}
 	
 	//////////////////////////////////////////////////////////////////
@@ -126,9 +117,9 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	//////////////////////////////////////////////////////////////////
 	private function toObject():void {
 		if ( thumbnail )
-			_info.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
+			info.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
 		else
-			_info.thumbnail = null;
+			info.thumbnail = null;
 	}
 	
 
@@ -136,36 +127,36 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	// $dbo.data
 	// and the read direct from persistance uses
 	// $dbo directly
-	// I abstract it away using the _info object
+	// I abstract it away using the info object
 	// it was needed to save the data in an abstract way.
 	public function fromObjectImport( $dbo:DatabaseObject ):void {
-		_dbo = $dbo;
+		dbo = $dbo;
 		if ( !dbo.data )
 			throw new Error( "ModelMetaData.fromObjectImport - NO DBO or DBO data" );
-		_info = $dbo.data;	
+		info = $dbo.data;	
 		loadFromInfo();	
+		changed = true;
 	}
 
 	public function fromObject( $dbo:DatabaseObject ):void {
-		_dbo = $dbo;
-		_info = $dbo;	
+		dbo = $dbo;
+		info = $dbo;	
 		
 		loadFromInfo();	
 	}
 	
 	private function loadFromInfo():void {
-		if ( !_info.permissions )
-			_info.permissions = new Object();
+		if ( !info.permissions )
+			info.permissions = new Object();
 		
 		// the permission object is just an encapsulation of the permissions section of the object
-		_permissions = new PermissionsModel( _info.permissions );
+		_permissions = new PermissionsModel( info.permissions );
 		
-		if ( _info.thumbnail ) {
+		if ( info.thumbnail ) {
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.INIT, function(event:Event):void { thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData; } );
-			loader.loadBytes( _info.thumbnail );			
+			loader.loadBytes( info.thumbnail );			
 		}
-		changed = false;
 	}
 }
 }

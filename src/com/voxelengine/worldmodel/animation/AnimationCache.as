@@ -11,12 +11,15 @@ import flash.events.DataEvent;
 import flash.utils.ByteArray;
 import flash.net.URLLoaderDataFormat;
 
+import playerio.DatabaseObject;
+
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.events.AnimationEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.utils.StringUtils;
 
 /**
  * ...
@@ -37,9 +40,10 @@ public class AnimationCache
 	public function AnimationCache() {}
 	
 	static public function init():void {
-		AnimationEvent.addListener( ModelBaseEvent.REQUEST, request );
-		AnimationEvent.addListener( ModelBaseEvent.DELETE, deleteHandler );
-		
+		AnimationEvent.addListener( ModelBaseEvent.REQUEST, 		request );
+		AnimationEvent.addListener( ModelBaseEvent.DELETE, 			deleteHandler );
+		AnimationEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );		
+
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
@@ -62,12 +66,33 @@ public class AnimationCache
 		var modelAnis:Array = _animatedModels[$ae.modelGuid]; 
 		var ani:Animation;
 		if ( modelAnis ) {
-			ani = modelAnis[$ae.aniGuid];
-			ani = null;
+			if ( modelAnis[$ae.aniGuid] );
+				modelAnis[$ae.aniGuid] = null;
 			// TODO need to clean up eventually
 		}
 		//else if its not in the cache, we can still delete it.
 		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_ANIMATIONS, $ae.aniGuid, null ) );
+	}
+	
+	static private function updateGuid( $ae:AnimationEvent ):void {
+		// Make sure this is saved correctly
+		var guidArray:Array = $ae.aniGuid.split( ":" );
+		var oldGuid:String = guidArray[0];
+		var newGuid:String = guidArray[1];
+		var modelAnis:Array = _animatedModels[$ae.modelGuid]; 
+		if ( null == modelAnis ) {
+			Log.out( "AnimationCache.updateGuid - model not found: " + $ae.modelGuid, Log.ERROR );
+			return; 
+		}
+		else {
+			var ani:Animation = modelAnis[oldGuid];
+			if ( ani ) {
+				modelAnis[oldGuid] = null;
+				modelAnis[newGuid] = ani;
+			}
+			else
+				Log.out( "AnimationCache.updateGuid - animation not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.ERROR );
+		}
 	}
 	
 	
@@ -101,31 +126,40 @@ public class AnimationCache
 		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		if ( $pe.dbo || $pe.data ) {
-			Log.out( "AnimationCache.loadSucceed guid: " + $pe.guid, Log.INFO );
-			var ani:Animation = new Animation();
-			if ( $pe.dbo )
-				ani.fromPersistance( $pe.dbo );
+			var ani:Animation = new Animation( $pe.guid );
+			if ( $pe.dbo ) {
+				ani.fromObject( $pe.dbo );
+			}
 			else {
-				//Log.out( "AnimationCache.loadSucceed - IMPORT - name: " + $pe.guid + "   "  + $pe.data );
-				var jsonResult:Object = JSONUtil.parse( $pe.data, $pe.guid + $pe.table, "AnimationCache.loadSucceed" );
-				if ( null == jsonResult ) {
-					//(new Alert( "VoxelVerse - Error Parsing: " + $pe.guid + $pe.table, 500 ) ).display();
+				// This is for import from local only.
+				var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_ANIMATIONS, "0", "0", 0, true, null );
+				dbo.data = new Object();
+				var fileData:String = String( $pe.data );
+				fileData = StringUtils.trim(fileData);
+				dbo.data = JSONUtil.parse( fileData, $pe.guid + $pe.table, "AnimationCache.loadSucceed" );
+				if ( null == dbo.data ) {
+					Log.out( "AnimationCache.loadSucceed - error parsing animation on import. guid: " + $pe.guid, Log.ERROR );
 					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
 					return;
 				}
-				// check $pe.other is modelGuid
-				ani.fromImport( jsonResult, $pe.guid, $pe.other );
-				//ani.loaded = true;
+				ani.fromObjectImport( dbo );
+				// On import mark it as changed.
+				ani.changed = true;
 				ani.save();
 			}
-				
 			add( $pe, ani );
+			
+//			if ( _block.has( $pe.guid ) )
+//				_block.clear( $pe.guid )
+				
 		}
 		else {
 			Log.out( "AnimationCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR );
 			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
 		}
 	}
+	
+	
 	
 	static private function add( $pe:PersistanceEvent, $ani:Animation ):void 
 	{ 
@@ -134,8 +168,8 @@ public class AnimationCache
 			return;
 		}
 		// check to make sure this is new data
-		var animationGuid:String = $ani.metadata.guid;
-		var modelGuid:String = $ani.metadata.modelGuid;
+		var animationGuid:String = $ani.guid;
+		var modelGuid:String = $ani.modelGuid;
 		var modelAnimations:Array =  _animatedModels[modelGuid];
 		if ( null ==  modelAnimations ) {
 			// we need to create a new array for this model
@@ -147,7 +181,7 @@ public class AnimationCache
 		if ( null == modelAnimations[animationGuid] ) {
 			modelAnimations[animationGuid] = $ani;
 			// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $aniType:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
-			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.ADDED, $pe.series, "", $ani.metadata.guid, $ani ) );
+			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.ADDED, $pe.series, $pe.other, $ani.guid, $ani ) );
 		}
 	}
 	

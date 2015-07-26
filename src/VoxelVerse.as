@@ -126,14 +126,14 @@ package {
 		
 		private function deactivate(e:Event):void 
 		{
-			//Log.out( "VoxelVerse.deactive event", Log.WARN );
+			Log.out( "VoxelVerse.deactive event", Log.WARN );
 			if ( Globals.active )
 				deactivateApp();
 		}
 		
 		private function activate(e:Event):void 
 		{
-			//Log.out( "VoxelVerse.activate event" );
+			Log.out( "VoxelVerse.activate event" );
 			activateApp();
 		}
 		

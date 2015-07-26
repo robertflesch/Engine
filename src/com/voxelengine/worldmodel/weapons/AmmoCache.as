@@ -79,7 +79,6 @@ public class AmmoCache
 	{
 		if ( Globals.AMMO_EXT != $pe.table && Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
-		var imported:Boolean;	
 		if ( $pe.dbo || $pe.data ) {
 			//Log.out( "AmmoCache.loadSucceed guid: " + $pe.guid, Log.INFO );
 			var ammo:Ammo = new Ammo( $pe.guid );
@@ -92,9 +91,9 @@ public class AmmoCache
 				// This is for import from local only.
 				var fileData:String = String( $pe.data );
 				fileData = StringUtils.trim(fileData);
-				dbo.data = JSONUtil.parse( fileData, $pe.guid + $pe.table, "AnimationCache.loadSucceed" );
+				dbo.data = JSONUtil.parse( fileData, $pe.guid + $pe.table, "AmmoCache.loadSucceed" );
 				if ( null == dbo.data ) {
-					Log.out( "AnimationCache.loadSucceed - error parsing ammoInfo on import. guid: " + $pe.guid, Log.ERROR );
+					Log.out( "AmmoCache.loadSucceed - error parsing ammoInfo on import. guid: " + $pe.guid, Log.ERROR );
 					AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 					return;
 				}

@@ -281,7 +281,7 @@ public class Dragon extends Beast
 		if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
 			return;
 			
-		for each ( var child:VoxelModel in modelInfo.children ) {
+		for each ( var child:VoxelModel in modelInfo.childVoxelModels ) {
 			if ( child is Gun && me.instanceGuid == child.instanceInfo.instanceGuid )
 				_guns.push( child );
 		}

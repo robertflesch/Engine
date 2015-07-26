@@ -24,7 +24,9 @@ public class PersistanceObject
 	private var 	_guid:String;
 	private var 	_table:String;
 	private var 	_changed:Boolean;
-	protected var 	_dbo:DatabaseObject;
+	private var 	_dbo:DatabaseObject;
+	private var 	_info:Object;
+	
 	
 	public function PersistanceObject( $guid:String, $table:String ) {
 		if ( null == $guid || "" == $guid )
@@ -39,6 +41,8 @@ public class PersistanceObject
 		_dbo = null;
 	}
 	
+	public function get info():Object { return _info; }
+	public function set info(val:Object):void { _info = val; }
 	public function get guid():String  { return _guid; }
 	public function set guid(value:String):void { _guid = value; }
 	public function get dbo():DatabaseObject { return _dbo; }
@@ -63,6 +67,21 @@ public class PersistanceObject
 		PersistanceEvent.removeListener( PersistanceEvent.CREATE_FAILED, 	createFailed );
 		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
 		PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, 		saveFail );
+	}
+	
+	protected function toObject():void { }
+	
+	public function save():void {
+		if ( Globals.online && changed ) {
+			Log.out( "PersistanceObject.save - Saving to guid: " + guid  + " in table: " + table, Log.WARN );
+			addSaveEvents();
+			toObject();
+			changed = false;
+				
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null ) );
+		}
+		else
+			Log.out( "PersistanceObject.save - Not saving data, NOT online - guid: " + guid );
 	}
 	
 	private function saveSucceed( $pe:PersistanceEvent ):void { 

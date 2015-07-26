@@ -84,7 +84,7 @@ package com.voxelengine.GUI.voxelModels
 		public function childPanelAdd( $selectedModel:VoxelModel ):void {
 			if ( null == _childPanel ) 
 				_childPanel = new PanelModelAnimations( _parent );
-			_childPanel.updateChildren( $selectedModel.modelInfo.childrenGet, $selectedModel );
+			_childPanel.updateChildren( $selectedModel.modelInfo.childVoxelModelsGet, $selectedModel );
 			var topLevel:PanelBase = topLevelGet();
 			topLevel.addElement( _childPanel );
 			

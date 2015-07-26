@@ -86,7 +86,7 @@ public class PanelAnimations extends PanelBase
 		var anims:Vector.<Animation> = $vm.modelInfo.animations;
 		for each ( var anim:Animation in anims )
 		{
-			_listAnimations.addItem( anim.metadata.name + " - " + anim.metadata.guid, anim );
+			_listAnimations.addItem( anim.name + " - " + anim.guid, anim );
 		}
 	}
 	
@@ -126,7 +126,7 @@ public class PanelAnimations extends PanelBase
 			{
 				var anim:Animation = _selectedAnimation;
 				//(new Alert( LanguageManager.localizedStringGet( "NOT IMPLEMENTED" ) )).display();
-				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, _selectedModel.modelInfo.guid, anim.metadata.guid, null ) );
+				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, _selectedModel.modelInfo.guid, anim.guid, null ) );
 				populateAnimations( _selectedModel );
 				_selectedModel.changed = true;
 				_selectedModel.save();
@@ -143,7 +143,7 @@ public class PanelAnimations extends PanelBase
 		if ( _selectedAnimation )
 		{
 			_selectedModel.stateLock( false );
-			_selectedModel.stateSet( _selectedAnimation.metadata.name ); 
+			_selectedModel.stateSet( _selectedAnimation.name ); 
 			_selectedModel.stateLock( true );
 			_detailButton.enabled = true;
 			_detailButton.active = true;

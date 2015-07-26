@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.animation
 {
+import com.voxelengine.events.AnimationEvent;
+import com.voxelengine.events.ModelBaseEvent;
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
@@ -14,37 +16,147 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.events.AnimationMetadataEvent;
+import com.voxelengine.worldmodel.models.PersistanceObject;
 
 /**
  * ...
  * @author Robert Flesch - RSF 
  * 
  */
-public class Animation
+public class Animation extends PersistanceObject
 {
 	static private const BLANK_ANIMATION_TEMPLATE:Object = { "animation":[] };
 
-	static private const ANIMATION_STATE:String = "STATE";
-	static private const ANIMATION_ACTION:String = "ACTION";
+	static private const ANIMATION_STATE:String = "state";
+	static private const ANIMATION_ACTION:String = "action";
 	
 	//private var _loaded:Boolean = false;
 	private var _transforms:Vector.<AnimationTransform>;
 	private var _attachments:Vector.<AnimationAttachment>;
-	private var _metadata:AnimationMetadata = new AnimationMetadata();
 	private var _sound:AnimationSound;
 
 	public function get attachments():Vector.<AnimationAttachment> { return _attachments; }
 	public function get transforms():Vector.<AnimationTransform> { return _transforms; }
 	//public function get loaded():Boolean { return _loaded; }
-	public function get metadata():AnimationMetadata { return _metadata; }
 	
-	public function Animation() {  }
 	
-	public function fromImport( $json:Object, $guid:String, $modelGuid:String ):void  {
-		_metadata.fromImport( $guid, fromJSON( $json ), $modelGuid );
+	/////////////////
+	public function get modelGuid():String { return info.modelGuid; }
+	public function set modelGuid( $val:String):void { info.modelGuid = $val; }
+	public function get name():String { return info.name; }
+	public function get aniType():String { return info.aniType; }
+	public function get animationClass():String { return info.animationClass; }
+	public function get description():String { return info.description; }
+	public function get owner():String { return info.owner; }
+	////////////////
+	public function Animation( $guid:String ) {
+		super( $guid, Globals.BIGDB_TABLE_ANIMATIONS );		
 	}
 	
+	override public function set guid( $newGuid:String ):void { 
+		var oldGuid:String = super.guid;
+		super.guid = $newGuid;
+		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.UPDATE_GUID, 0, modelGuid, oldGuid + ":" + $newGuid, null ) );
+		changed = true;
+	}
+	
+	
+	public function fromObjectImport( $dbo:DatabaseObject ):void {
+		dbo = $dbo;
+		// The data is needed the first time it saves the object from import, after that it goes away
+		if ( !dbo.data || !dbo.data.animations ) {
+			Log.out( "Animation.fromObjectImport - Failed test !dbo.data || !dbo.data.ani dbo: " + JSON.stringify( dbo ), Log.ERROR );
+			return;
+		}
+		
+		info = $dbo.data;
+		loadFromInfo();
+	}
+	
+	public function fromObject( $dbo:DatabaseObject ):void {
+		dbo = $dbo;
+		if ( !dbo.animations ) {
+			Log.out( "Animation.fromObject - Failed test !dbo.data  dbo: " + JSON.stringify( dbo ), Log.ERROR );
+			return;
+		}
+		
+		info = $dbo;
+		loadFromInfo();
+	}
+	
+	override public function save():void {
+		if ( "0" == dbo.key )
+			guid = Globals.getUID();
+		super.save();
+	}
+	
+	public function toObject():void {
+		// Only need to change these if the data has changed, and since there are not editing tools in app for animations yet
+		// Not going to do it until it is needed
+		
+		//if ( _sound )
+			//_sound.getJSON( info );
+		//if ( _attachments )
+			//getAttachments( info );
+		//if ( _transforms )
+			//getTransforms( info );
+//
+		//function getAttachments( info:Object ):void {
+			//var oa:Vector.<Object> = new Vector.<Object>();
+			//for each ( var aa:AnimationAttachment in _attachments ) {
+				//var ao:Object = new Object();
+				//aa.buildExportObject( ao );
+				//oa.push( ao );
+			//}
+			//if ( oa.length )
+				//info.attachments = oa;
+		//}
+		//
+		//function getTransforms( info:Object ):void {
+			//var ot:Vector.<Object> = new Vector.<Object>();
+			//for each ( var at:AnimationTransform in _transforms ) {
+				//var ao:Object = new Object();
+				//at.buildExportObject( ao );
+				//ot.push( ao );
+			//}
+			//if ( ot.length )
+				//info.animations = ot;
+		//}
+	}
+
+	// Only attributes that need additional handling go here.
+	public function loadFromInfo():void {
+		var type:String = ANIMATION_STATE;
+		if ( info.type ) {
+			if ( "action" == info.type )
+				type = ANIMATION_ACTION;
+			else if ( "state" == info.type ) 	
+				type = ANIMATION_STATE;
+			else
+				Log.out( "Animation.fromJSON - ERROR unknown type: " + info.type, Log.ERROR );
+		}
+		if ( info.sound ) {
+			_sound = new AnimationSound();
+			_sound.init( info.sound );
+		}
+		if ( info.attachments ) {
+			_attachments = new Vector.<AnimationAttachment>;
+			for each ( var attachmentJson:Object in info.attachment )
+			{
+				_attachments.push( new AnimationAttachment( attachmentJson ) );				
+			}
+		}
+		if ( info.animations ) {
+			_transforms = new Vector.<AnimationTransform>;
+			for each ( var transformJson:Object in info.animations )
+			{
+				_transforms.push( new AnimationTransform( transformJson ) );				
+			}
+		}
+		//LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.ANIMATION_LOAD_COMPLETE, name ) );
+//		return type;
+	}
+/*
 	public function fromJSON( $json:Object ):String  {
 		var type:String = ANIMATION_STATE;
 		if ( $json.type ) {
@@ -88,7 +200,8 @@ public class Animation
 		var jsonResult:Object = JSONUtil.parse( json, _metadata.guid, "Animation.fromPersistance" );
 		fromJSON( jsonResult );
 	}
-	
+*/	
+	/*
 	private function getJSON( obj:Object ):void {
 		if ( _sound )
 			_sound.getJSON( obj );
@@ -119,7 +232,7 @@ public class Animation
 				obj.animations = ot;
 		}
 	}
-	
+	*/
 	public function play( $owner:VoxelModel, $val:Number ):void {
 		//Log.out( "Animation.play - name: " + _name );
 		if ( _sound )
@@ -150,34 +263,6 @@ public class Animation
 	public function update( $val:Number ):void {
 		if ( _sound )
 			_sound.update( $val / 3 );
-	}
-	
-	public function save():void {
-		var ba:ByteArray = new ByteArray();
-		ba = toByteArray( ba );
-		metadata.save( ba );
-	}
-	
-	public function toByteArray( $ba:ByteArray ):ByteArray {
-		var obj:Object = new Object();
-		getJSON( obj );
-		var json:String = JSON.stringify( obj );
-		$ba.writeInt( json.length );
-		$ba.writeUTFBytes( json );
-		$ba.compress();
-		return $ba;	
-	}
-
-	private	function createSuccess( dbo:DatabaseObject):void { 
-		if ( dbo ) 
-			metadata.dbo = dbo;
-	}
-	
-	public function toString():String {
-		var obj:Object = new Object();
-		getJSON( obj );
-		return 	_metadata.name + "  " + JSON.stringify( obj );
-
 	}
 }
 }

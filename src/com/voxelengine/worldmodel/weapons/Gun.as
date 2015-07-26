@@ -50,9 +50,10 @@ public class Gun extends ControllableVoxelModel
 	
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
-		
-		var centerLoc:int = 2 << ( $mi.grainSize - 2);
-		calculateCenter( centerLoc );
+		if ( $mi.grainSize ) {
+			var centerLoc:int = 2 << ( $mi.grainSize - 2);
+			calculateCenter( centerLoc );
+		}
 		
 		// Process the gun specific info
 		var script:Script = _instanceInfo.addScript( "FireProjectileScript", true );

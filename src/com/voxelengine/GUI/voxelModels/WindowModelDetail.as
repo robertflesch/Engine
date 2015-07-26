@@ -87,7 +87,7 @@ package com.voxelengine.GUI.voxelModels
 			}
 			if ( _vm.anim )
 				// TODO add a drop down of available states
-				addElement( new ComponentLabel( "State", _vm.anim ? _vm.anim.metadata.name : "", width ) );
+				addElement( new ComponentLabel( "State", _vm.anim ? _vm.anim.name : "", width ) );
 				
 			if ( ii.controllingModel )
 				addElement( new ComponentLabel( "Parent GUID",  ii.controllingModel ? ii.controllingModel.instanceInfo.instanceGuid : "", width ) );

@@ -275,8 +275,8 @@ package com.voxelengine.worldmodel.models
 					
 					// did I intersect this model, and do I need to check its children?
 					// this will add any intersection with the child model to the totalIntersections list
-					if ( true == $checkChildModels && 0 < _worldSpaceIntersections.length && 0 < vm.modelInfo.children.length )
-						findRayIntersections( vm.modelInfo.childrenGet(), true );
+					if ( true == $checkChildModels && 0 < _worldSpaceIntersections.length && 0 < vm.modelInfo.childVoxelModels.length )
+						findRayIntersections( vm.modelInfo.childVoxelModelsGet(), true );
 				}
 			}
 			

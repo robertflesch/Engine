@@ -15,7 +15,6 @@ import org.flashapi.swing.databinding.DataProvider;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.events.AnimationMetadataEvent;
 import com.voxelengine.server.Network;
 
 public class WindowAnimationMetadata extends VVPopup
@@ -70,7 +69,7 @@ public class WindowAnimationMetadata extends VVPopup
 	}
 	
 	private function save( e:UIMouseEvent ):void { 
-		Globals.g_app.dispatchEvent( new AnimationMetadataEvent( AnimationMetadataEvent.ANIMATION_INFO_COLLECTED, _name, _desc.label, _guid, Network.PUBLIC ) );
+		//Globals.g_app.dispatchEvent( new AnimationMetadataEvent( AnimationMetadataEvent.ANIMATION_INFO_COLLECTED, _name, _desc.label, _guid, Network.PUBLIC ) );
 		remove();
 	}
 }

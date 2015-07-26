@@ -228,6 +228,7 @@ public class VoxelModel
 			
 		processClassJson();
 		
+		modelInfo.childrenLoad( this );
 		modelInfo.animationsLoad();
 	}
 	
@@ -852,7 +853,7 @@ public class VoxelModel
 	{
 		if ( _stateLock )
 			return;
-		if ( (_anim && _anim.metadata.name == $state) || 0 == modelInfo.animations.length )
+		if ( (_anim && _anim.name == $state) || 0 == modelInfo.animations.length )
 			return;
 			
 		if ( false == modelInfo.childrenLoaded ) {
@@ -861,10 +862,10 @@ public class VoxelModel
 			return; // not all children have loaded yet
 		}
 		
-		Log.out( "VoxelModel.stateSet setTo: " + $state + "  current: " + (_anim ? _anim.metadata.name : "No current state") ); 
+		Log.out( "VoxelModel.stateSet setTo: " + $state + "  current: " + (_anim ? _anim.name : "No current state") ); 
 		if (_anim)
 		{
-			Log.out( "VoxelModel.stateSet - Stopping anim: " + _anim.metadata.name + "  starting: " + $state ); 
+			Log.out( "VoxelModel.stateSet - Stopping anim: " + _anim.name + "  starting: " + $state ); 
 			_anim.stop( this );
 			_anim = null;
 		}
@@ -885,7 +886,7 @@ public class VoxelModel
 			for each (var at:AnimationTransform in anim.transforms)
 			{
 				//Log.out( "VoxelModel.stateSet - have AnimationTransform looking for child : " + at.attachmentName );
-				if (addAnimationsInChildren(modelInfo.children, at, useInitializer, $lockTime))
+				if (addAnimationsInChildren(modelInfo.childVoxelModels, at, useInitializer, $lockTime))
 					result = true;
 			}
 		}
@@ -912,10 +913,10 @@ public class VoxelModel
 					cm.stateSetData($at, $useInitializer, $lockTime);
 					result = true;
 				}
-				else if (0 < cm.modelInfo.children.length)
+				else if (0 < cm.modelInfo.childVoxelModels.length)
 				{
 					//Log.out( "VoxelModel.stateSet - addAnimationsInChildren - looking in children of child for: " + $at.attachmentName );
-					if (addAnimationsInChildren(cm.modelInfo.children, $at, $useInitializer, $lockTime))
+					if (addAnimationsInChildren(cm.modelInfo.childVoxelModels, $at, $useInitializer, $lockTime))
 						result = true;
 				}
 			}
@@ -958,18 +959,18 @@ public class VoxelModel
 				//Log.out( "VoxelModel.updateAnimations - stateSet on anim: " + _anim.name ); 
 		}
 		// changing anim	
-		else if (_anim.metadata.name != $state)
+		else if (_anim.name != $state)
 		{
 			stateSet($state, $percentage);
 				//Log.out( "VoxelModel.updateAnimations - stateSet on NEW anim: " + _anim.name ); 
 		}
 		// updating existing anim
-		else if (_anim.metadata.name == $state)
+		else if (_anim.name == $state)
 		{
 			//Log.out( "VoxelModel.updateAnimations - updating transform on anim: " + _anim.name + " val: " + $percentage ); 
 			for each (var at:AnimationTransform in _anim.transforms)
 			{
-				updateAnimationsInChildren(modelInfo.children, at, $percentage);
+				updateAnimationsInChildren(modelInfo.childVoxelModels, at, $percentage);
 			}
 			_anim.update($percentage);
 		}
@@ -993,10 +994,10 @@ public class VoxelModel
 				}
 			}
 			// If this child has children, check them also.
-			else if (0 < cm.modelInfo.children.length)
+			else if (0 < cm.modelInfo.childVoxelModels.length)
 			{
 				//Log.out( "VoxelModel.updateAnimationsInChildren - looking in children of child for: " + $at.attachmentName );
-				if (updateAnimationsInChildren(cm.modelInfo.children, $at, $percentage))
+				if (updateAnimationsInChildren(cm.modelInfo.childVoxelModels, $at, $percentage))
 					result = true;
 			}
 		}

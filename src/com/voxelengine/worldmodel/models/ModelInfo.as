@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
@@ -38,7 +39,6 @@ import com.voxelengine.worldmodel.models.types.Player;
 
 public class ModelInfo extends PersistanceObject
 {
-	private var _childrenInstanceInfo:Vector.<InstanceInfo> 		= new Vector.<InstanceInfo>;// Child models and their relative positions
 	private var _animations:Vector.<Animation> 						= new Vector.<Animation>();	// Animations that this model has
 	
 	private var _data:OxelPersistance;
@@ -53,14 +53,13 @@ public class ModelInfo extends PersistanceObject
 	
 	public function get oxel():Oxel 								{ return _data.oxel; }
 	public function get data():OxelPersistance  					{ return _data; }
-	public function get childrenInstanceInfo():Vector.<InstanceInfo> { return _childrenInstanceInfo; }
-	public function get animationInfo():Vector.<InstanceInfo> 		{ return _info.model.animations; }
+	public function get animationInfo():Object						{ return info.model.animations; }
 	
-	public function get scripts():Vector.<String> 					{ return _info.model.scripts; }
-	public function get modelClass():String							{ return _info.model.modelClass; }
-	public function set modelClass(val:String):void 				{ _info.model.modelClass = val; }
-	public function get grainSize():int								{ return _info.model.grainSize; }
-	public function set grainSize(val:int):void						{ _info.model.grainSize = val; }
+	public function get scripts():Vector.<String> 					{ return info.model.scripts; }
+	public function get modelClass():String							{ return info.model.modelClass; }
+	public function set modelClass(val:String):void 				{ info.model.modelClass = val; }
+	public function get grainSize():int								{ return info.model.grainSize; }
+	public function set grainSize(val:int):void						{ info.model.grainSize = val; }
 	
 	public function get animations():Vector.<Animation> 			{ return _animations; }
 	public function get associatedGrain():GrainCursor 				{ return _associatedGrain; }
@@ -93,7 +92,7 @@ public class ModelInfo extends PersistanceObject
 		if ( data )
 			data.update();
 			
-		for each (var vm:VoxelModel in _children)
+		for each (var vm:VoxelModel in childVoxelModels )
 			vm.update($context, $elapsedTimeMS);
 	}
 	
@@ -101,7 +100,7 @@ public class ModelInfo extends PersistanceObject
 		if ( _data )
 			_data.draw(	$mvp, $vm, $context, $selected, $isChild, $isAlpha );
 			
-		for each (var vm:VoxelModel in _children) {
+		for each (var vm:VoxelModel in childVoxelModels) {
 			if (vm && vm.complete)
 				vm.draw($mvp, $context, true, $isAlpha );
 		}
@@ -110,7 +109,6 @@ public class ModelInfo extends PersistanceObject
 	override public function release():void {
 		super.release();
 		_biomes = null;
-		_childrenInstanceInfo = null;
 		_animations = null;
 		_data.release();
 	}
@@ -123,7 +121,7 @@ public class ModelInfo extends PersistanceObject
 	}
 
 	public function bringOutYourDead():void {
-		for each (var deadCandidate:VoxelModel in _children) {
+		for each (var deadCandidate:VoxelModel in childVoxelModels) {
 			if (true == deadCandidate.dead)
 				childRemove(deadCandidate.instanceInfo);
 		}
@@ -244,15 +242,17 @@ public class ModelInfo extends PersistanceObject
 	protected 	var	_animationsLoaded:Boolean						= true;
 	public 	function get animationsLoaded():Boolean 				{ return _animationsLoaded; }
 	public 	function set animationsLoaded(value:Boolean):void		{ _animationsLoaded = value; }
-	private var _animationInfo:Vector.<Object> 						= new Vector.<Object>();	// ID and name of animations that this model has, before loading
+	//private var _animationInfo:Vector.<Object> 						= new Vector.<Object>();	// ID and name of animations that this model has, before loading
 	private var _animationCount:int;			
 	
 	// Dont load the animations until the model is instaniated
 	public function animationsLoad():void {
-		AnimationEvent.addListener( ModelBaseEvent.DELETE, animationDeleteHandler );
-		AnimationEvent.addListener( ModelBaseEvent.ADDED, animationAdd );
 		_series = 0;
 		if ( animationInfo && 0 < animationInfo.length ) {
+			AnimationEvent.addListener( ModelBaseEvent.DELETE, 		animationDeleteHandler );
+			AnimationEvent.addListener( ModelBaseEvent.ADDED, 		animationAdd );
+			AnimationEvent.addListener( ModelBaseEvent.UPDATE_GUID,	animationUpdateGuid );		
+			
 			for each ( var animData:Object in animationInfo ) {
 				animationsLoaded = false;
 				_animationCount++; 
@@ -273,6 +273,7 @@ public class ModelInfo extends PersistanceObject
 	public function animationsDelete():void {
 		if ( animationInfo ) {
 			Log.out( "ModelInfo.animationsDelete - animations found" );
+			// Dont worry about removing the animations, since the modelInfo is being deleted.
 			for each ( var animData:Object in animationInfo ) {
 				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, guid, animData.guid, null ) );
 			}
@@ -282,22 +283,44 @@ public class ModelInfo extends PersistanceObject
 	public function animationAdd( $ae:AnimationEvent ):void {
 		//Log.out( "ModelInfo.addAnimation " + $ae, Log.WARN );
 		if ( _series == $ae.series ) {
-			$ae.ani.metadata.modelGuid = guid;
+//			$ae.ani.modelGuid = guid;
 			_animations.push( $ae.ani );
 			_animationCount--;
 			if ( 0 == _animationCount ) {
 				animationsLoaded = true;
+				AnimationEvent.removeListener( ModelBaseEvent.DELETE, 		animationDeleteHandler );
+				AnimationEvent.removeListener( ModelBaseEvent.ADDED, 		animationAdd );
+				AnimationEvent.removeListener( ModelBaseEvent.UPDATE_GUID,	animationUpdateGuid );		
 				//Log.out( "ModelInfo.addAnimation safe to save now: " + guid, Log.WARN );
+			}
+			// This is only needed when I am importing objects into the app.
+			if ( ModelMakerImport.isImporting ) {
+				for each ( var ani:Object in animationInfo ) {
+					if ( ani.name == $ae.ani.name ) {
+						if ( ani.guid != $ae.ani.guid ) {
+							ani.guid = $ae.ani.guid
+							changed = true;
+						}
+					}
+				}
 			}
 		}
 	}
+	
+	public function animationUpdateGuid( $ae:AnimationEvent ):void {
+		Log.out( "ModelInfo.animationUpdateGuid $ae: " + $ae, Log.WARN );
+		if ( $ae.modelGuid == guid )
+			// Looking the in the animationInfo, and the animations.
+			changed = true;
+	}
+	
 	
 	public function animationDeleteHandler( $ae:AnimationEvent ):void {
 		//Log.out( "ModelInfo.animationDelete $ae: " + $ae, Log.WARN );
 		if ( $ae.modelGuid == guid ) {
 			for ( var i:int; i < _animations.length; i++ ) {
 				var anim:Animation = _animations[i];
-				if ( anim.metadata.guid == $ae.aniGuid ) {
+				if ( anim.guid == $ae.aniGuid ) {
 					_animations.splice( i, 1 );
 					changed = true;
 					return;
@@ -309,7 +332,7 @@ public class ModelInfo extends PersistanceObject
 	public function animationGet( $animName:String ):Animation {
 		for ( var i:int; i < _animations.length; i++ ) {
 			var anim:Animation = _animations[i];
-			if ( anim.metadata.name == $animName ) {
+			if ( anim.name == $animName ) {
 				return anim;
 			}
 		}
@@ -319,57 +342,44 @@ public class ModelInfo extends PersistanceObject
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  Children functions
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	protected 	var			 _children:Vector.<VoxelModel>			= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
-	public		function get children():Vector.<VoxelModel>			{ return _children; }
-	public		function 	 childrenGet():Vector.<VoxelModel>		{ return _children; } // This is so the function can be passed as parameter
+	protected 	var			 _childVoxelModels:Vector.<VoxelModel>			= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
+	public		function get childVoxelModels():Vector.<VoxelModel>			{ return _childVoxelModels; }
+	public		function 	 childVoxelModelsGet():Vector.<VoxelModel>		{ return _childVoxelModels; } // This is so the function can be passed as parameter
+
+	//private var _childrenInstanceInfo:Vector.<InstanceInfo> 		= new Vector.<InstanceInfo>;// Child models and their relative positions
+	//public function get childrenInstanceInfo():Vector.<InstanceInfo> { return _childrenInstanceInfo; }
 	
 	protected 	var			_childrenLoaded:Boolean					= true;
 	public 		function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
 	public 		function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
 	
 	/////////////////////
-	private function childrenFromObject( $children:Object ):void {
+	/*
+	private function childrenFromObject():void {
 		Log.out( "ModelInfo.childrenFromObject", Log.DEBUG );
-		for each ( var v:Object in $children ) {
+		for each ( var v:Object in info.model.children ) {
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.fromObject( v );
 			// This adds the instanceInfo for the child models to our child list which is processed when object is initialized
-			childrenInstanceInfoAdd( ii );
+//			childrenInstanceInfoAdd( ii );
 		}
 	}
-	
-	private function childrenInstanceInfoAdd( $instanceInfo:InstanceInfo ):void {
-		if ( guid == $instanceInfo.modelGuid ) {
-			// TODO this needs to examine all of the children in that model guid.
-			// Since this would allow B owns A, and you could add B to A, which would cause a recurvise error
-			Log.out( "ModelInfo.childAddInstanceInfo - Rejecting child with same model guid as parent", Log.ERROR );
-			return;
-		}
-		// Dont add child that already exist
-		//Log.out( "ModelInfo.childAddInstanceInfo  fileName: " + fileName + " child ii: " + $instanceInfo, Log.WARN );
-		for each ( var child:InstanceInfo in _childrenInstanceInfo ) {
-			if ( child === $instanceInfo ) {
-				//Log.out( "ModelInfo.childAddInstanceInfo - Rejecting child with same instance guid as sibling", Log.ERROR );
-				return;
-			}
-		}
-		_childrenInstanceInfo.push( $instanceInfo );
-	}
+	*/
 	
 	public function childrenLoad( $vm:VoxelModel ):void {
-		if ( childrenInstanceInfo && 0 < childrenInstanceInfo.length)
+		if ( info.model.children && 0 < info.model.children.length)
 		{
-			Log.out( "ModelInfo.childrenLoad - loading for model: " + guid + childrenInstanceInfo.length );
+			Log.out( "ModelInfo.childrenLoad - loading for model: " + guid + " len: " + info.model.children.length );
 			childrenLoaded	= false;
 			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
-			for each (var childInstanceInfo:InstanceInfo in childrenInstanceInfo)
-			{
-				// Add the parent model info to the child.
-				childInstanceInfo.controllingModel = $vm;
-				childInstanceInfo.baseLightLevel = $vm.instanceInfo.baseLightLevel;
+			for each ( var v:Object in info.model.children ) {
+				var ii:InstanceInfo = new InstanceInfo();
+				ii.fromObject( v );
+				ii.controllingModel = $vm;
+				ii.baseLightLevel = $vm.instanceInfo.baseLightLevel;
 				
 				//Log.out( "VoxelModel.childrenLoad - create child of parent.instance: " + instanceInfo.guid + "  - child.instanceGuid: " + child.instanceGuid );					
-				if ( null == childInstanceInfo.modelGuid )
+				if ( null == ii.modelGuid )
 					continue;
 				// now load the child, this might load from the persistance
 				// or it could be an import, or it could be a model for the toolbar.
@@ -379,10 +389,12 @@ public class ModelInfo extends PersistanceObject
 				// So add to cache just adds it to parent instance.
 				//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
 				//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + childInstanceInfo );
-				ModelMakerBase.load( childInstanceInfo, true, false );
+				ModelMakerBase.load( ii, true, false );
 			}
 			Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
 			//Log.out( "VoxelModel.childrenLoad - loading child models END" );
+			if ( ModelMakerImport.isImporting )
+				delete info.model.children
 		}
 		else
 			childrenLoaded	= true;
@@ -402,12 +414,12 @@ public class ModelInfo extends PersistanceObject
 		var index:int = 0;
 		var gc:GrainCursor;
 		var result:Boolean;
-		for each (var child:VoxelModel in _children) {
+		for each (var child:VoxelModel in childVoxelModels) {
 			if ( !child || !child.associatedGrain )
 				continue;
 			gc = child.associatedGrain;	
 			if ( gc.is_equal( $gc ) ) {
-				_children.splice(index, 1);
+				childVoxelModels.splice(index, 1);
 				result = true;
 				break;
 			}
@@ -425,24 +437,42 @@ public class ModelInfo extends PersistanceObject
 			 $child.instanceInfo.instanceGuid = Globals.getUID();
 		//Log.out(  "-------------- VoxelModel.childAdd -  $child: " +  $child.toString() );
 		// remove parent level model
-		_children.push( $child);
-		changed = true;
+		childVoxelModels.push( $child);
 		// Dont add the player to the instanceInfo, or you end up in a recursive loop
 		if ( $child is Player )
 			return;
 		else
-			childrenInstanceInfoAdd( $child.instanceInfo )
-		// do I need the light level?
-//		$child.instanceInfo.baseLightLevel = owner.instanceInfo.baseLightLevel;
+			childrenAdd( $child.instanceInfo )
 		// Do I need to return to player to a parent model when leaving a ridable.
 //		Region.currentRegion.modelCache.changeFromParentToChild( $child);
+
+		function childrenAdd( $instanceInfo:InstanceInfo ):void {
+			if ( guid == $instanceInfo.modelGuid ) {
+				// TODO this needs to examine all of the children in that model guid.
+				// Since this would allow B owns A, and you could add B to A, which would cause a recurvise error
+				Log.out( "ModelInfo.childAddInstanceInfo - Rejecting child with same model guid as parent", Log.ERROR );
+				return;
+			}
+			// Dont add child that already exist
+			if ( info.model.children ) {
+				for each ( var child:Object in info.model.children ) {
+					if ( child.instanceGuid === $instanceInfo.instanceGuid )
+						return;
+				}
+			}
+			else 
+				info.model.children = new Array();
+				
+			changed = true;
+			info.model.children.push( $instanceInfo.toObject() );
+		}
 	}
 	
 	public function childRemoveByInstanceInfo( $instanceInfo:InstanceInfo ):void {
 		var index:int = 0;
-		for each (var child:VoxelModel in _children) {
+		for each (var child:VoxelModel in childVoxelModels) {
 			if (child.instanceInfo.instanceGuid ==  $instanceInfo.instanceGuid ) {
-				_children.splice(index, 1);
+				childVoxelModels.splice(index, 1);
 				changed = true;
 				break;
 			}
@@ -487,12 +517,12 @@ public class ModelInfo extends PersistanceObject
 	
 	public function childModelFind(guid:String):VoxelModel
 	{
-		for each (var child:VoxelModel in _children) {
+		for each (var child:VoxelModel in childVoxelModels) {
 			if (child.instanceInfo.instanceGuid == guid)
 				return child;
 		}
 		// didnt find it at first level, lets look recurvsivly
-		for each ( child in _children) {
+		for each ( child in childVoxelModels) {
 			var cvm:VoxelModel = child.modelInfo.childModelFind( guid );
 			if ( cvm )
 				return cvm;
@@ -504,7 +534,7 @@ public class ModelInfo extends PersistanceObject
 	
 	public function childFindByName($name:String):VoxelModel
 	{
-		for each (var child:VoxelModel in _children) {
+		for each (var child:VoxelModel in childVoxelModels) {
 			if (child.metadata.name == $name)
 				return child;
 		}
@@ -512,17 +542,20 @@ public class ModelInfo extends PersistanceObject
 	}
 	
 	public function childRemove( $ii:InstanceInfo ):void	{
-		for ( var i:int; i < _childrenInstanceInfo.length; i++ )
-			if ( $ii == _childrenInstanceInfo[i] );
-				_childrenInstanceInfo[i] = null;
+		// Must remove the model, and the child dependancy
+		for ( var j:int; j < childVoxelModels.length; j++ ) {
+			if ( childVoxelModels[j].instanceInfo ==  $ii )
+				childVoxelModels.splice( j, 1 );
+		}
+		for ( var i:int; i < info.model.children.length; i++ )
+			if ( info.model.children[i].instanceGuid == $ii.instanceGuid );
+				delete info.model.children[i];
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// start persistance
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private static const DEFAULT_CLASS:String		= "VoxelModel";
-	private var _info:Object;
-	public function get info():Object { return _info; }
 
 	private var _fileName:String 					= "INVALID"; 	// Used for local loading and import of data from local file system
 	private var _biomes:Biomes;										// used to generate terrain and apply other functions to oxel
@@ -530,50 +563,41 @@ public class ModelInfo extends PersistanceObject
 	private var _altGuid:String;									// used to handle loading from biome
 	private var _firstLoadFailed:Boolean;							// true if load from biomes data is needed
 	
-	public function save():void {
-		if ( Globals.online && changed ) {
-			if (  true == animationsLoaded && true == childrenLoaded ) {
-				if ( Globals.isGuid( guid ) ) {
-					//Log.out( "ModelInfo.save - Saving ModelInfo: " + guid  + " in table: " + table, Log.WARN );
-					changed = false;
-					addSaveEvents();
-					toObject();
-						
-					PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null ) );
-				}
+	override public function save():void {
+		if (  true == animationsLoaded && true == childrenLoaded ) {
+			if ( Globals.isGuid( guid ) ) {
+				//Log.out( "ModelInfo.save - Saving ModelInfo: " + guid  + " in table: " + table, Log.WARN );
+				super.save();
 			}
-			//else 
-				//Log.out( "ModelInfo.save - Not saving ModelInfo - children OR animations not loaded - guid: " + guid );
 		}
-		//else
-			//Log.out( "ModelInfo.save - Not saving ModelInfo - either offline or NOT changed - guid: " + guid );
 			
 		if ( _data )
 			_data.save();	
 		
-		for ( var i:int; i < _children.length; i++ ) {
-			var child:VoxelModel = _children[i];
+		for ( var i:int; i < childVoxelModels.length; i++ ) {
+			var child:VoxelModel = childVoxelModels[i];
 			child.save();
 		}
 	}
 	
 	
 	public function fromObjectImport( $dbo:DatabaseObject ):void {
-		_dbo = $dbo;
+		dbo = $dbo;
 		// The data is needed the first time it saves the object from import, after that it goes away
 		if ( !dbo.data.model )
 			return;
 		
-		_info = $dbo.data;
+		info = $dbo.data;
 		loadFromInfo();
+		changed = true;
 	}
 	
 	public function fromObject( $dbo:DatabaseObject ):void {
-		_dbo = $dbo;
+		dbo = $dbo;
 		if ( !dbo.model )
 			return;
 		
-		_info = $dbo;
+		info = $dbo;
 		loadFromInfo();
 	}
 	
@@ -581,42 +605,42 @@ public class ModelInfo extends PersistanceObject
 	private function loadFromInfo():void {
 		if ( !info.model ) {
 			info.model = new Object();
-			Log.out( "ModelInfo.loadFromInfo - modelInfo not found: " + JSON.stringify( _info ), Log.ERROR );
+			Log.out( "ModelInfo.loadFromInfo - modelInfo not found: " + JSON.stringify( info ), Log.ERROR );
 		}
-		var mi:Object = _info.model;
-		if ( !mi.modelClass )
-			mi.modelClass = DEFAULT_CLASS;
-		if ( mi.biomes )
-			biomesFromObject( mi.biomes );
+		if ( !info.model.modelClass )
+			info.model.modelClass = DEFAULT_CLASS;
+		if ( info.model.biomes )
+			biomesFromObject( info.model.biomes );
 		
 		// scripts are stored in the info object until needed, no more preloading
 		//scriptsFromObject( mi.scripts );
 		
-		if ( mi.children )
-			childrenFromObject( mi.children );
-		if ( mi.animations )
-			animationsFromObject( mi.animations );
+		//if ( info.model.children )
+			//childrenFromObject();
+		// animations are stored in the info object until needed, no more preloading
+		//if ( mi.animations )
+			//animationsFromObject( mi.animations );
 	
 	}
 
 		public function toObject():void {
 		// I am faking a heirarchy here, not good object oriented behavior but needs major redesign to do what I want.
 		// so instead I just get the current setting from the class
-		var modelClassPrototype:Class = ModelLibrary.getAsset( _info.model.modelClass );
+		var modelClassPrototype:Class = ModelLibrary.getAsset( info.model.modelClass );
 		try {
 			modelClassPrototype.buildExportObject( dbo );
 		} catch ( e:Error ) {
-			Log.out( "ModelInfo.toObject - Error with Class: " + _info.model.modelClass, Log.ERROR );
+			Log.out( "ModelInfo.toObject - Error with Class: " + info.model.modelClass, Log.ERROR );
 		}
 
 		if ( getGrainSize() )
-			_info.model.grainSize =  getGrainSize();
+			info.model.grainSize =  getGrainSize();
 		if ( null != associatedGrain )
-			_info.model.associatedGrain = associatedGrain;
+			info.model.associatedGrain = associatedGrain;
 		
-		var childrenAdded:int = childrenGet();
+		//var childrenAdded:int = childrenGet();
 		//animationsGet();
-		
+		/*
 		function childrenGet():int {
 			// Same code that is in modelCache to build models in region
 			// this is just models in models
@@ -627,11 +651,12 @@ public class ModelInfo extends PersistanceObject
 						children["instanceInfo" + i]  = _childrenInstanceInfo[i].toObject();
 				}	}
 
-				_info.model.children = children;
+				info.model.children = children;
 				return i;
 			}
 			return 0;
 		}
+		*/
 		/*
 		function animationsGet():void {
 			var len:int = _animations.length;
@@ -645,7 +670,7 @@ public class ModelInfo extends PersistanceObject
 				oa.push( ao );
 			}
 			if ( 0 < oa.length ) 
-				_info.animations = JSON.stringify( oa );
+				info.animations = JSON.stringify( oa );
 			oa = null;
 		}
 		*/
@@ -662,6 +687,7 @@ public class ModelInfo extends PersistanceObject
 		delete info.model.biomes;	
 		
 	}
+	/*
 	private function animationsFromObject( $animations:Object ):void {
 	// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
 		Log.out( "ModelInfo.animationsFromObject" );	
@@ -670,7 +696,7 @@ public class ModelInfo extends PersistanceObject
 			_animationInfo.push( animData );
 		}
 	}
-
+*/
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End Children functions
 	/////////////////////////////////////////////////////////////////////////////////////////////

@@ -41,9 +41,14 @@ import com.voxelengine.worldmodel.models.ModelInfo;
 	 */
 public class ModelMakerImport extends ModelMakerBase {
 	
-	private var _prompt:Boolean;
+	static private var _isImporting:Boolean;
+	static public function get isImporting():Boolean { return _isImporting; }
 	
+	private var _prompt:Boolean;
+		
 	public function ModelMakerImport( $ii:InstanceInfo, $prompt:Boolean = true ) {
+		// This should never happen in a release version, so dont worry about setting it to false when done
+		_isImporting = true;
 		_prompt = $prompt;
 		super( $ii, false );
 		Log.out( "ModelMakerImport - ii: " + ii.toString() );

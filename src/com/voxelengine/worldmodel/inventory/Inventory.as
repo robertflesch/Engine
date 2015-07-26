@@ -67,17 +67,13 @@ public class Inventory extends PersistanceObject implements IPersistance
 	// TO Persistance
 	//////////////////////////////////////////////////////////////////
 	
-	public function save():void {
+	override public function save():void {
 		// TODO this needs to detect "changed"
-		if ( Globals.online && loaded ) {
-			Log.out( "Inventory.save - Saving Inventory: " + guid  + " in table: " + table, Log.DEBUG );
-			addSaveEvents();
-			toPersistance();
-				
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, _dbo, null ) );
+		if ( loaded ) {
+			Log.out( "Inventory.save - Not LOADED", Log.DEBUG );
+			return; 
 		}
-		else
-			Log.out( "Inventory.save - Not saving data, either offline or NOT changed or locked - guid: " + guid );
+		super.save();
 	}
 
 	//public function toObject():void {
@@ -88,10 +84,10 @@ public class Inventory extends PersistanceObject implements IPersistance
 	public function fromObject( $object:Object, $ba:ByteArray ):void { }
 	
 	public function toPersistance():void {
-		_voxels.toPersistance(_dbo);
-		_slots.toPersistance(_dbo);
+		_voxels.toPersistance(dbo);
+		_slots.toPersistance(dbo);
 		var ba:ByteArray = new ByteArray(); 
-		_dbo.data 			= toByteArray( ba );
+		dbo.data 			= toByteArray( ba );
 	}
 
 
@@ -100,7 +96,7 @@ public class Inventory extends PersistanceObject implements IPersistance
 		if ( $dbo ) {
 			_createdDate	= $dbo.createdDate;
 			_modifiedDate   = $dbo.modifiedDate;
-			_dbo 			= $dbo;
+			dbo 			= $dbo;
 		}
 		
 		// This tells me how many of each kind I have

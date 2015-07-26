@@ -83,7 +83,7 @@ package com.voxelengine.GUI.animation
 			}
 			else {
 				_create = true
-				_ani = new Animation();
+				_ani = new Animation( "INVALID" );
 			}
 			
 			autoSize = true;
