@@ -241,13 +241,13 @@ package com.voxelengine.worldmodel.models
 			//}
 		//}
 
-		public function toObject():Object {
-			var models:Object = new Object();
+		public function toObject():Array {
+			var models:Array = new Array();
 			for ( var i:int; i < _instances.length; i++ ) {
 				var vm:VoxelModel = _instances[i];
 				if ( vm is Player )
 					continue;
-				models["instanceInfo" + i] = vm.instanceInfo.toObject();
+				models.push( vm.instanceInfo.toObject() );	
 			}
 			return models;
 		}
