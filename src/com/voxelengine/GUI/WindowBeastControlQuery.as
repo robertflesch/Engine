@@ -48,7 +48,7 @@ public class WindowBeastControlQuery extends VVCanvas
 			_s_currentInstance = this;
 			autoSize = true;
 			
-			var button:Button = new Button( "Click me to control beast ( or 'F' key )" );
+			var button:Button = new Button( "F key to take control" );
 			button.width = 300;
 			button.height = 80;
 			button.addEventListener(MouseEvent.CLICK, takeControlMouse );

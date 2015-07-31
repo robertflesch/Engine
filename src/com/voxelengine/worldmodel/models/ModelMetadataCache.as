@@ -112,7 +112,7 @@ public class ModelMetadataCache
 	}
 	
 	static private function deleteHandler( $mme:ModelMetadataEvent ):void {
-		Log.out( "ModelMetadataCache.deleteHandler $mme: " + $mme, Log.WARN );
+		//Log.out( "ModelMetadataCache.deleteHandler $mme: " + $mme, Log.WARN );
 		var mmd:ModelMetadata = _metadata[$mme.modelGuid];
 		if ( null != mmd ) {
 			_metadata[$mme.modelGuid] = null; 
@@ -191,7 +191,7 @@ public class ModelMetadataCache
 		}
 		// check to make sure is not already there
 		if ( null ==  _metadata[$vmm.guid] ) {
-			Log.out( "ModelMetadataCache.add vmm: " + $vmm.guid, Log.WARN );
+			//Log.out( "ModelMetadataCache.add vmm: " + $vmm.guid, Log.WARN );
 			_metadata[$vmm.guid] = $vmm; 
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, $series, $vmm.guid, $vmm ) );
 		}

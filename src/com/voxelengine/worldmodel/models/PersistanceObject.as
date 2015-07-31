@@ -80,8 +80,15 @@ public class PersistanceObject
 				
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null ) );
 		}
-		else
-			Log.out( "PersistanceObject.save - Not saving data, NOT online - guid: " + guid );
+		else {
+			if ( Globals.online && !changed )
+				Log.out( "PersistanceObject.save - Not saving data - guid: " + guid + " NOT changed" );
+			else if ( !Globals.online && changed )
+				Log.out( "PersistanceObject.save - Not saving data - guid: " + guid + " NOT online" );
+			else	
+				Log.out( "PersistanceObject.save - Not saving data - Offline and not changed" );
+		}
+				
 	}
 	
 	private function saveSucceed( $pe:PersistanceEvent ):void { 

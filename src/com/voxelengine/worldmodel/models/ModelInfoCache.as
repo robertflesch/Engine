@@ -117,8 +117,6 @@ public class ModelInfoCache
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
 	}
 	
-	
-	
 	static private function generated( $mie:ModelInfoEvent ):void  {
 		add( 0, $mie.vmi );
 	}

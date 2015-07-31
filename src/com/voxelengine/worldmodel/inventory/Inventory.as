@@ -70,7 +70,7 @@ public class Inventory extends PersistanceObject implements IPersistance
 	override public function save():void {
 		// TODO this needs to detect "changed"
 		if ( loaded ) {
-			Log.out( "Inventory.save - Not LOADED", Log.DEBUG );
+			Log.out( "Inventory.save - Not LOADED - guid: " + guid, Log.DEBUG );
 			return; 
 		}
 		super.save();

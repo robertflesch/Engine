@@ -116,7 +116,7 @@ package com.voxelengine.worldmodel.models.types
 				
 			if ( beastInfo.seatLocation ) {
 				if ( beastInfo.seatLocation is Object ) {
-					Log.out( "Beast.processClassJson: " + beastInfo.seatLocation );
+//					Log.out( "Beast.processClassJson: " + JSON.stringify( beastInfo.seatLocation ) );
 					_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
 				}
 				else

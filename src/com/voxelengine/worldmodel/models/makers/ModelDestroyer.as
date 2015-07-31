@@ -49,7 +49,7 @@ public class ModelDestroyer {
 	private function dataResult( $mie:ModelInfoEvent):void 
 	{
 		if ( _modelGuid == $mie.modelGuid ) {
-			Log.out( "ModelDestroyer.dataResult - received modelInfo: " + $mie, Log.WARN );
+			//Log.out( "ModelDestroyer.dataResult - received modelInfo: " + $mie, Log.WARN );
 			// Now that we have the modelData, we can extract the modelInfo
 			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, dataResult );
 			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, dataResult );

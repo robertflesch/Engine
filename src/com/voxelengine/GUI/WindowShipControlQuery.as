@@ -38,7 +38,7 @@ public class WindowShipControlQuery extends VVCanvas
 			//onCloseFunction = closeFunction;
 			//defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION;
 			
-			var button:Button = new Button( "Click me to become captain ( or 'F' key )" );
+			var button:Button = new Button( "F key to take control" );
 			button.width = 300;
 			button.height = 80;
 			button.addEventListener(MouseEvent.CLICK, takeControlMouse );

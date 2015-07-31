@@ -133,7 +133,7 @@ package {
 		
 		private function activate(e:Event):void 
 		{
-			Log.out( "VoxelVerse.activate event" );
+			Log.out( "VoxelVerse.activate event", Log.WARN );
 			activateApp();
 		}
 		

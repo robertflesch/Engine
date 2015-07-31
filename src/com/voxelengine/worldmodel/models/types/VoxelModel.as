@@ -858,7 +858,7 @@ public class VoxelModel
 			return; // not all children have loaded yet
 		}
 		
-		Log.out( "VoxelModel.stateSet setTo: " + $state + "  current: " + (_anim ? _anim.name : "No current state") ); 
+		//Log.out( "VoxelModel.stateSet setTo: " + $state + "  current: " + (_anim ? _anim.name : "No current state") ); 
 		if (_anim)
 		{
 			Log.out( "VoxelModel.stateSet - Stopping anim: " + _anim.name + "  starting: " + $state ); 

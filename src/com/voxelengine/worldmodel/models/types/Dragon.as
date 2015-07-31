@@ -242,12 +242,10 @@ public class Dragon extends Beast
 	private function defaultSlotDataRequest( $ise:InventorySlotEvent ):void {
 		if ( instanceInfo.instanceGuid == $ise.ownerGuid ) {
 			Log.out( "Dragon.getDefaultSlotData - Loading default data into slots" , Log.WARN );
-			var slots:Vector.<ObjectInfo> = new Vector.<ObjectInfo>( Slots.ITEM_COUNT );
-			for ( var i:int; i < Slots.ITEM_COUNT; i++ ) 
-				slots[i] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );
 			
 			var oa:ObjectAction = new ObjectAction( null, "loseControlHandler", "dismount.png", "Dismount" );
-				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, instanceInfo.instanceGuid, 0, oa ) ); 
+			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, instanceInfo.instanceGuid, 0, oa ) ); 
+			
 			for each ( var gun:Gun in _guns )
 				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, gun.instanceInfo.instanceGuid, 0, null ) );
 		}

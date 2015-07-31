@@ -86,7 +86,7 @@ public class OxelPersistanceCache
 			return;
 		}
 		
-		Log.out( "OxelDataCache.request guid: " + $ode.modelGuid, Log.DEBUG );
+		//Log.out( "OxelDataCache.request guid: " + $ode.modelGuid, Log.DEBUG );
 		var od:OxelPersistance = _oxelDataDic[$ode.modelGuid]; 
 		if ( null == od ) {
 			if ( _block.has( $ode.modelGuid ) )	
@@ -109,7 +109,7 @@ public class OxelPersistanceCache
 	}
 	
 	static private function deleteHandler( $ode:OxelDataEvent ):void {
-		Log.out( "OxelDataCache.deleteHandler $ode: " + $ode, Log.WARN );
+		//Log.out( "OxelDataCache.deleteHandler $ode: " + $ode, Log.WARN );
 		var od:OxelPersistance = _oxelDataDic[$ode.modelGuid];
 		if ( null != od ) {
 			_oxelDataDic[$ode.modelGuid] = null; 
@@ -136,8 +136,6 @@ public class OxelPersistanceCache
 				dbo.data = new Object();
 				dbo.data.ba = $pe.data;
 				od.fromObjectImport( dbo );
-				// On import mark it as changed.
-				od.changed = true;
 			}
 			else
 				od.fromObject( $pe.dbo );

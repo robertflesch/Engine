@@ -272,11 +272,11 @@ package com.voxelengine.worldmodel
 			
 			// The null owner check makes it to we dont save local loaded regions to persistance
 			if ( Globals.online && changed && null != owner && Globals.isGuid( guid ) ) {
-				Log.out( "Region.save - SAVING region id: " + guid + "  name: " + name + "  and locking", Log.INFO );
+				//Log.out( "Region.save - SAVING region id: " + guid + "  name: " + name + "  and locking", Log.INFO );
 				addSaveEvents();
 				toObject();
 				
-				Log.out( "Region.save - PersistanceEvent.dispatch region id: " + guid + "  name: " + name, Log.WARN );
+				//Log.out( "Region.save - PersistanceEvent.dispatch region id: " + guid + "  name: " + name, Log.WARN );
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.BIGDB_TABLE_REGIONS, guid, dbo, null ) );
 				// or could do this in the suceed, but if it fails do I want to keep retrying?
 				changed = false;

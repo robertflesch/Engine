@@ -96,8 +96,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 			
 			var ba:ByteArray = OxelPersistance.toByteArray( oxel );
-			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
-			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
+//			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
+//			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba ) );
 			
 			//Log.out( "GenerateCube.start - took: "  + (getTimer() - timer) );					

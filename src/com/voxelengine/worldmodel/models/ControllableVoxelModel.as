@@ -117,8 +117,8 @@ public class ControllableVoxelModel extends VoxelModel
 			if ( cmInfo.maxSpeed )
 				maxSpeed = cmInfo.maxSpeed;
 		}
-		else
-			Log.out( "ControllableVoxelModel.processClassJson - no ControllableModelInfo info found", Log.WARN );
+//		else
+//			Log.out( "ControllableVoxelModel.processClassJson - no ControllableModelInfo info found", Log.WARN );
 	}
 	
 	static public function buildExportObject( obj:Object ):void {
