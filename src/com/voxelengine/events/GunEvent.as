@@ -15,29 +15,31 @@ import com.voxelengine.worldmodel.weapons.Ammo;
  * ...
  * @author Robert Flesch - RSF 
  */
-public class AmmoEvent extends ModelBaseEvent
+public class GunEvent extends Event
 {
+	static public const AMMO_ADDED:String						= "AMMO_ADDED";
+	static public const AMMO_LOAD_COMPLETE:String				= "AMMO_LOAD_COMPLETE";
+	//static public const AMMO_EXHUSTED:String					= "AMMO_EXHUSTED";
+	//static public const AMMO_REMOVED:String						= "AMMO_REMOVED";
 	private var _guid:String;
-	private var _ammo:Ammo;
-	private var _fromTable:Boolean;
-	public function get guid():String { return _guid; }
-	public function get ammo():Ammo  { return _ammo; }
-	public function get fromTable():Boolean  { return _fromTable; }
-	
-	public function AmmoEvent( $type:String, $series:int, $guid:String, $ammo:Ammo, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	private var _data1:*;
+	private var _data2:*;
+	public function get data1():* { return _data1; }
+	public function get data2():* { return _data2; }
+	public function GunEvent( $type:String, $guid:String, $data1:* = null, $data2:* = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
-		super( $type, $series, $bubbles, $cancellable );
-		_fromTable = $fromTable;
+		super( $type, $bubbles, $cancellable );
 		_guid = $guid;
-		_ammo = $ammo;
+		_data1 = $data1;
+		_data2 = $data2;
 	}
 	
 	public override function clone():Event {
-		return new AmmoEvent(type, series, _guid, _ammo, bubbles, cancelable);
+		return new GunEvent(type, _guid, _data1, _data2, bubbles, cancelable);
 	}
    
 	public override function toString():String {
-		return formatToString( "AmmoEvent", "series", "guid", "ammo", "vmd" );
+		return formatToString( "GunEvent", "data1", "data2" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////
@@ -53,9 +55,10 @@ public class AmmoEvent extends ModelBaseEvent
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:AmmoEvent ) : Boolean {
+	static public function dispatch( $event:GunEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
+	
 	
 	///////////////// Event handler interface /////////////////////////////
 }

@@ -55,7 +55,7 @@ public class ModelInfo extends PersistanceObject
 	public function get data():OxelPersistance  					{ return _data; }
 	public function get animationInfo():Object						{ return info.model.animations; }
 	
-	public function get scripts():Vector.<String> 					{ return info.model.scripts; }
+	public function get scripts():Array 							{ return info.model.scripts; }
 	public function get modelClass():String							{ return info.model.modelClass; }
 	public function set modelClass(val:String):void 				{ info.model.modelClass = val; }
 	public function get grainSize():int								{ return info.model.grainSize; }

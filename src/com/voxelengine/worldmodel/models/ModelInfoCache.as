@@ -102,7 +102,7 @@ public class ModelInfoCache
 		// And this was called only after the request returned.
 		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
 		if ( mi ) {
-			for each ( var childii:InstanceInfo in mi.info.children ) {
+			for each ( var childii:Object in mi.info.model.children ) {
 				if ( childii && childii.modelGuid ) {
 					// Using the fromTables to handle the recursive flag
 					new ModelDestroyer( childii.modelGuid, $mie.fromTables );		

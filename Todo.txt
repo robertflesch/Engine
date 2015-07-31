@@ -302,3 +302,6 @@ http://jobs.gamasutra.com/job/vp-of-engineering-los-angeles-california-28983
 
 Replacement for PlayerIO
 http://gamua.com/flox/
+
+Possible Open Source License
+https://en.wikipedia.org/wiki/Affero_General_Public_License

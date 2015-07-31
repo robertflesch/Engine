@@ -98,8 +98,10 @@ package com.voxelengine.renderer
 			
 			// This allows flash to run on older video drivers.
 			//Context3DProfile.BASELINE_CONSTRAINED
-			Log.out( "Renderer.init - requestContext3D", Log.DEBUG );			
+			Log.out( "Renderer.init - requestContext3D Profile: Context3DProfile.BASELINE_CONSTRAINED", Log.DEBUG );	
+			// http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display3D/Context3DProfile.html
 			_stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE_CONSTRAINED);
+			
 			Log.out( "Renderer.init - requestContext3D AFTER", Log.DEBUG );			
 			//_stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE);
 		}

@@ -19,7 +19,6 @@ import org.flashapi.swing.Alert;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.worldmodel.SoundBank;
-import com.voxelengine.events.AmmoEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.worldmodel.TypeInfo;
@@ -28,6 +27,7 @@ import com.voxelengine.worldmodel.models.IPersistance;
 
 public class Ammo extends PersistanceObject
 {
+	public function get name():String  				{ return info.name; }
 	public function get type():int  				{ return info.type; }
 	public function set type(val:int):void			{ info.type = val; }
 	public function get count():int  				{ return info.count; }
@@ -119,6 +119,7 @@ public class Ammo extends PersistanceObject
 		}
 		
 		info = $dbo.data.ammo;
+		guid = $dbo.data.ammo.key;
 		loadFromInfo();
 	}
 	
@@ -135,6 +136,11 @@ public class Ammo extends PersistanceObject
 	
 	public function toObject():void {
 		// No special handling needed
+	}
+
+	override public function save():void {
+		// Watch how the guid is saved.
+		super.save();
 	}
 
 	// Only attributes that need additional handling go here.
@@ -175,6 +181,22 @@ public class Ammo extends PersistanceObject
 			
 		//ModelLoader.modelInfoFindOrCreate( _model, null, false );
 		//ModelLoader.modelInfoFindOrCreate( _model, _model, false );
+	}
+	// Only attributes that need additional handling go here.
+	public function createDefault():void {
+		info = new Object();
+		info.name = "Blank";
+		info.type = 1;
+		info.count = 1;
+		info.grain = 2;
+		info.accuracy = 0.1;
+		info.velocity = 200;
+		info.life = 5;
+		info.model = "CannonBall";
+		info.oxelType = TypeInfo.STEEL;
+		info.contactScript = "";
+		info.launchSoundFile = "";
+		info.impactSoundFile = "";
 	}
 }
 }

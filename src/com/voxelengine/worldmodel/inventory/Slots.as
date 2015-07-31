@@ -36,26 +36,42 @@ public class Slots
 	public function Slots( $owner:String ) {
 		// Do I need to unregister this?
 		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
+		//InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_DEFAULT_RESPONSE, defaultResponse );
 		_owner = $owner;
 		FunctionRegistry.functionAdd( noneSlots, "noneSlots" );
 		FunctionRegistry.functionAdd( pickToolSlots, "pickToolSlots" );
 	}
-	
+/*	
+	private function defaultResponse(e:InventorySlotEvent):void {
+		
+		var defaultSlotData:Vector.<ObjectInfo> = e.data as Vector.<ObjectInfo>;
+		
+		
+		Log.out( "Slots.addSlotDefaultData - Loading default data into slots" , Log.WARN );
+		for ( var i:int; i < Slots.ITEM_COUNT; i++ )
+			setItemData( i, defaultSlotData[i] );
+
+		changed = true;
+		
+	}
+	*/
 	public function unload():void {
 		InventorySlotEvent.removeListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
 	}
 	
 	public function slotChange(e:InventorySlotEvent):void {
-		Log.out( "SlotsManager.slotChange slot: " + e.slotId + "  item: " + e.item );
-		if ( _items ) {
-			if ( null == e.item )
-				setItemData( e.slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) );
+		Log.out( "SlotsManager.slotChange slot: " + e.slotId + "  item: " + e.data );
+		if ( _owner == e.ownerGuid ) {
+			if ( _items ) {
+				if ( null == e.data )
+					setItemData( e.slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) );
+				else
+					setItemData( e.slotId, e.data );
+				changed = true;
+			}
 			else
-				setItemData( e.slotId, e.item );
-			changed = true;
+				Log.out( "SlotsManager.slotChange _slots container not initialized", Log.WARN );
 		}
-		else
-			Log.out( "SlotsManager.slotChange _slots container not initialized", Log.WARN );
 	}
 	
 	private function createObjectFromInventoryString( $data:String, $slotId:int ):ObjectInfo {
@@ -126,17 +142,8 @@ public class Slots
 	
 	import flash.utils.getQualifiedClassName;
 	public function addSlotDefaultData():void {
-
-		var model:VoxelModel = Region.currentRegion.modelCache.instanceGet( _owner );
-		var defaultData:Vector.<ObjectInfo> = model.getDefaultSlotData();
-		
 		initializeSlots();
-		
-		Log.out( "Slots.addSlotDefaultData - Loading default data into slots" , Log.WARN );
-		for ( var i:int; i < Slots.ITEM_COUNT; i++ )
-			setItemData( i, defaultData[i] );
-
-		changed = true;
+		InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, _owner, 0, null ) );
 	}
 	
 	

@@ -205,7 +205,6 @@ public class  UserInventory extends QuickInventory
 		{
 			(e.dropTarget as BoxInventory).updateObjectInfo( e.dragOperation.initiator.data );
 			(e.dragOperation.initiator as BoxInventory).reset();
-			
 		}
 	}
 	

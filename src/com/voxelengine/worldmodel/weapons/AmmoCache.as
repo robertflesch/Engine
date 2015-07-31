@@ -46,26 +46,26 @@ public class AmmoCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	static private function request( $ae:AmmoEvent ):void 
 	{   
-		if ( null == $ae.name ) {
-			Log.out( "AmmoCache.request name requested is NULL", Log.WARN );
+		if ( null == $ae.guid ) {
+			Log.out( "AmmoCache.request guid requested is NULL", Log.WARN );
 			return;
 		}
-		Log.out( "AmmoCache.request name: " + $ae.name, Log.INFO );
-		var ammo:Ammo = _ammoData[$ae.name]; 
+		Log.out( "AmmoCache.request guid: " + $ae.guid, Log.INFO );
+		var ammo:Ammo = _ammoData[$ae.guid]; 
 		if ( null == ammo ) {
 			if ( true == Globals.online && $ae.fromTable )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.BIGDB_TABLE_AMMO, $ae.name ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ae.series, Globals.BIGDB_TABLE_AMMO, $ae.guid ) );
 			else	
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.AMMO_EXT, $ae.name ) );
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.AMMO_EXT, $ae.guid ) );
 		}
 		else
-			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.RESULT, $ae.series, $ae.name, ammo ) );
+			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.RESULT, $ae.series, $ae.guid, ammo ) );
 	}
 	
 	static private function add( $pe:PersistanceEvent, $ammo:Ammo ):void 
 	{ 
 		if ( null == $ammo || null == $pe.guid ) {
-			Log.out( "AmmoCache.add trying to add NULL ammo or name", Log.WARN );
+			Log.out( "AmmoCache.add trying to add NULL ammo or guid", Log.WARN );
 			return;
 		}
 		// check to make sure this is new data

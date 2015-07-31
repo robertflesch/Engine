@@ -7,9 +7,13 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.events.GunEvent;
 import com.voxelengine.events.InventoryInterfaceEvent;
+import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelEvent;
+import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.weapons.Ammo;
+import com.voxelengine.worldmodel.weapons.Armory;
 import com.voxelengine.worldmodel.weapons.Gun;
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
@@ -46,6 +50,8 @@ public class Dragon extends Beast
 		//usesGravity = true;
 		collisionMarkers = true;
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
+		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, defaultSlotDataRequest );
+//		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_DEFAULT_RESPONSE, defaultSlotDataResponse );
 		FunctionRegistry.functionAdd( loseControlHandler, "loseControlHandler" );
 		FunctionRegistry.functionAdd( fire, "fire" );
 	}
@@ -231,44 +237,63 @@ public class Dragon extends Beast
 		return changed;	
 	}
 	
+//	override public function getDefaultSlotData():Vector.<ObjectInfo> {
 	import com.voxelengine.worldmodel.inventory.*;
-	override public function getDefaultSlotData():Vector.<ObjectInfo> {
-		
-		Log.out( "Dragon.getDefaultSlotData - Loading default data into slots" , Log.WARN );
-		var slots:Vector.<ObjectInfo> = new Vector.<ObjectInfo>( Slots.ITEM_COUNT );
-		for ( var i:int; i < Slots.ITEM_COUNT; i++ ) 
-			slots[i] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );
-		
-		slots[0] = new ObjectAction( null, "loseControlHandler", "dismount.png", "Dismount" );
-		
-		var slotIndex:int = 1;
-		if ( _guns && _guns.length && _guns[0] && _guns[0].ammo ) {
-			for each ( var ammo:String in Gun.armory ) {
-				var actionItem:ObjectAction = new ObjectAction( null,
-																"fire",
-																ammo + ".png",
-																"Fire " + ammo );
-				actionItem.ammoName = ammo;
-				Log.out( "Dragon.getDefaultSlotData - HACK TODO", Log.WARN );
-				actionItem.instanceGuid = _guns[0].instanceInfo.instanceGuid;
-				
-				slots[slotIndex++] = actionItem;
-			}
+	private function defaultSlotDataRequest( $ise:InventorySlotEvent ):void {
+		if ( instanceInfo.instanceGuid == $ise.ownerGuid ) {
+			Log.out( "Dragon.getDefaultSlotData - Loading default data into slots" , Log.WARN );
+			var slots:Vector.<ObjectInfo> = new Vector.<ObjectInfo>( Slots.ITEM_COUNT );
+			for ( var i:int; i < Slots.ITEM_COUNT; i++ ) 
+				slots[i] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );
+			
+			var oa:ObjectAction = new ObjectAction( null, "loseControlHandler", "dismount.png", "Dismount" );
+				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, instanceInfo.instanceGuid, 0, oa ) ); 
+			for each ( var gun:Gun in _guns )
+				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, gun.instanceInfo.instanceGuid, 0, null ) );
 		}
-		
-		return slots;
+	}
+	/*
+	private function defaultSlotDataResponse( $ise:InventorySlotEvent ):void {
+		//if (  $ise.ownerGuid is child
 	}
 
-	static private function fire():void {
-		Log.out( "Dragon.fire");
-		/*
-		var gmInstanceGuid:String = (objectAction as Object).instanceGuid;
-		var gun:Gun = Region.currentRegion.modelCache.instanceGet( gmInstanceGuid ) as Gun;
-		if ( gun )
-			gun.fire();
-			*/
+	private function ammoLoadComplete( $e:GunEvent ):void {
+		var gun:Gun = _guns[0];
+		var armory:Armory = gun.armory;
+		var ammos:Vector.<Ammo> = armory.getAmmoList();
+		for ( var i:int; i < ammos.length; i++ ) {
+			//public function InventorySlotEvent( $type:String, $ownerGuid:String, $slotId:int, $item:ObjectInfo, $bubbles:Boolean = true, $cancellable:Boolean = false )
+			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE
+			                                                   , instanceInfo.modelGuid
+															   , i + 1
+															   , new ObjectAction( null, ObjectInfo.OBJECTINFO_EMPTY );
+				ammoAdded( ammo );
+			}
+	}
+
+	private function ammoAddedEvent(e:GunEvent):void {
+		var ammo:Ammo = e.data1 as Ammo;
+		ammoAdded( ammo );
 	}
 	
+	private function ammoAdded( $ammo:Ammo ):void 
+	{
+		var actionItem:ObjectAction = new ObjectAction( null,
+														"fire",
+														$ammo.guid + ".png",
+														"Fire " + $ammo.guid );
+		actionItem.ammoName = $ammo.name;
+		Log.out( "Dragon.getDefaultSlotData - HACK TODO", Log.WARN );
+		actionItem.instanceGuid = _guns[0].instanceInfo.instanceGuid;
+	}
+
+	private function getFreeSlot():int {
+		return 0;
+	}
+	*/
+	static private function fire():void {
+		Log.out( "Dragon.fire");
+	}
 	static private function loseControlHandler():void {
 		VoxelModel.controlledModel.loseControl( Player.player );
 		Player.player.takeControl( null, false );

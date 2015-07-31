@@ -8,6 +8,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.weapons
 {
 import com.voxelengine.events.AmmoEvent;
+import com.voxelengine.events.GunEvent;
+import com.voxelengine.events.InventoryInterfaceEvent;
+import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
@@ -27,17 +30,13 @@ import flash.ui.Keyboard;
  */
 public class Gun extends ControllableVoxelModel 
 {
-	protected var _id:int;
 	protected var _series:int;
-	static protected var _armory:Vector.<String> = new Vector.<String>;
-	protected var _ammo:Ammo;
-	static protected var _reloadSpeed:Number;
+	protected var _armory:Armory = new Armory();
+	protected var _reloadSpeed:Number;
+	private var _ammoLoaded:Boolean;
 
-	public function get ammo():Ammo { return _ammo; }
-	public function set ammo( $ammo:Ammo ):void { _ammo = $ammo; }
-	static public function get armory():Vector.<String>  { return _armory; }
-	
-	static public function get reloadSpeed():Number { return _reloadSpeed; }
+	public function get armory():Armory  { return _armory; }
+	public function get reloadSpeed():Number { return _reloadSpeed; }
 	//Barrel
 	//Stand
 	//Sight
@@ -45,7 +44,6 @@ public class Gun extends ControllableVoxelModel
 	{ 
 		super( instanceInfo );
 		// give the gun a unique series
-		_series = _id++;
 	}
 	
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
@@ -62,9 +60,10 @@ public class Gun extends ControllableVoxelModel
 	
 	public function fire():void
 	{
-		Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, instanceInfo.instanceGuid, ammo ) );			
+		Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, instanceInfo.instanceGuid, _armory.currentSelection() ) );			
 	}
 	
+	private var _ammoCount:int;
 	override protected function processClassJson():void {
 		super.processClassJson();
 		
@@ -83,52 +82,38 @@ public class Gun extends ControllableVoxelModel
 			AmmoEvent.addListener( ModelBaseEvent.ADDED, result );
 			AmmoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, resultFailed );
 			var ammosJson:Object = gunInfo.ammos;
-			for each ( var ammoInfo:Object in ammosJson )
-				request( ammoInfo.name );
+			for each ( var ammoInfo:Object in ammosJson ) {
+				var ae:AmmoEvent = new AmmoEvent( ModelBaseEvent.REQUEST, _series, ammoInfo.guid, null );
+				_series = ae.series;
+				AmmoEvent.dispatch( ae );
+				_ammoCount++;
+			}
 		}
-//			if ( _armory.length )
-//				_ammo = _armory[0];
-	}
-
-	static public function buildExportObject( obj:Object ):void {
-		// For now just use the existing gun data
-		ControllableVoxelModel.buildExportObject( obj )
-		//var gunData:Object = new Object();
-		//gunData.reloadSpeed = _reloadSpeed;
-		//
-		//var oa:Vector.<Object> = new Vector.<Object>();
-		//var ammosJson:Object = modelInfo.dbo.gun.ammos;
-		//for each ( var ammoInfo:Object in ammosJson )
-			//oa.push( { name: ammoInfo.name } );
-//
-		//gunData.ammos = oa;
-//		obj.gun = gunData;
-	}
-
-	public function request( $ammoName:String ):void {
-		
-		//public function PersistanceEvent( $type:String, $series:int, $table:String, $guid:String, $dbo:DatabaseObject = null, $data:* = null, $format:String = URLLoaderDataFormat.TEXT, $other:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false );
-		_armory.push( $ammoName );
-		AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST, _series, $ammoName, null ) );
-	}
-
-	private function result(e:AmmoEvent):void 
-	{
-		if ( _series == e.series )
-			_armory.push( e.ammo );
 	}
 	
-	private function resultFailed(e:AmmoEvent):void 
-	{
-		if ( _series == e.series )
-			Log.out( "Gun.resultFailed - No ammo information found for name: " + e.name );
+	private function result(e:AmmoEvent):void {
+		if ( _series == e.series ) {
+			_ammoCount--;
+			_armory.add( e.ammo );
+			GunEvent.dispatch( new GunEvent( GunEvent.AMMO_ADDED, instanceInfo.modelGuid, e.ammo ) );
+			ifLoadCompleteThenBroadcast();
+		}
 	}
 	
-	override public function update(context:Context3D, elapsedTimeMS:int):void 
-	{
-		super.update(context, elapsedTimeMS);
+	private function resultFailed(e:AmmoEvent):void {
+		if ( _series == e.series ) {
+			_ammoCount--;
+			Log.out( "Gun.resultFailed - No ammo information found for guid: " + e.guid, Log.ERROR );
+			ifLoadCompleteThenBroadcast();
+		}
 	}
 	
+	private function ifLoadCompleteThenBroadcast():void {
+		if ( 0 == _ammoCount )
+			GunEvent.dispatch( new GunEvent( GunEvent.AMMO_LOAD_COMPLETE, instanceInfo.modelGuid, instanceInfo.instanceGuid ) );
+	}
+	
+	// When is this used?
 	override protected function onKeyDown(e:KeyboardEvent):void 
 	{
 		switch (e.keyCode) {
@@ -147,6 +132,7 @@ public class Gun extends ControllableVoxelModel
 		}
 	}
 	
+	// When is this used?
 	override protected function onKeyUp(e:KeyboardEvent):void 
 	{
 		switch (e.keyCode) {
@@ -159,5 +145,19 @@ public class Gun extends ControllableVoxelModel
 		}
 	}
 	
+	static public function buildExportObject( obj:Object ):void {
+		// For now just use the existing gun data
+		ControllableVoxelModel.buildExportObject( obj )
+		//var gunData:Object = new Object();
+		//gunData.reloadSpeed = _reloadSpeed;
+		//
+		//var oa:Vector.<Object> = new Vector.<Object>();
+		//var ammosJson:Object = modelInfo.dbo.gun.ammos;
+		//for each ( var ammoInfo:Object in ammosJson )
+			//oa.push( { name: ammoInfo.name } );
+//
+		//gunData.ammos = oa;
+//		obj.gun = gunData;
+	}
 }
 }
