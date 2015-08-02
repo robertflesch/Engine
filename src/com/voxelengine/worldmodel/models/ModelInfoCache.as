@@ -71,8 +71,7 @@ public class ModelInfoCache
 		if ( null == mi ) {
 			if ( _block.has( $mie.modelGuid ) )
 				return;
-			else
-				_block.add( $mie.modelGuid );
+			_block.add( $mie.modelGuid );
 				
 			if ( true == Globals.online && $mie.fromTables )
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid ) );

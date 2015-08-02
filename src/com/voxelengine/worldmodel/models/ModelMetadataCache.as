@@ -30,6 +30,7 @@ public class ModelMetadataCache
 	// this acts as a cache for all model objects loaded from persistance
 	// dont use weak keys since this is THE spot that holds things.
 	static private var _metadata:Dictionary = new Dictionary(false);
+	static private var _block:Block = new Block();
 	
 	public function ModelMetadataCache() {	}
 	
@@ -90,8 +91,12 @@ public class ModelMetadataCache
 		}
 		Log.out( "ModelMetadataCache.request guid: " + $mme.modelGuid, Log.INFO );
 		var vmm:ModelMetadata = _metadata[$mme.modelGuid]; 
-		if ( null == vmm )
+		if ( null == vmm ) {
+			if ( _block.has( $mme.modelGuid ) )	
+				return;
+			_block.add( $mme.modelGuid );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid ) );
+		}
 		else
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm ) );
 	}
@@ -168,6 +173,8 @@ public class ModelMetadataCache
 	static private function loadFailed( $pe:PersistanceEvent ):void  {
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
+		if ( _block.has( $pe.guid ) )
+			_block.clear( $pe.guid )
 		Log.out( "ModelMetadataCache.metadataLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
@@ -175,6 +182,8 @@ public class ModelMetadataCache
 	static private function loadNotFound( $pe:PersistanceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
+		if ( _block.has( $pe.guid ) )
+			_block.clear( $pe.guid )
 		Log.out( "ModelMetadataCache.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
@@ -193,6 +202,8 @@ public class ModelMetadataCache
 		if ( null ==  _metadata[$vmm.guid] ) {
 			//Log.out( "ModelMetadataCache.add vmm: " + $vmm.guid, Log.WARN );
 			_metadata[$vmm.guid] = $vmm; 
+			if ( _block.has( $vmm.guid ) )
+				_block.clear( $vmm.guid )
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, $series, $vmm.guid, $vmm ) );
 		}
 	}

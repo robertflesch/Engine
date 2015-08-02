@@ -91,8 +91,7 @@ public class OxelPersistanceCache
 		if ( null == od ) {
 			if ( _block.has( $ode.modelGuid ) )	
 				return;
-			else
-				_block.add( $ode.modelGuid );
+			_block.add( $ode.modelGuid );
 				
 			_loadingCount++;
 			if ( true == Globals.online && $ode.fromTables )
@@ -141,9 +140,6 @@ public class OxelPersistanceCache
 				od.fromObject( $pe.dbo );
 				
 			add( $pe.series, od );
-			
-			//if ( _block.has( $pe.guid ) )
-				//_block.clear( $pe.guid )
 		}
 		else {
 			Log.out( "OxelDataCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.WARN );
