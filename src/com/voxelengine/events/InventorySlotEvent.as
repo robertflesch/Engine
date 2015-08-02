@@ -21,21 +21,23 @@ public class InventorySlotEvent extends Event
 	static public const INVENTORY_DEFAULT_REQUEST:String  		= "INVENTORY_DEFAULT_REQUEST";
 	static public const INVENTORY_DEFAULT_RESPONSE:String  		= "INVENTORY_DEFAULT_RESPONSE";
 	
-	private var _ownerGuid:String; // Guid of model which is implementing this action
-	private var _slotId:int;	  // Voxel Type ID
+	private var _ownerGuid:String; 		// Guid of model which owns the actionbar
+	private var _instanceGuid:String; 	// Guid of model which is implementing this action
+	private var _slotId:int;	  		// Slot that this goes in, -1 for first empty slot
 	private var _data:*;
 	
-	public function InventorySlotEvent( $type:String, $ownerGuid:String, $slotId:int, $data:*, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function InventorySlotEvent( $type:String, $ownerGuid:String, $instanceGuid:String, $slotId:int, $data:*, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
 		_ownerGuid = $ownerGuid;
+		_instanceGuid = $instanceGuid;
 		_slotId = $slotId;
 		_data = $data;
 	}
 	
 	public override function clone():Event
 	{
-		return new InventorySlotEvent( type, _ownerGuid, _slotId, _data, bubbles, cancelable);
+		return new InventorySlotEvent( type, _ownerGuid, _instanceGuid, _slotId, _data, bubbles, cancelable);
 	}
    
 	public override function toString():String
@@ -44,6 +46,7 @@ public class InventorySlotEvent extends Event
 	}
 	
 	public function get ownerGuid():String { return _ownerGuid; }
+	public function get instanceGuid():String { return _instanceGuid; }
 	public function get slotId():int { return _slotId; }
 	public function get data():ObjectInfo { return _data; }
 	

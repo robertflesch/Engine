@@ -14,6 +14,7 @@ import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
+import com.voxelengine.worldmodel.inventory.ObjectAction;
 import com.voxelengine.worldmodel.weapons.Ammo;
 import com.voxelengine.worldmodel.scripts.Script;
 import com.voxelengine.worldmodel.models.*;
@@ -22,6 +23,7 @@ import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.events.KeyboardEvent;
 import flash.ui.Keyboard;	
+import com.voxelengine.worldmodel.inventory.FunctionRegistry;
 
 /**
  * ...
@@ -42,6 +44,7 @@ public class Gun extends ControllableVoxelModel
 	//Sight
 	public function Gun( instanceInfo:InstanceInfo ) 
 	{ 
+		Log.out( "Gun instanceInfo: " + instanceInfo,Log.WARN );
 		super( instanceInfo );
 		// give the gun a unique series
 	}
@@ -56,7 +59,30 @@ public class Gun extends ControllableVoxelModel
 		// Process the gun specific info
 		var script:Script = _instanceInfo.addScript( "FireProjectileScript", true );
 		//script.processClassJson( modelInfo );
+			
+		FunctionRegistry.functionAdd( fire, "fire" );
+		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, defaultGunInventory );
 	}
+	
+	private function defaultGunInventory(e:InventorySlotEvent):void 
+	{
+		Log.out( "Gun.defaultGunInventory",Log.WARN );
+		if ( instanceInfo.instanceGuid == e.instanceGuid ) {
+			Log.out( "Gun.defaultGunInventory - right instance",Log.WARN );
+			var ammoList:Vector.<Ammo> = _armory.getAmmoList();
+			for each ( var ammo:Ammo in ammoList ) {
+				var oa:ObjectAction = new ObjectAction( null, "fire", ammo.guid + ".png", "Fire" );
+				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, e.ownerGuid, instanceInfo.instanceGuid, -1, oa ) ); 
+			}
+		}
+		else
+			Log.out( "Gun.defaultGunInventory - WRONG instance",Log.WARN );
+	}
+	
+	static private function fire():void {
+		Log.out( "Gun.fire");
+	}
+
 	
 	public function fire():void
 	{

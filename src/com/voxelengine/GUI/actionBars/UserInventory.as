@@ -192,7 +192,7 @@ public class  UserInventory extends QuickInventory
 			hideGrainTools();
 			hideModelTools();
 			
-			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, _owner, slotId, null ) );
+			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, _owner, "", slotId, null ) );
 			// sets edit cursor to none
 //			EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
 //			EditCursor.editing = false;

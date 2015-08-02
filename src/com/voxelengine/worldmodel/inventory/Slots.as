@@ -129,6 +129,10 @@ public class Slots
 	}
 	
 	private function setItemData( $slot:int, $data:ObjectInfo ):void {
+		// find an empty slot
+		if ( -1 == $slot )
+			$slot = findFirstEmptySlot();
+
 		if ( 0 > $slot || 9 < $slot ) {
 			Log.out( "Slots.setItemData - invalid slot: " + $slot, Log.ERROR );
 			throw new Error( "Slots.setItemData - invalid slot: " + $slot );
@@ -137,13 +141,26 @@ public class Slots
 			Log.out( "Slots.setItemData - invalid data: " + $data, Log.ERROR );
 			throw new Error( "Slots.setItemData - invalid data: " + $data );
 		}
+		
 		_items[$slot] = $data;
+	}
+	
+	
+	private function findFirstEmptySlot():int {
+		for ( var i:int; i < _items.length; i++ ) {
+			Log.out( "Slots.findFirstEmptySlot: " + i );
+			if ( ObjectInfo.OBJECTINFO_EMPTY == _items[i].objectType ) {
+				return i;
+			}
+		}
+		return -1;
 	}
 	
 	import flash.utils.getQualifiedClassName;
 	public function addSlotDefaultData():void {
+		Log.out( "Slots.addSlotDefaultData", Log.WARN );
 		initializeSlots();
-		InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, _owner, 0, null ) );
+		InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, _owner, _owner, 0, null ) );
 	}
 	
 	

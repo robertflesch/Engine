@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models.types
 {
 import com.voxelengine.events.GunEvent;
+import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.InventoryInterfaceEvent;
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelEvent;
@@ -53,7 +54,6 @@ public class Dragon extends Beast
 		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, defaultSlotDataRequest );
 //		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_DEFAULT_RESPONSE, defaultSlotDataResponse );
 		FunctionRegistry.functionAdd( loseControlHandler, "loseControlHandler" );
-		FunctionRegistry.functionAdd( fire, "fire" );
 	}
 	
 	static public function buildExportObject( obj:Object ):void {
@@ -167,6 +167,7 @@ public class Dragon extends Beast
 		$modelLosingControl.stateLock( true );
 		var className:String = getQualifiedClassName( topmostControllingModel() );
 		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
+		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, instanceInfo.instanceGuid, null ) );
 	}
 
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
@@ -240,14 +241,14 @@ public class Dragon extends Beast
 //	override public function getDefaultSlotData():Vector.<ObjectInfo> {
 	import com.voxelengine.worldmodel.inventory.*;
 	private function defaultSlotDataRequest( $ise:InventorySlotEvent ):void {
-		if ( instanceInfo.instanceGuid == $ise.ownerGuid ) {
+		if ( instanceInfo.instanceGuid == $ise.instanceGuid ) {
 			Log.out( "Dragon.getDefaultSlotData - Loading default data into slots" , Log.WARN );
 			
 			var oa:ObjectAction = new ObjectAction( null, "loseControlHandler", "dismount.png", "Dismount" );
-			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, instanceInfo.instanceGuid, 0, oa ) ); 
+			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, instanceInfo.instanceGuid, instanceInfo.instanceGuid, 0, oa ) ); 
 			
 			for each ( var gun:Gun in _guns )
-				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, gun.instanceInfo.instanceGuid, 0, null ) );
+				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, instanceInfo.instanceGuid, gun.instanceInfo.instanceGuid, 0, null ) );
 		}
 	}
 	/*
@@ -289,9 +290,6 @@ public class Dragon extends Beast
 		return 0;
 	}
 	*/
-	static private function fire():void {
-		Log.out( "Dragon.fire");
-	}
 	static private function loseControlHandler():void {
 		VoxelModel.controlledModel.loseControl( Player.player );
 		Player.player.takeControl( null, false );

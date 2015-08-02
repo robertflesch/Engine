@@ -338,7 +338,7 @@ public class InventoryPanelModel extends VVContainer
 					var item:ObjectModel = e.dragOperation.initiator.data;
 					bi.updateObjectInfo( item );
 					var slotId:int = int( bi.name );
-					InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, slotId, item ) );
+					InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, Network.userId, slotId, item ) );
 					// we are going to need the data to build the model for this.
 					OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, item.modelGuid, null ) );
 				}
