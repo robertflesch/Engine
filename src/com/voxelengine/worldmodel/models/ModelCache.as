@@ -143,10 +143,6 @@ package com.voxelengine.worldmodel.models
 						Log.out( "ModelCache.add - Trying to add the same MODEL AND INSTANCE for a second time", Log.ERROR );
 				}
 			}
-			
-			// This prefetches the data, so it is ready when requested
-			if ( vm.hasInventory )
-				InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, vm.instanceInfo.instanceGuid, null ) );
 		}
 		
 		public function draw( $mvp:Matrix3D, $context:Context3D ):void {
