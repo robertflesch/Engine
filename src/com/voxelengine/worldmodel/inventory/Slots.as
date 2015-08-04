@@ -148,7 +148,7 @@ public class Slots
 	
 	private function findFirstEmptySlot():int {
 		for ( var i:int; i < _items.length; i++ ) {
-			Log.out( "Slots.findFirstEmptySlot: " + i );
+			//Log.out( "Slots.findFirstEmptySlot: " + i );
 			if ( ObjectInfo.OBJECTINFO_EMPTY == _items[i].objectType ) {
 				return i;
 			}

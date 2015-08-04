@@ -305,7 +305,7 @@ package com.voxelengine.worldmodel.models.types
 				var scaleFactor:Number = mClimbRate + climbFactor;
 				// When you are climbing you can turn faster because you are going slower
 				var effectiveTurnRate:Number = mMaxTurnRate * ( scaleFactor )
-				Log.out( "Move Speed would be set to: " + mMoveSpeed * scaleFactor + "  instead setting to 0", Log.WARN );
+//				Log.out( "Move Speed would be set to: " + mMoveSpeed * scaleFactor + "  instead setting to 0", Log.WARN );
 				//instanceInfo.moveSpeed = mMoveSpeed * scaleFactor;
 				instanceInfo.moveSpeed = 10;
 				var dx:Number

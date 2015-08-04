@@ -10,102 +10,123 @@ package com.voxelengine.pools
 {
 
 import com.voxelengine.events.LoadingEvent;
+import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelEvent;
+import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.ProjectileEvent;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.worldmodel.models.*;
+import com.voxelengine.worldmodel.models.makers.ModelMakerProjectile;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 import com.voxelengine.worldmodel.weapons.Projectile;
+import playerio.DatabaseObject;
      
 public final class ProjectilePool 
 { 
-	private static var GROWTH_VALUE:uint; 
+	private static var _currentPoolSize:uint; 
+	private static var _growthValue:uint; 
 	private static var _counter:uint; 
 	private static var _pool:Vector.<Projectile>; 
-	private static const CLASS_NAME:String = "CannonBall";
+	//private static const CLASS_NAME:String = "CannonBall";
 	
 	static public function remaining():uint { return _counter; }
 	static public function total():uint { return _pool.length; }
-	static public function totalUsed():uint { return _pool ? _pool.length - _counter : GROWTH_VALUE; }
+	static public function totalUsed():uint { return _pool ? _pool.length - _counter : _growthValue; }
 
 	
 	public static function initialize( $initialPoolSize:uint, $growthValue:uint ):void 
 	{ 
-		GROWTH_VALUE = $growthValue; 
+		_currentPoolSize = $initialPoolSize; 
+		_growthValue = $growthValue; 
 		_counter = $initialPoolSize; 
 		// We have to wait until types are loading before we can start our process
 		LoadingEvent.addListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 	} 
 	
+	static private var _modelInfo:ModelInfo
+	static private var _modelMetadata:ModelMetadata
+	static private const CLASS_NAME:String = "Projectile";
 	private static function onTypesLoaded( $event:LoadingEvent ):void
 	{
 		// So types are done, now we have to preload the CLASS_NAME.mjson file
 		LoadingEvent.removeListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
-		// Preload the modelInfo for the CLASS_NAME
-//		ModelLoader.modelInfoFindOrCreate( CLASS_NAME, "-1", false );
-		// Listen for it being loaded
-		ModelEvent.addListener( ModelEvent.INFO_LOADED, onModelInfoLoaded );
+		
+		var obj:DatabaseObject = GenerateCube.script();
+		obj.model.grainSize = 2;
+		// This is a special case for modelInfo, the modelInfo its self is contained in the generate script
+		_modelInfo = new ModelInfo( CLASS_NAME );
+		_modelInfo.fromObject( obj );
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.GENERATION, 0, CLASS_NAME, _modelInfo ) );
+
+		_modelMetadata = new ModelMetadata( CLASS_NAME );
+		var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
+		newDbo.data = new Object();
+		_modelMetadata.fromObjectImport( newDbo );
+		_modelMetadata.name = CLASS_NAME;
+		_modelMetadata.description = CLASS_NAME + " - GENERATED";
+		_modelMetadata.owner = "";
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, CLASS_NAME, _modelMetadata ) );
+		_modelInfo.oxelLoadData();		
+		projectilesGenerate();
 	}
 	
-	private static function onModelInfoLoaded( $event:ModelEvent ):void
-	{
-		// if our CLASS_NAME.mjson has loaded, so now we can create all of the instances
-		if ( CLASS_NAME == $event.instanceGuid )
-		{
-			ModelEvent.removeListener( ModelEvent.INFO_LOADED, onTypesLoaded );
-			var i:uint = _counter; 
-			_pool = new Vector.<Projectile>(_counter);
-			_counter = 0;
-			//Log.out( "ProjectilePool.onModelInfoLoaded: counter: " + _counter + "  _currentPoolSize: " + _currentPoolSize + " poolsize: " + _pool.length );
-			while( --i > -1 ) 
-				addToPool( newModel() );
+	static private function projectilesGenerate():void {
+		var i:uint = _counter; 
+		_pool = new Vector.<Projectile>(_counter);
+		_counter = 0;
+		//Log.out( "ProjectilePool.onModelInfoLoaded: counter: " + _counter + "  _currentPoolSize: " + _currentPoolSize + " poolsize: " + _pool.length );
+		while( --i > -1 ) 
+			addToPool( newModel() );
+	}
+	
+	static private function newModel():Projectile {
+		var ii:InstanceInfo = new InstanceInfo();
+		ii.instanceGuid = CLASS_NAME;
+		ii.modelGuid = CLASS_NAME;
+		ii.usesCollision = true;
+		ii.dynamicObject = true;
+		ii.baseLightLevel = 255;
+		var vm:Projectile = new Projectile( ii );
+		if ( null == vm ) {
+			Log.out( "Projectile.newModel - failed to create Projectile", Log.ERROR );
+			return null;
 		}
+		vm.init( _modelInfo, _modelMetadata );
+		return vm;
 	}
-	
-	public static function poolGet():Projectile 
-	{ 
+
+	public static function poolGet():Projectile { 
 		if ( _counter > 0 ) 
 			return _pool[--_counter]; 
 			 
-		var i:uint = GROWTH_VALUE; 
-		while( --i > -1 ) 
-				_pool.unshift( newModel() ); 
-		_counter = GROWTH_VALUE; 
+		Log.out( "ProjectilePool.poolGet - Allocating more Projectiles: " + _currentPoolSize );
+//		var timer:int = getTimer();
+
+		_currentPoolSize += _growthValue;
+		_pool = null
+		_pool = new Vector.<Projectile>(_currentPoolSize);
+		for ( var newIndex:int = 0; newIndex < _growthValue; newIndex++ ) 
+			_pool[newIndex] = newModel();
+		_counter = newIndex - 1; 
+		
+//		Log.out( "ProjectilePool.poolGet - Done allocating more Projectiles: " + _currentPoolSize  + " took: " + (getTimer() - timer) );
+		
 		return poolGet(); 
-		 
 	} 
 
-	public static function poolDispose( $disposedProjectile:Projectile):void 
-	{ 
+	public static function poolDispose( $disposedProjectile:Projectile):void { 
+		$disposedProjectile.dead = false;
+		$disposedProjectile.instanceInfo.removeAllTransforms();
+		
 		addToPool( $disposedProjectile ); 
 	} 
 	
-	private static function addToPool( $projectile:Projectile ):void
-	{
+	private static function addToPool( $projectile:Projectile ):void {
 		_pool[_counter++] = $projectile; 
 	}
-	
-	private static function newModel():Projectile
-	{
-		var pi:InstanceInfo = new InstanceInfo();
-		pi.modelGuid = CLASS_NAME;
-		//pi.name = "Projectile";
-		pi.grainSize = 2;
-		pi.usesCollision = true;
-		pi.dynamicObject = true;
-		pi.baseLightLevel = 255;
-
-		throw new Error( "ProjectilePool.newModel" );
-		//var mi:ModelInfo = Globals.modelInfoGet(pi.guid);
-		//var modelAsset:String = mi.modelClass;
-		//var modelClass:Class = ModelLibrary.getAsset( modelAsset )
-		//var vm:* = new modelClass( pi, mi );
-		//// the task of replacing the oxel is placed 
-		//vm.modelInfo.biomes.addParticleTaskToController( vm );
-//
-		//return vm;
-		return null;
-	}
-
-} 
 }
-
+}

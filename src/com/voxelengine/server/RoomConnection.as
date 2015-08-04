@@ -7,6 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.server {
 
+	import com.voxelengine.events.AmmoEvent;
+	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.worldmodel.models.types.Player;
 	import flash.geom.Vector3D;
 	import playerio.Connection;
@@ -120,16 +122,28 @@ package com.voxelengine.server {
 			}
 		}
 		
+		// I dont like this, but it is expident.
+		static private var _s_pe:ProjectileEvent;
 		static private function handleProjectileEvent( msg:Message ):void
 		{
-			var pe:ProjectileEvent = new ProjectileEvent( ProjectileEvent.PROJECTILE_CREATED );
+			
+			_s_pe = new ProjectileEvent( ProjectileEvent.PROJECTILE_CREATED );
 			var index:int = 0;
-			pe.owner = msg.getString( index++ );
-			pe.position = new Vector3D( msg.getNumber( index++ ), msg.getNumber( index++ ), msg.getNumber( index++ ) );			
-			pe.direction = new Vector3D( msg.getNumber( index++ ), msg.getNumber( index++ ), msg.getNumber( index++ ) );			
-			index = pe.ammo.fromMessage( msg, index );
+			_s_pe.owner = msg.getString( index++ );
+			_s_pe.position = new Vector3D( msg.getNumber( index++ ), msg.getNumber( index++ ), msg.getNumber( index++ ) );			
+			_s_pe.direction = new Vector3D( msg.getNumber( index++ ), msg.getNumber( index++ ), msg.getNumber( index++ ) );			
+			var ammoGuid:String = msg.getString( index );
+			AmmoEvent.addListener( ModelBaseEvent.RESULT, ammoDataRecieved );
+			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST, 0, ammoGuid, null ) );
+			//index = _s_pe.ammo.fromMessage( msg, index );
 			//trace( "handleProjjectileEvent: " + pe );
-			Globals.g_app.dispatchEvent( pe );
+		}
+		
+		static private function ammoDataRecieved(e:AmmoEvent):void {
+			AmmoEvent.removeListener( ModelBaseEvent.RESULT, ammoDataRecieved );
+			_s_pe.ammo = e.ammo;
+			Globals.g_app.dispatchEvent( _s_pe );
+			_s_pe = null;
 		}
 		
 		

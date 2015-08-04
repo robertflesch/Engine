@@ -25,14 +25,13 @@ public final class OxelPool
 	static public function totalUsed():uint { return _currentPoolSize - _counter; }
 	static public function total():uint { return _currentPoolSize; }
 
-	public static function initialize( maxPoolSize:uint, growthValue:uint ):void 
+	public static function initialize( $initialPoolSize:uint, growthValue:uint ):void 
 	{ 
-		_currentPoolSize = maxPoolSize; 
+		_currentPoolSize = $initialPoolSize; 
+		_counter = $initialPoolSize; 
 		_growthValue = growthValue; 
-		_counter = maxPoolSize; 
-		 
-		var i:uint = maxPoolSize; 
-		 
+		
+		var i:uint = $initialPoolSize; 
 		_pool = new Vector.<Oxel>(_currentPoolSize); 
 		while( --i > -1 ) 
 			_pool[i] = new Oxel(); 

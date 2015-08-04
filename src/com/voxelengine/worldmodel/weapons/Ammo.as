@@ -51,7 +51,7 @@ public class Ammo extends PersistanceObject
 	}
 	
 	public function addToMessage( $msg:Message ):void {
-		throw new Error( "Ammo.addToMessage - REFACTOR" );
+		$msg.add( guid );
 	}
 	
 		//Log.out( "Ammo.addToMessage - REFACTOR with new DBO scheme", Log.ERROR );
@@ -69,8 +69,9 @@ public class Ammo extends PersistanceObject
 		//$msg.add( guid );
 	
 	public function fromMessage( $msg:Message, $index:int ):int	{
-		throw new Error( "Ammo.fromMessage - REFACTOR" );
-		return 0;
+		Log.out( "Ammo.fromMessage - REFACTOR with new DBO scheme" );
+		var ammoGuid:String = $msg.getString( $index );
+		return $index;
 	}
 
 		//Log.out( "Ammo.fromMessage - REFACTOR with new DBO scheme", Log.ERROR );
@@ -162,7 +163,7 @@ public class Ammo extends PersistanceObject
 			info.model = "CannonBall";
 			
 		if ( info.oxelType ) {
-			if ( info.oxelTypeId is String )
+			if ( info.oxelType is String )
 				info.oxelType = TypeInfo.getTypeId( info.oxelType );
 		}
 		else

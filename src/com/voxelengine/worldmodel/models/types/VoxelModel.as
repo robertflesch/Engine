@@ -120,7 +120,6 @@ public class VoxelModel
 	}
 
 	protected function processClassJson():void {
-		Log.out( "VoxelModel.processClassJson load children for model name: " + _metadata.name, Log.DEBUG ),
 		modelInfo.childrenLoad( this );
 		modelInfo.scriptsLoad( instanceInfo );
 		modelInfo.animationsLoad();

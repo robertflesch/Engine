@@ -569,12 +569,11 @@ public class ModelInfo extends PersistanceObject
 				//Log.out( "ModelInfo.save - Saving ModelInfo: " + guid  + " in table: " + table, Log.WARN );
 				super.save();
 			}
-//			else
-//				Log.out( "ModelInfo.save - NOT Saving ModelInfo: " + guid  + " not guid", Log.WARN );
+			else
+				Log.out( "ModelInfo.save - NOT Saving ModelInfo: " + guid  + " not guid", Log.WARN );
 		}
-//		else
-//			Log.out( "ModelInfo.save - NOT Saving ModelInfo: " + guid  + " NEED Animations or children to complete", Log.WARN );
-
+		else
+			Log.out( "ModelInfo.save - NOT Saving ModelInfo: " + guid  + " NEED Animations or children to complete", Log.WARN );
 			
 		if ( _data )
 			_data.save();	

@@ -45,7 +45,7 @@ import com.voxelengine.worldmodel.MemoryManager;
 			GrainCursorPool.initialize( INITIAL_POOL_SETTINGS * 6, INITIAL_POOL_SETTINGS );
 			OxelPool.initialize( INITIAL_POOL_SETTINGS * 6, INITIAL_POOL_SETTINGS );
 			//ParticlePool.initialize( INITIAL_POOL_SETTINGS/1000, INITIAL_POOL_SETTINGS/200 );
-			//ProjectilePool.initialize( INITIAL_POOL_SETTINGS/1000, INITIAL_POOL_SETTINGS/200 );
+			ProjectilePool.initialize( INITIAL_POOL_SETTINGS/1000, INITIAL_POOL_SETTINGS/200 );
 		}
 	}
 

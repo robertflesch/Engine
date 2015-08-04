@@ -48,7 +48,7 @@ package com.voxelengine.worldmodel.weapons
 		//
 		public function Projectile( $instanceInfo:InstanceInfo ) 
 		{ 
-			super( instanceInfo );
+			super( $instanceInfo );
 		}
 		
 		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
@@ -149,11 +149,21 @@ package com.voxelengine.worldmodel.weapons
 		override public function release():void 
 		{
 			//Log.out( "Projectile.release - guid: " + instanceInfo.instanceGuid );
-			dead = false;
-			instanceInfo.removeAllTransforms();
 			ProjectilePool.poolDispose( this );
 		}
 		
+		override public function set dead(val:Boolean):void 					{ 
+			_dead = val; 
+			
+			if (0 < instanceInfo.scripts.length) {
+				for each (var script:Script in instanceInfo.scripts)
+				{
+					script.instanceGuid = instanceInfo.instanceGuid;
+				}
+			}
+			//ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, instanceInfo.instanceGuid ) );
+		}
+	
 		override public function update( $context:Context3D, $elapsedTimeMS:int):void 
 		{
 			if ( dead )

@@ -305,3 +305,6 @@ http://gamua.com/flox/
 
 Possible Open Source License
 https://en.wikipedia.org/wiki/Affero_General_Public_License
+
+VR
+http://www.roadtovr.com/vivecraft-demo-shows-just-how-amazing-minecraft-and-more-will-be-with-natural-input/

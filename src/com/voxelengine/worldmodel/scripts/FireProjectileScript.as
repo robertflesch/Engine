@@ -98,8 +98,8 @@ package com.voxelengine.worldmodel.scripts
 				// dont handle event directly, since then I will generate event at same times as everyone else.
 				var pe:ProjectileEvent = new ProjectileEvent( ProjectileEvent.PROJECTILE_SHOT );
 				
-				throw new Error( "FireProjectileScript.onFire - what to do here" );
-//				pe.ammo = ammo.clone();
+				//throw new Error( "FireProjectileScript.onFire - what to do here" );
+				pe.ammo = ammo;
 				pe.owner = gunModel.instanceInfo.instanceGuid;
 				pe.position = bulletWSLocation;
 				pe.direction = dr;
@@ -121,13 +121,10 @@ package com.voxelengine.worldmodel.scripts
 				var parentVelocity:Vector3D = cm.instanceInfo.worldSpaceMatrix.deltaTransformVector( cm.instanceInfo.velocityGet );
 			}
 			
-			if ( 1 == pe.ammo.type )
-			{
+			if ( 1 == pe.ammo.type ) {
 					bulletPool( pe, parentVelocity );
-
 			}
-			else if ( 2 == pe.ammo.type )
-			{
+			else if ( 2 == pe.ammo.type ) {
 				var count:int = pe.ammo.count;
 				for ( var i:int = 0; i < count; i++ )
 				{

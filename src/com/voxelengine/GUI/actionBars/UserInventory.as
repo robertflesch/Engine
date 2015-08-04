@@ -323,12 +323,22 @@ public class  UserInventory extends QuickInventory
 			showGrainTools();
 		}
 		else if ( oi is ObjectAction ) {
-			Log.out( "UserInventory.processItemSelection - ObjectAction");
+			Log.out( "UserInventory.processItemSelection - ObjectAction - RETEST with different action types", Log.DEBUG );
 			var oa:ObjectAction = oi as ObjectAction;
-			if ( lastItemSelection != itemIndex )
-			{   // We are selecting none when it was previously on another item
-				oa.callBack();
+			if ( lastItemSelection == itemIndex ) {
+				// check for reload time of other blocking mechanism
+				// oa.isBlocked
+				if ( oa.ammoName )
+					oa.callBack( oa.ammoName );
+				else
+					oa.callBack();
+			} else if ( lastItemSelection != itemIndex ) {
+				if ( oa.ammoName )
+					oa.callBack( oa.ammoName );
+				else
+					oa.callBack();
 			}
+			/*
 			else if ( - 1 != _itemMaterialSelection )// We are selecting the pick again when that is what we have already.
 			{	// go back to previously used material
 				//throw new Error( "UserInventory - processItemSelection - HOW DO I GET HERE?" );
@@ -337,6 +347,7 @@ public class  UserInventory extends QuickInventory
 				processItemSelection( lastBoxNone )
 				return;
 			}
+			*/
 		}
 		else if ( oi is ObjectTool ) {
 			Log.out( "UserInventory.processItemSelection - ObjectTool");

@@ -7,27 +7,28 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-import com.voxelengine.events.GunEvent;
-import com.voxelengine.events.InventoryEvent;
-import com.voxelengine.events.InventoryInterfaceEvent;
-import com.voxelengine.events.InventorySlotEvent;
-import com.voxelengine.events.ModelEvent;
-import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.weapons.Ammo;
-import com.voxelengine.worldmodel.weapons.Armory;
-import com.voxelengine.worldmodel.weapons.Gun;
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
 import flash.utils.getQualifiedClassName;
 
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
+import com.voxelengine.Globals;
+import com.voxelengine.events.GunEvent;
+import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.InventoryInterfaceEvent;
+import com.voxelengine.events.InventorySlotEvent;
+import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.ShipEvent;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.MouseKeyboardHandler;
+import com.voxelengine.worldmodel.inventory.*;
 import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.models.CameraLocation;
 import com.voxelengine.worldmodel.models.CollisionPoint;
-import com.voxelengine.worldmodel.MouseKeyboardHandler;
+import com.voxelengine.worldmodel.weapons.Ammo;
+import com.voxelengine.worldmodel.weapons.Armory;
+import com.voxelengine.worldmodel.weapons.Gun;
 
 /**
  * ...
@@ -238,8 +239,6 @@ public class Dragon extends Beast
 		return changed;	
 	}
 	
-//	override public function getDefaultSlotData():Vector.<ObjectInfo> {
-	import com.voxelengine.worldmodel.inventory.*;
 	private function defaultSlotDataRequest( $ise:InventorySlotEvent ):void {
 		if ( instanceInfo.instanceGuid == $ise.instanceGuid ) {
 			Log.out( "Dragon.getDefaultSlotData - Loading default data into slots" , Log.WARN );

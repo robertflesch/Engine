@@ -41,5 +41,13 @@ public class Armory
 	public function getAmmoList():Vector.<Ammo> {
 		return _ammos;
 	}
+	
+	public function getAmmoByName( $name:String ):Ammo {
+		for ( var i:int; i < _ammos.length; i++ ) {
+			if ( _ammos[i] && $name == _ammos[i].name )
+				return _ammos[i];
+		}
+		return currentSelection();
+	}
 }
 }

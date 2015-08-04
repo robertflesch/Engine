@@ -161,14 +161,14 @@ package com.voxelengine.GUI
 					miJson = GenerateCube.script();
 					
 					li = _cbSize.getItemAt(_cbSize.selectedIndex );
-					miJson.grainSize = li.data;
-					miJson.biomes.layers[0].offset = li.data;
+					miJson.model.grainSize = li.data;
+					miJson.model.biomes.layers[0].offset = li.data;
 					
 					li = _cbType.getItemAt( _cbType.selectedIndex );
-					miJson.biomes.layers[0].type = li.data;
+					miJson.model.biomes.layers[0].type = li.data;
 					
 					li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
-					miJson.biomes.layers[0].range = 0;
+					miJson.model.biomes.layers[0].range = 0;
 					
 					break;
 				case 1: // From Sphere
@@ -189,7 +189,8 @@ package com.voxelengine.GUI
 			vv.scaleBy( GrainCursor.two_to_the_g( miJson.grainSize ) * 4 );
 			vv = vv.add( VoxelModel.controlledModel.instanceInfo.positionGet );
 			ii.positionSet = vv;
-			ii.modelGuid = miJson.guid = Globals.getUID();
+			// this needs to be key for database.
+			ii.modelGuid = miJson.model.guid = Globals.getUID();
 			
 			new ModelMakerGenerate( ii, miJson );
 		}

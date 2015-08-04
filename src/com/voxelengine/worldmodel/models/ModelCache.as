@@ -268,6 +268,7 @@ package com.voxelengine.worldmodel.models
 				if ( vm && true == vm.dead ) {
 					_instancesDynamic.splice( i, 1 );
 					_instanceByGuidDynamic[vm.instanceInfo.instanceGuid] = null;
+					vm.release();
 				}
 				else 
 					i++

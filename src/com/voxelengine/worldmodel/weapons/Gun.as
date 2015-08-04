@@ -66,27 +66,20 @@ public class Gun extends ControllableVoxelModel
 	
 	private function defaultGunInventory(e:InventorySlotEvent):void 
 	{
-		Log.out( "Gun.defaultGunInventory",Log.WARN );
 		if ( instanceInfo.instanceGuid == e.instanceGuid ) {
-			Log.out( "Gun.defaultGunInventory - right instance",Log.WARN );
 			var ammoList:Vector.<Ammo> = _armory.getAmmoList();
 			for each ( var ammo:Ammo in ammoList ) {
 				var oa:ObjectAction = new ObjectAction( null, "fire", ammo.guid + ".png", "Fire" );
+				oa.ammoName = ammo.name;
+				oa.instanceGuid = instanceInfo.instanceGuid;
 				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, e.ownerGuid, instanceInfo.instanceGuid, -1, oa ) ); 
 			}
 		}
-		else
-			Log.out( "Gun.defaultGunInventory - WRONG instance",Log.WARN );
 	}
 	
-	static private function fire():void {
-		Log.out( "Gun.fire");
-	}
-
-	
-	public function fire():void
-	{
-		Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, instanceInfo.instanceGuid, _armory.currentSelection() ) );			
+	public function fire( $name:String ):void {
+		var ammo:Ammo = _armory.getAmmoByName( $name );
+		Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, instanceInfo.instanceGuid, ammo ) );			
 	}
 	
 	private var _ammoCount:int;

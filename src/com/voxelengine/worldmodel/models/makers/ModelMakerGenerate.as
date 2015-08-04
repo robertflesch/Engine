@@ -40,11 +40,11 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	private var _type:int;
 	
 	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:DatabaseObject ) {
-		_creationFunction 	= $miJson.biomes.layers[0].functionName;
-		_type 				= $miJson.biomes.layers[0].type;
+		_creationFunction 	= $miJson.model.biomes.layers[0].functionName;
+		_type 				= $miJson.model.biomes.layers[0].type;
 		
 		super( $ii );
-		Log.out( "ModelMakerGenerate - ii: " + ii.toString() + "  using generation script: " + $miJson.biomes.layers[0].functionName );
+		Log.out( "ModelMakerGenerate - ii: " + ii.toString() + "  using generation script: " + $miJson.model.biomes.layers[0].functionName );
 		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 		
 		// This is a special case for modelInfo, the modelInfo its self is contained in the generate script

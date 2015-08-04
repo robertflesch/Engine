@@ -34,12 +34,13 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		static public function script():DatabaseObject {
 			//ammo.dbo = new DatabaseObject( Globals.BIGDB_TABLE_AMMO, $pe.guid, "0", 0, true, null );
 			var obj:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_OXEL_DATA, Globals.getUID(), "0", 0, true, null );
+			obj.model = new Object();
 			var biomes:Object = new Object();
 			var layers:Vector.<Object> = new Vector.<Object>();
 			var layer:Object = new Object();
 			
-			obj.grainSize = 4;
-			obj.biomes = biomes;
+			obj.model.grainSize = 4;
+			obj.model.biomes = biomes;
 			biomes.layers = layers;
 			layers[0] = layer;
 			layer.functionName = "GenerateCube";
