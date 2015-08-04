@@ -18,7 +18,6 @@ import com.voxelengine.events.ProjectileEvent;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.worldmodel.models.*;
-import com.voxelengine.worldmodel.models.makers.ModelMakerProjectile;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
@@ -47,30 +46,9 @@ public final class ProjectilePool
 		LoadingEvent.addListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
 	} 
 	
-	static private var _modelInfo:ModelInfo
-	static private var _modelMetadata:ModelMetadata
-	static private const CLASS_NAME:String = "Projectile";
-	private static function onTypesLoaded( $event:LoadingEvent ):void
-	{
+	private static function onTypesLoaded( $event:LoadingEvent ):void {
 		// So types are done, now we have to preload the CLASS_NAME.mjson file
 		LoadingEvent.removeListener( LoadingEvent.LOAD_TYPES_COMPLETE, onTypesLoaded );
-		
-		var obj:DatabaseObject = GenerateCube.script();
-		obj.model.grainSize = 2;
-		// This is a special case for modelInfo, the modelInfo its self is contained in the generate script
-		_modelInfo = new ModelInfo( CLASS_NAME );
-		_modelInfo.fromObject( obj );
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.GENERATION, 0, CLASS_NAME, _modelInfo ) );
-
-		_modelMetadata = new ModelMetadata( CLASS_NAME );
-		var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
-		newDbo.data = new Object();
-		_modelMetadata.fromObjectImport( newDbo );
-		_modelMetadata.name = CLASS_NAME;
-		_modelMetadata.description = CLASS_NAME + " - GENERATED";
-		_modelMetadata.owner = "";
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, CLASS_NAME, _modelMetadata ) );
-		_modelInfo.oxelLoadData();		
 		projectilesGenerate();
 	}
 	
@@ -84,6 +62,25 @@ public final class ProjectilePool
 	}
 	
 	static private function newModel():Projectile {
+		
+		var CLASS_NAME:String = Globals.getUID();
+		var obj:DatabaseObject = GenerateCube.script();
+		obj.model.grainSize = 2;
+		// This is a special case for modelInfo, the modelInfo its self is contained in the generate script
+		var modelInfo:ModelInfo = new ModelInfo( CLASS_NAME );
+		modelInfo.fromObject( obj );
+		//ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.GENERATION, 0, CLASS_NAME, modelInfo ) );
+
+		var modelMetadata:ModelMetadata = new ModelMetadata( CLASS_NAME );
+		var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
+		newDbo.data = new Object();
+		modelMetadata.fromObjectImport( newDbo );
+		modelMetadata.name = CLASS_NAME;
+		modelMetadata.description = CLASS_NAME + " - GENERATED";
+		modelMetadata.owner = "";
+		//ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, CLASS_NAME, modelMetadata ) );
+		modelInfo.oxelLoadData();		
+		
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.instanceGuid = CLASS_NAME;
 		ii.modelGuid = CLASS_NAME;
@@ -95,7 +92,7 @@ public final class ProjectilePool
 			Log.out( "Projectile.newModel - failed to create Projectile", Log.ERROR );
 			return null;
 		}
-		vm.init( _modelInfo, _modelMetadata );
+		vm.init( modelInfo, modelMetadata );
 		return vm;
 	}
 

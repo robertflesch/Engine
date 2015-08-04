@@ -103,7 +103,7 @@ public class VoxelModel
 	}
 
 // TO DO Decouple this, I dislike having every instance of the OxelData have a listener for oxel events
-	public function get oxel():Oxel { return _modelInfo.oxel; }
+	//public function get oxel():Oxel { return _modelInfo.oxel; }
 	
 	public function get dead():Boolean 							{ return _dead; }
 	public function set dead(val:Boolean):void 					{ 
@@ -677,10 +677,12 @@ public class VoxelModel
 	public function changeGrainSize( changeSize:int):void {
 		_timer = getTimer();
 		Oxel.nodes = 0;
-		oxel.changeGrainSize(changeSize, oxel.gc.bound + changeSize);
-		//Log.out("VoxelModel.changeGrainSize - took: " + (getTimer() - _timer) + " count " + Oxel.nodes);
-		oxel.rebuildAll();
-		//Log.out("VoxelModel.changeGrainSize - rebuildAll took: " + (getTimer() - _timer));
+		if ( oxel ) {
+			oxel.changeGrainSize(changeSize, oxel.gc.bound + changeSize);
+			//Log.out("VoxelModel.changeGrainSize - took: " + (getTimer() - _timer) + " count " + Oxel.nodes);
+			oxel.rebuildAll();
+			//Log.out("VoxelModel.changeGrainSize - rebuildAll took: " + (getTimer() - _timer));
+		}
 	}
 	
 	public function breakdown(smallest:int = 2):void {
