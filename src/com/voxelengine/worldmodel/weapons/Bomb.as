@@ -64,7 +64,7 @@ package com.voxelengine.worldmodel.weapons
 				if (  !_bombHolder.isInParentChain( collisionCandidate ) )
 				{
 					var mp:Vector3D = collisionCandidate.worldToModel( instanceInfo.positionGet );
-					var isPassable:Boolean = collisionCandidate.isPassable( mp.x, mp.y, mp.z, oxel.gc.grain );
+					var isPassable:Boolean = collisionCandidate.isPassable( mp.x, mp.y, mp.z, modelInfo.data.oxel.gc.grain );
 					if ( !isPassable )
 					{
 						var mpv:Vector3D = new Vector3D( mp.x + instanceInfo.center.x, mp.y + instanceInfo.center.y, mp.z + instanceInfo.center.z );

@@ -11,6 +11,7 @@ import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.InventoryInterfaceEvent;
 import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.oxel.Oxel;
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.utils.getTimer;
@@ -170,13 +171,19 @@ public class ControllableVoxelModel extends VoxelModel
 	protected function collisionPointsAdd():void {
 		// TO DO Should define this in meta data??? RSF or using extents?
 		
-		var sizeOxel:Number = oxel.gc.size() / 2;
-		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, 0 ) ) );
-		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, sizeOxel*2 ) ) );
-		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 0, sizeOxel, sizeOxel ) ) );
-		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel*2, sizeOxel, sizeOxel ) ) );
-		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, 0, sizeOxel ) ) );
-		_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel*2, sizeOxel ) ) );
+		if ( modelInfo.data && modelInfo.data.oxel ) {
+			var oxel:Oxel = modelInfo.data.oxel;
+			var sizeOxel:Number = oxel.gc.size() / 2;
+			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, 0 ) ) );
+			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, sizeOxel*2 ) ) );
+			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 0, sizeOxel, sizeOxel ) ) );
+			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel*2, sizeOxel, sizeOxel ) ) );
+			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, 0, sizeOxel ) ) );
+			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel*2, sizeOxel ) ) );
+		}
+		else
+			Log.out( "ControlableVoxelModel.collisionPointsAdd - modelInfo.data.oxel not found for guid: " + modelInfo.guid, Log.WARN );
+		
 	}
 
 	override protected function oxelLoaded():void

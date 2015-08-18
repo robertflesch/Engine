@@ -71,7 +71,7 @@ public class ConsoleCommands {
 	{
 		if ( VoxelModel.selectedModel )
 		{
-			VoxelModel.selectedModel.oxel.growTreesOn( VoxelModel.selectedModel.instanceInfo.instanceGuid, TypeInfo.GRASS );
+			VoxelModel.selectedModel.modelInfo.data.oxel.growTreesOn( VoxelModel.selectedModel.instanceInfo.instanceGuid, TypeInfo.GRASS );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -99,7 +99,7 @@ public class ConsoleCommands {
 	{
 		if ( VoxelModel.selectedModel )
 		{
-			VoxelModel.selectedModel.oxel.dirtToGrassAndSand();
+			VoxelModel.selectedModel.modelInfo.data.oxel.dirtToGrassAndSand();
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -109,7 +109,7 @@ public class ConsoleCommands {
 	{
 		if ( VoxelModel.selectedModel )
 		{
-			VoxelModel.selectedModel.oxel.vines( VoxelModel.selectedModel.instanceInfo.instanceGuid );
+			VoxelModel.selectedModel.modelInfo.data.oxel.vines( VoxelModel.selectedModel.instanceInfo.instanceGuid );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -121,7 +121,7 @@ public class ConsoleCommands {
 		if ( VoxelModel.selectedModel )
 		{
 			var ol:Vector.<Oxel> = new Vector.<Oxel>();
-			VoxelModel.selectedModel.oxel.lightingSunGatherList( ol );
+			VoxelModel.selectedModel.modelInfo.data.oxel.lightingSunGatherList( ol );
 		}
 		else {
 			Log.out( "No selected model" );
@@ -142,8 +142,8 @@ public class ConsoleCommands {
 	{
 		if ( VoxelModel.selectedModel )
 		{
-			VoxelModel.selectedModel.oxel.lightingReset();
-			VoxelModel.selectedModel.oxel.rebuildAll();
+			VoxelModel.selectedModel.modelInfo.data.oxel.lightingReset();
+			VoxelModel.selectedModel.modelInfo.data.oxel.rebuildAll();
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -153,7 +153,7 @@ public class ConsoleCommands {
 	{
 		if ( VoxelModel.selectedModel )
 		{
-			VoxelModel.selectedModel.oxel.harvestTrees( VoxelModel.selectedModel.instanceInfo.instanceGuid );
+			VoxelModel.selectedModel.modelInfo.data.oxel.harvestTrees( VoxelModel.selectedModel.instanceInfo.instanceGuid );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -258,7 +258,7 @@ public class ConsoleCommands {
 			{ Log.out( "ConsoleCommands.lavaSpheresCarve  No model selected", Log.WARN ); return; }
 		
 		for ( var i:int; i < $count; i++ )
-			spheresCarve( vm, Oxel.locationRandomGet( vm.oxel ), TypeInfo.LAVA );
+			spheresCarve( vm, Oxel.locationRandomGet( vm.modelInfo.data.oxel ), TypeInfo.LAVA );
 	}
 	
 	private static function waterSpheres( $count:int = 10 ):void
@@ -268,13 +268,13 @@ public class ConsoleCommands {
 			{ Log.out( "ConsoleCommands.waterSpheresCarve  No model selected", Log.WARN ); return; }
 
 		for ( var i:int; i < $count; i++ )
-			spheresCarve( vm, Oxel.locationRandomGet( vm.oxel ), TypeInfo.WATER );
+			spheresCarve( vm, Oxel.locationRandomGet( vm.modelInfo.data.oxel ), TypeInfo.WATER );
 	}
 	
 	private static function spheresCarve( $vm:VoxelModel, $loc:Vector3D, $type:int, $radius:int = 32, $minGrain:int = 2 ):void {
 		var timer:int = getTimer();
 		Oxel.nodes = 0;
-		$vm.oxel.write_sphere( $vm.instanceInfo.instanceGuid
+		$vm.modelInfo.data.oxel.write_sphere( $vm.instanceInfo.instanceGuid
 											   , $loc.x
 											   , $loc.y
 											   , $loc.z
@@ -283,7 +283,7 @@ public class ConsoleCommands {
 											   , $minGrain );
 		Log.out( "ConsoleCommands.waterSpheresCarve  carve AIR time: " + (getTimer() - timer) + "  change count: " + Oxel.nodes );
 		timer = getTimer();
-		$vm.oxel.writeHalfSphere( $vm.instanceInfo.instanceGuid
+		$vm.modelInfo.data.oxel.writeHalfSphere( $vm.instanceInfo.instanceGuid
 											   , $loc.x
 											   , $loc.y
 											   , $loc.z
@@ -292,7 +292,7 @@ public class ConsoleCommands {
 											   , $minGrain );
 		Log.out( "ConsoleCommands.waterSpheresCarve  carve mats time: " + (getTimer() - timer) );
 		
-		Oxel.merge( $vm.oxel );
+		Oxel.merge( $vm.modelInfo.data.oxel );
 	}
 	
 	private static function ambientOcculsion():void {

@@ -232,7 +232,7 @@ public class VoxelModel
 		if (ie.instanceGuid == instanceInfo.instanceGuid )
 			return;
 		
-		if (oxel && oxel.gc) {
+		if (modelInfo.data.oxel && modelInfo.data.oxel.gc) {
 			var msLoc:Vector3D = worldToModel(ie.position);
 			if (doesOxelIntersectSphere(msLoc, ie.radius))
 			{
@@ -301,7 +301,7 @@ public class VoxelModel
 	
 	public function doesOxelIntersectSphere($center:Vector3D, $radius:Number):Boolean {
 		var dist_squared:Number = squared($radius);
-		var maxDis:int = oxel.size_in_world_coordinates();
+		var maxDis:int = modelInfo.data.oxel.size_in_world_coordinates();
 		// assume C1 and C2 are element-wise sorted, if not, do that now 
 		if ($center.x < 0)
 			dist_squared -= squared($center.x);
@@ -367,7 +367,7 @@ public class VoxelModel
 	*/
 	public function flow( $countDown:int = 8, $countOut:int = 8 ):void
 	{
-		oxel.flowFindCandidates( instanceInfo.instanceGuid, $countDown, $countOut );	
+		modelInfo.data.oxel.flowFindCandidates( instanceInfo.instanceGuid, $countDown, $countOut );	
 	}
 	
 	// This function writes to the root oxel, and lets the root find the correct target
@@ -385,26 +385,26 @@ public class VoxelModel
 	public function write_sphere(cx:int, cy:int, cz:int, radius:int, what:int, gmin:uint = 0):void
 	{
 		changed = true;
-		oxel.write_sphere( instanceInfo.instanceGuid, cx, cy, cz, radius, what, gmin);
+		modelInfo.data.oxel.write_sphere( instanceInfo.instanceGuid, cx, cy, cz, radius, what, gmin);
 	}
 	
 	public function empty_square(cx:int, cy:int, cz:int, radius:int, gmin:uint = 0):void
 	{
 		changed = true;
-		oxel.empty_square( instanceInfo.instanceGuid, cx, cy, cz, radius, gmin);
+		modelInfo.data.oxel.empty_square( instanceInfo.instanceGuid, cx, cy, cz, radius, gmin);
 	}
 	
 	public function effect_sphere(cx:int, cy:int, cz:int, ie:ImpactEvent ):void {
 		_timer = getTimer();
 		changed = true;
-		oxel.effect_sphere( instanceInfo.instanceGuid, cx, cy, cz, ie );
+		modelInfo.data.oxel.effect_sphere( instanceInfo.instanceGuid, cx, cy, cz, ie );
 		//Log.out( "VoxelModel.effect_sphere - radius: " + ie.radius + " gmin: " + ie.detail + " took: " + (getTimer() - _timer) );
 		//oxel.mergeRecursive(); // Causes bad things to happen since we dont regen faces!
 	}
 	public function empty_sphere(cx:int, cy:int, cz:int, radius:Number, gmin:uint = 0):void {
 		_timer = getTimer();
 		changed = true;
-		oxel.write_sphere( instanceInfo.instanceGuid, cx, cy - 1, cz, radius - 1.5, TypeInfo.AIR, gmin);
+		modelInfo.data.oxel.write_sphere( instanceInfo.instanceGuid, cx, cy - 1, cz, radius - 1.5, TypeInfo.AIR, gmin);
 		
 		//Log.out( "VoxelModel.empty_sphere - radius: " + radius + " gmin: " + gmin + " took: " + (getTimer() - _timer) );
 		//oxel.mergeRecursive(); // Causes bad things to happen since we dont regen faces!
@@ -458,7 +458,7 @@ public class VoxelModel
 		if ( 0 == instanceInfo.center.length )
 		{
 			if ( 0 == $oxelCenter )
-				$oxelCenter = oxel.size_in_world_coordinates() / 2;
+				$oxelCenter = modelInfo.data.oxel.size_in_world_coordinates() / 2;
 			instanceInfo.centerSetComp( $oxelCenter, $oxelCenter, $oxelCenter ); 
 		}
 	}
@@ -468,7 +468,7 @@ public class VoxelModel
 		Log.out("----------------------- Print VoxelModel -------------------------------");
 		Log.out("----------------------- instanceInfo.instanceGuid: " + instanceInfo.instanceGuid + " -------------------------------");
 		Log.out("----------------------- instanceInfo.modelGuid:       " + instanceInfo.modelGuid + " -------------------------------");
-		oxel.print();
+		modelInfo.data.oxel.print();
 		Log.out("------------------------------------------------------------------------------");
 	}
 	
@@ -529,7 +529,7 @@ public class VoxelModel
 		
 		// if I was inside of a large oxel, the ray would not intersect any of the planes.
 		// So this does a check quick check to see if worldSpaceStart point is inside of the model
-		var gct:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
+		var gct:GrainCursor = GrainCursorPool.poolGet( modelInfo.data.oxel.gc.bound );
 		//if ( isInside( modelSpaceStartPoint.x, modelSpaceStartPoint.y, modelSpaceStartPoint.z, gct ) )
 		//{
 			//oxel.lineIntersect
@@ -549,7 +549,7 @@ public class VoxelModel
 		//else
 		{
 			// this is returning model space intersections
-			oxel.lineIntersect(modelSpaceStartPoint, modelSpaceEndPoint, worldSpaceIntersections);
+			modelInfo.data.oxel.lineIntersect(modelSpaceStartPoint, modelSpaceEndPoint, worldSpaceIntersections);
 		
 			for each (var gci:GrainCursorIntersection in worldSpaceIntersections) {
 				gci.wsPoint = modelToWorld(gci.point);
@@ -562,7 +562,7 @@ public class VoxelModel
 	public function lineIntersectWithChildren($worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>, minSize:int):void {
 		var msStartPoint:Vector3D = worldToModel( $worldSpaceStartPoint );
 		var msEndPoint:Vector3D   = worldToModel( $worldSpaceEndPoint );
-		oxel.lineIntersectWithChildren( msStartPoint, msEndPoint, worldSpaceIntersections, minSize );
+		modelInfo.data.oxel.lineIntersectWithChildren( msStartPoint, msEndPoint, worldSpaceIntersections, minSize );
 		// lineIntersect returns modelSpaceIntersections, convert to world space.
 		for each (var gci:GrainCursorIntersection in worldSpaceIntersections)
 			gci.wsPoint = modelToWorld(gci.point);
@@ -574,7 +574,7 @@ public class VoxelModel
 	
 	public function isInside(x:int, y:int, z:int, gct:GrainCursor):Boolean {
 		GrainCursor.getGrainFromPoint(x, y, z, gct, gct.bound);
-		var fo:Oxel = oxel.childFind(gct);
+		var fo:Oxel = modelInfo.data.oxel.childFind(gct);
 		if (Globals.BAD_OXEL == fo)
 		{
 			//Log.out( "Camera.isNewPositionValid - oxel is BAD, so passable")
@@ -596,7 +596,7 @@ public class VoxelModel
 	
 	public function isPassableAvatar(x:int, y:int, z:int, gct:GrainCursor, collideAtGrain:uint, positionResult:PositionTest):Boolean {
 		GrainCursor.getGrainFromPoint(x, y, z, gct, collideAtGrain);
-		var fo:Oxel = oxel.childFind(gct);
+		var fo:Oxel = modelInfo.data.oxel.childFind(gct);
 		var result:Boolean = true;
 		if (Globals.BAD_OXEL == fo)
 		{
@@ -623,9 +623,9 @@ public class VoxelModel
 	public function isPassable($x:int, $y:int, $z:int, collideAtGrain:uint):Boolean {
 		if ( 0 > $x || 0 > $y || 0 > $z )
 			return true;
-		var gct:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
+		var gct:GrainCursor = GrainCursorPool.poolGet(modelInfo.data.oxel.gc.bound);
 		GrainCursor.getGrainFromPoint($x, $y, $z, gct, collideAtGrain);
-		var fo:Oxel = oxel.childFind(gct);
+		var fo:Oxel = modelInfo.data.oxel.childFind(gct);
 		var result:Boolean = true;
 		if (Globals.BAD_OXEL == fo)
 		{
@@ -645,10 +645,10 @@ public class VoxelModel
 	}
 	
 	public function getOxelAtWSPoint($pos:Vector3D, $collideAtGrain:uint):Oxel {
-		var gct:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
+		var gct:GrainCursor = GrainCursorPool.poolGet(modelInfo.data.oxel.gc.bound);
 		var posMs:Vector3D = worldToModel($pos);
 		gct.getGrainFromVector(posMs, $collideAtGrain);
-		var fo:Oxel = oxel.childFind(gct);
+		var fo:Oxel = modelInfo.data.oxel.childFind(gct);
 		GrainCursorPool.poolDispose(gct);
 		return fo;
 	}
@@ -671,23 +671,23 @@ public class VoxelModel
 		}
 	}
 	
-	public function rotateCCW():void { oxel.rotateCCW(); }
-	public function validate():void { oxel.validate(); }
+	public function rotateCCW():void { modelInfo.data.oxel.rotateCCW(); }
+	public function validate():void { modelInfo.data.oxel.validate(); }
 	
 	public function changeGrainSize( changeSize:int):void {
 		_timer = getTimer();
 		Oxel.nodes = 0;
-		if ( oxel ) {
-			oxel.changeGrainSize(changeSize, oxel.gc.bound + changeSize);
+		if ( modelInfo.data.oxel ) {
+			modelInfo.data.oxel.changeGrainSize(changeSize, modelInfo.data.oxel.gc.bound + changeSize);
 			//Log.out("VoxelModel.changeGrainSize - took: " + (getTimer() - _timer) + " count " + Oxel.nodes);
-			oxel.rebuildAll();
+			modelInfo.data.oxel.rebuildAll();
 			//Log.out("VoxelModel.changeGrainSize - rebuildAll took: " + (getTimer() - _timer));
 		}
 	}
 	
 	public function breakdown(smallest:int = 2):void {
 		var timer:int = getTimer();
-		oxel.breakdown(smallest);
+		modelInfo.data.oxel.breakdown(smallest);
 		Log.out("Oxel.breakdown - took: " + (getTimer() - timer));
 	}
 	
@@ -706,7 +706,7 @@ public class VoxelModel
 		// we need to use the center of the model for the projection.
 		// do I need to use 5 points of detections?
 		var offsetDueTomodelRotation:Vector3D = model.instanceInfo.worldSpaceMatrix.deltaTransformVector(new Vector3D(0, 0, -1));
-		offsetDueTomodelRotation.scaleBy(model.oxel.gc.size() / 2);
+		offsetDueTomodelRotation.scaleBy(model.modelInfo.data.oxel.gc.size() / 2);
 		var modelCenter:Vector3D = model.instanceInfo.positionGet.add(model.instanceInfo.center);
 		var barrelTipModelSpaceLocation:Vector3D = modelCenter.add(offsetDueTomodelRotation);
 		
@@ -723,7 +723,7 @@ public class VoxelModel
 		var worldSpaceStartPoint:Vector3D = model.instanceInfo.positionGet.add(model.instanceInfo.center);
 		
 		var worldSpaceEndPoint:Vector3D = model.instanceInfo.worldSpaceMatrix.transformVector(new Vector3D(0, 0, -250));
-		collisionCandidate.lineIntersectWithChildren(worldSpaceEndPoint, worldSpaceStartPoint, worldSpaceIntersections, oxel.gc.bound);
+		collisionCandidate.lineIntersectWithChildren(worldSpaceEndPoint, worldSpaceStartPoint, worldSpaceIntersections, modelInfo.data.oxel.gc.bound);
 		
 		if (worldSpaceIntersections.length)
 		{
@@ -1012,7 +1012,7 @@ public class VoxelModel
 	// This should be called from voxelModel
 	public function lightSetDefault( $attn:uint ):void {
 		instanceInfo.baseLightLevel = $attn;
-		oxel.lightsStaticSetDefault( $attn );
+		modelInfo.data.oxel.lightsStaticSetDefault( $attn );
 	}
 
 	

@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.voxelModels
 {
+import com.voxelengine.worldmodel.oxel.Oxel;
 import flash.events.MouseEvent;
 import org.flashapi.swing.list.ListItem;
 import org.flashapi.swing.*;
@@ -15,6 +16,7 @@ import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 
 import com.voxelengine.Globals;
+import com.voxelengine.Log;
 import com.voxelengine.GUI.VVPopup;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -90,7 +92,13 @@ public class WindowChangeType extends VVPopup
 				return;
 			li = _cbTo.getItemAt(_cbTo.selectedIndex );
 			var toType:int = li.data;
-			_vm.oxel.changeTypeFromTo( fromType, toType );
+			
+			if ( _vm.modelInfo.data && _vm.modelInfo.data.oxel ) {
+				var oxel:Oxel = _vm.modelInfo.data.oxel;
+				oxel.changeTypeFromTo( fromType, toType );
+			}
+			else
+				Log.out( "WindowChangeType.change - modelInfo.data.oxel not found for guid: " + _vm.modelInfo.guid, Log.WARN );
 		}
 	}
 

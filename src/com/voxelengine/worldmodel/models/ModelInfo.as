@@ -145,7 +145,7 @@ public class ModelInfo extends PersistanceObject
 	private function retrieveData( $ode:OxelDataEvent):void {
 		if ( guid == $ode.modelGuid || altGuid == $ode.modelGuid ) {
 			removeListeners();
-			Log.out( "ModelInfo.retrieveData - loaded oxel guid: " + guid );
+			//Log.out( "ModelInfo.retrieveData - loaded oxel guid: " + guid );
 			_data = $ode.oxelData;
 			if ( "0" == _data.dbo.key ) {
 				_data.changed = true;
@@ -182,11 +182,11 @@ public class ModelInfo extends PersistanceObject
 		var layer1:LayerInfo = biomes.layers[0];
 		if ( "LoadModelFromIVM" == layer1.functionName ) {
 			_altGuid = layer1.data;
-			Log.out( "ModelInfo.loadFromBiomeData - trying to load from local file with alternate name - guid: " + _altGuid, Log.DEBUG );
+			//Log.out( "ModelInfo.loadFromBiomeData - trying to load from local file with alternate name - guid: " + _altGuid, Log.DEBUG );
 			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, _altGuid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );		
 		}
 		else {
-			Log.out( "ModelInfo.loadFromBiomeData - building bio from layer data", Log.DEBUG );
+			//Log.out( "ModelInfo.loadFromBiomeData - building bio from layer data", Log.DEBUG );
 			biomes.addToTaskControllerUsingNewStyle( guid );
 		}
 	}
@@ -210,12 +210,12 @@ public class ModelInfo extends PersistanceObject
 	
 	public function oxelLoadData():void {
 		if ( _data && _data.loaded ) {
-			Log.out( "ModelInfo.loadOxelData - returning loaded oxel guid: " + guid );
+			//Log.out( "ModelInfo.loadOxelData - returning loaded oxel guid: " + guid );
 			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, _data ) );
 		} else { 
 			addListeners();
 			// try to load from tables first
-			Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
+			//Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
 			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_PERSISTANCE ) );
 		}
 	}
@@ -275,6 +275,7 @@ public class ModelInfo extends PersistanceObject
 			Log.out( "ModelInfo.animationsDelete - animations found" );
 			// Dont worry about removing the animations, since the modelInfo is being deleted.
 			for each ( var animData:Object in animationInfo ) {
+				Log.out( "ModelInfo.animationsDelete - deleteing animation: " + animData.guid );
 				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, guid, animData.guid, null ) );
 			}
 		}
@@ -300,6 +301,7 @@ public class ModelInfo extends PersistanceObject
 						if ( ani.guid != $ae.ani.guid ) {
 							ani.guid = $ae.ani.guid
 							changed = true;
+							return;
 						}
 					}
 				}

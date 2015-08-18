@@ -36,7 +36,12 @@ public class ModelEvent extends Event
 	static public const CHILD_MODEL_ADDED:String		= "CHILD_MODEL_ADDED";
 	static public const PARENT_MODEL_ADDED:String		= "PARENT_MODEL_ADDED";
 	static public const DYNAMIC_MODEL_ADDED:String		= "DYNAMIC_MODEL_ADDED";
+	
 	static public const AVATAR_MODEL_ADDED:String		= "AVATAR_MODEL_ADDED";
+	static public const AVATAR_MODEL_REMOVED:String		= "AVATAR_MODEL_REMOVED";
+	static public const PLAYER_MODEL_ADDED:String		= "PLAYER_MODEL_ADDED";
+	static public const PLAYER_MODEL_REMOVED:String		= "PLAYER_MODEL_REMOVED";
+
 	//
 	//static public const CHILD_MODEL_REMOVED:String		= "CHILD_MODEL_REMOVED";
 	static public const PARENT_MODEL_REMOVED:String		= "PARENT_MODEL_REMOVED";

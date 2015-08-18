@@ -43,6 +43,21 @@ package com.voxelengine.worldmodel.models
 		
 		public function ModelCache( $region:Region ) {
 			_region = $region;
+			ModelEvent.addListener( ModelEvent.PLAYER_MODEL_REMOVED, playerRemoved );
+		}
+		
+		private function playerRemoved(e:ModelEvent):void {
+			var vm:VoxelModel;
+			for ( var i:int; i < _instances.length; ) {
+				vm = _instances[i];
+				if ( vm && vm is Player ) {
+					_instances.splice( i, 1 );
+					_instanceByGuid[vm.instanceInfo.instanceGuid] = null;
+					return;
+				}
+				else 
+					i++
+			}
 		}
 		
 		// need to do a recurvsive search here
@@ -62,14 +77,13 @@ package com.voxelengine.worldmodel.models
 			return results;
 		}
 
-		public function createPlayer():Boolean	{
+		static public function createPlayer():void	{
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			Log.out( "ModelCache.createPlayer - creating from LOCAL", Log.DEBUG );
 			instanceInfo.modelGuid = "Player";
 			instanceInfo.instanceGuid = "Player";
 			instanceInfo.grainSize = 4;
 			ModelMakerBase.load( instanceInfo );
-			return true
 		}
 
 		public function save():void {
@@ -125,7 +139,10 @@ package com.voxelengine.worldmodel.models
 					if ( null == _instanceByGuid[vm.instanceInfo.instanceGuid] ) {
 						_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
 						_instances.push(vm);
-						ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
+						if ( vm is Player )
+							ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
+						else	
+							ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
 					}
 					else
 						Log.out( "ModelCache.add - Trying to add a AVATAR with the same MODEL AND INSTANCE for a second time", Log.ERROR );

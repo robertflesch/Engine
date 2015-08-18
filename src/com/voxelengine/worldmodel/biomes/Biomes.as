@@ -166,10 +166,6 @@ package com.voxelengine.worldmodel.biomes
 			biomes.add_layer( new LayerInfo( "TestQuarterSphere", "",  TypeInfo.STONE, 8, 0 ) );
 		}
 		
-		public static function testDebugMacro( biomes:Biomes ):void {
-			biomes.add_layer( new LayerInfo( "TestDebugMacro", "",  TypeInfo.GRASS,   4, 0 ) );
-		}
-		
 		public static function generateCube( biomes:Biomes ):void {
 			//biomes.add_layer( new LayerInfo( TestSingleOxelFaces,  TypeInfo.GRASS,   1, 0 ) );
 			//public function LayerInfo( functionName:String = null, data:String = "", type:int = 0 , range:int = 0, offset:int = 0, optional1:String = "", optional2:int = 0 )

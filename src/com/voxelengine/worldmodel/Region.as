@@ -143,7 +143,7 @@ package com.voxelengine.worldmodel
 				
 			// for local use only
 			if ( !Globals.online && !Player.player )
-				Region.currentRegion.modelCache.createPlayer();
+				ModelCache.createPlayer();
 				
 			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name, Log.DEBUG );
 		}	

@@ -39,8 +39,9 @@ public class GenerateWater extends LandscapeTask
 		if ( vm )
 		{
 			// this gives us a general range
-			var rangeInG0:int = vm.oxel.size_in_world_coordinates() * _layer.offset / 100;
-			var gct:GrainCursor = GrainCursorPool.poolGet( vm.oxel.gc.bound );
+			var oxel:Oxel = vm.modelInfo.data.oxel;
+			var rangeInG0:int = oxel.size_in_world_coordinates() * _layer.offset / 100;
+			var gct:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
 			// this finds a g0 at that point
 			GrainCursor.roundToInt( 0, rangeInG0, 0, gct );
 			// this gives us the minGrain loction that holds the g0
@@ -52,7 +53,7 @@ public class GenerateWater extends LandscapeTask
 			GrainCursorPool.poolDispose( gct );
 			
 			trace( "GenerateWater.start - water height: " + rangeInG0 );	
-			vm.oxel.layDownWater( rangeInG0 );
+			oxel.layDownWater( rangeInG0 );
 			Log.out( "GenerateWater.start - CREATED CHILDREN: " + Oxel.TEMP_COUNT );
 
 		}

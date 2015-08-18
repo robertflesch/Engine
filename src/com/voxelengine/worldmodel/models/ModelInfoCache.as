@@ -93,8 +93,7 @@ public class ModelInfoCache
 		}
 	}
 	
-	// TODO NOTE: This doesnt not work the first time the object is imported - why?
-	// You have to close app and restart to get guids correct.
+	// You have to close the inventory window and reopen to get guids correct.
 	static private function deleteRecursive( $mie:ModelInfoEvent ):void {
 		// first delete any children
 		// Should always be an entry in the modelInfo table, since a request for it went out first.

@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.voxelModels
 {
+import com.voxelengine.worldmodel.oxel.Oxel;
 import flash.events.MouseEvent;
 
 import org.flashapi.swing.list.ListItem;
@@ -16,6 +17,7 @@ import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 
 import com.voxelengine.Globals;
+import com.voxelengine.Log;
 import com.voxelengine.GUI.VVPopup;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -56,7 +58,13 @@ public class WindowChangeBaseLightLevel extends VVPopup
 			if ( _vm )
 			{
 				var ll:String = _ll.label;
-				_vm.oxel.lightsStaticSetDefault( parseInt( ll ) );
+				
+				if ( _vm.modelInfo.data && _vm.modelInfo.data.oxel ) {
+					var oxel:Oxel = _vm.modelInfo.data.oxel;
+					oxel.lightsStaticSetDefault( parseInt( ll ) );
+				}
+				else
+					Log.out( "WindowChangeBaseLightLevel.change - vm.modelInfo.data || vm.modelInfo.data.oxel not found for guid: " + _vm.modelInfo.guid, Log.WARN );
 			}
 		}
 

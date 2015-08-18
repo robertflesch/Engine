@@ -93,7 +93,7 @@ public class PersistURL
 
 		function loadError(event:IOErrorEvent):void {
 			var errorMsg:String = "PersistURL.loadError - event: " + event.toString() + "  filePath: " + _filePath;
-			Log.out( errorMsg, Log.WARN );
+			//Log.out( errorMsg, Log.WARN );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, 0, $pe.table, $pe.guid, null, errorMsg, $pe.format, $pe.other ) );
 		}	
 		

@@ -169,34 +169,34 @@ public class EditCursor extends VoxelModel
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation
 		  || CursorOperationEvent.INSERT_OXEL == cursorOperation ) {
 			if ( VoxelModel.selectedModel )
-				if ( e.size < VoxelModel.selectedModel.oxel.gc.bound && 0 <= e.size ) {
-					oxel.gc.bound = e.size;
-					oxel.gc.grain = e.size;
+				if ( e.size < VoxelModel.selectedModel.modelInfo.data.oxel.gc.bound && 0 <= e.size ) {
+					modelInfo.data.oxel.gc.bound = e.size;
+					modelInfo.data.oxel.gc.grain = e.size;
 				}
 				else {	
 					// reseting so I have to inform others
-					oxel.gc.bound = 4;
-					oxel.gc.grain = 4;
-					CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, oxel.gc.grain ) );
+					modelInfo.data.oxel.gc.bound = 4;
+					modelInfo.data.oxel.gc.grain = 4;
+					CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, modelInfo.data.oxel.gc.grain ) );
 				}
 			else {
-				oxel.gc.bound = e.size;
-				oxel.gc.grain = e.size;
+				modelInfo.data.oxel.gc.bound = e.size;
+				modelInfo.data.oxel.gc.grain = e.size;
 			}
 		}
 	}
 	private function sizeGrowEvent(e:CursorSizeEvent):void {
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation || CursorOperationEvent.INSERT_OXEL == cursorOperation ) {
-			if ( oxel.gc.grain < 6 )
-				oxel.gc.grain++;
-			CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, oxel.gc.grain ) );
+			if ( modelInfo.data.oxel.gc.grain < 6 )
+				modelInfo.data.oxel.gc.grain++;
+			CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, modelInfo.data.oxel.gc.grain ) );
 		}
 	}
 	private function sizeShrinkEvent(e:CursorSizeEvent):void {
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation || CursorOperationEvent.INSERT_OXEL == cursorOperation ) {
-			if ( 0 < oxel.gc.grain )
-				oxel.gc.grain--;
-			CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, oxel.gc.grain ) );
+			if ( 0 < modelInfo.data.oxel.gc.grain )
+				modelInfo.data.oxel.gc.grain--;
+			CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, modelInfo.data.oxel.gc.grain ) );
 		}
 	}
 	
@@ -316,12 +316,12 @@ public class EditCursor extends VoxelModel
 	public function gciDataClear():void { gciData = null; }
 	public function gciDataSet( $gciData:GrainCursorIntersection ):void {
 		_gciData = $gciData;
-		oxel.gc.bound = $gciData.model.oxel.gc.bound;
+		modelInfo.data.oxel.gc.bound = $gciData.model.modelInfo.data.oxel.gc.bound;
 		//// This cleans up (int) the location of the gc
-		var gct:GrainCursor = GrainCursorPool.poolGet( $gciData.model.oxel.gc.bound );
+		var gct:GrainCursor = GrainCursorPool.poolGet( $gciData.model.modelInfo.data.oxel.gc.bound );
 		GrainCursor.roundToInt( $gciData.point.x, $gciData.point.y, $gciData.point.z, gct );
 		// we have to make the grain scale up to the size of the edit cursor
-		gct.become_ancestor( oxel.gc.grain );
+		gct.become_ancestor( modelInfo.data.oxel.gc.grain );
 		_gciData.gc.copyFrom( gct );
 		GrainCursorPool.poolDispose( gct );
 	}
@@ -348,7 +348,7 @@ public class EditCursor extends VoxelModel
 			var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
 			viewMatrix.prependScale( 1 + SCALE_FACTOR, 1 + SCALE_FACTOR, 1 + SCALE_FACTOR ); 
 			var positionscaled:Vector3D = viewMatrix.position;
-			var t:Number = oxel.gc.size() * SCALE_FACTOR/2;
+			var t:Number = modelInfo.data.oxel.gc.size() * SCALE_FACTOR/2;
 			viewMatrix.prependTranslation( -t, -t, -t)
 			viewMatrix.append($mvp);
 			
@@ -385,7 +385,7 @@ public class EditCursor extends VoxelModel
 		if ( !gciData && objectModel && objectModel.complete ) { // this is the INSERT_MODEL where its not on a parent model
 			oxelTexture = oxelTextureValid;
 			var vv:Vector3D = ModelCacheUtils.viewVectorNormalizedGet();
-			vv.scaleBy( objectModel.oxel.gc.size() * 4 );
+			vv.scaleBy( objectModel.modelInfo.data.oxel.gc.size() * 4 );
 			vv = vv.add( VoxelModel.controlledModel.instanceInfo.positionGet );
 			objectModel.instanceInfo.positionSet = vv;
 		}
@@ -395,38 +395,38 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function buildCursorModel():void {	
-		oxel.reset();
+		modelInfo.data.oxel.reset();
 		
 		if ( objectModel ) {
-			oxel.gc.bound = _objectModel.grain;
-			oxel.gc.grain = _objectModel.grain;
+			modelInfo.data.oxel.gc.bound = _objectModel.grain;
+			modelInfo.data.oxel.gc.grain = _objectModel.grain;
 		}
 		if ( CursorShapeEvent.CYLINDER == cursorShape || CursorShapeEvent.SPHERE == cursorShape ) {
 			// I could use gciData.near to determine which single face to use, but seems like overkill
 			if ( Globals.AXIS_X == _gciData.axis ) {
-				oxel.faceSet( Globals.POSX );
-				oxel.faceSet( Globals.NEGX );
+				modelInfo.data.oxel.faceSet( Globals.POSX );
+				modelInfo.data.oxel.faceSet( Globals.NEGX );
 			} else if ( Globals.AXIS_Y == _gciData.axis ) {
-				oxel.faceSet( Globals.POSY );
-				oxel.faceSet( Globals.NEGY );
+				modelInfo.data.oxel.faceSet( Globals.POSY );
+				modelInfo.data.oxel.faceSet( Globals.NEGY );
 			} else {
-				oxel.faceSet( Globals.POSZ );
-				oxel.faceSet( Globals.NEGZ );
+				modelInfo.data.oxel.faceSet( Globals.POSZ );
+				modelInfo.data.oxel.faceSet( Globals.NEGZ );
 			}
 		} else {	
-			oxel.faceSet( Globals.POSX );
-			oxel.faceSet( Globals.NEGX );
-			oxel.faceSet( Globals.POSY );
-			oxel.faceSet( Globals.NEGY );
-			oxel.faceSet( Globals.POSZ );
-			oxel.faceSet( Globals.NEGZ );
+			modelInfo.data.oxel.faceSet( Globals.POSX );
+			modelInfo.data.oxel.faceSet( Globals.NEGX );
+			modelInfo.data.oxel.faceSet( Globals.POSY );
+			modelInfo.data.oxel.faceSet( Globals.NEGY );
+			modelInfo.data.oxel.faceSet( Globals.POSZ );
+			modelInfo.data.oxel.faceSet( Globals.NEGZ );
 		}
 		
-		if ( !oxel.lighting )
-			oxel.lighting = LightingPool.poolGet( 0xff );
-		var li:LightInfo = oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-		oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
-		oxel.write( EDIT_CURSOR, oxel.gc, oxelTexture, true );
+		if ( !modelInfo.data.oxel.lighting )
+			modelInfo.data.oxel.lighting = LightingPool.poolGet( 0xff );
+		var li:LightInfo = modelInfo.data.oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+		modelInfo.data.oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
+		modelInfo.data.oxel.write( EDIT_CURSOR, modelInfo.data.oxel.gc, oxelTexture, true );
 		
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
 			li.color = cursorColorRainbow();
@@ -437,7 +437,7 @@ public class EditCursor extends VoxelModel
 		else
 			li.color = 0xffffffff;
 		
-		oxel.quadsBuild();
+		modelInfo.data.oxel.quadsBuild();
 
 		function cursorColorRainbow():uint {
 			var frequency:Number = 2.4;
@@ -456,10 +456,10 @@ public class EditCursor extends VoxelModel
 	private function isAvatarInsideThisOxel( vm:VoxelModel, oxel:Oxel ):Boolean {
 		var mp:Vector3D = vm.worldToModel( ModelCacheUtils.worldSpaceStartPoint );
 		// check head
-		var result:Boolean = oxel.gc.is_point_inside( mp );
+		var result:Boolean = modelInfo.data.oxel.gc.is_point_inside( mp );
 		// and foot
 		mp.y -= Globals.AVATAR_HEIGHT;
-		result = result || oxel.gc.is_point_inside( mp );
+		result = result || modelInfo.data.oxel.gc.is_point_inside( mp );
 		return result;
 	}
 	
@@ -473,7 +473,7 @@ public class EditCursor extends VoxelModel
 			Log.out( "EditCursor.getHighlightedOxel NO PLACEMENT FOUND" );
 			return Globals.BAD_OXEL;
 		}
-		var oxelToBeModified:Oxel = foundModel.oxel.childGetOrCreate( _pl.gc );
+		var oxelToBeModified:Oxel = foundModel.modelInfo.data.oxel.childGetOrCreate( _pl.gc );
 		if ( Globals.BAD_OXEL == oxelToBeModified )
 		{
 			Log.out( "EditCursor.getHighlightedOxel BAD OXEL OLD" );
@@ -608,14 +608,14 @@ public class EditCursor extends VoxelModel
 	}
 	
 	static private function getOxelFromPoint( vm:VoxelModel, gci:GrainCursorIntersection ):Oxel {
-		var gcDelete:GrainCursor = GrainCursorPool.poolGet( vm.oxel.gc.bound );
+		var gcDelete:GrainCursor = GrainCursorPool.poolGet( vm.modelInfo.data.oxel.gc.bound );
 		// This is where it intersects with a grain 0
 		gcDelete.grainX = int( EditCursor.currentInstance.instanceInfo.positionGet.x + 0.05 );
 		gcDelete.grainY = int( EditCursor.currentInstance.instanceInfo.positionGet.y + 0.05 );
 		gcDelete.grainZ = int( EditCursor.currentInstance.instanceInfo.positionGet.z + 0.05 );
 		// we have to make the grain scale up to the size of the edit cursor
-		gcDelete.become_ancestor( EditCursor.currentInstance.oxel.gc.grain );
-		var oxelToBeDeleted:Oxel = vm.oxel.childFind( gcDelete );
+		gcDelete.become_ancestor( EditCursor.currentInstance.modelInfo.data.oxel.gc.grain );
+		var oxelToBeDeleted:Oxel = vm.modelInfo.data.oxel.childFind( gcDelete );
 		GrainCursorPool.poolDispose( gcDelete );
 		return oxelToBeDeleted;
 	}
@@ -631,17 +631,17 @@ public class EditCursor extends VoxelModel
 			Player.player.stateLock( true, 300 );
 			
 			foundModel = VoxelModel.selectedModel;
-			var fmRoot:Oxel = foundModel.oxel;
+			var fmRoot:Oxel = foundModel.modelInfo.data.oxel;
 			if ( CursorShapeEvent.SQUARE == cursorShape )
 			{
-				var gcDelete:GrainCursor = GrainCursorPool.poolGet(foundModel.oxel.gc.bound);
+				var gcDelete:GrainCursor = GrainCursorPool.poolGet(foundModel.modelInfo.data.oxel.gc.bound);
 				// This is where it intersects with a grain 0
 				gcDelete.grainX = int( EditCursor.currentInstance.instanceInfo.positionGet.x + 0.05 );
 				gcDelete.grainY = int( EditCursor.currentInstance.instanceInfo.positionGet.y + 0.05 );
 				gcDelete.grainZ = int( EditCursor.currentInstance.instanceInfo.positionGet.z + 0.05 );
 				// we have to make the grain scale up to the size of the edit cursor
-				gcDelete.become_ancestor( EditCursor.currentInstance.oxel.gc.grain );
-				var oxelToBeDeleted:Oxel = foundModel.oxel.childGetOrCreate( gcDelete );
+				gcDelete.become_ancestor( EditCursor.currentInstance.modelInfo.data.oxel.gc.grain );
+				var oxelToBeDeleted:Oxel = foundModel.modelInfo.data.oxel.childGetOrCreate( gcDelete );
 				if ( Globals.BAD_OXEL != oxelToBeDeleted )
 					foundModel.write( gcDelete, TypeInfo.AIR );
 				GrainCursorPool.poolDispose( gcDelete );
@@ -716,8 +716,8 @@ public class EditCursor extends VoxelModel
 			cuttingPointCyl.y = where.getModelY() + radius
 			cuttingPointCyl.z = where.getModelZ() + radius
 			
-			var minGrain:int = Math.max( EditCursor.currentInstance.oxel.gc.grain - 4, 0 );
-			var startingGrain:int = EditCursor.currentInstance.oxel.gc.grain - 1;
+			var minGrain:int = Math.max( EditCursor.currentInstance.modelInfo.data.oxel.gc.grain - 4, 0 );
+			var startingGrain:int = EditCursor.currentInstance.modelInfo.data.oxel.gc.grain - 1;
 			//SphereOperation( gc:GrainCursor, what:int, guid:String,	cx:int, cy:int, cz:int, radius:int, currentGrain:int, gmin:uint = 0  ):void 				
 			new SphereOperation( where
 								 , what
@@ -780,8 +780,8 @@ public class EditCursor extends VoxelModel
 				what = TypeInfo.AIR;
 			}
 				
-			var minGrain:int = Math.max( EditCursor.currentInstance.oxel.gc.grain - 5, 0 );
-			var startingGrain:int = EditCursor.currentInstance.oxel.gc.grain - 1;
+			var minGrain:int = Math.max( EditCursor.currentInstance.modelInfo.data.oxel.gc.grain - 5, 0 );
+			var startingGrain:int = EditCursor.currentInstance.modelInfo.data.oxel.gc.grain - 1;
 			if ( where )
 			{
 				new CylinderOperation( where

@@ -150,7 +150,7 @@ public class OxelPersistanceCache
 	static private function loadFailed( $pe:PersistanceEvent ):void {
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
-		Log.out( "OxelDataCache.loadFailed " + $pe.toString(), Log.WARN );
+		//Log.out( "OxelDataCache.loadFailed " + $pe.toString(), Log.WARN );
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid )
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );

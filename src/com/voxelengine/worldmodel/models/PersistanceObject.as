@@ -73,7 +73,7 @@ public class PersistanceObject
 	
 	public function save():void {
 		if ( Globals.online && changed ) {
-			Log.out( "PersistanceObject.save - Saving to guid: " + guid  + " in table: " + table, Log.WARN );
+			//Log.out( "PersistanceObject.save - Saving to guid: " + guid  + " in table: " + table, Log.WARN );
 			addSaveEvents();
 			toObject();
 			changed = false;
@@ -83,10 +83,10 @@ public class PersistanceObject
 		else {
 			if ( Globals.online && !changed )
 				Log.out( "PersistanceObject.save - Not saving data - guid: " + guid + " NOT changed" );
-			else if ( !Globals.online && changed )
-				Log.out( "PersistanceObject.save - Not saving data - guid: " + guid + " NOT online" );
-			else	
-				Log.out( "PersistanceObject.save - Not saving data - Offline and not changed" );
+			//else if ( !Globals.online && changed )
+			//	Log.out( "PersistanceObject.save - Not saving data - guid: " + guid + " NOT online" );
+			//else	
+			//	Log.out( "PersistanceObject.save - Not saving data - Offline and not changed" );
 		}
 				
 	}

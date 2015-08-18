@@ -373,6 +373,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
 		Log.out( "Player.loseControl --------------------------------------------------------------------------------------------------------------------", Log.DEBUG );
 		super.loseControl( $modelDetaching, false );
+		ModelEvent.dispatch( new ModelEvent( ModelEvent.PLAYER_MODEL_REMOVED, instanceInfo.instanceGuid ) );
 		instanceInfo.usesCollision = false;
 	}
 

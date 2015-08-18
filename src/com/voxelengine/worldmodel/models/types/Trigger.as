@@ -119,7 +119,7 @@ package com.voxelengine.worldmodel.models.types
 			{
 				_was_selected = false;
 				var loco1:GrainCursor = GrainCursorPool.poolGet(ox.gc.bound);
-				throw new Error( "Trigger.update - How to do this with new oxel model?" );
+				Log.out( "Trigger.update - How to do this with new oxel model?", Log.ERROR );
 				// this prunes the children oxel
 				//loco1.set_values( 0, 0, 0, oxel.gc.grain );
 				//_ba.position = 0;

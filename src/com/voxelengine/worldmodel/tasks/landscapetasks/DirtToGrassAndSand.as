@@ -36,7 +36,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var vm:VoxelModel = getVoxelModel();
 			if ( vm )
 			{
-				vm.oxel.dirtToGrassAndSand();
+				vm.modelInfo.data.oxel.dirtToGrassAndSand();
 			}
 			else
 				Log.out( "GrowTreesOn.start - VM not found for guid: " + _modelGuid );

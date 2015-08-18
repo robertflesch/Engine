@@ -25,7 +25,6 @@ package com.voxelengine.worldmodel.tasks.tests
 			TestSphere;	
 			GenerateCube;
 			TestError;
-			TestDebugMacro;
 			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.tasks.tests.TestError" ) ) ;;
 			try 
 			{

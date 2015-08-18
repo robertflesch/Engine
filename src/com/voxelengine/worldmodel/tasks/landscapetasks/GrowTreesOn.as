@@ -34,18 +34,22 @@ public class GrowTreesOn extends LandscapeTask
 		
 		//Log.out( "GrowTreesOn.start - enter: ", Log.ERROR);					
 		var vm:VoxelModel = getVoxelModel();
-		if ( vm )
-		{
-			// This should be 1 - 100 range
-			//var outOf:int = _layer.range;
-			//vm.oxel.growTreesOn( _layer.type, outOf ? outOf : 2000 );
-			// 100 is 100
-			// 1 is 2000
-			var outOf:int = 81 + 1900/_layer.range;
-			vm.oxel.growTreesOn( _modelGuid, _layer.type, outOf ? outOf : 1000 );
+		if ( vm ) {
+			if ( vm.modelInfo.data && vm.modelInfo.data.oxel ) {
+				// This should be 1 - 100 range
+				//var outOf:int = _layer.range;
+				//vm.oxel.growTreesOn( _layer.type, outOf ? outOf : 2000 );
+				// 100 is 100
+				// 1 is 2000
+				var oxel:Oxel = vm.modelInfo.data.oxel;
+				var outOf:int = 81 + 1900 / _layer.range;
+				oxel.growTreesOn( _modelGuid, _layer.type, outOf ? outOf : 1000 );
+			}
+			else
+				Log.out( "GrowTreesOn.start - vm.modelInfo.data || vm.modelInfo.data.oxel not found for guid: " + _modelGuid, Log.WARN );
 		}
 		else
-			Log.out( "GrowTreesOn.start - VM not found for guid: " + _modelGuid );
+			Log.out( "GrowTreesOn.start - VM not found for guid: " + _modelGuid, Log.WARN );
 
 		Log.out( "GrowTreesOn.start - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) );	
 		

@@ -41,7 +41,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var vm:VoxelModel = getVoxelModel();
 			var max:uint  = 1 << vm.instanceInfo.grainSize;
 			
-			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
+			var loco:GrainCursor = GrainCursorPool.poolGet(vm.modelInfo.data.oxel.gc.bound);
 			for ( var x:int = 0; x < max; x++ ) {
 				vm.write( loco.set_values( x, 0, 0, 0 ), TypeInfo.RED, true );
 				vm.write( loco.set_values( 0, x, 0, 0 ), TypeInfo.GREEN, true );
@@ -68,7 +68,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private function GeneratePlusX( xo:int, yo:int, zo:int ):void
         {
 			var vm:VoxelModel = getVoxelModel();
-			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
+			var loco:GrainCursor = GrainCursorPool.poolGet(vm.modelInfo.data.oxel.gc.bound);
 			
 			vm.write( loco.set_values(xo, 0, 0, 0 ), TypeInfo.RED, true );
             vm.write( loco.set_values(xo, yo, zo, 0 ), TypeInfo.RED, true );
@@ -116,7 +116,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private function GeneratePlusY( xo:int, yo:int, zo:int ):void
         {
 			var vm:VoxelModel = getVoxelModel();
-			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
+			var loco:GrainCursor = GrainCursorPool.poolGet(vm.modelInfo.data.oxel.gc.bound);
 
             vm.write( loco.set_values(xo + 0, yo, zo - 0, 0 ), TypeInfo.GREEN, true );
             vm.write( loco.set_values(xo + 1, yo, zo - 1, 0 ), TypeInfo.GREEN, true );
@@ -144,7 +144,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private function GeneratePlusZ( xo:int, yo:int, zo:int ):void
         {
 			var vm:VoxelModel = getVoxelModel();
-			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
+			var loco:GrainCursor = GrainCursorPool.poolGet(vm.modelInfo.data.oxel.gc.bound);
 
             vm.write( loco.set_values(xo + 7, yo - 0, zo, 0 ), TypeInfo.BLUE, true );
             vm.write( loco.set_values(xo + 8, yo - 0, zo, 0 ), TypeInfo.BLUE, true );

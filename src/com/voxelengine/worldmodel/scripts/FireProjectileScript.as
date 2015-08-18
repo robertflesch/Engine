@@ -146,9 +146,13 @@ package com.voxelengine.worldmodel.scripts
 			pm.ammo = pe.ammo;
 			
 			var grainChange:int = pe.ammo.grain - pm.grain;
+			if ( !pm.modelInfo || !pm.modelInfo.data ) {
+				Log.out( "FireProjectileScript.bulletPool" );
+				return;
+			}
 			pm.changeGrainSize( grainChange );
 //			trace( "bulletPool: changing type to: " + Globals.Info[pe.ammo.oxelType].name );
-			pm.oxel.changeAllButAirToType( pe.ammo.oxelType );
+			pm.modelInfo.data.oxel.changeAllButAirToType( pe.ammo.oxelType );
 			
 			pm.instanceInfo.positionSet = pe.position;
 //			Log.out( "FireProjectileScript.bulletPool ProjectileEvent: " + pe );

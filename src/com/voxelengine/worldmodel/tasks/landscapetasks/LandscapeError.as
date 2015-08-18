@@ -38,8 +38,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			// Builds Solid Cube of any grain size
 			//////////////////////////////////////////////////////////
 			var vm:VoxelModel = getVoxelModel();
-			var gc:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
-			gc.copyFrom(vm.oxel.gc);
+			var oxel:Oxel = vm.modelInfo.data.oxel;
+			var gc:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
+			gc.copyFrom(oxel.gc);
 			var root_grain_size:uint = gc.grain;
 			var min_grain_size:int = root_grain_size - _layer.range;
 			if ( 0 > min_grain_size || min_grain_size > root_grain_size || ( 3 < (root_grain_size - min_grain_size)) )
@@ -49,10 +50,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			}
 
 			trace("LandscapeError.start on rootGrain of max size: " + root_grain_size + "  Filling with grain of size: " + min_grain_size + " of type: " + TypeInfo.typeInfo[_layer.type].name );
-			var loco:GrainCursor = GrainCursorPool.poolGet(vm.oxel.gc.bound);
+			var loco:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
 			
 			var size:int = 1 << (root_grain_size - min_grain_size);
-			var oxel:Oxel;
 			for ( var x:int = 0; x < size; x++ ) {
 				for ( var y:int = 0; y < size; y++ ) {
 					for ( var z:int = 0; z < size; z++ ) {

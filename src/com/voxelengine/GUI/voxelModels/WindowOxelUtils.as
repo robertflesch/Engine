@@ -125,7 +125,7 @@ public class WindowOxelUtils extends VVPopup
 	
 	
 	private function resetFlowInfoHandler(event:UIMouseEvent):void {
-		_vm.oxel.resetFlowInfo();
+		_vm.modelInfo.data.oxel.resetFlowInfo();
 	}
 	
 	private function baseLightLevelHandler(event:UIMouseEvent):void {
@@ -147,7 +147,7 @@ public class WindowOxelUtils extends VVPopup
 	protected function onRepeat(event:TimerEvent):void
 	{
 		Log.out( "WindowOxelUtils.onRepeat - startingVal: " + startingVal );
-		_vm.oxel.fullBright( startingVal );
+		_vm.modelInfo.data.oxel.fullBright( startingVal );
 		
 		if ( 0xff == startingVal ) {
 			_reloadTimer.stop();
@@ -163,12 +163,12 @@ public class WindowOxelUtils extends VVPopup
 
 	private function rotateHandler(event:UIMouseEvent):void 
 	{
-		_vm.oxel.rotateCCW();
+		_vm.modelInfo.data.oxel.rotateCCW();
 	}
 
 	private function centerHandler(event:UIMouseEvent):void 
 	{
-		_vm.oxel.centerOxel();
+		_vm.modelInfo.data.oxel.centerOxel();
 	}
 	
 	private function breakdownHandler(event:UIMouseEvent):void 
@@ -184,17 +184,17 @@ public class WindowOxelUtils extends VVPopup
 	private function validateHandler(event:UIMouseEvent):void 
 	{
 		_vm.validate();
-		_vm.oxel.rebuildAll();
+		_vm.modelInfo.data.oxel.rebuildAll();
 	}
 	
 	private function mergeSameHandler(event:UIMouseEvent):void 
 	{
-		_vm.oxel.mergeAndRebuild();
+		_vm.modelInfo.data.oxel.mergeAndRebuild();
 	}
 	
 	private function mergeAirHandler(event:UIMouseEvent):void 
 	{
-		_vm.oxel.mergeAirAndRebuild();
+		_vm.modelInfo.data.oxel.mergeAirAndRebuild();
 	}
 	
 	
