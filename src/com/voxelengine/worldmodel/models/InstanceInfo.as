@@ -156,6 +156,10 @@ public class InstanceInfo extends Location	{
 	}
 	
 	private function vector3DToObject( $vec:Vector3D ):Object {
+		return { x:$vec.x, y:$vec.y, z:$vec.z };
+	}
+	
+	private function vector3DIntToObject( $vec:Vector3D ):Object {
 		return { x:int($vec.x), y:int($vec.y), z:int($vec.z) };
 	}
 	
@@ -171,7 +175,7 @@ public class InstanceInfo extends Location	{
 		if ( 0 < rotationGet.length )
 			instanceInfo.rotation 		= vector3DToObject( rotationGet );
 		if ( 0 < centerNotScaled.length )
-			instanceInfo.center 		= vector3DToObject( centerNotScaled );
+			instanceInfo.center 		= vector3DIntToObject( centerNotScaled );
 		if ( velocityGet.length )
 			instanceInfo.velocity		= vector3DToObject( velocityGet );
 		if ( 3 != scale.lengthSquared )
