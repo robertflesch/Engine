@@ -6,7 +6,7 @@ authorship protected under United States Copyright Act.
 Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
-package com.voxelengine.GUI.voxelModels
+package com.voxelengine.GUI.panels
 {
 import com.voxelengine.events.AnimationEvent;
 import com.voxelengine.events.ModelBaseEvent;

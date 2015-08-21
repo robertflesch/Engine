@@ -14,7 +14,7 @@ package com.voxelengine.GUI.crafting {
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
-	import com.voxelengine.GUI.voxelModels.PanelBase;	
+	import com.voxelengine.GUI.panels.PanelBase;	
 	import com.voxelengine.GUI.LanguageManager;
 	import com.voxelengine.events.CraftingItemEvent;
 	import com.voxelengine.worldmodel.crafting.Material;

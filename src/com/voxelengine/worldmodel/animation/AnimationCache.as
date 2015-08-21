@@ -35,7 +35,7 @@ public class AnimationCache
 	
 	// this acts as a holding spot for all model objects loaded from persistance
 	// dont use weak keys since this is THE spot that holds things.
-	static private var _animatedModels:Array = new Array();
+	static private var _animations:Array = new Array();
 	
 	public function AnimationCache() {}
 	
@@ -63,14 +63,8 @@ public class AnimationCache
 	}
 
 	static private function deleteHandler( $ae:AnimationEvent ):void {
-		var modelAnis:Array = _animatedModels[$ae.modelGuid]; 
-		var ani:Animation;
-		if ( modelAnis ) {
-			if ( modelAnis[$ae.aniGuid] );
-				modelAnis[$ae.aniGuid] = null;
-			// TODO need to clean up eventually
-		}
-		//else if its not in the cache, we can still delete it.
+		if ( _animations[$ae.aniGuid] ) 
+			_animations[$ae.aniGuid] = null;
 		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_ANIMATIONS, $ae.aniGuid, null ) );
 	}
 	
@@ -79,20 +73,13 @@ public class AnimationCache
 		var guidArray:Array = $ae.aniGuid.split( ":" );
 		var oldGuid:String = guidArray[0];
 		var newGuid:String = guidArray[1];
-		var modelAnis:Array = _animatedModels[$ae.modelGuid]; 
-		if ( null == modelAnis ) {
-			Log.out( "AnimationCache.updateGuid - model not found: " + $ae.modelGuid, Log.ERROR );
-			return; 
+		var ani:Animation = _animations[$ae.modelGuid]; 
+		if ( ani ) {
+			_animations[oldGuid] = null;
+			_animations[newGuid] = ani;
 		}
-		else {
-			var ani:Animation = modelAnis[oldGuid];
-			if ( ani ) {
-				modelAnis[oldGuid] = null;
-				modelAnis[newGuid] = ani;
-			}
-			else
-				Log.out( "AnimationCache.updateGuid - animation not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.ERROR );
-		}
+		else
+			Log.out( "AnimationCache.updateGuid - animation not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.ERROR );
 	}
 	
 	
@@ -107,10 +94,7 @@ public class AnimationCache
 			return;
 		}
 		Log.out( "AnimationCache.request modelGuid: " + $ame.modelGuid + "  aniGuid: " + $ame.aniGuid, Log.INFO );
-		var modelAnis:Array = _animatedModels[$ame.modelGuid]; 
-		var ani:Animation;
-		if ( modelAnis )
-			ani = modelAnis[$ame.aniGuid];
+		var ani:Animation = _animations[$ame.modelGuid]; 
 		if ( null == ani ) {
 			if ( true == Globals.online && $ame.fromTable )
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.BIGDB_TABLE_ANIMATIONS, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
@@ -167,20 +151,9 @@ public class AnimationCache
 			Log.out( "AnimationCache.Add trying to add NULL animations or guid", Log.WARN );
 			return;
 		}
-		// check to make sure this is new data
-		var animationGuid:String = $ani.guid;
-		var modelGuid:String = $ani.modelGuid;
-		var modelAnimations:Array =  _animatedModels[modelGuid];
-		if ( null ==  modelAnimations ) {
-			// we need to create a new array for this model
-			modelAnimations = new Array();
-			_animatedModels[modelGuid] = modelAnimations;
-		}
-		
-		// model already has a list of animations, check to make sure this one is not already in it.
-		if ( null == modelAnimations[animationGuid] ) {
-			modelAnimations[animationGuid] = $ani;
-			// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $aniType:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+		var ani:Animation =  _animations[$ani.guid];
+		if ( null == ani ) {
+			_animations[$ani.guid] = $ani;
 			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.ADDED, $pe.series, $pe.other, $ani.guid, $ani ) );
 		}
 	}

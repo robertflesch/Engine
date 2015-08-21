@@ -1,5 +1,5 @@
 
-package com.voxelengine.GUI
+package com.voxelengine.GUI.panels
 {
 	import com.voxelengine.worldmodel.models.ModelInfo;
 	import org.flashapi.swing.*;

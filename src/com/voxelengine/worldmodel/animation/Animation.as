@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.animation
 {
 import com.voxelengine.events.AnimationEvent;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.server.Network;
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
@@ -41,12 +42,12 @@ public class Animation extends PersistanceObject
 	
 	
 	/////////////////
-	public function get modelGuid():String { return info.modelGuid; }
-	public function set modelGuid( $val:String):void { info.modelGuid = $val; }
 	public function get name():String { return info.name; }
-	public function get aniType():String { return info.aniType; }
+	public function set name( $val:String ):void { info.name = $val; }
+	public function get type():String { return info.type; }
 	public function get animationClass():String { return info.animationClass; }
 	public function get description():String { return info.description; }
+	public function set description( $val:String ):void { info.description = $val; }
 	public function get owner():String { return info.owner; }
 	////////////////
 	public function Animation( $guid:String ) {
@@ -56,7 +57,7 @@ public class Animation extends PersistanceObject
 	override public function set guid( $newGuid:String ):void { 
 		var oldGuid:String = super.guid;
 		super.guid = $newGuid;
-		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.UPDATE_GUID, 0, modelGuid, oldGuid + ":" + $newGuid, null ) );
+		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.UPDATE_GUID, 0, animationClass, oldGuid + ":" + $newGuid, null ) );
 		changed = true;
 	}
 	
@@ -68,6 +69,7 @@ public class Animation extends PersistanceObject
 			Log.out( "Animation.fromObjectImport - Failed test !dbo.data || !dbo.data.ani dbo: " + JSON.stringify( dbo ), Log.ERROR );
 			return;
 		}
+		
 		
 		info = $dbo.data;
 		loadFromInfo();
@@ -153,6 +155,9 @@ public class Animation extends PersistanceObject
 				_transforms.push( new AnimationTransform( transformJson ) );				
 			}
 		}
+		if ( !info.owner )
+			info.owner = Network.PUBLIC;
+			
 		//LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.ANIMATION_LOAD_COMPLETE, name ) );
 //		return type;
 	}

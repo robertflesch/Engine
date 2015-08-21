@@ -6,8 +6,10 @@ authorship protected under United States Copyright Act.
 Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
-package com.voxelengine.GUI.voxelModels
+package com.voxelengine.GUI.panels
 {
+import com.voxelengine.GUI.panels.PanelBase;
+import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 import com.voxelengine.worldmodel.models.ModelCache;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;

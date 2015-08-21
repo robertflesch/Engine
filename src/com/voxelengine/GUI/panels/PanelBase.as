@@ -1,5 +1,5 @@
 
-package com.voxelengine.GUI.voxelModels
+package com.voxelengine.GUI.panels
 {
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;

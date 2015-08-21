@@ -30,6 +30,9 @@ public class AnimationTransform
 	private var _transforms:Vector.<ModelTransform> = new Vector.<ModelTransform>;
 	private var _hasTransform:Boolean = false;
 	private var _notNamed:Boolean = false;
+
+	public function get attachmentName():String { return _attachmentName; }
+	public function set attachmentName( $val:String ):void { _attachmentName = $val; }
 	
 	public function AnimationTransform( $json:Object ) 
 	{ 
@@ -157,11 +160,6 @@ public class AnimationTransform
 	public function get transforms():Vector.<ModelTransform>
 	{
 		return _transforms;
-	}
-	
-	public function get attachmentName():String 
-	{
-		return _attachmentName;
 	}
 	
 	public function get hasPosition():Boolean 

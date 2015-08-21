@@ -1,6 +1,8 @@
 
-package com.voxelengine.GUI.voxelModels
+package com.voxelengine.GUI.panels
 {
+	import com.voxelengine.GUI.panels.PanelAnimations;
+	import com.voxelengine.GUI.panels.PanelBase;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
