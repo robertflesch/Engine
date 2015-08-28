@@ -8,8 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.animation
 {
 import com.voxelengine.GUI.components.*;
-import com.voxelengine.GUI.panels.PanelAnimations;
-import com.voxelengine.GUI.panels.PanelAnimationTransform;
+import com.voxelengine.GUI.panels.*;
 import com.voxelengine.worldmodel.animation.Animation;
 import com.voxelengine.worldmodel.animation.AnimationTransform;
 import flash.geom.Vector3D;
@@ -24,6 +23,7 @@ import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.list.ListItem;
 
+
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.LoadingEvent;
@@ -37,11 +37,11 @@ import com.voxelengine.worldmodel.models.ModelMetadata;
 
 public class WindowAnimationDetail extends VVPopup
 {
-	private const _TOTAL_BUTTON_PANEL_HEIGHT:int = 100;
+	private const _TOTAL_BUTTON_PANEL_HEIGHT:int = 30;
 	private var _modelKey:String;
-private static const WIDTH:int = 300;
-private var _ani:Animation;
-private var _create:Boolean;
+	private static const WIDTH:int = 400;
+	private var _ani:Animation;
+	private var _create:Boolean;
 	
 	public function WindowAnimationDetail( $guid:String, $ani:Animation )
 	{
@@ -49,6 +49,7 @@ private var _create:Boolean;
 		if ( $ani ) 	title = LanguageManager.localizedStringGet( "Edit_Animation" );
 		else			title = LanguageManager.localizedStringGet( "New_Animation" );
 		super( title );	
+		width = WIDTH;
 	
 		if ( $ani ) {
 			_ani = $ani;
@@ -61,18 +62,13 @@ private var _create:Boolean;
 		autoSize = true;
 		layout.orientation = LayoutOrientation.VERTICAL;
 		
-		
 		addMetadataPanel();
 		addAnimationsPanel();
-		//addSoundPanel();
+		addSoundPanel();
 		//addAttachmentPanel();
-		
 		addButtonPanel();
 		
 		display();
-		
-		addEventListener(UIOEvent.REMOVED, onRemoved );
-		
 	}
 	
 	private function addButtonPanel():void {
@@ -91,10 +87,6 @@ private var _create:Boolean;
 		// TODO FIXME
 		// all changes are automattically saved, that is bad...
 	}
-	private function addAttachmentPanel():void {
-		var b:Box = new Box();
-		addElement( b );
-	}
 	
 	private function addMetadataPanel():void {
 		addElement( new ComponentSpacer( width ) );
@@ -108,6 +100,7 @@ private var _create:Boolean;
 										 , width ) );
 		addElement( new ComponentLabel( "AnimationClass", _ani.animationClass, width ) );
 		addElement( new ComponentLabel( "Type", _ani.type, width ) );
+		
 	}
 	
 	private function setChanged():void {
@@ -115,16 +108,21 @@ private var _create:Boolean;
 	}
 	
 	private function addAnimationsPanel():void {
-		if ( _ani.transforms && 0 < _ani.transforms.length ) {
-			for each ( var transform:AnimationTransform in _ani.transforms ) {
-				addElement( new PanelAnimationTransform( _ani, transform ) );
-			}
-		}
-	}
-	private function addSoundPanel():void {
-		var b:Box = new Box();
-		addElement( b );
+		addElement( new PanelVectorContainer( _ani
+		                                    , _ani.transforms as Vector.<*>
+											, "child models with animations"
+											, PanelAnimationTransform, WIDTH ) );
 	}
 	
+	private function addSoundPanel():void {
+		addElement( new PanelAnimationSound( _ani, WIDTH ) );
+	}
+	
+	private function addAttachmentPanel():void {
+		addElement( new PanelVectorContainer( _ani
+		                                    , _ani.transforms as Vector.<*>
+											, "attachments to parent or child models"
+											, PanelAnimationAttachment, WIDTH ) );
+	}
 }
 }

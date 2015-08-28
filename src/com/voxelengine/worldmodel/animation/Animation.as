@@ -49,11 +49,8 @@ public class Animation extends PersistanceObject
 	public function get description():String { return info.description; }
 	public function set description( $val:String ):void { info.description = $val; }
 	public function get owner():String { return info.owner; }
-	////////////////
-	public function Animation( $guid:String ) {
-		super( $guid, Globals.BIGDB_TABLE_ANIMATIONS );		
-	}
-	
+	public function get sound():AnimationSound { return _sound; }
+	public function set sound( $val:AnimationSound ):void  { _sound = $val; }
 	override public function set guid( $newGuid:String ):void { 
 		var oldGuid:String = super.guid;
 		super.guid = $newGuid;
@@ -61,6 +58,10 @@ public class Animation extends PersistanceObject
 		changed = true;
 	}
 	
+	////////////////
+	public function Animation( $guid:String ) {
+		super( $guid, Globals.BIGDB_TABLE_ANIMATIONS );		
+	}
 	
 	public function fromObjectImport( $dbo:DatabaseObject ):void {
 		dbo = $dbo;

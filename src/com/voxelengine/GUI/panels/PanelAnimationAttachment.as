@@ -8,17 +8,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.panels
 {
-import com.voxelengine.events.AnimationEvent;
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.GUI.animation.WindowAnimationDetail;
-import com.voxelengine.GUI.components.*;
-import com.voxelengine.worldmodel.animation.AnimationAttachment;
-import com.voxelengine.worldmodel.animation.AnimationTransform;
-import com.voxelengine.worldmodel.MemoryManager;
-import com.voxelengine.worldmodel.models.ModelTransform;
-import flash.display.Bitmap;
-import org.flashapi.swing.wtk.WindowButtonClose;
-
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
@@ -26,15 +15,17 @@ import org.flashapi.swing.list.ListItem;
 import org.flashapi.swing.containers.UIContainer;	
 import org.flashapi.swing.plaf.spas.SpasUI;
 import org.flashapi.swing.layout.AbsoluteLayout;
+import com.voxelengine.GUI.components.*;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.GUI.*;
+import com.voxelengine.GUI.components.*;
 import com.voxelengine.worldmodel.animation.Animation;
+import com.voxelengine.worldmodel.animation.AnimationTransform;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 
-public class PanelAnimationTransform extends Box
+public class PanelAnimationAttachment extends Box
 {
 	private var _ani:Animation;
 	private var _aniXform:AnimationTransform;
@@ -43,16 +34,15 @@ public class PanelAnimationTransform extends Box
 	private var _expanded:Boolean;
 	
 	private const ITEM_HEIGHT:int = 24;
-	public function PanelAnimationTransform( $ani:Animation, $aniXform:AnimationTransform, $widthParam = 250, $heightParam = 400 ) {
+	public function PanelAnimationAttachment( $ani:Animation, $aniXform:AnimationTransform, $widthParam = 250, $heightParam = 400 ) {
 		_ani = $ani;
 		_aniXform = $aniXform;
 		
 		super( $widthParam, $heightParam, BorderStyle.NONE )
+		title = $title;
 		layout = new AbsoluteLayout();
 		padding = 0;
 		backgroundColor = SpasUI.DEFAULT_COLOR;
-		title = $title;
-		padding = 0;
 		
 		if ( _aniXform ) {
 			_expandCollapse = new Button( "+", ITEM_HEIGHT, ITEM_HEIGHT );

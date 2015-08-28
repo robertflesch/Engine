@@ -67,8 +67,8 @@ package org.flashapi.swing.plaf.spas {
 		//--------------------------------------------------------------------------
 		
 		public function SpasButtonCloseUI(dto:LafDTO) {
-			dto.width = 36;
-			dto.height = 36;
+			dto.width = 20;
+			dto.height = 20;
 			super(dto);
 		}
 		

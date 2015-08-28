@@ -59,7 +59,7 @@ package org.flashapi.swing.wtk {
 		 *  Constructor. Creates a new <code>WindowButtonClose</code> instance.
 		 */
 		public function WindowButtonClose() {
-			super("", 36, 36);
+			super("", 20, 20);
 			initObj();
 		}
 		

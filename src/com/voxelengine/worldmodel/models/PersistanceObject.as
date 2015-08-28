@@ -76,13 +76,13 @@ public class PersistanceObject
 			//Log.out( "PersistanceObject.save - Saving to guid: " + guid  + " in table: " + table, Log.WARN );
 			addSaveEvents();
 			toObject();
-			changed = false;
 				
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null ) );
+			changed = false;
 		}
 		else {
-			if ( Globals.online && !changed )
-				Log.out( "PersistanceObject.save - Not saving data - guid: " + guid + " NOT changed" );
+			//if ( Globals.online && !changed )
+			//	Log.out( "PersistanceObject.save - Not saving data - guid: " + guid + " NOT changed" );
 			//else if ( !Globals.online && changed )
 			//	Log.out( "PersistanceObject.save - Not saving data - guid: " + guid + " NOT online" );
 			//else	

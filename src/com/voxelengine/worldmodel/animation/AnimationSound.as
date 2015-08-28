@@ -30,6 +30,15 @@ package com.voxelengine.worldmodel.animation
 
 		private var _owner:VoxelModel = null;
 		
+		public function get soundFile():String  { return _soundFile; }
+		public function set soundFile(value:String):void  { _soundFile = value; }
+		
+		public function get soundRangeMax():int { return _soundRangeMax; }
+		public function set soundRangeMax(value:int):void { _soundRangeMax = value; }
+		
+		public function get soundRangeMin():int { return _soundRangeMin; }
+		public function set soundRangeMin(value:int):void  { _soundRangeMin = value; }
+		
 		public function AnimationSound() {}
 		
 		public function init( $soundInfo:Object ):void 

@@ -31,6 +31,8 @@ public class AnimationTransform
 	private var _hasTransform:Boolean = false;
 	private var _notNamed:Boolean = false;
 
+	// for compatability with PanelVectorContainer
+	public function get name():String { return _attachmentName; }
 	public function get attachmentName():String { return _attachmentName; }
 	public function set attachmentName( $val:String ):void { _attachmentName = $val; }
 	

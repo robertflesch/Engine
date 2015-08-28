@@ -26,8 +26,9 @@ public class ComponentVector3D extends Box
 	{
 		super();
 		width = 300;
-		height = 50;
-		padding = 15;
+		height = 30;
+		padding = 5;
+		paddingTop = 8
 		title = $title;
 		borderStyle = BorderStyle.GROOVE;
 		backgroundColor = SpasUI.DEFAULT_COLOR;
@@ -70,7 +71,7 @@ public class ComponentVector3D extends Box
 		src.height = 20;
 		src.addEventListener( TextEvent.EDITED, textChanged );
 		
-		var sb:SpinButton = new SpinButton( 20, 20 );
+		var sb:SpinButton = new SpinButton( 20, 18 );
 		sb.addEventListener( SpinButtonEvent.CLICK_DOWN, clickHandler );
 		sb.addEventListener( SpinButtonEvent.CLICK_UP, clickHandler );
 		sb.data = src;

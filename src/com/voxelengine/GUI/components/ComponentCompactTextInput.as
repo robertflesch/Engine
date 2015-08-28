@@ -1,19 +1,19 @@
 
 package com.voxelengine.GUI.components {
-import org.flashapi.swing.Box;
+
 import org.flashapi.swing.TextInput;
-import org.flashapi.swing.event.TextEvent;
-import org.flashapi.swing.constants.BorderStyle;
+import org.flashapi.swing.*;
+import org.flashapi.swing.event.*;
+import org.flashapi.swing.constants.*;
 import org.flashapi.swing.plaf.spas.SpasUI;
 
-public class ComponentTextInput extends Box
+public class ComponentCompactTextInput extends Panel
 {
-	public function ComponentTextInput( label:String, changeHandler:Function, initialValue:String, $width:int, $height:int = 30, $padding:int = 5 )
+	public function ComponentCompactTextInput( label:String, changeHandler:Function, initialValue:String, $width:int, $height:int = 50, $padding:int = 15 )
 	{
 		super( $width, $height );
 		
 		padding = $padding;
-		paddingTop = $padding + 3;
 		backgroundColor = SpasUI.DEFAULT_COLOR;
 		title = label;
 		borderStyle = BorderStyle.GROOVE;

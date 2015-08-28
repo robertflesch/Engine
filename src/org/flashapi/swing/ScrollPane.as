@@ -31,12 +31,14 @@ package org.flashapi.swing {
 	*/
 	
 	import flash.display.DisplayObject;
+	import flash.events.Event;
 	import flash.geom.Rectangle;
 	import org.flashapi.swing.containers.ScrollableContainer;
 	import org.flashapi.swing.core.Initializable;
 	import org.flashapi.swing.core.LafRenderer;
 	import org.flashapi.swing.core.spas_internal;
 	import org.flashapi.swing.css.Selectors;
+	import org.flashapi.swing.event.ResizerEvent;
 	import org.flashapi.swing.plaf.libs.ScrollPaneUIRef;
 	import org.flashapi.swing.util.Observer;
 	
@@ -253,6 +255,13 @@ package org.flashapi.swing {
 			$scrollableArea.resize(width, height);
 			spas_internal::setSelector(Selectors.SCROLLPANE);
 			spas_internal::isInitialized(1);
+			addEventListener( ResizerEvent.RESIZE_UPDATE, updatePane );
+
+		}
+		
+		private function updatePane(e:ResizerEvent):void {
+			if ( target )
+				target.dispatchEvent(new ResizerEvent(ResizerEvent.RESIZE_UPDATE));
 		}
 		
 		private function createContainers():void {
