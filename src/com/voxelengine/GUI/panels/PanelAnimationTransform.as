@@ -42,7 +42,7 @@ public class PanelAnimationTransform extends Box
 	private var _itemBox:Box;
 	private var _expanded:Boolean;
 	
-	private const ITEM_HEIGHT:int = 24;
+	private const ITEM_HEIGHT:int = 20;
 	public function PanelAnimationTransform( $ani:Animation, $aniXform:AnimationTransform, $widthParam = 250, $heightParam = 400 ) {
 		_ani = $ani;
 		_aniXform = $aniXform;
@@ -58,18 +58,22 @@ public class PanelAnimationTransform extends Box
 			_expandCollapse = new Button( "+", ITEM_HEIGHT, ITEM_HEIGHT );
 			_expandCollapse.padding = 0;
 			_expandCollapse.x = 4;
-			_expandCollapse.y = 4;
+			_expandCollapse.y = 0;
 			$evtColl.addEvent( _expandCollapse, UIMouseEvent.RELEASE, changeList );
 			addElement( _expandCollapse );
 			
-			_itemBox = new Box( width - 45 - padding * 2, ITEM_HEIGHT );
+			_itemBox = new Box();
+			_itemBox.autoSize = false;
+			_itemBox.width = width - 45 - padding * 2 
+			_itemBox.height = ITEM_HEIGHT + 12;
 			_itemBox.x = 32;
-			_itemBox.y = 2;
-			_itemBox.padding = 0;
+			_itemBox.y = 0;
+			_itemBox.padding = 1;
 			_itemBox.borderStyle = BorderStyle.NONE;
-			_itemBox.backgroundColor = SpasUI.DEFAULT_COLOR;
+//			_itemBox.backgroundColor = SpasUI.DEFAULT_COLOR;
+			_itemBox.backgroundColor = 0x00ff00;
+
 			addElement( _itemBox );
-		
 			collapse();
 		}
 		else {
@@ -81,6 +85,7 @@ public class PanelAnimationTransform extends Box
 			newItemButton.color = 0x00FF00;
 			addElement( newItemButton );
 		}
+		addEventListener( ResizerEvent.RESIZE_UPDATE, resizePane );		
 	}
 	
 	private function newItemHandler( $me:UIMouseEvent ):void  {
@@ -105,21 +110,27 @@ public class PanelAnimationTransform extends Box
 		
 		_expandCollapse.label = "+";
 		
-		var label:Label = new Label( _aniXform.attachmentName, _itemBox.width - 40 )
-		label.backgroundColor = SpasUI.DEFAULT_COLOR;
+		var label:Label = new Label( _aniXform.attachmentName, _itemBox.width - (ITEM_HEIGHT + 5) );
 		_itemBox.addElement( label );
 		
-		var deleteButton:Button = new Button( "X", 24, 24 );
-		deleteButton.y = 0;
+		var deleteButton:Box = new Box();
+		deleteButton.autoSize = false;
+		deleteButton.width = ITEM_HEIGHT;
+		deleteButton.height = ITEM_HEIGHT;
 		deleteButton.padding = 0;
-//		$evtColl.addEvent( deleteButton, UIMouseEvent.RELEASE, changeList );
+		deleteButton.paddingLeft = 3;
+		deleteButton.backgroundColor = 0xff0000;
+		deleteButton.addElement( new Label( "X" ) );
+		$evtColl.addEvent( deleteButton, UIMouseEvent.RELEASE, deleteElementCheck );
 		_itemBox.addElement( deleteButton );
 		
-		height = _itemBox.height = 30;
-		target.dispatchEvent(new ResizerEvent(ResizerEvent.RESIZE_UPDATE));
+		resizePane( null );
 	}
 	
-	private const BUFFER_SIZE:int = 8;
+	private function deleteElementCheck( $me:UIMouseEvent ):void {
+		(new Alert( "Delete element check ", 350 )).display();
+	}
+	
 	private function expand():void {
 		_itemBox.removeElements();
 		_itemBox.layout.orientation = LayoutOrientation.VERTICAL;
@@ -131,39 +142,54 @@ public class PanelAnimationTransform extends Box
 										  , _aniXform.attachmentName ? _aniXform.attachmentName : "Missing Attachment Name"
 										  , _itemBox.width - 10 )
 											
-		_itemBox.height += cli.height + BUFFER_SIZE;
+		_itemBox.height += cli.height;
 		_itemBox.addElement( cli );
 		var cv3:ComponentVector3D
 		if ( _aniXform.hasPosition ) {
 			cv3 = new ComponentVector3D( setChanged, "location", "X: ", "Y: ", "Z: ",  _aniXform.position, updateVal );
 			_itemBox.addElement( cv3 );
-			_itemBox.height += cv3.height + BUFFER_SIZE;
 		}
 		if ( _aniXform.hasRotation ) {
 			cv3 = new ComponentVector3D( setChanged, "rotation", "X: ", "Y: ", "Z: ",  _aniXform.rotation, updateVal );
 			_itemBox.addElement( cv3 );
-			_itemBox.height += cv3.height + BUFFER_SIZE;
 		}
 		if ( _aniXform.hasScale ) {
 			cv3 = new ComponentVector3D( setChanged, "scale", "X: ", "Y: ", "Z: ",  _aniXform.scale, updateVal );
 			_itemBox.addElement( cv3 );
-			_itemBox.height += cv3.height + BUFFER_SIZE;
 		}
-		_itemBox.height + 10; // need spacer between it and next element
-		/*
-		var pmt:PanelModelTransform;
-		if ( _aniXform.hasTransform ) {
-			for each ( var transform:ModelTransform in _aniXform.transforms ) {
-				pmt = new PanelModelTransform( _ani, transform, width )
-				addElement( pmt );
-				_itemBox.height += pmt.height;
-			}
-		}
-		*/
-		height = _itemBox.height;
+		_itemBox.height + 5; // need spacer between it and next element
+
+		_itemBox.addElement( new PanelVectorContainer( _ani
+		                                    , _aniXform.transforms as Vector.<*>
+											, "transforms on child model"
+											, PanelModelTransform, _itemBox.width ) );
 		
+		height = _itemBox.height;
+		resizePane( null );
+	}
+	
+	private static const BUFFER:int = 10;
+	public function resizePane( $re:ResizerEvent ):void {
+		_itemBox.height = 0;
+		
+		for each ( var element:* in _itemBox.getElements() ) {
+			Log.out( "PanelAnimationTransform.resizePane item: " + element );
+			if ( LayoutOrientation.VERTICAL == _itemBox.layout.orientation )
+				_itemBox.height += element.height + BUFFER;
+			else	
+				_itemBox.height = Math.max( element.height, _itemBox.height );
+		}
+		
+		Log.out( "PanelAnimationTransform.resizePane height: " + _itemBox.height );
+		
+		if ( _itemBox.height < 26 )
+			height = 26
+		else	
+			height = _itemBox.height + 5;
+			
 		target.dispatchEvent(new ResizerEvent(ResizerEvent.RESIZE_UPDATE));
 	}
+	
 
 	
 	
