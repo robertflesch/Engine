@@ -307,7 +307,30 @@ public class VertexIndexBuilder
 		_vertexDataSize = 0;
 		var oxelSize:int = _oxels.length;
 		var oxel:Oxel;
+		var quad:Quad;
 		//for each ( var oxel:Oxel in _oxels ) { // This is a slower way
+		for ( var index:int; index < oxelSize; index++ ) {
+		    oxel = _oxels[index];
+			if ( oxel.quads ) {
+				for ( var indexQuad:int; indexQuad < oxel.quads.length; indexQuad++ ) {
+					quad = oxel.quads[indexQuad];
+					if ( quad && 0 < quad.components.length ) {
+						for ( var i:uint; i < Quad.COMPONENT_COUNT; i++ ) {
+							_vc[i] = quad.components[i];
+							_vertexDataSize += quad.components[i].size();
+						}
+						return;
+					}
+				}
+			}
+		}
+		throw new Error( "VertexIndexBuilder.addComponentData - No components found" );
+	}
+	
+	private function addComponentDataOld():void {
+		_vertexDataSize = 0;
+		var oxelSize:int = _oxels.length;
+		var oxel:Oxel;
 		for ( var index:int; index < oxelSize; index++ ) {
 		    oxel = _oxels[index];
 			if ( oxel.quads ) {
@@ -323,7 +346,7 @@ public class VertexIndexBuilder
 			}
 		}
 		throw new Error( "VertexIndexBuilder.addComponentData - No components found" );
-	}
+	}	
 
 	public function BufferCopyToGPU( context:Context3D ) : void 
 	{
