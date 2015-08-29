@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -23,10 +23,10 @@ public class XYZ extends VertexComponent {
 		_z = $z;
 	}
 	
-	override public function setNumArray(args:Vector.<Number>):void {
-		_x = args[0];
-		_y = args[1];
-		_z = args[2];
+	override public function setNums( $one:Number, $two:Number, $three:Number ):void {
+		_x = $one;
+		_y = $two;
+		_z = $three;
 	}
 
 	override public function writeToByteArray( $ba:ByteArray ):void {

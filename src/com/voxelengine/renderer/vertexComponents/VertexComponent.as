@@ -18,8 +18,8 @@ public class VertexComponent {
 		_size = $size;
 	}
 	
-	public function setNumArray(args:Vector.<Number>):void {;}
-	public function setIntArray(args:Vector.<int>):void {;}
+	public function setNums( one:Number, two:Number, three:Number ):void {;}
+	public function setInts( one:int, two:int, three:int):void {;}
 	public function setUint(args:uint):void {;}
 	
 	public function writeToByteArray( ba:ByteArray ):void {}
@@ -29,10 +29,6 @@ public class VertexComponent {
 	
 	[inline]
 	final public function size():uint { return _size; }
-	
-	//public function clone():VertexComponent {
-		//return new VertexComponent( _type, _size );
-	//}
 }
 }
 

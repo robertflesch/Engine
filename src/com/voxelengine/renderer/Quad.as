@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2014 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -19,13 +19,7 @@ import com.voxelengine.worldmodel.oxel.FlowInfo;
 import com.voxelengine.worldmodel.oxel.FlowScaling;
 import com.voxelengine.worldmodel.TileType;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.renderer.vertexComponents.Color;
-import com.voxelengine.renderer.vertexComponents.ColorUINT;
-import com.voxelengine.renderer.vertexComponents.XYZ;
-import com.voxelengine.renderer.vertexComponents.Normal;
-import com.voxelengine.renderer.vertexComponents.UV;
-import com.voxelengine.renderer.vertexComponents.UVScale;
-import com.voxelengine.renderer.vertexComponents.VertexComponent;
+import com.voxelengine.renderer.vertexComponents.*;
 	
 public class Quad {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,8 +27,6 @@ public class Quad {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	static private var 		_s_textureScale:int = 2048;
-	static private var 		_s_numArgs:Vector.<Number> = new Vector.<Number>(3, true);
-	static private var 		_s_intArgs:Vector.<int> = new Vector.<int>(3, true);
 	static private const 	_s_flowScaling:FlowScaling = new FlowScaling();
 	
 	static private const 	QUAD_UV_COUNT:int = 5;
@@ -404,10 +396,7 @@ public class Quad {
 		if ( null == components[componentIndex] )
 			components[componentIndex++] = new XYZ( x, y , z );
 		else {
-			_s_numArgs[0] = x;
-			_s_numArgs[1] = y;
-			_s_numArgs[2] = z;
-			components[componentIndex++].setNumArray( _s_numArgs );
+			components[componentIndex++].setNums( x, y, z );
 		}
 		
 		//if ( null == components[componentIndex] )
@@ -420,20 +409,14 @@ public class Quad {
 		if ( null == components[componentIndex] )
 			components[componentIndex++] = new UVScale( u, v, $grain );
 		else {
-			_s_numArgs[0] = u;
-			_s_numArgs[1] = v;
-			_s_numArgs[2] = $grain;
-			components[componentIndex++].setNumArray( _s_numArgs );
+			components[componentIndex++].setNums( u, v, $grain );
 		}
 	
 
 		if ( null == components[componentIndex] )
 			components[componentIndex++] = new Normal( normalx, normaly, normalz );
 		else {
-			_s_intArgs[0] = normalx;
-			_s_intArgs[1] = normaly;
-			_s_intArgs[2] = normalz;
-			components[componentIndex++].setIntArray( _s_intArgs );
+			components[componentIndex++].setInts( normalx, normaly, normalz );
 		}
 
 		if ( null == components[componentIndex] )
