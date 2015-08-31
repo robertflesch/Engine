@@ -16,96 +16,56 @@ import org.flashapi.swing.layout.AbsoluteLayout;
 import com.voxelengine.Log;
 import com.voxelengine.GUI.*;
 
-public class PanelVectorContainer extends Box {
+public class PanelVectorContainer extends ExpandableBox {
 	private var _vector:Vector.<*>;
 	private var _itemDisplayObject:Class;
 	private var _rootObject:*;
-	private var _expanded:Boolean;
-	private var _title:String;
-	private var _expandCollpase:Button;
-	private var _scrollPane:ScrollPane;
 	
 	// Note: item in vector needs to have a "name" method
-	public function PanelVectorContainer( $rootObject:*, $vector:Vector.<*>, $title:String, $itemDisplayObject:Class, $widthParam = 300, $heightParam = 400 ) {
-		_title = $title;
+	public function PanelVectorContainer( $title:String, $rootObject:*, $vector:Vector.<*> , $itemDisplayObject:Class, $newItemName:String, $widthParam:int ) {
 		_vector = $vector;
 		_itemDisplayObject = $itemDisplayObject;
 		_rootObject = $rootObject;
-		
-		super( $widthParam, $heightParam, BorderStyle.GROOVE )
-		layout = new AbsoluteLayout();
-		backgroundColor = SpasUI.DEFAULT_COLOR;
-		title = $title;
-		padding = 0;
-		paddingTop = 8;
-		
-		_expandCollpase = new Button( "+", 24, 24 );
-		_expandCollpase.padding = 0;
-		_expandCollpase.x = 4;
-		_expandCollpase.y = 8;
-		$evtColl.addEvent( _expandCollpase, UIMouseEvent.RELEASE, changeList );
-		addElement( _expandCollpase );
-		
-		_scrollPane = new ScrollPane();
-		_scrollPane.scrollPolicy = ScrollPolicy.NONE;
-		_scrollPane.width = width - _expandCollpase.width - 10;
-		_scrollPane.height = 24;
-		_scrollPane.layout.orientation = LayoutOrientation.VERTICAL;
-		_scrollPane.x = 32;
-		_scrollPane.y = 9;
-		_scrollPane.padding = 0;
-		//_scrollPane.borderStyle = BorderStyle.GROOVE;
-		//_scrollPane.backgroundColor = SpasUI.DEFAULT_COLOR;
-		addElement( _scrollPane );
-		
-		collapse();
-		addEventListener( ResizerEvent.RESIZE_UPDATE, resizePane );		
+		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
+		ebco.title = $title;
+		ebco.newItemText = $newItemName;
+		ebco.width = $widthParam;
+		ebco.showDelete = false;
+		ebco.paddingTop = 6;
+		ebco.paddingLeft = 6;
+		super( ebco );
 	}
 	
 	
-	private function changeList( $me:UIMouseEvent ):void {
-		if ( _expanded )
-			collapse();
-		else
-			expand();
-	}
-	
-	private function collapse():void {
-		_expanded = false;
-		_scrollPane.removeElements();
-		_expandCollpase.label = "+";
-		var label:Label = new Label( " (" + _vector.length + ")" )
-		label.backgroundColor = SpasUI.DEFAULT_COLOR;
-		_scrollPane.addElement( label );
-		resizePane( null );
-	}
-	
-	private function expand():void {
-		_expanded = true;
-		_scrollPane.removeElements();
-		_scrollPane.scrollPolicy = ScrollPolicy.NONE;
-		_expandCollpase.label = "-";
+	override protected function expand():void {
+		super.expand();
 		
-		for each ( var item:* in _vector )
-			_scrollPane.addElement( new _itemDisplayObject( _rootObject, item, (_scrollPane.width - 10) ) );
-		
-		// Add an emtpy object to generate a new button
-		_scrollPane.addElement( new _itemDisplayObject( _rootObject, null, (_scrollPane.width - 10) ) );
-		
-		resizePane( null );
-	}
-	
-	public function resizePane( $re:ResizerEvent ):void {
-		_scrollPane.height = 0;
-		for each ( var element:* in _scrollPane.getElements() ) {
-			//Log.out( "PanelVectorContainer.resizePane - element.height: " + element.height, Log.WARN );
-			_scrollPane.height += element.height;
+		_itemBox.height = 0;
+		for ( var i:int; i < _vector.length; i++ ) {
+			var item:* = new _itemDisplayObject( _rootObject, _vector[i], _itemBox.width );
+			_itemBox.addElement( item );
+			item.y = _itemBox.height;
+			_itemBox.height += item.height;
 		}
 		
-		if ( _scrollPane.height < 26 )
-			height = 36
-		else	
-			height = _scrollPane.height + 10;
+		// Add an emtpy object to generate a new button
+//		_itemBox.addElement( new _itemDisplayObject( _rootObject, null, _itemBox.width ) );
+		
+		resizePane( null );
 	}
+	
+	override public function collapasedInfo():String  {
+		return String( _vector.length );
+	}
+	
+	override public function deleteElementCheck( $me:UIMouseEvent ):void {
+		(new Alert( "PanelVectorContainer.deleteElementCheck", 350 )).display();
+	}
+	
+	override public function newItemHandler( $me:UIMouseEvent ):void  {
+		(new Alert( "PanelVectorContainer.newItemHandler", 350 )).display();
+	}
+	
+	
 }
 }

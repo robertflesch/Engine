@@ -255,8 +255,8 @@ package org.flashapi.swing {
 			$scrollableArea.resize(width, height);
 			spas_internal::setSelector(Selectors.SCROLLPANE);
 			spas_internal::isInitialized(1);
+			// added in to listen for child objects changing size.
 			addEventListener( ResizerEvent.RESIZE_UPDATE, updatePane );
-
 		}
 		
 		private function updatePane(e:ResizerEvent):void {

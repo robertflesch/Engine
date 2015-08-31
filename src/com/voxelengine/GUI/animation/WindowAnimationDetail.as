@@ -108,10 +108,12 @@ public class WindowAnimationDetail extends VVPopup
 	}
 	
 	private function addAnimationsPanel():void {
-		addElement( new PanelVectorContainer( _ani
+		addElement( new PanelVectorContainer( "child models with animations"
+											, _ani
 		                                    , _ani.transforms as Vector.<*>
-											, "child models with animations"
-											, PanelAnimationTransform, WIDTH ) );
+											, PanelAnimationTransform
+											, "New Animation Child"
+											, WIDTH ) );
 	}
 	
 	private function addSoundPanel():void {
@@ -119,10 +121,10 @@ public class WindowAnimationDetail extends VVPopup
 	}
 	
 	private function addAttachmentPanel():void {
-		addElement( new PanelVectorContainer( _ani
-		                                    , _ani.transforms as Vector.<*>
-											, "attachments to parent or child models"
-											, PanelAnimationAttachment, WIDTH ) );
+		//addElement( new PanelVectorContainer( _ani
+		                                    //, _ani.attachments as Vector.<*>
+											//, "attachments to parent or child models"
+											//, PanelAnimationAttachment, WIDTH ) );
 	}
 }
 }

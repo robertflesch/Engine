@@ -41,6 +41,7 @@ package org.flashapi.swing {
 	import org.flashapi.swing.css.Selectors;
 	import org.flashapi.swing.decorator.BorderDecorator;
 	import org.flashapi.swing.draw.Figure;
+	import org.flashapi.swing.event.ResizerEvent;
 	import org.flashapi.swing.framework.locale.Locale;
 	import org.flashapi.swing.layout.FlowLayout;
 	import org.flashapi.swing.plaf.libs.BoxUIRef;

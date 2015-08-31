@@ -46,7 +46,7 @@ public class PanelAnimationSound extends Box
 		var newItem:Button = new Button( "Add Sound", width - 20, ITEM_HEIGHT );
 		$evtColl.addEvent( newItem, UIMouseEvent.RELEASE, addSound );
 		addElement( newItem );
-		height = 30;
+		height = 40;
 	}
 	
 	private function addSound( $me:UIMouseEvent ):void {

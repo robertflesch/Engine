@@ -15,5 +15,7 @@ public class ComponentLabelInput extends LabelInput
 		
 		addEventListener( TextEvent.EDITED, $changeHandler );
 	}
+	
+	override public function get height () : Number { return super.height + 5; }
 }
 }

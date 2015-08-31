@@ -412,7 +412,9 @@ public class Quad {
 			components[componentIndex++].setNums( u, v, $grain );
 		}
 	
-
+		// TODO Should replace these with computed normals
+		// See http://www.volumesoffun.com/polyvox/documentation/dev/manual/Lighting.html#normal-calculation-for-cubic-meshes
+		// https://bitbucket.org/volumesoffun/polyvox/src/735b0ab6b153/examples/common/?at=develop
 		if ( null == components[componentIndex] )
 			components[componentIndex++] = new Normal( normalx, normaly, normalz );
 		else {

@@ -13,9 +13,9 @@ import org.flashapi.swing.plaf.spas.SpasUI;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 
-public class ComponentVector3D extends Box
+public class ComponentVector3DSideLabel extends Box
 {
-	public function ComponentVector3D( $markDirty:Function
+	public function ComponentVector3DSideLabel( $markDirty:Function
 									 , $title:String
 	                                 , $s1Label:String
 									 , $s2Label:String
@@ -25,17 +25,23 @@ public class ComponentVector3D extends Box
 									 , $decimalPlaces:int = 0 )
 	{
 		super();
-		width = 300;
-		height = 30;
-		padding = 5;
-		paddingTop = 8
-		title = $title;
+		width = 330;
+		height = 25;
+		padding = 0;
+		//paddingTop = 8
+		paddingTop = 2;
 		borderStyle = BorderStyle.NONE;
 		backgroundColor = SpasUI.DEFAULT_COLOR;
 		layout.orientation = LayoutOrientation.HORIZONTAL;
 		
 		if ( null == $changeFunction )
-			$changeFunction = ComponentVector3D.updateVal;
+			$changeFunction = ComponentVector3DSideLabel.updateVal;
+		
+		var lbl:Label = new Label($title);
+		lbl.width = 50;
+		lbl.height = 20;
+		lbl.textAlign = TextAlign.LEFT;
+		addElement( lbl )
 		
 		addSpinLabel( $s1Label
 					, function($e:SpinButtonEvent):void { $vect.setTo( $changeFunction($e), $vect.y, $vect.z ); }
@@ -51,7 +57,7 @@ public class ComponentVector3D extends Box
 					, $vect.z.toFixed($decimalPlaces) );
 	}
 	
-	override public function get height () : Number { return super.height + 5; }	
+	//override public function get height () : Number { return super.height + 5; }	
 	
 	static private function updateVal( $e:SpinButtonEvent ):int {
 		var ival:int = int( $e.target.data.text );
@@ -73,7 +79,8 @@ public class ComponentVector3D extends Box
 		src.height = 20;
 		src.addEventListener( TextEvent.EDITED, textChanged );
 		
-		var sb:SpinButton = new SpinButton( 20, 18 );
+		//var sb:SpinButton = new SpinButton( 20, 18 );
+		var sb:SpinButton = new SpinButton( 20, 20 );
 		sb.addEventListener( SpinButtonEvent.CLICK_DOWN, clickHandler );
 		sb.addEventListener( SpinButtonEvent.CLICK_UP, clickHandler );
 		sb.data = src;
