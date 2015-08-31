@@ -13,7 +13,7 @@ import org.flashapi.swing.event.ResizerEvent;
 
 public class ResizablePanelVV extends Box
 {
-	
+	// This just adds a RESIZE_UPDATE relay to box, So that parent object can respond
 	public function ResizablePanelVV( $widthParam:int, $heightParam:int, $borderStyleParam:String ) {
 		super( $widthParam, $heightParam, $borderStyleParam );
 		addEventListener( ResizerEvent.RESIZE_UPDATE, resizePane );		

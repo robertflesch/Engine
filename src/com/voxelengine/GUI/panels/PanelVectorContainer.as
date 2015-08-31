@@ -44,28 +44,22 @@ public class PanelVectorContainer extends ExpandableBox {
 		for ( var i:int; i < _vector.length; i++ ) {
 			var item:* = new _itemDisplayObject( _rootObject, _vector[i], _itemBox.width );
 			_itemBox.addElement( item );
-			item.y = _itemBox.height;
-			_itemBox.height += item.height;
 		}
-		
-		// Add an emtpy object to generate a new button
-//		_itemBox.addElement( new _itemDisplayObject( _rootObject, null, _itemBox.width ) );
-		
-		resizePane( null );
 	}
-	
 	override public function collapasedInfo():String  {
 		return String( _vector.length );
 	}
 	
-	override public function deleteElementCheck( $me:UIMouseEvent ):void {
-		(new Alert( "PanelVectorContainer.deleteElementCheck", 350 )).display();
-	}
+
+	//override public function deleteElementCheck( $me:UIMouseEvent ):void {
+		//(new Alert( "PanelVectorContainer.deleteElementCheck", 350 )).display();
+	//}
 	
 	override public function newItemHandler( $me:UIMouseEvent ):void  {
-		(new Alert( "PanelVectorContainer.newItemHandler", 350 )).display();
+		var item:* = new _itemDisplayObject( _rootObject, null, _itemBox.width );
+		_itemBox.addElement( item );
+		resizePane( null );
 	}
-	
 	
 }
 }

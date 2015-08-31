@@ -8,154 +8,74 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.panels
 {
-import org.flashapi.swing.*;
+import org.flashapi.swing.Alert;
 import org.flashapi.swing.event.*;
-import org.flashapi.swing.constants.*;
-import org.flashapi.swing.list.ListItem;
-import org.flashapi.swing.containers.UIContainer;	
-import org.flashapi.swing.plaf.spas.SpasUI;
 import org.flashapi.swing.layout.AbsoluteLayout;
-import com.voxelengine.GUI.components.*;
 
 import com.voxelengine.Log;
-import com.voxelengine.Globals;
 import com.voxelengine.GUI.components.*;
 import com.voxelengine.worldmodel.animation.Animation;
-import com.voxelengine.worldmodel.animation.AnimationTransform;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.animation.AnimationAttachment;
 
 
-public class PanelAnimationAttachment extends Box
+public class PanelAnimationAttachment extends ExpandableBox
 {
 	private var _ani:Animation;
-	private var _aniXform:AnimationTransform;
-	private var _expandCollapse:Button;
-	private var _itemBox:Box;
-	private var _expanded:Boolean;
+	private var _aniAttach:AnimationAttachment;
 	
-	private const ITEM_HEIGHT:int = 24;
-	public function PanelAnimationAttachment( $ani:Animation, $aniXform:AnimationTransform, $widthParam = 250, $heightParam = 400 ) {
+	static private const ITEM_HEIGHT:int = 20;
+	static private const TITLE:String = "";
+	static private const NEW_ITEM_TEXT:String = "Animation Transform";
+	public function PanelAnimationAttachment( $ani:Animation, $aniAttach:AnimationAttachment, $widthParam = 250 ) {
 		_ani = $ani;
-		_aniXform = $aniXform;
+		if ( null == $aniAttach )
+			$aniAttach = new AnimationAttachment( AnimationAttachment.DEFAULT_OBJECT );
+		_aniAttach = $aniAttach;
 		
-		super( $widthParam, $heightParam, BorderStyle.NONE )
-		title = $title;
-		layout = new AbsoluteLayout();
-		padding = 0;
-		backgroundColor = SpasUI.DEFAULT_COLOR;
-		
-		if ( _aniXform ) {
-			_expandCollapse = new Button( "+", ITEM_HEIGHT, ITEM_HEIGHT );
-			_expandCollapse.padding = 0;
-			_expandCollapse.x = 4;
-			_expandCollapse.y = 4;
-			$evtColl.addEvent( _expandCollapse, UIMouseEvent.RELEASE, changeList );
-			addElement( _expandCollapse );
-			
-			_itemBox = new Box( width - 45 - padding * 2, ITEM_HEIGHT );
-			_itemBox.x = 32;
-			_itemBox.y = 2;
-			_itemBox.padding = 0;
-			_itemBox.borderStyle = BorderStyle.NONE;
-			_itemBox.backgroundColor = SpasUI.DEFAULT_COLOR;
-			addElement( _itemBox );
-		
-			collapse();
-		}
-		else {
-			height = ITEM_HEIGHT + 8;
-			var newItemButton:Button = new Button( "New Animation on child model", width - 20, ITEM_HEIGHT );
-			newItemButton.x = 4;
-			newItemButton.y = 4;
-			$evtColl.addEvent( newItemButton, UIMouseEvent.RELEASE, newItemHandler );
-			newItemButton.color = 0x00FF00;
-			addElement( newItemButton );
-		}
+		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
+		ebco.showNew = true;
+		ebco.paddingTop = 2;
+		ebco.width = $widthParam;
+		//ebco.backgroundColor = 0x0000ff;
+		ebco.showNew = false;
+		super( ebco );
 	}
 	
-	private function newItemHandler( $me:UIMouseEvent ):void  {
-		
-	}
+	//override public function deleteElementCheck( $me:UIMouseEvent ):void {
+		//(new Alert( "PanelAnimationAttachment.deleteElementCheck", 350 )).display();
+	//}
 	
-	private function changeList( $me:UIMouseEvent ):void {
-		if ( _expanded ) {
-			_expanded = false;
-			collapse();
-		}
-		else {
-			_expanded = true;
-			expand();
-		}
-	}
-	
-	private function collapse():void {
+	override public function collapasedInfo():String  {
+		if ( _aniAttach )
+			return _aniAttach.attachsTo;
 		
-		_itemBox.removeElements();
-		_itemBox.layout.orientation = LayoutOrientation.HORIZONTAL;
-		
-		_expandCollapse.label = "+";
-		
-		var label:Label = new Label( _aniXform.attachmentName, _itemBox.width - 40 )
-		label.backgroundColor = SpasUI.DEFAULT_COLOR;
-		_itemBox.addElement( label );
-		
-		var deleteButton:Button = new Button( "X", 24, 24 );
-		deleteButton.y = 0;
-		deleteButton.padding = 0;
-//		$evtColl.addEvent( deleteButton, UIMouseEvent.RELEASE, changeList );
-		_itemBox.addElement( deleteButton );
-		
-		height = _itemBox.height = 30;
-		target.dispatchEvent(new ResizerEvent(ResizerEvent.RESIZE_UPDATE));
-	}
-	
-	private const BUFFER_SIZE:int = 8;
-	private function expand():void {
-		_itemBox.removeElements();
-		_itemBox.layout.orientation = LayoutOrientation.VERTICAL;
-		_itemBox.height = 5;
-		_expandCollapse.label = "-";
-		
-		var cli:ComponentLabelInput = new ComponentLabelInput( "Name"
-										  , function ($e:TextEvent):void { _aniXform.attachmentName = $e.target.text; setChanged(); }
-										  , _aniXform.attachmentName ? _aniXform.attachmentName : "Missing Attachment Name"
-										  , _itemBox.width - 10 )
-											
-		_itemBox.height += cli.height + BUFFER_SIZE;
-		_itemBox.addElement( cli );
-		var cv3:ComponentVector3D
-		if ( _aniXform.hasPosition ) {
-			cv3 = new ComponentVector3D( setChanged, "location", "X: ", "Y: ", "Z: ",  _aniXform.position, updateVal );
-			_itemBox.addElement( cv3 );
-			_itemBox.height += cv3.height + BUFFER_SIZE;
-		}
-		if ( _aniXform.hasRotation ) {
-			cv3 = new ComponentVector3D( setChanged, "rotation", "X: ", "Y: ", "Z: ",  _aniXform.rotation, updateVal );
-			_itemBox.addElement( cv3 );
-			_itemBox.height += cv3.height + BUFFER_SIZE;
-		}
-		if ( _aniXform.hasScale ) {
-			cv3 = new ComponentVector3D( setChanged, "scale", "X: ", "Y: ", "Z: ",  _aniXform.scale, updateVal );
-			_itemBox.addElement( cv3 );
-			_itemBox.height += cv3.height + BUFFER_SIZE;
-		}
-		_itemBox.height + 10; // need spacer between it and next element
-		/*
-		var pmt:PanelModelTransform;
-		if ( _aniXform.hasTransform ) {
-			for each ( var transform:ModelTransform in _aniXform.transforms ) {
-				pmt = new PanelModelTransform( _ani, transform, width )
-				addElement( pmt );
-				_itemBox.height += pmt.height;
-			}
-		}
-		*/
-		height = _itemBox.height;
-		
-		target.dispatchEvent(new ResizerEvent(ResizerEvent.RESIZE_UPDATE));
+		return "New Animation Attachment";
 	}
 
-	
+	override protected function expand():void {
+		super.expand();
+		
+		var cli1:ComponentLabelInput = new ComponentLabelInput( "Attachs To"
+										  , function ($e:TextEvent):void { _aniAttach.attachsTo = $e.target.text; setChanged(); }
+										  , _aniAttach.attachsTo ? _aniAttach.attachsTo : "Missing Attachment Name"
+										  , _itemBox.width )
+		_itemBox.addElement( cli1 );
+		var cli:ComponentLabelInput = new ComponentLabelInput( "Guid"
+										  , function ($e:TextEvent):void { _aniAttach.guid = $e.target.text; setChanged(); }
+										  , _aniAttach.guid ? _aniAttach.guid : "Missing Attachment Guid"
+										  , _itemBox.width )
+		_itemBox.addElement( cli );
+		
+		var cv3:ComponentVector3DSideLabel;
+		cv3 = new ComponentVector3DSideLabel( setChanged, "location", "X: ", "Y: ", "Z: ",  _aniAttach.instanceInfo.positionGet, updateVal );
+		_itemBox.addElement( cv3 );
+		
+		cv3 = new ComponentVector3DSideLabel( setChanged, "rotation", "X: ", "Y: ", "Z: ",  _aniAttach.instanceInfo.rotationGet, updateVal );
+		_itemBox.addElement( cv3 );
+		
+		cv3 = new ComponentVector3DSideLabel( setChanged, "scale", "X: ", "Y: ", "Z: ",  _aniAttach.instanceInfo.scale, updateVal );
+		_itemBox.addElement( cv3 );
+	}
 	
 	private function updateVal( $e:SpinButtonEvent ):int {
 		var ival:int = int( $e.target.data.text );
