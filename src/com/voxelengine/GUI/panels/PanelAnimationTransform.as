@@ -51,7 +51,7 @@ public class PanelAnimationTransform extends ExpandableBox
 		ebco.paddingTop = 2;
 		//ebco.paddingLeft = 4;
 		ebco.width = $widthParam;
-		ebco.backgroundColor = 0x0000ff;
+		//ebco.backgroundColor = 0x0000ff;
 		ebco.showNew = false;
 		super( ebco );
 	}
@@ -93,6 +93,8 @@ public class PanelAnimationTransform extends ExpandableBox
 			cv3 = new ComponentVector3DSideLabel( setChanged, "scale", "X: ", "Y: ", "Z: ",  _aniXform.scale, updateVal );
 			_itemBox.addElement( cv3 );
 		}
+		
+		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 10 ) )
 
 		_itemBox.addElement( new PanelVectorContainer( "transforms"
 											, _ani

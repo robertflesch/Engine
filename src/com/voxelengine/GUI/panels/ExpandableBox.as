@@ -50,11 +50,12 @@ public class ExpandableBox extends ResizablePanelVV implements IExpandableItem
 		$evtColl.addEvent( _expandCollapse, UIMouseEvent.RELEASE, expandOrCollapse );
 		addElement( _expandCollapse );
 		
-		_itemBox = new ResizablePanelVV( width - 35, ITEM_SIZE, BorderStyle.NONE );
+		_itemBox = new ResizablePanelVV( width - 31, ITEM_SIZE, BorderStyle.NONE );
 		_itemBox.layout = new AbsoluteLayout();
 		_itemBox.x = ITEM_SIZE + (_configObject.paddingLeft * 2);
 		_itemBox.y = _configObject.paddingTop;
 		_itemBox.backgroundColor = _configObject.backgroundColor ;
+_itemBox.backgroundColor = 0x00ff00;
 		addElement( _itemBox );
 	
 		collapse();
@@ -145,7 +146,7 @@ public class ExpandableBox extends ResizablePanelVV implements IExpandableItem
 			
 			if ( _configObject.showDelete ) {
 				var deleteButton:Box = new Box();
-				deleteButton.x = _itemBox.width - ITEM_SIZE;
+				deleteButton.x = (_itemBox.width - ITEM_SIZE);
 				deleteButton.autoSize = false;
 				deleteButton.width = ITEM_SIZE;
 				deleteButton.height = ITEM_SIZE;

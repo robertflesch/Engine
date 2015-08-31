@@ -31,7 +31,7 @@ public class PanelVectorContainer extends ExpandableBox {
 		ebco.newItemText = $newItemName;
 		ebco.width = $widthParam;
 		ebco.showDelete = false;
-		ebco.paddingTop = 6;
+		ebco.paddingTop = 10;
 		ebco.paddingLeft = 6;
 		super( ebco );
 	}

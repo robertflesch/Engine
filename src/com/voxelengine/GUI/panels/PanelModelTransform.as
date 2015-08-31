@@ -44,7 +44,8 @@ public class PanelModelTransform extends ExpandableBox
 		ebco.showNew = true;
 		ebco.paddingTop = 2;
 		ebco.width = $widthParam;
-		ebco.backgroundColor = 0x0000ff;
+		//ebco.backgroundColor = 0x0000ff;
+		ebco.showNew = false;
 		super( ebco );
 	}
 	
@@ -54,7 +55,7 @@ public class PanelModelTransform extends ExpandableBox
 	
 	override public function collapasedInfo():String  {
 		if ( _modelXform )
-			return _modelXform.name;
+			return ModelTransform.typeToString( _modelXform.type );
 		
 		return "New Model Transform";
 	}
@@ -67,28 +68,30 @@ public class PanelModelTransform extends ExpandableBox
 	override protected function expand():void {
 		super.expand();
 		
+		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 10 ) );
+		
 		var cti1:ComponentTextInput = new ComponentTextInput( "type"
 											  , function ($e:TextEvent):void { _modelXform.type = int ( $e.target.text ); setChanged(); }
 											  , _modelXform.type ? String( _modelXform.type ) : "Missing type"
 											  , width );
 		cti1.y = 0;
 		_itemBox.addElement( cti1 );
-		_itemBox.height += cti1.height;
+		//_itemBox.height += cti1.height;
 		
 		var cti2:ComponentTextInput = new ComponentTextInput( "time"
 											  , function ($e:TextEvent):void { _modelXform.time = int ( $e.target.text ); setChanged(); }
 											  , _modelXform.time ? String( _modelXform.time ) : "Missing time"
 											  , width );
 		_itemBox.addElement( cti2 );
-		cti2.y = _itemBox.height;
-		_itemBox.height += cti2.height;
+		//cti2.y = _itemBox.height;
+		//_itemBox.height += cti2.height;
 		
-		var cv3:ComponentVector3D = new ComponentVector3D( setChanged, "delta", "X: ", "Y: ", "Z: ",  _modelXform.delta, updateVal );
+		var cv3:ComponentVector3DSideLabel = new ComponentVector3DSideLabel( setChanged, "delta", "X: ", "Y: ", "Z: ",  _modelXform.delta, updateVal );
 		_itemBox.addElement( cv3 );
-		cv3.y = _itemBox.height;
-		_itemBox.height += cv3.height;
+		//cv3.y = _itemBox.height;
+		//_itemBox.height += cv3.height;
 											
-		height = _itemBox.height;
+		//height = _itemBox.height;
 	}
 	
 	//////////////////////////////
