@@ -72,7 +72,7 @@ _itemBox.backgroundColor = 0x00ff00;
 	override protected function resizePane( $re:ResizerEvent ):void {
 		_itemBox.height = 0;
 		for each ( var element:* in _itemBox.getElements() ) {
-			Log.out( "ExpandableBox.resizePane item: " + element + "  element.height: " + element.height + "  paddingTop: " + _configObject.paddingTop, Log.WARN );
+			Log.out( "ExpandableBox.resizePane item: " + element + "  element.height: " + element.height + "  paddingTop: " + _configObject.paddingTop + "  orientation: " + _itemBox.layout.orientation, Log.WARN );
 			if ( LayoutOrientation.VERTICAL == _itemBox.layout.orientation ) {
 				element.y = _itemBox.height;
 				_itemBox.height += element.height;
@@ -139,26 +139,24 @@ _itemBox.backgroundColor = 0x00ff00;
 		_expandCollapse.label = "+";
 		
 		var itemCount:String = collapasedInfo();
-		if ( "0" != itemCount ) {
-			var label:Label = new Label( collapasedInfo(), _itemBox.width - ITEM_SIZE );
-			label.x = 10;
-			_itemBox.addElement( label );
-			
-			if ( _configObject.showDelete ) {
-				var deleteButton:Box = new Box();
-				deleteButton.x = (_itemBox.width - ITEM_SIZE);
-				deleteButton.autoSize = false;
-				deleteButton.width = ITEM_SIZE;
-				deleteButton.height = ITEM_SIZE;
-				deleteButton.padding = 0;
-				deleteButton.paddingTop = 1;
-				deleteButton.paddingLeft = 4;
-				deleteButton.backgroundColor = 0xff0000;
-				deleteButton.addElement( new Label( "X" ) );
-				$evtColl.addEvent( deleteButton, UIMouseEvent.RELEASE, deleteElementCheck );
-				_itemBox.addElement( deleteButton );
-			}
+		var label:Label = new Label( collapasedInfo(), _itemBox.width - ITEM_SIZE );
+		label.x = 10;
+		_itemBox.addElement( label );
+		if ( _configObject.showDelete ) {
+			var deleteButton:Box = new Box();
+			deleteButton.x = (_itemBox.width - ITEM_SIZE);
+			deleteButton.autoSize = false;
+			deleteButton.width = ITEM_SIZE;
+			deleteButton.height = ITEM_SIZE;
+			deleteButton.padding = 0;
+			deleteButton.paddingTop = 1;
+			deleteButton.paddingLeft = 4;
+			deleteButton.backgroundColor = 0xff0000;
+			deleteButton.addElement( new Label( "X" ) );
+			$evtColl.addEvent( deleteButton, UIMouseEvent.RELEASE, deleteElementCheck );
+			_itemBox.addElement( deleteButton );
 		}
+
 	}
 }
 }
