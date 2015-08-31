@@ -20,6 +20,14 @@ import com.voxelengine.worldmodel.models.ModelTransform;
  */
 public class AnimationTransform
 {
+	static public var DEFAULT_OBJECT:Object = { 
+		attachmentName:"Choose parent model or child model",
+		//notNamed
+		location: { x:0, y:0, z:0 },
+		scale: { x:0, y:0, z:0 },
+		rotation: { x:0, y:0, z:0 }
+	}
+	
 	private var _attachmentName:String = "INVALID_ATTACHMENT";
 	private var _position:Vector3D = new Vector3D();
 	private var _hasPosition:Boolean = false;
@@ -36,42 +44,37 @@ public class AnimationTransform
 	public function get attachmentName():String { return _attachmentName; }
 	public function set attachmentName( $val:String ):void { _attachmentName = $val; }
 	
-	public function AnimationTransform( $json:Object ) 
+	public function AnimationTransform( $obj:Object ) 
 	{ 
-		if ( $json.attachmentName )
-			_attachmentName = $json.attachmentName;
+		if ( $obj.attachmentName )
+			_attachmentName = $obj.attachmentName;
 		else
 			Log.out( "AnimationTransform - No attachmentName name", Log.ERROR );
 			
-		if ( $json.location )
-		{
-			_position = new Vector3D( $json.location.x, $json.location.y, $json.location.z );
+		if ( $obj.location ) {
+			_position = new Vector3D( $obj.location.x, $obj.location.y, $obj.location.z );
 			_hasPosition = true
 		}
 		
 		// Transforms which are not named will stick around even after animation is played
 		// So they should only be used on timed animations.
-		if ( $json.notNamed )
-		{
-			_notNamed = $json.notNamed;
+		if ( $obj.notNamed ) {
+			_notNamed = $obj.notNamed;
 		}
 		
-		if ( $json.scale )
-		{
-			_scale = new Vector3D( $json.scale.x, $json.scale.y, $json.scale.z );
+		if ( $obj.scale ) {
+			_scale = new Vector3D( $obj.scale.x, $obj.scale.y, $obj.scale.z );
 			_hasScale = true;
 		}
 		
-		if ( $json.rotation )
-		{
-			_rotation = new Vector3D( $json.rotation.x, $json.rotation.y, $json.rotation.z );
+		if ( $obj.rotation ) {
+			_rotation = new Vector3D( $obj.rotation.x, $obj.rotation.y, $obj.rotation.z );
 			_hasRotation = true
 		}
 			
-		if ( $json.transforms )
-		{
+		if ( $obj.transforms ) {
 			_hasTransform = true;
-			for each ( var modelTransform:Object in $json.transforms )
+			for each ( var modelTransform:Object in $obj.transforms )
 			{
 				var type:int = ModelTransform.stringToType( modelTransform.type.toLowerCase() );
 				if ( "life" == modelTransform.type.toLowerCase() )
