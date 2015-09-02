@@ -20,7 +20,7 @@ public final class ProjectilePool
 { 
 	private static var _currentPoolSize:int 
 	private static var _growthValue:int
-	private static var _pools:Vector.<ProjectilePoolType> = new Vector.<ProjectilePoolType> 
+	private static var _pools:Array = new Array();
 	
 	public static function initialize( $initialPoolSize:uint, $growthValue:uint ):void { 
 		_currentPoolSize = $initialPoolSize
@@ -29,20 +29,23 @@ public final class ProjectilePool
 	} 
 	
 	static private function ammoAdded(e:AmmoEvent):void {
-		_pools[e.ammo.type] = new ProjectilePoolType( e.ammo.oxelType, _currentPoolSize, _growthValue )
+		_pools[e.ammo.name] = new ProjectilePoolType( e.ammo.oxelType, _currentPoolSize, _growthValue )
 	}
 	
 	public static function poolGet( ammo:Ammo ):Projectile { 
-		var pool:ProjectilePoolType = _pools[ammo.type]
+		var pool:ProjectilePoolType = _pools[ammo.name]
 		if ( !pool )
-			pool = _pools[ammo.type] = new ProjectilePoolType(ammo.oxelType, _currentPoolSize, _growthValue)
+			pool = _pools[ammo.name] = new ProjectilePoolType(ammo.oxelType, _currentPoolSize, _growthValue)
 		return pool.poolGet() 
 	} 
 
 	public static function poolDispose( $disposedProjectile:Projectile):void { 
-		var type:uint = $disposedProjectile.ammo.type
-		var pool:ProjectilePoolType = _pools[type]
-		
+		var name:String = $disposedProjectile.ammo.name
+		var pool:ProjectilePoolType = _pools[name]
+		if ( !pool ) {
+			Log.out( "ProjectilePool.poolDispose - no pool found for name: " + name + " ammo: " + $disposedProjectile.ammo.toString() )
+			return
+		}
 		pool.poolDispose( $disposedProjectile )
 	} 
 }

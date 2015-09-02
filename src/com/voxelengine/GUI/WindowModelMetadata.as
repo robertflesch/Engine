@@ -60,9 +60,9 @@ public class WindowModelMetadata extends VVPopup
 		if ( TYPE_IMPORT == windowType ) {
 			//_vmm = new ModelMetadata( $ii.modelGuid );
 			_vmm = new ModelMetadata( $ii.modelGuid );
-			var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
-			newDbo.data = new Object();
-			_vmm.fromObjectImport( newDbo );
+			var newObj:Object = ModelMetadata.newObject()
+			newObj.data = new Object();
+			_vmm.fromObjectImport( newObj );
 			_vmm.name = $ii.modelGuid;
 			_vmm.description = $ii.modelGuid + "-IMPORTED";
 			_vmm.owner = Network.userId;

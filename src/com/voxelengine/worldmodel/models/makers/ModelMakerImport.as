@@ -17,7 +17,6 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.PermissionsModel;
 import flash.utils.ByteArray;
 import org.flashapi.swing.Alert;
-import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -71,9 +70,9 @@ public class ModelMakerImport extends ModelMakerBase {
 				new WindowModelMetadata( ii, WindowModelMetadata.TYPE_IMPORT ); }
 			else {
 				_modelMetadata = new ModelMetadata( ii.modelGuid );
-				var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
-				newDbo.data = new Object();
-				_modelMetadata.fromObjectImport( newDbo );
+				var newObj:Object = ModelMetadata.newObject()
+				_modelMetadata.fromObjectImport( newObj );
+				_modelMetadata.fromObjectImport( newObj );
 				_modelMetadata.name = ii.modelGuid;
 				_modelMetadata.owner = Network.userId;
 				attemptMakeRetrieveParentModelInfo(); }

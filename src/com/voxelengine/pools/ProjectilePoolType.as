@@ -9,21 +9,12 @@
 package com.voxelengine.pools 
 {
 
-import com.voxelengine.events.LoadingEvent
-import com.voxelengine.events.ModelBaseEvent
-import com.voxelengine.events.ModelEvent
-import com.voxelengine.events.ModelInfoEvent
-import com.voxelengine.events.ModelMetadataEvent
-import com.voxelengine.events.ProjectileEvent
 import com.voxelengine.Log
 import com.voxelengine.Globals
 import com.voxelengine.worldmodel.models.*
-import com.voxelengine.worldmodel.models.types.VoxelModel
-import com.voxelengine.worldmodel.Region
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube
 import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube
 import com.voxelengine.worldmodel.weapons.Projectile
-import playerio.DatabaseObject
      
 public final class ProjectilePoolType 
 { 
@@ -60,19 +51,20 @@ public final class ProjectilePoolType
 		// I dont like that I create new metadata and _modelInfo for each projectile.
 		// I should be able to create instances
 		_projectileGuid = Globals.getUID()
-		var obj:DatabaseObject = GenerateCube.script()
+		var obj:Object = GenerateCube.script()
 		obj.model.grainSize = 2
 		obj.model.biomes.layers[0].type = TypeInfo.BLUE;
 		// This is a special case for _modelInfo, the _modelInfo its self is contained in the generate script
 		_modelInfo = new ModelInfo( _projectileGuid )
+		_modelInfo.dynamicObj = true;
 		_modelInfo.fromObject( obj )
 		//ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.GENERATION, 0, _projectileGuid, _modelInfo ) )
 
 		_modelMetadata = new ModelMetadata( _projectileGuid )
-		var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null )
-		newDbo.data = new Object()
-		newDbo.data.name = "ProjectilePoolType - " + $type
-		_modelMetadata.fromObjectImport( newDbo )
+		var newObj:Object = ModelMetadata.newObject()
+		newObj.data.name = "ProjectilePoolType - " + $type
+		_modelMetadata.fromObjectImport( newObj )
+		_modelMetadata.dynamicObj = true;
 		_modelMetadata.name = _projectileGuid
 		_modelMetadata.description = _projectileGuid + " - GENERATED"
 		_modelMetadata.owner = ""

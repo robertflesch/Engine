@@ -31,7 +31,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	 */
 	public class GenerateCube extends LandscapeTask 
 	{	
-		static public function script():DatabaseObject {
+		static public function script():Object {
 			//ammo.dbo = new DatabaseObject( Globals.BIGDB_TABLE_AMMO, $pe.guid, "0", 0, true, null );
 			var obj:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_OXEL_DATA, Globals.getUID(), "0", 0, true, null );
 			obj.model = new Object();

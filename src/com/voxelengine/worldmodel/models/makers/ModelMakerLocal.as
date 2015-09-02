@@ -41,9 +41,8 @@ public class ModelMakerLocal extends ModelMakerBase {
 	override protected function attemptMake():void {
 		if ( null != _modelInfo ) {
 			_modelMetadata = new ModelMetadata( ii.modelGuid );
-			var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
-			newDbo.data = new Object();
-			_modelMetadata.fromObjectImport( newDbo );
+			var newObj:Object = ModelMetadata.newObject()
+			_modelMetadata.fromObjectImport( newObj );
 			_modelMetadata.name = _modelInfo.guid;
 			_modelMetadata.description = _modelInfo.fileName + " from local data";
 			var vm:* = make();

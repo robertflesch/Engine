@@ -14,7 +14,6 @@ package com.voxelengine.GUI
 	import com.voxelengine.worldmodel.tasks.landscapetasks.*;
 	import flash.accessibility.Accessibility;
 	import flash.geom.Vector3D;
-	import playerio.DatabaseObject;
 	
 	import org.flashapi.swing.*;
 	import org.flashapi.swing.button.RadioButtonGroup;
@@ -149,7 +148,7 @@ package com.voxelengine.GUI
 			var ii:InstanceInfo = new InstanceInfo();
 			var detailSize:int;		
 			var li:ListItem;
-			var miJson:DatabaseObject;
+			var miJson:Object;
 			if ( -1 == _cbSize.selectedIndex ) {
 				(new Alert( "Please select a size" ) ).display();
 				return;

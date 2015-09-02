@@ -39,7 +39,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	private var _creationFunction:String;
 	private var _type:int;
 	
-	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:DatabaseObject ) {
+	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object ) {
 		_creationFunction 	= $miJson.model.biomes.layers[0].functionName;
 		_type 				= $miJson.model.biomes.layers[0].type;
 		
@@ -59,9 +59,8 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	override protected function retrieveBaseInfo():void {
 		
 		_modelMetadata = new ModelMetadata( ii.modelGuid );
-		var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
-		newDbo.data = new Object();
-		_modelMetadata.fromObjectImport( newDbo );
+		var newObj:Object = ModelMetadata.newObject()
+		_modelMetadata.fromObjectImport( newObj );
 		
 		_modelMetadata.name = TypeInfo.name( _type ) + _modelInfo.dbo.grainSize + "-" + _creationFunction;
 		_modelMetadata.description = _creationFunction + "- GENERATED";

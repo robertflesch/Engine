@@ -598,8 +598,8 @@ public class ModelInfo extends PersistanceObject
 		changed = true;
 	}
 	
-	public function fromObject( $dbo:DatabaseObject ):void {
-		dbo = $dbo;
+	public function fromObject( $dbo:Object ):void {
+		dbo = $dbo as DatabaseObject;
 		if ( !dbo.model )
 			return;
 		

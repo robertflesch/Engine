@@ -57,6 +57,12 @@ public class ModelMetadata extends PersistanceObject
 		return "name: " + name + "  description: " + description + "  guid: " + guid + "  owner: " + owner;
 	}
 	
+	static public function newObject():Object {
+		var obj:Object = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null )
+		obj.data = new Object()
+		return obj
+	}
+	
 	public function ModelMetadata( $guid:String ) {
 		super( $guid, Globals.BIGDB_TABLE_MODEL_METADATA );
 		if ( "EditCursor" != guid )
@@ -129,10 +135,12 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	// $dbo directly
 	// I abstract it away using the info object
 	// it was needed to save the data in an abstract way.
-	public function fromObjectImport( $dbo:DatabaseObject ):void {
-		dbo = $dbo;
-		if ( !dbo.data )
-			throw new Error( "ModelMetaData.fromObjectImport - NO DBO or DBO data" );
+	public function fromObjectImport( $dbo:Object ):void {
+		dbo = $dbo as DatabaseObject;
+		if ( !dbo.data ) {
+			dbo.data = new Object();
+			Log.out( "ModelMetaData.fromObjectImport - NO DBO or DBO data", Log.ERROR );
+		}
 		info = $dbo.data;	
 		loadFromInfo();	
 		changed = true;

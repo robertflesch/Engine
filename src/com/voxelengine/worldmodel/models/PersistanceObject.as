@@ -24,6 +24,7 @@ public class PersistanceObject
 	private var 	_guid:String;
 	private var 	_table:String;
 	private var 	_changed:Boolean;
+	private var 	_dynamicObj:Boolean;
 	private var 	_dbo:DatabaseObject;
 	private var 	_info:Object;
 	
@@ -51,6 +52,9 @@ public class PersistanceObject
 	public function get changed():Boolean { return _changed; }
 	public function set changed(value:Boolean):void { _changed = value; }
 	
+	public function get dynamicObj():Boolean { return _dynamicObj; }
+	public function set dynamicObj(value:Boolean):void { _dynamicObj = value; }
+	
 	public function clone( $guid:String ):* {
 		throw new Error( "PersistanceObject.clone - THIS METHOD NEEDS TO BE OVERRIDDEN", Log.ERROR );
 	}
@@ -72,7 +76,7 @@ public class PersistanceObject
 	protected function toObject():void { }
 	
 	public function save():void {
-		if ( Globals.online && changed ) {
+		if ( Globals.online && changed && !dynamicObj ) {
 			//Log.out( "PersistanceObject.save - Saving to guid: " + guid  + " in table: " + table, Log.WARN );
 			addSaveEvents();
 			toObject();

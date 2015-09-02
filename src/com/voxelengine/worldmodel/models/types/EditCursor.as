@@ -78,9 +78,8 @@ public class EditCursor extends VoxelModel
 			_s_currentInstance = new EditCursor( instanceInfo );
 
 			var metadata:ModelMetadata = new ModelMetadata( EDIT_CURSOR );
-			var newDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
-			newDbo.data = new Object();
-			metadata.fromObjectImport( newDbo );
+			var newObj:Object = ModelMetadata.newObject()
+			metadata.fromObjectImport( newObj );
 			metadata.permissions.modify = false;
 			
 			var modelInfo:ModelInfo = new ModelInfo( EDIT_CURSOR );
