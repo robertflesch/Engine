@@ -138,9 +138,10 @@ package com.voxelengine.worldmodel.scripts
 		
 		static private function bulletPool( pe:ProjectileEvent, parentVelocity:Vector3D ):void
 		{
-			var pm:Projectile = ProjectilePool.poolGet();
+			var pm:Projectile = ProjectilePool.poolGet( pe.ammo );
 			// Arrg - particles just contain place holder oxel the first time when first created.
 			// So any changes are wiped away once the actual model loads.
+			// may be fixed by pool changes.
 			
 			pm.instanceInfo.usesCollision = true;
 			pm.ammo = pe.ammo;

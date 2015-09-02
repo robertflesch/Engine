@@ -15,7 +15,7 @@ package com.voxelengine.renderer.shaders
 	import flash.display3D.Context3DTriangleFace;
 	import flash.geom.Matrix3D;
 
-	import com.adobe.utils.AGALMiniAssembler;
+	import com.adobe.utils.v3.AGALMiniAssembler;
 	
 	import com.voxelengine.renderer.shaders.Shader;
 	

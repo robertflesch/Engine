@@ -103,9 +103,9 @@ package com.voxelengine.GUI
 			addInt( "ParticlePool:", ParticlePool.remaining );
 			addSpace();
 
-			addInt( "Used ProjectilePool:", ProjectilePool.totalUsed );
-			addInt( "ProjectilePool:", ProjectilePool.remaining );
-			addSpace();
+			//addInt( "Used ProjectilePool:", ProjectilePool.totalUsed );
+			//addInt( "ProjectilePool:", ProjectilePool.remaining );
+			//addSpace();
 
 			addInt( "Land Tasks:", Globals.g_landscapeTaskController.queueSize );
 			addInt( "Flow Tasks:", Globals.g_flowTaskController.queueSize );

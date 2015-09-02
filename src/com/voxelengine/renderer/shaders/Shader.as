@@ -24,7 +24,7 @@ package com.voxelengine.renderer.shaders
 	import com.voxelengine.Log;
 	import com.voxelengine.renderer.Quad;
 	
-	import com.adobe.utils.AGALMiniAssembler;
+	import com.adobe.utils.v3.AGALMiniAssembler;
 	
 	
 	public class Shader {

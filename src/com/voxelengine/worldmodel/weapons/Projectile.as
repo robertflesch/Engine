@@ -57,6 +57,7 @@ package com.voxelengine.worldmodel.weapons
 			instanceInfo.dynamicObject = true;
 		}
 		
+		public function get ammo( ):Ammo { return _ammo }
 		public function set ammo( $ammo:Ammo ):void
 		{
 			_ammo = $ammo;
