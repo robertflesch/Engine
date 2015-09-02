@@ -179,8 +179,10 @@ package com.voxelengine.worldmodel
 		}
 		
 		private function regionChanged( $re:RegionEvent):void  { 
-			Log.out( "Region.regionChanged" );
-			changed = true;
+			if ( guid == $re.guid ) {
+				Log.out( "Region.regionChanged" );
+				changed = true;
+			}
 		}
 		
 		private function modelChanged(e:ModelEvent):void {

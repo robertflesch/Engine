@@ -34,7 +34,8 @@ package com.voxelengine.GUI.voxelModels
 		private var _eventCollector:EventCollector = new EventCollector();
 		private var _panelAdvanced:Panel;
 		private var _pic:Image;
-		private var _photoContainer:Container
+		private var _photoContainer:Container 		= new Container( width, 128 );
+
 		private var _vm:VoxelModel = null;
 		
 		private static const BORDER_WIDTH:int = 4;
@@ -72,11 +73,18 @@ package com.voxelengine.GUI.voxelModels
 			                                  , function ($e:TextEvent):void { _vm.metadata.name = $e.target.text; setChanged(); }
 											  , _vm.metadata.name ? _vm.metadata.name : "No Name"
 											  , width ) );
+			addPhoto()
+			addElement( new ComponentSpacer( width ) );
 			addElement( new ComponentTextArea( "Desc"
 											 , function ($e:TextEvent):void { _vm.metadata.description = $e.target.text; setChanged(); }
 											 , _vm.metadata.description ? _vm.metadata.description : "No Description"
 											 , width ) );
 
+			addElement( new ComponentVector3D( setChanged, "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, updateVal ) );
+			addElement( new ComponentVector3D( setChanged, "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, updateVal ) );
+			addElement( new ComponentVector3D( setChanged, "Center", "X: ", "Y: ", "Z: ",  ii.center, updateVal ) );
+			addElement( new ComponentVector3D( setChanged, "Scale", "X: ", "Y: ", "Z: ",  ii.scale, updateScaleVal, 5 ) );
+			
 			// TODO need to be able to handle an array of scipts.
 			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { ii.scriptName = $e.target.text; }, ii.scriptName, width ) );
 			const GRAINS_PER_METER:int = 16;
@@ -92,12 +100,6 @@ package com.voxelengine.GUI.voxelModels
 			if ( ii.controllingModel )
 				addElement( new ComponentLabel( "Parent GUID",  ii.controllingModel ? ii.controllingModel.instanceInfo.instanceGuid : "", width ) );
 //
-			addElement( new ComponentVector3D( setChanged, "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, updateVal ) );
-			addElement( new ComponentVector3D( setChanged, "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, updateVal ) );
-			addElement( new ComponentVector3D( setChanged, "Center", "X: ", "Y: ", "Z: ",  ii.center, updateVal ) );
-			addElement( new ComponentVector3D( setChanged, "Scale", "X: ", "Y: ", "Z: ",  ii.scale, updateScaleVal, 5 ) );
-			addPhoto()
-			
 			if ( Globals.g_debug )
 			{
 				var oxelUtils:Button = new Button( LanguageManager.localizedStringGet( "Oxel_Utils" ) );
@@ -125,7 +127,6 @@ package com.voxelengine.GUI.voxelModels
 		}
 		
 		private function addPhoto():void {
-			_photoContainer = new Container( width, 128 );
 			_photoContainer.name = "pc";
 			addElement(_photoContainer);
 			
@@ -135,13 +136,12 @@ package com.voxelengine.GUI.voxelModels
 			
 			_pic = new Image( new Bitmap( _vm.metadata.thumbnail ), 128, 128 );
 			_photoContainer.addElement( _pic );
-			setChanged();
 		}
 		
 		private function updatePhoto():void {
-			_photoContainer.removeElementAt( 1 );
-			_pic = new Image( new Bitmap( _vm.metadata.thumbnail ), 128, 128 );
-			_photoContainer.addElementAt( _pic, 1 );
+			_photoContainer.removeElements();
+			addPhoto();
+			setChanged();
 		}
 
 		private function updateScaleVal( $e:SpinButtonEvent ):Number {
@@ -164,9 +164,11 @@ package com.voxelengine.GUI.voxelModels
 		
 		private function setChanged():void {
 			_vm.changed = true;
+			_vm.metadata.changed = true;
+			_vm.modelInfo.changed = true;
 			_vm.instanceInfo.changed = true;
 			if ( _vm.instanceInfo.controllingModel )
-				_vm.instanceInfo.controllingModel.changed = true;
+				_vm.instanceInfo.controllingModel.modelInfo.changed = true;
 		}
 		
 		private function oxelUtilsHandler(event:UIMouseEvent):void  {
@@ -179,9 +181,10 @@ package com.voxelengine.GUI.voxelModels
 		{
 			_s_inExistance--;
 			_s_currentInstance = null;
-			
-			ModelEvent.dispatch( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.instanceGuid ) );
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, 0, null ) );
+	
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, null ) );
+//			ModelEvent.dispatch( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.instanceGuid ) );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, 0, Region.currentRegion.guid ) );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
 		}
 		

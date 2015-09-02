@@ -52,6 +52,7 @@ public class ExpandableBox extends ResizablePanelVV implements IExpandableItem
 		
 		_itemBox = new ResizablePanelVV( width - 31, ITEM_SIZE, BorderStyle.NONE );
 		_itemBox.layout = new AbsoluteLayout();
+		_itemBox.padding = 0;
 		_itemBox.x = ITEM_SIZE + (_configObject.paddingLeft * 2);
 		_itemBox.y = _configObject.paddingTop;
 		_itemBox.backgroundColor = _configObject.backgroundColor ;
@@ -72,7 +73,7 @@ _itemBox.backgroundColor = 0x00ff00;
 	override protected function resizePane( $re:ResizerEvent ):void {
 		_itemBox.height = 0;
 		for each ( var element:* in _itemBox.getElements() ) {
-			Log.out( "ExpandableBox.resizePane item: " + element + "  element.height: " + element.height + "  paddingTop: " + _configObject.paddingTop + "  orientation: " + _itemBox.layout.orientation, Log.WARN );
+			//Log.out( "ExpandableBox.resizePane item: " + element + "  element.height: " + element.height + "  paddingTop: " + _configObject.paddingTop + "  orientation: " + _itemBox.layout.orientation, Log.WARN );
 			if ( LayoutOrientation.VERTICAL == _itemBox.layout.orientation ) {
 				element.y = _itemBox.height;
 				_itemBox.height += element.height;
@@ -110,7 +111,7 @@ _itemBox.backgroundColor = 0x00ff00;
 		newItemButton.borderStyle = BorderStyle.GROOVE;
 		newItemButton.y = _itemBox.height;
 		newItemButton.width = _itemBox.width;
-		newItemButton.height = ITEM_SIZE + _configObject.paddingTop;
+		newItemButton.height = ITEM_SIZE;// + _configObject.paddingTop;
 		newItemButton.backgroundColor = 0x00ff00;
 		
 		var lbl:Label = new Label( _configObject.newItemText, _itemBox.width );
@@ -134,7 +135,6 @@ _itemBox.backgroundColor = 0x00ff00;
 	protected function collapse():void {
 		_itemBox.removeElements();
 		_itemBox.layout.orientation = LayoutOrientation.HORIZONTAL;
-		_itemBox.padding = 0;
 		
 		_expandCollapse.label = "+";
 		
