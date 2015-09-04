@@ -313,15 +313,20 @@ package com.voxelengine.worldmodel
 			
 			if ( $json.uv )
 			{
-				_maxpix = $json.uv.maxpix;
-				_minpix = $json.uv.minpix;
-				_toptt = $json.uv.top; 
+				if ( $json.uv.maxpix )
+					_maxpix = $json.uv.maxpix;
+				if ( $json.uv.minpix )
+					_minpix = $json.uv.minpix;
+				if ( $json.uv.top )
+					_toptt = $json.uv.top; 
 				_ut = $json.uv.ut;
 				_vt = $json.uv.vt;
-				_sidett = $json.uv.side; 
+				if ( $json.uv.side )
+					_sidett = $json.uv.side; 
 				_us = $json.uv.us;
 				_vs = $json.uv.vs;
-				_bottomtt = $json.uv.bottom; 
+				if ( $json.uv.bottom )
+					_bottomtt = $json.uv.bottom; 
 				_ub = $json.uv.ub;
 				_vb = $json.uv.vb;
 			}
