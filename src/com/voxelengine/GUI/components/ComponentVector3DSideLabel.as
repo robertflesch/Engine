@@ -33,6 +33,7 @@ public class ComponentVector3DSideLabel extends Box
 		borderStyle = BorderStyle.NONE;
 		backgroundColor = SpasUI.DEFAULT_COLOR;
 		layout.orientation = LayoutOrientation.HORIZONTAL;
+		autoSize = false;
 		
 		if ( null == $changeFunction )
 			$changeFunction = ComponentVector3DSideLabel.updateVal;
