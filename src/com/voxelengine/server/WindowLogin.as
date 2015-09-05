@@ -153,6 +153,7 @@ package com.voxelengine.server
 			buttonPanel.addElement( registerButton );
 			
 			var lostPasswordButton:Button = new Button( "Lost Password", buttonWidth, buttonHeight - 15 );
+			lostPasswordButton.padding = 0
 			lostPasswordButton.fontSize = 9;
 			lostPasswordButton.shadow = true;
 			$evtColl.addEvent( lostPasswordButton, UIMouseEvent.CLICK, lostPasswordHandler );
