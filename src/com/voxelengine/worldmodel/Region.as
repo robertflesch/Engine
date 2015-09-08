@@ -287,7 +287,8 @@ package com.voxelengine.worldmodel
 //				Log.out( "Region.save FAILED CONDITION - online:" + Globals.online + "  changed:" + changed + "  owner:" + owner + "  locked:" + _lockDB + "  name: " + name + "  - guid: " + guid, Log.DEBUG );
 		}
 		
-		public function toObject():void {
+		override protected function toObject():void {
+			Log.out( "Region.toObject", Log.WARN );
 			if ( _modelCache )
 				info.models = _modelCache.toObject();
 			else

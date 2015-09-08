@@ -13,20 +13,20 @@ import org.flashapi.swing.plaf.spas.SpasUI;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 
-public class ComponentVector3DSideLabel extends Box
+public class ComponentLocation extends Box
 {
-	public function ComponentVector3DSideLabel( $markDirty:Function
+	public function ComponentLocation( $markDirty:Function
+									 , $origUpdate:Function
 									 , $title:String
 	                                 , $s1Label:String
 									 , $s2Label:String
 									 , $s3Label:String
 									 , $vect:Vector3D
-									 , $width:int
 									 , $changeFunction:Function = null
 									 , $decimalPlaces:int = 0 )
 	{
 		super();
-		width = $width;
+		width = 330;
 		height = 25;
 		padding = 0;
 		//paddingTop = 8
@@ -37,28 +37,35 @@ public class ComponentVector3DSideLabel extends Box
 		autoSize = false;
 		
 		if ( null == $changeFunction )
-			$changeFunction = ComponentVector3DSideLabel.updateVal;
+			$changeFunction = ComponentLocation.updateVal;
 		
 		var lbl:Label = new Label($title);
-		lbl.width = int(width/5);
+		lbl.width = 50;
 		lbl.height = 20;
 		lbl.textAlign = TextAlign.LEFT;
 		addElement( lbl )
 		
 		addSpinLabel( $s1Label
-					, function($e:SpinButtonEvent):void { $vect.setTo( $changeFunction($e), $vect.y, $vect.z ); }
-					, function($e:TextEvent):void       { $vect.setTo( int( $e.target.text ), $vect.y, $vect.z ); $markDirty() }
+					, function($e:SpinButtonEvent):void { $origUpdate( cnto( $changeFunction($e), $vect.y, $vect.z ) ); }
+					, function($e:TextEvent):void       { $origUpdate( cnto( Number( $e.target.text ), $vect.y, $vect.z ) ); $markDirty() }
 					, $vect.x.toFixed($decimalPlaces) );
 		addSpinLabel( $s2Label
-					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $changeFunction($e), $vect.z );  }
-					, function($e:TextEvent):void       { $vect.setTo( $vect.x, int( $e.target.text ), $vect.z ); $markDirty()  }
+					, function($e:SpinButtonEvent):void { $origUpdate( cnto( $vect.x, $changeFunction($e), $vect.z ) );  }
+					, function($e:TextEvent):void       { $origUpdate( cnto( $vect.x, Number( $e.target.text ), $vect.z ) ); $markDirty()  }
 					, $vect.y.toFixed($decimalPlaces) );
 		addSpinLabel( $s3Label
-					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $vect.y, $changeFunction($e) );  }
-					, function($e:TextEvent):void       { $vect.setTo( $vect.x, $vect.y, int( $e.target.text ) ); $markDirty()  }
+					, function($e:SpinButtonEvent):void { $origUpdate( cnto( $vect.x, $vect.y, $changeFunction($e) ) );  }
+					, function($e:TextEvent):void       { $origUpdate( cnto( $vect.x, $vect.y, Number( $e.target.text ) ) ); $markDirty()  }
 					, $vect.z.toFixed($decimalPlaces) );
 	}
 	
+	// cnto = componentNumbersToObject
+	private function cnto( $x:Number, $y:Number, $z:Number ):Object {
+			return { x:$x, y:$y, z:$z };
+	}
+	private function componentIntToObject( $x:int, $y:int, $z:int ):Object {
+			return { x:$x, y:$y, z:$z };
+	}	
 	//override public function get height () : Number { return super.height + 5; }	
 	
 	static private function updateVal( $e:SpinButtonEvent ):int {
@@ -77,7 +84,7 @@ public class ComponentVector3DSideLabel extends Box
 		lbl.textAlign = TextAlign.CENTER;
 		
 		var src:TextInput = new TextInput(initialValue);
-		src.width = (width/4)-40;
+		src.width = 50;
 		src.height = 20;
 		src.addEventListener( TextEvent.EDITED, textChanged );
 		
@@ -87,7 +94,7 @@ public class ComponentVector3DSideLabel extends Box
 		sb.addEventListener( SpinButtonEvent.CLICK_UP, clickHandler );
 		sb.data = src;
 
-		var panel:Container = new Container( (width/4), 20 );
+		var panel:Container = new Container( 90, 20 );
 		panel.layout.orientation = LayoutOrientation.HORIZONTAL;
 		
 		panel.addElement( lbl );

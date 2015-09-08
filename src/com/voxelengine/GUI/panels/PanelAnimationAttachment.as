@@ -51,7 +51,7 @@ public class PanelAnimationAttachment extends ExpandableBox
 		
 		return "New Animation Attachment";
 	}
-
+	
 	override protected function expand():void {
 		super.expand();
 		
@@ -67,13 +67,13 @@ public class PanelAnimationAttachment extends ExpandableBox
 		_itemBox.addElement( cli );
 		
 		var cv3:ComponentVector3DSideLabel;
-		cv3 = new ComponentVector3DSideLabel( setChanged, "location", "X: ", "Y: ", "Z: ",  _aniAttach.instanceInfo.positionGet, updateVal );
+		cv3 = new ComponentVector3DSideLabel( setChanged, "location", "X: ", "Y: ", "Z: ",  _aniAttach.instanceInfo.positionGet, _itemBox.width, updateVal );
 		_itemBox.addElement( cv3 );
 		
-		cv3 = new ComponentVector3DSideLabel( setChanged, "rotation", "X: ", "Y: ", "Z: ",  _aniAttach.instanceInfo.rotationGet, updateVal );
+		cv3 = new ComponentVector3DSideLabel( setChanged, "rotation", "X: ", "Y: ", "Z: ",  _aniAttach.instanceInfo.rotationGet, _itemBox.width, updateVal );
 		_itemBox.addElement( cv3 );
 		
-		cv3 = new ComponentVector3DSideLabel( setChanged, "scale", "X: ", "Y: ", "Z: ",  _aniAttach.instanceInfo.scale, updateVal );
+		cv3 = new ComponentVector3DSideLabel( setChanged, "scale", "X: ", "Y: ", "Z: ",  _aniAttach.instanceInfo.scale, _itemBox.width, updateVal );
 		_itemBox.addElement( cv3 );
 	}
 	

@@ -29,7 +29,7 @@ public class AnimationCache
 {
 	// This should be a list so that it can be added to easily, this is hard coded.
 	static public const MODEL_BIPEDAL_10:String = "MODEL_BIPEDAL_10";
-	static public const MODEL_DRAGON_9:String =  "MODEL_DRAGON_9";
+	static public const MODEL_DRAGON_12:String =  "MODEL_DRAGON_12";
 	static public const MODEL_PROPELLER:String =  "MODEL_PROPELLER";
 	static public const MODEL_UNKNOWN:String =  "MODEL_UNKNOWN";
 	
@@ -51,7 +51,7 @@ public class AnimationCache
 	
 	static public function requestAnimationClass( $modelClass:String ):String {
 		if ( $modelClass == "Dragon" )
-			return MODEL_DRAGON_9;
+			return MODEL_DRAGON_12;
 		if ( $modelClass == "Avatar" )
 			return MODEL_BIPEDAL_10;
 		if ( $modelClass == "Player" )

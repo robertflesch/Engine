@@ -146,8 +146,8 @@ package com.voxelengine.server
 			
 			// have to enenable the captcha in playerio in quick connect
 			Log.out( "WindowRegister - BYPASSING CAPTCHA until fixed by PlayerIO", Log.WARN );
-			//captchaLoad();
-			bypassCaptcha();
+			captchaLoad();
+			//bypassCaptcha();
 			
 			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
 		}

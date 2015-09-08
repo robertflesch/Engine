@@ -93,7 +93,8 @@ public class Animation extends PersistanceObject
 		super.save();
 	}
 	
-	public function toObject():void {
+	override protected function toObject():void {
+		Log.out( "Animation.toObject", Log.WARN );
 		// Only need to change these if the data has changed, and since there are not editing tools in app for animations yet
 		// Not going to do it until it is needed
 		

@@ -17,23 +17,21 @@ import com.voxelengine.Log;
 import com.voxelengine.GUI.*;
 
 public class PanelVectorContainer extends ExpandableBox {
-	private var _vector:Vector.<*>;
-	private var _itemDisplayObject:Class;
-	private var _rootObject:*;
+	private var _ebco:ExpandableBoxConfigObject
 	
 	// Note: item in vector needs to have a "name" method
-	public function PanelVectorContainer( $title:String, $rootObject:*, $vector:Vector.<*> , $itemDisplayObject:Class, $newItemName:String, $widthParam:int ) {
-		_vector = $vector;
-		_itemDisplayObject = $itemDisplayObject;
-		_rootObject = $rootObject;
-		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
-		ebco.title = $title;
-		ebco.newItemText = $newItemName;
-		ebco.width = $widthParam;
-		ebco.showDelete = false;
-		ebco.paddingTop = 10;
-		ebco.paddingLeft = 6;
-		super( ebco );
+	public function PanelVectorContainer( $ebco:ExpandableBoxConfigObject ) {
+	//public function PanelVectorContainer( $title:String, $rootObject:*, $vector:Vector.<*> , $itemDisplayObject:Class, $newItemName:String, $widthParam:int, $showNewItem:Boolean ) {
+		_ebco = $ebco;
+		
+		//_ebco.itemBox.title = ""
+		//_ebco.itemBox.newItemText = $newItemName
+		//_ebco.itemBox.width = $widthParam
+		//_ebco.itemBox.showNew = $showNewItem
+		//_ebco.itemBox.showDelete = false
+		//_ebco.itemBox.paddingTop = 10
+		//_ebco.itemBox.paddingLeft = 6
+		super( _ebco )
 	}
 	
 	
@@ -41,13 +39,13 @@ public class PanelVectorContainer extends ExpandableBox {
 		super.expand();
 		
 		_itemBox.height = 0;
-		for ( var i:int; i < _vector.length; i++ ) {
-			var item:* = new _itemDisplayObject( _rootObject, _vector[i], _itemBox.width );
+		for ( var i:int; i < _ebco.items.length; i++ ) {
+			var item:* = new _ebco.itemDisplayObject( _ebco.rootObject, _ebco.items[i], _itemBox.width );
 			_itemBox.addElement( item );
 		}
 	}
 	override public function collapasedInfo():String  {
-		return String( _vector.length );
+		return String( _ebco.items.length ) + " " + _ebco.itemBox.title;
 	}
 	
 
@@ -56,7 +54,7 @@ public class PanelVectorContainer extends ExpandableBox {
 	//}
 	
 	override public function newItemHandler( $me:UIMouseEvent ):void  {
-		var item:* = new _itemDisplayObject( _rootObject, null, _itemBox.width );
+		var item:* = new _ebco.itemDisplayObject( _ebco.rootObject, null, _itemBox.width );
 		_itemBox.addElement( item );
 		resizePane( null );
 	}

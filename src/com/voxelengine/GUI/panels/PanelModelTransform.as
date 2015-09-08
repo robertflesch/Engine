@@ -35,17 +35,21 @@ public class PanelModelTransform extends ExpandableBox
 {
 	private var _ani:Animation;
 	private var _modelXform:ModelTransform;
+	private var _cbType:ComboBox  = new ComboBox()	
 	
 	public function PanelModelTransform( $ani:Animation, $modelXform:ModelTransform, $widthParam = 300, $heightParam = 100 ) {
 		_ani = $ani;
+		if ( null == $modelXform ) {
+			var obj:Object = ModelTransform.DEFAULT_OBJECT;
+			$modelXform = new ModelTransform( obj.delta.x, obj.delta.y, obj.delta.z, obj.time, obj.type, obj.name );
+		}
 		_modelXform = $modelXform;
 		
 		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
-		ebco.showNew = true;
-		ebco.paddingTop = 2;
+		ebco.itemBox.showNew = false;
+		ebco.itemBox.paddingTop = 2;
 		ebco.width = $widthParam;
 		//ebco.backgroundColor = 0x0000ff;
-		ebco.showNew = false;
 		super( ebco );
 	}
 	
@@ -62,7 +66,13 @@ public class PanelModelTransform extends ExpandableBox
 
 	override public function newItemHandler( $me:UIMouseEvent ):void  {
 		(new Alert( "newItemHandler", 350 )).display();
-		
+	}
+	
+	override protected function hasElements():Boolean {
+		if ( 0 < _modelXform.delta.length ) 
+			return true
+		 
+		return false
 	}
 	
 	override protected function expand():void {
@@ -70,28 +80,19 @@ public class PanelModelTransform extends ExpandableBox
 		
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 10 ) );
 		
-		var cti1:ComponentTextInput = new ComponentTextInput( "type"
-											  , function ($e:TextEvent):void { _modelXform.type = int ( $e.target.text ); setChanged(); }
-											  , _modelXform.type ? String( _modelXform.type ) : "Missing type"
-											  , width );
-		cti1.y = 0;
-		_itemBox.addElement( cti1 );
-		//_itemBox.height += cti1.height;
-		
-		var cti2:ComponentTextInput = new ComponentTextInput( "time"
+		_itemBox.addElement( new ComponentComboBoxWithLabel( "Transform type", typeChanged, ModelTransform.typeToString( _modelXform.type ), ModelTransform.typesList(), _itemBox.width ) )
+		_itemBox.addElement( new ComponentLabelInput( "time (ms)"
 											  , function ($e:TextEvent):void { _modelXform.time = int ( $e.target.text ); setChanged(); }
 											  , _modelXform.time ? String( _modelXform.time ) : "Missing time"
-											  , width );
-		_itemBox.addElement( cti2 );
-		//cti2.y = _itemBox.height;
-		//_itemBox.height += cti2.height;
-		
-		var cv3:ComponentVector3DSideLabel = new ComponentVector3DSideLabel( setChanged, "delta", "X: ", "Y: ", "Z: ",  _modelXform.delta, updateVal );
-		_itemBox.addElement( cv3 );
-		//cv3.y = _itemBox.height;
-		//_itemBox.height += cv3.height;
-											
-		//height = _itemBox.height;
+											  , _itemBox.width ) )
+											  
+		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "delta", "X: ", "Y: ", "Z: ",  _modelXform.delta, _itemBox.width, updateVal ) )
+	}
+	
+	private function typeChanged( $le:ListEvent ): void {
+		var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex )
+		 _modelXform.type = ModelTransform.stringToType( li.value )
+		 _ani.changed = true;
 	}
 	
 	//////////////////////////////

@@ -163,38 +163,31 @@ public class InstanceInfo extends Location	{
 		return { x:int($vec.x), y:int($vec.y), z:int($vec.z) };
 	}
 	
-	public function toObject():Object {	
+	override public function toObject():Object {	
 		
-		var instanceInfo:Object = new Object();
-		instanceInfo.instanceGuid		= instanceGuid; 
-		instanceInfo.modelGuid 			= modelGuid;
-		instanceInfo.location 			= vector3DToObject( positionGet );
-		instanceInfo.collision 			= _collidable;
-		instanceInfo.baseLightLevel 	= baseLightLevel;
+		var ii:Object 		= super.toObject()
+		ii.instanceGuid		= instanceGuid; 
+		ii.modelGuid 		= modelGuid;
+		ii.collision 		= _collidable;
+		ii.baseLightLevel 	= baseLightLevel;
 		
-		if ( 0 < rotationGet.length )
-			instanceInfo.rotation 		= vector3DToObject( rotationGet );
-		if ( 0 < centerNotScaled.length )
-			instanceInfo.center 		= vector3DIntToObject( centerNotScaled );
 		if ( velocityGet.length )
-			instanceInfo.velocity		= vector3DToObject( velocityGet );
-		if ( 3 != scale.lengthSquared )
-			instanceInfo.scale 			= vector3DToObject( scale );
+			ii.velocity		= vector3DToObject( velocityGet );
 		if ( _usesCollision )
-			instanceInfo.collision 		= _usesCollision;
+			ii.collision 		= _usesCollision;
 		if ( _critical )
-			instanceInfo.critical		= _critical;
+			ii.critical		= _critical;
 //		if ( _grainSize ) // this is only used to override biomes data. So only from a generate script
-//			instanceInfo.grainSize		= _grainSize;
+//			ii.grainSize		= _grainSize;
 //		if ( "" != _state )
-//			instanceInfo.state			= _state;
+//			ii.state			= _state;
 // This is saving the animation transforms into the instanceInfotransforms			
-// do I add transforms in the instanceInfo? RSF - 4.27.15
+// do I add transforms in the ii? RSF - 4.27.15
 //		if ( _transforms && 0 < _transforms.length )
 //			obj.model.transforms		= _transforms;
 //		instanceScriptOnly( obj.model );  //
 		
-		return instanceInfo;
+		return ii;
 		
 		function instanceScriptOnly( obj:Object ):void {
 			if ( _scripts.length ) {
@@ -248,7 +241,8 @@ public class InstanceInfo extends Location	{
 		return modelGuid;	
 	}
 	
-	public function fromObject( $info:Object ):void {
+	override public function fromObject( $info:Object ):void {
+		super.fromObject( $info );
 		Log.out( "InstanceInfo.fromObject - data: " + JSON.stringify( $info ) );
 		// Save off a copy of this in case we need multiple instances
 		if ( $info.model )
@@ -285,9 +279,6 @@ public class InstanceInfo extends Location	{
 		if ( _info.baseLightLevel )
 			baseLightLevel = _info.baseLightLevel;
 					
-		setPositionalInfo( _info );
-		setScaleInfo( _info );
-		setCenterInfo( _info );
 		setTypeInfo( _info );
 		setTransformInfo( _info );
 		// moved to shader

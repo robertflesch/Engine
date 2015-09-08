@@ -21,10 +21,10 @@ import com.voxelengine.worldmodel.models.ModelTransform;
 public class AnimationTransform
 {
 	static public var DEFAULT_OBJECT:Object = { 
-		attachmentName:"Choose parent model or child model",
+		attachmentName:"This should be the name of the parent or child",
 		//notNamed
 		location: { x:0, y:0, z:0 },
-		scale: { x:0, y:0, z:0 },
+		scale: { x:1, y:1, z:1 },
 		rotation: { x:0, y:0, z:0 }
 	}
 	
@@ -40,9 +40,19 @@ public class AnimationTransform
 	private var _notNamed:Boolean = false;
 
 	// for compatability with PanelVectorContainer
-	public function get name():String { return _attachmentName; }
-	public function get attachmentName():String { return _attachmentName; }
-	public function set attachmentName( $val:String ):void { _attachmentName = $val; }
+	public function get name():String 							{ return _attachmentName; }
+	public function get attachmentName():String 				{ return _attachmentName; }
+	public function set attachmentName( $val:String ):void 		{ _attachmentName = $val; }
+	public function get position():Vector3D 					{ return _position; }
+	public function get rotation():Vector3D 					{ return _rotation; }
+	public function get scale():Vector3D 						{ return _scale; }
+	public function get transforms():Vector.<ModelTransform> 	{ return _transforms; }
+	public function get hasPosition():Boolean  					{ return _hasPosition; }
+	public function get hasRotation():Boolean					{ return _hasRotation; }
+	public function get hasScale():Boolean 						{ return _hasScale; }
+	public function get hasTransform():Boolean  				{ return _hasTransform; }
+	public function get notNamed():Boolean 						{ return _notNamed; }
+	
 	
 	public function AnimationTransform( $obj:Object ) 
 	{ 
@@ -58,8 +68,10 @@ public class AnimationTransform
 		
 		// Transforms which are not named will stick around even after animation is played
 		// So they should only be used on timed animations.
+		// Need more details on how this is used
 		if ( $obj.notNamed ) {
 			_notNamed = $obj.notNamed;
+			Log.out( "AnimationTransformation - How is notNamed used?", Log.ERROR );
 		}
 		
 		if ( $obj.scale ) {
@@ -112,23 +124,21 @@ public class AnimationTransform
 		if ( hasScale )
 			obj.scale		= _scale;
 		if ( hasTransform )
-			getTransformsJSON( obj );
+			getTransformsObj( obj );
 			
-		function getTransformsJSON( obj:Object ):void {
-		
-		var ot:Vector.<Object> = new Vector.<Object>();
-		for each ( var mt:ModelTransform in _transforms ) {
-			var mto:Object = new Object();
-			mt.buildExportObject( mto );
-			ot.push( mto );
-		}
-		if ( ot.length )
-			obj.transforms = ot;
+		function getTransformsObj( obj:Object ):void {
+			var ot:Vector.<Object> = new Vector.<Object>();
+			for each ( var mt:ModelTransform in _transforms ) {
+				var mto:Object = new Object();
+				mt.buildExportObject( mto );
+				ot.push( mto );
+			}
+			if ( ot.length )
+				obj.transforms = ot;
 		}
 	}
 	
-	public function clone( $val:Number = 1 ):AnimationTransform
-	{
+	public function clone( $val:Number = 1 ):AnimationTransform	{
 		new Error( "AnimationTransform.clone - NOT VALIDATED" );
 		var obj:Object = new Object();
 		obj.attachmentName = _attachmentName;
@@ -141,55 +151,9 @@ public class AnimationTransform
 		return at;
 	}
 
-	public function addTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" ):void 
-	{
+	public function addTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" ):void {
 		_transforms.push( new ModelTransform( $x, $y, $z, $time, $type, $name ) );
 		//Log.out( "InstanceInfo.addTransform " + mt.toString() );
-	}
-	
-	public function get position():Vector3D 
-	{
-		return _position;
-	}
-	
-	public function get rotation():Vector3D 
-	{
-		return _rotation;
-	}
-	
-	public function get scale():Vector3D 
-	{
-		return _scale;
-	}
-	
-	public function get transforms():Vector.<ModelTransform>
-	{
-		return _transforms;
-	}
-	
-	public function get hasPosition():Boolean 
-	{
-		return _hasPosition;
-	}
-	
-	public function get hasRotation():Boolean 
-	{
-		return _hasRotation;
-	}
-	
-	public function get hasScale():Boolean 
-	{
-		return _hasScale;
-	}
-	
-	public function get hasTransform():Boolean 
-	{
-		return _hasTransform;
-	}
-	
-	public function get notNamed():Boolean 
-	{
-		return _notNamed;
 	}
 	
 	public function toString():String

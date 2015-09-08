@@ -108,25 +108,31 @@ public class WindowAnimationDetail extends VVPopup
 	}
 	
 	private function addAnimationsPanel():void {
-		addElement( new PanelVectorContainer( "Child models with animations"
-											, _ani
-		                                    , _ani.transforms as Vector.<*>
-											, PanelAnimationTransform
-											, "Add a new animation"
-											, WIDTH ) );
+		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
+		ebco.title = "transforms"
+		ebco.width = WIDTH
+		ebco.rootObject = _ani
+		ebco.items = _ani.transforms as Vector.<*>
+		ebco.itemDisplayObject = PanelAnimationTransform
+		ebco.itemBox.showNew = false
+		ebco.itemBox.title = "animatable elements"
+		addElement( new PanelVectorContainer( ebco ) )
 	}
 	
 	private function addSoundPanel():void {
 		addElement( new PanelAnimationSound( _ani, WIDTH ) );
 	}
-	
+/*	
 	private function addAttachmentPanel():void {
+		const showNewItem:Boolean = true;
 		addElement( new PanelVectorContainer( "Attachments to be used"
 											, _ani
 		                                    , _ani.attachments as Vector.<*>
 											, PanelAnimationAttachment
 											, "Add a new attachment"
-											, WIDTH ) );
+											, WIDTH
+											, showNewItem ) );
 	}
+	*/
 }
 }

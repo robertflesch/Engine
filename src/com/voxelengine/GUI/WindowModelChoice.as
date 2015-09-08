@@ -37,9 +37,9 @@ package com.voxelengine.GUI
 	public class WindowModelChoice extends VVPopup
 	{
 		private var _rbGroup:RadioButtonGroup = null;
-		private var _cbSize:ComboBox  = new ComboBox();;
-		private var _cbDetail:ComboBox  = new ComboBox();
-		private var _cbType:ComboBox  = new ComboBox();;
+		private var _cbSize:ComboBox  = new ComboBox()
+		private var _cbDetail:ComboBox  = new ComboBox()
+		private var _cbType:ComboBox  = new ComboBox()
 		
 		public function WindowModelChoice()
 		{
@@ -79,7 +79,6 @@ package com.voxelengine.GUI
 			panel.addElement(sizeContainer);
 			
 			panel.addElement( new Label( "Made of Type" ) );
-			_cbType = new ComboBox();
 			var item:TypeInfo;
 			for ( var i:int = TypeInfo.MIN_TYPE_INFO; i < TypeInfo.MAX_TYPE_INFO; i++ )
 			{

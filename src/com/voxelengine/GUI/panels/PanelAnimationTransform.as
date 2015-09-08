@@ -23,8 +23,6 @@ public class PanelAnimationTransform extends ExpandableBox
 	private var _ani:Animation;
 	private var _aniXform:AnimationTransform;
 	
-	static private const ITEM_HEIGHT:int = 37;
-	static private const TITLE:String = "";
 	static private const NEW_ITEM_TEXT:String = "Animation Transform";
 	public function PanelAnimationTransform( $ani:Animation, $aniXform:AnimationTransform, $widthParam = 250 ) {
 		_ani = $ani;
@@ -32,13 +30,18 @@ public class PanelAnimationTransform extends ExpandableBox
 			$aniXform = new AnimationTransform( AnimationTransform.DEFAULT_OBJECT );
 		_aniXform = $aniXform;
 		
-		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
-		ebco.showNew = true;
-		ebco.paddingTop = 2;
-		ebco.width = $widthParam;
+		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
+		ebco.itemBox.showNew = false
+		ebco.itemBox.showDelete = false
+		ebco.itemBox.showReset = true
+		ebco.itemBox.paddingTop = 2
+		ebco.width = $widthParam
+		ebco.itemBox.height = 25
 		//ebco.backgroundColor = 0x0000ff;
-		ebco.showNew = false;
 		super( ebco );
+		//autoSize = false;
+		//width = $widthParam;
+		//height = 25
 	}
 	
 	override public function deleteElementCheck( $me:UIMouseEvent ):void {
@@ -46,8 +49,12 @@ public class PanelAnimationTransform extends ExpandableBox
 	}
 	
 	override public function collapasedInfo():String  {
-		if ( _aniXform )
-			return _aniXform.name;
+		if ( _aniXform ) {
+			if ( hasElements() ) 
+				return _aniXform.name;
+			else
+				return _aniXform.name + " (empty)";
+		}
 		
 		return "New Animation Transform";
 	}
@@ -56,37 +63,36 @@ public class PanelAnimationTransform extends ExpandableBox
 		(new Alert( "PanelAnimationTransform.newItemHandler", 350 )).display();
 	}
 	
+	override protected function hasElements():Boolean {
+		if ( _aniXform.hasPosition || _aniXform.hasRotation || _aniXform.hasScale || _aniXform.hasTransform ) 
+			return true
+		 
+		return false
+	}
+	
 	override protected function expand():void {
 		super.expand();
 		
-		var cli:ComponentLabelInput = new ComponentLabelInput( "Name"
-										  , function ($e:TextEvent):void { _aniXform.attachmentName = $e.target.text; setChanged(); }
-										  , _aniXform.attachmentName ? _aniXform.attachmentName : "Missing Attachment Name"
-										  , _itemBox.width )
-											
-		_itemBox.addElement( cli );
-		var cv3:ComponentVector3DSideLabel
-		if ( _aniXform.hasPosition ) {
-			cv3 = new ComponentVector3DSideLabel( setChanged, "location", "X: ", "Y: ", "Z: ",  _aniXform.position, updateVal );
-			_itemBox.addElement( cv3 );
-		}
-		if ( _aniXform.hasRotation ) {
-			cv3 = new ComponentVector3DSideLabel( setChanged, "rotation", "X: ", "Y: ", "Z: ",  _aniXform.rotation, updateVal );
-			_itemBox.addElement( cv3 );
-		}
-		if ( _aniXform.hasScale ) {
-			cv3 = new ComponentVector3DSideLabel( setChanged, "scale", "X: ", "Y: ", "Z: ",  _aniXform.scale, updateVal );
-			_itemBox.addElement( cv3 );
-		}
+		_itemBox.addElement( new ComponentLabelInput( "Name"
+													, function ($e:TextEvent):void { _aniXform.attachmentName = $e.target.text; setChanged(); }
+													, _aniXform.attachmentName ? _aniXform.attachmentName : "Missing Attachment Name"
+													, _itemBox.width ) );
+													
+		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "location", "X: ", "Y: ", "Z: ",  _aniXform.position, _itemBox.width, updateVal ) );
+		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "rotation", "X: ", "Y: ", "Z: ",  _aniXform.rotation, _itemBox.width, updateVal ) );
+		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "scale", "X: ", "Y: ", "Z: ",  _aniXform.scale, _itemBox.width, updateVal ) );
 		
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 6 ) )
 
-		_itemBox.addElement( new PanelVectorContainer( "transforms"
-											, _ani
-		                                    , _aniXform.transforms as Vector.<*>
-											, PanelModelTransform
-											, "New Transform Child"
-											, _itemBox.width ) );
+		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
+		ebco.rootObject = _ani
+		ebco.items = _aniXform.transforms as Vector.<*>
+		ebco.itemDisplayObject = PanelModelTransform
+		ebco.itemBox.showNew = true
+		ebco.title = "transforms"
+		ebco.width = _itemBox.width
+		ebco.itemBox.newItemText = "New Transform"
+		_itemBox.addElement( new PanelVectorContainer( ebco ) )
 	}
 	
 	private function updateVal( $e:SpinButtonEvent ):int {

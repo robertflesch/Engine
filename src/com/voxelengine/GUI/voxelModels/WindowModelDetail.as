@@ -89,10 +89,10 @@ package com.voxelengine.GUI.voxelModels
 											 , _vm.metadata.description ? _vm.metadata.description : "No Description"
 											 , WIDTH ) );
 
-			addElement( new ComponentVector3DSideLabel( setChanged, "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, updateVal ) );
-			addElement( new ComponentVector3DSideLabel( setChanged, "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, updateVal ) );
-			addElement( new ComponentVector3DSideLabel( setChanged, "Center", "X: ", "Y: ", "Z: ",  ii.center, updateVal ) );
-			addElement( new ComponentVector3DSideLabel( setChanged, "Scale", "X: ", "Y: ", "Z: ",  ii.scale, updateScaleVal, 5 ) );
+			addElement( new ComponentLocation( setChanged, ii.setPositionInfo, "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, updateVal ) );
+			addElement( new ComponentLocation( setChanged, ii.setRotationInfo, "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, updateVal ) );
+			addElement( new ComponentLocation( setChanged, ii.setScaleInfo, "Scale", "X: ", "Y: ", "Z: ",  ii.scale, updateScaleVal, 5 ) );
+			addElement( new ComponentVector3DSideLabel( setChanged, "Center", "X: ", "Y: ", "Z: ",  ii.center, WIDTH, updateVal ) );
 			addElement( new ComponentSpacer( WIDTH ) );
 			
 			// TODO need to be able to handle an array of scipts.
@@ -139,7 +139,9 @@ package com.voxelengine.GUI.voxelModels
 		}	
 		private function addPhoto():void {
 			_photoContainer.removeElements();
-			var bmd:BitmapData = drawScaled( _vm.metadata.thumbnail, PHOTO_WIDTH, PHOTO_WIDTH );
+			var bmd:BitmapData = null;
+			if ( _vm.metadata.thumbnail )
+				bmd = drawScaled( _vm.metadata.thumbnail, PHOTO_WIDTH, PHOTO_WIDTH );
 			var pic:Image = new Image( new Bitmap( bmd ), PHOTO_WIDTH, PHOTO_WIDTH );
 			_photoContainer.addElement( pic );
 			

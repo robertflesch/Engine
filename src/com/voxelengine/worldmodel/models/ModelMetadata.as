@@ -121,7 +121,8 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	//////////////////////////////////////////////////////////////////
 	// Persistance
 	//////////////////////////////////////////////////////////////////
-	private function toObject():void {
+	override protected function toObject():void {
+		Log.out( "ModelMetadata.toObject", Log.WARN );
 		if ( thumbnail )
 			info.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
 		else

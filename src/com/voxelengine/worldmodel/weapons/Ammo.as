@@ -135,7 +135,8 @@ public class Ammo extends PersistanceObject
 		loadFromInfo();
 	}
 	
-	public function toObject():void {
+	override protected function toObject():void {
+		Log.out( "Ammo.toObject", Log.WARN );
 		// No special handling needed
 	}
 

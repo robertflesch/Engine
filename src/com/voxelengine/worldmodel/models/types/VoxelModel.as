@@ -868,7 +868,6 @@ public class VoxelModel
 		}
 		
 		var result:Boolean = false;
-		const useInitializer:Boolean = true;
 		var anim:Animation = modelInfo.animationGet( $state );
 		if ( anim ) {
 			//if (!anim.loaded)
@@ -883,7 +882,7 @@ public class VoxelModel
 			for each (var at:AnimationTransform in anim.transforms)
 			{
 				//Log.out( "VoxelModel.stateSet - have AnimationTransform looking for child : " + at.attachmentName );
-				if (addAnimationsInChildren(modelInfo.childVoxelModels, at, useInitializer, $lockTime))
+				if (addAnimationsInChildren(modelInfo.childVoxelModels, at, $lockTime))
 					result = true;
 			}
 		}
@@ -898,7 +897,7 @@ public class VoxelModel
 //				Log.out("VoxelModel.stateSet - addAnimationsInChildren returned false for: " + $state);
 		
 		// if any of the children load, then it succeeds, which is slightly problematic
-		function addAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $useInitializer:Boolean, $lockTime:Number):Boolean
+		function addAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $lockTime:Number):Boolean
 		{
 			//Log.out( "VoxelModel.checkChildren - have AnimationTransform looking for child : " + $at.attachmentName );
 			var result:Boolean = false;
@@ -907,13 +906,13 @@ public class VoxelModel
 				//Log.out( "VoxelModel.addAnimationsInChildren - is child.metadata.name: " + child.metadata.name + " equal to $at.attachmentName: " + $at.attachmentName );
 				if (cm.metadata.name == $at.attachmentName)
 				{
-					cm.stateSetData($at, $useInitializer, $lockTime);
+					cm.stateSetData($at, $lockTime);
 					result = true;
 				}
 				else if (0 < cm.modelInfo.childVoxelModels.length)
 				{
 					//Log.out( "VoxelModel.stateSet - addAnimationsInChildren - looking in children of child for: " + $at.attachmentName );
-					if (addAnimationsInChildren(cm.modelInfo.childVoxelModels, $at, $useInitializer, $lockTime))
+					if (addAnimationsInChildren(cm.modelInfo.childVoxelModels, $at, $lockTime))
 						result = true;
 				}
 			}
@@ -921,19 +920,26 @@ public class VoxelModel
 		}
 	}
 	
-	private function stateSetData($at:AnimationTransform, $useInitializer:Boolean, $lockTime:Number):void
+	private function stateSetData($at:AnimationTransform, $lockTime:Number):void
 	{
 		instanceInfo.removeAllNamedTransforms();
 		//Log.out( "VoxelModel.stateSet - attachment found: " + modelInfo.fileName + " initializer: " + $useInitializer + "  setting data " + $at );
-		if ($useInitializer)
-		{
-			if ($at.hasPosition)
-				instanceInfo.positionSet = $at.position;
-			if ($at.hasRotation)
-				instanceInfo.rotationSet = $at.rotation;
-			if ($at.hasScale)
-				instanceInfo.scale = $at.scale;
-		}
+		if ($at.hasPosition)
+			instanceInfo.positionSet = $at.position;
+		else
+			instanceInfo.positionReset();
+			
+		if ($at.hasRotation)
+			instanceInfo.rotationSet = $at.rotation;
+		else
+			instanceInfo.rotationReset();
+			
+		if ($at.hasScale)
+			instanceInfo.scale = $at.scale;
+		else
+			instanceInfo.scaleReset();
+			
+	
 		
 		if ($at.hasTransform)
 		{

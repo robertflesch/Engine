@@ -125,6 +125,7 @@ public class OxelPersistance extends PersistanceObject
 	}
 	
 	override protected function toObject():void {
+		Log.out( "OxelPersistance.toObject", Log.WARN );
 		dbo.data.ba			= toByteArray( oxel );
 	}
 				

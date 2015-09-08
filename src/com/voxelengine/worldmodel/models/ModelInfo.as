@@ -348,58 +348,45 @@ public class ModelInfo extends PersistanceObject
 	public		function get childVoxelModels():Vector.<VoxelModel>			{ return _childVoxelModels; }
 	public		function 	 childVoxelModelsGet():Vector.<VoxelModel>		{ return _childVoxelModels; } // This is so the function can be passed as parameter
 
-	//private var _childrenInstanceInfo:Vector.<InstanceInfo> 		= new Vector.<InstanceInfo>;// Child models and their relative positions
-	//public function get childrenInstanceInfo():Vector.<InstanceInfo> { return _childrenInstanceInfo; }
-	
 	protected 	var			_childrenLoaded:Boolean					= true;
 	public 		function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
 	public 		function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
 	
 	/////////////////////
-	/*
-	private function childrenFromObject():void {
-		Log.out( "ModelInfo.childrenFromObject", Log.DEBUG );
+	public function childrenLoad( $vm:VoxelModel ):void {
+		childrenLoaded	= true
+		if ( !info.model.children )
+			return
+		
+		Log.out( "ModelInfo.childrenLoad - loading for model: " + guid );
 		for each ( var v:Object in info.model.children ) {
+			// Only want to add the listener once
+			if ( true == childrenLoaded ) {
+				childrenLoaded	= false;
+				ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
+			}
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.fromObject( v );
-			// This adds the instanceInfo for the child models to our child list which is processed when object is initialized
-//			childrenInstanceInfoAdd( ii );
+			ii.controllingModel = $vm;
+			ii.baseLightLevel = $vm.instanceInfo.baseLightLevel;
+			
+			//Log.out( "VoxelModel.childrenLoad - create child of parent.instance: " + instanceInfo.guid + "  - child.instanceGuid: " + child.instanceGuid );					
+			if ( null == ii.modelGuid )
+				continue;
+			// now load the child, this might load from the persistance
+			// or it could be an import, or it could be a model for the toolbar.
+			// we never want to prompt for imported children, since this only happens in dev mode.
+			// to test if we are in the bar mode, we test of instanceGuid.
+			// Since this is a child object, it automatically get added to the parent.
+			// So add to cache just adds it to parent instance.
+			//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
+			//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + childInstanceInfo );
+			ModelMakerBase.load( ii, true, false );
 		}
-	}
-	*/
-	
-	public function childrenLoad( $vm:VoxelModel ):void {
-		if ( info.model.children && 0 < info.model.children.length)
-		{
-			Log.out( "ModelInfo.childrenLoad - loading for model: " + guid + " len: " + info.model.children.length );
-			childrenLoaded	= false;
-			ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
-			for each ( var v:Object in info.model.children ) {
-				var ii:InstanceInfo = new InstanceInfo();
-				ii.fromObject( v );
-				ii.controllingModel = $vm;
-				ii.baseLightLevel = $vm.instanceInfo.baseLightLevel;
-				
-				//Log.out( "VoxelModel.childrenLoad - create child of parent.instance: " + instanceInfo.guid + "  - child.instanceGuid: " + child.instanceGuid );					
-				if ( null == ii.modelGuid )
-					continue;
-				// now load the child, this might load from the persistance
-				// or it could be an import, or it could be a model for the toolbar.
-				// we never want to prompt for imported children, since this only happens in dev mode.
-				// to test if we are in the bar mode, we test of instanceGuid.
-				// Since this is a child object, it automatically get added to the parent.
-				// So add to cache just adds it to parent instance.
-				//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
-				//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + childInstanceInfo );
-				ModelMakerBase.load( ii, true, false );
-			}
-			Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
-			//Log.out( "VoxelModel.childrenLoad - loading child models END" );
-			if ( ModelMakerImport.isImporting )
-				delete info.model.children
-		}
-		else
-			childrenLoaded	= true;
+		Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
+		//Log.out( "VoxelModel.childrenLoad - loading child models END" );
+		if ( ModelMakerImport.isImporting )
+			delete info.model.children
 		
 		function childLoadingComplete(e:ModelLoadingEvent):void {
 	//		Log.out( "VoxelModel.childLoadingComplete - e: " + e, Log.WARN );
@@ -433,8 +420,7 @@ public class ModelInfo extends PersistanceObject
 		//Globals.g_app.dispatchEvent( me );
 	}
 
-	public function childAdd( $child:VoxelModel):void
-	{
+	public function childAdd( $child:VoxelModel):void {
 		if ( null ==  $child.instanceInfo.instanceGuid )
 			 $child.instanceInfo.instanceGuid = Globals.getUID();
 		//Log.out(  "-------------- VoxelModel.childAdd -  $child: " +  $child.toString() );
@@ -470,25 +456,8 @@ public class ModelInfo extends PersistanceObject
 		}
 	}
 	
-	public function childRemoveByInstanceInfo( $instanceInfo:InstanceInfo ):void {
-		var index:int = 0;
-		for each (var child:VoxelModel in childVoxelModels) {
-			if (child.instanceInfo.instanceGuid ==  $instanceInfo.instanceGuid ) {
-				childVoxelModels.splice(index, 1);
-				changed = true;
-				break;
-			}
-			index++;
-		}
-		
-		// Need a message here?
-		//var me:ModelEvent = new ModelEvent( ModelEvent.REMOVE, vm.instanceInfo.guid, instanceInfo.guid );
-		//Globals.g_app.dispatchEvent( me );
-	}
-	
 	// This leaves the model, but detaches it from parent.
-	public function childDetach( $vm:VoxelModel, $vmParent:VoxelModel ):void
-	{
+	public function childDetach( $vm:VoxelModel, $vmParent:VoxelModel ):void	{
 		// removethis child from the parents info
 		childRemove($vm.instanceInfo);
 		
@@ -517,8 +486,7 @@ public class ModelInfo extends PersistanceObject
 		changed = true;				
 	}
 	
-	public function childModelFind(guid:String):VoxelModel
-	{
+	public function childModelFind(guid:String):VoxelModel	{
 		for each (var child:VoxelModel in childVoxelModels) {
 			if (child.instanceInfo.instanceGuid == guid)
 				return child;
@@ -534,8 +502,7 @@ public class ModelInfo extends PersistanceObject
 		return null
 	}
 	
-	public function childFindByName($name:String):VoxelModel
-	{
+	public function childFindByName($name:String):VoxelModel {
 		for each (var child:VoxelModel in childVoxelModels) {
 			if (child.metadata.name == $name)
 				return child;
@@ -549,9 +516,17 @@ public class ModelInfo extends PersistanceObject
 			if ( childVoxelModels[j].instanceInfo ==  $ii )
 				childVoxelModels.splice( j, 1 );
 		}
-		for ( var i:int; i < info.model.children.length; i++ )
-			if ( info.model.children[i].instanceGuid == $ii.instanceGuid );
-				delete info.model.children[i];
+		var	newChildren:Object = new Object();
+		var i:int;
+		for each ( var obj:Object in  info.model.children ) {
+			if ( obj.instanceGuid != $ii.instanceGuid ) {
+				newChildren[i] = obj;
+				i++
+			}
+		}
+		delete info.model.children
+		info.model.children = newChildren;
+		changed = true;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -629,7 +604,8 @@ public class ModelInfo extends PersistanceObject
 	
 	}
 
-		public function toObject():void {
+	override protected function toObject():void {
+		Log.out( "ModelInfo.toObject", Log.WARN );
 		// I am faking a heirarchy here, not good object oriented behavior but needs major redesign to do what I want.
 		// so instead I just get the current setting from the class
 		var modelClassPrototype:Class = ModelLibrary.getAsset( info.model.modelClass );
@@ -644,25 +620,26 @@ public class ModelInfo extends PersistanceObject
 		if ( null != associatedGrain )
 			info.model.associatedGrain = associatedGrain;
 		
-		//var childrenAdded:int = childrenGet();
+		// this updates the original positions, to the current positions...
+		// how do I get original location and position, on animated objects?
+		if ( childrenLoaded )
+			childrenGet();
+			
 		//animationsGet();
-		/*
-		function childrenGet():int {
+		
+		function childrenGet():void {
 			// Same code that is in modelCache to build models in region
 			// this is just models in models
-			if ( _childrenInstanceInfo.length ) {
-				var children:Object = new Object();
-				for ( var i:int; i < _childrenInstanceInfo.length; i++ ) {
-					if ( null != _childrenInstanceInfo[i] ) {
-						children["instanceInfo" + i]  = _childrenInstanceInfo[i].toObject();
-				}	}
-
-				info.model.children = children;
-				return i;
-			}
-			return 0;
+			delete info.model.children;
+			var children:Object = new Object();
+			for ( var i:int; i < _childVoxelModels.length; i++ ) {
+				if ( null != _childVoxelModels[i] ) {
+					//children["instanceInfo" + i]  = _childrenInstanceInfo[i].toObject();
+					children[i]  = _childVoxelModels[i].instanceInfo.toObject();
+			}	}
+			info.model.children = children;
 		}
-		*/
+		
 		/*
 		function animationsGet():void {
 			var len:int = _animations.length;

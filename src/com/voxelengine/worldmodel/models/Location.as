@@ -19,10 +19,13 @@ package com.voxelengine.worldmodel.models
 		private var _changed:Boolean 							= false;					// INSTANCE NOT EXPORTED
 					
 		private var _position:Vector3D 							= new Vector3D();			// toJSON
+		private var _positionOrig:Vector3D 						= new Vector3D();			// toJSON
 		private var _rotation:Vector3D 							= new Vector3D();			// toJSON
+		private var _rotationOrig:Vector3D 							= new Vector3D();			// toJSON
 		private var _rotations:Vector.<Vector3D> 				= new Vector.<Vector3D>(3); // INSTANCE NOT EXPORTED
 		private var _positions:Vector.<Vector3D> 				= new Vector.<Vector3D>(3); // INSTANCE NOT EXPORTED
 		private var _scale:Vector3D 							= new Vector3D(1, 1, 1);	// toJSON
+		private var _scaleOrig:Vector3D 							= new Vector3D(1, 1, 1);	// toJSON
 		private var _center:Vector3D 							= new Vector3D();			// INSTANCE NOT EXPORTED
 		private var _centerNotScaled:Vector3D 					= new Vector3D();			// INSTANCE NOT EXPORTED
 		private var _velocity:Vector3D 							= new Vector3D();			// INSTANCE NOT EXPORTED
@@ -62,6 +65,7 @@ package com.voxelengine.worldmodel.models
 			_center.setTo( _centerNotScaled.x * $val.x, _centerNotScaled.y * $val.y, _centerNotScaled.z * $val.z );
 			//Log.out( "set scale - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
 		}
+		public function scaleReset():void 	{ scaleSetComp( _scaleOrig.x, _scaleOrig.y, _scaleOrig.z ); }
 				
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Rotation
@@ -81,6 +85,7 @@ package com.voxelengine.worldmodel.models
 			
 			_rotation.setTo( $x % 360, $y % 360, $z % 360 ); 
 		}
+		public function rotationReset():void 	{ rotationSetComp( _rotationOrig.x, _rotationOrig.y, _rotationOrig.z ); }
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Position
@@ -98,6 +103,7 @@ package com.voxelengine.worldmodel.models
 			
 			_position.setTo( $x, $y, $z ); 
 		}
+		public function positionReset():void 	{ positionSetComp( _positionOrig.x, _positionOrig.y, _positionOrig.z ); }
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Velocity
@@ -258,48 +264,61 @@ package com.voxelengine.worldmodel.models
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// JSON initialization from JSON
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		public function setScaleInfo( json:Object ):void {
-			if ( json.scale )
-			{
-				var scl:Vector3D = new Vector3D();
-				if ( json.scale.x )
-				{
-					scl.x = json.scale.x;
-					if ( 0 == _scale.x )
-						scl.x = 1;
-				}
-				if ( json.scale.y )
-				{
-					scl.y = json.scale.y;
-					if ( 0 == scl.y )
-						scl.y = 1;
-				}
-				if ( json.scale.z )
-				{
-					scl.z = json.scale.z;
-					if ( 0 == scl.z )
-						scl.z = 1;
-				}
-				
-				scale = scl;
-			}
+		public function setScaleInfo( $obj:Object ):void {
+				if ( $obj.x && $obj.x > 0.001 )
+					scale.x = $obj.x
+				if ( $obj.y && $obj.y > 0.001 )
+					scale.y = $obj.y
+				if ( $obj.z && $obj.z > 0.001 )
+					scale.z = $obj.z
+			_scaleOrig.setTo( scale.x, scale.y, scale.z )
 		}
 		
-		public function setCenterInfo( json:Object ):void {
-			if ( json.center ) {
-				//Log.out( "setCenterInfo center x: " + json.center.x + "  y: " + json.center.y  + "  z: " +  json.center.z, Log.WARN );
-
-				centerSetComp( json.center.x, json.center.y, json.center.z );
-			}
-
+		public function setCenterInfo( $obj:Object ):void {
+			centerSetComp( $obj.x, $obj.y, $obj.z );
 		}
 		
-		public function setPositionalInfo( json:Object ):void {
-			if ( json.location )
-				positionSetComp( json.location.x, json.location.y, json.location.z );
+		public function setPositionInfo( $obj:Object ):void {
+			positionSetComp( $obj.x, $obj.y, $obj.z );
+			_positionOrig.setTo( _position.x, _position.y, _position.z );
+		}
+		
+		public function setRotationInfo( $obj:Object ):void {
+			rotationSetComp( $obj.x, $obj.y, $obj.z );
+			_rotationOrig.setTo( _rotation.x, _rotation.y, _rotation.z );
+		}
+		
+		public function fromObject( $obj:Object ):void {
+			if ( $obj.location )
+				setPositionInfo( $obj.location );
+			if ( $obj.rotation )	
+				setRotationInfo( $obj.rotation );
+			if ( $obj.scale )
+				setScaleInfo( $obj.scale );
+			if ( $obj.center ) 
+				setCenterInfo( $obj.center );
+		}
+		
+		public function toObject():Object {
+			var obj:Object = new Object();
+		
+			obj.location 			= vector3DToObject( _positionOrig );
+			if ( 0 < _rotationOrig.length )
+				obj.rotation 		= vector3DToObject( _rotationOrig );
+			if ( 0 < centerNotScaled.length )
+				obj.center 		= vector3DIntToObject( centerNotScaled );
+			if ( 3 != _scaleOrig.lengthSquared )
+				obj.scale 			= vector3DToObject( _scaleOrig );
 			
-			if ( json.rotation )
-				rotationSetComp( json.rotation.x, json.rotation.y, json.rotation.z );
+			return obj
+		}
+		
+		private function vector3DToObject( $vec:Vector3D ):Object {
+			return { x:$vec.x, y:$vec.y, z:$vec.z };
+		}
+		
+		private function vector3DIntToObject( $vec:Vector3D ):Object {
+			return { x:int($vec.x), y:int($vec.y), z:int($vec.z) };
 		}
 	}
 }
