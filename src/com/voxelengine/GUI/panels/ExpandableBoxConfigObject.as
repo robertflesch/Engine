@@ -12,9 +12,9 @@ import org.flashapi.swing.Box;
 
 public class ExpandableBoxConfigObject extends Object
 {
-	public var rootObject:*
-	public var items:Vector.<*>
-	public var item:Box
+	public var rootObject:*		// The root of the object, needed to be marked as changed
+	public var items:Vector.<*> // The branch of the tree
+	public var item:*			// The leaf being operated on.
 	public var itemDisplayObject:Class
 	public var title:String
 	public var width:int = 200	

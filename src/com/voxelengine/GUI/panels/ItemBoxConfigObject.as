@@ -20,7 +20,7 @@ public class ItemBoxConfigObject extends Object
 	public var paddingTop:int = 6;
 	
 	public var title:String = "";
-	public var showNew:Boolean = true;
+	public var showNew:Boolean = false;
 	public var showDelete:Boolean = false;
 	public var showReset:Boolean = false;
 	public var newItemText:String = "New Item";

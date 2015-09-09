@@ -29,8 +29,11 @@ public class PanelVectorContainer extends ExpandableBox {
 		_itemBox.height = 0;
 		for ( var i:int; i < _ebco.items.length; i++ ) {
 			var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
-
-			var item:* = new _ebco.itemDisplayObject( _ebco.rootObject, _ebco.items[i], _itemBox.width );
+			ebco.item = _ebco.items[i]
+			ebco.width = _itemBox.width
+			ebco.title = ""
+			var item:* = new _ebco.itemDisplayObject( ebco );
+			//var item:* = new _ebco.itemDisplayObject( _ebco.rootObject, _ebco.items[i], _itemBox.width );
 			_itemBox.addElement( item );
 		}
 	}

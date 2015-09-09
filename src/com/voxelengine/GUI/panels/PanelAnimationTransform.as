@@ -20,28 +20,14 @@ import com.voxelengine.worldmodel.animation.AnimationTransform;
 
 public class PanelAnimationTransform extends ExpandableBox
 {
-	private var _ani:Animation;
-	private var _aniXform:AnimationTransform;
-	
 	static private const NEW_ITEM_TEXT:String = "Animation Transform";
-	public function PanelAnimationTransform( $ani:Animation, $aniXform:AnimationTransform, $widthParam = 250 ) {
-		_ani = $ani;
-		if ( null == $aniXform )
-			$aniXform = new AnimationTransform( AnimationTransform.DEFAULT_OBJECT );
-		_aniXform = $aniXform;
+	public function PanelAnimationTransform( $ebco:ExpandableBoxConfigObject ) {
+		if ( null == $ebco.item )
+			$ebco.item = new AnimationTransform( AnimationTransform.DEFAULT_OBJECT );
 		
-		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
-		ebco.itemBox.showNew = false
-		ebco.itemBox.showDelete = false
-		ebco.itemBox.showReset = true
-		ebco.itemBox.paddingTop = 2
-		ebco.width = $widthParam
-		ebco.itemBox.height = 25
-		//ebco.backgroundColor = 0x0000ff;
-		super( ebco );
-		//autoSize = false;
-		//width = $widthParam;
-		//height = 25
+		$ebco.itemBox.showReset = true
+		$ebco.itemBox.paddingTop = 2
+		super( $ebco );
 	}
 	
 	override public function deleteElementCheck( $me:UIMouseEvent ):void {
@@ -49,11 +35,11 @@ public class PanelAnimationTransform extends ExpandableBox
 	}
 	
 	override public function collapasedInfo():String  {
-		if ( _aniXform ) {
+		if ( _ebco.item ) {
 			if ( hasElements() ) 
-				return _aniXform.name;
+				return _ebco.item.name;
 			else
-				return _aniXform.name + " (empty)";
+				return _ebco.item.name + " (empty)";
 		}
 		
 		return "New Animation Transform";
@@ -64,7 +50,7 @@ public class PanelAnimationTransform extends ExpandableBox
 	}
 	
 	override protected function hasElements():Boolean {
-		if ( _aniXform.hasPosition || _aniXform.hasRotation || _aniXform.hasScale || _aniXform.hasTransform ) 
+		if ( _ebco.item.hasPosition || _ebco.item.hasRotation || _ebco.item.hasScale || _ebco.item.hasTransform ) 
 			return true
 		 
 		return false
@@ -74,19 +60,18 @@ public class PanelAnimationTransform extends ExpandableBox
 		super.expand();
 		
 		_itemBox.addElement( new ComponentLabelInput( "Name"
-													, function ($e:TextEvent):void { _aniXform.attachmentName = $e.target.text; setChanged(); }
-													, _aniXform.attachmentName ? _aniXform.attachmentName : "Missing Attachment Name"
+													, function ($e:TextEvent):void { _ebco.item.attachmentName = $e.target.text; setChanged(); }
+													, _ebco.item.attachmentName ? _ebco.item.attachmentName : "Missing Attachment Name"
 													, _itemBox.width ) );
 													
-		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "location", "X: ", "Y: ", "Z: ",  _aniXform.position, _itemBox.width, updateVal ) );
-		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "rotation", "X: ", "Y: ", "Z: ",  _aniXform.rotation, _itemBox.width, updateVal ) );
-		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "scale", "X: ", "Y: ", "Z: ",  _aniXform.scale, _itemBox.width, updateVal ) );
+		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "location", "X: ", "Y: ", "Z: ",  _ebco.item.position, _itemBox.width, updateVal ) );
+		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "rotation", "X: ", "Y: ", "Z: ",  _ebco.item.rotation, _itemBox.width, updateVal ) );
+		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "scale", "X: ", "Y: ", "Z: ",  _ebco.item.scale, _itemBox.width, updateVal ) );
 		
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 6 ) )
 
 		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
-		ebco.rootObject = _ani
-		ebco.items = _aniXform.transforms as Vector.<*>
+		ebco.items = _ebco.item.transforms as Vector.<*>
 		ebco.itemDisplayObject = PanelModelTransform
 		ebco.itemBox.showNew = true
 		ebco.title = "transforms"
@@ -106,7 +91,7 @@ public class PanelAnimationTransform extends ExpandableBox
 	
 	
 	private function setChanged():void {
-		_ani.changed = true;
+		_ebco.rootObject.changed = true;
 	}
 }
 }

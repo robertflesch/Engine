@@ -33,23 +33,16 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class PanelModelTransform extends ExpandableBox
 {
-	private var _ani:Animation;
-	private var _modelXform:ModelTransform;
 	private var _cbType:ComboBox  = new ComboBox()	
 	
-	public function PanelModelTransform( $ani:Animation, $modelXform:ModelTransform, $widthParam = 300, $heightParam = 100 ) {
-		_ani = $ani;
-		if ( null == $modelXform ) {
-			$modelXform = ModelTransform.defaultObject();
-		}
-		_modelXform = $modelXform;
+	//public function PanelModelTransform( $ani:Animation, $modelXform:ModelTransform, $widthParam = 300, $heightParam = 100 ) {
+	public function PanelModelTransform( $ebco:ExpandableBoxConfigObject ) {		
+		if ( null == $ebco.item )
+			$ebco.item = ModelTransform.defaultObject();
 		
-		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
-		ebco.itemBox.showNew = false;
-		ebco.itemBox.paddingTop = 2;
-		ebco.width = $widthParam;
-		//ebco.backgroundColor = 0x0000ff;
-		super( ebco );
+		$ebco.itemBox.showNew = false;
+		$ebco.itemBox.paddingTop = 2;
+		super( $ebco );
 	}
 	
 	override public function deleteElementCheck( $me:UIMouseEvent ):void {
@@ -57,8 +50,8 @@ public class PanelModelTransform extends ExpandableBox
 	}
 	
 	override public function collapasedInfo():String  {
-		if ( _modelXform )
-			return ModelTransform.typeToString( _modelXform.type );
+		if ( _ebco.item )
+			return ModelTransform.typeToString( _ebco.item.type );
 		
 		return "New Model Transform";
 	}
@@ -68,7 +61,7 @@ public class PanelModelTransform extends ExpandableBox
 	}
 	
 	override protected function hasElements():Boolean {
-		if ( 0 < _modelXform.delta.length ) 
+		if ( 0 < _ebco.item.delta.length ) 
 			return true
 		 
 		return false
@@ -79,19 +72,19 @@ public class PanelModelTransform extends ExpandableBox
 		
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 10 ) );
 		
-		_itemBox.addElement( new ComponentComboBoxWithLabel( "Transform type", typeChanged, ModelTransform.typeToString( _modelXform.type ), ModelTransform.typesList(), _itemBox.width ) )
+		_itemBox.addElement( new ComponentComboBoxWithLabel( "Transform type", typeChanged, ModelTransform.typeToString( _ebco.item.type ), ModelTransform.typesList(), _itemBox.width ) )
 		_itemBox.addElement( new ComponentLabelInput( "time (ms)"
-											  , function ($e:TextEvent):void { _modelXform.time = int ( $e.target.text ); setChanged(); }
-											  , _modelXform.time ? String( _modelXform.time ) : "Missing time"
+											  , function ($e:TextEvent):void { _ebco.item.time = int ( $e.target.text ); setChanged(); }
+											  , _ebco.item.time ? String( _ebco.item.time ) : "Missing time"
 											  , _itemBox.width ) )
 											  
-		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "delta", "X: ", "Y: ", "Z: ",  _modelXform.delta, _itemBox.width, updateVal ) )
+		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "delta", "X: ", "Y: ", "Z: ",  _ebco.item.delta, _itemBox.width, updateVal ) )
 	}
 	
 	private function typeChanged( $le:ListEvent ): void {
 		var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex )
-		 _modelXform.type = ModelTransform.stringToType( li.value )
-		 _ani.changed = true;
+		 _ebco.item.type = ModelTransform.stringToType( li.value )
+		 _ebco.rootObject.changed = true;
 	}
 	
 	//////////////////////////////
@@ -107,7 +100,7 @@ public class PanelModelTransform extends ExpandableBox
 	
 	
 	private function setChanged():void {
-		_ani.changed = true;
+		_ebco.rootObject.changed = true;
 	}
 }
 }
