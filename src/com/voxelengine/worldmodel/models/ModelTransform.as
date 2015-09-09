@@ -81,7 +81,12 @@ public class ModelTransform
 		return types
 	}
 	
-	static public var DEFAULT_OBJECT:Object = { 
+	static public function defaultObject():ModelTransform {
+		var obj:Object = ModelTransform.DEFAULT_OBJECT;
+		return new ModelTransform( obj.delta.x, obj.delta.y, obj.delta.z, obj.time, obj.type, obj.name );
+	}
+	
+	static private var DEFAULT_OBJECT:Object = { 
 		time : 1,
 		delta: { x:0, y:0, z:0 },
 		//transformTarget:Vector3D;

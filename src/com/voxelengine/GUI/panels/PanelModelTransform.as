@@ -40,8 +40,7 @@ public class PanelModelTransform extends ExpandableBox
 	public function PanelModelTransform( $ani:Animation, $modelXform:ModelTransform, $widthParam = 300, $heightParam = 100 ) {
 		_ani = $ani;
 		if ( null == $modelXform ) {
-			var obj:Object = ModelTransform.DEFAULT_OBJECT;
-			$modelXform = new ModelTransform( obj.delta.x, obj.delta.y, obj.delta.z, obj.time, obj.type, obj.name );
+			$modelXform = ModelTransform.defaultObject();
 		}
 		_modelXform = $modelXform;
 		

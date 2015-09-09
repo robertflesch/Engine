@@ -17,29 +17,19 @@ import com.voxelengine.Log;
 import com.voxelengine.GUI.*;
 
 public class PanelVectorContainer extends ExpandableBox {
-	private var _ebco:ExpandableBoxConfigObject
 	
 	// Note: item in vector needs to have a "name" method
 	public function PanelVectorContainer( $ebco:ExpandableBoxConfigObject ) {
-	//public function PanelVectorContainer( $title:String, $rootObject:*, $vector:Vector.<*> , $itemDisplayObject:Class, $newItemName:String, $widthParam:int, $showNewItem:Boolean ) {
-		_ebco = $ebco;
-		
-		//_ebco.itemBox.title = ""
-		//_ebco.itemBox.newItemText = $newItemName
-		//_ebco.itemBox.width = $widthParam
-		//_ebco.itemBox.showNew = $showNewItem
-		//_ebco.itemBox.showDelete = false
-		//_ebco.itemBox.paddingTop = 10
-		//_ebco.itemBox.paddingLeft = 6
-		super( _ebco )
+		super( $ebco )
 	}
-	
 	
 	override protected function expand():void {
 		super.expand();
 		
 		_itemBox.height = 0;
 		for ( var i:int; i < _ebco.items.length; i++ ) {
+			var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
+
 			var item:* = new _ebco.itemDisplayObject( _ebco.rootObject, _ebco.items[i], _itemBox.width );
 			_itemBox.addElement( item );
 		}
