@@ -37,8 +37,9 @@ public class PanelModelTransform extends ExpandableBox
 	
 	//public function PanelModelTransform( $ani:Animation, $modelXform:ModelTransform, $widthParam = 300, $heightParam = 100 ) {
 	public function PanelModelTransform( $ebco:ExpandableBoxConfigObject ) {		
-		if ( null == $ebco.item )
+		if ( null == $ebco.item ) {
 			$ebco.item = ModelTransform.defaultObject();
+		}
 		
 		$ebco.itemBox.showNew = false;
 		$ebco.itemBox.paddingTop = 2;
@@ -50,8 +51,11 @@ public class PanelModelTransform extends ExpandableBox
 	}
 	
 	override public function collapasedInfo():String  {
-		if ( _ebco.item )
+		if ( _ebco.item ) {
+			if ( ModelTransform.INVALID == _ebco.item.type )
+				return "No transforms "
 			return ModelTransform.typeToString( _ebco.item.type );
+		}
 		
 		return "New Model Transform";
 	}

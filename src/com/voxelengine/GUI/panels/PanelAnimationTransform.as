@@ -9,6 +9,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.panels
 {
 import org.flashapi.swing.Alert;
+import org.flashapi.swing.Label;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.layout.AbsoluteLayout;
 
@@ -58,23 +59,25 @@ public class PanelAnimationTransform extends ExpandableBox
 	
 	override protected function expand():void {
 		super.expand();
-		
-		_itemBox.addElement( new ComponentLabelInput( "Name"
-													, function ($e:TextEvent):void { _ebco.item.attachmentName = $e.target.text; setChanged(); }
-													, _ebco.item.attachmentName ? _ebco.item.attachmentName : "Missing Attachment Name"
-													, _itemBox.width ) );
-													
-		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "location", "X: ", "Y: ", "Z: ",  _ebco.item.position, _itemBox.width, updateVal ) );
-		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "rotation", "X: ", "Y: ", "Z: ",  _ebco.item.rotation, _itemBox.width, updateVal ) );
-		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "scale", "X: ", "Y: ", "Z: ",  _ebco.item.scale, _itemBox.width, updateVal ) );
+
+		_itemBox.addElement( new Label( _ebco.item.attachmentName, _itemBox.width ) )
+		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 6 ) )
+		_ebco.width = _itemBox.width
+		_ebco.title = "initial setting "
+		_itemBox.addElement( new PanelAnimationTransfromInitData( _ebco ) )
 		
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 6 ) )
 
+		if ( !_ebco.items ) {
+			_ebco.items = new Vector.<*>()
+			_ebco.items.push( _ebco.item )
+		}
+		
 		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
 		ebco.items = _ebco.item.transforms as Vector.<*>
 		ebco.itemDisplayObject = PanelModelTransform
 		ebco.itemBox.showNew = true
-		ebco.title = "transforms"
+		ebco.title = "transforms "
 		ebco.width = _itemBox.width
 		ebco.itemBox.newItemText = "New Transform"
 		_itemBox.addElement( new PanelVectorContainer( ebco ) )

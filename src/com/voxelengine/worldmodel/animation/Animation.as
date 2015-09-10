@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.animation
 import com.voxelengine.events.AnimationEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.PermissionsBase;
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
@@ -40,6 +41,10 @@ public class Animation extends PersistanceObject
 	public function get transforms():Vector.<AnimationTransform> { return _transforms; }
 	//public function get loaded():Boolean { return _loaded; }
 	
+	private var _permissions:PermissionsBase;
+	
+	public function get permissions():PermissionsBase 			{ return _permissions; }
+	public function set permissions( val:PermissionsBase):void	{ _permissions = val; changed = true; }
 	
 	/////////////////
 	public function get name():String { return info.name; }
@@ -73,6 +78,7 @@ public class Animation extends PersistanceObject
 		
 		
 		info = $dbo.data;
+		//info.guid = Globals.getUID();
 		loadFromInfo();
 	}
 	
@@ -88,8 +94,10 @@ public class Animation extends PersistanceObject
 	}
 	
 	override public function save():void {
-		if ( "0" == dbo.key )
-			guid = Globals.getUID();
+		if ( !Globals.isGuid( guid ) ) {
+			Log.out( "Animation.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
+			return;
+		}
 		super.save();
 	}
 	
@@ -159,6 +167,12 @@ public class Animation extends PersistanceObject
 		}
 		if ( !info.owner )
 			info.owner = Network.PUBLIC;
+
+		if ( !info.permissions )
+			info.permissions = new Object();
+		
+		// the permission object is just an encapsulation of the permissions section of the object
+		_permissions = new PermissionsBase( info.permissions );
 			
 		//LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.ANIMATION_LOAD_COMPLETE, name ) );
 //		return type;
@@ -247,7 +261,7 @@ public class Animation extends PersistanceObject
 			
 		if ( _attachments && 0 < _attachments.length ) {
 			for each ( var aa:AnimationAttachment in _attachments ) {
-				var cm:VoxelModel = $owner.modelInfo.childFindByName( aa.attachsTo );
+				var cm:VoxelModel = $owner.childFindByName( aa.attachsTo );
 				if ( cm )
 					aa.create( cm );
 			}
@@ -260,7 +274,7 @@ public class Animation extends PersistanceObject
 			
 		if ( _attachments && 0 < _attachments.length ) {
 			for each ( var aa:AnimationAttachment in _attachments ) {
-				var cm:VoxelModel = $owner.modelInfo.childFindByName( aa.attachsTo );
+				var cm:VoxelModel = $owner.childFindByName( aa.attachsTo );
 				if ( cm )
 					aa.detach();
 			}

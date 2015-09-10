@@ -89,10 +89,11 @@ package com.voxelengine.GUI.voxelModels
 											 , _vm.metadata.description ? _vm.metadata.description : "No Description"
 											 , WIDTH ) );
 
-			addElement( new ComponentLocation( setChanged, ii.setPositionInfo, "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, updateVal ) );
-			addElement( new ComponentLocation( setChanged, ii.setRotationInfo, "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, updateVal ) );
-			addElement( new ComponentLocation( setChanged, ii.setScaleInfo, "Scale", "X: ", "Y: ", "Z: ",  ii.scale, updateScaleVal, 5 ) );
-			addElement( new ComponentVector3DSideLabel( setChanged, "Center", "X: ", "Y: ", "Z: ",  ii.center, WIDTH, updateVal ) );
+			addElement( new ComponentVector3DToObject( setChanged, ii.setPositionInfo, "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, WIDTH, updateVal ) );
+			addElement( new ComponentVector3DToObject( setChanged, ii.setRotationInfo, "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, WIDTH, updateVal ) );
+			addElement( new ComponentVector3DToObject( setChanged, ii.setScaleInfo, "Scale", "X: ", "Y: ", "Z: ",  ii.scale, WIDTH, updateScaleVal, 5 ) );
+			addElement( new ComponentVector3DToObject( setChanged, ii.setCenterInfo, "Center", "X: ", "Y: ", "Z: ",  ii.center, WIDTH, updateVal ) );
+//			addElement( new ComponentVector3DSideLabel( setChanged, "Center", "X: ", "Y: ", "Z: ",  ii.center, WIDTH, updateVal ) );
 			addElement( new ComponentSpacer( WIDTH ) );
 			
 			// TODO need to be able to handle an array of scipts.

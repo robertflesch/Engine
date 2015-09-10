@@ -43,10 +43,17 @@ public class AnimationCache
 		AnimationEvent.addListener( ModelBaseEvent.REQUEST, 		request );
 		AnimationEvent.addListener( ModelBaseEvent.DELETE, 			deleteHandler );
 		AnimationEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );		
+		AnimationEvent.addListener( ModelBaseEvent.SAVE, 			save );		
 
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
+	}
+	
+	static private function save(e:AnimationEvent):void {
+		for each ( var ani:Animation in _animations )
+			if ( ani )
+				ani.save();
 	}
 	
 	static public function requestAnimationClass( $modelClass:String ):String {

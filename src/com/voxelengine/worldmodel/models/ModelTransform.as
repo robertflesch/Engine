@@ -23,6 +23,7 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 public class ModelTransform
 {
 	static private var objectEnum:int = 0;
+	static public const INVALID:int = objectEnum++; 	
 	static public const LOCATION:int = objectEnum++; 	
 	static public const LOCATION_TO:int = objectEnum++;
 	static public const LOCATION_REPEATING:int = objectEnum++;

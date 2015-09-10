@@ -156,6 +156,24 @@ public class VoxelModel
 			return instanceInfo.positionGet;
 	}
 	
+	public function childFindByName($name:String, $recursive:Boolean = true ):VoxelModel {
+		// Are we that model?
+		if ( metadata.name == $name )
+			return this
+		
+		// check children
+		for each (var child:VoxelModel in modelInfo.childVoxelModels) {
+			if (child.metadata.name == $name)
+				return child;
+			else { // check its children	
+				var cvm:VoxelModel = child.childFindByName( $name );
+				if ( cvm )
+					return cvm;
+			}
+		}
+		return null;
+	}
+	
 	// returns the root model in the model space chain
 	public function topmostControllingModel():VoxelModel
 	{

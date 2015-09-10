@@ -29,7 +29,6 @@ public class ComponentVector3DSideLabel extends Box
 		width = $width;
 		height = 25;
 		padding = 0;
-		//paddingTop = 8
 		paddingTop = 2;
 		borderStyle = BorderStyle.NONE;
 		backgroundColor = SpasUI.DEFAULT_COLOR;
@@ -46,15 +45,15 @@ public class ComponentVector3DSideLabel extends Box
 		addElement( lbl )
 		
 		addSpinLabel( $s1Label
-					, function($e:SpinButtonEvent):void { $vect.setTo( $changeFunction($e), $vect.y, $vect.z ); }
+					, function($e:SpinButtonEvent):void { $vect.setTo( $changeFunction($e), $vect.y, $vect.z ); $markDirty() }
 					, function($e:TextEvent):void       { $vect.setTo( int( $e.target.text ), $vect.y, $vect.z ); $markDirty() }
 					, $vect.x.toFixed($decimalPlaces) );
 		addSpinLabel( $s2Label
-					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $changeFunction($e), $vect.z );  }
+					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $changeFunction($e), $vect.z ); $markDirty()  }
 					, function($e:TextEvent):void       { $vect.setTo( $vect.x, int( $e.target.text ), $vect.z ); $markDirty()  }
 					, $vect.y.toFixed($decimalPlaces) );
 		addSpinLabel( $s3Label
-					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $vect.y, $changeFunction($e) );  }
+					, function($e:SpinButtonEvent):void { $vect.setTo( $vect.x, $vect.y, $changeFunction($e) ); $markDirty()  }
 					, function($e:TextEvent):void       { $vect.setTo( $vect.x, $vect.y, int( $e.target.text ) ); $markDirty()  }
 					, $vect.z.toFixed($decimalPlaces) );
 	}

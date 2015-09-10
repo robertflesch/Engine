@@ -299,8 +299,8 @@ public class ModelInfo extends PersistanceObject
 				for each ( var ani:Object in animationInfo ) {
 					if ( ani.name == $ae.ani.name ) {
 						if ( ani.guid != $ae.ani.guid ) {
-							ani.guid = $ae.ani.guid
-							changed = true;
+							ani.guid = $ae.ani.guid = Globals.getUID()
+							ani.changed = true;
 							return;
 						}
 					}
@@ -486,7 +486,7 @@ public class ModelInfo extends PersistanceObject
 		changed = true;				
 	}
 	
-	public function childModelFind(guid:String):VoxelModel	{
+	public function childModelFind(guid:String, $recursive:Boolean = true ):VoxelModel	{
 		for each (var child:VoxelModel in childVoxelModels) {
 			if (child.instanceInfo.instanceGuid == guid)
 				return child;
@@ -500,14 +500,6 @@ public class ModelInfo extends PersistanceObject
 		
 		//Log.out(  "VoxelModel.childFind - not found for guid: " + guid, Log.WARN );
 		return null
-	}
-	
-	public function childFindByName($name:String):VoxelModel {
-		for each (var child:VoxelModel in childVoxelModels) {
-			if (child.metadata.name == $name)
-				return child;
-		}
-		throw new Error("VoxelModel.childFindByName - not found for name: " + $name);
 	}
 	
 	public function childRemove( $ii:InstanceInfo ):void	{
@@ -601,7 +593,17 @@ public class ModelInfo extends PersistanceObject
 		// animations are stored in the info object until needed, no more preloading
 		//if ( mi.animations )
 			//animationsFromObject( mi.animations );
-	
+			
+		function biomesFromObject( $biomes:Object ):void {
+			// TODO this should only be true for new terrain models.
+			const createHeightMap:Boolean = true;
+			_biomes = new Biomes( createHeightMap  );
+			if ( !$biomes.layers )
+				throw new Error( "ModelInfo.biomesFromObject - WARNING - unable to find layerInfo: " + fileName );					
+			_biomes.layersLoad( $biomes.layers );
+			// now remove the biome data from the object so it is not saved to persistance
+			delete info.model.biomes;	
+		}
 	}
 
 	override protected function toObject():void {
@@ -659,17 +661,6 @@ public class ModelInfo extends PersistanceObject
 		*/
 	} 	
 
-	private function biomesFromObject( $biomes:Object ):void {
-		// TODO this should only be true for new terrain models.
-		const createHeightMap:Boolean = true;
-		_biomes = new Biomes( createHeightMap  );
-		if ( !$biomes.layers )
-			throw new Error( "ModelInfo.biomesFromObject - WARNING - unable to find layerInfo: " + fileName );					
-		_biomes.layersLoad( $biomes.layers );
-		// now remove the biome data from the object so it is not saved to persistance
-		delete info.model.biomes;	
-		
-	}
 	/*
 	private function animationsFromObject( $animations:Object ):void {
 	// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }
@@ -683,24 +674,5 @@ public class ModelInfo extends PersistanceObject
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End Children functions
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  Attic
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	/*
-	override public function clone( $guid:String ):* {
-		_data.clone( $guid );
-		throw new Error( "ModelInfo.clone - what to do here" );
-	}
-
-	private function cloneObject( obj:Object ):Object {
-		var ba:ByteArray = new ByteArray();
-		ba.writeObject( obj );
-		ba.position = 0;
-		var newObj:Object = ba.readObject();
-		return newObj;
-	}
-	*/
-	
 }
 }

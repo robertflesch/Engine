@@ -21,7 +21,7 @@ import com.voxelengine.Log;
  * http://wiki.secondlife.com/wiki/Permission
  * 
  */
-public class PermissionsModel
+public class PermissionsBase
 {
 	static public const COPY_COUNT:int			= 2048;
 	static public const BIND_NONE:String 		= "BIND_NONE";
@@ -53,7 +53,7 @@ public class PermissionsModel
 	public function get blueprint():Boolean 				{ return _permissions.blueprint; }
 	public function set blueprint(value:Boolean):void 		{ _permissions.blueprint = value; }
 	
-	public function PermissionsModel( $permissions:Object ) {
+	public function PermissionsBase( $permissions:Object ) {
 		_permissions = $permissions;
 		// If permissions already exist dont reset them.
 		if ( $permissions.createdDate || $permissions.creator )

@@ -13,23 +13,23 @@ import org.flashapi.swing.plaf.spas.SpasUI;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 
-public class ComponentLocation extends Box
+public class ComponentVector3DToObject extends Box
 {
-	public function ComponentLocation( $markDirty:Function
+	public function ComponentVector3DToObject( $markDirty:Function
 									 , $origUpdate:Function
 									 , $title:String
 	                                 , $s1Label:String
 									 , $s2Label:String
 									 , $s3Label:String
 									 , $vect:Vector3D
+									 , $width:int
 									 , $changeFunction:Function = null
 									 , $decimalPlaces:int = 0 )
 	{
 		super();
-		width = 330;
+		width = $width;
 		height = 25;
 		padding = 0;
-		//paddingTop = 8
 		paddingTop = 2;
 		borderStyle = BorderStyle.NONE;
 		backgroundColor = SpasUI.DEFAULT_COLOR;
@@ -37,10 +37,10 @@ public class ComponentLocation extends Box
 		autoSize = false;
 		
 		if ( null == $changeFunction )
-			$changeFunction = ComponentLocation.updateVal;
+			$changeFunction = ComponentVector3DToObject.updateVal;
 		
 		var lbl:Label = new Label($title);
-		lbl.width = 50;
+		lbl.width = int(width/5);
 		lbl.height = 20;
 		lbl.textAlign = TextAlign.LEFT;
 		addElement( lbl )
@@ -84,7 +84,7 @@ public class ComponentLocation extends Box
 		lbl.textAlign = TextAlign.CENTER;
 		
 		var src:TextInput = new TextInput(initialValue);
-		src.width = 50;
+		src.width = (width/4)-40;
 		src.height = 20;
 		src.addEventListener( TextEvent.EDITED, textChanged );
 		
@@ -94,7 +94,7 @@ public class ComponentLocation extends Box
 		sb.addEventListener( SpinButtonEvent.CLICK_UP, clickHandler );
 		sb.data = src;
 
-		var panel:Container = new Container( 90, 20 );
+		var panel:Container = new Container( width/4, 20 );
 		panel.layout.orientation = LayoutOrientation.HORIZONTAL;
 		
 		panel.addElement( lbl );

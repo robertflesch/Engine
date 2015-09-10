@@ -53,7 +53,8 @@ public class ExpandableBox extends ResizablePanelVV implements IExpandableItem
 		$evtColl.addEvent( _expandCollapse, UIMouseEvent.RELEASE, expandOrCollapse );
 		addElement( _expandCollapse );
 		
-		_itemBox = new ResizablePanelVV( width - 31, _ebco.itemBox.height, BorderStyle.NONE );
+		_ebco.itemBox.width = width - 31
+		_itemBox = new ResizablePanelVV( _ebco.itemBox.width, _ebco.itemBox.height, BorderStyle.NONE );
 		_itemBox.layout = new AbsoluteLayout();
 		_itemBox.autoSize =  false;
 		_itemBox.padding = 0;

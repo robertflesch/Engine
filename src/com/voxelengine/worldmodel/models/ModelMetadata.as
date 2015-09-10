@@ -22,7 +22,7 @@ import playerio.DatabaseObject;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.worldmodel.PermissionsModel;
+import com.voxelengine.worldmodel.PermissionsBase;
 import com.voxelengine.events.ModelBaseEvent;
 
 /**
@@ -32,11 +32,11 @@ import com.voxelengine.events.ModelBaseEvent;
  */
 public class ModelMetadata extends PersistanceObject
 {
-	private var _permissions:PermissionsModel;
+	private var _permissions:PermissionsBase;
 	private var _thumbnail:BitmapData;
 	
-	public function get permissions():PermissionsModel 			{ return _permissions; }
-	public function set permissions( val:PermissionsModel):void	{ _permissions = val; changed = true; }
+	public function get permissions():PermissionsBase 			{ return _permissions; }
+	public function set permissions( val:PermissionsBase):void	{ _permissions = val; changed = true; }
 	
 	public function get name():String  						{ return info.name; }
 	public function set name(value:String):void  			{ info.name = value; changed = true; }
@@ -159,7 +159,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 			info.permissions = new Object();
 		
 		// the permission object is just an encapsulation of the permissions section of the object
-		_permissions = new PermissionsModel( info.permissions );
+		_permissions = new PermissionsBase( info.permissions );
 		
 		if ( info.thumbnail ) {
 			var loader:Loader = new Loader();

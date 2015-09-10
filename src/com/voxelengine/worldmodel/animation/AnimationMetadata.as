@@ -14,7 +14,7 @@ import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.PermissionsModel;
+import com.voxelengine.worldmodel.PermissionsBase;
 import flash.events.Event;
 import flash.utils.ByteArray;
 import playerio.DatabaseObject;
@@ -26,7 +26,7 @@ import playerio.DatabaseObject;
 public class AnimationMetadata
 {
 	static private const INVALID:String = "INVALID"
-	private var _permissions:PermissionsModel;
+	private var _permissions:PermissionsBase;
 /*	private var _name:String 		= INVALID;
 	private var _guid:String 		= INVALID;
 	private var _aniType:String 	= INVALID;

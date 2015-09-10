@@ -7,6 +7,7 @@
 ==============================================================================*/
 
 package {
+	import com.voxelengine.events.AnimationEvent;
 	import flash.display.Sprite;
 	import flash.display.StageAlign;
 	import flash.display.StageScaleMode;
@@ -191,6 +192,7 @@ package {
 				if ( Globals.online ) {
 					//Log.out( "VoxelVerse.deactivateApp - NOT SAVING REGION AND INVENTORY", Log.WARN );
 					RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
+					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.SAVE, 0, null, null, null ) );
 					InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, null, null ) );
 					ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) );
 				}

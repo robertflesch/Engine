@@ -66,6 +66,7 @@ package com.voxelengine.worldmodel.models
 			//Log.out( "set scale - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
 		}
 		public function scaleReset():void 	{ scaleSetComp( _scaleOrig.x, _scaleOrig.y, _scaleOrig.z ); }
+		public function scaleGetOriginal():Vector3D 	{ return _scaleOrig; }
 				
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Rotation
@@ -86,6 +87,7 @@ package com.voxelengine.worldmodel.models
 			_rotation.setTo( $x % 360, $y % 360, $z % 360 ); 
 		}
 		public function rotationReset():void 	{ rotationSetComp( _rotationOrig.x, _rotationOrig.y, _rotationOrig.z ); }
+		public function rotationGetOriginal():Vector3D 	{ return _rotationOrig; }
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Position
@@ -104,6 +106,7 @@ package com.voxelengine.worldmodel.models
 			_position.setTo( $x, $y, $z ); 
 		}
 		public function positionReset():void 	{ positionSetComp( _positionOrig.x, _positionOrig.y, _positionOrig.z ); }
+		public function positionGetOriginal():Vector3D 	{ return _positionOrig; }
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Velocity

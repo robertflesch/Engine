@@ -8,7 +8,7 @@
 package com.voxelengine.worldmodel.models.makers
 {
 import com.voxelengine.events.PersistanceEvent;
-import com.voxelengine.worldmodel.PermissionsModel;
+import com.voxelengine.worldmodel.PermissionsBase;
 import com.voxelengine.worldmodel.TypeInfo;
 import flash.utils.ByteArray;
 import playerio.DatabaseObject;
