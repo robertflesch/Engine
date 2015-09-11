@@ -71,7 +71,7 @@ package {
 		
 		// after the splash and config have been loaded
 		public function readyToGo():void	{
-			Log.out( "<===============VoxelVerse.readyToGo - ENTER", Log.DEBUG );
+			//Log.out( "<===============VoxelVerse.readyToGo - ENTER", Log.DEBUG );
 			
 			addEventListener(Event.ENTER_FRAME, enterFrame);
 			addEventListener(Event.DEACTIVATE, deactivate);
@@ -84,17 +84,20 @@ package {
 //			stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, mouseDownRight);
 //			stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, mouseUpRight);
 			
+			// These two should be the same
+			// https://gamesnet.yahoo.net/forum/viewtopic.php?f=33&t=35896&sid=1f0b0c5bef7f97c6961760b6a3418c69
+			// for reference
 			//Security.loadPolicyFile( "http://cdn.playerio.com/crossdomain.xml" );
 			//Security.loadPolicyFile( "https://content.playerio.com/crossdomain.xml" );
-//			var ctxt:LoaderContext = new LoaderContext( true );
-//			ctxt.securityDomain = SecurityDomain.currentDomain;
+			//var ctxt:LoaderContext = new LoaderContext( true );
+			//ctxt.securityDomain = SecurityDomain.currentDomain;
 			//Security.allowDomain( "*" );
 			VoxelVerseGUI.currentInstance.buildGUI();	
-			Log.out( "VoxelVerse.readyToGo", Log.DEBUG );
+			//Log.out( "VoxelVerse.readyToGo", Log.DEBUG );
 		}
 		
 		private function mouseDown(e:MouseEvent):void {
-			Log.out( "VoxelVerse.mouseDown", Log.WARN );
+			//Log.out( "VoxelVerse.mouseDown", Log.WARN );
 //			if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active )
 //				return;
 		}
@@ -127,14 +130,14 @@ package {
 		
 		private function deactivate(e:Event):void 
 		{
-			Log.out( "VoxelVerse.deactive event", Log.WARN );
+			//Log.out( "VoxelVerse.deactive event", Log.WARN );
 			if ( Globals.active )
 				deactivateApp();
 		}
 		
 		private function activate(e:Event):void 
 		{
-			Log.out( "VoxelVerse.activate event", Log.WARN );
+			//Log.out( "VoxelVerse.activate event", Log.WARN );
 			activateApp();
 		}
 		
@@ -149,7 +152,7 @@ package {
 		 */
 		public function mouseLeave( e:Event ):void
 		{
-			Log.out( "VoxelVerse.mouseLeave event" );
+			//Log.out( "VoxelVerse.mouseLeave event" );
 			if ( Globals.active )
 				deactivateApp();
 		}
@@ -157,7 +160,7 @@ package {
 		private function activateApp():void {
 			
 			if ( false == Globals.active ) {
-				Log.out( "VoxelVerse.activateApp - setting active = TRUE" );
+				//Log.out( "VoxelVerse.activateApp - setting active = TRUE" );
 				Globals.active = true;
 				Globals.clicked = true;
 				VoxelVerseGUI.currentInstance.crossHairActive();
@@ -167,15 +170,15 @@ package {
 				
 //				GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_ACTIVATE ) );
 			}
-			else
-				Log.out( "VoxelVerse.activateApp - ignoring" );
+			//else
+			//	Log.out( "VoxelVerse.activateApp - ignoring" );
 		}
 
 		private function deactivateApp():void {
 			
-			Log.out( "VoxelVerse.deactivateApp", Log.WARN );
+			//Log.out( "VoxelVerse.deactivateApp", Log.WARN );
 			if ( true == Globals.active ) {
-				Log.out( "VoxelVerse.deactivateApp with active app", Log.WARN );
+				//Log.out( "VoxelVerse.deactivateApp with active app", Log.WARN );
 				Globals.active = false;
 				Globals.clicked = false;
 				VoxelVerseGUI.currentInstance.crossHairInactive();
@@ -199,8 +202,8 @@ package {
 				
 	//			GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_DEACTIVATE ) );
 			}
-			else
-				Log.out( "VoxelVerse.deactivateApp - app already deactivated", Log.WARN );
+			//else
+			//	Log.out( "VoxelVerse.deactivateApp - app already deactivated", Log.WARN );
 		}
 		
 		//private function mouseDown(e:MouseEvent):void 
@@ -211,7 +214,7 @@ package {
 		
 		private function mouseUp(e:MouseEvent):void 
 		{
-			Log.out( "VoxelVerse.mouseUp event" );
+			//Log.out( "VoxelVerse.mouseUp event" );
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			activateApp();
 		}
@@ -334,7 +337,7 @@ class VVInitializer
 {
 	static public function initialize( $stage:Stage ):void {
 		
-		Log.out("VVInitializer.initialize", Log.DEBUG );
+		//Log.out("VVInitializer.initialize", Log.DEBUG );
 		//var strUserAgent:String = String(ExternalInterface.call("function() {return navigator.userAgent;}")).toLowerCase();			
 		
 		// expect an exception to be thrown and caught here, the best way I know of to find out of we are in debug or release mode
@@ -345,13 +348,13 @@ class VVInitializer
 			Globals.g_debug = false;
 		}
 		
-		Log.out("VVInitializer.initialize this is " + (Globals.g_debug ? "debug" : "release") + " build", Log.DEBUG );
+		//Log.out("VVInitializer.initialize this is " + (Globals.g_debug ? "debug" : "release") + " build", Log.DEBUG );
 		
 		var url:String = $stage.loaderInfo.loaderURL;
 		//url = "file:///C:/dev/VoxelVerse/resources/bin/VoxelVerse.swf"
 		var index:int = url.lastIndexOf( "VoxelVerse.swf" );
 		Globals.appPath = url.substring( 0, index );
-		Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG );
+		//Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG );
 		
 		Globals.g_renderer.init( $stage );
 		// adds handlers for persistance of regions
