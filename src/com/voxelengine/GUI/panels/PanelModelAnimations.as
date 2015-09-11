@@ -54,7 +54,7 @@ package com.voxelengine.GUI.panels
 		
 		private function selectedModelChanged(e:UIRegionModelEvent):void 
 		{
-			Log.out( "PanelModelAnimations.selectedModelChanged - parentModel: " + ( _parentModel ? _parentModel.metadata.name : "No parent" ), Log.WARN );
+			//Log.out( "PanelModelAnimations.selectedModelChanged - parentModel: " + ( _parentModel ? _parentModel.metadata.name : "No parent" ), Log.WARN );
 			if ( null == e.voxelModel && _parentModel == e.parentVM )
 				childPanelRemove();
 			// true if our child changed the model

@@ -153,7 +153,7 @@ public class InventoryPanelModel extends VVContainer
 	// That is if I use the target "Name"
 	private function displaySelectedCategory( $category:String ):void
 	{	
-		Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
+		//Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
 		var mme:ModelMetadataEvent = new ModelMetadataEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId, null )
 		// The series makes it so that I dont see results from other objects requests
 		_seriesModelMetadataEvent = mme.series;

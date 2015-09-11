@@ -103,7 +103,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	// But the voxelModel has a handle to it, seems silly to have to propgate it every where, so its public
 	private function saveEvent( $vmd:ModelMetadataEvent ):void {
 		if ( guid != $vmd.modelGuid ) {
-			Log.out( "ModelMetadata.saveEvent - Ignoring save meant for other model my guid: " + guid + " target guid: " + $vmd.modelGuid, Log.WARN );
+			//Log.out( "ModelMetadata.saveEvent - Ignoring save meant for other model my guid: " + guid + " target guid: " + $vmd.modelGuid, Log.WARN );
 			return;
 		}
 		save();
@@ -122,7 +122,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	// Persistance
 	//////////////////////////////////////////////////////////////////
 	override protected function toObject():void {
-		Log.out( "ModelMetadata.toObject", Log.WARN );
+		//Log.out( "ModelMetadata.toObject", Log.WARN );
 		if ( thumbnail )
 			info.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
 		else

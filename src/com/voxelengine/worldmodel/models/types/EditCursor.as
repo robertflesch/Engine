@@ -874,11 +874,11 @@ public class EditCursor extends VoxelModel
 		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active )
 			return;
 		if ( doubleMessageHack ) {
-			Log.out( "EditCursor.mouseDown", Log.WARN );	
+			//Log.out( "EditCursor.mouseDown", Log.WARN );	
 				
-			//_repeatTimer = new Timer( 200 );
-			//_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
-			//_repeatTimer.start();
+			_repeatTimer = new Timer( 200 );
+			_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
+			_repeatTimer.start();
 			
 			switch (e.type) 
 			{

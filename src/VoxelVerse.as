@@ -149,7 +149,7 @@ package {
 		 */
 		public function mouseLeave( e:Event ):void
 		{
-			//Log.out( "VoxelVerse.mouseLeave event" );
+			Log.out( "VoxelVerse.mouseLeave event" );
 			if ( Globals.active )
 				deactivateApp();
 		}
@@ -157,7 +157,7 @@ package {
 		private function activateApp():void {
 			
 			if ( false == Globals.active ) {
-			//	Log.out( "VoxelVerse.activateApp - setting active = TRUE" );
+				Log.out( "VoxelVerse.activateApp - setting active = TRUE" );
 				Globals.active = true;
 				Globals.clicked = true;
 				VoxelVerseGUI.currentInstance.crossHairActive();
@@ -167,15 +167,15 @@ package {
 				
 //				GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_ACTIVATE ) );
 			}
-			//else
-				//Log.out( "VoxelVerse.activateApp - ignoring" );
+			else
+				Log.out( "VoxelVerse.activateApp - ignoring" );
 		}
 
 		private function deactivateApp():void {
 			
-			//Log.out( "VoxelVerse.deactivateApp", Log.WARN );
+			Log.out( "VoxelVerse.deactivateApp", Log.WARN );
 			if ( true == Globals.active ) {
-				//Log.out( "VoxelVerse.deactivateApp with active app", Log.WARN );
+				Log.out( "VoxelVerse.deactivateApp with active app", Log.WARN );
 				Globals.active = false;
 				Globals.clicked = false;
 				VoxelVerseGUI.currentInstance.crossHairInactive();
@@ -187,7 +187,7 @@ package {
 				//stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
 				stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 				stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp);
-					
+				stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);					
 
 				if ( Globals.online ) {
 					//Log.out( "VoxelVerse.deactivateApp - NOT SAVING REGION AND INVENTORY", Log.WARN );
@@ -199,19 +199,19 @@ package {
 				
 	//			GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_DEACTIVATE ) );
 			}
-			//else
-			//	Log.out( "VoxelVerse.activateApp - ignoring", Log.WARN );
+			else
+				Log.out( "VoxelVerse.deactivateApp - app already deactivated", Log.WARN );
 		}
 		
 		//private function mouseDown(e:MouseEvent):void 
 		//{
 			//stage.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown);
-			//stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			
 		//}
 		
 		private function mouseUp(e:MouseEvent):void 
 		{
-			//Log.out( "VoxelVerse.mouseUp event" );
+			Log.out( "VoxelVerse.mouseUp event" );
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 			activateApp();
 		}

@@ -147,6 +147,8 @@ public class ModelInfo extends PersistanceObject
 			removeListeners();
 			//Log.out( "ModelInfo.retrieveData - loaded oxel guid: " + guid );
 			_data = $ode.oxelData;
+			// if the parent is dynamic, the data should be too.
+			_data.dynamicObj = dynamicObj;
 			if ( "0" == _data.dbo.key ) {
 				_data.changed = true;
 				_data.guid = guid;
@@ -452,7 +454,7 @@ public class ModelInfo extends PersistanceObject
 				info.model.children = new Array();
 				
 			changed = true;
-			info.model.children.push( $instanceInfo.toObject() );
+			info.model.children[info.model.children.length] = $instanceInfo.toObject();
 		}
 	}
 	
