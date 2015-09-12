@@ -35,11 +35,7 @@ public class PanelAnimationTransform extends ExpandableBox
 		super( $ebco );
 	}
 	
-	override public function deleteElementCheck( $me:UIMouseEvent ):void {
-		(new Alert( "PanelAnimationTransform.deleteElementCheck", 350 )).display();
-	}
-	
-	override public function collapasedInfo():String  {
+	override protected function collapasedInfo():String  {
 		if ( _ebco.item ) {
 			if ( hasElements() ) 
 				return _ebco.item.name;
@@ -50,10 +46,6 @@ public class PanelAnimationTransform extends ExpandableBox
 		return "New Animation Transform";
 	}
 
-	override public function newItemHandler( $me:UIMouseEvent ):void  {
-		(new Alert( "PanelAnimationTransform.newItemHandler", 350 )).display();
-	}
-	
 	override protected function hasElements():Boolean {
 		if ( _ebco.item.hasPosition || _ebco.item.hasRotation || _ebco.item.hasScale || _ebco.item.hasTransform ) 
 			return true
@@ -66,10 +58,12 @@ public class PanelAnimationTransform extends ExpandableBox
 
 		_itemBox.addElement( new Label( _ebco.item.attachmentName, _itemBox.width ) )
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 6 ) )
-		_ebco.width = _itemBox.width
-		_ebco.title = "initial setting "
-		_itemBox.addElement( new PanelAnimationTransfromInitData( _ebco ) )
-		
+
+		var ebcoIb:ExpandableBoxConfigObject = _ebco.clone()
+		ebcoIb.width = _itemBox.width
+		ebcoIb.title = "initial setting "
+		ebcoIb.itemBox.paddingTop = 6
+		_itemBox.addElement( new PanelAnimationTransfromInitData( ebcoIb ) )
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 6 ) )
 
 		if ( !_ebco.items ) {
@@ -78,13 +72,15 @@ public class PanelAnimationTransform extends ExpandableBox
 		}
 		
 		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
+		ebco.rootObject = _ebco.rootObject
 		ebco.items = _ebco.item.transforms as Vector.<*>
 		ebco.itemDisplayObject = PanelModelTransform
 		ebco.itemBox.showNew = true
-		ebco.title = "transforms "
+		ebco.title = " model transforms "
 		ebco.width = _itemBox.width
-		ebco.itemBox.newItemText = "New Transform"
-		_itemBox.addElement( new PanelVectorContainer( ebco ) )
+		ebco.itemBox.title = " model transforms "
+		ebco.itemBox.newItemText = "New model transform"
+		_itemBox.addElement( new PanelModelTransformContainer( ebco ) )
 	}
 	
 	private function updateVal( $e:SpinButtonEvent ):int {

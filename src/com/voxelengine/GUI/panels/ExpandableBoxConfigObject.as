@@ -22,5 +22,17 @@ public class ExpandableBoxConfigObject extends Object
 		
 	public function ExpandableBoxConfigObject()	{
 	}
+	
+	public function clone():ExpandableBoxConfigObject {
+		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
+		ebco.rootObject			= rootObject			
+		ebco.items				= items				
+		ebco.item				= item				
+		ebco.itemDisplayObject	= itemDisplayObject	
+		ebco.title				= title				
+		ebco.width				= width				
+		ebco.itemBox			= itemBox.clone()			
+		return ebco
+	}
 }
 }

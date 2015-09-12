@@ -22,10 +22,12 @@ public class ComponentComboBoxWithLabel extends Box
 		
 		_cbType.autoSize = false;
 		_cbType.width = int($width * 0.60)
-		for ( var i:int; i < $types.length; i++ ) {
-			_cbType.addItem( $types[i] );
-			if ( $types[i] == $initialValue )
-				_cbType.selectedIndex = i;		
+		for each ( var item:String in $types ) {
+			_cbType.addItem( item );
+		}
+		for ( var j:int; j < $types.length; j++ ) {
+			if ( $types[j] == $initialValue )
+				_cbType.selectedIndex = j;		
 		}
 		addElement( _cbType );
 		eventCollector.addEvent( _cbType, ListEvent.LIST_CHANGED, $changeHandler );

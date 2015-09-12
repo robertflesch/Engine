@@ -35,14 +35,15 @@ public class PanelModelTransform extends ExpandableBox
 {
 	private var _cbType:ComboBox  = new ComboBox()	
 	private var _ani:Animation
+	private var _mt:ModelTransform
 	
 	//public function PanelModelTransform( $ani:Animation, $modelXform:ModelTransform, $widthParam = 300, $heightParam = 100 ) {
 	public function PanelModelTransform( $ebco:ExpandableBoxConfigObject ) {		
 		_ani = $ebco.rootObject
-
-		if ( null == $ebco.item ) {
-			$ebco.item = ModelTransform.defaultObject();
-			$ebco.items.push( $ebco.item as ModelTransform );
+		_mt = $ebco.item
+		if ( null == _mt ) {
+			$ebco.item = _mt = ModelTransform.defaultObject();
+			$ebco.items.push( _mt );
 		}
 		
 		$ebco.itemBox.showNew = false;
@@ -50,26 +51,32 @@ public class PanelModelTransform extends ExpandableBox
 		super( $ebco );
 	}
 	
-	override public function deleteElementCheck( $me:UIMouseEvent ):void {
-		(new Alert( "Delete element check ", 350 )).display();
+	override protected function yesDelete():void {
+		// now I need to iterate thru the items, and find the right one to delete
+		var itemSig:String = _mt.toString();
+		var mts:Vector.<ModelTransform> = _ebco.items as Vector.<ModelTransform>
+		for ( var i:int; i < mts.length; i++ ) {
+			var mt:ModelTransform = mts[i];
+			// don't add the deleted item to the list
+			if ( mt.toString() == itemSig ) {
+				mts.splice( i, 1 )
+			}
+		}
+		collapse();
 	}
 	
-	override public function collapasedInfo():String  {
-		if ( _ebco.item ) {
-			if ( ModelTransform.INVALID == _ebco.item.type )
+	override protected function collapasedInfo():String  {
+		if ( _mt ) {
+			if ( ModelTransform.INVALID == _mt.type )
 				return "No transforms "
-			return ModelTransform.typeToString( _ebco.item.type );
+			return ModelTransform.typeToString( _mt.type ) + "  " + _mt.deltaAsString();
 		}
 		
 		return "New Model Transform";
 	}
 
-	override public function newItemHandler( $me:UIMouseEvent ):void  {
-		(new Alert( "newItemHandler", 350 )).display();
-	}
-	
 	override protected function hasElements():Boolean {
-		if ( 0 < _ebco.item.delta.length ) 
+		if ( 0 < _mt.delta.length ) 
 			return true
 		 
 		return false
@@ -78,20 +85,20 @@ public class PanelModelTransform extends ExpandableBox
 	override protected function expand():void {
 		super.expand();
 		
-		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 10 ) );
+		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 4 ) );
 		
-		_itemBox.addElement( new ComponentComboBoxWithLabel( "Transform type", typeChanged, ModelTransform.typeToString( _ebco.item.type ), ModelTransform.typesList(), _itemBox.width ) )
+		_itemBox.addElement( new ComponentComboBoxWithLabel( "Transform type", typeChanged, ModelTransform.typeToString( _mt.type ), ModelTransform.typesList(), _itemBox.width ) )
 		_itemBox.addElement( new ComponentLabelInput( "time (ms)"
-											  , function ($e:TextEvent):void { _ebco.item.time = int ( $e.target.text ); setChanged(); }
-											  , _ebco.item.time ? String( _ebco.item.time ) : "Missing time"
+											  , function ($e:TextEvent):void { _mt.time = int ( $e.target.text ); setChanged(); }
+											  , _mt.time ? String( _mt.time ) : "Missing time"
 											  , _itemBox.width ) )
 											  
-		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "delta", "X: ", "Y: ", "Z: ",  _ebco.item.delta, _itemBox.width, updateVal ) )
+		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "delta", "X: ", "Y: ", "Z: ",  _mt.delta, _itemBox.width, updateVal ) )
 	}
 	
 	private function typeChanged( $le:ListEvent ): void {
 		var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex )
-		 _ebco.item.type = ModelTransform.stringToType( li.value )
+		 _mt.type = ModelTransform.stringToType( li.value )
 		 _ani.changed = true;
 	}
 	

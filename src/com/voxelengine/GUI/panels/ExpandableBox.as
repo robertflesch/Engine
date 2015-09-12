@@ -20,21 +20,62 @@ import com.voxelengine.Globals;
 import com.voxelengine.GUI.components.*;
 
 
-public class ExpandableBox extends ResizablePanelVV implements IExpandableItem
+public class ExpandableBox extends ResizablePanelVV
 {
 	private var _expandCollapse:Button;
 	private var _expanded:Boolean;
 	protected var _itemBox:Box;
 	protected var _ebco:ExpandableBoxConfigObject;
+	protected var _parent:ExpandableBox;
 	
 	private const ITEM_SIZE:int = 25;
 	private const EXPAND_BUTTON_HEIGHT:int = 20;
 	
 	// classes that inherit this need to override these
-	public function newItemHandler( $me:UIMouseEvent ):void 		{ (new Alert("ExpandableBox.newItemHandler - No function defined")).display();	}
-	public function collapasedInfo():String  					{ return "ExpandableBox.collapasedInfo - No function defined"; }
-	public function deleteElementCheck( $me:UIMouseEvent ):void  { (new Alert("ExpandableBox.deleteElementCheck - No function defined")).display(); }
-	public function resetElementCheck( $me:UIMouseEvent ):void  { (new Alert("ExpandableBox.resetElementCheck - No function defined")).display(); }
+	protected function newItemHandler( $me:UIMouseEvent ):void 		{ (new Alert("ExpandableBox.newItemHandler - No function defined")).display();	}
+	protected function collapasedInfo():String  					{ return "ExpandableBox.collapasedInfo - No function defined"; }
+	
+	public function deleteElementCheck( $me:UIMouseEvent ):void {
+		var alert:Alert = new Alert( "Do you really want to delete this " + _ebco.itemBox.title + "?", 350 )
+		alert.setLabels( "Yes", "No" );
+		alert.alertMode = AlertMode.CHOICE;
+		$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
+		alert.display();
+		
+		function alertAction( $ae:AlertEvent ):void {
+			if ( AlertEvent.ACTION == $ae.action )
+				yesDelete()
+			else ( AlertEvent.CHOICE == $ae.action )
+				doNotDelete()
+		}
+		
+		function doNotDelete():void { /* do nothing */ }
+	}
+	
+	protected function yesDelete():void {
+		(new Alert("ExpandableBox.yesDelete - No function defined - override")).display();
+	}
+	
+	public function resetElementCheck( $me:UIMouseEvent ):void {
+		var alert:Alert = new Alert( "Do you really want to reset this " + _ebco.itemBox.title + "?", 350 )
+		alert.setLabels( "Yes", "No" );
+		alert.alertMode = AlertMode.CHOICE;
+		$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
+		alert.display();
+		
+		function alertAction( $ae:AlertEvent ):void {
+			if ( AlertEvent.ACTION == $ae.action )
+				resetElement()
+			else ( AlertEvent.CHOICE == $ae.action )
+				doNotReset()
+		}
+		
+		function doNotReset():void { /* do nothing */ }
+	}
+	
+	protected function resetElement():void {
+		(new Alert("ExpandableBox.resetElement - No function defined - override")).display();
+	}
 	
 	public function ExpandableBox( $ebco:ExpandableBoxConfigObject ) {
 		_ebco = $ebco;
@@ -61,7 +102,7 @@ public class ExpandableBox extends ResizablePanelVV implements IExpandableItem
 		_itemBox.x = EXPAND_BUTTON_HEIGHT + (_ebco.itemBox.paddingLeft * 2);
 		_itemBox.y = _ebco.itemBox.paddingTop;
 		_itemBox.backgroundColor = _ebco.itemBox.backgroundColor ;
-_itemBox.backgroundColor = 0x00ff00;
+//_itemBox.backgroundColor = 0x00ff00;
 		addElement( _itemBox );
 	
 		collapse();
@@ -150,6 +191,7 @@ _itemBox.backgroundColor = 0x00ff00;
 		_expandCollapse.label = "+";
 		
 		var itemCount:String = collapasedInfo();
+		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 10 ) )
 		var label:Label = new Label( collapasedInfo(), _itemBox.width - ITEM_SIZE );
 		label.x = 10;
 		_itemBox.addElement( label );
@@ -182,7 +224,6 @@ _itemBox.backgroundColor = 0x00ff00;
 			$evtColl.addEvent( resetButton, UIMouseEvent.RELEASE, resetElementCheck );
 			_itemBox.addElement( resetButton );
 		}
-
 	}
 }
 }

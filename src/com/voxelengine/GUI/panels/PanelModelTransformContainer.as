@@ -7,13 +7,11 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
 package com.voxelengine.GUI.panels {
-	
-import org.flashapi.swing.event.UIMouseEvent;
 
-public class PanelVectorContainer extends ExpandableBox {
+public class PanelModelTransformContainer extends ExpandableBox {
 	
 	// Note: item in vector needs to have a "name" method
-	public function PanelVectorContainer( $ebco:ExpandableBoxConfigObject ) {
+	public function PanelModelTransformContainer( $ebco:ExpandableBoxConfigObject ) {
 		super( $ebco )
 	}
 	
@@ -28,25 +26,13 @@ public class PanelVectorContainer extends ExpandableBox {
 			ebco.items = _ebco.items
 			ebco.width = _itemBox.width
 			ebco.title = ""
+			ebco.itemBox.showDelete = true;
 			var item:* = new _ebco.itemDisplayObject( ebco );
 			_itemBox.addElement( item );
 		}
 	}
-	
 	override protected function collapasedInfo():String  {
-		return String( _ebco.items.length ) + " " + _ebco.itemBox.title;
-	}
-
-	override protected function newItemHandler( $me:UIMouseEvent ):void {
-		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
-		ebco.rootObject = _ebco.rootObject
-		ebco.item = null
-		ebco.items = _ebco.items
-		ebco.width = _itemBox.width
-		ebco.title = ""
-		var item:* = new _ebco.itemDisplayObject( ebco );
-		_itemBox.addElement( item );
-		resizePane( null );
+		return "PMTC " + String( _ebco.items.length ) + " " + _ebco.itemBox.title;
 	}
 }
 }

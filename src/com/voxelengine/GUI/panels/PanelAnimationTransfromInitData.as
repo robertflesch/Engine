@@ -8,7 +8,7 @@ import org.flashapi.swing.event.*
 import org.flashapi.swing.constants.*
 import org.flashapi.swing.plaf.spas.SpasUI
 
-import com.voxelengine.GUI.components.ComponentVector3DSideLabel
+import com.voxelengine.GUI.components.*
 import com.voxelengine.GUI.panels.ExpandableBox
 
 import com.voxelengine.worldmodel.animation.AnimationTransform
@@ -27,18 +27,14 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 		super( $ebco )
 	}
 	
-	override public function deleteElementCheck( $me:UIMouseEvent ):void {
-		(new Alert( "Delete element check ", 350 )).display()
-	}
-	
-	override public function resetElementCheck( $me:UIMouseEvent ):void  { 
+	override protected function resetElement():void  { 
 		_at.hasPosition = false
 		_at.hasRotation = false
 		_at.hasScale = false
 		collapse()
 	}
 	
-	override public function collapasedInfo():String  {
+	override protected function collapasedInfo():String  {
 		var outString:String = ""
 		if ( _at.hasPosition )
 			outString += formatVec3DToSummary( "pos:", _at.position )
@@ -61,10 +57,6 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 		return $title + "x:" + $vec.x + " y:" + $vec.y + " z:" + $vec.z + " "
 	}
 
-	override public function newItemHandler( $me:UIMouseEvent ):void  {
-		(new Alert( "newItemHandler", 350 )).display()
-	}
-	
 	override protected function hasElements():Boolean {
 		//if ( 0 < _ebco.item.delta.length ) 
 			return true
@@ -94,6 +86,7 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 				_at.scale.copyFrom( vm.instanceInfo.scaleGetOriginal() )
 		}
 		
+		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 4 ) );
 		_itemBox.addElement( new ComponentVector3DSideLabel( function ():void { _ani.changed = true; _at.hasPosition = true }
 		                                                   , "location", "X: ", "Y: ", "Z: ",  _at.position, _itemBox.width ) )
 		_itemBox.addElement( new ComponentVector3DSideLabel( function ():void { _ani.changed = true; _at.hasRotation = true }

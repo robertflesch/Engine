@@ -1,3 +1,8 @@
+Home automation
+http://madrossan.github.io/smart_home_arch/
+Blogging on github
+http://jekyllbootstrap.com/
+
 WHos hiring
 https://news.ycombinator.com/item?id=9996333
 
@@ -18,6 +23,7 @@ Model placement
 	The default screen shot of new models is has to be hand made.
 		Screen shot does not over write predicably
 	Nice to have an indication of which model is selected.
+	Intertra translucent membranes showing on wings
 	When I change a model, do all the models change, or is a new instance created? not clearly in one of the other situations right now.
 	Toolbar loses pictures of model when loading.
 	When you place a model, you can not stack another on top of it. It needs to have a placeholder inserted into the oxel.
