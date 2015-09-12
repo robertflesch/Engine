@@ -1361,11 +1361,16 @@ package org.flashapi.swing {
 			if (index >= $objList.size) {
 				resetSelectableItem(si);
 			} else  {
-				var item:Object = $objList.get(dataCursor).item;
-				si.spas_internal::setIndex(dataCursor);
-				si.enabled = true;
-				si.selected = si.dotted = item.selected;
-				updateSelectableItem(si, item);
+				var itemTemp:Object = $objList.get(dataCursor);
+				if ( itemTemp ) {
+					var item:Object = itemTemp.item;
+					si.spas_internal::setIndex(dataCursor);
+					si.enabled = true;
+					si.selected = si.dotted = item.selected;
+					updateSelectableItem(si, item);
+				}
+				else
+					trace( "ListBox.updateItemById - invalid data in objList" );
 			}
 		}
 		
