@@ -64,6 +64,7 @@ package com.voxelengine.worldmodel.scripts
 			
 			// What was I thinking here?
 			//var gunMSLocation:Vector3D = gunModel.positionGetWithParent;
+			// this is not calculating correctly, need to dig in and see why.
 			var gunWSLocation:Vector3D = gunModel.wsPositionGet()
 			var dr:Vector3D = new Vector3D(0, 0, -1);
 			dr = gunModel.deltaTransformVector( dr );

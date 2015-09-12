@@ -34,11 +34,15 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 public class PanelModelTransform extends ExpandableBox
 {
 	private var _cbType:ComboBox  = new ComboBox()	
+	private var _ani:Animation
 	
 	//public function PanelModelTransform( $ani:Animation, $modelXform:ModelTransform, $widthParam = 300, $heightParam = 100 ) {
 	public function PanelModelTransform( $ebco:ExpandableBoxConfigObject ) {		
+		_ani = $ebco.rootObject
+
 		if ( null == $ebco.item ) {
 			$ebco.item = ModelTransform.defaultObject();
+			$ebco.items.push( $ebco.item as ModelTransform );
 		}
 		
 		$ebco.itemBox.showNew = false;
@@ -88,7 +92,7 @@ public class PanelModelTransform extends ExpandableBox
 	private function typeChanged( $le:ListEvent ): void {
 		var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex )
 		 _ebco.item.type = ModelTransform.stringToType( li.value )
-		 _ebco.rootObject.changed = true;
+		 _ani.changed = true;
 	}
 	
 	//////////////////////////////
@@ -104,7 +108,7 @@ public class PanelModelTransform extends ExpandableBox
 	
 	
 	private function setChanged():void {
-		_ebco.rootObject.changed = true;
+		_ani.changed = true;
 	}
 }
 }

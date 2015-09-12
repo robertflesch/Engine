@@ -22,7 +22,11 @@ import com.voxelengine.worldmodel.animation.AnimationTransform;
 public class PanelAnimationTransform extends ExpandableBox
 {
 	static private const NEW_ITEM_TEXT:String = "Animation Transform";
+	private var _ani:Animation
+	
 	public function PanelAnimationTransform( $ebco:ExpandableBoxConfigObject ) {
+		_ani = $ebco.rootObject
+
 		if ( null == $ebco.item )
 			$ebco.item = new AnimationTransform( AnimationTransform.DEFAULT_OBJECT );
 		
@@ -94,7 +98,7 @@ public class PanelAnimationTransform extends ExpandableBox
 	
 	
 	private function setChanged():void {
-		_ebco.rootObject.changed = true;
+		_ani.changed = true;
 	}
 }
 }

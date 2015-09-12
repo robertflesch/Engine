@@ -40,16 +40,17 @@ public class PanelVectorContainer extends ExpandableBox {
 		}
 	}
 	override public function collapasedInfo():String  {
-		return String( _ebco.items.length ) + " " + _ebco.itemBox.title;
+		return "PVC " + String( _ebco.items.length ) + " " + _ebco.itemBox.title;
 	}
-	
 
-	//override public function deleteElementCheck( $me:UIMouseEvent ):void {
-		//(new Alert( "PanelVectorContainer.deleteElementCheck", 350 )).display();
-	//}
-	
 	override public function newItemHandler( $me:UIMouseEvent ):void  {
-		var item:* = new _ebco.itemDisplayObject( _ebco.rootObject, null, _itemBox.width );
+		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
+		ebco.rootObject = _ebco.rootObject
+		ebco.item = null
+		ebco.items = _ebco.items
+		ebco.width = _itemBox.width
+		ebco.title = ""
+		var item:* = new _ebco.itemDisplayObject( ebco );
 		_itemBox.addElement( item );
 		resizePane( null );
 	}
