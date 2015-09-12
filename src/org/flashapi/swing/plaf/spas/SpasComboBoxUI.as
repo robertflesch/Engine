@@ -204,29 +204,30 @@ package org.flashapi.swing.plaf.spas {
 			var color2:RGB = new RGB(comboboxColor);
 			f.clear();
 			var m:Matrix = new Matrix();
-			m.createGradientBox(w, h, Math.PI/2, 0, 0);
+			//m.createGradientBox(w, h, Math.PI/2, 0, 0);
 			if (lineColor2 == -1) f.lineStyle(1, lineColor1, 1, true);
 			else {
 				f.lineStyle(1, lineColor1, .5, true);
 				f.lineGradientStyle(GradientType.LINEAR, [lineColor1, lineColor2], [1, 1], [0, 250], m);
 			}
-			f.beginGradientFill(GradientType.LINEAR, [color2.darker(), comboboxColor], [1, 1], [0, 250], m);
+			//f.beginGradientFill(GradientType.LINEAR, [color2.darker(), comboboxColor], [1, 1], [0, 250], m);
+			f.beginFill(0xFFFFFF)
 			var cu:LafDTOCornerUtil = new LafDTOCornerUtil(dto, 6);
 			f.drawRoundedBox(0, 0, w, h, cu.topLeft, cu.topRight, cu.bottomRight, cu.bottomLeft);
 			f.endFill();
-			with(tgt.graphics) {
-				moveTo(cu.topLeft, 0);
-				lineStyle(0, lineColor1, 0);
-				beginFill(0xFFFFFF, .2);
-				lineTo(w-cu.topRight, 0);
-				curveTo(w, 0, w, cu.topRight);
-				lineTo(w, middle);
-				curveTo(3*w/4, middle+bch, w/2, middle);
-				curveTo(w/4, middle-bch, 0, middle);
-				lineTo(0, cu.topLeft);
-				curveTo(0, 0, cu.topLeft, 0);
-				endFill();
-			}
+			//with(tgt.graphics) {
+				//moveTo(cu.topLeft, 0);
+				//lineStyle(0, lineColor1, 0);
+				//beginFill(0x000000, .2);
+				//lineTo(w-cu.topRight, 0);
+				//curveTo(w, 0, w, cu.topRight);
+				//lineTo(w, middle);
+				//curveTo(3*w/4, middle+bch, w/2, middle);
+				//curveTo(w/4, middle-bch, 0, middle);
+				//lineTo(0, cu.topLeft);
+				//curveTo(0, 0, cu.topLeft, 0);
+				//endFill();
+			//}
 		}
 	}
 }
