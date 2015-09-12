@@ -38,11 +38,12 @@ public class ControlBeastScript extends Script
 			{
 				if ( vm )
 				{
-					var controllingModel:VoxelModel = vm.instanceInfo.controllingModel;
+					//var controllingModel:VoxelModel = vm.instanceInfo.controllingModel;
+					var controllingModel:VoxelModel = vm.topmostControllingModel();
 					if ( controllingModel ) { 
 						if ( Player.player && Player.player.instanceInfo ) {
 							var ii:InstanceInfo = Player.player.instanceInfo;
-							if ( controllingModel && null == Player.player.instanceInfo.controllingModel )
+							if ( null == Player.player.instanceInfo.controllingModel )
 								new WindowBeastControlQuery( controllingModel.instanceInfo.instanceGuid );
 						}
 						else

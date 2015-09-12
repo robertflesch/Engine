@@ -100,7 +100,7 @@ package com.voxelengine.worldmodel.scripts
 		
 		public function onWeaponEventDrop( $event:WeaponEvent ):void 
 		{
-			if ( instanceGuid != $event.instanceGuid )
+			if ( instanceGuid != $event.gun.instanceInfo.instanceGuid )
 			{
 				trace( "onWeaponEvent: BombScript - ignoring event for someone else" + $event + " guid: " + instanceGuid );
 				return;

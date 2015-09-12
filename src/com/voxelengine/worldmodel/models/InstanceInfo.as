@@ -238,7 +238,7 @@ public class InstanceInfo extends Location	{
 	public function topmostGuid():String {
 		if ( controllingModel )
 			return controllingModel.instanceInfo.topmostGuid();
-		return modelGuid;	
+		return instanceGuid;	
 	}
 	
 	override public function fromObject( $info:Object ):void {

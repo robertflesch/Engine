@@ -79,7 +79,7 @@ public class Gun extends ControllableVoxelModel
 	
 	public function fire( $name:String ):void {
 		var ammo:Ammo = _armory.getAmmoByName( $name );
-		Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, instanceInfo.instanceGuid, ammo ) );			
+		WeaponEvent.dispatch( new WeaponEvent( WeaponEvent.FIRE, this, ammo ) );			
 	}
 	
 	private var _ammoCount:int;

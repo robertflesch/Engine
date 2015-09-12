@@ -35,11 +35,10 @@ package com.voxelengine.worldmodel.models.types
 		{
 			super( ii, mi );
 			Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent, false, 0, true );
-			ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 			instanceInfo.track = true;
 		}
 		
-		protected function onChildAdded( me:ModelEvent ):void
+		override protected function onChildAdded( me:ModelEvent ):void
 		{
 			if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
 				return;

@@ -36,8 +36,8 @@ package com.voxelengine.worldmodel.scripts
 	{
 		public function FireProjectileScript() 
 		{
-			Globals.g_app.addEventListener( WeaponEvent.FIRE, onFire );
-			Globals.g_app.addEventListener( ProjectileEvent.PROJECTILE_CREATED, createProjectile );
+			WeaponEvent.addListener( WeaponEvent.FIRE, onFire );
+			ProjectileEvent.addListener( ProjectileEvent.PROJECTILE_CREATED, createProjectile );
 		}
 		
 		// TODO - Is there anyway that this is removed? and listeners are removed?
@@ -46,9 +46,8 @@ package com.voxelengine.worldmodel.scripts
 		{
 			// This gun listens for a WeaponEvent.FIRE, that means that a weapon has been fired
 			// make sure its the owner of this weapon that fired it. so that correct position info, etc can be determined
-			if ( instanceGuid != $event.instanceGuid )
-			{
-				trace( "FireProjectileScript.onFire - ignoring event for someone else" + $event + " instanceGuid: " + instanceGuid );
+			if ( instanceGuid != $event.gun.instanceInfo.instanceGuid ) {
+				Log.out( "FireProjectileScript.onFire - ignoring event for someone else" + $event + " instanceGuid: " + instanceGuid );
 				return;
 			}
 			
@@ -57,59 +56,102 @@ package com.voxelengine.worldmodel.scripts
 			// That is determined by the guns location, and rotation, and by its parents location and rotation
 			
 			// first we calculate the location of the end of the barrel
-			const gunModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
-			if ( gunModel )
-			{
-				// What was I thinking here?
-				//var gunMSLocation:Vector3D = gunModel.positionGetWithParent;
-				var gunMSLocation:Vector3D = gunModel.instanceInfo.positionGet
-				var gunMSCenterLocation:Vector3D = gunMSLocation.add( gunModel.instanceInfo.center );
+			const gunModel:Gun = $event.gun;
+			if ( !gunModel ) {
+				Log.out( "FireProjectileScript.onFire - Gun model is NULL", Log.ERROR );
+				return;
+			}
+			
+			// What was I thinking here?
+			//var gunMSLocation:Vector3D = gunModel.positionGetWithParent;
+			var gunWSLocation:Vector3D = gunModel.wsPositionGet()
+			var dr:Vector3D = new Vector3D(0, 0, -1);
+			dr = gunModel.deltaTransformVector( dr );
+			
+			// dont handle event directly, since then I will generate event at same times as everyone else.
+			var pe:ProjectileEvent = new ProjectileEvent( ProjectileEvent.PROJECTILE_SHOT );
+			
+			//throw new Error( "FireProjectileScript.onFire - what to do here" );
+			pe.ammo = $event.ammo
+			pe.owner = gunModel.instanceInfo.instanceGuid
+			pe.position = gunWSLocation
+			pe.direction = dr
+			
+			ProjectileEvent.dispatch( pe );
+			//Log.out( "FireProjectileScript.onFire - dispatchEvent: " + pe );
+			
+			SoundBank.playSound( SoundBank.getSound( $event.ammo.launchSoundFile ) );
+		}
+		
+		public function onFireOld( $event:WeaponEvent ):void {
+			// This gun listens for a WeaponEvent.FIRE, that means that a weapon has been fired
+			// make sure its the owner of this weapon that fired it. so that correct position info, etc can be determined
+			if ( instanceGuid != $event.gun.instanceInfo.instanceGuid ) {
+				Log.out( "FireProjectileScript.onFire - ignoring event for someone else" + $event + " instanceGuid: " + instanceGuid );
+				return;
+			}
+			
+			//Log.out( "FireProjectileScript.onFire - EVENT: " + WeaponEvent.FIRE );
+			// this calculates the bullets starting position.
+			// That is determined by the guns location, and rotation, and by its parents location and rotation
+			
+			// first we calculate the location of the end of the barrel
+			const gunModel:Gun = $event.gun;
+			if ( !gunModel ) {
+				Log.out( "FireProjectileScript.onFire - Gun model is NULL", Log.ERROR );
+				return;
+			}
+			
+			// What was I thinking here?
+			//var gunMSLocation:Vector3D = gunModel.positionGetWithParent;
+			var gunMSLocation:Vector3D = gunModel.instanceInfo.positionGet
+			var gunMSCenterLocation:Vector3D = gunMSLocation.add( gunModel.instanceInfo.center );
 
-				// now we have to determine the starting location of the bullet 
-				// size of bullet
-				var ammo:Ammo = $event.ammo;
-				var bulletG0:int = 1 << ammo.grain;
-				// Why is "Y" over 4, but rest are over 2?
-				var bulletCenter:Vector3D  = new Vector3D ( bulletG0/2, bulletG0/4, bulletG0/2 );
-				var bulletMSLocation:Vector3D = gunMSCenterLocation.subtract( bulletCenter );
-				
-				var bulletWSLocation:Vector3D;
-				if ( gunModel.instanceInfo.controllingModel )
+			// now we have to determine the starting location of the bullet 
+			// size of bullet
+			var ammo:Ammo = $event.ammo;
+			var bulletG0:int = 1 << ammo.grain;
+			// Why is "Y" over 4, but rest are over 2?
+			var bulletCenter:Vector3D  = new Vector3D ( bulletG0/2, bulletG0/4, bulletG0/2 );
+			var bulletMSLocation:Vector3D = gunMSCenterLocation.subtract( bulletCenter );
+			
+			var bulletWSLocation:Vector3D;
+			if ( gunModel.instanceInfo.controllingModel )
+			{
+				var shipModel:VoxelModel = gunModel.instanceInfo.controllingModel;
+				if ( shipModel )
 				{
-					var shipModel:VoxelModel = gunModel.instanceInfo.controllingModel;
-					if ( shipModel )
-					{
-						// adjust the bullets starting location based on parents rotation
-						//trace( "pre " + bulletMSLocation );
-						//bulletWSLocation = shipModel.instanceInfo.worldSpaceMatrix.deltaTransformVector( bulletMSLocation );
-						bulletWSLocation = shipModel.modelToWorld( bulletMSLocation );
-						//trace( "pst " + bulletWSLocation );
-					}
-					else
-						bulletWSLocation = gunModel.modelToWorld( bulletMSLocation );
+					// adjust the bullets starting location based on parents rotation
+					//trace( "pre " + bulletMSLocation );
+					//bulletWSLocation = shipModel.instanceInfo.worldSpaceMatrix.deltaTransformVector( bulletMSLocation );
+					bulletWSLocation = shipModel.modelToWorld( bulletMSLocation );
+					//trace( "pst " + bulletWSLocation );
 				}
 				else
 					bulletWSLocation = gunModel.modelToWorld( bulletMSLocation );
-
-
-				var dr:Vector3D = new Vector3D(0, 0, -1);
-				dr = gunModel.deltaTransformVector( dr );
-				
-				// dont handle event directly, since then I will generate event at same times as everyone else.
-				var pe:ProjectileEvent = new ProjectileEvent( ProjectileEvent.PROJECTILE_SHOT );
-				
-				//throw new Error( "FireProjectileScript.onFire - what to do here" );
-				pe.ammo = ammo;
-				pe.owner = gunModel.instanceInfo.instanceGuid;
-				pe.position = bulletWSLocation;
-				pe.direction = dr;
-				
-				Globals.g_app.dispatchEvent( pe );
-				//Log.out( "FireProjectileScript.onFire - dispatchEvent: " + pe );
-				
-				SoundBank.playSound( SoundBank.getSound( ammo.launchSoundFile ) );
 			}
+			else
+				bulletWSLocation = gunModel.modelToWorld( bulletMSLocation );
+
+
+			var dr:Vector3D = new Vector3D(0, 0, -1);
+			dr = gunModel.deltaTransformVector( dr );
+			
+			// dont handle event directly, since then I will generate event at same times as everyone else.
+			var pe:ProjectileEvent = new ProjectileEvent( ProjectileEvent.PROJECTILE_SHOT );
+			
+			//throw new Error( "FireProjectileScript.onFire - what to do here" );
+			pe.ammo = ammo;
+			pe.owner = gunModel.instanceInfo.instanceGuid;
+			pe.position = bulletWSLocation;
+			pe.direction = dr;
+			
+			ProjectileEvent.dispatch( pe );
+			//Log.out( "FireProjectileScript.onFire - dispatchEvent: " + pe );
+			
+			SoundBank.playSound( SoundBank.getSound( ammo.launchSoundFile ) );
 		}
+		
 		
 		static public function createProjectile( pe:ProjectileEvent ):void
 		{

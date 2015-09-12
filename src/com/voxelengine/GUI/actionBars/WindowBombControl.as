@@ -8,6 +8,7 @@ package com.voxelengine.GUI.actionBars
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.WeaponEvent;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
+	import com.voxelengine.worldmodel.weapons.Gun;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import org.flashapi.swing.*;
@@ -90,8 +91,8 @@ package com.voxelengine.GUI.actionBars
 
 		private function fire(event:UIMouseEvent):void 
 		{
-			var vm:VoxelModel = (event.target.data) as VoxelModel;
-			Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, vm.instanceInfo.instanceGuid, null ) );
+			var gun:Gun = (event.target.data) as Gun;
+			WeaponEvent.dispatch( new WeaponEvent( WeaponEvent.FIRE, gun,  gun.armory.currentSelection() ) );
 
 			event.target.enabled = false;
 			var reloadTimer:DataTimer = new DataTimer( 5000, 1 );

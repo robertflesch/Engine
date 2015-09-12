@@ -110,12 +110,10 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	}
 
 	override public function save():void {
-		if ( !Globals.isGuid( guid ) ) {
-			Log.out( "ModelMetadata.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
-			return;
-		}
+		if ( Globals.isGuid( guid ) )
+			return super.save();
 		
-		super.save();
+		Log.out( "ModelMetadata.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
 	}
 	
 	//////////////////////////////////////////////////////////////////

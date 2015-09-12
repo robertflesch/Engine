@@ -91,7 +91,7 @@ package com.voxelengine.GUI.voxelModels
 
 			addElement( new ComponentVector3DToObject( setChanged, ii.setPositionInfo, "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, WIDTH, updateVal ) );
 			addElement( new ComponentVector3DToObject( setChanged, ii.setRotationInfo, "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, WIDTH, updateVal ) );
-			addElement( new ComponentVector3DToObject( setChanged, ii.setScaleInfo, "Scale", "X: ", "Y: ", "Z: ",  ii.scale, WIDTH, updateScaleVal, 5 ) );
+			addElement( new ComponentVector3DToObject( setChanged, ii.setScaleInfo, "Scale", "X: ", "Y: ", "Z: ",  ii.scale, WIDTH, updateScaleVal, 4 ) );
 			addElement( new ComponentVector3DToObject( setChanged, ii.setCenterInfo, "Center", "X: ", "Y: ", "Z: ",  ii.center, WIDTH, updateVal ) );
 //			addElement( new ComponentVector3DSideLabel( setChanged, "Center", "X: ", "Y: ", "Z: ",  ii.center, WIDTH, updateVal ) );
 			addElement( new ComponentSpacer( WIDTH ) );
@@ -126,9 +126,8 @@ package com.voxelengine.GUI.voxelModels
 		private function newPhoto( $me:UIMouseEvent ):void {
 			var bmpd:BitmapData = Globals.g_renderer.modelShot();
 			_vm.metadata.thumbnail = drawScaled( bmpd, PHOTO_CAPTURE_WIDTH, PHOTO_CAPTURE_WIDTH );
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CHANGED, 0, _vm.metadata.guid, null ) );
 			addPhoto();
-			_vm.metadata.changed = true;
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CHANGED, 0, _vm.metadata.guid, null ) );
 		}
 		
 		private function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {

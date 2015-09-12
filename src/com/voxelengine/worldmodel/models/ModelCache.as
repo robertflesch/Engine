@@ -122,7 +122,7 @@ package com.voxelengine.worldmodel.models
 				// ah, this is the instance by guid, basically the look up spot for things...
 				// not the instances, which are used to draw everything.
 				_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
-				ModelEvent.dispatch( new ModelEvent( ModelEvent.CHILD_MODEL_ADDED, vm.instanceInfo.instanceGuid, null, null, vm.instanceInfo.controllingModel.instanceInfo.instanceGuid ) );
+				ModelEvent.dispatch( new ModelEvent( ModelEvent.CHILD_MODEL_ADDED, vm.instanceInfo.instanceGuid, null, null, vm.instanceInfo.controllingModel.instanceInfo.instanceGuid, vm ) );
 			}
 			else if ( vm.instanceInfo.dynamicObject )
 			{

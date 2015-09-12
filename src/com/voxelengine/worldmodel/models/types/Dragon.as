@@ -52,7 +52,6 @@ public class Dragon extends Beast
 		hasInventory = true;
 		//usesGravity = true;
 		collisionMarkers = true;
-		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, defaultSlotDataRequest );
 //		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_DEFAULT_RESPONSE, defaultSlotDataResponse );
 		FunctionRegistry.functionAdd( loseControlHandler, "loseControlHandler" );
@@ -302,15 +301,22 @@ public class Dragon extends Beast
 	
 	import com.voxelengine.worldmodel.weapons.Gun;
 	protected var _guns:Vector.<Gun> = new Vector.<Gun>;
-	override protected function onChildAdded( me:ModelEvent ):void
+	override protected function onChildAdded( $me:ModelEvent ):void
 	{
-		if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
+		if ( !$me.vm ) {
+			Log.out( "Dragon.onChildAdded - missing child model", Log.ERROR );
+			return;
+		}
+		
+		if ( !($me.vm is Gun) )	
 			return;
 			
-		for each ( var child:VoxelModel in modelInfo.childVoxelModels ) {
-			if ( child is Gun && me.instanceGuid == child.instanceInfo.instanceGuid )
-				_guns.push( child );
-		}
+		// make sure the gun belongs to us.
+		var topMostGuid:String = $me.vm.instanceInfo.topmostGuid()
+		if ( topMostGuid != instanceInfo.instanceGuid )
+			return;
+			
+		_guns.push( $me.vm )
 	}
 	
 }

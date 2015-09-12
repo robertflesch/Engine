@@ -193,13 +193,8 @@ public class ControllableVoxelModel extends VoxelModel
 //				_ct.markersAdd();
 	}		
 	
-	protected function onChildAdded( me:ModelEvent ):void
-	{
-		if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
-			return;
-			
-//			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( me.ownerGuid );
-	}
+	// Just here for the descendants to override
+	protected function onChildAdded( me:ModelEvent ):void { }
 	
 	protected function throttleEvent( event:ShipEvent ):void
 	{

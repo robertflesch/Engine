@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.events
 {
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.events.Event;
 import flash.geom.Vector3D;
 import flash.events.EventDispatcher;
@@ -55,28 +56,31 @@ public class ModelEvent extends Event
 	private var _rotation:Vector3D;
 	private var _position:Vector3D;
 	private var _instanceGuid:String;
+	private var _vm:VoxelModel;
 	
 	public function get rotation():Vector3D { return _rotation; }
 	public function get position():Vector3D { return _position; }
 	public function get instanceGuid():String { return _instanceGuid; }
+	public function get vm():VoxelModel { return _vm }
 	
-	public function ModelEvent( $type:String, $instanceGuid:String, $position:Vector3D = null, $rotation:Vector3D = null, $parentInstanceGuid:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function ModelEvent( $type:String, $instanceGuid:String, $position:Vector3D = null, $rotation:Vector3D = null, $parentInstanceGuid:String = "", $vm:VoxelModel = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
 		_instanceGuid = $instanceGuid;
 		_rotation = $rotation;
 		_position = $position;
 		_parentInstanceGuid = $parentInstanceGuid;
+		_vm = $vm;
 	}
 	
 	public override function clone():Event
 	{
-		return new ModelEvent(type, _instanceGuid, _rotation, _position, _parentInstanceGuid, bubbles, cancelable);
+		return new ModelEvent(type, _instanceGuid, _rotation, _position, _parentInstanceGuid, _vm, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString("ModelEvent", "instanceGuid", "rotation", "position", "parentGuid" );
+		return formatToString("ModelEvent", "instanceGuid", "rotation", "position", "parentGuid", "vm" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

@@ -119,8 +119,6 @@ public class Player extends Avatar
 	private function addEventHandlers():void {
 		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		
-		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
-		
 		LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
 		ModelLoadingEvent.addListener( ModelLoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
@@ -132,8 +130,6 @@ public class Player extends Avatar
 
 	private function removeEventHandlers():void {
 		LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, onLogin );
-		
-		ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		
 		ModelLoadingEvent.removeListener( ModelLoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
 		LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );

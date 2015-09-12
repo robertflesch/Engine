@@ -7,6 +7,7 @@ package com.voxelengine.GUI.actionBars
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.WeaponEvent;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
+	import com.voxelengine.worldmodel.weapons.Gun;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import org.flashapi.swing.*;
@@ -71,7 +72,10 @@ package com.voxelengine.GUI.actionBars
 		private function fire(event:UIMouseEvent):void 
 		{
 			var instanceGuid:String = (event.target.data) as String;
-			Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, instanceGuid, null ) );
+			// Make sure this is right
+			var gun:Gun = Region.currentRegion.modelCache.instanceGet( instanceGuid ) as Gun;
+			WeaponEvent.dispatch( new WeaponEvent( WeaponEvent.FIRE, gun,  gun.armory.currentSelection() ) );
+			
 
 			event.target.enabled = false;
 			var reloadTimer:DataTimer = new DataTimer( 5000, 1 );

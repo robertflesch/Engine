@@ -1,100 +1,84 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
-  All rights reserved.  This product contains computer programs, screen
-  displays and printed documentation which are original works of
-  authorship protected under United States Copyright Act.
-  Unauthorized reproduction, translation, or display is prohibited.
+Copyright 2011-2015 Robert Flesch
+All rights reserved.  This product contains computer programs, screen
+displays and printed documentation which are original works of
+authorship protected under United States Copyright Act.
+Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-	import com.voxelengine.Globals;
-	import com.voxelengine.Log;
-	import com.voxelengine.worldmodel.oxel.GrainCursor;
-	import com.voxelengine.worldmodel.oxel.Oxel;
-	import com.voxelengine.worldmodel.scripts.Script;
-	import com.voxelengine.worldmodel.models.*;
-	import com.voxelengine.worldmodel.*;
-	import com.voxelengine.events.TriggerEvent;
-	import com.voxelengine.pools.GrainCursorPool;
-	import flash.display3D.Context3D;
-	import flash.geom.Vector3D;
-	import flash.geom.Matrix3D;
-	import flash.utils.ByteArray;
+import com.voxelengine.Globals;
+import com.voxelengine.Log;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
+import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.scripts.Script;
+import com.voxelengine.worldmodel.models.*;
+import com.voxelengine.worldmodel.*;
+import com.voxelengine.events.TriggerEvent;
+import com.voxelengine.pools.GrainCursorPool;
+import flash.display3D.Context3D;
+import flash.geom.Vector3D;
+import flash.geom.Matrix3D;
+import flash.utils.ByteArray;
+
+/**
+ * ...
+ * @author Robert Flesch - RSF 
+ * The world model holds the active oxels
+ */
+public class Trigger extends VoxelModel 
+{
+	private var _inside:Boolean = false;
 	
-	/**
-	 * ...
-	 * @author Robert Flesch - RSF 
-	 * The world model holds the active oxels
-	 */
-	public class Trigger extends VoxelModel 
-	{
-		private var _inside:Boolean = false;
-		private var _was_selected:Boolean = false;
-		private var _ba:ByteArray = new ByteArray();
+	public function Trigger( $ii:InstanceInfo ) { 
+		super( $ii );
+	}
+	
+	static public function buildExportObject( obj:Object ):void {
+		VoxelModel.buildExportObject( obj )
+	}
+	
+	override public function update(context:Context3D, elapsedTimeMS:int):void {
+		super.update(context, elapsedTimeMS);
 		
-		public function Trigger( $ii:InstanceInfo ) { 
-			super( $ii );
-		}
-		
-		static public function buildExportObject( obj:Object ):void {
-			VoxelModel.buildExportObject( obj )
-		}
-		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-			super.init( $mi, $vmm );
-		}
-		
-
-		override public function update(context:Context3D, elapsedTimeMS:int):void 
-		{
-			super.update(context, elapsedTimeMS);
+		if ( !VoxelModel.controlledModel || !modelInfo.data || !modelInfo.data.oxel )
+			return;
 			
-			if ( VoxelModel.controlledModel && modelInfo.data )
-			{
-				var wsPositionCenter:Vector3D = VoxelModel.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( VoxelModel.controlledModel.instanceInfo.center );
-				
-				var msPos:Vector3D;
-				if ( instanceInfo.controllingModel )
-				{
-					msPos = instanceInfo.controllingModel.worldToModel( wsPositionCenter );
-					msPos = msPos.subtract( this.instanceInfo.positionGet );
-				}
-				else
-					msPos = worldToModel( wsPositionCenter );
+		var wsPositionCenter:Vector3D = VoxelModel.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( VoxelModel.controlledModel.instanceInfo.center );
+			
+		var msPos:Vector3D;
+		if ( instanceInfo.controllingModel )
+		{
+			msPos = instanceInfo.controllingModel.worldToModel( wsPositionCenter );
+			msPos = msPos.subtract( this.instanceInfo.positionGet );
+		}
+		else
+			msPos = worldToModel( wsPositionCenter );
 
-				var ox:Oxel = modelInfo.data.oxel;
-				var gct:GrainCursor = GrainCursorPool.poolGet( ox.gc.bound );
-				gct.getGrainFromVector( msPos, 0 );
-				if ( gct.is_inside( ox.gc ) )
-				{
-					// Only want to dispatch the event once per transition
-					if ( !_inside )
-					{
-						_inside = true;
-						// Send OxelEvent?
-						Log.out( "Trigger.update - INSIDE" );
-						//for each ( var iscript:Script in instanceInfo.scripts )
-						{
-							TriggerEvent.dispatch( new TriggerEvent( TriggerEvent.INSIDE, instanceInfo.instanceGuid ) );
-						}
-					}
-				} 
-				else
-				{
-					if ( _inside )
-					{
-						_inside = false;
-						Log.out( "Trigger.update - OUTSIDE" );
-						//for each ( var oscript:Script in instanceInfo.scripts )
-						{
-							TriggerEvent.dispatch( new TriggerEvent( TriggerEvent.OUTSIDE, instanceInfo.instanceGuid ) );
-						}
-					}
-				}
-				
-				GrainCursorPool.poolDispose( gct );
+		var ox:Oxel = modelInfo.data.oxel;
+		var gct:GrainCursor = GrainCursorPool.poolGet( ox.gc.bound );
+		gct.getGrainFromVector( msPos, 0 );
+		if ( gct.is_inside( ox.gc ) ) {
+			// Only want to dispatch the event once per transition
+			if ( !_inside ) {
+				_inside = true;
+				Log.out( "Trigger.update - INSIDE" );
+				TriggerEvent.dispatch( new TriggerEvent( TriggerEvent.INSIDE, instanceInfo.instanceGuid ) );
 			}
+		} 
+		else {
+			if ( _inside ) {
+				_inside = false;
+				Log.out( "Trigger.update - OUTSIDE" );
+				TriggerEvent.dispatch( new TriggerEvent( TriggerEvent.OUTSIDE, instanceInfo.instanceGuid ) );
+			}
+		}
+		GrainCursorPool.poolDispose( gct );
+	}
+}
+}
 
+/*
 			var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
 			if ( selected )
 			{
@@ -131,6 +115,4 @@ package com.voxelengine.worldmodel.models.types
 				//oxel.dirty = true;
 				//oxel.quadsBuild();
 			}
-		}
-	}
-}
+			*/

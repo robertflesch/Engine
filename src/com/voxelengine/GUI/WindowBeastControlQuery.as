@@ -38,8 +38,7 @@ public class WindowBeastControlQuery extends VVCanvas
 			}
 		}
 		
-		public function WindowBeastControlQuery( $beastInstanceGuid:String ):void 
-		{ 
+		public function WindowBeastControlQuery( $beastInstanceGuid:String ):void { 
 			super();
 			if ( null != WindowBeastControlQuery.currentInstance )
 				Log.out( "WindowBeastControlQuery.constructor - trying to create window when one already exists" );
@@ -59,37 +58,40 @@ public class WindowBeastControlQuery extends VVCanvas
 			RegionEvent.addListener( RegionEvent.UNLOAD, onRegionUnload );
 			GUIEvent.addListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
 			GUIEvent.addListener( GUIEvent.TOOLBAR_SHOW, guiEventHandler );
+			ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 				
 			display();
 			onResize( null );
 		} 
 		
-        protected function onResize( event:Event ):void
-        {
+		private function modelRemoved( $me:ModelEvent):void {
+			if ( $me.instanceGuid == _beastInstanceGuid )
+				remove();
+		}
+		
+        protected function onResize( event:Event ):void {
 			move( Globals.g_renderer.width / 2 - width / 2, Globals.g_renderer.height - height - window_offset );
 		}
 		
-		private function onRegionUnload ( le:RegionEvent ):void 
-		{ 
+		private function onRegionUnload ( le:RegionEvent ):void { 
 			remove();
 		}
 		
 
 		// Window events
-		private function onRemoved( event:UIOEvent ):void
- 		{
+		private function onRemoved( event:UIOEvent ):void {
 			removeEventListener(UIOEvent.REMOVED, onRemoved );
             Globals.g_app.stage.removeEventListener(Event.RESIZE, onResize );
 			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, takeControlKey );
 			RegionEvent.removeListener( RegionEvent.UNLOAD, onRegionUnload );
 			GUIEvent.removeListener( GUIEvent.TOOLBAR_HIDE, guiEventHandler );
 			GUIEvent.removeListener( GUIEvent.TOOLBAR_SHOW, guiEventHandler );
+			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
 			_s_currentInstance = null;
 		}
 
-		private function takeControl():void 
-		{
+		private function takeControl():void {
 			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _beastInstanceGuid );
 			if ( vm )
 			{
@@ -98,20 +100,17 @@ public class WindowBeastControlQuery extends VVCanvas
 			}
 		}
 		
-		private function takeControlKey(e:KeyboardEvent):void 
-		{
+		private function takeControlKey(e:KeyboardEvent):void {
 			if ( Keyboard.F == e.keyCode )
 				takeControl();
 		}
 		
-		private function takeControlMouse(event:UIMouseEvent):void 
-		{
+		private function takeControlMouse(event:UIMouseEvent):void {
 			event.target.removeEventListener(MouseEvent.CLICK, takeControl );
 			takeControl();
 		}
 		
-		private function guiEventHandler( e:GUIEvent ):void
-		{
+		private function guiEventHandler( e:GUIEvent ):void	{
 			if ( GUIEvent.TOOLBAR_HIDE == e.type )
 				window_offset = 0;
 			else if ( GUIEvent.TOOLBAR_SHOW == e.type )

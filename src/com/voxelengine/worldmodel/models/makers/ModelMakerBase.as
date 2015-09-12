@@ -88,6 +88,9 @@ public class ModelMakerBase {
 	protected function make():VoxelModel {
 		var modelAsset:String = _modelInfo.modelClass;
 		var modelClass:Class = ModelLibrary.getAsset( modelAsset )
+		if ( null == _ii.instanceGuid )
+			 _ii.instanceGuid = Globals.getUID();
+		
 		var vm:VoxelModel = new modelClass( _ii );
 		if ( null == vm ) {
 			Log.out( "ModelMakerBase.make - Model failed in creation - modelAsset: " + modelAsset + "  modelClass: " + modelClass, Log.ERROR );

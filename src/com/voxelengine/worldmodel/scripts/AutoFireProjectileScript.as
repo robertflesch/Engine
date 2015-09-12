@@ -4,6 +4,8 @@ package com.voxelengine.worldmodel.scripts
 	 * ...
 	 * @author Bob
 	 */
+	import com.voxelengine.worldmodel.weapons.Ammo;
+	import com.voxelengine.worldmodel.weapons.Gun;
 	import flash.events.TimerEvent;
 	import flash.events.KeyboardEvent;
 	import flash.utils.Timer;
@@ -45,7 +47,8 @@ package com.voxelengine.worldmodel.scripts
 		private function fire():void
 		{
 			trace( "AutoFireProjectileScript.fire" );
-			Globals.g_app.dispatchEvent( new WeaponEvent( WeaponEvent.FIRE, _instanceGuid, null ) );
+			var ammo:Ammo = (vm as Gun).armory.currentSelection()
+			WeaponEvent.dispatch( new WeaponEvent( WeaponEvent.FIRE, vm as Gun, ammo ) );
 			//_owner.explode(1);
 		}
 	}
