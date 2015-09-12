@@ -38,7 +38,7 @@ public class PanelModelTransform extends ExpandableBox
 	private var _mt:ModelTransform
 	
 	//public function PanelModelTransform( $ani:Animation, $modelXform:ModelTransform, $widthParam = 300, $heightParam = 100 ) {
-	public function PanelModelTransform( $ebco:ExpandableBoxConfigObject ) {		
+	public function PanelModelTransform( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {		
 		_ani = $ebco.rootObject
 		_mt = $ebco.item
 		if ( null == _mt ) {
@@ -47,8 +47,8 @@ public class PanelModelTransform extends ExpandableBox
 		}
 		
 		$ebco.itemBox.showNew = false;
-		$ebco.itemBox.paddingTop = 2;
-		super( $ebco );
+		//$ebco.itemBox.paddingTop = 2;
+		super( $parent, $ebco );
 	}
 	
 	override protected function yesDelete():void {
@@ -91,7 +91,7 @@ public class PanelModelTransform extends ExpandableBox
 		_itemBox.addElement( new ComponentLabelInput( "time (ms)"
 											  , function ($e:TextEvent):void { _mt.time = int ( $e.target.text ); setChanged(); }
 											  , _mt.time ? String( _mt.time ) : "Missing time"
-											  , _itemBox.width ) )
+											  , _itemBox.width - 10 ) )
 											  
 		_itemBox.addElement( new ComponentVector3DSideLabel( setChanged, "delta", "X: ", "Y: ", "Z: ",  _mt.delta, _itemBox.width, updateVal ) )
 	}

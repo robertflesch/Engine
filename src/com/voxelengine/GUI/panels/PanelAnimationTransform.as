@@ -24,15 +24,15 @@ public class PanelAnimationTransform extends ExpandableBox
 	static private const NEW_ITEM_TEXT:String = "Animation Transform";
 	private var _ani:Animation
 	
-	public function PanelAnimationTransform( $ebco:ExpandableBoxConfigObject ) {
+	public function PanelAnimationTransform( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {
 		_ani = $ebco.rootObject
 
 		if ( null == $ebco.item )
 			$ebco.item = new AnimationTransform( AnimationTransform.DEFAULT_OBJECT );
 		
 		$ebco.itemBox.showReset = true
-		$ebco.itemBox.paddingTop = 2
-		super( $ebco );
+		//$ebco.itemBox.paddingTop = 2
+		super( $parent, $ebco );
 	}
 	
 	override protected function collapasedInfo():String  {
@@ -62,8 +62,8 @@ public class PanelAnimationTransform extends ExpandableBox
 		var ebcoIb:ExpandableBoxConfigObject = _ebco.clone()
 		ebcoIb.width = _itemBox.width
 		ebcoIb.title = "initial setting "
-		ebcoIb.itemBox.paddingTop = 6
-		_itemBox.addElement( new PanelAnimationTransfromInitData( ebcoIb ) )
+		//ebcoIb.itemBox.paddingTop = 6
+		_itemBox.addElement( new PanelAnimationTransfromInitData( this, ebcoIb ) )
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 6 ) )
 
 		if ( !_ebco.items ) {
@@ -80,7 +80,7 @@ public class PanelAnimationTransform extends ExpandableBox
 		ebco.width = _itemBox.width
 		ebco.itemBox.title = " model transforms "
 		ebco.itemBox.newItemText = "New model transform"
-		_itemBox.addElement( new PanelModelTransformContainer( ebco ) )
+		_itemBox.addElement( new PanelModelTransformContainer( this, ebco ) )
 	}
 	
 	private function updateVal( $e:SpinButtonEvent ):int {

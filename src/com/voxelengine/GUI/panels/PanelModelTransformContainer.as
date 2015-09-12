@@ -7,12 +7,12 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
 package com.voxelengine.GUI.panels {
-
+import org.flashapi.swing.event.UIMouseEvent;
 public class PanelModelTransformContainer extends ExpandableBox {
 	
 	// Note: item in vector needs to have a "name" method
-	public function PanelModelTransformContainer( $ebco:ExpandableBoxConfigObject ) {
-		super( $ebco )
+	public function PanelModelTransformContainer( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {
+		super( $parent, $ebco )
 	}
 	
 	override protected function expand():void {
@@ -27,12 +27,26 @@ public class PanelModelTransformContainer extends ExpandableBox {
 			ebco.width = _itemBox.width
 			ebco.title = ""
 			ebco.itemBox.showDelete = true;
-			var item:* = new _ebco.itemDisplayObject( ebco );
+			var item:* = new _ebco.itemDisplayObject( this, ebco );
 			_itemBox.addElement( item );
 		}
 	}
 	override protected function collapasedInfo():String  {
-		return "PMTC " + String( _ebco.items.length ) + " " + _ebco.itemBox.title;
+		return String( _ebco.items.length ) + " " + _ebco.itemBox.title;
+	}
+	
+	// This handles the new model transform
+	override protected function newItemHandler( $me:UIMouseEvent ):void 		{ 
+		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
+		ebco.rootObject = _ebco.rootObject
+		ebco.item = null
+		ebco.items = _ebco.items
+		ebco.width = _itemBox.width
+		ebco.title = ""
+		ebco.itemBox.showDelete = true;
+		var item:* = new _ebco.itemDisplayObject( this, ebco );
+		_itemBox.addElement( item );
+		resizePane( null );
 	}
 }
 }

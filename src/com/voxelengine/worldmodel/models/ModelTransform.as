@@ -364,9 +364,11 @@ public class ModelTransform
 		return outString;
 	}
 	
-	public function toString():String 
-	{ 
+	public function toString():String { 
 		return "{ delta: " +  _delta + "  time: " + _time + "  type: " + typeToString( _type ) + "  name: " + name + "}";
+	} 			
+		public function deltaAsString():String { 
+		return "x: " +  _delta.x + " y: " +  _delta.y + " z: " +  _delta.z + " "
 	} 			
 }
 }

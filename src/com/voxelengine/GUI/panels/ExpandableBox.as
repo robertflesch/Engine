@@ -77,8 +77,9 @@ public class ExpandableBox extends ResizablePanelVV
 		(new Alert("ExpandableBox.resetElement - No function defined - override")).display();
 	}
 	
-	public function ExpandableBox( $ebco:ExpandableBoxConfigObject ) {
+	public function ExpandableBox( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {
 		_ebco = $ebco;
+		_parent = $parent
 		
 		super( _ebco.width, ITEM_SIZE + 2, _ebco.itemBox.borderStyle );
 		setConfigInfo();
@@ -129,8 +130,10 @@ public class ExpandableBox extends ResizablePanelVV
 		}
 		
 		height = _itemBox.height + (_ebco.itemBox.paddingTop * 2);	
-		if ( height < _ebco.itemBox.height )
-			height = _ebco.itemBox.height
+		//if ( height < _ebco.itemBox.height )
+		//	height = _ebco.itemBox.height
+		if ( height < ( _expandCollapse.height + (_ebco.itemBox.paddingTop * 2) ) )
+			height = ( _expandCollapse.height + (_ebco.itemBox.paddingTop * 2) )
 			
 		if ( target )
 			target.dispatchEvent(new ResizerEvent(ResizerEvent.RESIZE_UPDATE));
@@ -190,8 +193,6 @@ public class ExpandableBox extends ResizablePanelVV
 		
 		_expandCollapse.label = "+";
 		
-		var itemCount:String = collapasedInfo();
-		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 10 ) )
 		var label:Label = new Label( collapasedInfo(), _itemBox.width - ITEM_SIZE );
 		label.x = 10;
 		_itemBox.addElement( label );

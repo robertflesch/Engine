@@ -13,8 +13,8 @@ import org.flashapi.swing.event.UIMouseEvent;
 public class PanelVectorContainer extends ExpandableBox {
 	
 	// Note: item in vector needs to have a "name" method
-	public function PanelVectorContainer( $ebco:ExpandableBoxConfigObject ) {
-		super( $ebco )
+	public function PanelVectorContainer( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {
+		super( $parent, $ebco )
 	}
 	
 	override protected function expand():void {
@@ -28,25 +28,13 @@ public class PanelVectorContainer extends ExpandableBox {
 			ebco.items = _ebco.items
 			ebco.width = _itemBox.width
 			ebco.title = ""
-			var item:* = new _ebco.itemDisplayObject( ebco );
+			var item:* = new _ebco.itemDisplayObject( this, ebco );
 			_itemBox.addElement( item );
 		}
 	}
 	
 	override protected function collapasedInfo():String  {
 		return String( _ebco.items.length ) + " " + _ebco.itemBox.title;
-	}
-
-	override protected function newItemHandler( $me:UIMouseEvent ):void {
-		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
-		ebco.rootObject = _ebco.rootObject
-		ebco.item = null
-		ebco.items = _ebco.items
-		ebco.width = _itemBox.width
-		ebco.title = ""
-		var item:* = new _ebco.itemDisplayObject( ebco );
-		_itemBox.addElement( item );
-		resizePane( null );
 	}
 }
 }

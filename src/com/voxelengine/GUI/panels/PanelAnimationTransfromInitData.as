@@ -19,12 +19,12 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 {
 	private var _at:AnimationTransform
 	private var _ani:Animation
-	public function PanelAnimationTransfromInitData( $ebco:ExpandableBoxConfigObject ) {		
+	public function PanelAnimationTransfromInitData( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {		
 		_at  = $ebco.item
 		_ani = $ebco.rootObject
 		$ebco.itemBox.showNew = false
-		$ebco.itemBox.paddingTop = 2
-		super( $ebco )
+		//$ebco.itemBox.paddingTop = 2
+		super( $parent, $ebco )
 	}
 	
 	override protected function resetElement():void  { 

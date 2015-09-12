@@ -116,7 +116,8 @@ public class WindowAnimationDetail extends VVPopup
 		ebco.itemDisplayObject = PanelAnimationTransform
 		ebco.itemBox.showNew = false
 		ebco.itemBox.title = "animatable elements"
-		addElement( new PanelVectorContainer( ebco ) )
+		ebco.itemBox.paddingTop = 6
+		addElement( new PanelVectorContainer( null, ebco ) )
 	}
 	
 	private function addSoundPanel():void {
