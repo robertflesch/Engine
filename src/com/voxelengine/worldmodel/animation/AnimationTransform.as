@@ -48,11 +48,22 @@ public class AnimationTransform
 	public function get scale():Vector3D 						{ return _scale; }
 	public function get transforms():Vector.<ModelTransform> 	{ return _transforms; }
 	public function get hasPosition():Boolean  					{ return _hasPosition; }
-	public function set hasPosition( $val:Boolean):void			{ _hasPosition = $val; }
+	public function set hasPosition( $val:Boolean):void			{ 
+		_hasPosition = $val; 
+		if ( false == $val )
+			_position.setTo( 0, 0, 0 );
+	}
 	public function get hasRotation():Boolean					{ return _hasRotation; }
-	public function set hasRotation( $val:Boolean):void			{ _hasRotation = $val; }
+	public function set hasRotation( $val:Boolean):void			{ 
+		_hasRotation = $val; 
+		_rotation.setTo( 0, 0, 0 );
+	}
 	public function get hasScale():Boolean 						{ return _hasScale; }
-	public function set hasScale( $val:Boolean):void			{ _hasScale = $val; }
+	public function set hasScale( $val:Boolean):void			{ 
+		_hasScale = $val; 
+		if ( false == $val )
+			_scale.setTo( 1, 1, 1 );
+	}
 	public function get hasTransform():Boolean  				{ return _hasTransform; }
 	public function get notNamed():Boolean 						{ return _notNamed; }
 	
@@ -79,7 +90,10 @@ public class AnimationTransform
 		
 		if ( $obj.scale ) {
 			_scale = new Vector3D( $obj.scale.x, $obj.scale.y, $obj.scale.z );
-			_hasScale = true;
+			if ( 3 != _scale.lengthSquared )
+				_hasScale = true;
+			else
+				_hasScale = false;
 		}
 		
 		if ( $obj.rotation ) {
