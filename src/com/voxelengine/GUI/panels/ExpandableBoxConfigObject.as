@@ -21,6 +21,9 @@ public class ExpandableBoxConfigObject extends Object
 	public var itemBox:ItemBoxConfigObject = new ItemBoxConfigObject()
 	public var paddingLeft:int = 4;
 	public var paddingTop:int = 5;
+	public var itemSize:int = 25;
+	public var expandButtonSize:int = 20;
+
 		
 	public function ExpandableBoxConfigObject()	{
 	}
@@ -34,6 +37,10 @@ public class ExpandableBoxConfigObject extends Object
 		ebco.title				= title				
 		ebco.width				= width				
 		ebco.itemBox			= itemBox.clone()			
+		ebco.paddingLeft		= paddingLeft
+		ebco.paddingTop			= paddingTop
+		ebco.itemSize			= itemSize
+		ebco.expandButtonSize	= expandButtonSize
 		return ebco
 	}
 }

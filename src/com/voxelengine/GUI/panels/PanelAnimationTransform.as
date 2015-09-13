@@ -81,17 +81,7 @@ public class PanelAnimationTransform extends ExpandableBox
 		_itemBox.addElement( new PanelModelTransformContainer( this, ebco ) )
 	}
 	
-	private function updateVal( $e:SpinButtonEvent ):int {
-		var ival:int = int( $e.target.data.text );
-		if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival--;
-		else 											ival++;
-		setChanged();
-		$e.target.data.text = ival.toString();
-		return ival;
-	}
-	
-	
-	private function setChanged():void {
+	override protected function setChanged():void {
 		_ani.changed = true;
 	}
 }

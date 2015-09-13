@@ -11,15 +11,17 @@ package com.voxelengine.GUI.panels
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
-import org.flashapi.swing.containers.UIContainer;	
-import org.flashapi.swing.plaf.spas.SpasUI;
 import org.flashapi.swing.layout.AbsoluteLayout;
 
 import com.voxelengine.Log;
-import com.voxelengine.Globals;
-import com.voxelengine.GUI.components.*;
 
-
+/* This class features a +/- button on the right side
+ * and an expandable panel on the right. 
+ * The expandable panel can contain more expandable panels
+ * allowing for heirarchy to be displayed in a collapable manner
+ * the look and feel of the panels can be controlled via the
+ * ExpandableBoxConfigObject
+ */
 public class ExpandableBox extends ResizablePanelVV
 {
 	private var _expandCollapse:Button;
@@ -28,13 +30,43 @@ public class ExpandableBox extends ResizablePanelVV
 	protected var _ebco:ExpandableBoxConfigObject;
 	protected var _parent:ExpandableBox;
 	
-	private const ITEM_SIZE:int = 25;
-	private const EXPAND_BUTTON_HEIGHT:int = 20;
-	
 	// classes that inherit this need to override these
 	protected function newItemHandler( $me:UIMouseEvent ):void 		{ (new Alert("ExpandableBox.newItemHandler - No function defined")).display();	}
 	protected function collapasedInfo():String  					{ return "ExpandableBox.collapasedInfo - No function defined"; }
 	
+	public function ExpandableBox( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {
+		_ebco = $ebco;
+		_parent = $parent
+		
+		super( _ebco.width, _ebco.itemSize + 2, _ebco.itemBox.borderStyle );
+		setConfigInfo();
+		layout = new AbsoluteLayout();
+		padding = 0;
+		autoSize = false;
+		
+		// This create the expand button
+		_expandCollapse = new Button( "+", _ebco.expandButtonSize, _ebco.expandButtonSize );
+		_expandCollapse.padding = 0;
+		_expandCollapse.x = _ebco.paddingLeft;
+		_expandCollapse.y = _ebco.paddingTop;
+		$evtColl.addEvent( _expandCollapse, UIMouseEvent.RELEASE, expandOrCollapse );
+		addElement( _expandCollapse );
+		
+		_ebco.itemBox.width = width - 31
+		_itemBox = new ResizablePanelVV( _ebco.itemBox.width, _ebco.itemBox.height, BorderStyle.NONE );
+		_itemBox.layout = new AbsoluteLayout();
+		_itemBox.autoSize =  false;
+		_itemBox.padding = 0;
+		_itemBox.x = _ebco.expandButtonSize + (_ebco.paddingLeft * 2);
+		_itemBox.y = _ebco.paddingTop;
+		_itemBox.backgroundColor = _ebco.itemBox.backgroundColor ;
+		addElement( _itemBox );
+	
+		collapse();
+		resizePane( null );
+		addEventListener( ResizerEvent.RESIZE_UPDATE, resizePane );		
+	}
+
 	public function deleteElementCheck( $me:UIMouseEvent ):void {
 		var alert:Alert = new Alert( "Do you really want to delete this " + _ebco.itemBox.title + "?", 350 )
 		alert.setLabels( "Yes", "No" );
@@ -77,40 +109,6 @@ public class ExpandableBox extends ResizablePanelVV
 		(new Alert("ExpandableBox.resetElement - No function defined - override")).display();
 	}
 	
-	public function ExpandableBox( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {
-		_ebco = $ebco;
-		_parent = $parent
-		
-		super( _ebco.width, ITEM_SIZE + 2, _ebco.itemBox.borderStyle );
-		setConfigInfo();
-		layout = new AbsoluteLayout();
-		padding = 0;
-		autoSize = false;
-		
-		// This create the expand button
-		_expandCollapse = new Button( "+", EXPAND_BUTTON_HEIGHT, EXPAND_BUTTON_HEIGHT );
-		_expandCollapse.padding = 0;
-		_expandCollapse.x = _ebco.paddingLeft;
-		_expandCollapse.y = _ebco.paddingTop;
-		$evtColl.addEvent( _expandCollapse, UIMouseEvent.RELEASE, expandOrCollapse );
-		addElement( _expandCollapse );
-		
-		_ebco.itemBox.width = width - 31
-		_itemBox = new ResizablePanelVV( _ebco.itemBox.width, _ebco.itemBox.height, BorderStyle.NONE );
-		_itemBox.layout = new AbsoluteLayout();
-		_itemBox.autoSize =  false;
-		_itemBox.padding = 0;
-		_itemBox.x = EXPAND_BUTTON_HEIGHT + (_ebco.paddingLeft * 2);
-		_itemBox.y = _ebco.paddingTop;
-		_itemBox.backgroundColor = _ebco.itemBox.backgroundColor ;
-//_itemBox.backgroundColor = 0x00ff00;
-		addElement( _itemBox );
-	
-		collapse();
-		resizePane( null );
-		addEventListener( ResizerEvent.RESIZE_UPDATE, resizePane );		
-	}
-	
 	private function setConfigInfo():void {
 		title = _ebco.title;
 		backgroundColor = _ebco.itemBox.backgroundColor;
@@ -130,8 +128,7 @@ public class ExpandableBox extends ResizablePanelVV
 		}
 		
 		height = _itemBox.height + (_ebco.itemBox.paddingTop * 2);	
-		//if ( height < _ebco.itemBox.height )
-		//	height = _ebco.itemBox.height
+		// Make sure that the min size is larger then the button size plus twice padding
 		if ( height < ( _expandCollapse.height + (_ebco.paddingTop * 2) ) )
 			height = ( _expandCollapse.height + (_ebco.paddingTop * 2) )
 			
@@ -165,7 +162,7 @@ public class ExpandableBox extends ResizablePanelVV
 		newItemButton.borderStyle = BorderStyle.GROOVE;
 		newItemButton.y = _itemBox.height;
 		newItemButton.width = _itemBox.width;
-		newItemButton.height = ITEM_SIZE;// + _ebco.itemBox.paddingTop;
+		newItemButton.height = _ebco.itemSize;// + _ebco.itemBox.paddingTop;
 		newItemButton.backgroundColor = 0x00ff00;
 		
 		var lbl:Label = new Label( _ebco.itemBox.newItemText, _itemBox.width );
@@ -196,15 +193,15 @@ public class ExpandableBox extends ResizablePanelVV
 		
 		_expandCollapse.label = "+";
 		
-		var label:Label = new Label( collapasedInfo(), _itemBox.width - ITEM_SIZE );
+		var label:Label = new Label( collapasedInfo(), _itemBox.width - _ebco.itemSize );
 		label.x = 10;
 		_itemBox.addElement( label );
 		if ( _ebco.itemBox.showDelete ) {
 			var deleteButton:Box = new Box();
-			deleteButton.x = (_itemBox.width - EXPAND_BUTTON_HEIGHT );
+			deleteButton.x = (_itemBox.width - _ebco.expandButtonSize );
 			deleteButton.autoSize = false;
-			deleteButton.width = EXPAND_BUTTON_HEIGHT;
-			deleteButton.height = EXPAND_BUTTON_HEIGHT;
+			deleteButton.width = _ebco.expandButtonSize;
+			deleteButton.height = _ebco.expandButtonSize;
 			deleteButton.padding = 0;
 			deleteButton.paddingTop = 1;
 			deleteButton.paddingLeft = 4;
@@ -215,19 +212,35 @@ public class ExpandableBox extends ResizablePanelVV
 		}
 		if ( _ebco.itemBox.showReset && hasElements() ) {
 			var resetButton:Box = new Box();
-			resetButton.x = (_itemBox.width - EXPAND_BUTTON_HEIGHT * 3);
+			resetButton.x = (_itemBox.width - _ebco.expandButtonSize * 3);
 			resetButton.autoSize = false;
-			resetButton.width = EXPAND_BUTTON_HEIGHT * 3;
-			resetButton.height = EXPAND_BUTTON_HEIGHT;
+			resetButton.width = _ebco.expandButtonSize * 3;
+			resetButton.height = _ebco.expandButtonSize;
 			resetButton.borderStyle = BorderStyle.RIDGE
 			resetButton.padding = 0;
 			resetButton.paddingTop = 1;
 			resetButton.paddingLeft = 4;
 			resetButton.backgroundColor = 0xff0000;
-			resetButton.addElement( new Label( "  Reset" ) );
+			var rbLabel:Label = new Label( "Reset" )
+			rbLabel.textAlign = TextAlign.CENTER;
+			resetButton.addElement( rbLabel );
 			$evtColl.addEvent( resetButton, UIMouseEvent.RELEASE, resetElementCheck );
 			_itemBox.addElement( resetButton );
 		}
 	}
+	
+	protected function updateVal( $e:SpinButtonEvent ):int {
+		var ival:int = int( $e.target.data.text );
+		if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival--;
+		else 											ival++;
+		setChanged();
+		$e.target.data.text = ival.toString();
+		return ival;
+	}
+	
+	protected function setChanged():void {
+		{ (new Alert("ExpandableBox.setChanged - No function defined, MUST override")).display();	}		
+	}
+	
 }
 }
