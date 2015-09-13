@@ -17,7 +17,7 @@ public class ItemBoxConfigObject extends Object
 	public var backgroundColor:uint = SpasUI.DEFAULT_COLOR;
 	
 	public var paddingLeft:int = 4;
-	public var paddingTop:int = 4;
+	public var paddingTop:int = 5;
 	
 	public var title:String = "";
 	public var showNew:Boolean = false;

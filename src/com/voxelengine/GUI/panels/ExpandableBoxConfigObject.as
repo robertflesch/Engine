@@ -19,6 +19,8 @@ public class ExpandableBoxConfigObject extends Object
 	public var title:String
 	public var width:int = 200	
 	public var itemBox:ItemBoxConfigObject = new ItemBoxConfigObject()
+	public var paddingLeft:int = 4;
+	public var paddingTop:int = 5;
 		
 	public function ExpandableBoxConfigObject()	{
 	}

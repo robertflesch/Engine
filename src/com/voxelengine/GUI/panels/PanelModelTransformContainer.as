@@ -46,7 +46,9 @@ public class PanelModelTransformContainer extends ExpandableBox {
 		ebco.itemBox.showDelete = true;
 		var item:* = new _ebco.itemDisplayObject( this, ebco );
 		_itemBox.addElement( item );
-		resizePane( null );
+		changeMode()
+		changeMode()
+
 	}
 }
 }

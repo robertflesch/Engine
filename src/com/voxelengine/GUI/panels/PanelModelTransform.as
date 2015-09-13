@@ -47,7 +47,6 @@ public class PanelModelTransform extends ExpandableBox
 		}
 		
 		$ebco.itemBox.showNew = false;
-		//$ebco.itemBox.paddingTop = 2;
 		super( $parent, $ebco );
 	}
 	
@@ -62,7 +61,8 @@ public class PanelModelTransform extends ExpandableBox
 				mts.splice( i, 1 )
 			}
 		}
-		collapse();
+		_parent.changeMode()
+		_parent.changeMode()
 	}
 	
 	override protected function collapasedInfo():String  {

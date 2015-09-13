@@ -116,7 +116,7 @@ public class WindowAnimationDetail extends VVPopup
 		ebco.itemDisplayObject = PanelAnimationTransform
 		ebco.itemBox.showNew = false
 		ebco.itemBox.title = "animatable elements"
-		ebco.itemBox.paddingTop = 6
+		ebco.paddingTop = 8
 		addElement( new PanelVectorContainer( null, ebco ) )
 	}
 	

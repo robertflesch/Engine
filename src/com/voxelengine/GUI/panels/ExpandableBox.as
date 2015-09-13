@@ -90,8 +90,8 @@ public class ExpandableBox extends ResizablePanelVV
 		// This create the expand button
 		_expandCollapse = new Button( "+", EXPAND_BUTTON_HEIGHT, EXPAND_BUTTON_HEIGHT );
 		_expandCollapse.padding = 0;
-		_expandCollapse.x = _ebco.itemBox.paddingLeft;
-		_expandCollapse.y = _ebco.itemBox.paddingTop;
+		_expandCollapse.x = _ebco.paddingLeft;
+		_expandCollapse.y = _ebco.paddingTop;
 		$evtColl.addEvent( _expandCollapse, UIMouseEvent.RELEASE, expandOrCollapse );
 		addElement( _expandCollapse );
 		
@@ -100,8 +100,8 @@ public class ExpandableBox extends ResizablePanelVV
 		_itemBox.layout = new AbsoluteLayout();
 		_itemBox.autoSize =  false;
 		_itemBox.padding = 0;
-		_itemBox.x = EXPAND_BUTTON_HEIGHT + (_ebco.itemBox.paddingLeft * 2);
-		_itemBox.y = _ebco.itemBox.paddingTop;
+		_itemBox.x = EXPAND_BUTTON_HEIGHT + (_ebco.paddingLeft * 2);
+		_itemBox.y = _ebco.paddingTop;
 		_itemBox.backgroundColor = _ebco.itemBox.backgroundColor ;
 //_itemBox.backgroundColor = 0x00ff00;
 		addElement( _itemBox );
@@ -132,14 +132,14 @@ public class ExpandableBox extends ResizablePanelVV
 		height = _itemBox.height + (_ebco.itemBox.paddingTop * 2);	
 		//if ( height < _ebco.itemBox.height )
 		//	height = _ebco.itemBox.height
-		if ( height < ( _expandCollapse.height + (_ebco.itemBox.paddingTop * 2) ) )
-			height = ( _expandCollapse.height + (_ebco.itemBox.paddingTop * 2) )
+		if ( height < ( _expandCollapse.height + (_ebco.paddingTop * 2) ) )
+			height = ( _expandCollapse.height + (_ebco.paddingTop * 2) )
 			
 		if ( target )
 			target.dispatchEvent(new ResizerEvent(ResizerEvent.RESIZE_UPDATE));
 	}
-	
-	private function expandOrCollapse( $me:UIMouseEvent ):void {
+
+	public function changeMode():void {
 		if ( _expanded ) {
 			_expanded = false;
 			collapse();
@@ -147,12 +147,15 @@ public class ExpandableBox extends ResizablePanelVV
 		else {
 			_expanded = true;
 			expand();
+			if ( _ebco.itemBox.showNew )
+				addNewItemButton();
 		}
 		
-		if ( _ebco.itemBox.showNew )
-			addNewItemButton();
-			
 		resizePane( null );
+	}
+	
+	private function expandOrCollapse( $me:UIMouseEvent ):void {
+		changeMode()
 	}
 	
 	private function addNewItemButton():void {

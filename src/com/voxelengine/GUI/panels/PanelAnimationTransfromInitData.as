@@ -23,7 +23,6 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 		_at  = $ebco.item
 		_ani = $ebco.rootObject
 		$ebco.itemBox.showNew = false
-		//$ebco.itemBox.paddingTop = 2
 		super( $parent, $ebco )
 	}
 	

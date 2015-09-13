@@ -31,7 +31,6 @@ public class PanelAnimationTransform extends ExpandableBox
 			$ebco.item = new AnimationTransform( AnimationTransform.DEFAULT_OBJECT );
 		
 		$ebco.itemBox.showReset = true
-		//$ebco.itemBox.paddingTop = 2
 		super( $parent, $ebco );
 	}
 	
@@ -62,7 +61,6 @@ public class PanelAnimationTransform extends ExpandableBox
 		var ebcoIb:ExpandableBoxConfigObject = _ebco.clone()
 		ebcoIb.width = _itemBox.width
 		ebcoIb.title = "initial setting "
-		//ebcoIb.itemBox.paddingTop = 6
 		_itemBox.addElement( new PanelAnimationTransfromInitData( this, ebcoIb ) )
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 6 ) )
 
