@@ -289,10 +289,16 @@ public class ModelTransform
 		return false;
 	}
 	
-	public function buildExportObject( obj:Object ):void {			
+	public function toObject():Object {			
+		var obj:Object = new Object();
 		obj.time 	= _originalTime;
-		obj.delta	= _originalDelta;
+		obj.delta	= vector3DToObject( _originalDelta );
 		obj.type 	= typeToString( _type );
+		return obj
+		
+		function vector3DToObject( $vec:Vector3D ):Object {
+			return { x:$vec.x, y:$vec.y, z:$vec.z };
+		}
 	}
 	
 	static public function stringToType( val:String ):int

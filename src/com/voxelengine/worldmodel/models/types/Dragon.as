@@ -312,8 +312,8 @@ public class Dragon extends Beast
 			return;
 			
 		// make sure the gun belongs to us.
-		var topMostGuid:String = $me.vm.instanceInfo.topmostGuid()
-		if ( topMostGuid != instanceInfo.instanceGuid )
+		var topmostInstanceGuid:String = $me.vm.instanceInfo.topmostInstanceGuid()
+		if ( topmostInstanceGuid != instanceInfo.instanceGuid )
 			return;
 			
 		_guns.push( $me.vm )

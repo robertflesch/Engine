@@ -36,12 +36,12 @@ public class Animation extends PersistanceObject
 	private var _transforms:Vector.<AnimationTransform>;
 	private var _attachments:Vector.<AnimationAttachment>;
 	private var _sound:AnimationSound;
+	private var _permissions:PermissionsBase;
 
 	public function get attachments():Vector.<AnimationAttachment> { return _attachments; }
 	public function get transforms():Vector.<AnimationTransform> { return _transforms; }
 	//public function get loaded():Boolean { return _loaded; }
 	
-	private var _permissions:PermissionsBase;
 	
 	public function get permissions():PermissionsBase 			{ return _permissions; }
 	public function set permissions( val:PermissionsBase):void	{ _permissions = val; changed = true; }
@@ -66,6 +66,20 @@ public class Animation extends PersistanceObject
 	////////////////
 	public function Animation( $guid:String ) {
 		super( $guid, Globals.BIGDB_TABLE_ANIMATIONS );		
+	}
+	
+	static public function newObject():Object {
+		var obj:Object = new DatabaseObject( Globals.BIGDB_TABLE_ANIMATIONS, "0", "0", 0, true, null )
+		obj.data = new Object()
+		return obj
+	}
+	
+	override public function clone( $guid:String ):* {
+		// force the data from the dynamic classes into the object
+		toObject()
+		var newAni:Animation = new Animation( $guid )
+		newAni.fromObjectImport( dbo )
+		return newAni
 	}
 	
 	public function fromObjectImport( $dbo:DatabaseObject ):void {
@@ -102,38 +116,39 @@ public class Animation extends PersistanceObject
 	}
 	
 	override protected function toObject():void {
-		Log.out( "Animation.toObject", Log.WARN );
-		// Only need to change these if the data has changed, and since there are not editing tools in app for animations yet
-		// Not going to do it until it is needed
+		Log.out( "Animation.toObject", Log.WARN )
+		// just use the info as it is at base level
+		// but need to refresh
+		// transforms
+		// attachments
+		// sounds
+		// permissions?
 		
-		//if ( _sound )
-			//_sound.getJSON( info );
-		//if ( _attachments )
-			//getAttachments( info );
-		//if ( _transforms )
-			//getTransforms( info );
-//
-		//function getAttachments( info:Object ):void {
-			//var oa:Vector.<Object> = new Vector.<Object>();
-			//for each ( var aa:AnimationAttachment in _attachments ) {
-				//var ao:Object = new Object();
-				//aa.buildExportObject( ao );
-				//oa.push( ao );
-			//}
-			//if ( oa.length )
-				//info.attachments = oa;
-		//}
-		//
-		//function getTransforms( info:Object ):void {
-			//var ot:Vector.<Object> = new Vector.<Object>();
-			//for each ( var at:AnimationTransform in _transforms ) {
-				//var ao:Object = new Object();
-				//at.buildExportObject( ao );
-				//ot.push( ao );
-			//}
-			//if ( ot.length )
-				//info.animations = ot;
-		//}
+		if ( _sound )
+			info.sound = _sound.toObject()
+		if ( _transforms && _transforms.length )
+			info.animations = getAnimations()
+		if ( _attachments && _attachments.length )
+			info.attachments = getAttachments()
+
+		function getAttachments():Object {
+			var attachments:Array = new Array();
+			for each ( var aa:AnimationAttachment in _attachments ) {
+				var aao:Object = aa.toObject()
+				attachments.push( aao )
+			}
+			return attachments
+		}
+		
+		function getAnimations():Object {
+			var transforms:Array = new Array();
+			for ( var i:int; i < _transforms.length; i++ ) {
+				var at:AnimationTransform = _transforms[i]
+				var ato:Object = at.toObject()
+				transforms.push( ato )
+			}
+			return transforms
+		}
 	}
 
 	// Only attributes that need additional handling go here.

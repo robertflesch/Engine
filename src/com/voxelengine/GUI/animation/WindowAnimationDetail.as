@@ -7,33 +7,18 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.animation
 {
-import com.voxelengine.GUI.components.*;
-import com.voxelengine.GUI.panels.*;
-import com.voxelengine.worldmodel.animation.Animation;
-import com.voxelengine.worldmodel.animation.AnimationTransform;
-import flash.geom.Vector3D;
-import flash.net.FileReference;
-import flash.events.Event;
-import flash.net.FileFilter;
-import flash.utils.ByteArray;
-import flash.utils.Dictionary;
-
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
-import org.flashapi.swing.list.ListItem;
+//import org.flashapi.swing.list.ListItem;
+import org.flashapi.swing.plaf.spas.SpasUI;
 
-
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.GUI.VVPopup;
 import com.voxelengine.GUI.LanguageManager;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.types.Player;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.models.ModelMetadata;
+import com.voxelengine.GUI.components.*;
+import com.voxelengine.GUI.panels.*;
+import com.voxelengine.worldmodel.animation.Animation;
 
 public class WindowAnimationDetail extends VVPopup
 {
@@ -41,6 +26,7 @@ public class WindowAnimationDetail extends VVPopup
 	private var _modelKey:String;
 	private static const WIDTH:int = 400;
 	private var _ani:Animation;
+	private var _aniBackup:Animation;
 	private var _create:Boolean;
 	
 	public function WindowAnimationDetail( $guid:String, $ani:Animation )
@@ -58,6 +44,7 @@ public class WindowAnimationDetail extends VVPopup
 			_create = true
 			_ani = new Animation( "INVALID" );
 		}
+		_aniBackup = _ani.clone( _ani.guid );
 		
 		autoSize = true;
 		layout.orientation = LayoutOrientation.VERTICAL;
@@ -69,24 +56,57 @@ public class WindowAnimationDetail extends VVPopup
 		addButtonPanel();
 		
 		display();
+		defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION;
+		onCloseFunction = closeFunction;
+	}
+	
+	private function closeFunction():void {
+		// ask about saving changes?
+		if ( _ani.changed ) 
+			queryToSaveChanges()
+		remove();
+		
+		function queryToSaveChanges():void {
+			var alert:Alert = new Alert( "You have unsaved changes, want do you want to do?", 400 )
+			alert.setLabels( "Save", "Abandon" );
+			alert.alertMode = AlertMode.CHOICE;
+			$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
+			alert.display();
+			
+			function alertAction( $ae:AlertEvent ):void {
+				if ( AlertEvent.ACTION == $ae.action )
+					_ani.save()
+				else ( AlertEvent.CHOICE == $ae.action )
+					_ani = _aniBackup
+			}
+		}
 	}
 	
 	private function addButtonPanel():void {
-		var panelParentButton:Panel = new Panel( width, _TOTAL_BUTTON_PANEL_HEIGHT );
-		panelParentButton.layout.orientation = LayoutOrientation.VERTICAL;
-		panelParentButton.padding = 2;
-		addElement( panelParentButton );
+		var buttonBox:Box = new Box( width, 35, BorderStyle.NONE )
+		buttonBox.layout.orientation = LayoutOrientation.HORIZONTAL
+		buttonBox.backgroundColor = SpasUI.DEFAULT_COLOR
+		buttonBox.padding = 2
+		addElement( buttonBox )
 		
 		var saveAnimation:Button = new Button( LanguageManager.localizedStringGet( "Save_Animation" ));
-		saveAnimation.addEventListener(UIMouseEvent.CLICK, saveAnimationHandler );
+		saveAnimation.addEventListener(UIMouseEvent.CLICK, saveHandler );
 		//saveAnimation.width = pbWidth - 2 * pbPadding;
-		panelParentButton.addElement( saveAnimation );
+		buttonBox.addElement( saveAnimation );
+		
+		var revert:Button = new Button( LanguageManager.localizedStringGet( "Revert Changes" ));
+		revert.addEventListener(UIMouseEvent.CLICK, revertHandler );
+		//revert.width = pbWidth - 2 * pbPadding;
+		buttonBox.addElement( revert );
+		
+		function revertHandler(event:UIMouseEvent):void  {
+			_ani = _aniBackup
+		}
+		function saveHandler(event:UIMouseEvent):void  {
+			_ani.save()
+		}
 	}
 
-	private function saveAnimationHandler(event:UIMouseEvent):void  {
-		// TODO FIXME
-		// all changes are automattically saved, that is bad...
-	}
 	
 	private function addMetadataPanel():void {
 		addElement( new ComponentSpacer( width ) );

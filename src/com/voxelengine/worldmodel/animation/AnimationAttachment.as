@@ -62,20 +62,37 @@ public class AnimationAttachment
 		_instanceInfo = new InstanceInfo();
 		_instanceInfo.fromObject( $obj );
 	}
-
+/*
 	public function buildExportObject( obj:Object ):void {			
 		obj.fileName 		= _guid;
 		obj.attachsTo 		= _attachsTo;
 		obj.location		= _instanceInfo.positionGet;
 		obj.rotation		= _instanceInfo.rotationGet;
 	}
-	
+	*/
+	public function toObject( ):Object {			
+		var obj:Object = new Object()
+		obj.fileName 		= _guid
+		obj.attachsTo 		= _attachsTo
+		obj.location		= vector3DIntToObject( _instanceInfo.positionGet )
+		obj.rotation		= vector3DToObject( _instanceInfo.rotationGet )
+		return obj
+		
+		function vector3DToObject( $vec:Vector3D ):Object {
+			return { x:$vec.x, y:$vec.y, z:$vec.z };
+		}
+		
+		function vector3DIntToObject( $vec:Vector3D ):Object {
+			return { x:int($vec.x), y:int($vec.y), z:int($vec.z) };
+		}
+	}
+	/*
 	public function toJSON(k:*):* {
 		return {
 			attachmentName: _owner
 		}
 	}
-	
+	*/
 	public function create( $owner:VoxelModel ):void
 	{
 		Log.out( "AnimationAttachment.create owner: " + $owner.toString() );

@@ -95,18 +95,18 @@ public class ModelMakerImport extends ModelMakerBase {
 			completeMake();
 	}
 	
-	private var _topMostGuid:String; // Used to return the modelClass of the topmost guid of the parent chain.
+	private var _topMostModelGuid:String; // Used to return the modelClass of the topmost guid of the parent chain.
 	private function retrieveParentModelInfo():void {
 		// We need the parents modelClass so we can know what kind of animations are correct for this model.
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, parentModelInfoResult );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, parentModelInfoResult );
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
-		_topMostGuid = ii.topmostGuid();
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _topMostGuid, null ) );
+		_topMostModelGuid = ii.topmostModelGuid();
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _topMostModelGuid, null ) );
 	}
 	
 	private function parentModelInfoResult($mie:ModelInfoEvent):void {
-		if ( $mie.modelGuid == _topMostGuid ) {
+		if ( $mie.modelGuid == _topMostModelGuid ) {
 			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, parentModelInfoResult );
 			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, parentModelInfoResult );
 			ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );

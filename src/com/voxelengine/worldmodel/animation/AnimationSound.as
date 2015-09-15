@@ -54,6 +54,14 @@ package com.voxelengine.worldmodel.animation
 			}
 		}
 		
+		public function toObject():Object {
+			var sound:Object = new Object();
+			sound.name 			= _soundFile
+			sound.soundRangeMax	= _soundRangeMax
+			sound.soundRangeMin	= _soundRangeMin
+			return sound
+		}
+
 		public function getJSON( obj:Object ):void {
 			obj.sound = new Object();
 			obj.sound.name 			= _soundFile;

@@ -61,7 +61,6 @@ public class WindowModelMetadata extends VVPopup
 			//_vmm = new ModelMetadata( $ii.modelGuid );
 			_vmm = new ModelMetadata( $ii.modelGuid );
 			var newObj:Object = ModelMetadata.newObject()
-			newObj.data = new Object();
 			_vmm.fromObjectImport( newObj );
 			_vmm.name = $ii.modelGuid;
 			_vmm.description = $ii.modelGuid + "-IMPORTED";

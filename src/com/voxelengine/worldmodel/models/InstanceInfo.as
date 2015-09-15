@@ -235,9 +235,21 @@ public class InstanceInfo extends Location	{
 	{
 	}
 	
-	public function topmostGuid():String {
+	//public function topmostGuid():String {
+		//if ( controllingModel )
+			//return controllingModel.instanceInfo.topmostGuid();
+		//return instanceGuid;	
+	//}
+	
+	public function topmostModelGuid():String {
 		if ( controllingModel )
-			return controllingModel.instanceInfo.topmostGuid();
+			return controllingModel.instanceInfo.topmostModelGuid();
+		return modelGuid;	
+	}
+	
+	public function topmostInstanceGuid():String {
+		if ( controllingModel )
+			return controllingModel.instanceInfo.topmostInstanceGuid();
 		return instanceGuid;	
 	}
 	
