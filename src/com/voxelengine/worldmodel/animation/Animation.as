@@ -81,6 +81,37 @@ public class Animation extends PersistanceObject
 		newAni.fromObjectImport( dbo )
 		return newAni
 	}
+
+	public function createBackCopy():Object {
+		// force the data from the dynamic classes into the object
+		// this give me an object that holds all of the data for the animation
+		toObject() 
+		var backupInfo:Object = new Object();
+		backupInfo.name 			= String( info.name );
+		backupInfo.description 	= String( info.description );
+		backupInfo.owner 			= String( info.owner )
+		backupInfo.type 			= String( info.type )
+		backupInfo.animationClass 	= String( info.animationClass )
+		if ( _sound )
+			backupInfo.sound = _sound.toObject()
+		if ( _transforms && _transforms.length )
+			backupInfo.animations = getAnimations()
+		if ( _attachments && _attachments.length )
+			backupInfo.attachments = getAttachments()
+		return backupInfo
+	}
+	
+	public function restoreFromBackup( $info:Object ):void {
+		// if you just assign name, then it shares the same object
+		// we want a new object in this case
+		info.name 			= String( $info.name );
+		info.description 	= String( $info.description );
+		info.owner 			= String( $info.owner )
+		info.type 			= String( $info.type )
+		info.animationClass = String( $info.animationClass )
+		loadFromInfo( $info )
+		changed = false
+	}
 	
 	public function fromObjectImport( $dbo:DatabaseObject ):void {
 		dbo = $dbo;
@@ -90,10 +121,8 @@ public class Animation extends PersistanceObject
 			return;
 		}
 		
-		
 		info = $dbo.data;
-		//info.guid = Globals.getUID();
-		loadFromInfo();
+		loadFromInfo( info );
 	}
 	
 	public function fromObject( $dbo:DatabaseObject ):void {
@@ -104,14 +133,15 @@ public class Animation extends PersistanceObject
 		}
 		
 		info = $dbo;
-		loadFromInfo();
+		loadFromInfo( info );
 	}
 	
 	override public function save():void {
 		if ( !Globals.isGuid( guid ) ) {
-			Log.out( "Animation.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
+			Log.out( "Animation.save - NOT Saving INVALID GUID: " + guid, Log.WARN );
 			return;
 		}
+		Log.out( "Animation.save - Saving guid: " + guid  + " in table: " + table, Log.WARN );
 		super.save();
 	}
 	
@@ -130,67 +160,57 @@ public class Animation extends PersistanceObject
 			info.animations = getAnimations()
 		if ( _attachments && _attachments.length )
 			info.attachments = getAttachments()
-
-		function getAttachments():Object {
-			var attachments:Array = new Array();
-			for each ( var aa:AnimationAttachment in _attachments ) {
-				var aao:Object = aa.toObject()
-				attachments.push( aao )
-			}
-			return attachments
+	}
+	
+	private function getAttachments():Object {
+		var attachments:Array = new Array();
+		for each ( var aa:AnimationAttachment in _attachments ) {
+			var aao:Object = aa.toObject()
+			attachments.push( aao )
 		}
-		
-		function getAnimations():Object {
-			var transforms:Array = new Array();
-			for ( var i:int; i < _transforms.length; i++ ) {
-				var at:AnimationTransform = _transforms[i]
-				var ato:Object = at.toObject()
-				transforms.push( ato )
-			}
-			return transforms
+		return attachments
+	}
+	
+	private function getAnimations():Object {
+		var transforms:Array = new Array();
+		for ( var i:int; i < _transforms.length; i++ ) {
+			var at:AnimationTransform = _transforms[i]
+			var ato:Object = at.toObject()
+			transforms.push( ato )
 		}
+		return transforms
 	}
 
 	// Only attributes that need additional handling go here.
-	public function loadFromInfo():void {
-		var type:String = ANIMATION_STATE;
-		if ( info.type ) {
-			if ( "action" == info.type )
-				type = ANIMATION_ACTION;
-			else if ( "state" == info.type ) 	
-				type = ANIMATION_STATE;
-			else
-				Log.out( "Animation.fromJSON - ERROR unknown type: " + info.type, Log.ERROR );
-		}
-		if ( info.sound ) {
+	public function loadFromInfo( $info:Object ):void {
+		
+		if ( $info.sound ) {
 			_sound = new AnimationSound();
-			_sound.init( info.sound );
+			_sound.init( $info.sound );
 		}
-		if ( info.attachments ) {
+		
+		if ( $info.attachments ) {
 			_attachments = new Vector.<AnimationAttachment>;
-			for each ( var attachmentJson:Object in info.attachment )
+			for each ( var attachmentJson:Object in $info.attachment )
 			{
 				_attachments.push( new AnimationAttachment( attachmentJson ) );				
 			}
 		}
-		if ( info.animations ) {
+		
+		if ( $info.animations ) {
 			_transforms = new Vector.<AnimationTransform>;
-			for each ( var transformJson:Object in info.animations )
-			{
+			for each ( var transformJson:Object in $info.animations )
 				_transforms.push( new AnimationTransform( transformJson ) );				
-			}
 		}
-		if ( !info.owner )
-			info.owner = Network.PUBLIC;
+		
+		if ( !$info.owner )
+			$info.owner = Network.PUBLIC;
 
-		if ( !info.permissions )
-			info.permissions = new Object();
+		if ( !$info.permissions )
+			$info.permissions = new Object();
 		
 		// the permission object is just an encapsulation of the permissions section of the object
-		_permissions = new PermissionsBase( info.permissions );
-			
-		//LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.ANIMATION_LOAD_COMPLETE, name ) );
-//		return type;
+		_permissions = new PermissionsBase( $info.permissions );
 	}
 /*
 	public function fromJSON( $json:Object ):String  {

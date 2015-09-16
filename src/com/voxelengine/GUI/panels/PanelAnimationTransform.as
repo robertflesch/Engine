@@ -36,7 +36,7 @@ public class PanelAnimationTransform extends ExpandableBox
 	
 	override protected function collapasedInfo():String  {
 		if ( _ebco.item ) {
-			if ( hasElements() ) 
+			if ( hasElements()) 
 				return _ebco.item.name;
 			else
 				return _ebco.item.name + " (empty)";

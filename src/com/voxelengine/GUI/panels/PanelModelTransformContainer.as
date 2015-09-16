@@ -46,9 +46,9 @@ public class PanelModelTransformContainer extends ExpandableBox {
 		ebco.itemBox.showDelete = true;
 		var item:* = new _ebco.itemDisplayObject( this, ebco );
 		_itemBox.addElement( item );
-		changeMode()
-		changeMode()
-
+		changeMode() // collapse container
+		changeMode() // reexpand so that new item is at the bottom
+		item.changeMode() // this should expand the newly added item, but it doesnt
 	}
 }
 }

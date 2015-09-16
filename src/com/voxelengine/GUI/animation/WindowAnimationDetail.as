@@ -10,7 +10,6 @@ package com.voxelengine.GUI.animation
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
-//import org.flashapi.swing.list.ListItem;
 import org.flashapi.swing.plaf.spas.SpasUI;
 
 import com.voxelengine.Log;
@@ -26,7 +25,7 @@ public class WindowAnimationDetail extends VVPopup
 	private var _modelKey:String;
 	private static const WIDTH:int = 400;
 	private var _ani:Animation;
-	private var _aniBackup:Animation;
+	private var _infoBackup:Object;
 	private var _create:Boolean;
 	
 	public function WindowAnimationDetail( $guid:String, $ani:Animation )
@@ -44,7 +43,8 @@ public class WindowAnimationDetail extends VVPopup
 			_create = true
 			_ani = new Animation( "INVALID" );
 		}
-		_aniBackup = _ani.clone( _ani.guid );
+		_infoBackup = _ani.createBackCopy();
+		_ani.dynamicObj = true // true while editing
 		
 		autoSize = true;
 		layout.orientation = LayoutOrientation.VERTICAL;
@@ -64,7 +64,8 @@ public class WindowAnimationDetail extends VVPopup
 		// ask about saving changes?
 		if ( _ani.changed ) 
 			queryToSaveChanges()
-		remove();
+			
+		remove()
 		
 		function queryToSaveChanges():void {
 			var alert:Alert = new Alert( "You have unsaved changes, want do you want to do?", 400 )
@@ -74,10 +75,11 @@ public class WindowAnimationDetail extends VVPopup
 			alert.display();
 			
 			function alertAction( $ae:AlertEvent ):void {
-				if ( AlertEvent.ACTION == $ae.action )
-					_ani.save()
+				if ( AlertEvent.ACTION == $ae.action ) {
+					saveHandler( null )
+				}
 				else ( AlertEvent.CHOICE == $ae.action )
-					_ani = _aniBackup
+					revertHandler( null )
 			}
 		}
 	}
@@ -91,22 +93,27 @@ public class WindowAnimationDetail extends VVPopup
 		
 		var saveAnimation:Button = new Button( LanguageManager.localizedStringGet( "Save_Animation" ));
 		saveAnimation.addEventListener(UIMouseEvent.CLICK, saveHandler );
-		//saveAnimation.width = pbWidth - 2 * pbPadding;
+		saveAnimation.width = buttonBox.width/2 - buttonBox.padding * 2;
 		buttonBox.addElement( saveAnimation );
 		
 		var revert:Button = new Button( LanguageManager.localizedStringGet( "Revert Changes" ));
 		revert.addEventListener(UIMouseEvent.CLICK, revertHandler );
-		//revert.width = pbWidth - 2 * pbPadding;
+		revert.width = buttonBox.width/2 - buttonBox.padding * 2;
 		buttonBox.addElement( revert );
-		
-		function revertHandler(event:UIMouseEvent):void  {
-			_ani = _aniBackup
-		}
-		function saveHandler(event:UIMouseEvent):void  {
-			_ani.save()
-		}
 	}
-
+	
+	private function revertHandler(event:UIMouseEvent):void  {
+		_ani.restoreFromBackup( _infoBackup )
+		_ani.dynamicObj = false
+		_ani.changed = false
+		remove()
+	}
+	
+	private  function saveHandler(event:UIMouseEvent):void  {
+		_ani.dynamicObj = false
+		_ani.save()
+		remove()
+	}
 	
 	private function addMetadataPanel():void {
 		addElement( new ComponentSpacer( width ) );

@@ -30,13 +30,9 @@ public class AnimationTransform
 	
 	private var _attachmentName:String = "INVALID_ATTACHMENT";
 	private var _position:Vector3D = new Vector3D();
-	private var _hasPosition:Boolean = false;
 	private var _rotation:Vector3D = new Vector3D();
-	private var _hasRotation:Boolean = false;
 	private var _scale:Vector3D = new Vector3D(1,1,1);
-	private var _hasScale:Boolean = false;
 	private var _transforms:Vector.<ModelTransform> = new Vector.<ModelTransform>;
-	private var _hasTransform:Boolean = false;
 	private var _notNamed:Boolean = false;
 
 	// for compatability with PanelVectorContainer
@@ -47,26 +43,29 @@ public class AnimationTransform
 	public function get rotation():Vector3D 					{ return _rotation; }
 	public function get scale():Vector3D 						{ return _scale; }
 	public function get transforms():Vector.<ModelTransform> 	{ return _transforms; }
-	public function get hasPosition():Boolean  					{ return _hasPosition; }
+	public function get hasPosition():Boolean  					{ return 0 != _position.length; }
 	public function set hasPosition( $val:Boolean):void			{ 
-		_hasPosition = $val; 
 		if ( false == $val )
 			_position.setTo( 0, 0, 0 );
 	}
-	public function get hasRotation():Boolean					{ return _hasRotation; }
+	public function get hasRotation():Boolean					{ return 0 != _rotation.length; }
 	public function set hasRotation( $val:Boolean):void			{ 
-		_hasRotation = $val; 
-		_rotation.setTo( 0, 0, 0 );
+		if ( false == $val )
+			_rotation.setTo( 0, 0, 0 );
 	}
-	public function get hasScale():Boolean 						{ return _hasScale; }
+	public function get hasScale():Boolean 						{ return 3 != _scale.lengthSquared; }
 	public function set hasScale( $val:Boolean):void			{ 
-		_hasScale = $val; 
 		if ( false == $val )
 			_scale.setTo( 1, 1, 1 );
 	}
-	public function get hasTransform():Boolean  				{ return _hasTransform; }
+	public function get hasTransform():Boolean  				{ return 0 < _transforms.length; }
 	public function get notNamed():Boolean 						{ return _notNamed; }
 	
+	public function resetInitialPosition():void {
+		_position.setTo(0,0,0)
+		_rotation.setTo(0,0,0)
+		_scale.setTo(1,1,1)
+	}
 	
 	public function AnimationTransform( $obj:Object ) 
 	{ 
@@ -77,7 +76,6 @@ public class AnimationTransform
 			
 		if ( $obj.location ) {
 			_position = new Vector3D( $obj.location.x, $obj.location.y, $obj.location.z );
-			_hasPosition = true
 		}
 		
 		// Transforms which are not named will stick around even after animation is played
@@ -90,19 +88,13 @@ public class AnimationTransform
 		
 		if ( $obj.scale ) {
 			_scale = new Vector3D( $obj.scale.x, $obj.scale.y, $obj.scale.z );
-			if ( 3 != _scale.lengthSquared )
-				_hasScale = true;
-			else
-				_hasScale = false;
 		}
 		
 		if ( $obj.rotation ) {
 			_rotation = new Vector3D( $obj.rotation.x, $obj.rotation.y, $obj.rotation.z );
-			_hasRotation = true
 		}
 			
 		if ( $obj.transforms ) {
-			_hasTransform = true;
 			for each ( var modelTransform:Object in $obj.transforms )
 			{
 				var type:int = ModelTransform.stringToType( modelTransform.type.toLowerCase() );

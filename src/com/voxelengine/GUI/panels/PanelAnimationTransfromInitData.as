@@ -1,6 +1,7 @@
 
 package com.voxelengine.GUI.panels {
 
+import com.voxelengine.Log;
 import flash.geom.Vector3D
 	
 import org.flashapi.swing.*
@@ -27,10 +28,9 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 	}
 	
 	override protected function resetElement():void  { 
-		_at.hasPosition = false
-		_at.hasRotation = false
-		_at.hasScale = false
-		collapse()
+		_at.resetInitialPosition()
+		changeMode()
+		
 	}
 	
 	override protected function collapasedInfo():String  {
@@ -52,10 +52,14 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 		return outString
 	}
 	
-	private function formatVec3DToSummary( $title:String, $vec:Object ):String {
+	private function formatVec3DToSummaryBig( $title:String, $vec:Object ):String {
 		return $title + "x:" + $vec.x + " y:" + $vec.y + " z:" + $vec.z + " "
 	}
 
+	private function formatVec3DToSummary( $title:String, $vec:Object ):String {
+		return $title + "{" + $vec.x + ":" + $vec.y + ":" + $vec.z + "} "
+	}
+	
 	override protected function hasElements():Boolean {
 		//if ( 0 < _ebco.item.delta.length ) 
 			return true
@@ -86,13 +90,31 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 		}
 		
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 4 ) );
-		_itemBox.addElement( new ComponentVector3DSideLabel( function ():void { _ani.changed = true; _at.hasPosition = true }
+		_itemBox.addElement( new ComponentVector3DSideLabel( markChangedPos
 		                                                   , "location", "X: ", "Y: ", "Z: ",  _at.position, _itemBox.width ) )
-		_itemBox.addElement( new ComponentVector3DSideLabel( function ():void { _ani.changed = true; _at.hasRotation = true }
+		_itemBox.addElement( new ComponentVector3DSideLabel( markChangedRot
 		                                                   , "rotation", "X: ", "Y: ", "Z: ",  _at.rotation, _itemBox.width ) )
-		_itemBox.addElement( new ComponentVector3DSideLabel( function ():void { _ani.changed = true; _at.hasScale = true }
+		_itemBox.addElement( new ComponentVector3DSideLabel( markChangedScale
 		                                                   , "scale", "X: ", "Y: ", "Z: ",  _at.scale, _itemBox.width ) )
 	}
+	private function markChangedPos():void { 
+		Log.out( "markChangedPos: " + _at.position )
+		_ani.changed = true
+		_at.hasPosition = true 
+	}
+	
+	private function markChangedRot():void { 
+		Log.out( "markChangedRot: " + _at.rotation )
+		_ani.changed = true
+		_at.hasRotation = true 
+	}
+	
+	private function markChangedScale():void { 
+		Log.out( "markChangedPos: " + _at.scale )
+		_ani.changed = true
+		_at.hasScale = true 
+	}
+	
 }
 }
 
