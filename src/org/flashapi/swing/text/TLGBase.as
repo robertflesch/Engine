@@ -424,6 +424,7 @@ package org.flashapi.swing.text {
 		 */
 		protected function createEditableTextEvents():void {
 			$evtColl.addEvent($editableText, TextEvent.VALIDATED, dispatchValidationEvent);
+			$evtColl.addEvent($editableText, TextEvent.EDITED, dispatchEditedEvent);
 		}
 		
 		//--------------------------------------------------------------------------
@@ -458,6 +459,9 @@ package org.flashapi.swing.text {
 		
 		private function dispatchValidationEvent(e:TextEvent):void {
 			this.dispatchEvent(new TextEvent(TextEvent.VALIDATED));
+		}
+		private function dispatchEditedEvent(e:TextEvent):void {
+			this.dispatchEvent(new TextEvent(TextEvent.EDITED));
 		}
 	}
 }
