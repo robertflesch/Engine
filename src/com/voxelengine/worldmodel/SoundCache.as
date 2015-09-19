@@ -23,7 +23,7 @@ package com.voxelengine.worldmodel
 	 * @author Robert Flesch - RSF 
 	 * 
 	 */
-	public class SoundBank 
+	public class SoundCache 
 	{
 		static private var _sounds:Dictionary = new Dictionary(true);
 		static private var _soundsLoading:Dictionary = new Dictionary(true);
@@ -101,7 +101,7 @@ package com.voxelengine.worldmodel
 			}
 			else
 			{
-				var snd:Sound = SoundBank.getSound( $soundFile );
+				var snd:Sound = SoundCache.getSound( $soundFile );
 				if ( snd )
 				{
 					//Log.out( "Ship.playSoundwWithPitch - play sound: " + snd.url );
