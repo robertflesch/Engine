@@ -609,7 +609,6 @@ public class ModelInfo extends PersistanceObject
 	}
 
 	override protected function toObject():void {
-		Log.out( "ModelInfo.toObject", Log.WARN );
 		// I am faking a heirarchy here, not good object oriented behavior but needs major redesign to do what I want.
 		// so instead I just get the current setting from the class
 		var modelClassPrototype:Class = ModelLibrary.getAsset( info.model.modelClass );

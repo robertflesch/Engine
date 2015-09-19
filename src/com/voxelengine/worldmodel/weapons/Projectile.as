@@ -21,7 +21,7 @@ package com.voxelengine.worldmodel.weapons
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;
-	import com.voxelengine.worldmodel.SoundBank;
+	import com.voxelengine.worldmodel.SoundCache;
 	
 	import com.voxelengine.pools.GrainCursorPool;
 	import flash.display3D.Context3D;
@@ -62,7 +62,7 @@ package com.voxelengine.worldmodel.weapons
 		{
 			_ammo = $ammo;
 //			SoundBank.getSound( _soundFile ); // Preload the sound file
-			SoundBank.getSound( _ammo.impactSoundFile ); // Preload the sound file
+			SoundCache.getSound( _ammo.impactSoundFile ); // Preload the sound file
 
 			//if ( instanceInfo.controllingModel )
 			//	_thatWhichCreatedYou = $thatWhichCreatedYou;

@@ -92,7 +92,7 @@ public class PanelAnimations extends PanelBase
 	
 	// FIXME This would be much better with drag and drop
 	private function animationButtonsCreate():void {
-		Log.out( "PanelAnimations.animationButtonsCreate - width: " + width + "  height: " + height );
+		//Log.out( "PanelAnimations.animationButtonsCreate - width: " + width + "  height: " + height );
 		_buttonContainer = new Container( width, 100 );
 		_buttonContainer.layout.orientation = LayoutOrientation.VERTICAL;
 		_buttonContainer.padding = 2;
@@ -134,7 +134,7 @@ public class PanelAnimations extends PanelBase
 			else
 				noAnimationSelected();
 		}
-		Log.out( "PanelAnimations.animationButtonsCreate AFTER - width: " + width + "  height: " + height + " buttoncontainer - AFTER - width: " + _buttonContainer.width + "  height: " + _buttonContainer.height );
+		//Log.out( "PanelAnimations.animationButtonsCreate AFTER - width: " + width + "  height: " + height + " buttoncontainer - AFTER - width: " + _buttonContainer.width + "  height: " + _buttonContainer.height );
 	}
 	
 	private function select(event:ListEvent):void 

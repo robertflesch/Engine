@@ -10,7 +10,9 @@ package com.voxelengine.worldmodel.animation
 import com.voxelengine.events.AnimationEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.models.ModelInfoCache;
 import com.voxelengine.worldmodel.PermissionsBase;
+import com.voxelengine.worldmodel.Region;
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
@@ -63,17 +65,44 @@ public class Animation extends PersistanceObject
 		changed = true;
 	}
 	
+	static public function defaultObject( $modelGuid:String ):Animation {
+		var obj:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_ANIMATIONS, "0", "0", 0, true, null )
+		obj.data = Animation.DEFAULT_OBJECT
+		// This is UGLY - TODO
+		obj.data.animationClass = AnimationCache.requestAnimationClass( Region.currentRegion.modelCache.requestModelInfoByModelGuid( $modelGuid ).modelClass )
+		var childNameList:Vector.<String> = new Vector.<String>
+		VoxelModel.selectedModel.childNameList( childNameList )
+		obj.data.animations = new Array()
+		for each ( var name:String in childNameList ) {
+			var at:AnimationTransform = new AnimationTransform( new Object() )
+			at.attachmentName = name
+			obj.data.animations.push( at.toObject() )
+		}
+		
+		var ani:Animation = new Animation( Globals.getUID() );
+		ani.fromObjectImport( obj )
+		return ani
+	}
+	
+	static private var DEFAULT_OBJECT:Object = { 
+		name: "Default",
+		description: "Enter description here",
+		type : ANIMATION_STATE,
+		owner : Network.userId
+	}
+	
+	
 	////////////////
 	public function Animation( $guid:String ) {
 		super( $guid, Globals.BIGDB_TABLE_ANIMATIONS );		
 	}
-	
+	/*
 	static public function newObject():Object {
 		var obj:Object = new DatabaseObject( Globals.BIGDB_TABLE_ANIMATIONS, "0", "0", 0, true, null )
 		obj.data = new Object()
 		return obj
 	}
-	
+	*/
 	override public function clone( $guid:String ):* {
 		// force the data from the dynamic classes into the object
 		toObject()
@@ -141,17 +170,12 @@ public class Animation extends PersistanceObject
 			Log.out( "Animation.save - NOT Saving INVALID GUID: " + guid, Log.WARN );
 			return;
 		}
-		Log.out( "Animation.save - Saving guid: " + guid  + " in table: " + table, Log.WARN );
 		super.save();
 	}
 	
 	override protected function toObject():void {
-		Log.out( "Animation.toObject", Log.WARN )
 		// just use the info as it is at base level
 		// but need to refresh
-		// transforms
-		// attachments
-		// sounds
 		// permissions?
 		
 		if ( _sound )
@@ -289,10 +313,10 @@ public class Animation extends PersistanceObject
 		}
 	}
 	*/
-	public function play( $owner:VoxelModel, $val:Number ):void {
+	public function play( $owner:VoxelModel, $lockTime:Number ):void {
 		//Log.out( "Animation.play - name: " + _name );
 		if ( _sound )
-			_sound.play( $owner, $val );
+			_sound.play( $owner, $lockTime );
 			
 		if ( _attachments && 0 < _attachments.length ) {
 			for each ( var aa:AnimationAttachment in _attachments ) {

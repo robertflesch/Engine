@@ -30,7 +30,6 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 	override protected function resetElement():void  { 
 		_at.resetInitialPosition()
 		changeMode()
-		
 	}
 	
 	override protected function collapasedInfo():String  {
@@ -99,20 +98,24 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 	}
 	private function markChangedPos():void { 
 		Log.out( "markChangedPos: " + _at.position )
-		_ani.changed = true
+		setChanged()
 		_at.hasPosition = true 
 	}
 	
 	private function markChangedRot():void { 
 		Log.out( "markChangedRot: " + _at.rotation )
-		_ani.changed = true
+		setChanged()
 		_at.hasRotation = true 
 	}
 	
 	private function markChangedScale():void { 
 		Log.out( "markChangedPos: " + _at.scale )
-		_ani.changed = true
+		setChanged()
 		_at.hasScale = true 
+	}
+	
+	override protected function setChanged():void {
+		_ani.changed = true
 	}
 	
 }

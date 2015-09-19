@@ -127,10 +127,10 @@ public class ExpandableBox extends ResizablePanelVV
 				_itemBox.height = Math.max( element.height, _itemBox.height );
 		}
 		
-		height = _itemBox.height + (_ebco.itemBox.paddingTop * 2);	
+		height = _itemBox.height + ( _ebco.paddingTop + _ebco.paddingBottom );	
 		// Make sure that the min size is larger then the button size plus twice padding
-		if ( height < ( _expandCollapse.height + (_ebco.paddingTop * 2) ) )
-			height = ( _expandCollapse.height + (_ebco.paddingTop * 2) )
+		if ( height < ( _expandCollapse.height + (_ebco.paddingTop + _ebco.paddingBottom) ) )
+			height = ( _expandCollapse.height + (_ebco.paddingTop + _ebco.paddingBottom) )
 			
 		if ( target )
 			target.dispatchEvent(new ResizerEvent(ResizerEvent.RESIZE_UPDATE));
@@ -163,10 +163,13 @@ public class ExpandableBox extends ResizablePanelVV
 		newItemButton.y = _itemBox.height;
 		newItemButton.width = _itemBox.width;
 		newItemButton.height = _ebco.itemSize;// + _ebco.itemBox.paddingTop;
-		newItemButton.backgroundColor = 0x00ff00;
+		// http://www.colorpicker.com/28BF58
+		newItemButton.backgroundColor = 0x28BF58;
 		
 		var lbl:Label = new Label( _ebco.itemBox.newItemText, _itemBox.width );
-		lbl.textAlign = TextAlign.CENTER;
+		lbl.height = _ebco.itemSize
+		lbl.textAlign = TextAlign.CENTER
+		lbl.verticalAlignment = VerticalAlignment.MIDDLE
 		lbl.y = 1;
 		newItemButton.addElement( lbl );
 		
@@ -221,7 +224,7 @@ public class ExpandableBox extends ResizablePanelVV
 			resetButton.paddingTop = 1;
 			resetButton.paddingLeft = 4;
 			resetButton.backgroundColor = 0xff0000;
-			var rbLabel:Label = new Label( "Reset" )
+			var rbLabel:Label = new Label( "Reset", _ebco.expandButtonSize * 3 )
 			rbLabel.textAlign = TextAlign.CENTER;
 			resetButton.addElement( rbLabel );
 			$evtColl.addEvent( resetButton, UIMouseEvent.RELEASE, resetElementCheck );

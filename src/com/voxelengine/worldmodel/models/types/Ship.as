@@ -19,7 +19,7 @@ package com.voxelengine.worldmodel.models.types
 	import com.voxelengine.worldmodel.models.types.Engine;
 	import com.voxelengine.worldmodel.weapons.Gun;
 	import com.voxelengine.worldmodel.models.*;
-	import com.voxelengine.worldmodel.SoundBank;
+	import com.voxelengine.worldmodel.SoundCache;
 	
 	/**
 	 * ...

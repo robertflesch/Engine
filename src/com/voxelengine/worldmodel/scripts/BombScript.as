@@ -20,7 +20,7 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.weapons.Bomb;
-	import com.voxelengine.worldmodel.SoundBank;
+	import com.voxelengine.worldmodel.SoundCache;
 	import com.voxelengine.worldmodel.models.*;
 
 
@@ -34,7 +34,7 @@ package com.voxelengine.worldmodel.scripts
 		{
 			_bulletSize = bulletSize;
 			addKeyboardListeners();
-			SoundBank.getSound( _soundFile ); // Preload the sound file
+			SoundCache.getSound( _soundFile ); // Preload the sound file
 			Globals.g_app.addEventListener( WeaponEvent.FIRE, onWeaponEventDrop, false, 0, true );
 		}
 		
@@ -65,7 +65,7 @@ package com.voxelengine.worldmodel.scripts
 		{
 			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
 			
-			var snd:Sound = SoundBank.getSound( _soundFile );
+			var snd:Sound = SoundCache.getSound( _soundFile );
 			_channel = snd.play();
 			
 			var bomb:Bomb = Region.currentRegion.modelCache.instanceGet( instanceGuid ) as Bomb;

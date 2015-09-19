@@ -24,9 +24,9 @@ public class ModelTransform
 {
 	static private var objectEnum:int = 0;
 	static public const INVALID:int = objectEnum++; 	
-	static public const LOCATION:int = objectEnum++; 	
-	static public const LOCATION_TO:int = objectEnum++;
-	static public const LOCATION_REPEATING:int = objectEnum++;
+	static public const POSITION:int = objectEnum++; 	
+	static public const POSITION_TO:int = objectEnum++;
+	static public const POSITION_REPEATING:int = objectEnum++;
 	static public const SCALE:int = objectEnum++;		
 	static public const ROTATION:int = objectEnum++;    
 	static public const ROTATE_TO:int = objectEnum++;   
@@ -35,9 +35,9 @@ public class ModelTransform
 	static public const VELOCITY:int = objectEnum++;
 	static public const INFINITE_TIME:int = -1;
 	
-	static public const LOCATION_STRING:String 				= "location"
-	static public const LOCATION_TO_STRING:String			= "location_to"
-	static public const LOCATION_REPEATING_STRING:String 	= "location_repeating"
+	static public const POSITION_STRING:String 				= "position"
+	static public const POSITION_TO_STRING:String			= "position_to"
+	static public const POSITION_REPEATING_STRING:String 	= "position_repeating"
 	static public const SCALE_STRING:String 				= "scale"
 	static public const ROTATION_STRING:String 				= "rotation"
 	static public const ROTATE_TO_STRING:String 			= "rotate_to"
@@ -47,8 +47,8 @@ public class ModelTransform
 	
 	static private const TIMELEFT_INFINITE:int = -1;
 	
-	private var _time:int = 0;
-	private var _originalTime:Number = 0;
+	private var _time:int = 0;            // in milliseconds
+	private var _originalTime:Number = 0; // in milliseconds (NOW)
 	private var _originalDelta:Vector3D = new Vector3D();
 	private var _delta:Vector3D = new Vector3D();
 	private var _transformTarget:Vector3D;
@@ -57,22 +57,28 @@ public class ModelTransform
 	private var _guid:String = "INVALID";
 	private var _inverse:Boolean = false;  // REPEATING ROTATIONS change the sign on the delta every cycle.
 	
-	public function get time():int { return _time; }
-	public function set time(val:int):void {  _time = val; }
-	public function get type():int { return _type; }
-	public function set type(val:int):void { _type = val; }
-	private function get transformTarget():Vector3D { return _transformTarget; }
+	// these are dynamic values that change over the life of the animation
+	private function get time():int 						{ return _time; }
+	private function set time(val:int):void 				{ _time = val; }
+	private function get delta():Vector3D 					{ return _delta; }
+	private function set delta(val:Vector3D):void 			{ _delta = val; }
+	private function get transformTarget():Vector3D 		{ return _transformTarget; }
 	private function set transformTarget(val:Vector3D):void { _transformTarget = val; }
-	public function get delta():Vector3D { return _delta; }
-	private function set delta(val:Vector3D):void { _delta = val; }
-	public function get name():String { return _name; }
-	public function set name(val:String):void { _name = val; }
+	
+	public function get originalTime():int 					{ return _originalTime; }
+	public function set originalTime(val:int):void 			{  _time = _originalTime = val; }
+	public function get originalDelta():Vector3D 			{ return _originalDelta; }
+	public function set originalDelta(val:Vector3D):void 	{ _delta = _originalDelta = val; }
+	public function get type():int 							{ return _type; }
+	public function set type(val:int):void 					{ _type = val; }
+	public function get name():String 						{ return _name; }
+	public function set name(val:String):void 				{ _name = val; }
 	
 	static public function typesList():Vector.<String> {
 		var types:Vector.<String> = new Vector.<String>
-		types.push( LOCATION_STRING )
-		types.push( LOCATION_TO_STRING )		
-		types.push( LOCATION_REPEATING_STRING )
+		types.push( POSITION_STRING )
+		types.push( POSITION_TO_STRING )		
+		types.push( POSITION_REPEATING_STRING )
 		types.push( SCALE_STRING )
 		types.push( ROTATION_STRING )
 		types.push( ROTATE_TO_STRING ) 		
@@ -83,20 +89,17 @@ public class ModelTransform
 	}
 	
 	static public function defaultObject():ModelTransform {
-		var obj:Object = ModelTransform.DEFAULT_OBJECT;
+		var obj:Object = { 	time : 1,
+							delta: { x:0, y:0, z:0 },
+							type: ModelTransform.ROTATION_REPEATING,
+							name: "Default" }
+
 		return new ModelTransform( obj.delta.x, obj.delta.y, obj.delta.z, obj.time, obj.type, obj.name );
-	}
-	
-	static private var DEFAULT_OBJECT:Object = { 
-		time : 1,
-		delta: { x:0, y:0, z:0 },
-		//transformTarget:Vector3D;
-		type: ModelTransform.ROTATION_REPEATING,
-		name: "Default"
 	}
 	
 	public function ModelTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" )
 	{
+		
 		_originalDelta.setTo( $x, $y, $z );
 		_originalTime = $time;
 		if ( 0 == $time )
@@ -105,6 +108,11 @@ public class ModelTransform
 		if ( 0 == $x && 0 == $y && 0 == $z && 0 == $time && ModelTransform.LIFE != $type )
 			Log.out( "InstanceInfo.addTransform - No values defined", Log.ERROR );
 		
+		if ( 1 > $time ) {
+			Log.out( "InstanceInfo.addTransform - OLD TIME BEING USED: " + $name + " x: " + $x + " y: " + $y + " z: " + $z, Log.ERROR );
+			$time = $time * 1000
+		}
+
 		name = $name;
 		type = $type;
 		if ( type == ModelTransform.SCALE )
@@ -113,7 +121,7 @@ public class ModelTransform
 			_delta.y = ($y - 1) / 1000;
 			_delta.z = ($z - 1) / 1000;
 		}
-		else if ( ModelTransform.ROTATE_TO == type || ModelTransform.LOCATION_TO == type )
+		else if ( ModelTransform.ROTATE_TO == type || ModelTransform.POSITION_TO == type )
 		{
 			_delta.x = $x;
 			_delta.y = $y;
@@ -121,15 +129,15 @@ public class ModelTransform
 		}
 		else
 		{
-			_delta.x = $x / ( 1000 * $time );
-			_delta.y = $y / ( 1000 * $time );
-			_delta.z = $z / ( 1000 * $time );
+			_delta.x = $x / $time
+			_delta.y = $y / $time
+			_delta.z = $z / $time
 		}
 		
 		if ( ModelTransform.INFINITE_TIME == $time )
 			time = ModelTransform.INFINITE_TIME;
 		else
-			time = $time * 1000;
+			time = $time
 			
 //			if ( ModelTransform.LIFE == type )
 //				Log.out( "ModelTransform.constructor - data: " + toString() );	
@@ -159,8 +167,8 @@ public class ModelTransform
 			_guid = Globals.getUID();
 		}
 		
-		if  (  ModelTransform.LOCATION == type 
-			|| ModelTransform.LOCATION_REPEATING == type )	 	
+		if  (  ModelTransform.POSITION == type 
+			|| ModelTransform.POSITION_REPEATING == type )	 	
 			transformTarget = ii.positionGet;
 		else if (  ModelTransform.ROTATION == type
 				|| ModelTransform.ROTATION_REPEATING == type )	
@@ -173,7 +181,7 @@ public class ModelTransform
 			_delta.y = ( _delta.y - transformTarget.y ) / time;
 			_delta.z = ( _delta.z - transformTarget.z ) / time;
 		}
-		else if (  ModelTransform.LOCATION_TO == type )	
+		else if (  ModelTransform.POSITION_TO == type )	
 		{
 			transformTarget = ii.positionGet;
 			// This one cant get its delta until it gets its transform target
@@ -217,12 +225,12 @@ public class ModelTransform
 				// if this is the object's life, removed it.
 				if ( elapsedTimeMS >= _time )
 				{
-					if ( ROTATION_REPEATING == type || LOCATION_REPEATING == type )
+					if ( ROTATION_REPEATING == type || POSITION_REPEATING == type )
 					{
 						if ( ModelTransform.INFINITE_TIME == _originalTime )
 							_time = ModelTransform.INFINITE_TIME;
 						else
-							_time = _originalTime * 1000;
+							_time = _originalTime
 						
 						_delta.negate();
 						_inverse = !_inverse;
@@ -303,12 +311,12 @@ public class ModelTransform
 	
 	static public function stringToType( val:String ):int
 	{
-		if ( LOCATION_STRING == val.toLowerCase() )
-			return LOCATION;
-		if ( LOCATION_TO_STRING == val.toLowerCase() )
-			return LOCATION_TO;
-		if ( LOCATION_REPEATING_STRING == val.toLowerCase() )
-			return LOCATION_REPEATING;
+		if ( POSITION_STRING == val.toLowerCase() )
+			return POSITION;
+		if ( POSITION_TO_STRING == val.toLowerCase() )
+			return POSITION_TO;
+		if ( POSITION_REPEATING_STRING == val.toLowerCase() )
+			return POSITION_REPEATING;
 		else if ( SCALE_STRING == val.toLowerCase() )
 			return SCALE;
 		else if ( ROTATION_STRING == val.toLowerCase() )
@@ -328,12 +336,12 @@ public class ModelTransform
 
 	static public function typeToString( val:int ):String
 	{
-		if ( LOCATION == val )
-			return LOCATION_STRING;
-		if ( LOCATION_TO == val )
-			return LOCATION_TO_STRING;
-		if ( LOCATION_REPEATING == val )
-			return LOCATION_REPEATING_STRING;
+		if ( POSITION == val )
+			return POSITION_STRING;
+		if ( POSITION_TO == val )
+			return POSITION_TO_STRING;
+		if ( POSITION_REPEATING == val )
+			return POSITION_REPEATING_STRING;
 		else if ( SCALE == val )
 			return SCALE_STRING;
 		else if ( ROTATION == val )
@@ -351,7 +359,7 @@ public class ModelTransform
 			
 		return "Undefined";
 	}
-
+/*
 	private function vectorToJSON( v:Vector3D ):String {  return JSON.stringify( {x:v.x, y:v.y, z:v.z} ); } 	
 
 	public function getJSON():String {
@@ -369,13 +377,13 @@ public class ModelTransform
 		outString += "}";
 		return outString;
 	}
-	
+	*/
 	public function toString():String { 
-		return "{ delta: " +  _delta + "  time: " + _time + "  type: " + typeToString( _type ) + "  name: " + name + "}";
+		return "{ delta: " +  _originalDelta + "  time: " + _originalTime + "  type: " + typeToString( _type ) + "  name: " + name + "}";
 	} 			
 	
 	public function deltaAsString():String { 
-		return "x: " +  _delta.x + " y: " +  _delta.y + " z: " +  _delta.z + " "
+		return "x: " +  _originalDelta.x + " y: " +  _originalDelta.y + " z: " +  _originalDelta.z + " "
 	} 			
 }
 }

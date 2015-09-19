@@ -174,6 +174,13 @@ public class VoxelModel
 		return null;
 	}
 	
+	public function childNameList( $nameList:Vector.<String> ):void {
+		for each (var child:VoxelModel in modelInfo.childVoxelModels) {
+			$nameList.push( child.metadata.name )
+			child.childNameList( $nameList );
+		}
+	}
+
 	// returns the root model in the model space chain
 	public function topmostControllingModel():VoxelModel
 	{
@@ -289,10 +296,10 @@ public class VoxelModel
 				var life:Number = 2.5 + Math.random() * 2;
 				vm.instanceInfo.addTransform(0, 0, 0, life, ModelTransform.LIFE);
 				var velocity:Number = Math.random() * 800;
-				vm.instanceInfo.addTransform(dr.x * velocity, dr.y * velocity, dr.z * velocity, life, ModelTransform.LOCATION, Projectile.PROJECTILE_VELOCITY);
+				vm.instanceInfo.addTransform(dr.x * velocity, dr.y * velocity, dr.z * velocity, life, ModelTransform.POSITION, Projectile.PROJECTILE_VELOCITY);
 				var rotation:Number = Math.random() * 50;
 				vm.instanceInfo.addTransform(dr.x * rotation, dr.y * rotation, dr.z * rotation, life, ModelTransform.ROTATION);
-				//vm.instanceInfo.addTransform(0, Globals.GRAVITY, 0, ModelTransform.INFINITE_TIME, ModelTransform.LOCATION, "Gravity");
+				//vm.instanceInfo.addTransform(0, Globals.GRAVITY, 0, ModelTransform.INFINITE_TIME, ModelTransform.POSITION, "Gravity");
 			}
 			else
 				Log.out("VoxelModel.explode - oxel is empty");
@@ -730,11 +737,11 @@ public class VoxelModel
 		
 		//trace( "VoxelModel.bounce toBeReflected: " + toBeReflected + "  velocity: " + model.instanceInfo.velocity );
 		var startPoint:Vector3D = instanceInfo.positionGet.clone();
-		if (toBeReflected && model.instanceInfo.velocityGet.length < toBeReflected.delta.length)
+		if (toBeReflected && model.instanceInfo.velocityGet.length < toBeReflected.originalDelta.length)
 		{
-			startPoint.x += -100 * toBeReflected.delta.x;
-			startPoint.y += -100 * toBeReflected.delta.y;
-			startPoint.z += -100 * toBeReflected.delta.z;
+			startPoint.x += -100 * toBeReflected.originalDelta.x;
+			startPoint.y += -100 * toBeReflected.originalDelta.y;
+			startPoint.z += -100 * toBeReflected.originalDelta.z;
 		}
 		
 		var worldSpaceIntersections:Vector.<GrainCursorIntersection> = new Vector.<GrainCursorIntersection>();
@@ -755,21 +762,21 @@ public class VoxelModel
 					model.instanceInfo.velocitySetComp( model.instanceInfo.velocityGet.x, model.instanceInfo.velocityGet.y, -model.instanceInfo.velocityGet.z );
 					trace("VoxelModel.bounce X PLANE velocity inverted: " + model.instanceInfo.velocityGet);
 					if (toBeReflected)
-						toBeReflected.delta.z = -toBeReflected.delta.z;
+						toBeReflected.originalDelta.z = -toBeReflected.originalDelta.z;
 					break;
 				case Globals.AXIS_Y: 
 					trace("VoxelModel.bounce Y PLANE velocity: " + model.instanceInfo.velocityGet);
 					model.instanceInfo.velocitySetComp( model.instanceInfo.velocityGet.x, -model.instanceInfo.velocityGet.y, model.instanceInfo.velocityGet.z );
 					trace("VoxelModel.bounce Y PLANE velocity inverted: " + model.instanceInfo.velocityGet);
 					if (toBeReflected)
-						toBeReflected.delta.y = -toBeReflected.delta.y;
+						toBeReflected.originalDelta.y = -toBeReflected.originalDelta.y;
 					break;
 				case Globals.AXIS_Z: 
 					trace("VoxelModel.bounce Z PLANE velocity: " + model.instanceInfo.velocityGet);
 					model.instanceInfo.velocitySetComp( -model.instanceInfo.velocityGet.x, model.instanceInfo.velocityGet.y, model.instanceInfo.velocityGet.z );
 					trace("VoxelModel.bounce Z PLANE velocity inverted: " + model.instanceInfo.velocityGet);
 					if (toBeReflected)
-						toBeReflected.delta.x = -toBeReflected.delta.x;
+						toBeReflected.originalDelta.x = -toBeReflected.originalDelta.x;
 					break;
 			}
 		}
@@ -851,7 +858,7 @@ public class VoxelModel
 		Log.out("VoxelModel.stateLock - stateLock: " + $val );
 		_stateLock = $val;
 		// if $lockTime then unlock after that amount of time.
-		if ( $lockTime )
+		if ( $val && $lockTime )
 		{
 			var pt:Timer = new Timer( $lockTime, 1 );
 			pt.addEventListener(TimerEvent.TIMER, onStateLockRemove );
@@ -883,7 +890,8 @@ public class VoxelModel
 			Log.out( "VoxelModel.stateSet - Stopping anim: " + _anim.name + "  starting: " + $state ); 
 			_anim.stop( this );
 			_anim = null;
-		}
+		} else 
+			Log.out( "VoxelModel.stateSet - Starting anim: " + $state ); 
 		
 		var result:Boolean = false;
 		var anim:Animation = modelInfo.animationGet( $state );
@@ -1052,22 +1060,19 @@ public class VoxelModel
 	}
 	
 	// acts as stub for overloading
-	protected function oxelLoaded():void
-	{
-//		calculateCenter();
+	protected function oxelLoaded():void { }
+	
+	private static var _s_controlledModel:VoxelModel = null;
+	public static function get controlledModel():VoxelModel { return _s_controlledModel; }
+	public static function set controlledModel( val:VoxelModel ):void { _s_controlledModel = val; }
+	
+	private static var _s_selectedModel:VoxelModel = null;
+	public static function get selectedModel():VoxelModel { return _s_selectedModel; }
+	//public static function set selectedModel( $val:VoxelModel ):void { _s_selectedModel = $val; }
+	public static function set selectedModel( $val:VoxelModel ):void { 
+		Log.out( "VoxelModel.selectedModel: " + ( $val ? $val.toString() : "null") , Log.WARN );
+		_s_selectedModel = $val; 
 	}
-	
-	private static var g_controlledModel:VoxelModel = null;
-	public static function get controlledModel():VoxelModel { return g_controlledModel; }
-	public static function set controlledModel( val:VoxelModel ):void { g_controlledModel = val; }
-	
-	private static var g_selectedModel:VoxelModel = null;
-	public static function get selectedModel():VoxelModel { return g_selectedModel; }
-	public static function set selectedModel( $val:VoxelModel ):void { g_selectedModel = $val; }
-	//public static function set selectedModel( $val:VoxelModel ):void { 
-		//Log.out( "VoxelModel.selectedModel: " + ( $val ? $val.toString() : "null") , Log.WARN );
-		//g_selectedModel = $val; 
-	//}
 	
 	public function size():int {
 		if ( _modelInfo && _modelInfo.data && _modelInfo.data.loaded )

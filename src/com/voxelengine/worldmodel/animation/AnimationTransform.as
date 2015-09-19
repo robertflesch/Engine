@@ -20,14 +20,6 @@ import com.voxelengine.worldmodel.models.ModelTransform;
  */
 public class AnimationTransform
 {
-	static public var DEFAULT_OBJECT:Object = { 
-		attachmentName:"This should be the name of the parent or child",
-		//notNamed
-		location: { x:0, y:0, z:0 },
-		scale: { x:1, y:1, z:1 },
-		rotation: { x:0, y:0, z:0 }
-	}
-	
 	private var _attachmentName:String = "INVALID_ATTACHMENT";
 	private var _position:Vector3D = new Vector3D();
 	private var _rotation:Vector3D = new Vector3D();
@@ -77,6 +69,9 @@ public class AnimationTransform
 		if ( $obj.location ) {
 			_position = new Vector3D( $obj.location.x, $obj.location.y, $obj.location.z );
 		}
+		if ( $obj.position ) {
+			_position = new Vector3D( $obj.position.x, $obj.position.y, $obj.position.z );
+		}
 		
 		// Transforms which are not named will stick around even after animation is played
 		// So they should only be used on timed animations.
@@ -95,8 +90,7 @@ public class AnimationTransform
 		}
 			
 		if ( $obj.transforms ) {
-			for each ( var modelTransform:Object in $obj.transforms )
-			{
+			for each ( var modelTransform:Object in $obj.transforms ) {
 				var type:int = ModelTransform.stringToType( modelTransform.type.toLowerCase() );
 				if ( "life" == modelTransform.type.toLowerCase() )
 					addTransform( 0
@@ -107,8 +101,7 @@ public class AnimationTransform
 								, attachmentName );
 				else
 				{
-					if ( !modelTransform.time || !modelTransform.type )
-					{
+					if ( !modelTransform.time || !modelTransform.type )	{
 						Log.out( "AnimationTransform.construct - ALL transforms must contain x,y,z,time, type, and name values attachmentName: " + _attachmentName + "  mt data: " + modelTransform );
 						return;
 					}
@@ -123,35 +116,12 @@ public class AnimationTransform
 			}
 		}
 	}
-/*
-	public function buildExportObject( obj:Object ):void {			
-		obj.attachmentName 	= _attachmentName;
-		if ( hasPosition )
-			obj.location	= _position;
-		if ( hasRotation )
-			obj.rotation	= _rotation;
-		if ( hasScale )
-			obj.scale		= _scale;
-		if ( hasTransform )
-			getTransformsObj( obj );
-			
-		function getTransformsObj( obj:Object ):void {
-			var ot:Vector.<Object> = new Vector.<Object>();
-			for each ( var mt:ModelTransform in _transforms ) {
-				var mto:Object = new Object();
-				mt.buildExportObject( mto );
-				ot.push( mto );
-			}
-			if ( ot.length )
-				obj.transforms = ot;
-		}
-	}
-	*/
+
 	public function toObject():Object {			
 		var obj:Object = new Object()
 		obj.attachmentName 	= _attachmentName;
 		if ( hasPosition )
-			obj.location	= vector3DIntToObject( _position );
+			obj.position	= vector3DIntToObject( _position );
 		if ( hasRotation )
 			obj.rotation	= vector3DIntToObject( _rotation );
 		if ( hasScale )
@@ -197,8 +167,7 @@ public class AnimationTransform
 		//Log.out( "InstanceInfo.addTransform " + mt.toString() );
 	}
 	
-	public function toString():String
-	{
+	public function toString():String {
 		return " attachmentName: " + _attachmentName + "  position: " + _position +  "  scale: " + _scale + "  rotation: " + _rotation + " transform: " + _transforms;
 	}
 	

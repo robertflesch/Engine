@@ -20,26 +20,69 @@ import com.voxelengine.Log;
 import com.voxelengine.worldmodel.animation.Animation;
 import com.voxelengine.GUI.components.*;
 
-public class PanelAnimationSound extends Box
+public class PanelAnimationSound extends ExpandableBox
 {
-	private var _ani:Animation;
-	
-	private const ITEM_HEIGHT:int = 24;
-	public function PanelAnimationSound( $ani:Animation, $widthParam = 250, $heightParam = 30 ) {
-		_ani = $ani;
+	private var _ani:Animation
+	private var _sound:AnimationSound
+	public function PanelAnimationSound( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {
+		_ani = $ebco.rootObject
+		_ani.sound = $ebco.item
 		
-		super( $widthParam, $heightParam, BorderStyle.GROOVE )
-		backgroundColor = SpasUI.DEFAULT_COLOR;
-		title = "Sound";
-		padding = 5;
-
-		if ( _ani.sound )
-			addSound( null );
-		else
-			deleteSound( null );
+		if ( null == $ebco.item )
+			_ani.sound = $ebco.item = new AnimationSound()
 		
-	}		
+		$ebco.itemBox.showReset = true
+		super( $parent, $ebco );
+	}
 	
+	override protected function collapasedInfo():String  {
+		if ( AnimationSound.SOUND_INVALID == _ani.sound.soundFile ) {
+			_ebco.itemBox.showNew = true
+			return "No sound defined"
+		}
+		
+		_ebco.itemBox.showNew = false
+		_ebco.itemBox.showReset = true
+		return _ani.sound.soundFile + " min: " + _ani.sound.soundRangeMin + " max: " + _ani.sound.soundRangeMax
+	}
+	
+	override protected function resetElement():void  { 
+		_ani.sound.reset()
+		changeMode()
+	}
+	
+	// This handles the new model transform
+	override protected function newItemHandler( $me:UIMouseEvent ):void 		{ 
+		
+		_ani.sound.soundFile = "Undefined Sound"
+		changeMode() // collapse container
+		changeMode() // reexpand so that new item is at the bottom
+	}
+	
+	override protected function expand():void {
+		super.expand()
+		
+		if ( AnimationSound.SOUND_INVALID == _ani.sound.soundFile ) {
+			return
+		}
+		
+		_itemBox.addElement( new ComponentLabelInput( "Name"
+									, function ($e:TextEvent):void { _ani.sound.soundFile = $e.target.text; setChanged(); }
+									, _ani.sound.soundFile ? _ani.sound.soundFile : "No sound"
+									, width - 20 ) )
+		
+		_itemBox.addElement( new ComponentLabelInput( "RangeMax"
+									  , function ($e:TextEvent):void { _ani.sound.soundRangeMax = int( $e.target.text ); setChanged(); }
+									  , _ani.sound.soundRangeMax ? String( _ani.sound.soundRangeMax ) : "No max range"
+									  , width - 20 ) )
+											
+		_itemBox.addElement( new ComponentLabelInput( "RangeMin"
+									  , function ($e:TextEvent):void { _ani.sound.soundRangeMin = int( $e.target.text ); setChanged(); }
+									  , _ani.sound.soundRangeMin ? String( _ani.sound.soundRangeMin ) : "No min range"
+									  , width - 20 ) )
+	}
+	
+	/*
 	private function deleteSound( $me:UIMouseEvent ):void {
 		removeElements();
 		_ani.sound = null;
@@ -48,7 +91,8 @@ public class PanelAnimationSound extends Box
 		addElement( newItem );
 		height = 40;
 	}
-	
+	*/
+	/*
 	private function addSound( $me:UIMouseEvent ):void {
 		removeElements();
 		if ( null == _ani.sound )
@@ -85,9 +129,10 @@ public class PanelAnimationSound extends Box
 		$evtColl.addEvent( deleteButton, UIMouseEvent.RELEASE, deleteSound );
 		addElement( deleteButton );
 	}
-	
+	*/
 	private function setChanged():void {
 		_ani.changed = true;
 	}
+	
 }
 }

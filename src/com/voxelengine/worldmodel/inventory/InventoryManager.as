@@ -59,7 +59,6 @@ public class InventoryManager
 	
 	static private function deleteInventory(e:InventoryEvent):void 
 	{
-		Log.out( "InventoryManager.deleteInventory - OWNER: " + e.owner, Log.DEBUG );
 		var inv:Inventory = _s_inventoryByGuid[e.owner];
 		if ( inv ) {
 			Log.out( "InventoryManager.deleteInventory - InventoryEvent.DELETE - OWNER: " + e.owner, Log.DEBUG );

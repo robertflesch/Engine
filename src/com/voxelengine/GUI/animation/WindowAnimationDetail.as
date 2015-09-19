@@ -7,57 +7,59 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.animation
 {
-import org.flashapi.swing.*;
-import org.flashapi.swing.event.*;
-import org.flashapi.swing.constants.*;
-import org.flashapi.swing.plaf.spas.SpasUI;
+import com.voxelengine.worldmodel.models.types.VoxelModel
+import org.flashapi.swing.*
+import org.flashapi.swing.event.*
+import org.flashapi.swing.constants.*
+import org.flashapi.swing.plaf.spas.SpasUI
 
-import com.voxelengine.Log;
-import com.voxelengine.GUI.VVPopup;
-import com.voxelengine.GUI.LanguageManager;
-import com.voxelengine.GUI.components.*;
-import com.voxelengine.GUI.panels.*;
-import com.voxelengine.worldmodel.animation.Animation;
+import com.voxelengine.Log
+import com.voxelengine.GUI.VVPopup
+import com.voxelengine.GUI.LanguageManager
+import com.voxelengine.GUI.components.*
+import com.voxelengine.GUI.panels.*
+import com.voxelengine.worldmodel.animation.Animation
 
 public class WindowAnimationDetail extends VVPopup
 {
-	private const _TOTAL_BUTTON_PANEL_HEIGHT:int = 30;
-	private var _modelKey:String;
-	private static const WIDTH:int = 400;
-	private var _ani:Animation;
-	private var _infoBackup:Object;
-	private var _create:Boolean;
+	private const _TOTAL_BUTTON_PANEL_HEIGHT:int = 30
+	private var _modelKey:String
+	private static const WIDTH:int = 400
+	private var _ani:Animation
+	private var _infoBackup:Object
+	private var _create:Boolean
 	
 	public function WindowAnimationDetail( $guid:String, $ani:Animation )
 	{
-		var title:String;
-		if ( $ani ) 	title = LanguageManager.localizedStringGet( "Edit_Animation" );
-		else			title = LanguageManager.localizedStringGet( "New_Animation" );
-		super( title );	
-		width = WIDTH;
+		var title:String
+		if ( $ani ) 	title = LanguageManager.localizedStringGet( "Edit_Animation" )
+		else			title = LanguageManager.localizedStringGet( "New_Animation" )
+		super( title )	
+		autoSize = false
+		autoHeight = true
+		width = WIDTH
 	
 		if ( $ani ) {
-			_ani = $ani;
+			_ani = $ani
 		}
 		else {
 			_create = true
-			_ani = new Animation( "INVALID" );
+			_ani = Animation.defaultObject( $guid )
 		}
-		_infoBackup = _ani.createBackCopy();
+		_infoBackup = _ani.createBackCopy()
 		_ani.dynamicObj = true // true while editing
 		
-		autoSize = true;
-		layout.orientation = LayoutOrientation.VERTICAL;
+		layout.orientation = LayoutOrientation.VERTICAL
+		padding = 5
+		addMetadataPanel()
+		addAnimationsPanel()
+		addSoundPanel()
+		//addAttachmentPanel()
+		addButtonPanel()
 		
-		addMetadataPanel();
-		addAnimationsPanel();
-		addSoundPanel();
-		//addAttachmentPanel();
-		addButtonPanel();
-		
-		display();
-		defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION;
-		onCloseFunction = closeFunction;
+		display()
+		defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION
+		onCloseFunction = closeFunction
 	}
 	
 	private function closeFunction():void {
@@ -69,10 +71,10 @@ public class WindowAnimationDetail extends VVPopup
 		
 		function queryToSaveChanges():void {
 			var alert:Alert = new Alert( "You have unsaved changes, want do you want to do?", 400 )
-			alert.setLabels( "Save", "Abandon" );
-			alert.alertMode = AlertMode.CHOICE;
-			$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
-			alert.display();
+			alert.setLabels( "Save", "Abandon" )
+			alert.alertMode = AlertMode.CHOICE
+			$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction )
+			alert.display()
 			
 			function alertAction( $ae:AlertEvent ):void {
 				if ( AlertEvent.ACTION == $ae.action ) {
@@ -91,15 +93,21 @@ public class WindowAnimationDetail extends VVPopup
 		buttonBox.padding = 2
 		addElement( buttonBox )
 		
-		var saveAnimation:Button = new Button( LanguageManager.localizedStringGet( "Save_Animation" ));
-		saveAnimation.addEventListener(UIMouseEvent.CLICK, saveHandler );
-		saveAnimation.width = buttonBox.width/2 - buttonBox.padding * 2;
-		buttonBox.addElement( saveAnimation );
+		const BUTTON_COUNT:int = 3
+		var saveAnimation:Button = new Button( LanguageManager.localizedStringGet( "Save" ))
+		saveAnimation.addEventListener(UIMouseEvent.CLICK, saveHandler )
+		saveAnimation.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * 4
+		buttonBox.addElement( saveAnimation )
 		
-		var revert:Button = new Button( LanguageManager.localizedStringGet( "Revert Changes" ));
-		revert.addEventListener(UIMouseEvent.CLICK, revertHandler );
-		revert.width = buttonBox.width/2 - buttonBox.padding * 2;
-		buttonBox.addElement( revert );
+		var apply:Button = new Button( LanguageManager.localizedStringGet( "Apply" ))
+		apply.addEventListener(UIMouseEvent.CLICK, applyHandler )
+		apply.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * 4
+		buttonBox.addElement( apply )
+		
+		var revert:Button = new Button( LanguageManager.localizedStringGet( "Revert" ))
+		revert.addEventListener(UIMouseEvent.CLICK, revertHandler )
+		revert.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * 4
+		buttonBox.addElement( revert )
 	}
 	
 	private function revertHandler(event:UIMouseEvent):void  {
@@ -109,6 +117,12 @@ public class WindowAnimationDetail extends VVPopup
 		remove()
 	}
 	
+	private function applyHandler(event:UIMouseEvent):void  {
+		VoxelModel.selectedModel.stateLock( false )
+		VoxelModel.selectedModel.stateSet( "Starting", 0 )
+		VoxelModel.selectedModel.stateSet( _ani.name, 0 )
+	}
+
 	private  function saveHandler(event:UIMouseEvent):void  {
 		_ani.dynamicObj = false
 		_ani.save()
@@ -116,50 +130,57 @@ public class WindowAnimationDetail extends VVPopup
 	}
 	
 	private function addMetadataPanel():void {
-		addElement( new ComponentSpacer( width ) );
+		addElement( new ComponentSpacer( width ) )
 		addElement( new ComponentTextInput( "Name"
 										  , function ($e:TextEvent):void { _ani.name = $e.target.text; setChanged(); }
 										  , _ani.name ? _ani.name : "No Name"
-										  , width ) );
+										  , width ) )
 		addElement( new ComponentTextArea( "Desc"
 										 , function ($e:TextEvent):void { _ani.description = $e.target.text; setChanged(); }
 										 , _ani.description ? _ani.description : "No Description"
-										 , width ) );
-		addElement( new ComponentLabel( "AnimationClass", _ani.animationClass, width ) );
-		addElement( new ComponentLabel( "Type", _ani.type, width ) );
+										 , width ) )
+		addElement( new ComponentLabel( "AnimationClass", _ani.animationClass, width ) )
+		addElement( new ComponentLabel( "Type", _ani.type, width ) )
 		
 	}
 	
 	private function setChanged():void {
-		_ani.changed = true;
+		_ani.changed = true
 	}
 	
 	private function addAnimationsPanel():void {
 		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
-		ebco.title = "transforms"
+		ebco.title = " transforms "
 		ebco.width = WIDTH
 		ebco.rootObject = _ani
 		ebco.items = _ani.transforms as Vector.<*>
 		ebco.itemDisplayObject = PanelAnimationTransform
 		ebco.itemBox.showNew = false
 		ebco.itemBox.title = "animatable elements"
-		ebco.paddingTop = 8
+		ebco.paddingTop = 7
 		addElement( new PanelVectorContainer( null, ebco ) )
 	}
 	
 	private function addSoundPanel():void {
-		addElement( new PanelAnimationSound( _ani, WIDTH ) );
+		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
+		ebco.title = " sound "
+		ebco.width = WIDTH
+		ebco.rootObject = _ani
+		ebco.item = _ani.sound
+		ebco.itemBox.newItemText = "Add a sound"
+		ebco.paddingTop = 7
+		addElement( new PanelAnimationSound( null, ebco ) )
 	}
 /*	
 	private function addAttachmentPanel():void {
-		const showNewItem:Boolean = true;
+		const showNewItem:Boolean = true
 		addElement( new PanelVectorContainer( "Attachments to be used"
 											, _ani
 		                                    , _ani.attachments as Vector.<*>
 											, PanelAnimationAttachment
 											, "Add a new attachment"
 											, WIDTH
-											, showNewItem ) );
+											, showNewItem ) )
 	}
 	*/
 }

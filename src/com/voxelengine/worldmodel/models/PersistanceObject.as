@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 import flash.utils.ByteArray;
+import flash.utils.getQualifiedClassName;
 
 import playerio.DatabaseObject;
 
@@ -77,7 +78,7 @@ public class PersistanceObject
 	
 	public function save():void {
 		if ( Globals.online && changed && !dynamicObj ) {
-			//Log.out( "PersistanceObject.save - Saving to guid: " + guid  + " in table: " + table, Log.WARN );
+			Log.out( getQualifiedClassName( this ) + ".save - Saving to guid: " + guid  + " in table: " + table, Log.WARN );
 			addSaveEvents();
 			toObject();
 				
@@ -99,7 +100,7 @@ public class PersistanceObject
 		if ( _table != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "PersistanceObject.saveSucceed - save: " + guid + " in table: " + $pe.table ); 
+		Log.out( getQualifiedClassName( this ) + ".saveSucceed - save: " + guid + " in table: " + $pe.table ); 
 	}	
 	
 	private function createSucceed( $pe:PersistanceEvent ):void { 
@@ -108,7 +109,7 @@ public class PersistanceObject
 		if ( $pe.dbo )
 			_dbo = $pe.dbo;
 		removeSaveEvents();
-		Log.out( "PersistanceObject.createSuccess - created: " + guid + " in table: " + $pe.table, Log.DEBUG ); 
+		Log.out( getQualifiedClassName( this ) + ".createSuccess - created: " + guid + " in table: " + $pe.table, Log.DEBUG ); 
 	}	
 	
 	private function createFailed( $pe:PersistanceEvent ):void  {
@@ -116,7 +117,7 @@ public class PersistanceObject
 			return;
 		removeSaveEvents();
 		// TODO How do I handle the metadata for failed object?
-		Log.out( "PersistanceObject.createFailed - created: " + guid + " in table: " + $pe.table, Log.ERROR ); 
+		Log.out( getQualifiedClassName( this ) + ".createFailed - created: " + guid + " in table: " + $pe.table, Log.ERROR ); 
 		
 	}
 	
@@ -124,7 +125,7 @@ public class PersistanceObject
 		if ( _table != $pe.table )
 			return;
 		removeSaveEvents();
-		Log.out( "PersistanceObject.saveFail - guid: " + guid + " in table: " + $pe.table, Log.ERROR ); 
+		Log.out( getQualifiedClassName( this ) + ".saveFail - guid: " + guid + " in table: " + $pe.table, Log.ERROR ); 
 	}	
 
 	protected function addLoadEvents():void {
@@ -140,15 +141,15 @@ public class PersistanceObject
 	}
 
 	protected function notFound($pe:PersistanceEvent):void {
-		throw new Error( "PersistanceObject.notFound - Must be overridden" );
+		throw new Error( getQualifiedClassName( this ) + ".notFound - Must be overridden" );
 	}
 	
 	protected function loadSuccess( $pe:PersistanceEvent ):void {
-		throw new Error( "PersistanceObject.loadSuccess - Must be overridden" );
+		throw new Error( getQualifiedClassName( this ) + ".loadSuccess - Must be overridden" );
 	}
 	
 	protected function loadFailed( $pe:PersistanceEvent ):void  {
-		throw new Error( "PersistanceObject.loadFailed - Must be overridden" );
+		throw new Error( getQualifiedClassName( this ) + ".loadFailed - Must be overridden" );
 	}
 }
 }

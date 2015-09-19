@@ -21,6 +21,7 @@ public class ExpandableBoxConfigObject extends Object
 	public var itemBox:ItemBoxConfigObject = new ItemBoxConfigObject()
 	public var paddingLeft:int = 4;
 	public var paddingTop:int = 5;
+	public var paddingBottom:int = 5;
 	public var itemSize:int = 25;
 	public var expandButtonSize:int = 20;
 

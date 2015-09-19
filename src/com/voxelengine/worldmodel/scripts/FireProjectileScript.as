@@ -24,7 +24,7 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.worldmodel.weapons.*;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.worldmodel.models.ModelTransform;
-	import com.voxelengine.worldmodel.SoundBank;
+	import com.voxelengine.worldmodel.SoundCache;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;
@@ -81,7 +81,7 @@ package com.voxelengine.worldmodel.scripts
 			ProjectileEvent.dispatch( pe );
 			//Log.out( "FireProjectileScript.onFire - dispatchEvent: " + pe );
 			
-			SoundBank.playSound( SoundBank.getSound( $event.ammo.launchSoundFile ) );
+			SoundCache.playSound( SoundCache.getSound( $event.ammo.launchSoundFile ) );
 		}
 		
 		public function onFireOld( $event:WeaponEvent ):void {
@@ -150,7 +150,7 @@ package com.voxelengine.worldmodel.scripts
 			ProjectileEvent.dispatch( pe );
 			//Log.out( "FireProjectileScript.onFire - dispatchEvent: " + pe );
 			
-			SoundBank.playSound( SoundBank.getSound( ammo.launchSoundFile ) );
+			SoundCache.playSound( SoundCache.getSound( ammo.launchSoundFile ) );
 		}
 		
 		
@@ -229,8 +229,8 @@ package com.voxelengine.worldmodel.scripts
 			else
 				Log.out( "FireProjectileScript.bulletPool - direction: " + dr );
 				
-			pm.instanceInfo.addTransform( dr.x, dr.y, dr.z, ModelTransform.INFINITE_TIME, ModelTransform.LOCATION, Projectile.PROJECTILE_VELOCITY );
-			//pm.instanceInfo.addTransform( 0, Globals.GRAVITY, 0, ModelTransform.INFINITE_TIME, ModelTransform.LOCATION, "Gravity" );
+			pm.instanceInfo.addTransform( dr.x, dr.y, dr.z, ModelTransform.INFINITE_TIME, ModelTransform.POSITION, Projectile.PROJECTILE_VELOCITY );
+			//pm.instanceInfo.addTransform( 0, Globals.GRAVITY, 0, ModelTransform.INFINITE_TIME, ModelTransform.POSITION, "Gravity" );
 			pm.instanceInfo.addTransform( 0, 0, 0, pe.ammo.life, ModelTransform.LIFE );
 			//pm.instanceInfo.addTransform( 0, 0, 0.1, ModelTransform.INFINITE_TIME, ModelTransform.ROTATION_STRING );
 			

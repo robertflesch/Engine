@@ -1,6 +1,6 @@
 package com.voxelengine.worldmodel.scripts 
 {
-	import com.voxelengine.worldmodel.SoundBank;
+	import com.voxelengine.worldmodel.SoundCache;
 	import com.voxelengine.worldmodel.weapons.Ammo;
 	import flash.geom.Vector3D;
 	/**
@@ -26,7 +26,7 @@ package com.voxelengine.worldmodel.scripts
 		
 		protected function impactSound():void
 		{
-			SoundBank.playSound( SoundBank.getSound( _ammo.impactSoundFile ) );
+			SoundCache.playSound( SoundCache.getSound( _ammo.impactSoundFile ) );
 		}
 		
 		

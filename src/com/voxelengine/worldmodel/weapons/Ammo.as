@@ -18,7 +18,7 @@ import org.flashapi.swing.Alert;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.worldmodel.SoundBank;
+import com.voxelengine.worldmodel.SoundCache;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.worldmodel.TypeInfo;
@@ -175,11 +175,11 @@ public class Ammo extends PersistanceObject
 			
 		if ( !info.launchSoundFile )
 			info.launchSoundFile = "Cannon.mp3";
-		SoundBank.getSound( info.launchSoundFile ); // Preload the sound file
+		SoundCache.getSound( info.launchSoundFile ); // Preload the sound file
 		
 		if ( !info.impactSoundFile )
 			info.impactSoundFile = "CannonBallExploding.mp3";
-		SoundBank.getSound( info.impactSoundFile );
+		SoundCache.getSound( info.impactSoundFile );
 			
 		//ModelLoader.modelInfoFindOrCreate( _model, null, false );
 		//ModelLoader.modelInfoFindOrCreate( _model, _model, false );

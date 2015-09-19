@@ -17,14 +17,13 @@ import com.voxelengine.Log
 import com.voxelengine.GUI.components.*
 import com.voxelengine.worldmodel.animation.Animation
 import com.voxelengine.worldmodel.models.ModelTransform
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class PanelModelTransform extends ExpandableBox
 {
-	private var _cbType:ComboBox  = new ComboBox()	
 	private var _ani:Animation
 	private var _mt:ModelTransform
 	
-	//public function PanelModelTransform( $ani:Animation, $modelXform:ModelTransform, $widthParam = 300, $heightParam = 100 ) {
 	public function PanelModelTransform( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {		
 		_ani = $ebco.rootObject
 		_mt = $ebco.item
@@ -55,19 +54,19 @@ public class PanelModelTransform extends ExpandableBox
 		_parent.changeMode()
 	}
 	
-	
 	override protected function collapasedInfo():String  {
-		if ( _mt ) {
-			if ( ModelTransform.INVALID == _mt.type )
-				return "No transforms "
-			return ModelTransform.typeToString( _mt.type ) + "  " + _mt.deltaAsString()
+		if ( !_mt ) {
+			Log.out( "PanelModelTransform.collapsedInfo - null == _mt", Log.ERROR )
+			return "PanelModelTransform.collapsedInfo - null == _mt"
 		}
-		
-		return "New Model Transform"
+			
+		if ( ModelTransform.INVALID == _mt.type )
+			return "No transforms "
+		return ModelTransform.typeToString( _mt.type ) + "  " + _mt.deltaAsString()
 	}
 
 	override protected function hasElements():Boolean {
-		if ( 0 < _mt.delta.length ) 
+		if ( 0 < _mt.originalDelta.length ) 
 			return true
 		 
 		return false
@@ -81,10 +80,10 @@ public class PanelModelTransform extends ExpandableBox
 		_itemBox.addElement( new ComponentComboBoxWithLabel( "Transform type", typeChanged, ModelTransform.typeToString( _mt.type ), ModelTransform.typesList(), _itemBox.width ) )
 		_itemBox.addElement( new ComponentLabelInput( "time (ms)"
 											  , timeChanged
-											  , _mt.time ? String( _mt.time ) : "Missing time"
+											  , _mt.originalTime ? String( _mt.originalTime ) : "Missing time"
 											  , _itemBox.width - 10 ) )
 											  
-		_itemBox.addElement( new ComponentVector3DSideLabel( deltaChanged, "delta", "X: ", "Y: ", "Z: ",  _mt.delta, _itemBox.width, updateVal ) )
+		_itemBox.addElement( new ComponentVector3DSideLabel( deltaChanged, "delta", "X: ", "Y: ", "Z: ",  _mt.originalDelta, _itemBox.width, updateVal ) )
 	}
 	
 	private function typeChanged( $le:ListEvent ): void {
@@ -94,15 +93,15 @@ public class PanelModelTransform extends ExpandableBox
 	}
 	
 	private function timeChanged($e:TextEvent):void { 
-		_mt.time = int ( $e.target.label )
-		if ( isNaN( _mt.time ) )
-			_mt.time = 1000
-		Log.out( "deltaChanged: " + _mt.time )
+		_mt.originalTime = int ( $e.target.label )
+		if ( isNaN( _mt.originalTime ) )
+			_mt.originalTime = 1000
+		Log.out( "deltaChanged: " + _mt.originalTime )
 		setChanged() 
 	}
 	
 	private function deltaChanged():void { 
-		Log.out( "deltaChanged: " + _mt.delta )
+		Log.out( "deltaChanged: " + _mt.originalDelta )
 		setChanged() 
 	}
 	
