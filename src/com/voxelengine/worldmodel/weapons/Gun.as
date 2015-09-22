@@ -7,23 +7,19 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.weapons
 {
-import com.voxelengine.events.AmmoEvent;
-import com.voxelengine.events.GunEvent;
-import com.voxelengine.events.InventoryInterfaceEvent;
-import com.voxelengine.events.InventorySlotEvent;
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.Globals;
-import com.voxelengine.Log;
-import com.voxelengine.worldmodel.inventory.ObjectAction;
-import com.voxelengine.worldmodel.weapons.Ammo;
-import com.voxelengine.worldmodel.scripts.Script;
-import com.voxelengine.worldmodel.models.*;
-import com.voxelengine.events.WeaponEvent;
-import flash.display3D.Context3D;
-import flash.geom.Vector3D;
 import flash.events.KeyboardEvent;
 import flash.ui.Keyboard;	
+
+import com.voxelengine.Log;
+import com.voxelengine.events.AmmoEvent;
+import com.voxelengine.events.GunEvent;
+import com.voxelengine.events.InventorySlotEvent;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.WeaponEvent;
 import com.voxelengine.worldmodel.inventory.FunctionRegistry;
+import com.voxelengine.worldmodel.inventory.ObjectAction;
+import com.voxelengine.worldmodel.models.*;
+import com.voxelengine.worldmodel.scripts.Script;
 
 /**
  * ...
@@ -42,8 +38,7 @@ public class Gun extends ControllableVoxelModel
 	//Barrel
 	//Stand
 	//Sight
-	public function Gun( instanceInfo:InstanceInfo ) 
-	{ 
+	public function Gun( instanceInfo:InstanceInfo ) { 
 		Log.out( "Gun instanceInfo: " + instanceInfo,Log.WARN );
 		super( instanceInfo );
 		// give the gun a unique series

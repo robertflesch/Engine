@@ -220,7 +220,7 @@ package com.voxelengine.worldmodel.scripts
 			else
 				dr.z -= Math.random() * accuracy;
 			
-			dr.scaleBy( -pe.ammo.velocity );
+			dr.scaleBy( pe.ammo.velocity );
 
 			if ( parentVelocity )
 			{

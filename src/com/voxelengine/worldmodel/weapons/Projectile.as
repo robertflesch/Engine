@@ -166,6 +166,7 @@ package com.voxelengine.worldmodel.weapons
 					script.instanceGuid = instanceInfo.instanceGuid;
 				}
 			}
+			//trace( "Projectile.dead" );
 			//ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, instanceInfo.instanceGuid ) );
 		}
 	
@@ -174,6 +175,7 @@ package com.voxelengine.worldmodel.weapons
 			if ( dead )
 				return;
 				
+			//trace( "Projectile.update projectileWSPosition: " + instanceInfo.positionGet );
 			super.update( $context, $elapsedTimeMS );
 		}
 		

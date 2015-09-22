@@ -22,18 +22,18 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class ModelTransform
 {
-	static private var objectEnum:int = 0;
-	static public const INVALID:int = objectEnum++; 	
-	static public const POSITION:int = objectEnum++; 	
-	static public const POSITION_TO:int = objectEnum++;
-	static public const POSITION_REPEATING:int = objectEnum++;
-	static public const SCALE:int = objectEnum++;		
-	static public const ROTATION:int = objectEnum++;    
-	static public const ROTATE_TO:int = objectEnum++;   
-	static public const ROTATION_REPEATING:int = objectEnum++;
-	static public const LIFE:int = objectEnum++;		
-	static public const VELOCITY:int = objectEnum++;
-	static public const INFINITE_TIME:int = -1;
+	static public const INVALID:int 			= 0 	
+	static public const POSITION:int 			= 1 	
+	static public const POSITION_TO:int 		= 2
+	static public const POSITION_REPEATING:int 	= 3
+	static public const SCALE:int 				= 4		
+	static public const ROTATION:int 			= 5    
+	static public const ROTATE_TO:int 			= 6
+	static public const ROTATION_REPEATING:int 	= 7
+	static public const LIFE:int 				= 8
+	static public const VELOCITY:int 			= 9
+	
+	static public const INFINITE_TIME:int 		= -1;
 	
 	static public const POSITION_STRING:String 				= "position"
 	static public const POSITION_TO_STRING:String			= "position_to"
@@ -44,8 +44,6 @@ public class ModelTransform
 	static public const ROTATION_REPEATING_STRING:String 	= "rotation_repeating"
 	static public const LIFE_STRING:String 					= "life"
 	static public const VELOCITY_STRING:String 				= "velocity"
-	
-	static private const TIMELEFT_INFINITE:int = -1;
 	
 	private var _time:int = 0;            // in milliseconds
 	private var _originalTime:Number = 0; // in milliseconds (NOW)
@@ -108,7 +106,7 @@ public class ModelTransform
 		if ( 0 == $x && 0 == $y && 0 == $z && 0 == $time && ModelTransform.LIFE != $type )
 			Log.out( "InstanceInfo.addTransform - No values defined", Log.ERROR );
 		
-		if ( 1 > $time && -1 != $time ) {
+		if ( 100 > $time && -1 != $time ) {
 			Log.out( "InstanceInfo.addTransform - OLD TIME BEING USED: " + $name + " x: " + $x + " y: " + $y + " z: " + $z, Log.ERROR );
 			$time = $time * 1000
 		}
@@ -129,9 +127,16 @@ public class ModelTransform
 		}
 		else
 		{
-			_delta.x = $x / $time
-			_delta.y = $y / $time
-			_delta.z = $z / $time
+			if ( ModelTransform.INFINITE_TIME == $time ) {
+				_delta.x = $x / 1000
+				_delta.y = $y / 1000
+				_delta.z = $z / 1000
+			}
+			else {
+				_delta.x = $x / $time
+				_delta.y = $y / $time
+				_delta.z = $z / $time
+			}
 		}
 		
 		if ( ModelTransform.INFINITE_TIME == $time )
@@ -205,28 +210,26 @@ public class ModelTransform
 	
 	public function update( elapsedTimeMS:int, owner:VoxelModel ):Boolean
 	{
-		if ( null == transformTarget )
-		{
+		if ( 50 < elapsedTimeMS )
+			Log.out( "ModelTransform.update - elapsedTimeMS: " + elapsedTimeMS );
+			
+		if ( null == transformTarget ) {
 			Log.out( "ModelTransform.update - ERROR - No transfrom target OR assigned is false" );
 			return true;
 		}
 		
 		var channelRunTime:Number = 0;
-		if ( _time > 0 || _time == TIMELEFT_INFINITE )
-		{
+		if ( _time > 0 || _time == INFINITE_TIME ) {
 			// Translate channel active, update position
-			if ( _time == TIMELEFT_INFINITE )
-			{
+			if ( _time == INFINITE_TIME ) {
 				channelRunTime = elapsedTimeMS;
 			}
 			else
 			{
 				// if no time is left, return the remaining time as run time.
 				// if this is the object's life, removed it.
-				if ( elapsedTimeMS >= _time )
-				{
-					if ( ROTATION_REPEATING == type || POSITION_REPEATING == type )
-					{
+				if ( elapsedTimeMS >= _time ) {
+					if ( ROTATION_REPEATING == type || POSITION_REPEATING == type ) {
 						if ( ModelTransform.INFINITE_TIME == _originalTime )
 							_time = ModelTransform.INFINITE_TIME;
 						else
@@ -235,25 +238,21 @@ public class ModelTransform
 						_delta.negate();
 						_inverse = !_inverse;
 					}
-					else
-					{
+					else {
 						channelRunTime = _time;
 						_time = 0;
 						TransformEvent.dispatch( new TransformEvent( TransformEvent.ENDED, _guid, name ) );
 					}
 				}
-				else
-				{
+				else {
 					channelRunTime = elapsedTimeMS;
 					_time -= elapsedTimeMS;
 				}
 			}
 		}
 		
-		if ( 0 < channelRunTime )
-		{
-			if ( VELOCITY == type )
-			{
+		if ( 0 < channelRunTime ) {
+			if ( VELOCITY == type ) {
 				var dr:Vector3D = owner.instanceInfo.worldSpaceMatrix.deltaTransformVector( new Vector3D(0, 1, -1) );
 
 				_transformTarget.x += channelRunTime * _delta.x * dr.x;
@@ -262,17 +261,17 @@ public class ModelTransform
 				
 				//Log.out( "ModelTransform.update - Velocity: " + _transformTarget );
 			}
-			else
-			{
-				_transformTarget.x += channelRunTime * _delta.x;
-				_transformTarget.y += channelRunTime * _delta.y;
-				_transformTarget.z += channelRunTime * _delta.z;
-				
-				if ( ROTATION == type )
-				{
+			else {
+				if ( ROTATION == type ) {
 					_transformTarget.x = _transformTarget.x % 360;
 					_transformTarget.y = _transformTarget.y % 360;
 					_transformTarget.z = _transformTarget.z % 360;
+				}
+				else {
+					_transformTarget.x += channelRunTime * _delta.x;
+					_transformTarget.y += channelRunTime * _delta.y;
+					_transformTarget.z += channelRunTime * _delta.z;
+					Log.out( "ModelTransform.update - type: " + typeToString( type ) + "  tt: " + _transformTarget + " crt: " + channelRunTime + "  delta: " + _delta );
 				}
 				
 			}

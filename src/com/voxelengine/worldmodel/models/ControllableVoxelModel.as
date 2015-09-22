@@ -508,7 +508,7 @@ public class ControllableVoxelModel extends VoxelModel
 			trailMarker.dynamicObject = true;
 			trailMarker.scale = new Vector3D( 0.25, 0.25, 0.25 );
 			trailMarker.positionSet = wsCenter;
-			trailMarker.addTransform( 0, 0, 0, 10, ModelTransform.LIFE );
+			trailMarker.addTransform( 0, 0, 0, 10000, ModelTransform.LIFE );
 			
 			ModelMakerBase.load( trailMarker );
 		}
