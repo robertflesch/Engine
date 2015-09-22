@@ -108,7 +108,7 @@ public class ModelTransform
 		if ( 0 == $x && 0 == $y && 0 == $z && 0 == $time && ModelTransform.LIFE != $type )
 			Log.out( "InstanceInfo.addTransform - No values defined", Log.ERROR );
 		
-		if ( 1 > $time ) {
+		if ( 1 > $time && -1 != $time ) {
 			Log.out( "InstanceInfo.addTransform - OLD TIME BEING USED: " + $name + " x: " + $x + " y: " + $y + " z: " + $z, Log.ERROR );
 			$time = $time * 1000
 		}

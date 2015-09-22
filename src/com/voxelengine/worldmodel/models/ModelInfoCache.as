@@ -215,8 +215,6 @@ public class ModelInfoCache
 			Log.out( "ModelInfoCache.add modelInfo: " + $mi.toString(), Log.DEBUG );
 			_modelInfo[$mi.guid] = $mi; 
 			
-			if ( _block.has( $mi.guid ) )
-				_block.clear( $mi.guid )
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $series, $mi.guid, $mi ) );
 		}
 	}

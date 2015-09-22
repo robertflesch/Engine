@@ -102,7 +102,7 @@ public class Animation extends PersistanceObject
 		obj.data = new Object()
 		return obj
 	}
-	*/
+	
 	override public function clone( $guid:String ):* {
 		// force the data from the dynamic classes into the object
 		toObject()
@@ -110,7 +110,7 @@ public class Animation extends PersistanceObject
 		newAni.fromObjectImport( dbo )
 		return newAni
 	}
-
+	*/
 	public function createBackCopy():Object {
 		// force the data from the dynamic classes into the object
 		// this give me an object that holds all of the data for the animation
@@ -208,23 +208,22 @@ public class Animation extends PersistanceObject
 	// Only attributes that need additional handling go here.
 	public function loadFromInfo( $info:Object ):void {
 		
-		if ( $info.sound ) {
-			_sound = new AnimationSound();
-			_sound.init( $info.sound );
-		}
+		if ( $info.sound ) 
+			_sound = new AnimationSound( this, $info.sound )
+
 		
 		if ( $info.attachments ) {
 			_attachments = new Vector.<AnimationAttachment>;
-			for each ( var attachmentJson:Object in $info.attachment )
+			for each ( var attachmentObj:Object in $info.attachment )
 			{
-				_attachments.push( new AnimationAttachment( attachmentJson ) );				
+				_attachments.push( new AnimationAttachment( attachmentObj ) );				
 			}
 		}
 		
 		if ( $info.animations ) {
 			_transforms = new Vector.<AnimationTransform>;
-			for each ( var transformJson:Object in $info.animations )
-				_transforms.push( new AnimationTransform( transformJson ) );				
+			for each ( var transformObj:Object in $info.animations )
+				_transforms.push( new AnimationTransform( transformObj ) );				
 		}
 		
 		if ( !$info.owner )

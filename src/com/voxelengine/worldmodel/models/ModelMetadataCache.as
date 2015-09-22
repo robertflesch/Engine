@@ -138,7 +138,7 @@ public class ModelMetadataCache
 		var newGuid:String = guidArray[1];
 		var modelMetadataExisting:ModelMetadata = _metadata[oldGuid];
 		if ( null == modelMetadataExisting ) {
-			Log.out( "ModelMetadataCache.updateGuid - guid not found: " + oldGuid, Log.ERROR );
+			//Log.out( "ModelMetadataCache.updateGuid - guid not found: " + oldGuid, Log.WARN );
 			return; }
 		else {
 			_metadata[oldGuid] = null;

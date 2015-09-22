@@ -4,6 +4,8 @@ package com.voxelengine.worldmodel.scripts
 	 * ...
 	 * @author Bob
 	 */
+	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.SoundEvent;
 	import flash.media.Sound;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -27,21 +29,22 @@ package com.voxelengine.worldmodel.scripts
 	public class BombScript extends Script 
 	{
 		private var _bulletSize:int = 2;
-		private var _channel:SoundChannel;
+		//private var _channel:SoundChannel;
 		protected var _soundFile:String = "BombDrop.mp3";		
 		
 		public function BombScript( bulletSize:int = 2 ) 
 		{
 			_bulletSize = bulletSize;
 			addKeyboardListeners();
-			SoundCache.getSound( _soundFile ); // Preload the sound file
-			Globals.g_app.addEventListener( WeaponEvent.FIRE, onWeaponEventDrop, false, 0, true );
+			//SoundCache.getSound( _soundFile ); // Preload the sound file
+			SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, _soundFile, null, Globals.isGuid( _soundFile ) ? true : false ) )
+			WeaponEvent.addListener( WeaponEvent.FIRE, onWeaponEventDrop, false, 0, true );
 		}
 		
 		override public function dispose():void
 		{
-			if ( _channel )
-				_channel.stop();
+			//if ( _channel )
+			//	_channel.stop();
 		}
 		
 		private function ioErrorHandler(event:IOErrorEvent):void {
@@ -65,8 +68,9 @@ package com.voxelengine.worldmodel.scripts
 		{
 			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
 			
-			var snd:Sound = SoundCache.getSound( _soundFile );
-			_channel = snd.play();
+			//var snd:Sound = SoundCache.getSound( _soundFile );
+			//_channel = snd.play();
+			SoundCache.playSound( _soundFile )
 			
 			var bomb:Bomb = Region.currentRegion.modelCache.instanceGet( instanceGuid ) as Bomb;
 			if ( bomb )

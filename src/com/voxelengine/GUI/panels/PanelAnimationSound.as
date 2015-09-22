@@ -28,22 +28,23 @@ public class PanelAnimationSound extends ExpandableBox
 		_ani = $ebco.rootObject
 		_ani.sound = $ebco.item
 		
-		if ( null == $ebco.item )
-			_ani.sound = $ebco.item = new AnimationSound()
+		if ( null == $ebco.item ) {
+			_ani.sound = $ebco.item = new AnimationSound( _ani, AnimationSound.DEFAULT_OBJECT )
+		}
 		
 		$ebco.itemBox.showReset = true
 		super( $parent, $ebco );
 	}
 	
 	override protected function collapasedInfo():String  {
-		if ( AnimationSound.SOUND_INVALID == _ani.sound.soundFile ) {
+		if ( AnimationSound.SOUND_INVALID == _ani.sound.guid ) {
 			_ebco.itemBox.showNew = true
 			return "No sound defined"
 		}
 		
 		_ebco.itemBox.showNew = false
 		_ebco.itemBox.showReset = true
-		return _ani.sound.soundFile + " min: " + _ani.sound.soundRangeMin + " max: " + _ani.sound.soundRangeMax
+		return _ani.sound.guid + " min: " + _ani.sound.soundRangeMin + " max: " + _ani.sound.soundRangeMax
 	}
 	
 	override protected function resetElement():void  { 
@@ -54,7 +55,7 @@ public class PanelAnimationSound extends ExpandableBox
 	// This handles the new model transform
 	override protected function newItemHandler( $me:UIMouseEvent ):void 		{ 
 		
-		_ani.sound.soundFile = "Undefined Sound"
+		_ani.sound.guid = "Undefined Sound"
 		changeMode() // collapse container
 		changeMode() // reexpand so that new item is at the bottom
 	}
@@ -62,13 +63,13 @@ public class PanelAnimationSound extends ExpandableBox
 	override protected function expand():void {
 		super.expand()
 		
-		if ( AnimationSound.SOUND_INVALID == _ani.sound.soundFile ) {
+		if ( AnimationSound.SOUND_INVALID == _ani.sound.guid ) {
 			return
 		}
 		
 		_itemBox.addElement( new ComponentLabelInput( "Name"
-									, function ($e:TextEvent):void { _ani.sound.soundFile = $e.target.text; setChanged(); }
-									, _ani.sound.soundFile ? _ani.sound.soundFile : "No sound"
+									, function ($e:TextEvent):void { _ani.sound.guid = $e.target.text; setChanged(); }
+									, _ani.sound.guid ? _ani.sound.guid : "No sound"
 									, width - 20 ) )
 		
 		_itemBox.addElement( new ComponentLabelInput( "RangeMax"
@@ -101,8 +102,8 @@ public class PanelAnimationSound extends ExpandableBox
 		
 		var cli:ComponentLabelInput;
 		cli = new ComponentLabelInput( "Name"
-									  , function ($e:TextEvent):void { _ani.sound.soundFile = $e.target.text; setChanged(); }
-									  , _ani.sound.soundFile ? _ani.sound.soundFile : "No sound"
+									  , function ($e:TextEvent):void { _ani.sound.guid = $e.target.text; setChanged(); }
+									  , _ani.sound.guid ? _ani.sound.guid : "No sound"
 									  , width - 20 )
 											
 		height += cli.height + padding;

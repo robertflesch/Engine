@@ -166,7 +166,7 @@ public class Dragon extends Beast
 
 	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
 		Player.player.loseControl( null );
-		Log.out( "Dragon.takeControl --------------------------------------------------------------------------------------------------------------------", Log.WARN );
+		//Log.out( "Dragon.takeControl --------------------------------------------------------------------------------------------------------------------", Log.WARN );
 		//Log.out( "Dragon.takeControl - starting position: " + $vm.instanceInfo.positionGet );
 		super.takeControl( $modelLosingControl, $addAsChild );
 		$modelLosingControl.stateSet( "Ride");

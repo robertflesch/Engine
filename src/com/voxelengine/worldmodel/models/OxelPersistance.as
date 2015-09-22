@@ -125,7 +125,7 @@ public class OxelPersistance extends PersistanceObject
 	}
 	
 	override protected function toObject():void {
-		Log.out( "OxelPersistance.toObject", Log.WARN );
+		//Log.out( "OxelPersistance.toObject", Log.WARN );
 		dbo.data.ba			= toByteArray( oxel );
 	}
 				
@@ -191,7 +191,7 @@ public class OxelPersistance extends PersistanceObject
 		var time:int = getTimer();
 		
 		try { $ba.uncompress(); }
-		catch (error:Error) { Log.out( "OxelPersistanceCache.loadSucceed - Was expecting compressed data " + guid, Log.WARN ); }
+		catch (error:Error) { Log.out( "OxelPersistance.fromByteArray - Was expecting compressed data " + guid, Log.WARN ); }
 		$ba.position = 0;
 		
 		extractVersionInfo( $ba );

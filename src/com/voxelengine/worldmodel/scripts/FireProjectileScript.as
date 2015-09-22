@@ -81,7 +81,8 @@ package com.voxelengine.worldmodel.scripts
 			ProjectileEvent.dispatch( pe );
 			//Log.out( "FireProjectileScript.onFire - dispatchEvent: " + pe );
 			
-			SoundCache.playSound( SoundCache.getSound( $event.ammo.launchSoundFile ) );
+			//SoundCache.playSound( SoundCache.getSound( $event.ammo.launchSound ) );
+			SoundCache.playSound( $event.ammo.launchSound )
 		}
 		
 		public function onFireOld( $event:WeaponEvent ):void {
@@ -150,7 +151,8 @@ package com.voxelengine.worldmodel.scripts
 			ProjectileEvent.dispatch( pe );
 			//Log.out( "FireProjectileScript.onFire - dispatchEvent: " + pe );
 			
-			SoundCache.playSound( SoundCache.getSound( ammo.launchSoundFile ) );
+			//SoundCache.playSound( SoundCache.getSound( ammo.launchSound ) );
+			SoundCache.playSound( $event.ammo.launchSound )
 		}
 		
 		

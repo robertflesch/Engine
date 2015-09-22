@@ -8,6 +8,8 @@
 package com.voxelengine.worldmodel.weapons
 {
 	import com.voxelengine.events.ImpactEvent;
+	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.SoundEvent;
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -40,7 +42,8 @@ package com.voxelengine.worldmodel.weapons
 			super.init( $mi, $vmm );
 			
 			_bombHolder = _instanceInfo.controllingModel;
-			SoundCache.getSound( _soundFile ); // Preload the sound file
+			//SoundCache.getSound( _soundFile ); // Preload the sound file
+			SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, _soundFile, null, Globals.isGuid( _soundFile ) ? true : false ) )
 			instanceInfo.dynamicObject = true;
 		}
 
@@ -86,7 +89,7 @@ package com.voxelengine.worldmodel.weapons
 			
 			ImpactEvent.dispatch( new ImpactEvent( ImpactEvent.EXPLODE, center, grain * 16, grain, instanceInfo.instanceGuid ) );
 			
-			SoundCache.playSound( SoundCache.getSound( _soundFile ) );
+			SoundCache.playSound( _soundFile )
 		}
 	}
 }

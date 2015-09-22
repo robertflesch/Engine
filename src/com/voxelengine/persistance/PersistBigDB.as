@@ -45,6 +45,8 @@ public class PersistBigDB
 			return true;
 		else if ( Globals.BIGDB_TABLE_MODEL_INFO == $pe.table )	
 			return true;
+		else if ( Globals.BIGDB_TABLE_SOUNDS == $pe.table )	
+			return true;
 		else {
 			if ( Globals.isGuid( $pe.guid ) )
 				Log.out( "PersistBigDB.isSupportedTable - FAILED table: " + $pe.table + " is not supported", Log.ERROR );

@@ -26,7 +26,9 @@ package com.voxelengine.worldmodel.scripts
 		
 		protected function impactSound():void
 		{
-			SoundCache.playSound( SoundCache.getSound( _ammo.impactSoundFile ) );
+			//SoundCache.playSound( SoundCache.getSound( _ammo.impactSound ) );
+			SoundCache.playSound( _ammo.impactSound )
+			
 		}
 		
 		

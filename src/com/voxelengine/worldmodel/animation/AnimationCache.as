@@ -89,8 +89,6 @@ public class AnimationCache
 			Log.out( "AnimationCache.updateGuid - animation not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.ERROR );
 	}
 	
-	
-	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  public function AnimationEvent( $type:String, $series:int, $modelGuid:String, , $aniGuid:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	/////////////////////////////////////////////////////////////////////////////////////////////

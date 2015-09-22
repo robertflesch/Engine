@@ -38,6 +38,7 @@ package com.voxelengine {
 		static public const BIGDB_TABLE_ANIMATIONS:String = "animations";
 		static public const BIGDB_TABLE_AMMO:String = "ammo";
 		static public const BIGDB_TABLE_REGIONS:String = "regions";
+		static public const BIGDB_TABLE_SOUNDS:String = "sounds";
 		
 		// Yahoo Game Networks Big DB table indexs
 		static public const BIGDB_TABLE_REGIONS_INDEX_OWNER:String = "owner";
@@ -50,6 +51,7 @@ package com.voxelengine {
 		static public const MODEL_INFO_EXT:String = ".mjson";
 		static public const ANI_EXT:String = ".ajson";
 		static public const AMMO_EXT:String = ".ammo";
+		static public const SOUND_EXT:String = ".mp3";
 
 		static public const VOXELVERSE:String 	= "VoxelVerse";
 		public static var g_app:VoxelVerse;

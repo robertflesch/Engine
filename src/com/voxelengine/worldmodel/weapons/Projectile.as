@@ -7,6 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.weapons
 {
+	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.SoundEvent;
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.pools.ParticlePool;
@@ -58,11 +60,13 @@ package com.voxelengine.worldmodel.weapons
 		}
 		
 		public function get ammo( ):Ammo { return _ammo }
-		public function set ammo( $ammo:Ammo ):void
-		{
+		public function set ammo( $ammo:Ammo ):void {
 			_ammo = $ammo;
 //			SoundBank.getSound( _soundFile ); // Preload the sound file
-			SoundCache.getSound( _ammo.impactSoundFile ); // Preload the sound file
+			//SoundCache.getSound( _ammo.impactSound ); // Preload the sound file
+			if ( _ammo.impactSound && "" != _ammo.impactSound )
+				SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, _ammo.impactSound, null, Globals.isGuid( _ammo.impactSound ) ? true : false ) )
+
 
 			//if ( instanceInfo.controllingModel )
 			//	_thatWhichCreatedYou = $thatWhichCreatedYou;

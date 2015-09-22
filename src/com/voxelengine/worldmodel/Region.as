@@ -290,7 +290,7 @@ package com.voxelengine.worldmodel
 		}
 		
 		override protected function toObject():void {
-			Log.out( "Region.toObject", Log.WARN );
+			//Log.out( "Region.toObject", Log.WARN );
 			if ( _modelCache )
 				info.models = _modelCache.toObject();
 			else
