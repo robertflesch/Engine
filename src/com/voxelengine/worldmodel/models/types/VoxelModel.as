@@ -434,6 +434,25 @@ public class VoxelModel
 		//Log.out( "VoxelModel.empty_sphere - radius: " + radius + " gmin: " + gmin + " took: " + (getTimer() - _timer) );
 		//oxel.mergeRecursive(); // Causes bad things to happen since we dont regen faces!
 	}
+
+	
+	public function getModelChain( $chain:Vector.<VoxelModel> ):void {
+		$chain.push( this )
+		if ( instanceInfo.controllingModel ) {
+			instanceInfo.controllingModel.getModelChain( $chain )
+		}
+	}
+	
+	static public function getWorldSpacePositionInChain( $chain:Vector.<VoxelModel> ):Matrix3D {
+		var len:int = $chain.length
+		Log.out( "VoxelModel.getWorldSpacePositionInChain - all these clones are BAD", Log.ERROR );
+
+		var viewMatrix:Matrix3D = $chain[len-1].instanceInfo.worldSpaceMatrix.clone();
+		for ( var i:int = len - 2; 0 <= i; i-- ) {
+			viewMatrix.append( $chain[i].instanceInfo.worldSpaceMatrix )
+		}
+		return viewMatrix
+	}
 	
 	public function draw(mvp:Matrix3D, $context:Context3D, $isChild:Boolean, $alpha:Boolean ):void	{
 		if ( !instanceInfo.visible )

@@ -95,8 +95,7 @@ public class ModelTransform
 		return new ModelTransform( obj.delta.x, obj.delta.y, obj.delta.z, obj.time, obj.type, obj.name );
 	}
 	
-	public function ModelTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" )
-	{
+	public function ModelTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" ) {
 		
 		_originalDelta.setTo( $x, $y, $z );
 		_originalTime = $time;
@@ -149,8 +148,7 @@ public class ModelTransform
 	}
 	
 	// Animations use these as throw aways, when scaling animations
-	public function clone( $val:Number ):ModelTransform
-	{
+	public function clone( $val:Number ):ModelTransform {
 		var mt:ModelTransform = new ModelTransform( _originalDelta.x
 												  , _originalDelta.y
 												  , _originalDelta.z
@@ -163,8 +161,7 @@ public class ModelTransform
 		return mt;
 	}
 
-	public function assignToInstanceInfo( ii:InstanceInfo ):String
-	{
+	public function assignToInstanceInfo( ii:InstanceInfo ):String {
 		if ( ii )
 		{
 			if ( _guid != "INVALID" )
@@ -201,15 +198,13 @@ public class ModelTransform
 		return _guid;
 	}
 	
-	public function modify( $referenceMt:ModelTransform, $val:Number ):void
-	{
+	public function modify( $referenceMt:ModelTransform, $val:Number ):void {
 		_delta.setTo( $referenceMt._delta.x * $val, $referenceMt._delta.y * $val, $referenceMt._delta.z * $val );
 		if ( _inverse )
 			_delta.negate();
 	}
 	
-	public function update( elapsedTimeMS:int, owner:VoxelModel ):Boolean
-	{
+	public function update( elapsedTimeMS:int, owner:VoxelModel ):Boolean {
 		if ( 50 < elapsedTimeMS )
 			Log.out( "ModelTransform.update - elapsedTimeMS: " + elapsedTimeMS );
 			
@@ -252,6 +247,7 @@ public class ModelTransform
 		}
 		
 		if ( 0 < channelRunTime ) {
+			//Log.out( "ModelTransform.update - type: " + typeToString( type ) + "  tt: " + _transformTarget + " crt: " + channelRunTime + "  delta: " + _delta + " time: " + _time );
 			if ( VELOCITY == type ) {
 				var dr:Vector3D = owner.instanceInfo.worldSpaceMatrix.deltaTransformVector( new Vector3D(0, 1, -1) );
 
@@ -271,9 +267,7 @@ public class ModelTransform
 					_transformTarget.x += channelRunTime * _delta.x;
 					_transformTarget.y += channelRunTime * _delta.y;
 					_transformTarget.z += channelRunTime * _delta.z;
-					Log.out( "ModelTransform.update - type: " + typeToString( type ) + "  tt: " + _transformTarget + " crt: " + channelRunTime + "  delta: " + _delta );
 				}
-				
 			}
 		}
 
@@ -308,8 +302,7 @@ public class ModelTransform
 		}
 	}
 	
-	static public function stringToType( val:String ):int
-	{
+	static public function stringToType( val:String ):int {
 		if ( POSITION_STRING == val.toLowerCase() )
 			return POSITION;
 		if ( POSITION_TO_STRING == val.toLowerCase() )
@@ -333,8 +326,7 @@ public class ModelTransform
 		return -1;
 	}
 
-	static public function typeToString( val:int ):String
-	{
+	static public function typeToString( val:int ):String {
 		if ( POSITION == val )
 			return POSITION_STRING;
 		if ( POSITION_TO == val )

@@ -101,13 +101,14 @@ public class RoomConnection
 	
 	static private function sourceProjectileEvent( event:ProjectileEvent ):void {
 		if ( Globals.online ) {
-			var msg:Message = _connection.createMessage( PROJECTILE_SHOT_MESSAGE );
-			msg.add( Network.userId );
-			msg.add( event.position.x, event.position.y, event.position.z );
-			msg.add( event.direction.x, event.direction.y, event.direction.z );
-			event.ammo.addToMessage( msg );
+			var msg:Message = _connection.createMessage( PROJECTILE_SHOT_MESSAGE )
+			msg.add( Network.userId )
+			msg.add( event.owner )
+			msg.add( event.position.x, event.position.y, event.position.z )
+			msg.add( event.direction.x, event.direction.y, event.direction.z )
+			msg.add( event.ammo.guid )
 			//trace( "sourceProjjectileEvent: " + msg );
-			_connection.sendMessage( msg );
+			_connection.sendMessage( msg )
 		}
 		else {
 			// Since server is not handling it, change type here
@@ -119,17 +120,20 @@ public class RoomConnection
 	static private function handleProjectileEvent( msg:Message ):void {
 		var pe:ProjectileEvent = new ProjectileEvent( ProjectileEvent.PROJECTILE_CREATED );
 		var index:int = 0;
+		const shooter:String = msg.getString( index++ );
 		pe.owner = msg.getString( index++ );
 		pe.position = new Vector3D( msg.getNumber( index++ ), msg.getNumber( index++ ), msg.getNumber( index++ ) );			
 		pe.direction = new Vector3D( msg.getNumber( index++ ), msg.getNumber( index++ ), msg.getNumber( index++ ) );			
 		var ammoGuid:String = msg.getString( index );
 		AmmoEvent.addListener( ModelBaseEvent.RESULT, ammoDataRecieved );
+		AmmoEvent.addListener( ModelBaseEvent.ADDED, ammoDataRecieved );
 		AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST, 0, ammoGuid, null ) );
 		//index = pe.ammo.fromMessage( msg, index );
 		//trace( "handleProjjectileEvent: " + pe );
 		
 		function ammoDataRecieved(e:AmmoEvent):void {
 			AmmoEvent.removeListener( ModelBaseEvent.RESULT, ammoDataRecieved );
+			AmmoEvent.removeListener( ModelBaseEvent.ADDED, ammoDataRecieved );
 			pe.ammo = e.ammo;
 			ProjectileEvent.dispatch( pe );
 		}

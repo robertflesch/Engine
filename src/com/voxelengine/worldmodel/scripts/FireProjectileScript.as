@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -11,7 +11,6 @@ package com.voxelengine.worldmodel.scripts
 	 * ...
 	 * @author Bob
 	 */
-	import com.voxelengine.worldmodel.Region;
 	import flash.geom.Vector3D;
 	
 	import com.voxelengine.Log;
@@ -20,15 +19,15 @@ package com.voxelengine.worldmodel.scripts
 	import com.voxelengine.events.ProjectileEvent;
 	import com.voxelengine.events.WeaponEvent;
 	import com.voxelengine.pools.ParticlePool;
+	import com.voxelengine.pools.ProjectilePool;
 	import com.voxelengine.worldmodel.Region;
+	import com.voxelengine.worldmodel.SoundCache;
 	import com.voxelengine.worldmodel.weapons.*;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.worldmodel.models.ModelTransform;
-	import com.voxelengine.worldmodel.SoundCache;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelInfo;
-	import com.voxelengine.pools.ProjectilePool;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	//import org.flintparticles.common.events.ParticleEvent;
 
@@ -155,16 +154,23 @@ package com.voxelengine.worldmodel.scripts
 			SoundCache.playSound( $event.ammo.launchSound )
 		}
 		
-		
+		import flash.geom.Matrix3D;
+
 		static public function createProjectile( pe:ProjectileEvent ):void
 		{
 			var ownerGuid:String = pe.owner;
 			var gunModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( ownerGuid );
-			if ( gunModel && gunModel.instanceInfo.controllingModel )
-			{
-				var cm:VoxelModel = gunModel.instanceInfo.controllingModel;
-				var parentVelocity:Vector3D = cm.instanceInfo.worldSpaceMatrix.deltaTransformVector( cm.instanceInfo.velocityGet );
-			}
+			var chain:Vector.<VoxelModel> = new Vector.<VoxelModel>()
+			gunModel.getModelChain( chain )
+			var worldSpaceMatrixForGun:Matrix3D = VoxelModel.getWorldSpacePositionInChain( chain )
+			pe.position = worldSpaceMatrixForGun.position
+			Log.out( "FireProjectileScript.createProjectile pe.position: " + pe.position )
+			// More work here, do I really need to pass this direction and velocity with ProjectileEvent?
+			// Or when is best time to do it? When I fire or here?
+			Log.out( "ProjectileScript.createProjectile - NOT DONE HERE 9.23.15", Log.ERROR );
+			
+			var cm:VoxelModel = gunModel.instanceInfo.controllingModel;
+			var parentVelocity:Vector3D = cm.instanceInfo.worldSpaceMatrix.deltaTransformVector( cm.instanceInfo.velocityGet );
 			
 			if ( 1 == pe.ammo.type ) {
 					bulletPool( pe, parentVelocity );
@@ -198,6 +204,7 @@ package com.voxelengine.worldmodel.scripts
 			}
 			pm.changeGrainSize( grainChange );
 //			trace( "bulletPool: changing type to: " + Globals.Info[pe.ammo.oxelType].name );
+//			IS THIS STILL NEEDED WITH NEW BULLET INSTANCING?
 			pm.modelInfo.data.oxel.changeAllButAirToType( pe.ammo.oxelType );
 			
 			pm.instanceInfo.positionSet = pe.position;

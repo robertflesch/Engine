@@ -634,13 +634,20 @@ public class ModelInfo extends PersistanceObject
 			// Same code that is in modelCache to build models in region
 			// this is just models in models
 			delete info.model.children;
-			var children:Object = new Object();
-			for ( var i:int; i < _childVoxelModels.length; i++ ) {
-				if ( null != _childVoxelModels[i] ) {
-					//children["instanceInfo" + i]  = _childrenInstanceInfo[i].toObject();
-					children[i]  = _childVoxelModels[i].instanceInfo.toObject();
-			}	}
-			info.model.children = children;
+			if ( 0 < _childVoxelModels.length ) {
+				var children:Object = new Object();
+				for ( var i:int; i < _childVoxelModels.length; i++ ) {
+					if ( null != _childVoxelModels[i] ) {
+						// Dont save the player as a child model
+						if ( _childVoxelModels[i] is Player )
+							continue
+						//children["instanceInfo" + i]  = _childrenInstanceInfo[i].toObject();
+						children[i]  = _childVoxelModels[i].instanceInfo.toObject();
+					}
+				}
+				if ( children[0] ) // since the player might be a child model
+					info.model.children = children;
+			}
 		}
 		
 		/*
