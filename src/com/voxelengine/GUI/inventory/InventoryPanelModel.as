@@ -196,13 +196,21 @@ public class InventoryPanelModel extends VVContainer
 	}
 	
 	private function addModelTo( e:UIMouseEvent ):void {
-		var om:ObjectModel = (e.target.objectInfo as ObjectModel);
-		
-		var ii:InstanceInfo = new InstanceInfo();
-		ii.modelGuid = om.modelGuid;
-		if ( VoxelModel.selectedModel )
-			ii.controllingModel = VoxelModel.selectedModel;
-		ModelMakerBase.load( ii );
+		if ( e.target.objectInfo is ObjectAction ) {
+			var oa:ObjectAction = e.target.objectInfo as ObjectAction
+			var cb:Function = oa.callBack
+			// just execute the callback here, dont need to do cb(), which calls it twice, interesting
+			cb
+		}
+		else if ( e.target.objectInfo is ObjectModel ) {
+			var om:ObjectModel = (e.target.objectInfo as ObjectModel);
+			
+			var ii:InstanceInfo = new InstanceInfo();
+			ii.modelGuid = om.modelGuid;
+			if ( VoxelModel.selectedModel )
+				ii.controllingModel = VoxelModel.selectedModel;
+			ModelMakerBase.load( ii );
+		}
 		
 		
 		//if ( VoxelModel.selectedModel ) {

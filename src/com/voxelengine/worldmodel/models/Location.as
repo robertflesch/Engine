@@ -305,13 +305,16 @@ package com.voxelengine.worldmodel.models
 		public function toObject():Object {
 			var obj:Object = new Object();
 		
-			obj.location 			= vector3DToObject( _positionOrig );
+			// Save original or current positions? would seem like current
+			// why was I using original?
+			obj.location 			= vector3DToObject( _position );
+//Log.out( "Location.toObject _positionOrig: " + _positionOrig + "  _position: " + _position, Log.WARN )			
 			if ( 0 < _rotationOrig.length )
-				obj.rotation 		= vector3DToObject( _rotationOrig );
+				obj.rotation 		= vector3DToObject( _rotation );
 			if ( 0 < centerNotScaled.length )
 				obj.center 		= vector3DIntToObject( centerNotScaled );
 			if ( 3 != _scaleOrig.lengthSquared )
-				obj.scale 			= vector3DToObject( _scaleOrig );
+				obj.scale 			= vector3DToObject( _scale );
 			
 			return obj
 		}

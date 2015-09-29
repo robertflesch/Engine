@@ -51,6 +51,7 @@ public class AnimationTransform
 			_scale.setTo( 1, 1, 1 );
 	}
 	public function get hasTransform():Boolean  				{ return 0 < _transforms.length; }
+	// what the heck does this do? 9.28.15 RSF
 	public function get notNamed():Boolean 						{ return _notNamed; }
 	
 	public function resetInitialPosition():void {

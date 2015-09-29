@@ -535,23 +535,19 @@ public class ModelInfo extends PersistanceObject
 	private var _firstLoadFailed:Boolean;							// true if load from biomes data is needed
 	
 	override public function save():void {
-		if (  true == animationsLoaded && true == childrenLoaded ) {
-			if ( Globals.isGuid( guid ) ) {
-				//Log.out( "ModelInfo.save - Saving ModelInfo: " + guid  + " in table: " + table, Log.WARN );
+		if ( Globals.isGuid( guid ) ) {
+			if (  true == animationsLoaded && true == childrenLoaded )
 				super.save();
-			}
 			//else
-			//	Log.out( "ModelInfo.save - NOT Saving ModelInfo: " + guid  + " not guid", Log.WARN );
-		}
-		//else
-		//	Log.out( "ModelInfo.save - NOT Saving ModelInfo: " + guid  + " NEED Animations or children to complete", Log.WARN );
+			//	Log.out( "ModelInfo.save - NOT Saving ModelInfo: " + guid  + " NEED Animations or children to complete", Log.WARN );
 			
-		if ( _data )
-			_data.save();	
-		
-		for ( var i:int; i < childVoxelModels.length; i++ ) {
-			var child:VoxelModel = childVoxelModels[i];
-			child.save();
+			if ( _data )
+				_data.save();	
+			
+			for ( var i:int; i < childVoxelModels.length; i++ ) {
+				var child:VoxelModel = childVoxelModels[i];
+				child.save();
+			}
 		}
 	}
 	

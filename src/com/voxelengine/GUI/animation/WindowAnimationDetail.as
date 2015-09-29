@@ -93,20 +93,20 @@ public class WindowAnimationDetail extends VVPopup
 		buttonBox.padding = 2
 		addElement( buttonBox )
 		
-		const BUTTON_COUNT:int = 3
+		const BUTTON_COUNT:int = 2
 		var saveAnimation:Button = new Button( LanguageManager.localizedStringGet( "Save" ))
 		saveAnimation.addEventListener(UIMouseEvent.CLICK, saveHandler )
-		saveAnimation.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * 4
+		saveAnimation.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * BUTTON_COUNT
 		buttonBox.addElement( saveAnimation )
 		
-		var apply:Button = new Button( LanguageManager.localizedStringGet( "Apply" ))
-		apply.addEventListener(UIMouseEvent.CLICK, applyHandler )
-		apply.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * 4
-		buttonBox.addElement( apply )
+		//var apply:Button = new Button( LanguageManager.localizedStringGet( "Apply" ))
+		//apply.addEventListener(UIMouseEvent.CLICK, applyHandler )
+		//apply.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * BUTTON_COUNT
+		//buttonBox.addElement( apply )
 		
 		var revert:Button = new Button( LanguageManager.localizedStringGet( "Revert" ))
 		revert.addEventListener(UIMouseEvent.CLICK, revertHandler )
-		revert.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * 4
+		revert.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * BUTTON_COUNT
 		buttonBox.addElement( revert )
 	}
 	
@@ -117,11 +117,13 @@ public class WindowAnimationDetail extends VVPopup
 		remove()
 	}
 	
-	private function applyHandler(event:UIMouseEvent):void  {
-		VoxelModel.selectedModel.stateLock( false )
-		VoxelModel.selectedModel.stateSet( "Starting", 0 )
-		VoxelModel.selectedModel.stateSet( _ani.name, 0 )
-	}
+	//private function applyHandler(event:UIMouseEvent):void  {
+		//VoxelModel.selectedModel.stateLock( false )
+		//VoxelModel.selectedModel.stateSet( "Starting", 0 )
+		//VoxelModel.selectedModel.stateSet( _ani.name, 0 )
+		//VoxelModel.selectedModel.stateLock( true )
+		//
+	//}
 
 	private  function saveHandler(event:UIMouseEvent):void  {
 		_ani.dynamicObj = false

@@ -116,8 +116,11 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 	
 	override protected function setChanged():void {
 		_ani.changed = true
+		VoxelModel.selectedModel.stateLock( false )
+		VoxelModel.selectedModel.stateSet( "Starting", 0 )
+		VoxelModel.selectedModel.stateSet( _ani.name, 0 )
+		VoxelModel.selectedModel.stateLock( true )
 	}
-	
 }
 }
 

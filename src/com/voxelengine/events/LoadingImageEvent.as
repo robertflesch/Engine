@@ -17,7 +17,7 @@ import flash.events.EventDispatcher;
 public class LoadingImageEvent extends Event
 {
 	static public const CREATE:String  	= "CREATE";
-	static public const DESTORY:String	= "DESTORY";
+	static public const DESTROY:String	= "DESTROY";
 	static public const ANNIHILATE:String	= "ANNIHILATE"; // This closes regardless of online state
 
 	public function LoadingImageEvent( $type:String, $bubbles:Boolean = true, $cancellable:Boolean = false )

@@ -34,7 +34,7 @@ package com.voxelengine.GUI
 			if ( WindowSplash.isActive ) {
 				WindowSplash._s_currentInstance.remove();
 				WindowSplash._s_currentInstance = null;
-				LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTORY ) );			
+				LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );			
 			}
 		}
 		

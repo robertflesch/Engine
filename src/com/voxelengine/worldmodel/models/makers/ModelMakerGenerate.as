@@ -26,6 +26,7 @@ import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.worldmodel.models.types.VoxelModel
 import com.voxelengine.worldmodel.tasks.landscapetasks.TaskLibrary;
 	/**
 	 * ...
@@ -40,16 +41,25 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	private var _type:int;
 	
 	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object ) {
-		_creationFunction 	= $miJson.model.biomes.layers[0].functionName;
-		_type 				= $miJson.model.biomes.layers[0].type;
+		_creationFunction 	= $miJson.biomes.layers[0].functionName;
+		_type 				= $miJson.biomes.layers[0].type;
 		
 		super( $ii );
-		Log.out( "ModelMakerGenerate - ii: " + ii.toString() + "  using generation script: " + $miJson.model.biomes.layers[0].functionName );
+		Log.out( "ModelMakerGenerate - ii: " + ii.toString() + "  using generation script: " + $miJson.biomes.layers[0].functionName );
 		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 		
 		// This is a special case for modelInfo, the modelInfo its self is contained in the generate script
 		_modelInfo = new ModelInfo( $ii.modelGuid );
-		_modelInfo.fromObject( $miJson );
+		///////////////////
+		var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_INFO, "0", "0", 0, true, null );
+		dbo.data = new Object();
+		// This is for import from generated only.
+		dbo.data.model = $miJson
+		_modelInfo.fromObjectImport( dbo );
+		// On import save it.
+		_modelInfo.save();
+		
+		///////////////////
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.GENERATION, 0, $ii.modelGuid, _modelInfo ) );
 		
 		retrieveBaseInfo();
@@ -62,7 +72,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		var newObj:Object = ModelMetadata.newObject()
 		_modelMetadata.fromObjectImport( newObj );
 		
-		_modelMetadata.name = TypeInfo.name( _type ) + _modelInfo.dbo.grainSize + "-" + _creationFunction;
+		_modelMetadata.name = TypeInfo.name( _type ) + "-" + _modelInfo.info.model.grainSize + "-" + _creationFunction;
 		_modelMetadata.description = _creationFunction + "- GENERATED";
 		_modelMetadata.owner = Network.userId;
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelMetadata ) );
@@ -85,5 +95,13 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			markComplete( true, vm );
 		}
 	}
+	
+	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
+		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
+		
+		// do this last as it nulls everything.
+		super.markComplete( $success, $vm );
+	}
+	
 }	
 }

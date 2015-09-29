@@ -172,7 +172,10 @@ public class PanelModels extends PanelBase
 		}
 		
 		function addModel(event:UIMouseEvent):void { 
-			WindowInventoryNew._s_hackShowChildren = true;
+			if ( VoxelModel.selectedModel && null != VoxelModel.selectedModel.instanceInfo.controllingModel )
+				WindowInventoryNew._s_hackShowChildren = true;
+			else
+				WindowInventoryNew._s_hackShowChildren = false;
 			WindowInventoryNew._s_hackSupportClick = true;
 			var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
 			new WindowInventoryNew( startingTab ); 

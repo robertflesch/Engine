@@ -32,23 +32,15 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	public class GenerateCube extends LandscapeTask 
 	{	
 		static public function script():Object {
-			//ammo.dbo = new DatabaseObject( Globals.BIGDB_TABLE_AMMO, $pe.guid, "0", 0, true, null );
-			var obj:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_OXEL_DATA, Globals.getUID(), "0", 0, true, null );
-			obj.model = new Object();
 			var biomes:Object = new Object();
-			var layers:Vector.<Object> = new Vector.<Object>();
-			var layer:Object = new Object();
+			biomes.layers = new Vector.<Object>();
+			biomes.layers[0] = new Object();
+			biomes.layers[0].functionName = "GenerateCube";
+			biomes.layers[0].type = "SAND"
+			biomes.layers[0].range = 0;
+			biomes.layers[0].offset = 0; // used for the root grain size
 			
-			obj.model.grainSize = 4;
-			obj.model.biomes = biomes;
-			biomes.layers = layers;
-			layers[0] = layer;
-			layer.functionName = "GenerateCube";
-			layer.type = "SAND"
-			layer.range = 0;
-			layer.offset = 0; // used for the root grain size
-			
-			return obj;
+			return biomes;
 		}
 		
 		public function GenerateCube( guid:String, layer:LayerInfo ):void {

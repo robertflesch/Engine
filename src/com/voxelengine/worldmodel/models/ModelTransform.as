@@ -96,17 +96,18 @@ public class ModelTransform
 	}
 	
 	public function ModelTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" ) {
+		Log.out( "ModelTransform - "  + " type: " + $type + " x: " + $x + " y: " + $y + " z: " + $z + " time: " + $time + " name: " + $name, Log.WARN );
 		
 		_originalDelta.setTo( $x, $y, $z );
 		_originalTime = $time;
 		if ( 0 == $time )
-			Log.out( "InstanceInfo.addTransform - No time defined name: " + $name + " x: " + $x + " y: " + $y + " z: " + $z, Log.ERROR );
+			Log.out( "ModelTransform - No time defined name: " + $name + " x: " + $x + " y: " + $y + " z: " + $z, Log.ERROR );
 
 		if ( 0 == $x && 0 == $y && 0 == $z && 0 == $time && ModelTransform.LIFE != $type )
-			Log.out( "InstanceInfo.addTransform - No values defined", Log.ERROR );
+			Log.out( "ModelTransform - No values defined", Log.ERROR );
 		
 		if ( 100 > $time && -1 != $time ) {
-			Log.out( "InstanceInfo.addTransform - OLD TIME BEING USED: " + $name + " x: " + $x + " y: " + $y + " z: " + $z, Log.ERROR );
+			Log.out( "ModelTransform - OLD TIME BEING USED: " + $name + " x: " + $x + " y: " + $y + " z: " + $z, Log.ERROR );
 			$time = $time * 1000
 		}
 
@@ -149,6 +150,8 @@ public class ModelTransform
 	
 	// Animations use these as throw aways, when scaling animations
 	public function clone( $val:Number ):ModelTransform {
+		Log.out( "ModelTransform.clone - "  + " type: " + type + " x: " + _originalDelta.x + " y: " + _originalDelta.y + " z: " + _originalDelta.z
+		       + " time: " + time + " name: " + name, Log.WARN );
 		var mt:ModelTransform = new ModelTransform( _originalDelta.x
 												  , _originalDelta.y
 												  , _originalDelta.z
@@ -156,8 +159,10 @@ public class ModelTransform
 												  , type
 												  , name );
 		mt._delta.setTo( _delta.x * $val, _delta.y * $val, _delta.z * $val );
-		mt._time = _time;
-		mt._originalTime = _originalTime;
+//		mt._time = _time;
+//		mt._originalTime = _originalTime;
+//		Log.out( "ModelTransform.clone - "  + " type: " + type + " x: " + _originalDelta.x + " y: " + _originalDelta.y + " z: " + _originalDelta.z
+//		       + " time: " + time + " name: " + name, Log.WARN );
 		return mt;
 	}
 

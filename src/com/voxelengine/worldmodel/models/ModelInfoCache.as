@@ -49,6 +49,8 @@ public class ModelInfoCache
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );
+		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createdHandler ); 
+		
 	}
 	
 	static private function save(e:ModelInfoEvent):void {
@@ -136,6 +138,20 @@ public class ModelInfoCache
 			_modelInfo[oldGuid] = null;
 			_modelInfo[newGuid] = modelInfoExisting;
 		}
+	}
+
+	// Just assign the dbo from the create to the region
+	static private function createdHandler( $pe:PersistanceEvent ):void {
+		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table )
+			return;
+		
+		Log.out( "ModelInfoCache.createdHandler: " + $pe.guid );
+		// check for duplicates
+		var mi:ModelInfo = _modelInfo[$pe.guid]; 
+		if ( mi )
+			mi.fromObject( $pe.dbo )
+		else	
+			Log.out( "ModelInfoCache.createdHandler: ERROR modelInfo not found for returned guid: " + $pe.guid, Log.WARN );
 	}
 	
 	static private function loadSucceed( $pe:PersistanceEvent):void {

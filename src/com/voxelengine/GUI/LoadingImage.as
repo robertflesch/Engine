@@ -24,7 +24,7 @@ package com.voxelengine.GUI
 	{
 		static public function init():void {
 			LoadingImageEvent.addListener( LoadingImageEvent.CREATE, create );
-			LoadingImageEvent.addListener( LoadingImageEvent.DESTORY, destroy );
+			LoadingImageEvent.addListener( LoadingImageEvent.DESTROY, destroy );
 			LoadingImageEvent.addListener( LoadingImageEvent.ANNIHILATE, annihilate );
 		}
 		

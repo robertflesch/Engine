@@ -51,12 +51,15 @@ package com.voxelengine.worldmodel
 		static public function get rightTurnEnabled():Boolean 				{ return _s_rightTurnEnabled; }
 		static public function set rightTurnEnabled(value:Boolean):void 	{ _s_rightTurnEnabled = value; }
 		
-		static public function get forward():Boolean 					{ return (Globals.openWindowCount || Log.showing) ? false : _s_forward; }
-		static public function get backward():Boolean 					{ return (Globals.openWindowCount || Log.showing) ? false : _s_backward; }
-		static public function get leftSlide():Boolean 					{ return (Globals.openWindowCount || Log.showing) ? false : _s_left; }
-		static public function get rightSlide():Boolean 				{ return (Globals.openWindowCount || Log.showing) ? false : _s_right; }
-		static public function get up():Boolean 						{ return (Globals.openWindowCount || Log.showing) ? false : _s_up; }
-		static public function get down():Boolean 						{ return (Globals.openWindowCount || Log.showing) ? false : _s_down; }
+		static private function allowMovement( $val:Boolean ):Boolean {
+			return (( Log.showing ) || (Globals.openWindowCount && !shift) ) ? false : $val
+		}
+		static public function get forward():Boolean 					{ return allowMovement( _s_forward ) }
+		static public function get backward():Boolean 					{ return allowMovement( _s_backward ) }
+		static public function get leftSlide():Boolean 					{ return allowMovement( _s_left ) }
+		static public function get rightSlide():Boolean 				{ return allowMovement( _s_right ) }
+		static public function get up():Boolean 						{ return allowMovement( _s_up ) }
+		static public function get down():Boolean 						{ return allowMovement( _s_down ) }
 		static public function get ctrl():Boolean 						{ return _s_ctrl; }
 		static public function get shift():Boolean 						{ return _s_shift; }
 		static public function get alt():Boolean 						{ return _s_alt; }
@@ -79,7 +82,7 @@ package com.voxelengine.worldmodel
 		}
 		
 		static public function getMouseXChange():int {
-			if ( (Globals.openWindowCount || Log.showing) )
+			if ( (Globals.openWindowCount || Log.showing) && !MouseKeyboardHandler.shift )
 				return 0;
 				
 			var val:Number = 0;
@@ -94,7 +97,7 @@ package com.voxelengine.worldmodel
 		}
 		
 		static public function getMouseYChange():int {
-			if ( (Globals.openWindowCount || Log.showing) )
+			if ( (Globals.openWindowCount || Log.showing)  && !MouseKeyboardHandler.shift )
 				return 0;
 				
 			var val:Number = 0;

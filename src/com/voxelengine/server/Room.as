@@ -67,7 +67,7 @@ public class Room
 				Globals.inRoom = false;
 				RoomEvent.dispatch( new RoomEvent( RoomEvent.ROOM_DISCONNECT, null, _guid ) );
 			}
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTORY ) );						
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );						
 		}
 		
 		function handleJoinError(error:PlayerIOError):void
@@ -75,7 +75,7 @@ public class Room
 			Log.out( "Room.handleJoinError - Join Room Error: " + error.message, Log.ERROR, error );
 			Globals.inRoom = false;
 			RoomEvent.dispatch( new RoomEvent( RoomEvent.ROOM_JOIN_FAILURE, error, _guid ) );
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTORY ) );						
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );						
 		}
 	}
 	
