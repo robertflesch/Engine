@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 import flash.utils.Dictionary;
+import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -17,6 +18,9 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.server.Network;
+
+import com.voxelengine.utils.JSONUtil;
+import com.voxelengine.utils.StringUtils;
 
 /**
  * ...
@@ -156,13 +160,50 @@ public class ModelMetadataCache
 	static private function loadSucceed( $pe:PersistanceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
-		if ( $pe.dbo ) {
+		// can have $pe.data if cloning object	
+		if ( $pe.dbo || $pe.data ) {
 			Log.out( "ModelMetadataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
-			var vmm:ModelMetadata = new ModelMetadata( $pe.guid );
-			vmm.fromObject( $pe.dbo );
-//			if ( $pe.data && true == $pe.data )
-//				vmm.dbo = null;
-			add( $pe.series, vmm );
+			var vmm:ModelMetadata = _metadata[$pe.guid]; 
+			if ( null == vmm ) {
+				vmm = new ModelMetadata( $pe.guid );
+				if ( $pe.dbo )
+					vmm.fromObject( $pe.dbo );
+				else {
+					var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
+					dbo.data = new Object();
+					// This is for cloning existing objects only.
+					var fileData:String = String( $pe.data );
+					fileData = StringUtils.trim(fileData);
+					dbo.data = JSONUtil.parse( fileData, $pe.guid + $pe.table, "ModelMetadataEvent.loadSucceed" );
+					if ( null == dbo.data ) {
+						Log.out( "ModelMetadataCache.loadSucceed - error parsing ModelMetadata on import. guid: " + $pe.guid, Log.ERROR );
+						ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
+						return;
+					}
+					if ( dbo.data.thumbnail )
+						dbo.data.thumbnail = null
+					if ( dbo.data.table )
+						delete dbo.data.table // this is an article from the toObject process used in cloning
+					if ( dbo.data.key )
+						delete dbo.data.key // this is an article from the toObject process used in cloning
+					if ( dbo.data.permissions && dbo.data.permissions.blueprint )
+						dbo.data.permissions.blueprint = false
+					if ( dbo.data.permissions )
+						dbo.data.permissions.blueprintGuid = $pe.other
+						
+					vmm.fromObjectImport( dbo );
+					// On import save it.
+					vmm.save();
+				}
+				
+				add( $pe.series, vmm );
+				if ( _block.has( $pe.guid ) )
+					_block.clear( $pe.guid )
+			}
+			else {
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $pe.series, $pe.guid, vmm ) );
+				Log.out( "ModelMetadataCache.loadSucceed - attempting to load duplicate ModelMetadata guid: " + $pe.guid, Log.WARN );
+			}
 		}
 		else {
 			Log.out( "ModelMetadataCache.loadSucceed FAILED no DBO PersistanceEvent: " + $pe.toString(), Log.WARN );

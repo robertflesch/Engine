@@ -333,7 +333,7 @@ public class  UserInventory extends QuickInventory
 				else
 					oa.callBack();
 			} else if ( lastItemSelection != itemIndex ) {
-				if ( oa.ammoName )
+				if ( oa.ammoName && "null" != oa.ammoName )
 					oa.callBack( oa.ammoName );
 				else
 					oa.callBack();

@@ -11,6 +11,7 @@ import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
+import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
 
@@ -66,6 +67,13 @@ public class ModelInfo extends PersistanceObject
 	public function set associatedGrain(value:GrainCursor):void 	{ _associatedGrain = value; }
 	
 	public function toString():String {  return "ModelInfo - guid: " + guid; }
+	
+	static public function newObject():Object {
+		var obj:Object = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_INFO, "0", "0", 0, true, null )
+		obj.data = new Object()
+		return obj
+	}
+	
 	
 	public function ModelInfo( $guid:String ):void  { 
 		super( $guid, Globals.BIGDB_TABLE_MODEL_INFO ); 
@@ -552,8 +560,8 @@ public class ModelInfo extends PersistanceObject
 	}
 	
 	
-	public function fromObjectImport( $dbo:DatabaseObject ):void {
-		dbo = $dbo;
+	public function fromObjectImport( $dbo:Object ):void {
+		dbo = $dbo as DatabaseObject;
 		// The data is needed the first time it saves the object from import, after that it goes away
 		if ( !dbo.data.model )
 			return;
@@ -664,6 +672,7 @@ public class ModelInfo extends PersistanceObject
 		}
 		*/
 	} 	
+	
 
 	/*
 	private function animationsFromObject( $animations:Object ):void {
@@ -678,5 +687,21 @@ public class ModelInfo extends PersistanceObject
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End Children functions
 	/////////////////////////////////////////////////////////////////////////////////////////////
+	
+	override public function clone( $guid:String ):* {
+		toObject()
+		var oldObj:String = JSON.stringify( info )
+		
+		var pe:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.MODEL_INFO_EXT, $guid, null, oldObj )
+		PersistanceEvent.dispatch( pe )
+		
+		// also need to clone the oxel
+		
+		// this adds the version header, need for the persistanceEvent
+		var ba:ByteArray = OxelPersistance.toByteArray( data.oxel );
+		
+		var ope:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $guid, null, ba )
+		PersistanceEvent.dispatch( ope )
+	}
 }
 }

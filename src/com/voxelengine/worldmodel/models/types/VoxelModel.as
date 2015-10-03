@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.GUI.voxelModels.WindowBluePrintCopy;
 import flash.display3D.Context3D;
 import flash.events.KeyboardEvent;
 import flash.events.TimerEvent;
@@ -397,14 +398,18 @@ public class VoxelModel
 	
 	// This function writes to the root oxel, and lets the root find the correct target
 	// it also add flow and lighting
-	public function write( $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean
-	{
-		var result:Boolean = modelInfo.changeOxel( $gc, $type, $onlyChangeType );
-		if ( result )
-			changed = true;
-			
-		
-		return result;
+	public function write( $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
+		if ( _metadata.permissions.blueprint ) {
+			if ( !WindowBluePrintCopy.exists() )
+				new WindowBluePrintCopy( this)
+		}
+		else {
+			var result:Boolean = modelInfo.changeOxel( $gc, $type, $onlyChangeType );
+			if ( result )
+				changed = true;
+			return result;
+		}
+		return false
 	}
 	
 	public function write_sphere(cx:int, cy:int, cz:int, radius:int, what:int, gmin:uint = 0):void
@@ -1089,7 +1094,7 @@ public class VoxelModel
 	public static function get selectedModel():VoxelModel { return _s_selectedModel; }
 	//public static function set selectedModel( $val:VoxelModel ):void { _s_selectedModel = $val; }
 	public static function set selectedModel( $val:VoxelModel ):void { 
-		Log.out( "VoxelModel.selectedModel: " + ( $val ? $val.toString() : "null") , Log.WARN );
+		//Log.out( "VoxelModel.selectedModel: " + ( $val ? $val.toString() : "null") , Log.WARN );
 		_s_selectedModel = $val; 
 	}
 	

@@ -158,8 +158,8 @@ public class Player extends Avatar
 				var restOfString:String = userName.substr(1, userName.length); 
 				$dbo.userName = firstChar.toUpperCase() + restOfString.toLowerCase();
 				$dbo.description = "New Player Avatar";
-				$dbo.modifiedDate = new Date();
-				$dbo.createdDate = new Date();
+				$dbo.modifiedDate = new Date().toUTCString();
+				$dbo.createdDate = new Date().toUTCString();
 				$dbo.save();
 			}
 			

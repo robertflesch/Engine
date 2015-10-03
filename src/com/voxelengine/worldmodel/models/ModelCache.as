@@ -270,6 +270,9 @@ public class ModelCache
 			var vm:VoxelModel = _instances[i];
 			if ( vm is Player )
 				continue;
+			if ( vm.dead )
+				continue;
+			Log.out( "ModelCache.toObject - saving" + vm.instanceInfo.toString() )	
 			models.push( vm.instanceInfo.toObject() );	
 		}
 		return models;

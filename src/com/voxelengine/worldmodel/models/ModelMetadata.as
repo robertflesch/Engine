@@ -16,6 +16,7 @@ import flash.display.LoaderInfo
 import flash.events.Event;
 import flash.geom.Rectangle;
 import flash.utils.ByteArray;
+import flash.net.URLLoaderDataFormat;
 
 import playerio.DatabaseObject;
 
@@ -63,8 +64,8 @@ public class ModelMetadata extends PersistanceObject
 		return obj
 	}
 	
-	public function ModelMetadata( $guid:String ) {
-		super( $guid, Globals.BIGDB_TABLE_MODEL_METADATA );
+	public function ModelMetadata( $newGuid:String ) {
+		super( $newGuid, Globals.BIGDB_TABLE_MODEL_METADATA );
 		if ( "EditCursor" != guid )
 			ModelMetadataEvent.addListener( ModelBaseEvent.SAVE, saveEvent );
 	}
@@ -153,17 +154,22 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	}
 	
 	private function loadFromInfo():void {
-		if ( !info.permissions )
-			info.permissions = new Object();
-		
 		// the permission object is just an encapsulation of the permissions section of the object
-		_permissions = new PermissionsBase( info.permissions );
+		_permissions = new PermissionsBase( info );
 		
 		if ( info.thumbnail ) {
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.INIT, function(event:Event):void { thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData; } );
 			loader.loadBytes( info.thumbnail );			
 		}
+	}
+	
+	override public function clone( $newGuid:String ):* {
+		toObject()
+		var oldObj:String = JSON.stringify( info )
+
+		var pe:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, $newGuid, null, oldObj, URLLoaderDataFormat.TEXT, guid )
+		PersistanceEvent.dispatch( pe )
 	}
 }
 }

@@ -15,7 +15,6 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.utils.Dictionary;
 import playerio.DatabaseObject;
 
-import com.voxelengine.utils.StringUtils;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -24,6 +23,7 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.utils.JSONUtil;
+import com.voxelengine.utils.StringUtils;
 
 /**
  * ...
@@ -178,6 +178,10 @@ public class ModelInfoCache
 						ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 						return;
 					}
+					if ( dbo.data.table )
+						delete dbo.data.table // this is an article from the toObject process used in cloning
+					if ( dbo.data.key )
+						delete dbo.data.key // this is an article from the toObject process used in cloning
 					mi.fromObjectImport( dbo );
 					// On import save it.
 					mi.save();
@@ -189,7 +193,7 @@ public class ModelInfoCache
 			}
 			else {
 				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, mi ) );
-				Log.out( "ModelInfoCache.loadSucceed - attempting to add duplicate ModelInfo guid: " + $pe.guid, Log.WARN );
+				Log.out( "ModelInfoCache.loadSucceed - attempting to load duplicate ModelInfo guid: " + $pe.guid, Log.WARN );
 			}
 		}
 		else {

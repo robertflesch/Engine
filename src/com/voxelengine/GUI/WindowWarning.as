@@ -44,6 +44,5 @@ package com.voxelengine.GUI
             Globals.g_app.stage.removeEventListener(Event.RESIZE, onResizeHeading );
 			removeEventListener(UIOEvent.REMOVED, onRemoved );
 		}
-
 	}
 }

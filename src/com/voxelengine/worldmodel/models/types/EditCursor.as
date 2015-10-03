@@ -497,9 +497,11 @@ public class EditCursor extends VoxelModel
 	
 	private function insertModel():void {
 		if ( CursorOperationEvent.INSERT_MODEL != cursorOperation )
-			return;
+			return
 		if ( EDITCURSOR_INVALID == oxelTexture )
-			return;
+			return
+		if ( !objectModel )
+			return
 			
 		var ii:InstanceInfo = objectModel.instanceInfo.clone();
 		if ( VoxelModel.selectedModel && PlacementLocation.INVALID != _pl.state) {
@@ -857,10 +859,12 @@ public class EditCursor extends VoxelModel
 			
 		// do I need to add axis models?	
 		//	this.childAdd();
-			var t:Vector3D = VoxelModel.selectedModel.instanceInfo.positionGet;
-			t.z += dy/4;
-			t.x += dx/4;
-			VoxelModel.selectedModel.instanceInfo.positionSetComp( t.x, t.y, t.z );
+			if ( VoxelModel.selectedModel ) {
+				var t:Vector3D = VoxelModel.selectedModel.instanceInfo.positionGet;
+				t.z += dy/4;
+				t.x += dx/4;
+				VoxelModel.selectedModel.instanceInfo.positionSetComp( t.x, t.y, t.z );
+			}
 		}
 	}
 	

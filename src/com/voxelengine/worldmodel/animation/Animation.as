@@ -233,7 +233,7 @@ public class Animation extends PersistanceObject
 			$info.permissions = new Object();
 		
 		// the permission object is just an encapsulation of the permissions section of the object
-		_permissions = new PermissionsBase( $info.permissions );
+		_permissions = new PermissionsBase( $info );
 	}
 /*
 	public function fromJSON( $json:Object ):String  {

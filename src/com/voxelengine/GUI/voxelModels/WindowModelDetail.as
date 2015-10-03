@@ -1,8 +1,6 @@
 
 package com.voxelengine.GUI.voxelModels
 {
-	import com.voxelengine.events.ModelBaseEvent;
-	import com.voxelengine.events.ModelMetadataEvent;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.events.MouseEvent;
@@ -24,6 +22,9 @@ package com.voxelengine.GUI.voxelModels
 	import com.voxelengine.worldmodel.RegionManager;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
+	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.ModelMetadataEvent;
+	import com.voxelengine.GUI.panels.*;
 
 	
 	public class WindowModelDetail extends VVPopup
@@ -51,6 +52,7 @@ package com.voxelengine.GUI.voxelModels
 		{
 			super( "Model Details" );
             autoSize = false;
+			autoHeight = true
 			width = WIDTH + 10;
 			height = 600;
 			padding = 0;
@@ -110,6 +112,8 @@ package com.voxelengine.GUI.voxelModels
 				
 			if ( ii.controllingModel )
 				addElement( new ComponentLabel( "Parent GUID",  ii.controllingModel ? ii.controllingModel.instanceInfo.instanceGuid : "", WIDTH ) );
+				
+			addPermissions()
 //
 			if ( Globals.g_debug )	{
 				var oxelUtils:Button = new Button( LanguageManager.localizedStringGet( "Oxel_Utils" ) );
@@ -120,6 +124,17 @@ package com.voxelengine.GUI.voxelModels
 			
 			display( 600, 20 );
         }
+		
+		private function addPermissions():void {
+			var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
+			ebco.rootObject = _vm.metadata.permissions
+			ebco.title = " zzz "
+			ebco.paddingTop = 7
+			ebco.width = WIDTH
+			ebco.itemBox.title = " xxx "
+			ebco.itemBox.newItemText = "yyy"
+			addElement( new PanelPermissionModel( null, ebco ) )
+		}
 		
 		static private const PHOTO_WIDTH:int = 128
 		static private const PHOTO_CAPTURE_WIDTH:int = 128

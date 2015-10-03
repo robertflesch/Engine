@@ -32,10 +32,10 @@ public class PermissionsRegion
 	//public function get editors():Vector.<String> { return _editors; }
 	//public function set editors(value:Vector.<String>):void  { _editors = value; }
 	
-	public function get created():Date  { return _permissions.created; }
-	public function set created(value:Date):void  { _permissions.created = value; }
-	public function get modified():Date  { return _permissions.modified; }
-	public function set modified(value:Date):void  { _permissions.modified = value; }	
+	public function get created():String  { return _permissions.created; }
+	public function set created(value:String):void  { _permissions.created = value; }
+	public function get modified():String  { return _permissions.modified; }
+	public function set modified(value:String):void  { _permissions.modified = value; }	
 	public function get guest():Boolean  { return _permissions.guest; }
 	public function set guest(value:Boolean):void  { _permissions.guest = value; }	
 
@@ -49,8 +49,8 @@ public class PermissionsRegion
 		} else {
 			$permissions = new Object();
 			_permissions = $permissions;
-			$permissions.created = new Date();
-			$permissions.modified = new Date();
+			$permissions.created = new Date().toUTCString();
+			$permissions.modified = new Date().toUTCString();
 			$permissions.guests = false;
 			//$info.permissions.editors = [];
 			//$info.permissions.admins = [];
