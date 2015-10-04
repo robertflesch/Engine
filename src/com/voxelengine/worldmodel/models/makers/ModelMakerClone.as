@@ -7,29 +7,13 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-//import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.ModelEvent;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.animation.AnimationCache;
-import com.voxelengine.worldmodel.biomes.LayerInfo;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.PermissionsBase;
-import flash.utils.ByteArray;
-import org.flashapi.swing.Alert;
-
-import com.voxelengine.Log;
-import com.voxelengine.Globals;
-import com.voxelengine.events.LoadingEvent;
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.RegionEvent;
-import com.voxelengine.worldmodel.Region;
-import com.voxelengine.GUI.WindowModelMetadata;
-import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.ModelMetadata;
-import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.Log
+import com.voxelengine.Globals
+import com.voxelengine.events.ModelBaseEvent
+import com.voxelengine.events.ModelMetadataEvent
+import com.voxelengine.worldmodel.Region
+import com.voxelengine.worldmodel.models.types.VoxelModel
+import com.voxelengine.worldmodel.models.ModelMetadata
 
 	/**
 	 * ...
@@ -40,12 +24,12 @@ import com.voxelengine.worldmodel.models.ModelInfo;
 	 */
 public class ModelMakerClone extends ModelMakerBase {
 	
-	private var _oldVM:VoxelModel;
+	private var _oldVM:VoxelModel
 		
 	public function ModelMakerClone( $vm:VoxelModel ) {
 		_oldVM = $vm
-		super( _oldVM.instanceInfo.clone(), false );
-		Log.out( "ModelMakerClone - ii: " + ii.toString() );
+		super( _oldVM.instanceInfo.clone(), false )
+		Log.out( "ModelMakerClone - ii: " + ii.toString() )
 		ii.modelGuid = Globals.getUID()
 		
 		addListeners()
@@ -57,24 +41,24 @@ public class ModelMakerClone extends ModelMakerBase {
 	}
 
 	override protected function addListeners():void {
-		super.addListeners();
-		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retrivedMetadata );		
-		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retrivedMetadata );		
-		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );		
+		super.addListeners()
+		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retrivedMetadata )		
+		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retrivedMetadata )		
+		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata )		
 	}
 	
 	private function retrivedMetadata( $mme:ModelMetadataEvent):void {
 		if ( ii.modelGuid == $mme.modelGuid ) {
-			Log.out( "ModelMakerClone.retrivedMetadata - ii: " + ii.toString() );
-			_modelMetadata = $mme.modelMetadata;
+			Log.out( "ModelMakerClone.retrivedMetadata - ii: " + ii.toString() )
+			_modelMetadata = $mme.modelMetadata
 			
-			attemptMake();
+			attemptMake()
 		}
 	}
 	
 	private function failedMetadata( $mme:ModelMetadataEvent):void {
 		if ( ii.modelGuid == $mme.modelGuid ) {
-			markComplete(false);
+			markComplete(false)
 		}
 	}
 	
@@ -82,32 +66,33 @@ public class ModelMakerClone extends ModelMakerBase {
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
 		if ( null != _modelMetadata && null != _modelInfo ) {
-			Log.out( "ModelMakerClone.attemptMake - ii: " + ii.toString() );
+			Log.out( "ModelMakerClone.attemptMake - ii: " + ii.toString() )
 			
-			var vm:* = make();
+			var vm:* = make()
 
 			if ( vm ) {
 				//vm.metadata.permissions.blueprintGuid = _oldVM.metadata.guid
-				vm.stateLock( true, 10000 ); // Lock state so that is had time to load animations
-				vm.changed = true;
-				vm.save();
-				Region.currentRegion.modelCache.add( vm );
+				vm.stateLock( true, 10000 ) // Lock state so that is had time to load animations
+				vm.complete = true
+				vm.changed = true
+				vm.save()
+				Region.currentRegion.modelCache.add( vm )
 			}
 			
-			markComplete( true, vm );
+			markComplete( true, vm )
 		}
 	}
 	
 	override protected function markComplete( $success:Boolean, vm:VoxelModel = null ):void {
-		removeListeners();		
+		removeListeners()		
 		function removeListeners():void {
-			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrivedMetadata );		
-			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrivedMetadata );		
-			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );	
+			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrivedMetadata )		
+			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrivedMetadata )		
+			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata )	
 		}		
 		
 		// do this last as it nulls everything.
-		super.markComplete( $success, vm );
+		super.markComplete( $success, vm )
 	}
 }	
 }

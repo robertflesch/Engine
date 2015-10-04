@@ -69,7 +69,6 @@ import com.voxelengine.GUI.LanguageManager
 	private  function saveHandler(event:UIMouseEvent):void  {
 		
 		clone()
-		_instance = null
 		remove()
 	}
 	
@@ -79,6 +78,7 @@ import com.voxelengine.GUI.LanguageManager
 
 	// Window events
 	private function onRemoved( event:UIOEvent ):void {
+		_instance = null
 		Globals.g_app.stage.removeEventListener(Event.RESIZE, onResizeHeading );
 		removeEventListener(UIOEvent.REMOVED, onRemoved );
 	}

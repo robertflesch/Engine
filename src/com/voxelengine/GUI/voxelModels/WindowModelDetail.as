@@ -128,11 +128,9 @@ package com.voxelengine.GUI.voxelModels
 		private function addPermissions():void {
 			var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
 			ebco.rootObject = _vm.metadata.permissions
-			ebco.title = " zzz "
+			ebco.title = " permissions "
 			ebco.paddingTop = 7
 			ebco.width = WIDTH
-			ebco.itemBox.title = " xxx "
-			ebco.itemBox.newItemText = "yyy"
 			addElement( new PanelPermissionModel( null, ebco ) )
 		}
 		
