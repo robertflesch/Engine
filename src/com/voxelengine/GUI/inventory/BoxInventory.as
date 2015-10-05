@@ -40,6 +40,7 @@ public class BoxInventory extends VVBox
 	{
 		super( $widthParam, $heightParam, $borderStyle );
 		layout = new AbsoluteLayout();
+		padding = 0
 		autoSize = false;
 		dragEnabled = true;
 		_count = new Label( "", $widthParam );
@@ -81,6 +82,12 @@ public class BoxInventory extends VVBox
 
 				setHelp( om.vmm.name );			
 				backgroundTexture = drawScaled( om.vmm.thumbnail, width, height );
+				if ( om.vmm.permissions.blueprint ) {
+					var bp:Image = new Image( Globals.appPath + "assets/textures/blueprint.png" )
+					if ( 128 == width )
+						bp.x = bp.y = 64
+					addElement( bp )
+				}
 			}
 			break;
 			
