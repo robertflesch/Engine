@@ -98,7 +98,7 @@ public class PanelModels extends PanelBase
 				if ( vm.metadata.name )
 					itemName = vm.metadata.name;
 				else	
-					itemName = vm.modelInfo.fileName;
+					itemName = vm.modelInfo.guid;
 				//Log.out( "PanelModels.populateModels - adding: " + itemName );
 				
 				_listModels.addItem( itemName, vm );

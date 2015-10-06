@@ -52,7 +52,12 @@ public class OxelPersistance extends PersistanceObject
 	private var _loaded:Boolean;
 	private	var _version:int;
 	private var _topMostChunk:Chunk;
-		
+	private var _parent:ModelInfo
+	private var _ba:ByteArray
+	
+	private function get ba():ByteArray 						{ return _ba }
+	public function get parent():ModelInfo						{ return _parent }
+	public function set parent( $val:ModelInfo ):void			{ _parent = $val }
 	public 	function get oxel():Oxel 							{ return _oxel; }
 	public 	function get loaded():Boolean 						{ return _loaded; }
 	public 	function set loaded(value:Boolean):void 			{ _loaded = value; }
@@ -78,7 +83,8 @@ public class OxelPersistance extends PersistanceObject
 	}
 
 	public function createEditCursor():void {
-		fromByteArray( compressedReferenceBA );
+		_ba = compressedReferenceBA
+		fromByteArray()
 	}
 	/*
 	// creating a new copy of this
@@ -136,11 +142,13 @@ public class OxelPersistance extends PersistanceObject
 	
 	public function fromObjectImport( $dbo:DatabaseObject ):void {
 		dbo			= $dbo;
-		fromByteArray( $dbo.data.ba );
+		_ba = $dbo.data.ba
+		//fromByteArray();
 	}
 	public function fromObject( $dbo:DatabaseObject ):void {
 		dbo			= $dbo;
-		fromByteArray( $dbo.ba );
+		_ba = $dbo.ba 
+		//fromByteArray();
 	}
 	
 	// Make sense, called from for Makers
@@ -188,44 +196,46 @@ public class OxelPersistance extends PersistanceObject
 		}
 	}
 	
-	private function fromByteArray($ba:ByteArray):void {
+	public function fromByteArray():void {
 
 		//Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.WARN );
 		var time:int = getTimer();
 		
-		try { $ba.uncompress(); }
+		try { ba.uncompress(); }
 		catch (error:Error) { Log.out( "OxelPersistance.fromByteArray - Was expecting compressed data " + guid, Log.WARN ); }
-		$ba.position = 0;
+		ba.position = 0;
 		
-		extractVersionInfo( $ba );
+		extractVersionInfo( ba );
 		// how many bytes is the modelInfo
-		var strLen:int = $ba.readInt();
+		var strLen:int = ba.readInt();
 		// read off that many bytes, even though we are using the data from the modelInfo file
-		var modelInfoJson:String = $ba.readUTFBytes( strLen );
+		var modelInfoJson:String = ba.readUTFBytes( strLen );
 		
 		// Read off 1 bytes, the root size
-		var rootGrainSize:int = $ba.readByte();
+		var rootGrainSize:int = ba.readByte();
 		if ( null == _oxel )
-			_oxel = Oxel.initializeRoot( rootGrainSize, Lighting.defaultBaseLightAttn );
+			_oxel = Oxel.initializeRoot( rootGrainSize, Lighting.defaultBaseLightAttn ); // Lighting should be model or instance default lighting
 		else 
 			Log.out( "OxelPersistance.fromByteArray - Why does oxel exist?", Log.WARN );
 			
-		//_statisics.gather( version, $ba, rootGrainSize);
+		//_statisics.gather( version, ba, rootGrainSize);
 		
 		// TODO - do I need to do this everytime? or could I use a static initializer? RSF - 7.16.2015
 		registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);	
 		registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);	
 		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
+		if ( parent )
+			Lighting.defaultBaseLightAttn = parent.baseLightLevel
 		gct.grain = rootGrainSize;
 		if (Globals.VERSION_000 == _version)
-			oxel.readData( null, gct, $ba, _statisics );
+			oxel.readData( null, gct, ba, _statisics );
 		else
-			oxel.readVersionedData( _version, null, gct, $ba, _statisics );
+			oxel.readVersionedData( _version, null, gct, ba, _statisics );
 		GrainCursorPool.poolDispose(gct);
 		//Log.out( "OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.WARN );
 		
 		_statisics.gather();
-		//_statisics.statsPrint();
+		_statisics.statsPrint();
 		
 		//Log.out( "OxelPersistance.fromByteArray - _statisics took: " + (getTimer() - time), Log.WARN );
 		

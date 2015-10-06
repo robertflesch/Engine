@@ -38,8 +38,10 @@ public class ModelMakerCursor extends ModelMakerBase {
 		if ( null != _modelInfo ) {
 			Log.out( "ModelMakerCursor.attemptMake - ii: " + ii.toString(), Log.DEBUG );
 			var vm:* = make();
-			if ( vm )
+			if ( vm ) {
+				vm.complete = true;
 				EditCursor.currentInstance.objectModelSet( vm );
+			}
 			markComplete( true, vm );
 		}
 	}

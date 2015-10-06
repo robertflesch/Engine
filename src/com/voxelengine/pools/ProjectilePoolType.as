@@ -78,7 +78,6 @@ public final class ProjectilePoolType
 		ii.modelGuid = _projectileGuid
 		ii.usesCollision = true
 		ii.dynamicObject = true
-		ii.baseLightLevel = 255
 		var vm:Projectile = new Projectile( ii )
 		if ( null == vm ) {
 			Log.out( "Projectile.newModel - failed to create Projectile", Log.ERROR )

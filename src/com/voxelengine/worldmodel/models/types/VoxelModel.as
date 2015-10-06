@@ -578,6 +578,8 @@ public class VoxelModel
 		
 		// if I was inside of a large oxel, the ray would not intersect any of the planes.
 		// So this does a check quick check to see if worldSpaceStart point is inside of the model
+		if ( !modelInfo.data )
+			return
 		var gct:GrainCursor = GrainCursorPool.poolGet( modelInfo.data.oxel.gc.bound );
 		//if ( isInside( modelSpaceStartPoint.x, modelSpaceStartPoint.y, modelSpaceStartPoint.z, gct ) )
 		//{
@@ -1067,7 +1069,7 @@ public class VoxelModel
 	
 	// This should be called from voxelModel
 	public function lightSetDefault( $attn:uint ):void {
-		instanceInfo.baseLightLevel = $attn;
+//		instanceInfo.baseLightLevel = $attn;
 		modelInfo.data.oxel.lightsStaticSetDefault( $attn );
 	}
 

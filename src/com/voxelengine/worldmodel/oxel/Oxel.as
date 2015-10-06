@@ -1826,7 +1826,7 @@ public class Oxel extends OxelBitfields
 					li.setAll( avgLight );
 			}
 			else {
-				var baseLightLevel:uint = lighting.avg;
+				var baseLightLevel:uint = Lighting.defaultBaseLightAttn //lighting.avg;
 				lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).setAll( baseLightLevel );
 			}
 			lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;

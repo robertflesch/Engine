@@ -7,19 +7,17 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.furusystems.dconsole2.core.commands.IntrospectionCommand;
-import com.voxelengine.events.LoadingEvent;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.Region;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
-//import org.flintparticles.threeD.initializers.Rotation;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
+import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.models.*;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.scripts.ScriptLibrary;
 import com.voxelengine.worldmodel.scripts.Script;
@@ -31,41 +29,48 @@ import com.voxelengine.pools.GrainCursorPool;
  */
 public class InstanceInfo extends Location	{
 	
-	static private const MAX_ROT_RATE:Number 		= 2.0;
-	static protected var _s_speedMultipler:Number	= 4;
+	static private const MAX_ROT_RATE:Number 					= 2.0
+	static private var _s_speedMultipler:Number					= 4
+				
+	private var _usesCollision:Boolean 							= false;                        // toJSON
+	private var _collidable:Boolean 							= true;							// toJSON
+	private var _critical:Boolean 								= false;						// toJSON
+	private var	_moveSpeed:SecureNumber 						= new SecureNumber( 0.01 );
+	private var _transforms:Vector.<ModelTransform> 			= new Vector.<ModelTransform>;	// toJSON
+	private var _modelGuid:String;											                        // toJSON
+	private var _instanceGuid:String;															// toJSON
+				
+	private var _detailSize:int 								= 0;                            // INSTANCE NOT EXPORTED
+	private var _type:int 										= -1;                           // toJSON - This type overrides a native task type.
+				
+	private var _dynamicObject:Boolean 							= false;						// INSTANCE NOT EXPORTED
+	private var _scripts:Vector.<Script> 						= new Vector.<Script>			// INSTANCE NOT EXPORTED
+	private var _controllingModel:VoxelModel 					= null;    						// INSTANCE NOT EXPORTED
+	private var _owner:VoxelModel 								= null;               			// INSTANCE NOT EXPORTED
+	private var _info:Object 									= null;                         // INSTANCE NOT EXPORTED
+	private var _state:String 									= "";							// INSTANCE NOT EXPORTED
+				
+	private	var	_visible:Boolean 								= true;  // Should be exported/ move to instance
 	
-	private var _usesCollision:Boolean 				= false;                        // toJSON
-	private var _collidable:Boolean 				= true;							// toJSON
-	private var _critical:Boolean 					= false;						// toJSON
-	private var	_moveSpeed:SecureNumber 			= new SecureNumber( 0.01 );
-	private var _transforms:Vector.<ModelTransform> = new Vector.<ModelTransform>;	// toJSON
-	private var _shader:String 						= "ShaderOxel";					// toJSON
-	private var _modelGuid:String;								                        // toJSON
-	private var _instanceGuid:String;												// toJSON
-	
-	private var _grainSize:int 						= 0;                            // toJSON
-	private var _detailSize:int 					= 0;                            // INSTANCE NOT EXPORTED
-	private var _type:int 							= -1;                           // toJSON - This type overrides a native task type.
-	
-	private var _dynamicObject:Boolean 				= false;						// INSTANCE NOT EXPORTED
-	private var _scripts:Vector.<Script> 			= new Vector.<Script>			// INSTANCE NOT EXPORTED
-	private var _controllingModel:VoxelModel 		= null;    						// INSTANCE NOT EXPORTED
-	private var _owner:VoxelModel 					= null;               			// INSTANCE NOT EXPORTED
-	private var _info:Object 				= null;                         // INSTANCE NOT EXPORTED
-	private var _state:String 						= "";							// INSTANCE NOT EXPORTED
-	
-	private var _life:Vector3D 						= new Vector3D(1, 1, 1);		// INSTANCE NOT EXPORTED
-	
-	private		var	_visible:Boolean 							= true;  // Should be exported/ move to instance
 	public	function get visible():Boolean 						{ return _visible; }
 	public	function set visible(val:Boolean):void 				{ _visible = val; }
-	private var	_baseLightLevel:uint				= 0x33;
-	public function get baseLightLevel():uint 					{ return _baseLightLevel; }
-	public function set baseLightLevel(val:uint):void 			{ _baseLightLevel = val; }
+	
+	private var 		_life:Vector3D 							= new Vector3D(1, 1, 1);		// INSTANCE NOT EXPORTED
+	public function get life():Vector3D 						{ return _life; }
+	
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// overrides values in modelInfo
+	//private var 		_shader:String 							= "ShaderOxel";					// toJSON
+	//public function get shader():String 						{ return _shader; }
+	//private var			_baseLightLevel:uint					= 0x33;
+	//public function get baseLightLevel():uint 					{ return _baseLightLevel; }
+	//public function set baseLightLevel(val:uint):void 			{ _baseLightLevel = val; }
+	//private var 		_grainSize:int 							= 0;                            // toJSON
+	//public function set grainSize(val:int):void					{ _grainSize = val; }
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public function speed( time:Number ):Number 				{ return _moveSpeed.val * _s_speedMultipler * time; }
 	
-	public function get life():Vector3D 						{ return _life; }
 	public function get moveSpeed():Number  					{ return _moveSpeed.val; }
 	public function set moveSpeed(value:Number):void  			{ _moveSpeed.val = value; }
 	public function get dynamicObject():Boolean 				{ return _dynamicObject; }
@@ -92,13 +97,11 @@ public class InstanceInfo extends Location	{
 	//public function set instanceGuid(val:String):void			{ _instanceGuid = val; }
 	public function set instanceGuid(val:String):void 			{ _instanceGuid = val; }
 	
-	public function get grainSize():int  						{ return _grainSize; }
+//	public function get grainSize():int  						{ return _grainSize; }
 	public function get detailSize():int  						{ return _detailSize; }
 	public function set detailSize(val:int):void				{ _detailSize = val; }  // This is used in the generation of spheres only
 	public function get type():int  							{ return _type; }
 	public function set type( val:int):void  					{ _type = val; }
-	public function set grainSize(val:int):void					{ _grainSize = val; }
-	public function get shader():String 						{ return _shader; }
 	// this is the voxel model which controls the parent of the instanceInfo.
 	public function get controllingModel():VoxelModel  			{ return _controllingModel; }
 	public function set controllingModel(val:VoxelModel):void 	
@@ -135,13 +138,13 @@ public class InstanceInfo extends Location	{
 	public function release():void {
 		_moveSpeed 			= null;
 		_transforms 		= null;
-		_shader				= null;
+		//_shader			= null;
 		_modelGuid			= null;			                    
 		_instanceGuid		= null;							
 		_scripts			= null;
 		_controllingModel	= null;    						
 		_owner				= null;               			
-		_info		= null;                         
+		_info				= null;                         
 		_state				= null;
 		_life				= null;		
 	}
@@ -169,7 +172,7 @@ public class InstanceInfo extends Location	{
 		ii.instanceGuid		= instanceGuid; 
 		ii.modelGuid 		= modelGuid;
 		ii.collision 		= _collidable;
-		ii.baseLightLevel 	= baseLightLevel;
+//		ii.baseLightLevel 	= baseLightLevel;
 		
 		if ( velocityGet.length )
 			ii.velocity		= vector3DToObject( velocityGet );
@@ -288,14 +291,14 @@ public class InstanceInfo extends Location	{
 		if ( _info.state )
 			_state = _info.state;
 
-		if ( _info.baseLightLevel )
-			baseLightLevel = _info.baseLightLevel;
+	//	if ( _info.baseLightLevel )
+		//	baseLightLevel = _info.baseLightLevel;
 					
 		setTypeInfo( _info );
 		setTransformInfo( _info );
 		// moved to shader
 //			setTextureInfo( _creationJSON );
-		setShaderInfo( _info );
+		//setShaderInfo( _info );
 		setScriptInfo( _info );
 		setCollisionInfo( _info );
 		setCriticalInfo( _info );
@@ -386,10 +389,10 @@ public class InstanceInfo extends Location	{
 	}
 	
 	
-	public function setShaderInfo( $info:Object ):void {
-		if ( $info.shader )
-			_shader = $info.shader;
-	}
+	//public function setShaderInfo( $info:Object ):void {
+		//if ( $info.shader )
+			//_shader = $info.shader;
+	//}
 	
 	public function setTypeInfo( $info:Object ):void {
 	
@@ -402,12 +405,12 @@ public class InstanceInfo extends Location	{
 				Log.out( "InstanceInfo.setTypeInfo - WARNING - INVALID type found: " + typeString, Log.WARN );
 		}
 		
-		if ( $info.grainSize )
-			_grainSize = 	$info.grainSize;
-		else if ( $info.GrainSize )
-			_grainSize = 	$info.GrainSize;
-		else if ( $info.grainsize )
-			_grainSize = 	$info.grainsize;
+		//if ( $info.grainSize )
+//			_grainSize = 	$info.grainSize;
+	//	else if ( $info.GrainSize )
+//			_grainSize = 	$info.GrainSize;
+//		else if ( $info.grainsize )
+	//		_grainSize = 	$info.grainsize;
 	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

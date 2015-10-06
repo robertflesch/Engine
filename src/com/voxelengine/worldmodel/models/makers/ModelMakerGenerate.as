@@ -81,7 +81,6 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
 		if ( null != _modelInfo && null != _modelMetadata ) {
-			_modelInfo.fileName = "";
 			
 			var vm:* = make();
 			if ( vm ) {

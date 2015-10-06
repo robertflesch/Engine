@@ -38,7 +38,6 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			GenerateSubSphere;
 			LandscapeError;
 			LoadModelFromIVM;
-			AddAxes;
 			GenerateClouds;
 			CarveCloudOutside;
 			Flow;

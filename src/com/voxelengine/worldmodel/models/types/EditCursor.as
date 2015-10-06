@@ -168,7 +168,7 @@ public class EditCursor extends VoxelModel
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation
 		  || CursorOperationEvent.INSERT_OXEL == cursorOperation ) {
 			if ( VoxelModel.selectedModel )
-				if ( e.size < VoxelModel.selectedModel.modelInfo.data.oxel.gc.bound && 0 <= e.size ) {
+				if ( e.size <= VoxelModel.selectedModel.modelInfo.data.oxel.gc.bound && 0 <= e.size ) {
 					modelInfo.data.oxel.gc.bound = e.size;
 					modelInfo.data.oxel.gc.grain = e.size;
 				}
@@ -236,9 +236,6 @@ public class EditCursor extends VoxelModel
 		oxelTextureValid = oxelTexture = e.oxelType;
 		
 		var ii:InstanceInfo = new InstanceInfo();
-		// Add the parent model info to the child.
-//			ii.controllingModel = this;
-		ii.baseLightLevel = Lighting.MAX_LIGHT_LEVEL;
 		ii.modelGuid = e.om.modelGuid;
 		var mm:ModelMakerCursor = new ModelMakerCursor( ii, e.om.vmm );
 	}
@@ -381,7 +378,7 @@ public class EditCursor extends VoxelModel
 			buildCursorModel();	
 		} 
 		
-		if ( !gciData && objectModel && objectModel.complete ) { // this is the INSERT_MODEL where its not on a parent model
+		if ( !gciData && objectModel && objectModel.complete && objectModel.modelInfo.data ) { // this is the INSERT_MODEL where its not on a parent model
 			oxelTexture = oxelTextureValid;
 			var vv:Vector3D = ModelCacheUtils.viewVectorNormalizedGet();
 			vv.scaleBy( objectModel.modelInfo.data.oxel.gc.size() * 4 );

@@ -16,15 +16,16 @@ package com.voxelengine.GUI.voxelModels
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.ModelMetadataEvent;
+	import com.voxelengine.GUI.panels.*;
 	import com.voxelengine.GUI.*;
 	import com.voxelengine.GUI.components.*;
 	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.RegionManager;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
-	import com.voxelengine.events.ModelBaseEvent;
-	import com.voxelengine.events.ModelMetadataEvent;
-	import com.voxelengine.GUI.panels.*;
+	import com.voxelengine.worldmodel.oxel.Oxel;
 
 	
 	public class WindowModelDetail extends VVPopup
@@ -98,6 +99,11 @@ package com.voxelengine.GUI.voxelModels
 //			addElement( new ComponentVector3DSideLabel( setChanged, "Center", "X: ", "Y: ", "Z: ",  ii.center, WIDTH, updateVal ) );
 			addElement( new ComponentSpacer( WIDTH ) );
 			
+			addElement( new ComponentLabelInput( "Base Light"
+									  , function ($e:TextEvent):void { _vm.modelInfo.baseLightLevel = uint( $e.target.label ); changeBaseLightLevel(); setChanged(); }
+									  , String( _vm.modelInfo.baseLightLevel )
+									  , WIDTH ) )
+			
 			// TODO need to be able to handle an array of scipts.
 			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { ii.scriptName = $e.target.text; }, ii.scriptName, WIDTH ) );
 			const GRAINS_PER_METER:int = 16;
@@ -163,6 +169,13 @@ package com.voxelengine.GUI.voxelModels
 			_photoContainer.addElement(btn);
 		}
 		
+		private function changeBaseLightLevel():void 
+		{
+			if ( _vm.modelInfo.data && _vm.modelInfo.data.oxel ) {
+				var oxel:Oxel = _vm.modelInfo.data.oxel;
+				oxel.lightsStaticSetDefault( _vm.modelInfo.baseLightLevel );
+			}
+		}
 
 		private function updateScaleVal( $e:SpinButtonEvent ):Number {
 			var ival:Number = Number( $e.target.data.text );

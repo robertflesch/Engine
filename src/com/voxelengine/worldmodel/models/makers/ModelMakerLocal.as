@@ -44,7 +44,7 @@ public class ModelMakerLocal extends ModelMakerBase {
 			var newObj:Object = ModelMetadata.newObject()
 			_modelMetadata.fromObjectImport( newObj );
 			_modelMetadata.name = _modelInfo.guid;
-			_modelMetadata.description = _modelInfo.fileName + " from local data";
+			_modelMetadata.description = _modelInfo.guid + " from local data";
 			var vm:* = make();
 			if ( vm )
 				Region.currentRegion.modelCache.add( vm );

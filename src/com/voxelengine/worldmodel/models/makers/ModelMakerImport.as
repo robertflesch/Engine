@@ -155,7 +155,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	
 	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
 		if ( false == $success && _modelInfo && _modelInfo.boimeHas() ) {
-			Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + _modelInfo.biomes.toString(), Log.WARN );
+			Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + _modelInfo.guid, Log.WARN );
 			return;
 		}
 		super.markComplete( $success, $vm );

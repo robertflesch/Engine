@@ -95,8 +95,6 @@ public final class ParticlePool
 	{
 		var pi:InstanceInfo = new InstanceInfo();
 		pi.modelGuid = CLASS_NAME;
-		//pi.name = CLASS_NAME;
-		pi.grainSize = 2;
 		pi.usesCollision = false;
 		pi.dynamicObject = true;
 		

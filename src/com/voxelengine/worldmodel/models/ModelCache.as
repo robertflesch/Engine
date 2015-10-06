@@ -92,7 +92,6 @@ public class ModelCache
 		Log.out( "ModelCache.createPlayer - creating from LOCAL", Log.DEBUG );
 		instanceInfo.modelGuid = "Player";
 		instanceInfo.instanceGuid = "Player";
-		instanceInfo.grainSize = 4;
 		ModelMakerBase.load( instanceInfo );
 	}
 

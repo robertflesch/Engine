@@ -164,8 +164,6 @@ public class Player extends Avatar
 			}
 			
 			var ii:InstanceInfo = new InstanceInfo();
-			ii.grainSize = 4;
-			//ii.guid = $dbo.modelGuid;
 			ii.modelGuid = "Player";
 			ii.instanceGuid = Network.userId;
 			new ModelMakerLocal( ii );

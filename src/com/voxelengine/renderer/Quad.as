@@ -324,7 +324,9 @@ public class Quad {
 			fs = _s_flowScaling;
 			
 		//Log.out( "Quad.add type: " + $type );
-		var tint:uint = $lighting.color;
+		var tint:uint = $ti.color; // I think %ti color is correct here.
+		//var tint:uint = $lighting.color;
+		
 		switch ( $face ) 
 		{
 			case Globals.POSX:
