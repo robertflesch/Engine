@@ -47,8 +47,33 @@ import com.voxelengine.worldmodel.weapons.Projectile;
  * @author Robert Flesch - RSF
  * The world model holds the active oxels
  */
-public class VoxelModel
+public class VoxelModel 
 {
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	private static var _s_controlledModel:VoxelModel = null;
+	public static function get controlledModel():VoxelModel { return _s_controlledModel; }
+	public static function set controlledModel( val:VoxelModel ):void { _s_controlledModel = val; }
+	
+	private static var _s_selectedModel:VoxelModel = null;
+	public static function get selectedModel():VoxelModel { return _s_selectedModel; }
+	//public static function set selectedModel( $val:VoxelModel ):void { _s_selectedModel = $val; }
+	public static function set selectedModel( $val:VoxelModel ):void { 
+		if ( _s_selectedModel == $val )
+			return
+		Log.out( "VoxelModel.selectedModel: " + ( $val ? $val.toString() : "null") , Log.WARN );
+		// unselect the old model
+		if ( _s_selectedModel )
+			_s_selectedModel.selected = false	
+		// change the static to new model
+		_s_selectedModel = $val
+		// set new model as selected
+		if ( _s_selectedModel )
+			_s_selectedModel.selected = true	
+		if ( null == $val )
+			Axes.hide()
+	}
+	/////////////////////////////////////////////////////////////////////////////////////////////////////
+	
 	// This is a reference to the data which is store in the metaDataCache
 	private 	var	_metadata:ModelMetadata;
 	// This is a reference to the data which is store in the modelInfoCache
@@ -73,8 +98,8 @@ public class VoxelModel
 	protected	var	_dead:Boolean; 		 
 			
 	// sub classes of VoxelModel can have inventory
-	public function get hasInventory():Boolean 				{ return _hasInventory; }
-	public function set hasInventory(value:Boolean):void  	{ _hasInventory = value; }
+	public function get hasInventory():Boolean 					{ return _hasInventory; }
+	public function set hasInventory(value:Boolean):void  		{ _hasInventory = value; }
 				
 	protected function get initialized():Boolean 				{ return _initialized; }
 	protected function set initialized( val:Boolean ):void		{ _initialized = val; }
@@ -95,7 +120,7 @@ public class VoxelModel
 	public	function set selected(val:Boolean):void  			{ _selected = val; }
 	public 	function get complete():Boolean						{ return _complete; }
 	public 	function set complete(val:Boolean):void				{ _complete = val; }
-	public 	function toString():String 							{ return metadata.toString() + " ii: " + instanceInfo.toString(); }
+	public 	function 	 toString():String 						{ return metadata.toString() + " ii: " + instanceInfo.toString(); }
 	public  function get associatedGrain():GrainCursor			{ return _associatedGrain; }
 	public  function set associatedGrain( $val:GrainCursor ):void {  
 		if ( null == _associatedGrain )
@@ -109,17 +134,43 @@ public class VoxelModel
 	public function get dead():Boolean 							{ return _dead; }
 	public function set dead(val:Boolean):void 					{ 
 		_dead = val; 
-		
-		if (0 < instanceInfo.scripts.length)
-		{
-			for each (var script:Script in instanceInfo.scripts)
-			{
-				script.instanceGuid = instanceInfo.instanceGuid;
-			}
+		// this should really use the PARENT MODEL REMOVED event as trigger
+		if (0 < instanceInfo.scripts.length) {
+			for each (var script:Script in instanceInfo.scripts) 
+				script.dispose()
 		}
 		ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, instanceInfo.instanceGuid ) );
 	}
 
+	public function VoxelModel( $ii:InstanceInfo ):void {
+		_instanceInfo = $ii;
+		_instanceInfo.owner = this; // This tells the instanceInfo that this voxel model is its owner.
+	}
+	
+	public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
+		_modelInfo = $mi;
+		_metadata = $vmm;
+
+		if ( null == _metadata )
+			Log.out( "VoxelModel.init - IS NULL ModelMetadata valid?", Log.ERROR );
+		
+		if ( metadata.permissions.modify ) {
+//			Log.out( "VoxelModel - added ImpactEvent.EXPLODE for " + _modelInfo.modelClass );
+			ImpactEvent.addListener(ImpactEvent.EXPLODE, impactEventHandler);
+			ImpactEvent.addListener(ImpactEvent.DFIRE, impactEventHandler);
+			ImpactEvent.addListener(ImpactEvent.DICE, impactEventHandler);
+			ImpactEvent.addListener(ImpactEvent.ACID, impactEventHandler);
+		}
+		
+		cameraAddLocations();
+		
+		if (instanceInfo.state != "")
+			stateSet(instanceInfo.state)
+			
+		processClassJson();
+	}
+	
+	
 	protected function processClassJson():void {
 		modelInfo.childrenLoad( this );
 		modelInfo.scriptsLoad( instanceInfo );
@@ -223,34 +274,6 @@ public class VoxelModel
 		$loc.positionSet = _sScratchVector;
 		
 		//Log.out( "VoxelModel.calculateTargetPosition - worldSpaceTargetPosition: " + worldSpaceTargetPosition );
-	}
-	
-	public function VoxelModel( $ii:InstanceInfo ):void {
-		_instanceInfo = $ii;
-		_instanceInfo.owner = this; // This tells the instanceInfo that this voxel model is its owner.
-	}
-	
-	public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-		_modelInfo = $mi;
-		_metadata = $vmm;
-
-		if ( null == _metadata )
-			Log.out( "VoxelModel.init - IS NULL ModelMetadata valid?", Log.ERROR );
-		
-		if ( metadata.permissions.modify ) {
-//			Log.out( "VoxelModel - added ImpactEvent.EXPLODE for " + _modelInfo.modelClass );
-			ImpactEvent.addListener(ImpactEvent.EXPLODE, impactEventHandler);
-			ImpactEvent.addListener(ImpactEvent.DFIRE, impactEventHandler);
-			ImpactEvent.addListener(ImpactEvent.DICE, impactEventHandler);
-			ImpactEvent.addListener(ImpactEvent.ACID, impactEventHandler);
-		}
-		
-		cameraAddLocations();
-		
-		if (instanceInfo.state != "")
-			stateSet(instanceInfo.state)
-			
-		processClassJson();
 	}
 	
 	private function impactEventHandler(ie:ImpactEvent):void {
@@ -470,6 +493,11 @@ public class VoxelModel
 			// We have to draw all of the non alpha first, otherwise parts of the tree might get drawn after the alpha does
 			var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
 			modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha );
+		}
+		
+		if ( selected && false == $alpha ) {
+			Axes.positionSet( wsPositionGet() )
+			Axes.display()
 		}
 	}
 	
@@ -1087,18 +1115,6 @@ public class VoxelModel
 	
 	// acts as stub for overloading
 	protected function oxelLoaded():void { }
-	
-	private static var _s_controlledModel:VoxelModel = null;
-	public static function get controlledModel():VoxelModel { return _s_controlledModel; }
-	public static function set controlledModel( val:VoxelModel ):void { _s_controlledModel = val; }
-	
-	private static var _s_selectedModel:VoxelModel = null;
-	public static function get selectedModel():VoxelModel { return _s_selectedModel; }
-	//public static function set selectedModel( $val:VoxelModel ):void { _s_selectedModel = $val; }
-	public static function set selectedModel( $val:VoxelModel ):void { 
-		//Log.out( "VoxelModel.selectedModel: " + ( $val ? $val.toString() : "null") , Log.WARN );
-		_s_selectedModel = $val; 
-	}
 	
 	public function size():int {
 		if ( _modelInfo && _modelInfo.data && _modelInfo.data.loaded )

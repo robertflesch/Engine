@@ -56,11 +56,12 @@ public class OxelPersistance extends PersistanceObject
 	private var _ba:ByteArray
 	
 	private function get ba():ByteArray 						{ return _ba }
+	
 	public function get parent():ModelInfo						{ return _parent }
 	public function set parent( $val:ModelInfo ):void			{ _parent = $val }
 	public 	function get oxel():Oxel 							{ return _oxel; }
 	public 	function get loaded():Boolean 						{ return _loaded; }
-	public 	function set loaded(value:Boolean):void 			{ _loaded = value; }
+	public 	function set loaded( $val:Boolean):void 			{ _loaded = $val; }
 	
 	public function OxelPersistance( $guid:String ) {
 		//Log.out( "OxelPersistance: " + $guid, Log.WARN );
