@@ -8,6 +8,7 @@
 
 package {
 	import com.voxelengine.events.AnimationEvent
+	import com.voxelengine.renderer.shaders.Shader;
 	import flash.display.Sprite
 	import flash.display.StageAlign
 	import flash.display.StageScaleMode
@@ -114,6 +115,7 @@ package {
 			var timeUpdate:int = getTimer()
 			
 			RegionManager.instance.update( elapsed )
+			Shader.animationOffsetsUpdate( elapsed );
 			timeUpdate = getTimer() - timeUpdate
 			
 			if ( showConsole )

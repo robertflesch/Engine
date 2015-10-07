@@ -227,7 +227,6 @@ package com.voxelengine.renderer
 			if ( !cm )
 				return;
 				
-			Shader.animationOffsetsUpdate();
 			backgroundColor();
 			
 			var wsPositionCamera:Vector3D = cm.instanceInfo.worldSpaceMatrix.transformVector( cm.camera.current.position );

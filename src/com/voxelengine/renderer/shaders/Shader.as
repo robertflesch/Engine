@@ -51,9 +51,9 @@ package com.voxelengine.renderer.shaders
 			_s_lights = new Vector.<ShaderLight>(); 
 		}
 		
-		static public  function     animationOffsetsUpdate():void 						{ 
-			_textureOffsetV -= 0.0001;
-
+		static public  function     animationOffsetsUpdate( $elapsed:int ):void 						{ 
+			_textureOffsetV -= 0.000006 * $elapsed;
+			                   
 			if ( _textureOffsetV < -0.888671875 )
 				_textureOffsetV = 0;
 		}
