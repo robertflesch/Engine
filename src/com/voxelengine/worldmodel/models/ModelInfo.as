@@ -427,6 +427,7 @@ public class ModelInfo extends PersistanceObject
 		//Globals.g_app.dispatchEvent( me );
 	}
 
+	// This should only be called from voxelModel who can check permissions
 	public function childAdd( $child:VoxelModel):void {
 		if ( null ==  $child.instanceInfo.instanceGuid )
 			 $child.instanceInfo.instanceGuid = Globals.getUID();

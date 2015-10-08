@@ -497,6 +497,7 @@ public class VoxelModel
 		
 		if ( selected && false == $alpha ) {
 			Axes.positionSet( wsPositionGet() )
+			Axes.scaleSet( modelInfo.grainSize )
 			Axes.display()
 		}
 	}
@@ -857,12 +858,21 @@ public class VoxelModel
 		
 		// adds the player to the child list
 		if ( $modelLosingControl )
-			modelInfo.childAdd($modelLosingControl);
+			childAdd($modelLosingControl);
 		camera.index = 0;
 		
 		// Pass in the name of the class that is taking control.
 //		var className:String = getQualifiedClassName(this)
 //		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
+	}
+	
+	public function childAdd( $childModel:VoxelModel):void {
+		
+		if ( false == modelInfo.childrenLoaded )
+			modelInfo.childAdd( $childModel )
+		else	
+			if ( metadata.permissions.modify )
+				modelInfo.childAdd( $childModel )
 	}
 	
 	public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void
