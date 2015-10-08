@@ -64,6 +64,8 @@ public class EditCursor extends VoxelModel
 	static private const 		EDITCURSOR_CYLINDER:uint			= 1002;
 	static private const 		EDITCURSOR_CYLINDER_ANIMATED:uint	= 1003;
 	static private const 		EDITCURSOR_INVALID:uint				= 1004;
+	static private const 		EDITCURSOR_HAND_LR:uint				= 1005;
+	static private const 		EDITCURSOR_HAND_UD:uint				= 1006;
 	static private var 			_s_listenersAdded:Boolean;
 	
 	
@@ -301,6 +303,7 @@ public class EditCursor extends VoxelModel
 		CursorSizeEvent.addListener( CursorSizeEvent.SHRINK, 		sizeShrinkEvent );
 		
 		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
+		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_UP, 	 mouseUp);
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_MOVE,  mouseMove);
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_DOWN, 	mouseDown);
@@ -796,15 +799,28 @@ public class EditCursor extends VoxelModel
 		}
 	}
 	
-	private function keyDown(e:KeyboardEvent):void  {
+	private function keyUp(e:KeyboardEvent):void  {
 		if ( Globals.openWindowCount || !Globals.clicked )
 			return;
 			
+		switch (e.keyCode) {
+			case Keyboard.CONTROL:
+				oxelTexture = oxelTextureValid
+		}
+	}
+	
+	private function keyDown(e:KeyboardEvent):void  {
+		if ( Globals.openWindowCount || !Globals.clicked )
+			return;
+
+			
 		var foundModel:VoxelModel;
-		switch (e.keyCode) 
-		{
-			//case Keyboard.F:
-				//break;
+		switch (e.keyCode) {
+			case Keyboard.CONTROL:
+				if ( MouseKeyboardHandler.leftMouseDown )
+					oxelTexture = EDITCURSOR_HAND_UD
+				else
+					oxelTexture = EDITCURSOR_HAND_LR
 			case 107: case Keyboard.NUMPAD_ADD:
 			case 45: case Keyboard.INSERT:
 					insertOxel();
@@ -849,19 +865,27 @@ public class EditCursor extends VoxelModel
 				return;
 			}
 			var dy:Number = Globals.g_app.stage.mouseY - _s_dy;
+			if ( 0 < dy )
+				dy = 1
+			else if ( dy < 0 )
+				dy = -1
 			_s_dy = Globals.g_app.stage.mouseY;
 			var dx:Number =  Globals.g_app.stage.mouseX - _s_dx;
+			if ( 0 < dx )
+				dx = 1
+			else if ( dx < 0 )
+				dx = -1
 			_s_dx = Globals.g_app.stage.mouseX
-//				Log.out( "EditCursor.mouse move dx: " + dx + "  dy: " + dy );
+			Log.out( "EditCursor.mouse move dx: " + dx + "  dy: " + dy + " _s_dx: " + _s_dx + "  _s_dy: " + _s_dy, Log.WARN );
 			
 			if ( VoxelModel.selectedModel ) {
 				var t:Vector3D = VoxelModel.selectedModel.instanceInfo.positionGet;
 				if ( MouseKeyboardHandler.leftMouseDown ) {
-					t.y += dy/4;
-					t.y += dx/4;
+					t.y += dy;
+					t.y += dx;
 				} else {
-					t.z += dy/4;
-					t.x += dx/4;
+					t.z += dy;
+					t.x += dx;
 				}
 				VoxelModel.selectedModel.instanceInfo.positionSetComp( t.x, t.y, t.z );
 			}
