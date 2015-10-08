@@ -127,7 +127,7 @@ public class ModelCache
 		//Log.out( "ModelCache.add - name: " + vm.metadata.name + "  guid: " + vm.instanceInfo.modelGuid + "  instanceGuid: " + vm.instanceInfo.instanceGuid, Log.WARN );			
 		if ( vm.instanceInfo.controllingModel )
 		{
-			vm.instanceInfo.controllingModel.modelInfo.childAdd( vm );
+			vm.instanceInfo.controllingModel.childAdd( vm );
 			// ah, this is the instance by guid, basically the look up spot for things...
 			// not the instances, which are used to draw everything.
 			_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;

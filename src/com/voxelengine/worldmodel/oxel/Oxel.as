@@ -2562,8 +2562,6 @@ public class Oxel extends OxelBitfields
 			for each ( var child:Oxel in _children )
 				child.changeTypeFromTo( fromType, toType );
 		}
-		else
-			changeTypeFromTo( fromType, toType );
 	}
 	
 	private function reboundAll( newBound:int ):void {

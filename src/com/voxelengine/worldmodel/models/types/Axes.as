@@ -55,8 +55,17 @@ public class Axes extends VoxelModel
 	//}
 	
 	static public function hide():void {
-		if ( _model )
+		if ( _model ) {
 			_model.instanceInfo.visible = false
+			scaleSet( 4 )
+		}
+	}
+	
+	static public function scaleSet( $grain:int ):void {
+		if ( _model ) {
+			 var s:Number = Math.pow( 2, $grain)/32
+			_model.instanceInfo.scaleSetComp( s, s, s )
+		}
 	}
 	
 	static public function positionSet( $pos:Vector3D ):void {

@@ -106,7 +106,7 @@ public class AnimationAttachment
 		else
 		{
 			//Log.out( "AnimationAttachment.create owner: " + $owner.toString() + "   attachment: " + _voxelModel.toString() );
-			$owner.modelInfo.childAdd( _voxelModel );
+			$owner.childAdd( _voxelModel );
 		}
 	}
 	
