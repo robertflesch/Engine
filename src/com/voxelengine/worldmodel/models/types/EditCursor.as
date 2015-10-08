@@ -854,12 +854,15 @@ public class EditCursor extends VoxelModel
 			_s_dx = Globals.g_app.stage.mouseX
 //				Log.out( "EditCursor.mouse move dx: " + dx + "  dy: " + dy );
 			
-		// do I need to add axis models?	
-		//	this.childAdd();
 			if ( VoxelModel.selectedModel ) {
 				var t:Vector3D = VoxelModel.selectedModel.instanceInfo.positionGet;
-				t.z += dy/4;
-				t.x += dx/4;
+				if ( MouseKeyboardHandler.leftMouseDown ) {
+					t.y += dy/4;
+					t.y += dx/4;
+				} else {
+					t.z += dy/4;
+					t.x += dx/4;
+				}
 				VoxelModel.selectedModel.instanceInfo.positionSetComp( t.x, t.y, t.z );
 			}
 		}
