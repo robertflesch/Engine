@@ -96,6 +96,8 @@ public class WindowChangeType extends VVPopup
 			if ( _vm.modelInfo.data && _vm.modelInfo.data.oxel ) {
 				var oxel:Oxel = _vm.modelInfo.data.oxel;
 				oxel.changeTypeFromTo( fromType, toType );
+				_vm.modelInfo.data.changed = true
+				_vm.modelInfo.data.save()
 			}
 			else
 				Log.out( "WindowChangeType.change - modelInfo.data.oxel not found for guid: " + _vm.modelInfo.guid, Log.WARN );
