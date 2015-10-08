@@ -73,9 +73,10 @@ public class ModelMaker extends ModelMakerBase {
 			
 			var vm:* = make();
 			
-			markComplete( true, vm );
 			if ( vm && _addToRegionWhenComplete )
 				Region.currentRegion.modelCache.add( vm );
+				
+			markComplete( true, vm );
 		}
 	}
 	
