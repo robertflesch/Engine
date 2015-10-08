@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.events.AppEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.worldmodel.PermissionsBase;
@@ -22,7 +23,7 @@ import playerio.DatabaseObject;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.events.GUIEvent;
+import com.voxelengine.events.AppEvent;
 import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.events.CursorShapeEvent;
 import com.voxelengine.events.CursorSizeEvent;
@@ -140,8 +141,8 @@ public class EditCursor extends VoxelModel
 
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
-		GUIEvent.addListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
-		GUIEvent.addListener( GUIEvent.APP_ACTIVATE, onActivate );
+		AppEvent.addListener( AppEvent.APP_DEACTIVATE, onDeactivate );
+		AppEvent.addListener( AppEvent.APP_ACTIVATE, onActivate );
 		
 		addListeners();
 	}
@@ -151,18 +152,19 @@ public class EditCursor extends VoxelModel
 		
 		removeListeners();
 		
-		GUIEvent.removeListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
-		GUIEvent.removeListener( GUIEvent.APP_ACTIVATE, onActivate );
+		AppEvent.removeListener( AppEvent.APP_DEACTIVATE, onDeactivate );
+		AppEvent.removeListener( AppEvent.APP_ACTIVATE, onActivate );
 	}
 	
-	protected function onDeactivate( e:GUIEvent ):void  {
+	protected function onDeactivate( e:AppEvent ):void  {
 		//Log.out( "onDeactivate - disabling repeat" );
 		// We dont want the repeat on if app loses focus
 		mouseUp( null );
 		removeListeners();
+		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) )
 	}
 	
-	protected function onActivate( e:GUIEvent ):void  { addListeners(); }
+	protected function onActivate( e:AppEvent ):void  { addListeners(); }
 	
 	////////////////////////////////////////////////
 	// CursorSizeEvents
@@ -876,7 +878,7 @@ public class EditCursor extends VoxelModel
 			else if ( dx < 0 )
 				dx = -1
 			_s_dx = Globals.g_app.stage.mouseX
-			Log.out( "EditCursor.mouse move dx: " + dx + "  dy: " + dy + " _s_dx: " + _s_dx + "  _s_dy: " + _s_dy, Log.WARN );
+			//Log.out( "EditCursor.mouse move dx: " + dx + "  dy: " + dy + " _s_dx: " + _s_dx + "  _s_dy: " + _s_dy, Log.WARN );
 			
 			if ( VoxelModel.selectedModel ) {
 				var t:Vector3D = VoxelModel.selectedModel.instanceInfo.positionGet;

@@ -26,7 +26,7 @@ import com.voxelengine.Log;
 import com.voxelengine.worldmodel.*;
 import com.voxelengine.worldmodel.models.*
 import com.voxelengine.events.CollisionEvent;
-import com.voxelengine.events.GUIEvent;
+import com.voxelengine.events.AppEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.ShipEvent;
 import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
@@ -101,8 +101,8 @@ public class ControllableVoxelModel extends VoxelModel
 		super.init( $mi, $vmm );
 		Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent, false, 0, true );
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
-		GUIEvent.addListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
-		GUIEvent.addListener( GUIEvent.APP_ACTIVATE, onActivate );
+		AppEvent.addListener( AppEvent.APP_DEACTIVATE, onDeactivate );
+		AppEvent.addListener( AppEvent.APP_ACTIVATE, onActivate );
 		_ct = new CollisionTest( this );
 	}
 	
@@ -148,15 +148,15 @@ public class ControllableVoxelModel extends VoxelModel
 			
 		Globals.g_app.removeEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent );
 		ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
-		GUIEvent.removeListener( GUIEvent.APP_DEACTIVATE, onDeactivate );
-		GUIEvent.removeListener( GUIEvent.APP_ACTIVATE, onActivate );
+		AppEvent.removeListener( AppEvent.APP_DEACTIVATE, onDeactivate );
+		AppEvent.removeListener( AppEvent.APP_ACTIVATE, onActivate );
 	}
 
-	protected function onDeactivate( e:GUIEvent ):void 
+	protected function onDeactivate( e:AppEvent ):void 
 	{
 		
 	}
-	protected function onActivate( e:GUIEvent ):void 
+	protected function onActivate( e:AppEvent ):void 
 	{
 		//Log.out( "ControllableVoxelModel.onActivate - REMOVED STATELOCK AND STATESET", Log.WARN );
 //		stateLock( false );

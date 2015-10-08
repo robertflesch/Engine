@@ -8,6 +8,7 @@
 
 package {
 	import com.voxelengine.events.AnimationEvent
+	import com.voxelengine.events.AppEvent;
 	import com.voxelengine.renderer.shaders.Shader;
 	import flash.display.Sprite
 	import flash.display.StageAlign
@@ -169,7 +170,7 @@ package {
 				
 				stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown)
 				
-//				GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_ACTIVATE ) )
+				AppEvent.dispatch( new AppEvent( AppEvent.APP_ACTIVATE ) )
 			}
 			//else
 			//	Log.out( "VoxelVerse.activateApp - ignoring" )
@@ -193,14 +194,14 @@ package {
 				stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp)					
 
 				if ( Globals.online ) {
+					AppEvent.dispatch( new AppEvent( AppEvent.APP_DEACTIVATE ) )
+					
 					//Log.out( "VoxelVerse.deactivateApp - NOT SAVING REGION AND INVENTORY", Log.WARN )
 					RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) )
 					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.SAVE, 0, null, null, null ) )
 					InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, null, null ) )
 					ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) )
 				}
-				
-	//			GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_DEACTIVATE ) )
 			}
 			//else
 			//	Log.out( "VoxelVerse.deactivateApp - app already deactivated", Log.WARN )

@@ -8,6 +8,7 @@
 
 package com.voxelengine.GUI.actionBars
 {
+import com.voxelengine.events.AppEvent;
 import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.worldmodel.models.ModelPlacementType;
 import flash.display.DisplayObject;
@@ -46,27 +47,35 @@ import com.voxelengine.worldmodel.models.types.EditCursor;
 
 public class  UserInventory extends QuickInventory
 {
+	static private var _s_currentInstance:UserInventory;
+	
 	private var _dragOp:DnDOperation = new DnDOperation();
-	private var _itemMaterialSelection:int = -1;
-	private var _lastItemSelection:int = -1;
 	private var _toolSize:GrainSelector;
 	private var _shape:ShapeSelector;
-	
 	private var _modelTools:ModelPlacementType;
 		
 	private var _remove:Boolean;
 	private var _owner:String;
 	private var _inventoryLoaded:Boolean;
+
+	private var 		 _itemMaterialSelection:int = -1;
+	private function get itemMaterialSelection():int  { return _itemMaterialSelection; }
+	private function set itemMaterialSelection(value:int):void {
+		Log.out( "UserInventory.itemMaterialSelection: " + value )
+		_itemMaterialSelection = value; 
+	}
 	
-	private function get lastItemSelection():int  { return _lastItemSelection; }
-	private function set lastItemSelection(value:int):void { _lastItemSelection = value; }
+	private var 		 _lastBoxesSelection:int = -1;
+	private function get lastBoxesSelection():int  { return _lastBoxesSelection; }
+	private function set lastBoxesSelection(value:int):void {
+		Log.out( "UserInventory.lastItemSelection: " + value )
+		_lastBoxesSelection = value; 
+	}
 	
-	static private var _s_currentInstance:UserInventory;
 
 	static public function init():void {	
 		InventoryInterfaceEvent.addListener( InventoryInterfaceEvent.CLOSE, closeEvent );
 		InventoryInterfaceEvent.addListener( InventoryInterfaceEvent.DISPLAY, displayEvent );
-//		InventoryInterfaceEvent.addListener( InventoryInterfaceEvent.HIDE, hideEvent );
 	}
 	
 	public function UserInventory( $owner:String, $image:String ) {
@@ -109,27 +118,16 @@ public class  UserInventory extends QuickInventory
 		//Log.out( "UserInventory.remove ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 		RoomEvent.removeListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
 		InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
-
+		AppEvent.addListener( AppEvent.APP_DEACTIVATE, onDeactivate );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.UNLOAD_REQUEST, _owner, null ) );
 		_s_currentInstance = null;
 		super.remove();
 	}
-
-	static private function hideEvent(e:InventoryInterfaceEvent):void {
-		if ( null == _s_currentInstance )
-			return;
-		else if ( _s_currentInstance && _s_currentInstance._owner != e.owner ) {
-			_s_currentInstance.remove();
-			_s_currentInstance = null;
-		}
-			
-		EditCursor.editing = false;
-		with ( _s_currentInstance ) {
-			visible = false;
-			removeListeners();
-		}
-	}
 	
+	private function onDeactivate( $ae:AppEvent ):void {
+		processItemSelection( boxes[1] )
+	}
+
 	static private function displayEvent(e:InventoryInterfaceEvent):void {
 		// build it the first time
 		if ( null == _s_currentInstance && e )
@@ -150,6 +148,7 @@ public class  UserInventory extends QuickInventory
 				addListeners();
 				display();
 				resizeObject( null );
+				AppEvent.addListener( AppEvent.APP_DEACTIVATE, onDeactivate );
 			}
 		}
 	}
@@ -302,11 +301,12 @@ public class  UserInventory extends QuickInventory
 	private var _lastCursorType:int
 	
 	private function processItemSelection( box:UIObject ):void {
+		Log.out( "UserInventory.processItemSelection - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex + " box.name: " + box.name, Log.DEBUG );
 		if ( 0 < Globals.openWindowCount )
 			return;
 			
 		moveSelector( box );
-		var itemIndex:int = int( box.name );
+		var boxesIndex:int = int( box.name ); // Boxes[0] uses hotkey 1
 		
 		hideGrainTools();
 		hideModelTools();
@@ -317,55 +317,54 @@ public class  UserInventory extends QuickInventory
 			var ti:ObjectVoxel = oi as ObjectVoxel;
 			var selectedTypeId:int = ti.type;
 			if ( TypeInfo.INVALID != selectedTypeId ) {
-				_itemMaterialSelection = itemIndex;
+				itemMaterialSelection = boxesIndex;
 				CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.INSERT_OXEL, selectedTypeId ) ); 
 			}
 			showGrainTools();
 		}
 		else if ( oi is ObjectAction ) {
-			Log.out( "UserInventory.processItemSelection - ObjectAction - RETEST with different action types", Log.DEBUG );
+			Log.out( "UserInventory.processItemSelection - ObjectAction - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
 			var oa:ObjectAction = oi as ObjectAction;
-			if ( lastItemSelection == itemIndex ) {
+			if ( lastBoxesSelection == boxesIndex ) {
 				// check for reload time of other blocking mechanism
 				// oa.isBlocked
-				if ( oa.ammoName )
+				Log.out( "UserInventory.processItemSelection - ObjectAction - lastItemSelection == boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
+				if ( oa.ammoName && "null" != oa.ammoName )
 					oa.callBack( oa.ammoName );
 				else
 					oa.callBack();
-			} else if ( lastItemSelection != itemIndex ) {
+			} 
+			else {
+				Log.out( "UserInventory.processItemSelection - ObjectAction - lastItemSelection != boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
 				if ( oa.ammoName && "null" != oa.ammoName )
 					oa.callBack( oa.ammoName );
 				else
 					oa.callBack();
 			}
-			/*
-			else if ( - 1 != _itemMaterialSelection )// We are selecting the pick again when that is what we have already.
-			{	// go back to previously used material
-				//throw new Error( "UserInventory - processItemSelection - HOW DO I GET HERE?" );
-//				CursorEvent.dispatch( new CursorEvent( CursorEvent.CURSOR_OP_INSERT, selectedTypeId, true ) ); 
-				var lastBoxNone:Box = boxes[_itemMaterialSelection ];
-				processItemSelection( lastBoxNone )
-				return;
-			}
-			*/
 		}
 		else if ( oi is ObjectTool ) {
 			Log.out( "UserInventory.processItemSelection - ObjectTool");
 			EditCursor.editing = true;
 			var ot:ObjectTool = oi as ObjectTool;
-			if ( lastItemSelection != itemIndex )
-			{   // We are selecting the pick when it was previously on another item
+			if ( lastBoxesSelection == boxesIndex ) {
+				Log.out( "UserInventory.processItemSelection - ObjectTool - lastItemSelection == boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
+				// we are double tapping the tool key
+				if ( - 1 != itemMaterialSelection ) {	
+					var lastBoxPick:Box = boxes[itemMaterialSelection ];
+					processItemSelection( lastBoxPick )
+					return;
+				}
+				else {
+					Log.out( "UserInventory.processItemSelection - ObjectTool - lastItemSelection != boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
+					processItemSelection( boxes[1] )
+					return;
+				}
+			}
+			else {
+			   // We are selecting a new tool 
 				ot.callBack();
+				showGrainTools();
 			}
-			else if ( - 1 != _itemMaterialSelection ) 
-			{	// go back to previously used material
-				throw new Error( "UserInventory - processItemSelection - HOW DO I GET HERE?" );
-				
-				//var lastBoxPick:Box = boxes[_itemMaterialSelection ];
-				//processItemSelection( lastBoxPick );
-				return;
-			}
-			showGrainTools();
 		}
 		else if ( oi is ObjectModel ) {
 			Log.out( "UserInventory.processItemSelection - ObjectModel", Log.WARN);
@@ -381,8 +380,7 @@ public class  UserInventory extends QuickInventory
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) ); 
 		}
 		
-		lastItemSelection = itemIndex;
-		_itemMaterialSelection = itemIndex;
+		lastBoxesSelection = boxesIndex;
 	}
 	
 	private function cursorReady(e:LoadingEvent):void  {
@@ -396,22 +394,22 @@ public class  UserInventory extends QuickInventory
 			return;
 			
 		if ( 0 < event.delta ) {
-			if ( lastItemSelection < (Slots.ITEM_COUNT - 1)  )
+			if ( lastBoxesSelection < (Slots.ITEM_COUNT - 1)  )
 			{
-				selectByIndex( lastItemSelection + 1 );
+				selectByIndex( lastBoxesSelection + 1 );
 			}
-			else if ( ( Slots.ITEM_COUNT -1 ) == lastItemSelection )
+			else if ( ( Slots.ITEM_COUNT -1 ) == lastBoxesSelection )
 			{
 				selectByIndex( 0 );
 			}
 		} else
-			if ( 0 == lastItemSelection )
+			if ( 0 == lastBoxesSelection )
 			{
 				selectByIndex( Slots.ITEM_COUNT - 1 );
 			}
-			else if ( 0 < lastItemSelection )
+			else if ( 0 < lastBoxesSelection )
 			{
-				selectByIndex( lastItemSelection - 1 );
+				selectByIndex( lastBoxesSelection - 1 );
 			}
 	}	
 
