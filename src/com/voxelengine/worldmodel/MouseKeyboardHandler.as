@@ -24,18 +24,19 @@ package com.voxelengine.worldmodel
 	 */
 	public class MouseKeyboardHandler
 	{
-		static private var _s_active:Boolean  							= false;
+		static private var _s_active:Boolean  	
 		
-		static private var _s_forward:Boolean  							= false;
-		static private var _s_backward:Boolean 		 					= false;
-		static private var _s_left:Boolean  							= false;
-		static private var _s_right:Boolean  							= false;
-		static private var _s_up:Boolean 								= false;
-		static private var _s_down:Boolean 								= false;
+		static private var _s_forward:Boolean  	
+		static private var _s_backward:Boolean 	
+		static private var _s_left:Boolean  	
+		static private var _s_right:Boolean  	
+		static private var _s_up:Boolean 		
+		static private var _s_down:Boolean 		
 		
-		static private var _s_ctrl:Boolean 								= false;
-		static private var _s_shift:Boolean 							= false;
-		static private var _s_alt:Boolean 								= false;
+		static private var _s_ctrl:Boolean 		
+		static private var _s_shift:Boolean 	
+		static private var _s_alt:Boolean 		
+		static private var _s_leftMouseDown:Boolean						
 		
 		// Enable / Disable Keys
 		static private var _s_leftTurnEnabled:Boolean 					= true;
@@ -64,6 +65,7 @@ package com.voxelengine.worldmodel
 		static public function get shift():Boolean 						{ return _s_shift; }
 		static public function get alt():Boolean 						{ return _s_alt; }
 		static public function get active():Boolean						{ return _s_active; }
+		static public function get leftMouseDown():Boolean				{ return _s_leftMouseDown }
 		static public function set active($val:Boolean):void			{ _s_active = $val; }
 		
 		public function MouseKeyboardHandler()  {}
@@ -116,32 +118,37 @@ package com.voxelengine.worldmodel
 				_s_handlersAdded = true;
 				Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 				Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
-				Globals.g_app.stage.addEventListener( FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
-				RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, regionLoadBegin );
-				RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, regionLoadComplete );
+				Globals.g_app.stage.addEventListener(FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
+				Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_DOWN, leftMouseDownEvent )
+				Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_UP, leftMouseUp )
+				Globals.g_app.stage.addEventListener(MouseEvent.RELEASE_OUTSIDE, leftMouseUp )
+				Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
+				RegionEvent.addListener( RegionEvent.LOAD_BEGUN, loadBegun )
+				RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, loadComplete )
 			}
 		}
 		
-		static private function regionLoadComplete(e:RegionEvent):void  {
-			active = true;
-		}
-		
-		static private function regionLoadBegin(e:RegionEvent):void  {
-			active = false;
-		}
+		static private function leftMouseDownEvent( $me:MouseEvent ):void { _s_leftMouseDown = true }
+		static private function leftMouseUp( $me:MouseEvent ):void { _s_leftMouseDown = false }
+		static private function loadBegun(e:RegionEvent):void  { active = false }
+		static private function loadComplete(e:RegionEvent):void  { active = true }
 		
 		static private function removeInputListeners():void {
 			if ( true == _s_handlersAdded ) {
 				_s_handlersAdded = false;
 				Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 				Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp);
-				Globals.g_app.stage.removeEventListener( FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
-				RegionEvent.removeListener( RegionEvent.LOAD_COMPLETE, regionLoadBegin );
-				RegionEvent.removeListener( RegionEvent.LOAD_COMPLETE, regionLoadComplete );
+				Globals.g_app.stage.removeEventListener(FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
+				Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_DOWN, leftMouseDownEvent )
+				Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_UP, leftMouseUp )
+				Globals.g_app.stage.removeEventListener(MouseEvent.RELEASE_OUTSIDE, leftMouseUp )
+				RegionEvent.removeListener( RegionEvent.LOAD_BEGUN, loadBegun )
+				RegionEvent.removeListener( RegionEvent.LOAD_COMPLETE, loadComplete )
 			}
 		}
 		
-		static public function init():void  { addInputListeners(); }
+		static public function init():void  { 
+			addInputListeners(); }
 		
 		static public function reset():void {
 			_s_forward = false;		

@@ -168,7 +168,6 @@ package {
 				VoxelVerseGUI.currentInstance.crossHairActive()
 				
 				stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown)
-				stage.addEventListener(KeyboardEvent.KEY_UP, keyUp)
 				
 //				GUIEvent.dispatch( new GUIEvent( GUIEvent.APP_ACTIVATE ) )
 			}
@@ -191,7 +190,6 @@ package {
 				// one way to wake us back up is thru the mouse click
 				//stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown)
 				stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown)
-				stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp)
 				stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp)					
 
 				if ( Globals.online ) {
@@ -214,15 +212,13 @@ package {
 			
 		//}
 		
-		private function mouseUp(e:MouseEvent):void 
-		{
+		private function mouseUp(e:MouseEvent):void {
 			//Log.out( "VoxelVerse.mouseUp event" )
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp)
 			activateApp()
 		}
 		
-		private function toggleConsole():void 
-		{
+		private function toggleConsole():void {
 			showConsole = false
 			if ( Log.showing )
 				Log.hide()
@@ -230,43 +226,18 @@ package {
 				Log.show()
 		}
 		
-		private var _shiftDown:Boolean
-		private var _controlDown:Boolean
-		private function keyDown(e:KeyboardEvent):void 
-		{
+		private function keyDown(e:KeyboardEvent):void {
 			switch (e.keyCode) {
-				//case Keyboard.BACKQUOTE:
-				case Keyboard.SHIFT:
-					_shiftDown = true
-					break
-				case Keyboard.CONTROL:
-					_controlDown = true
-					break
 				case Keyboard.ENTER:
 					// trying to stop the BACKQUOTE from getting to the doomsday console.
 					//e.stopImmediatePropagation()
-					if ( _controlDown )
+					if ( MouseKeyboardHandler.ctrl )
 						showConsole = true
 					break
 			}
 		}
-		
-		private function keyUp(e:KeyboardEvent):void 
-		{
-			switch (e.keyCode) {
-				//case Keyboard.BACKQUOTE:
-				case Keyboard.SHIFT:
-					_shiftDown = false
-					break
-				case Keyboard.CONTROL:
-					_controlDown = false
-					break
-			}
-		}
-		////////////////////////////
         
-        private function uncaughtErrorHandler(event:UncaughtErrorEvent):void
-        {
+        private function uncaughtErrorHandler(event:UncaughtErrorEvent):void {
             if (event.error is Error)
             {
                 var error:Error = event.error as Error
