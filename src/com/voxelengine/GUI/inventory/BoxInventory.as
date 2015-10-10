@@ -51,6 +51,24 @@ public class BoxInventory extends VVBox
 		addElement(_count);
 	}	
 	
+	private function thumbnailLoaded( $mme:ModelMetadataEvent ):void {
+		var om:ObjectModel = _objectInfo as ObjectModel
+		if ( $mme.modelGuid == om.modelGuid ) {
+			ModelMetadataEvent.removeListener( ModelMetadataEvent.BITMAP_LOADED, thumbnailLoaded )				
+			backgroundTexture = drawScaled( om.vmm.thumbnail, width, height );
+		}
+	}
+	
+	private function metadataChanged( $mme:ModelMetadataEvent ):void {
+		var om:ObjectModel = _objectInfo as ObjectModel
+		if ( $mme.modelGuid == om.modelGuid ) {
+			ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged )
+			om.vmm = $mme.modelMetadata
+			updateObjectInfo( om )
+		}
+	}
+	
+	
 	public function updateObjectInfo( $item:ObjectInfo ):void {
 		if ( null == $item )
 			return;
@@ -67,10 +85,16 @@ public class BoxInventory extends VVBox
 		case ObjectInfo.OBJECTINFO_MODEL:
 			var om:ObjectModel = _objectInfo as ObjectModel;
 			if ( om.vmm ) {
-				if ( null == om.vmm.thumbnail ) {
-					var bmpd:BitmapData = Globals.g_renderer.modelShot();
-					om.vmm.thumbnail = drawScaled( bmpd, width, height );
+				if ( om.vmm.thumbnailLoaded ) {
+					backgroundTexture = drawScaled( om.vmm.thumbnail, width, height );
+//					var bmpd:BitmapData = Globals.g_renderer.modelShot();
+//					om.vmm.thumbnail = drawScaled( bmpd, width, height );
 				}
+				else
+					ModelMetadataEvent.addListener( ModelMetadataEvent.BITMAP_LOADED, thumbnailLoaded )				
+				
+				// listen for changes to this object
+				ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged )
 				
 				var modelsOfThisGuid:int = om.vmm.permissions.copyCount;
 				if ( 99999 < modelsOfThisGuid )
@@ -81,9 +105,8 @@ public class BoxInventory extends VVBox
 					_count.text = String( modelsOfThisGuid );
 
 				setHelp( om.vmm.name );			
-				backgroundTexture = drawScaled( om.vmm.thumbnail, width, height );
 				if ( om.vmm.permissions.blueprint ) {
-					var bp:Image = new Image( Globals.appPath + "assets/textures/blueprint.png" )
+					var bp:Image = new Image( Globals.texturePath + "blueprint.png" )
 					if ( 128 == width )
 						bp.x = bp.y = 64
 					addElement( bp )

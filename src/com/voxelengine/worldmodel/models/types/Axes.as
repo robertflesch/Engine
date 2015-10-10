@@ -1,5 +1,5 @@
 /*==============================================================================
-Copyright 2011-2013 Robert Flesch
+Copyright 2011-2015 Robert Flesch
 All rights reserved.  This product contains computer programs, screen
 displays and printed documentation which are original works of
 authorship protected under United States Copyright Act.
@@ -7,15 +7,15 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-import com.voxelengine.Globals
 import com.voxelengine.Log
+import com.voxelengine.Globals
 import com.voxelengine.events.ModelLoadingEvent
 import com.voxelengine.worldmodel.models.InstanceInfo
 import com.voxelengine.worldmodel.models.ModelMetadata
 import com.voxelengine.worldmodel.models.ModelInfo
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase
 import com.voxelengine.worldmodel.models.types.VoxelModel
-import flash.display3D.Context3D;
+//import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D
 
@@ -56,8 +56,15 @@ public class Axes extends VoxelModel
 	
 	static public function hide():void {
 		if ( _model ) {
+			//Log.out( "Axes.hide: " + VoxelModel.selectedModel , Log.WARN );
 			_model.instanceInfo.visible = false
-			scaleSet( 4 )
+		}
+	}
+	
+	static public function show():void {
+		if ( _model ) {
+			//Log.out( "Axes.show: " + VoxelModel.selectedModel , Log.WARN );
+			_model.instanceInfo.visible = true
 		}
 	}
 	
@@ -70,8 +77,13 @@ public class Axes extends VoxelModel
 	
 	static public function positionSet( $pos:Vector3D ):void {
 		if ( _model ) {
-			_model.instanceInfo.visible = true
 			_model.instanceInfo.positionSetComp( $pos.x, $pos.y, $pos.z )
+		}
+	}
+	
+	static public function rotationSet( $rot:Vector3D ):void {
+		if ( _model ) {
+			_model.instanceInfo.rotationSetComp( $rot.x, $rot.y, $rot.z )
 		}
 	}
 	

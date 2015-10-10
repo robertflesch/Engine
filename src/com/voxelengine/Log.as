@@ -65,6 +65,7 @@ package com.voxelengine
 		
 		public static function out( $msg:String, $type:int = INFO, $error:Error = null ):void {
 			
+			Logging.setDefaultLoggerTag( "VoxelVerse" )
 			const L:ILogger = Logging.getLogger(Log);
 
 			switch ( $type )

@@ -19,6 +19,7 @@ import com.voxelengine.worldmodel.models.ModelMetadata;
  */
 public class ModelMetadataEvent extends ModelBaseEvent
 {
+	static public const BITMAP_LOADED:String					= "BITMAP_LOADED";
 	static public const RESULT_CHILDREN:String					= "RESULT_CHILDREN";
 
 	private var _modelMetadata:ModelMetadata;

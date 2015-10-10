@@ -15,6 +15,7 @@ import flash.display.Loader;
 import flash.display.LoaderInfo
 import flash.events.Event;
 import flash.geom.Rectangle;
+import flash.net.URLRequest;
 import flash.utils.ByteArray;
 import flash.net.URLLoaderDataFormat;
 
@@ -54,6 +55,9 @@ public class ModelMetadata extends PersistanceObject
 	public function get thumbnail():BitmapData 				{ return _thumbnail; }
 	public function set thumbnail(value:BitmapData):void 	{ _thumbnail = value; changed = true; }
 
+	private var			_thumbnailLoaded:Boolean
+	public function get thumbnailLoaded():Boolean 			{ return _thumbnailLoaded; }
+	
 	public function toString():String {
 		return "name: " + name + "  description: " + description + "  guid: " + guid + "  owner: " + owner;
 	}
@@ -142,7 +146,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 			Log.out( "ModelMetaData.fromObjectImport - NO DBO or DBO data", Log.ERROR );
 		}
 		info = $dbo.data;	
-		loadFromInfo();	
+		loadFromInfo( this );	
 		changed = true;
 	}
 
@@ -150,17 +154,27 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		dbo = $dbo;
 		info = $dbo;	
 		
-		loadFromInfo();	
+		loadFromInfo( this );	
 	}
 	
-	private function loadFromInfo():void {
+	private function loadFromInfo( $mm:ModelMetadata ):void {
 		// the permission object is just an encapsulation of the permissions section of the object
 		_permissions = new PermissionsBase( info );
 		
+		var loader:Loader = new Loader();
+		loader.contentLoaderInfo.addEventListener(Event.INIT, bitmapLoaded );
 		if ( info.thumbnail ) {
-			var loader:Loader = new Loader();
-			loader.contentLoaderInfo.addEventListener(Event.INIT, function(event:Event):void { thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData; } );
 			loader.loadBytes( info.thumbnail );			
+		}
+		else {
+			loader.load( new URLRequest( Globals.texturePath + "NoImage128.png" ) )
+		}
+		
+		
+		function bitmapLoaded(event:Event):void { 
+			thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData 
+			_thumbnailLoaded = true
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.BITMAP_LOADED, 0, guid, $mm ) )
 		}
 	}
 	

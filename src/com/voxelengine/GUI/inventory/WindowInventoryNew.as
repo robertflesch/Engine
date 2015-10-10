@@ -63,7 +63,7 @@ package com.voxelengine.GUI.inventory {
 			
 			display();
 			
-			move( Globals.g_renderer.width / 2 - width / 2, Globals.g_renderer.height / 2 - height / 2 );
+			move( Globals.g_renderer.width / 2 - width / 2, 50 );
 			addEventListener( UIOEvent.RESIZED, onResized );
 		}
 		

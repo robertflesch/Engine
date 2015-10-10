@@ -191,7 +191,7 @@ public class InventoryPanelModel extends VVContainer
 
 			return box;
 		}
-		Log.out( "InventoryPanelModel.addModel - Failed to addModel: " + $oi );
+		Log.out( "InventoryPanelModel.addModel - Failed to addModel: " + $oi, Log.ERROR );
 		return null
 	}
 	

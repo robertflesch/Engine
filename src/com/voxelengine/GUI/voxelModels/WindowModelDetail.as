@@ -146,7 +146,7 @@ package com.voxelengine.GUI.voxelModels
 			var bmpd:BitmapData = Globals.g_renderer.modelShot();
 			_vm.metadata.thumbnail = drawScaled( bmpd, PHOTO_CAPTURE_WIDTH, PHOTO_CAPTURE_WIDTH );
 			addPhoto();
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CHANGED, 0, _vm.metadata.guid, null ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CHANGED, 0, _vm.metadata.guid, _vm.metadata ) );
 		}
 		
 		private function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {

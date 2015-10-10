@@ -323,19 +323,19 @@ public class  UserInventory extends QuickInventory
 			showGrainTools();
 		}
 		else if ( oi is ObjectAction ) {
-			Log.out( "UserInventory.processItemSelection - ObjectAction - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
+			//Log.out( "UserInventory.processItemSelection - ObjectAction - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
 			var oa:ObjectAction = oi as ObjectAction;
 			if ( lastBoxesSelection == boxesIndex ) {
 				// check for reload time of other blocking mechanism
 				// oa.isBlocked
-				Log.out( "UserInventory.processItemSelection - ObjectAction - lastItemSelection == boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
+				//Log.out( "UserInventory.processItemSelection - ObjectAction - lastItemSelection == boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
 				if ( oa.ammoName && "null" != oa.ammoName )
 					oa.callBack( oa.ammoName );
 				else
 					oa.callBack();
 			} 
 			else {
-				Log.out( "UserInventory.processItemSelection - ObjectAction - lastItemSelection != boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
+				//Log.out( "UserInventory.processItemSelection - ObjectAction - lastItemSelection != boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
 				if ( oa.ammoName && "null" != oa.ammoName )
 					oa.callBack( oa.ammoName );
 				else
@@ -343,11 +343,11 @@ public class  UserInventory extends QuickInventory
 			}
 		}
 		else if ( oi is ObjectTool ) {
-			Log.out( "UserInventory.processItemSelection - ObjectTool");
+			//Log.out( "UserInventory.processItemSelection - ObjectTool");
 			EditCursor.editing = true;
 			var ot:ObjectTool = oi as ObjectTool;
 			if ( lastBoxesSelection == boxesIndex ) {
-				Log.out( "UserInventory.processItemSelection - ObjectTool - lastItemSelection == boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
+				//Log.out( "UserInventory.processItemSelection - ObjectTool - lastItemSelection == boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
 				// we are double tapping the tool key
 				if ( - 1 != itemMaterialSelection ) {	
 					var lastBoxPick:Box = boxes[itemMaterialSelection ];
@@ -355,7 +355,7 @@ public class  UserInventory extends QuickInventory
 					return;
 				}
 				else {
-					Log.out( "UserInventory.processItemSelection - ObjectTool - lastItemSelection != boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
+					//Log.out( "UserInventory.processItemSelection - ObjectTool - lastItemSelection != boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
 					processItemSelection( boxes[1] )
 					return;
 				}
@@ -376,7 +376,7 @@ public class  UserInventory extends QuickInventory
 			showModelTools();
 		}
 		else if ( oi is ObjectInfo ) {
-			Log.out( "UserInventory.processItemSelection - ObjectInfo");
+			//Log.out( "UserInventory.processItemSelection - ObjectInfo");
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) ); 
 		}
 		

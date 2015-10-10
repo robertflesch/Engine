@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.panels
 {
+import com.voxelengine.events.ModelEvent;
 import com.voxelengine.GUI.panels.PanelBase;
 import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 import com.voxelengine.worldmodel.models.ModelCache;
@@ -158,11 +159,11 @@ public class PanelModels extends PanelBase
 				// move this item to the players INVENTORY so that is it not "lost"
 				Log.out( "PanelModels.deleteModel - " + _selectedModel.toString(), Log.WARN );
 //				InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_CHANGE, Network.userId, _selectedModel.instanceInfo.guid, 1 ) );
-
-				_selectedModel.dead = true;
+				ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved )
 				if ( _selectedModel.associatedGrain && _selectedModel.instanceInfo.controllingModel ) {
 					_selectedModel.instanceInfo.controllingModel.write( _selectedModel.associatedGrain, TypeInfo.AIR );
 				}
+				_selectedModel.dead = true;
 				populateModels( _dictionarySource, _parentModel );
 				buttonsDisable();
 				UIRegionModelEvent.dispatch( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, _parentModel ) );
@@ -171,6 +172,15 @@ public class PanelModels extends PanelBase
 				noModelSelected();
 		}
 		
+		function modelRemoved( $me:ModelEvent ):void {
+			if ( $me.instanceGuid == _selectedModel.instanceInfo.instanceGuid ) {
+				ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved )
+				VoxelModel.selectedModel.selected = false
+				VoxelModel.selectedModel = null
+				_selectedModel = null
+			}
+		}
+
 		function addModel(event:UIMouseEvent):void { 
 			if ( VoxelModel.selectedModel && null != VoxelModel.selectedModel.instanceInfo.controllingModel )
 				WindowInventoryNew._s_hackShowChildren = true;
@@ -182,6 +192,7 @@ public class PanelModels extends PanelBase
 		}
 	}
 
+	
 	private function selectModel(event:ListEvent):void 
 	{
 		_selectedModel = event.target.data;

@@ -30,7 +30,7 @@ public class ModelPlacementType extends VVCanvas
 	{
 		super( 84, 74 );
 		layout = new AbsoluteLayout();
-		_outline = new Image( Globals.appPath + "assets/textures/toolSelector.png" );
+		_outline = new Image( Globals.texturePath + "toolSelector.png" );
 		addElement( _outline );
 		display();
 		addModelPlacementType();

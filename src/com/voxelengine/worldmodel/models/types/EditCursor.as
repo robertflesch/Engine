@@ -889,7 +889,7 @@ public class EditCursor extends VoxelModel
 					t.z += dy;
 					t.x += dx;
 				}
-				VoxelModel.selectedModel.instanceInfo.positionSetComp( t.x, t.y, t.z );
+				VoxelModel.selectedModel.instanceInfo.positionSetComp( int(t.x), int(t.y), int(t.z) );
 			}
 		}
 	}

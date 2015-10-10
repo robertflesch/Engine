@@ -67,10 +67,13 @@ public class VoxelModel
 		// change the static to new model
 		_s_selectedModel = $val
 		// set new model as selected
-		if ( _s_selectedModel )
+		if ( _s_selectedModel ) {
 			_s_selectedModel.selected = true	
+			Axes.show()
+		}
 		if ( null == $val )
 			Axes.hide()
+			
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	
@@ -491,12 +494,12 @@ public class VoxelModel
 		
 		if ( modelInfo ) {
 			// We have to draw all of the non alpha first, otherwise parts of the tree might get drawn after the alpha does
-			var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
 			modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha );
 		}
 		
 		if ( selected && false == $alpha ) {
 			Axes.positionSet( wsPositionGet() )
+			Axes.rotationSet( instanceInfo.rotationGet )
 			Axes.scaleSet( modelInfo.grainSize )
 			Axes.display()
 		}

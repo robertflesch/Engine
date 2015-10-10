@@ -185,6 +185,7 @@ package com.voxelengine {
 			g_modelPath = g_appPath + "assets/models/";
 			g_soundPath = g_appPath + "assets/sounds/";
 			g_regionPath = g_appPath + "assets/regions/";
+			g_texturePath = g_appPath + "assets/textures/";
 		}
 		
 		private static var g_modelPath:String;
@@ -193,6 +194,9 @@ package com.voxelengine {
 		public static function get soundPath():String { return g_soundPath; }
 		private static var g_regionPath:String;
 		public static function get regionPath():String { return g_regionPath; }
+		
+		private static var g_texturePath:String;
+		public static function get texturePath():String { return g_texturePath; }
 		
 		public static function isGuid(val:String):Boolean { return 30 < val.length; }
 		public static function getUID():String { return GUID.create() }

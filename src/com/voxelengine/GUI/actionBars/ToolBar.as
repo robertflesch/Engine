@@ -39,7 +39,7 @@ package com.voxelengine.GUI.actionBars
 		
 		public function ToolBar( $assetName:String )
 		{
-			var outline:Image = new Image( Globals.appPath + "assets/textures/" + $assetName );
+			var outline:Image = new Image( Globals.texturePath + $assetName );
 			outline.addEventListener(ImageEvent.IMAGE_LOADED, imageLoaded );
 			addElement( outline );
 			

@@ -68,7 +68,7 @@ package com.voxelengine.GUI.actionBars
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onTextureLoadComplete);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
-			loader.load(new URLRequest( Globals.appPath + "assets/textures/shipwheel_150.png" ));
+			loader.load(new URLRequest( Globals.texturePath + "shipwheel_150.png" ));
 			
 			_knob = new KnobButton( 75 );
 			_knob.addEventListener(KnobEvent.KNOB_UPDATE, onKnobUpdate);
