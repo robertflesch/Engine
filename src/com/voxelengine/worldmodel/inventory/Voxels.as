@@ -20,16 +20,11 @@ import com.voxelengine.worldmodel.models.SecureInt;
 public class Voxels
 {
 	private var  _items:Vector.<SecureInt> = new Vector.<SecureInt>( TypeInfo.MAX_TYPE_INFO, true );
-	private var _networkId:String;
-	private var _changed:Boolean;
-	
-	public function get changed():Boolean { return _changed; }
-	public function set changed(value:Boolean):void  { _changed = value; }
-	
 	public function get items():Vector.<SecureInt>  { return _items; }
+	private var _owner:Inventory;
 
-	public function Voxels( $networkId:String ) {
-		_networkId = $networkId;
+	public function Voxels( $owner:Inventory ) {
+		_owner = $owner;
 		
 		var allTypes:Vector.<TypeInfo> = TypeInfo.typeInfo;
 		for ( var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
@@ -49,10 +44,10 @@ public class Voxels
 	// This returns an Array which holds the typeId and the count of those voxels
 	public function types(e:InventoryVoxelEvent):void 
 	{
-		if ( e.networkId == _networkId ) {
+		if ( e.networkId == _owner.guid ) {
 			const cat:String = (e.result as String).toUpperCase();
 			if ( cat == "ALL" ) {
-				InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.TYPES_RESULT, _networkId, -1, _items ) );
+				InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.TYPES_RESULT, _owner.guid, -1, _items ) );
 				return;
 			}
 				
@@ -73,7 +68,7 @@ public class Voxels
 				}
 			}
 
-			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.TYPES_RESULT, _networkId, -1, result ) );
+			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.TYPES_RESULT, _owner.guid, -1, result ) );
 		}
 	}
 	
@@ -81,10 +76,10 @@ public class Voxels
 	{
 		if ( null == _items )
 			return;
-		if ( e.networkId == _networkId ) {
+		if ( e.networkId == _owner.guid ) {
 			var typeId:int = e.typeId;
 			var voxelCount:int = _items[typeId].val;
-			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_RESULT, _networkId, typeId, voxelCount ) );
+			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_RESULT, _owner.guid, typeId, voxelCount ) );
 			return;
 		}
 		//Log.out( "Voxels.voxelCount - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
@@ -95,12 +90,12 @@ public class Voxels
 			if ( _items[typeId] )
 				_items[typeId].val = Math.random() * 1000000;
 		}
-		changed = true;
+		_owner.changed = true;
 	}
 	
 	public function change(e:InventoryVoxelEvent):void {
 		//InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.CHANGE, Network.userId, typeIdToUse, amountInGrain0 ) );		
-		if ( e.networkId == _networkId ) {
+		if ( e.networkId == _owner.guid ) {
 			if ( null == _items ) {
 				Log.out( "Voxels.change - ITEMS NULL", Log.WARN );
 				return;
@@ -111,17 +106,14 @@ public class Voxels
 			voxelCount += changeAmount;
 			_items[typeId].val = voxelCount;
 			//Log.out( "Voxels.change - Succeeded test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
-			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_RESULT, _networkId, typeId, voxelCount ) );
-			changed = true;
+			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_RESULT, _owner.guid, typeId, voxelCount ) );
+			_owner.changed = true;
 			return;
 		}
 		//Log.out( "Voxels.change - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
 	}
 	
-	public function fromPersistance( $dbo:DatabaseObject ):void {}
-	public function toPersistance( $dbo:DatabaseObject ):void {}
-
-	public function fromByteArray( $ba:ByteArray ):void {
+	public function fromObject( $ba:ByteArray ):void {
 		const typesCount:int = $ba.readInt();
 		for ( var i:int; i < typesCount; i++ ) {
 			if ( $ba.bytesAvailable < 4 )
@@ -135,7 +127,6 @@ public class Voxels
 		for ( var i:int; i < TypeInfo.MAX_TYPE_INFO; i++ ) {
 			$ba.writeInt( _items[i].val )
 		}
-		changed = false;
 		return $ba; 
 	}
 }

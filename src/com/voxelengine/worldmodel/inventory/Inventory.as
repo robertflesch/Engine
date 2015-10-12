@@ -17,13 +17,12 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.*;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.models.IPersistance;
 import com.voxelengine.worldmodel.models.PersistanceObject;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 
-public class Inventory extends PersistanceObject implements IPersistance
+public class Inventory extends PersistanceObject
 {
 	// support data for persistance
 	private var _createdDate:Date;
@@ -40,8 +39,8 @@ public class Inventory extends PersistanceObject implements IPersistance
 	
 	public function Inventory( $guid:String ) {
 		super( $guid, Globals.BIGDB_TABLE_INVENTORY );
-		_slots = new Slots( $guid );
-		_voxels = new Voxels( $guid );
+		_slots = new Slots( this );
+		_voxels = new Voxels( this );
 	}
 	
 	public function unload():void {
@@ -50,12 +49,6 @@ public class Inventory extends PersistanceObject implements IPersistance
 		_voxels.unload();
 	}
 		
-	private function changed():Boolean {
-		if ( _slots.changed || _voxels.changed )
-			return true;
-		return false;
-	}
-	
 	public function deleteInventory():void {
 		
 		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, guid, null ) );
@@ -64,34 +57,32 @@ public class Inventory extends PersistanceObject implements IPersistance
 	}
 
 	//////////////////////////////////////////////////////////////////
-	// TO Persistance
+	// Persistance
 	//////////////////////////////////////////////////////////////////
 	
 	override public function save():void {
 		// TODO this needs to detect "changed"
-		if ( loaded ) {
+		if ( !loaded ) {
 			Log.out( "Inventory.save - Not LOADED - guid: " + guid, Log.DEBUG );
 			return; 
 		}
+		Log.out( "Inventory.save - saving - guid: " + guid, Log.DEBUG );
 		super.save();
 	}
-
-	//public function toObject():void {
-		//var ba:ByteArray = new ByteArray();	
-		//_obj.ba = toByteArray( ba );
-	//}
 	
-	public function fromObject( $object:Object, $ba:ByteArray ):void { }
-	
-	public function toPersistance():void {
-		_voxels.toPersistance(dbo);
-		_slots.toPersistance(dbo);
+	override protected function toObject():void {
+		_slots.toObject(dbo);
+		
+		// voxels
 		var ba:ByteArray = new ByteArray(); 
-		dbo.data 			= toByteArray( ba );
+		ba.writeUTF( guid );
+		_voxels.toByteArray( ba );
+		ba.compress();
+		dbo.data = ba;	
 	}
 
 
-	public function fromPersistance( $dbo:DatabaseObject ):void {
+	public function fromObject( $dbo:DatabaseObject ):void {
 		
 		if ( $dbo ) {
 			_createdDate	= $dbo.createdDate;
@@ -99,18 +90,16 @@ public class Inventory extends PersistanceObject implements IPersistance
 			dbo 			= $dbo;
 		}
 		
-		// This tells me how many of each kind I have
-		// Since the slots use voxel data, get it first
-		_voxels.fromPersistance( $dbo );
 		// Slot data is stored as fields for easy analysis
 		// we can know what user carry around
-		_slots.fromPersistance( $dbo );
+		_slots.fromObject( $dbo );
 		
 		if ( $dbo && $dbo.data ) {
 			var ba:ByteArray = $dbo.data 
 			if ( ba && 0 < ba.bytesAvailable ) {
 				ba.uncompress();
-				fromByteArray( ba );
+				var ownerId:String = ba.readUTF();
+				_voxels.fromObject( ba );
 			}
 		}
 		else {
@@ -120,23 +109,6 @@ public class Inventory extends PersistanceObject implements IPersistance
 		}
 	}
 	
-	public function toByteArray( $ba:ByteArray ):ByteArray {
-		$ba.writeUTF( guid );
-		_voxels.toByteArray( $ba );
-		_slots.toByteArray( $ba );
-		$ba.compress();
-		return $ba;	
-	}
-	
-	public function fromByteArray( $ba:ByteArray ):void {
-		var ownerId:String = $ba.readUTF();
-		_voxels.fromByteArray( $ba );
-		_slots.fromByteArray( $ba );
-	}
-	
-	////////////////////////////////////////////////////////////////
-	// FROM Persistance
-	////////////////////////////////////////////////////////////////
 	public function load():void {
 		if ( Globals.online ) {
 			addLoadEvents();
@@ -151,7 +123,7 @@ public class Inventory extends PersistanceObject implements IPersistance
 		// this occurs on first time logging in.
 		removeLoadEvents();
 		Log.out( "Inventory.notFound - OWNER: " + guid, Log.WARN );
-		fromPersistance( null );
+		fromObject( null );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, guid, this ) );
 	}
 	
@@ -162,7 +134,7 @@ public class Inventory extends PersistanceObject implements IPersistance
 		if ( guid != $pe.guid )
 			return;
 		removeLoadEvents();
-		fromPersistance( $pe.dbo );
+		fromObject( $pe.dbo );
 		_loaded = true;
 		//Log.out( "Inventory.loadSuccess - OWNER: " + guid + "  guid: " + $pe.guid, Log.WARN );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, guid, this ) );

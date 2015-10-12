@@ -25,15 +25,10 @@ public class Slots
 	static public const ITEM_COUNT:int = 10;
 	
 	private var _items:Vector.<ObjectInfo> = new Vector.<ObjectInfo>(10, true);
-	private var _owner:String;
-	private var _changed:Boolean;
-	
-	public function get changed():Boolean { return _changed; }
-	public function set changed(value:Boolean):void  { _changed = value; }
-	
+	private var _owner:Inventory;
 	public function get items():Vector.<ObjectInfo>  { return _items; }
 
-	public function Slots( $owner:String ) {
+	public function Slots( $owner:Inventory ) {
 		// Do I need to unregister this?
 		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
 		//InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_DEFAULT_RESPONSE, defaultResponse );
@@ -61,13 +56,13 @@ public class Slots
 	
 	public function slotChange(e:InventorySlotEvent):void {
 		Log.out( "SlotsManager.slotChange slot: " + e.slotId + "  item: " + e.data );
-		if ( _owner == e.ownerGuid ) {
+		if ( _owner.guid == e.ownerGuid ) {
 			if ( _items ) {
 				if ( null == e.data )
 					setItemData( e.slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) );
 				else
 					setItemData( e.slotId, e.data );
-				changed = true;
+				_owner.changed = true;
 			}
 			else
 				Log.out( "SlotsManager.slotChange _slots container not initialized", Log.WARN );
@@ -95,7 +90,7 @@ public class Slots
 		return new ObjectInfo( null, ObjectInfo.OBJECTINFO_INVALID );
 	}
 	
-	public function fromPersistance( $dbo:DatabaseObject ):void {	
+	public function fromObject( $dbo:DatabaseObject ):void {	
 		if ( $dbo && $dbo.slot0 ) {
 			var index:int;
 			setItemData( index, createObjectFromInventoryString( $dbo.slot0, index++ ) );
@@ -114,7 +109,7 @@ public class Slots
 		}
 	}
 	
-	public function toPersistance( $dbo:DatabaseObject ):void {
+	public function toObject( $dbo:DatabaseObject ):void {
 		$dbo.slot0	= _items[0].asInventoryString();
 		$dbo.slot1	= _items[1].asInventoryString();
 		$dbo.slot2	= _items[2].asInventoryString();
@@ -125,7 +120,6 @@ public class Slots
 		$dbo.slot7	= _items[7].asInventoryString();
 		$dbo.slot8	= _items[8].asInventoryString();
 		$dbo.slot9	= _items[9].asInventoryString();
-		changed = false;
 	}
 	
 	private function setItemData( $slot:int, $data:ObjectInfo ):void {
@@ -160,7 +154,9 @@ public class Slots
 	public function addSlotDefaultData():void {
 		Log.out( "Slots.addSlotDefaultData", Log.WARN );
 		initializeSlots();
-		InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, _owner, _owner, 0, null ) );
+		Log.out( "Slots.addSlotDefaultData - How do I pass the model guid in second parameter?", Log.ERROR )
+		// is guid model OR instance?
+		InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, _owner.guid, _owner.guid, 0, null ) );
 	}
 	
 	
@@ -183,8 +179,5 @@ public class Slots
 			setItemData( i, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) );
 		}
 	}
-
-	public function fromByteArray( $ba:ByteArray ):void {}
-	public function toByteArray( $ba:ByteArray ):ByteArray { return $ba; }
 }
 }

@@ -24,7 +24,6 @@ import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.SoundEvent;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.PersistanceObject;
-//import com.voxelengine.worldmodel.models.IPersistance;
 
 public class Ammo extends PersistanceObject
 {

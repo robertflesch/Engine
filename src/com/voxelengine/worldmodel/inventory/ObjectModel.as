@@ -42,14 +42,14 @@ public class ObjectModel extends ObjectInfo
 	
 	override public function asInventoryString():String {
 		if ( ObjectInfo.OBJECTINFO_MODEL == _objectType )
-			return String( _objectType + "" + _modelGuid )
+			return String( _objectType + ";" + _modelGuid )
 			
 		return String( _objectType )	
 	}
 	
 	override public function fromInventoryString( $data:String, $slotId:int ): ObjectInfo {
 		super.fromInventoryString( $data, $slotId )
-		var values:Array = $data.split("")
+		var values:Array = $data.split(";")
 		if ( values.length != 2 ) {
 			Log.out( "ObjectModel.fromInventoryString - not equal to 2 tokens found, length is: " + values.length, Log.WARN )
 			reset()
