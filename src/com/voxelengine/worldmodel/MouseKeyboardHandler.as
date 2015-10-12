@@ -9,6 +9,7 @@
 package com.voxelengine.worldmodel 
 {
 	import com.voxelengine.events.RegionEvent;
+	import com.voxelengine.GUI.WindowSplash;
 	import flash.events.KeyboardEvent;
 	import flash.events.FullScreenEvent;
 	import flash.events.MouseEvent;
@@ -87,6 +88,9 @@ package com.voxelengine.worldmodel
 			if ( (Globals.openWindowCount || Log.showing) && !MouseKeyboardHandler.shift )
 				return 0;
 				
+			if ( WindowSplash.isActive )
+				return 0;
+				
 			var val:Number = 0;
 			if ( Globals.g_app.stage.mouseLock ) {
 				val = _s_x * 50;
@@ -100,6 +104,9 @@ package com.voxelengine.worldmodel
 		
 		static public function getMouseYChange():int {
 			if ( (Globals.openWindowCount || Log.showing)  && !MouseKeyboardHandler.shift )
+				return 0;
+				
+			if ( WindowSplash.isActive )
 				return 0;
 				
 			var val:Number = 0;
