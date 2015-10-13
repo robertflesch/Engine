@@ -8,7 +8,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.panels
 {
+import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelEvent;
+import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.GUI.panels.PanelBase;
 import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 import com.voxelengine.worldmodel.models.ModelCache;
@@ -40,17 +42,12 @@ public class PanelModels extends PanelBase
 	private var _parentModel:VoxelModel;
 	private var _listModels:ListBox;
 	private var _dictionarySource:Function;
-	private var _selectedModel:VoxelModel;
 	private var _buttonContainer:Container
 	
 	private var _detailButton:Button
 	private var _deleteButton:Button
 	
-	//private var _dragOp:DnDOperation = new DnDOperation();
-	
-	
-	public function PanelModels( $parent:PanelModelAnimations, $widthParam:Number, $elementHeight:Number, $heightParam:Number )
-	{
+	public function PanelModels( $parent:PanelModelAnimations, $widthParam:Number, $elementHeight:Number, $heightParam:Number )	{
 		super( $parent, $widthParam, $heightParam );
 		_parent = $parent;
 		
@@ -60,6 +57,7 @@ public class PanelModels extends PanelBase
 		_listModels.draggable = true;
 
 		_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, selectModel );		
+		ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged )
 		
 		buttonsCreate();
 		addElement( _listModels );
@@ -77,14 +75,12 @@ public class PanelModels extends PanelBase
 		
 		_parentModel = null;
 		_dictionarySource = null;
-		_selectedModel = null;
 	}
 	
-	public function populateModels( $source:Function, $parentModel:VoxelModel ):int
-	{
+	public function populateModels( $source:Function, $parentModel:VoxelModel ):int	{
+		Log.out( "PanelModels.populateModels", Log.WARN )
 		_dictionarySource = $source;
 		_parentModel = $parentModel;
-		_selectedModel = null;
 		_listModels.removeAll();
 		var countAdded:int;
 		for each ( var vm:VoxelModel in _dictionarySource() )
@@ -149,35 +145,52 @@ public class PanelModels extends PanelBase
 		_detailButton.width = width - 10;
 		_detailButton.enabled = false;
 		_detailButton.active = false;
-		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new WindowModelDetail( _selectedModel ); } );
+		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new WindowModelDetail( VoxelModel.selectedModel ); } );
 		_detailButton.width = btnWidth;
 		_buttonContainer.addElement( _detailButton );
 		
 		function deleteModelHandler(event:UIMouseEvent):void  {
-			if ( _selectedModel )
-			{
-				// move this item to the players INVENTORY so that is it not "lost"
-				Log.out( "PanelModels.deleteModel - " + _selectedModel.toString(), Log.WARN );
-//				InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_CHANGE, Network.userId, _selectedModel.instanceInfo.guid, 1 ) );
-				ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved )
-				if ( _selectedModel.associatedGrain && _selectedModel.instanceInfo.controllingModel ) {
-					_selectedModel.instanceInfo.controllingModel.write( _selectedModel.associatedGrain, TypeInfo.AIR );
+			if ( VoxelModel.selectedModel )
+				deleteModelCheck()
+			else
+				noModelSelected();
+			
+			function deleteModelCheck():void {
+				var alert:Alert = new Alert( "Do you really want to delete the model '" + VoxelModel.selectedModel.metadata.name + "'?", 400 )
+				alert.setLabels( "Yes", "No" );
+				alert.alertMode = AlertMode.CHOICE;
+				$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
+				alert.display();
+				
+				function alertAction( $ae:AlertEvent ):void {
+					if ( AlertEvent.ACTION == $ae.action )
+						deleteElement()
+					else ( AlertEvent.CHOICE == $ae.action )
+						doNotDelete()
 				}
-				_selectedModel.dead = true;
+				
+				function doNotDelete():void { /* do nothing */ }
+			}
+			
+			function deleteElement():void {
+				Log.out( "PanelModels.deleteModel - " + VoxelModel.selectedModel.toString(), Log.WARN );
+				ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved )
+				if ( VoxelModel.selectedModel.associatedGrain && VoxelModel.selectedModel.instanceInfo.controllingModel ) {
+					VoxelModel.selectedModel.instanceInfo.controllingModel.write( VoxelModel.selectedModel.associatedGrain, TypeInfo.AIR );
+				}
+				VoxelModel.selectedModel.dead = true;
 				populateModels( _dictionarySource, _parentModel );
 				buttonsDisable();
 				UIRegionModelEvent.dispatch( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, _parentModel ) );
+//				InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_CHANGE, Network.userId, _selectedModel.instanceInfo.guid, 1 ) );
 			}
-			else
-				noModelSelected();
 		}
 		
 		function modelRemoved( $me:ModelEvent ):void {
-			if ( $me.instanceGuid == _selectedModel.instanceInfo.instanceGuid ) {
+			if ( $me.instanceGuid == VoxelModel.selectedModel.instanceInfo.instanceGuid ) {
 				ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved )
 				VoxelModel.selectedModel.selected = false
 				VoxelModel.selectedModel = null
-				_selectedModel = null
 			}
 		}
 
@@ -192,16 +205,30 @@ public class PanelModels extends PanelBase
 		}
 	}
 
-	
-	private function selectModel(event:ListEvent):void 
-	{
-		_selectedModel = event.target.data;
-		if ( _selectedModel )
-		{
+	private function metadataChanged( $mme:ModelMetadataEvent ):void {
+		
+		//if ( $mme.modelGuid == om.modelGuid ) {
+			//ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged )
+			//om.vmm = $mme.modelMetadata
+			//updateObjectInfo( om )
+		//}
+		for ( var i:int; i < _listModels.length; i++ ) {
+			var listItem:ListItem = _listModels.getItemAt( i )
+			var vm:VoxelModel = listItem.data as VoxelModel
+			if ( $mme.modelGuid == vm.modelInfo.guid ) {
+				//_listModels.removeItemAt( i )
+				_listModels.updateItemAt( i, vm.metadata.name, vm )
+			}
+		}
+		
+	}
+
+	private function selectModel(event:ListEvent):void {
+		if ( event.target.data ) {
 			buttonsEnable();
-			VoxelModel.selectedModel = _selectedModel
+			VoxelModel.selectedModel = event.target.data
 			// TO DO this is the right path, but probably need a custom event for this...
-			UIRegionModelEvent.dispatch( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, _selectedModel, _parentModel ) );
+			UIRegionModelEvent.dispatch( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, VoxelModel.selectedModel, _parentModel ) );
 			//_parent.childPanelAdd( _selectedModel );
 			//_parent.animationPanelAdd( _selectedModel );
 		}
@@ -224,8 +251,7 @@ public class PanelModels extends PanelBase
 		_deleteButton.active = true;
 	}
 	
-	private function noModelSelected():void
-	{
+	private function noModelSelected():void	{
 		(new Alert( LanguageManager.localizedStringGet( "No_Model_Selected" ) )).display();
 	}
 	
