@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models.makers
 {
 
+import com.voxelengine.events.InventoryModelEvent;
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
@@ -33,6 +34,7 @@ public class ModelDestroyer {
 		Log.out( "ModelDestroyer - removing modelGuid: " + _modelGuid + ( _recursive ? " and children from" : " from" ) + " persistance" );
 		
 		// remove inventory
+		InventoryModelEvent.dispatch( new InventoryModelEvent( ModelBaseEvent.DELETE, "", _modelGuid, null ) )
 		// request the ModelData so that we can get the modelInfo from it.
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, dataResult );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, dataResult );

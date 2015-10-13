@@ -10,6 +10,8 @@ package com.voxelengine.GUI.actionBars
 {
 import com.voxelengine.events.AppEvent;
 import com.voxelengine.events.CursorOperationEvent;
+import com.voxelengine.events.InventoryModelEvent;
+import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.worldmodel.models.ModelPlacementType;
 import flash.display.DisplayObject;
 import flash.events.MouseEvent;
@@ -105,8 +107,23 @@ public class  UserInventory extends QuickInventory
 		RoomEvent.addListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
 		InventoryEvent.addListener( InventoryEvent.RESPONSE, inventoryLoaded );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, _owner, null ) );
+		InventoryModelEvent.addListener( ModelBaseEvent.DELETE, modelDeleted )	
 	}
-
+	
+	private function modelDeleted(e:InventoryModelEvent):void {
+		for each ( var bi:BoxInventory in boxes ) {
+			if ( bi.objectInfo is ObjectModel ) {
+				var om:ObjectModel = bi.objectInfo as ObjectModel
+				if ( e.itemGuid == om.modelGuid )
+					InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, _owner, "", int(bi.name), null ) );
+					if ( int(bi.name) == lastBoxesSelection ) {
+						CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) );
+						hideModelTools()
+					}
+					bi.reset()
+			}
+		}
+	}
 	
 	private function onJoinRoomEvent(e:RoomEvent):void 
 	{
@@ -198,6 +215,8 @@ public class  UserInventory extends QuickInventory
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) );
 		}
 	}
+	
+	
 	
 	private function dropMaterial(e:DnDEvent):void  {
 		if ( e.dropTarget is BoxInventory && e.dragOperation.initiator is BoxInventory )

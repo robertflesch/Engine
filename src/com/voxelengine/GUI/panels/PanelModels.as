@@ -67,6 +67,12 @@ public class PanelModels extends PanelBase
 		//_listModels.eventCollector.addEvent( _dragOp, DnDEvent.DND_DROP_ACCEPTED, dropMaterial );
 		//_listModels.eventCollector.addEvent( this, ListEvent.ITEM_PRESSED, doDrag);
 		//addListeners();
+		
+		//_listModels.eventCollector.addEvent( _listModels, ListEvent.LIST_CHANGED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - LIST_CHANGED $le: " + $le ) } )		
+		//_listModels.eventCollector.addEvent( _listModels, ListEvent.EDITED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - EDITED $le: " + $le ) } )		
+		//_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_CLICKED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - ITEM_CLICKED $le: " + $le ) } )		
+		//_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - ITEM_PRESSED $le: " + $le ) } )		
+		//_listModels.eventCollector.addEvent( _listModels, ListEvent.DATA_PROVIDER_CHANGED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - DATA_PROVIDER_CHANGED $le: " + $le ) } )		
 	}
 	
 	override public function close():void {
