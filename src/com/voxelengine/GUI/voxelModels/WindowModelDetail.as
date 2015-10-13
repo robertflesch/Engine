@@ -1,6 +1,7 @@
 
 package com.voxelengine.GUI.voxelModels
 {
+	import com.voxelengine.events.ModelInfoEvent;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.events.MouseEvent;
@@ -215,7 +216,14 @@ package com.voxelengine.GUI.voxelModels
 			_s_inExistance--;
 			_s_currentInstance = null;
 	
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, null ) );
+			if ( _vm.metadata.changed ) {
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.metadata ) );
+				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, null ) );
+			}
+			if ( _vm.modelInfo.changed ) {
+				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.modelInfo ) );
+				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, null ) );
+			}
 //			ModelEvent.dispatch( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.instanceGuid ) );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, 0, Region.currentRegion.guid ) );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
