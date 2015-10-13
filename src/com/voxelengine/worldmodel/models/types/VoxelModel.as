@@ -202,7 +202,7 @@ public class VoxelModel
 		return totalPosition;
 	}
 	
-	// returns the location of this model in the model space
+	// returns the location of this model in the world space
 	public function wsPositionGet():Vector3D
 	{
 		if (instanceInfo.controllingModel)
@@ -498,7 +498,7 @@ public class VoxelModel
 		}
 		
 		if ( selected && false == $alpha ) {
-			Axes.positionSet( wsPositionGet() )
+			Axes.positionSet( instanceInfo.positionGet )
 			Axes.rotationSet( instanceInfo.rotationGet )
 			Axes.scaleSet( modelInfo.grainSize )
 			Axes.display()
