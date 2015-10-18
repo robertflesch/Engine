@@ -18,6 +18,8 @@ import com.voxelengine.worldmodel.models.OxelPersistance;
  */
 public class OxelDataEvent extends ModelBaseEvent
 {
+	static public const OXEL_READY:String					= "OXEL_READY"
+	
 	private var _od:OxelPersistance;
 	private var _modelGuid:String;
 	private var _fromTables:Boolean;

@@ -244,6 +244,13 @@ public class InstanceInfo extends Location	{
 		//return instanceGuid;	
 	//}
 	
+	public function modelGuidChain( $models:Vector.<String> ):void {
+		if ( controllingModel ) {
+			$models.push( controllingModel.modelInfo.guid )
+			return controllingModel.instanceInfo.modelGuidChain( $models );
+		}
+	}
+
 	public function topmostModelGuid():String {
 		if ( controllingModel )
 			return controllingModel.instanceInfo.topmostModelGuid();

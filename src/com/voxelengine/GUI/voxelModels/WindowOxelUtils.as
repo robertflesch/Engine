@@ -41,30 +41,25 @@ public class WindowOxelUtils extends VVPopup
 		rotate.width = 150;
 		addElement( rotate );
 		
-		var center:Button = new Button( "Center" );
-		center.addEventListener(UIMouseEvent.CLICK, centerHandler );
-		center.width = 150;
-		addElement( center );
+		//var center:Button = new Button( "Center" );
+		//center.addEventListener(UIMouseEvent.CLICK, centerHandler );
+		//center.width = 150;
+		//addElement( center );
 		
 		var mergeSame:Button = new Button( "Merge Same Oxel" );
 		mergeSame.addEventListener(UIMouseEvent.CLICK, mergeSameHandler );
 		mergeSame.width = 150;
 		addElement( mergeSame );
 		
-		var mergeAir:Button = new Button( "Merge Air" );
-		mergeAir.addEventListener(UIMouseEvent.CLICK, mergeAirHandler );
-		mergeAir.width = 150;
-		addElement( mergeAir );
-		
-		var breakDownB:Button = new Button( "Breakdown" );
-		breakDownB.addEventListener(UIMouseEvent.CLICK, breakdownHandler );
-		breakDownB.width = 150;
-		addElement( breakDownB );
-
-		var validate:Button = new Button( "Validate" );
-		validate.addEventListener(UIMouseEvent.CLICK, validateHandler );
-		validate.width = 150;
-		addElement( validate );
+		//var breakDownB:Button = new Button( "Breakdown" );
+		//breakDownB.addEventListener(UIMouseEvent.CLICK, breakdownHandler );
+		//breakDownB.width = 150;
+		//addElement( breakDownB );
+//
+		//var validate:Button = new Button( "Validate" );
+		//validate.addEventListener(UIMouseEvent.CLICK, validateHandler );
+		//validate.width = 150;
+		//addElement( validate );
 		
 		var decreaseGrain:Button = new Button( "Decrease Grain" );
 		decreaseGrain.addEventListener(UIMouseEvent.CLICK, decreaseGrainHandler );
@@ -144,8 +139,7 @@ public class WindowOxelUtils extends VVPopup
 		_reloadTimer.start();
 	}
 
-	protected function onRepeat(event:TimerEvent):void
-	{
+	protected function onRepeat(event:TimerEvent):void {
 		Log.out( "WindowOxelUtils.onRepeat - startingVal: " + startingVal );
 		_vm.modelInfo.data.oxel.fullBright( startingVal );
 		
@@ -156,56 +150,39 @@ public class WindowOxelUtils extends VVPopup
 		startingVal++;
 	}
 	
-	//private function saveModelDataHandler(event:UIMouseEvent):void 
-	//{
-		//Globals.g_gui.saveModelIVM(null);
-	//}
-
-	private function rotateHandler(event:UIMouseEvent):void 
-	{
+	private function rotateHandler(event:UIMouseEvent):void {
 		_vm.modelInfo.data.oxel.rotateCCW();
 	}
 
-	private function centerHandler(event:UIMouseEvent):void 
-	{
+	private function centerHandler(event:UIMouseEvent):void {
 		_vm.modelInfo.data.oxel.centerOxel();
 	}
 	
-	private function breakdownHandler(event:UIMouseEvent):void 
-	{
+	private function breakdownHandler(event:UIMouseEvent):void {
 		_vm.breakdown();
 	}
 	
-	private function changeTypeHandler(event:UIMouseEvent):void 
-	{
+	private function changeTypeHandler(event:UIMouseEvent):void {
 		new WindowChangeType( _vm );
 	}
 
-	private function validateHandler(event:UIMouseEvent):void 
-	{
-		_vm.validate();
-		_vm.modelInfo.data.oxel.rebuildAll();
+	private function validateHandler(event:UIMouseEvent):void {
+		_vm.validate()
+		_vm.modelInfo.data.oxel.rebuildAll()
+		_vm.modelInfo.data.changed = true
 	}
 	
-	private function mergeSameHandler(event:UIMouseEvent):void 
-	{
-		_vm.modelInfo.data.oxel.mergeAndRebuild();
+	private function mergeSameHandler(event:UIMouseEvent):void {
+		_vm.modelInfo.data.oxel.mergeAndRebuild()
+		_vm.modelInfo.data.changed = true
 	}
 	
-	private function mergeAirHandler(event:UIMouseEvent):void 
-	{
-		_vm.modelInfo.data.oxel.mergeAirAndRebuild();
+	private function decreaseGrainHandler(event:UIMouseEvent):void {
+		_vm.changeGrainSize( -1 )
 	}
 	
-	
-	private function decreaseGrainHandler(event:UIMouseEvent):void 
-	{
-		_vm.changeGrainSize( -1 );
-	}
-	
-	private function increaseGrainHandler(event:UIMouseEvent):void 
-	{
-		_vm.changeGrainSize( 1 );
+	private function increaseGrainHandler(event:UIMouseEvent):void {
+		_vm.changeGrainSize( 1 )
 	}
 }	
 }

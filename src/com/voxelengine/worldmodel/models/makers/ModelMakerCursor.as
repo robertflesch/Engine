@@ -41,6 +41,7 @@ public class ModelMakerCursor extends ModelMakerBase {
 			if ( vm ) {
 				vm.complete = true;
 				EditCursor.currentInstance.objectModelSet( vm );
+				vm.calculateCenter()
 			}
 			markComplete( true, vm );
 		}

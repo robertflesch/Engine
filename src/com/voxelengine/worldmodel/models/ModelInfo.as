@@ -163,6 +163,7 @@ public class ModelInfo extends PersistanceObject
 					OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.UPDATE_GUID, 0, altGuid + ":" + guid, null ) );
 				_data.save();
 			}
+			OxelDataEvent.dispatch( new OxelDataEvent( OxelDataEvent.OXEL_READY, 0, guid, _data ) )
 		}
 	}
 	
@@ -426,42 +427,50 @@ public class ModelInfo extends PersistanceObject
 		//var me:ModelEvent = new ModelEvent( ModelEvent.REMOVE, vm.instanceInfo.guid, instanceInfo.guid );
 		//Globals.g_app.dispatchEvent( me );
 	}
+	
+	private function childExists( $child:VoxelModel ):Boolean {
+		for each ( var vm:VoxelModel in childVoxelModels ) {
+			if ( vm.instanceInfo.instanceGuid == $child.instanceInfo.instanceGuid )
+				return true
+		}
+		return false
+	}
 
 	// This should only be called from voxelModel who can check permissions
 	public function childAdd( $child:VoxelModel):void {
+		//Log.out(  "-------------- VoxelModel.childAdd -  $child: " +  $child.toString() );
 		if ( null ==  $child.instanceInfo.instanceGuid )
 			 $child.instanceInfo.instanceGuid = Globals.getUID();
-		//Log.out(  "-------------- VoxelModel.childAdd -  $child: " +  $child.toString() );
-		// remove parent level model
-		childVoxelModels.push( $child);
-		// Dont add the player to the instanceInfo, or you end up in a recursive loop
-		if ( $child is Player )
-			return;
-		else
-			childrenAdd( $child.instanceInfo )
-		// Do I need to return to player to a parent model when leaving a ridable.
-//		Region.currentRegion.modelCache.changeFromParentToChild( $child);
 
-		function childrenAdd( $instanceInfo:InstanceInfo ):void {
-			if ( guid == $instanceInfo.modelGuid ) {
-				// TODO this needs to examine all of the children in that model guid.
-				// Since this would allow B owns A, and you could add B to A, which would cause a recurvise error
-				Log.out( "ModelInfo.childAddInstanceInfo - Rejecting child with same model guid as parent", Log.ERROR );
-				return;
-			}
-			// Dont add child that already exist
-			if ( info.model.children ) {
-				for each ( var child:Object in info.model.children ) {
-					if ( child.instanceGuid === $instanceInfo.instanceGuid )
-						return;
-				}
-			}
-			else 
-				info.model.children = new Array();
-				
-			changed = true;
-			info.model.children[info.model.children.length] = $instanceInfo.toObject();
+		// this examines all of the parents in that model guid.
+		// Since this would allow B owns A, and you could add B to A, which would cause a recurvise error
+		var modelGuidChain:Vector.<String> = new Vector.<String>;
+		 $child.instanceInfo.modelGuidChain( modelGuidChain )
+		for each ( var modelGuid:String in modelGuidChain ) {
+			if ( $child.modelInfo.guid == modelGuid )
+				return
 		}
+		
+		// templates would like to add the child for each instance, that is a no no..
+		if ( !childExists( $child ) )
+			childVoxelModels.push( $child);
+		
+		// Dont add child that already exist
+		if ( info.model.children ) {
+			for each ( var child:Object in info.model.children ) {
+				if ( child.instanceGuid === $child.instanceInfo.instanceGuid )
+					return;
+			}
+		}
+		else 
+			info.model.children = new Array();
+
+			
+		// Dont add the player to the info.model.children, or you end up in a recursive loop
+		if ( $child is Player )
+			return
+		changed = true;
+		info.model.children[info.model.children.length] = $child.instanceInfo.toObject();
 	}
 	
 	// This leaves the model, but detaches it from parent.

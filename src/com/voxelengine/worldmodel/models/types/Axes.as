@@ -87,6 +87,13 @@ public class Axes extends VoxelModel
 		}
 	}
 	
+	static public function centerSet( $rot:Vector3D ):void {
+		if ( _model ) {
+			_model.instanceInfo.centerSetComp( $rot.x, $rot.y, $rot.z )
+		}
+	}
+	
+	
 	public function Axes( instanceInfo:InstanceInfo ) { 
 		super( instanceInfo )
 	}

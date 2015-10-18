@@ -772,21 +772,22 @@ public class Oxel extends OxelBitfields
 		// This is only a two level merge, brain not up to a n level recursive today...
 		if ( TypeInfo.AIR == type && p )
 		{
-			// make a copy since this oxel may be going away.
-			if ( p.checkForMerge() )
-			{
-				p = p.parent;
-				if ( p && p.checkForMerge() ) {
-					if ( null == p )
-						Log.out( "out" );
-					return p;
-					
-				}
-				else 
-					if ( null == p )
-						Log.out( "out1" );
-					return p;
-			}
+			p.mergeRecursive()		
+			//// make a copy since this oxel may be going away.
+			//if ( p.checkForMerge() )
+			//{
+				//p = p.parent;
+				//if ( p && p.checkForMerge() ) {
+					//if ( null == p )
+						//Log.out( "out" );
+					//return p;
+					//
+				//}
+				//else 
+					//if ( null == p )
+						//Log.out( "out1" );
+					//return p;
+			//}
 		}
 		
 		return this;
@@ -843,17 +844,6 @@ public class Oxel extends OxelBitfields
 		Log.out("Oxel.mergeAndRebuild - rebuildAll took: " + (getTimer() - _timer));
 	}
 	
-	public function mergeAirAndRebuild():void {
-		var _timer:int = getTimer();
-		Oxel.nodes = 0;
-		mergeAirRecursive();
-		Log.out("Oxel.mergeAirAndRebuild - merge took: " + (getTimer() - _timer) + " count " + Oxel.nodes );
-		
-		_timer = getTimer();
-		rebuildAll();
-		Log.out("Oxel.mergeAirAndRebuild - rebuildAll took: " + (getTimer() - _timer));
-	}
-
 	public function checkForMerge():Boolean	{
 		const childType:uint = _children[0].type;
 		var hasBrightnessData:Boolean = false;
@@ -888,7 +878,7 @@ public class Oxel extends OxelBitfields
 		}
 		nodes += 8;
 		childrenPrune();
-		neighborsInvalidate();
+		neighborsInvalidate();22
 		
 		if ( childType != type )
 			type = childType;
@@ -896,35 +886,15 @@ public class Oxel extends OxelBitfields
 		return true;	
 	}
 	
-	public function mergeRecursive():Boolean {
-		if ( childrenHas() )
-		{
-			for each ( var child:Oxel in _children ) 
-			{
+	private function mergeRecursive():Boolean {
+		if ( childrenHas() ) {
+			for each ( var child:Oxel in _children ) {
 				if ( child.mergeRecursive() )
-				return false;
+					return false;
 			}
 		}
-		else
-		{
+		else {
 			if ( _parent )
-				return _parent.checkForMerge();
-		}
-		return false;
-	}
-	
-	public function mergeAirRecursive():Boolean {
-		if ( childrenHas() )
-		{
-			for each ( var child:Oxel in _children ) 
-			{
-				if ( child.mergeRecursive() )
-				return false;
-			}
-		}
-		else
-		{
-			if ( _parent && TypeInfo.AIR == type )
 				return _parent.checkForMerge();
 		}
 		return false;
@@ -1900,14 +1870,11 @@ public class Oxel extends OxelBitfields
 	}
 
 	public function lineIntersectWithChildren( $msStartPoint:Vector3D, $msEndPoint:Vector3D, $msIntersections:Vector.<GrainCursorIntersection>, $minSize:int = 2 ):void	{
-		if ( !childrenHas() )
-		{
-			if ( TypeInfo.AIR != type )
-				gc.lineIntersect( this, $msStartPoint, $msEndPoint, $msIntersections );
-		}
-		else if ( gc.grain <=  $minSize	)			
+		
+		if ( !childrenHas() && TypeInfo.AIR != type )
 			gc.lineIntersect( this, $msStartPoint, $msEndPoint, $msIntersections );
-
+		else if ( gc.grain <=  $minSize	)			
+			gc.lineIntersect( this, $msStartPoint, $msEndPoint, $msIntersections );		
 		// find the oxel that is closest to the start point, and is solid?
 		// first do a quick check to see if ray hits any children.
 		// then for any children it hits, do a hit test with its children
@@ -1924,7 +1891,8 @@ public class Oxel extends OxelBitfields
 					gcIntersection.oxel = child;
 					totalIntersections.push( gcIntersection );
 				}
-				childIntersections.splice( 0, childIntersections.length );
+				//childIntersections.splice( 0, childIntersections.length );
+				childIntersections.length = 0
 			}
 			// if nothing to work with leave early
 			if ( 0 == totalIntersections.length )
@@ -1946,19 +1914,20 @@ public class Oxel extends OxelBitfields
 				}
 			}
 		}
+		
+		function intersectionsSort( pointModel1:GrainCursorIntersection, pointModel2:GrainCursorIntersection ):Number {
+			// TODO subtract is SLOW
+			var point1Rel:Number = _s_scratchVector.subtract( pointModel1.point ).length;
+			var point2Rel:Number = _s_scratchVector.subtract( pointModel2.point ).length;
+			if ( point1Rel < point2Rel )
+				return -1;
+			else if ( point1Rel > point2Rel ) 
+				return 1;
+			else 
+				return 0;			
+		}
 	}
 	
-	private function intersectionsSort( pointModel1:GrainCursorIntersection, pointModel2:GrainCursorIntersection ):Number {
-		// TODO subtract is SLOW
-		var point1Rel:Number = _s_scratchVector.subtract( pointModel1.point ).length;
-		var point2Rel:Number = _s_scratchVector.subtract( pointModel2.point ).length;
-		if ( point1Rel < point2Rel )
-			return -1;
-		else if ( point1Rel > point2Rel ) 
-			return 1;
-		else 
-			return 0;			
-	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Intersection functions END

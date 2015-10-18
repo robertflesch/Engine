@@ -124,9 +124,10 @@ public class ModelCache
 		// if this is a child model, give it to parent, 
 		// next check to see if its a dynamic model
 		//otherwise add it to ModelCache list.
-		//Log.out( "ModelCache.add - name: " + vm.metadata.name + "  guid: " + vm.instanceInfo.modelGuid + "  instanceGuid: " + vm.instanceInfo.instanceGuid, Log.WARN );			
+		Log.out( "ModelCache.add - name: " + vm.metadata.name + "  guid: " + vm.instanceInfo.modelGuid + "  instanceGuid: " + vm.instanceInfo.instanceGuid, Log.WARN );			
 		if ( vm.instanceInfo.controllingModel )
 		{
+			Log.out( "    which is child of  - name: " + vm.instanceInfo.controllingModel.metadata.name + "  guid: " + vm.instanceInfo.controllingModel.instanceInfo.modelGuid + "  instanceGuid: " + vm.instanceInfo.controllingModel.instanceInfo.instanceGuid, Log.WARN );			
 			vm.instanceInfo.controllingModel.childAdd( vm );
 			// ah, this is the instance by guid, basically the look up spot for things...
 			// not the instances, which are used to draw everything.

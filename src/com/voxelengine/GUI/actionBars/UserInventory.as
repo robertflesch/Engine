@@ -80,6 +80,8 @@ public class  UserInventory extends QuickInventory
 		InventoryInterfaceEvent.addListener( InventoryInterfaceEvent.DISPLAY, displayEvent );
 	}
 	
+
+	
 	public function UserInventory( $owner:String, $image:String ) {
 		_owner = $owner;
 		//Log.out( "UserInventory.create ===================== <<<<<<<<< " + _owner + " <<<<<<<<<<<< ========================", Log.WARN );
@@ -108,8 +110,12 @@ public class  UserInventory extends QuickInventory
 		InventoryEvent.addListener( InventoryEvent.RESPONSE, inventoryLoaded );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, _owner, null ) );
 		InventoryModelEvent.addListener( ModelBaseEvent.DELETE, modelDeleted )	
+		CursorOperationEvent.addListener( CursorOperationEvent.NONE, onCursorOperationNone )	
 	}
 	
+	private function onCursorOperationNone(e:CursorOperationEvent):void { 
+		onDeactivate(null) 
+	}
 	private function modelDeleted(e:InventoryModelEvent):void {
 		for each ( var bi:BoxInventory in boxes ) {
 			if ( bi.objectInfo is ObjectModel ) {
@@ -137,6 +143,7 @@ public class  UserInventory extends QuickInventory
 		InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
 		AppEvent.addListener( AppEvent.APP_DEACTIVATE, onDeactivate );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.UNLOAD_REQUEST, _owner, null ) );
+		CursorOperationEvent.removeListener( CursorOperationEvent.NONE, onCursorOperationNone )	
 		_s_currentInstance = null;
 		super.remove();
 	}
@@ -144,6 +151,8 @@ public class  UserInventory extends QuickInventory
 	private function onDeactivate( $ae:AppEvent ):void {
 		processItemSelection( boxes[1] )
 	}
+	
+	
 
 	static private function displayEvent(e:InventoryInterfaceEvent):void {
 		// build it the first time
@@ -318,6 +327,8 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private var _lastCursorType:int
+	
+	
 	
 	private function processItemSelection( box:UIObject ):void {
 		Log.out( "UserInventory.processItemSelection - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex + " box.name: " + box.name, Log.DEBUG );

@@ -308,7 +308,8 @@ public class EditCursor extends VoxelModel
 		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_UP, 	 mouseUp);
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_MOVE,  mouseMove);
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_DOWN, 	mouseDown);
+		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_DOWN,  mouseDown);
+		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);			
 	}
 
 	
@@ -362,12 +363,12 @@ public class EditCursor extends VoxelModel
 		
 		gciData = null;
 		// this puts the insert/delete location if appropriate into the gciData
-		if ( _cursorOperation != CursorOperationEvent.NONE )
+		if ( cursorOperation != CursorOperationEvent.NONE )
 			ModelCacheUtils.highLightEditableOxel();
 
 		// We generate gci data for INSERT_MODEL with cursorShape == MODEL_CHILD || MODEL_AUTO
 		if ( gciData ) {
-			if ( _cursorOperation == CursorOperationEvent.INSERT_OXEL || _cursorOperation == CursorOperationEvent.INSERT_MODEL ) {
+			if ( cursorOperation == CursorOperationEvent.INSERT_OXEL || cursorOperation == CursorOperationEvent.INSERT_MODEL ) {
 				// This gets the closest open oxel along the ray
 				insertLocationCalculate( gciData.model );
 				PlacementLocation.INVALID == _pl.state ?  oxelTexture = EDITCURSOR_INVALID : oxelTexture = oxelTextureValid;
@@ -377,7 +378,7 @@ public class EditCursor extends VoxelModel
 
 				instanceInfo.positionSetComp( _pl.gc.getModelX(), _pl.gc.getModelY(), _pl.gc.getModelZ() );
 			}
-			else if ( _cursorOperation == CursorOperationEvent.DELETE_OXEL || _cursorOperation == CursorOperationEvent.DELETE_MODEL ) {
+			else if ( cursorOperation == CursorOperationEvent.DELETE_OXEL || cursorOperation == CursorOperationEvent.DELETE_MODEL ) {
 				instanceInfo.positionSetComp( _gciData.gc.getModelX(), _gciData.gc.getModelY(), _gciData.gc.getModelZ() );
 			}
 			buildCursorModel();	
@@ -510,12 +511,14 @@ public class EditCursor extends VoxelModel
 			ii.controllingModel = VoxelModel.selectedModel;
 			// This places an oxel that is invisible, but collidable at the same location as the model
 			// This should lock the model to that location, otherwise the oxel is invalid.
-			VoxelModel.selectedModel.write( _pl.gc, 101 );
+			VoxelModel.selectedModel.write( _pl.gc, 99 );
 			// This adds a link from the model to the placement location
 			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelInsertComplete );			
 		}
-			
+		
+		Log.out( "EditCursor.insertModel - before load" );		
 		ModelMakerBase.load( ii, true );
+		Log.out( "EditCursor.insertModel - after load" );		
 		
 		//Now we need to listen for the model to be built, then use associatedGrain to see the location on the new ModelBaseEvent
 		function modelInsertComplete( $mle:ModelLoadingEvent ): void {
@@ -910,6 +913,7 @@ public class EditCursor extends VoxelModel
 			_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
 			_repeatTimer.start();
 			
+			Log.out( "EditCursor.mouseDown" )
 			switch (e.type) 
 			{
 				case "mouseDown": case Keyboard.NUMPAD_ADD:
@@ -925,7 +929,7 @@ public class EditCursor extends VoxelModel
 	}
 	
 	import flash.utils.getTimer;
-	private static const WAITING_PERIOD:int = 50;
+	private static const WAITING_PERIOD:int = 100;
 	private var doubleMessageHackTime:int = getTimer();
 	private function get doubleMessageHack():Boolean {
 		var newTime:int = getTimer();

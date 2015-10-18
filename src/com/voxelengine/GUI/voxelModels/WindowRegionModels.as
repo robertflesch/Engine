@@ -1,6 +1,7 @@
 
 package com.voxelengine.GUI.voxelModels
 {
+	import com.voxelengine.events.CursorOperationEvent;
 	import com.voxelengine.GUI.panels.PanelBase;
 	import com.voxelengine.GUI.panels.PanelModelAnimations;
 	import org.flashapi.swing.*;
@@ -28,6 +29,7 @@ package com.voxelengine.GUI.voxelModels
 			display();
 			
 			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelAdded );
+			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) )
         }
 		
 		private function onParentModelAdded(event:ModelEvent):void {

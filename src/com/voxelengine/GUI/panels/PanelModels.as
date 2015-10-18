@@ -84,7 +84,7 @@ public class PanelModels extends PanelBase
 	}
 	
 	public function populateModels( $source:Function, $parentModel:VoxelModel ):int	{
-		Log.out( "PanelModels.populateModels", Log.WARN )
+		Log.out( "PanelModels.populateModels - parentModel:" + $parentModel, Log.WARN )
 		_dictionarySource = $source;
 		_parentModel = $parentModel;
 		_listModels.removeAll();
@@ -195,8 +195,10 @@ public class PanelModels extends PanelBase
 		function modelRemoved( $me:ModelEvent ):void {
 			if ( $me.instanceGuid == VoxelModel.selectedModel.instanceInfo.instanceGuid ) {
 				ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved )
-				VoxelModel.selectedModel.selected = false
-				VoxelModel.selectedModel = null
+				if ( null == _parentModel ) {
+					VoxelModel.selectedModel.selected = false
+					VoxelModel.selectedModel = null
+				}
 			}
 		}
 

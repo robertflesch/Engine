@@ -80,8 +80,8 @@ package com.voxelengine.worldmodel.models
 	
 		public function statAdd( type:int, grain:int ):void
 		{
-			if ( type < 100 )
-				Log.out( "ModelStatisics.statAdd - Where does this come from?" );
+			if ( type < 99 )
+				Log.out( "ModelStatisics.statAdd - Where does this come from: " + type );
 			if ( isNaN( _stats[type] ) )
 				_stats[type]  = 0;
 			var count:int = Math.pow( Math.pow( 2, grain ), 3 );			

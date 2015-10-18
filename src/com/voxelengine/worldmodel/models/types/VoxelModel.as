@@ -154,6 +154,8 @@ public class VoxelModel
 		_modelInfo = $mi;
 		_metadata = $vmm;
 
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );		
+		
 		if ( null == _metadata )
 			Log.out( "VoxelModel.init - IS NULL ModelMetadata valid?", Log.ERROR );
 		
@@ -171,6 +173,13 @@ public class VoxelModel
 			stateSet(instanceInfo.state)
 			
 		processClassJson();
+	}
+	
+	private function oxelDataRetrieved(e:OxelDataEvent):void {
+		if ( e.modelGuid == modelInfo.guid ) {
+			OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelDataRetrieved )
+			calculateCenter()
+		}
 	}
 	
 	
@@ -500,6 +509,7 @@ public class VoxelModel
 		if ( selected && false == $alpha ) {
 			Axes.positionSet( instanceInfo.positionGet )
 			Axes.rotationSet( instanceInfo.rotationGet )
+			Axes.centerSet( instanceInfo.center )
 			Axes.scaleSet( modelInfo.grainSize )
 			Axes.display()
 		}
@@ -534,13 +544,13 @@ public class VoxelModel
 		}
 	}
 
-	public function calculateCenter( $oxelCenter:int = 0 ):void
-	{
-		if ( 0 == instanceInfo.center.length )
-		{
+	public function calculateCenter( $oxelCenter:int = 0 ):void {
+		if ( 0 == instanceInfo.center.length ) {
 			if ( 0 == $oxelCenter )
-				$oxelCenter = modelInfo.data.oxel.size_in_world_coordinates() / 2;
-			instanceInfo.centerSetComp( $oxelCenter, $oxelCenter, $oxelCenter ); 
+				if ( modelInfo.data && modelInfo.data.oxel ) {
+					$oxelCenter = modelInfo.data.oxel.size_in_world_coordinates() / 2;
+					instanceInfo.centerSetComp( $oxelCenter, $oxelCenter, $oxelCenter )
+				}
 		}
 	}
 	
