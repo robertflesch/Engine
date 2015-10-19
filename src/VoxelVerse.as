@@ -312,6 +312,7 @@ class VVInitializer
 {
 	static public function initialize( $stage:Stage ):void {
 		
+		Log.init()
 		//Log.out("VVInitializer.initialize", Log.DEBUG )
 		//var strUserAgent:String = String(ExternalInterface.call("function() {return navigator.userAgent}")).toLowerCase()			
 		

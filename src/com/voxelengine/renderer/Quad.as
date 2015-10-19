@@ -324,8 +324,7 @@ public class Quad {
 			fs = _s_flowScaling;
 			
 		//Log.out( "Quad.add type: " + $type );
-		var tint:uint = $ti.color; // I think %ti color is correct here.
-		//var tint:uint = $lighting.color;
+		var tint:uint = $ti.color;
 		
 		switch ( $face ) 
 		{
@@ -387,7 +386,7 @@ public class Quad {
 				Log.out( "Quad.addStraightVertices - Plane INVALID", Log.ERROR );
 			}
 			
-		// ambient lighting can require that the quad be rotated.
+		// ambient occulsion lighting can require that the quad be rotated.
 		var rotate:Boolean = $lighting.rotateQuad( $face );
 			
 		buildIndices( normal, rotate );

@@ -138,8 +138,8 @@ package com.voxelengine.renderer.shaders
 					// mip mapping. Options: nomip (or mipnone , they are the same) , mipnearest, miplinear
 					// texture filtering. Options: nearest, linear
 					// texture repeat. Options: repeat, wrap, clamp
-					// 0.125 is texture bias for adjusting the mipmap distance
-					"tex ft0, v0, fs0 <2d,clamp,mipnearest,0.125>", // v0 is passed in from vertex, UV coordinates
+					// 0.0625 is texture bias for adjusting the mipmap distance
+					"tex ft0, v0, fs0 <2d,clamp,mipnearest,0.0625>",
 					
 					// http://pgstudios.org/old_tut_archive.html
 					// Fix for Pre-Multiplied Alpha in PNGs
