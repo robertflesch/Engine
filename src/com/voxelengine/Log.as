@@ -11,8 +11,10 @@ package com.voxelengine
 	import com.furusystems.dconsole2.DConsole
 	import com.furusystems.logging.slf4as.Logging
 	import com.furusystems.logging.slf4as.ILogger
-	import com.voxelengine.server.Network
+	
 	import playerio.ErrorLog
+	
+	import com.voxelengine.server.Network
 	
 	public class Log {
 		
@@ -34,18 +36,9 @@ package com.voxelengine
 			_showing = false
 		}
 		
-		public static function init():void {
-			Logging.setDefaultLoggerTag( "VoxelVerse" )
-			Logging.setLevel( 0 )
-			_log = Logging.getLogger(Log)
-		}
-		
 		public static function show():void {
-			
-			if ( !_initialized )
-			{
+			if ( !_initialized ) {
 				_initialized = true
-				
 				Globals.g_app.addChild(DConsole.view)
 				DConsole.createCommand( "hide", hide )
 				ConsoleCommands.addCommands()
@@ -55,8 +48,13 @@ package com.voxelengine
 			_showing = true
 		}
 		
+		public static function init():void {
+			Logging.setDefaultLoggerTag( "VoxelVerse" )
+			Logging.setLevel( 0 )
+			_log = Logging.getLogger(Log)
+		}
+		
 		private static function writeErrorToServer( $errorType:String, $details:String, $error:Error, $extraData:Object = null, callback:Function = null, errorHandler:Function = null):void {
-			
 			var stackTrace:String = "NO stack trace"
 			if ( $error ) {
 				stackTrace = $error.getStackTrace()
@@ -97,7 +95,7 @@ package com.voxelengine
 					break
 			}
 			
-			if ( ERROR < $type )
+			if ( ERROR <= $type )
 				show()
 		}
 	}
