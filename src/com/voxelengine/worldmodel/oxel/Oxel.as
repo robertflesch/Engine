@@ -1190,18 +1190,20 @@ public class Oxel extends OxelBitfields
 			facesMarkAllClean();
 		else  if ( TypeInfo.LEAF == type )
 			facesSetAll();
-		//else  if ( TypeInfo.WATER == type )
-		//	facesBuildWater();
 		else if ( faceHasDirtyBits() ) {
 			var no:Oxel = null ;
 			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 			{
+				//if ( face == Globals.POSY && type == TypeInfo.WATER )
+				//	Log.out( "Water face" )
 				// only check the faces marked as dirty
 				if ( faceIsDirty( face ) )
 				{
 					no = neighbor( face );
 					if ( Globals.BAD_OXEL == no ) {
 						// this is an external face. that is on the edge of the grain space
+						if ( face == Globals.POSY && flowInfo && flowInfo.flowScaling )
+							scaleTopFlowFace()
 						faceSet( face );
 					}
 					else if ( no.type == type ) {
@@ -1244,7 +1246,9 @@ public class Oxel extends OxelBitfields
 						else {
 							faceClear( face );
 							if ( faceAlphaNeedsFace( face, type, no ) )
-								faceSet( face );
+								if ( face == Globals.POSY && flowInfo && flowInfo.flowScaling )
+									scaleTopFlowFace()
+								faceSet( face )
 						}
 						
 						//var rface:int = Oxel.face_get_opposite( face );
@@ -1254,8 +1258,11 @@ public class Oxel extends OxelBitfields
 					// no children, so just check against type
 					else
 					{
-						if ( ( TypeInfo.hasAlpha( no.type ) ) )
+						if ( ( TypeInfo.hasAlpha( no.type ) ) ) {
+							if ( face == Globals.POSY && flowInfo && flowInfo.flowScaling )
+								scaleTopFlowFace()
 							faceSet( face );
+						}
 						else if ( flowInfo ) // All water and lava have flow info.
 						{ 
 							if ( flowInfo.flowScaling.scalingHas() ) 	// for scaled lava or other non alpha flowing types
@@ -1289,6 +1296,15 @@ public class Oxel extends OxelBitfields
 			}
 		}
 		facesMarkAllClean();
+	}
+	
+	private function scaleTopFlowFace():void {
+		if ( !flowInfo.flowScaling.scalingHas() ) {
+			flowInfo.flowScaling.NxNz = 15
+			flowInfo.flowScaling.NxPz = 15
+			flowInfo.flowScaling.PxNz = 15
+			flowInfo.flowScaling.PxPz = 15
+		}
 	}
 	
 	static public function face_get_opposite( dir:int ):int	{

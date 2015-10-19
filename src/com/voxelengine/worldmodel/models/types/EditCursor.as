@@ -161,7 +161,6 @@ public class EditCursor extends VoxelModel
 		// We dont want the repeat on if app loses focus
 		mouseUp( null );
 		removeListeners();
-		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) )
 	}
 	
 	protected function onActivate( e:AppEvent ):void  { addListeners(); }

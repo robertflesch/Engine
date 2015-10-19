@@ -55,6 +55,7 @@ public class  UserInventory extends QuickInventory
 	private var _toolSize:GrainSelector;
 	private var _shape:ShapeSelector;
 	private var _modelTools:ModelPlacementType;
+	private var _lastCursorType:int
 		
 	private var _remove:Boolean;
 	private var _owner:String;
@@ -113,9 +114,6 @@ public class  UserInventory extends QuickInventory
 		CursorOperationEvent.addListener( CursorOperationEvent.NONE, onCursorOperationNone )	
 	}
 	
-	private function onCursorOperationNone(e:CursorOperationEvent):void { 
-		onDeactivate(null) 
-	}
 	private function modelDeleted(e:InventoryModelEvent):void {
 		for each ( var bi:BoxInventory in boxes ) {
 			if ( bi.objectInfo is ObjectModel ) {
@@ -131,8 +129,7 @@ public class  UserInventory extends QuickInventory
 		}
 	}
 	
-	private function onJoinRoomEvent(e:RoomEvent):void 
-	{
+	private function onJoinRoomEvent(e:RoomEvent):void {
 		displayEvent(null);
 	}
 	
@@ -141,18 +138,12 @@ public class  UserInventory extends QuickInventory
 		//Log.out( "UserInventory.remove ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 		RoomEvent.removeListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
 		InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
-		AppEvent.addListener( AppEvent.APP_DEACTIVATE, onDeactivate );
+		AppEvent.removeListener( AppEvent.APP_DEACTIVATE, onDeactivate );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.UNLOAD_REQUEST, _owner, null ) );
 		CursorOperationEvent.removeListener( CursorOperationEvent.NONE, onCursorOperationNone )	
 		_s_currentInstance = null;
 		super.remove();
 	}
-	
-	private function onDeactivate( $ae:AppEvent ):void {
-		processItemSelection( boxes[1] )
-	}
-	
-	
 
 	static private function displayEvent(e:InventoryInterfaceEvent):void {
 		// build it the first time
@@ -316,6 +307,7 @@ public class  UserInventory extends QuickInventory
 
 	private function pressItem(e:UIMouseEvent):void  {
 		var box:UIObject = e.target as UIObject;
+		Log.out( "UserInventory.pressItem", Log.DEBUG );
 		processItemSelection( box );
 	}			
 	
@@ -323,14 +315,21 @@ public class  UserInventory extends QuickInventory
 	}			
 	
 	private function selectByIndex( $index:int ):void {
+		Log.out( "UserInventory.selectByIndex", Log.DEBUG );
 		processItemSelection( boxes[$index] );
 	}
 	
-	private var _lastCursorType:int
+	private function onDeactivate( $ae:AppEvent ):void {
+		Log.out( "UserInventory.onDeactivate", Log.DEBUG );
+		processItemSelection( boxes[1], false )
+	}
 	
+	private function onCursorOperationNone(e:CursorOperationEvent):void { 
+		Log.out( "UserInventory.onCursorOperationNone", Log.DEBUG );
+		processItemSelection( boxes[1], false )
+	}
 	
-	
-	private function processItemSelection( box:UIObject ):void {
+	private function processItemSelection( box:UIObject, $propagate:Boolean = true ):void {
 		Log.out( "UserInventory.processItemSelection - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex + " box.name: " + box.name, Log.DEBUG );
 		if ( 0 < Globals.openWindowCount )
 			return;
@@ -379,14 +378,20 @@ public class  UserInventory extends QuickInventory
 			if ( lastBoxesSelection == boxesIndex ) {
 				//Log.out( "UserInventory.processItemSelection - ObjectTool - lastItemSelection == boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
 				// we are double tapping the tool key
-				if ( - 1 != itemMaterialSelection ) {	
+				if ( -1 != itemMaterialSelection ) {	
 					var lastBoxPick:Box = boxes[itemMaterialSelection ];
-					processItemSelection( lastBoxPick )
+					if ( $propagate ) {
+						Log.out( "UserInventory.processItemSelection.ObjectTool.- 1 != itemMaterialSelection", Log.WARN);
+						processItemSelection( lastBoxPick )
+					}
 					return;
 				}
 				else {
 					//Log.out( "UserInventory.processItemSelection - ObjectTool - lastItemSelection != boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
-					processItemSelection( boxes[1] )
+					if ( $propagate ) {
+						Log.out( "UserInventory.processItemSelection.ObjectTool.other", Log.WARN);
+						processItemSelection( boxes[1] )
+					}
 					return;
 				}
 			}

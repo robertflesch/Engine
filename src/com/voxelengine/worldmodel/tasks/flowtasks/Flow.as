@@ -71,7 +71,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			
 			super.start();
 			
-			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _guid );
+			var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
 			main:if ( vm )
 			{
 				var flowOxel:Oxel = vm.modelInfo.data.oxel.childGetOrCreate( _gc );

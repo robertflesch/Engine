@@ -194,7 +194,7 @@ package {
 				stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp)					
 
 				if ( Globals.online ) {
-//					AppEvent.dispatch( new AppEvent( AppEvent.APP_DEACTIVATE ) )
+					AppEvent.dispatch( new AppEvent( AppEvent.APP_DEACTIVATE ) )
 					
 					//Log.out( "VoxelVerse.deactivateApp - NOT SAVING REGION AND INVENTORY", Log.WARN )
 					RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) )

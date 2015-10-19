@@ -56,6 +56,16 @@ public class ModelCache
 		return null
 	}
 	
+	public function getModelFromModelGuid( $modelGuid:String ):VoxelModel {
+		for ( var i:int; i < _instances.length; i++ ) {
+			var vm:VoxelModel = _instances[i];
+			if ( vm )
+				if ( $modelGuid == vm.modelInfo.guid )
+					return vm
+		}
+		return null
+	}
+	
 	private function playerRemoved(e:ModelEvent):void {
 		var vm:VoxelModel;
 		for ( var i:int; i < _instances.length; ) {
