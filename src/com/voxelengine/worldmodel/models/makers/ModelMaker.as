@@ -96,6 +96,7 @@ public class ModelMaker extends ModelMakerBase {
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) )
 			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) )
 		}
+		removeListeners()
 		
 		// do this last as it nulls everything.
 		super.markComplete( $success, vm )
