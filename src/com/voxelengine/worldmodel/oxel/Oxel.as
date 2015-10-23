@@ -1551,7 +1551,7 @@ public class Oxel extends OxelBitfields
 		if ( validFace && quad ) {
 			if ( quad.dirty ) {
 				quadLighting( $face, $ti );
-				quad.rebuild( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $grain, _lighting );
+				quad.rebuildScaled( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $grain, _lighting, _flowInfo );
 			}
 			return 1;
 		}
@@ -1602,7 +1602,7 @@ public class Oxel extends OxelBitfields
 		if ( quad )
 		{
 			var plane_facing:int = 1;
-			quad.rebuild( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, plane_facing, gc.grain, _lighting );
+			quad.rebuildScaled( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, plane_facing, gc.grain, _lighting, _flowInfo );
 		}
 	}
 

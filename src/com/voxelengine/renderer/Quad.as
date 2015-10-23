@@ -61,14 +61,26 @@ public class Quad {
 	// Empty constuctor for QuadPool
 	public function Quad():void { };
 	
-	public function rebuild( $type:int,						 // material type
+	//public function rebuild( $type:int,						 // material type
+						     //$x:Number, $y:Number, $z:Number,// world location
+						     //$face:int,						 // which 
+						     //$planeFacing:int,				 // facing
+						     //$grain:Number,                  // the world size of the quad 
+						     //$lighting:Lighting ):void			
+	//{
+		//add( $type, $x, $y, $z, $face, $planeFacing, $grain, TypeInfo.typeInfo[$type], $lighting, null );
+		//dirty = 0;
+	//}
+	
+	public function rebuildScaled( $type:int,						 // material type
 						     $x:Number, $y:Number, $z:Number,// world location
 						     $face:int,						 // which 
 						     $planeFacing:int,				 // facing
 						     $grain:Number,                  // the world size of the quad 
-						     $lighting:Lighting ):void			
+						     $lighting:Lighting,
+							 $flowInfo:FlowInfo ):void			
 	{
-		add( $type, $x, $y, $z, $face, $planeFacing, $grain, TypeInfo.typeInfo[$type], $lighting, null );
+		add( $type, $x, $y, $z, $face, $planeFacing, $grain, TypeInfo.typeInfo[$type], $lighting, $flowInfo );
 		dirty = 0;
 	}
 	
