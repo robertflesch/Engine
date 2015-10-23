@@ -666,7 +666,7 @@ public class Oxel extends OxelBitfields
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	// This only writes into empty voxel.
-	public function write_empty( $instanceGuid:String, $gc:GrainCursor, $type:int ):Boolean {
+	public function write_empty( $modelGuid:String, $gc:GrainCursor, $type:int ):Boolean {
 		// have we arrived?
 		if ( $gc.is_equal( gc ) )
 		{			
@@ -699,7 +699,7 @@ public class Oxel extends OxelBitfields
 		if ( Globals.BAD_OXEL == child )
 			return false;
 		
-		return child.write_empty( $instanceGuid, $gc, $type );
+		return child.write_empty( $modelGuid, $gc, $type );
 		
 	}
 	
@@ -733,7 +733,7 @@ public class Oxel extends OxelBitfields
 		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.CHANGE, Network.userId, typeIdToUse, amountInGrain0 ) );
 	}
 	
-	private function writeInternal( $instanceGuid:String, $newType:int, $onlyChangeType:Boolean ):Oxel {
+	private function writeInternal( $modelGuid:String, $newType:int, $onlyChangeType:Boolean ):Oxel {
 		
 		nodes++;
 
@@ -743,7 +743,7 @@ public class Oxel extends OxelBitfields
 		// we dont want to add edit cursor to our inventory
 		// also if we have a scripts that generates blocks, not sure how to handle that.
 		// TODO how do we handle scripts the generate blocks, need to take inventory status first?
-		if ( EditCursor.EDIT_CURSOR != $instanceGuid && false == $onlyChangeType )
+		if ( EditCursor.EDIT_CURSOR != $modelGuid && false == $onlyChangeType )
 			updateInventory( $newType );
 		
 		// kill any existing family, you can be parent type OR physical type, not both
@@ -756,7 +756,6 @@ public class Oxel extends OxelBitfields
 		}
 		
 		additionalDataClear();
-		
 			
 		// Now we can change type
 		type = $newType;
@@ -766,38 +765,22 @@ public class Oxel extends OxelBitfields
 			return this;
 		
 		// anytime oxel changes, neighbors need to know
-		neighborsMarkDirtyFaces( $instanceGuid, gc.size() );
+		neighborsMarkDirtyFaces( $modelGuid, gc.size() );
 		
 		var p:Oxel = _parent;
 		// This is only a two level merge, brain not up to a n level recursive today...
 		if ( TypeInfo.AIR == type && p )
-		{
-			p.mergeRecursive()		
-			//// make a copy since this oxel may be going away.
-			//if ( p.checkForMerge() )
-			//{
-				//p = p.parent;
-				//if ( p && p.checkForMerge() ) {
-					//if ( null == p )
-						//Log.out( "out" );
-					//return p;
-					//
-				//}
-				//else 
-					//if ( null == p )
-						//Log.out( "out1" );
-					//return p;
-			//}
-		}
+			p.mergeRecursive()
 		
+		// what to return if recursive merge happens?
 		return this;
 	}
 	
 	// This write to a child if it is a valid child of the oxel
 	// if the child does not exist, it is created
-	public function write( $instanceGuid:String, $gc:GrainCursor, $newType:int, $onlyChangeType:Boolean = false ):Oxel	{
+	public function write( $modelGuid:String, $gc:GrainCursor, $newType:int, $onlyChangeType:Boolean = false ):Oxel	{
 		
-		// this finds the closest oxel, could be target oxel, could be parent
+		// thisa finds the closest oxel, could be target oxel, could be parent
 		var co:Oxel = childFind( $gc );
 		
 		if ( co.type != $newType && !gc.is_equal( $gc ) )
@@ -813,7 +796,7 @@ public class Oxel extends OxelBitfields
 		if ( $newType == co.type && $gc.bound == co.gc.bound && !co.childrenHas() )
 			return co;
 		
-		return co.writeInternal( $instanceGuid, $newType, $onlyChangeType );	
+		return co.writeInternal( $modelGuid, $newType, $onlyChangeType );	
 	}
 			
 	//public function dispose():void {
@@ -1042,7 +1025,7 @@ public class Oxel extends OxelBitfields
 	
 	// Mark all of the faces opposite this oxel as dirty
 	// propogate count is to keep it from spreading too far, by maybe this should be distance, rather then hard count?
-	public function neighborsMarkDirtyFaces( $instanceGuid:String, $size:int, $propogateCount:int = 2 ):void {
+	public function neighborsMarkDirtyFaces( $modelGuid:String, $size:int, $propogateCount:int = 2 ):void {
 		var no:Oxel;
 		$propogateCount--;
 		for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
@@ -1058,13 +1041,13 @@ public class Oxel extends OxelBitfields
 			}
 				
 			// RSF - 10.2.14 This just got way easier, always mark the neighbor face!
-			no.faceMarkDirty( $instanceGuid, Oxel.face_get_opposite( face ), $propogateCount );
+			no.faceMarkDirty( $modelGuid, Oxel.face_get_opposite( face ), $propogateCount );
 			// now test if we need to propagate it.
 			// Why do alpha faces have to propagate? Is it because of light changes?
 			if ( TypeInfo.hasAlpha( no.type ) ) {
 				// So now I can mark my neighbors dirty, decrementing each time.
 				if ( 0 < $size && 0 < $propogateCount )
-					no.neighborsMarkDirtyFaces( $instanceGuid, $size, $propogateCount );
+					no.neighborsMarkDirtyFaces( $modelGuid, $size, $propogateCount );
 			}
 		}
 	}
@@ -1101,12 +1084,12 @@ public class Oxel extends OxelBitfields
 	// face function
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	override protected function faceMarkDirty( $instanceGuid:String, $face:uint, $propogateCount:int = 2 ):void {
+	override protected function faceMarkDirty( $modelGuid:String, $face:uint, $propogateCount:int = 2 ):void {
 		
 		if ( childrenHas() ) {
 			const children:Vector.<Oxel> = childrenForDirection( $face );
 			for each ( var child:Oxel in children ) {
-				child.faceMarkDirty( $instanceGuid, $face, $propogateCount );
+				child.faceMarkDirty( $modelGuid, $face, $propogateCount );
 			}
 		}
 		else {
@@ -1114,8 +1097,14 @@ public class Oxel extends OxelBitfields
 			// TODO This needs to be refactored to remove this from this function, so more likely go in the write function of the voxelModel.
 			// TODO also be nice to pass in the flow direction if possible. We know which face, so we know flow dir...
 			// 1 = $propogateCount means only the oxel directly next to the effect oxel will have flow tasks generated.
-			if ( ti.flowable && Globals.autoFlow && EditCursor.EDIT_CURSOR != $instanceGuid && 1 == $propogateCount )
-				Flow.addTask( $instanceGuid, gc, type, null != flowInfo ? flowInfo : ti.flowInfo.clone(), 1 );
+			if ( ti.flowable && Globals.autoFlow && EditCursor.EDIT_CURSOR != $modelGuid && 1 == $propogateCount ) {
+				var raw:int
+				if ( flowInfo ) 
+					raw = flowInfo.flowInfoRaw 
+				else
+					raw = ti.flowInfo.flowInfoRaw
+				Flow.addTask( $modelGuid, gc, type, raw, 1 );
+			}
 				
 			if ( _quads && _quads[$face] )
 				_quads[$face].dirty = 1;
@@ -1123,7 +1112,7 @@ public class Oxel extends OxelBitfields
 			if ( lighting )
 				lighting.occlusionResetFace( $face );
 
-			super.faceMarkDirty( $instanceGuid, $face, $propogateCount );
+			super.faceMarkDirty( $modelGuid, $face, $propogateCount );
 		}
 	}
 
@@ -1132,11 +1121,11 @@ public class Oxel extends OxelBitfields
 		facesClearAll();
 	}
 	
-	public function faces_rebuild( $instanceGuid:String ):void {
+	public function faces_rebuild( $modelGuid:String ):void {
 		quadsDeleteAll();
 		
 		// anytime oxel changes, neighbors need to know
-		neighborsMarkDirtyFaces( $instanceGuid, gc.size() );
+		neighborsMarkDirtyFaces( $modelGuid, gc.size() );
 		facesMarkAllDirty();
 	}
 
@@ -1185,7 +1174,7 @@ public class Oxel extends OxelBitfields
 	}
 	
 	private function facesBuildTerminal():void {
-		//trace( "Oxel.facesBuildTerminal");
+		//trace( "Oxel.facesBuildTerminal - type: " + type );
 		if ( TypeInfo.AIR == type )
 			facesMarkAllClean();
 		else  if ( TypeInfo.LEAF == type )
@@ -1428,11 +1417,11 @@ public class Oxel extends OxelBitfields
 		_lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
 	}
 
-	public function lightingFromSun( $instanceGuid:String, $face:int ):void {
+	public function lightingFromSun( $modelGuid:String, $face:int ):void {
 		if ( childrenHas() )
 		{
 			for each ( var child:Oxel in _children )
-				child.lightingFromSun( $instanceGuid, $face );
+				child.lightingFromSun( $modelGuid, $face );
 		}
 		else
 		{
@@ -1440,7 +1429,7 @@ public class Oxel extends OxelBitfields
 			if ( faceHas( $face ) )
 			{
 				_s_oxelsEvaluated++;
-				//LightSunCheck.addTask( $instanceGuid, gc, 1, $face );
+				//LightSunCheck.addTask( $modelGuid, gc, 1, $face );
 			}
 
 		}
@@ -1448,11 +1437,11 @@ public class Oxel extends OxelBitfields
 	
 	// This would only be run once when model loads
 	// set the activeVoxelinstanceGuid before calling
-	public function lightsStaticCount( $instanceGuid:String ):void {
+	public function lightsStaticCount( $modelGuid:String ):void {
 		if ( childrenHas() )
 		{
 			for each ( var child:Oxel in _children )
-				child.lightsStaticCount( $instanceGuid );
+				child.lightsStaticCount( $modelGuid );
 		}
 		else
 		{
@@ -1705,12 +1694,12 @@ public class Oxel extends OxelBitfields
 	 *
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
 	private const MIN_FLOW_GRAIN:int = 2;
-	public function flowFindCandidates( $instanceGuid:String, $countDown:int = 8, $countOut:int = 8):void {
+	public function flowFindCandidates( $modelGuid:String, $countDown:int = 8, $countOut:int = 8):void {
 		if ( childrenHas() )
 		{
 			for each ( var child:Oxel in children )
 				if ( MIN_FLOW_GRAIN <= child.gc.grain )
-					child.flowFindCandidates( $instanceGuid, $countDown, $countOut);
+					child.flowFindCandidates( $modelGuid, $countDown, $countOut);
 		}
 		else
 		{
@@ -1718,7 +1707,7 @@ public class Oxel extends OxelBitfields
 			{
 				Log.out( "Oxel.flowFindCandidates - gc: " + gc.toString() );
 				//flowTerminal();
-				Flow.addTask( $instanceGuid, gc, type, flowInfo, 1 );
+				Flow.addTask( $modelGuid, gc, type, flowInfo.flowInfoRaw, 1 );
 			}
 		}
 	}
@@ -2093,10 +2082,10 @@ public class Oxel extends OxelBitfields
 		return temp;
 	}
 	
-	public function write_sphere( $instanceGuid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, gmin:uint = 0 ):void {
+	public function write_sphere( $modelGuid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, gmin:uint = 0 ):void {
 		if ( true == GrainCursorUtils.is_inside_sphere( gc, cx, cy, cz, radius ))
 		{
-			write( $instanceGuid, gc, $newType );
+			write( $modelGuid, gc, $newType );
 			return;
 		}
 		
@@ -2119,11 +2108,11 @@ public class Oxel extends OxelBitfields
 		{
 			// make sure child has not already been released.
 			if ( child && child.gc )
-				child.write_sphere( $instanceGuid, cx, cy, cz, radius, $newType, gmin );
+				child.write_sphere( $modelGuid, cx, cy, cz, radius, $newType, gmin );
 		}
 	}
 	
-	public function writeHalfSphere( $instanceGuid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, gmin:uint = 0 ):void {
+	public function writeHalfSphere( $modelGuid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, gmin:uint = 0 ):void {
 		
 		if ( true == GrainCursorUtils.is_inside_sphere( gc, cx, cy, cz, radius ) )
 		{
@@ -2132,7 +2121,7 @@ public class Oxel extends OxelBitfields
 				for each ( var newChild:Oxel in _children )
 				{
 					if ( newChild && newChild.gc )
-						newChild.writeHalfSphere( $instanceGuid, cx, cy, cz, radius, $newType, gmin );
+						newChild.writeHalfSphere( $modelGuid, cx, cy, cz, radius, $newType, gmin );
 				}
 				// if I put a return here, the top layer stays the same, but changes occur below the surface.
 				//return;
@@ -2141,7 +2130,7 @@ public class Oxel extends OxelBitfields
 				return;
 				
 //				Log.out( "writeHalfSphere gc: " + gc.toString() + "  cy: " + cy + " gc.getModelY(): " + gc.getModelY() + "  gc.size: " + gc.size() );
-			write( $instanceGuid, gc, $newType );
+			write( $modelGuid, gc, $newType );
 			return;
 		}
 		
@@ -2164,11 +2153,11 @@ public class Oxel extends OxelBitfields
 		{
 			// make sure child has not already been released.
 			if ( child && child.gc )
-				child.writeHalfSphere( $instanceGuid, cx, cy, cz, radius, $newType, gmin );
+				child.writeHalfSphere( $modelGuid, cx, cy, cz, radius, $newType, gmin );
 		}
 	}
 	
-	public function writeCylinder( $instanceGuid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, axis:int, gmin:uint, startTime:int, runTime:int, startingSize:int ):Boolean {
+	public function writeCylinder( $modelGuid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, axis:int, gmin:uint, startTime:int, runTime:int, startingSize:int ):Boolean {
 		var result:Boolean = true;
 		var timer:int = getTimer();
 		if ( startTime + runTime < timer )
@@ -2176,7 +2165,7 @@ public class Oxel extends OxelBitfields
 			
 		if ( true == GrainCursorUtils.isInsideCircle( gc, cx, cy, cz, radius, axis ))
 		{
-			write( $instanceGuid, gc, $newType );
+			write( $modelGuid, gc, $newType );
 			return result;
 		}
 		else if ( gc.grain < startingSize && true == GrainCursorUtils.isOutsideCircle( gc, cx, cy, cz, radius, axis ))
@@ -2194,7 +2183,7 @@ public class Oxel extends OxelBitfields
 		{
 			if ( child )
 			{
-				result = child.writeCylinder( $instanceGuid, cx, cy, cz, radius, $newType, axis, gmin, startTime, runTime, startingSize );
+				result = child.writeCylinder( $modelGuid, cx, cy, cz, radius, $newType, axis, gmin, startTime, runTime, startingSize );
 				if ( !result )
 					return result;
 			}
@@ -2203,10 +2192,10 @@ public class Oxel extends OxelBitfields
 		return result
 	}
 	
-	public function empty_square( $instanceGuid:String, cx:int, cy:int, cz:int, radius:int, gmin:uint=0 ):void {
+	public function empty_square( $modelGuid:String, cx:int, cy:int, cz:int, radius:int, gmin:uint=0 ):void {
 		if ( true == GrainCursorUtils.is_inside_square( gc, cx, cy, cz, radius ))
 		{
-			write( $instanceGuid, gc, TypeInfo.AIR );
+			write( $modelGuid, gc, TypeInfo.AIR );
 			return;
 		} 
 		if ( true == GrainCursorUtils.is_outside_square( gc, cx, cy, cz, radius ))
@@ -2216,7 +2205,7 @@ public class Oxel extends OxelBitfields
 		
 		if ( gc.grain <= gmin )
 		{
-			write( $instanceGuid, gc, TypeInfo.AIR );
+			write( $modelGuid, gc, TypeInfo.AIR );
 			return;	
 		}
 
@@ -2224,11 +2213,11 @@ public class Oxel extends OxelBitfields
 		
 		for each ( var child:Oxel in _children )
 		{
-			child.empty_square( $instanceGuid, cx, cy, cz, radius, gmin );
+			child.empty_square( $modelGuid, cx, cy, cz, radius, gmin );
 		}
 	}
 
-	public function effect_sphere( $instanceGuid:String, cx:int, cy:int, cz:int, ie:ImpactEvent ):void {
+	public function effect_sphere( $modelGuid:String, cx:int, cy:int, cz:int, ie:ImpactEvent ):void {
 		var radius:int = ie.radius
 		var writeType:int = 0;
 		var ip:InteractionParams = null;
@@ -2239,7 +2228,7 @@ public class Oxel extends OxelBitfields
 			writeType = TypeInfo.getTypeId( ip.type );
 			if ( type == writeType )
 				return;
-			write( $instanceGuid, gc, writeType, false );
+			write( $modelGuid, gc, writeType, false );
 			return;
 		} 
 		
@@ -2256,7 +2245,7 @@ public class Oxel extends OxelBitfields
 				return;
 //				if ( "melt" == ip.script )
 //					flowInfo.type = FlowInfo.FLOW_TYPE_MELT;
-			write( $instanceGuid, gc, writeType, false );
+			write( $modelGuid, gc, writeType, false );
 			//else if ( "" != ip.script )
 				//Log.out( "Oxel.effect_sphere - " + ip.script + " source type: " + type +  " writeType: " + writeType );
 			return;	
@@ -2272,12 +2261,12 @@ public class Oxel extends OxelBitfields
 		for each ( var child:Oxel in _children )
 		{
 			if ( child && child.gc )
-				child.effect_sphere( $instanceGuid, cx, cy, cz, ie );
+				child.effect_sphere( $modelGuid, cx, cy, cz, ie );
 		}
 	}
 	
 	// pass in 8 levels of height maps.
-	public function write_height_map( $instanceGuid:String 
+	public function write_height_map( $modelGuid:String 
 									, $type:int
 									, minHeightMapArray:Vector.<Array>
 									, maxHeightMapArray:Vector.<Array>
@@ -2306,17 +2295,17 @@ public class Oxel extends OxelBitfields
 			{
 				for each ( var child1:Oxel in _children )
 				{
-					child1.write_height_map( $instanceGuid, $type, minHeightMapArray, maxHeightMapArray, gmin, heightMapOffset - 1, ignoreSolid );
+					child1.write_height_map( $modelGuid, $type, minHeightMapArray, maxHeightMapArray, gmin, heightMapOffset - 1, ignoreSolid );
 				}
 			}
 			else
 			{
 				if ( ignoreSolid )
-					//write( $instanceGuid, gc, $type, true );
+					//write( $modelGuid, gc, $type, true );
 					writeFromHeightMap( gc, $type );
 				else
 					writeFromHeightMap( gc, $type );
-					//write_empty( $instanceGuid, gc, $type );
+					//write_empty( $modelGuid, gc, $type );
 			}
 			return;
 		}
@@ -2332,7 +2321,7 @@ public class Oxel extends OxelBitfields
 		
 			for each ( var child:Oxel in _children )
 			{
-				child.write_height_map( $instanceGuid, $type, minHeightMapArray, maxHeightMapArray, gmin, heightMapOffset - 1, ignoreSolid );
+				child.write_height_map( $modelGuid, $type, minHeightMapArray, maxHeightMapArray, gmin, heightMapOffset - 1, ignoreSolid );
 			}
 		}
 	}
@@ -2628,34 +2617,34 @@ public class Oxel extends OxelBitfields
 		return newOxel;
 	}
 	*/
-	public function growTreesOn( $instanceGuid:String, $type:int, $chance:int = 2000 ):void {
+	public function growTreesOn( $modelGuid:String, $type:int, $chance:int = 2000 ):void {
 		if ( childrenHas() )
 		{
 			for each ( var child:Oxel in children )
-				child.growTreesOn( $instanceGuid, $type, $chance );
+				child.growTreesOn( $modelGuid, $type, $chance );
 		}
 		else if ( $type == type )
 		{
 			var upperNeighbor:Oxel = neighbor( Globals.POSY );
 			if ( Globals.BAD_OXEL != upperNeighbor && TypeInfo.AIR == upperNeighbor.type ) // false == upperNeighbor.hasAlpha
 			{
-				TreeGenerator.generateTree( $instanceGuid, this, $chance );
+				TreeGenerator.generateTree( $modelGuid, this, $chance );
 			}
 		}
 	}
 	
-	public function growTreesOnAnything( $instanceGuid:String, $chance:int = 2000 ):void {
+	public function growTreesOnAnything( $modelGuid:String, $chance:int = 2000 ):void {
 		if ( childrenHas() )
 		{
 			for each ( var child:Oxel in children )
-				child.growTreesOnAnything( $instanceGuid, $chance );
+				child.growTreesOnAnything( $modelGuid, $chance );
 		}
 		else
 		{
 			var upperNeighbor:Oxel = neighbor( Globals.POSY );
 			if ( Globals.BAD_OXEL != upperNeighbor && TypeInfo.AIR == upperNeighbor.type )
 			{
-				TreeGenerator.generateTree( $instanceGuid, this, $chance );
+				TreeGenerator.generateTree( $modelGuid, this, $chance );
 			}
 		}
 	}
@@ -2718,31 +2707,31 @@ public class Oxel extends OxelBitfields
 		}
 	}
 	
-	public function vines( $instanceGuid:String ):void {
+	public function vines( $modelGuid:String ):void {
 
 		if ( childrenHas() )
 		{
 			for each ( var child:Oxel in children )
-				child.vines( $instanceGuid );
+				child.vines( $modelGuid );
 		}
 		else if ( 152 == type  )
 		{
 			var nou:Oxel = neighbor( Globals.POSY )
 			if ( Globals.BAD_OXEL == nou && TypeInfo.AIR == nou.type && !nou.childrenHas() && nou.gc.grain <= 4 )
-				nou.write( $instanceGuid, gc, 152 );
+				nou.write( $modelGuid, gc, 152 );
 			var nod:Oxel = neighbor( Globals.NEGY )
 			if ( Globals.BAD_OXEL != nod && TypeInfo.AIR == nod.type && !nod.childrenHas() && nod.gc.grain <= 4 )
-				nou.write( $instanceGuid, gc, 152 );
+				nou.write( $modelGuid, gc, 152 );
 		}
 	}
 	
-	public function harvestTrees( $instanceGuid:String ):void {
+	public function harvestTrees( $modelGuid:String ):void {
 
 		if ( childrenHas() )
 		{
 			for each ( var child:Oxel in children )
 			{
-				child.harvestTrees( $instanceGuid );
+				child.harvestTrees( $modelGuid );
 				// harvesting trees can cause air oxels to merge. So we need to make sure we still have a valid parent.
 				if ( !children )
 					return;
@@ -2750,7 +2739,7 @@ public class Oxel extends OxelBitfields
 		}
 		else if ( TypeInfo.LEAF == type || TypeInfo.BARK == type )
 		{
-			write( $instanceGuid, gc, TypeInfo.AIR );
+			write( $modelGuid, gc, TypeInfo.AIR );
 		}
 	}
 	
@@ -2906,8 +2895,8 @@ public class Oxel extends OxelBitfields
 	// Explosion Event Helpers END
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public function generateID( $instanceGuid:String ):String {
-		return $instanceGuid + _gc.toID();
+	public function generateID( $modelGuid:String ):String {
+		return $modelGuid + _gc.toID();
 	}
 	
 	static public function childIdOpposite( $face:uint, $childID:uint ):uint {
@@ -3010,25 +2999,42 @@ public class Oxel extends OxelBitfields
 			}
 		}
 		
-		var result:Boolean;
-		var changedOxel:Oxel = write( $modelGuid, $gc, $type, $onlyChangeType );
 		
-		if ( Globals.BAD_OXEL != changedOxel ) {
-			changedOxel.dirty = true;
+		// thisa finds the closest oxel, could be target oxel, could be parent
+		var changeCandidate:Oxel = childFind( $gc );
+		
+		//if ( changeCandidate.type != $type && !gc.is_equal( $gc ) )
+		if ( !gc.is_equal( $gc ) )
+			// this gets the exact oxel we are looking for if it is different from returned type.
+			changeCandidate = changeCandidate.childGetOrCreate( $gc );
+			
+		if ( Globals.BAD_OXEL == changeCandidate ) {
+			Log.out( "Oxel.write - cant find child!", Log.ERROR );
+			return changeCandidate;
+		}
+		
+		if ( $type == changeCandidate.type && $gc.bound == changeCandidate.gc.bound && !changeCandidate.childrenHas() )
+			return changeCandidate;
+		
+		var result:Boolean;
+		if ( Globals.BAD_OXEL != changeCandidate ) {
+			changeCandidate.dirty = true;
 			result = true;
 			var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
 		
 			if ( typeInfo.flowable ) {
-				if ( null == changedOxel.flowInfo ) // if it doesnt have flow info, get some! This is from placement of flowable oxels
-					changedOxel.flowInfo = typeInfo.flowInfo.clone();
+				if ( null == changeCandidate.flowInfo ) // if it doesnt have flow info, get some! This is from placement of flowable oxels
+					changeCandidate.flowInfo = typeInfo.flowInfo.clone();
+				else	
+					changeCandidate.flowInfo.copy( typeInfo.flowInfo )
 					
 				//if ( Globals.autoFlow && EditCursor.EDIT_CURSOR != $modelGuid )
 				if ( Globals.autoFlow  )
-					Flow.addTask( $modelGuid, changedOxel.gc, changedOxel.type, changedOxel.flowInfo, 1 );
+					Flow.addTask( $modelGuid, changeCandidate.gc, changeCandidate.type, changeCandidate.flowInfo.flowInfoRaw, 1 );
 			}
 			else {
-				if ( changedOxel.flowInfo )
-					changedOxel.flowInfo = null;  // If it has flow info, release it, no need to check first
+				if ( changeCandidate.flowInfo )
+					changeCandidate.flowInfo.reset()  // If it has flow info, reset it
 			}
 				
 			if ( oldTypeInfo.lightInfo.lightSource )
@@ -3038,15 +3044,17 @@ public class Oxel extends OxelBitfields
 			
 			if ( TypeInfo.isSolid( oldType ) && TypeInfo.hasAlpha( $type ) ) {
 				// we removed a solid block, and are replacing it with air or transparent
-				if ( changedOxel.lighting && changedOxel.lighting.valuesHas() )
-					LightEvent.dispatch( new LightEvent( LightEvent.SOLID_TO_ALPHA, $modelGuid, changedOxel.gc ) );
+				if ( changeCandidate.lighting && changeCandidate.lighting.valuesHas() )
+					LightEvent.dispatch( new LightEvent( LightEvent.SOLID_TO_ALPHA, $modelGuid, changeCandidate.gc ) );
 			} 
 			else if ( TypeInfo.isSolid( $type ) && TypeInfo.hasAlpha( oldType ) ) {
 				
 				// we added a solid block, and are replacing the transparent block that was there
-				if ( changedOxel.lighting && changedOxel.lighting.valuesHas() )
-					LightEvent.dispatch( new LightEvent( LightEvent.ALPHA_TO_SOLID, $modelGuid, changedOxel.gc ) );
+				if ( changeCandidate.lighting && changeCandidate.lighting.valuesHas() )
+					LightEvent.dispatch( new LightEvent( LightEvent.ALPHA_TO_SOLID, $modelGuid, changeCandidate.gc ) );
 			}
+			
+			changeCandidate.writeInternal( $modelGuid, $type, $onlyChangeType );
 		}
 		
 		return result;

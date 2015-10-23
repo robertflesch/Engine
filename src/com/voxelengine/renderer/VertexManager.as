@@ -63,7 +63,7 @@ public class VertexManager {
 		
 		_shaders.push( new ShaderAlpha($context) ); // alpha oxel
 		
-		shader = new ShaderAlpha($context); // animated alpha oxel
+		shader = new ShaderAlphaAnimated($context); // animated alpha oxel
 		shader.isAnimated = true;
 		_shaders.push( shader );
 		

@@ -19,11 +19,13 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	// * @author Robert Flesch
 	public class FlowTask extends AbstractTask 
 	{		
+		private static var _s_flowInfo:FlowInfo = new FlowInfo()
+		
 		protected var _guid:String;
 		protected var _gc:GrainCursor;
 		protected var _type:int;
 		protected var _ready:Boolean = false;
-		protected var _flowInfo:FlowInfo;
+		protected var _flowInfoRaw:int;
 		
 		public static const TASK_TYPE:String = "FLOW_TASK";
         public static const TASK_PRIORITY:int = 1;
@@ -47,7 +49,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			// so find the address we want, then getChild on that oxel. Which causes the oxel to break up if needed.
 			gct.copyFrom( flowOxel.gc );
 			// move cursor to oxel we want.
-			gct.move( _flowInfo.direction );
+			_s_flowInfo.flowInfoRaw = _flowInfoRaw
+			gct.move( _s_flowInfo.direction );
 			// now get the possibly reduced oxel we want.
 			flowIntoTarget = flowIntoNeighbor.childGetOrCreate( gct );
 			GrainCursorPool.poolDispose( gct );
@@ -60,9 +63,6 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			super.complete();
 		}
 		
-		public function get type():int 
-		{
-			return _type;
-		}
+		public function get type():int { return _type; }
 	}
 }

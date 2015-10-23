@@ -21,6 +21,7 @@ package com.voxelengine.renderer.shaders
         {
 			ShaderOxel;
 			ShaderAlpha;
+			ShaderAlphaAnimated;
 			ShaderFire;
 			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.renderer.shaders.ShaderOxel" ) );
 			try 

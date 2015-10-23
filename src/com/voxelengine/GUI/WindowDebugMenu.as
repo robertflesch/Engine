@@ -120,10 +120,17 @@ package com.voxelengine.GUI
 			
 			//addStaticMemoryNumberDisplay( _target, 100, 0, "           Total Voxels: ", Quad.count );
 			
-			display( 0, 240 );	
+			display( 0, 240 )	
+			onResize( null )
 			
 			Globals.g_app.addEventListener( Event.ENTER_FRAME, onEnterFrame );
+			Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 		} 
+		
+        protected function onResize(event:Event):void
+        {
+			move( Globals.g_renderer.width - 160, 150 );
+		}
 		
 		private function addInt( title:String, callback:Function ):void
 		{

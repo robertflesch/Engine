@@ -109,7 +109,12 @@ public class EditCursor extends VoxelModel
 	
 	private 		  	var _cursorOperation:String 					= CursorOperationEvent.NONE;
 	private  function 	get cursorOperation():String 					{ return _cursorOperation; }
-	private  function 	set cursorOperation(val:String):void 			{ _cursorOperation = val; }
+	private  function 	set cursorOperation(val:String):void 			{ 
+		//Log.out( "EditCursor.cursorOperation", Log.WARN )
+		if ( _cursorOperation == CursorOperationEvent.NONE )
+			repeatTimerStop()
+		_cursorOperation = val; 
+	}
 	
 	private 		 	var _cursorShape:String 						= CursorShapeEvent.SQUARE;		// round, square, cylinder
 	private function 	get cursorShape():String 						{ return _cursorShape; }
@@ -161,6 +166,7 @@ public class EditCursor extends VoxelModel
 		// We dont want the repeat on if app loses focus
 		mouseUp( null );
 		removeListeners();
+		reset()
 	}
 	
 	protected function onActivate( e:AppEvent ):void  { addListeners(); }
@@ -204,10 +210,16 @@ public class EditCursor extends VoxelModel
 	
 	////////////////////////////////////////////////
 	// CursorOperationEvents
-	private function resetEvent(e:CursorOperationEvent):void {
+	private function resetEvent(e:CursorOperationEvent):void { reset() }
+		
+	private function deactivate(e:AppEvent):void { reset() }
+		
+	private function reset():void {		
+		//Log.out( "EditCursor.resetEvent", Log.WARN )
 		_editing = false;
 		cursorShape = CursorShapeEvent.SQUARE;
-		cursorOperation = e.type;
+		// The change to NONE turns off the repeat timer
+		cursorOperation = CursorOperationEvent.NONE;
 	}
 	private function deleteOxelEvent(e:CursorOperationEvent):void {
 		_editing = true;
@@ -288,7 +300,7 @@ public class EditCursor extends VoxelModel
 			return;
 			
 		_s_listenersAdded = true;	
-		CursorOperationEvent.addListener( CursorOperationEvent.NONE, 			resetEvent );
+		CursorOperationEvent.addListener( CursorOperationEvent.NONE, 			resetEvent )
 		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_OXEL, 	deleteOxelEvent );
 		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_MODEL, 	deleteModelEvent);
 		CursorOperationEvent.addListener( CursorOperationEvent.INSERT_OXEL, 	insertOxelEvent );
@@ -897,11 +909,18 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function mouseUp(e:MouseEvent):void  {
-		if ( _repeatTimer )
-			_repeatTimer.removeEventListener( TimerEvent.TIMER, onRepeat );
-		_count = 0;	
+		repeatTimerStop()
 	}
 	
+	private function repeatTimerStop():void  {
+		if ( _repeatTimer ) {
+			_repeatTimer.removeEventListener( TimerEvent.TIMER, onRepeat );
+			_repeatTimer.stop()
+			_repeatTimer = null
+			_count = 0
+		}
+	}
+		
 	private function mouseDown(e:MouseEvent):void {
 		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active )
 			return;
@@ -912,7 +931,6 @@ public class EditCursor extends VoxelModel
 			_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
 			_repeatTimer.start();
 			
-			Log.out( "EditCursor.mouseDown" )
 			switch (e.type) 
 			{
 				case "mouseDown": case Keyboard.NUMPAD_ADD:

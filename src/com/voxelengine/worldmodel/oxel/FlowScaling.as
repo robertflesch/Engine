@@ -99,6 +99,19 @@ public class FlowScaling
 	public function scalingReset( $oxel:Oxel = null ):void	{
 		//Log.out( "FlowScaling.scalingReset oxel: " + toString() );
 		// This is telling us we dont need no stinking scaling, however our neighbors might
+		_calculated = false;
+		// first reset this oxels scaling
+		if ( scalingHas() )
+		{
+			reset();
+			if ( $oxel )
+				$oxel.rebuildAll();
+		}
+	}
+	
+	public function scalingSetToDefault( $oxel:Oxel = null ):void	{
+		Log.out( "FlowScaling.scalingSetToDefault oxel: " + toString() );
+		// This is telling us we dont need no stinking scaling, however our neighbors might
 		_calculated = true;
 		// first reset this oxels scaling
 		if ( scalingHas() )
@@ -131,17 +144,18 @@ public class FlowScaling
 		if ( !scalingHas() )
 			return;
 			
-		//Log.out( "FlowScaling.scaleRecalculate was: " + toString() );
+		Log.out( "FlowScaling.scaleRecalculate was: " + toString() );
 		_calculated = false;
-		scalingCalculate( $oxel );
+		scaleCalculate( $oxel );
 		$oxel.rebuildAll();
-		//Log.out( "FlowScaling.scaleRecalculate is: " + toString() );
+		Log.out( "FlowScaling.scaleRecalculate is: " + toString() );
 	}
 	
-	public function scalingCalculate( $oxel:Oxel ):void	{
+	public function scaleCalculate( $oxel:Oxel ):void	{
 		if ( _calculated )
 			return;
 	
+		Log.out( "FlowScaling.scaleCalculate was: " + toString() );
 		_calculated = true;
 		// set these to a minimum level, so that their influence for the other corners can be felt
 		_scale = 0x00000000;
@@ -162,7 +176,7 @@ public class FlowScaling
 			NxNz = fi.scale()/_scaleRate;
 		if ( CORNER_MIN == NxPz )
 			NxPz = fi.scale()/_scaleRate;
-		//Log.out( "FlowScaling.scalingCalculate caculated: " + toString() );
+		Log.out( "FlowScaling.scalingCalculate is: " + toString() );
 	}
 		
 	private function grabNeighborInfluences( $oxel:Oxel, $dir:int ):void {

@@ -49,26 +49,32 @@ public class FlowInfo
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//  _flowInfo function this is a bitwise data field. which holds flow type, CONTRIBUTE, count out and count down
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private var _flowInfo:int 								= 0;                 
+	private var _data:int 								= 0;                 
 	private var _flowScaling:FlowScaling					= new FlowScaling();
 	
-	public 	function get out():int { return (_flowInfo & FLOW_OUT) >> FLOW_OUT_OFFSET; }
-	public 	function set out($val:int):void { $val = $val << FLOW_OUT_OFFSET;  _flowInfo &= FLOW_OUT_MASK; _flowInfo = $val | _flowInfo; }
-	public 	function get outRef():int { return (_flowInfo & FLOW_OUT_REF ) >> FLOW_OUT_REF_OFFSET; }
-	public	function set outRef($val:int):void { $val = $val << FLOW_OUT_REF_OFFSET;  _flowInfo &= FLOW_OUT_REF_MASK; _flowInfo = $val | _flowInfo; }
+	public 	function get out():int { return (_data & FLOW_OUT) >> FLOW_OUT_OFFSET; }
+	public 	function set out($val:int):void { $val = $val << FLOW_OUT_OFFSET;  _data &= FLOW_OUT_MASK; _data = $val | _data; }
+	public 	function get outRef():int { return (_data & FLOW_OUT_REF ) >> FLOW_OUT_REF_OFFSET; }
+	public	function set outRef($val:int):void { $val = $val << FLOW_OUT_REF_OFFSET;  _data &= FLOW_OUT_REF_MASK; _data = $val | _data; }
 	
-	public 	function get down():int { return (_flowInfo & FLOW_DOWN) >> FLOW_DOWN_OFFSET; }
-	public 	function set down($val:int):void { $val = $val << FLOW_DOWN_OFFSET; _flowInfo &= FLOW_DOWN_MASK; _flowInfo = $val | _flowInfo; }
+	public 	function get down():int { return (_data & FLOW_DOWN) >> FLOW_DOWN_OFFSET; }
+	public 	function set down($val:int):void { $val = $val << FLOW_DOWN_OFFSET; _data &= FLOW_DOWN_MASK; _data = $val | _data; }
 	
-	public 	function get type():int { return (_flowInfo & FLOW_FLOW_TYPE) >> FLOW_TYPE_OFFSET; }
-	public 	function set type($val:int):void { $val = $val << FLOW_TYPE_OFFSET; _flowInfo &= FLOW_FLOW_TYPE_MASK; _flowInfo = $val | _flowInfo; }
+	public 	function get type():int { return (_data & FLOW_FLOW_TYPE) >> FLOW_TYPE_OFFSET; }
+	public 	function set type($val:int):void { 
+		$val = $val << FLOW_TYPE_OFFSET;
+		_data &= FLOW_FLOW_TYPE_MASK;
+		_data = $val | _data; 
+		if ( 0 == ( _data & FLOW_FLOW_TYPE_MASK  ) )
+			Log.out( "FlowInfo.type - set to 0", Log.WARN )
+	}
 
-	public 	function get direction():int { return (_flowInfo & FLOW_FLOW_DIR) >> FLOW_DIR_OFFSET; }
+	public 	function get direction():int { return (_data & FLOW_FLOW_DIR) >> FLOW_DIR_OFFSET; }
 	public 	function set direction( $val:int):void 
 	{ 
 		$val = $val << FLOW_DIR_OFFSET;
-		_flowInfo &= FLOW_FLOW_DIR_MASK;
-		_flowInfo = $val | _flowInfo;
+		_data &= FLOW_FLOW_DIR_MASK;
+		_data = $val | _data;
 		
 		if ( Globals.ALL_DIRS == direction )
 			return;
@@ -104,10 +110,13 @@ public class FlowInfo
 		//Log.out( "FlowInfo.constructor" );
 	}
 	
+	public function get flowInfoRaw():int { return _data }
+	public function set flowInfoRaw( val:int ):void { _data = val }
+	
 	public function reset( $oxel:Oxel = null ):void {
 		direction = Globals.ALL_DIRS;
 		type = FLOW_TYPE_UNDEFINED;
-		_flowScaling.scalingReset( $oxel );
+		flowScaling.scalingReset( $oxel );
 	}
 	
 	public function toString():String {
@@ -116,10 +125,18 @@ public class FlowInfo
 	
 	public function clone( isChild:Boolean = false ):FlowInfo {
 		var fi:FlowInfo = FlowPool.poolGet();
-		fi._flowInfo = _flowInfo;
+		fi.flowInfoRaw = flowInfoRaw;
 		if ( isChild )
 			out = out * 2;
 		return fi;
+	}
+	
+	public function copy( $rhs:FlowInfo ):void {
+		type 	= $rhs.type
+		outRef 	= $rhs.outRef
+		out 	= $rhs.outRef
+		down 	= $rhs.down
+		direction = $rhs.direction
 	}
 	
 	public function fromJson( $flowJson:Object ):void
@@ -143,14 +160,14 @@ public class FlowInfo
 	}
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray {
-		$ba.writeInt( _flowInfo );
-		$ba = _flowScaling.toByteArray( $ba )
+		$ba.writeInt( _data );
+		$ba = flowScaling.toByteArray( $ba )
 		return $ba;
 	}
 	
 	public function fromByteArray( $version:int, $ba:ByteArray ):ByteArray {
-		_flowInfo = $ba.readInt();
-		$ba = _flowScaling.fromByteArray( $version, $ba )
+		flowInfoRaw = $ba.readInt();
+		$ba = flowScaling.fromByteArray( $version, $ba )
 		return $ba;
 	}
 	

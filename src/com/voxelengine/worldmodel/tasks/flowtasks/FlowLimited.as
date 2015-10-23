@@ -113,7 +113,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 						flowIntoTarget.flowInfo = _flowInfo; // flowInfo has to be present when write is performed
 						flowIntoTarget.write( _guid, flowIntoTarget.gc, _type );
 						//flowIntoTarget.flowInfo.direction = _flowInfo.direction;
-						flowIntoTarget.flowInfo.flowScaling.scalingCalculate( flowIntoTarget );
+						flowIntoTarget.flowInfo.flowScaling.scaleCalculate( flowIntoTarget );
 						flowOxel.write( _guid, flowOxel.gc, TypeInfo.AIR );
 						FlowLimited.addTask( _guid, flowIntoTarget.gc, _type, flowIntoTarget.flowInfo, FlowTask.TASK_PRIORITY );
 					}

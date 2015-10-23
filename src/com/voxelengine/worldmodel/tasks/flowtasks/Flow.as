@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	import com.voxelengine.pools.FlowPool;
 	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.oxel.FlowInfo;
+	import com.voxelengine.worldmodel.oxel.FlowScaling;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.utils.Timer;
 	import flash.utils.getTimer;
@@ -34,16 +35,16 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	 */
 	public class Flow extends FlowTask 
 	{		
-		static public function addTask( $instanceGuid:String, $gc:GrainCursor, $type:int, $flowInfo:FlowInfo, $taskPriority:int ):void 
+		static public function addTask( $instanceGuid:String, $gc:GrainCursor, $type:int, $flowInfoRaw:int, $taskPriority:int ):void 
 		{
-			var f:Flow = new Flow( $instanceGuid, $gc, $type, $flowInfo, $gc.toID(), $taskPriority );
+			var f:Flow = new Flow( $instanceGuid, $gc, $type, $flowInfoRaw, $gc.toID(), $taskPriority );
 			f.selfOverride = true;
 			Globals.g_flowTaskController.addTask( f );
 		}
 		
-		public function Flow( $instanceGuid:String, $gc:GrainCursor, $type:int, $flowInfo:FlowInfo, $taskType:String, $taskPriority:int ):void {
-			Log.out( "Flow.create flowInfo: " + $flowInfo.toString() );
-			_flowInfo = $flowInfo;
+		public function Flow( $instanceGuid:String, $gc:GrainCursor, $type:int, $flowInfoRaw:int, $taskType:String, $taskPriority:int ):void {
+			Log.out( "Flow.create flowInfo: " + $flowInfoRaw );
+			_flowInfoRaw = $flowInfoRaw;
 			super( $instanceGuid, $gc, $type, $taskType, $taskPriority );
 			
 			var pt:Timer = new Timer( 1000, 1 );
@@ -66,111 +67,84 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		}
 		
 		override public function start():void {
-			
-			//var timeStart:int = getTimer();
-			
 			super.start();
 			
 			var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
-			main:if ( vm )
-			{
-				var flowOxel:Oxel = vm.modelInfo.data.oxel.childGetOrCreate( _gc );
-				if ( null == flowOxel )
+			if ( vm ) {
+				var flowFromOxel:Oxel = vm.modelInfo.data.oxel.childGetOrCreate( _gc );
+				if ( null == flowFromOxel )
 					return;
 
-				// If we are flowing from another oxel, we need to grab its count if we dont have flow info.
-				if ( (null != _flowInfo) )
-				{
-					if ( null ==  flowOxel.flowInfo ) // existing flow info, dont copy over it. ??? RSF Not sure
-						flowOxel.flowInfo = _flowInfo; // Flow info has to be present when write is performed
-					else if ( FlowInfo.FLOW_TYPE_UNDEFINED == flowOxel.flowInfo.type )
-						flowOxel.flowInfo = _flowInfo; // This oxel has a undefine flow type, so no data in it.
-				}
-				else {	
-					flowOxel.flowInfo = FlowPool.poolGet()
-					flowOxel.flowInfo = TypeInfo.typeInfo[_type].flowInfo;
-				}
+				if ( null ==  flowFromOxel.flowInfo ) // existing flow info, dont copy over it. ??? RSF Not sure
+					flowFromOxel.flowInfo = FlowPool.poolGet()
+				flowFromOxel.flowInfo.flowInfoRaw = _flowInfoRaw; // Flow info has to be present when write is performed
 					
-				flowTerminal(flowOxel);
-				scale( flowOxel );
+				var ft:int = flowFromOxel.flowInfo.type;
+				//Log.out( "Flow.start - flowable oxel of type: " + ft );
+				if ( FlowInfo.FLOW_TYPE_CONTINUOUS == ft )
+					flowStartContinous(flowFromOxel);
+				else if ( FlowInfo.FLOW_TYPE_MELT == ft )
+					flowStartMelt(flowFromOxel);
+				else if ( FlowInfo.FLOW_TYPE_SPRING == ft )
+					flowStartSpring(flowFromOxel);
+				else
+					Log.out( "Flow.start - NO FLOW TYPE FOUND ft: " + ft, Log.WARN );
+					
+				scale( flowFromOxel );
 			}
 			else
-			{
 				Log.out( "Flow.start - VoxelModel not found: " + _guid, Log.ERROR );
-			}	
 			super.complete();
 			//Log.out( "Flow.start - Complete time: " + (getTimer() - timeStart) );
 		}
 		
-		public function flowTerminal( flowOxel:Oxel ):void {
-
-			var ft:int = flowOxel.flowInfo.type;
-			//Log.out( "Flow.flowTerminal - flowable oxel of type: " + ft );
-			if ( FlowInfo.FLOW_TYPE_CONTINUOUS == ft )
-				flowStartContinous(flowOxel);
-			else if ( FlowInfo.FLOW_TYPE_MELT == ft )
-				flowStartMelt(flowOxel);
-			else if ( FlowInfo.FLOW_TYPE_SPRING == ft )
-				flowStartSpring(flowOxel);
-			else
-				Log.out( "Flow.flowTerminal - NO FLOW TYPE FOUND ft: " + ft, Log.WARN );
-		}
-		
-		private function scale( flowOxel:Oxel ):void
-		{
-			//Log.out( "Flow.scale.start - FlowOxel scaleInfo: " + flowOxel.flowInfo.flowScaling.toString() );
+		private function scale( flowFromOxel:Oxel ):void {
+			//Log.out( "Flow.scale.start - flowFromOxel scaleInfo: " + flowFromOxel.flowInfo.flowScaling.toString() );
 				
-			if ( flowOxel.type == _type )
-			{
-				Log.out( "Flow.start - ALREADY " + TypeInfo.typeInfo[_type].name + " here" );
+			if ( flowFromOxel.type == _type ) {
 				return; 
 			}
-			else if ( null == flowOxel.gc )
-			{
-				Log.out( "Flow.start - oxel released" );
+			else if ( null == flowFromOxel.gc ) {
+				Log.out( "Flow.scale - oxel released", Log.WARN );
 				return; 
+			} 
+			else if ( TypeInfo.getTypeId( "obsidian" ) == flowFromOxel.type ) { 
+				Log.out( "Flow.scale - what is supposed to happen here? why would I change obsidian?: " + TypeInfo.typeInfo[flowFromOxel.type].name + " expecting: " + TypeInfo.typeInfo[writeType].name, Log.WARN );
+				flowFromOxel.flowInfo.flowScaling.scaleRecalculate( flowFromOxel );
 			}
-				
-			if ( TypeInfo.getTypeId( "obsidian" ) == flowOxel.type )
-			{
-				flowOxel.flowInfo.flowScaling.scaleRecalculate( flowOxel );
-			}
-			else if ( TypeInfo.AIR != flowOxel.type )
-			{
+			else if ( TypeInfo.AIR != flowFromOxel.type ) {
 				// Is it still the type I am expected?
 				// I would need to do a reverse lookup.
 				var toTypeName:String = TypeInfo.typeInfo[type].name;
-				var ip:InteractionParams = TypeInfo.typeInfo[flowOxel.type].interactions.IOGet( toTypeName );
+				var ip:InteractionParams = TypeInfo.typeInfo[flowFromOxel.type].interactions.IOGet( toTypeName );
 				var writeType:int = TypeInfo.getTypeId( ip.type );
-				//var writeType:int = Globals.Info[type].interactions.IOGet( Globals.Info[flowOxel.type].name ).type
-				if ( flowOxel.type != writeType )
-				{
-					Log.out( "Flow.scale - wrong write type is: " + TypeInfo.typeInfo[flowOxel.type].name + " expecting: " + TypeInfo.typeInfo[writeType].name );
+				//var writeType:int = Globals.Info[type].interactions.IOGet( Globals.Info[flowFromOxel.type].name ).type
+				if ( flowFromOxel.type != writeType ) {
+					Log.out( "Flow.scale - wrong write type is: " + TypeInfo.typeInfo[flowFromOxel.type].name + " expecting: " + TypeInfo.typeInfo[writeType].name, Log.WARN );
 					return; 
 				}
+				Log.out( "Flow.scale - what is supposed to happen here? Change type to interaction type?: " + TypeInfo.typeInfo[flowFromOxel.type].name + " expecting: " + TypeInfo.typeInfo[writeType].name, Log.WARN );
+				flowFromOxel.write( _guid, flowFromOxel.gc, writeType );
 			}
-			else
-			{
-				flowOxel.write( _guid, flowOxel.gc, type );
-				flowOxel.flowInfo.flowScaling.scalingCalculate( flowOxel );
+			else {
+				// I can only flow into AIR, everything else I interact with
+				flowFromOxel.write( _guid, flowFromOxel.gc, type );
+				flowFromOxel.flowInfo.flowScaling.scaleCalculate( flowFromOxel );
 
 				// if I flow under another of the same type
-				var flowUnder:Oxel = flowOxel.neighbor( Globals.POSY );
-				if ( Globals.BAD_OXEL != flowUnder && flowUnder.type == flowOxel.type )
-				{
-					flowOxel.flowInfo.flowScaling.scalingReset( flowOxel );
-				}
+				var flowUnder:Oxel = flowFromOxel.neighbor( Globals.POSY );
+				if ( Globals.BAD_OXEL != flowUnder && flowUnder.type == flowFromOxel.type ) 
+					flowFromOxel.flowInfo.flowScaling.scalingSetToDefault( flowFromOxel );
+					
 				// if I flow over another oxel of the same type, reset its scaling
-				var flowOver:Oxel = flowOxel.neighbor( Globals.NEGY );
-				if ( Globals.BAD_OXEL != flowOver && flowOver.type == flowOxel.type )
-				{
-					flowOver.flowInfo.flowScaling.scalingReset( flowOver );
-				}
-				flowOxel.flowInfo.flowScaling.neighborsRecalc( flowOxel );
-
-				_flowInfo = null;
+				var flowOver:Oxel = flowFromOxel.neighbor( Globals.NEGY );
+				if ( Globals.BAD_OXEL != flowOver && flowOver.type == flowFromOxel.type )
+					flowOver.flowInfo.flowScaling.scalingSetToDefault( flowOver );
+					
+//				Is this needed, scaling was happening once about in the scaleCalculate, and again here.
+//				flowFromOxel.flowInfo.flowScaling.neighborsRecalc( flowFromOxel );
 			}
-			//Log.out( "Flow.scale.end - FlowOxel scaleInfo: " + flowOxel.flowInfo.flowScaling.toString() );
+			//Log.out( "Flow.scale.end - flowFromOxel scaleInfo: " + flowFromOxel.flowInfo.flowScaling.toString() );
 		}
 		
 		override public function cancel():void {
@@ -178,69 +152,65 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			super.cancel();
 		}
 
-		private function flowStartSpring(flowOxel:Oxel):void {
+		private function flowStartSpring(flowFromOxel:Oxel):void {
 		}
 		
 		static private const MIN_MELT_GRAIN:int = 2;
-		private function flowStartMelt( flowOxel:Oxel ):void {
+		private function flowStartMelt( flowFromOxel:Oxel ):void {
 			// Figure out what direction I can flow in.
 			// Crack oxel and send 1/8 down in flow direction
 			// go from 1,1,1 to 0,0,0 for flow order
 			// each child voxel should try to flow at least 8 before stopping
-			if ( MIN_MELT_GRAIN > flowOxel.gc.grain )
+			if ( MIN_MELT_GRAIN > flowFromOxel.gc.grain )
 				return;
 				
-//			FlowFlop.addTask( _guid, flowOxel.gc, flowOxel.type, flowOxel.flowInfo, 1 );
+//			FlowFlop.addTask( _guid, flowFromOxel.gc, flowFromOxel.type, flowFromOxel.flowInfo, 1 );
 		}
 
-		private function flowStartContinous(flowOxel:Oxel):void {
+		private function flowStartContinous(flowFromOxel:Oxel):void {
 			// Prefer going down if possible (or up for floatium)
 			var floatiumTypeID:uint = TypeInfo.getTypeId( "floatium" );
-			var fc:Vector.<FlowTest> = new Vector.<FlowTest>;
+			var flowCandidates:Vector.<FlowCandidate> = new Vector.<FlowCandidate>;
 			var partial:Boolean = false;
 			if ( floatiumTypeID == type )
-				partial = flowable( flowOxel, Globals.POSY, fc );
+				partial = canFlowInto( flowFromOxel, Globals.POSY, flowCandidates );
 			else
-				partial = flowable( flowOxel, Globals.NEGY, fc );
+				partial = canFlowInto( flowFromOxel, Globals.NEGY, flowCandidates );
 				
 			// if there is water below us, dont do anything
-			if ( 0 == fc.length && partial )
+			if ( 0 == flowCandidates.length && partial )
 				return;
 			// if we found a down/up, add that as a priority
-			else if ( 0 < fc.length )
+			else if ( 0 < flowCandidates.length )
 			{
-				flowTasksAdd( fc, true, flowOxel.flowInfo );
+				flowTasksAdd( flowCandidates, true, flowFromOxel.flowInfo );
 				// if we only went partially down, try the sides	
 				if ( false == partial )
 					return;
 				// reset list
-				fc.length = 0;	
+				flowCandidates.length = 0;	
 			}
 				
 			// no downs found, so check outs
-			if ( 0 == fc.length )
+			if ( 0 == flowCandidates.length )
 			{
 				// check sides once
-				flowable( flowOxel, Globals.POSX, fc );
-				flowable( flowOxel, Globals.NEGX, fc );
-				flowable( flowOxel, Globals.POSZ, fc );
-				flowable( flowOxel, Globals.NEGZ, fc );
-				if ( 0 < fc.length )
-				{
-					flowTasksAdd( fc, false, flowOxel.flowInfo );
-				}
+				canFlowInto( flowFromOxel, Globals.POSX, flowCandidates );
+				canFlowInto( flowFromOxel, Globals.NEGX, flowCandidates );
+				canFlowInto( flowFromOxel, Globals.POSZ, flowCandidates );
+				canFlowInto( flowFromOxel, Globals.NEGZ, flowCandidates );
+				if ( 0 < flowCandidates.length )
+					flowTasksAdd( flowCandidates, false, flowFromOxel.flowInfo );
 			}
 		}
 		
-		private function flowTasksAdd( $fc:Vector.<FlowTest>, $upOrDown:Boolean, $flowInfo:FlowInfo ):void {
-			for each ( var flowTest:FlowTest in $fc )
+		private function flowTasksAdd( $fc:Vector.<FlowCandidate>, $upOrDown:Boolean, $flowInfo:FlowInfo ):void {
+			for each ( var flowTest:FlowCandidate in $fc )
 			{
 				//Log.out( "Oxel.flowTaskAdd - $count: " + $countDown + "  countOut: " + $countOut + " gc data: " + flowCanditate.gc.toString() + " tasks: " + (Globals.g_flowTaskController.queueSize() + 1) );
-				var	taskPriority:int = 0;
+				var	taskPriority:int = 3;
 				if ( $upOrDown )
 					taskPriority = 1;
-				else
-					taskPriority = 3;
 				
 				var fi:FlowInfo = $flowInfo.clone();
 				fi.direction = flowTest.dir;
@@ -249,48 +219,43 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				if ( 0 == fi.down )
 					continue;
 
-				Flow.addTask( _guid, flowTest.flowCandidate.gc, type, fi, taskPriority + 1 )
+				Flow.addTask( _guid, flowTest.flowCandidate.gc, type, fi.flowInfoRaw, taskPriority + 1 )
 			}
 		}
 		
 		static private const FLOW_NO_FACE_FOUND:int = -1;
-		private function flowFindMeltableDirection(flowOxel:Oxel):int {
-			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
-			{
+		private function flowFindMeltableDirection(flowFromOxel:Oxel):int {
+			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
 				if ( Globals.POSY == face )
 					continue;
 					
-				var no:Oxel = flowOxel.neighbor( face );
+				var no:Oxel = flowFromOxel.neighbor( face );
 				if ( TypeInfo.AIR == no.type )
 					return face;
-					
 			}
 			
 			return FLOW_NO_FACE_FOUND;
 		}
 		
 		private const MIN_FLOW_GRAIN:int = 2;
-		private function flowable( flowOxel:Oxel, $face:int, $fc:Vector.<FlowTest> ):Boolean {
+		private function canFlowInto( flowOxel:Oxel, $face:int, $fc:Vector.<FlowCandidate> ):Boolean {
 		
 			var co:Oxel = flowOxel.neighbor($face);
 			var partial:Boolean = false;
-			var ft:FlowTest = null;
+			var ft:FlowCandidate = null;
 			if ( Globals.BAD_OXEL != co && co.gc && co.gc.grain >= MIN_FLOW_GRAIN )
 			{
 				// if our neighbor is air, just flow into it.o
-				if ( co.type == TypeInfo.AIR && !co.childrenHas() )
-				{
+				if ( co.type == TypeInfo.AIR && !co.childrenHas() ) {
 					// Our neighbor oxel might be larger then this oxel
 					// in which case just ask for oxel of same size
-					if ( co.gc.grain == flowOxel.gc.grain )
-					{
-						ft = new FlowTest();
+					if ( co.gc.grain == flowOxel.gc.grain ) {
+						ft = new FlowCandidate();
 						ft.dir = $face;
 						ft.flowCandidate = co;
 						$fc.push( ft );
 					}
-					else	
-					{
+					else {
 						// neighbor might be larger, never smaller
 						var gct:GrainCursor = GrainCursorPool.poolGet( flowOxel.gc.bound );
 						gct.copyFrom( flowOxel.gc );
@@ -300,7 +265,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 						GrainCursorPool.poolDispose( gct );
 						if ( Globals.BAD_OXEL != crackedOxel )
 						{
-							ft = new FlowTest();
+							ft = new FlowCandidate();
 							ft.dir = $face;
 							ft.flowCandidate = crackedOxel;
 							$fc.push( ft );
@@ -308,33 +273,27 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					}
 				}
 				// if the neighbor is a flowable type, look up its interaction with that type
-				else if ( TypeInfo.typeInfo[co.type].flowable )
-				{
-					if ( co.type != type )
-					{
+				else if ( TypeInfo.typeInfo[co.type].flowable ) {
+					if ( co.type != type ) {
 						//Log.out( "Oxel.flowable - 2 Different flow types here! getting IP for: " + Globals.Info[type].name + "  with " + Globals.Info[co.type].name );
 						
 						var ip:InteractionParams = TypeInfo.typeInfo[type].interactions.IOGet( TypeInfo.typeInfo[co.type].name );
 						var writeType:int = TypeInfo.getTypeId( ip.type );
-						if ( type != writeType )
-						{
-							if ( TypeInfo.typeInfo[writeType].flowable )
-							{
+						if ( type != writeType ) {
+							if ( TypeInfo.typeInfo[writeType].flowable ) {
 								// if write type is same as flow type, add it.
-								if ( type == writeType )
-								{
-									ft = new FlowTest();
+								if ( type == writeType ) {
+									ft = new FlowCandidate();
 									ft.dir = $face;
 									ft.flowCandidate = co;
 									$fc.push( ft );
 								}
 							}
-							else
-							{
+							else {
 								co.write( _guid, co.gc, writeType, false );
 								// defer the scaling until after the water has been written
 								// this makes the obsidian reach up to the water, is that right?
-								ft = new FlowTest();
+								ft = new FlowCandidate();
 								ft.dir = $face;
 								ft.flowCandidate = co;
 								$fc.push( ft );
@@ -344,43 +303,32 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					else
 					{
 						//Log.out( "Oxel.flowable - ALREADY " + Globals.Info[co.type].name + " here" );
-						if ( TypeInfo.getTypeId( "floatium" ) == co.type )
-						{
+						if ( TypeInfo.getTypeId( "floatium" ) == co.type ) {
 							// there is floatium above us, we should not flow out.
 							if ( Globals.POSY == $face )
-							{
 								partial = true;
-							}
 						}
-						else
-						{
+						else {
 							// there is water below us, we should not flow out.
 							if ( Globals.NEGY == $face )
-							{
 								partial = true;
-							}
 						}
 					}
 				}
-				else if ( co.childrenHas() )
-				{
+				else if ( co.childrenHas() ) {
 					const dchildren:Vector.<Oxel> = co.childrenForDirection( Oxel.face_get_opposite( $face ) );
-					for each ( var dchild:Oxel in dchildren ) 
-					{
-						if ( TypeInfo.AIR == dchild.type )
-						{
-							if ( TypeInfo.getTypeId( "floatium" ) == type )
-							{
-								ft = new FlowTest();
+					for each ( var dchild:Oxel in dchildren )  {
+						if ( TypeInfo.AIR == dchild.type ) {
+							if ( TypeInfo.getTypeId( "floatium" ) == type ) {
+								ft = new FlowCandidate();
 								ft.dir = $face;
 								ft.flowCandidate = dchild;
 								$fc.push( ft );
 								partial = true;
 								
 							}
-							else if ( flowOxel.gc.grainY == dchild.gc.grainY && flowOxel.gc.grain == dchild.gc.grain )
-							{
-								ft = new FlowTest();
+							else if ( flowOxel.gc.grainY == dchild.gc.grainY && flowOxel.gc.grain == dchild.gc.grain ) {
+								ft = new FlowCandidate();
 								ft.dir = $face;
 								ft.flowCandidate = dchild;
 								$fc.push( ft );
@@ -399,7 +347,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.oxel.FlowInfo;
 import com.voxelengine.Globals;
-internal class FlowTest
+internal class FlowCandidate
 {
 	public var flowCandidate:Oxel = null;
 	public var dir:int = Globals.ALL_DIRS;

@@ -95,7 +95,7 @@ package com.voxelengine
 					break
 			}
 			
-			if ( ERROR <= $type )
+			if ( FATAL <= $type )
 				show()
 		}
 	}
