@@ -111,8 +111,10 @@ public class EditCursor extends VoxelModel
 	private  function 	get cursorOperation():String 					{ return _cursorOperation; }
 	private  function 	set cursorOperation(val:String):void 			{ 
 		//Log.out( "EditCursor.cursorOperation", Log.WARN )
-		if ( _cursorOperation == CursorOperationEvent.NONE )
+		if ( _cursorOperation == CursorOperationEvent.NONE ) {
+			Log.out( "EditCursor.cursorOperation - reseting", Log.WARN )
 			repeatTimerStop()
+		}
 		_cursorOperation = val; 
 	}
 	
@@ -927,9 +929,11 @@ public class EditCursor extends VoxelModel
 		if ( doubleMessageHack ) {
 			//Log.out( "EditCursor.mouseDown", Log.WARN );	
 				
-			_repeatTimer = new Timer( 200 );
-			_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
-			_repeatTimer.start();
+			if ( null == _repeatTimer && 0 == _count) {
+				_repeatTimer = new Timer( 200 );
+				_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
+				_repeatTimer.start();
+			}
 			
 			switch (e.type) 
 			{

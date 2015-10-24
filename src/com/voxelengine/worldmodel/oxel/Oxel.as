@@ -1180,7 +1180,7 @@ public class Oxel extends OxelBitfields
 		else  if ( TypeInfo.LEAF == type )
 			facesSetAll();
 		else if ( faceHasDirtyBits() ) {
-			var no:Oxel = null ;
+			var oppositeOxel:Oxel = null ;
 			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 			{
 				//if ( face == Globals.POSY && type == TypeInfo.WATER )
@@ -1188,22 +1188,23 @@ public class Oxel extends OxelBitfields
 				// only check the faces marked as dirty
 				if ( faceIsDirty( face ) )
 				{
-					no = neighbor( face );
-					if ( Globals.BAD_OXEL == no ) {
+					// get the oxel opposite to this face
+					oppositeOxel = neighbor( face );
+					if ( Globals.BAD_OXEL == oppositeOxel ) {
 						// this is an external face. that is on the edge of the grain space
 						if ( face == Globals.POSY && flowInfo && flowInfo.flowScaling )
 							scaleTopFlowFace()
 						faceSet( face );
 					}
-					else if ( no.type == type ) {
+					else if ( oppositeOxel.type == type ) {
 						// nieghbor oxel is the same, we are done? nope, the neighbor might have different scaling.. for flowable type.
 						// do we both have flow info?
-						if ( no.flowInfo && flowInfo ) {
+						if ( oppositeOxel.flowInfo && flowInfo ) {
 							// verify both have scaling
-							if ( no.flowInfo.flowScaling && flowInfo.flowScaling ) {
+							if ( oppositeOxel.flowInfo.flowScaling && flowInfo.flowScaling ) {
 								// so now I need the equivelent spots on each face to compare.
 								var p1:Point = flowInfo.flowScaling.faceGet( face );
-								var p2:Point = no.flowInfo.flowScaling.faceGet( face_get_opposite( face ) );
+								var p2:Point = oppositeOxel.flowInfo.flowScaling.faceGet( face_get_opposite( face ) );
 								if ( p1.equals( p2 ) )
 									faceClear( face );
 								else 
@@ -1213,14 +1214,14 @@ public class Oxel extends OxelBitfields
 						else
 							faceClear( face );
 					}
-					else if ( no.childrenHas() ) {
+					else if ( oppositeOxel.childrenHas() ) {
 						// so I am a larger face looking to see if there is visability to me.
 						// if I am solid, and any neighbors has alpha, then I am visible.
 						var rface:int;
 						if ( !TypeInfo.hasAlpha( type ) ) {
 							rface = Oxel.face_get_opposite( face );
 							// get the children of my neighbor, that touch me.
-							const dchildren:Vector.<Oxel> = no.childrenForDirection( rface );
+							const dchildren:Vector.<Oxel> = oppositeOxel.childrenForDirection( rface );
 							for each ( var dchild:Oxel in dchildren ) 
 							{
 								// Need to gather the alpha info from each child
@@ -1234,23 +1235,23 @@ public class Oxel extends OxelBitfields
 						}
 						else {
 							faceClear( face );
-							if ( faceAlphaNeedsFace( face, type, no ) )
+							if ( faceAlphaNeedsFace( face, type, oppositeOxel ) )
 								if ( face == Globals.POSY && flowInfo && flowInfo.flowScaling )
 									scaleTopFlowFace()
 								faceSet( face )
 						}
 						
 						//var rface:int = Oxel.face_get_opposite( face );
-						//if ( no.faceHasAlpha( rface ) )
+						//if ( oppositeOxel.faceHasAlpha( rface ) )
 							//face_set( face );
 					}
 					// no children, so just check against type
 					else
 					{
-						// If the oxel next to me has alpha, I need to set the face
-						if ( TypeInfo.hasAlpha( no.type ) ) {
+						// If the oxel opposite this face has alpha, I need to set the face
+						if ( TypeInfo.hasAlpha( oppositeOxel.type ) ) {
 							// if the oxel next to me is air and its a top face, then scale the oxel
-							if ( TypeInfo.AIR == no.type && face == Globals.POSY )
+							if ( TypeInfo.AIR == oppositeOxel.type && face == Globals.POSY && TypeInfo.typeInfo[type].flowable )
 								scaleTopFlowFace()
 							//else {	
 								//// if above has alpha, but its not air, reset scaling
@@ -1261,13 +1262,15 @@ public class Oxel extends OxelBitfields
 							//}
 							faceSet( face );
 						}
-						else if ( flowInfo ) // All water and lava have flow info.
+						// oxel opposite (oppositeOxel) does not have alpha.
+						// does this 
+						else if ( flowInfo && flowInfo.flowScaling ) // All water and lava have flow info.
 						{ 
-							if ( no.flowInfo.flowScaling.scalingHas() ) { 	// for scaled lava or other non alpha flowing types
+							if ( oppositeOxel.flowInfo.flowScaling.scalingHas() ) { 	// for scaled lava or other non alpha flowing types
 								faceSet( face );
 							}
 							else {
-								if ( no.type && face == Globals.POSY ) {
+								if ( TypeInfo.AIR == oppositeOxel.type && face == Globals.POSY ) {
 									scaleTopFlowFace()
 									faceSet( face )
 								}
@@ -1276,18 +1279,18 @@ public class Oxel extends OxelBitfields
 								/*
 								if ( TypeInfo.WATER == type ) {
 									//face_set( face ) This adds an interior face, but z buffer conflicts makes it not work well.
-									if ( no.lighting ) {
-										var li:LightInfo = no.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+									if ( oppositeOxel.lighting ) {
+										var li:LightInfo = oppositeOxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
 										li.color = 0x0000ff;
-										no.dirty = true;
+										oppositeOxel.dirty = true;
 									}
 								}
 								*/
 							}
 						}
-						else if ( no.flowInfo )	// for scaled lava or other non alpha flowing types
+						else if ( oppositeOxel.flowInfo )	// for scaled lava or other non alpha flowing types
 						{
-							if ( no.flowInfo.flowScaling.scalingHas() )
+							if ( oppositeOxel.flowInfo.flowScaling.scalingHas() )
 								faceSet( face );
 							else
 								faceClear( face );
