@@ -64,11 +64,11 @@ package com.voxelengine.GUI
 		public function LoadingImage():void { 
 			//Log.out( "LoadingImage.constructor", Log.WARN );
 			super( Globals.g_renderer.width, Globals.g_renderer.height );
+			_s_currentInstance = this;
 
 			_splashImage = (new _splashImageClass() as Bitmap);
 			_outline = new Image( _splashImage );
 			addElement( _outline );
-			_s_currentInstance = this;
 			
 			display( _outline.x, _outline.x );
 			onResize( null );

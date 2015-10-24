@@ -7,9 +7,6 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-import com.voxelengine.events.PersistanceEvent;
-import com.voxelengine.worldmodel.PermissionsBase;
-import com.voxelengine.worldmodel.TypeInfo;
 import flash.utils.ByteArray;
 import playerio.DatabaseObject;
 
@@ -20,8 +17,11 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.PermissionsBase;
+import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
@@ -31,7 +31,8 @@ import com.voxelengine.worldmodel.tasks.landscapetasks.TaskLibrary;
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF
-	 * This class is used to load a model once its metadata AND data has been loaded from persistance
+	 * This class is used to generate the modelInfo and the modelMetadata
+	 * The class is different then all the other makers which depend on local or persistent object
 	 * it then removes its listeners, which should cause it be to be garbage collected.
 	 * Might I need to add a timeout on this object in case if never completes.
 	 */
@@ -46,7 +47,6 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		
 		super( $ii );
 		Log.out( "ModelMakerGenerate - ii: " + ii.toString() + "  using generation script: " + $miJson.biomes.layers[0].functionName );
-		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 		
 		// This is a special case for modelInfo, the modelInfo its self is contained in the generate script
 		_modelInfo = new ModelInfo( $ii.modelGuid );
@@ -55,9 +55,9 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		dbo.data = new Object();
 		// This is for import from generated only.
 		dbo.data.model = $miJson
-		_modelInfo.fromObjectImport( dbo );
+		modelInfo.fromObjectImport( dbo );
 		// On import save it.
-		_modelInfo.save();
+		modelInfo.save();
 		
 		///////////////////
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.GENERATION, 0, $ii.modelGuid, _modelInfo ) );
@@ -72,7 +72,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		var newObj:Object = ModelMetadata.newObject()
 		_modelMetadata.fromObjectImport( newObj );
 		
-		_modelMetadata.name = TypeInfo.name( _type ) + "-" + _modelInfo.info.model.grainSize + "-" + _creationFunction;
+		_modelMetadata.name = TypeInfo.name( _type ) + "-" + modelInfo.info.model.grainSize + "-" + _creationFunction;
 		_modelMetadata.description = _creationFunction + "- GENERATED";
 		_modelMetadata.owner = Network.userId;
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelMetadata ) );
@@ -80,13 +80,13 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
-		if ( null != _modelInfo && null != _modelMetadata ) {
+		if ( null != modelInfo && null != _modelMetadata ) {
 			
 			var vm:* = make();
 			if ( vm ) {
 				vm.complete = true;
 				vm.changed = true;
-				_modelInfo.changed = true;
+				modelInfo.changed = true;
 				_modelMetadata.changed = true;
 				vm.save();
 				Region.currentRegion.modelCache.add( vm );
@@ -96,8 +96,6 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	}
 	
 	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
-		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
-		
 		// do this last as it nulls everything.
 		super.markComplete( $success, $vm );
 	}

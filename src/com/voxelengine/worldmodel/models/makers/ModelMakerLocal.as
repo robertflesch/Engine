@@ -39,12 +39,12 @@ public class ModelMakerLocal extends ModelMakerBase {
 	
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
-		if ( null != _modelInfo ) {
+		if ( null != modelInfo ) {
 			_modelMetadata = new ModelMetadata( ii.modelGuid );
 			var newObj:Object = ModelMetadata.newObject()
 			_modelMetadata.fromObjectImport( newObj );
-			_modelMetadata.name = _modelInfo.guid;
-			_modelMetadata.description = _modelInfo.guid + " from local data";
+			_modelMetadata.name = modelInfo.guid;
+			_modelMetadata.description = modelInfo.guid + " from local data";
 			var vm:* = make();
 			if ( vm )
 				Region.currentRegion.modelCache.add( vm );
@@ -56,12 +56,6 @@ public class ModelMakerLocal extends ModelMakerBase {
 	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
 		super.markComplete( $success, $vm );
 		makerCountDecrement();
-		if ( 0 == makerCountGet() ) {
-			//Log.out( "ModelMakerLocal.markComplete - makerCount: 0, SHUTTING DOWN SPLASH", Log.WARN );
-			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
-			//WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );
-		}
 	}
 }	
 }

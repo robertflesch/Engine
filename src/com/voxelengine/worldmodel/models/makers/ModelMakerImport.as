@@ -63,7 +63,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	
 	// next get or generate the metadata
 	override protected function attemptMake():void {
-		if ( null != _modelInfo && null == _modelMetadata ) {
+		if ( null != modelInfo && null == _modelMetadata ) {
 			// The new guid is generated in the Window or in the hidden metadata creation
 			if ( _prompt ) {
 				ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, metadataFromUI );
@@ -80,7 +80,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	}
 	
 	private function metadataFromUI( $mme:ModelMetadataEvent):void {
-		if ( $mme.modelGuid == _modelInfo.guid ) {
+		if ( $mme.modelGuid == modelInfo.guid ) {
 			ModelMetadataEvent.removeListener( ModelBaseEvent.GENERATION, metadataFromUI );
 			_modelMetadata = $mme.modelMetadata;
 			// Now check if this has a parent model, if so, get the animation class from the parent.
@@ -117,7 +117,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	}
 	
 	private function parentModelInfoResultFailed($mie:ModelInfoEvent):void {
-		if ( $mie.modelGuid == _modelInfo.guid ) {
+		if ( $mie.modelGuid == modelInfo.guid ) {
 			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, parentModelInfoResult );
 			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, parentModelInfoResult );
 			ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
@@ -126,22 +126,22 @@ public class ModelMakerImport extends ModelMakerBase {
 	}
 	
 	private function completeMake():void {
-		if ( null != _modelInfo && null != _modelMetadata ) {
+		if ( null != modelInfo && null != _modelMetadata ) {
 			
 			if ( !Globals.isGuid( _modelMetadata.guid ) )
 				_modelMetadata.guid = Globals.getUID();
 				
-			_modelInfo.guid = _modelMetadata.guid;
+			modelInfo.guid = _modelMetadata.guid;
 			ii.modelGuid 	= _modelMetadata.guid;
 			// Not saved, might as well keep it around.
-			//_modelInfo.fileName = "";
+			//modelInfo.fileName = "";
 			
 			var vm:* = make()
 			if ( vm ) {
 				vm.stateLock( true, 10000 ); // Lock state so that is had time to load animations
 //				vm.complete = true;
-				_modelInfo.changed = true;
-				_modelInfo.save();
+				modelInfo.changed = true;
+				modelInfo.save();
 				_modelMetadata.changed = true;
 				_modelMetadata.save();
 				vm.changed = true;
@@ -154,8 +154,8 @@ public class ModelMakerImport extends ModelMakerBase {
 	}
 	
 	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
-		if ( false == $success && _modelInfo && _modelInfo.boimeHas() ) {
-			Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + _modelInfo.guid, Log.WARN );
+		if ( false == $success && modelInfo && modelInfo.boimeHas() ) {
+			Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.WARN );
 			return;
 		}
 		super.markComplete( $success, $vm );

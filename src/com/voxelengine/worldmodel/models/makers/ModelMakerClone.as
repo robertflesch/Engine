@@ -65,7 +65,7 @@ public class ModelMakerClone extends ModelMakerBase {
 	
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
-		if ( null != _modelMetadata && null != _modelInfo ) {
+		if ( null != _modelMetadata && null != modelInfo ) {
 			Log.out( "ModelMakerClone.attemptMake - ii: " + ii.toString() )
 			
 			var vm:* = make()

@@ -27,15 +27,13 @@ public class ModelMakerCursor extends ModelMakerBase {
 		Log.out( "ModelMakerCursor.constructor ii: " + $ii.toString(), Log.DEBUG );
 		super( $ii );
 		_modelMetadata = $vmm;
-		if ( 0 == makerCountGet() )
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 		makerCountIncrement();
 		retrieveBaseInfo();
 	}
 	
 	// once the ModelInfo has been retrieved by base class, we can make the object
 	override protected function attemptMake():void {
-		if ( null != _modelInfo ) {
+		if ( null != modelInfo ) {
 			Log.out( "ModelMakerCursor.attemptMake - ii: " + ii.toString(), Log.DEBUG );
 			var vm:* = make();
 			if ( vm ) {
@@ -50,9 +48,6 @@ public class ModelMakerCursor extends ModelMakerBase {
 	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
 		super.markComplete( $success, $vm );
 		makerCountDecrement();
-		if ( 0 == makerCountGet() ) {
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
-		}
 	}
 
 }	
