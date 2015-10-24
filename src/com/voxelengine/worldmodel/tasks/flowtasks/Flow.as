@@ -115,7 +115,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			else if ( TypeInfo.AIR != flowFromOxel.type ) {
 				// Is it still the type I am expected?
 				// I would need to do a reverse lookup.
-				var toTypeName:String = TypeInfo.typeInfo[type].name;
+				var toTypeName :String = TypeInfo.typeInfo[type].name;
 				var ip:InteractionParams = TypeInfo.typeInfo[flowFromOxel.type].interactions.IOGet( toTypeName );
 				var writeType:int = TypeInfo.getTypeId( ip.type );
 				//var writeType:int = Globals.Info[type].interactions.IOGet( Globals.Info[flowFromOxel.type].name ).type
@@ -142,7 +142,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					flowOver.flowInfo.flowScaling.scalingSetToDefault( flowOver );
 					
 //				Is this needed, scaling was happening once about in the scaleCalculate, and again here.
-//				flowFromOxel.flowInfo.flowScaling.neighborsRecalc( flowFromOxel );
+				//flowFromOxel.flowInfo.flowScaling.neighborsRecalc( flowFromOxel );
+				flowFromOxel.neighborsMarkDirtyFaces( _guid, flowFromOxel.gc.size(), 0 )
 			}
 			//Log.out( "Flow.scale.end - flowFromOxel scaleInfo: " + flowFromOxel.flowInfo.flowScaling.toString() );
 		}

@@ -1247,16 +1247,31 @@ public class Oxel extends OxelBitfields
 					// no children, so just check against type
 					else
 					{
-						if ( ( TypeInfo.hasAlpha( no.type ) ) ) {
-							if ( face == Globals.POSY && flowInfo && flowInfo.flowScaling )
+						// If the oxel next to me has alpha, I need to set the face
+						if ( TypeInfo.hasAlpha( no.type ) ) {
+							// if the oxel next to me is air and its a top face, then scale the oxel
+							if ( TypeInfo.AIR == no.type && face == Globals.POSY )
 								scaleTopFlowFace()
+							//else {	
+								//// if above has alpha, but its not air, reset scaling
+								//if ( flowInfo && flowInfo.flowScaling && flowInfo.flowScaling.scalingHas() ) {
+									//flowInfo.flowScaling.scalingReset()
+									//quadsDeleteAll()
+								//}
+							//}
 							faceSet( face );
 						}
 						else if ( flowInfo ) // All water and lava have flow info.
 						{ 
-							if ( flowInfo.flowScaling.scalingHas() ) 	// for scaled lava or other non alpha flowing types
+							if ( no.flowInfo.flowScaling.scalingHas() ) { 	// for scaled lava or other non alpha flowing types
 								faceSet( face );
+							}
 							else {
+								if ( no.type && face == Globals.POSY ) {
+									scaleTopFlowFace()
+									faceSet( face )
+								}
+								else
 								faceClear( face );
 								/*
 								if ( TypeInfo.WATER == type ) {
@@ -3004,8 +3019,8 @@ public class Oxel extends OxelBitfields
 		var changeCandidate:Oxel = childFind( $gc );
 		
 		//if ( changeCandidate.type != $type && !gc.is_equal( $gc ) )
-		if ( !gc.is_equal( $gc ) )
-			// this gets the exact oxel we are looking for if it is different from returned type.
+		if ( !changeCandidate.gc.is_equal( $gc ) )
+			// this gets the exact oxel we are looking for if it is different gc from returned oxel.
 			changeCandidate = changeCandidate.childGetOrCreate( $gc );
 			
 		if ( Globals.BAD_OXEL == changeCandidate ) {
