@@ -29,7 +29,7 @@ public class FlowScaling
 	private var _scaleRate:Number = 2;
 	public function get calculated():Boolean { return _calculated; }
 	
-	private var _scale:uint;
+	private var _scale:uint = DEFAULT_TOTAL_SCALE;
 	public function get PxPz():uint { return ((_scale  & 0x0000000f)) + 1; }
 	public function get PxNz():uint { return ((_scale  & 0x000000f0) >> 4 ) + 1; }
 	public function get NxNz():uint { return ((_scale  & 0x00000f00) >> 8 ) + 1; }
@@ -59,13 +59,8 @@ public class FlowScaling
 	 *              |_____Pz_____|
 	 * 
 	 */
-	public function FlowScaling():void {
-		reset();
-	}
-	
-	private function reset():void {
-		_scale = DEFAULT_TOTAL_SCALE;	
-	}
+	public function FlowScaling():void {}
+	public function has():Boolean { return ( _scale != DEFAULT_TOTAL_SCALE ) }
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray {
 		
@@ -81,8 +76,7 @@ public class FlowScaling
 			NxNz = rnd( $ba.readFloat() );
 			NxPz = rnd( $ba.readFloat() );
 		}
-		else
-		{
+		else {
 			_scale = $ba.readUnsignedInt();
 		}
 		return $ba;
@@ -96,30 +90,23 @@ public class FlowScaling
 	 * This function resets the scale of an oxel, for example if another oxel of same type flows over it.
 	 * There are two phases, reseting of this oxels scale, and the resetting of the oxels around it.
 	 */
-	public function scalingReset( $oxel:Oxel = null ):void	{
+	public function reset( $oxel:Oxel = null ):void	{
 		//Log.out( "FlowScaling.scalingReset oxel: " + toString() );
 		// This is telling us we dont need no stinking scaling, however our neighbors might
 		_calculated = false;
 		// first reset this oxels scaling
-		if ( scalingHas() )
-		{
-			reset();
+		if ( has() ) {
+			_scale = DEFAULT_TOTAL_SCALE
 			if ( $oxel )
 				$oxel.rebuildAll();
 		}
 	}
 	
-	public function scalingSetToDefault( $oxel:Oxel = null ):void	{
-		Log.out( "FlowScaling.scalingSetToDefault oxel: " + toString() );
+	public function setToDefault( $oxel:Oxel = null ):void	{
+		Log.out( "FlowScaling.setToDefault oxel: " + toString() );
 		// This is telling us we dont need no stinking scaling, however our neighbors might
+		reset()
 		_calculated = true;
-		// first reset this oxels scaling
-		if ( scalingHas() )
-		{
-			reset();
-			if ( $oxel )
-				$oxel.rebuildAll();
-		}
 	}
 	
 	public function neighborsRecalc( $oxel:Oxel ):void	{
@@ -131,27 +118,23 @@ public class FlowScaling
 				continue;
 				
 			if ( fromOxel.type == $oxel.type && null != fromOxel.flowInfo )
-				fromOxel.flowInfo.flowScaling.scaleRecalculate( fromOxel );
+				fromOxel.flowInfo.flowScaling.recalculate( fromOxel );
 		}
 	}
 	
 	
-	public function scalingHas():Boolean {
-		return ( _scale != DEFAULT_TOTAL_SCALE );
-	}
-	
-	public function scaleRecalculate( $oxel:Oxel ):void	{
-		if ( !scalingHas() )
+	public function recalculate( $oxel:Oxel ):void	{
+		if ( !has() )
 			return;
 			
 		Log.out( "FlowScaling.scaleRecalculate was: " + toString() );
 		_calculated = false;
-		scaleCalculate( $oxel );
+		calculate( $oxel );
 		$oxel.rebuildAll();
 		Log.out( "FlowScaling.scaleRecalculate is: " + toString() );
 	}
 	
-	public function scaleCalculate( $oxel:Oxel ):void	{
+	public function calculate( $oxel:Oxel ):void	{
 		if ( _calculated )
 			return;
 	
@@ -227,35 +210,28 @@ public class FlowScaling
 					fromRecalc = true;
 			}
 			if ( fromRecalc )
-				fromOxel.flowInfo.flowScaling.scaleRecalculate( fromOxel );
+				fromOxel.flowInfo.flowScaling.recalculate( fromOxel );
 		}
 	}
 	
 	public function faceGet( $dir:int ):Point {
-
 		var point:Point = new Point(1,1);
-		
-		if ( Globals.POSX == $dir )
-		{
+		if ( Globals.POSX == $dir ) {
 			point.x = PxNz;
 			point.y = PxPz
 		}
-		else if ( Globals.NEGX == $dir )
-		{
+		else if ( Globals.NEGX == $dir ) {
 			point.x = NxNz;
 			point.y = NxPz;
 		}   
-		else if ( Globals.POSZ == $dir )
-		{
+		else if ( Globals.POSZ == $dir ) {
 			point.x = PxPz;
 			point.y = NxPz
 		}   
-		else if ( Globals.NEGZ == $dir )
-		{
+		else if ( Globals.NEGZ == $dir ) {
 			point.x = PxNz;
 			point.y = NxNz
 		}
-		
 		return point;
 	}
 	

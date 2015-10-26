@@ -18,6 +18,8 @@ package com.voxelengine.worldmodel.oxel
  */
 public class FlowInfo
 {
+	private static const DEFAULT:uint 						= 0x006288ff;
+	
 	private static const FLOW_DOWN:uint 					= 0x000000ff;
 	private static const FLOW_DOWN_MASK:uint 				= 0xffffff00;
 	private static const FLOW_OUT:uint 						= 0x00000f00;
@@ -104,23 +106,20 @@ public class FlowInfo
 	
 	
 	public function FlowInfo() {
-		direction = Globals.ALL_DIRS;
-		// TODO this should be melt/pour type 
-		type = FLOW_TYPE_UNDEFINED;
-		//Log.out( "FlowInfo.constructor" );
+		flowInfoRaw = DEFAULT
 	}
 	
 	public function get flowInfoRaw():int { return _data }
-	public function set flowInfoRaw( val:int ):void { _data = val }
+	public function set flowInfoRaw( val:int ):void { 
+		_data = val 
+		if ( 0 == type )
+			Log.out( "FlowInfo.flowInfoRaw - type: " + type );
+	}
 	
 	public function reset( $oxel:Oxel = null ):void {
 		direction = Globals.ALL_DIRS;
 		type = FLOW_TYPE_UNDEFINED;
-		flowScaling.scalingReset( $oxel );
-	}
-	
-	public function toString():String {
-		return "FlowInfo - type: " + type + "  out: " + out + "  down: " + down + "  dir: " + direction;
+		flowScaling.reset( $oxel );
 	}
 	
 	public function clone( isChild:Boolean = false ):FlowInfo {
@@ -132,11 +131,12 @@ public class FlowInfo
 	}
 	
 	public function copy( $rhs:FlowInfo ):void {
-		type 	= $rhs.type
-		outRef 	= $rhs.outRef
-		out 	= $rhs.outRef
-		down 	= $rhs.down
-		direction = $rhs.direction
+		flowInfoRaw = $rhs.flowInfoRaw
+		//type 	= $rhs.type
+		//outRef 	= $rhs.outRef
+		//out 	= $rhs.outRef
+		//down 	= $rhs.down
+		//direction = $rhs.direction
 	}
 	
 	public function fromJson( $flowJson:Object ):void
@@ -161,6 +161,7 @@ public class FlowInfo
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray {
 		$ba.writeInt( _data );
+		//trace( "FlowInfo.toByteArray - " + toString() )
 		$ba = flowScaling.toByteArray( $ba )
 		return $ba;
 	}
@@ -171,5 +172,8 @@ public class FlowInfo
 		return $ba;
 	}
 	
+	public function toString():String {
+		return "FlowInfo - _data: " + _data.toString(16) + " type: " + type + " out: " + out + " outRef: " + outRef + " down: " + down  + " dir: " + direction
+	}
 } // end of class FlowInfo
 } // end of package

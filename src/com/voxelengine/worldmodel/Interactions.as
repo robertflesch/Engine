@@ -49,6 +49,7 @@ public class Interactions
 	
 	public function IOGet( $name:String ):InteractionParams
 	{
+		$name = $name.toUpperCase()
 		for ( var name:String in _interactions )
 		{
 			if ( name == $name )

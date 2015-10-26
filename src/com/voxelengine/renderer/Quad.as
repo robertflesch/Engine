@@ -61,52 +61,25 @@ public class Quad {
 	// Empty constuctor for QuadPool
 	public function Quad():void { };
 	
-	//public function rebuild( $type:int,						 // material type
-						     //$x:Number, $y:Number, $z:Number,// world location
-						     //$face:int,						 // which 
-						     //$planeFacing:int,				 // facing
-						     //$grain:Number,                  // the world size of the quad 
-						     //$lighting:Lighting ):void			
-	//{
-		//add( $type, $x, $y, $z, $face, $planeFacing, $grain, TypeInfo.typeInfo[$type], $lighting, null );
-		//dirty = 0;
-	//}
-	
-	public function rebuildScaled( $type:int,						 // material type
-						     $x:Number, $y:Number, $z:Number,// world location
-						     $face:int,						 // which 
-						     $planeFacing:int,				 // facing
-						     $grain:Number,                  // the world size of the quad 
-						     $lighting:Lighting,
-							 $flowInfo:FlowInfo ):void			
+	public function rebuildScaled(  $type:int,						 // material type
+									$x:Number, $y:Number, $z:Number,// world location
+									$face:int,						 // which 
+									$planeFacing:int,				 // facing
+									$grain:Number,                  // the world size of the quad 
+									$lighting:Lighting,
+									$flowInfo:FlowInfo ):void			
 	{
 		add( $type, $x, $y, $z, $face, $planeFacing, $grain, TypeInfo.typeInfo[$type], $lighting, $flowInfo );
 		dirty = 0;
 	}
-	
-	public function build( $type:int,						// material type
-						   $x:Number, $y:Number, $z:Number,	// world location
-						   $face:int,						// which 
-						   $$planeFacing:int,				// facing
-						   $grain:Number,                   // the world size of the quad 
-						   $lighting:Lighting ):Boolean			
-	{
-		var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
-		if ( !calculateUV( typeInfo, $face, $grain, null, $lighting ) )
-			return false;
-			
-		add( $type, $x, $y, $z, $face, $$planeFacing, $grain, typeInfo, $lighting, null );
-		//add( $type, $x, $y, $z, $face, $$planeFacing, $grain, typeInfo, $lighting );
-		return true;
-	}
-	
-	public function buildScaled( $type:int,						// material type
-										$x:Number, $y:Number, $z:Number,	// world location
-										$face:int,						// which 
-										$$planeFacing:int,				// facing
-										$grain:Number,
-									    $lighting:Lighting,
-										$flowInfo:FlowInfo ):Boolean			// the scaled for flow distance
+
+	public function buildScaled( 	$type:int,						// material type
+									$x:Number, $y:Number, $z:Number,// world location
+									$face:int,						// which 
+									$$planeFacing:int,				// facing
+									$grain:Number,
+									$lighting:Lighting,
+									$flowInfo:FlowInfo ):Boolean	// the scaled for flow distance
 	{
 		var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
 		if ( !calculateUV( typeInfo, $face, $grain, $flowInfo, $lighting ) )

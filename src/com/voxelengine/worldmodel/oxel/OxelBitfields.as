@@ -16,6 +16,9 @@ package com.voxelengine.worldmodel.oxel
 	{
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//     Static Variables
+		//
+		//  0xf = 1111  0xe = 1110 0xd = 1101 0xc = 1100 0xb = 1011  0xa = 1010 0x9 = 1001 0x8 = 1000 0x7 = 0111
+		//  
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		private static const OXEL_DATA_CLEAR:uint					= 0x00000000;
 		private static const OXEL_DATA_FACE_BITS_CLEAR:uint  		= 0x8181ffff;
@@ -58,6 +61,8 @@ package com.voxelengine.worldmodel.oxel
 
 		private static const OXEL_DATA_PARENT_MASK:uint 			= 0xfffffbff;
 		private static const OXEL_DATA_PARENT:uint					= 0x00000400;
+		
+		// bottom 10 bits not used. Used to be type data, now stored in its own full int
 
 		private static const OXEL_DATA_TYPE_MASK_TEMP:uint			= 0xfe7fffff;
 		

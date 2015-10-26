@@ -8,11 +8,6 @@
 
 package com.voxelengine.worldmodel.tasks.flowtasks
 {
-	import com.voxelengine.pools.FlowPool;
-	import com.voxelengine.pools.GrainCursorPool;
-	import com.voxelengine.worldmodel.oxel.FlowInfo;
-	import com.voxelengine.worldmodel.oxel.FlowScaling;
-	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.utils.Timer;
 	import flash.utils.getTimer;
 	import flash.events.TimerEvent;
@@ -21,11 +16,16 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
+	import com.voxelengine.pools.FlowPool;
+	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.InteractionParams;
+	import com.voxelengine.worldmodel.Region;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
-	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.oxel.Oxel;
+	import com.voxelengine.worldmodel.oxel.FlowInfo;
+	import com.voxelengine.worldmodel.oxel.FlowScaling;
 	import com.voxelengine.worldmodel.tasks.flowtasks.FlowTask;
 
 
@@ -37,6 +37,13 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	{		
 		static public function addTask( $instanceGuid:String, $gc:GrainCursor, $type:int, $flowInfoRaw:int, $taskPriority:int ):void 
 		{
+			if ( !TypeInfo.typeInfo[$type].flowable ) {
+				Log.out( "Flow.addTask - adding task for non flowable type: " + $type, Log.WARN );
+				return
+			}
+			if ( 0 == ( ($flowInfoRaw & 0x000f0000) >> 16  ) ) {
+				Log.out( "Flow.addTask - NO FLOW TYPE FOUND", Log.WARN );
+			}
 			var f:Flow = new Flow( $instanceGuid, $gc, $type, $flowInfoRaw, $gc.toID(), $taskPriority );
 			f.selfOverride = true;
 			Globals.g_flowTaskController.addTask( f );
@@ -87,8 +94,11 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					flowStartMelt(flowFromOxel);
 				else if ( FlowInfo.FLOW_TYPE_SPRING == ft )
 					flowStartSpring(flowFromOxel);
-				else
-					Log.out( "Flow.start - NO FLOW TYPE FOUND ft: " + ft, Log.WARN );
+				else {
+					Log.out( "Flow.start - NO FLOW TYPE FOUND ft: " + ft + " using continuous flow", Log.WARN );
+					flowFromOxel.flowInfo.type = FlowInfo.FLOW_TYPE_CONTINUOUS
+					flowStartContinous(flowFromOxel)
+				}
 					
 				scale( flowFromOxel );
 			}
@@ -101,18 +111,18 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		private function scale( flowFromOxel:Oxel ):void {
 			//Log.out( "Flow.scale.start - flowFromOxel scaleInfo: " + flowFromOxel.flowInfo.flowScaling.toString() );
 				
-			if ( flowFromOxel.type == _type ) {
-				return; 
-			}
+			if ( flowFromOxel.type == _type )
+				return
 			else if ( null == flowFromOxel.gc ) {
 				Log.out( "Flow.scale - oxel released", Log.WARN );
 				return; 
 			} 
 			else if ( TypeInfo.getTypeId( "obsidian" ) == flowFromOxel.type ) { 
 				Log.out( "Flow.scale - what is supposed to happen here? why would I change obsidian?: " + TypeInfo.typeInfo[flowFromOxel.type].name + " expecting: " + TypeInfo.typeInfo[writeType].name, Log.WARN );
-				flowFromOxel.flowInfo.flowScaling.scaleRecalculate( flowFromOxel );
+				flowFromOxel.flowInfo.flowScaling.recalculate( flowFromOxel );
 			}
 			else if ( TypeInfo.AIR != flowFromOxel.type ) {
+				// how do I get here?
 				// Is it still the type I am expected?
 				// I would need to do a reverse lookup.
 				var toTypeName :String = TypeInfo.typeInfo[type].name;
@@ -129,17 +139,17 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			else {
 				// I can only flow into AIR, everything else I interact with
 				flowFromOxel.write( _guid, flowFromOxel.gc, type );
-				flowFromOxel.flowInfo.flowScaling.scaleCalculate( flowFromOxel );
+				flowFromOxel.flowInfo.flowScaling.calculate( flowFromOxel );
 
 				// if I flow under another of the same type
 				var flowUnder:Oxel = flowFromOxel.neighbor( Globals.POSY );
 				if ( Globals.BAD_OXEL != flowUnder && flowUnder.type == flowFromOxel.type ) 
-					flowFromOxel.flowInfo.flowScaling.scalingSetToDefault( flowFromOxel );
+					flowFromOxel.flowInfo.flowScaling.setToDefault( flowFromOxel );
 					
 				// if I flow over another oxel of the same type, reset its scaling
 				var flowOver:Oxel = flowFromOxel.neighbor( Globals.NEGY );
 				if ( Globals.BAD_OXEL != flowOver && flowOver.type == flowFromOxel.type )
-					flowOver.flowInfo.flowScaling.scalingSetToDefault( flowOver );
+					flowOver.flowInfo.flowScaling.setToDefault( flowOver );
 					
 //				Is this needed, scaling was happening once about in the scaleCalculate, and again here.
 				//flowFromOxel.flowInfo.flowScaling.neighborsRecalc( flowFromOxel );
@@ -200,8 +210,9 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				canFlowInto( flowFromOxel, Globals.NEGX, flowCandidates );
 				canFlowInto( flowFromOxel, Globals.POSZ, flowCandidates );
 				canFlowInto( flowFromOxel, Globals.NEGZ, flowCandidates );
-				if ( 0 < flowCandidates.length )
+				if ( 0 < flowCandidates.length ) {
 					flowTasksAdd( flowCandidates, false, flowFromOxel.flowInfo );
+				}
 			}
 		}
 		
@@ -219,7 +230,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					continue;
 				if ( 0 == fi.down )
 					continue;
-
+					
+				scale( flowTest.flowCandidate )
 				Flow.addTask( _guid, flowTest.flowCandidate.gc, type, fi.flowInfoRaw, taskPriority + 1 )
 			}
 		}
@@ -291,13 +303,9 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 								}
 							}
 							else {
+								// changed types are not flowable
 								co.write( _guid, co.gc, writeType, false );
-								// defer the scaling until after the water has been written
-								// this makes the obsidian reach up to the water, is that right?
-								ft = new FlowCandidate();
-								ft.dir = $face;
-								ft.flowCandidate = co;
-								$fc.push( ft );
+								//scale( co )
 							}
 						}
 					}

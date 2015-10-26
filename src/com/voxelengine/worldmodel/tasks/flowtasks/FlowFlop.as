@@ -205,7 +205,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				{
 					flowIntoChild.write( _guid, flowIntoChild.gc, _type );
 					flowIntoChild.flowInfo.direction = $dir;
-					flowIntoChild.flowInfo.flowScaling.scaleCalculate( flowIntoChild );
+					flowIntoChild.flowInfo.flowScaling.calculate( flowIntoChild );
 					flowFromChild = $flowOxel.childGetFromDirection( $dir, TOP_LEVEL, opposite );
 					flowFromChild.write( _guid, flowFromChild.gc, TypeInfo.AIR );
 					return flowIntoChild;
@@ -219,7 +219,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					{
 						flowIntoChild.write( _guid, flowIntoChild.gc, _type );
 						flowIntoChild.flowInfo.direction = $dir;
-						flowIntoChild.flowInfo.flowScaling.scaleCalculate( flowIntoChild );
+						flowIntoChild.flowInfo.flowScaling.calculate( flowIntoChild );
 						flowFromChild = $flowOxel.childGetFromDirection( $dir, TOP_LEVEL, opposite );
 						flowFromChild.write( _guid, flowFromChild.gc, TypeInfo.AIR );
 						return flowIntoChild;

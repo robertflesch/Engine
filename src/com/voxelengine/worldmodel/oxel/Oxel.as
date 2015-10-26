@@ -1099,7 +1099,7 @@ public class Oxel extends OxelBitfields
 			// 1 = $propogateCount means only the oxel directly next to the effect oxel will have flow tasks generated.
 			if ( ti.flowable && Globals.autoFlow && EditCursor.EDIT_CURSOR != $modelGuid && 1 == $propogateCount ) {
 				var raw:int
-				if ( flowInfo ) 
+				if ( flowInfo && flowInfo.type ) 
 					raw = flowInfo.flowInfoRaw 
 				else
 					raw = ti.flowInfo.flowInfoRaw
@@ -1192,7 +1192,7 @@ public class Oxel extends OxelBitfields
 					oppositeOxel = neighbor( face );
 					if ( Globals.BAD_OXEL == oppositeOxel ) {
 						// this is an external face. that is on the edge of the grain space
-						if ( face == Globals.POSY && flowInfo && flowInfo.flowScaling )
+						if ( face == Globals.POSY && flowInfo && flowInfo.flowScaling && TypeInfo.typeInfo[type].flowable )
 							scaleTopFlowFace()
 						faceSet( face );
 					}
@@ -1251,7 +1251,7 @@ public class Oxel extends OxelBitfields
 						// If the oxel opposite this face has alpha, I need to set the face
 						if ( TypeInfo.hasAlpha( oppositeOxel.type ) ) {
 							// if the oxel next to me is air and its a top face, then scale the oxel
-							if ( TypeInfo.AIR == oppositeOxel.type && face == Globals.POSY && TypeInfo.typeInfo[type].flowable )
+							if ( TypeInfo.AIR == oppositeOxel.type && face == Globals.POSY && TypeInfo.typeInfo[type].flowable && !flowInfo.flowScaling.has() )
 								scaleTopFlowFace()
 							//else {	
 								//// if above has alpha, but its not air, reset scaling
@@ -1266,16 +1266,18 @@ public class Oxel extends OxelBitfields
 						// does this 
 						else if ( flowInfo && flowInfo.flowScaling ) // All water and lava have flow info.
 						{ 
-							if ( oppositeOxel.flowInfo.flowScaling.scalingHas() ) { 	// for scaled lava or other non alpha flowing types
+							if ( oppositeOxel.flowInfo && oppositeOxel.flowInfo.flowScaling.has() ) { 	// for scaled lava or other non alpha flowing types
 								faceSet( face );
 							}
 							else {
 								if ( TypeInfo.AIR == oppositeOxel.type && face == Globals.POSY ) {
 									scaleTopFlowFace()
+								}
+								else if ( face == Globals.POSY ) {
 									faceSet( face )
 								}
 								else
-								faceClear( face );
+									faceClear( face );
 								/*
 								if ( TypeInfo.WATER == type ) {
 									//face_set( face ) This adds an interior face, but z buffer conflicts makes it not work well.
@@ -1290,7 +1292,7 @@ public class Oxel extends OxelBitfields
 						}
 						else if ( oppositeOxel.flowInfo )	// for scaled lava or other non alpha flowing types
 						{
-							if ( oppositeOxel.flowInfo.flowScaling.scalingHas() )
+							if ( oppositeOxel.flowInfo.flowScaling.has() )
 								faceSet( face );
 							else
 								faceClear( face );
@@ -1306,7 +1308,7 @@ public class Oxel extends OxelBitfields
 	}
 	
 	private function scaleTopFlowFace():void {
-		if ( !flowInfo.flowScaling.scalingHas() ) {
+		if ( !flowInfo.flowScaling.has() ) {
 			flowInfo.flowScaling.NxNz = 15
 			flowInfo.flowScaling.NxPz = 15
 			flowInfo.flowScaling.PxNz = 15
@@ -1578,17 +1580,9 @@ public class Oxel extends OxelBitfields
 		{
 			quadLighting( $face, $ti );				
 			quad = QuadPool.poolGet();
-			if ( flowInfo && TypeInfo.flowable( type ) ) {
-				if ( !quad.buildScaled( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $grain, _lighting, flowInfo ) ) {
-					QuadPool.poolDispose( quad );
-					return 0;
-				}
-			}
-			else {
-				if ( !quad.build( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $grain, _lighting ) ) {
-					QuadPool.poolDispose( quad );
-					return 0;
-				}
+			if ( !quad.buildScaled( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $grain, _lighting, flowInfo ) ) {
+				QuadPool.poolDispose( quad );
+				return 0;
 			}
 			_quads[$face] = quad;
 			return 1;
@@ -3048,7 +3042,7 @@ public class Oxel extends OxelBitfields
 					
 				//if ( Globals.autoFlow && EditCursor.EDIT_CURSOR != $modelGuid )
 				if ( Globals.autoFlow  )
-					Flow.addTask( $modelGuid, changeCandidate.gc, changeCandidate.type, changeCandidate.flowInfo.flowInfoRaw, 1 );
+					Flow.addTask( $modelGuid, changeCandidate.gc, $type, changeCandidate.flowInfo.flowInfoRaw, 1 );
 			}
 			else {
 				if ( changeCandidate.flowInfo )
