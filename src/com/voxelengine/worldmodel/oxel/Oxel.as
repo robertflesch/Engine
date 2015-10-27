@@ -270,7 +270,7 @@ public class Oxel extends OxelBitfields
 		//trace( "Oxel.release" + gc.toString() );
 
 		if ( _flowInfo ) { 
-			FlowPool.poolReturn( _flowInfo );
+			FlowInfoPool.poolReturn( _flowInfo );
 			_flowInfo = null;
 		}
 		if ( _lighting ) { 
@@ -1249,11 +1249,11 @@ public class Oxel extends OxelBitfields
 					else
 					{
 						// If the oxel opposite this face has alpha, I need to set the face
-						if ( TypeInfo.hasAlpha( oppositeOxel.type ) ) {
+						if ( TypeInfo.hasAlpha( oppositeOxel.type ) || (oppositeOxel.flowInfo && oppositeOxel.flowInfo.flowScaling.has) ) {
 							// if the oxel next to me is air and its a top face, then scale the oxel
 							if ( TypeInfo.AIR == oppositeOxel.type && face == Globals.POSY && TypeInfo.typeInfo[type].flowable && !flowInfo.flowScaling.has() )
 								scaleTopFlowFace()
-							//else {	
+							//else {	1
 								//// if above has alpha, but its not air, reset scaling
 								//if ( flowInfo && flowInfo.flowScaling && flowInfo.flowScaling.scalingHas() ) {
 									//flowInfo.flowScaling.scalingReset()
@@ -1755,7 +1755,7 @@ public class Oxel extends OxelBitfields
 			$ba.writeUnsignedInt( type );
 			
 			if ( !flowInfo )
-				flowInfo = FlowPool.poolGet();
+				flowInfo = FlowInfoPool.poolGet();
 			flowInfo.toByteArray( $ba );
 			
 			if ( !lighting )
@@ -1794,7 +1794,7 @@ public class Oxel extends OxelBitfields
 		if ( OxelBitfields.dataHasAdditional( faceData ) )
 		{
 			if ( !flowInfo )
-				flowInfo = FlowPool.poolGet();
+				flowInfo = FlowInfoPool.poolGet();
 			$ba = flowInfo.fromByteArray( $version, $ba );
 			
 			// hack warning
@@ -3035,10 +3035,12 @@ public class Oxel extends OxelBitfields
 			var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
 		
 			if ( typeInfo.flowable ) {
-				if ( null == changeCandidate.flowInfo ) // if it doesnt have flow info, get some! This is from placement of flowable oxels
-					changeCandidate.flowInfo = typeInfo.flowInfo.clone();
-				else	
+				if ( null == changeCandidate.flowInfo ) { // if it doesnt have flow info, get some! This is from placement of flowable oxels
+					changeCandidate.flowInfo = FlowInfoPool.poolGet()
 					changeCandidate.flowInfo.copy( typeInfo.flowInfo )
+				}
+				if ( FlowInfo.FLOW_TYPE_UNDEFINED == changeCandidate.flowInfo.type	)
+					changeCandidate.flowInfo.type = typeInfo.flowInfo.type
 					
 				//if ( Globals.autoFlow && EditCursor.EDIT_CURSOR != $modelGuid )
 				if ( Globals.autoFlow  )

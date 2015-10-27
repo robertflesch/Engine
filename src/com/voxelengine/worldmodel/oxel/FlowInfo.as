@@ -7,7 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
-	import com.voxelengine.pools.FlowPool;
+	import com.voxelengine.pools.FlowInfoPool;
 	import flash.utils.ByteArray;
 	
 	import com.voxelengine.Globals;
@@ -51,7 +51,7 @@ public class FlowInfo
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//  _flowInfo function this is a bitwise data field. which holds flow type, CONTRIBUTE, count out and count down
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private var _data:int 								= 0;                 
+	private var _data:uint 									= 0;                 
 	private var _flowScaling:FlowScaling					= new FlowScaling();
 	
 	public 	function get out():int { return (_data & FLOW_OUT) >> FLOW_OUT_OFFSET; }
@@ -70,6 +70,8 @@ public class FlowInfo
 		if ( 0 == ( _data & FLOW_FLOW_TYPE_MASK  ) )
 			Log.out( "FlowInfo.type - set to 0", Log.WARN )
 	}
+	
+	public function isSource():Boolean { return outRef == out }
 
 	public 	function get direction():int { return (_data & FLOW_FLOW_DIR) >> FLOW_DIR_OFFSET; }
 	public 	function set direction( $val:int):void 
@@ -102,28 +104,39 @@ public class FlowInfo
 	
 	public function get flowScaling():FlowScaling 	{ return _flowScaling; }
 	//public function scale():Number 				{ return Math.max( 0.0625, ( out / outRef ) ); }	
-	public function scale():uint 				{ return Math.max( 1, ( out / outRef ) * 16 ); }  //	x/8
+	//public function scale():uint 				{ return Math.max( 1, ( out / outRef ) * 16 ); }  //	x/8
+	public function scale():uint { return Math.max( 1, ( out / outRef ) * 16 ); }
 	
+	public function inheritFlowMax( $intersectingFlowInfo:FlowInfo ):void {
+		if ( out < $intersectingFlowInfo.out )
+			out = $intersectingFlowInfo.out
+		if ( down < $intersectingFlowInfo.down )
+			down = $intersectingFlowInfo.down
+	}
 	
+	// This should really only be used by the flowInfoPool
 	public function FlowInfo() {
 		flowInfoRaw = DEFAULT
 	}
 	
-	public function get flowInfoRaw():int { return _data }
-	public function set flowInfoRaw( val:int ):void { 
+	public function get flowInfoRaw():uint { return _data }
+	public function set flowInfoRaw( val:uint ):void { 
 		_data = val 
 		if ( 0 == type )
 			Log.out( "FlowInfo.flowInfoRaw - type: " + type );
 	}
 	
 	public function reset( $oxel:Oxel = null ):void {
-		direction = Globals.ALL_DIRS;
-		type = FLOW_TYPE_UNDEFINED;
-		flowScaling.reset( $oxel );
+		direction = Globals.ALL_DIRS
+		type = FLOW_TYPE_UNDEFINED
+		out = 0
+		outRef = 0
+		down = 0
+		flowScaling.reset( $oxel )
 	}
 	
 	public function clone( isChild:Boolean = false ):FlowInfo {
-		var fi:FlowInfo = FlowPool.poolGet();
+		var fi:FlowInfo = FlowInfoPool.poolGet();
 		fi.flowInfoRaw = flowInfoRaw;
 		if ( isChild )
 			out = out * 2;
@@ -160,14 +173,14 @@ public class FlowInfo
 	}
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray {
-		$ba.writeInt( _data );
+		$ba.writeUnsignedInt( _data );
 		//trace( "FlowInfo.toByteArray - " + toString() )
 		$ba = flowScaling.toByteArray( $ba )
 		return $ba;
 	}
 	
 	public function fromByteArray( $version:int, $ba:ByteArray ):ByteArray {
-		flowInfoRaw = $ba.readInt();
+		flowInfoRaw = $ba.readUnsignedInt();
 		$ba = flowScaling.fromByteArray( $version, $ba )
 		return $ba;
 	}

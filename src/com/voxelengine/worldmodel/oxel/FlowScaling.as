@@ -90,9 +90,9 @@ public class FlowScaling
 	 * This function resets the scale of an oxel, for example if another oxel of same type flows over it.
 	 * There are two phases, reseting of this oxels scale, and the resetting of the oxels around it.
 	 */
-	public function reset( $oxel:Oxel = null ):void	{
-		//Log.out( "FlowScaling.scalingReset oxel: " + toString() );
-		// This is telling us we dont need no stinking scaling, however our neighbors might
+	public function reset( $oxel:Oxel = null, $calculated:Boolean = false ):void	{
+		//Log.out( "FlowScaling.reset oxel: " + toString() );
+		// This differs from setToDefault in the set
 		_calculated = false;
 		// first reset this oxels scaling
 		if ( has() ) {
@@ -102,23 +102,17 @@ public class FlowScaling
 		}
 	}
 	
-	public function setToDefault( $oxel:Oxel = null ):void	{
-		Log.out( "FlowScaling.setToDefault oxel: " + toString() );
-		// This is telling us we dont need no stinking scaling, however our neighbors might
-		reset()
-		_calculated = true;
-	}
-	
-	public function neighborsRecalc( $oxel:Oxel ):void	{
+	public function neighborsRecalc( $oxel:Oxel, $propgateMaxs:Boolean ):void	{
 		// now check to see if we need to reset the scaling of our neighbors
-		for each ( var dir:int in Globals.horizontalDirections )
-		{
+		for each ( var dir:int in Globals.horizontalDirections ) {
 			var fromOxel:Oxel = $oxel.neighbor( dir );
 			if ( Globals.BAD_OXEL == fromOxel )
 				continue;
-				
-			if ( fromOxel.type == $oxel.type && null != fromOxel.flowInfo )
-				fromOxel.flowInfo.flowScaling.recalculate( fromOxel );
+			if ( fromOxel.type == $oxel.type && null != fromOxel.flowInfo ) {
+				if ( $propgateMaxs )
+					fromOxel.flowInfo.inheritFlowMax( $oxel.flowInfo )
+				fromOxel.flowInfo.flowScaling.recalculate( fromOxel )
+			}
 		}
 	}
 	
@@ -128,6 +122,9 @@ public class FlowScaling
 			return;
 			
 		Log.out( "FlowScaling.scaleRecalculate was: " + toString() );
+		if ( $oxel.gc.eval( 4, 6, 3, 5 ) )
+			Log.out( "FlowScaling.scaleRecalculate ORIGINGAL" );
+		
 		_calculated = false;
 		calculate( $oxel );
 		$oxel.rebuildAll();
@@ -140,13 +137,16 @@ public class FlowScaling
 	
 		Log.out( "FlowScaling.scaleCalculate was: " + toString() );
 		_calculated = true;
+		
+		// The origin of the flow should never scale.
+		if ( $oxel.flowInfo.isSource() )
+			return
 		// set these to a minimum level, so that their influence for the other corners can be felt
 		_scale = 0x00000000;
 		
+
 		for each ( var horizontalDir:int in Globals.horizontalDirections )
-		{
 			grabNeighborInfluences( $oxel, horizontalDir );
-		}
 		
 		// if these corners have not been influenced by another vert
 		// set them to scale
@@ -209,8 +209,8 @@ public class FlowScaling
 				if ( fromOxelScale.PxNz < PxPz )
 					fromRecalc = true;
 			}
-			if ( fromRecalc )
-				fromOxel.flowInfo.flowScaling.recalculate( fromOxel );
+			//if ( fromRecalc )
+			//	fromOxel.flowInfo.flowScaling.recalculate( fromOxel );
 		}
 	}
 	

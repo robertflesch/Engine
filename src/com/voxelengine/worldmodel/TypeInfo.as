@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel
 {
 	import com.voxelengine.events.PersistanceEvent;
+	import com.voxelengine.pools.FlowInfoPool;
 	import flash.geom.Vector3D;
 
 	import flash.events.IOErrorEvent;
@@ -365,13 +366,13 @@ package com.voxelengine.worldmodel
 			if ( $json.flowable )
 			{
 				_flowable = true;
-				_flowInfo = new FlowInfo();
+				_flowInfo = FlowInfoPool.poolGet();
 				_flowInfo.fromJson( $json.flowable );
 			}
 			else
 			{
 				_flowable = false;
-				_flowInfo = new FlowInfo();
+				_flowInfo = FlowInfoPool.poolGet()
 			}
 
 			if ( $json.animated )
