@@ -25,7 +25,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		protected var _gc:GrainCursor;
 		protected var _type:int;
 		protected var _ready:Boolean = false;
-		protected var _flowInfoRaw:int;
+		protected var _flowInfoRaw:uint;
 		
 		public static const TASK_TYPE:String = "FLOW_TASK";
         public static const TASK_PRIORITY:int = 1;

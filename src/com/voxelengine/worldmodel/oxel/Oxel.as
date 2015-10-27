@@ -1098,7 +1098,7 @@ public class Oxel extends OxelBitfields
 			// TODO also be nice to pass in the flow direction if possible. We know which face, so we know flow dir...
 			// 1 = $propogateCount means only the oxel directly next to the effect oxel will have flow tasks generated.
 			if ( ti.flowable && Globals.autoFlow && EditCursor.EDIT_CURSOR != $modelGuid && 1 == $propogateCount ) {
-				var raw:int
+				var raw:uint
 				if ( flowInfo && flowInfo.type ) 
 					raw = flowInfo.flowInfoRaw 
 				else
@@ -3035,10 +3035,11 @@ public class Oxel extends OxelBitfields
 			var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
 		
 			if ( typeInfo.flowable ) {
-				if ( null == changeCandidate.flowInfo ) { // if it doesnt have flow info, get some! This is from placement of flowable oxels
+				if ( null == changeCandidate.flowInfo ) // if it doesnt have flow info, get some! This is from placement of flowable oxels
 					changeCandidate.flowInfo = FlowInfoPool.poolGet()
+				if ( !FlowInfo.validateData( changeCandidate.flowInfo.flowInfoRaw ) )
 					changeCandidate.flowInfo.copy( typeInfo.flowInfo )
-				}
+
 				if ( FlowInfo.FLOW_TYPE_UNDEFINED == changeCandidate.flowInfo.type	)
 					changeCandidate.flowInfo.type = typeInfo.flowInfo.type
 					

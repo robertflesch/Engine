@@ -72,6 +72,16 @@ public class FlowInfo
 	}
 	
 	public function isSource():Boolean { return outRef == out }
+	public static function getFlowType( $data:uint ):uint { return ($data & FLOW_FLOW_TYPE) >> FLOW_TYPE_OFFSET; }
+	public static function validateData( $data:uint ):Boolean { 
+		if ( 0 == ($data & FLOW_OUT) >> FLOW_OUT_OFFSET )
+			return false
+		else if ( 0 ==  ($data & FLOW_DOWN) >> FLOW_DOWN_OFFSET )
+			return false
+		else if ( 0 == ($data & FLOW_FLOW_TYPE) >> FLOW_TYPE_OFFSET )
+			return false
+		return true
+	}
 
 	public 	function get direction():int { return (_data & FLOW_FLOW_DIR) >> FLOW_DIR_OFFSET; }
 	public 	function set direction( $val:int):void 

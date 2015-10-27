@@ -35,7 +35,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	 */
 	public class Flow extends FlowTask 
 	{		
-		static public function addTask( $instanceGuid:String, $gc:GrainCursor, $type:int, $flowInfoRaw:int, $taskPriority:int ):void 
+		static public function addTask( $instanceGuid:String, $gc:GrainCursor, $type:int, $flowInfoRaw:uint, $taskPriority:int ):void 
 		{
 			if ( !TypeInfo.typeInfo[$type].flowable ) {
 				Log.out( "Flow.addTask - adding task for non flowable type: " + $type, Log.WARN );
@@ -74,19 +74,26 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				var $flowFromOxel:Oxel = vm.modelInfo.data.oxel.childGetOrCreate( _gc );
 				if ( null == $flowFromOxel )
 					return;
-				
-				$flowFromOxel.flowInfo.flowInfoRaw = _flowInfoRaw; // Flow info has to be present when write is performed
 					
-				var ft:int = $flowFromOxel.flowInfo.type;
+				if ( !FlowInfo.validateData( _flowInfoRaw )	) {
+					Log.out( "Flow.start - _flowInfoRaw - flow data invalid", Log.WARN );
+					return;
+				}
+				if ( !FlowInfo.validateData( $flowFromOxel.flowInfo.flowInfoRaw )	) {
+					Log.out( "Flow.start - $flowFromOxel.flowInfo.flowInfoRaw - flow data invalid", Log.WARN );
+					return;
+				}
+				
+				var flowType:uint = FlowInfo.getFlowType( _flowInfoRaw );
 				//Log.out( "Flow.start - flowable oxel of type: " + ft );
-				if ( FlowInfo.FLOW_TYPE_CONTINUOUS == ft )
+				if ( FlowInfo.FLOW_TYPE_CONTINUOUS == flowType )
 					flowStartContinous($flowFromOxel);
-				else if ( FlowInfo.FLOW_TYPE_MELT == ft )
+				else if ( FlowInfo.FLOW_TYPE_MELT == flowType )
 					flowStartMelt($flowFromOxel);
-				else if ( FlowInfo.FLOW_TYPE_SPRING == ft )
+				else if ( FlowInfo.FLOW_TYPE_SPRING == flowType )
 					flowStartSpring($flowFromOxel);
 				else {
-					Log.out( "Flow.start - NO FLOW TYPE FOUND ft: " + ft + " using continuous flow", Log.WARN );
+					Log.out( "Flow.start - NO FLOW TYPE FOUND ft: " + flowType + " using continuous flow", Log.WARN );
 					$flowFromOxel.flowInfo.type = FlowInfo.FLOW_TYPE_CONTINUOUS
 					flowStartContinous($flowFromOxel)
 				}
@@ -95,6 +102,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			}
 			else
 				Log.out( "Flow.start - VoxelModel not found: " + _guid, Log.ERROR );
+				
 			super.complete();
 			//Log.out( "Flow.start - Complete time: " + (getTimer() - timeStart) );
 		}
