@@ -13,7 +13,7 @@ import flash.utils.getTimer;
 import com.voxelengine.Log;
 import com.voxelengine.worldmodel.oxel.FlowInfo;
      
-public final class FlowPool
+public final class FlowInfoPool
 { 
 	private static var _currentPoolSize:uint; 
 	private static var GROWTH_VALUE:uint; 
