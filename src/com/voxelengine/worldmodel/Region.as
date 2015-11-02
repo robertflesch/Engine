@@ -120,7 +120,7 @@ package com.voxelengine.worldmodel
 				return;
 				
 			if ( _s_currentRegion )
-				_s_currentRegion.unload( null );
+				RegionEvent.dispatch( new RegionEvent( RegionEvent.UNLOAD, 0, _s_currentRegion.guid ) );
 			_s_currentRegion = this;
 			
 			_modelCache = new ModelCache( this );

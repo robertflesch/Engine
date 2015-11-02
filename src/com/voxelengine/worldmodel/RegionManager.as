@@ -63,13 +63,13 @@ public class RegionManager
 	 * @return - None
 	 * Generates Event RegionEvent.UNLOAD if it is the current region
 	*/
-	private function regionLoad( $re:RegionEvent ):void {
-		Log.out( "RegionManager.load - region: " + $re.guid, Log.DEBUG );
-		WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.CREATE ) );
-		
-		RegionEvent.dispatch( new RegionEvent( RegionEvent.UNLOAD, 0, null ) );
-		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, $re.guid ) );
-	}
+	//private function regionLoad( $re:RegionEvent ):void {
+		//Log.out( "RegionManager.load - region: " + $re.guid, Log.DEBUG );
+		//WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.CREATE ) );
+		//
+		//RegionEvent.dispatch( new RegionEvent( RegionEvent.UNLOAD, 0, null ) );
+		//RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, $re.guid ) );
+	//}
 	
 	private function regionRequest( $re:RegionEvent):void {
 		

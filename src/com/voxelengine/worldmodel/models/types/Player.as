@@ -116,7 +116,6 @@ public class Player extends Avatar
 	}
 	
 	private function addEventHandlers():void {
-		//LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		//LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		
@@ -391,55 +390,23 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 	
 	private function onRegionUnload( le:RegionEvent ):void {
-		//instanceInfo.controllingModel = null;
-		//usesGravity = false;
 		lastCollisionModelReset();
 	}
 	
 	private function onRegionLoad( $re:RegionEvent ):void {
-		Log.out( "Player.onRegionLoad - add player to model cache, and applying region info =============================================" );
+		//Log.out( "Player.onRegionLoad - add player to model cache, and applying region info =============================================" );
 		// add the player to this regions model list.
 		Region.currentRegion.modelCache.add( this );
 		
 		if ( Region.currentRegion )
 			Region.currentRegion.applyRegionInfoToPlayer( this );
-			
-//		ModelEvent.dispatch( new ModelEvent( ModelEvent.RELEASE_CONTROL, instanceInfo.instanceGuid ) );
-//		var className:String = getQualifiedClassName( topmostControllingModel() );
-//		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
-	}
-	
-	
-	private function onLoadingPlayerComplete( le:LoadingEvent ):void {
-		//Log.out( "Player.onLoadingPlayerComplete - PLAYER LOADED =============================================" );
-		calculateCenter();
-		if ( Player.player )
-			Player.player.loseControl( null );
-		Player.player.takeControl( null );
-		//LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
-		// TODO  - this forces inventory load, should I let it load lazily?
-//		MouseKeyboardHandler.addInputListeners();
-		collisionPointsAdd();
 	}
 
-	private function onLoadingComplete( le:LoadingEvent ):void {
-		Log.out( "Player.onLoadingComplete" );
-		//ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_LOADED, onLoadingComplete );
-		//LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
-		//if ( !Globals.g_regionManager.currentRegion.criticalModelDetected )
-		//{
-			////Log.out( "Player.onLoadingComplete - no critical model" );
-			//collisionPointsAdd();
-			//MouseKeyboardHandler.addInputListeners();
-			//gravityOn()
-		//}
-	}
-	
 	private function onCriticalModelLoaded( le:ModelLoadingEvent ):void {
 		//ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
 		Log.out( "Player.onCriticalModelLoaded - CRITICAL model" );
-//		MouseKeyboardHandler.addInputListeners();
-		collisionPointsAdd();
+		// if there is a critical model, don't turn on gravity until it is loaded 
+		// NOTE- RSF - I think this needs to be the OXEL loaded
 		gravityOn()
 	}
 
@@ -467,6 +434,8 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 			// right left
 			var dy:Number = MouseKeyboardHandler.getMouseXChange() / MOUSE_LOOK_CHANGE_RATE;
 			dy *= $elapsedTimeMS;
+			
+			//Log.out( "Player.handleMouseMovement dy: " + dy + "   $elapsedTimeMS: " + $elapsedTimeMS )
 			if ( MIN_TURN_AMOUNT >= Math.abs(dy) )
 				dy = 0;
 			//

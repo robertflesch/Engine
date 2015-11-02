@@ -113,22 +113,18 @@ package {
 			
 			MemoryManager.update()
 			
-			var timeUpdate:int = getTimer()
-			
 			RegionManager.instance.update( elapsed )
 			Shader.animationOffsetsUpdate( elapsed );
-			timeUpdate = getTimer() - timeUpdate
+			var timeUpdate:int = getTimer() - timeEntered
 			
 			if ( showConsole )
 				toggleConsole()
 				
-			var timeRender:int = getTimer()
 			Globals.g_renderer.render()
-			timeRender = getTimer() - timeRender
+			var timeRender:int = getTimer() - timeEntered - timeUpdate
 				
 			//if ( ( 10 < timeRender || 10 < timeUpdate ) && Globals.active )	
 			//	Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed, Log.INFO )
-			_timePrevious = getTimer()
 		}
 		
 		private function deactivate(e:Event):void 
