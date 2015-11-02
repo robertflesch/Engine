@@ -12,6 +12,7 @@ package com.voxelengine.worldmodel.scripts
 	 * @author Bob
 	 */
 	import com.voxelengine.events.LoadingEvent;
+	import com.voxelengine.events.OxelDataEvent;
 	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.scripts.Script;
 	import com.voxelengine.events.ModelEvent;
@@ -25,36 +26,39 @@ package com.voxelengine.worldmodel.scripts
 		public function AutoControlObjectScript() 
 		{
 			ModelEvent.addListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent, false, 0, true );
+			Log.out( "AutoControlObjectScript.AutoControlObjectScript scirpt for player controlling this object: ", Log.ERROR );
 		}
 		
 		public function onModelEvent( $event:ModelEvent ):void 
 		{
-			if ( $event.type == ModelEvent.AVATAR_MODEL_ADDED )
+			if ( $event.instanceGuid == instanceGuid )
 			{
-				if ( $event.instanceGuid == instanceGuid )
-				{
-					ModelEvent.removeListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent );
-					if ( Player.player ) {
-						var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
-						vm.takeControl( Player.player );
-						Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.metadata.name );
-					}
-					else {
-						LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
-						//LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingPlayerComplete );
-					}
+				ModelEvent.removeListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent );
+				if ( Player.player ) {
+					var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
+					vm.takeControl( Player.player );
+					Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.metadata.name );
+				}
+				else {
+					OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, onOxelReady )
+					
+					//LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
+					//LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingPlayerComplete );
 				}
 			}
 		}
 		
-		private function onLoadingPlayerComplete( le:LoadingEvent ):void {
-			LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
-			
-			var player:VoxelModel = Player.player;
-			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
-			if ( player && vm ) {
-				vm.takeControl( player );
+		private function onOxelReady( $ode:OxelDataEvent ):void {
+			if ( $ode.modelGuid == Player.player.modelInfo.guid ) {
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, onOxelReady )
+				var player:VoxelModel = Player.player;
+				var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
+				if ( player && vm ) {
+					vm.takeControl( player );
+				}
 			}
+			//LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
+			
 		}
 	}
 }

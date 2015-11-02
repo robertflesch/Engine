@@ -22,6 +22,7 @@ package com.voxelengine.GUI
 	
 	public class LoadingImage extends VVCanvas
 	{
+		static private var _count:int
 		static public function init():void {
 			LoadingImageEvent.addListener( LoadingImageEvent.CREATE, create );
 			LoadingImageEvent.addListener( LoadingImageEvent.DESTROY, destroy );
@@ -29,24 +30,26 @@ package com.voxelengine.GUI
 		}
 		
 		static private function annihilate(e:LoadingImageEvent):void {
+			_count = 0
 			if ( LoadingImage.isActive ) {
 				LoadingImage._s_currentInstance.remove();
-				LoadingImage._s_currentInstance = null;
 			}
 		}
 		
 		static private function create(e:LoadingImageEvent):void {
-			if ( null == _s_currentInstance )
+			_count++
+			if ( !LoadingImage.isActive )
 				new LoadingImage();
 		}
 		
 		static private function destroy(e:LoadingImageEvent):void {
 //			Log.out( "LoadingImage.destroy called", Log.WARN );
-			if ( LoadingImage.isActive && Globals.online )
+			if ( 0 < _count )
+				_count--
+			if ( LoadingImage.isActive )
 			{
 				//Log.out( "LoadingImage.DESTROYED", Log.WARN );
 				LoadingImage._s_currentInstance.remove();
-				LoadingImage._s_currentInstance = null;
 			}
 		}
 		

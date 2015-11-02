@@ -132,8 +132,6 @@ public class FlowInfo
 	public function get flowInfoRaw():uint { return _data }
 	public function set flowInfoRaw( val:uint ):void { 
 		_data = val 
-		if ( 0 == type )
-			Log.out( "FlowInfo.flowInfoRaw - type: " + type );
 	}
 	
 	public function reset( $oxel:Oxel = null ):void {

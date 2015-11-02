@@ -171,13 +171,15 @@ public class InstanceInfo extends Location	{
 		var ii:Object 		= super.toObject()
 		ii.instanceGuid		= instanceGuid; 
 		ii.modelGuid 		= modelGuid;
-		ii.collision 		= _collidable;
+		ii.collision 		= collidable;
 //		ii.baseLightLevel 	= baseLightLevel;
 		
 		if ( velocityGet.length )
 			ii.velocity		= vector3DToObject( velocityGet );
-		if ( _usesCollision )
-			ii.collision 		= _usesCollision;
+		if ( usesCollision )
+			ii.collision 		= usesCollision;
+		if ( collidable )
+			ii.collidable 		= collidable;
 		if ( _critical )
 			ii.critical		= _critical;
 //		if ( _grainSize ) // this is only used to override biomes data. So only from a generate script
@@ -371,27 +373,19 @@ public class InstanceInfo extends Location	{
 	public function setCollisionInfo( $info:Object ):void {
 		// is this object able to be collided with 
 		_collidable = true;
-		var collideable:String;
-		if ( $info.collidable )
-		{
-			collideable = $info.collidable;
-			if ( "false" == collideable.toLowerCase() )
+		if ( $info.collidable ) {
+			var collideableVal:String = $info.collidable;
+			if ( "false" == collideableVal.toLowerCase() )
 				_collidable = false;
 		}	
-		if ( $info.collideable )
-		{
-			collideable = $info.collideable;
-			if ( "false" == collideable.toLowerCase() )
-				_collidable = false;
-		}
 		
 		// does this object attempt to collide with other objects?
-		_usesCollision = false;
+		usesCollision = false;
 		if ( $info.collision )
 		{
-			var collision:String = $info.collision;
-			if ( "true" == collision.toLowerCase() )
-				_usesCollision = true;
+			var collisionVal:String = $info.collision;
+			if ( "true" == collisionVal.toLowerCase() )
+				usesCollision = true;
 		}
 	}
 	

@@ -186,13 +186,6 @@ public class ControllableVoxelModel extends VoxelModel
 		
 	}
 
-	override protected function oxelLoaded():void
-	{
-		collisionPointsAdd();
-//			if ( _displayCollisionMarkers )
-//				_ct.markersAdd();
-	}		
-	
 	// Just here for the descendants to override
 	protected function onChildAdded( me:ModelEvent ):void { }
 	

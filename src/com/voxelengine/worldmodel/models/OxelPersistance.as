@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.LoadingImageEvent;
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.net.registerClassAlias;
@@ -199,6 +200,7 @@ public class OxelPersistance extends PersistanceObject
 	
 	public function fromByteArray():void {
 
+		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) )
 		//Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.WARN );
 		var time:int = getTimer();
 		
@@ -245,6 +247,7 @@ public class OxelPersistance extends PersistanceObject
 		//Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.WARN );
 		
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this ) );
+		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) )
 	}
 	
 	static public function toByteArray( $oxel:Oxel ):ByteArray {

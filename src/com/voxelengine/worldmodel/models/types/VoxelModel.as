@@ -1136,9 +1136,6 @@ public class VoxelModel
 		return slots;
 	}
 	
-	// acts as stub for overloading
-	protected function oxelLoaded():void { }
-	
 	public function size():int {
 		if ( _modelInfo && _modelInfo.data && _modelInfo.data.loaded )
 			return _modelInfo.data.oxel.size_in_world_coordinates();

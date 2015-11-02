@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.models.types
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.InventoryInterfaceEvent;
 import com.voxelengine.events.ModelLoadingEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.biomes.Biomes;
@@ -92,14 +93,12 @@ public class Player extends Avatar
 		hasInventory = true;
 		instanceInfo.usesCollision = true;
 		clipVelocityFactor = AVATAR_CLIP_FACTOR;
-		//metadata.modify = false;
 		addEventHandlers();
-		
 		takeControl( null );
-		
-		//_ct.markersAdd();
-		
 		torchToggle();
+		collisionPointsAdd();
+		if ( _displayCollisionMarkers )
+			_ct.markersAdd();
 	}
 	
 	static public function buildExportObject( obj:Object ):void {
@@ -117,23 +116,22 @@ public class Player extends Avatar
 	}
 	
 	private function addEventHandlers():void {
+		//LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+		//LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		
-		LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
-		
 		ModelLoadingEvent.addListener( ModelLoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
-		LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 		
 		RegionEvent.addListener( RegionEvent.UNLOAD, onRegionUnload );
 		RegionEvent.addListener( RegionEvent.LOAD_BEGUN, onRegionLoad );
 	}
 
 	private function removeEventHandlers():void {
+		//LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
+		//LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		
 		ModelLoadingEvent.removeListener( ModelLoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
-		LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
-		LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
 		
 		RegionEvent.removeListener( RegionEvent.UNLOAD, onRegionUnload );
 		RegionEvent.removeListener( RegionEvent.LOAD_BEGUN, onRegionLoad );

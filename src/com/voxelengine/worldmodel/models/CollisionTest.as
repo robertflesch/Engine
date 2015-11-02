@@ -23,45 +23,30 @@ package com.voxelengine.worldmodel.models
 		private var _owner:VoxelModel = null
 		
 		// Collision points are defined in World Space coordinates
-		public function CollisionTest( $owner:VoxelModel )
-		{
-			_owner = $owner;
-		}
+		public function CollisionTest( $owner:VoxelModel ) 				{ _owner = $owner }
 		
-		public function collisionPoints():Vector.<CollisionPoint>
-		{
-			return _collisionPoints;
-		}
+		public function collisionPoints():Vector.<CollisionPoint> 		{ return _collisionPoints  }
 		
-		public function addCollisionPoint( $val:CollisionPoint ):void
-		{
-			_collisionPoints.push( $val );
-		}
+		public function addCollisionPoint( $val:CollisionPoint ):void  	{ _collisionPoints.push( $val ) }
 		
-		public function isNotValid():Boolean
-		{
-			for each ( var result:CollisionPoint in _collisionPoints )
-			{
+		public function isNotValid():Boolean {
+			for each ( var result:CollisionPoint in _collisionPoints ) {
 				if ( result.collided )
 					return true;
 			}
 			return false;
 		}
 
-		public function isValid():Boolean
-		{
-			for each ( var result:CollisionPoint in _collisionPoints )
-			{
+		public function isValid():Boolean {
+			for each ( var result:CollisionPoint in _collisionPoints ) {
 				if ( result.collided )
 					return false;
 			}
 			return true;
 		}
 		
-		public function setValid():void
-		{
-			for each ( var cp:CollisionPoint in _collisionPoints )
-			{
+		public function setValid():void {
+			for each ( var cp:CollisionPoint in _collisionPoints ) {
 				cp.collided = false;
 				cp.oxel = null;
 			}
@@ -70,9 +55,7 @@ package com.voxelengine.worldmodel.models
 		public function toString():String {
 			var result:String = "CollisionTest type: ";
 			for each ( var cp:CollisionPoint in _collisionPoints )
-			{
 				result += cp.toString() + " - "
-			}
 			
 			return result;
 		}
@@ -82,19 +65,12 @@ package com.voxelengine.worldmodel.models
 		public function markersAdd():void {
 			
 			for each ( var cp:CollisionPoint in _collisionPoints )
-			{
 				cp.markerAdd( _owner );
-			}
 		}
 		
-		
-		
 		public function markersRemove():void {
-			
 			for each ( var cp:CollisionPoint in _collisionPoints )
-			{
 				cp.markerRemove( _owner );
-			}
 		}
 		
 	}
