@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.GUI
 {
+	import com.voxelengine.events.AppEvent;
 	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
 	import flash.events.Event;
@@ -78,7 +79,7 @@ package com.voxelengine.GUI
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize );
-			Globals.g_app.addEventListener( Event.ENTER_FRAME, onEnterFrame );
+			AppEvent.addListener( AppEvent.INTERNAL_ENTER_FRAME, onEnterFrame )
 		} 
 		
         protected function onResize(event:Event):void {
@@ -91,12 +92,12 @@ package com.voxelengine.GUI
 		private function onRemoved( event:UIOEvent ):void {
 			removeEventListener(UIOEvent.REMOVED, onRemoved );
 			Globals.g_app.stage.removeEventListener( Event.RESIZE, onResize );
-			Globals.g_app.removeEventListener( Event.ENTER_FRAME, onEnterFrame );
+			AppEvent.removeListener( AppEvent.INTERNAL_ENTER_FRAME, onEnterFrame )
 			
 			_s_currentInstance = null;
 		}
 		
-		private function onEnterFrame( e:Event ):void {
+		private function onEnterFrame( e:AppEvent ):void {
 			rotateImage( _angle );
 		}
 		

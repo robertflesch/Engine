@@ -1,6 +1,7 @@
 
 package com.voxelengine.GUI
 {
+	import com.voxelengine.events.AppEvent;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.utils.getQualifiedClassName;
 	import flash.events.Event;
@@ -78,7 +79,7 @@ package com.voxelengine.GUI
 			
 			display( 0, 0 );	
 			
-			Globals.g_app.addEventListener( Event.ENTER_FRAME, onEnterFrame );
+			AppEvent.addListener( AppEvent.INTERNAL_ENTER_FRAME, onEnterFrame )
 			Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 			
 			onResize(null);

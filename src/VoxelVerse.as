@@ -125,6 +125,7 @@ package {
 				
 			//if ( ( 10 < timeRender || 10 < timeUpdate ) && Globals.active )	
 			//	Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed, Log.INFO )
+			AppEvent.dispatch( new AppEvent( AppEvent.INTERNAL_ENTER_FRAME ) )
 		}
 		
 		private function deactivate(e:Event):void 

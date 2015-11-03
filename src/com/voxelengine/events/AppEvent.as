@@ -19,6 +19,7 @@ public class AppEvent extends Event
 {
 	static public const APP_DEACTIVATE:String					= "APP_DEACTIVATE";
 	static public const APP_ACTIVATE:String						= "APP_ACTIVATE";
+	static public const INTERNAL_ENTER_FRAME:String				= "INTERNAL_ENTER_FRAME";
 	
 	public function AppEvent( $type:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{

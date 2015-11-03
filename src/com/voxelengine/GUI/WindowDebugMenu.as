@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.GUI
 {
+	import com.voxelengine.events.AppEvent;
 	import com.voxelengine.worldmodel.models.types.EditCursor;
 	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -123,7 +124,8 @@ package com.voxelengine.GUI
 			display( 0, 240 )	
 			onResize( null )
 			
-			Globals.g_app.addEventListener( Event.ENTER_FRAME, onEnterFrame );
+			AppEvent.addListener( AppEvent.INTERNAL_ENTER_FRAME, onEnterFrame )
+			
 			Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 		} 
 		
