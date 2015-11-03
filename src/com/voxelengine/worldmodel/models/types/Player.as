@@ -477,8 +477,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 			var posWs:Vector3D = $loc.modelToWorld( cp.pointScaled );
 			
 			// pass in the world space coordinate to get back whether the oxel at the location is solid
-//				cp.collided = $collisionCandidate.isSolidAtWorldSpace( posWs, MIN_COLLISION_GRAIN );
-			$collisionCandidate.isSolidAtWorldSpace( cp, posWs, MIN_COLLISION_GRAIN );
+			$collisionCandidate.isSolidAtWorldSpace( cp, posWs, MIN_COLLISION_GRAIN, this );
 			// if collided, increment the count on that collision point set
 			if ( true == cp.collided )
 			{

@@ -70,7 +70,6 @@ public class ControllableVoxelModel extends VoxelModel
 	// This should be at the controllable model leve			
 	static private var 	_clipVelocityFactor:SecureNumber		= new SecureNumber(DEFAULT_CLIP_VELOCITY); 		// INSTANCE NOT EXPORTED
 	
-	private var 	_lastCollisionModel:VoxelModel; 											// INSTANCE NOT EXPORTED
 	protected var 	_turnRate:Number 						= DEFAULT_TURN_RATE; // 2.5 for ship
 	protected var 	_accelRate:Number 						= DEFAULT_ACCEL_RATE;
 	private var 	_onSolidGround:Boolean														// INSTANCE NOT EXPORTED
@@ -81,9 +80,6 @@ public class ControllableVoxelModel extends VoxelModel
 	public function get		accelRate():Number 						{ return _accelRate; }
 	static public function get		clipVelocityFactor():Number 			{ return _clipVelocityFactor.val; }
 	static public function set		clipVelocityFactor($val:Number):void 	{ _clipVelocityFactor.val = $val; }
-	public function get		lastCollisionModel():VoxelModel 		{ return _lastCollisionModel; }
-	public function set		lastCollisionModel(val:VoxelModel):void { _lastCollisionModel = val; }
-	public function 		lastCollisionModelReset():void 				{ _lastCollisionModel = null; }
 	static public function get 	maxSpeed():Number 						{ return _maxSpeed.val; }
 	static public function set 	maxSpeed($value:Number):void 			{ _maxSpeed.val = $value; }
 	protected function get 	mMaxFallRate():Number 					{ return _maxFallRate.val; }

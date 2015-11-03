@@ -9,8 +9,12 @@
 package com.voxelengine.renderer 
 {
 	import com.voxelengine.events.ContextEvent;
+	import com.voxelengine.events.WindowWaterEvent;
 	import com.voxelengine.worldmodel.models.ModelInfoCache;
+	import com.voxelengine.worldmodel.models.types.Player;
+	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.TextureBank;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.display.Stage3D;
 	import flash.display.BitmapData;
 	import flash.display.Stage;
@@ -230,6 +234,23 @@ package com.voxelengine.renderer
 			backgroundColor();
 			
 			var wsPositionCamera:Vector3D = cm.instanceInfo.worldSpaceMatrix.transformVector( cm.camera.current.position );
+			
+			// This does not handle the case where the player has not collided with the model yet
+			// Say they are falling onto an island, and they hit the water first.
+			// I should probably adjust that algorithm to account for it.
+			if ( Player.player ) {
+				var lcm:VoxelModel = Player.player.lastCollisionModel
+				if ( null != lcm ) {
+					var camOxel:Oxel = lcm.getOxelAtWSPoint( wsPositionCamera, 4 )
+					if ( camOxel && Globals.BAD_OXEL != camOxel ) {
+						if ( TypeInfo.WATER == camOxel.type )
+							WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.CREATE ) )
+						else
+							WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.ANNIHILATE ) )
+					}
+				}
+			}
+			
 //			trace( "Renderer.render - wsPositionCamera: " + wsPositionCamera );
 			wsPositionCamera.negate();
 			
@@ -256,6 +277,7 @@ package com.voxelengine.renderer
 				_context.drawToBitmapData( screenShot );
 			else
 				_context.present();
+			
 		}
 		
 		private function perspectiveProjection(fov:Number = 90, aspect:Number = 1, near:Number = 1, far:Number = 2048):Matrix3D {

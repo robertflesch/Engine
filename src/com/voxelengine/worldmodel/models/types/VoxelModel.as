@@ -130,10 +130,12 @@ public class VoxelModel
 			_associatedGrain = new GrainCursor();
 		_associatedGrain.copyFrom( $val ); 
 	}
-
-// TO DO Decouple this, I dislike having every instance of the OxelData have a listener for oxel events
-	//public function get oxel():Oxel { return _modelInfo.oxel; }
 	
+	private var 	_lastCollisionModel:VoxelModel; 											// INSTANCE NOT EXPORTED
+	public function get		lastCollisionModel():VoxelModel 		{ return _lastCollisionModel; }
+	public function set		lastCollisionModel(val:VoxelModel):void { _lastCollisionModel = val; }
+	public function 		lastCollisionModelReset():void 				{ _lastCollisionModel = null; }
+
 	public function get dead():Boolean 							{ return _dead; }
 	public function set dead(val:Boolean):void 					{ 
 		_dead = val; 
@@ -746,11 +748,10 @@ public class VoxelModel
 		return fo;
 	}
 	
-	public function isSolidAtWorldSpace($cp:CollisionPoint, $pos:Vector3D, $collideAtGrain:uint):void {
+	public function isSolidAtWorldSpace($cp:CollisionPoint, $pos:Vector3D, $collideAtGrain:uint, $collidingModel:VoxelModel = null ):void {
 		$cp.oxel = getOxelAtWSPoint($pos, $collideAtGrain);
 		if (Globals.BAD_OXEL == $cp.oxel)
 		{
-			//Log.out( "Camera.isNewPositionValid - oxel is BAD, so passable")
 			$cp.collided = false;
 		}
 		else if ( TypeInfo.typeInfo[$cp.oxel.type].solid )
@@ -761,6 +762,12 @@ public class VoxelModel
 		{
 			// TODO - RSF What happens if the children are passabled?
 			$cp.collided = true;
+		}
+		else if ( $cp.oxel.type != TypeInfo.AIR ) {
+			if ( $collidingModel is Player ) {
+				Player.player.lastCollisionModel = this
+				//Log.out( "VoxelModel.isNewPositionValid - oxel is BAD, so passable")
+			}
 		}
 	}
 	

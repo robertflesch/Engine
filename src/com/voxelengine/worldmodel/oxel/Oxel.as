@@ -349,9 +349,8 @@ public class Oxel extends OxelBitfields
 	// this could be called childGetClosest
 	[inline]
 	public function childFind( $gc:GrainCursor ):Oxel {
-		if ( $gc.grain > gc.grain )
-		{
-			throw new Error("Looking for a larger grain within a smaller grain");
+		if ( $gc.grain > gc.grain ) {
+			Log.out( "Oxel.childFind - Looking for a larger grain within a smaller grain");
 			return Globals.BAD_OXEL;
 		}
 			
@@ -361,12 +360,13 @@ public class Oxel extends OxelBitfields
 		if ( 0 == gc.grain || $gc.grain == gc.grain )
 			return Globals.BAD_OXEL;
 		
-		for each ( var child:Oxel in _children ) 
-		{
-			if ( $gc.is_equal( child.gc ) )
-				return child;
-			if ( $gc.is_inside( child.gc ) ) 
-				return child.childFind( $gc );
+		if ( $gc.is_inside( gc ) ) {
+			for each ( var child:Oxel in _children ) {
+				if ( $gc.is_equal( child.gc ) )
+					return child;
+				if ( $gc.is_inside( child.gc ) ) 
+					return child.childFind( $gc );
+			}
 		}
 		
 		// $gc is inside of a grain that doesnt have children at that level, so return the topmost grain that holds that child

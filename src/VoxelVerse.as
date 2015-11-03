@@ -300,6 +300,7 @@ import com.voxelengine.Globals
 
 import com.voxelengine.GUI.VoxelVerseGUI
 import com.voxelengine.GUI.WindowSplash
+import com.voxelengine.GUI.WindowWater
 import com.voxelengine.worldmodel.MouseKeyboardHandler
 import com.voxelengine.worldmodel.models.*
 import com.voxelengine.worldmodel.inventory.InventoryManager
@@ -335,6 +336,7 @@ class VVInitializer
 		
 		VoxelVerseGUI.currentInstance.init()
 		WindowSplash.init()
+		WindowWater.init()
 		
 		// This adds the event handlers
 		// Is there a central place to do this?
