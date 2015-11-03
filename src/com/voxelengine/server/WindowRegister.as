@@ -49,11 +49,13 @@ package com.voxelengine.server
 		private var _eInput:TextInput
 		
 		private var _refresh:Bitmap;
-		[Embed(source='../../../../../Resources/bin/assets/textures/refresh.png')]
+		[Embed(source='../../../../embed/textures/refresh.png')]
+		//[Embed(source='../../../../../Resources/bin/assets/textures/refresh.png')]
 		private var _refreshImageTest:Class;
 		
 		private var _retrievingCaptcha:Bitmap;
-		[Embed(source='../../../../../Resources/bin/assets/textures/retrievingCaptcha.jpg')]
+		[Embed(source='../../../../embed/textures/retrievingCaptcha.jpg')]
+		//[Embed(source='../../../../../Resources/bin/assets/textures/retrievingCaptcha.jpg')]
 		private var _retrievingCaptchaImage:Class;
 				
 		

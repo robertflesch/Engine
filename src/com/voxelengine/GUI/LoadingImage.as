@@ -60,7 +60,7 @@ package com.voxelengine.GUI
 		private var _count:int = 0;
 		private var _outline:Image;
 		private var _splashImage:Bitmap;
-		[Embed(source='../../../../../Resources/bin/assets/textures/loadingCursor.png')]
+		[Embed(source='../../../../embed/textures/loadingCursor.png')]
 		private var _splashImageClass:Class;
 
 		

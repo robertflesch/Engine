@@ -57,7 +57,7 @@ package com.voxelengine.GUI
 		
 		private var _outline:Image;
 		private var _splashImage:Bitmap;
-		[Embed(source='../../../../../Resources/bin/assets/textures/splash.png')]
+		[Embed(source='../../../../embed/textures/splash.png')]
 		private var _splashImageClass:Class;
 
 		

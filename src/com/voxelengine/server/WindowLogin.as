@@ -44,7 +44,7 @@ package com.voxelengine.server
 		private var _loginButton:Button
 
 		private var _topImage:Bitmap;
-		[Embed(source='../../../../../Resources/bin/assets/textures/loginImage.png')]
+		[Embed(source='../../../../embed/textures/loginImage.png')]
 		private var _topImageClass:Class;
 		
 		public function WindowLogin( $email:String, $password:String )
