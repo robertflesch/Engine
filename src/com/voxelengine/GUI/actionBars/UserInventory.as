@@ -210,8 +210,6 @@ public class  UserInventory extends QuickInventory
 			
 			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, _owner, "", slotId, null ) );
 			// sets edit cursor to none
-//			EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
-//			EditCursor.editing = false;
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) );
 		}
 	}

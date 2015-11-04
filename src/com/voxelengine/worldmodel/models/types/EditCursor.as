@@ -905,7 +905,7 @@ public class EditCursor extends VoxelModel
 	}
 		
 	private function mouseDown(e:MouseEvent):void {
-		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active )
+		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active || !editing )
 			return;
 		if ( doubleMessageHack ) {
 			//Log.out( "EditCursor.mouseDown", Log.WARN );	

@@ -161,9 +161,6 @@ public class Slots
 	
 	
 	static private function pickToolSlots():void {
-//		EditCursor.cursorOperation = EditCursor.CURSOR_OP_DELETE;
-//		EditCursor.setPickColorFromType( EditCursor.cursorType )
-//		EditCursor.editing = true;
 		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.DELETE_OXEL ) );
 	}
 	

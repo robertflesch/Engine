@@ -8,9 +8,9 @@
 
 package com.voxelengine.GUI.actionBars
 {
-import com.voxelengine.events.CursorSizeEvent;
 import flash.events.MouseEvent;
 import flash.events.KeyboardEvent;
+import flash.events.Event;
 
 import org.flashapi.swing.Box;
 import org.flashapi.swing.Label;
@@ -20,6 +20,7 @@ import org.flashapi.swing.event.UIMouseEvent;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
+import com.voxelengine.events.CursorSizeEvent;
 import com.voxelengine.GUI.inventory.BoxInventory;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
