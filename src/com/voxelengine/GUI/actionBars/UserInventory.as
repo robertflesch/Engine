@@ -325,8 +325,9 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function onCursorOperationNone(e:CursorOperationEvent):void { 
-		Log.out( "UserInventory.onCursorOperationNone", Log.DEBUG );
-		processItemSelection( boxes[1], false )
+		hideModelTools()
+		hideGrainTools()
+		moveSelector( boxes[1] );
 	}
 	
 	private function processItemSelection( box:UIObject, $propagate:Boolean = true ):void {
@@ -337,9 +338,9 @@ public class  UserInventory extends QuickInventory
 		moveSelector( box );
 		var boxesIndex:int = int( box.name ); // Boxes[0] uses hotkey 1
 		
-		hideGrainTools();
-		hideModelTools();
-		EditCursor.editing = false;
+		//hideGrainTools();
+		//;
+		//EditCursor.editing = false;
 		
 		var oi:ObjectInfo = box.data as ObjectInfo;
 		if ( oi is ObjectVoxel ) {
@@ -349,7 +350,8 @@ public class  UserInventory extends QuickInventory
 				itemMaterialSelection = boxesIndex;
 				CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.INSERT_OXEL, selectedTypeId ) ); 
 			}
-			showGrainTools();
+			hideModelTools()
+			showGrainTools()
 		}
 		else if ( oi is ObjectAction ) {
 			//Log.out( "UserInventory.processItemSelection - ObjectAction - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
@@ -373,7 +375,7 @@ public class  UserInventory extends QuickInventory
 		}
 		else if ( oi is ObjectTool ) {
 			//Log.out( "UserInventory.processItemSelection - ObjectTool");
-			EditCursor.editing = true;
+			hideModelTools()
 			var ot:ObjectTool = oi as ObjectTool;
 			if ( lastBoxesSelection == boxesIndex ) {
 				//Log.out( "UserInventory.processItemSelection - ObjectTool - lastItemSelection == boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
@@ -403,16 +405,18 @@ public class  UserInventory extends QuickInventory
 		}
 		else if ( oi is ObjectModel ) {
 			Log.out( "UserInventory.processItemSelection - ObjectModel", Log.WARN);
-			EditCursor.editing = true;
 			var ti1:TypeInfo = TypeInfo.typeInfoByName[ "CLEAR GLASS" ];
 			var om:ObjectModel = oi as ObjectModel;
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.INSERT_MODEL, ti1.type, om ) ); 
 			
-			showModelTools();
+			hideGrainTools()
+			showModelTools()
 		}
 		else if ( oi is ObjectInfo ) {
 			//Log.out( "UserInventory.processItemSelection - ObjectInfo");
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) ); 
+			hideGrainTools()
+			hideModelTools()
 		}
 		
 		lastBoxesSelection = boxesIndex;

@@ -128,7 +128,7 @@ package com.voxelengine.worldmodel.models
 				
 				VoxelModel.selectedModel = editableModel;
 				
-				if ( EditCursor.editing )
+				if ( EditCursor.isEditing )
 				{
 					const minSize:int = EditCursor.currentInstance.grain;
 					

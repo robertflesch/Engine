@@ -168,9 +168,7 @@ public class Slots
 	}
 	
 	static private function noneSlots():void {
-//		EditCursor.cursorOperation = EditCursor.CURSOR_OP_NONE;
-//		EditCursor.editing = false;
-//		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) );
+		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) );
 	}
 	
 

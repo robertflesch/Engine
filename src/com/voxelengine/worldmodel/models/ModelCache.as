@@ -200,7 +200,7 @@ public class ModelCache
 				vm.draw( $mvp, $context, false, false );	
 		}
 		
-		if ( EditCursor.editing )
+		if ( EditCursor.isEditing )
 			EditCursor.currentInstance.drawCursor( $mvp, $context, false, false );
 			
 		for ( i = 0; i < _instances.length; i++ ) {
@@ -216,7 +216,7 @@ public class ModelCache
 				vm.draw( $mvp, $context, false, true );	
 		}
 		
-		if ( EditCursor.editing ) //  && ModelPlacementType.PLACEMENT_TYPE_PARENT == ModelPlacementType.modelPlacementTypeGet()
+		if ( EditCursor.isEditing ) //  && ModelPlacementType.PLACEMENT_TYPE_PARENT == ModelPlacementType.modelPlacementTypeGet()
 			EditCursor.currentInstance.drawCursor( $mvp, $context, false, true );
 		
 		bringOutYourDead();
@@ -255,7 +255,7 @@ public class ModelCache
 		
 		modelTime = getTimer() - modelTime;
 			
-		if ( EditCursor.editing )
+		if ( EditCursor.isEditing )
 			EditCursor.currentInstance.update( Globals.g_renderer.context, $elapsedTimeMS);
 
 	}

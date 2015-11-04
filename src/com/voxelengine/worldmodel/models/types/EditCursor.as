@@ -7,10 +7,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-import com.voxelengine.events.AppEvent;
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelLoadingEvent;
-import com.voxelengine.worldmodel.PermissionsBase;
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
@@ -21,15 +17,16 @@ import flash.ui.Keyboard;
 import flash.utils.Timer;
 import playerio.DatabaseObject;
 
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.events.AppEvent;
+import com.voxelengine.Globals;
+import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.events.CursorShapeEvent;
 import com.voxelengine.events.CursorSizeEvent;
 import com.voxelengine.pools.LightingPool;
 import com.voxelengine.pools.GrainCursorPool;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.PermissionsBase;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.*;
 import com.voxelengine.worldmodel.inventory.ObjectModel;
@@ -57,8 +54,8 @@ public class EditCursor extends VoxelModel
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	static private var _s_currentInstance:EditCursor;
 
-	static public const 		EDIT_CURSOR:String 		= "EditCursor";
-	static 	private	const 		SCALE_FACTOR:Number 			= 0.01;
+	static public const 		EDIT_CURSOR:String 					= "EditCursor";
+	static 	private	const 		SCALE_FACTOR:Number 				= 0.01;
 		
 	static private const 		EDITCURSOR_SQUARE:uint				= 1000;
 	static private const 		EDITCURSOR_ROUND:uint				= 1001;
@@ -71,8 +68,9 @@ public class EditCursor extends VoxelModel
 	
 	
 	static private var 			_editing:Boolean;
-	static public function  get editing():Boolean 					{ return _editing; }
-	static public function  set editing(val:Boolean):void 			{ _editing = val; }
+	static private function  get editing():Boolean 					{ return _editing; }
+	static private function  set editing(val:Boolean):void 			{ _editing = val; }
+	static public function   get isEditing():Boolean 				{ return _editing; }
 	
 	static public function get currentInstance():EditCursor {
 		if ( null == _s_currentInstance ) {
@@ -110,12 +108,13 @@ public class EditCursor extends VoxelModel
 	private 		  	var _cursorOperation:String 					= CursorOperationEvent.NONE;
 	private  function 	get cursorOperation():String 					{ return _cursorOperation; }
 	private  function 	set cursorOperation(val:String):void 			{ 
-		//Log.out( "EditCursor.cursorOperation", Log.WARN )
+		_cursorOperation = val; 
 		if ( _cursorOperation == CursorOperationEvent.NONE ) {
-			Log.out( "EditCursor.cursorOperation - reseting", Log.WARN )
+			editing = false
 			repeatTimerStop()
 		}
-		_cursorOperation = val; 
+		else
+			editing = true
 	}
 	
 	private 		 	var _cursorShape:String 						= CursorShapeEvent.SQUARE;		// round, square, cylinder
@@ -148,9 +147,6 @@ public class EditCursor extends VoxelModel
 
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
-		AppEvent.addListener( AppEvent.APP_DEACTIVATE, onDeactivate );
-		AppEvent.addListener( AppEvent.APP_ACTIVATE, onActivate );
-		
 		addListeners();
 	}
 	
@@ -158,20 +154,7 @@ public class EditCursor extends VoxelModel
 		super.release();
 		
 		removeListeners();
-		
-		AppEvent.removeListener( AppEvent.APP_DEACTIVATE, onDeactivate );
-		AppEvent.removeListener( AppEvent.APP_ACTIVATE, onActivate );
 	}
-	
-	protected function onDeactivate( e:AppEvent ):void  {
-		//Log.out( "onDeactivate - disabling repeat" );
-		// We dont want the repeat on if app loses focus
-		mouseUp( null );
-		removeListeners();
-		reset()
-	}
-	
-	protected function onActivate( e:AppEvent ):void  { addListeners(); }
 	
 	////////////////////////////////////////////////
 	// CursorSizeEvents
@@ -212,19 +195,12 @@ public class EditCursor extends VoxelModel
 	
 	////////////////////////////////////////////////
 	// CursorOperationEvents
-	private function resetEvent(e:CursorOperationEvent):void { reset() }
-		
-	private function deactivate(e:AppEvent):void { reset() }
-		
-	private function reset():void {		
-		//Log.out( "EditCursor.resetEvent", Log.WARN )
-		_editing = false;
-		cursorShape = CursorShapeEvent.SQUARE;
-		// The change to NONE turns off the repeat timer
-		cursorOperation = CursorOperationEvent.NONE;
+	private function resetEvent(e:CursorOperationEvent):void {
+		editing = false
 	}
+	
 	private function deleteOxelEvent(e:CursorOperationEvent):void {
-		_editing = true;
+		editing = true;
 		cursorOperation = e.type;
 		if ( CursorShapeEvent.CYLINDER == cursorShape )
 			oxelTextureValid = oxelTexture = EditCursor.EDITCURSOR_CYLINDER;
@@ -235,19 +211,19 @@ public class EditCursor extends VoxelModel
 		objectModelClear();
 	}
 	private function insertOxelEvent(e:CursorOperationEvent):void {
-		_editing = true;
+		editing = true;
 		cursorOperation = e.type;
 		oxelTextureValid = oxelTexture = e.oxelType;
 		objectModelClear();
 	}
 	private function deleteModelEvent(e:CursorOperationEvent):void {
-		_editing = true;
+		editing = true;
 		cursorShape = CursorShapeEvent.MODEL_AUTO;
 		cursorOperation = e.type;
 	}
 	private function insertModelEvent(e:CursorOperationEvent):void {
 		Log.out( "EditCursor.insertModelEvent", Log.WARN );
-		_editing = true;
+		editing = true;
 		cursorShape = CursorShapeEvent.MODEL_AUTO;
 		cursorOperation = e.type;
 		oxelTextureValid = oxelTexture = e.oxelType;
@@ -275,7 +251,7 @@ public class EditCursor extends VoxelModel
 	private function removeListeners():void {	
 		//Log.out( "EditCursor.removeListeners", Log.WARN );
 		//_s_listenersAdded = false;
-		//CursorOperationEvent.removeListener( CursorOperationEvent.NONE, 		resetEvent );
+		////CursorOperationEvent.removeListener( CursorOperationEvent.NONE, 		resetEvent );
 		//CursorOperationEvent.removeListener( CursorOperationEvent.DELETE_OXEL, 	deleteOxelEvent );
 		//CursorOperationEvent.removeListener( CursorOperationEvent.DELETE_MODEL, deleteModelEvent );
 		//CursorOperationEvent.removeListener( CursorOperationEvent.INSERT_OXEL, 	insertOxelEvent );
@@ -518,6 +494,8 @@ public class EditCursor extends VoxelModel
 			return
 		if ( !objectModel )
 			return
+		if ( !isEditing )
+			return
 			
 		var ii:InstanceInfo = objectModel.instanceInfo.clone();
 		if ( VoxelModel.selectedModel && PlacementLocation.INVALID != _pl.state) {
@@ -545,6 +523,9 @@ public class EditCursor extends VoxelModel
 	private function insertOxel(recurse:Boolean = false):void {
 		if ( CursorOperationEvent.INSERT_OXEL != cursorOperation )
 			return;
+		if ( !isEditing )
+			return
+			
 
 		var foundModel:VoxelModel = VoxelModel.selectedModel;
 		if ( foundModel )

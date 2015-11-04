@@ -66,6 +66,7 @@ package com.voxelengine
 				var detailsPlus:String = "UserID: " + Network.userId + " details: " + $details
 				Network.client.errorLog.writeError( $errorType, detailsPlus, stackTrace, $extraData )
 			}
+			trace( stackTrace )
 		}
 		
 		

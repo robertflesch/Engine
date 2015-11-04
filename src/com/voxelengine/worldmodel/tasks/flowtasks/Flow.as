@@ -72,17 +72,16 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
 			if ( vm ) {
 				var $flowFromOxel:Oxel = vm.modelInfo.data.oxel.childGetOrCreate( _gc );
-				if ( null == $flowFromOxel )
+				if ( null == $flowFromOxel  )
 					return;
-					
+				if ( null == $flowFromOxel.flowInfo  )
+					return;
 				if ( !FlowInfo.validateData( _flowInfoRaw )	) {
 					Log.out( "Flow.start - _flowInfoRaw - flow data invalid", Log.WARN );
-					return;
-				}
+					return; }
 				if ( !FlowInfo.validateData( $flowFromOxel.flowInfo.flowInfoRaw )	) {
 					Log.out( "Flow.start - $flowFromOxel.flowInfo.flowInfoRaw - flow data invalid", Log.WARN );
-					return;
-				}
+					return; }
 				
 				var flowType:uint = FlowInfo.getFlowType( _flowInfoRaw );
 				//Log.out( "Flow.start - flowable oxel of type: " + ft );
