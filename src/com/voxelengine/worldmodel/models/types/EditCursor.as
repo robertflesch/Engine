@@ -15,6 +15,8 @@ import flash.events.MouseEvent;
 import flash.events.TimerEvent;
 import flash.ui.Keyboard;
 import flash.utils.Timer;
+import flash.utils.getTimer;
+
 import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
@@ -25,6 +27,7 @@ import com.voxelengine.events.CursorShapeEvent;
 import com.voxelengine.events.CursorSizeEvent;
 import com.voxelengine.pools.LightingPool;
 import com.voxelengine.pools.GrainCursorPool;
+import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.PermissionsBase;
 import com.voxelengine.worldmodel.TypeInfo;
@@ -55,7 +58,7 @@ public class EditCursor extends VoxelModel
 	static private var _s_currentInstance:EditCursor;
 
 	static public const 		EDIT_CURSOR:String 					= "EditCursor";
-	static 	private	const 		SCALE_FACTOR:Number 				= 0.01;
+	static private	const 		SCALE_FACTOR:Number 				= 0.01;
 		
 	static private const 		EDITCURSOR_SQUARE:uint				= 1000;
 	static private const 		EDITCURSOR_ROUND:uint				= 1001;
@@ -65,7 +68,6 @@ public class EditCursor extends VoxelModel
 	static private const 		EDITCURSOR_HAND_LR:uint				= 1005;
 	static private const 		EDITCURSOR_HAND_UD:uint				= 1006;
 	static private var 			_s_listenersAdded:Boolean;
-	
 	
 	static private var 			_editing:Boolean;
 	static private function  get editing():Boolean 					{ return _editing; }
@@ -132,8 +134,8 @@ public class EditCursor extends VoxelModel
 	
 	// This saves the last valid texture that was set.
 	private 		  	var _oxelTextureValid:int		 				= EDITCURSOR_SQUARE;
-	public function 	get oxelTextureValid():int 						{ return _oxelTextureValid; }
-	public function 	set oxelTextureValid(value:int):void  			{ _oxelTextureValid = value; }
+	private function 	get oxelTextureValid():int 						{ return _oxelTextureValid; }
+	private function 	set oxelTextureValid(value:int):void  			{ _oxelTextureValid = value; }
 	
 	private 		  	var _oxelTexture:int			 				= EDITCURSOR_SQUARE;
 	private  function 	get oxelTexture():int 							{ return _oxelTexture; }
@@ -478,7 +480,7 @@ public class EditCursor extends VoxelModel
 			{
 				Log.out( "EditCursor.getHighlightedOxel BAD OXEL NEW gciData.point" + EditCursor.currentInstance.gciData.point + "  gciData.gc: " + EditCursor.currentInstance.gciData.gc );
 				// What does this do?
-				insertOxel( true );
+				//insertOxel( true );
 				return Globals.BAD_OXEL;
 			}
 //					foundModel.grow( _pl );
@@ -488,15 +490,6 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function insertModel():void {
-		if ( CursorOperationEvent.INSERT_MODEL != cursorOperation )
-			return
-		if ( EDITCURSOR_INVALID == oxelTexture )
-			return
-		if ( !objectModel )
-			return
-		if ( !isEditing )
-			return
-			
 		var ii:InstanceInfo = objectModel.instanceInfo.clone();
 		if ( VoxelModel.selectedModel && PlacementLocation.INVALID != _pl.state) {
 			ii.controllingModel = VoxelModel.selectedModel;
@@ -521,12 +514,6 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function insertOxel(recurse:Boolean = false):void {
-		if ( CursorOperationEvent.INSERT_OXEL != cursorOperation )
-			return;
-		if ( !isEditing )
-			return
-			
-
 		var foundModel:VoxelModel = VoxelModel.selectedModel;
 		if ( foundModel )
 		{
@@ -809,9 +796,8 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function keyDown(e:KeyboardEvent):void  {
-		if ( Globals.openWindowCount || !Globals.clicked )
+		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active || !editing )
 			return;
-
 			
 		var foundModel:VoxelModel;
 		switch (e.keyCode) {
@@ -840,8 +826,9 @@ public class EditCursor extends VoxelModel
 	}
 	
 	protected function onRepeat(event:TimerEvent):void {
-		if ( Globals.openWindowCount )
-			return;
+		if ( Globals.openWindowCount || !Globals.clicked || !Globals.active || !editing ) {
+			repeatTimerStop()		
+			return; }
 			
 		if ( 1 < _count )
 		{
@@ -853,7 +840,6 @@ public class EditCursor extends VoxelModel
 		_count++;
 	}
 
-	import com.voxelengine.worldmodel.MouseKeyboardHandler;
 	private static var _s_dy:Number = 0;
 	private static var _s_dx:Number = 0;
 	private function mouseMove(e:MouseEvent):void {
@@ -907,6 +893,7 @@ public class EditCursor extends VoxelModel
 	private function mouseDown(e:MouseEvent):void {
 		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active || !editing )
 			return;
+			
 		if ( doubleMessageHack ) {
 			//Log.out( "EditCursor.mouseDown", Log.WARN );	
 				
@@ -930,7 +917,6 @@ public class EditCursor extends VoxelModel
 		}
 	}
 	
-	import flash.utils.getTimer;
 	private static const WAITING_PERIOD:int = 100;
 	private var doubleMessageHackTime:int = getTimer();
 	private function get doubleMessageHack():Boolean {
@@ -959,11 +945,7 @@ public class EditCursor extends VoxelModel
 }
 }
 
-import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
-import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.Globals;
-
 internal class PlacementLocation
 {
 	static public const INVALID:int = 0;

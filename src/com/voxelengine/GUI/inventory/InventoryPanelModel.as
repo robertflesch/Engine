@@ -211,16 +211,6 @@ public class InventoryPanelModel extends VVContainer
 				ii.controllingModel = VoxelModel.selectedModel;
 			ModelMakerBase.load( ii );
 		}
-		
-		
-		//if ( VoxelModel.selectedModel ) {
-			//VoxelModel.selectedModel.childAdd( objectModel.clone() );
-			//Log.out( "EditCursor.insertModel - adding as CHILD", Log.WARN );
-		//}
-		//else {  
-			//Region.currentRegion.modelCache.add( objectModel.clone() );
-			//Log.out( "EditCursor.insertModel - adding as PARENT", Log.WARN );
-		//}
 	}
 	
 	private function addEmptyRow( $countMax:int ):void {
