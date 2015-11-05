@@ -1049,6 +1049,12 @@ public class Oxel extends OxelBitfields
 				if ( 0 < $size && 0 < $propogateCount )
 					no.neighborsMarkDirtyFaces( $modelGuid, $size, $propogateCount );
 			}
+			// if we are being placed over an oxel of the same type that has scaling, we need to reset 
+			// the scaling on the oxel below us.
+			if ( Globals.NEGY == face && no.flowInfo && no.flowInfo.flowScaling.has() ) {
+				no.flowInfo.flowScaling.reset()
+				no.quadsDeleteAll()
+			}
 		}
 	}
 	
@@ -1251,15 +1257,16 @@ public class Oxel extends OxelBitfields
 						// If the oxel opposite this face has alpha, I need to set the face
 						if ( TypeInfo.hasAlpha( oppositeOxel.type ) || (oppositeOxel.flowInfo && oppositeOxel.flowInfo.flowScaling.has) ) {
 							// if the oxel next to me is air and its a top face, then scale the oxel
-							if ( TypeInfo.AIR == oppositeOxel.type && face == Globals.POSY && TypeInfo.typeInfo[type].flowable && !flowInfo.flowScaling.has() )
+							if ( TypeInfo.AIR == oppositeOxel.type && face == Globals.POSY && TypeInfo.typeInfo[type].flowable && !flowInfo.flowScaling.has() ) {
 								scaleTopFlowFace()
+								quadsDeleteAll()
+							}
 							//else {	1
 								//// if above has alpha, but its not air, reset scaling
 								//if ( flowInfo && flowInfo.flowScaling && flowInfo.flowScaling.scalingHas() ) {
 									//flowInfo.flowScaling.scalingReset()
 									//quadsDeleteAll()
 								//}
-							//}
 							faceSet( face );
 						}
 						// oxel opposite (oppositeOxel) does not have alpha.
@@ -1309,10 +1316,20 @@ public class Oxel extends OxelBitfields
 	
 	private function scaleTopFlowFace():void {
 		if ( !flowInfo.flowScaling.has() ) {
-			flowInfo.flowScaling.NxNz = 15
-			flowInfo.flowScaling.NxPz = 15
-			flowInfo.flowScaling.PxNz = 15
-			flowInfo.flowScaling.PxPz = 15
+			var flowScale:int = 16
+			if ( 5 == gc.grain )
+				flowScale = 15
+			else if ( 4 == gc.grain )
+				flowScale = 14
+			else if ( 3 == gc.grain )
+				flowScale = 12
+			else if ( 2 == gc.grain )
+				flowScale = 8
+				
+			flowInfo.flowScaling.NxNz = flowScale
+ 			flowInfo.flowScaling.NxPz = flowScale
+			flowInfo.flowScaling.PxNz = flowScale
+			flowInfo.flowScaling.PxPz = flowScale
 		}
 	}
 	
@@ -1554,7 +1571,10 @@ public class Oxel extends OxelBitfields
 		// did any of the quads change?
 		if ( changeCount ) {
 			// if those this oxel has not been added to vertex manager do it now.
-			if ( !addedToVertex ) 
+			if ( !facesHas() && addedToVertex ) 
+				chunkRemoveOxel()
+			// this feels like I might be double adding faces
+			else if ( facesHas() && !addedToVertex ) 
 				chunkAddOxel();
 		}
 		else if ( addedToVertex ) // I was added to vertex, but I lost all my face, so remove oxel

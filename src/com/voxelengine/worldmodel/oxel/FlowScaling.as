@@ -21,7 +21,6 @@ package com.voxelengine.worldmodel.oxel
 public class FlowScaling
 {
 	private const CORNER_MIN:Number = 1;
-	private const DEFAULT_SCALE:Number = 16;
 	private const DEFAULT_TOTAL_SCALE:uint = 0xffffffff;
 	
 	// has scaling for this oxel be calcualted
@@ -121,21 +120,19 @@ public class FlowScaling
 		if ( !has() )
 			return;
 			
-		Log.out( "FlowScaling.scaleRecalculate was: " + toString() );
-		if ( $oxel.gc.eval( 4, 6, 3, 5 ) )
-			Log.out( "FlowScaling.scaleRecalculate ORIGINGAL" );
+		//Log.out( "FlowScaling.recalculate was: " + toString() );
 		
 		_calculated = false;
 		calculate( $oxel );
 		$oxel.rebuildAll();
-		Log.out( "FlowScaling.scaleRecalculate is: " + toString() );
+		//Log.out( "FlowScaling.recalculate is: " + toString() );
 	}
 	
 	public function calculate( $oxel:Oxel ):void	{
 		if ( _calculated )
 			return;
 	
-		Log.out( "FlowScaling.scaleCalculate was: " + toString() );
+		//Log.out( "FlowScaling.calculate was: " + toString() );
 		_calculated = true;
 		
 		// The origin of the flow should never scale.
@@ -159,7 +156,7 @@ public class FlowScaling
 			NxNz = fi.scale()/_scaleRate;
 		if ( CORNER_MIN == NxPz )
 			NxPz = fi.scale()/_scaleRate;
-		Log.out( "FlowScaling.scalingCalculate is: " + toString() );
+		//Log.out( "FlowScaling.calculate is: " + toString() );
 	}
 		
 	private function grabNeighborInfluences( $oxel:Oxel, $dir:int ):void {
@@ -208,6 +205,12 @@ public class FlowScaling
 				PxPz = Math.max( PxPz, fromOxelScale.PxNz );
 				if ( fromOxelScale.PxNz < PxPz )
 					fromRecalc = true;
+			}
+			else if ( Globals.POSY == $dir )
+			{
+				reset()
+				fromOxel.quadsDeleteAll()
+				fromRecalc = true;
 			}
 			//if ( fromRecalc )
 			//	fromOxel.flowInfo.flowScaling.recalculate( fromOxel );

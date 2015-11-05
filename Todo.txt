@@ -23,14 +23,10 @@ Where do I start?
 Known Issues
 Model placement
 	The default screen shot of new models is has to be hand made.
-		Screen shot does not over write predicably
-	Nice to have an indication of which model is selected.
-	Intertra translucent membranes showing on wings
-	When I change a model, do all the models change, or is a new instance created? not clearly in one of the other situations right now.
-	Toolbar loses pictures of model when loading.
 	When you place a model, you can not stack another on top of it. It needs to have a placeholder inserted into the oxel. --/partial fix
 	Dynamic lighting on placed child models is not correct.
 	Object editing inside holes of other objects not correct
+	when a flow oxel is flowing and the oxel height is less then 100%, if you select a smaller cursor size, then seemly empty oxels are highlighted
 GUI
 	The close icon sometimes acts as acancel, other times as a save.
 	App does not get focus when starting, so I have to click it to use enter key to log in.
@@ -170,6 +166,10 @@ FIX: Dispose on torch attachment is cause exception
 FIX: Mouse lock in full screen doesnt allow you to use GUI at all.
 IMPROVE: She wants fullbright, any color
 FIX - MINOR: Oxels appear to not already being removed. I just saw a oxel with no quads in addComponentData
+FIX: Nice to have an indication of which model is selected.
+FIX: Intertra translucent membranes showing on wings
+FIX: When I change a model, do all the models change, or is a new instance created? not clearly in one of the other situations right now.
+FIX: Toolbar loses pictures of model when loading.
 
 PlayerIO
 SFTP password = redparrotSFTP

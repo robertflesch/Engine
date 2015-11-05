@@ -160,15 +160,20 @@ public class FlowInfo
 		//direction = $rhs.direction
 	}
 	
+	//FLOW_TYPE_UNDEFINED:int				= 0;
+	//FLOW_TYPE_MELT:int					= 1;
+	//FLOW_TYPE_CONTINUOUS:int			= 2;
+	//FLOW_TYPE_SPRING:int				= 3;
+
 	public function fromJson( $flowJson:Object ):void
 	{
-		if ( 3 == $flowJson.length )
+		if ( 3 <= $flowJson.length )
 		{
 			type = $flowJson[0];
 			var outVal:int = $flowJson[1];
 			if ( 15 < outVal ) // out is never more then 15
 			{
-				Log.out( "FlowInfo.fromJson - Out value is greater then 15, clipping it to 15: " + outVal );
+				Log.out( "FlowInfo.fromJson - Out value is greater then 15, clipping it to 15: " + outVal, Log.WARN );
 				outVal = 15;
 			}
 			out =  outVal;
@@ -177,7 +182,7 @@ public class FlowInfo
 			direction = Globals.ALL_DIRS;
 		}
 		else
-			Log.out( "FlowInfo.fromJson - INCORRECT NUMBER OF PARAMETERS, EXPECTED 3, GOT: " + $flowJson.length );
+			Log.out( "FlowInfo.fromJson - INCORRECT NUMBER OF PARAMETERS, EXPECTED 3, GOT: " + $flowJson.length, Log.WARN );
 	}
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray {

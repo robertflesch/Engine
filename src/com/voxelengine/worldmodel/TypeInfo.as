@@ -60,6 +60,7 @@ package com.voxelengine.worldmodel
 		public static const BRONZE:uint							= enum_val++;	// 122
 		public static const STEEL:uint							= enum_val++;	// 123
 		public static const GLASS:uint							= enum_val++;	// 124
+		public static const FIRE:uint							= 145;	
 		// NO MORE!!
 		
 		// WARNING use sparingly
@@ -131,7 +132,11 @@ package com.voxelengine.worldmodel
 		private var _flowable:Boolean 			= false;
 		private var _animated:Boolean 			= false;
 		private var _placeable:Boolean  		= true;
+		private var _flammable:Boolean 			= false;
 		private var _flame:Boolean  			= false;
+		private var _spreadInterval:int			= 1000 // ms
+		private var _spreadChance:int			= 100
+		private var _burnTime:int				= 10
 		private var _interactions:Interactions 	= null;
 		private var _flowInfo:FlowInfo 			= null;
 		private var _lightInfo:Light  			= new Light();
@@ -160,6 +165,8 @@ package com.voxelengine.worldmodel
 		public function get lightInfo():Light 		{ return _lightInfo; }
 		
 		public function get flame():Boolean 		{ return _flame; }
+		public function get spreadInterval():int	{ return _spreadInterval }
+
 		public function get solid():Boolean 		{ return _solid; }
 		public function get flowable():Boolean 		{ return _flowable; }
 		public function get animated():Boolean 		{ return _animated; }
@@ -368,6 +375,9 @@ package com.voxelengine.worldmodel
 				_flowable = true;
 				_flowInfo = FlowInfoPool.poolGet();
 				_flowInfo.fromJson( $json.flowable );
+				if ( $json.flowable[3] )
+					_spreadInterval = $json.flowable[3]
+
 			}
 			else
 			{
@@ -375,6 +385,17 @@ package com.voxelengine.worldmodel
 				_flowInfo = FlowInfoPool.poolGet()
 			}
 
+			if ( $json.flammable )
+			{
+				_spreadChance = $json.flammable[0]
+				_burnTime = $json.flammable[1]
+				_flammable = true;
+			}
+			else
+			{
+				_flammable = false;
+			}
+			
 			if ( $json.animated )
 			{
 				if ( "true" ==  $json.animated.toLowerCase() )

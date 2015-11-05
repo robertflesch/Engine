@@ -54,7 +54,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			_flowInfoRaw = $flowInfoRaw;
 			super( $instanceGuid, $gc, $type, $taskType, $taskPriority );
 			
-			var pt:Timer = new Timer( 1000, 1 );
+			var spreadInterval:int = TypeInfo.typeInfo[$type].spreadInterval
+			var pt:Timer = new Timer( spreadInterval, 1 );
 			pt.addEventListener(TimerEvent.TIMER, timeout );
 			pt.start();
 		}
@@ -96,8 +97,6 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					$flowFromOxel.flowInfo.type = FlowInfo.FLOW_TYPE_CONTINUOUS
 					flowStartContinous($flowFromOxel)
 				}
-					
-				//scale( $flowFromOxel );
 			}
 			else
 				Log.out( "Flow.start - VoxelModel not found: " + _guid, Log.ERROR );
@@ -110,6 +109,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		{
 			// I can only flow into AIR, everything else I interact with
 			$flowIntoOxel.changeOxel( _guid, $flowIntoOxel.gc, type )
+			if ( TypeInfo.FIRE ==  type )
+				return
 			$flowIntoOxel.flowInfo.flowScaling.calculate( $flowIntoOxel );
 		
 			var flowUnder:Oxel = $flowIntoOxel.neighbor( Globals.POSY );
@@ -117,7 +118,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			// if I flow under another of the same type
 			if ( Globals.BAD_OXEL != flowUnder ) {
 				if ( flowUnder.type == $flowIntoOxel.type ) {
-					flowUnder.flowInfo.flowScaling.reset( flowUnder, true )
+					//flowUnder.flowInfo.flowScaling.reset( flowUnder, true )
 					flowUnder.flowInfo.inheritFlowMax( $flowIntoOxel.flowInfo )
 					flowUnder.flowInfo.flowScaling.neighborsRecalc( flowUnder, true );
 				} else {
