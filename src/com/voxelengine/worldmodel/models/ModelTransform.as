@@ -96,7 +96,7 @@ public class ModelTransform
 	}
 	
 	public function ModelTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" ) {
-		Log.out( "ModelTransform - "  + " type: " + $type + " x: " + $x + " y: " + $y + " z: " + $z + " time: " + $time + " name: " + $name, Log.WARN );
+		//Log.out( "ModelTransform - "  + " type: " + $type + " x: " + $x + " y: " + $y + " z: " + $z + " time: " + $time + " name: " + $name, Log.WARN );
 		
 		_originalDelta.setTo( $x, $y, $z );
 		_originalTime = $time;

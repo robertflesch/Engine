@@ -134,10 +134,14 @@ public class Chunk {
 	}
 	
 	public function oxelRemove( $oxel:Oxel ):void {
-		_vertMan.oxelRemove( $oxel );
+		if ( _vertMan )
+			_vertMan.oxelRemove( $oxel );
 	}
 
 	public function oxelAdd( $oxel:Oxel ):void {
+		if ( !_vertMan )
+			_vertMan = new VertexManager( $oxel.gc, null );
+		
 		_vertMan.oxelAdd( $oxel );
 	}
 	

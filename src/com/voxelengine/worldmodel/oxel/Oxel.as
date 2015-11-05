@@ -1317,6 +1317,8 @@ public class Oxel extends OxelBitfields
 	private function scaleTopFlowFace():void {
 		if ( !flowInfo.flowScaling.has() ) {
 			var flowScale:int = 16
+			if ( 6 == gc.grain )
+				flowScale = 15
 			if ( 5 == gc.grain )
 				flowScale = 15
 			else if ( 4 == gc.grain )

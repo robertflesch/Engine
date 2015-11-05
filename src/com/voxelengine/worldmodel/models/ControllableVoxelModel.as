@@ -334,7 +334,7 @@ public class ControllableVoxelModel extends VoxelModel
 	public function jump( mutliplier:Number = 1 ):void
 	{
 		//Log.out( "Jump PRE: " + instanceInfo.velocityGet.y );
-		instanceInfo.addTransform( 0, -8 * mutliplier, 0, 0.1, ModelTransform.VELOCITY );
+		instanceInfo.addTransform( 0, -8 * mutliplier, 0, 100, ModelTransform.VELOCITY );
 		//Log.out( "Jump PST: " + instanceInfo.velocityGet.y );
 	}
 
