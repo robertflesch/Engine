@@ -86,6 +86,11 @@ public class WindowOxelUtils extends VVPopup
 		resetFlowInfo.width = 150;
 		addElement( resetFlowInfo );
 		
+		var rebuildWaterInfo:Button = new Button( "Rebuild Water" );
+		rebuildWaterInfo.addEventListener(UIMouseEvent.CLICK, rebuildWaterHandler );
+		rebuildWaterInfo.width = 150;
+		addElement( rebuildWaterInfo );
+		
 		//var fullBrightB:Button = new Button( "Full Bright" );
 		//fullBrightB.addEventListener(UIMouseEvent.CLICK, fullBrightHandler );
 		//fullBrightB.width = 150;
@@ -118,6 +123,10 @@ public class WindowOxelUtils extends VVPopup
 		//_vm.statisics.statsPrint();
 	}
 	
+	
+	private function rebuildWaterHandler(event:UIMouseEvent):void {
+		_vm.modelInfo.data.oxel.rebuildWater();
+	}
 	
 	private function resetFlowInfoHandler(event:UIMouseEvent):void {
 		_vm.modelInfo.data.oxel.resetFlowInfo();

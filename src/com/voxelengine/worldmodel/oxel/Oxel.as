@@ -2354,17 +2354,23 @@ public class Oxel extends OxelBitfields
 	}
 
 	public function resetFlowInfo():void {
-		if ( childrenHas() )
-		{
+		if ( childrenHas() ) {
 			for each ( var child:Oxel in _children )
-			{
-				child.resetFlowInfo();
-			}
-		}
-		else
-		{
+				child.resetFlowInfo(); }
+		else {
 			if ( null != _flowInfo )
-				_flowInfo.reset( this )
+				_flowInfo.reset( this ) }
+	}
+	
+	
+	public function rebuildWater():void {
+		if ( childrenHas() ) {
+			for each ( var child:Oxel in _children )
+				child.rebuildWater(); }
+		else {
+			if ( TypeInfo.WATER == type ) {
+				facesMarkAllDirty();
+				quadsDeleteAll(); }
 		}
 	}
 	
