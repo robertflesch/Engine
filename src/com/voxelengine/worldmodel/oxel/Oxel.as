@@ -1198,8 +1198,6 @@ public class Oxel extends OxelBitfields
 					oppositeOxel = neighbor( face );
 					if ( Globals.BAD_OXEL == oppositeOxel ) {
 						// this is an external face. that is on the edge of the grain space
-						if ( face == Globals.POSY && flowInfo && flowInfo.flowScaling && TypeInfo.typeInfo[type].flowable )
-							scaleTopFlowFace()
 						faceSet( face );
 					}
 					else if ( oppositeOxel.type == type ) {
@@ -1242,8 +1240,6 @@ public class Oxel extends OxelBitfields
 						else {
 							faceClear( face );
 							if ( faceAlphaNeedsFace( face, type, oppositeOxel ) )
-								if ( face == Globals.POSY && flowInfo && flowInfo.flowScaling )
-									scaleTopFlowFace()
 								faceSet( face )
 						}
 						
@@ -1256,17 +1252,6 @@ public class Oxel extends OxelBitfields
 					{
 						// If the oxel opposite this face has alpha, I need to set the face
 						if ( TypeInfo.hasAlpha( oppositeOxel.type ) || (oppositeOxel.flowInfo && oppositeOxel.flowInfo.flowScaling.has) ) {
-							// if the oxel next to me is air and its a top face, then scale the oxel
-							if ( TypeInfo.AIR == oppositeOxel.type && face == Globals.POSY && TypeInfo.typeInfo[type].flowable && !flowInfo.flowScaling.has() ) {
-								scaleTopFlowFace()
-								quadsDeleteAll()
-							}
-							//else {	1
-								//// if above has alpha, but its not air, reset scaling
-								//if ( flowInfo && flowInfo.flowScaling && flowInfo.flowScaling.scalingHas() ) {
-									//flowInfo.flowScaling.scalingReset()
-									//quadsDeleteAll()
-								//}
 							faceSet( face );
 						}
 						// oxel opposite (oppositeOxel) does not have alpha.
@@ -1277,24 +1262,10 @@ public class Oxel extends OxelBitfields
 								faceSet( face );
 							}
 							else {
-								if ( TypeInfo.AIR == oppositeOxel.type && face == Globals.POSY ) {
-									scaleTopFlowFace()
-								}
-								else if ( face == Globals.POSY ) {
+								if ( face == Globals.POSY )
 									faceSet( face )
-								}
 								else
 									faceClear( face );
-								/*
-								if ( TypeInfo.WATER == type ) {
-									//face_set( face ) This adds an interior face, but z buffer conflicts makes it not work well.
-									if ( oppositeOxel.lighting ) {
-										var li:LightInfo = oppositeOxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-										li.color = 0x0000ff;
-										oppositeOxel.dirty = true;
-									}
-								}
-								*/
 							}
 						}
 						else if ( oppositeOxel.flowInfo )	// for scaled lava or other non alpha flowing types
@@ -1305,7 +1276,7 @@ public class Oxel extends OxelBitfields
 								faceClear( face );
 						}
 						else {
-							faceClear( face );;
+							faceClear( face )
 						}
 					}
 				}
@@ -2393,7 +2364,7 @@ public class Oxel extends OxelBitfields
 		else
 		{
 			if ( null != _flowInfo )
-				_flowInfo.reset( this );
+				_flowInfo.reset( this )
 		}
 	}
 	
@@ -3086,7 +3057,11 @@ public class Oxel extends OxelBitfields
 
 				if ( FlowInfo.FLOW_TYPE_UNDEFINED == changeCandidate.flowInfo.type	)
 					changeCandidate.flowInfo.type = typeInfo.flowInfo.type
-					
+				
+				var neighborAbove:Oxel = neighbor( Globals.POSY );
+				if ( Globals.BAD_OXEL == neighborAbove || TypeInfo.AIR == neighborAbove.type )
+					changeCandidate.scaleTopFlowFace()
+				
 				if ( Globals.autoFlow  )
 					Flow.addTask( $modelGuid, changeCandidate.gc, $type, changeCandidate.flowInfo.flowInfoRaw, 1 );
 			}

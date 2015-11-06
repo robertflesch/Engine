@@ -129,22 +129,29 @@ package com.voxelengine.worldmodel
 		private var _ub:Number					= 0;
 		private var _vb:Number					= 0;
 		private var _solid:Boolean 				= true;
-		private var _flowable:Boolean 			= false;
 		private var _animated:Boolean 			= false;
 		private var _placeable:Boolean  		= true;
+		
 		private var _flammable:Boolean 			= false;
 		private var _flame:Boolean  			= false;
 		private var _spreadInterval:int			= 1000 // ms
 		private var _spreadChance:int			= 100
 		private var _burnTime:int				= 10
+		
 		private var _interactions:Interactions 	= null;
+		
+		private var _flowable:Boolean 			= false;
 		private var _flowInfo:FlowInfo 			= null;
+		private var _flowScalable:Boolean		= true;
+		
 		private var _lightInfo:Light  			= new Light();
 		private var _color:uint					= 0xffffffff;
 		private var _damage:Number				= 1;
+		
 		private var _speed:Number				= 1;
 		private var _durability:Number			= 1;
 		private var _luck:Number				= 1;
+		
 		private var _countColor:uint			= 0x00ffffff; // the color to be used to show how many of this object exist
 		private var _name:String				= "";
 		private var _image:String				= "Invalid.png";
@@ -380,7 +387,8 @@ package com.voxelengine.worldmodel
 				_flowInfo.fromJson( $json.flowable );
 				if ( $json.flowable[3] )
 					_spreadInterval = $json.flowable[3]
-
+				if ( $json.flowable[4] )
+					_flowScalable = $json.flowable[4]
 			}
 			else
 			{
