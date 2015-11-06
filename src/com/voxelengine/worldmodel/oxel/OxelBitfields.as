@@ -62,6 +62,8 @@ package com.voxelengine.worldmodel.oxel
 		private static const OXEL_DATA_PARENT_MASK:uint 			= 0xfffffbff;
 		private static const OXEL_DATA_PARENT:uint					= 0x00000400;
 		
+		private static const OXEL_DATA_FIRE_CLEAR:uint 				= 0xfffffdff;
+		private static const OXEL_DATA_FIRE:uint					= 0x00000200;
 		// bottom 10 bits not used. Used to be type data, now stored in its own full int
 
 		private static const OXEL_DATA_TYPE_MASK_TEMP:uint			= 0xfe7fffff;
@@ -80,6 +82,13 @@ package com.voxelengine.worldmodel.oxel
 				_data |= OXEL_DATA_DIRTY; 
 		}
 
+		protected  function get onFire():Boolean 		{ return 0 < (_data & OXEL_DATA_FIRE); }
+		protected  function set onFire( $val:Boolean ):void { 
+			_data &= OXEL_DATA_FIRE_CLEAR;
+			if ( $val )
+				_data |= OXEL_DATA_FIRE; 
+		}
+		
 		protected  function get addedToVertex():Boolean 		{ return 0 < (_data & OXEL_DATA_ADD_VERTEX); }
 		protected  function set addedToVertex( $val:Boolean ):void { 
 			_data &= OXEL_DATA_ADD_VERTEX_CLEAR;

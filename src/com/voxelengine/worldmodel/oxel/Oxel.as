@@ -1314,6 +1314,28 @@ public class Oxel extends OxelBitfields
 		facesMarkAllClean();
 	}
 	
+	import flash.utils.Timer;
+	import flash.events.TimerEvent;
+	
+	public function setOnFire( $modelGuid:String ):void {
+		var ti:TypeInfo = TypeInfo.typeInfo[type]
+		if ( ti.flammable ) {
+			if ( Math.random() * 100 < ti.spreadChance ) {
+				var pt:Timer = new Timer( ti.burnTime, 1 );
+				pt.addEventListener(TimerEvent.TIMER, burnUp );
+				pt.start();
+				// need to add a flag in the bit to show it is on fire
+				onFire = true
+			}
+		}
+		
+		function burnUp(e:TimerEvent):void {
+			if ( onFire )
+				changeOxel( $modelGuid, gc, TypeInfo.AIR )
+			onFire = false
+		}
+	}
+	
 	private function scaleTopFlowFace():void {
 		if ( !flowInfo.flowScaling.has() ) {
 			var flowScale:int = 16
@@ -3065,7 +3087,6 @@ public class Oxel extends OxelBitfields
 				if ( FlowInfo.FLOW_TYPE_UNDEFINED == changeCandidate.flowInfo.type	)
 					changeCandidate.flowInfo.type = typeInfo.flowInfo.type
 					
-				//if ( Globals.autoFlow && EditCursor.EDIT_CURSOR != $modelGuid )
 				if ( Globals.autoFlow  )
 					Flow.addTask( $modelGuid, changeCandidate.gc, $type, changeCandidate.flowInfo.flowInfoRaw, 1 );
 			}

@@ -35,8 +35,11 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	 */
 	public class Flow extends FlowTask 
 	{		
-		static public function addTask( $instanceGuid:String, $gc:GrainCursor, $type:int, $flowInfoRaw:uint, $taskPriority:int ):void 
-		{
+		static public function addTask( $modelGuid:String, $gc:GrainCursor, $type:int, $flowInfoRaw:uint, $taskPriority:int ):void {
+			if ( null == $modelGuid || "" == $modelGuid ) {
+				Log.out( "Flow.addTask - cant add task for null or empty model guid", Log.WARN );
+				return
+			}
 			if ( !TypeInfo.typeInfo[$type].flowable ) {
 				Log.out( "Flow.addTask - adding task for non flowable type: " + $type, Log.WARN );
 				return
@@ -44,15 +47,15 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			if ( 0 == ( ($flowInfoRaw & 0x000f0000) >> 16  ) ) {
 				Log.out( "Flow.addTask - NO FLOW TYPE FOUND", Log.WARN );
 			}
-			var f:Flow = new Flow( $instanceGuid, $gc, $type, $flowInfoRaw, $gc.toID(), $taskPriority );
+			var f:Flow = new Flow( $modelGuid, $gc, $type, $flowInfoRaw, $gc.toID(), $taskPriority );
 			f.selfOverride = true;
 			Globals.g_flowTaskController.addTask( f );
 		}
 		
-		public function Flow( $instanceGuid:String, $gc:GrainCursor, $type:int, $flowInfoRaw:int, $taskType:String, $taskPriority:int ):void {
+		public function Flow( $modelGuid:String, $gc:GrainCursor, $type:int, $flowInfoRaw:int, $taskType:String, $taskPriority:int ):void {
 			Log.out( "Flow.create flowInfo: " + $flowInfoRaw );
 			_flowInfoRaw = $flowInfoRaw;
-			super( $instanceGuid, $gc, $type, $taskType, $taskPriority );
+			super( $modelGuid, $gc, $type, $taskType, $taskPriority );
 			
 			var spreadInterval:int = TypeInfo.typeInfo[$type].spreadInterval
 			var pt:Timer = new Timer( spreadInterval, 1 );
@@ -109,12 +112,15 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		{
 			// I can only flow into AIR, everything else I interact with
 			$flowIntoOxel.changeOxel( _guid, $flowIntoOxel.gc, type )
-			if ( TypeInfo.FIRE ==  type )
+			var flowOver:Oxel = $flowIntoOxel.neighbor( Globals.NEGY );
+			var flowUnder:Oxel = $flowIntoOxel.neighbor( Globals.POSY );
+			if ( TypeInfo.FIRE ==  type ) {
+				flowOver.setOnFire( _guid )
+				flowUnder.setOnFire( _guid )
 				return
+			}
 			$flowIntoOxel.flowInfo.flowScaling.calculate( $flowIntoOxel );
 		
-			var flowUnder:Oxel = $flowIntoOxel.neighbor( Globals.POSY );
-			var flowOver:Oxel = $flowIntoOxel.neighbor( Globals.NEGY );
 			// if I flow under another of the same type
 			if ( Globals.BAD_OXEL != flowUnder ) {
 				if ( flowUnder.type == $flowIntoOxel.type ) {

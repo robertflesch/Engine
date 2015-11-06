@@ -42,7 +42,7 @@ package com.voxelengine
 				Globals.g_app.addChild(DConsole.view)
 				DConsole.createCommand( "hide", hide )
 				ConsoleCommands.addCommands()
-				out( "Type 'hide' to hide the console", Log.ERROR )
+				out( "Type 'hide' to hide the console", Log.WARN )
 			}
 			DConsole.show()
 			_showing = true

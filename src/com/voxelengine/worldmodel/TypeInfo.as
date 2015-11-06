@@ -165,7 +165,10 @@ package com.voxelengine.worldmodel
 		public function get lightInfo():Light 		{ return _lightInfo; }
 		
 		public function get flame():Boolean 		{ return _flame; }
+		public function get flammable():Boolean 	{ return _flammable }
 		public function get spreadInterval():int	{ return _spreadInterval }
+		public function get burnTime():int			{ return _burnTime }
+		public function get spreadChance():int		{ return _spreadChance }
 
 		public function get solid():Boolean 		{ return _solid; }
 		public function get flowable():Boolean 		{ return _flowable; }

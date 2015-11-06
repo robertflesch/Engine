@@ -248,7 +248,11 @@ package com.voxelengine.renderer
 						else
 							WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.ANNIHILATE ) )
 					}
+					else
+						WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.ANNIHILATE ) )
 				}
+				else
+					WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.ANNIHILATE ) )
 			}
 			
 //			trace( "Renderer.render - wsPositionCamera: " + wsPositionCamera );
