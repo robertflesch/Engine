@@ -1330,8 +1330,6 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 	private function scaleTopFlowFace():void {
 		if ( !flowInfo.flowScaling.has() ) {
 			var flowScale:int = 16
-			if ( 6 == gc.grain )
-				flowScale = 15
 			if ( 5 == gc.grain )
 				flowScale = 15
 			else if ( 4 == gc.grain )
@@ -2379,8 +2377,11 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 				child.rebuildWater(); }
 		else {
 			if ( TypeInfo.WATER == type ) {
+				if ( 5 < gc.grain )
+					childrenCreate( true )
 				facesMarkAllDirty();
-				quadsDeleteAll(); }
+				quadsDeleteAll();
+			}
 		}
 	}
 	

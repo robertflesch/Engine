@@ -939,7 +939,7 @@ public class VoxelModel
 	
 	
 	public function stateLock( $val:Boolean, $lockTime:int = 0 ):void {
-		Log.out("VoxelModel.stateLock - stateLock: " + $val );
+		//Log.out("VoxelModel.stateLock - stateLock: " + $val );
 		_stateLock = $val;
 		// if $lockTime then unlock after that amount of time.
 		if ( $val && $lockTime )

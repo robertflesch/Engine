@@ -95,14 +95,14 @@ package com.voxelengine.worldmodel
 			// but those are the only region messages they listen to.
 			// unless they are loaded
 			RegionEvent.addListener( RegionEvent.LOAD, 		load );
-			RegionEvent.addListener( ModelBaseEvent.SAVE, 	save );	
+			RegionEvent.addListener( ModelBaseEvent.SAVE, 	saveEvent );	
 		}
 		
 		// allows me to release the listeners for temporary regions
 		override public function release():void {
 			super.release();
 			RegionEvent.removeListener( RegionEvent.LOAD, 		load );
-			RegionEvent.removeListener( ModelBaseEvent.SAVE, 	save );	
+			RegionEvent.removeListener( ModelBaseEvent.SAVE, 	saveEvent );	
 		}
 		
 		private function onCriticalModelDetected( me:ModelEvent ):void {
@@ -267,7 +267,7 @@ package com.voxelengine.worldmodel
 		// toPersistance
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		private function save( $re:RegionEvent ):void {
+		private function saveEvent( $re:RegionEvent ):void {
 			
 			if ( guid != $re.guid ) {
 				//Log.out( "Region.save - Ignoring save meant for other region my guid: " + guid + " target guid: " + $re.guid, Log.WARN );
@@ -275,18 +275,8 @@ package com.voxelengine.worldmodel
 			}
 			
 			// The null owner check makes it to we dont save local loaded regions to persistance
-			if ( Globals.online && changed && null != owner && Globals.isGuid( guid ) ) {
-				//Log.out( "Region.save - SAVING region id: " + guid + "  name: " + name + "  and locking", Log.INFO );
-				addSaveEvents();
-				toObject();
-				
-				//Log.out( "Region.save - PersistanceEvent.dispatch region id: " + guid + "  name: " + name, Log.WARN );
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, Globals.BIGDB_TABLE_REGIONS, guid, dbo, null ) );
-				// or could do this in the suceed, but if it fails do I want to keep retrying?
-				changed = false;
-			}
-//			else
-//				Log.out( "Region.save FAILED CONDITION - online:" + Globals.online + "  changed:" + changed + "  owner:" + owner + "  locked:" + _lockDB + "  name: " + name + "  - guid: " + guid, Log.DEBUG );
+			if ( Globals.online && changed && null != owner && Globals.isGuid( guid ) )
+				super.save()
 		}
 		
 		override protected function toObject():void {

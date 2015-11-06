@@ -21,6 +21,10 @@ http://techcrunch.com/2015/06/08/lessons-from-a-study-of-perfect-pitch-decks-vcs
 Where do I start?
 
 Known Issues
+Movement
+	When jump and getting bounce from auto jump, you can just too high
+	Camera needs to collide and adjust view distance if in third person view
+	Edit cursor is not always in correct spot when in first person view
 Model placement
 	The default screen shot of new models is has to be hand made.
 	When you place a model, you can not stack another on top of it. It needs to have a placeholder inserted into the oxel. --/partial fix
