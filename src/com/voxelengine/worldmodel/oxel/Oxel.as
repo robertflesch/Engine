@@ -945,22 +945,16 @@ public class Oxel extends OxelBitfields
 		return "oxel of type: " + TypeInfo.typeInfo[type].name + "\t location: " + gc.toString();
 	}
 	
-	public function rebuildAll():void
-	{
-		if ( childrenHas() )
-		{
-			if ( TypeInfo.AIR != type )
-			{
+	public function rebuildAll():void {
+		if ( childrenHas() ) {
+			if ( TypeInfo.AIR != type ) {
 				Log.out( "Oxel.rebuildAll - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
 				type = TypeInfo.AIR; 
 			}
 			for each ( var child:Oxel in _children )
-			{
 				child.rebuildAll();
-			}
 		}
-		else
-		{
+		else {
 			facesMarkAllDirty();
 			quadsDeleteAll();
 		}
@@ -1180,16 +1174,14 @@ public class Oxel extends OxelBitfields
 	}
 	
 	private function facesBuildTerminal():void {
-		//trace( "Oxel.facesBuildTerminal - type: " + type );
-		//if ( gc.eval( 4, 53, 98, 92 ) )
-			//trace( "Oxel.facesBuildTerminal - found it" );
-
 		if ( TypeInfo.AIR == type )
 			facesMarkAllClean();
 		else  if ( TypeInfo.LEAF == type )
 			facesSetAll();
 		else if ( faceHasDirtyBits() ) {
 			var oppositeOxel:Oxel = null ;
+if ( gc.eval( 5, 10, 44, 46 ) )
+	trace( "Oxel.facesBuildTerminal - found it" );
 			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 			{
 				//if ( face == Globals.POSY && type == TypeInfo.WATER )
@@ -1204,17 +1196,21 @@ public class Oxel extends OxelBitfields
 						faceSet( face );
 					}
 					else if ( oppositeOxel.type == type ) {
-						// nieghbor oxel is the same, we are done? nope, the neighbor might have different scaling.. for flowable type.
+						// neighbor oxel is the same, we are done? nope, the neighbor might have different scaling.. for flowable type.
 						// if its up or down, there is no scaling, so clear face
-						// do we both have flow info?
-						if ( ( face == Globals.POSX || face == Globals.NEGX || face == Globals.POSZ || face == Globals.NEGZ ) && oppositeOxel.flowInfo && flowInfo ) {
-							// verify both have scaling
-							if ( oppositeOxel.flowInfo.flowScaling && flowInfo.flowScaling ) {
-								// if opposite is larger and this is on the bottom layer
-								// then no face is needed
-								if ( gc.grain < oppositeOxel.gc.grain && ( 0 == gc.grainY % 2 ) )
-								 faceClear( face )
-								else { 
+						if ( ( face == Globals.POSX || face == Globals.NEGX || face == Globals.POSZ || face == Globals.NEGZ ) ) {
+							// if opposite is larger and this is on the bottom layer
+							// then no face is needed
+							if ( gc.grain < oppositeOxel.gc.grain && ( 0 == gc.grainY % 2 ) )
+								faceClear( face )
+							else { // opposite can not be smaller and be the same type
+								if ( null == oppositeOxel.flowInfo && null == flowInfo )
+									faceClear( face )
+								else if ( oppositeOxel.flowInfo && oppositeOxel.flowInfo.flowScaling.has() && null == flowInfo )
+									faceSet( face )
+								else if ( null == oppositeOxel.flowInfo )
+									faceClear( face )
+								else if ( oppositeOxel.flowInfo.flowScaling.has() && flowInfo.flowScaling.has() ) {
 									// so now I need the equivelent spots on each face to compare.
 									var p1:Point = flowInfo.flowScaling.faceGet( face );
 									var p2:Point = oppositeOxel.flowInfo.flowScaling.faceGet( face_get_opposite( face ) );
@@ -1232,9 +1228,12 @@ public class Oxel extends OxelBitfields
 										faceSet( face );
 									}
 								}
+								else {
+									// The both have flowInfo (all external faces do), but neither has scaling
+									faceClear( face ) // what case is this?
+								}
+								
 							}
-							else
-								faceSet( face );
 						}
 						else
 							faceClear( face );
@@ -1272,18 +1271,18 @@ public class Oxel extends OxelBitfields
 					else
 					{
 						// If the oxel opposite this face has alpha, I need to set the face
-						if ( TypeInfo.hasAlpha( oppositeOxel.type ) || (oppositeOxel.flowInfo && oppositeOxel.flowInfo.flowScaling.has) ) {
+						if ( TypeInfo.hasAlpha( oppositeOxel.type ) || (oppositeOxel.flowInfo && oppositeOxel.flowInfo.flowScaling.has() ) ) {
 							faceSet( face );
 						}
 						// oxel opposite (oppositeOxel) does not have alpha.
 						// does this 
-						else if ( flowInfo && flowInfo.flowScaling ) // All water and lava have flow info.
+						else if ( flowInfo && flowInfo.flowScaling.has() ) // All water and lava have flow info, as do any oxel that has quads
 						{ 
 							if ( oppositeOxel.flowInfo && oppositeOxel.flowInfo.flowScaling.has() ) { 	// for scaled lava or other non alpha flowing types
 								faceSet( face );
 							}
 							else {
-								if ( face == Globals.POSY )
+								if ( face == Globals.POSY && flowInfo.flowScaling.has() )
 									faceSet( face )
 								else
 									faceClear( face );
@@ -2374,16 +2373,6 @@ public class Oxel extends OxelBitfields
 		}
 	}
 
-	public function resetFlowInfo():void {
-		if ( childrenHas() ) {
-			for each ( var child:Oxel in _children )
-				child.resetFlowInfo(); }
-		else {
-			if ( null != _flowInfo )
-				_flowInfo.reset( this ) }
-	}
-	
-	
 	public function rebuildWater():void {
 		if ( childrenHas() ) {
 			for each ( var child:Oxel in _children )

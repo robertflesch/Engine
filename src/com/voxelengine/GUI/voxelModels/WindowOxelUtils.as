@@ -81,8 +81,8 @@ public class WindowOxelUtils extends VVPopup
 		baseLightLevelB.width = 150;
 		addElement( baseLightLevelB );
 
-		var resetFlowInfo:Button = new Button( "Reset FlowInfo..." );
-		resetFlowInfo.addEventListener(UIMouseEvent.CLICK, resetFlowInfoHandler );
+		var resetFlowInfo:Button = new Button( "Rebuild Model" );
+		resetFlowInfo.addEventListener(UIMouseEvent.CLICK, rebuildFacesHandler );
 		resetFlowInfo.width = 150;
 		addElement( resetFlowInfo );
 		
@@ -128,8 +128,8 @@ public class WindowOxelUtils extends VVPopup
 		_vm.modelInfo.data.oxel.rebuildWater();
 	}
 	
-	private function resetFlowInfoHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.oxel.resetFlowInfo();
+	private function rebuildFacesHandler(event:UIMouseEvent):void {
+		_vm.modelInfo.data.oxel.rebuildAll()
 	}
 	
 	private function baseLightLevelHandler(event:UIMouseEvent):void {
