@@ -1181,6 +1181,9 @@ public class Oxel extends OxelBitfields
 	
 	private function facesBuildTerminal():void {
 		//trace( "Oxel.facesBuildTerminal - type: " + type );
+		//if ( gc.eval( 4, 53, 98, 92 ) )
+			//trace( "Oxel.facesBuildTerminal - found it" );
+
 		if ( TypeInfo.AIR == type )
 			facesMarkAllClean();
 		else  if ( TypeInfo.LEAF == type )
@@ -1202,18 +1205,36 @@ public class Oxel extends OxelBitfields
 					}
 					else if ( oppositeOxel.type == type ) {
 						// nieghbor oxel is the same, we are done? nope, the neighbor might have different scaling.. for flowable type.
+						// if its up or down, there is no scaling, so clear face
 						// do we both have flow info?
-						if ( oppositeOxel.flowInfo && flowInfo ) {
+						if ( ( face == Globals.POSX || face == Globals.NEGX || face == Globals.POSZ || face == Globals.NEGZ ) && oppositeOxel.flowInfo && flowInfo ) {
 							// verify both have scaling
 							if ( oppositeOxel.flowInfo.flowScaling && flowInfo.flowScaling ) {
-								// so now I need the equivelent spots on each face to compare.
-								var p1:Point = flowInfo.flowScaling.faceGet( face );
-								var p2:Point = oppositeOxel.flowInfo.flowScaling.faceGet( face_get_opposite( face ) );
-								if ( p1.equals( p2 ) )
-									faceClear( face );
-								else 
-									faceSet( face );
+								// if opposite is larger and this is on the bottom layer
+								// then no face is needed
+								if ( gc.grain < oppositeOxel.gc.grain && ( 0 == gc.grainY % 2 ) )
+								 faceClear( face )
+								else { 
+									// so now I need the equivelent spots on each face to compare.
+									var p1:Point = flowInfo.flowScaling.faceGet( face );
+									var p2:Point = oppositeOxel.flowInfo.flowScaling.faceGet( face_get_opposite( face ) );
+									// need to adjust the height since it relative to the oxel size
+									if ( gc.size() != oppositeOxel.gc.size() ) {
+										p1.x = gc.size() - ( p1.x/16 * gc.size() )
+										p1.y = gc.size() - ( p1.y/16 * gc.size() )
+										p2.x = oppositeOxel.gc.size() - ( p2.x/16 * oppositeOxel.gc.size() )
+										p2.y = oppositeOxel.gc.size() - ( p2.y/16 * oppositeOxel.gc.size() )
+									}
+									if ( p1.equals( p2 ) )
+										faceClear( face );
+									else {
+										Log.out( "faceBuildTerminal face: " + face + "  p1: " + p1.toString() + " size: " + gc.size() + "  p2: " + p2.toString() + " size: " + oppositeOxel.gc.size() , Log.WARN )
+										faceSet( face );
+									}
+								}
 							}
+							else
+								faceSet( face );
 						}
 						else
 							faceClear( face );
