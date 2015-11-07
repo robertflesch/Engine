@@ -10,6 +10,7 @@ package com.voxelengine.GUI
 	import com.enjoymondays.i18n.providers.DefaultProviderFactory;
 	import com.enjoymondays.i18n.providers.DefaultProviderManager;
 	import com.enjoymondays.i18n.ResourceBundle;
+	import com.voxelengine.Globals;
 	
 	import com.voxelengine.Log;
 
@@ -30,7 +31,7 @@ package com.voxelengine.GUI
 			var currentLocale:ILocale = _getCurrentLocale( );
 			var supportedCodes:Array  = _getSupportedCodes( );
 			
-			_provider = new DefaultProviderManager;
+			_provider = new DefaultProviderManager( Globals.appPath )
 			_factory  = new DefaultProviderFactory;
 			_localization = LocalizationManager.instance;
 			_localization.setProviderStrategy( _provider, _factory );
