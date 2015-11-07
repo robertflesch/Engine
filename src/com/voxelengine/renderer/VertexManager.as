@@ -13,8 +13,6 @@ import flash.display3D.Context3D;
 import flash.utils.getTimer;
 import flash.utils.Timer;
 
-import mx.utils.NameUtil;
-
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.worldmodel.TypeInfo;

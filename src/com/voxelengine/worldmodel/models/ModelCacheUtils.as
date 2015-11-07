@@ -22,8 +22,6 @@ package com.voxelengine.worldmodel.models
 	import flash.utils.ByteArray;
 	import flash.display3D.Context3D;
 	
-	import mx.utils.StringUtil;
-	
 	import com.developmentarc.core.tasks.tasks.ITask;
 	import com.developmentarc.core.tasks.groups.TaskGroup;
 	
