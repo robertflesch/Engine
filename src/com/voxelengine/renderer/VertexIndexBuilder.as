@@ -327,27 +327,6 @@ public class VertexIndexBuilder
 		throw new Error( "VertexIndexBuilder.addComponentData - No components found" );
 	}
 	
-	private function addComponentDataOld():void {
-		_vertexDataSize = 0;
-		var oxelSize:int = _oxels.length;
-		var oxel:Oxel;
-		for ( var index:int; index < oxelSize; index++ ) {
-		    oxel = _oxels[index];
-			if ( oxel.quads ) {
-				for each ( var quad:Quad in oxel.quads ) {
-					if ( quad && 0 < quad.components.length ) {
-						for ( var i:uint; i < Quad.COMPONENT_COUNT; i++ ) {
-							_vc[i] = quad.components[i].clone();
-							_vertexDataSize += quad.components[i].size();
-						}
-						return;
-					}
-				}
-			}
-		}
-		throw new Error( "VertexIndexBuilder.addComponentData - No components found" );
-	}	
-
 	public function BufferCopyToGPU( context:Context3D ) : void 
 	{
 		var vb:VertexBuffer3D;
