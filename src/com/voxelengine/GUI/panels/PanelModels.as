@@ -124,7 +124,7 @@ public class PanelModels extends PanelBase
 		_buttonContainer.height = 0;
 		addElementAt( _buttonContainer, 0 );
 
-		var addButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Add" ) + ".."  );
+		var addButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Add" )  );
 		//addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
 		addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, addModel );
 		
@@ -145,7 +145,7 @@ public class PanelModels extends PanelBase
 		_buttonContainer.addElement( _deleteButton );
 		_buttonContainer.height += _deleteButton.height + pbPadding;
 		
-		_detailButton = new Button( LanguageManager.localizedStringGet( "Model_Detail" ) + ".." );
+		_detailButton = new Button( LanguageManager.localizedStringGet( "Model_Detail" ) );
 		_detailButton.y = 55;			
 		_detailButton.x = 2;			
 		_detailButton.width = width - 10;

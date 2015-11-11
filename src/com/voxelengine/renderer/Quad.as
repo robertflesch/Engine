@@ -317,8 +317,8 @@ public class Quad {
 				//trace( "Quad.addScaledVertices - addQuad POSX" );
 				normal = -1 * $planeFacing;
 				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y         			 			    , $z			, _u[1]		, _v[3]		, normal, 0, 0, tint, $lighting.lightGetComposite( $face, Lighting.B100 ), $grain );
-				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y + (scale * fs.PxNz)/SCALE_FACTOR  , $z			, _u[2]		, _v[0]		, normal, 0, 0, tint, $lighting.lightGetComposite( $face, Lighting.B110 ), $grain );
-				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y + (scale * fs.PxPz)/SCALE_FACTOR  , $z + scale	, _u[3]		, _v[1]		, normal, 0, 0, tint, $lighting.lightGetComposite( $face, Lighting.B111 ), $grain );
+				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y + (scale * fs.QuadPxNz)/SCALE_FACTOR  , $z			, _u[2]		, _v[0]		, normal, 0, 0, tint, $lighting.lightGetComposite( $face, Lighting.B110 ), $grain );
+				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y + (scale * fs.QuadPxPz)/SCALE_FACTOR  , $z + scale	, _u[3]		, _v[1]		, normal, 0, 0, tint, $lighting.lightGetComposite( $face, Lighting.B111 ), $grain );
 				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y         			 			    , $z + scale	, _u[0]		, _v[2]		, normal, 0, 0, tint, $lighting.lightGetComposite( $face, Lighting.B101 ), $grain );
 				break;
 				
@@ -326,8 +326,8 @@ public class Quad {
 				//trace( "Quad.addScaledVertices - addQuad NEGX" );
 				normal = 1 * $planeFacing;
 				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y         			 			    , $z			, _u[3]		, _v[3]		, normal, 0, 0, tint, $lighting.lightGetComposite( $face, Lighting.B000 ), $grain );
-				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y + (scale * fs.NxNz)/SCALE_FACTOR  , $z			, _u[0]		, _v[0]		, normal, 0, 0, tint, $lighting.lightGetComposite( $face, Lighting.B010 ), $grain );
-				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y + (scale * fs.NxPz)/SCALE_FACTOR  , $z + scale	, _u[1]		, _v[1]		, normal, 0, 0, tint, $lighting.lightGetComposite( $face, Lighting.B011 ), $grain );
+				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y + (scale * fs.QuadNxNz)/SCALE_FACTOR  , $z			, _u[0]		, _v[0]		, normal, 0, 0, tint, $lighting.lightGetComposite( $face, Lighting.B010 ), $grain );
+				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y + (scale * fs.QuadNxPz)/SCALE_FACTOR  , $z + scale	, _u[1]		, _v[1]		, normal, 0, 0, tint, $lighting.lightGetComposite( $face, Lighting.B011 ), $grain );
 				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y         			 			    , $z + scale	, _u[2]		, _v[2]		, normal, 0, 0, tint, $lighting.lightGetComposite( $face, Lighting.B001 ), $grain );
 				break;
 				
@@ -343,10 +343,10 @@ public class Quad {
 		case Globals.POSY:
 				//trace( "Quad.addStraightVertices - addQuad NEGY" );
 				normal = -1 * $planeFacing;
-				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y + (scale * fs.NxNz)/SCALE_FACTOR	, $z			, _u[0]		, _v[0]		, 0, normal, 0, tint, $lighting.lightGetComposite( $face, Lighting.B010 ), $grain );
-				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y + (scale * fs.NxPz)/SCALE_FACTOR	, $z + scale	, _u[3]		, _v[3]		, 0, normal, 0, tint, $lighting.lightGetComposite( $face, Lighting.B011 ), $grain );
-				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y + (scale * fs.PxPz)/SCALE_FACTOR	, $z + scale	, _u[2]		, _v[2]		, 0, normal, 0, tint, $lighting.lightGetComposite( $face, Lighting.B111 ), $grain );
-				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y + (scale * fs.PxNz)/SCALE_FACTOR	, $z			, _u[1]		, _v[1]		, 0, normal, 0, tint, $lighting.lightGetComposite( $face, Lighting.B110 ), $grain );
+				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y + (scale * fs.QuadNxNz)/SCALE_FACTOR	, $z			, _u[0]		, _v[0]		, 0, normal, 0, tint, $lighting.lightGetComposite( $face, Lighting.B010 ), $grain );
+				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y + (scale * fs.QuadNxPz)/SCALE_FACTOR	, $z + scale	, _u[3]		, _v[3]		, 0, normal, 0, tint, $lighting.lightGetComposite( $face, Lighting.B011 ), $grain );
+				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y + (scale * fs.QuadPxPz)/SCALE_FACTOR	, $z + scale	, _u[2]		, _v[2]		, 0, normal, 0, tint, $lighting.lightGetComposite( $face, Lighting.B111 ), $grain );
+				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y + (scale * fs.QuadPxNz)/SCALE_FACTOR	, $z			, _u[1]		, _v[1]		, 0, normal, 0, tint, $lighting.lightGetComposite( $face, Lighting.B110 ), $grain );
 				break;
 
 			case Globals.POSZ:
@@ -354,8 +354,8 @@ public class Quad {
 				normal = -1 * $planeFacing;
 				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y									, $z + scale	, _u[0]		, _v[2]		, 0, 0, normal, tint, $lighting.lightGetComposite( $face, Lighting.B001 ), $grain );
 				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y									, $z + scale	, _u[1]		, _v[3]		, 0, 0, normal, tint, $lighting.lightGetComposite( $face, Lighting.B101 ), $grain );
-				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y + (scale * fs.PxPz)/SCALE_FACTOR	, $z + scale	, _u[2]		, _v[0]		, 0, 0, normal, tint, $lighting.lightGetComposite( $face, Lighting.B111 ), $grain );
-				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y + (scale * fs.NxPz)/SCALE_FACTOR	, $z + scale	, _u[3]		, _v[1]		, 0, 0, normal, tint, $lighting.lightGetComposite( $face, Lighting.B011 ), $grain );
+				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y + (scale * fs.QuadPxPz)/SCALE_FACTOR	, $z + scale	, _u[2]		, _v[0]		, 0, 0, normal, tint, $lighting.lightGetComposite( $face, Lighting.B111 ), $grain );
+				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y + (scale * fs.QuadNxPz)/SCALE_FACTOR	, $z + scale	, _u[3]		, _v[1]		, 0, 0, normal, tint, $lighting.lightGetComposite( $face, Lighting.B011 ), $grain );
 				break;
 				
 			case Globals.NEGZ:
@@ -363,8 +363,8 @@ public class Quad {
 				normal = 1 * $planeFacing;
 				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y								    , $z			, _u[2]		, _v[2]		, 0, 0, normal, tint, $lighting.lightGetComposite( $face, Lighting.B000 ), $grain );
 				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y								    , $z			, _u[3]		, _v[3]		, 0, 0, normal, tint, $lighting.lightGetComposite( $face, Lighting.B100 ), $grain );
-				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y + (scale * fs.PxNz)/SCALE_FACTOR  , $z			, _u[0]		, _v[0]		, 0, 0, normal, tint, $lighting.lightGetComposite( $face, Lighting.B110 ), $grain );
-				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y + (scale * fs.NxNz)/SCALE_FACTOR  , $z			, _u[1]		, _v[1]		, 0, 0, normal, tint, $lighting.lightGetComposite( $face, Lighting.B010 ), $grain );
+				vertexIndex = buildVerticeComponents( vertexIndex, $x + scale	, $y + (scale * fs.QuadPxNz)/SCALE_FACTOR  , $z			, _u[0]		, _v[0]		, 0, 0, normal, tint, $lighting.lightGetComposite( $face, Lighting.B110 ), $grain );
+				vertexIndex = buildVerticeComponents( vertexIndex, $x			, $y + (scale * fs.QuadNxNz)/SCALE_FACTOR  , $z			, _u[1]		, _v[1]		, 0, 0, normal, tint, $lighting.lightGetComposite( $face, Lighting.B010 ), $grain );
 				break;
 				
 			default:

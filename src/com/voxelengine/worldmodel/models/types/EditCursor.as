@@ -514,6 +514,7 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function insertOxel(recurse:Boolean = false):void {
+		//Log.out( "EditCursor.insertOxel", Log.WARN );
 		var foundModel:VoxelModel = VoxelModel.selectedModel;
 		if ( foundModel )
 		{
@@ -826,18 +827,18 @@ public class EditCursor extends VoxelModel
 	}
 	
 	protected function onRepeat(event:TimerEvent):void {
-		if ( Globals.openWindowCount || !Globals.clicked || !Globals.active || !editing ) {
-			repeatTimerStop()		
-			return; }
-			
-		if ( 1 < _count )
-		{
-			if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
-				deleteOxel();
-			else if ( CursorOperationEvent.INSERT_OXEL == cursorOperation )
-				insertOxel();
-		}
-		_count++;
+		//if ( Globals.openWindowCount || !Globals.clicked || !Globals.active || !editing ) {
+			//repeatTimerStop()		
+			//return; }
+			//
+		//if ( 1 < _count )
+		//{
+			//if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
+				//deleteOxel();
+			//else if ( CursorOperationEvent.INSERT_OXEL == cursorOperation )
+				//insertOxel();
+		//}
+		//_count++;
 	}
 
 	private static var _s_dy:Number = 0;

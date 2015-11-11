@@ -428,10 +428,6 @@ public class VoxelModel
 		oxel.rebuildAll();
 	}
 	*/
-	public function flow( $countDown:int = 8, $countOut:int = 8 ):void
-	{
-		modelInfo.data.oxel.flowFindCandidates( instanceInfo.instanceGuid, $countDown, $countOut );	
-	}
 	
 	// This function writes to the root oxel, and lets the root find the correct target
 	// it also add flow and lighting

@@ -55,7 +55,7 @@ package com.voxelengine
 		}
 		
 		private static function writeErrorToServer( $errorType:String, $details:String, $error:Error, $extraData:Object = null, callback:Function = null, errorHandler:Function = null):void {
-			var stackTrace:String = "NO stack trace"
+			var stackTrace:String = "Log.writeErrorToServer - NO stack trace"
 			if ( $error ) {
 				stackTrace = $error.getStackTrace()
 				var split:Array = stackTrace.split("\n")

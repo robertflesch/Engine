@@ -127,8 +127,10 @@ public class LightInfo
 
 	public function setAll( $attn:uint ):void	{
 		
-		if ( LightInfo.MAX < $attn )
-			throw new Error( "LightInfo.setAll - attn > MAX" );
+		if ( LightInfo.MAX < $attn ) {
+			$attn = LightInfo.MAX
+			Log.out( "LightInfo.setAll - attn > MAX" );
+		}
 
 		b000 = $attn;
 		b001 = $attn;

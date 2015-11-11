@@ -262,18 +262,19 @@ package com.voxelengine.worldmodel.oxel
 		
 		protected   function parentMarkAs():void 					{ _data |= OXEL_DATA_PARENT;  }
 		protected   function parentClear():void 					{ _data &= OXEL_DATA_PARENT_MASK; }
+		protected   function parentIs():Boolean 					{ return 0 < (_data & OXEL_DATA_PARENT) }
 		
 		public      function additionalDataMark():void				{ _data |= OXEL_DATA_ADDITIONAL;  }
 		public      function additionalDataHas():Boolean			{ return 0 < ( _data & OXEL_DATA_ADDITIONAL );  }
 		public      function additionalDataClear():void 			{ _data &= OXEL_DATA_ADDITIONAL_CLEAR; }
 
 		static public function dataIsParent( $data:uint ):Boolean 	{ return 0 < ($data & OXEL_DATA_PARENT); }
-		static public function dataHasAdditional( $data:uint ):Boolean 	
-		{ 
+		static public function dataHasAdditional( $data:uint ):Boolean { 
 			var t:uint = ($data & OXEL_DATA_ADDITIONAL);
 			t = t >> 1;
 			return 0 < t; 
-			}
+		}
+		static public function dataAdditionalClear( $data:uint ):uint 			{ return $data & OXEL_DATA_ADDITIONAL_CLEAR }
 	}
 }
 		

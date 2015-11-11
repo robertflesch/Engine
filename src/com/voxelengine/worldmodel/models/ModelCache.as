@@ -282,7 +282,7 @@ public class ModelCache
 				continue;
 			if ( vm.dead )
 				continue;
-			Log.out( "ModelCache.toObject - saving" + vm.instanceInfo.toString() )	
+			//Log.out( "ModelCache.toObject - saving" + vm.instanceInfo.toString() )	
 			models.push( vm.instanceInfo.toObject() );	
 		}
 		return models;

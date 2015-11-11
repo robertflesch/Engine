@@ -2,6 +2,8 @@
 package com.voxelengine.GUI.voxelModels
 {
 	import com.voxelengine.events.ModelInfoEvent;
+	import com.voxelengine.worldmodel.Light;
+	import com.voxelengine.worldmodel.oxel.LightInfo;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.events.MouseEvent;
@@ -100,10 +102,20 @@ package com.voxelengine.GUI.voxelModels
 //			addElement( new ComponentVector3DSideLabel( setChanged, "Center", "X: ", "Y: ", "Z: ",  ii.center, WIDTH, updateVal ) );
 			addElement( new ComponentSpacer( WIDTH ) );
 			
-			addElement( new ComponentLabelInput( "Base Light"
-									  , function ($e:TextEvent):void { _vm.modelInfo.baseLightLevel = uint( $e.target.label ); changeBaseLightLevel(); setChanged(); }
+			var lc:Container = new Container( WIDTH, 30 )
+			lc.padding = 0
+			lc.layout.orientation = LayoutOrientation.HORIZONTAL;
+			
+			lc.addElement( new ComponentLabelInput( "Light(0-255)"
+									  , function ($e:TextEvent):void { _vm.modelInfo.baseLightLevel = uint( $e.target.label );  }
 									  , String( _vm.modelInfo.baseLightLevel )
-									  , WIDTH ) )
+									  , WIDTH - 120 ) )
+									  
+			var applyLight:Button = new Button( "Apply Light" )
+			applyLight.addEventListener(UIMouseEvent.CLICK, changeBaseLightLevel )
+			applyLight.width = 110
+			lc.addElement( applyLight )
+			addElement( lc )
 			
 			// TODO need to be able to handle an array of scipts.
 			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { ii.scriptName = $e.target.text; }, ii.scriptName, WIDTH ) );
@@ -170,10 +182,11 @@ package com.voxelengine.GUI.voxelModels
 			_photoContainer.addElement(btn);
 		}
 		
-		private function changeBaseLightLevel():void 
-		{
+		private function changeBaseLightLevel( $e:UIMouseEvent ):void  {
 			if ( _vm.modelInfo.data && _vm.modelInfo.data.oxel ) {
 				var oxel:Oxel = _vm.modelInfo.data.oxel;
+				if ( LightInfo.MAX < int( _vm.modelInfo.baseLightLevel ) )
+					_vm.modelInfo.baseLightLevel = LightInfo.MAX
 				oxel.lightsStaticSetDefault( _vm.modelInfo.baseLightLevel );
 			}
 		}

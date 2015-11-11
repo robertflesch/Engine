@@ -103,18 +103,18 @@ package com.voxelengine.worldmodel.models
 		
 		public function	statsPrint():void
 		{
-			trace( "---------------------" );
-//			trace( "root grain: " + _rootGrain );
-			trace( "largest solid grain: " + _solid_max );
-			trace( "smallest solid grain: " + _solid_min );
+			Log.out( "---------------------" );
+//			Log.out( "root grain: " + _rootGrain );
+			Log.out( "largest solid grain: " + _solid_max );
+			Log.out( "smallest solid grain: " + _solid_min );
 			for ( var key:* in _stats )
 			{
 				if ( !isNaN( key ) )
 				{
 					if ( TypeInfo.typeInfo[key] )
-						trace( "Contains " + _stats[key]/GRAINS_PER_SQUARE_METER + " cubic meters of " + TypeInfo.typeInfo[key].name);
+						Log.out( "Contains " + _stats[key]/GRAINS_PER_SQUARE_METER + " cubic meters of " + TypeInfo.typeInfo[key].name);
 					else	
-						trace( "ModelStatisics.statsPrint - unknown key: " + key );
+						Log.out( "ModelStatisics.statsPrint - unknown key: " + key );
 				}
 			}
 		}

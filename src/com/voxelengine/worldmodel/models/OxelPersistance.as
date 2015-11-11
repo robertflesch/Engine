@@ -238,7 +238,7 @@ public class OxelPersistance extends PersistanceObject
 		//Log.out( "OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.WARN );
 		
 		_statisics.gather();
-		_statisics.statsPrint();
+		//_statisics.statsPrint();
 		
 		//Log.out( "OxelPersistance.fromByteArray - _statisics took: " + (getTimer() - time), Log.WARN );
 		

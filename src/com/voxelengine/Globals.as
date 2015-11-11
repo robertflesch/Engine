@@ -134,6 +134,11 @@ package com.voxelengine {
 		
 		private static const  g_horizontalDirections:Array = [ Globals.POSX, Globals.NEGX, Globals.POSZ, Globals.NEGZ ];
 		public static function get horizontalDirections():Array { return g_horizontalDirections; }
+		public static function isHorizontalDirection( $val:uint ):Boolean { 
+			if ( Globals.POSX == $val || Globals.NEGX == $val || Globals.POSZ == $val || Globals.NEGZ == $val )
+				return true
+			return false
+		}
 
 		private static const  g_allButDownDirections:Array = [ Globals.POSY, Globals.POSX, Globals.NEGX, Globals.POSZ, Globals.NEGZ ];
 		public static function get allButDownDirections():Array { return g_allButDownDirections; }

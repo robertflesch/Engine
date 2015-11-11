@@ -53,9 +53,9 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		}
 		
 		public function Flow( $modelGuid:String, $gc:GrainCursor, $type:int, $flowInfoRaw:int, $taskType:String, $taskPriority:int ):void {
-			Log.out( "Flow.create flowInfo: " + $flowInfoRaw );
 			_flowInfoRaw = $flowInfoRaw;
 			super( $modelGuid, $gc, $type, $taskType, $taskPriority );
+			Log.out( "Flow.create flow: " + toString() );
 			
 			var spreadInterval:int = TypeInfo.typeInfo[$type].spreadInterval
 			var pt:Timer = new Timer( spreadInterval, 1 );
@@ -72,7 +72,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		
 		override public function start():void {
 			super.start();
-			
+			Log.out( "Flow.start " + toString(), Log.WARN );
 			var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
 			if ( vm ) {
 				var $flowFromOxel:Oxel = vm.modelInfo.data.oxel.childGetOrCreate( _gc );
@@ -84,6 +84,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					Log.out( "Flow.start - _flowInfoRaw - flow data invalid", Log.WARN );
 					return; }
 				if ( !FlowInfo.validateData( $flowFromOxel.flowInfo.flowInfoRaw )	) {
+
 					Log.out( "Flow.start - $flowFromOxel.flowInfo.flowInfoRaw - flow data invalid", Log.WARN );
 					return; }
 				
@@ -126,6 +127,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				if ( flowUnder.type == $flowIntoOxel.type ) {
 					//flowUnder.flowInfo.flowScaling.reset( flowUnder, true )
 					flowUnder.flowInfo.inheritFlowMax( $flowIntoOxel.flowInfo )
+					$flowIntoOxel.flowInfo.flowScaling.reset( $flowIntoOxel, true )
 					flowUnder.flowInfo.flowScaling.neighborsRecalc( flowUnder, true );
 				} else {
 					// does the tasks flow type I interact with the type over us?
@@ -141,6 +143,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				if ( flowOver.type == $flowIntoOxel.type ) {
 					flowOver.flowInfo.flowScaling.reset( flowOver, true )
 					flowOver.flowInfo.inheritFlowMax( $flowIntoOxel.flowInfo )
+					flowOver.flowInfo.flowScaling.reset( $flowIntoOxel, true )
 					flowOver.flowInfo.flowScaling.neighborsRecalc( flowOver, true );
 				} else {
 					// does the tasks flow type I interact with the type under us?
@@ -205,7 +208,10 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				canFlowInto( $flowFromOxel, Globals.NEGZ, flowCandidates );
 				if ( 0 < flowCandidates.length ) {
 					flowTasksAdd( flowCandidates, false, $flowFromOxel.flowInfo );
+					Log.out( "Flow.flowStartContinous adding: " + flowCandidates.length + " new flows" )
+					return
 				}
+				Log.out( "Flow.flowStartContinous NO new flows found" )
 			}
 		}
 		
@@ -223,10 +229,14 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 
 				var fi:FlowInfo = flowTest.flowCandidate.flowInfo
 				fi.copy( $flowInfo )
-				fi.direction = flowTest.dir
-				if ( 0 == fi.out )
-					continue
+				fi.directionSetAndDecrement( flowTest.dir, flowTest.flowCandidate.gc.size() )
 				if ( 0 == fi.down )
+					continue
+				else if ( $upOrDown )
+					flowTest.flowCandidate.flowInfo.flowScaling.reset()
+					
+				Log.out( "Flow.flowTasksAdd fi.out" + fi.out + "  fi.flowScaling.min " + fi.flowScaling.min )
+				if ( 0 == fi.flowScaling.min() )
 					continue
 					
 				writeFlowTypeAndScaleNeighbors( flowTest.flowCandidate )

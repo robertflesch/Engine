@@ -34,9 +34,9 @@ public class PanelPermissionModel extends ExpandableBox
 	override protected function collapasedInfo():String  {
 		var outString:String = ""
 		
-		outString += "creator: " + _permissions.creator + " "
+		outString += "creator: " + _permissions.creator + "   "
 		if ( _permissions.blueprint )
-			outString += "bp: " + (_permissions.blueprint?"yes ":"no ")
+			outString += "blue print: " + (_permissions.blueprint?"yes ":"no ")
 		//if ( _at.hasScale )
 			//outString += formatVec3DToSummary( "scl:", _at.scale )
 		//if ( outString == "" ) {

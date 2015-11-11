@@ -93,7 +93,7 @@ public class ModelMetadataCache
 			Log.out( "ModelMetadataCache.request guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "ModelMetadataCache.request guid: " + $mme.modelGuid, Log.INFO );
+		//Log.out( "ModelMetadataCache.request guid: " + $mme.modelGuid, Log.INFO );
 		var vmm:ModelMetadata = _metadata[$mme.modelGuid]; 
 		if ( null == vmm ) {
 			if ( _block.has( $mme.modelGuid ) )	
@@ -162,7 +162,7 @@ public class ModelMetadataCache
 			return;
 		// can have $pe.data if cloning object	
 		if ( $pe.dbo || $pe.data ) {
-			Log.out( "ModelMetadataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
+			//Log.out( "ModelMetadataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
 			var vmm:ModelMetadata = _metadata[$pe.guid]; 
 			if ( null == vmm ) {
 				vmm = new ModelMetadata( $pe.guid );

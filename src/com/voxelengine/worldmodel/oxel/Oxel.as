@@ -233,9 +233,9 @@ public class Oxel extends OxelBitfields
 		if ( TypeInfo.flowable( type ) )
 		{
 			if ( $parent && $parent.flowInfo )
-				flowInfo = $parent.flowInfo.clone();
+				flowInfo = $parent.flowInfo.clone( true, null );
 			else
-				flowInfo = TypeInfo.typeInfo[type].flowInfo.clone();
+				flowInfo = TypeInfo.typeInfo[type].flowInfo.clone( false, null );
 		}
 	}
 	
@@ -625,6 +625,14 @@ public class Oxel extends OxelBitfields
 		var gct:GrainCursor = GrainCursorPool.poolGet(root_get().gc.bound );
 		facesClearAll();
 
+		var min:uint
+		var max:uint
+		if ( _flowInfo && _flowInfo.flowScaling.has() ) {
+			min	 = _flowInfo.flowScaling.min()
+			max	 = _flowInfo.flowScaling.max()
+		}
+		
+		Log.out( "FlowScaling.childGetScale - parent oxel flowScaling: " + toString(), Log.WARN )
 		for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
 		{
 			_children[i]  = OxelPool.poolGet();
@@ -647,6 +655,11 @@ public class Oxel extends OxelBitfields
 			// Special case for grass, leave upper oxels as grass.
 			if ( TypeInfo.GRASS == type && ( 0 == gct.grainY % 2 ) )
 				_children[i].type = TypeInfo.DIRT;
+			
+			if ( _flowInfo && _flowInfo.flowScaling.has() ) {
+				// now we need to distribute the scaling out to the resultant oxels
+				flowInfo.flowScaling.childGetScale( _children[i], min, max )
+			}
 		}
 
 		this.parentMarkAs();
@@ -658,7 +671,7 @@ public class Oxel extends OxelBitfields
 
 		GrainCursorPool.poolDispose( gct );
 	}
-
+	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Children function END
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -755,7 +768,7 @@ public class Oxel extends OxelBitfields
 			neighborsInvalidate();
 		}
 		
-		additionalDataClear();
+		additionalDataClear()
 			
 		// Now we can change type
 		type = $newType;
@@ -1025,12 +1038,14 @@ public class Oxel extends OxelBitfields
 		for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 		{
 			no = neighbor(face);
+//			if ( no != Globals.BAD_OXEL && no.gc.eval( 5, 22, 49, 44 ) )
+//				Log.out( "Oxel.neighborsMarkDirtyFaces - found it", Log.WARN )
 			if ( Globals.BAD_OXEL == no )
 				continue;
 				
 			// if I have alpha, then see if neighbor is same size, if no=()t break it up.
 			if ( TypeInfo.hasAlpha( type ) ) {				
-				if ( gc.grain < no.gc.grain  )
+				if ( gc.grain < no.gc.grain && TypeInfo.AIR != no.type  )
 					no.breakToSize( no.gc.grain - gc.grain );
 			}
 				
@@ -1038,6 +1053,7 @@ public class Oxel extends OxelBitfields
 			no.faceMarkDirty( $modelGuid, Oxel.face_get_opposite( face ), $propogateCount );
 			// now test if we need to propagate it.
 			// Why do alpha faces have to propagate? Is it because of light changes?
+			// is it just for lighting?
 			if ( TypeInfo.hasAlpha( no.type ) ) {
 				// So now I can mark my neighbors dirty, decrementing each time.
 				if ( 0 < $size && 0 < $propogateCount )
@@ -1045,7 +1061,7 @@ public class Oxel extends OxelBitfields
 			}
 			// if we are being placed over an oxel of the same type that has scaling, we need to reset 
 			// the scaling on the oxel below us.
-			if ( Globals.NEGY == face && no.flowInfo && no.flowInfo.flowScaling.has() ) {
+			if ( type == no.type && Globals.NEGY == face && no.flowInfo && no.flowInfo.flowScaling.has() ) {
 				no.flowInfo.flowScaling.reset()
 				no.quadsDeleteAll()
 			}
@@ -1103,7 +1119,10 @@ public class Oxel extends OxelBitfields
 					raw = flowInfo.flowInfoRaw 
 				else
 					raw = ti.flowInfo.flowInfoRaw
-				Flow.addTask( $modelGuid, gc, type, raw, 1 );
+				var priority:int = 1
+				if ( Globals.isHorizontalDirection( $face ) )
+					priority = 3
+				Flow.addTask( $modelGuid, gc, type, raw, priority );
 			}
 				
 			if ( _quads && _quads[$face] )
@@ -1324,25 +1343,6 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 			if ( onFire )
 				changeOxel( $modelGuid, gc, TypeInfo.AIR )
 			onFire = false
-		}
-	}
-	
-	private function scaleTopFlowFace():void {
-		if ( !flowInfo.flowScaling.has() ) {
-			var flowScale:int = 16
-			if ( 5 == gc.grain )
-				flowScale = 15
-			else if ( 4 == gc.grain )
-				flowScale = 14
-			else if ( 3 == gc.grain )
-				flowScale = 12
-			else if ( 2 == gc.grain )
-				flowScale = 8
-				
-			flowInfo.flowScaling.NxNz = flowScale
- 			flowInfo.flowScaling.NxPz = flowScale
-			flowInfo.flowScaling.PxNz = flowScale
-			flowInfo.flowScaling.PxPz = flowScale
 		}
 	}
 	
@@ -1730,36 +1730,6 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Vertex Manager END
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	 * FLOW FUNCTIONS
-	 * three different kinds of flow
-	 * 1) pressurized flow, $gc unlimited oxels are produced (rate limited?), this could fill a cavity then go over the top
-	 * 2) continuous gravity flow, a spring for example, this flow always goes downhill, but doesnt run out
-	 * 3) limited flow, like a bucket of water being poured out, this has a set number of oxels.
-	 *
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////*/
-	private const MIN_FLOW_GRAIN:int = 2;
-	public function flowFindCandidates( $modelGuid:String, $countDown:int = 8, $countOut:int = 8):void {
-		if ( childrenHas() )
-		{
-			for each ( var child:Oxel in children )
-				if ( MIN_FLOW_GRAIN <= child.gc.grain )
-					child.flowFindCandidates( $modelGuid, $countDown, $countOut);
-		}
-		else
-		{
-			if ( TypeInfo.flowable( type ) )
-			{
-				Log.out( "Oxel.flowFindCandidates - gc: " + gc.toString() );
-				//flowTerminal();
-				Flow.addTask( $modelGuid, gc, type, flowInfo.flowInfoRaw, 1 );
-			}
-		}
-	}
-
-	//public function flowTerminal():void { }
-	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// END FLOW FUNCTIONS
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Saving and Restoring from File
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1781,7 +1751,7 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 		}
 		
 		// If it has flow or lighting, we have to save both.
-		if ( flowInfo || lighting )	{
+		if ( (flowInfo || lighting) && !parentIs() )	{
 			// I only have 1 bit for additional data...
 			additionalDataMark();
 			$ba.writeUnsignedInt( maskTempData() );
@@ -1823,6 +1793,11 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 			Log.out( "Oxel.readVersionedData - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
 			type = TypeInfo.AIR;
 		}
+		
+//		if ( OxelBitfields.dataIsParent( faceData ) && OxelBitfields.dataHasAdditional( faceData ) )
+			//faceData = OxelBitfields.dataAdditionalClear( faceData )
+//			Log.out( "Oxel.readVersionedData - parent with FLOW OR LIGHT data: " + TypeInfo.typeInfo[type].name, Log.WARN );
+		
 		// Check for flow and brightnessInfo
 		if ( OxelBitfields.dataHasAdditional( faceData ) )
 		{
@@ -3067,20 +3042,29 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 			var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
 		
 			if ( typeInfo.flowable ) {
-				if ( null == changeCandidate.flowInfo ) // if it doesnt have flow info, get some! This is from placement of flowable oxels
+				if ( null == changeCandidate.flowInfo ) { // if it doesnt have flow info, get some! This is from placement of flowable oxels
 					changeCandidate.flowInfo = FlowInfoPool.poolGet()
-				if ( !FlowInfo.validateData( changeCandidate.flowInfo.flowInfoRaw ) )
+				}
+				
+				// When  
+				if ( !FlowInfo.validateData( changeCandidate.flowInfo.flowInfoRaw ) ) {
 					changeCandidate.flowInfo.copy( typeInfo.flowInfo )
-
+				}
+				
 				if ( FlowInfo.FLOW_TYPE_UNDEFINED == changeCandidate.flowInfo.type	)
 					changeCandidate.flowInfo.type = typeInfo.flowInfo.type
+					
+				if ( !FlowInfo.validateData( changeCandidate.flowInfo.flowInfoRaw ) ) {
+					changeCandidate.flowInfo.copy( typeInfo.flowInfo )
+				}
 				
 				var neighborAbove:Oxel = neighbor( Globals.POSY );
 				if ( Globals.BAD_OXEL == neighborAbove || TypeInfo.AIR == neighborAbove.type )
-					changeCandidate.scaleTopFlowFace()
+					FlowScaling.scaleTopFlowFace( changeCandidate )
 				
 				if ( Globals.autoFlow  )
 					Flow.addTask( $modelGuid, changeCandidate.gc, $type, changeCandidate.flowInfo.flowInfoRaw, 1 );
+
 			}
 			else {
 				if ( changeCandidate.flowInfo )

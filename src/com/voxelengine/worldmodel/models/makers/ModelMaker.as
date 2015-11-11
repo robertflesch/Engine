@@ -48,7 +48,7 @@ public class ModelMaker extends ModelMakerBase {
 	private function retrivedMetadata( $mme:ModelMetadataEvent):void {
 		if ( ii.modelGuid == $mme.modelGuid ) {
 			_modelMetadata = $mme.modelMetadata
-			Log.out( "ModelMaker.retrivedMetadata - metadata: " + _modelMetadata.toString() )
+			//Log.out( "ModelMaker.retrivedMetadata - metadata: " + _modelMetadata.toString() )
 			attemptMake()
 		}
 	}
@@ -62,7 +62,7 @@ public class ModelMaker extends ModelMakerBase {
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
 		if ( null != _modelMetadata && null != modelInfo ) {
-			Log.out( "ModelMaker.attemptMake - ii: " + ii.toString() )
+			//Log.out( "ModelMaker.attemptMake - ii: " + ii.toString() )
 			
 			var vm:* = make()
 			

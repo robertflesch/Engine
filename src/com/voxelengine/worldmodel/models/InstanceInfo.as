@@ -267,7 +267,7 @@ public class InstanceInfo extends Location	{
 	
 	override public function fromObject( $info:Object ):void {
 		super.fromObject( $info );
-		Log.out( "InstanceInfo.fromObject - data: " + JSON.stringify( $info ) );
+		//Log.out( "InstanceInfo.fromObject - data: " + JSON.stringify( $info ) );
 		// Save off a copy of this in case we need multiple instances
 		if ( $info.model )
 			_info = $info.model;

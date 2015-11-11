@@ -366,7 +366,7 @@ public class ModelInfo extends PersistanceObject
 		if ( !info.model.children )
 			return
 		
-		Log.out( "ModelInfo.childrenLoad - loading for model: " + guid );
+		//Log.out( "ModelInfo.childrenLoad - loading for model: " + guid );
 		for each ( var v:Object in info.model.children ) {
 			// Only want to add the listener once
 			if ( true == childrenLoaded ) {
@@ -391,7 +391,7 @@ public class ModelInfo extends PersistanceObject
 			//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + childInstanceInfo );
 			ModelMakerBase.load( ii, true, false );
 		}
-		Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
+		//Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
 		//Log.out( "VoxelModel.childrenLoad - loading child models END" );
 		if ( ModelMakerImport.isImporting )
 			delete info.model.children

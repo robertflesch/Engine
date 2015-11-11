@@ -64,5 +64,15 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		}
 		
 		public function get type():int { return _type; }
+		
+		override public function toString():String {
+			var output:String =  _guid
+			if ( _gc )
+				output += "  gc: " + _gc.toString()
+			output += "  type: " + _type
+			output += "  _flowInfoRaw: " + _flowInfoRaw
+			return output
+		}
+
 	}
 }

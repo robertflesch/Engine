@@ -66,7 +66,7 @@ public class Inventory extends PersistanceObject
 			Log.out( "Inventory.save - Not LOADED - guid: " + guid, Log.DEBUG );
 			return; 
 		}
-		Log.out( "Inventory.save - saving - guid: " + guid, Log.DEBUG );
+		//Log.out( "Inventory.save - saving - guid: " + guid, Log.DEBUG );
 		super.save();
 	}
 	

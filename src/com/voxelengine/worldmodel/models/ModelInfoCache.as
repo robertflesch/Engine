@@ -227,12 +227,12 @@ public class ModelInfoCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	static private function add( $series:int, $mi:ModelInfo ):void { 
 		if ( null == $mi || null == $mi.guid ) {
-			Log.out( "ModelInfoCache.add trying to add NULL modelInfo or guid", Log.WARN );
+			//Log.out( "ModelInfoCache.add trying to add NULL modelInfo or guid", Log.WARN );
 			return;
 		}
 		// check to make sure is not already there
 		if ( null ==  _modelInfo[$mi.guid] ) {
-			Log.out( "ModelInfoCache.add modelInfo: " + $mi.toString(), Log.DEBUG );
+			//Log.out( "ModelInfoCache.add modelInfo: " + $mi.toString(), Log.DEBUG );
 			_modelInfo[$mi.guid] = $mi; 
 			
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $series, $mi.guid, $mi ) );

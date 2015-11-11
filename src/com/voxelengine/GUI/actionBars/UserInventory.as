@@ -64,14 +64,14 @@ public class  UserInventory extends QuickInventory
 	private var 		 _itemMaterialSelection:int = -1;
 	private function get itemMaterialSelection():int  { return _itemMaterialSelection; }
 	private function set itemMaterialSelection(value:int):void {
-		Log.out( "UserInventory.itemMaterialSelection: " + value )
+		//Log.out( "UserInventory.itemMaterialSelection: " + value )
 		_itemMaterialSelection = value; 
 	}
 	
 	private var 		 _lastBoxesSelection:int = -1;
 	private function get lastBoxesSelection():int  { return _lastBoxesSelection; }
 	private function set lastBoxesSelection(value:int):void {
-		Log.out( "UserInventory.lastItemSelection: " + value )
+		//Log.out( "UserInventory.lastItemSelection: " + value )
 		_lastBoxesSelection = value; 
 	}
 	
@@ -305,7 +305,7 @@ public class  UserInventory extends QuickInventory
 
 	private function pressItem(e:UIMouseEvent):void  {
 		var box:UIObject = e.target as UIObject;
-		Log.out( "UserInventory.pressItem", Log.DEBUG );
+		//Log.out( "UserInventory.pressItem", Log.DEBUG );
 		processItemSelection( box );
 	}			
 	
@@ -313,12 +313,12 @@ public class  UserInventory extends QuickInventory
 	}			
 	
 	private function selectByIndex( $index:int ):void {
-		Log.out( "UserInventory.selectByIndex", Log.DEBUG );
+		//Log.out( "UserInventory.selectByIndex", Log.DEBUG );
 		processItemSelection( boxes[$index] );
 	}
 	
 	private function onDeactivate( $ae:AppEvent ):void {
-		Log.out( "UserInventory.onDeactivate", Log.DEBUG );
+		//Log.out( "UserInventory.onDeactivate", Log.DEBUG );
 		processItemSelection( boxes[1], false )
 	}
 	
@@ -329,7 +329,7 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function processItemSelection( box:UIObject, $propagate:Boolean = true ):void {
-		Log.out( "UserInventory.processItemSelection - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex + " box.name: " + box.name, Log.DEBUG );
+		//Log.out( "UserInventory.processItemSelection - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex + " box.name: " + box.name, Log.DEBUG );
 		if ( 0 < Globals.openWindowCount )
 			return;
 			
@@ -381,7 +381,7 @@ public class  UserInventory extends QuickInventory
 				if ( -1 != itemMaterialSelection ) {	
 					var lastBoxPick:Box = boxes[itemMaterialSelection ];
 					if ( $propagate ) {
-						Log.out( "UserInventory.processItemSelection.ObjectTool.- 1 != itemMaterialSelection", Log.WARN);
+						//Log.out( "UserInventory.processItemSelection.ObjectTool.- 1 != itemMaterialSelection", Log.WARN);
 						processItemSelection( lastBoxPick )
 					}
 					return;
@@ -389,7 +389,7 @@ public class  UserInventory extends QuickInventory
 				else {
 					//Log.out( "UserInventory.processItemSelection - ObjectTool - lastItemSelection != boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
 					if ( $propagate ) {
-						Log.out( "UserInventory.processItemSelection.ObjectTool.other", Log.WARN);
+						//Log.out( "UserInventory.processItemSelection.ObjectTool.other", Log.WARN);
 						processItemSelection( boxes[1] )
 					}
 					return;
@@ -402,7 +402,7 @@ public class  UserInventory extends QuickInventory
 			}
 		}
 		else if ( oi is ObjectModel ) {
-			Log.out( "UserInventory.processItemSelection - ObjectModel", Log.WARN);
+			//Log.out( "UserInventory.processItemSelection - ObjectModel", Log.WARN);
 			var ti1:TypeInfo = TypeInfo.typeInfoByName[ "CLEAR GLASS" ];
 			var om:ObjectModel = oi as ObjectModel;
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.INSERT_MODEL, ti1.type, om ) ); 
@@ -486,7 +486,7 @@ public class  UserInventory extends QuickInventory
 			
 		if ( 48 <= e.keyCode && e.keyCode <= 58 )
 		{
-			Log.out( "UserInventory.hotKeyInventory - e.keyCode: " + e.keyCode );
+			//Log.out( "UserInventory.hotKeyInventory - e.keyCode: " + e.keyCode );
 			var selectedItem:int = e.keyCode - 48;
 			if ( 0 < selectedItem )
 				selectByIndex( selectedItem - 1 ); // 1 is index 0

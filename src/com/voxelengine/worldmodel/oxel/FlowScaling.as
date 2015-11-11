@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2015 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -7,12 +7,11 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
-	import adobe.utils.ProductManager;
 	import flash.geom.Point;
 	import flash.utils.ByteArray;
 	
-	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
+	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.TypeInfo;
 /**
  * ...
@@ -20,24 +19,45 @@ package com.voxelengine.worldmodel.oxel
  */
 public class FlowScaling
 {
-	private const CORNER_MIN:Number = 1;
 	private const DEFAULT_TOTAL_SCALE:uint = 0xffffffff;
 	
-	// has scaling for this oxel be calcualted
-	private var _calculated:Boolean = false
-	private var _scaleRate:Number = 2;
+	private 		var _calculated:Boolean = false
 	public function get calculated():Boolean { return _calculated; }
 	
-	private var _scale:uint = DEFAULT_TOTAL_SCALE;
-	public function get PxPz():uint { return ((_scale  & 0x0000000f)) + 1; }
-	public function get PxNz():uint { return ((_scale  & 0x000000f0) >> 4 ) + 1; }
-	public function get NxNz():uint { return ((_scale  & 0x00000f00) >> 8 ) + 1; }
-	public function get NxPz():uint { return ((_scale  & 0x0000f000) >> 12 ) + 1; }
+	// has scaling for this oxel be calcualted
+	private var _data:uint = DEFAULT_TOTAL_SCALE;
+	public function get PxPz():uint { return ((_data  & 0x0000000f)); }
+	public function get PxNz():uint { return ((_data  & 0x000000f0) >> 4 ); }
+	public function get NxNz():uint { return ((_data  & 0x00000f00) >> 8 ); }
+	public function get NxPz():uint { return ((_data  & 0x0000f000) >> 12 ); }
 	
-	public function set PxPz( value:uint ):void { _scale = ((_scale & 0xfffffff0) | ( value - 1 )); }
-	public function set PxNz( value:uint ):void { _scale = ((_scale & 0xffffff0f) | (( value - 1 ) << 4) ); }
-	public function set NxNz( value:uint ):void { _scale = ((_scale & 0xfffff0ff) | (( value - 1 ) << 8) ); }
-	public function set NxPz( value:uint ):void { _scale = ((_scale & 0xffff0fff) | (( value - 1 ) << 12) ); }
+	// The quads needs this as 1 to 16, not 0 to 15
+	public function get QuadPxPz():uint { return PxPz + 1 }
+	public function get QuadPxNz():uint { return PxNz + 1 }
+	public function get QuadNxNz():uint { return NxNz + 1 }
+	public function get QuadNxPz():uint { return NxPz + 1 }
+	
+	//public function set PxPz( value:uint ):void { _data = ((_data & 0xfffffff0) | ( value )); }
+	//public function set PxNz( value:uint ):void { _data = ((_data & 0xffffff0f) | (( value ) << 4) ); }
+	//public function set NxNz( value:uint ):void { _data = ((_data & 0xfffff0ff) | (( value ) << 8) ); }
+	//public function set NxPz( value:uint ):void { _data = ((_data & 0xffff0fff) | (( value ) << 12) ); }
+
+	public function set PxPz( value:uint ):void { 
+		if ( 15 < value )
+			Log.out( "FlowScaling.PxPz PAST MAX: " + value, Log.WARN )
+		_data = ((_data & 0xfffffff0) | ( value )); }
+	public function set PxNz( value:uint ):void { 
+		if ( 15 < value )
+			Log.out( "FlowScaling.PxNz PAST MAX: " + value, Log.WARN )
+		_data = ((_data & 0xffffff0f) | (( value ) << 4) ); }
+	public function set NxNz( value:uint ):void { 
+		if ( 15 < value )
+			Log.out( "FlowScaling.NxNz PAST MAX: " + value, Log.WARN )
+		_data = ((_data & 0xfffff0ff) | (( value ) << 8) ); }
+	public function set NxPz( value:uint ):void { 
+		if ( 15 < value )
+			Log.out( "FlowScaling.NxPz PAST MAX: " + value, Log.WARN )
+		_data = ((_data & 0xffff0fff) | (( value ) << 12) ); }
 	
 	/*
 	 *               _____Nz_____
@@ -48,7 +68,7 @@ public class FlowScaling
 	 *  ____________|____________|____________
 	 * |            |            |            |
 	 * |        PxNz|NxNz    PxNz|NxNz        |
-	 * Nx            |            |           Px
+	 * Nx           |            |           Px
 	 * |        PxPz|NxPz    PxPz|NxPz        |
 	 * |____________|____________|____________|
 	 *              |            |
@@ -59,14 +79,26 @@ public class FlowScaling
 	 * 
 	 */
 	public function FlowScaling():void {}
-	public function has():Boolean { return ( _scale != DEFAULT_TOTAL_SCALE ) }
+	public function has():Boolean { return ( _data != DEFAULT_TOTAL_SCALE ) }
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray {
 		
-		$ba.writeUnsignedInt( _scale );
+		$ba.writeUnsignedInt( _data );
 		return $ba;
 	}
 	
+	public function copy( $toBeCopied:FlowScaling ):void {
+		_data = $toBeCopied._data
+	}
+	
+	public function max():uint {
+		return Math.max( Math.max( PxPz, PxNz ), Math.max( NxNz, NxPz ) )
+	}
+	
+	public function min():uint {
+		return Math.min( Math.min( PxPz, PxNz ), Math.min( NxNz, NxPz ) )
+	}
+
 	public function fromByteArray( $version:int, $ba:ByteArray ):ByteArray {
 		// No need to handle versions yet
 		if ( Globals.VERSION_004 == $version || Globals.VERSION_003 == $version ) {
@@ -75,8 +107,12 @@ public class FlowScaling
 			NxNz = rnd( $ba.readFloat() );
 			NxPz = rnd( $ba.readFloat() );
 		}
+		else if ( Globals.VERSION_004 <= $version  ) {
+			_data = $ba.readUnsignedInt();
+		}
 		else {
-			_scale = $ba.readUnsignedInt();
+			Log.out( "FlowSacaling.fromByteArray - The version of data is not handled", Log.WARN )
+			_data = $ba.readUnsignedInt();
 		}
 		return $ba;
 		
@@ -95,7 +131,7 @@ public class FlowScaling
 		_calculated = false;
 		// first reset this oxels scaling
 		if ( has() ) {
-			_scale = DEFAULT_TOTAL_SCALE
+			_data = DEFAULT_TOTAL_SCALE
 			if ( $oxel )
 				$oxel.rebuildAll();
 		}
@@ -128,35 +164,41 @@ public class FlowScaling
 		//Log.out( "FlowScaling.recalculate is: " + toString() );
 	}
 	
+	private static const CORNER_MIN:Number = 0;
 	public function calculate( $oxel:Oxel ):void	{
 		if ( _calculated )
 			return;
 	
-		//Log.out( "FlowScaling.calculate was: " + toString() );
+		Log.out( "FlowScaling.calculate was: " + toString() + " oxel: " + toString() );
 		_calculated = true;
 		
 		// The origin of the flow should never scale.
 		if ( $oxel.flowInfo.isSource() )
 			return
 		// set these to a minimum level, so that their influence for the other corners can be felt
-		_scale = 0x00000000;
+		_data = 0x00000000;
 		
 
 		for each ( var horizontalDir:int in Globals.horizontalDirections )
 			grabNeighborInfluences( $oxel, horizontalDir );
 		
+		Log.out( "FlowScaling.calculate after grabNeighborInfluences: " + toString() );
 		// if these corners have not been influenced by another vert
 		// set them to scale
 		var fi:FlowInfo = $oxel.flowInfo; // Scale uses my out
+		//var size:uint = $oxel.gc.size()
 		if ( CORNER_MIN == PxPz )
-			PxPz = fi.scale()/_scaleRate;
+			PxPz = fi.scale();
 		if ( CORNER_MIN == PxNz )
-			PxNz = fi.scale()/_scaleRate;
+			PxNz = fi.scale();
 		if ( CORNER_MIN == NxNz )
-			NxNz = fi.scale()/_scaleRate;
+			NxNz = fi.scale();
 		if ( CORNER_MIN == NxPz )
-			NxPz = fi.scale()/_scaleRate;
-		//Log.out( "FlowScaling.calculate is: " + toString() );
+			NxPz = fi.scale();
+		Log.out( "FlowScaling.calculate is: " + toString() + " oxel: " + toString() );
+		if ( PxPz == 4 &&  PxNz == 4 && NxNz == 5 &&  NxPz == 5 )
+			Log.out( "FlowScaling.calculate WHY GO DOWN BY ONE?" );
+
 	}
 		
 	private function grabNeighborInfluences( $oxel:Oxel, $dir:int ):void {
@@ -241,5 +283,122 @@ public class FlowScaling
 	public function toString():String 	{
 		return "PxPz: " + PxPz + "  PxNz: " + PxNz + "  NxNz: " + NxNz + "  NxPz: " + NxPz;
 	}
+	
+/*
+	 *               _____Nz_____
+	 *              |            | 
+	 *              |            | 
+	 *              |            |
+	 *              |NxPz    PxPz|
+	 *  ____________|____________|____________
+	 * |            |            |            |
+	 * |        PxNz|NxNz    PxNz|NxNz        |
+	 * Nx           |            |           Px
+	 * |        PxPz|NxPz    PxPz|NxPz        |
+	 * |____________|____________|____________|
+	 *              |            |
+	 *              |NxNz    PxNz|
+	 *              |            |
+	 *              |            |
+	 *              |_____Pz_____|
+	 * 
+	 */	
+	// creates a virtual brightness(light) the light from a parent to a child brightness with all lights
+	public function childGetScale( $child:Oxel, min:uint, max:uint ):void {
+
+		
+		// how this is set depends on the out level, and way I am doing out doesnt work
+		// plus I have to take into account the top scaling on water and lava
+		
+		// so evaluate scaling of parent
+		// remember that scaling is relative to the size of the oxel
+		// if min is greater then 8 then we have all same type oxels
+		
+		var childID:uint = $child.gc.childId()
+		var childFS:FlowScaling = $child.flowInfo.flowScaling
+		// I think the diagonals should be averaged between both corners
+		if ( 0 == childID ) { // b000
+			childFS.NxNz = Math.min( 15, (NxNz * 2) )
+			childFS.PxNz = Math.min( 15, (NxNz + PxNz) )
+			childFS.PxPz = Math.min( 15, (NxNz + PxPz) )
+			childFS.NxPz = Math.min( 15, (NxPz + NxNz) )
+		}
+		else if ( 1 == childID )	{ // b100
+			childFS.NxNz = Math.min( 15, (NxNz + PxNz) )
+			childFS.PxNz = Math.min( 15, (PxNz * 2) )
+			childFS.PxPz = Math.min( 15, (PxNz + PxPz) )
+			childFS.NxPz = Math.min( 15, (NxNz + PxPz) )
+		}
+		else if ( 2 == childID )	{ // b010
+			childFS.NxNz = Math.max( 0, ((NxNz - 8) * 2) )
+			childFS.PxNz = Math.max( 0, (NxNz + PxNz - 15) )
+			childFS.PxPz = Math.max( 0, (NxNz + PxPz - 15) )
+			childFS.NxPz = Math.max( 0, (NxPz + NxNz - 15) )
+			if ( 0 == childFS.max() )
+				$child.type = TypeInfo.AIR
+		}
+		else if ( 3 == childID ) { // b110
+			childFS.NxNz = Math.max( 0, (NxNz + PxNz - 15) )
+			childFS.PxNz = Math.max( 0, ((PxNz - 8) * 2) )
+			childFS.PxPz = Math.max( 0, (PxNz + PxPz - 15) )
+			childFS.NxPz = Math.max( 0, (NxNz + PxPz - 15) )
+			if ( 0 == childFS.max() )
+				$child.type = TypeInfo.AIR
+		}
+		else if ( 4 == childID )	{ // b001
+			childFS.NxNz = Math.min( 15, (NxNz + NxPz) )
+			childFS.PxNz = Math.min( 15, (NxNz + PxPz) )
+			childFS.PxPz = Math.min( 15, (NxPz + PxPz) )
+			childFS.NxPz = Math.min( 15, (NxPz  * 2) )
+		}
+		else if ( 5 == childID )	{ // b101
+			childFS.NxNz = Math.min( 15, (NxNz + PxPz) )
+			childFS.PxNz = Math.min( 15, (PxNz + PxPz) )
+			childFS.PxPz = Math.min( 15, (PxPz * 2) )
+			childFS.NxPz = Math.min( 15, (NxPz + PxPz) )
+		}
+		else if ( 6 == childID )	{ // b011
+			childFS.NxNz = Math.max( 0, (NxNz + NxPz - 15) )
+			childFS.PxNz = Math.max( 0, (NxNz + PxPz - 15) )
+			childFS.PxPz = Math.max( 0, (NxPz + PxPz - 15) )
+			childFS.NxPz = Math.max( 0, ((NxPz - 8)  * 2) )
+			if ( 0 == childFS.max() )
+				$child.type = TypeInfo.AIR
+		}
+		else if ( 7 == childID )	{ // b111
+			childFS.NxNz = Math.max( 0, (NxNz + PxPz - 15) )
+			childFS.PxNz = Math.max( 0, (PxNz + PxPz - 15) )
+			childFS.PxPz = Math.max( 0, ((PxPz - 8) * 2) )
+			childFS.NxPz = Math.max( 0, (NxPz + PxPz - 15) )
+			if ( 0 == childFS.max() )
+				$child.type = TypeInfo.AIR
+		}	
+		
+		Log.out( "FlowScaling.childGetScale - childID: " + childID + "  childFS: " + childFS.toString(), Log.WARN )
+	}
+	
+	static public function scaleTopFlowFace( $oxelToScale:Oxel ):void {
+		var fs:FlowScaling = $oxelToScale.flowInfo.flowScaling
+		if ( !fs.has() ) {
+			var newScale:int = 15 // 15 is max
+			if ( 5 == $oxelToScale.gc.grain )
+				newScale = 14
+			else if ( 4 == $oxelToScale.gc.grain )
+				newScale = 13
+			else if ( 3 == $oxelToScale.gc.grain )
+				newScale = 11
+			else if ( 2 == $oxelToScale.gc.grain )
+				newScale = 7
+				
+			fs.NxNz = newScale
+ 			fs.NxPz = newScale
+			fs.PxNz = newScale
+			fs.PxPz = newScale
+		}
+		//Log.out( "FlowScaling.scaleTopFlowFace - flowScale: " + fs.toString(), Log.WARN )
+	}
+	
+	
+	
 } // end of class FlowInfo
 } // end of package

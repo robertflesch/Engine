@@ -54,8 +54,10 @@ package com.voxelengine.renderer.shaders
 		static public  function     animationOffsetsUpdate( $elapsed:int ):void 						{ 
 			_textureOffsetV -= 0.000006 * $elapsed;
 			                   
-			if ( _textureOffsetV < -0.888671875 )
+			//if ( _textureOffsetV < -0.888671875 )
+			if ( _textureOffsetV < -0.9296875 )  //Texture length - 64, so we dont run past end.
 				_textureOffsetV = 0;
+			//trace( 	_textureOffsetV )
 		}
 		
 		public function		get		textureName():String  					{ return _textureName; }
@@ -298,9 +300,7 @@ package com.voxelengine.renderer.shaders
 			$context.setProgramConstantsFromMatrix(Context3DProgramType.VERTEX, 8, $vm.instanceInfo.worldSpaceMatrix, true); // aka vc8
 			
 			if ( _isAnimated ) 
-			{
 				animationOffsets();
-			}
 			
 			$context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 12, _offsets);
 		}

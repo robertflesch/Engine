@@ -47,7 +47,7 @@ public class ModelMakerBase {
 	public function ModelMakerBase( $ii:InstanceInfo, $fromTables:Boolean = true ) {
 		if ( null == $ii )
 			throw new Error( "ModelMakerBase - NO instanceInfo recieve in constructor" )
-		Log.out( "ModelMakerBase - ii: " + $ii.toString(), Log.DEBUG )
+		//Log.out( "ModelMakerBase - ii: " + $ii.toString(), Log.DEBUG )
 		_ii = $ii
 		if ( $ii.controllingModel ) {
 			// Using modelGuid rather then instanceGuid since imported models have no instanceGuid at this point.

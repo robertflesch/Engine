@@ -166,7 +166,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			else
 				taskPriority = 3;
 			
-			var fi:FlowInfo = $flowInfo.clone();
+			var fi:FlowInfo = $flowInfo.clone( false, flowTarget );
 			//fi.direction = flowTarget.
 			if ( 0 == fi.out )
 				return;
