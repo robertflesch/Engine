@@ -185,20 +185,19 @@ public class FlowScaling
 		Log.out( "FlowScaling.calculate after grabNeighborInfluences: " + toString() );
 		// if these corners have not been influenced by another vert
 		// set them to scale
-		var fi:FlowInfo = $oxel.flowInfo; // Scale uses my out
-		//var size:uint = $oxel.gc.size()
-		if ( CORNER_MIN == PxPz )
-			PxPz = fi.scale();
-		if ( CORNER_MIN == PxNz )
-			PxNz = fi.scale();
-		if ( CORNER_MIN == NxNz )
-			NxNz = fi.scale();
-		if ( CORNER_MIN == NxPz )
-			NxPz = fi.scale();
+		const fallRatePerMeter:uint = 2
+		const amountToFall:uint = fallRatePerMeter * $oxel.gc.size() / Globals.UNITS_PER_METER
+		if ( max() > amountToFall ) {
+			if ( CORNER_MIN == PxPz )
+				PxPz = max() - amountToFall
+			if ( CORNER_MIN == PxNz )
+				PxNz = max() - amountToFall
+			if ( CORNER_MIN == NxNz )
+				NxNz = max() - amountToFall
+			if ( CORNER_MIN == NxPz )
+				NxPz = max() - amountToFall
+		}
 		Log.out( "FlowScaling.calculate is: " + toString() + " oxel: " + toString() );
-		if ( PxPz == 4 &&  PxNz == 4 && NxNz == 5 &&  NxPz == 5 )
-			Log.out( "FlowScaling.calculate WHY GO DOWN BY ONE?" );
-
 	}
 		
 	private function grabNeighborInfluences( $oxel:Oxel, $dir:int ):void {
@@ -207,7 +206,6 @@ public class FlowScaling
 		if ( Globals.BAD_OXEL == fromOxel )
 			return;
 			
-		//if ( fromOxel.type == $oxel.type )
 		if ( TypeInfo.typeInfo[fromOxel.type].flowable && fromOxel.flowInfo && fromOxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling )
 		{
 			var fromRecalc:Boolean = false;

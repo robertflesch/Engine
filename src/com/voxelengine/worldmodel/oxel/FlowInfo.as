@@ -78,18 +78,20 @@ public class FlowInfo
 	
 	public function isSource():Boolean { return outRef == out }
 	public static function getFlowType( $data:uint ):uint { return ($data & FLOW_FLOW_TYPE) >> FLOW_TYPE_OFFSET; }
-	public static function validateData( $data:uint ):Boolean { 
-		if ( 0 == ($data & FLOW_OUT) >> FLOW_OUT_OFFSET ) {
-			Log.out( "FlowInfo.validateData - FLOW_OUT is 0", Log.WARN )	
-			return false }
-		else if ( 0 ==  ($data & FLOW_DOWN) >> FLOW_DOWN_OFFSET ) {
-			Log.out( "FlowInfo.validateData - FLOW_DOWN is 0", Log.WARN )	
-			return false }
-		else if ( 0 == ($data & FLOW_FLOW_TYPE) >> FLOW_TYPE_OFFSET ) {
-			Log.out( "FlowInfo.validateData - FLOW_FLOW_TYPE is 0", Log.WARN )	
-			return false }
-		return true
-	}
+	//public static function validateData( $data:uint ):Boolean { 
+		//// Flow out can be 0, if this is a last oxel, and we cut below it.
+		////if ( 0 == ($data & FLOW_OUT) >> FLOW_OUT_OFFSET ) {
+			////Log.out( "FlowInfo.validateData - FLOW_OUT is 0", Log.WARN )	
+			////return false }
+		//// else
+		//if ( 0 ==  ($data & FLOW_DOWN) >> FLOW_DOWN_OFFSET ) {
+			//Log.out( "FlowInfo.validateData - FLOW_DOWN is 0", Log.WARN )	
+			//return false }
+		//else if ( 0 == ($data & FLOW_FLOW_TYPE) >> FLOW_TYPE_OFFSET ) {
+			//Log.out( "FlowInfo.validateData - FLOW_FLOW_TYPE is 0", Log.WARN )	
+			//return false }
+		//return true
+	//}
 
 	public 	function get direction():int { return (_data & FLOW_FLOW_DIR) >> FLOW_DIR_OFFSET; }
 	public 	function set direction( $val:int ):void  { 
@@ -112,32 +114,26 @@ public class FlowInfo
 			}
 		}
 		else {
-			if ( 0 < out )
+			if ( 0 < out ) {
 				// If the out is less then the amount we are going to decrement it, set it to 0
 				if ( out < ($oxelSize / Globals.UNITS_PER_METER) * 4 )
 					out = 0
 				else	
 					outDec( ($oxelSize / Globals.UNITS_PER_METER) * 4 );
-			//if ( scale() >= _flowScaling.max() ) {
-				//var ns:uint = outFromScale( _flowScaling.max() )
-				//out = ns
-				//outDec( ($oxelSize / Globals.UNITS_PER_METER) * 4 )
-			//}
+			}
 		}
 		Log.out( "FlowInfo.dirAndSet - out: " + out + "  oxelSize: " + $oxelSize );
 	}
 	
 	public 	function outInc( $val:uint ):void { var i:int = out; i += $val; out = i; }
-	public 	function outDec( $val:uint ):void { var i:int = out; i -= $val; out = i; }
+	public 	function outDec( $val:uint ):void { var i:int = out; i -= $val;  0 > i ? out = 0 : out = i; }
 
 	// Once we go down, all out values are reset
 	public function downInc( $val:uint ):void { var i:int = down; i += $val; down = i; out = outRef; }
-	public function downDec( $val:uint ):void { var i:int = down; i -= $val; down = i; out = outRef; }
+	public function downDec( $val:uint ):void { var i:int = down; i -= $val; 0 > i ? down = 0 : down = i; out = outRef; }
 	
 	public function get flowScaling():FlowScaling 	{ return _flowScaling; }
-	public function scale():uint 					{ return Math.max( 1, ( out / outRef ) * 16 ); }
-	public function outFromScale( $val:uint ):uint 	{ return ( $val * outRef ) / 16 }
-	
+
 	public function inheritFlowMax( $intersectingFlowInfo:FlowInfo ):void {
 		if ( out < $intersectingFlowInfo.out )
 			out = $intersectingFlowInfo.out
@@ -146,14 +142,7 @@ public class FlowInfo
 	}
 	
 	// This should really only be used by the flowInfoPool
-	public function FlowInfo() {
-		flowInfoRaw = DEFAULT
-	}
-	
-	public function get flowInfoRaw():uint { return _data }
-	public function set flowInfoRaw( val:uint ):void { 
-		_data = val 
-	}
+	public function FlowInfo() { _data = DEFAULT }
 	
 	public function reset( $oxel:Oxel = null ):void {
 		direction = Globals.ALL_DIRS
@@ -166,7 +155,7 @@ public class FlowInfo
 	
 	public function clone( isChild:Boolean, $sourceOxel:Oxel  ):FlowInfo {
 		var fi:FlowInfo = FlowInfoPool.poolGet();
-		fi.flowInfoRaw = flowInfoRaw;
+		fi.copy( this )
 		if ( isChild )
 			out = out * 2;
 		else if ( $sourceOxel && Globals.UNITS_PER_METER < $sourceOxel.gc.size() )
@@ -175,15 +164,10 @@ public class FlowInfo
 	}
 	
 	public function copy( $rhs:FlowInfo ):void {
-		flowInfoRaw = $rhs.flowInfoRaw
+		_data = $rhs._data
 		flowScaling.copy( $rhs.flowScaling )
 	}
 	
-	//FLOW_TYPE_UNDEFINED:int				= 0;
-	//FLOW_TYPE_MELT:int					= 1;
-	//FLOW_TYPE_CONTINUOUS:int			= 2;
-	//FLOW_TYPE_SPRING:int				= 3;
-
 	public function fromJson( $flowJson:Object ):void
 	{
 		if ( 3 <= $flowJson.length )
@@ -216,7 +200,7 @@ public class FlowInfo
 	}
 	
 	public function fromByteArray( $version:int, $ba:ByteArray ):ByteArray {
-		flowInfoRaw = $ba.readUnsignedInt();
+		_data = $ba.readUnsignedInt();
 		$ba = flowScaling.fromByteArray( $version, $ba )
 		return $ba;
 	}

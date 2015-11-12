@@ -1042,8 +1042,12 @@ public class Oxel extends OxelBitfields
 //				Log.out( "Oxel.neighborsMarkDirtyFaces - found it", Log.WARN )
 			if ( Globals.BAD_OXEL == no )
 				continue;
+
+			var noti:TypeInfo = TypeInfo.typeInfo[no.type];
+			if ( noti.flowable && Globals.autoFlow && EditCursor.EDIT_CURSOR != $modelGuid && 1 == $propogateCount )
+				no.addFlowTask( $modelGuid, noti )
 				
-			// if I have alpha, then see if neighbor is same size, if no=()t break it up.
+			// if I have alpha, then see if neighbor is same size, if not break it up.
 			if ( TypeInfo.hasAlpha( type ) ) {				
 				if ( gc.grain < no.gc.grain && TypeInfo.AIR != no.type  )
 					no.breakToSize( no.gc.grain - gc.grain );
@@ -1054,17 +1058,21 @@ public class Oxel extends OxelBitfields
 			// now test if we need to propagate it.
 			// Why do alpha faces have to propagate? Is it because of light changes?
 			// is it just for lighting?
-			if ( TypeInfo.hasAlpha( no.type ) ) {
+			if ( noti.alpha || TypeInfo.AIR == no.type ) {
 				// So now I can mark my neighbors dirty, decrementing each time.
 				if ( 0 < $size && 0 < $propogateCount )
 					no.neighborsMarkDirtyFaces( $modelGuid, $size, $propogateCount );
 			}
+			
+			
+			/* DOES THIS REALLY NEED TO HAPPEN HERE TOO?
 			// if we are being placed over an oxel of the same type that has scaling, we need to reset 
 			// the scaling on the oxel below us.
 			if ( type == no.type && Globals.NEGY == face && no.flowInfo && no.flowInfo.flowScaling.has() ) {
 				no.flowInfo.flowScaling.reset()
 				no.quadsDeleteAll()
 			}
+			*/
 		}
 	}
 	
@@ -1109,28 +1117,12 @@ public class Oxel extends OxelBitfields
 			}
 		}
 		else {
-			var ti:TypeInfo = TypeInfo.typeInfo[type];
-			// TODO This needs to be refactored to remove this from this function, so more likely go in the write function of the voxelModel.
-			// TODO also be nice to pass in the flow direction if possible. We know which face, so we know flow dir...
-			// 1 = $propogateCount means only the oxel directly next to the effect oxel will have flow tasks generated.
-			if ( ti.flowable && Globals.autoFlow && EditCursor.EDIT_CURSOR != $modelGuid && 1 == $propogateCount ) {
-				var raw:uint
-				if ( flowInfo && flowInfo.type ) 
-					raw = flowInfo.flowInfoRaw 
-				else
-					raw = ti.flowInfo.flowInfoRaw
-				var priority:int = 1
-				if ( Globals.isHorizontalDirection( $face ) )
-					priority = 3
-				Flow.addTask( $modelGuid, gc, type, raw, priority );
-			}
-				
 			if ( _quads && _quads[$face] )
 				_quads[$face].dirty = 1;
-
+			/*
 			if ( lighting )
 				lighting.occlusionResetFace( $face );
-
+			*/
 			super.faceMarkDirty( $modelGuid, $face, $propogateCount );
 		}
 	}
@@ -2999,99 +2991,101 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 	
 	// This function writes to the root oxel, and lets the root find the correct target
 	// it also add flow and lighting
-	public function changeOxel( $modelGuid:String, $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean
+	public function changeOxel( $modelGuid:String, $gc:GrainCursor, $newType:int, $onlyChangeType:Boolean = false ):Boolean
 	{
-		// pass in the oxel directly here?
-		// requires some refactoring but not hard - RSF
-		var oldOxel:Oxel = childGetOrCreate( $gc );
-		var oldType:int = oldOxel.type;
-		var oldTypeInfo:TypeInfo = TypeInfo.typeInfo[oldType];
-		if ( oldOxel.lighting ) {
-			if ( oldTypeInfo.lightInfo.lightSource )
-				var oldLightID:uint = oldOxel.lighting.lightIDGet();
-			if ( oldOxel.lighting.ambientOcculsionHas() ) {
-				// We have to do this here before the model changes, this clears out the ambient occulusion from the removed oxel
-				for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
-					if ( oldOxel.quads && oldOxel.quads[face] )
-						oldOxel.lighting.evaluateAmbientOcculusion( oldOxel, face, Lighting.AMBIENT_REMOVE );
-				}
-			}
-		}
-		
-		
 		// thisa finds the closest oxel, could be target oxel, could be parent
 		var changeCandidate:Oxel = childFind( $gc );
-		
-		//if ( changeCandidate.type != $type && !gc.is_equal( $gc ) )
 		if ( !changeCandidate.gc.is_equal( $gc ) )
 			// this gets the exact oxel we are looking for if it is different gc from returned oxel.
 			changeCandidate = changeCandidate.childGetOrCreate( $gc );
 			
 		if ( Globals.BAD_OXEL == changeCandidate ) {
 			Log.out( "Oxel.write - cant find child!", Log.ERROR );
-			return changeCandidate;
+			return false;
 		}
 		
-		if ( $type == changeCandidate.type && $gc.bound == changeCandidate.gc.bound && !changeCandidate.childrenHas() )
-			return changeCandidate;
+		if ( $newType == changeCandidate.type && $gc.bound == changeCandidate.gc.bound && !changeCandidate.childrenHas() )
+			return false;
+			
+		if ( !$onlyChangeType )
+			changeCandidate.removeOldLightInfo( $modelGuid )
 		
-		var result:Boolean;
-		if ( Globals.BAD_OXEL != changeCandidate ) {
-			changeCandidate.dirty = true;
-			result = true;
-			var typeInfo:TypeInfo = TypeInfo.typeInfo[$type];
-		
-			if ( typeInfo.flowable ) {
-				if ( null == changeCandidate.flowInfo ) { // if it doesnt have flow info, get some! This is from placement of flowable oxels
-					changeCandidate.flowInfo = FlowInfoPool.poolGet()
-				}
+		changeCandidate.dirty = true;
+		if ( !$onlyChangeType ) {
+			changeCandidate.applyNewLightInfo( $modelGuid, $newType )
+			changeCandidate.applyFlowInfo( $modelGuid, $newType )
+		}
+		changeCandidate.writeInternal( $modelGuid, $newType, $onlyChangeType );
+		return true
+	}
+
+	private function removeOldLightInfo( $modelGuid:String ):void {
+		if ( lighting ) {
+			var ti:TypeInfo = TypeInfo.typeInfo[type];
+			if ( ti.lightInfo.lightSource ) {
+				var oldLightID:uint = lighting.lightIDGet();
+				if ( 0 != oldLightID )
+					LightEvent.dispatch( new LightEvent( LightEvent.REMOVE, $modelGuid, gc, oldLightID ) );
+			}
 				
-				// When  
-				if ( !FlowInfo.validateData( changeCandidate.flowInfo.flowInfoRaw ) ) {
-					changeCandidate.flowInfo.copy( typeInfo.flowInfo )
+			if ( lighting.ambientOcculsionHas() ) {
+				// We have to do this here before the model changes, this clears out the ambient occulusion from the removed oxel
+				for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
+					if ( quads && quads[face] )
+						lighting.evaluateAmbientOcculusion( this, face, Lighting.AMBIENT_REMOVE );
 				}
+			}
+		}
+	}
+	
+	private function applyNewLightInfo( $modelGuid:String, $newType:int ):void {
+		var newTypeInfo:TypeInfo = TypeInfo.typeInfo[$newType];
+		if ( newTypeInfo.lightInfo.lightSource )
+			LightEvent.dispatch( new LightEvent( LightEvent.ADD, $modelGuid, gc, Math.random() * 0xffffffff ) );
+			
+		if ( TypeInfo.isSolid( type ) && TypeInfo.hasAlpha( $newType ) ) {
+			// we removed a solid block, and are replacing it with air or transparent
+			if ( lighting && lighting.valuesHas() )
+				LightEvent.dispatch( new LightEvent( LightEvent.SOLID_TO_ALPHA, $modelGuid, gc ) );
+		} 
+		else if ( TypeInfo.isSolid( $newType ) && TypeInfo.hasAlpha( type ) ) {
+			// we added a solid block, and are replacing the transparent block that was there
+			if ( lighting && lighting.valuesHas() )
+				LightEvent.dispatch( new LightEvent( LightEvent.ALPHA_TO_SOLID, $modelGuid, gc ) );
+		}
+	}
+	
+	private function applyFlowInfo( $modelGuid:String, $newType:int ):void {
+			// at this point the target oxel should either have valid flowInfo from the oxel it came from
+			// or it was just placed, in which case it should have invalid info, and then
+			// reference data is copied over it.
+			var newTypeInfo:TypeInfo = TypeInfo.typeInfo[$newType];
+			if ( newTypeInfo.flowable ) {
 				
-				if ( FlowInfo.FLOW_TYPE_UNDEFINED == changeCandidate.flowInfo.type	)
-					changeCandidate.flowInfo.type = typeInfo.flowInfo.type
-					
-				if ( !FlowInfo.validateData( changeCandidate.flowInfo.flowInfoRaw ) ) {
-					changeCandidate.flowInfo.copy( typeInfo.flowInfo )
-				}
+				addFlowTask( $modelGuid, newTypeInfo )
 				
 				var neighborAbove:Oxel = neighbor( Globals.POSY );
 				if ( Globals.BAD_OXEL == neighborAbove || TypeInfo.AIR == neighborAbove.type )
-					FlowScaling.scaleTopFlowFace( changeCandidate )
-				
-				if ( Globals.autoFlow  )
-					Flow.addTask( $modelGuid, changeCandidate.gc, $type, changeCandidate.flowInfo.flowInfoRaw, 1 );
-
+					FlowScaling.scaleTopFlowFace( this )
 			}
-			else {
-				if ( changeCandidate.flowInfo )
-					changeCandidate.flowInfo.reset()  // If it has flow info, reset it
-			}
-				
-			if ( oldTypeInfo.lightInfo.lightSource )
-				LightEvent.dispatch( new LightEvent( LightEvent.REMOVE, $modelGuid, $gc, oldLightID ) );
-			if ( typeInfo.lightInfo.lightSource )
-				LightEvent.dispatch( new LightEvent( LightEvent.ADD, $modelGuid, $gc, Math.random() * 0xffffffff ) );
-			
-			if ( TypeInfo.isSolid( oldType ) && TypeInfo.hasAlpha( $type ) ) {
-				// we removed a solid block, and are replacing it with air or transparent
-				if ( changeCandidate.lighting && changeCandidate.lighting.valuesHas() )
-					LightEvent.dispatch( new LightEvent( LightEvent.SOLID_TO_ALPHA, $modelGuid, changeCandidate.gc ) );
-			} 
-			else if ( TypeInfo.isSolid( $type ) && TypeInfo.hasAlpha( oldType ) ) {
-				
-				// we added a solid block, and are replacing the transparent block that was there
-				if ( changeCandidate.lighting && changeCandidate.lighting.valuesHas() )
-					LightEvent.dispatch( new LightEvent( LightEvent.ALPHA_TO_SOLID, $modelGuid, changeCandidate.gc ) );
-			}
-			
-			changeCandidate.writeInternal( $modelGuid, $type, $onlyChangeType );
-		}
+			else
+				if ( flowInfo )
+					flowInfo.reset()
+	}
+	
+	private function addFlowTask( $modelGuid:String, $newTypeInfo:TypeInfo ):void {
+		if ( null == flowInfo ) // if it doesnt have flow info, get some! This is from placement of flowable oxels
+			flowInfo = FlowInfoPool.poolGet()
 		
-		return result;
+		if ( FlowInfo.FLOW_TYPE_UNDEFINED == flowInfo.type )
+			flowInfo.copy( $newTypeInfo.flowInfo )
+		
+		if ( Globals.autoFlow ) {
+			var priority:int = 1
+			if ( Globals.isHorizontalDirection( flowInfo.direction ) )
+				priority = 3
+			Flow.addTask( $modelGuid, gc, $newTypeInfo.type, priority )
+		}
 	}
 } // end of class Oxel
 } // end of package

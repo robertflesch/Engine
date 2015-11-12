@@ -9,12 +9,12 @@
 package com.voxelengine.worldmodel.tasks.flowtasks
 {
 	import com.developmentarc.core.tasks.tasks.AbstractTask;
-	import com.voxelengine.Globals;
-	import com.voxelengine.worldmodel.oxel.Oxel;
 	
+	import com.voxelengine.Globals;
 	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.worldmodel.oxel.FlowInfo;
+	import com.voxelengine.worldmodel.oxel.Oxel;
 	
 	// * @author Robert Flesch
 	public class FlowTask extends AbstractTask 
@@ -25,7 +25,6 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		protected var _gc:GrainCursor;
 		protected var _type:int;
 		protected var _ready:Boolean = false;
-		protected var _flowInfoRaw:uint;
 		
 		public static const TASK_TYPE:String = "FLOW_TASK";
         public static const TASK_PRIORITY:int = 1;
@@ -49,8 +48,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			// so find the address we want, then getChild on that oxel. Which causes the oxel to break up if needed.
 			gct.copyFrom( flowOxel.gc );
 			// move cursor to oxel we want.
-			_s_flowInfo.flowInfoRaw = _flowInfoRaw
-			gct.move( _s_flowInfo.direction );
+//			_s_flowInfo.flowInfoRaw = _flowInfoRaw
+//			gct.move( _s_flowInfo.direction );
 			// now get the possibly reduced oxel we want.
 			flowIntoTarget = flowIntoNeighbor.childGetOrCreate( gct );
 			GrainCursorPool.poolDispose( gct );
@@ -70,7 +69,6 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			if ( _gc )
 				output += "  gc: " + _gc.toString()
 			output += "  type: " + _type
-			output += "  _flowInfoRaw: " + _flowInfoRaw
 			return output
 		}
 

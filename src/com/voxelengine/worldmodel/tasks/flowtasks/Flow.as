@@ -35,7 +35,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	 */
 	public class Flow extends FlowTask 
 	{		
-		static public function addTask( $modelGuid:String, $gc:GrainCursor, $type:int, $flowInfoRaw:uint, $taskPriority:int ):void {
+		static public function addTask( $modelGuid:String, $gc:GrainCursor, $type:int, $taskPriority:int ):void {
 			if ( null == $modelGuid || "" == $modelGuid ) {
 				Log.out( "Flow.addTask - cant add task for null or empty model guid", Log.WARN );
 				return
@@ -44,16 +44,12 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				Log.out( "Flow.addTask - adding task for non flowable type: " + $type, Log.WARN );
 				return
 			}
-			if ( 0 == ( ($flowInfoRaw & 0x000f0000) >> 16  ) ) {
-				Log.out( "Flow.addTask - NO FLOW TYPE FOUND", Log.WARN );
-			}
-			var f:Flow = new Flow( $modelGuid, $gc, $type, $flowInfoRaw, $gc.toID(), $taskPriority );
+			var f:Flow = new Flow( $modelGuid, $gc, $type, $gc.toID(), $taskPriority );
 			f.selfOverride = true;
 			Globals.g_flowTaskController.addTask( f );
 		}
 		
-		public function Flow( $modelGuid:String, $gc:GrainCursor, $type:int, $flowInfoRaw:int, $taskType:String, $taskPriority:int ):void {
-			_flowInfoRaw = $flowInfoRaw;
+		public function Flow( $modelGuid:String, $gc:GrainCursor, $type:int, $taskType:String, $taskPriority:int ):void {
 			super( $modelGuid, $gc, $type, $taskType, $taskPriority );
 			Log.out( "Flow.create flow: " + toString() );
 			
@@ -80,15 +76,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					return;
 				if ( null == $flowFromOxel.flowInfo  )
 					return;
-				if ( !FlowInfo.validateData( _flowInfoRaw )	) {
-					Log.out( "Flow.start - _flowInfoRaw - flow data invalid", Log.WARN );
-					return; }
-				if ( !FlowInfo.validateData( $flowFromOxel.flowInfo.flowInfoRaw )	) {
-
-					Log.out( "Flow.start - $flowFromOxel.flowInfo.flowInfoRaw - flow data invalid", Log.WARN );
-					return; }
 				
-				var flowType:uint = FlowInfo.getFlowType( _flowInfoRaw );
+				var flowType:uint = $flowFromOxel.flowInfo.type
 				//Log.out( "Flow.start - flowable oxel of type: " + ft );
 				if ( FlowInfo.FLOW_TYPE_CONTINUOUS == flowType )
 					flowStartContinous($flowFromOxel);
@@ -216,8 +205,11 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		}
 		
 		private function flowTasksAdd( $fc:Vector.<FlowCandidate>, $upOrDown:Boolean, $flowInfo:FlowInfo ):void {
-			for each ( var flowTest:FlowCandidate in $fc )
-			{
+			for each ( var flowTest:FlowCandidate in $fc ) {
+				const stepSize:int = ( flowTest.flowCandidate.gc.size() / Globals.UNITS_PER_METER) * 4
+				if ( !$upOrDown && $flowInfo.flowScaling.min() < stepSize/4 )
+					continue
+				
 				//Log.out( "Oxel.flowTaskAdd - $count: " + $countDown + "  countOut: " + $countOut + " gc data: " + flowCanditate.gc.toString() + " tasks: " + (Globals.g_flowTaskController.queueSize() + 1) );
 				var	taskPriority:int = 3;
 				if ( $upOrDown )
@@ -227,40 +219,35 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				if (  null == flowTest.flowCandidate.flowInfo )
 					flowTest.flowCandidate.flowInfo = FlowInfoPool.poolGet()
 
+				// now set the flowInfo in the flowCandidate, which will be using in the changeOxel
 				var fi:FlowInfo = flowTest.flowCandidate.flowInfo
 				fi.copy( $flowInfo )
-				fi.directionSetAndDecrement( flowTest.dir, flowTest.flowCandidate.gc.size() )
+				fi.directionSetAndDecrement( flowTest.dir, stepSize )
 				if ( 0 == fi.down )
 					continue
 				else if ( $upOrDown )
 					flowTest.flowCandidate.flowInfo.flowScaling.reset()
 					
 				Log.out( "Flow.flowTasksAdd fi.out" + fi.out + "  fi.flowScaling.min " + fi.flowScaling.min )
-				if ( 0 == fi.flowScaling.min() )
-					continue
 					
 				writeFlowTypeAndScaleNeighbors( flowTest.flowCandidate )
-				Flow.addTask( _guid, flowTest.flowCandidate.gc, type, fi.flowInfoRaw, taskPriority + 1 )
+				Flow.addTask( _guid, flowTest.flowCandidate.gc, type, taskPriority + 1 )
 			}
 		}
 		
 		private const MIN_FLOW_GRAIN:int = 2;
 		private function canFlowInto( flowOxel:Oxel, $face:int, $fc:Vector.<FlowCandidate> ):Boolean {
 		
-			var co:Oxel = flowOxel.neighbor($face);
+			var no:Oxel = flowOxel.neighbor($face);
 			var partial:Boolean = false;
-			var ft:FlowCandidate = null;
-			if ( Globals.BAD_OXEL != co && co.gc && co.gc.grain >= MIN_FLOW_GRAIN )
+			if ( Globals.BAD_OXEL != no && no.gc && no.gc.grain >= MIN_FLOW_GRAIN )
 			{
 				// if our neighbor is air, just flow into it.o
-				if ( co.type == TypeInfo.AIR && !co.childrenHas() ) {
+				if ( no.type == TypeInfo.AIR && !no.childrenHas() ) {
 					// Our neighbor oxel might be larger then this oxel
 					// in which case just ask for oxel of same size
-					if ( co.gc.grain == flowOxel.gc.grain ) {
-						ft = new FlowCandidate();
-						ft.dir = $face;
-						ft.flowCandidate = co;
-						$fc.push( ft );
+					if ( no.gc.grain == flowOxel.gc.grain ) {
+						$fc.push( new FlowCandidate( $face, no ) );
 					}
 					else {
 						// neighbor might be larger, never smaller
@@ -268,81 +255,77 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 						gct.copyFrom( flowOxel.gc );
 						gct.move( $face );
 						// getChild will crack the neighbor, if neighbor was larger to start
-						var crackedOxel:Oxel = co.childGetOrCreate( gct );
+						var crackedOxel:Oxel = no.childGetOrCreate( gct );
 						GrainCursorPool.poolDispose( gct );
 						if ( Globals.BAD_OXEL != crackedOxel )
-						{
-							ft = new FlowCandidate();
-							ft.dir = $face;
-							ft.flowCandidate = crackedOxel;
-							$fc.push( ft );
-						}
+							$fc.push( new FlowCandidate( $face, crackedOxel ) );
 					}
 				}
 				// if the neighbor is a flowable type, look up its interaction with that type
-				else if ( TypeInfo.typeInfo[co.type].flowable ) {
-					if ( co.type != type ) {
-						//Log.out( "Oxel.flowable - 2 Different flow types here! getting IP for: " + Globals.Info[type].name + "  with " + Globals.Info[co.type].name );
+				else if ( TypeInfo.typeInfo[no.type].flowable ) {
+					if ( no.type != type ) {
+						//Log.out( "Oxel.flowable - 2 Different flow types here! getting IP for: " + Globals.Info[type].name + "  with " + Globals.Info[no.type].name );
 						
-						var ip:InteractionParams = TypeInfo.typeInfo[type].interactions.IOGet( TypeInfo.typeInfo[co.type].name );
+						var ip:InteractionParams = TypeInfo.typeInfo[type].interactions.IOGet( TypeInfo.typeInfo[no.type].name );
 						var writeType:int = TypeInfo.getTypeId( ip.type );
 						if ( type != writeType ) {
 							if ( TypeInfo.typeInfo[writeType].flowable ) {
 								// if write type is same as flow type, add it.
-								if ( type == writeType ) {
-									ft = new FlowCandidate();
-									ft.dir = $face;
-									ft.flowCandidate = co;
-									$fc.push( ft );
-								}
+								if ( type == writeType )
+									$fc.push( new FlowCandidate( $face, no ) );
 							}
 							else {
 								// changed types are not flowable
-								co.write( _guid, co.gc, writeType, false );
-								//scale( co )
+								no.write( _guid, no.gc, writeType, false );
+								//scale( no )
 							}
 						}
 					}
-					else
-					{
-						//Log.out( "Oxel.flowable - ALREADY " + Globals.Info[co.type].name + " here" );
-						if ( TypeInfo.getTypeId( "floatium" ) == co.type ) {
+					else {
+						//Log.out( "Oxel.flowable - ALREADY " + Globals.Info[no.type].name + " here" );
+						if ( TypeInfo.getTypeId( "floatium" ) == no.type ) {
 							// there is floatium above us, we should not flow out.
 							if ( Globals.POSY == $face )
 								partial = true;
 						}
 						else {
-							// there is water below us, we should not flow out.
+							// there is water or lava or any other flowable type that is the same below us, we should not flow out.
 							if ( Globals.NEGY == $face )
 								partial = true;
 						}
 					}
 				}
-				else if ( co.childrenHas() ) {
-					const dchildren:Vector.<Oxel> = co.childrenForDirection( Oxel.face_get_opposite( $face ) );
-					for each ( var dchild:Oxel in dchildren )  {
-						if ( TypeInfo.AIR == dchild.type ) {
-							if ( TypeInfo.getTypeId( "floatium" ) == type ) {
-								ft = new FlowCandidate();
-								ft.dir = $face;
-								ft.flowCandidate = dchild;
-								$fc.push( ft );
-								partial = true;
-								
-							}
-							else if ( flowOxel.gc.grainY == dchild.gc.grainY && flowOxel.gc.grain == dchild.gc.grain ) {
-								ft = new FlowCandidate();
-								ft.dir = $face;
-								ft.flowCandidate = dchild;
-								$fc.push( ft );
-								partial = true;
-							}
-						}
-							
-					}
+				else if ( no.childrenHas() ) {
+					attemptFlowIntoChildren( no, $face, $fc )
 				}
 			}
 			return partial;
+		}
+		
+		private function attemptFlowIntoChildren( $no:Oxel, $face:int, $fc:Vector.<FlowCandidate> ):Boolean {
+			// 
+			if ( MIN_FLOW_GRAIN + 1 > $no.gc.grain )
+				return false
+				
+			var partial:Boolean = false;
+			const dchildren:Vector.<Oxel> = $no.childrenForDirection( Oxel.face_get_opposite( $face ) );
+			for each ( var dchild:Oxel in dchildren )  {
+				if ( TypeInfo.AIR == dchild.type && !dchild.childrenHas() ) {
+					if ( TypeInfo.getTypeId( "floatium" ) == type ) {
+						$fc.push( new FlowCandidate( $face, dchild ) );
+						partial = true;
+					}
+					// what was this if statement here?
+					else { //if ( flowOxel.gc.grainY == dchild.gc.grainY && flowOxel.gc.grain == dchild.gc.grain ) {
+						$fc.push( new FlowCandidate( $face, dchild ) );
+						partial = true;
+					}
+				}
+				else if ( TypeInfo.AIR == dchild.type && dchild.childrenHas() ) {
+					partial = attemptFlowIntoChildren( dchild, $face, $fc )
+				}
+			}
+			return partial
 		}
 		/*
 		static private const FLOW_NO_FACE_FOUND:int = -1;
@@ -370,4 +353,9 @@ internal class FlowCandidate
 {
 	public var flowCandidate:Oxel = null;
 	public var dir:int = Globals.ALL_DIRS;
+	
+	public function FlowCandidate( $dir:int, $fc:Oxel ) {
+		dir = $dir
+		flowCandidate = $fc
+	}
 }
