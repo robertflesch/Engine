@@ -81,6 +81,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				var flowIntoTarget:Oxel = null;
 				if ( Globals.BAD_OXEL != flowIntoNeighbor && TypeInfo.AIR == flowIntoNeighbor.type )
 				{
+					//childGetOrCreate
 					flowIntoTarget = neighborGetOrCreate( flowOxel, flowIntoNeighbor );
 					if ( Globals.BAD_OXEL != flowIntoTarget && TypeInfo.AIR == flowIntoTarget.type )
 					{

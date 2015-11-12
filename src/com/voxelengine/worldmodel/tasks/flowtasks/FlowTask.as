@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 {
 	import com.developmentarc.core.tasks.tasks.AbstractTask;
 	
+	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
@@ -42,6 +43,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		}
 
 		protected function neighborGetOrCreate( flowOxel:Oxel, flowIntoNeighbor:Oxel ):Oxel {
+			Log.out( "FlowTask.neighborGetOrCreate - REFACTOR", Log.WARN )
 			var flowIntoTarget:Oxel = null;
 			var gct:GrainCursor = GrainCursorPool.poolGet( flowOxel.gc.bound );
 			// this is oxel next to the one we want, but the flowIntoNeighbor might be a larger grain.
