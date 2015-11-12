@@ -36,6 +36,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	public class Flow extends FlowTask 
 	{		
 		static public function addTask( $modelGuid:String, $gc:GrainCursor, $type:int, $taskPriority:int ):void {
+			// http://jacksondunstan.com/articles/2439 for a better assert
 			if ( null == $modelGuid || "" == $modelGuid ) {
 				Log.out( "Flow.addTask - cant add task for null or empty model guid", Log.WARN );
 				return
@@ -51,9 +52,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		
 		public function Flow( $modelGuid:String, $gc:GrainCursor, $type:int, $taskType:String, $taskPriority:int ):void {
 			super( $modelGuid, $gc, $type, $taskType, $taskPriority );
-			Log.out( "Flow.create flow: " + toString() );
-			
-			var spreadInterval:int = TypeInfo.typeInfo[$type].spreadInterval
+			//Log.out( "Flow.create flow: " + toString() );
+			var spreadInterval:int = TypeInfo.typeInfo[$type].spreadInterval // How fast this type spreads
 			var pt:Timer = new Timer( spreadInterval, 1 );
 			pt.addEventListener(TimerEvent.TIMER, timeout );
 			pt.start();
@@ -176,9 +176,9 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			// if there is water below us, dont do anything
 			if ( 0 == flowCandidates.length && partial )
 				return;
+				
 			// if we found a down/up, add that as a priority
-			else if ( 0 < flowCandidates.length )
-			{
+			else if ( 0 < flowCandidates.length ) {
 				flowTasksAdd( flowCandidates, true, $flowFromOxel.flowInfo );
 				// if we only went partially down, try the sides	
 				if ( false == partial )
@@ -188,8 +188,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			}
 				
 			// no downs found, so check outs
-			if ( 0 == flowCandidates.length )
-			{
+			if ( 0 == flowCandidates.length ) {
 				// check sides once
 				canFlowInto( $flowFromOxel, Globals.POSX, flowCandidates );
 				canFlowInto( $flowFromOxel, Globals.NEGX, flowCandidates );
@@ -197,10 +196,10 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				canFlowInto( $flowFromOxel, Globals.NEGZ, flowCandidates );
 				if ( 0 < flowCandidates.length ) {
 					flowTasksAdd( flowCandidates, false, $flowFromOxel.flowInfo );
-					Log.out( "Flow.flowStartContinous adding: " + flowCandidates.length + " new flows" )
+					//Log.out( "Flow.flowStartContinous adding: " + flowCandidates.length + " new flows" )
 					return
 				}
-				Log.out( "Flow.flowStartContinous NO new flows found" )
+//				Log.out( "Flow.flowStartContinous NO new flows found" )
 			}
 		}
 		
@@ -215,7 +214,6 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				if ( $upOrDown )
 					taskPriority = 1;
 				
-				// why no flow info?
 				if (  null == flowTest.flowCandidate.flowInfo )
 					flowTest.flowCandidate.flowInfo = FlowInfoPool.poolGet()
 
@@ -228,7 +226,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				else if ( $upOrDown )
 					flowTest.flowCandidate.flowInfo.flowScaling.reset()
 					
-				Log.out( "Flow.flowTasksAdd fi.out" + fi.out + "  fi.flowScaling.min " + fi.flowScaling.min )
+				Log.out( "Flow.flowTasksAdd fi.type: " + fi.type + "  fi.out" + fi.out + "  fi.flowScaling.min " + fi.flowScaling.min() )
 					
 				writeFlowTypeAndScaleNeighbors( flowTest.flowCandidate )
 				Flow.addTask( _guid, flowTest.flowCandidate.gc, type, taskPriority + 1 )

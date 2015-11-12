@@ -229,14 +229,6 @@ public class Oxel extends OxelBitfields
 		
 		// Since this is from byteArray, I dont need to perform operations on the chunks.
 		super.dirty = true;
-		
-		if ( TypeInfo.flowable( type ) )
-		{
-			if ( $parent && $parent.flowInfo )
-				flowInfo = $parent.flowInfo.clone( true, null );
-			else
-				flowInfo = TypeInfo.typeInfo[type].flowInfo.clone( false, null );
-		}
 	}
 	
 
@@ -619,22 +611,11 @@ public class Oxel extends OxelBitfields
 	public function childrenCreate( $invalidateNeighbors:Boolean = true ):void {
 		if ( childrenHas() )
 		   return;
-
 		//trace( "childrenCreate to grain: " + gc.grain+ " (" + gc.size() + ") to grain: " + (gc.grain- 1) + );
-		_children = ChildOxelPool.poolGet();
-		var gct:GrainCursor = GrainCursorPool.poolGet(root_get().gc.bound );
-		facesClearAll();
-
-		var min:uint
-		var max:uint
-		if ( _flowInfo && _flowInfo.flowScaling.has() ) {
-			min	 = _flowInfo.flowScaling.min()
-			max	 = _flowInfo.flowScaling.max()
-		}
 		
-		Log.out( "FlowScaling.childGetScale - parent oxel flowScaling: " + toString(), Log.WARN )
-		for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
-		{
+		var gct:GrainCursor = GrainCursorPool.poolGet(root_get().gc.bound );
+		_children = ChildOxelPool.poolGet();
+		for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ ) {
 			_children[i]  = OxelPool.poolGet();
 			gct.copyFrom( gc );
 			gct.become_child( i );   
@@ -644,21 +625,22 @@ public class Oxel extends OxelBitfields
 			//super.facesMarkAllDirty();
 			_children[i].facesMarkAllDirty();
 			
-			if ( _lighting )
-			{
+			if ( _lighting ) {
 				_children[i].lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
 				lighting.childGetAllLights( gct.childId(), _children[i].lighting );
 				// child should attenuate light at same rate.
 				_children[i].lighting.materialFallOffFactor = lighting.materialFallOffFactor;
 				_children[i].lighting.color = lighting.color;
 			}
+			
 			// Special case for grass, leave upper oxels as grass.
 			if ( TypeInfo.GRASS == type && ( 0 == gct.grainY % 2 ) )
 				_children[i].type = TypeInfo.DIRT;
 			
 			if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				// now we need to distribute the scaling out to the resultant oxels
-				flowInfo.flowScaling.childGetScale( _children[i], min, max )
+				flowInfo.childGet( _children[i] )
+				//Log.out( "broken child flow info: " + _children[i].flowInfo.toString(), Log.WARN )
 			}
 		}
 
@@ -666,6 +648,7 @@ public class Oxel extends OxelBitfields
 		// Dont do this when generating terrain
 		if ( $invalidateNeighbors )
 			this.neighborsInvalidate();
+		facesClearAll();
 		this.type = TypeInfo.AIR;
 		this.dirty = true;
 

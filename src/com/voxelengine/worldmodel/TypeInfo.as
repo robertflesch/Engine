@@ -141,7 +141,7 @@ package com.voxelengine.worldmodel
 		private var _interactions:Interactions 	= null;
 		
 		private var _flowable:Boolean 			= false;
-		private var _flowInfo:FlowInfo 			= null;
+		private var _flowInfo:FlowInfo 			= FlowInfoPool.poolGet()
 		private var _flowScalable:Boolean		= true;
 		
 		private var _lightInfo:Light  			= new Light();
@@ -383,7 +383,6 @@ package com.voxelengine.worldmodel
 			if ( $json.flowable )
 			{
 				_flowable = true;
-				_flowInfo = FlowInfoPool.poolGet();
 				_flowInfo.fromJson( $json.flowable );
 				if ( $json.flowable[3] )
 					_spreadInterval = $json.flowable[3]
@@ -393,7 +392,6 @@ package com.voxelengine.worldmodel
 			else
 			{
 				_flowable = false;
-				_flowInfo = FlowInfoPool.poolGet()
 			}
 
 			if ( $json.flammable )

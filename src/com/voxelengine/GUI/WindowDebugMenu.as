@@ -92,16 +92,13 @@ package com.voxelengine.GUI
 			addInt( "Remaining:", GrainCursorPool.remaining );
 			addSpace();
 				
-			addInt( "Used OxelPool:", OxelPool.totalUsed );
-			addInt( "Remaining:", OxelPool.remaining );
-			addSpace();
-			
 			addInt( "Used QuadPool:", QuadPool.totalUsed );
 			addInt( "QuadPool:", QuadPool.remaining );
 			addSpace();
 			
 			addInt( "Used ParticlePool:", ParticlePool.totalUsed );
 			addInt( "ParticlePool:", ParticlePool.remaining );
+			addSpace();
 			addSpace();
 
 			//addInt( "Used ProjectilePool:", ProjectilePool.totalUsed );
@@ -112,6 +109,7 @@ package com.voxelengine.GUI
 			addInt( "Flow Tasks:", Globals.g_flowTaskController.queueSize );
 			addInt( "Light Tasks:", Globals.g_lightTaskController.queueSize );
 			addSpace();
+			addSpace();
 			
 			addString( "selected model:", null );
 
@@ -121,7 +119,7 @@ package com.voxelengine.GUI
 			
 			//addStaticMemoryNumberDisplay( _target, 100, 0, "           Total Voxels: ", Quad.count );
 			
-			display( 0, 240 )	
+			display( 0, 250 )	
 			onResize( null )
 			
 			AppEvent.addListener( AppEvent.INTERNAL_ENTER_FRAME, onEnterFrame )

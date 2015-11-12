@@ -302,21 +302,16 @@ public class FlowScaling
 	 * 
 	 */	
 	// creates a virtual brightness(light) the light from a parent to a child brightness with all lights
-	public function childGetScale( $child:Oxel, min:uint, max:uint ):void {
-
-		
-		// how this is set depends on the out level, and way I am doing out doesnt work
-		// plus I have to take into account the top scaling on water and lava
-		
+	public function childGetScaleAndType( $child:Oxel ):void {
 		// so evaluate scaling of parent
 		// remember that scaling is relative to the size of the oxel
-		// if min is greater then 8 then we have all same type oxels
+		// and that some of the oxel might become AIR if scaling is low.
 		
 		var childID:uint = $child.gc.childId()
 		var childFS:FlowScaling = $child.flowInfo.flowScaling
 		// I think the diagonals should be averaged between both corners
 		if ( 0 == childID ) { // b000
-			childFS.NxNz = Math.min( 15, (NxNz * 2) )
+			childFS.NxNz = Math.min( 15, (NxNz * 2 + 1) )
 			childFS.PxNz = Math.min( 15, (NxNz + PxNz) )
 			childFS.PxPz = Math.min( 15, (NxNz + PxPz) )
 			childFS.NxPz = Math.min( 15, (NxPz + NxNz) )
@@ -328,7 +323,7 @@ public class FlowScaling
 			childFS.NxPz = Math.min( 15, (NxNz + PxPz) )
 		}
 		else if ( 2 == childID )	{ // b010
-			childFS.NxNz = Math.max( 0, ((NxNz - 8) * 2) )
+			childFS.NxNz = Math.max( 0, ((NxNz - 8) * 2 + 1) )
 			childFS.PxNz = Math.max( 0, (NxNz + PxNz - 15) )
 			childFS.PxPz = Math.max( 0, (NxNz + PxPz - 15) )
 			childFS.NxPz = Math.max( 0, (NxPz + NxNz - 15) )
@@ -337,7 +332,7 @@ public class FlowScaling
 		}
 		else if ( 3 == childID ) { // b110
 			childFS.NxNz = Math.max( 0, (NxNz + PxNz - 15) )
-			childFS.PxNz = Math.max( 0, ((PxNz - 8) * 2) )
+			childFS.PxNz = Math.max( 0, ((PxNz - 8) * 2 + 1) )
 			childFS.PxPz = Math.max( 0, (PxNz + PxPz - 15) )
 			childFS.NxPz = Math.max( 0, (NxNz + PxPz - 15) )
 			if ( 0 == childFS.max() )
@@ -347,26 +342,26 @@ public class FlowScaling
 			childFS.NxNz = Math.min( 15, (NxNz + NxPz) )
 			childFS.PxNz = Math.min( 15, (NxNz + PxPz) )
 			childFS.PxPz = Math.min( 15, (NxPz + PxPz) )
-			childFS.NxPz = Math.min( 15, (NxPz  * 2) )
+			childFS.NxPz = Math.min( 15, (NxPz  * 2 + 1) )
 		}
 		else if ( 5 == childID )	{ // b101
 			childFS.NxNz = Math.min( 15, (NxNz + PxPz) )
 			childFS.PxNz = Math.min( 15, (PxNz + PxPz) )
-			childFS.PxPz = Math.min( 15, (PxPz * 2) )
+			childFS.PxPz = Math.min( 15, (PxPz * 2 + 1) )
 			childFS.NxPz = Math.min( 15, (NxPz + PxPz) )
 		}
 		else if ( 6 == childID )	{ // b011
 			childFS.NxNz = Math.max( 0, (NxNz + NxPz - 15) )
 			childFS.PxNz = Math.max( 0, (NxNz + PxPz - 15) )
 			childFS.PxPz = Math.max( 0, (NxPz + PxPz - 15) )
-			childFS.NxPz = Math.max( 0, ((NxPz - 8)  * 2) )
+			childFS.NxPz = Math.max( 0, ((NxPz - 8)  * 2 + 1) )
 			if ( 0 == childFS.max() )
 				$child.type = TypeInfo.AIR
 		}
 		else if ( 7 == childID )	{ // b111
 			childFS.NxNz = Math.max( 0, (NxNz + PxPz - 15) )
 			childFS.PxNz = Math.max( 0, (PxNz + PxPz - 15) )
-			childFS.PxPz = Math.max( 0, ((PxPz - 8) * 2) )
+			childFS.PxPz = Math.max( 0, ((PxPz - 8) * 2 + 1) )
 			childFS.NxPz = Math.max( 0, (NxPz + PxPz - 15) )
 			if ( 0 == childFS.max() )
 				$child.type = TypeInfo.AIR

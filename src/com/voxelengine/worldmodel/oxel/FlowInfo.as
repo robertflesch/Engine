@@ -18,8 +18,6 @@ package com.voxelengine.worldmodel.oxel
  */
 public class FlowInfo
 {
-	private static const DEFAULT:uint 						= 0x006288ff;
-	
 	private static const FLOW_DOWN:uint 					= 0x000000ff;
 	private static const FLOW_DOWN_MASK:uint 				= 0xffffff00;
 	private static const FLOW_OUT:uint 						= 0x0000ff00;
@@ -60,69 +58,90 @@ public class FlowInfo
 	private var _flowScaling:FlowScaling					= new FlowScaling();
 	
 	public 	function get out():int { return (_data & FLOW_OUT) >> FLOW_OUT_OFFSET; }
-	public 	function set out($val:int):void { $val = $val << FLOW_OUT_OFFSET;  _data &= FLOW_OUT_MASK; _data = $val | _data; }
+	public 	function set out($val:int):void { $val = $val << FLOW_OUT_OFFSET;  _data &= FLOW_OUT_MASK; _data |= $val; tempCheckFlowType() }
+	
 	public 	function get outRef():int { return (_data & FLOW_OUT_REF ) >> FLOW_OUT_REF_OFFSET; }
-	public	function set outRef($val:int):void { $val = $val << FLOW_OUT_REF_OFFSET;  _data &= FLOW_OUT_REF_MASK; _data = $val | _data; }
+	private	function     outRefSet($val:int):void { $val = $val << FLOW_OUT_REF_OFFSET;  _data &= FLOW_OUT_REF_MASK; _data |= $val;	}
 	
 	public 	function get down():int { return (_data & FLOW_DOWN) >> FLOW_DOWN_OFFSET; }
-	public 	function set down($val:int):void { $val = $val << FLOW_DOWN_OFFSET; _data &= FLOW_DOWN_MASK; _data = $val | _data; }
+	public 	function set down($val:int):void { $val = $val << FLOW_DOWN_OFFSET; _data &= FLOW_DOWN_MASK; _data |= $val; tempCheckFlowType()	 }
 	
 	public 	function get type():int { return (_data & FLOW_FLOW_TYPE) >> FLOW_TYPE_OFFSET; }
 	public 	function set type($val:int):void { 
 		$val = $val << FLOW_TYPE_OFFSET;
 		_data &= FLOW_FLOW_TYPE_MASK;
 		_data = $val | _data; 
-		if ( 0 == ( _data & FLOW_FLOW_TYPE_MASK  ) )
-			Log.out( "FlowInfo.type - set to 0", Log.WARN )
+		tempCheckFlowType()	
+	}
+	
+	private function tempCheckFlowType():void {
+		if ( 3 == ( _data & FLOW_FLOW_TYPE_MASK  ) )
+			Log.out( "FlowInfo.tempCheckFlowType - CONTINUOUS", Log.WARN )
 	}
 	
 	public function isSource():Boolean { return outRef == out }
-	public static function getFlowType( $data:uint ):uint { return ($data & FLOW_FLOW_TYPE) >> FLOW_TYPE_OFFSET; }
-	//public static function validateData( $data:uint ):Boolean { 
-		//// Flow out can be 0, if this is a last oxel, and we cut below it.
-		////if ( 0 == ($data & FLOW_OUT) >> FLOW_OUT_OFFSET ) {
-			////Log.out( "FlowInfo.validateData - FLOW_OUT is 0", Log.WARN )	
-			////return false }
-		//// else
-		//if ( 0 ==  ($data & FLOW_DOWN) >> FLOW_DOWN_OFFSET ) {
-			//Log.out( "FlowInfo.validateData - FLOW_DOWN is 0", Log.WARN )	
-			//return false }
-		//else if ( 0 == ($data & FLOW_FLOW_TYPE) >> FLOW_TYPE_OFFSET ) {
-			//Log.out( "FlowInfo.validateData - FLOW_FLOW_TYPE is 0", Log.WARN )	
-			//return false }
-		//return true
-	//}
 
 	public 	function get direction():int { return (_data & FLOW_FLOW_DIR) >> FLOW_DIR_OFFSET; }
 	public 	function set direction( $val:int ):void  { 
 		$val = $val << FLOW_DIR_OFFSET;
 		_data &= FLOW_FLOW_DIR_MASK;
 		_data = $val | _data;
+		tempCheckFlowType()			
 	}
 	
-	public 	function directionSetAndDecrement( $val:int, $oxelSize:uint ):void  { 
+	// This should really only be used by the flowInfoPool
+	public function FlowInfo():void {
+		_data = 0
+	}
+	
+	public function childGet( $child:Oxel ):void {
+		$child.flowInfo = FlowInfoPool.poolGet()
+		$child.flowInfo.copyToChild( this )
+		_flowScaling.childGetScaleAndType( $child )
+	}
+
+	public function copyToChild( $rhs:FlowInfo ):void {
+		type = $rhs.type
+		outRefSet( $rhs.outRef )
+		out = $rhs.out
+		down = $rhs.down
+		direction = $rhs.direction
+
+		// if its top grain, reduce down by half of unit value
+		// need to do for out too, screw it!
+		//if ( $child.gc.grainY % 2 )
+		//	downInc( $child.gc.size() / Globals.UNITS_PER_METER) * 2 )
+	}
+	
+	public function copy( $rhs:FlowInfo ):void {
+		_data = $rhs._data
+		tempCheckFlowType()	
+		flowScaling.copy( $rhs.flowScaling )
+	}
+		
+	public 	function directionSetAndDecrement( $val:int, $stepSize:uint ):void  { 
 		direction = $val
 		
 		if ( Globals.ALL_DIRS == direction )
 			return;
 		else if ( Globals.POSY == direction || Globals.NEGY == direction ) {
 			if ( 0 < down ) {
-				if ( down < ($oxelSize / Globals.UNITS_PER_METER) * 4 )
+				if ( down < $stepSize )
 					down = 0
 				else	
-					downDec( ($oxelSize / Globals.UNITS_PER_METER) * 4 );
+					downDec( $stepSize );
 			}
 		}
 		else {
 			if ( 0 < out ) {
 				// If the out is less then the amount we are going to decrement it, set it to 0
-				if ( out < ($oxelSize / Globals.UNITS_PER_METER) * 4 )
+				if ( out < $stepSize )
 					out = 0
 				else	
-					outDec( ($oxelSize / Globals.UNITS_PER_METER) * 4 );
+					outDec( $stepSize );
 			}
 		}
-		Log.out( "FlowInfo.dirAndSet - out: " + out + "  oxelSize: " + $oxelSize );
+		Log.out( "FlowInfo.dirAndSet - out: " + out + "  oxelSize: " + $stepSize );
 	}
 	
 	public 	function outInc( $val:uint ):void { var i:int = out; i += $val; out = i; }
@@ -141,31 +160,15 @@ public class FlowInfo
 			down = $intersectingFlowInfo.down
 	}
 	
-	// This should really only be used by the flowInfoPool
-	public function FlowInfo() { _data = DEFAULT }
-	
 	public function reset( $oxel:Oxel = null ):void {
-		direction = Globals.ALL_DIRS
-		type = FLOW_TYPE_UNDEFINED
-		out = 0
-		outRef = 0
-		down = 0
+		_data = 0
 		flowScaling.reset( $oxel )
 	}
 	
-	public function clone( isChild:Boolean, $sourceOxel:Oxel  ):FlowInfo {
-		var fi:FlowInfo = FlowInfoPool.poolGet();
+	public function initialize( isChild:Boolean, $sourceOxel:Oxel  ):FlowInfo {
+		var fi:FlowInfo = FlowInfoPool.poolGet()
 		fi.copy( this )
-		if ( isChild )
-			out = out * 2;
-		else if ( $sourceOxel && Globals.UNITS_PER_METER < $sourceOxel.gc.size() )
-			out = out / $sourceOxel.gc.size()/Globals.UNITS_PER_METER;
-		return fi;
-	}
-	
-	public function copy( $rhs:FlowInfo ):void {
-		_data = $rhs._data
-		flowScaling.copy( $rhs.flowScaling )
+		return fi
 	}
 	
 	public function fromJson( $flowJson:Object ):void
@@ -179,7 +182,7 @@ public class FlowInfo
 				outVal = 15;
 			}
 			out =  ( outVal * 4);
-			outRef = ( outVal * 4);
+			outRefSet( outVal * 4);
 			var downVal:int = $flowJson[2];
 			if ( 63 < downVal ) { // down is never more then 63
 				Log.out( "FlowInfo.downVal - down value is greater then 63, clipping it to 63: " + downVal, Log.WARN );
