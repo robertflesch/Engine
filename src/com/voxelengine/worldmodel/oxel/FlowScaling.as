@@ -169,7 +169,7 @@ public class FlowScaling
 		if ( _calculated )
 			return;
 	
-		Log.out( "FlowScaling.calculate was: " + toString() + " oxel: " + toString() );
+		//Log.out( "FlowScaling.calculate was: " + toString() + " oxel: " + toString() );
 		_calculated = true;
 		
 		// The origin of the flow should never scale.
@@ -182,7 +182,7 @@ public class FlowScaling
 		for each ( var horizontalDir:int in Globals.horizontalDirections )
 			grabNeighborInfluences( $oxel, horizontalDir );
 		
-		Log.out( "FlowScaling.calculate after grabNeighborInfluences: " + toString() );
+		//Log.out( "FlowScaling.calculate after grabNeighborInfluences: " + toString() );
 		// if these corners have not been influenced by another vert
 		// set them to scale
 		const fallRatePerMeter:uint = 2
@@ -197,7 +197,7 @@ public class FlowScaling
 			if ( CORNER_MIN == NxPz )
 				NxPz = max() - amountToFall
 		}
-		Log.out( "FlowScaling.calculate is: " + toString() + " oxel: " + toString() );
+		//Log.out( "FlowScaling.calculate is: " + toString() + " oxel: " + toString() );
 	}
 		
 	private function grabNeighborInfluences( $oxel:Oxel, $dir:int ):void {

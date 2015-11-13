@@ -76,11 +76,6 @@ public class WindowOxelUtils extends VVPopup
 		statsB.width = 150;
 		addElement( statsB );
 		
-		var baseLightLevelB:Button = new Button( "Set Base Light Level..." );
-		baseLightLevelB.addEventListener(UIMouseEvent.CLICK, baseLightLevelHandler );
-		baseLightLevelB.width = 150;
-		addElement( baseLightLevelB );
-
 		var resetFlowInfo:Button = new Button( "Rebuild Model" );
 		resetFlowInfo.addEventListener(UIMouseEvent.CLICK, rebuildFacesHandler );
 		resetFlowInfo.width = 150;
@@ -132,11 +127,6 @@ public class WindowOxelUtils extends VVPopup
 		_vm.modelInfo.data.oxel.rebuildAll()
 	}
 	
-	private function baseLightLevelHandler(event:UIMouseEvent):void {
-		new WindowChangeBaseLightLevel( _vm );
-	}
-		
-
 	import flash.utils.Timer;
 	import flash.events.TimerEvent;
 	private var _reloadTimer:Timer;

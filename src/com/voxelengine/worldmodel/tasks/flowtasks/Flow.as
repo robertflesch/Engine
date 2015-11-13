@@ -97,57 +97,6 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			super.complete();
 			//Log.out( "Flow.start - Complete time: " + (getTimer() - timeStart) );
 		}
-
-		private function writeFlowTypeAndScaleNeighbors( $flowIntoOxel:Oxel ):void 
-		{
-			// I can only flow into AIR, everything else I interact with
-			$flowIntoOxel.changeOxel( _guid, $flowIntoOxel.gc, type )
-			var flowOver:Oxel = $flowIntoOxel.neighbor( Globals.NEGY );
-			var flowUnder:Oxel = $flowIntoOxel.neighbor( Globals.POSY );
-			if ( TypeInfo.FIRE ==  type ) {
-				flowOver.setOnFire( _guid )
-				flowUnder.setOnFire( _guid )
-				return
-			}
-			$flowIntoOxel.flowInfo.flowScaling.calculate( $flowIntoOxel );
-		
-			// if I flow under another of the same type
-			if ( Globals.BAD_OXEL != flowUnder ) {
-				if ( flowUnder.type == $flowIntoOxel.type ) {
-					//flowUnder.flowInfo.flowScaling.reset( flowUnder, true )
-					flowUnder.flowInfo.inheritFlowMax( $flowIntoOxel.flowInfo )
-					$flowIntoOxel.flowInfo.flowScaling.reset( $flowIntoOxel, true )
-					flowUnder.flowInfo.flowScaling.neighborsRecalc( flowUnder, true );
-				} else {
-					// does the tasks flow type I interact with the type over us?
-					var ipu:InteractionParams = TypeInfo.typeInfo[type].interactions.IOGet( TypeInfo.typeInfo[flowUnder.type].name );
-					if ( "AIR" != ipu.type ) {
-						flowUnder.flowInfo.flowScaling.reset( flowUnder, true )
-						flowUnder.flowInfo.flowScaling.neighborsRecalc( flowUnder, true );
-					}
-				}
-			}
-			// if I flow over another oxel of the same type, reset its scaling
-			if ( Globals.BAD_OXEL != flowOver ) {
-				if ( flowOver.type == $flowIntoOxel.type ) {
-					flowOver.flowInfo.flowScaling.reset( flowOver, true )
-					flowOver.flowInfo.inheritFlowMax( $flowIntoOxel.flowInfo )
-					flowOver.flowInfo.flowScaling.reset( $flowIntoOxel, true )
-					flowOver.flowInfo.flowScaling.neighborsRecalc( flowOver, true );
-				} else {
-					// does the tasks flow type I interact with the type under us?
-					// where else do I interact? Can it be moved here?
-					var ipo:InteractionParams = TypeInfo.typeInfo[type].interactions.IOGet( TypeInfo.typeInfo[flowOver.type].name );
-					if ( "AIR" != ipo.type ) {
-						flowOver.flowInfo.flowScaling.reset( flowOver, true )
-						flowOver.flowInfo.flowScaling.neighborsRecalc( flowOver, true );
-					}
-				}
-			}
-				
-			// scaling was happening once about in the scaleCalculate, and again here.
-			$flowIntoOxel.flowInfo.flowScaling.neighborsRecalc( $flowIntoOxel, false );
-		}		
 		
 		private function flowStartSpring($flowFromOxel:Oxel):void { }
 		
@@ -203,36 +152,6 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			}
 		}
 		
-		private function flowTasksAdd( $fc:Vector.<FlowCandidate>, $upOrDown:Boolean, $flowInfo:FlowInfo ):void {
-			for each ( var flowTest:FlowCandidate in $fc ) {
-				const stepSize:int = ( flowTest.flowCandidate.gc.size() / Globals.UNITS_PER_METER) * 4
-				if ( !$upOrDown && $flowInfo.flowScaling.min() < stepSize/4 )
-					continue
-				
-				//Log.out( "Oxel.flowTaskAdd - $count: " + $countDown + "  countOut: " + $countOut + " gc data: " + flowCanditate.gc.toString() + " tasks: " + (Globals.g_flowTaskController.queueSize() + 1) );
-				var	taskPriority:int = 3;
-				if ( $upOrDown )
-					taskPriority = 1;
-				
-				if (  null == flowTest.flowCandidate.flowInfo )
-					flowTest.flowCandidate.flowInfo = FlowInfoPool.poolGet()
-
-				// now set the flowInfo in the flowCandidate, which will be using in the changeOxel
-				var fi:FlowInfo = flowTest.flowCandidate.flowInfo
-				fi.copy( $flowInfo )
-				fi.directionSetAndDecrement( flowTest.dir, stepSize )
-				if ( 0 == fi.down )
-					continue
-				else if ( $upOrDown )
-					flowTest.flowCandidate.flowInfo.flowScaling.reset()
-					
-				Log.out( "Flow.flowTasksAdd fi.type: " + fi.type + "  fi.out" + fi.out + "  fi.flowScaling.min " + fi.flowScaling.min() )
-					
-				writeFlowTypeAndScaleNeighbors( flowTest.flowCandidate )
-				Flow.addTask( _guid, flowTest.flowCandidate.gc, type, taskPriority + 1 )
-			}
-		}
-		
 		private const MIN_FLOW_GRAIN:int = 2;
 		private function canFlowInto( flowOxel:Oxel, $face:int, $fc:Vector.<FlowCandidate> ):Boolean {
 		
@@ -264,20 +183,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					if ( no.type != type ) {
 						//Log.out( "Oxel.flowable - 2 Different flow types here! getting IP for: " + Globals.Info[type].name + "  with " + Globals.Info[no.type].name );
 						
-						var ip:InteractionParams = TypeInfo.typeInfo[type].interactions.IOGet( TypeInfo.typeInfo[no.type].name );
-						var writeType:int = TypeInfo.getTypeId( ip.type );
-						if ( type != writeType ) {
-							if ( TypeInfo.typeInfo[writeType].flowable ) {
-								// if write type is same as flow type, add it.
-								if ( type == writeType )
-									$fc.push( new FlowCandidate( $face, no ) );
-							}
-							else {
-								// changed types are not flowable
-								no.write( _guid, no.gc, writeType, false );
-								//scale( no )
-							}
-						}
+						interactWithFlowableType( no );
 					}
 					else {
 						//Log.out( "Oxel.flowable - ALREADY " + Globals.Info[no.type].name + " here" );
@@ -325,6 +231,113 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			}
 			return partial
 		}
+		
+		private function flowTasksAdd( $fc:Vector.<FlowCandidate>, $upOrDown:Boolean, $flowInfo:FlowInfo ):void {
+			for each ( var flowTest:FlowCandidate in $fc ) {
+				const stepSize:int = ( flowTest.flowCandidate.gc.size() / Globals.UNITS_PER_METER) * 4
+				if ( !$upOrDown && $flowInfo.flowScaling.min() < stepSize/4 )
+					continue
+				
+				//Log.out( "Oxel.flowTaskAdd - $count: " + $countDown + "  countOut: " + $countOut + " gc data: " + flowCanditate.gc.toString() + " tasks: " + (Globals.g_flowTaskController.queueSize() + 1) );
+				var	taskPriority:int = 3;
+				if ( $upOrDown )
+					taskPriority = 1;
+				
+				if (  null == flowTest.flowCandidate.flowInfo )
+					flowTest.flowCandidate.flowInfo = FlowInfoPool.poolGet()
+
+				// now set the flowInfo in the flowCandidate, which will be using in the changeOxel
+				var fi:FlowInfo = flowTest.flowCandidate.flowInfo
+				fi.copy( $flowInfo )
+				fi.directionSetAndDecrement( flowTest.dir, stepSize )
+				if ( 0 == fi.down )
+					continue
+				else if ( $upOrDown )
+					flowTest.flowCandidate.flowInfo.flowScaling.reset()
+					
+				//Log.out( "Flow.flowTasksAdd fi.type: " + fi.type + "  fi.out" + fi.out + "  fi.flowScaling.min " + fi.flowScaling.min() )
+					
+				writeFlowTypeAndScaleNeighbors( flowTest.flowCandidate )
+				Flow.addTask( _guid, flowTest.flowCandidate.gc, type, taskPriority + 1 )
+			}
+		}
+		
+		private function writeFlowTypeAndScaleNeighbors( $flowIntoOxel:Oxel ):void 
+		{
+			// I can only flow into AIR, everything else I interact with
+			$flowIntoOxel.changeOxel( _guid, $flowIntoOxel.gc, type )
+			var flowOver:Oxel = $flowIntoOxel.neighbor( Globals.NEGY );
+			var flowUnder:Oxel = $flowIntoOxel.neighbor( Globals.POSY );
+			if ( TypeInfo.FIRE ==  type ) {
+				flowOver.setOnFire( _guid )
+				flowUnder.setOnFire( _guid )
+				return
+			}
+			$flowIntoOxel.flowInfo.flowScaling.calculate( $flowIntoOxel );
+		
+			// if I flow under another of the same type
+			if ( Globals.BAD_OXEL != flowUnder ) {
+				if ( flowUnder.type == $flowIntoOxel.type ) {
+					//flowUnder.flowInfo.flowScaling.reset( flowUnder, true )
+					flowUnder.flowInfo.inheritFlowMax( $flowIntoOxel.flowInfo )
+					$flowIntoOxel.flowInfo.flowScaling.reset( $flowIntoOxel, true )
+					flowUnder.flowInfo.flowScaling.neighborsRecalc( flowUnder, true );
+				} else {
+					if ( flowUnder.childrenHas() ) 
+						attemptInteractionWithChildren( flowUnder, Globals.NEGY )
+					else
+						interactRescale( flowUnder )
+				}
+			}
+			// if I flow over another oxel of the same type, reset its scaling
+			if ( Globals.BAD_OXEL != flowOver ) {
+				if ( flowOver.type == $flowIntoOxel.type ) {
+					flowOver.flowInfo.flowScaling.reset( flowOver, true )
+					flowOver.flowInfo.inheritFlowMax( $flowIntoOxel.flowInfo )
+					flowOver.flowInfo.flowScaling.reset( $flowIntoOxel, true )
+					flowOver.flowInfo.flowScaling.neighborsRecalc( flowOver, true );
+				} else {
+					if ( flowOver.childrenHas() ) 
+						attemptInteractionWithChildren( flowOver, Globals.NEGY )
+					else
+						interactRescale( flowOver )
+				}
+			}
+				
+			// scaling was happening once about in the scaleCalculate, and again here.
+			$flowIntoOxel.flowInfo.flowScaling.neighborsRecalc( $flowIntoOxel, false );
+		}		
+		
+		private function interactRescale( $interOxel:Oxel ):void {
+			var ipo:InteractionParams = TypeInfo.typeInfo[type].interactions.IOGet( TypeInfo.typeInfo[$interOxel.type].name );
+			if ( "AIR" != ipo.type && $interOxel.flowInfo && $interOxel.flowInfo.flowScaling.has() ) {
+				$interOxel.flowInfo.flowScaling.reset( $interOxel, true )
+				$interOxel.flowInfo.flowScaling.neighborsRecalc( $interOxel, true );
+			}
+		}
+		
+		private function attemptInteractionWithChildren( flowOver:Oxel, $face:int ):Boolean {
+			if ( MIN_FLOW_GRAIN + 1 > flowOver.gc.grain )
+				return false
+				
+			var partial:Boolean = false;
+			const dchildren:Vector.<Oxel> = flowOver.childrenForDirection( Oxel.face_get_opposite( $face ) );
+			for each ( var dchild:Oxel in dchildren )  {
+				if ( TypeInfo.AIR != dchild.type && !dchild.childrenHas() ) {
+					interactRescale( dchild )
+				}
+			}
+			return partial
+		}
+		
+		private function interactWithFlowableType( no:Oxel ):void  {
+			var ip:InteractionParams = TypeInfo.typeInfo[type].interactions.IOGet( TypeInfo.typeInfo[no.type].name );
+			var writeType:int = TypeInfo.getTypeId( ip.type );
+			if ( type != writeType )
+				// changed types are not flowable
+				no.write( _guid, no.gc, writeType, false );
+		}
+		
 		/*
 		static private const FLOW_NO_FACE_FOUND:int = -1;
 		private function flowFindMeltableDirection($flowFromOxel:Oxel):int {

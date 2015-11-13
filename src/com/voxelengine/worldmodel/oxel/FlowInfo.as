@@ -141,7 +141,7 @@ public class FlowInfo
 					outDec( $stepSize );
 			}
 		}
-		Log.out( "FlowInfo.dirAndSet - out: " + out + "  oxelSize: " + $stepSize );
+		//Log.out( "FlowInfo.dirAndSet - out: " + out + "  oxelSize: " + $stepSize );
 	}
 	
 	public 	function outInc( $val:uint ):void { var i:int = out; i += $val; out = i; }
