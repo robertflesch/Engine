@@ -65,7 +65,6 @@ public class VertexIndexBuilder
 	private var _verticeByteArray:ByteArray = new ByteArray();
 	private var _vertexDataSize:uint;
 	
-	private var _sorted:Boolean = false;
 	private var _dirty:Boolean = false;
 
 	private var _sortCount:int;
@@ -73,9 +72,7 @@ public class VertexIndexBuilder
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//     Getters/Setters
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public function get sorted():Boolean { return _sorted; }
-	public function set sorted( val:Boolean):void { _sorted = val; }
-
+	
 	public function get dirty():Boolean { return _dirty; }
 	public function set dirty( val:Boolean ):void { _dirty = val; }
 	
@@ -110,7 +107,7 @@ public class VertexIndexBuilder
 	}
 	
 	public function sort() : void {
-		_sortCount++;
+		//_sortCount++; // SORT DISABLED
 		if ( _sortCount < _sortEvery )
 			return;
 			
@@ -118,14 +115,13 @@ public class VertexIndexBuilder
 
 		if ( _oxels && 0 < _oxels.length ) {
 			// this causes a major bottleneck if done each frame.
-			if ( false == _sorted ) 
-			{
-				_s_compareVec = VoxelModel.controlledModel.modelToWorld( VoxelModel.controlledModel.camera.center );
-				//Log.out( "VertexIndexBuilder.sort - _s_compareVec: " + _s_compareVec );
-				_oxels.sort( compareFunction );	
-				//trace( "VertexIndexBuilder - sorted: " + _oxels.length + " - took: "  + (getTimer() - timer) );					
-				_sorted = true;
-			}
+			// AND it doesnt work correctly
+			_s_compareVec = VoxelModel.controlledModel.modelToWorld( VoxelModel.controlledModel.camera.center );
+			//Log.out( "VertexIndexBuilder.sort - VoxelModel.controlledModel.modelToWorld: " + VoxelModel.controlledModel.modelToWorld( new Vector3D( 8, 8, 8) ) )
+			//Log.out( "VertexIndexBuilder.sort - camera.center: " + VoxelModel.controlledModel.camera.center )
+			//Log.out( "VertexIndexBuilder.sort - _s_compareVec: " + _s_compareVec );
+			_oxels.sort( compareFunction );	
+			trace( "VertexIndexBuilder - sorted: " + _oxels.length + " - took: "  + (getTimer() - timer) );					
 		}
 		_sortCount = 0;
 	}
@@ -188,7 +184,6 @@ public class VertexIndexBuilder
 		_bufferVertexMemory = 0;
 		_bufferIndexMemory = 0;
 	
-		_sorted = false;
 		dirty = true;
 		
 		//trace ( "VertexIndexBuilder - dispose" + this );			
