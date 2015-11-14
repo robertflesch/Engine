@@ -173,7 +173,7 @@ public class Quad {
 
 		var scale:int = 1 << $grain;
 		if ( TileType.TILE_NONE == tilingType ) {
-			return false; // Ash burning uses this
+			return false; // Fire uses this
 		}
 		
 		if ( TileType.TILE_RANDOM_CENTERED == tilingType ) {

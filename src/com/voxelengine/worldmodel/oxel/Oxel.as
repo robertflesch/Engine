@@ -612,6 +612,12 @@ public class Oxel extends OxelBitfields
 		if ( childrenHas() )
 		   return;
 		//trace( "childrenCreate to grain: " + gc.grain+ " (" + gc.size() + ") to grain: " + (gc.grain- 1) + );
+		//var ti:TypeInfo = TypeInfo.typeInfo[type];
+		
+if ( _flowInfo && _flowInfo.flowScaling.has() ) {
+	Log.out( "Oxel.childrenCreate out of - flow info: " + flowInfo.flowScaling.toString(), Log.WARN )
+}
+		
 		
 		var gct:GrainCursor = GrainCursorPool.poolGet(root_get().gc.bound );
 		_children = ChildOxelPool.poolGet();
@@ -637,11 +643,9 @@ public class Oxel extends OxelBitfields
 			if ( TypeInfo.GRASS == type && ( 0 == gct.grainY % 2 ) )
 				_children[i].type = TypeInfo.DIRT;
 			
-			if ( _flowInfo && _flowInfo.flowScaling.has() ) {
+			if ( _flowInfo && _flowInfo.flowScaling.has() )
 				// now we need to distribute the scaling out to the resultant oxels
 				flowInfo.childGet( _children[i] )
-				//Log.out( "broken child flow info: " + _children[i].flowInfo.toString(), Log.WARN )
-			}
 		}
 
 		this.parentMarkAs();
@@ -1006,13 +1010,6 @@ public class Oxel extends OxelBitfields
 		return result;
 	}
 
-	private function breakToSize( $levelsToBreak:int ):void {
-		// just doing a single level break for now
-		// pretty sure I wrote a get opposite oxel somewhere in the lighting system.
-		// should use it to continue multi level breakdown.
-		childrenCreate(true);
-	}
-	
 	// Mark all of the faces opposite this oxel as dirty
 	// propogate count is to keep it from spreading too far, by maybe this should be distance, rather then hard count?
 	public function neighborsMarkDirtyFaces( $modelGuid:String, $size:int, $propogateCount:int = 2 ):void {
@@ -1031,9 +1028,17 @@ public class Oxel extends OxelBitfields
 				no.addFlowTask( $modelGuid, noti )
 				
 			// if I have alpha, then see if neighbor is same size, if not break it up.
+			// the makes it so that I dont have any inter oxel alpha faces, like I do if
+			// one of the neighbors is not alpha, if they are same size no problems
 			if ( TypeInfo.hasAlpha( type ) ) {				
-				if ( gc.grain < no.gc.grain && TypeInfo.AIR != no.type  )
-					no.breakToSize( no.gc.grain - gc.grain );
+				if ( gc.grain < no.gc.grain && TypeInfo.AIR != no.type  ) {
+					// calculate GC of opposite oxel on face
+					var gct:GrainCursor = GrainCursorPool.poolGet( gc.bound )
+					gct.copyFrom( gc )
+					gct.move( face )
+					childGetOrCreate( gct ) // by getting the child, we break up the oxel
+					GrainCursorPool.poolDispose( gct )
+				}
 			}
 				
 			// RSF - 10.2.14 This just got way easier, always mark the neighbor face!
@@ -1218,7 +1223,7 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 									if ( p1.equals( p2 ) )
 										faceClear( face );
 									else {
-										Log.out( "faceBuildTerminal face: " + face + "  p1: " + p1.toString() + " size: " + gc.size() + "  p2: " + p2.toString() + " size: " + oppositeOxel.gc.size() , Log.WARN )
+										//Log.out( "faceBuildTerminal face: " + face + "  p1: " + p1.toString() + " size: " + gc.size() + "  p2: " + p2.toString() + " size: " + oppositeOxel.gc.size() , Log.WARN )
 										faceSet( face );
 									}
 								}

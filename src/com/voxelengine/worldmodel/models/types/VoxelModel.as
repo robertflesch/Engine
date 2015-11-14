@@ -60,7 +60,7 @@ public class VoxelModel
 	public static function set selectedModel( $val:VoxelModel ):void { 
 		if ( _s_selectedModel == $val )
 			return
-		Log.out( "VoxelModel.selectedModel: " + ( $val ? $val.toString() : "null") , Log.WARN );
+		//Log.out( "VoxelModel.selectedModel: " + ( $val ? $val.toString() : "null") , Log.DEBUG );
 		// unselect the old model
 		if ( _s_selectedModel )
 			_s_selectedModel.selected = false	

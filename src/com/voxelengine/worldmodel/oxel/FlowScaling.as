@@ -312,15 +312,15 @@ public class FlowScaling
 		// I think the diagonals should be averaged between both corners
 		if ( 0 == childID ) { // b000
 			childFS.NxNz = Math.min( 15, (NxNz * 2 + 1) )
-			childFS.PxNz = Math.min( 15, (NxNz + PxNz) )
-			childFS.PxPz = Math.min( 15, (NxNz + PxPz) )
-			childFS.NxPz = Math.min( 15, (NxPz + NxNz) )
+			childFS.PxNz = Math.min( 15, (NxNz + PxNz  + 1 ) )
+			childFS.PxPz = Math.min( 15, (NxNz + PxPz + 1) )
+			childFS.NxPz = Math.min( 15, (NxPz + NxNz  + 1) )
 		}
 		else if ( 1 == childID )	{ // b100
-			childFS.NxNz = Math.min( 15, (NxNz + PxNz) )
-			childFS.PxNz = Math.min( 15, (PxNz * 2) )
-			childFS.PxPz = Math.min( 15, (PxNz + PxPz) )
-			childFS.NxPz = Math.min( 15, (NxNz + PxPz) )
+			childFS.NxNz = Math.min( 15, (NxNz + PxNz + 1) )
+			childFS.PxNz = Math.min( 15, (PxNz * 2 + 1) )
+			childFS.PxPz = Math.min( 15, (PxNz + PxPz + 1) )
+			childFS.NxPz = Math.min( 15, (NxNz + PxPz + 1) )
 		}
 		else if ( 2 == childID )	{ // b010
 			childFS.NxNz = Math.max( 0, ((NxNz - 8) * 2 + 1) )
@@ -331,30 +331,30 @@ public class FlowScaling
 				$child.type = TypeInfo.AIR
 		}
 		else if ( 3 == childID ) { // b110
-			childFS.NxNz = Math.max( 0, (NxNz + PxNz - 15) )
+			childFS.NxNz = Math.max( 0, NxNz + PxNz - 15 )
 			childFS.PxNz = Math.max( 0, ((PxNz - 8) * 2 + 1) )
-			childFS.PxPz = Math.max( 0, (PxNz + PxPz - 15) )
-			childFS.NxPz = Math.max( 0, (NxNz + PxPz - 15) )
+			childFS.PxPz = Math.max( 0, PxNz + PxPz - 15 )
+			childFS.NxPz = Math.max( 0, NxNz + PxPz - 15 )
 			if ( 0 == childFS.max() )
 				$child.type = TypeInfo.AIR
 		}
 		else if ( 4 == childID )	{ // b001
-			childFS.NxNz = Math.min( 15, (NxNz + NxPz) )
-			childFS.PxNz = Math.min( 15, (NxNz + PxPz) )
-			childFS.PxPz = Math.min( 15, (NxPz + PxPz) )
+			childFS.NxNz = Math.min( 15, (NxNz + NxPz + 1) )
+			childFS.PxNz = Math.min( 15, (NxNz + PxPz + 1) )
+			childFS.PxPz = Math.min( 15, (NxPz + PxPz + 1) )
 			childFS.NxPz = Math.min( 15, (NxPz  * 2 + 1) )
 		}
 		else if ( 5 == childID )	{ // b101
-			childFS.NxNz = Math.min( 15, (NxNz + PxPz) )
-			childFS.PxNz = Math.min( 15, (PxNz + PxPz) )
-			childFS.PxPz = Math.min( 15, (PxPz * 2 + 1) )
-			childFS.NxPz = Math.min( 15, (NxPz + PxPz) )
+			childFS.NxNz = Math.min( 15, (NxNz + PxPz + 1) )
+			childFS.PxNz = Math.min( 15, (PxNz + PxPz + 1) )
+			childFS.PxPz = Math.min( 15, ((PxPz * 2) + 1) )
+			childFS.NxPz = Math.min( 15, (NxPz + PxPz + 1) )
 		}
 		else if ( 6 == childID )	{ // b011
 			childFS.NxNz = Math.max( 0, (NxNz + NxPz - 15) )
 			childFS.PxNz = Math.max( 0, (NxNz + PxPz - 15) )
 			childFS.PxPz = Math.max( 0, (NxPz + PxPz - 15) )
-			childFS.NxPz = Math.max( 0, ((NxPz - 8)  * 2 + 1) )
+			childFS.NxPz = Math.max( 0, ((NxPz - 8) * 2 + 1) )
 			if ( 0 == childFS.max() )
 				$child.type = TypeInfo.AIR
 		}
@@ -367,7 +367,7 @@ public class FlowScaling
 				$child.type = TypeInfo.AIR
 		}	
 		
-		Log.out( "FlowScaling.childGetScale - childID: " + childID + "  childFS: " + childFS.toString(), Log.WARN )
+		Log.out( "FlowScaling.childGetScaleAndType - childID: " + childID + "  childFS: " + childFS.toString(), Log.WARN )
 	}
 	
 	static public function scaleTopFlowFace( $oxelToScale:Oxel ):void {

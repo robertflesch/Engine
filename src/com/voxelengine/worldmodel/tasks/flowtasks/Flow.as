@@ -68,14 +68,16 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		
 		override public function start():void {
 			super.start();
-			Log.out( "Flow.start " + toString(), Log.WARN );
+			//Log.out( "Flow.start " + toString(), Log.WARN );
 			var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
 			if ( vm ) {
 				var $flowFromOxel:Oxel = vm.modelInfo.data.oxel.childGetOrCreate( _gc );
-				if ( null == $flowFromOxel  )
-					return;
-				if ( null == $flowFromOxel.flowInfo  )
-					return;
+				if ( null == $flowFromOxel  ) {
+					Log.out( "Flow.start - null == $flowFromOxel", Log.WARN );
+					return; }
+				if ( null == $flowFromOxel.flowInfo  ) {
+					Log.out( "Flow.start - null == $flowFromOxel.flowInfo", Log.WARN );
+					return; }
 				
 				var flowType:uint = $flowFromOxel.flowInfo.type
 				//Log.out( "Flow.start - flowable oxel of type: " + ft );
