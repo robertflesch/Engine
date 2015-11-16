@@ -97,7 +97,7 @@ public class FlowInfo
 	public function childGet( $child:Oxel ):void {
 		$child.flowInfo = FlowInfoPool.poolGet()
 		$child.flowInfo.copyToChild( this )
-		_flowScaling.childGetScaleAndType( $child )
+		_flowScaling.childGetScaleAndType( $child, $child.flowInfo.flowScaling )
 	}
 
 	public function copyToChild( $rhs:FlowInfo ):void {

@@ -12,6 +12,7 @@ package com.voxelengine.worldmodel.oxel
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
+	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.TypeInfo;
 /**
  * ...
@@ -19,6 +20,7 @@ package com.voxelengine.worldmodel.oxel
  */
 public class FlowScaling
 {
+	private static var _s_flowScaling:FlowScaling = new FlowScaling() 
 	private const DEFAULT_TOTAL_SCALE:uint = 0xffffffff;
 	
 	private 		var _calculated:Boolean = false
@@ -200,16 +202,32 @@ public class FlowScaling
 		//Log.out( "FlowScaling.calculate is: " + toString() + " oxel: " + toString() );
 	}
 		
+	// This currently only works for same sized neighbors.
 	private function grabNeighborInfluences( $oxel:Oxel, $dir:int ):void {
 		
 		var fromOxel:Oxel = $oxel.neighbor( Oxel.face_get_opposite( $dir ) );
 		if ( Globals.BAD_OXEL == fromOxel )
 			return;
+		var fromOxelScale:FlowScaling
+		if ( TypeInfo.typeInfo[fromOxel.type].flowable && fromOxel.flowInfo && fromOxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling ) {
 			
-		if ( TypeInfo.typeInfo[fromOxel.type].flowable && fromOxel.flowInfo && fromOxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling )
-		{
+			// only accounts for one level of difference
+			if ( $oxel.gc.grain < fromOxel.gc.grain && fromOxel.flowInfo ) {
+				// calculate GC of opposite oxel on face
+				var gct:GrainCursor = GrainCursorPool.poolGet( $oxel.gc.bound )
+				gct.copyFrom( $oxel.gc )
+				gct.move( $dir )
+				var iDOpposite:uint = Oxel.childIdOpposite( Oxel.face_get_opposite( $dir ), $oxel.gc.childId()  )
+				// this gets gets a copy of the virtual child in that position
+				childGetScale( iDOpposite, fromOxel.flowInfo.flowScaling, _s_flowScaling )			
+				GrainCursorPool.poolDispose( gct )
+				fromOxelScale = _s_flowScaling
+			}
+			else
+				fromOxelScale = fromOxel.flowInfo.flowScaling;
+			
+				
 			var fromRecalc:Boolean = false;
-			var fromOxelScale:FlowScaling = fromOxel.flowInfo.flowScaling;
 			if ( Globals.POSX == $dir )
 			{
 				NxPz = Math.max( NxPz, fromOxelScale.PxPz );
@@ -301,73 +319,76 @@ public class FlowScaling
 	 *              |_____Pz_____|
 	 * 
 	 */	
-	// creates a virtual brightness(light) the light from a parent to a child brightness with all lights
-	public function childGetScaleAndType( $child:Oxel ):void {
+	
+	public function childGetScaleAndType( $child:Oxel, childFS:FlowScaling ):void {
 		// so evaluate scaling of parent
 		// remember that scaling is relative to the size of the oxel
 		// and that some of the oxel might become AIR if scaling is low.
 		
 		var childID:uint = $child.gc.childId()
-		var childFS:FlowScaling = $child.flowInfo.flowScaling
-		// I think the diagonals should be averaged between both corners
-		if ( 0 == childID ) { // b000
-			childFS.NxNz = Math.min( 15, (NxNz * 2 + 1) )
-			childFS.PxNz = Math.min( 15, (NxNz + PxNz  + 1 ) )
-			childFS.PxPz = Math.min( 15, (NxNz + PxPz + 1) )
-			childFS.NxPz = Math.min( 15, (NxPz + NxNz  + 1) )
-		}
-		else if ( 1 == childID )	{ // b100
-			childFS.NxNz = Math.min( 15, (NxNz + PxNz + 1) )
-			childFS.PxNz = Math.min( 15, (PxNz * 2 + 1) )
-			childFS.PxPz = Math.min( 15, (PxNz + PxPz + 1) )
-			childFS.NxPz = Math.min( 15, (NxNz + PxPz + 1) )
-		}
-		else if ( 2 == childID )	{ // b010
-			childFS.NxNz = Math.max( 0, ((NxNz - 8) * 2 + 1) )
-			childFS.PxNz = Math.max( 0, (NxNz + PxNz - 15) )
-			childFS.PxPz = Math.max( 0, (NxNz + PxPz - 15) )
-			childFS.NxPz = Math.max( 0, (NxPz + NxNz - 15) )
-			if ( 0 == childFS.max() )
-				$child.type = TypeInfo.AIR
-		}
-		else if ( 3 == childID ) { // b110
-			childFS.NxNz = Math.max( 0, NxNz + PxNz - 15 )
-			childFS.PxNz = Math.max( 0, ((PxNz - 8) * 2 + 1) )
-			childFS.PxPz = Math.max( 0, PxNz + PxPz - 15 )
-			childFS.NxPz = Math.max( 0, NxNz + PxPz - 15 )
-			if ( 0 == childFS.max() )
-				$child.type = TypeInfo.AIR
-		}
-		else if ( 4 == childID )	{ // b001
-			childFS.NxNz = Math.min( 15, (NxNz + NxPz + 1) )
-			childFS.PxNz = Math.min( 15, (NxNz + PxPz + 1) )
-			childFS.PxPz = Math.min( 15, (NxPz + PxPz + 1) )
-			childFS.NxPz = Math.min( 15, (NxPz  * 2 + 1) )
-		}
-		else if ( 5 == childID )	{ // b101
-			childFS.NxNz = Math.min( 15, (NxNz + PxPz + 1) )
-			childFS.PxNz = Math.min( 15, (PxNz + PxPz + 1) )
-			childFS.PxPz = Math.min( 15, ((PxPz * 2) + 1) )
-			childFS.NxPz = Math.min( 15, (NxPz + PxPz + 1) )
-		}
-		else if ( 6 == childID )	{ // b011
-			childFS.NxNz = Math.max( 0, (NxNz + NxPz - 15) )
-			childFS.PxNz = Math.max( 0, (NxNz + PxPz - 15) )
-			childFS.PxPz = Math.max( 0, (NxPz + PxPz - 15) )
-			childFS.NxPz = Math.max( 0, ((NxPz - 8) * 2 + 1) )
-			if ( 0 == childFS.max() )
-				$child.type = TypeInfo.AIR
-		}
-		else if ( 7 == childID )	{ // b111
-			childFS.NxNz = Math.max( 0, (NxNz + PxPz - 15) )
-			childFS.PxNz = Math.max( 0, (PxNz + PxPz - 15) )
-			childFS.PxPz = Math.max( 0, ((PxPz - 8) * 2 + 1) )
-			childFS.NxPz = Math.max( 0, (NxPz + PxPz - 15) )
-			if ( 0 == childFS.max() )
-				$child.type = TypeInfo.AIR
-		}	
+		
+		childGetScale( childID, this, $child.flowInfo.flowScaling )
+		if ( 0 == childFS.max() )
+			$child.type = TypeInfo.AIR
 		
 		Log.out( "FlowScaling.childGetScaleAndType - childID: " + childID + "  childFS: " + childFS.toString(), Log.WARN )
+	}
+	
+	static private function childGetScale( $childID:uint, $pfs:FlowScaling, $childFS:FlowScaling ):void {
+		// so evaluate scaling of parent
+		// remember that scaling is relative to the size of the oxel
+		// and that some of the oxel might become AIR if scaling is low.
+		
+		if ( 0 == $childID ) { // b000
+			$childFS.NxNz = Math.min( 15, ($pfs.NxNz * 2 + 1) )
+			$childFS.PxNz = Math.min( 15, ($pfs.NxNz + $pfs.PxNz  + 1 ) )
+			$childFS.PxPz = Math.min( 15, ($pfs.NxNz + $pfs.PxPz + 1) )
+			$childFS.NxPz = Math.min( 15, ($pfs.NxPz + $pfs.NxNz  + 1) )
+		}
+		else if ( 1 == $childID )	{ // b100
+			$childFS.NxNz = Math.min( 15, ($pfs.NxNz + $pfs.PxNz + 1) )
+			$childFS.PxNz = Math.min( 15, ($pfs.PxNz * 2 + 1) )
+			$childFS.PxPz = Math.min( 15, ($pfs.PxNz + $pfs.PxPz + 1) )
+			$childFS.NxPz = Math.min( 15, ($pfs.NxNz + $pfs.PxPz + 1) )
+		}
+		else if ( 2 == $childID )	{ // b010
+			$childFS.NxNz = Math.max( 0, (($pfs.NxNz - 8) * 2 + 1) )
+			$childFS.PxNz = Math.max( 0, ($pfs.NxNz + $pfs.PxNz - 15) )
+			$childFS.PxPz = Math.max( 0, ($pfs.NxNz + $pfs.PxPz - 15) )
+			$childFS.NxPz = Math.max( 0, ($pfs.NxPz + $pfs.NxNz - 15) )
+		}
+		else if ( 3 == $childID ) { // b110
+			$childFS.NxNz = Math.max( 0, $pfs.NxNz + $pfs.PxNz - 15 )
+			$childFS.PxNz = Math.max( 0, (($pfs.PxNz - 8) * 2 + 1) )
+			$childFS.PxPz = Math.max( 0, $pfs.PxNz + $pfs.PxPz - 15 )
+			$childFS.NxPz = Math.max( 0, $pfs.NxNz + $pfs.PxPz - 15 )
+		}
+		else if ( 4 == $childID )	{ // b001
+			$childFS.NxNz = Math.min( 15, ($pfs.NxNz + $pfs.NxPz + 1) )
+			$childFS.PxNz = Math.min( 15, ($pfs.NxNz + $pfs.PxPz + 1) )
+			$childFS.PxPz = Math.min( 15, ($pfs.NxPz + $pfs.PxPz + 1) )
+			$childFS.NxPz = Math.min( 15, ($pfs.NxPz  * 2 + 1) )
+		}
+		else if ( 5 == $childID )	{ // b101
+			$childFS.NxNz = Math.min( 15, ($pfs.NxNz + $pfs.PxPz + 1) )
+			$childFS.PxNz = Math.min( 15, ($pfs.PxNz + $pfs.PxPz + 1) )
+			$childFS.PxPz = Math.min( 15, (($pfs.PxPz * 2) + 1) )
+			$childFS.NxPz = Math.min( 15, ($pfs.NxPz + $pfs.PxPz + 1) )
+		}
+		else if ( 6 == $childID )	{ // b011
+			$childFS.NxNz = Math.max( 0, ($pfs.NxNz + $pfs.NxPz - 15) )
+			$childFS.PxNz = Math.max( 0, ($pfs.NxNz + $pfs.PxPz - 15) )
+			$childFS.PxPz = Math.max( 0, ($pfs.NxPz + $pfs.PxPz - 15) )
+			$childFS.NxPz = Math.max( 0, (($pfs.NxPz - 8) * 2 + 1) )
+		}
+		else if ( 7 == $childID )	{ // b111
+			$childFS.NxNz = Math.max( 0, ($pfs.NxNz + $pfs.PxPz - 15) )
+			$childFS.PxNz = Math.max( 0, ($pfs.PxNz + $pfs.PxPz - 15) )
+			$childFS.PxPz = Math.max( 0, (($pfs.PxPz - 8) * 2 + 1) )
+			$childFS.NxPz = Math.max( 0, ($pfs.NxPz + $pfs.PxPz - 15) )
+		}	
+		
+		Log.out( "FlowScaling.childGetScale - childID: " + $childID + "  childFS: " + $childFS.toString(), Log.WARN )
 	}
 	
 	static public function scaleTopFlowFace( $oxelToScale:Oxel ):void {

@@ -275,7 +275,14 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				flowUnder.setOnFire( _guid )
 				return
 			}
+			//if ( $flowIntoOxel.gc.eval( 5, 3, 5, 0 ) )
+				//Log.out( "Bump over rock" )
 			$flowIntoOxel.flowInfo.flowScaling.calculate( $flowIntoOxel );
+			// if I have 0 scale, then this is not valid.
+			//if ( 0 ==  $flowIntoOxel.flowInfo.flowScaling.max() ) {
+				//$flowIntoOxel.changeOxel( _guid, $flowIntoOxel.gc, type )
+				//return
+			//}
 		
 			// if I flow under another of the same type
 			if ( Globals.BAD_OXEL != flowUnder ) {

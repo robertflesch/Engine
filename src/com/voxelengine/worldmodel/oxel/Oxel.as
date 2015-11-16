@@ -909,41 +909,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return;
 	}
 	
-	public function print():void {
-		trace( "Oxel - print: " + toString() );
-		for each ( var child:Oxel in _children ) {
-			child.print();
-		}
-	}
-	
-	public function toString():String {
-		var p:String = _parent ? " has parent" : "  no parent";
-		var c:String = childrenHas() ? (" has " + _children.length + " kids") : "  no children";
-		var t:String = "";
-		if ( null != root_get().gc )
-		{
-			var bg:uint = root_get().gc.grain;
-			for ( var i:int = 0; i < bg - gc.grain; i++ ) {
-				t += "\t";
-			}
-		var r:String;
-		if ( TypeInfo.INVALID == type )
-			r = "\t\t oxel of type: " + TypeInfo.typeInfo[type].name;
-		else
-			var str:String = "";
-			str = maskTempData().toString(16)
-			var hex:String = ("0x00000000").substr(2,8 - str.length) + str;
-			r = t + " oxel of type: " + TypeInfo.typeInfo[type].name + "\t location: " + gc.toString() + "  data: " + hex + " parent: " + p + " children: " + c;
-		}
-		else
-			r = "Uninitialized Oxel" + p + c;
-
-		return r;
-	}
-	
-	public function toStringShort():String {
-		return "oxel of type: " + TypeInfo.typeInfo[type].name + "\t location: " + gc.toString();
-	}
 	
 	public function rebuildAll():void {
 		if ( childrenHas() ) {
@@ -982,7 +947,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		if ( null == no )
 		{
 			// This uses the _s_scratchGrain
-			if ( neighborsIsValid( $face ) ) {
+			if ( neighborIsValid( $face, gc ) ) {
 				_neighbors[ $face ] = root_get().childFind( _s_scratchGrain );
 			}
 			else
@@ -991,8 +956,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return _neighbors[ $face ];
 	}
 	
-	protected function neighborsIsValid( dir:int ):Boolean {
-		_s_scratchGrain.copyFrom( gc );
+	private static function neighborIsValid( dir:int, $gc:GrainCursor ):Boolean {
+		_s_scratchGrain.copyFrom( $gc );
 		var result:Boolean = false;
 		if ( Globals.POSX == dir )
 			result = _s_scratchGrain.move_posx();
@@ -2894,10 +2859,6 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 	// Explosion Event Helpers END
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public function generateID( $modelGuid:String ):String {
-		return $modelGuid + _gc.toID();
-	}
-	
 	static public function childIdOpposite( $face:uint, $childID:uint ):uint {
 		if ( 0 == $childID ) {
 			if ( Globals.NEGX == $face ) return 1;
@@ -3075,5 +3036,45 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 			Flow.addTask( $modelGuid, gc, $newTypeInfo.type, priority )
 		}
 	}
+	
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//  Util functions
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public function print():void {
+		trace( "Oxel - print: " + toString() );
+		for each ( var child:Oxel in _children ) {
+			child.print();
+		}
+	}
+	
+	public function toString():String {
+		var p:String = _parent ? " has parent" : "  no parent";
+		var c:String = childrenHas() ? (" has " + _children.length + " kids") : "  no children";
+		var t:String = "";
+		if ( null != root_get().gc )
+		{
+			var bg:uint = root_get().gc.grain;
+			for ( var i:int = 0; i < bg - gc.grain; i++ ) {
+				t += "\t";
+			}
+		var r:String;
+		if ( TypeInfo.INVALID == type )
+			r = "\t\t oxel of type: " + TypeInfo.typeInfo[type].name;
+		else
+			var str:String = "";
+			str = maskTempData().toString(16)
+			var hex:String = ("0x00000000").substr(2,8 - str.length) + str;
+			r = t + " oxel of type: " + TypeInfo.typeInfo[type].name + "\t location: " + gc.toString() + "  data: " + hex + " parent: " + p + " children: " + c;
+		}
+		else
+			r = "Uninitialized Oxel" + p + c;
+
+		return r;
+	}
+	
+	public function toStringShort():String {
+		return "oxel of type: " + TypeInfo.typeInfo[type].name + "\t location: " + gc.toString();
+	}
+		
 } // end of class Oxel
 } // end of package
