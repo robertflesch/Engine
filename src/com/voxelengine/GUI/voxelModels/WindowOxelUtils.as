@@ -51,6 +51,11 @@ public class WindowOxelUtils extends VVPopup
 		mergeSame.width = 150;
 		addElement( mergeSame );
 		
+		var mergeAir:Button = new Button( "Merge Air Oxels" );
+		mergeAir.addEventListener(UIMouseEvent.CLICK, mergeAirHandler );
+		mergeAir.width = 150;
+		addElement( mergeAir );
+		
 		//var breakDownB:Button = new Button( "Breakdown" );
 		//breakDownB.addEventListener(UIMouseEvent.CLICK, breakdownHandler );
 		//breakDownB.width = 150;
@@ -173,6 +178,11 @@ public class WindowOxelUtils extends VVPopup
 	
 	private function mergeSameHandler(event:UIMouseEvent):void {
 		_vm.modelInfo.data.oxel.mergeAndRebuild()
+		_vm.modelInfo.data.changed = true
+	}
+	
+	private function mergeAirHandler(event:UIMouseEvent):void {
+		_vm.modelInfo.data.oxel.mergeAIRAndRebuild()
 		_vm.modelInfo.data.changed = true
 	}
 	

@@ -278,20 +278,20 @@ public class FlowScaling
 	public function faceGet( $dir:int ):Point {
 		var point:Point = new Point(1,1);
 		if ( Globals.POSX == $dir ) {
-			point.x = PxNz;
-			point.y = PxPz
+			point.x = QuadPxNz;
+			point.y = QuadPxPz
 		}
 		else if ( Globals.NEGX == $dir ) {
-			point.x = NxNz;
-			point.y = NxPz;
+			point.x = QuadNxNz;
+			point.y = QuadNxPz;
 		}   
 		else if ( Globals.POSZ == $dir ) {
-			point.x = PxPz;
-			point.y = NxPz
+			point.x = QuadPxPz;
+			point.y = QuadNxPz
 		}   
 		else if ( Globals.NEGZ == $dir ) {
-			point.x = PxNz;
-			point.y = NxNz
+			point.x = QuadPxNz;
+			point.y = QuadNxNz
 		}
 		return point;
 	}
@@ -411,8 +411,5 @@ public class FlowScaling
 		}
 		//Log.out( "FlowScaling.scaleTopFlowFace - flowScale: " + fs.toString(), Log.WARN )
 	}
-	
-	
-	
 } // end of class FlowInfo
 } // end of package

@@ -26,6 +26,17 @@ import com.voxelengine.worldmodel.tasks.landscapetasks.*;
 
 public class ConsoleCommands {
 	
+	private static function setGC():void {
+		if ( Globals.g_oxelBreakEnabled ) {
+			Globals.oxelBreakDataReset()
+			Log.out( "Selected Oxel break point is off", Log.WARN );
+		}
+		else {
+			Globals.oxelBreakDataSet( EditCursor.currentInstance.gciData.gc )
+			Log.out( "Selected Oxel break point is ON data: " + EditCursor.currentInstance.gciData.gc.toString(), Log.WARN );
+		}
+	}
+
 	private static function reset():void
 	{
 		if ( Player.player )
@@ -303,6 +314,7 @@ public class ConsoleCommands {
 	public static function addCommands():void
 	{
 		DConsole.createCommand( "reset", reset );
+		DConsole.createCommand( "setGC", setGC );
 		DConsole.createCommand( "gravity", gravity );
 		DConsole.createCommand( "collide", collide );
 		DConsole.createCommand( "trail", trail );

@@ -243,16 +243,24 @@ package com.voxelengine.renderer
 				if ( null != lcm ) {
 					var camOxel:Oxel = lcm.getOxelAtWSPoint( wsPositionCamera, 4 )
 					if ( camOxel && Globals.BAD_OXEL != camOxel ) {
-						if ( TypeInfo.WATER == camOxel.type )
+						if ( TypeInfo.WATER == camOxel.type ) {
+							Globals.g_underwater = true
 							WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.CREATE ) )
-						else
+						}
+						else {
+							Globals.g_underwater = false
 							WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.ANNIHILATE ) )
+						}
 					}
-					else
+					else {
+						Globals.g_underwater = false
 						WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.ANNIHILATE ) )
+					}
 				}
-				else
+				else {
+					Globals.g_underwater = false
 					WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.ANNIHILATE ) )
+				}
 			}
 			
 //			trace( "Renderer.render - wsPositionCamera: " + wsPositionCamera );

@@ -355,7 +355,7 @@ public class EditCursor extends VoxelModel
 		gciData = null;
 		// this puts the insert/delete location if appropriate into the gciData
 		if ( cursorOperation != CursorOperationEvent.NONE )
-			ModelCacheUtils.highLightEditableOxel();
+			ModelCacheUtils.highLightEditableOxel( Globals.g_underwater ? TypeInfo.WATER : TypeInfo.AIR );
 
 		// We generate gci data for INSERT_MODEL with cursorShape == MODEL_CHILD || MODEL_AUTO
 		if ( gciData ) {

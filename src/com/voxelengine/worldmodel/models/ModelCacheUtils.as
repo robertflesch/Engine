@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.worldmodel.models.types.EditCursor;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.Region;
+	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
 	import flash.utils.ByteArray;
@@ -108,7 +109,7 @@ package com.voxelengine.worldmodel.models
 				return 0;			
 		}
 
-		static public function highLightEditableOxel():void {
+		static public function highLightEditableOxel( $ignoreType:uint = 100 ):void {
 			if ( !VoxelModel.controlledModel )
 				return;
 			
@@ -116,6 +117,7 @@ package com.voxelengine.worldmodel.models
 			_worldSpaceIntersections.length = 0;
 			
 			// We should only use the models in the view frustrum - TODO - RSF
+			var ignoreType:uint = Globals.g_underwater ? TypeInfo.WATER : TypeInfo.AIR
 			var editableModel:VoxelModel = findEditableModel();
 			_totalIntersections.length = 0;
 			_worldSpaceIntersections.length = 0;
@@ -130,7 +132,7 @@ package com.voxelengine.worldmodel.models
 				{
 					const minSize:int = EditCursor.currentInstance.grain;
 					
-					editableModel.lineIntersectWithChildren( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections, minSize )
+					editableModel.lineIntersectWithChildren( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections, $ignoreType, minSize )
 						
 					for each ( var gcIntersection:GrainCursorIntersection in _worldSpaceIntersections )
 					{
@@ -172,7 +174,7 @@ package com.voxelengine.worldmodel.models
 			if ( vm )
 			{
 				const minSize:int = 2; // TODO pass this in?
-				vm.lineIntersectWithChildren( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections, minSize )
+				vm.lineIntersectWithChildren( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections, TypeInfo.AIR, minSize )
 					
 				for each ( var gcIntersection:GrainCursorIntersection in _worldSpaceIntersections )
 				{

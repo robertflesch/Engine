@@ -37,6 +37,11 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	{		
 		static public function addTask( $modelGuid:String, $gc:GrainCursor, $type:int, $taskPriority:int ):void {
 			// http://jacksondunstan.com/articles/2439 for a better assert
+			if ( TypeInfo.INVALID == $type ) {
+				Log.out( "Flow.addTask - cant add task for TypeInfo.INVALID", Log.WARN );
+				return
+			}
+			
 			if ( null == $modelGuid || "" == $modelGuid ) {
 				Log.out( "Flow.addTask - cant add task for null or empty model guid", Log.WARN );
 				return
@@ -118,6 +123,10 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			// Prefer going down if possible (or up for floatium)
 			var floatiumTypeID:uint = TypeInfo.getTypeId( "floatium" );
 			var flowCandidates:Vector.<FlowCandidate> = new Vector.<FlowCandidate>;
+			
+		if ( Globals.g_oxelBreakEnabled	)
+			if ( gc.evalGC( Globals.g_oxelBreakData ) )
+				trace( "Flow.flowStartContinous - setGC breakpoint" )
 			var partial:Boolean = false;
 			if ( floatiumTypeID == type )
 				partial = canFlowInto( $flowFromOxel, Globals.POSY, flowCandidates );
@@ -139,7 +148,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			}
 				
 			// no downs found, so check outs
-			if ( 0 == flowCandidates.length ) {
+			if ( 0 == flowCandidates.length && 0 < $flowFromOxel.flowInfo.out) {
 				// check sides once
 				canFlowInto( $flowFromOxel, Globals.POSX, flowCandidates );
 				canFlowInto( $flowFromOxel, Globals.NEGX, flowCandidates );
@@ -186,6 +195,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 						//Log.out( "Oxel.flowable - 2 Different flow types here! getting IP for: " + Globals.Info[type].name + "  with " + Globals.Info[no.type].name );
 						
 						interactWithFlowableType( no );
+						partial = true
 					}
 					else {
 						//Log.out( "Oxel.flowable - ALREADY " + Globals.Info[no.type].name + " here" );
@@ -241,10 +251,6 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					continue
 				
 				//Log.out( "Oxel.flowTaskAdd - $count: " + $countDown + "  countOut: " + $countOut + " gc data: " + flowCanditate.gc.toString() + " tasks: " + (Globals.g_flowTaskController.queueSize() + 1) );
-				var	taskPriority:int = 3;
-				if ( $upOrDown )
-					taskPriority = 1;
-				
 				if (  null == flowTest.flowCandidate.flowInfo )
 					flowTest.flowCandidate.flowInfo = FlowInfoPool.poolGet()
 
@@ -252,10 +258,24 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				var fi:FlowInfo = flowTest.flowCandidate.flowInfo
 				fi.copy( $flowInfo )
 				fi.directionSetAndDecrement( flowTest.dir, stepSize )
-				if ( 0 == fi.down )
-					continue
-				else if ( $upOrDown )
+					
+				var	taskPriority:int = 3;
+				if ( $upOrDown ) {
+					taskPriority = 1
 					flowTest.flowCandidate.flowInfo.flowScaling.reset()
+					if ( 0 > fi.down )
+						continue
+					else if ( fi.changeType( stepSize ) ) {
+						var newType:uint = TypeInfo.changeType( type )
+						if ( TypeInfo.AIR == newType )
+							continue
+						else {	
+							_type = newType
+							fi.copy( TypeInfo.typeInfo[type].flowInfo )
+						}
+					}
+
+				}
 					
 				//Log.out( "Flow.flowTasksAdd fi.type: " + fi.type + "  fi.out" + fi.out + "  fi.flowScaling.min " + fi.flowScaling.min() )
 					

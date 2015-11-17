@@ -98,6 +98,9 @@ package com.voxelengine.worldmodel
 		static public function flowable( type:int ):Boolean { return typeInfo[type].flowable; }
 		
 		[inline]
+		static public function changeType( type:int ):uint { return typeInfo[type]._changeType; }
+		
+		[inline]
 		static public function drawable( type:int ):Boolean { return (( typeInfo[type].solid || typeInfo[type].alpha ) ? true: false); }
 		
 		[inline]
@@ -114,6 +117,7 @@ package com.voxelengine.worldmodel
 
 		//////////////////////////////////////////////////////////////////////////////////////////////
 		private var _typeId:uint				= TypeInfo.INVALID;
+		private var _changeType:uint			= TypeInfo.AIR;
 		private var _category:String 			= "INVALID";
 		private var _subCat:String 				= "INVALID";
 
@@ -388,6 +392,8 @@ package com.voxelengine.worldmodel
 					_spreadInterval = $json.flowable[3]
 				if ( $json.flowable[4] )
 					_flowScalable = $json.flowable[4]
+				if ( $json.flowable[5] )
+					_changeType = $json.flowable[5]
 			}
 			else
 			{

@@ -827,6 +827,22 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		Log.out("Oxel.mergeAndRebuild - rebuildAll took: " + (getTimer() - _timer));
 	}
 	
+	public function mergeAIRAndRebuild():void {
+		var _timer:int = getTimer();
+		Oxel.nodes = 0;
+		mergeAirRecursive();
+		Log.out("Oxel.mergeAIRAndRebuild - merge took: " + (getTimer() - _timer) + " count " + Oxel.nodes );
+		
+		_timer = getTimer();
+		Oxel.nodes = 0;
+		mergeAirRecursive();
+		Log.out("Oxel.mergeAIRAndRebuild - merge 2 took: " + (getTimer() - _timer) + " count " + Oxel.nodes );
+		
+		_timer = getTimer();
+		rebuildAll();
+		Log.out("Oxel.mergeAIRAndRebuild - rebuildAll took: " + (getTimer() - _timer));
+	}
+	
 	public function checkForMerge():Boolean	{
 		const childType:uint = _children[0].type;
 		var hasBrightnessData:Boolean = false;
@@ -878,6 +894,20 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 		else {
 			if ( _parent )
+				return _parent.checkForMerge();
+		}
+		return false;
+	}
+	
+	private function mergeAirRecursive():Boolean {
+		if ( childrenHas() ) {
+			for each ( var child:Oxel in _children ) {
+				if ( child.mergeAirRecursive() )
+					return false;
+			}
+		}
+		else {
+			if ( TypeInfo.AIR == type && _parent )
 				return _parent.checkForMerge();
 		}
 		return false;
@@ -1143,9 +1173,12 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		else  if ( TypeInfo.LEAF == type )
 			facesSetAll();
 		else if ( faceHasDirtyBits() ) {
-			var oppositeOxel:Oxel = null ;
-if ( gc.eval( 5, 10, 44, 46 ) )
-	trace( "Oxel.facesBuildTerminal - found it" );
+			var oppositeOxel:Oxel = null
+			
+			if ( Globals.g_oxelBreakEnabled	)
+				if ( gc.evalGC( Globals.g_oxelBreakData ) )
+					trace( "Oxel.facesBuildTerminal - setGC breakpoint" )
+	
 			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 			{
 				//if ( face == Globals.POSY && type == TypeInfo.WATER )
@@ -1236,6 +1269,13 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 					{
 						// If the oxel opposite this face has alpha, I need to set the face
 						if ( TypeInfo.hasAlpha( oppositeOxel.type ) || (oppositeOxel.flowInfo && oppositeOxel.flowInfo.flowScaling.has() ) ) {
+							// I dont like doing this here, but since oxels are not placed during the rebuild water phase, this is critical to get water right
+							if ( TypeInfo.AIR == oppositeOxel.type && Globals.POSY == face && TypeInfo.flowable( type ) ) {
+								if ( null == _flowInfo )
+									_flowInfo = new FlowInfo()
+								if ( !flowInfo.flowScaling.has() )
+									FlowScaling.scaleTopFlowFace( this )
+							}
 							faceSet( face );
 						}
 						// oxel opposite (oppositeOxel) does not have alpha.
@@ -1833,15 +1873,17 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Intersection functions START
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public function lineIntersect( $msStartPoint:Vector3D, $msEndPoint:Vector3D, $msIntersections:Vector.<GrainCursorIntersection> ):void {
+	public function lineIntersect( $msStartPoint:Vector3D, $msEndPoint:Vector3D, $msIntersections:Vector.<GrainCursorIntersection>, $ignoreType:uint = 100 ):void {
+		if ( $ignoreType == type && !childrenHas() )
+			return;
 		if ( TypeInfo.AIR == type && !childrenHas() )
 			return;
 		gc.lineIntersect( this, $msStartPoint, $msEndPoint, $msIntersections );
 	}
 
-	public function lineIntersectWithChildren( $msStartPoint:Vector3D, $msEndPoint:Vector3D, $msIntersections:Vector.<GrainCursorIntersection>, $minSize:int = 2 ):void	{
+	public function lineIntersectWithChildren( $msStartPoint:Vector3D, $msEndPoint:Vector3D, $msIntersections:Vector.<GrainCursorIntersection>, $ignoreType:uint, $minSize:int = 2 ):void	{
 		
-		if ( !childrenHas() && TypeInfo.AIR != type )
+		if ( !childrenHas() && $ignoreType != type )
 			gc.lineIntersect( this, $msStartPoint, $msEndPoint, $msIntersections );
 		else if ( gc.grain <=  $minSize	)			
 			gc.lineIntersect( this, $msStartPoint, $msEndPoint, $msIntersections );		
@@ -1855,7 +1897,7 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 			var totalIntersections:Vector.<GrainCursorIntersection> = new Vector.<GrainCursorIntersection>();
 			for each ( var child:Oxel in _children ) 
 			{
-				child.lineIntersect( $msStartPoint, $msEndPoint, childIntersections );
+				child.lineIntersect( $msStartPoint, $msEndPoint, childIntersections, $ignoreType );
 				for each ( var gcIntersection:GrainCursorIntersection in childIntersections )
 				{
 					gcIntersection.oxel = child;
@@ -1876,7 +1918,7 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 			for each ( var gci:GrainCursorIntersection in totalIntersections )
 			{
 				// closest child might be empty, if no intersection with this child, try the next one.
-				gci.oxel.lineIntersectWithChildren( $msStartPoint, $msEndPoint, $msIntersections, $minSize );
+				gci.oxel.lineIntersectWithChildren( $msStartPoint, $msEndPoint, $msIntersections, $ignoreType, $minSize );
 				// does this bail after the first found interesection?
 				if ( 0 != $msIntersections.length )
 				{
@@ -2297,8 +2339,9 @@ if ( gc.eval( 5, 10, 44, 46 ) )
 				child.rebuildWater(); }
 		else {
 			if ( TypeInfo.WATER == type ) {
-				if ( 5 < gc.grain )
-					childrenCreate( true )
+				if ( 5 < gc.grain ) {
+					trace( "Oxel.rebuildWater: " + gc.toString() )
+					childrenCreate( true ) }
 				facesMarkAllDirty();
 				quadsDeleteAll();
 			}

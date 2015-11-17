@@ -612,7 +612,7 @@ public class VoxelModel
 	public function worldToModelNew(v:Vector3D,d:Vector3D):void { return instanceInfo.worldToModelNew(v,d); }
 	public function modelToWorld(v:Vector3D):Vector3D { return instanceInfo.modelToWorld(v); }
 	
-	public function lineIntersect( $worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>):void {
+	public function lineIntersect( $worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection> ):void {
 		var modelSpaceStartPoint:Vector3D = worldToModel( $worldSpaceStartPoint );
 		var modelSpaceEndPoint:Vector3D   = worldToModel( $worldSpaceEndPoint );
 		
@@ -640,7 +640,7 @@ public class VoxelModel
 		//else
 		{
 			// this is returning model space intersections
-			modelInfo.data.oxel.lineIntersect(modelSpaceStartPoint, modelSpaceEndPoint, worldSpaceIntersections);
+			modelInfo.data.oxel.lineIntersect(modelSpaceStartPoint, modelSpaceEndPoint, worldSpaceIntersections );
 		
 			for each (var gci:GrainCursorIntersection in worldSpaceIntersections) {
 				gci.wsPoint = modelToWorld(gci.point);
@@ -650,10 +650,10 @@ public class VoxelModel
 		GrainCursorPool.poolDispose( gct );
 	}
 	
-	public function lineIntersectWithChildren($worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>, minSize:int):void {
+	public function lineIntersectWithChildren($worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>, $ignoreType:uint, minSize:int):void {
 		var msStartPoint:Vector3D = worldToModel( $worldSpaceStartPoint );
 		var msEndPoint:Vector3D   = worldToModel( $worldSpaceEndPoint );
-		modelInfo.data.oxel.lineIntersectWithChildren( msStartPoint, msEndPoint, worldSpaceIntersections, minSize );
+		modelInfo.data.oxel.lineIntersectWithChildren( msStartPoint, msEndPoint, worldSpaceIntersections, $ignoreType, minSize );
 		// lineIntersect returns modelSpaceIntersections, convert to world space.
 		for each (var gci:GrainCursorIntersection in worldSpaceIntersections)
 			gci.wsPoint = modelToWorld(gci.point);
@@ -819,7 +819,8 @@ public class VoxelModel
 		var worldSpaceStartPoint:Vector3D = model.instanceInfo.positionGet.add(model.instanceInfo.center);
 		
 		var worldSpaceEndPoint:Vector3D = model.instanceInfo.worldSpaceMatrix.transformVector(new Vector3D(0, 0, -250));
-		collisionCandidate.lineIntersectWithChildren(worldSpaceEndPoint, worldSpaceStartPoint, worldSpaceIntersections, modelInfo.data.oxel.gc.bound);
+		// are parmeter here backwards?
+		collisionCandidate.lineIntersectWithChildren(worldSpaceEndPoint, worldSpaceStartPoint, worldSpaceIntersections, TypeInfo.AIR, modelInfo.data.oxel.gc.bound);
 		
 		if (worldSpaceIntersections.length)
 		{

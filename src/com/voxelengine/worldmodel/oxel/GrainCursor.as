@@ -687,5 +687,13 @@ public class GrainCursor
 		else
 			return false;
 	}
+	
+	public function evalGC( $gc:GrainCursor ):Boolean {
+		if ( grain == $gc.grain && grainY == $gc.grainY && grainX == $gc.grainX && grainZ == $gc.grainZ )
+			return true;
+		else
+			return false;
+	}
+	
 }
 }

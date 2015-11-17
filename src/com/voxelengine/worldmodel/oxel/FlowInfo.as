@@ -52,31 +52,34 @@ public class FlowInfo
 	public static const FLOW_TYPE_SPRING:int				= 3;
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//  _flowInfo function this is a bitwise data field. which holds flow type, CONTRIBUTE, count out and count down
+	//  _data is a bitwise data field. which holds flow type, direction, count out and count down
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private var _data:uint 									= 0;                 
 	private var _flowScaling:FlowScaling					= new FlowScaling();
 	
 	public 	function get out():int { return (_data & FLOW_OUT) >> FLOW_OUT_OFFSET; }
-	public 	function set out($val:int):void { $val = $val << FLOW_OUT_OFFSET;  _data &= FLOW_OUT_MASK; _data |= $val; tempCheckFlowType() }
-	
+	public 	function set out($val:int):void { $val = $val << FLOW_OUT_OFFSET;  _data &= FLOW_OUT_MASK; _data |= $val;  }
+	public 	function     outInc( $val:uint ):void { var i:int = out; i += $val; out = i; }
+	public 	function     outDec( $val:uint ):void { var i:int = out; i -= $val;  0 > i ? out = 0 : out = i; }
+	// outRef is the max possible out values
 	public 	function get outRef():int { return (_data & FLOW_OUT_REF ) >> FLOW_OUT_REF_OFFSET; }
 	private	function     outRefSet($val:int):void { $val = $val << FLOW_OUT_REF_OFFSET;  _data &= FLOW_OUT_REF_MASK; _data |= $val;	}
 	
 	public 	function get down():int { return (_data & FLOW_DOWN) >> FLOW_DOWN_OFFSET; }
-	public 	function set down($val:int):void { $val = $val << FLOW_DOWN_OFFSET; _data &= FLOW_DOWN_MASK; _data |= $val; tempCheckFlowType()	 }
+	public 	function set down($val:int):void { 
+		$val = $val << FLOW_DOWN_OFFSET;
+		_data &= FLOW_DOWN_MASK;
+		_data |= $val; 	 
+	}
+	// Once we go down, all out values are reset
+	public function      downInc( $val:uint ):void { var i:int = down; i += $val; down = i; out = outRef; }
+	public function      downDec( $val:uint ):void { var i:int = down; i -= $val; 0 > i ? down = 0 : down = i; out = outRef; }
 	
 	public 	function get type():int { return (_data & FLOW_FLOW_TYPE) >> FLOW_TYPE_OFFSET; }
 	public 	function set type($val:int):void { 
 		$val = $val << FLOW_TYPE_OFFSET;
 		_data &= FLOW_FLOW_TYPE_MASK;
 		_data = $val | _data; 
-		tempCheckFlowType()	
-	}
-	
-	private function tempCheckFlowType():void {
-		if ( 3 == ( _data & FLOW_FLOW_TYPE_MASK  ) )
-			Log.out( "FlowInfo.tempCheckFlowType - CONTINUOUS", Log.WARN )
 	}
 	
 	public function isSource():Boolean { return outRef == out }
@@ -86,7 +89,7 @@ public class FlowInfo
 		$val = $val << FLOW_DIR_OFFSET;
 		_data &= FLOW_FLOW_DIR_MASK;
 		_data = $val | _data;
-		tempCheckFlowType()			
+					
 	}
 	
 	// This should really only be used by the flowInfoPool
@@ -115,10 +118,21 @@ public class FlowInfo
 	
 	public function copy( $rhs:FlowInfo ):void {
 		_data = $rhs._data
-		tempCheckFlowType()	
+			
 		flowScaling.copy( $rhs.flowScaling )
 	}
 		
+	public 	function changeType( $stepSize:uint ):Boolean  { 
+		if ( down < $stepSize )
+			return true
+		else if ( down < $stepSize * 2 )
+			return Math.random() < 0.80
+		else if ( down < $stepSize * 3 )
+			return Math.random() < 0.5
+		else if ( down < $stepSize * 4 )
+			return Math.random() < 0.20
+		return false	
+	}
 	public 	function directionSetAndDecrement( $val:int, $stepSize:uint ):void  { 
 		direction = $val
 		
@@ -143,13 +157,6 @@ public class FlowInfo
 		}
 		//Log.out( "FlowInfo.dirAndSet - out: " + out + "  oxelSize: " + $stepSize );
 	}
-	
-	public 	function outInc( $val:uint ):void { var i:int = out; i += $val; out = i; }
-	public 	function outDec( $val:uint ):void { var i:int = out; i -= $val;  0 > i ? out = 0 : out = i; }
-
-	// Once we go down, all out values are reset
-	public function downInc( $val:uint ):void { var i:int = down; i += $val; down = i; out = outRef; }
-	public function downDec( $val:uint ):void { var i:int = down; i -= $val; 0 > i ? down = 0 : down = i; out = outRef; }
 	
 	public function get flowScaling():FlowScaling 	{ return _flowScaling; }
 

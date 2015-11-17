@@ -24,6 +24,7 @@ package com.voxelengine {
 	import com.voxelengine.worldmodel.crafting.CraftingManager;
 	import com.voxelengine.worldmodel.models.*;
 	import com.voxelengine.worldmodel.models.types.Player;
+	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.oxel.OxelBad;
 	import com.voxelengine.utils.GUID;
@@ -84,6 +85,11 @@ package com.voxelengine {
 		
 		static public const MANIFEST_VERSION:int = 100;
 		
+		public static var g_underwater:Boolean
+		public static var g_oxelBreakEnabled:Boolean
+		public static var g_oxelBreakData:GrainCursor = new GrainCursor()
+		public static function oxelBreakDataSet( $gc:GrainCursor ):void { g_oxelBreakData.bound = $gc.grain; g_oxelBreakData.set_values( $gc.grainX, $gc.grainY, $gc.grainZ, $gc.grain ); g_oxelBreakEnabled = true }
+		public static function oxelBreakDataReset():void { g_oxelBreakData.set_values( 0,0,0,0 ); g_oxelBreakEnabled = false }
 
 		public static var g_landscapeTaskController:TaskController = new TaskController();
 		public static var g_flowTaskController:TaskController =  new TaskController();
