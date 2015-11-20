@@ -25,8 +25,6 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 public class Inventory extends PersistanceObject
 {
 	// support data for persistance
-	private var _createdDate:Date;
-	private var _modifiedDate:Date;
 	private var _generateNewInventory:Boolean;
 	private var _loaded:Boolean;
 
@@ -62,8 +60,8 @@ public class Inventory extends PersistanceObject
 	
 	override public function save():void {
 		// TODO this needs to detect "changed"
-		if ( !loaded ) {
-			Log.out( "Inventory.save - Not LOADED - guid: " + guid, Log.DEBUG );
+		if ( !loaded && !changed ) {
+			Log.out( "Inventory.save - Not LOADED and not changed - guid: " + guid, Log.DEBUG );
 			return; 
 		}
 		//Log.out( "Inventory.save - saving - guid: " + guid, Log.DEBUG );
@@ -71,31 +69,36 @@ public class Inventory extends PersistanceObject
 	}
 	
 	override protected function toObject():void {
-		_slots.toObject(dbo);
-		
+		_slots.toObject( info );
+		info.modifiedData = new Date().toUTCString()
 		// voxels
 		var ba:ByteArray = new ByteArray(); 
 		ba.writeUTF( guid );
 		_voxels.toByteArray( ba );
 		ba.compress();
-		dbo.data = ba;	
+		info.voxelData = ba;	
 	}
 
-
 	public function fromObject( $dbo:DatabaseObject ):void {
-		
+		var isNewRecord:Boolean = false
 		if ( $dbo ) {
-			_createdDate	= $dbo.createdDate;
-			_modifiedDate   = $dbo.modifiedDate;
-			dbo 			= $dbo;
+			dbo  = $dbo
+			info = $dbo;
+		}
+		else {
+			dbo = new DatabaseObject( _table, "0", "0", 0, true, null )
+			dbo.data = new Object()
+			info = dbo.data
+			info.createdDate	= new Date().toUTCString()
+			isNewRecord = true
 		}
 		
 		// Slot data is stored as fields for easy analysis
 		// we can know what user carry around
-		_slots.fromObject( $dbo );
+		_slots.fromObject( info );
 		
-		if ( $dbo && $dbo.data ) {
-			var ba:ByteArray = $dbo.data 
+		if ( info && info.voxelData ) {
+			var ba:ByteArray = info.voxelData 
 			if ( ba && 0 < ba.bytesAvailable ) {
 				ba.uncompress();
 				var ownerId:String = ba.readUTF();
@@ -107,6 +110,9 @@ public class Inventory extends PersistanceObject
 			if ( ownerModel && ownerModel is Player )
 				_voxels.addTestData();
 		}
+		
+		if ( isNewRecord )
+			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, guid, null ) );		
 	}
 	
 	public function load():void {

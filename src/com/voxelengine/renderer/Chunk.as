@@ -61,6 +61,9 @@ public class Chunk {
 	}
 	
 	
+	// TODO
+	// add functions and optimize
+	//
 	// I can see I need two more functions
 	// public function merge():Chunk
 	// public function divide():?

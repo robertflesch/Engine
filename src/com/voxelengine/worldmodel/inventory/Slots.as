@@ -12,8 +12,6 @@ import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.utils.ByteArray;
 
-import playerio.DatabaseObject;
-
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.InventorySlotEvent;
@@ -30,8 +28,8 @@ public class Slots
 
 	public function Slots( $owner:Inventory ) {
 		// Do I need to unregister this?
-		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
-		//InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_DEFAULT_RESPONSE, defaultResponse );
+		InventorySlotEvent.addListener( InventorySlotEvent.SLOT_CHANGE,	slotChange );
+		//InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_RESPONSE, defaultResponse );
 		_owner = $owner;
 		FunctionRegistry.functionAdd( noneSlots, "noneSlots" );
 		FunctionRegistry.functionAdd( pickToolSlots, "pickToolSlots" );
@@ -51,7 +49,7 @@ public class Slots
 	}
 	*/
 	public function unload():void {
-		InventorySlotEvent.removeListener( InventorySlotEvent.INVENTORY_SLOT_CHANGE,	slotChange );
+		InventorySlotEvent.removeListener( InventorySlotEvent.SLOT_CHANGE,	slotChange );
 	}
 	
 	public function slotChange(e:InventorySlotEvent):void {
@@ -90,36 +88,36 @@ public class Slots
 		return new ObjectInfo( null, ObjectInfo.OBJECTINFO_INVALID );
 	}
 	
-	public function fromObject( $dbo:DatabaseObject ):void {	
-		if ( $dbo && $dbo.slot0 ) {
+	public function fromObject( $info:Object ):void {	
+		if ( $info && $info.slot0 ) {
 			var index:int;
-			setItemData( index, createObjectFromInventoryString( $dbo.slot0, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $dbo.slot1, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $dbo.slot2, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $dbo.slot3, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $dbo.slot4, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $dbo.slot5, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $dbo.slot6, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $dbo.slot7, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $dbo.slot8, index++ ) );
-			setItemData( index, createObjectFromInventoryString( $dbo.slot9, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $info.slot0, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $info.slot1, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $info.slot2, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $info.slot3, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $info.slot4, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $info.slot5, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $info.slot6, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $info.slot7, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $info.slot8, index++ ) );
+			setItemData( index, createObjectFromInventoryString( $info.slot9, index++ ) );
 		}
 		else {
 			addSlotDefaultData();		
 		}
 	}
 	
-	public function toObject( $dbo:DatabaseObject ):void {
-		$dbo.slot0	= _items[0].asInventoryString();
-		$dbo.slot1	= _items[1].asInventoryString();
-		$dbo.slot2	= _items[2].asInventoryString();
-		$dbo.slot3	= _items[3].asInventoryString();
-		$dbo.slot4	= _items[4].asInventoryString();
-		$dbo.slot5	= _items[5].asInventoryString();
-		$dbo.slot6	= _items[6].asInventoryString();
-		$dbo.slot7	= _items[7].asInventoryString();
-		$dbo.slot8	= _items[8].asInventoryString();
-		$dbo.slot9	= _items[9].asInventoryString();
+	public function toObject( $info:Object ):void {
+		$info.slot0	= _items[0].asInventoryString();
+		$info.slot1	= _items[1].asInventoryString();
+		$info.slot2	= _items[2].asInventoryString();
+		$info.slot3	= _items[3].asInventoryString();
+		$info.slot4	= _items[4].asInventoryString();
+		$info.slot5	= _items[5].asInventoryString();
+		$info.slot6	= _items[6].asInventoryString();
+		$info.slot7	= _items[7].asInventoryString();
+		$info.slot8	= _items[8].asInventoryString();
+		$info.slot9	= _items[9].asInventoryString();
 	}
 	
 	private function setItemData( $slot:int, $data:ObjectInfo ):void {
@@ -154,9 +152,13 @@ public class Slots
 	public function addSlotDefaultData():void {
 		Log.out( "Slots.addSlotDefaultData", Log.WARN );
 		initializeSlots();
-		Log.out( "Slots.addSlotDefaultData - How do I pass the model guid in second parameter?", Log.ERROR )
+		
 		// is guid model OR instance?
-		InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, _owner.guid, _owner.guid, 0, null ) );
+		// its the MODEL guid, since models have default data, instances have specific data
+		// so this message is handle by the model class.
+		// might need to be a table driven event also.
+		// so the default data is in the "class inventory" table
+		InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.DEFAULT_REQUEST, _owner.guid, _owner.guid, 0, null ) );
 	}
 	
 	

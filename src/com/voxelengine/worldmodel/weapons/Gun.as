@@ -56,7 +56,7 @@ public class Gun extends ControllableVoxelModel
 		//script.processClassJson( modelInfo );
 			
 		FunctionRegistry.functionAdd( fire, "fire" );
-		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, defaultGunInventory );
+		InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_REQUEST, defaultGunInventory );
 	}
 	
 	private function defaultGunInventory(e:InventorySlotEvent):void 
@@ -67,7 +67,7 @@ public class Gun extends ControllableVoxelModel
 				var oa:ObjectAction = new ObjectAction( null, "fire", ammo.guid + ".png", "Fire" );
 				oa.ammoName = ammo.name;
 				oa.instanceGuid = instanceInfo.instanceGuid;
-				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, e.ownerGuid, instanceInfo.instanceGuid, -1, oa ) ); 
+				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, e.ownerGuid, instanceInfo.instanceGuid, -1, oa ) ); 
 			}
 		}
 	}

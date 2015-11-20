@@ -35,6 +35,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	 */
 	public class Flow extends FlowTask 
 	{		
+		private var _vm:VoxelModel	// temp holder for VM, it is set to null when start routine exits.
 		static public function addTask( $modelGuid:String, $gc:GrainCursor, $type:int, $taskPriority:int ):void {
 			// http://jacksondunstan.com/articles/2439 for a better assert
 			if ( TypeInfo.INVALID == $type ) {
@@ -74,9 +75,9 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		override public function start():void {
 			super.start();
 			//Log.out( "Flow.start " + toString(), Log.WARN );
-			var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
-			if ( vm ) {
-				var $flowFromOxel:Oxel = vm.modelInfo.data.oxel.childGetOrCreate( _gc );
+			_vm = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
+			if ( _vm ) {
+				var $flowFromOxel:Oxel = _vm.modelInfo.data.oxel.childGetOrCreate( _gc );
 				if ( null == $flowFromOxel  ) {
 					Log.out( "Flow.start - null == $flowFromOxel", Log.WARN );
 					return; }
@@ -101,6 +102,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			else
 				Log.out( "Flow.start - VoxelModel not found: " + _guid, Log.ERROR );
 				
+			_vm = null	
 			super.complete();
 			//Log.out( "Flow.start - Complete time: " + (getTimer() - timeStart) );
 		}
@@ -114,9 +116,17 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			// go from 1,1,1 to 0,0,0 for flow order
 			// each child voxel should try to flow at least 8 before stopping
 			if ( MIN_MELT_GRAIN > $flowFromOxel.gc.grain )
+				//$flowFromOxel.changeOxel( _guid, $flowFromOxel.gc, TypeInfo.AIR )
+				_vm.write( $flowFromOxel.gc, TypeInfo.AIR )
 				return;
 				
-//			FlowFlop.addTask( _guid, $flowFromOxel.gc, $flowFromOxel.type, $flowFromOxel.flowInfo, 1 );
+			//FlowFlop.addTask( _guid, $flowFromOxel.gc, $flowFromOxel.type, $flowFromOxel.flowInfo, 1 );
+			
+			// so first the top layer should flow out.
+			// what does flow out mean?
+			// it means that the oxel should break into its children
+			// then the bottom half of the oxels should test the space around them
+			// if there is air, the should move to that space, and the oxel above them should move down.
 		}
 
 		private function flowStartContinous($flowFromOxel:Oxel):void {
@@ -124,9 +134,10 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			var floatiumTypeID:uint = TypeInfo.getTypeId( "floatium" );
 			var flowCandidates:Vector.<FlowCandidate> = new Vector.<FlowCandidate>;
 			
-		if ( Globals.g_oxelBreakEnabled	)
-			if ( gc.evalGC( Globals.g_oxelBreakData ) )
-				trace( "Flow.flowStartContinous - setGC breakpoint" )
+			if ( Globals.g_oxelBreakEnabled	)
+				if ( $flowFromOxel.gc.evalGC( Globals.g_oxelBreakData ) )
+					trace( "Flow.flowStartContinous - setGC breakpoint" )
+					
 			var partial:Boolean = false;
 			if ( floatiumTypeID == type )
 				partial = canFlowInto( $flowFromOxel, Globals.POSY, flowCandidates );
@@ -287,7 +298,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		private function writeFlowTypeAndScaleNeighbors( $flowIntoOxel:Oxel ):void 
 		{
 			// I can only flow into AIR, everything else I interact with
-			$flowIntoOxel.changeOxel( _guid, $flowIntoOxel.gc, type )
+			//$flowIntoOxel.changeOxel( _guid, $flowIntoOxel.gc, type )
+			_vm.write( $flowIntoOxel.gc, type )
 			var flowOver:Oxel = $flowIntoOxel.neighbor( Globals.NEGY );
 			var flowUnder:Oxel = $flowIntoOxel.neighbor( Globals.POSY );
 			if ( TypeInfo.FIRE ==  type ) {

@@ -22,8 +22,8 @@ import com.voxelengine.events.PersistanceEvent;
  */
 public class PersistanceObject
 {
+	protected var 	_table:String;
 	private var 	_guid:String;
-	private var 	_table:String;
 	private var 	_changed:Boolean;
 	private var 	_dynamicObj:Boolean;
 	private var 	_dbo:DatabaseObject;

@@ -131,7 +131,7 @@ public class VoxelModel
 		_associatedGrain.copyFrom( $val ); 
 	}
 	
-	private var 	_lastCollisionModel:VoxelModel; 											// INSTANCE NOT EXPORTED
+	private var 			_lastCollisionModel:VoxelModel; 											// INSTANCE NOT EXPORTED
 	public function get		lastCollisionModel():VoxelModel 		{ return _lastCollisionModel; }
 	public function set		lastCollisionModel(val:VoxelModel):void { _lastCollisionModel = val; }
 	public function 		lastCollisionModelReset():void 				{ _lastCollisionModel = null; }

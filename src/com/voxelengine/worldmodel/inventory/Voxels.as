@@ -9,8 +9,6 @@ package com.voxelengine.worldmodel.inventory {
 	
 import flash.utils.ByteArray;
 
-import playerio.DatabaseObject;
-
 import com.voxelengine.Log;
 import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.worldmodel.TypeInfo;

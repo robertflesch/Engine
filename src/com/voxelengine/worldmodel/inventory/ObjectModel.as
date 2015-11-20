@@ -74,7 +74,7 @@ public class ObjectModel extends ObjectInfo
 			if ( box )
 				box.reset()
 			Log.out( "ObjectModel.metadataFailed - guid: " + e.modelGuid, Log.WARN )
-			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, Network.userId, Network.userId, _slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) ) )
+			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, _slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) ) )
 		}
 	}
 	

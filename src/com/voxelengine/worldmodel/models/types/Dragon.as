@@ -52,8 +52,8 @@ public class Dragon extends Beast
 		hasInventory = true;
 		//usesGravity = true;
 		collisionMarkers = true;
-		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, defaultSlotDataRequest );
-//		InventorySlotEvent.addListener( InventorySlotEvent.INVENTORY_DEFAULT_RESPONSE, defaultSlotDataResponse );
+		InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest );
+//		InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_RESPONSE, defaultSlotDataResponse );
 		FunctionRegistry.functionAdd( loseControlHandler, "loseControlHandler" );
 	}
 	
@@ -249,10 +249,10 @@ public class Dragon extends Beast
 			Log.out( "Dragon.getDefaultSlotData - Loading default data into slots" , Log.WARN );
 			
 			var oa:ObjectAction = new ObjectAction( null, "loseControlHandler", "dismount.png", "Dismount" );
-			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_SLOT_CHANGE, instanceInfo.instanceGuid, instanceInfo.instanceGuid, 0, oa ) ); 
+			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, instanceInfo.instanceGuid, instanceInfo.instanceGuid, 0, oa ) ); 
 			
 			for each ( var gun:Gun in _guns )
-				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.INVENTORY_DEFAULT_REQUEST, instanceInfo.instanceGuid, gun.instanceInfo.instanceGuid, 0, null ) );
+				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.DEFAULT_REQUEST, instanceInfo.instanceGuid, gun.instanceInfo.instanceGuid, 0, null ) );
 		}
 	}
 	/*

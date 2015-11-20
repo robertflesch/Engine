@@ -17,9 +17,9 @@ import flash.events.EventDispatcher;
  */
 public class InventorySlotEvent extends Event
 {
-	static public const INVENTORY_SLOT_CHANGE:String  			= "INVENTORY_SLOT_CHANGE";
-	static public const INVENTORY_DEFAULT_REQUEST:String  		= "INVENTORY_DEFAULT_REQUEST";
-	static public const INVENTORY_DEFAULT_RESPONSE:String  		= "INVENTORY_DEFAULT_RESPONSE";
+	static public const SLOT_CHANGE:String  			= "SLOT_CHANGE";
+	static public const DEFAULT_REQUEST:String  		= "DEFAULT_REQUEST";
+	static public const DEFAULT_RESPONSE:String  		= "DEFAULT_RESPONSE";
 	
 	private var _ownerGuid:String; 		// Guid of model which owns the actionbar
 	private var _instanceGuid:String; 	// Guid of model which is implementing this action
@@ -42,7 +42,7 @@ public class InventorySlotEvent extends Event
    
 	public override function toString():String
 	{
-		return formatToString("InventoryEvent", "slotId", "data" );
+		return formatToString("InventorySlotEvent", "slotId", "data" );
 	}
 	
 	public function get ownerGuid():String { return _ownerGuid; }

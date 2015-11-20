@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models.types
 {
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.InventoryInterfaceEvent;
+import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.GUI.actionBars.UserInventory;
@@ -45,6 +46,7 @@ import com.voxelengine.worldmodel.RegionManager;
 import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
+	import com.voxelengine.worldmodel.inventory.*;
 import com.voxelengine.worldmodel.inventory.Inventory;
 import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.oxel.Oxel;
@@ -138,6 +140,7 @@ public class Player extends Avatar
 	
 	static private function onLogin( $event:LoginEvent ):void {
 		Log.out( "Player.onLogin - retrieve player info from Persistance", Log.DEBUG );
+		InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest )
 		Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
 	}
 	
@@ -363,6 +366,22 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
 	}
 
+	static private function defaultSlotDataRequest( $ise:InventorySlotEvent ):void {
+		// inventory is always on a instance guid.
+//		if ( instanceInfo.instanceGuid == $ise.instanceGuid ) {
+			Log.out( "Player.getDefaultSlotData - Loading default data into slots" , Log.WARN );
+			
+			var ot:ObjectTool = new ObjectTool( null, "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );
+			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, 0, ot ) ); 
+			var oa:ObjectAction = new ObjectAction( null, "noneSlots", "none.png", "Do nothing" );
+			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, 1, oa ) ); 
+			
+			
+//			for each ( var gun:Gun in _guns )
+//				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.DEFAULT_REQUEST, instanceInfo.instanceGuid, gun.instanceInfo.instanceGuid, 0, null ) );
+//		}
+	}
+				
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
 		Log.out( "Player.loseControl --------------------------------------------------------------------------------------------------------------------", Log.DEBUG );
 		super.loseControl( $modelDetaching, false );
@@ -680,20 +699,6 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 			instanceInfo.velocityReset();
 		}
 	}		
-	
-	import com.voxelengine.worldmodel.inventory.*;
-	override public function getDefaultSlotData():Vector.<ObjectInfo> {
-		
-		Log.out( "Player.getDefaultSlotData - Loading default data into slots" , Log.WARN );
-		var slots:Vector.<ObjectInfo> = new Vector.<ObjectInfo>( Slots.ITEM_COUNT );
-		for ( var i:int; i < Slots.ITEM_COUNT; i++ ) 
-			slots[i] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );
-		
-		slots[0] = new ObjectTool( null, "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );
-		slots[1] = new ObjectAction( null, "noneSlots", "none.png", "Do nothing" );
-		
-		return slots;
-	}
 	
 	/* applyGravityNew
 	private	function applyGravityNew( $elapsedTimeMS:int ):void
