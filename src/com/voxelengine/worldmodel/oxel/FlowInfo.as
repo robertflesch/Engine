@@ -29,14 +29,14 @@ public class FlowInfo
 	private static const FLOW_FLOW_DIR:uint 				= 0x00f00000;
 	private static const FLOW_FLOW_DIR_MASK:uint 			= 0xff0fffff;
 	
-	private static const FLOW_OUT_REF:uint					= 0xff000000;
-	private static const FLOW_OUT_REF_MASK:uint				= 0x00ffffff;
+	private static const FLOW_DOWN_REF:uint					= 0xff000000;
+	private static const FLOW_DOWN_REF_MASK:uint			= 0x00ffffff; // reused out mask here
 	
 	private static const FLOW_DOWN_OFFSET:uint				= 0;
 	private static const FLOW_OUT_OFFSET:uint				= 8;
 	private static const FLOW_TYPE_OFFSET:uint				= 16;
 	private static const FLOW_DIR_OFFSET:uint				= 20;
-	private static const FLOW_OUT_REF_OFFSET:uint			= 24;
+	private static const FLOW_DOWN_REF_OFFSET:uint			= 24;
 
 	/*//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	 * FLOW FUNCTIONS
@@ -57,13 +57,15 @@ public class FlowInfo
 	private var _data:uint 									= 0;                 
 	private var _flowScaling:FlowScaling					= new FlowScaling();
 	
-	public 	function get out():int { return (_data & FLOW_OUT) >> FLOW_OUT_OFFSET; }
-	public 	function set out($val:int):void { $val = $val << FLOW_OUT_OFFSET;  _data &= FLOW_OUT_MASK; _data |= $val;  }
+	// using out in a different way now
+	private 	function get out():int { return (_data & FLOW_OUT) >> FLOW_OUT_OFFSET; }
+	private 	function set out($val:int):void { $val = $val << FLOW_OUT_OFFSET;  _data &= FLOW_OUT_MASK; _data |= $val;  }
 	public 	function     outInc( $val:uint ):void { var i:int = out; i += $val; out = i; }
 	public 	function     outDec( $val:uint ):void { var i:int = out; i -= $val;  0 > i ? out = 0 : out = i; }
+	
 	// outRef is the max possible out values
-	public 	function get outRef():int { return (_data & FLOW_OUT_REF ) >> FLOW_OUT_REF_OFFSET; }
-	private	function     outRefSet($val:int):void { $val = $val << FLOW_OUT_REF_OFFSET;  _data &= FLOW_OUT_REF_MASK; _data |= $val;	}
+	public 	function get downRef():int { return (_data & FLOW_DOWN_REF ) >> FLOW_DOWN_REF_OFFSET; }
+	private	function     downRefSet($val:int):void { $val = $val << FLOW_DOWN_REF_OFFSET;  _data &= FLOW_DOWN_REF_MASK; _data |= $val;	}
 	
 	public 	function get down():int { return (_data & FLOW_DOWN) >> FLOW_DOWN_OFFSET; }
 	public 	function set down($val:int):void { 
@@ -72,8 +74,8 @@ public class FlowInfo
 		_data |= $val; 	 
 	}
 	// Once we go down, all out values are reset
-	public function      downInc( $val:uint ):void { var i:int = down; i += $val; down = i; out = outRef; }
-	public function      downDec( $val:uint ):void { var i:int = down; i -= $val; 0 > i ? down = 0 : down = i; out = outRef; }
+	public function      downInc( $val:uint ):void { var i:int = down; i += $val; down = i; /*out = outRef;*/ }
+	public function      downDec( $val:uint ):void { var i:int = down; i -= $val; 0 > i ? down = 0 : down = i; /*out = outRef;*/ }
 	
 	public 	function get type():int { return (_data & FLOW_FLOW_TYPE) >> FLOW_TYPE_OFFSET; }
 	public 	function set type($val:int):void { 
@@ -82,14 +84,13 @@ public class FlowInfo
 		_data = $val | _data; 
 	}
 	
-	public function isSource():Boolean { return outRef == out }
+	public function isSource():Boolean { return _flowScaling.min() == 16 || _flowScaling.min() == 15 }
 
 	public 	function get direction():int { return (_data & FLOW_FLOW_DIR) >> FLOW_DIR_OFFSET; }
 	public 	function set direction( $val:int ):void  { 
 		$val = $val << FLOW_DIR_OFFSET;
 		_data &= FLOW_FLOW_DIR_MASK;
 		_data = $val | _data;
-					
 	}
 	
 	// This should really only be used by the flowInfoPool
@@ -105,8 +106,7 @@ public class FlowInfo
 
 	public function copyToChild( $rhs:FlowInfo ):void {
 		type = $rhs.type
-		outRefSet( $rhs.outRef )
-		out = $rhs.out
+		downRefSet( $rhs.downRef )
 		down = $rhs.down
 		direction = $rhs.direction
 
@@ -133,8 +133,8 @@ public class FlowInfo
 			return Math.random() < 0.20
 		return false	
 	}
-	public 	function directionSetAndDecrement( $val:int, $stepSize:uint ):void  { 
-		direction = $val
+	public 	function directionSetAndDecrement( $dir:int, $stepSize:uint ):void  { 
+		direction = $dir
 		
 		if ( Globals.ALL_DIRS == direction )
 			return;
@@ -142,18 +142,17 @@ public class FlowInfo
 			if ( 0 < down ) {
 				if ( down < $stepSize )
 					down = 0
-				else	
+				else
 					downDec( $stepSize );
+				
+				out = 0
 			}
 		}
 		else {
-			if ( 0 < out ) {
-				// If the out is less then the amount we are going to decrement it, set it to 0
-				if ( out < $stepSize )
-					out = 0
-				else	
-					outDec( $stepSize );
-			}
+			// reset down value when we go out, like we reset out when we go down.
+			down = downRef
+			flowScaling.setToZero()
+			out = out + 1
 		}
 		//Log.out( "FlowInfo.dirAndSet - out: " + out + "  oxelSize: " + $stepSize );
 	}
@@ -161,8 +160,6 @@ public class FlowInfo
 	public function get flowScaling():FlowScaling 	{ return _flowScaling; }
 
 	public function inheritFlowMax( $intersectingFlowInfo:FlowInfo ):void {
-		if ( out < $intersectingFlowInfo.out )
-			out = $intersectingFlowInfo.out
 		if ( down < $intersectingFlowInfo.down )
 			down = $intersectingFlowInfo.down
 	}
@@ -178,8 +175,7 @@ public class FlowInfo
 		return fi
 	}
 	
-	public function fromJson( $flowJson:Object ):void
-	{
+	public function fromJson( $flowJson:Object ):void {
 		if ( 3 <= $flowJson.length )
 		{
 			type = $flowJson[0];
@@ -188,14 +184,15 @@ public class FlowInfo
 				Log.out( "FlowInfo.fromJson - Out value is greater then 15, clipping it to 15: " + outVal, Log.WARN );
 				outVal = 15;
 			}
-			out =  ( outVal * 4);
-			outRefSet( outVal * 4);
+//			out =  ( outVal * 4);
+//			outRefSet( outVal * 4);
 			var downVal:int = $flowJson[2];
 			if ( 63 < downVal ) { // down is never more then 63
 				Log.out( "FlowInfo.downVal - down value is greater then 63, clipping it to 63: " + downVal, Log.WARN );
 				downVal = 63;
 			}
 			down = downVal * 4;
+			downRefSet( downVal * 4);
 			direction = Globals.ALL_DIRS;
 		}
 		else
@@ -216,7 +213,7 @@ public class FlowInfo
 	}
 	
 	public function toString():String {
-		return "FlowInfo - _data: " + _data.toString(16) + " type: " + type + " out: " + out + " outRef: " + outRef + " down: " + down  + " dir: " + direction
+		return "FlowInfo - _data: " + _data.toString(16) + " type: " + type + " down: " + down  + " dir: " + direction
 	}
 } // end of class FlowInfo
 } // end of package

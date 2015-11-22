@@ -138,28 +138,28 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				if ( $flowFromOxel.gc.evalGC( Globals.g_oxelBreakData ) )
 					trace( "Flow.flowStartContinous - setGC breakpoint" )
 					
-			var partial:Boolean = false;
+			var downwardFlow:Boolean = false;
 			if ( floatiumTypeID == type )
-				partial = canFlowInto( $flowFromOxel, Globals.POSY, flowCandidates );
+				downwardFlow = canFlowInto( $flowFromOxel, Globals.POSY, flowCandidates );
 			else
-				partial = canFlowInto( $flowFromOxel, Globals.NEGY, flowCandidates );
-				
-			// if there is water below us, dont do anything
-			if ( 0 == flowCandidates.length && partial )
-				return;
+				downwardFlow = canFlowInto( $flowFromOxel, Globals.NEGY, flowCandidates );
 				
 			// if we found a down/up, add that as a priority
-			else if ( 0 < flowCandidates.length ) {
+			if ( 0 < flowCandidates.length ) {
 				flowTasksAdd( flowCandidates, true, $flowFromOxel.flowInfo );
 				// if we only went partially down, try the sides	
-				if ( false == partial )
+				if ( false == downwardFlow )
 					return;
 				// reset list
 				flowCandidates.length = 0;	
+			} else if ( downwardFlow ) {
+				trace( "Flow.flowStartContinous - partial" )
+				return
 			}
 				
 			// no downs found, so check outs
-			if ( 0 == flowCandidates.length && 0 < $flowFromOxel.flowInfo.out) {
+//			if ( 0 == flowCandidates.length && 0 < $flowFromOxel.flowInfo.out) {
+			if ( 0 == flowCandidates.length ) {
 				// check sides once
 				canFlowInto( $flowFromOxel, Globals.POSX, flowCandidates );
 				canFlowInto( $flowFromOxel, Globals.NEGX, flowCandidates );
@@ -217,8 +217,12 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 						}
 						else {
 							// there is water or lava or any other flowable type that is the same below us, we should not flow out.
-							if ( Globals.NEGY == $face )
+							if ( Globals.NEGY == $face ) {
+								if ( no.flowInfo.flowScaling.has() )
+									no.flowInfo.flowScaling.reset( no )
+									no.flowInfo.flowScaling.neighborsRecalc( no, false );
 								partial = true;
+							}
 						}
 					}
 				}
@@ -258,7 +262,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		private function flowTasksAdd( $fc:Vector.<FlowCandidate>, $upOrDown:Boolean, $flowInfo:FlowInfo ):void {
 			for each ( var flowTest:FlowCandidate in $fc ) {
 				const stepSize:int = ( flowTest.flowCandidate.gc.size() / Globals.UNITS_PER_METER) * 4
-				if ( !$upOrDown && $flowInfo.flowScaling.min() < stepSize/4 )
+				if ( !$upOrDown && 0 == $flowInfo.flowScaling.min() )
 					continue
 				
 				//Log.out( "Oxel.flowTaskAdd - $count: " + $countDown + "  countOut: " + $countOut + " gc data: " + flowCanditate.gc.toString() + " tasks: " + (Globals.g_flowTaskController.queueSize() + 1) );
@@ -307,14 +311,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				flowUnder.setOnFire( _guid )
 				return
 			}
-			//if ( $flowIntoOxel.gc.eval( 5, 3, 5, 0 ) )
-				//Log.out( "Bump over rock" )
 			$flowIntoOxel.flowInfo.flowScaling.calculate( $flowIntoOxel );
-			// if I have 0 scale, then this is not valid.
-			//if ( 0 ==  $flowIntoOxel.flowInfo.flowScaling.max() ) {
-				//$flowIntoOxel.changeOxel( _guid, $flowIntoOxel.gc, type )
-				//return
-			//}
 		
 			// if I flow under another of the same type
 			if ( Globals.BAD_OXEL != flowUnder ) {

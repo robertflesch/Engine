@@ -166,6 +166,10 @@ public class FlowScaling
 		//Log.out( "FlowScaling.recalculate is: " + toString() );
 	}
 	
+	public function setToZero():void {
+		_data = 0x00000000;
+	}
+	
 	private static const CORNER_MIN:Number = 0;
 	public function calculate( $oxel:Oxel ):void	{
 		if ( _calculated )
@@ -178,8 +182,7 @@ public class FlowScaling
 		if ( $oxel.flowInfo.isSource() )
 			return
 		// set these to a minimum level, so that their influence for the other corners can be felt
-		_data = 0x00000000;
-		
+		setToZero()
 
 		for each ( var horizontalDir:int in Globals.horizontalDirections )
 			grabNeighborInfluences( $oxel, horizontalDir );
@@ -188,7 +191,7 @@ public class FlowScaling
 		// if these corners have not been influenced by another vert
 		// set them to scale
 		const fallRatePerMeter:uint = 2
-		const amountToFall:uint = fallRatePerMeter * $oxel.gc.size() / Globals.UNITS_PER_METER
+		const amountToFall:uint = (fallRatePerMeter * $oxel.gc.size() / Globals.UNITS_PER_METER)
 		if ( max() > amountToFall ) {
 			if ( CORNER_MIN == PxPz )
 				PxPz = max() - amountToFall
@@ -226,7 +229,6 @@ public class FlowScaling
 			else
 				fromOxelScale = fromOxel.flowInfo.flowScaling;
 			
-				
 			var fromRecalc:Boolean = false;
 			if ( Globals.POSX == $dir )
 			{
