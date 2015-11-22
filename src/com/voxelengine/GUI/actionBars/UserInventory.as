@@ -14,6 +14,7 @@ import com.voxelengine.events.InventoryModelEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.worldmodel.models.ModelPlacementType;
 import flash.display.DisplayObject;
+import flash.events.Event;
 import flash.events.MouseEvent;
 import flash.events.KeyboardEvent;
 
@@ -138,7 +139,7 @@ public class  UserInventory extends QuickInventory
 		//Log.out( "UserInventory.remove ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 		RoomEvent.removeListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
 		InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
-		AppEvent.removeListener( AppEvent.APP_DEACTIVATE, onDeactivate );
+		AppEvent.removeListener( Event.DEACTIVATE, onDeactivate );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.UNLOAD_REQUEST, _owner, null ) );
 		CursorOperationEvent.removeListener( CursorOperationEvent.NONE, onCursorOperationNone )	
 		_s_currentInstance = null;
@@ -165,7 +166,7 @@ public class  UserInventory extends QuickInventory
 				addListeners();
 				display();
 				resizeObject( null );
-				AppEvent.addListener( AppEvent.APP_DEACTIVATE, onDeactivate );
+				AppEvent.addListener( Event.DEACTIVATE, onDeactivate );
 			}
 		}
 	}
@@ -317,7 +318,7 @@ public class  UserInventory extends QuickInventory
 		processItemSelection( boxes[$index] );
 	}
 	
-	private function onDeactivate( $ae:AppEvent ):void {
+	private function onDeactivate( $ae:Event ):void {
 		//Log.out( "UserInventory.onDeactivate", Log.DEBUG );
 		processItemSelection( boxes[1], false )
 	}

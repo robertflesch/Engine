@@ -125,20 +125,22 @@ package {
 				
 			//if ( ( 10 < timeRender || 10 < timeUpdate ) && Globals.active )	
 			//	Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed, Log.INFO )
-			AppEvent.dispatch( new AppEvent( AppEvent.INTERNAL_ENTER_FRAME ) )
+			
+			// For some reason is was important to make sure everything was updated before this got passed on to child classes.
+			AppEvent.dispatch( e )
 		}
 		
 		private function deactivate(e:Event):void 
 		{
 			//Log.out( "VoxelVerse.deactive event", Log.WARN )
 			if ( Globals.active )
-				deactivateApp()
+				deactivateApp(e)
 		}
 		
 		private function activate(e:Event):void 
 		{
 			//Log.out( "VoxelVerse.activate event", Log.WARN )
-			activateApp()
+			activateApp(e)
 		}
 		
 		/**
@@ -153,11 +155,11 @@ package {
 		public function mouseLeave( e:Event ):void
 		{
 			//Log.out( "VoxelVerse.mouseLeave event" )
-			if ( Globals.active )
-				deactivateApp()
+//			if ( Globals.active )
+//				deactivateApp( e )
 		}
 		
-		private function activateApp():void {
+		private function activateApp(e:Event):void {
 			
 			if ( false == Globals.active ) {
 				//Log.out( "VoxelVerse.activateApp - setting active = TRUE" )
@@ -167,13 +169,13 @@ package {
 				
 				stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown)
 				
-				AppEvent.dispatch( new AppEvent( AppEvent.APP_ACTIVATE ) )
+				AppEvent.dispatch( e )
 			}
 			//else
 			//	Log.out( "VoxelVerse.activateApp - ignoring" )
 		}
 
-		private function deactivateApp():void {
+		private function deactivateApp(e:Event):void {
 			
 			//Log.out( "VoxelVerse.deactivateApp", Log.WARN )
 			if ( true == Globals.active ) {
@@ -191,7 +193,7 @@ package {
 				stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp)					
 
 				if ( Globals.online ) {
-					AppEvent.dispatch( new AppEvent( AppEvent.APP_DEACTIVATE ) )
+					AppEvent.dispatch( e )
 					
 					//Log.out( "VoxelVerse.deactivateApp - NOT SAVING REGION AND INVENTORY", Log.WARN )
 					RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) )
@@ -213,7 +215,7 @@ package {
 		private function mouseUp(e:MouseEvent):void {
 			//Log.out( "VoxelVerse.mouseUp event" )
 			stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp)
-			activateApp()
+//			activateApp(e)
 		}
 		
 		private function toggleConsole():void {

@@ -79,7 +79,7 @@ package com.voxelengine.GUI
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize );
-			AppEvent.addListener( AppEvent.INTERNAL_ENTER_FRAME, onEnterFrame )
+			AppEvent.addListener( Event.ENTER_FRAME, onEnterFrame )
 		} 
 		
         protected function onResize(event:Event):void {
@@ -92,12 +92,12 @@ package com.voxelengine.GUI
 		private function onRemoved( event:UIOEvent ):void {
 			removeEventListener(UIOEvent.REMOVED, onRemoved );
 			Globals.g_app.stage.removeEventListener( Event.RESIZE, onResize );
-			AppEvent.removeListener( AppEvent.INTERNAL_ENTER_FRAME, onEnterFrame )
+			AppEvent.removeListener( Event.ENTER_FRAME, onEnterFrame )
 			
 			_s_currentInstance = null;
 		}
 		
-		private function onEnterFrame( e:AppEvent ):void {
+		private function onEnterFrame( e:Event ):void {
 			rotateImage( _angle );
 		}
 		

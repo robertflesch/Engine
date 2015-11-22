@@ -10,17 +10,15 @@ package com.voxelengine.events
 import flash.events.Event;
 import flash.events.EventDispatcher;
 
-import com.voxelengine.worldmodel.weapons.Ammo;
 /**
  * ...
  * @author Robert Flesch - RSF 
+ * This class was added in to handle the problem of unknown order handling.
+ * I did not know which class was going to get the ENTER_FRAME first, and it was imporant
+ * that the updates happened first.
  */
 public class AppEvent extends Event
 {
-	static public const APP_DEACTIVATE:String					= "APP_DEACTIVATE";
-	static public const APP_ACTIVATE:String						= "APP_ACTIVATE";
-	static public const INTERNAL_ENTER_FRAME:String				= "INTERNAL_ENTER_FRAME";
-	
 	public function AppEvent( $type:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
@@ -43,7 +41,7 @@ public class AppEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:AppEvent ) : Boolean {
+	static public function dispatch( $event:Event ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 	

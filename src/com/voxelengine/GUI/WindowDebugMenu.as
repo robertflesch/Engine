@@ -122,7 +122,7 @@ package com.voxelengine.GUI
 			display( 0, 250 )	
 			onResize( null )
 			
-			AppEvent.addListener( AppEvent.INTERNAL_ENTER_FRAME, onEnterFrame )
+			AppEvent.addListener( Event.ENTER_FRAME, onEnterFrame )
 			
 			Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 		} 
