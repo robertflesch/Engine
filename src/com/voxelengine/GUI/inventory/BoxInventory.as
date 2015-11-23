@@ -33,6 +33,7 @@ import com.voxelengine.worldmodel.models.ModelMetadata;
 public class BoxInventory extends VVBox
 {
 	private var _count:Label
+	private var _bpValue:Image	
 	private var _objectInfo:ObjectInfo;
 	public function get objectInfo():ObjectInfo { return _objectInfo; }
 	
@@ -106,10 +107,14 @@ public class BoxInventory extends VVBox
 
 				setHelp( om.vmm.name );			
 				if ( om.vmm.permissions.blueprint ) {
-					var bp:Image = new Image( Globals.texturePath + "blueprint.png" )
+					_bpValue = new Image( Globals.texturePath + "blueprint.png" )
 					if ( 128 == width )
-						bp.x = bp.y = 64
-					addElement( bp )
+						_bpValue.x = _bpValue.y = 64
+					addElement( _bpValue )
+				}
+				else if ( _bpValue ) {
+					removeElement( _bpValue )
+					_bpValue = null
 				}
 			}
 			break;
@@ -168,6 +173,11 @@ public class BoxInventory extends VVBox
 		_count.text = "";
 		backgroundTexture = "assets/textures/blank.png";
 		data = null;
+		if ( _bpValue ) {
+			removeElement( _bpValue )
+			_bpValue = null
+		}
+
 		_objectInfo = new ObjectInfo( this, ObjectInfo.OBJECTINFO_EMPTY );
 	}
 	

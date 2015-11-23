@@ -17,7 +17,9 @@ import flash.ui.Keyboard;
 import flash.utils.Timer;
 import flash.utils.getTimer;
 
-import playerio.DatabaseObject;
+//import playerio.DatabaseObject;
+
+import org.flashapi.swing.UIManager
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -86,7 +88,7 @@ public class EditCursor extends VoxelModel
 			metadata.permissions.modify = false;
 			
 			var modelInfo:ModelInfo = new ModelInfo( EDIT_CURSOR );
-			var newECDbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_INFO, "0", "0", 0, true, null );
+			var newECDbo:Object = ModelInfo.newObject()
 			newECDbo.model = new Object();
 			newECDbo.model.modelClass = EDIT_CURSOR;
 			newECDbo.model.fileName = EDIT_CURSOR;
@@ -826,21 +828,6 @@ public class EditCursor extends VoxelModel
 		}
 	}
 	
-	protected function onRepeat(event:TimerEvent):void {
-		//if ( Globals.openWindowCount || !Globals.clicked || !Globals.active || !editing ) {
-			//repeatTimerStop()		
-			//return; }
-			//
-		//if ( 1 < _count )
-		//{
-			//if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
-				//deleteOxel();
-			//else if ( CursorOperationEvent.INSERT_OXEL == cursorOperation )
-				//insertOxel();
-		//}
-		//_count++;
-	}
-
 	private static var _s_dy:Number = 0;
 	private static var _s_dx:Number = 0;
 	private function mouseMove(e:MouseEvent):void {
@@ -880,33 +867,15 @@ public class EditCursor extends VoxelModel
 	
 	private function mouseUp(e:MouseEvent):void  {
 		repeatTimerStop()
-	}
-	
-	private function repeatTimerStop():void  {
-		if ( _repeatTimer ) {
-			_repeatTimer.removeEventListener( TimerEvent.TIMER, onRepeat );
-			_repeatTimer.stop()
-			_repeatTimer = null
-			_count = 0
-		}
-	}
 		
-	private function mouseDown(e:MouseEvent):void {
-		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active || !editing )
+		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging )
 			return;
-			
+		
+		Log.out( "EditCursor.mouseUp e: " + e.toString() )
 		if ( doubleMessageHack ) {
-			//Log.out( "EditCursor.mouseDown", Log.WARN );	
-				
-			if ( null == _repeatTimer && 0 == _count) {
-				_repeatTimer = new Timer( 200 );
-				_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
-				_repeatTimer.start();
-			}
-			
 			switch (e.type) 
 			{
-				case "mouseDown": case Keyboard.NUMPAD_ADD:
+				case "mouseUp": case Keyboard.NUMPAD_ADD:
 					if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
 						deleteOxel();
 					else if ( CursorOperationEvent.INSERT_MODEL == cursorOperation )
@@ -918,6 +887,45 @@ public class EditCursor extends VoxelModel
 		}
 	}
 	
+	private function mouseDown(e:MouseEvent):void {
+		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging )
+			return
+			
+		if ( doubleMessageHack ) {
+			//Log.out( "EditCursor.mouseDown", Log.WARN );	
+				
+			if ( null == _repeatTimer && 0 == _count) {
+				_repeatTimer = new Timer( 200 );
+				_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
+				_repeatTimer.start();
+			}
+		}
+	}
+	
+	private function repeatTimerStop():void  {
+		if ( _repeatTimer ) {
+			_repeatTimer.removeEventListener( TimerEvent.TIMER, onRepeat );
+			_repeatTimer.stop()
+			_repeatTimer = null
+			_count = 0
+		}
+	}
+		
+	protected function onRepeat(event:TimerEvent):void {
+		if ( Globals.openWindowCount || !Globals.clicked || !Globals.active || !editing ) {
+			repeatTimerStop()		
+			return; }
+			
+		if ( 1 < _count )
+		{
+			if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
+				deleteOxel();
+			else if ( CursorOperationEvent.INSERT_OXEL == cursorOperation )
+				insertOxel();
+		}
+		_count++;
+	}
+
 	private static const WAITING_PERIOD:int = 100;
 	private var doubleMessageHackTime:int = getTimer();
 	private function get doubleMessageHack():Boolean {
