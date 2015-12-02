@@ -78,22 +78,23 @@ public class PersistanceObject
 	
 	public function save():void {
 		if ( Globals.online && changed && !dynamicObj ) {
-			//Log.out( getQualifiedClassName( this ) + ".save - Saving to guid: " + guid  + " in table: " + table, Log.WARN );
+			Log.out( getQualifiedClassName( this ) + ".save - Saving to guid: " + guid  + " in table: " + table, Log.WARN );
 			addSaveEvents();
 			toObject();
+			if ( info.changed )
+				delete info.changed
 				
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null ) );
 			changed = false;
 		}
-		else {
+		//else {
 			//if ( Globals.online && !changed )
-			//	Log.out( "PersistanceObject.save - Not saving data - guid: " + guid + " NOT changed" );
+				//Log.out( "PersistanceObject.save - Not saving data - guid: " + guid + " NOT changed" );
 			//else if ( !Globals.online && changed )
-			//	Log.out( "PersistanceObject.save - Not saving data - guid: " + guid + " NOT online" );
+				//Log.out( "PersistanceObject.save - Not saving data - guid: " + guid + " NOT online" );
 			//else	
-			//	Log.out( "PersistanceObject.save - Not saving data - Offline and not changed" );
-		}
-				
+				//Log.out( "PersistanceObject.save - Not saving data - Offline and not changed" );
+		//}
 	}
 	
 	private function saveSucceed( $pe:PersistanceEvent ):void { 

@@ -97,14 +97,6 @@ public class ModelCache
 		return results;
 	}
 
-	static public function createPlayer():void	{
-		var instanceInfo:InstanceInfo = new InstanceInfo();
-		Log.out( "ModelCache.createPlayer - creating from LOCAL", Log.DEBUG );
-		instanceInfo.modelGuid = "Player";
-		instanceInfo.instanceGuid = "Player";
-		ModelMakerBase.load( instanceInfo );
-	}
-
 	public function save():void {
 		//Log.out( "ModelCache.save - Saving all models", Log.WARN );
 		if ( false == Globals.online || false == Globals.inRoom )

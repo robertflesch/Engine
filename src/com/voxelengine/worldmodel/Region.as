@@ -28,9 +28,9 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.events.WindowSplashEvent;
-	import com.voxelengine.utils.JSONUtil;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+	import com.voxelengine.worldmodel.models.types.Avatar;
 	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelCache;
@@ -143,7 +143,7 @@ package com.voxelengine.worldmodel
 				
 			// for local use only
 			if ( !Globals.online && !Player.player )
-				ModelCache.createPlayer();
+				Avatar.createPlayer();
 				
 			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name, Log.DEBUG );
 		}	

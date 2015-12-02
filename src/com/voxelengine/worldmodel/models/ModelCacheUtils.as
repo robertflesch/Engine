@@ -379,6 +379,9 @@ package com.voxelengine.worldmodel.models
 		static private var _s_mspOrigin:Vector3D = new Vector3D();
 		
 		static public function whichModelsIsThisInfluencedBy( vm:VoxelModel ):Vector.<VoxelModel> {
+			var modelList:Vector.<VoxelModel> = new Vector.<VoxelModel>;
+			if ( !vm.modelInfo.data )
+				return modelList
 			var worldSpaceStartPointOrigin:Vector3D = vm.instanceInfo.positionGet;
 			_s_worldSpaceStartPointCorner.setTo( worldSpaceStartPointOrigin.x, worldSpaceStartPointOrigin.y, worldSpaceStartPointOrigin.z );
 			// add size to get corner
@@ -387,7 +390,7 @@ package com.voxelengine.worldmodel.models
 			_s_worldSpaceStartPointCorner.y += vm.modelInfo.data.oxel.gc.size();
 			_s_worldSpaceStartPointCorner.z += vm.modelInfo.data.oxel.gc.size();
 
-			var modelList:Vector.<VoxelModel> = new Vector.<VoxelModel>;
+			
 			var models:Vector.<VoxelModel> = Region.currentRegion.modelCache.models;
 			for each ( var collideCandidate:VoxelModel in models )
 			{

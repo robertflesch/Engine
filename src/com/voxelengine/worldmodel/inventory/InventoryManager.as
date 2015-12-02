@@ -28,7 +28,6 @@ public class InventoryManager
 	
 	static public function init():void {
 		// This creates a inventory object for login.
-//		objectInventoryGet("player");	
 		InventoryEvent.addListener( InventoryEvent.UNLOAD_REQUEST, unloadInventory );
 		InventoryEvent.addListener( InventoryEvent.REQUEST, requestInventory );
 		InventoryEvent.addListener( InventoryEvent.SAVE_REQUEST, save );

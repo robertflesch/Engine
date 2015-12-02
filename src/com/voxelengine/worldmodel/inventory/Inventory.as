@@ -61,7 +61,7 @@ public class Inventory extends PersistanceObject
 	override public function save():void {
 		// TODO this needs to detect "changed"
 		if ( !loaded && !changed ) {
-			Log.out( "Inventory.save - Not LOADED and not changed - guid: " + guid, Log.DEBUG );
+			//Log.out( "Inventory.save - Not LOADED and not changed - guid: " + guid, Log.DEBUG );
 			return; 
 		}
 		//Log.out( "Inventory.save - saving - guid: " + guid, Log.DEBUG );

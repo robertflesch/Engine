@@ -7,51 +7,47 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-import com.voxelengine.events.InventoryEvent;
-import com.voxelengine.events.InventoryInterfaceEvent;
-import com.voxelengine.events.InventorySlotEvent;
-import com.voxelengine.events.ModelLoadingEvent;
-import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.GUI.actionBars.UserInventory;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.biomes.Biomes;
-import com.voxelengine.worldmodel.inventory.InventoryManager;
-import com.voxelengine.worldmodel.models.makers.ModelMakerLocal;
-import com.voxelengine.worldmodel.models.types.Avatar;
 import flash.display3D.Context3D;
 import flash.events.KeyboardEvent;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
 import flash.utils.getQualifiedClassName;
 
-
-import playerio.PlayerIOError;
-import playerio.DatabaseObject;
-
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 
 import com.voxelengine.events.GUIEvent;
 import com.voxelengine.events.LoginEvent;
-import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.LoadingEvent;
+import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.InventoryInterfaceEvent;
+import com.voxelengine.events.InventorySlotEvent;
+import com.voxelengine.events.ModelEvent;
+import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.RegionEvent;
+import com.voxelengine.events.OxelDataEvent;
+
+import com.voxelengine.persistance.Persistance;
 
 import com.voxelengine.renderer.lamps.ShaderLight;
 import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.renderer.lamps.*;
-import com.voxelengine.persistance.Persistance;
+
+import com.voxelengine.server.Network;
 
 import com.voxelengine.worldmodel.RegionManager;
 import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
-	import com.voxelengine.worldmodel.inventory.*;
-import com.voxelengine.worldmodel.inventory.Inventory;
+import com.voxelengine.worldmodel.biomes.Biomes;
+import com.voxelengine.worldmodel.inventory.*;
 import com.voxelengine.worldmodel.models.*;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+import com.voxelengine.worldmodel.models.types.Avatar;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.weapons.Gun;
 import com.voxelengine.worldmodel.weapons.Bomb;
+
 
 public class Player extends Avatar
 {
@@ -141,41 +137,9 @@ public class Player extends Avatar
 	static private function onLogin( $event:LoginEvent ):void {
 		Log.out( "Player.onLogin - retrieve player info from Persistance", Log.DEBUG );
 		InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest )
+		// request that the database load the player Object
 		Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
 	}
-	
-	// This does not belong here
-	static private function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
-		
-		if ( $dbo ) {
-			if ( null == $dbo.modelGuid ) {
-				// Assign the player the default avatar
-				//$dbo.modelGuid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
-				$dbo.modelGuid = "Player"
-				
-				var userName:String = $dbo.key.substring( 6 );
-				var firstChar:String = userName.substr(0, 1); 
-				var restOfString:String = userName.substr(1, userName.length); 
-				$dbo.userName = firstChar.toUpperCase() + restOfString.toLowerCase();
-				$dbo.description = "New Player Avatar";
-				$dbo.modifiedDate = new Date().toUTCString();
-				$dbo.createdDate = new Date().toUTCString();
-				$dbo.save();
-			}
-			
-			var ii:InstanceInfo = new InstanceInfo();
-			ii.modelGuid = "Player";
-			ii.instanceGuid = Network.userId;
-			new ModelMakerLocal( ii );
-		}
-		else {
-			Log.out( "Player.onPlayerLoadedAction - ERROR, failed to create new record for ?" );
-		}
-	}
-	
-	static private function onPlayerLoadError(error:PlayerIOError):void {
-		Log.out("Player.onPlayerLoadError", Log.ERROR, error );
-	}			
 	
 	override public function release():void {
 		//Log.out( "Player.release --------------------------------------------------------------------------------------------------------------------" );

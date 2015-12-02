@@ -7,28 +7,91 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-	import com.voxelengine.Globals;
-	import com.voxelengine.Log;
-	
-	import com.voxelengine.worldmodel.models.InstanceInfo;
-	import com.voxelengine.worldmodel.models.ControllableVoxelModel;
-	import com.voxelengine.worldmodel.models.ModelMetadata;
-	import com.voxelengine.worldmodel.models.ModelInfo;
+import playerio.PlayerIOError;
+import playerio.DatabaseObject;
 
-    public class Avatar extends ControllableVoxelModel
-    {
-		public function Avatar( instanceInfo:InstanceInfo ) 
-		{ 
-			//Log.out( "Avatar CREATED" );
-			super( instanceInfo );
-		}
+import com.voxelengine.Globals;
+import com.voxelengine.Log;
+
+import com.voxelengine.server.Network
+
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ControllableVoxelModel;
+import com.voxelengine.worldmodel.models.ModelMetadata;
+import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube
+
+
+public class Avatar extends ControllableVoxelModel
+{
+	public function Avatar( instanceInfo:InstanceInfo ) 
+	{ 
+		//Log.out( "Avatar CREATED" );
+		super( instanceInfo );
+	}
+	
+	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
+		super.init( $mi, $vmm );
+	}
+	
+	static public function buildExportObject( obj:Object ):void {
+		ControllableVoxelModel.buildExportObject( obj )
+	}
+	
+	// This does not belong here
+	static public function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
 		
-		override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-			super.init( $mi, $vmm );
+		if ( $dbo ) {
+			if ( null == $dbo.modelGuid ) {
+				// Assign the Avatar the default avatar
+				//$dbo.modelGuid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
+				$dbo.modelGuid = "Player"
+				
+				var userName:String = $dbo.key.substring( 6 );
+				var firstChar:String = userName.substr(0, 1); 
+				var restOfString:String = userName.substr(1, userName.length); 
+				$dbo.userName = firstChar.toUpperCase() + restOfString.toLowerCase();
+				$dbo.description = "New Player Avatar";
+				$dbo.modifiedDate = new Date().toUTCString();
+				$dbo.createdDate = new Date().toUTCString();
+				$dbo.save();
+			}
+			
+			//var ii:InstanceInfo = new InstanceInfo();
+			//ii.modelGuid = "Player";
+			//ii.instanceGuid = Network.userId;
+			//new ModelMakerLocal( ii );
+			Log.out( "Avatar.onPlayerLoadedAction - START TEMPORARILY CREATING Avatar FROM SCRIPT", Log.WARN );
+			createPlayer( "Player", Network.userId )
+			Log.out( "Avatar.onPlayerLoadedAction - END TEMPORARILY CREATING Avatar FROM SCRIPT", Log.WARN );
 		}
-		
-		static public function buildExportObject( obj:Object ):void {
-			ControllableVoxelModel.buildExportObject( obj )
+		else {
+			Log.out( "Avatar.onPlayerLoadedAction - ERROR, failed to create new record for ?" );
 		}
 	}
+	
+	static public function onPlayerLoadError(error:PlayerIOError):void {
+		Log.out("Avatar.onPlayerLoadError", Log.ERROR, error );
+	}			
+	
+	static public function createPlayer( $modelGuid:String = "Player", $instanceGuid:String = "Player" ):void	{
+		//Log.out( "Player.createPlayer - creating from LOCAL", Log.DEBUG );
+		//var ii:InstanceInfo = new InstanceInfo();
+		//ii.modelGuid = "Player";
+		//ii.instanceGuid = "Player";
+		//// Something is listen for this to generate some event.
+		//ModelMakerBase.load( ii );
+		
+		Log.out( "Avatar.createPlayer - creating from GenerateCube", Log.DEBUG )
+		var ii:InstanceInfo = new InstanceInfo()
+		ii.modelGuid = "Player"
+		ii.instanceGuid = $instanceGuid
+		var model:Object = new Object()
+		model.biomes = GenerateCube.script()
+		model.modelClass = "Player"
+		new ModelMakerGenerate( ii, model )
+	}
+	
+}
 }

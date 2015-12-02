@@ -871,7 +871,7 @@ public class EditCursor extends VoxelModel
 		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging )
 			return;
 		
-		Log.out( "EditCursor.mouseUp e: " + e.toString() )
+		//Log.out( "EditCursor.mouseUp e: " + e.toString() )
 		if ( doubleMessageHack ) {
 			switch (e.type) 
 			{
