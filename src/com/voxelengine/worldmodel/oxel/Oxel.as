@@ -2340,10 +2340,14 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		else {
 			if ( TypeInfo.WATER == type ) {
 				if ( 5 < gc.grain ) {
-					trace( "Oxel.rebuildWater: " + gc.toString() )
-					childrenCreate( true ) }
-				facesMarkAllDirty();
-				quadsDeleteAll();
+					Log.out( "Oxel.rebuildWater found grain too large: " + gc.toString() )
+					childrenCreate( true ) 
+					for each ( var newChild:Oxel in _children )
+						newChild.rebuildWater() 
+				} else {
+					facesMarkAllDirty();
+					quadsDeleteAll();
+				}
 			}
 		}
 	}

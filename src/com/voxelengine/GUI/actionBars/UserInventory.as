@@ -56,6 +56,7 @@ public class  UserInventory extends QuickInventory
 	private var _toolSize:GrainSelector;
 	private var _shape:ShapeSelector;
 	private var _modelTools:ModelPlacementType;
+	private var _inventory:InventoryIcon
 	private var _lastCursorType:int
 		
 	private var _remove:Boolean;
@@ -75,14 +76,11 @@ public class  UserInventory extends QuickInventory
 		//Log.out( "UserInventory.lastItemSelection: " + value )
 		_lastBoxesSelection = value; 
 	}
-	
 
 	static public function init():void {	
 		InventoryInterfaceEvent.addListener( InventoryInterfaceEvent.CLOSE, closeEvent );
 		InventoryInterfaceEvent.addListener( InventoryInterfaceEvent.DISPLAY, displayEvent );
 	}
-	
-
 	
 	public function UserInventory( $owner:String, $image:String ) {
 		_owner = $owner;
@@ -101,8 +99,12 @@ public class  UserInventory extends QuickInventory
 		_modelTools = new ModelPlacementType();
 		addChild(_modelTools);
 		
+		_inventory = new InventoryIcon( width );
+		addChild( _inventory );
+
 		hideGrainTools();
 		hideModelTools();
+		_inventory.visible = false
 		
 		_s_currentInstance = this;
 		
@@ -142,7 +144,11 @@ public class  UserInventory extends QuickInventory
 		AppEvent.removeListener( Event.DEACTIVATE, onDeactivate );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.UNLOAD_REQUEST, _owner, null ) );
 		CursorOperationEvent.removeListener( CursorOperationEvent.NONE, onCursorOperationNone )	
+		_toolSize.remove()
+		_shape.remove()
+		_inventory.remove()
 		_s_currentInstance = null;
+		
 		super.remove();
 	}
 
@@ -161,7 +167,8 @@ public class  UserInventory extends QuickInventory
 		if ( Globals.inRoom ) {
 			with ( _s_currentInstance ) {
 				// display it!
-				visible = true;
+				visible = true
+				_inventory.visible = true
 //				EditCursor.editing = true;
 				addListeners();
 				display();

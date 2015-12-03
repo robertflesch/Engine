@@ -53,6 +53,11 @@ public class QuickInventory extends VVCanvas
 		addElement( _outline );
 		
 		Globals.g_app.stage.addEventListener( Event.RESIZE, resizeObject );
+		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
+	}
+	
+	protected function onRemoved( event:UIOEvent ):void {
+		Globals.g_app.stage.removeEventListener( Event.RESIZE, resizeObject );
 	}
 	
 	public function addTypeAt( ti:TypeInfo, slot:int ):void {
@@ -88,8 +93,7 @@ public class QuickInventory extends VVCanvas
 	
 	protected function buildItems():void { }
 	
-	public function resizeObject(event:Event):void 
-	{
+	public function resizeObject(event:Event):void {
 		var halfRW:int = Globals.g_renderer.width / 2;
 		var halfRH:int = Globals.g_renderer.height / 2;
 

@@ -61,8 +61,8 @@ public class Player extends Avatar
 	static private const 	AVATAR_CLIP_FACTOR:Number 	= 0.90;
 	static private var  	STEP_UP_MAX:int 			= 16;
 	
-	static protected    const DEFAULT_SPEED_X:Number		= 0.5;
-	private var   	_speedMultiplier:Number 				= DEFAULT_SPEED_X;
+	static protected  const DEFAULT_SPEED_X:Number		= 0.5;
+	private var   			_speedMultiplier:Number 				= DEFAULT_SPEED_X;
 	protected function get 	mSpeedMultiplier():Number 				{ return _speedMultiplier; }
 	protected function set 	mSpeedMultiplier($value:Number):void	{ _speedMultiplier = $value; }
 	
@@ -81,7 +81,6 @@ public class Player extends Avatar
 		}
 		Player.player = this;
 		inventoryBitmap = "userInventory.png";
-
 	}
 	
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {

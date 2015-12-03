@@ -81,7 +81,7 @@ public class PersistanceObject
 			Log.out( getQualifiedClassName( this ) + ".save - Saving to guid: " + guid  + " in table: " + table, Log.WARN );
 			addSaveEvents();
 			toObject();
-			if ( info.changed )
+			if ( info && info.changed )
 				delete info.changed
 				
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null ) );
