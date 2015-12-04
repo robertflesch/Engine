@@ -58,9 +58,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		}
 		
 		protected function getVoxelModel():VoxelModel {
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
-			throw new Error( "LandscapeTask.getVoxelModel - replace with ModelInfo request" );
-			return null;
+			return Region.currentRegion.modelCache.getModelFromModelGuid( _modelGuid )			
 		}
 		
 		protected function getVoxelInstance():VoxelModel {

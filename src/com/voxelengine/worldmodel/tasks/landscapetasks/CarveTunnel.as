@@ -8,6 +8,7 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
+	import com.voxelengine.worldmodel.Region;
 	import flash.geom.Vector3D;
 	import flash.utils.getTimer;
 	
@@ -51,7 +52,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		override public function start():void {
             super.start() // AbstractTask will send event
 			var timer:int = getTimer();
-            var vm:VoxelModel = getVoxelModel();
+			var vm:VoxelModel = getVoxelModel()
 			if ( !vm ) {
 				super.complete() // AbstractTask will send event
 				return;

@@ -118,23 +118,23 @@ public class Renderer extends EventDispatcher
 	
 	public function resizeEvent(event:Event):void {
 		setStageSize( Globals.g_app.stage.stageWidth, Globals.g_app.stage.stageHeight);
-		
-		if (timer.running) {
-			//Log.out("Renderer.resizeEvent - reset timer");
-			timer.reset();
-		}
-		else {
-			//Log.out("Renderer.resizeEvent - timer NOT running" );
-			var t:int = getTimer()
-			ContextEvent.dispatch( new ContextEvent( ContextEvent.DISPOSED, null ) );
-			context.dispose();
-			//Log.out("Renderer.resizeEvent - time to dispose time: " + (getTimer() - t) );
-		}
-		timer.start();			
+		configureBackBuffer()		
+		//if (timer.running) {
+			////Log.out("Renderer.resizeEvent - reset timer");
+			//timer.reset();
+		//}
+		//else {
+			////Log.out("Renderer.resizeEvent - timer NOT running" );
+			//var t:int = getTimer()
+			//ContextEvent.dispatch( new ContextEvent( ContextEvent.DISPOSED, null ) );
+			//context.dispose();
+			////Log.out("Renderer.resizeEvent - time to dispose time: " + (getTimer() - t) );
+		//}
+		//timer.start();			
 	}		
 	
 	private function timerHandler(e:Event):void {
-		Log.out("Renderer.timerHandler - Timer HAS STOPPED" );
+		//Log.out("Renderer.timerHandler - Timer HAS STOPPED" );
 		timer.stop();
 		onContext()
 	}		
@@ -173,7 +173,8 @@ public class Renderer extends EventDispatcher
 
 	public function setBackgroundColor( r:int=0, g:int=0, b:int=0 ):void {
 		// Clears the back buffer to this color, for now it will be the "sky" color
-		context.clear( r/255, g/255, b/ 255, 0);
+		if ( context )
+			context.clear( r/255, g/255, b/ 255, 0);
 	}
 
 	public function onContextCreated(e:Event):void {
@@ -185,31 +186,17 @@ public class Renderer extends EventDispatcher
 	public function onContext():void {
 		// dont initialize/reinitialize the context if the timer is running
 		if (timer.running) {
-			Log.out("Renderer.onContext - Timer is running" );
+			//Log.out("Renderer.onContext - Timer is running" );
 			return
 		}
 
-		if ( context )
-		{
+		if ( context ) {
 			if ( Globals.g_debug )
 				context.enableErrorChecking = true;
 			else	
 				context.enableErrorChecking = false;
 				
-			// 0	No antialiasing
-			// 2	Minimal antialiasing.
-			// 4	High-quality antialiasing.
-			// 16	Very high-quality antialiasing.
-			const antiAlias:int = 0;
-			Log.out( "Renderer.onContext - ANTI_ALIAS set to: " + antiAlias, Log.DEBUG );
-			
-			// false indicates no depth or stencil buffer is created, true creates a depth and a stencil buffer. 
-			const enableDepthAndStencil:Boolean = true;
-			context.configureBackBuffer( width, height, antiAlias, enableDepthAndStencil );
-			
-				
-			//CONFIG::debug {	context.enableErrorChecking = true; }			
-
+			configureBackBuffer();
 			_isHW = context.driverInfo.toLowerCase().indexOf("software") == -1;			
 			if ( !_isHW )
 				Log.out( "Renderer.onContext - SOFTWARE RENDERING - driverInfo: " + context.driverInfo, Log.WARN );
@@ -341,6 +328,20 @@ public class Renderer extends EventDispatcher
 		}
 		else
 			setBackgroundColor( 92, 172, 238 );
+	}
+	
+	private function configureBackBuffer():void 
+	{
+			// 0	No antialiasing
+			// 2	Minimal antialiasing.
+			// 4	High-quality antialiasing.
+			// 16	Very high-quality antialiasing.
+		const antiAlias:int = 0;
+		//Log.out( "Renderer.onContext - ANTI_ALIAS set to: " + antiAlias, Log.DEBUG );
+		
+		// false indicates no depth or stencil buffer is created, true creates a depth and a stencil buffer. 
+		const enableDepthAndStencil:Boolean = true;
+		context.configureBackBuffer( width, height, antiAlias, enableDepthAndStencil );
 	}
 }
 }
