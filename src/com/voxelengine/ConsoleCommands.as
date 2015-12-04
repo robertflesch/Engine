@@ -205,7 +205,7 @@ public class ConsoleCommands {
 			return;
 		}
 			
-		CarveTunnel.contructor( VoxelModel.selectedModel.instanceInfo.instanceGuid
+		CarveTunnel.contructor( VoxelModel.selectedModel.instanceInfo.modelGuid
 							  , ModelCacheUtils.gci.point
 							  , ModelCacheUtils.viewVectorNormalizedGet()
 							  , TypeInfo.AIR
@@ -230,7 +230,7 @@ public class ConsoleCommands {
 			return;
 		}
 			
-		CarveTunnels.contructor( VoxelModel.selectedModel.instanceInfo.instanceGuid
+		CarveTunnels.contructor( VoxelModel.selectedModel.instanceInfo.modelGuid
 							   , ModelCacheUtils.gci.point
 							   , ModelCacheUtils.viewVectorNormalizedGet()
 							   , TypeInfo.AIR

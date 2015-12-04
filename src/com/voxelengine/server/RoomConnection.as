@@ -145,13 +145,11 @@ public class RoomConnection
 	}
 	
 	static private function createPlayer( userid:String ):void {
-		throw new Error( "RoomConnection.createPlayer - NOT IMPLMENTED" );
-		Log.out("RoomConnection.createPlayer - create player model for :" + userid, Log.DEBUG );
+		Log.out("RoomConnection.createPlayer - create player model for :" + userid, Log.WARN );
 	}
 	
 	static private function createAvatar( userid:String ):void  {
-		throw new Error( "RoomConnection.createAvatar - NOT IMPLMENTED" );
-		Log.out("RoomConnection.createAvatar - create avatar for :" + userid, Log.DEBUG );
+		Log.out("RoomConnection.createAvatar - create avatar for :" + userid, Log.WARN );
 	}
 	
 	static private function userJoinedMessage( $m:Message, $userid:String):void {

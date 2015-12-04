@@ -71,10 +71,11 @@ package com.voxelengine.worldmodel
 			PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFail );			
 			PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
 			
-			_defaultRegionJson = JSONUtil.parse( e.data, "config" + Globals.APP_EXT, "ConfigManager.loadSucceed" );
+			Log.out( "ConfigManager.loadSucceed: " + Globals.appPath + "config" + Globals.APP_EXT, Log.DEBUG )
+			
+			_defaultRegionJson = JSONUtil.parse( e.data, Globals.appPath + "config" + Globals.APP_EXT, "ConfigManager.loadSucceed" );
 			if ( null == _defaultRegionJson ) {
-				// TODO App needs to communicate that something is wrong.
-				//(new Alert( "VoxelVerse.configManager PLEASE EXIT PROGRAM - Error Parsing: config" + Globals.APP_EXT, 500 ) ).display();
+				Log.out( "ConfigManager.loadSucceed - error parsing config: " + Globals.appPath + "config" + Globals.APP_EXT, Log.ERROR );
 				return;
 			}
 			
@@ -93,12 +94,7 @@ package com.voxelengine.worldmodel
 			PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFail );			
 			PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
 			var errorMsg:String = (e.data as String);
-			Log.out( "ConfigManager.loadFail - error: " + errorMsg, Log.ERROR )
-			// the Alert does not work here ???
-			//(new Alert( "ConfigManager" ) ).display();
-			//(new Alert( "ConfigManager.loadFail - error: " + errorMsg ) ).display();
-			//var t:Alert = new Alert( "ConfigManager.loadFail" );
-			//t.display();
+			Log.out( "ConfigManager.loadFail - error: " + errorMsg + " file name and path: " + Globals.appPath + "config" + Globals.APP_EXT, Log.ERROR )
 		}
 		
 		private function onTypesLoaded( $e:LoadingEvent ):void

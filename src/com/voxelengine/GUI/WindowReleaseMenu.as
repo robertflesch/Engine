@@ -1,20 +1,19 @@
 
 package com.voxelengine.GUI
 {
-	import com.voxelengine.events.AppEvent;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
-	import flash.utils.getQualifiedClassName;
 	import flash.events.Event;
+	import flash.geom.Vector3D;
+	import flash.utils.getTimer;
+	
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
 	
-	import flash.utils.getTimer;
-	import flash.geom.Vector3D;
-	import flash.globalization.DateTimeFormatter;
-	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;	
+	import com.voxelengine.events.AppEvent;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
+	
 	public class WindowReleaseMenu extends VVCanvas
 	{
 		static private var _s_currentInstance:WindowReleaseMenu = null;
@@ -38,13 +37,7 @@ package com.voxelengine.GUI
 			layout.orientation = LayoutOrientation.VERTICAL;
 			layout.horizontalAlignment = LayoutHorizontalAlignment.RIGHT;
 			
-//			var d:Date = new Date();
-//			var dtf:DateTimeFormatter = new DateTimeFormatter("en-US");
-			//dtf.setDateTimePattern("yyyy-MM-dd 'at' hh:mm:ssa");
-//			dtf.setDateTimePattern( "yyyy-MM-dd" );
-//			trace(dtf.format(d)); 
-
-			var name:Label = new Label( "VoxelVerse 2015.12.03" );
+			var name:Label = new Label( "VoxelVerse 2015.12.04 - 10:52 AM" );
 			name.fontSize = 14;
 			name.fontColor = 0xffffff;
 			addElement( name );

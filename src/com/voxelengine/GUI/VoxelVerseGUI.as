@@ -314,7 +314,11 @@ public class VoxelVerseGUI extends EventDispatcher
 		//Log.out( "VVGui.onModelLoadingComplete" );
 		LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 		addKeyboardListeners( event );
-		new WindowLogin( "", "" );
+		
+		if ( ConfigManager.instance.showHelp )
+			new WindowHelp()
+		else
+			new WindowLogin( "", "" );
 	}
 	
 	private function onKeyPressed( e : KeyboardEvent) : void {

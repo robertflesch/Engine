@@ -8,11 +8,13 @@
 
 package com.voxelengine.GUI
 {
+	import org.flashapi.swing.event.UIOEvent;
 	import org.flashapi.collector.EventCollector;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.managers.*;
 	
 	import com.voxelengine.Globals;
+	import com.voxelengine.server.WindowLogin;
 	
 	public class WindowHelp extends Popup
 	{
@@ -32,8 +34,13 @@ package com.voxelengine.GUI
 			_textArea.editable = false;
 			_textArea.loadText( Globals.appPath + "assets/help.txt" );
             addElement(_textArea);
-            display(30, 30);
+			eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
+			display(30, 30);
         }
+
+		private function onRemoved( event:UIOEvent ):void {
+			new WindowLogin( "", "" )
+		}
 		
 	}
 }
