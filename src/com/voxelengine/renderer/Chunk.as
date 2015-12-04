@@ -7,7 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.renderer {
 
-import com.voxelengine.worldmodel.TypeInfo;
 import flash.geom.Matrix3D;
 import flash.display3D.Context3D;
 import flash.utils.getTimer;
@@ -15,8 +14,11 @@ import flash.utils.Timer;
 	
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
+import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.tasks.landscapetasks.RefreshQuadsAndFaces;
+import com.voxelengine.worldmodel.tasks.landscapetasks.RebuildFaces;
 
 public class Chunk {
 	
@@ -109,31 +111,43 @@ public class Chunk {
 		else if ( _vertMan )
 			_vertMan.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
 	}
-	
-	public function  refreshFaces():void {
+	/*
+	public function  refreshFaces( $guid:String ):void {
 		if ( childrenHas() ) {
 			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
 				if ( _children[i].dirty )
-					_children[i].refreshFaces();
+					_children[i].refreshFaces( $guid );
 			}
 		}
 		else {
-			_oxel.facesBuild();
+			RebuildFaces.addTask( $guid, this )
 		}
 	}
-
-	public function refreshQuads():void {
+	*/
+	public function refreshFacesTerminal():void {
+		_oxel.facesBuild();
+	}
+	
+	public function refreshFacesAndQuads( $guid:String ):void {
 		if ( childrenHas() ) {
 			dirtyClear();
 			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
+				//if ( _children[i].dirty && _children[i]._oxel && _children[i]._oxel.dirty )
 				if ( _children[i].dirty )
-					_children[i].refreshQuads();
+					_children[i].refreshFacesAndQuads( $guid );
 			}
 		}
 		else {
-			_oxel.quadsBuild();
-			dirtyClear();
+			// Since task has been added for this chunk, mark it as clear
+			dirtyClear()
+			if ( _oxel && _oxel.dirty )
+				RefreshQuadsAndFaces.addTask( $guid, this )
 		}
+	}
+	
+	public function refreshFacesAndQuadsTerminal():void {
+		_oxel.facesBuild()
+		_oxel.quadsBuild()
 	}
 	
 	public function oxelRemove( $oxel:Oxel ):void {

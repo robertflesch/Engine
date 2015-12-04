@@ -100,16 +100,17 @@ public class OxelPersistance extends PersistanceObject
 	*/
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Chunk operations
-	public function refreshFaces():void {
-		_topMostChunk.refreshFaces();
-	}
 	
 	public function update():void {
 		if ( _topMostChunk && _topMostChunk.dirty ) {
-			//if ( guid != EditCursor.EDIT_CURSOR )
-			//	Log.out( "OxelPersistance.update - calling refreshQuads guid: " + guid, Log.WARN );
-			_topMostChunk.refreshFaces();
-			_topMostChunk.refreshQuads();
+			if ( EditCursor.EDIT_CURSOR == guid ) {
+				_oxel.facesBuild()
+				_oxel.quadsBuild()
+			}
+			else {
+				Log.out( "OxelPersistance.update - calling refreshQuads guid: " + guid, Log.WARN );
+				_topMostChunk.refreshFacesAndQuads( guid );
+			}
 		}
 	}
 	
@@ -200,7 +201,6 @@ public class OxelPersistance extends PersistanceObject
 	
 	public function fromByteArray():void {
 
-		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) )
 		//Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.WARN );
 		var time:int = getTimer();
 		
@@ -244,10 +244,9 @@ public class OxelPersistance extends PersistanceObject
 		
 		_topMostChunk = Chunk.parse( oxel, null );
 		_loaded = true;
-		//Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.WARN );
+		Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.WARN );
 		
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this ) );
-		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) )
 	}
 	
 	static public function toByteArray( $oxel:Oxel ):ByteArray {

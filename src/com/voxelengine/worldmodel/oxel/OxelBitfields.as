@@ -123,8 +123,10 @@ package com.voxelengine.worldmodel.oxel
 		public 		function facesCleanAllFaceBits():void 				{ _data &= OXEL_DATA_FACE_BITS_CLEAR; } //  doesnt touch dirty;
 		// faces marked as dirty that need re-evaluation to determine if a face exists there.
 		protected	function faceHasDirtyBits():Boolean 			{ return 0 < (_data & OXEL_DATA_FACES_DIRTY); }
-		public		function facesMarkAllClean():void 		{ _data &= OXEL_DATA_FACES_DIRTY_CLEAR; dirty = true; }
-		public		function facesSetAll():void 				{ _data |= OXEL_DATA_FACES;  dirty = true;}
+//		public		function facesMarkAllClean():void 		{ _data &= OXEL_DATA_FACES_DIRTY_CLEAR; dirty = true; }
+		public		function facesMarkAllClean():void 		{ _data &= OXEL_DATA_FACES_DIRTY_CLEAR; }
+//		public		function facesSetAll():void 				{ _data |= OXEL_DATA_FACES;  dirty = true;}
+		public		function facesSetAll():void 				{ _data |= OXEL_DATA_FACES;  }
 		public		function facesClearAll():void 			{ _data &= OXEL_DATA_FACES_CLEAR;  dirty = true;	 }
 		protected	function facesMarkAllDirty():void 		{ 
 			_data |= OXEL_DATA_FACES_DIRTY;

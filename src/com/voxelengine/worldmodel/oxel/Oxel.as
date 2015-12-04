@@ -96,7 +96,7 @@ public class Oxel extends OxelBitfields
 				_parent.dirty = true;
 				
 			var ch:Chunk = chunkGet(); // Get the parent chunk
-			if ( ch ) 
+			if ( ch && $isDirty ) // only mark it dirty, dont mark on clean
 				ch.dirtySet( type );
 		}
 	}
