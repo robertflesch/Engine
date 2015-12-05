@@ -79,23 +79,14 @@ package {
 			addEventListener(Event.DEACTIVATE, deactivate)
 			addEventListener(Event.ACTIVATE, activate)
 			
-			//Log.out( "VoxelVerse.onSplashLoaded - stage.addEventListener" )
-//			stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown)
-//			stage.addEventListener(MouseEvent.RIGHT_CLICK, mouseRightClick) // Not supporting right click
 			stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave)
-//			stage.addEventListener(MouseEvent.RIGHT_MOUSE_DOWN, mouseDownRight)
-//			stage.addEventListener(MouseEvent.RIGHT_MOUSE_UP, mouseUpRight)
 			
 			// These two should be the same
 			// https://gamesnet.yahoo.net/forum/viewtopic.php?f=33&t=35896&sid=1f0b0c5bef7f97c6961760b6a3418c69
 			// for reference
 			//Security.loadPolicyFile( "http://cdn.playerio.com/crossdomain.xml" )
-			//Security.loadPolicyFile( "https://content.playerio.com/crossdomain.xml" )
-			//var ctxt:LoaderContext = new LoaderContext( true )
-			//ctxt.securityDomain = SecurityDomain.currentDomain
-			//Security.allowDomain( "*" )
+			Security.loadPolicyFile( "https://content.playerio.com/crossdomain.xml" )
 			VoxelVerseGUI.currentInstance.buildGUI()	
-			//Log.out( "VoxelVerse.readyToGo", Log.DEBUG )
 		}
 		
 		private function mouseDown(e:MouseEvent):void {
