@@ -281,10 +281,10 @@ package com.voxelengine.worldmodel
 		
 		override protected function toObject():void {
 			//Log.out( "Region.toObject", Log.WARN );
+			// modelCache will be true if this region has been loaded.
+			// if it has not been loaded, just use the existing info.models data
 			if ( _modelCache )
 				info.models = _modelCache.toObject();
-			else
-				info.models = [];
 				
 			_permissions.toObject();
 		}
