@@ -65,6 +65,7 @@ public class Slots
 			else
 				Log.out( "SlotsManager.slotChange _slots container not initialized", Log.WARN );
 		}
+		_owner.save();
 	}
 	
 	private function createObjectFromInventoryString( $data:String, $slotId:int ):ObjectInfo {
