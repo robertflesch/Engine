@@ -7,9 +7,6 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-	import com.voxelengine.events.ModelLoadingEvent;
-	import com.voxelengine.worldmodel.models.PersistanceObject;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.geom.Vector3D;
 	import flash.events.Event;
     import flash.events.TimerEvent;
@@ -28,28 +25,29 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.events.WindowSplashEvent;
+	import com.voxelengine.events.ModelLoadingEvent;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 	import com.voxelengine.worldmodel.models.types.Avatar;
 	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelCache;
+	import com.voxelengine.worldmodel.models.PersistanceObject;
+	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	/**
 	 * ...
 	 * @author Bob
 	 */
-	public class Region extends PersistanceObject
-	{
-		static public const DEFAULT_REGION_ID:String = "000000-000000-000000";
+	public class Region extends PersistanceObject {
 		
-		private var _permissions:PermissionsRegion;
 		
 		static public var _s_currentRegion:Region;
 		static public function get currentRegion():Region { return _s_currentRegion; }
 		
 		private var _loaded:Boolean;							// INSTANCE NOT EXPORTED
 		private var _criticalModelDetected:Boolean = false;
+		private var _permissions:PermissionsRegion;
 		private var _modelCache:ModelCache;
 		private var _skyColor:Vector3D = new Vector3D();
 
@@ -64,11 +62,9 @@ package com.voxelengine.worldmodel
 		public function get gravity():Boolean { return info.gravity; }
 		public function set gravity(val:Boolean):void { info.gravity = val; }
 		public function getSkyColor():Vector3D { return _skyColor; }
-		public function setSkyColor( r:int, g:int, b:int ):void { 
-			info.skyColor.r = r;
-			info.skyColor.g = g;
-			info.skyColor.b = b; 
-			_skyColor.setTo( r, g , b );
+		public function setSkyColor( $skyColor:Object ):void { 
+			info.skyColor = $skyColor
+			_skyColor.setTo( info.skyColor.r, info.skyColor.g , info.skyColor.b )
 		}
 		public function get playerPosition():Object { return info.playerPosition; }
 		public function get playerRotation():Object {return info.playerRotation; }
@@ -234,8 +230,7 @@ package com.voxelengine.worldmodel
 		}
 		
 		static public function resetPosition():void {
-			if ( VoxelModel.controlledModel )
-			{
+			if ( VoxelModel.controlledModel ) {
 				VoxelModel.controlledModel.instanceInfo.positionSetComp( currentRegion.playerPosition.x, currentRegion.playerPosition.y, currentRegion.playerPosition.z );
 				VoxelModel.controlledModel.instanceInfo.rotationSetComp( currentRegion.playerRotation.x, currentRegion.playerRotation.y, currentRegion.playerRotation.z );
 				//VoxelModel.controlledModel.instanceInfo.positionSetComp(0,0,0);
@@ -244,16 +239,14 @@ package com.voxelengine.worldmodel
 		
 		public function applyRegionInfoToPlayer( $avatar:Player ):void {
 			//Log.out( "Region.applyRegionInfoToPlayer" );
-			if ( playerPosition )
-			{
+			if ( playerPosition ) {
 				//Log.out( "Player.onLoadingPlayerComplete - setting position to  - x: "  + playerPosition.x + "   y: " + playerPosition.y + "   z: " + playerPosition.z );
 				$avatar.instanceInfo.positionSetComp( playerPosition.x, playerPosition.y, playerPosition.z );
 			}
 			else
 				$avatar.instanceInfo.positionSetComp( 0, 0, 0 );
 			
-			if ( playerRotation )
-			{
+			if ( playerRotation ) {
 				//Log.out( "Player.onLoadingPlayerComplete - setting player rotation to  -  y: " + playerRotation );
 				$avatar.instanceInfo.rotationSet = new Vector3D( 0, playerRotation.y, 0 );
 			}
@@ -263,19 +256,25 @@ package com.voxelengine.worldmodel
 			$avatar.usesGravity = gravity;
 		}
 		
+		public function setPlayerPosition( $obj:Object ):void {
+			info.playerPosition = $obj
+		}
+		
+		public function setPlayerRotation( $obj:Object ):void {
+			info.playerRotation = $obj
+		}
+		
+		
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		// toPersistance
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		private function saveEvent( $re:RegionEvent ):void {
-			
-			if ( guid != $re.guid ) {
-				//Log.out( "Region.save - Ignoring save meant for other region my guid: " + guid + " target guid: " + $re.guid, Log.WARN );
-				return;
-			}
+			if ( guid != $re.guid )
+				return
 			
 			// The null owner check makes it to we dont save local loaded regions to persistance
-			if ( Globals.online && changed && null != owner && Globals.isGuid( guid ) )
+			if ( null != owner && Globals.isGuid( guid ) )
 				super.save()
 		}
 		
@@ -318,7 +317,7 @@ package com.voxelengine.worldmodel
 		
 		private function fromInfo():void {
 			// push it into the vector3d
-			setSkyColor( info.skyColor.r, info.skyColor.g, info.skyColor.b );
+			setSkyColor( info.skyColor )
 			
 			for each ( var instanceInfo:Object in info.models ) {
 				var ii:InstanceInfo = new InstanceInfo();

@@ -29,7 +29,7 @@ import com.voxelengine.GUI.components.*;
 public class WindowRegionDetail extends VVPopup
 {
 	private static const PADDING:int = 15;
-	private static const WIDTH:int = 300;
+	private static const WIDTH:int = 350;
 	private static const BORDER_WIDTH:int = 4;
 	private static const BORDER_WIDTH_2:int = BORDER_WIDTH * 2;
 	private static const BORDER_WIDTH_4:int = BORDER_WIDTH * 4;
@@ -40,10 +40,6 @@ public class WindowRegionDetail extends VVPopup
 	private var _create:Boolean;
 	private var _callBack:Class;
 	private var _params:String;
-	
-	//private var _background:Bitmap;
-	//[Embed(source='../../../../../Resources/bin/assets/textures/black.jpg')]
-	//private var _backgroundImage:Class;
 	
 	// Null for RegionId causes a new region to be created
 	public function WindowRegionDetail( $regionID:String, $callBack:Class, $params:String = null )
@@ -59,6 +55,9 @@ public class WindowRegionDetail extends VVPopup
 			title = "New Region";
 		super( title );	
 
+		autoWidth = false
+		width = WIDTH
+		
 		if ( $regionID ) {	
 			RegionEvent.addListener( ModelBaseEvent.ADDED, collectRegionInfo );
 			RegionEvent.addListener( ModelBaseEvent.RESULT, collectRegionInfo );
@@ -103,15 +102,12 @@ public class WindowRegionDetail extends VVPopup
 		addElement( new ComponentRadioButtonGroup( "Gravity", gravArray, gravChange,  _region.gravity ? 0 : 1, WIDTH ) );
 		
 		var playerPosition:Vector3D = new Vector3D( _region.playerPosition.x, _region.playerPosition.y, _region.playerPosition.z );
-		var playerStartingPosition:ComponentVector3D = new ComponentVector3D( markDirty, "Player Starting Location", "X: ", "Y: ", "Z: ",  playerPosition, updateVal );
-		addElement( playerStartingPosition );
+		addElement( new ComponentVector3DToObject( setChanged, _region.setPlayerPosition, "Player Loc", "X: ", "Y: ", "Z: ",  playerPosition, WIDTH, updateVal ) );		
 		
 		var playerRotation:Vector3D = new Vector3D( _region.playerRotation.x, _region.playerRotation.y, _region.playerRotation.z );
-		var playerStartingRotation:ComponentVector3D = new ComponentVector3D( markDirty, "Player Starting Rotation", "X: ", "Y: ", "Z: ",  playerRotation, updateVal );
-		addElement( playerStartingRotation );
+		addElement( new ComponentVector3DToObject( setChanged, _region.setPlayerRotation, "Player Rot", "X: ", "Y: ", "Z: ",  playerRotation, WIDTH, updateVal ) );		
 		
-		var skyColor:ComponentVector3D = new ComponentVector3D( markDirty, "Sky Color", "R: ", "G: ", "B: ",  _region.getSkyColor(), updateVal );
-		addElement( skyColor );
+		addElement( new ComponentVector3DToObject( setChanged, _region.setSkyColor, "SkyColor", "X: ", "Y: ", "Z: ",  _region.getSkyColor(), WIDTH, updateVal ) );		
 		
 		/// Buttons /////////////////////////////////////////////
 		var buttonPanel:Container = new Container( WIDTH, 40 );
@@ -145,6 +141,11 @@ public class WindowRegionDetail extends VVPopup
 		display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
 		//display();
 	}
+	
+	private function setChanged():void {
+		_region.changed = true
+	}
+	
 	
 	private function updateVal( $e:SpinButtonEvent ):int {
 		var ival:int = int( $e.target.data.text );
