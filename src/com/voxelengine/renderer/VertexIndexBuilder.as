@@ -319,7 +319,7 @@ public class VertexIndexBuilder
 				}
 			}
 		}
-		throw new Error( "VertexIndexBuilder.addComponentData - No components found" );
+		Log.out( "VertexIndexBuilder.addComponentData - No components found", Log.WARN );
 	}
 	
 	public function BufferCopyToGPU( context:Context3D ) : void 
