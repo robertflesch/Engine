@@ -37,7 +37,7 @@ package com.voxelengine.GUI
 			layout.orientation = LayoutOrientation.VERTICAL;
 			layout.horizontalAlignment = LayoutHorizontalAlignment.RIGHT;
 			
-			var name:Label = new Label( "VoxelVerse 2015.12.04 - 10:52 AM" );
+			var name:Label = new Label( "VoxelVerse 2015.12.05 - 5:36 PM" );
 			name.fontSize = 14;
 			name.fontColor = 0xffffff;
 			addElement( name );
