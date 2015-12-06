@@ -14,6 +14,10 @@ package com.voxelengine.server
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
 	
+	import flash.system.SecurityDomain;
+    import flash.system.ApplicationDomain;
+    import flash.system.LoaderContext;	
+	
 	import org.flashapi.collector.EventCollector;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
@@ -147,8 +151,8 @@ package com.voxelengine.server
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize);
 			
 			// have to enenable the captcha in playerio in quick connect
-			Log.out( "WindowRegister - BYPASSING CAPTCHA until fixed by PlayerIO", Log.WARN );
 			captchaLoad();
+			//Log.out( "WindowRegister - BYPASSING CAPTCHA until fixed by PlayerIO", Log.WARN );
 			//bypassCaptcha();
 			
 			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
@@ -170,10 +174,15 @@ package com.voxelengine.server
 		{
 			_captchaKey = $captchaKey
 			var loader:Loader = new Loader();
-			loader
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onCaptchaLoadComplete );
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onCaptchaLoadError );
-			loader.load(new URLRequest( $captchaImageUrl ));
+			
+			// This allows the jpg to be loaded from the playerIO site. Which is cross domain.
+			var loaderContext:LoaderContext = new LoaderContext();
+			loaderContext.applicationDomain = ApplicationDomain.currentDomain;
+			loaderContext.securityDomain = SecurityDomain.currentDomain; // Sets the security 
+		
+			loader.load(new URLRequest( $captchaImageUrl ),loaderContext);
 			
 			removeElementAt( 4 );
 			
