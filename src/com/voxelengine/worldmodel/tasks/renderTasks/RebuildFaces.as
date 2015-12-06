@@ -6,7 +6,7 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
-package com.voxelengine.worldmodel.tasks.landscapetasks
+package com.voxelengine.worldmodel.tasks.renderTasks
 {
 import flash.utils.getTimer
 import flash.utils.Timer
@@ -19,15 +19,17 @@ import com.voxelengine.renderer.Chunk
  * ...
  * @author Robert Flesch
  */
-public class RefreshQuadsAndFaces extends RenderingTask 
+public class RebuildFaces extends RenderingTask 
 {	
 	static public function addTask( $guid:String, $chunk:Chunk ): void {
-		var rq:RefreshQuadsAndFaces = new RefreshQuadsAndFaces( $guid, $chunk )
+		if ( null == $chunk )
+			return
+		var rq:RebuildFaces = new RebuildFaces( $guid, $chunk )
 		Globals.g_landscapeTaskController.addTask( rq )
 	}
 	
-	public function RefreshQuadsAndFaces( guid:String, $chunk:Chunk ):void {
-		super(guid, $chunk, "RefreshQuadsAndFaces")
+	public function RebuildFaces( $guid:String, $chunk:Chunk ):void {
+		super( $guid, $chunk, "RebuildFaces")
 	}
 	
 	override public function start():void {
@@ -35,14 +37,14 @@ public class RefreshQuadsAndFaces extends RenderingTask
 		
 		var time:int = getTimer()
 		if ( _chunk )
-			_chunk.refreshFacesAndQuadsTerminal()
+			_chunk.refreshFacesTerminal()
 		var pt:int = (getTimer() - time)
 		// if the processing time is less then 1 ms, do the next task
 		if ( pt < 1 ) {
 			Globals.g_landscapeTaskController.next()
 		}
-		//else
-			//Log.out( "RefreshQuadsAndFaces.start - refreshQuads took: " + pt, Log.WARN )
+		else
+			Log.out( "RebuildFaces.start - took: " + pt, Log.WARN )
 		
 		super.complete()
 	}

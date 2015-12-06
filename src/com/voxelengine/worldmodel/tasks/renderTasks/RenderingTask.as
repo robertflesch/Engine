@@ -6,7 +6,7 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
-package com.voxelengine.worldmodel.tasks.landscapetasks
+package com.voxelengine.worldmodel.tasks.renderTasks
 {
 	import flash.utils.getTimer
 	

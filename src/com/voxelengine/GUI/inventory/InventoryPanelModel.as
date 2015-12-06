@@ -158,6 +158,10 @@ public class InventoryPanelModel extends VVContainer
 		// The series makes it so that I dont see results from other objects requests
 		_seriesModelMetadataEvent = mme.series;
 		ModelMetadataEvent.dispatch( mme );
+
+		var mmep:ModelMetadataEvent = new ModelMetadataEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC, null )
+		mmep.series = _seriesModelMetadataEvent
+		ModelMetadataEvent.dispatch( mme );
 	}
 
 	private function addModelMetadataEvent($mme:ModelMetadataEvent):void {

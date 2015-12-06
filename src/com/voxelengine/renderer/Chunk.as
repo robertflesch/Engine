@@ -17,8 +17,8 @@ import com.voxelengine.Log;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.tasks.landscapetasks.RefreshQuadsAndFaces;
-import com.voxelengine.worldmodel.tasks.landscapetasks.RebuildFaces;
+import com.voxelengine.worldmodel.tasks.renderTasks.RefreshQuadsAndFaces;
+import com.voxelengine.worldmodel.tasks.renderTasks.RebuildFaces;
 
 public class Chunk {
 	

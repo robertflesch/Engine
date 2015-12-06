@@ -79,6 +79,9 @@ public class OxelPersistance extends PersistanceObject
 	}
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
+		if ( null == _topMostChunk )
+			return // I see this when the chunk is getting generated
+			
 		if ( $isAlpha )
 			_topMostChunk.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
 		else

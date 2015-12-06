@@ -37,6 +37,7 @@ import com.voxelengine.worldmodel.models.makers.ModelLibrary;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.scripts.Script;
+import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
 
 public class ModelInfo extends PersistanceObject
 {
@@ -152,9 +153,11 @@ public class ModelInfo extends PersistanceObject
 			//Log.out( "ModelInfo.retrieveData - loaded oxel guid: " + guid );
 			_data = $ode.oxelData;
 			_data.parent = this
-			_data.fromByteArray()
 			// if the parent is dynamic, the data should be too.
 			_data.dynamicObj = dynamicObj;
+			FromByteArray.addTask( guid, _altGuid )
+			/*
+			_data.fromByteArray()
 			if ( "0" == _data.dbo.key ) {
 				_data.changed = true;
 				_data.guid = guid;
@@ -164,6 +167,7 @@ public class ModelInfo extends PersistanceObject
 				_data.save();
 			}
 			OxelDataEvent.dispatch( new OxelDataEvent( OxelDataEvent.OXEL_READY, 0, guid, _data ) )
+			*/
 		}
 	}
 	
