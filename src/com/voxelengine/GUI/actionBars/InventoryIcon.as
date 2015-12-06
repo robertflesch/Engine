@@ -12,6 +12,7 @@ import com.voxelengine.GUI.inventory.WindowInventoryNew;
 import flash.events.MouseEvent;
 import flash.events.KeyboardEvent;
 import flash.events.Event;
+import org.flashapi.swing.text.UITextField;
 
 import org.flashapi.swing.Box;
 import org.flashapi.swing.Label;
@@ -42,6 +43,12 @@ public class InventoryIcon extends VVCanvas
 		_outline = new Image( Globals.texturePath + "backpack.png" )
 		eventCollector.addEvent( _outline, UIMouseEvent.PRESS, pressShape )
 		addElement( _outline )
+		var it:UITextField = new UITextField()
+		it.text = "Inventory (I)"
+		it.x = 16
+		it.y = 48
+		it.textColor = 0xFFFFFF
+		addElement( it )
 		display()
 		resizeObject( null )
 		visible = false
