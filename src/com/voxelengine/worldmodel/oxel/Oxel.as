@@ -126,7 +126,7 @@ public class Oxel extends OxelBitfields
 				
 			// uses the OLD type since _data has not been set yet
 			if ( TypeInfo.AIR != type )
-				chunkRemoveOxel();
+				quadsDeleteAll()
 			
 			super.type = $val;
 			
@@ -280,7 +280,7 @@ public class Oxel extends OxelBitfields
 		
 		// removes all quad and the quads vector
 		// removed the brightness
-		chunkRemoveOxel();
+		quadsDeleteAll()
 		
 		//if ( _chunk )
 		//{
@@ -652,7 +652,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		// Dont do this when generating terrain
 		if ( $invalidateNeighbors )
 			this.neighborsInvalidate();
-		facesClearAll();
+	
+		// remove chunk before changing type, so it know what VBO its in.
+		quadsDeleteAll()
 		this.type = TypeInfo.AIR;
 		this.dirty = true;
 
@@ -1536,7 +1538,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			if ( childrenHas() ) {
 				// parents dont have quads!
 				if ( dirty  && _quads )
-					chunkRemoveOxel();
+					quadsDeleteAll()
 
 				facesCleanAllFaceBits();
 
@@ -1570,13 +1572,13 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		if ( changeCount ) {
 			// if those this oxel has not been added to vertex manager do it now.
 			if ( !facesHas() && addedToVertex ) 
-				chunkRemoveOxel()
+				quadsDeleteAll()
 			// this feels like I might be double adding faces
 			else if ( facesHas() && !addedToVertex ) 
 				chunkAddOxel();
 		}
 		else if ( addedToVertex ) // I was added to vertex, but I lost all my face, so remove oxel
-			chunkRemoveOxel();
+			quadsDeleteAll()
 
 		dirty = false;
 	}
@@ -1608,7 +1610,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		// no face but has a quad
 		else if ( !validFace && quad )
 		{
-			quadDelete( quad, $face, TypeInfo.INVALID );
+			quadDelete( quad, $face );
 			return 0;
 		}
 		// last case is no face and no quad		
@@ -1621,7 +1623,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		dirty = true;
 		var quad:Quad = _quads[$face];
 		if ( quad )
-			quadDelete( quad, $face, type );
+			quadDelete( quad, $face );
 	}
 
 	public function quadRebuild( $face:int ):void {
@@ -1656,27 +1658,46 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	////////////////////////////////////////
 	public function quadsDeleteAll():int {
 		var changeCount:int;
-		if  ( _quads )
-		{
+		if  ( _quads ) {
 			//Log.out( "Oxel.quadsDeleteAll" );
 			dirty = true;
 			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
-				var quad:Quad = _quads[face];
-				if ( quad ) {
-					quadDelete( quad, face, type );
-					changeCount++;
+				// _quads can go away in middle of loop
+				if ( _quads ) {
+					var quad:Quad = _quads[face];
+					if ( quad ) {
+						quadDelete( quad, face );
+						changeCount++;
+					}
 				}
 			}
 		}
+		
 		return changeCount;
 	}
 
 	// TODO, I see some risk here when I am changing oxel type from things like sand to glass
 	// Its going to assume that it was solid, which works for sand to glass
 	// how about water to sand? the oxel would lose all its faces, but never go away.
-	protected function quadDelete( quad:Quad, face:int, type:int ):void {
+	protected function quadDelete( quad:Quad, face:int ):void {
 		QuadPool.poolDispose( quad );
 		_quads[face] = null;
+		var hasQuads:Boolean
+		for ( var cface:int = Globals.POSX; cface <= Globals.NEGZ; cface++ ) {
+			if ( null != _quads[cface] )
+				hasQuads = true
+		}
+		if ( false == hasQuads ) {
+			if ( _quads ) 
+				QuadsPool.poolDispose( _quads );
+			_quads = null;
+
+			if ( addedToVertex ) {
+				// Todo - this should just mark the oxels, and clean up should happen later
+				chunkGet().oxelRemove( this );
+				addedToVertex = false;
+			}
+		}
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1684,28 +1705,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Vertex Manager functions START
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	private function chunkRemoveOxel():void {
-		if ( _quads )
-		{
-			quadsDeleteAll();
-			QuadsPool.poolDispose( _quads );
-			_quads = null;
-		}
-		// Air can have brightness but not quads
-		//if ( _brightness )
-		//{
-			//BrightnessPool.poolReturn( _brightness );
-			//_brightness = null;
-		//}
-		
-		if ( addedToVertex )
-		{
-			// Todo - this should just mark the oxels, and clean up should happen later
-			chunkGet().oxelRemove( this );
-			addedToVertex = false;
-		}
-	}
 	
 	private function chunkAddOxel():void {
 		addedToVertex = true;
