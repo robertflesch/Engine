@@ -55,6 +55,7 @@ public class OxelPersistance extends PersistanceObject
 	private var _topMostChunk:Chunk;
 	private var _parent:ModelInfo
 	private var _ba:ByteArray
+	private var firstTime:Boolean								= true
 	
 	private function get ba():ByteArray 						{ return _ba }
 	
@@ -109,7 +110,9 @@ public class OxelPersistance extends PersistanceObject
 			}
 			else {
 				Log.out( "OxelPersistance.update - calling refreshQuads guid: " + guid, Log.WARN );
-				_topMostChunk.refreshFacesAndQuads( guid );
+				_topMostChunk.refreshFacesAndQuads( guid, firstTime );
+				if ( firstTime )
+					firstTime = false
 			}
 		}
 	}

@@ -128,20 +128,24 @@ public class Chunk {
 		_oxel.facesBuild();
 	}
 	
-	public function refreshFacesAndQuads( $guid:String ):void {
+	public function refreshFacesAndQuads( $guid:String, $firstTime:Boolean = false ):void {
 		if ( childrenHas() ) {
 			dirtyClear();
 			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
 				//if ( _children[i].dirty && _children[i]._oxel && _children[i]._oxel.dirty )
 				if ( _children[i].dirty )
-					_children[i].refreshFacesAndQuads( $guid );
+					_children[i].refreshFacesAndQuads( $guid, $firstTime );
 			}
 		}
 		else {
 			// Since task has been added for this chunk, mark it as clear
 			dirtyClear()
-			if ( _oxel && _oxel.dirty )
-				RefreshQuadsAndFaces.addTask( $guid, this )
+			if ( _oxel && _oxel.dirty ) {
+				if ( $firstTime )
+					RefreshQuadsAndFaces.addTask( $guid, this )
+				else
+					refreshFacesAndQuadsTerminal()
+			}
 		}
 	}
 	
