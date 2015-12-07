@@ -22,6 +22,7 @@ import com.voxelengine.worldmodel.tasks.renderTasks.RebuildFaces;
 
 public class Chunk {
 	
+	//static private const MAX_CHILDREN:uint = 8192;
 	static private const MAX_CHILDREN:uint = 4096;
 	//static private const MAX_CHILDREN:uint = 2048;
 	static private const OCT_TREE_SIZE:uint = 8;
