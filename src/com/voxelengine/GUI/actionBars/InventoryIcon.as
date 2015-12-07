@@ -61,8 +61,9 @@ public class InventoryIcon extends VVCanvas
 	}
 	
 	private function pressShape( $e:UIMouseEvent ):void {
-		var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_VOXELS );
-		new WindowInventoryNew( startingTab ); 
+		var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_LAST, WindowInventoryNew.INVENTORY_CAT_LAST );
+		WindowInventoryNew.toggle( startingTab )
+		
 	}
 	
 	

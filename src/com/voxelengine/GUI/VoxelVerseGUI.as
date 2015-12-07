@@ -322,6 +322,38 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	private function onKeyPressed( e : KeyboardEvent) : void {
+		if ( Keyboard.F11 == e.keyCode )
+			Globals.g_renderer.screenShot( true );
+
+		if ( Keyboard.F12 == e.keyCode )
+			Globals.g_renderer.screenShot( false );
+			
+		if ( Keyboard.F9 == e.keyCode )
+			toggleFullscreen();
+				
+		if  ( ConfigManager.instance.showEditMenu )
+		{
+			if ( Keyboard.I == e.keyCode && false == Globals.g_textInput ) {
+				//var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
+				var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_LAST, WindowInventoryNew.INVENTORY_CAT_LAST );
+				WindowInventoryNew.toggle( startingTab )
+			}
+
+			if ( Keyboard.N == e.keyCode && false == Globals.g_textInput )
+				WindowRegionModels.toggle()
+				//new WindowVideoTest(); Wait for hummingbird
+
+			//if ( Keyboard.O == e.keyCode )
+			//{
+				//Globals.TestCheckForFlow();
+				////Globals.g_renderer.context.dispose();
+			//}
+			
+			if ( Keyboard.L == e.keyCode )
+			{
+				Globals.muted = !Globals.muted;
+			}
+		}
 		// this is required for windows that have text fields. 
 		// but if I have crafting up, then I need to have inventory up too.
 		// TODO Fix this, question is how, do I bring both the crafting AND inventory window up,
@@ -335,14 +367,6 @@ public class VoxelVerseGUI extends EventDispatcher
 				if ( Player.player )
 					Player.player.torchToggle();
 				
-			if ( Keyboard.F11 == e.keyCode )
-				Globals.g_renderer.screenShot( true );
-
-			if ( Keyboard.F12 == e.keyCode )
-				Globals.g_renderer.screenShot( false );
-				
-			if ( Keyboard.F9 == e.keyCode )
-				toggleFullscreen();
 				
 			//if ( Keyboard.F == e.keyCode )
 			//{
@@ -376,34 +400,12 @@ public class VoxelVerseGUI extends EventDispatcher
 					new WindowModelDetail( VoxelModel.selectedModel );
 				//saveModelIVM();
 
-			if ( Keyboard.N == e.keyCode )
-				new WindowRegionModels();
-				//new WindowVideoTest(); Wait for hummingbird
 				
 			if ( Keyboard.C == e.keyCode ) {
 				new WindowCrafting();
 				new WindowInventory();
 			}
 				
-		}
-		
-		if  ( ConfigManager.instance.showEditMenu )
-		{
-			if ( Keyboard.I == e.keyCode ) {
-				var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
-				new WindowInventoryNew( startingTab );
-			}
-				
-			//if ( Keyboard.O == e.keyCode )
-			//{
-				//Globals.TestCheckForFlow();
-				////Globals.g_renderer.context.dispose();
-			//}
-			
-			if ( Keyboard.L == e.keyCode )
-			{
-				Globals.muted = !Globals.muted;
-			}
 		}
 	}
 	

@@ -266,8 +266,9 @@ package com.voxelengine.worldmodel.models
 					
 				worldSpaceIntersectionsClear();
 				// finds up to two intersecting planes per model
-				if ( vm && vm.complete && vm.metadata.permissions.modify )
+				if ( vm && vm.complete && vm.metadata.permissions.modify && vm.modelInfo.data.oxel )
 				{
+					
 					vm.lineIntersect( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections );
 				
 					for each ( var gcIntersection:GrainCursorIntersection in _worldSpaceIntersections )

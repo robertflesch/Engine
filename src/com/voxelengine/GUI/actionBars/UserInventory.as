@@ -57,6 +57,7 @@ public class  UserInventory extends QuickInventory
 	private var _shape:ShapeSelector;
 	private var _modelTools:ModelPlacementType;
 	private var _inventory:InventoryIcon
+	private var _propList:PropListIcon
 	private var _lastCursorType:int
 		
 	private var _remove:Boolean;
@@ -102,9 +103,13 @@ public class  UserInventory extends QuickInventory
 		_inventory = new InventoryIcon( width );
 		addChild( _inventory );
 
+		_propList = new PropListIcon( width );
+		addChild( _propList );
+		
 		hideGrainTools();
 		hideModelTools();
 		_inventory.visible = false
+		_propList.visible = false
 		
 		_s_currentInstance = this;
 		
@@ -147,6 +152,7 @@ public class  UserInventory extends QuickInventory
 		_toolSize.remove()
 		_shape.remove()
 		_inventory.remove()
+		_propList.remove()
 		_s_currentInstance = null;
 		
 		super.remove();
@@ -169,6 +175,7 @@ public class  UserInventory extends QuickInventory
 				// display it!
 				visible = true
 				_inventory.visible = true
+				_propList.visible = true
 //				EditCursor.editing = true;
 				addListeners();
 				display();
@@ -246,7 +253,7 @@ public class  UserInventory extends QuickInventory
 				Log.out( "UserInventory.doDrag - didnt find category for: " + e.target.data, Log.WARN );
 		}
 		else if ( e.target.data is ObjectInfo ) {		
-			Log.out( "UserInventory.doDrag - What do I need to do here? ", Log.WARN );
+			Log.out( "UserInventory.doDrag - What do I need to do with object info?", Log.WARN );
 		}
 		
 		UIManager.dragManager.startDragDrop(_dragOp);

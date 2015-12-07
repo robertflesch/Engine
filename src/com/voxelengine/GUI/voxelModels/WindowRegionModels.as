@@ -18,6 +18,17 @@ package com.voxelengine.GUI.voxelModels
 	public class WindowRegionModels extends VVPopup
 	{
 		private var _modelPanel:PanelModelAnimations;
+
+		static public var _s_instance:WindowRegionModels;
+		
+		static public function toggle():void {
+			if ( null == _s_instance )
+				_s_instance = new WindowRegionModels()
+			else {
+				_s_instance.remove()
+				_s_instance = null
+			}
+		}
 		
 		public function WindowRegionModels()
 		{
@@ -46,6 +57,8 @@ package com.voxelengine.GUI.voxelModels
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, 0, null ));
 			
 			_modelPanel.close();
+			
+			_s_instance = null
 		}
 
 		

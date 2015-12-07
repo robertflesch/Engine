@@ -18,7 +18,7 @@ public class ComponentCompactTextInput extends Panel
 		title = label;
 		borderStyle = BorderStyle.GROOVE;
 		
-		var li:TextInput = new TextInput();
+		var li:TextInput = new VVTextInput();
 		li.text = initialValue;
 		li.width = $width - 20;
 		li.addEventListener( TextEvent.EDITED, changeHandler );

@@ -112,7 +112,7 @@ public class OxelPersistance extends PersistanceObject
 				_oxel.quadsBuild()
 			}
 			else {
-				Log.out( "OxelPersistance.update - calling refreshQuads guid: " + guid, Log.WARN );
+				//Log.out( "OxelPersistance.update - calling refreshQuads guid: " + guid, Log.WARN );
 				_topMostChunk.refreshFacesAndQuads( guid, firstTime );
 				if ( firstTime )
 					firstTime = false
@@ -250,7 +250,7 @@ public class OxelPersistance extends PersistanceObject
 		
 		_topMostChunk = Chunk.parse( oxel, null );
 		_loaded = true;
-		Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.WARN );
+		//Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.WARN );
 		
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this ) );
 	}

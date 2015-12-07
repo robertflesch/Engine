@@ -60,6 +60,7 @@ package com.voxelengine {
 		public static var g_renderer:Renderer = new Renderer();
 		
 		public static var g_mouseKeyboardHandler:MouseKeyboardHandler = new MouseKeyboardHandler();
+		public static var g_textInput:Boolean
 
 		public static var g_nearplane:Number = 1/4;
 		public static var g_farplane:Number = 65536 / 4;

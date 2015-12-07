@@ -6,8 +6,11 @@ import org.flashapi.swing.event.TextEvent;
 import org.flashapi.swing.constants.BorderStyle;
 import org.flashapi.swing.plaf.spas.SpasUI;
 
+//import com.voxelengine.Log;
+
 public class ComponentTextInput extends Box
 {
+	private var _li:TextInput
 	public function ComponentTextInput( label:String, changeHandler:Function, initialValue:String, $width:int, $height:int = 30, $padding:int = 5 )
 	{
 		super( $width, $height );
@@ -18,12 +21,10 @@ public class ComponentTextInput extends Box
 		title = label;
 		borderStyle = BorderStyle.GROOVE;
 		
-		var li:TextInput = new TextInput();
-		li.text = initialValue;
-		li.width = $width - 20;
-		li.addEventListener( TextEvent.EDITED, changeHandler );
+		_li = new VVTextInput(initialValue,$width - 20);
+		_li.addEventListener( TextEvent.EDITED, changeHandler );
 			
-		addElement( li );
+		addElement( _li );
 	}
 }
 }

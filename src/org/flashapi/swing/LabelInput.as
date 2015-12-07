@@ -30,6 +30,7 @@ package org.flashapi.swing {
 	* @see http://www.flashapi.org/
 	*/
 	
+	import com.voxelengine.GUI.components.VVTextInput;
 	import org.flashapi.swing.core.Initializable;
 	import org.flashapi.swing.core.LafRenderer;
 	import org.flashapi.swing.core.spas_internal;
@@ -148,7 +149,7 @@ package org.flashapi.swing {
 		 *  @private
 		 */
 		override protected function createEditableText(width:Number):void {
-			$editableText = new TextInput($defaultText, width);
+			$editableText = new VVTextInput($defaultText, width);
 			$editableText.height = $height;
 			createEditableTextEvents();
 		}

@@ -26,7 +26,6 @@ package com.voxelengine.GUI.inventory {
 		private var _underline:Box;
 		private var _parentWindow:UIContainer;
 		
-		
 		public function InventoryPanelOverview( $windowInventoryNew:UIContainer, $source:String, $tabTokens:String ) {
 			_parentWindow = $windowInventoryNew;
 			super( null );
@@ -71,6 +70,7 @@ package com.voxelengine.GUI.inventory {
 			super.onRemoved( event );
 		}
 		
+		private static var _s_lastSelectedIndex:int
 		private function upperTabsAdd( $startingTabName:String ):void {
 			_barUpper = new TabBar();
 			_barUpper.name = "upper";
@@ -84,11 +84,13 @@ package com.voxelengine.GUI.inventory {
 			_barUpper.setButtonsWidth( 192 );
 			_barUpper.height = 40;
 			if ( WindowInventoryNew.INVENTORY_CAT_VOXELS == $startingTabName )
-				_barUpper.selectedIndex = 0;
+				_s_lastSelectedIndex = _barUpper.selectedIndex = 0;
 			else if ( WindowInventoryNew.INVENTORY_CAT_MODELS == $startingTabName )
-				_barUpper.selectedIndex = 1;
-			else // WindowInventoryNew.INVENTORY_CAT_REGIONS
-				_barUpper.selectedIndex = 2;
+				_s_lastSelectedIndex = _barUpper.selectedIndex = 1;
+			else if ( WindowInventoryNew.INVENTORY_CAT_REGIONS == $startingTabName )
+				_s_lastSelectedIndex = _barUpper.selectedIndex = 2;
+			else WindowInventoryNew.INVENTORY_CAT_LAST
+				_barUpper.selectedIndex = _s_lastSelectedIndex
 
 			eventCollector.addEvent( _barUpper, ListEvent.ITEM_CLICKED, selectCategory );
             addGraphicElements( _barUpper );
@@ -100,16 +102,24 @@ package com.voxelengine.GUI.inventory {
 
 		private function selectCategory(e:ListEvent):void 
 		{			
-			displaySelectedContainer( e.target.data as String, "" );	
+			_s_lastCategory = e.target.data as String
+			displaySelectedContainer( _s_lastCategory, "" );	
 		}
 		
+		private static var _s_lastCategory:String
 		private function displaySelectedContainer( $category:String, $tabTokens:String ):void
 		{	
 			if ( _panelContainer ) {
 				removeElement( _panelContainer );
 				_panelContainer.remove();
 			}
-				
+			
+			if ( WindowInventoryNew.INVENTORY_CAT_LAST == $category ) {
+				// does last have a value? if not give it voxels
+				if ( null == _s_lastCategory || 0 == _s_lastCategory.length || _s_lastCategory)
+					_s_lastCategory = WindowInventoryNew.INVENTORY_CAT_VOXELS
+				$category = _s_lastCategory
+			}
 			if ( WindowInventoryNew.INVENTORY_CAT_VOXELS == $category )
 				_panelContainer = new InventoryPanelVoxel( this );
 			else if ( WindowInventoryNew.INVENTORY_CAT_MODELS == $category )	

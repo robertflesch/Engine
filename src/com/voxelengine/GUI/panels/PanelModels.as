@@ -84,7 +84,7 @@ public class PanelModels extends PanelBase
 	}
 	
 	public function populateModels( $source:Function, $parentModel:VoxelModel ):int	{
-		Log.out( "PanelModels.populateModels - parentModel:" + $parentModel, Log.WARN )
+		//Log.out( "PanelModels.populateModels - parentModel:" + $parentModel, Log.WARN )
 		_dictionarySource = $source;
 		_parentModel = $parentModel;
 		_listModels.removeAll();
@@ -209,7 +209,7 @@ public class PanelModels extends PanelBase
 				WindowInventoryNew._s_hackShowChildren = false;
 			WindowInventoryNew._s_hackSupportClick = true;
 			var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
-			new WindowInventoryNew( startingTab ); 
+			WindowInventoryNew.toggle( startingTab )
 		}
 	}
 

@@ -27,11 +27,13 @@ package com.voxelengine.GUI.inventory {
         static public const ALL_ITEMS:String = "all_items";
         static public const INVENTORY_OWNED:String = "backpack";
         static public const INVENTORY_STORE:String = "store";
+        static public const INVENTORY_LAST:String = "last";
 		
 		// TODO need a more central location for these
         static public const INVENTORY_CAT_VOXELS:String = "Voxels";
         static public const INVENTORY_CAT_MODELS:String = "Models";
         static public const INVENTORY_CAT_REGIONS:String = "Regions";
+        static public const INVENTORY_CAT_LAST:String = "Last";
 		
         private var _ownedVsStore:TabBar;
 		private var _panelContainer:Container;
@@ -48,6 +50,16 @@ package com.voxelengine.GUI.inventory {
 		
 		static public var _s_hackShowChildren:Boolean;
 		static public var _s_hackSupportClick:Boolean;
+		static public var _s_instance:WindowInventoryNew;
+		
+		static public function toggle( $startingTab:String ):void {
+			if ( null == _s_instance )
+				_s_instance = new WindowInventoryNew( $startingTab )
+			else {
+				_s_instance.remove()
+				_s_instance = null
+			}
+		}
 		
 		public function WindowInventoryNew( $startingTab:String )
 		{
@@ -91,10 +103,10 @@ package com.voxelengine.GUI.inventory {
             _ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_OWNED ), INVENTORY_OWNED );
 			_ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_STORE ), INVENTORY_STORE );
 			_ownedVsStore.setButtonsWidth( 256, 36 );
-			if ( startingTabName == INVENTORY_OWNED )
-				_ownedVsStore.selectedIndex = 0;
-			else
+			if ( startingTabName == INVENTORY_STORE )
 				_ownedVsStore.selectedIndex = 1;
+			else
+				_ownedVsStore.selectedIndex = 0;
 			//_ownedVsStore.itemsCollection
             eventCollector.addEvent( _ownedVsStore, ListEvent.ITEM_CLICKED, selectCategory );
             addGraphicElements( _ownedVsStore );
@@ -118,13 +130,14 @@ package com.voxelengine.GUI.inventory {
 			}
 			
 			super.onRemoved( event );
-			_s_hackShowChildren = false;
-			_s_hackSupportClick = false;
+			_s_hackShowChildren = false
+			_s_hackSupportClick = false
+			_s_instance = null
 		}
 		
 		private function selectCategory(e:ListEvent):void 
 		{			
-			displaySelectedContainer( e.target.data as String, "" );	
+			displaySelectedContainer( e.target.data as String, INVENTORY_CAT_LAST );	
 		}
 		
 		private function displaySelectedContainer( $category:String, $tabTokens:String ):void

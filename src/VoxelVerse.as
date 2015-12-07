@@ -145,7 +145,8 @@ package {
 		 */
 		public function mouseLeave( e:Event ):void
 		{
-			//Log.out( "VoxelVerse.mouseLeave event" )
+			Log.out( "VoxelVerse.mouseLeave event" )
+			dispatchSaves()
 //			if ( Globals.active )
 //				deactivateApp( e )
 		}
@@ -185,16 +186,19 @@ package {
 
 				if ( Globals.online ) {
 					AppEvent.dispatch( e )
-					
-					//Log.out( "VoxelVerse.deactivateApp - NOT SAVING REGION AND INVENTORY", Log.WARN )
-					RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) )
-					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.SAVE, 0, null, null, null ) )
-					InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, null, null ) )
-					ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) )
+					dispatchSaves()
 				}
 			}
 			//else
 			//	Log.out( "VoxelVerse.deactivateApp - app already deactivated", Log.WARN )
+		}
+		
+		private function dispatchSaves():void {
+			//Log.out( "VoxelVerse.dispatchSaves", Log.WARN )
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) )
+			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.SAVE, 0, null, null, null ) )
+			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, null, null ) )
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) )
 		}
 		
 		//private function mouseDown(e:MouseEvent):void 

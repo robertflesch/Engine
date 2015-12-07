@@ -10,6 +10,7 @@ package com.voxelengine.server
 	import com.voxelengine.events.LoadingImageEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.events.WindowSplashEvent;
+	import com.voxelengine.GUI.components.VVTextInput;
 	import com.voxelengine.GUI.VoxelVerseGUI;
 	//import com.voxelengine.GUI.WindowSplash;
 	import flash.display.Bitmap;
@@ -106,7 +107,7 @@ package com.voxelengine.server
 			
 			var password:String = _userInfo.data.password ?  _userInfo.data.password : $password;
 			//_passwordInput = new LabelInput( " Password", password, width );
-			_passwordInput = new TextInput( password, width );
+			_passwordInput = new VVTextInput( password, width );
 			_passwordInput.displayAsPassword = true;
 			_passwordInput.tabIndex = 1;
 			

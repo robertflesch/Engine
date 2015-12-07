@@ -105,7 +105,10 @@ public class BoxInventory extends VVBox
 				else
 					_count.text = String( modelsOfThisGuid );
 
-				setHelp( om.vmm.name );			
+				if ( Globals.g_debug )
+					setHelp( om.vmm.name + " guid: " + om.vmm.guid );			
+				else	
+					setHelp( om.vmm.name );			
 				if ( om.vmm.permissions.blueprint ) {
 					_bpValue = new Image( Globals.texturePath + "blueprint.png" )
 					if ( 128 == width )
