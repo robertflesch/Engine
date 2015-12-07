@@ -45,7 +45,7 @@ public class InventoryIcon extends VVCanvas
 		addElement( _outline )
 		var it:UITextField = new UITextField()
 		it.text = "Inventory (I)"
-		it.x = 16
+		it.x = 24
 		it.y = 48
 		it.textColor = 0xFFFFFF
 		addElement( it )
@@ -70,8 +70,8 @@ public class InventoryIcon extends VVCanvas
 	public function resizeObject(event:Event):void {
 		var halfRW:int = Globals.g_renderer.width / 2
 
-		y = Globals.g_renderer.height - height- 32
-		x = halfRW - (width / 2) - _parentWidth/2 - 15
+		y = Globals.g_renderer.height - height- 24
+		x = halfRW - (width / 2) - _parentWidth/2
 	}
 	
 	public function show():void { _outline.visible = true; visible = false }
