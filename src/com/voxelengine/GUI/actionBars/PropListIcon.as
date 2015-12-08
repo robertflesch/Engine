@@ -63,7 +63,7 @@ public class PropListIcon extends VVCanvas
 	public function resizeObject(event:Event):void {
 		var halfRW:int = Globals.g_renderer.width / 2
 
-		y = Globals.g_renderer.height - height - 20
+		y = Globals.g_renderer.height - height - 24
 		x = halfRW - (width / 2) + _parentWidth/2 + 28
 	}
 	
