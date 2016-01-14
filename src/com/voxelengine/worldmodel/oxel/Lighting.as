@@ -882,15 +882,17 @@ public class Lighting  {
 			}
 		}
 		
-		var cornerAttn:uint = cornerForFace( $face, $corner );
-		if ( 0 < cornerAttn ) {
-			cornerAttn = MAX_LIGHT_LEVEL - cornerAttn * li.attn * 4; //* 2;
-			cornerAttn = Math.max( cornerAttn, 0 );
-			_compositeColor = ColorUtils.placeAlpha( _compositeColor, cornerAttn );
-//			Log.out( "Brightness.lightGetComposite for corner - _compositeColor: " + ColorUtils.extractAlpha( _compositeColor ) );
-_compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
-		} else {
-			_compositeColor = ColorUtils.placeAlpha( _compositeColor, MAX_LIGHT_LEVEL );
+		if ( Lighting.eaoEnabled ) {
+			var cornerAttn:uint = cornerForFace( $face, $corner );
+			if ( 0 < cornerAttn ) {
+				cornerAttn = MAX_LIGHT_LEVEL - cornerAttn * li.attn * 4; //* 2;
+				cornerAttn = Math.max( cornerAttn, 0 );
+				_compositeColor = ColorUtils.placeAlpha( _compositeColor, cornerAttn );
+	//			Log.out( "Brightness.lightGetComposite for corner - _compositeColor: " + ColorUtils.extractAlpha( _compositeColor ) );
+	_compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
+			} else {
+				_compositeColor = ColorUtils.placeAlpha( _compositeColor, MAX_LIGHT_LEVEL );
+			}
 		}
 		return _compositeColor;
 	}
@@ -1846,7 +1848,7 @@ _compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
 	// $addOrRemoveAmbient should be either Lighting.AMBIENT_ADD or Lighting.AMBIENT_REMOVE
 	public function evaluateAmbientOcculusion( $o:Oxel, $face:int, $addOrRemoveAmbient:Boolean ):void {
 		
-		if ( !_s_eaoEnabled )
+		if ( !eaoEnabled )
 			return;
 		
 		// get the oxel next to the face we are evaluating.

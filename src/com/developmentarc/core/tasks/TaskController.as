@@ -256,21 +256,21 @@ package com.developmentarc.core.tasks
 		 * queue based on the defined logic. 
 		 * 
 		 */
-		public function next():void
-		{
-			//if ( !_paused )
-				//nextTask();
-			//else
-			//	Log.out(" TaskController paused" );
-		}
 		
-		public function VVNextTask():int
+		public function next():int
 		{
-			nextTask();
+			if ( !_paused ) {
+				nextTask();
+			}
+//			else	
+//				trace( "TaskController.VVNextTask - PAUSED" )
 			return queueSize();
 		}
 		
-		public var _paused:Boolean = false;
+		private var _paused:Boolean = false;
+		public function get paused():Boolean  { return _paused }
+		public function set paused(value:Boolean):void  { _paused = value }
+		
 		 
 		protected function nextTask():void
 		{
@@ -330,6 +330,8 @@ package com.developmentarc.core.tasks
 					task.addEventListener(TaskEvent.TASK_ERROR, handleTaskEvent);
 					activeTasks.addItem(task, true);
 					task.start();
+					trace( "TaskController.nextTask - Executing" )
+
 					// see if we can add more tasks
 					if (activeTasks.length < __activeTaskLimit) 
 						next();

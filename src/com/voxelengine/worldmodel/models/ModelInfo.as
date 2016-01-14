@@ -11,6 +11,7 @@ import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
 import flash.utils.ByteArray;
+import flash.utils.getTimer
 
 import playerio.DatabaseObject;
 
@@ -99,17 +100,21 @@ public class ModelInfo extends PersistanceObject
 		_data.createEditCursor();
 	}
 	
-	public function update( $context:Context3D, $elapsedTimeMS:int ):void {
+	public function update( $context:Context3D, $elapsedTimeMS:int, $vm:VoxelModel ):void {
 		if ( data )
-			data.update();
+			data.update( $vm );
 			
 		for each (var vm:VoxelModel in childVoxelModels )
 			vm.update($context, $elapsedTimeMS);
 	}
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
+//		var time:int = getTimer()
 		if ( _data )
 			_data.draw(	$mvp, $vm, $context, $selected, $isChild, $isAlpha );
+//		var t:int = (getTimer() - time) 	
+//		if ( t )
+//			Log.out( "ModelInfo.draw time: " + t );
 			
 		for each (var vm:VoxelModel in childVoxelModels) {
 			if (vm && vm.complete)
@@ -149,13 +154,15 @@ public class ModelInfo extends PersistanceObject
 	
 	private function retrieveData( $ode:OxelDataEvent):void {
 		if ( guid == $ode.modelGuid || altGuid == $ode.modelGuid ) {
-			removeListeners();
+			removeListeners()
 			//Log.out( "ModelInfo.retrieveData - loaded oxel guid: " + guid );
-			_data = $ode.oxelData;
+			_data = $ode.oxelData
 			_data.parent = this
 			// if the parent is dynamic, the data should be too.
-			_data.dynamicObj = dynamicObj;
-			FromByteArray.addTask( guid, _altGuid )
+			_data.dynamicObj = dynamicObj
+			// calculate distance from player
+			const priority:int = 5
+			FromByteArray.addTask( guid, priority, _altGuid )
 			/*
 			_data.fromByteArray()
 			if ( "0" == _data.dbo.key ) {

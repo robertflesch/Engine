@@ -28,7 +28,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		protected var _ready:Boolean = false;
 		
 		public static const TASK_TYPE:String = "FLOW_TASK";
-        public static const TASK_PRIORITY:int = 1;
+        public static const TASK_PRIORITY:int = 64000;
 		
 		public function FlowTask( $instanceGuid:String, $gc:GrainCursor, $type:int, $taskType:String = TASK_TYPE, $taskPriority:int = TASK_PRIORITY ):void {
 			// The model containing the grain 

@@ -180,16 +180,15 @@ public class RoomConnection
 	//}
 			
 	static private function handleMoveMessage(m:Message):void {
-		var userid:String = m.getString(0);
-		if ( Network.userId != userid ) {
-			//trace("RoomConnection.handleMoveMessage - Received move message", m);
-			var am:Avatar = Region.currentRegion.modelCache.instanceGet( userid ) as Avatar;
-			if ( am )
-			{
-				var pos:Vector3D = new Vector3D( m.getNumber( 1 ), m.getNumber( 2 ), m.getNumber( 3 ) );
-				am.instanceInfo.positionSet = pos;
-			}
-		}
+		const userid:String = m.getString(0);
+		// ignore move message for self
+		if ( userid == Network.userId )
+			return 
+			
+		//trace("RoomConnection.handleMoveMessage - Received move message", m);
+		var avatar:Avatar = Region.currentRegion.modelCache.instanceGet( userid ) as Avatar;
+		if ( avatar )
+			avatar.instanceInfo.positionSetComp( m.getNumber( 1 ), m.getNumber( 2 ), m.getNumber( 3 ) )
 		//else	
 		//	trace("RoomConnection.handleMoveMessage - Ignoring move messages for self")
 	}

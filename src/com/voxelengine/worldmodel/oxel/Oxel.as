@@ -130,8 +130,8 @@ public class Oxel extends OxelBitfields
 			
 			super.type = $val;
 			
-			if ( TypeInfo.AIR == $val ) 
-			{
+			if ( TypeInfo.AIR == $val ) {
+				quadsDeleteAll()
 				facesCleanAllFaceBits();
 				// Todo - this CAN leave behind empty oxels, need to add some kind of flag or check for them.
 				//if ( _parent ) 
@@ -825,7 +825,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		Log.out("Oxel.mergeAndRebuild - merge 2 took: " + (getTimer() - _timer) + " count " + Oxel.nodes );
 		
 		_timer = getTimer();
-		rebuildAll();
+		Oxel.rebuild(this);
 		Log.out("Oxel.mergeAndRebuild - rebuildAll took: " + (getTimer() - _timer));
 	}
 	
@@ -841,7 +841,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		Log.out("Oxel.mergeAIRAndRebuild - merge 2 took: " + (getTimer() - _timer) + " count " + Oxel.nodes );
 		
 		_timer = getTimer();
-		rebuildAll();
+		Oxel.rebuild(this);
 		Log.out("Oxel.mergeAIRAndRebuild - rebuildAll took: " + (getTimer() - _timer));
 	}
 	
@@ -942,21 +942,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 	
 	
-	public function rebuildAll():void {
-		if ( childrenHas() ) {
-			if ( TypeInfo.AIR != type ) {
-				Log.out( "Oxel.rebuildAll - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
-				type = TypeInfo.AIR; 
-			}
-			for each ( var child:Oxel in _children )
-				child.rebuildAll();
-		}
-		else {
-			facesMarkAllDirty();
-			quadsDeleteAll();
-		}
-	}
-	
 	public function root_get():Oxel {
 		if ( _parent )
 			return _parent.root_get();
@@ -1007,6 +992,16 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return result;
 	}
 
+	
+	public function recalculateAmbient( $modelGuid:String ):void {
+		if ( childrenHas() ) {
+			for each ( var child:Oxel in _children )
+				child.recalculateAmbient( $modelGuid );
+		}
+		else
+			neighborsMarkDirtyFaces( $modelGuid, 0, 0 )
+	}
+	
 	// Mark all of the faces opposite this oxel as dirty
 	// propogate count is to keep it from spreading too far, by maybe this should be distance, rather then hard count?
 	public function neighborsMarkDirtyFaces( $modelGuid:String, $size:int, $propogateCount:int = 2 ):void {
@@ -2351,6 +2346,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 	
+	
 	public function rotateCCW():void
 	{
 		var range:uint = gc.bound - gc.grain;
@@ -2684,38 +2680,41 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		else if ( TypeInfo.DIRT == type || TypeInfo.GRASS == type )
 		{
 			// See if we have water around us, if so change to sand
-			for each ( var dir:int in Globals.allButDownDirections )
-			{
+			for each ( var dir:int in Globals.allButDownDirections ) 
 				dirtAndGrassToSand( dir );	
-			}
 			
 			// if this is still dirt meaning no water, see if we have air above us, change to grass
-			if ( TypeInfo.DIRT == type )
-			{
-				var no:Oxel = neighbor( Globals.POSY );
-				if ( Globals.BAD_OXEL == no )
-					return;
-					
-				if ( TypeInfo.AIR == no.type )
-				{
-					if ( null == no._children )
-						type = TypeInfo.GRASS;
-					else
-					{
-						var kids:Vector.<Oxel> = no.childrenForDirection( Globals.NEGY );
-						for each ( var kid:Oxel in kids )
-						{
-							if ( TypeInfo.AIR == kid.type )
-							{
-								type = TypeInfo.GRASS;
-								break;
-							}
-						}
-					}
-				}
+			if ( TypeInfo.DIRT == type ) {
+				evaluateForChangeToGrass();
 			}
 		}
 	}
+	
+	private function evaluateForChangeToGrass():void {
+		var no:Oxel = neighbor( Globals.POSY );
+		if ( Globals.BAD_OXEL == no )
+				type = TypeInfo.GRASS;
+		else if ( TypeInfo.hasAlpha( no.type ) && no.childrenHas() ) {
+			if ( no.faceHasAlpha( Globals.NEGY ) ) {
+				// no has alpha and children, I need to change to dirt and break up, and revaluate
+				type = TypeInfo.DIRT
+				if ( 0 < gc.grain ) {
+					childrenCreate( true ) 
+					for each ( var dchild:Oxel in children )
+						dchild.evaluateForChangeToGrass()
+				}
+			}
+			else
+				type = TypeInfo.DIRT
+		}
+		else if ( TypeInfo.hasAlpha( no.type ) && !no.childrenHas() ) {
+			type = TypeInfo.GRASS;
+		}
+		//else 
+		// leave it as dirt
+	}
+	
+	
 	
 	public function vines( $modelGuid:String ):void {
 
@@ -3121,6 +3120,83 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	public function toStringShort():String {
 		return "oxel of type: " + TypeInfo.typeInfo[type].name + "\t location: " + gc.toString();
 	}
+	
+	//// This rebuilds just this oxel and its children
+	//public function rebuild():void {
+		//if ( childrenHas() ) {
+			//if ( TypeInfo.AIR != type ) {
+				//Log.out( "Oxel.rebuildAll - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
+				//type = TypeInfo.AIR; 
+			//}
+			//for each ( var child:Oxel in _children )
+				//child.rebuild();
+		//}
+		//else {
+			//facesMarkAllDirty();
+			//quadsDeleteAll();
+		//}
+	//}
+	
+	
+	///////////////////////////////////////////////////////////////////////////
+	// lambda functions
+	///////////////////////////////////////////////////////////////////////////
+	
+	static public function rebuildGrass( $oxel:Oxel ):void {
+		if ( $oxel.childrenHas() ) {
+			for each ( var child:Oxel in $oxel._children )
+				Oxel.rebuildGrass( child ); }
+		else {
+			if ( TypeInfo.GRASS == $oxel.type ) {
+				if ( $oxel.gc.eval( 4, 64, 89, 13 ) )
+					Log.out( "Oxel.rebuildGrass - why doesnt this change?" )
+				// look above this oxel
+				var no:Oxel = $oxel.neighbor( Globals.POSY )
+				// if its air, ok
+				if ( TypeInfo.hasAlpha( no.type ) && !no.childrenHas() )
+					return
+				// if its has children, and one of those is air
+				// change it to dirt, and create children
+				if ( no.type == TypeInfo.AIR && no.childrenHas() ) {
+					if ( no.faceHasAlpha( Globals.NEGY ) ) {
+						// no has alpha and children, I need to change to dirt and break up, and revaluate
+						$oxel.type = TypeInfo.DIRT
+						$oxel.childrenCreate( true ) 
+						for each ( var dchild:Oxel in $oxel.children )
+							dchild.evaluateForChangeToGrass()
+					}
+					else
+						$oxel.type = TypeInfo.DIRT
+				}
+				else if ( !TypeInfo.hasAlpha( no.type ) ) {
+					$oxel.type = TypeInfo.DIRT
+				}
+				else if ( no.childrenHas() ) {
+					Log.out( "Oxel.rebuildGrass - invalid condition: no.type" + no.type, Log.ERROR )
+				}
+				else 
+					Log.out( "Oxel.rebuildGrass - invalid condition", Log.ERROR )
+			}
+		}
+	}
+
+	// This rebuilds the oxel and its children.
+	// if used in a lambda function, it rebuilds the entire model
+	static public function rebuild( $oxel:Oxel ):void {
+		if ( $oxel.childrenHas() ) {
+			if ( TypeInfo.AIR != $oxel.type ) {
+				Log.out( "Oxel.rebuildAll - parent with TYPE: " + TypeInfo.typeInfo[$oxel.type].name, Log.ERROR );
+				$oxel.type = TypeInfo.AIR; 
+			}
+			for each ( var child:Oxel in $oxel._children )
+				Oxel.rebuild(child);
+		}
+		else {
+			$oxel.facesMarkAllDirty();
+			$oxel.quadsDeleteAll();
+		}
+	}
+	
 		
 } // end of class Oxel
 } // end of package

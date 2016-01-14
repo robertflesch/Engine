@@ -322,16 +322,20 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	private function onKeyPressed( e : KeyboardEvent) : void {
+			
 		if ( Keyboard.F11 == e.keyCode )
-			Globals.g_renderer.screenShot( true );
+			Globals.g_renderer.screenShot( true ); // draws UI
 
 		if ( Keyboard.F12 == e.keyCode )
 			Globals.g_renderer.screenShot( false );
 			
+		if ( Log.showing )
+			return 
+			
 		if ( Keyboard.F9 == e.keyCode )
 			toggleFullscreen();
 				
-		if  ( ConfigManager.instance.showEditMenu )
+		if  ( ConfigManager.instance.showEditMenu  )
 		{
 			if ( Keyboard.I == e.keyCode && false == Globals.g_textInput ) {
 				//var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
@@ -358,21 +362,16 @@ public class VoxelVerseGUI extends EventDispatcher
 		// but if I have crafting up, then I need to have inventory up too.
 		// TODO Fix this, question is how, do I bring both the crafting AND inventory window up,
 		// or do I give the crafting window access to the inventory thru some built in mechanism
-		if ( ( 0 < Globals.openWindowCount || Log.showing) )
+		if ( ( 0 < Globals.openWindowCount ) )
 			return;				
 			
-		if ( !Log.showing )
-		{
+		if ( false == Globals.g_textInput ) {
 			if ( Keyboard.T == e.keyCode )
 				if ( Player.player )
 					Player.player.torchToggle();
 				
-				
-			//if ( Keyboard.F == e.keyCode )
-			//{
-				//createProjectile( VoxelModel.controlledModel );
-				//return;
-			//}
+			if ( Keyboard.F == e.keyCode )
+				createProjectile( VoxelModel.controlledModel );
 				
 			//if ( Keyboard.O == e.keyCode )
 			//{
@@ -398,14 +397,11 @@ public class VoxelVerseGUI extends EventDispatcher
 			if ( Keyboard.M == e.keyCode )
 				if ( VoxelModel.selectedModel )
 					new WindowModelDetail( VoxelModel.selectedModel );
-				//saveModelIVM();
-
 				
 			if ( Keyboard.C == e.keyCode ) {
 				new WindowCrafting();
 				new WindowInventory();
 			}
-				
 		}
 	}
 	

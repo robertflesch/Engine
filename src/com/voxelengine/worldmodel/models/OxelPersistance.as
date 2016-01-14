@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.models
 import com.voxelengine.events.LoadingImageEvent;
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
+import flash.geom.Vector3D;
 import flash.net.registerClassAlias;
 import flash.utils.ByteArray;
 import flash.utils.getTimer;
@@ -105,7 +106,7 @@ public class OxelPersistance extends PersistanceObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Chunk operations
 	
-	public function update():void {
+	public function update( $vm:VoxelModel ):void {
 		if ( _topMostChunk && _topMostChunk.dirty ) {
 			if ( EditCursor.EDIT_CURSOR == guid ) {
 				_oxel.facesBuild()
@@ -113,13 +114,18 @@ public class OxelPersistance extends PersistanceObject
 			}
 			else {
 				//Log.out( "OxelPersistance.update - calling refreshQuads guid: " + guid, Log.WARN );
-				_topMostChunk.refreshFacesAndQuads( guid, firstTime );
+				_topMostChunk.refreshFacesAndQuads( guid, $vm, firstTime );
 				if ( firstTime )
 					firstTime = false
 			}
 		}
 	}
 	
+	public function lambda( $func:Function ):void {
+		_topMostChunk.lambda( guid, $func )
+	}
+	
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// oxel operations
 	public function changeOxel( $modelGuid:String, $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
@@ -136,6 +142,7 @@ public class OxelPersistance extends PersistanceObject
 				//Log.out( "OxelPersistance.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
 				return;
 		}
+		//Log.out( "OxelPersistance.save - NOT Saving COMMENTED OUT", Log.WARN );
 		super.save();
 	}
 	

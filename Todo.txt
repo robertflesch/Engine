@@ -1,36 +1,46 @@
-
-4, 82,104,90
-
+Kahoots
 
 
-	private function chunkRemoveOxel():void {
-		facesClearAll()
-		if ( _quads )
-		{
-			quadsDeleteAll();
-			QuadsPool.poolDispose( _quads );
-			_quads = null;
-		}
-		// Air can have brightness but not quads
-		//if ( _brightness )
-		//{
-			//BrightnessPool.poolReturn( _brightness );
-			//_brightness = null;
-		//}
-		
-		if ( addedToVertex )
-		{
-			// Todo - this should just mark the oxels, and clean up should happen later
-			chunkGet().oxelRemove( this );
-			addedToVertex = false;
-		}
-	}
-	
-	private function chunkAddOxel():void {
-		addedToVertex = true;
-		chunkGet().oxelAdd( this );
-	}
+Platform Settings
+need to define SDK as air_sdk
+http://www.adobe.com/devnet/air/air-sdk-download-win.html
+
+next to go to Project Tab
+select SDK
+compiler output = c:\dev\kahoots\bin
+
+now go to modules page
+click + for new module, now import the kahootsapp.iml
+now you have to go to each module and set the dependnacy
+
+These are something we should move toward over time, any new code should meet this format
+Coding Standards
+member variables start with _
+static member variables start with _s_
+parameters start with $
+
+Logging standards
+trace("BridgeBugsnag.init.Exception caught") 
+rather then 
+trace("Exception caught") rather then 
 
 
+BobFlesch
+r3dp4rr0t42
+https://kahoots.signin.aws.amazon.com/console
+				
+C:\Users\Dev\AppData\Roaming\com.kahootsapp.staging\Local Store\kahoots.db
+
+VoxelVerse
+
+<1 voxels shows, but infinite amount
+the edit cursor is not always showing up in correct spot
+ambient occulsion is broken
+glass draws both sides - pass flag in shader? backside doesnt work until alpha is sorted properly
+lights don't work
+when switched to other tabs and then when I came back it would only let me move with Wasda and not change angle
 
 
+Thank you for your order
+Your Oculus Rift is expected to ship in March 2016. We sent an order confirmation email to: robertflesch@gmail.com
+Order Number: 61300002788839

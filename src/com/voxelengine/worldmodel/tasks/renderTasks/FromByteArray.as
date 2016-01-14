@@ -27,16 +27,18 @@ public class FromByteArray extends AbstractTask
 {	
 	private var	_guid:String
 	private var	_altGuid:String
+    private static const TASK_PRIORITY:int = 64000;
 	
-	static public function addTask( $guid:String, $altGuid:String ): void {
-		var fba:FromByteArray = new FromByteArray( $guid, $altGuid )
+	static public function addTask( $guid:String, $taskPriority:int, $altGuid:String ): void {
+		var fba:FromByteArray = new FromByteArray( $guid, $taskPriority, $altGuid )
 		Globals.g_landscapeTaskController.addTask( fba )
 	}
 	
-	public function FromByteArray( $guid:String, $altGuid:String = null ):void {
+//public function AbstractTask(type:String, priority:int = 5, uid:Object = null, selfOverride:Boolean = false, blocking:Boolean = false)	
+	public function FromByteArray( $guid:String, $taskPriority:int, $altGuid:String = null ):void {
 		_guid = $guid
 		_altGuid = $altGuid
-		super("FromByteArray")
+		super("FromByteArray", $taskPriority )
 		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) )
 	}
 	

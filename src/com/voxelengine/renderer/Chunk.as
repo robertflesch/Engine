@@ -7,8 +7,10 @@
 ==============================================================================*/
 package com.voxelengine.renderer {
 
+import com.voxelengine.worldmodel.models.types.Player;
 import flash.geom.Matrix3D;
 import flash.display3D.Context3D;
+import flash.geom.Vector3D;
 import flash.utils.getTimer;
 import flash.utils.Timer;
 	
@@ -18,13 +20,18 @@ import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.tasks.renderTasks.RefreshQuadsAndFaces;
-import com.voxelengine.worldmodel.tasks.renderTasks.RebuildFaces;
+import com.voxelengine.worldmodel.tasks.renderTasks.LambdaTask;
 
 public class Chunk {
 	
+	// You want this number to be as high as possible. 
+	// But the higher it is, the longer updates take.
+	//static private const MAX_CHILDREN:uint = 32768; // draw for all chunks on island takes 1ms
+	//static private const MAX_CHILDREN:uint = 16384;
 	//static private const MAX_CHILDREN:uint = 8192;
-	static private const MAX_CHILDREN:uint = 4096;
+	 static private const MAX_CHILDREN:uint = 4096; // draw for all chunks on island takes 5ms
 	//static private const MAX_CHILDREN:uint = 2048;
+	//static private const MAX_CHILDREN:uint = 1024;
 	static private const OCT_TREE_SIZE:uint = 8;
 	private var _children:Vector.<Chunk>; 	// These are created when needed
 	private var _vertMan:VertexManager
@@ -33,6 +40,8 @@ public class Chunk {
 	private var _parent:Chunk;
 	
 	public function get dirty():Boolean { return _dirty; }
+	public function get oxel():Oxel  { return _oxel; }
+	
 	// TODO Should just add dirty chunks to a rebuild queue, which would get me a more incremental build
 	public function dirtyClear():void { _dirty = false; }
 	public function dirtySet( $type:uint ):void {
@@ -112,44 +121,50 @@ public class Chunk {
 		else if ( _vertMan )
 			_vertMan.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
 	}
-	/*
-	public function  refreshFaces( $guid:String ):void {
-		if ( childrenHas() ) {
-			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
-				if ( _children[i].dirty )
-					_children[i].refreshFaces( $guid );
-			}
-		}
-		else {
-			RebuildFaces.addTask( $guid, this )
-		}
-	}
-	*/
+	
 	public function refreshFacesTerminal():void {
 		_oxel.facesBuild();
 	}
 	
-	public function refreshFacesAndQuads( $guid:String, $firstTime:Boolean = false ):void {
+	public function refreshFacesAndQuads( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {
 		if ( childrenHas() ) {
 			dirtyClear();
 			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
 				//if ( _children[i].dirty && _children[i]._oxel && _children[i]._oxel.dirty )
 				if ( _children[i].dirty )
-					_children[i].refreshFacesAndQuads( $guid, $firstTime );
+					_children[i].refreshFacesAndQuads( $guid, $vm, $firstTime );
 			}
 		}
 		else {
 			// Since task has been added for this chunk, mark it as clear
 			dirtyClear()
 			if ( _oxel && _oxel.dirty ) {
-				if ( $firstTime )
-					RefreshQuadsAndFaces.addTask( $guid, this )
+				if ( $firstTime ) {
+					var priority:int = 32000000 // low priority by default
+					if ( Player.player && Player.player.instanceInfo ) {
+						// this takes the origin of the oxel and converts it to world space.
+						// takes the resulting vector and subtracts the player position, and uses the length as the priority
+						priority = ($vm.modelToWorld( _oxel.gc.getModelVector() ).subtract( Player.player.instanceInfo.positionGet ) ).length
+						//trace( "Chunk.refreshFacesAndQuads distance: priority: " + priority + "  chunk.oxel.gc: " + _oxel.gc.getModelVector().toString()  + "  Player.player: " +  Player.player.instanceInfo.positionGet )
+					}
+					RefreshQuadsAndFaces.addTask( $guid, this, priority )
+				}
 				else
 					refreshFacesAndQuadsTerminal()
 			}
 		}
 	}
 	
+	public function lambda( $guid:String, $func:Function ):void {
+		if ( childrenHas() ) {
+			for ( var i:int; i < OCT_TREE_SIZE; i++ )
+				_children[i].lambda( $guid, $func );
+		}
+		else if ( _vertMan )
+			LambdaTask.addTask( $guid, this, $func, 10000 )
+		
+	}
+
 	public function refreshFacesAndQuadsTerminal():void {
 		_oxel.facesBuild()
 		_oxel.quadsBuild()

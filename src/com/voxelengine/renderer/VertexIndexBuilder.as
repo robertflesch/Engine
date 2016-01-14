@@ -77,6 +77,7 @@ public class VertexIndexBuilder
 	public function set dirty( val:Boolean ):void { _dirty = val; }
 	
 	public function get length():int { return _oxels ? _oxels.length : 0; }
+	public function get hasFaces():Boolean { return 0 < _bufferVertexMemory; }
 	
 	public function VertexIndexBuilder()
 	{

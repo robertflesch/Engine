@@ -135,7 +135,7 @@ public class FlowScaling
 		if ( has() ) {
 			_data = DEFAULT_TOTAL_SCALE
 			if ( $oxel )
-				$oxel.rebuildAll();
+				Oxel.rebuild($oxel);
 		}
 	}
 	
@@ -162,7 +162,7 @@ public class FlowScaling
 		
 		_calculated = false;
 		calculate( $oxel );
-		$oxel.rebuildAll();
+		Oxel.rebuild($oxel);
 		//Log.out( "FlowScaling.recalculate is: " + toString() );
 	}
 	

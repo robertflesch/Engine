@@ -154,7 +154,8 @@ public class ConsoleCommands {
 		if ( VoxelModel.selectedModel )
 		{
 			VoxelModel.selectedModel.modelInfo.data.oxel.lightingReset();
-			VoxelModel.selectedModel.modelInfo.data.oxel.rebuildAll();
+			//VoxelModel.selectedModel.modelInfo.data.oxel.rebuildAll();
+			VoxelModel.selectedModel.modelInfo.data.lambda( Oxel.rebuild );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -311,6 +312,12 @@ public class ConsoleCommands {
 		Log.out( "ambientOcculusion is " + (Lighting.eaoEnabled ? "ENABLED" : "DISABLED"), Log.WARN );
 	}
 	
+	private static function recalculateAmbient():void {
+		var vm:VoxelModel = VoxelModel.selectedModel
+		if ( vm )
+			vm.modelInfo.data.oxel.recalculateAmbient( vm.modelInfo.guid )
+	}
+	
 	public static function addCommands():void
 	{
 		DConsole.createCommand( "reset", reset );
@@ -336,7 +343,7 @@ public class ConsoleCommands {
 		DConsole.createCommand( "lavaSpheresRandom", lavaSpheres );
 		DConsole.createCommand( "waterSpheresRandom", waterSpheres );
 		DConsole.createCommand( "ambientOcculsion", ambientOcculsion );
-		
+		DConsole.createCommand( "recalculateAmbient", recalculateAmbient );
 	}
 }
 }

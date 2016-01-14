@@ -136,7 +136,7 @@ public class VertexManager {
 		if ( null == _shaders )
 			createShaders( $context );
 			
-		if ( _vertBuf && _vertBuf.length )
+		if ( _vertBuf && _vertBuf.length && ( _vertBuf.hasFaces || _vertBuf.dirty ) )
 		{
 			if ( _shaders[0].update( $mvp, $vm, $context, $selected, $isChild ) )
 			{
@@ -145,7 +145,7 @@ public class VertexManager {
 			}
 		}
 		
-		if ( _vertBufAnimated && _vertBufAnimated.length )
+		if ( _vertBufAnimated && _vertBufAnimated.length && ( _vertBufAnimated.hasFaces || _vertBufAnimated.dirty ) )
 		{
 			if ( _shaders[1].update( $mvp, $vm, $context, $selected, $isChild ) )
 			{
@@ -164,7 +164,7 @@ public class VertexManager {
 		// Only update the shaders if they are in use, other wise 
 		// we have all of the costly state changes happening for no good reason.
 		// TODO - RSF - We should probably NOT upload the shaders unless they are being used.
-		if ( _vertBufAnimatedAlpha && _vertBufAnimatedAlpha.length ) {
+		if ( _vertBufAnimatedAlpha && _vertBufAnimatedAlpha.length && ( _vertBufAnimatedAlpha.hasFaces || _vertBufAnimatedAlpha.dirty ) ) {
 			if ( _shaders[3].update( $mvp, $vm, $context, $selected, $isChild ) ) {
 				_vertBufAnimatedAlpha.sort();
 				_vertBufAnimatedAlpha.buffersBuildFromOxels( $context );
@@ -172,7 +172,7 @@ public class VertexManager {
 			}
 		}
 		
-		if ( _vertBufFire && _vertBufFire.length ) {
+		if ( _vertBufFire && _vertBufFire.length && ( _vertBufFire.hasFaces || _vertBufFire.dirty ) ) {
 			if ( _shaders[4].update( $mvp, $vm, $context, $selected, $isChild ) ) {
 				_vertBufFire.sort();
 				_vertBufFire.buffersBuildFromOxels( $context );
@@ -180,7 +180,7 @@ public class VertexManager {
 			}
 		}	
 		
-		if ( _vertBufAlpha && _vertBufAlpha.length ) {
+		if ( _vertBufAlpha && _vertBufAlpha.length && ( _vertBufAlpha.hasFaces || _vertBufAlpha.dirty ) ) {
 			if ( _shaders[2].update( $mvp, $vm, $context, $selected, $isChild ) ) {
 				// TODO anyway to optimise this? its causing a huge amount of vector allocations
 				//var xdist:Number = _gc.getDistance( VoxelModel.controlledModel.modelToWorld( VoxelModel.controlledModel.camera.center ) );

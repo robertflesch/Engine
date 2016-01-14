@@ -21,13 +21,14 @@ import com.voxelengine.renderer.Chunk
  */
 public class RefreshQuadsAndFaces extends RenderingTask 
 {	
-	static public function addTask( $guid:String, $chunk:Chunk ): void {
-		var rq:RefreshQuadsAndFaces = new RefreshQuadsAndFaces( $guid, $chunk )
+	static public function addTask( $guid:String, $chunk:Chunk, $taskPriority:int ): void {
+		var rq:RefreshQuadsAndFaces = new RefreshQuadsAndFaces( $guid, $chunk, $taskPriority )
 		Globals.g_landscapeTaskController.addTask( rq )
 	}
 	
-	public function RefreshQuadsAndFaces( guid:String, $chunk:Chunk ):void {
-		super(guid, $chunk, "RefreshQuadsAndFaces")
+	public function RefreshQuadsAndFaces( $guid:String, $chunk:Chunk, $taskPriority:int ):void {
+		// public function RenderingTask( $guid:String, $chunk:Chunk, taskType:String = TASK_TYPE, $taskPriority:int = TASK_PRIORITY ):void {
+		super( $guid, $chunk, "RefreshQuadsAndFaces", $taskPriority )
 	}
 	
 	override public function start():void {
@@ -45,6 +46,6 @@ public class RefreshQuadsAndFaces extends RenderingTask
 			//Log.out( "RefreshQuadsAndFaces.start - refreshQuads took: " + pt, Log.WARN )
 		
 		super.complete()
-	}
+	}	
 }
 }

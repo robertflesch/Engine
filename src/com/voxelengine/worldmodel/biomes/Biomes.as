@@ -61,7 +61,7 @@ package com.voxelengine.worldmodel.biomes
 		public function addToTaskControllerUsingNewStyle( $guid:String ):void 
 		{
 			// land task controller
-			Globals.g_landscapeTaskController.activeTaskLimit = 0;
+			Globals.g_landscapeTaskController.paused = true
 
 			// Create task group
 			var taskGroup:TaskGroup = new TaskGroup("Generate Model for " + $guid, 2);
@@ -108,12 +108,11 @@ package com.voxelengine.worldmodel.biomes
 			Globals.g_landscapeTaskController.addTask( taskGroup );
 			
 			// This unblocks the landscape task controller when all terrain tasks have been added
-			if (0 == Globals.g_landscapeTaskController.activeTaskLimit)
-				Globals.g_landscapeTaskController.activeTaskLimit = 1;
+			Globals.g_landscapeTaskController.paused = false	
 		}
 		
 		public function addParticleTaskToController( $vm:VoxelModel ):void  {
-			Globals.g_landscapeTaskController.activeTaskLimit = 0;
+			Globals.g_landscapeTaskController.paused = true
 			var guid:String = $vm.instanceInfo.instanceGuid;
 
 			// Create task group
@@ -123,6 +122,7 @@ package com.voxelengine.worldmodel.biomes
 			taskGroup.addTask(task);
 			
 			Globals.g_landscapeTaskController.addTask( taskGroup );
+			Globals.g_landscapeTaskController.paused = false
 		}
 
 		

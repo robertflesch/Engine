@@ -525,7 +525,7 @@ public class VoxelModel
 		
 		if ( complete ) {
 			instanceInfo.update($elapsedTimeMS);
-			modelInfo.update($context,$elapsedTimeMS);
+			modelInfo.update($context,$elapsedTimeMS, this );
 			
 			collisionTest($elapsedTimeMS);
 			modelInfo.bringOutYourDead();
@@ -776,7 +776,7 @@ public class VoxelModel
 		if ( modelInfo.data.oxel ) {
 			modelInfo.data.oxel.changeGrainSize(changeSize, modelInfo.data.oxel.gc.bound + changeSize);
 			//Log.out("VoxelModel.changeGrainSize - took: " + (getTimer() - _timer) + " count " + Oxel.nodes);
-			modelInfo.data.oxel.rebuildAll();
+			modelInfo.data.lambda( Oxel.rebuild );
 			//Log.out("VoxelModel.changeGrainSize - rebuildAll took: " + (getTimer() - _timer));
 		}
 	}

@@ -135,7 +135,7 @@ package com.voxelengine.worldmodel
 				WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.DESTORY ) );
 			}
 			else
-				Globals.g_landscapeTaskController.activeTaskLimit = 1;
+				Globals.g_landscapeTaskController.paused = false
 				
 			// for local use only
 			if ( !Globals.online && !Player.player )

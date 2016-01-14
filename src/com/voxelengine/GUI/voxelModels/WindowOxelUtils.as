@@ -9,6 +9,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.voxelModels
 {
 import com.voxelengine.GUI.VVPopup;
+import com.voxelengine.worldmodel.oxel.Oxel;
 import flash.utils.ByteArray;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
@@ -91,6 +92,11 @@ public class WindowOxelUtils extends VVPopup
 		rebuildWaterInfo.width = 150;
 		addElement( rebuildWaterInfo );
 		
+		var rebuildGrassInfo:Button = new Button( "Rebuild Grass" );
+		rebuildGrassInfo.addEventListener(UIMouseEvent.CLICK, rebuildGrassHandler );
+		rebuildGrassInfo.width = 150;
+		addElement( rebuildGrassInfo );
+		
 		//var fullBrightB:Button = new Button( "Full Bright" );
 		//fullBrightB.addEventListener(UIMouseEvent.CLICK, fullBrightHandler );
 		//fullBrightB.width = 150;
@@ -128,8 +134,13 @@ public class WindowOxelUtils extends VVPopup
 		_vm.modelInfo.data.oxel.rebuildWater();
 	}
 	
+	private function rebuildGrassHandler(event:UIMouseEvent):void {
+		_vm.modelInfo.data.lambda( Oxel.rebuildGrass );
+	}
+	
 	private function rebuildFacesHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.oxel.rebuildAll()
+		//_vm.modelInfo.data.oxel.rebuildAll()
+		_vm.modelInfo.data.lambda( Oxel.rebuild );
 	}
 	
 	import flash.utils.Timer;
@@ -172,7 +183,7 @@ public class WindowOxelUtils extends VVPopup
 
 	private function validateHandler(event:UIMouseEvent):void {
 		_vm.validate()
-		_vm.modelInfo.data.oxel.rebuildAll()
+		_vm.modelInfo.data.lambda( Oxel.rebuild );
 		_vm.modelInfo.data.changed = true
 	}
 	
