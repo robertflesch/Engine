@@ -42,7 +42,6 @@ import com.voxelengine.worldmodel.models.Camera;
 import com.voxelengine.worldmodel.models.CameraLocation;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.Location;
-import com.voxelengine.worldmodel.models.ModelInfoCache;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.types.Player;

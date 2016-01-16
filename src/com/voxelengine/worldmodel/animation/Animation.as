@@ -10,7 +10,6 @@ package com.voxelengine.worldmodel.animation
 import com.voxelengine.events.AnimationEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.ModelInfoCache;
 import com.voxelengine.worldmodel.PermissionsBase;
 import com.voxelengine.worldmodel.Region;
 import flash.utils.ByteArray;
