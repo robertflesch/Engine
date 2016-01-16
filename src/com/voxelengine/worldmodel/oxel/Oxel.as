@@ -128,6 +128,9 @@ public class Oxel extends OxelBitfields
 			if ( TypeInfo.AIR != type )
 				quadsDeleteAll()
 			
+			if ( flowInfo && flowInfo.flowScaling && flowInfo.flowScaling.has() )
+				flowInfo.flowScaling.reset()
+			
 			super.type = $val;
 			
 			if ( TypeInfo.AIR == $val ) {
@@ -2326,26 +2329,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			}
 		}
 	}
-
-	public function rebuildWater():void {
-		if ( childrenHas() ) {
-			for each ( var child:Oxel in _children )
-				child.rebuildWater(); }
-		else {
-			if ( TypeInfo.WATER == type ) {
-				if ( 5 < gc.grain ) {
-					Log.out( "Oxel.rebuildWater found grain too large: " + gc.toString() )
-					childrenCreate( true ) 
-					for each ( var newChild:Oxel in _children )
-						newChild.rebuildWater() 
-				} else {
-					facesMarkAllDirty();
-					quadsDeleteAll();
-				}
-			}
-		}
-	}
-	
 	
 	public function rotateCCW():void
 	{
@@ -3145,7 +3128,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	static public function rebuildGrass( $oxel:Oxel ):void {
 		if ( $oxel.childrenHas() ) {
 			for each ( var child:Oxel in $oxel._children )
-				Oxel.rebuildGrass( child ); }
+				rebuildGrass( child ); }
 		else {
 			if ( TypeInfo.GRASS == $oxel.type ) {
 				if ( $oxel.gc.eval( 4, 64, 89, 13 ) )
@@ -3189,7 +3172,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				$oxel.type = TypeInfo.AIR; 
 			}
 			for each ( var child:Oxel in $oxel._children )
-				Oxel.rebuild(child);
+				rebuild(child);
 		}
 		else {
 			$oxel.facesMarkAllDirty();
@@ -3197,6 +3180,54 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 	
+	static public function rebuildWater( $oxel:Oxel ):void {
+		if ( $oxel.childrenHas() ) {
+			for each ( var child:Oxel in $oxel._children )
+				rebuildWater( child ); }
+		else {
+			if ( TypeInfo.WATER == $oxel.type ) {
+				if ( 5 < $oxel.gc.grain ) {
+					Log.out( "Oxel.rebuildWater found grain too large: " + $oxel.gc.toString() )
+					$oxel.childrenCreate( true ) 
+					for each ( var newChild:Oxel in $oxel._children )
+						rebuildWater( newChild ) 
+				} else {
+					var no:Oxel;
+					// This finds edges of bottoms that are open to free flowing and turns them to sand
+					for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
+						if ( Globals.isHorizontalDirection( face ) || Globals.NEGY == face ) {
+							no = $oxel.neighbor(face)
+							if ( Globals.BAD_OXEL == no )
+								$oxel.type = TypeInfo.SAND
+							else if ( TypeInfo.AIR == no.type && !no.childrenHas() )
+								$oxel.type = TypeInfo.SAND
+						}
+					}
+					
+					$oxel.facesMarkAllDirty();
+					$oxel.quadsDeleteAll();
+				}
+			}
+		}
+	}
+	
+	static public function resetScaling( $oxel:Oxel ):void {
+		if ( $oxel.childrenHas() ) {
+			for each ( var child:Oxel in $oxel._children )
+				resetScaling( child ); }
+		else {
+			if ( Globals.BAD_OXEL == $oxel )
+				return
+			if ( $oxel.flowInfo && $oxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling.has() ) {
+				if ( TypeInfo.flowable[ $oxel.type ] )
+					return 
+
+				$oxel.flowInfo.flowScaling.reset()
+				$oxel.facesMarkAllDirty();
+				$oxel.quadsDeleteAll();
+			}
+		}
+	}
 		
 } // end of class Oxel
 } // end of package

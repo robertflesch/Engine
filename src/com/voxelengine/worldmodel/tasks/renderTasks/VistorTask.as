@@ -11,16 +11,16 @@ import com.voxelengine.renderer.Chunk
  * ...
  * @author Robert Flesch
  */
-public class LambdaTask extends RenderingTask 
+public class VistorTask extends RenderingTask 
 {	
 	public var _func:Function
 	static public function addTask( $guid:String, $chunk:Chunk, $func:Function, $taskPriority:int ): void {
-		var lt:LambdaTask = new LambdaTask( $guid, $chunk, $taskPriority )
+		var lt:VistorTask = new VistorTask( $guid, $chunk, $taskPriority )
 		lt._func = $func
 		Globals.g_landscapeTaskController.addTask( lt )
 	}
 	
-	public function LambdaTask( $guid:String, $chunk:Chunk, $taskPriority:int ):void {
+	public function VistorTask( $guid:String, $chunk:Chunk, $taskPriority:int ):void {
 		// public function RenderingTask( $guid:String, $chunk:Chunk, taskType:String = TASK_TYPE, $taskPriority:int = TASK_PRIORITY ):void {
 		super( $guid, $chunk, "LambdaTask", $taskPriority )
 	}

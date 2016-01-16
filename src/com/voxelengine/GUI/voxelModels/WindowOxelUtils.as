@@ -62,11 +62,6 @@ public class WindowOxelUtils extends VVPopup
 		//breakDownB.width = 150;
 		//addElement( breakDownB );
 //
-		//var validate:Button = new Button( "Validate" );
-		//validate.addEventListener(UIMouseEvent.CLICK, validateHandler );
-		//validate.width = 150;
-		//addElement( validate );
-		
 		var decreaseGrain:Button = new Button( "Decrease Grain" );
 		decreaseGrain.addEventListener(UIMouseEvent.CLICK, decreaseGrainHandler );
 		decreaseGrain.width = 150;
@@ -96,6 +91,11 @@ public class WindowOxelUtils extends VVPopup
 		rebuildGrassInfo.addEventListener(UIMouseEvent.CLICK, rebuildGrassHandler );
 		rebuildGrassInfo.width = 150;
 		addElement( rebuildGrassInfo );
+		
+		var resetOxelScaling:Button = new Button( "Rebuild Scaling" );
+		resetOxelScaling.addEventListener(UIMouseEvent.CLICK, resetOxelScalingHandler );
+		resetOxelScaling.width = 150;
+		addElement( resetOxelScaling );
 		
 		//var fullBrightB:Button = new Button( "Full Bright" );
 		//fullBrightB.addEventListener(UIMouseEvent.CLICK, fullBrightHandler );
@@ -129,19 +129,6 @@ public class WindowOxelUtils extends VVPopup
 		//_vm.statisics.statsPrint();
 	}
 	
-	
-	private function rebuildWaterHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.oxel.rebuildWater();
-	}
-	
-	private function rebuildGrassHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.lambda( Oxel.rebuildGrass );
-	}
-	
-	private function rebuildFacesHandler(event:UIMouseEvent):void {
-		//_vm.modelInfo.data.oxel.rebuildAll()
-		_vm.modelInfo.data.lambda( Oxel.rebuild );
-	}
 	
 	import flash.utils.Timer;
 	import flash.events.TimerEvent;
@@ -181,12 +168,6 @@ public class WindowOxelUtils extends VVPopup
 		new WindowChangeType( _vm );
 	}
 
-	private function validateHandler(event:UIMouseEvent):void {
-		_vm.validate()
-		_vm.modelInfo.data.lambda( Oxel.rebuild );
-		_vm.modelInfo.data.changed = true
-	}
-	
 	private function mergeSameHandler(event:UIMouseEvent):void {
 		_vm.modelInfo.data.oxel.mergeAndRebuild()
 		_vm.modelInfo.data.changed = true
@@ -204,5 +185,22 @@ public class WindowOxelUtils extends VVPopup
 	private function increaseGrainHandler(event:UIMouseEvent):void {
 		_vm.changeGrainSize( 1 )
 	}
+	
+	private function rebuildWaterHandler(event:UIMouseEvent):void {
+		_vm.modelInfo.data.vistor( Oxel.rebuildWater );
+	}
+	
+	private function rebuildGrassHandler(event:UIMouseEvent):void {
+		_vm.modelInfo.data.vistor( Oxel.rebuildGrass );
+	}
+	
+	private function rebuildFacesHandler(event:UIMouseEvent):void {
+		_vm.modelInfo.data.vistor( Oxel.rebuild );
+	}
+	
+	private function resetOxelScalingHandler(event:UIMouseEvent):void {
+		_vm.modelInfo.data.vistor( Oxel.resetScaling );
+	}
+	
 }	
 }

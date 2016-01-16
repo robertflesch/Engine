@@ -330,7 +330,7 @@ package com.developmentarc.core.tasks
 					task.addEventListener(TaskEvent.TASK_ERROR, handleTaskEvent);
 					activeTasks.addItem(task, true);
 					task.start();
-					trace( "TaskController.nextTask - Executing" )
+					//trace( "TaskController.nextTask - Executing" )
 
 					// see if we can add more tasks
 					if (activeTasks.length < __activeTaskLimit) 

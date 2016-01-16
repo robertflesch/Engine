@@ -776,7 +776,7 @@ public class VoxelModel
 		if ( modelInfo.data.oxel ) {
 			modelInfo.data.oxel.changeGrainSize(changeSize, modelInfo.data.oxel.gc.bound + changeSize);
 			//Log.out("VoxelModel.changeGrainSize - took: " + (getTimer() - _timer) + " count " + Oxel.nodes);
-			modelInfo.data.lambda( Oxel.rebuild );
+			modelInfo.data.vistor( Oxel.rebuild );
 			//Log.out("VoxelModel.changeGrainSize - rebuildAll took: " + (getTimer() - _timer));
 		}
 	}

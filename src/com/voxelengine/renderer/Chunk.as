@@ -20,7 +20,7 @@ import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.tasks.renderTasks.RefreshQuadsAndFaces;
-import com.voxelengine.worldmodel.tasks.renderTasks.LambdaTask;
+import com.voxelengine.worldmodel.tasks.renderTasks.VistorTask;
 
 public class Chunk {
 	
@@ -155,13 +155,13 @@ public class Chunk {
 		}
 	}
 	
-	public function lambda( $guid:String, $func:Function ):void {
+	public function vistor( $guid:String, $func:Function ):void {
 		if ( childrenHas() ) {
 			for ( var i:int; i < OCT_TREE_SIZE; i++ )
-				_children[i].lambda( $guid, $func );
+				_children[i].vistor( $guid, $func );
 		}
 		else if ( _vertMan )
-			LambdaTask.addTask( $guid, this, $func, 10000 )
+			VistorTask.addTask( $guid, this, $func, 10000 )
 		
 	}
 

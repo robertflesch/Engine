@@ -121,8 +121,8 @@ public class OxelPersistance extends PersistanceObject
 		}
 	}
 	
-	public function lambda( $func:Function ):void {
-		_topMostChunk.lambda( guid, $func )
+	public function vistor( $func:Function ):void {
+		_topMostChunk.vistor( guid, $func )
 	}
 	
 
@@ -139,10 +139,11 @@ public class OxelPersistance extends PersistanceObject
 	// persistance operations
 	override public function save():void {
 		if ( false == loaded || !Globals.isGuid( guid ) ) {
-				//Log.out( "OxelPersistance.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
+				Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " loaded: " + loaded + " in table: " + table, Log.WARN );
 				return;
 		}
 		//Log.out( "OxelPersistance.save - NOT Saving COMMENTED OUT", Log.WARN );
+		Log.out( "OxelPersistance.save - Saving", Log.WARN );
 		super.save();
 	}
 	
