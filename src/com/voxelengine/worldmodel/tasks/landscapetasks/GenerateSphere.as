@@ -28,22 +28,18 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	public class GenerateSphere extends LandscapeTask 
 	{		
 		static public function script():Object {
-			var obj:Object = new Object();
-			var model:Object = new Object();
-			var biomes:Object = new Object();
-			var layers:Vector.<Object> = new Vector.<Object>();
-			var layer:Object = new Object();
+			var model:Object = new Object
+			model.grainSize = 6
+			model.name = "GenerateSphere"
+			model.biomes = new Object();
+			model.biomes.layers = new Vector.<Object>();
+			model.biomes.layers[0] = new Object();
+			model.biomes.layers[0].functionName = "GenerateSphere"
+			model.biomes.layers[0].type = "SAND"
+			model.biomes.layers[0].range = 3
+			model.biomes.layers[0].offset = 7
 			
-			obj.model = model;
-			model.biomes = biomes;
-			biomes.layers = layers;
-			layers[0] = layer;
-			layer.functionName = "GenerateSphere";
-			layer.type = "SAND"
-			layer.range = 3; // min_grain_size
-			layer.offset = 7; // root_grain_size
-			
-			return obj;
+			return model;
 		}
 		
 		public function GenerateSphere( guid:String,layer:LayerInfo ):void {

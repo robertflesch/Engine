@@ -66,6 +66,7 @@ public class ModelMetadataCache
 	// This loads the first 100 objects from the users inventory OR the public inventory
 	static private function requestType( $mme:ModelMetadataEvent ):void {
 		
+		//Log.out( "ModelMetadataCache.requestType  owner: " + $mme.modelGuid, Log.WARN );
 		// For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $vmm.guid, $vmm ) event
 		if ( Network.PUBLIC == $mme.modelGuid ) {
 			if ( false == _initializedPublic ) {
@@ -83,8 +84,12 @@ public class ModelMetadataCache
 			
 		// This will return models already loaded.
 		for each ( var vmm:ModelMetadata in _metadata ) {
-			if ( vmm && vmm.owner == $mme.modelGuid )
+			if ( vmm && vmm.owner == $mme.modelGuid ) {
+				//Log.out( "ModelMetadataCache.requestType returning guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
 				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm ) );
+			}
+			//else 
+			//	Log.out( "ModelMetadataCache.requestType REJECTING guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
 		}
 	}
 	
@@ -101,8 +106,10 @@ public class ModelMetadataCache
 			_block.add( $mme.modelGuid );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid ) );
 		}
-		else
+		else {
+			//Log.out( "ModelMetadataCache.request returning guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm ) );
+		}
 	}
 	
 	static private function update($mme:ModelMetadataEvent):void {
@@ -246,6 +253,7 @@ public class ModelMetadataCache
 			_metadata[$vmm.guid] = $vmm; 
 			if ( _block.has( $vmm.guid ) )
 				_block.clear( $vmm.guid )
+			//Log.out( "ModelMetadataCache.add returning guid: " + $vmm.guid + "  owner: " + $vmm.owner, Log.WARN );
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, $series, $vmm.guid, $vmm ) );
 		}
 	}

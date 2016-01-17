@@ -184,7 +184,6 @@ public class VoxelModel
 		}
 	}
 	
-	
 	protected function processClassJson():void {
 		modelInfo.childrenLoad( this );
 		modelInfo.scriptsLoad( instanceInfo );

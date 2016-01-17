@@ -84,12 +84,13 @@ public class Avatar extends ControllableVoxelModel
 		//ModelMakerBase.load( ii );
 		
 		Log.out( "Avatar.createPlayer - creating from GenerateCube", Log.DEBUG )
+		var model:Object = GenerateCube.script()
+		model.modelClass = "Player"
+
 		var ii:InstanceInfo = new InstanceInfo()
 		ii.modelGuid = "Player"
 		ii.instanceGuid = $instanceGuid
-		var model:Object = new Object()
-		model.biomes = GenerateCube.script()
-		model.modelClass = "Player"
+		
 		new ModelMakerGenerate( ii, model )
 	}
 	

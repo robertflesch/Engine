@@ -54,7 +54,7 @@ package com.voxelengine.GUI
 			eventCollector.addEvent( _rbGroup, ButtonsGroupEvent.GROUP_CHANGED, modelTypeChanged  );
 			var radioButtons:DataProvider = new DataProvider();
 //            radioButtons.addAll( { label:"My Models" }, { label:"All Models" }, { label:"From Cube" }, { label:"From Model Template" }, { label:"New Model Template" } );
-            radioButtons.addAll( { label:"From Cube" }, { label:"From Sphere" }, { label:"From SubSphere" } );
+            radioButtons.addAll( { label:"From Cube" }, { label:"Generate Island" }); // , { label:"From SubSphere" } 
 			_rbGroup.dataProvider = radioButtons;
 			_rbGroup.index = 0;
 			
@@ -147,16 +147,17 @@ package com.voxelengine.GUI
 			var ii:InstanceInfo = new InstanceInfo();
 			var detailSize:int;		
 			var li:ListItem;
-			var model:Object = new Object();
+			
 			if ( -1 == _cbSize.selectedIndex ) {
 				(new Alert( "Please select a size" ) ).display();
 				return;
 			}
+			var model:Object
 			switch ( id )
 			{
 				case 0: // From Cube
 					
-					model.biomes = GenerateCube.script();
+					model = GenerateCube.script();
 					
 					li = _cbSize.getItemAt(_cbSize.selectedIndex );
 					model.grainSize = li.data;
@@ -169,13 +170,18 @@ package com.voxelengine.GUI
 					model.biomes.layers[0].range = 0;
 					
 					break;
-				case 1: // From Sphere
+				case 1: // From Island
+					model = GenerateIsland.script();
+					ii.modelGuid = model.name
+
+					break;
+//				case 1: // From Sphere
 					//ii.modelGuid = "GenerateSphere";
 					//li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
 					//detailSize = li.data;			
 					//miJson = GenerateSphere.script();
 					break;
-				case 2: // From Sphere
+//				case 2: // From Sphere
 					//ii.modelGuid = "GenerateSubSphere";
 					//li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
 					//detailSize = li.data;			

@@ -8,6 +8,9 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
+	import com.voxelengine.events.ModelBaseEvent;
+	import com.voxelengine.events.ModelInfoEvent;
+	import com.voxelengine.events.OxelDataEvent;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -17,6 +20,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.display.BitmapData;
+	import flash.events.Event;
 	import flash.utils.getTimer;
 	import com.voxelengine.worldmodel.Region;
 	
@@ -26,21 +30,49 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	 */
 	public class GenerateLayer extends LandscapeTask 
 	{		
-		public function GenerateLayer( guid:String, layer:LayerInfo ):void {
+		public function GenerateLayer( $guid:String, layer:LayerInfo ):void {
 			Log.out( "GenerateLayer of type: " + (TypeInfo.typeInfo[layer.type].name.toUpperCase()) );					
-			super( guid, layer, "GenerateLayer: " + (TypeInfo.typeInfo[layer.type].name.toUpperCase()) );
+			super( $guid, layer, "GenerateLayer: " + (TypeInfo.typeInfo[layer.type].name.toUpperCase()) );
 		}
 		
 		override public function start():void {
             super.start() // AbstractTask will send event
+			// is it  ready?
+			ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoResult );
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
+		}
+		
+		private function oxelDataRetrieved(e:OxelDataEvent):void {
+			if ( e.modelGuid == _modelGuid ) {
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved )
+				var oxel:Oxel = e.oxelData.oxel
+				processOxel( oxel )
+			}
+		}
+		
+		private function modelInfoResult(e:ModelInfoEvent):void {
 			
+			if ( e.modelGuid == _modelGuid ) {
+				if ( !e.vmi || !e.vmi.data || !e.vmi.data.oxel ) {
+					ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoResult );
+					OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );		
+					Log.out( "GenerateLayer.modelInfoResult = no oxel found, waiting on OXEL_READY", Log.ERROR )
+					// error handling???
+					// what if it never loads?
+					return
+				}
+				var oxel:Oxel = e.vmi.data.oxel
+				processOxel( oxel )
+			}
+		}
+		
+		private function processOxel( $oxel:Oxel ):void {
 			var timer:int = getTimer();
 			
 			//Globals.g_seed = 0;
-			
-			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _modelGuid );
-			var oxel:Oxel = vm.modelInfo.data.oxel;
-			var masterMapSize:uint = Math.min( oxel.size_in_world_coordinates(), 1024 );
+			const root_grain_size:int = _layer.offset;
+			const baseLightLevel:int = 51;
+			var masterMapSize:uint = Math.min( $oxel.size_in_world_coordinates(), 1024 );
 			
 			var octaves:int  = ( Math.random() * 144 ) % (Math.random() * 12);
 			if ( 0 == octaves )
@@ -57,8 +89,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			//var t2:int = GrainCursor.get_the_g0_size_for_grain(oxel.gc.grain);
 			
 			// range should use up what ever percentage leftover from the offset
-			var offsetInG0:int = _layer.offset/100 * GrainCursor.get_the_g0_size_for_grain(oxel.gc.grain);
-			var remainingRange:int = oxel.size_in_world_coordinates() - offsetInG0;
+			var offsetInG0:int = _layer.offset/100 * GrainCursor.get_the_g0_size_for_grain($oxel.gc.grain);
+			var remainingRange:int = $oxel.size_in_world_coordinates() - offsetInG0;
 			var rangeInG0:int = remainingRange * _layer.range/100; 
 			var normalizedMasterHeightMap:Array = NoiseGenerator.normalize_height_map_for_oxel( masterHeightMap
 																							  , masterMapSize
@@ -75,20 +107,20 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 			// Array is only 10 in size, so if grain is larger then 10, we only calculate 10 levels down MAX.
 			var arrayOffset:int = 0;
-			if ( 10 < oxel.gc.bound )
+			if ( 10 < $oxel.gc.bound )
 			{
 				arrayOffset = 10;
 			}
 			else
-				arrayOffset = oxel.gc.bound;
+				arrayOffset = $oxel.gc.bound;
 			
-			var minGrain:int = oxel.gc.grain - _layer.optionalInt;
+			var minGrain:int = $oxel.gc.grain - _layer.optionalInt;
 			if ( 0 > minGrain ) minGrain = 0;
 			
 			var ignoreSolid:Boolean = false;
 			if ( TypeInfo.AIR == _layer.type || TypeInfo.RED == _layer.type )
 				ignoreSolid = true;
-			oxel.write_height_map( _modelGuid, _layer.type, minHeightMapArray, maxHeightMapArray, minGrain, arrayOffset, ignoreSolid );
+			$oxel.write_height_map( _modelGuid, _layer.type, minHeightMapArray, maxHeightMapArray, minGrain, arrayOffset, ignoreSolid );
 			Log.out( "GenerateLayer - completed layer of type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer() - timer) ); // + " in queue for: " + (timer - _startTime));
 			//timer = getTimer();
 			//Log.out( "GenerateLayer - merging: ");
@@ -102,6 +134,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			//Log.out( "GenerateLayer - merging 2 recovered: " + Oxel.nodes + " took: " + (getTimer() - timer), Log.ERROR );
 			
             super.complete() // AbstractTask will send event
+			
 		}
 		
 		override public function cancel():void {

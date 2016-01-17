@@ -52,6 +52,7 @@ public final class ProjectilePoolType
 		// I should be able to create instances
 		_projectileGuid = Globals.getUID()
 		var obj:Object = GenerateCube.script()
+		throw new Error( "Need to refactor this, I broke it when I added the island generation" );
 		obj.model.grainSize = 2
 		obj.model.biomes.layers[0].type = TypeInfo.BLUE;
 		// This is a special case for _modelInfo, the _modelInfo its self is contained in the generate script

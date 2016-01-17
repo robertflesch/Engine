@@ -32,15 +32,16 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	public class GenerateCube extends LandscapeTask 
 	{	
 		static public function script():Object {
-			var biomes:Object = new Object();
-			biomes.layers = new Vector.<Object>();
-			biomes.layers[0] = new Object();
-			biomes.layers[0].functionName = "GenerateCube";
-			biomes.layers[0].type = "SAND"
-			biomes.layers[0].range = 0;
-			biomes.layers[0].offset = 0; // used for the root grain size
+			var model:Object = new Object
+			model.name = "GenerateCube"
+			model.grainSize = 6
+			model.biomes = new Object();
+			model.biomes.layers = new Vector.<Object>();
+			model.biomes.layers[0] = new Object();
+			model.biomes.layers[0].functionName = "GenerateCube";
+			model.biomes.layers[0].type = "SAND"
 			
-			return biomes;
+			return model;
 		}
 		
 		public function GenerateCube( guid:String, layer:LayerInfo ):void {
@@ -91,6 +92,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var ba:ByteArray = OxelPersistance.toByteArray( oxel );
 //			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
 //			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
+			Log.out( "GenerateCube finished modelGuid: " + _modelGuid );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba ) );
 			
 			//Log.out( "GenerateCube.start - took: "  + (getTimer() - timer) );					

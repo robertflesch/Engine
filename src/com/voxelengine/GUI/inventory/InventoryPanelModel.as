@@ -161,7 +161,7 @@ public class InventoryPanelModel extends VVContainer
 
 		var mmep:ModelMetadataEvent = new ModelMetadataEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC, null )
 		mmep.series = _seriesModelMetadataEvent
-		ModelMetadataEvent.dispatch( mme );
+		ModelMetadataEvent.dispatch( mmep );
 	}
 
 	private function addModelMetadataEvent($mme:ModelMetadataEvent):void {

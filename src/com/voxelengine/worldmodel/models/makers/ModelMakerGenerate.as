@@ -42,7 +42,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	private var _type:int;
 	
 	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object ) {
-		_creationFunction 	= $miJson.biomes.layers[0].functionName;
+		_creationFunction 	= $miJson.name;
 		_type 				= $miJson.biomes.layers[0].type;
 		
 		super( $ii );
