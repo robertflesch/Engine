@@ -204,8 +204,6 @@ public class ModelMetadataCache
 				}
 				
 				add( $pe.series, vmm );
-				if ( _block.has( $pe.guid ) )
-					_block.clear( $pe.guid )
 			}
 			else {
 				// we already have it, publishing this results in dulicate items being sent to inventory window.

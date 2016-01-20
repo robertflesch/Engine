@@ -23,7 +23,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.Log;
 	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
-	import playerio.DatabaseObject;
+	import com.voxelengine.worldmodel.TypeInfo;
 	
 	/**
 	 * ...
@@ -44,14 +44,15 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			return model;
 		}
 		
-		public function GenerateCube( guid:String, layer:LayerInfo ):void {
-			//Log.out( "GenerateCube.construct of type: " + (Globals.Info[layer.type].name.toUpperCase()) );					
-			super(guid, layer, "GenerateCube");
+		public function GenerateCube( $guid:String, layer:LayerInfo ):void {
+			super($guid, layer, "GenerateCube");
+			Log.out( "GenerateCube: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );
 		}
 		
 		override public function start():void 
 		{
             super.start() // AbstractTask will send event
+			Log.out( "GenerateCube.start: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );
 			
 			var timer:int = getTimer();
 			

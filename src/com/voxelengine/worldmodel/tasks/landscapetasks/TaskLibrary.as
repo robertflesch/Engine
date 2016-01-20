@@ -21,6 +21,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			GenerateLayer; // Tested
 			CarveOutsideSurface; // Tested
 			CarveOutsideSurfaceNoTaper; // Tested
+			MergeLayer;
 			
 			CarveTunnel; // One tunnel starting at edit cursor location
 			CarveTunnels;

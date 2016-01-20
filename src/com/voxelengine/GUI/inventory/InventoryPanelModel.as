@@ -261,6 +261,7 @@ public class InventoryPanelModel extends VVContainer
 	
 	static private function createNewObjectIPM():void {
 		new WindowModelChoice();
+		WindowInventoryNew._s_instance.remove()
 	}
 	
 	static private function importObjectIPM():void {

@@ -160,8 +160,7 @@ public class ModelInfo extends PersistanceObject
 			_data.parent = this
 			// if the parent is dynamic, the data should be too.
 			_data.dynamicObj = dynamicObj
-			// calculate distance from player
-			const priority:int = 5
+			const priority:int = 1
 			FromByteArray.addTask( guid, priority, _altGuid )
 			/*
 			_data.fromByteArray()

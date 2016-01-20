@@ -77,7 +77,7 @@ package com.developmentarc.core.tasks
 		 */		
 		protected var notReadyQueue:HashTable;
 		
-		private var __activeTaskLimit:uint = 2;
+		private var __activeTaskLimit:uint = 10;
 		private var __isBlocked:Boolean = false;
 		
 		//public static var _s_taskCount:int = 0;

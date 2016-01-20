@@ -15,14 +15,14 @@ public class VistorTask extends RenderingTask
 {	
 	public var _func:Function
 	static public function addTask( $guid:String, $chunk:Chunk, $func:Function, $taskPriority:int ): void {
-		var lt:VistorTask = new VistorTask( $guid, $chunk, $taskPriority )
-		lt._func = $func
+		var lt:VistorTask = new VistorTask( $guid, $chunk, $func, $taskPriority )
 		Globals.g_landscapeTaskController.addTask( lt )
 	}
 	
-	public function VistorTask( $guid:String, $chunk:Chunk, $taskPriority:int ):void {
+	public function VistorTask( $guid:String, $chunk:Chunk, $func:Function, $taskPriority:int ):void {
+		_func = $func
 		// public function RenderingTask( $guid:String, $chunk:Chunk, taskType:String = TASK_TYPE, $taskPriority:int = TASK_PRIORITY ):void {
-		super( $guid, $chunk, "LambdaTask", $taskPriority )
+		super( $guid, $chunk, "VistorTask", $taskPriority )
 	}
 	
 	override public function start():void {
@@ -36,7 +36,7 @@ public class VistorTask extends RenderingTask
 		if ( pt < 1 )
 			Globals.g_landscapeTaskController.next()
 		//else	
-		Log.out( "LambdaTask took: " + pt, Log.DEBUG )
+		Log.out( "VistorTask took: " + pt, Log.DEBUG )
 		
 		super.complete()
 	}
