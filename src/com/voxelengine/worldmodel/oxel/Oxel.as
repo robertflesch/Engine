@@ -890,7 +890,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return true;	
 	}
 	
-	private function mergeRecursive():Boolean {
+	public function mergeRecursive():Boolean {
 		if ( childrenHas() ) {
 			for each ( var child:Oxel in _children ) {
 				if ( child.mergeRecursive() )

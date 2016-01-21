@@ -211,7 +211,7 @@ public class ConsoleCommands {
 							  , ModelCacheUtils.viewVectorNormalizedGet()
 							  , TypeInfo.AIR
 							  , 2048
-							  , 64 );
+							  , 96 );
 	}
 	
 	private static function tunnelNetwork():void
@@ -236,7 +236,7 @@ public class ConsoleCommands {
 							   , ModelCacheUtils.viewVectorNormalizedGet()
 							   , TypeInfo.AIR
 							   , 2048
-							   , 64 );
+							   , 96 );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////

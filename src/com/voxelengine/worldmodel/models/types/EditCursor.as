@@ -377,7 +377,7 @@ public class EditCursor extends VoxelModel
 			buildCursorModel();	
 		} 
 		
-		if ( !gciData && objectModel && objectModel.complete && objectModel.modelInfo.data ) { // this is the INSERT_MODEL where its not on a parent model
+		if ( !gciData && objectModel && objectModel.complete && objectModel.modelInfo.data && objectModel.modelInfo.data.oxel ) { // this is the INSERT_MODEL where its not on a parent model
 			oxelTexture = oxelTextureValid;
 			var vv:Vector3D = ModelCacheUtils.viewVectorNormalizedGet();
 			vv.scaleBy( objectModel.modelInfo.data.oxel.gc.size() * 4 );

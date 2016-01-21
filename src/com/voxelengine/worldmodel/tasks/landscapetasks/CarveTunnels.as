@@ -26,7 +26,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	{		
 		public var startLoc:Vector3D;
 		public var view:Vector3D;
-		public var radiusMultiplierMax:Number = 16;
+		public var radiusMultiplierMax:Number = 24;
 		public var radiusMultiplierMin:Number = 0.85;
 		public var stepSize:int = 24;
 		

@@ -75,15 +75,20 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			timer = getTimer();
 			Log.out( "MergeLayer - merging: ");
 			$oxel.mergeRecursive();
-			//Oxel.nodes = 0;
-			//oxel.mergeRecursive();
-			//Log.out( "MergeLayer - merging recovered: " + Oxel.nodes + " took: " + (getTimer() - timer), Log.ERROR );
-			//timer = getTimer();
-			//Oxel.nodes = 0;
-			//oxel.mergeRecursive();
-			//Log.out( "MergeLayer - merging 2 recovered: " + Oxel.nodes + " took: " + (getTimer() - timer), Log.ERROR );
+			Log.out( "MergeLayer - merging recovered: " + Oxel.nodes + " took: " + (getTimer() - timer), Log.ERROR );
+			Oxel.nodes = 0;
+			$oxel.mergeRecursive();
+			Log.out( "MergeLayer - merging recovered: " + Oxel.nodes + " took: " + (getTimer() - timer), Log.ERROR );
+			timer = getTimer();
+			Oxel.nodes = 0;
+			$oxel.mergeRecursive();
+			Log.out( "MergeLayer - merging 2 recovered: " + Oxel.nodes + " took: " + (getTimer() - timer), Log.ERROR );
 			$oxel.chunkGet().vistor( _modelGuid, Oxel.rebuild );
 
+			var vm:VoxelModel = getVoxelModel()
+			if ( vm )
+				vm.complete = true
+			
             super.complete() // AbstractTask will send event
 			
 		}

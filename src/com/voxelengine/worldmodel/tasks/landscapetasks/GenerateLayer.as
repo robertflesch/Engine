@@ -61,6 +61,10 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var timer:int = getTimer();
 			Log.out( "GenerateLayer.processOxel: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );
 			
+			var vm:VoxelModel = getVoxelModel()
+			if ( vm )
+				vm.complete = false
+			
 			//Globals.g_seed = 0;
 			const root_grain_size:int = _layer.offset;
 			const baseLightLevel:int = 51;
