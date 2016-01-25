@@ -71,8 +71,11 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		_modelMetadata = new ModelMetadata( ii.modelGuid );
 		var newObj:Object = ModelMetadata.newObject()
 		_modelMetadata.fromObjectImport( newObj );
-		
-		_modelMetadata.name = TypeInfo.name( _type ) + "-" + modelInfo.info.model.grainSize + "-" + _creationFunction;
+
+		if ( _type )
+			_modelMetadata.name = _creationFunction + TypeInfo.name( _type ) + "-" + modelInfo.info.model.grainSize + "-" + _creationFunction;
+		else	
+			_modelMetadata.name = _creationFunction + "-" + modelInfo.info.model.grainSize;
 		_modelMetadata.description = _creationFunction + "- GENERATED";
 		_modelMetadata.owner = Network.userId;
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelMetadata ) );

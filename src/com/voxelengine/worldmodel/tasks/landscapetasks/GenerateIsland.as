@@ -36,7 +36,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			model.biomes.layers[i] = new Object();
 			model.biomes.layers[i].functionName = "GenerateLayer"
 			model.biomes.layers[i].type = "GRAVEL"
-			model.biomes.layers[i].range = 80
+			model.biomes.layers[i].range = 60
 			model.biomes.layers[i].offset = 52
 			model.biomes.layers[i].optionalInt = 5
 			i++
@@ -61,29 +61,33 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			model.biomes.layers[i].offset = 70
 			model.biomes.layers[i].optionalInt = 8
 			i++
-			/*
-
+			
 			model.biomes.layers[i] = new Object();
 			model.biomes.layers[i].functionName = "GenerateWater"
 			model.biomes.layers[i].type = "WATER"
 			model.biomes.layers[i].range = 78
 			model.biomes.layers[i].optionalInt = 8
-
+			i++
 			model.biomes.layers[i] = new Object();
 			model.biomes.layers[i].functionName = "GenerateLayer"
 			model.biomes.layers[i].type = "AIR"
 			model.biomes.layers[i].range = 30
 			model.biomes.layers[i].optionalInt = 5
-			
+			i++
 			model.biomes.layers[i] = new Object();
 			model.biomes.layers[i].functionName = "CarveOutsideSurface"
 			model.biomes.layers[i].range = 100
 			model.biomes.layers[i].offset = 40
 			model.biomes.layers[i].optionalInt = 5
-			
+			i++
 			model.biomes.layers[i] = new Object();
-			model.biomes.layers[i].functionName = "GenerateGrassAndTrees"
-	*/		
+			model.biomes.layers[i].functionName = "DirtToGrassAndSand"
+			i++
+			model.biomes.layers[i] = new Object();
+			model.biomes.layers[i].functionName = "GrowTreesOn"
+			model.biomes.layers[i].type = "DIRT"
+			model.biomes.layers[i].range = 1000
+			i++
 			model.biomes.layers[i] = new Object();
 			model.biomes.layers[i].functionName = "MergeLayer"
 			

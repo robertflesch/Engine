@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2016 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -54,11 +54,6 @@ public class GrowTreesOn extends LandscapeTask
 		Log.out( "GrowTreesOn.start - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) );	
 		
 		super.complete();
-	}
-	
-	override public function cancel():void {
-		// TODO stop this somehow?
-		super.cancel();
 	}
 }
 }

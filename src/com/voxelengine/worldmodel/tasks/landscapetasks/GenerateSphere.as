@@ -80,6 +80,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			oxel.facesBuild();
 			
 			var ba:ByteArray = OxelPersistance.toByteArray( oxel );
+			Log.out( "GenerateSphere finished modelGuid: " + _modelGuid );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba ) );
 			
 			//Log.out( "GenerateSphere.start - completed layer of type: " + (Globals.Info[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));

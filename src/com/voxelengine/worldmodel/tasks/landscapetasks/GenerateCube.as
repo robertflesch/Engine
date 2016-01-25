@@ -54,7 +54,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
             super.start() // AbstractTask will send event
 			Log.out( "GenerateCube.start: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );
 			
-			var timer:int = getTimer();
+			var timer:int =  getTimer();
 			
 			//////////////////////////////////////////////////////////
 			// Builds Solid Cube of any grain size
