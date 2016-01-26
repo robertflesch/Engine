@@ -64,7 +64,7 @@ public class WindowModelChoice extends VVPopup
 		
 		addElement( new Spacer( width, 15 ) );
 		var button:Button = new Button( "Create" );
-		eventCollector.addEvent( button, UIMouseEvent.CLICK, create );
+		eventCollector.addEvent( button, UIMouseEvent.CLICK, function ( e:UIMouseEvent ):void { createObject(); remove(); } );
 		addElement( button );
 		
 		// Now set the default object creation method to be Cube
@@ -85,36 +85,24 @@ public class WindowModelChoice extends VVPopup
 		else if ( 2 == bge.target.index )
 			panelGenerateIsland()
 	}
-	
-	private function create( e:UIMouseEvent ):void
-	{
-		createObject();
-		remove();
-	}
 
-	private function createObject():void
-	{
+	private function createObject():void {
 		var ii:InstanceInfo = new InstanceInfo();
 		var detailSize:int;		
 		var model:Object
-		switch ( _rbGroup.index )
-		{
+		switch ( _rbGroup.index ) {
 			case 0: // From Cube
-				
 				model = GenerateCube.script();
 				parameters( model )
-				
 				break;
 			case 1: // Sphere
 				model = GenerateSphere.script();
 				parameters( model )
-				
 				break;
 			case 2: // Island
 				model = GenerateIsland.script();
 				parameters( model )
 				ii.modelGuid = model.name
-
 				break;
 //				case 2: // From Sphere
 				//ii.modelGuid = "GenerateSubSphere";
@@ -125,7 +113,7 @@ public class WindowModelChoice extends VVPopup
 		}
 		
 		var vv:Vector3D = ModelCacheUtils.viewVectorNormalizedGet();
-		vv.scaleBy( GrainCursor.two_to_the_g( model.grainSize ) * 4 );
+		vv.scaleBy( GrainCursor.two_to_the_g( model.grainSize ) + 200 );
 		vv = vv.add( VoxelModel.controlledModel.instanceInfo.positionGet );
 		ii.positionSet = vv;
 		// this needs to be key for database.
@@ -237,6 +225,7 @@ public class WindowModelChoice extends VVPopup
 		}
 		if ( _cbDetail ) {
 			li = _cbDetail.getItemAt(_cbDetail.selectedIndex )
+			$model.smallestGrain = li.data
 			$model.biomes.layers[0].range = li.data
 		}
 		if ( _cbType ) {

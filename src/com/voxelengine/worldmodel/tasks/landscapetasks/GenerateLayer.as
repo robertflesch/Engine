@@ -61,19 +61,25 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var timer:int = getTimer();
 			Log.out( "GenerateLayer.processOxel: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );
 			
+			var smallestGrain:int = 4
 			var vm:VoxelModel = getVoxelModel()
-			if ( vm )
+			if ( vm ) {
 				vm.complete = false
+				if ( vm.modelInfo.info.model.smallestGrain )
+					smallestGrain = vm.modelInfo.info.model.smallestGrain
+			}
 			
 			//Globals.g_seed = 0;
 			const root_grain_size:int = _layer.offset;
 			const baseLightLevel:int = 51;
 			var masterMapSize:uint = Math.min( $oxel.size_in_world_coordinates(), 1024 );
 			
-			var octaves:int  = ( Math.random() * 144 ) % (Math.random() * 12);
-			if ( 0 == octaves )
+			var octaves:int  = ( Math.random() * 144 ) % (Math.random() * 8);
+			if ( 0 == octaves ) {
 				octaves = 6;
-			Log.out( "GenerateLayer - start - generating random number of octives Octaves: " + octaves );					
+				Log.out( "GenerateLayer - start - generating random number of Octaves: " + octaves );					
+			} else 
+				Log.out( "GenerateLayer - start - number of Octaves: " + octaves );					
 			
 			var masterHeightMap:Array = NoiseGenerator.generate_height_map( masterMapSize, octaves );
 			//heightMap = generatePerlinNoise2DMap(voxels);
@@ -105,7 +111,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				arrayOffset = $oxel.gc.bound;
 			
 			var minGrain:int = $oxel.gc.grain - _layer.optionalInt;
-			if ( 0 > minGrain ) minGrain = 0;
+			if ( minGrain < smallestGrain ) 
+				minGrain = smallestGrain;
+			Log.out( "GenerateLayer - start - min Grain set to: " + minGrain );					
 			
 			var ignoreSolid:Boolean = false;
 			if ( TypeInfo.AIR == _layer.type || TypeInfo.RED == _layer.type )

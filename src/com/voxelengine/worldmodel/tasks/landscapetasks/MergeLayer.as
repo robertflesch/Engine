@@ -88,6 +88,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var vm:VoxelModel = getVoxelModel()
 			if ( vm )
 				vm.complete = true
+				
+			vm.modelInfo.data.changed = true
+			vm.modelInfo.data.save()
 			
             super.complete() // AbstractTask will send event
 			
