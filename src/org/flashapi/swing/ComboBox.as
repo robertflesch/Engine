@@ -562,6 +562,7 @@ package org.flashapi.swing {
 		 * 	@private
 		 */
 		override protected function createItemsList():void {
+			trace( "ComboBox.createItemsList" )
 			$itemsList = new ListBox($width, $size);
 			ListBox($itemsList).unselectEnabled = false;
 			$evtColl.addEvent($itemsList, KeyObserverEvent.ENTER_KEY_UP, onEnterKeyUp);
@@ -720,10 +721,12 @@ package org.flashapi.swing {
 		}
 		
 		private function pressOutsideHandler(e:UIMouseEvent):void {
+			trace( "ComboBox.pressOutsideHandler" )
 			editionIsFinished();
 		}
 		
 		private function validateHandler(e:TextEvent):void {
+			trace( "ComboBox.validateHandler" )
 			editionIsFinished();
 		}
 		
