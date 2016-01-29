@@ -779,12 +779,28 @@ package org.flashapi.swing {
 			setIconState();
 		}
 		
+		import flash.utils.getTimer;
+		private static const WAITING_PERIOD:int = 50;
+		private var doubleMessageHackTime:int = getTimer();
+		private function get doubleMessageHack():Boolean {
+			var newTime:int = getTimer();
+			var result:Boolean = false;
+			if ( doubleMessageHackTime + WAITING_PERIOD < newTime )
+				result = true;
+				
+			doubleMessageHackTime = newTime;
+			return result;
+		}
+		
+		// Need to add the double message hack in to prevent two clicks message from happening
 		private function comboBoxMouseDownHandler(e:MouseEvent):void { 
-			if ($active && $enabled) {
-				drawBoxState(ButtonState.DOWN);
-				$itemsList.displayed ? hideList() : showList();
+			if ( doubleMessageHack ) {
+				if ($active && $enabled) {
+					drawBoxState(ButtonState.DOWN);
+					$itemsList.displayed ? hideList() : showList();
+				}
+				setIconState();
 			}
-			setIconState();
 		}
 		
 		private function drawBoxState(state:String = "up"):void {//ButtonState.UP
