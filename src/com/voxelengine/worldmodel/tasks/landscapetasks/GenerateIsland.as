@@ -22,6 +22,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			model.biomes.layers = new Vector.<Object>();
 			var i:int
 			model.biomes.layers[i] = new Object();
+			model.biomes.layers[i].functionName = "LoadingImageDisplay"
+			i++
+			model.biomes.layers[i] = new Object();
 			model.biomes.layers[i].functionName = "GenerateCube"
 			model.biomes.layers[i].type = "AIR"
 			model.biomes.layers[i].offset = model.grainSize
@@ -90,6 +93,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			i++
 			model.biomes.layers[i] = new Object();
 			model.biomes.layers[i].functionName = "MergeLayer"
+			i++
+			model.biomes.layers[i] = new Object();
+			model.biomes.layers[i].functionName = "LoadingImageDestroy"
 			
 			return model;
 		}

@@ -148,14 +148,14 @@ public class ModelMakerBase {
 	
 	static public function makerCountGet():int { return _makerCount }
 	static public function makerCountIncrement():void { 
-		_makerCount++ 
-		if ( 0 != makerCountGet() )
+		if ( 0 == makerCountGet() )
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) )
+		_makerCount++ 
 	}
 	static public function makerCountDecrement():void { 
 		_makerCount-- 
 		if ( 0 == makerCountGet() ) {
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) )
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) )
 			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) )
 		}
 	}

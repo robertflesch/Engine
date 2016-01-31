@@ -21,27 +21,31 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			GenerateLayer; // Tested
 			CarveOutsideSurface; // Tested
 			CarveOutsideSurfaceNoTaper; // Tested
+			CarveOutsideVolcano; // 
 			MergeLayer;
-			
+			LoadingImageDisplay;
+			LoadingImageDestroy;
 			CarveTunnel; // One tunnel starting at edit cursor location
 			CarveTunnels;
-			GenerateGrassAndTrees; // Old
-			
-			GenerateVolcano; // 
-			DirtToGrassAndSand;
 			GrowTreesOn; // Tested
 			GrowTreesOnAnything;
-			GenerateLavaPockets;
-			
 			GenerateWater;
 			GenerateCube;
 			GenerateSphere;
+			LoadModelFromIVM;
+			Flow;
+			DirtToGrassAndSand;
+			
+
+			/// old or untested
+			GenerateGrassAndTrees; // Old
+			GenerateVolcano; // 
+			GenerateLavaPockets;
+			
 			GenerateSubSphere;
 			LandscapeError;
-			LoadModelFromIVM;
 			GenerateClouds;
 			CarveCloudOutside;
-			Flow;
 			
 			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeError" ) );
 			try 

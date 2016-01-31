@@ -247,7 +247,7 @@ package com.voxelengine.server
 			LoginEvent.removeListener( LoginEvent.LOGIN_FAILURE, onUnknownFailure );
 			LoginEvent.removeListener( LoginEvent.LOGIN_FAILURE_PASSWORD, onPasswordFailure );
 			LoginEvent.removeListener( LoginEvent.LOGIN_FAILURE_EMAIL, onEmailFailure );
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
+			//LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
 			_loginButton.enabled = true;
 		}
 		
@@ -270,6 +270,7 @@ package com.voxelengine.server
 		
 		private function onUnknownFailure( $e:LoginEvent ):void {
 			removeLoginEventHandlers()
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );
 			Log.out("WindowLogin.onUnknownFailure" + $e.guid, Log.ERROR );
 			_errorText.text = "Server error, try again later";
 		}
@@ -288,7 +289,8 @@ package com.voxelengine.server
 				Log.out("WindowLogin.loginSuccess - Unable to save user email", Log.WARN );
 				
 			//Log.out("WindowLogin.loginSuccess - Closing Login Window" );
-			
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );
+
 			remove();
 		}
 		

@@ -31,6 +31,7 @@ package com.voxelengine.GUI
 		}
 		
 		static private function annihilate(e:LoadingImageEvent):void {
+			Log.out( "LoadingImage.annihilate called count: " + _count, Log.WARN );
 			_count = 0
 			if ( LoadingImage.isActive ) {
 				LoadingImage._s_currentInstance.remove();
@@ -39,23 +40,23 @@ package com.voxelengine.GUI
 		
 		static private function create(e:LoadingImageEvent):void {
 			_count++
+			//Log.out( "LoadingImage.create called count: " + _count, Log.WARN );
 			if ( !LoadingImage.isActive )
 				new LoadingImage();
 		}
 		
 		static private function destroy(e:LoadingImageEvent):void {
-//			Log.out( "LoadingImage.destroy called", Log.WARN );
 			if ( 0 < _count )
 				_count--
-			if ( LoadingImage.isActive )
-			{
+			//Log.out( "LoadingImage.destroy called count: " + _count, Log.WARN );
+			if ( LoadingImage.isActive && _count == 0 ) {
 				//Log.out( "LoadingImage.DESTROYED", Log.WARN );
 				LoadingImage._s_currentInstance.remove();
 			}
 		}
 		
 		static private var _s_currentInstance:LoadingImage = null;
-		static public function get isActive():Boolean { return _s_currentInstance ? true: false; }
+		static private function get isActive():Boolean { return _s_currentInstance ? true: false; }
 		
 		private const _angle:Number = 0.5236;
 		private var _count:int = 0;
@@ -82,7 +83,7 @@ package com.voxelengine.GUI
 			AppEvent.addListener( Event.ENTER_FRAME, onEnterFrame )
 		} 
 		
-        protected function onResize(event:Event):void {
+        private function onResize(event:Event):void {
 			// still kinda funky in placement.... but works.
 			_outline.x = Globals.g_renderer.width / 2 - _outline.x / 2
 			_outline.y = Globals.g_renderer.height / 2 - _outline.y / 2
