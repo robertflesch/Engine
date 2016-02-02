@@ -63,8 +63,22 @@ package com.voxelengine.worldmodel
 		public function set gravity(val:Boolean):void { info.gravity = val; }
 		public function getSkyColor():Vector3D { return _skyColor; }
 		public function setSkyColor( $skyColor:Object ):void { 
+			if ( !$skyColor ) {
+				Log.out( "Region.setSkyColor - no object", Log.ERROR)
+				$skyColor = { "x":92, "y":172, "z":238 }
+			}
+			var x:int = $skyColor.x
+			if ( x < 0 || 255 < x )
+				$skyColor.x = 92
+			var y:int = $skyColor.y
+			if ( y < 0 || 255 < y )
+				$skyColor.y = 172
+			var z:int = $skyColor.z
+			if ( z < 0 || 255 < z )
+				$skyColor.z = 238
+				
 			info.skyColor = $skyColor
-			_skyColor.setTo( info.skyColor.r, info.skyColor.g , info.skyColor.b )
+			_skyColor.setTo( info.skyColor.x, info.skyColor.y , info.skyColor.z )
 		}
 		public function get playerPosition():Object { return info.playerPosition; }
 		public function get playerRotation():Object {return info.playerRotation; }
@@ -80,7 +94,7 @@ package com.voxelengine.worldmodel
 			var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_REGIONS, "0", "0", 0, true, null );
 			dbo.data = new Object();
 			dbo.data.models = []
-			dbo.data.skyColor = { "r":92, "g":172, "b":238 }
+			dbo.data.skyColor = { "x":92, "y":172, "z":238 }
 			dbo.data.gravity = false
 			fromObjectImport( dbo ); 
 		}
