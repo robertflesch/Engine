@@ -66,6 +66,7 @@ package com.voxelengine.server
 		public function WindowRegister()
 		{
 			super( "Register" );
+			showCloseButton = false;
 			padding = 5;
 			width = 280;
 			height = 320;
@@ -151,9 +152,9 @@ package com.voxelengine.server
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize);
 			
 			// have to enenable the captcha in playerio in quick connect
-			captchaLoad();
-			//Log.out( "WindowRegister - BYPASSING CAPTCHA until fixed by PlayerIO", Log.WARN );
-			//bypassCaptcha();
+			//captchaLoad();
+			Log.out( "WindowRegister - BYPASSING CAPTCHA until fixed by PlayerIO", Log.WARN );
+			bypassCaptcha();
 			
 			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
 		}

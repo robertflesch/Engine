@@ -62,7 +62,7 @@ public class WindowSandboxList extends VVPopup
 		super(WINDOWSANDBOXLIST_TITLE);
 		autoSize = true;
 		layout.orientation = LayoutOrientation.VERTICAL;
-		closeButtonActive = false;
+		showCloseButton = false;
 
 		var bar:TabBar = new TabBar();
 		bar.setButtonsWidth( WIDTH/3 );

@@ -91,6 +91,7 @@ public class WindowRegionDetail extends VVPopup
 		layout.orientation = LayoutOrientation.VERTICAL;
 		//closeButtonEnabled = false; // this show it enabled, but doesnt allow it to be clicked
 		//closeButtonActive = false;  // this greys it out, and doesnt allow it to be clicked
+		showCloseButton = false
 		
 		addElement( new Spacer( WIDTH, 10 ) );
 		addElement( new ComponentTextInput( "Name", changeNameHandler, _region.name, WIDTH ) );
@@ -107,7 +108,7 @@ public class WindowRegionDetail extends VVPopup
 		var playerRotation:Vector3D = new Vector3D( _region.playerRotation.x, _region.playerRotation.y, _region.playerRotation.z );
 		addElement( new ComponentVector3DToObject( setChanged, _region.setPlayerRotation, "Player Rot", "X: ", "Y: ", "Z: ",  playerRotation, WIDTH, updateVal ) );		
 		
-		addElement( new ComponentVector3DToObject( setChanged, _region.setSkyColor, "SkyColor", "X: ", "Y: ", "Z: ",  _region.getSkyColor(), WIDTH, updateVal ) );		
+		addElement( new ComponentVector3DToObject( setChanged, _region.setSkyColor, "SkyColor", "R: ", "G: ", "B: ",  _region.getSkyColor(), WIDTH, updateVal ) );		
 		
 		/// Buttons /////////////////////////////////////////////
 		var buttonPanel:Container = new Container( WIDTH, 40 );
