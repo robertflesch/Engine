@@ -111,9 +111,8 @@ package com.voxelengine.GUI.voxelModels
 									  , String( _vm.modelInfo.baseLightLevel )
 									  , WIDTH - 120 ) )
 									  
-			var applyLight:Button = new Button( "Apply Light" )
+			var applyLight:Button = new Button( "Apply Light", 110 )
 			applyLight.addEventListener(UIMouseEvent.CLICK, changeBaseLightLevel )
-			applyLight.width = 110
 			lc.addElement( applyLight )
 			addElement( lc )
 			
