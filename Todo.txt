@@ -1,5 +1,70 @@
-Kahoots
+Order# 1339629833. I was able to process this one for you. All you have to do now is place your device in a sturdy box, rap your device with bubble wrapping or newspaper for extra protection and wait for the Email Print Label that will be sent to you email address. You will be receiving that label within 24 hours. Print and place the label to the box where the device is, then send your device to the nearest Fedex office. They will then ship the device to us, after our service centers inspect on your defective device they will then ship the replacement device to you. The total turnaround time of this process will take 5-8 business days.
 
+DC
+GW
+Georgetown
+
+Princeton
+
+MIT
+Havard
+
+vanderbilt
+
+
+Comcast - level 2
+1888 824 8988
+
+Oculus Rift DK2 in retail box. (Adult owned, Excellent condition.)
+
+This Oculus DK2 is practically brand new as it has only been used on 3 different occasions. I bought it while I was in graduate school and only had time to play with it for a few hours. I boxed it back up and didn't open it again until several months later when I let my daughter play Minecraft with it(which was an amazing experience). The last time I used it was a few days ago to verify that it was in perfect working order since school loans came due and I need the money. It is still in the retail box with original packaging minus the HDMI to DVI converter. I have no idea where that thing is. Happy bidding and I hope you use it the way it is meant to be used.
+
+tem specifics
+Condition:	
+Used: An item that has been used previously. The item may have some signs of cosmetic wear, but is fully ... Read more
+Brand:	
+Oculus
+Viewing Experience:	Immersive	Type:	Virtual Reality Headset
+Country/Region of Manufacture:	United States	Model:	
+DK2
+
+Like-new condition, works perfectly. Used for 20-30 hours and always stored in a case. Includes all original hardware, packaging, and manual. Ships immediately. Paypal only Established accounts only please.
+
+Selling my Oculus rift DK2. Perfect working condition. It's been used less than 10 times, mostly for getting my feet wet into VR. The experience has been great ever since SDK 8.0. Very easy to set up on windows 10 to get started. 
+
+
+Carlos
+Frederic
+Michael
+John
+Tom G
+Tom D
+Roy
+Bill
+Warren
+Mike Weathersby
+Robert Q
+Marc
+Lou
+Gil
+Rick
+
+
+NOTES:
+If I crash when uploading, server thinks it has my data.
+We should make sure handshake is complete before setting known user to true.
+
+SharedGroup, ContactGroup
+What are these?
+
+C:\Users\Dev\AppData\Local\Temp\kahoots.db
+C:\Users\Dev\AppData\Roaming\com.kahootsapp.staging\Local Store\cache
+
+
+Install on Mac Mini
+intelij, git, java, mySQL, grails, groovy, redis
+
+Kahoots
 
 Platform Settings
 need to define SDK as air_sdk
@@ -32,6 +97,11 @@ https://kahoots.signin.aws.amazon.com/console
 C:\Users\Dev\AppData\Roaming\com.kahootsapp.staging\Local Store\kahoots.db
 
 VoxelVerse
+
+Whta do 
+Valor - a hero
+belonging - we are in this together, part of a social network.
+empowerment - what you do will matter
 
 <1 voxels shows, but infinite amount
 the edit cursor is not always showing up in correct spot
