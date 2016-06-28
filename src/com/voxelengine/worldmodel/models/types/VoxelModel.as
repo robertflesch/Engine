@@ -495,6 +495,7 @@ public class VoxelModel
 		if ( !instanceInfo.visible )
 			return;
 		
+		// This could be improved, I am doing it at least twice per model per frame.
 		var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
 		viewMatrix.append(mvp);
 		
