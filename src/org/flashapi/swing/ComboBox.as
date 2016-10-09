@@ -29,7 +29,8 @@ package org.flashapi.swing {
 	* @version 1.3.0, 05/03/2011 13:47
 	* @see http://www.flashapi.org/
 	*/
-	
+
+	import com.voxelengine.Globals;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Point;
@@ -780,15 +781,15 @@ package org.flashapi.swing {
 		}
 		
 		import flash.utils.getTimer;
-		private static const WAITING_PERIOD:int = 50;
 		private var doubleMessageHackTime:int = getTimer();
 		private function get doubleMessageHack():Boolean {
 			var newTime:int = getTimer();
 			var result:Boolean = false;
-			if ( doubleMessageHackTime + WAITING_PERIOD < newTime )
-				result = true;
-				
-			doubleMessageHackTime = newTime;
+            if ( doubleMessageHackTime + Globals.DOUBLE_MESSAGE_WAITING_PERIOD < newTime ) {
+                doubleMessageHackTime = newTime;
+                result = true;
+            }
+
 			return result;
 		}
 		

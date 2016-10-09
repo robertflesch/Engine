@@ -29,8 +29,10 @@ package org.flashapi.swing.button.core {
 	* @version 1.3.0, 23/02/2010 15:09
 	* @see http://www.flashapi.org/
 	*/
-	
-	import flash.display.Sprite;
+
+import com.voxelengine.Globals;
+
+import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
@@ -1694,15 +1696,14 @@ package org.flashapi.swing.button.core {
 		}
 		
 		import flash.utils.getTimer;
-		private static const WAITING_PERIOD:int = 50;
 		private var doubleMessageHackTime:int = getTimer();
 		private function get doubleMessageHack():Boolean {
 			var newTime:int = getTimer();
 			var result:Boolean = false;
-			if ( doubleMessageHackTime + WAITING_PERIOD < newTime )
+			if ( doubleMessageHackTime + Globals.DOUBLE_MESSAGE_WAITING_PERIOD < newTime ) {
+				doubleMessageHackTime = newTime;
 				result = true;
-				
-			doubleMessageHackTime = newTime;
+			}
 			return result;
 		}
 		
