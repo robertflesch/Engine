@@ -46,11 +46,11 @@ public class Lighting  {
 	public static const DEFAULT_LIGHT_ID:uint = 1;
 	//public static const DEFAULT_BASE_LIGHT_LEVEL:uint = 0x00; // out of 255
 	private static var _defaultBaseLightAttn:uint = 0x33; // out of 255
-	private static var _s_eaoEnabled:Boolean = false;
-	
+
 	private static const CORNER_RESET_VAL:uint = 0;
 	private static const CORNER_BUMP_VAL:uint = 1;
-	
+
+	private static var _s_eaoEnabled:Boolean = false;
 	static public function get eaoEnabled():Boolean { return _s_eaoEnabled; }
 	static public function set eaoEnabled(value:Boolean):void  { _s_eaoEnabled = value; }
 	static public function get defaultBaseLightAttn():uint { return _defaultBaseLightAttn; }
@@ -885,7 +885,7 @@ public class Lighting  {
 		if ( Lighting.eaoEnabled ) {
 			var cornerAttn:uint = cornerForFace( $face, $corner );
 			if ( 0 < cornerAttn ) {
-				cornerAttn = MAX_LIGHT_LEVEL - cornerAttn * li.attn * 4; //* 2;
+				cornerAttn = MAX_LIGHT_LEVEL - cornerAttn * li.attn * 2; // 4 for darker corners
 				cornerAttn = Math.max( cornerAttn, 0 );
 				_compositeColor = ColorUtils.placeAlpha( _compositeColor, cornerAttn );
 	//			Log.out( "Brightness.lightGetComposite for corner - _compositeColor: " + ColorUtils.extractAlpha( _compositeColor ) );
@@ -1875,16 +1875,20 @@ public class Lighting  {
 			else if ( TypeInfo.AIR == nno.type && !nno.childrenHas() )
 				continue;
 				
-			if ( nno.gc.grain > $o.gc.grain )  // implies it has no children.
-				projectOnLargerGrain( $o, nno, $face, af, $addOrRemoveAmbient );
-			else if ( no.gc.grain == $o.gc.grain ) // equal grain can have children
-				projectOnEqualGrain( $o, nno, $face, af, $addOrRemoveAmbient );
-			else
-				Log.out( "LightAdd.evaluateAmbientOcculusion - invalid condition - neighbor is smaller: ", Log.ERROR );
+			extracted(nno, $o, $face, af, $addOrRemoveAmbient, no, index);
 		}
 	}
+
+	private function extracted(nno:Oxel, $o:Oxel, $face:int, af:int, $addOrRemoveAmbient:Boolean, no:Oxel, $index:int ):void {
+		if (nno.gc.grain > $o.gc.grain)  // implies it has no children.
+			projectOnLargerGrain($o, nno, $face, af, $addOrRemoveAmbient, $index);
+		else if (no.gc.grain == $o.gc.grain) // equal grain can have children
+			projectOnEqualGrain($o, nno, $face, af, $addOrRemoveAmbient);
+		else
+			Log.out("LightAdd.evaluateAmbientOcculusion - invalid condition - neighbor is smaller: ", Log.ERROR);
+	}
 	
-	public function projectOnLargerGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int, $addOrRemoveAmbient:Boolean ):void {
+	public function projectOnLargerGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int, $addOrRemoveAmbient:Boolean, $index:int ):void {
 		
 		// So I am evaluating a larger grain next to me.
 		// depending on my child location I may or may not have a face that effects me.
@@ -1896,10 +1900,16 @@ public class Lighting  {
 		// the nno is 1 grain larger.
 		// So now I need to identify which child I am next to. Hm...
 		if ( $nno.childrenHas() ) {
-			
+            // if it has child then I should have gotten the child!
 		}
 		else {
 			// The adjuenct face is larger
+            $nno.childrenCreate( false );
+
+			var no:Oxel = $o.neighbor( $af );
+			extracted($nno, $o, $face, $af, $addOrRemoveAmbient, no, $index);
+
+
 			// So if $o is located on the edge, we influence one corner only
 			// if $o is in the center, there is nothing to do
 		}
