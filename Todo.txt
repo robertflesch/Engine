@@ -49,6 +49,15 @@ Lou
 Gil
 Rick
 
+-------------------------------------------------
+5196840000095424
+6.17
+Nichols Petit
+cvc 431
+MC
+
+2253 N. Burling St. Chicago IL 60614
+-------------------------------------------------
 
 NOTES:
 If I crash when uploading, server thinks it has my data.
