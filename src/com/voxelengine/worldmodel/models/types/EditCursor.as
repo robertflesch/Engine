@@ -632,8 +632,14 @@ public class EditCursor extends VoxelModel
 				// we have to make the grain scale up to the size of the edit cursor
 				gcDelete.become_ancestor( EditCursor.currentInstance.modelInfo.data.oxel.gc.grain );
 				var oxelToBeDeleted:Oxel = foundModel.modelInfo.data.oxel.childGetOrCreate( gcDelete );
-				if ( Globals.BAD_OXEL != oxelToBeDeleted )
-					foundModel.write( gcDelete, TypeInfo.AIR );
+				if ( Globals.BAD_OXEL != oxelToBeDeleted ) {
+					Log.out( "EditCursor - found oxel to be deleted");
+					foundModel.write(gcDelete, TypeInfo.AIR);
+				}
+				else {
+					// I didnt find grain cursor, why?
+					Log.out( "EditCursor - DIDN'T find oxel to be deleted");
+				}
 				GrainCursorPool.poolDispose( gcDelete );
 			}
 			else if ( CursorShapeEvent.SPHERE == cursorShape )
@@ -871,19 +877,24 @@ public class EditCursor extends VoxelModel
 		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging )
 			return;
 		
-		//Log.out( "EditCursor.mouseUp e: " + e.toString() )
+		Log.out( "EditCursor.mouseUp e: " + e.toString() )
 		if ( doubleMessageHack ) {
 			switch (e.type) 
 			{
 				case "mouseUp": case Keyboard.NUMPAD_ADD:
-					if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
+					if ( CursorOperationEvent.DELETE_OXEL == cursorOperation ) {
+						Log.out( "EditCursor.mouseUp DELETE IT" );
 						deleteOxel();
+					}
 					else if ( CursorOperationEvent.INSERT_MODEL == cursorOperation )
 						insertModel();						
 					else if ( CursorOperationEvent.INSERT_OXEL == cursorOperation )
 						insertOxel();
 					break;
 			}
+		}
+		else {
+			Log.out( "EditCursor.mouseUp doubleMessageHack is false" );
 		}
 	}
 	
@@ -926,15 +937,14 @@ public class EditCursor extends VoxelModel
 		_count++;
 	}
 
-	private static const WAITING_PERIOD:int = 100;
-	private var doubleMessageHackTime:int = getTimer();
+	private var doubleMessageHackTime:int = 0;
 	private function get doubleMessageHack():Boolean {
 		var newTime:int = getTimer();
 		var result:Boolean = false;
-		if ( doubleMessageHackTime + WAITING_PERIOD < newTime )
+		if ( doubleMessageHackTime + Globals.DOUBLE_MESSAGE_WAITING_PERIOD < newTime ) {
+			doubleMessageHackTime = newTime;
 			result = true;
-			
-		doubleMessageHackTime = newTime;
+		}
 		return result;
 	}
 			
