@@ -436,6 +436,7 @@ public class VoxelModel
 				new WindowBluePrintCopy( this)
 		}
 		else {
+			Log.out( "VoxelModel.write - going to changeOxel");
 			var result:Boolean = modelInfo.changeOxel( $gc, $type, $onlyChangeType );
 			if ( result )
 				changed = true;

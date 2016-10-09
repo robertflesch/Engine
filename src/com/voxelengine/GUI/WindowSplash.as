@@ -98,8 +98,17 @@ package com.voxelengine.GUI
 		} 
 		
         protected function onResize(event:Event):void {
-			_outline.scaleX = Globals.g_renderer.width/791;
-			_outline.scaleY = Globals.g_renderer.height/592;
+			if ( Globals.g_debug )
+			{
+				// this scale the window down, so we can see it, but it shows we are in debug
+				_outline.scaleX = Globals.g_renderer.width/2791;
+				_outline.scaleY = Globals.g_renderer.height/2592;
+			}
+			else
+			{
+				_outline.scaleX = Globals.g_renderer.width/791;
+				_outline.scaleY = Globals.g_renderer.height / 592;
+			}
 		}
 		
 		// Window events

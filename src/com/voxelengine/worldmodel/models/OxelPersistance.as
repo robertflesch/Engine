@@ -215,13 +215,15 @@ public class OxelPersistance extends PersistanceObject
 	
 	public function fromByteArray():void {
 
-		//Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.WARN );
+		Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.INFO );
 		var time:int = getTimer();
 		
 		try { ba.uncompress(); }
 		catch (error:Error) { Log.out( "OxelPersistance.fromByteArray - Was expecting compressed data " + guid, Log.WARN ); }
 		ba.position = 0;
-		
+
+		Log.out( "OxelPersistance.fromByteArray - uncompress took: " + (getTimer() - time), Log.INFO );
+
 		extractVersionInfo( ba );
 		// how many bytes is the modelInfo
 		var strLen:int = ba.readInt();
@@ -233,10 +235,7 @@ public class OxelPersistance extends PersistanceObject
 		if ( null == _oxel )
 			_oxel = Oxel.initializeRoot( rootGrainSize, Lighting.defaultBaseLightAttn ); // Lighting should be model or instance default lighting
 		else 
-			Log.out( "OxelPersistance.fromByteArray - Why does oxel exist?", Log.WARN );
-			
-		//_statisics.gather( version, ba, rootGrainSize);
-		
+
 		// TODO - do I need to do this everytime? or could I use a static initializer? RSF - 7.16.2015
 		registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);	
 		registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);	
@@ -244,21 +243,22 @@ public class OxelPersistance extends PersistanceObject
 		if ( parent )
 			Lighting.defaultBaseLightAttn = parent.baseLightLevel
 		gct.grain = rootGrainSize;
+Log.out( "OxelPersistance.fromByteArray - b4 readVersionedData?", Log.INFO );
 		if (Globals.VERSION_000 == _version)
 			oxel.readData( null, gct, ba, _statisics );
 		else
 			oxel.readVersionedData( _version, null, gct, ba, _statisics );
 		GrainCursorPool.poolDispose(gct);
-		//Log.out( "OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.WARN );
+Log.out( "OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.INFO );
 		
 		_statisics.gather();
 		//_statisics.statsPrint();
 		
-		//Log.out( "OxelPersistance.fromByteArray - _statisics took: " + (getTimer() - time), Log.WARN );
+		Log.out( "OxelPersistance.fromByteArray - _statisics took: " + (getTimer() - time), Log.INFO );
 		
 		_topMostChunk = Chunk.parse( oxel, null );
 		_loaded = true;
-		//Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.WARN );
+		Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 		
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this ) );
 	}

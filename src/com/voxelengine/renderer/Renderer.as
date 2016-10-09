@@ -58,7 +58,7 @@ public class Renderer extends EventDispatcher
 	
 	private var _stage3D:Stage3D
 	public function get stage3D():Stage3D { return _stage3D; }
-	public function get context():Context3D { return _stage3D.context3D; }
+	public function get context3D():Context3D { return _stage3D.context3D; }
 	
 	private var _isFullScreen:Boolean = false;
 	private var _isResizing:Boolean = false;
@@ -109,15 +109,13 @@ public class Renderer extends EventDispatcher
 		Log.out( "Renderer.init - requestContext3D Profile: Context3DProfile.BASELINE_CONSTRAINED", Log.DEBUG );	
 		// http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display3D/Context3DProfile.html
 		stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE_CONSTRAINED);
-		
-		Log.out( "Renderer.init - requestContext3D AFTER", Log.DEBUG );			
 		//stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE);
 	}
 	
 	
 	public function resizeEvent(event:Event):void {
 		setStageSize( Globals.g_app.stage.stageWidth, Globals.g_app.stage.stageHeight);
-		configureBackBuffer()		
+		configureBackBuffer()
 		//if (timer.running) {
 			////Log.out("Renderer.resizeEvent - reset timer");
 			//timer.reset();
@@ -126,7 +124,7 @@ public class Renderer extends EventDispatcher
 			////Log.out("Renderer.resizeEvent - timer NOT running" );
 			//var t:int = getTimer()
 			//ContextEvent.dispatch( new ContextEvent( ContextEvent.DISPOSED, null ) );
-			//context.dispose();
+			//context3D.dispose();
 			////Log.out("Renderer.resizeEvent - time to dispose time: " + (getTimer() - t) );
 		//}
 		//timer.start();			
@@ -172,8 +170,8 @@ public class Renderer extends EventDispatcher
 
 	public function setBackgroundColor( r:int=0, g:int=0, b:int=0 ):void {
 		// Clears the back buffer to this color, for now it will be the "sky" color
-		if ( context )
-			context.clear( r/255, g/255, b/ 255, 0);
+		if ( context3D )
+			context3D.clear( r/255, g/255, b/ 255, 0);
 	}
 
 	public function onContextCreated(e:Event):void {
@@ -183,27 +181,27 @@ public class Renderer extends EventDispatcher
 	
 	// This handles the event created in the init function
 	public function onContext():void {
-		// dont initialize/reinitialize the context if the timer is running
+		// dont initialize/reinitialize the context3D if the timer is running
 		if (timer.running) {
 			//Log.out("Renderer.onContext - Timer is running" );
 			return
 		}
 
-		if ( context ) {
+		if ( context3D ) {
 			if ( Globals.g_debug )
-				context.enableErrorChecking = true;
+				context3D.enableErrorChecking = true;
 			else	
-				context.enableErrorChecking = false;
+				context3D.enableErrorChecking = false;
 				
 			configureBackBuffer();
-			_isHW = context.driverInfo.toLowerCase().indexOf("software") == -1;			
+			_isHW = context3D.driverInfo.toLowerCase().indexOf("software") == -1;
 			if ( !_isHW )
-				Log.out( "Renderer.onContext - SOFTWARE RENDERING - driverInfo: " + context.driverInfo, Log.WARN );
+				Log.out( "Renderer.onContext - SOFTWARE RENDERING - driverInfo: " + context3D.driverInfo, Log.WARN );
 			else
-				Log.out( "Renderer.onContext - driverInfo: " + context.driverInfo, Log.DEBUG );
+				Log.out( "Renderer.onContext - driverInfo: " + context3D.driverInfo, Log.DEBUG );
 				
-			context.clear();
-			ContextEvent.dispatch( new ContextEvent( ContextEvent.ACQUIRED, context ) );
+			context3D.clear();
+			ContextEvent.dispatch( new ContextEvent( ContextEvent.ACQUIRED, context3D ) );
 		}
 	}
 	
@@ -216,15 +214,15 @@ public class Renderer extends EventDispatcher
 	
 	public function render( screenShot:BitmapData = null ):void 
 	{
-		if ( null == context )
+		if ( null == context3D )
 		{
 			//Log.out( "Renderer.render - CONTEXT NULL" );
 			return;
 		}
 		
-		if ( "Disposed" == context.driverInfo )
+		if ( "Disposed" == context3D.driverInfo )
 		{
-			//Log.out( "Renderer.render - CONTEXT Disposed" + context.toString() );
+			//Log.out( "Renderer.render - CONTEXT Disposed" + context3D.toString() );
 			return;
 		}
 		
@@ -287,12 +285,12 @@ public class Renderer extends EventDispatcher
 		
 		_mvp.append( perspectiveProjection(90, _width/_height, Globals.g_nearplane, Globals.g_farplane) );
 
-		Region.currentRegion.modelCache.draw( _mvp, context );
+		Region.currentRegion.modelCache.draw( _mvp, context3D );
 
 		if ( screenShot )
-			context.drawToBitmapData( screenShot );
+			context3D.drawToBitmapData( screenShot );
 		else
-			context.present();
+			context3D.present();
 		
 	}
 	
@@ -340,7 +338,8 @@ public class Renderer extends EventDispatcher
 		
 		// false indicates no depth or stencil buffer is created, true creates a depth and a stencil buffer. 
 		const enableDepthAndStencil:Boolean = true;
-		context.configureBackBuffer( width, height, antiAlias, enableDepthAndStencil );
+		if ( context3D )
+			context3D.configureBackBuffer( width, height, antiAlias, enableDepthAndStencil );
 	}
 }
 }

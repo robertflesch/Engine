@@ -352,7 +352,7 @@ public class VertexIndexBuilder
 	}	
 	
 	/*
-	private function quadsCopyToVertexBuffersVector( oxelStartingIndex:int, oxelsToProcess:int, quadsToProcess:int, context:Context3D ):void { 
+	private function quadsCopyToVertexBuffersVector( oxelStartingIndex:int, oxelsToProcess:int, quadsToProcess:int, context3D:Context3D ):void {
 		_s_totalUsed++;
 		_bufferVertexMemory += quadsToProcess * Quad.VERTICES * 4; // times 4 seems true, but I dont understand why
 		
@@ -380,7 +380,7 @@ public class VertexIndexBuilder
 		
 		//trace("VertexIndexBuilder.quadsCopyToBuffers - startingIndex: " + oxelStartingIndex + " oxelsToProcess:" +  oxelsToProcess + " quadsToProcess: " + quadsToProcess );
 		try {
-			var vb:VertexBuffer3D = context.createVertexBuffer( quadsToProcess * Quad.VERTICES / Quad.DATA_PER_VERTEX , Quad.DATA_PER_VERTEX);
+			var vb:VertexBuffer3D = context3D.createVertexBuffer( quadsToProcess * Quad.VERTICES / Quad.DATA_PER_VERTEX , Quad.DATA_PER_VERTEX);
 		} catch (error:ArgumentError) {
 			trace('An argument error has occured');
 			return;
@@ -402,7 +402,7 @@ public class VertexIndexBuilder
 	}
 */
 /*
-	private function quadsCopyToIndexBuffersVector( oxelStartingIndex:int, oxelsToProcess:int, quadsToProcess:int, context:Context3D ):void { 
+	private function quadsCopyToIndexBuffersVector( oxelStartingIndex:int, oxelsToProcess:int, quadsToProcess:int, context3D:Context3D ):void {
 		
 		// NEW 3
 		Log.out( "VertexIndexBuilder.quadsCopyToIndexBuffersVector - NEW 3" );
@@ -433,7 +433,7 @@ public class VertexIndexBuilder
 		
 		_bufferIndexMemory = quadsToProcess * Quad.INDICES;
 		
-		var ib:IndexBuffer3D = context.createIndexBuffer( quadsToProcess * Quad.INDICES );
+		var ib:IndexBuffer3D = context3D.createIndexBuffer( quadsToProcess * Quad.INDICES );
 		ib.uploadFromVector( _offsetIndices, 0, quadsToProcess * Quad.INDICES );
 		_indexBuffers.push(ib);
 
@@ -446,7 +446,7 @@ public class VertexIndexBuilder
 */	
 	/*
 	// Not using since some index is off...
-	private function quadsCopyToIndexBuffersByteArray( $oxelStartingIndex:int, $oxelsToProcess:int, $quadsToProcess:int, $context:Context3D ):void { 
+	private function quadsCopyToIndexBuffersByteArray( $oxelStartingIndex:int, $oxelsToProcess:int, $quadsToProcess:int, $context3D:Context3D ):void {
 		
 		Log.out( "VertexIndexBuilder.quadsCopyToIndexBuffersVector - NEW 4" );
 		var _offsetIndices:ByteArray = new ByteArray();
@@ -483,16 +483,16 @@ public class VertexIndexBuilder
 		_bufferIndexMemory = $quadsToProcess * Quad.INDICES * BYTES_PER_WORD;
 		
 		//public function createIndexBuffer (numIndices:int) : flash.display3D.IndexBuffer3D;
-		var ib:IndexBuffer3D = $context.createIndexBuffer( $quadsToProcess * Quad.INDICES );
+		var ib:IndexBuffer3D = $context3D.createIndexBuffer( $quadsToProcess * Quad.INDICES );
 		ib.uploadFromByteArray( _offsetIndices, 0, 0, $quadsToProcess * Quad.INDICES );
 		_indexBuffers.push(ib);
 	}
 */
 /*
-	private function quadsCopyToBuffersVectorGood( oxelStartingIndex:int, oxelsToProcess:int, quadsToProcess:int, context:Context3D ):void { 
+	private function quadsCopyToBuffersVectorGood( oxelStartingIndex:int, oxelsToProcess:int, quadsToProcess:int, context3D:Context3D ):void {
 		//trace("VertexIndexBuilder.quadsCopyToBuffers - startingIndex: " + oxelStartingIndex + " oxelsToProcess:" +  oxelsToProcess + " quadsToProcess: " + quadsToProcess );
 		try {
-			var vb:VertexBuffer3D = context.createVertexBuffer( quadsToProcess * Quad.VERTICES / Quad.DATA_PER_VERTEX , Quad.DATA_PER_VERTEX);
+			var vb:VertexBuffer3D = context3D.createVertexBuffer( quadsToProcess * Quad.VERTICES / Quad.DATA_PER_VERTEX , Quad.DATA_PER_VERTEX);
 		} catch (error:ArgumentError) {
 			trace('An argument error has occured');
 			return;
@@ -550,7 +550,7 @@ public class VertexIndexBuilder
 	
 		_bufferIndexMemory = quadsToProcess * Quad.INDICES;
 		
-		var ib:IndexBuffer3D = context.createIndexBuffer( quadsToProcess * Quad.INDICES );
+		var ib:IndexBuffer3D = context3D.createIndexBuffer( quadsToProcess * Quad.INDICES );
 		ib.uploadFromVector( _offsetIndices, 0, quadsToProcess * Quad.INDICES );
 		_indexBuffers.push(ib);
 
@@ -568,7 +568,7 @@ public class VertexIndexBuilder
 	// Not currently in use - RSF 11.10.13
 	//////////////////////////////////
 	/*
-	public function moveSkyTrianglesToGPU( context:Context3D ) : void {
+	public function moveSkyTrianglesToGPU( context3D:Context3D ) : void {
 		
 		var vb:VertexBuffer3D;
 		var ib:IndexBuffer3D;
@@ -577,10 +577,10 @@ public class VertexIndexBuilder
 			vb = _vertexBuffers[i];
 			
 			// Position
-			context.setVertexBufferAt(0, vb, 0, Context3DVertexBufferFormat.FLOAT_3);
+			context3D.setVertexBufferAt(0, vb, 0, Context3DVertexBufferFormat.FLOAT_3);
 			
 			ib = _indexBuffers[i];
-			context.drawTriangles(ib);
+			context3D.drawTriangles(ib);
 		}
 	}
 	*/

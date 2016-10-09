@@ -62,6 +62,8 @@ package com.voxelengine {
 		public static var g_mouseKeyboardHandler:MouseKeyboardHandler = new MouseKeyboardHandler();
 		public static var g_textInput:Boolean
 
+		public static const DOUBLE_MESSAGE_WAITING_PERIOD:int = 50;
+
 		public static var g_nearplane:Number = 1/4;
 		public static var g_farplane:Number = 65536 / 4;
 		public static const UNITS_PER_METER:int = 16;

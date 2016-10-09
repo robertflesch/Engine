@@ -234,10 +234,10 @@ public class ModelCache
 
 		var dynModelTime:int = getTimer();
 		
-		var vm:VoxelModel
+		var vm:VoxelModel;
 		for ( var i:int; i < _instancesDynamic.length; i++ ) {
 			vm = _instancesDynamic[i];
-			vm.update( Globals.g_renderer.context,  $elapsedTimeMS );	
+			vm.update( Globals.g_renderer.context3D,  $elapsedTimeMS );
 		}
 		
 		dynModelTime = getTimer() - dynModelTime;
@@ -245,13 +245,13 @@ public class ModelCache
 		var modelTime:int = getTimer();
 		for ( i = 0; i < _instances.length;  i++ ) {
 			vm = _instances[i];
-			vm.update( Globals.g_renderer.context,  $elapsedTimeMS );	
+			vm.update( Globals.g_renderer.context3D,  $elapsedTimeMS );
 		}
 		
 		modelTime = getTimer() - modelTime;
 			
 		if ( EditCursor.isEditing )
-			EditCursor.currentInstance.update( Globals.g_renderer.context, $elapsedTimeMS);
+			EditCursor.currentInstance.update( Globals.g_renderer.context3D, $elapsedTimeMS);
 
 	}
 	

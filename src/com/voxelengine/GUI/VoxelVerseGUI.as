@@ -350,7 +350,7 @@ public class VoxelVerseGUI extends EventDispatcher
 			//if ( Keyboard.O == e.keyCode )
 			//{
 				//Globals.TestCheckForFlow();
-				////Globals.g_renderer.context.dispose();
+				////Globals.g_renderer.context3D.dispose();
 			//}
 			
 			if ( Keyboard.L == e.keyCode )
