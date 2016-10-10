@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="Flex" version="4">
+  <component name="FlexBuildConfigurationManager" active="Debug">
+    <configurations>
+      <configuration name="Debug" pure-as="true" main-class="VoxelVerse" output-file="VoxelVerseD.swf" output-folder="$MODULE_DIR$/../Resources/bin">
+        <dependencies target-player="22.0">
+          <entries>
+            <entry library-id="48f9b327-4678-43d7-b9fb-d2f59f02eb89">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry library-id="b81615cc-5417-4633-a59a-26751b08fec1">
+              <dependency linkage="Merged" />
+            </entry>
+          </entries>
+          <sdk name="22.0" />
+        </dependencies>
+        <compiler-options>
+          <option name="resourceFilesMode" value="None" />
+        </compiler-options>
+        <packaging-air-desktop />
+        <packaging-android />
+        <packaging-ios />
+      </configuration>
+      <configuration name="Release" pure-as="true" main-class="VoxelVerse" output-file="VoxelVerse.swf" output-folder="$MODULE_DIR$/../Resources/bin">
+        <dependencies target-player="22.0">
+          <entries>
+            <entry library-id="558cca8f-e53a-41d4-be0a-081cf3c8cf31">
+              <dependency linkage="Merged" />
+            </entry>
+            <entry library-id="d8929b53-2ccc-4741-8efb-aa60b0dfa0a4">
+              <dependency linkage="Merged" />
+            </entry>
+          </entries>
+          <sdk name="22.0" />
+        </dependencies>
+        <compiler-options>
+          <map>
+            <entry key="compiler.debug.swf" value="false" />
+          </map>
+          <option name="resourceFilesMode" value="None" />
+        </compiler-options>
+        <packaging-air-desktop />
+        <packaging-android />
+        <packaging-ios />
+      </configuration>
+    </configurations>
+    <compiler-options />
+  </component>
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="jdk" jdkName="22.0" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="48f9b327-4678-43d7-b9fb-d2f59f02eb89" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/PlayerIOClient.swc!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="b81615cc-5417-4633-a59a-26751b08fec1" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/DConsole2.3.swc!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="558cca8f-e53a-41d4-be0a-081cf3c8cf31" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/PlayerIOClient.swc!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="d8929b53-2ccc-4741-8efb-aa60b0dfa0a4" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/DConsole2.3.swc!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+  </component>
+</module>
