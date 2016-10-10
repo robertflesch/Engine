@@ -139,11 +139,11 @@ public class OxelPersistance extends PersistanceObject
 	// persistance operations
 	override public function save():void {
 		if ( false == loaded || !Globals.isGuid( guid ) ) {
-				Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " loaded: " + loaded + " in table: " + table, Log.WARN );
+				Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " loaded: " + loaded + " in table: " + table, Log.DEBUG );
 				return;
 		}
 		//Log.out( "OxelPersistance.save - NOT Saving COMMENTED OUT", Log.WARN );
-		Log.out( "OxelPersistance.save - Saving", Log.WARN );
+		Log.out( "OxelPersistance.save - Saving", Log.DEBUG );
 		super.save();
 	}
 	
