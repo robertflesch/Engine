@@ -50,11 +50,10 @@ public final class ProjectilePoolType
 		
 		// I dont like that I create new metadata and _modelInfo for each projectile.
 		// I should be able to create instances
-		_projectileGuid = Globals.getUID()
-		var obj:Object = GenerateCube.script()
-		throw new Error( "Need to refactor this, I broke it when I added the island generation" );
-		obj.model.grainSize = 2
-		obj.model.biomes.layers[0].type = TypeInfo.BLUE;
+		_projectileGuid = Globals.getUID();
+		var obj:Object = {};
+		obj.model = GenerateCube.script( 2, TypeInfo.BLUE );
+		//throw new Error( "Need to refactor this, I broke it when I added the island generation" );
 		// This is a special case for _modelInfo, the _modelInfo its self is contained in the generate script
 		_modelInfo = new ModelInfo( _projectileGuid )
 		_modelInfo.dynamicObj = true;
@@ -70,7 +69,9 @@ public final class ProjectilePoolType
 		_modelMetadata.description = _projectileGuid + " - GENERATED"
 		_modelMetadata.owner = ""
 		//ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, _projectileGuid, _modelMetadata ) )
-		_modelInfo.oxelLoadData()		
+		Log.out( "ProjectilePoolType.generateData: " + _modelInfo.toString() );
+		//_modelInfo.oxelLoadData();
+		_modelInfo.loadFromBiomeData();
 	}
 		
 	private function newModel():Projectile {	

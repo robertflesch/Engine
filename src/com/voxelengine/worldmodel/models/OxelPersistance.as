@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.LoadingImageEvent;
+import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
+
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
@@ -78,6 +80,11 @@ public class OxelPersistance extends PersistanceObject
 		_topMostChunk.release();
 		super.release();
 	}
+
+	public function load( $guid:String, $taskPriority:int, $parent:ModelInfo, $isDynObj:Boolean, $altGuid:String ):void {
+        _parent = $parent;
+		FromByteArray.addTask( $guid, $taskPriority, this, $altGuid )
+	}
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
 		if ( null == _topMostChunk )
@@ -139,11 +146,10 @@ public class OxelPersistance extends PersistanceObject
 	// persistance operations
 	override public function save():void {
 		if ( false == loaded || !Globals.isGuid( guid ) ) {
-				Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " loaded: " + loaded + " in table: " + table, Log.DEBUG );
+				//Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " loaded: " + loaded + " in table: " + table, Log.DEBUG );
 				return;
 		}
-		//Log.out( "OxelPersistance.save - NOT Saving COMMENTED OUT", Log.WARN );
-		Log.out( "OxelPersistance.save - Saving", Log.DEBUG );
+		//Log.out( "OxelPersistance.save - Saving", Log.DEBUG );
 		super.save();
 	}
 	
@@ -215,14 +221,14 @@ public class OxelPersistance extends PersistanceObject
 	
 	public function fromByteArray():void {
 
-		Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.INFO );
+		//Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.INFO );
 		var time:int = getTimer();
 		
 		try { ba.uncompress(); }
 		catch (error:Error) { Log.out( "OxelPersistance.fromByteArray - Was expecting compressed data " + guid, Log.WARN ); }
 		ba.position = 0;
 
-		Log.out( "OxelPersistance.fromByteArray - uncompress took: " + (getTimer() - time), Log.INFO );
+		//Log.out( "OxelPersistance.fromByteArray - uncompress took: " + (getTimer() - time), Log.INFO );
 
 		extractVersionInfo( ba );
 		// how many bytes is the modelInfo
@@ -243,22 +249,22 @@ public class OxelPersistance extends PersistanceObject
 		if ( parent )
 			Lighting.defaultBaseLightAttn = parent.baseLightLevel
 		gct.grain = rootGrainSize;
-Log.out( "OxelPersistance.fromByteArray - b4 readVersionedData?", Log.INFO );
+		//Log.out( "OxelPersistance.fromByteArray - b4 readVersionedData?", Log.INFO );
 		if (Globals.VERSION_000 == _version)
 			oxel.readData( null, gct, ba, _statisics );
 		else
 			oxel.readVersionedData( _version, null, gct, ba, _statisics );
 		GrainCursorPool.poolDispose(gct);
-Log.out( "OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.INFO );
+		//Log.out( "OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.INFO );
 		
 		_statisics.gather();
 		//_statisics.statsPrint();
 		
-		Log.out( "OxelPersistance.fromByteArray - _statisics took: " + (getTimer() - time), Log.INFO );
+		//Log.out( "OxelPersistance.fromByteArray - _statisics took: " + (getTimer() - time), Log.INFO );
 		
 		_topMostChunk = Chunk.parse( oxel, null );
 		_loaded = true;
-		Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
+		//Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 		
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this ) );
 	}

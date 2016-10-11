@@ -80,13 +80,14 @@ public class AnimationCache
 		var guidArray:Array = $ae.aniGuid.split( ":" );
 		var oldGuid:String = guidArray[0];
 		var newGuid:String = guidArray[1];
-		var ani:Animation = _animations[$ae.modelGuid]; 
+		var ani:Animation = _animations[oldGuid];
 		if ( ani ) {
 			_animations[oldGuid] = null;
 			_animations[newGuid] = ani;
 		}
 		else
-			Log.out( "AnimationCache.updateGuid - animation not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.ERROR );
+			_animations[newGuid] = ani;
+//			Log.out( "AnimationCache.updateGuid - animation not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.ERROR );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////

@@ -31,15 +31,17 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	 */
 	public class GenerateCube extends LandscapeTask 
 	{	
-		static public function script():Object {
-			var model:Object = new Object
-			model.name = "GenerateCube"
-			model.grainSize = 6
+		static public function script( $grain:int = 6, $type:int = 0 ):Object {
+			if ( 0 == $type )
+				$type = TypeInfo.SAND;
+			var model:Object = {};
+			model.name = "GenerateCube";
+			model.grainSize = $grain;
 			model.biomes = new Object();
 			model.biomes.layers = new Vector.<Object>();
-			model.biomes.layers[0] = new Object();
+			model.biomes.layers[0] = {};
 			model.biomes.layers[0].functionName = "GenerateCube";
-			model.biomes.layers[0].type = "SAND"
+			model.biomes.layers[0].type = TypeInfo.name( $type );
 			
 			return model;
 		}

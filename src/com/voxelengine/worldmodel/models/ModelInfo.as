@@ -141,27 +141,24 @@ public class ModelInfo extends PersistanceObject
 	// start data (oxel) operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private function addListeners():void {
-		OxelDataEvent.addListener( ModelBaseEvent.ADDED, retrieveData );		
-		OxelDataEvent.addListener( ModelBaseEvent.RESULT, retrieveData );		
+		OxelDataEvent.addListener( ModelBaseEvent.ADDED, retrievedData );
+		OxelDataEvent.addListener( ModelBaseEvent.RESULT, retrievedData );
 		OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );
 	}
 	
 	private function removeListeners():void {
-		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, retrieveData );		
-		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, retrieveData );		
+		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, retrievedData );
+		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, retrievedData );
 		OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );
 	}
 	
-	private function retrieveData( $ode:OxelDataEvent):void {
+	private function retrievedData( $ode:OxelDataEvent):void {
 		if ( guid == $ode.modelGuid || altGuid == $ode.modelGuid ) {
-			removeListeners()
-			//Log.out( "ModelInfo.retrieveData - loaded oxel guid: " + guid );
-			_data = $ode.oxelData
-			_data.parent = this
-			// if the parent is dynamic, the data should be too.
-			_data.dynamicObj = dynamicObj
-			const priority:int = 1
-			FromByteArray.addTask( guid, priority, _altGuid )
+			removeListeners();
+			const priority:int = 1;
+			_data = $ode.oxelData;
+
+			_data.load( guid, priority, this, dynamicObj, _altGuid );
 			/*
 			_data.fromByteArray()
 			if ( "0" == _data.dbo.key ) {
@@ -197,11 +194,11 @@ public class ModelInfo extends PersistanceObject
 		}
 	}
 	
-	private function loadFromBiomeData():void {
+	public function loadFromBiomeData():void {
 		var layer1:LayerInfo = biomes.layers[0];
 		if ( "LoadModelFromIVM" == layer1.functionName ) {
 			_altGuid = layer1.data;
-			//Log.out( "ModelInfo.loadFromBiomeData - trying to load from local file with alternate name - guid: " + _altGuid, Log.DEBUG );
+			Log.out( "ModelInfo.loadFromBiomeData - trying to load from local file with alternate name - altGuid: " + _altGuid, Log.DEBUG );
 			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, _altGuid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );		
 		}
 		else {
@@ -234,7 +231,7 @@ public class ModelInfo extends PersistanceObject
 		} else { 
 			addListeners();
 			// try to load from tables first
-			//Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
+			Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
 			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_PERSISTANCE ) );
 		}
 	}
@@ -592,11 +589,15 @@ public class ModelInfo extends PersistanceObject
 	}
 	
 	public function fromObject( $dbo:Object ):void {
-		dbo = $dbo as DatabaseObject;
-		if ( !dbo.model )
-			return;
-		
-		info = $dbo;
+		if ( dynamicObj ) {
+			info = $dbo;
+		} else {
+			dbo = $dbo as DatabaseObject;
+			if ( !dbo.model )
+				return;
+
+			info = $dbo;
+		}
 		loadFromInfo();
 	}
 	

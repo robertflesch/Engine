@@ -69,10 +69,10 @@ public class VoxelModel
 		// set new model as selected
 		if ( _s_selectedModel ) {
 			_s_selectedModel.selected = true	
-			Axes.show()
+			//Axes.show()
 		}
-		if ( null == $val )
-			Axes.hide()
+		//if ( null == $val )
+		//	Axes.hide()
 			
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -504,7 +504,7 @@ public class VoxelModel
 			// We have to draw all of the non alpha first, otherwise parts of the tree might get drawn after the alpha does
 			modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha );
 		}
-		
+		/*
 		if ( selected && false == $alpha ) {
 			Axes.positionSet( instanceInfo.positionGet )
 			Axes.rotationSet( instanceInfo.rotationGet )
@@ -512,6 +512,7 @@ public class VoxelModel
 			Axes.scaleSet( modelInfo.grainSize )
 			Axes.display()
 		}
+		*/
 	}
 	
 	public function update($context:Context3D, $elapsedTimeMS:int):void	{

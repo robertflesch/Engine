@@ -86,7 +86,7 @@ public class OxelPersistanceCache
 			return;
 		}
 		
-		//Log.out( "OxelDataCache.request guid: " + $ode.modelGuid, Log.DEBUG );
+		Log.out( "OxelDataCache.request guid: " + $ode.modelGuid, Log.DEBUG );
 		var od:OxelPersistance = _oxelDataDic[$ode.modelGuid]; 
 		if ( null == od ) {
 			if ( _block.has( $ode.modelGuid ) )	
