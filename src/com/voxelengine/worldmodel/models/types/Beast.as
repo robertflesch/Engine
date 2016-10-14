@@ -31,29 +31,28 @@ package com.voxelengine.worldmodel.models.types
 		static private const MIN_TURN_AMOUNT:Number = 0.02;
 		
 		// Trying to keep these numbers between 1 and 100
-		static private var _climbRate:SecureNumber = new SecureNumber( 70 );
-		static private var _moveSpeed:SecureNumber = new SecureNumber( 20 );
+		static private var  _climbRate:SecureNumber = new SecureNumber( 70 );
 		static private var	_maxClimbAngle:SecureNumber = new SecureNumber( 45 );
-		static private var _maxTurnRate:SecureNumber = new SecureNumber( 100 );
-		static private var _stallSpeed:SecureNumber = new SecureNumber( 2 );
-		
+		static private var  _maxTurnRate:SecureNumber = new SecureNumber( 0.01 );
+		static private var  _stallSpeed:SecureNumber = new SecureNumber( 2 );
+        static protected    const DEFAULT_SPEED_X:Number		= 1.0;
+        static private var  _speedMultiplier:Number 				= DEFAULT_SPEED_X;
+
 		static protected var _seatLocation:Vector3D =  new Vector3D( 8, 12, 13 );
 		
-		static protected    const DEFAULT_SPEED_X:Number		= 0.5;
-		private var   		_speedMultiplier:Number 				= DEFAULT_SPEED_X;
 		protected function get 	mSpeedMultiplier():Number 				{ return _speedMultiplier; }
 		protected function set 	mSpeedMultiplier($value:Number):void	{ _speedMultiplier = $value; }
 
-		static public function get mClimbRate():Number  				{ return _climbRate.val; }
-		static public function set mClimbRate($value:Number):void  		{ _climbRate.val = $value; }
-		static public function get mMoveSpeed():Number  				{ return _moveSpeed.val; }
-		static public function set mMoveSpeed($value:Number):void  		{ _moveSpeed.val = $value; }
-		static public function get mMaxClimbAngle():Number  			{ return _maxClimbAngle.val; }
-		static public function set mMaxClimbAngle($value:Number):void  { _maxClimbAngle.val = $value; }
-		static public function get mMaxTurnRate():Number  				{ return _maxTurnRate.val; }
-		static public function set mMaxTurnRate($value:Number):void  	{ _maxTurnRate.val = $value; }
-		static public function get mStallSpeed():Number 				{ return _stallSpeed.val; }
-		static public function set mStallSpeed($value:Number):void		{ _stallSpeed.val = $value; }
+		static public function get climbRate():Number  				{ return _climbRate.val; }
+		static public function set climbRate($value:Number):void  		{ _climbRate.val = $value; }
+		//static public function get mMoveSpeed():Number  				{ return _moveSpeed.val; }
+		//static public function set mMoveSpeed($value:Number):void  		{ _moveSpeed.val = $value; }
+		static public function get maxClimbAngle():Number  			{ return _maxClimbAngle.val; }
+		static public function set maxClimbAngle($value:Number):void  { _maxClimbAngle.val = $value; }
+		static public function get maxTurnRate():Number  				{ return _maxTurnRate.val; }
+		static public function set maxTurnRate($value:Number):void  	{ _maxTurnRate.val = $value; }
+		static public function get stallSpeed():Number 				{ return _stallSpeed.val; }
+		static public function set stallSpeed($value:Number):void		{ _stallSpeed.val = $value; }
 		
 		static protected 	const 	TAIL:String					= "TAIL";
 		static protected 	const 	WING:String					= "WING";
@@ -76,14 +75,15 @@ package com.voxelengine.worldmodel.models.types
 			collisionMarkers = true;
 		}		
 
-		static public function buildExportObject( obj:Object ):void {
+		static public function buildExportObject( obj:Object ):Object {
 			ControllableVoxelModel.buildExportObject( obj )
 			obj.beast 					= new Object();
-			obj.beast.moveSpeed 		= mMoveSpeed * 10000;
-			obj.beast.maxTurnRate 		= mMaxTurnRate / 100;
-			obj.beast.maxClimbAngle		= mMaxClimbAngle;
-			obj.beast.climbRate 		= mClimbRate * 100;
+			obj.beast.moveSpeed 		= _speedMultiplier;
+			obj.beast.maxTurnRate 		= maxTurnRate;
+			obj.beast.maxClimbAngle		= maxClimbAngle;
+			obj.beast.climbRate 		= climbRate;
 			obj.beast.seatLocation 		= { x:int(_seatLocation.x), y:int(_seatLocation.y), z:int(_seatLocation.z) };
+            return obj;
 		}
 		
 		override protected function processClassJson():void {
@@ -95,25 +95,20 @@ package com.voxelengine.worldmodel.models.types
 				Log.out( "Beast.processClassJson - beast section not found: " + modelInfo.dbo.toString(), Log.ERROR );
 				return;
 			}
-			if ( beastInfo.moveSpeed)
-				mMoveSpeed = beastInfo.moveSpeed/10000;
-			else
-				mMoveSpeed = mMoveSpeed/10000;
+			if ( beastInfo.moveSpeed) {
+                _speedMultiplier = beastInfo.moveSpeed
+				instanceInfo.moveSpeed = instanceInfo.moveSpeed * _speedMultiplier;
+			} else
 			
 			if ( beastInfo.maxTurnRate )
-				mMaxTurnRate = beastInfo.maxTurnRate * 100;
-			else
-				// This should be around 10,000
-				mMaxTurnRate = mMaxTurnRate * 100;
-			
+				maxTurnRate = beastInfo.maxTurnRat/100;
+
 			if ( beastInfo.maxClimbAngle )
-				mMaxClimbAngle = beastInfo.maxClimbAngle;
+				maxClimbAngle = beastInfo.maxClimbAngle;
 			
 			if ( beastInfo.climbRate )
-				mClimbRate = beastInfo.climbRate/100;
-			else
-				mClimbRate = mClimbRate / 100;
-				
+				climbRate = beastInfo.climbRate;
+
 			if ( beastInfo.seatLocation ) {
 				if ( beastInfo.seatLocation is Object ) {
 //					Log.out( "Beast.processClassJson: " + JSON.stringify( beastInfo.seatLocation ) );
@@ -125,21 +120,9 @@ package com.voxelengine.worldmodel.models.types
 			}
 			else
 				_seatLocation.setTo( 0, 0, 0 );
+
+            Log.out( "Beast.processClassJson values: " + JSON.stringify( buildExportObject( {} ) ) );
 		}
-		
-		//override protected function addClassJson():String {
-			//var jsonString:String = super.addClassJson();
-			//jsonString += ",";
-			//jsonString += "\"beast\": { "
-			//jsonString += "\"moveSpeed\" : " + (mMoveSpeed * 10000) + ",";
-			//jsonString += "\"maxTurnRate\" : " + (mMaxTurnRate / 100) + ",";
-			//jsonString += "\"maxClimbAngle\" : " + mMaxClimbAngle + ",";
-			//jsonString += "\"climbRate\" : " + (mClimbRate * 100) + ",";
-			//jsonString += "\"seatLocation\" : " + JSON.stringify( _seatLocation );
-			//jsonString += "}";
-			//return jsonString;
-		//}
-		
 		
 		override protected function collisionPointsAdd():void {
 			// TO DO Should define this in meta data??? RSF or using extents?
@@ -305,10 +288,10 @@ package com.voxelengine.worldmodel.models.types
 		override protected function handleMouseMovement( $elapsedTimeMS:int ):void {
 			if ( 0 == Globals.openWindowCount && Globals.active && Globals.clicked ) 
 			{
-				var climbFactor:Number = ( mMaxClimbAngle + instanceInfo.rotationGet.x) / mMaxClimbAngle;
-				var scaleFactor:Number = mClimbRate + climbFactor;
+				var climbFactor:Number = ( maxClimbAngle + instanceInfo.rotationGet.x) / maxClimbAngle;
+				var scaleFactor:Number = climbRate + climbFactor;
 				// When you are climbing you can turn faster because you are going slower
-				var effectiveTurnRate:Number = mMaxTurnRate * ( scaleFactor )
+				var effectiveTurnRate:Number = maxTurnRate * ( scaleFactor )
 //				Log.out( "Move Speed would be set to: " + mMoveSpeed * scaleFactor + "  instead setting to 0", Log.WARN );
 				//instanceInfo.moveSpeed = mMoveSpeed * scaleFactor;
 				instanceInfo.moveSpeed = 10;
@@ -332,9 +315,9 @@ package com.voxelengine.worldmodel.models.types
 				{
 					instanceInfo.rotationSetComp( instanceInfo.rotationGet.x + dx, instanceInfo.rotationGet.y + _dy, instanceInfo.rotationGet.z );
 					// This sets the max climb angle, different beast could have different climb angles
-					if ( -mMaxClimbAngle > instanceInfo.rotationGet.x )
+					if ( -maxClimbAngle > instanceInfo.rotationGet.x )
 					{
-						instanceInfo.rotationSetComp( -mMaxClimbAngle, instanceInfo.rotationGet.y + _dy, instanceInfo.rotationGet.z );
+						instanceInfo.rotationSetComp( -maxClimbAngle, instanceInfo.rotationGet.y + _dy, instanceInfo.rotationGet.z );
 					}
 				}
 

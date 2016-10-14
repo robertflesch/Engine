@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.weapons
 {
+import com.voxelengine.events.InventoryEvent;
+
 import flash.events.KeyboardEvent;
 import flash.ui.Keyboard;	
 
@@ -67,7 +69,7 @@ public class Gun extends ControllableVoxelModel
 				var oa:ObjectAction = new ObjectAction( null, "fire", ammo.guid + ".png", "Fire" );
 				oa.ammoName = ammo.name;
 				oa.instanceGuid = instanceInfo.instanceGuid;
-				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, e.ownerGuid, instanceInfo.instanceGuid, -1, oa ) ); 
+				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, e.ownerGuid, instanceInfo.instanceGuid, -1, oa ) );
 			}
 		}
 	}

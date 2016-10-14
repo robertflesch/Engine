@@ -10,7 +10,10 @@ package {
 	import com.voxelengine.events.AnimationEvent
 	import com.voxelengine.events.AppEvent;
 	import com.voxelengine.renderer.shaders.Shader;
-	import flash.display.Sprite
+import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+
+import flash.display.Sprite
 	import flash.display.StageAlign
 	import flash.display.StageScaleMode
 	import flash.events.Event
@@ -195,7 +198,10 @@ package {
 			if ( Region.currentRegion )
 				RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
 			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.SAVE, 0, null, null, null ) );
-			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, null, null ) );
+			var vm:VoxelModel = VoxelModel.controlledModel;
+			if ( null != vm && vm.instanceInfo ) {
+				InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, vm.instanceInfo.instanceGuid , null ) );
+			}
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) );
 		}
 		

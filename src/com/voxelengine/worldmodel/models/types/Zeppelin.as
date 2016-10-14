@@ -7,8 +7,16 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-	import com.voxelengine.worldmodel.models.types.Engine;
-	import flash.display3D.Context3D;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.Location;
+import com.voxelengine.worldmodel.models.ModelCacheUtils;
+import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.worldmodel.models.types.Engine;
+import com.voxelengine.worldmodel.weapons.Bomb;
+import com.voxelengine.worldmodel.weapons.Gun;
+
+import flash.display3D.Context3D;
     import flash.geom.Vector3D;
 	
 	import flash.events.KeyboardEvent;
@@ -33,11 +41,11 @@ package com.voxelengine.worldmodel.models.types
 		
 		public function Zeppelin( ii:InstanceInfo, mi:ModelInfo ):void 
 		{
-			super( ii, mi );
+			super( ii );
 			Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent, false, 0, true );
-			instanceInfo.track = true;
+			//instanceInfo.track = true;
 		}
-		
+		/*
 		override protected function onChildAdded( me:ModelEvent ):void
 		{
 			if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
@@ -52,7 +60,7 @@ package com.voxelengine.worldmodel.models.types
 				_bombs.push( vm );
 		}
 		
-		protected function throttleEvent( event:ShipEvent ):void
+		override protected function throttleEvent( event:ShipEvent ):void
 		{
 			if ( event.instanceGuid != instanceInfo.instanceGuid )
 				return;
@@ -76,20 +84,20 @@ package com.voxelengine.worldmodel.models.types
 			throw new Error( "Not implemented" );
 			var loc:Location = new Location();
 			loc.setTo( instanceInfo );
-			instanceInfo.setTargetLocation( loc, lastCollisionModel, this, true );
+			//instanceInfo.setTargetLocation( loc, lastCollisionModel, this, true );
 			
 			const STEP_UP_CHECK:Boolean = true;
 			// does model have collision, if no collision, then why bother with gravity
 			if ( instanceInfo.usesCollision )
 			{
-				_collisionCandidates = Globals.whichModelsIsThisInfluencedBy( this )
+				_collisionCandidates = ModelCacheUtils.whichModelsIsThisInfluencedBy( this )
 				//trace( "collisionTest: " + _collisionCandidates.length )
 				if ( 0 == _collisionCandidates.length )
 				{
-					if ( instanceInfo.usesGravity )
+					if ( usesGravity )
 					{
 						var leastFallDistance:Vector3D = new Vector3D( 0, 1, 0 );
-						instanceInfo.velocity.y += leastFallDistance.y;
+//						instanceInfo.velocity.y += leastFallDistance.y;
 						onSolidGround = false;
 					}
 					instanceInfo.setTo( loc );
@@ -106,7 +114,7 @@ package com.voxelengine.worldmodel.models.types
 						{
 							instanceInfo.restoreOld( restorePoint );
 							instanceInfo.velocityReset();
-							instanceInfo.recalculateMatrix();
+//							instanceInfo.recalculateMatrix();
 							return false;
 						}
 						// New position is valid
@@ -123,7 +131,7 @@ package com.voxelengine.worldmodel.models.types
 		{
 			instanceInfo.changed = false;
 			
-			internal_update( context, $elapsedTimeMS );
+			//internal_update( context, $elapsedTimeMS );
 			
 			// Do the things that just a voxel model does
 			// update the edit cursor
@@ -183,5 +191,6 @@ package com.voxelengine.worldmodel.models.types
 					break;
 			}
         }
+        */
 	}
 }

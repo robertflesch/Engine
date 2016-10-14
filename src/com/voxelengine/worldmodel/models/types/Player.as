@@ -331,7 +331,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 
 	static private function defaultSlotDataRequest( $ise:InventorySlotEvent ):void {
 		// inventory is always on a instance guid.
-//		if ( instanceInfo.instanceGuid == $ise.instanceGuid ) {
+		if ( Player.player.instanceInfo.instanceGuid == $ise.instanceGuid ) {
 			Log.out( "Player.getDefaultSlotData - Loading default data into slots" , Log.WARN );
 			
 			var ot:ObjectTool = new ObjectTool( null, "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );
@@ -342,7 +342,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 			
 //			for each ( var gun:Gun in _guns )
 //				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.DEFAULT_REQUEST, instanceInfo.instanceGuid, gun.instanceInfo.instanceGuid, 0, null ) );
-//		}
+		}
 	}
 				
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {

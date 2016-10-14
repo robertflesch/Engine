@@ -64,8 +64,9 @@ public class Slots
 			}
 			else
 				Log.out( "SlotsManager.slotChange _slots container not initialized", Log.WARN );
+
+			_owner.save();
 		}
-		_owner.save();
 	}
 	
 	private function createObjectFromInventoryString( $data:String, $slotId:int ):ObjectInfo {
@@ -159,6 +160,7 @@ public class Slots
 		// so this message is handle by the model class.
 		// might need to be a table driven event also.
 		// so the default data is in the "class inventory" table
+		_owner.loaded = true;
 		InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.DEFAULT_REQUEST, _owner.guid, _owner.guid, 0, null ) );
 	}
 	

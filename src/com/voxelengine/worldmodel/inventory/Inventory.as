@@ -34,7 +34,8 @@ public class Inventory extends PersistanceObject
 	public function get voxels():Voxels  { return _voxels; }
 	
 	public function get loaded():Boolean { return _loaded; }
-	
+	public function set loaded($val:Boolean):void { _loaded = $val; }
+
 	public function Inventory( $guid:String ) {
 		super( $guid, Globals.BIGDB_TABLE_INVENTORY );
 		_slots = new Slots( this );
@@ -60,9 +61,13 @@ public class Inventory extends PersistanceObject
 	
 	override public function save():void {
 		// TODO this needs to detect "changed"
-		if ( !loaded && !changed ) {
-			//Log.out( "Inventory.save - Not LOADED and not changed - guid: " + guid, Log.DEBUG );
+		if ( !loaded ) {
+			Log.out( "Inventory.save - Not LOADED - guid: " + guid, Log.DEBUG );
 			return; 
+		}
+		if ( !changed ) {
+			//Log.out( "Inventory.save - LOADED but not changed - guid: " + guid, Log.DEBUG );
+			return;
 		}
 		//Log.out( "Inventory.save - saving - guid: " + guid, Log.DEBUG );
 		super.save();
@@ -100,7 +105,12 @@ public class Inventory extends PersistanceObject
 		if ( info && info.voxelData ) {
 			var ba:ByteArray = info.voxelData 
 			if ( ba && 0 < ba.bytesAvailable ) {
-				ba.uncompress();
+				try { ba.uncompress(); }
+				catch (error:Error) {
+					Log.out( "Inventory.fromObject - Was expecting compressed data " + guid, Log.WARN ); }
+				ba.position = 0;
+
+//				ba.uncompress();
 				var ownerId:String = ba.readUTF();
 				_voxels.fromObject( ba );
 			}

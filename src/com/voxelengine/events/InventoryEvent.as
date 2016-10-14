@@ -23,6 +23,7 @@ public class InventoryEvent extends Event
 	
 	// Save request no response needed
 	static public const SAVE_REQUEST:String  	= "SAVE_REQUEST";
+	static public const SAVE_FORCE:String  		= "SAVE_FORCE";
 	// User/NP is logging/leaving system out, so remove inventory
 	static public const UNLOAD_REQUEST:String 	= "UNLOAD_REQUEST";
 	

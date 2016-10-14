@@ -24,26 +24,47 @@ public class InventoryManager
 {
 	// There is still some confustion here, do I use network id? that would mean only avatars can have intentory
 	// really I want any model to be able to have inventory. so this is instanceInfo.instanceGuid.
-	static private var  _s_inventoryByGuid:Array = [];
+	static private var  _s_inventoryByGuid:Object = {};
 	
 	static public function init():void {
 		// This creates a inventory object for login.
 		InventoryEvent.addListener( InventoryEvent.UNLOAD_REQUEST, unloadInventory );
 		InventoryEvent.addListener( InventoryEvent.REQUEST, requestInventory );
 		InventoryEvent.addListener( InventoryEvent.SAVE_REQUEST, save );
+		InventoryEvent.addListener( InventoryEvent.SAVE_FORCE, saveForce );
 		InventoryEvent.addListener( InventoryEvent.DELETE, deleteInventory );
 	}
 
 
 	static private function save( e:InventoryEvent ):void {
 		if ( Globals.online ) {
-			for each ( var inventory:Inventory in _s_inventoryByGuid )
-				if ( null != inventory && inventory.guid != "Player" )
-					inventory.save();
+			if ( null == _s_inventoryByGuid[e.owner] && null != e.result )
+				_s_inventoryByGuid[e.owner] == e.result as Inventory;
+
+			var inv:Inventory = _s_inventoryByGuid[e.owner];
+			if ( null != inv ) {
+				inv.save();
+			}
+
+//			for each ( var inventory:Inventory in _s_inventoryByGuid )
+//				if ( null != inventory && inventory.guid != "Player" )
+//					inventory.save();
 		}
 	}
-	
-	
+
+	static private function saveForce( e:InventoryEvent ):void {
+		if ( Globals.online ) {
+			if ( null == _s_inventoryByGuid[e.owner] && null != e.result )
+				_s_inventoryByGuid[e.owner] == e.result as Inventory;
+
+			var inv:Inventory = _s_inventoryByGuid[e.owner];
+			if ( null != inv ) {
+				inv.changed = true;
+				inv.save();
+			}
+		}
+	}
+
 	static private function requestInventory(e:InventoryEvent):void 
 	{
 		Log.out( "InventoryManager.requestInventory - OWNER: " + e.owner, Log.DEBUG );

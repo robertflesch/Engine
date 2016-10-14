@@ -9,6 +9,8 @@
 package com.voxelengine.pools 
 {
 
+import com.voxelengine.worldmodel.oxel.LightInfo;
+
 import flash.utils.getTimer;
 import com.voxelengine.Log;
 import com.voxelengine.worldmodel.oxel.Lighting;
@@ -42,12 +44,14 @@ public final class LightingPool
 		if ( _counter > 0 ) 
 		{
 			var lighting:Lighting = _pool[--_counter];
-			lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).setAll( $baseLightLevel );
+			var light:LightInfo = lighting.lightGet( Lighting.DEFAULT_LIGHT_ID )
+			if ( light )
+				light.setAll( $baseLightLevel );
 			
 			return lighting; 
 		}
 			 
-		Log.out( "BrightnessPool.poolGet - Allocating more Brightness: " + _currentPoolSize );
+		//Log.out( "BrightnessPool.poolGet - Allocating more Brightness: " + _currentPoolSize );
 		var timer:int = getTimer();
 
 		_currentPoolSize += GROWTH_VALUE;
@@ -59,7 +63,7 @@ public final class LightingPool
 		}
 		_counter = newIndex - 1; 
 		
-		Log.out( "BrightnessPool.poolGet - Done allocating more Brightness: " + _currentPoolSize  + " took: " + (getTimer() - timer) );
+		//Log.out( "BrightnessPool.poolGet - Done allocating more Brightness: " + _currentPoolSize  + " took: " + (getTimer() - timer) );
 		return poolGet( $baseLightLevel ); 
 	} 
 

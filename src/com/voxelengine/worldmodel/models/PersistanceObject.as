@@ -108,8 +108,24 @@ public class PersistanceObject
 	private function createSucceed( $pe:PersistanceEvent ):void { 
 		if ( _table != $pe.table )
 			return;
-		if ( $pe.dbo )
-			_dbo = $pe.dbo;
+		if ( $pe.dbo ) {
+			// the create result was coming back after some additional saves had been made
+			// this was causing data to be lost!! So first save data, then copy over dbo, then restore data!
+			if ( dbo && dbo.data ) {
+				var dataBackup:Object = dbo.data;
+				_dbo = $pe.dbo;
+				for ( var key:String in dataBackup ) {
+                    Log.out( "PersistanceObject key: " + key );
+					_dbo[key] = dataBackup[key];
+				}
+                if ( _dbo.data )
+                        delete _dbo.data;
+                changed = true;
+                save();
+			}
+			else
+				_dbo = $pe.dbo;
+		}
 		removeSaveEvents();
 		Log.out( getQualifiedClassName( this ) + ".createSuccess - created: " + guid + " in table: " + $pe.table, Log.DEBUG ); 
 	}	

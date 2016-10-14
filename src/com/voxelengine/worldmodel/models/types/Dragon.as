@@ -122,7 +122,7 @@ public class Dragon extends Beast
 			return;
 			
 		clipVelocityFactor = 0.995;
-		var climbFactor:Number = ( mMaxClimbAngle + instanceInfo.rotationGet.x) / mMaxClimbAngle;
+		var climbFactor:Number = ( maxClimbAngle + instanceInfo.rotationGet.x) / maxClimbAngle;
 		
 		if ( onSolidGround )
 		{
@@ -130,7 +130,7 @@ public class Dragon extends Beast
 			instanceInfo.velocityReset();
 			stateLock( true, 500 );
 		}
-		else if ( mStallSpeed > instanceInfo.velocityGet.z )
+		else if ( stallSpeed > instanceInfo.velocityGet.z )
 		{
 			updateAnimations( "Land", 0.5 );
 			clipVelocityFactor = 0.95;
@@ -191,11 +191,12 @@ public class Dragon extends Beast
 		{
 			var vel:Vector3D = instanceInfo.velocityGet;
 			var speedVal:Number = instanceInfo.speed( $elapsedTimeMS ) / 4;
+
+			speedVal = 0.5;
 			
 			// Add in movement factors
 			if ( MouseKeyboardHandler.forward )	{ 
-				if ( instanceInfo.velocityGet.length < maxSpeed )
-				{
+				if ( instanceInfo.velocityGet.length < maxSpeed ) {
 					instanceInfo.velocitySetComp( 0, 0, vel.z + speedVal ); 
 					changed = true; 
 					mForward = true; }

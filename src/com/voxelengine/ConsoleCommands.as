@@ -213,9 +213,13 @@ public class ConsoleCommands {
 							  , 2048
 							  , 96 );
 	}
-	
-	private static function tunnelNetwork():void
-	{
+
+
+	private static function tunnelNetworkDragon():void {
+		tunnelNetwork( 2048, 96, 6 );
+	}
+
+	private static function tunnelNetwork( $tunnelLength:int = 2048, $tunnelSize:int = 96, $minSize:int = 4 ):void {
 		if ( !VoxelModel.selectedModel ) {
 			Log.out( "ConsoleCommands.CarveTunnels  No model selected", Log.WARN );
 			return;
@@ -235,8 +239,9 @@ public class ConsoleCommands {
 							   , ModelCacheUtils.gci.point
 							   , ModelCacheUtils.viewVectorNormalizedGet()
 							   , TypeInfo.AIR
-							   , 2048
-							   , 96 );
+							   , $tunnelLength
+							   , $tunnelSize
+							   , $minSize);
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -337,7 +342,8 @@ public class ConsoleCommands {
 		
 		DConsole.createCommand( "tunnel", tunnel );
 		DConsole.createCommand( "tunnelNetwork", tunnelNetwork );
-		
+		DConsole.createCommand( "tunnelNetworkDragon", tunnelNetworkDragon );
+
 		DConsole.createCommand( "lavaSpheres", lavaSphere );
 		DConsole.createCommand( "waterSpheres", waterSphere );
 		DConsole.createCommand( "lavaSpheresRandom", lavaSpheres );

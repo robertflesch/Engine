@@ -346,6 +346,8 @@ public class VertexIndexBuilder
 			catch ( e:Error) {
 				Log.out( "VertexIndexBuilder.BufferCopyToGPU - Error caught: " + e.message );
 				Log.out( e.getStackTrace() );
+				if ( e.errorID == 3601 ) // Error #3601: No valid index buffer set.
+					dirty = true; // Force rebuilding of index buffer. Got this error when installing MySQL Workbench while testing app
 			}
 		}
 		//trace ( "VertexIndexBuilder.bufferCopyToGPU - took: "  + (getTimer() - timer) + "  to process " + _buffers + " buffers" );			
