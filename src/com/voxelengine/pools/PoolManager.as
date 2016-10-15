@@ -37,7 +37,7 @@ import com.voxelengine.worldmodel.MemoryManager;
 			ChildOxelPool.initialize( INITIAL_POOL_SETTINGS, INITIAL_POOL_SETTINGS* 2/8 );
 			QuadPool.initialize( INITIAL_POOL_SETTINGS * 4, INITIAL_POOL_SETTINGS/2 );
 			QuadsPool.initialize( INITIAL_POOL_SETTINGS * 1.7, INITIAL_POOL_SETTINGS/6 );
-			LightingPool.initialize( INITIAL_POOL_SETTINGS * 10, INITIAL_POOL_SETTINGS );
+			LightingPool.initialize( INITIAL_POOL_SETTINGS * 1, INITIAL_POOL_SETTINGS ); // 10
 			FlowInfoPool.initialize( INITIAL_POOL_SETTINGS * 10, INITIAL_POOL_SETTINGS );
 			NeighborPool.initialize( INITIAL_POOL_SETTINGS * 2.5, INITIAL_POOL_SETTINGS );
 			VertexIndexBuilderPool.initialize( INITIAL_POOL_SETTINGS/50, INITIAL_POOL_SETTINGS/200 );

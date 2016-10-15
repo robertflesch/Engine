@@ -6,17 +6,10 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory {
-	
-import com.voxelengine.events.CursorOperationEvent;
-import com.voxelengine.worldmodel.models.types.EditCursor;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import flash.utils.ByteArray;
 
 import com.voxelengine.Log;
-import com.voxelengine.Globals;
+import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.events.InventorySlotEvent;
-import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.*;
 
 public class Slots
 {

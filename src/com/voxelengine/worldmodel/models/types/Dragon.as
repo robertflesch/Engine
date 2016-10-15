@@ -56,10 +56,11 @@ public class Dragon extends Beast
 //		InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_RESPONSE, defaultSlotDataResponse );
 		FunctionRegistry.functionAdd( loseControlHandler, "loseControlHandler" );
 	}
-	
-	static public function buildExportObject( obj:Object ):void {
-		Beast.buildExportObject( obj )
+
+	override public function buildExportObject( obj:Object ):Object {
+		super.buildExportObject( obj )
 		obj.dragon = new Object();
+		return obj;
 	}
 	
 	override protected function processClassJson():void {

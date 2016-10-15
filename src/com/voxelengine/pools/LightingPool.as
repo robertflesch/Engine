@@ -19,7 +19,7 @@ public final class LightingPool
 { 
 	private static var _currentPoolSize:uint; 
 	private static var GROWTH_VALUE:uint; 
-	private static var _counter:uint; 
+	private static var _counter:uint = 0;
 	private static var _pool:Vector.<Lighting>; 
 	
 	static public function remaining():uint { return _counter; }
@@ -51,7 +51,7 @@ public final class LightingPool
 			return lighting; 
 		}
 			 
-		//Log.out( "BrightnessPool.poolGet - Allocating more Brightness: " + _currentPoolSize );
+		Log.out( "BrightnessPool.poolGet - Allocating more Brightness: " + _currentPoolSize );
 		var timer:int = getTimer();
 
 		_currentPoolSize += GROWTH_VALUE;
@@ -63,7 +63,7 @@ public final class LightingPool
 		}
 		_counter = newIndex - 1; 
 		
-		//Log.out( "BrightnessPool.poolGet - Done allocating more Brightness: " + _currentPoolSize  + " took: " + (getTimer() - timer) );
+		Log.out( "BrightnessPool.poolGet - Done allocating more Brightness: " + _currentPoolSize  + " took: " + (getTimer() - timer) );
 		return poolGet( $baseLightLevel ); 
 	} 
 

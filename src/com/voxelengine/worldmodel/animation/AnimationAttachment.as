@@ -63,11 +63,13 @@ public class AnimationAttachment
 		_instanceInfo.fromObject( $obj );
 	}
 /*
-	public function buildExportObject( obj:Object ):void {			
-		obj.fileName 		= _guid;
+	 override public function buildExportObject( obj:Object ):Object {
+	 	super.buildExportObject( obj );
+		 obj.fileName 		= _guid;
 		obj.attachsTo 		= _attachsTo;
 		obj.location		= _instanceInfo.positionGet;
 		obj.rotation		= _instanceInfo.rotationGet;
+		return obj;
 	}
 	*/
 	public function toObject( ):Object {			

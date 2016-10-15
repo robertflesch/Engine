@@ -9,7 +9,8 @@
 package {
 	import com.voxelengine.events.AnimationEvent
 	import com.voxelengine.events.AppEvent;
-	import com.voxelengine.renderer.shaders.Shader;
+import com.voxelengine.pools.PoolManager;
+import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
@@ -272,7 +273,7 @@ class StartupSynchronizer
 		
 		WindowSplashEvent.addListener( WindowSplashEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded );
 		WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.CREATE ) );
-		
+
 		RegionManager.instance;
 		ConfigManager.instance;
 		//ConfigManager.instance.init( $startingModelToDisplay )
@@ -334,7 +335,7 @@ class VVInitializer
 		//Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG )
 		
 		Globals.g_renderer.init( $stage );
-		// adds handlers for persistance of regions
+		// adds handlers for persistence of regions
 		Persistance.addEventHandlers();
 		
 		VoxelVerseGUI.currentInstance.init();

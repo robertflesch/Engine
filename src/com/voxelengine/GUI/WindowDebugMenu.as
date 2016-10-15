@@ -35,11 +35,12 @@ package com.voxelengine.GUI
 		private var _smids:Vector.<StaticMemoryDisplay> = new Vector.<StaticMemoryDisplay>;
 		private var _modelLoc:Label = new Label();
 		private var _gcLabel:Label = new Label("grain: 0 x: 0  y: 0  z: 0");
+		private var _cmLabel:Label = new Label("grain: 0 x: 0  y: 0  z: 0"); // Controlled model stats
 
 		
 		public function WindowDebugMenu():void 
 		{ 
-			super( 100, 100 );
+			super( 500, 100 );
 			_s_currentInstance = this;
 			
 			//glowColor = "red";
@@ -112,11 +113,16 @@ package com.voxelengine.GUI
 			addSpace();
 			
 			addString( "selected model:", null );
+			addString( "controlled model:", null );
 
 			_gcLabel.textAlign = TextAlign.CENTER;
 			_gcLabel.textFormat.color = 0xFFFFFF;
 			addElement( _gcLabel );
-			
+
+			_cmLabel.textAlign = TextAlign.LEFT;
+			_cmLabel.textFormat.color = 0xFFFFFF;
+			addElement( _cmLabel );
+
 			//addStaticMemoryNumberDisplay( _target, 100, 0, "           Total Voxels: ", Quad.count );
 			
 			display( 0, 250 )	
@@ -129,7 +135,8 @@ package com.voxelengine.GUI
 		
         protected function onResize(event:Event):void
         {
-			move( Globals.g_renderer.width - 160, 150 );
+			//move( Globals.g_renderer.width - 160, 150 ); right side
+			move( 20, 150 );
 		}
 		
 		private function addInt( title:String, callback:Function ):void
@@ -186,6 +193,7 @@ package com.voxelengine.GUI
 			}
 			
 			updateGC();
+			updateCMStats();
 		}
 
 		private function updateGC():void
@@ -200,7 +208,15 @@ package com.voxelengine.GUI
 				}
 			}
 		}
-		
+
+		private function updateCMStats():void
+		{
+			// TO DO I dont like this direct call into the EditCursor
+			if (Globals.g_app && VoxelModel.controlledModel ) {
+				_cmLabel.text = JSON.stringify(VoxelModel.controlledModel.buildExportObject( {} ));
+			}
+		}
+
 		private function addModelLocation():void
 		{
 			addElement( _modelLoc );

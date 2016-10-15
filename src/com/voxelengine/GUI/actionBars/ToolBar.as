@@ -10,8 +10,6 @@ package com.voxelengine.GUI.actionBars
 {
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.GUI.VVCanvas;
-	import com.voxelengine.worldmodel.inventory.ObjectInfo;
-	import com.voxelengine.worldmodel.models.types.EditCursor;
 	import flash.events.Event;
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
@@ -19,7 +17,6 @@ package com.voxelengine.GUI.actionBars
 	
 	import org.flashapi.swing.Box;
 	import org.flashapi.swing.Image;
-	import org.flashapi.swing.Label;
     import org.flashapi.swing.event.UIMouseEvent;
     import org.flashapi.swing.event.UIOEvent;
 	import org.flashapi.swing.core.UIObject;

@@ -33,9 +33,10 @@ public class Trigger extends VoxelModel
 	public function Trigger( $ii:InstanceInfo ) { 
 		super( $ii );
 	}
-	
-	static public function buildExportObject( obj:Object ):void {
-		VoxelModel.buildExportObject( obj )
+
+	override public function buildExportObject( obj:Object ):Object {
+		super.buildExportObject( obj )
+		return obj;
 	}
 	
 	override public function update(context:Context3D, elapsedTimeMS:int):void {

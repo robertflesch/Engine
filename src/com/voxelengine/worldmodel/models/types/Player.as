@@ -97,9 +97,10 @@ public class Player extends Avatar
 		if ( _displayCollisionMarkers )
 			_ct.markersAdd();
 	}
-	
-	static public function buildExportObject( obj:Object ):void {
-		Avatar.buildExportObject( obj )
+
+	override public function buildExportObject( obj:Object ):Object {
+		super.buildExportObject( obj )
+		return obj;
 	}
 	
 	override protected function processClassJson():void {

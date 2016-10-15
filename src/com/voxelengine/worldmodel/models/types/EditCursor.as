@@ -177,8 +177,10 @@ public class EditCursor extends VoxelModel
 					CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, modelInfo.data.oxel.gc.grain ) );
 				}
 			else {
-				modelInfo.data.oxel.gc.bound = e.size;
-				modelInfo.data.oxel.gc.grain = e.size;
+				if ( modelInfo && modelInfo.data && modelInfo.data.oxel ) {
+					modelInfo.data.oxel.gc.bound = e.size;
+					modelInfo.data.oxel.gc.grain = e.size;
+				}
 			}
 		}
 	}

@@ -33,7 +33,7 @@ package com.voxelengine.worldmodel.models.types
 		// Trying to keep these numbers between 1 and 100
 		static private var  _climbRate:SecureNumber = new SecureNumber( 70 );
 		static private var	_maxClimbAngle:SecureNumber = new SecureNumber( 45 );
-		static private var  _maxTurnRate:SecureNumber = new SecureNumber( 0.01 );
+		static private var  _maxTurnRate:SecureNumber = new SecureNumber( 100 );
 		static private var  _stallSpeed:SecureNumber = new SecureNumber( 2 );
         static protected    const DEFAULT_SPEED_X:Number		= 1.0;
         static private var  _speedMultiplier:Number 				= DEFAULT_SPEED_X;
@@ -73,10 +73,10 @@ package com.voxelengine.worldmodel.models.types
 			instanceInfo.usesCollision = true;
 			//usesGravity = true;
 			collisionMarkers = true;
-		}		
+		}
 
-		static public function buildExportObject( obj:Object ):Object {
-			ControllableVoxelModel.buildExportObject( obj )
+		override public function buildExportObject( obj:Object ):Object {
+			super.buildExportObject( obj )
 			obj.beast 					= new Object();
 			obj.beast.moveSpeed 		= _speedMultiplier;
 			obj.beast.maxTurnRate 		= maxTurnRate;

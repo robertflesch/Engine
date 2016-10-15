@@ -23,8 +23,6 @@ import flash.utils.Timer;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
 import flash.net.FileReference;
-import flash.system.System;	
-import flash.utils.getTimer;
 
 import com.adobe.images.JPGEncoder;	
 
@@ -33,16 +31,8 @@ import com.voxelengine.Log;
 
 import com.voxelengine.events.ContextEvent;
 import com.voxelengine.events.WindowWaterEvent;
-import com.voxelengine.renderer.shaders.Shader;
-import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.TextureBank;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.models.Camera;
-import com.voxelengine.worldmodel.models.CameraLocation;
-import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.Location;
-import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.oxel.Oxel;
