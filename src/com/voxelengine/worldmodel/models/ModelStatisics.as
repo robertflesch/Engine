@@ -43,12 +43,9 @@ package com.voxelengine.worldmodel.models
 		public function get range():int { return _solid_max - _solid_min };
 		public function get count():int { return _count };
 		public function get countInMeters():int { return _count/GRAINS_PER_SQUARE_METER };
-		
-		static private var _TempFlowInfo:FlowInfo = new FlowInfo();
-		static private var _TempBrightness:Lighting = LightingPool.poolGet( 0x12 );
 
-		private function initialize():void
-		{
+		private function initialize():void {
+
 			_x_max = 0;
 			_x_min = 2048;
 			_y_max = 0;
