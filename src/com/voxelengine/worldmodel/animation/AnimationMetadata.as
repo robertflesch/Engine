@@ -27,7 +27,7 @@ public class AnimationMetadata
 {
 	static private const INVALID:String = "INVALID"
 	private var _permissions:PermissionsBase;
-/*	private var _name:String 		= INVALID;
+	private var _name:String 		= INVALID;
 	private var _guid:String 		= INVALID;
 	private var _aniType:String 	= INVALID;
 	private var _description:String = INVALID;
@@ -35,7 +35,7 @@ public class AnimationMetadata
 	private var _animationClass:String 	= AnimationCache.MODEL_UNKNOWN;
 	private var _world:String		= Globals.VOXELVERSE;
 	private var _modelGuid:String;
-*/
+
 	protected var 	_info:Object;
 	////////////
 
@@ -58,18 +58,19 @@ public class AnimationMetadata
 	//////////////////////////////////////////////////////////////////
 
 	public function toObject( $ba:ByteArray ):Object {
-		
+
 		var metadataObj:Object =   { name: 			_name
 								   , description: 	_description
 								   , aniType: 		_aniType
 								   , owner: 		_owner
-								   , modifiedDate: 	_modifiedDate
+								   //, modifiedDate: 	_modifiedDate
 								   , animationClass:	 _animationClass
 								   , modelGuid: 	_modelGuid
 								   , world: 		_world
 								   , data: 			$ba }
-		metadataObj = _permissions.addToObject( metadataObj );
-		return metadataObj;						   
+		//metadataObj = _permissions.addToObject( metadataObj );
+		return metadataObj;
+
 	}
 }
 }

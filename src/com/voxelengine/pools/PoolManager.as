@@ -12,15 +12,17 @@ package com.voxelengine.pools
 import com.voxelengine.Log;
 import com.voxelengine.pools.*;
 import com.voxelengine.worldmodel.MemoryManager;
-     
-	public final class PoolManager
+
+import flash.utils.getTimer;
+
+public final class PoolManager
 	{ 
 		// this uses up 3.6 gig of memory
 		//private static const INITIAL_POOL_SETTINGS:int = 1200000;
 		// this uses up ?? gig of memory
 		//private static const INITIAL_POOL_SETTINGS:int = 600000;
 		// this uses up 1.2 gig of memory
-		//private static const INITIAL_POOL_SETTINGS:int = 400000;
+		//private static const INITIAL_POOL_SETTINGS:int = 400000; // ~15.6 seconds
 		// USE THIS FOR ISLANDS (g12)
 		// this uses up 687 meg of memory
 		//private static const INITIAL_POOL_SETTINGS:int = 250000;
@@ -34,6 +36,8 @@ import com.voxelengine.worldmodel.MemoryManager;
 		
 		public function PoolManager()
 		{
+			Log.out( "PoolManager.construct");
+			var time:int = getTimer();
 			ChildOxelPool.initialize( INITIAL_POOL_SETTINGS, INITIAL_POOL_SETTINGS* 2/8 );
 			QuadPool.initialize( INITIAL_POOL_SETTINGS * 4, INITIAL_POOL_SETTINGS/2 );
 			QuadsPool.initialize( INITIAL_POOL_SETTINGS * 1.7, INITIAL_POOL_SETTINGS/6 );
@@ -46,6 +50,7 @@ import com.voxelengine.worldmodel.MemoryManager;
 			OxelPool.initialize( INITIAL_POOL_SETTINGS * 6, INITIAL_POOL_SETTINGS );
 			//ParticlePool.initialize( INITIAL_POOL_SETTINGS/1000, INITIAL_POOL_SETTINGS/200 );
 			ProjectilePool.initialize( INITIAL_POOL_SETTINGS/1000, INITIAL_POOL_SETTINGS/200 );
+			Log.out( "PoolManager.construct - end: " + (getTimer() - time) );
 		}
 	}
 

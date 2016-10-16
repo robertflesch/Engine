@@ -150,8 +150,8 @@ public class ModelTransform
 	
 	// Animations use these as throw aways, when scaling animations
 	public function clone( $val:Number ):ModelTransform {
-		Log.out( "ModelTransform.clone - "  + " type: " + type + " x: " + _originalDelta.x + " y: " + _originalDelta.y + " z: " + _originalDelta.z
-		       + " time: " + time + " name: " + name, Log.WARN );
+		//Log.out( "ModelTransform.clone - "  + " type: " + type + " x: " + _originalDelta.x + " y: " + _originalDelta.y + " z: " + _originalDelta.z
+		//       + " time: " + time + " name: " + name, Log.WARN );
 		var mt:ModelTransform = new ModelTransform( _originalDelta.x
 												  , _originalDelta.y
 												  , _originalDelta.z
