@@ -8,9 +8,6 @@
             <entry library-id="48f9b327-4678-43d7-b9fb-d2f59f02eb89">
               <dependency linkage="Merged" />
             </entry>
-            <entry library-id="b81615cc-5417-4633-a59a-26751b08fec1">
-              <dependency linkage="Merged" />
-            </entry>
           </entries>
           <sdk name="22.0" />
         </dependencies>
@@ -25,9 +22,6 @@
         <dependencies target-player="22.0">
           <entries>
             <entry library-id="558cca8f-e53a-41d4-be0a-081cf3c8cf31">
-              <dependency linkage="Merged" />
-            </entry>
-            <entry library-id="d8929b53-2ccc-4741-8efb-aa60b0dfa0a4">
               <dependency linkage="Merged" />
             </entry>
           </entries>
@@ -65,29 +59,9 @@
     </orderEntry>
     <orderEntry type="module-library" exported="">
       <library type="flex">
-        <properties id="b81615cc-5417-4633-a59a-26751b08fec1" />
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/DConsole2.3.swc!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library type="flex">
         <properties id="558cca8f-e53a-41d4-be0a-081cf3c8cf31" />
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/PlayerIOClient.swc!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" exported="">
-      <library type="flex">
-        <properties id="d8929b53-2ccc-4741-8efb-aa60b0dfa0a4" />
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/DConsole2.3.swc!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />
