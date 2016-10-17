@@ -67,9 +67,9 @@ package com.voxelengine.worldmodel
 			loc.grain = grain;
 			_oxel = new Oxel( null, loc , TypeInfo.STONE );
 			_oxel.faces_set_all();
-			Quad.texture_scale_set( 1.0 );
+			Quad.textureScaleSet(1.0);
 			_oxel.quads_build_sky( plane_facing );
-			Quad.texture_scale_set( 1.0/4.0 );
+			Quad.textureScaleSet(1.0 / 4.0);
 			_bufferObject.addOxel( _oxel );
 		
 			_sunPos = new Vector3D( -1 / 2, 0, 1 / 2);

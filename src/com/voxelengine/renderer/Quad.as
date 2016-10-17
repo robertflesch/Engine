@@ -8,19 +8,15 @@
 
 package com.voxelengine.renderer {
 
-import com.voxelengine.utils.ColorUtils;
-import flash.geom.Vector3D;
-import flash.utils.getTimer;
-
-import com.voxelengine.Globals
+import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.worldmodel.oxel.Lighting;
-import com.voxelengine.worldmodel.oxel.FlowInfo;
-import com.voxelengine.worldmodel.oxel.FlowScaling;
+import com.voxelengine.renderer.vertexComponents.*;
 import com.voxelengine.worldmodel.TileType;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.renderer.vertexComponents.*;
-	
+import com.voxelengine.worldmodel.oxel.FlowInfo;
+import com.voxelengine.worldmodel.oxel.FlowScaling;
+import com.voxelengine.worldmodel.oxel.Lighting;
+
 public class Quad {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//     Static Variables
@@ -42,7 +38,7 @@ public class Quad {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//     Static Functions
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public static function texture_scale_set( val:int ):void { _s_textureScale = val; }
+	public static function textureScaleSet(val:int):void { _s_textureScale = val; }
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//     Member Variables

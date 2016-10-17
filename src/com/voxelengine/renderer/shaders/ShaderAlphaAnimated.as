@@ -24,7 +24,7 @@ package com.voxelengine.renderer.shaders
 		}
 		
 		override public function update( mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, selected:Boolean, $isChild:Boolean = false ): Boolean {
-			if ( !update_texture( $context ) )
+			if ( !updateTexture( $context ) )
 				return false;
 			
 			$context.setProgram( program3D );	

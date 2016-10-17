@@ -29,6 +29,7 @@ package com.voxelengine.renderer.shaders
 	
 	public class Shader {
 
+		static private      var     _lastTextureName:String;
 		static private      var     _s_lights:Vector.<ShaderLight> = new Vector.<ShaderLight>();
 		static protected	var		_textureOffsetU:Number = 0.0
 		static protected	var		_textureOffsetV:Number = 0.0
@@ -71,7 +72,7 @@ package com.voxelengine.renderer.shaders
 
 		
 		public function Shader( $context:Context3D ) {
-			Quad.texture_scale_set( textureScale );
+			Quad.textureScaleSet(textureScale);
 		}
 		
 		public function release():void { dispose(); }
@@ -317,8 +318,11 @@ package com.voxelengine.renderer.shaders
 				_textureScale = Number(json.textureScale);
 		}
 		
-		protected function update_texture( $context:Context3D ): Boolean {
-			
+		protected function updateTexture($context:Context3D ): Boolean {
+
+			if ( _lastTextureName == textureName)
+				return true;
+
 			var tex0:Texture = TextureBank.instance.getTexture( $context, textureName );
 			//var tex1:Texture = TextureBank.instance.getTexture( "assets/textures/x.png" );
 			if ( !tex0 )
@@ -332,9 +336,10 @@ package com.voxelengine.renderer.shaders
 				//$context.setTextureAt( 0, null );
 				//$context.setTextureAt( 1, null );
 				$context.setTextureAt( 0, tex0 );
+				_lastTextureName = textureName;
 				//$context.setTextureAt( 1, tex1 );
 			}
-			Quad.texture_scale_set( textureScale );
+			Quad.textureScaleSet(textureScale);
 			
 			return true;
 		}
