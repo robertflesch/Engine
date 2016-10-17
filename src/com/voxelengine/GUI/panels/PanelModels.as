@@ -93,7 +93,7 @@ public class PanelModels extends PanelBase
 		{
 			if ( vm && !vm.instanceInfo.dynamicObject && !vm.dead )
 			{
-				if ( !Globals.g_debug ) {
+				if ( !Globals.isDebug ) {
 					if ( vm is Player )
 						continue;
 				}

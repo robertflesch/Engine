@@ -93,7 +93,7 @@ public class InventoryPanelRegions extends VVContainer
 		RegionEvent.addListener( ModelBaseEvent.ADDED, regionLoadedEvent );
 		RegionEvent.addListener( ModelBaseEvent.RESULT, regionLoadedEvent );
 		RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId ) );
-		if ( true == Globals.g_debug )
+		if ( true == Globals.isDebug )
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC ) );
 	}
 

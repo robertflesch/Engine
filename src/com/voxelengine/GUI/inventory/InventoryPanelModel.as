@@ -253,7 +253,7 @@ public class InventoryPanelModel extends VVContainer
 		box = addModel( new ObjectAction( box, "createNewObjectIPM", "NewModel128.png", "Click to create new model" ), false );
 		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		
-		if ( Globals.g_debug ) {
+		if ( Globals.isDebug ) {
 			box = addModel( new ObjectAction( box, "importObjectIPM", "import128.png", "Click to import local model" ), false );
 			eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		}

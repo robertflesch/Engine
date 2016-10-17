@@ -65,7 +65,7 @@ package com.voxelengine.server
 				Log.out( "WindowLogin.constructor - unable to open local shared object" );
 			}
 
-			if ( Globals.g_debug ) {
+			if ( Globals.isDebug ) {
 				defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION;
 				// calls the close function when window shuts down, which closes the splash screen in debug.
 				onCloseFunction = closeFunction;

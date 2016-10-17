@@ -178,7 +178,7 @@ public class Renderer extends EventDispatcher
 		}
 
 		if ( context3D ) {
-			if ( Globals.g_debug )
+			if ( Globals.isDebug )
 				context3D.enableErrorChecking = true;
 			else	
 				context3D.enableErrorChecking = false;

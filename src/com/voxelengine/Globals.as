@@ -102,8 +102,10 @@ package com.voxelengine {
 		public static var GAME_ID_DEV:String = "voxelversedev-yeiensar20ofthu906l6ma"
 		//public static var g_gamesNetworkID:String = "servertestgame-co3lwnb10a4ytwvxddjtq";
 		
-		public static var g_debug:Boolean  = false;
-				
+		private static var g_debug:Boolean  = false;
+		public static function get isDebug():Boolean  { return g_debug };
+		public static function set setDebug( $val:Boolean ):void  { g_debug = $val };
+
 		public static const CATEGORY_METAL:String				= "METAL";
 		public static const CATEGORY_LEATHER:String				= "LEATHER";
 		public static const CATEGORY_PLANT:String				= "PLANT";

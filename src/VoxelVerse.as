@@ -44,7 +44,7 @@ public class VoxelVerse extends Sprite
 {
 	private var _timePrevious:int = getTimer();
 
-	private var _showConsole:Boolean;
+	private var _showConsole:Boolean = false;
 	public function get showConsole():Boolean { return _showConsole }
 	public function set showConsole(value:Boolean):void { _showConsole = value }
 
@@ -139,7 +139,7 @@ public class VoxelVerse extends Sprite
 		if ( showConsole )
 			toggleConsole();
 
-		if ( ( 20 < timeRender || 10 < timeUpdate ) && Globals.active && Globals.g_debug )
+		if ( ( 20 < timeRender || 10 < timeUpdate ) && Globals.active && Globals.isDebug )
 			Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed, Log.INFO )
 
 		// For some reason is was important to make sure everything was updated before this got passed on to child classes.
@@ -306,17 +306,18 @@ static public function initialize( $stage:Stage ):void {
 	//Log.out("VVInitializer.initialize", Log.DEBUG )
 	//var strUserAgent:String = String(ExternalInterface.call("function() {return navigator.userAgent}")).toLowerCase()
 
-	Globals.g_debug = Capabilities.isDebugger;
+	Globals.setDebug = Capabilities.isDebugger;
 
-	Log.out("VVInitializer.initialize this is " + (Globals.g_debug ? "debug" : "release") + " build", Log.WARN );
+	Log.out("VVInitializer.initialize this is " + (Globals.isDebug ? "debug" : "release") + " build", Log.WARN );
 
 	var url:String = $stage.loaderInfo.loaderURL;
 	//url = "file:///C:/dev/VoxelVerse/resources/bin/VoxelVerse.swf"
-	var index:int;
-	if ( Globals.g_debug )
+	var index:int = url.lastIndexOf( "VoxelVerse.swf" );
+	if ( -1 == index )
 		index = url.lastIndexOf( "VoxelVerseD.swf" );
-	else
-		index = url.lastIndexOf( "VoxelVerse.swf" );
+	if ( -1 == index )
+			Log.out( "VoxelVerse.initialize - App path not being set correctly appPath: " + url );
+
 	Globals.appPath = url.substring( 0, index );
 	//Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG )
 

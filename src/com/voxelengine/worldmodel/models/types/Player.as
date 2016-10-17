@@ -297,7 +297,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 
 	override protected function cameraAddLocations():void {
-		//if ( Globals.g_debug )
+		//if ( Globals.isDebug )
 		//	camera.addLocation( new CameraLocation( true, 0, 0, 0 ) );
 			
 //			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, 0 ) );

@@ -65,7 +65,7 @@ package com.voxelengine.GUI
 			
 			_s_currentInstance = this;
 			
-			//if ( Globals.g_debug )
+			//if ( Globals.isDebug )
 			//	display( Globals.g_renderer.width - 791, 0 );
 			//else
 				display( 0, 0 );
@@ -81,7 +81,7 @@ package com.voxelengine.GUI
 		} 
 		
         protected function onResize(event:Event):void {
-			/*if ( Globals.g_debug ) {
+			/*if ( Globals.isDebug ) {
 				// this scales the window down, so we can see it, but it shows we are in debug
 				_outline.scaleX = Globals.g_renderer.width/2791;
 				_outline.scaleY = Globals.g_renderer.height/2592;

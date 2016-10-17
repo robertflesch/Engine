@@ -120,7 +120,7 @@ package com.voxelengine.GUI.voxelModels
 			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { ii.scriptName = $e.target.text; }, ii.scriptName, WIDTH ) );
 			const GRAINS_PER_METER:int = 16;
 			addElement( new ComponentLabel( "Size in Meters", String( $vm.modelInfo.data.oxel.gc.size()/GRAINS_PER_METER ), WIDTH ) );
-			if ( Globals.g_debug ) {
+			if ( Globals.isDebug ) {
 				addElement( new ComponentLabel( "Model GUID",  ii.modelGuid, WIDTH ) );
 				addElement( new ComponentLabel( "Instance GUID",  ii.instanceGuid, WIDTH ) );
 			}
@@ -133,7 +133,7 @@ package com.voxelengine.GUI.voxelModels
 				
 			addPermissions()
 //
-			if ( Globals.g_debug )	{
+			if ( Globals.isDebug )	{
 				var oxelUtils:Button = new Button( LanguageManager.localizedStringGet( "Oxel_Utils" ) );
 				oxelUtils.addEventListener(UIMouseEvent.CLICK, oxelUtilsHandler );
 				//oxelUtils.width = pbWidth - 2 * pbPadding;
