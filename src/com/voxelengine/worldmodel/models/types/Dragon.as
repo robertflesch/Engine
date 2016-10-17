@@ -139,13 +139,13 @@ public class Dragon extends Beast
 		else if ( -5 > instanceInfo.rotationGet.x )
 		{
 			updateAnimations( "Fly", 1 - climbFactor );
-			mSpeedMultiplier = 0.35;
+			speedMultiplier = 0.35;
 		}
 		else if ( 15 < instanceInfo.rotationGet.x )
 		{
 			stateSet( "Dive" );
 			clipVelocityFactor = 1;
-			mSpeedMultiplier = 1;
+			speedMultiplier = 1;
 		}
 		// Be fun to make this have the avatar put their arms out to the side
 		else	
@@ -155,12 +155,12 @@ public class Dragon extends Beast
 			if ( mForward )
 			{
 				updateAnimations( "Fly", 0.5 );
-				mSpeedMultiplier = 0.50;
+				speedMultiplier = 0.50;
 			}
 			else
 			{
 				stateSet( "Glide" );
-				mSpeedMultiplier = 0.50;
+				speedMultiplier = 0.50;
 			}
 		}
 	}

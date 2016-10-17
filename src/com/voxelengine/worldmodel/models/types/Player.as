@@ -60,13 +60,6 @@ public class Player extends Avatar
 	static private const 	MIN_TURN_AMOUNT:Number 		= 0.09;
 	static private const 	AVATAR_CLIP_FACTOR:Number 	= 0.90;
 	static private var  	STEP_UP_MAX:int 			= 16;
-	
-	static protected  const DEFAULT_SPEED_X:Number		= 0.5;
-	private var   			_speedMultiplier:Number 				= DEFAULT_SPEED_X;
-	protected function get 	mSpeedMultiplier():Number 				{ return _speedMultiplier; }
-	protected function set 	mSpeedMultiplier($value:Number):void	{ _speedMultiplier = $value; }
-	
-//	override public function get 	maxSpeed():Number 						{ return (_maxSpeed.val * _speedMultiplier); }
 
 	private static var g_player:Player;
 	public static function get player():Player { return g_player; }
