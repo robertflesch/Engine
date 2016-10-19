@@ -253,7 +253,8 @@ public class  UserInventory extends QuickInventory
 				Log.out( "UserInventory.doDrag - didnt find category for: " + e.target.data, Log.WARN );
 		}
 		else if ( e.target.data is ObjectInfo ) {		
-			Log.out( "UserInventory.doDrag - What do I need to do with object info?", Log.WARN );
+			// What do I need to do with object info? for now, just prevent drag
+			return;
 		}
 		
 		UIManager.dragManager.startDragDrop(_dragOp);
