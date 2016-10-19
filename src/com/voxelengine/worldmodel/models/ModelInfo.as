@@ -70,7 +70,7 @@ public class ModelInfo extends PersistanceObject
 	public function set grainSize(val:int):void						{ info.model.grainSize = val; }
 	
 	public function get baseLightLevel():uint 						{ return info.model.baseLightLevel; }
-	public function set baseLightLevel(val:uint):void 				{ info.model.baseLightLevel = val; }
+	public function set baseLightLevel(val:uint):void 				{ info.model.baseLightLevel = val; changed = true; }
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	static public function newObject():Object {
