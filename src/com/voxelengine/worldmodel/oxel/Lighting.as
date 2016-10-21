@@ -487,7 +487,12 @@ public class Lighting  {
 		return changed;
 	}
 
-	public function mergeChildren( $childID:uint, $b:Lighting, $grainUnits:uint, $hasAlpha:Boolean ):void {	
+	public function resetToAmbient():void {
+		_lights = new Vector.<LightInfo>();
+		add( DEFAULT_LIGHT_ID, DEFAULT_COLOR, 0x10, _defaultBaseLightAttn );
+	}
+
+	public function mergeChildren( $childID:uint, $b:Lighting, $grainUnits:uint, $hasAlpha:Boolean ):void {
 		// There is a bug in here, since it is the first three lights that get added.
 		// I should eval each child and see if its light level is higher then one of the current lights
 		var childLightCount:uint = $b._lights.length;

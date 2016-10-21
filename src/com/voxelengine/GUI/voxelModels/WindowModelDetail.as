@@ -107,7 +107,7 @@ package com.voxelengine.GUI.voxelModels
 			lc.layout.orientation = LayoutOrientation.HORIZONTAL;
 			
 			lc.addElement( new ComponentLabelInput( "Light(0-255)"
-									  , function ($e:TextEvent):void { _vm.modelInfo.baseLightLevel = uint( $e.target.label );  }
+									  , function ($e:TextEvent):void { _vm.modelInfo.baseLightLevel = Math.max( Math.min( uint( $e.target.label ), 255 ), 0 );  }
 									  , String( _vm.modelInfo.baseLightLevel )
 									  , WIDTH - 120 ) )
 									  
@@ -185,8 +185,9 @@ package com.voxelengine.GUI.voxelModels
 			if ( _vm.modelInfo.data && _vm.modelInfo.data.oxel ) {
 				var oxel:Oxel = _vm.modelInfo.data.oxel;
 				if ( LightInfo.MAX < int( _vm.modelInfo.baseLightLevel ) )
-					_vm.modelInfo.baseLightLevel = LightInfo.MAX
+					_vm.modelInfo.baseLightLevel = LightInfo.MAX;
 				oxel.lightsStaticSetDefault( _vm.modelInfo.baseLightLevel );
+				_vm.modelInfo.save();
 			}
 		}
 

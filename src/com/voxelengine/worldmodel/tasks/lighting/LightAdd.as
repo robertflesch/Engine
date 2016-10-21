@@ -8,37 +8,37 @@
 
 package com.voxelengine.worldmodel.tasks.lighting
 {
-	import flash.geom.Vector3D;
-
-	import com.developmentarc.core.tasks.events.TaskEvent;
-	
+    import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.LightEvent;
 	import com.voxelengine.pools.LightingPool;
-	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.oxel.Lighting;
-//	import com.voxelengine.worldmodel.oxel.BrightnessTests;
-	import com.voxelengine.worldmodel.tasks.lighting.LightTask;
 
 	/**
 	 * ...
 	 * @author Robert Flesch
 	 */
 	public class LightAdd extends LightTask 
-	{		
-		static public function handleLightEvents( $le:LightEvent ):void {
+	{
+        static public function init():void {
+            LightEvent.addListener( LightEvent.ADD, handleLightEventAdd );
+            LightEvent.addListener( LightEvent.SOLID_TO_ALPHA, handleLightEventS2A );
+            LightEvent.addListener( LightEvent.ALPHA_TO_SOLID, handleLightEventsA2S );
+        }
+
+		static private function handleLightEventAdd( $le:LightEvent ):void {
 			if ( LightEvent.ADD == $le.type )
 			{
 				// This could effect more then one model...
 				// TODO make this work for multiple models. Maybe just use a world location like the explosion code does.
 				var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( $le.instanceGuid );
 				if ( vm ) {
-					var lo:Oxel = vm.oxel.childFind( $le.gc );
+					var lo:Oxel = vm.modelInfo.data.oxel.childFind( $le.gc );
 					if ( Oxel.validLightable( lo ) )
 					{
 						var ti:TypeInfo = TypeInfo.typeInfo[lo.type];
@@ -53,33 +53,36 @@ package com.voxelengine.worldmodel.tasks.lighting
 				else
 					Log.out( "LightAdd.handleLightAddEvent - VoxelModel not found", Log.ERROR );
 			}
-			else if ( LightEvent.SOLID_TO_ALPHA == $le.type )
-			{
-				var vmc:VoxelModel = Region.currentRegion.modelCache.instanceGet( $le.instanceGuid );
-				if ( vmc ) {
-					var co:Oxel = vmc.oxel.childFind( $le.gc );
-					if ( co && Oxel.validLightable( co ) )
-					{
-						// This oxel changed from solid to AIR or Translucent
-						// So I just need to rebalance it as an AIR oxel
-						var airAttn:uint = TypeInfo.typeInfo[ TypeInfo.AIR ].lightInfo.attn;
-						const attnScaling:uint = co.lighting.materialFallOffFactor * airAttn * (co.gc.size() / Globals.UNITS_PER_METER);
-						co.lighting.balanceAttnAll( attnScaling );
-						// REVIEW - Just grabbing the ID of the brightest light, but I THINK all will spread.
-						// Did not work correctly with just brightest light in other places, replacing here with all lights
-						var lights:Vector.<uint> = co.lighting.lightIDNonDefaultUsedGet();
-						for each ( var lightsOnThisOxel:uint in lights )
-							addTask( $le.instanceGuid, $le.gc, lightsOnThisOxel, Globals.ALL_DIRS );						
-					}
-					else
-						Log.out( "LightAdd.handleLightAddEvent - invalid light source", Log.ERROR );
-				}
-				else
-					Log.out( "LightAdd.handleLightAddEvent - VoxelModel not found", Log.ERROR );
-				
-			}
 		}
-		 
+
+        static private function handleLightEventS2A( $le:LightEvent ):void {
+            var vmc:VoxelModel = Region.currentRegion.modelCache.instanceGet( $le.instanceGuid );
+            if ( vmc ) {
+                var co:Oxel = vmc.modelInfo.data.oxel.childFind( $le.gc );
+                if ( co && Oxel.validLightable( co ) )
+                {
+                    // This oxel changed from solid to AIR or Translucent
+                    // So I just need to rebalance it as an AIR oxel
+                    var airAttn:uint = TypeInfo.typeInfo[ TypeInfo.AIR ].lightInfo.attn;
+                    const attnScaling:uint = co.lighting.materialFallOffFactor * airAttn * (co.gc.size() / Globals.UNITS_PER_METER);
+                    co.lighting.balanceAttnAll( attnScaling );
+                    // REVIEW - Just grabbing the ID of the brightest light, but I THINK all will spread.
+                    // Did not work correctly with just brightest light in other places, replacing here with all lights
+                    var lights:Vector.<uint> = co.lighting.lightIDNonDefaultUsedGet();
+                    for each ( var lightsOnThisOxel:uint in lights )
+                        addTask( $le.instanceGuid, $le.gc, lightsOnThisOxel, Globals.ALL_DIRS );
+                }
+                else
+                    Log.out( "LightAdd.handleLightAddEvent - invalid light source", Log.ERROR );
+            }
+            else
+                Log.out( "LightAdd.handleLightAddEvent - VoxelModel not found", Log.ERROR );
+        }
+
+        static private function handleLightEventsA2S( $le:LightEvent ):void {
+//            var vmc:VoxelModel = Region.currentRegion.modelCache.instanceGet( $le.instanceGuid );
+        }
+
 		static private function addTask( $instanceGuid:String, $gc:GrainCursor, $lightID:uint, $lightDir:uint ):void {
 			var lt:LightAdd = new LightAdd( $instanceGuid, $gc, $lightID, $lightDir, $gc.toID(), $gc.grain );
 			lt.selfOverride = true;
@@ -110,7 +113,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 			if ( vm ) {
 			
 				try {
-					var lo:Oxel = vm.oxel.childFind( _gc );
+					var lo:Oxel = vm.modelInfo.data.oxel.childFind( _gc );
 					if ( Oxel.validLightable( lo ) ) {
 						
 						if ( !lo.gc.is_equal( _gc ) )
@@ -147,7 +150,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 				var no:Oxel = $lo.neighbor(face);
 					
 				if ( !Oxel.validLightable( no ) ) continue;
-				if ( no.isLight ) continue;
+				if ( TypeInfo.isLight( no.type ) ) continue;
 				if ( checkIfProcessed( no ) ) continue;
 				
 				if ( no.gc.grain > $lo.gc.grain )  // implies it has no children.
@@ -172,7 +175,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 			}					
 			else 
 			{
-				if ( true == $no.isSolid ) // this is a SOLID object which does not transmit light (leaves, water are exceptions)
+				if ( true == TypeInfo.isSolid( $no.type ) ) // this is a SOLID object which does not transmit light (leaves, water are exceptions)
 				{
 					if ( $no.lighting.influenceAdd( lightID, $lo.lighting, $face, true, $no.gc.size() ) )
 						rebuildFace( $no, $face );
@@ -208,7 +211,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 			
 			var grainUnits:uint = $lo.gc.size();
 			// project the light oxel onto the virtual brightness
-			bt.influenceAdd( lightID, $lo.lighting, $face, !$no.hasAlpha, grainUnits );
+			bt.influenceAdd( lightID, $lo.lighting, $face, !TypeInfo.hasAlpha($no.type), grainUnits );
 			if ( !bt.valuesHas() )
 				return false;
 
@@ -219,7 +222,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 				var childID:uint = Oxel.childIdOpposite( $face, currentLo.gc.childId() );	
 				btp.reset();
 				// now extend the brightness child onto its parent!
-				btp.childAdd( lightID, childID, bt, grainUnits, !$no.hasAlpha );
+				btp.childAdd( lightID, childID, bt, grainUnits, !TypeInfo.hasAlpha($no.type) );
 				bt.copyFrom( btp );
 				grainUnits *= 2;
 				// if sizeDiff is 2 or great, we have to recalculate the child id for the lo's parent
@@ -241,7 +244,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 			LightingPool.poolReturn( btp );
 			
 			if ( changed ) {
-				if ( true == $no.isSolid ) { // this is a SOLID object which does not transmit light (leaves, water are exceptions)
+				if ( true == !TypeInfo.isSolid($no.type)  ) { // this is a SOLID object which does not transmit light (leaves, water are exceptions)
 					rebuildFace( $no, $face );
 				} else if ( TypeInfo.AIR == $no.type ) {
 					add( $no );
@@ -261,7 +264,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 			if ( $o.childrenHas() )
 			{
 				for each ( var child:Oxel in $o.children ) {
-					if ( child.isSolid ) return false;
+					if ( !TypeInfo.isSolid(child.type) ) return false;
 					if ( !checkIfProcessed( child ) ) return false;
 				}
 				// lets mark $o as processed for this lightID
@@ -310,8 +313,8 @@ package com.voxelengine.worldmodel.tasks.lighting
 							Log.out( "LightAdd.projectOnNeighborChildren - How do I get here?", Log.ERROR );
 						
 						// Project the virtual brightness object on the real child of the same size
-						if ( noChild.lighting.influenceAdd( lightID, bt, $face, !noChild.hasAlpha, noChild.gc.size() ) ) {
-							if ( noChild.hasAlpha )
+						if ( noChild.lighting.influenceAdd( lightID, bt, $face, !TypeInfo.hasAlpha(noChild.type), noChild.gc.size() ) ) {
+							if ( TypeInfo.hasAlpha( noChild.type ) )
 								add( noChild )
 							else
 								rebuildFace( noChild, $face );
@@ -336,7 +339,7 @@ package com.voxelengine.worldmodel.tasks.lighting
 			if ( checkIfProcessed( $o ) )
 				return;
 			
-			if ( $o.isSolid )
+			if ( TypeInfo.isSolid( $o.type ) )
 			{
 				Log.out( "LightAdd.add - SOLID", Log.ERROR );
 				return;

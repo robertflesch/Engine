@@ -1,5 +1,5 @@
 /*==============================================================================
-Copyright 2011-2015 Robert Flesch
+Copyright 2011-2016 Robert Flesch
 All rights reserved.  This product contains computer programs, screen
 displays and printed documentation which are original works of
 authorship protected under United States Copyright Act.
@@ -9,19 +9,12 @@ package com.voxelengine.worldmodel.models
 {
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
-import flash.geom.Vector3D;
 import flash.utils.Dictionary;
 import flash.utils.getTimer;
-
-//import com.developmentarc.core.datastructures.utils.HashTable;
-
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelEvent;
-import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.models.ModelPlacementType;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.*;
 
 public class ModelCache 
@@ -89,7 +82,7 @@ public class ModelCache
 	public function instancesOfModelGet( $modelGuid:String ):Vector.<VoxelModel>
 	{ 
 		var results:Vector.<VoxelModel> = new Vector.<VoxelModel>();
-		for ( var i:int; i < _instances.length; i++ ) {
+		for ( var i:int= 0; i < _instances.length; i++ ) {
 			var vm:VoxelModel = _instances[i];
 			if ( vm && vm.metadata.guid == $modelGuid )
 				results.push( vm );
@@ -121,7 +114,7 @@ public class ModelCache
 			vm.dead = true;
 		}
 	}
-	
+
 	public function add( vm:VoxelModel ):void {
 		// if this is a child model, give it to parent, 
 		// next check to see if its a dynamic model
@@ -219,7 +212,7 @@ public class ModelCache
 		
 		ModelCacheUtils.worldSpaceStartAndEndPointCalculate();
 
-		var taskTime:int = getTimer();
+		//var taskTime:int = getTimer();
 		// Make sure to call this before the model update, so that models have time to repair them selves.
 		if ( 0 == Globals.g_landscapeTaskController.next() )
 		{
@@ -230,25 +223,25 @@ public class ModelCache
 		else  {
 			Globals.g_landscapeTaskController.paused = false
 		}
-		taskTime = getTimer() - taskTime;
+		//taskTime = getTimer() - taskTime;
 
-		var dynModelTime:int = getTimer();
+		//var dynModelTime:int = getTimer();
 		
 		var vm:VoxelModel;
-		for ( var i:int; i < _instancesDynamic.length; i++ ) {
+		for ( var i:int = 0; i < _instancesDynamic.length; i++ ) {
 			vm = _instancesDynamic[i];
 			vm.update( Globals.g_renderer.context3D,  $elapsedTimeMS );
 		}
 		
-		dynModelTime = getTimer() - dynModelTime;
+		//dynModelTime = getTimer() - dynModelTime;
 		
-		var modelTime:int = getTimer();
+		//var modelTime:int = getTimer();
 		for ( i = 0; i < _instances.length;  i++ ) {
 			vm = _instances[i];
 			vm.update( Globals.g_renderer.context3D,  $elapsedTimeMS );
 		}
 		
-		modelTime = getTimer() - modelTime;
+		//modelTime = getTimer() - modelTime;
 			
 		if ( EditCursor.isEditing )
 			EditCursor.currentInstance.update( Globals.g_renderer.context3D, $elapsedTimeMS);
@@ -270,8 +263,8 @@ public class ModelCache
 	//}
 
 	public function toObject():Array {
-		var models:Array = new Array();
-		for ( var i:int; i < _instances.length; i++ ) {
+		var models:Array = [];
+		for ( var i:int = 0; i < _instances.length; i++ ) {
 			var vm:VoxelModel = _instances[i];
 			if ( vm is Player )
 				continue;
@@ -284,8 +277,8 @@ public class ModelCache
 	}
 	
 	public function bringOutYourDead():void {
-		var vm:VoxelModel
-		for ( var i:int; i < _instances.length; ) {
+		var vm:VoxelModel;
+		for ( var i:int = 0; i < _instances.length; ) {
 			vm = _instances[i];
 			if ( vm && true == vm.dead ) {
 				_instances.splice( i, 1 );
@@ -298,7 +291,7 @@ public class ModelCache
 	
 	public function bringOutYourDeadDynamic():void {
 		var vm:VoxelModel;
-		for ( var i:int; i < _instancesDynamic.length; ) {
+		for ( var i:int = 0; i < _instancesDynamic.length; ) {
 			vm = _instancesDynamic[i];
 			if ( vm && true == vm.dead ) {
 				_instancesDynamic.splice( i, 1 );
@@ -309,12 +302,12 @@ public class ModelCache
 				i++
 		}
 	}
-	
+
 	// Models removed this way are not dead, just no longer part of the parent model loop
 	public function changeFromParentToChild( $vm:VoxelModel ):void {
 
-		var vm:VoxelModel
-		for ( var i:int; i < _instances.length; i++ ) {
+		var vm:VoxelModel;
+		for ( var i:int = 0; i < _instances.length; i++ ) {
 			vm = _instances[i];
 			if ( vm && $vm == vm )
 			{

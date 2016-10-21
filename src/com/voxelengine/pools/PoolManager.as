@@ -18,9 +18,9 @@ import flash.utils.getTimer;
 public final class PoolManager
 	{ 
 		// this uses up 3.6 gig of memory
-		//private static const INITIAL_POOL_SETTINGS:int = 1200000;
+		//private static const INITIAL_POOL_SETTINGS:int = 1200000; // crashes app
 		// this uses up ?? gig of memory
-		//private static const INITIAL_POOL_SETTINGS:int = 600000;
+		//private static const INITIAL_POOL_SETTINGS:int = 600000; // 2.33 gig  22 seconds
 		// this uses up 1.2 gig of memory
 		//private static const INITIAL_POOL_SETTINGS:int = 400000; // ~15.6 seconds
 		// USE THIS FOR ISLANDS (g12)
@@ -28,16 +28,13 @@ public final class PoolManager
 		//private static const INITIAL_POOL_SETTINGS:int = 250000;
 		// this uses up 424 meg of memory (565 meg now with lighting on AlexaIsland)
 		// This is minimum kickstarter setting
-		private static const INITIAL_POOL_SETTINGS:int = 100000;
+		private static const INITIAL_POOL_SETTINGS:int = 100000;  //3.5 seconds
 		//private static const INITIAL_POOL_SETTINGS:int = 50000;
 		//private static const INITIAL_POOL_SETTINGS:int = 30000;
 		// this uses up 157 meg of memory
 		//private static const INITIAL_POOL_SETTINGS:int = 1000;
 		
-		public function PoolManager()
-		{
-			Log.out( "PoolManager.construct");
-			var time:int = getTimer();
+		public function PoolManager() {
 			ChildOxelPool.initialize( INITIAL_POOL_SETTINGS, INITIAL_POOL_SETTINGS* 2/8 );
 			QuadPool.initialize( INITIAL_POOL_SETTINGS * 4, INITIAL_POOL_SETTINGS/2 );
 			QuadsPool.initialize( INITIAL_POOL_SETTINGS * 1.7, INITIAL_POOL_SETTINGS/6 );
@@ -50,7 +47,6 @@ public final class PoolManager
 			OxelPool.initialize( INITIAL_POOL_SETTINGS * 6, INITIAL_POOL_SETTINGS );
 			//ParticlePool.initialize( INITIAL_POOL_SETTINGS/1000, INITIAL_POOL_SETTINGS/200 );
 			ProjectilePool.initialize( INITIAL_POOL_SETTINGS/1000, INITIAL_POOL_SETTINGS/200 );
-			Log.out( "PoolManager.construct - end: " + (getTimer() - time) );
 		}
 	}
 

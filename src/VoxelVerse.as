@@ -7,13 +7,26 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
 package {
+import com.voxelengine.GUI.WindowSplash;
+import com.voxelengine.GUI.WindowWater;
 import com.voxelengine.events.AnimationEvent
 import com.voxelengine.events.AppEvent;
 import com.voxelengine.events.WindowSplashEvent;
+import com.voxelengine.persistance.Persistance;
 import com.voxelengine.pools.PoolManager;
 import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.worldmodel.ConfigManager;
+import com.voxelengine.worldmodel.SoundCache;
+import com.voxelengine.worldmodel.animation.AnimationCache;
+import com.voxelengine.worldmodel.inventory.InventoryManager;
+import com.voxelengine.worldmodel.models.ModelCacheUtils;
+import com.voxelengine.worldmodel.models.ModelInfoCache;
+import com.voxelengine.worldmodel.models.ModelMetadataCache;
+import com.voxelengine.worldmodel.models.OxelPersistanceCache;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
+import com.voxelengine.worldmodel.tasks.lighting.LightRemove;
+import com.voxelengine.worldmodel.weapons.AmmoCache;
 
 import flash.display.Sprite
 import flash.display.StageAlign
@@ -23,6 +36,7 @@ import flash.events.KeyboardEvent
 import flash.events.MouseEvent
 import flash.events.ErrorEvent
 import flash.events.UncaughtErrorEvent
+import flash.system.Capabilities;
 import flash.system.Security
 import flash.ui.Keyboard
 import flash.utils.getTimer
@@ -62,24 +76,59 @@ public class VoxelVerse extends Sprite
 		stage.scaleMode = StageScaleMode.NO_SCALE;
 		stage.align = StageAlign.TOP_LEFT;
 
-		VVInitializer.initialize( stage );
+		initializeDataBeforeSplash();
 
-		//var parameters:Object = stage.loaderInfo.parameters
-		//if ( parameters.guid ) {
-			//Log.out( "VVInitializer.initialize - single model found: " + parameters.guid, Log.DEBUG )
-			//new LoadSynchronizer( parameters.guid )
-		//}
-		//else
 		WindowSplashEvent.addListener( WindowSplashEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded );
 		WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.CREATE ) );
-		//ConfigManager.instance.init( $startingModelToDisplay )
 	}
 
 	private var _splashDisplayed:Boolean;
 	private function onSplashLoaded(e:WindowSplashEvent):void {
+		trace( "SPALSH_DISPLAYED")
 		WindowSplashEvent.removeListener( WindowSplashEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded );
 		_splashDisplayed = true;
 		addEventListener(Event.ENTER_FRAME, enterFrame);
+	}
+
+	private function initializeDataBeforeSplash():void {
+		Globals.setDebug = Capabilities.isDebugger;
+		Log.init();
+		Log.out("VoxelVerse.initializeDataBeforeSplash this is " + (Globals.isDebug ? "debug" : "release") + " build", Log.WARN );
+
+		var url:String = stage.loaderInfo.loaderURL;
+		var index:int = url.lastIndexOf( "VoxelVerse.swf" );
+		if ( -1 == index )
+			index = url.lastIndexOf( "VoxelVerseD.swf" );
+		if ( -1 == index )
+			Log.out( "VoxelVerse.initializeDataBeforeSplash - App path not being set correctly appPath: " + url, Log.ERROR );
+		Globals.appPath = url.substring( 0, index );
+		//Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG )
+
+		Globals.g_renderer.init( stage );
+		VoxelVerseGUI.currentInstance.init();
+		WindowSplash.init();
+	}
+
+	private function initializeDataAfterSplash():void {
+		WindowWater.init();
+
+		Persistance.addEventHandlers();
+		ModelMetadataCache.init();
+		ModelInfoCache.init();
+		SoundCache.init();
+		AmmoCache.init();
+		OxelPersistanceCache.init();
+		AnimationCache.init();
+		ModelCacheUtils.init();
+
+		InventoryManager.init();
+		MouseKeyboardHandler.init();
+		RegionManager.instance;
+		ConfigManager.instance;
+		LightAdd.init();
+		LightRemove.init();
+		//ConfigManager.instance.init( $startingModelToDisplay )
+		new PoolManager();
 	}
 
 	// after the splash and config have been loaded
@@ -87,9 +136,9 @@ public class VoxelVerse extends Sprite
 		Log.out( "<===============VoxelVerse.readyToGo - ENTER", Log.DEBUG )
 
 		timeEntered = getTimer();
-		RegionManager.instance;
-		ConfigManager.instance;
-		new PoolManager();
+
+		initializeDataAfterSplash();
+
 
 		// These two should be the same
 		// https://gamesnet.yahoo.net/forum/viewtopic.php?f=33&t=35896&sid=1f0b0c5bef7f97c6961760b6a3418c69
@@ -102,25 +151,25 @@ public class VoxelVerse extends Sprite
 		addEventListener(Event.DEACTIVATE, deactivate);
 		addEventListener(Event.ACTIVATE, activate);
 		stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
-
+		activate( new Event( Event.ACTIVATE ) );
 		Log.out("<===============VoxelVerse.readyToGo: " + (getTimer() - timeEntered) );
 		return;
 
 	}
 
-//		private function mouseDown(e:MouseEvent):void {
-		//Log.out( "VoxelVerse.mouseDown", Log.WARN )
-//			if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active )
-//				return
-//		}
-
-
 	public static var timeEntered:int = 0;
+	public static var framesToDisplaySplash:int = 0;
 	private function enterFrame(e:Event):void {
 
 		//Log.out( "VoxelVerse.enterFrame" );
-		if ( 0 == timeEntered )
-			readyToGo();
+		if ( 0 == timeEntered ) {
+			if ( _splashDisplayed && ( 1 == framesToDisplaySplash) )
+				readyToGo();
+			else{
+				framesToDisplaySplash++;
+				return;
+			}
+		}
 		else
 			timeEntered = getTimer();
 
@@ -146,39 +195,48 @@ public class VoxelVerse extends Sprite
 		AppEvent.dispatch( e )
 	}
 
-	private function deactivate(e:Event):void
-	{
-		//Log.out( "VoxelVerse.deactive event", Log.WARN )
-		if ( Globals.active )
-			deactivateApp(e)
-	}
-
-	private function activate(e:Event):void
-	{
-		//Log.out( "VoxelVerse.activate event", Log.WARN )
-		activateApp(e)
-	}
-
 	/**
-	 *  Called when the mouse leaves the app
-	 *  by leaving the app, the active is set to false
+	 *  Called when the mouse leaves the app by leaving the app, the active is set to false
 	 *  and the mouse view is turned off.
-	 *  This allow the app to not pick up any other mouse or keyboard
-	 *  activity when app is not active
-	 *
-	 * 	@param e 	Event Object generated by system
+	 *  This allow the app to not pick up any other mouse or keyboard activity when app is not active
 	 */
-	public static function mouseLeave( e:Event ):void {
+	public function mouseLeave( e:Event ):void {
 		Log.out( "VoxelVerse.mouseLeave event" );
-		dispatchSaves();
-//			if ( Globals.active )
-//				deactivateApp( e )
+		deactivate( e )
 	}
 
-	private function activateApp(e:Event):void {
+	private function deactivate(e:Event):void {
+		Log.out( "VoxelVerse.deactive event", Log.WARN );
+		if ( Globals.active )
+			appLosesFocus(e)
+	}
 
+	private function appLosesFocus(e:Event):void {
+		Log.out( "VoxelVerse.appLosesFocus", Log.WARN )
+		Globals.active = false;
+		Globals.clicked = false;
+		VoxelVerseGUI.currentInstance.crossHairInactive();
+
+		MemoryManager.update();
+		MouseKeyboardHandler.reset();
+
+		// one way to wake us back up is thru the mouse click
+		//stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown)
+		stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
+		stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+
+		if ( Globals.online ) {
+			AppEvent.dispatch( e );
+			dispatchSaves();
+		}
+		//else
+		//	Log.out( "VoxelVerse.deactivateApp - app already deactivated", Log.WARN )
+	}
+
+	private function activate(e:Event):void {
+		Log.out( "VoxelVerse.activate event", Log.WARN )
 		if ( false == Globals.active ) {
-			//Log.out( "VoxelVerse.activateApp - setting active = TRUE" )
+			Log.out( "VoxelVerse.activate - setting active = TRUE" );
 			Globals.active = true;
 			Globals.clicked = true;
 			VoxelVerseGUI.currentInstance.crossHairActive();
@@ -189,32 +247,6 @@ public class VoxelVerse extends Sprite
 		}
 		//else
 		//	Log.out( "VoxelVerse.activateApp - ignoring" )
-	}
-
-	private function deactivateApp(e:Event):void {
-
-		//Log.out( "VoxelVerse.deactivateApp", Log.WARN )
-		if ( true == Globals.active ) {
-			//Log.out( "VoxelVerse.deactivateApp with active app", Log.WARN )
-			Globals.active = false;
-			Globals.clicked = false;
-			VoxelVerseGUI.currentInstance.crossHairInactive();
-
-			MemoryManager.update();
-			MouseKeyboardHandler.reset();
-
-			// one way to wake us back up is thru the mouse click
-			//stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown)
-			stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp)				;
-
-			if ( Globals.online ) {
-				AppEvent.dispatch( e );
-				dispatchSaves();
-			}
-		}
-		//else
-		//	Log.out( "VoxelVerse.deactivateApp - app already deactivated", Log.WARN )
 	}
 
 	private static function dispatchSaves():void {
@@ -236,9 +268,9 @@ public class VoxelVerse extends Sprite
 	//}
 
 	private function mouseUp(e:MouseEvent):void {
-		//Log.out( "VoxelVerse.mouseUp event" )
+		Log.out( "VoxelVerse.mouseUp event" )
 		stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
-//			activateApp(e)
+		activate(e)
 	}
 
 	private function toggleConsole():void {
@@ -276,70 +308,5 @@ public class VoxelVerse extends Sprite
 			Log.out( "VoxelVerse.uncaughtErrorHandler something was caught: " + event.toString(), Log.WARN );
 		}
 	}
-}
-}
-
-
-
-import flash.display.Stage
-import com.voxelengine.Log
-import com.voxelengine.Globals
-
-import com.voxelengine.GUI.VoxelVerseGUI
-import com.voxelengine.GUI.WindowSplash
-import com.voxelengine.GUI.WindowWater
-import com.voxelengine.persistance.Persistance
-import com.voxelengine.worldmodel.MouseKeyboardHandler
-import com.voxelengine.worldmodel.models.*
-import com.voxelengine.worldmodel.inventory.InventoryManager
-import com.voxelengine.worldmodel.animation.AnimationCache
-import com.voxelengine.worldmodel.SoundCache
-import com.voxelengine.worldmodel.weapons.AmmoCache
-
-import flash.system.Capabilities;
-
-class VVInitializer 
-{
-static public function initialize( $stage:Stage ):void {
-
-	Log.init();
-	//Log.out("VVInitializer.initialize", Log.DEBUG )
-	//var strUserAgent:String = String(ExternalInterface.call("function() {return navigator.userAgent}")).toLowerCase()
-
-	Globals.setDebug = Capabilities.isDebugger;
-
-	Log.out("VVInitializer.initialize this is " + (Globals.isDebug ? "debug" : "release") + " build", Log.WARN );
-
-	var url:String = $stage.loaderInfo.loaderURL;
-	//url = "file:///C:/dev/VoxelVerse/resources/bin/VoxelVerse.swf"
-	var index:int = url.lastIndexOf( "VoxelVerse.swf" );
-	if ( -1 == index )
-		index = url.lastIndexOf( "VoxelVerseD.swf" );
-	if ( -1 == index )
-			Log.out( "VoxelVerse.initialize - App path not being set correctly appPath: " + url );
-
-	Globals.appPath = url.substring( 0, index );
-	//Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG )
-
-	Globals.g_renderer.init( $stage );
-	// adds handlers for persistence of regions
-	Persistance.addEventHandlers();
-
-	VoxelVerseGUI.currentInstance.init();
-	WindowSplash.init();
-	WindowWater.init();
-
-	// This adds the event handlers
-	// Is there a central place to do this?
-	ModelMetadataCache.init();
-	ModelInfoCache.init();
-	SoundCache.init();
-	AmmoCache.init();
-	OxelPersistanceCache.init();
-	AnimationCache.init();
-	// This causes the to load its caches and listeners
-	InventoryManager.init();
-	MouseKeyboardHandler.init();
-	ModelCacheUtils.init();
 }
 }

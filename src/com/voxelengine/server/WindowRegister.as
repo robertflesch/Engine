@@ -227,6 +227,10 @@ package com.voxelengine.server
 				var createAccountButton:Button = new Button( "Create Account", 265, 40 );
 				createAccountButton.addEventListener(UIMouseEvent.CLICK, createAccountButtonHandler );
 				addElement( createAccountButton );
+
+				var backButton:Button = new Button( "Back", 265, 40 );
+				backButton.addEventListener(UIMouseEvent.CLICK, backButtonHandler );
+				addElement( backButton );
 			}
 							
 			function onCaptchaLoadError( $error:IOErrorEvent):void {
@@ -239,6 +243,10 @@ package com.voxelengine.server
 			var createAccountButton:Button = new Button( "Create Account", 265, 40 );
 				createAccountButton.addEventListener(UIMouseEvent.CLICK, createAccountButtonHandlerNoCaptcha );
 				addElement( createAccountButton );
+
+			var backButton:Button = new Button( "Back", 265, 40 );
+			backButton.addEventListener(UIMouseEvent.CLICK, backButtonHandler );
+			addElement( backButton );
 		}
 		
 		private function captchaReReceive( $captchaKey:String, $captchaImageUrl:String):void
@@ -367,5 +375,11 @@ package com.voxelengine.server
 			new WindowLogin( _email, _password );
 			remove();
 		}
+
+		private function backButtonHandler( $event:UIMouseEvent ):void {
+			new WindowLogin( "", "" );
+			remove();
+		}
+
 	}
 }

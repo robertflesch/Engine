@@ -29,8 +29,10 @@ package org.flashapi.swing {
 	* @version 1.0.1, 27/01/2010 13:43
 	* @see http://www.flashapi.org/
 	*/
-	
-	import flash.display.DisplayObject;
+
+import com.voxelengine.Log;
+
+import flash.display.DisplayObject;
 	import flash.display.LoaderInfo;
 	import flash.display.Stage;
 	import flash.display.StageAlign;
@@ -624,7 +626,8 @@ package org.flashapi.swing {
 		 * 	@see #debugger
 		 */
 		public static function print(...arguments):void {
-			UIManager.debugger.print(arguments);
+			for each ( var element:* in arguments )
+				Log.out( "UIManager.print: args: " + element );
 		}
 		
 		/**

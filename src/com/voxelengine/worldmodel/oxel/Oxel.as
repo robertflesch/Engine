@@ -7,43 +7,29 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
-import com.voxelengine.events.InventoryVoxelEvent;
-import com.voxelengine.events.LightEvent;
-import com.voxelengine.renderer.Chunk;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.inventory.InventoryManager;
-import flash.display3D.Context3D;
+import com.voxelengine.worldmodel.Light;
+
 import flash.geom.Point;
 import flash.geom.Vector3D;
-import flash.geom.Matrix3D;
-import flash.net.registerClassAlias;
 import flash.utils.ByteArray;
 import flash.utils.getTimer;
 
-import com.developmentarc.core.tasks.tasks.ITask;
-import com.developmentarc.core.tasks.groups.TaskGroup;
-
-
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
+import com.voxelengine.events.InventoryVoxelEvent;
+import com.voxelengine.events.LightEvent;
 import com.voxelengine.events.ImpactEvent;
 import com.voxelengine.utils.Plane;
-//	import com.voxelengine.renderer.VertexManager;
 import com.voxelengine.renderer.Quad;
-import com.voxelengine.renderer.shaders.Shader;
+import com.voxelengine.renderer.Chunk;
+import com.voxelengine.server.Network;
 import com.voxelengine.pools.*;
 import com.voxelengine.worldmodel.InteractionParams;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.models.ModelStatisics;
 import com.voxelengine.worldmodel.models.types.EditCursor;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.tasks.landscapetasks.TreeGenerator;
-import com.voxelengine.worldmodel.tasks.lighting.LightRemove;
-import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
 import com.voxelengine.worldmodel.tasks.flowtasks.Flow;
-import com.voxelengine.worldmodel.tasks.flowtasks.FlowFlop;
 
 /**
  * ...
@@ -62,8 +48,6 @@ public class Oxel extends OxelBitfields
 	private static		const ALL_POSY_CHILD:uint						= 0xcc;
 	private static		const ALL_NEGX_CHILD:uint						= 0x55;
 	private static		const ALL_POSX_CHILD:uint						= 0xaa;
-	
-	private static		const MAX_BUILD_TIME:int                        = 14000;
 	
 	static private 		var _s_scratchGrain:GrainCursor 				= new GrainCursor();
 	static private 		var _s_scratchVector:Vector3D 					= null;
@@ -126,15 +110,15 @@ public class Oxel extends OxelBitfields
 				
 			// uses the OLD type since _data has not been set yet
 			if ( TypeInfo.AIR != type )
-				quadsDeleteAll()
+				quadsDeleteAll();
 			
 			if ( flowInfo && flowInfo.flowScaling && flowInfo.flowScaling.has() )
-				flowInfo.flowScaling.reset()
+				flowInfo.flowScaling.reset();
 			
 			super.type = $val;
 			
 			if ( TypeInfo.AIR == $val ) {
-				quadsDeleteAll()
+				quadsDeleteAll();
 				facesCleanAllFaceBits();
 				// Todo - this CAN leave behind empty oxels, need to add some kind of flag or check for them.
 				//if ( _parent ) 
@@ -206,7 +190,7 @@ public class Oxel extends OxelBitfields
 	static public function initializeRoot( $grainBound:int, $baseLightLevel:int ):Oxel
 	{
 		try {
-			var gct:GrainCursor = GrainCursorPool.poolGet( $grainBound )
+			var gct:GrainCursor = GrainCursorPool.poolGet( $grainBound );
 			gct.grain = $grainBound;
 			var oxel:Oxel = OxelPool.poolGet();
 			oxel.initialize(null, gct, 0, TypeInfo.AIR);
@@ -283,7 +267,7 @@ public class Oxel extends OxelBitfields
 		
 		// removes all quad and the quads vector
 		// removed the brightness
-		quadsDeleteAll()
+		quadsDeleteAll();
 		
 		//if ( _chunk )
 		//{
@@ -372,7 +356,7 @@ public class Oxel extends OxelBitfields
 	}
 
 	public function childrenForKittyCorner( $face:int, $af:int ):Object {
-		var oxelPair:Object = new Object();
+		var oxelPair:Object = {};
 		
 		if ( Globals.POSX == $face ) {
 			if ( Globals.POSY == $af ) {
@@ -552,12 +536,12 @@ public class Oxel extends OxelBitfields
 
 		var childrenDirectional:Vector.<Oxel> = new Vector.<Oxel>;
 		var mask:uint = 0;
-		if      ( Globals.POSX == dir )	mask = ALL_POSX_CHILD
-		else if ( Globals.NEGX == dir ) mask = ALL_NEGX_CHILD
-		else if ( Globals.POSY == dir ) mask = ALL_POSY_CHILD
-		else if ( Globals.NEGY == dir ) mask = ALL_NEGY_CHILD
-		else if ( Globals.POSZ == dir ) mask = ALL_POSZ_CHILD
-		else if ( Globals.NEGZ == dir ) mask = ALL_NEGZ_CHILD
+		if      ( Globals.POSX == dir )	mask = ALL_POSX_CHILD;
+		else if ( Globals.NEGX == dir ) mask = ALL_NEGX_CHILD;
+		else if ( Globals.POSY == dir ) mask = ALL_POSY_CHILD;
+		else if ( Globals.NEGY == dir ) mask = ALL_NEGY_CHILD;
+		else if ( Globals.POSZ == dir ) mask = ALL_POSZ_CHILD;
+		else if ( Globals.NEGZ == dir ) mask = ALL_NEGZ_CHILD;
 
 		for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++)
 		{
@@ -573,12 +557,12 @@ public class Oxel extends OxelBitfields
 		
 		var childIDsDirectional:Vector.<uint> = new Vector.<uint>;
 		var mask:uint = 0;
-		if      ( Globals.POSX == dir )	mask = ALL_POSX_CHILD
-		else if ( Globals.NEGX == dir ) mask = ALL_NEGX_CHILD
-		else if ( Globals.POSY == dir ) mask = ALL_POSY_CHILD
-		else if ( Globals.NEGY == dir ) mask = ALL_NEGY_CHILD
-		else if ( Globals.POSZ == dir ) mask = ALL_POSZ_CHILD
-		else if ( Globals.NEGZ == dir ) mask = ALL_NEGZ_CHILD
+		if      ( Globals.POSX == dir )	mask = ALL_POSX_CHILD;
+		else if ( Globals.NEGX == dir ) mask = ALL_NEGX_CHILD;
+		else if ( Globals.POSY == dir ) mask = ALL_POSY_CHILD;
+		else if ( Globals.NEGY == dir ) mask = ALL_NEGY_CHILD;
+		else if ( Globals.POSZ == dir ) mask = ALL_POSZ_CHILD;
+		else if ( Globals.NEGZ == dir ) mask = ALL_NEGZ_CHILD;
 
 		for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++)
 		{
@@ -657,7 +641,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			this.neighborsInvalidate();
 	
 		// remove chunk before changing type, so it know what VBO its in.
-		quadsDeleteAll()
+		quadsDeleteAll();
 		this.type = TypeInfo.AIR;
 		this.dirty = true;
 
@@ -710,7 +694,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	
 	public function writeFromHeightMap( $gc:GrainCursor, $newType:int ):void {
 		
-		var co:Oxel = childGetOrCreate( $gc );
+		childGetOrCreate( $gc );
 		super.type = $newType;
 		dirty = true;
 	}
@@ -728,7 +712,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		var typeIdToUse:int;
 		if ( TypeInfo.AIR == $newType ) {
 			typeIdToUse = type;
-			amountInGrain0 = amountInGrain0;
+			//amountInGrain0 = amountInGrain0;
 		}
 		else {
 			typeIdToUse = $newType;
@@ -744,7 +728,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 		// so I am changing type to new type
 		// if type == air then I am removing x amount of newType from inventory
-		const EDIT_CURSOR_MIN:int = 990;
+		//const EDIT_CURSOR_MIN:int = 990;
 		// we dont want to add edit cursor to our inventory
 		// also if we have a scripts that generates blocks, not sure how to handle that.
 		// TODO how do we handle scripts the generate blocks, need to take inventory status first?
@@ -760,7 +744,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			neighborsInvalidate();
 		}
 		
-		additionalDataClear()
+		additionalDataClear();
 			
 		// Now we can change type
 		type = $newType;
@@ -775,7 +759,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		var p:Oxel = _parent;
 		// This is only a two level merge, brain not up to a n level recursive today...
 		if ( TypeInfo.AIR == type && p )
-			p.mergeRecursive()
+			p.mergeRecursive();
 		
 		// what to return if recursive merge happens?
 		return this;
@@ -882,7 +866,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 		nodes += 8;
 		childrenPrune();
-		neighborsInvalidate();22
+		neighborsInvalidate();
 		
 		if ( childType != type )
 			type = childType;
@@ -941,7 +925,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			gc.bound = newBound;
 			gc.grain = gc.grain + changeSize;
 		}
-		return;
 	}
 	
 	
@@ -1020,7 +1003,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 			var noti:TypeInfo = TypeInfo.typeInfo[no.type];
 			if ( noti.flowable && Globals.autoFlow && EditCursor.EDIT_CURSOR != $modelGuid && 1 == $propogateCount )
-				no.addFlowTask( $modelGuid, noti )
+				no.addFlowTask( $modelGuid, noti );
 				
 			// if I have alpha, then see if neighbor is same size, if not break it up.
 			// the makes it so that I dont have any inter oxel alpha faces, like I do if
@@ -1028,10 +1011,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			if ( TypeInfo.hasAlpha( type ) ) {				
 				if ( gc.grain < no.gc.grain && TypeInfo.AIR != no.type  ) {
 					// calculate GC of opposite oxel on face
-					var gct:GrainCursor = GrainCursorPool.poolGet( gc.bound )
-					gct.copyFrom( gc )
-					gct.move( face )
-					childGetOrCreate( gct ) // by getting the child, we break up the oxel
+					var gct:GrainCursor = GrainCursorPool.poolGet( gc.bound );
+					gct.copyFrom( gc );
+					gct.move( face );
+					childGetOrCreate( gct ); // by getting the child, we break up the oxel
 					GrainCursorPool.poolDispose( gct )
 				}
 			}
@@ -1152,6 +1135,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	//}
 
 	public function facesBuild():void {
+		if ( gc.eval( 5, 101, 72, 16 ))
+			Log.out( "Oxel.facesBuild - not being lit" );
+
 		if ( dirty ) {
 			if ( childrenHas() ) {
 				// parents dont have faces!
@@ -1168,16 +1154,21 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 	
 	private function facesBuildTerminal():void {
+		if ( gc.eval( 5, 101, 72, 16 )) {
+			var result:Boolean = faceHasDirtyBits();
+			Log.out("Oxel.facesBuildTerminal - not being lit");
+		}
+
 		if ( TypeInfo.AIR == type )
 			facesMarkAllClean();
 		else  if ( TypeInfo.LEAF == type )
 			facesSetAll();
 		else if ( faceHasDirtyBits() ) {
-			var oppositeOxel:Oxel = null
+			var oppositeOxel:Oxel = null;
 			
 			if ( Globals.g_oxelBreakEnabled	)
 				if ( gc.evalGC( Globals.g_oxelBreakData ) )
-					trace( "Oxel.facesBuildTerminal - setGC breakpoint" )
+					trace( "Oxel.facesBuildTerminal - setGC breakpoint" );
 	
 			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 			{
@@ -1199,24 +1190,24 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 							// if opposite is larger and this is on the bottom layer
 							// then no face is needed
 							if ( gc.grain < oppositeOxel.gc.grain && ( 0 == gc.grainY % 2 ) )
-								faceClear( face )
+								faceClear( face );
 							else { // opposite can not be smaller and be the same type
 								if ( null == oppositeOxel.flowInfo && null == flowInfo )
-									faceClear( face )
+									faceClear( face );
 								else if ( oppositeOxel.flowInfo && oppositeOxel.flowInfo.flowScaling.has() && null == flowInfo )
-									faceSet( face )
+									faceSet( face );
 								else if ( null == oppositeOxel.flowInfo )
-									faceClear( face )
+									faceClear( face );
 								else if ( oppositeOxel.flowInfo.flowScaling.has() && flowInfo.flowScaling.has() ) {
 									// so now I need the equivelent spots on each face to compare.
 									var p1:Point = flowInfo.flowScaling.faceGet( face );
 									var p2:Point = oppositeOxel.flowInfo.flowScaling.faceGet( face_get_opposite( face ) );
 									// need to adjust the height since it relative to the oxel size
 									if ( gc.size() != oppositeOxel.gc.size() ) {
-										p1.x = gc.size() - ( p1.x/16 * gc.size() )
-										p1.y = gc.size() - ( p1.y/16 * gc.size() )
-										p2.x = oppositeOxel.gc.size() - ( p2.x/16 * oppositeOxel.gc.size() )
-										p2.y = oppositeOxel.gc.size() - ( p2.y/16 * oppositeOxel.gc.size() )
+										p1.x = gc.size() - ( p1.x/16 * gc.size() );
+										p1.y = gc.size() - ( p1.y/16 * gc.size() );
+										p2.x = oppositeOxel.gc.size() - ( p2.x/16 * oppositeOxel.gc.size() );
+										p2.y = oppositeOxel.gc.size() - ( p2.y/16 * oppositeOxel.gc.size() );
 									}
 									if ( p1.equals( p2 ) )
 										faceClear( face );
@@ -1227,7 +1218,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 								}
 								else {
 									// The both have flowInfo (all external faces do), but neither has scaling
-									faceClear( face ) // what case is this?
+									faceClear( face ); // what case is this?
 								}
 								
 							}
@@ -1250,14 +1241,13 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 								// if all neighbors are opaque, that face is not needed
 								if ( true == dchild.faceHasAlpha( rface ) ) {
 									faceSet( face );
-									continue;
 								}
 							}
 						}
 						else {
 							faceClear( face );
 							if ( faceAlphaNeedsFace( face, type, oppositeOxel ) )
-								faceSet( face )
+								faceSet( face );
 						}
 						
 						//var rface:int = Oxel.face_get_opposite( face );
@@ -1272,7 +1262,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 							// I dont like doing this here, but since oxels are not placed during the rebuild water phase, this is critical to get water right
 							if ( TypeInfo.AIR == oppositeOxel.type && Globals.POSY == face && TypeInfo.flowable( type ) ) {
 								if ( null == _flowInfo )
-									_flowInfo = new FlowInfo()
+									_flowInfo = new FlowInfo();
 								if ( !flowInfo.flowScaling.has() )
 									FlowScaling.scaleTopFlowFace( this )
 							}
@@ -1287,7 +1277,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 							}
 							else {
 								if ( face == Globals.POSY && flowInfo.flowScaling.has() )
-									faceSet( face )
+									faceSet( face );
 								else
 									faceClear( face );
 							}
@@ -1313,7 +1303,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	import flash.events.TimerEvent;
 	
 	public function setOnFire( $modelGuid:String ):void {
-		var ti:TypeInfo = TypeInfo.typeInfo[type]
+		var ti:TypeInfo = TypeInfo.typeInfo[type];
 		if ( ti.flammable ) {
 			if ( Math.random() * 100 < ti.spreadChance ) {
 				var pt:Timer = new Timer( ti.burnTime, 1 );
@@ -1326,7 +1316,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		
 		function burnUp(e:TimerEvent):void {
 			if ( onFire )
-				changeOxel( $modelGuid, gc, TypeInfo.AIR )
+				changeOxel( $modelGuid, gc, TypeInfo.AIR );
 			onFire = false
 		}
 	}
@@ -1434,10 +1424,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				var li:LightInfo = _lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
 				// break down for debugging
 				//var rootAttn:uint = root_get()._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg
-				var rootAttn:uint = Lighting.defaultBaseLightAttn
+				var rootAttn:uint = Lighting.defaultBaseLightAttn;
 				var root:Oxel = root_get();
 				if ( root && root._lighting )
-					rootAttn = root._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg
+					rootAttn = root._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg;
 				else
 					Log.out( "Oxel.quadLighting - root or root lighting not found", Log.WARN );
 				li.setAll( rootAttn );
@@ -1494,6 +1484,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 		else
 		{
+			if ( gc.eval( 5, 101, 72, 16 ))
+				Log.out( "Oxel.lightsStaticSetDefault - not being lit" );
+
 			if ( _lighting && _lighting.lightHas( Lighting.DEFAULT_LIGHT_ID ) ) {
 				var li:LightInfo = _lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
 				li.setAll( $attn );
@@ -1536,7 +1529,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			if ( childrenHas() ) {
 				// parents dont have quads!
 				if ( dirty  && _quads )
-					quadsDeleteAll()
+					quadsDeleteAll();
 
 				facesCleanAllFaceBits();
 
@@ -1551,6 +1544,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 	
 	protected function quadsBuildTerminal( $plane_facing:int = 1 ):void {
+		if ( gc.eval( 5, 101, 72, 16 ))
+			Log.out( "Oxel.quadsBuildTerminal - not being lit" );
 		var changeCount:int = 0;
 		// Does this oxel have faces
 		if ( facesHas() )
@@ -1570,13 +1565,13 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		if ( changeCount ) {
 			// if those this oxel has not been added to vertex manager do it now.
 			if ( !facesHas() && addedToVertex ) 
-				quadsDeleteAll()
+				quadsDeleteAll();
 			// this feels like I might be double adding faces
 			else if ( facesHas() && !addedToVertex ) 
 				chunkAddOxel();
 		}
 		else if ( addedToVertex ) // I was added to vertex, but I lost all my face, so remove oxel
-			quadsDeleteAll()
+			quadsDeleteAll();
 
 		dirty = false;
 	}
@@ -1655,7 +1650,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	
 	////////////////////////////////////////
 	public function quadsDeleteAll():int {
-		var changeCount:int;
+		var changeCount:int = 0;
 		if  ( _quads ) {
 			//Log.out( "Oxel.quadsDeleteAll" );
 			dirty = true;
@@ -1803,7 +1798,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 					li.setAll( avgLight );
 			}
 			else {
-				var baseLightLevel:uint = Lighting.defaultBaseLightAttn //lighting.avg;
+				var baseLightLevel:uint = Lighting.defaultBaseLightAttn; //lighting.avg;
 				lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).setAll( baseLightLevel );
 			}
 			lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
@@ -1860,7 +1855,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	
 	private function intToHexString( $val:int ):String
 	{
-		var str:String = $val.toString(16)
+		var str:String = $val.toString(16);
 		var hex:String = ("0x00000000").substr(2,8 - str.length) + str;
 		return hex;
 	}
@@ -2102,10 +2097,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		if ( false == childrenHas() )
 			childrenCreate();
 		
-		if ( false == childrenHas() )
-		{
+		if ( false == childrenHas() ) {
 			throw new Error("Oxel.write_sphere - ERROR - children expected");
-			return;
 		}
 
 		for each ( var child:Oxel in _children )
@@ -2148,10 +2141,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			childrenCreate();
 		
 		if ( false == childrenHas() )
-		{
 			throw new Error("Oxel.write_sphere - ERROR - children expected");
-			return;
-		}
 
 		for each ( var child:Oxel in _children )
 		{
@@ -2680,9 +2670,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		else if ( TypeInfo.hasAlpha( no.type ) && no.childrenHas() ) {
 			if ( no.faceHasAlpha( Globals.NEGY ) ) {
 				// no has alpha and children, I need to change to dirt and break up, and revaluate
-				type = TypeInfo.DIRT
+				type = TypeInfo.DIRT;
 				if ( 0 < gc.grain ) {
-					childrenCreate( true ) 
+					childrenCreate( true );
 					for each ( var dchild:Oxel in children )
 						dchild.evaluateForChangeToGrass()
 				}
@@ -2985,11 +2975,11 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			return false;
 			
 		if ( !$onlyChangeType )
-			changeCandidate.removeOldLightInfo( $modelGuid )
+			changeCandidate.removeOldLightInfo( $modelGuid );
 		
 		changeCandidate.dirty = true;
 		if ( !$onlyChangeType ) {
-			changeCandidate.applyNewLightInfo( $modelGuid, $newType )
+			changeCandidate.applyNewLightInfo( $modelGuid, $newType );
 			changeCandidate.applyFlowInfo( $modelGuid, $newType )
 		}
 		changeCandidate.writeInternal( $modelGuid, $newType, $onlyChangeType );
@@ -3039,7 +3029,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			var newTypeInfo:TypeInfo = TypeInfo.typeInfo[$newType];
 			if ( newTypeInfo.flowable ) {
 				
-				addFlowTask( $modelGuid, newTypeInfo )
+				addFlowTask( $modelGuid, newTypeInfo );
 				
 				var neighborAbove:Oxel = neighbor( Globals.POSY );
 				if ( Globals.BAD_OXEL == neighborAbove || TypeInfo.AIR == neighborAbove.type )
@@ -3052,15 +3042,15 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	
 	private function addFlowTask( $modelGuid:String, $newTypeInfo:TypeInfo ):void {
 		if ( null == flowInfo ) // if it doesnt have flow info, get some! This is from placement of flowable oxels
-			flowInfo = FlowInfoPool.poolGet()
+			flowInfo = FlowInfoPool.poolGet();
 		
 		if ( FlowInfo.FLOW_TYPE_UNDEFINED == flowInfo.type )
-			flowInfo.copy( $newTypeInfo.flowInfo )
+			flowInfo.copy( $newTypeInfo.flowInfo );
 		
 		if ( Globals.autoFlow ) {
-			var priority:int = 1
+			var priority:int = 1;
 			if ( Globals.isHorizontalDirection( flowInfo.direction ) )
-				priority = 3
+				priority = 3;
 			Flow.addTask( $modelGuid, gc, $newTypeInfo.type, priority )
 		}
 	}
@@ -3090,7 +3080,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			r = "\t\t oxel of type: " + TypeInfo.typeInfo[type].name;
 		else
 			var str:String = "";
-			str = maskTempData().toString(16)
+			str = maskTempData().toString(16);
 			var hex:String = ("0x00000000").substr(2,8 - str.length) + str;
 			r = t + " oxel of type: " + TypeInfo.typeInfo[type].name + "\t location: " + gc.toString() + "  data: " + hex + " parent: " + p + " children: " + c;
 		}
@@ -3137,7 +3127,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				var no:Oxel = $oxel.neighbor( Globals.POSY )
 				// if its air, ok
 				if ( TypeInfo.hasAlpha( no.type ) && !no.childrenHas() )
-					return
+					return;
 				// if its has children, and one of those is air
 				// change it to dirt, and create children
 				if ( no.type == TypeInfo.AIR && no.childrenHas() ) {
@@ -3175,11 +3165,43 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				rebuild(child);
 		}
 		else {
+			if ( $oxel.gc.eval( 5, 101, 72, 16 )) {
+				var result1:Boolean = $oxel.faceHasDirtyBits();
+				Log.out("Oxel.rebuild - not being lit");
+			}
 			$oxel.facesMarkAllDirty();
 			$oxel.quadsDeleteAll();
+			if ( $oxel.gc.eval( 5, 101, 72, 16 )) {
+				var result2:Boolean = $oxel.faceHasDirtyBits();
+				Log.out("Oxel.rebuild - not being lit");
+			}
 		}
 	}
-	
+
+	static private var _lights:Vector.<Oxel> = new Vector.<Oxel>();
+	static public function rebuildLighting( $oxel:Oxel ):void {
+		// first I need to build up a list of all the existing lights
+		if ($oxel.childrenHas()) {
+			for each (var child:Oxel in $oxel._children)
+				rebuildLighting(child);
+		}
+		else {
+			if ( TypeInfo.isLight( $oxel.type ) )
+				_lights.push( $oxel );
+		}
+
+		// now reset the lights to just ambient
+		if ($oxel.childrenHas()) {
+			for each (var child1:Oxel in $oxel._children)
+				rebuildLighting(child1);
+		}
+		else {
+			if ( $oxel.lighting )
+				$oxel.lighting.resetToAmbient();
+		}
+
+	}
+
 	static public function rebuildWater( $oxel:Oxel ):void {
 		if ( $oxel.childrenHas() ) {
 			for each ( var child:Oxel in $oxel._children )
@@ -3187,8 +3209,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		else {
 			if ( TypeInfo.WATER == $oxel.type ) {
 				if ( 5 < $oxel.gc.grain ) {
-					Log.out( "Oxel.rebuildWater found grain too large: " + $oxel.gc.toString() )
-					$oxel.childrenCreate( true ) 
+					Log.out( "Oxel.rebuildWater found grain too large: " + $oxel.gc.toString() );
+					$oxel.childrenCreate( true );
 					for each ( var newChild:Oxel in $oxel._children )
 						rebuildWater( newChild ) 
 				} else {
@@ -3196,11 +3218,11 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 					// This finds edges of bottoms that are open to free flowing and turns them to sand
 					for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
 						if ( Globals.isHorizontalDirection( face ) || Globals.NEGY == face ) {
-							no = $oxel.neighbor(face)
+							no = $oxel.neighbor(face);
 							if ( Globals.BAD_OXEL == no )
-								$oxel.type = TypeInfo.SAND
+								$oxel.type = TypeInfo.SAND;
 							else if ( TypeInfo.AIR == no.type && !no.childrenHas() )
-								$oxel.type = TypeInfo.SAND
+								$oxel.type = TypeInfo.SAND;
 						}
 					}
 					
@@ -3217,12 +3239,12 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				resetScaling( child ); }
 		else {
 			if ( Globals.BAD_OXEL == $oxel )
-				return
+				return;
 			if ( $oxel.flowInfo && $oxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling.has() ) {
 				if ( TypeInfo.flowable[ $oxel.type ] )
-					return 
+					return;
 
-				$oxel.flowInfo.flowScaling.reset()
+				$oxel.flowInfo.flowScaling.reset();
 				$oxel.facesMarkAllDirty();
 				$oxel.quadsDeleteAll();
 			}

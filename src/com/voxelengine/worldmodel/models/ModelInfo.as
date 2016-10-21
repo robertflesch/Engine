@@ -640,11 +640,14 @@ public class ModelInfo extends PersistanceObject
 		// I am faking a heirarchy here, not good object oriented behavior but needs major redesign to do what I want.
 		// so instead I just get the current setting from the class
 		var modelClassPrototype:Class = ModelLibrary.getAsset( info.model.modelClass );
-		try {
-			modelClassPrototype.buildExportObject( dbo );
-		} catch ( e:Error ) {
-			Log.out( "ModelInfo.toObject - Error with Class: " + info.model.modelClass, Log.ERROR );
-		}
+		if ( dbo.key != "0" ) {
+			try {
+				modelClassPrototype.buildExportObject(dbo);
+			} catch (e:Error) {
+				Log.out("ModelInfo.toObject - Error with Class: " + info.model.modelClass, Log.ERROR);
+			}
+		} else
+			return;
 
 		info.model.grainSize =  grainSize;
 		if ( null != associatedGrain )

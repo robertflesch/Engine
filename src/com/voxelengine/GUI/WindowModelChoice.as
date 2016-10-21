@@ -203,7 +203,7 @@ public class WindowModelChoice extends VVPopup
 	private function panelCreateModel():void {
 		reset()
 		_name = "GenerateModel"
-		addSize( "Size in meters", 0, 12, 6 )
+		addSize( "Size in meters", 4, 12, 6 )
 		addType( "Made of Type" )
 	}
 	

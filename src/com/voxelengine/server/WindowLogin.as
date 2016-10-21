@@ -233,6 +233,7 @@ package com.voxelengine.server
 			addLoginEventHandlers();
 			Log.out("WindowLogin.loginButtonHandler - Trying to establish connection to server", Log.DEBUG );
 			Network.login( _emailInput.label, _passwordInput.text );
+			Globals.active = true;
 		}
 		
 		private function addLoginEventHandlers():void {

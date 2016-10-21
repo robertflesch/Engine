@@ -259,11 +259,12 @@ public class VoxelVerseGUI extends EventDispatcher
 		if ( !_built ) {
 			_releaseMenu = addReleaseMenu();
 			_releaseMenu.visible = false;
+			/*
 			if ( true == Globals.isDebug ) {
 				_debugMenu = new WindowDebugMenu();
 				_debugMenu.visible = false;
 			}
-			
+			*/
 			if ( !Globals.g_renderer.hardwareAccelerated )
 				 new WindowNotHardware( "WARNING", "Hardware acceleration is not enabled in your browser, this is happening in Chrome on some machines, try FireFox or Internet Explorer" );
 			_built = true;
@@ -275,10 +276,6 @@ public class VoxelVerseGUI extends EventDispatcher
 		UIManager.debugger = new FDTrace();
 		RegionEvent.addListener( RegionEvent.LOAD_BEGUN, onRegionLoadingComplete );
 		LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
-//			Globals.g_app.addEventListener(Event.DEACTIVATE, deactivate);
-//			Globals.g_app.addEventListener(Event.ACTIVATE, activate);
-//			Globals.g_app.stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
-		
 		ModelEvent.addListener( ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
 		LoginEvent.addListener(LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
 		RoomEvent.addListener(RoomEvent.ROOM_JOIN_FAILURE, joinRoomFailureHandler );
@@ -316,7 +313,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		addKeyboardListeners( event );
 		
 		if ( ConfigManager.instance.showHelp )
-			new WindowHelp()
+			new WindowHelp();
 		else
 			new WindowLogin( "", "" );
 	}

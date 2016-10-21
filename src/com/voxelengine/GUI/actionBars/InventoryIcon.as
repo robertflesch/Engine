@@ -41,12 +41,14 @@ public class InventoryIcon extends VVCanvas
 		// These numbers come from the size of the artwork, and from the size of the toolbar below it.
 		layout = new AbsoluteLayout()
 		_outline = new Image( Globals.texturePath + "backpack.png" )
+		_outline.scaleX = 0.75;
+		_outline.scaleY = 0.75;
 		eventCollector.addEvent( _outline, UIMouseEvent.PRESS, pressShape )
 		addElement( _outline )
 		var it:UITextField = new UITextField()
 		it.text = "Inventory (I)"
-		it.x = 24
-		it.y = 48
+		it.x = 24;
+		it.y = 48;
 		it.textColor = 0xFFFFFF
 		addElement( it )
 		display()
