@@ -12,18 +12,11 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.events.ModelInfoEvent;
 	import com.voxelengine.events.OxelDataEvent;
 	import com.voxelengine.Log;
-	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.oxel.Oxel;
-	import com.voxelengine.worldmodel.oxel.GrainCursor;
 	import com.voxelengine.worldmodel.biomes.*;
-	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
-	import com.voxelengine.worldmodel.TypeInfo;
-	import flash.display.BitmapData;
-	import flash.events.Event;
 	import flash.utils.getTimer;
-	import com.voxelengine.worldmodel.Region;
-	
+
 	/**
 	 * ...
 	 * @author Robert Flesch
@@ -36,7 +29,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		}
 		
 		override public function start():void {
-            super.start() // AbstractTask will send event
+            super.start(); // AbstractTask will send event
 			Log.out( "MergeLayer.start: " );
 			// is it  ready?
 			ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoResult );
@@ -46,8 +39,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private function oxelDataRetrieved(e:OxelDataEvent):void {
 			Log.out( "MergeLayer.oxelDataRetrieved:");
 			if ( e.modelGuid == _modelGuid ) {
-				OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved )
-				var oxel:Oxel = e.oxelData.oxel
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );
+				var oxel:Oxel = e.oxelData.oxel;
 				processOxel( oxel )
 			}
 		}
@@ -58,21 +51,20 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				if ( !e.vmi || !e.vmi.data || !e.vmi.data.oxel ) {
 					ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoResult );
 					OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );		
-					Log.out( "MergeLayer.modelInfoResult = no oxel found, waiting on OXEL_READY", Log.WARN )
+					Log.out( "MergeLayer.modelInfoResult = no oxel found, waiting on OXEL_READY", Log.WARN );
 					// error handling???
 					// what if it never loads?
 					return
 				}
-				var oxel:Oxel = e.vmi.data.oxel
+				var oxel:Oxel = e.vmi.data.oxel;
 				processOxel( oxel )
 			}
 		}
 		
 		private function processOxel( $oxel:Oxel ):void {
-			var timer:int = getTimer();
 			Log.out( "MergeLayer.processOxel:" );
-			
-			timer = getTimer();
+
+			var timer:int = getTimer();
 			Log.out( "MergeLayer - merging: ");
 			$oxel.mergeRecursive();
 			Log.out( "MergeLayer - merging recovered: " + Oxel.nodes + " took: " + (getTimer() - timer), Log.DEBUG );
@@ -83,16 +75,16 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			Oxel.nodes = 0;
 			$oxel.mergeRecursive();
 			Log.out( "MergeLayer - merging 2 recovered: " + Oxel.nodes + " took: " + (getTimer() - timer), Log.DEBUG );
-			$oxel.chunkGet().vistor( _modelGuid, Oxel.rebuild );
+			$oxel.chunkGet().visitor( _modelGuid, Oxel.rebuild );
 
-			var vm:VoxelModel = getVoxelModel()
+			var vm:VoxelModel = getVoxelModel();
 			if ( vm )
-				vm.complete = true
+				vm.complete = true;
 				
-			vm.modelInfo.data.changed = true
-			vm.modelInfo.data.save()
+			vm.modelInfo.data.changed = true;
+			vm.modelInfo.data.save();
 			
-            super.complete() // AbstractTask will send event
+            super.complete(); // AbstractTask will send event
 			
 		}
 	}

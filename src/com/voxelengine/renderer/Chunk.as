@@ -27,9 +27,11 @@ public class Chunk {
 	// You want this number to be as high as possible. 
 	// But the higher it is, the longer updates take.
 	//static private const MAX_CHILDREN:uint = 32768; // draw for all chunks on island takes 1ms
-	//static private const MAX_CHILDREN:uint = 16384;
+	static private const MAX_CHILDREN:uint = 16384;
 	//static private const MAX_CHILDREN:uint = 8192;
-	 static private const MAX_CHILDREN:uint = 4096; // draw for all chunks on island takes 5ms
+	static public var _s_chunkCount:int;
+	static public function chunkCount():int { return _s_chunkCount; }
+	//static private const MAX_CHILDREN:uint = 4096; // draw for all chunks on island takes 5ms
 	//static private const MAX_CHILDREN:uint = 2048;
 	//static private const MAX_CHILDREN:uint = 1024;
 	static private const OCT_TREE_SIZE:uint = 8;
@@ -57,6 +59,7 @@ public class Chunk {
 	public function Chunk( $parent:Chunk ):void {
 		_parent = $parent;
 		_dirty = true;
+		_s_chunkCount++;
 	}
 	
 	public function release():void {
@@ -69,6 +72,7 @@ public class Chunk {
 			_vertMan.release();
 			_oxel = null;
 			_parent = null;
+			_s_chunkCount--;
 		}
 	}
 	
@@ -155,10 +159,10 @@ public class Chunk {
 		}
 	}
 	
-	public function vistor( $guid:String, $func:Function ):void {
+	public function visitor( $guid:String, $func:Function ):void {
 		if ( childrenHas() ) {
 			for ( var i:int; i < OCT_TREE_SIZE; i++ )
-				_children[i].vistor( $guid, $func );
+				_children[i].visitor( $guid, $func );
 		}
 		else if ( _vertMan )
 			VistorTask.addTask( $guid, this, $func, 10000 )

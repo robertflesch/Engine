@@ -128,15 +128,15 @@ public class OxelPersistance extends PersistanceObject
 		}
 	}
 	
-	public function vistor( $func:Function ):void {
-		_topMostChunk.vistor( guid, $func )
+	public function visitor( $func:Function ):void {
+		_topMostChunk.visitor( guid, $func )
 	}
 	
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// oxel operations
-	public function changeOxel( $modelGuid:String, $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
-		var result:Boolean = _oxel.changeOxel( $modelGuid, $gc, $type, $onlyChangeType );
+	public function changeOxel( $instanceGuid:String, $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
+		var result:Boolean = _oxel.changeOxel( $instanceGuid, $gc, $type, $onlyChangeType );
 		if ( result )
 			changed = true;
 		return result;

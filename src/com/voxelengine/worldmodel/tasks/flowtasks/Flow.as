@@ -36,14 +36,14 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	public class Flow extends FlowTask 
 	{		
 		private var _vm:VoxelModel	// temp holder for VM, it is set to null when start routine exits.
-		static public function addTask( $modelGuid:String, $gc:GrainCursor, $type:int, $taskPriority:int ):void {
+		static public function addTask( $instanceGuid:String, $gc:GrainCursor, $type:int, $taskPriority:int ):void {
 			// http://jacksondunstan.com/articles/2439 for a better assert
 			if ( TypeInfo.INVALID == $type ) {
 				Log.out( "Flow.addTask - cant add task for TypeInfo.INVALID", Log.WARN );
 				return
 			}
 			
-			if ( null == $modelGuid || "" == $modelGuid ) {
+			if ( null == $instanceGuid || "" == $instanceGuid ) {
 				Log.out( "Flow.addTask - cant add task for null or empty model guid", Log.WARN );
 				return
 			}
@@ -51,13 +51,13 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				Log.out( "Flow.addTask - adding task for non flowable type: " + $type, Log.WARN );
 				return
 			}
-			var f:Flow = new Flow( $modelGuid, $gc, $type, $gc.toID(), $taskPriority );
+			var f:Flow = new Flow( $instanceGuid, $gc, $type, $gc.toID(), $taskPriority );
 			f.selfOverride = true;
 			Globals.g_flowTaskController.addTask( f );
 		}
 		
-		public function Flow( $modelGuid:String, $gc:GrainCursor, $type:int, $taskType:String, $taskPriority:int ):void {
-			super( $modelGuid, $gc, $type, $taskType, $taskPriority );
+		public function Flow( $instanceGuid:String, $gc:GrainCursor, $type:int, $taskType:String, $taskPriority:int ):void {
+			super( $instanceGuid, $gc, $type, $taskType, $taskPriority );
 			//Log.out( "Flow.create flow: " + toString() );
 			var spreadInterval:int = TypeInfo.typeInfo[$type].spreadInterval // How fast this type spreads
 			var pt:Timer = new Timer( spreadInterval, 1 );

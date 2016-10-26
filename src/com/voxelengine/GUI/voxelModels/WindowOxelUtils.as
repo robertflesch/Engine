@@ -192,23 +192,23 @@ public class WindowOxelUtils extends VVPopup
 	}
 
 	private function rebuildLightingHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.vistor( Oxel.rebuildLighting );
+		_vm.modelInfo.data.visitor( Oxel.rebuildLighting );
 	}
 
 	private function rebuildWaterHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.vistor( Oxel.rebuildWater );
+		_vm.modelInfo.data.visitor( Oxel.rebuildWater );
 	}
 	
 	private function rebuildGrassHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.vistor( Oxel.rebuildGrass );
+		_vm.modelInfo.data.visitor( Oxel.rebuildGrass );
 	}
 	
 	private function rebuildFacesHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.vistor( Oxel.rebuild );
+		_vm.modelInfo.data.visitor( Oxel.rebuild );
 	}
 	
 	private function resetOxelScalingHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.vistor( Oxel.resetScaling );
+		_vm.modelInfo.data.visitor( Oxel.resetScaling );
 	}
 	
 }	

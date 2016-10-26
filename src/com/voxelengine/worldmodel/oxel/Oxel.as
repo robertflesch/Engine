@@ -1135,8 +1135,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	//}
 
 	public function facesBuild():void {
-		if ( gc.eval( 5, 101, 72, 16 ))
-			Log.out( "Oxel.facesBuild - not being lit" );
+		//if ( gc.eval( 5, 101, 72, 16 ))
+		//	Log.out( "Oxel.facesBuild - not being lit" );
 
 		if ( dirty ) {
 			if ( childrenHas() ) {
@@ -1154,10 +1154,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 	
 	private function facesBuildTerminal():void {
-		if ( gc.eval( 5, 101, 72, 16 )) {
-			var result:Boolean = faceHasDirtyBits();
-			Log.out("Oxel.facesBuildTerminal - not being lit");
-		}
+		//if ( gc.eval( 5, 101, 72, 16 )) {
+		//	var result:Boolean = faceHasDirtyBits();
+		//	Log.out("Oxel.facesBuildTerminal - not being lit");
+		//}
 
 		if ( TypeInfo.AIR == type )
 			facesMarkAllClean();
@@ -2958,7 +2958,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	
 	// This function writes to the root oxel, and lets the root find the correct target
 	// it also add flow and lighting
-	public function changeOxel( $modelGuid:String, $gc:GrainCursor, $newType:int, $onlyChangeType:Boolean = false ):Boolean
+	public function changeOxel( $instanceGuid:String, $gc:GrainCursor, $newType:int, $onlyChangeType:Boolean = false ):Boolean
 	{
 		// thisa finds the closest oxel, could be target oxel, could be parent
 		var changeCandidate:Oxel = childFind( $gc );
@@ -2975,24 +2975,24 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			return false;
 			
 		if ( !$onlyChangeType )
-			changeCandidate.removeOldLightInfo( $modelGuid );
+			changeCandidate.removeOldLightInfo( $instanceGuid );
 		
 		changeCandidate.dirty = true;
 		if ( !$onlyChangeType ) {
-			changeCandidate.applyNewLightInfo( $modelGuid, $newType );
-			changeCandidate.applyFlowInfo( $modelGuid, $newType )
+			changeCandidate.applyNewLightInfo( $instanceGuid, $newType );
+			changeCandidate.applyFlowInfo( $instanceGuid, $newType )
 		}
-		changeCandidate.writeInternal( $modelGuid, $newType, $onlyChangeType );
+		changeCandidate.writeInternal( $instanceGuid, $newType, $onlyChangeType );
 		return true
 	}
 
-	private function removeOldLightInfo( $modelGuid:String ):void {
+	private function removeOldLightInfo( $instanceGuid:String ):void {
 		if ( lighting ) {
 			var ti:TypeInfo = TypeInfo.typeInfo[type];
 			if ( ti.lightInfo.lightSource ) {
 				var oldLightID:uint = lighting.lightIDGet();
 				if ( 0 != oldLightID )
-					LightEvent.dispatch( new LightEvent( LightEvent.REMOVE, $modelGuid, gc, oldLightID ) );
+					LightEvent.dispatch( new LightEvent( LightEvent.REMOVE, $instanceGuid, gc, oldLightID ) );
 			}
 				
 			if ( lighting.ambientOcculsionHas() ) {
@@ -3005,31 +3005,31 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 	
-	private function applyNewLightInfo( $modelGuid:String, $newType:int ):void {
+	private function applyNewLightInfo( $instanceGuid:String, $newType:int ):void {
 		var newTypeInfo:TypeInfo = TypeInfo.typeInfo[$newType];
 		if ( newTypeInfo.lightInfo.lightSource )
-			LightEvent.dispatch( new LightEvent( LightEvent.ADD, $modelGuid, gc, Math.random() * 0xffffffff ) );
+			LightEvent.dispatch( new LightEvent( LightEvent.ADD, $instanceGuid, gc, Math.random() * 0xffffffff ) );
 			
 		if ( TypeInfo.isSolid( type ) && TypeInfo.hasAlpha( $newType ) ) {
 			// we removed a solid block, and are replacing it with air or transparent
 			if ( lighting && lighting.valuesHas() )
-				LightEvent.dispatch( new LightEvent( LightEvent.SOLID_TO_ALPHA, $modelGuid, gc ) );
+				LightEvent.dispatch( new LightEvent( LightEvent.SOLID_TO_ALPHA, $instanceGuid, gc ) );
 		} 
 		else if ( TypeInfo.isSolid( $newType ) && TypeInfo.hasAlpha( type ) ) {
 			// we added a solid block, and are replacing the transparent block that was there
 			if ( lighting && lighting.valuesHas() )
-				LightEvent.dispatch( new LightEvent( LightEvent.ALPHA_TO_SOLID, $modelGuid, gc ) );
+				LightEvent.dispatch( new LightEvent( LightEvent.ALPHA_TO_SOLID, $instanceGuid, gc ) );
 		}
 	}
 	
-	private function applyFlowInfo( $modelGuid:String, $newType:int ):void {
+	private function applyFlowInfo( $instanceGuid:String, $newType:int ):void {
 			// at this point the target oxel should either have valid flowInfo from the oxel it came from
 			// or it was just placed, in which case it should have invalid info, and then
 			// reference data is copied over it.
 			var newTypeInfo:TypeInfo = TypeInfo.typeInfo[$newType];
 			if ( newTypeInfo.flowable ) {
 				
-				addFlowTask( $modelGuid, newTypeInfo );
+				addFlowTask( $instanceGuid, newTypeInfo );
 				
 				var neighborAbove:Oxel = neighbor( Globals.POSY );
 				if ( Globals.BAD_OXEL == neighborAbove || TypeInfo.AIR == neighborAbove.type )
@@ -3040,7 +3040,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 					flowInfo.reset()
 	}
 	
-	private function addFlowTask( $modelGuid:String, $newTypeInfo:TypeInfo ):void {
+	private function addFlowTask( $instanceGuid:String, $newTypeInfo:TypeInfo ):void {
 		if ( null == flowInfo ) // if it doesnt have flow info, get some! This is from placement of flowable oxels
 			flowInfo = FlowInfoPool.poolGet();
 		
@@ -3051,7 +3051,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			var priority:int = 1;
 			if ( Globals.isHorizontalDirection( flowInfo.direction ) )
 				priority = 3;
-			Flow.addTask( $modelGuid, gc, $newTypeInfo.type, priority )
+			Flow.addTask( $instanceGuid, gc, $newTypeInfo.type, priority )
 		}
 	}
 	

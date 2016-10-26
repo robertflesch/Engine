@@ -213,8 +213,8 @@ public class ModelInfo extends PersistanceObject
 		return false;
 	}
 	
-	public function changeOxel( $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
-		var result:Boolean = _data.changeOxel( guid, $gc, $type, $onlyChangeType );
+	public function changeOxel( $instanceGuid:String , $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
+		var result:Boolean = _data.changeOxel( $instanceGuid, $gc, $type, $onlyChangeType );
 		if ( TypeInfo.AIR == $type )
 			childRemoveByGC( $gc );
 		return result;

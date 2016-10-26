@@ -186,9 +186,7 @@ package com.voxelengine {
 		
 		private static var g_active:Boolean = false; // app is active
 		public static function get active():Boolean{ return g_active; }
-		public static function set active( val:Boolean ):void {
-			Log.out( "ACTIVE: " + val, Log.WARN );
-		g_active = val; }
+		public static function set active( val:Boolean ):void { g_active = val; }
 		
 		// This eats the first click on the screen when it is activated
 		private static var g_clicked:Boolean = false; // app has been clicked on after an activate has happened

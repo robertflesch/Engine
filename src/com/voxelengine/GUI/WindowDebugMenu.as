@@ -8,7 +8,8 @@
 package com.voxelengine.GUI
 {
 	import com.voxelengine.events.AppEvent;
-	import com.voxelengine.worldmodel.models.types.EditCursor;
+import com.voxelengine.renderer.Chunk;
+import com.voxelengine.worldmodel.models.types.EditCursor;
 	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
@@ -43,17 +44,11 @@ package com.voxelengine.GUI
 			super( 500, 100 );
 			_s_currentInstance = this;
 			
-			//glowColor = "red";
-			//glow = true;
 			shadow = true;
 			
 			autoSize = true;
 			padding = 0;
 			layout.orientation = LayoutOrientation.VERTICAL;
-			
-			//addButton( "Save ModelIVM"	, Globals.g_gui.saveModelIVM );
-			//addButton( "Save ModelMeta"	, Globals.g_gui.saveModelMeta );
-			//addButton( "Save Map"	, Globals.g_gui.saveMap );
 			
 			addSpace();
 			addModelLocation();
@@ -62,13 +57,8 @@ package com.voxelengine.GUI
 			addSpace();
 			
 			addInt( "Total  CPU Mem: ", MemoryManager.currentMemory );
-			addInt( "Drawn Oxels:", VertexIndexBuilder.totalOxels );
 			addSpace();
 			
-//			addInt( "Landscape Tasks: ", TaskController.taskCount );
-//			addInt( "       Flow Tasks: ", FlowTaskController.taskCount );
-//			addSpace();
-
 			addInt( "Used Vertex Buf:", VertexIndexBuilderPool.totalUsed );
 			addInt( "Remaining:", VertexIndexBuilderPool.remaining );
 			addSpace();
@@ -76,9 +66,13 @@ package com.voxelengine.GUI
 			addInt( "GPU Vertex Mem:", VertexIndexBuilder.totalVertexMemory );
 			addInt( "GPU Index Mem:", VertexIndexBuilder.totalIndexMemory );
 			addSpace();
-			
+
+			addInt( "Drawn Oxels:", VertexIndexBuilder.totalOxels );
 			addInt( "Used Oxels: ", OxelPool.totalUsed );
 			addInt( "Remaining: ", OxelPool.remaining );
+			addSpace();
+
+			addInt( "Used Chunks: ", Chunk.chunkCount );
 			addSpace();
 
 			addInt( "Used Neighbors: ", NeighborPool.totalUsed );
@@ -125,10 +119,10 @@ package com.voxelengine.GUI
 
 			//addStaticMemoryNumberDisplay( _target, 100, 0, "           Total Voxels: ", Quad.count );
 			
-			display( 0, 250 )	
-			onResize( null )
+			display( 0, 250 );
+			onResize( null );
 			
-			AppEvent.addListener( Event.ENTER_FRAME, onEnterFrame )
+			AppEvent.addListener( Event.ENTER_FRAME, onEnterFrame );
 			
 			Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 		} 
@@ -154,7 +148,7 @@ package com.voxelengine.GUI
 			addElement( smsd );
 			_smids.push( smsd );
 		}
-		
+		/*
 		private function addButton( title:String, callback:Function ):void
 		{
 			var but:Button = new Button( title );
@@ -162,19 +156,14 @@ package com.voxelengine.GUI
 			but.addEventListener(UIMouseEvent.PRESS, callback );
 			addElement( but );
 		}
-		
+		*/
 		private function addSpace():void
 		{
 			var space:Label = new Label();
 			space.height = 10;
 			addElement( space );
 		}
-		
-		private function fullScreenHandler(e:UIMouseEvent):void 
-		{
-			VoxelVerseGUI.currentInstance.toggleFullscreen();
-		}
-		
+
 		private function onEnterFrame( event:Event ):void
 		{
 			for each ( var smid:StaticMemoryDisplay in _smids )
@@ -187,7 +176,7 @@ package com.voxelengine.GUI
 				_modelLoc.text = ""; 
 				if ( Player.player )
 				{
-					var loc:Vector3D = VoxelModel.controlledModel.instanceInfo.positionGet
+					var loc:Vector3D = VoxelModel.controlledModel.instanceInfo.positionGet;
 					_modelLoc.text = "x: " + int( loc.x ) + "  y: " + int( loc.y ) + "  z: " + int( loc.z ); 
 				}
 			}
@@ -203,7 +192,7 @@ package com.voxelengine.GUI
 				if ( VoxelModel.selectedModel && EditCursor.currentInstance.gciData )
 				{
 					var gci:GrainCursorIntersection = EditCursor.currentInstance.gciData;
-					var rot:Vector3D = VoxelModel.controlledModel.instanceInfo.rotationGet;
+					//var rot:Vector3D = VoxelModel.controlledModel.instanceInfo.rotationGet;
 					_gcLabel.text = "grain: " + gci.gc.grain + " x: " + int( gci.gc.grainX ) + "  y: " + int( gci.gc.grainY ) + "  z: " + int( gci.gc.grainZ ); 
 				}
 			}
@@ -226,7 +215,6 @@ package com.voxelengine.GUI
 }
 
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import org.flashapi.swing.Canvas;
 import org.flashapi.swing.Label;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.layout.AbsoluteLayout;
@@ -237,7 +225,7 @@ class StaticMemoryDisplay extends VVCanvas
 		super( 200, 10 );
 	}
 	
-	public function updateFunction():void {};
+	public function updateFunction():void {}
 }
 
 class StaticMemoryIntDisplay extends StaticMemoryDisplay
@@ -255,7 +243,7 @@ class StaticMemoryIntDisplay extends StaticMemoryDisplay
 		_value = value;
 		
 		layout = new AbsoluteLayout();
-		_prefix.textAlign = TextAlign.RIGHT
+		_prefix.textAlign = TextAlign.RIGHT;
 		_prefix.text = prefix;
 		_prefix.width = PREFIX_WIDTH;
 		_prefix.x = 0;
@@ -263,7 +251,7 @@ class StaticMemoryIntDisplay extends StaticMemoryDisplay
 		_prefix.fontColor = FONT_COLOR;
 		_prefix.fontSize = 10;
 		addElement( _prefix );
-		_data.textAlign = TextAlign.RIGHT
+		_data.textAlign = TextAlign.RIGHT;
 		_data.width = 60;
 		_data.x = PREFIX_WIDTH;
 		_data.y = 0;
@@ -304,7 +292,6 @@ class StaticMemoryIntDisplay extends StaticMemoryDisplay
 	}
 }
 
-import com.voxelengine.Globals;
 class StaticMemoryStringDisplay extends StaticMemoryDisplay
 {
 	private var _prefix:Label = new Label();
@@ -317,9 +304,9 @@ class StaticMemoryStringDisplay extends StaticMemoryDisplay
 	{
 		super();
 		_value = value;
-		
+
 		layout = new AbsoluteLayout();
-		_prefix.textAlign = TextAlign.RIGHT
+		_prefix.textAlign = TextAlign.RIGHT;
 		_prefix.text = prefix;
 		_prefix.width = PREFIX_WIDTH;
 		_prefix.x = 0;
@@ -327,7 +314,7 @@ class StaticMemoryStringDisplay extends StaticMemoryDisplay
 		_prefix.fontColor = FONT_COLOR;
 		_prefix.fontSize = 10;
 		addElement( _prefix );
-		_data.textAlign = TextAlign.RIGHT
+		_data.textAlign = TextAlign.RIGHT;
 		_data.width = 60;
 		_data.x = PREFIX_WIDTH;
 		_data.y = 0;

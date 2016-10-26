@@ -192,14 +192,14 @@ package org.flashapi.swing.core {
 	 *
 	 *  @eventType org.flashapi.swing.event.FocusEvent.FOCUS_IN
 	 */
-	[Event(name = "focusIn", type = "org.flashapi.swing.event.FocusEvent")]
+	//[Event(name = "focusIn", type = "org.flashapi.swing.event.FocusEvent")]
 	
 	/**
 	 *  Dispatched each time the <code>UIObject</code> looses the focus.
 	 *
 	 *  @eventType org.flashapi.swing.event.FocusEvent.FOCUS_OUT
 	 */
-	[Event(name = "focusOut", type = "org.flashapi.swing.event.FocusEvent")]
+	//[Event(name = "focusOut", type = "org.flashapi.swing.event.FocusEvent")]
 	
 	/**
 	 *  Dispatched each time this <code>UIObject</code> is resized.
@@ -2671,7 +2671,7 @@ package org.flashapi.swing.core {
 					lookAndFeel.onChange();
 					lookAndFeel = null;
 				}
-				$uiRef.lafList.deleteObserver(this);
+//				$uiRef.lafList.deleteObserver(this); RSF commented out since it was an error 11/21/2016
 				if ($uiRef.lafList.countObservers() == 0) $uiRef.lafList = null;
 			}
 			spas_internal::lafDTO.spas_internal::finalize();
@@ -3146,7 +3146,7 @@ package org.flashapi.swing.core {
 				}
 			}
 			*/
-			$uiRef.lafList.addObserver(this);
+//			$uiRef.lafList.addObserver(this);  RSF commented out since it was an error 11/21/2016
 			validateLaf(_defaultLaf);
 			if ($uiRef.laf == undefined) setLafRef(_defaultLaf);
 			setNewLaf();

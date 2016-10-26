@@ -123,7 +123,8 @@ package com.voxelengine.GUI
 			var elapsed:int = time - _startTime;
 			if(elapsed >= 1000)
 			{
-				_fps = Math.round(_frames * 1000 / elapsed);
+				//_fps = Math.round(_frames * 1000 / elapsed);
+				_fps = 1000/VoxelVerse.frameTime();
 				_frames = 0;
 				_startTime = time;
 				// update the parent component with the right 

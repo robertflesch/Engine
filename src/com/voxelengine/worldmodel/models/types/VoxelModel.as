@@ -14,33 +14,20 @@ import flash.events.TimerEvent;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
 import flash.ui.Keyboard;
-import flash.utils.ByteArray;
-import flash.utils.getQualifiedClassName;
 import flash.utils.getTimer;
 import flash.utils.Timer;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-
 import com.voxelengine.events.*;
-
-import com.voxelengine.pools.LightingPool;
 import com.voxelengine.pools.GrainCursorPool;
-import com.voxelengine.pools.OxelPool;
-
 import com.voxelengine.worldmodel.*;
 import com.voxelengine.worldmodel.animation.*;
-import com.voxelengine.worldmodel.biomes.LayerInfo;
-import com.voxelengine.worldmodel.oxel.Lighting;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.models.*;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.tasks.flowtasks.Flow;
-import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
 import com.voxelengine.worldmodel.scripts.Script;
-import com.voxelengine.worldmodel.weapons.Projectile;
 
 /**
  * ...
@@ -59,16 +46,16 @@ public class VoxelModel
 	//public static function set selectedModel( $val:VoxelModel ):void { _s_selectedModel = $val; }
 	public static function set selectedModel( $val:VoxelModel ):void { 
 		if ( _s_selectedModel == $val )
-			return
+			return;
 		//Log.out( "VoxelModel.selectedModel: " + ( $val ? $val.toString() : "null") , Log.DEBUG );
 		// unselect the old model
 		if ( _s_selectedModel )
-			_s_selectedModel.selected = false	
+			_s_selectedModel.selected = false;
 		// change the static to new model
-		_s_selectedModel = $val
+		_s_selectedModel = $val;
 		// set new model as selected
 		if ( _s_selectedModel ) {
-			_s_selectedModel.selected = true	
+			_s_selectedModel.selected = true;
 			//Axes.show()
 		}
 		//if ( null == $val )
@@ -94,7 +81,7 @@ public class VoxelModel
 	private		var	_timer:int 									= getTimer(); 				
 	private		var	_initialized:Boolean;
 	private 	var _hasInventory:Boolean;
-	protected	var	_stateLock:Boolean
+	protected	var	_stateLock:Boolean;
 	protected	var	_changed:Boolean; 
 	protected	var	_complete:Boolean;
 	protected	var	_selected:Boolean;
@@ -172,14 +159,14 @@ public class VoxelModel
 		cameraAddLocations();
 		
 		if (instanceInfo.state != "")
-			stateSet(instanceInfo.state)
+			stateSet(instanceInfo.state);
 			
 		processClassJson();
 	}
 	
 	private function oxelDataRetrieved(e:OxelDataEvent):void {
 		if ( e.modelGuid == modelInfo.guid ) {
-			OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelDataRetrieved )
+			OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelDataRetrieved );
 			calculateCenter()
 		}
 	}
@@ -225,7 +212,7 @@ public class VoxelModel
 	public function childFindByName($name:String, $recursive:Boolean = true ):VoxelModel {
 		// Are we that model?
 		if ( metadata.name == $name )
-			return this
+			return this;
 		
 		// check children
 		for each (var child:VoxelModel in modelInfo.childVoxelModels) {
@@ -242,7 +229,7 @@ public class VoxelModel
 	
 	public function childNameList( $nameList:Vector.<String> ):void {
 		for each (var child:VoxelModel in modelInfo.childVoxelModels) {
-			$nameList.push( child.metadata.name )
+			$nameList.push( child.metadata.name );
 			child.childNameList( $nameList );
 		}
 	}
@@ -438,7 +425,7 @@ public class VoxelModel
 		}
 		else {
 			Log.out( "VoxelModel.write - going to changeOxel");
-			var result:Boolean = modelInfo.changeOxel( $gc, $type, $onlyChangeType );
+			var result:Boolean = modelInfo.changeOxel( instanceInfo.instanceGuid, $gc, $type, $onlyChangeType );
 			if ( result )
 				changed = true;
 			return result;
@@ -476,14 +463,14 @@ public class VoxelModel
 
 	
 	public function getModelChain( $chain:Vector.<VoxelModel> ):void {
-		$chain.push( this )
+		$chain.push( this );
 		if ( instanceInfo.controllingModel ) {
 			instanceInfo.controllingModel.getModelChain( $chain )
 		}
 	}
 	
 	static public function getWorldSpacePositionInChain( $chain:Vector.<VoxelModel> ):Matrix3D {
-		var len:int = $chain.length
+		var len:int = $chain.length;
 		Log.out( "VoxelModel.getWorldSpacePositionInChain - all these clones are BAD", Log.ERROR );
 
 		var viewMatrix:Matrix3D = $chain[len-1].instanceInfo.worldSpaceMatrix.clone();
@@ -684,8 +671,6 @@ public class VoxelModel
 		pt.setValid();
 		throw new Error("VoxelModel.isPositionValid - NOT IMPLEMENTED - this would be used by a generic model vs another generic model");
 		return pt;
-		// This sends the message back to the 
-		return pt;
 	}
 	
 	public function isPassableAvatar(x:int, y:int, z:int, gct:GrainCursor, collideAtGrain:uint, positionResult:PositionTest):Boolean {
@@ -764,7 +749,7 @@ public class VoxelModel
 		}
 		else if ( $cp.oxel.type != TypeInfo.AIR ) {
 			if ( $collidingModel is Player ) {
-				Player.player.lastCollisionModel = this
+				Player.player.lastCollisionModel = this;
 				//Log.out( "VoxelModel.isNewPositionValid - oxel is BAD, so passable")
 			}
 		}
@@ -779,7 +764,7 @@ public class VoxelModel
 		if ( modelInfo.data.oxel ) {
 			modelInfo.data.oxel.changeGrainSize(changeSize, modelInfo.data.oxel.gc.bound + changeSize);
 			//Log.out("VoxelModel.changeGrainSize - took: " + (getTimer() - _timer) + " count " + Oxel.nodes);
-			modelInfo.data.vistor( Oxel.rebuild );
+			modelInfo.data.visitor( Oxel.rebuild );
 			//Log.out("VoxelModel.changeGrainSize - rebuildAll took: " + (getTimer() - _timer));
 		}
 	}
@@ -889,7 +874,7 @@ public class VoxelModel
 	public function childAdd( $childModel:VoxelModel):void {
 		
 		if ( false == modelInfo.childrenLoaded )
-			modelInfo.childAdd( $childModel )
+			modelInfo.childAdd( $childModel );
 		else	
 			if ( metadata.permissions.modify )
 				modelInfo.childAdd( $childModel )
@@ -1137,7 +1122,7 @@ public class VoxelModel
 		
 		Log.out( "VoxelModel.getDefaultSlotData - Loading default data into slots" , Log.WARN );
 		var slots:Vector.<ObjectInfo> = new Vector.<ObjectInfo>( Slots.ITEM_COUNT );
-		for ( var i:int; i < Slots.ITEM_COUNT; i++ ) 
+		for ( var i:int = 0; i < Slots.ITEM_COUNT; i++ )
 			slots[i] = new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY );
 		
 		return slots;
