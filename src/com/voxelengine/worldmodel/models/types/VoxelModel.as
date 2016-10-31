@@ -157,11 +157,12 @@ public class VoxelModel
 		}
 		
 		cameraAddLocations();
-		
+
+		// I think this should be before we do the setStage
+		processClassJson();
+
 		if (instanceInfo.state != "")
 			stateSet(instanceInfo.state);
-			
-		processClassJson();
 	}
 	
 	private function oxelDataRetrieved(e:OxelDataEvent):void {

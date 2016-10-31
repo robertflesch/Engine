@@ -51,7 +51,7 @@ public final class LightingPool
 			return lighting; 
 		}
 			 
-		Log.out( "BrightnessPool.poolGet - Allocating more Brightness: " + _currentPoolSize );
+		Log.out( "LightingPool.poolGet - Allocating more Brightness: " + _currentPoolSize );
 		var timer:int = getTimer();
 
 		_currentPoolSize += GROWTH_VALUE;
@@ -63,7 +63,7 @@ public final class LightingPool
 		}
 		_counter = newIndex - 1; 
 		
-		Log.out( "BrightnessPool.poolGet - Done allocating more Brightness: " + _currentPoolSize  + " took: " + (getTimer() - timer) );
+		Log.out( "LightingPool.poolGet - Done allocating more Brightness: " + _currentPoolSize  + " took: " + (getTimer() - timer) );
 		return poolGet( $baseLightLevel ); 
 	} 
 
@@ -71,7 +71,7 @@ public final class LightingPool
 	{ 
 		if ( !$disposedBrightness )
 		{
-			Log.out( "BrightnessPool.poolReturn - displosedBrightness is NULL" );
+			Log.out( "LightingPool.poolReturn - displosedBrightness is NULL" );
 			return;
 		}
 		$disposedBrightness.reset();	

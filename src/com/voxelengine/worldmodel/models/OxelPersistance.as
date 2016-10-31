@@ -221,14 +221,14 @@ public class OxelPersistance extends PersistanceObject
 	
 	public function fromByteArray():void {
 
-		//Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.INFO );
+		Log.out( "OxelPersistance.fromByteArray - guid: " + guid, Log.INFO );
 		var time:int = getTimer();
 		
 		try { ba.uncompress(); }
 		catch (error:Error) { Log.out( "OxelPersistance.fromByteArray - Was expecting compressed data " + guid, Log.WARN ); }
 		ba.position = 0;
 
-		//Log.out( "OxelPersistance.fromByteArray - uncompress took: " + (getTimer() - time), Log.INFO );
+		Log.out( "OxelPersistance.fromByteArray - uncompress took: " + (getTimer() - time), Log.INFO );
 
 		extractVersionInfo( ba );
 		// how many bytes is the modelInfo
@@ -249,22 +249,23 @@ public class OxelPersistance extends PersistanceObject
 		if ( parent )
 			Lighting.defaultBaseLightAttn = parent.baseLightLevel
 		gct.grain = rootGrainSize;
-		//Log.out( "OxelPersistance.fromByteArray - b4 readVersionedData?", Log.INFO );
+
+		Log.out( "OxelPersistance.fromByteArray - b4 readVersionedData?", Log.INFO );
 		if (Globals.VERSION_000 == _version)
 			oxel.readData( null, gct, ba, _statisics );
 		else
 			oxel.readVersionedData( _version, null, gct, ba, _statisics );
 		GrainCursorPool.poolDispose(gct);
-		//Log.out( "OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.INFO );
+		Log.out( "OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.INFO );
 		
 		_statisics.gather();
 		//_statisics.statsPrint();
 		
-		//Log.out( "OxelPersistance.fromByteArray - _statisics took: " + (getTimer() - time), Log.INFO );
+		Log.out( "OxelPersistance.fromByteArray - _statisics took: " + (getTimer() - time), Log.INFO );
 		
 		_topMostChunk = Chunk.parse( oxel, null );
 		_loaded = true;
-		//Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
+		Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 		
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this ) );
 	}

@@ -53,7 +53,8 @@ import com.voxelengine.worldmodel.MemoryManager
 import com.voxelengine.worldmodel.MouseKeyboardHandler
 import com.voxelengine.worldmodel.Region
 
-[SWF(width='512',height='512',frameRate='90',backgroundColor='0xDDDDDD')]
+//[SWF(frameRate='60',width='512',height='512',backgroundColor='0xffffff')]
+[SWF(frameRate="120",backgroundColor="0xffffff",width="960",height="540")]
 public class VoxelVerse extends Sprite
 {
 	private var _timePrevious:int = getTimer();
@@ -100,6 +101,8 @@ public class VoxelVerse extends Sprite
 		if ( -1 == index )
 			index = url.lastIndexOf( "VoxelVerseD.swf" );
 		if ( -1 == index )
+			index = url.lastIndexOf( "VoxelVerseDDesk.swf" );
+		if ( -1 == index )
 			Log.out( "VoxelVerse.initializeDataBeforeSplash - App path not being set correctly appPath: " + url, Log.ERROR );
 		Globals.appPath = url.substring( 0, index );
 		//Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG )
@@ -139,7 +142,6 @@ public class VoxelVerse extends Sprite
 
 		initializeDataAfterSplash();
 
-
 		// These two should be the same
 		// https://gamesnet.yahoo.net/forum/viewtopic.php?f=33&t=35896&sid=1f0b0c5bef7f97c6961760b6a3418c69
 		// for reference
@@ -159,6 +161,8 @@ public class VoxelVerse extends Sprite
 
 	public static var timeEntered:int = 0;
 	public static var framesToDisplaySplash:int = 0;
+    private static var _s_frameTime:int
+    public static function frameTime():int { return _s_frameTime; }
 	private function enterFrame(e:Event):void {
 
 		//Log.out( "VoxelVerse.enterFrame" );
@@ -174,7 +178,6 @@ public class VoxelVerse extends Sprite
 			timeEntered = getTimer();
 
 		var elapsed:int = timeEntered - _timePrevious;
-		_timePrevious = timeEntered;
 
 		MemoryManager.update();
 
@@ -188,11 +191,13 @@ public class VoxelVerse extends Sprite
 		if ( showConsole )
 			toggleConsole();
 
-		if ( ( 20 < timeRender || 10 < timeUpdate ) && Globals.active && Globals.isDebug )
-			Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed, Log.INFO )
+        _s_frameTime = elapsed + timeUpdate + timeRender;
+		//if ( ( 20 < timeRender || 10 < timeUpdate ) && Globals.active && Globals.isDebug )
+		//  Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed, Log.INFO )
 
 		// For some reason is was important to make sure everything was updated before this got passed on to child classes.
 		AppEvent.dispatch( e )
+		_timePrevious = getTimer();
 	}
 
 	/**
@@ -201,12 +206,12 @@ public class VoxelVerse extends Sprite
 	 *  This allow the app to not pick up any other mouse or keyboard activity when app is not active
 	 */
 	public function mouseLeave( e:Event ):void {
-		Log.out( "VoxelVerse.mouseLeave event" );
+		//Log.out( "VoxelVerse.mouseLeave event" );
 		deactivate( e )
 	}
 
 	private function deactivate(e:Event):void {
-		Log.out( "VoxelVerse.deactive event", Log.WARN );
+		//Log.out( "VoxelVerse.deactive event", Log.WARN );
 		if ( Globals.active )
 			appLosesFocus(e)
 	}
@@ -234,9 +239,9 @@ public class VoxelVerse extends Sprite
 	}
 
 	private function activate(e:Event):void {
-		Log.out( "VoxelVerse.activate event", Log.WARN )
+		//Log.out( "VoxelVerse.activate event", Log.WARN )
 		if ( false == Globals.active ) {
-			Log.out( "VoxelVerse.activate - setting active = TRUE" );
+			//Log.out( "VoxelVerse.activate - setting active = TRUE" );
 			Globals.active = true;
 			Globals.clicked = true;
 			VoxelVerseGUI.currentInstance.crossHairActive();
@@ -268,7 +273,7 @@ public class VoxelVerse extends Sprite
 	//}
 
 	private function mouseUp(e:MouseEvent):void {
-		Log.out( "VoxelVerse.mouseUp event" )
+		//Log.out( "VoxelVerse.mouseUp event" )
 		stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 		activate(e)
 	}

@@ -2,7 +2,7 @@
 <module type="Flex" version="4">
   <component name="FlexBuildConfigurationManager" active="Debug">
     <configurations>
-      <configuration name="Debug" pure-as="true" main-class="VoxelVerse" output-file="VoxelVerseD.swf" output-folder="$MODULE_DIR$/../Resources/bin">
+      <configuration name="Debug" pure-as="true" main-class="VoxelVerse" output-file="VoxelVerseDDesk.swf" output-folder="$MODULE_DIR$/../Resources/bin">
         <dependencies target-player="22.0">
           <entries>
             <entry library-id="48f9b327-4678-43d7-b9fb-d2f59f02eb89">
@@ -32,11 +32,33 @@
             <entry key="compiler.debug.swf" value="false" />
           </map>
           <option name="resourceFilesMode" value="None" />
-          <option name="additionalOptions" value="-advanced-telemetry=false" />
+          <option name="additionalOptions" value="-advanced-telemetry=true" />
         </compiler-options>
         <packaging-air-desktop />
         <packaging-android />
         <packaging-ios />
+      </configuration>
+      <configuration name="Device Debug" target-platform="Mobile" pure-as="true" main-class="VoxelVerse" output-file="VoxelVerseD.swf" output-folder="$MODULE_DIR$/../Resources/bin">
+        <dependencies>
+          <entries>
+            <entry library-id="83af9a87-a6c3-4f5e-85f1-9b7cf3a3e0d9">
+              <dependency linkage="Merged" />
+            </entry>
+          </entries>
+          <sdk name="23.0" />
+        </dependencies>
+        <compiler-options>
+          <option name="resourceFilesMode" value="None" />
+        </compiler-options>
+        <packaging-air-desktop />
+        <packaging-android enabled="true" use-generated-descriptor="false" custom-descriptor-path="$MODULE_DIR$/VoxelVerse-app.xml" package-file-name="Device_Debug">
+          <files-to-package>
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/../Resources/bin/config.json" path-in-package="config.json" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/../Resources/bin/types.json" path-in-package="types.json" />
+            <FilePathAndPathInPackage file-path="$MODULE_DIR$/../Resources/bin/assets" path-in-package="assets" />
+          </files-to-package>
+        </packaging-android>
+        <packaging-ios package-file-name="Device_Debug" />
       </configuration>
     </configurations>
     <compiler-options />
@@ -46,7 +68,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="22.0" jdkType="Flex SDK Type (new)" />
+    <orderEntry type="jdk" jdkName="23.0&#9;22.0" jdkType="__CompositeFlexSdk__" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library" exported="">
       <library type="flex">
@@ -61,6 +83,16 @@
     <orderEntry type="module-library" exported="">
       <library type="flex">
         <properties id="558cca8f-e53a-41d4-be0a-081cf3c8cf31" />
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/lib/PlayerIOClient.swc!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library" exported="">
+      <library type="flex">
+        <properties id="83af9a87-a6c3-4f5e-85f1-9b7cf3a3e0d9" />
         <CLASSES>
           <root url="jar://$MODULE_DIR$/lib/PlayerIOClient.swc!/" />
         </CLASSES>

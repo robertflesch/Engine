@@ -44,8 +44,8 @@ public class VertexIndexBuilder
 	//     Static Functions
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// These are not getters because I am not able to access them from GUI if they are.
-	public static function totalVertexMemory():int { return _s_totalVertexMemory;}
-	public static function totalIndexMemory():int { return _s_totalIndexMemory; }
+	public static function totalVertexMemory():int { return _s_totalVertexMemory/1000 ;}
+	public static function totalIndexMemory():int { return _s_totalIndexMemory/1000 ; }
 	public static function totalUsed():int { return _s_totalUsed; }
 	public static function totalOxels():int { return _s_totalOxels;}
 

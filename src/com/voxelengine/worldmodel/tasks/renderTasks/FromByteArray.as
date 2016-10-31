@@ -18,6 +18,8 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.models.OxelPersistance;
 
+import flash.utils.getTimer;
+
 /**
  * ...
  * @author Robert Flesch
@@ -46,6 +48,8 @@ public class FromByteArray extends AbstractTask
 	override public function start():void {
 		super.start()
 
+		Log.out( "FromByteArray.start: guid: " + _guid );
+		var time:int = getTimer();
 		_parent.fromByteArray();
 
 		if ("0" == _parent.dbo.key) {
@@ -60,6 +64,7 @@ public class FromByteArray extends AbstractTask
 
 		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );
 		super.complete()
+		Log.out( "FromByteArray.start: took: " + (getTimer() - time) + "  guid: " + _guid );
 	}
 }
 }
