@@ -326,9 +326,9 @@ public class Renderer extends EventDispatcher
 		const antiAlias:int = 0;
 		//Log.out( "Renderer.onContext - ANTI_ALIAS set to: " + antiAlias, Log.DEBUG );
 		
-		// false indicates no depth or stencil buffer is created, true creates a depth and a stencil buffer. 
-		//const enableDepthAndStencil:Boolean = true;
-		const enableDepthAndStencil:Boolean = false;
+		// false indicates no depth or stencil buffer is created, true creates a depth and a stencil buffer.
+		// This HAS to be true in order for Z Depth to work
+		const enableDepthAndStencil:Boolean = true;
 		if ( context3D )
 			context3D.configureBackBuffer( width, height, antiAlias, enableDepthAndStencil );
 	}
