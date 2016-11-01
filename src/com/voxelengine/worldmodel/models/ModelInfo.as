@@ -49,7 +49,8 @@ public class ModelInfo extends PersistanceObject
 	
 	private var 		_data:OxelPersistance;
 	public function get data():OxelPersistance  					{ return _data; }
-	
+	public function set data( $oxel:OxelPersistance ):void			{ _data = $oxel; }
+
 	public function get scripts():Array 							{ return info.model.scripts; }
 	public function get modelClass():String							{ return info.model.modelClass; }
 	public function set modelClass(val:String):void 				{ info.model.modelClass = val; }
@@ -557,8 +558,8 @@ public class ModelInfo extends PersistanceObject
 	
 	// These are temporary used for loading local objects
 	private function get altGuid():String 							{ return _altGuid; }
-	private function get biomes():Biomes 							{ return _biomes; }
-	private function set biomes(value:Biomes):void  					{ _biomes = value; }
+	public function get biomes():Biomes 							{ return _biomes; }
+	public function set biomes(value:Biomes):void  					{ _biomes = value; }
 	
 	override public function save():void {
 		if ( Globals.isGuid( guid ) ) {

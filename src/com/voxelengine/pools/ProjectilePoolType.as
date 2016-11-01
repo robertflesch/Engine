@@ -13,6 +13,7 @@ import com.voxelengine.Log
 import com.voxelengine.Globals
 import com.voxelengine.worldmodel.models.*
 import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube
 import com.voxelengine.worldmodel.weapons.Projectile
      
@@ -71,37 +72,40 @@ public final class ProjectilePoolType
 		//ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, _projectileGuid, _modelMetadata ) )
 		Log.out( "ProjectilePoolType.generateData: " + _modelInfo.toString() );
 		//_modelInfo.oxelLoadData();
-		_modelInfo.loadFromBiomeData();
+		//_modelInfo.loadFromBiomeData();
+		_modelInfo.data = new OxelPersistance( _projectileGuid );
+		_modelInfo.data.ba  = Oxel.generateCube( _projectileGuid, _modelInfo.biomes.layers[0], false );
+		_modelInfo.data.fromByteArray();
 	}
 		
 	private function newModel():Projectile {	
-		var ii:InstanceInfo = new InstanceInfo()
-		ii.instanceGuid = Globals.getUID()
-		ii.modelGuid = _projectileGuid
-		ii.usesCollision = true
-		ii.dynamicObject = true
-		var vm:Projectile = new Projectile( ii )
+		var ii:InstanceInfo = new InstanceInfo();
+		ii.instanceGuid = Globals.getUID();
+		ii.modelGuid = _projectileGuid;
+		ii.usesCollision = true;
+		ii.dynamicObject = true;
+		var vm:Projectile = new Projectile( ii );
 		if ( null == vm ) {
-			Log.out( "Projectile.newModel - failed to create Projectile", Log.ERROR )
+			Log.out( "Projectile.newModel - failed to create Projectile", Log.ERROR );
 			return null
 		}
-		vm.init( _modelInfo, _modelMetadata )
+		vm.init( _modelInfo, _modelMetadata );
 		return vm
 	}
 
 	public function poolGet():Projectile { 
 		if ( _counter > 0 ) 
-			return _pool[--_counter] 
+			return _pool[--_counter];
 			 
-		Log.out( "ProjectilePoolType.poolGet - Allocating more Projectiles: " + _currentPoolSize )
+		Log.out( "ProjectilePoolType.poolGet - Allocating more Projectiles: " + _currentPoolSize );
 //		var timer:int = getTimer()
 
-		_currentPoolSize += _growthValue
+		_currentPoolSize += _growthValue;
 		_pool = null
-		_pool = new Vector.<Projectile>(_currentPoolSize)
+		_pool = new Vector.<Projectile>(_currentPoolSize);
 		for ( var newIndex:int = 0; newIndex < _growthValue; newIndex++ ) 
 			_pool[newIndex] = newModel()
-		_counter = newIndex - 1 
+		_counter = newIndex - 1;
 		
 //		Log.out( "ProjectilePoolType.poolGet - Done allocating more Projectiles: " + _currentPoolSize  + " took: " + (getTimer() - timer) )
 		
@@ -109,8 +113,8 @@ public final class ProjectilePoolType
 	} 
 
 	public function poolDispose( $disposedProjectile:Projectile):void { 
-		$disposedProjectile.dead = false
-		$disposedProjectile.instanceInfo.removeAllTransforms()
+		$disposedProjectile.dead = false;
+		$disposedProjectile.instanceInfo.removeAllTransforms();
 		
 		addToPool( $disposedProjectile ) 
 	} 

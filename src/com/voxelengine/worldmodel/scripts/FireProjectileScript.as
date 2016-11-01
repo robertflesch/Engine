@@ -167,7 +167,7 @@ package com.voxelengine.worldmodel.scripts
 			Log.out( "FireProjectileScript.createProjectile pe.position: " + pe.position )
 			// More work here, do I really need to pass this direction and velocity with ProjectileEvent?
 			// Or when is best time to do it? When I fire or here?
-			Log.out( "ProjectileScript.createProjectile - NOT DONE HERE 9.23.15", Log.ERROR );
+//			Log.out( "ProjectileScript.createProjectile - NOT DONE HERE 9.23.15", Log.ERROR );
 			
 			var cm:VoxelModel = gunModel.instanceInfo.controllingModel;
 			var parentVelocity:Vector3D = cm.instanceInfo.worldSpaceMatrix.deltaTransformVector( cm.instanceInfo.velocityGet );
@@ -199,7 +199,7 @@ package com.voxelengine.worldmodel.scripts
 			
 			var grainChange:int = pe.ammo.grain - pm.grain;
 			if ( !pm.modelInfo || !pm.modelInfo.data ) {
-				Log.out( "FireProjectileScript.bulletPool" );
+				Log.out( "FireProjectileScript.bulletPool Didnt find !pm.modelInfo || !pm.modelInfo.data" );
 				return;
 			}
 			pm.changeGrainSize( grainChange );

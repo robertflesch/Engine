@@ -20,7 +20,7 @@ public final class ProjectilePool
 { 
 	private static var _currentPoolSize:int 
 	private static var _growthValue:int
-	private static var _pools:Array = new Array();
+	private static var _pools:Object = {};
 	
 	public static function initialize( $initialPoolSize:uint, $growthValue:uint ):void { 
 		_currentPoolSize = $initialPoolSize
