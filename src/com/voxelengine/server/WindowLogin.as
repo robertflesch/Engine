@@ -285,6 +285,10 @@ package com.voxelengine.server
 				else
 					_userInfo.data.password = null;
 				_userInfo.flush();
+
+				//TODO use encrypted local storage instead
+				//EncryptedLocalStorage.setItem('key', byteArray);
+
 			}
 			else
 				Log.out("WindowLogin.loginSuccess - Unable to save user email", Log.WARN );
