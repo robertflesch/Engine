@@ -1,5 +1,5 @@
 /*==============================================================================
-Copyright 2011-2015 Robert Flesch
+Copyright 2011-2016 Robert Flesch
 All rights reserved.  This product contains computer programs, screen
 displays and printed documentation which are original works of
 authorship protected under United States Copyright Act.
@@ -59,9 +59,10 @@ public class OxelPersistance extends PersistanceObject
 	private var _parent:ModelInfo
 	private var _ba:ByteArray
 	private var firstTime:Boolean								= true
-	
-	private function get ba():ByteArray 						{ return _ba }
-	
+
+	public function get ba():ByteArray 							{ return _ba }
+	public function set ba( $ba:ByteArray):void 				{ _ba = $ba; }
+
 	public function get parent():ModelInfo						{ return _parent }
 	public function set parent( $val:ModelInfo ):void			{ _parent = $val }
 	public 	function get oxel():Oxel 							{ return _oxel; }
@@ -240,7 +241,7 @@ public class OxelPersistance extends PersistanceObject
 		var rootGrainSize:int = ba.readByte();
 		if ( null == _oxel )
 			_oxel = Oxel.initializeRoot( rootGrainSize, Lighting.defaultBaseLightAttn ); // Lighting should be model or instance default lighting
-		else 
+
 
 		// TODO - do I need to do this everytime? or could I use a static initializer? RSF - 7.16.2015
 		registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);	

@@ -514,7 +514,7 @@ public class VoxelModel
 			modelInfo.oxelLoadData();
 		}
 		
-		if ( complete ) {
+		if ( complete && modelInfo.data ) {
 			instanceInfo.update($elapsedTimeMS);
 			modelInfo.update($context,$elapsedTimeMS, this );
 			
