@@ -7,7 +7,10 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
+import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.worldmodel.Light;
+import com.voxelengine.worldmodel.biomes.LayerInfo;
+import com.voxelengine.worldmodel.models.OxelPersistance;
 
 import flash.geom.Point;
 import flash.geom.Vector3D;
@@ -3250,6 +3253,50 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			}
 		}
 	}
-		
+
+	public static function generateCube( $modelGuid:String, $layer:LayerInfo, $generateEvent:Boolean = true ):ByteArray {
+		//////////////////////////////////////////////////////////
+		// Builds Solid Cube of any grain size
+		//////////////////////////////////////////////////////////
+		var root_grain_size:int = $layer.offset;
+		const baseLightLevel:int = 51;
+		var oxel:Oxel = Oxel.initializeRoot( root_grain_size, baseLightLevel );
+		//
+		var min_grain_size:int = root_grain_size - $layer.range;
+		if ( 0 > min_grain_size || min_grain_size > root_grain_size || ( 8 < (root_grain_size - min_grain_size)) )
+		{
+			min_grain_size = Math.max( 0, root_grain_size - 4 );
+			Log.out( "GenerateCube.start - WARNING - Adjusting range: " + min_grain_size, Log.WARN );
+		}
+
+		//trace("GenerateCube.start on rootGrain of max size: " + root_grain_size + "  Filling with grain of size: " + min_grain_size + " of type: " + Globals.Info[_layer.type].name );
+		var loco:GrainCursor = GrainCursorPool.poolGet(root_grain_size);
+		var size:int = 1 << (root_grain_size - min_grain_size);
+		for ( var x:int = 0; x < size; x++ ) {
+			for ( var y:int = 0; y < size; y++ ) {
+				for ( var z:int = 0; z < size; z++ ) {
+					loco.set_values( x, y, z, min_grain_size )
+					oxel.write( $modelGuid, loco, $layer.type, true );
+				}
+			}
+		}
+		oxel.dirty = true;
+		// CRITICAL STEP. when restoring the oxel, it expects to have faces, not dirty faces
+		// So this step turns the dirty faces into real faces.
+		// for multistep builds I will have to ponder this more.
+//			oxel.facesBuildWater();
+		oxel.facesBuild();
+		GrainCursorPool.poolDispose( loco );
+
+
+		var ba:ByteArray = OxelPersistance.toByteArray( oxel );
+//			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
+//			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
+		Log.out( "GenerateCube finished modelGuid: " + $modelGuid );
+		if ( $generateEvent )
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
+		return ba;
+	}
+
 } // end of class Oxel
 } // end of package
