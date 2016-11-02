@@ -274,24 +274,10 @@ public class OxelPersistance extends PersistanceObject
 	static public function toByteArray( $oxel:Oxel ):ByteArray {
 		var ba:ByteArray = new ByteArray();
 		writeVersionedHeader( ba );
-		//writeManifest( ba );
-		// VERSION_008 no longer uses embedded manifest.
-		writeManifest( ba );
 		ba = $oxel.toByteArray( ba );
 		ba.compress();
 		return ba;
 		
-		function writeManifest( $ba:ByteArray ):void { 
-			
-			// Always write the manifest into the IVM.
-			/* ------------------------------------------
-			   0 unsigned char model info version - 100 currently
-			   next byte is size of model json
-			   n+1...  is model json
-			   ------------------------------------------ */
-			$ba.writeByte(Globals.MANIFEST_VERSION);
-			$ba.writeInt( 0 );
-		}
 	}
 	
 	static private function writeVersionedHeader( $ba:ByteArray):void {
@@ -311,11 +297,24 @@ public class OxelPersistance extends PersistanceObject
 		$ba.writeByte(outVersion.charCodeAt(1));
 		$ba.writeByte(outVersion.charCodeAt(2));
 
+		writeManifest( $ba );
+
 		function zeroPad(number:int, width:int):String {
 		   var ret:String = ""+number;
 		   while( ret.length < width )
 			   ret="0" + ret;
 		   return ret;
+		}
+		function writeManifest( $ba:ByteArray ):void {
+
+			// Always write the manifest into the IVM.
+			/* ------------------------------------------
+			 0 unsigned char model info version - 100 currently
+			 next byte is size of model json
+			 n+1...  is model json
+			 ------------------------------------------ */
+			$ba.writeByte(Globals.MANIFEST_VERSION);
+			$ba.writeInt( 0 );
 		}
 	}
 	

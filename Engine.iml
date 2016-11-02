@@ -12,6 +12,9 @@
           <sdk name="22.0" />
         </dependencies>
         <compiler-options>
+          <map>
+            <entry key="compiler.debug.swf" value="true" />
+          </map>
           <option name="resourceFilesMode" value="None" />
         </compiler-options>
         <packaging-air-desktop />

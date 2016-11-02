@@ -325,7 +325,8 @@ public class Lighting  {
 			lightCount = $ba.readByte();
 			// Now read each light
 			for ( i = 0; i < lightCount; i++ ) {
-				_lights[i] = new LightInfo(0, 0, defaultLightLevelSetter(), $attnPerMeter, false );
+				_lights[i] = new LightInfo();
+				_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), $attnPerMeter, false )
 				_lights[i].fromByteArray( $ba );
 			}
 		}
@@ -335,7 +336,8 @@ public class Lighting  {
 			lightCount = $ba.readByte();
 			// Now read each light
 			for ( i = 0; i < lightCount; i++ ) {
-				_lights[i] = new LightInfo(0, 0, defaultLightLevelSetter(), $attnPerMeter, false );
+				_lights[i] = new LightInfo();
+				_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), $attnPerMeter, false )
 				_lights[i].fromByteArray( $ba );
 			}
 		}
@@ -346,7 +348,8 @@ public class Lighting  {
 			lightCount = $ba.readByte();
 			// Now read each light
 			for ( i = 0; i < lightCount; i++ ) {
-				_lights[i] = new LightInfo(0, 0, defaultLightLevelSetter(), $attnPerMeter, false );
+				_lights[i] = new LightInfo();
+				_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), $attnPerMeter, false )
 				_lights[i].fromByteArray( $ba );
 			}
 		}
@@ -373,8 +376,10 @@ public class Lighting  {
 		for ( var i:int; i < $b._lights.length; i++ ) {
 			var sli:LightInfo = $b._lights[i];
 			if ( null != sli ) { 
-				if ( _lights.length <= i || (null == _lights[i]) )
-					_lights[i] = new LightInfo(0, 0, defaultLightLevelSetter(), 0, false );
+				if ( _lights.length <= i || (null == _lights[i]) ) {
+					_lights[i] = new LightInfo();
+					_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), 0, false )
+				}
 				_lights[i].copyFrom( sli );
 			}
 			else 
@@ -834,7 +839,9 @@ public class Lighting  {
 		if ( DEFAULT_LIGHT_ID != $ID && _defaultBaseLightAttn == $avgAttn )
 			return false;
 			
-		var newLi:LightInfo = new LightInfo( $ID, $color, defaultLightLevelSetter(), $attnPerMeter, $lightIs );
+		var newLi:LightInfo = new LightInfo();
+		newLi.setInfo( $ID, $color, defaultLightLevelSetter(), $attnPerMeter, $lightIs );
+
 			// check for available slot first, if none found, add new light to end.
 		for ( var i:int; i < _lights.length; i++ ) {
 			if ( null == _lights[i] ) {

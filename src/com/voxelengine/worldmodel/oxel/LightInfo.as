@@ -34,7 +34,10 @@ public class LightInfo
 	public var attn:uint;
 	
 	
-	public function LightInfo( $ID:uint, $color:uint, $baseAttn:uint, $attnPerMeter:uint, $lightIs:Boolean ) {		
+	public function LightInfo() {
+	}
+
+	public function setInfo( $ID:uint, $color:uint, $baseAttn:uint, $attnPerMeter:uint, $lightIs:Boolean ):void {
 		ID = $ID;
 		color = $color;
 		lightIs = $lightIs;
@@ -44,7 +47,7 @@ public class LightInfo
 			setAll( 255 );
 		attn = $attnPerMeter;
 	}
-	
+
 	public function toByteArray( $ba:ByteArray ):ByteArray {
 		$ba.writeBoolean( lightIs );
 		$ba.writeUnsignedInt( ID );
