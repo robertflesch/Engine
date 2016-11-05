@@ -20,8 +20,14 @@ package com.voxelengine.worldmodel.oxel
 		//  0xf = 1111  0xe = 1110 0xd = 1101 0xc = 1100 0xb = 1011  0xa = 1010 0x9 = 1001 0x8 = 1000 0x7 = 0111
 		//  
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		private static const OXEL_DATA_CLEAR:uint					= 0x00000000;
+		private static const OXEL_DATA_FLOW_INFO:uint				= 0x00000001;
+		private static const OXEL_DATA_FLOW_INFO_CLEAR:uint			= 0xfffffffe;
+
+		private static const OXEL_DATA_LIGHT_INFO:uint				= 0x00000002;
+		private static const OXEL_DATA_LIGHT_INFO_CLEAR:uint		= 0xfffffffd;
+
 		private static const OXEL_DATA_FACE_BITS_CLEAR:uint  		= 0x8181ffff;
+		private static const OXEL_DATA_CLEAR:uint					= 0x00000000;
 
 		private static const OXEL_DATA_ADDITIONAL_CLEAR:uint  		= 0x7fffffff; // used if oxel has flow or light data
 		private static const OXEL_DATA_ADDITIONAL:uint  			= 0x80000000; // used if oxel has flow or light data
@@ -276,7 +282,23 @@ package com.voxelengine.worldmodel.oxel
 			t = t >> 1;
 			return 0 < t; 
 		}
-		static public function dataAdditionalClear( $data:uint ):uint 			{ return $data & OXEL_DATA_ADDITIONAL_CLEAR }
+		static public function dataAdditionalClear( $data:uint ):uint 	{ return $data & OXEL_DATA_ADDITIONAL_CLEAR }
+
+		[inline] public function flowInfoMark():void								{ _data |= OXEL_DATA_FLOW_INFO;  }
+		[inline] public function flowInfoClear():void							{ _data &= OXEL_DATA_FLOW_INFO_CLEAR }
+		static public function flowInfoHas( $data:uint ):Boolean {
+			var t:uint = ($data & OXEL_DATA_FLOW_INFO);
+			t = t >> 1;
+			return 0 < t;
+		}
+
+		[inline] public function lightInfoMark():void						{ _data |= OXEL_DATA_LIGHT_INFO;  }
+		[inline] public function lightInfoClear():void						{ _data &= OXEL_DATA_LIGHT_INFO_CLEAR }
+		static public function lightInfoHas( $data:uint ):Boolean {
+			var t:uint = ($data & OXEL_DATA_LIGHT_INFO);
+			t = t >> 1;
+			return 0 < t;
+		}
 	}
 }
 		
