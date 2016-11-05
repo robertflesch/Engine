@@ -47,23 +47,28 @@ public class FromByteArray extends AbstractTask
 	
 	override public function start():void {
 		super.start()
-
-		Log.out( "FromByteArray.start: guid: " + _guid );
 		var time:int = getTimer();
-		_parent.fromByteArray();
 
-		if ("0" == _parent.dbo.key) {
-			_parent.changed = true;
-			_parent.guid = _guid;
-			// When import objects, we have to update the cache so they have the correct info.
-			if (null != _altGuid)
-				OxelDataEvent.dispatch(new OxelDataEvent(ModelBaseEvent.UPDATE_GUID, 0, _altGuid + ":" + _guid, null));
-			_parent.save();
+		try {
+			Log.out("FromByteArray.start: guid: " + _guid);
+			_parent.fromByteArray();
+
+			if ("0" == _parent.dbo.key) {
+				_parent.changed = true;
+				_parent.guid = _guid;
+				// When import objects, we have to update the cache so they have the correct info.
+				if (null != _altGuid)
+					OxelDataEvent.dispatch(new OxelDataEvent(ModelBaseEvent.UPDATE_GUID, 0, _altGuid + ":" + _guid, null));
+				_parent.save();
+			}
+			OxelDataEvent.dispatch(new OxelDataEvent(OxelDataEvent.OXEL_READY, 0, _guid, _parent));
 		}
-		OxelDataEvent.dispatch(new OxelDataEvent(OxelDataEvent.OXEL_READY, 0, _guid, _parent));
-
-		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );
-		super.complete()
+		catch ( e:Error ) {
+			Log.out( "FromByteArray.start: ERROR: " + e.toString() );
+			OxelDataEvent.dispatch(new OxelDataEvent(OxelDataEvent.OXEL_FAILED, 0, _guid, _parent));
+		}
+		LoadingImageEvent.dispatch(new LoadingImageEvent(LoadingImageEvent.DESTROY));
+		super.complete();
 		Log.out( "FromByteArray.start: took: " + (getTimer() - time) + "  guid: " + _guid );
 	}
 }

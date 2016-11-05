@@ -143,10 +143,13 @@ public class VoxelModel
 		_modelInfo = $mi;
 		_metadata = $vmm;
 
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );		
-		
-		if ( null == _metadata )
-			Log.out( "VoxelModel.init - IS NULL ModelMetadata valid?", Log.ERROR );
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_FAILED, oxelDataRetrievedFailed );
+
+		if ( null == _metadata ) {
+			Log.out("VoxelModel.init - IS NULL ModelMetadata valid?", Log.ERROR);
+			return;
+		}
 		
 		if ( metadata.permissions.modify ) {
 //			Log.out( "VoxelModel - added ImpactEvent.EXPLODE for " + _modelInfo.modelClass );
@@ -167,10 +170,21 @@ public class VoxelModel
 	
 	private function oxelDataRetrieved(e:OxelDataEvent):void {
 		if ( e.modelGuid == modelInfo.guid ) {
-			OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelDataRetrieved );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );
 			calculateCenter()
 		}
 	}
+
+	private function oxelDataRetrievedFailed(e:OxelDataEvent):void {
+		if ( e.modelGuid == modelInfo.guid ) {
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FAILED, oxelDataRetrieved );
+			dead = true;
+			// TODO need to change model picture to BROKEN, or just totally delete it.
+			Log.out("VoxelModel.oxelDataRetrievedFailed - Error reading OXEL data guid: " + modelInfo.guid, Log.ERROR);
+
+		}
+	}
+
 	
 	protected function processClassJson():void {
 		modelInfo.childrenLoad( this );
@@ -179,7 +193,7 @@ public class VoxelModel
 	}
 	
 	// The export object is a combination of modelInfo and instanceInfo
-	public function buildExportObject( obj:Object ):Object {
+	static public function buildExportObject( obj:Object ):Object {
 		//Log.out( "VoxelModel.buildExportObject" );
 		return obj;
 	}
