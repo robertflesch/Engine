@@ -34,8 +34,8 @@ public class Trigger extends VoxelModel
 		super( $ii );
 	}
 
-	override public function buildExportObject( obj:Object ):Object {
-		super.buildExportObject( obj )
+	static public function buildExportObject( obj:Object ):Object {
+		VoxelModel.buildExportObject( obj )
 		return obj;
 	}
 	

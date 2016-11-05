@@ -57,8 +57,8 @@ public class Dragon extends Beast
 		FunctionRegistry.functionAdd( loseControlHandler, "loseControlHandler" );
 	}
 
-	override public function buildExportObject( obj:Object ):Object {
-		super.buildExportObject( obj )
+	static public function buildExportObject( obj:Object ):Object {
+		Beast.buildExportObject( obj )
 		obj.dragon = new Object();
 		return obj;
 	}

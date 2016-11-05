@@ -9,6 +9,7 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.events.AppEvent;
 import com.voxelengine.renderer.Chunk;
+import com.voxelengine.worldmodel.models.makers.ModelLibrary;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -200,7 +201,9 @@ public class WindowDebugMenu extends VVCanvas
 	{
 		// TO DO I dont like this direct call into the EditCursor
 		if (Globals.g_app && VoxelModel.controlledModel ) {
-			_cmLabel.text = JSON.stringify(VoxelModel.controlledModel.buildExportObject( {} ));
+			var modelClassPrototype:Class = ModelLibrary.getAsset( VoxelModel.controlledModel.modelInfo.modelClass );
+
+			_cmLabel.text = JSON.stringify( modelClassPrototype.buildExportObject( {} ));
 		}
 	}
 

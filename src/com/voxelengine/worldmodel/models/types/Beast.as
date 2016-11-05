@@ -35,8 +35,8 @@ public class Beast extends ControllableVoxelModel
 	static private var  _speedMultiplier:SecureNumber 	= new SecureNumber( 1.0 );
 	static protected var _seatLocation:Vector3D 		= new Vector3D( 8, 12, 13 );
 
-	protected function get 	speedMultiplier():Number 				{ return _speedMultiplier.val; }
-	protected function set 	speedMultiplier($value:Number):void		{ _speedMultiplier.val = $value; }
+	static public function get 	speedMultiplier():Number 				{ return _speedMultiplier.val; }
+	static public function set 	speedMultiplier($value:Number):void		{ _speedMultiplier.val = $value; }
 
 	static public function get climbRate():Number  					{ return _climbRate.val; }
 	static public function set climbRate($value:Number):void  		{ _climbRate.val = $value; }
@@ -68,8 +68,8 @@ public class Beast extends ControllableVoxelModel
 		collisionMarkers = true;
 	}
 
-	override public function buildExportObject( obj:Object ):Object {
-		super.buildExportObject( obj )
+	static public function buildExportObject( obj:Object ):Object {
+		ControllableVoxelModel.buildExportObject( obj )
 		obj.beast 					= new Object();
 		obj.beast.moveSpeed 		= speedMultiplier;
 		obj.beast.maxTurnRate 		= maxTurnRate;

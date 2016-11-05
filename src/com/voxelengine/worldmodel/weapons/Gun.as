@@ -161,9 +161,9 @@ public class Gun extends ControllableVoxelModel
 		}
 	}
 	
-	override public function buildExportObject( obj:Object ):Object {
+	static public function buildExportObject( obj:Object ):Object {
 		// For now just use the existing gun data
-		super.buildExportObject( obj );
+		ControllableVoxelModel.buildExportObject( obj );
 		return obj;
 
 		//var gunData:Object = new Object();

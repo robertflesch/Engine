@@ -91,8 +91,8 @@ public class Player extends Avatar
 			_ct.markersAdd();
 	}
 
-	override public function buildExportObject( obj:Object ):Object {
-		super.buildExportObject( obj )
+	static public function buildExportObject( obj:Object ):Object {
+		Avatar.buildExportObject( obj )
 		return obj;
 	}
 	

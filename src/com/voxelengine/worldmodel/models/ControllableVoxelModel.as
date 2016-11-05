@@ -116,8 +116,8 @@ public class ControllableVoxelModel extends VoxelModel
 //			Log.out( "ControllableVoxelModel.processClassJson - no ControllableModelInfo info found", Log.WARN );
 	}
 	
-	override public function buildExportObject( obj:Object ):Object {
-		super.buildExportObject( obj )
+	static public function buildExportObject( obj:Object ):Object {
+		VoxelModel.buildExportObject( obj )
 		obj.controllableVoxelModel = new Object();
 		obj.controllableVoxelModel.clipFactor = clipVelocityFactor * 100;
 		obj.controllableVoxelModel.maxSpeed = maxSpeed;
