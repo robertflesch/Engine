@@ -70,7 +70,7 @@ package org.flashapi.swing.wtk {
 	 *
 	 *  @eventType org.flashapi.swing.event.WindowEvent.CLOSE_BUTTON_CLICKED
 	 */
-	[Event(name = "closeButtonClicked", type = "org.flashapi.swing.event.WidowEvent")]
+	[Event(name = "closeButtonClicked", type = "org.flashapi.swing.event.WindowEvent")]
 	
 	/**
 	 *  Dispatched when users double-clicks on the title bar.
