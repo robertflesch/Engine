@@ -199,7 +199,8 @@ public class Oxel extends OxelBitfields
 			oxel.initialize(null, gct, 0, TypeInfo.AIR);
 			GrainCursorPool.poolDispose( gct );
 			
-			oxel.lighting = LightingPool.poolGet( $baseLightLevel );
+			// TODO how to handle assigning the default light? Since chunk does not exist.
+			//oxel.lighting = LightingPool.poolGet( $baseLightLevel );
 			Lighting.defaultBaseLightAttn = $baseLightLevel;
 		}
 		catch (e:Error) {
@@ -607,8 +608,7 @@ public class Oxel extends OxelBitfields
 if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	Log.out( "Oxel.childrenCreate out of - flow info: " + flowInfo.flowScaling.toString(), Log.WARN )
 }
-		
-		
+
 		var gct:GrainCursor = GrainCursorPool.poolGet(root_get().gc.bound );
 		_children = ChildOxelPool.poolGet();
 		for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ ) {
@@ -637,18 +637,26 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				// now we need to distribute the scaling out to the resultant oxels
 				flowInfo.childGet( _children[i] )
 		}
+		GrainCursorPool.poolDispose( gct );
 
 		this.parentMarkAs();
-		// Dont do this when generating terrain
-		if ( $invalidateNeighbors )
-			this.neighborsInvalidate();
-	
 		// remove chunk before changing type, so it know what VBO its in.
 		quadsDeleteAll();
 		this.type = TypeInfo.AIR;
 		this.dirty = true;
 
-		GrainCursorPool.poolDispose( gct );
+		if (lighting) {
+			LightingPool.poolReturn(lighting);
+			lighting = null;
+		}
+
+		if (_flowInfo) {
+			_flowInfo = null;
+		}
+
+		// Dont do this when generating terrain
+		if ( $invalidateNeighbors )
+			this.neighborsInvalidate();
 	}
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1551,11 +1559,16 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			Log.out( "Oxel.quadsBuildTerminal - not being lit" );
 		var changeCount:int = 0;
 		// Does this oxel have faces
-		if ( facesHas() )
-		{
+		if ( facesHas() ) {
 			if ( null == _quads )
 				_quads = QuadsPool.poolGet();
-			
+
+			// all oxels with faces need lighting
+			if ( !lighting )
+				lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
+			if ( 0 == lighting.lightCount() ) // add default chunk light
+				lighting.add( chunkGet().lightInfo );
+
 			var ti:TypeInfo = TypeInfo.typeInfo[type];
 			// We have to go thru each one, since some may be added, and others removed.
 			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
@@ -1722,25 +1735,28 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return $ba;
 	}
 	
-	private function toByteArrayRecursive( $ba:ByteArray ):void 
-	{
+	private function toByteArrayRecursive( $ba:ByteArray ):void {
 		//trace( Oxel.data_mask_temp( _data ) );
-		if ( childrenHas() && TypeInfo.AIR != type )	{
-			Log.out( "Oxel.writeData - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
-			type = TypeInfo.AIR; 
+		if ( childrenHas() )	{
+			if ( TypeInfo.AIR != type )	{
+				Log.out( "Oxel.toByteArrayRecursive - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
+				type = TypeInfo.AIR;
+			}
 		}
-		
+
 		// If it has flow or lighting, we have to save both.
 		if ( (flowInfo || lighting) && !parentIs() )	{
 			// I only have 1 bit for additional data...
 			additionalDataMark();
 			$ba.writeUnsignedInt( maskTempData() );
 			$ba.writeUnsignedInt( type );
-			
+			Log.out( "Oxel.toByteArrayRecursive - lighting\tdata: " + maskTempData().toString(16) );
+			Log.out( "Oxel.toByteArrayRecursive - lighting\ttype: " + type );
+
 			if ( !flowInfo )
 				flowInfo = FlowInfoPool.poolGet();
 			flowInfo.toByteArray( $ba );
-			
+
 			if ( !lighting )
 				lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
 			lighting.toByteArray( $ba );
@@ -1749,11 +1765,88 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			additionalDataClear();
 			$ba.writeUnsignedInt( maskTempData() );
 			$ba.writeUnsignedInt( type );
+			Log.out( "Oxel.toByteArrayRecursive - no_light\tdata: " + maskTempData().toString(16) );
+			Log.out( "Oxel.toByteArrayRecursive - no_light\ttype: " + type );
 		}
-		
+
 		if ( childrenHas() ) {
-			for each ( var child:Oxel in _children ) 
+			Log.out("Oxel.toByteArrayRecursive -- write children ---: " );
+			for each ( var child:Oxel in _children ) {
+				child.toByteArrayRecursive($ba);
+			}
+			Log.out("Oxel.toByteArrayRecursive -- write children ---: " );
+		}
+	}
+
+	private function cleanUpChild():void {
+		if ( flowInfo && flowInfo.flowScaling.has() )
+			flowInfoMark();
+		else {
+			resetFlowInfo();
+		}
+
+		if ( lighting && (0 < lighting.lightCount() || lighting.color || lighting.ambientHas) )
+			lightInfoMark();
+		else {
+			resetLighting();
+		}
+	}
+
+	private function resetLighting():void {
+		lightInfoClear();
+		LightingPool.poolReturn( lighting );
+		lighting = null;
+	}
+
+	private function resetFlowInfo():void {
+		flowInfoClear();
+		flowInfo = null;
+	}
+
+	private function cleanUpParent():void {
+		if ( flowInfo )
+			resetFlowInfo();
+
+		if ( lighting )
+			resetLighting();
+	}
+
+
+	private function toByteArrayRecursiveV9( $ba:ByteArray ):void {
+		// This version has to do a bit of clean up on flowInfo and lightInfo
+		// In versions previous to 9, I save the flowInfo and lightInfo on every voxel if it had faces.
+		// Now I only save that info if there is non default values in it.
+		// So if I find default values, I clear that info and don't save it.
+		if ( childrenHas() )
+			cleanUpParent();
+		else
+			cleanUpChild();
+
+		// Write core data to array
+		$ba.writeUnsignedInt(maskTempData()); // data contains info on faces, lighting, flow
+		$ba.writeUnsignedInt(type); // type has typeData
+
+		if ( childrenHas() )
+			writeParent();
+		else
+			writeChild();
+
+		function writeParent():void {
+			for each ( var child:Oxel in _children )
 				child.toByteArrayRecursive( $ba );
+		}
+
+		function writeChild():void {
+			if (flowInfo)
+				flowInfo.toByteArray($ba);
+
+			if (lighting)
+				lighting.toByteArray($ba);
+
+			Log.out("toByteArrayRecursive data: " + maskTempData().toString(16));
+			Log.out("toByteArrayRecursive type: " + type);
+			Log.out("toByteArrayRecursive flowInfo: " + (flowInfo ? "yes" : "no"));
+			Log.out("toByteArrayRecursive lighting: " + (lighting ? "yes" : "no"));
 		}
 	}
 	
@@ -1766,11 +1859,15 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			var typeData:uint = $ba.readUnsignedInt();
 			initialize( $parent, $gc, faceData, typeData );	
 		}
-		
+
+		Log.out( "Oxel.fromByteArray - faceData: " + faceData.toString(16) );
+		Log.out( "Oxel.fromByteArray - type    : " + type );
+
+
 		// Bad data check
 		if ( OxelBitfields.dataIsParent( faceData ) && TypeInfo.AIR != type )
 		{
-			Log.out( "Oxel.readVersionedData - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
+			Log.out( "Oxel.fromByteArray - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
 			type = TypeInfo.AIR;
 		}
 		
@@ -1796,9 +1893,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			if ( $parent ) {
 				// override the stored data with the baseLightLevel set in the instance.
 				var li:LightInfo = lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-				var avgLight:uint = root_get().lighting.avg;
-				if ( li )
-					li.setAll( avgLight );
+				// TODO needs to be adjusted for new lighting schema
+//				var avgLight:uint = root_get().lighting.avg;
+//				if ( li )
+//					li.setAll( avgLight );
 			}
 			else {
 				var baseLightLevel:uint = Lighting.defaultBaseLightAttn; //lighting.avg;
@@ -1812,6 +1910,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			childCount = 8;
 			_children = ChildOxelPool.poolGet();
 			var gct:GrainCursor = GrainCursorPool.poolGet( $stats.largest );
+			Log.out( "Oxel.fromByteArray - ------------- read children -------" );
+
 			for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
 			{
 				_children[i]  = OxelPool.poolGet();
@@ -1819,6 +1919,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				gct.become_child(i);   
 				_children[i].readVersionedData( $version, this, gct, $ba, $stats );
 			}
+			Log.out( "Oxel.fromByteArray - ------------- read children -------" );
 			GrainCursorPool.poolDispose( gct );
 		}
 		else {

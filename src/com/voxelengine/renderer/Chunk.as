@@ -7,7 +7,11 @@
 ==============================================================================*/
 package com.voxelengine.renderer {
 
+import com.voxelengine.pools.LightingPool;
 import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.oxel.LightInfo;
+import com.voxelengine.worldmodel.oxel.Lighting;
+
 import flash.geom.Matrix3D;
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
@@ -40,7 +44,9 @@ public class Chunk {
 	private var _oxel:Oxel;
 	private var _dirty:Boolean;
 	private var _parent:Chunk;
-	
+	private var _lightInfo:LightInfo;
+
+	public function get lightInfo():LightInfo { return _lightInfo; }
 	public function get dirty():Boolean { return _dirty; }
 	public function get oxel():Oxel  { return _oxel; }
 	
@@ -86,6 +92,11 @@ public class Chunk {
 	
 	static public function parse( $oxel:Oxel, $parent:Chunk ):Chunk {
 		var chunk:Chunk = new Chunk( $parent );
+		// when I create the chunk I add a light level to it.
+		chunk._lightInfo = new LightInfo();
+		chunk._lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID,  Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, Lighting.defaultBaseLightAttn )
+		chunk._lightInfo.setAll( Lighting.defaultBaseLightAttn );
+
 		//Log.out( "chunk.parse - new chunk: " + $oxel.childCount );
 			
 		if ( MAX_CHILDREN < $oxel.childCount ) {
@@ -107,8 +118,8 @@ public class Chunk {
 		}
 		return chunk;	
 	}
-	
-	public function drawNew( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean = false ):void {		
+
+	public function drawNew( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean = false ):void {
 		if ( childrenHas() ) {
 			for ( var i:int; i < OCT_TREE_SIZE; i++ )
 				_children[i].drawNew( $mvp, $vm, $context, $selected, $isChild );
@@ -182,7 +193,10 @@ public class Chunk {
 	public function oxelAdd( $oxel:Oxel ):void {
 		if ( !_vertMan )
 			_vertMan = new VertexManager( $oxel.gc, null );
-		
+
+		if ( !$oxel.facesHas() )
+			return;
+
 		_vertMan.oxelAdd( $oxel );
 	}
 	

@@ -84,7 +84,8 @@ public class FlowScaling
 	public function has():Boolean { return ( _data != DEFAULT_TOTAL_SCALE ) }
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray {
-		
+
+		trace( "FlowScaling.toByteArray -_data: " + _data.toString(16) );
 		$ba.writeUnsignedInt( _data );
 		return $ba;
 	}
@@ -102,7 +103,7 @@ public class FlowScaling
 	}
 
 	public function fromByteArray( $version:int, $ba:ByteArray ):ByteArray {
-		// No need to handle versions yet
+
 		if ( Globals.VERSION_004 == $version || Globals.VERSION_003 == $version ) {
 			PxPz = rnd( $ba.readFloat() );
 			PxNz = rnd( $ba.readFloat() );
@@ -111,6 +112,7 @@ public class FlowScaling
 		}
 		else if ( Globals.VERSION_004 <= $version  ) {
 			_data = $ba.readUnsignedInt();
+			trace( "FlowScaling.fromByteArray - \t\t data: " + _data.toString(16) );
 		}
 		else {
 			Log.out( "FlowSacaling.fromByteArray - The version of data is not handled", Log.WARN )

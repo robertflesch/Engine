@@ -7,7 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
-	import com.voxelengine.renderer.Quad;
+import com.voxelengine.pools.LightInfoPool;
+import com.voxelengine.renderer.Quad;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.geom.Vector3D;
 	import flash.utils.ByteArray;
@@ -36,14 +37,17 @@ public class Lighting  {
 	 *        |
 	 *        \/
 	 */
-	private static const DEFAULT_COLOR:uint = 0x00ffffff;
+	public static const DEFAULT_COLOR:uint = 0x00ffffff;
 	private static const DEFAULT_SIGMA:uint = 2;
-	
+//	public static const _defaultBaseLightAttn:uint = 0x33; // out of 255
+
 	public static const AMBIENT_ADD:Boolean = true;
 	public static const AMBIENT_REMOVE:Boolean = false;
 
 	public static const MAX_LIGHT_LEVEL:uint = 0xff;
 	public static const DEFAULT_LIGHT_ID:uint = 1;
+	public static const DEFAULT_ATTN:uint = 0x10;
+
 	//public static const DEFAULT_BASE_LIGHT_LEVEL:uint = 0x00; // out of 255
 	private static var _defaultBaseLightAttn:uint = 0x33; // out of 255
 
@@ -78,6 +82,8 @@ public class Lighting  {
 	// the choice is 0, 1, 2, so I need 2 bits of data to support that. 6 faces * 4 verts * 2 bits = 48 bits, 2 uints
 	private var _lowerAmbient:uint;
 	private var _higherAmbient:uint;
+	public function get ambientHas():uint { return (_lowerAmbient || _higherAmbient ); }
+
 	public function get posX100():uint { return ((_lowerAmbient  & 0x00000003)); }
 	public function get posX101():uint { return ((_lowerAmbient  & 0x0000000c) >> 2 ); }
 	public function get posX110():uint { return ((_lowerAmbient  & 0x00000030) >> 4 ); }
@@ -257,6 +263,7 @@ public class Lighting  {
 	public function set materialFallOffFactor( val:uint ):void { _materialFallOffFactor = val; }
 	
 	private var _lights:Vector.<LightInfo> = new Vector.<LightInfo>();
+	public function lightCount():int { return _lights.length }
 	
 	private var _color:uint = 0xffffffff;
 	public function get color():uint { return _color; }
@@ -266,7 +273,7 @@ public class Lighting  {
 	
 	public function Lighting():void {
 		
-		add( DEFAULT_LIGHT_ID, DEFAULT_COLOR, 0x10, _defaultBaseLightAttn );
+		//add( DEFAULT_LIGHT_ID, DEFAULT_COLOR, Lighting.DEFAULT_ATTN, _defaultBaseLightAttn );
 	}
 
 	public function ambientOcculsionHas():Boolean {
@@ -279,11 +286,43 @@ public class Lighting  {
 		_higherAmbient = _higherAmbient & 0xffd0ffff;
 	}
 	
+	public function toByteArrayV9( $ba:ByteArray ):ByteArray {
+
+		$ba.writeUnsignedInt( _color );
+		$ba.writeUnsignedInt( _lowerAmbient );
+		$ba.writeUnsignedInt( _higherAmbient );
+		Log.out( "Lighting.toByteArray _color: " + _color.toString(16));
+		Log.out( "Lighting.toByteArray _lowerAmbient: " + _lowerAmbient.toString(16) );
+		Log.out( "Lighting.toByteArray _higherAmbient: " + _higherAmbient.toString(16));
+
+		var li:LightInfo;
+		// dont count the lights with DEFAULT_LIGHT_ID or invalid ones
+		var lightsFromLoop:uint = 0;
+		for ( var i:int = 0; i < _lights.length; i++ ) {
+			li = _lights[i];
+			if ( null != li && li.ID != Lighting.DEFAULT_LIGHT_ID && li.ID != 0 )
+				lightsFromLoop++;
+		}
+		// now write the count of lights to the byte array
+		$ba.writeByte( lightsFromLoop );
+//		Log.out( "Lighting.toByteArray lightsFromLoop: " + lightsFromLoop);
+
+		// now for each light, write its contents to the byte array
+		for ( var j:int = 0; j < _lights.length; j++ ) {
+			li = _lights[j];
+			if ( null != li && li.ID != Lighting.DEFAULT_LIGHT_ID && li.ID != 0 ) {
+				$ba = li.toByteArray( $ba );
+			}
+		}
+		return $ba;
+	}
+
 	public function toByteArray( $ba:ByteArray ):ByteArray {
 
 		$ba.writeUnsignedInt( _color );
 		$ba.writeUnsignedInt( _lowerAmbient );
 		$ba.writeUnsignedInt( _higherAmbient );
+
 		
 		// calculate how many lights this oxel is influcence by
 		var lightCount:uint;
@@ -294,6 +333,11 @@ public class Lighting  {
 		// now write the count of lights to the byte array
 		$ba.writeByte( lightCount );
 
+		Log.out( "Lighting.toByteArray - \t\t\tcolor: " + _color );
+		Log.out( "Lighting.toByteArray - \t\tlowerAmbient: " + _lowerAmbient );
+		Log.out( "Lighting.toByteArray - \t\thigherAmbient: " + _higherAmbient );
+		Log.out( "Lighting.toByteArray - \t\t\tlightCount: " + lightCount );
+
 		// now for each light, write its contents to the byte array
 		for ( var j:int; j < _lights.length; j++ ) {
 			var li:LightInfo = _lights[j];
@@ -303,8 +347,8 @@ public class Lighting  {
 		}
 		return $ba;
 	}
-	
-	// TODO Maybe - Not sure what attnPerMeter should be here, that value is not persisted to the ivm.
+
+// TODO Maybe - Not sure what attnPerMeter should be here, that value is not persisted to the ivm.
 	// However I dont know if it is ever used again, so what should I set it to?
 	public function fromByteArray( $version:int, $ba:ByteArray, $attnPerMeter:uint = 0x10 ):ByteArray {
 		var lightCount:int;
@@ -318,9 +362,9 @@ public class Lighting  {
 			$ba.readInt();
 			$ba.readInt();
 			$ba.readInt();
-			$ba.readInt();			
+			$ba.readInt();
 		}
-		else if ( Globals.VERSION_003 == $version ){ 
+		else if ( Globals.VERSION_003 == $version ){
 			// How many light do I need to read?
 			lightCount = $ba.readByte();
 			// Now read each light
@@ -330,7 +374,7 @@ public class Lighting  {
 				_lights[i].fromByteArray( $ba );
 			}
 		}
-		else if ( Globals.VERSION_004 == $version || Globals.VERSION_005 == $version ) { 
+		else if ( Globals.VERSION_004 == $version || Globals.VERSION_005 == $version ) {
 			_lowerAmbient = $ba.readUnsignedInt();
 			_higherAmbient = $ba.readUnsignedInt();
 			lightCount = $ba.readByte();
@@ -341,11 +385,17 @@ public class Lighting  {
 				_lights[i].fromByteArray( $ba );
 			}
 		}
-		else if ( Globals.VERSION_006 <= $version ) { 
+		else if ( Globals.VERSION_006 <= $version ) {
 			_color = $ba.readUnsignedInt();
 			_lowerAmbient = $ba.readUnsignedInt();
 			_higherAmbient = $ba.readUnsignedInt();
 			lightCount = $ba.readByte();
+
+			Log.out( "Lighting.fromByteArray - \t\tcolor: \t\t" + _color );
+			Log.out( "Lighting.fromByteArray - \t\tlowerAmbient: \t" + _lowerAmbient );
+			Log.out( "Lighting.fromByteArray - \t\thigherAmbient: \t" + _higherAmbient );
+			Log.out( "Lighting.fromByteArray - \t\tlightCount: \t\t" + lightCount );
+
 			// Now read each light
 			for ( i = 0; i < lightCount; i++ ) {
 				_lights[i] = new LightInfo();
@@ -355,7 +405,54 @@ public class Lighting  {
 		}
 		else
 			throw new Error( "Brightness.fromByteArray - unsupported version: " + $version );
-			
+
+		return $ba;
+	}
+
+	// TODO Maybe - Not sure what attnPerMeter should be here, that value is not persisted to the ivm.
+	// However I dont know if it is ever used again, so what should I set it to?
+	public function fromByteArrayV9( $version:int, $ba:ByteArray, $attnPerMeter:uint = Lighting.DEFAULT_ATTN ):ByteArray {
+		try {
+			var lightsFromBA:int = 0;
+			if (Globals.VERSION_001 == $version || Globals.VERSION_002 == $version) {
+				// Old style, Just throw away this information.
+				$ba.readInt();
+				$ba.readInt();
+				$ba.readInt();
+				$ba.readInt();
+				$ba.readInt();
+				$ba.readInt();
+				$ba.readInt();
+				$ba.readInt();
+			} else if (Globals.VERSION_003 == $version) {
+				lightsFromBA = $ba.readByte();
+			} else if (Globals.VERSION_004 == $version || Globals.VERSION_005 == $version) {
+				_lowerAmbient = $ba.readUnsignedInt();
+				_higherAmbient = $ba.readUnsignedInt();
+				lightsFromBA = $ba.readByte();
+			} else if (Globals.VERSION_006 <= $version) {
+				_color = $ba.readUnsignedInt();
+				_lowerAmbient = $ba.readUnsignedInt();
+				_higherAmbient = $ba.readUnsignedInt();
+				lightsFromBA = $ba.readByte();
+
+				Log.out("Lighting.fromByteArray _color: \t\t" + _color.toString(16));
+				Log.out("Lighting.fromByteArray _lowerAmbient: \t" + _lowerAmbient.toString(16));
+				Log.out("Lighting.fromByteArray _higherAmbient: \t" + _higherAmbient.toString(16));
+				Log.out("Lighting.fromByteArray lightsFromLoop: \t" + lightsFromBA);
+			} else
+				throw new Error("Brightness.fromByteArray - unsupported version: " + $version);
+
+			// Now read each light
+			for (var i:int = 0; i < lightsFromBA; i++) {
+				_lights[i] = new LightInfo();
+				_lights[i].setInfo(0, 0, defaultLightLevelSetter(), $attnPerMeter, false);
+				_lights[i].fromByteArray($ba);
+			}
+		}
+		catch( e:Error ){
+			Log.out( "Lighting.fromByteArray error: " + e.toString() );
+		}
 		return $ba;
 	}
 
@@ -494,7 +591,8 @@ public class Lighting  {
 
 	public function resetToAmbient():void {
 		_lights = new Vector.<LightInfo>();
-		add( DEFAULT_LIGHT_ID, DEFAULT_COLOR, 0x10, _defaultBaseLightAttn );
+		// TODO how do I add the default light from chunk back in here?
+//		add( DEFAULT_LIGHT_ID, DEFAULT_COLOR, Lighting.DEFAULT_ATTN, _defaultBaseLightAttn );
 	}
 
 	public function mergeChildren( $childID:uint, $b:Lighting, $grainUnits:uint, $hasAlpha:Boolean ):void {
@@ -521,9 +619,13 @@ public class Lighting  {
 		var localattn:uint = materialFallOffFactor * sli.attn * $grainUnits / Globals.UNITS_PER_METER;
 		var sqrattn:Number =  Math.sqrt( 2 * (localattn * localattn) );
 		var csqrattn:Number = Math.sqrt( (localattn * localattn) + (sqrattn * sqrattn) );
-		
-		if ( !add( $ID, sli.color, sli.avg, sli.attn ) )
+
+		var newLi:LightInfo = LightInfoPool.poolGet();
+		newLi.setInfo( $ID, sli.color, sli.avg, sli.attn );
+		if ( !add( newLi ) ) {
+			LightInfoPool.poolReturn(newLi);
 			return; // failed to add the light, This is a valid condition, if the light added is lower then the existing lights, it will not be added
+		}
 		var li:LightInfo =  lightGet( $ID );		
 		
 		// The corner that the child is in is always the most accurate data, everything else is a guess
@@ -660,9 +762,11 @@ public class Lighting  {
 			return false;
 		}	
 			
-		var li:LightInfo =  lightGet( $ID );		
+		var li:LightInfo =  lightGet( $ID );
 
-		if ( !$b.add( $ID, li.color, li.avg, li.attn ) ) {
+		var newLi:LightInfo = LightInfoPool.poolGet();
+		newLi.setInfo( $ID, li.color, li.avg, li.attn );
+		if ( !$b.add( newLi ) ) {
 			//Log.out( "Brightness.childGet - $b does not have light info for lightID: " + $ID, Log.WARN )
 			return false;
 		}
@@ -830,7 +934,7 @@ public class Lighting  {
 		return _lights[maxAttnIndex];
 	}
 	
-	public function add( $ID:uint, $color:uint, $avgAttn:uint, $attnPerMeter:uint, $lightIs:Boolean = false ):Boolean {
+	public function addOld( $ID:uint, $color:uint, $avgAttn:uint, $attnPerMeter:uint, $lightIs:Boolean = false ):Boolean {
 		
 		if ( lightHas( $ID ) )
 			return true;
@@ -852,7 +956,27 @@ public class Lighting  {
 		_lights.push( newLi );
 		return true;
 	}
-	
+
+	public function add( $li:LightInfo ):Boolean {
+
+		if ( lightHas( $li.ID ) )
+			return true;
+
+		// dont add in lights who are at base attn level
+		if ( DEFAULT_LIGHT_ID != $li.ID && _defaultBaseLightAttn == $li.avg )
+			return false;
+
+		// check for available slot first, if none found, add new light to end.
+		for ( var i:int; i < _lights.length; i++ ) {
+			if ( null == _lights[i] ) {
+				_lights[i] = $li;
+				return true;
+			}
+		}
+		_lights.push( $li );
+		return true;
+	}
+
 	public function remove( $ID:uint ):Boolean {
 		
 		if ( !lightHas( $ID ) )
@@ -863,6 +987,7 @@ public class Lighting  {
 			var li:LightInfo = _lights[i];
 			if ( null != li ) {
 				if ( $ID == li.ID ) {
+					LightInfoPool.poolReturn( li );
 					_lights[i] = null;
 					_lights.splice( i, 1 );
 					return true
@@ -971,8 +1096,12 @@ public class Lighting  {
 		var sli:LightInfo = $lob.lightGet( $ID );
 		if ( null == sli )
 			return false; // This should not really occur
-		if ( !add( $ID, sli.color, sli.avg, sli.attn ) )
+		var newLi:LightInfo = LightInfoPool.poolGet();
+		newLi.setInfo( $ID, sli.color, sli.avg, sli.attn );
+		if ( !add( newLi ) ) {
+			LightInfoPool.poolReturn(newLi);
 			return false;
+		}
 		var li:LightInfo = lightGet( $ID );
 		
 		var c:Boolean = false;
@@ -1125,8 +1254,12 @@ public class Lighting  {
 		if ( !$b.lightHas( $ID ) )
 			return false; // if there is no value for the light, it is not added
 		var sli:LightInfo = $b.lightGet( $ID );
-		if ( !add( sli.ID, sli.color, sli.avg, sli.attn ) )
+		var newLi:LightInfo = LightInfoPool.poolGet();
+		newLi.setInfo( sli.ID, sli.color, sli.avg, sli.attn );
+		if ( !add( newLi ) ) {
+			LightInfoPool.poolReturn( newLi );
 			return false;
+		}
 		var li:LightInfo = lightGet( $ID );
 		
 		var c:Boolean;
@@ -1230,7 +1363,7 @@ public class Lighting  {
 					an.lighting.posX110 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGZ)
+				an = $oxel.neighbor(Globals.NEGZ);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.posX111 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1241,7 +1374,7 @@ public class Lighting  {
 					an.lighting.posX100 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGZ)
+				an = $oxel.neighbor(Globals.NEGZ);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.posX101 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1252,7 +1385,7 @@ public class Lighting  {
 					an.lighting.posX101 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGY)
+				an = $oxel.neighbor(Globals.NEGY);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.posX111 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1263,7 +1396,7 @@ public class Lighting  {
 					an.lighting.posX100 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGY)
+				an = $oxel.neighbor(Globals.NEGY);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.posX110 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1276,7 +1409,7 @@ public class Lighting  {
 					an.lighting.negX010 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGZ)
+				an = $oxel.neighbor(Globals.NEGZ);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.negX011 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1287,7 +1420,7 @@ public class Lighting  {
 					an.lighting.negX000 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGZ)
+				an = $oxel.neighbor(Globals.NEGZ);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.negX001 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1298,7 +1431,7 @@ public class Lighting  {
 					an.lighting.negX001 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGY)
+				an = $oxel.neighbor(Globals.NEGY);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.negX011 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1309,7 +1442,7 @@ public class Lighting  {
 					an.lighting.negX000 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGY)
+				an = $oxel.neighbor(Globals.NEGY);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.negX010 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1323,7 +1456,7 @@ public class Lighting  {
 					an.lighting.posY110 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGZ)
+				an = $oxel.neighbor(Globals.NEGZ);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.posY111 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1334,7 +1467,7 @@ public class Lighting  {
 					an.lighting.posY010 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGZ)
+				an = $oxel.neighbor(Globals.NEGZ);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.posY011 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1345,7 +1478,7 @@ public class Lighting  {
 					an.lighting.posY011 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGX)
+				an = $oxel.neighbor(Globals.NEGX);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.posY111 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1356,7 +1489,7 @@ public class Lighting  {
 					an.lighting.posY010 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGX)
+				an = $oxel.neighbor(Globals.NEGX);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.posY110 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1370,7 +1503,7 @@ public class Lighting  {
 					an.lighting.negY100 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGZ)
+				an = $oxel.neighbor(Globals.NEGZ);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.negY101 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1381,7 +1514,7 @@ public class Lighting  {
 					an.lighting.negY000 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGZ)
+				an = $oxel.neighbor(Globals.NEGZ);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.negY001 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1392,7 +1525,7 @@ public class Lighting  {
 					an.lighting.negY001 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGX)
+				an = $oxel.neighbor(Globals.NEGX);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.negY101 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1403,7 +1536,7 @@ public class Lighting  {
 					an.lighting.negY000 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGX)
+				an = $oxel.neighbor(Globals.NEGX);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.negY100 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1417,7 +1550,7 @@ public class Lighting  {
 					an.lighting.posZ101 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGY)
+				an = $oxel.neighbor(Globals.NEGY);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.posZ111 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1428,7 +1561,7 @@ public class Lighting  {
 					an.lighting.posZ001 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGY)
+				an = $oxel.neighbor(Globals.NEGY);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.posZ011 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1439,7 +1572,7 @@ public class Lighting  {
 					an.lighting.posZ011 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGX)
+				an = $oxel.neighbor(Globals.NEGX);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.posZ111 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1450,7 +1583,7 @@ public class Lighting  {
 					an.lighting.posZ001 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGX)
+				an = $oxel.neighbor(Globals.NEGX);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.posZ101 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1464,7 +1597,7 @@ public class Lighting  {
 					an.lighting.negZ100 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGY)
+				an = $oxel.neighbor(Globals.NEGY);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.negZ110 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1475,7 +1608,7 @@ public class Lighting  {
 					an.lighting.negZ000 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGY)
+				an = $oxel.neighbor(Globals.NEGY);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.negZ010 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1486,7 +1619,7 @@ public class Lighting  {
 					an.lighting.negZ010 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGX)
+				an = $oxel.neighbor(Globals.NEGX);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.negZ110 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
@@ -1497,7 +1630,7 @@ public class Lighting  {
 					an.lighting.negZ000 = $adjustVal;
 					an.quadRebuild( $majorFace ); }
 					
-				an = $oxel.neighbor(Globals.NEGX)
+				an = $oxel.neighbor(Globals.NEGX);
 				if ( Oxel.validLightable( an ) ) {
 					an.lighting.negZ100 = $adjustVal;
 					an.quadRebuild( $majorFace ); }

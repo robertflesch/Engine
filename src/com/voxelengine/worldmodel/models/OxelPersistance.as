@@ -247,15 +247,14 @@ public class OxelPersistance extends PersistanceObject
 		registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);	
 		registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);	
 		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
-		if ( parent )
-			Lighting.defaultBaseLightAttn = parent.baseLightLevel
 		gct.grain = rootGrainSize;
 
-		Log.out( "OxelPersistance.fromByteArray - b4 readVersionedData?", Log.INFO );
+		Log.out( "OxelPersistance.fromByteArray - b4 readVersionedData _version: " + _version + "  rootGrain: " + rootGrainSize, Log.INFO );
 		if (Globals.VERSION_000 == _version)
 			oxel.readData( null, gct, ba, _statisics );
 		else
-			oxel.readVersionedData( _version, null, gct, ba, _statisics );
+			oxel.readVersionedData(_version, null, gct, ba, _statisics);
+
 		GrainCursorPool.poolDispose(gct);
 		Log.out( "OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.INFO );
 		
@@ -265,6 +264,7 @@ public class OxelPersistance extends PersistanceObject
 		Log.out( "OxelPersistance.fromByteArray - _statisics took: " + (getTimer() - time), Log.INFO );
 		
 		_topMostChunk = Chunk.parse( oxel, null );
+
 		_loaded = true;
 		Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 		

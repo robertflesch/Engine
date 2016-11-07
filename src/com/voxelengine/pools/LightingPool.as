@@ -39,16 +39,10 @@ public final class LightingPool
 			_pool[i] = new Lighting(); 
 	} 
 	 
-	public static function poolGet( $baseLightLevel:uint ):Lighting 
+	public static function poolGet( $baseLightLevel:uint ):Lighting
 	{ 
-		if ( _counter > 0 ) 
-		{
-			var lighting:Lighting = _pool[--_counter];
-			var light:LightInfo = lighting.lightGet( Lighting.DEFAULT_LIGHT_ID )
-			if ( light )
-				light.setAll( $baseLightLevel );
-			
-			return lighting; 
+		if ( _counter > 0 ) {
+			return _pool[--_counter];
 		}
 			 
 		Log.out( "LightingPool.poolGet - Allocating more Brightness: " + _currentPoolSize );
@@ -64,13 +58,12 @@ public final class LightingPool
 		_counter = newIndex - 1; 
 		
 		Log.out( "LightingPool.poolGet - Done allocating more Brightness: " + _currentPoolSize  + " took: " + (getTimer() - timer) );
-		return poolGet( $baseLightLevel ); 
+		return poolGet( $baseLightLevel );
 	} 
 
 	public static function poolReturn( $disposedBrightness:Lighting ):void 
 	{ 
-		if ( !$disposedBrightness )
-		{
+		if ( !$disposedBrightness ) {
 			Log.out( "LightingPool.poolReturn - displosedBrightness is NULL" );
 			return;
 		}

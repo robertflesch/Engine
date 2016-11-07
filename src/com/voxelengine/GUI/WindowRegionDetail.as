@@ -55,16 +55,16 @@ public class WindowRegionDetail extends VVPopup
 			title = "New Region";
 		super( title );	
 
-		autoWidth = false
-		width = WIDTH
-		
+		autoWidth = false;
+		width = WIDTH;
+
 		if ( $regionID ) {	
 			RegionEvent.addListener( ModelBaseEvent.ADDED, collectRegionInfo );
 			RegionEvent.addListener( ModelBaseEvent.RESULT, collectRegionInfo );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST, 0, $regionID ) );
 		}
 		else {			
-			_create = true
+			_create = true;
 			_region = new Region( Globals.getUID() );
 			_region.createEmptyRegion();
 			_region.owner = Network.PUBLIC;
@@ -91,7 +91,7 @@ public class WindowRegionDetail extends VVPopup
 		layout.orientation = LayoutOrientation.VERTICAL;
 		//closeButtonEnabled = false; // this show it enabled, but doesnt allow it to be clicked
 		//closeButtonActive = false;  // this greys it out, and doesnt allow it to be clicked
-		showCloseButton = false
+		showCloseButton = true;
 		
 		addElement( new Spacer( WIDTH, 10 ) );
 		addElement( new ComponentTextInput( "Name", changeNameHandler, _region.name, WIDTH ) );
@@ -116,16 +116,19 @@ public class WindowRegionDetail extends VVPopup
 
 		var _createRegionButton:Button;
 		if ( _create )
-			_createRegionButton = new Button( "Create", WIDTH - 10 );
+			_createRegionButton = new Button( "Create", WIDTH - 10, 50 );
 		else
 			_createRegionButton = new Button( "Save", WIDTH - 10 );
 		eventCollector.addEvent( _createRegionButton , UIMouseEvent.CLICK ,save );
+		buttonPanel.layout.horizontalAlignment = LayoutHorizontalAlignment.CENTER;
 		buttonPanel.addElement( _createRegionButton );
 
 //		var cancelRegionButton:Button = new Button( "Cancel" );
 //		eventCollector.addEvent( cancelRegionButton , UIMouseEvent.CLICK, cancel );
 //		buttonPanel.addElement( cancelRegionButton );
+		addElement( new Spacer( WIDTH, 10 ) );
 		addElement( buttonPanel );
+		addElement( new Spacer( WIDTH, 10 ) );
 		/// Buttons /////////////////////////////////////////////
 		//defaultCloseOperation = ClosableProperties.DO_NOTHING_ON_CLOSE;
 		

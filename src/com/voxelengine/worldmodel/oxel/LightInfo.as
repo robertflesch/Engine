@@ -25,7 +25,9 @@ public class LightInfo
 {
 	public static const MAX:uint = 0xff;
 	
-	public var lightIs:Boolean;		// Is this object indeed a light source, or just an air oxel
+	private var _lightIs:Boolean;		// Is this object indeed a light source, or just an air oxel
+	public function get lightIs():Boolean { return _lightIs; }
+
 	public var processed:Boolean;	// has this color has been used to project on its neighbors
 	public var ID:uint				// The ID of the light
 	public var color:uint;			// the RGBA color info
@@ -37,10 +39,10 @@ public class LightInfo
 	public function LightInfo() {
 	}
 
-	public function setInfo( $ID:uint, $color:uint, $baseAttn:uint, $attnPerMeter:uint, $lightIs:Boolean ):void {
+	public function setInfo( $ID:uint, $color:uint, $baseAttn:uint, $attnPerMeter:uint, $lightIs:Boolean = false ):void {
 		ID = $ID;
 		color = $color;
-		lightIs = $lightIs;
+		_lightIs = $lightIs;
 		bLower = $baseAttn;
 		bHigher = $baseAttn;
 		if ( true == $lightIs )
@@ -49,20 +51,35 @@ public class LightInfo
 	}
 
 	public function toByteArray( $ba:ByteArray ):ByteArray {
-		$ba.writeBoolean( lightIs );
+		$ba.writeBoolean( _lightIs );
 		$ba.writeUnsignedInt( ID );
 		$ba.writeUnsignedInt( color );
 		$ba.writeUnsignedInt( bLower );
 		$ba.writeUnsignedInt( bHigher );
+		Log.out( "LightInfo.toByteArray lightIs: \t\t" + _lightIs);
+		Log.out( "LightInfo.toByteArray ID: \t\t\t" + ID);
+		Log.out( "LightInfo.toByteArray color: \t\t" + color.toString(16));
+		Log.out( "LightInfo.toByteArray bLower: \t\t" + bLower.toString(16));
+		Log.out( "LightInfo.toByteArray bHigher: \t\t" + bHigher.toString(16));
 		return $ba;
 	}
-	
+
 	public function fromByteArray( $ba:ByteArray ):ByteArray {
-		lightIs = $ba.readBoolean();
-		ID  	= $ba.readUnsignedInt();
-		color	= $ba.readUnsignedInt();
-		bLower	= $ba.readUnsignedInt();
-		bHigher	= $ba.readUnsignedInt();
+		try {
+			_lightIs 	= $ba.readBoolean();
+			ID 			= $ba.readUnsignedInt();
+			color 		= $ba.readUnsignedInt();
+			bLower		= $ba.readUnsignedInt();
+			bHigher 	= $ba.readUnsignedInt();
+			Log.out("LightInfo.fromByteArray \t\t\tlightIs: \t" + _lightIs);
+			Log.out("LightInfo.fromByteArray \t\t\tID: \t\t" + ID);
+			Log.out("LightInfo.fromByteArray \t\t\tcolor: \t" + color.toString(16));
+			Log.out("LightInfo.fromByteArray \t\t\tbLower: \t" + bLower.toString(16));
+			Log.out("LightInfo.fromByteArray \t\t\tbHigher: \t" + bHigher.toString(16));
+		}
+		catch( e:Error ){
+			Log.out( "LightinInfo.fromByteArray error: " + e.toString() );
+		}
 		return $ba;
 	}
 
@@ -102,11 +119,11 @@ public class LightInfo
 		return toStringDetail();
 	}
 	public function toStringShort():String {
-		return (" LightInfo - ID: " + ID + "\tcolor: " + toHex(color) + " bLower: " + toHex(bLower) + " bHigher: " + toHex(bHigher) + " lightIs: " + lightIs + "\n" );
+		return (" LightInfo - ID: " + ID + "\tcolor: " + toHex(color) + " bLower: " + toHex(bLower) + " bHigher: " + toHex(bHigher) + " lightIs: " + _lightIs + "\n" );
 	}
 
 	public function toStringDetail():String {
-		return (" LightInfo - ID: " + ID + "\tcolor: " + toHex(color) + " bLower: " + toLightLevel(bLower) + " bHigher: " + toLightLevel(bHigher) + " lightIs: " + lightIs + "\n" );
+		return (" LightInfo - ID: " + ID + "\tcolor: " + toHex(color) + " bLower: " + toLightLevel(bLower) + " bHigher: " + toLightLevel(bHigher) + " lightIs: " + _lightIs + "\n" );
 	}
 	
 	public function copyFrom( $li:LightInfo ):void {
@@ -114,7 +131,7 @@ public class LightInfo
 		color = $li.color;
 		bLower = $li.bLower;
 		bHigher = $li.bHigher;
-		lightIs = $li.lightIs;
+		_lightIs = $li._lightIs;
 		attn = $li.attn;
 	}
 	

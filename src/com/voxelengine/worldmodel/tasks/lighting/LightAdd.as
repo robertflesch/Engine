@@ -8,7 +8,8 @@
 
 package com.voxelengine.worldmodel.tasks.lighting
 {
-    import com.voxelengine.worldmodel.Region;
+import com.voxelengine.pools.LightInfoPool;
+import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.LightEvent;
@@ -16,7 +17,8 @@ package com.voxelengine.worldmodel.tasks.lighting
 	import com.voxelengine.worldmodel.TypeInfo;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
-	import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.oxel.LightInfo;
+import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.oxel.Lighting;
 
 	/**
@@ -42,8 +44,12 @@ package com.voxelengine.worldmodel.tasks.lighting
 					if ( Oxel.validLightable( lo ) )
 					{
 						var ti:TypeInfo = TypeInfo.typeInfo[lo.type];
-						if ( !lo.lighting.add( $le.lightID, ti.lightInfo.color, Lighting.MAX_LIGHT_LEVEL, ti.lightInfo.attn, true ) )
-							throw new Error( "LightAdd.handleLightEvent - How did we get here?" );
+						var newLi:LightInfo = LightInfoPool.poolGet();
+						newLi.setInfo( $le.lightID, ti.lightInfo.color, Lighting.MAX_LIGHT_LEVEL, ti.lightInfo.attn, true );
+						if ( !lo.lighting.add( newLi ) ) {
+							LightInfoPool.poolReturn( newLi );
+							throw new Error("LightAdd.handleLightEvent - How did we get here?");
+						}
 //						lo.brightness.fallOffPerMeter = ti.lightInfo.attn;
 						addTask( $le.instanceGuid, $le.gc, $le.lightID, Globals.ALL_DIRS );
 					}

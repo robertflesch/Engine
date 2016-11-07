@@ -201,13 +201,14 @@ public class FlowInfo
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray {
 		$ba.writeUnsignedInt( _data );
-		//trace( "FlowInfo.toByteArray - " + toString() )
+		trace( "FlowInfo.toByteArray - " + _data.toString(16) );
 		$ba = flowScaling.toByteArray( $ba )
 		return $ba;
 	}
 	
 	public function fromByteArray( $version:int, $ba:ByteArray ):ByteArray {
 		_data = $ba.readUnsignedInt();
+		trace( "FlowInfo.fromByteArray - \t data: " + _data.toString(16) );
 		$ba = flowScaling.fromByteArray( $version, $ba )
 		return $ba;
 	}
