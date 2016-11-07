@@ -13,8 +13,11 @@ import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.PermissionsBase;
+
+import flash.geom.Vector3D;
 import flash.utils.ByteArray;
 import org.flashapi.swing.Alert;
 
@@ -135,17 +138,22 @@ public class ModelMakerImport extends ModelMakerBase {
 			ii.modelGuid 	= _modelMetadata.guid;
 			// Not saved, might as well keep it around.
 			//modelInfo.fileName = "";
-			
+
+
 			var vm:* = make()
 			if ( vm ) {
-				vm.stateLock( true, 10000 ); // Lock state so that is had time to load animations
+				vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
 //				vm.complete = true;
 				modelInfo.changed = true;
 				modelInfo.save();
 				_modelMetadata.changed = true;
 				_modelMetadata.save();
 				vm.changed = true;
-				vm.save();
+                var lav:Vector3D = ii.lookAtVector( 500 );
+                var diffPos:Vector3D = Player.player.wsPositionGet().clone();
+                diffPos = diffPos.add( lav );
+                (vm as VoxelModel).instanceInfo.positionSet = diffPos;
+                vm.save();
 				Region.currentRegion.modelCache.add( vm );
 			}
 			

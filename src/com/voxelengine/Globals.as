@@ -75,7 +75,7 @@ public class Globals  {
 	static public const VERSION_007:int 		  = 7;
 	static public const VERSION_008:int 		  = 8;
 	static public const VERSION_009:int 		  = 9;
-	static public const VERSION:int 			  = VERSION_008;
+	static public const VERSION:int 			  = VERSION_009;
 
 	static public const MANIFEST_VERSION:int = 100;
 

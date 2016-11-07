@@ -323,11 +323,11 @@ public class Lighting  {
 		$ba.writeUnsignedInt( _lowerAmbient );
 		$ba.writeUnsignedInt( _higherAmbient );
 
-		
 		// calculate how many lights this oxel is influcence by
+		// dont count the region light which has ID 1
 		var lightCount:uint;
 		for ( var i:int; i < _lights.length; i++ ) {
-			if ( null != _lights[i] )
+			if ( null != _lights[i] && _lights[i].ID != 1 )
 				lightCount++;
 		}
 		// now write the count of lights to the byte array
@@ -339,9 +339,10 @@ public class Lighting  {
 		Log.out( "Lighting.toByteArray - \t\t\tlightCount: " + lightCount );
 
 		// now for each light, write its contents to the byte array
+		// dont save the region light which has ID 1
 		for ( var j:int; j < _lights.length; j++ ) {
 			var li:LightInfo = _lights[j];
-			if ( null != li ) {
+			if ( null != li  && _lights[j].ID != 1 ) {
 				$ba = li.toByteArray( $ba );
 			}
 		}
@@ -391,10 +392,10 @@ public class Lighting  {
 			_higherAmbient = $ba.readUnsignedInt();
 			lightCount = $ba.readByte();
 
-			Log.out( "Lighting.fromByteArray - \t\tcolor: \t\t" + _color );
-			Log.out( "Lighting.fromByteArray - \t\tlowerAmbient: \t" + _lowerAmbient );
-			Log.out( "Lighting.fromByteArray - \t\thigherAmbient: \t" + _higherAmbient );
-			Log.out( "Lighting.fromByteArray - \t\tlightCount: \t\t" + lightCount );
+			//Log.out( "Lighting.fromByteArray - \t\tcolor: \t\t" + _color );
+			//Log.out( "Lighting.fromByteArray - \t\tlowerAmbient: \t" + _lowerAmbient );
+			//Log.out( "Lighting.fromByteArray - \t\thigherAmbient: \t" + _higherAmbient );
+			//Log.out( "Lighting.fromByteArray - \t\tlightCount: \t\t" + lightCount );
 
 			// Now read each light
 			for ( i = 0; i < lightCount; i++ ) {

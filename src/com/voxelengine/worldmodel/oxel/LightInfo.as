@@ -56,11 +56,11 @@ public class LightInfo
 		$ba.writeUnsignedInt( color );
 		$ba.writeUnsignedInt( bLower );
 		$ba.writeUnsignedInt( bHigher );
-		Log.out( "LightInfo.toByteArray lightIs: \t\t" + _lightIs);
-		Log.out( "LightInfo.toByteArray ID: \t\t\t" + ID);
-		Log.out( "LightInfo.toByteArray color: \t\t" + color.toString(16));
-		Log.out( "LightInfo.toByteArray bLower: \t\t" + bLower.toString(16));
-		Log.out( "LightInfo.toByteArray bHigher: \t\t" + bHigher.toString(16));
+//		Log.out( "LightInfo.toByteArray lightIs: \t\t" + _lightIs);
+//		Log.out( "LightInfo.toByteArray ID: \t\t\t" + ID);
+//		Log.out( "LightInfo.toByteArray color: \t\t" + color.toString(16));
+//		Log.out( "LightInfo.toByteArray bLower: \t\t" + bLower.toString(16));
+//		Log.out( "LightInfo.toByteArray bHigher: \t\t" + bHigher.toString(16));
 		return $ba;
 	}
 
@@ -71,11 +71,11 @@ public class LightInfo
 			color 		= $ba.readUnsignedInt();
 			bLower		= $ba.readUnsignedInt();
 			bHigher 	= $ba.readUnsignedInt();
-			Log.out("LightInfo.fromByteArray \t\t\tlightIs: \t" + _lightIs);
-			Log.out("LightInfo.fromByteArray \t\t\tID: \t\t" + ID);
-			Log.out("LightInfo.fromByteArray \t\t\tcolor: \t" + color.toString(16));
-			Log.out("LightInfo.fromByteArray \t\t\tbLower: \t" + bLower.toString(16));
-			Log.out("LightInfo.fromByteArray \t\t\tbHigher: \t" + bHigher.toString(16));
+//			Log.out("LightInfo.fromByteArray \t\t\tlightIs: \t" + _lightIs);
+//			Log.out("LightInfo.fromByteArray \t\t\tID: \t\t" + ID);
+//			Log.out("LightInfo.fromByteArray \t\t\tcolor: \t" + color.toString(16));
+//			Log.out("LightInfo.fromByteArray \t\t\tbLower: \t" + bLower.toString(16));
+//			Log.out("LightInfo.fromByteArray \t\t\tbHigher: \t" + bHigher.toString(16));
 		}
 		catch( e:Error ){
 			Log.out( "LightinInfo.fromByteArray error: " + e.toString() );

@@ -252,8 +252,10 @@ public class OxelPersistance extends PersistanceObject
 		Log.out( "OxelPersistance.fromByteArray - b4 readVersionedData _version: " + _version + "  rootGrain: " + rootGrainSize, Log.INFO );
 		if (Globals.VERSION_000 == _version)
 			oxel.readData( null, gct, ba, _statisics );
-		else
+		else if ( Globals.VERSION_008 >= _version )
 			oxel.readVersionedData(_version, null, gct, ba, _statisics);
+        else
+            oxel.fromByteArray(_version, null, gct, ba, _statisics);
 
 		GrainCursorPool.poolDispose(gct);
 		Log.out( "OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.INFO );
