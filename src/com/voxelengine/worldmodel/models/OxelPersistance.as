@@ -53,18 +53,22 @@ public class OxelPersistance extends PersistanceObject
 	//static private const referenceBA:ByteArray 					= Hex.toArray( "69:76:6d:30:30:38:64:00:00:00:00:04:fe:00:00:00:00:00:00:68:00:60:00:00:ff:ff:ff:ff:ff:ff:ff:ff:00:00:00:00:00:00:00:00:01:00:00:00:00:01:00:ff:ff:ff:33:33:33:33:33:33:33:33" );
 	private	var	_statisics:ModelStatisics 						= new ModelStatisics();
 	private var _oxel:Oxel;
+	//private var _oxels:Vector<Oxel> = new Vector.<Oxel>();
 	private var _loaded:Boolean;
 	private	var _version:int;
 	private var _topMostChunk:Chunk;
 	private var _parent:ModelInfo
 	private var _ba:ByteArray
-	private var firstTime:Boolean								= true
+	private var firstTime:Boolean								= true;
+	//private var _lod:int;
+	//public function set setLOD( $lod:int ):void 				{ _lod = $lod; }
 
 	public function get ba():ByteArray 							{ return _ba }
 	public function set ba( $ba:ByteArray):void 				{ _ba = $ba; }
 
 	public function get parent():ModelInfo						{ return _parent }
 	public function set parent( $val:ModelInfo ):void			{ _parent = $val }
+	//public 	function get oxel():Oxel 							{ return _oxels[_lod]; }
 	public 	function get oxel():Oxel 							{ return _oxel; }
 	public 	function get loaded():Boolean 						{ return _loaded; }
 	public 	function set loaded( $val:Boolean):void 			{ _loaded = $val; }
@@ -77,7 +81,7 @@ public class OxelPersistance extends PersistanceObject
 	
 	override public function release():void {
 		_statisics.release();
-		_oxel.release();
+		oxel.release();
 		_topMostChunk.release();
 		super.release();
 	}
@@ -117,8 +121,8 @@ public class OxelPersistance extends PersistanceObject
 	public function update( $vm:VoxelModel ):void {
 		if ( _topMostChunk && _topMostChunk.dirty ) {
 			if ( EditCursor.EDIT_CURSOR == guid ) {
-				_oxel.facesBuild()
-				_oxel.quadsBuild()
+				oxel.facesBuild()
+				oxel.quadsBuild()
 			}
 			else {
 				//Log.out( "OxelPersistance.update - calling refreshQuads guid: " + guid, Log.WARN );
@@ -137,7 +141,7 @@ public class OxelPersistance extends PersistanceObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// oxel operations
 	public function changeOxel( $instanceGuid:String, $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
-		var result:Boolean = _oxel.changeOxel( $instanceGuid, $gc, $type, $onlyChangeType );
+		var result:Boolean = oxel.changeOxel( $instanceGuid, $gc, $type, $onlyChangeType );
 		if ( result )
 			changed = true;
 		return result;
@@ -239,7 +243,7 @@ public class OxelPersistance extends PersistanceObject
 		
 		// Read off 1 bytes, the root size
 		var rootGrainSize:int = ba.readByte();
-		if ( null == _oxel )
+		if ( null == oxel )
 			_oxel = Oxel.initializeRoot( rootGrainSize, Lighting.defaultBaseLightAttn ); // Lighting should be model or instance default lighting
 
 
@@ -251,9 +255,9 @@ public class OxelPersistance extends PersistanceObject
 
 		Log.out( "OxelPersistance.fromByteArray - b4 readVersionedData _version: " + _version + "  rootGrain: " + rootGrainSize, Log.INFO );
 		if (Globals.VERSION_000 == _version)
-			oxel.readData( null, gct, ba, _statisics );
+			oxel.fromByteArrayV0( null, gct, ba, _statisics );
 		else if ( Globals.VERSION_008 >= _version )
-			oxel.readVersionedData(_version, null, gct, ba, _statisics);
+			oxel.fromByteArrayV8(_version, null, gct, ba, _statisics);
         else
             oxel.fromByteArray(_version, null, gct, ba, _statisics);
 
@@ -264,8 +268,11 @@ public class OxelPersistance extends PersistanceObject
 		//_statisics.statsPrint();
 		
 		Log.out( "OxelPersistance.fromByteArray - _statisics took: " + (getTimer() - time), Log.INFO );
-		
-		_topMostChunk = Chunk.parse( oxel, null );
+
+		 var lightInfo:LightInfo = new LightInfo();
+		lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID,  Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, Lighting.defaultBaseLightAttn )
+
+		_topMostChunk = Chunk.parse( oxel, null, lightInfo );
 
 		_loaded = true;
 		Log.out( "OxelPersistance.fromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
@@ -352,6 +359,25 @@ public class OxelPersistance extends PersistanceObject
 		
 		return $ba;
 	}
+
+	public function generateLOD():void {
+		var changed:int;
+		var childrenFound:Boolean = true;
+
+		while( true == childrenFound ) {
+			changed = oxel.generateLODRecursive( _statisics.largest, changed );
+			oxel.childCountReset();
+			oxel.childCountCalc();
+			if ( 0 < changed )
+				childrenFound = true;
+			else
+				childrenFound = false;
+			changed = 0;
+		};
+		Oxel.rebuild( oxel );
+	}
+
+
 	/*
 	// legacy function for reference
 	static public function extractModelInfo( $ba:ByteArray ):Object {

@@ -286,37 +286,6 @@ public class Lighting  {
 		_higherAmbient = _higherAmbient & 0xffd0ffff;
 	}
 	
-	public function toByteArrayV9( $ba:ByteArray ):ByteArray {
-
-		$ba.writeUnsignedInt( _color );
-		$ba.writeUnsignedInt( _lowerAmbient );
-		$ba.writeUnsignedInt( _higherAmbient );
-		Log.out( "Lighting.toByteArray _color: " + _color.toString(16));
-		Log.out( "Lighting.toByteArray _lowerAmbient: " + _lowerAmbient.toString(16) );
-		Log.out( "Lighting.toByteArray _higherAmbient: " + _higherAmbient.toString(16));
-
-		var li:LightInfo;
-		// dont count the lights with DEFAULT_LIGHT_ID or invalid ones
-		var lightsFromLoop:uint = 0;
-		for ( var i:int = 0; i < _lights.length; i++ ) {
-			li = _lights[i];
-			if ( null != li && li.ID != Lighting.DEFAULT_LIGHT_ID && li.ID != 0 )
-				lightsFromLoop++;
-		}
-		// now write the count of lights to the byte array
-		$ba.writeByte( lightsFromLoop );
-//		Log.out( "Lighting.toByteArray lightsFromLoop: " + lightsFromLoop);
-
-		// now for each light, write its contents to the byte array
-		for ( var j:int = 0; j < _lights.length; j++ ) {
-			li = _lights[j];
-			if ( null != li && li.ID != Lighting.DEFAULT_LIGHT_ID && li.ID != 0 ) {
-				$ba = li.toByteArray( $ba );
-			}
-		}
-		return $ba;
-	}
-
 	public function toByteArray( $ba:ByteArray ):ByteArray {
 
 		$ba.writeUnsignedInt( _color );
@@ -327,22 +296,22 @@ public class Lighting  {
 		// dont count the region light which has ID 1
 		var lightCount:uint;
 		for ( var i:int; i < _lights.length; i++ ) {
-			if ( null != _lights[i] && _lights[i].ID != 1 )
+			if ( null != _lights[i] && _lights[i].ID != Lighting.DEFAULT_LIGHT_ID )
 				lightCount++;
 		}
 		// now write the count of lights to the byte array
 		$ba.writeByte( lightCount );
 
-		Log.out( "Lighting.toByteArray - \t\t\tcolor: " + _color );
-		Log.out( "Lighting.toByteArray - \t\tlowerAmbient: " + _lowerAmbient );
-		Log.out( "Lighting.toByteArray - \t\thigherAmbient: " + _higherAmbient );
-		Log.out( "Lighting.toByteArray - \t\t\tlightCount: " + lightCount );
+		//Log.out( "Lighting.toByteArray - \t\t\tcolor: " + _color );
+		//Log.out( "Lighting.toByteArray - \t\tlowerAmbient: " + _lowerAmbient );
+		//Log.out( "Lighting.toByteArray - \t\thigherAmbient: " + _higherAmbient );
+		//Log.out( "Lighting.toByteArray - \t\t\tlightCount: " + lightCount );
 
 		// now for each light, write its contents to the byte array
 		// dont save the region light which has ID 1
 		for ( var j:int; j < _lights.length; j++ ) {
 			var li:LightInfo = _lights[j];
-			if ( null != li  && _lights[j].ID != 1 ) {
+			if ( null != li  && _lights[j].ID != Lighting.DEFAULT_LIGHT_ID ) {
 				$ba = li.toByteArray( $ba );
 			}
 		}
@@ -570,24 +539,14 @@ public class Lighting  {
 	}
 	
 	public function reset():Boolean {
-		
-		var changed:Boolean;
-		
-		for ( var i:int = 1; i < _lights.length; i++ ) {
-			var li:LightInfo = _lights[i];
-			if ( null != li ) {
-				remove( li.ID );
-				changed = true;
-			}
-		}
+		resetToAmbient();
 		
 		if ( _lowerAmbient ||  _higherAmbient ) {
-			changed = true;
 			_lowerAmbient = 0;
 			_higherAmbient = 0;
 		}
-		
-		return changed;
+		_compositeColor = 0;
+		return true;
 	}
 
 	public function resetToAmbient():void {

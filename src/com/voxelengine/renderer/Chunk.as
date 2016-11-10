@@ -90,19 +90,17 @@ public class Chunk {
 	// public function merge():Chunk
 	// public function divide():?
 	
-	static public function parse( $oxel:Oxel, $parent:Chunk ):Chunk {
+	static public function parse( $oxel:Oxel, $parent:Chunk, $lightInfo:LightInfo ):Chunk {
 		var chunk:Chunk = new Chunk( $parent );
 		// when I create the chunk I add a light level to it.
-		chunk._lightInfo = new LightInfo();
-		chunk._lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID,  Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, Lighting.defaultBaseLightAttn )
-		chunk._lightInfo.setAll( Lighting.defaultBaseLightAttn );
 
 		//Log.out( "chunk.parse - new chunk: " + $oxel.childCount );
+		chunk._lightInfo = $lightInfo;
 			
 		if ( MAX_CHILDREN < $oxel.childCount ) {
 			chunk._children = new Vector.<Chunk>(OCT_TREE_SIZE, true);
 			for ( var i:int; i < OCT_TREE_SIZE; i++ )
-				chunk._children[i] = parse( $oxel.children[i], chunk );
+				chunk._children[i] = parse( $oxel.children[i], chunk, $lightInfo );
 		}
 		else {
 			chunk._oxel = $oxel;
@@ -139,6 +137,21 @@ public class Chunk {
 	
 	public function refreshFacesTerminal():void {
 		_oxel.facesBuild();
+	}
+
+	public function rebuildLighting():void {
+		//public function refreshFacesAndQuadsTerminal():void {
+		if ( childrenHas() ) {
+			for (var i:int; i < OCT_TREE_SIZE; i++)
+				_children[i].rebuildLighting();
+		}
+		else {
+			if ( _oxel && _oxel.childrenHas() ) {
+
+			}
+			else
+				refreshFacesAndQuadsTerminal()
+		}
 	}
 	
 	public function refreshFacesAndQuads( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {

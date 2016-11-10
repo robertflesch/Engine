@@ -24,7 +24,7 @@ package com.voxelengine.worldmodel.oxel
 public class LightInfo
 {
 	public static const MAX:uint = 0xff;
-	
+
 	private var _lightIs:Boolean;		// Is this object indeed a light source, or just an air oxel
 	public function get lightIs():Boolean { return _lightIs; }
 
@@ -40,6 +40,8 @@ public class LightInfo
 	}
 
 	public function setInfo( $ID:uint, $color:uint, $baseAttn:uint, $attnPerMeter:uint, $lightIs:Boolean = false ):void {
+		if ( Lighting.DEFAULT_LIGHT_ID == $ID )
+				Log.out( "LightInfo.default");
 		ID = $ID;
 		color = $color;
 		_lightIs = $lightIs;

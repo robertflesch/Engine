@@ -9,6 +9,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.voxelModels
 {
 import com.voxelengine.GUI.VVPopup;
+import com.voxelengine.renderer.Chunk;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import flash.utils.ByteArray;
 import org.flashapi.swing.*;
@@ -36,7 +37,12 @@ public class WindowOxelUtils extends VVPopup
 		changeType.addEventListener(UIMouseEvent.CLICK, changeTypeHandler );
 		changeType.width = 150;
 		addElement( changeType );
-		
+
+		var lod:Button = new Button( "GenerateLOD" );
+		lod.addEventListener(UIMouseEvent.CLICK, generateLODHandler );
+		lod.width = 150;
+		addElement( lod );
+
 		var rotate:Button = new Button( "Rotate Oxel" );
 		rotate.addEventListener(UIMouseEvent.CLICK, rotateHandler );
 		rotate.width = 150;
@@ -156,7 +162,11 @@ public class WindowOxelUtils extends VVPopup
 		
 		startingVal++;
 	}
-	
+
+	private function generateLODHandler(event:UIMouseEvent):void {
+		_vm.modelInfo.data.generateLOD();
+	}
+
 	private function rotateHandler(event:UIMouseEvent):void {
 		_vm.modelInfo.data.oxel.rotateCCW();
 	}
@@ -192,7 +202,7 @@ public class WindowOxelUtils extends VVPopup
 	}
 
 	private function rebuildLightingHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.visitor( Oxel.rebuildLighting );
+		_vm.modelInfo.data.visitor( Oxel.rebuildLightingRecursive );
 	}
 
 	private function rebuildWaterHandler(event:UIMouseEvent):void {

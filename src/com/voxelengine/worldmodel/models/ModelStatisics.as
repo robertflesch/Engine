@@ -7,17 +7,10 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.pools.LightingPool;
-	import com.voxelengine.worldmodel.oxel.Lighting;
-	import com.voxelengine.worldmodel.oxel.FlowInfo;
-	import com.voxelengine.worldmodel.oxel.OxelBitfields;
-	import flash.utils.ByteArray;
-	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.TypeInfo;
-	import com.voxelengine.worldmodel.oxel.Oxel;
-	
+
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF 
@@ -75,8 +68,7 @@ package com.voxelengine.worldmodel.models
 			}
 		}
 	
-		public function statAdd( type:int, grain:int ):void
-		{
+		public function statAdd( type:int, grain:int ):void {
 			if ( type < 99 )
 				Log.out( "ModelStatisics.statAdd - Where does this come from: " + type );
 			if ( isNaN( _stats[type] ) )
@@ -85,9 +77,9 @@ package com.voxelengine.worldmodel.models
 			_stats[type] = _stats[type] + count;
 
 			if ( grain < _solid_min && TypeInfo.AIR != type )
-				_solid_min = grain
+				_solid_min = grain;
 			if ( grain > _solid_max && TypeInfo.AIR != type )
-				_solid_max = grain
+				_solid_max = grain;
 		}
 
 		public function statRemove( type:int, grain:int ):void

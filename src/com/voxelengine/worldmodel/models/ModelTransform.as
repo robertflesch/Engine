@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.worldmodel.models.types.Player;
+
 import flash.geom.Vector3D;
 
 import com.voxelengine.events.TransformEvent;
@@ -22,17 +24,18 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class ModelTransform
 {
-	static public const INVALID:int 			= 0 	
-	static public const POSITION:int 			= 1 	
-	static public const POSITION_TO:int 		= 2
-	static public const POSITION_REPEATING:int 	= 3
-	static public const SCALE:int 				= 4		
-	static public const ROTATION:int 			= 5    
-	static public const ROTATE_TO:int 			= 6
-	static public const ROTATION_REPEATING:int 	= 7
-	static public const LIFE:int 				= 8
-	static public const VELOCITY:int 			= 9
-	
+	static public const INVALID:int 			= 0;
+	static public const POSITION:int 			= 1;
+	static public const POSITION_TO:int 		= 2;
+	static public const POSITION_REPEATING:int 	= 3;
+	static public const SCALE:int 				= 4;
+	static public const ROTATION:int 			= 5;
+	static public const ROTATE_TO:int 			= 6;
+	static public const ROTATION_REPEATING:int 	= 7;
+	static public const LIFE:int 				= 8;
+	static public const VELOCITY:int 			= 9;
+	static public const POSITION_TO_ME:int 		= 10;
+
 	static public const INFINITE_TIME:int 		= -1;
 	
 	static public const POSITION_STRING:String 				= "position"
@@ -44,7 +47,8 @@ public class ModelTransform
 	static public const ROTATION_REPEATING_STRING:String 	= "rotation_repeating"
 	static public const LIFE_STRING:String 					= "life"
 	static public const VELOCITY_STRING:String 				= "velocity"
-	
+	static public const POSITION_TO_ME_STRING:String		= "position_to_me"
+
 	private var _time:int = 0;            // in milliseconds
 	private var _originalTime:Number = 0; // in milliseconds (NOW)
 	private var _originalDelta:Vector3D = new Vector3D();
@@ -73,16 +77,17 @@ public class ModelTransform
 	public function set name(val:String):void 				{ _name = val; }
 	
 	static public function typesList():Vector.<String> {
-		var types:Vector.<String> = new Vector.<String>
-		types.push( POSITION_STRING )
-		types.push( POSITION_TO_STRING )		
-		types.push( POSITION_REPEATING_STRING )
-		types.push( SCALE_STRING )
-		types.push( ROTATION_STRING )
-		types.push( ROTATE_TO_STRING ) 		
-		types.push( ROTATION_REPEATING_STRING )
-		types.push( LIFE_STRING )	
-		types.push( VELOCITY_STRING )
+		var types:Vector.<String> = new Vector.<String>;
+		types.push( POSITION_STRING );
+		types.push( POSITION_TO_STRING );
+		types.push( POSITION_REPEATING_STRING );
+		types.push( SCALE_STRING );
+		types.push( ROTATION_STRING );
+		types.push( ROTATE_TO_STRING );
+		types.push( ROTATION_REPEATING_STRING );
+		types.push( LIFE_STRING );
+		types.push( VELOCITY_STRING );
+		types.push( POSITION_TO_ME_STRING );
 		return types
 	}
 	
@@ -120,6 +125,12 @@ public class ModelTransform
 			_delta.z = ($z - 1) / 1000;
 		}
 		else if ( ModelTransform.ROTATE_TO == type || ModelTransform.POSITION_TO == type )
+		{
+			_delta.x = $x;
+			_delta.y = $y;
+			_delta.z = $z;
+		}
+		else if ( ModelTransform.POSITION_TO_ME == type )
 		{
 			_delta.x = $x;
 			_delta.y = $y;
@@ -177,6 +188,8 @@ public class ModelTransform
 		if  (  ModelTransform.POSITION == type 
 			|| ModelTransform.POSITION_REPEATING == type )	 	
 			transformTarget = ii.positionGet;
+		else if (  ModelTransform.POSITION_TO_ME == type )
+			transformTarget = Player.player.instanceInfo.positionGet;
 		else if (  ModelTransform.ROTATION == type
 				|| ModelTransform.ROTATION_REPEATING == type )	
 			transformTarget = ii.rotationGet;
@@ -314,6 +327,8 @@ public class ModelTransform
 			return POSITION_TO;
 		if ( POSITION_REPEATING_STRING == val.toLowerCase() )
 			return POSITION_REPEATING;
+		if ( POSITION_TO_ME_STRING == val.toLowerCase() )
+			return POSITION_TO_ME;
 		else if ( SCALE_STRING == val.toLowerCase() )
 			return SCALE;
 		else if ( ROTATION_STRING == val.toLowerCase() )
@@ -336,6 +351,8 @@ public class ModelTransform
 			return POSITION_STRING;
 		if ( POSITION_TO == val )
 			return POSITION_TO_STRING;
+		if ( POSITION_TO_ME == val )
+			return POSITION_TO_ME_STRING;
 		if ( POSITION_REPEATING == val )
 			return POSITION_REPEATING_STRING;
 		else if ( SCALE == val )
