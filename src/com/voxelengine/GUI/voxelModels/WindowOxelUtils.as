@@ -164,7 +164,8 @@ public class WindowOxelUtils extends VVPopup
 	}
 
 	private function generateLODHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.generateLOD();
+		//_vm.modelInfo.data.generateLOD();
+		_vm.generateAllLODs();
 	}
 
 	private function rotateHandler(event:UIMouseEvent):void {

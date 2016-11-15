@@ -98,6 +98,7 @@ public class ModelInfo extends PersistanceObject
 	
 	public function createEditCursor( $guid:String ):void {
 		_data = new OxelPersistance( $guid );
+		_data.parent = this;
 		_data.createEditCursor();
 	}
 	
@@ -111,6 +112,7 @@ public class ModelInfo extends PersistanceObject
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
 //		var time:int = getTimer()
+
 		if ( _data )
 			_data.draw(	$mvp, $vm, $context, $selected, $isChild, $isAlpha );
 //		var t:int = (getTimer() - time) 	
@@ -158,6 +160,7 @@ public class ModelInfo extends PersistanceObject
 			removeListeners();
 			const priority:int = 1;
 			_data = $ode.oxelData;
+			_data.parent = this;
 
 			_data.load( guid, priority, this, dynamicObj, _altGuid );
 			/*

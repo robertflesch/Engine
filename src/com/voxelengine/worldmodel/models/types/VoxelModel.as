@@ -8,6 +8,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models.types
 {
 import com.voxelengine.GUI.voxelModels.WindowBluePrintCopy;
+import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
+import com.voxelengine.worldmodel.oxel.GrainCursorUtils;
+
 import flash.display3D.Context3D;
 import flash.events.KeyboardEvent;
 import flash.events.TimerEvent;
@@ -502,8 +505,31 @@ public class VoxelModel
 		// This could be improved, I am doing it at least twice per model per frame.
 		var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
 		viewMatrix.append(mvp);
-		
+
 		if ( modelInfo ) {
+
+			if ( modelInfo.data ) {
+				var ppos:Vector3D = Player.player.instanceInfo.positionGet;
+				var modelPos:Vector3D = this.instanceInfo.positionGet;
+				var d:int = ppos.subtract(modelPos).length;
+//				Log.out("ModelInfo.draw distance to model: " + d);
+
+				if ( d > 2900 )
+					modelInfo.data.setLOD = 5;
+				else if ( d > 2800 )
+					modelInfo.data.setLOD = 4;
+				else if ( d > 2700 )
+					modelInfo.data.setLOD = 3;
+				else if ( d > 2600 )
+					modelInfo.data.setLOD = 2;
+				else if ( d > 2500 )
+					modelInfo.data.setLOD = 1;
+				else
+					modelInfo.data.setLOD = 0;
+
+				//Log.out( "VoxelModel.draw - set LOD to: " + modelInfo.data.lod );
+			}
+
 			// We have to draw all of the non alpha first, otherwise parts of the tree might get drawn after the alpha does
 			modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha );
 		}
@@ -1155,6 +1181,14 @@ public class VoxelModel
 		else
 			return 0;
 	}
+
+	public function generateAllLODs():void {
+		var time:int = getTimer();
+		Log.out( "VoxelModel.generalAllLODs start")
+		modelInfo.data.generateLOD( this );
+		Log.out( "VoxelModel.generalAllLODs took: " + (getTimer()-time));
+	}
+
 }
 }
 

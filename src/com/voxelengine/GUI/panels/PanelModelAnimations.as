@@ -59,6 +59,7 @@ package com.voxelengine.GUI.panels
 				childPanelRemove();
 			// true if our child changed the model
 			else if ( e.parentVM == _parentModel ) {
+				//Log.out( "PanelModelAnimations.selectedModelChanged");
 				childPanelAdd( e.voxelModel );
 				animationPanelAdd( e.voxelModel );
 			}

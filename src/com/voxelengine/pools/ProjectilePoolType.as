@@ -16,7 +16,9 @@ import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube
 import com.voxelengine.worldmodel.weapons.Projectile
-     
+
+import flash.utils.ByteArray;
+
 public final class ProjectilePoolType 
 { 
 	private var _currentPoolSize:uint 
@@ -71,10 +73,8 @@ public final class ProjectilePoolType
 		_modelMetadata.owner = ""
 		//ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, _projectileGuid, _modelMetadata ) )
 		Log.out( "ProjectilePoolType.generateData: " + _modelInfo.toString() );
-		//_modelInfo.oxelLoadData();
-		//_modelInfo.loadFromBiomeData();
 		_modelInfo.data = new OxelPersistance( _projectileGuid );
-		_modelInfo.data.ba  = Oxel.generateCube( _projectileGuid, _modelInfo.biomes.layers[0], false );
+		var ba:ByteArray  = Oxel.generateCube( _projectileGuid, _modelInfo.biomes.layers[0], false );
 		_modelInfo.data.fromByteArray();
 	}
 		

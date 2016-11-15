@@ -154,7 +154,7 @@ public class PanelModels extends PanelBase
 		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new WindowModelDetail( VoxelModel.selectedModel ); } );
 		_detailButton.width = btnWidth;
 		_buttonContainer.addElement( _detailButton );
-		
+
 		function deleteModelHandler(event:UIMouseEvent):void  {
 			if ( VoxelModel.selectedModel )
 				deleteModelCheck()
@@ -231,17 +231,32 @@ public class PanelModels extends PanelBase
 		
 	}
 
-	private function selectModel(event:ListEvent):void {
-		if ( event.target.data ) {
-			buttonsEnable();
-			VoxelModel.selectedModel = event.target.data
-			// TO DO this is the right path, but probably need a custom event for this...
-			UIRegionModelEvent.dispatch( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, VoxelModel.selectedModel, _parentModel ) );
-			//_parent.childPanelAdd( _selectedModel );
-			//_parent.animationPanelAdd( _selectedModel );
+	import flash.utils.getTimer;
+	private var doubleMessageHackTime:int = getTimer();
+	private function get doubleMessageHack():Boolean {
+		var newTime:int = getTimer();
+		var result:Boolean = false;
+		if ( doubleMessageHackTime + Globals.DOUBLE_MESSAGE_WAITING_PERIOD * 10 < newTime ) {
+			doubleMessageHackTime = newTime;
+			result = true;
 		}
-		else {
-			buttonsDisable();
+		return result;
+	}
+	private function selectModel(event:ListEvent):void {
+		if ( doubleMessageHack ) {
+			if (event.target.data) {
+				Log.out("PanelModels.selectModel has TARGET DATA");
+				buttonsEnable();
+				VoxelModel.selectedModel = event.target.data
+				// TO DO this is the right path, but probably need a custom event for this...
+				UIRegionModelEvent.dispatch(new UIRegionModelEvent(UIRegionModelEvent.SELECTED_MODEL_CHANGED, VoxelModel.selectedModel, _parentModel));
+				//_parent.childPanelAdd( _selectedModel );
+				//_parent.animationPanelAdd( _selectedModel );
+			}
+			else {
+				Log.out("PanelModels.selectModel has NO target data");
+				buttonsDisable();
+			}
 		}
 	}
 	

@@ -37,8 +37,6 @@ public class GrainSelector extends QuickInventory
 		super( 244, 42, 32, "grainSelector.png", 84 );
 		_selectorXOffset = 10; // From image of "grainSelector.png"
 		buildItems();
-		display();
-		resizeObject( null );
 	}
 	
 	public function addListeners():void {
@@ -70,7 +68,9 @@ public class GrainSelector extends QuickInventory
 		_outline.visible = true;
 		visible = true;
 		addListeners();
-		CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, _currentSize ) ); 
+		CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, _currentSize ) );
+		display();
+		resizeObject( null );
 	}
 	
 	public function hide():void {
@@ -152,6 +152,7 @@ public class GrainSelector extends QuickInventory
 		addSelector();			
 		// start off highlighting 1 meter
 		processGrainSelection( boxes[4] );
+		Log.out( "GrainSelector.buildItems exit" );
 	}
 	
 	private function pressGrain(e:UIMouseEvent):void { processGrainSelection( e.target as UIObject ); }			
@@ -187,7 +188,7 @@ public class GrainSelector extends QuickInventory
 			else
 				VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( _currentSize * 1.5 ); 
 		}
-
+		Log.out( "GrainSelector.processGrainSelection exit" );
 	}
 }
 }

@@ -43,7 +43,14 @@ public class ModelMakerBase {
 	protected function get parentModelGuid():String { return _parentModelGuid }
 	
 	static private var _s_parentChildCount:Array = new Array()
-	
+
+	/*
+	//   This generates either a
+	//	 ModelLoadingEvent.MODEL_LOAD_COMPLETE
+	//	 ModelLoadingEvent.MODEL_LOAD_FAILURE
+	//   event
+	*/
+
 	public function ModelMakerBase( $ii:InstanceInfo, $fromTables:Boolean = true ) {
 		if ( null == $ii )
 			throw new Error( "ModelMakerBase - NO instanceInfo recieve in constructor" )

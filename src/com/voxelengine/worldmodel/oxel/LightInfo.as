@@ -39,17 +39,16 @@ public class LightInfo
 	public function LightInfo() {
 	}
 
-	public function setInfo( $ID:uint, $color:uint, $baseAttn:uint, $attnPerMeter:uint, $lightIs:Boolean = false ):void {
-		if ( Lighting.DEFAULT_LIGHT_ID == $ID )
-				Log.out( "LightInfo.default");
+	public function setInfo( $ID:uint, $color:uint, $baseAttn:uint, $baseLightLevel:uint, $lightIs:Boolean = false ):void {
+//		if ( Lighting.DEFAULT_LIGHT_ID == $ID )
+//				Log.out( "LightInfo.default");
 		ID = $ID;
 		color = $color;
 		_lightIs = $lightIs;
-		bLower = $baseAttn;
-		bHigher = $baseAttn;
+		setAll( $baseLightLevel );
 		if ( true == $lightIs )
 			setAll( 255 );
-		attn = $attnPerMeter;
+		attn = $baseAttn;
 	}
 
 	public function toByteArray( $ba:ByteArray ):ByteArray {

@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.worldmodel.Light;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
@@ -14,6 +16,7 @@ import com.voxelengine.worldmodel.models.OxelPersistance;
 
 import flash.geom.Point;
 import flash.geom.Vector3D;
+import flash.net.registerClassAlias;
 import flash.utils.ByteArray;
 import flash.utils.getTimer;
 
@@ -1815,8 +1818,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 	private function resetLighting():void {
 		lightInfoClear();
-		LightingPool.poolReturn( lighting );
-		lighting = null;
+		if ( lighting ) {
+			LightingPool.poolReturn(lighting);
+			lighting = null;
+		}
 	}
 
 	private function resetFlowInfo():void {
@@ -1848,8 +1853,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		$ba.writeUnsignedInt(maskTempData()); // data contains info on faces, lighting, flow
 		$ba.writeUnsignedInt(type); // type has typeData
 
-		Log.out("toByteArrayRecursive data: " + maskTempData().toString(16));
-		Log.out("toByteArrayRecursive type: " + type);
+//		Log.out("toByteArrayRecursive data: " + maskTempData().toString(16));
+//		Log.out("toByteArrayRecursive type: " + type);
 
 		if ( childrenHas() )
 			writeParent();
@@ -1857,10 +1862,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			writeChild();
 
 		function writeParent():void {
-			Log.out("toByteArrayRecursive ---- start write parent -------" );
+//			Log.out("toByteArrayRecursive ---- start write parent -------" );
 			for each ( var child:Oxel in _children )
 				child.toByteArrayRecursiveV9( $ba );
-			Log.out("toByteArrayRecursive ---- end write parent -------" );
+//			Log.out("toByteArrayRecursive ---- end write parent -------" );
 		}
 
 		function writeChild():void {
@@ -1931,6 +1936,96 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 		return $ba;
 	}
+
+	public function decompressAndExtractMetadata( $guid:String, $ba:ByteArray, $op:OxelPersistance, $statisics:ModelStatisics ):void {
+
+		var time:int = getTimer();
+		try {
+			$ba.uncompress();
+		}
+		catch (error:Error) {
+			Log.out("OxelPersistance.fromByteArray - Was expecting compressed data " + $guid, Log.WARN);
+		}
+		$ba.position = 0;
+
+		Log.out("OxelPersistance.fromByteArray - uncompress took: " + (getTimer() - time), Log.INFO);
+
+		extractVersionInfo($ba, $op);
+		// how many bytes is the modelInfo
+		var strLen:int = $ba.readInt();
+		// read off that many bytes, even though we are using the data from the modelInfo file
+		var modelInfoJson:String = $ba.readUTFBytes(strLen);
+
+		// Read off 1 bytes, the root size
+		var rootGrainSize:int = $ba.readByte();
+		gc.grain = gc.bound = rootGrainSize;
+
+		// TODO - do I need to do this everytime? or could I use a static initializer? RSF - 7.16.2015
+		registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);
+		registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);
+
+		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
+		gct.grain = rootGrainSize;
+
+		Log.out("OxelPersistance.fromByteArray - b4 readVersionedData _version: " + $op.version + "  rootGrain: " + rootGrainSize, Log.INFO);
+		if (Globals.VERSION_000 == $op.version)
+			fromByteArrayV0(null, gct, $ba, $statisics);
+		else if (Globals.VERSION_008 >= $op.version)
+			fromByteArrayV8($op.version, null, gct, $ba, $statisics);
+		else
+			fromByteArray($op.version, null, gct, $ba, $statisics);
+
+		GrainCursorPool.poolDispose(gct);
+		Log.out("OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.INFO);
+
+	}
+
+	// Make sense, called from for Makers
+	private function extractVersionInfo( $ba:ByteArray, $op:OxelPersistance ):void {
+		$ba.position = 0;
+		// Read off first 3 bytes, the data format
+		var format:String = readFormat($ba);
+		if ("ivm" != format)
+			throw new Error("OxelPersistance.extractVersionInfo - Exception - unsupported format: " + format );
+
+		// Read off next 3 bytes, the data version
+		$op.version = readVersion($ba);
+		// Read off next byte, the manifest version
+		$ba.readByte();
+		//Log.out("OxelPersistance.extractVersionInfo - version: " + $op.version );
+
+		// This reads the format info and advances position on byteArray
+		function readFormat($ba:ByteArray):String
+		{
+			var format:String;
+			var byteRead:int = 0;
+			byteRead = $ba.readByte();
+			format = String.fromCharCode(byteRead);
+			byteRead = $ba.readByte();
+			format += String.fromCharCode(byteRead);
+			byteRead = $ba.readByte();
+			format += String.fromCharCode(byteRead);
+
+			return format;
+		}
+
+		// This reads the version info and advances position on byteArray
+		function readVersion($ba:ByteArray):int
+		{
+			var version:String;
+			var byteRead:int = 0;
+			byteRead = $ba.readByte();
+			version = String.fromCharCode(byteRead);
+			byteRead = $ba.readByte();
+			version += String.fromCharCode(byteRead);
+			byteRead = $ba.readByte();
+			version += String.fromCharCode(byteRead);
+
+			return int(version);
+		}
+	}
+
+
 
 	public function fromByteArray( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $stats:ModelStatisics ):ByteArray {
 		var faceData:uint = $ba.readUnsignedInt();
@@ -3476,76 +3571,101 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return ba;
 	}
 
+	public function generateLOD( $minGrain:uint ):void {
+		Log.out( "Oxel.generateLOD creating model of with min grain: " + $minGrain );
+		var childrenFound:Boolean = true;
+		while ( $minGrain > findSmallest() ) {
+			// this should be called on the clone.
+			generateLODRecursiveInternal($minGrain);
+			childCountReset();
+			childCountCalc();
+		}
+		Log.out( "Oxel.generateLOD lod has child: " + childCount );
+	}
 
-	public function generateLODRecursive( gmin:uint, $changed:int ):int {
-        if ( gmin >= gc.grain ) {
-            if (8 == childCount  ) {
-                // The grain is smaller then the minimum and this is a stem node
-                collapse();
-				$changed += 8;
-            }
-            else  {
-				$changed = passToChildren( gmin, $changed );
-            }
-        } else {
-			$changed = passToChildren( gmin, $changed );
-        }
-		return $changed;
-
-		function passToChildren( gmin:uint, $changed:int ):int {
+	private function generateLODRecursiveInternal( $gmin:uint ):void {
+		if ($gmin >= gc.grain && childrenHas() ) {
+			//Log.out("Oxel.generateLODRecursiveInternal --- collapsing child: " + childCount + "  gc: " + gc.toString());
+			// The grain is smaller then the minimum and this is a stem node
+			collapse();
+			//Log.out("Oxel.generateLODRecursiveInternal --- after collapse: " + childCount + "  gc: " + gc.toString());
+			childCount = 1;
+		} else {
 			var child:Oxel;
-			if ( childrenHas() ) {
+			if (childrenHas()) {
+				//Log.out("Oxel.generateLODRecursiveInternal too big, passing to children: " + childCount + "  gc: " + gc.toString());
 				for (var i:int = 0; i < OXEL_CHILD_COUNT; i++) {
 					child = children[i];
-					$changed = child.generateLODRecursive(gmin,$changed);
+					child.generateLODRecursiveInternal($gmin);
 				}
 			}
+			//else
+				//Log.out("Oxel.generateLODRecursiveInternal too big, but no children: " + childCount + "  gc: " + gc.toString());
 		}
-    }
+	}
 
     public function collapse():void {
+
+		var child:Oxel;
         // this releases the children
-		Log.out( "Oxel.collapse gc: " + gc.toString() );
+//		Log.out( "Oxel.collapse gc: " + gc.toString() );
         var typesWithin:Array = [];
         var airCount:int;
-        for  ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ ) {
-            var child:Oxel = children[i];
-            if ( child ) {
+		if ( childrenHas() ) {
+			for (var i:int = 0; i < OXEL_CHILD_COUNT; i++) {
+				child = children[i];
+				if (child) {
+					child.collapse();
 
-                if ( typesWithin[child.type] )
-                    typesWithin[child.type]++;
-                else
-                    typesWithin[child.type] = 1;
+					if (typesWithin[child.type])
+						typesWithin[child.type]++;
+					else
+						typesWithin[child.type] = 1;
 
-                if ( TypeInfo.AIR == child.type)
-                    airCount++;
+					if (TypeInfo.AIR == child.type)
+						airCount++;
 
-                children[i].release();
-                children[i] = null;
-            }
-        }
-
-		var mostFrequentTypeCount:int;
-		var mostFrequentType:int = TypeInfo.AIR;
-        if ( airCount < 4 ) {
-			for (var typeData:String in typesWithin) {
-				if (mostFrequentTypeCount < typesWithin[typeData]) {
-					mostFrequentTypeCount = typesWithin[typeData];
-					mostFrequentType = int(typeData);
+					child.release();
+					child = null;
 				}
 			}
+
+			var mostFrequentTypeCount:int;
+			var mostFrequentType:int = TypeInfo.AIR;
+			if (airCount <= 5) {
+				for (var typeData:String in typesWithin) {
+					if (mostFrequentTypeCount < typesWithin[typeData] && TypeInfo.AIR != int(typeData) ) {
+						mostFrequentTypeCount = typesWithin[typeData];
+						mostFrequentType = int(typeData);
+					}
+				}
+			}
+
+
+			ChildOxelPool.poolReturn(_children);
+			_children = null;
+			childCount = 1;
+//			Log.out( "Oxel.collapse changing type to: " + mostFrequentType + "  airCount: " + airCount + "  gc: " + gc.toString() );
+			type = mostFrequentType;
+
+			parentClear();
 		}
-
-
-        ChildOxelPool.poolReturn( _children );
-        _children = null;
-        childCount = 1;
-		Log.out( "Oxel.collapse changing type to: " + mostFrequentType + "  airCount: " + airCount );
-		type = mostFrequentType;
-
-        parentClear();
     }
 
-
+	public function findSmallest():uint {
+		var size:uint = 32;
+		if ( childrenHas() ) {
+			for each ( var child:Oxel in _children ) {
+				var cs:uint = child.findSmallest();
+				if ( cs < size )
+						size = cs;
+			}
+		}
+		else {
+			if (gc.grain < size)
+				size = gc.grain;
+		}
+		return size;
+	}
 } // end of class Oxel
 } // end of package
