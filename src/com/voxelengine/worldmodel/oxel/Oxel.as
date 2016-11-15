@@ -1838,7 +1838,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			resetLighting();
 	}
 
-
 	private function toByteArrayRecursiveV9( $ba:ByteArray ):void {
 		// This version has to do a bit of clean up on flowInfo and lightInfo
 		// In versions previous to 9, I save the flowInfo and lightInfo on every voxel if it had faces.
@@ -1956,6 +1955,12 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		// read off that many bytes, even though we are using the data from the modelInfo file
 		var modelInfoJson:String = $ba.readUTFBytes(strLen);
 
+		readBAData($ba, $op, $statisics);
+		Log.out("OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.INFO);
+
+	}
+
+	private function readBAData($ba:ByteArray, $op:OxelPersistance, $statisics:ModelStatisics):void {
 		// Read off 1 bytes, the root size
 		var rootGrainSize:int = $ba.readByte();
 		gc.grain = gc.bound = rootGrainSize;
@@ -1967,7 +1972,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
 		gct.grain = rootGrainSize;
 
-		Log.out("OxelPersistance.fromByteArray - b4 readVersionedData _version: " + $op.version + "  rootGrain: " + rootGrainSize, Log.INFO);
+		//Log.out("Oxel.readBAData - b4 readVersionedData _version: " + $op.version + "  rootGrain: " + rootGrainSize, Log.INFO);
 		if (Globals.VERSION_000 == $op.version)
 			fromByteArrayV0(null, gct, $ba, $statisics);
 		else if (Globals.VERSION_008 >= $op.version)
@@ -1976,8 +1981,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			fromByteArray($op.version, null, gct, $ba, $statisics);
 
 		GrainCursorPool.poolDispose(gct);
-		Log.out("OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.INFO);
-
 	}
 
 	// Make sense, called from for Makers
