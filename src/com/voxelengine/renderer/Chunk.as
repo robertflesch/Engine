@@ -31,8 +31,8 @@ public class Chunk {
 	// You want this number to be as high as possible. 
 	// But the higher it is, the longer updates take.
 	//static private const MAX_CHILDREN:uint = 32768; // draw for all chunks on island takes 1ms
-	static private const MAX_CHILDREN:uint = 16384;
-	//static private const MAX_CHILDREN:uint = 8192;
+	//static private const MAX_CHILDREN:uint = 16384;
+	static private const MAX_CHILDREN:uint = 8192;
 	static public var _s_chunkCount:int;
 	static public function chunkCount():int { return _s_chunkCount; }
 	//static private const MAX_CHILDREN:uint = 4096; // draw for all chunks on island takes 5ms
@@ -91,6 +91,8 @@ public class Chunk {
 	// public function divide():?
 	
 	static public function parse( $oxel:Oxel, $parent:Chunk, $lightInfo:LightInfo ):Chunk {
+		var time:int = getTimer();
+
 		var chunk:Chunk = new Chunk( $parent );
 		// when I create the chunk I add a light level to it.
 
@@ -98,11 +100,13 @@ public class Chunk {
 		chunk._lightInfo = $lightInfo;
 			
 		if ( MAX_CHILDREN < $oxel.childCount ) {
+			Log.out( "chunk.parse - creating parent chunk: " + $oxel.childCount );
 			chunk._children = new Vector.<Chunk>(OCT_TREE_SIZE, true);
 			for ( var i:int; i < OCT_TREE_SIZE; i++ )
 				chunk._children[i] = parse( $oxel.children[i], chunk, $lightInfo );
 		}
 		else {
+			Log.out( "chunk.parse - creating chunk with child count: " + $oxel.childCount );
 			chunk._oxel = $oxel;
 			$oxel.chunk = chunk;
 			if ( 1 == $oxel.childCount && false == $oxel.facesHas() ) {
@@ -114,7 +118,8 @@ public class Chunk {
 				chunk._vertMan = new VertexManager( $oxel.gc, null );
 			}
 		}
-		return chunk;	
+		Log.out( "Chunk.parse took: " + (getTimer() - time) );
+		return chunk;
 	}
 
 	public function drawNew( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean = false ):void {
@@ -165,20 +170,21 @@ public class Chunk {
 		}
 		else {
 			// Since task has been added for this chunk, mark it as clear
-			dirtyClear()
+			dirtyClear();
 			if ( _oxel && _oxel.dirty ) {
-				if ( $firstTime ) {
-					var priority:int = 32000000 // low priority by default
-					if ( Player.player && Player.player.instanceInfo ) {
-						// this takes the origin of the oxel and converts it to world space.
-						// takes the resulting vector and subtracts the player position, and uses the length as the priority
-						priority = ($vm.modelToWorld( _oxel.gc.getModelVector() ).subtract( Player.player.instanceInfo.positionGet ) ).length
-						//trace( "Chunk.refreshFacesAndQuads distance: priority: " + priority + "  chunk.oxel.gc: " + _oxel.gc.getModelVector().toString()  + "  Player.player: " +  Player.player.instanceInfo.positionGet )
-					}
-					RefreshQuadsAndFaces.addTask( $guid, this, priority )
-				}
+//				if ( $firstTime ) {
+//					var priority:int = $vm.distanceFromPlayerToModel();
+//					RefreshQuadsAndFaces.addTask( $guid, this, priority )
+//				}
+//				else
+//					refreshFacesAndQuadsTerminal()
+				var priority:int;
+				if ( $firstTime )
+					 priority = $vm.distanceFromPlayerToModel();
 				else
-					refreshFacesAndQuadsTerminal()
+					priority = 4; // high but not too high?
+
+				RefreshQuadsAndFaces.addTask( $guid, this, priority )
 			}
 		}
 	}

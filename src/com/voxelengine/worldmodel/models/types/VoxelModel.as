@@ -1189,6 +1189,15 @@ public class VoxelModel
 		Log.out( "VoxelModel.generalAllLODs took: " + (getTimer()-time));
 	}
 
+	public function distanceFromPlayerToModel():Number {
+		if ( Player.player && Player.player.instanceInfo ) {
+			// this takes the origin of the oxel and converts it to world space.
+			// takes the resulting vector and subtracts the player position, and uses the length as the priority
+			//trace( "Chunk.refreshFacesAndQuads distance: priority: " + priority + "  chunk.oxel.gc: " + _oxel.gc.getModelVector().toString()  + "  Player.player: " +  Player.player.instanceInfo.positionGet )
+			return ( modelToWorld( modelInfo.data.oxel.gc.getModelVector() ).subtract( Player.player.instanceInfo.positionGet ) ).length;
+		}
+		return 32000;
+	}
 }
 }
 

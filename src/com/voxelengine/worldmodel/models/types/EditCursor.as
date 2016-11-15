@@ -392,7 +392,7 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function buildCursorModel():void {	
-		modelInfo.data.oxel.reset();
+		modelInfo.data.oxel.editCursorReset();
 		
 		if ( objectModel ) {
 			modelInfo.data.oxel.gc.bound = _objectModel.grain;
@@ -419,10 +419,13 @@ public class EditCursor extends VoxelModel
 			modelInfo.data.oxel.faceSet( Globals.NEGZ );
 		}
 		
-		if ( !modelInfo.data.oxel.lighting )
-			modelInfo.data.oxel.lighting = LightingPool.poolGet( 0xff );
+		if ( !modelInfo.data.oxel.lighting ) {
+			modelInfo.data.oxel.lighting = LightingPool.poolGet(0xff);
+			modelInfo.data.oxel.lighting.add( modelInfo.data.oxel.chunkGet().lightInfo );
+		}
 		var li:LightInfo = modelInfo.data.oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-		modelInfo.data.oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
+		if ( li )
+			modelInfo.data.oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
 		modelInfo.data.oxel.write( EDIT_CURSOR, modelInfo.data.oxel.gc, oxelTexture, true );
 		
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )

@@ -7,12 +7,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.PersistanceEvent;
-import com.voxelengine.worldmodel.Light;
-import com.voxelengine.worldmodel.biomes.LayerInfo;
-import com.voxelengine.worldmodel.models.OxelPersistance;
 
 import flash.geom.Point;
 import flash.geom.Vector3D;
@@ -25,6 +19,7 @@ import com.voxelengine.Globals;
 import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.events.LightEvent;
 import com.voxelengine.events.ImpactEvent;
+import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.utils.Plane;
 import com.voxelengine.renderer.Quad;
 import com.voxelengine.renderer.Chunk;
@@ -36,6 +31,8 @@ import com.voxelengine.worldmodel.models.ModelStatisics;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.tasks.landscapetasks.TreeGenerator;
 import com.voxelengine.worldmodel.tasks.flowtasks.Flow;
+import com.voxelengine.worldmodel.biomes.LayerInfo;
+import com.voxelengine.worldmodel.models.OxelPersistance;
 
 /**
  * ...
@@ -58,9 +55,9 @@ public class Oxel extends OxelBitfields
 	static private 		var _s_scratchGrain:GrainCursor 				= new GrainCursor();
 	static private 		var _s_scratchVector:Vector3D 					= null;
 
-	// How do I manage this for unique values for each face?
 	static private 		var _s_nodes:int 								= 0;
-	
+	static private 		var _aliasInitialized:Boolean					= false; // used to only register class names once
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//     Member Variables
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,7 +71,7 @@ public class Oxel extends OxelBitfields
 	private var _chunk:Chunk; 	// created when needed
 	private var _lighting:Lighting;
 	private var _flowInfo:FlowInfo; 		// used to count up and out in flowing oxel ( only uses 2 bytes, down, out )
-	
+
 	override public function set dirty( $isDirty:Boolean ):void { 
 		// mark oxel as dirty using the super function which just sets the dirty bit.
 		super.dirty = $isDirty;
@@ -1955,24 +1952,25 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		// read off that many bytes, even though we are using the data from the modelInfo file
 		var modelInfoJson:String = $ba.readUTFBytes(strLen);
 
-		readBAData($ba, $op, $statisics);
-		Log.out("OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.INFO);
+		if ( !_aliasInitialized ) {
+			_aliasInitialized = true;
+			// TODO - do I need to do this everytime? or could I use a static initializer? RSF - 7.16.2015
+			registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);
+			registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);
+		}
 
+		readOxelData($ba, $op, $statisics);
+		Log.out("OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.INFO);
 	}
 
-	private function readBAData($ba:ByteArray, $op:OxelPersistance, $statisics:ModelStatisics):void {
+	private function readOxelData($ba:ByteArray, $op:OxelPersistance, $statisics:ModelStatisics):void {
 		// Read off 1 bytes, the root size
 		var rootGrainSize:int = $ba.readByte();
 		gc.grain = gc.bound = rootGrainSize;
 
-		// TODO - do I need to do this everytime? or could I use a static initializer? RSF - 7.16.2015
-		registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);
-		registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);
-
 		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
 		gct.grain = rootGrainSize;
 
-		//Log.out("Oxel.readBAData - b4 readVersionedData _version: " + $op.version + "  rootGrain: " + rootGrainSize, Log.INFO);
 		if (Globals.VERSION_000 == $op.version)
 			fromByteArrayV0(null, gct, $ba, $statisics);
 		else if (Globals.VERSION_008 >= $op.version)
@@ -2996,7 +2994,13 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		facesClearAll();
 		facesMarkAllClean();
 	}
-	
+
+	public function editCursorReset():void {
+		quadsDeleteAll();
+		facesClearAll();
+		facesMarkAllClean();
+	}
+
 	public function lightingReset():void {
 
 		if ( childrenHas() )

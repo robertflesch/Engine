@@ -11,7 +11,9 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.TypeInfo;
 
-	/**
+import flash.utils.getTimer;
+
+/**
 	 * ...
 	 * @author Robert Flesch - RSF 
 	 * how many and what type
@@ -56,6 +58,7 @@ package com.voxelengine.worldmodel.models
 		}
 
 		public function gather():void {
+			var time:int = getTimer();
 			for ( var key:* in _stats )
 			{
 				if ( !isNaN( key ) )
@@ -66,6 +69,7 @@ package com.voxelengine.worldmodel.models
 						Log.out( "ModelStatisics.gather - key not found key: " + key, Log.WARN );
 				}
 			}
+			Log.out( "ModelStatisics.gather -  took: " + (getTimer() - time), Log.INFO );
 		}
 	
 		public function statAdd( type:int, grain:int ):void {

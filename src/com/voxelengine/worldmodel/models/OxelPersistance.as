@@ -60,7 +60,7 @@ public class OxelPersistance extends PersistanceObject
 	private var _loaded:Boolean;
 	private var _version:int;
 	private var _topMostChunks:Vector.<Chunk>					= new Vector.<Chunk>();
-	private function get topMostChunk():Chunk						{ return _topMostChunks[_lod]; }
+	private function get topMostChunk():Chunk					{ return _topMostChunks[_lod]; }
 	private var _parent:ModelInfo
 	private var _ba:ByteArray
 	private var firstTime:Boolean								= true;
@@ -104,6 +104,7 @@ public class OxelPersistance extends PersistanceObject
 	}
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
+		//var time:int = getTimer();
 		if ( null == topMostChunk )
 			return; // I see this when the chunk is getting generated
 			
@@ -111,6 +112,7 @@ public class OxelPersistance extends PersistanceObject
 			topMostChunk.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
 		else
 			topMostChunk.drawNew( $mvp, $vm, $context, $selected, $isChild );
+		//Log.out( "OxelPersistance.draw guid: " + $vm.instanceInfo.instanceGuid + " TOOK: " + (getTimer()-time) );
 	}
 
 	public function createEditCursor():void {
@@ -205,18 +207,16 @@ public class OxelPersistance extends PersistanceObject
 		_oxels[_lod] = newOxel;
 
 		newOxel.decompressAndExtractMetadata( guid, $ba, this, statisics );
-		Log.out( "OxelPersistance.lodFromByteArray lod: " + _lod + "  newOxel: " + newOxel.toString() );
+		Log.out( "OxelPersistance.lodFromByteArray-decompressAndExtractMetadata - lod: " + _lod + "  newOxel: " + newOxel.toString() + " took: " + (getTimer() - time) );
 
 		statisics.gather();
-
-		Log.out( "OxelPersistance.lodFromByteArray - _statisics took: " + (getTimer() - time), Log.INFO );
 
 		var lightInfo:LightInfo = new LightInfo();
 		lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID,  Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, Lighting.defaultBaseLightAttn )
 
+		time = getTimer();
 		_topMostChunks[_lod] = Chunk.parse( oxel, null, lightInfo );
-
-		Log.out( "OxelPersistance.lodFromByteArray - DONE guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
+		Log.out( "OxelPersistance.lodFromByteArray - DONE lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 	}
 
 	

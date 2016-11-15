@@ -191,15 +191,16 @@ public class VertexIndexBuilder
 	}
 
 	// We need to break the quads in ~ 16k sized chunks. since that is the limit for each VertexBuffer
-	public function buffersBuildFromOxels( context:Context3D ):void {
+	public function buffersBuildFromOxels( context:Context3D ):Boolean {
 		if ( !dirty || !_oxels )
 		{
 			//trace( "VertexIndexBuilder.buffersBuildFromOxels - CLEAN" );
-			return;
+			return false;
 		}
-			
+
+//		var time:int = getTimer();
 		dispose();
-		if ( 0 < _oxels.length ) 
+		if ( 0 < _oxels.length )
 		{
 			var oxelStartingIndex:int = 0;
 			var remainingOxels:int = _oxels.length;
@@ -232,12 +233,14 @@ public class VertexIndexBuilder
 				remainingOxels = _oxels.length - oxelsProcessed;
 				//trace( "VertexIndexBuilder.buffersBuildFromOxels oxelStartingIndex: " + oxelStartingIndex + " oxelsProcessed: " + oxelsProcessed + " quadsProcessed: " + quadsProcessed );
 			}
-		}	
+		}
 		
 		_s_totalVertexMemory += _bufferVertexMemory;
 		_s_totalIndexMemory += _bufferIndexMemory;
 
 		dirty = false;
+//		trace( "VertexIndexBuilder.buffersBuildFromOxels took: " + (getTimer()-time)+ " for " + _oxels.length + " oxels quads: " + quadsProcessed );
+		return true
 	}
 	
 	private function populateVertexAndIndexBuffers( $oxelStartingIndex:int, $oxelsToProcess:int, $quadsToProcess:int, $context:Context3D ):void { 
