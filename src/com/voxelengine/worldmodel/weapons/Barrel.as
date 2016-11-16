@@ -31,5 +31,11 @@ package com.voxelengine.worldmodel.weapons
 //			else
 //				trace( "Stand - NO Stand INFO FOUND" );
 		}
+
+		static public function buildExportObject( obj:Object ):Object {
+			VoxelModel.buildExportObject( obj );
+			return obj;
+		}
+
 	}
 }

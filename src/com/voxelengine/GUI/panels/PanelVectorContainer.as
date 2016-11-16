@@ -36,5 +36,15 @@ public class PanelVectorContainer extends ExpandableBox {
 	override protected function collapasedInfo():String  {
 		return String( _ebco.items.length ) + " " + _ebco.itemBox.title;
 	}
+
+	// This handles the new model transform
+	override protected function newItemHandler( $me:UIMouseEvent ):void 		{
+
+		_itemBox.addElement( new _ebco.itemDisplayObject( this, _ebco ) );
+		changeMode() // collapse container
+		changeMode() // reexpand so that new item is at the bottom
+	}
+
+
 }
 }

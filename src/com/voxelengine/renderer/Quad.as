@@ -26,7 +26,7 @@ public class Quad {
 	static private const 	_s_flowScaling:FlowScaling = new FlowScaling();
 	
 	static private const 	QUAD_UV_COUNT:int = 5;
-	static public const 	COMPONENT_COUNT:int = 5;
+	static public const 	COMPONENT_COUNT:int = 4;
 	static public const 	VERTEX_PER_QUAD:int = 4;
 	static public const 	INDICES:int = 6;
 	
@@ -375,6 +375,7 @@ public class Quad {
 
 	private function buildVerticeComponents( componentIndex:int, x:Number, y:Number, z:Number, u:Number, v:Number, normalx:int, normaly:int, normalz:int, tint:uint, light:uint, $grain:Number = 1 ):int
 	{
+		// va0
 		if ( null == components[componentIndex] )
 			components[componentIndex++] = new XYZ( x, y , z );
 		else {
@@ -388,6 +389,7 @@ public class Quad {
 			//_s_numArgs[1] = v;
 			//components[componentIndex++].setNumArray( _s_numArgs );
 		//}
+		// va1
 		if ( null == components[componentIndex] )
 			components[componentIndex++] = new UVScale( u, v, $grain );
 		else {
@@ -397,17 +399,20 @@ public class Quad {
 		// TODO Should replace these with computed normals
 		// See http://www.volumesoffun.com/polyvox/documentation/dev/manual/Lighting.html#normal-calculation-for-cubic-meshes
 		// https://bitbucket.org/volumesoffun/polyvox/src/735b0ab6b153/examples/common/?at=develop
-		if ( null == components[componentIndex] )
-			components[componentIndex++] = new Normal( normalx, normaly, normalz );
-		else {
-			components[componentIndex++].setInts( normalx, normaly, normalz );
-		}
+		// va2
+//		if ( null == components[componentIndex] )
+//			components[componentIndex++] = new Normal( normalx, normaly, normalz );
+//		else {
+//			components[componentIndex++].setInts( normalx, normaly, normalz );
+//		}
 
+		// va3
 		if ( null == components[componentIndex] )
 			components[componentIndex++] = new ColorUINT( tint );
 		else	
 			components[componentIndex++].setUint( tint );
 
+		// va4
 		if ( null == components[componentIndex] )
 			components[componentIndex++] = new ColorUINT( light );
 		else	

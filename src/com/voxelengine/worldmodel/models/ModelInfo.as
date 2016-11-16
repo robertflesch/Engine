@@ -648,6 +648,7 @@ public class ModelInfo extends PersistanceObject
 			try {
 				modelClassPrototype.buildExportObject(dbo);
 			} catch (e:Error) {
+				VoxelModel.buildExportObject(dbo);
 				Log.out("ModelInfo.toObject - Error with Class: " + info.model.modelClass, Log.ERROR);
 			}
 		} else

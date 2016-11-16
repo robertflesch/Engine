@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2016 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -83,10 +83,11 @@ package com.voxelengine.renderer.shaders
 				[
 					"m44 op, va0, vc0", // transform vertex positions (va0) by the world camera data (vc0)
 					"add v0, va1, vc4.xy",	// add in the UV offset (va1) and the animated offset (vc12) (may be 0 for non animated), and put in v0 which holds the UV offset
-					"mov v1, va3",        	// pass texture color and brightness (va3) to the fragment shader via v1
-					"mov v2, va2",        	// need to pass normals to keep shader compiler happy
+					"mov v1, va2",        	// pass texture color and brightness (va3) to the fragment shader via v1
+//					"mov v2, va2",        	// need to pass normals to keep shader compiler happy
+					// these are not being used, but the VertexIndexBuilder populates them.
 					"m44 v3, va0, vc8",  	// the transformed vertices with out the camera data, works great for default AND for translated cube, rotated cube broken still
-					"mov v4, va4",        	// pass light color and brightness (va4) to the fragment shader via v4
+					"mov v4, va3"        	// pass light color and brightness (va4) to the fragment shader via v4
 				];
 				_vertexShaderAssembler.assemble(Context3DProgramType.VERTEX, vertexShader.join("\n"));
 			}

@@ -10,7 +10,9 @@ package com.voxelengine.worldmodel.oxel
 import com.voxelengine.pools.LightInfoPool;
 import com.voxelengine.renderer.Quad;
 	import com.voxelengine.worldmodel.TypeInfo;
-	import flash.geom.Vector3D;
+import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
+
+import flash.geom.Vector3D;
 	import flash.utils.ByteArray;
 
 	import com.voxelengine.Log;
@@ -413,11 +415,20 @@ public class Lighting  {
 			} else
 				throw new Error("Brightness.fromByteArray - unsupported version: " + $version);
 
-			// Now read each light
-			for (var i:int = 0; i < lightsFromBA; i++) {
-				_lights[i] = new LightInfo();
-				_lights[i].setInfo(0, 0, defaultLightLevelSetter(), $attnPerMeter, false);
-				_lights[i].fromByteArray($ba);
+			if ( ModelMakerImport.isImporting ) {
+				// throw away lights for imports
+				for (var i:int = 0; i < lightsFromBA; i++) {
+					var li:LightInfo = new LightInfo();
+					li.fromByteArray($ba);
+				}
+			}
+			else {
+				// Now read each light
+				for (var i:int = 0; i < lightsFromBA; i++) {
+					_lights[i] = new LightInfo();
+					_lights[i].setInfo(0, 0, defaultLightLevelSetter(), $attnPerMeter, false);
+					_lights[i].fromByteArray($ba);
+				}
 			}
 		}
 		catch( e:Error ){

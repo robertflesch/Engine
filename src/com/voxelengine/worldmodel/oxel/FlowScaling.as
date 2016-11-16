@@ -85,7 +85,7 @@ public class FlowScaling
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray {
 
-		trace( "FlowScaling.toByteArray -_data: " + _data.toString(16) );
+		//trace( "FlowScaling.toByteArray -_data: " + _data.toString(16) );
 		$ba.writeUnsignedInt( _data );
 		return $ba;
 	}
@@ -112,7 +112,7 @@ public class FlowScaling
 		}
 		else if ( Globals.VERSION_004 <= $version  ) {
 			_data = $ba.readUnsignedInt();
-			trace( "FlowScaling.fromByteArray - \t\t data: " + _data.toString(16) );
+			//trace( "FlowScaling.fromByteArray - \t\t data: " + _data.toString(16) );
 		}
 		else {
 			Log.out( "FlowSacaling.fromByteArray - The version of data is not handled", Log.WARN )

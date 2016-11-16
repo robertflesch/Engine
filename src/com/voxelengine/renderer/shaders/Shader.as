@@ -98,22 +98,21 @@ package com.voxelengine.renderer.shaders
 
 					"div vt1, vc12.xy, va1.z",        // grain
 					"add v0, va1.xy, vt1.xy", // add in the UV offset (va1) and the animated offset (vc12) (may be 0 for non animated), and put in v0 which holds the UV offset
-	//				"add v0, va1.xy, vc12.xy", // add in the UV offset (va1) and the animated offset (vc12) (may be 0 for non animated), and put in v0 which holds the UV offset
-					"mov v1, va3",        	// pass texture color and brightness (va3) to the fragment shader via v1
-					"m44 v2, va2, vc4",  	// transform vertex normal, send to fragment shader
-					
+					"mov v1, va2",        	// pass texture color and brightness (va3) to the fragment shader via v1
+
 					// the transformed vertices without the camera data
 	//				"mov v3, vt0",       	// no no no
 	//				"mov v3, va0",       	// works great for default. Not for translated cube
 	//				"m44 v3, va0, vc0",  	// works great for default. Not for translated cube
 	//				"m44 v3, va0, vc4",  	// works great for default. Not for translated cube
 					"m44 v3, va0, vc8",  	// the transformed vertices with out the camera data, works great for default AND for translated cube, rotated cube broken still
-					"mov v4, va4",        	// pass light color and brightness (va4) to the fragment shader via v4
-					
+					"mov v4, va3",        	// pass light color and brightness (va3) to the fragment shader via v4
+
+					//"m44 v5, va2, vc4",  	// transform vertex normal, send to fragment shader
 					// A non working method for a generated normal
-					//"nrm vt1.xyz, va0.xyz",	// normalize the vertex (va0) into vt1. we need to mask the W component as the normalize operation only work for Vector3D
-					//"mov vt1.w, va0.w",		// Set the w component back to its original value from va0 into vt1
-					//"mov v2, vt1"			// Interpolate the normal (vt1) into variable register v1
+					"nrm vt1.xyz, va0.xyz",	// normalize the vertex (va0) into vt1. we need to mask the W component as the normalize operation only work for Vector3D
+					"mov vt1.w, va0.w",		// Set the w component back to its original value from va0 into vt1
+					"mov v2, vt1"			// Interpolate the normal (vt1) into variable register v2
 				];
 				_vertexShaderAssembler.assemble(Context3DProgramType.VERTEX, vertexShader.join("\n"));
 			}

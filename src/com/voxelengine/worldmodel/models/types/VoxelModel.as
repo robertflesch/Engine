@@ -513,7 +513,7 @@ public class VoxelModel
 				var modelPos:Vector3D = this.instanceInfo.positionGet;
 				var d:int = ppos.subtract(modelPos).length;
 //				Log.out("ModelInfo.draw distance to model: " + d);
-
+/*
 				if ( d > 2900 )
 					modelInfo.data.setLOD = 5;
 				else if ( d > 2800 )
@@ -524,7 +524,7 @@ public class VoxelModel
 					modelInfo.data.setLOD = 2;
 				else if ( d > 2500 )
 					modelInfo.data.setLOD = 1;
-				else
+				else*/
 					modelInfo.data.setLOD = 0;
 
 				//Log.out( "VoxelModel.draw - set LOD to: " + modelInfo.data.lod );

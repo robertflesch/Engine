@@ -22,7 +22,7 @@ package com.voxelengine.worldmodel.models.types
 		//Stand
 		//Stand
 		//Sight
-		private var _reloadSpeed:int;
+		static private var _reloadSpeed:int;
 		
 		public function Stand( $ii:InstanceInfo ) 
 		{ 
@@ -41,5 +41,15 @@ package com.voxelengine.worldmodel.models.types
 //			else
 //				trace( "Stand - NO Stand INFO FOUND" );
 		}
+
+		static public function buildExportObject( obj:Object ):Object {
+			VoxelModel.buildExportObject( obj );
+			obj.stand 					= new Object();
+			obj.stand.reloadSpeed 		= _reloadSpeed;
+
+			return obj;
+		}
+
+
 	}
 }

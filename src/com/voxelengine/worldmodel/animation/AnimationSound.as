@@ -67,9 +67,11 @@ public class AnimationSound
 		else	
 			guid = $intiObj.name
 		
-		if ( !Globals.isGuid( guid ) )
-			SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, updateGuid )		
-		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, guid, null, Globals.isGuid( guid ) ? true : false ) )
+		if ( AnimationSound.DEFAULT_OBJECT.name != guid ) {
+			if (!Globals.isGuid(guid))
+				SoundEvent.addListener(ModelBaseEvent.UPDATE_GUID, updateGuid)
+			SoundEvent.dispatch(new SoundEvent(ModelBaseEvent.REQUEST, 0, guid, null, Globals.isGuid(guid) ? true : false))
+		}
 
 		if ( $intiObj.soundRangeMax && ( $intiObj.soundRangeMax != 2000 ) ) {
 			_soundRangeMax = $intiObj.soundRangeMax
