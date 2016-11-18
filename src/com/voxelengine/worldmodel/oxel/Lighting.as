@@ -417,7 +417,7 @@ public class Lighting  {
 
 			if ( ModelMakerImport.isImporting ) {
 				// throw away lights for imports
-				for (var i:int = 0; i < lightsFromBA; i++) {
+				for (var j:int = 0; j < lightsFromBA; j++) {
 					var li:LightInfo = new LightInfo();
 					li.fromByteArray($ba);
 				}

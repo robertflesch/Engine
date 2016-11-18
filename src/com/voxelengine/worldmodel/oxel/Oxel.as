@@ -1940,12 +1940,12 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			$ba.uncompress();
 		}
 		catch (error:Error) {
-			Log.out("OxelPersistance.fromByteArray - Was expecting compressed data " + $guid, Log.WARN);
+			Log.out("Oxel.decompressAndExtractMetadata - Was expecting compressed data " + $guid, Log.WARN);
 		}
 		$ba.position = 0;
+		Log.out("Oxel.decompressAndExtractMetadata - uncompress took: " + (getTimer() - time), Log.INFO);
 
-		Log.out("OxelPersistance.fromByteArray - uncompress took: " + (getTimer() - time), Log.INFO);
-
+		time = getTimer();
 		extractVersionInfo($ba, $op);
 		// how many bytes is the modelInfo
 		var strLen:int = $ba.readInt();
@@ -1958,12 +1958,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);
 			registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);
 		}
-
-		readOxelData($ba, $op, $statisics);
-		Log.out("OxelPersistance.fromByteArray - readVersionedData took: " + (getTimer() - time), Log.INFO);
+		Log.out("Oxel.decompressAndExtractMetadata - extractVersionInfo took: " + (getTimer() - time), Log.INFO);
 	}
 
-	private function readOxelData($ba:ByteArray, $op:OxelPersistance, $statisics:ModelStatisics):void {
+	public function readOxelData($ba:ByteArray, $op:OxelPersistance, $statisics:ModelStatisics):void {
 		// Read off 1 bytes, the root size
 		var rootGrainSize:int = $ba.readByte();
 		gc.grain = gc.bound = rootGrainSize;
@@ -2050,38 +2048,19 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			childCount = 1;
 			$stats.statAdd( type, gc.grain );
 
-			if (OxelBitfields.flowInfoHas(faceData))
-				processFlowInfoData();
+			if (OxelBitfields.flowInfoHas(faceData)){
+				flowInfo = FlowInfoPool.poolGet();
+				flowInfo.fromByteArray( $version, $ba );
+			}
 
-			if (OxelBitfields.lightInfoHas(faceData))
-				processLightData();
+			if (OxelBitfields.lightInfoHas(faceData)) {
+				lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
+				lighting.fromByteArray( $version, $ba );
+				lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
+			}
 		}
 
 		return $ba;
-
-		function processLightData():void {
-			//Log.out( "processLightData lighting: yes");
-			// hack warning
-			// the baseLightLevel gets overridden by data from byte array.
-			// so if there is no parent, I need to save off the baseLightLevel
-			// and restore it after the data has been read.
-			if ( !lighting )
-				lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
-			lighting.fromByteArray( $version, $ba );
-			lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
-//			var li:LightInfo = lighting.lightGet(Lighting.DEFAULT_LIGHT_ID);
-//			var avgLight:uint = root_get().lighting.avg;
-//			if (li)
-//				li.setAll(avgLight);
-
-		}
-
-		function processFlowInfoData():void {
-			//Log.out( "readVersionedData flowInfo: yes");
-			if ( !flowInfo )
-				flowInfo = FlowInfoPool.poolGet();
-			flowInfo.fromByteArray( $version, $ba );
-		}
 	}
 
 

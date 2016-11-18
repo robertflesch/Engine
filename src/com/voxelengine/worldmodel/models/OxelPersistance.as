@@ -209,6 +209,12 @@ public class OxelPersistance extends PersistanceObject
 		newOxel.decompressAndExtractMetadata( guid, $ba, this, statisics );
 		Log.out( "OxelPersistance.lodFromByteArray-decompressAndExtractMetadata - lod: " + _lod + "  newOxel: " + newOxel.toString() + " took: " + (getTimer() - time) );
 
+
+		time = getTimer();
+		newOxel.readOxelData($ba, this, statisics);
+		Log.out("OxelPersistance.lodFromByteArray - readOxelData took: " + (getTimer() - time), Log.INFO);
+
+
 		statisics.gather();
 
 		var lightInfo:LightInfo = new LightInfo();
@@ -216,7 +222,7 @@ public class OxelPersistance extends PersistanceObject
 
 		time = getTimer();
 		_topMostChunks[_lod] = Chunk.parse( oxel, null, lightInfo );
-		Log.out( "OxelPersistance.lodFromByteArray - DONE lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
+		Log.out( "OxelPersistance.lodFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 	}
 
 	

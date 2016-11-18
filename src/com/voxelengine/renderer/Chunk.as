@@ -96,17 +96,17 @@ public class Chunk {
 		var chunk:Chunk = new Chunk( $parent );
 		// when I create the chunk I add a light level to it.
 
-		//Log.out( "chunk.parse - new chunk: " + $oxel.childCount );
+		//Log.out( "chunk.parse - new chunk: " + $oxel.childCount, Log.WARN );
 		chunk._lightInfo = $lightInfo;
 			
 		if ( MAX_CHILDREN < $oxel.childCount ) {
-			Log.out( "chunk.parse - creating parent chunk: " + $oxel.childCount );
+			//Log.out( "chunk.parse - creating parent chunk: " + $oxel.childCount, Log.WARN );
 			chunk._children = new Vector.<Chunk>(OCT_TREE_SIZE, true);
 			for ( var i:int; i < OCT_TREE_SIZE; i++ )
 				chunk._children[i] = parse( $oxel.children[i], chunk, $lightInfo );
 		}
 		else {
-			Log.out( "chunk.parse - creating chunk with child count: " + $oxel.childCount );
+			//Log.out( "chunk.parse - creating chunk with child count: " + $oxel.childCount, Log.WARN );
 			chunk._oxel = $oxel;
 			$oxel.chunk = chunk;
 			if ( 1 == $oxel.childCount && false == $oxel.facesHas() ) {
@@ -114,11 +114,11 @@ public class Chunk {
 				chunk.dirtyClear();
 			}
 			else {
-				//Log.out( "chunk.parse - new VertexManager: " + $oxel.childCount + "  oxel.gc: " + $oxel.gc );
+				//Log.out( "chunk.parse - new VertexManager: " + $oxel.childCount + "  oxel.gc: " + $oxel.gc, Log.WARN );
 				chunk._vertMan = new VertexManager( $oxel.gc, null );
 			}
 		}
-		Log.out( "Chunk.parse took: " + (getTimer() - time) );
+		//Log.out( "Chunk.parse took: " + (getTimer() - time), Log.WARN );
 		return chunk;
 	}
 
