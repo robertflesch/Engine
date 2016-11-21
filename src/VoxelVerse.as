@@ -217,9 +217,9 @@ public class VoxelVerse extends Sprite
 	}
 
 	private function appLosesFocus(e:Event):void {
-		Log.out( "VoxelVerse.appLosesFocus", Log.WARN )
 		Globals.active = false;
 		Globals.clicked = false;
+		Log.out( "VoxelVerse.appLosesFocus Globals.active: " + Globals.active + "  Globals.clicked: " + Globals.clicked, Log.WARN )
 		VoxelVerseGUI.currentInstance.crossHairInactive();
 
 		MemoryManager.update();
@@ -239,11 +239,13 @@ public class VoxelVerse extends Sprite
 	}
 
 	private function activate(e:Event):void {
-		//Log.out( "VoxelVerse.activate event", Log.WARN )
+		Log.out( "VoxelVerse.activate event" )
 		if ( false == Globals.active ) {
 			//Log.out( "VoxelVerse.activate - setting active = TRUE" );
 			Globals.active = true;
 			Globals.clicked = true;
+			Log.out( "VoxelVerse.activate Globals.active: " + Globals.active + "  Globals.clicked: " + Globals.clicked, Log.WARN )
+
 			VoxelVerseGUI.currentInstance.crossHairActive();
 
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
@@ -273,7 +275,7 @@ public class VoxelVerse extends Sprite
 	//}
 
 	private function mouseUp(e:MouseEvent):void {
-		//Log.out( "VoxelVerse.mouseUp event" )
+		Log.out( "VoxelVerse.mouseUp event" )
 		stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 		activate(e)
 	}
