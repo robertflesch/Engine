@@ -1942,23 +1942,30 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		catch (error:Error) {
 			Log.out("Oxel.decompressAndExtractMetadata - Was expecting compressed data " + $guid, Log.WARN);
 		}
-		$ba.position = 0;
-		Log.out("Oxel.decompressAndExtractMetadata - uncompress took: " + (getTimer() - time), Log.INFO);
 
-		time = getTimer();
-		extractVersionInfo($ba, $op);
-		// how many bytes is the modelInfo
-		var strLen:int = $ba.readInt();
-		// read off that many bytes, even though we are using the data from the modelInfo file
-		var modelInfoJson:String = $ba.readUTFBytes(strLen);
+		try {
+			$ba.position = 0;
+			Log.out("Oxel.decompressAndExtractMetadata - uncompress took: " + (getTimer() - time), Log.INFO);
 
-		if ( !_aliasInitialized ) {
-			_aliasInitialized = true;
-			// TODO - do I need to do this everytime? or could I use a static initializer? RSF - 7.16.2015
-			registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);
-			registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);
+			time = getTimer();
+			extractVersionInfo($ba, $op);
+			// how many bytes is the modelInfo
+			var strLen:int = $ba.readInt();
+			// read off that many bytes, even though we are using the data from the modelInfo file
+			var modelInfoJson:String = $ba.readUTFBytes(strLen);
+
+			if ( !_aliasInitialized ) {
+				_aliasInitialized = true;
+				// TODO - do I need to do this everytime? or could I use a static initializer? RSF - 7.16.2015
+				registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);
+				registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);
+			}
+			Log.out("Oxel.decompressAndExtractMetadata - extractVersionInfo took: " + (getTimer() - time), Log.INFO);
 		}
-		Log.out("Oxel.decompressAndExtractMetadata - extractVersionInfo took: " + (getTimer() - time), Log.INFO);
+		catch (error:Error) {
+			Log.out("Oxel.decompressAndExtractMetadata - exception loading oxe data " + $guid, Log.WARN);
+		}
+
 	}
 
 	public function readOxelData($ba:ByteArray, $op:OxelPersistance, $statisics:ModelStatisics):void {
@@ -3519,7 +3526,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		//////////////////////////////////////////////////////////
 		var root_grain_size:int = $layer.offset;
 		const baseLightLevel:int = 51;
-		var oxel:Oxel = Oxel.initializeRoot( root_grain_size, baseLightLevel );
+		var oxel:Oxel = Oxel.initializeRoot( root_grain_size, Lighting.MAX_LIGHT_LEVEL );
 		//
 		var min_grain_size:int = root_grain_size - $layer.range;
 		if ( 0 > min_grain_size || min_grain_size > root_grain_size || ( 8 < (root_grain_size - min_grain_size)) )
