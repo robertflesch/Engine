@@ -149,10 +149,13 @@ public class ModelMakerImport extends ModelMakerBase {
 				_modelMetadata.changed = true;
 				_modelMetadata.save();
 				vm.changed = true;
-                var lav:Vector3D = ii.lookAtVector( 500 );
-                var diffPos:Vector3D = Player.player.wsPositionGet().clone();
-                diffPos = diffPos.add( lav );
-                (vm as VoxelModel).instanceInfo.positionSet = diffPos;
+				if ( null == vm.instanceInfo.controllingModel ) {
+					// Only do this for top level models.
+					var lav:Vector3D = Player.player.instanceInfo.lookAtVector(500);
+					var diffPos:Vector3D = Player.player.wsPositionGet().clone();
+					diffPos = diffPos.add(lav);
+					(vm as VoxelModel).instanceInfo.positionSet = diffPos;
+				}
                 vm.save();
 				Region.currentRegion.modelCache.add( vm );
 			}
