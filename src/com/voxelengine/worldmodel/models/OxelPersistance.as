@@ -7,17 +7,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.voxelengine.events.LevelOfDetailEvent;
-import com.voxelengine.events.LoadingImageEvent;
-import com.voxelengine.events.ModelLoadingEvent;
-import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
-import com.voxelengine.worldmodel.models.makers.OxelCloner;
-import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
 
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
-import flash.geom.Vector3D;
-import flash.net.registerClassAlias;
 import flash.utils.ByteArray;
 import flash.utils.getTimer;
 
@@ -27,22 +19,21 @@ import com.adobe.utils.Hex;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.pools.GrainCursorPool;
-import com.voxelengine.pools.LightingPool;
-import com.voxelengine.pools.OxelPool;
+import com.voxelengine.events.LevelOfDetailEvent;
+import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.renderer.Chunk;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
-import com.voxelengine.worldmodel.oxel.FlowInfo;
 import com.voxelengine.worldmodel.oxel.LightInfo;
 import com.voxelengine.worldmodel.oxel.OxelBitfields;
 import com.voxelengine.worldmodel.oxel.Lighting;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.models.makers.OxelCloner;
+import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
 
 
 /**
@@ -200,19 +191,24 @@ public class OxelPersistance extends PersistanceObject
 	}
 
 	public function lodFromByteArray( $ba:ByteArray ):void {
-		Log.out( "OxelPersistance.lodFromByteArray - guid: " + guid, Log.INFO );
+		//Log.out( "OxelPersistance.lodFromByteArray - guid: " + guid, Log.INFO );
 		var time:int = getTimer();
 
-		var newOxel:Oxel  = Oxel.initializeRoot( 31, parent.info.model.baseLightLevel ); // Lighting should be model or instance default lighting
+		var baseLightLevel:int;
+		if ( parent && parent.info && parent.info.model )
+			baseLightLevel = parent.info.model.baseLightLevel;
+		else
+			baseLightLevel = Lighting.DEFAULT_ATTN;
+		var newOxel:Oxel  = Oxel.initializeRoot( 31, baseLightLevel ); // Lighting should be model or instance default lighting
 		_oxels[_lod] = newOxel;
 
 		newOxel.decompressAndExtractMetadata( guid, $ba, this, statisics );
-		Log.out( "OxelPersistance.lodFromByteArray-decompressAndExtractMetadata - lod: " + _lod + "  newOxel: " + newOxel.toString() + " took: " + (getTimer() - time) );
+		//Log.out( "OxelPersistance.lodFromByteArray-decompressAndExtractMetadata - lod: " + _lod + "  newOxel: " + newOxel.toString() + " took: " + (getTimer() - time) );
 
 
 		time = getTimer();
 		newOxel.readOxelData($ba, this, statisics);
-		Log.out("OxelPersistance.lodFromByteArray - readOxelData took: " + (getTimer() - time), Log.INFO);
+		//Log.out("OxelPersistance.lodFromByteArray - readOxelData took: " + (getTimer() - time), Log.INFO);
 
 
 		statisics.gather();
@@ -222,7 +218,7 @@ public class OxelPersistance extends PersistanceObject
 
 		time = getTimer();
 		_topMostChunks[_lod] = Chunk.parse( oxel, null, lightInfo );
-		Log.out( "OxelPersistance.lodFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
+		//Log.out( "OxelPersistance.lodFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 	}
 
 	
