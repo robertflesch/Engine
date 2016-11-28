@@ -80,8 +80,12 @@ public class ModelInfoCache
 			else	
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.modelGuid ) );
 		}
-		else
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.RESULT, $mie.series, $mie.modelGuid, mi ) );
+		else {
+			if ($mie)
+				ModelInfoEvent.create( ModelBaseEvent.RESULT, $mie.series, $mie.modelGuid, mi );
+			else
+				Log.out( "ModelInfoCache.request ModelInfoEvent is NULL: ", Log.WARN );
+		}
 	}
 	
 	static private function deleteHandler( $mie:ModelInfoEvent ):void {
@@ -204,7 +208,7 @@ public class ModelInfoCache
 	static private function loadFailed( $pe:PersistanceEvent ):void {
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
-		Log.out( "ModelInfoCache.loadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		Log.out( "ModelInfoCache.loadFailed PersistanceEvent: " + $pe.toString(), Log.WARN );
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid )
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
@@ -213,7 +217,7 @@ public class ModelInfoCache
 	static private function loadNotFound( $pe:PersistanceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
-		Log.out( "ModelInfoCache.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		Log.out( "ModelInfoCache.loadNotFound PersistanceEvent: " + $pe.toString(), Log.WARN );
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid )
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
