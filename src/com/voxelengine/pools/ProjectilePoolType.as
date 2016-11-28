@@ -72,7 +72,7 @@ public final class ProjectilePoolType
 		_modelMetadata.description = _projectileGuid + " - GENERATED"
 		_modelMetadata.owner = ""
 		//ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, _projectileGuid, _modelMetadata ) )
-		Log.out( "ProjectilePoolType.generateData: " + _modelInfo.toString() );
+		//Log.out( "ProjectilePoolType.generateData: " + _modelInfo.toString() );
 		_modelInfo.data = new OxelPersistance( _projectileGuid );
 		var ba:ByteArray  = Oxel.generateCube( _projectileGuid, _modelInfo.biomes.layers[0], false );
 		_modelInfo.data.ba = ba;

@@ -69,7 +69,7 @@ import flash.utils.getTimer;
 						Log.out( "ModelStatisics.gather - key not found key: " + key, Log.WARN );
 				}
 			}
-			Log.out( "ModelStatisics.gather -  took: " + (getTimer() - time), Log.INFO );
+			//Log.out( "ModelStatisics.gather -  took: " + (getTimer() - time), Log.INFO );
 		}
 	
 		public function statAdd( type:int, grain:int ):void {

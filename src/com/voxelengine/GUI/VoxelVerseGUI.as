@@ -282,6 +282,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	private function addKeyboardListeners(event : Event) : void {
+		Log.out( "VoxelVerseGUI.addKeyboardListeners");
 		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
 	}
 
@@ -317,6 +318,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	private function onKeyPressed( e : KeyboardEvent) : void {
+		//Log.out( "VoxelVerseGUI.onKeyPressed: KeyboardEvent: " + e);
 			
 		if ( Keyboard.F11 == e.keyCode )
 			Globals.g_renderer.screenShot( true ); // draws UI
@@ -325,7 +327,7 @@ public class VoxelVerseGUI extends EventDispatcher
 			Globals.g_renderer.screenShot( false );
 			
 		if ( Log.showing )
-			return 
+			return;
 			
 		if ( Keyboard.F9 == e.keyCode )
 			toggleFullscreen();

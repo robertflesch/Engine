@@ -75,7 +75,6 @@ public class ModelMakerImport extends ModelMakerBase {
 				_modelMetadata = new ModelMetadata( ii.modelGuid );
 				var newObj:Object = ModelMetadata.newObject()
 				_modelMetadata.fromObjectImport( newObj );
-				_modelMetadata.fromObjectImport( newObj );
 				_modelMetadata.name = ii.modelGuid;
 				_modelMetadata.owner = Network.userId;
 				attemptMakeRetrieveParentModelInfo(); }
@@ -136,9 +135,6 @@ public class ModelMakerImport extends ModelMakerBase {
 				
 			modelInfo.guid = _modelMetadata.guid;
 			ii.modelGuid 	= _modelMetadata.guid;
-			// Not saved, might as well keep it around.
-			//modelInfo.fileName = "";
-
 
 			var vm:* = make()
 			if ( vm ) {
@@ -147,7 +143,8 @@ public class ModelMakerImport extends ModelMakerBase {
 				modelInfo.changed = true;
 				modelInfo.save();
 				_modelMetadata.changed = true;
-				_modelMetadata.save();
+                // this gets saved in the vm.save
+				//_modelMetadata.save();
 				vm.changed = true;
 				if ( null == vm.instanceInfo.controllingModel ) {
 					// Only do this for top level models.
@@ -158,6 +155,9 @@ public class ModelMakerImport extends ModelMakerBase {
 				}
                 vm.save();
 				Region.currentRegion.modelCache.add( vm );
+                if ( null == vm.instanceInfo.controllingModel ) {
+                    Region.currentRegion.save();
+                }
 			}
 			
 			markComplete( true, vm );

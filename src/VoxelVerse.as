@@ -85,7 +85,7 @@ public class VoxelVerse extends Sprite
 
 	private var _splashDisplayed:Boolean;
 	private function onSplashLoaded(e:WindowSplashEvent):void {
-		trace( "SPALSH_DISPLAYED")
+		//Log.out( "SPLASH_DISPLAYED" );
 		WindowSplashEvent.removeListener( WindowSplashEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded );
 		_splashDisplayed = true;
 		addEventListener(Event.ENTER_FRAME, enterFrame);
@@ -219,7 +219,7 @@ public class VoxelVerse extends Sprite
 	private function appLosesFocus(e:Event):void {
 		Globals.active = false;
 		Globals.clicked = false;
-		Log.out( "VoxelVerse.appLosesFocus Globals.active: " + Globals.active + "  Globals.clicked: " + Globals.clicked, Log.WARN )
+		//Log.out( "VoxelVerse.appLosesFocus Globals.active: " + Globals.active + "  Globals.clicked: " + Globals.clicked, Log.WARN )
 		VoxelVerseGUI.currentInstance.crossHairInactive();
 
 		MemoryManager.update();
@@ -239,12 +239,12 @@ public class VoxelVerse extends Sprite
 	}
 
 	private function activate(e:Event):void {
-		Log.out( "VoxelVerse.activate event" )
+		//Log.out( "VoxelVerse.activate event" )
 		if ( false == Globals.active ) {
 			//Log.out( "VoxelVerse.activate - setting active = TRUE" );
 			Globals.active = true;
 			Globals.clicked = true;
-			Log.out( "VoxelVerse.activate Globals.active: " + Globals.active + "  Globals.clicked: " + Globals.clicked, Log.WARN )
+			//Log.out( "VoxelVerse.activate Globals.active: " + Globals.active + "  Globals.clicked: " + Globals.clicked, Log.WARN )
 
 			VoxelVerseGUI.currentInstance.crossHairActive();
 
@@ -275,7 +275,7 @@ public class VoxelVerse extends Sprite
 	//}
 
 	private function mouseUp(e:MouseEvent):void {
-		Log.out( "VoxelVerse.mouseUp event" )
+		//Log.out( "VoxelVerse.mouseUp event" )
 		stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
 		activate(e)
 	}

@@ -141,7 +141,7 @@ public class Ammo extends PersistanceObject
 	}
 	
 	override protected function toObject():void {
-		Log.out( "Ammo.toObject guid: " + guid, Log.WARN );
+		Log.out( "Ammo.toObject guid: " + guid, Log.DEBUG );
 		// No special handling needed
 	}
 

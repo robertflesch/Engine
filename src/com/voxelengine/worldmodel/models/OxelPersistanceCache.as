@@ -86,7 +86,7 @@ public class OxelPersistanceCache
 			return;
 		}
 		
-		Log.out( "OxelDataCache.request guid: " + $ode.modelGuid, Log.DEBUG );
+		//Log.out( "OxelDataCache.request guid: " + $ode.modelGuid, Log.DEBUG );
 		var od:OxelPersistance = _oxelDataDic[$ode.modelGuid]; 
 		if ( null == od ) {
 			if ( _block.has( $ode.modelGuid ) )	
@@ -162,7 +162,8 @@ public class OxelPersistanceCache
 		//Log.out( "OxelDataCache.loadNotFound " + $pe.toString(), Log.WARN );
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid )
-		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
+		//OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
+		OxelDataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End - Persistance Events

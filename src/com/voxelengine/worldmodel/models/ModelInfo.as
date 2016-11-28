@@ -202,7 +202,7 @@ public class ModelInfo extends PersistanceObject
 		var layer1:LayerInfo = biomes.layers[0];
 		if ( "LoadModelFromIVM" == layer1.functionName ) {
 			_altGuid = layer1.data;
-			Log.out( "ModelInfo.loadFromBiomeData - trying to load from local file with alternate name - altGuid: " + _altGuid, Log.DEBUG );
+			//Log.out( "ModelInfo.loadFromBiomeData - trying to load from local file with alternate name - altGuid: " + _altGuid, Log.DEBUG );
 			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, _altGuid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );		
 		}
 		else {
@@ -235,7 +235,7 @@ public class ModelInfo extends PersistanceObject
 		} else { 
 			addListeners();
 			// try to load from tables first
-			Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
+			//Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
 			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_PERSISTANCE ) );
 		}
 	}
@@ -568,8 +568,8 @@ public class ModelInfo extends PersistanceObject
 		if ( Globals.isGuid( guid ) ) {
 			if (  true == animationsLoaded && true == childrenLoaded )
 				super.save();
-			//else
-			//	Log.out( "ModelInfo.save - NOT Saving ModelInfo: " + guid  + " NEED Animations or children to complete", Log.WARN );
+			else
+				Log.out( "ModelInfo.save - NOT Saving ModelInfo: " + guid  + " NEED Animations or children to complete", Log.WARN );
 			
 			if ( _data )
 				_data.save();	

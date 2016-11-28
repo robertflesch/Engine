@@ -54,7 +54,10 @@ public class ModelMakerBase {
 			throw new Error( "ModelMakerBase - NO instanceInfo recieve in constructor" );
 		//Log.out( "ModelMakerBase - ii: " + $ii.toString(), Log.DEBUG )
 		_ii = $ii;
+		//Log.out( "ModelMakerBase - _ii.modelGuid: " + _ii.modelGuid );
+
 		if ( $ii.controllingModel ) {
+			//Log.out( "ModelMakerBase - _ii.modelGuid: " + _ii.modelGuid + "  $ii.controllingModel: " + $ii.controllingModel);
 			// Using modelGuid rather then instanceGuid since imported models have no instanceGuid at this point.
 			// No sure if using model guid has a down side or not.
 			//Log.out( "ModelMakerBase has controlling model - modelGuid of parent: " + $ii.controllingModel.instanceInfo.modelGuid, Log.WARN )
@@ -65,8 +68,9 @@ public class ModelMakerBase {
 	}
 	
 	protected function retrieveBaseInfo():void {
+		//Log.out( "ModelMakerBase.retrieveBaseInfo - _ii.modelGuid: " + _ii.modelGuid );
 		addListeners();
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null ) )	;
+		ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null );
 	}
 	
 	protected function addListeners():void {
@@ -77,16 +81,18 @@ public class ModelMakerBase {
 	
 	
 	protected function retrievedModelInfo($mie:ModelInfoEvent):void  {
-		if ( _ii.modelGuid == $mie.modelGuid ) {
+		if (_ii &&  _ii.modelGuid == $mie.modelGuid ) {
 			//Log.out( "ModelMakerBase.retrievedModelInfo - ii: " + _ii.toString(), Log.DEBUG )
+			removeListeners();
 			_modelInfo = $mie.vmi;
 			attemptMake();
 		}
 	}
 		
 	protected function failedModelInfo( $mie:ModelInfoEvent):void  {
-		if ( _ii.modelGuid == $mie.modelGuid ) {
+		if ( _ii && _ii.modelGuid == $mie.modelGuid ) {
 			Log.out( "ModelMakerBase.failedData - ii: " + _ii.toString(), Log.WARN );
+			removeListeners();
 			markComplete( false );
 		}
 	}
@@ -96,7 +102,6 @@ public class ModelMakerBase {
 	
 	// once they both have been retrieved, we can make the object
 	protected function make():VoxelModel {
-		removeListeners();
 		var modelAsset:String = _modelInfo.modelClass;
 		var modelClass:Class = ModelLibrary.getAsset( modelAsset );
 		if ( null == _ii.instanceGuid )
@@ -110,11 +115,12 @@ public class ModelMakerBase {
 		vm.init( _modelInfo, _modelMetadata );
 		return vm;
 
-		function removeListeners():void {
-			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retrievedModelInfo );
-			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retrievedModelInfo );
-			ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
-		}
+	}
+
+	private function removeListeners():void {
+		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retrievedModelInfo );
+		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retrievedModelInfo );
+		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
 	}
 
 	protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {

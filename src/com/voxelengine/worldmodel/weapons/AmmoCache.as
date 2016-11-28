@@ -50,7 +50,7 @@ public class AmmoCache
 			Log.out( "AmmoCache.request guid requested is NULL", Log.WARN );
 			return;
 		}
-		Log.out( "AmmoCache.request guid: " + $ae.guid, Log.INFO );
+		//Log.out( "AmmoCache.request guid: " + $ae.guid, Log.INFO );
 		var ammo:Ammo = _ammoData[$ae.guid]; 
 		if ( null == ammo ) {
 			if ( true == Globals.online && $ae.fromTable )

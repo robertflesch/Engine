@@ -79,7 +79,7 @@ public class PersistBigDB
 		function loadSuccess( $dbo:DatabaseObject ):void {
 			if ( !$dbo ) {
 				// This seems to be the case where no record exists, not the error handler
-				Log.out( "PersistBigDB.load.loadSuccess - NULL DatabaseObject -  table: " + $pe.table + "  guid:" + $pe.guid + "  " + $pe.toString(), Log.WARN );
+				Log.out( "PersistBigDB.load.loadSuccess - NULL DatabaseObject -  table: " + $pe.table + "  guid:" + $pe.guid + "  " + $pe.toString(), Log.DEBUG );
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_NOT_FOUND, $pe.series, $pe.table, $pe.guid ) );
 				return;
 			}
@@ -157,15 +157,14 @@ public class PersistBigDB
 		PlayerIOPersistanceEvent.addListener( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB, errorNoDB );
 		if ( "0" != $pe.dbo.key )
 		{
-			//Log.out( "PersistBigDB.save - saving inventory: " + $pe.guid );
-			
+			//Log.out( "PersistBigDB.save - saving: " + $pe.guid );
 			Persistance.saveObject( $pe.dbo
 			                      , saveSucceed
 								  , saveFailure );
 		}
 		else
 		{
-			Log.out( "PersistBigDB.create - creating object in table: " + $pe.table + "  guid:" + $pe.guid + "" );
+			//Log.out( "PersistBigDB.create - creating object in table: " + $pe.table + "  guid:" + $pe.guid + "" );
 			//var metadata:Object = { created: new Date(), modified: new Date(), data: $pe.data };
 			var metadata:Object = $pe.dbo.data;
 			Persistance.createObject( $pe.table

@@ -1945,7 +1945,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 		try {
 			$ba.position = 0;
-			Log.out("Oxel.decompressAndExtractMetadata - uncompress took: " + (getTimer() - time), Log.INFO);
+			//Log.out("Oxel.decompressAndExtractMetadata - uncompress took: " + (getTimer() - time), Log.INFO);
 
 			time = getTimer();
 			extractVersionInfo($ba, $op);
@@ -1960,7 +1960,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);
 				registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);
 			}
-			Log.out("Oxel.decompressAndExtractMetadata - extractVersionInfo took: " + (getTimer() - time), Log.INFO);
+			//Log.out("Oxel.decompressAndExtractMetadata - extractVersionInfo took: " + (getTimer() - time), Log.INFO);
 		}
 		catch (error:Error) {
 			Log.out("Oxel.decompressAndExtractMetadata - exception loading oxe data " + $guid, Log.WARN);
@@ -3558,7 +3558,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		var ba:ByteArray = OxelPersistance.toByteArray( oxel );
 //			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
 //			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
-		Log.out( "GenerateCube finished modelGuid: " + $modelGuid );
+		//Log.out( "GenerateCube finished modelGuid: " + $modelGuid );
 		if ( $generateEvent )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
 		return ba;

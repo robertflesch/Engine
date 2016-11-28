@@ -61,7 +61,10 @@ public class OxelDataEvent extends ModelBaseEvent
 	static public function dispatch( $event:OxelDataEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
-	
+
+	static public function create( $type:String, $series:int, $guid:String, $vmd:OxelPersistance, $fromTable:Boolean = true ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new OxelDataEvent( $type, $series, $guid, $vmd ) );
+	}
 	///////////////// Event handler interface /////////////////////////////
 }
 }

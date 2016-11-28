@@ -66,7 +66,7 @@ public class SoundCache
 				//Log.out( "SoundCache.request blocking on : " + $se.guid, Log.WARN )
 				return;
 			}
-			Log.out( "SoundCache.request add block on : " + $se.guid, Log.WARN )
+			//Log.out( "SoundCache.request add block on : " + $se.guid, Log.WARN )
 			_block.add( $se.guid );
 			
 			if ( true == Globals.online && $se.fromTables )

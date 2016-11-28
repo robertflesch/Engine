@@ -231,7 +231,7 @@ public class ModelMetadataCache
 			return;
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid )
-		Log.out( "ModelMetadataCache.loadNotFound PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		Log.out( "ModelMetadataCache.loadNotFound PersistanceEvent: " + $pe.toString(), Log.WARN );
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////
