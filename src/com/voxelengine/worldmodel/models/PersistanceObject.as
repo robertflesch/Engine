@@ -44,9 +44,14 @@ public class PersistanceObject
 	}
 	
 	public function get info():Object { return _info; }
-	public function set info(val:Object):void { _info = val; }
+	public function set info(val:Object):void {
+		//Log.out( "PersistanceObject - info set to: " + JSON.stringify( val ) );
+		_info = val; }
 	public function get guid():String  { return _guid; }
-	public function set guid(value:String):void { _guid = value; }
+	public function set guid(value:String):void	{
+		if ( _guid != value && Globals.isGuid( _guid ) && Globals.isGuid( value ) )
+				Log.out( "PersistanceObject - WHY AM I CHANGING A VALID GUID");
+		_guid = value; }
 	public function get dbo():DatabaseObject { return _dbo; }
 	public function set dbo(val:DatabaseObject ):void { _dbo = val; }
 	public function get table():String { return _table; }
@@ -79,7 +84,7 @@ public class PersistanceObject
 	public function save():void {
 		var name:String = getQualifiedClassName( this )
 		if ( Globals.online && changed && !dynamicObj ) {
-			Log.out( name + ".save - Saving to guid: " + guid  + " in table: " + table, Log.DEBUG );
+			//Log.out( name + ".save - Saving to guid: " + guid  + " in table: " + table, Log.DEBUG );
 			addSaveEvents();
 			toObject();
 			if ( info && info.changed )
@@ -108,14 +113,14 @@ public class PersistanceObject
 	private function createSucceed( $pe:PersistanceEvent ):void { 
 		if ( _table != $pe.table )
 			return;
-		if ( $pe.dbo ) {
+		if ( $pe.dbo && guid == $pe.guid ) {
 			// the create result was coming back after some additional saves had been made
 			// this was causing data to be lost!! So first save data, then copy over dbo, then restore data!
 			if ( dbo && dbo.data ) {
 				var dataBackup:Object = dbo.data;
 				_dbo = $pe.dbo;
 				for ( var key:String in dataBackup ) {
-                    Log.out( "PersistanceObject key: " + key );
+                    //Log.out( "PersistanceObject key: " + key );
 					_dbo[key] = dataBackup[key];
 				}
                 if ( _dbo.data )
@@ -125,10 +130,17 @@ public class PersistanceObject
 			}
 			else
 				_dbo = $pe.dbo;
+			Log.out( getQualifiedClassName( this ) + ".createSuccess - created: " + guid + " in table: " + $pe.table, Log.DEBUG );
+
+		}
+		else {
+			if ( !$pe.dbo ) {
+				Log.out("PersistanceObject.createSucceed NO DBO Object this: " + this, Log.ERROR );
+			} //else
+				//Log.out( "PersistanceObject.createSucceed ---- BUT guid: " + guid + " !=  $pe.dbo.guid: " + $pe.dbo.key, Log.DEBUG )
 		}
 		removeSaveEvents();
-		Log.out( getQualifiedClassName( this ) + ".createSuccess - created: " + guid + " in table: " + $pe.table, Log.DEBUG ); 
-	}	
+	}
 	
 	private function createFailed( $pe:PersistanceEvent ):void  {
 		if ( _table != $pe.table )
