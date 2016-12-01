@@ -99,7 +99,7 @@ public class AnimationCache
 			Log.out( "AnimationCache.request guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		Log.out( "AnimationCache.request modelGuid: " + $ame.modelGuid + "  aniGuid: " + $ame.aniGuid, Log.INFO );
+		//Log.out( "AnimationCache.request modelGuid: " + $ame.modelGuid + "  aniGuid: " + $ame.aniGuid, Log.INFO );
 		var ani:Animation = _animations[$ame.modelGuid]; 
 		if ( null == ani ) {
 			if ( true == Globals.online && $ame.fromTable )

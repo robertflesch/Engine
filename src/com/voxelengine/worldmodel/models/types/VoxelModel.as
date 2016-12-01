@@ -489,7 +489,7 @@ public class VoxelModel
 	
 	static public function getWorldSpacePositionInChain( $chain:Vector.<VoxelModel> ):Matrix3D {
 		var len:int = $chain.length;
-		Log.out( "VoxelModel.getWorldSpacePositionInChain - all these clones are BAD", Log.ERROR );
+		Log.out( "VoxelModel.getWorldSpacePositionInChain - all these clones are BAD", Log.WARN );
 
 		var viewMatrix:Matrix3D = $chain[len-1].instanceInfo.worldSpaceMatrix.clone();
 		for ( var i:int = len - 2; 0 <= i; i-- ) {
@@ -628,6 +628,7 @@ public class VoxelModel
 		//Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 		//Log.out( "VoxelModel.save - name: " + metadata.name, Log.WARN );
 		changed = false;
+		modelInfo.save();
 		metadata.save();
 	}
 	
@@ -805,7 +806,7 @@ public class VoxelModel
 		if ( modelInfo.data.oxel ) {
 			modelInfo.data.oxel.changeGrainSize(changeSize, modelInfo.data.oxel.gc.bound + changeSize);
 			//Log.out("VoxelModel.changeGrainSize - took: " + (getTimer() - _timer) + " count " + Oxel.nodes);
-			modelInfo.data.visitor( Oxel.rebuild );
+			modelInfo.data.visitor( Oxel.rebuild, "Oxel.rebuild" );
 			//Log.out("VoxelModel.changeGrainSize - rebuildAll took: " + (getTimer() - _timer));
 		}
 	}
@@ -1198,6 +1199,17 @@ public class VoxelModel
 		}
 		return 32000;
 	}
+
+	public function rebuildLightingHandler():void {
+		modelInfo.data.visitor( Oxel.rebuildLightingRecursive, "Oxel.rebuildLightingRecursive" );
+		var children:Vector.<VoxelModel> = modelInfo.childVoxelModelsGet();
+		for each ( var child:VoxelModel in children ) {
+			if ( child.metadata.name == "DragonHead" )
+				Log.out( "VoxelModel.CHECK THIS OUT" );
+			child.rebuildLightingHandler();
+		}
+	}
+
 }
 }
 

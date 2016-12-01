@@ -117,6 +117,7 @@ public class PersistanceObject
 			// the create result was coming back after some additional saves had been made
 			// this was causing data to be lost!! So first save data, then copy over dbo, then restore data!
 			if ( dbo && dbo.data ) {
+				Log.out( getQualifiedClassName( this ) + ".createSuccess - ALT PATH created: " + guid + " in table: " + $pe.table, Log.DEBUG );
 				var dataBackup:Object = dbo.data;
 				_dbo = $pe.dbo;
 				for ( var key:String in dataBackup ) {
@@ -128,10 +129,10 @@ public class PersistanceObject
                 changed = true;
                 save();
 			}
-			else
+			else {
+				Log.out(getQualifiedClassName(this) + ".createSuccess - created: " + guid + " in table: " + $pe.table, Log.DEBUG);
 				_dbo = $pe.dbo;
-			Log.out( getQualifiedClassName( this ) + ".createSuccess - created: " + guid + " in table: " + $pe.table, Log.DEBUG );
-
+			}
 		}
 		else {
 			if ( !$pe.dbo ) {

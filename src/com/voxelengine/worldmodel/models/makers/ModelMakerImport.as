@@ -66,19 +66,29 @@ public class ModelMakerImport extends ModelMakerBase {
 	
 	// next get or generate the metadata
 	override protected function attemptMake():void {
+		Log.out( "ModelMakerImport - attemptMake: " + ii.toString() );
 		if ( null != modelInfo && null == _modelMetadata ) {
 			// The new guid is generated in the Window or in the hidden metadata creation
 			if ( _prompt ) {
+				Log.out( "ModelMakerImport - attemptMake: gathering metadata " + ii.toString() );
 				ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, metadataFromUI );
 				new WindowModelMetadata( ii, WindowModelMetadata.TYPE_IMPORT ); }
 			else {
+				Log.out( "ModelMakerImport - attemptMake: generating metadata " + ii.toString() );
 				_modelMetadata = new ModelMetadata( ii.modelGuid );
 				var newObj:Object = ModelMetadata.newObject()
 				_modelMetadata.fromObjectImport( newObj );
 				_modelMetadata.name = ii.modelGuid;
 				_modelMetadata.owner = Network.userId;
 				attemptMakeRetrieveParentModelInfo(); }
-		}	
+		}
+		else if ( null == modelInfo && null == _modelMetadata )
+			Log.out( "ModelMakerImport - attemptMake: null == modelInfo && null == _modelMetadata " + ii.toString() );
+		else if ( null == modelInfo )
+			Log.out( "ModelMakerImport - attemptMake: null == modelInfo " + ii.toString() );
+		else
+			Log.out( "ModelMakerImport - attemptMake: INVALID CONDITION" + ii.toString(), Log.ERROR );
+
 	}
 	
 	private function metadataFromUI( $mme:ModelMetadataEvent):void {
@@ -86,19 +96,25 @@ public class ModelMakerImport extends ModelMakerBase {
 			ModelMetadataEvent.removeListener( ModelBaseEvent.GENERATION, metadataFromUI );
 			_modelMetadata = $mme.modelMetadata;
 			// Now check if this has a parent model, if so, get the animation class from the parent.
-			attemptMakeRetrieveParentModelInfo(); 
+			Log.out( "ModelMakerImport.metadataFromUI: " + ii.toString() );
+			attemptMakeRetrieveParentModelInfo();
 		}
 	}
 
 	private function attemptMakeRetrieveParentModelInfo():void {
-		if ( parentModelGuid )
+		if ( parentModelGuid ) {
+			Log.out("ModelMakerImport.attemptMakeRetrieveParentModelInfo - retrieveParentModelInfo " + ii.toString());
 			retrieveParentModelInfo();
-		else
+		}
+		else {
+			Log.out("ModelMakerImport.attemptMakeRetrieveParentModelInfo - completeMake " + ii.toString());
 			completeMake();
+		}
 	}
 	
 	private var _topMostModelGuid:String; // Used to return the modelClass of the topmost guid of the parent chain.
 	private function retrieveParentModelInfo():void {
+		Log.out("ModelMakerImport.retrieveParentModelInfo: " + ii.toString());
 		// We need the parents modelClass so we can know what kind of animations are correct for this model.
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, parentModelInfoResult );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, parentModelInfoResult );
@@ -109,6 +125,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	
 	private function parentModelInfoResult($mie:ModelInfoEvent):void {
 		if ( $mie.modelGuid == _topMostModelGuid ) {
+			Log.out("ModelMakerImport.retrieveParentModelInfo: " + ii.toString());
 			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, parentModelInfoResult );
 			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, parentModelInfoResult );
 			ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
@@ -119,6 +136,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	}
 	
 	private function parentModelInfoResultFailed($mie:ModelInfoEvent):void {
+		Log.out("ModelMakerImport.parentModelInfoResultFailed: " + ii.toString(), Log.ERROR);
 		if ( $mie.modelGuid == modelInfo.guid ) {
 			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, parentModelInfoResult );
 			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, parentModelInfoResult );
@@ -128,8 +146,10 @@ public class ModelMakerImport extends ModelMakerBase {
 	}
 	
 	private function completeMake():void {
+		Log.out("ModelMakerImport.completeMake: " + ii.toString());
 		if ( null != modelInfo && null != _modelMetadata ) {
-			
+
+			Log.out("ModelMakerImport.completeMake - needed info found: " + ii.toString());
 			if ( !Globals.isGuid( _modelMetadata.guid ) )
 				_modelMetadata.guid = Globals.getUID();
 				
@@ -141,7 +161,6 @@ public class ModelMakerImport extends ModelMakerBase {
 				vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
 //				vm.complete = true;
 				modelInfo.changed = true;
-				modelInfo.save();
 				_modelMetadata.changed = true;
                 // this gets saved in the vm.save
 				//_modelMetadata.save();
@@ -162,6 +181,9 @@ public class ModelMakerImport extends ModelMakerBase {
 			
 			markComplete( true, vm );
 		}
+		else
+			Log.out( "ModelMakerImport.completeMake - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
+
 	}
 	
 	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {

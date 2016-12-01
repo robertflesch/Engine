@@ -10,6 +10,7 @@ package com.voxelengine.GUI.voxelModels
 {
 import com.voxelengine.GUI.VVPopup;
 import com.voxelengine.renderer.Chunk;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import flash.utils.ByteArray;
 import org.flashapi.swing.*;
@@ -203,23 +204,23 @@ public class WindowOxelUtils extends VVPopup
 	}
 
 	private function rebuildLightingHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.visitor( Oxel.rebuildLightingRecursive );
+		_vm.rebuildLightingHandler();
 	}
 
 	private function rebuildWaterHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.visitor( Oxel.rebuildWater );
+		_vm.modelInfo.data.visitor( Oxel.rebuildWater, "Oxel.rebuildWater" );
 	}
 	
 	private function rebuildGrassHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.visitor( Oxel.rebuildGrass );
+		_vm.modelInfo.data.visitor( Oxel.rebuildGrass, "Oxel.rebuildGrass" );
 	}
 	
 	private function rebuildFacesHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.visitor( Oxel.rebuild );
+		_vm.modelInfo.data.visitor( Oxel.rebuild, "Oxel.rebuild" );
 	}
 	
 	private function resetOxelScalingHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.visitor( Oxel.resetScaling );
+		_vm.modelInfo.data.visitor( Oxel.resetScaling, "Oxel.resetScaling" );
 	}
 	
 }	

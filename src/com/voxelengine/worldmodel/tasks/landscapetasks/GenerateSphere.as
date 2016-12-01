@@ -57,8 +57,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			// Builds Sphere Cube of any grain size
 			//////////////////////////////////////////////////////////
 			const root_grain_size:int = _layer.offset;
-			const baseLightLevel:int = 51;
-			var oxel:Oxel = Oxel.initializeRoot( root_grain_size, baseLightLevel );
+			var oxel:Oxel = Oxel.initializeRoot( root_grain_size );
 			//
 			var min_grain_size:int = _layer.range;
 			if ( 0 > min_grain_size || min_grain_size > (root_grain_size - 3) || ( 8 < (root_grain_size - min_grain_size)) )

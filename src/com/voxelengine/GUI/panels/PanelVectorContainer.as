@@ -39,10 +39,10 @@ public class PanelVectorContainer extends ExpandableBox {
 
 	// This handles the new model transform
 	override protected function newItemHandler( $me:UIMouseEvent ):void 		{
-
-		_itemBox.addElement( new _ebco.itemDisplayObject( this, _ebco ) );
-		changeMode() // collapse container
-		changeMode() // reexpand so that new item is at the bottom
+		_ebco.item.showNew = false;
+		var item:* = new _ebco.itemDisplayObject( this, _ebco.clone() )
+		_itemBox.addElement( item );
+		resizePane( null );
 	}
 
 

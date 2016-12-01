@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 
+import com.voxelengine.pools.LightInfoPool;
+
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.utils.ByteArray;
@@ -61,6 +63,11 @@ public class OxelPersistance extends PersistanceObject
 	public function incrementLOD():void 						{ _lod++; }
 	public function lodModelCount():int 						{ return _oxels.length; }
 
+	private var _baseLightLevel:int;
+	public function get baseLightLevel():int 					{ return _baseLightLevel; }
+	public function set baseLightLevel( value:int ):void		{ _baseLightLevel = value; }
+
+	private var _lightInfo:LightInfo 							= null;
 
 	public function get ba():ByteArray 							{ return _ba }
 	public function set ba( $ba:ByteArray):void 				{ _ba = $ba; }
@@ -72,10 +79,13 @@ public class OxelPersistance extends PersistanceObject
 	public 	function get loaded():Boolean 						{ return _loaded; }
 	public 	function set loaded( $val:Boolean):void 			{ _loaded = $val; }
 	
-	public function OxelPersistance( $guid:String ) {
+	public function OxelPersistance( $guid:String, $baseLightLevel:int ) {
 		//Log.out( "OxelPersistance: " + $guid, Log.WARN );
 		super( $guid, Globals.BIGDB_TABLE_OXEL_DATA );
 		_loaded = false;
+		// This should all come from model, so I could give the whole model a tint if I liked.
+		_lightInfo = LightInfoPool.poolGet();
+		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID,  Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, $baseLightLevel )
 	}
 	
 	override public function release():void {
@@ -87,6 +97,7 @@ public class OxelPersistance extends PersistanceObject
 		for each ( var c:Chunk in _topMostChunks )
 			c.release();
 		super.release();
+		LightInfoPool.poolReturn(_lightInfo)
 	}
 
 	public function load( $guid:String, $taskPriority:int, $parent:ModelInfo, $isDynObj:Boolean, $altGuid:String ):void {
@@ -138,8 +149,9 @@ public class OxelPersistance extends PersistanceObject
 		}
 	}
 	
-	public function visitor( $func:Function ):void {
-		topMostChunk.visitor( guid, $func )
+	public function visitor( $func:Function, $functionName:String = "" ):void {
+		changed = true;
+		topMostChunk.visitor( guid, $func, $functionName )
 	}
 	
 
@@ -156,10 +168,10 @@ public class OxelPersistance extends PersistanceObject
 	// persistance operations
 	override public function save():void {
 		if ( false == loaded || !Globals.isGuid( guid ) ) {
-				//Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " loaded: " + loaded + " in table: " + table, Log.DEBUG );
+				Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " loaded: " + loaded + " in table: " + table, Log.DEBUG );
 				return;
 		}
-		//Log.out( "OxelPersistance.save - Saving", Log.DEBUG );
+		Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.DEBUG );
 		super.save();
 	}
 	
@@ -194,30 +206,20 @@ public class OxelPersistance extends PersistanceObject
 		//Log.out( "OxelPersistance.lodFromByteArray - guid: " + guid, Log.INFO );
 		var time:int = getTimer();
 
-		var baseLightLevel:int;
-		if ( parent && parent.info && parent.info.model )
-			baseLightLevel = parent.info.model.baseLightLevel;
-		else
-			baseLightLevel = Lighting.DEFAULT_ATTN;
-		var newOxel:Oxel  = Oxel.initializeRoot( 31, baseLightLevel ); // Lighting should be model or instance default lighting
+		var newOxel:Oxel  = Oxel.initializeRoot( 31 ); // Lighting should be model or instance default lighting
 		_oxels[_lod] = newOxel;
 
-		newOxel.decompressAndExtractMetadata( guid, $ba, this, statisics );
+		newOxel.decompressAndExtractMetadata( $ba, this );
 		//Log.out( "OxelPersistance.lodFromByteArray-decompressAndExtractMetadata - lod: " + _lod + "  newOxel: " + newOxel.toString() + " took: " + (getTimer() - time) );
 
-
 		time = getTimer();
-		newOxel.readOxelData($ba, this, statisics);
+		newOxel.readOxelData($ba, this );
 		//Log.out("OxelPersistance.lodFromByteArray - readOxelData took: " + (getTimer() - time), Log.INFO);
-
 
 		statisics.gather();
 
-		var lightInfo:LightInfo = new LightInfo();
-		lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID,  Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, Lighting.defaultBaseLightAttn )
-
 		time = getTimer();
-		_topMostChunks[_lod] = Chunk.parse( oxel, null, lightInfo );
+		_topMostChunks[_lod] = Chunk.parse( oxel, null, _lightInfo );
 		//Log.out( "OxelPersistance.lodFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 	}
 

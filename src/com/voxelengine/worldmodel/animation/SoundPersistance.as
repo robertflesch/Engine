@@ -1,5 +1,5 @@
 /*==============================================================================
-Copyright 2011-2015 Robert Flesch
+Copyright 2011-2016 Robert Flesch
 All rights reserved.  This product contains computer programs, screen
 displays and printed documentation which are original works of
 authorship protected under United States Copyright Act.
@@ -8,7 +8,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.animation
 {
 import flash.media.Sound
-import flash.utils.ByteArray
 
 import playerio.DatabaseObject
 
@@ -27,8 +26,8 @@ import com.voxelengine.events.ModelBaseEvent
  */
 public class SoundPersistance extends PersistanceObject
 {
-	private var _sound:Sound = new Sound()
-	private var _loaded:Boolean
+	private var _sound:Sound = new Sound();
+	private var _loaded:Boolean;
 	
 	public function get loaded():Boolean  			{ return _loaded }
 	public function set loaded(value:Boolean):void  { _loaded = value }
@@ -39,8 +38,8 @@ public class SoundPersistance extends PersistanceObject
 	public function set hashTags( $val:String):void	{ info.hashTags = $val }
 	
 	public function SoundPersistance( $guid:String ) {
-		super( $guid, Globals.BIGDB_TABLE_SOUNDS )
-		_loaded = false
+		super( $guid, Globals.BIGDB_TABLE_SOUNDS );
+		_loaded = false;
 	}
 	
 	override public function set guid( $newGuid:String ):void { 
@@ -65,26 +64,26 @@ public class SoundPersistance extends PersistanceObject
 	
 					
 	public function fromObject( $pe:PersistanceEvent ):void {
-		dbo			= $pe.dbo
-		info 		= $pe.dbo
+		dbo			= $pe.dbo;
+		info 		= $pe.dbo;
 
-		sound.loadCompressedDataFromByteArray( dbo.ba, dbo.ba.length )
+		sound.loadCompressedDataFromByteArray( dbo.ba, dbo.ba.length );
 		loaded = true
 	}
 
 	public function fromObjectImport( $pe:PersistanceEvent ):void {
-		dbo = new DatabaseObject( Globals.BIGDB_TABLE_SOUNDS, "0", "0", 0, true, null )
-		dbo.data = new Object()
-		dbo.data.ba = $pe.data
-		sound.loadCompressedDataFromByteArray( dbo.data.ba, dbo.data.ba.length )
+		dbo = new DatabaseObject( Globals.BIGDB_TABLE_SOUNDS, "0", "0", 0, true, null );
+		dbo.data = new Object();
+		dbo.data.ba = $pe.data;
+		sound.loadCompressedDataFromByteArray( dbo.data.ba, dbo.data.ba.length );
 		// On import mark it as changed.
-		loaded = true
-		changed = true
-		info = dbo.data
-		info.name = $pe.guid
-		info.length = sound.length
-		info.hashTags = "#dragon"
-		guid = Globals.getUID() // do this last so that the rest of the data is filled in
+		loaded = true;
+		changed = true;
+		info = dbo.data;
+		info.name = $pe.guid;
+		info.length = sound.length;
+		info.hashTags = "#dragon";
+		guid = Globals.getUID(); // do this last so that the rest of the data is filled in
 		save()
 	}
 }

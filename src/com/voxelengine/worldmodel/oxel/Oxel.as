@@ -209,7 +209,7 @@ public class Oxel extends OxelBitfields
 		return true;
 	}
 	
-	static public function initializeRoot( $grainBound:int, $baseLightLevel:int ):Oxel
+	static public function initializeRoot( $grainBound:int ):Oxel
 	{
 		try {
 			var gct:GrainCursor = GrainCursorPool.poolGet( $grainBound );
@@ -217,10 +217,6 @@ public class Oxel extends OxelBitfields
 			var oxel:Oxel = OxelPool.poolGet();
 			oxel.initialize(null, gct, 0, TypeInfo.AIR);
 			GrainCursorPool.poolDispose( gct );
-			
-			// TODO how to handle assigning the default light? Since chunk does not exist.
-			//oxel.lighting = LightingPool.poolGet( $baseLightLevel );
-			Lighting.defaultBaseLightAttn = $baseLightLevel;
 		}
 		catch (e:Error) {
 			Log.out( "Oxel.initialize_root_oxel - grain: " + oxel.gc.grain );					
@@ -1933,14 +1929,14 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return $ba;
 	}
 
-	public function decompressAndExtractMetadata( $guid:String, $ba:ByteArray, $op:OxelPersistance, $statisics:ModelStatisics ):void {
+	public function decompressAndExtractMetadata( $ba:ByteArray, $op:OxelPersistance ):void {
 
 		var time:int = getTimer();
 		try {
 			$ba.uncompress();
 		}
 		catch (error:Error) {
-			Log.out("Oxel.decompressAndExtractMetadata - Was expecting compressed data " + $guid, Log.WARN);
+			Log.out("Oxel.decompressAndExtractMetadata - Was expecting compressed data " + $op.guid, Log.WARN);
 		}
 
 		try {
@@ -1963,12 +1959,12 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			//Log.out("Oxel.decompressAndExtractMetadata - extractVersionInfo took: " + (getTimer() - time), Log.INFO);
 		}
 		catch (error:Error) {
-			Log.out("Oxel.decompressAndExtractMetadata - exception loading oxe data " + $guid, Log.WARN);
+			Log.out("Oxel.decompressAndExtractMetadata - exception loading oxe data " + $op.guid, Log.WARN);
 		}
 
 	}
 
-	public function readOxelData($ba:ByteArray, $op:OxelPersistance, $statisics:ModelStatisics):void {
+	public function readOxelData($ba:ByteArray, $op:OxelPersistance ):void {
 		// Read off 1 bytes, the root size
 		var rootGrainSize:int = $ba.readByte();
 		gc.grain = gc.bound = rootGrainSize;
@@ -1977,11 +1973,11 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		gct.grain = rootGrainSize;
 
 		if (Globals.VERSION_000 == $op.version)
-			fromByteArrayV0(null, gct, $ba, $statisics);
+			fromByteArrayV0(null, gct, $ba, $op.statisics);
 		else if (Globals.VERSION_008 >= $op.version)
-			fromByteArrayV8($op.version, null, gct, $ba, $statisics);
+			fromByteArrayV8($op.version, null, gct, $ba, $op.statisics);
 		else
-			fromByteArray($op.version, null, gct, $ba, $statisics);
+			fromByteArray($op.version, null, gct, $ba, $op.statisics);
 
 		GrainCursorPool.poolDispose(gct);
 	}
@@ -3430,45 +3426,21 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 
-	public function rebuildLighting( $oxel:Oxel ):void {
-		var ch:Chunk = chunkGet(); // Get the parent chunk
-		ch.rebuildLighting();
-	}
-
 	static public function rebuildLightingRecursive( $oxel:Oxel ):void {
 		if ($oxel.childrenHas()) {
 			for each (var child:Oxel in $oxel._children)
 				rebuildLightingRecursive( child );
 		}
 		else {
-			$oxel.facesBuild();
-			$oxel.quadsBuild();
+			if ( $oxel.facesHas() ) {
+				if ( !$oxel.lighting ) {
+					$oxel.lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
+					$oxel.lighting.add( $oxel.chunkGet().lightInfo ) // Get the parent chunk
+				}
+				$oxel.dirty = true;
+				$oxel.quadsRebuildAll();
+			}
 		}
-	}
-
-
-	static private var _lights:Vector.<Oxel> = new Vector.<Oxel>();
-	static public function rebuildLightingOld( $oxel:Oxel ):void {
-		// first I need to build up a list of all the existing lights
-		if ($oxel.childrenHas()) {
-			for each (var child:Oxel in $oxel._children)
-				rebuildLightingOld(child);
-		}
-		else {
-			if ( TypeInfo.isLight( $oxel.type ) )
-				_lights.push( $oxel );
-		}
-
-		// now reset the lights to just ambient
-		if ($oxel.childrenHas()) {
-			for each (var child1:Oxel in $oxel._children)
-				rebuildLightingOld(child1);
-		}
-		else {
-			if ( $oxel.lighting )
-				$oxel.lighting.resetToAmbient();
-		}
-
 	}
 
 	static public function rebuildWater( $oxel:Oxel ):void {
@@ -3526,7 +3498,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		//////////////////////////////////////////////////////////
 		var root_grain_size:int = $layer.offset;
 		const baseLightLevel:int = 51;
-		var oxel:Oxel = Oxel.initializeRoot( root_grain_size, Lighting.MAX_LIGHT_LEVEL );
+		var oxel:Oxel = Oxel.initializeRoot( root_grain_size );
 		//
 		var min_grain_size:int = root_grain_size - $layer.range;
 		if ( 0 > min_grain_size || min_grain_size > root_grain_size || ( 8 < (root_grain_size - min_grain_size)) )

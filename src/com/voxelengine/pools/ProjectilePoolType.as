@@ -13,6 +13,7 @@ import com.voxelengine.Log
 import com.voxelengine.Globals
 import com.voxelengine.worldmodel.models.*
 import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.oxel.Lighting;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube
 import com.voxelengine.worldmodel.weapons.Projectile
@@ -73,7 +74,7 @@ public final class ProjectilePoolType
 		_modelMetadata.owner = ""
 		//ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, _projectileGuid, _modelMetadata ) )
 		//Log.out( "ProjectilePoolType.generateData: " + _modelInfo.toString() );
-		_modelInfo.data = new OxelPersistance( _projectileGuid );
+		_modelInfo.data = new OxelPersistance( _projectileGuid, Lighting.MAX_LIGHT_LEVEL );
 		var ba:ByteArray  = Oxel.generateCube( _projectileGuid, _modelInfo.biomes.layers[0], false );
 		_modelInfo.data.ba = ba;
 		_modelInfo.data.fromByteArray();

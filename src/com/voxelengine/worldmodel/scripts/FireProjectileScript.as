@@ -202,7 +202,8 @@ package com.voxelengine.worldmodel.scripts
 				Log.out( "FireProjectileScript.bulletPool Didnt find !pm.modelInfo || !pm.modelInfo.data" );
 				return;
 			}
-			pm.changeGrainSize( grainChange );
+			if ( 0 < grainChange )
+				pm.changeGrainSize( grainChange );
 //			trace( "bulletPool: changing type to: " + Globals.Info[pe.ammo.oxelType].name );
 //			IS THIS STILL NEEDED WITH NEW BULLET INSTANCING?
 			pm.modelInfo.data.oxel.changeAllButAirToType( pe.ammo.oxelType );

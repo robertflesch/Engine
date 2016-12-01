@@ -241,7 +241,7 @@ import flash.utils.getTimer;
 				PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFail );			
 				PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
 				
-				Log.out( "ConfigManager.loadSucceed: " + Globals.appPath + $fileName + Globals.APP_EXT, Log.DEBUG )
+				Log.out( "TypeInfo.loadSucceed: " + Globals.appPath + $fileName + Globals.APP_EXT, Log.DEBUG )
 
 				loadTypeDataFromJSON( e.data as String );
 			}

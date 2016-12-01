@@ -22,9 +22,9 @@ public final class PoolManager
 		//private static const INITIAL_POOL_SETTINGS:int = 250000;
 		// this uses up 424 meg of memory (565 meg now with lighting on AlexaIsland)
 		// This is minimum kickstarter setting
-		private static const INITIAL_POOL_SETTINGS:int = 100000;  //3.5 seconds
+		//private static const INITIAL_POOL_SETTINGS:int = 100000;  //3.5 seconds
 		//private static const INITIAL_POOL_SETTINGS:int = 50000;
-		//private static const INITIAL_POOL_SETTINGS:int = 30000;
+		private static const INITIAL_POOL_SETTINGS:int = 30000;
 		// this uses up 157 meg of memory
 		//private static const INITIAL_POOL_SETTINGS:int = 1000;
 		

@@ -13,14 +13,16 @@ import com.voxelengine.renderer.Chunk
  */
 public class VistorTask extends RenderingTask 
 {	
-	public var _func:Function
-	static public function addTask( $guid:String, $chunk:Chunk, $func:Function, $taskPriority:int ): void {
-		var lt:VistorTask = new VistorTask( $guid, $chunk, $func, $taskPriority )
+	public var _func:Function;
+	private var _taskName:String;
+	static public function addTask( $guid:String, $chunk:Chunk, $func:Function, $taskPriority:int, $taskName:String = "" ): void {
+		var lt:VistorTask = new VistorTask( $guid, $chunk, $func, $taskPriority, $taskName )
 		Globals.g_landscapeTaskController.addTask( lt )
 	}
 	
-	public function VistorTask( $guid:String, $chunk:Chunk, $func:Function, $taskPriority:int ):void {
-		_func = $func
+	public function VistorTask( $guid:String, $chunk:Chunk, $func:Function, $taskPriority:int, $taskName:String ):void {
+		_func = $func;
+		_taskName = $taskName;
 		// public function RenderingTask( $guid:String, $chunk:Chunk, taskType:String = TASK_TYPE, $taskPriority:int = TASK_PRIORITY ):void {
 		super( $guid, $chunk, "VistorTask", $taskPriority )
 	}
@@ -36,7 +38,7 @@ public class VistorTask extends RenderingTask
 		if ( pt < 1 )
 			Globals.g_landscapeTaskController.next()
 		//else	
-		Log.out( "VistorTask took: " + pt, Log.DEBUG )
+		Log.out( "VistorTask.func: " + _taskName + " chunkSize: " + ( (_chunk && _chunk.oxel) ? _chunk.oxel.childCount : 0) +  "  took: " + pt, Log.DEBUG )
 		
 		super.complete()
 	}

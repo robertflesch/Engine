@@ -97,7 +97,7 @@ public class ModelInfo extends PersistanceObject
 	}
 	
 	public function createEditCursor( $guid:String ):void {
-		_data = new OxelPersistance( $guid );
+		_data = new OxelPersistance( $guid, Lighting.MAX_LIGHT_LEVEL );
 		_data.parent = this;
 		_data.createEditCursor();
 	}
@@ -332,7 +332,6 @@ public class ModelInfo extends PersistanceObject
 	public function animationUpdateGuid( $ae:AnimationEvent ):void {
 		Log.out( "ModelInfo.animationUpdateGuid $ae: " + $ae, Log.WARN );
 		if ( $ae.modelGuid == guid )
-			// Looking the in the animationInfo, and the animations.
 			changed = true;
 	}
 	

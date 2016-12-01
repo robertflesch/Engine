@@ -9,6 +9,8 @@ package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.oxel.Lighting;
+
 import flash.utils.ByteArray;
 import flash.utils.Dictionary;
 import flash.net.URLLoaderDataFormat;
@@ -129,7 +131,7 @@ public class OxelPersistanceCache
 			return;
 		if ( $pe.dbo || $pe.data ) {
 			//Log.out( "OxelDataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
-			var od:OxelPersistance = new OxelPersistance( $pe.guid );
+			var od:OxelPersistance = new OxelPersistance( $pe.guid, Lighting.DEFAULT_ATTN );
 			if ( !$pe.dbo ) {
 				var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_OXEL_DATA, "0", "0", 0, true, null );
 				dbo.data = new Object();

@@ -155,7 +155,7 @@ public class ConsoleCommands {
 		{
 			VoxelModel.selectedModel.modelInfo.data.oxel.lightingReset();
 			//VoxelModel.selectedModel.modelInfo.data.oxel.rebuildAll();
-			VoxelModel.selectedModel.modelInfo.data.visitor( Oxel.rebuild );
+			VoxelModel.selectedModel.modelInfo.data.visitor( Oxel.rebuild, "Oxel.rebuild" );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );

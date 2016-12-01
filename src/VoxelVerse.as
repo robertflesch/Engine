@@ -113,6 +113,7 @@ public class VoxelVerse extends Sprite
 	}
 
 	private function initializeDataAfterSplash():void {
+
 		WindowWater.init();
 
 		Persistance.addEventHandlers();
@@ -131,7 +132,10 @@ public class VoxelVerse extends Sprite
 		LightAdd.init();
 		LightRemove.init();
 		//ConfigManager.instance.init( $startingModelToDisplay )
+
+		// All the init time is trivial compared to this.
 		new PoolManager();
+
 	}
 
 	// after the splash and config have been loaded

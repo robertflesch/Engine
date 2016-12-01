@@ -341,7 +341,7 @@ public class Lighting  {
 			lightCount = $ba.readByte();
 			// Now read each light
 			for ( i = 0; i < lightCount; i++ ) {
-				_lights[i] = new LightInfo();
+				_lights[i] = LightInfoPool.poolGet();
 				_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), $attnPerMeter, false )
 				_lights[i].fromByteArray( $ba );
 			}
@@ -352,7 +352,7 @@ public class Lighting  {
 			lightCount = $ba.readByte();
 			// Now read each light
 			for ( i = 0; i < lightCount; i++ ) {
-				_lights[i] = new LightInfo();
+				_lights[i] = LightInfoPool.poolGet();
 				_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), $attnPerMeter, false )
 				_lights[i].fromByteArray( $ba );
 			}
@@ -370,7 +370,7 @@ public class Lighting  {
 
 			// Now read each light
 			for ( i = 0; i < lightCount; i++ ) {
-				_lights[i] = new LightInfo();
+				_lights[i] = LightInfoPool.poolGet();
 				_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), $attnPerMeter, false )
 				_lights[i].fromByteArray( $ba );
 			}
@@ -418,14 +418,14 @@ public class Lighting  {
 			if ( ModelMakerImport.isImporting ) {
 				// throw away lights for imports
 				for (var j:int = 0; j < lightsFromBA; j++) {
-					var li:LightInfo = new LightInfo();
+					var li:LightInfo = LightInfoPool.poolGet();
 					li.fromByteArray($ba);
 				}
 			}
 			else {
 				// Now read each light
 				for (var i:int = 0; i < lightsFromBA; i++) {
-					_lights[i] = new LightInfo();
+					_lights[i] = LightInfoPool.poolGet();
 					_lights[i].setInfo(0, 0, defaultLightLevelSetter(), $attnPerMeter, false);
 					_lights[i].fromByteArray($ba);
 				}
@@ -455,13 +455,18 @@ public class Lighting  {
 			var sli:LightInfo = $b._lights[i];
 			if ( null != sli ) { 
 				if ( _lights.length <= i || (null == _lights[i]) ) {
-					_lights[i] = new LightInfo();
+					_lights[i] = LightInfoPool.poolGet();
 					_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), 0, false )
 				}
 				_lights[i].copyFrom( sli );
 			}
-			else 
-				_lights[i] = null;
+			else {
+                if ( _lights[i] ){
+                    LightInfoPool.poolReturn( _lights[i] );
+                    _lights[i] = null;
+                    _lights.slice(i, 1);
+                }
+            }
 		}
 	}
 	
@@ -914,7 +919,7 @@ public class Lighting  {
 		if ( DEFAULT_LIGHT_ID != $ID && _defaultBaseLightAttn == $avgAttn )
 			return false;
 			
-		var newLi:LightInfo = new LightInfo();
+		var newLi:LightInfo = LightInfoPool.poolGet();
 		newLi.setInfo( $ID, $color, defaultLightLevelSetter(), $attnPerMeter, $lightIs );
 
 			// check for available slot first, if none found, add new light to end.

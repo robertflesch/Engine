@@ -50,7 +50,7 @@ public class FromByteArray extends AbstractTask
 		var time:int = getTimer();
 
 		try {
-			//Log.out("FromByteArray.start: guid: " + _guid);
+			Log.out("FromByteArray.start: guid: " + _guid);
 			_parent.fromByteArray();
 
 			if ("0" == _parent.dbo.key) {
@@ -70,7 +70,7 @@ public class FromByteArray extends AbstractTask
 		}
 		LoadingImageEvent.dispatch(new LoadingImageEvent(LoadingImageEvent.DESTROY));
 		super.complete();
-		//Log.out( "FromByteArray.start: took: " + (getTimer() - time) + "  guid: " + _guid );
+		Log.out( "FromByteArray.start: took: " + (getTimer() - time) + "  guid: " + _guid );
 	}
 }
 }

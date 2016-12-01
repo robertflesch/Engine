@@ -10,6 +10,7 @@ package com.voxelengine.GUI.panels
 {
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelEvent;
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.GUI.panels.PanelBase;
 import com.voxelengine.GUI.voxelModels.WindowModelDetail;
@@ -61,6 +62,9 @@ public class PanelModels extends PanelBase
 		
 		buttonsCreate();
 		addElement( _listModels );
+
+		//ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
+		ModelInfoEvent.addListener( ModelBaseEvent.DELETE, modelDeletedGlobally );
 		
 		// ALL DRAG AND DROP methods, which are not working
 		//_listModels.dndData
@@ -73,6 +77,16 @@ public class PanelModels extends PanelBase
 		//_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_CLICKED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - ITEM_CLICKED $le: " + $le ) } )		
 		//_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - ITEM_PRESSED $le: " + $le ) } )		
 		//_listModels.eventCollector.addEvent( _listModels, ListEvent.DATA_PROVIDER_CHANGED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - DATA_PROVIDER_CHANGED $le: " + $le ) } )		
+	}
+
+	private function modelDeletedGlobally( e:ModelInfoEvent ): void {
+		for ( var i:int; i < _listModels.length; i++ ) {
+			var listItem:ListItem = _listModels.getItemAt( i );
+			var vm:VoxelModel = listItem.data as VoxelModel;
+			if ( e.modelGuid == vm.modelInfo.guid ) {
+				_listModels.removeItemAt( i );
+			}
+		}
 	}
 	
 	override public function close():void {

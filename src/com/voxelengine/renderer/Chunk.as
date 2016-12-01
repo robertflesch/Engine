@@ -144,21 +144,6 @@ public class Chunk {
 		_oxel.facesBuild();
 	}
 
-	public function rebuildLighting():void {
-		//public function refreshFacesAndQuadsTerminal():void {
-		if ( childrenHas() ) {
-			for (var i:int; i < OCT_TREE_SIZE; i++)
-				_children[i].rebuildLighting();
-		}
-		else {
-			if ( _oxel && _oxel.childrenHas() ) {
-
-			}
-			else
-				refreshFacesAndQuadsTerminal()
-		}
-	}
-	
 	public function refreshFacesAndQuads( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {
 		if ( childrenHas() ) {
 			dirtyClear();
@@ -189,13 +174,13 @@ public class Chunk {
 		}
 	}
 	
-	public function visitor( $guid:String, $func:Function ):void {
+	public function visitor( $guid:String, $func:Function, $functionName:String = "" ):void {
 		if ( childrenHas() ) {
 			for ( var i:int; i < OCT_TREE_SIZE; i++ )
-				_children[i].visitor( $guid, $func );
+				_children[i].visitor( $guid, $func, $functionName );
 		}
 		else if ( _vertMan )
-			VistorTask.addTask( $guid, this, $func, 10000 )
+			VistorTask.addTask( $guid, this, $func, 10000, $functionName )
 		
 	}
 
