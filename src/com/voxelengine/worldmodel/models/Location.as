@@ -90,7 +90,7 @@ package com.voxelengine.worldmodel.models
 		public function rotationGetOriginal():Vector3D 	{ return _rotationOrig; }
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// Position
+		// Position - positions are in MODEL SPACE (ms)
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		public function get positionGet():Vector3D 				{ return _position; }
 		public function set positionSet( $val:Vector3D ):void 	{ positionSetComp( $val.x, $val.y, $val.z ); }
@@ -207,7 +207,8 @@ package com.voxelengine.worldmodel.models
 		{
 			if ( changed )
 				recalculateMatrix();
-			return _modelMatrix.deltaTransformVector( new Vector3D( 0, 0, -length ) );
+			// was using _modelMatrix, but I think that is wrong.
+			return _invModelMatrix.deltaTransformVector( new Vector3D( 0, 0, -length ) );
 		}
 		
 		public function lookDownVector( length:int ):Vector3D

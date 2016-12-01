@@ -266,7 +266,7 @@ import flash.utils.getTimer;
 		}
 
 		static private function loadTypeDataFromJSON( $data:String ):void {
-			Log.out( "TypeInfo.loadTypeDataFromJSON - loading", Log.WARN );
+			//Log.out( "TypeInfo.loadTypeDataFromJSON - loading", Log.WARN );
 			var timer:int = getTimer();
 			var ti:TypeInfo = new TypeInfo( 0 );
 			ti._typeId = 0;
@@ -296,7 +296,7 @@ import flash.utils.getTimer;
 			{
 				throw new Error( "TypeInfo.onTypesLoadedAction - - unable to PARSE types.json" );					
 			}
-			Log.out( "TypeInfo.loadTypeDataFromJSON - took: " + (getTimer() - timer), Log.WARN );
+			//Log.out( "TypeInfo.loadTypeDataFromJSON - took: " + (getTimer() - timer), Log.WARN );
 		}
 
 		public function init( $json:Object ):void 

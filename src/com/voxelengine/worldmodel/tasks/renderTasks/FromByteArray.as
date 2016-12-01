@@ -50,7 +50,7 @@ public class FromByteArray extends AbstractTask
 		var time:int = getTimer();
 
 		try {
-			Log.out("FromByteArray.start: guid: " + _guid);
+			//Log.out("FromByteArray.start: guid: " + _guid);
 			_parent.fromByteArray();
 
 			if ("0" == _parent.dbo.key) {
@@ -65,12 +65,12 @@ public class FromByteArray extends AbstractTask
 			OxelDataEvent.dispatch(new OxelDataEvent(OxelDataEvent.OXEL_READY, 0, _guid, _parent));
 		}
 		catch ( e:Error ) {
-			Log.out( "FromByteArray.start: ERROR: " + e.toString() );
+			Log.out( "FromByteArray.start: ERROR: " + e.toString(), Log.ERROR );
 			OxelDataEvent.dispatch(new OxelDataEvent(OxelDataEvent.OXEL_FAILED, 0, _guid, _parent));
 		}
 		LoadingImageEvent.dispatch(new LoadingImageEvent(LoadingImageEvent.DESTROY));
 		super.complete();
-		Log.out( "FromByteArray.start: took: " + (getTimer() - time) + "  guid: " + _guid );
+		//Log.out( "FromByteArray.start: took: " + (getTimer() - time) + "  guid: " + _guid );
 	}
 }
 }

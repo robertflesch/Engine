@@ -94,7 +94,7 @@ public class VoxelVerse extends Sprite
 	private function initializeDataBeforeSplash():void {
 		Globals.setDebug = Capabilities.isDebugger;
 		Log.init();
-		Log.out("VoxelVerse.initializeDataBeforeSplash this is " + (Globals.isDebug ? "debug" : "release") + " build", Log.WARN );
+		//Log.out("VoxelVerse.initializeDataBeforeSplash this is " + (Globals.isDebug ? "debug" : "release") + " build", Log.WARN );
 
 		var url:String = stage.loaderInfo.loaderURL;
 		var index:int = url.lastIndexOf( "VoxelVerse.swf" );

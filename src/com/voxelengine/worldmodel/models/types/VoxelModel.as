@@ -217,14 +217,21 @@ public class VoxelModel
 		
 		return totalPosition;
 	}
-	
-	// returns the location of this model in the world space
-	public function wsPositionGet():Vector3D
+
+	public function rotationGetCummulative():Vector3D
 	{
+		var totalRotation:Vector3D = null;
 		if (instanceInfo.controllingModel)
-			return modelToWorld( msPositionGet() );
-		else	
-			return instanceInfo.positionGet;
+			totalRotation = instanceInfo.rotationGet.add(instanceInfo.controllingModel.rotationGetCummulative());
+		else
+			totalRotation = instanceInfo.rotationGet;
+
+		return totalRotation;
+	}
+
+	// returns the location of this model in the world space
+	public function wsPositionGet():Vector3D {
+		return modelToWorld( msPositionGet() );
 	}
 	
 	public function childFindByName($name:String, $recursive:Boolean = true ):VoxelModel {
@@ -1005,7 +1012,9 @@ public class VoxelModel
 			Log.out( "VoxelModel.stateSet - Starting anim: " + $state ); 
 		
 		var result:Boolean = false;
-		var anim:Animation = modelInfo.animationGet( $state );
+// HACK ONE
+var anim:Animation = modelInfo.animationGet( "Starting" );
+		//var anim:Animation = modelInfo.animationGet( $state );
 		if ( anim ) {
 			//if (!anim.loaded)
 			//{
@@ -1032,7 +1041,8 @@ public class VoxelModel
 		}
 //			else
 //				Log.out("VoxelModel.stateSet - addAnimationsInChildren returned false for: " + $state);
-		
+// HACK TWO
+_stateLock = true;
 		// if any of the children load, then it succeeds, which is slightly problematic
 		function addAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $lockTime:Number):Boolean
 		{

@@ -62,7 +62,7 @@ public class ProjectileEvent extends Event
    
 	public override function toString():String
 	{
-		return formatToString("ProjectileEvent", "bubbles", "cancelable") + " ownerId: " + owner + "  position: " + position + "  direction: " + direction + " ammo: " + ammo;
+		return formatToString("ProjectileEvent" + "  position: " + position + "  direction: " + direction + " ammo: " + ammo  + " ownerId: " + owner);
 	}
 		
 	///////////////// Event handler interface /////////////////////////////

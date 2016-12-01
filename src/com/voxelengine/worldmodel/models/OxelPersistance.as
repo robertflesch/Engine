@@ -171,7 +171,7 @@ public class OxelPersistance extends PersistanceObject
 				Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " loaded: " + loaded + " in table: " + table, Log.DEBUG );
 				return;
 		}
-		Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.DEBUG );
+		//Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.DEBUG );
 		super.save();
 	}
 	
