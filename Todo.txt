@@ -1,2 +1,18 @@
 TIt4O^kXHYR)tPxA
 password for fodo.me
+
+VoxelVerse todo
+
+static lighting on head of dragon
+dynamic lighting on all of dragon
+speed val of dragon Dragon.as line 196 - check if speed that we are importing is getting scaled correctly.
+
+! need to add clipVelocity and speedMultiplier to rest of the animations, and to the setState, so that they are not hard coded.
+
+			speedMultiplier = 0.35;
+			clipVelocityFactor = 0.995;
+
+need to add clipVelocity and speedMultiplier to animation editor
+
+When deleting a model in the inventory, if the model is selecting in the region models, it is removed, but the animations and child models are not removed correctly 12.2.16 RSF
+When deleting a model in the inventory, make sure to delete its inventory.
