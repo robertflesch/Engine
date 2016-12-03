@@ -8,6 +8,8 @@
 
 package com.voxelengine.GUI.actionBars
 {
+import com.voxelengine.renderer.Renderer;
+
 import flash.events.Event;
 
 import org.flashapi.swing.Box;
@@ -61,9 +63,9 @@ public class PropListIcon extends VVCanvas
 	
 	
 	public function resizeObject(event:Event):void {
-		var halfRW:int = Globals.g_renderer.width / 2
+		var halfRW:int = Renderer.renderer.width / 2
 
-		y = Globals.g_renderer.height - height - 24
+		y = Renderer.renderer.height - height - 24
 		x = halfRW - (width / 2) + _parentWidth/2 + 28
 	}
 	

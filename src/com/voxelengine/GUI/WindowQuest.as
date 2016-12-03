@@ -26,7 +26,7 @@ package com.voxelengine.GUI
 			_textArea.height = 300;
             addElement(_textArea);
 			
-			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
+			display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 
 			Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 			addEventListener(UIOEvent.REMOVED, onRemoved );
@@ -42,7 +42,7 @@ package com.voxelengine.GUI
 		
         protected function onResize(event:Event):void
         {
-			move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
+			move( Renderer.renderer.width / 2 - (width + 10) / 2, Renderer.renderer.height / 2 - (height + 10) / 2 );
 		}
 	}
 }

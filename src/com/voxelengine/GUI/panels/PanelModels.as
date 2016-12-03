@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.panels
 {
+import com.voxelengine.events.InventoryModelEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.ModelInfoEvent;
@@ -80,12 +81,21 @@ public class PanelModels extends PanelBase
 	}
 
 	private function modelDeletedGlobally( e:ModelInfoEvent ): void {
+		var modelFound:Boolean = true;
 		for ( var i:int; i < _listModels.length; i++ ) {
 			var listItem:ListItem = _listModels.getItemAt( i );
 			var vm:VoxelModel = listItem.data as VoxelModel;
 			if ( e.modelGuid == vm.modelInfo.guid ) {
 				_listModels.removeItemAt( i );
+				modelFound = true;
+				break;
 			}
+		}
+
+		if ( modelFound && vm ) {
+			UIRegionModelEvent.dispatch(new UIRegionModelEvent(UIRegionModelEvent.SELECTED_MODEL_CHANGED, vm, _parentModel));
+			// remove inventory
+			InventoryModelEvent.dispatch( new InventoryModelEvent( ModelBaseEvent.DELETE, "", vm.instanceInfo.instanceGuid, null ) )
 		}
 	}
 	

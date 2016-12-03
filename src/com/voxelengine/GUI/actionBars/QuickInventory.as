@@ -9,6 +9,8 @@
 package com.voxelengine.GUI.actionBars
 {
 import com.voxelengine.GUI.VVCanvas;
+import com.voxelengine.renderer.Renderer;
+
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.MouseEvent;
@@ -94,10 +96,10 @@ public class QuickInventory extends VVCanvas
 	protected function buildItems():void { }
 	
 	public function resizeObject(event:Event):void {
-		var halfRW:int = Globals.g_renderer.width / 2;
-		var halfRH:int = Globals.g_renderer.height / 2;
+		var halfRW:int = Renderer.renderer.width / 2;
+		var halfRH:int = Renderer.renderer.height / 2;
 
-		y = Globals.g_renderer.height - (height + _offsetFromBottom);
+		y = Renderer.renderer.height - (height + _offsetFromBottom);
 		x = halfRW - (width / 2);
 	}
 

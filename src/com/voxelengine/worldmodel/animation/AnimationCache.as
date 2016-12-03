@@ -70,8 +70,13 @@ public class AnimationCache
 	}
 
 	static private function deleteHandler( $ae:AnimationEvent ):void {
-		if ( _animations[$ae.aniGuid] ) 
+		var anim:Animation = _animations[$ae.aniGuid]
+		if ( anim ) {
 			_animations[$ae.aniGuid] = null;
+			if ( anim.sound )
+                PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_SOUNDS, anim.sound.guid, null ) );
+
+		}
 		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_ANIMATIONS, $ae.aniGuid, null ) );
 	}
 	

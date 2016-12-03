@@ -14,6 +14,7 @@ import com.voxelengine.events.AppEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.persistance.Persistance;
 import com.voxelengine.pools.PoolManager;
+import com.voxelengine.renderer.Renderer;
 import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.worldmodel.ConfigManager;
 import com.voxelengine.worldmodel.SoundCache;
@@ -107,7 +108,7 @@ public class VoxelVerse extends Sprite
 		Globals.appPath = url.substring( 0, index );
 		//Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG )
 
-		Globals.g_renderer.init( stage );
+		Renderer.renderer.init( stage );
 		VoxelVerseGUI.currentInstance.init();
 		WindowSplash.init();
 	}
@@ -189,7 +190,7 @@ public class VoxelVerse extends Sprite
 		var timeUpdate:int = getTimer() - timeEntered;
 		Shader.animationOffsetsUpdate( elapsed );
 
-		Globals.g_renderer.render();
+		Renderer.renderer.render();
 		var timeRender:int = getTimer() - timeEntered - timeUpdate;
 
 		if ( showConsole )

@@ -10,6 +10,7 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.GUI.actionBars.WindowBeastControl;
+import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.ConfigManager;
 import com.voxelengine.worldmodel.models.types.Player;
 import flash.display.DisplayObjectContainer;
@@ -154,8 +155,8 @@ public class VoxelVerseGUI extends EventDispatcher
 		//Log.out( "VoxelVerseGUI.crossHairResize" );
 		if ( _crossHairHorizontal )
 		{
-			var halfRW:int = Globals.g_renderer.width / 2;
-			var halfRH:int = Globals.g_renderer.height / 2;
+			var halfRW:int = Renderer.renderer.width / 2;
+			var halfRH:int = Renderer.renderer.height / 2;
 			_crossHairHorizontal.x = halfRW - _crossHairHorizontal.width/2;
 			_crossHairHorizontal.y = halfRH;
 			_crossHairVertical.x = halfRW;
@@ -263,7 +264,7 @@ public class VoxelVerseGUI extends EventDispatcher
 				_debugMenu = new WindowDebugMenu();
 				_debugMenu.visible = false;
 			}
-			if ( !Globals.g_renderer.hardwareAccelerated )
+			if ( !Renderer.renderer.hardwareAccelerated )
 				 new WindowNotHardware( "WARNING", "Hardware acceleration is not enabled in your browser, this is happening in Chrome on some machines, try FireFox or Internet Explorer" );
 			_built = true;
 		}
@@ -321,10 +322,10 @@ public class VoxelVerseGUI extends EventDispatcher
 		//Log.out( "VoxelVerseGUI.onKeyPressed: KeyboardEvent: " + e);
 			
 		if ( Keyboard.F11 == e.keyCode )
-			Globals.g_renderer.screenShot( true ); // draws UI
+			Renderer.renderer.screenShot( true ); // draws UI
 
 		if ( Keyboard.F12 == e.keyCode )
-			Globals.g_renderer.screenShot( false );
+			Renderer.renderer.screenShot( false );
 			
 		if ( Log.showing )
 			return;
@@ -347,7 +348,7 @@ public class VoxelVerseGUI extends EventDispatcher
 			//if ( Keyboard.O == e.keyCode )
 			//{
 				//Globals.TestCheckForFlow();
-				////Globals.g_renderer.context3D.dispose();
+				////Renderer.renderer.context3D.dispose();
 			//}
 			
 			if ( Keyboard.L == e.keyCode )
@@ -412,7 +413,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		var label:Label = new Label("No servers were found for this room, try later");
 		popup.addElement(label);
 		
-		popup.display( Globals.g_renderer.width / 2 - (((popup.width + 10) / 2) + popup.x ), Globals.g_renderer.height / 2 - (((popup.height + 10) / 2) + popup.y) );
+		popup.display( Renderer.renderer.width / 2 - (((popup.width + 10) / 2) + popup.x ), Renderer.renderer.height / 2 - (((popup.height + 10) / 2) + popup.y) );
 		popup.eventCollector.addEvent( popup, UIOEvent.REMOVED, function( e:UIOEvent ):void { new WindowSandboxList(); popup.remove(); } );
 	}
 	

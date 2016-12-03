@@ -7,7 +7,9 @@
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
-	import org.flashapi.swing.*
+import com.voxelengine.renderer.Renderer;
+
+import org.flashapi.swing.*
 	import org.flashapi.swing.core.UIObject;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
@@ -75,7 +77,7 @@ package com.voxelengine.GUI.inventory {
 			
 			display();
 			
-			move( Globals.g_renderer.width / 2 - width / 2, 50 );
+			move( Renderer.renderer.width / 2 - width / 2, 50 );
 			addEventListener( UIOEvent.RESIZED, onResized );
 		}
 		

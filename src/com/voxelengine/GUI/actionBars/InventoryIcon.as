@@ -9,6 +9,8 @@
 package com.voxelengine.GUI.actionBars
 {
 import com.voxelengine.GUI.inventory.WindowInventoryNew;
+import com.voxelengine.renderer.Renderer;
+
 import flash.events.MouseEvent;
 import flash.events.KeyboardEvent;
 import flash.events.Event;
@@ -70,9 +72,9 @@ public class InventoryIcon extends VVCanvas
 	
 	
 	public function resizeObject(event:Event):void {
-		var halfRW:int = Globals.g_renderer.width / 2
+		var halfRW:int = Renderer.renderer.width / 2
 
-		y = Globals.g_renderer.height - height- 30
+		y = Renderer.renderer.height - height- 30
 		x = halfRW - (width / 2) - _parentWidth/2
 	}
 	

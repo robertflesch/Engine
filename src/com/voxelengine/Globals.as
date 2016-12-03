@@ -46,8 +46,6 @@ public class Globals  {
 	static public const VOXELVERSE:String 	= "VoxelVerse";
 	public static var g_app:VoxelVerse;
 
-	public static var g_renderer:Renderer = new Renderer();
-
 	public static var g_mouseKeyboardHandler:MouseKeyboardHandler = new MouseKeyboardHandler();
 	public static var g_textInput:Boolean
 

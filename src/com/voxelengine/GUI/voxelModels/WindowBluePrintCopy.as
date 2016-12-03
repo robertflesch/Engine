@@ -1,6 +1,8 @@
 
 package com.voxelengine.GUI.voxelModels
 {
+import com.voxelengine.renderer.Renderer;
+
 import flash.events.Event;
 
 import org.flashapi.swing.*;
@@ -31,7 +33,7 @@ import com.voxelengine.GUI.LanguageManager
 			width = 250
 			height = 100
 			addButtonPanel()
-			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
+			display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 			
 			
 			Globals.g_app.stage.addEventListener(Event.RESIZE, onResizeHeading );
@@ -73,7 +75,7 @@ import com.voxelengine.GUI.LanguageManager
 	}
 	
 	protected function onResizeHeading( event:Event ):void {
-		move( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
+		move( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 	}
 
 	// Window events

@@ -12,6 +12,8 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.PermissionsBase;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.models.SecureNumber;
+
 import flash.utils.ByteArray;
 
 import playerio.DatabaseObject;
@@ -38,6 +40,14 @@ public class Animation extends PersistanceObject
 	private var _attachments:Vector.<AnimationAttachment>;
 	private var _sound:AnimationSound;
 	private var _permissions:PermissionsBase;
+	private var  _clipVelocity:SecureNumber 		= new SecureNumber( 0.95 );
+	private var  _speedMultiplier:SecureNumber 		= new SecureNumber( 0.95 );
+
+	public function get clipVelocity():Number  					{ return _clipVelocity.val; }
+	public function set clipVelocity($value:Number):void  		{ _clipVelocity.val = $value; }
+
+	public function get speedMultiplier():Number  					{ return _speedMultiplier.val; }
+	public function set speedMultiplier($value:Number):void  		{ _speedMultiplier.val = $value; }
 
 	public function get attachments():Vector.<AnimationAttachment> { return _attachments; }
 	public function get transforms():Vector.<AnimationTransform> { return _transforms; }
@@ -126,6 +136,7 @@ public class Animation extends PersistanceObject
 			backupInfo.animations = getAnimations()
 		if ( _attachments && _attachments.length )
 			backupInfo.attachments = getAttachments()
+		// TODO - add clip velocity and speed multiplier
 		return backupInfo
 	}
 	
@@ -183,6 +194,11 @@ public class Animation extends PersistanceObject
 			info.animations = getAnimations()
 		if ( _attachments && _attachments.length )
 			info.attachments = getAttachments()
+
+		info.clipVelocity = clipVelocity;
+		//Log.out( "Animation.toObject - clipVelocity: " + clipVelocity);
+		info.speedMultiplier = speedMultiplier;
+		//Log.out( "Animation.toObject - speedMultiplier: " + speedMultiplier);
 	}
 	
 	private function getAttachments():Object {
@@ -233,6 +249,15 @@ public class Animation extends PersistanceObject
 		
 		// the permission object is just an encapsulation of the permissions section of the object
 		_permissions = new PermissionsBase( $info );
+
+		if ( $info.clipVelocity )
+			clipVelocity = $info.clipVelocity;
+		if ( $info.speedMultiplier )
+			speedMultiplier = $info.speedMultiplier;
+
+		//Log.out( "Animation.loadFromInfo - clipVelocity: " + clipVelocity);
+		//Log.out( "Animation.loadFromInfo - speedMultiplier: " + speedMultiplier);
+
 	}
 /*
 	public function fromJSON( $json:Object ):String  {

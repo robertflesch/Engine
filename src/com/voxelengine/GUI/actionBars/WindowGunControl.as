@@ -6,7 +6,8 @@ package com.voxelengine.GUI.actionBars
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.events.WeaponEvent;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.renderer.Renderer;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.weapons.Gun;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -63,7 +64,7 @@ package com.voxelengine.GUI.actionBars
 				autoSize = true;
 				shadow = true;
 				
-				display( Globals.g_renderer.width - (width + fudgeFactor), 322 );
+				display( Renderer.renderer.width - (width + fudgeFactor), 322 );
 		
 				Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 				addEventListener(UIOEvent.REMOVED, onRemoved );
@@ -105,7 +106,7 @@ package com.voxelengine.GUI.actionBars
 		
         protected function onResize(event:Event):void
         {
-			move( Globals.g_renderer.width - (width + fudgeFactor), 322 );
+			move( Renderer.renderer.width - (width + fudgeFactor), 322 );
 		}
 	}
 	

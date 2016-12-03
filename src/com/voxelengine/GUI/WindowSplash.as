@@ -7,7 +7,9 @@
 ==============================================================================*/
 package com.voxelengine.GUI
 {
-	import flash.display.Bitmap;
+import com.voxelengine.renderer.Renderer;
+
+import flash.display.Bitmap;
 	import flash.events.Event;
 	
 	import org.flashapi.swing.*;
@@ -57,7 +59,7 @@ package com.voxelengine.GUI
 
 		
 		public function WindowSplash():void { 
-			super( Globals.g_renderer.width, Globals.g_renderer.height );
+			super( Renderer.renderer.width, Renderer.renderer.height );
 
 			_outline = new Image( (new _splashImageClass() as Bitmap) );
 
@@ -66,7 +68,7 @@ package com.voxelengine.GUI
 			_s_currentInstance = this;
 			
 			//if ( Globals.isDebug )
-			//	display( Globals.g_renderer.width - 791, 0 );
+			//	display( Renderer.renderer.width - 791, 0 );
 			//else
 				display( 0, 0 );
 			
@@ -83,15 +85,15 @@ package com.voxelengine.GUI
         protected function onResize(event:Event):void {
 			/*if ( Globals.isDebug ) {
 				// this scales the window down, so we can see it, but it shows we are in debug
-				_outline.scaleX = Globals.g_renderer.width/2791;
-				_outline.scaleY = Globals.g_renderer.height/2592;
+				_outline.scaleX = Renderer.renderer.width/2791;
+				_outline.scaleY = Renderer.renderer.height/2592;
 			} else {
-				_outline.scaleX = Globals.g_renderer.width/791; // 791 is width of splash screen
-				_outline.scaleY = Globals.g_renderer.height/592; // 592 is height of splash screen
+				_outline.scaleX = Renderer.renderer.width/791; // 791 is width of splash screen
+				_outline.scaleY = Renderer.renderer.height/592; // 592 is height of splash screen
 			}*/
 
-			_outline.scaleX = Globals.g_renderer.width/791; // 791 is width of splash screen
-			_outline.scaleY = Globals.g_renderer.height/592; // 592 is height of splash screen
+			_outline.scaleX = Renderer.renderer.width/791; // 791 is width of splash screen
+			_outline.scaleY = Renderer.renderer.height/592; // 592 is height of splash screen
 		}
 		
 		// Window events

@@ -7,7 +7,8 @@ package com.voxelengine.GUI.actionBars
 	import com.voxelengine.GUI.WindowHeading;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
-	import com.voxelengine.worldmodel.models.ModelTransform;
+import com.voxelengine.renderer.Renderer;
+import com.voxelengine.worldmodel.models.ModelTransform;
 	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.types.Ship;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -91,7 +92,7 @@ package com.voxelengine.GUI.actionBars
 
 			addElement( button );
 
-			display( Globals.g_renderer.width/2 - (width + fudgeFactor)/2, Globals.g_renderer.height - height - 128 );
+			display( Renderer.renderer.width/2 - (width + fudgeFactor)/2, Renderer.renderer.height - height - 128 );
             Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 			RegionEvent.addListener( RegionEvent.UNLOAD, onRegionUnload );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
@@ -174,7 +175,7 @@ package com.voxelengine.GUI.actionBars
 		
         protected function onResize(event:Event):void
         {
-			move( Globals.g_renderer.width / 2 - (width + fudgeFactor) / 2, Globals.g_renderer.height - height - 128 );
+			move( Renderer.renderer.width / 2 - (width + fudgeFactor) / 2, Renderer.renderer.height - height - 128 );
 		}
 	}
 }

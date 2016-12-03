@@ -3,6 +3,7 @@ package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.CursorShapeEvent;
 import com.voxelengine.GUI.VVCanvas;
+import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
@@ -39,9 +40,9 @@ public class ModelPlacementType extends VVCanvas
 	
 	public function resizeObject(event:Event):void 
 	{
-		var halfRW:int = Globals.g_renderer.width / 3;
+		var halfRW:int = Renderer.renderer.width / 3;
 
-		y = Globals.g_renderer.height - (height + 84);
+		y = Renderer.renderer.height - (height + 84);
 		x = halfRW - (width / 2);
 	}
 	

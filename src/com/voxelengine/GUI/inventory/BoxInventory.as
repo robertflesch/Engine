@@ -88,7 +88,7 @@ public class BoxInventory extends VVBox
 			if ( om.vmm ) {
 				if ( om.vmm.thumbnailLoaded ) {
 					backgroundTexture = drawScaled( om.vmm.thumbnail, width, height );
-//					var bmpd:BitmapData = Globals.g_renderer.modelShot();
+//					var bmpd:BitmapData = Renderer.renderer.modelShot();
 //					om.vmm.thumbnail = drawScaled( bmpd, width, height );
 				}
 				else

@@ -12,7 +12,9 @@ package com.voxelengine.server
 	import com.voxelengine.events.WindowSplashEvent;
 	import com.voxelengine.GUI.components.VVTextInput;
 	import com.voxelengine.GUI.VoxelVerseGUI;
-	//import com.voxelengine.GUI.WindowSplash;
+import com.voxelengine.renderer.Renderer;
+
+//import com.voxelengine.GUI.WindowSplash;
 	import flash.display.Bitmap;
 	import flash.events.KeyboardEvent;
 	import flash.events.Event;
@@ -163,7 +165,7 @@ package com.voxelengine.server
 			
 			addElement( buttonPanel );
 			
-			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
+			display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
 		}

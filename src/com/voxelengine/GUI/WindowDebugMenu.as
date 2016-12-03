@@ -128,7 +128,7 @@ public class WindowDebugMenu extends VVCanvas
 
 	protected function onResize(event:Event):void
 	{
-		//move( Globals.g_renderer.width - 160, 150 ); right side
+		//move( Renderer.renderer.width - 160, 150 ); right side
 		move( 20, 150 );
 	}
 

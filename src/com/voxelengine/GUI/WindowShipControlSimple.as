@@ -34,7 +34,7 @@ package com.voxelengine.GUI
 			//defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION;
 			pc.layout.orientation = LayoutOrientation.HORIZONTAL;
 
-			display( Globals.g_renderer.width/2 - (width + fudgeFactor)/2, Globals.g_renderer.height - height - 128 );
+			display( Renderer.renderer.width/2 - (width + fudgeFactor)/2, Renderer.renderer.height - height - 128 );
             Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 			
@@ -87,7 +87,7 @@ package com.voxelengine.GUI
 		
         protected function onResize(event:Event):void
         {
-			move( Globals.g_renderer.width / 2 - (width + fudgeFactor) / 2, Globals.g_renderer.height - height - 128 );
+			move( Renderer.renderer.width / 2 - (width + fudgeFactor) / 2, Renderer.renderer.height - height - 128 );
 		}
 	}
 }

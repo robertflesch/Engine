@@ -3,7 +3,8 @@ package com.voxelengine.GUI
 {
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
-	import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.renderer.Renderer;
+import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.events.Event;
 	import flash.utils.Timer;
@@ -61,7 +62,7 @@ package com.voxelengine.GUI
 			_vel.textFormat.color = 0xFFFFFF;
 			addElement( _vel );
 			
-			display( Globals.g_renderer.width / 2 - (_heading.trackLength + fudgeFactor) / 2, 0 );
+			display( Renderer.renderer.width / 2 - (_heading.trackLength + fudgeFactor) / 2, 0 );
 			
             Globals.g_app.stage.addEventListener(Event.RESIZE, onResizeHeading );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
@@ -105,7 +106,7 @@ package com.voxelengine.GUI
 		
         protected function onResizeHeading( event:Event ):void
         {
-			move( Globals.g_renderer.width / 2 - (_heading.trackLength + fudgeFactor) / 2, 0 );
+			move( Renderer.renderer.width / 2 - (_heading.trackLength + fudgeFactor) / 2, 0 );
 		}
 		
 	}

@@ -1012,9 +1012,7 @@ public class VoxelModel
 			Log.out( "VoxelModel.stateSet - Starting anim: " + $state ); 
 		
 		var result:Boolean = false;
-// HACK ONE
-var anim:Animation = modelInfo.animationGet( "Starting" );
-		//var anim:Animation = modelInfo.animationGet( $state );
+		var anim:Animation = modelInfo.animationGet( $state );
 		if ( anim ) {
 			//if (!anim.loaded)
 			//{
@@ -1025,6 +1023,7 @@ var anim:Animation = modelInfo.animationGet( "Starting" );
 				//return;
 			//}
 			//
+
 			for each (var at:AnimationTransform in anim.transforms)
 			{
 				//Log.out( "VoxelModel.stateSet - have AnimationTransform looking for child : " + at.attachmentName );
@@ -1041,8 +1040,7 @@ var anim:Animation = modelInfo.animationGet( "Starting" );
 		}
 //			else
 //				Log.out("VoxelModel.stateSet - addAnimationsInChildren returned false for: " + $state);
-// HACK TWO
-_stateLock = true;
+
 		// if any of the children load, then it succeeds, which is slightly problematic
 		function addAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $lockTime:Number):Boolean
 		{
@@ -1088,10 +1086,8 @@ _stateLock = true;
 			
 	
 		
-		if ($at.hasTransform)
-		{
-			for each (var mt:ModelTransform in $at.transforms)
-			{
+		if ($at.hasTransform) {
+			for each (var mt:ModelTransform in $at.transforms) {
 				if ($at.notNamed)
 					instanceInfo.addTransformMT(mt.clone($lockTime));
 				else
@@ -1100,28 +1096,20 @@ _stateLock = true;
 		}
 	}
 	
-	public function updateAnimations($state:String, $percentage:Number):void
-	{
-		// No anim set
-		if (null == _anim)
-		{
+	public function updateAnimations($state:String, $percentage:Number):void {
+
+		if (null == _anim) { // No anim set
+			//Log.out( "VoxelModel.updateAnimations - new anim from NO state : " + $state );
 			stateSet($state, $percentage);
-				//Log.out( "VoxelModel.updateAnimations - stateSet on anim: " + _anim.name ); 
 		}
-		// changing anim	
-		else if (_anim.name != $state)
-		{
+		else if (_anim.name != $state) { // changing anim
+			Log.out( "VoxelModel.updateAnimations - change to new anim: "  + $state + "  from old anim: " + _anim.name );
 			stateSet($state, $percentage);
-				//Log.out( "VoxelModel.updateAnimations - stateSet on NEW anim: " + _anim.name ); 
 		}
-		// updating existing anim
-		else if (_anim.name == $state)
-		{
+		else if (_anim.name == $state) { // updating existing anim
 			//Log.out( "VoxelModel.updateAnimations - updating transform on anim: " + _anim.name + " val: " + $percentage ); 
 			for each (var at:AnimationTransform in _anim.transforms)
-			{
 				updateAnimationsInChildren(modelInfo.childVoxelModels, at, $percentage);
-			}
 			_anim.update($percentage);
 		}
 		else

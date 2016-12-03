@@ -7,6 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.persistance 
 {
+import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
+
 import playerio.PlayerIOError;
 import playerio.DatabaseObject;
 
@@ -79,7 +81,8 @@ public class PersistBigDB
 		function loadSuccess( $dbo:DatabaseObject ):void {
 			if ( !$dbo ) {
 				// This seems to be the case where no record exists, not the error handler
-				Log.out( "PersistBigDB.load.loadSuccess - NULL DatabaseObject -  table: " + $pe.table + "  guid:" + $pe.guid + "  " + $pe.toString(), Log.DEBUG );
+				if ( !ModelMakerImport.isImporting )
+					Log.out( "PersistBigDB.load.loadSuccess - NULL DatabaseObject -  table: " + $pe.table + "  guid:" + $pe.guid + "  " + $pe.toString(), Log.DEBUG );
 				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_NOT_FOUND, $pe.series, $pe.table, $pe.guid ) );
 				return;
 			}

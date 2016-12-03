@@ -4,6 +4,7 @@ package com.voxelengine.GUI
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.RegionEvent;
+import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.RegionManager;
 import flash.geom.Vector3D;
 import flash.events.Event;
@@ -142,7 +143,7 @@ public class WindowRegionDetail extends VVPopup
 		// This auto centers
 		//_modalObj.display();
 		// this does not...
-		display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
+		display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 		//display();
 	}
 	

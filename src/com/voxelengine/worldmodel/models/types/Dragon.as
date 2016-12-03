@@ -116,52 +116,37 @@ public class Dragon extends Beast
 		camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT, 100) );
 		camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT, 250) );
 	}
-	
+
+	override public function stateSet($state:String, $lockTime:Number = 1):void {
+		super.stateSet( $state, $lockTime );
+		if ( anim ){
+			speedMultiplier = anim.speedMultiplier;
+			clipVelocityFactor = anim.clipVelocity;
+		}
+	}
+
 	override protected function setAnimation():void	{
 		
 		if ( _stateLock )
 			return;
 			
-		clipVelocityFactor = 0.995;
 		var climbFactor:Number = ( maxClimbAngle + instanceInfo.rotationGet.x) / maxClimbAngle;
 		
-		if ( onSolidGround )
-		{
+		if ( onSolidGround ) {
 			updateAnimations( "Walk", 0.5 );
 			instanceInfo.velocityReset();
 			stateLock( true, 500 );
-		}
-		else if ( stallSpeed > instanceInfo.velocityGet.z )
-		{
+		} else if ( stallSpeed > instanceInfo.velocityGet.z ) {
 			updateAnimations( "Land", 0.5 );
-			clipVelocityFactor = 0.95;
-		}
-		else if ( -5 > instanceInfo.rotationGet.x )
-		{
+		} else if ( -5 > instanceInfo.rotationGet.x ) {
 			updateAnimations( "Fly", 1 - climbFactor );
-			speedMultiplier = 0.35;
-		}
-		else if ( 15 < instanceInfo.rotationGet.x )
-		{
+		} else if ( 15 < instanceInfo.rotationGet.x ) {
 			stateSet( "Dive" );
-			clipVelocityFactor = 1;
-			speedMultiplier = 1;
-		}
-		// Be fun to make this have the avatar put their arms out to the side
-		else	
-		{
-			//Log.out( "Dragon.setAnimation - else ? forward: " + mForward );
-			clipVelocityFactor = 0.995;
+		} else { 		// Be fun to make this have the avatar put their arms out to the side
 			if ( mForward )
-			{
 				updateAnimations( "Fly", 0.5 );
-				speedMultiplier = 0.50;
-			}
 			else
-			{
 				stateSet( "Glide" );
-				speedMultiplier = 0.50;
-			}
 		}
 	}
 

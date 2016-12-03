@@ -39,6 +39,9 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 
 public class Renderer extends EventDispatcher 
 {
+	private static var _s_renderer:Renderer = new Renderer();
+	public static function get renderer():Renderer 	{ return _s_renderer };
+
 	private var timer:Timer;
 	private const resizeInterval:Number = 1500; //amount of time you believe is enough to say that continuous resizing is ended after last discrete Event.RESIZE
 	private var _width:int;

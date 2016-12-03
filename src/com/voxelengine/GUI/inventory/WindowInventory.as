@@ -1,5 +1,6 @@
 package com.voxelengine.GUI.inventory {
-	import com.voxelengine.worldmodel.inventory.ObjectVoxel;
+import com.voxelengine.renderer.Renderer;
+import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
 	import flash.events.Event;
@@ -52,7 +53,7 @@ package com.voxelengine.GUI.inventory {
 			display();
 			
 			
-			move( Globals.g_renderer.width / 2 - width / 2, Globals.g_renderer.height / 2 - height / 2 );
+			move( Renderer.renderer.width / 2 - width / 2, Renderer.renderer.height / 2 - height / 2 );
 		}
 		
 		private function upperTabsAdd():void {

@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.renderer.Renderer;
+
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.utils.Dictionary;
@@ -209,7 +211,9 @@ public class ModelCache
 	}
 		
 	public function update( $elapsedTimeMS:int ):void {
-		
+		//if ( 50 < $elapsedTimeMS )
+			//Log.out( "ModelCache.update - its been more then " + $elapsedTimeMS +  " since this animation was updated." );
+
 		ModelCacheUtils.worldSpaceStartAndEndPointCalculate();
 
 		//var taskTime:int = getTimer();
@@ -230,7 +234,7 @@ public class ModelCache
 		var vm:VoxelModel;
 		for ( var i:int = 0; i < _instancesDynamic.length; i++ ) {
 			vm = _instancesDynamic[i];
-			vm.update( Globals.g_renderer.context3D,  $elapsedTimeMS );
+			vm.update( Renderer.renderer.context3D,  $elapsedTimeMS );
 		}
 		
 		//dynModelTime = getTimer() - dynModelTime;
@@ -238,13 +242,13 @@ public class ModelCache
 		//var modelTime:int = getTimer();
 		for ( i = 0; i < _instances.length;  i++ ) {
 			vm = _instances[i];
-			vm.update( Globals.g_renderer.context3D,  $elapsedTimeMS );
+			vm.update( Renderer.renderer.context3D,  $elapsedTimeMS );
 		}
 		
 		//modelTime = getTimer() - modelTime;
 			
 		if ( EditCursor.isEditing )
-			EditCursor.currentInstance.update( Globals.g_renderer.context3D, $elapsedTimeMS);
+			EditCursor.currentInstance.update( Renderer.renderer.context3D, $elapsedTimeMS);
 
 	}
 	

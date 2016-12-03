@@ -2,7 +2,8 @@
 package com.voxelengine.GUI
 {
 	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.renderer.Renderer;
+import com.voxelengine.worldmodel.models.types.Player;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
 	import flash.events.KeyboardEvent;
@@ -71,7 +72,7 @@ public class WindowBeastControlQuery extends VVCanvas
 		}
 		
         protected function onResize( event:Event ):void {
-			move( Globals.g_renderer.width / 2 - width / 2, Globals.g_renderer.height - height - window_offset );
+			move( Renderer.renderer.width / 2 - width / 2, Renderer.renderer.height - height - window_offset );
 		}
 		
 		private function onRegionUnload ( le:RegionEvent ):void { 

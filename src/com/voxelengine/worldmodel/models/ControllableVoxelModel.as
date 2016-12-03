@@ -79,7 +79,8 @@ public class ControllableVoxelModel extends VoxelModel
 	public function set 	onSolidGround(val:Boolean):void 		{ _onSolidGround = val; }
 	public function get		accelRate():Number 						{ return _accelRate; }
 	static public function get		clipVelocityFactor():Number 			{ return _clipVelocityFactor.val; }
-	static public function set		clipVelocityFactor($val:Number):void 	{ _clipVelocityFactor.val = $val; }
+	static public function set		clipVelocityFactor($val:Number):void { _clipVelocityFactor.val = $val;
+	}
 	static public function get 	maxSpeed():Number 						{ return _maxSpeed.val; }
 	static public function set 	maxSpeed($value:Number):void 			{ _maxSpeed.val = $value; }
 	protected function get 	mMaxFallRate():Number 					{ return _maxFallRate.val; }

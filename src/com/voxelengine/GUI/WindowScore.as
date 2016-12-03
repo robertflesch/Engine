@@ -48,7 +48,7 @@ package com.voxelengine.GUI
 			
 			addElement( _text );
 			
-			display( Globals.g_renderer.width / 2 - 100 / 2, 0 );
+			display( Renderer.renderer.width / 2 - 100 / 2, 0 );
 			
 			
 			Globals.g_app.addEventListener( TargetEvent.DESTROYED, onTargetHit );

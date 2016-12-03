@@ -1,6 +1,8 @@
 
 package com.voxelengine.GUI
 {
+import com.voxelengine.renderer.Renderer;
+
 import flash.events.Event;
 
 import org.flashapi.swing.Popup;
@@ -27,7 +29,7 @@ public class VVPopup extends Popup
 
 	protected function onResize($event:Event):void
 	{
-		move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
+		move( Renderer.renderer.width / 2 - (width + 10) / 2, Renderer.renderer.height / 2 - (height + 10) / 2 );
 	}
 	
 	override public function remove():void {

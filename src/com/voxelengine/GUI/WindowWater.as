@@ -8,7 +8,9 @@
 package com.voxelengine.GUI
 {
 	import com.voxelengine.events.LoadingImageEvent;
-	import flash.display.Bitmap;
+import com.voxelengine.renderer.Renderer;
+
+import flash.display.Bitmap;
 	import flash.events.Event;
 	
 	import org.flashapi.swing.*;
@@ -62,13 +64,13 @@ package com.voxelengine.GUI
 
 		
 		public function WindowWater():void { 
-			super( Globals.g_renderer.width, Globals.g_renderer.height );
+			super( Renderer.renderer.width, Renderer.renderer.height );
 
 			_splashImage = (new _splashImageClass() as Bitmap);
 			_outline = new Image( _splashImage );
 			
-			_outline.scaleX = Globals.g_renderer.width/16;
-			_outline.scaleY = Globals.g_renderer.height /16;
+			_outline.scaleX = Renderer.renderer.width/16;
+			_outline.scaleY = Renderer.renderer.height /16;
 			
 			addElement( _outline );
 			
@@ -81,8 +83,8 @@ package com.voxelengine.GUI
 		} 
 		
         protected function onResize(event:Event):void {
-			_outline.scaleX = Globals.g_renderer.width/16;
-			_outline.scaleY = Globals.g_renderer.height/16;
+			_outline.scaleX = Renderer.renderer.width/16;
+			_outline.scaleY = Renderer.renderer.height/16;
 		}
 		
 		// Window events

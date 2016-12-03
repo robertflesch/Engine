@@ -223,9 +223,6 @@ public class ModelTransform
 	}
 	
 	public function update( elapsedTimeMS:int, owner:VoxelModel ):Boolean {
-		if ( 50 < elapsedTimeMS )
-			Log.out( "ModelTransform.update - elapsedTimeMS: " + elapsedTimeMS );
-			
 		if ( null == transformTarget ) {
 			Log.out( "ModelTransform.update - ERROR - No transfrom target OR assigned is false" );
 			return true;

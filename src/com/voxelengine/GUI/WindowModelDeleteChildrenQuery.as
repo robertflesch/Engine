@@ -12,6 +12,7 @@ import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.models.makers.ModelDestroyer;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.ModelInfo;
@@ -59,7 +60,7 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 		
 		addElement( new Spacer( width, 20 ) );
 		
-		display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
+		display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 		
 		// make sure everything is saved BEFORE we delete, otherwise the save can come AFTER the delete
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) );

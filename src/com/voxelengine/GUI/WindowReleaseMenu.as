@@ -1,7 +1,9 @@
 
 package com.voxelengine.GUI
 {
-	import flash.events.Event;
+import com.voxelengine.renderer.Renderer;
+
+import flash.events.Event;
 	import flash.geom.Vector3D;
 	import flash.utils.getTimer;
 	
@@ -80,7 +82,7 @@ package com.voxelengine.GUI
 		
         protected function onResize(event:Event):void
         {
-			move( Globals.g_renderer.width - 120, 0 );
+			move( Renderer.renderer.width - 120, 0 );
 		}
 		
 		private function fullScreenHandler(e:UIMouseEvent):void 
@@ -96,7 +98,7 @@ package com.voxelengine.GUI
 		
 		private function screenShotHandler(e:UIMouseEvent):void 
 		{
-			Globals.g_renderer.screenShot( true );
+			Renderer.renderer.screenShot( true );
 		}
 		
 		private function onEnterFrame( event:Event ):void

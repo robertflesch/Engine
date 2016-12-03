@@ -46,7 +46,7 @@ public class Lighting  {
 	public static const AMBIENT_ADD:Boolean = true;
 	public static const AMBIENT_REMOVE:Boolean = false;
 
-	public static const MAX_LIGHT_LEVEL:uint = 0xff;
+	public static const MAX_LIGHT_LEVEL:uint = 0x01; //0xff;
 	public static const DEFAULT_LIGHT_ID:uint = 1;
 	public static const DEFAULT_ATTN:uint = 0x10;
 

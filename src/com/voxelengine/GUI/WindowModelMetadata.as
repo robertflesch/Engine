@@ -10,6 +10,7 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.PermissionsBase;
@@ -192,7 +193,7 @@ Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );
 		//addElement( cancelButton );
 
 		// This auto centers
-		display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
+		display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 	}
 	
 	private function save( e:UIMouseEvent ):void { 

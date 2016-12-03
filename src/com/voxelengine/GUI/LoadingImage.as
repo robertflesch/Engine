@@ -8,7 +8,9 @@
 package com.voxelengine.GUI
 {
 	import com.voxelengine.events.AppEvent;
-	import flash.display.Bitmap;
+import com.voxelengine.renderer.Renderer;
+
+import flash.display.Bitmap;
 	import flash.display.DisplayObject;
 	import flash.events.Event;
 	import flash.geom.Point;
@@ -68,7 +70,7 @@ package com.voxelengine.GUI
 		
 		public function LoadingImage():void { 
 			//Log.out( "LoadingImage.constructor", Log.WARN );
-			super( Globals.g_renderer.width, Globals.g_renderer.height );
+			super( Renderer.renderer.width, Renderer.renderer.height );
 			_s_currentInstance = this;
 
 			_splashImage = (new _splashImageClass() as Bitmap);
@@ -85,8 +87,8 @@ package com.voxelengine.GUI
 		
         private function onResize(event:Event):void {
 			// still kinda funky in placement.... but works.
-			_outline.x = Globals.g_renderer.width / 2 - _outline.x / 2
-			_outline.y = Globals.g_renderer.height / 2 - _outline.y / 2
+			_outline.x = Renderer.renderer.width / 2 - _outline.x / 2
+			_outline.y = Renderer.renderer.height / 2 - _outline.y / 2
 		}
 		
 		// Window events

@@ -7,7 +7,9 @@
 ==============================================================================*/
 package com.voxelengine.server
 {
-	import flash.display.Bitmap;
+import com.voxelengine.renderer.Renderer;
+
+import flash.display.Bitmap;
 	import flash.display.Loader;
 	import flash.display.LoaderInfo;
 	import flash.events.Event;
@@ -156,7 +158,7 @@ package com.voxelengine.server
 			Log.out( "WindowRegister - BYPASSING CAPTCHA until fixed by PlayerIO", Log.WARN );
 			bypassCaptcha();
 			
-			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
+			display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 		}
 		
 		private function cancel( e:WindowEvent ):void {

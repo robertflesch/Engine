@@ -2,7 +2,8 @@
 package com.voxelengine.GUI.voxelModels
 {
 	import com.voxelengine.events.ModelInfoEvent;
-	import com.voxelengine.worldmodel.Light;
+import com.voxelengine.renderer.Renderer;
+import com.voxelengine.worldmodel.Light;
 	import com.voxelengine.worldmodel.oxel.LightInfo;
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
@@ -159,7 +160,7 @@ package com.voxelengine.GUI.voxelModels
 		static private const PHOTO_WIDTH:int = 128
 		static private const PHOTO_CAPTURE_WIDTH:int = 128
 		private function newPhoto( $me:UIMouseEvent ):void {
-			var bmpd:BitmapData = Globals.g_renderer.modelShot();
+			var bmpd:BitmapData = Renderer.renderer.modelShot();
 			_vm.metadata.thumbnail = drawScaled( bmpd, PHOTO_CAPTURE_WIDTH, PHOTO_CAPTURE_WIDTH );
 			addPhoto();
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CHANGED, 0, _vm.metadata.guid, _vm.metadata ) );

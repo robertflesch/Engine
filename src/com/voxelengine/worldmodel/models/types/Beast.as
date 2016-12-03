@@ -36,6 +36,7 @@ public class Beast extends ControllableVoxelModel
 	static protected var _seatLocation:Vector3D 		= new Vector3D( 8, 12, 13 );
 
 	static public function get 	speedMultiplier():Number 				{ return _speedMultiplier.val; }
+	// TODO What is the valid range for this?
 	static public function set 	speedMultiplier($value:Number):void		{ _speedMultiplier.val = $value; }
 
 	static public function get climbRate():Number  					{ return _climbRate.val; }
@@ -287,7 +288,6 @@ public class Beast extends ControllableVoxelModel
 			var effectiveTurnRate:Number = maxTurnRate * ( scaleFactor )
 //				Log.out( "Move Speed would be set to: " + mMoveSpeed * scaleFactor + "  instead setting to 0", Log.WARN );
 			//instanceInfo.moveSpeed = mMoveSpeed * scaleFactor;
-			instanceInfo.moveSpeed = 10;
 			var dx:Number
 			dx = MouseKeyboardHandler.getMouseYChange()/effectiveTurnRate;
 			dx *= $elapsedTimeMS;

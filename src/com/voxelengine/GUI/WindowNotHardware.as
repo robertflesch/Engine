@@ -3,7 +3,9 @@ package com.voxelengine.GUI
 {
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
-	import flash.events.Event;
+import com.voxelengine.renderer.Renderer;
+
+import flash.events.Event;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
 	
@@ -32,7 +34,7 @@ package com.voxelengine.GUI
 			
             addElement(_textArea);
 			
-			display( Globals.g_renderer.width / 2 - (((width + 10) / 2) + x ), Globals.g_renderer.height / 2 - (((height + 10) / 2) + y) );
+			display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 
 			Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 			addEventListener(UIOEvent.REMOVED, onRemoved );

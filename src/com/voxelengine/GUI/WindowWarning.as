@@ -27,7 +27,7 @@ package com.voxelengine.GUI
 			autoSize = false;
 			shadow = true;
 			
-			display( Globals.g_renderer.width / 2 - 300, 60 );
+			display( Renderer.renderer.width / 2 - 300, 60 );
 			
             Globals.g_app.stage.addEventListener(Event.RESIZE, onResizeHeading );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
@@ -35,7 +35,7 @@ package com.voxelengine.GUI
 		
         protected function onResizeHeading( event:Event ):void
         {
-			move( Globals.g_renderer.width / 2 - 300, 60 );
+			move( Renderer.renderer.width / 2 - 300, 60 );
 		}
 
 		// Window events

@@ -5,7 +5,8 @@ package com.voxelengine.GUI
 	import com.voxelengine.GUI.actionBars.WindowGunControl;
 	import com.voxelengine.GUI.actionBars.WindowShipControl;
 	import com.voxelengine.Log;
-	import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.renderer.Renderer;
+import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.types.Ship;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.events.Event;
@@ -50,7 +51,7 @@ public class WindowShipControlQuery extends VVCanvas
             autoSize = true;
 			shadow = true;
 			
-			display( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
+			display( Renderer.renderer.width / 2 - (width + 10) / 2, Renderer.renderer.height / 2 - (height + 10) / 2 );
 			
             Globals.g_app.stage.addEventListener(Event.RESIZE, onResizeHeading );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
@@ -58,7 +59,7 @@ public class WindowShipControlQuery extends VVCanvas
 		
         protected function onResizeHeading( event:Event ):void
         {
-			move( Globals.g_renderer.width / 2 - (width + 10) / 2, Globals.g_renderer.height / 2 - (height + 10) / 2 );
+			move( Renderer.renderer.width / 2 - (width + 10) / 2, Renderer.renderer.height / 2 - (height + 10) / 2 );
 		}
 
 		// Window events
