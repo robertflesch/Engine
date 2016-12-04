@@ -45,7 +45,7 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 					{
 						var ti:TypeInfo = TypeInfo.typeInfo[lo.type];
 						var newLi:LightInfo = LightInfoPool.poolGet();
-						newLi.setInfo( $le.lightID, ti.lightInfo.color, Lighting.MAX_LIGHT_LEVEL, ti.lightInfo.attn, true );
+						newLi.setInfo( $le.lightID, ti.lightInfo.color, ti.lightInfo.attn, Lighting.MAX_LIGHT_LEVEL, true );
 						if ( !lo.lighting.add( newLi ) ) {
 							LightInfoPool.poolReturn( newLi );
 							throw new Error("LightAdd.handleLightEvent - How did we get here?");

@@ -10,6 +10,7 @@
 package com.voxelengine.pools {
 import com.voxelengine.Log;
 import com.voxelengine.worldmodel.oxel.LightInfo;
+import com.voxelengine.worldmodel.oxel.Lighting;
 
 import flash.utils.getTimer;
 
@@ -65,6 +66,9 @@ public static function poolReturn( $disposedBrightness:LightInfo ):void
         Log.out( "LightInfoPool.poolReturn - displosedLightInfo is NULL" );
         return;
     }
+    //                  setInfo( $ID:uint , $color:uint , $baseAttn:uint , $baseLightLevel:uint , $lightIs:Boolean = false ):void {
+    $disposedBrightness.setInfo( 0, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, Lighting.DEFAULT_ILLUMINATION, false )
+
     _pool[_counter++] = $disposedBrightness;
     }
 }

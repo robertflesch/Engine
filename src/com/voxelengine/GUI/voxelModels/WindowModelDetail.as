@@ -192,6 +192,7 @@ import com.voxelengine.worldmodel.Light;
 				if ( LightInfo.MAX < int( _vm.modelInfo.baseLightLevel ) )
 					_vm.modelInfo.baseLightLevel = LightInfo.MAX;
 				oxel.lightsStaticSetDefault( _vm.modelInfo.baseLightLevel );
+				_vm.modelInfo.data.changed = true;
 				_vm.modelInfo.save();
 			}
 		}

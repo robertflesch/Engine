@@ -161,6 +161,9 @@ public class ModelInfo extends PersistanceObject
 			const priority:int = 1;
 			_data = $ode.oxelData;
 			_data.parent = this;
+			// Set OxelPersistance to the baseLightLevel for this object.
+			Log.out( "ModelInfo.retrievedData - set baseLightLevel: " + baseLightLevel);
+			_data.baseLightLevel = baseLightLevel;
 
 			_data.load( guid, priority, this, dynamicObj, _altGuid );
 			/*

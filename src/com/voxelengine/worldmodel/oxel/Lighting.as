@@ -46,12 +46,15 @@ public class Lighting  {
 	public static const AMBIENT_ADD:Boolean = true;
 	public static const AMBIENT_REMOVE:Boolean = false;
 
-	public static const MAX_LIGHT_LEVEL:uint = 0x01; //0xff;
+	public static const MAX_LIGHT_LEVEL:uint = 0xff;
 	public static const DEFAULT_LIGHT_ID:uint = 1;
 	public static const DEFAULT_ATTN:uint = 0x10;
+	public static const DEFAULT_ILLUMINATION:uint = 0x33;
 
-	//public static const DEFAULT_BASE_LIGHT_LEVEL:uint = 0x00; // out of 255
+	// How much light falls off per meter for this material
 	private static var _defaultBaseLightAttn:uint = 0x33; // out of 255
+	// The default illumination level for this object.
+	private static var _defaultBaseLightIllumination:uint = 0x33; // out of 255
 
 	private static const CORNER_RESET_VAL:uint = 0;
 	private static const CORNER_BUMP_VAL:uint = 1;
@@ -61,13 +64,15 @@ public class Lighting  {
 	static public function set eaoEnabled(value:Boolean):void  { _s_eaoEnabled = value; }
 	static public function get defaultBaseLightAttn():uint { return _defaultBaseLightAttn; }
 	static public function set defaultBaseLightAttn(value:uint):void  { _defaultBaseLightAttn = value; }
-	
-	
-	public static function defaultLightLevelSetter():uint { 
-		var temp:uint = _defaultBaseLightAttn;
-		temp = temp | (_defaultBaseLightAttn << 8);
-		temp = temp | (_defaultBaseLightAttn << 16);
-		temp = temp | (_defaultBaseLightAttn << 24);
+
+	static public function get defaultBaseLightIllumination():uint { return _defaultBaseLightIllumination; }
+	static public function set defaultBaseLightIllumination(value:uint):void  { _defaultBaseLightIllumination = value; }
+
+	public static function defaultLightIlluminationSetter():uint {
+		var temp:uint = _defaultBaseLightIllumination;
+		temp = temp | (_defaultBaseLightIllumination << 8);
+		temp = temp | (_defaultBaseLightIllumination << 16);
+		temp = temp | (_defaultBaseLightIllumination << 24);
 		return temp;
 	}
 	
@@ -342,7 +347,6 @@ public class Lighting  {
 			// Now read each light
 			for ( i = 0; i < lightCount; i++ ) {
 				_lights[i] = LightInfoPool.poolGet();
-				_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), $attnPerMeter, false )
 				_lights[i].fromByteArray( $ba );
 			}
 		}
@@ -353,7 +357,6 @@ public class Lighting  {
 			// Now read each light
 			for ( i = 0; i < lightCount; i++ ) {
 				_lights[i] = LightInfoPool.poolGet();
-				_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), $attnPerMeter, false )
 				_lights[i].fromByteArray( $ba );
 			}
 		}
@@ -370,9 +373,16 @@ public class Lighting  {
 
 			// Now read each light
 			for ( i = 0; i < lightCount; i++ ) {
-				_lights[i] = LightInfoPool.poolGet();
-				_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), $attnPerMeter, false )
-				_lights[i].fromByteArray( $ba );
+				var obj:Object = {};
+				LightInfo.fromByteArrayEvaluator( $ba, obj );
+				// The chunk lights should not be written to byte array, or read...
+				if ( 1 != obj.ID) {
+					_lights[i] = LightInfoPool.poolGet();
+					_lights[i].fromObject( obj );
+				}
+//				_lights[i] = LightInfoPool.poolGet();
+//				_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), $attnPerMeter, false )
+//				_lights[i].fromByteArray( $ba );
 			}
 		}
 		else
@@ -426,7 +436,6 @@ public class Lighting  {
 				// Now read each light
 				for (var i:int = 0; i < lightsFromBA; i++) {
 					_lights[i] = LightInfoPool.poolGet();
-					_lights[i].setInfo(0, 0, defaultLightLevelSetter(), $attnPerMeter, false);
 					_lights[i].fromByteArray($ba);
 				}
 			}
@@ -456,7 +465,6 @@ public class Lighting  {
 			if ( null != sli ) { 
 				if ( _lights.length <= i || (null == _lights[i]) ) {
 					_lights[i] = LightInfoPool.poolGet();
-					_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), 0, false )
 				}
 				_lights[i].copyFrom( sli );
 			}
@@ -480,7 +488,7 @@ public class Lighting  {
 		if ( Lighting.MAX_LIGHT_LEVEL < $attn )
 			throw new Error( "Brightness.setAll - attn too high" );
 
-		li.setAll( $attn );
+		li.attn = $attn;
 	}
 	
 	public function valuesHas():Boolean	{
@@ -597,7 +605,7 @@ public class Lighting  {
 		var csqrattn:Number = Math.sqrt( (localattn * localattn) + (sqrattn * sqrattn) );
 
 		var newLi:LightInfo = LightInfoPool.poolGet();
-		newLi.setInfo( $ID, sli.color, sli.avg, sli.attn );
+		newLi.setInfo( $ID, sli.color, sli.attn, sli.avg );
 		if ( !add( newLi ) ) {
 			LightInfoPool.poolReturn(newLi);
 			return; // failed to add the light, This is a valid condition, if the light added is lower then the existing lights, it will not be added
@@ -741,7 +749,7 @@ public class Lighting  {
 		var li:LightInfo =  lightGet( $ID );
 
 		var newLi:LightInfo = LightInfoPool.poolGet();
-		newLi.setInfo( $ID, li.color, li.avg, li.attn );
+		newLi.setInfo( $ID, li.color, li.attn, li.avg );
 		if ( !$b.add( newLi ) ) {
 			//Log.out( "Brightness.childGet - $b does not have light info for lightID: " + $ID, Log.WARN )
 			return false;
@@ -920,7 +928,7 @@ public class Lighting  {
 			return false;
 			
 		var newLi:LightInfo = LightInfoPool.poolGet();
-		newLi.setInfo( $ID, $color, defaultLightLevelSetter(), $attnPerMeter, $lightIs );
+		newLi.setInfo( $ID, $color, $attnPerMeter, Lighting.defaultBaseLightIllumination, $lightIs );
 
 			// check for available slot first, if none found, add new light to end.
 		for ( var i:int; i < _lights.length; i++ ) {
@@ -1231,7 +1239,7 @@ public class Lighting  {
 			return false; // if there is no value for the light, it is not added
 		var sli:LightInfo = $b.lightGet( $ID );
 		var newLi:LightInfo = LightInfoPool.poolGet();
-		newLi.setInfo( sli.ID, sli.color, sli.avg, sli.attn );
+		newLi.setInfo( sli.ID, sli.color, sli.attn, sli.avg );
 		if ( !add( newLi ) ) {
 			LightInfoPool.poolReturn( newLi );
 			return false;

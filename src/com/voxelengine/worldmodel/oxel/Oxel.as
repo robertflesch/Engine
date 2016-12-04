@@ -1445,19 +1445,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	private function quadLighting( $face:int, $ti:TypeInfo ):void {
 		
 		if ( !_lighting ) {
-			_lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
-			if ( _lighting.lightHas( Lighting.DEFAULT_LIGHT_ID ) ) {
-				var li:LightInfo = _lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-				// break down for debugging
-				//var rootAttn:uint = root_get()._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg
-				var rootAttn:uint = Lighting.defaultBaseLightAttn;
-				var root:Oxel = root_get();
-				if ( root && root._lighting )
-					rootAttn = root._lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).avg;
-				else
-					Log.out( "Oxel.quadLighting - root or root lighting not found", Log.WARN );
-				li.setAll( rootAttn );
-			}
+			_lighting = LightingPool.poolGet( _chunk.lightInfo.avg );
+            _lighting.add( _chunk.lightInfo );
 			_lighting.materialFallOffFactor = $ti.lightInfo.fallOffFactor;
 			_lighting.color = $ti.color;
 		}
@@ -1899,10 +1888,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 //				if ( li )
 //					li.setAll( avgLight );
 			}
-			else {
-				var baseLightLevel:uint = Lighting.defaultBaseLightAttn; //lighting.avg;
-				lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).setAll( baseLightLevel );
-			}
+//			else {
+//				var baseLightLevel:uint = Lighting.defaultBaseLightAttn; //lighting.avg;
+//				lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).setAll( baseLightLevel );
+//			}
 			lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
 		}
 		

@@ -29,7 +29,7 @@ public class LightInfo
 	public function get lightIs():Boolean { return _lightIs; }
 
 	public var processed:Boolean;	// has this color has been used to project on its neighbors
-	public var ID:uint				// The ID of the light
+	public var ID:uint;				// The ID of the light
 	public var color:uint;			// the RGBA color info
 	private var bLower:uint; 		// The 0xff values for the lower corners are stored in this uint
 	private var bHigher:uint; 		// The 0xff values for the upper corners are stored in this uint
@@ -39,16 +39,21 @@ public class LightInfo
 	public function LightInfo() {
 	}
 
-	public function setInfo( $ID:uint, $color:uint, $baseAttn:uint, $baseLightLevel:uint, $lightIs:Boolean = false ):void {
+	public function setInfo( $ID:uint
+			               , $color:uint
+			               , $baseAttn:uint
+			               , $baseLightIllumination:uint
+			               , $lightIs:Boolean = false ):void {
 //		if ( Lighting.DEFAULT_LIGHT_ID == $ID )
 //				Log.out( "LightInfo.default");
 		ID = $ID;
 		color = $color;
 		_lightIs = $lightIs;
-		setAll( $baseLightLevel );
+		attn = $baseAttn;
 		if ( true == $lightIs )
 			setAll( 255 );
-		attn = $baseAttn;
+		else
+			setAll( $baseLightIllumination );
 	}
 
 	public function toByteArray( $ba:ByteArray ):ByteArray {
@@ -83,6 +88,24 @@ public class LightInfo
 		}
 		return $ba;
 	}
+
+	public function fromObject( $obj:Object ):void {
+		_lightIs 	= $obj._lightIs;
+		ID 			= $obj.ID;
+		color 		= $obj.color;
+		bLower		= $obj.bLower;
+		bHigher 	= $obj.bHigher;
+	}
+
+	static public function fromByteArrayEvaluator( $ba:ByteArray, $obj:Object ):ByteArray {
+		$obj.lightIs 	= $ba.readBoolean();
+		$obj.ID 		= $ba.readUnsignedInt();
+		$obj.color 		= $ba.readUnsignedInt();
+		$obj.bLower		= $ba.readUnsignedInt();
+		$obj.bHigher 	= $ba.readUnsignedInt();
+		return $ba;
+	}
+
 
 	private function toHex( val:uint ):String {
 		var str:String = "";

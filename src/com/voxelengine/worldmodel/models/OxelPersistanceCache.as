@@ -131,7 +131,7 @@ public class OxelPersistanceCache
 			return;
 		if ( $pe.dbo || $pe.data ) {
 			//Log.out( "OxelDataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
-			var od:OxelPersistance = new OxelPersistance( $pe.guid, Lighting.DEFAULT_ATTN );
+			var od:OxelPersistance = new OxelPersistance( $pe.guid, Lighting.defaultBaseLightIllumination );
 			if ( !$pe.dbo ) {
 				var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_OXEL_DATA, "0", "0", 0, true, null );
 				dbo.data = new Object();

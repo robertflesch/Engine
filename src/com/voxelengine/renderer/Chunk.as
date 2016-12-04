@@ -96,7 +96,7 @@ public class Chunk {
 		var chunk:Chunk = new Chunk( $parent );
 		// when I create the chunk I add a light level to it.
 
-		//Log.out( "chunk.parse - new chunk: " + $oxel.childCount, Log.WARN );
+		Log.out( "chunk.parse - new chunk: " + $oxel.childCount + "  $lightInfo: " + $lightInfo, Log.WARN );
 		chunk._lightInfo = $lightInfo;
 			
 		if ( MAX_CHILDREN < $oxel.childCount ) {

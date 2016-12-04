@@ -79,13 +79,12 @@ public class OxelPersistance extends PersistanceObject
 	public 	function get loaded():Boolean 						{ return _loaded; }
 	public 	function set loaded( $val:Boolean):void 			{ _loaded = $val; }
 	
-	public function OxelPersistance( $guid:String, $baseLightLevel:int ) {
-		//Log.out( "OxelPersistance: " + $guid, Log.WARN );
+	public function OxelPersistance( $guid:String, $baseLightIllumination:int ) {
+		Log.out( "OxelPersistance: " + $guid + " baseLightIllumination: " + $baseLightIllumination, Log.WARN );
 		super( $guid, Globals.BIGDB_TABLE_OXEL_DATA );
 		_loaded = false;
 		// This should all come from model, so I could give the whole model a tint if I liked.
 		_lightInfo = LightInfoPool.poolGet();
-		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID,  Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, $baseLightLevel )
 	}
 	
 	override public function release():void {
@@ -206,6 +205,8 @@ public class OxelPersistance extends PersistanceObject
 		//Log.out( "OxelPersistance.lodFromByteArray - guid: " + guid, Log.INFO );
 		var time:int = getTimer();
 
+		if ( guid == "380CE3BD-8840-ED86-F00A-1F2D74B8BD2B")
+				Log.out( "WATCH LIGHTING HERE");
 		var newOxel:Oxel  = Oxel.initializeRoot( 31 ); // Lighting should be model or instance default lighting
 		_oxels[_lod] = newOxel;
 
