@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.CursorSizeEvent;
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.InventoryInterfaceEvent;
 import com.voxelengine.GUI.actionBars.UserInventory;
@@ -98,7 +99,15 @@ public class ControllableVoxelModel extends VoxelModel
 		super.init( $mi, $vmm );
 		Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent, false, 0, true );
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
+		CursorSizeEvent.addListener( CursorSizeEvent.SET, adjustSpeedMultiplier );
 		_ct = new CollisionTest( this );
+	}
+
+	protected function adjustSpeedMultiplier( e:CursorSizeEvent ): void {
+		if ( this == VoxelModel.controlledModel ) {
+			Log.out("ControllableVoxelModel.adjustSpeedMultiplier - ONE");
+			VoxelModel.controlledModel.instanceInfo.setSpeedMultipler(1);
+		}
 	}
 	
 	override protected function processClassJson():void {

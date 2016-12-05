@@ -73,7 +73,9 @@ public class EditCursor extends VoxelModel
 	
 	static private var 			_editing:Boolean;
 	static private function  get editing():Boolean 					{ return _editing; }
-	static private function  set editing(val:Boolean):void 			{ _editing = val; }
+	static private function  set editing(val:Boolean):void 			{
+		Log.out( "EditCursor.editing: " + val );
+		_editing = val; }
 	static public function   get isEditing():Boolean 				{ return _editing; }
 	
 	static public function get currentInstance():EditCursor {

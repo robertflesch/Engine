@@ -7,6 +7,9 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.events.CursorOperationEvent;
+import com.voxelengine.events.CursorSizeEvent;
+
 import flash.display3D.Context3D;
 import flash.events.KeyboardEvent;
 import flash.geom.Matrix3D;
@@ -74,8 +77,9 @@ public class Player extends Avatar
 		}
 		Player.player = this;
 		inventoryBitmap = "userInventory.png";
+		CursorOperationEvent.addListener( CursorOperationEvent.NONE, changeCursorOperationEvent );
 	}
-	
+
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		Log.out( "Player.init instanceGuid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super.init( $mi, $vmm );
@@ -89,6 +93,24 @@ public class Player extends Avatar
 		collisionPointsAdd();
 		if ( _displayCollisionMarkers )
 			_ct.markersAdd();
+	}
+
+	// This allows the player to move more slowly when adjusting small grains
+	override protected function adjustSpeedMultiplier( e:CursorSizeEvent ): void {
+		if ( this == VoxelModel.controlledModel && EditCursor.isEditing ) {
+			//Log.out( "Player.adjustSpeedMultiplier - size: " + e.size );
+			VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( Math.max( e.size, 0.5 ) );
+		} else {
+			//Log.out( "Player.adjustSpeedMultiplier - is controlledModel? : " + (this == VoxelModel.controlledModel) + " isEditing: " + EditCursor.isEditing );
+			VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( 1 );
+		}
+	}
+
+	// When the player stops editing, set movement speed to 1
+	private function changeCursorOperationEvent( e:CursorOperationEvent ):void	{
+		if ( this == VoxelModel.controlledModel ) {
+			VoxelModel.controlledModel.instanceInfo.setSpeedMultipler(1);
+		}
 	}
 
 	static public function buildExportObject( obj:Object ):Object {

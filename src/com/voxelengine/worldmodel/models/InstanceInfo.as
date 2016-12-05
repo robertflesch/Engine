@@ -29,8 +29,8 @@ import com.voxelengine.pools.GrainCursorPool;
  */
 public class InstanceInfo extends Location	{
 	
-	static private const MAX_ROT_RATE:Number 					= 2.0
-	static private var _s_speedMultipler:Number					= 4
+	static private const MAX_ROT_RATE:Number 					= 2.0;
+	static private var _s_speedMultipler:Number					= 4;
 				
 	private var _usesCollision:Boolean 							= false;                        // toJSON
 	private var _collidable:Boolean 							= true;							// toJSON
@@ -44,7 +44,7 @@ public class InstanceInfo extends Location	{
 	private var _type:int 										= -1;                           // toJSON - This type overrides a native task type.
 				
 	private var _dynamicObject:Boolean 							= false;						// INSTANCE NOT EXPORTED
-	private var _scripts:Vector.<Script> 						= new Vector.<Script>			// INSTANCE NOT EXPORTED
+	private var _scripts:Vector.<Script> 						= new Vector.<Script>;		// INSTANCE NOT EXPORTED
 	private var _controllingModel:VoxelModel 					= null;    						// INSTANCE NOT EXPORTED
 	private var _owner:VoxelModel 								= null;               			// INSTANCE NOT EXPORTED
 	private var _info:Object 									= null;                         // INSTANCE NOT EXPORTED
@@ -69,8 +69,10 @@ public class InstanceInfo extends Location	{
 	//public function set grainSize(val:int):void					{ _grainSize = val; }
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	public function speed( time:Number ):Number 				{ return _moveSpeed.val * _s_speedMultipler * time; }
-	
+	public function speed( $time:Number ):Number 				{
+		//Log.out( "InstanceInfo.speed - _moveSpeed.val: " + _moveSpeed.val + " _s_speedMultipler: " + _s_speedMultipler + " timeElapsed: " + $time );
+		return _moveSpeed.val * _s_speedMultipler * $time; }
+
 	public function get moveSpeed():Number  					{ return _moveSpeed.val; }
 	public function set moveSpeed(value:Number):void  			{ _moveSpeed.val = value; }
 	public function get dynamicObject():Boolean 				{ return _dynamicObject; }

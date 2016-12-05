@@ -175,19 +175,9 @@ public class GrainSelector extends QuickInventory
 	}		
 	
 	public function processGrainSelection( $box:UIObject ):void {
-		
 		var ti:ObjectGrain = $box.data as ObjectGrain;
 		_currentSize = int ( ti.name.toLowerCase() );
-		
-		CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, _currentSize ) ); 
-		
-		if ( null != VoxelModel.controlledModel ) {
-			// don't want movement speed to be 0, so set it to 0.5
-			if ( 0 == _currentSize )
-				VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( 0.5 ); 
-			else
-				VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( _currentSize * 1.5 ); 
-		}
+		CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, _currentSize ) );
 		Log.out( "GrainSelector.processGrainSelection exit" );
 	}
 }

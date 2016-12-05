@@ -91,7 +91,8 @@ public class Beast extends ControllableVoxelModel
 		}
 		if ( beastInfo.moveSpeed) {
 			speedMultiplier = beastInfo.moveSpeed
-			instanceInfo.moveSpeed = instanceInfo.moveSpeed * speedMultiplier;
+			//instanceInfo.moveSpeed = instanceInfo.moveSpeed * speedMultiplier;
+			instanceInfo.moveSpeed = speedMultiplier;
 		} else
 
 		if ( beastInfo.maxTurnRate )
