@@ -189,9 +189,7 @@ import com.voxelengine.worldmodel.Light;
 		private function changeBaseLightLevel( $e:UIMouseEvent ):void  {
 			if ( _vm.modelInfo.data && _vm.modelInfo.data.oxel ) {
 				var oxel:Oxel = _vm.modelInfo.data.oxel;
-				if ( LightInfo.MAX < int( _vm.modelInfo.baseLightLevel ) )
-					_vm.modelInfo.baseLightLevel = LightInfo.MAX;
-				oxel.lightsStaticSetDefault( _vm.modelInfo.baseLightLevel );
+				_vm.applyBaseLightLevel();
 				_vm.modelInfo.data.changed = true;
 				_vm.modelInfo.save();
 			}

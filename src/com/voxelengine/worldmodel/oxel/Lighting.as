@@ -48,6 +48,7 @@ public class Lighting  {
 
 	public static const MAX_LIGHT_LEVEL:uint = 0xff;
 	public static const DEFAULT_LIGHT_ID:uint = 1;
+	public static const DEFAULT_BRIGHT_LIGHT_ID:uint = 2;
 	public static const DEFAULT_ATTN:uint = 0x10;
 	public static const DEFAULT_ILLUMINATION:uint = 0x33;
 
@@ -281,6 +282,12 @@ public class Lighting  {
 	public function Lighting():void {
 		
 		//add( DEFAULT_LIGHT_ID, DEFAULT_COLOR, Lighting.DEFAULT_ATTN, _defaultBaseLightAttn );
+	}
+
+	public function addFullBright():void {
+		var li:LightInfo = LightInfoPool.poolGet();
+		li.setInfo( Lighting.DEFAULT_BRIGHT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, Lighting.MAX_LIGHT_LEVEL );
+		add( li );
 	}
 
 	public function ambientOcculsionHas():Boolean {
@@ -986,7 +993,10 @@ public class Lighting  {
 		
 		var li:LightInfo = lightGet( Lighting.DEFAULT_LIGHT_ID );
 		if ( li )
-			li.setAll( 255 );
+				if ( Lighting.DEFAULT_LIGHT_ID == li.ID )
+					Log.out( "Brightness.lightFullBright - CAN'T SET DEFAULT LIGHT TO FULL BRIGHT", Log.WARN );
+				else
+					li.setIlluminationLevel( Lighting.MAX_LIGHT_LEVEL );
 		else
 			Log.out( "Brightness.lightFullBright - MISSING DEFAULT LIGHTS", Log.WARN );
 	}
@@ -999,7 +1009,7 @@ public class Lighting  {
 		{
 			var li:LightInfo = _lights[i];
 			if ( null != li ) {
-				_compositeColor = ColorUtils.testCombineARGB( _compositeColor, li.color, li.attnLevelGet( $corner ) );
+				_compositeColor = ColorUtils.testCombineARGB( _compositeColor, li.color, li.illuminationLevelGet( $corner ) );
 			}
 		}
 		

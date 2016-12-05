@@ -1451,9 +1451,11 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			_lighting.color = $ti.color;
 		}
 		
-		if ( true == $ti.lightInfo.fullBright && false == $ti.lightInfo.lightSource )
-			_lighting.lightFullBright();
-		
+		if ( true == $ti.lightInfo.fullBright && false == $ti.lightInfo.lightSource ) {
+            if ( 1 == _lighting.lightCount() )
+                _lighting.addFullBright();
+        }
+
 		_lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
 	}
 
@@ -1499,12 +1501,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 		else
 		{
-			if ( gc.eval( 5, 101, 72, 16 ))
-				Log.out( "Oxel.lightsStaticSetDefault - not being lit" );
-
 			if ( _lighting && _lighting.lightHas( Lighting.DEFAULT_LIGHT_ID ) ) {
 				var li:LightInfo = _lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-				li.setAll( $attn );
+				li.setIlluminationLevel( $attn );
 				quadsRebuildAll();
 			}
 		}

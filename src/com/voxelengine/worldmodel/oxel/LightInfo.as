@@ -51,9 +51,9 @@ public class LightInfo
 		_lightIs = $lightIs;
 		attn = $baseAttn;
 		if ( true == $lightIs )
-			setAll( 255 );
+			setIlluminationLevel( Lighting.MAX_LIGHT_LEVEL );
 		else
-			setAll( $baseLightIllumination );
+			setIlluminationLevel( $baseLightIllumination );
 	}
 
 	public function toByteArray( $ba:ByteArray ):ByteArray {
@@ -169,24 +169,24 @@ public class LightInfo
 		return true;
 	}
 
-	public function setAll( $attn:uint ):void	{
+	public function setIlluminationLevel( $illumination:uint ):void	{
 		
-		if ( LightInfo.MAX < $attn ) {
-			$attn = LightInfo.MAX
+		if ( LightInfo.MAX < $illumination ) {
+			$illumination = LightInfo.MAX
 			Log.out( "LightInfo.setAll - attn > MAX" );
 		}
 
-		b000 = $attn;
-		b001 = $attn;
-		b100 = $attn;
-		b101 = $attn;
-		b010 = $attn;
-		b011 = $attn;
-		b110 = $attn;
-		b111 = $attn;
+		b000 = $illumination;
+		b001 = $illumination;
+		b100 = $illumination;
+		b101 = $illumination;
+		b010 = $illumination;
+		b011 = $illumination;
+		b110 = $illumination;
+		b111 = $illumination;
 	}
 	
-	public function attnLevelGet( $corner:uint ):uint {
+	public function illuminationLevelGet( $corner:uint ):uint {
 		if (       Lighting.B000 == $corner ) 
 			return b000;
 		else if (  Lighting.B001 == $corner ) 

@@ -1208,6 +1208,17 @@ public class VoxelModel
 		}
 	}
 
+	public function applyBaseLightLevel():void {
+		//modelInfo.data.visitor( Oxel.rebuildLightingRecursive, "Oxel.rebuildLightingRecursive" );
+		modelInfo.data.oxel.lightsStaticSetDefault( modelInfo.baseLightLevel );
+		var children:Vector.<VoxelModel> = modelInfo.childVoxelModelsGet();
+		for each ( var child:VoxelModel in children ) {
+//			if ( child.metadata.name == "DragonHead" )
+//				Log.out( "VoxelModel.CHECK THIS OUT" );
+			child.modelInfo.baseLightLevel = modelInfo.baseLightLevel;
+			child.applyBaseLightLevel()
+		}
+	}
 }
 }
 

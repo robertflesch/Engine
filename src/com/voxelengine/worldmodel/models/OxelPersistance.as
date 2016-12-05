@@ -85,6 +85,7 @@ public class OxelPersistance extends PersistanceObject
 		_loaded = false;
 		// This should all come from model, so I could give the whole model a tint if I liked.
 		_lightInfo = LightInfoPool.poolGet();
+		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, $baseLightIllumination );
 	}
 	
 	override public function release():void {
@@ -117,7 +118,7 @@ public class OxelPersistance extends PersistanceObject
 	}
 
 	public function createEditCursor():void {
-		_ba = compressedReferenceBA
+		_ba = compressedReferenceBA;
 		fromByteArray()
 	}
 	/*
@@ -204,9 +205,7 @@ public class OxelPersistance extends PersistanceObject
 	public function lodFromByteArray( $ba:ByteArray ):void {
 		//Log.out( "OxelPersistance.lodFromByteArray - guid: " + guid, Log.INFO );
 		var time:int = getTimer();
-
-		if ( guid == "380CE3BD-8840-ED86-F00A-1F2D74B8BD2B")
-				Log.out( "WATCH LIGHTING HERE");
+		_lightInfo.setIlluminationLevel( baseLightLevel );
 		var newOxel:Oxel  = Oxel.initializeRoot( 31 ); // Lighting should be model or instance default lighting
 		_oxels[_lod] = newOxel;
 
