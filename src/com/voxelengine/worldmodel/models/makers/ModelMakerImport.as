@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models.makers
 {
 //import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.ModelEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
@@ -47,7 +48,8 @@ public class ModelMakerImport extends ModelMakerBase {
 	static public function get isImporting():Boolean { return _isImporting; }
 	
 	private var _prompt:Boolean;
-		
+	private var _vmTemp:VoxelModel;
+
 	public function ModelMakerImport( $ii:InstanceInfo, $prompt:Boolean = true ) {
 		// This should never happen in a release version, so dont worry about setting it to false when done
 		_isImporting = true;
@@ -156,42 +158,67 @@ public class ModelMakerImport extends ModelMakerBase {
 			modelInfo.guid = _modelMetadata.guid;
 			ii.modelGuid 	= _modelMetadata.guid;
 
-			var vm:* = make()
-			if ( vm ) {
-				vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
+			_vmTemp = make();
+			if ( _vmTemp ) {
+				_vmTemp.stateLock( true, 10000 ); // Lock state so that it has time to load animations
 //				vm.complete = true;
 				modelInfo.changed = true;
 				_modelMetadata.changed = true;
                 // this gets saved in the vm.save
 				//_modelMetadata.save();
-				vm.changed = true;
-				if ( null == vm.instanceInfo.controllingModel ) {
+				_vmTemp.changed = true;
+				if ( null == _vmTemp.instanceInfo.controllingModel ) {
 					// Only do this for top level models.
 					var lav:Vector3D = Player.player.instanceInfo.lookAtVector(500);
 					var diffPos:Vector3D = Player.player.wsPositionGet().clone();
 					diffPos = diffPos.add(lav);
-					(vm as VoxelModel).instanceInfo.positionSet = diffPos;
+					_vmTemp.instanceInfo.positionSet = diffPos;
 				}
-                vm.save();
-				Region.currentRegion.modelCache.add( vm );
-                if ( null == vm.instanceInfo.controllingModel ) {
-                    Region.currentRegion.save();
-                }
+				addOxelDataCompleteListeners();
+				_vmTemp.modelInfo.oxelLoadData();
 			}
-			
-			markComplete( true, vm );
 		}
 		else
 			Log.out( "ModelMakerImport.completeMake - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
-
 	}
-	
+
+	private  function addOxelDataCompleteListeners():void {
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelReady );
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_FAILED, oxelFailedToLoad );
+	}
+
+	private  function removeOxelDataCompleteListeners():void {
+		OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelReady );
+		OxelDataEvent.removeListener( OxelDataEvent.OXEL_FAILED, oxelFailedToLoad );
+	}
+
+	private function oxelReady( $ode:OxelDataEvent):void {
+		if ( modelInfo.guid == $ode.modelGuid  ) {
+			removeOxelDataCompleteListeners();
+
+			_vmTemp.save();
+			Region.currentRegion.modelCache.add( _vmTemp );
+			if ( null == _vmTemp.instanceInfo.controllingModel ) {
+				Region.currentRegion.save();
+			}
+
+			markComplete( true, _vmTemp );
+		}
+	}
+
+	private function oxelFailedToLoad( $ode:OxelDataEvent):void {
+		if ( modelInfo.guid == $ode.modelGuid  ) {
+			removeOxelDataCompleteListeners();
+			markComplete( false, _vmTemp );
+		}
+	}
+
 	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
-		if ( false == $success && modelInfo && modelInfo.boimeHas() ) {
+		if ( false == $success && modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" ) {
 			Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.WARN );
 			return;
 		}
-		super.markComplete( $success, $vm );
+		super.markComplete( $success, _vmTemp );
 	}
 }	
 }

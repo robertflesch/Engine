@@ -12,6 +12,7 @@ import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.GUI.actionBars.WindowBeastControl;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.ConfigManager;
+import com.voxelengine.worldmodel.models.OxelPersistance;
 import com.voxelengine.worldmodel.models.types.Player;
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
@@ -24,6 +25,7 @@ import flash.events.KeyboardEvent;
 import flash.events.TimerEvent;
 import flash.net.FileReference;
 import flash.ui.Keyboard;
+import flash.utils.ByteArray;
 import flash.utils.ByteArray;
 import flash.utils.Timer;
 import flash.utils.getQualifiedClassName;
@@ -320,7 +322,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	
 	private function onKeyPressed( e : KeyboardEvent) : void {
 		//Log.out( "VoxelVerseGUI.onKeyPressed: KeyboardEvent: " + e);
-			
+
 		if ( Keyboard.F11 == e.keyCode )
 			Renderer.renderer.screenShot( true ); // draws UI
 
@@ -399,6 +401,19 @@ public class VoxelVerseGUI extends EventDispatcher
 			if ( Keyboard.C == e.keyCode ) {
 				new WindowCrafting();
 				new WindowInventory();
+			}
+
+			// allows for saving of ivm to disk
+			if ( Globals.isDebug ) {
+				if (Keyboard.O == e.keyCode) {
+					// save current oxelData
+					const _fileRef:FileReference = new FileReference();
+					if (VoxelModel.selectedModel) {
+						var ba:ByteArray = OxelPersistance.toByteArray(VoxelModel.selectedModel.modelInfo.data.oxel);
+						var fileName:String = "NEW_" + VoxelModel.selectedModel.metadata.name + ".ivm";
+						_fileRef.save(ba, fileName);
+					}
+				}
 			}
 		}
 	}

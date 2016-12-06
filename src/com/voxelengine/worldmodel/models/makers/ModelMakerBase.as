@@ -14,10 +14,14 @@ import com.voxelengine.events.ModelInfoEvent
 import com.voxelengine.events.LoadingEvent
 import com.voxelengine.events.LoadingImageEvent
 import com.voxelengine.events.ModelLoadingEvent
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.models.*
 import com.voxelengine.worldmodel.models.types.VoxelModel
 
-	/**
+import org.flashapi.swing.Alert;
+
+/**
 	 * ...
 	 * @author Robert Flesch - RSF
 	 * This class is used to load a models data, it is used by all of the current Makers
@@ -126,8 +130,15 @@ public class ModelMakerBase {
 	protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
 		if ( $success )
 			ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid, _parentModelGuid, $vm ) );
-		else	
-			ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_FAILURE, _ii.modelGuid, _parentModelGuid ) );
+		else {
+			ModelLoadingEvent.dispatch(new ModelLoadingEvent(ModelLoadingEvent.MODEL_LOAD_FAILURE, _ii.modelGuid, _parentModelGuid));
+
+			(new Alert( "ERROR importing model" )).display();
+			// remove anything that might be hanging around.
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, _ii.modelGuid, null ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, _ii.modelGuid, null ) );
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.DELETE, 0, _ii.modelGuid, null ) );
+		}
 		
 		//Log.out( "ModelMakerBase.markComplete - " + ($success ? "SUCCESS" : "FAILURE" ) + "  ii: " + _ii + "  success: " + $success, Log.DEBUG )
 		if ( _parentModelGuid ) {

@@ -103,7 +103,7 @@ public class ModelInfo extends PersistanceObject
 	}
 	
 	public function update( $context:Context3D, $elapsedTimeMS:int, $vm:VoxelModel ):void {
-		if ( data )
+		if ( data && data.loaded && data.oxel.chunkGet() )
 			data.update( $vm );
 			
 		for each (var vm:VoxelModel in childVoxelModels )
@@ -143,13 +143,13 @@ public class ModelInfo extends PersistanceObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// start data (oxel) operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private function addListeners():void {
+	private function addOxelDataCompleteListeners():void {
 		OxelDataEvent.addListener( ModelBaseEvent.ADDED, retrievedData );
 		OxelDataEvent.addListener( ModelBaseEvent.RESULT, retrievedData );
 		OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );
 	}
 	
-	private function removeListeners():void {
+	private function removeOxelDataCompleteListeners():void {
 		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, retrievedData );
 		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, retrievedData );
 		OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );
@@ -157,7 +157,7 @@ public class ModelInfo extends PersistanceObject
 	
 	private function retrievedData( $ode:OxelDataEvent):void {
 		if ( guid == $ode.modelGuid || altGuid == $ode.modelGuid ) {
-			removeListeners();
+			removeOxelDataCompleteListeners();
 			const priority:int = 1;
 			_data = $ode.oxelData;
 			_data.parent = this;
@@ -184,7 +184,7 @@ public class ModelInfo extends PersistanceObject
 	private function failedData( $ode:OxelDataEvent):void {
 		if ( guid == $ode.modelGuid || altGuid == $ode.modelGuid ) {
 			if ( _firstLoadFailed ) {
-				removeListeners();
+				removeOxelDataCompleteListeners();
 				Log.out( "ModelInfo.failedData - unable to process request for guid: " + guid, Log.ERROR );
 				OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, 0, guid, null ) );		
 			}
@@ -193,7 +193,7 @@ public class ModelInfo extends PersistanceObject
 				if ( biomes ) // this should generate the VMD
 					loadFromBiomeData();
 				else {
-					removeListeners();
+					removeOxelDataCompleteListeners();
 					Log.out( "ModelInfo.failedData - no alternative processing method: " + guid, Log.ERROR );
 					OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, 0, guid, null ) );		
 				}
@@ -235,8 +235,8 @@ public class ModelInfo extends PersistanceObject
 		if ( _data && _data.loaded ) {
 			//Log.out( "ModelInfo.loadOxelData - returning loaded oxel guid: " + guid );
 			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, _data ) );
-		} else { 
-			addListeners();
+		} else {
+			addOxelDataCompleteListeners();
 			// try to load from tables first
 			//Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
 			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_PERSISTANCE ) );
@@ -562,7 +562,7 @@ public class ModelInfo extends PersistanceObject
 	private var _firstLoadFailed:Boolean;							// true if load from biomes data is needed
 	
 	// These are temporary used for loading local objects
-	private function get altGuid():String 							{ return _altGuid; }
+	public function get altGuid():String 							{ return _altGuid; }
 	public function get biomes():Biomes 							{ return _biomes; }
 	public function set biomes(value:Biomes):void  					{ _biomes = value; }
 	

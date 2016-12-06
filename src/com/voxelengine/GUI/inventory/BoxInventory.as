@@ -33,7 +33,8 @@ import com.voxelengine.worldmodel.models.ModelMetadata;
 public class BoxInventory extends VVBox
 {
 	private var _count:Label
-	private var _bpValue:Image	
+	private var _name:Label
+	private var _bpValue:Image
 	private var _objectInfo:ObjectInfo;
 	public function get objectInfo():ObjectInfo { return _objectInfo; }
 	
@@ -49,8 +50,15 @@ public class BoxInventory extends VVBox
 		_count.textAlign = TextAlign.CENTER
 		//_count.x = 16;
 		_count.y = 20;
+
+		_name = new Label( "", $widthParam );
+		_name.fontColor = 0xffffff;
+		_name.textAlign = TextAlign.CENTER
+		//_count.x = 16;
+		_name.y = 90;
 		addElement(_count);
-	}	
+		addElement(_name);
+	}
 	
 	private function thumbnailLoaded( $mme:ModelMetadataEvent ):void {
 		var om:ObjectModel = _objectInfo as ObjectModel
@@ -76,11 +84,12 @@ public class BoxInventory extends VVBox
 			
 		_objectInfo = $item;
 		data = $item;
-		
+		_name.text = "";
+
 		switch ( $item.objectType ) {
 		case ObjectInfo.OBJECTINFO_EMPTY:
 			backgroundTexture = $item.backgroundTexture( width );
-			setHelp( "Empty" );		
+			setHelp( "Empty" );
 			_count.text = "";
 			break;
 		case ObjectInfo.OBJECTINFO_MODEL:
@@ -96,7 +105,7 @@ public class BoxInventory extends VVBox
 				
 				// listen for changes to this object
 				ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged )
-				
+				_name.text = om.vmm.name;
 				var modelsOfThisGuid:int = om.vmm.permissions.copyCount;
 				if ( 99999 < modelsOfThisGuid )
 					_count.text = "lots";
@@ -105,10 +114,7 @@ public class BoxInventory extends VVBox
 				else
 					_count.text = String( modelsOfThisGuid );
 
-				if ( Globals.isDebug )
-					setHelp( om.vmm.name + " guid: " + om.vmm.guid );			
-				else	
-					setHelp( om.vmm.name );
+				setHelp( "guid: " + om.vmm.guid );
 
 				if ( om.vmm.permissions.blueprint ) {
 					_bpValue = new Image( Globals.texturePath + "blueprint.png" )

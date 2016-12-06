@@ -179,8 +179,11 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	}
 	
 	override public function clone( $newGuid:String ):* {
-		toObject()
+		toObject();
+		var oldName:String = info.name;
+		info.name = info.name + "_duplicate";
 		var oldObj:String = JSON.stringify( info )
+		info.name = oldName;
 
 		var pe:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, $newGuid, null, oldObj, URLLoaderDataFormat.TEXT, guid )
 		PersistanceEvent.dispatch( pe )

@@ -12,6 +12,8 @@ import com.voxelengine.events.InventoryModelEvent;
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.SoundEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -37,6 +39,8 @@ public class ModelDestroyer {
 		// request the ModelData so that we can get the modelInfo from it.
 		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, dataResult );
 		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, dataResult );
+		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, dataResultFailed );
+
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
 
 		// The Region could also listen for model delete
@@ -46,9 +50,20 @@ public class ModelDestroyer {
 		for each ( var vm:VoxelModel in modelOnScreen )
 			vm.dead = true;
 	}
-	
-	private function dataResult( $mie:ModelInfoEvent):void 
-	{
+
+	private function dataResultFailed( $mie:ModelInfoEvent):void {
+		if ( _modelGuid == $mie.modelGuid ) {
+			//Log.out( "ModelDestroyer.dataResult - received modelInfo: " + $mie, Log.WARN );
+			// ModelInfo is model flaky right now, so if we don't find it, make sure to delete the Metadata and OxelData
+			ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, dataResult);
+			ModelInfoEvent.removeListener(ModelBaseEvent.ADDED, dataResult);
+
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
+		}
+	}
+
+	private function dataResult( $mie:ModelInfoEvent):void	{
 		if ( _modelGuid == $mie.modelGuid ) {
 			//Log.out( "ModelDestroyer.dataResult - received modelInfo: " + $mie, Log.WARN );
 			// Now that we have the modelData, we can extract the modelInfo
@@ -64,6 +79,10 @@ public class ModelDestroyer {
 				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelInfoEvent.DELETE_RECURSIVE, 0, _modelGuid, null, _recursive ) );
 			else
 				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
+
+			// Now delete the parents data
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
 		}
 	}
 }	

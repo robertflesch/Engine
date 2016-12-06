@@ -7,6 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.inventory
 {
+import com.voxelengine.worldmodel.models.ModelGuid;
+
 import flash.events.TimerEvent
 import flash.utils.Timer
 
@@ -26,47 +28,48 @@ import com.voxelengine.worldmodel.models.ModelMetadata
  */
 public class ObjectModel extends ObjectInfo 
 {
-	protected var _modelGuid:String
-	protected var _vmm:ModelMetadata
+	protected var _modelGuid:ModelGuid = new ModelGuid();
+
+	protected var _vmm:ModelMetadata;
 	
-	public function get modelGuid():String 						{ return _modelGuid }
-	public function set modelGuid(value:String):void 			{ _modelGuid = value }
+	public function get modelGuid():String 						{ return _modelGuid.val; }
+	public function set modelGuid(value:String):void 			{ _modelGuid.valSet = value; }
 	
 	public function get vmm():ModelMetadata 					{ return _vmm }
 	public function set vmm(value:ModelMetadata):void 			{ _vmm = value }
 	
 	public function ObjectModel( $owner:BoxInventory, $guid:String ):void {
-		super( $owner, ObjectInfo.OBJECTINFO_MODEL )
-		_modelGuid = $guid
+		super( $owner, ObjectInfo.OBJECTINFO_MODEL );
+		modelGuid = $guid;
 	}
 	
 	override public function asInventoryString():String {
 		if ( ObjectInfo.OBJECTINFO_MODEL == _objectType )
-			return String( _objectType + ";" + _modelGuid )
+			return String( _objectType + ";" + _modelGuid );
 			
-		return String( _objectType )	
+		return String( _objectType )	;
 	}
 	
 	override public function fromInventoryString( $data:String, $slotId:int ): ObjectInfo {
-		super.fromInventoryString( $data, $slotId )
-		var values:Array = $data.split(";")
+		super.fromInventoryString( $data, $slotId );
+		var values:Array = $data.split(";");
 		if ( values.length != 2 ) {
-			Log.out( "ObjectModel.fromInventoryString - not equal to 2 tokens found, length is: " + values.length, Log.WARN )
-			reset()
+			Log.out( "ObjectModel.fromInventoryString - not equal to 2 tokens found, length is: " + values.length, Log.WARN );
+			reset();
 			return this
 		}
-		_objectType = values[0]
-		_modelGuid = values[1]
-		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, metadataAdded )
-		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, metadataAdded )
-		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed )
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) )
+		_objectType = values[0];
+		_modelGuid = values[1];
+		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, metadataAdded );
+		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, metadataAdded );
+		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
+		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, modelGuid, null ) );
 		return this
 	}
 	
 	private function metadataFailed(e:ModelMetadataEvent):void 
 	{
-		if ( _modelGuid == e.modelGuid ) {
+		if ( modelGuid == e.modelGuid ) {
 			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded )
 			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed )
 			//_owner remove me!
@@ -80,7 +83,7 @@ public class ObjectModel extends ObjectInfo
 	
 	private function metadataAdded(e:ModelMetadataEvent):void 
 	{
-		if ( _modelGuid == e.modelGuid ) {
+		if ( modelGuid == e.modelGuid ) {
 			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded )
 			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, metadataAdded )
 			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed )
@@ -105,6 +108,7 @@ public class ObjectModel extends ObjectInfo
 	
 	override public function reset():void {
 		super.reset()
+		_modelGuid.release();
 		_modelGuid = null
 		_vmm = null
 	}

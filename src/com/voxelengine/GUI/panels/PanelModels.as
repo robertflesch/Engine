@@ -18,6 +18,8 @@ import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 import com.voxelengine.worldmodel.models.ModelCache;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
+
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.event.ListEvent;
@@ -45,7 +47,8 @@ public class PanelModels extends PanelBase
 	private var _listModels:ListBox;
 	private var _dictionarySource:Function;
 	private var _buttonContainer:Container
-	
+
+	private var _dupButton:Button
 	private var _detailButton:Button
 	private var _deleteButton:Button
 	
@@ -178,6 +181,23 @@ public class PanelModels extends PanelBase
 		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new WindowModelDetail( VoxelModel.selectedModel ); } );
 		_detailButton.width = btnWidth;
 		_buttonContainer.addElement( _detailButton );
+
+		if ( Globals.isDebug ) {
+			_dupButton = new Button( LanguageManager.localizedStringGet( "DUP" ) );
+			_dupButton.y = 75;
+			_dupButton.x = 2;
+			_dupButton.width = width - 10;
+			_dupButton.enabled = true;
+			_dupButton.active = true;
+			_dupButton.eventCollector.addEvent( _dupButton, UIMouseEvent.CLICK, dupModel );
+			_dupButton.width = btnWidth;
+			_buttonContainer.addElement( _dupButton );
+
+		}
+
+		function dupModel(event:UIMouseEvent):void  {
+			new ModelMakerClone(  VoxelModel.selectedModel, false );
+		}
 
 		function deleteModelHandler(event:UIMouseEvent):void  {
 			if ( VoxelModel.selectedModel )

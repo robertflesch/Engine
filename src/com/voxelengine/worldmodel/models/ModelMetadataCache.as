@@ -98,7 +98,7 @@ public class ModelMetadataCache
 			Log.out( "ModelMetadataCache.request guid rquested is NULL: ", Log.WARN );
 			return;
 		}
-		//Log.out( "ModelMetadataCache.request guid: " + $mme.modelGuid, Log.INFO );
+		Log.out( "ModelMetadataCache.request guid: " + $mme.modelGuid, Log.INFO );
 		var vmm:ModelMetadata = _metadata[$mme.modelGuid]; 
 		if ( null == vmm ) {
 			if ( _block.has( $mme.modelGuid ) )	

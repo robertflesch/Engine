@@ -14,8 +14,12 @@ import com.voxelengine.events.ModelMetadataEvent
 import com.voxelengine.worldmodel.Region
 import com.voxelengine.worldmodel.models.types.VoxelModel
 import com.voxelengine.worldmodel.models.ModelMetadata
+import com.voxelengine.worldmodel.oxel.GrainCursor;
+import com.voxelengine.worldmodel.oxel.GrainCursorUtils;
 
-	/**
+import flash.geom.Vector3D;
+
+/**
 	 * ...
 	 * @author Robert Flesch - RSF
 	 * This class is used to load a model once its metadata AND data has been loaded from persistance
@@ -26,31 +30,41 @@ public class ModelMakerClone extends ModelMakerBase {
 	
 	private var _oldVM:VoxelModel
 		
-	public function ModelMakerClone( $vm:VoxelModel ) {
-		_oldVM = $vm
-		super( _oldVM.instanceInfo.clone(), false )
-		Log.out( "ModelMakerClone - ii: " + ii.toString() )
-		ii.modelGuid = Globals.getUID()
-		
-		addListeners()
+	public function ModelMakerClone( $vm:VoxelModel, $killOldModel:Boolean = true ) {
+		_oldVM = $vm;
+		super( _oldVM.instanceInfo.clone(), false );
+		ii.modelGuid = Globals.getUID();
+		if ( $killOldModel ) {
+			_oldVM.dead = true;
+		} else {
+
+			var size:int = GrainCursor.two_to_the_g( $vm.modelInfo.data.oxel.gc.grain );
+			var offset:Vector3D = new Vector3D(1,1,1);
+			offset.scaleBy(size);
+			var v:Vector3D = ii.positionGet.clone();
+			v = v.add( offset );
+			ii.positionSetComp( v.x, v.y, v.z  );
+		}
+		Log.out( "ModelMakerClone - ii: " + ii.toString() );
+
+		addListeners();
 		
 		// this causes it to generate a ModelBaseEvent.ADDED event
-		_oldVM.modelInfo.clone( ii.modelGuid )
-		_oldVM.metadata.clone( ii.modelGuid )
-		_oldVM.dead = true
+		_oldVM.modelInfo.clone( ii.modelGuid );
+		_oldVM.metadata.clone( ii.modelGuid );
 	}
 
 	override protected function addListeners():void {
 		super.addListeners()
-		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retrivedMetadata )		
-		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retrivedMetadata )		
-		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata )		
+		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retrivedMetadata );
+		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retrivedMetadata );
+		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );
 	}
 	
 	private function retrivedMetadata( $mme:ModelMetadataEvent):void {
 		if ( ii.modelGuid == $mme.modelGuid ) {
-			Log.out( "ModelMakerClone.retrivedMetadata - ii: " + ii.toString() )
-			_modelMetadata = $mme.modelMetadata
+			Log.out( "ModelMakerClone.retrivedMetadata - ii: " + ii.toString() );
+			_modelMetadata = $mme.modelMetadata;
 			
 			attemptMake()
 		}
@@ -58,7 +72,7 @@ public class ModelMakerClone extends ModelMakerBase {
 	
 	private function failedMetadata( $mme:ModelMetadataEvent):void {
 		if ( ii.modelGuid == $mme.modelGuid ) {
-			markComplete(false)
+			markComplete(false);
 		}
 	}
 	
@@ -66,33 +80,33 @@ public class ModelMakerClone extends ModelMakerBase {
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
 		if ( null != _modelMetadata && null != modelInfo ) {
-			Log.out( "ModelMakerClone.attemptMake - ii: " + ii.toString() )
+			Log.out( "ModelMakerClone.attemptMake - ii: " + ii.toString() );
 			
-			var vm:* = make()
+			var vm:* = make();
 
 			if ( vm ) {
 				//vm.metadata.permissions.blueprintGuid = _oldVM.metadata.guid
-				vm.stateLock( true, 10000 ) // Lock state so that is had time to load animations
-				vm.complete = true
-				vm.changed = true
-				vm.save()
-				Region.currentRegion.modelCache.add( vm )
+				vm.stateLock( true, 10000 ); // Lock state so that is had time to load animations
+				vm.complete = true;
+				vm.changed = true;
+				vm.save();
+				Region.currentRegion.modelCache.add( vm );
 			}
 			
-			markComplete( true, vm )
+			markComplete( true, vm );
 		}
 	}
 	
 	override protected function markComplete( $success:Boolean, vm:VoxelModel = null ):void {
-		removeListeners()		
+		removeListeners();
 		function removeListeners():void {
-			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrivedMetadata )		
-			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrivedMetadata )		
-			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata )	
+			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrivedMetadata );
+			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrivedMetadata );
+			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );
 		}		
 		
 		// do this last as it nulls everything.
-		super.markComplete( $success, vm )
+		super.markComplete( $success, vm );
 	}
 }	
 }

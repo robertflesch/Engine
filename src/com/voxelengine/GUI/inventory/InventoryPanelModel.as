@@ -8,18 +8,13 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.inventory {
 
 import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.ModelEvent;
 import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
-import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.models.ModelCache;
-import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.display.DisplayObject;
 import flash.events.Event;
 import flash.net.FileReference;
 import flash.net.FileFilter;
-import org.flashapi.swing.containers.MainContainer;
 
 import org.flashapi.swing.*
 import org.flashapi.swing.core.UIObject;
@@ -39,7 +34,6 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 import com.voxelengine.worldmodel.inventory.FunctionRegistry;
 import com.voxelengine.worldmodel.inventory.ObjectAction;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
@@ -59,11 +53,10 @@ public class InventoryPanelModel extends VVContainer
 	static private const MODEL_IMAGE_WIDTH:int = 128;
 	
 	private var _dragOp:DnDOperation = new DnDOperation();
-	private var _barLeft:TabBar
+	private var _barLeft:TabBar;
 	// This hold the items to be displayed
 	// http://www.flashapi.org/spas-doc/org/flashapi/swing/ScrollPane.html
 	private var _itemContainer:ScrollPane;
-	private var _infoContainer:Container;
 	private var _currentRow:Container;
 	private var _seriesModelMetadataEvent:int;
 	
@@ -75,7 +68,9 @@ public class InventoryPanelModel extends VVContainer
 		FunctionRegistry.functionAdd( importObjectIPM, "importObjectIPM" );
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, addModelMetadataEvent );
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, addModelMetadataEvent );
-		
+		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, removeModelMetadataEvent );
+
+
 		upperTabsAdd();
 		addItemContainer();
 		addTrashCan();
@@ -130,13 +125,15 @@ public class InventoryPanelModel extends VVContainer
 	}
 	
 	private function addTrashCan():void {
-		_infoContainer = new Container();
-		_infoContainer.autoSize = true;
-		addElement( _infoContainer );
+		var infoContainer:Container;
+		infoContainer = new Container();
+		infoContainer.autoSize = true;
+		addElement( infoContainer );
+
 		var b:BoxTrashCan = new BoxTrashCan(100, 100, BorderStyle.RIDGE );
 		b.backgroundTexture = "assets/textures/trashCan.png";
 		b.dropEnabled = true;
-		_infoContainer.addElement( b );
+		infoContainer.addElement( b );
 	}
 	
 	private function selectCategory(e:ListEvent):void 
@@ -164,8 +161,13 @@ public class InventoryPanelModel extends VVContainer
 		ModelMetadataEvent.dispatch( mmep );
 	}
 
+	private function removeModelMetadataEvent($mme:ModelMetadataEvent):void {
+		removeModel( $mme.modelGuid );
+	}
+
+
 	private function addModelMetadataEvent($mme:ModelMetadataEvent):void {
-		
+
 		// I only want the results from the series I asked for
 		if ( _seriesModelMetadataEvent == $mme.series || 0 == $mme.series ) {
 			var om:ObjectModel = new ObjectModel( null, $mme.modelGuid );
@@ -329,7 +331,7 @@ public class InventoryPanelModel extends VVContainer
 			//}
 			//else if ( e.dropTarget.target is QuickInventory ) {
 			if ( e.dropTarget is BoxTrashCan ) {
-				var btc:BoxTrashCan = e.dropTarget as BoxTrashCan;
+				//var btc:BoxTrashCan = e.dropTarget as BoxTrashCan;
 				var droppedItem:ObjectModel = e.dragOperation.initiator.data;
 				
 				new WindowModelDeleteChildrenQuery( droppedItem.modelGuid, removeModel );				
