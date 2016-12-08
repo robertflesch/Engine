@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2015 Robert Flesch
+  Copyright 2011-2017 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -29,14 +29,12 @@ public class FromByteArray extends AbstractTask
 	private var	_guid:String;
 	private var	_altGuid:String;
 	private var	_parent:OxelPersistance;
-    //private static const TASK_PRIORITY:int = 64000;
 
 	static public function addTask( $guid:String, $taskPriority:int, $parent:OxelPersistance, $altGuid:String ): void {
 		var fba:FromByteArray = new FromByteArray( $guid, $taskPriority, $parent, $altGuid );
 		Globals.g_landscapeTaskController.addTask( fba )
 	}
 	
-//public function AbstractTask(type:String, priority:int = 5, uid:Object = null, selfOverride:Boolean = false, blocking:Boolean = false)	
 	public function FromByteArray( $guid:String, $taskPriority:int, $parent:OxelPersistance, $altGuid:String ):void {
 		_guid = $guid;
 		_parent = $parent;
@@ -47,7 +45,7 @@ public class FromByteArray extends AbstractTask
 	
 	override public function start():void {
 		super.start()
-		var time:int = getTimer();
+		//var time:int = getTimer();
 
 		try {
 			//Log.out("FromByteArray.start: guid: " + _guid);
@@ -65,7 +63,7 @@ public class FromByteArray extends AbstractTask
 			OxelDataEvent.dispatch(new OxelDataEvent(OxelDataEvent.OXEL_READY, 0, _guid, _parent));
 		}
 		catch ( e:Error ) {
-			Log.out( "FromByteArray.start: ERROR: " + e.toString(), Log.ERROR );
+			Log.out( "FromByteArray.start: ERROR: " + e.toString(), Log.ERROR, e );
 			OxelDataEvent.dispatch(new OxelDataEvent(OxelDataEvent.OXEL_FAILED, 0, _guid, _parent));
 		}
 		LoadingImageEvent.dispatch(new LoadingImageEvent(LoadingImageEvent.DESTROY));

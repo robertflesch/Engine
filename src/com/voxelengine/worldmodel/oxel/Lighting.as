@@ -378,19 +378,21 @@ public class Lighting  {
 			//Log.out( "Lighting.fromByteArray - \t\thigherAmbient: \t" + _higherAmbient );
 			//Log.out( "Lighting.fromByteArray - \t\tlightCount: \t\t" + lightCount );
 
-			// Now read each light
-			for ( i = 0; i < lightCount; i++ ) {
-				var obj:Object = {};
-				LightInfo.fromByteArrayEvaluator( $ba, obj );
-				// The chunk lights should not be written to byte array, or read...
-				if ( 1 != obj.ID) {
-					_lights[i] = LightInfoPool.poolGet();
-					_lights[i].fromObject( obj );
+			//try {
+				// Now read each light
+				for (i = 0; i < lightCount; i++) {
+					var light:Object = {};
+					LightInfo.fromByteArrayEvaluator($ba, light);
+					// The chunk lights should not be written to byte array, or read...
+					if (Lighting.DEFAULT_LIGHT_ID != light.ID) {
+						var li:LightInfo = LightInfoPool.poolGet();
+						li.fromObject(light);
+						_lights.push(li);
+					}
 				}
-//				_lights[i] = LightInfoPool.poolGet();
-//				_lights[i].setInfo( 0, 0, defaultLightLevelSetter(), $attnPerMeter, false )
-//				_lights[i].fromByteArray( $ba );
-			}
+//			} catch ( e:Error ) {
+//					Log.out( "Lighting.fromByteArray: ERROR: " + e.toString(), Log.ERROR, e );
+//			}
 		}
 		else
 			throw new Error( "Brightness.fromByteArray - unsupported version: " + $version );

@@ -141,7 +141,7 @@ public class OxelPersistance extends PersistanceObject
 				oxel.quadsBuild()
 			}
 			else {
-				//Log.out( "OxelPersistance.update - calling refreshQuads guid: " + guid, Log.WARN );
+				Log.out( "OxelPersistance.update ------------ calling refreshQuads guid: " + guid, Log.DEBUG );
 				topMostChunk.refreshFacesAndQuads( guid, $vm, firstTime );
 				if ( firstTime )
 					firstTime = false
@@ -197,6 +197,8 @@ public class OxelPersistance extends PersistanceObject
 	}
 
 	public function fromByteArray():void {
+		_lightInfo.setIlluminationLevel( baseLightLevel );
+		_oxels[_lod] = Oxel.initializeRoot( 31 ); // Lighting should be model or instance default lighting
 		lodFromByteArray( ba );
 		_loaded = true;
 		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this ) );
@@ -205,21 +207,19 @@ public class OxelPersistance extends PersistanceObject
 	public function lodFromByteArray( $ba:ByteArray ):void {
 		//Log.out( "OxelPersistance.lodFromByteArray - guid: " + guid, Log.INFO );
 		var time:int = getTimer();
-		_lightInfo.setIlluminationLevel( baseLightLevel );
-		var newOxel:Oxel  = Oxel.initializeRoot( 31 ); // Lighting should be model or instance default lighting
-		_oxels[_lod] = newOxel;
 
-		newOxel.decompressAndExtractMetadata( $ba, this );
+		oxel.decompressAndExtractMetadata( $ba, this );
 		//Log.out( "OxelPersistance.lodFromByteArray-decompressAndExtractMetadata - lod: " + _lod + "  newOxel: " + newOxel.toString() + " took: " + (getTimer() - time) );
 
 		time = getTimer();
-		newOxel.readOxelData($ba, this );
+		oxel.readOxelData($ba, this );
 		//Log.out("OxelPersistance.lodFromByteArray - readOxelData took: " + (getTimer() - time), Log.INFO);
 
 		statisics.gather();
 
 		time = getTimer();
-		_topMostChunks[_lod] = Chunk.parse( oxel, null, _lightInfo );
+		_topMostChunks[_lod] = oxel.chunk = Chunk.parse( oxel, null, _lightInfo );
+		//Log.out( "OxelPersistance.lodFromByteArray oxel.chunkGet(): " + oxel.chunkGet() +  "  lod: " + _lod + " _topMostChunks[_lod] " + _topMostChunks[_lod]  );
 		//Log.out( "OxelPersistance.lodFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 	}
 

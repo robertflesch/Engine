@@ -208,7 +208,7 @@ public class ModelMetadataCache
 			else {
 				// we already have it, publishing this results in dulicate items being sent to inventory window.
 				//ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $pe.series, $pe.guid, vmm ) );
-				Log.out( "ModelMetadataCache.loadSucceed - attempting to load duplicate ModelMetadata guid: " + $pe.guid, Log.WARN );
+				Log.out( "ModelMetadataCache.loadSucceed - attempting to load duplicate ModelMetadata guid: " + $pe.guid, Log.DEBUG );
 			}
 		}
 		else {

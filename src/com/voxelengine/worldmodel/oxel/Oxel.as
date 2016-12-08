@@ -1558,8 +1558,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 	
 	protected function quadsBuildTerminal( $plane_facing:int = 1 ):void {
-		if ( gc.eval( 4, 0, 4, 2 ))
-			Log.out( "Oxel.quadsBuildTerminal - not being lit" );
 		var changeCount:int = 0;
 		// Does this oxel have faces
 		if ( facesHas() ) {
@@ -1934,9 +1932,16 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			time = getTimer();
 			extractVersionInfo($ba, $op);
 			// how many bytes is the modelInfo
-			var strLen:int = $ba.readInt();
-			// read off that many bytes, even though we are using the data from the modelInfo file
-			var modelInfoJson:String = $ba.readUTFBytes(strLen);
+			if ($op.version >= 4) {
+				var strLen:int = $ba.readInt();
+				// read off that many bytes, even though we are using the data from the modelInfo file
+				var modelInfoJson:String = $ba.readUTFBytes(strLen);
+			} else {
+				Log.out("Oxel.decompressAndExtractMetadata - REALLY OLD VERSION " + $op.guid, Log.WARN);
+				// need to read off one dummy byte
+				$ba.readByte();
+				// next byte is root grain size
+			}
 
 			if ( !_aliasInitialized ) {
 				_aliasInitialized = true;
@@ -1980,8 +1985,12 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 		// Read off next 3 bytes, the data version
 		$op.version = readVersion($ba);
-		// Read off next byte, the manifest version
-		$ba.readByte();
+		if ( $op.version >= 4 ) {
+			// Read off next byte, the manifest version
+			var t:int = $ba.readByte();
+		}
+
+		Log.out( "Oxel.extractVersionInfo - format: " + format + "version: " + $op.version );
 		//Log.out("OxelPersistance.extractVersionInfo - version: " + $op.version );
 
 		// This reads the format info and advances position on byteArray
@@ -1995,7 +2004,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			format += String.fromCharCode(byteRead);
 			byteRead = $ba.readByte();
 			format += String.fromCharCode(byteRead);
-
 			return format;
 		}
 

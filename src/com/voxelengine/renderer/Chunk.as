@@ -113,7 +113,7 @@ public class Chunk {
 			chunk._oxel = $oxel;
 			$oxel.chunk = chunk;
 			if ( 1 == $oxel.childCount && false == $oxel.facesHas() ) {
-				//Log.out( "chunk.parse - EMPTY CHUNK, no faces" );
+				//Log.out( "chunk.parse --------------- EMPTY CHUNK, no faces" );
 				chunk.dirtyClear();
 			}
 			else {

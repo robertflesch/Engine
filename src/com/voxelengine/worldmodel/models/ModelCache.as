@@ -10,6 +10,8 @@ package com.voxelengine.worldmodel.models
 import com.voxelengine.renderer.Renderer;
 
 import flash.display3D.Context3D;
+
+import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.utils.Dictionary;
 import flash.utils.getTimer;
@@ -230,11 +232,12 @@ public class ModelCache
 		//taskTime = getTimer() - taskTime;
 
 		//var dynModelTime:int = getTimer();
-		
+
+		var context3D:Context3D = Renderer.renderer.context3D;
 		var vm:VoxelModel;
 		for ( var i:int = 0; i < _instancesDynamic.length; i++ ) {
 			vm = _instancesDynamic[i];
-			vm.update( Renderer.renderer.context3D,  $elapsedTimeMS );
+			vm.update( context3D,  $elapsedTimeMS );
 		}
 		
 		//dynModelTime = getTimer() - dynModelTime;
@@ -242,13 +245,13 @@ public class ModelCache
 		//var modelTime:int = getTimer();
 		for ( i = 0; i < _instances.length;  i++ ) {
 			vm = _instances[i];
-			vm.update( Renderer.renderer.context3D,  $elapsedTimeMS );
+			vm.update( context3D,  $elapsedTimeMS );
 		}
 		
 		//modelTime = getTimer() - modelTime;
 			
 		if ( EditCursor.isEditing )
-			EditCursor.currentInstance.update( Renderer.renderer.context3D, $elapsedTimeMS);
+			EditCursor.currentInstance.update( context3D, $elapsedTimeMS);
 
 	}
 	

@@ -176,8 +176,8 @@ public class Dragon extends Beast
 		if ( this == VoxelModel.controlledModel && Globals.active )
 		{
 			var vel:Vector3D = instanceInfo.velocityGet;
-			var speedVal:Number = instanceInfo.speed( $elapsedTimeMS );
-			Log.out( "Dragon.updateVelocity - speed value calculated: " + speedVal + " is being set to 0.5" );
+			var speedVal:Number = instanceInfo.speed( $elapsedTimeMS )/1000;
+			//Log.out( "Dragon.updateVelocity - speed value calculated: " + speedVal + " is being set to 0.5" );
 
 			//speedVal = 0.5;
 

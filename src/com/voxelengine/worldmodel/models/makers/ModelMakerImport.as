@@ -216,6 +216,13 @@ public class ModelMakerImport extends ModelMakerBase {
 	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
 		if ( false == $success && modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" ) {
 			Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.WARN );
+
+			(new Alert( "ERROR importing model" )).display();
+			// remove anything that might be hanging around.
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, ii.modelGuid, null ) );
+			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, ii.modelGuid, null ) );
+			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.DELETE, 0, ii.modelGuid, null ) );
+
 			return;
 		}
 		super.markComplete( $success, _vmTemp );

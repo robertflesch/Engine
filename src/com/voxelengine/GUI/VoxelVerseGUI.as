@@ -410,7 +410,7 @@ public class VoxelVerseGUI extends EventDispatcher
 					const _fileRef:FileReference = new FileReference();
 					if (VoxelModel.selectedModel) {
 						var ba:ByteArray = OxelPersistance.toByteArray(VoxelModel.selectedModel.modelInfo.data.oxel);
-						var fileName:String = "NEW_" + VoxelModel.selectedModel.metadata.name + ".ivm";
+						var fileName:String = VoxelModel.selectedModel.metadata.name + "_NEW" + ".ivm";
 						_fileRef.save(ba, fileName);
 					}
 				}
