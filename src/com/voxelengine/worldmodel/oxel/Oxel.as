@@ -2103,12 +2103,12 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Intersection functions START
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public function lineIntersect( $msStartPoint:Vector3D, $msEndPoint:Vector3D, $msIntersections:Vector.<GrainCursorIntersection>, $ignoreType:uint = 100 ):void {
+	public function lineIntersect( $msStartPoint:Vector3D, $msEndPoint:Vector3D, $intersections:Vector.<GrainCursorIntersection>, $ignoreType:uint = 100 ):void {
 		if ( $ignoreType == type && !childrenHas() )
 			return;
 		if ( TypeInfo.AIR == type && !childrenHas() )
 			return;
-		gc.lineIntersect( this, $msStartPoint, $msEndPoint, $msIntersections );
+		gc.lineIntersect( this, $msStartPoint, $msEndPoint, $intersections );
 	}
 
 	public function lineIntersectWithChildren( $msStartPoint:Vector3D, $msEndPoint:Vector3D, $msIntersections:Vector.<GrainCursorIntersection>, $ignoreType:uint, $minSize:int = 2 ):void	{

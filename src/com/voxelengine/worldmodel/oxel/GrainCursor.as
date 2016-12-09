@@ -1,6 +1,8 @@
 package com.voxelengine.worldmodel.oxel
 {
 //import com.voxelengine.Log;
+import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
+
 import flash.geom.Vector3D;
 import com.voxelengine.Globals;
 
@@ -13,7 +15,8 @@ public class GrainCursor
 
 	private static var _s_v3:Vector3D = new Vector3D;
 	private static var _s_gc:GrainCursor = new GrainCursor();	
-	private static var _s_axes:Vector.<int> = null;
+	private static const AXES:Vector.<int> = new <int>[0,1,2];
+
 
 	[inline]
 	public function get grain( ):uint { return _data & 0x0000ffff; }
@@ -92,14 +95,6 @@ public class GrainCursor
 		_gz = gz;
 		grain = g;
 		
-		// initialize this static
-		if ( !_s_axes )
-		{
-			_s_axes = new Vector.<int>(3);
-			_s_axes[0] = 0;
-			_s_axes[1] = 1;
-			_s_axes[2] = 2;
-		}
 	}
 	
 	[inline]
@@ -218,55 +213,50 @@ public class GrainCursor
 	private static var _s_min:Vector3D = new Vector3D();
 	private static var _s_max:Vector3D = new Vector3D();
 	private static var _s_beginToEnd:Vector3D = new Vector3D();
-	public function lineIntersect( $o:Oxel, modelSpaceStartPoint:Vector3D, modelSpaceEndPoint:Vector3D, modelSpaceIntersections:Vector.<GrainCursorIntersection> ):Boolean
+	public function lineIntersect( $o:Oxel, $modelSpaceStartPoint:Vector3D, $modelSpaceEndPoint:Vector3D, $intersections:Vector.<GrainCursorIntersection> ):Boolean
 	{
-		// TODO - these subtracts are SLOW
-		//var beginToEnd:Vector3D = modelSpaceEndPoint.subtract( modelSpaceStartPoint );
-		_s_beginToEnd.x = modelSpaceEndPoint.x - modelSpaceStartPoint.x;
-		_s_beginToEnd.y = modelSpaceEndPoint.y - modelSpaceStartPoint.y;
-		_s_beginToEnd.z = modelSpaceEndPoint.z - modelSpaceStartPoint.z;
+		_s_beginToEnd.x = $modelSpaceEndPoint.x - $modelSpaceStartPoint.x;
+		_s_beginToEnd.y = $modelSpaceEndPoint.y - $modelSpaceStartPoint.y;
+		_s_beginToEnd.z = $modelSpaceEndPoint.z - $modelSpaceStartPoint.z;
+
 		_s_min.setTo(0, 0, 0);
+		_s_min.x -= $modelSpaceStartPoint.x;
+		_s_min.y -= $modelSpaceStartPoint.y;
+		_s_min.z -= $modelSpaceStartPoint.z;
+		_s_min.x += getModelX();
+		_s_min.y += getModelY();
+		_s_min.z += getModelZ();
+
 		_s_max.setTo(size(),size(),size());
-		//var beginToMin:Vector3D = _s_min.subtract( modelSpaceStartPoint );
-		_s_min.x -= modelSpaceStartPoint.x;
-		_s_min.y -= modelSpaceStartPoint.y;
-		_s_min.z -= modelSpaceStartPoint.z;
-		var beginToMin:Vector3D = _s_min;
-		beginToMin.x += getModelX();
-		beginToMin.y += getModelY();
-		beginToMin.z += getModelZ();
-		//var beginToMax:Vector3D = _s_max.subtract( modelSpaceStartPoint );
-		_s_max.x -= modelSpaceStartPoint.x;
-		_s_max.y -= modelSpaceStartPoint.y;
-		_s_max.z -= modelSpaceStartPoint.z;
-		var beginToMax:Vector3D = _s_max;
-		beginToMax.x += getModelX();
-		beginToMax.y += getModelY();
-		beginToMax.z += getModelZ();
+		_s_max.x -= $modelSpaceStartPoint.x;
+		_s_max.y -= $modelSpaceStartPoint.y;
+		_s_max.z -= $modelSpaceStartPoint.z;
+		_s_max.x += getModelX();
+		_s_max.y += getModelY();
+		_s_max.z += getModelZ();
+
 		var tNear:Number = -10000000;
 		var tFar:Number = 10000000;
 		var tNearAxis:int = -1;
 		var tFarAxis:int = -1;
-		for each ( var axis:int in _s_axes )
+		for each ( var axis:int in AXES )
 		{
 			if ( getCoordinate(_s_beginToEnd, axis) == 0) // parallel
 			{
-				if ( getCoordinate( beginToMin, axis) > 0 || getCoordinate(beginToMax,axis) < 0)
+				if ( getCoordinate( _s_min, axis) > 0 || getCoordinate( _s_max, axis) < 0)
 					return false; // segment is not between planes, return empty set
 			}
 			else
 			{
-				var t1:Number = getCoordinate(beginToMin, axis) / (getCoordinate(_s_beginToEnd,axis));
-				var t2:Number = getCoordinate(beginToMax, axis) / (getCoordinate(_s_beginToEnd,axis));
+				var t1:Number = getCoordinate( _s_min, axis) / getCoordinate(_s_beginToEnd,axis);
+				var t2:Number = getCoordinate( _s_max, axis) / getCoordinate(_s_beginToEnd,axis);
 				var tMin:Number = Math.min(t1, t2);
 				var tMax:Number = Math.max(t1, t2);
-				if (tMin > tNear)
-				{
+				if (tMin > tNear) {
 					tNear = tMin;
 					tNearAxis = axis;
 				}
-				if (tMax < tFar) 
-				{
+				if (tMax < tFar)  {
 					tFar = tMax;
 					tFarAxis = axis;
 				}
@@ -275,31 +265,10 @@ public class GrainCursor
 			}
 		}
 		
-		if (tNear >= 0 && tNear <= 1) 
-		{
-			var gciNear:GrainCursorIntersection = new GrainCursorIntersection();
-			gciNear.oxel = $o;
-			gciNear.point.copyFrom( _s_beginToEnd );
-			gciNear.point.scaleBy( tNear );
-			gciNear.point = modelSpaceStartPoint.add( gciNear.point );
-			roundVector( gciNear.point );
-			gciNear.gc.copyFrom( this );
-			gciNear.near = true;
-			gciNear.axis = tNearAxis;
-			var ipoint:Number = GrainCursor.getCoordinate( gciNear.point, gciNear.axis );
-			if ( ((1 << gciNear.gc.grain) + getWorldCoordinate( gciNear.axis)) == GrainCursor.getCoordinate( gciNear.point, gciNear.axis ) )
-			{
-				GrainCursor.setCoordinate( gciNear.point, gciNear.axis, 0.001 );
-			}
-			if ( getWorldCoordinate( gciNear.axis) == GrainCursor.getCoordinate( gciNear.point, gciNear.axis ) )
-			{
-				GrainCursor.setCoordinate( gciNear.point, gciNear.axis, -0.001 );
-			}
-			modelSpaceIntersections.push( gciNear );
-			
-// TODO - does this work? if we have near one, thats all we need.
-//return true;
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		if (tNear >= 0 && tNear <= 1) {
+			var gci:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tNear, tNearAxis, true );
+			gci.oxel = $o;
+			$intersections.push( gci );
 			//trace( "GrainCursor.lineIntersectTest3 - intersection near " + gciNear.toString() );
 		}
 		
@@ -307,33 +276,33 @@ public class GrainCursor
 		//if (tFar >= 0 && tFar <= 1) 
 //		if (tFar >= 0 && tFar <= 32) 
 // tFar = 0 occurs when starting point is on face of oxel
-		if (tFar > 0 && tFar <= 32) 
-		{	
-			var gciFar:GrainCursorIntersection = new GrainCursorIntersection();
-			gciFar.oxel = $o;
-			gciFar.point.copyFrom( _s_beginToEnd );
-			gciFar.point.scaleBy( tFar );
-			gciFar.point = modelSpaceStartPoint.add( gciFar.point );
-			roundVector( gciFar.point );
-			gciFar.gc.copyFrom( this );
-			gciFar.near = false;
-			gciFar.axis = tFarAxis;
-			if ( ((1 << gciFar.gc.grain) + getWorldCoordinate( gciFar.axis)) == GrainCursor.getCoordinate( gciFar.point, gciFar.axis ) )
-			{
-				// test for add vs subtract...
-				GrainCursor.setCoordinate( gciFar.point, gciFar.axis, 0.001 );
-			}
-			if ( getWorldCoordinate( gciFar.axis) == GrainCursor.getCoordinate( gciFar.point, gciFar.axis ) )
-			{
-				// test for add vs subtract...
-				GrainCursor.setCoordinate( gciFar.point, gciFar.axis, -0.001 );
-			}
-			modelSpaceIntersections.push( gciFar );
-			//trace( "GrainCursor.lineIntersectTest3 - intersection far " + gciFar.toString() );
-			////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		// failing on really large models
+		//if (tFar > 0 && tFar <= 32)
+		if (tFar > 0 && tFar <= 100) // what does 100 represent?
+		{
+			var gci:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tFar, tFarAxis, false );
+			gci.oxel = $o;
+			$intersections.push( gci );
 		}
 		return true;
 	}	
+
+	private function buildIntersection( $modelSpaceStartPoint:Vector3D, $magnitude:Number, $axis:int, $nearAxis:Boolean ):GrainCursorIntersection  {
+		var gci:GrainCursorIntersection = new GrainCursorIntersection();
+		gci.point.copyFrom( _s_beginToEnd );
+		gci.point.scaleBy( $magnitude );
+		gci.point = $modelSpaceStartPoint.add( gci.point );
+		roundVector( gci.point );
+		gci.gc.copyFrom( this );
+		gci.near = $nearAxis;
+		gci.axis = $axis;
+		if ( ((1 << gci.gc.grain) + getWorldCoordinate( gci.axis)) == GrainCursor.getCoordinate( gci.point, gci.axis ) )
+			GrainCursor.setCoordinate( gci.point, gci.axis, 0.001 );
+		if ( getWorldCoordinate( gci.axis) == GrainCursor.getCoordinate( gci.point, gci.axis ) )
+			GrainCursor.setCoordinate( gci.point, gci.axis, -0.001 );
+		return gci;
+	}
 
 	[inline]
 	public function childId():uint {

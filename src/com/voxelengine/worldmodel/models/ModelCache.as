@@ -35,6 +35,16 @@ public class ModelCache
 	private var _region:Region;
 	
 	public function get models():Vector.<VoxelModel> { return _instances; }
+	public function get getEditableModels():Vector.<VoxelModel> {
+		var list:Vector.<VoxelModel> = new Vector.<VoxelModel>();
+		for ( var i:int; i < _instances.length; i++ ){
+			var vm:VoxelModel = _instances[i];
+			if ( vm && vm.complete && vm.metadata.permissions.modify && !(vm is Player)  && vm != VoxelModel.controlledModel ) // vm.modelInfo.data.oxel
+				list.push(vm);
+		}
+		return list;
+	}
+
 	public function modelsGet():Vector.<VoxelModel> { return _instances; }
 	public function get modelsDynamic():Vector.<VoxelModel> { return _instancesDynamic; }
 	

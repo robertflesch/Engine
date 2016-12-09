@@ -193,7 +193,7 @@ package com.voxelengine.worldmodel.models
 
 		static private	function findEditableModel():VoxelModel {
 			var foundModel:VoxelModel = null;
-			var intersections:Vector.<GrainCursorIntersection> = findRayIntersections( Region.currentRegion.modelCache.models, true );
+			var intersections:Vector.<GrainCursorIntersection> = findRayIntersections( Region.currentRegion.modelCache.getEditableModels, true );
 			intersections.sort( sortIntersections );
 			// get first (closest) interesction
 			var intersection:GrainCursorIntersection = intersections.shift();
@@ -257,28 +257,20 @@ package com.voxelengine.worldmodel.models
 		// TODO RSF - If the closest model has a hole in it, that the ray should pass thru
 		// it still stops and identifies that as the closest model.
 		static public function findRayIntersections( $candidateModels:Vector.<VoxelModel>, $checkChildModels:Boolean = false ):Vector.<GrainCursorIntersection> {
-			// We should only use the models in the view frustrum - TODO - RSF
-			var controlledModel:VoxelModel = VoxelModel.controlledModel;
+			// TODO - RSF  - We should only use the models in the view frustrum
 			for each ( var vm:VoxelModel in $candidateModels )
 			{
-				if ( vm == controlledModel )
-					continue;
-					
 				worldSpaceIntersectionsClear();
 				// finds up to two intersecting planes per model
-				if ( vm && vm.complete && vm.metadata.permissions.modify && vm.modelInfo.data.oxel )
-				{
-					
-					vm.lineIntersect( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections );
-				
-					for each ( var gcIntersection:GrainCursorIntersection in _worldSpaceIntersections )
-						_totalIntersections.push( gcIntersection );
-					
-					// did I intersect this model, and do I need to check its children?
-					// this will add any intersection with the child model to the totalIntersections list
-					if ( true == $checkChildModels && 0 < _worldSpaceIntersections.length && 0 < vm.modelInfo.childVoxelModels.length )
-						findRayIntersections( vm.modelInfo.childVoxelModelsGet(), true );
-				}
+				vm.lineIntersect( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections );
+
+				for each ( var gcIntersection:GrainCursorIntersection in _worldSpaceIntersections )
+					_totalIntersections.push( gcIntersection );
+
+				// did I intersect this model, and do I need to check its children?
+				// this will add any intersection with the child model to the totalIntersections list
+				if ( true == $checkChildModels && 0 < _worldSpaceIntersections.length && 0 < vm.modelInfo.childVoxelModels.length )
+					findRayIntersections( vm.modelInfo.childVoxelModelsGet(), true );
 			}
 			
 			return _totalIntersections;

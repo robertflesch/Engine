@@ -12,5 +12,6 @@ need to add clipVelocity and speedMultiplier to animation editor
 When deleting a model in the inventory, if the model is selected in the region models, it is removed, but the animations and child models are not removed correctly (from the panels) 12.2.16 RSF
 When deleting a model in the inventory, make sure to delete its inventory.
 
+Would be nice to add the name of the item to the image to that you dont have to hover about in it the inventory models panel. Look at updateObjectInfo to see if the BoxInventory supports a title?
 ! 12.1.16 need to add clipVelocity and speedMultiplier to rest of the animations, and to the setState, so that they are not hard coded.
 ! 12.4.16 static lighting on head of dragon

@@ -651,15 +651,13 @@ public class VoxelModel
 	public function worldToModelNew(v:Vector3D,d:Vector3D):void { return instanceInfo.worldToModelNew(v,d); }
 	public function modelToWorld(v:Vector3D):Vector3D { return instanceInfo.modelToWorld(v); }
 	
-	public function lineIntersect( $worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection> ):void {
+	public function lineIntersect( $worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, $intersections:Vector.<GrainCursorIntersection> ):void {
 		var modelSpaceStartPoint:Vector3D = worldToModel( $worldSpaceStartPoint );
 		var modelSpaceEndPoint:Vector3D   = worldToModel( $worldSpaceEndPoint );
 		
 		// if I was inside of a large oxel, the ray would not intersect any of the planes.
 		// So this does a check quick check to see if worldSpaceStart point is inside of the model
-		if ( !modelInfo.data )
-			return
-		var gct:GrainCursor = GrainCursorPool.poolGet( modelInfo.data.oxel.gc.bound );
+		//var gct:GrainCursor = GrainCursorPool.poolGet( modelInfo.data.oxel.gc.bound );
 		//if ( isInside( modelSpaceStartPoint.x, modelSpaceStartPoint.y, modelSpaceStartPoint.z, gct ) )
 		//{
 			//oxel.lineIntersect
@@ -679,14 +677,14 @@ public class VoxelModel
 		//else
 		{
 			// this is returning model space intersections
-			modelInfo.data.oxel.lineIntersect(modelSpaceStartPoint, modelSpaceEndPoint, worldSpaceIntersections );
+			modelInfo.data.oxel.lineIntersect(modelSpaceStartPoint, modelSpaceEndPoint, $intersections );
 		
-			for each (var gci:GrainCursorIntersection in worldSpaceIntersections) {
+			for each (var gci:GrainCursorIntersection in $intersections) {
 				gci.wsPoint = modelToWorld(gci.point);
 				gci.model = this;
 			}
 		}
-		GrainCursorPool.poolDispose( gct );
+		//GrainCursorPool.poolDispose( gct );
 	}
 	
 	public function lineIntersectWithChildren($worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>, $ignoreType:uint, minSize:int):void {

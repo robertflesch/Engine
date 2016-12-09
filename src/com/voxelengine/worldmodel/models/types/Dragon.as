@@ -177,9 +177,9 @@ public class Dragon extends Beast
 		{
 			var vel:Vector3D = instanceInfo.velocityGet;
 			var speedVal:Number = instanceInfo.speed( $elapsedTimeMS )/1000;
-			//Log.out( "Dragon.updateVelocity - speed value calculated: " + speedVal + " is being set to 0.5" );
+//			Log.out( "Dragon.updateVelocity - speed value calculated: " + speedVal + " is being set to 0.5" );
 
-			//speedVal = 0.5;
+			speedVal = 0.5;
 
 			// Add in movement factors
 			if ( MouseKeyboardHandler.forward )	{ 
