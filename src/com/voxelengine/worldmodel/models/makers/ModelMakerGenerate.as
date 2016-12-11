@@ -88,7 +88,6 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			var vm:* = make();
 			if ( vm ) {
 				vm.complete = true;
-				vm.changed = true;
 				modelInfo.changed = true;
 				_modelMetadata.changed = true;
 				vm.save();

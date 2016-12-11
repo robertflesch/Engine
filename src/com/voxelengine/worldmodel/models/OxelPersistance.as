@@ -174,7 +174,12 @@ public class OxelPersistance extends PersistanceObject
 		//Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.DEBUG );
 		super.save();
 	}
-	
+
+	override public function set changed(value:Boolean):void {
+		if ( parent )
+			parent.changed = value;
+	}
+
 	override protected function toObject():void {
 		//Log.out( "OxelPersistance.toObject", Log.WARN );
 		if ( dbo.data )

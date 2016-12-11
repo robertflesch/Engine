@@ -85,7 +85,6 @@ public class VoxelModel
 	private		var	_initialized:Boolean;
 	private 	var _hasInventory:Boolean;
 	protected	var	_stateLock:Boolean;
-	protected	var	_changed:Boolean; 
 	protected	var	_complete:Boolean;
 	protected	var	_selected:Boolean;
 	protected	var	_dead:Boolean; 		 
@@ -107,8 +106,6 @@ public class VoxelModel
 	public	function set usesGravity(val:Boolean):void 			{ _usesGravity = val; }
 	public	function get camera():Camera						{ return _camera; }
 	public	function get anim():Animation 						{ return _anim; }
-	public	function get changed():Boolean						{ return _changed; }
-	public	function set changed( $val:Boolean):void			{ _changed = $val; }
 	public	function get selected():Boolean 					{ return _selected; }
 	public	function set selected(val:Boolean):void  			{ _selected = val; }
 	public 	function get complete():Boolean						{ return _complete; }
@@ -169,6 +166,14 @@ public class VoxelModel
 
 		if (instanceInfo.state != "")
 			stateSet(instanceInfo.state);
+
+		if (instanceInfo.scripts) {
+			for each ( var s:Script in instanceInfo.scripts ) {
+				s.vm = this;
+				s.init();
+
+			}
+		}
 	}
 	
 	private function oxelDataRetrieved(e:OxelDataEvent):void {
@@ -452,7 +457,7 @@ public class VoxelModel
 			Log.out( "VoxelModel.write - going to changeOxel");
 			var result:Boolean = modelInfo.changeOxel( instanceInfo.instanceGuid, $gc, $type, $onlyChangeType );
 			if ( result )
-				changed = true;
+				modelInfo.data.changed = true;
 			return result;
 		}
 		return false
@@ -460,26 +465,26 @@ public class VoxelModel
 	
 	public function write_sphere(cx:int, cy:int, cz:int, radius:int, what:int, gmin:uint = 0):void
 	{
-		changed = true;
+		modelInfo.data.changed = true;
 		modelInfo.data.oxel.write_sphere( instanceInfo.instanceGuid, cx, cy, cz, radius, what, gmin);
 	}
 	
 	public function empty_square(cx:int, cy:int, cz:int, radius:int, gmin:uint = 0):void
 	{
-		changed = true;
+		modelInfo.data.changed = true;
 		modelInfo.data.oxel.empty_square( instanceInfo.instanceGuid, cx, cy, cz, radius, gmin);
 	}
 	
 	public function effect_sphere(cx:int, cy:int, cz:int, ie:ImpactEvent ):void {
 		_timer = getTimer();
-		changed = true;
+		modelInfo.data.changed = true;
 		modelInfo.data.oxel.effect_sphere( instanceInfo.instanceGuid, cx, cy, cz, ie );
 		//Log.out( "VoxelModel.effect_sphere - radius: " + ie.radius + " gmin: " + ie.detail + " took: " + (getTimer() - _timer) );
 		//oxel.mergeRecursive(); // Causes bad things to happen since we dont regen faces!
 	}
 	public function empty_sphere(cx:int, cy:int, cz:int, radius:Number, gmin:uint = 0):void {
 		_timer = getTimer();
-		changed = true;
+		modelInfo.data.changed = true;
 		modelInfo.data.oxel.write_sphere( instanceInfo.instanceGuid, cx, cy - 1, cz, radius - 1.5, TypeInfo.AIR, gmin);
 		
 		//Log.out( "VoxelModel.empty_sphere - radius: " + radius + " gmin: " + gmin + " took: " + (getTimer() - _timer) );
@@ -623,18 +628,11 @@ public class VoxelModel
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public function save():void
 	{
-		if ( !changed ) {
-			//Log.out( "VoxelModel.save - NOT changed, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
-			return;
-		}
 		if ( !Globals.online ) {
 			//Log.out( "VoxelModel.save - NOT online, NOT SAVING name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
 			return;
 		}
 			
-		//Log.out("VoxelModel.save - SAVING changes name: " + metadata.name + "  metadata.modelGuid: " + metadata.guid + "  instanceInfo.instanceGuid: " + instanceInfo.instanceGuid  );
-		//Log.out( "VoxelModel.save - name: " + metadata.name, Log.WARN );
-		changed = false;
 		modelInfo.save();
 		metadata.save();
 	}

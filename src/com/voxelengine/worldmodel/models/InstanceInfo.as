@@ -44,7 +44,7 @@ public class InstanceInfo extends Location	{
 	private var _type:int 										= -1;                           // toJSON - This type overrides a native task type.
 				
 	private var _dynamicObject:Boolean 							= false;						// INSTANCE NOT EXPORTED
-	private var _scripts:Vector.<Script> 						= new Vector.<Script>;		// INSTANCE NOT EXPORTED
+	private var _scripts:Array 									= [];							// toJSON
 	private var _controllingModel:VoxelModel 					= null;    						// INSTANCE NOT EXPORTED
 	private var _owner:VoxelModel 								= null;               			// INSTANCE NOT EXPORTED
 	private var _info:Object 									= null;                         // INSTANCE NOT EXPORTED
@@ -121,9 +121,9 @@ public class InstanceInfo extends Location	{
 		// make sure we have a previous position
 		positionSet = positionGet;
 	}
-	public function get scripts():Vector.<Script>				{ return _scripts; }
+	public function get scripts():Array							{ return _scripts; }
 	public function get state():String 							{ return _state; }
-	public function set state(val:String):void						{ _state = val; }
+	public function set state(val:String):void					{ _state = val; }
 	// I dont like that sometimes this is in World Space, and sometimes in Model Space
 	// example?
 	public function get transforms():Vector.<ModelTransform>	{ return _transforms; }
@@ -192,28 +192,27 @@ public class InstanceInfo extends Location	{
 // do I add transforms in the ii? RSF - 4.27.15
 //		if ( _transforms && 0 < _transforms.length )
 //			obj.model.transforms		= _transforms;
-//		instanceScriptOnly( obj.model );  //
+		instanceScriptOnly( ii );  //
 		
 		return ii;
 		
 		function instanceScriptOnly( obj:Object ):void {
 			if ( _scripts.length ) {
-				var scripts:Object = new Object();
+				var scriptsArray:Array = [];
 				for ( var i:int; i < _scripts.length; i++ ) {
 					if ( _scripts[i]  && !_scripts[i].modelScript ) {
 						Log.out( "InstanceInfo.instanceScriptOnly - script: " + _scripts[i] );
-						scripts["script" + i] = Script.getCurrentClassName( _scripts[i] );
+						//scripts["script" + i] = Script.getCurrentClassName( _scripts[i] );
+						scriptsArray[i] = _scripts[i].toObject();
 				}	}
-				obj.scripts = scripts;
+				obj.scripts = scriptsArray;
 			}
 			else {
 				if ( obj.scripts )
 					delete obj.scripts
 		}	}
 	}
-	
-	
-	
+
 	public function explosionClone():InstanceInfo
 	{
 		var ii:InstanceInfo = new InstanceInfo();
@@ -325,38 +324,32 @@ public class InstanceInfo extends Location	{
 		else
 			script = new scriptClass();
 		
-		script.modelScript = $modelScript;
 		_scripts.push( script );
 		
 		if ( script )
 		{
+			script.modelScript = $modelScript;
 			script.instanceGuid = instanceGuid;
 			script.vm		= owner;
+			script.name     = scriptName;
 			//script.event( OxelEvent.CREATE );
 			// Only person using this is the AutoControlObjectScript
+			//script.init();
 		}
+		if ( owner && owner.complete )
+			Region.currentRegion.changed = true;
 
 		return script;
 	}
 	
-	public function scriptsLoad():void {
-		// Both instanceInfo and modelInfo can have scripts. With each being persisted in correct location.
-		// Currently both are loaded into instanceInfo, which is not great, but it is quick, which is needed
-		if ( scripts && 0 < scripts.length) {
-			for each (var instanceScript:String in scripts )
-				addScript( instanceScript, false );
-		}
-	}
-	
-	
 	public function setScriptInfo( $info:Object ):void {
-		if ( $info.script && ( 0 < $info.script.length ) )
-		{
-			for each ( var scriptObject:Object in $info.script ) {
-				if ( scriptObject.name ) {
-					//trace( "InstanceInfo.setScriptInfo - Model GUID:" + fileName + "  adding script: " + scriptObject.name );
+		if ( $info.scripts ) {
+			for each ( var scriptObject:Object in $info.scripts ) {
+				//trace( "InstanceInfo.setScriptInfo - Model GUID:" + fileName + "  adding script: " + scriptObject.name );
+				if ( scriptObject.param )
+					addScript( scriptObject.name, false, scriptObject.param );
+				else
 					addScript( scriptObject.name, false );
-				}
 			}
 		}
 	}

@@ -14,17 +14,18 @@ package com.voxelengine.GUI.panels
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	// all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
-	public class PanelModelAnimations extends PanelBase
+	public class PanelModelDetails extends PanelBase
 	{
 		private var _parentModel:VoxelModel;
 		private var _listModels:PanelModels;
 		private var _listAnimations:PanelAnimations;
-		private var _childPanel:PanelModelAnimations;
+		private var _listScripts:PanelModelScripts;
+		private var _childPanel:PanelModelDetails;
 		
 		private const width_default:int = 200;
 		private const height_default:int = 150;
 		
-		public function PanelModelAnimations( $parent:PanelBase )
+		public function PanelModelDetails($parent:PanelBase )
 		{
 			super( $parent, width_default, height_default );
 			
@@ -45,23 +46,30 @@ package com.voxelengine.GUI.panels
 				_childPanel = null;
 			}
 			
+			if ( _listScripts ) {
+				_listScripts.close();
+				_listScripts = null;
+			}
+
 			if ( _listAnimations ) {
 				_listAnimations.close();
 				_listAnimations = null;
 			}
+
 			_parentModel = null;
 		}
 		
 		private function selectedModelChanged(e:UIRegionModelEvent):void 
 		{
-			//Log.out( "PanelModelAnimations.selectedModelChanged - parentModel: " + ( _parentModel ? _parentModel.metadata.name : "No parent" ), Log.WARN );
+			//Log.out( "PanelModelDetails.selectedModelChanged - parentModel: " + ( _parentModel ? _parentModel.metadata.name : "No parent" ), Log.WARN );
 			if ( null == e.voxelModel && _parentModel == e.parentVM )
 				childPanelRemove();
 			// true if our child changed the model
 			else if ( e.parentVM == _parentModel ) {
-				//Log.out( "PanelModelAnimations.selectedModelChanged");
+				//Log.out( "PanelModelDetails.selectedModelChanged");
 				childPanelAdd( e.voxelModel );
 				animationPanelAdd( e.voxelModel );
+				scriptPanelAdd( e.voxelModel );
 			}
 		}
 		
@@ -86,7 +94,7 @@ package com.voxelengine.GUI.panels
 		
 		public function childPanelAdd( $selectedModel:VoxelModel ):void {
 			if ( null == _childPanel ) 
-				_childPanel = new PanelModelAnimations( _parent );
+				_childPanel = new PanelModelDetails( _parent );
 			_childPanel.updateChildren( $selectedModel.modelInfo.childVoxelModelsGet, $selectedModel );
 			var topLevel:PanelBase = topLevelGet();
 			topLevel.addElement( _childPanel );
@@ -102,7 +110,17 @@ package com.voxelengine.GUI.panels
 			_listAnimations.populateAnimations( $vm );
 			//recalc( width, height );
 		}
-		
+
+		public function scriptPanelAdd( $vm:VoxelModel ):void {
+			if ( null == _listScripts ) {
+				_listScripts = new PanelModelScripts( this, width_default, 15, height_default );
+				addElement( _listScripts );
+			}
+
+			_listScripts.populateScripts( $vm );
+			//recalc( width, height );
+		}
+
 		public function childPanelRemove():void {
 			if ( null != _childPanel ) {
 				_childPanel.remove();

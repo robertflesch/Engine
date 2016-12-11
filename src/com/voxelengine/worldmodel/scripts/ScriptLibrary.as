@@ -8,7 +8,14 @@
 
 package com.voxelengine.worldmodel.scripts
 {
-	import flash.utils.getDefinitionByName;
+import com.voxelengine.worldmodel.models.ControllableVoxelModel;
+import com.voxelengine.worldmodel.models.types.Beast;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.models.types.Zeppelin;
+import com.voxelengine.worldmodel.weapons.Gun;
+import com.voxelengine.worldmodel.weapons.Projectile;
+
+import flash.utils.getDefinitionByName;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
@@ -17,7 +24,35 @@ package com.voxelengine.worldmodel.scripts
     public class ScriptLibrary 
     {
         public function ScriptLibrary() {}
-        
+
+		public static function getScripts( $vm:VoxelModel ):Vector.<String> {
+
+			var _scriptList:Vector.<String> = new Vector.<String>();
+			if ( $vm is Gun ) {
+				_scriptList.push("FireProjectileScript");
+				_scriptList.push("BombScript");
+				_scriptList.push("AutoFireProjectileScript");
+				_scriptList.push("ExplosionScript");
+			}
+			else if ( $vm is Projectile ) {
+				_scriptList.push("ExplosionScript");
+			}
+			else if ( $vm is Beast ) {
+				_scriptList.push("ControlBeastScript");
+			}
+			else if ( $vm is Zeppelin || $vm is ControllableVoxelModel ) {
+				_scriptList.push("ControlObjectScript");
+				_scriptList.push("AutoControlObjectScript");
+			}
+			else {
+				_scriptList.push("DefaultScript");
+				_scriptList.push("RotateScript");
+				_scriptList.push("BobbleScript");
+
+			}
+			return _scriptList;
+		}
+
         public static function getAsset ( assetLinkageID : String ) : Class
         {
 			ControlObjectScript;
@@ -32,6 +67,8 @@ package com.voxelengine.worldmodel.scripts
 			IceScript;
 			FireScript;
 			DragonFireScript;
+			RotateScript;
+			BobbleScript;
 			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.scripts.DefaultScript" ) );
 			try 
 			{

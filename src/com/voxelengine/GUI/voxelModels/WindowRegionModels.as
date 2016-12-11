@@ -3,7 +3,7 @@ package com.voxelengine.GUI.voxelModels
 {
 	import com.voxelengine.events.CursorOperationEvent;
 	import com.voxelengine.GUI.panels.PanelBase;
-	import com.voxelengine.GUI.panels.PanelModelAnimations;
+	import com.voxelengine.GUI.panels.PanelModelDetails;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
@@ -17,7 +17,7 @@ package com.voxelengine.GUI.voxelModels
 	
 	public class WindowRegionModels extends VVPopup
 	{
-		private var _modelPanel:PanelModelAnimations;
+		private var _modelPanel:PanelModelDetails;
 
 		static public var _s_instance:WindowRegionModels;
 		
@@ -71,7 +71,7 @@ package com.voxelengine.GUI.voxelModels
 			panelCanvas.layout.orientation = LayoutOrientation.HORIZONTAL;
 			addElement( panelCanvas );
 			
-			_modelPanel = new PanelModelAnimations( panelCanvas );
+			_modelPanel = new PanelModelDetails( panelCanvas );
 			_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null );
 			panelCanvas.addElement( _modelPanel );
 		}

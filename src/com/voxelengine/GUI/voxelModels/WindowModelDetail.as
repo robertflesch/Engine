@@ -214,7 +214,6 @@ import com.voxelengine.worldmodel.Light;
 		}
 		
 		private function setChanged():void {
-			_vm.changed = true;
 			_vm.metadata.changed = true;
 			_vm.modelInfo.changed = true;
 			_vm.instanceInfo.changed = true;

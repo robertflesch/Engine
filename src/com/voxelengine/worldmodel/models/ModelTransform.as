@@ -243,7 +243,7 @@ public class ModelTransform
 						if ( ModelTransform.INFINITE_TIME == _originalTime )
 							_time = ModelTransform.INFINITE_TIME;
 						else
-							_time = _originalTime
+							_time = _originalTime;
 						
 						_delta.negate();
 						_inverse = !_inverse;
@@ -274,9 +274,9 @@ public class ModelTransform
 			}
 			else {
 				if ( ROTATION == type ) {
-					_transformTarget.x = _transformTarget.x % 360;
-					_transformTarget.y = _transformTarget.y % 360;
-					_transformTarget.z = _transformTarget.z % 360;
+					_transformTarget.x = (_transformTarget.x + channelRunTime * _delta.x )% 360;
+					_transformTarget.y = (_transformTarget.y + channelRunTime * _delta.y ) % 360;
+					_transformTarget.z = (_transformTarget.z + channelRunTime * _delta.z ) % 360;
 				}
 				else {
 					_transformTarget.x += channelRunTime * _delta.x;

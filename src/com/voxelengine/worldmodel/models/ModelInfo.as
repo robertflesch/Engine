@@ -24,7 +24,6 @@ import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.PersistanceEvent;
-import com.voxelengine.worldmodel.Light;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.animation.Animation;
@@ -37,8 +36,6 @@ import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 import com.voxelengine.worldmodel.models.makers.ModelLibrary;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.scripts.Script;
-import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
 
 public class ModelInfo extends PersistanceObject
 {
@@ -80,8 +77,7 @@ public class ModelInfo extends PersistanceObject
 		return obj
 	}
 
-	
-	public function ModelInfo( $guid:String ):void  { 
+	public function ModelInfo( $guid:String ):void  {
 		super( $guid, Globals.BIGDB_TABLE_MODEL_INFO ); 
 	}
 

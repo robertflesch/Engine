@@ -166,7 +166,6 @@ public class ModelMakerImport extends ModelMakerBase {
 				_modelMetadata.changed = true;
                 // this gets saved in the vm.save
 				//_modelMetadata.save();
-				_vmTemp.changed = true;
 				if ( null == _vmTemp.instanceInfo.controllingModel ) {
 					// Only do this for top level models.
 					var lav:Vector3D = Player.player.instanceInfo.lookAtVector(500);

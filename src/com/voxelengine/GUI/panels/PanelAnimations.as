@@ -38,7 +38,7 @@ public class PanelAnimations extends PanelBase
 	private var _detailButton:				Button;
 	private var _selectedModel:				VoxelModel;
 	
-	public function PanelAnimations( $parent:PanelModelAnimations, $widthParam:Number, $elementHeight:Number, $heightParam:Number )
+	public function PanelAnimations($parent:PanelModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number )
 	{
 		super( $parent, $widthParam, $heightParam );
 		
@@ -128,7 +128,7 @@ public class PanelAnimations extends PanelBase
 				//(new Alert( LanguageManager.localizedStringGet( "NOT IMPLEMENTED" ) )).display();
 				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, _selectedModel.modelInfo.guid, anim.guid, null ) );
 				populateAnimations( _selectedModel );
-				_selectedModel.changed = true;
+				_selectedModel.modelInfo.changed = true;
 				_selectedModel.save();
 			}
 			else

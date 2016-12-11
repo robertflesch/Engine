@@ -1,8 +1,9 @@
-
 package com.voxelengine.GUI.panels
 {
 
-	import org.flashapi.swing.*;
+import com.voxelengine.GUI.VVCanvas;
+
+import org.flashapi.swing.*;
 	import org.flashapi.swing.button.RadioButtonGroup;
 	import org.flashapi.swing.databinding.DataProvider;
     import org.flashapi.swing.event.*;

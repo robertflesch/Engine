@@ -281,9 +281,9 @@ public class GrainCursor
 		//if (tFar > 0 && tFar <= 32)
 		if (tFar > 0 && tFar <= 100) // what does 100 represent?
 		{
-			var gci:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tFar, tFarAxis, false );
-			gci.oxel = $o;
-			$intersections.push( gci );
+			var gci1:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tFar, tFarAxis, false );
+			gci1.oxel = $o;
+			$intersections.push( gci1 );
 		}
 		return true;
 	}	
