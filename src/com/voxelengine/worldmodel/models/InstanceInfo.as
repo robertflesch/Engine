@@ -7,6 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.ScriptEvent;
+
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
 
@@ -314,15 +316,11 @@ public class InstanceInfo extends Location	{
 		setCriticalInfo( _info );
 	}
 	
-	public function addScript( scriptName:String, $modelScript:Boolean, params:* = null ):Script
+	public function addScript( scriptName:String, $modelScript:Boolean, $params:Object = null ):Script
 	{
-		//Log.out( "InstanceInfo.addScript - " + scriptName );
+		//Log.out( "InstanceInfo.add  - " + scriptName );
 		var scriptClass:Class = ScriptLibrary.getAsset( scriptName );
-		var script:Script = null;
-		if ( params )
-			script = new scriptClass( params );
-		else
-			script = new scriptClass();
+		var script:Script = new scriptClass( $params );
 		
 		_scripts.push( script );
 		
@@ -331,10 +329,11 @@ public class InstanceInfo extends Location	{
 			script.modelScript = $modelScript;
 			script.instanceGuid = instanceGuid;
 			script.vm		= owner;
-			script.name     = scriptName;
+			script.name     = Script.getCurrentClassName(script);
 			//script.event( OxelEvent.CREATE );
 			// Only person using this is the AutoControlObjectScript
-			//script.init();
+			if ( owner )
+				script.init();
 		}
 		if ( owner && owner.complete )
 			Region.currentRegion.changed = true;
@@ -443,14 +442,14 @@ public class InstanceInfo extends Location	{
 
 	public function advance( $elapsedTimeMS:int ):Boolean {
 		var index:int = 0;
-		for each ( var trans:ModelTransform in transforms )
+		for each ( var mt:ModelTransform in transforms )
 		{
 			//Log.out( "InstanceInfo.update: " + trans );
 			// Update transform, performing appropriate action and
 			// check to see if there is time remaining on this transform
-			if ( trans.update( $elapsedTimeMS, owner ) )
+			if ( mt.update( $elapsedTimeMS, owner ) )
 			{
-				if ( ModelTransform.LIFE == trans.type )
+				if ( ModelTransform.LIFE == mt.type )
 				{
 					owner.dead = true;
 					//Log.out("InstanceInfo.update - marking expired instance as dead: " + instanceGuid );
@@ -460,6 +459,7 @@ public class InstanceInfo extends Location	{
 				// this transform is now expired!
 				//Log.out( "InstanceInfo.update - removing expired transform", Log.ERROR );
 				transforms.splice( index, 1 );
+				ScriptEvent.create( ScriptEvent.SCRIPT_EXPIRED, mt.type, instanceGuid, mt.name );
 			}
 			index++;	
 		}
@@ -481,6 +481,8 @@ public class InstanceInfo extends Location	{
 				// this transform is now expired!
 				//Log.out( "InstanceInfo.update - removing NAMED transform", Log.ERROR );
 				transforms.splice( index, 1 );
+				ScriptEvent.create( ScriptEvent.SCRIPT_EXPIRED, mt.type, instanceGuid, mt.name );
+
 				break;
 			}
 			index++;	
@@ -510,6 +512,8 @@ public class InstanceInfo extends Location	{
 					//}
 				//}				
 				transforms.splice( index, 1 );
+				ScriptEvent.create( ScriptEvent.SCRIPT_EXPIRED, mt.type, instanceGuid, mt.name );
+
 			}
 			index++;	
 		}
