@@ -140,6 +140,7 @@ package com.voxelengine.worldmodel
 			addEventListeners();
 			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_BEGUN, 0, guid ) );
 			// old style uses region.
+			setSkyColor( info.skyColor );
 			var count:int = loadRegionObjects(info.models);
 			
 			_loaded = false;
@@ -310,7 +311,6 @@ package com.voxelengine.worldmodel
 			dbo = $dbo;
 			info = $dbo;
 			_permissions = new PermissionsRegion( info.permissions );
-			fromInfo();
 			changed = false;
 		}
 		
@@ -325,19 +325,7 @@ package com.voxelengine.worldmodel
 			info.playerPosition.x = info.playerPosition.y = info.playerPosition.z = 0;
 			info.playerRotation.x = info.playerRotation.y = info.playerRotation.z = 0;
 			_permissions = new PermissionsRegion( info );
-			fromInfo();
 			changed = true;
 		}
-		
-		private function fromInfo():void {
-			// push it into the vector3d
-			setSkyColor( info.skyColor )
-			
-			for each ( var instanceInfo:Object in info.models ) {
-				var ii:InstanceInfo = new InstanceInfo();
-				ii.fromObject( instanceInfo );
-			}
-		}
-		
 	} // Region
 } // Package
