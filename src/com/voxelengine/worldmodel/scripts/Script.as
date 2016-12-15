@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2017 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -8,10 +8,11 @@
 package com.voxelengine.worldmodel.scripts
 {
 	import com.voxelengine.Log;
-	import com.voxelengine.worldmodel.models.ModelInfo;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
-	
-	/**
+
+import flash.utils.getQualifiedClassName;
+
+/**
 	 * ...
 	 * @author Robert Flesch - RSF 
 	 * 
@@ -34,12 +35,11 @@ package com.voxelengine.worldmodel.scripts
 		public function get vm():VoxelModel { return _vm; }
 		public function set vm(value:VoxelModel):void { _vm = value; }
 
-		public function Script() 
+		public function Script( $params:Object )
 		{ 
 		}
 
 		public function init():void {
-
 		}
 		
 		public function dispose():void { 
@@ -48,25 +48,36 @@ package com.voxelengine.worldmodel.scripts
 		}
 
 		public function toObject():Object {
+			Log.out( "This object: " + getCurrentClassName(this) + " does not override toObject", Log.WARN );
 			return {name: Script.getCurrentClassName(this)}
 		}
 
-		public function toJSON(k:*):* {
-			
-			var className:String = getCurrentClassName(this);
-			return { name : className }
+		public function toString():String {
+			Log.out( "This object: " + getCurrentClassName(this) + " does not override toString", Log.WARN );
+			return Script.getCurrentClassName(this);
 		}
-		
-		public static function getCurrentClassName(c:Object):String
-			{
-				var cString:String = c.toString();
-				var cSplittedFirst:Array = cString.split('[object ');
-				var cFirstString:String = String(cSplittedFirst[1]);
-				var cSplittedLast:Array = cFirstString.split(']');
-				var cName:String = cSplittedLast.join('');
 
-				return cName;
-			}		
-			
+		public function fromObject( $obj:Object):void {
+			Log.out( "This object: " + getCurrentClassName(this) + " does not override fromObject", Log.WARN );
 		}
+
+		public function fromString( $params:String ):void {
+			try {
+				var obj:Object = JSON.parse($params);
+				if (obj)
+					fromObject(obj);
+			} catch (e:Error) {
+				Log.out( "This object: " + getCurrentClassName(this) + " had an error when parsing is params in fromString params: " + $params, Log.WARN );
+			}
+		}
+
+
+		public static function getCurrentClassName(c:Object):String{
+			var namePath:String = getQualifiedClassName( c );
+			var i:int = namePath.lastIndexOf("::") + 2;
+			namePath = namePath.substring(i);
+			return namePath;
+		}
+
+}
 }

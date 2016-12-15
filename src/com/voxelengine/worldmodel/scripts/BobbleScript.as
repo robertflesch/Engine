@@ -7,24 +7,62 @@ package com.voxelengine.worldmodel.scripts
  * ...
  * @author Bob
  */
+
+import com.voxelengine.Log;
+import com.voxelengine.events.ScriptEvent;
 import com.voxelengine.worldmodel.models.ModelTransform;
+
+import flash.geom.Vector3D;
 
 public class BobbleScript extends Script
 {
-    public function BobbleScript() {
+    private var _defaultBobbleRate:Number = 15;
+    private var _defaultBobbleDistance:Number = 100;
+    private var _originalPos:Vector3D = new Vector3D();
+    public function BobbleScript(  $params:Object ) {
+        super($params);
+        fromObject( $params )
     }
 
     override public function init():void {
-        //addTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" ):void {
-        vm.instanceInfo.addTransform( 0, 1, 0, 5, ModelTransform.POSITION_REPEATING, "BobbleScript" );
+        _originalPos = vm.instanceInfo.positionGet.clone();
+        addBobble();
+    }
+
+    private function addBobble():void {
+        ScriptEvent.addListener( ScriptEvent.SCRIPT_EXPIRED, scriptExpired );
+        vm.instanceInfo.addTransform( 0, _defaultBobbleDistance, 0, _defaultBobbleRate, ModelTransform.POSITION, "BobbleScript" );
+    }
+
+    private function scriptExpired( se:ScriptEvent ):void {
+        ScriptEvent.removeListener( ScriptEvent.SCRIPT_EXPIRED, scriptExpired );
+        Log.out( "BobbleScript.scriptExpired")
     }
 
     override public function dispose():void {
         // have to call this before I dispose of the handle to the VM
-        vm.instanceInfo.removeNamedTransform( ModelTransform.POSITION_REPEATING, "BobbleScript" );
+        vm.instanceInfo.removeNamedTransform( ModelTransform.POSITION, "BobbleScript" );
+        vm.instanceInfo.positionSet = _originalPos;
         super.dispose();
     }
 
-}
+    override public function toObject():Object {
+        return {name: super.toString() , param: { defaultBobbleRate: _defaultBobbleRate, defaultBobbleDistance: _defaultBobbleDistance } };
+    }
 
+    override public function fromObject( $params:Object):void {
+        if ( $params ) {
+            if ($params.defaultBobbleRate)
+                _defaultBobbleRate = $params.defaultBobbleRate;
+            if ($params.defaultBobbleDistance)
+                _defaultBobbleDistance = $params.defaultBobbleDistance;
+        }
+    }
+
+    override public function toString():String {
+        return  '{ "defaultBobbleRate": ' + _defaultBobbleRate +
+                ', "defaultBobbleDistance": ' + _defaultBobbleDistance + ' }';
+    }
+
+}
 }

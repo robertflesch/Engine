@@ -14,7 +14,7 @@ import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.PersistanceEvent;
-import com.voxelengine.events.ScriptSelectedEvent;
+import com.voxelengine.events.ScriptEvent;
 import com.voxelengine.events.VVWindowEvent;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -86,7 +86,10 @@ public class WindowScriptList extends VVPopup
     {
         var listBox:ListBox = e.target as ListBox;
         var item:ListItem = listBox.itemGet( listBox.selectedIndex );
-        ScriptSelectedEvent.create( ScriptSelectedEvent.SCRIPT_SELECTED, item.value )
+        // I am missing using name here,
+        // since name usually refers to a name of a script, not the type of a script
+        // and here name is type
+        ScriptEvent.create( ScriptEvent.SCRIPT_SELECTED, 0, "", item.value )
         remove();
     }
 

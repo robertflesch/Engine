@@ -24,8 +24,8 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class FireProjectileScript extends Script
 {
-	public function FireProjectileScript()
-	{
+	public function FireProjectileScript( $params:Object ) {
+		super( $params );
 		WeaponEvent.addListener( WeaponEvent.FIRE, onFire );
 		ProjectileEvent.addListener( ProjectileEvent.PROJECTILE_CREATED, createProjectile );
 	}

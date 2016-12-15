@@ -7,22 +7,15 @@ package com.voxelengine.worldmodel.scripts
  * ...
  * @author Bob
  */
-import com.voxelengine.Globals;
-import com.voxelengine.GUI.actionBars.WindowShipControl;
-import com.voxelengine.GUI.actionBars.WindowGunControl;
-import com.voxelengine.GUI.WindowShipControlQuery;
 import com.voxelengine.worldmodel.models.ModelTransform;
-import com.voxelengine.worldmodel.scripts.Script;
-import com.voxelengine.events.TriggerEvent;
-import com.voxelengine.Log;
-import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class RotateScript extends Script
 {
     private var _rotationRate:Number = 1;
-    public function RotateScript( $rotationRate:Number = 1 ) {
-        _rotationRate = $rotationRate
+    public function RotateScript( $params:Object ) {
+        super( $params );
+        if ( $params && $params.rotationRate )
+            _rotationRate = $params.rotationRate;
     }
 
     override public function init():void {
@@ -36,7 +29,12 @@ public class RotateScript extends Script
     }
 
     override public function toObject():Object {
-        return {name: Script.getCurrentClassName(this), param: _rotationRate }
+        return {name: Script.getCurrentClassName(this), param: { rotationRate: _rotationRate } };
+    }
+
+    override public function fromObject( $obj:Object):void {
+        if ( $obj && $obj.rotationRate )
+            _rotationRate = $obj.rotationRate;
     }
 
 }

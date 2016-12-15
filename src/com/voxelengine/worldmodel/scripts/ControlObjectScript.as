@@ -18,8 +18,8 @@ package com.voxelengine.worldmodel.scripts
 	{
 		private var _wt:WindowShipControlQuery = null;
 				
-		public function ControlObjectScript() 
-		{
+		public function ControlObjectScript( $params:Object ) {
+			super( $params );
 			TriggerEvent.addListener( TriggerEvent.INSIDE, onInsideEvent, true, 0, true);
 			TriggerEvent.addListener( TriggerEvent.OUTSIDE, onOutsideEvent, true, 0, true);
 		}

@@ -22,9 +22,8 @@ package com.voxelengine.worldmodel.scripts
 		private var _timer:Timer;
 		private var _repeatTime:int = 5000;
 		
-		public function AutoFireProjectileScript() 
-		{
-			super();
+		public function AutoFireProjectileScript($params:Object ) {
+			super ( $params );
 			
 			_timer = new Timer( _repeatTime, 0);
 			_timer.addEventListener( TimerEvent.TIMER

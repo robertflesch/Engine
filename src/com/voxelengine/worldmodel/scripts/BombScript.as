@@ -32,9 +32,11 @@ public class BombScript extends Script
 	//private var _channel:SoundChannel;
 	protected var _soundFile:String = "BombDrop.mp3";		
 	
-	public function BombScript( bulletSize:int = 2 ) 
-	{
-		_bulletSize = bulletSize;
+	public function BombScript( $params:Object ) {
+		super( $params );
+		if ( $params && $params.bulletSize )
+			_bulletSize = $params.bulletSize;
+
 		addKeyboardListeners();
 		//SoundCache.getSound( _soundFile ); // Preload the sound file
 		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, _soundFile, null, Globals.isGuid( _soundFile ) ? true : false ) )

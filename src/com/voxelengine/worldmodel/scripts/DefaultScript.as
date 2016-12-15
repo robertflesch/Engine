@@ -7,8 +7,8 @@ package com.voxelengine.worldmodel.scripts
 	public class DefaultScript extends Script
 	{
 		
-		public function DefaultScript() 
-		{
+		public function DefaultScript($params:Object ) {
+			super( $params );
 		}
 		
 	}

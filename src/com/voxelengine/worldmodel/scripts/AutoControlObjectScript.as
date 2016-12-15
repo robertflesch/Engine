@@ -23,8 +23,8 @@ package com.voxelengine.worldmodel.scripts
 	
 	public class AutoControlObjectScript extends Script 
 	{
-		public function AutoControlObjectScript() 
-		{
+		public function AutoControlObjectScript( $params:Object ) {
+			super ( $params );
 			ModelEvent.addListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent, false, 0, true );
 			Log.out( "AutoControlObjectScript.AutoControlObjectScript scirpt for player controlling this object: ", Log.ERROR );
 		}

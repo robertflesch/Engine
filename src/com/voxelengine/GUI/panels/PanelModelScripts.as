@@ -5,8 +5,9 @@ package com.voxelengine.GUI.panels
 {
 import com.voxelengine.GUI.LanguageManager;
 import com.voxelengine.GUI.WindowScriptList;
+import com.voxelengine.GUI.voxelModels.WindowScriptDetail;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ScriptSelectedEvent;
+import com.voxelengine.events.ScriptEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.scripts.Script;
 import org.flashapi.swing.*;
@@ -82,6 +83,8 @@ public class PanelModelScripts extends PanelBase
                 _listScripts.addItem(anim.name, anim);
             }
         }
+
+        select(null);
     }
 
     // FIXME This would be much better with drag and drop
@@ -118,18 +121,19 @@ public class PanelModelScripts extends PanelBase
         function deleteScriptHandler(event:UIMouseEvent):void  {
             if ( _selectedScript )
             {
-                var script:Script = _selectedScript;
                 var scripts:Array = _selectedModel.instanceInfo.scripts;
                 for ( var i:int; i < scripts.length; i++ ){
-                    if ( script == scripts[i] ) {
+                    if ( _selectedScript == scripts[i] ) {
                         scripts[i].dispose();
                         scripts[i] = null;
                         scripts.splice( i, 1 );
                     }
                 }
                 populateScripts( _selectedModel );
-                _selectedModel.modelInfo.changed = true;
-                _selectedModel.save();
+                // these are instance scripts, not model scripts.
+                //_selectedModel.modelInfo.changed = true;
+                Region.currentRegion.changed = true;
+                Region.currentRegion.save();
             }
             else
                 noScriptSelected();
@@ -139,7 +143,11 @@ public class PanelModelScripts extends PanelBase
 
     private function select(event:ListEvent):void
     {
-        _selectedScript = event.target.data;
+        if ( event && event.target && event.target.data )
+            _selectedScript = event.target.data;
+        else
+            _selectedScript = null;
+
         if ( _selectedScript )
         {
             _selectedModel.stateLock( false );
@@ -159,28 +167,25 @@ public class PanelModelScripts extends PanelBase
     }
 
 
-    private function scriptDetailHandler(event:UIMouseEvent):void
-    {
-//        new WindowScriptDetail( _selectedModel.modelInfo.guid, _selectedScript );
+    private function scriptDetailHandler(event:UIMouseEvent):void {
+        new WindowScriptDetail( _selectedScript );
     }
 
-    private function scriptAddHandler(event:UIMouseEvent):void
-    {
-        ScriptSelectedEvent.addListener( ScriptSelectedEvent.SCRIPT_SELECTED, scriptSelected );
+    private function scriptAddHandler(event:UIMouseEvent):void {
+        ScriptEvent.addListener( ScriptEvent.SCRIPT_SELECTED, scriptSelected );
         new WindowScriptList( _selectedModel );
     }
 
     ///////////////////////////////////////////////////////////////////////
 
-    private function noScriptSelected():void
-    {
+    private function noScriptSelected():void {
         (new Alert( LanguageManager.localizedStringGet( "No_Script_Selected" ) )).display();
     }
 
-    private function scriptSelected(event:ScriptSelectedEvent):void {
-        var scriptName:String = event.scriptName;
-        _listScripts.addItem( scriptName );
-        _selectedModel.instanceInfo.addScript( scriptName, false);
+    private function scriptSelected(se:ScriptEvent):void {
+        // I am misusing se.name here, name is really the 'type'
+        var addedScript:Script = _selectedModel.instanceInfo.addScript( se.name, false);
+        _listScripts.addItem(  se.name, addedScript );
         Region.currentRegion.save();
     }
 }

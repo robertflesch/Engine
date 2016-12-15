@@ -16,8 +16,8 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class ControlBeastScript extends Script 
 {
-	public function ControlBeastScript() 
-	{
+	public function ControlBeastScript( $params:Object ) {
+		super( $params );
 		TriggerEvent.addListener( TriggerEvent.INSIDE, onInsideEvent );
 		TriggerEvent.addListener( TriggerEvent.OUTSIDE, onOutsideEvent );
 	}
