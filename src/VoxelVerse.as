@@ -188,6 +188,7 @@ public class VoxelVerse extends Sprite
 
 		MemoryManager.update();
 
+		Log.out( "VoxelVerse.enterFrame elapsed: " + elapsed );
 		RegionManager.instance.update( elapsed );
 		var timeUpdate:int = getTimer() - timeEntered;
 		Shader.animationOffsetsUpdate( elapsed );

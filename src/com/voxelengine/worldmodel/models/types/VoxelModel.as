@@ -170,7 +170,7 @@ public class VoxelModel
 		if (instanceInfo.scripts) {
 			for each ( var s:Script in instanceInfo.scripts ) {
 				s.vm = this;
-//				s.init();
+				s.init();
 
 			}
 		}

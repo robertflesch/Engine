@@ -71,12 +71,6 @@ public class PanelModelScripts extends PanelBase
     {
         _selectedModel = $vm;
         _listScripts.removeAll();
-//        if ( $vm.modelInfo.scripts ) {
-//            var anims:Array = $vm.modelInfo.scripts;
-//            for each (var anim:Script in anims) {
-//                _listScripts.addItem(anim.name, anim);
-//            }
-//        }
         if ( $vm.instanceInfo.scripts ) {
             var scripts:Array = $vm.instanceInfo.scripts;
             for each (var anim:Script in scripts) {

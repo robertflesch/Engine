@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.scripts
 
 import com.voxelengine.Log;
 import com.voxelengine.events.ScriptEvent;
+import com.voxelengine.events.TransformEvent;
 import com.voxelengine.worldmodel.models.ModelTransform;
 
 import flash.geom.Vector3D;
@@ -30,12 +31,12 @@ public class BobbleScript extends Script
     }
 
     private function addBobble():void {
-        ScriptEvent.addListener( ScriptEvent.SCRIPT_EXPIRED, scriptExpired );
+        TransformEvent.addListener( TransformEvent.ENDED, transformExpired );
         vm.instanceInfo.addTransform( 0, _defaultBobbleDistance, 0, _defaultBobbleRate, ModelTransform.POSITION, "BobbleScript" );
     }
 
-    private function scriptExpired( se:ScriptEvent ):void {
-        ScriptEvent.removeListener( ScriptEvent.SCRIPT_EXPIRED, scriptExpired );
+    private function transformExpired( se:TransformEvent ):void {
+        TransformEvent.removeListener( TransformEvent.ENDED, transformExpired );
         Log.out( "BobbleScript.scriptExpired")
     }
 

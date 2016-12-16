@@ -440,6 +440,8 @@ public class InstanceInfo extends Location	{
 		}
 	}
 
+	public function update( $elapsedTimeMS:int ):Boolean { return advance( $elapsedTimeMS ); }
+
 	public function advance( $elapsedTimeMS:int ):Boolean {
 		var index:int = 0;
 		for each ( var mt:ModelTransform in transforms )
@@ -447,10 +449,8 @@ public class InstanceInfo extends Location	{
 			//Log.out( "InstanceInfo.update: " + trans );
 			// Update transform, performing appropriate action and
 			// check to see if there is time remaining on this transform
-			if ( mt.update( $elapsedTimeMS, owner ) )
-			{
-				if ( ModelTransform.LIFE == mt.type )
-				{
+			if ( mt.update( $elapsedTimeMS, owner ) ) {
+				if ( ModelTransform.LIFE == mt.type ) {
 					owner.dead = true;
 					//Log.out("InstanceInfo.update - marking expired instance as dead: " + instanceGuid );
 					return true;
@@ -459,7 +459,6 @@ public class InstanceInfo extends Location	{
 				// this transform is now expired!
 				//Log.out( "InstanceInfo.update - removing expired transform", Log.ERROR );
 				transforms.splice( index, 1 );
-				ScriptEvent.create( ScriptEvent.SCRIPT_EXPIRED, mt.type, instanceGuid, mt.name );
 			}
 			index++;	
 		}
@@ -469,20 +468,14 @@ public class InstanceInfo extends Location	{
 		return false;
 	}
 	
-	public function update( $elapsedTimeMS:int ):Boolean { return advance( $elapsedTimeMS ); }
-	
 	public function removeNamedTransform( type:int, name:String ):void {
 		var index:int = 0;
 		// see if the transformations contain one already with this name.
-		for each ( var mt:ModelTransform in transforms )
-		{
-			if ( mt.name == name && mt.type == type )
-			{
+		for each ( var mt:ModelTransform in transforms ) {
+			if ( mt.name == name && mt.type == type ) {
 				// this transform is now expired!
 				//Log.out( "InstanceInfo.update - removing NAMED transform", Log.ERROR );
 				transforms.splice( index, 1 );
-				ScriptEvent.create( ScriptEvent.SCRIPT_EXPIRED, mt.type, instanceGuid, mt.name );
-
 				break;
 			}
 			index++;	
@@ -494,26 +487,10 @@ public class InstanceInfo extends Location	{
 		//Log.out( "InstanceInfo.removeAllNamedTransforms", Log.WARN );
 		var index:int = 0;
 		// see if the transformations contain one already with this name.
-		for each ( var mt:ModelTransform in transforms )
-		{
-			if ( "" != mt.name )
-			{
+		for each ( var mt:ModelTransform in transforms ) {
+			if ( "" != mt.name ) {
 				//Log.out( "InstanceInfo.removeAllNamedTransforms - name:" + name, Log.ERROR );
-				// TODO http://jacksondunstan.com/articles/1279
-				// a way to not allocate more memory
-				//function removePerson(name:String): void
-				//{
-					//var index:int = people.indexOf(name);
-					//if (index >= 0)
-					//{
-						//var len:int = people.length - 1;
-						//people[index] = people[len];
-						//people.length = len;
-					//}
-				//}				
 				transforms.splice( index, 1 );
-				ScriptEvent.create( ScriptEvent.SCRIPT_EXPIRED, mt.type, instanceGuid, mt.name );
-
 			}
 			index++;	
 		}

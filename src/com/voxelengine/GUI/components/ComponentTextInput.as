@@ -26,5 +26,9 @@ public class ComponentTextInput extends Box
 			
 		addElement( _li );
 	}
+
+	public function text():String {
+		return _li.text;
+	}
 }
 }
