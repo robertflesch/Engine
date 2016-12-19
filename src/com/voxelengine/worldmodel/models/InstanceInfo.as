@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.ScriptEvent;
+import com.voxelengine.events.TransformEvent;
 
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
@@ -203,7 +204,7 @@ public class InstanceInfo extends Location	{
 				var scriptsArray:Array = [];
 				for ( var i:int; i < _scripts.length; i++ ) {
 					if ( _scripts[i]  && !_scripts[i].modelScript ) {
-						Log.out( "InstanceInfo.instanceScriptOnly - script: " + _scripts[i] );
+						Log.out( "InstanceInfo.instanceScriptOnly - script: " + Script.getCurrentClassName( _scripts[i] ) );
 						//scripts["script" + i] = Script.getCurrentClassName( _scripts[i] );
 						scriptsArray[i] = _scripts[i].toObject();
 				}	}
@@ -476,6 +477,7 @@ public class InstanceInfo extends Location	{
 				// this transform is now expired!
 				//Log.out( "InstanceInfo.update - removing NAMED transform", Log.ERROR );
 				transforms.splice( index, 1 );
+				TransformEvent.dispatch( new TransformEvent( TransformEvent.ENDED, instanceGuid, mt.name ) );
 				break;
 			}
 			index++;	
@@ -491,6 +493,7 @@ public class InstanceInfo extends Location	{
 			if ( "" != mt.name ) {
 				//Log.out( "InstanceInfo.removeAllNamedTransforms - name:" + name, Log.ERROR );
 				transforms.splice( index, 1 );
+				TransformEvent.dispatch( new TransformEvent( TransformEvent.ENDED, instanceGuid, mt.name ) );
 			}
 			index++;	
 		}

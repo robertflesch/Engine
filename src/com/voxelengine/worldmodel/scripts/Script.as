@@ -12,11 +12,6 @@ package com.voxelengine.worldmodel.scripts
 
 import flash.utils.getQualifiedClassName;
 
-/**
-	 * ...
-	 * @author Robert Flesch - RSF 
-	 * 
-	 */
 	public class Script
 	{
 		protected var _name:String = null;
@@ -35,9 +30,7 @@ import flash.utils.getQualifiedClassName;
 		public function get vm():VoxelModel { return _vm; }
 		public function set vm(value:VoxelModel):void { _vm = value; }
 
-		public function Script( $params:Object )
-		{ 
-		}
+		public function Script( $params:Object ){ }
 
 		public function init():void {
 		}
@@ -71,6 +64,10 @@ import flash.utils.getQualifiedClassName;
 			}
 		}
 
+		public function paramsString():String {
+			Log.out( "This object: " + getCurrentClassName(this) + " does not override paramsString", Log.WARN );
+			return Script.getCurrentClassName(this);
+		}
 
 		public static function getCurrentClassName(c:Object):String{
 			var namePath:String = getQualifiedClassName( c );

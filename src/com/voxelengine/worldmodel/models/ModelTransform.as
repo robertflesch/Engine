@@ -240,10 +240,10 @@ public class ModelTransform
 				// if this is the object's life, removed it.
 				if ( elapsedTimeMS >= _time ) {
 					if ( ROTATION_REPEATING == type || POSITION_REPEATING == type ) {
-						if ( ModelTransform.INFINITE_TIME == _originalTime )
+						if ( ModelTransform.INFINITE_TIME == originalTime )
 							_time = ModelTransform.INFINITE_TIME;
 						else
-							_time = _originalTime;
+							_time = originalTime * 1000;
 						
 						_delta.negate();
 						_inverse = !_inverse;
@@ -307,7 +307,7 @@ public class ModelTransform
 	
 	public function toObject():Object {			
 		var obj:Object = new Object();
-		obj.time 	= _originalTime;
+		obj.time 	= originalTime;
 		obj.delta	= vector3DToObject( _originalDelta );
 		obj.type 	= typeToString( _type );
 		return obj
@@ -389,7 +389,7 @@ public class ModelTransform
 	}
 	*/
 	public function toString():String { 
-		return "{ delta: " +  _originalDelta + "  time: " + _originalTime + "  type: " + typeToString( _type ) + "  name: " + name + "}";
+		return "{ delta: " +  originalDelta + "  time: " + originalTime + "  type: " + typeToString( _type ) + "  name: " + name + "}";
 	} 			
 	
 	public function deltaAsString():String { 

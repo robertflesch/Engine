@@ -36,7 +36,7 @@ public class Room
 		// Save the region id for when we need to load the region.
 		_guid = $guid;
 		
-		trace("Room.joinRoom - trying to join room at host: " + Network.client.multiplayer.developmentServer );
+		//trace("Room.joinRoom - trying to join room at host: " + Network.client.multiplayer.developmentServer );
 		//Create pr join the room test
 		//public function createJoinRoom (roomId:String, roomType:String, visible:Boolean, roomData:Object, joinData:Object, callback:Function=null, errorHandler:Function=null) : void;
 		Network.client.multiplayer.createJoinRoom(

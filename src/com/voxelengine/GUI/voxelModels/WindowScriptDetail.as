@@ -35,7 +35,7 @@ public class WindowScriptDetail extends VVPopup
         addElement( new ComponentSpacer( WIDTH ) );
         _text = new ComponentTextInput( "Parameters: "
                 , function ($e:TextEvent):void {  }
-                , $script.toString()
+                , $script.paramsString()
                 , WIDTH );
         addElement( _text );
 

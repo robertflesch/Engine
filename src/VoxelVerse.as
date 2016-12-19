@@ -143,7 +143,7 @@ public class VoxelVerse extends Sprite
 	public function readyToGo():void	{
 		Log.out( "<===============VoxelVerse.readyToGo - ENTER", Log.DEBUG )
 
-		timeEntered = getTimer();
+		_s_timeEntered = getTimer();
 
 		initializeDataAfterSplash();
 
@@ -159,13 +159,15 @@ public class VoxelVerse extends Sprite
 		addEventListener(Event.ACTIVATE, activate);
 		stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
 		activate( new Event( Event.ACTIVATE ) );
-		Log.out("<===============VoxelVerse.readyToGo: " + (getTimer() - timeEntered) );
+		Log.out("<===============VoxelVerse.readyToGo: " + (getTimer() - _s_timeEntered) );
 		return;
 
 	}
 
-	public static var timeEntered:int = 0;
-	public static var framesToDisplaySplash:int = 0;
+	private static var _s_timeEntered:int;
+	private static var _s_timeRender:int;
+	private static var _s_timeUpdate:int;
+	private static var framesToDisplaySplash:int;
     private static var _s_frameTime:int;
     public static function frameTime():int { return _s_frameTime; }
 	private static var _s_frameCounter:int = 0;
@@ -173,7 +175,7 @@ public class VoxelVerse extends Sprite
 		_s_frameCounter++;
 		if ( 0 == (_s_frameCounter % 60) )
 			Log.out( "VoxelVerse.enterFrame 60 frames" );
-		if ( 0 == timeEntered ) {
+		if ( 0 == _s_timeEntered ) {
 			if ( _splashDisplayed && ( 1 == framesToDisplaySplash) )
 				readyToGo();
 			else{
@@ -182,26 +184,25 @@ public class VoxelVerse extends Sprite
 			}
 		}
 		else
-			timeEntered = getTimer();
+			_s_timeEntered = getTimer();
 
-		var elapsed:int = timeEntered - _timePrevious;
+		var interFrameTime:int = _s_timeEntered - _timePrevious;
 
 		MemoryManager.update();
 
-		Log.out( "VoxelVerse.enterFrame elapsed: " + elapsed );
-		RegionManager.instance.update( elapsed );
-		var timeUpdate:int = getTimer() - timeEntered;
-		Shader.animationOffsetsUpdate( elapsed );
+		RegionManager.instance.update( interFrameTime + _s_timeRender );
+		Shader.animationOffsetsUpdate( interFrameTime + _s_timeRender );
+		_s_timeUpdate = getTimer() - _s_timeEntered;
 
 		Renderer.renderer.render();
-		var timeRender:int = getTimer() - timeEntered - timeUpdate;
+		_s_timeRender = getTimer() - _s_timeEntered - _s_timeUpdate;
 
 		if ( showConsole )
 			toggleConsole();
 
-        _s_frameTime = elapsed + timeUpdate + timeRender;
-		//if ( ( 20 < timeRender || 10 < timeUpdate ) && Globals.active && Globals.isDebug )
-		//  Log.out( "VoxelVerse.enterFrame - render: " + timeRender + "  timeUpdate: " + timeUpdate + "  total time: " +  + ( getTimer() - timeEntered ) + "  time to get back to app: " + elapsed, Log.INFO )
+        _s_frameTime = interFrameTime + _s_timeUpdate + _s_timeRender;
+		if ( ( 20 < _s_timeRender || 10 < _s_timeUpdate ) && Globals.active && Globals.isDebug )
+			Log.out( "VoxelVerse.enterFrame - update: "  + _s_timeUpdate + " render: " + _s_timeRender  + "  total: " +  _s_frameTime + "  interFrameTime: " + interFrameTime, Log.INFO )
 
 		// For some reason is was important to make sure everything was updated before this got passed on to child classes.
 		AppEvent.dispatch( e )
