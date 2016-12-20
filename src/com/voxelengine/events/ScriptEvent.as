@@ -16,19 +16,17 @@ public class ScriptEvent extends Event
     static public const SCRIPT_SELECTED:String	= "SCRIPT_SELECTED";
     static public const SCRIPT_EXPIRED:String	= "SCRIPT_EXPIRED";
 
-    private var _scriptType:int;
     private var _name:String;
-    private var _guid:String                = "";
+    private var _guid:String;
 
-    public function ScriptEvent($type:String, $scriptType:int, $guid:String = "", $name:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false ) {
+    public function ScriptEvent($type:String, $guid:String = "", $name:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false ) {
         super( $type, $bubbles, $cancellable );
-        _scriptType = $scriptType;
         _guid = $guid;
         _name = $name;
     }
 
     public override function clone():Event {
-        return new ScriptEvent(type, _scriptType, _guid, _name, bubbles, cancelable);
+        return new ScriptEvent(type, _guid, _name, bubbles, cancelable);
     }
 
     public override function toString():String {
@@ -51,16 +49,13 @@ public class ScriptEvent extends Event
         return _eventDispatcher.dispatchEvent( $event );
     }
 
-    static public  function create( $type:String, $scriptType:int, $guid:String = "", $name:String = "" ):Boolean {
-        return ScriptEvent.dispatch( new ScriptEvent( $type, $scriptType, $guid, $name ) );
+    static public  function create( $type:String, $guid:String = "", $name:String = "" ):Boolean {
+        return ScriptEvent.dispatch( new ScriptEvent( $type, $guid, $name ) );
     }
 
 
     ///////////////// Event handler interface /////////////////////////////
 
-    public function get scriptType():int {
-        return _scriptType;
-    }
     public function get guid():String {
         return _guid;
     }

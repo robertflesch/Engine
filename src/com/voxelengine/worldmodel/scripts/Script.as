@@ -40,11 +40,6 @@ import flash.utils.getQualifiedClassName;
 			_instanceGuid = null;
 		}
 
-		public function toObject():Object {
-			Log.out( "This object: " + getCurrentClassName(this) + " does not override toObject", Log.WARN );
-			return {name: Script.getCurrentClassName(this)}
-		}
-
 		public function toString():String {
 			Log.out( "This object: " + getCurrentClassName(this) + " does not override toString", Log.WARN );
 			return Script.getCurrentClassName(this);
@@ -64,11 +59,6 @@ import flash.utils.getQualifiedClassName;
 			}
 		}
 
-		public function paramsString():String {
-			Log.out( "This object: " + getCurrentClassName(this) + " does not override paramsString", Log.WARN );
-			return Script.getCurrentClassName(this);
-		}
-
 		public static function getCurrentClassName(c:Object):String{
 			var namePath:String = getQualifiedClassName( c );
 			var i:int = namePath.lastIndexOf("::") + 2;
@@ -76,5 +66,19 @@ import flash.utils.getQualifiedClassName;
 			return namePath;
 		}
 
-}
+		public function toObject():Object {
+			return {name: getCurrentClassName( this ) , param: paramsObject() };
+		}
+
+		protected function paramsObject():Object {
+			return { };
+		}
+
+		public function paramsString():String {
+			return JSON.stringify( paramsObject() );
+		}
+
+
+
+	}
 }

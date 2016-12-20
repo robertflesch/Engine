@@ -3,39 +3,69 @@
  */
 package com.voxelengine.worldmodel.scripts
 {
-/**
- * ...
- * @author Bob
- */
+import com.voxelengine.events.TransformEvent;
 import com.voxelengine.worldmodel.models.ModelTransform;
+
+import flash.geom.Vector3D;
 
 public class RotateScript extends Script
 {
-    private var _rotationRate:Number = 1;
+    public static const ROTATE_SCRIPT:String = "RotateScript";
+    private var _rotationRate:Vector3D = new Vector3D();
+    private var _rotationTime:int = -1;
     public function RotateScript( $params:Object ) {
         super( $params );
-        if ( $params && $params.rotationRate )
-            _rotationRate = $params.rotationRate;
+        fromObject( $params );
     }
 
     override public function init():void {
-        //addTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" ):void {
-        vm.instanceInfo.addTransform( 0, _rotationRate, 0, -1, ModelTransform.ROTATION, "RotateScript" );
+        addRotation();
+    }
+
+    private function addRotation():void {
+        TransformEvent.addListener( TransformEvent.ENDED, transformEnded );
+        vm.instanceInfo.addTransform( _rotationRate.x, _rotationRate.y, _rotationRate.z, _rotationTime, ModelTransform.ROTATION_REPEATING, ROTATE_SCRIPT );
+    }
+
+    private function transformEnded( se:TransformEvent ):void {
+        TransformEvent.removeListener( TransformEvent.ENDED, transformEnded );
+    }
+
+    private function reset():void {
+        // have to call this before I dispose of the handle to the VM
+        if ( vm ) {
+            vm.instanceInfo.removeNamedTransform( ModelTransform.ROTATION_REPEATING, ROTATE_SCRIPT );
+        }
     }
 
     override public function dispose():void {
-        vm.instanceInfo.removeNamedTransform( ModelTransform.ROTATION, "RotateScript" );
+        vm.instanceInfo.removeNamedTransform( ModelTransform.ROTATION_REPEATING, ROTATE_SCRIPT );
         super.dispose();
     }
 
     override public function toObject():Object {
-        return {name: Script.getCurrentClassName(this), param: { rotationRate: _rotationRate } };
+        return {name: Script.getCurrentClassName(this), param: { rotationRate: _rotationRate, rotationTime: _rotationTime } };
     }
 
-    override public function fromObject( $obj:Object):void {
-        if ( $obj && $obj.rotationRate )
-            _rotationRate = $obj.rotationRate;
+    override public function fromObject( $params:Object ):void {
+        if ( $params ) {
+            if ($params.rotationRate) {
+                _rotationRate.x = $params.rotationRate.x;
+                _rotationRate.y = $params.rotationRate.y;
+                _rotationRate.z = $params.rotationRate.z;
+            }
+            if ($params.rotationTime)
+                _rotationTime = $params.rotationTime;
+
+            if ( vm ) {
+                reset();
+                addRotation();
+            }
+        }
     }
 
+    override protected function paramsObject():Object {
+        return { rotationRate: _rotationRate };
+    }
 }
 }

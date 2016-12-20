@@ -89,7 +89,7 @@ public class WindowScriptList extends VVPopup
         // I am missing using name here,
         // since name usually refers to a name of a script, not the type of a script
         // and here name is type
-        ScriptEvent.create( ScriptEvent.SCRIPT_SELECTED, 0, "", item.value )
+        ScriptEvent.create( ScriptEvent.SCRIPT_SELECTED, "", item.value )
         remove();
     }
 

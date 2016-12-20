@@ -4,6 +4,8 @@
 package com.voxelengine.worldmodel.scripts
 {
 
+import com.voxelengine.events.ScriptEvent;
+
 import flash.geom.Vector3D;
 
 import com.voxelengine.Log;
@@ -13,7 +15,8 @@ import com.voxelengine.worldmodel.models.ModelTransform;
 
 public class BobbleScript extends Script
 {
-    private var _defaultBobbleTime:Number = 5;
+    public static const BOBBLE_SCRIPT:String = "BobbleScript";
+    private var _defaultBobbleTime:Number = 30;
     private var _defaultBobbleDistance:Number = 100;
     private var _originalPos:Vector3D = new Vector3D();
     public function BobbleScript(  $params:Object ) {
@@ -28,32 +31,28 @@ public class BobbleScript extends Script
 
     private function addBobble():void {
         TransformEvent.addListener( TransformEvent.ENDED, transformEnded );
-        vm.instanceInfo.addTransform( 0, _defaultBobbleDistance, 0, _defaultBobbleTime, ModelTransform.POSITION_REPEATING, "BobbleScript" );
+        vm.instanceInfo.addTransform( 0, _defaultBobbleDistance, 0, _defaultBobbleTime, ModelTransform.POSITION_REPEATING, BOBBLE_SCRIPT );
     }
 
     private function transformEnded( se:TransformEvent ):void {
         TransformEvent.removeListener( TransformEvent.ENDED, transformEnded );
-        Log.out( "BobbleScript.scriptExpired")
     }
 
-    private function restoreOriginal():void {
+    private function reset():void {
         // have to call this before I dispose of the handle to the VM
         if ( vm ) {
-            vm.instanceInfo.removeNamedTransform(ModelTransform.POSITION_REPEATING, "BobbleScript");
+            vm.instanceInfo.removeNamedTransform( ModelTransform.POSITION_REPEATING, BOBBLE_SCRIPT );
             vm.instanceInfo.positionSet = _originalPos;
         }
     }
 
     override public function dispose():void {
-        restoreOriginal();
+        reset();
+        ScriptEvent.create( ScriptEvent.SCRIPT_EXPIRED, vm.instanceInfo.instanceGuid, BOBBLE_SCRIPT );
         super.dispose();
     }
 
-    override public function toObject():Object {
-        return {name: getCurrentClassName( this ) , param: paramsObject() };
-    }
-
-    public function paramsObject():Object {
+    override protected function paramsObject():Object {
         return { defaultBobbleTime: _defaultBobbleTime, defaultBobbleDistance: _defaultBobbleDistance };
     }
 
@@ -65,7 +64,7 @@ public class BobbleScript extends Script
                 _defaultBobbleDistance = $params.defaultBobbleDistance;
 
             if ( vm ) {
-                restoreOriginal();
+                reset();
                 addBobble();
             }
         }
