@@ -40,6 +40,7 @@ package com.voxelengine.GUI.voxelModels
 			display();
 			
 			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelAdded );
+			ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED, onParentModelRemoved );
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) )
         }
 		
@@ -48,6 +49,13 @@ package com.voxelengine.GUI.voxelModels
 				_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
 		}
+
+		private function onParentModelRemoved(event:ModelEvent):void {
+			if ( _modelPanel )
+				_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null, true );
+			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
+		}
+
 		
 		override protected function onRemoved(event:UIOEvent):void 
 		{

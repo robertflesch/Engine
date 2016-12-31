@@ -48,7 +48,7 @@ public class FromByteArray extends AbstractTask
 		//var time:int = getTimer();
 
 		try {
-			//Log.out("FromByteArray.start: guid: " + _guid);
+			Log.out("FromByteArray.start: guid: " + _guid);
 			_parent.fromByteArray();
 
 			if ("0" == _parent.dbo.key) {
@@ -57,14 +57,14 @@ public class FromByteArray extends AbstractTask
 				_parent.guid = _guid;
 				// When import objects, we have to update the cache so they have the correct info.
 				if (null != _altGuid)
-					OxelDataEvent.dispatch(new OxelDataEvent(ModelBaseEvent.UPDATE_GUID, 0, _altGuid + ":" + _guid, null));
+					OxelDataEvent.create( ModelBaseEvent.UPDATE_GUID, 0, _altGuid + ":" + _guid, null );
 				_parent.save();
 			}
-			OxelDataEvent.dispatch(new OxelDataEvent(OxelDataEvent.OXEL_READY, 0, _guid, _parent));
+			OxelDataEvent.create( OxelDataEvent.OXEL_READY, 0, _guid, _parent );
 		}
 		catch ( e:Error ) {
 			Log.out( "FromByteArray.start: ERROR: " + e.toString(), Log.ERROR, e );
-			OxelDataEvent.dispatch(new OxelDataEvent(OxelDataEvent.OXEL_FAILED, 0, _guid, _parent));
+			OxelDataEvent.create( OxelDataEvent.OXEL_FAILED, 0, _guid, _parent );
 		}
 		LoadingImageEvent.dispatch(new LoadingImageEvent(LoadingImageEvent.DESTROY));
 		super.complete();

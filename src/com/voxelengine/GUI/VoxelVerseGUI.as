@@ -79,6 +79,8 @@ public class VoxelVerseGUI extends EventDispatcher
 	private var _built:Boolean = false;
 	private var _debugMenu:WindowDebugMenu = null;
 	private var _releaseMenu:WindowReleaseMenu = null;
+	public function releaseMenu():WindowReleaseMenu { return _releaseMenu; }
+
 	private var _fileReference:FileReference = new FileReference();
 	private var _projectileEnabled:Boolean = true;
 	

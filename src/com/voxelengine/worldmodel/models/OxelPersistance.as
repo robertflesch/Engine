@@ -76,6 +76,7 @@ public class OxelPersistance extends PersistanceObject
 	public function set parent( $val:ModelInfo ):void			{ _parent = $val }
 	public 	function get statisics():ModelStatisics				{ return _statisics; }
 	public 	function get oxel():Oxel 							{ return _oxels[_lod]; }
+	public 	function get oxelCount():int 						{ return _oxels.length; }
 	public 	function get loaded():Boolean 						{ return _loaded; }
 	public 	function set loaded( $val:Boolean):void 			{ _loaded = $val; }
 	
@@ -171,13 +172,14 @@ public class OxelPersistance extends PersistanceObject
 				Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " loaded: " + loaded + " in table: " + table, Log.DEBUG );
 				return;
 		}
-		//Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.DEBUG );
+		Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.DEBUG );
 		super.save();
 	}
 
 	override public function set changed(value:Boolean):void {
 		if ( parent )
 			parent.changed = value;
+		super.changed = value;
 	}
 
 	override protected function toObject():void {
@@ -206,7 +208,7 @@ public class OxelPersistance extends PersistanceObject
 		_oxels[_lod] = Oxel.initializeRoot( 31 ); // Lighting should be model or instance default lighting
 		lodFromByteArray( ba );
 		_loaded = true;
-		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this ) );
+		OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this );
 	}
 
 	public function lodFromByteArray( $ba:ByteArray ):void {

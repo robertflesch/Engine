@@ -74,7 +74,7 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 			addElement( new Spacer( width, 20 ) );
 
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
-			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
+			OxelDataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 			// This too?
 			//ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
 

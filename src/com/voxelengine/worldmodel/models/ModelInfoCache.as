@@ -117,7 +117,7 @@ public class ModelInfoCache
 		
 		// Now delete the parents data
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
-		OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
+		OxelDataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
 	}
 	

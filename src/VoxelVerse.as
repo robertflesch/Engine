@@ -173,8 +173,8 @@ public class VoxelVerse extends Sprite
 	private static var _s_frameCounter:int = 0;
 	private function enterFrame(e:Event):void {
 		_s_frameCounter++;
-		if ( 0 == (_s_frameCounter % 60) )
-			Log.out( "VoxelVerse.enterFrame 60 frames" );
+//		if ( 0 == (_s_frameCounter % 60) )
+//			Log.out( "VoxelVerse.enterFrame 60 frames fps: " + VoxelVerseGUI.currentInstance.releaseMenu().fps() );
 		if ( 0 == _s_timeEntered ) {
 			if ( _splashDisplayed && ( 1 == framesToDisplaySplash) )
 				readyToGo();

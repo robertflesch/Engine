@@ -21,6 +21,7 @@ import flash.events.Event;
 		static private var _s_currentInstance:WindowReleaseMenu = null;
 		static public function get currentInstance():WindowReleaseMenu { return _s_currentInstance; }
 		private var _fpsLabel:Label = new Label("FPS:");
+		public function fps():String { return _fpsLabel.text; }
 		private var _locLabel:Label = new Label("x: 0  y: 0  z: 0");
 		private var _rotLabel:Label = new Label("x: 0  y: 0  z: 0");
 

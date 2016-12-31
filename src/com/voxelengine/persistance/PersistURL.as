@@ -60,68 +60,67 @@ public class PersistURL
 	}
 
 	static private function load( $pe:PersistanceEvent ):void {
-
-	if ( !isSupportedTable( $pe ) ) {
-		//Log.out("PersistURL.load - EXTENSION IS NOT SUPPORTED EXT:" + $pe.table , Log.ERROR );
-		//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
-		return;
-	}
-
-	//Log.out( "PersistURL.load - file: " + _filePath );
-
-	var urlLoader:URLLoader = new URLLoader();
-	configureListeners(urlLoader);
-	urlLoader.dataFormat = $pe.format;
-	urlLoader.addEventListener(Event.COMPLETE, loadSuccess );
-	urlLoader.addEventListener(IOErrorEvent.IO_ERROR, loadError);
-	try {
-		urlLoader.load(new URLRequest( _filePath ));
-	} catch (error:Error) {
-		Log.out("PersistURL.load - Unable to load requested document." + error.getStackTrace(), Log.WARN );
-	}
-
-
-	function loadSuccess(event:Event):void {
-
-		//Log.out( "PersistURL.loadSuccess - guid: " + $pe.guid + $pe.table, Log.DEBUG );
-		if ( URLLoaderDataFormat.BINARY == $pe.format ) {
-			var ba:ByteArray = event.target.data;
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $pe.guid, null, ba, $pe.format, $pe.other ) );
+		if ( !isSupportedTable( $pe ) ) {
+			//Log.out("PersistURL.load - EXTENSION IS NOT SUPPORTED EXT:" + $pe.table , Log.ERROR );
+			//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
+			return;
 		}
-		else {
 
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $pe.guid, null, StringUtils.trim(event.target.data), $pe.format, $pe.other ) );
+		//Log.out( "PersistURL.load - file: " + _filePath );
+
+		var urlLoader:URLLoader = new URLLoader();
+		configureListeners(urlLoader);
+		urlLoader.dataFormat = $pe.format;
+		urlLoader.addEventListener(Event.COMPLETE, loadSuccess );
+		urlLoader.addEventListener(IOErrorEvent.IO_ERROR, loadError);
+		try {
+			urlLoader.load(new URLRequest( _filePath ));
+		} catch (error:Error) {
+			Log.out("PersistURL.load - Unable to load requested document." + error.getStackTrace(), Log.WARN );
+		}
+
+
+		function loadSuccess(event:Event):void {
+
+			//Log.out( "PersistURL.loadSuccess - guid: " + $pe.guid + $pe.table, Log.DEBUG );
+			if ( URLLoaderDataFormat.BINARY == $pe.format ) {
+				var ba:ByteArray = event.target.data;
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $pe.guid, null, ba, $pe.format, $pe.other ) );
+			}
+			else {
+
+				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $pe.guid, null, StringUtils.trim(event.target.data), $pe.format, $pe.other ) );
+			}
+		}
+
+		function loadError(event:IOErrorEvent):void {
+			var errorMsg:String = "PersistURL.loadError - event: " + event.toString() + "  filePath: " + _filePath;
+			//Log.out( errorMsg, Log.WARN );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, 0, $pe.table, $pe.guid, null, errorMsg, $pe.format, $pe.other ) );
+		}
+
+		function configureListeners(dispatcher:URLLoader):void {
+			//dispatcher.addEventListener(Event.OPEN, openHandler);
+			//dispatcher.addEventListener(ProgressEvent.PROGRESS, progressHandler);
+			dispatcher.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
+			//dispatcher.addEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatusHandler);
+		}
+
+		function openHandler(event:Event):void {
+			Log.out("PersistURL.openHandler guid: " + $pe.guid + $pe.table + " event: " + event, Log.DEBUG);
+		}
+
+		function progressHandler(event:ProgressEvent):void {
+			Log.out("PersistURL.progressHandler guid: " + $pe.guid + $pe.table + "  loaded:" + event.bytesLoaded + " total: " + event.bytesTotal, Log.DEBUG );
+		}
+
+		function securityErrorHandler(event:SecurityErrorEvent):void {
+			Log.out("PersistURL.securityErrorHandler: guid: " + $pe.guid + $pe.table + "  event " + event, Log.WARN );
+		}
+
+		function httpStatusHandler(event:HTTPStatusEvent):void {
+			Log.out( "PersistURL.httpStatusHandler: " + event, Log.DEBUG );
 		}
 	}
-
-	function loadError(event:IOErrorEvent):void {
-		var errorMsg:String = "PersistURL.loadError - event: " + event.toString() + "  filePath: " + _filePath;
-		//Log.out( errorMsg, Log.WARN );
-		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, 0, $pe.table, $pe.guid, null, errorMsg, $pe.format, $pe.other ) );
-	}
-
-	function configureListeners(dispatcher:URLLoader):void {
-		//dispatcher.addEventListener(Event.OPEN, openHandler);
-		//dispatcher.addEventListener(ProgressEvent.PROGRESS, progressHandler);
-		dispatcher.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
-		//dispatcher.addEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatusHandler);
-	}
-
-	function openHandler(event:Event):void {
-		Log.out("PersistURL.openHandler guid: " + $pe.guid + $pe.table + " event: " + event, Log.DEBUG);
-	}
-
-	function progressHandler(event:ProgressEvent):void {
-		Log.out("PersistURL.progressHandler guid: " + $pe.guid + $pe.table + "  loaded:" + event.bytesLoaded + " total: " + event.bytesTotal, Log.DEBUG );
-	}
-
-	function securityErrorHandler(event:SecurityErrorEvent):void {
-		Log.out("PersistURL.securityErrorHandler: guid: " + $pe.guid + $pe.table + "  event " + event, Log.WARN );
-	}
-
-	function httpStatusHandler(event:HTTPStatusEvent):void {
-		Log.out( "PersistURL.httpStatusHandler: " + event, Log.DEBUG );
-	}
-}
 }	
 }

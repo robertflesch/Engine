@@ -76,7 +76,7 @@ public class Avatar extends ControllableVoxelModel
 		Log.out("Avatar.onPlayerLoadError", Log.ERROR, error );
 	}			
 	
-	static public function createPlayer( $modelGuid:String = "Player", $instanceGuid:String = "Player" ):void	{
+	static public function createPlayer( $modelGuid:String = "DefaultPlayer", $instanceGuid:String = "Player" ):void	{
 		//Log.out( "Player.createPlayer - creating from LOCAL", Log.DEBUG );
 		//var ii:InstanceInfo = new InstanceInfo();
 		//ii.modelGuid = "Player";
@@ -89,8 +89,8 @@ public class Avatar extends ControllableVoxelModel
 		model.modelClass = "Player"
 
 		var ii:InstanceInfo = new InstanceInfo()
-		ii.modelGuid = "Player"
-		ii.instanceGuid = $instanceGuid
+		ii.modelGuid = $modelGuid;
+		ii.instanceGuid = $instanceGuid;
 		
 		new ModelMakerGenerate( ii, model )
 	}

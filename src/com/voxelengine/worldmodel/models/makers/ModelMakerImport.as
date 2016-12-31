@@ -220,7 +220,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			// remove anything that might be hanging around.
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, ii.modelGuid, null ) );
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, ii.modelGuid, null ) );
-			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.DELETE, 0, ii.modelGuid, null ) );
+			OxelDataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
 
 			return;
 		}

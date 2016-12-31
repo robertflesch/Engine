@@ -87,7 +87,7 @@ public class ModelInfo extends PersistanceObject
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
 		if ( _data ) {
 			_data.guid = $newGuid;
-			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
+			OxelDataEvent.create( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null );
 		}
 		changed = true;
 	}
@@ -161,7 +161,8 @@ public class ModelInfo extends PersistanceObject
 			Log.out( "ModelInfo.retrievedData - set baseLightLevel: " + baseLightLevel);
 			_data.baseLightLevel = baseLightLevel;
 
-			_data.load( guid, priority, this, dynamicObj, _altGuid );
+			if ( _data && 0 == _data.oxelCount )
+				_data.load( guid, priority, this, dynamicObj, _altGuid );
 			/*
 			_data.fromByteArray()
 			if ( "0" == _data.dbo.key ) {
@@ -182,7 +183,7 @@ public class ModelInfo extends PersistanceObject
 			if ( _firstLoadFailed ) {
 				removeOxelDataCompleteListeners();
 				Log.out( "ModelInfo.failedData - unable to process request for guid: " + guid, Log.ERROR );
-				OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, 0, guid, null ) );		
+				OxelDataEvent.create( ModelBaseEvent.REQUEST_FAILED, 0, guid, null );
 			}
 			else {
 				_firstLoadFailed = true;
@@ -191,7 +192,7 @@ public class ModelInfo extends PersistanceObject
 				else {
 					removeOxelDataCompleteListeners();
 					Log.out( "ModelInfo.failedData - no alternative processing method: " + guid, Log.ERROR );
-					OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST_FAILED, 0, guid, null ) );		
+					OxelDataEvent.create( ModelBaseEvent.REQUEST_FAILED, 0, guid, null );
 				}
 			}
 		}
@@ -202,7 +203,7 @@ public class ModelInfo extends PersistanceObject
 		if ( "LoadModelFromIVM" == layer1.functionName ) {
 			_altGuid = layer1.data;
 			//Log.out( "ModelInfo.loadFromBiomeData - trying to load from local file with alternate name - altGuid: " + _altGuid, Log.DEBUG );
-			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, _altGuid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );		
+			OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, _altGuid, null, ModelBaseEvent.USE_FILE_SYSTEM );
 		}
 		else {
 			//Log.out( "ModelInfo.loadFromBiomeData - building bio from layer data", Log.DEBUG );
@@ -230,12 +231,12 @@ public class ModelInfo extends PersistanceObject
 	public function oxelLoadData():void {
 		if ( _data && _data.loaded ) {
 			//Log.out( "ModelInfo.loadOxelData - returning loaded oxel guid: " + guid );
-			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.RESULT_COMPLETE, 0, guid, _data ) );
+			OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, _data );
 		} else {
 			addOxelDataCompleteListeners();
 			// try to load from tables first
 			//Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
-			OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_PERSISTANCE ) );
+			OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_PERSISTANCE );
 		}
 	}
 	

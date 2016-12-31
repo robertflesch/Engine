@@ -3528,7 +3528,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 //			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
 		//Log.out( "GenerateCube finished modelGuid: " + $modelGuid );
 		if ( $generateEvent )
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
+		//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
+
 		return ba;
 	}
 

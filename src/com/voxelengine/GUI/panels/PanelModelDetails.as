@@ -73,12 +73,17 @@ package com.voxelengine.GUI.panels
 			}
 		}
 		
-		public function updateChildren( $source:Function, $parentModel:VoxelModel ):void {
+		public function updateChildren( $source:Function, $parentModel:VoxelModel, $removeAniAndScripts:Boolean = false ):void {
 			_parentModel = $parentModel;
 			if ( null != _listModels ) {
 				var countAdded:int = _listModels.populateModels( $source, $parentModel );
-				if ( 0 == countAdded )
+//				if ( 0 == countAdded )
 					childPanelRemove();
+
+				if ( $removeAniAndScripts ) {
+					animationPanelRemove();
+					scriptPanelRemove();
+				}
 			}
 		}
 		
@@ -111,6 +116,13 @@ package com.voxelengine.GUI.panels
 			//recalc( width, height );
 		}
 
+		public function animationPanelRemove():void {
+			if ( null != _listAnimations ) {
+				removeElement(_listAnimations);
+				_listAnimations = null;
+			}
+		}
+
 		public function scriptPanelAdd( $vm:VoxelModel ):void {
 			if ( null == _listScripts ) {
 				_listScripts = new PanelModelScripts( this, width_default, 15, height_default );
@@ -119,6 +131,13 @@ package com.voxelengine.GUI.panels
 
 			_listScripts.populateScripts( $vm );
 			//recalc( width, height );
+		}
+
+		public function scriptPanelRemove():void {
+			if (null != _listScripts) {
+				removeElement(_listScripts);
+				_listScripts = null;
+			}
 		}
 
 		public function childPanelRemove():void {

@@ -19,7 +19,6 @@ import flash.utils.getDefinitionByName;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.worldmodel.scripts.*;
 
 public class ScriptLibrary
 {

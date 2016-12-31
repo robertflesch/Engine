@@ -374,7 +374,7 @@ package com.voxelengine.worldmodel.models
 		static public function whichModelsIsThisInfluencedBy( vm:VoxelModel ):Vector.<VoxelModel> {
 			var modelList:Vector.<VoxelModel> = new Vector.<VoxelModel>;
 			if ( !vm.modelInfo.data )
-				return modelList
+				return modelList;
 			var worldSpaceStartPointOrigin:Vector3D = vm.instanceInfo.positionGet;
 			_s_worldSpaceStartPointCorner.setTo( worldSpaceStartPointOrigin.x, worldSpaceStartPointOrigin.y, worldSpaceStartPointOrigin.z );
 			// add size to get corner

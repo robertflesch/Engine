@@ -7,6 +7,8 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
+import com.voxelengine.events.OxelDataEvent;
+
 import flash.utils.ByteArray;
 import playerio.DatabaseObject;
 
@@ -40,6 +42,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	private var _creationInfo:Object;
 	private var _creationFunction:String;
 	private var _type:int;
+	private  var _vm:VoxelModel;
 	
 	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object ) {
 		_creationFunction 	= $miJson.name;
@@ -56,12 +59,6 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		// This is for import from generated only.
 		dbo.data.model = $miJson
 		modelInfo.fromObjectImport( dbo );
-		// On import save it.
-		modelInfo.save();
-		
-		///////////////////
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.GENERATION, 0, $ii.modelGuid, _modelInfo ) );
-		
 		retrieveBaseInfo();
 		attemptMake();
 	}
@@ -83,24 +80,48 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	
 	// once they both have been retrived, we can make the object
 	override protected function attemptMake():void {
+		Log.out( "ModelMakerGenerate.attemptMake " + ii.modelGuid );
 		if ( null != modelInfo && null != _modelMetadata ) {
 			
-			var vm:* = make();
-			if ( vm ) {
-				vm.complete = true;
-				modelInfo.changed = true;
-				_modelMetadata.changed = true;
-				vm.save();
-				Region.currentRegion.modelCache.add( vm );
+			_vm = make();
+			if ( _vm ) {
+				OxelDataEvent.addListener( ModelBaseEvent.ADDED, listenForGenerationComplete );
+				Region.currentRegion.modelCache.add( _vm );
 			}
-			markComplete( true, vm );
+			else {
+				Log.out( "ModelMakerGenerate.attemptMake FAILED to generate from " + _creationFunction, Log.WARN );
+				markComplete( false, _vm );
+			}
 		}
 	}
 	
 	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
 		// do this last as it nulls everything.
+		Log.out( "ModelMakerGenerate.markComplete " + ii.modelGuid );
 		super.markComplete( $success, $vm );
+		_vm = null;
+		_creationFunction = null;
+		_creationInfo = null;
 	}
+
+		private function listenForGenerationComplete( $e:OxelDataEvent ):void {
+			if ( $e.modelGuid == ii.modelGuid ) {
+				OxelDataEvent.removeListener( ModelBaseEvent.ADDED, listenForGenerationComplete );
+				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelInfo ) );
+				Log.out( "ModelMakerGenerate.listenForGenerationComplete " + ii.modelGuid + " == " + $e.modelGuid );
+				_vm.complete = true;
+				modelInfo.data = $e.oxelData;
+				modelInfo.data.changed = true;
+				modelInfo.changed = true;
+				_modelMetadata.changed = true;
+				_vm.save();
+				markComplete( true, _vm );
+			}
+			else
+				Log.out( "ModelMakerGenerate.listenForGenerationComplete " + ii.modelGuid + " != " + $e.modelGuid );
+
+		}
+
 	
 }	
 }
