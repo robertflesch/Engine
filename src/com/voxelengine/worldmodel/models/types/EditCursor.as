@@ -86,7 +86,7 @@ public class EditCursor extends VoxelModel
 
 			var metadata:ModelMetadata = new ModelMetadata( EDIT_CURSOR );
 			var newObj:Object = ModelMetadata.newObject()
-			metadata.fromObjectImport( newObj );
+			metadata.fromObjectImport( newObj, false );
 			metadata.permissions.modify = false;
 			
 			var modelInfo:ModelInfo = new ModelInfo( EDIT_CURSOR );
@@ -802,7 +802,7 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function keyUp(e:KeyboardEvent):void  {
-		if ( Globals.openWindowCount || !Globals.clicked )
+		if ( Globals.openWindowCount )
 			return;
 			
 		switch (e.keyCode) {
@@ -812,7 +812,7 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function keyDown(e:KeyboardEvent):void  {
-		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active || !editing )
+		if ( Globals.openWindowCount || e.ctrlKey || !Globals.active || !editing )
 			return;
 			
 		var foundModel:VoxelModel;
@@ -881,7 +881,7 @@ public class EditCursor extends VoxelModel
 	private function mouseUp(e:MouseEvent):void  {
 		repeatTimerStop()
 		
-		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging )
+		if ( Globals.openWindowCount || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging )
 			return;
 		
 		Log.out( "EditCursor.mouseUp e: " + e.toString() )
@@ -906,7 +906,7 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function mouseDown(e:MouseEvent):void {
-		if ( Globals.openWindowCount || !Globals.clicked || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging )
+		if ( Globals.openWindowCount  || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging )
 			return
 			
 		if ( doubleMessageHack ) {
@@ -930,7 +930,7 @@ public class EditCursor extends VoxelModel
 	}
 		
 	protected function onRepeat(event:TimerEvent):void {
-		if ( Globals.openWindowCount || !Globals.clicked || !Globals.active || !editing ) {
+		if ( Globals.openWindowCount || !Globals.active || !editing ) {
 			repeatTimerStop()		
 			return; }
 			

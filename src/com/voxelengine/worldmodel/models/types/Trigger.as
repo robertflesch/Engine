@@ -63,14 +63,14 @@ public class Trigger extends VoxelModel
 			// Only want to dispatch the event once per transition
 			if ( !_inside ) {
 				_inside = true;
-				Log.out( "Trigger.update - INSIDE" );
+				//Log.out( "Trigger.update - INSIDE" );
 				TriggerEvent.dispatch( new TriggerEvent( TriggerEvent.INSIDE, instanceInfo.instanceGuid ) );
 			}
 		} 
 		else {
 			if ( _inside ) {
 				_inside = false;
-				Log.out( "Trigger.update - OUTSIDE" );
+				//Log.out( "Trigger.update - OUTSIDE" );
 				TriggerEvent.dispatch( new TriggerEvent( TriggerEvent.OUTSIDE, instanceInfo.instanceGuid ) );
 			}
 		}

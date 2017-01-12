@@ -418,11 +418,15 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 
 	override protected function handleMouseMovement( $elapsedTimeMS:int ):void {
-		if ( Globals.active 
+//		Log.out( "Player.handleMouseMovement - Globals.active: " + Globals.active
+//				+ "  MouseKeyboardHandler.ctrl: " + MouseKeyboardHandler.ctrl
+//				+ " MouseKeyboardHandler.active: " + MouseKeyboardHandler.active
+//				+ " Globals.openWindowCount: " + Globals.openWindowCount  );
+		if ( Globals.active
 		  //&& 0 == Globals.openWindowCount // this allows it to be handled in the getMouseYChange
-		  && Globals.clicked 
-		  && false == MouseKeyboardHandler.ctrl 
-		  && true == MouseKeyboardHandler.active ) 
+		  && false == MouseKeyboardHandler.ctrl
+		  && true == MouseKeyboardHandler.active
+		  && 0 == Globals.openWindowCount )
 		{
 			// up down
 			var dx:Number = 0;

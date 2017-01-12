@@ -67,11 +67,11 @@ public final class ProjectilePoolType
 		_modelMetadata = new ModelMetadata( _projectileGuid )
 		var newObj:Object = ModelMetadata.newObject()
 		newObj.data.name = "ProjectilePoolType - " + $type
-		_modelMetadata.fromObjectImport( newObj )
+		_modelMetadata.fromObjectImport( newObj, false )
 		_modelMetadata.dynamicObj = true;
-		_modelMetadata.name = _projectileGuid
-		_modelMetadata.description = _projectileGuid + " - GENERATED"
-		_modelMetadata.owner = ""
+		_modelMetadata.info.name = _projectileGuid
+		_modelMetadata.info.description = _projectileGuid + " - GENERATED"
+		_modelMetadata.info.owner = ""
 		//ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, _projectileGuid, _modelMetadata ) )
 		//Log.out( "ProjectilePoolType.generateData: " + _modelInfo.toString() );
 		_modelInfo.data = new OxelPersistance( _projectileGuid, Lighting.MAX_LIGHT_LEVEL );

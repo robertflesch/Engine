@@ -64,7 +64,7 @@ import com.voxelengine.renderer.Renderer;
 			}
 			catch ( error:Error )
 			{
-				Log.out( "WindowLogin.constructor - unable to open local shared object" );
+				Log.out( "WindowLogin.constructor - unable to open local shared object", Log.ERROR );
 			}
 
 			if ( Globals.isDebug ) {
@@ -204,13 +204,13 @@ import com.voxelengine.renderer.Renderer;
 		private function recoverySuccess( $e:LoginEvent ):void 
 		{ 
 			removeRecoveryEventHandlers();
-			(new Alert( "An email has been sent to " + _emailInput.label, 350 )).display();
+			(new Alert( "An email has been sent to " + _emailInput.label, 450 )).display();
 		}
 
 		private function recoveryFailure( $e:LoginEvent ):void 
 		{ 
 			removeRecoveryEventHandlers();
-			(new Alert( "No account has been found for " + _emailInput.label, 350 )).display();
+			(new Alert( "No account has been found for " + _emailInput.label, 450 )).display();
 		}
 
 		////////////////////////////////////////////////////////////////////////////////
@@ -235,7 +235,7 @@ import com.voxelengine.renderer.Renderer;
 			addLoginEventHandlers();
 			Log.out("WindowLogin.loginButtonHandler - Trying to establish connection to server", Log.DEBUG );
 			Network.login( _emailInput.label, _passwordInput.text );
-			Globals.active = true;
+//			Globals.active = true;
 		}
 		
 		private function addLoginEventHandlers():void {
@@ -274,7 +274,7 @@ import com.voxelengine.renderer.Renderer;
 		private function onUnknownFailure( $e:LoginEvent ):void {
 			removeLoginEventHandlers()
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );
-			Log.out("WindowLogin.onUnknownFailure" + $e.guid, Log.ERROR );
+			Log.out("WindowLogin.onUnknownFailure: " + $e.guid, Log.ERROR );
 			_errorText.text = "Server error, try again later";
 		}
 		

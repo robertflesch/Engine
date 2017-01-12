@@ -63,9 +63,9 @@ public class Avatar extends ControllableVoxelModel
 			//ii.modelGuid = "Player";
 			//ii.instanceGuid = Network.userId;
 			//new ModelMakerLocal( ii );
-			Log.out( "Avatar.onPlayerLoadedAction - START TEMPORARILY CREATING Avatar FROM SCRIPT", Log.WARN );
-			createPlayer( "Player", Network.userId )
-			Log.out( "Avatar.onPlayerLoadedAction - END TEMPORARILY CREATING Avatar FROM SCRIPT", Log.WARN );
+			//Log.out( "Avatar.onPlayerLoadedAction - START TEMPORARILY CREATING Avatar FROM SCRIPT", Log.WARN );
+			createPlayer( "DefaultPlayer", Network.userId )
+			//Log.out( "Avatar.onPlayerLoadedAction - END TEMPORARILY CREATING Avatar FROM SCRIPT", Log.WARN );
 		}
 		else {
 			Log.out( "Avatar.onPlayerLoadedAction - ERROR, failed to create new record for ?" );

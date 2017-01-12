@@ -17,7 +17,8 @@ package com.voxelengine.worldmodel.models
 	public class Location
 	{
 		private var _changed:Boolean 							= false;					// INSTANCE NOT EXPORTED
-					
+		private var _useOrigPosition:Boolean 					= false;					// Set via script
+
 		private var _position:Vector3D 							= new Vector3D();			// toJSON
 		private var _positionOrig:Vector3D 						= new Vector3D();			// toJSON
 		private var _rotation:Vector3D 							= new Vector3D();			// toJSON
@@ -36,6 +37,10 @@ package com.voxelengine.worldmodel.models
 				
 		public function get changed():Boolean 					{ return _changed; }
 		public function set changed($val:Boolean):void			{ _changed = $val; }
+
+		public function get useOrigPosition():Boolean 					{ return _useOrigPosition; }
+		public function set useOrigPosition($val:Boolean):void			{ _useOrigPosition = $val; }
+
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Center
@@ -101,7 +106,7 @@ package com.voxelengine.worldmodel.models
 			_positions[2].setTo( _positions[1].x, _positions[1].y, _positions[1].z );
 			_positions[1].setTo( _positions[0].x, _positions[0].y, _positions[0].z );
 			_positions[0].setTo( _position.x,     _position.y,     _position.z );
-			//trace( "Location.positionSetComp position[0] position: " + _positions[0] );
+			//trace( "Location.positionSetComp position: x: " + $x + "  y: " + $y + "  z: " + $z );
 			
 			_position.setTo( $x, $y, $z ); 
 		}
@@ -283,6 +288,8 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		public function setPositionInfo( $obj:Object ):void {
+			if ( isNaN( $obj.x )|| isNaN( $obj.y ) || isNaN( $obj.z ) )
+					return;
 			positionSetComp( $obj.x, $obj.y, $obj.z );
 			_positionOrig.setTo( _position.x, _position.y, _position.z );
 		}
@@ -308,14 +315,28 @@ package com.voxelengine.worldmodel.models
 		
 			// Save original or current positions? would seem like current
 			// why was I using original?
-			obj.location 			= vector3DToObject( _position );
+			if ( useOrigPosition )
+				obj.location 			= vector3DToObject( _positionOrig );
+			else
+				obj.location 			= vector3DToObject( _position );
+
 //Log.out( "Location.toObject _positionOrig: " + _positionOrig + "  _position: " + _position, Log.WARN )			
-			if ( 0 < _rotationOrig.length )
-				obj.rotation 		= vector3DToObject( _rotation );
+			if ( 0 < _rotationOrig.length ) {
+				if ( useOrigPosition )
+					obj.rotation = vector3DToObject(_rotationOrig);
+				else
+					obj.rotation = vector3DToObject(_rotation);
+			}
+
 			if ( 0 < centerNotScaled.length )
 				obj.center 		= vector3DIntToObject( centerNotScaled );
-			if ( 3 != _scaleOrig.lengthSquared )
-				obj.scale 			= vector3DToObject( _scale );
+
+			if ( 3 != _scaleOrig.lengthSquared ) {
+				if ( useOrigPosition )
+					obj.scale = vector3DToObject(_scaleOrig );
+				else
+					obj.scale = vector3DToObject(_scale);
+			}
 			
 			return obj
 		}

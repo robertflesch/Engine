@@ -170,6 +170,8 @@ public class InventoryPanelModel extends VVContainer
 
 		// I only want the results from the series I asked for
 		if ( _seriesModelMetadataEvent == $mme.series || 0 == $mme.series ) {
+			if ( "Player" == $mme.modelGuid)
+					return;
 			var om:ObjectModel = new ObjectModel( null, $mme.modelGuid );
 			om.vmm = $mme.modelMetadata;
 			addModel( om );

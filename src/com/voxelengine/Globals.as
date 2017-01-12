@@ -178,9 +178,9 @@ public class Globals  {
 	public static function set active( val:Boolean ):void { g_active = val; }
 
 	// This eats the first click on the screen when it is activated
-	private static var g_clicked:Boolean = false; // app has been clicked on after an activate has happened
-	public static function get clicked():Boolean { return g_clicked; }
-	public static function set clicked( val:Boolean ):void  { g_clicked = val; }
+//	private static var g_clicked:Boolean = false; // app has been clicked on after an activate has happened
+//	public static function get clicked():Boolean { return g_clicked; }
+//	public static function set clicked( val:Boolean ):void  { g_clicked = val; }
 
 	private static var g_appPath:String;
 	public static function get appPath():String{ return g_appPath; }

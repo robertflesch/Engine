@@ -49,6 +49,9 @@ public class ScriptLibrary
 			_scriptList.push( BobbleScript.BOBBLE_SCRIPT );
 			_scriptList.push( ComeToMeScript.COME_TO_ME_SCRIPT );
 		}
+
+		_scriptList.push( ResetStartingPosition.RESET_STARTING_POSITION );
+
 		return _scriptList;
 	}
 
@@ -69,6 +72,7 @@ public class ScriptLibrary
 		RotateAroundYScript;
 		RotateScript;
 		BobbleScript;
+		ResetStartingPosition;
 
 
 		var asset:Class;

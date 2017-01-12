@@ -39,6 +39,7 @@ public class ModelMetadataCache
 	public function ModelMetadataCache() {	}
 	
 	static public function init():void {
+		ModelMetadataEvent.addListener( ModelBaseEvent.EXISTS_REQUEST, 	checkIfExists );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, 	requestType );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, 		request );
 		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE, 			update );
@@ -86,57 +87,78 @@ public class ModelMetadataCache
 		for each ( var vmm:ModelMetadata in _metadata ) {
 			if ( vmm && vmm.owner == $mme.modelGuid ) {
 				//Log.out( "ModelMetadataCache.requestType returning guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
-				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm ) );
+				ModelMetadataEvent.create( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm );
 			}
 			//else 
 			//	Log.out( "ModelMetadataCache.requestType REJECTING guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
 		}
 	}
 	
-	static private function request( $mme:ModelMetadataEvent ):void {   
-		if ( null == $mme.modelGuid ) {
-			Log.out( "ModelMetadataCache.request guid rquested is NULL: ", Log.WARN );
-			return;
-		}
-		Log.out( "ModelMetadataCache.request guid: " + $mme.modelGuid, Log.INFO );
-		var vmm:ModelMetadata = _metadata[$mme.modelGuid]; 
-		if ( null == vmm ) {
-			if ( _block.has( $mme.modelGuid ) )	
-				return;
-			_block.add( $mme.modelGuid );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid ) );
-		}
-		else {
-			//Log.out( "ModelMetadataCache.request returning guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm ) );
+	static private function request( $mme:ModelMetadataEvent ):void {
+		if ( null == $mme || null == $mme.modelGuid ) { // Validator
+			Log.out( "ModelMetadataCache.request - event or guid is NULL: ", Log.ERROR );
+			ModelMetadataEvent.create( ModelBaseEvent.EXISTS_ERROR, ( $mme ? $mme.series: -1 ), "MISSING", null );
+		} else {
+			//Log.out( "ModelMetadataCache.request guid: " + $mme.modelGuid, Log.INFO );
+			var vmm:ModelMetadata = _metadata[$mme.modelGuid];
+			if (null == vmm) {
+				if (_block.has($mme.modelGuid))
+					return;
+				_block.add($mme.modelGuid);
+				PersistanceEvent.dispatch(new PersistanceEvent(PersistanceEvent.LOAD_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid));
+			}
+			else {
+				//Log.out( "ModelMetadataCache.request returning guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
+				ModelMetadataEvent.create(ModelBaseEvent.RESULT, $mme.series, vmm.guid, vmm);
+			}
 		}
 	}
+
+	static private function checkIfExists( $mme:ModelMetadataEvent ):void {
+		if ( null == $mme || null == $mme.modelGuid ) { // Validator
+			Log.out( "ModelMetadataCache.checkIfExists - event or guid is NULL: ", Log.ERROR );
+			ModelMetadataEvent.create( ModelBaseEvent.EXISTS_ERROR, ( $mme ? $mme.series: -1 ), "MISSING", null );
+		} else {
+			var vmm:ModelMetadata = _metadata[$mme.modelGuid];
+			if (null != vmm)
+				ModelMetadataEvent.create(ModelBaseEvent.EXISTS, $mme.series, $mme.modelGuid, vmm);
+			else
+				ModelMetadataEvent.create(ModelBaseEvent.EXISTS_FAILED, $mme.series, $mme.modelGuid, null);
+		}
+	}
+
 	
 	static private function update($mme:ModelMetadataEvent):void {
-		if ( null == $mme || null == $mme.modelGuid ) {
-			Log.out( "ModelMetadataCache.update trying to add NULL metadata or guid", Log.WARN );
-			return;
-		}
-		// check to make sure is not already there
-		var vmm:ModelMetadata = _metadata[$mme.modelGuid];
-		if ( null ==  vmm ) {
-			Log.out( "ModelMetadataCache.update trying update NULL metadata or guid, adding instead", Log.WARN );
-			add( 0, $mme.modelMetadata );
+		if ( null == $mme || null == $mme.modelGuid ) { // Validator
+			Log.out("ModelMetadataCache.update - event or guid is NULL: ", Log.ERROR);
+			ModelMetadataEvent.create(ModelBaseEvent.EXISTS_ERROR, ( $mme ? $mme.series : -1 ), "MISSING", null);
 		} else {
-			vmm.update( $mme.modelMetadata );
+			// check to make sure is not already there
+			var vmm:ModelMetadata = _metadata[$mme.modelGuid];
+			if ( null ==  vmm ) {
+				Log.out( "ModelMetadataCache.update trying update NULL metadata or guid, adding instead", Log.WARN );
+				add( 0, $mme.modelMetadata );
+			} else {
+				vmm.update( $mme.modelMetadata );
+			}
 		}
 	}
 	
 	static private function deleteHandler( $mme:ModelMetadataEvent ):void {
-		//Log.out( "ModelMetadataCache.deleteHandler $mme: " + $mme, Log.WARN );
-		var mmd:ModelMetadata = _metadata[$mme.modelGuid];
-		if ( null != mmd ) {
-			_metadata[$mme.modelGuid] = null; 
-			// TODO need to clean up eventually
-			mmd = null;
-			//Log.out( "ModelMetadataCache.deleteHandler making call to PersistanceEvent", Log.WARN );
+		if ( null == $mme || null == $mme.modelGuid ) { // Validator
+			Log.out("ModelMetadataCache.deleteHandler - event or guid is NULL: ", Log.ERROR);
+			ModelMetadataEvent.create(ModelBaseEvent.EXISTS_ERROR, ( $mme ? $mme.series : -1 ), "MISSING", null);
+		} else {
+			//Log.out( "ModelMetadataCache.deleteHandler $mme: " + $mme, Log.WARN );
+			var mmd:ModelMetadata = _metadata[$mme.modelGuid];
+			if (null != mmd) {
+				_metadata[$mme.modelGuid] = null;
+				// TODO need to clean up eventually
+				mmd = null;
+				//Log.out( "ModelMetadataCache.deleteHandler making call to PersistanceEvent", Log.WARN );
+			}
+			PersistanceEvent.dispatch(new PersistanceEvent(PersistanceEvent.DELETE_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid, null));
 		}
-		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid, null ) );
 	}
 	
 	static private function generated( $mme:ModelMetadataEvent ):void  {

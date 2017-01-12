@@ -139,15 +139,17 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	// $dbo directly
 	// I abstract it away using the info object
 	// it was needed to save the data in an abstract way.
-	public function fromObjectImport( $dbo:Object ):void {
+	public function fromObjectImport( $dbo:Object, $markAsChanged:Boolean = true ):void {
 		dbo = $dbo as DatabaseObject;
 		if ( !dbo.data ) {
 			dbo.data = new Object();
 			Log.out( "ModelMetaData.fromObjectImport - NO DBO or DBO data", Log.ERROR );
 		}
 		info = $dbo.data;	
-		loadFromInfo( this );	
-		changed = true;
+		loadFromInfo( this );
+		// TODO Sometimes default guid is Player, sometimes DefaultPlayer
+		if ( $markAsChanged && ( guid != "DefaultPlayer" ) )
+			changed = true;
 	}
 
 	public function fromObject( $dbo:DatabaseObject ):void {
@@ -171,9 +173,10 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		}
 		
 		
-		function bitmapLoaded(event:Event):void { 
-			thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData 
-			_thumbnailLoaded = true
+		function bitmapLoaded(event:Event):void {
+			// Bypass setter to keep it from getting marked as changed
+			_thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData;
+			_thumbnailLoaded = true;
 			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.BITMAP_LOADED, 0, guid, $mm ) )
 		}
 	}
@@ -182,7 +185,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		toObject();
 		var oldName:String = info.name;
 		info.name = info.name + "_duplicate";
-		var oldObj:String = JSON.stringify( info )
+		var oldObj:String = JSON.stringify( info );
 		info.name = oldName;
 
 		var pe:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, $newGuid, null, oldObj, URLLoaderDataFormat.TEXT, guid )

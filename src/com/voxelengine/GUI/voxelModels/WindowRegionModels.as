@@ -59,7 +59,7 @@ package com.voxelengine.GUI.voxelModels
 		
 		override protected function onRemoved(event:UIOEvent):void 
 		{
-			Log.out( "WindowRegionModels.onRemoved", Log.WARN );
+			//Log.out( "WindowRegionModels.onRemoved", Log.WARN );
 			super.onRemoved(event);
 			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelAdded );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, 0, null ));

@@ -987,6 +987,8 @@ public class VoxelModel
 	
 	public function stateSet($state:String, $lockTime:Number = 1):void
 	{
+		if ( this is Player )
+				return;
 		if ( _stateLock )
 			return;
 		if ( (_anim && _anim.name == $state) || 0 == modelInfo.animations.length )
@@ -1004,10 +1006,11 @@ public class VoxelModel
 			Log.out( "VoxelModel.stateSet - Stopping anim: " + _anim.name + "  starting: " + $state ); 
 			_anim.stop( this );
 			_anim = null;
-		} else 
-			Log.out( "VoxelModel.stateSet - Starting anim: " + $state ); 
+		}
+		//else
+		//	Log.out( "VoxelModel.stateSet - Starting anim: " + $state );
 		
-		var result:Boolean = false;
+		var result:Boolean = true;
 		var anim:Animation = modelInfo.animationGet( $state );
 		if ( anim ) {
 			//if (!anim.loaded)
@@ -1023,8 +1026,10 @@ public class VoxelModel
 			for each (var at:AnimationTransform in anim.transforms)
 			{
 				//Log.out( "VoxelModel.stateSet - have AnimationTransform looking for child : " + at.attachmentName );
-				if (addAnimationsInChildren(modelInfo.childVoxelModels, at, $lockTime))
-					result = true;
+				if ( modelInfo.childrenLoaded ) // if any result is false, the result is false
+					result = result && addAnimationsInChildren(modelInfo.childVoxelModels, at, $lockTime);
+				else
+					result = false;
 			}
 		}
 
@@ -1034,30 +1039,33 @@ public class VoxelModel
 			//Log.out( "VoxelModel.stateSet - Playing anim: " + _anim.name ); 
 			_anim.play(this, $lockTime);
 		}
-//			else
-//				Log.out("VoxelModel.stateSet - addAnimationsInChildren returned false for: " + $state);
+		//else
+		//	Log.out("VoxelModel.stateSet - addAnimationsInChildren returned false for: " + $state);
 
 		// if any of the children load, then it succeeds, which is slightly problematic
 		function addAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $lockTime:Number):Boolean
 		{
 			//Log.out( "VoxelModel.checkChildren - have AnimationTransform looking for child : " + $at.attachmentName );
-			var result:Boolean = false;
-			for each (var cm:VoxelModel in $children)
-			{
-				//Log.out( "VoxelModel.addAnimationsInChildren - is child.metadata.name: " + child.metadata.name + " equal to $at.attachmentName: " + $at.attachmentName );
-				if (cm.metadata.name == $at.attachmentName)
-				{
-					cm.stateSetData($at, $lockTime);
-					result = true;
-				}
-				else if (0 < cm.modelInfo.childVoxelModels.length)
-				{
-					//Log.out( "VoxelModel.stateSet - addAnimationsInChildren - looking in children of child for: " + $at.attachmentName );
-					if (addAnimationsInChildren(cm.modelInfo.childVoxelModels, $at, $lockTime))
-						result = true;
+			var resultChildren:Boolean = true;
+			if ( $children && 0 != $children.length) {
+				for each (var cm:VoxelModel in $children) {
+					if (cm && cm.modelInfo && cm.modelInfo.childrenLoaded) {
+						//Log.out( "VoxelModel.addAnimationsInChildren - is child.metadata.name: " + child.metadata.name + " equal to $at.attachmentName: " + $at.attachmentName );
+						if (cm.metadata.name == $at.attachmentName) {
+							cm.stateSetData($at, $lockTime);
+						}
+						else if (0 < cm.modelInfo.childVoxelModels.length) {
+							//Log.out( "VoxelModel.stateSet - addAnimationsInChildren - looking in children of child for: " + $at.attachmentName );
+							result = result && addAnimationsInChildren(cm.modelInfo.childVoxelModels, $at, $lockTime);
+						}
+						else
+							resultChildren = false;
+					}
+					else
+						resultChildren = false;
 				}
 			}
-			return result;
+			return resultChildren;
 		}
 	}
 	

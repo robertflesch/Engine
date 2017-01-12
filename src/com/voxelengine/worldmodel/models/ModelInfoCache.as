@@ -39,6 +39,7 @@ public class ModelInfoCache
 	public function ModelInfoCache() {}
 	
 	static public function init():void {
+		ModelInfoEvent.addListener( ModelBaseEvent.EXISTS_REQUEST, 		checkIfExists );
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST, 			request );
 		ModelInfoEvent.addListener( ModelBaseEvent.DELETE, 				deleteHandler );
 		ModelInfoEvent.addListener( ModelBaseEvent.GENERATION, 			generated );
@@ -50,7 +51,6 @@ public class ModelInfoCache
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );
 		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createdHandler ); 
-		
 	}
 	
 	static private function save(e:ModelInfoEvent):void {
@@ -62,32 +62,45 @@ public class ModelInfoCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  ModelInfoEvent
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	static private function request( $mie:ModelInfoEvent ):void {   
-		if ( null == $mie.modelGuid ) {
-			Log.out( "ModelInfoCache.request requested guid is NULL: ", Log.WARN );
-			return;
-		}
-		
-		//Log.out( "ModelInfoCache.modelInfoRequest guid: " + $mie.modelGuid, Log.INFO );
-		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
-		if ( null == mi ) {
-			if ( _block.has( $mie.modelGuid ) )
-				return;
-			_block.add( $mie.modelGuid );
-				
-			if ( true == Globals.online && $mie.fromTables )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid ) );
-			else	
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.modelGuid ) );
-		}
-		else {
-			if ($mie)
-				ModelInfoEvent.create( ModelBaseEvent.RESULT, $mie.series, $mie.modelGuid, mi );
-			else
-				Log.out( "ModelInfoCache.request ModelInfoEvent is NULL: ", Log.WARN );
+	static private function request( $mie:ModelInfoEvent ):void {
+		if ( null == $mie || null == $mie.modelGuid ) { // Validator
+			Log.out( "ModelInfoCache.request requested event or guid is NULL: ", Log.ERROR );
+			ModelInfoEvent.create( ModelBaseEvent.EXISTS_ERROR, ( $mie ? $mie.series: -1 ), "MISSING", null );
+		} else {
+			//Log.out( "ModelInfoCache.modelInfoRequest guid: " + $mie.modelGuid, Log.INFO );
+			var mi:ModelInfo = _modelInfo[$mie.modelGuid];
+			if (null == mi) {
+				if (_block.has($mie.modelGuid))
+					return;
+				_block.add($mie.modelGuid);
+
+				if (true == Globals.online && $mie.fromTables)
+					PersistanceEvent.dispatch(new PersistanceEvent(PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid));
+				else
+					PersistanceEvent.dispatch(new PersistanceEvent(PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.modelGuid));
+			}
+			else {
+				if ($mie)
+					ModelInfoEvent.create(ModelBaseEvent.RESULT, $mie.series, $mie.modelGuid, mi);
+				else
+					Log.out("ModelInfoCache.request ModelInfoEvent is NULL: ", Log.WARN);
+			}
 		}
 	}
-	
+
+	static private function checkIfExists( $mie:ModelInfoEvent ):void {
+		if ( null == $mie || null == $mie.modelGuid ) { // Validator
+			Log.out( "ModelInfoCache.checkIfExists requested event or guid is NULL: ", Log.ERROR );
+			ModelInfoEvent.create( ModelBaseEvent.EXISTS_ERROR, ( $mie ? $mie.series: -1 ), "MISSING", null );
+		} else {
+			var mi:ModelInfo = _modelInfo[$mie.modelGuid];
+			if (null != mi)
+				ModelInfoEvent.create( ModelBaseEvent.EXISTS, $mie.series, $mie.modelGuid, mi);
+			else
+				ModelInfoEvent.create( ModelBaseEvent.EXISTS_FAILED, $mie.series, $mie.modelGuid, null);
+		}
+	}
+
 	static private function deleteHandler( $mie:ModelInfoEvent ):void {
 		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
 		if ( null != mi ) {

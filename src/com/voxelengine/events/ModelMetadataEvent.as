@@ -53,7 +53,10 @@ public class ModelMetadataEvent extends ModelBaseEvent
 	static public function dispatch( $event:ModelMetadataEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
-	
+
+	static public function create( $type:String, $series:int, $modelGuid:String, $modelMetadata:ModelMetadata ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new ModelMetadataEvent( $type, $series, $modelGuid, $modelMetadata ) );
+	}
 	///////////////// Event handler interface /////////////////////////////
 }
 }

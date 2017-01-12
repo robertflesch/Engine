@@ -1990,7 +1990,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			var t:int = $ba.readByte();
 		}
 
-		Log.out( "Oxel.extractVersionInfo - format: " + format + "version: " + $op.version );
+		//Log.out( "Oxel.extractVersionInfo - format: " + format + "  version: " + $op.version );
 		//Log.out("OxelPersistance.extractVersionInfo - version: " + $op.version );
 
 		// This reads the format info and advances position on byteArray

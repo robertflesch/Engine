@@ -129,7 +129,9 @@ public class Dragon extends Beast
 		
 		if ( _stateLock )
 			return;
-			
+		if ( !modelInfo.animationsLoaded )
+			return;
+
 		var climbFactor:Number = ( maxClimbAngle + instanceInfo.rotationGet.x) / maxClimbAngle;
 		
 		if ( onSolidGround ) {

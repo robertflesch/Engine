@@ -204,7 +204,7 @@ public class InstanceInfo extends Location	{
 				var scriptsArray:Array = [];
 				for ( var i:int; i < _scripts.length; i++ ) {
 					if ( _scripts[i]  && !_scripts[i].modelScript ) {
-						Log.out( "InstanceInfo.instanceScriptOnly - script: " + Script.getCurrentClassName( _scripts[i] ) );
+						//Log.out( "InstanceInfo.instanceScriptOnly - script: " + Script.getCurrentClassName( _scripts[i] ) );
 						//scripts["script" + i] = Script.getCurrentClassName( _scripts[i] );
 						scriptsArray[i] = _scripts[i].toObject();
 				}	}

@@ -170,11 +170,15 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	public function crossHairActive():void {
+		Log.out( "VoxelVerseGUI.crossHairActive event Globals.active: " + Globals.active, Log.WARN );
+
 		_crossHairColor = CROSS_HAIR_YELLOW;
 		crossHairChange();
 	}
 	
 	public function crossHairInactive():void {
+		Log.out( "VoxelVerseGUI.crossHairInactive event Globals.active: " + Globals.active, Log.WARN );
+
 		_crossHairColor = CROSS_HAIR_RED;
 		crossHairChange();
 	}
@@ -265,8 +269,8 @@ public class VoxelVerseGUI extends EventDispatcher
 			_releaseMenu = addReleaseMenu();
 			_releaseMenu.visible = false;
 			if ( true == Globals.isDebug ) {
-				_debugMenu = new WindowDebugMenu();
-				_debugMenu.visible = false;
+//				_debugMenu = new WindowDebugMenu();
+//				_debugMenu.visible = false;
 			}
 			if ( !Renderer.renderer.hardwareAccelerated )
 				 new WindowNotHardware( "WARNING", "Hardware acceleration is not enabled in your browser, this is happening in Chrome on some machines, try FireFox or Internet Explorer" );
@@ -286,7 +290,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		LanguageManager.init();
 	}
 	
-	private function addKeyboardListeners(event : Event) : void {
+	private function addKeyboardListeners() : void {
 		Log.out( "VoxelVerseGUI.addKeyboardListeners");
 		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
 	}
@@ -314,7 +318,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	private function onModelLoadingComplete(event : LoadingEvent ) : void {
 		//Log.out( "VVGui.onModelLoadingComplete" );
 		LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
-		addKeyboardListeners( event );
+		addKeyboardListeners();
 		
 		if ( ConfigManager.instance.showHelp )
 			new WindowHelp();
@@ -323,7 +327,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	private function onKeyPressed( e : KeyboardEvent) : void {
-		//Log.out( "VoxelVerseGUI.onKeyPressed: KeyboardEvent: " + e);
+		Log.out( "VoxelVerseGUI.onKeyPressed: KeyboardEvent: " + e.keyCode );
 
 		if ( Keyboard.F11 == e.keyCode )
 			Renderer.renderer.screenShot( true ); // draws UI

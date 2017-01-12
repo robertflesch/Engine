@@ -186,7 +186,10 @@ public class VoxelVerse extends Sprite
 		else
 			_s_timeEntered = getTimer();
 
+
 		var interFrameTime:int = _s_timeEntered - _timePrevious;
+		_timePrevious = getTimer();
+		//Log.out( "VoxelVerse.enterFrame -  interFrameTime: " + interFrameTime, Log.INFO )
 
 		MemoryManager.update();
 
@@ -201,12 +204,11 @@ public class VoxelVerse extends Sprite
 			toggleConsole();
 
         _s_frameTime = interFrameTime + _s_timeUpdate + _s_timeRender;
-		if ( ( 20 < _s_timeRender || 10 < _s_timeUpdate ) && Globals.active && Globals.isDebug )
-			Log.out( "VoxelVerse.enterFrame - update: "  + _s_timeUpdate + " render: " + _s_timeRender  + "  total: " +  _s_frameTime + "  interFrameTime: " + interFrameTime, Log.INFO )
+//		if ( ( 20 < _s_timeRender || 10 < _s_timeUpdate ) && Globals.active && Globals.isDebug )
+//			Log.out( "VoxelVerse.enterFrame - update: "  + _s_timeUpdate + " render: " + _s_timeRender  + "  total: " +  _s_frameTime + "  interFrameTime: " + interFrameTime, Log.INFO )
 
 		// For some reason is was important to make sure everything was updated before this got passed on to child classes.
 		AppEvent.dispatch( e )
-		_timePrevious = getTimer();
 	}
 
 	/**
@@ -215,45 +217,52 @@ public class VoxelVerse extends Sprite
 	 *  This allow the app to not pick up any other mouse or keyboard activity when app is not active
 	 */
 	public function mouseLeave( e:Event ):void {
-		//Log.out( "VoxelVerse.mouseLeave event" );
+		Log.out( "VoxelVerse.mouseLeave event" );
 		deactivate( e )
 	}
 
 	private function deactivate(e:Event):void {
-		//Log.out( "VoxelVerse.deactive event", Log.WARN );
+		Log.out( "VoxelVerse.deactivate event", Log.WARN );
 		if ( Globals.active )
-			appLosesFocus(e)
-	}
+			appLostFocus(e);
 
-	private function appLosesFocus(e:Event):void {
-		Globals.active = false;
-		Globals.clicked = false;
-		//Log.out( "VoxelVerse.appLosesFocus Globals.active: " + Globals.active + "  Globals.clicked: " + Globals.clicked, Log.WARN )
-		VoxelVerseGUI.currentInstance.crossHairInactive();
+		function appLostFocus(e:Event):void {
+			Globals.active = false;
+//			Globals.clicked = false;
+			Log.out( "VoxelVerse.appLostFocus Globals.active: " + Globals.active, Log.WARN );
 
-		MemoryManager.update();
-		MouseKeyboardHandler.reset();
+			VoxelVerseGUI.currentInstance.crossHairInactive();
 
-		// one way to wake us back up is thru the mouse click
-		//stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown)
-		stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-		stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+			MemoryManager.update();
+			MouseKeyboardHandler.reset();
 
-		if ( Globals.online ) {
-			AppEvent.dispatch( e );
-			dispatchSaves();
+			// one way to wake us back up is thru the mouse click
+			//stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown)
+			stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
+			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+
+			if ( Globals.online ) {
+				AppEvent.dispatch( e );
+				dispatchSaves();
+			}
+			//else
+			//	Log.out( "VoxelVerse.deactivateApp - app already deactivated", Log.WARN )
 		}
-		//else
-		//	Log.out( "VoxelVerse.deactivateApp - app already deactivated", Log.WARN )
 	}
+
 
 	private function activate(e:Event):void {
-		//Log.out( "VoxelVerse.activate event" )
-		if ( false == Globals.active ) {
-			//Log.out( "VoxelVerse.activate - setting active = TRUE" );
+        //Log.out( "VoxelVerse.activate Globals.active: " + Globals.active + "  Globals.clicked: " + Globals.clicked )
+		Log.out( "VoxelVerse.activate Globals.active: " + Globals.active, Log.DEBUG )
+		if ( false == Globals.active )
+			appGainsFocus(e);
+
+		//else
+		//	Log.out( "VoxelVerse.activateApp - ignoring" )
+		function appGainsFocus(e:Event):void {
 			Globals.active = true;
-			Globals.clicked = true;
-			//Log.out( "VoxelVerse.activate Globals.active: " + Globals.active + "  Globals.clicked: " + Globals.clicked, Log.WARN )
+//			Globals.clicked = true;
+			Log.out( "VoxelVerse.appGainsFocus Globals.active: " + Globals.active, Log.WARN )
 
 			VoxelVerseGUI.currentInstance.crossHairActive();
 
@@ -261,8 +270,7 @@ public class VoxelVerse extends Sprite
 
 			AppEvent.dispatch( e );
 		}
-		//else
-		//	Log.out( "VoxelVerse.activateApp - ignoring" )
+
 	}
 
 	private static function dispatchSaves():void {

@@ -311,7 +311,6 @@ package com.voxelengine.worldmodel
 			dbo = $dbo;
 			info = $dbo;
 			_permissions = new PermissionsRegion( info.permissions );
-			changed = false;
 		}
 		
 		public function fromObjectImport( $dbo:DatabaseObject ):void {
@@ -325,7 +324,7 @@ package com.voxelengine.worldmodel
 			info.playerPosition.x = info.playerPosition.y = info.playerPosition.z = 0;
 			info.playerRotation.x = info.playerRotation.y = info.playerRotation.z = 0;
 			_permissions = new PermissionsRegion( info );
-			changed = true;
+//			changed = true;
 		}
 	} // Region
 } // Package

@@ -281,7 +281,7 @@ public class Beast extends ControllableVoxelModel
 
 	private var _dy:Number = 0;
 	override protected function handleMouseMovement( $elapsedTimeMS:int ):void {
-		if ( 0 == Globals.openWindowCount && Globals.active && Globals.clicked )
+		if ( 0 == Globals.openWindowCount && Globals.active )
 		{
 			var climbFactor:Number = ( maxClimbAngle + instanceInfo.rotationGet.x) / maxClimbAngle;
 			var scaleFactor:Number = climbRate + climbFactor;

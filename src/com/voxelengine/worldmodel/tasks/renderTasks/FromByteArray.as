@@ -28,7 +28,7 @@ public class FromByteArray extends AbstractTask
 {	
 	private var	_guid:String;
 	private var	_altGuid:String;
-	private var	_parent:OxelPersistance;
+	private var	_op:OxelPersistance;
 
 	static public function addTask( $guid:String, $taskPriority:int, $parent:OxelPersistance, $altGuid:String ): void {
 		var fba:FromByteArray = new FromByteArray( $guid, $taskPriority, $parent, $altGuid );
@@ -37,34 +37,34 @@ public class FromByteArray extends AbstractTask
 	
 	public function FromByteArray( $guid:String, $taskPriority:int, $parent:OxelPersistance, $altGuid:String ):void {
 		_guid = $guid;
-		_parent = $parent;
+		_op = $parent;
 		_altGuid = $altGuid;
 		super("FromByteArray", $taskPriority );
 		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 	}
 	
 	override public function start():void {
-		super.start()
+		super.start();
 		//var time:int = getTimer();
 
 		try {
-			Log.out("FromByteArray.start: guid: " + _guid);
-			_parent.fromByteArray();
+			//Log.out("FromByteArray.start: guid: " + _guid);
+			_op.fromByteArray();
 
-			if ("0" == _parent.dbo.key) {
-				_parent.changed = true;
-				//Log.out( "FromByteArray.start - parent.dbo.key = 0 " + _parent )
-				_parent.guid = _guid;
+			if ("0" == _op.dbo.key) {
+				_op.changed = true;
+				//Log.out( "FromByteArray.start - parent.dbo.key = 0 " + _op )
+				_op.guid = _guid;
 				// When import objects, we have to update the cache so they have the correct info.
 				if (null != _altGuid)
 					OxelDataEvent.create( ModelBaseEvent.UPDATE_GUID, 0, _altGuid + ":" + _guid, null );
-				_parent.save();
+				_op.save();
 			}
-			OxelDataEvent.create( OxelDataEvent.OXEL_READY, 0, _guid, _parent );
+			OxelDataEvent.create( OxelDataEvent.OXEL_READY, 0, _guid, _op );
 		}
 		catch ( e:Error ) {
 			Log.out( "FromByteArray.start: ERROR: " + e.toString(), Log.ERROR, e );
-			OxelDataEvent.create( OxelDataEvent.OXEL_FAILED, 0, _guid, _parent );
+			OxelDataEvent.create( OxelDataEvent.OXEL_FAILED, 0, _guid, _op );
 		}
 		LoadingImageEvent.dispatch(new LoadingImageEvent(LoadingImageEvent.DESTROY));
 		super.complete();

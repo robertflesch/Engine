@@ -7,6 +7,7 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
+import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
 
 import flash.utils.ByteArray;
@@ -47,34 +48,91 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object ) {
 		_creationFunction 	= $miJson.name;
 		_type 				= $miJson.biomes.layers[0].type;
-		
+		_creationInfo		= $miJson;
+		Log.out( "ModelMakerGenerate - ii: " + $ii.toString() + "  using generation script: " + $miJson.biomes.layers[0].functionName );
 		super( $ii );
-		Log.out( "ModelMakerGenerate - ii: " + ii.toString() + "  using generation script: " + $miJson.biomes.layers[0].functionName );
-		
+
+		// So there is a chance that this model already exists, as in the case for the DefaultPlayer
+		// Check to see if this modelInfo already exists.
+		ModelInfoEvent.addListener( ModelBaseEvent.EXISTS, modelInfoExists );
+		ModelInfoEvent.addListener( ModelBaseEvent.EXISTS_FAILED, modelInfoExistsFailed );
+		ModelInfoEvent.create( ModelBaseEvent.EXISTS_REQUEST, 0, $ii.modelGuid, null );
+	}
+
+	private function removeModelInfoEventHandler():void {
+		ModelInfoEvent.removeListener( ModelBaseEvent.EXISTS, modelInfoExists );
+		ModelInfoEvent.removeListener( ModelBaseEvent.EXISTS_FAILED, modelInfoExistsFailed );
+	}
+
+	private function modelInfoExists( $e:ModelInfoEvent ):void {
+		if ( $e.modelGuid != ii.modelGuid )
+			return;
+		removeModelInfoEventHandler();
+		_modelInfo = $e.vmi;
+		checkIfModelMetadataExists();
+	}
+
+	private function checkIfModelMetadataExists(): void {
+		ModelMetadataEvent.addListener( ModelBaseEvent.EXISTS, modelMetadataExists );
+		ModelMetadataEvent.addListener( ModelBaseEvent.EXISTS_FAILED, modelMetadataExistsFailed );
+		ModelMetadataEvent.create( ModelBaseEvent.EXISTS_REQUEST, 0, ii.modelGuid, null );
+	}
+
+	private function modelInfoExistsFailed( $e:ModelInfoEvent ):void {
+		if ( $e.modelGuid != ii.modelGuid )
+			return;
+
+		removeModelInfoEventHandler();
 		// This is a special case for modelInfo, the modelInfo its self is contained in the generate script
-		_modelInfo = new ModelInfo( $ii.modelGuid );
-		///////////////////
-		var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_INFO, "0", "0", 0, true, null );
-		dbo.data = new Object();
-		// This is for import from generated only.
-		dbo.data.model = $miJson
-		modelInfo.fromObjectImport( dbo );
+//		_modelInfo = new ModelInfo( ii.modelGuid );
+//		var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_INFO, "0", "0", 0, true, null );
+//		dbo.data = new Object();
+//		// This is for import from generated only.
+//		dbo.data.model = _creationInfo;
+//		modelInfo.fromObjectImport( dbo );
+
+		_modelInfo = new ModelInfo( ii.modelGuid );
+		var newObj:Object = ModelInfo.newObject();
+		newObj.data.model = _creationInfo;
+		modelInfo.fromObjectImport( newObj );
+
+		checkIfModelMetadataExists();
+	}
+
+	private function removeModelMetadataEventHandler():void {
+		ModelMetadataEvent.removeListener( ModelBaseEvent.EXISTS, modelMetadataExists );
+		ModelMetadataEvent.removeListener( ModelBaseEvent.EXISTS_FAILED, modelMetadataExistsFailed );
+	}
+
+	private function modelMetadataExists( $e:ModelMetadataEvent ):void {
+		if ( $e.modelGuid != ii.modelGuid )
+			return;
+		removeModelMetadataEventHandler();
+		_modelMetadata = $e.modelMetadata;
+		attemptMake();
+	}
+
+	private function modelMetadataExistsFailed( $e:ModelMetadataEvent ):void {
+		if ( $e.modelGuid != ii.modelGuid )
+			return;
+		removeModelMetadataEventHandler();
 		retrieveBaseInfo();
 		attemptMake();
 	}
-	
+
 	override protected function retrieveBaseInfo():void {
-		
+		Log.out( "ModelMakerGenerate.retrieveBaseInfo " + ii.modelGuid );
 		_modelMetadata = new ModelMetadata( ii.modelGuid );
-		var newObj:Object = ModelMetadata.newObject()
+		var newObj:Object = ModelMetadata.newObject();
 		_modelMetadata.fromObjectImport( newObj );
 
+		// Bypass the setter so that we dont set it to changed
 		if ( _type )
-			_modelMetadata.name = _creationFunction + TypeInfo.name( _type ) + "-" + modelInfo.info.model.grainSize + "-" + _creationFunction;
-		else	
-			_modelMetadata.name = _creationFunction + "-" + modelInfo.info.model.grainSize;
-		_modelMetadata.description = _creationFunction + "- GENERATED";
-		_modelMetadata.owner = Network.userId;
+			_modelMetadata.info.name = _creationFunction + TypeInfo.name( _type ) + "-" + modelInfo.info.model.grainSize + "-" + _creationFunction;
+		else
+			_modelMetadata.info.name = _creationFunction + "-" + modelInfo.info.model.grainSize;
+		_modelMetadata.info.description = _creationFunction + "- GENERATED";
+		_modelMetadata.info.owner = Network.userId;
 		ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelMetadata ) );
 	}
 	
@@ -111,9 +169,11 @@ public class ModelMakerGenerate extends ModelMakerBase {
 				Log.out( "ModelMakerGenerate.listenForGenerationComplete " + ii.modelGuid + " == " + $e.modelGuid );
 				_vm.complete = true;
 				modelInfo.data = $e.oxelData;
-				modelInfo.data.changed = true;
-				modelInfo.changed = true;
-				_modelMetadata.changed = true;
+				if ( modelInfo.guid != "DefaultPlayer" ) {
+					modelInfo.data.changed = true;
+					modelInfo.changed = true;
+					_modelMetadata.changed = true;
+				}
 				_vm.save();
 				markComplete( true, _vm );
 			}

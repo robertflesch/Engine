@@ -50,13 +50,16 @@ public class PersistanceObject
 	public function get guid():String  { return _guid; }
 	public function set guid(value:String):void	{
 		if ( _guid != value && Globals.isGuid( _guid ) && Globals.isGuid( value ) )
-				Log.out( "PersistanceObject - WHY AM I CHANGING A VALID GUID");
-		_guid = value; }
+				Log.out( "PersistanceObject - WHY AM I CHANGING A VALID GUID  _guid: " + _guid + "  newGuid: " + value );
+		_guid = value;
+	}
 	public function get dbo():DatabaseObject { return _dbo; }
 	public function set dbo(val:DatabaseObject ):void { _dbo = val; }
 	public function get table():String { return _table; }
 	public function get changed():Boolean { return _changed; }
-	public function set changed(value:Boolean):void { _changed = value; }
+	public function set changed(value:Boolean):void {
+		Log.out( "PersistanceObject.Changed value: " + value + "  guid: " + _guid, Log.WARN);
+		_changed = value; }
 	
 	public function get dynamicObj():Boolean { return _dynamicObj; }
 	public function set dynamicObj(value:Boolean):void { _dynamicObj = value; }
@@ -93,14 +96,14 @@ public class PersistanceObject
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null ) );
 			changed = false;
 		}
-		else {
-			if ( Globals.online && !changed )
-				Log.out( name + " save - Not saving data - guid: " + guid + " NOT changed" );
-			else if ( !Globals.online && changed )
-				Log.out( name + " save - Not saving data - guid: " + guid + " NOT online" );
-			else	
-				Log.out( name + " save - Not saving data - Offline and not changed" );
-		}
+//		else {
+//			if ( Globals.online && !changed )
+//				Log.out( name + " save - Not saving data - guid: " + guid + " NOT changed" );
+//			else if ( !Globals.online && changed )
+//				Log.out( name + " save - Not saving data - guid: " + guid + " NOT online" );
+//			else
+//				Log.out( name + " save - Not saving data - Offline and not changed" );
+//		}
 	}
 	
 	private function saveSucceed( $pe:PersistanceEvent ):void { 

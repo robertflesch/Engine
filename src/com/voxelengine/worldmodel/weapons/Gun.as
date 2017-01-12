@@ -41,7 +41,7 @@ public class Gun extends ControllableVoxelModel
 	//Stand
 	//Sight
 	public function Gun( instanceInfo:InstanceInfo ) { 
-		Log.out( "Gun instanceInfo: " + instanceInfo,Log.WARN );
+		//Log.out( "Gun instanceInfo: " + instanceInfo,Log.WARN );
 		super( instanceInfo );
 		// give the gun a unique series
 	}

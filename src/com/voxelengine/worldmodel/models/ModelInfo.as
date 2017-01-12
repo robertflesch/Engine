@@ -73,7 +73,7 @@ public class ModelInfo extends PersistanceObject
 	
 	static public function newObject():Object {
 		var obj:Object = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_INFO, "0", "0", 0, true, null )
-		obj.data = new Object()
+		obj.data = {};
 		return obj
 	}
 
@@ -158,7 +158,7 @@ public class ModelInfo extends PersistanceObject
 			_data = $ode.oxelData;
 			_data.parent = this;
 			// Set OxelPersistance to the baseLightLevel for this object.
-			Log.out( "ModelInfo.retrievedData - set baseLightLevel: " + baseLightLevel);
+			//Log.out( "ModelInfo.retrievedData - set baseLightLevel: " + baseLightLevel);
 			_data.baseLightLevel = baseLightLevel;
 
 			if ( _data && 0 == _data.oxelCount )
@@ -260,7 +260,7 @@ public class ModelInfo extends PersistanceObject
 	//  start animation operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	protected 	var		_animationsLoaded:Boolean
-	private 	var 	_animationCount:int			
+	private 	var 	_animsRemainingToLoad:int			
 	public 	function get animationsLoaded():Boolean 				{ return _animationsLoaded; }
 	public 	function set animationsLoaded(value:Boolean):void		{ _animationsLoaded = value; }
 	
@@ -275,7 +275,7 @@ public class ModelInfo extends PersistanceObject
 			AnimationEvent.addListener( ModelBaseEvent.UPDATE_GUID,	animationUpdateGuid );		
 			
 			for each ( var animData:Object in animationInfo ) {
-				_animationCount++; 
+				_animsRemainingToLoad++; 
 				
 				// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 				var ae:AnimationEvent;
@@ -306,8 +306,8 @@ public class ModelInfo extends PersistanceObject
 		if ( _series == $ae.series ) {
 //			$ae.ani.modelGuid = guid;
 			_animations.push( $ae.ani );
-			_animationCount--;
-			if ( 0 == _animationCount ) {
+			_animsRemainingToLoad--;
+			if ( 0 == _animsRemainingToLoad ) {
 				animationsLoaded = true;
 				AnimationEvent.removeListener( ModelBaseEvent.DELETE, 		animationDeleteHandler );
 				AnimationEvent.removeListener( ModelBaseEvent.ADDED, 		animationAdd );
@@ -588,7 +588,8 @@ public class ModelInfo extends PersistanceObject
 		
 		info = $dbo.data;
 		loadFromInfo();
-		changed = true;
+		if ( $dbo.data && $dbo.data.model && $dbo.data.model.modelClass != "Player" )
+			changed = true;
 	}
 	
 	public function fromObject( $dbo:Object ):void {

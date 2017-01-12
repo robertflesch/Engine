@@ -34,6 +34,13 @@ public class ModelBaseEvent extends Event
 	static public const RESULT:String						= "RESULT";
 	static public const RESULT_COMPLETE:String				= "RESULT_COMPLETE";
 	static public const REQUEST_FAILED:String				= "REQUEST_FAILED";
+
+	// New sequesnce to see if data exists already, used by generation system
+	static public const EXISTS_REQUEST:String				= "EXISTS_REQUEST";
+	static public const EXISTS:String						= "EXISTS";
+	static public const EXISTS_FAILED:String				= "EXISTS_FAILED";
+	static public const EXISTS_ERROR:String					= "EXISTS_ERROR";
+
 	
 	// data or meta data about this object has changed
 	static public const CREATED:String						= "CREATED";

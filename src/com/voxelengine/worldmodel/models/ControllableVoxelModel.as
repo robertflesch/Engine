@@ -345,6 +345,46 @@ public class ControllableVoxelModel extends VoxelModel
 		
 		const STEP_UP_CHECK:Boolean = true;
 		// does model have collision, if no collision, then why bother with gravity
+		if ( instanceInfo.usesCollision ) {
+			_collisionCandidates = ModelCacheUtils.whichModelsIsThisInfluencedBy( this )
+			//trace( "collisionTest: " + _collisionCandidates.length )
+			if ( 0 == _collisionCandidates.length ) {
+				if ( usesGravity )
+					fall( loc, $elapsedTimeMS );
+				onSolidGround = false;
+				instanceInfo.setTo( loc );
+			} else {
+				for each ( var collisionCandidate:VoxelModel in _collisionCandidates ) {
+					// if it collided or failed to step up
+					// restore the previous position
+					var restorePoint:int = collisionCheckNew( $elapsedTimeMS, loc, collisionCandidate, STEP_UP_CHECK )
+					if ( -1 < restorePoint ) {
+						Globals.g_app.dispatchEvent( new CollisionEvent( CollisionEvent.COLLIDED, this.instanceInfo.instanceGuid ) );
+						instanceInfo.restoreOld( restorePoint );
+						instanceInfo.velocityReset();
+						return false;
+					}
+					else 					// New position is valid
+						instanceInfo.setTo( loc );
+				}
+			}
+		}
+		else
+			instanceInfo.setTo( loc );
+		
+		return true;
+	}
+
+	protected function controlledModelChecksVerbose( $elapsedTimeMS:Number ):Boolean {
+		// set our next position by adding in velocities
+		// If there is no collision or gravity, this is where the model would end up.
+		var loc:Location = _s_scratchLocation;
+		loc.setTo( instanceInfo );
+		setTargetLocation( loc );
+		//Log.out( "CVM.controlledModelChecks - loc.positionSet: " + loc.positionGet );
+
+		const STEP_UP_CHECK:Boolean = true;
+		// does model have collision, if no collision, then why bother with gravity
 		if ( instanceInfo.usesCollision )
 		{
 			var timer:int = getTimer();
@@ -359,22 +399,22 @@ public class ControllableVoxelModel extends VoxelModel
 			//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
 			//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.UP);
 			//if ( test )
-				//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
-			//else	
-				//Log.out("CVM.test - findClosestIntersectionInDirection NO MODEL: " );
+			//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
+			//else
+			//Log.out("CVM.test - findClosestIntersectionInDirection NO MODEL: " );
 			//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.DOWN);
 			//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
-				
+
 //				Log.out("CVM.test - findClosestIntersectionInDirection took: " + (getTimer() - timer));
-			
-			
+
+
 			_collisionCandidates = ModelCacheUtils.whichModelsIsThisInfluencedBy( this )
 			//trace( "collisionTest: " + _collisionCandidates.length )
 			if ( 0 == _collisionCandidates.length )
 			{
 				if ( usesGravity )
 				{
-					fall( loc, $elapsedTimeMS );	
+					fall( loc, $elapsedTimeMS );
 				}
 				onSolidGround = false;
 				instanceInfo.setTo( loc );
@@ -386,7 +426,7 @@ public class ControllableVoxelModel extends VoxelModel
 					// if it collided or failed to step up
 					// restore the previous position
 
-					
+
 					var restorePoint:int = collisionCheckNew( $elapsedTimeMS, loc, collisionCandidate, STEP_UP_CHECK )
 					if ( -1 < restorePoint )
 					{
@@ -403,10 +443,10 @@ public class ControllableVoxelModel extends VoxelModel
 		}
 		else
 			instanceInfo.setTo( loc );
-		
+
 		return true;
 	}
-	
+
 	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
 		super.takeControl( $modelLosingControl, $addAsChild );
 		InventoryInterfaceEvent.dispatch( new InventoryInterfaceEvent( InventoryInterfaceEvent.DISPLAY, instanceInfo.instanceGuid, inventoryBitmap ) );
@@ -518,6 +558,8 @@ public class ControllableVoxelModel extends VoxelModel
 	
 	override public function updateVelocity( $elapsedTimeMS:int, $clipFactor:Number ):Boolean
 	{
+		//Log.out( "updateVelocity this == VoxelModel.controlledModel " + (this == VoxelModel.controlledModel) + " Globals.active: " + Globals.active );
+
 		var changed:Boolean = false;
 		
 		// if app is not active, we still need to clip velocitys, but we dont need keyboard or mouse movement
@@ -527,9 +569,9 @@ public class ControllableVoxelModel extends VoxelModel
 			var speedVal:Number = instanceInfo.speed( $elapsedTimeMS ) / 4;
 			
 			// Add in movement factors
-			if ( MouseKeyboardHandler.forward )	{ 
+			if ( MouseKeyboardHandler.forward )	{
 				if ( instanceInfo.velocityGet.length < maxSpeed ) {
-					instanceInfo.velocitySetComp( vel.x, vel.y, vel.z + speedVal ); 
+					instanceInfo.velocitySetComp( vel.x, vel.y, vel.z + speedVal );
 					changed = true; 
 					mForward = true; 
 				}

@@ -81,7 +81,7 @@ public class OxelPersistance extends PersistanceObject
 	public 	function set loaded( $val:Boolean):void 			{ _loaded = $val; }
 	
 	public function OxelPersistance( $guid:String, $baseLightIllumination:int ) {
-		Log.out( "OxelPersistance: " + $guid + " baseLightIllumination: " + $baseLightIllumination, Log.WARN );
+		//Log.out( "OxelPersistance: " + $guid + " baseLightIllumination: " + $baseLightIllumination, Log.WARN );
 		super( $guid, Globals.BIGDB_TABLE_OXEL_DATA );
 		_loaded = false;
 		// This should all come from model, so I could give the whole model a tint if I liked.
@@ -142,7 +142,7 @@ public class OxelPersistance extends PersistanceObject
 				oxel.quadsBuild()
 			}
 			else {
-				Log.out( "OxelPersistance.update ------------ calling refreshQuads guid: " + guid, Log.DEBUG );
+				//Log.out( "OxelPersistance.update ------------ calling refreshQuads guid: " + guid, Log.DEBUG );
 				topMostChunk.refreshFacesAndQuads( guid, $vm, firstTime );
 				if ( firstTime )
 					firstTime = false
@@ -172,7 +172,7 @@ public class OxelPersistance extends PersistanceObject
 				Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " loaded: " + loaded + " in table: " + table, Log.DEBUG );
 				return;
 		}
-		Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.DEBUG );
+		//Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.DEBUG );
 		super.save();
 	}
 

@@ -243,7 +243,7 @@ public class ModelTransform
 						if ( ModelTransform.INFINITE_TIME == originalTime )
 							_time = ModelTransform.INFINITE_TIME;
 						else
-							_time = originalTime * 1000;
+							_time = originalTime;
 						
 						_delta.negate();
 						_inverse = !_inverse;
