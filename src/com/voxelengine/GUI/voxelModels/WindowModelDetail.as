@@ -163,7 +163,7 @@ import com.voxelengine.worldmodel.Light;
 			var bmpd:BitmapData = Renderer.renderer.modelShot();
 			_vm.metadata.thumbnail = drawScaled( bmpd, PHOTO_CAPTURE_WIDTH, PHOTO_CAPTURE_WIDTH );
 			addPhoto();
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CHANGED, 0, _vm.metadata.guid, _vm.metadata ) );
+			ModelMetadataEvent.create( ModelBaseEvent.CHANGED, 0, _vm.metadata.guid, _vm.metadata );
 		}
 		
 		private function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
@@ -233,12 +233,12 @@ import com.voxelengine.worldmodel.Light;
 			_s_currentInstance = null;
 	
 			if ( _vm.metadata.changed ) {
-				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.metadata ) );
-				ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, null ) );
+				ModelMetadataEvent.create( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.metadata );
+				ModelMetadataEvent.create( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, null );
 			}
 			if ( _vm.modelInfo.changed ) {
-				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.modelInfo ) );
-				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, null ) );
+				ModelInfoEvent.create( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.modelInfo );
+				ModelInfoEvent.create( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, null );
 			}
 //			ModelEvent.dispatch( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.instanceGuid ) );
 			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, 0, Region.currentRegion.guid ) );

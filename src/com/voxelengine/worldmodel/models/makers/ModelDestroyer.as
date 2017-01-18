@@ -58,7 +58,7 @@ public class ModelDestroyer {
 			ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, dataResult);
 			ModelInfoEvent.removeListener(ModelBaseEvent.ADDED, dataResult);
 
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
+			ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 			OxelDataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 		}
 	}
@@ -81,7 +81,7 @@ public class ModelDestroyer {
 				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
 
 			// Now delete the parents data
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
+			ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, _modelGuid, null );
 			OxelDataEvent.create( ModelBaseEvent.DELETE, 0, _modelGuid, null );
 		}
 	}

@@ -69,6 +69,7 @@ public class InventoryPanelModel extends VVContainer
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, addModelMetadataEvent );
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, addModelMetadataEvent );
 		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, removeModelMetadataEvent );
+		ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, addModelMetadataEvent );
 
 
 		upperTabsAdd();
@@ -151,14 +152,11 @@ public class InventoryPanelModel extends VVContainer
 	private function displaySelectedCategory( $category:String ):void
 	{	
 		//Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
-		var mme:ModelMetadataEvent = new ModelMetadataEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId, null )
 		// The series makes it so that I dont see results from other objects requests
-		_seriesModelMetadataEvent = mme.series;
-		ModelMetadataEvent.dispatch( mme );
-
-		var mmep:ModelMetadataEvent = new ModelMetadataEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC, null )
-		mmep.series = _seriesModelMetadataEvent
-		ModelMetadataEvent.dispatch( mmep );
+		// This grabs the current series counter which will be used on the REQUEST_TYPE call
+		_seriesModelMetadataEvent = ModelBaseEvent.seriesCounter;
+		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId, null );
+		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.PUBLIC, null );
 	}
 
 	private function removeModelMetadataEvent($mme:ModelMetadataEvent):void {
@@ -366,7 +364,10 @@ public class InventoryPanelModel extends VVContainer
 	}			
 	
 	override protected function onRemoved( event:UIOEvent ):void {
-		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, addModelMetadataEvent )
+		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, addModelMetadataEvent );
+		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, addModelMetadataEvent );
+		ModelMetadataEvent.removeListener( ModelBaseEvent.DELETE, removeModelMetadataEvent );
+		ModelMetadataEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, addModelMetadataEvent );
 	}
 }
 }

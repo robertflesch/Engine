@@ -37,17 +37,17 @@ public class ModelMaker extends ModelMakerBase {
 	}
 	
 	override protected function retrieveBaseInfo():void {
-		super.retrieveBaseInfo()
-		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retrivedMetadata )		
-		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retrivedMetadata )		
-		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata )		
+		super.retrieveBaseInfo();
+		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retrivedMetadata );
+		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retrivedMetadata );
+		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );
 	
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null ) )		
+		ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null );
 	}
 	
 	private function retrivedMetadata( $mme:ModelMetadataEvent):void {
 		if ( ii.modelGuid == $mme.modelGuid ) {
-			_modelMetadata = $mme.modelMetadata
+			_modelMetadata = $mme.modelMetadata;
 			//Log.out( "ModelMaker.retrivedMetadata - metadata: " + _modelMetadata.toString() )
 			attemptMake()
 		}

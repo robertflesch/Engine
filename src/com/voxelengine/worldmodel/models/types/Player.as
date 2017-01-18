@@ -252,36 +252,6 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		return true;
 	}
 	
-	override protected function setAnimation():void	{
-		
-		/*if ( EditCursor.toolOrBlockEnabled )
-		{
-			stateSet( "Pick", 1 );
-		}*/
-		
-		if ( -0.4 > instanceInfo.velocityGet.y )
-		{
-			updateAnimations( "Jump", 1 );
-		}
-		else if ( 0.4 < instanceInfo.velocityGet.y )
-		{
-			updateAnimations( "Fall", 1 );
-		}
-		else if ( 0.2 < Math.abs( instanceInfo.velocityGet.z )  )
-		{
-			updateAnimations( "Walk", 2 );
-		}
-		else if ( 0.2 < Math.abs( instanceInfo.velocityGet.x )  )
-		{
-			updateAnimations( "Slide", 1 );
-		}
-		else
-		{
-			stateSet( "Stand", 1 );
-		}
-		//trace( "Player.update - end" );
-	}
-	
 	override protected function collisionPointsAdd():void {
 		/*  0,0xxxxxx8xxxxxx15,0 
 		 *  x                x

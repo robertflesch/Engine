@@ -55,15 +55,14 @@ public class ModelMakerImport extends ModelMakerBase {
 		_isImporting = true;
 		_prompt = $prompt;
 		super( $ii, false );
-		Log.out( "ModelMakerImport - ii: " + ii.toString() );
+		Log.out( "ModelMakerImport - ii: " + ii.toString(), Log.WARN );
 		retrieveBaseInfo();
 	}
 
 	override protected function retrieveBaseInfo():void {
 		addListeners();	
 		// Since this is the import, it uses the local file system rather then persistance
-		// So we need to override the base handler
-		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );	
+		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );
 	}
 	
 	// next get or generate the metadata
@@ -114,36 +113,41 @@ public class ModelMakerImport extends ModelMakerBase {
 		}
 	}
 	
-	private var _topMostModelGuid:String; // Used to return the modelClass of the topmost guid of the parent chain.
 	private function retrieveParentModelInfo():void {
 		Log.out("ModelMakerImport.retrieveParentModelInfo: " + ii.toString());
 		// We need the parents modelClass so we can know what kind of animations are correct for this model.
-		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, parentModelInfoResult );
-		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, parentModelInfoResult );
-		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
-		_topMostModelGuid = ii.topmostModelGuid();
+		addParentModelInfoListener();
+		var _topMostModelGuid:String = ii.topmostModelGuid();
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _topMostModelGuid, null ) );
-	}
-	
-	private function parentModelInfoResult($mie:ModelInfoEvent):void {
-		if ( $mie.modelGuid == _topMostModelGuid ) {
-			Log.out("ModelMakerImport.retrieveParentModelInfo: " + ii.toString());
-			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, parentModelInfoResult );
-			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, parentModelInfoResult );
-			ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
-			var modelClass:String = $mie.vmi.modelClass;
-			_modelMetadata.animationClass = AnimationCache.requestAnimationClass( modelClass );
-			completeMake();
+
+		function parentModelInfoResult($mie:ModelInfoEvent):void {
+			if ( $mie.modelGuid == _topMostModelGuid ) {
+				Log.out("ModelMakerImport.parentModelInfoResult: " + ii.toString());
+				removeParentModelInfoListener();
+				var modelClass:String = $mie.vmi.modelClass;
+				_modelMetadata.animationClass = AnimationCache.requestAnimationClass( modelClass );
+				completeMake();
+			}
 		}
-	}
-	
-	private function parentModelInfoResultFailed($mie:ModelInfoEvent):void {
-		Log.out("ModelMakerImport.parentModelInfoResultFailed: " + ii.toString(), Log.ERROR);
-		if ( $mie.modelGuid == modelInfo.guid ) {
-			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, parentModelInfoResult );
-			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, parentModelInfoResult );
-			ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
-			markComplete( false );
+
+		function parentModelInfoResultFailed($mie:ModelInfoEvent):void {
+			Log.out("ModelMakerImport.parentModelInfoResultFailed: " + ii.toString(), Log.ERROR);
+			if ( $mie.modelGuid == modelInfo.guid ) {
+				removeParentModelInfoListener();
+				markComplete( false );
+			}
+		}
+
+		function addParentModelInfoListener():void {
+			ModelInfoEvent.addListener( ModelBaseEvent.RESULT, parentModelInfoResult );
+			ModelInfoEvent.addListener( ModelBaseEvent.ADDED, parentModelInfoResult );
+			ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed );
+		}
+
+		function removeParentModelInfoListener():void {
+			ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, parentModelInfoResult);
+			ModelInfoEvent.removeListener(ModelBaseEvent.ADDED, parentModelInfoResult);
+			ModelInfoEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed);
 		}
 	}
 	
@@ -151,19 +155,9 @@ public class ModelMakerImport extends ModelMakerBase {
 		Log.out("ModelMakerImport.completeMake: " + ii.toString());
 		if ( null != modelInfo && null != _modelMetadata ) {
 
-			Log.out("ModelMakerImport.completeMake - needed info found: " + ii.toString());
-			if ( !Globals.isGuid( _modelMetadata.guid ) )
-				_modelMetadata.guid = Globals.getUID();
-				
-			modelInfo.guid = _modelMetadata.guid;
-			ii.modelGuid 	= _modelMetadata.guid;
-
 			_vmTemp = make();
 			if ( _vmTemp ) {
 				_vmTemp.stateLock( true, 10000 ); // Lock state so that it has time to load animations
-//				vm.complete = true;
-				modelInfo.changed = true;
-				_modelMetadata.changed = true;
                 // this gets saved in the vm.save
 				//_modelMetadata.save();
 				if ( null == _vmTemp.instanceInfo.controllingModel ) {
@@ -179,36 +173,35 @@ public class ModelMakerImport extends ModelMakerBase {
 		}
 		else
 			Log.out( "ModelMakerImport.completeMake - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
-	}
 
-	private  function addOxelDataCompleteListeners():void {
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelReady );
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_FAILED, oxelFailedToLoad );
-	}
-
-	private  function removeOxelDataCompleteListeners():void {
-		OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelReady );
-		OxelDataEvent.removeListener( OxelDataEvent.OXEL_FAILED, oxelFailedToLoad );
-	}
-
-	private function oxelReady( $ode:OxelDataEvent):void {
-		if ( modelInfo.guid == $ode.modelGuid  ) {
-			removeOxelDataCompleteListeners();
-
-			_vmTemp.save();
-			Region.currentRegion.modelCache.add( _vmTemp );
-			if ( null == _vmTemp.instanceInfo.controllingModel ) {
-				Region.currentRegion.save();
+		function oxelReady( $ode:OxelDataEvent):void {
+			Log.out( "ModelMakerImport.oxelReady - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
+			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid ) {
+				removeOxelDataCompleteListeners();
+				modelInfo.assignOxelDataToModelInfo( $ode.oxelData );
+				markComplete( true, _vmTemp );
 			}
-
-			markComplete( true, _vmTemp );
+			else
+				Log.out( "ModelMakerImport.oxelReady - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
 		}
-	}
 
-	private function oxelFailedToLoad( $ode:OxelDataEvent):void {
-		if ( modelInfo.guid == $ode.modelGuid  ) {
-			removeOxelDataCompleteListeners();
-			markComplete( false, _vmTemp );
+		function oxelFailedToLoad( $ode:OxelDataEvent):void {
+			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid  ) {
+				removeOxelDataCompleteListeners();
+				markComplete( false, _vmTemp );
+			}
+			else
+				Log.out( "ModelMakerImport.oxelFailedToLoad - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
+		}
+
+		function addOxelDataCompleteListeners():void {
+			OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelReady );
+			OxelDataEvent.addListener( OxelDataEvent.OXEL_FAILED, oxelFailedToLoad );
+		}
+
+		function removeOxelDataCompleteListeners():void {
+			OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelReady );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FAILED, oxelFailedToLoad );
 		}
 	}
 
@@ -217,14 +210,36 @@ public class ModelMakerImport extends ModelMakerBase {
 			Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.WARN );
 
 			(new Alert( "ERROR importing model" )).display();
-			// remove anything that might be hanging around.
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, ii.modelGuid, null ) );
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, ii.modelGuid, null ) );
-			OxelDataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
-
+			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
 			return;
+		} else {
+			Log.out("ModelMakerImport.completeMake - needed info found: " + ii.toString());
+			if ( !Globals.isGuid( _modelMetadata.guid ) )
+				_modelMetadata.guid = Globals.getUID();
+
+			modelInfo.guid = _modelMetadata.guid;
+			ii.modelGuid 	= _modelMetadata.guid;
+
+			ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
+			ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
+			_vmTemp.complete = true;
+
+			modelInfo.changed = true;
+			modelInfo.data.changed = true;
+			_modelMetadata.changed = true;
+			_vmTemp.save();
+			Region.currentRegion.modelCache.add( _vmTemp );
+		}
+
+
+		if ( null == _vmTemp.instanceInfo.controllingModel ) {
+			Region.currentRegion.save();
 		}
 		super.markComplete( $success, _vmTemp );
+		// how are sub models handled?
+		//_isImporting = false;
+		_vmTemp = null;
+
 	}
 }	
 }

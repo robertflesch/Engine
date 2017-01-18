@@ -34,6 +34,7 @@ public class ModelBaseEvent extends Event
 	static public const RESULT:String						= "RESULT";
 	static public const RESULT_COMPLETE:String				= "RESULT_COMPLETE";
 	static public const REQUEST_FAILED:String				= "REQUEST_FAILED";
+	static public const IMPORT_COMPLETE:String				= "IMPORT_COMPLETE";
 
 	// New sequesnce to see if data exists already, used by generation system
 	static public const EXISTS_REQUEST:String				= "EXISTS_REQUEST";
@@ -63,6 +64,9 @@ public class ModelBaseEvent extends Event
 			
 		super( $type, $bubbles, $cancellable );
 	}
-	
+
+	static public function get seriesCounter():int {
+		return _seriesCounter;
+	}
 }
 }

@@ -150,31 +150,25 @@ public class ModelInfo extends PersistanceObject
 		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, retrievedData );
 		OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );
 	}
-	
-	private function retrievedData( $ode:OxelDataEvent):void {
-		if ( guid == $ode.modelGuid || altGuid == $ode.modelGuid ) {
-			removeOxelDataCompleteListeners();
-			const priority:int = 1;
-			_data = $ode.oxelData;
+
+	public function assignOxelDataToModelInfo( $od:OxelPersistance ):void {
+		if ( null == _data ) {
+			_data = $od;
 			_data.parent = this;
 			// Set OxelPersistance to the baseLightLevel for this object.
 			//Log.out( "ModelInfo.retrievedData - set baseLightLevel: " + baseLightLevel);
 			_data.baseLightLevel = baseLightLevel;
 
-			if ( _data && 0 == _data.oxelCount )
-				_data.load( guid, priority, this, dynamicObj, _altGuid );
-			/*
-			_data.fromByteArray()
-			if ( "0" == _data.dbo.key ) {
-				_data.changed = true;
-				_data.guid = guid;
-				// When import objects, we have to update the cache so they have the correct info.
-				if ( null != _altGuid )
-					OxelDataEvent.dispatch( new OxelDataEvent( ModelBaseEvent.UPDATE_GUID, 0, altGuid + ":" + guid, null ) );
-				_data.save();
-			}
-			OxelDataEvent.dispatch( new OxelDataEvent( OxelDataEvent.OXEL_READY, 0, guid, _data ) )
-			*/
+			const priority:int = 5;
+			if (_data && 0 == _data.oxelCount)
+				_data.createTaskToLoadFromByteArray(guid, priority, this, dynamicObj, _altGuid);
+		}
+	}
+
+	private function retrievedData( $ode:OxelDataEvent):void {
+		if ( guid == $ode.modelGuid || altGuid == $ode.modelGuid ) {
+			removeOxelDataCompleteListeners();
+			assignOxelDataToModelInfo( $ode.oxelData );
 		}
 	}
 	
@@ -229,9 +223,14 @@ public class ModelInfo extends PersistanceObject
 	}
 	
 	public function oxelLoadData():void {
-		if ( _data && _data.loaded ) {
+		if ( _data ) {
+			if ( _data.loaded )
+				OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, _data );
+			else {
+				_data.createTaskToLoadFromByteArray(guid, 5, this, dynamicObj, _altGuid );
+			}
+
 			//Log.out( "ModelInfo.loadOxelData - returning loaded oxel guid: " + guid );
-			OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, _data );
 		} else {
 			addOxelDataCompleteListeners();
 			// try to load from tables first

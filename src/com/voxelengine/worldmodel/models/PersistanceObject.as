@@ -58,7 +58,7 @@ public class PersistanceObject
 	public function get table():String { return _table; }
 	public function get changed():Boolean { return _changed; }
 	public function set changed(value:Boolean):void {
-		Log.out( "PersistanceObject.Changed value: " + value + "  guid: " + _guid, Log.WARN);
+		//Log.out( "PersistanceObject.Changed value: " + value + "  guid: " + _guid, Log.WARN);
 		_changed = value; }
 	
 	public function get dynamicObj():Boolean { return _dynamicObj; }

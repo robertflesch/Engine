@@ -45,8 +45,9 @@ public class ModelInfoCache
 		ModelInfoEvent.addListener( ModelBaseEvent.GENERATION, 			generated );
 		ModelInfoEvent.addListener( ModelBaseEvent.SAVE, 				save );
 		ModelInfoEvent.addListener( ModelInfoEvent.DELETE_RECURSIVE, 	deleteRecursive );
-		ModelInfoEvent.addListener( ModelBaseEvent.UPDATE_GUID, 		updateGuid );		
-		
+		ModelInfoEvent.addListener( ModelBaseEvent.UPDATE_GUID, 		updateGuid );
+		ModelInfoEvent.addListener( ModelBaseEvent.UPDATE, 				update );
+
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );
@@ -129,7 +130,7 @@ public class ModelInfoCache
 			Log.out( "ModelInfoCache.deleteRecursive - ModelInfo not found $mie" + $mie, Log.ERROR )
 		
 		// Now delete the parents data
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
+		ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 		OxelDataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
 	}
@@ -137,6 +138,23 @@ public class ModelInfoCache
 	static private function generated( $mie:ModelInfoEvent ):void  {
 		add( 0, $mie.vmi );
 	}
+
+	static private function update($mie:ModelInfoEvent):void {
+		if ( null == $mie || null == $mie.modelGuid ) { // Validator
+			Log.out("ModelMetadataCache.update - event or guid is NULL: ", Log.ERROR);
+			ModelInfoEvent.create(ModelBaseEvent.EXISTS_ERROR, ( $mie ? $mie.series : -1 ), "MISSING", null);
+		} else {
+			var mi:ModelInfo = _modelInfo[$mie.modelGuid];
+			if ( null ==  mi ) {
+				Log.out( "ModelInfoCache.update trying update NULL metadata or guid, adding instead", Log.WARN );
+				add( 0, $mie.vmi );
+			} else {
+				_modelInfo[$mie.modelGuid] = $mie.vmi;
+			}
+		}
+	}
+
+
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  ModelInfoEvent
 	/////////////////////////////////////////////////////////////////////////////////////////////

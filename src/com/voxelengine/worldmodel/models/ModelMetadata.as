@@ -77,7 +77,7 @@ public class ModelMetadata extends PersistanceObject
 	override public function set guid( $newGuid:String ):void { 
 		var oldGuid:String = super.guid;
 		super.guid = $newGuid;
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
+		ModelMetadataEvent.create( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null );
 		changed = true;
 	}
 	
@@ -177,7 +177,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 			// Bypass setter to keep it from getting marked as changed
 			_thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData;
 			_thumbnailLoaded = true;
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.BITMAP_LOADED, 0, guid, $mm ) )
+			ModelMetadataEvent.create( ModelMetadataEvent.BITMAP_LOADED, 0, guid, $mm );
 		}
 	}
 	

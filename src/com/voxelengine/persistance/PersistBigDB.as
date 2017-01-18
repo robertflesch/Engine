@@ -192,7 +192,7 @@ public class PersistBigDB
 		}
 
 		function saveSucceed():void  {  
-			//Log.out( "PersistBigDB.save - Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
+			Log.out( "PersistBigDB.save - Success - table: " + $pe.table + "  guid:" + $pe.guid, Log.DEBUG );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_SUCCEED, $pe.series, $pe.table, $pe.guid ) ); 
 		}
 		

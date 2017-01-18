@@ -217,12 +217,12 @@ public class VoxelVerse extends Sprite
 	 *  This allow the app to not pick up any other mouse or keyboard activity when app is not active
 	 */
 	public function mouseLeave( e:Event ):void {
-		Log.out( "VoxelVerse.mouseLeave event" );
+		//Log.out( "VoxelVerse.mouseLeave event" );
 		deactivate( e )
 	}
 
 	private function deactivate(e:Event):void {
-		Log.out( "VoxelVerse.deactivate event", Log.WARN );
+		//Log.out( "VoxelVerse.deactivate event", Log.WARN );
 		if ( Globals.active )
 			appLostFocus(e);
 

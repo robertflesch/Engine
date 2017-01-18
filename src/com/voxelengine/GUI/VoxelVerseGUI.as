@@ -327,8 +327,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	private function onKeyPressed( e : KeyboardEvent) : void {
-		Log.out( "VoxelVerseGUI.onKeyPressed: KeyboardEvent: " + e.keyCode );
-
+		//Log.out( "VoxelVerseGUI.onKeyPressed: KeyboardEvent: " + e.keyCode );
 		if ( Keyboard.F11 == e.keyCode )
 			Renderer.renderer.screenShot( true ); // draws UI
 

@@ -85,8 +85,8 @@ public class Avatar extends ControllableVoxelModel
 		//ModelMakerBase.load( ii );
 		
 		Log.out( "Avatar.createPlayer - creating from GenerateCube", Log.DEBUG )
-		var model:Object = GenerateCube.script()
-		model.modelClass = "Player"
+		var model:Object = GenerateCube.script();
+		model.modelClass = "Player";
 
 		var ii:InstanceInfo = new InstanceInfo()
 		ii.modelGuid = $modelGuid;
@@ -94,6 +94,37 @@ public class Avatar extends ControllableVoxelModel
 		
 		new ModelMakerGenerate( ii, model )
 	}
-	
+
+	override protected function setAnimation():void	{
+
+		/*if ( EditCursor.toolOrBlockEnabled )
+		 {
+		 stateSet( "Pick", 1 );
+		 }*/
+
+		if ( -0.4 > instanceInfo.velocityGet.y )
+		{
+			updateAnimations( "Jump", 1 );
+		}
+		else if ( 0.4 < instanceInfo.velocityGet.y )
+		{
+			updateAnimations( "Fall", 1 );
+		}
+		else if ( 0.2 < Math.abs( instanceInfo.velocityGet.z )  )
+		{
+			updateAnimations( "Walk", 2 );
+		}
+		else if ( 0.2 < Math.abs( instanceInfo.velocityGet.x )  )
+		{
+			updateAnimations( "Slide", 1 );
+		}
+		else
+		{
+			stateSet( "Stand", 1 );
+		}
+		//trace( "Player.update - end" );
+	}
+
+
 }
 }

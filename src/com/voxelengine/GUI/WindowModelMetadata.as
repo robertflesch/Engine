@@ -75,7 +75,7 @@ public class WindowModelMetadata extends VVPopup
 			}
 		}
 		else {
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST, 0, $ii.modelGuid, null ) );
+			ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, $ii.modelGuid, null );
 		}
 	}
 	
@@ -202,9 +202,9 @@ Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );
 		if ( _type == TYPE_EDIT ) {
 			// this field only exists when I am editting
 			_vmm.permissions.copyCount = parseInt( _copies.label, 10 );
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.UPDATE, 0, _vmm.guid, _vmm ) );
+			ModelMetadataEvent.create( ModelBaseEvent.UPDATE, 0, _vmm.guid, _vmm );
 		} else { // TYPE_IMPORT so new data
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, _vmm.guid, _vmm ) );
+			ModelMetadataEvent.create( ModelBaseEvent.GENERATION, 0, _vmm.guid, _vmm );
 		}
 		remove();
 	}

@@ -101,7 +101,7 @@ public class OxelPersistance extends PersistanceObject
 		LightInfoPool.poolReturn(_lightInfo)
 	}
 
-	public function load( $guid:String, $taskPriority:int, $parent:ModelInfo, $isDynObj:Boolean, $altGuid:String ):void {
+	public function createTaskToLoadFromByteArray($guid:String, $taskPriority:int, $parent:ModelInfo, $isDynObj:Boolean, $altGuid:String ):void {
         _parent = $parent;
 		FromByteArray.addTask( $guid, $taskPriority, this, $altGuid )
 	}
@@ -169,10 +169,10 @@ public class OxelPersistance extends PersistanceObject
 	// persistance operations
 	override public function save():void {
 		if ( false == loaded || !Globals.isGuid( guid ) ) {
-				Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " loaded: " + loaded + " in table: " + table, Log.DEBUG );
+				Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " loaded: " + loaded + " in table: " + table, Log.WARN );
 				return;
 		}
-		//Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.DEBUG );
+		//Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.WARN );
 		super.save();
 	}
 

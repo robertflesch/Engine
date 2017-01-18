@@ -44,7 +44,7 @@ public class ModelMetadataCache
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, 		request );
 		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE, 			update );
 		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, 			deleteHandler );
-		ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, 		generated );
+		//ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, 		generated );
 		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );		
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
@@ -161,10 +161,6 @@ public class ModelMetadataCache
 		}
 	}
 	
-	static private function generated( $mme:ModelMetadataEvent ):void  {
-		add( 0, $mme.modelMetadata );
-	}
-
 	static private function updateGuid( $mme:ModelMetadataEvent ):void {
 		var guidArray:Array = $mme.modelGuid.split( ":" );
 		var oldGuid:String = guidArray[0];
@@ -206,7 +202,7 @@ public class ModelMetadataCache
 					dbo.data = JSONUtil.parse( fileData, $pe.guid + $pe.table, "ModelMetadataEvent.loadSucceed" );
 					if ( null == dbo.data ) {
 						Log.out( "ModelMetadataCache.loadSucceed - error parsing ModelMetadata on import. guid: " + $pe.guid, Log.ERROR );
-						ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
+						ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null );
 						return;
 					}
 					if ( dbo.data.thumbnail )
@@ -235,7 +231,7 @@ public class ModelMetadataCache
 		}
 		else {
 			Log.out( "ModelMetadataCache.loadSucceed FAILED no DBO PersistanceEvent: " + $pe.toString(), Log.WARN );
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
+			ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 		}
 	}
 	
@@ -245,7 +241,7 @@ public class ModelMetadataCache
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid )
 		Log.out( "ModelMetadataCache.metadataLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
+		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 	}
 
 	static private function loadNotFound( $pe:PersistanceEvent):void {
@@ -254,7 +250,7 @@ public class ModelMetadataCache
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid )
 		Log.out( "ModelMetadataCache.loadNotFound PersistanceEvent: " + $pe.toString(), Log.WARN );
-		ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
+		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End - Persistance Events
@@ -274,7 +270,7 @@ public class ModelMetadataCache
 			if ( _block.has( $vmm.guid ) )
 				_block.clear( $vmm.guid )
 			//Log.out( "ModelMetadataCache.add returning guid: " + $vmm.guid + "  owner: " + $vmm.owner, Log.WARN );
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.ADDED, $series, $vmm.guid, $vmm ) );
+			ModelMetadataEvent.create( ModelBaseEvent.ADDED, $series, $vmm.guid, $vmm );
 		}
 	}
 }

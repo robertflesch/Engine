@@ -73,7 +73,7 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 			addElement( new Label( "Click the close window (red X) button to cancel" ) );
 			addElement( new Spacer( width, 20 ) );
 
-			ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
+			ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 			OxelDataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 			// This too?
 			//ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );

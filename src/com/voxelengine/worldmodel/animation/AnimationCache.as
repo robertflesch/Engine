@@ -140,7 +140,8 @@ public class AnimationCache
 				ani.fromObjectImport( dbo );
 				// On import mark it as changed.
 				ani.changed = true;
-				ani.save();
+				if ( Globals.isGuid( ani.guid ) )
+					ani.save();
 			}
 			add( $pe, ani );
 			
