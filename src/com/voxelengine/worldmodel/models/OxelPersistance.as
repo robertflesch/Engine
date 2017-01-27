@@ -50,7 +50,6 @@ public class OxelPersistance extends PersistanceObject
 	//static private const referenceBA:ByteArray 					= Hex.toArray( "69:76:6d:30:30:38:64:00:00:00:00:04:fe:00:00:00:00:00:00:68:00:60:00:00:ff:ff:ff:ff:ff:ff:ff:ff:00:00:00:00:00:00:00:00:01:00:00:00:00:01:00:ff:ff:ff:33:33:33:33:33:33:33:33" );
 	private	var	_statisics:ModelStatisics						= new ModelStatisics();
 	private var _oxels:Vector.<Oxel> 							= new Vector.<Oxel>();
-	private var _loaded:Boolean;
 	private var _version:int;
 	private var _topMostChunks:Vector.<Chunk>					= new Vector.<Chunk>();
 	private function get topMostChunk():Chunk					{ return _topMostChunks[_lod]; }
@@ -77,13 +76,10 @@ public class OxelPersistance extends PersistanceObject
 	public 	function get statisics():ModelStatisics				{ return _statisics; }
 	public 	function get oxel():Oxel 							{ return _oxels[_lod]; }
 	public 	function get oxelCount():int 						{ return _oxels.length; }
-	public 	function get loaded():Boolean 						{ return _loaded; }
-	public 	function set loaded( $val:Boolean):void 			{ _loaded = $val; }
-	
+
 	public function OxelPersistance( $guid:String, $baseLightIllumination:int ) {
 		//Log.out( "OxelPersistance: " + $guid + " baseLightIllumination: " + $baseLightIllumination, Log.WARN );
 		super( $guid, Globals.BIGDB_TABLE_OXEL_DATA );
-		_loaded = false;
 		// This should all come from model, so I could give the whole model a tint if I liked.
 		_lightInfo = LightInfoPool.poolGet();
 		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, $baseLightIllumination );
@@ -108,7 +104,7 @@ public class OxelPersistance extends PersistanceObject
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
 		//var time:int = getTimer();
-		if ( !loaded || null == topMostChunk )
+		if ( !oxel || null == topMostChunk )
 			return; // I see this when the chunk is getting generated
 			
 		if ( $isAlpha )
@@ -168,11 +164,11 @@ public class OxelPersistance extends PersistanceObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// persistance operations
 	override public function save():void {
-		if ( false == loaded || !Globals.isGuid( guid ) ) {
-				Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " loaded: " + loaded + " in table: " + table, Log.WARN );
+		if ( 0 == oxelCount || !Globals.isGuid( guid ) ) {
+				//Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " oxel: " + (oxel?oxel:"No oxel") + " in table: " + table, Log.WARN );
 				return;
 		}
-		//Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.WARN );
+		//Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.DEBUG );
 		super.save();
 	}
 
@@ -207,7 +203,6 @@ public class OxelPersistance extends PersistanceObject
 		_lightInfo.setIlluminationLevel( baseLightLevel );
 		_oxels[_lod] = Oxel.initializeRoot( 31 ); // Lighting should be model or instance default lighting
 		lodFromByteArray( ba );
-		_loaded = true;
 		OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this );
 	}
 

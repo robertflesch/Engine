@@ -42,7 +42,7 @@ public class Trigger extends VoxelModel
 	override public function update(context:Context3D, elapsedTimeMS:int):void {
 		super.update(context, elapsedTimeMS);
 		
-		if ( !VoxelModel.controlledModel || !modelInfo.data || !modelInfo.data.loaded )
+		if ( !VoxelModel.controlledModel || !modelInfo.data || 0 == modelInfo.data.oxelCount )
 			return;
 			
 		var wsPositionCenter:Vector3D = VoxelModel.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( VoxelModel.controlledModel.instanceInfo.center );

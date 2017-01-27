@@ -7,33 +7,25 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-//import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.ModelEvent;
+import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.animation.AnimationCache;
-import com.voxelengine.worldmodel.biomes.LayerInfo;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.PermissionsBase;
 
 import flash.geom.Vector3D;
-import flash.utils.ByteArray;
 import org.flashapi.swing.Alert;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.GUI.WindowModelMetadata;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
-import com.voxelengine.worldmodel.models.ModelInfo;
 
 	/**
 	 * ...
@@ -67,18 +59,19 @@ public class ModelMakerImport extends ModelMakerBase {
 	
 	// next get or generate the metadata
 	override protected function attemptMake():void {
-		Log.out( "ModelMakerImport - attemptMake: " + ii.toString() );
+		//Log.out( "ModelMakerImport - attemptMake: " + ii.toString() );
 		if ( null != modelInfo && null == _modelMetadata ) {
 			// The new guid is generated in the Window or in the hidden metadata creation
 			if ( _prompt ) {
-				Log.out( "ModelMakerImport - attemptMake: gathering metadata " + ii.toString() );
+				//Log.out( "ModelMakerImport - attemptMake: gathering metadata " + ii.toString() );
 				ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, metadataFromUI );
 				new WindowModelMetadata( ii, WindowModelMetadata.TYPE_IMPORT ); }
 			else {
-				Log.out( "ModelMakerImport - attemptMake: generating metadata " + ii.toString() );
+				//Log.out( "ModelMakerImport - attemptMake: generating metadata " + ii.toString() );
 				_modelMetadata = new ModelMetadata( ii.modelGuid );
 				var newObj:Object = ModelMetadata.newObject()
 				_modelMetadata.fromObjectImport( newObj );
+				_modelMetadata.description = ii.modelGuid + " - Imported";
 				_modelMetadata.name = ii.modelGuid;
 				_modelMetadata.owner = Network.userId;
 				attemptMakeRetrieveParentModelInfo(); }
@@ -97,24 +90,24 @@ public class ModelMakerImport extends ModelMakerBase {
 			ModelMetadataEvent.removeListener( ModelBaseEvent.GENERATION, metadataFromUI );
 			_modelMetadata = $mme.modelMetadata;
 			// Now check if this has a parent model, if so, get the animation class from the parent.
-			Log.out( "ModelMakerImport.metadataFromUI: " + ii.toString() );
+			//Log.out( "ModelMakerImport.metadataFromUI: " + ii.toString() );
 			attemptMakeRetrieveParentModelInfo();
 		}
 	}
 
 	private function attemptMakeRetrieveParentModelInfo():void {
 		if ( parentModelGuid ) {
-			Log.out("ModelMakerImport.attemptMakeRetrieveParentModelInfo - retrieveParentModelInfo " + ii.toString());
+			//Log.out("ModelMakerImport.attemptMakeRetrieveParentModelInfo - retrieveParentModelInfo " + ii.toString());
 			retrieveParentModelInfo();
 		}
 		else {
-			Log.out("ModelMakerImport.attemptMakeRetrieveParentModelInfo - completeMake " + ii.toString());
+			//Log.out("ModelMakerImport.attemptMakeRetrieveParentModelInfo - completeMake " + ii.toString());
 			completeMake();
 		}
 	}
 	
 	private function retrieveParentModelInfo():void {
-		Log.out("ModelMakerImport.retrieveParentModelInfo: " + ii.toString());
+		//Log.out("ModelMakerImport.retrieveParentModelInfo: " + ii.toString());
 		// We need the parents modelClass so we can know what kind of animations are correct for this model.
 		addParentModelInfoListener();
 		var _topMostModelGuid:String = ii.topmostModelGuid();
@@ -122,7 +115,7 @@ public class ModelMakerImport extends ModelMakerBase {
 
 		function parentModelInfoResult($mie:ModelInfoEvent):void {
 			if ( $mie.modelGuid == _topMostModelGuid ) {
-				Log.out("ModelMakerImport.parentModelInfoResult: " + ii.toString());
+				//Log.out("ModelMakerImport.parentModelInfoResult: " + ii.toString());
 				removeParentModelInfoListener();
 				var modelClass:String = $mie.vmi.modelClass;
 				_modelMetadata.animationClass = AnimationCache.requestAnimationClass( modelClass );
@@ -150,60 +143,80 @@ public class ModelMakerImport extends ModelMakerBase {
 			ModelInfoEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, parentModelInfoResultFailed);
 		}
 	}
-	
+
+	private var waitForChildren:Boolean;
 	private function completeMake():void {
-		Log.out("ModelMakerImport.completeMake: " + ii.toString());
+		//Log.out("ModelMakerImport.completeMake: " + ii.toString());
 		if ( null != modelInfo && null != _modelMetadata ) {
 
 			_vmTemp = make();
 			if ( _vmTemp ) {
 				_vmTemp.stateLock( true, 10000 ); // Lock state so that it has time to load animations
-                // this gets saved in the vm.save
-				//_modelMetadata.save();
-				if ( null == _vmTemp.instanceInfo.controllingModel ) {
-					// Only do this for top level models.
-					var lav:Vector3D = Player.player.instanceInfo.lookAtVector(500);
-					var diffPos:Vector3D = Player.player.wsPositionGet().clone();
-					diffPos = diffPos.add(lav);
-					_vmTemp.instanceInfo.positionSet = diffPos;
+				OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelAdded );
+				OxelDataEvent.addListener( ModelBaseEvent.GENERATION, oxelAdded );
+				modelInfo.oxelLoadData();
+				if ( false == modelInfo.childrenLoaded ){ // its true if they are loaded or the model has no children.
+					waitForChildren = true;
+					ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
+
 				}
-				addOxelDataCompleteListeners();
-				_vmTemp.modelInfo.oxelLoadData();
 			}
 		}
-		else
-			Log.out( "ModelMakerImport.completeMake - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
+//		else
+//			Log.out( "ModelMakerImport.completeMake - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
 
-		function oxelReady( $ode:OxelDataEvent):void {
-			Log.out( "ModelMakerImport.oxelReady - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
+		function childrenAllReady( $ode:ModelLoadingEvent):void {
 			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid ) {
-				removeOxelDataCompleteListeners();
-				modelInfo.assignOxelDataToModelInfo( $ode.oxelData );
+				Log.out( "ModelMakerImport.allChildrenReady - modelMetadata.description: " + _modelMetadata.description, Log.WARN );
+				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
 				markComplete( true, _vmTemp );
 			}
-			else
-				Log.out( "ModelMakerImport.oxelReady - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
 		}
 
-		function oxelFailedToLoad( $ode:OxelDataEvent):void {
+		function oxelAdded( $ode:OxelDataEvent):void {
+			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid ) {
+				//Log.out( "ModelMakerImport.oxelReady - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
+				OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelAdded );
+				OxelDataEvent.removeListener( ModelBaseEvent.GENERATION, oxelAdded );
+				addOxelReadyDataCompleteListeners();
+				modelInfo.assignOxelDataToModelInfo( $ode.oxelData );
+			}
+//			else
+//				Log.out( "ModelMakerImport.oxelReady - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
+		}
+
+		function oxelReady( $ode:OxelDataEvent):void {
 			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid  ) {
-				removeOxelDataCompleteListeners();
+				removeOxelReadyDataCompleteListeners();
+				if ( false == waitForChildren )
+					markComplete( true, _vmTemp );
+			}
+//			else
+//				Log.out( "ModelMakerImport.oxelReady - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
+		}
+
+		function oxelReadyFailedToLoad( $ode:OxelDataEvent):void {
+			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid  ) {
+				removeOxelReadyDataCompleteListeners();
 				markComplete( false, _vmTemp );
 			}
-			else
-				Log.out( "ModelMakerImport.oxelFailedToLoad - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
+//			else
+//				Log.out( "ModelMakerImport.oxelReadyFailedToLoad - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
 		}
 
-		function addOxelDataCompleteListeners():void {
-			OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelReady );
-			OxelDataEvent.addListener( OxelDataEvent.OXEL_FAILED, oxelFailedToLoad );
+
+		function addOxelReadyDataCompleteListeners():void {
+			OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelReady );
+			OxelDataEvent.addListener( OxelDataEvent.OXEL_FAILED, oxelReadyFailedToLoad );
 		}
 
-		function removeOxelDataCompleteListeners():void {
-			OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelReady );
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FAILED, oxelFailedToLoad );
+		function removeOxelReadyDataCompleteListeners():void {
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelReady );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FAILED, oxelReadyFailedToLoad );
 		}
 	}
+
+
 
 	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
 		if ( false == $success && modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" ) {
@@ -213,7 +226,6 @@ public class ModelMakerImport extends ModelMakerBase {
 			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
 			return;
 		} else {
-			Log.out("ModelMakerImport.completeMake - needed info found: " + ii.toString());
 			if ( !Globals.isGuid( _modelMetadata.guid ) )
 				_modelMetadata.guid = Globals.getUID();
 
@@ -228,13 +240,23 @@ public class ModelMakerImport extends ModelMakerBase {
 			modelInfo.data.changed = true;
 			_modelMetadata.changed = true;
 			_vmTemp.save();
-			Region.currentRegion.modelCache.add( _vmTemp );
 		}
 
 
 		if ( null == _vmTemp.instanceInfo.controllingModel ) {
+			// Only do this for top level models.
+			var lav:Vector3D = Player.player.instanceInfo.lookAtVector(500);
+			var diffPos:Vector3D = Player.player.wsPositionGet().clone();
+			diffPos = diffPos.add(lav);
+			_vmTemp.instanceInfo.positionSet = diffPos;
+			Region.currentRegion.modelCache.add( _vmTemp );
 			Region.currentRegion.save();
 		}
+		else
+			Region.currentRegion.modelCache.add( _vmTemp );
+
+
+		Log.out("ModelMakerImport.completeMake - needed info found: " + _modelMetadata.description );
 		super.markComplete( $success, _vmTemp );
 		// how are sub models handled?
 		//_isImporting = false;

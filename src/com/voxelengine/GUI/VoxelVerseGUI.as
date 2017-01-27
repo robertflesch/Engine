@@ -170,14 +170,14 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	public function crossHairActive():void {
-		Log.out( "VoxelVerseGUI.crossHairActive event Globals.active: " + Globals.active, Log.WARN );
+		//Log.out( "VoxelVerseGUI.crossHairActive event Globals.active: " + Globals.active, Log.WARN );
 
 		_crossHairColor = CROSS_HAIR_YELLOW;
 		crossHairChange();
 	}
 	
 	public function crossHairInactive():void {
-		Log.out( "VoxelVerseGUI.crossHairInactive event Globals.active: " + Globals.active, Log.WARN );
+		//Log.out( "VoxelVerseGUI.crossHairInactive event Globals.active: " + Globals.active, Log.WARN );
 
 		_crossHairColor = CROSS_HAIR_RED;
 		crossHairChange();

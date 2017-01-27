@@ -180,7 +180,7 @@ public class ModelInfoCache
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table )
 			return;
 		
-		Log.out( "ModelInfoCache.createdHandler: " + $pe.guid );
+		//Log.out( "ModelInfoCache.createdHandler: " + $pe.guid );
 		// check for duplicates
 		var mi:ModelInfo = _modelInfo[$pe.guid]; 
 		if ( mi )

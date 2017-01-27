@@ -133,13 +133,6 @@ public class ModelMakerBase {
 		else
 			ModelLoadingEvent.dispatch(new ModelLoadingEvent(ModelLoadingEvent.MODEL_LOAD_FAILURE, _ii.modelGuid, _parentModelGuid));
 
-		//Log.out( "ModelMakerBase.markComplete - " + ($success ? "SUCCESS" : "FAILURE" ) + "  ii: " + _ii + "  success: " + $success, Log.DEBUG )
-		if ( _parentModelGuid && $success ) {
-			var count:int = _s_parentChildCount[_parentModelGuid];
-			_s_parentChildCount[_parentModelGuid] = --count;
-			if ( 0 == count )
-				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _ii.modelGuid, _parentModelGuid, $vm ) )
-		}
 		_modelMetadata = null;
 		_modelInfo = null;
 		_ii = null;

@@ -60,7 +60,7 @@ public class ModelInfo extends PersistanceObject
 	// overrideable in instanceInfo
 	// how to link this to instance info, when this is shared object???
 	public function get grainSize():int								{
-		if ( _data && _data.loaded )
+		if ( _data && _data.oxel )
 			return _data.oxel.gc.grain;
 		else 
 			return info.model.grainSize;
@@ -99,7 +99,7 @@ public class ModelInfo extends PersistanceObject
 	}
 	
 	public function update( $context:Context3D, $elapsedTimeMS:int, $vm:VoxelModel ):void {
-		if ( data && data.loaded && data.oxel.chunkGet() )
+		if ( data && data.oxel && data.oxel.chunkGet() )
 			data.update( $vm );
 			
 		for each (var vm:VoxelModel in childVoxelModels )
@@ -162,6 +162,8 @@ public class ModelInfo extends PersistanceObject
 			const priority:int = 5;
 			if (_data && 0 == _data.oxelCount)
 				_data.createTaskToLoadFromByteArray(guid, priority, this, dynamicObj, _altGuid);
+			else
+				OxelDataEvent.create( OxelDataEvent.OXEL_READY, 0, $od.guid, $od );
 		}
 	}
 
@@ -224,7 +226,7 @@ public class ModelInfo extends PersistanceObject
 	
 	public function oxelLoadData():void {
 		if ( _data ) {
-			if ( _data.loaded )
+			if ( _data.oxel )
 				OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, _data );
 			else {
 				_data.createTaskToLoadFromByteArray(guid, 5, this, dynamicObj, _altGuid );
@@ -362,6 +364,8 @@ public class ModelInfo extends PersistanceObject
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  Children functions
 	/////////////////////////////////////////////////////////////////////////////////////////////
+	private 	var			 _childCount:uint;
+
 	private 	var			 _childVoxelModels:Vector.<VoxelModel>			= new Vector.<VoxelModel>; 	// INSTANCE NOT EXPORTED
 	public		function get childVoxelModels():Vector.<VoxelModel>			{ return _childVoxelModels; }
 	public		function 	 childVoxelModelsGet():Vector.<VoxelModel>		{ return _childVoxelModels; } // This is so the function can be passed as parameter
@@ -371,7 +375,8 @@ public class ModelInfo extends PersistanceObject
 	public		function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
 	/////////////////////
 	public function childrenLoad( $vm:VoxelModel ):void {
-		childrenLoaded	= true
+		childrenLoaded	= true;
+		_childCount = 0;
 		if ( !info.model.children )
 			return
 		
@@ -380,7 +385,7 @@ public class ModelInfo extends PersistanceObject
 			// Only want to add the listener once
 			if ( true == childrenLoaded ) {
 				childrenLoaded	= false;
-				ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
+				ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 			}
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.fromObject( v );
@@ -398,6 +403,7 @@ public class ModelInfo extends PersistanceObject
 			// So add to cache just adds it to parent instance.
 			//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
 			//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + childInstanceInfo );
+			_childCount++;
 			ModelMakerBase.load( ii, true, false );
 		}
 		//Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
@@ -405,15 +411,22 @@ public class ModelInfo extends PersistanceObject
 		if ( ModelMakerImport.isImporting )
 			delete info.model.children
 		
-		function childLoadingComplete(e:ModelLoadingEvent):void {
-	//		Log.out( "VoxelModel.childLoadingComplete - e: " + e, Log.WARN );
-			if ( e.parentModelGuid == guid ) {
-				//Log.out( "VoxelModel.childLoadingComplete - for modelGuid: " + instanceInfo.modelGuid, Log.WARN );
-				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
-				// if we save the model, before it is complete, we put bad child data into model info
-				childrenLoaded = true;
-		}	}	
+
 	}
+
+	protected function onChildAdded( me:ModelEvent ):void {
+		if ( me.vm && me.vm.instanceInfo.controllingModel && me.vm.instanceInfo.controllingModel.modelInfo.guid == guid ) {
+			_childCount--;
+			Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children remaining: " + _childCount, Log.WARN );
+			if (0 == _childCount) {
+				Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children COMPLETE", Log.WARN );
+				ModelEvent.removeListener(ModelEvent.CHILD_MODEL_ADDED, onChildAdded);
+				childrenLoaded = true;
+				ModelLoadingEvent.dispatch(new ModelLoadingEvent(ModelLoadingEvent.CHILD_LOADING_COMPLETE, guid));
+			}
+		}
+	}
+
 
 	public function childRemoveByGC( $gc:GrainCursor ):Boolean {
 		

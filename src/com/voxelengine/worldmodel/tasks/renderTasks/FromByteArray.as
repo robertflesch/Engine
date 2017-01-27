@@ -53,12 +53,6 @@ public class FromByteArray extends AbstractTask
 
 			if ("0" == _op.dbo.key) {
 				_op.changed = true;
-				//Log.out( "FromByteArray.start - parent.dbo.key = 0 " + _op )
-				_op.guid = _guid;
-				// When import objects, we have to update the cache so they have the correct info.
-				if (null != _altGuid)
-					OxelDataEvent.create( ModelBaseEvent.UPDATE_GUID, 0, _altGuid + ":" + _guid, null );
-				_op.save();
 			}
 			OxelDataEvent.create( OxelDataEvent.OXEL_READY, 0, _guid, _op );
 		}

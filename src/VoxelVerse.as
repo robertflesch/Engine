@@ -229,7 +229,7 @@ public class VoxelVerse extends Sprite
 		function appLostFocus(e:Event):void {
 			Globals.active = false;
 //			Globals.clicked = false;
-			Log.out( "VoxelVerse.appLostFocus Globals.active: " + Globals.active, Log.WARN );
+			//Log.out( "VoxelVerse.appLostFocus Globals.active: " + Globals.active, Log.WARN );
 
 			VoxelVerseGUI.currentInstance.crossHairInactive();
 
@@ -253,7 +253,7 @@ public class VoxelVerse extends Sprite
 
 	private function activate(e:Event):void {
         //Log.out( "VoxelVerse.activate Globals.active: " + Globals.active + "  Globals.clicked: " + Globals.clicked )
-		Log.out( "VoxelVerse.activate Globals.active: " + Globals.active, Log.DEBUG )
+		//Log.out( "VoxelVerse.activate Globals.active: " + Globals.active, Log.DEBUG )
 		if ( false == Globals.active )
 			appGainsFocus(e);
 
@@ -262,7 +262,7 @@ public class VoxelVerse extends Sprite
 		function appGainsFocus(e:Event):void {
 			Globals.active = true;
 //			Globals.clicked = true;
-			Log.out( "VoxelVerse.appGainsFocus Globals.active: " + Globals.active, Log.WARN )
+			//Log.out( "VoxelVerse.appGainsFocus Globals.active: " + Globals.active, Log.WARN )
 
 			VoxelVerseGUI.currentInstance.crossHairActive();
 

@@ -1173,13 +1173,13 @@ public class VoxelModel
 	}
 	
 	public function size():int {
-		if ( _modelInfo && _modelInfo.data && _modelInfo.data.loaded )
+		if ( _modelInfo && _modelInfo.data && _modelInfo.data.oxel )
 			return _modelInfo.data.oxel.size_in_world_coordinates();
 		else
 			return 0;
 	}
 	public function get grain():int {
-		if ( _modelInfo && _modelInfo.data && _modelInfo.data.loaded )
+		if ( _modelInfo && _modelInfo.data && _modelInfo.data.oxel )
 			return _modelInfo.data.oxel.gc.grain;
 		else
 			return 0;

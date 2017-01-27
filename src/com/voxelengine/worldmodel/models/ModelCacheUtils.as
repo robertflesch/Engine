@@ -13,29 +13,8 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.geom.Matrix3D;
-	import flash.geom.Vector3D;
-	import flash.utils.ByteArray;
-	import flash.events.Event;
-	import flash.events.IOErrorEvent;
-	import flash.net.URLRequest;
-	import flash.net.FileReference;
-	import flash.utils.Dictionary;
-	import flash.utils.ByteArray;
-	import flash.display3D.Context3D;
-	
-	import com.developmentarc.core.tasks.tasks.ITask;
-	import com.developmentarc.core.tasks.groups.TaskGroup;
-	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
-	import com.voxelengine.events.ModelEvent;
-	import com.voxelengine.events.LoadingEvent;
-	import com.voxelengine.pools.*;
-	//import com.voxelengine.persistance.Persistance;
-	import com.voxelengine.utils.CustomURLLoader;
-	import com.voxelengine.worldmodel.models.*;
-	import com.voxelengine.worldmodel.tasks.landscapetasks.CompletedModel;
-	import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 	
 	/**
