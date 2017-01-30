@@ -69,6 +69,7 @@ public class PersistanceObject
 	}
 	
 	protected function addSaveEvents():void {
+		//Log.out( getQualifiedClassName( this ) + ".addSaveEvents - guid: " + guid, Log.DEBUG );
 		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, 	createFailed );
 		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
@@ -76,6 +77,7 @@ public class PersistanceObject
 	}
 	
 	protected function removeSaveEvents():void {
+		//Log.out( getQualifiedClassName( this ) + ".removeSaveEvents - guid: " + guid, Log.DEBUG );
 		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
 		PersistanceEvent.removeListener( PersistanceEvent.CREATE_FAILED, 	createFailed );
 		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
@@ -109,18 +111,20 @@ public class PersistanceObject
 	private function saveSucceed( $pe:PersistanceEvent ):void { 
 		if ( _table != $pe.table )
 			return;
-		removeSaveEvents();
-		//Log.out( getQualifiedClassName( this ) + ".saveSucceed - save: " + guid + " in table: " + $pe.table );
+		if ( $pe.dbo && guid == $pe.guid ) {
+			removeSaveEvents();
+			Log.out(getQualifiedClassName( this ) + ".PersistanceObject.saveSucceed - save: " + guid + " in table: " + $pe.table);
+		}
 	}	
 	
-	private function createSucceed( $pe:PersistanceEvent ):void { 
+	private function createSucceed( $pe:PersistanceEvent ):void {
 		if ( _table != $pe.table )
 			return;
 		if ( $pe.dbo && guid == $pe.guid ) {
 			// the create result was coming back after some additional saves had been made
 			// this was causing data to be lost!! So first save data, then copy over dbo, then restore data!
 			if ( dbo && dbo.data ) {
-				Log.out( getQualifiedClassName( this ) + ".createSuccess - ALT PATH created: " + guid + " in table: " + $pe.table, Log.DEBUG );
+				Log.out( getQualifiedClassName( this ) + ".PersistanceObject.createSuccess - ALT PATH created: " + guid + " in table: " + $pe.table, Log.DEBUG );
 				var dataBackup:Object = dbo.data;
 				_dbo = $pe.dbo;
 				for ( var key:String in dataBackup ) {
@@ -133,17 +137,17 @@ public class PersistanceObject
                 save();
 			}
 			else {
-				Log.out(getQualifiedClassName(this) + ".createSuccess - created: " + guid + " in table: " + $pe.table, Log.DEBUG);
+				Log.out(getQualifiedClassName( this ) + ".PersistanceObject.createSuccess - created: " + guid + " in table: " + $pe.table, Log.DEBUG);
 				_dbo = $pe.dbo;
 			}
+			removeSaveEvents();
 		}
 		else {
-			if ( !$pe.dbo ) {
+			if ( !$pe.dbo )
 				Log.out("PersistanceObject.createSucceed NO DBO Object this: " + this, Log.ERROR );
-			} //else
-				//Log.out( "PersistanceObject.createSucceed ---- BUT guid: " + guid + " !=  $pe.dbo.guid: " + $pe.dbo.key, Log.DEBUG )
+			//else
+			//	Log.out( getQualifiedClassName( this ) + ".PersistanceObject.createSucceed ---- BUT guid: " + guid + " !=  $pe.dbo.guid: " + $pe.dbo.key, Log.DEBUG );
 		}
-		removeSaveEvents();
 	}
 	
 	private function createFailed( $pe:PersistanceEvent ):void  {
