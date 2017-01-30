@@ -9,7 +9,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.scripts
 {
 import com.voxelengine.worldmodel.models.ControllableVoxelModel;
-import com.voxelengine.worldmodel.models.types.Beast;
+import com.voxelengine.worldmodel.models.types.Trigger;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.types.Zeppelin;
 import com.voxelengine.worldmodel.weapons.Gun;
@@ -36,7 +36,7 @@ public class ScriptLibrary
 		else if ( $vm is Projectile ) {
 			_scriptList.push("ExplosionScript");
 		}
-		else if ( $vm is Beast ) {
+		else if ( $vm is Trigger ) {
 			_scriptList.push("ControlBeastScript");
 		}
 		else if ( $vm is Zeppelin || $vm is ControllableVoxelModel ) {
