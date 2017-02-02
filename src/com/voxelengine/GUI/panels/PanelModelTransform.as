@@ -96,20 +96,21 @@ public class PanelModelTransform extends ExpandableBox
 		_mt.originalTime = int ( $e.target.label )
 		if ( isNaN( _mt.originalTime ) )
 			_mt.originalTime = 1000
-		Log.out( "deltaChanged: " + _mt.originalTime )
+		//Log.out( "deltaChanged: " + _mt.originalTime )
 		setChanged() 
 	}
 	
 	private function deltaChanged():void { 
-		Log.out( "deltaChanged: " + _mt.originalDelta )
+		//Log.out( "deltaChanged: " + _mt.originalDelta )
 		setChanged() 
 	}
 	
 	override protected function setChanged():void {
 		_ani.changed = true
-		VoxelModel.selectedModel.stateLock( false )
-		VoxelModel.selectedModel.stateSet( "Starting", 0 )
-		VoxelModel.selectedModel.stateSet( _ani.name, 0 )
+		VoxelModel.selectedModel.stateLock( false );
+		VoxelModel.selectedModel.stateReset(); // have to reset first since it is already in this state
+		VoxelModel.selectedModel.stateSet( _ani.name, 0 );
+		//VoxelModel.selectedModel.updateAnimations( _ani.name, 1 );
 		VoxelModel.selectedModel.stateLock( true )
 	}
 }

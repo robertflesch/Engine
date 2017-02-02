@@ -102,8 +102,13 @@ public class ModelInfo extends PersistanceObject
 		if ( data && data.oxel && data.oxel.chunkGet() )
 			data.update( $vm );
 			
-		for each (var vm:VoxelModel in childVoxelModels )
+		for each (var vm:VoxelModel in childVoxelModels ) {
+			if ("LeftArm" == vm.metadata.name){
+				var i:int = 3;
+				//Log.out( "ModelInfo.update - vm.metadata.name: " + vm.metadata.name );
+			}
 			vm.update($context, $elapsedTimeMS);
+		}
 	}
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
@@ -417,9 +422,9 @@ public class ModelInfo extends PersistanceObject
 	protected function onChildAdded( me:ModelEvent ):void {
 		if ( me.vm && me.vm.instanceInfo.controllingModel && me.vm.instanceInfo.controllingModel.modelInfo.guid == guid ) {
 			_childCount--;
-			Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children remaining: " + _childCount, Log.WARN );
+			//Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children remaining: " + _childCount, Log.WARN );
 			if (0 == _childCount) {
-				Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children COMPLETE", Log.WARN );
+				//Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children COMPLETE", Log.WARN );
 				ModelEvent.removeListener(ModelEvent.CHILD_MODEL_ADDED, onChildAdded);
 				childrenLoaded = true;
 				ModelLoadingEvent.dispatch(new ModelLoadingEvent(ModelLoadingEvent.CHILD_LOADING_COMPLETE, guid));

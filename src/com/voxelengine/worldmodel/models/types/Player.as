@@ -232,26 +232,6 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 	}
 	*/
 	
-	override public function collisionTest( $elapsedTimeMS:Number ):Boolean {
-		
-		if ( this === VoxelModel.controlledModel )
-		{
-			// check to make sure the ship or object you were on was not destroyed or removed
-			//if ( lastCollisionModel && lastCollisionModel.instanceInfo.dead )
-				//lastCollisionModelReset();
-			
-			if ( false == controlledModelChecks( $elapsedTimeMS ) )
-			{
-				stateSet( "PlayerAniStand", 1 ); // Should be crash?
-				return false;
-			}
-			else
-				setAnimation();
-		}
-		
-		return true;
-	}
-	
 	override protected function collisionPointsAdd():void {
 		/*  0,0xxxxxx8xxxxxx15,0 
 		 *  x                x

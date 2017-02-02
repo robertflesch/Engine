@@ -7,6 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+
 import playerio.PlayerIOError;
 import playerio.DatabaseObject;
 
@@ -46,9 +48,9 @@ public class Avatar extends ControllableVoxelModel
 		if ( $dbo ) {
 			if ( null == $dbo.modelGuid ) {
 				// Assign the Avatar the default avatar
-				//$dbo.modelGuid = "2C18D274-DE77-6BDD-1E7B-816BFA7286AE"
-				$dbo.modelGuid = "Player"
-				
+				//$dbo.modelGuid = "Player"
+				$dbo.modelGuid = "58467A21-E8B2-E558-6778-69AD35AC33A1";
+
 				var userName:String = $dbo.key.substring( 6 );
 				var firstChar:String = userName.substr(0, 1); 
 				var restOfString:String = userName.substr(1, userName.length); 
@@ -59,13 +61,7 @@ public class Avatar extends ControllableVoxelModel
 				$dbo.save();
 			}
 			
-			//var ii:InstanceInfo = new InstanceInfo();
-			//ii.modelGuid = "Player";
-			//ii.instanceGuid = Network.userId;
-			//new ModelMakerLocal( ii );
-			//Log.out( "Avatar.onPlayerLoadedAction - START TEMPORARILY CREATING Avatar FROM SCRIPT", Log.WARN );
-			createPlayer( "DefaultPlayer", Network.userId )
-			//Log.out( "Avatar.onPlayerLoadedAction - END TEMPORARILY CREATING Avatar FROM SCRIPT", Log.WARN );
+			createPlayer( "DefaultPlayer", Network.userId );
 		}
 		else {
 			Log.out( "Avatar.onPlayerLoadedAction - ERROR, failed to create new record for ?" );
@@ -77,13 +73,13 @@ public class Avatar extends ControllableVoxelModel
 	}			
 	
 	static public function createPlayer( $modelGuid:String = "DefaultPlayer", $instanceGuid:String = "Player" ):void	{
-		//Log.out( "Player.createPlayer - creating from LOCAL", Log.DEBUG );
-		//var ii:InstanceInfo = new InstanceInfo();
+/*
+		var ii:InstanceInfo = new InstanceInfo();
 		//ii.modelGuid = "Player";
-		//ii.instanceGuid = "Player";
-		//// Something is listen for this to generate some event.
-		//ModelMakerBase.load( ii );
-		
+		ii.modelGuid = "58467A21-E8B2-E558-6778-69AD35AC33A1";
+		ii.instanceGuid = Network.userId;
+		ModelMakerBase.load( ii, false );
+*/
 		Log.out( "Avatar.createPlayer - creating from GenerateCube", Log.DEBUG )
 		var model:Object = GenerateCube.script();
 		model.modelClass = "Player";
@@ -94,6 +90,27 @@ public class Avatar extends ControllableVoxelModel
 		
 		new ModelMakerGenerate( ii, model )
 	}
+
+	override public function collisionTest( $elapsedTimeMS:Number ):Boolean {
+
+//		if ( this === VoxelModel.controlledModel )
+		{
+			// check to make sure the ship or object you were on was not destroyed or removed
+			//if ( lastCollisionModel && lastCollisionModel.instanceInfo.dead )
+			//lastCollisionModelReset();
+
+			if ( false == controlledModelChecks( $elapsedTimeMS ) )
+			{
+				stateSet( "PlayerAniStand", 1 ); // Should be crash?
+				return false;
+			}
+			else
+				setAnimation();
+		}
+
+		return true;
+	}
+
 
 	override protected function setAnimation():void	{
 

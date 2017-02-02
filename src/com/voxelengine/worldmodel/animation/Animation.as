@@ -265,7 +265,7 @@ public class Animation extends PersistanceObject
 		if ( $json.type ) {
 			if ( "action" == $json.type )
 				type = ANIMATION_ACTION;
-			else if ( "state" == $json.type ) 	
+			else if ( "state" == $json.type )
 				type = ANIMATION_STATE;
 			else
 				Log.out( "Animation.fromJSON - ERROR unknown type: " + $json.type, Log.ERROR );
@@ -278,21 +278,21 @@ public class Animation extends PersistanceObject
 			_attachments = new Vector.<AnimationAttachment>;
 			for each ( var attachmentJson:Object in $json.attachment )
 			{
-				_attachments.push( new AnimationAttachment( attachmentJson ) );				
+				_attachments.push( new AnimationAttachment( attachmentJson ) );
 			}
 		}
 		if ( $json.animations ) {
 			_transforms = new Vector.<AnimationTransform>;
 			for each ( var transformJson:Object in $json.animations )
 			{
-				_transforms.push( new AnimationTransform( transformJson ) );				
+				_transforms.push( new AnimationTransform( transformJson ) );
 			}
 		}
 		//LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.ANIMATION_LOAD_COMPLETE, name ) );
 		return type;
 	}
-	
-	public function fromPersistance( $dbo:DatabaseObject ):void {	
+
+	public function fromPersistance( $dbo:DatabaseObject ):void {
 		var ba:ByteArray = _metadata.fromPersistance( $dbo );
 		ba.position = 0;
 		// how many bytes is the animation
@@ -303,7 +303,7 @@ public class Animation extends PersistanceObject
 		var jsonResult:Object = JSONUtil.parse( json, _metadata.guid, "Animation.fromPersistance" );
 		fromJSON( jsonResult );
 	}
-*/	
+*/
 	/*
 	private function getJSON( obj:Object ):void {
 		if ( _sound )
@@ -323,7 +323,7 @@ public class Animation extends PersistanceObject
 			if ( oa.length )
 				obj.attachments = oa;
 		}
-		
+
 		function getTransformsJSON( obj:Object ):void {
 			var ot:Vector.<Object> = new Vector.<Object>();
 			for each ( var at:AnimationTransform in _transforms ) {
@@ -367,5 +367,7 @@ public class Animation extends PersistanceObject
 		if ( _sound )
 			_sound.update( $val / 3 );
 	}
+
+
 }
 }

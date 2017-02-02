@@ -76,50 +76,51 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 	}
 	
 	override protected function expand():void {
-		super.expand()
+		super.expand();
 	
-		var vm:VoxelModel = modelGet()
+		var vm:VoxelModel = modelGet();
 		if ( vm ) {
 			if ( !_at.hasPosition )
-				_at.position.copyFrom( vm.instanceInfo.positionGetOriginal() )
+				_at.position.copyFrom( vm.instanceInfo.positionGetOriginal() );
 			if ( !_at.hasRotation )
-				_at.rotation.copyFrom( vm.instanceInfo.rotationGetOriginal() )
+				_at.rotation.copyFrom( vm.instanceInfo.rotationGetOriginal() );
 			if ( !_at.hasScale )
 				_at.scale.copyFrom( vm.instanceInfo.scaleGetOriginal() )
 		}
 		
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 4 ) );
 		_itemBox.addElement( new ComponentVector3DSideLabel( markChangedPos
-		                                                   , "location", "X: ", "Y: ", "Z: ",  _at.position, _itemBox.width ) )
+		                                                   , "location", "X: ", "Y: ", "Z: ",  _at.position, _itemBox.width ) );
 		_itemBox.addElement( new ComponentVector3DSideLabel( markChangedRot
-		                                                   , "rotation", "X: ", "Y: ", "Z: ",  _at.rotation, _itemBox.width ) )
+		                                                   , "rotation", "X: ", "Y: ", "Z: ",  _at.rotation, _itemBox.width ) );
 		_itemBox.addElement( new ComponentVector3DSideLabel( markChangedScale
 		                                                   , "scale", "X: ", "Y: ", "Z: ",  _at.scale, _itemBox.width ) )
 	}
 	private function markChangedPos():void { 
-		Log.out( "markChangedPos: " + _at.position )
-		setChanged()
+		Log.out( "markChangedPos: " + _at.position );
+		setChanged();
 		_at.hasPosition = true 
 	}
 	
 	private function markChangedRot():void { 
-		Log.out( "markChangedRot: " + _at.rotation )
-		setChanged()
+		Log.out( "markChangedRot: " + _at.rotation );
+		setChanged();
 		_at.hasRotation = true 
 	}
 	
 	private function markChangedScale():void { 
-		Log.out( "markChangedPos: " + _at.scale )
-		setChanged()
+		Log.out( "markChangedPos: " + _at.scale );
+		setChanged();
 		_at.hasScale = true 
 	}
 	
 	override protected function setChanged():void {
-		_ani.changed = true
-		VoxelModel.selectedModel.stateLock( false )
-		VoxelModel.selectedModel.stateSet( "Starting", 0 )
-		VoxelModel.selectedModel.stateSet( _ani.name, 0 )
-		VoxelModel.selectedModel.stateLock( true )
+		_ani.changed = true;
+		VoxelModel.selectedModel.stateLock( false );
+		VoxelModel.selectedModel.stateReset(); // have to reset first since it is already in this state
+		VoxelModel.selectedModel.stateSet( _ani.name, 0 );
+		//VoxelModel.selectedModel.updateAnimations( _ani.name, 0 );
+		VoxelModel.selectedModel.stateLock( true );
 	}
 }
 }

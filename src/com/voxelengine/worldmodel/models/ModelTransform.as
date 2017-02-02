@@ -101,7 +101,7 @@ public class ModelTransform
 	}
 	
 	public function ModelTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" ) {
-		//Log.out( "ModelTransform - "  + " type: " + $type + " x: " + $x + " y: " + $y + " z: " + $z + " time: " + $time + " name: " + $name, Log.WARN );
+		Log.out( "ModelTransform - "  + " type: " + $type + " x: " + $x + " y: " + $y + " z: " + $z + " time: " + $time + " name: " + $name, Log.WARN );
 		
 		_originalDelta.setTo( $x, $y, $z );
 		_originalTime = $time;
@@ -172,8 +172,8 @@ public class ModelTransform
 		mt._delta.setTo( _delta.x * $val, _delta.y * $val, _delta.z * $val );
 //		mt._time = _time;
 //		mt._originalTime = _originalTime;
-//		Log.out( "ModelTransform.clone - "  + " type: " + type + " x: " + _originalDelta.x + " y: " + _originalDelta.y + " z: " + _originalDelta.z
-//		       + " time: " + time + " name: " + name, Log.WARN );
+		Log.out( "ModelTransform.clone - "  + " type: " + type + " x: " + _originalDelta.x + " y: " + _originalDelta.y + " z: " + _originalDelta.z
+		       + " time: " + time + " name: " + name, Log.WARN );
 		return mt;
 	}
 
@@ -182,7 +182,7 @@ public class ModelTransform
 		{
 			if ( _guid != "INVALID" )
 				Log.out( "ModelTransform.assignToInstanceInfo - Guid already assigned", Log.ERROR );
-			_guid = Globals.getUID();
+			_guid = ii.instanceGuid; // instance guid or model guid?
 		}
 		
 		if  (  ModelTransform.POSITION == type 

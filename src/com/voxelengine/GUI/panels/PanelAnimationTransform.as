@@ -71,15 +71,15 @@ public class PanelAnimationTransform extends ExpandableBox
 		}
 		
 		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
-		ebco.rootObject = _ebco.rootObject
-		ebco.items = _ebco.item.transforms as Vector.<*>
-		ebco.itemDisplayObject = PanelModelTransform
-		ebco.itemBox.showNew = true
-		ebco.title = " model transforms "
+		ebco.rootObject = _ebco.rootObject;
+		ebco.items = _ebco.item.transforms as Vector.<*>;
+		ebco.itemDisplayObject = PanelModelTransform;
+		ebco.itemBox.showNew = true;
+		ebco.title = " model transforms ";
 		ebco.paddingTop = 7
-		ebco.width = _itemBox.width
-		ebco.itemBox.title = " model transforms "
-		ebco.itemBox.newItemText = "New model transform"
+		ebco.width = _itemBox.width;
+		ebco.itemBox.title = " model transforms ";
+		ebco.itemBox.newItemText = "New model transform";
 		_itemBox.addElement( new PanelModelTransformContainer( this, ebco ) )
 	}
 	

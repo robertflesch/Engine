@@ -152,15 +152,15 @@ public class WindowAnimationDetail extends VVPopup
 	
 	private function addAnimationsPanel():void {
 		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
-		ebco.title = " transforms "
-		ebco.width = WIDTH
-		ebco.rootObject = _ani
-		ebco.items = _ani.transforms as Vector.<*>
-		ebco.itemDisplayObject = PanelAnimationTransform
-		ebco.itemBox.newItemText = "Add transforms"
-		ebco.itemBox.showNew = true
-		ebco.itemBox.title = "animatable elements"
-		ebco.paddingTop = 7
+		ebco.title = " animated elements ";
+		ebco.width = WIDTH;
+		ebco.rootObject = _ani;
+		ebco.items = _ani.transforms as Vector.<*>;
+		ebco.itemDisplayObject = PanelAnimationTransform;
+		ebco.itemBox.newItemText = "Add transforms";
+		ebco.itemBox.showNew = true;
+		ebco.itemBox.title = "animatable elements";
+		ebco.paddingTop = 7;
 		addElement( new PanelVectorContainer( null, ebco ) )
 	}
 	

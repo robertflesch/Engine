@@ -980,13 +980,17 @@ public class VoxelModel
 		}
 	}
 
-	protected function onStateLockRemove(event:TimerEvent):void
-	{
-		_stateLock = false;
+	protected function onStateLockRemove(event:TimerEvent):void { _stateLock = false; }
+
+	public function stateReset():void {
+		if (_anim) {
+			Log.out( "VoxelModel.stateReset - Stopping anim: " + _anim.name );
+			_anim.stop( this );
+			_anim = null;
+		}
 	}
-	
-	public function stateSet($state:String, $lockTime:Number = 1):void
-	{
+
+	public function stateSet($state:String, $lockTime:Number = 1):void {
 		if ( this is Player )
 				return;
 		if ( _stateLock )
@@ -1001,50 +1005,33 @@ public class VoxelModel
 		}
 		
 		//Log.out( "VoxelModel.stateSet setTo: " + $state + "  current: " + (_anim ? _anim.name : "No current state") ); 
-		if (_anim)
-		{
-			Log.out( "VoxelModel.stateSet - Stopping anim: " + _anim.name + "  starting: " + $state ); 
-			_anim.stop( this );
-			_anim = null;
-		}
 		//else
 		//	Log.out( "VoxelModel.stateSet - Starting anim: " + $state );
-		
+		stateReset();
 		var result:Boolean = true;
 		var anim:Animation = modelInfo.animationGet( $state );
 		if ( anim ) {
-			//if (!anim.loaded)
-			//{
-				//Log.out("VoxelModel.stateSet - ANIMATION NOT LOADED name: " + $state, Log.INFO);
-				//instanceInfo.state = $state;
-				// This should be redone as animationLoadComplete, and use an animation event
-				//Globals.g_app.addEventListener(LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
-				//return;
-			//}
-			//
-
-			for each (var at:AnimationTransform in anim.transforms)
-			{
+			for each (var at:AnimationTransform in anim.transforms) {
 				//Log.out( "VoxelModel.stateSet - have AnimationTransform looking for child : " + at.attachmentName );
 				if ( modelInfo.childrenLoaded ) // if any result is false, the result is false
 					result = result && addAnimationsInChildren(modelInfo.childVoxelModels, at, $lockTime);
 				else
 					result = false;
 			}
+
+			if (true == result) {
+				_anim = anim;
+				Log.out( "VoxelModel.stateSet - Playing anim: " + _anim.name );
+				_anim.play(this, $lockTime);
+			}
+
 		}
 
-		if (true == result)
-		{
-			_anim = anim;
-			//Log.out( "VoxelModel.stateSet - Playing anim: " + _anim.name ); 
-			_anim.play(this, $lockTime);
-		}
-		//else
-		//	Log.out("VoxelModel.stateSet - addAnimationsInChildren returned false for: " + $state);
+		else
+			Log.out("VoxelModel.stateSet - addAnimationsInChildren returned false for: " + $state);
 
 		// if any of the children load, then it succeeds, which is slightly problematic
-		function addAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $lockTime:Number):Boolean
-		{
+		function addAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $lockTime:Number):Boolean {
 			//Log.out( "VoxelModel.checkChildren - have AnimationTransform looking for child : " + $at.attachmentName );
 			var resultChildren:Boolean = true;
 			if ( $children && 0 != $children.length) {
@@ -1053,16 +1040,19 @@ public class VoxelModel
 						//Log.out( "VoxelModel.addAnimationsInChildren - is child.metadata.name: " + child.metadata.name + " equal to $at.attachmentName: " + $at.attachmentName );
 						if (cm.metadata.name == $at.attachmentName) {
 							cm.stateSetData($at, $lockTime);
+							return resultChildren; // TODO This does not allow for multiple attachments to same parent with same name, but is faster.
 						}
 						else if (0 < cm.modelInfo.childVoxelModels.length) {
 							//Log.out( "VoxelModel.stateSet - addAnimationsInChildren - looking in children of child for: " + $at.attachmentName );
-							result = result && addAnimationsInChildren(cm.modelInfo.childVoxelModels, $at, $lockTime);
+							resultChildren = resultChildren && addAnimationsInChildren(cm.modelInfo.childVoxelModels, $at, $lockTime);
+							if ( false == resultChildren )
+								Log.out("VoxelModel.addAnimationsInChildren - FALSE");
 						}
-						else
-							resultChildren = false;
 					}
-					else
+					else {
+						Log.out("VoxelModel.addAnimationsInChildren - FALSE");
 						resultChildren = false;
+					}
 				}
 			}
 			return resultChildren;
