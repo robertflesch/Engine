@@ -118,7 +118,7 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 		_ani.changed = true;
 		VoxelModel.selectedModel.stateLock( false );
 		VoxelModel.selectedModel.stateReset(); // have to reset first since it is already in this state
-		VoxelModel.selectedModel.stateSet( _ani.name, 0 );
+		VoxelModel.selectedModel.stateSet( _ani.name );
 		//VoxelModel.selectedModel.updateAnimations( _ani.name, 0 );
 		VoxelModel.selectedModel.stateLock( true );
 	}

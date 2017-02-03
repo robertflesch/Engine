@@ -990,7 +990,7 @@ public class VoxelModel
 		}
 	}
 
-	public function stateSet($state:String, $lockTime:Number = 1):void {
+	public function stateSet($state:String, $scale:Number = 1):void {
 		if ( this is Player )
 				return;
 		if ( _stateLock )
@@ -1008,30 +1008,25 @@ public class VoxelModel
 		//else
 		//	Log.out( "VoxelModel.stateSet - Starting anim: " + $state );
 		stateReset();
-		var result:Boolean = true;
 		var anim:Animation = modelInfo.animationGet( $state );
-		if ( anim ) {
-			for each (var at:AnimationTransform in anim.transforms) {
-				//Log.out( "VoxelModel.stateSet - have AnimationTransform looking for child : " + at.attachmentName );
-				if ( modelInfo.childrenLoaded ) // if any result is false, the result is false
-					result = result && addAnimationsInChildren(modelInfo.childVoxelModels, at, $lockTime);
-				else
-					result = false;
-			}
-
-			if (true == result) {
-				_anim = anim;
-				Log.out( "VoxelModel.stateSet - Playing anim: " + _anim.name );
-				_anim.play(this, $lockTime);
-			}
-
+		if ( null == anim ) {
+			Log.out("VoxelModel.stateSet - no animation found for state: " + $state);
+			return;
 		}
 
-		else
-			Log.out("VoxelModel.stateSet - addAnimationsInChildren returned false for: " + $state);
+		var result:Boolean = true;
+		for each (var at:AnimationTransform in anim.transforms) {
+			result = result && addAnimationsInChildren(modelInfo.childVoxelModels, at, $scale);
+		}
+
+		if (true == result) {
+			_anim = anim;
+			Log.out( "VoxelModel.stateSet - Playing anim: " + _anim.name );
+			_anim.play(this, $scale);
+		}
 
 		// if any of the children load, then it succeeds, which is slightly problematic
-		function addAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $lockTime:Number):Boolean {
+		function addAnimationsInChildren($children:Vector.<VoxelModel>, $at:AnimationTransform, $scale:Number):Boolean {
 			//Log.out( "VoxelModel.checkChildren - have AnimationTransform looking for child : " + $at.attachmentName );
 			var resultChildren:Boolean = true;
 			if ( $children && 0 != $children.length) {
@@ -1039,12 +1034,12 @@ public class VoxelModel
 					if (cm && cm.modelInfo && cm.modelInfo.childrenLoaded) {
 						//Log.out( "VoxelModel.addAnimationsInChildren - is child.metadata.name: " + child.metadata.name + " equal to $at.attachmentName: " + $at.attachmentName );
 						if (cm.metadata.name == $at.attachmentName) {
-							cm.stateSetData($at, $lockTime);
+							cm.stateSetData($at, $scale);
 							return resultChildren; // TODO This does not allow for multiple attachments to same parent with same name, but is faster.
 						}
 						else if (0 < cm.modelInfo.childVoxelModels.length) {
 							//Log.out( "VoxelModel.stateSet - addAnimationsInChildren - looking in children of child for: " + $at.attachmentName );
-							resultChildren = resultChildren && addAnimationsInChildren(cm.modelInfo.childVoxelModels, $at, $lockTime);
+							resultChildren = resultChildren && addAnimationsInChildren(cm.modelInfo.childVoxelModels, $at, $scale);
 							if ( false == resultChildren )
 								Log.out("VoxelModel.addAnimationsInChildren - FALSE");
 						}
@@ -1059,7 +1054,7 @@ public class VoxelModel
 		}
 	}
 	
-	private function stateSetData($at:AnimationTransform, $lockTime:Number):void
+	private function stateSetData($at:AnimationTransform, $scale:Number):void
 	{
 		instanceInfo.removeAllNamedTransforms();
 		//Log.out( "VoxelModel.stateSet - attachment found: " + modelInfo.fileName + " initializer: " + $useInitializer + "  setting data " + $at );
@@ -1083,9 +1078,9 @@ public class VoxelModel
 		if ($at.hasTransform) {
 			for each (var mt:ModelTransform in $at.transforms) {
 				if ($at.notNamed)
-					instanceInfo.addTransformMT(mt.clone($lockTime));
+					instanceInfo.addTransformMT(mt.clone($scale));
 				else
-					instanceInfo.addNamedTransformMT(mt.clone($lockTime));
+					instanceInfo.addNamedTransformMT(mt.clone($scale));
 			}
 		}
 	}

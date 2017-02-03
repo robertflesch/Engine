@@ -336,10 +336,10 @@ public class Animation extends PersistanceObject
 		}
 	}
 	*/
-	public function play( $owner:VoxelModel, $lockTime:Number ):void {
+	public function play( $owner:VoxelModel, $scale:Number ):void {
 		//Log.out( "Animation.play - name: " + _name );
 		if ( _sound )
-			_sound.play( $owner, $lockTime );
+			_sound.play( $owner, $scale );
 			
 		if ( _attachments && 0 < _attachments.length ) {
 			for each ( var aa:AnimationAttachment in _attachments ) {

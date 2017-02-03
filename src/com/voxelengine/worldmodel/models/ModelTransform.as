@@ -24,6 +24,7 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class ModelTransform
 {
+	static public const INVALID_STRING:String 	= "INVALID";
 	static public const INVALID:int 			= 0;
 	static public const POSITION:int 			= 1;
 	static public const POSITION_TO:int 		= 2;
@@ -56,7 +57,7 @@ public class ModelTransform
 	private var _transformTarget:Vector3D;
 	private var _type:int;
 	private var _name:String;
-	private var _guid:String = "INVALID";
+	private var _guid:String = INVALID_STRING;
 	private var _inverse:Boolean = false;  // REPEATING ROTATIONS change the sign on the delta every cycle.
 	
 	// these are dynamic values that change over the life of the animation
@@ -139,14 +140,14 @@ public class ModelTransform
 		else
 		{
 			if ( ModelTransform.INFINITE_TIME == $time ) {
-				_delta.x = $x / 1000
-				_delta.y = $y / 1000
-				_delta.z = $z / 1000
+				_delta.x = $x / 1000;
+				_delta.y = $y / 1000;
+				_delta.z = $z / 1000;
 			}
 			else {
-				_delta.x = $x / $time
-				_delta.y = $y / $time
-				_delta.z = $z / $time
+				_delta.x = $x / $time;
+				_delta.y = $y / $time;
+				_delta.z = $z / $time;
 			}
 		}
 		
@@ -161,30 +162,33 @@ public class ModelTransform
 	
 	// Animations use these as throw aways, when scaling animations
 	public function clone( $val:Number ):ModelTransform {
-		//Log.out( "ModelTransform.clone - "  + " type: " + type + " x: " + _originalDelta.x + " y: " + _originalDelta.y + " z: " + _originalDelta.z
-		//       + " time: " + time + " name: " + name, Log.WARN );
 		var mt:ModelTransform = new ModelTransform( _originalDelta.x
 												  , _originalDelta.y
 												  , _originalDelta.z
 												  , _originalTime
 												  , type
 												  , name );
-		mt._delta.setTo( _delta.x * $val, _delta.y * $val, _delta.z * $val );
-//		mt._time = _time;
-//		mt._originalTime = _originalTime;
-		Log.out( "ModelTransform.clone - "  + " type: " + type + " x: " + _originalDelta.x + " y: " + _originalDelta.y + " z: " + _originalDelta.z
-		       + " time: " + time + " name: " + name, Log.WARN );
+		mt.scaleTransform( $val );
 		return mt;
 	}
 
+	private function scaleTransform( $val:Number):void {
+		_delta.setTo(_delta.x * $val, _delta.y * $val, _delta.z * $val);
+	}
+
 	public function assignToInstanceInfo( ii:InstanceInfo ):String {
-		if ( ii )
-		{
-			if ( _guid != "INVALID" )
-				Log.out( "ModelTransform.assignToInstanceInfo - Guid already assigned", Log.ERROR );
-			_guid = ii.instanceGuid; // instance guid or model guid?
+		if ( null == ii ) {
+			Log.out("ModelTransform.assignToInstanceInfo - instanceInfo is null", Log.ERROR);
+			return INVALID_STRING;
 		}
-		
+
+		if ( _guid != INVALID_STRING ) {
+			Log.out("ModelTransform.assignToInstanceInfo - Guid already assigned", Log.ERROR);
+			return INVALID_STRING
+		}
+
+		_guid = ii.instanceGuid; // instance guid or model guid?
+
 		if  (  ModelTransform.POSITION == type 
 			|| ModelTransform.POSITION_REPEATING == type )	 	
 			transformTarget = ii.positionGet;
