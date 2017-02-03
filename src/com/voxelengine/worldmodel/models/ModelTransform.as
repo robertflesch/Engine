@@ -102,7 +102,7 @@ public class ModelTransform
 	}
 	
 	public function ModelTransform( $x:Number, $y:Number, $z:Number, $time:Number, $type:int, $name:String = "Default" ) {
-		Log.out( "ModelTransform - "  + " type: " + $type + " x: " + $x + " y: " + $y + " z: " + $z + " time: " + $time + " name: " + $name, Log.WARN );
+		//Log.out( "ModelTransform - type: " + $type + " x: " + $x + " y: " + $y + " z: " + $z + " time: " + $time + " name: " + $name, Log.WARN );
 		
 		_originalDelta.setTo( $x, $y, $z );
 		_originalTime = $time;
@@ -110,7 +110,7 @@ public class ModelTransform
 			Log.out( "ModelTransform - No time defined name: " + $name + " x: " + $x + " y: " + $y + " z: " + $z, Log.ERROR );
 
 		if ( 0 == $x && 0 == $y && 0 == $z && 0 == $time && ModelTransform.LIFE != $type )
-			Log.out( "ModelTransform - No values defined", Log.ERROR );
+			Log.out( "ModelTransform - No values defined for delta or time", Log.ERROR );
 		
 		if ( 100 > $time && -1 != $time ) {
 			Log.out( "ModelTransform - OLD TIME BEING USED: " + $name + " x: " + $x + " y: " + $y + " z: " + $z, Log.ERROR );
