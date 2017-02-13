@@ -13,6 +13,7 @@ import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.oxel.Oxel;
 
 import flash.geom.Vector3D;
 import org.flashapi.swing.Alert;
@@ -186,10 +187,15 @@ public class ModelMakerImport extends ModelMakerBase {
 		}
 
 		function oxelReady( $ode:OxelDataEvent):void {
-			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid  ) {
+			if ( modelInfo && ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid ) ) {
 				removeOxelReadyDataCompleteListeners();
+				Log.out( "ModelMakerImport.oxelReady - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
+
+				Oxel.resetScaling( $ode.oxelData.oxel );
+				Oxel.rebuild( $ode.oxelData.oxel );
+
 				if ( false == waitForChildren )
-					markComplete( true, _vmTemp );
+					markComplete(true, _vmTemp);
 			}
 //			else
 //				Log.out( "ModelMakerImport.oxelReady - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
@@ -245,8 +251,8 @@ public class ModelMakerImport extends ModelMakerBase {
 
 		if ( null == _vmTemp.instanceInfo.controllingModel ) {
 			// Only do this for top level models.
-			var lav:Vector3D = Player.player.instanceInfo.lookAtVector(500);
-			var diffPos:Vector3D = Player.player.wsPositionGet().clone();
+			var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(500);
+			var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
 			diffPos = diffPos.add(lav);
 			_vmTemp.instanceInfo.positionSet = diffPos;
 			Region.currentRegion.modelCache.add( _vmTemp );

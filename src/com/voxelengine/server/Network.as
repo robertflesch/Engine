@@ -17,12 +17,13 @@ import com.voxelengine.events.LoginEvent;
 
 public class Network
 {
+	public static const LOCAL:String = "local";
 	public static const PUBLIC:String = "public";
 	
 	static private var _client:Client;	
 	static public function get client():Client { return _client; };
 	
-	static private var _userId:String = "player";
+	static private var _userId:String = LOCAL;
 	static public function get userId():String { return _userId; };
 	
 	// This was a test to see if I could make a client that didnt need user interaction.

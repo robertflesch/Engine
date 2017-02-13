@@ -11,6 +11,8 @@ import com.voxelengine.events.CursorSizeEvent;
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.InventoryInterfaceEvent;
 import com.voxelengine.GUI.actionBars.UserInventory;
+import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import flash.display3D.Context3D;
@@ -64,7 +66,7 @@ public class ControllableVoxelModel extends VoxelModel
 	protected var _displayCollisionMarkers:Boolean 			= false
 	protected var _leaveTrail:Boolean 						= false
 	protected var _forward:Boolean 							= false
-	protected var _inventoryBitmap:String					= "";
+	protected var _inventoryBitmap:String					= "userInventory.png";
 
 	protected var _maxFallRate:SecureNumber 				= new SecureNumber( DEFAULT_FALL_RATE );
 	static protected var _maxSpeed:SecureNumber 					= new SecureNumber( DEFAULT_SPEED_MAX );
@@ -103,13 +105,26 @@ public class ControllableVoxelModel extends VoxelModel
 		_ct = new CollisionTest( this );
 	}
 
-	protected function adjustSpeedMultiplier( e:CursorSizeEvent ): void {
+/*	protected function adjustSpeedMultiplier( e:CursorSizeEvent ): void {
 		if ( this == VoxelModel.controlledModel ) {
 			Log.out("ControllableVoxelModel.adjustSpeedMultiplier - ONE");
 			VoxelModel.controlledModel.instanceInfo.setSpeedMultipler(1);
 		}
+	}*/
+
+	// This allows the player to move more slowly when adjusting small grains
+	protected function adjustSpeedMultiplier( e:CursorSizeEvent ): void {
+		if ( this == VoxelModel.controlledModel && EditCursor.isEditing ) {
+			//Log.out( "Player.adjustSpeedMultiplier - size: " + e.size );
+			VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( Math.max( e.size, 0.5 ) );
+		} else {
+			//Log.out( "Player.adjustSpeedMultiplier - is controlledModel? : " + (this == VoxelModel.controlledModel) + " isEditing: " + EditCursor.isEditing );
+			VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( 1 );
+		}
 	}
-	
+
+
+
 	override protected function processClassJson():void {
 		super.processClassJson();
 		clipVelocityFactor = DEFAULT_CLIP_VELOCITY/100; // setting it to 0.95
@@ -149,7 +164,7 @@ public class ControllableVoxelModel extends VoxelModel
 		super.dead = val;
 		
 		if ( VoxelModel.controlledModel && VoxelModel.controlledModel == this )
-			loseControl( Player.player );
+			loseControl( VoxelModel.controlledModel );
 			
 		Globals.g_app.removeEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent );
 		ModelEvent.removeListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
@@ -449,7 +464,8 @@ public class ControllableVoxelModel extends VoxelModel
 
 	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
 		super.takeControl( $modelLosingControl, $addAsChild );
-		InventoryInterfaceEvent.dispatch( new InventoryInterfaceEvent( InventoryInterfaceEvent.DISPLAY, instanceInfo.instanceGuid, inventoryBitmap ) );
+		if ( Network.userId != Network.LOCAL )
+			InventoryInterfaceEvent.dispatch( new InventoryInterfaceEvent( InventoryInterfaceEvent.DISPLAY, instanceInfo.instanceGuid, inventoryBitmap ) );
 	}
 	
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {

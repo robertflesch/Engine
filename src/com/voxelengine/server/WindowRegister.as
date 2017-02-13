@@ -366,8 +366,8 @@ import flash.display.Bitmap;
 				_unInput.glow = true;
 			}
 			else {
-				_errorText.text = "Unknown Error in simpleResister: " + e.message;
-				Log.out( "WindowRegistration.registrationError Unknow Registrion Error in simpleResister: " + e.message, Log.ERROR, e);
+				_errorText.text = "Unknown Error in simpleRegister: " + e.message;
+				Log.out( "WindowRegistration.registrationError Unknown Registration Error in simpleRegister: " + e.message, Log.ERROR, e);
 			}
 		}
 			

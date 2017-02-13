@@ -74,14 +74,14 @@ import com.voxelengine.worldmodel.models.types.Player;
 
 		protected function onRepeat(event:TimerEvent):void
 		{
-			if ( Player.player.instanceInfo.controllingModel )
+			if ( VoxelModel.controlledModel.instanceInfo.controllingModel )
 			{
-				var loc:Vector3D = Player.player.instanceInfo.controllingModel.instanceInfo.positionGet;
+				var loc:Vector3D = VoxelModel.controlledModel.instanceInfo.controllingModel.instanceInfo.positionGet;
 				_loc.text = "x: " + int( loc.x ) + "  y: " + int( loc.y ) + "  z: " + int( loc.z ); 
-				var vel:Vector3D = Player.player.instanceInfo.controllingModel.instanceInfo.velocityGet;
+				var vel:Vector3D = VoxelModel.controlledModel.instanceInfo.controllingModel.instanceInfo.velocityGet;
 				_vel.text = "x: " + int( vel.x ) + "  y: " + int( vel.y ) + "  z: " + int( vel.z ); 
 				
-				var rot:Number = -Player.player.instanceInfo.controllingModel.instanceInfo.rotationGet.y % 360;
+				var rot:Number = -VoxelModel.controlledModel.instanceInfo.controllingModel.instanceInfo.rotationGet.y % 360;
 				var calRot:Number = 0;
 				if ( 180 < rot )
 					calRot = 50 - ( ( rot - 180 ) * 100 / 360 );

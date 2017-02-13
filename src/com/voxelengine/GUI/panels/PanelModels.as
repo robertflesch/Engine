@@ -16,6 +16,7 @@ import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.GUI.panels.PanelBase;
 import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 import com.voxelengine.worldmodel.models.ModelCache;
+import com.voxelengine.worldmodel.models.ModelCache;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
@@ -62,8 +63,9 @@ public class PanelModels extends PanelBase
 		_listModels.draggable = true;
 
 		_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, selectModel );		
-		ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged )
-		
+		ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
+		ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
+
 		buttonsCreate();
 		addElement( _listModels );
 
@@ -104,8 +106,10 @@ public class PanelModels extends PanelBase
 	
 	override public function close():void {
 		super.close();
-		_listModels.removeEventListener( ListEvent.LIST_CHANGED, selectModel );		
-		
+		_listModels.removeEventListener( ListEvent.LIST_CHANGED, selectModel );
+		ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged );
+		ModelMetadataEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
+
 		_parentModel = null;
 		_dictionarySource = null;
 	}
@@ -118,12 +122,11 @@ public class PanelModels extends PanelBase
 		var countAdded:int;
 		for each ( var vm:VoxelModel in _dictionarySource() )
 		{
-			if ( vm && !vm.instanceInfo.dynamicObject && !vm.dead )
-			{
-				if ( !Globals.isDebug ) {
-					if ( vm is Player )
-						continue;
-				}
+			if ( vm && !vm.instanceInfo.dynamicObject && !vm.dead ) {
+//				if ( !Globals.isDebug ) {
+//					if ( vm is Player )
+//						continue;
+//				}
 				var itemName:String = "";
 				if ( vm.metadata.name )
 					itemName = vm.metadata.name;
@@ -255,6 +258,15 @@ public class PanelModels extends PanelBase
 			WindowInventoryNew._s_hackSupportClick = true;
 			var startingTab:String = WindowInventoryNew.makeStartingTabString( WindowInventoryNew.INVENTORY_OWNED, WindowInventoryNew.INVENTORY_CAT_MODELS );
 			WindowInventoryNew.toggle( startingTab )
+		}
+	}
+
+	//ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
+	private function metadataImported( $mme:ModelMetadataEvent ):void {
+		var instances:Vector.<VoxelModel> = Region.currentRegion.modelCache.instancesOfModelGet( $mme.modelGuid );
+		// should be one if I just imported it.
+		for each ( var vm:VoxelModel in instances ){
+			_listModels.addItem( vm.metadata.name, vm );
 		}
 	}
 

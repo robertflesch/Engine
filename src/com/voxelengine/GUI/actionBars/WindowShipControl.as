@@ -123,8 +123,8 @@ import com.voxelengine.worldmodel.models.ModelTransform;
 			}
 
 			remove();
-			
-			Player.player.instanceInfo.controllingModel = null;
+
+			VoxelModel.controlledModel.instanceInfo.controllingModel = null;
 		}
 		
 		public function onTextureLoadComplete (event:Event):void 

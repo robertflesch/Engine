@@ -41,9 +41,9 @@ public class ControlBeastScript extends Script
 					//var controllingModel:VoxelModel = vm.instanceInfo.controllingModel;
 					var controllingModel:VoxelModel = vm.topmostControllingModel();
 					if ( controllingModel ) { 
-						if ( Player.player && Player.player.instanceInfo ) {
-							var ii:InstanceInfo = Player.player.instanceInfo;
-							if ( null == Player.player.instanceInfo.controllingModel )
+						if ( Player.player && VoxelModel.controlledModel.instanceInfo ) {
+							var ii:InstanceInfo = VoxelModel.controlledModel.instanceInfo;
+							if ( null == VoxelModel.controlledModel.instanceInfo.controllingModel )
 								new WindowBeastControlQuery( controllingModel.instanceInfo.instanceGuid );
 						}
 						else

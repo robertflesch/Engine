@@ -7,79 +7,54 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-import com.voxelengine.events.CursorOperationEvent;
-import com.voxelengine.events.CursorSizeEvent;
+import com.voxelengine.events.InventorySlotEvent;
+import com.voxelengine.events.LoadingEvent;
+import com.voxelengine.events.LoginEvent;
+import com.voxelengine.persistance.Persistance;
+import com.voxelengine.worldmodel.RegionManager;
+import com.voxelengine.worldmodel.inventory.ObjectAction;
+import com.voxelengine.worldmodel.inventory.ObjectTool;
+import com.voxelengine.worldmodel.models.types.Avatar;
 
-import flash.display3D.Context3D;
-import flash.events.KeyboardEvent;
-import flash.geom.Matrix3D;
-import flash.geom.Vector3D;
-import flash.utils.getQualifiedClassName;
+import playerio.DatabaseObject;
+import playerio.PlayerIOError;
 
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
 
-import com.voxelengine.events.GUIEvent;
-import com.voxelengine.events.LoginEvent;
-import com.voxelengine.events.LoadingEvent;
-import com.voxelengine.events.InventoryEvent;
-import com.voxelengine.events.InventoryInterfaceEvent;
-import com.voxelengine.events.InventorySlotEvent;
-import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.RegionEvent;
-import com.voxelengine.events.OxelDataEvent;
-
-import com.voxelengine.persistance.Persistance;
-
-import com.voxelengine.renderer.lamps.ShaderLight;
-import com.voxelengine.renderer.shaders.Shader;
-import com.voxelengine.renderer.lamps.*;
-
 import com.voxelengine.server.Network;
 
-import com.voxelengine.worldmodel.RegionManager;
-import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.biomes.LayerInfo;
-import com.voxelengine.worldmodel.biomes.Biomes;
-import com.voxelengine.worldmodel.inventory.*;
 import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.models.types.Avatar;
-import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.weapons.Gun;
-import com.voxelengine.worldmodel.weapons.Bomb;
+import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 
-
-public class Player extends Avatar
+public class Player
 {
-	//static private const 	HIPWIDTH:Number 			= (Globals.UNITS_PER_METER * 3)/8;
-	static private const 	FALL:String					= "FALL";
-	static private const 	FOOT:String					= "FOOT";
-	static private const 	HEAD:String					= "HEAD";
-//		static private const 	MOUSE_LOOK_CHANGE_RATE:int 	= 10000;
-	static private const 	MOUSE_LOOK_CHANGE_RATE:int 	= 5000;
-	static private const 	MIN_TURN_AMOUNT:Number 		= 0.09;
-	static private const 	AVATAR_CLIP_FACTOR:Number 	= 0.90;
-	static private var  	STEP_UP_MAX:int 			= 16;
-
 	private static var g_player:Player;
 	public static function get player():Player { return g_player; }
 	public static function set player( val:Player ):void { g_player = val; }
 	
-	public function Player( instanceInfo:InstanceInfo ) { 
-		Log.out( "Player.construct instanceGuid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );
-		super( instanceInfo );
-		if ( Player.player ) {
-			Player.player.dead = true;
-			Player.player = null;
-		}
-		Player.player = this;
-		inventoryBitmap = "userInventory.png";
-		CursorOperationEvent.addListener( CursorOperationEvent.NONE, changeCursorOperationEvent );
+	public function Player() {
+		Log.out( "Player.construct" );
+		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
+		LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, newRegionLoaded );
 	}
 
+	private function newRegionLoaded( $le:LoadingEvent ):void {
+		Region.currentRegion.modelCache.add( VoxelModel.controlledModel );
+	}
+
+	static private function onLogin( $event:LoginEvent ):void {
+		LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, onLogin );
+		Log.out( "Player.onLogin - retrieve player info from Persistance", Log.DEBUG );
+		// request that the database load the player Object
+		Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
+	}
+
+/*
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		Log.out( "Player.init instanceGuid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );
 		super.init( $mi, $vmm );
@@ -94,124 +69,91 @@ public class Player extends Avatar
 		if ( _displayCollisionMarkers )
 			_ct.markersAdd();
 	}
-
-	// This allows the player to move more slowly when adjusting small grains
-	override protected function adjustSpeedMultiplier( e:CursorSizeEvent ): void {
-		if ( this == VoxelModel.controlledModel && EditCursor.isEditing ) {
-			//Log.out( "Player.adjustSpeedMultiplier - size: " + e.size );
-			VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( Math.max( e.size, 0.5 ) );
-		} else {
-			//Log.out( "Player.adjustSpeedMultiplier - is controlledModel? : " + (this == VoxelModel.controlledModel) + " isEditing: " + EditCursor.isEditing );
-			VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( 1 );
-		}
-	}
-
+*/
+/*
 	// When the player stops editing, set movement speed to 1
 	private function changeCursorOperationEvent( e:CursorOperationEvent ):void	{
 		if ( this == VoxelModel.controlledModel ) {
 			VoxelModel.controlledModel.instanceInfo.setSpeedMultipler(1);
 		}
 	}
+*/
+	static public function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
 
-	static public function buildExportObject( obj:Object ):Object {
-		Avatar.buildExportObject( obj )
-		return obj;
-	}
-	
-	override protected function processClassJson():void {
-		super.processClassJson();
-	}
-		
-	override public function set dead(val:Boolean):void { 
-		super.dead = val;
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.UNLOAD_REQUEST, instanceInfo.instanceGuid, null ) );
-		removeEventHandlers();
-	}
-	
-	private function addEventHandlers():void {
-		//LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
-		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
-		
-		ModelLoadingEvent.addListener( ModelLoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
-		
-		RegionEvent.addListener( RegionEvent.UNLOAD, onRegionUnload );
-		RegionEvent.addListener( RegionEvent.LOAD_BEGUN, onRegionLoad );
+		if ( $dbo ) {
+			if ( null == $dbo.modelGuid ) {
+				// Assign the Avatar the default avatar
+				//$dbo.modelGuid = "DefaultPlayer";
+				$dbo.modelGuid = "FF8E75FB-EC3D-13B6-060A-202F664D7121";
+
+				var userName:String = $dbo.key.substring( 6 );
+				var firstChar:String = userName.substr(0, 1);
+				var restOfString:String = userName.substr(1, userName.length);
+				$dbo.userName = firstChar.toUpperCase() + restOfString.toLowerCase();
+				$dbo.description = "New Player Avatar";
+				$dbo.modifiedDate = new Date().toUTCString();
+				$dbo.createdDate = new Date().toUTCString();
+				$dbo.save();
+			}
+			$dbo.modelGuid = "FF8E75FB-EC3D-13B6-060A-202F664D7121";
+			createPlayer( $dbo.modelGuid, Network.userId );
+		}
+		else {
+			Log.out( "Avatar.onPlayerLoadedAction - ERROR, failed to create new record for new players?" );
+		}
 	}
 
-	private function removeEventHandlers():void {
-		//LoadingEvent.removeListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
-		//LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
-		LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, onLogin );
-		
-		ModelLoadingEvent.removeListener( ModelLoadingEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
-		
-		RegionEvent.removeListener( RegionEvent.UNLOAD, onRegionUnload );
-		RegionEvent.removeListener( RegionEvent.LOAD_BEGUN, onRegionLoad );
-	}
-	
-	static private function onLogin( $event:LoginEvent ):void {
-		Log.out( "Player.onLogin - retrieve player info from Persistance", Log.DEBUG );
-		InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest )
-		// request that the database load the player Object
-		Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
-	}
-	
-	override public function release():void {
-		//Log.out( "Player.release --------------------------------------------------------------------------------------------------------------------" );
-		super.release();
-	}
-	
-	override protected function onChildAdded( me:ModelEvent ):void	{
-		if ( me.parentInstanceGuid != instanceInfo.instanceGuid )
-			return;
-			
-		var vm:VoxelModel = modelInfo.childModelFind( me.instanceGuid );	
-		if ( !vm ) {
-			Log.out( "Player.onChildAdded ERROR FIND CHILD MODEL: " + me.instanceGuid );
+	static public function createPlayer( $modelGuid:String, $userId:String ):void	{
+		var ii:InstanceInfo = new InstanceInfo();
+		ii.modelGuid = $modelGuid;
+		ii.instanceGuid = $userId;
+		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
+
+		if ( "DefaultPlayer" == $modelGuid ) {
+			Log.out( "Avatar.createPlayer - creating from GenerateCube", Log.DEBUG )
+			var model:Object = GenerateCube.script();
+			model.modelClass = "Avatar";
+			new ModelMakerGenerate( ii, model )
 		}
-		//var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( me.instanceGuid );
-//Log.out( "Player.onChildAdded model: " + vm.toString() );
-		if ( vm is Engine )
-Log.out( "Player.onChildAdded - Player has ENGINE" )
-			//_engines.push( vm );
-		if ( vm is Gun )
-Log.out( "Player.onChildAdded - Player has GUN" )
-			//_guns.push( vm );
-		if ( vm is Bomb )
-Log.out( "Player.onChildAdded - Player has BOMP" )
-			//_bombs.push( vm );
-	}
-	
-	private var _torchIndex:int;
-	public function torchToggle():void {
-		Shader.lightsClear();
-		var sl:ShaderLight;
-		switch( _torchIndex ) {
-			case 0:
-				sl = new Lamp();
-				break;
-			case 1:
-				sl = new Torch();
-				(sl as Torch).flicker = true;
-				break;
-			case 2:
-				sl = new RainbowLight();
-				break;
-			case 3:
-				sl = new BlackLamp();
-				break;
-			case 4:
-				sl = new LampBright();
-				_torchIndex = -1; // its going to get incremented
-				break;
+		else {
+			InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest )
+			ModelMakerBase.load(ii, false, false);
 		}
-		_torchIndex++;
-		sl.position = instanceInfo.positionGet.clone();
-		sl.position.y += 30;
-		sl.position.x += 4;
-		Shader.lightAdd( sl ); 
 	}
-	
+
+
+	static public function onPlayerLoadError(error:PlayerIOError):void {
+		Log.out("Avatar.onPlayerLoadError", Log.ERROR, error );
+	}
+
+	static private function playerModelLoaded( $mle:ModelLoadingEvent ):void {
+		if ( $mle.vm && ( $mle.vm.instanceInfo.instanceGuid == Network.userId || $mle.vm.instanceInfo.instanceGuid == Network.LOCAL ) ){
+			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
+			$mle.vm.takeControl( VoxelModel.controlledModel, false );
+
+		}
+	}
+
+	static private function defaultSlotDataRequest( $ise:InventorySlotEvent ):void {
+		// inventory is always on a instance guid.
+		if ( VoxelModel.controlledModel.instanceInfo.instanceGuid == $ise.instanceGuid ) {
+			InventorySlotEvent.removeListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest )
+			Log.out( "Player.getDefaultSlotData - Loading default data into slots" , Log.WARN );
+
+			var ot:ObjectTool = new ObjectTool( null, "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );
+			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, 0, ot ) );
+			var oa:ObjectAction = new ObjectAction( null, "noneSlots", "none.png", "Do nothing" );
+			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, 1, oa ) );
+
+
+//			for each ( var gun:Gun in _guns )
+//				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.DEFAULT_REQUEST, instanceInfo.instanceGuid, gun.instanceInfo.instanceGuid, 0, null ) );
+		}
+	}
+
+
+
+
 	/*
 	// Be nice to have the UI driven
 	public function torchAdd():void {
@@ -231,122 +173,15 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		Shader.lightsClear();
 	}
 	*/
-	
-	override protected function collisionPointsAdd():void {
-		/*  0,0xxxxxx8xxxxxx15,0 
-		 *  x                x
-		 *  x                x
-		 *  x                x
-		 *  0,4              x
-		 * ...               ...
-		 *  x                x
-		 *  0,15xxxxx8xxxxxx15,15
-		 * 
-		 * */
-		// TO DO Should define this in meta data??? RSF or using extents?
-		// diamond around feet
-		if ( !_ct.hasPoints() ) {
-			_ct.addCollisionPoint( new CollisionPoint( FALL, new Vector3D( 7.5, -1, 7.5 ), false ) );
-			
-			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
-			//_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX/2, 0 ) ) );
-			//_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX, 0 ) ) );
-	//			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 11, Globals.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
-	//			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT, 11 ) ) );
-	//			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 4, Globals.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
-			// middle of chest
-			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST - 4, 7.5 ) ) );
-			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST, 7.5 ) ) );
-			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST + 4, 7.5 ) ) );
-			// diamond around feet
-			_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
-			_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 7.5 ), false ) );
-			//_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 15 ) ) );
-			//_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 0, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
-		}
-
-		//_ct.markersAdd();
-	}
-
-	override protected function cameraAddLocations():void {
-		//if ( Globals.isDebug )
-		//	camera.addLocation( new CameraLocation( true, 0, 0, 0 ) );
-			
-//			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, 0 ) );
-//			camera.addLocation( new CameraLocation( true, 0, Globals.AVATAR_HEIGHT - 4, 0) );
-		//camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, Globals.AVATAR_WIDTH/2) );
-		camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, Globals.AVATAR_WIDTH/2 - 4) );
-		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, 50) );
-//			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT + 20, 50) );
-		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 100) );
-//			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 250) );
-	}
-
-	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
-		Log.out( "Player.takeControl --------------------------------------------------------------------------------------------------------------------", Log.DEBUG );
-		super.takeControl( $modelLosingControl, false );
-		instanceInfo.usesCollision = true;
-		// We need to grab the rotation of the old parent, otherwise we get rotated back to 0 since last rotation is 0
-		if ( $modelLosingControl )
-			instanceInfo.rotationSet = $modelLosingControl.instanceInfo.rotationGet;
-
-		//GUIEvent.dispatch( new GUIEvent(GUIEvent.TOOLBAR_SHOW));
-		var className:String = getQualifiedClassName( topmostControllingModel() );
-		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
-	}
-
-	static private function defaultSlotDataRequest( $ise:InventorySlotEvent ):void {
-		// inventory is always on a instance guid.
-		if ( Player.player.instanceInfo.instanceGuid == $ise.instanceGuid ) {
-			Log.out( "Player.getDefaultSlotData - Loading default data into slots" , Log.WARN );
-			
-			var ot:ObjectTool = new ObjectTool( null, "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );
-			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, 0, ot ) ); 
-			var oa:ObjectAction = new ObjectAction( null, "noneSlots", "none.png", "Do nothing" );
-			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, 1, oa ) ); 
-			
-			
-//			for each ( var gun:Gun in _guns )
-//				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.DEFAULT_REQUEST, instanceInfo.instanceGuid, gun.instanceInfo.instanceGuid, 0, null ) );
-		}
-	}
-				
-	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
-		Log.out( "Player.loseControl --------------------------------------------------------------------------------------------------------------------", Log.DEBUG );
-		super.loseControl( $modelDetaching, false );
-		ModelEvent.dispatch( new ModelEvent( ModelEvent.PLAYER_MODEL_REMOVED, instanceInfo.instanceGuid ) );
-		instanceInfo.usesCollision = false;
-	}
-
-	override public function update($context:Context3D, $elapsedTimeMS:int):void	{
-
-		if ( 0 < Shader.lightCount() ) {
-			var sl:ShaderLight = Shader.lights(0);
-			if ( VoxelModel.controlledModel != this ) {
-				sl.position = VoxelModel.controlledModel.instanceInfo.positionGet.clone();
-				sl.position.y += 30;
-				sl.position.x += 4;
-			}
-			else 
-			{
-				sl.position = instanceInfo.positionGet.clone();
-				sl.position.y += 30;
-				sl.position.x += 4;
-			}
-			sl.update();
-		}
-
-		super.update( $context, $elapsedTimeMS );
-	}
-	
+/*
 	private function onRegionUnload( le:RegionEvent ):void {
 		lastCollisionModelReset();
 	}
-	
+*/
 	private function onRegionLoad( $re:RegionEvent ):void {
 		//Log.out( "Player.onRegionLoad - add player to model cache, and applying region info =============================================" );
 		// add the player to this regions model list.
-		Region.currentRegion.modelCache.add( this );
+		Region.currentRegion.modelCache.add( VoxelModel.controlledModel );
 		
 		if ( Region.currentRegion )
 			Region.currentRegion.applyRegionInfoToPlayer( this );
@@ -362,48 +197,14 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 
 	private function gravityOn():void {
 		if ( true == Region.currentRegion.gravity )
-			usesGravity = true;
-		else		
-			usesGravity = false;
+			VoxelModel.controlledModel.usesGravity = true;
+		else
+			VoxelModel.controlledModel.usesGravity = false;
 	}
 
-	override protected function handleMouseMovement( $elapsedTimeMS:int ):void {
-//		Log.out( "Player.handleMouseMovement - Globals.active: " + Globals.active
-//				+ "  MouseKeyboardHandler.ctrl: " + MouseKeyboardHandler.ctrl
-//				+ " MouseKeyboardHandler.active: " + MouseKeyboardHandler.active
-//				+ " Globals.openWindowCount: " + Globals.openWindowCount  );
-		if ( Globals.active
-		  //&& 0 == Globals.openWindowCount // this allows it to be handled in the getMouseYChange
-		  && false == MouseKeyboardHandler.ctrl
-		  && true == MouseKeyboardHandler.active
-		  && 0 == Globals.openWindowCount )
-		{
-			// up down
-			var dx:Number = 0;
-			dx = MouseKeyboardHandler.getMouseYChange() / MOUSE_LOOK_CHANGE_RATE;
-			dx *= $elapsedTimeMS;
-			if ( MIN_TURN_AMOUNT >= Math.abs(dx) )
-				dx = 0;
-				
-			// right left
-			var dy:Number = MouseKeyboardHandler.getMouseXChange() / MOUSE_LOOK_CHANGE_RATE;
-			dy *= $elapsedTimeMS;
-			
-			//Log.out( "Player.handleMouseMovement dy: " + dy + "   $elapsedTimeMS: " + $elapsedTimeMS )
-			if ( MIN_TURN_AMOUNT >= Math.abs(dy) )
-				dy = 0;
-			//
-			//Log.out( "Player.handleMouseMovement - rotation: " + instanceInfo.rotationGet );
-			// I only want to rotate the head here, not the whole body. in the X dir.
-			// so if I made the head the main body part, could I keep the rest of the head fixed on the x and z axis...
-			instanceInfo.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y + dy, instanceInfo.rotationGet.z );
-			//camera.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y, instanceInfo.rotationGet.z );
-			// this uses the camera y rotation, but it breaks other things like where to dig.
-			camera.rotationSetComp( camera.rotationGet.x + dx, instanceInfo.rotationGet.y, instanceInfo.rotationGet.z );
-			//trace( "handleMouseMovement instanceInfo.rotationGet: " + instanceInfo.rotationGet + "  camera.rotation: " + camera.rotationGet );
-		}
-	}
-
+	/*
+*/
+	/*
 	// returns -1 if new position is valid, returns 0-2 if there was collision
 	// 0-2 is the number of steps back to take in position queue
 	override protected function collisionCheckNew( $elapsedTimeMS:Number, $loc:Location, $collisionCandidate:VoxelModel, $stepUpCheck:Boolean = true ):int {
@@ -568,42 +369,42 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 		Log.out( "Player.collisionCheckNew - ALL CLEAR" );
 		return -1;
 	}
-	
+	*/
+	/*
 	public function collisionCheckOLD():void {
 		var collided:Boolean = false;
 		var pt:PositionTest = isPositionValid( lastCollisionModel );
 		if ( pt.isNotValid() )
 		{
 //				Log.out( "Player.collisionCheck PositionTest: " + pt.toString() );
-			/*
+
 			// head is clear, chest is clear, foot is blocked
-			if ( pt.head && pt.chest && !pt.foot )
-			{
-				trace( "Player.collisionCheck step up chance" );
-				// if a step up pts in a legal foot position, then test with that foot position
-				if ( pt.footHeight <= instanceInfo.positionGet.y + STEP_UP_MAX )
-				{
-					// now I need to retest head, chest and foot in new position
-					instanceInfo.positionSetComp( instanceInfo.positionGet.x, pt.footHeight, instanceInfo.positionGet.z );
-					pt = isPositionValid( lastCollisionModel );
-					// if the body in the new position is not all valid, we will get stuck
-					if ( !pt.head || !pt.chest || !pt.foot )
-						collided = true;
-				}
-				else
-					collided = true;
-					
-				//resetVelocities();	
-			}
-			// if head OR chest OR foot is blocked, we are blocked
-			else if ( !pt.head || !pt.chest || !pt.foot )
-			{
-				// TODO Should consider redirecting the velocity to an angle orthagonal to the face
-				collided = true;
-				// ok I see why you continue up to wall after you hit the first time.
-				// since the velocity is being reset, the slower speed alows you to get a bit closer before colliding.
-			}
-			*/
+//			if ( pt.head && pt.chest && !pt.foot )
+//			{
+//				trace( "Player.collisionCheck step up chance" );
+//				// if a step up pts in a legal foot position, then test with that foot position
+//				if ( pt.footHeight <= instanceInfo.positionGet.y + STEP_UP_MAX )
+//				{
+//					// now I need to retest head, chest and foot in new position
+//					instanceInfo.positionSetComp( instanceInfo.positionGet.x, pt.footHeight, instanceInfo.positionGet.z );
+//					pt = isPositionValid( lastCollisionModel );
+//					// if the body in the new position is not all valid, we will get stuck
+//					if ( !pt.head || !pt.chest || !pt.foot )
+//						collided = true;
+//				}
+//				else
+//					collided = true;
+//
+//				//resetVelocities();
+//			}
+//			// if head OR chest OR foot is blocked, we are blocked
+//			else if ( !pt.head || !pt.chest || !pt.foot )
+//			{
+//				// TODO Should consider redirecting the velocity to an angle orthagonal to the face
+//				collided = true;
+//				// ok I see why you continue up to wall after you hit the first time.
+//				// since the velocity is being reset, the slower speed alows you to get a bit closer before colliding.
+//			}
 		}
 //			else
 //				trace( "Player.collisionCheck NO Collided at: " + pt.position );
@@ -632,7 +433,7 @@ Log.out( "Player.onChildAdded - Player has BOMP" )
 			instanceInfo.velocityReset();
 		}
 	}		
-	
+	*/
 	/* applyGravityNew
 	private	function applyGravityNew( $elapsedTimeMS:int ):void
 	{

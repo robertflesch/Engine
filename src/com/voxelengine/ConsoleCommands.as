@@ -39,8 +39,8 @@ public class ConsoleCommands {
 
 	private static function reset():void
 	{
-		if ( Player.player )
-			Player.player.instanceInfo.reset();
+		if ( VoxelModel.controlledModel )
+			VoxelModel.controlledModel.instanceInfo.reset();
 	}
 	
 	private static function trail():void

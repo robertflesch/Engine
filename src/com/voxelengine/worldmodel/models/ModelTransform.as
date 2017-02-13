@@ -193,7 +193,7 @@ public class ModelTransform
 			|| ModelTransform.POSITION_REPEATING == type )	 	
 			transformTarget = ii.positionGet;
 		else if (  ModelTransform.POSITION_TO_ME == type )
-			transformTarget = Player.player.instanceInfo.positionGet;
+			transformTarget = VoxelModel.controlledModel.instanceInfo.positionGet;
 		else if (  ModelTransform.ROTATION == type
 				|| ModelTransform.ROTATION_REPEATING == type )	
 			transformTarget = ii.rotationGet;

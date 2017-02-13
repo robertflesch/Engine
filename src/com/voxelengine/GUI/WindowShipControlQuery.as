@@ -78,8 +78,8 @@ public class WindowShipControlQuery extends VVCanvas
 			{
 				addControlWindows( vm );
 				remove();
-				
-				Player.player.instanceInfo.controllingModel = vm;
+
+				VoxelModel.controlledModel.instanceInfo.controllingModel = vm;
 			}
 		}
 		

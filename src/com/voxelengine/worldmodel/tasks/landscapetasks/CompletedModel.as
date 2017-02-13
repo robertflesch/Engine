@@ -57,7 +57,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 						throw new Error( "CompletedModel.start - Should not be used" );
 					}
 						
-					if ( vm is Player )
+					if ( vm == VoxelModel.controlledModel )
 					{
 						LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, _modelGuid ) );
 					}
@@ -73,12 +73,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 					Log.out( "CompletedModel.start - VoxelModel Not found: " + _modelGuid, Log.WARN );
 				}
 			}
-			catch ( error:Error )
-			{
-				if ( Player.player.instanceInfo.instanceGuid == _modelGuid )
-					Player.player.complete = true;
-				else
-					Log.out( "CompletedModel.start - exception was thrown for model guid: " + _modelGuid, Log.ERROR );
+			catch ( error:Error ) {
+				Log.out( "CompletedModel.start - exception was thrown for model guid: " + _modelGuid, Log.ERROR );
 			}
 			
 			//Log.out( "CompletedModel.start - completedModel: " + _guid + "  count: " + _count );

@@ -373,7 +373,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		if ( false == Globals.g_textInput ) {
 			if ( Keyboard.T == e.keyCode )
 				if ( Player.player )
-					Player.player.torchToggle();
+					VoxelModel.controlledModel.torchToggle();
 				
 			if ( Keyboard.F == e.keyCode )
 				createProjectile( VoxelModel.controlledModel );

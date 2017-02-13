@@ -153,7 +153,7 @@ public class Dragon extends Beast
 	}
 
 	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
-		Player.player.loseControl( null );
+		VoxelModel.controlledModel.loseControl( null );
 		//Log.out( "Dragon.takeControl --------------------------------------------------------------------------------------------------------------------", Log.WARN );
 		//Log.out( "Dragon.takeControl - starting position: " + $vm.instanceInfo.positionGet );
 		super.takeControl( $modelLosingControl, $addAsChild );
@@ -285,8 +285,8 @@ public class Dragon extends Beast
 	}
 	*/
 	static private function loseControlHandler():void {
-		VoxelModel.controlledModel.loseControl( Player.player );
-		Player.player.takeControl( null, false );
+		VoxelModel.controlledModel.loseControl( VoxelModel.controlledModel );
+		VoxelModel.controlledModel.takeControl( null, false );
 	}
 	
 	import com.voxelengine.worldmodel.weapons.Gun;

@@ -32,14 +32,13 @@ public class ModelCache
 	private var _instanceByGuid:Dictionary = new Dictionary();
 	private var _instancesDynamic:Vector.<VoxelModel> = new Vector.<VoxelModel>();
 	private var _instanceByGuidDynamic:Dictionary = new Dictionary();
-	private var _region:Region;
-	
+
 	public function get models():Vector.<VoxelModel> { return _instances; }
 	public function get getEditableModels():Vector.<VoxelModel> {
 		var list:Vector.<VoxelModel> = new Vector.<VoxelModel>();
 		for ( var i:int; i < _instances.length; i++ ){
 			var vm:VoxelModel = _instances[i];
-			if ( vm && vm.complete && vm.metadata.permissions.modify && !(vm is Player)  && vm != VoxelModel.controlledModel ) // vm.modelInfo.data.oxel
+			if ( vm && vm.complete && vm.metadata.permissions.modify && vm != VoxelModel.controlledModel ) // vm.modelInfo.data.oxel
 				list.push(vm);
 		}
 		return list;
@@ -48,9 +47,7 @@ public class ModelCache
 	public function modelsGet():Vector.<VoxelModel> { return _instances; }
 	public function get modelsDynamic():Vector.<VoxelModel> { return _instancesDynamic; }
 	
-	public function ModelCache( $region:Region ) {
-		_region = $region;
-		ModelEvent.addListener( ModelEvent.PLAYER_MODEL_REMOVED, playerRemoved );
+	public function ModelCache() {
 	}
 	
 	public function requestModelInfoByModelGuid( $modelGuid:String ):ModelInfo {
@@ -71,20 +68,6 @@ public class ModelCache
 					return vm
 		}
 		return null
-	}
-	
-	private function playerRemoved(e:ModelEvent):void {
-		var vm:VoxelModel;
-		for ( var i:int; i < _instances.length; ) {
-			vm = _instances[i];
-			if ( vm && vm is Player ) {
-				_instances.splice( i, 1 );
-				_instanceByGuid[vm.instanceInfo.instanceGuid] = null;
-				return;
-			}
-			else 
-				i++
-		}
 	}
 	
 	// need to do a recurvsive search here
@@ -118,7 +101,8 @@ public class ModelCache
 		var vm:VoxelModel;
 		for ( var i:int = 0; i < _instances.length; i++ ) {
 			vm = _instances[i];
-			if ( vm is Player )
+			var t:VoxelModel = VoxelModel.controlledModel;
+			if ( vm == VoxelModel.controlledModel )
 				continue;
 			vm.dead = true;	
 		}
@@ -154,14 +138,12 @@ public class ModelCache
 		else
 		{
 			if ( vm is Avatar ) {
-				// need to seperate these out into their own catagory
+				Log.out( "ModelCache.add AVATAR - vm.instanceInfo.instanceGuid: " + vm.instanceInfo.instanceGuid, Log.WARN );
+				// need to separate these out into their own category
 				if ( null == _instanceByGuid[vm.instanceInfo.instanceGuid] ) {
 					_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
 					_instances.push(vm);
-					if ( vm is Player )
-						ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
-					else	
-						ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
+					ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.instanceGuid, null, null, null, vm ) );
 				}
 				else
 					Log.out( "ModelCache.add - Trying to add a AVATAR with the same MODEL AND INSTANCE for a second time", Log.ERROR );
@@ -283,7 +265,7 @@ public class ModelCache
 		var models:Array = [];
 		for ( var i:int = 0; i < _instances.length; i++ ) {
 			var vm:VoxelModel = _instances[i];
-			if ( vm is Player )
+			if ( vm is Avatar )
 				continue;
 			if ( vm.dead )
 				continue;

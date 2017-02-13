@@ -36,7 +36,7 @@ package com.voxelengine.worldmodel.scripts
 				ModelEvent.removeListener( ModelEvent.AVATAR_MODEL_ADDED, onModelEvent );
 				if ( Player.player ) {
 					var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
-					vm.takeControl( Player.player );
+					vm.takeControl( VoxelModel.controlledModel );
 					Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.metadata.name );
 				}
 				else {
@@ -49,9 +49,9 @@ package com.voxelengine.worldmodel.scripts
 		}
 		
 		private function onOxelReady( $ode:OxelDataEvent ):void {
-			if ( $ode.modelGuid == Player.player.modelInfo.guid ) {
+			if ( $ode.modelGuid == VoxelModel.controlledModel.modelInfo.guid ) {
 				OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, onOxelReady )
-				var player:VoxelModel = Player.player;
+				var player:VoxelModel = VoxelModel.controlledModel;
 				var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
 				if ( player && vm ) {
 					vm.takeControl( player );

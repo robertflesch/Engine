@@ -4,6 +4,7 @@
 package com.voxelengine.worldmodel.scripts {
 import com.voxelengine.events.ScriptEvent;
 import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 import flash.geom.Vector3D;
 
@@ -29,7 +30,7 @@ public class ComeToMeScript extends Script
     private function addMovement():void {
         TransformEvent.addListener( TransformEvent.ENDED, transformEnded );
         // player position
-        var locPlayer:Vector3D = Player.player.instanceInfo.positionGet.clone();
+        var locPlayer:Vector3D = VoxelModel.controlledModel.instanceInfo.positionGet.clone();
         vm.instanceInfo.addTransform( locPlayer.x, locPlayer.y, locPlayer.z, _defaultTravelTime, ModelTransform.POSITION_TO, COME_TO_ME_SCRIPT );
         vm.instanceInfo.addTransform( 360, 360, 360, _defaultTravelTime, ModelTransform.ROTATION_REPEATING, COME_TO_ME_SCRIPT );
     }

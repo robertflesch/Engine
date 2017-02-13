@@ -562,7 +562,7 @@ public class EditCursor extends VoxelModel
 			
 		// determines whether a block can be placed
 		// calculate difference between avatar location and intersection point
-		var diffPos:Vector3D = Player.player.wsPositionGet().clone();
+		var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
 		diffPos = diffPos.subtract( gci.wsPoint );
 		
 		_pl.reset();
@@ -624,8 +624,8 @@ public class EditCursor extends VoxelModel
 		var foundModel:VoxelModel;
 		if ( VoxelModel.selectedModel )
 		{
-			Player.player.stateSet( "Pick", 1 );
-			Player.player.stateLock( true, 300 );
+			VoxelModel.controlledModel.stateSet( "Pick", 1 );
+			VoxelModel.controlledModel.stateLock( true, 300 );
 			
 			foundModel = VoxelModel.selectedModel;
 			var fmRoot:Oxel = foundModel.modelInfo.data.oxel;

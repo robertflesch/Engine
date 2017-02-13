@@ -213,6 +213,7 @@ public class InventoryPanelModel extends VVContainer
 			
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.modelGuid = om.modelGuid;
+			ii.instanceGuid = Globals.getUID();
 			if ( VoxelModel.selectedModel )
 				ii.controllingModel = VoxelModel.selectedModel;
 			ModelMakerBase.load( ii );

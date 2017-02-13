@@ -234,7 +234,7 @@ public class Renderer extends EventDispatcher
 		// Say they are falling onto an island, and they hit the water first.
 		// I should probably adjust that algorithm to account for it.
 		if ( Player.player ) {
-			var lcm:VoxelModel = Player.player.lastCollisionModel
+			var lcm:VoxelModel = VoxelModel.controlledModel.lastCollisionModel
 			if ( null != lcm ) {
 				var camOxel:Oxel = lcm.getOxelAtWSPoint( wsPositionCamera, 4 )
 				if ( camOxel && Globals.BAD_OXEL != camOxel ) {

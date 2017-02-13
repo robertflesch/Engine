@@ -97,7 +97,7 @@ public class WindowBeastControlQuery extends VVCanvas
 			if ( vm )
 			{
 				remove();
-				vm.takeControl( Player.player );
+				vm.takeControl( VoxelModel.controlledModel );
 			}
 		}
 		

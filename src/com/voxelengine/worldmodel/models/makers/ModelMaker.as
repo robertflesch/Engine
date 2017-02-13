@@ -26,14 +26,17 @@ import com.voxelengine.worldmodel.models.types.VoxelModel
 	 */
 public class ModelMaker extends ModelMakerBase {
 	
-	private var _addToRegionWhenComplete:Boolean
+	private var 	_addToRegionWhenComplete:Boolean;
+	private var		_addToCount:Boolean;
 	
-	public function ModelMaker( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean ) {
-		//Log.out( "ModelMaker.constructor ii: " + $ii.toString(), Log.DEBUG )
-		super( $ii )
-		_addToRegionWhenComplete = $addToRegionWhenComplete
-		makerCountIncrement()
-		retrieveBaseInfo()
+	public function ModelMaker( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean, $addToCount:Boolean = true ) {
+		Log.out( "ModelMaker.constructor ii: " + $ii.toString(), Log.DEBUG );
+		super( $ii );
+		_addToRegionWhenComplete = $addToRegionWhenComplete;
+		_addToCount = $addToCount;
+		if ( _addToCount )
+			makerCountIncrement();
+		retrieveBaseInfo();
 	}
 	
 	override protected function retrieveBaseInfo():void {
@@ -49,13 +52,13 @@ public class ModelMaker extends ModelMakerBase {
 		if ( ii.modelGuid == $mme.modelGuid ) {
 			_modelMetadata = $mme.modelMetadata;
 			//Log.out( "ModelMaker.retrivedMetadata - metadata: " + _modelMetadata.toString() )
-			attemptMake()
+			attemptMake();
 		}
 	}
 	
 	private function failedMetadata( $mme:ModelMetadataEvent):void {
 		if ( ii.modelGuid == $mme.modelGuid ) {
-			markComplete(false)
+			markComplete(false);
 		}
 	}
 	
@@ -64,28 +67,29 @@ public class ModelMaker extends ModelMakerBase {
 		if ( null != _modelMetadata && null != modelInfo ) {
 			//Log.out( "ModelMaker.attemptMake - ii: " + ii.toString() )
 			
-			var vm:* = make()
+			var vm:* = make();
 			
 			if ( vm && _addToRegionWhenComplete )
-				Region.currentRegion.modelCache.add( vm )
+				Region.currentRegion.modelCache.add( vm );
 				
 			markComplete( true, vm )
 		}
 	}
 	
 	override protected function markComplete( $success:Boolean, vm:VoxelModel = null ):void {
-		makerCountDecrement()
-		if ( 0 == makerCountGet() ) {
-			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) )
+		if ( _addToCount ) {
+			makerCountDecrement();
+			if (0 == makerCountGet())
+				WindowSplashEvent.dispatch(new WindowSplashEvent(WindowSplashEvent.ANNIHILATE))
 		}
-		removeListeners()
+		removeListeners();
 		
 		// do this last as it nulls everything.
-		super.markComplete( $success, vm )
+		super.markComplete( $success, vm );
 		
 		function removeListeners():void {
-			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrivedMetadata )		
-			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrivedMetadata )		
+			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrivedMetadata );
+			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrivedMetadata );
 			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata )	
 		}		
 		

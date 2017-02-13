@@ -86,6 +86,8 @@ public class ModelInfo extends PersistanceObject
 		super.guid = $newGuid;
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
 		if ( _data ) {
+			if ( altGuid )
+				oldGuid = altGuid;
 			_data.guid = $newGuid;
 			OxelDataEvent.create( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null );
 		}
@@ -102,12 +104,12 @@ public class ModelInfo extends PersistanceObject
 		if ( data && data.oxel && data.oxel.chunkGet() )
 			data.update( $vm );
 			
-		for each (var vm:VoxelModel in childVoxelModels ) {
-			if ("LeftArm" == vm.metadata.name){
+		for each (var cm:VoxelModel in childVoxelModels ) {
+			if ("LeftArm" == cm.metadata.name){
 				var i:int = 3;
 				//Log.out( "ModelInfo.update - vm.metadata.name: " + vm.metadata.name );
 			}
-			vm.update($context, $elapsedTimeMS);
+			cm.update($context, $elapsedTimeMS);
 		}
 	}
 	
@@ -407,8 +409,8 @@ public class ModelInfo extends PersistanceObject
 			// Since this is a child object, it automatically get added to the parent.
 			// So add to cache just adds it to parent instance.
 			//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
-			//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + childInstanceInfo );
 			_childCount++;
+			Log.out( "VoxelModel.childrenLoad - calling load on ii: " + ii + "  childCount: " + _childCount );
 			ModelMakerBase.load( ii, true, false );
 		}
 		//Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
@@ -422,9 +424,9 @@ public class ModelInfo extends PersistanceObject
 	protected function onChildAdded( me:ModelEvent ):void {
 		if ( me.vm && me.vm.instanceInfo.controllingModel && me.vm.instanceInfo.controllingModel.modelInfo.guid == guid ) {
 			_childCount--;
-			//Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children remaining: " + _childCount, Log.WARN );
+			Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children remaining: " + _childCount, Log.WARN );
 			if (0 == _childCount) {
-				//Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children COMPLETE", Log.WARN );
+				Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children COMPLETE", Log.WARN );
 				ModelEvent.removeListener(ModelEvent.CHILD_MODEL_ADDED, onChildAdded);
 				childrenLoaded = true;
 				ModelLoadingEvent.dispatch(new ModelLoadingEvent(ModelLoadingEvent.CHILD_LOADING_COMPLETE, guid));
@@ -494,8 +496,8 @@ public class ModelInfo extends PersistanceObject
 
 			
 		// Dont add the player to the info.model.children, or you end up in a recursive loop
-		if ( $child is Player )
-			return
+		if ( $child == VoxelModel.controlledModel )
+			return;
 		changed = true;
 		info.model.children[info.model.children.length] = $child.instanceInfo.toObject();
 	}
@@ -691,7 +693,7 @@ public class ModelInfo extends PersistanceObject
 				for ( var i:int; i < _childVoxelModels.length; i++ ) {
 					if ( null != _childVoxelModels[i] ) {
 						// Dont save the player as a child model
-						if ( _childVoxelModels[i] is Player )
+						if ( _childVoxelModels[i] == VoxelModel.controlledModel )
 							continue
 						//children["instanceInfo" + i]  = _childrenInstanceInfo[i].toObject();
 						children[i]  = _childVoxelModels[i].instanceInfo.toObject();

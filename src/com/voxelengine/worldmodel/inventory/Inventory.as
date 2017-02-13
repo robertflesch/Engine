@@ -117,7 +117,7 @@ public class Inventory extends PersistanceObject
 		}
 		else {
 			var ownerModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( guid );
-			if ( ownerModel && ownerModel is Player )
+			if ( ownerModel && ownerModel == VoxelModel.controlledModel )
 				_voxels.addTestData();
 		}
 		

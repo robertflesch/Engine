@@ -141,15 +141,15 @@ public class ModelMakerBase {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	// A factory method to build the correct object
-	static public function load( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true, $prompt:Boolean = true ):void {
+	static public function load( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true, $addToCountORPrompt:Boolean = true ):void {
 		//Log.out( "ModelMakerBase.load - choose maker ii: " + $ii.toString() )
 		if ( !Globals.isGuid( $ii.modelGuid ) )
 			if ( Globals.online )
-				new ModelMakerImport( $ii, $prompt );
+				new ModelMakerImport( $ii, $addToCountORPrompt );
 			else
 				new ModelMakerLocal( $ii );
 		else
-			new ModelMaker( $ii, $addToRegionWhenComplete )
+			new ModelMaker( $ii, $addToRegionWhenComplete, $addToCountORPrompt );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -164,7 +164,7 @@ public class ModelMakerBase {
 		_makerCount-- ;
 		if ( 0 == makerCountGet() ) {
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );
-			LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
+			//LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
 		}
 	}
 	

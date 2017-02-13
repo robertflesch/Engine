@@ -10,6 +10,8 @@ package com.voxelengine.server {
 import com.voxelengine.events.AmmoEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+
 import flash.geom.Vector3D;
 import playerio.Connection;
 import playerio.PlayerIO;
@@ -168,8 +170,8 @@ public class RoomConnection
 			var ae:ModelEvent = new ModelEvent( 
 							 ModelEvent.MOVED
 						   , Network.userId
-						   , Player.player.instanceInfo.positionGet
-						   , Player.player.instanceInfo.rotationGet );
+						   , VoxelModel.controlledModel.instanceInfo.positionGet
+						   , VoxelModel.controlledModel.instanceInfo.rotationGet );
 			sourceMovementEvent( ae );			   
 		}
 	}

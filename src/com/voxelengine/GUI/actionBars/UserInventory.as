@@ -166,11 +166,10 @@ public class  UserInventory extends QuickInventory
 		// close it and open new one
 		else if ( _s_currentInstance && e && _s_currentInstance._owner != e.owner ) {
 			_s_currentInstance.remove();
-			_s_currentInstance = null;
 			_s_currentInstance = new UserInventory( e.owner, e.image );
 		}
 		
-		if ( Globals.inRoom ) {
+		if ( Globals.inRoom && _s_currentInstance ) {
 			with ( _s_currentInstance ) {
 				// display it!
 				visible = true
@@ -188,9 +187,7 @@ public class  UserInventory extends QuickInventory
 	static private function closeEvent(e:InventoryInterfaceEvent):void {
 		if ( null == _s_currentInstance )
 			return;
-		with ( _s_currentInstance ) {
-			remove();
-		}
+		_s_currentInstance.remove();
 		//Log.out( "UserInventory.closeEvent ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 	}
 	

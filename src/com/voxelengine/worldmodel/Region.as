@@ -133,7 +133,7 @@ package com.voxelengine.worldmodel
 				RegionEvent.dispatch( new RegionEvent( RegionEvent.UNLOAD, 0, _s_currentRegion.guid ) );
 			_s_currentRegion = this;
 			
-			_modelCache = new ModelCache( this );
+			_modelCache = new ModelCache();
 			
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
 			
@@ -151,11 +151,15 @@ package com.voxelengine.worldmodel
 			}
 			else
 				Globals.g_landscapeTaskController.paused = false
-				
-			// for local use only
-			if ( !Globals.online && !Player.player )
-				Avatar.createPlayer();
-				
+
+			if ( !Player.player )
+				Player.player = new Player();
+			// for startup use before you go online
+			if ( !Globals.online )
+				Player.createPlayer("DefaultPlayer", Network.LOCAL );
+			else if ( VoxelModel.controlledModel && VoxelModel.controlledModel.instanceInfo.instanceGuid == "DefaultPlayer" )
+				Player.createPlayer("DefaultPlayer", Network.LOCAL );
+
 			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name, Log.DEBUG );
 		}	
 		
@@ -207,6 +211,8 @@ package com.voxelengine.worldmodel
 			Log.out( "Region.unload: " + guid, Log.DEBUG );
 			removeEventListeners();
 			_modelCache.unload();
+            _modelCache
+            Log.out( "Region.unload complete modelCache.count: " + _modelCache, Log.DEBUG );
 		}
 		
 		private function removeEventListeners():void {
@@ -253,7 +259,8 @@ package com.voxelengine.worldmodel
 		}
 		
 		public function applyRegionInfoToPlayer( $avatar:Player ):void {
-			//Log.out( "Region.applyRegionInfoToPlayer" );
+			Log.out( "Region.applyRegionInfoToPlayer", Log.WARN );
+/*
 			if ( playerPosition ) {
 				//Log.out( "Player.onLoadingPlayerComplete - setting position to  - x: "  + playerPosition.x + "   y: " + playerPosition.y + "   z: " + playerPosition.z );
 				$avatar.instanceInfo.positionSetComp( playerPosition.x, playerPosition.y, playerPosition.z );
@@ -269,6 +276,7 @@ package com.voxelengine.worldmodel
 				$avatar.instanceInfo.rotationSet = new Vector3D( 0, 0, 0 );
 				
 			$avatar.usesGravity = gravity;
+*/
 		}
 		
 		public function setPlayerPosition( $obj:Object ):void {

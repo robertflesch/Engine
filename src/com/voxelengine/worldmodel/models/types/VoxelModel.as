@@ -8,6 +8,13 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models.types
 {
 import com.voxelengine.GUI.voxelModels.WindowBluePrintCopy;
+import com.voxelengine.renderer.lamps.BlackLamp;
+import com.voxelengine.renderer.lamps.Lamp;
+import com.voxelengine.renderer.lamps.LampBright;
+import com.voxelengine.renderer.lamps.RainbowLight;
+import com.voxelengine.renderer.lamps.ShaderLight;
+import com.voxelengine.renderer.lamps.Torch;
+import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 import com.voxelengine.worldmodel.oxel.GrainCursorUtils;
 
@@ -521,7 +528,7 @@ public class VoxelModel
 		if ( modelInfo ) {
 
 			if ( modelInfo.data ) {
-				var ppos:Vector3D = Player.player.instanceInfo.positionGet;
+				var ppos:Vector3D = controlledModel.instanceInfo.positionGet;
 				var modelPos:Vector3D = this.instanceInfo.positionGet;
 				var d:int = ppos.subtract(modelPos).length;
 //				Log.out("ModelInfo.draw distance to model: " + d);
@@ -793,8 +800,8 @@ public class VoxelModel
 			$cp.collided = true;
 		}
 		else if ( $cp.oxel.type != TypeInfo.AIR ) {
-			if ( $collidingModel is Player ) {
-				Player.player.lastCollisionModel = this;
+			if ( $collidingModel == VoxelModel.controlledModel ) {
+				controlledModel.lastCollisionModel = this;
 				//Log.out( "VoxelModel.isNewPositionValid - oxel is BAD, so passable")
 			}
 		}
@@ -907,7 +914,7 @@ public class VoxelModel
 		VoxelModel.controlledModel = this;
 		
 		// adds the player to the child list
-		if ( $modelLosingControl )
+		if ( $modelLosingControl && !($modelLosingControl is Avatar) )
 			childAdd($modelLosingControl);
 		camera.index = 0;
 		
@@ -1178,11 +1185,11 @@ public class VoxelModel
 	}
 
 	public function distanceFromPlayerToModel():Number {
-		if ( Player.player && Player.player.instanceInfo ) {
+		if ( Player.player && controlledModel.instanceInfo ) {
 			// this takes the origin of the oxel and converts it to world space.
 			// takes the resulting vector and subtracts the player position, and uses the length as the priority
 			//trace( "Chunk.refreshFacesAndQuads distance: priority: " + priority + "  chunk.oxel.gc: " + _oxel.gc.getModelVector().toString()  + "  Player.player: " +  Player.player.instanceInfo.positionGet )
-			return ( modelToWorld( modelInfo.data.oxel.gc.getModelVector() ).subtract( Player.player.instanceInfo.positionGet ) ).length;
+			return ( modelToWorld( modelInfo.data.oxel.gc.getModelVector() ).subtract( controlledModel.instanceInfo.positionGet ) ).length;
 		}
 		return 32000;
 	}
@@ -1208,6 +1215,37 @@ public class VoxelModel
 			child.applyBaseLightLevel()
 		}
 	}
+	private var _torchIndex:int;
+	public function torchToggle():void {
+		Shader.lightsClear();
+		var sl:ShaderLight;
+		switch( _torchIndex ) {
+			case 0:
+				sl = new Lamp();
+				break;
+			case 1:
+				sl = new Torch();
+				(sl as Torch).flicker = true;
+				break;
+			case 2:
+				sl = new RainbowLight();
+				break;
+			case 3:
+				sl = new BlackLamp();
+				break;
+			case 4:
+				sl = new LampBright();
+				_torchIndex = -1; // its going to get incremented
+				break;
+		}
+		_torchIndex++;
+		sl.position = instanceInfo.positionGet.clone();
+		sl.position.y += 30;
+		sl.position.x += 4;
+		Shader.lightAdd( sl );
+	}
+
+
 }
 }
 
