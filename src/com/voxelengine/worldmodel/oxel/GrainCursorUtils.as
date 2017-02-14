@@ -47,7 +47,7 @@ public class GrainCursorUtils
 	*/
 	
 	/*
-	 * This funciton is fast because it does not actually perform a square root call
+	 * This function is fast because it does not actually perform a square root call
 	 * It is intended for use by callers that need to find the min or max of a set of 3d points
 	 */
 	static public function fast_distance( x0:int, y0:int, z0:int,

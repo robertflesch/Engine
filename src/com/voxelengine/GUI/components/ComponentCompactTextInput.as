@@ -1,3 +1,10 @@
+/*==============================================================================
+ Copyright 2011-2017 Robert Flesch
+ All rights reserved.  This product contains computer programs, screen
+ displays and printed documentation which are original works of
+ authorship protected under United States Copyright Act.
+ Unauthorized reproduction, translation, or display is prohibited.
+ ==============================================================================*/
 
 package com.voxelengine.GUI.components {
 
@@ -15,10 +22,10 @@ public class ComponentCompactTextInput extends Panel
 		
 		padding = $padding;
 		backgroundColor = SpasUI.DEFAULT_COLOR;
-		title = label;
-		borderStyle = BorderStyle.GROOVE;
+		//title = label;
+		//borderStyle = BorderStyle.GROOVE;
 		
-		var li:TextInput = new VVTextInput();
+		var li:TextInput = new VVTextInput( "", 50 );
 		li.text = initialValue;
 		li.width = $width - 20;
 		li.addEventListener( TextEvent.EDITED, changeHandler );

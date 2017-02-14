@@ -1,7 +1,18 @@
-
+/*==============================================================================
+ Copyright 2011-2017 Robert Flesch
+ All rights reserved.  This product contains computer programs, screen
+ displays and printed documentation which are original works of
+ authorship protected under United States Copyright Act.
+ Unauthorized reproduction, translation, or display is prohibited.
+ ==============================================================================*/
 package com.voxelengine.GUI.layerDataComponents
 {
-    import org.flashapi.swing.event.*;
+import com.voxelengine.Globals;
+import com.voxelengine.worldmodel.TypeInfo;
+
+import org.flashapi.swing.ComboBox;
+import org.flashapi.swing.Label;
+import org.flashapi.swing.event.*;
 	import org.flashapi.swing.containers.*;
 	import flash.geom.Vector3D;
 
@@ -17,7 +28,7 @@ package com.voxelengine.GUI.layerDataComponents
 			var cbType:ComboBox = new ComboBox( $value, 80, 10 );
 			cbType.addEventListener( ListEvent.LIST_CHANGED, callBack );
 			cbType.x = $width - 80;
-			for each (var nitem:TypeInfo in Globals.Info )
+			for each (var nitem:TypeInfo in TypeInfo.typeInfo )
 			{
 				//if ( "INVALID" != nitem.name && "AIR" != nitem.name && "BRAND" != nitem.name && -1 == nitem.name.indexOf( "EDIT" ) && -1 == nitem.name.indexOf( "UNNAMED" ) )
 				if ( "INVALID" != nitem.name && "AIR" != nitem.name && "BRAND" != nitem.name && -1 == nitem.name.indexOf( "EDIT" ) )

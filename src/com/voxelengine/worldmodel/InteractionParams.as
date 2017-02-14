@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2017 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and prStringed documentation which are original works of
   authorship protected under uStringed States Copyright Act.

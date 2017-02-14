@@ -1,17 +1,19 @@
+/*==============================================================================
+ Copyright 2011-2017 Robert Flesch
+ All rights reserved.  This product contains computer programs, screen
+ displays and printed documentation which are original works of
+ authorship protected under United States Copyright Act.
+ Unauthorized reproduction, translation, or display is prohibited.
+ ==============================================================================*/
 
 package com.voxelengine.GUI.components {
-import flash.geom.ColorTransform;
 import flash.geom.Vector3D;
-import org.flashapi.swing.color.Color;
 
 import org.flashapi.swing.*
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
-import org.flashapi.swing.containers.*;
 import org.flashapi.swing.plaf.spas.SpasUI;
 
-import com.voxelengine.Globals;
-import com.voxelengine.Log;
 
 public class ComponentVector3D extends Box
 {

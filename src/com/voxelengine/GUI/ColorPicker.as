@@ -1,5 +1,5 @@
 /*==============================================================================
-  Copyright 2011-2013 Robert Flesch
+  Copyright 2011-2017 Robert Flesch
   All rights reserved.  This product contains computer programs, screen
   displays and printed documentation which are original works of
   authorship protected under United States Copyright Act.
@@ -9,7 +9,6 @@
 package com.voxelengine.GUI
 {
     import flash.display.BitmapData;
-	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
 	
 	import org.flashapi.swing.Image;
@@ -21,7 +20,7 @@ package com.voxelengine.GUI
     public class ColorPicker extends VVCanvas {
 
         public function ColorPicker( x:int = 200, y:int = 200 ) {
-			VoxelVerseGUI.openWindowCount = VoxelVerseGUI.openWindowCount + 1;
+			Globals.openWindowCount = Globals.openWindowCount + 1;
 			var image:Image = new Image( Globals.texturePath + "colors.png");
 			addElement( image );
 			display( x, y );

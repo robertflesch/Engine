@@ -1,3 +1,10 @@
+/*==============================================================================
+ Copyright 2011-2017 Robert Flesch
+ All rights reserved.  This product contains computer programs, screen
+ displays and printed documentation which are original works of
+ authorship protected under United States Copyright Act.
+ Unauthorized reproduction, translation, or display is prohibited.
+ ==============================================================================*/
 package com.voxelengine.GUI.panels
 {
 
@@ -25,13 +32,14 @@ import org.flashapi.swing.*;
 		{
 			_mi = $mi;
 			super( $width, $height );
+/*
 //			borderColor = Color.WINDOWS_WORKSPACE_COLOR;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			layout.verticalAlignment = LayoutVerticalAlignment.TOP;
 			layout.horizontalAlignment = LayoutHorizontalAlignment.CENTER;
 			
 			addElement( new Label( "File Name" ) );
-			var fileNameInput:TextInput = new TextInput( _mi.fileName );
+			var fileNameInput:TextInput = new TextInput( _mi.altGuid );
 			fileNameInput.width = $width - $width/5;
 			fileNameInput.height = 20;
 			eventCollector.addEvent( fileNameInput, TextEvent.EDITED
@@ -119,6 +127,7 @@ import org.flashapi.swing.*;
 					_templateName.visible = false;
 				}
 			}
+			*/
 		}
 	}
 }

@@ -1,3 +1,11 @@
+/*==============================================================================
+ Copyright 2011-2017 Robert Flesch
+ All rights reserved.  This product contains computer programs, screen
+ displays and printed documentation which are original works of
+ authorship protected under United States Copyright Act.
+ Unauthorized reproduction, translation, or display is prohibited.
+ ==============================================================================*/
+
 package com.voxelengine.GUI.inventory {
 
 	import org.flashapi.swing.*
@@ -13,17 +21,17 @@ package com.voxelengine.GUI.inventory {
 	public class InventoryPanelRecipes extends VVContainer
 	{
 		// TODO need a more central location for these
-        static public const RECIPE_CAT_1:String = "GOD KNOWS 1";
-        static public const RECIPE_CAT_2:String = "GOD KNOWS 2";
-        static public const RECIPE_CAT_3:String = "GOD KNOWS 3";
-        static public const RECIPE_CAT_4:String = "GOD KNOWS 4";
+        static public const MODEL_CAT_1:String = "GOD KNOWS 1";
+        static public const MODEL_CAT_2:String = "GOD KNOWS 2";
+        static public const MODEL_CAT_3:String = "GOD KNOWS 3";
+        static public const MODEL_CAT_4:String = "GOD KNOWS 4";
 		
 		private var _barUpper:TabBar = new TabBar();
 		// This hold the items to be displayed
 		private var _itemContainer:Container;
 		
 		public function InventoryPanelRecipes() {
-			super();
+			super( this );
 			autoSize = true;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			
@@ -34,10 +42,10 @@ package com.voxelengine.GUI.inventory {
 		private function upperTabsAdd():void {
 			_barUpper.name = "upper";
 			// TODO I should really iterate thru the types and collect the categories - RSF
-            _barUpper.addItem( LanguageManager.localizedStringGet( RECIPE_CAT_ARCHITECTURE ), RECIPE_CAT_ARCHITECTURE );
-			_barUpper.addItem( LanguageManager.localizedStringGet( RECIPE_CAT_CHARACTERS ), RECIPE_CAT_CHARACTERS );
-            _barUpper.addItem( LanguageManager.localizedStringGet( RECIPE_CAT_PLANTS ), RECIPE_CAT_PLANTS );
-            _barUpper.addItem( LanguageManager.localizedStringGet( RECIPE_CAT_FURNITURE ), RECIPE_CAT_FURNITURE );
+            _barUpper.addItem( LanguageManager.localizedStringGet( InventoryPanelModel.MODEL_CAT_ARCHITECTURE ), InventoryPanelModel.MODEL_CAT_ARCHITECTURE );
+			_barUpper.addItem( LanguageManager.localizedStringGet( InventoryPanelModel.MODEL_CAT_CHARACTERS ), InventoryPanelModel.MODEL_CAT_CHARACTERS );
+            _barUpper.addItem( LanguageManager.localizedStringGet( InventoryPanelModel.MODEL_CAT_PLANTS ), InventoryPanelModel.MODEL_CAT_PLANTS );
+            _barUpper.addItem( LanguageManager.localizedStringGet( InventoryPanelModel.MODEL_CAT_FURNITURE ), InventoryPanelModel.MODEL_CAT_FURNITURE );
 			_barUpper.setButtonsWidth( 128 );
 			_barUpper.selectedIndex = 0;
             eventCollector.addEvent( _barUpper, ListEvent.ITEM_CLICKED, selectCategory );
