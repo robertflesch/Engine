@@ -16,6 +16,8 @@ import com.voxelengine.events.LoadingImageEvent
 import com.voxelengine.events.ModelLoadingEvent
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.RegionEvent;
+import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.*
 import com.voxelengine.worldmodel.models.types.VoxelModel
 
@@ -164,7 +166,7 @@ public class ModelMakerBase {
 		_makerCount-- ;
 		if ( 0 == makerCountGet() ) {
 			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );
-			//LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
+			RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
 		}
 	}
 	

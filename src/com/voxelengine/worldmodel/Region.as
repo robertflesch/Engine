@@ -130,7 +130,7 @@ package com.voxelengine.worldmodel
 				return;
 				
 			if ( _s_currentRegion )
-				RegionEvent.dispatch( new RegionEvent( RegionEvent.UNLOAD, 0, _s_currentRegion.guid ) );
+				RegionEvent.create( RegionEvent.UNLOAD, 0, _s_currentRegion.guid );
 			_s_currentRegion = this;
 			
 			_modelCache = new ModelCache();
@@ -138,27 +138,26 @@ package com.voxelengine.worldmodel
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
 			
 			addEventListeners();
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_BEGUN, 0, guid ) );
+			RegionEvent.create( RegionEvent.LOAD_BEGUN, 0, guid );
 			// old style uses region.
 			setSkyColor( info.skyColor );
 			var count:int = loadRegionObjects(info.models);
-			
+
+			// for startup use before you go online
+			if ( !Globals.online )
+				Player.createPlayer("DefaultPlayer", Network.LOCAL );
+//			else if ( VoxelModel.controlledModel && VoxelModel.controlledModel.instanceInfo.instanceGuid == "DefaultPlayer" )
+//				Player.createPlayer("DefaultPlayer", Network.LOCAL );
+
 			_loaded = false;
 			if ( 0 == count ) {
 				_loaded = true;
-				LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_COMPLETE, "" ) );
+				RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
 				WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.DESTORY ) );
 			}
 			else
 				Globals.g_landscapeTaskController.paused = false
 
-			if ( !Player.player )
-				Player.player = new Player();
-			// for startup use before you go online
-			if ( !Globals.online )
-				Player.createPlayer("DefaultPlayer", Network.LOCAL );
-			else if ( VoxelModel.controlledModel && VoxelModel.controlledModel.instanceInfo.instanceGuid == "DefaultPlayer" )
-				Player.createPlayer("DefaultPlayer", Network.LOCAL );
 
 			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name, Log.DEBUG );
 		}	

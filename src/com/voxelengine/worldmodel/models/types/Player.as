@@ -33,19 +33,28 @@ import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 
 public class Player
 {
-	private static var g_player:Player;
-	public static function get player():Player { return g_player; }
-	public static function set player( val:Player ):void { g_player = val; }
+	private static var _s_player:Player;
+	public static function get player():Player { return _s_player; }
+	public static function set player( val:Player ):void { _s_player = val; }
 	
 	public function Player() {
 		Log.out( "Player.construct" );
 		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
-		LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, newRegionLoaded );
+		RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, onRegionLoad );
 	}
 
-	private function newRegionLoaded( $le:LoadingEvent ):void {
-		Region.currentRegion.modelCache.add( VoxelModel.controlledModel );
+	private function onRegionLoad( $re:RegionEvent ):void {
+		if ( VoxelModel.controlledModel ) {
+			if ( null == Region.currentRegion.modelCache.instanceGet( VoxelModel.controlledModel.instanceInfo.instanceGuid ) )
+				Region.currentRegion.modelCache.add( VoxelModel.controlledModel );
+		} else {
+			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
+		}
+
+		if ( Region.currentRegion )
+			Region.currentRegion.applyRegionInfoToPlayer( this );
 	}
+
 
 	static private function onLogin( $event:LoginEvent ):void {
 		LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, onLogin );
@@ -54,37 +63,13 @@ public class Player
 		Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
 	}
 
-/*
-	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
-		Log.out( "Player.init instanceGuid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );
-		super.init( $mi, $vmm );
-		
-		hasInventory = true;
-		instanceInfo.usesCollision = true;
-		clipVelocityFactor = AVATAR_CLIP_FACTOR;
-		addEventHandlers();
-		takeControl( null );
-		torchToggle();
-		collisionPointsAdd();
-		if ( _displayCollisionMarkers )
-			_ct.markersAdd();
-	}
-*/
-/*
-	// When the player stops editing, set movement speed to 1
-	private function changeCursorOperationEvent( e:CursorOperationEvent ):void	{
-		if ( this == VoxelModel.controlledModel ) {
-			VoxelModel.controlledModel.instanceInfo.setSpeedMultipler(1);
-		}
-	}
-*/
 	static public function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
-
 		if ( $dbo ) {
 			if ( null == $dbo.modelGuid ) {
 				// Assign the Avatar the default avatar
 				//$dbo.modelGuid = "DefaultPlayer";
-				$dbo.modelGuid = "FF8E75FB-EC3D-13B6-060A-202F664D7121";
+				//$dbo.modelGuid = "FF8E75FB-EC3D-13B6-060A-202F664D7121";
+				$dbo.modelGuid = "ECC57575-41A1-6B65-5B37-1B484FD1D0D4";
 
 				var userName:String = $dbo.key.substring( 6 );
 				var firstChar:String = userName.substr(0, 1);
@@ -95,7 +80,6 @@ public class Player
 				$dbo.createdDate = new Date().toUTCString();
 				$dbo.save();
 			}
-			$dbo.modelGuid = "FF8E75FB-EC3D-13B6-060A-202F664D7121";
 			createPlayer( $dbo.modelGuid, Network.userId );
 		}
 		else {
@@ -104,10 +88,12 @@ public class Player
 	}
 
 	static public function createPlayer( $modelGuid:String, $userId:String ):void	{
+		if ( null == player )
+			player = new Player();
+
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.modelGuid = $modelGuid;
 		ii.instanceGuid = $userId;
-		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 
 		if ( "DefaultPlayer" == $modelGuid ) {
 			Log.out( "Avatar.createPlayer - creating from GenerateCube", Log.DEBUG )
@@ -128,7 +114,12 @@ public class Player
 
 	static private function playerModelLoaded( $mle:ModelLoadingEvent ):void {
 		if ( $mle.vm && ( $mle.vm.instanceInfo.instanceGuid == Network.userId || $mle.vm.instanceInfo.instanceGuid == Network.LOCAL ) ){
-			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
+			if ( null == Region.currentRegion.modelCache.instanceGet( $mle.vm.instanceInfo.instanceGuid ) ) {
+				Region.currentRegion.modelCache.add($mle.vm);
+				// We dont want to remove this listener for the generated event.
+				// Only for the model loaded from the DB.
+				ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded);
+			}
 			$mle.vm.takeControl( VoxelModel.controlledModel, false );
 
 		}
@@ -151,6 +142,30 @@ public class Player
 		}
 	}
 
+	/*
+	 override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
+	 Log.out( "Player.init instanceGuid: " + instanceInfo.instanceGuid + "  --------------------------------------------------------------------------------------------------------------------" );
+	 super.init( $mi, $vmm );
+
+	 hasInventory = true;
+	 instanceInfo.usesCollision = true;
+	 clipVelocityFactor = AVATAR_CLIP_FACTOR;
+	 addEventHandlers();
+	 takeControl( null );
+	 torchToggle();
+	 collisionPointsAdd();
+	 if ( _displayCollisionMarkers )
+	 _ct.markersAdd();
+	 }
+	 */
+	/*
+	 // When the player stops editing, set movement speed to 1
+	 private function changeCursorOperationEvent( e:CursorOperationEvent ):void	{
+	 if ( this == VoxelModel.controlledModel ) {
+	 VoxelModel.controlledModel.instanceInfo.setSpeedMultipler(1);
+	 }
+	 }
+	 */
 
 
 
@@ -178,15 +193,6 @@ public class Player
 		lastCollisionModelReset();
 	}
 */
-	private function onRegionLoad( $re:RegionEvent ):void {
-		//Log.out( "Player.onRegionLoad - add player to model cache, and applying region info =============================================" );
-		// add the player to this regions model list.
-		Region.currentRegion.modelCache.add( VoxelModel.controlledModel );
-		
-		if ( Region.currentRegion )
-			Region.currentRegion.applyRegionInfoToPlayer( this );
-	}
-
 	private function onCriticalModelLoaded( le:ModelLoadingEvent ):void {
 		//ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
 		Log.out( "Player.onCriticalModelLoaded - CRITICAL model" );

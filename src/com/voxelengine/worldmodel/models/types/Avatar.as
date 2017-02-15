@@ -198,7 +198,7 @@ public class Avatar extends ControllableVoxelModel
 	}
 
 	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
-		Log.out( "Player.takeControl --------------------------------------------------------------------------------------------------------------------", Log.DEBUG );
+		Log.out( "Avatar.takeControl --------------------------------------------------------------------------------------------------------------------", Log.DEBUG );
 		super.takeControl( $modelLosingControl, false );
 		instanceInfo.usesCollision = true;
 		// We need to grab the rotation of the old parent, otherwise we get rotated back to 0 since last rotation is 0
@@ -211,7 +211,7 @@ public class Avatar extends ControllableVoxelModel
 	}
 
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
-		Log.out( "Player.loseControl --------------------------------------------------------------------------------------------------------------------", Log.DEBUG );
+		Log.out( "Avatar.loseControl --------------------------------------------------------------------------------------------------------------------", Log.DEBUG );
 		super.loseControl( $modelDetaching, false );
 		instanceInfo.usesCollision = false;
 	}

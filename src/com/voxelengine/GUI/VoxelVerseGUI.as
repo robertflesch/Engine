@@ -12,6 +12,7 @@ import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.GUI.actionBars.WindowBeastControl;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.ConfigManager;
+import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.OxelPersistance;
 import com.voxelengine.worldmodel.models.types.Player;
 import flash.display.DisplayObjectContainer;
@@ -302,17 +303,20 @@ public class VoxelVerseGUI extends EventDispatcher
 
 	
 	private function onRegionLoadingComplete(event : RegionEvent ) : void {
-		Globals.g_app.removeEventListener(RegionEvent.LOAD_BEGUN, onRegionLoadingComplete);
+		RegionEvent.removeListener(RegionEvent.LOAD_BEGUN, onRegionLoadingComplete);
 		
-		if ( false == Globals.inRoom )
-		{
+		if ( false == Globals.inRoom ) {
 			RoomConnection.addEventHandlers();
-		}
-		else
-		{
+		} else {
 			Globals.mode = Globals.MODE_PUBLIC;
 			//WindowLogin.autoLogin();
 		}
+
+		if ( ConfigManager.instance.showHelp )
+			new WindowHelp();
+		else
+			new WindowLogin( "", "" );
+
 	}
 	
 	private function onModelLoadingComplete(event : LoadingEvent ) : void {
@@ -320,10 +324,6 @@ public class VoxelVerseGUI extends EventDispatcher
 		LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 		addKeyboardListeners();
 		
-		if ( ConfigManager.instance.showHelp )
-			new WindowHelp();
-		else
-			new WindowLogin( "", "" );
 	}
 	
 	private function onKeyPressed( e : KeyboardEvent) : void {

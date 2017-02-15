@@ -147,7 +147,7 @@ public class WindowSandboxList extends VVPopup
 			}
 			
 			if ( li.data )
-				RegionEvent.dispatch( new RegionEvent( RegionEvent.JOIN, 0, li.data ) ); 
+				RegionEvent.create( RegionEvent.JOIN, 0, li.data );
 			else
 				Log.out( "WindowSandboxList.loadthisRegion - NO REGION GUID FOUND", Log.ERROR );
 		}
@@ -160,16 +160,16 @@ public class WindowSandboxList extends VVPopup
 		Globals.mode = type;
 		if ( Globals.MODE_PRIVATE == type )
 		{
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId ) );
+			RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId );
 		}
 		else if ( Globals.MODE_PUBLIC == type )
 		{
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC ) );
+			RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC );
 		}
 		else
 		{
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId ) );
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC ) );
+			RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId );
+			RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC );
 		}
 	}
 

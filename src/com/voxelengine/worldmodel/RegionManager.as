@@ -80,7 +80,7 @@ public class RegionManager
 		Log.out( "RegionManager.regionRequest guid: " + $re.guid, Log.INFO );
 		var region:Region = regionGet( $re.guid );
 		if ( region ) {
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.RESULT, 0, region.guid, region ) );
+			RegionEvent.create( ModelBaseEvent.RESULT, 0, region.guid, region );
 			return;
 		}
 		
@@ -104,7 +104,7 @@ public class RegionManager
 		// Get a list of what we currently have
 		for each ( var region:Region in _regions ) {
 			if ( region && region.owner == e.guid )
-				RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.RESULT, 0, region.guid, region ) );
+				RegionEvent.create( ModelBaseEvent.RESULT, 0, region.guid, region );
 		}
 	}
 	
@@ -135,7 +135,7 @@ public class RegionManager
 		//Log.out( "RegionManager.regionAdd - adding region: " + $region.guid, Log.DEBUG );
 		if ( false == regionHas( $region.guid ) ) {
 			_regions.push( $region );
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.ADDED, ($pe ? $pe.series: 0), $region.guid, $region ) );
+			RegionEvent.create( ModelBaseEvent.ADDED, ($pe ? $pe.series: 0), $region.guid, $region );
 		}
 		else
 			Log.out( "RegionManager.regionAdd - NOT loading duplicate region: " + $region.guid, Log.DEBUG );
@@ -157,7 +157,7 @@ public class RegionManager
 		var startingRegion:Region = new Region( "Blank" );
 		startingRegion.createEmptyRegion();
 		regionAdd( null, startingRegion );
-		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, startingRegion.guid ) ); 
+		RegionEvent.create( RegionEvent.LOAD, 0, startingRegion.guid );
 		//RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, 0, startingRegion.guid ) );
 		// This tells the config manager that the local region was loaded and is ready to load rest of data.
 	}
@@ -166,7 +166,7 @@ public class RegionManager
 		// remove this handler
 		RegionEvent.removeListener( ModelBaseEvent.ADDED, startingRegionLoaded );
 		// now load the file that was designated as the starting region
-		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, $re.guid, $re.region ) );
+		RegionEvent.create( RegionEvent.LOAD, 0, $re.guid, $re.region );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -185,7 +185,7 @@ public class RegionManager
 	
 	public function onJoinRoomEvent( e:RoomEvent ):void {
 		Log.out( "RegionManager.onJoinRoomEvent - guid: " + e.guid, Log.DEBUG );
-		RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, e.guid ) );
+		RegionEvent.create( RegionEvent.LOAD, 0, e.guid );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////

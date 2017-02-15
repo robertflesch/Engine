@@ -69,7 +69,7 @@ public class WindowRegionDetail extends VVPopup
 		if ( $regionID ) {	
 			RegionEvent.addListener( ModelBaseEvent.ADDED, collectRegionInfo );
 			RegionEvent.addListener( ModelBaseEvent.RESULT, collectRegionInfo );
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST, 0, $regionID ) );
+			RegionEvent.create( ModelBaseEvent.REQUEST, 0, $regionID );
 		}
 		else {			
 			_create = true;
@@ -186,12 +186,12 @@ public class WindowRegionDetail extends VVPopup
 			// This tell the region manager to add it to the region list
 			//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true ) );			
 			// This tell the region to save itself!
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, _region.guid ) );
+			RegionEvent.create( ModelBaseEvent.SAVE, 0, _region.guid );
 		}
 		else {
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, 0, _region.guid ) );
+			RegionEvent.create( ModelBaseEvent.CHANGED, 0, _region.guid );
 			// This is not the active region, so we have to save it.
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, _region.guid ) );
+			RegionEvent.create( ModelBaseEvent.SAVE, 0, _region.guid );
 		}
 			
 		closeFunction();

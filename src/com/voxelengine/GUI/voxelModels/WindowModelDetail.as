@@ -248,8 +248,8 @@ import com.voxelengine.worldmodel.Light;
 				ModelInfoEvent.create( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, null );
 			}
 //			ModelEvent.dispatch( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.instanceGuid ) );
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, 0, Region.currentRegion.guid ) );
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
+			RegionEvent.create( ModelBaseEvent.CHANGED, 0, Region.currentRegion.guid );
+			RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );
 		}
 		
 

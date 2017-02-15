@@ -54,13 +54,13 @@ package com.voxelengine.GUI.voxelModels
 		private function onParentModelAdded(event:ModelEvent):void {
 			if ( _modelPanel )
 				_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null );
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
+			RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );
 		}
 
 		private function onParentModelRemoved(event:ModelEvent):void {
 			if ( _modelPanel )
 				_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null, true );
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
+			RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );
 		}
 
 		
@@ -69,7 +69,7 @@ package com.voxelengine.GUI.voxelModels
 			//Log.out( "WindowRegionModels.onRemoved", Log.WARN );
 			super.onRemoved(event);
 			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelAdded );
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.CHANGED, 0, null ));
+			RegionEvent.create( ModelBaseEvent.CHANGED, 0, null );
 			
 			_modelPanel.close();
 			

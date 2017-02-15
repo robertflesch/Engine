@@ -75,8 +75,8 @@ public class RegionEvent extends ModelBaseEvent
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:RegionEvent ) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
+	static public function create( $type:String, $series:int, $guid:String, $region:Region = null ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new RegionEvent( $type, $series, $guid, $region ) );
 	}
 
 	///////////////// Event handler interface /////////////////////////////

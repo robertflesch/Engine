@@ -111,7 +111,7 @@ package com.voxelengine.worldmodel
 		
 		private function listenForLoginSuccess( $event:LoginEvent ):void {
 			LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, listenForLoginSuccess );
-			RegionEvent.dispatch( new RegionEvent( RegionEvent.JOIN, 0, _defaultRegionJson.config.region.startingRegion ) ); 
+			RegionEvent.create( RegionEvent.JOIN, 0, _defaultRegionJson.config.region.startingRegion );
 		}
 	} // ConfigManager
 } // Package
