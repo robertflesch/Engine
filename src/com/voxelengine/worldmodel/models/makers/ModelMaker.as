@@ -30,7 +30,7 @@ public class ModelMaker extends ModelMakerBase {
 	private var		_addToCount:Boolean;
 	
 	public function ModelMaker( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean, $addToCount:Boolean = true ) {
-		Log.out( "ModelMaker.constructor ii: " + $ii.toString(), Log.DEBUG );
+		//Log.out( "ModelMaker.constructor ii: " + $ii.toString(), Log.DEBUG );
 		super( $ii );
 		_addToRegionWhenComplete = $addToRegionWhenComplete;
 		_addToCount = $addToCount;

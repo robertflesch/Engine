@@ -410,7 +410,7 @@ public class ModelInfo extends PersistanceObject
 			// So add to cache just adds it to parent instance.
 			//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
 			_childCount++;
-			Log.out( "VoxelModel.childrenLoad - calling load on ii: " + ii + "  childCount: " + _childCount );
+			//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + ii + "  childCount: " + _childCount );
 			ModelMakerBase.load( ii, true, false );
 		}
 		//Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
@@ -424,9 +424,9 @@ public class ModelInfo extends PersistanceObject
 	protected function onChildAdded( me:ModelEvent ):void {
 		if ( me.vm && me.vm.instanceInfo.controllingModel && me.vm.instanceInfo.controllingModel.modelInfo.guid == guid ) {
 			_childCount--;
-			Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children remaining: " + _childCount, Log.WARN );
+			//Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children remaining: " + _childCount, Log.WARN );
 			if (0 == _childCount) {
-				Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children COMPLETE", Log.WARN );
+				//Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children COMPLETE", Log.WARN );
 				ModelEvent.removeListener(ModelEvent.CHILD_MODEL_ADDED, onChildAdded);
 				childrenLoaded = true;
 				ModelLoadingEvent.dispatch(new ModelLoadingEvent(ModelLoadingEvent.CHILD_LOADING_COMPLETE, guid));

@@ -60,7 +60,7 @@ public class OxelPersistanceCache
 			_loadingCount--;
 			OxelDataEvent.create( ModelBaseEvent.ADDED, $series, $od.guid, $od );
 			if ( 0 == _loadingCount ) {
-				Log.out( "OxelPersistanceCache.add - done loading oxels: " + $od.guid, Log.WARN );
+				//Log.out( "OxelPersistanceCache.add - done loading oxels: " + $od.guid, Log.WARN );
 				// So does the loading of the VoxelModel or oxel complete region?
 				//RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
 			}

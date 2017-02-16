@@ -927,7 +927,7 @@ public class VoxelModel
 		
 		if ( false == modelInfo.childrenLoaded )
 			modelInfo.childAdd( $childModel );
-		else	
+		else
 			if ( metadata.permissions.modify )
 				modelInfo.childAdd( $childModel )
 	}
@@ -1047,12 +1047,12 @@ public class VoxelModel
 						else if (0 < cm.modelInfo.childVoxelModels.length) {
 							//Log.out( "VoxelModel.stateSet - addAnimationsInChildren - looking in children of child for: " + $at.attachmentName );
 							resultChildren = resultChildren && addAnimationsInChildren(cm.modelInfo.childVoxelModels, $at, $scale);
-							if ( false == resultChildren )
-								Log.out("VoxelModel.addAnimationsInChildren - FALSE");
+							//if ( false == resultChildren )
+							//	Log.out("VoxelModel.addAnimationsInChildren - FALSE");
 						}
 					}
 					else {
-						Log.out("VoxelModel.addAnimationsInChildren - FALSE");
+						//Log.out("VoxelModel.addAnimationsInChildren - FALSE");
 						resultChildren = false;
 					}
 				}
