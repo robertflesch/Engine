@@ -180,7 +180,8 @@ public class Animation extends PersistanceObject
 			Log.out( "Animation.save - NOT Saving INVALID GUID: " + guid, Log.WARN );
 			return;
 		}
-		super.save();
+		if ( changed )
+			super.save();
 	}
 	
 	override protected function toObject():void {

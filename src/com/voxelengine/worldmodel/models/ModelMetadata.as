@@ -7,7 +7,11 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.Globals;
 import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.utils.JSONUtil;
+
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.JPEGEncoderOptions;
@@ -115,24 +119,17 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	}
 
 	override public function save():void {
-		if ( Globals.isGuid( guid ) )
-			return super.save();
-		
-		Log.out( "ModelMetadata.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
+		if ( changed ) {
+			if ( Globals.isGuid( guid ) )
+				super.save();
+			else
+				Log.out( "ModelMetadata.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
+		}
 	}
 	
 	//////////////////////////////////////////////////////////////////
 	// Persistance
 	//////////////////////////////////////////////////////////////////
-	override protected function toObject():void {
-		//Log.out( "ModelMetadata.toObject", Log.WARN );
-		if ( thumbnail )
-			info.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() ); 
-		else
-			info.thumbnail = null;
-	}
-	
-
 	// These two functions are slighting different in that the import uses
 	// $dbo.data
 	// and the read direct from persistance uses
@@ -160,6 +157,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	}
 	
 	private function loadFromInfo( $mm:ModelMetadata ):void {
+
 		// the permission object is just an encapsulation of the permissions section of the object
 		_permissions = new PermissionsBase( info );
 		
@@ -179,8 +177,39 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 			_thumbnailLoaded = true;
 			ModelMetadataEvent.create( ModelMetadataEvent.BITMAP_LOADED, 0, guid, $mm );
 		}
+    }
+
+
+    override protected function toObject():void {
+		//Log.out( "ModelMetadata.toObject", Log.WARN );
+		if ( thumbnail )
+			info.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() );
+		else
+			info.thumbnail = null;
 	}
-	
+
+
+	public function cloneNew( $guid:String ):ModelMetadata {
+		toObject();
+
+		var metadata:ModelMetadata = new ModelMetadata( Globals.getUID() );
+		var newObj:Object = ModelMetadata.newObject()
+		metadata.fromObjectImport( newObj );
+trace( info );
+/*
+		// This is an easy way to copy the structure, probably not the best.
+		var objData:Object = JSON.parse( JSON.stringify( info ) );
+
+		var newModelMetadata:ModelMetadata = new ModelMetadata( $guid );
+		// this gets new persistance record
+		var newObj:Object = ModelMetadata.newObject();
+		newObj.data = objData;
+		newModelMetadata.fromObject( newObj as DatabaseObject );
+		newModelMetadata.description = description + " - Cloned";
+		newModelMetadata.owner = Network.userId;*/
+		return metadata;
+	}
+
 	override public function clone( $newGuid:String ):* {
 		toObject();
 		var oldName:String = info.name;

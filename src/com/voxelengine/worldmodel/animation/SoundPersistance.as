@@ -54,7 +54,8 @@ public class SoundPersistance extends PersistanceObject
 				//Log.out( "SoundPersistance.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN )
 				return
 		}
-		super.save()
+		if ( changed )
+			super.save()
 	}
 	
 	override protected function toObject():void {

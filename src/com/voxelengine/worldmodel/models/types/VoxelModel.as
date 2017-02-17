@@ -186,17 +186,18 @@ public class VoxelModel
 	private function oxelDataRetrieved(e:OxelDataEvent):void {
 		if ( e.modelGuid == modelInfo.guid ) {
 			OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FAILED, oxelDataRetrievedFailed );
 			calculateCenter()
 		}
 	}
 
 	private function oxelDataRetrievedFailed(e:OxelDataEvent):void {
 		if ( e.modelGuid == modelInfo.guid ) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FAILED, oxelDataRetrieved );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FAILED, oxelDataRetrievedFailed );
 			dead = true;
 			// TODO need to change model picture to BROKEN, or just totally delete it.
 			Log.out("VoxelModel.oxelDataRetrievedFailed - Error reading OXEL data guid: " + modelInfo.guid, Log.ERROR);
-
 		}
 	}
 

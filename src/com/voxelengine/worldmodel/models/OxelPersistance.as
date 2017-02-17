@@ -13,6 +13,7 @@ import com.voxelengine.pools.LightInfoPool;
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.utils.ByteArray;
+import flash.utils.ByteArray;
 import flash.utils.getTimer;
 
 import playerio.DatabaseObject;
@@ -169,7 +170,8 @@ public class OxelPersistance extends PersistanceObject
 				return;
 		}
 		//Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.DEBUG );
-		super.save();
+		if ( changed )
+			super.save();
 	}
 
 	override public function set changed(value:Boolean):void {
@@ -358,6 +360,19 @@ public class OxelPersistance extends PersistanceObject
 
 	public function set version(value:int):void {
 		_version = value;
+	}
+
+	public function cloneNew( $guid:String ):OxelPersistance {
+		// this adds the version header, need for the persistanceEvent
+		var ba:ByteArray = toByteArray( oxel );
+
+		var od:OxelPersistance = new OxelPersistance( $guid, Lighting.defaultBaseLightIllumination );
+		var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_OXEL_DATA, "0", "0", 0, true, null );
+		dbo.data = new Object();
+		dbo.data.ba = ba;
+		od.fromObjectImport( dbo );
+
+		return od;
 	}
 }
 }

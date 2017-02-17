@@ -87,10 +87,10 @@ public class PersistanceObject
 	protected function toObject():void { }
 	
 	public function save():void {
-		var name:String = getQualifiedClassName( this )
-		if ( Globals.online && changed && !dynamicObj ) {
+		if ( Globals.online && !dynamicObj ) {
 			changed = false;
-//			Log.out( name + ".save - Saving to guid: " + guid  + " in table: " + table, Log.DEBUG );
+			var name:String = getQualifiedClassName( this );
+			Log.out( name + ".save - Saving to guid: " + guid  + " in table: " + table, Log.DEBUG );
 			addSaveEvents();
 			toObject();
 			if ( info && info.changed )

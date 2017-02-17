@@ -155,8 +155,9 @@ public class Ammo extends PersistanceObject
 			Log.out( "Ammo.save - sounds not guids:" + guid + " impactSound: " + impactSound + " launchSound: " + launchSound  )
 			return
 		}
-		saving = true	
-		super.save();
+		saving = true;
+		if ( changed )
+			super.save();
 	}
 
 	// Only attributes that need additional handling go here.

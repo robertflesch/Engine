@@ -159,7 +159,6 @@ public class ModelMakerImport extends ModelMakerBase {
 				if ( false == modelInfo.childrenLoaded ){ // its true if they are loaded or the model has no children.
 					waitForChildren = true;
 					ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
-
 				}
 			}
 		}

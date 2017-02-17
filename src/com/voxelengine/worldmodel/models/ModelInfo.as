@@ -583,11 +583,16 @@ public class ModelInfo extends PersistanceObject
 	public function set biomes(value:Biomes):void  					{ _biomes = value; }
 	
 	override public function save():void {
-		if ( Globals.isGuid( guid ) ) {
-			if (  true == animationsLoaded && true == childrenLoaded )
-				super.save();
-			else
-				Log.out( "ModelInfo.save - NOT Saving ModelInfo: " + guid  + " NEED Animations or children to complete", Log.WARN );
+		if ( changed ) {
+			if ( !Globals.isGuid( guid ) ) {
+				Log.out( "ModelInfo.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
+			}
+			else {
+				if (true == animationsLoaded && true == childrenLoaded)
+					super.save();
+				else
+					Log.out("ModelInfo.save - NOT Saving guid: " + guid + " NEED Animations or children to complete", Log.WARN);
+			}
 			
 			if ( _data )
 				_data.save();	
@@ -737,18 +742,32 @@ public class ModelInfo extends PersistanceObject
 	//  end persistance functions
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
+	public function cloneNew( $guid:String ):ModelInfo {
+		toObject();
+		var oldObj:String = JSON.stringify( info );
+		var newObj:Object = JSON.parse(oldObj);
+		// also need to clone the oxel
+		var newModelInfo:ModelInfo = new ModelInfo( $guid );
+		//var newObj:Object = ModelMetadata.newObject();
+		newModelInfo.fromObjectImport( newObj );
+
+		newModelInfo.data = data.cloneNew( $guid );
+
+		return newModelInfo;
+	}
+
 	override public function clone( $guid:String ):* {
-		toObject()
+		toObject();
 		var oldObj:String = JSON.stringify( info )
-		
+
 		var pe:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.MODEL_INFO_EXT, $guid, null, oldObj )
 		PersistanceEvent.dispatch( pe )
-		
+
 		// also need to clone the oxel
-		
+
 		// this adds the version header, need for the persistanceEvent
 		var ba:ByteArray = OxelPersistance.toByteArray( data.oxel );
-		
+
 		var ope:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $guid, null, ba )
 		PersistanceEvent.dispatch( ope )
 	}

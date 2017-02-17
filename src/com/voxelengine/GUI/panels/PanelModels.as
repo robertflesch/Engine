@@ -190,8 +190,8 @@ public class PanelModels extends PanelBase
 			_dupButton.y = 75;
 			_dupButton.x = 2;
 			_dupButton.width = width - 10;
-			_dupButton.enabled = true;
-			_dupButton.active = true;
+			_dupButton.enabled = false;
+			_dupButton.active = false;
 			_dupButton.eventCollector.addEvent( _dupButton, UIMouseEvent.CLICK, dupModel );
 			_dupButton.width = btnWidth;
 			_buttonContainer.addElement( _dupButton );
@@ -322,6 +322,10 @@ public class PanelModels extends PanelBase
 		_detailButton.active = false;
 		_deleteButton.enabled = false;
 		_deleteButton.active = false;
+		if ( _dupButton ) {
+			_dupButton.enabled = false;
+			_dupButton.active = false;
+		}
 	}
 	
 	private function buttonsEnable():void {
@@ -329,6 +333,10 @@ public class PanelModels extends PanelBase
 		_detailButton.active = true;
 		_deleteButton.enabled = true;
 		_deleteButton.active = true;
+		if ( _dupButton ) {
+			_dupButton.enabled = true;
+			_dupButton.active = true;
+		}
 	}
 	
 	private function noModelSelected():void	{

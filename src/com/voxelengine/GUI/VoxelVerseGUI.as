@@ -283,7 +283,6 @@ public class VoxelVerseGUI extends EventDispatcher
 		UIManager.initialize( Globals.g_app.stage );
 		UIManager.debugger = new FDTrace();
 		RegionEvent.addListener( RegionEvent.LOAD_BEGUN, onRegionLoadingComplete );
-		LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 		ModelEvent.addListener( ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
 		LoginEvent.addListener(LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
 		RoomEvent.addListener(RoomEvent.ROOM_JOIN_FAILURE, joinRoomFailureHandler );
@@ -317,13 +316,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		else
 			new WindowLogin( "", "" );
 
-	}
-	
-	private function onModelLoadingComplete(event : LoadingEvent ) : void {
-		//Log.out( "VVGui.onModelLoadingComplete" );
-		LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onModelLoadingComplete );
 		addKeyboardListeners();
-		
 	}
 	
 	private function onKeyPressed( e : KeyboardEvent) : void {
