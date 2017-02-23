@@ -127,8 +127,8 @@ import com.voxelengine.worldmodel.Light;
 			// TODO need to be able to handle an array of scipts.
 			//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { ii.scriptName = $e.target.text; }, ii.scriptName, WIDTH ) );
 			const GRAINS_PER_METER:int = 16;
-			if ( $vm.modelInfo.data && $vm.modelInfo.data.oxel )
-				addElement( new ComponentLabel( "Size in Meters", String( $vm.modelInfo.data.oxel.gc.size()/GRAINS_PER_METER ), WIDTH ) );
+			if ( $vm.modelInfo.oxelPersistance && $vm.modelInfo.oxelPersistance.oxel )
+				addElement( new ComponentLabel( "Size in Meters", String( $vm.modelInfo.oxelPersistance.oxel.gc.size()/GRAINS_PER_METER ), WIDTH ) );
 			else
 				addElement( new ComponentLabel( "Size in Meters", "Unknown", WIDTH ) );
 
@@ -194,10 +194,10 @@ import com.voxelengine.worldmodel.Light;
 		}
 		
 		private function changeBaseLightLevel( $e:UIMouseEvent ):void  {
-			if ( _vm.modelInfo.data && _vm.modelInfo.data.oxel ) {
-				var oxel:Oxel = _vm.modelInfo.data.oxel;
+			if ( _vm.modelInfo.oxelPersistance && _vm.modelInfo.oxelPersistance.oxel ) {
+				var oxel:Oxel = _vm.modelInfo.oxelPersistance.oxel;
 				_vm.applyBaseLightLevel();
-				_vm.modelInfo.data.changed = true;
+				_vm.modelInfo.oxelPersistance.changed = true;
 				_vm.modelInfo.save();
 			}
 		}

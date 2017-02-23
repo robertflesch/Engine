@@ -1,5 +1,5 @@
 /*==============================================================================
-Copyright 2011-2016 Robert Flesch
+Copyright 2011-2017 Robert Flesch
 All rights reserved.  This product contains computer programs, screen
 displays and printed documentation which are original works of
 authorship protected under United States Copyright Act.
@@ -276,7 +276,7 @@ public class VoxelVerse extends Sprite
 	private static function dispatchSaves():void {
 		//Log.out( "VoxelVerse.dispatchSaves", Log.WARN )
 		if ( Region.currentRegion )
-			RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid ) );
+			RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );
 		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.SAVE, 0, null, null, null ) );
 		var vm:VoxelModel = VoxelModel.controlledModel;
 		if ( null != vm && vm.instanceInfo ) {

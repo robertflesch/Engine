@@ -28,24 +28,24 @@ import com.voxelengine.worldmodel.models.PersistanceObject;
 public class Ammo extends PersistanceObject
 {
 	private var saving:Boolean
-	public function get name():String  				{ return info.name; }
-	public function get type():int  				{ return info.type; }
-	public function set type(val:int):void			{ info.type = val; }
-	public function get count():int  				{ return info.count; }
-	public function set count(val:int):void			{ info.count = val; }
-	public function get grain():int 				{ return info.grain; }
-	public function set grain(val:int):void 		{ info.grain = val; }
-	public function get accuracy():Number 			{ return info.accuracy; }
-	public function set accuracy(val:Number):void 	{ info.accuracy = val; }
-	public function get velocity():Number 			{ return info.velocity; }
-	public function set velocity(val:Number):void 	{ info.velocity = val; }
-	public function get life():Number 				{ return info.life; }
-	public function set life(val:Number):void 		{ info.life = val; }
-	public function get launchSound():String  		{ return info.launchSound; }
-	public function get impactSound():String  		{ return info.impactSound; }
-	public function get contactScript():String  	{ return info.contactScript; }
-	public function get model():String 				{ return info.model; }
-	public function get oxelType():int 				{ return info.oxelType; }
+	public function get name():String  				{ return dbo.name; }
+	public function get type():int  				{ return dbo.type; }
+	public function set type(val:int):void			{ dbo.type = val; }
+	public function get count():int  				{ return dbo.count; }
+	public function set count(val:int):void			{ dbo.count = val; }
+	public function get grain():int 				{ return dbo.grain; }
+	public function set grain(val:int):void 		{ dbo.grain = val; }
+	public function get accuracy():Number 			{ return dbo.accuracy; }
+	public function set accuracy(val:Number):void 	{ dbo.accuracy = val; }
+	public function get velocity():Number 			{ return dbo.velocity; }
+	public function set velocity(val:Number):void 	{ dbo.velocity = val; }
+	public function get life():Number 				{ return dbo.life; }
+	public function set life(val:Number):void 		{ dbo.life = val; }
+	public function get launchSound():String  		{ return dbo.launchSound; }
+	public function get impactSound():String  		{ return dbo.impactSound; }
+	public function get contactScript():String  	{ return dbo.contactScript; }
+	public function get model():String 				{ return dbo.model; }
+	public function get oxelType():int 				{ return dbo.oxelType; }
 	
 	public function Ammo( $name:String ) {
 		super( $name, Globals.BIGDB_TABLE_AMMO );
@@ -113,9 +113,8 @@ public class Ammo extends PersistanceObject
 	////////////////////////////////////////////////////////////////
 	public function fromObjectImport( $dbo:DatabaseObject ):void {
 		dbo = $dbo;
-		// The data is needed the first time it saves the object from import, after that it goes away
-		if ( !dbo.data || !dbo.data.ammo ) {
-			Log.out( "Ammo.fromObjectImport - Failed test !dbo.data || !dbo.data.ammo dbo: " + JSON.stringify( dbo ), Log.ERROR );
+		if ( !dbo.ammo ) {
+			Log.out( "Ammo.fromObjectImport - Failed test !dbo.oxelPersistance.ammo dbo: " + JSON.stringify( dbo ), Log.ERROR );
 			return;
 		}
 		
@@ -124,19 +123,18 @@ public class Ammo extends PersistanceObject
 		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, endSaving )
 		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, endSaving )
 		
-		info = $dbo.data.ammo;
-		guid = $dbo.data.ammo.key;
+		guid = $dbo.key;
 		loadFromInfo();
 	}
 	
 	public function fromObject( $dbo:DatabaseObject ):void {
 		dbo = $dbo;
 		if ( !dbo.ammo ) {
-			Log.out( "Ammo.fromObject - Failed test !dbo.data  dbo: " + JSON.stringify( dbo ), Log.ERROR );
+			Log.out( "Ammo.fromObject - Failed test !dbo.oxelPersistance  dbo: " + JSON.stringify( dbo ), Log.ERROR );
 			return;
 		}
 		
-		info = $dbo.ammo;
+		//info = $dbo.ammo;
 		loadFromInfo();
 	}
 	
@@ -162,49 +160,49 @@ public class Ammo extends PersistanceObject
 
 	// Only attributes that need additional handling go here.
 	public function loadFromInfo():void {
-		if ( !info.type )
-			info.type = 1;
-		if ( !info.count )
-			info.count = 1;
-		if ( !info.grain )
-			info.grain = 2;
-		if ( !info.accuracy )
-			info.accuracy = 0.1;
-		if ( !info.velocity )
-			info.velocity = 200;
-		if ( !info.life )
-			info.life = 5;
+		if ( !dbo.type )
+			dbo.type = 1;
+		if ( !dbo.count )
+			dbo.count = 1;
+		if ( !dbo.grain )
+			dbo.grain = 2;
+		if ( !dbo.accuracy )
+			dbo.accuracy = 0.1;
+		if ( !dbo.velocity )
+			dbo.velocity = 200;
+		if ( !dbo.life )
+			dbo.life = 5;
 		
-		if ( !info.model )
-			info.model = "CannonBall";
+		if ( !dbo.model )
+			dbo.model = "CannonBall";
 			
-		if ( info.oxelType ) {
-			if ( info.oxelType is String )
-				info.oxelType = TypeInfo.getTypeId( info.oxelType );
+		if ( dbo.oxelType ) {
+			if ( dbo.oxelType is String )
+				dbo.oxelType = TypeInfo.getTypeId( dbo.oxelType );
 		}
 		else
-			info.oxelType = TypeInfo.STEEL;
+			dbo.oxelType = TypeInfo.STEEL;
 			
-		if ( !info.contactScript )
-			info.contactScript = "";
+		if ( !dbo.contactScript )
+			dbo.contactScript = "";
 
 			
-		if ( !info.launchSound )
-			info.launchSound = "Cannon";
-		if ( !Globals.isGuid( info.launchSound ) )
+		if ( !dbo.launchSound )
+			dbo.launchSound = "Cannon";
+		if ( !Globals.isGuid( dbo.launchSound ) )
 			SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, updateSoundGuid )		
 		
-		if ( !info.impactSound )
-			info.impactSound = "CannonBallExploding";
+		if ( !dbo.impactSound )
+			dbo.impactSound = "CannonBallExploding";
 			
-		if ( !Globals.isGuid( info.impactSound ) || !Globals.isGuid( info.launchSound ) ) {
+		if ( !Globals.isGuid( dbo.impactSound ) || !Globals.isGuid( dbo.launchSound ) ) {
 			SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, updateSoundGuid )		
 			SoundEvent.addListener( ModelBaseEvent.ADDED, verifySoundData )
 			SoundEvent.addListener( ModelBaseEvent.RESULT, verifySoundData )
 		}
 			
-		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, info.launchSound, null, Globals.isGuid( info.launchSound ) ? true : false ) )
-		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, info.impactSound, null, Globals.isGuid( info.impactSound ) ? true : false ) )
+		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, dbo.launchSound, null, Globals.isGuid( dbo.launchSound ) ? true : false ) )
+		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, dbo.impactSound, null, Globals.isGuid( dbo.impactSound ) ? true : false ) )
 
 		//ModelLoader.modelInfoFindOrCreate( _model, null, false );
 		//ModelLoader.modelInfoFindOrCreate( _model, _model, false );
@@ -217,18 +215,18 @@ public class Ammo extends PersistanceObject
 		const newGuid:String = guidArray[1];
 
 		Log.out( "Ammo.updateSoundGuid: " + guid 
-		       + " ammo name: " + $se.snd.info.name 
+		       + " ammo name: " + $se.snd.dbo.name 
 			   + " ammo old guid: " + oldGuid 
 			   + " ammo new guid: " + newGuid 
 			   + " impactSound: " + impactSound 
 			   + " launchSound: " + launchSound  )
 		
-		if ( info.impactSound == oldGuid ) {
-			info.impactSound = newGuid
+		if ( dbo.impactSound == oldGuid ) {
+			dbo.impactSound = newGuid
 			changed = true
 		}
-		if ( info.launchSound == oldGuid ) {
-			info.launchSound = newGuid
+		if ( dbo.launchSound == oldGuid ) {
+			dbo.launchSound = newGuid
 			changed = true
 		}
 		
@@ -238,16 +236,16 @@ public class Ammo extends PersistanceObject
 	
 	private function verifySoundData( $se:SoundEvent ):void {
 		Log.out( "Ammo.verifySoundData: " + guid 
-		       + " ammo name: " + $se.snd.info.name 
+		       + " ammo name: " + $se.snd.dbo.name 
 			   + " ammo guid: " + $se.snd.guid 
 			   + " impactSound: " + impactSound 
 			   + " launchSound: " + launchSound  )
-		if ( info.launchSound == $se.snd.info.name ) {
-			info.launchSound = $se.snd.guid
+		if ( dbo.launchSound == $se.snd.dbo.name ) {
+			dbo.launchSound = $se.snd.guid
 			changed = true
 		}
-		if ( info.impactSound == $se.snd.info.name ) {
-			info.impactSound = $se.snd.guid
+		if ( dbo.impactSound == $se.snd.dbo.name ) {
+			dbo.impactSound = $se.snd.guid
 			changed = true
 		}
 		if ( changed )
@@ -256,19 +254,19 @@ public class Ammo extends PersistanceObject
 
 	// Only attributes that need additional handling go here.
 	public function createDefault():void {
-		info = new Object();
-		info.name = "Blank";
-		info.type = 1;
-		info.count = 1;
-		info.grain = 2;
-		info.accuracy = 0.1;
-		info.velocity = 200;
-		info.life = 5;
-		info.model = "CannonBall";
-		info.oxelType = TypeInfo.STEEL;
-		info.contactScript = "";
-		info.launchSound = "";
-		info.impactSound = "";
+		//dbo = new Object();
+		dbo.name = "Blank";
+		dbo.type = 1;
+		dbo.count = 1;
+		dbo.grain = 2;
+		dbo.accuracy = 0.1;
+		dbo.velocity = 200;
+		dbo.life = 5;
+		dbo.model = "CannonBall";
+		dbo.oxelType = TypeInfo.STEEL;
+		dbo.contactScript = "";
+		dbo.launchSound = "";
+		dbo.impactSound = "";
 	}
 	
 		
@@ -281,9 +279,9 @@ public class Ammo extends PersistanceObject
 		
 		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, 	createdHandler ); 			
 		// update the dbo with the saved version
-		var oldInfo:Object = info
+//		var oldInfo:Object = info
 		dbo = $pe.dbo
-		dbo.ammo = oldInfo
+//		dbo.ammo = oldInfo
 		Log.out( "Ammo.createdHandler: " + guid )
 		saving = false;
 	}	

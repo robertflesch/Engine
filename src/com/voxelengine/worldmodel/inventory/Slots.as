@@ -46,7 +46,7 @@ public class Slots
 	}
 	
 	public function slotChange(e:InventorySlotEvent):void {
-		Log.out( "SlotsManager.slotChange slot: " + e.slotId + "  item: " + e.data );
+		Log.out( "Slots.slotChange slot: " + e.slotId + "  item: " + e.data );
 		if ( _owner.guid == e.ownerGuid ) {
 			if ( _items ) {
 				if ( null == e.data )
@@ -56,9 +56,9 @@ public class Slots
 				_owner.changed = true;
 			}
 			else
-				Log.out( "SlotsManager.slotChange _slots container not initialized", Log.WARN );
+				Log.out( "Slots.slotChange _slots container not initialized", Log.WARN );
 
-			_owner.save();
+			//_owner.save();
 		}
 	}
 	
@@ -82,7 +82,24 @@ public class Slots
 		
 		return new ObjectInfo( null, ObjectInfo.OBJECTINFO_INVALID );
 	}
-	
+
+	import flash.utils.getQualifiedClassName;
+	public function addSlotDefaultData():void {
+		Log.out( "Slots.addSlotDefaultData", Log.WARN );
+		initializeSlots();
+
+		// is guid model OR instance?
+		// its the MODEL guid, since models have default oxelPersistance, instances have specific oxelPersistance
+		// so this message is handle by the model class.
+		// might need to be a table driven event also.
+		// so the default oxelPersistance is in the "class inventory" table
+		_owner.loaded = true;
+		InventorySlotEvent.create( InventorySlotEvent.DEFAULT_REQUEST, _owner.guid, _owner.guid, 0, null );
+	}
+
+
+
+
 	public function fromObject( $info:Object ):void {	
 		if ( $info && $info.slot0 ) {
 			var index:int;
@@ -97,11 +114,9 @@ public class Slots
 			setItemData( index, createObjectFromInventoryString( $info.slot8, index++ ) );
 			setItemData( index, createObjectFromInventoryString( $info.slot9, index++ ) );
 		}
-		else {
-			addSlotDefaultData();		
-		}
 	}
-	
+
+
 	public function toObject( $info:Object ):void {
 		$info.slot0	= _items[0].asInventoryString();
 		$info.slot1	= _items[1].asInventoryString();
@@ -142,21 +157,6 @@ public class Slots
 		}
 		return -1;
 	}
-	
-	import flash.utils.getQualifiedClassName;
-	public function addSlotDefaultData():void {
-		Log.out( "Slots.addSlotDefaultData", Log.WARN );
-		initializeSlots();
-		
-		// is guid model OR instance?
-		// its the MODEL guid, since models have default data, instances have specific data
-		// so this message is handle by the model class.
-		// might need to be a table driven event also.
-		// so the default data is in the "class inventory" table
-		_owner.loaded = true;
-		InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.DEFAULT_REQUEST, _owner.guid, _owner.guid, 0, null ) );
-	}
-	
 	
 	static private function pickToolSlots():void {
 		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.DELETE_OXEL ) );

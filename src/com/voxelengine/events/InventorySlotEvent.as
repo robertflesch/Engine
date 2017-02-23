@@ -26,9 +26,9 @@ public class InventorySlotEvent extends Event
 	private var _slotId:int;	  		// Slot that this goes in, -1 for first empty slot
 	private var _data:*;
 	
-	public function InventorySlotEvent( $type:String, $ownerGuid:String, $instanceGuid:String, $slotId:int, $data:*, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function InventorySlotEvent( $type:String, $ownerGuid:String, $instanceGuid:String, $slotId:int, $data:* )
 	{
-		super( $type, $bubbles, $cancellable );
+		super( $type );
 		_ownerGuid = $ownerGuid;
 		_instanceGuid = $instanceGuid;
 		_slotId = $slotId;
@@ -37,7 +37,7 @@ public class InventorySlotEvent extends Event
 	
 	public override function clone():Event
 	{
-		return new InventorySlotEvent( type, _ownerGuid, _instanceGuid, _slotId, _data, bubbles, cancelable);
+		return new InventorySlotEvent( type, _ownerGuid, _instanceGuid, _slotId, _data );
 	}
    
 	public override function toString():String
@@ -63,8 +63,8 @@ public class InventorySlotEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:InventorySlotEvent ) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
+	static public function create( $type:String, $ownerGuid:String, $instanceGuid:String, $slotId:int, $data:* ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new InventorySlotEvent( $type, $ownerGuid, $instanceGuid, $slotId, $data ) );
 	}
 
 	///////////////// Event handler interface /////////////////////////////

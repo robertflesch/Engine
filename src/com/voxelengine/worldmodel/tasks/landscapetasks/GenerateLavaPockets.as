@@ -100,7 +100,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var type:int =_layer.type;
 			for (var x:int = 0; x < numberOfTunnels; x++)
             {
-                placeLava( vm.modelInfo.data.oxel, tunnelLength, tunnelRadius, type );
+                placeLava( vm.modelInfo.oxelPersistance.oxel, tunnelLength, tunnelRadius, type );
             }
 			
 

@@ -119,14 +119,14 @@ public class FireProjectileScript extends Script
 		pm.ammo = pe.ammo;
 
 		var grainChange:int = pe.ammo.grain - pm.grain;
-		if ( !pm.modelInfo || !pm.modelInfo.data ) {
-			Log.out( "FireProjectileScript.bulletPool Didnt find !pm.modelInfo || !pm.modelInfo.data" );
+		if ( !pm.modelInfo || !pm.modelInfo.oxelPersistance ) {
+			Log.out( "FireProjectileScript.bulletPool Didnt find !pm.modelInfo || !pm.modelInfo.oxelPersistance" );
 			return;
 		}
 		if ( 0 < grainChange )
 			pm.changeGrainSize( grainChange );
-		if ( pm.modelInfo.data.oxel.type != pe.ammo.oxelType )
-			pm.modelInfo.data.oxel.changeAllButAirToType( pe.ammo.oxelType );
+		if ( pm.modelInfo.oxelPersistance.oxel.type != pe.ammo.oxelType )
+			pm.modelInfo.oxelPersistance.oxel.changeAllButAirToType( pe.ammo.oxelType );
 
 		pm.instanceInfo.positionSet = pe.position;
 //			Log.out( "FireProjectileScript.bulletPool ProjectileEvent: " + pe );

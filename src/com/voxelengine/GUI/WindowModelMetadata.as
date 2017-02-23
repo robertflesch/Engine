@@ -61,8 +61,6 @@ public class WindowModelMetadata extends VVPopup
 		if ( TYPE_IMPORT == windowType ) {
 			//_vmm = new ModelMetadata( $ii.modelGuid );
 			_vmm = new ModelMetadata( $ii.modelGuid );
-			var newObj:Object = ModelMetadata.newObject()
-			_vmm.fromObjectImport( newObj );
 			_vmm.name = $ii.modelGuid;
 			_vmm.description = $ii.modelGuid + "-IMPORTED";
 			_vmm.owner = Network.userId;

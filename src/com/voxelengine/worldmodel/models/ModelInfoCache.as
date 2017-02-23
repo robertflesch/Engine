@@ -32,7 +32,7 @@ import com.voxelengine.utils.StringUtils;
 public class ModelInfoCache
 {
 	// this only loaded ModelInfo from the local files system.
-	// for the online system this information is embedded in the data segment.
+	// for the online system this information is embedded in the oxelPersistance segment.
 	static private var _modelInfo:Dictionary = new Dictionary(false);
 	static private var _block:Block = new Block();
 	
@@ -51,7 +51,7 @@ public class ModelInfoCache
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );
-		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createdHandler ); 
+		//PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createdHandler );
 	}
 	
 	static private function save(e:ModelInfoEvent):void {
@@ -119,7 +119,7 @@ public class ModelInfoCache
 		// And this was called only after the request returned.
 		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
 		if ( mi ) {
-			for each ( var childii:Object in mi.info.model.children ) {
+			for each ( var childii:Object in mi.dbo.children ) {
 				if ( childii && childii.modelGuid ) {
 					// Using the fromTables to handle the recursive flag
 					new ModelDestroyer( childii.modelGuid, $mie.fromTables );		
@@ -128,12 +128,13 @@ public class ModelInfoCache
 		} else 
 			Log.out( "ModelInfoCache.deleteRecursive - ModelInfo not found $mie" + $mie, Log.ERROR )
 		
-		// Now delete the parents data
+		// Now delete the parents oxelPersistance
 		ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 		OxelDataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
 	}
-	
+
+
 	static private function generated( $mie:ModelInfoEvent ):void  {
 		add( 0, $mie.vmi );
 	}
@@ -182,59 +183,69 @@ public class ModelInfoCache
 		//Log.out( "ModelInfoCache.createdHandler: " + $pe.guid );
 		// check for duplicates
 		var mi:ModelInfo = _modelInfo[$pe.guid]; 
-		if ( mi )
-			mi.fromObject( $pe.dbo )
-		else	
-			Log.out( "ModelInfoCache.createdHandler: ERROR modelInfo not found for returned guid: " + $pe.guid, Log.WARN );
+//		if ( mi )
+//			mi.fromObject( $pe.dbo )
+//		else
+//			Log.out( "ModelInfoCache.createdHandler: ERROR modelInfo not found for returned guid: " + $pe.guid, Log.WARN );
 	}
-	
+
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//  Internal Methods
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	static private function add( $series:int, $mi:ModelInfo ):void {
+		if ( null == $mi || null == $mi.guid ) {
+			//Log.out( "ModelInfoCache.add trying to add NULL modelInfo or guid", Log.WARN );
+			return;
+		}
+		// check to make sure is not already there
+		if ( null ==  _modelInfo[$mi.guid] ) {
+			//Log.out( "ModelInfoCache.add modelInfo: " + $mi.toString(), Log.DEBUG );
+			_modelInfo[$mi.guid] = $mi;
+
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $series, $mi.guid, $mi ) );
+		}
+	}
+
 	static private function loadSucceed( $pe:PersistanceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
-		//Log.out( "ModelInfoCache.modelInfoLoadSucceed guid: " + $pe.guid, Log.INFO );
-		// $pe.dbo is valid for loading from persistance, $pe.data is valid on imports
-		if ( $pe.dbo || $pe.data ) {
-			// need to check we don't have this info already
-			var mi:ModelInfo = _modelInfo[$pe.guid]; 
-			if ( null == mi ) {
-				mi = new ModelInfo( $pe.guid );
-				if ( $pe.dbo )
-					mi.fromObject( $pe.dbo );
-				else {
-					var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_INFO, "0", "0", 0, true, null );
-					dbo.data = new Object();
-					// This is for import from local only.
-					var fileData:String = String( $pe.data );
-					fileData = StringUtils.trim(fileData);
-					dbo.data = JSONUtil.parse( fileData, $pe.guid + $pe.table, "ModelInfoCache.loadSucceed" );
-					if ( null == dbo.data ) {
-						Log.out( "ModelInfoCache.loadSucceed - error parsing modelInfo on import. guid: " + $pe.guid, Log.ERROR );
-						ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
-						return;
-					}
-					if ( dbo.data.table )
-						delete dbo.data.table // this is an article from the toObject process used in cloning
-					if ( dbo.data.key )
-						delete dbo.data.key // this is an article from the toObject process used in cloning
-					mi.fromObjectImport( dbo );
-					// On import save it.
-					mi.save();
-				}
-				
-				add( $pe.series, mi );
-				if ( _block.has( $pe.guid ) )
-					_block.clear( $pe.guid )
-			}
-			else {
-				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, mi ) );
-				Log.out( "ModelInfoCache.loadSucceed - attempting to load duplicate ModelInfo guid: " + $pe.guid, Log.WARN );
-			}
+
+		var mi:ModelInfo = _modelInfo[$pe.guid];
+		if ( null != mi ) {
+			// we already have it, publishing this results in dulicate items being sent to inventory window.
+			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, mi ) );
+			Log.out( "ModelInfoCache.loadSucceed - attempting to load duplicate ModelInfo guid: " + $pe.guid, Log.WARN );
+			return;
 		}
-		else {
+
+		if ( $pe.dbo ) {
+			mi = new ModelInfo( $pe.guid, $pe.dbo, null );
+			add( $pe.series, mi );
+		} else if ( $pe.data ) {
+			// need to check we don't have this info already
+			var fileData:String = String( $pe.data );
+			fileData = StringUtils.trim(fileData);
+			var newObjData:Object = JSONUtil.parse( fileData, $pe.guid + $pe.table, "ModelInfoCache.loadSucceed" );
+			if ( null == newObjData ) {
+				Log.out( "ModelInfoCache.loadSucceed - error parsing modelInfo on import. guid: " + $pe.guid, Log.ERROR );
+				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
+				return;
+			}
+            if ( newObjData.model )
+                mi = new ModelInfo( $pe.guid, null, newObjData.model );
+            else
+			    mi = new ModelInfo( $pe.guid, null, newObjData );
+			mi.save();
+
+			add( $pe.series, mi );
+			if ( _block.has( $pe.guid ) )
+				_block.clear( $pe.guid )
+		} else {
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 		}
 	}
-	
+
+
 	static private function loadFailed( $pe:PersistanceEvent ):void {
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
@@ -256,21 +267,5 @@ public class ModelInfoCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End - Persistance Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  Internal Methods
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	static private function add( $series:int, $mi:ModelInfo ):void { 
-		if ( null == $mi || null == $mi.guid ) {
-			//Log.out( "ModelInfoCache.add trying to add NULL modelInfo or guid", Log.WARN );
-			return;
-		}
-		// check to make sure is not already there
-		if ( null ==  _modelInfo[$mi.guid] ) {
-			//Log.out( "ModelInfoCache.add modelInfo: " + $mi.toString(), Log.DEBUG );
-			_modelInfo[$mi.guid] = $mi; 
-			
-			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $series, $mi.guid, $mi ) );
-		}
-	}
 }
 }

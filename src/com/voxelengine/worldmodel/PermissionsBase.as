@@ -34,7 +34,7 @@ public class PermissionsBase
 	static public const BIND_USE:String 		= "BIND_USE";
 	static public const BIND_MODIFY:String 		= "BIND_MODIFY";
 	
-	private var _owner:Object;
+	private var _owner:DatabaseObject;
 	
 	public function get blueprintGuid():String  			{ return _owner.permissions.blueprintGuid; }
 	public function set blueprintGuid(value:String):void 	{ _owner.permissions.blueprintGuid = value; }
@@ -60,23 +60,23 @@ public class PermissionsBase
 	
 	public function get owner():Object 						{ return _owner;}
 	
-	public function PermissionsBase( $owner:Object ) {
-		_owner = $owner
+	public function PermissionsBase( $owner:DatabaseObject ) {
+		_owner = $owner;
 		if ( !_owner.permissions )
-			_owner.permissions = new Object()
+			_owner.permissions = new Object();
 			
 		// If permissions already exist dont reset them.
 		if ( _owner.permissions.createdDate || _owner.permissions.creator )
 			return;
 			
-		_owner.permissions.copyCount 		= COPY_COUNT;
-		_owner.permissions.modify			= true;
-		_owner.permissions.blueprint		= false;
-		_owner.permissions.blueprintGuid	= null;
+		copyCount 							= COPY_COUNT;
+		modify								= true;
+		blueprint							= false;
+		blueprintGuid						= null;
+		modifiedDate						= new Date().toUTCString();
+		binding								= BIND_NONE;
 		_owner.permissions.creator			= Network.userId;
 		_owner.permissions.createdDate		= new Date().toUTCString();
-		_owner.permissions.modifyDate		= new Date().toUTCString();
-		_owner.permissions.binding			= BIND_NONE;
 	}
 }
 }

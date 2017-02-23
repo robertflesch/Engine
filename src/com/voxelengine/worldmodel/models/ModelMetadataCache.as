@@ -185,53 +185,45 @@ public class ModelMetadataCache
 	static private function loadSucceed( $pe:PersistanceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
-		// can have $pe.data if cloning object	
-		if ( $pe.dbo || $pe.data ) {
-			//Log.out( "ModelMetadataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
-			var vmm:ModelMetadata = _metadata[$pe.guid]; 
-			if ( null == vmm ) {
-				vmm = new ModelMetadata( $pe.guid );
-				if ( $pe.dbo )
-					vmm.fromObject( $pe.dbo );
-				else {
-					var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
-					dbo.data = new Object();
-					// This is for cloning existing objects only.
-					var fileData:String = String( $pe.data );
-					fileData = StringUtils.trim(fileData);
-					dbo.data = JSONUtil.parse( fileData, $pe.guid + $pe.table, "ModelMetadataEvent.loadSucceed" );
-					if ( null == dbo.data ) {
-						Log.out( "ModelMetadataCache.loadSucceed - error parsing ModelMetadata on import. guid: " + $pe.guid, Log.ERROR );
-						ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null );
-						return;
-					}
-					if ( dbo.data.thumbnail )
-						dbo.data.thumbnail = null
-					if ( dbo.data.table )
-						delete dbo.data.table // this is an article from the toObject process used in cloning
-					if ( dbo.data.key )
-						delete dbo.data.key // this is an article from the toObject process used in cloning
-					if ( dbo.data.permissions && dbo.data.permissions.blueprint )
-						dbo.data.permissions.blueprint = false
-					if ( dbo.data.permissions )
-						dbo.data.permissions.blueprintGuid = $pe.other
-						
-					vmm.fromObjectImport( dbo );
-					// On import save it.
-					vmm.save();
-				}
-				
-				add( $pe.series, vmm );
-			}
-			else {
-				// we already have it, publishing this results in dulicate items being sent to inventory window.
-				//ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $pe.series, $pe.guid, vmm ) );
-				Log.out( "ModelMetadataCache.loadSucceed - attempting to load duplicate ModelMetadata guid: " + $pe.guid, Log.DEBUG );
-			}
+
+		var vmm:ModelMetadata = _metadata[$pe.guid];
+		if ( null != vmm ) {
+			// we already have it, publishing this results in dulicate items being sent to inventory window.
+			//ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelBaseEvent.RESULT, $pe.series, $pe.guid, vmm ) );
+			Log.out( "ModelMetadataCache.loadSucceed - attempting to load duplicate ModelMetadata guid: " + $pe.guid, Log.WARN );
+			return;
 		}
-		else {
-			Log.out( "ModelMetadataCache.loadSucceed FAILED no DBO PersistanceEvent: " + $pe.toString(), Log.WARN );
+
+		if ( $pe.dbo ) {
+			vmm = new ModelMetadata( $pe.guid, $pe.dbo );
+			add( $pe.series, vmm );
+		} else if ( $pe.data ) {
+ 			// This is for cloning and importing existing objects only.
+			var fileData:String = String( $pe.data );
+			fileData = StringUtils.trim(fileData);
+			var newData:Object = JSONUtil.parse( fileData, $pe.guid + $pe.table, "ModelMetadataEvent.loadSucceed" );
+			if ( null == newData ) {
+				Log.out( "ModelMetadataCache.loadSucceed - error parsing ModelMetadata on import. guid: " + $pe.guid, Log.ERROR );
+				ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null );
+				return;
+			}
+			vmm = new ModelMetadata( $pe.guid, null, newData );
+			// On new object save it.
+//			vmm.save();
+			add( $pe.series, vmm );
+		} else {
+			Log.out( "ModelMetadataCache.loadSucceed NO oxelPersistance or DBO PersistanceEvent: " + $pe.toString(), Log.WARN );
 			ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
+		}
+
+		function merge( obj0:Object, obj1:DatabaseObject ):DatabaseObject
+		{
+			for( var p:String in obj0 )
+			{
+				obj1[ p ] = ( obj1[ p ] != null ) ? obj1[ p ] : obj0[ p ];
+				trace( p, ' : obj0', obj0[ p ], 'obj1', obj1[ p ], '-> new value = ', obj1[ p ] );
+			}
+			return obj1;
 		}
 	}
 	

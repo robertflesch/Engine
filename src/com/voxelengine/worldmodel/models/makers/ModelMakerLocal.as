@@ -41,8 +41,6 @@ public class ModelMakerLocal extends ModelMakerBase {
 	override protected function attemptMake():void {
 		if ( null != modelInfo ) {
 			_modelMetadata = new ModelMetadata( ii.modelGuid );
-			var newObj:Object = ModelMetadata.newObject()
-			_modelMetadata.fromObjectImport( newObj );
 			_modelMetadata.name = modelInfo.guid;
 			_modelMetadata.description = modelInfo.guid + " from local data";
 			var vm:* = make();

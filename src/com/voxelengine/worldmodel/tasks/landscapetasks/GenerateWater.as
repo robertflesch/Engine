@@ -39,7 +39,7 @@ public class GenerateWater extends LandscapeTask
 		if ( vm )
 		{
 			// this gives us a general range
-			var oxel:Oxel = vm.modelInfo.data.oxel;
+			var oxel:Oxel = vm.modelInfo.oxelPersistance.oxel;
 			var rangeInG0:int = oxel.size_in_world_coordinates() * _layer.offset / 100;
 			var gct:GrainCursor = GrainCursorPool.poolGet( oxel.gc.bound );
 			// this finds a g0 at that point

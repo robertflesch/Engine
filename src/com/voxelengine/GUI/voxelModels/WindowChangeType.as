@@ -93,14 +93,14 @@ public class WindowChangeType extends VVPopup
 			li = _cbTo.getItemAt(_cbTo.selectedIndex );
 			var toType:int = li.data;
 			
-			if ( _vm.modelInfo.data && _vm.modelInfo.data.oxel ) {
-				var oxel:Oxel = _vm.modelInfo.data.oxel;
+			if ( _vm.modelInfo.oxelPersistance && _vm.modelInfo.oxelPersistance.oxel ) {
+				var oxel:Oxel = _vm.modelInfo.oxelPersistance.oxel;
 				oxel.changeTypeFromTo( fromType, toType );
-				_vm.modelInfo.data.changed = true
-				_vm.modelInfo.data.save()
+				_vm.modelInfo.oxelPersistance.changed = true
+				_vm.modelInfo.oxelPersistance.save()
 			}
 			else
-				Log.out( "WindowChangeType.change - modelInfo.data.oxel not found for guid: " + _vm.modelInfo.guid, Log.WARN );
+				Log.out( "WindowChangeType.change - modelInfo.oxelPersistance.oxel not found for guid: " + _vm.modelInfo.guid, Log.WARN );
 		}
 	}
 

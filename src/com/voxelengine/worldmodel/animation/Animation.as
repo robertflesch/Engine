@@ -58,13 +58,13 @@ public class Animation extends PersistanceObject
 	public function set permissions( val:PermissionsBase):void	{ _permissions = val; changed = true; }
 	
 	/////////////////
-	public function get name():String { return info.name; }
-	public function set name( $val:String ):void { info.name = $val; }
-	public function get type():String { return info.type; }
-	public function get animationClass():String { return info.animationClass; }
-	public function get description():String { return info.description; }
-	public function set description( $val:String ):void { info.description = $val; }
-	public function get owner():String { return info.owner; }
+	public function get name():String { return dbo.name; }
+	public function set name( $val:String ):void { dbo.name = $val; }
+	public function get type():String { return dbo.type; }
+	public function get animationClass():String { return dbo.animationClass; }
+	public function get description():String { return dbo.description; }
+	public function set description( $val:String ):void { dbo.description = $val; }
+	public function get owner():String { return dbo.owner; }
 	public function get sound():AnimationSound { return _sound; }
 	public function set sound( $val:AnimationSound ):void  { _sound = $val; }
 	override public function set guid( $newGuid:String ):void { 
@@ -105,31 +105,17 @@ public class Animation extends PersistanceObject
 	public function Animation( $guid:String ) {
 		super( $guid, Globals.BIGDB_TABLE_ANIMATIONS );		
 	}
-	/*
-	static public function newObject():Object {
-		var obj:Object = new DatabaseObject( Globals.BIGDB_TABLE_ANIMATIONS, "0", "0", 0, true, null )
-		obj.data = new Object()
-		return obj
-	}
-	
-	override public function clone( $guid:String ):* {
-		// force the data from the dynamic classes into the object
-		toObject()
-		var newAni:Animation = new Animation( $guid )
-		newAni.fromObjectImport( dbo )
-		return newAni
-	}
-	*/
+
 	public function createBackCopy():Object {
 		// force the data from the dynamic classes into the object
 		// this give me an object that holds all of the data for the animation
 		toObject() 
 		var backupInfo:Object = new Object();
-		backupInfo.name 			= String( info.name );
-		backupInfo.description 	= String( info.description );
-		backupInfo.owner 			= String( info.owner )
-		backupInfo.type 			= String( info.type )
-		backupInfo.animationClass 	= String( info.animationClass )
+		backupInfo.name 			= String( dbo.name );
+		backupInfo.description 	= String( dbo.description );
+		backupInfo.owner 			= String( dbo.owner )
+		backupInfo.type 			= String( dbo.type )
+		backupInfo.animationClass 	= String( dbo.animationClass )
 		if ( _sound )
 			backupInfo.sound = _sound.toObject()
 		if ( _transforms && _transforms.length )
@@ -143,11 +129,11 @@ public class Animation extends PersistanceObject
 	public function restoreFromBackup( $info:Object ):void {
 		// if you just assign name, then it shares the same object
 		// we want a new object in this case
-		info.name 			= String( $info.name );
-		info.description 	= String( $info.description );
-		info.owner 			= String( $info.owner )
-		info.type 			= String( $info.type )
-		info.animationClass = String( $info.animationClass )
+		dbo.name 			= String( $info.name );
+		dbo.description 	= String( $info.description );
+		dbo.owner 			= String( $info.owner )
+		dbo.type 			= String( $info.type )
+		dbo.animationClass = String( $info.animationClass )
 		loadFromInfo( $info )
 		changed = false
 	}
@@ -155,24 +141,22 @@ public class Animation extends PersistanceObject
 	public function fromObjectImport( $dbo:DatabaseObject ):void {
 		dbo = $dbo;
 		// The data is needed the first time it saves the object from import, after that it goes away
-		if ( !dbo.data || !dbo.data.animations ) {
-			Log.out( "Animation.fromObjectImport - Failed test !dbo.data || !dbo.data.ani dbo: " + JSON.stringify( dbo ), Log.ERROR );
+		if ( !dbo.animations ) {
+			Log.out( "Animation.fromObjectImport - Failed test dbo.animations dbo: " + JSON.stringify( dbo ), Log.ERROR );
 			return;
 		}
 		
-		info = $dbo.data;
-		loadFromInfo( info );
+		loadFromInfo( dbo );
 	}
 	
 	public function fromObject( $dbo:DatabaseObject ):void {
 		dbo = $dbo;
 		if ( !dbo.animations ) {
-			Log.out( "Animation.fromObject - Failed test !dbo.data  dbo: " + JSON.stringify( dbo ), Log.ERROR );
+			Log.out( "Animation.fromObject - Failed test !dbo.animations dbo: " + JSON.stringify( dbo ), Log.ERROR );
 			return;
 		}
 		
-		info = $dbo;
-		loadFromInfo( info );
+		loadFromInfo( dbo );
 	}
 	
 	override public function save():void {
@@ -185,20 +169,20 @@ public class Animation extends PersistanceObject
 	}
 	
 	override protected function toObject():void {
-		// just use the info as it is at base level
+		// just use the dbo as it is at base level
 		// but need to refresh
 		// permissions?
 		
 		if ( _sound )
-			info.sound = _sound.toObject()
+			dbo.sound = _sound.toObject()
 		if ( _transforms && _transforms.length )
-			info.animations = getAnimations()
+			dbo.animations = getAnimations()
 		if ( _attachments && _attachments.length )
-			info.attachments = getAttachments()
+			dbo.attachments = getAttachments()
 
-		info.clipVelocity = clipVelocity;
+		dbo.clipVelocity = clipVelocity;
 		//Log.out( "Animation.toObject - clipVelocity: " + clipVelocity);
-		info.speedMultiplier = speedMultiplier;
+		dbo.speedMultiplier = speedMultiplier;
 		//Log.out( "Animation.toObject - speedMultiplier: " + speedMultiplier);
 	}
 	
@@ -249,7 +233,7 @@ public class Animation extends PersistanceObject
 			$info.permissions = new Object();
 		
 		// the permission object is just an encapsulation of the permissions section of the object
-		_permissions = new PermissionsBase( $info );
+		_permissions = new PermissionsBase( dbo );
 
 		if ( $info.clipVelocity )
 			clipVelocity = $info.clipVelocity;

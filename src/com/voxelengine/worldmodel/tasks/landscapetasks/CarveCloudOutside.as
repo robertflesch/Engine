@@ -38,16 +38,16 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var masterHeightMap:Array = null;
 			var masterMapSize:uint = 0;
 
-			var size:int = vm.modelInfo.data.oxel.size_in_world_coordinates();
-			var oxel:Oxel = vm.modelInfo.data.oxel;
+			var size:int = vm.modelInfo.oxelPersistance.oxel.size_in_world_coordinates();
+			var oxel:Oxel = vm.modelInfo.oxelPersistance.oxel;
 			masterMapSize = Math.min( size, 1024 );
 			masterHeightMap = NoiseGenerator.generate_height_map( masterMapSize );
 			trace( "CarveCloudOutside - start - generate_height_map took: " + (getTimer() - timer) );		
 			timer = getTimer();
 
 			// range should use up what ever percentage leftover from the offset
-			var offsetInG0:int = _layer.offset * GrainCursor.get_the_g0_size_for_grain(vm.modelInfo.data.oxel.gc.grain) / 100;
-			var remainingRange:int = vm.modelInfo.data.oxel.size_in_world_coordinates() - offsetInG0;
+			var offsetInG0:int = _layer.offset * GrainCursor.get_the_g0_size_for_grain(vm.modelInfo.oxelPersistance.oxel.gc.grain) / 100;
+			var remainingRange:int = vm.modelInfo.oxelPersistance.oxel.size_in_world_coordinates() - offsetInG0;
 			var rangeInG0:int = remainingRange * (_layer.range/100);
 			masterHeightMap = NoiseGenerator.normalize_height_map_for_oxel( masterHeightMap
 																		  , masterMapSize
@@ -55,7 +55,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 																		  , offsetInG0 );
 			
 			
-			var minGrain:int = vm.modelInfo.data.oxel.gc.grain - _layer.optionalInt;
+			var minGrain:int = vm.modelInfo.oxelPersistance.oxel.gc.grain - _layer.optionalInt;
 			var minGrainInG0:int = GrainCursor.get_the_g0_size_for_grain( minGrain );
 			
 			var height:int = 0;
@@ -65,7 +65,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var endY:int = size/minGrainInG0;
 			var endZ:int = size/minGrainInG0;
 			var offset:int = 0;
-			var bound:int = vm.modelInfo.data.oxel.gc.bound;
+			var bound:int = vm.modelInfo.oxelPersistance.oxel.gc.bound;
 			var to:Oxel = Globals.BAD_OXEL;
 			var gct:GrainCursor = GrainCursorPool.poolGet( bound );
 			gct.become_ancestor( minGrain );
@@ -95,7 +95,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 						if ( voxelDistToCenter > heightAdjustedMaxRadius )
 						{
 							GrainCursor.roundToInt( x, y, z, gct );
-							to = vm.modelInfo.data.oxel.childFind( gct );
+							to = vm.modelInfo.oxelPersistance.oxel.childFind( gct );
 							if ( Globals.BAD_OXEL != to )
 								to.write( _modelGuid, gct, TypeInfo.AIR )
 						}

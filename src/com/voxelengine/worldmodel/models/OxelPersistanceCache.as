@@ -131,35 +131,33 @@ public class OxelPersistanceCache
 	static private function loadSucceed( $pe:PersistanceEvent):void {
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
-		if ( $pe.dbo || $pe.data ) {
-			//Log.out( "OxelDataCache.loadSucceed guid: " + $pe.guid, Log.INFO );
-			var od:OxelPersistance = new OxelPersistance( $pe.guid, Lighting.defaultBaseLightIllumination );
-			if ( !$pe.dbo ) {
-				var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_OXEL_DATA, "0", "0", 0, true, null );
-				dbo.data = new Object();
-				dbo.data.ba = $pe.data;
-				od.fromObjectImport( dbo );
-			}
-			else
-				od.fromObject( $pe.dbo );
-				
-			add( $pe.series, od );
+
+		var op:OxelPersistance = _oxelDataDic[$pe.guid];
+		if ( null != op ) {
+			// we already have it, publishing this results in dulicate items being sent to inventory window.
+			OxelDataEvent.create( ModelBaseEvent.ADDED, $pe.series, $pe.guid, op );
+			Log.out( "OxelPersistanceCache.loadSucceed - attempting to load duplicate OxelPersistance guid: " + $pe.guid, Log.WARN );
+			return;
 		}
-		else {
+
+		var od:OxelPersistance;
+		if ( $pe.dbo ) {
+			od = new OxelPersistance( $pe.guid, $pe.dbo, null, Lighting.defaultBaseLightIllumination );
+			add( $pe.series, od );
+		} else if ( $pe.data ) {
+			od = new OxelPersistance( $pe.guid, null, $pe.data as ByteArray, Lighting.defaultBaseLightIllumination );
+			add( $pe.series, od );
+		} else {
 			Log.out( "OxelDataCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.WARN );
 			OxelDataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 		}
 	}
 
+	// This is the same as load succeed.
 	static private function generateSucceed( $pe:PersistanceEvent):void {
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
-		var od:OxelPersistance = new OxelPersistance( $pe.guid, Lighting.defaultBaseLightIllumination );
-		var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_OXEL_DATA, "0", "0", 0, true, null );
-		dbo.data = new Object();
-		dbo.data.ba = $pe.data;
-		od.fromObjectImport( dbo );
-		od.fromByteArray();
+		var od:OxelPersistance = new OxelPersistance( $pe.guid, null, $pe.data, Lighting.defaultBaseLightIllumination );
 		add( $pe.series, od );
 		Log.out( "OxelDataCache.generateSucceed " + $pe.toString(), Log.INFO );
 	}

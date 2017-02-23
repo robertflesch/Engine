@@ -39,8 +39,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var masterHeightMap:Array = null;
 			var masterMapSize:uint = 0;
 
-			var size:int = vm.modelInfo.data.oxel.size_in_world_coordinates();
-			var oxel:Oxel = vm.modelInfo.data.oxel;
+			var size:int = vm.modelInfo.oxelPersistance.oxel.size_in_world_coordinates();
+			var oxel:Oxel = vm.modelInfo.oxelPersistance.oxel;
 			masterMapSize = Math.min( size, 1024 );
 			masterHeightMap = NoiseGenerator.generate_height_map( masterMapSize );
 			trace( "CarveOutsideSurface - start - generate_height_map took: " + (getTimer() - timer) );		

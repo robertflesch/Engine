@@ -257,7 +257,7 @@ package com.voxelengine.worldmodel.models
 
 		static public function sphereCollideWithModels( $testObject:VoxelModel ):Vector.<VoxelModel> {
 			var scenter:Vector3D = $testObject.modelToWorld( $testObject.instanceInfo.center );
-			var radius:int = $testObject.modelInfo.data.oxel.gc.size() / 8; //2
+			var radius:int = $testObject.modelInfo.oxelPersistance.oxel.gc.size() / 8; //2
 			var collidingModels:Vector.<VoxelModel> = new Vector.<VoxelModel>;
 			var models:Vector.<VoxelModel> = Region.currentRegion.modelCache.models;
 			for each ( var vm:VoxelModel in models )
@@ -285,7 +285,7 @@ package com.voxelengine.worldmodel.models
 					var wsCenterPointOfModel:Vector3D = cm.instanceInfo.worldSpaceMatrix.transformVector( cm.camera.current.position );
 
 					var msp:Vector3D = vm.worldToModel( wsCenterPointOfModel );
-					// RSF 9.13/13 - Verify that vm.modelInfo.data.oxel.gc.grain is correct value to pass in.
+					// RSF 9.13/13 - Verify that vm.modelInfo.oxelPersistance.oxel.gc.grain is correct value to pass in.
 					result = vm.isPassable( msp.x, msp.y, msp.z, vm.grain );
 					
 					// If any result fails, position is invalid, restore last position
@@ -303,7 +303,7 @@ package com.voxelengine.worldmodel.models
 			const numOfCorners:int = 8;
 			var points:Vector.<Vector3D> = new Vector.<Vector3D>(numOfCorners, true);
 			var scratch:Vector3D = new Vector3D();
-			var size:int = vm.modelInfo.data.oxel.gc.size()
+			var size:int = vm.modelInfo.oxelPersistance.oxel.gc.size()
 			
 			var origin:Vector3D = vm.worldToModel( vm.instanceInfo.positionGet );
 			points[0] = vm.modelToWorld( origin );
@@ -332,7 +332,7 @@ package com.voxelengine.worldmodel.models
 					for each ( var cpoint:Vector3D in points )
 					{
 						testPoint = instance.worldToModel( cpoint );
-						if ( instance.modelInfo.data.oxel.gc.containsModelSpacePoint( testPoint ) ) 
+						if ( instance.modelInfo.oxelPersistance.oxel.gc.containsModelSpacePoint( testPoint ) )
 						{
 							modelList.push( instance );
 							break;
@@ -352,15 +352,15 @@ package com.voxelengine.worldmodel.models
 		
 		static public function whichModelsIsThisInfluencedBy( vm:VoxelModel ):Vector.<VoxelModel> {
 			var modelList:Vector.<VoxelModel> = new Vector.<VoxelModel>;
-			if ( !vm.modelInfo.data )
+			if ( !vm.modelInfo.oxelPersistance )
 				return modelList;
 			var worldSpaceStartPointOrigin:Vector3D = vm.instanceInfo.positionGet;
 			_s_worldSpaceStartPointCorner.setTo( worldSpaceStartPointOrigin.x, worldSpaceStartPointOrigin.y, worldSpaceStartPointOrigin.z );
 			// add size to get corner
 			// might want to do all 8 corners if we need to be through
-			_s_worldSpaceStartPointCorner.x += vm.modelInfo.data.oxel.gc.size();
-			_s_worldSpaceStartPointCorner.y += vm.modelInfo.data.oxel.gc.size();
-			_s_worldSpaceStartPointCorner.z += vm.modelInfo.data.oxel.gc.size();
+			_s_worldSpaceStartPointCorner.x += vm.modelInfo.oxelPersistance.oxel.gc.size();
+			_s_worldSpaceStartPointCorner.y += vm.modelInfo.oxelPersistance.oxel.gc.size();
+			_s_worldSpaceStartPointCorner.z += vm.modelInfo.oxelPersistance.oxel.gc.size();
 
 			
 			var models:Vector.<VoxelModel> = Region.currentRegion.modelCache.models;
@@ -396,11 +396,11 @@ package com.voxelengine.worldmodel.models
 					mspHead.x += _s_offset.x;
 					mspHead.y += _s_offset.y;
 					mspHead.z += _s_offset.z;
-					if ( collideCandidate.modelInfo.data.oxel.gc.containsModelSpacePoint( _s_mspOrigin ) ) 
+					if ( collideCandidate.modelInfo.oxelPersistance.oxel.gc.containsModelSpacePoint( _s_mspOrigin ) )
 					{
 						modelList.push( collideCandidate );
 					}
-					else if ( collideCandidate.modelInfo.data.oxel.gc.containsModelSpacePoint( mspHead ) ) 
+					else if ( collideCandidate.modelInfo.oxelPersistance.oxel.gc.containsModelSpacePoint( mspHead ) )
 					{
 						modelList.push( collideCandidate );
 					}
@@ -415,9 +415,9 @@ package com.voxelengine.worldmodel.models
 			var worldSpaceStartPointOrigin:Vector3D = vm.instanceInfo.positionGet;
 			var worldSpaceStartPointCorner:Vector3D = vm.instanceInfo.positionGet.clone();
 			// add size to get corner
-			worldSpaceStartPointCorner.x = worldSpaceStartPointCorner.x + vm.modelInfo.data.oxel.gc.size();
-			worldSpaceStartPointCorner.y = worldSpaceStartPointCorner.y + vm.modelInfo.data.oxel.gc.size();
-			worldSpaceStartPointCorner.z = worldSpaceStartPointCorner.z + vm.modelInfo.data.oxel.gc.size();
+			worldSpaceStartPointCorner.x = worldSpaceStartPointCorner.x + vm.modelInfo.oxelPersistance.oxel.gc.size();
+			worldSpaceStartPointCorner.y = worldSpaceStartPointCorner.y + vm.modelInfo.oxelPersistance.oxel.gc.size();
+			worldSpaceStartPointCorner.z = worldSpaceStartPointCorner.z + vm.modelInfo.oxelPersistance.oxel.gc.size();
 
 			var modelList:Vector.<VoxelModel> = new Vector.<VoxelModel>;
 			var models:Vector.<VoxelModel> = Region.currentRegion.modelCache.models;
@@ -429,11 +429,11 @@ package com.voxelengine.worldmodel.models
 				{
 					var mspOrigin:Vector3D = collideCandidate.worldToModel( worldSpaceStartPointOrigin );
 					var mspHead:Vector3D = collideCandidate.worldToModel( worldSpaceStartPointCorner );
-					if ( collideCandidate.modelInfo.data.oxel.gc.containsModelSpacePoint( mspOrigin ) ) 
+					if ( collideCandidate.modelInfo.oxelPersistance.oxel.gc.containsModelSpacePoint( mspOrigin ) )
 					{
 						modelList.push( collideCandidate );
 					}
-					else if ( collideCandidate.modelInfo.data.oxel.gc.containsModelSpacePoint( mspHead ) ) 
+					else if ( collideCandidate.modelInfo.oxelPersistance.oxel.gc.containsModelSpacePoint( mspHead ) )
 					{
 						modelList.push( collideCandidate );
 					}

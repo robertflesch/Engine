@@ -32,10 +32,10 @@ public class SoundPersistance extends PersistanceObject
 	public function get loaded():Boolean  			{ return _loaded }
 	public function set loaded(value:Boolean):void  { _loaded = value }
 	public function get sound():Sound 				{ return _sound }
-	public function get name():String				{ return info.name }
-	public function get length():Number				{ return info.length }
-	public function get hashTags():String			{ return info.hashTags }
-	public function set hashTags( $val:String):void	{ info.hashTags = $val }
+	public function get name():String				{ return dbo.name }
+	public function get length():Number				{ return dbo.length }
+	public function get hashTags():String			{ return dbo.hashTags }
+	public function set hashTags( $val:String):void	{ dbo.hashTags = $val }
 	
 	public function SoundPersistance( $guid:String ) {
 		super( $guid, Globals.BIGDB_TABLE_SOUNDS );
@@ -59,14 +59,14 @@ public class SoundPersistance extends PersistanceObject
 	}
 	
 	override protected function toObject():void {
-		// Just leave the raw mp3 data alone
-		//Log.out( "SoundPersistance.toObject size:" + dbo.data.ba.length, Log.WARN )
+		// Just leave the raw mp3 oxelPersistance alone
+		//Log.out( "SoundPersistance.toObject size:" + dbo.oxelPersistance.ba.length, Log.WARN )
 	}
 	
 					
 	public function fromObject( $pe:PersistanceEvent ):void {
 		dbo			= $pe.dbo;
-		info 		= $pe.dbo;
+//		info 		= $pe.dbo;
 
 		sound.loadCompressedDataFromByteArray( dbo.ba, dbo.ba.length );
 		loaded = true
@@ -74,16 +74,14 @@ public class SoundPersistance extends PersistanceObject
 
 	public function fromObjectImport( $pe:PersistanceEvent ):void {
 		dbo = new DatabaseObject( Globals.BIGDB_TABLE_SOUNDS, "0", "0", 0, true, null );
-		dbo.data = new Object();
-		dbo.data.ba = $pe.data;
-		sound.loadCompressedDataFromByteArray( dbo.data.ba, dbo.data.ba.length );
+		dbo.ba = $pe.data;
+		sound.loadCompressedDataFromByteArray( dbo.ba, dbo.ba.length );
 		// On import mark it as changed.
 		loaded = true;
 		changed = true;
-		info = dbo.data;
-		info.name = $pe.guid;
-		info.length = sound.length;
-		info.hashTags = "#dragon";
+		dbo.name = $pe.guid;
+		dbo.length = sound.length;
+		dbo.hashTags = "#dragon";
 		guid = Globals.getUID(); // do this last so that the rest of the data is filled in
 		save()
 	}

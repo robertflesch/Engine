@@ -54,7 +54,7 @@ public class ModelMakerClone extends ModelMakerBase {
 		if ( $killOldModel ) {
 			originalVM.dead = true;
 		} else {
-			var size:int = GrainCursor.two_to_the_g( $vm.modelInfo.data.oxel.gc.grain );
+			var size:int = GrainCursor.two_to_the_g( $vm.modelInfo.oxelPersistance.oxel.gc.grain );
 			var offset:Vector3D = new Vector3D(1,1,1);
 			offset.scaleBy(size);
 			var v:Vector3D = ii.positionGet.clone();
@@ -239,7 +239,7 @@ public class ModelMakerClone extends ModelMakerBase {
 			_vmTemp.complete = true;
 
 			modelInfo.changed = true;
-			modelInfo.data.changed = true;
+			modelInfo.oxelPersistance.changed = true;
 			_modelMetadata.changed = true;
 			_vmTemp.save();
 		}

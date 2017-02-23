@@ -74,40 +74,39 @@ public class Inventory extends PersistanceObject
 	}
 	
 	override protected function toObject():void {
-		_slots.toObject( info );
-		info.modifiedData = new Date().toUTCString()
+		_slots.toObject( dbo );
+		dbo.modifiedData = new Date().toUTCString()
 		// voxels
 		var ba:ByteArray = new ByteArray(); 
 		ba.writeUTF( guid );
 		_voxels.toByteArray( ba );
 		ba.compress();
-		info.voxelData = ba;	
+		dbo.voxelData = ba;
 	}
 
 	public function fromObject( $dbo:DatabaseObject ):void {
 		var isNewRecord:Boolean = false
 		if ( $dbo ) {
 			dbo  = $dbo
-			info = $dbo;
+            _slots.fromObject( dbo );
 		}
 		else {
-			dbo = new DatabaseObject( _table, "0", "0", 0, true, null )
-			dbo.data = new Object()
-			info = dbo.data
-			info.createdDate	= new Date().toUTCString()
+			dbo = new DatabaseObject( _table, "0", "0", 0, true, null );
+			//info = dbo.oxelPersistance
+			dbo.createdDate	= new Date().toUTCString()
 			isNewRecord = true
+            _slots.addSlotDefaultData();
 		}
 		
 		// Slot data is stored as fields for easy analysis
 		// we can know what user carry around
-		_slots.fromObject( info );
-		
-		if ( info && info.voxelData ) {
-			var ba:ByteArray = info.voxelData 
+
+		if ( dbo && dbo.voxelData ) {
+			var ba:ByteArray = dbo.voxelData
 			if ( ba && 0 < ba.bytesAvailable ) {
 				try { ba.uncompress(); }
 				catch (error:Error) {
-					Log.out( "Inventory.fromObject - Was expecting compressed data " + guid, Log.WARN ); }
+					Log.out( "Inventory.fromObject - Was expecting compressed oxelPersistance " + guid, Log.WARN ); }
 				ba.position = 0;
 
 //				ba.uncompress();

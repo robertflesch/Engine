@@ -69,7 +69,7 @@ public class Gun extends ControllableVoxelModel
 				var oa:ObjectAction = new ObjectAction( null, "fire", ammo.guid + ".png", "Fire" );
 				oa.ammoName = ammo.name;
 				oa.instanceGuid = instanceInfo.instanceGuid;
-				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, e.ownerGuid, instanceInfo.instanceGuid, -1, oa ) );
+				InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, e.ownerGuid, instanceInfo.instanceGuid, -1, oa );
 			}
 		}
 	}
@@ -83,28 +83,28 @@ public class Gun extends ControllableVoxelModel
 	override protected function processClassJson():void {
 		super.processClassJson();
 		
-		if ( modelInfo.info && modelInfo.info.gun )
-			var gunInfo:Object = modelInfo.info.gun;
-		else {
-			Log.out( "Gun.processClassJson - Gun section not found: " + modelInfo.dbo.toString(), Log.ERROR );
-			return;
-		}
+//		if ( modelInfo.info && modelInfo.info.gun )
+//			var gunInfo:Object = modelInfo.info.gun;
+//		else {
+//			Log.out( "Gun.processClassJson - Gun section not found: " + modelInfo.dbo.toString(), Log.ERROR );
+//			return;
+//		}
 		
-		if ( gunInfo.reloadSpeed )
-			_reloadSpeed = gunInfo.reloadSpeed;
-			
-		if ( gunInfo.ammos ) {
-			AmmoEvent.addListener( ModelBaseEvent.RESULT, result );
-			AmmoEvent.addListener( ModelBaseEvent.ADDED, result );
-			AmmoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, resultFailed );
-			var ammosJson:Object = gunInfo.ammos;
-			for each ( var ammoInfo:Object in ammosJson ) {
-				var ae:AmmoEvent = new AmmoEvent( ModelBaseEvent.REQUEST, _series, ammoInfo.guid, null );
-				_series = ae.series;
-				AmmoEvent.dispatch( ae );
-				_ammoCount++;
-			}
-		}
+//		if ( gunInfo.reloadSpeed )
+//			_reloadSpeed = gunInfo.reloadSpeed;
+//
+//		if ( gunInfo.ammos ) {
+//			AmmoEvent.addListener( ModelBaseEvent.RESULT, result );
+//			AmmoEvent.addListener( ModelBaseEvent.ADDED, result );
+//			AmmoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, resultFailed );
+//			var ammosJson:Object = gunInfo.ammos;
+//			for each ( var ammoInfo:Object in ammosJson ) {
+//				var ae:AmmoEvent = new AmmoEvent( ModelBaseEvent.REQUEST, _series, ammoInfo.guid, null );
+//				_series = ae.series;
+//				AmmoEvent.dispatch( ae );
+//				_ammoCount++;
+//			}
+//		}
 	}
 	
 	private function result(e:AmmoEvent):void {

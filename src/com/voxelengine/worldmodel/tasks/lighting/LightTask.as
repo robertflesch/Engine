@@ -52,7 +52,7 @@ public class LightTask extends AbstractTask
 
         var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( $le.instanceGuid );
         if ( vm ) {
-            var lo:Oxel = vm.modelInfo.data.oxel.childFind( $le.gc );
+            var lo:Oxel = vm.modelInfo.oxelPersistance.oxel.childFind( $le.gc );
             if ( lo && valid( lo ) )
                 return lo;
 

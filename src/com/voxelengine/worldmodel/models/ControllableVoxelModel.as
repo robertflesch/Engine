@@ -128,8 +128,8 @@ public class ControllableVoxelModel extends VoxelModel
 	override protected function processClassJson():void {
 		super.processClassJson();
 		clipVelocityFactor = DEFAULT_CLIP_VELOCITY/100; // setting it to 0.95
-		if ( modelInfo.info && modelInfo.info.controllableVoxelModel ) {
-			var cmInfo:Object = modelInfo.info.controllableVoxelModel;
+		if ( modelInfo.dbo && modelInfo.dbo.controllableVoxelModel ) {
+			var cmInfo:Object = modelInfo.dbo.controllableVoxelModel;
 			
 			if ( cmInfo.clipFactor )
 				clipVelocityFactor = cmInfo.clipFactor/100;
@@ -178,8 +178,8 @@ public class ControllableVoxelModel extends VoxelModel
 	protected function collisionPointsAdd():void {
 		// TO DO Should define this in meta data??? RSF or using extents?
 		
-		if ( modelInfo.data && modelInfo.data.oxel ) {
-			var oxel:Oxel = modelInfo.data.oxel;
+		if ( modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxel ) {
+			var oxel:Oxel = modelInfo.oxelPersistance.oxel;
 			var sizeOxel:Number = oxel.gc.size() / 2;
 			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, 0 ) ) );
 			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, sizeOxel*2 ) ) );
@@ -189,7 +189,7 @@ public class ControllableVoxelModel extends VoxelModel
 			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel*2, sizeOxel ) ) );
 		}
 		else
-			Log.out( "ControlableVoxelModel.collisionPointsAdd - modelInfo.data.oxel not found for guid: " + modelInfo.guid, Log.WARN );
+			Log.out( "ControlableVoxelModel.collisionPointsAdd - modelInfo.oxelPersistance.oxel not found for guid: " + modelInfo.guid, Log.WARN );
 		
 	}
 

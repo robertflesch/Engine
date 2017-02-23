@@ -44,38 +44,83 @@ public class ModelMetadata extends PersistanceObject
 	public function get permissions():PermissionsBase 			{ return _permissions; }
 	public function set permissions( val:PermissionsBase):void	{ _permissions = val; changed = true; }
 	
-	public function get name():String  						{ return info.name; }
-	public function set name(value:String):void  			{ info.name = value; changed = true; }
+	public function get name():String  						{ return dbo.name; }
+	public function set name(value:String):void  			{ dbo.name = value; changed = true; }
 	
-	public function get description():String  				{ return info.description; }
-	public function set description(value:String):void  	{ info.description = value; changed = true; }
+	public function get description():String  				{ return dbo.description; }
+	public function set description(value:String):void  	{ dbo.description = value; changed = true; }
 	
-	public function get owner():String  					{ return info.owner; }
-	public function set owner(value:String):void  			{ info.owner = value; changed = true; }
+	public function get owner():String  					{ return dbo.owner; }
+	public function set owner(value:String):void  			{ dbo.owner = value; changed = true; }
 	
-	public function get animationClass():String 			{ return info.animationClass; }
-	public function set animationClass(value:String):void  	{ info.animationClass = value; changed = true; }
+	public function get animationClass():String 			{ return dbo.animationClass; }
+	public function set animationClass(value:String):void  	{ dbo.animationClass = value; changed = true; }
 	
 	public function get thumbnail():BitmapData 				{ return _thumbnail; }
 	public function set thumbnail(value:BitmapData):void 	{ _thumbnail = value; changed = true; }
 
-	private var			_thumbnailLoaded:Boolean
-	public function get thumbnailLoaded():Boolean 			{ return _thumbnailLoaded; }
+	public function get thumbnailLoaded():Boolean 			{ return dbo.thumbnailLoaded; }
+	public function set thumbnailLoaded($val:Boolean):void  { dbo.thumbnailLoaded = $val; }
 	
 	public function toString():String {
 		return "name: " + name + "  description: " + description + "  guid: " + guid + "  owner: " + owner;
 	}
 	
-	static public function newObject():Object {
-		var obj:Object = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null )
-		obj.data = new Object()
-		return obj
-	}
-	
-	public function ModelMetadata( $newGuid:String ) {
-		super( $newGuid, Globals.BIGDB_TABLE_MODEL_METADATA );
+	public function ModelMetadata( $guid:String, $dbo:DatabaseObject = null, $newData:Object = null ) {
+		super( $guid, Globals.BIGDB_TABLE_MODEL_METADATA );
+
+		if ( null == $dbo)
+			assignNewDatabaseObject();
+		else {
+			dbo = $dbo;
+		}
+
+		init( this, $newData );
+
 		if ( "EditCursor" != guid )
 			ModelMetadataEvent.addListener( ModelBaseEvent.SAVE, saveEvent );
+
+
+		function assignNewDatabaseObject():void {
+			dbo = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
+			// new object don't have thumbnails
+			setToDefault();
+		}
+
+		function init( $modelMetadata:ModelMetadata, $newData:Object = null ):void {
+
+			if ( $newData )
+				mergeOverwrite( $newData );
+
+			// the permission object is just an encapsulation of the permissions section of the object
+			_permissions = new PermissionsBase( dbo );
+
+			var loader:Loader = new Loader();
+			loader.contentLoaderInfo.addEventListener(Event.INIT, bitmapLoaded );
+			if ( dbo.thumbnail ) {
+				loader.loadBytes( dbo.thumbnail );
+			}
+			else {
+				loader.load( new URLRequest( Globals.texturePath + "NoImage128.png" ) )
+			}
+
+			function bitmapLoaded(event:Event):void {
+				// Bypass setter to keep it from getting marked as changed
+				_thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData;
+				thumbnailLoaded = true;
+				ModelMetadataEvent.create( ModelMetadataEvent.BITMAP_LOADED, 0, guid, $modelMetadata );
+			}
+		}
+
+		function setToDefault():void {
+			dbo.thumbnailLoaded = false;
+			_thumbnail = null;
+			animationClass = "";
+			description = "Default";
+			name = "Default";
+			name = "Default";
+			owner = "";
+		}
 	}
 
 	override public function set guid( $newGuid:String ):void { 
@@ -131,61 +176,31 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	// Persistance
 	//////////////////////////////////////////////////////////////////
 	// These two functions are slighting different in that the import uses
-	// $dbo.data
+	// $dbo.oxelPersistance
 	// and the read direct from persistance uses
 	// $dbo directly
 	// I abstract it away using the info object
-	// it was needed to save the data in an abstract way.
-	public function fromObjectImport( $dbo:Object, $markAsChanged:Boolean = true ):void {
-		dbo = $dbo as DatabaseObject;
-		if ( !dbo.data ) {
-			dbo.data = new Object();
-			Log.out( "ModelMetaData.fromObjectImport - NO DBO or DBO data", Log.ERROR );
-		}
-		info = $dbo.data;	
-		loadFromInfo( this );
-		// TODO Sometimes default guid is Player, sometimes DefaultPlayer
-		if ( $markAsChanged && ( guid != "DefaultPlayer" ) )
-			changed = true;
-	}
+	// it was needed to save the oxelPersistance in an abstract way.
+//	public function fromObjectImport( $newData:Object, $markAsChanged:Boolean = true ):void {
+//		loadFromInfo( $newData );
+//		// TODO Sometimes default guid is Player, sometimes DefaultPlayer
+//		if ( $markAsChanged && ( guid != "DefaultPlayer" ) )
+//			changed = true;
+//	}
 
-	public function fromObject( $dbo:DatabaseObject ):void {
-		dbo = $dbo;
-		info = $dbo;	
-		
-		loadFromInfo( this );	
-	}
-	
-	private function loadFromInfo( $mm:ModelMetadata ):void {
-
-		// the permission object is just an encapsulation of the permissions section of the object
-		_permissions = new PermissionsBase( info );
-		
-		var loader:Loader = new Loader();
-		loader.contentLoaderInfo.addEventListener(Event.INIT, bitmapLoaded );
-		if ( info.thumbnail ) {
-			loader.loadBytes( info.thumbnail );			
-		}
-		else {
-			loader.load( new URLRequest( Globals.texturePath + "NoImage128.png" ) )
-		}
-		
-		
-		function bitmapLoaded(event:Event):void {
-			// Bypass setter to keep it from getting marked as changed
-			_thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData;
-			_thumbnailLoaded = true;
-			ModelMetadataEvent.create( ModelMetadataEvent.BITMAP_LOADED, 0, guid, $mm );
-		}
-    }
-
+//	public function fromObject( $dbo:DatabaseObject ):void {
+//		dbo = $dbo;
+//		//info = $dbo;
+//
+//		loadFromInfo( this );
+//	}
 
     override protected function toObject():void {
 		//Log.out( "ModelMetadata.toObject", Log.WARN );
 		if ( thumbnail )
-			info.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() );
+			dbo.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() );
 		else
-			info.thumbnail = null;
+			dbo.thumbnail = null;
 	}
 
 
@@ -193,9 +208,8 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		toObject();
 
 		var metadata:ModelMetadata = new ModelMetadata( Globals.getUID() );
-		var newObj:Object = ModelMetadata.newObject()
-		metadata.fromObjectImport( newObj );
-trace( info );
+//		metadata.fromObjectImport( newObj );
+
 /*
 		// This is an easy way to copy the structure, probably not the best.
 		var objData:Object = JSON.parse( JSON.stringify( info ) );
@@ -203,7 +217,7 @@ trace( info );
 		var newModelMetadata:ModelMetadata = new ModelMetadata( $guid );
 		// this gets new persistance record
 		var newObj:Object = ModelMetadata.newObject();
-		newObj.data = objData;
+		newObj.oxelPersistance = objData;
 		newModelMetadata.fromObject( newObj as DatabaseObject );
 		newModelMetadata.description = description + " - Cloned";
 		newModelMetadata.owner = Network.userId;*/
@@ -212,10 +226,10 @@ trace( info );
 
 	override public function clone( $newGuid:String ):* {
 		toObject();
-		var oldName:String = info.name;
-		info.name = info.name + "_duplicate";
-		var oldObj:String = JSON.stringify( info );
-		info.name = oldName;
+		var oldName:String = dbo.name;
+		dbo.name = dbo.name + "_duplicate";
+		var oldObj:String = JSON.stringify( dbo );
+		dbo.name = oldName;
 
 		var pe:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, $newGuid, null, oldObj, URLLoaderDataFormat.TEXT, guid )
 		PersistanceEvent.dispatch( pe )

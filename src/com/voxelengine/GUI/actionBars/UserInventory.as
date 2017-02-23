@@ -127,7 +127,7 @@ public class  UserInventory extends QuickInventory
 			if ( bi.objectInfo is ObjectModel ) {
 				var om:ObjectModel = bi.objectInfo as ObjectModel
 				if ( e.itemGuid == om.modelGuid )
-					InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, _owner, "", int(bi.name), null ) );
+					InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, _owner, "", int(bi.name), null );
 					if ( int(bi.name) == lastBoxesSelection ) {
 						CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) );
 						hideModelTools()
@@ -220,7 +220,7 @@ public class  UserInventory extends QuickInventory
 			hideGrainTools();
 			hideModelTools();
 			
-			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, _owner, "", slotId, null ) );
+			InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, _owner, "", slotId, null );
 			// sets edit cursor to none
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) );
 		}

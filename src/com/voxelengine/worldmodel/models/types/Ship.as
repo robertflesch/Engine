@@ -64,8 +64,8 @@ public class Ship extends ControllableVoxelModel
 	override protected function collisionPointsAdd():void {
 		// TO DO Should define this in meta data??? RSF or using extents?
 
-		if ( modelInfo.data && modelInfo.data.oxel ) {
-			var oxel:Oxel = modelInfo.data.oxel;
+		if ( modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxel ) {
+			var oxel:Oxel = modelInfo.oxelPersistance.oxel;
 			var sizeOxel:Number = oxel.gc.size() / 2;
 			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, 0 ) ) );
 			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, sizeOxel*2 ) ) );
@@ -77,7 +77,7 @@ public class Ship extends ControllableVoxelModel
 			//_ct.addCollisionPointMarkers();
 		}
 		else
-			Log.out( "Ship.collisionPointsAdd - modelInfo.data.oxel not found for guid: " + modelInfo.guid, Log.WARN );
+			Log.out( "Ship.collisionPointsAdd - modelInfo.oxelPersistance.oxel not found for guid: " + modelInfo.guid, Log.WARN );
 	}
 
 	private function altitudeEvent( event:ShipEvent ):void

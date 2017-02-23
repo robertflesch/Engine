@@ -70,23 +70,23 @@ public class ObjectModel extends ObjectInfo
 	private function metadataFailed(e:ModelMetadataEvent):void 
 	{
 		if ( modelGuid == e.modelGuid ) {
-			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded )
-			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed )
+			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded );
+			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
 			//_owner remove me!
-			reset()
+			reset();
 			if ( box )
-				box.reset()
-			Log.out( "ObjectModel.metadataFailed - guid: " + e.modelGuid, Log.WARN )
-			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, _slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) ) )
+				box.reset();
+			Log.out( "ObjectModel.metadataFailed - guid: " + e.modelGuid, Log.WARN );
+			InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, _slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) );
 		}
 	}
 	
 	private function metadataAdded(e:ModelMetadataEvent):void 
 	{
 		if ( modelGuid == e.modelGuid ) {
-			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded )
-			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, metadataAdded )
-			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed )
+			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded );
+			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, metadataAdded );
+			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
 			_vmm = e.modelMetadata
 			// a delay is needed since the metadata loads the thumbnail on a seperate thread.
 			delayedUpdate()
@@ -95,8 +95,8 @@ public class ObjectModel extends ObjectInfo
 	
 	private function delayedUpdate():void
 	{
-		var pt:Timer = new Timer( 2000, 1 )
-		pt.addEventListener(TimerEvent.TIMER, delayOver )
+		var pt:Timer = new Timer( 2000, 1 );
+		pt.addEventListener(TimerEvent.TIMER, delayOver );
 		pt.start()
 	}
 
@@ -107,10 +107,10 @@ public class ObjectModel extends ObjectInfo
 	}
 	
 	override public function reset():void {
-		super.reset()
+		super.reset();
 		_modelGuid.release();
-		_modelGuid = null
-		_vmm = null
+		_modelGuid = null;
+		_vmm = null;
 	}
 }
 }

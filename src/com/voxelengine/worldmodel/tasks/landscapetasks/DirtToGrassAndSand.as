@@ -36,7 +36,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var vm:VoxelModel = getVoxelModel();
 			if ( vm )
 			{
-				vm.modelInfo.data.oxel.dirtToGrassAndSand();
+				vm.modelInfo.oxelPersistance.oxel.dirtToGrassAndSand();
 			}
 			else
 				Log.out( "DirtToGrassAndSand.start - VM not found for guid: " + _modelGuid );

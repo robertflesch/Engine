@@ -48,7 +48,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		private function modelInfoResult(e:ModelInfoEvent):void {
 			Log.out( "MergeLayer.modelInfoResult:" );
 			if ( e.modelGuid == _modelGuid ) {
-				if ( !e.vmi || !e.vmi.data || !e.vmi.data.oxel ) {
+				if ( !e.vmi || !e.vmi.oxelPersistance || !e.vmi.oxelPersistance.oxel ) {
 					ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoResult );
 					OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );		
 					Log.out( "MergeLayer.modelInfoResult = no oxel found, waiting on OXEL_READY", Log.WARN );
@@ -56,7 +56,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 					// what if it never loads?
 					return
 				}
-				var oxel:Oxel = e.vmi.data.oxel;
+				var oxel:Oxel = e.vmi.oxelPersistance.oxel;
 				processOxel( oxel )
 			}
 		}
@@ -81,8 +81,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			if ( vm )
 				vm.complete = true;
 				
-			vm.modelInfo.data.changed = true;
-			vm.modelInfo.data.save();
+			vm.modelInfo.oxelPersistance.changed = true;
+			vm.modelInfo.oxelPersistance.save();
 			
             super.complete(); // AbstractTask will send event
 			

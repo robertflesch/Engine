@@ -41,6 +41,7 @@ public class Player
 		Log.out( "Player.construct" );
 		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, onRegionLoad );
+		InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest );
 	}
 
 	private function onRegionLoad( $re:RegionEvent ):void {
@@ -67,9 +68,9 @@ public class Player
 		if ( $dbo ) {
 			if ( null == $dbo.modelGuid ) {
 				// Assign the Avatar the default avatar
-				//$dbo.modelGuid = "DefaultPlayer";
+				$dbo.modelGuid = "DefaultPlayer";
 				//$dbo.modelGuid = "FF8E75FB-EC3D-13B6-060A-202F664D7121";
-				$dbo.modelGuid = "ECC57575-41A1-6B65-5B37-1B484FD1D0D4";
+				//$dbo.modelGuid = "ECC57575-41A1-6B65-5B37-1B484FD1D0D4";
 
 				var userName:String = $dbo.key.substring( 6 );
 				var firstChar:String = userName.substr(0, 1);
@@ -80,6 +81,7 @@ public class Player
 				$dbo.createdDate = new Date().toUTCString();
 				$dbo.save();
 			}
+			$dbo.modelGuid = "DefaultPlayer";
 			createPlayer( $dbo.modelGuid, Network.userId );
 		}
 		else {
@@ -95,16 +97,17 @@ public class Player
 		ii.modelGuid = $modelGuid;
 		ii.instanceGuid = $userId;
 
-		if ( "DefaultPlayer" == $modelGuid ) {
-			Log.out( "Avatar.createPlayer - creating from GenerateCube", Log.DEBUG )
+//		if ( "DefaultPlayer" == $modelGuid ) {
+			Log.out( "Avatar.createPlayer - creating from GenerateCube", Log.WARN )
 			var model:Object = GenerateCube.script();
 			model.modelClass = "Avatar";
+			model.name = "Temp Avatar";
 			new ModelMakerGenerate( ii, model )
-		}
-		else {
-			InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest )
-			ModelMakerBase.load(ii, false, false);
-		}
+//		}
+//		else {
+//
+//			ModelMakerBase.load(ii, false, false);
+//		}
 	}
 
 
@@ -132,9 +135,9 @@ public class Player
 			Log.out( "Player.getDefaultSlotData - Loading default data into slots" , Log.WARN );
 
 			var ot:ObjectTool = new ObjectTool( null, "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );
-			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, 0, ot ) );
+			InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, 0, ot );
 			var oa:ObjectAction = new ObjectAction( null, "noneSlots", "none.png", "Do nothing" );
-			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, 1, oa ) );
+			InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, 1, oa );
 
 
 //			for each ( var gun:Gun in _guns )

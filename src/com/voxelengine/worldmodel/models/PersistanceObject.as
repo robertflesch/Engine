@@ -27,8 +27,7 @@ public class PersistanceObject
 	private var 	_changed:Boolean;
 	private var 	_dynamicObj:Boolean;
 	private var 	_dbo:DatabaseObject;
-	private var 	_info:Object;
-	
+
 	
 	public function PersistanceObject( $guid:String, $table:String ) {
 		if ( null == $guid || "" == $guid )
@@ -43,10 +42,6 @@ public class PersistanceObject
 		_dbo = null;
 	}
 	
-	public function get info():Object { return _info; }
-	public function set info(val:Object):void {
-		//Log.out( "PersistanceObject - info set to: " + JSON.stringify( val ) );
-		_info = val; }
 	public function get guid():String  { return _guid; }
 	public function set guid(value:String):void	{
 		if ( _guid != value && Globals.isGuid( _guid ) && Globals.isGuid( value ) )
@@ -93,8 +88,8 @@ public class PersistanceObject
 			Log.out( name + ".save - Saving to guid: " + guid  + " in table: " + table, Log.DEBUG );
 			addSaveEvents();
 			toObject();
-			if ( info && info.changed )
-				delete info.changed;
+			if ( dbo && dbo.changed )
+				delete dbo.changed;
 				
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null ) );
 		}
@@ -121,26 +116,17 @@ public class PersistanceObject
 		if ( _table != $pe.table )
 			return;
 		if ( $pe.dbo && guid == $pe.guid ) {
+			removeSaveEvents();
 			// the create result was coming back after some additional saves had been made
 			// this was causing data to be lost!! So first save data, then copy over dbo, then restore data!
-			if ( dbo && dbo.data ) {
+			_dbo = $pe.dbo;
+			if ( dbo ) {
 				Log.out( getQualifiedClassName( this ) + ".PersistanceObject.createSuccess - ALT PATH created: " + guid + " in table: " + $pe.table, Log.DEBUG );
-				var dataBackup:Object = dbo.data;
-				_dbo = $pe.dbo;
-				for ( var key:String in dataBackup ) {
-                    //Log.out( "PersistanceObject key: " + key );
-					_dbo[key] = dataBackup[key];
-				}
-                if ( _dbo.data )
-                        delete _dbo.data;
                 changed = true;
-                save();
 			}
 			else {
-				Log.out(getQualifiedClassName( this ) + ".PersistanceObject.createSuccess - created: " + guid + " in table: " + $pe.table, Log.DEBUG);
-				_dbo = $pe.dbo;
+				Log.out(getQualifiedClassName( this ) + ".PersistanceObject.createSuccess - ERROR: " + guid + " in table: " + $pe.table, Log.ERROR);
 			}
-			removeSaveEvents();
 		}
 		else {
 			if ( !$pe.dbo )
@@ -189,6 +175,23 @@ public class PersistanceObject
 	protected function loadFailed( $pe:PersistanceEvent ):void  {
 		throw new Error( getQualifiedClassName( this ) + ".loadFailed - Must be overridden" );
 	}
+
+	protected function mergeOverwrite( obj0:Object ):void {
+		for( var p:String in obj0 ) {
+			if ( null != obj0[ p ]) {
+				dbo[p] = obj0[p];
+				trace("PersistanceObject.mergeOverwrite " + p, ' : obj0', obj0[p], 'dbo', dbo[p], '-> new value = ', dbo[p]);
+			}
+		}
+	}
+
+	protected function mergePreferExisting( obj0:Object ):void {
+		for( var p:String in obj0 ) {
+			dbo[ p ] = ( dbo[ p ] != null ) ? dbo[ p ] : obj0[ p ];
+			trace( "PersistanceObject.merge " + p, ' : obj0', obj0[ p ], 'dbo', dbo[ p ], '-> new value = ', dbo[ p ] );
+		}
+	}
+
 }
 }
 

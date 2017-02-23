@@ -69,14 +69,14 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			for ( var i:int = 1; i < tunnelLength / stepSize; i++ ) {
 				
 				var radius:int = Math.min( tunnelRadius * radiusMultiplierMin, Math.random() * tunnelRadius * radiusMultiplierMax );
-				vm.modelInfo.data.oxel.write_sphere( _modelGuid, startLoc.x, startLoc.y, startLoc.z, radius, TypeInfo.AIR, minGrain );
+				vm.modelInfo.oxelPersistance.oxel.write_sphere( _modelGuid, startLoc.x, startLoc.y, startLoc.z, radius, TypeInfo.AIR, minGrain );
 				startLoc.x += view.x + rndOffset( tunnelRadius );
 				startLoc.y += view.y + rndOffset( tunnelRadius );
 				startLoc.z += view.z + rndOffset( tunnelRadius );
 			}
 
 			trace( "CarveTunnel - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime)  );
-			Oxel.merge( vm.modelInfo.data.oxel );
+			Oxel.merge( vm.modelInfo.oxelPersistance.oxel );
             super.complete() // AbstractTask will send event
 		}
 		

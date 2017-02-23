@@ -155,7 +155,7 @@ public class WindowOxelUtils extends VVPopup
 
 	protected function onRepeat(event:TimerEvent):void {
 		Log.out( "WindowOxelUtils.onRepeat - startingVal: " + startingVal );
-		_vm.modelInfo.data.oxel.fullBright( startingVal );
+		_vm.modelInfo.oxelPersistance.oxel.fullBright( startingVal );
 		
 		if ( 0xff == startingVal ) {
 			_reloadTimer.stop();
@@ -165,16 +165,16 @@ public class WindowOxelUtils extends VVPopup
 	}
 
 	private function generateLODHandler(event:UIMouseEvent):void {
-		//_vm.modelInfo.data.generateLOD();
+		//_vm.modelInfo.oxelPersistance.generateLOD();
 		_vm.generateAllLODs();
 	}
 
 	private function rotateHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.oxel.rotateCCW();
+		_vm.modelInfo.oxelPersistance.oxel.rotateCCW();
 	}
 
 	private function centerHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.oxel.centerOxel();
+		_vm.modelInfo.oxelPersistance.oxel.centerOxel();
 	}
 	
 	private function breakdownHandler(event:UIMouseEvent):void {
@@ -186,13 +186,13 @@ public class WindowOxelUtils extends VVPopup
 	}
 
 	private function mergeSameHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.oxel.mergeAndRebuild()
-		_vm.modelInfo.data.changed = true
+		_vm.modelInfo.oxelPersistance.oxel.mergeAndRebuild()
+		_vm.modelInfo.oxelPersistance.changed = true
 	}
 	
 	private function mergeAirHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.oxel.mergeAIRAndRebuild()
-		_vm.modelInfo.data.changed = true
+		_vm.modelInfo.oxelPersistance.oxel.mergeAIRAndRebuild()
+		_vm.modelInfo.oxelPersistance.changed = true
 	}
 	
 	private function decreaseGrainHandler(event:UIMouseEvent):void {
@@ -208,19 +208,19 @@ public class WindowOxelUtils extends VVPopup
 	}
 
 	private function rebuildWaterHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.visitor( Oxel.rebuildWater, "Oxel.rebuildWater" );
+		_vm.modelInfo.oxelPersistance.visitor( Oxel.rebuildWater, "Oxel.rebuildWater" );
 	}
 	
 	private function rebuildGrassHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.visitor( Oxel.rebuildGrass, "Oxel.rebuildGrass" );
+		_vm.modelInfo.oxelPersistance.visitor( Oxel.rebuildGrass, "Oxel.rebuildGrass" );
 	}
 	
 	private function rebuildFacesHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.visitor( Oxel.rebuild, "Oxel.rebuild" );
+		_vm.modelInfo.oxelPersistance.visitor( Oxel.rebuild, "Oxel.rebuild" );
 	}
 	
 	private function resetOxelScalingHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.data.visitor( Oxel.resetScaling, "Oxel.resetScaling" );
+		_vm.modelInfo.oxelPersistance.visitor( Oxel.resetScaling, "Oxel.resetScaling" );
 	}
 	
 }	

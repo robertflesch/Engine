@@ -40,7 +40,7 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 				// TODO make this work for multiple models. Maybe just use a world location like the explosion code does.
 				var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( $le.instanceGuid );
 				if ( vm ) {
-					var lo:Oxel = vm.modelInfo.data.oxel.childFind( $le.gc );
+					var lo:Oxel = vm.modelInfo.oxelPersistance.oxel.childFind( $le.gc );
 					if ( Oxel.validLightable( lo ) )
 					{
 						var ti:TypeInfo = TypeInfo.typeInfo[lo.type];
@@ -64,7 +64,7 @@ import com.voxelengine.worldmodel.oxel.Oxel;
         static private function handleLightEventS2A( $le:LightEvent ):void {
             var vmc:VoxelModel = Region.currentRegion.modelCache.instanceGet( $le.instanceGuid );
             if ( vmc ) {
-                var co:Oxel = vmc.modelInfo.data.oxel.childFind( $le.gc );
+                var co:Oxel = vmc.modelInfo.oxelPersistance.oxel.childFind( $le.gc );
                 if ( co && Oxel.validLightable( co ) )
                 {
                     // This oxel changed from solid to AIR or Translucent
@@ -119,7 +119,7 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 			if ( vm ) {
 			
 				try {
-					var lo:Oxel = vm.modelInfo.data.oxel.childFind( _gc );
+					var lo:Oxel = vm.modelInfo.oxelPersistance.oxel.childFind( _gc );
 					if ( Oxel.validLightable( lo ) ) {
 						
 						if ( !lo.gc.is_equal( _gc ) )

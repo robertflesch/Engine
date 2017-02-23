@@ -83,46 +83,46 @@ public class Beast extends ControllableVoxelModel
 	override protected function processClassJson():void {
 		super.processClassJson();
 
-		if ( modelInfo.info && modelInfo.info.beast )
-			var beastInfo:Object = modelInfo.info.beast;
-		else {
-			Log.out( "Beast.processClassJson - beast section not found: " + modelInfo.dbo.toString(), Log.ERROR );
-			return;
-		}
-		if ( beastInfo.moveSpeed) {
-			speedMultiplier = beastInfo.moveSpeed
-			//instanceInfo.moveSpeed = instanceInfo.moveSpeed * speedMultiplier;
-			instanceInfo.moveSpeed = speedMultiplier;
-		} else
-
-		if ( beastInfo.maxTurnRate )
-			maxTurnRate = beastInfo.maxTurnRat/100;
-
-		if ( beastInfo.maxClimbAngle )
-			maxClimbAngle = beastInfo.maxClimbAngle;
-
-		if ( beastInfo.climbRate )
-			climbRate = beastInfo.climbRate;
-
-		if ( beastInfo.seatLocation ) {
-			if ( beastInfo.seatLocation is Object ) {
-//					Log.out( "Beast.processClassJson: " + JSON.stringify( beastInfo.seatLocation ) );
-				_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
-			}
-			else
-				_seatLocation.setTo( 0, 0, 0 );
-				//_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
-		}
-		else
-			_seatLocation.setTo( 0, 0, 0 );
+//		if ( modelInfo.info.beast )
+//			var beastInfo:Object = modelInfo.info.beast;
+//		else {
+//			Log.out( "Beast.processClassJson - beast section not found: " + modelInfo.dbo.toString(), Log.ERROR );
+//			return;
+//		}
+//		if ( beastInfo.moveSpeed) {
+//			speedMultiplier = beastInfo.moveSpeed
+//			//instanceInfo.moveSpeed = instanceInfo.moveSpeed * speedMultiplier;
+//			instanceInfo.moveSpeed = speedMultiplier;
+//		} else
+//
+//		if ( beastInfo.maxTurnRate )
+//			maxTurnRate = beastInfo.maxTurnRat/100;
+//
+//		if ( beastInfo.maxClimbAngle )
+//			maxClimbAngle = beastInfo.maxClimbAngle;
+//
+//		if ( beastInfo.climbRate )
+//			climbRate = beastInfo.climbRate;
+//
+//		if ( beastInfo.seatLocation ) {
+//			if ( beastInfo.seatLocation is Object ) {
+////					Log.out( "Beast.processClassJson: " + JSON.stringify( beastInfo.seatLocation ) );
+//				_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
+//			}
+//			else
+//				_seatLocation.setTo( 0, 0, 0 );
+//				//_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
+//		}
+//		else
+//			_seatLocation.setTo( 0, 0, 0 );
 
 		Log.out( "Beast.processClassJson values: " + JSON.stringify( buildExportObject( {} ) ) );
 	}
 
 	override protected function collisionPointsAdd():void {
-		// TO DO Should define this in meta data??? RSF or using extents?
-		if ( modelInfo.data && modelInfo.data.oxel ) {
-			var oxel:Oxel = modelInfo.data.oxel;
+		// TO DO Should define this in meta oxelPersistance??? RSF or using extents?
+		if ( modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxel ) {
+			var oxel:Oxel = modelInfo.oxelPersistance.oxel;
 			var sizeOxel:Number = oxel.gc.size() / 2;
 			_ct.addCollisionPoint( new CollisionPoint( FALL, new Vector3D( sizeOxel, -16, 0 ) ) );
 			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( sizeOxel, -15, 0 ) ) ); // foot
@@ -143,7 +143,7 @@ public class Beast extends ControllableVoxelModel
 			//_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, -6, 0 ) ) ); // bottom
 		}
 		else
-			Log.out( "Beast.collisionPointsAdd - modelInfo.data.oxel not found for guid: " + modelInfo.guid, Log.WARN );
+			Log.out( "Beast.collisionPointsAdd - modelInfo.oxelPersistance.oxel not found for guid: " + modelInfo.guid, Log.WARN );
 	}
 
 	override protected function cameraAddLocations():void {

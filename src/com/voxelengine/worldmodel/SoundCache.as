@@ -116,8 +116,8 @@ public class SoundCache
 		if ( null == _sounds[$sp.guid] )
 			_sounds[$sp.guid] = $sp
 		
-		if ( null == _soundsByName[$sp.info.name] )
-			_soundsByName[$sp.info.name] = $sp
+		if ( null == _soundsByName[$sp.dbo.name] )
+			_soundsByName[$sp.dbo.name] = $sp
 			
 		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $sp ) )
 	}

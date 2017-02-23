@@ -76,11 +76,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 
 			removeModelInfoEventHandler();
 
-			_modelInfo = new ModelInfo( ii.modelGuid );
-			var newObj:Object = ModelInfo.newObject();
-			newObj.data.model = _creationInfo;
-			modelInfo.fromObjectImport( newObj );
-
+			_modelInfo = new ModelInfo( ii.modelGuid, null, _creationInfo );
 			retrieveOrGenerateModelMetadata();
 		}
 
@@ -122,16 +118,14 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	override protected function retrieveBaseInfo():void {
 		Log.out( "ModelMakerGenerate.retrieveBaseInfo " + ii.modelGuid );
 		_modelMetadata = new ModelMetadata( ii.modelGuid );
-		var newObj:Object = ModelMetadata.newObject();
-		_modelMetadata.fromObjectImport( newObj );
 
 		// Bypass the setter so that we dont set it to changed
 		if ( _type )
-			_modelMetadata.info.name = _creationFunction + TypeInfo.name( _type ) + "-" + modelInfo.info.model.grainSize + "-" + _creationFunction;
+			_modelMetadata.name = _creationFunction + TypeInfo.name( _type ) + "-" + modelInfo.grainSize + "-" + _creationFunction;
 		else
-			_modelMetadata.info.name = _creationFunction + "-" + modelInfo.info.model.grainSize;
-		_modelMetadata.info.description = _creationFunction + "- GENERATED";
-		_modelMetadata.info.owner = Network.userId;
+			_modelMetadata.name = _creationFunction + "-" + modelInfo.grainSize;
+		_modelMetadata.description = _creationFunction + "- GENERATED";
+		_modelMetadata.owner = Network.userId;
 	}
 	
 	// once they both have been retrived, we can make the object
@@ -140,7 +134,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		if ( null != modelInfo && null != _modelMetadata ) {
 			_vm = make();
 			if ( _vm ) {
-				if ( !_vm.modelInfo.data ) {
+				if ( !_vm.modelInfo.oxelPersistance ) {
 					OxelDataEvent.addListener(ModelBaseEvent.ADDED, listenForGenerationComplete);
 					_modelInfo.oxelLoadData();
 				} else
@@ -156,7 +150,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			if ( $e.modelGuid == ii.modelGuid ) {
 				OxelDataEvent.removeListener( ModelBaseEvent.ADDED, listenForGenerationComplete );
 				Log.out( "ModelMakerGenerate.listenForGenerationComplete " + ii.modelGuid + " == " + $e.modelGuid );
-				modelInfo.data = $e.oxelData;
+				modelInfo.oxelPersistance = $e.oxelData;
 				markComplete( true, _vm );
 			}
 			else
@@ -175,7 +169,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			_vm.complete = true;
 
 			if ( modelInfo.guid != "DefaultPlayer" ) {
-				modelInfo.data.changed = true;
+				modelInfo.oxelPersistance.changed = true;
 				modelInfo.changed = true;
 				_modelMetadata.changed = true;
 				_vm.save();

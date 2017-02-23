@@ -38,7 +38,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			// Builds Solid Cube of any grain size
 			//////////////////////////////////////////////////////////
 			var vm:VoxelModel = getVoxelModel();
-			var oxel:Oxel = vm.modelInfo.data.oxel;
+			var oxel:Oxel = vm.modelInfo.oxelPersistance.oxel;
 			var gc:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
 			gc.copyFrom(oxel.gc);
 			var root_grain_size:uint = gc.grain;

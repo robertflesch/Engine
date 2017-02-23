@@ -55,7 +55,6 @@ public class OxelPersistance extends PersistanceObject
 	private var _topMostChunks:Vector.<Chunk>					= new Vector.<Chunk>();
 	private function get topMostChunk():Chunk					{ return _topMostChunks[_lod]; }
 	private var _parent:ModelInfo
-	private var _ba:ByteArray
 	private var firstTime:Boolean								= true;
 	private var _lod:int;
 	public function set setLOD( $lod:int ):void 				{ _lod = $lod; }
@@ -69,8 +68,8 @@ public class OxelPersistance extends PersistanceObject
 
 	private var _lightInfo:LightInfo 							= null;
 
-	public function get ba():ByteArray 							{ return _ba }
-	public function set ba( $ba:ByteArray):void 				{ _ba = $ba; }
+	public function get ba():ByteArray 							{ return dbo.ba }
+	public function set ba( $ba:ByteArray):void 				{ dbo.ba = $ba; }
 
 	public function get parent():ModelInfo						{ return _parent }
 	public function set parent( $val:ModelInfo ):void			{ _parent = $val }
@@ -78,14 +77,36 @@ public class OxelPersistance extends PersistanceObject
 	public 	function get oxel():Oxel 							{ return _oxels[_lod]; }
 	public 	function get oxelCount():int 						{ return _oxels.length; }
 
-	public function OxelPersistance( $guid:String, $baseLightIllumination:int ) {
-		//Log.out( "OxelPersistance: " + $guid + " baseLightIllumination: " + $baseLightIllumination, Log.WARN );
-		super( $guid, Globals.BIGDB_TABLE_OXEL_DATA );
-		// This should all come from model, so I could give the whole model a tint if I liked.
+	public function OxelPersistance( $guid:String, $dbo:DatabaseObject, $newData:ByteArray, $baseLightIllumination:int ):void {
+		super($guid, Globals.BIGDB_TABLE_OXEL_DATA);
+
 		_lightInfo = LightInfoPool.poolGet();
-		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, $baseLightIllumination );
+		_lightInfo.setInfo(Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, $baseLightIllumination);
+
+
+		if (null == $dbo)
+			assignNewDatabaseObject();
+		else {
+			dbo = $dbo;
+		}
+
+		init($newData);
+
+		function assignNewDatabaseObject():void {
+			dbo = new DatabaseObject(Globals.BIGDB_TABLE_OXEL_DATA, "0", "0", 0, true, null);
+			setToDefault();
+		}
+
+		function setToDefault():void {
+		}
 	}
-	
+
+	private function init( $newData:ByteArray = null ):void {
+		if ( $newData )
+			dbo.ba = $newData;
+		fromByteArray();
+	}
+
 	override public function release():void {
 		_statisics.release();
 		for each ( var o:Oxel in _oxels )
@@ -115,10 +136,6 @@ public class OxelPersistance extends PersistanceObject
 		//Log.out( "OxelPersistance.draw guid: " + $vm.instanceInfo.instanceGuid + " TOOK: " + (getTimer()-time) );
 	}
 
-	public function createEditCursor():void {
-		_ba = compressedReferenceBA;
-		fromByteArray()
-	}
 	/*
 	// creating a new copy of this
 	override public function clone( $guid:String ):* {
@@ -181,26 +198,11 @@ public class OxelPersistance extends PersistanceObject
 	}
 
 	override protected function toObject():void {
-		//Log.out( "OxelPersistance.toObject", Log.WARN );
-		if ( dbo.data )
-			dbo.data.ba			= toByteArray( oxel );
-		else	
-			dbo.ba			= toByteArray( oxel );
+		dbo.ba			= toByteArray( oxel );
 	}
 				
 	// FROM Persistance
 	
-	public function fromObjectImport( $dbo:DatabaseObject ):void {
-		dbo			= $dbo;
-		_ba = $dbo.data.ba
-		//fromByteArray();
-	}
-	public function fromObject( $dbo:DatabaseObject ):void {
-		dbo			= $dbo;
-		_ba = $dbo.ba 
-		//fromByteArray();
-	}
-
 	public function fromByteArray():void {
 		_lightInfo.setIlluminationLevel( baseLightLevel );
 		_oxels[_lod] = Oxel.initializeRoot( 31 ); // Lighting should be model or instance default lighting
@@ -315,7 +317,7 @@ public class OxelPersistance extends PersistanceObject
 		// ... continue until max - 2?
 
 		LevelOfDetailEvent.addListener( LevelOfDetailEvent.MODEL_CLONE_COMPLETE, lodCloneCompleteEvent )
-		new OxelCloner( $vm.modelInfo.data );
+		new OxelCloner( $vm.modelInfo.oxelPersistance );
 	}
 
 	private function lodCloneCompleteEvent(event:LevelOfDetailEvent):void {
@@ -366,12 +368,7 @@ public class OxelPersistance extends PersistanceObject
 		// this adds the version header, need for the persistanceEvent
 		var ba:ByteArray = toByteArray( oxel );
 
-		var od:OxelPersistance = new OxelPersistance( $guid, Lighting.defaultBaseLightIllumination );
-		var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_OXEL_DATA, "0", "0", 0, true, null );
-		dbo.data = new Object();
-		dbo.data.ba = ba;
-		od.fromObjectImport( dbo );
-
+		var od:OxelPersistance = new OxelPersistance( $guid, null, ba, Lighting.defaultBaseLightIllumination );
 		return od;
 	}
 }

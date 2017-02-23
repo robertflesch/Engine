@@ -70,8 +70,6 @@ public class ModelMakerImport extends ModelMakerBase {
 			else {
 				//Log.out( "ModelMakerImport - attemptMake: generating metadata " + ii.toString() );
 				_modelMetadata = new ModelMetadata( ii.modelGuid );
-				var newObj:Object = ModelMetadata.newObject()
-				_modelMetadata.fromObjectImport( newObj );
 				_modelMetadata.description = ii.modelGuid + " - Imported";
 				_modelMetadata.name = ii.modelGuid;
 				_modelMetadata.owner = Network.userId;
@@ -242,7 +240,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			_vmTemp.complete = true;
 
 			modelInfo.changed = true;
-			modelInfo.data.changed = true;
+			modelInfo.oxelPersistance.changed = true;
 			_modelMetadata.changed = true;
 			_vmTemp.save();
 		}

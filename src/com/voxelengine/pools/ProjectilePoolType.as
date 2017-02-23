@@ -55,29 +55,21 @@ public final class ProjectilePoolType
 		// I dont like that I create new metadata and _modelInfo for each projectile.
 		// I should be able to create instances
 		_projectileGuid = Globals.getUID();
-		var obj:Object = {};
-		obj.model = GenerateCube.script( 2, TypeInfo.BLUE );
 		//throw new Error( "Need to refactor this, I broke it when I added the island generation" );
 		// This is a special case for _modelInfo, the _modelInfo its self is contained in the generate script
-		_modelInfo = new ModelInfo( _projectileGuid )
+		_modelInfo = new ModelInfo( _projectileGuid, null, GenerateCube.script( 2, TypeInfo.BLUE ) );
 		_modelInfo.dynamicObj = true;
-		_modelInfo.fromObject( obj )
-		//ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.GENERATION, 0, _projectileGuid, _modelInfo ) )
 
-		_modelMetadata = new ModelMetadata( _projectileGuid )
-		var newObj:Object = ModelMetadata.newObject()
-		newObj.data.name = "ProjectilePoolType - " + $type
-		_modelMetadata.fromObjectImport( newObj, false )
+		_modelMetadata = new ModelMetadata( _projectileGuid );
 		_modelMetadata.dynamicObj = true;
-		_modelMetadata.info.name = _projectileGuid
-		_modelMetadata.info.description = _projectileGuid + " - GENERATED"
-		_modelMetadata.info.owner = ""
+		_modelMetadata.name = _projectileGuid;
+		_modelMetadata.description = _projectileGuid + " - GENERATED";
+		_modelMetadata.owner = "";
 		//ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, _projectileGuid, _modelMetadata ) )
 		//Log.out( "ProjectilePoolType.generateData: " + _modelInfo.toString() );
-		_modelInfo.data = new OxelPersistance( _projectileGuid, Lighting.MAX_LIGHT_LEVEL );
 		var ba:ByteArray  = Oxel.generateCube( _projectileGuid, _modelInfo.biomes.layers[0], false );
-		_modelInfo.data.ba = ba;
-		_modelInfo.data.fromByteArray();
+		_modelInfo.oxelPersistance = new OxelPersistance( _projectileGuid, null, ba, Lighting.MAX_LIGHT_LEVEL );
+		_modelInfo.oxelPersistance.fromByteArray();
 	}
 		
 	private function newModel():Projectile {	

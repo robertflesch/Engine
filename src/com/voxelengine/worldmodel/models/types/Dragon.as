@@ -8,28 +8,19 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models.types
 {
 import com.voxelengine.worldmodel.oxel.Oxel;
-import flash.display3D.Context3D;
 import flash.geom.Vector3D;
-import flash.geom.Matrix3D;
 import flash.utils.getQualifiedClassName;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.events.GunEvent;
 import com.voxelengine.events.InventoryEvent;
-import com.voxelengine.events.InventoryInterfaceEvent;
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelEvent;
-import com.voxelengine.events.ShipEvent;
-import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.inventory.*;
 import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.models.CameraLocation;
 import com.voxelengine.worldmodel.models.CollisionPoint;
-import com.voxelengine.worldmodel.weapons.Ammo;
-import com.voxelengine.worldmodel.weapons.Armory;
-import com.voxelengine.worldmodel.weapons.Gun;
 
 /**
  * ...
@@ -66,10 +57,10 @@ public class Dragon extends Beast
 	override protected function processClassJson():void {
 		super.processClassJson();
 		// no unique items at this level
-		if ( modelInfo.info && modelInfo.info.dragon )
-			var dragonInfo:Object = modelInfo.info.dragon;
+		if ( modelInfo.dbo && modelInfo.dbo.dragon )
+			var dragonInfo:Object = modelInfo.dbo.dragon;
 		else
-			Log.out( "Dragon.processClassJson - Dragon section not found: " + JSON.stringify( modelInfo.info ), Log.ERROR );
+			Log.out( "Dragon.processClassJson - Dragon section not found: " + JSON.stringify( modelInfo.dbo ), Log.ERROR );
 	}
 /*		
 	override protected function addClassJson():String {
@@ -81,10 +72,10 @@ public class Dragon extends Beast
 */	
 	
 	override protected function collisionPointsAdd():void {
-		// TO DO Should define this in meta data??? RSF or using extents?
+		// TO DO Should define this in meta oxelPersistance??? RSF or using extents?
 		
-		if ( modelInfo.data && modelInfo.data.oxel ) {
-			var oxel:Oxel = modelInfo.data.oxel;
+		if ( modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxel ) {
+			var oxel:Oxel = modelInfo.oxelPersistance.oxel;
 			var sizeOxel:Number = oxel.gc.size() / 2;
 			_ct.addCollisionPoint( new CollisionPoint( FALL, new Vector3D( sizeOxel, -16, 0 ) ) );
 			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( sizeOxel, -15, 0 ) ) ); // foot
@@ -105,7 +96,7 @@ public class Dragon extends Beast
 			//_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, -6, 0 ) ) ); // bottom
 		}
 		else
-			Log.out( "Dragon.collisionPointsAdd - modelInfo.data.oxel not found for guid: " + modelInfo.guid, Log.WARN );
+			Log.out( "Dragon.collisionPointsAdd - modelInfo.oxelPersistance.oxel not found for guid: " + modelInfo.guid, Log.WARN );
 	}
 
 	override protected function cameraAddLocations():void {
@@ -239,10 +230,10 @@ public class Dragon extends Beast
 			Log.out( "Dragon.getDefaultSlotData - Loading default data into slots" , Log.WARN );
 			
 			var oa:ObjectAction = new ObjectAction( null, "loseControlHandler", "dismount.png", "Dismount" );
-			InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.SLOT_CHANGE, instanceInfo.instanceGuid, instanceInfo.instanceGuid, 0, oa ) ); 
+			InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, instanceInfo.instanceGuid, instanceInfo.instanceGuid, 0, oa );
 			
 			for each ( var gun:Gun in _guns )
-				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.DEFAULT_REQUEST, instanceInfo.instanceGuid, gun.instanceInfo.instanceGuid, 0, null ) );
+				InventorySlotEvent.create( InventorySlotEvent.DEFAULT_REQUEST, instanceInfo.instanceGuid, gun.instanceInfo.instanceGuid, 0, null );
 		}
 	}
 	/*

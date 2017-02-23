@@ -51,16 +51,16 @@ package com.voxelengine.worldmodel
 		private var _modelCache:ModelCache;
 		private var _skyColor:Vector3D = new Vector3D();
 
-		public function get worldId():String { return info.worldId; }
-		public function set worldId(val:String):void { info.worldId = val; }
-		public function get owner():String { return info.owner; }
-		public function set owner(val:String):void { info.owner = val; }
-		public function get desc():String { return info.desc; }
-		public function set desc(val:String):void { info.desc = val; }
-		public function get name():String { return info.name; }
-		public function set name(val:String):void { info.name = val; }
-		public function get gravity():Boolean { return info.gravity; }
-		public function set gravity(val:Boolean):void { info.gravity = val; }
+		public function get worldId():String { return dbo.worldId; }
+		public function set worldId(val:String):void { dbo.worldId = val; }
+		public function get owner():String { return dbo.owner; }
+		public function set owner(val:String):void { dbo.owner = val; }
+		public function get desc():String { return dbo.desc; }
+		public function set desc(val:String):void { dbo.desc = val; }
+		public function get name():String { return dbo.name; }
+		public function set name(val:String):void { dbo.name = val; }
+		public function get gravity():Boolean { return dbo.gravity; }
+		public function set gravity(val:Boolean):void { dbo.gravity = val; }
 		public function getSkyColor():Vector3D { return _skyColor; }
 		public function setSkyColor( $skyColor:Object ):void { 
 			if ( !$skyColor ) {
@@ -77,11 +77,11 @@ package com.voxelengine.worldmodel
 			if ( z < 0 || 255 < z )
 				$skyColor.z = 238
 				
-			info.skyColor = $skyColor
-			_skyColor.setTo( info.skyColor.x, info.skyColor.y , info.skyColor.z )
+			dbo.skyColor = $skyColor
+			_skyColor.setTo( dbo.skyColor.x, dbo.skyColor.y , dbo.skyColor.z )
 		}
-		public function get playerPosition():Object { return info.playerPosition; }
-		public function get playerRotation():Object {return info.playerRotation; }
+		public function get playerPosition():Object { return dbo.playerPosition; }
+		public function get playerRotation():Object {return dbo.playerRotation; }
 		
 		public function set changedForce(val:Boolean):void { changed = val; }
 		public function get criticalModelDetected():Boolean { return  _criticalModelDetected; } 
@@ -91,11 +91,10 @@ package com.voxelengine.worldmodel
 		public function get modelCache():ModelCache  { return _modelCache; }
 
 		public function createEmptyRegion():void { 
-			var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_REGIONS, "0", "0", 0, true, null );
-			dbo.data = new Object();
-			dbo.data.models = []
-			dbo.data.skyColor = { "x":92, "y":172, "z":238 }
-			dbo.data.gravity = false
+			dbo = new DatabaseObject( Globals.BIGDB_TABLE_REGIONS, "0", "0", 0, true, null );
+			dbo.models = []
+			dbo.skyColor = { "x":92, "y":172, "z":238 }
+			dbo.gravity = false
 			fromObjectImport( dbo ); 
 		}
 		
@@ -140,8 +139,8 @@ package com.voxelengine.worldmodel
 			addEventListeners();
 			RegionEvent.create( RegionEvent.LOAD_BEGUN, 0, guid );
 			// old style uses region.
-			setSkyColor( info.skyColor );
-			var count:int = loadRegionObjects(info.models);
+			setSkyColor( dbo.skyColor );
+			var count:int = loadRegionObjects(dbo.models);
 
 			// for startup use before you go online
 			if ( !Globals.online )
@@ -229,7 +228,7 @@ package com.voxelengine.worldmodel
 		
 		private function removeFailedObjectFromRegion( $e:ModelLoadingEvent ):void {
 			// Do I need to remove this failed load?
-			Log.out( "Region.removeFailedObjectFromRegion - failed to load: " + $e.modelGuid, Log.ERROR );
+			Log.out( "Region.removeFailedObjectFromRegion - failed to load: " + $e.modelGuid, Log.WARN );
 			currentRegion.changedForce = true;
 		}
 	
@@ -279,11 +278,11 @@ package com.voxelengine.worldmodel
 		}
 		
 		public function setPlayerPosition( $obj:Object ):void {
-			info.playerPosition = $obj
+			dbo.playerPosition = $obj
 		}
 		
 		public function setPlayerRotation( $obj:Object ):void {
-			info.playerRotation = $obj
+			dbo.playerRotation = $obj
 		}
 		
 		
@@ -303,9 +302,9 @@ package com.voxelengine.worldmodel
 		override protected function toObject():void {
 			//Log.out( "Region.toObject", Log.WARN );
 			// modelCache will be true if this region has been loaded.
-			// if it has not been loaded, just use the existing info.models data
+			// if it has not been loaded, just use the existing dbo.models oxelPersistance
 			if ( _modelCache )
-				info.models = _modelCache.toObject();
+				dbo.models = _modelCache.toObject();
 				
 			_permissions.toObject();
 		}
@@ -316,21 +315,19 @@ package com.voxelengine.worldmodel
 		
 		public function fromObject( $dbo:DatabaseObject ):void {
 			dbo = $dbo;
-			info = $dbo;
-			_permissions = new PermissionsRegion( info.permissions );
+			_permissions = new PermissionsRegion( dbo.permissions );
 		}
 		
 		public function fromObjectImport( $dbo:DatabaseObject ):void {
-			dbo = $dbo;
-			info = $dbo.data;
-			info.worldId = Globals.VOXELVERSE;
-			info.name = "NewRegion";
-			info.desc = "Describe what is special about this region";
-			info.playerPosition = new Object();
-			info.playerRotation = new Object();
-			info.playerPosition.x = info.playerPosition.y = info.playerPosition.z = 0;
-			info.playerRotation.x = info.playerRotation.y = info.playerRotation.z = 0;
-			_permissions = new PermissionsRegion( info );
+			//info = $dbo.oxelPersistance;
+			dbo.worldId = Globals.VOXELVERSE;
+			dbo.name = "NewRegion";
+			dbo.desc = "Describe what is special about this region";
+			dbo.playerPosition = new Object();
+			dbo.playerRotation = new Object();
+			dbo.playerPosition.x = dbo.playerPosition.y = dbo.playerPosition.z = 0;
+			dbo.playerRotation.x = dbo.playerRotation.y = dbo.playerRotation.z = 0;
+			_permissions = new PermissionsRegion( null );
 //			changed = true;
 		}
 	} // Region

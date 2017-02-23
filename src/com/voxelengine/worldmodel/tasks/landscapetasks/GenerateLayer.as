@@ -47,7 +47,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			Log.out( "GenerateLayer.modelInfoResult: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );
 			if ( e.modelGuid == _modelGuid ) {
 				ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoResult );
-				var oxel:Oxel = e.vmi.data.oxel
+				var oxel:Oxel = e.vmi.oxelPersistance.oxel
 				if ( null == oxel ) {
 					Log.out( "GenerateLayer.modelInfoResult = no oxel found, waiting on OXEL_READY", Log.WARN )
 					super.complete()
@@ -65,8 +65,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var vm:VoxelModel = getVoxelModel()
 			if ( vm ) {
 				vm.complete = false
-				if ( vm.modelInfo.info.model.smallestGrain )
-					smallestGrain = vm.modelInfo.info.model.smallestGrain
+				if ( vm.modelInfo.dbo.smallestGrain )
+					smallestGrain = vm.modelInfo.dbo.smallestGrain
 			}
 			
 			//Globals.g_seed = 0;

@@ -39,7 +39,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _modelGuid );
 			if ( vm )
 			{
-				var root_grain_size:uint = vm.modelInfo.data.oxel.gc.bound
+				var root_grain_size:uint = vm.modelInfo.oxelPersistance.oxel.gc.bound
 				var min_grain_size:int = root_grain_size - _layer.range;
 				if ( 0 > min_grain_size || min_grain_size >= (root_grain_size - 2) || ( 8 < (root_grain_size - min_grain_size)) )
 				{
@@ -47,10 +47,10 @@ package com.voxelengine.worldmodel.tasks.tests
 					trace( "TestSphere.start - WARNING - Adjusting range: " + min_grain_size );
 				}
 				
-				var c:int = vm.modelInfo.data.oxel.size_in_world_coordinates() / 2;
+				var c:int = vm.modelInfo.oxelPersistance.oxel.size_in_world_coordinates() / 2;
 				// 1 large spheres 
 				//vm.oxel.write_sphere( c, c, c, c - 1, _layer.type, min_grain_size );
-				vm.modelInfo.data.oxel.write_sphere( _modelGuid, c, c/2, c, c - 1, _layer.type, min_grain_size );
+				vm.modelInfo.oxelPersistance.oxel.write_sphere( _modelGuid, c, c/2, c, c - 1, _layer.type, min_grain_size );
 				/* 
 				// 8 spheres 
 				var type:int = TypeInfo.GRASS;

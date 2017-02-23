@@ -87,7 +87,7 @@ public class PersistBigDB
 				return;
 			}
 			
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $dbo.key, $dbo, false ) );
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $dbo.key, $dbo, null ) );
 		}
 		
 		function loadFail( $pioe:PlayerIOError ):void {
@@ -167,12 +167,10 @@ public class PersistBigDB
 		}
 		else
 		{
-			//Log.out( "PersistBigDB.create - creating object in table: " + $pe.table + "  guid:" + $pe.guid + "" );
-			//var metadata:Object = { created: new Date(), modified: new Date(), data: $pe.data };
-			var metadata:Object = $pe.dbo.data;
+			Log.out( "PersistBigDB.create - creating object in table: " + $pe.table + "  guid:" + $pe.guid + "" );
 			Persistance.createObject( $pe.table
 									, $pe.guid
-									, metadata
+									, $pe.dbo
 									, createSucceed
 									, createFail
 									);
