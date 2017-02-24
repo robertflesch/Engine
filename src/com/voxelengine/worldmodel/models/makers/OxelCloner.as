@@ -13,6 +13,9 @@ import flash.utils.ByteArray;
 
 public class OxelCloner {
     public function OxelCloner( $op:OxelPersistance ) {
+
+        throw new Error( "REFACTOR = 2.22.17");
+/*
         // this adds the version header, need for the persistanceEvent
         var ba:ByteArray = OxelPersistance.toByteArray( $op.oxel );
         // We want to write the copy into the new lod, and reduce it from there.
@@ -30,6 +33,7 @@ public class OxelCloner {
         // Oxel.rebuild( oxel );
 
         LevelOfDetailEvent.dispatch( new LevelOfDetailEvent( LevelOfDetailEvent.MODEL_CLONE_COMPLETE ) );
+        */
     }
 }
 }

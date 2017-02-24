@@ -75,6 +75,8 @@ public class EditCursor extends VoxelModel
 	
 	static public function get currentInstance():EditCursor {
 		if ( null == _s_currentInstance ) {
+			_s_currentInstance = VoxelModel.cubeModel( EDIT_CURSOR, EditCursor ) as EditCursor;
+			/*
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			instanceInfo.modelGuid = EDIT_CURSOR
 			_s_currentInstance = new EditCursor( instanceInfo );
@@ -88,8 +90,8 @@ public class EditCursor extends VoxelModel
 			var modelInfo:ModelInfo = new ModelInfo( EDIT_CURSOR, null, mi );
 
 			_s_currentInstance.init( modelInfo, metadata );
-			var ba:ByteArray = Hex.toArray( "78:da:cb:2c:cb:35:30:b0:48:61:00:02:96:7f:0c:60:90:c1:90:c0:c0:f0:1f:0a:18:a0:80:11:42:00:45:8c:a1:00:00:e2:da:10:a2" );
-			_s_currentInstance.modelInfo.createEditCursor( EDIT_CURSOR, ba );
+			_s_currentInstance.modelInfo.createEditCursor( EDIT_CURSOR, Oxel.COMPRESSED_REFERENCE_BA_SQUARE );
+			*/
 		}
 		return _s_currentInstance;
 	}

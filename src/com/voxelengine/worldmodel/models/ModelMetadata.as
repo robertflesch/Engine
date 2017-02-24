@@ -105,6 +105,8 @@ public class ModelMetadata extends PersistanceObject
 			}
 
 			function bitmapLoaded(event:Event):void {
+				Log.out( "ModelMetadata.init.bitmapLoaded for guid: " + guid, Log.WARN );
+				loader.contentLoaderInfo.removeEventListener(Event.INIT, bitmapLoaded );
 				// Bypass setter to keep it from getting marked as changed
 				_thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData;
 				thumbnailLoaded = true;

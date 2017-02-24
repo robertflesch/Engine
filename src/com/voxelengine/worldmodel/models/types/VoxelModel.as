@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.adobe.utils.Hex;
 import com.voxelengine.GUI.voxelModels.WindowBluePrintCopy;
 import com.voxelengine.renderer.lamps.BlackLamp;
 import com.voxelengine.renderer.lamps.Lamp;
@@ -17,6 +18,7 @@ import com.voxelengine.renderer.lamps.Torch;
 import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 import com.voxelengine.worldmodel.oxel.GrainCursorUtils;
+import com.voxelengine.worldmodel.oxel.Lighting;
 
 import flash.display3D.Context3D;
 import flash.events.KeyboardEvent;
@@ -24,6 +26,7 @@ import flash.events.TimerEvent;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
 import flash.ui.Keyboard;
+import flash.utils.ByteArray;
 import flash.utils.getTimer;
 import flash.utils.Timer;
 
@@ -570,7 +573,8 @@ public class VoxelModel
 		if (!initialized) {
 			initialized = true;
 			//Log.out( "VoxelModel.update - loading oxel data: " + modelInfo.guid, Log.WARN );
-			OxelDataEvent.addListener( ModelBaseEvent.RESULT_COMPLETE, oxelComplete );
+			OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelComplete );
+
 			modelInfo.oxelLoadData();
 		}
 		
@@ -587,7 +591,7 @@ public class VoxelModel
 		//Log.out( "VoxelModel.oxelComplete evalutate - guid: " + $ode.modelGuid, Log.WARN );
 		// add $ode.modelGuid == metadata.name for imported from local file system models.
 		if ( $ode.modelGuid == instanceInfo.modelGuid || $ode.modelGuid == metadata.name ) {
-			OxelDataEvent.removeListener( ModelBaseEvent.RESULT_COMPLETE, oxelComplete );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelComplete );
 			//Log.out( "VoxelModel.oxelComplete guid: " + $ode.modelGuid, Log.WARN );
 			complete = true;
 		}
@@ -1246,6 +1250,23 @@ public class VoxelModel
 		Shader.lightAdd( sl );
 	}
 
+	static public function cubeModel( $guid:String, $class:Class, $bound:int = 4 ):VoxelModel {
+		var metadata:ModelMetadata = new ModelMetadata( $guid );
+		metadata.permissions.modify = false;
+
+		var modelInfo:ModelInfo = new ModelInfo( $guid, null, {} );
+		modelInfo.modelClass = flash.utils.getQualifiedClassName( $class );
+
+		var instanceInfo:InstanceInfo = new InstanceInfo();
+		instanceInfo.modelGuid = $guid;
+		var newModel:VoxelModel = new $class( instanceInfo );
+		newModel.init( modelInfo, metadata );
+		newModel.modelInfo.oxelPersistance = new OxelPersistance( $guid, null, Oxel.COMPRESSED_REFERENCE_BA_SQUARE, Lighting.MAX_LIGHT_LEVEL );
+		newModel.modelInfo.oxelPersistance.bound = $bound;
+		newModel.modelInfo.oxelPersistance.loadFromByteArray();
+
+		return newModel;
+	}
 
 }
 }

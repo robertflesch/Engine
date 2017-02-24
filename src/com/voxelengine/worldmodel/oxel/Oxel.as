@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.oxel
 {
 
+import com.adobe.utils.Hex;
+
 import flash.geom.Point;
 import flash.geom.Vector3D;
 import flash.net.registerClassAlias;
@@ -43,6 +45,10 @@ public class Oxel extends OxelBitfields
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//     Static Variables
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	static public const COMPRESSED_REFERENCE_BA_SQUARE:ByteArray	= Hex.toArray( "78:da:cb:2c:cb:35:30:b0:48:61:00:02:96:7f:0c:60:90:c1:90:c0:c0:f0:1f:0a:18:a0:80:11:42:00:45:8c:a1:00:00:e2:da:10:a2" );
+	static public const REFERENCE_BA_SQUARE:ByteArray 			= Hex.toArray( "69:76:6d:30:30:38:64:00:00:00:00:04:fe:00:00:00:00:00:00:68:00:60:00:00:ff:ff:ff:ff:ff:ff:ff:ff:00:00:00:00:00:00:00:00:01:00:00:00:00:01:00:ff:ff:ff:33:33:33:33:33:33:33:33" );
+
 	private static const OXEL_CHILD_COUNT:int = 8;
 	
 	private static		const ALL_NEGZ_CHILD:uint						= 0x0f;
@@ -1727,13 +1733,11 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Saving and Restoring from File
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public function toByteArray( $ba:ByteArray ):ByteArray {
-		//  n unsigned char root grain size
-		$ba.writeByte( gc.bound );
-		//  n+1 oxel data
-		toByteArrayRecursiveV9( $ba );
-		$ba.position = 0;
-		return $ba;
+	public function toByteArray():ByteArray {
+		var ba:ByteArray = new ByteArray();
+		toByteArrayRecursiveV9( ba );
+		ba.position = 0;
+		return ba;
 	}
 	
 	private function toByteArrayRecursiveV8( $ba:ByteArray ):void {
@@ -1924,7 +1928,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		catch (error:Error) {
 			Log.out("Oxel.decompressAndExtractMetadata - Was expecting compressed data " + $op.guid, Log.WARN);
 		}
-
+/*
 		try {
 			$ba.position = 0;
 			//Log.out("Oxel.decompressAndExtractMetadata - uncompress took: " + (getTimer() - time), Log.INFO);
@@ -1954,10 +1958,28 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		catch (error:Error) {
 			Log.out("Oxel.decompressAndExtractMetadata - exception loading oxe data " + $op.guid, Log.WARN);
 		}
-
+*/
 	}
 
 	public function readOxelData($ba:ByteArray, $op:OxelPersistance ):void {
+		// Read off 1 bytes, the root size
+		var rootGrainSize:int = $op.bound;
+		gc.grain = gc.bound = rootGrainSize;
+
+		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
+		gct.grain = rootGrainSize;
+
+		if (Globals.VERSION_000 == $op.version)
+			fromByteArrayV0(null, gct, $ba, $op.statistics);
+		else if (Globals.VERSION_008 >= $op.version)
+			fromByteArrayV8($op.version, null, gct, $ba, $op.statistics);
+		else
+			fromByteArray($op.version, null, gct, $ba, $op.statistics);
+
+		GrainCursorPool.poolDispose(gct);
+	}
+
+	public function readOxelDataOld($ba:ByteArray, $op:OxelPersistance ):void {
 		// Read off 1 bytes, the root size
 		var rootGrainSize:int = $ba.readByte();
 		gc.grain = gc.bound = rootGrainSize;
@@ -1966,11 +1988,11 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		gct.grain = rootGrainSize;
 
 		if (Globals.VERSION_000 == $op.version)
-			fromByteArrayV0(null, gct, $ba, $op.statisics);
+			fromByteArrayV0(null, gct, $ba, $op.statistics);
 		else if (Globals.VERSION_008 >= $op.version)
-			fromByteArrayV8($op.version, null, gct, $ba, $op.statisics);
+			fromByteArrayV8($op.version, null, gct, $ba, $op.statistics);
 		else
-			fromByteArray($op.version, null, gct, $ba, $op.statisics);
+			fromByteArray($op.version, null, gct, $ba, $op.statistics);
 
 		GrainCursorPool.poolDispose(gct);
 	}
@@ -3489,6 +3511,14 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 
 	public static function generateCube( $modelGuid:String, $layer:LayerInfo, $generateEvent:Boolean = true ):ByteArray {
+		var ba:ByteArray = COMPRESSED_REFERENCE_BA_SQUARE;
+		if ( $generateEvent )
+			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
+		return ba;
+	}
+
+
+	public static function generateCubeOld( $modelGuid:String, $layer:LayerInfo, $generateEvent:Boolean = true ):ByteArray {
 		//////////////////////////////////////////////////////////
 		// Builds Solid Cube of any grain size
 		//////////////////////////////////////////////////////////
@@ -3522,15 +3552,13 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		oxel.facesBuild();
 		GrainCursorPool.poolDispose( loco );
 
-
-		var ba:ByteArray = OxelPersistance.toByteArray( oxel );
+		var ba:ByteArray = oxel.toByteArray();
 //			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
 //			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
 		//Log.out( "GenerateCube finished modelGuid: " + $modelGuid );
 		if ( $generateEvent )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
 		//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
-
 		return ba;
 	}
 

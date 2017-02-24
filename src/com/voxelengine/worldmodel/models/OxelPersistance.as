@@ -9,10 +9,11 @@ package com.voxelengine.worldmodel.models
 {
 
 import com.voxelengine.pools.LightInfoPool;
+import com.voxelengine.worldmodel.oxel.FlowInfo;
 
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
-import flash.utils.ByteArray;
+import flash.net.registerClassAlias;
 import flash.utils.ByteArray;
 import flash.utils.getTimer;
 
@@ -22,8 +23,6 @@ import com.adobe.utils.Hex;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.LevelOfDetailEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.renderer.Chunk;
@@ -47,68 +46,149 @@ import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
 public class OxelPersistance extends PersistanceObject
 {
 	// 1 meter stone cube is reference
-	static private const compressedReferenceBA:ByteArray		= Hex.toArray( "78:da:cb:2c:cb:35:30:b0:48:61:00:02:96:7f:0c:60:90:c1:90:c0:c0:f0:1f:0a:18:a0:80:11:42:00:45:8c:a1:00:00:e2:da:10:a2" );
-	//static private const referenceBA:ByteArray 					= Hex.toArray( "69:76:6d:30:30:38:64:00:00:00:00:04:fe:00:00:00:00:00:00:68:00:60:00:00:ff:ff:ff:ff:ff:ff:ff:ff:00:00:00:00:00:00:00:00:01:00:00:00:00:01:00:ff:ff:ff:33:33:33:33:33:33:33:33" );
-	private	var	_statisics:ModelStatisics						= new ModelStatisics();
-	private var _oxels:Vector.<Oxel> 							= new Vector.<Oxel>();
-	private var _version:int;
+	static private var 	 _aliasInitialized:Boolean				= false; // used to only register class names once
+	private var _initializeFacesAndQuads:Boolean				= true;
+	
+	public function get baseLightLevel():int 					{ return dbo.baseLightLevel; }
+	public function set baseLightLevel( value:int ):void		{ dbo.baseLightLevel = value; }
+
+	public function get bound():int 							{ return dbo.bound; }
+	public function set bound( value:int ):void					{ dbo.bound = value; }
+
+	public function get type():String 							{ return dbo.type; }
+	public function set type( value:String ):void				{ dbo.type = value; }
+
+	public function get version():int 							{ return dbo.version; }
+	public function set version( value:int ):void				{ dbo.version = value; }
+
+	public function get ba():ByteArray 							{ return dbo.ba }
+	public function set ba( $ba:ByteArray):void 				{ dbo.ba = $ba; }
+
+	private var _lightInfo:LightInfo 							= LightInfoPool.poolGet();
+
+	private	var	_statistics:ModelStatisics						= new ModelStatisics();
+	public 	function get statistics():ModelStatisics			{ return _statistics; }
+
 	private var _topMostChunks:Vector.<Chunk>					= new Vector.<Chunk>();
 	private function get topMostChunk():Chunk					{ return _topMostChunks[_lod]; }
-	private var _parent:ModelInfo
-	private var firstTime:Boolean								= true;
+
 	private var _lod:int;
 	public function set setLOD( $lod:int ):void 				{ _lod = $lod; }
 	public function get lod():int			 					{ return _lod; }
 	public function incrementLOD():void 						{ _lod++; }
 	public function lodModelCount():int 						{ return _oxels.length; }
 
-	private var _baseLightLevel:int;
-	public function get baseLightLevel():int 					{ return _baseLightLevel; }
-	public function set baseLightLevel( value:int ):void		{ _baseLightLevel = value; }
-
-	private var _lightInfo:LightInfo 							= null;
-
-	public function get ba():ByteArray 							{ return dbo.ba }
-	public function set ba( $ba:ByteArray):void 				{ dbo.ba = $ba; }
-
-	public function get parent():ModelInfo						{ return _parent }
-	public function set parent( $val:ModelInfo ):void			{ _parent = $val }
-	public 	function get statisics():ModelStatisics				{ return _statisics; }
+	private var _oxels:Vector.<Oxel> 							= new Vector.<Oxel>();
 	public 	function get oxel():Oxel 							{ return _oxels[_lod]; }
 	public 	function get oxelCount():int 						{ return _oxels.length; }
 
-	public function OxelPersistance( $guid:String, $dbo:DatabaseObject, $newData:ByteArray, $baseLightIllumination:int ):void {
+	public function OxelPersistance( $guid:String, $dbo:DatabaseObject, $importedData:ByteArray, $baseLightIllumination:int ):void {
 		super($guid, Globals.BIGDB_TABLE_OXEL_DATA);
 
-		_lightInfo = LightInfoPool.poolGet();
-		_lightInfo.setInfo(Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, $baseLightIllumination);
+		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, $baseLightIllumination );
 
-
-		if (null == $dbo)
-			assignNewDatabaseObject();
-		else {
-			dbo = $dbo;
+		if (!_aliasInitialized) {
+			_aliasInitialized = true;
+			registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);
+			registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);
 		}
 
-		init($newData);
+		if ( null == $dbo ) {
+			assignNewDatabaseObject();
+			stripDataFromImport( $importedData );
+		} else {
+			dbo = $dbo;
+			dbo.ba.uncompress();
+		}
 
 		function assignNewDatabaseObject():void {
 			dbo = new DatabaseObject(Globals.BIGDB_TABLE_OXEL_DATA, "0", "0", 0, true, null);
-			setToDefault();
-		}
-
-		function setToDefault():void {
+			type 	= "ivm";
+			version = Globals.VERSION;
+			ba		= null;
+			bound		= -1;
 		}
 	}
 
-	private function init( $newData:ByteArray = null ):void {
-		if ( $newData )
-			dbo.ba = $newData;
-		fromByteArray();
+
+	private function stripDataFromImport( $importedData:ByteArray ):void {
+		try {
+			$importedData.uncompress();
+		} catch (error:Error) {
+			Log.out("OxelPersistance.stripDataFromImport - Was expecting compressed data " + guid, Log.WARN);
+		}
+
+		try {
+			$importedData.position = 0;
+			extractVersionInfo( $importedData );
+			var manifestVersion:int = $importedData.readByte();
+			if (version >= 4) {
+				var strLen:int = $importedData.readInt();
+				// read off that many bytes, even though we are using the data from the modelInfo file
+				var modelInfoJson:String = $importedData.readUTFBytes(strLen);
+			} else {
+				Log.out("OxelPersistance.stripDataFromImport - REALLY OLD VERSION " + guid, Log.WARN);
+				// need to read off one dummy byte
+				$importedData.readByte();
+				// next byte is root grain size
+			}
+
+			// Read off 1 bytes, the root size
+			bound = $importedData.readByte();
+
+			// Copy just the oxel data into the ba
+			ba = new ByteArray();
+			ba.writeBytes( $importedData, $importedData.position );
+			ba.position = 0;
+		}
+		catch (error:Error) {
+			Log.out("OxelPersistence.stripDataFromImport - exception stripping imported data " + guid, Log.WARN);
+		}
 	}
+
+/////////////////
+	// Make sense, called from for Makers
+	private function extractVersionInfo( $ba:ByteArray ):void {
+		// Read off first 3 bytes, the data format
+		type = readFormat($ba);
+		if ("ivm" != type )
+			throw new Error("OxelPersistance.extractVersionInfo - Exception - unsupported format: " + type );
+
+		// Read off next 3 bytes, the data version
+		version = readVersion($ba);
+
+		// This reads the format info and advances position on byteArray
+		function readFormat($ba:ByteArray):String {
+			var format:String;
+			var byteRead:int = 0;
+			byteRead = $ba.readByte();
+			format = String.fromCharCode(byteRead);
+			byteRead = $ba.readByte();
+			format += String.fromCharCode(byteRead);
+			byteRead = $ba.readByte();
+			format += String.fromCharCode(byteRead);
+			return format;
+		}
+
+		// This reads the version info and advances position on byteArray
+		function readVersion($ba:ByteArray):int {
+			var version:String;
+			var byteRead:int = 0;
+			byteRead = $ba.readByte();
+			version = String.fromCharCode(byteRead);
+			byteRead = $ba.readByte();
+			version += String.fromCharCode(byteRead);
+			byteRead = $ba.readByte();
+			version += String.fromCharCode(byteRead);
+
+			return int(version);
+		}
+	}
+/////////////////
+
 
 	override public function release():void {
-		_statisics.release();
+		_statistics.release();
 		for each ( var o:Oxel in _oxels )
 			o.release();
 		// TODO how to handle this?
@@ -119,9 +199,9 @@ public class OxelPersistance extends PersistanceObject
 		LightInfoPool.poolReturn(_lightInfo)
 	}
 
-	public function createTaskToLoadFromByteArray($guid:String, $taskPriority:int, $parent:ModelInfo, $isDynObj:Boolean, $altGuid:String ):void {
-        _parent = $parent;
-		FromByteArray.addTask( $guid, $taskPriority, this, $altGuid )
+	static public const NORMAL_BYTE_LOAD_PRIORITY:int = 5;
+	public function createTaskToLoadFromByteArray($guid:String, $taskPriority:int ):void {
+		FromByteArray.addTask( $guid, $taskPriority, this )
 	}
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
@@ -136,30 +216,20 @@ public class OxelPersistance extends PersistanceObject
 		//Log.out( "OxelPersistance.draw guid: " + $vm.instanceInfo.instanceGuid + " TOOK: " + (getTimer()-time) );
 	}
 
-	/*
-	// creating a new copy of this
-	override public function clone( $guid:String ):* {
-		var vmd:OxelPersistance = new OxelPersistance( $guid );
-		vmd._dbo = null; // Can I just reference this? They are pointing to same object
-		var ba:ByteArray = toByteArray( oxel );
-		vmd.fromByteArray( ba );
-		return vmd;
-	}
-	*/
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Chunk operations
 	
 	public function update( $vm:VoxelModel ):void {
 		if ( topMostChunk && topMostChunk.dirty ) {
 			if ( EditCursor.EDIT_CURSOR == guid ) {
-				oxel.facesBuild()
-				oxel.quadsBuild()
+				oxel.facesBuild();
+				oxel.quadsBuild();
 			}
 			else {
 				//Log.out( "OxelPersistance.update ------------ calling refreshQuads guid: " + guid, Log.DEBUG );
-				topMostChunk.refreshFacesAndQuads( guid, $vm, firstTime );
-				if ( firstTime )
-					firstTime = false
+				topMostChunk.refreshFacesAndQuads( guid, $vm, _initializeFacesAndQuads );
+				if ( _initializeFacesAndQuads )
+					_initializeFacesAndQuads = false
 			}
 		}
 	}
@@ -168,7 +238,6 @@ public class OxelPersistance extends PersistanceObject
 		changed = true;
 		topMostChunk.visitor( guid, $func, $functionName )
 	}
-	
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// oxel operations
@@ -180,37 +249,64 @@ public class OxelPersistance extends PersistanceObject
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// persistance operations
+	// persistence operations
 	override public function save():void {
 		if ( 0 == oxelCount || !Globals.isGuid( guid ) ) {
-				//Log.out( "OxelPersistance.save - NOT Saving GUID: " + guid  + " oxel: " + (oxel?oxel:"No oxel") + " in table: " + table, Log.WARN );
+				//Log.out( "OxelPersistence.save - NOT Saving GUID: " + guid  + " oxel: " + (oxel?oxel:"No oxel") + " in table: " + table, Log.WARN );
 				return;
 		}
-		//Log.out( "OxelPersistance.save - Saving GUID: " + guid, Log.DEBUG );
+		//Log.out( "OxelPersistence.save - Saving GUID: " + guid, Log.DEBUG );
 		if ( changed )
 			super.save();
 	}
 
 	override public function set changed(value:Boolean):void {
-		if ( parent )
-			parent.changed = value;
+//		if ( parent )
+//			parent.changed = value;
 		super.changed = value;
 	}
 
+//	private function versionGlobal():String {
+//		return zeroPad( Globals.VERSION, 3 );
+//		function zeroPad(number:int, width:int):String {
+//			var ret:String = ""+number;
+//			while( ret.length < width )
+//				ret="0" + ret;
+//			return ret;
+//		}
+//	}
+
 	override protected function toObject():void {
-		dbo.ba			= toByteArray( oxel );
+		type 	= "ivm";
+		version = Globals.VERSION;
+		ba		= toByteArray();
+		bound		= oxel.gc.bound;
+
+		function zeroPad(number:int, width:int):String {
+			var ret:String = ""+number;
+			while( ret.length < width )
+				ret="0" + ret;
+			return ret;
+		}
 	}
 				
 	// FROM Persistance
 	
-	public function fromByteArray():void {
-		_lightInfo.setIlluminationLevel( baseLightLevel );
-		_oxels[_lod] = Oxel.initializeRoot( 31 ); // Lighting should be model or instance default lighting
-		lodFromByteArray( ba );
-		OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, this );
+	public function loadFromByteArray():void {
+		//Log.out( "OxelPersistance.lodFromByteArray - guid: " + guid, Log.INFO );
+
+		_oxels[_lod] = Oxel.initializeRoot(bound);
+		oxel.readOxelData(ba, this );
+		//Log.out("OxelPersistance.lodFromByteArray - readOxelData took: " + (getTimer() - time), Log.INFO);
+
+		_statistics.gather();
+
+		_topMostChunks[_lod] = oxel.chunk = Chunk.parse( oxel, null, _lightInfo );
+		//Log.out( "OxelPersistance.lodFromByteArray oxel.chunkGet(): " + oxel.chunkGet() +  "  lod: " + _lod + " _topMostChunks[_lod] " + _topMostChunks[_lod]  );
+		//Log.out( "OxelPersistance.lodFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 	}
 
-	public function lodFromByteArray( $ba:ByteArray ):void {
+	public function lodFromByteArrayOld( $ba:ByteArray ):void {
 		//Log.out( "OxelPersistance.lodFromByteArray - guid: " + guid, Log.INFO );
 		var time:int = getTimer();
 
@@ -221,7 +317,7 @@ public class OxelPersistance extends PersistanceObject
 		oxel.readOxelData($ba, this );
 		//Log.out("OxelPersistance.lodFromByteArray - readOxelData took: " + (getTimer() - time), Log.INFO);
 
-		statisics.gather();
+		_statistics.gather();
 
 		time = getTimer();
 		_topMostChunks[_lod] = oxel.chunk = Chunk.parse( oxel, null, _lightInfo );
@@ -230,16 +326,25 @@ public class OxelPersistance extends PersistanceObject
 	}
 
 	
-	static public function toByteArray( $oxel:Oxel ):ByteArray {
+	public function toByteArray():ByteArray {
+		ba = oxel.toByteArray();
+		Log.out( "OxelPersistance.toByteArray - guid: " + guid + "  Precompressed size: " + ba.length );
+		ba.compress();
+		Log.out( "OxelPersistance.toByteArray - guid: " + guid + "  POSTcompressed size: " + ba.length );
+		return ba;
+	}
+
+	static public function toByteArrayOld( $oxel:Oxel ):ByteArray {
 		var ba:ByteArray = new ByteArray();
-		writeVersionedHeader( ba );
-		ba = $oxel.toByteArray( ba );
+		writeVersionedHeaderOld( ba );
+		throw new Error("Refactor");
+		//ba = $oxel.toByteArray( ba );
 		ba.compress();
 		return ba;
-		
+
 	}
-	
-	static private function writeVersionedHeader( $ba:ByteArray):void {
+
+	static private function writeVersionedHeaderOld( $ba:ByteArray):void {
 		/* ------------------------------------------
 		   0 char 'i'
 		   1 char 'v'
@@ -280,7 +385,7 @@ public class OxelPersistance extends PersistanceObject
 	private function validateOxel( $ba:ByteArray, $currentGrain:int):ByteArray {
 		var faceData:uint = $ba.readUnsignedInt();
 		var type:uint;
-		if ( _version <= Globals.VERSION_006 )
+		if ( version <= Globals.VERSION_006 )
 			type = OxelBitfields.typeFromRawDataOld(faceData);
 		else {  //_version > Globals.VERSION_006
 			var typeData:uint = $ba.readUnsignedInt();
@@ -356,20 +461,16 @@ public class OxelPersistance extends PersistanceObject
 	}
 	*/
 
-	public function get version():int {
-		return _version;
-	}
-
-	public function set version(value:int):void {
-		_version = value;
-	}
-
 	public function cloneNew( $guid:String ):OxelPersistance {
+		throw new Error( "REFACTOR = 2.22.17");
+/*
 		// this adds the version header, need for the persistanceEvent
 		var ba:ByteArray = toByteArray( oxel );
 
 		var od:OxelPersistance = new OxelPersistance( $guid, null, ba, Lighting.defaultBaseLightIllumination );
 		return od;
+		*/
+		return null;
 	}
 }
 }

@@ -69,7 +69,7 @@ public final class ProjectilePoolType
 		//Log.out( "ProjectilePoolType.generateData: " + _modelInfo.toString() );
 		var ba:ByteArray  = Oxel.generateCube( _projectileGuid, _modelInfo.biomes.layers[0], false );
 		_modelInfo.oxelPersistance = new OxelPersistance( _projectileGuid, null, ba, Lighting.MAX_LIGHT_LEVEL );
-		_modelInfo.oxelPersistance.fromByteArray();
+		_modelInfo.oxelPersistance.loadFromByteArray();
 	}
 		
 	private function newModel():Projectile {	

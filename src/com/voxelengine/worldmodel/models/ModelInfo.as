@@ -64,8 +64,8 @@ public class ModelInfo extends PersistanceObject
 	// overrideable in instanceInfo
 	// how to link this to instance info, when this is shared object???
 	public function get grainSize():int								{
-		if ( _oxelPersistance && _oxelPersistance.oxel )
-			return _oxelPersistance.oxel.gc.grain;
+		if ( oxelPersistance && oxelPersistance.oxel )
+			return oxelPersistance.oxel.gc.grain;
 		else 
 			return dbo.grainSize;
 	}
@@ -131,21 +131,15 @@ public class ModelInfo extends PersistanceObject
 		var oldGuid:String = super.guid;
 		super.guid = $newGuid;
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
-		if ( _oxelPersistance ) {
+		if ( oxelPersistance ) {
 			if ( altGuid )
 				oldGuid = altGuid;
-			_oxelPersistance.guid = $newGuid;
+			oxelPersistance.guid = $newGuid;
 			OxelDataEvent.create( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null );
 		}
 		changed = true;
 	}
 
-	public function createEditCursor( $guid:String, $ba:ByteArray ):void {
-		_oxelPersistance = new OxelPersistance( $guid, null, $ba, Lighting.MAX_LIGHT_LEVEL );
-		_oxelPersistance.parent = this;
-		_oxelPersistance.fromByteArray();
-	}
-	
 	public function update( $context:Context3D, $elapsedTimeMS:int, $vm:VoxelModel ):void {
 		if ( oxelPersistance && oxelPersistance.oxel && oxelPersistance.oxel.chunkGet() )
 			oxelPersistance.update( $vm );
@@ -162,8 +156,8 @@ public class ModelInfo extends PersistanceObject
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
 //		var time:int = getTimer()
 
-		if ( _oxelPersistance )
-			_oxelPersistance.draw(	$mvp, $vm, $context, $selected, $isChild, $isAlpha );
+		if ( oxelPersistance )
+			oxelPersistance.draw(	$mvp, $vm, $context, $selected, $isChild, $isAlpha );
 //		var t:int = (getTimer() - time) 	
 //		if ( t )
 //			Log.out( "ModelInfo.draw time: " + t );
@@ -178,7 +172,7 @@ public class ModelInfo extends PersistanceObject
 		super.release();
 		_biomes = null;
 		_animations = null;
-		_oxelPersistance.release();
+		oxelPersistance.release();
 	}
 
 
@@ -205,16 +199,15 @@ public class ModelInfo extends PersistanceObject
 	}
 
 	public function assignOxelDataToModelInfo( $od:OxelPersistance ):void {
-		if ( null == _oxelPersistance ) {
-			_oxelPersistance = $od;
-			_oxelPersistance.parent = this;
+		if ( null == oxelPersistance ) {
+			oxelPersistance = $od;
 			// Set OxelPersistance to the baseLightLevel for this object.
 			//Log.out( "ModelInfo.retrievedData - set baseLightLevel: " + baseLightLevel);
-			_oxelPersistance.baseLightLevel = baseLightLevel;
+			oxelPersistance.baseLightLevel = baseLightLevel;
 
 			const priority:int = 5;
-			if (_oxelPersistance && 0 == _oxelPersistance.oxelCount)
-				_oxelPersistance.createTaskToLoadFromByteArray(guid, priority, this, dynamicObj, _altGuid);
+			if (oxelPersistance && 0 == oxelPersistance.oxelCount)
+				oxelPersistance.createTaskToLoadFromByteArray(guid, priority);
 			else
 				OxelDataEvent.create( OxelDataEvent.OXEL_READY, 0, $od.guid, $od );
 		}
@@ -267,22 +260,22 @@ public class ModelInfo extends PersistanceObject
 	}
 	
 	public function changeOxel( $instanceGuid:String , $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
-		var result:Boolean = _oxelPersistance.changeOxel( $instanceGuid, $gc, $type, $onlyChangeType );
+		var result:Boolean = oxelPersistance.changeOxel( $instanceGuid, $gc, $type, $onlyChangeType );
 		if ( TypeInfo.AIR == $type )
 			childRemoveByGC( $gc );
 		return result;
 	}
 
 	public function oxelDataChanged():void {
-		 _oxelPersistance.changed = true;
+		 oxelPersistance.changed = true;
 	}
 	
 	public function oxelLoadData():void {
-		if ( _oxelPersistance ) {
-			if ( _oxelPersistance.oxelCount )
-				OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, _oxelPersistance );
+		if ( oxelPersistance ) {
+			if ( oxelPersistance.oxelCount )
+				OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, oxelPersistance );
 			else {
-				_oxelPersistance.createTaskToLoadFromByteArray(guid, 5, this, dynamicObj, _altGuid );
+				oxelPersistance.createTaskToLoadFromByteArray(guid, OxelPersistance.NORMAL_BYTE_LOAD_PRIORITY );
 			}
 
 			//Log.out( "ModelInfo.loadOxelData - returning loaded oxel guid: " + guid );
@@ -313,8 +306,8 @@ public class ModelInfo extends PersistanceObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//  start animation operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	protected 	var		_animationsLoaded:Boolean
-	private 	var 	_animsRemainingToLoad:int			
+	protected 	var		_animationsLoaded:Boolean;
+	private 	var 	_animsRemainingToLoad:int;
 	public 	function get animationsLoaded():Boolean 				{ return _animationsLoaded; }
 	public 	function set animationsLoaded(value:Boolean):void		{ _animationsLoaded = value; }
 	
@@ -638,8 +631,8 @@ public class ModelInfo extends PersistanceObject
 					Log.out("ModelInfo.save - NOT Saving guid: " + guid + " NEED Animations or children to complete", Log.WARN);
 			}
 			
-			if ( _oxelPersistance )
-				_oxelPersistance.save();
+			if ( oxelPersistance )
+				oxelPersistance.save();
 			
 			for ( var i:int; i < childVoxelModels.length; i++ ) {
 				var child:VoxelModel = childVoxelModels[i];
@@ -745,12 +738,14 @@ public class ModelInfo extends PersistanceObject
 		PersistanceEvent.dispatch( pe )
 
 		// also need to clone the oxel
-
+		throw new Error( "REFACTOR = 2.22.17");
+		/*
 		// this adds the version header, need for the persistanceEvent
 		var ba:ByteArray = OxelPersistance.toByteArray( oxelPersistance.oxel );
 
 		var ope:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $guid, null, ba )
 		PersistanceEvent.dispatch( ope )
+		*/
 	}
 
 	public function toString():String {  return "ModelInfo - guid: " + guid; }

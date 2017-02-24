@@ -257,7 +257,7 @@ package com.voxelengine.worldmodel
 		}
 		
 		public function applyRegionInfoToPlayer( $avatar:Player ):void {
-			Log.out( "Region.applyRegionInfoToPlayer", Log.WARN );
+			Log.out( "Region.applyRegionInfoToPlayer - DISABLED", Log.WARN );
 /*
 			if ( playerPosition ) {
 				//Log.out( "Player.onLoadingPlayerComplete - setting position to  - x: "  + playerPosition.x + "   y: " + playerPosition.y + "   z: " + playerPosition.z );

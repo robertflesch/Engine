@@ -120,13 +120,10 @@ public class PersistanceObject
 			// the create result was coming back after some additional saves had been made
 			// this was causing data to be lost!! So first save data, then copy over dbo, then restore data!
 			_dbo = $pe.dbo;
-			if ( dbo ) {
+			if ( dbo )
 				Log.out( getQualifiedClassName( this ) + ".PersistanceObject.createSuccess - ALT PATH created: " + guid + " in table: " + $pe.table, Log.DEBUG );
-                changed = true;
-			}
-			else {
+			else
 				Log.out(getQualifiedClassName( this ) + ".PersistanceObject.createSuccess - ERROR: " + guid + " in table: " + $pe.table, Log.ERROR);
-			}
 		}
 		else {
 			if ( !$pe.dbo )
@@ -180,7 +177,7 @@ public class PersistanceObject
 		for( var p:String in obj0 ) {
 			if ( null != obj0[ p ]) {
 				dbo[p] = obj0[p];
-				trace("PersistanceObject.mergeOverwrite " + p, ' : obj0', obj0[p], 'dbo', dbo[p], '-> new value = ', dbo[p]);
+				//trace("PersistanceObject.mergeOverwrite " + p, ' : obj0', obj0[p], 'dbo', dbo[p], '-> new value = ', dbo[p]);
 			}
 		}
 	}

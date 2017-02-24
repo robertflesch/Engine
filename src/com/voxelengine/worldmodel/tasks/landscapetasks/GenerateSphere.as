@@ -77,11 +77,13 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			// for multistep builds I will have to ponder this more.
 			//oxel.facesBuildWater();
 			oxel.facesBuild();
-			
+
+			throw new Error( "REFACTOR = 2.22.17");
+/*
 			var ba:ByteArray = OxelPersistance.toByteArray( oxel );
 			Log.out( "GenerateSphere finished modelGuid: " + _modelGuid );
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba ) );
-			
+*/
 			//Log.out( "GenerateSphere.start - completed layer of type: " + (Globals.Info[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
 			super.complete() // AbstractTask will send event
 		}

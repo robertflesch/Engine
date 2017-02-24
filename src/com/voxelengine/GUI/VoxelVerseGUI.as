@@ -400,7 +400,7 @@ public class VoxelVerseGUI extends EventDispatcher
 				new WindowCrafting();
 				new WindowInventory();
 			}
-
+/*
 			// allows for saving of ivm to disk
 			if ( Globals.isDebug ) {
 				if (Keyboard.O == e.keyCode) {
@@ -413,6 +413,7 @@ public class VoxelVerseGUI extends EventDispatcher
 					}
 				}
 			}
+ */
 		}
 	}
 	

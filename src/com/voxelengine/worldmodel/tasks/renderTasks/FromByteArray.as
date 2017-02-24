@@ -27,18 +27,16 @@ import flash.utils.getTimer;
 public class FromByteArray extends AbstractTask 
 {	
 	private var	_guid:String;
-	private var	_altGuid:String;
 	private var	_op:OxelPersistance;
 
-	static public function addTask( $guid:String, $taskPriority:int, $parent:OxelPersistance, $altGuid:String ): void {
-		var fba:FromByteArray = new FromByteArray( $guid, $taskPriority, $parent, $altGuid );
+	static public function addTask( $guid:String, $taskPriority:int, $parent:OxelPersistance ): void {
+		var fba:FromByteArray = new FromByteArray( $guid, $taskPriority, $parent );
 		Globals.g_landscapeTaskController.addTask( fba )
 	}
 	
-	public function FromByteArray( $guid:String, $taskPriority:int, $parent:OxelPersistance, $altGuid:String ):void {
+	public function FromByteArray( $guid:String, $taskPriority:int, $parent:OxelPersistance ):void {
 		_guid = $guid;
 		_op = $parent;
-		_altGuid = $altGuid;
 		super("FromByteArray", $taskPriority );
 		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
 	}
@@ -48,8 +46,8 @@ public class FromByteArray extends AbstractTask
 		//var time:int = getTimer();
 
 		try {
-			//Log.out("FromByteArray.start: guid: " + _guid);
-			_op.fromByteArray();
+			Log.out("FromByteArray.start: guid: " + _guid, Log.WARN);
+			_op.loadFromByteArray();
 
 			if ("0" == _op.dbo.key) {
 				_op.changed = true;

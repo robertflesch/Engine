@@ -140,13 +140,12 @@ public class OxelPersistanceCache
 			return;
 		}
 
-		var od:OxelPersistance;
 		if ( $pe.dbo ) {
-			od = new OxelPersistance( $pe.guid, $pe.dbo, null, Lighting.defaultBaseLightIllumination );
-			add( $pe.series, od );
+			op = new OxelPersistance( $pe.guid, $pe.dbo, null, Lighting.defaultBaseLightIllumination );
+			add( $pe.series, op );
 		} else if ( $pe.data ) {
-			od = new OxelPersistance( $pe.guid, null, $pe.data as ByteArray, Lighting.defaultBaseLightIllumination );
-			add( $pe.series, od );
+			op = new OxelPersistance( $pe.guid, null, $pe.data as ByteArray, Lighting.defaultBaseLightIllumination );
+			add( $pe.series, op );
 		} else {
 			Log.out( "OxelDataCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.WARN );
 			OxelDataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );

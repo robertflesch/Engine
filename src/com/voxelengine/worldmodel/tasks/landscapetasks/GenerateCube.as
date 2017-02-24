@@ -8,28 +8,13 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
-	import com.adobe.utils.Hex;
-	import com.voxelengine.events.ModelBaseEvent;
-	import com.voxelengine.events.OxelDataEvent;
-	import com.voxelengine.events.PersistanceEvent;
-	import com.voxelengine.worldmodel.models.OxelPersistance;
-	import com.voxelengine.worldmodel.oxel.GrainCursor;
-	import com.voxelengine.pools.GrainCursorPool;
-	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
-	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
 	import com.voxelengine.worldmodel.TypeInfo;
 	
-	/**
-	 * ...
-	 * @author Robert Flesch
-	 */
-	public class GenerateCube extends LandscapeTask 
+	public class GenerateCube extends LandscapeTask
 	{	
 		static public function script( $grain:int = 6, $type:int = 0 ):Object {
 			if ( 0 == $type )
@@ -48,25 +33,16 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		public function GenerateCube( $guid:String, layer:LayerInfo ):void {
 			super($guid, layer, "GenerateCube");
-			Log.out( "GenerateCube: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );
 		}
 		
-		override public function start():void 
-		{
-            super.start() // AbstractTask will send event
-			Log.out( "GenerateCube.start: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );
-			
+		override public function start():void {
 			var timer:int =  getTimer();
+            super.start() // AbstractTask will send event
 
 			Oxel.generateCube( _modelGuid, _layer );
 
-			//Log.out( "GenerateCube.start - took: "  + (getTimer() - timer) );					
-            super.complete() // AbstractTask will send event
-		}
-		
-		override public function cancel():void {
-			// TODO stop this somehow?
-			super.cancel();
+            super.complete(); // AbstractTask will send event
+			Log.out( "GenerateCube.start guid: " + _modelGuid + " type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + " took: " + (getTimer() - timer), Log.WARN );
 		}
 	}
 }
