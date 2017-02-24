@@ -256,7 +256,9 @@ import com.voxelengine.renderer.Renderer;
 		
 		private const BAD_EMAIL_PASSWORD:String = "Bad email or password";
 		private function onPasswordFailure( $e:LoginEvent ):void {
-			removeLoginEventHandlers()
+			removeLoginEventHandlers();
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
+
 			Log.out("WindowLogin.onPasswordFailure" + $e.guid );
 			//_passwordInput.glow = true;
 			//_errorText.text = $e.guid;
@@ -265,6 +267,7 @@ import com.voxelengine.renderer.Renderer;
 		
 		private function onEmailFailure( $e:LoginEvent ):void {
 			removeLoginEventHandlers()
+			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
 			Log.out("WindowLogin.onEmailFailure" + $e.guid );
 //			_emailInput.glow = true;
 //			_errorText.text = $e.guid;
