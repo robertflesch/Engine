@@ -58,8 +58,6 @@ import com.voxelengine.worldmodel.Region
 [SWF(frameRate="120",backgroundColor="0xffffff",width="960",height="540")]
 public class VoxelVerse extends Sprite
 {
-	private var _timePrevious:int = getTimer();
-
 	private var _showConsole:Boolean = false;
 	public function get showConsole():Boolean { return _showConsole }
 	public function set showConsole(value:Boolean):void { _showConsole = value }
@@ -164,17 +162,17 @@ public class VoxelVerse extends Sprite
 
 	}
 
-	private static var _s_timeEntered:int;
-	private static var _s_timeRender:int;
-	private static var _s_timeUpdate:int;
-	private static var framesToDisplaySplash:int;
-    private static var _s_frameTime:int;
-    public static function frameTime():int { return _s_frameTime; }
-	private static var _s_frameCounter:int = 0;
+	private var _fpsStat:int;
+	public function get fps():int 					{ return _fpsStat };
+
+	private var _s_timeEntered:int;
+	private var _s_timeExited:int = getTimer();
+	private var _s_timeRender:int;
+	private var _s_timeUpdate:int;
+	private var _s_timeLastFPS:int;
+	private var framesToDisplaySplash:int;
+	private var _s_frameCounter:int = 0;
 	private function enterFrame(e:Event):void {
-		_s_frameCounter++;
-//		if ( 0 == (_s_frameCounter % 60) )
-//			Log.out( "VoxelVerse.enterFrame 60 frames fps: " + VoxelVerseGUI.currentInstance.releaseMenu().fps() );
 		if ( 0 == _s_timeEntered ) {
 			if ( _splashDisplayed && ( 1 == framesToDisplaySplash) )
 				readyToGo();
@@ -183,18 +181,17 @@ public class VoxelVerse extends Sprite
 				return;
 			}
 		}
-		else
-			_s_timeEntered = getTimer();
+		// Do this after checking it for 0
+		_s_timeEntered = getTimer();
+		_s_frameCounter++;
 
-
-		var interFrameTime:int = _s_timeEntered - _timePrevious;
-		_timePrevious = getTimer();
+		var interFrameTime:int = _s_timeEntered - _s_timeExited;
 		//Log.out( "VoxelVerse.enterFrame -  interFrameTime: " + interFrameTime, Log.INFO )
 
 		MemoryManager.update();
 
-		RegionManager.instance.update( interFrameTime + _s_timeRender );
-		Shader.animationOffsetsUpdate( interFrameTime + _s_timeRender );
+		RegionManager.instance.update( interFrameTime );
+		Shader.animationOffsetsUpdate( interFrameTime );
 		_s_timeUpdate = getTimer() - _s_timeEntered;
 
 		Renderer.renderer.render();
@@ -203,12 +200,20 @@ public class VoxelVerse extends Sprite
 		if ( showConsole )
 			toggleConsole();
 
-        _s_frameTime = interFrameTime + _s_timeUpdate + _s_timeRender;
+		if( _s_timeEntered - 1000 > _s_timeLastFPS ) {
+			_s_timeLastFPS = getTimer();
+			_fpsStat = _s_frameCounter;
+			_s_frameCounter = 0;
+//			Log.out( "VoxelVerse.enterFrame 60 frames fps: " + VoxelVerseGUI.currentInstance.releaseMenu().fps() );
+		}
+
 //		if ( ( 20 < _s_timeRender || 10 < _s_timeUpdate ) && Globals.active && Globals.isDebug )
 //			Log.out( "VoxelVerse.enterFrame - update: "  + _s_timeUpdate + " render: " + _s_timeRender  + "  total: " +  _s_frameTime + "  interFrameTime: " + interFrameTime, Log.INFO )
 
 		// For some reason is was important to make sure everything was updated before this got passed on to child classes.
 		AppEvent.dispatch( e )
+
+		_s_timeExited = getTimer();
 	}
 
 	/**

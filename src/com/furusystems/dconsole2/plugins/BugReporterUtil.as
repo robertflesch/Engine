@@ -7,9 +7,9 @@ package com.furusystems.dconsole2.plugins
 	import flash.display.BitmapData;
 	import flash.net.FileReference;
 	import flash.utils.ByteArray;
-	import nochump.util.zip.ZipEntry;
-	import nochump.util.zip.ZipFile;
-	import nochump.util.zip.ZipOutput;
+	import com.voxelengine.utils.zip.ZipEntry;
+	import com.voxelengine.utils.zip.ZipFile;
+	import com.voxelengine.utils.zip.ZipOutput;
 	/**
 	 * ...
 	 * @author Andreas Rønning

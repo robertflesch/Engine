@@ -1,6 +1,5 @@
 package com.furusystems.dconsole2.plugins 
 {
-	import com.adobe.serialization.json.JSON;
 	import com.furusystems.dconsole2.core.plugins.IParsingDConsolePlugin;
 	import com.furusystems.dconsole2.core.plugins.PluginManager;
 	
@@ -24,7 +23,7 @@ package com.furusystems.dconsole2.plugins
 				case "[":
 				case "{":
 					try {
-						var ret:* = com.adobe.serialization.json.JSON.decode(data);
+						var ret:* = JSON.parse(data);
 						return ret;
 					}catch (e:Error) {
 						return null;

@@ -8,6 +8,7 @@
 
 package com.voxelengine.GUI
 {
+import com.voxelengine.Globals;
 import com.voxelengine.renderer.Renderer;
 
 import flash.events.Event;
@@ -33,8 +34,6 @@ import flash.events.Event;
 		private var _rotLabel:Label = new Label("x: 0  y: 0  z: 0");
 
 		private var _startTime:int = 0;
-		protected var _frames:int = 0;
-		protected var _fps:int = 0;
 		protected var _prefix:String = "";
 		
 		public function WindowReleaseMenu():void 
@@ -128,19 +127,9 @@ import flash.events.Event;
 		
 		private function updateFPS():void
 		{
-			_frames++;
-			var time:int = getTimer();
-			var elapsed:int = time - _startTime;
-			if(elapsed >= 1000)
-			{
-				//_fps = Math.round(_frames * 1000 / elapsed);
-				_fps = 1000/VoxelVerse.frameTime();
-				_frames = 0;
-				_startTime = time;
-				// update the parent component with the right 
-				_fpsLabel.text = _prefix + _fps.toString();
-			}
-			
+			// update the parent component with the right
+			_fpsLabel.text = _prefix +  Globals.g_app.fps;
+			// Globals.g_app.stage.frameRate  /Target rate
 		}
 		
 		public static function addCommasToLargeInt( value:int ):String 

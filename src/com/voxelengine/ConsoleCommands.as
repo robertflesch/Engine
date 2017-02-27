@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine
 {
+import com.furusystems.dconsole2.plugins.plugcollections.BasicPlugins;
+
 import flash.utils.getTimer;
 
 import com.furusystems.dconsole2.DConsole;
@@ -350,6 +352,8 @@ public class ConsoleCommands {
 		DConsole.createCommand( "waterSpheresRandom", waterSpheres );
 		DConsole.createCommand( "ambientOcculsion", ambientOcculsion );
 		DConsole.createCommand( "recalculateAmbient", recalculateAmbient );
+
+		DConsole.registerPlugins(BasicPlugins);
 	}
 }
 }

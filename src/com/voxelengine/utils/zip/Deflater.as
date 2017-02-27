@@ -1,5 +1,5 @@
 /*
-nochump.util.zip.Deflater
+com.voxelengine.utils.zip.Deflater
 Copyright (c) 2008 David Chang (dchang@nochump.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,7 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package nochump.util.zip {
+package com.voxelengine.utils.zip {
 	
 	import flash.utils.Endian;
 	import flash.utils.ByteArray;

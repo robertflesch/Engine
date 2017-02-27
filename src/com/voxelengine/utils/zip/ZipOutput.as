@@ -1,5 +1,5 @@
 /*
-nochump.util.zip.ZipOutput
+com.voxelengine.utils.zip.ZipOutput
 Copyright (c) 2008 David Chang (dchang@nochump.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -20,11 +20,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-package nochump.util.zip {
+package com.voxelengine.utils.zip {
 
-	import flash.utils.Dictionary;
-	import flash.utils.Endian;
-	import flash.utils.ByteArray;
+
+import com.voxelengine.utils.zip.CRC32;
+import com.voxelengine.utils.zip.Deflater;
+import com.voxelengine.utils.zip.ZipEntry;
+
+import flash.utils.Dictionary;
+import flash.utils.Endian;
+import flash.utils.ByteArray;
 	
 	public class ZipOutput {
 		

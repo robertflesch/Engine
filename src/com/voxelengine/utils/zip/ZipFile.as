@@ -1,5 +1,5 @@
 /*
-nochump.util.zip.ZipFile
+com.voxelengine.utils.zip.ZipFile
 Copyright (c) 2008 David Chang (dchang@nochump.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
