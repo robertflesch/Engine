@@ -1736,6 +1736,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	public function toByteArray():ByteArray {
 		var ba:ByteArray = new ByteArray();
 		toByteArrayRecursiveV9( ba );
+		//Log.out( "Oxel.toByteArray - length: " + ba.length );
 		ba.position = 0;
 		return ba;
 	}
@@ -1831,26 +1832,24 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		else
 			cleanUpChild();
 
-		// Write core data to array
-		$ba.writeUnsignedInt(maskTempData()); // data contains info on faces, lighting, flow
+		// Write oxel's core data to array
+		//Log.out("toByteArrayRecursive " + getTabs(gc.bound - gc.grain ) + "data: " + maskWriteData().toString(16));
+		//Log.out("toByteArrayRecursive " + getTabs(gc.bound - gc.grain ) + "type: " + type);
+
+		$ba.writeUnsignedInt(maskWriteData()); // data contains info on faces, lighting, flow
 		$ba.writeUnsignedInt(type); // type has typeData
 
-//		Log.out("toByteArrayRecursive data: " + maskTempData().toString(16));
-//		Log.out("toByteArrayRecursive type: " + type);
-
 		if ( childrenHas() )
-			writeParent();
+			writeChildren();
 		else
-			writeChild();
+			writeFlowAndLightingInfo();
 
-		function writeParent():void {
-//			Log.out("toByteArrayRecursive ---- start write parent -------" );
+		function writeChildren():void {
 			for each ( var child:Oxel in _children )
 				child.toByteArrayRecursiveV9( $ba );
-//			Log.out("toByteArrayRecursive ---- end write parent -------" );
 		}
 
-		function writeChild():void {
+		function writeFlowAndLightingInfo():void {
 			if (flowInfo)
 				flowInfo.toByteArray($ba);
 
@@ -1919,48 +1918,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return $ba;
 	}
 
-	public function decompressAndExtractMetadata( $ba:ByteArray, $op:OxelPersistance ):void {
-
-		var time:int = getTimer();
-		try {
-			$ba.uncompress();
-		}
-		catch (error:Error) {
-			Log.out("Oxel.decompressAndExtractMetadata - Was expecting compressed data " + $op.guid, Log.WARN);
-		}
-/*
-		try {
-			$ba.position = 0;
-			//Log.out("Oxel.decompressAndExtractMetadata - uncompress took: " + (getTimer() - time), Log.INFO);
-
-			time = getTimer();
-			extractVersionInfo($ba, $op);
-			// how many bytes is the modelInfo
-			if ($op.version >= 4) {
-				var strLen:int = $ba.readInt();
-				// read off that many bytes, even though we are using the data from the modelInfo file
-				var modelInfoJson:String = $ba.readUTFBytes(strLen);
-			} else {
-				Log.out("Oxel.decompressAndExtractMetadata - REALLY OLD VERSION " + $op.guid, Log.WARN);
-				// need to read off one dummy byte
-				$ba.readByte();
-				// next byte is root grain size
-			}
-
-			if ( !_aliasInitialized ) {
-				_aliasInitialized = true;
-				// TODO - do I need to do this everytime? or could I use a static initializer? RSF - 7.16.2015
-				registerClassAlias("com.voxelengine.worldmodel.oxel.FlowInfo", FlowInfo);
-				registerClassAlias("com.voxelengine.worldmodel.oxel.Brightness", Lighting);
-			}
-			//Log.out("Oxel.decompressAndExtractMetadata - extractVersionInfo took: " + (getTimer() - time), Log.INFO);
-		}
-		catch (error:Error) {
-			Log.out("Oxel.decompressAndExtractMetadata - exception loading oxe data " + $op.guid, Log.WARN);
-		}
-*/
-	}
-
 	public function readOxelData($ba:ByteArray, $op:OxelPersistance ):void {
 		// Read off 1 bytes, the root size
 		var rootGrainSize:int = $op.bound;
@@ -1974,25 +1931,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		else if (Globals.VERSION_008 >= $op.version)
 			fromByteArrayV8($op.version, null, gct, $ba, $op.statistics);
 		else
-			fromByteArray($op.version, null, gct, $ba, $op.statistics);
-
-		GrainCursorPool.poolDispose(gct);
-	}
-
-	public function readOxelDataOld($ba:ByteArray, $op:OxelPersistance ):void {
-		// Read off 1 bytes, the root size
-		var rootGrainSize:int = $ba.readByte();
-		gc.grain = gc.bound = rootGrainSize;
-
-		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
-		gct.grain = rootGrainSize;
-
-		if (Globals.VERSION_000 == $op.version)
-			fromByteArrayV0(null, gct, $ba, $op.statistics);
-		else if (Globals.VERSION_008 >= $op.version)
-			fromByteArrayV8($op.version, null, gct, $ba, $op.statistics);
-		else
-			fromByteArray($op.version, null, gct, $ba, $op.statistics);
+			fromByteArray($op.version, null, gct, $ba, $op );
 
 		GrainCursorPool.poolDispose(gct);
 	}
@@ -2016,8 +1955,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		//Log.out("OxelPersistance.extractVersionInfo - version: " + $op.version );
 
 		// This reads the format info and advances position on byteArray
-		function readFormat($ba:ByteArray):String
-		{
+		function readFormat($ba:ByteArray):String {
 			var format:String;
 			var byteRead:int = 0;
 			byteRead = $ba.readByte();
@@ -2030,8 +1968,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 
 		// This reads the version info and advances position on byteArray
-		function readVersion($ba:ByteArray):int
-		{
+		function readVersion($ba:ByteArray):int {
 			var version:String;
 			var byteRead:int = 0;
 			byteRead = $ba.readByte();
@@ -2045,29 +1982,36 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 
+	private function getTabs( count:int ):String {
+		var result:String = "";
+		for ( var i:int; i < count; i++ ){
+			result += "\t";
+		}
+		return result;
+	}
 
-
-	public function fromByteArray( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $stats:ModelStatisics ):ByteArray {
+	public function fromByteArray( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $op:OxelPersistance ):ByteArray {
 		var faceData:uint = $ba.readUnsignedInt();
 		var typeData:uint = $ba.readUnsignedInt();
-		//Log.out( "fromByteArray data: " + faceData.toString(16));
-		//Log.out( "fromByteArray type: " + typeData );
+		//Log.out( "fromByteArray " + getTabs($gc.bound - $gc.grain ) + "  data: " + faceData.toString(16));
+		//Log.out( "fromByteArray " + getTabs($gc.bound - $gc.grain ) + "  type: " + typeData );
+
 		initialize( $parent, $gc, faceData, typeData );
 
 		if ( OxelBitfields.dataIsParent( faceData ) ) {
 			_children = ChildOxelPool.poolGet();
-			var gct:GrainCursor = GrainCursorPool.poolGet( $stats.largest );
+			var gct:GrainCursor = GrainCursorPool.poolGet( gc.grain );
 			for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ ) {
 				_children[i]  = OxelPool.poolGet();
 				gct.copyFrom( $gc );
 				gct.become_child(i);
-				_children[i].fromByteArray( $version, this, gct, $ba, $stats );
+				_children[i].fromByteArray( $version, this, gct, $ba, $op );
 			}
 			GrainCursorPool.poolDispose( gct );
 		}
 		else {
 			childCount = 1;
-			$stats.statAdd( type, gc.grain );
+			$op.statistics.statAdd( type, gc.grain );
 
 			if (OxelBitfields.flowInfoHas(faceData)){
 				flowInfo = FlowInfoPool.poolGet();
@@ -2086,8 +2030,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 
 
-	public function fromByteArrayV0( $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $stats:ModelStatisics ):ByteArray
-	{
+	public function fromByteArrayV0( $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $stats:ModelStatisics ):ByteArray {
 		var oxelData:uint = $ba.readInt();
 		//trace( intToHexString() + "  " + oxelData );
 		initialize( $parent, $gc, oxelData, OxelBitfields.typeFromRawDataOld( oxelData ) );
@@ -2113,8 +2056,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return $ba;
 	}
 	
-	private function intToHexString( $val:int ):String
-	{
+	private function intToHexString( $val:int ):String	{
 		var str:String = $val.toString(16);
 		var hex:String = ("0x00000000").substr(2,8 - str.length) + str;
 		return hex;
@@ -3431,16 +3373,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				rebuild(child);
 		}
 		else {
-			if ( $oxel.gc.eval( 5, 101, 72, 16 )) {
-				var result1:Boolean = $oxel.faceHasDirtyBits();
-				Log.out("Oxel.rebuild - not being lit");
-			}
 			$oxel.facesMarkAllDirty();
 			$oxel.quadsDeleteAll();
-			if ( $oxel.gc.eval( 5, 101, 72, 16 )) {
-				var result2:Boolean = $oxel.faceHasDirtyBits();
-				Log.out("Oxel.rebuild - not being lit");
-			}
+			$oxel.facesBuildTerminal();
 		}
 	}
 
@@ -3504,7 +3439,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 					return;
 
 				$oxel.flowInfo.flowScaling.reset();
-				$oxel.facesMarkAllDirty();
+//				$oxel.facesMarkAllDirty();
 				$oxel.quadsDeleteAll();
 			}
 		}

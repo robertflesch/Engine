@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.models.OxelPersistance;
 import com.voxelengine.worldmodel.oxel.Lighting;
 
 import flash.utils.ByteArray;
@@ -42,13 +43,20 @@ public class OxelPersistanceCache
 		OxelDataEvent.addListener( ModelBaseEvent.GENERATION, 			generated );
 		OxelDataEvent.addListener( ModelBaseEvent.DELETE, 				deleteHandler );
 		OxelDataEvent.addListener( ModelBaseEvent.UPDATE_GUID, 			updateGuid );
+		OxelDataEvent.addListener( ModelBaseEvent.SAVE, 				save );
 		
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.GENERATE_SUCCEED,generateSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
 	}
-	
+
+	static private function save(e:OxelDataEvent):void {
+		for each ( var op:OxelPersistance in _oxelDataDic )
+			if ( op )
+				op.save();
+	}
+
 	static private function add( $series:int, $od:OxelPersistance ):void { 
 		if ( null == $od || null == $od.guid ) {
 			Log.out( "OxelDataCache.Add trying to add NULL OxelData or guid", Log.WARN );
@@ -141,10 +149,10 @@ public class OxelPersistanceCache
 		}
 
 		if ( $pe.dbo ) {
-			op = new OxelPersistance( $pe.guid, $pe.dbo, null, Lighting.defaultBaseLightIllumination );
+			op = new OxelPersistance( $pe.guid, $pe.dbo, null );
 			add( $pe.series, op );
 		} else if ( $pe.data ) {
-			op = new OxelPersistance( $pe.guid, null, $pe.data as ByteArray, Lighting.defaultBaseLightIllumination );
+			op = new OxelPersistance( $pe.guid, null, $pe.data as ByteArray );
 			add( $pe.series, op );
 		} else {
 			Log.out( "OxelDataCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.WARN );
@@ -156,7 +164,7 @@ public class OxelPersistanceCache
 	static private function generateSucceed( $pe:PersistanceEvent):void {
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
-		var od:OxelPersistance = new OxelPersistance( $pe.guid, null, $pe.data, Lighting.defaultBaseLightIllumination );
+		var od:OxelPersistance = new OxelPersistance( $pe.guid, null, $pe.data );
 		add( $pe.series, od );
 		Log.out( "OxelDataCache.generateSucceed " + $pe.toString(), Log.INFO );
 	}

@@ -417,13 +417,17 @@ public class EditCursor extends VoxelModel
 		
 		if ( !modelInfo.oxelPersistance.oxel.lighting ) {
 			modelInfo.oxelPersistance.oxel.lighting = LightingPool.poolGet(0xff);
-			modelInfo.oxelPersistance.oxel.lighting.add( modelInfo.oxelPersistance.oxel.chunkGet().lightInfo );
 		}
 		var li:LightInfo = modelInfo.oxelPersistance.oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-		if ( li )
-			modelInfo.oxelPersistance.oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
+		if ( null == li ) {
+			modelInfo.oxelPersistance.oxel.lighting.add(modelInfo.oxelPersistance.oxel.chunkGet().lightInfo);
+			li = modelInfo.oxelPersistance.oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+		}
+		modelInfo.oxelPersistance.oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
 		modelInfo.oxelPersistance.oxel.write( EDIT_CURSOR, modelInfo.oxelPersistance.oxel.gc, oxelTexture, true );
-		
+
+		if ( null == li )
+			Log.out( "EditCursor - LightInfo is bad", Log.WARN);
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
 			li.color = cursorColorRainbow();
 		else if ( CursorOperationEvent.INSERT_OXEL == cursorOperation && EDITCURSOR_INVALID == oxelTexture )
@@ -875,7 +879,7 @@ public class EditCursor extends VoxelModel
 	private function mouseUp(e:MouseEvent):void  {
 		repeatTimerStop()
 		
-		if ( Globals.openWindowCount || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging )
+		if ( Globals.openWindowCount || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging || Log.showing )
 			return;
 		
 		Log.out( "EditCursor.mouseUp e: " + e.toString() )
@@ -900,7 +904,7 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function mouseDown(e:MouseEvent):void {
-		if ( Globals.openWindowCount  || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging )
+		if ( Globals.openWindowCount  || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging || Log.showing )
 			return
 			
 		if ( doubleMessageHack ) {

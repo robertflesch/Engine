@@ -1261,7 +1261,7 @@ public class VoxelModel
 		instanceInfo.modelGuid = $guid;
 		var newModel:VoxelModel = new $class( instanceInfo );
 		newModel.init( modelInfo, metadata );
-		newModel.modelInfo.oxelPersistance = new OxelPersistance( $guid, null, Oxel.COMPRESSED_REFERENCE_BA_SQUARE, Lighting.MAX_LIGHT_LEVEL );
+		newModel.modelInfo.oxelPersistance = new OxelPersistance( $guid, null, Oxel.COMPRESSED_REFERENCE_BA_SQUARE );
 		newModel.modelInfo.oxelPersistance.bound = $bound;
 		newModel.modelInfo.oxelPersistance.loadFromByteArray();
 

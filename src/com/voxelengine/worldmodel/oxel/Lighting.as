@@ -316,9 +316,9 @@ public class Lighting  {
 		// now write the count of lights to the byte array
 		$ba.writeByte( lightCount );
 
-		//Log.out( "Lighting.toByteArray - \t\t\tcolor: " + _color );
-		//Log.out( "Lighting.toByteArray - \t\tlowerAmbient: " + _lowerAmbient );
-		//Log.out( "Lighting.toByteArray - \t\thigherAmbient: " + _higherAmbient );
+		//Log.out( "Lighting.toByteArray - \t\t\tcolor: " + _color.toString(16) );
+		//Log.out( "Lighting.toByteArray - \t\tlowerAmbient: " + _lowerAmbient.toString(16));
+		//Log.out( "Lighting.toByteArray - \t\thigherAmbient: " + _higherAmbient.toString(16) );
 		//Log.out( "Lighting.toByteArray - \t\t\tlightCount: " + lightCount );
 
 		// now for each light, write its contents to the byte array
@@ -373,9 +373,9 @@ public class Lighting  {
 			_higherAmbient = $ba.readUnsignedInt();
 			lightCount = $ba.readByte();
 
-			//Log.out( "Lighting.fromByteArray - \t\tcolor: \t\t" + _color );
-			//Log.out( "Lighting.fromByteArray - \t\tlowerAmbient: \t" + _lowerAmbient );
-			//Log.out( "Lighting.fromByteArray - \t\thigherAmbient: \t" + _higherAmbient );
+			//Log.out( "Lighting.fromByteArray - \t\tcolor: \t\t" + _color.toString(16) );
+			//Log.out( "Lighting.fromByteArray - \t\tlowerAmbient: \t" + _lowerAmbient.toString(16) );
+			//Log.out( "Lighting.fromByteArray - \t\thigherAmbient: \t" + _higherAmbient.toString(16) );
 			//Log.out( "Lighting.fromByteArray - \t\tlightCount: \t\t" + lightCount );
 
 			//try {

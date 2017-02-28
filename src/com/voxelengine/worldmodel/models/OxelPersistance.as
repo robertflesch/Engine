@@ -82,10 +82,8 @@ public class OxelPersistance extends PersistanceObject
 	public 	function get oxel():Oxel 							{ return _oxels[_lod]; }
 	public 	function get oxelCount():int 						{ return _oxels.length; }
 
-	public function OxelPersistance( $guid:String, $dbo:DatabaseObject, $importedData:ByteArray, $baseLightIllumination:int ):void {
+	public function OxelPersistance( $guid:String, $dbo:DatabaseObject, $importedData:ByteArray ):void {
 		super($guid, Globals.BIGDB_TABLE_OXEL_DATA);
-
-		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, $baseLightIllumination );
 
 		if (!_aliasInitialized) {
 			_aliasInitialized = true;
@@ -96,10 +94,15 @@ public class OxelPersistance extends PersistanceObject
 		if ( null == $dbo ) {
 			assignNewDatabaseObject();
 			stripDataFromImport( $importedData );
+			baseLightLevel = Lighting.defaultBaseLightIllumination;
 		} else {
 			dbo = $dbo;
+			//Log.out( "OxelPersistance: " + guid + "  compressed size: " + dbo.ba.length );
 			dbo.ba.uncompress();
+			//Log.out( "OxelPersistance: " + guid + "  UNcompressed size: " + dbo.ba.length );
 		}
+
+		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, baseLightLevel );
 
 		function assignNewDatabaseObject():void {
 			dbo = new DatabaseObject(Globals.BIGDB_TABLE_OXEL_DATA, "0", "0", 0, true, null);
@@ -227,7 +230,7 @@ public class OxelPersistance extends PersistanceObject
 			}
 			else {
 				//Log.out( "OxelPersistance.update ------------ calling refreshQuads guid: " + guid, Log.DEBUG );
-				topMostChunk.refreshFacesAndQuads( guid, $vm, _initializeFacesAndQuads );
+				topMostChunk.buildQuadsRecursively( guid, $vm, _initializeFacesAndQuads );
 				if ( _initializeFacesAndQuads )
 					_initializeFacesAndQuads = false
 			}
@@ -280,7 +283,7 @@ public class OxelPersistance extends PersistanceObject
 		type 	= "ivm";
 		version = Globals.VERSION;
 		ba		= toByteArray();
-		bound		= oxel.gc.bound;
+		bound	= oxel.gc.bound;
 
 		function zeroPad(number:int, width:int):String {
 			var ret:String = ""+number;
@@ -306,26 +309,6 @@ public class OxelPersistance extends PersistanceObject
 		//Log.out( "OxelPersistance.lodFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 	}
 
-	public function lodFromByteArrayOld( $ba:ByteArray ):void {
-		//Log.out( "OxelPersistance.lodFromByteArray - guid: " + guid, Log.INFO );
-		var time:int = getTimer();
-
-		oxel.decompressAndExtractMetadata( $ba, this );
-		//Log.out( "OxelPersistance.lodFromByteArray-decompressAndExtractMetadata - lod: " + _lod + "  newOxel: " + newOxel.toString() + " took: " + (getTimer() - time) );
-
-		time = getTimer();
-		oxel.readOxelData($ba, this );
-		//Log.out("OxelPersistance.lodFromByteArray - readOxelData took: " + (getTimer() - time), Log.INFO);
-
-		_statistics.gather();
-
-		time = getTimer();
-		_topMostChunks[_lod] = oxel.chunk = Chunk.parse( oxel, null, _lightInfo );
-		//Log.out( "OxelPersistance.lodFromByteArray oxel.chunkGet(): " + oxel.chunkGet() +  "  lod: " + _lod + " _topMostChunks[_lod] " + _topMostChunks[_lod]  );
-		//Log.out( "OxelPersistance.lodFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
-	}
-
-	
 	public function toByteArray():ByteArray {
 		ba = oxel.toByteArray();
 		Log.out( "OxelPersistance.toByteArray - guid: " + guid + "  Precompressed size: " + ba.length );

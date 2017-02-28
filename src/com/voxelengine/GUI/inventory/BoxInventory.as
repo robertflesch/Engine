@@ -95,7 +95,7 @@ public class BoxInventory extends VVBox
 		case ObjectInfo.OBJECTINFO_MODEL:
 			var om:ObjectModel = _objectInfo as ObjectModel;
 			if ( om.vmm ) {
-				if ( om.vmm.thumbnailLoaded ) {
+				if ( om.vmm.thumbnailLoaded && om.vmm.thumbnail ) {
 					backgroundTexture = drawScaled( om.vmm.thumbnail, width, height );
 //					var bmpd:BitmapData = Renderer.renderer.modelShot();
 //					om.vmm.thumbnail = drawScaled( bmpd, width, height );

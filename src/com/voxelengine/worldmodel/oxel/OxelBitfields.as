@@ -26,11 +26,19 @@ package com.voxelengine.worldmodel.oxel
 		private static const OXEL_DATA_LIGHT_INFO:uint				= 0x00000002;
 		private static const OXEL_DATA_LIGHT_INFO_CLEAR:uint		= 0xfffffffd;
 
+		private static const OXEL_DATA_FIRE:uint					= 0x00000200;
+		private static const OXEL_DATA_FIRE_CLEAR:uint 				= 0xfffffdff;
+
+		private static const OXEL_DATA_PARENT:uint					= 0x00000400;
+		private static const OXEL_DATA_PARENT_MASK:uint 			= 0xfffffbff;
+
 		private static const OXEL_DATA_FACE_BITS_CLEAR:uint  		= 0x8181ffff;
 		private static const OXEL_DATA_CLEAR:uint					= 0x00000000;
 
 		private static const OXEL_DATA_ADDITIONAL_CLEAR:uint  		= 0x7fffffff; // used if oxel has flow or light data
 		private static const OXEL_DATA_ADDITIONAL:uint  			= 0x80000000; // used if oxel has flow or light data
+
+		private static const OXEL_WRITE_DATA:uint  		            = 0x7e000603; // only these bits are valid for writing
 
 		private static const OXEL_DATA_FACES_CLEAR:uint				= 0x81ffffff;
 		private static const OXEL_DATA_FACES:uint  					= 0x7e000000;
@@ -65,11 +73,6 @@ package com.voxelengine.worldmodel.oxel
 		private static const OXEL_DATA_FACES_DIRTY_POSZ:uint		= 0x00040000;
 		private static const OXEL_DATA_FACES_DIRTY_NEGZ:uint		= 0x00020000;
 
-		private static const OXEL_DATA_PARENT_MASK:uint 			= 0xfffffbff;
-		private static const OXEL_DATA_PARENT:uint					= 0x00000400;
-		
-		private static const OXEL_DATA_FIRE_CLEAR:uint 				= 0xfffffdff;
-		private static const OXEL_DATA_FIRE:uint					= 0x00000200;
 		// bottom 10 bits not used. Used to be type data, now stored in its own full int
 
 		private static const OXEL_DATA_TYPE_MASK_TEMP:uint			= 0xfe7fffff;
@@ -111,7 +114,9 @@ package com.voxelengine.worldmodel.oxel
 
 		private static const OXEL_DATA_TYPE_MASK_CLEAR:uint 		= 0xfffffc00;
 		private static const OXEL_DATA_TYPE_OLD_MASK:uint			= 0x000003ff;
-				
+
+
+			   protected 	function maskWriteData():uint 					{ return _data & OXEL_WRITE_DATA; }
 			   protected 	function maskTempData():uint 					{ return _data & OXEL_DATA_TYPE_MASK_TEMP; }
 		static public 		function type1FromData( $data:uint ):uint 		{ return $data & OXEL_DATA_TYPE_1_MASK; }
 		static public 		function typeFromRawDataOld( $data:uint ):uint	{ return $data & OXEL_DATA_TYPE_OLD_MASK; }
@@ -288,7 +293,6 @@ package com.voxelengine.worldmodel.oxel
 		[inline] public function flowInfoClear():void							{ _data &= OXEL_DATA_FLOW_INFO_CLEAR }
 		static public function flowInfoHas( $data:uint ):Boolean {
 			var t:uint = ($data & OXEL_DATA_FLOW_INFO);
-			t = t >> 1;
 			return 0 < t;
 		}
 

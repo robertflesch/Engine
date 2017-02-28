@@ -11,6 +11,7 @@ import com.voxelengine.GUI.WindowSplash;
 import com.voxelengine.GUI.WindowWater;
 import com.voxelengine.events.AnimationEvent
 import com.voxelengine.events.AppEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.persistance.Persistance;
 import com.voxelengine.pools.PoolManager;
@@ -288,6 +289,7 @@ public class VoxelVerse extends Sprite
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, vm.instanceInfo.instanceGuid , null ) );
 		}
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) );
+		OxelDataEvent.create( ModelBaseEvent.SAVE, 0, "", null );
 	}
 
 	//private function mouseDown(e:MouseEvent):void

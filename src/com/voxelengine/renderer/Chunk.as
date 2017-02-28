@@ -7,23 +7,16 @@
 ==============================================================================*/
 package com.voxelengine.renderer {
 
-import com.voxelengine.pools.LightingPool;
-import com.voxelengine.worldmodel.models.types.Player;
-import com.voxelengine.worldmodel.oxel.LightInfo;
-import com.voxelengine.worldmodel.oxel.Lighting;
-
 import flash.geom.Matrix3D;
 import flash.display3D.Context3D;
-import flash.geom.Vector3D;
 import flash.utils.getTimer;
-import flash.utils.Timer;
-	
-import com.voxelengine.Globals;
+
 import com.voxelengine.Log;
-import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.oxel.LightInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.tasks.renderTasks.RefreshQuadsAndFaces;
+import com.voxelengine.worldmodel.tasks.renderTasks.BuildQuads;
+import com.voxelengine.worldmodel.tasks.renderTasks.RefreshFaces;
 import com.voxelengine.worldmodel.tasks.renderTasks.VistorTask;
 
 public class Chunk {
@@ -143,36 +136,51 @@ public class Chunk {
 			_vertMan.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
 	}
 	
-	public function refreshFacesTerminal():void {
-		_oxel.facesBuild();
-	}
-
-	public function refreshFacesAndQuads( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {
+	public function buildQuadsRecursively( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {
 		if ( childrenHas() ) {
 			dirtyClear();
 			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
 				//if ( _children[i].dirty && _children[i]._oxel && _children[i]._oxel.dirty )
 				if ( _children[i].dirty )
-					_children[i].refreshFacesAndQuads( $guid, $vm, $firstTime );
+					_children[i].buildQuadsRecursively( $guid, $vm, $firstTime );
 			}
 		}
 		else {
 			// Since task has been added for this chunk, mark it as clear
 			dirtyClear();
 			if ( _oxel && _oxel.dirty ) {
-//				if ( $firstTime ) {
-//					var priority:int = $vm.distanceFromPlayerToModel();
-//					RefreshQuadsAndFaces.addTask( $guid, this, priority )
-//				}
-//				else
-//					refreshFacesAndQuadsTerminal()
+				var priority:int;
+				if ( $firstTime )
+					priority = $vm.distanceFromPlayerToModel();
+				else
+					priority = 4; // high but not too high?
+
+				BuildQuads.addTask( $guid, this, priority )
+			}
+		}
+	}
+
+
+	public function refreshFaces( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {
+		if ( childrenHas() ) {
+			dirtyClear();
+			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
+				//if ( _children[i].dirty && _children[i]._oxel && _children[i]._oxel.dirty )
+				if ( _children[i].dirty )
+					_children[i].refreshFaces( $guid, $vm, $firstTime );
+			}
+		}
+		else {
+			// Since task has been added for this chunk, mark it as clear
+			dirtyClear();
+			if ( _oxel && _oxel.dirty ) {
 				var priority:int;
 				if ( $firstTime )
 					 priority = $vm.distanceFromPlayerToModel();
 				else
 					priority = 4; // high but not too high?
 
-				RefreshQuadsAndFaces.addTask( $guid, this, priority )
+				RefreshFaces.addTask( $guid, this, priority )
 			}
 		}
 	}
@@ -187,11 +195,6 @@ public class Chunk {
 		
 	}
 
-	public function refreshFacesAndQuadsTerminal():void {
-		_oxel.facesBuild()
-		_oxel.quadsBuild()
-	}
-	
 	public function oxelRemove( $oxel:Oxel ):void {
 		if ( _vertMan )
 			_vertMan.oxelRemove( $oxel );

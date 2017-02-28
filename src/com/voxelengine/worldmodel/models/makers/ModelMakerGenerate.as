@@ -166,7 +166,6 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			// Everything worked, add these to the caches and save them
 			ModelMetadataEvent.create( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelMetadata );
 			ModelInfoEvent.create( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelInfo );
-			_vm.complete = true;
 
 			if ( modelInfo.guid != "DefaultPlayer" ) {
 				modelInfo.oxelPersistance.changed = true;
