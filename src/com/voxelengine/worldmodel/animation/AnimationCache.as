@@ -115,48 +115,41 @@ public class AnimationCache
 		else
 			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.RESULT, $ame.series, $ame.modelGuid, $ame.aniGuid, ani ) );
 	}
-	
-	static private function loadSucceed( $pe:PersistanceEvent):void 
+
+	static private function loadSucceed( $pe:PersistanceEvent):void
 	{
 		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
-		if ( $pe.dbo || $pe.data ) {
-			var ani:Animation = new Animation( $pe.guid );
-			if ( $pe.dbo ) {
-				ani.fromObject( $pe.dbo );
-			}
-			else {
-				// This is for import from local only.
-				var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_ANIMATIONS, "0", "0", 0, true, null );
-				dbo.data = new Object();
-				var fileData:String = String( $pe.data );
-				fileData = StringUtils.trim(fileData);
-				dbo.data = JSONUtil.parse( fileData, $pe.guid + $pe.table, "AnimationCache.loadSucceed" );
-				if ( null == dbo.data ) {
-					Log.out( "AnimationCache.loadSucceed - error parsing animation on import. guid: " + $pe.guid, Log.ERROR );
-					AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
-					return;
-				}
-				ani.fromObjectImport( dbo );
-				// On import mark it as changed.
-				ani.changed = true;
-				if ( Globals.isGuid( ani.guid ) )
-					ani.save();
-			}
-			add( $pe, ani );
-			
-//			if ( _block.has( $pe.guid ) )
-//				_block.clear( $pe.guid )
-				
+
+		var ani:Animation =  _animations[$pe.guid];
+		if ( null != ani ) {
+			// we already have it, publishing this results in dulicate items being sent to inventory window.
+			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.ADDED, $pe.series, $pe.other, $pe.guid, ani ) );
+			Log.out( "AnimationCache.loadSucceed - attempting to load duplicate AnimationC guid: " + $pe.guid, Log.WARN );
+			return;
 		}
-		else {
+
+		if ( $pe.dbo ) {
+			ani = new Animation($pe.guid, $pe.dbo, null);
+			add( $pe, ani );
+		} else if ( $pe.data ) {
+			var fileData:String = String( $pe.data );
+			fileData = StringUtils.trim(fileData);
+			var newObjData:Object = JSONUtil.parse( fileData, $pe.guid + $pe.table, "AnimationCache.loadSucceed" );
+			if ( null == newObjData ) {
+				Log.out( "AnimationCache.loadSucceed - error parsing animation info on import. guid: " + $pe.guid, Log.ERROR );
+				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.other, $pe.guid, null ) );
+				return;
+			}
+			ani = new Animation($pe.guid, null, newObjData );
+			ani.save();
+			add( $pe, ani );
+		} else {
 			Log.out( "AnimationCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR );
 			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
 		}
 	}
-	
-	
-	
+
 	static private function add( $pe:PersistanceEvent, $ani:Animation ):void 
 	{ 
 		if ( null == $ani || null == $pe.guid ) {

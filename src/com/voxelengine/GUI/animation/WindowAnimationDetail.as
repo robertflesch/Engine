@@ -44,7 +44,8 @@ public class WindowAnimationDetail extends VVPopup
 		}
 		else {
 			_create = true
-			_ani = Animation.defaultObject( $guid )
+			throw new Error( "WindowAnimationDetail - What to do here?");
+//			_ani = Animation.defaultObject( $guid )
 		}
 		_infoBackup = _ani.createBackCopy()
 		_ani.dynamicObj = true // true while editing
