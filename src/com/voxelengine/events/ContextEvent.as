@@ -20,17 +20,18 @@ public class ContextEvent extends Event
 {
 	static public const DISPOSED:String			= "DISPOSED";
 	static public const ACQUIRED:String			= "ACQUIRED";
-	
+	static public const REBUILD:String			= "REBUILD";
+
 	private var _context3D:Context3D;
 	public function get context3D():Context3D  { return _context3D; }
 	
-	public function ContextEvent( $type:String, $context:Context3D, $bubbles:Boolean = true, $cancellable:Boolean = false ) {
-		super( $type, $bubbles, $cancellable );
+	public function ContextEvent( $type:String, $context:Context3D ) {
+		super( $type );
 		_context3D = $context;
 	}
 	
 	public override function clone():Event {
-		return new ContextEvent(type, _context3D, bubbles, cancelable);
+		return new ContextEvent(type, _context3D);
 	}
    
 	public override function toString():String {
@@ -50,8 +51,8 @@ public class ContextEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:ContextEvent ) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
+	static public function create( $type:String, $context:Context3D ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new ContextEvent( $type, $context ) );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

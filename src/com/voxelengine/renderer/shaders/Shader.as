@@ -317,9 +317,9 @@ package com.voxelengine.renderer.shaders
 				_textureScale = Number(json.textureScale);
 		}
 		
-		protected function updateTexture($context:Context3D ): Boolean {
+		public function updateTexture($context:Context3D, $forceUpdate:Boolean = false ): Boolean {
 
-			if ( _lastTextureName == textureName)
+			if ( _lastTextureName == textureName && !$forceUpdate )
 				return true;
 
 			var tex0:Texture = TextureBank.instance.getTexture( $context, textureName );

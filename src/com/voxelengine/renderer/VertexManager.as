@@ -45,6 +45,7 @@ public class VertexManager {
 		//Log.out( "----------VertexManager.construct---------- " + name );
 		ContextEvent.addListener( ContextEvent.DISPOSED, disposeContext );
 		ContextEvent.addListener( ContextEvent.ACQUIRED, acquiredContext );
+		ContextEvent.addListener( ContextEvent.REBUILD, rebuildContext );
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,11 +72,25 @@ public class VertexManager {
 	}
 	
 	public function acquiredContext( $ce:ContextEvent ):void {
-		//trace("VoxelModel.reinitialize - modelInfo: " + modelInfo.fileName );
+		if ( _vertBuf )
+			_vertBuf.dirty = true;
+		if ( _vertBufAlpha )
+			_vertBufAlpha.dirty = true;
+		if ( _vertBufAnimated )
+			_vertBufAnimated.dirty = true;
+		if ( _vertBufAnimatedAlpha )
+			_vertBufAnimatedAlpha.dirty = true;
+		if ( _vertBufFire )
+			_vertBufFire.dirty = true;
 		for each ( var shader:Shader in _shaders )
 			shader.createProgram( $ce.context3D );
 	}
-	
+
+	public function rebuildContext( $ce:ContextEvent ):void {
+		for each ( var shader:Shader in _shaders )
+			shader.updateTexture( $ce.context3D, true );
+	}
+
 	public function disposeContext( $ce:ContextEvent ):void {
 		for each ( var shader:Shader in _shaders )
 			shader.dispose();
@@ -129,6 +144,11 @@ public class VertexManager {
 			VertexIndexBuilderPool.poolDispose( _vertBufFire );
 			_vertBufFire = null;
 		}
+
+		ContextEvent.removeListener( ContextEvent.DISPOSED, disposeContext );
+		ContextEvent.removeListener( ContextEvent.ACQUIRED, acquiredContext );
+		ContextEvent.removeListener( ContextEvent.REBUILD, rebuildContext );
+
 	}
 	
 	public function drawNew( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean = false ):void {

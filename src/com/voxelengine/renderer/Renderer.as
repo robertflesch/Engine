@@ -194,7 +194,8 @@ public class Renderer extends EventDispatcher
 				Log.out( "Renderer.onContext - driverInfo: " + context3D.driverInfo, Log.DEBUG );
 				
 			context3D.clear();
-			ContextEvent.dispatch( new ContextEvent( ContextEvent.ACQUIRED, context3D ) );
+			ContextEvent.create( ContextEvent.ACQUIRED, context3D );
+			ContextEvent.create( ContextEvent.REBUILD, context3D );
 		}
 	}
 	
