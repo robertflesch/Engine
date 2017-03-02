@@ -14,12 +14,9 @@ import com.voxelengine.worldmodel.PermissionsBase;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.SecureNumber;
 
-import flash.utils.ByteArray;
-
 import playerio.DatabaseObject;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.PersistanceObject;
 
@@ -30,8 +27,6 @@ import com.voxelengine.worldmodel.models.PersistanceObject;
  */
 public class Animation extends PersistanceObject
 {
-	static private const BLANK_ANIMATION_TEMPLATE:Object = { "animation":[] };
-
 	static private const ANIMATION_STATE:String = "state";
 	static private const ANIMATION_ACTION:String = "action";
 	
@@ -73,56 +68,80 @@ public class Animation extends PersistanceObject
 		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.UPDATE_GUID, 0, animationClass, oldGuid + ":" + $newGuid, null ) );
 		changed = true;
 	}
-	
-	static public function defaultObject( $modelGuid:String ):Animation {
-		var obj:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_ANIMATIONS, "0", "0", 0, true, null )
-		obj.data = Animation.DEFAULT_OBJECT
-		// This is UGLY - TODO
-		obj.data.animationClass = AnimationCache.requestAnimationClass( Region.currentRegion.modelCache.requestModelInfoByModelGuid( $modelGuid ).modelClass )
-		var childNameList:Vector.<String> = new Vector.<String>
-		VoxelModel.selectedModel.childNameList( childNameList )
-		obj.data.animations = new Array()
-		for each ( var name:String in childNameList ) {
-			var at:AnimationTransform = new AnimationTransform( new Object() )
-			at.attachmentName = name
-			obj.data.animations.push( at.toObject() )
+
+	public function Animation( $guid:String, $dbo:DatabaseObject, $importedData:Object ):void {
+		super( $guid, Globals.BIGDB_TABLE_ANIMATIONS );
+		if ( null == $dbo ) {
+			assignNewDatabaseObject();
+		} else {
+			dbo = $dbo;
 		}
-		
-		var ani:Animation = new Animation( Globals.getUID() );
-		ani.fromObjectImport( obj )
-		return ani
+		init( $importedData );
+
+		function assignNewDatabaseObject():void {
+			dbo = new DatabaseObject( table, "0", "0", 0, true, null );
+			dbo.name = "Default";
+			dbo.description = "Enter description here";
+			dbo.type =  ANIMATION_STATE;
+			dbo.owner = Network.userId;
+			changed = true;
+		}
 	}
-	
-	static private var DEFAULT_OBJECT:Object = { 
-		name: "Default",
-		description: "Enter description here",
-		type : ANIMATION_STATE,
-		owner : Network.userId
-	}
-	
-	
-	////////////////
-	public function Animation( $guid:String ) {
-		super( $guid, Globals.BIGDB_TABLE_ANIMATIONS );		
+
+	private function init( $newData:Object = null ):void {
+
+		if ($newData)
+			mergeOverwrite($newData);
+
+		if ( !owner )
+			dbo.owner = Network.PUBLIC;
+
+		Region.currentRegion.modelCache.requestModelInfoByModelGuid( owner );
+		Region.currentRegion.modelCache.instancesOfModelGet( owner );
+
+		if ( dbo.sound )
+			_sound = new AnimationSound( this, sound );
+
+		if ( dbo.clipVelocity )
+			clipVelocity = dbo.clipVelocity;
+		if ( dbo.speedMultiplier )
+			speedMultiplier = dbo.speedMultiplier;
+
+		if ( dbo.animations ) {
+			_transforms = new Vector.<AnimationTransform>;
+			for each ( var transformObj:Object in dbo.animations )
+				_transforms.push( new AnimationTransform( transformObj ) );
+		}
+
+		if ( dbo.attachment ) {
+			_attachments = new Vector.<AnimationAttachment>;
+			for each ( var attachmentJson:Object in dbo.attachment )
+				_attachments.push( new AnimationAttachment( attachmentJson ) );
+		}
+
+		// the permission object is just an encapsulation of the permissions section of the object
+		_permissions = new PermissionsBase( dbo );
 	}
 
 	public function createBackCopy():Object {
 		// force the data from the dynamic classes into the object
 		// this give me an object that holds all of the data for the animation
-		toObject() 
-		var backupInfo:Object = new Object();
+		toObject();
+		var backupInfo:Object = {};
 		backupInfo.name 			= String( dbo.name );
-		backupInfo.description 	= String( dbo.description );
-		backupInfo.owner 			= String( dbo.owner )
-		backupInfo.type 			= String( dbo.type )
-		backupInfo.animationClass 	= String( dbo.animationClass )
+		backupInfo.description 		= String( dbo.description );
+		backupInfo.owner 			= String( dbo.owner );
+		backupInfo.type 			= String( dbo.type );
+		backupInfo.animationClass 	= String( dbo.animationClass );
 		if ( _sound )
-			backupInfo.sound = _sound.toObject()
+			backupInfo.sound = _sound.toObject();
 		if ( _transforms && _transforms.length )
-			backupInfo.animations = getAnimations()
+			backupInfo.animations = getAnimations();
 		if ( _attachments && _attachments.length )
-			backupInfo.attachments = getAttachments()
+			backupInfo.attachments = getAttachments();
 		// TODO - add clip velocity and speed multiplier
+//		dbo.clipVelocity = clipVelocity;
+//		dbo.speedMultiplier = speedMultiplier;
 		return backupInfo
 	}
 	
@@ -131,32 +150,12 @@ public class Animation extends PersistanceObject
 		// we want a new object in this case
 		dbo.name 			= String( $info.name );
 		dbo.description 	= String( $info.description );
-		dbo.owner 			= String( $info.owner )
-		dbo.type 			= String( $info.type )
-		dbo.animationClass = String( $info.animationClass )
-		loadFromInfo( $info )
-		changed = false
-	}
-	
-	public function fromObjectImport( $dbo:DatabaseObject ):void {
-		dbo = $dbo;
-		// The data is needed the first time it saves the object from import, after that it goes away
-		if ( !dbo.animations ) {
-			Log.out( "Animation.fromObjectImport - Failed test dbo.animations dbo: " + JSON.stringify( dbo ), Log.ERROR );
-			return;
-		}
-		
-		loadFromInfo( dbo );
-	}
-	
-	public function fromObject( $dbo:DatabaseObject ):void {
-		dbo = $dbo;
-		if ( !dbo.animations ) {
-			Log.out( "Animation.fromObject - Failed test !dbo.animations dbo: " + JSON.stringify( dbo ), Log.ERROR );
-			return;
-		}
-		
-		loadFromInfo( dbo );
+		dbo.owner 			= String( $info.owner );
+		dbo.type 			= String( $info.type );
+		dbo.animationClass = String( $info.animationClass );
+		changed = false;
+		throw new Error( "Animation.restoreFromBackup - REFACTOR");
+//		loadFromInfo( $info )
 	}
 	
 	override public function save():void {
@@ -174,9 +173,9 @@ public class Animation extends PersistanceObject
 		// permissions?
 		
 		if ( _sound )
-			dbo.sound = _sound.toObject()
+			dbo.sound = _sound.toObject();
 		if ( _transforms && _transforms.length )
-			dbo.animations = getAnimations()
+			dbo.animations = getAnimations();
 		if ( _attachments && _attachments.length )
 			dbo.attachments = getAttachments()
 
@@ -187,63 +186,24 @@ public class Animation extends PersistanceObject
 	}
 	
 	private function getAttachments():Object {
-		var attachments:Array = new Array();
+		var attachments:Array = [];
 		for each ( var aa:AnimationAttachment in _attachments ) {
-			var aao:Object = aa.toObject()
-			attachments.push( aao )
+			var aao:Object = aa.toObject();
+			attachments.push( aao );
 		}
 		return attachments
 	}
 	
 	private function getAnimations():Object {
-		var transforms:Array = new Array();
+		var transforms:Array = [];
 		for ( var i:int; i < _transforms.length; i++ ) {
-			var at:AnimationTransform = _transforms[i]
-			var ato:Object = at.toObject()
-			transforms.push( ato )
+			var at:AnimationTransform = _transforms[i];
+			var ato:Object = at.toObject();
+			transforms.push( ato );
 		}
-		return transforms
+		return transforms;
 	}
 
-	// Only attributes that need additional handling go here.
-	public function loadFromInfo( $info:Object ):void {
-		
-		if ( $info.sound ) 
-			_sound = new AnimationSound( this, $info.sound )
-
-		
-		if ( $info.attachments ) {
-			_attachments = new Vector.<AnimationAttachment>;
-			for each ( var attachmentObj:Object in $info.attachment )
-			{
-				_attachments.push( new AnimationAttachment( attachmentObj ) );				
-			}
-		}
-		
-		if ( $info.animations ) {
-			_transforms = new Vector.<AnimationTransform>;
-			for each ( var transformObj:Object in $info.animations )
-				_transforms.push( new AnimationTransform( transformObj ) );				
-		}
-		
-		if ( !$info.owner )
-			$info.owner = Network.PUBLIC;
-
-		if ( !$info.permissions )
-			$info.permissions = new Object();
-		
-		// the permission object is just an encapsulation of the permissions section of the object
-		_permissions = new PermissionsBase( dbo );
-
-		if ( $info.clipVelocity )
-			clipVelocity = $info.clipVelocity;
-		if ( $info.speedMultiplier )
-			speedMultiplier = $info.speedMultiplier;
-
-		//Log.out( "Animation.loadFromInfo - clipVelocity: " + clipVelocity);
-		//Log.out( "Animation.loadFromInfo - speedMultiplier: " + speedMultiplier);
-
-	}
 /*
 	public function fromJSON( $json:Object ):String  {
 		var type:String = ANIMATION_STATE;
