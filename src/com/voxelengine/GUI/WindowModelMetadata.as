@@ -11,6 +11,7 @@ package com.voxelengine.GUI
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.renderer.Renderer;
+import com.voxelengine.worldmodel.PermissionsModel;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.PermissionsBase;
@@ -143,7 +144,7 @@ public class WindowModelMetadata extends VVPopup
 Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );			
 			var rbTransferGroup:RadioButtonGroup = new RadioButtonGroup( this );
 			eventCollector.addEvent( rbTransferGroup, ButtonsGroupEvent.GROUP_CHANGED
-								   , function (event:ButtonsGroupEvent):void {  _vmm.permissions.binding = (0 == event.target.index ?  PermissionsBase.BIND_MODIFY :  PermissionsBase.BIND_NONE ) } );
+								   , function (event:ButtonsGroupEvent):void {  _vmm.permissions.binding = (0 == event.target.index ?  PermissionsModel.BIND_MODIFY :  PermissionsModel.BIND_NONE ) } );
 			var rbTransferDP:DataProvider = new DataProvider();
 			rbTransferDP.addAll( { label:"Allow this object to be transferred" }
 							   , { label:"Bind this object to user" } );

@@ -73,8 +73,7 @@ public class WindowRegionDetail extends VVPopup
 		}
 		else {			
 			_create = true;
-			_region = new Region( Globals.getUID() );
-			_region.createEmptyRegion();
+			_region = new Region( Globals.getUID(), null, {} );
 			_region.owner = Network.PUBLIC;
 			_region.name = Network.userId + "-" + int( Math.random() * 1000 );
 			_region.desc = "Please enter something meaningful here";
@@ -182,7 +181,7 @@ public class WindowRegionDetail extends VVPopup
 //			_region.release();
 			//
 			var pe:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true )
-			RegionManager.instance.regionAdd( pe, _region );
+			RegionManager.instance.add( pe, _region );
 			// This tell the region manager to add it to the region list
 			//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true ) );			
 			// This tell the region to save itself!
@@ -229,7 +228,5 @@ public class WindowRegionDetail extends VVPopup
 		_region.desc = event.target.text;
 		markDirty();
 	}
-	
-
 }
 }

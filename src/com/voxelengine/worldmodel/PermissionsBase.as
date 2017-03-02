@@ -8,9 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel
 {
 import playerio.DatabaseObject;
-
 import com.voxelengine.server.Network;
-import com.voxelengine.Log;
+
 /**
  * ...
  * @author Robert Flesch - RSF 
@@ -24,59 +23,30 @@ import com.voxelengine.Log;
  * Transfer - Bind
  * Move - if you are owner, you can change.
  */
-public class PermissionsBase
-{
-	static public const COPY_COUNT:int			= 2048;
+public class PermissionsBase {
+	protected var _dboReference:DatabaseObject;
 	
-	// All the binds need to be tested
-	static public const BIND_NONE:String 		= "BIND_NONE";
-	static public const BIND_PICKUP:String 		= "BIND_PICKUP";
-	static public const BIND_USE:String 		= "BIND_USE";
-	static public const BIND_MODIFY:String 		= "BIND_MODIFY";
+	public function get modifiedDate():String 				{ return _dboReference.permissions.modifiedDate; }
+	public function set modifiedDate(value:String):void		{ _dboReference.permissions.modifiedDate = value; }
+			
+	public function get createdDate():String 				{ return _dboReference.permissions.createdDate; }
+			
+	public function get creator():String 					{ return _dboReference.permissions.creator; }
+			
+	public function get dboReference():Object 				{ return _dboReference;}
 	
-	private var _owner:DatabaseObject;
-	
-	public function get blueprintGuid():String  			{ return _owner.permissions.blueprintGuid; }
-	public function set blueprintGuid(value:String):void 	{ _owner.permissions.blueprintGuid = value; }
-
-	public function get modify():Boolean 					{ return _owner.permissions.modify; }
-	public function set modify(value:Boolean):void 			{ _owner.permissions.modify = value; }
-			
-	public function get modifiedDate():String 				{ return _owner.permissions.modifiedDate; }
-	public function set modifiedDate(value:String):void		{ _owner.permissions.modifiedDate = value; }
-			
-	public function get copyCount():int  					{ return _owner.permissions.copyCount; }
-	public function set copyCount(value:int):void  			{ _owner.permissions.copyCount = value; }
-			
-	public function get createdDate():String 				{ return _owner.permissions.createdDate; }
-			
-	public function get creator():String 					{ return _owner.permissions.creator; }
-			
-	public function get binding():String 					{ return _owner.permissions.binding; }
-	public function set binding(value:String):void  		{ _owner.permissions.binding = value; }
-			
-	public function get blueprint():Boolean 				{ return _owner.permissions.blueprint; }
-	public function set blueprint(value:Boolean):void		{ _owner.permissions.blueprint = value; }
-	
-	public function get owner():Object 						{ return _owner;}
-	
-	public function PermissionsBase( $owner:DatabaseObject ) {
-		_owner = $owner;
-		if ( !_owner.permissions )
-			_owner.permissions = new Object();
+	public function PermissionsBase( $dboReference:DatabaseObject ) {
+		_dboReference = $dboReference;
+		if ( !_dboReference.permissions )
+			_dboReference.permissions = {};
 			
 		// If permissions already exist dont reset them.
-		if ( _owner.permissions.createdDate || _owner.permissions.creator )
+		if ( _dboReference.permissions.createdDate || _dboReference.permissions.creator )
 			return;
 			
-		copyCount 							= COPY_COUNT;
-		modify								= true;
-		blueprint							= false;
-		blueprintGuid						= null;
 		modifiedDate						= new Date().toUTCString();
-		binding								= BIND_NONE;
-		_owner.permissions.creator			= Network.userId;
-		_owner.permissions.createdDate		= new Date().toUTCString();
+		_dboReference.permissions.creator	= Network.userId;
+		_dboReference.permissions.createdDate = new Date().toUTCString();
 	}
 }
 }

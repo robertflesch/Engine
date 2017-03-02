@@ -69,14 +69,14 @@ package com.voxelengine.GUI.voxelModels
 			//Log.out( "WindowRegionModels.onRemoved", Log.WARN );
 			super.onRemoved(event);
 			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelAdded );
-			RegionEvent.create( ModelBaseEvent.CHANGED, 0, null );
+			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, onParentModelRemoved );
+			RegionEvent.create( ModelBaseEvent.SAVE, 0, null );
 			
 			_modelPanel.close();
 			
 			_s_instance = null
 		}
 
-		
 		private function createTopLevel():void
 		{
 			// Popup is NOT a UIContainer for some reason.

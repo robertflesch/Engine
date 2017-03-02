@@ -8,6 +8,8 @@
 
 package com.voxelengine.GUI.panels {
 import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.PermissionsModel;
+
 import org.flashapi.swing.*
 import org.flashapi.swing.event.*
 import org.flashapi.swing.constants.*
@@ -20,7 +22,7 @@ import com.voxelengine.worldmodel.PermissionsBase;
 
 public class PanelPermissionModel extends ExpandableBox
 {
-	private var _permissions:PermissionsBase
+	private var _permissions:PermissionsModel;
 	public function PanelPermissionModel( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {		
 		_permissions = $ebco.rootObject
 		super( $parent, $ebco )
@@ -90,7 +92,7 @@ public class PanelPermissionModel extends ExpandableBox
 	private function changeModify(event:UIMouseEvent):void {
 		if ( Network.userId == _permissions.creator ) {
 			_permissions.modify = (event.target as CheckBox).selected
-			_permissions.owner.changed = true
+			_permissions.dboReference.changed = true
 		}
 		else
 			(new Alert("You do not have permission to change the 'modify' permission on this object")).display();		
@@ -99,7 +101,7 @@ public class PanelPermissionModel extends ExpandableBox
 	private function changeBluePrint(event:UIMouseEvent):void {
 		if ( Network.userId == _permissions.creator ) {
 			_permissions.blueprint = (event.target as CheckBox).selected
-			_permissions.owner.changed = true
+			_permissions.dboReference.changed = true
 		}
 		else
 			(new Alert("You do not have permission to change the 'blue print' permission on this object")).display();		

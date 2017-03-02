@@ -44,11 +44,13 @@ package com.voxelengine.worldmodel
 		
 		static public var _s_currentRegion:Region;
 		static public function get currentRegion():Region { return _s_currentRegion; }
-		
-		private var _loaded:Boolean;							// INSTANCE NOT EXPORTED
+
+		// INSTANCE NOT EXPORTED
+		private var _loaded:Boolean;
 		private var _criticalModelDetected:Boolean = false;
-		private var _permissions:PermissionsRegion;
 		private var _modelCache:ModelCache;
+		private var _permissions:PermissionsRegion;
+		// INSTANCE AND EXPORTED - Run time optimization
 		private var _skyColor:Vector3D = new Vector3D();
 
 		public function get worldId():String { return dbo.worldId; }
@@ -61,25 +63,6 @@ package com.voxelengine.worldmodel
 		public function set name(val:String):void { dbo.name = val; }
 		public function get gravity():Boolean { return dbo.gravity; }
 		public function set gravity(val:Boolean):void { dbo.gravity = val; }
-		public function getSkyColor():Vector3D { return _skyColor; }
-		public function setSkyColor( $skyColor:Object ):void { 
-			if ( !$skyColor ) {
-				Log.out( "Region.setSkyColor - no object", Log.ERROR)
-				$skyColor = { "x":92, "y":172, "z":238 }
-			}
-			var x:int = $skyColor.x
-			if ( x < 0 || 255 < x )
-				$skyColor.x = 92
-			var y:int = $skyColor.y
-			if ( y < 0 || 255 < y )
-				$skyColor.y = 172
-			var z:int = $skyColor.z
-			if ( z < 0 || 255 < z )
-				$skyColor.z = 238
-				
-			dbo.skyColor = $skyColor
-			_skyColor.setTo( dbo.skyColor.x, dbo.skyColor.y , dbo.skyColor.z )
-		}
 		public function get playerPosition():Object { return dbo.playerPosition; }
 		public function get playerRotation():Object {return dbo.playerRotation; }
 		
@@ -90,28 +73,66 @@ package com.voxelengine.worldmodel
 		public function get loaded():Boolean { return _loaded; }
 		public function get modelCache():ModelCache  { return _modelCache; }
 
-		public function createEmptyRegion():void { 
-			dbo = new DatabaseObject( Globals.BIGDB_TABLE_REGIONS, "0", "0", 0, true, null );
-			dbo.models = []
-			dbo.skyColor = { "x":92, "y":172, "z":238 }
-			dbo.gravity = false
-			fromObjectImport( dbo ); 
+		public function getSkyColor():Vector3D { return _skyColor; }
+		public function setSkyColor( $skyColor:Object ):void {
+			if ( !$skyColor ) {
+				Log.out( "Region.setSkyColor - no object", Log.ERROR);
+				$skyColor = { "x":92, "y":172, "z":238 }
+			}
+			var x:int = $skyColor.x;
+			if ( x < 0 || 255 < x )
+				$skyColor.x = 92;
+			var y:int = $skyColor.y;
+			if ( y < 0 || 255 < y )
+				$skyColor.y = 172;
+			var z:int = $skyColor.z;
+			if ( z < 0 || 255 < z )
+				$skyColor.z = 238;
+
+			dbo.skyColor = $skyColor;
+			_skyColor.setTo( dbo.skyColor.x, dbo.skyColor.y , dbo.skyColor.z )
 		}
-		
-		public function Region( $guid:String ):void {
+
+		public function Region( $guid:String, $dbo:DatabaseObject, $importedData:Object ):void {
 			super( $guid, Globals.BIGDB_TABLE_REGIONS );
-			// all regions listen to be loaded and saved, 
+			if( $dbo ) {
+                dbo = $dbo;
+            } else {
+                createEmptyRegion($importedData);
+            }
+
+			init();
+
+			// all regions listen to be loaded and saved,
 			// but those are the only region messages they listen to.
 			// unless they are loaded
 			RegionEvent.addListener( RegionEvent.LOAD, 		load );
-			RegionEvent.addListener( ModelBaseEvent.SAVE, 	saveEvent );	
+
+			function init():void {
+				// This creates and parses the permissions
+				_permissions = new PermissionsRegion(dbo);
+			}
+
+            function createEmptyRegion( $notSupported:Object ):void {
+                dbo = new DatabaseObject(Globals.BIGDB_TABLE_REGIONS, "0", "0", 0, true, null);
+                dbo.models = [];
+                dbo.skyColor = {"x": 92, "y": 172, "z": 238};
+                dbo.gravity = false;
+                dbo.worldId = Globals.VOXELVERSE;
+                dbo.name = "NewRegion";
+                dbo.desc = "Describe what is special about this region";
+                dbo.playerPosition = {};
+                dbo.playerPosition.x = dbo.playerPosition.y = dbo.playerPosition.z = 0;
+                dbo.playerRotation = {};
+                dbo.playerRotation.x = dbo.playerRotation.y = dbo.playerRotation.z = 0;
+//			    changed = true;
+            }
 		}
 		
 		// allows me to release the listeners for temporary regions
 		override public function release():void {
 			super.release();
 			RegionEvent.removeListener( RegionEvent.LOAD, 		load );
-			RegionEvent.removeListener( ModelBaseEvent.SAVE, 	saveEvent );	
 		}
 		
 		private function onCriticalModelDetected( me:ModelEvent ):void {
@@ -136,7 +157,7 @@ package com.voxelengine.worldmodel
 			
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
 			
-			addEventListeners();
+			addLoadingEventListeners();
 			RegionEvent.create( RegionEvent.LOAD_BEGUN, 0, guid );
 			// old style uses region.
 			setSkyColor( dbo.skyColor );
@@ -179,19 +200,32 @@ package com.voxelengine.worldmodel
 			return count;
 		}
 
-		private function addEventListeners():void {
-			RegionEvent.addListener( ModelBaseEvent.CHANGED, 				regionChanged );	
-			RegionEvent.addListener( RegionEvent.UNLOAD, 					unload );
+		private function addLoadingEventListeners():void {
+			RegionEvent.addListener( ModelBaseEvent.CHANGED, 					regionChanged );
+			RegionEvent.addListener( RegionEvent.UNLOAD, 						unload );
 				
-			LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, 			onLoadingComplete );
-			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_FAILURE,		removeFailedObjectFromRegion );
+			LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, 				onLoadingComplete );
+			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_FAILURE,removeFailedObjectFromRegion );
 				
-			ModelEvent.addListener( ModelEvent.CRITICAL_MODEL_DETECTED,		onCriticalModelDetected );
-			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED,			modelChanged );
-			ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED,		modelChanged );
+			ModelEvent.addListener( ModelEvent.CRITICAL_MODEL_DETECTED,			onCriticalModelDetected );
+			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED,				modelChanged );
+			ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED,			modelChanged );
 		}
-		
-		private function regionChanged( $re:RegionEvent):void  { 
+
+		private function removeLoadingEventListeners():void {
+			RegionEvent.removeListener( ModelBaseEvent.CHANGED, 				regionChanged );
+			RegionEvent.removeListener( RegionEvent.UNLOAD, 					unload );
+
+			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, 			onLoadingComplete );
+
+			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_FAILURE,	removeFailedObjectFromRegion );
+
+			ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_DETECTED, 		onCriticalModelDetected );
+			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED,			regionChanged );
+			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED,			regionChanged );
+		}
+
+		private function regionChanged( $re:RegionEvent):void  {
 			if ( guid == $re.guid ) {
 				Log.out( "Region.regionChanged" );
 				changed = true;
@@ -206,24 +240,10 @@ package com.voxelengine.worldmodel
 		}
 		
 		private function unload( $re:RegionEvent ):void {
-			Log.out( "Region.unload: " + guid, Log.DEBUG );
-			removeEventListeners();
+			removeLoadingEventListeners();
+			Log.out( "Region.unload guid: " + guid + " complete modelCache.count: " + _modelCache, Log.DEBUG );
 			_modelCache.unload();
-            _modelCache
-            Log.out( "Region.unload complete modelCache.count: " + _modelCache, Log.DEBUG );
-		}
-		
-		private function removeEventListeners():void {
-			RegionEvent.removeListener( ModelBaseEvent.CHANGED, 			regionChanged );	
-			RegionEvent.removeListener( RegionEvent.UNLOAD, 				unload );
-			
-			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, 		onLoadingComplete );
-			
-			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_FAILURE,	removeFailedObjectFromRegion );									  
-			
-			ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_DETECTED, 	onCriticalModelDetected );
-			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED,		regionChanged );
-			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED,		regionChanged );
+			//release(); // Dont release it, memory is invalidated
 		}
 		
 		private function removeFailedObjectFromRegion( $e:ModelLoadingEvent ):void {
@@ -290,10 +310,7 @@ package com.voxelengine.worldmodel
 		// toPersistance
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		private function saveEvent( $re:RegionEvent ):void {
-			if ( guid != $re.guid )
-				return
-			
+		override public function save():void {
 			// The null owner check makes it to we dont save local loaded regions to persistance
 			if ( null != owner && Globals.isGuid( guid ) )
 				super.save()
@@ -306,29 +323,8 @@ package com.voxelengine.worldmodel
 			if ( _modelCache )
 				dbo.models = _modelCache.toObject();
 				
-			_permissions.toObject();
+			//dbo.permissions.toObject();
 		}
 		
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-		// fromPersistance
-		////////////////////////////////////////////////////////////////////////////////////////////////////
-		
-		public function fromObject( $dbo:DatabaseObject ):void {
-			dbo = $dbo;
-			_permissions = new PermissionsRegion( dbo.permissions );
-		}
-		
-		public function fromObjectImport( $dbo:DatabaseObject ):void {
-			//info = $dbo.oxelPersistance;
-			dbo.worldId = Globals.VOXELVERSE;
-			dbo.name = "NewRegion";
-			dbo.desc = "Describe what is special about this region";
-			dbo.playerPosition = new Object();
-			dbo.playerRotation = new Object();
-			dbo.playerPosition.x = dbo.playerPosition.y = dbo.playerPosition.z = 0;
-			dbo.playerRotation.x = dbo.playerRotation.y = dbo.playerRotation.z = 0;
-			_permissions = new PermissionsRegion( null );
-//			changed = true;
-		}
 	} // Region
 } // Package

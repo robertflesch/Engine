@@ -46,8 +46,9 @@ public class RegionManager
 
 		RegionEvent.addListener( RegionEvent.JOIN, 				requestServerJoin ); 
 		RegionEvent.addListener( ModelBaseEvent.REQUEST_TYPE, 	regionTypeRequest );
-		RegionEvent.addListener( ModelBaseEvent.REQUEST, 		regionRequest );	
-		
+		RegionEvent.addListener( ModelBaseEvent.REQUEST, 		regionRequest );
+		RegionEvent.addListener( ModelBaseEvent.SAVE, 			save );
+
 		RoomEvent.addListener( RoomEvent.ROOM_DISCONNECT, 		requestDefaultRegionLoad );
 		RoomEvent.addListener( RoomEvent.ROOM_JOIN_SUCCESS, 	onJoinRoomEvent );
 		
@@ -117,21 +118,14 @@ public class RegionManager
 	}
 	
 	private function loadSucceed( $pe:PersistanceEvent ):void {
-		if ( Globals.BIGDB_TABLE_REGIONS == $pe.table ) {
+		if ( Globals.BIGDB_TABLE_REGIONS == $pe.table || Globals.REGION_EXT == $pe.table ) {
 			//Log.out( "RegionManager.loadSucceed - creating new region: " + $pe.guid, Log.DEBUG );
-			var newRegion:Region = new Region( $pe.guid );
-			newRegion.fromObject( $pe.dbo );
-			regionAdd( $pe, newRegion );
-		}
-		// Bad thing about this is it ignores all the metadata
-		else if ( Globals.REGION_EXT == $pe.table ) {
-			var region:Region = new Region( $pe.guid );
-//			region.initJSON( $pe.data );
-//			regionAdd( null, region );
+			var newRegion:Region = new Region( $pe.guid, $pe.dbo, $pe.data );
+			add( $pe, newRegion );
 		}
 	}
 	
-	public function regionAdd( $pe:PersistanceEvent, $region:Region ):void {
+	public function add( $pe:PersistanceEvent, $region:Region ):void {
 		//Log.out( "RegionManager.regionAdd - adding region: " + $region.guid, Log.DEBUG );
 		if ( false == regionHas( $region.guid ) ) {
 			_regions.push( $region );
@@ -154,9 +148,8 @@ public class RegionManager
 	}
 	
 	public function startWithEmptyRegion():void {
-		var startingRegion:Region = new Region( "Blank" );
-		startingRegion.createEmptyRegion();
-		regionAdd( null, startingRegion );
+		var startingRegion:Region = new Region( "Blank", null, {} );
+		add( null, startingRegion );
 		RegionEvent.create( RegionEvent.LOAD, 0, startingRegion.guid );
 		//RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, 0, startingRegion.guid ) );
 		// This tells the config manager that the local region was loaded and is ready to load rest of data.
@@ -234,5 +227,12 @@ public class RegionManager
 		return false;
 	}
 
+	private function save(event:RegionEvent):void {
+		for each ( var region:Region in _regions ) {
+			if ( region && region.guid == event.guid ) {
+				region.save();
+			}
+		}
+	}
 } // RegionManager
 } // Package

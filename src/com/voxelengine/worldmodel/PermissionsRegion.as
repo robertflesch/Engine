@@ -9,8 +9,6 @@ package com.voxelengine.worldmodel
 {
 import playerio.DatabaseObject;
 
-import com.voxelengine.server.Network;
-import com.voxelengine.Log;
 /**
  * ...
  * @author Robert Flesch - RSF 
@@ -21,9 +19,8 @@ import com.voxelengine.Log;
  * http://wiki.secondlife.com/wiki/Permission
  * 
  */
-public class PermissionsRegion
+public class PermissionsRegion extends PermissionsBase
 {
-	private var _permissions:Object;
 	//private var _editors:Vector.<String> = new Vector.<String>() //{ user Id1:role, user id2:role... }
 	//private var _admins:Vector.<String> = new Vector.<String>() // : { user Id1:role, user id2:role... }
 	//
@@ -32,35 +29,26 @@ public class PermissionsRegion
 	//public function get editors():Vector.<String> { return _editors; }
 	//public function set editors(value:Vector.<String>):void  { _editors = value; }
 	
-	public function get created():String  { return _permissions.created; }
-	public function set created(value:String):void  { _permissions.created = value; }
-	public function get modified():String  { return _permissions.modified; }
-	public function set modified(value:String):void  { _permissions.modified = value; }	
-	public function get guest():Boolean  { return _permissions.guest; }
-	public function set guest(value:Boolean):void  { _permissions.guest = value; }	
+	public function get created():String  { return dboReference.permissions.created; }
+	public function set created(value:String):void  { dboReference.permissions.created = value; }
+	public function get modified():String  { return dboReference.permissions.modified; }
+	public function set modified(value:String):void  { dboReference.permissions.modified = value; }
+	public function get guest():Boolean  { return dboReference.permissions.guest; }
+	public function set guest(value:Boolean):void  { dboReference.permissions.guest = value; }
 
-	public function PermissionsRegion( $permissions:Object ) {
-		if ( $permissions ) {
-			_permissions = $permissions;
-			//if ( _permissions.editors )
-				//_editors = cvsToVector( _permissions.editors );
-			//if ( _permissions.admins )
-				//_admins = cvsToVector( _permissions.admins );
-		} else {
-			$permissions = new Object();
-			_permissions = $permissions;
-			$permissions.created = new Date().toUTCString();
-			$permissions.modified = new Date().toUTCString();
-			$permissions.guests = false;
-			//$info.permissions.editors = [];
-			//$info.permissions.admins = [];
-		}
+	public function PermissionsRegion( $dboReference:DatabaseObject ) {
+		super( $dboReference );
+
+		if ( !dboReference.permissions.guests )
+			dboReference.permissions.guests = false;
+		//$info.permissions.editors = [];
+		//$info.permissions.admins = [];
 	}
 
 	public function toObject():Object {
 		//_permissions.editors = editorsListGet();
 		//_permissions.admins = adminsListGet();
-		return _permissions;
+		return dboReference.permissions;
 	}
 
 	//private function editorsListGet():String { return _editors.toString(); }
