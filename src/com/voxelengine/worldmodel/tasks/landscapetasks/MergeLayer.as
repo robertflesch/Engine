@@ -15,7 +15,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.biomes.*;
-	import flash.utils.getTimer;
+import com.voxelengine.worldmodel.oxel.VisitorFunctions;
+
+import flash.utils.getTimer;
 
 	/**
 	 * ...
@@ -75,7 +77,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			Oxel.nodes = 0;
 			$oxel.mergeRecursive();
 			Log.out( "MergeLayer - merging 2 recovered: " + Oxel.nodes + " took: " + (getTimer() - timer), Log.DEBUG );
-			$oxel.chunkGet().visitor( _modelGuid, Oxel.rebuild, "Oxel.rebuild" );
+			$oxel.chunkGet().visitor( _modelGuid, VisitorFunctions.rebuild, "Oxel.rebuild" );
 
 			var vm:VoxelModel = getVoxelModel();
 			if ( vm )

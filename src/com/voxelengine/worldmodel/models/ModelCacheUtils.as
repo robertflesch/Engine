@@ -443,7 +443,9 @@ package com.voxelengine.worldmodel.models
 			return modelList;
 		}
 	}
-	
+
+	// This is not recognized by compiler, but works like a charm
+	// http://tobyho.com/2009/05/02/modifying-core-types-in/
 	import flash.geom.Vector3D;
 	flash.geom.Vector3D.prototype.toJSON = function (k:*):* { 
 	return {x:this.x, y:this.y, z:this.z};

@@ -14,6 +14,7 @@ import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.oxel.VisitorFunctions;
 
 import flash.geom.Vector3D;
 import org.flashapi.swing.Alert;
@@ -188,8 +189,8 @@ public class ModelMakerImport extends ModelMakerBase {
 				removeOxelReadyDataCompleteListeners();
 				Log.out( "ModelMakerImport.oxelReady - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
 
-				Oxel.resetScaling( $ode.oxelData.oxel );
-				Oxel.rebuild( $ode.oxelData.oxel );
+				VisitorFunctions.resetScaling( $ode.oxelData.oxel );
+				//Oxel.rebuild( $ode.oxelData.oxel );
 
 				if ( false == waitForChildren )
 					markComplete(true, _vmTemp);

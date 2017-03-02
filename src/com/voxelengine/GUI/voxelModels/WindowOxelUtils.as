@@ -12,6 +12,8 @@ import com.voxelengine.GUI.VVPopup;
 import com.voxelengine.renderer.Chunk;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.oxel.VisitorFunctions;
+
 import flash.utils.ByteArray;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
@@ -85,7 +87,7 @@ public class WindowOxelUtils extends VVPopup
 		addElement( statsB );
 		
 		var rebuildFacesInfo:Button = new Button( "Rebuild Model" );
-		rebuildFacesInfo.addEventListener(UIMouseEvent.CLICK, rebuildFacesHandler );
+		rebuildFacesInfo.addEventListener(UIMouseEvent.CLICK, rebuildModelHandler );
 		rebuildFacesInfo.width = 150;
 		addElement( rebuildFacesInfo );
 
@@ -140,29 +142,6 @@ public class WindowOxelUtils extends VVPopup
 		//_vm.statisics.gather( Globals.VERSION, ba, _vm.oxel.gc.grain );
 		//_vm.statisics.statsPrint();
 	}
-	
-	
-	import flash.utils.Timer;
-	import flash.events.TimerEvent;
-	private var _reloadTimer:Timer;
-	private var startingVal:uint = 0x33;
-	private function fullBrightHandler(event:UIMouseEvent):void {
-	
-		_reloadTimer = new Timer( 250 );
-		_reloadTimer.addEventListener(TimerEvent.TIMER, onRepeat);
-		_reloadTimer.start();
-	}
-
-	protected function onRepeat(event:TimerEvent):void {
-		Log.out( "WindowOxelUtils.onRepeat - startingVal: " + startingVal );
-		_vm.modelInfo.oxelPersistance.oxel.fullBright( startingVal );
-		
-		if ( 0xff == startingVal ) {
-			_reloadTimer.stop();
-		}
-		
-		startingVal++;
-	}
 
 	private function generateLODHandler(event:UIMouseEvent):void {
 		//_vm.modelInfo.oxelPersistance.generateLOD();
@@ -208,19 +187,23 @@ public class WindowOxelUtils extends VVPopup
 	}
 
 	private function rebuildWaterHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.oxelPersistance.visitor( Oxel.rebuildWater, "Oxel.rebuildWater" );
+		VoxelModel.visitor( VisitorFunctions.rebuildWater, "Oxel.rebuildWater" );
 	}
 	
 	private function rebuildGrassHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.oxelPersistance.visitor( Oxel.rebuildGrass, "Oxel.rebuildGrass" );
+		VoxelModel.visitor( VisitorFunctions.rebuildGrass, "Oxel.rebuildGrass" );
 	}
 	
-	private function rebuildFacesHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.oxelPersistance.visitor( Oxel.rebuild, "Oxel.rebuild" );
+	private function rebuildModelHandler(event:UIMouseEvent):void {
+		//_vm.modelInfo.oxelPersistance.visitor( Oxel.rebuild, "Oxel.rebuild" );
+		_vm.modelInfo.oxelPersistance.oxel.chunkGet().setDirtyRecursively();
+		_vm.modelInfo.oxelPersistance.oxel.chunkGet().buildFacesRecursively( _vm.modelInfo.guid, _vm, false );
+		_vm.modelInfo.oxelPersistance.oxel.chunkGet().buildQuadsRecursively( _vm.modelInfo.guid, _vm );
+
 	}
 	
 	private function resetOxelScalingHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.oxelPersistance.visitor( Oxel.resetScaling, "Oxel.resetScaling" );
+		VoxelModel.visitor( VisitorFunctions.resetScaling, "Oxel.resetScaling" );
 	}
 	
 }	

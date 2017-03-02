@@ -7,6 +7,10 @@
 ==============================================================================*/
 package com.voxelengine.renderer {
 
+import com.voxelengine.pools.ChildOxelPool;
+import com.voxelengine.pools.GrainCursorPool;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
+
 import flash.geom.Matrix3D;
 import flash.display3D.Context3D;
 import flash.utils.getTimer;
@@ -33,17 +37,21 @@ public class Chunk {
 	//static private const MAX_CHILDREN:uint = 1024;
 	static private const OCT_TREE_SIZE:uint = 8;
 	private var _children:Vector.<Chunk>; 	// These are created when needed
-	private var _vertMan:VertexManager
-	private var _oxel:Oxel;
-	private var _dirty:Boolean;
+	private var _vertMan:VertexManager;
 	private var _parent:Chunk;
-	private var _lightInfo:LightInfo;
 
+	private var _gc:GrainCursor; 			// Object that give us our location allocates memory for the grain
+	public function get  gc():GrainCursor { return _gc }; 			// Object that give us our location allocates memory for the grain
+
+	private var _lightInfo:LightInfo;
 	public function get lightInfo():LightInfo { return _lightInfo; }
-	public function get dirty():Boolean { return _dirty; }
+
+	private var _oxel:Oxel;
 	public function get oxel():Oxel  { return _oxel; }
 	
 	// TODO Should just add dirty chunks to a rebuild queue, which would get me a more incremental build
+	private var _dirty:Boolean;
+	public function get dirty():Boolean { return _dirty; }
 	public function dirtyClear():void { _dirty = false; }
 	public function dirtySet( $type:uint ):void {
 		_dirty = true;
@@ -55,9 +63,10 @@ public class Chunk {
 	}
 	public function childrenHas():Boolean { return null != _children; }
 	
-	public function Chunk( $parent:Chunk ):void {
+	public function Chunk( $parent:Chunk, $bound:uint ):void {
 		_parent = $parent;
 		_dirty = true;
+		_gc = GrainCursorPool.poolGet( $bound );
 		_s_chunkCount++;
 	}
 	
@@ -73,33 +82,43 @@ public class Chunk {
 			_parent = null;
 			_s_chunkCount--;
 		}
+		GrainCursorPool.poolDispose( _gc );
 	}
 	
 	
 	// TODO
 	// add functions and optimize
-	//
 	// I can see I need two more functions
 	// public function merge():Chunk
 	// public function divide():?
 	
 	static public function parse( $oxel:Oxel, $parent:Chunk, $lightInfo:LightInfo ):Chunk {
 		var time:int = getTimer();
+		var bound:uint = $oxel.gc.bound;
+		var chunk:Chunk = new Chunk( $parent, bound );
 
-		var chunk:Chunk = new Chunk( $parent );
+		chunk._gc.grain = $parent ? ($parent._gc.grain - 1) : $oxel.gc.bound;
+
 		// when I create the chunk I add a light level to it.
-
 		if ( 0 == $lightInfo.ID )
 			Log.out( "chunk.parse - LIGHT ID IS ZERO lightInfo: " + $lightInfo, Log.WARN );
 		//else
 		//	Log.out( "chunk.parse - new chunk: " + $oxel.childCount + "  $lightInfo: " + $lightInfo, Log.WARN );
 		chunk._lightInfo = $lightInfo;
-			
+
+		//Log.out( "chunk.parse - creating children chunks: " + $oxel.childCount + " chunkCount: " + Chunk.chunkCount(), Log.WARN );
 		if ( MAX_CHILDREN < $oxel.childCount ) {
-			//Log.out( "chunk.parse - creating parent chunk: " + $oxel.childCount, Log.WARN );
+			var gct:GrainCursor = GrainCursorPool.poolGet( chunk._gc.bound );
+			Log.out( "chunk.parse - creating children chunks: " + $oxel.childCount, Log.WARN );
 			chunk._children = new Vector.<Chunk>(OCT_TREE_SIZE, true);
-			for ( var i:int; i < OCT_TREE_SIZE; i++ )
-				chunk._children[i] = parse( $oxel.children[i], chunk, $lightInfo );
+			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
+				chunk._children[i] = parse($oxel.children[i], chunk, $lightInfo);
+				gct.copyFrom( chunk._gc );
+				gct.become_child( i );
+				chunk._children[i]._gc.copyFrom( gct );
+				Log.out( "chunk.parse - chunk gc: " + chunk._children[i]._gc + " count: " + (chunk._children[i].oxel ? chunk._children[i].oxel.childCount : "parent")  + " chunkCount: " + Chunk.chunkCount(), Log.WARN );
+			}
+			GrainCursorPool.poolDispose( gct );
 		}
 		else {
 			//Log.out( "chunk.parse - creating chunk with child count: " + $oxel.childCount, Log.WARN );
@@ -160,14 +179,13 @@ public class Chunk {
 		}
 	}
 
-
-	public function refreshFaces( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {
+	public function buildFacesRecursively( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {
 		if ( childrenHas() ) {
 			dirtyClear();
 			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
 				//if ( _children[i].dirty && _children[i]._oxel && _children[i]._oxel.dirty )
 				if ( _children[i].dirty )
-					_children[i].refreshFaces( $guid, $vm, $firstTime );
+					_children[i].buildFacesRecursively( $guid, $vm, $firstTime );
 			}
 		}
 		else {
@@ -180,11 +198,23 @@ public class Chunk {
 				else
 					priority = 4; // high but not too high?
 
-				RefreshFaces.addTask( $guid, this, priority )
+				RefreshFaces.addTask( $guid, this, priority );
 			}
 		}
 	}
-	
+
+	public function setDirtyRecursively():void {
+		if ( childrenHas() ) {
+			_dirty = true;
+			for ( var i:int; i < OCT_TREE_SIZE; i++ )
+				_children[i].setDirtyRecursively();
+		} else {
+			_dirty = true;
+			if ( _oxel )
+				_oxel.setDirtyRecursively();
+		}
+	}
+
 	public function visitor( $guid:String, $func:Function, $functionName:String = "" ):void {
 		if ( childrenHas() ) {
 			for ( var i:int; i < OCT_TREE_SIZE; i++ )

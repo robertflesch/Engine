@@ -110,10 +110,10 @@ public class Dragon extends Beast
 
 	override public function stateSet($state:String, $lockTime:Number = 1):void {
 		super.stateSet( $state, $lockTime );
-		if ( anim ){
-			speedMultiplier = anim.speedMultiplier;
-			clipVelocityFactor = anim.clipVelocity;
-		}
+//		if ( anim ){
+//			speedMultiplier = anim.speedMultiplier;
+//			clipVelocityFactor = anim.clipVelocity;
+//		}
 	}
 
 	override protected function setAnimation():void	{

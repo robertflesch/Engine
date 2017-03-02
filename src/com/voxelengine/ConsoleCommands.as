@@ -9,6 +9,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine
 {
 import com.furusystems.dconsole2.plugins.plugcollections.BasicPlugins;
+import com.voxelengine.worldmodel.oxel.VisitorFunctions;
 
 import flash.utils.getTimer;
 
@@ -153,13 +154,10 @@ public class ConsoleCommands {
 	
 	private static function lightingReset():void
 	{
-		if ( VoxelModel.selectedModel )
-		{
-			VoxelModel.selectedModel.modelInfo.oxelPersistance.oxel.lightingReset();
-			//VoxelModel.selectedModel.modelInfo.oxelPersistance.oxel.rebuildAll();
-			VoxelModel.selectedModel.modelInfo.oxelPersistance.visitor( Oxel.rebuild, "Oxel.rebuild" );
-		}
-		else
+		if ( VoxelModel.selectedModel ) {
+			VoxelModel.visitor( VisitorFunctions.lightingReset, "Oxel.lightingReset" );
+			VoxelModel.visitor( VisitorFunctions.rebuild, "Oxel.rebuild" );
+		} else
 			Log.out( "No selected model", Log.WARN );
 	}
 	

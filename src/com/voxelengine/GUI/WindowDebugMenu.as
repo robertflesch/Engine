@@ -173,7 +173,7 @@ public class WindowDebugMenu extends VVCanvas
 		if ( _modelLoc )
 		{
 			_modelLoc.text = "";
-			if ( Player.player )
+			if ( VoxelModel.controlledModel )
 			{
 				var loc:Vector3D = VoxelModel.controlledModel.instanceInfo.positionGet;
 				_modelLoc.text = "x: " + int( loc.x ) + "  y: " + int( loc.y ) + "  z: " + int( loc.z );

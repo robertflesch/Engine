@@ -19,6 +19,7 @@ import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 import com.voxelengine.worldmodel.oxel.GrainCursorUtils;
 import com.voxelengine.worldmodel.oxel.Lighting;
+import com.voxelengine.worldmodel.oxel.VisitorFunctions;
 
 import flash.display3D.Context3D;
 import flash.events.KeyboardEvent;
@@ -821,7 +822,7 @@ public class VoxelModel
 		if ( modelInfo.oxelPersistance.oxel ) {
 			modelInfo.oxelPersistance.oxel.changeGrainSize(changeSize, modelInfo.oxelPersistance.oxel.gc.bound + changeSize);
 			//Log.out("VoxelModel.changeGrainSize - took: " + (getTimer() - _timer) + " count " + Oxel.nodes);
-			modelInfo.oxelPersistance.visitor( Oxel.rebuild, "Oxel.rebuild" );
+			modelInfo.oxelPersistance.visitor( VisitorFunctions.rebuild, "Oxel.rebuild" );
 			//Log.out("VoxelModel.changeGrainSize - rebuildAll took: " + (getTimer() - _timer));
 		}
 	}
@@ -1200,7 +1201,7 @@ public class VoxelModel
 	}
 
 	public function rebuildLightingHandler():void {
-		modelInfo.oxelPersistance.visitor( Oxel.rebuildLightingRecursive, "Oxel.rebuildLightingRecursive" );
+		modelInfo.oxelPersistance.visitor( VisitorFunctions.rebuildLightingRecursive, "Oxel.rebuildLightingRecursive" );
 		var children:Vector.<VoxelModel> = modelInfo.childVoxelModelsGet();
 		for each ( var child:VoxelModel in children ) {
 			if ( child.metadata.name == "DragonHead" )
@@ -1268,6 +1269,11 @@ public class VoxelModel
 		return newModel;
 	}
 
+	static public function visitor( $func:Function, $functionName:String = "" ):void {
+		if ( selectedModel ) {
+			selectedModel.modelInfo.oxelPersistance.visitor( $func, $functionName );
+		}
+	}
 }
 }
 

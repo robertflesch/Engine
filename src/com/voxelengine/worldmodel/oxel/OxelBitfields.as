@@ -139,7 +139,7 @@ package com.voxelengine.worldmodel.oxel
 //		public		function facesSetAll():void 				{ _data |= OXEL_DATA_FACES;  dirty = true;}
 		public		function facesSetAll():void 				{ _data |= OXEL_DATA_FACES;  }
 		public		function facesClearAll():void 			{ _data &= OXEL_DATA_FACES_CLEAR;  dirty = true;	 }
-		protected	function facesMarkAllDirty():void 		{ 
+		public		function facesMarkAllDirty():void 		{
 			_data |= OXEL_DATA_FACES_DIRTY;
 			dirty = true; 
 		}

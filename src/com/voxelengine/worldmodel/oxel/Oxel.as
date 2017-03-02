@@ -238,7 +238,7 @@ public class Oxel extends OxelBitfields
 		dataRaw( $data, $type );
 		_gc = GrainCursorPool.poolGet( $gc.bound );
 		_gc.copyFrom( $gc );
-		
+
 		// Since this is from byteArray, I dont need to perform operations on the chunks.
 		super.dirty = true;
 	}
@@ -844,7 +844,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		Log.out("Oxel.mergeAndRebuild - merge 2 took: " + (getTimer() - _timer) + " count " + Oxel.nodes );
 		
 		_timer = getTimer();
-		Oxel.rebuild(this);
+		VisitorFunctions.rebuild(this);
 		Log.out("Oxel.mergeAndRebuild - rebuildAll took: " + (getTimer() - _timer));
 	}
 	
@@ -860,7 +860,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		Log.out("Oxel.mergeAIRAndRebuild - merge 2 took: " + (getTimer() - _timer) + " count " + Oxel.nodes );
 		
 		_timer = getTimer();
-		Oxel.rebuild(this);
+		VisitorFunctions.rebuild(this);
 		Log.out("Oxel.mergeAIRAndRebuild - rebuildAll took: " + (getTimer() - _timer));
 	}
 	
@@ -1125,7 +1125,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 
-	override protected function facesMarkAllDirty():void { 
+	override public function facesMarkAllDirty():void {
 		super.facesMarkAllDirty();
 		facesClearAll();
 	}
@@ -1185,7 +1185,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 	
-	private function facesBuildTerminal():void {
+	public function facesBuildTerminal():void {
 		//if ( gc.eval( 5, 101, 72, 16 )) {
 		//	var result:Boolean = faceHasDirtyBits();
 		//	Log.out("Oxel.facesBuildTerminal - not being lit");
@@ -1918,6 +1918,22 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return $ba;
 	}
 
+	/* meaning of oxel data read from ivm
+	OXEL_DATA_FLOW_INFO:uint				= 0x00000001;
+	OXEL_DATA_LIGHT_INFO:uint				= 0x00000002;
+	OXEL_DATA_FIRE:uint						= 0x00000200;
+	OXEL_DATA_PARENT:uint					= 0x00000400;
+
+	OXEL_DATA_FACES:uint  					= 0x7e000000;
+	OXEL_DATA_FACES_NEGZ:uint				= 0x02000000;
+	OXEL_DATA_FACES_POSZ:uint				= 0x04000000;
+	OXEL_DATA_FACES_NEGY:uint				= 0x08000000;
+	OXEL_DATA_FACES_POSY:uint				= 0x10000000;
+	OXEL_DATA_FACES_NEGX:uint				= 0x20000000;
+	OXEL_DATA_FACES_POSX:uint				= 0x40000000;
+
+	OXEL_DATA_ADDITIONAL:uint  			    = 0x80000000; // deprecated used if oxel has flow or light data
+	*/
 	public function readOxelData($ba:ByteArray, $op:OxelPersistance ):void {
 		// Read off 1 bytes, the root size
 		var rootGrainSize:int = $op.bound;
@@ -2865,7 +2881,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 	
-	private function evaluateForChangeToGrass():void {
+	public function evaluateForChangeToGrass():void {
 		var no:Oxel = neighbor( Globals.POSY );
 		if ( Globals.BAD_OXEL == no )
 				type = TypeInfo.GRASS;
@@ -2943,22 +2959,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		facesMarkAllClean();
 	}
 
-	public function lightingReset():void {
-
-		if ( childrenHas() )
-		{
-			for each ( var child:Oxel in children )
-			{
-				child.lightingReset();
-			}
-		}
-		else if ( _lighting )
-		{
-			if ( _lighting.reset() )
-				quadsRebuildAll();
-		}
-	}
-	
 	public function lightingSunGatherList( ol:Vector.<Oxel> ):void {
 
 		if ( childrenHas() )
@@ -3048,42 +3048,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				child.layDownWater( $waterHeight );
 		}
 	}
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Explosion Event Helpers START
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Not sure what this does - RSF
-	public function breakFromParent():void
-	{
-		gc.bound = _parent.gc.bound - 1;
-		gc.grainX = 0;
-		gc.grainY = 0;
-		gc.grainZ = 0;
-		if ( childrenHas() )
-			calculateGC();
-		Log.out( "Oxel.breakFromParent - This should NEVER happen " );
-		// God know what this should be at this point
-//			_vertMan = new VertexManager( gc, null );
-		_parent = null;
-	}
-	
-	public function calculateGC():void
-	{
-		var gct:GrainCursor = GrainCursorPool.poolGet(root_get().gc.bound );
-		for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
-		{
-			gct.copyFrom( gc );
-			gct.become_child( i );   
-			children[i].gc.copyFrom( gct );
-			if ( true == children[i].childrenHas() )
-				children[i].calculateGC();
-		}
-		GrainCursorPool.poolDispose( gct );
-		
-	}
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Explosion Event Helpers END
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	static public function childIdOpposite( $face:uint, $childID:uint ):uint {
 		if ( 0 == $childID ) {
@@ -3303,148 +3267,22 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 	
 	//// This rebuilds just this oxel and its children
-	//public function rebuild():void {
-		//if ( childrenHas() ) {
-			//if ( TypeInfo.AIR != type ) {
-				//Log.out( "Oxel.rebuildAll - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
-				//type = TypeInfo.AIR; 
-			//}
-			//for each ( var child:Oxel in _children )
-				//child.rebuild();
-		//}
-		//else {
-			//facesMarkAllDirty();
-			//quadsDeleteAll();
-		//}
-	//}
-	
-	
-	///////////////////////////////////////////////////////////////////////////
-	// lambda functions
-	///////////////////////////////////////////////////////////////////////////
-	
-	static public function rebuildGrass( $oxel:Oxel ):void {
-		if ( $oxel.childrenHas() ) {
-			for each ( var child:Oxel in $oxel._children )
-				rebuildGrass( child ); }
-		else {
-			if ( TypeInfo.GRASS == $oxel.type ) {
-				if ( $oxel.gc.eval( 4, 64, 89, 13 ) )
-					Log.out( "Oxel.rebuildGrass - why doesnt this change?" )
-				// look above this oxel
-				var no:Oxel = $oxel.neighbor( Globals.POSY )
-				// if its air, ok
-				if ( TypeInfo.hasAlpha( no.type ) && !no.childrenHas() )
-					return;
-				// if its has children, and one of those is air
-				// change it to dirt, and create children
-				if ( no.type == TypeInfo.AIR && no.childrenHas() ) {
-					if ( no.faceHasAlpha( Globals.NEGY ) ) {
-						// no has alpha and children, I need to change to dirt and break up, and revaluate
-						$oxel.type = TypeInfo.DIRT
-						$oxel.childrenCreate( true ) 
-						for each ( var dchild:Oxel in $oxel.children )
-							dchild.evaluateForChangeToGrass()
-					}
-					else
-						$oxel.type = TypeInfo.DIRT
-				}
-				else if ( !TypeInfo.hasAlpha( no.type ) ) {
-					$oxel.type = TypeInfo.DIRT
-				}
-				else if ( no.childrenHas() ) {
-					Log.out( "Oxel.rebuildGrass - invalid condition: no.type" + no.type, Log.ERROR )
-				}
-				else 
-					Log.out( "Oxel.rebuildGrass - invalid condition", Log.ERROR )
+	public function rebuild():void {
+		if ( childrenHas() ) {
+			if ( TypeInfo.AIR != type ) {
+				Log.out( "Oxel.rebuildAll - parent with TYPE: " + TypeInfo.typeInfo[type].name, Log.ERROR );
+				type = TypeInfo.AIR;
 			}
-		}
-	}
-
-	// This rebuilds the oxel and its children.
-	// if used in a lambda function, it rebuilds the entire model
-	static public function rebuild( $oxel:Oxel ):void {
-		if ( $oxel.childrenHas() ) {
-			if ( TypeInfo.AIR != $oxel.type ) {
-				Log.out( "Oxel.rebuildAll - parent with TYPE: " + TypeInfo.typeInfo[$oxel.type].name, Log.ERROR );
-				$oxel.type = TypeInfo.AIR; 
-			}
-			for each ( var child:Oxel in $oxel._children )
-				rebuild(child);
+			for each ( var child:Oxel in _children )
+				child.rebuild();
 		}
 		else {
-			$oxel.facesMarkAllDirty();
-			$oxel.quadsDeleteAll();
-			$oxel.facesBuildTerminal();
-		}
-	}
-
-	static public function rebuildLightingRecursive( $oxel:Oxel ):void {
-		if ($oxel.childrenHas()) {
-			for each (var child:Oxel in $oxel._children)
-				rebuildLightingRecursive( child );
-		}
-		else {
-			if ( $oxel.facesHas() ) {
-				if ( !$oxel.lighting ) {
-					$oxel.lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
-					$oxel.lighting.add( $oxel.chunkGet().lightInfo ) // Get the parent chunk
-				}
-				$oxel.dirty = true;
-				$oxel.quadsRebuildAll();
-			}
-		}
-	}
-
-	static public function rebuildWater( $oxel:Oxel ):void {
-		if ( $oxel.childrenHas() ) {
-			for each ( var child:Oxel in $oxel._children )
-				rebuildWater( child ); }
-		else {
-			if ( TypeInfo.WATER == $oxel.type ) {
-				if ( 5 < $oxel.gc.grain ) {
-					Log.out( "Oxel.rebuildWater found grain too large: " + $oxel.gc.toString() );
-					$oxel.childrenCreate( true );
-					for each ( var newChild:Oxel in $oxel._children )
-						rebuildWater( newChild ) 
-				} else {
-					var no:Oxel;
-					// This finds edges of bottoms that are open to free flowing and turns them to sand
-					for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
-						if ( Globals.isHorizontalDirection( face ) || Globals.NEGY == face ) {
-							no = $oxel.neighbor(face);
-							if ( Globals.BAD_OXEL == no )
-								$oxel.type = TypeInfo.SAND;
-							else if ( TypeInfo.AIR == no.type && !no.childrenHas() )
-								$oxel.type = TypeInfo.SAND;
-						}
-					}
-					
-					$oxel.facesMarkAllDirty();
-					$oxel.quadsDeleteAll();
-				}
-			}
+			facesMarkAllDirty();
+			quadsDeleteAll();
 		}
 	}
 	
-	static public function resetScaling( $oxel:Oxel ):void {
-		if ( $oxel.childrenHas() ) {
-			for each ( var child:Oxel in $oxel._children )
-				resetScaling( child ); }
-		else {
-			if ( Globals.BAD_OXEL == $oxel )
-				return;
-			if ( $oxel.flowInfo && $oxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling.has() ) {
-				if ( TypeInfo.flowable[ $oxel.type ] )
-					return;
-
-				$oxel.flowInfo.flowScaling.reset();
-//				$oxel.facesMarkAllDirty();
-				$oxel.quadsDeleteAll();
-			}
-		}
-	}
-
+	
 	public static function generateCube( $modelGuid:String, $layer:LayerInfo, $generateEvent:Boolean = true ):ByteArray {
 		var ba:ByteArray = COMPRESSED_REFERENCE_BA_SQUARE;
 		if ( $generateEvent )
@@ -3593,5 +3431,17 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 		return size;
 	}
+
+	public function setDirtyRecursively():void {
+		if ( childrenHas() ) {
+			for each ( var child:Oxel in _children )
+				child.setDirtyRecursively();
+		}
+		else {
+			facesMarkAllDirty();
+		}
+	}
+
+
 } // end of class Oxel
 } // end of package
