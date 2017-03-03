@@ -208,23 +208,12 @@ public class ModelMetadataCache
 				return;
 			}
 			vmm = new ModelMetadata( $pe.guid, null, newData );
-			// On new object save it.
-//			vmm.save();
 			add( $pe.series, vmm );
 		} else {
 			Log.out( "ModelMetadataCache.loadSucceed NO oxelPersistance or DBO PersistanceEvent: " + $pe.toString(), Log.WARN );
 			ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 		}
 
-		function merge( obj0:Object, obj1:DatabaseObject ):DatabaseObject
-		{
-			for( var p:String in obj0 )
-			{
-				obj1[ p ] = ( obj1[ p ] != null ) ? obj1[ p ] : obj0[ p ];
-				trace( p, ' : obj0', obj0[ p ], 'obj1', obj1[ p ], '-> new value = ', obj1[ p ] );
-			}
-			return obj1;
-		}
 	}
 	
 	static private function loadFailed( $pe:PersistanceEvent ):void  {

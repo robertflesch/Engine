@@ -54,13 +54,11 @@ package com.voxelengine.GUI.voxelModels
 		private function onParentModelAdded(event:ModelEvent):void {
 			if ( _modelPanel )
 				_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null );
-			RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );
 		}
 
 		private function onParentModelRemoved(event:ModelEvent):void {
 			if ( _modelPanel )
 				_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null, true );
-			RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );
 		}
 
 		

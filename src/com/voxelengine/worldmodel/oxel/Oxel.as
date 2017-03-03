@@ -3283,7 +3283,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 	
 	
-	public static function generateCube( $modelGuid:String, $layer:LayerInfo, $generateEvent:Boolean = true ):ByteArray {
+	public static function generateCubeNah( $modelGuid:String, $layer:LayerInfo, $generateEvent:Boolean = true ):ByteArray {
 		var ba:ByteArray = COMPRESSED_REFERENCE_BA_SQUARE;
 		if ( $generateEvent )
 			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
@@ -3291,7 +3291,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 
 
-	public static function generateCubeOld( $modelGuid:String, $layer:LayerInfo, $generateEvent:Boolean = true ):ByteArray {
+	public static function generateCube( $modelGuid:String, $layer:LayerInfo, $generateEvent:Boolean = true ):ByteArray {
 		//////////////////////////////////////////////////////////
 		// Builds Solid Cube of any grain size
 		//////////////////////////////////////////////////////////

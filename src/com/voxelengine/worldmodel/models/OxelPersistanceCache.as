@@ -164,7 +164,7 @@ public class OxelPersistanceCache
 	static private function generateSucceed( $pe:PersistanceEvent):void {
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
-		var od:OxelPersistance = new OxelPersistance( $pe.guid, null, $pe.data );
+		var od:OxelPersistance = new OxelPersistance( $pe.guid, null, $pe.data, true );
 		add( $pe.series, od );
 		Log.out( "OxelDataCache.generateSucceed " + $pe.toString(), Log.INFO );
 	}

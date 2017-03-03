@@ -67,7 +67,7 @@ public class ModelInfo extends PersistanceObject
 		if ( oxelPersistance && oxelPersistance.oxel )
 			return oxelPersistance.oxel.gc.grain;
 		else 
-			return dbo.grainSize;
+			return dbo.grainSize ? dbo.grainSize : 4;
 	}
 	public function set grainSize(val:int):void						{ dbo.grainSize = val; }
 	
@@ -109,7 +109,7 @@ public class ModelInfo extends PersistanceObject
 		// scripts are stored in the info object until needed, no more preloading
 		//scriptsFromObject( mi.scripts );
 
-		//if ( dbo.model.children )
+		//if ( dbo.children )
 		//childrenFromObject();
 		// animations are stored in the info object until needed, no more preloading
 		//if ( mi.animations )
@@ -422,7 +422,7 @@ public class ModelInfo extends PersistanceObject
 	public function childrenLoad( $vm:VoxelModel ):void {
 		childrenLoaded	= true;
 		_childCount = 0;
-		if ( !dbo.children )
+		if ( !dbo || !dbo.children )
 			return
 		
 		//Log.out( "ModelInfo.childrenLoad - loading for model: " + guid );

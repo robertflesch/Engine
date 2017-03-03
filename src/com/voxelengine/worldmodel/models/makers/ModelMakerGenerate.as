@@ -42,12 +42,12 @@ import com.voxelengine.worldmodel.tasks.landscapetasks.TaskLibrary;
 	 */
 public class ModelMakerGenerate extends ModelMakerBase {
 	private var _creationInfo:Object;
-	private var _creationFunction:String;
+	private var _name:String;
 	private var _type:int;
 	private  var _vm:VoxelModel;
 	
 	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object ) {
-		_creationFunction = $miJson.name;
+		_name = $miJson.name;
 		_type = $miJson.biomes.layers[0].type;
 		_creationInfo = $miJson;
 		Log.out("ModelMakerGenerate - ii: " + $ii.toString() + "  using generation script: " + $miJson.biomes.layers[0].functionName);
@@ -121,10 +121,10 @@ public class ModelMakerGenerate extends ModelMakerBase {
 
 		// Bypass the setter so that we dont set it to changed
 		if ( _type )
-			_modelMetadata.name = _creationFunction + TypeInfo.name( _type ) + "-" + modelInfo.grainSize + "-" + _creationFunction;
+			_modelMetadata.name = _name + TypeInfo.name( _type ) + "-" + modelInfo.grainSize + "-" + _name;
 		else
-			_modelMetadata.name = _creationFunction + "-" + modelInfo.grainSize;
-		_modelMetadata.description = _creationFunction + "- GENERATED";
+			_modelMetadata.name = _name + "-" + modelInfo.grainSize;
+		_modelMetadata.description = _name + "- GENERATED";
 		_modelMetadata.owner = Network.userId;
 	}
 	
@@ -141,7 +141,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 					markComplete( true, _vm );
 			}
 			else {
-				Log.out( "ModelMakerGenerate.attemptMake FAILED to generate from " + _creationFunction, Log.WARN );
+				Log.out( "ModelMakerGenerate.attemptMake FAILED to generate from " + _name, Log.WARN );
 				markComplete( false, _vm );
 			}
 		}
@@ -178,7 +178,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 
 		super.markComplete( $success, $vm );
 		_vm = null;
-		_creationFunction = null;
+		_name = null;
 		_creationInfo = null;
 	}
 

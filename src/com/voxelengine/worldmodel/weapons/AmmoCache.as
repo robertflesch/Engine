@@ -83,25 +83,20 @@ public class AmmoCache
 			return;
 		if ( $pe.dbo || $pe.data ) {
 			//Log.out( "AmmoCache.loadSucceed guid: " + $pe.guid, Log.INFO );
-			var ammo:Ammo = new Ammo( $pe.guid );
+			var ammo:Ammo;
 			if ( $pe.dbo ) {
-				ammo.fromObject( $pe.dbo );
+				ammo = new Ammo( $pe.guid, $pe.dbo, null );
 			}
 			else {
-				var dbo:DatabaseObject = new DatabaseObject( Globals.BIGDB_TABLE_AMMO, "0", "0", 0, true, null );
-				dbo.data = new Object();
-				// This is for import from local only.
 				var fileData:String = String( $pe.data );
 				fileData = StringUtils.trim(fileData);
-				dbo.data = JSONUtil.parse( fileData, $pe.guid + $pe.table, "AmmoCache.loadSucceed" );
-				if ( null == dbo.data ) {
+				var newObjData:Object = JSONUtil.parse( fileData, $pe.guid + $pe.table, "ModelInfoCache.loadSucceed" );
+				if ( null == newObjData ) {
 					Log.out( "AmmoCache.loadSucceed - error parsing ammoInfo on import. guid: " + $pe.guid, Log.ERROR );
 					AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 					return;
 				}
-				ammo.fromObjectImport( dbo );
-				// On import mark it as changed.
-				ammo.changed = true;
+				ammo = new Ammo( $pe.guid, null, newObjData );
 				ammo.save();
 			}
 			

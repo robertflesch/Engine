@@ -50,7 +50,7 @@ public class Dragon extends Beast
 
 	static public function buildExportObject( obj:Object ):Object {
 		Beast.buildExportObject( obj )
-		obj.dragon = new Object();
+		obj.dragon = {};
 		return obj;
 	}
 	

@@ -82,7 +82,7 @@ public class OxelPersistance extends PersistanceObject
 	public 	function get oxel():Oxel 							{ return _oxels[_lod]; }
 	public 	function get oxelCount():int 						{ return _oxels.length; }
 
-	public function OxelPersistance( $guid:String, $dbo:DatabaseObject, $importedData:ByteArray ):void {
+	public function OxelPersistance( $guid:String, $dbo:DatabaseObject, $importedData:ByteArray, $generated:Boolean = false ):void {
 		super($guid, Globals.BIGDB_TABLE_OXEL_DATA);
 
 		if (!_aliasInitialized) {
@@ -93,7 +93,10 @@ public class OxelPersistance extends PersistanceObject
 
 		if ( null == $dbo ) {
 			assignNewDatabaseObject();
-			stripDataFromImport( $importedData );
+			if ( $generated )
+				ba = $importedData;
+			else
+				stripDataFromImport( $importedData );
 			baseLightLevel = Lighting.defaultBaseLightIllumination;
 		} else {
 			dbo = $dbo;

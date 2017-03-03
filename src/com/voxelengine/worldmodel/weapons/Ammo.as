@@ -46,11 +46,101 @@ public class Ammo extends PersistanceObject
 	public function get contactScript():String  	{ return dbo.contactScript; }
 	public function get model():String 				{ return dbo.model; }
 	public function get oxelType():int 				{ return dbo.oxelType; }
-	
-	public function Ammo( $name:String ) {
-		super( $name, Globals.BIGDB_TABLE_AMMO );
+
+
+	public function Ammo( $guid:String, $dbo:DatabaseObject = null, $newData:Object = null ) {
+		super( $guid, Globals.BIGDB_TABLE_AMMO );
+
+		if ( null == $dbo)
+			assignNewDatabaseObject();
+		else {
+			dbo = $dbo;
+		}
+
+		init( $newData );
 	}
-	
+
+	// Only attributes that need additional handling go here.
+	private function init( $newData:Object = null ):void {
+
+		if ($newData)
+			mergeOverwrite($newData);
+
+		if ( !dbo.type )
+			dbo.type = 1;
+		if ( !dbo.count )
+			dbo.count = 1;
+		if ( !dbo.grain )
+			dbo.grain = 2;
+		if ( !dbo.accuracy )
+			dbo.accuracy = 0.1;
+		if ( !dbo.velocity )
+			dbo.velocity = 200;
+		if ( !dbo.life )
+			dbo.life = 5;
+
+		if ( !dbo.model )
+			dbo.model = "CannonBall";
+
+		if ( dbo.oxelType ) {
+			if ( dbo.oxelType is String )
+				dbo.oxelType = TypeInfo.getTypeId( dbo.oxelType );
+		}
+		else
+			dbo.oxelType = TypeInfo.STEEL;
+
+		if ( !dbo.contactScript )
+			dbo.contactScript = "";
+
+
+		if ( !dbo.launchSound )
+			dbo.launchSound = "Cannon";
+		if ( !Globals.isGuid( dbo.launchSound ) )
+			SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, updateSoundGuid )
+
+		if ( !dbo.impactSound )
+			dbo.impactSound = "CannonBallExploding";
+
+		if ( !Globals.isGuid( dbo.impactSound ) || !Globals.isGuid( dbo.launchSound ) ) {
+			SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, updateSoundGuid )
+			SoundEvent.addListener( ModelBaseEvent.ADDED, verifySoundData )
+			SoundEvent.addListener( ModelBaseEvent.RESULT, verifySoundData )
+		}
+
+		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, dbo.launchSound, null, Globals.isGuid( dbo.launchSound ) ? true : false ) )
+		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, dbo.impactSound, null, Globals.isGuid( dbo.impactSound ) ? true : false ) )
+	}
+
+
+	private function assignNewDatabaseObject():void {
+		dbo = new DatabaseObject( table, "0", "0", 0, true, null );
+
+		createDefault();
+
+//		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createdHandler );
+//		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, endSaving )
+//		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, endSaving )
+//		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, endSaving )
+
+		//setToDefault();
+	}
+
+	// Only attributes that need additional handling go here.
+	public function createDefault():void {
+		dbo.name = "Blank";
+		dbo.type = 1;
+		dbo.count = 1;
+		dbo.grain = 2;
+		dbo.accuracy = 0.1;
+		dbo.velocity = 200;
+		dbo.life = 5;
+		dbo.model = "CannonBall";
+		dbo.oxelType = TypeInfo.STEEL;
+		dbo.contactScript = "";
+		dbo.launchSound = "";
+		dbo.impactSound = "";
+	}
+
 	public function addToMessage( $msg:Message ):void {
 		$msg.add( guid );
 	}
@@ -89,8 +179,7 @@ public class Ammo extends PersistanceObject
 		//guid 				= $msg.getString( $index++ );
 		//return $index;
 
-	public function toString():String
-	{
+	public function toString():String {
 		var ammos:String;
 		ammos = "Ammo accuracy: " + accuracy;
 		ammos += "  grain: " + grain;
@@ -111,33 +200,6 @@ public class Ammo extends PersistanceObject
 	////////////////////////////////////////////////////////////////
 	// FROM Persistance
 	////////////////////////////////////////////////////////////////
-	public function fromObjectImport( $dbo:DatabaseObject ):void {
-		dbo = $dbo;
-		if ( !dbo.ammo ) {
-			Log.out( "Ammo.fromObjectImport - Failed test !dbo.oxelPersistance.ammo dbo: " + JSON.stringify( dbo ), Log.ERROR );
-			return;
-		}
-		
-		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createdHandler ); 
-		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, endSaving )
-		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, endSaving )
-		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, endSaving )
-		
-		guid = $dbo.key;
-		loadFromInfo();
-	}
-	
-	public function fromObject( $dbo:DatabaseObject ):void {
-		dbo = $dbo;
-		if ( !dbo.ammo ) {
-			Log.out( "Ammo.fromObject - Failed test !dbo.oxelPersistance  dbo: " + JSON.stringify( dbo ), Log.ERROR );
-			return;
-		}
-		
-		//info = $dbo.ammo;
-		loadFromInfo();
-	}
-	
 	override protected function toObject():void {
 		Log.out( "Ammo.toObject guid: " + guid, Log.DEBUG );
 		// No special handling needed
@@ -158,56 +220,6 @@ public class Ammo extends PersistanceObject
 			super.save();
 	}
 
-	// Only attributes that need additional handling go here.
-	public function loadFromInfo():void {
-		if ( !dbo.type )
-			dbo.type = 1;
-		if ( !dbo.count )
-			dbo.count = 1;
-		if ( !dbo.grain )
-			dbo.grain = 2;
-		if ( !dbo.accuracy )
-			dbo.accuracy = 0.1;
-		if ( !dbo.velocity )
-			dbo.velocity = 200;
-		if ( !dbo.life )
-			dbo.life = 5;
-		
-		if ( !dbo.model )
-			dbo.model = "CannonBall";
-			
-		if ( dbo.oxelType ) {
-			if ( dbo.oxelType is String )
-				dbo.oxelType = TypeInfo.getTypeId( dbo.oxelType );
-		}
-		else
-			dbo.oxelType = TypeInfo.STEEL;
-			
-		if ( !dbo.contactScript )
-			dbo.contactScript = "";
-
-			
-		if ( !dbo.launchSound )
-			dbo.launchSound = "Cannon";
-		if ( !Globals.isGuid( dbo.launchSound ) )
-			SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, updateSoundGuid )		
-		
-		if ( !dbo.impactSound )
-			dbo.impactSound = "CannonBallExploding";
-			
-		if ( !Globals.isGuid( dbo.impactSound ) || !Globals.isGuid( dbo.launchSound ) ) {
-			SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, updateSoundGuid )		
-			SoundEvent.addListener( ModelBaseEvent.ADDED, verifySoundData )
-			SoundEvent.addListener( ModelBaseEvent.RESULT, verifySoundData )
-		}
-			
-		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, dbo.launchSound, null, Globals.isGuid( dbo.launchSound ) ? true : false ) )
-		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, dbo.impactSound, null, Globals.isGuid( dbo.impactSound ) ? true : false ) )
-
-		//ModelLoader.modelInfoFindOrCreate( _model, null, false );
-		//ModelLoader.modelInfoFindOrCreate( _model, _model, false );
-	}
-	
 	private function updateSoundGuid( $se:SoundEvent ):void {
 		// Make sure this is saved correctly
 		var guidArray:Array = $se.guid.split( ":" );
@@ -252,24 +264,6 @@ public class Ammo extends PersistanceObject
 			save()
 	}
 
-	// Only attributes that need additional handling go here.
-	public function createDefault():void {
-		//dbo = new Object();
-		dbo.name = "Blank";
-		dbo.type = 1;
-		dbo.count = 1;
-		dbo.grain = 2;
-		dbo.accuracy = 0.1;
-		dbo.velocity = 200;
-		dbo.life = 5;
-		dbo.model = "CannonBall";
-		dbo.oxelType = TypeInfo.STEEL;
-		dbo.contactScript = "";
-		dbo.launchSound = "";
-		dbo.impactSound = "";
-	}
-	
-		
 	// Just assign the dbo from the create to the region
 	private function createdHandler( $pe:PersistanceEvent ):void {
 		if ( Globals.BIGDB_TABLE_AMMO != $pe.table )
