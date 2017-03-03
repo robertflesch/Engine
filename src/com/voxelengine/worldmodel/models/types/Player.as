@@ -47,7 +47,7 @@ public class Player
 	private function onRegionLoad( $re:RegionEvent ):void {
 		if ( VoxelModel.controlledModel ) {
 			if ( null == Region.currentRegion.modelCache.instanceGet( VoxelModel.controlledModel.instanceInfo.instanceGuid ) )
-				Region.currentRegion.modelCache.add( VoxelModel.controlledModel );
+				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, VoxelModel.controlledModel );
 		} else {
 			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 		}
@@ -118,7 +118,8 @@ public class Player
 	static private function playerModelLoaded( $mle:ModelLoadingEvent ):void {
 		if ( $mle.vm && ( $mle.vm.instanceInfo.instanceGuid == Network.userId || $mle.vm.instanceInfo.instanceGuid == Network.LOCAL ) ){
 			if ( null == Region.currentRegion.modelCache.instanceGet( $mle.vm.instanceInfo.instanceGuid ) ) {
-				Region.currentRegion.modelCache.add($mle.vm);
+				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, $mle.vm );
+
 				// We dont want to remove this listener for the generated event.
 				// Only for the model loaded from the DB.
 				ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded);

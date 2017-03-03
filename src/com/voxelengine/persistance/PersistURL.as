@@ -47,7 +47,7 @@ public class PersistURL
 		else if ( Globals.APP_EXT == $pe.table )
 			_filePath = Globals.appPath + $pe.guid + $pe.table;
 		else if ( Globals.ANI_EXT == $pe.table )
-			_filePath = Globals.modelPath + $pe.guid + $pe.table;
+			_filePath = Globals.modelPath + $pe.other + "/" + $pe.guid + $pe.table;
 		else if ( Globals.AMMO_EXT == $pe.table )
 			_filePath = Globals.modelPath + $pe.guid + $pe.table;
 		else if ( Globals.SOUND_EXT == $pe.table )

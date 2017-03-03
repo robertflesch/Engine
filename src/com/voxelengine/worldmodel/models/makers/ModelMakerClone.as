@@ -14,6 +14,7 @@ import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent
 import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.RegionEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region
 import com.voxelengine.worldmodel.animation.AnimationCache;
@@ -227,12 +228,6 @@ public class ModelMakerClone extends ModelMakerBase {
 
 	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
 		if ( false == $success && modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" ) {
-			Log.out( "ModelMakerClone.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.WARN );
-
-			(new Alert( "ERROR duplicating model" )).display();
-			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
-			return;
-		} else {
 			// Are these needed?
 			ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
 			ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
@@ -242,23 +237,24 @@ public class ModelMakerClone extends ModelMakerBase {
 			modelInfo.oxelPersistance.changed = true;
 			_modelMetadata.changed = true;
 			_vmTemp.save();
+
+			if ( null == _vmTemp.instanceInfo.controllingModel ) {
+				// Only do this for top level models.
+				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(500);
+				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
+				diffPos = diffPos.add(lav);
+				_vmTemp.instanceInfo.positionSet = diffPos;
+				//Region.currentRegion.modelCache.add( _vmTemp );
+				RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid, null );
+			}
+			RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vmTemp );
+			Log.out("ModelMakerClone.completeMake - needed info found: " + _modelMetadata.description );
+		} else {
+			Log.out( "ModelMakerClone.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.WARN );
+
+			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
 		}
 
-
-		if ( null == _vmTemp.instanceInfo.controllingModel ) {
-			// Only do this for top level models.
-			var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(500);
-			var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
-			diffPos = diffPos.add(lav);
-			_vmTemp.instanceInfo.positionSet = diffPos;
-			Region.currentRegion.modelCache.add( _vmTemp );
-			Region.currentRegion.save();
-		}
-		else
-			Region.currentRegion.modelCache.add( _vmTemp );
-
-
-		Log.out("ModelMakerClone.completeMake - needed info found: " + _modelMetadata.description );
 		super.markComplete( $success, _vmTemp );
 		// how are sub models handled?
 		//_isImporting = false;

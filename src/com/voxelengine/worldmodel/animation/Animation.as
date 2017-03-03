@@ -100,7 +100,7 @@ public class Animation extends PersistanceObject
 		Region.currentRegion.modelCache.instancesOfModelGet( owner );
 
 		if ( dbo.sound )
-			_sound = new AnimationSound( this, sound );
+			_sound = new AnimationSound( this, dbo.sound );
 
 		if ( dbo.clipVelocity )
 			clipVelocity = dbo.clipVelocity;

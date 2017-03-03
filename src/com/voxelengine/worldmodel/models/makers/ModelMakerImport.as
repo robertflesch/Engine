@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models.makers
 {
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.RegionEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.types.Player;
@@ -223,13 +224,7 @@ public class ModelMakerImport extends ModelMakerBase {
 
 
 	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
-		if ( false == $success && modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" ) {
-			Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.WARN );
-
-			(new Alert( "ERROR importing model" )).display();
-			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
-			return;
-		} else {
+		if ( true == $success ) {
 			if ( !Globals.isGuid( _modelMetadata.guid ) )
 				_modelMetadata.guid = Globals.getUID();
 
@@ -244,20 +239,29 @@ public class ModelMakerImport extends ModelMakerBase {
 			modelInfo.oxelPersistance.changed = true;
 			_modelMetadata.changed = true;
 			_vmTemp.save();
+
+			if ( null == _vmTemp.instanceInfo.controllingModel ) {
+				// Only do this for top level models.
+				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(500);
+				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
+				diffPos = diffPos.add(lav);
+				_vmTemp.instanceInfo.positionSet = diffPos;
+			}
+            RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vmTemp );
+            RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid, null );
+
+		} else {
+			if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
+				Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.ERROR );
+			else if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName )
+				Log.out( "ModelMakerImport.markComplete - Failed import, Failed to load from IVM : " + modelInfo.guid, Log.ERROR );
+			else
+				Log.out( "ModelMakerImport.markComplete - Unknown error causing failure : " + ii.modelGuid, Log.ERROR );
+
+			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
+			ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
 		}
 
-
-		if ( null == _vmTemp.instanceInfo.controllingModel ) {
-			// Only do this for top level models.
-			var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(500);
-			var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
-			diffPos = diffPos.add(lav);
-			_vmTemp.instanceInfo.positionSet = diffPos;
-			Region.currentRegion.modelCache.add( _vmTemp );
-			Region.currentRegion.save();
-		}
-		else
-			Region.currentRegion.modelCache.add( _vmTemp );
 
 
 		Log.out("ModelMakerImport.completeMake - needed info found: " + _modelMetadata.description );

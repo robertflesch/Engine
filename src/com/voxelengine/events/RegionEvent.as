@@ -37,29 +37,30 @@ public class RegionEvent extends ModelBaseEvent
 	
 	// Used by the sandbox list and config manager to request a join of a server region
 	static public const JOIN:String							= "JOIN";
+	static public const ADD_MODEL:String					= "ADD_MODEL";
 
 	private var _guid:String;
-	private var _region:Region;
+	private var _regionOrModel:*;
 	
 	public function get guid():String { return _guid; } 
 	
-	public function get region():Region  { return _region; }
+	public function get data():*  { return _regionOrModel; }
 	
-	public function RegionEvent( $type:String, $series:int, $guid:String, $region:Region = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function RegionEvent( $type:String, $series:int, $guid:String, $regionOrModel:* = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $series, $bubbles, $cancellable );
 		_guid = $guid;
-		_region = $region;
+		_regionOrModel = $regionOrModel;
 	}
 	
 	public override function clone():Event
 	{
-		return new RegionEvent(type, series, _guid, _region, bubbles, cancelable);
+		return new RegionEvent(type, series, _guid, _regionOrModel, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString("RegionEvent", "series", "guid", "region");
+		return formatToString("RegionEvent", "series", "guid", "regionOrModel");
 	}
 
 	///////////////// Event handler interface /////////////////////////////
@@ -75,8 +76,8 @@ public class RegionEvent extends ModelBaseEvent
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function create( $type:String, $series:int, $guid:String, $region:Region = null ) : Boolean {
-		return _eventDispatcher.dispatchEvent( new RegionEvent( $type, $series, $guid, $region ) );
+	static public function create( $type:String, $series:int, $guid:String, $regionOrModel:* = null ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new RegionEvent( $type, $series, $guid, $regionOrModel ) );
 	}
 
 	///////////////// Event handler interface /////////////////////////////

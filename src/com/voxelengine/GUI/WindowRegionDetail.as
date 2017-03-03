@@ -88,7 +88,7 @@ public class WindowRegionDetail extends VVPopup
 	{
 		RegionEvent.removeListener( ModelBaseEvent.ADDED, collectRegionInfo );
 		RegionEvent.removeListener( ModelBaseEvent.RESULT, collectRegionInfo );
-		_region =  $re.region;
+		_region =  $re.data as Region;
 
 		//_background = (new _backgroundImage() as Bitmap);
 		//texture = _background;

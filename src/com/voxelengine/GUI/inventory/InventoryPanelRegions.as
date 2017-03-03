@@ -99,7 +99,7 @@ public class InventoryPanelRegions extends VVContainer
 
 	private function regionLoadedEvent( $re: RegionEvent ):void
 	{
-		var region:Region  = $re.region;
+		var region:Region  = $re.data as Region;
 		_listbox1.addItem( region.name + "\t Owner: " + region.owner + "\t Desc: " + region.desc , region.guid );
 	}
 	

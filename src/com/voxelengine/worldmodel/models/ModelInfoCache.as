@@ -231,8 +231,10 @@ public class ModelInfoCache
 				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, null, null ) );
 				return;
 			}
-            if ( newObjData.model )
-                mi = new ModelInfo( $pe.guid, null, newObjData.model );
+            if ( newObjData.model ) {
+				mi = new ModelInfo($pe.guid, null, newObjData.model);
+				Log.out( "ModelInfoCache.loadSucceed - OLD MODEL FOUND IN INFO.", Log.WARN);
+			}
             else
 			    mi = new ModelInfo( $pe.guid, null, newObjData );
 			mi.save();

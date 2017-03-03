@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.scripts 
 {
+import com.voxelengine.events.RegionEvent;
+
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
 
@@ -169,7 +171,8 @@ public class FireProjectileScript extends Script
 		//pm.instanceInfo.addTransform( 0, 0, 0.1, ModelTransform.INFINITE_TIME, ModelTransform.ROTATION_STRING );
 
 		// add this particle to the system, it will get returned to pool when it dies.
-		Region.currentRegion.modelCache.add( pm );
+		RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, pm );
+
 	}
 }
 }

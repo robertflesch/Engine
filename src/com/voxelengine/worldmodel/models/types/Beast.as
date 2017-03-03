@@ -83,38 +83,38 @@ public class Beast extends ControllableVoxelModel
 	override protected function processClassJson():void {
 		super.processClassJson();
 
-//		if ( modelInfo.info.beast )
-//			var beastInfo:Object = modelInfo.info.beast;
-//		else {
-//			Log.out( "Beast.processClassJson - beast section not found: " + modelInfo.dbo.toString(), Log.ERROR );
-//			return;
-//		}
-//		if ( beastInfo.moveSpeed) {
-//			speedMultiplier = beastInfo.moveSpeed
-//			//instanceInfo.moveSpeed = instanceInfo.moveSpeed * speedMultiplier;
-//			instanceInfo.moveSpeed = speedMultiplier;
-//		} else
-//
-//		if ( beastInfo.maxTurnRate )
-//			maxTurnRate = beastInfo.maxTurnRat/100;
-//
-//		if ( beastInfo.maxClimbAngle )
-//			maxClimbAngle = beastInfo.maxClimbAngle;
-//
-//		if ( beastInfo.climbRate )
-//			climbRate = beastInfo.climbRate;
-//
-//		if ( beastInfo.seatLocation ) {
-//			if ( beastInfo.seatLocation is Object ) {
-////					Log.out( "Beast.processClassJson: " + JSON.stringify( beastInfo.seatLocation ) );
-//				_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
-//			}
-//			else
-//				_seatLocation.setTo( 0, 0, 0 );
-//				//_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
-//		}
-//		else
-//			_seatLocation.setTo( 0, 0, 0 );
+		if ( modelInfo.dbo.beast )
+			var beastInfo:Object = modelInfo.dbo.beast;
+		else {
+			Log.out( "Beast.processClassJson - beast section not found: " + modelInfo.dbo.toString(), Log.ERROR );
+			return;
+		}
+		if ( beastInfo.moveSpeed) {
+			speedMultiplier = beastInfo.moveSpeed
+			//instanceInfo.moveSpeed = instanceInfo.moveSpeed * speedMultiplier;
+			instanceInfo.moveSpeed = speedMultiplier;
+		} else
+
+		if ( beastInfo.maxTurnRate )
+			maxTurnRate = beastInfo.maxTurnRat/100;
+
+		if ( beastInfo.maxClimbAngle )
+			maxClimbAngle = beastInfo.maxClimbAngle;
+
+		if ( beastInfo.climbRate )
+			climbRate = beastInfo.climbRate;
+
+		if ( beastInfo.seatLocation ) {
+			if ( beastInfo.seatLocation is Object ) {
+//					Log.out( "Beast.processClassJson: " + JSON.stringify( beastInfo.seatLocation ) );
+				_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
+			}
+			else
+				_seatLocation.setTo( 0, 0, 0 );
+				//_seatLocation.setTo( beastInfo.seatLocation.x, beastInfo.seatLocation.y, beastInfo.seatLocation.z );
+		}
+		else
+			_seatLocation.setTo( 0, 0, 0 );
 
 		Log.out( "Beast.processClassJson values: " + JSON.stringify( buildExportObject( {} ) ) );
 	}

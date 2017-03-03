@@ -17,6 +17,7 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.Room;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 /**
  * ...
@@ -48,6 +49,7 @@ public class RegionManager
 		RegionEvent.addListener( ModelBaseEvent.REQUEST_TYPE, 	regionTypeRequest );
 		RegionEvent.addListener( ModelBaseEvent.REQUEST, 		regionRequest );
 		RegionEvent.addListener( ModelBaseEvent.SAVE, 			save );
+		RegionEvent.addListener( RegionEvent.ADD_MODEL, 		addModel );
 
 		RoomEvent.addListener( RoomEvent.ROOM_DISCONNECT, 		requestDefaultRegionLoad );
 		RoomEvent.addListener( RoomEvent.ROOM_JOIN_SUCCESS, 	onJoinRoomEvent );
@@ -159,7 +161,7 @@ public class RegionManager
 		// remove this handler
 		RegionEvent.removeListener( ModelBaseEvent.ADDED, startingRegionLoaded );
 		// now load the file that was designated as the starting region
-		RegionEvent.create( RegionEvent.LOAD, 0, $re.guid, $re.region );
+		RegionEvent.create( RegionEvent.LOAD, 0, $re.guid, $re.data );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////
@@ -204,11 +206,6 @@ public class RegionManager
 			Log.out( "RegionManager.regionCreatedHandler: ERROR region not found for returned guid: " + $pe.guid );
 	}
 	
-	/**
-	 * @param  - guid of region
-	 * @return - region or null
-	 * 
-	*/
 	private function regionGet( $guid:String ):Region {
 		for each ( var region:Region in _regions ) {
 			if ( region && region.guid == $guid ) {
@@ -234,5 +231,14 @@ public class RegionManager
 			}
 		}
 	}
+
+	private function addModel(event:RegionEvent):void {
+		for each ( var region:Region in _regions ) {
+			if ( region && region.guid == event.guid ) {
+				region.modelCache.add( event.data );
+			}
+		}
+	}
+
 } // RegionManager
 } // Package

@@ -175,7 +175,7 @@ public class WindowSandboxList extends VVPopup
 
 	private function regionLoadedEvent( $re: RegionEvent ):void
 	{
-		var region:Region  = $re.region;
+		var region:Region  = $re.data as Region;
 		
 		//Log.out( "WindowSandboxList.regionLoadedEvent - adding regionId: " + region.toString() );
 		if ( Globals.MODE_PRIVATE == Globals.mode )

@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.models.makers
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.RegionEvent;
 
 import flash.utils.ByteArray;
 import playerio.DatabaseObject;
@@ -173,7 +174,10 @@ public class ModelMakerGenerate extends ModelMakerBase {
 				_modelMetadata.changed = true;
 				_vm.save();
 			}
-			Region.currentRegion.modelCache.add( _vm );
+			RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vm );
+		} else {
+			Log.out( "ModelMakerGenerate.markComplete - guid: " + modelInfo.guid, Log.WARN );
+			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
 		}
 
 		super.markComplete( $success, $vm );

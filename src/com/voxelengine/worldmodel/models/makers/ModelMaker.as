@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.models.makers
 import com.voxelengine.Log
 import com.voxelengine.events.ModelMetadataEvent
 import com.voxelengine.events.ModelBaseEvent
+import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.WindowSplashEvent
 import com.voxelengine.worldmodel.Region
 import com.voxelengine.worldmodel.models.InstanceInfo
@@ -70,8 +71,8 @@ public class ModelMaker extends ModelMakerBase {
 			var vm:* = make();
 			
 			if ( vm && _addToRegionWhenComplete )
-				Region.currentRegion.modelCache.add( vm );
-				
+				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, vm );
+
 			markComplete( true, vm )
 		}
 	}

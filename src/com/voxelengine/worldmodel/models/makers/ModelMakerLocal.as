@@ -11,6 +11,7 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.LoadingImageEvent;
+import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.PermissionsBase;
@@ -45,9 +46,9 @@ public class ModelMakerLocal extends ModelMakerBase {
 			_modelMetadata.description = modelInfo.guid + " from local data";
 			var vm:* = make();
 			if ( vm )
-				Region.currentRegion.modelCache.add( vm );
-			
-			markComplete( true, vm );
+				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, vm );
+
+			markComplete( vm ? true : false, vm );
 		}
 	}
 	

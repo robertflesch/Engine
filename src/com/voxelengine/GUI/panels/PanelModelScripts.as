@@ -12,6 +12,7 @@ import com.voxelengine.GUI.LanguageManager;
 import com.voxelengine.GUI.WindowScriptList;
 import com.voxelengine.GUI.voxelModels.WindowScriptDetail;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.ScriptEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.scripts.Script;
@@ -132,7 +133,7 @@ public class PanelModelScripts extends PanelBase
                 // these are instance scripts, not model scripts.
                 //_selectedModel.modelInfo.changed = true;
                 Region.currentRegion.changed = true;
-                Region.currentRegion.save();
+                RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid, null );
             }
             else
                 noScriptSelected();
@@ -185,7 +186,7 @@ public class PanelModelScripts extends PanelBase
         // I am misusing se.name here, name is really the 'type'
         var addedScript:Script = _selectedModel.instanceInfo.addScript( se.name, false);
         _listScripts.addItem(  se.name, addedScript );
-        Region.currentRegion.save();
+        RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid, null );
     }
 }
 }
