@@ -29,10 +29,9 @@ public class PermissionsBase {
 	public function get modifiedDate():String 				{ return _dboReference.permissions.modifiedDate; }
 	public function set modifiedDate(value:String):void		{ _dboReference.permissions.modifiedDate = value; }
 			
-	public function get createdDate():String 				{ return _dboReference.permissions.createdDate; }
-			
-	public function get creator():String 					{ return _dboReference.permissions.creator; }
-			
+	public function get creator():String 					{ return _dboReference.creator; }
+	public function get createdDate():String 				{ return _dboReference.createdDate; }
+
 	public function get dboReference():Object 				{ return _dboReference;}
 	
 	public function PermissionsBase( $dboReference:DatabaseObject ) {
@@ -41,12 +40,10 @@ public class PermissionsBase {
 			_dboReference.permissions = {};
 			
 		// If permissions already exist dont reset them.
-		if ( _dboReference.permissions.createdDate || _dboReference.permissions.creator )
+		if ( _dboReference.permissions.creator )
 			return;
 			
 		modifiedDate						= new Date().toUTCString();
-		_dboReference.permissions.creator	= Network.userId;
-		_dboReference.permissions.createdDate = new Date().toUTCString();
 	}
 }
 }

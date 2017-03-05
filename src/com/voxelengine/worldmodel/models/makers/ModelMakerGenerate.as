@@ -11,6 +11,7 @@ import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.RegionEvent;
+import com.voxelengine.worldmodel.models.types.Player;
 
 import flash.utils.ByteArray;
 import playerio.DatabaseObject;
@@ -45,8 +46,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	private var _creationInfo:Object;
 	private var _name:String;
 	private var _type:int;
-	private  var _vm:VoxelModel;
-	
+
 	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object ) {
 		_name = $miJson.name;
 		_type = $miJson.biomes.layers[0].type;
@@ -139,11 +139,11 @@ public class ModelMakerGenerate extends ModelMakerBase {
 					OxelDataEvent.addListener(ModelBaseEvent.ADDED, listenForGenerationComplete);
 					_modelInfo.oxelLoadData();
 				} else
-					markComplete( true, _vm );
+					markComplete( true );
 			}
 			else {
 				Log.out( "ModelMakerGenerate.attemptMake FAILED to generate from " + _name, Log.WARN );
-				markComplete( false, _vm );
+				markComplete( false );
 			}
 		}
 
@@ -152,7 +152,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 				OxelDataEvent.removeListener( ModelBaseEvent.ADDED, listenForGenerationComplete );
 				Log.out( "ModelMakerGenerate.listenForGenerationComplete " + ii.modelGuid + " == " + $e.modelGuid );
 				modelInfo.oxelPersistance = $e.oxelData;
-				markComplete( true, _vm );
+				markComplete( true );
 			}
 			else
 				Log.out( "ModelMakerGenerate.listenForGenerationComplete " + ii.modelGuid + " != " + $e.modelGuid );
@@ -160,7 +160,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		}
 	}
 	
-	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
+	override protected function markComplete( $success:Boolean ):void {
 		// do this last as it nulls everything.
 		Log.out( "ModelMakerGenerate.markComplete " + ii.modelGuid );
 		if ( $success ){
@@ -168,20 +168,18 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			ModelMetadataEvent.create( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelMetadata );
 			ModelInfoEvent.create( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelInfo );
 
-			if ( modelInfo.guid != "DefaultPlayer" ) {
+			if ( modelInfo.guid != Player.DEFAULT_PLAYER ) {
 				modelInfo.oxelPersistance.changed = true;
 				modelInfo.changed = true;
 				_modelMetadata.changed = true;
 				_vm.save();
 			}
-			RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vm );
 		} else {
 			Log.out( "ModelMakerGenerate.markComplete - guid: " + modelInfo.guid, Log.WARN );
 			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
 		}
 
-		super.markComplete( $success, $vm );
-		_vm = null;
+		super.markComplete( $success );
 		_name = null;
 		_creationInfo = null;
 	}

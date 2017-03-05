@@ -47,6 +47,9 @@ public class ModelMakerBase {
 	protected function get parentModelGuid():String { return _parentModelGuid }
 	
 	static private var _s_parentChildCount:Array = [];
+	protected  			var _vm:VoxelModel;
+	protected 			var _addToRegionWhenComplete:Boolean = true;
+
 
 	/*
 	//   This generates either a
@@ -129,17 +132,22 @@ public class ModelMakerBase {
 		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
 	}
 
-	protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
-		if ( $success )
-			ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid, _parentModelGuid, $vm ) );
+	protected function markComplete( $success:Boolean ):void {
+		if ( $success ) {
+			_vm.complete = true;
+			if ( _vm && _addToRegionWhenComplete )
+				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vm );
+			RegionEvent.create(ModelBaseEvent.SAVE, 0, Region.currentRegion.guid, null);
+			ModelLoadingEvent.dispatch(new ModelLoadingEvent(ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid, _parentModelGuid, _vm ));
+		}
 		else
 			ModelLoadingEvent.dispatch(new ModelLoadingEvent(ModelLoadingEvent.MODEL_LOAD_FAILURE, _ii.modelGuid, _parentModelGuid));
 
 		_modelMetadata = null;
 		_modelInfo = null;
 		_ii = null;
+		_vm = null;
 	}
-	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	// A factory method to build the correct object

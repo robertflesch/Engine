@@ -246,6 +246,8 @@ public class ControllableVoxelModel extends VoxelModel
 	//static var temp:int = 0;
 	override public function update($context:Context3D, $elapsedTimeMS:int):void {
 		
+		//var cm:* = VoxelModel.controlledModel;
+		//var tm:* = this;
 		if ( this === VoxelModel.controlledModel )
 			handleMouseMovement( $elapsedTimeMS );
 		

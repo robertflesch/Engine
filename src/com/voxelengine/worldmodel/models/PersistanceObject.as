@@ -7,6 +7,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.models.types.Player;
+
 import flash.utils.ByteArray;
 import flash.utils.getQualifiedClassName;
 
@@ -28,12 +31,24 @@ public class PersistanceObject
 	private var 	_dynamicObj:Boolean;
 	private var 	_dbo:DatabaseObject;
 
-	
+	public function get creator():int 							{ return dbo.creator; }
+	public function get version():int 							{ return dbo.version; }
+	public function set version( value:int ):void				{ dbo.version = value; }
+
 	public function PersistanceObject( $guid:String, $table:String ) {
 		if ( null == $guid || "" == $guid )
 			throw new Error( "PersistanceObject - Missing guid in constructor" );
 		_guid = $guid;
 		_table = $table;
+	}
+
+	protected function assignNewDatabaseObject():void {
+		dbo = new DatabaseObject( table, "0", "0", 0, true, null);
+		version = Globals.VERSION;
+		changed = true;
+		dbo.hashTags = "#new";
+		dbo.createdDate	= new Date().toUTCString();
+		dbo.creator	= Network.userId;
 	}
 
 	public function release():void {
@@ -82,25 +97,32 @@ public class PersistanceObject
 	protected function toObject():void { }
 	
 	public function save():void {
-		if ( Globals.online && !dynamicObj ) {
-			changed = false;
-			var name:String = getQualifiedClassName( this );
-			Log.out( name + ".save - Saving to guid: " + guid  + " in table: " + table, Log.DEBUG );
-			addSaveEvents();
-			toObject();
-			if ( dbo && dbo.changed )
-				delete dbo.changed;
-				
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null ) );
-		}
-//		else {
+		if ( !changed || !Globals.online || dynamicObj ) {
 //			if ( Globals.online && !changed )
 //				Log.out( name + " save - Not saving data - guid: " + guid + " NOT changed" );
 //			else if ( !Globals.online && changed )
 //				Log.out( name + " save - Not saving data - guid: " + guid + " NOT online" );
 //			else
 //				Log.out( name + " save - Not saving data - Offline and not changed" );
-//		}
+			return;
+		}
+
+		if (!Globals.isGuid(guid)) {
+			if ( Player.DEFAULT_PLAYER == guid)
+				return;
+			Log.out("PersistanceObject.save - NOT Saving INVALID GUID: " + guid + " in table: " + table, Log.WARN);
+			return;
+		}
+
+		changed = false;
+		var name:String = getQualifiedClassName(this);
+		Log.out(name + ".save - Saving to guid: " + guid + " in table: " + table, Log.DEBUG);
+		addSaveEvents();
+		toObject();
+		if (dbo && dbo.changed)
+			delete dbo.changed;
+
+		PersistanceEvent.dispatch(new PersistanceEvent(PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null));
 	}
 	
 	private function saveSucceed( $pe:PersistanceEvent ):void { 

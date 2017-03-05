@@ -41,12 +41,12 @@ public class ModelMakerCursor extends ModelMakerBase {
 				EditCursor.currentInstance.objectModelSet( vm );
 				vm.calculateCenter()
 			}
-			markComplete( true, vm );
+			markComplete( true );
 		}
 	}
 	
-	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
-		super.markComplete( $success, $vm );
+	override protected function markComplete( $success:Boolean ):void {
+		super.markComplete( $success );
 		makerCountDecrement();
 	}
 

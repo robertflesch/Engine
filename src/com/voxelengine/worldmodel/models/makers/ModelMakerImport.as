@@ -43,7 +43,6 @@ public class ModelMakerImport extends ModelMakerBase {
 	static public function get isImporting():Boolean { return _isImporting; }
 	
 	private var _prompt:Boolean;
-	private var _vmTemp:VoxelModel;
 
 	public function ModelMakerImport( $ii:InstanceInfo, $prompt:Boolean = true ) {
 		// This should never happen in a release version, so dont worry about setting it to false when done
@@ -150,9 +149,9 @@ public class ModelMakerImport extends ModelMakerBase {
 		//Log.out("ModelMakerImport.completeMake: " + ii.toString());
 		if ( null != modelInfo && null != _modelMetadata ) {
 
-			_vmTemp = make();
-			if ( _vmTemp ) {
-				_vmTemp.stateLock( true, 10000 ); // Lock state so that it has time to load animations
+			_vm = make();
+			if ( _vm ) {
+				_vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
 				OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelAdded );
 				OxelDataEvent.addListener( ModelBaseEvent.GENERATION, oxelAdded );
 				modelInfo.oxelLoadData();
@@ -169,7 +168,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid ) {
 				Log.out( "ModelMakerImport.allChildrenReady - modelMetadata.description: " + _modelMetadata.description, Log.WARN );
 				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
-				markComplete( true, _vmTemp );
+				markComplete( true );
 			}
 		}
 
@@ -194,7 +193,7 @@ public class ModelMakerImport extends ModelMakerBase {
 				//Oxel.rebuild( $ode.oxelData.oxel );
 
 				if ( false == waitForChildren )
-					markComplete(true, _vmTemp);
+					markComplete(true );
 			}
 //			else
 //				Log.out( "ModelMakerImport.oxelReady - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
@@ -203,7 +202,7 @@ public class ModelMakerImport extends ModelMakerBase {
 		function oxelReadyFailedToLoad( $ode:OxelDataEvent):void {
 			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid  ) {
 				removeOxelReadyDataCompleteListeners();
-				markComplete( false, _vmTemp );
+				markComplete( false );
 			}
 //			else
 //				Log.out( "ModelMakerImport.oxelReadyFailedToLoad - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
@@ -223,7 +222,7 @@ public class ModelMakerImport extends ModelMakerBase {
 
 
 
-	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
+	override protected function markComplete( $success:Boolean ):void {
 		if ( true == $success ) {
 			if ( !Globals.isGuid( _modelMetadata.guid ) )
 				_modelMetadata.guid = Globals.getUID();
@@ -233,22 +232,20 @@ public class ModelMakerImport extends ModelMakerBase {
 
 			ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
 			ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
-			_vmTemp.complete = true;
+			_vm.complete = true;
 
 			modelInfo.changed = true;
 			modelInfo.oxelPersistance.changed = true;
 			_modelMetadata.changed = true;
-			_vmTemp.save();
+			_vm.save();
 
-			if ( null == _vmTemp.instanceInfo.controllingModel ) {
+			if ( null == _vm.instanceInfo.controllingModel ) {
 				// Only do this for top level models.
 				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(500);
 				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
 				diffPos = diffPos.add(lav);
-				_vmTemp.instanceInfo.positionSet = diffPos;
+				_vm.instanceInfo.positionSet = diffPos;
 			}
-            RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vmTemp );
-            RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid, null );
 
 		} else {
 			if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
@@ -262,14 +259,10 @@ public class ModelMakerImport extends ModelMakerBase {
 			ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
 		}
 
-
-
 		Log.out("ModelMakerImport.completeMake - needed info found: " + _modelMetadata.description );
-		super.markComplete( $success, _vmTemp );
+		super.markComplete( $success );
 		// how are sub models handled?
 		//_isImporting = false;
-		_vmTemp = null;
-
 	}
 }	
 }

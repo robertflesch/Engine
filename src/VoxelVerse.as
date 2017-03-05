@@ -187,7 +187,7 @@ public class VoxelVerse extends Sprite
 		_s_frameCounter++;
 
 		var interFrameTime:int = _s_timeEntered - _s_timeExited;
-		//Log.out( "VoxelVerse.enterFrame -  interFrameTime: " + interFrameTime, Log.INFO )
+		//Log.out( "VoxelVerse.enterFrame -  interFrameTime: " + interFrameTime, Log.INFO );
 
 		MemoryManager.update();
 

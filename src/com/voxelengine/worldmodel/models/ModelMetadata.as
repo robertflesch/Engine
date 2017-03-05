@@ -80,13 +80,6 @@ public class ModelMetadata extends PersistanceObject
 		if ( "EditCursor" != guid )
 			ModelMetadataEvent.addListener( ModelBaseEvent.SAVE, saveEvent );
 
-
-		function assignNewDatabaseObject():void {
-			dbo = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_METADATA, "0", "0", 0, true, null );
-			// new object don't have thumbnails
-			setToDefault();
-		}
-
 		function init( $modelMetadata:ModelMetadata, $newData:Object = null ):void {
 
 			if ( $newData )
@@ -105,7 +98,7 @@ public class ModelMetadata extends PersistanceObject
 			}
 
 			function bitmapLoaded(event:Event):void {
-				Log.out( "ModelMetadata.init.bitmapLoaded for guid: " + guid, Log.WARN );
+				//Log.out( "ModelMetadata.init.bitmapLoaded for guid: " + guid, Log.WARN );
 				loader.contentLoaderInfo.removeEventListener(Event.INIT, bitmapLoaded );
 				// Bypass setter to keep it from getting marked as changed
 				_thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData;
@@ -113,6 +106,12 @@ public class ModelMetadata extends PersistanceObject
 				ModelMetadataEvent.create( ModelMetadataEvent.BITMAP_LOADED, 0, guid, $modelMetadata );
 			}
 		}
+
+	}
+
+	override protected function assignNewDatabaseObject():void {
+		super.assignNewDatabaseObject();
+		setToDefault();
 
 		function setToDefault():void {
 			dbo.thumbnailLoaded = false;
@@ -165,15 +164,6 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		save();
 	}
 
-	override public function save():void {
-		if ( changed ) {
-			if ( Globals.isGuid( guid ) )
-				super.save();
-			else
-				Log.out( "ModelMetadata.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
-		}
-	}
-	
 	//////////////////////////////////////////////////////////////////
 	// Persistance
 	//////////////////////////////////////////////////////////////////
@@ -185,8 +175,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	// it was needed to save the oxelPersistance in an abstract way.
 //	public function fromObjectImport( $newData:Object, $markAsChanged:Boolean = true ):void {
 //		loadFromInfo( $newData );
-//		// TODO Sometimes default guid is Player, sometimes DefaultPlayer
-//		if ( $markAsChanged && ( guid != "DefaultPlayer" ) )
+//		if ( $markAsChanged && ( guid != Player.DEFAULT_PLAYER ) )
 //			changed = true;
 //	}
 

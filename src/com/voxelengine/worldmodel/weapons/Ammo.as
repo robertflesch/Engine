@@ -48,7 +48,7 @@ public class Ammo extends PersistanceObject
 	public function get oxelType():int 				{ return dbo.oxelType; }
 
 
-	public function Ammo( $guid:String, $dbo:DatabaseObject = null, $newData:Object = null ) {
+	public function Ammo( $guid:String, $dbo:DatabaseObject, $newData:Object ) {
 		super( $guid, Globals.BIGDB_TABLE_AMMO );
 
 		if ( null == $dbo)
@@ -113,33 +113,31 @@ public class Ammo extends PersistanceObject
 
 
 	private function assignNewDatabaseObject():void {
-		dbo = new DatabaseObject( table, "0", "0", 0, true, null );
-
-		createDefault();
+		super.assignNewDatabaseObject();
+		setToDefault();
 
 //		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createdHandler );
 //		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, endSaving )
 //		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, endSaving )
 //		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, endSaving )
 
-		//setToDefault();
+		function setToDefault():void {
+			dbo.name = "Blank";
+			dbo.type = 1;
+			dbo.count = 1;
+			dbo.grain = 2;
+			dbo.accuracy = 0.1;
+			dbo.velocity = 200;
+			dbo.life = 5;
+			dbo.model = "CannonBall";
+			dbo.oxelType = TypeInfo.STEEL;
+			dbo.contactScript = "";
+			dbo.launchSound = "";
+			dbo.impactSound = "";
+		}
 	}
 
 	// Only attributes that need additional handling go here.
-	public function createDefault():void {
-		dbo.name = "Blank";
-		dbo.type = 1;
-		dbo.count = 1;
-		dbo.grain = 2;
-		dbo.accuracy = 0.1;
-		dbo.velocity = 200;
-		dbo.life = 5;
-		dbo.model = "CannonBall";
-		dbo.oxelType = TypeInfo.STEEL;
-		dbo.contactScript = "";
-		dbo.launchSound = "";
-		dbo.impactSound = "";
-	}
 
 	public function addToMessage( $msg:Message ):void {
 		$msg.add( guid );
@@ -216,8 +214,7 @@ public class Ammo extends PersistanceObject
 			return
 		}
 		saving = true;
-		if ( changed )
-			super.save();
+		super.save();
 	}
 
 	private function updateSoundGuid( $se:SoundEvent ):void {

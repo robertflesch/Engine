@@ -46,7 +46,7 @@ public class FromByteArray extends AbstractTask
 		//var time:int = getTimer();
 
 		try {
-			Log.out("FromByteArray.start: guid: " + _guid, Log.WARN);
+			//Log.out("FromByteArray.start: guid: " + _guid, Log.WARN);
 			_op.loadFromByteArray();
 
 			if ("0" == _op.dbo.key) {

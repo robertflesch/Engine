@@ -27,7 +27,6 @@ import com.voxelengine.worldmodel.models.types.VoxelModel
 	 */
 public class ModelMaker extends ModelMakerBase {
 	
-	private var 	_addToRegionWhenComplete:Boolean;
 	private var		_addToCount:Boolean;
 	
 	public function ModelMaker( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean, $addToCount:Boolean = true ) {
@@ -68,16 +67,12 @@ public class ModelMaker extends ModelMakerBase {
 		if ( null != _modelMetadata && null != modelInfo ) {
 			//Log.out( "ModelMaker.attemptMake - ii: " + ii.toString() )
 			
-			var vm:* = make();
-			
-			if ( vm && _addToRegionWhenComplete )
-				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, vm );
-
-			markComplete( true, vm )
+			_vm = make();
+			markComplete( true )
 		}
 	}
 	
-	override protected function markComplete( $success:Boolean, vm:VoxelModel = null ):void {
+	override protected function markComplete( $success:Boolean ):void {
 		if ( _addToCount ) {
 			makerCountDecrement();
 			if (0 == makerCountGet())
@@ -86,7 +81,7 @@ public class ModelMaker extends ModelMakerBase {
 		removeListeners();
 		
 		// do this last as it nulls everything.
-		super.markComplete( $success, vm );
+		super.markComplete( $success );
 		
 		function removeListeners():void {
 			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrivedMetadata );

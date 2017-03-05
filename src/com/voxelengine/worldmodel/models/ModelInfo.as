@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.RegionEvent;
+
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
@@ -86,19 +88,20 @@ public class ModelInfo extends PersistanceObject
 
 		init( $newData );
 
-		function assignNewDatabaseObject():void {
-			dbo = new DatabaseObject( Globals.BIGDB_TABLE_MODEL_INFO, "0", "0", 0, true, null )
-			setToDefault();
+
+	}
+	override protected function assignNewDatabaseObject():void {
+		super.assignNewDatabaseObject();
+		setToDefault();
+
+		function setToDefault():void {
+			modelClass = DEFAULT_CLASS;
 		}
-
 	}
 
-	private function setToDefault():void {
-	}
 
 	private function init( $newData:Object = null ):void {
 
-		modelClass = DEFAULT_CLASS;
 		if ( $newData )
 			mergeOverwrite( $newData );
 		if ( dbo.biomes )
@@ -547,7 +550,7 @@ public class ModelInfo extends PersistanceObject
 		// this make it belong to the world
 		$vm.instanceInfo.controllingModel = null;
 		//if ( !($vm is Player) )
-		Region.currentRegion.modelCache.add( $vm );
+		RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, $vm );
 
 		
 		// now give it correct world space position and velocity
@@ -620,24 +623,17 @@ public class ModelInfo extends PersistanceObject
 	public function set biomes(value:Biomes):void  					{ _biomes = value; }
 	
 	override public function save():void {
-		if ( changed ) {
-			if ( !Globals.isGuid( guid ) ) {
-				Log.out( "ModelInfo.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN );
-			}
-			else {
-				if (true == animationsLoaded && true == childrenLoaded)
-					super.save();
-				else
-					Log.out("ModelInfo.save - NOT Saving guid: " + guid + " NEED Animations or children to complete", Log.WARN);
-			}
-			
-			if ( oxelPersistance )
-				oxelPersistance.save();
-			
-			for ( var i:int; i < childVoxelModels.length; i++ ) {
-				var child:VoxelModel = childVoxelModels[i];
-				child.save();
-			}
+		if (true == animationsLoaded && true == childrenLoaded)
+			super.save();
+		else
+			Log.out("ModelInfo.save - NOT Saving guid: " + guid + " NEED Animations or children to complete", Log.WARN);
+
+		if ( oxelPersistance )
+			oxelPersistance.save();
+
+		for ( var i:int; i < childVoxelModels.length; i++ ) {
+			var child:VoxelModel = childVoxelModels[i];
+			child.save();
 		}
 	}
 	

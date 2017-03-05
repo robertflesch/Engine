@@ -109,14 +109,14 @@ public class Chunk {
 		//Log.out( "chunk.parse - creating children chunks: " + $oxel.childCount + " chunkCount: " + Chunk.chunkCount(), Log.WARN );
 		if ( MAX_CHILDREN < $oxel.childCount ) {
 			var gct:GrainCursor = GrainCursorPool.poolGet( chunk._gc.bound );
-			Log.out( "chunk.parse - creating children chunks: " + $oxel.childCount, Log.WARN );
+			//Log.out( "chunk.parse - creating children chunks: " + $oxel.childCount, Log.WARN );
 			chunk._children = new Vector.<Chunk>(OCT_TREE_SIZE, true);
 			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
 				chunk._children[i] = parse($oxel.children[i], chunk, $lightInfo);
 				gct.copyFrom( chunk._gc );
 				gct.become_child( i );
 				chunk._children[i]._gc.copyFrom( gct );
-				Log.out( "chunk.parse - chunk gc: " + chunk._children[i]._gc + " count: " + (chunk._children[i].oxel ? chunk._children[i].oxel.childCount : "parent")  + " chunkCount: " + Chunk.chunkCount(), Log.WARN );
+				//Log.out( "chunk.parse - chunk gc: " + chunk._children[i]._gc + " count: " + (chunk._children[i].oxel ? chunk._children[i].oxel.childCount : "parent")  + " chunkCount: " + Chunk.chunkCount(), Log.WARN );
 			}
 			GrainCursorPool.poolDispose( gct );
 		}

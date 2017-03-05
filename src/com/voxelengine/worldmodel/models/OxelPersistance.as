@@ -58,9 +58,6 @@ public class OxelPersistance extends PersistanceObject
 	public function get type():String 							{ return dbo.type; }
 	public function set type( value:String ):void				{ dbo.type = value; }
 
-	public function get version():int 							{ return dbo.version; }
-	public function set version( value:int ):void				{ dbo.version = value; }
-
 	public function get ba():ByteArray 							{ return dbo.ba }
 	public function set ba( $ba:ByteArray):void 				{ dbo.ba = $ba; }
 
@@ -107,15 +104,13 @@ public class OxelPersistance extends PersistanceObject
 
 		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, baseLightLevel );
 
-		function assignNewDatabaseObject():void {
-			dbo = new DatabaseObject(Globals.BIGDB_TABLE_OXEL_DATA, "0", "0", 0, true, null);
-			type 	= "ivm";
-			version = Globals.VERSION;
-			ba		= null;
-			bound		= -1;
-		}
 	}
 
+	override protected function assignNewDatabaseObject():void {
+		super.assignNewDatabaseObject();
+		ba		= null;
+		bound		= -1;
+	}
 
 	private function stripDataFromImport( $importedData:ByteArray ):void {
 		try {
@@ -257,13 +252,11 @@ public class OxelPersistance extends PersistanceObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// persistence operations
 	override public function save():void {
-		if ( 0 == oxelCount || !Globals.isGuid( guid ) ) {
-				//Log.out( "OxelPersistence.save - NOT Saving GUID: " + guid  + " oxel: " + (oxel?oxel:"No oxel") + " in table: " + table, Log.WARN );
-				return;
+		if ( 0 == oxelCount ) {
+			//Log.out( "OxelPersistence.save - NOT Saving GUID: " + guid  + " oxel: " + (oxel?oxel:"No oxel") + " in table: " + table, Log.WARN );
+			return;
 		}
-		//Log.out( "OxelPersistence.save - Saving GUID: " + guid, Log.DEBUG );
-		if ( changed )
-			super.save();
+		super.save();
 	}
 
 	override public function set changed(value:Boolean):void {

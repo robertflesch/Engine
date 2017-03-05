@@ -44,16 +44,13 @@ public class ModelMakerLocal extends ModelMakerBase {
 			_modelMetadata = new ModelMetadata( ii.modelGuid );
 			_modelMetadata.name = modelInfo.guid;
 			_modelMetadata.description = modelInfo.guid + " from local data";
-			var vm:* = make();
-			if ( vm )
-				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, vm );
-
-			markComplete( vm ? true : false, vm );
+			_vm = make();
+			markComplete( _vm ? true : false );
 		}
 	}
 	
-	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
-		super.markComplete( $success, $vm );
+	override protected function markComplete( $success:Boolean ):void {
+		super.markComplete( $success );
 		makerCountDecrement();
 	}
 }	

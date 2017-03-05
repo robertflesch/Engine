@@ -33,8 +33,7 @@ public class Armory
 			return _ammos[_selectedAmmoIndex];	
 		}
 		
-		var ammo:Ammo = new Ammo( "blank" );
-		ammo.createDefault();
+		var ammo:Ammo = new Ammo( "blank", null, {} );
 		return ammo;
 	}
 	

@@ -372,7 +372,10 @@ package com.voxelengine.worldmodel.models
 				// TODO - optimize RSF
 				if ( collideCandidate && collideCandidate.complete && collideCandidate != vm )
 				{
-					
+					if ( !collideCandidate.modelInfo.oxelPersistance )
+						continue;
+					if ( 0 == collideCandidate.modelInfo.oxelPersistance.oxelCount )
+						continue;
 					var sizeOfInstance:Number = collideCandidate.size();
 					if ( sizeOfInstance <= 2 ) 
 						continue;

@@ -50,12 +50,11 @@ public class SoundPersistance extends PersistanceObject
 	}
 	
 	override public function save():void {
-		if ( false == _loaded || !Globals.isGuid( guid ) ) {
+		if ( false == _loaded ) {
 				//Log.out( "SoundPersistance.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN )
-				return
+			return;
 		}
-		if ( changed )
-			super.save()
+		super.save()
 	}
 	
 	override protected function toObject():void {
@@ -73,18 +72,20 @@ public class SoundPersistance extends PersistanceObject
 	}
 
 	public function fromObjectImport( $pe:PersistanceEvent ):void {
-		dbo = new DatabaseObject( Globals.BIGDB_TABLE_SOUNDS, "0", "0", 0, true, null );
-		dbo.ba = $pe.data;
-		sound.loadCompressedDataFromByteArray( dbo.ba, dbo.ba.length );
+		assignNewDatabaseObject();
+		sound.loadCompressedDataFromByteArray( $pe.data, $pe.data.length );
 		// On import mark it as changed.
 		loaded = true;
-		changed = true;
 		dbo.name = $pe.guid;
 		dbo.length = sound.length;
-		dbo.hashTags = "#dragon";
 		guid = Globals.getUID(); // do this last so that the rest of the data is filled in
 		save()
 	}
+
+	override protected function assignNewDatabaseObject():void {
+		super.assignNewDatabaseObject();
+	}
+
 }
 }
 

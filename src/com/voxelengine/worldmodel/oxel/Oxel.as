@@ -3303,7 +3303,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		if ( 0 > min_grain_size || min_grain_size > root_grain_size || ( 8 < (root_grain_size - min_grain_size)) )
 		{
 			min_grain_size = Math.max( 0, root_grain_size - 4 );
-			Log.out( "GenerateCube.start - WARNING - Adjusting range: " + min_grain_size, Log.WARN );
+			Log.out( "Oxel.generateCube - WARNING - Adjusting range: " + min_grain_size, Log.WARN );
 		}
 
 		//trace("GenerateCube.start on rootGrain of max size: " + root_grain_size + "  Filling with grain of size: " + min_grain_size + " of type: " + Globals.Info[_layer.type].name );

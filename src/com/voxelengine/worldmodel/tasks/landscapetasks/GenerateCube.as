@@ -42,7 +42,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			Oxel.generateCube( _modelGuid, _layer );
 
             super.complete(); // AbstractTask will send event
-			Log.out( "GenerateCube.start guid: " + _modelGuid + " type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + " took: " + (getTimer() - timer), Log.WARN );
+			//Log.out( "GenerateCube.start guid: " + _modelGuid + " type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + " took: " + (getTimer() - timer), Log.WARN );
 		}
 	}
 }

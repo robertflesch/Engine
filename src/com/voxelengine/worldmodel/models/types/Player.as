@@ -42,35 +42,35 @@ public class Player
 		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, onRegionLoad );
 		InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest );
-	}
 
-	private function onRegionLoad( $re:RegionEvent ):void {
-		if ( VoxelModel.controlledModel ) {
-			if ( null == Region.currentRegion.modelCache.instanceGet( VoxelModel.controlledModel.instanceInfo.instanceGuid ) )
-				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, VoxelModel.controlledModel );
-		} else {
-			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
+		function onLogin( $event:LoginEvent ):void {
+			LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, onLogin );
+			Log.out( "Player.onLogin - retrieve player info from Persistance", Log.DEBUG );
+			// request that the database load the player Object
+			Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
 		}
 
-		if ( Region.currentRegion )
-			Region.currentRegion.applyRegionInfoToPlayer( this );
+		function onRegionLoad( $re:RegionEvent ):void {
+			if ( VoxelModel.controlledModel ) {
+				if ( null == Region.currentRegion.modelCache.instanceGet( VoxelModel.controlledModel.instanceInfo.instanceGuid ) )
+					RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, VoxelModel.controlledModel );
+			} else {
+				ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
+			}
+
+			//if ( Region.currentRegion )
+			//	Region.currentRegion.applyRegionInfoToPlayer();
+		}
 	}
 
 
-	static private function onLogin( $event:LoginEvent ):void {
-		LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, onLogin );
-		Log.out( "Player.onLogin - retrieve player info from Persistance", Log.DEBUG );
-		// request that the database load the player Object
-		Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
-	}
 
+	static public const DEFAULT_PLAYER:String = "DefaultPlayer";
 	static public function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
 		if ( $dbo ) {
 			if ( null == $dbo.modelGuid ) {
 				// Assign the Avatar the default avatar
-				$dbo.modelGuid = "DefaultPlayer";
-				//$dbo.modelGuid = "FF8E75FB-EC3D-13B6-060A-202F664D7121";
-				//$dbo.modelGuid = "ECC57575-41A1-6B65-5B37-1B484FD1D0D4";
+				$dbo.modelGuid = DEFAULT_PLAYER;
 
 				var userName:String = $dbo.key.substring( 6 );
 				var firstChar:String = userName.substr(0, 1);
@@ -81,7 +81,7 @@ public class Player
 				$dbo.createdDate = new Date().toUTCString();
 				$dbo.save();
 			}
-			$dbo.modelGuid = "DefaultPlayer";
+			// Dont modify the modelGuid, change it in the DB if needed
 			createPlayer( $dbo.modelGuid, Network.userId );
 		}
 		else {
@@ -97,17 +97,16 @@ public class Player
 		ii.modelGuid = $modelGuid;
 		ii.instanceGuid = $userId;
 
-//		if ( "DefaultPlayer" == $modelGuid ) {
-			Log.out( "Avatar.createPlayer - creating from GenerateCube", Log.WARN )
+		if ( DEFAULT_PLAYER == $modelGuid ) {
+			Log.out( "Avatar.createPlayer - creating DEFAULT_PLAYER from GenerateCube", Log.WARN )
 			var model:Object = GenerateCube.script();
 			model.modelClass = "Avatar";
 			model.name = "Temp Avatar";
 			new ModelMakerGenerate( ii, model )
-//		}
-//		else {
-//
-//			ModelMakerBase.load(ii, false, false);
-//		}
+		}
+		else {
+			ModelMakerBase.load(ii, false, false);
+		}
 	}
 
 

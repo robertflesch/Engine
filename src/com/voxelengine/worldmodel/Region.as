@@ -98,7 +98,7 @@ package com.voxelengine.worldmodel
 			if( $dbo ) {
                 dbo = $dbo;
             } else {
-                createEmptyRegion($importedData);
+				assignNewDatabaseObject();
             }
 
 			init();
@@ -112,21 +112,20 @@ package com.voxelengine.worldmodel
 				// This creates and parses the permissions
 				_permissions = new PermissionsRegion(dbo);
 			}
+		}
 
-            function createEmptyRegion( $notSupported:Object ):void {
-                dbo = new DatabaseObject(Globals.BIGDB_TABLE_REGIONS, "0", "0", 0, true, null);
-                dbo.models = [];
-                dbo.skyColor = {"x": 92, "y": 172, "z": 238};
-                dbo.gravity = false;
-                dbo.worldId = Globals.VOXELVERSE;
-                dbo.name = "NewRegion";
-                dbo.desc = "Describe what is special about this region";
-                dbo.playerPosition = {};
-                dbo.playerPosition.x = dbo.playerPosition.y = dbo.playerPosition.z = 0;
-                dbo.playerRotation = {};
-                dbo.playerRotation.x = dbo.playerRotation.y = dbo.playerRotation.z = 0;
-//			    changed = true;
-            }
+		override protected function assignNewDatabaseObject():void {
+			super.assignNewDatabaseObject()
+			dbo.models = [];
+			dbo.skyColor = {"x": 92, "y": 172, "z": 238};
+			dbo.gravity = false;
+			dbo.worldId = Globals.VOXELVERSE;
+			dbo.name = "NewRegion";
+			dbo.desc = "Describe what is special about this region";
+			dbo.playerPosition = {};
+			dbo.playerPosition.x = dbo.playerPosition.y = dbo.playerPosition.z = 0;
+			dbo.playerRotation = {};
+			dbo.playerRotation.x = dbo.playerRotation.y = dbo.playerRotation.z = 0;
 		}
 		
 		// allows me to release the listeners for temporary regions
@@ -165,9 +164,9 @@ package com.voxelengine.worldmodel
 
 			// for startup use before you go online
 			if ( !Globals.online )
-				Player.createPlayer("DefaultPlayer", Network.LOCAL );
-//			else if ( VoxelModel.controlledModel && VoxelModel.controlledModel.instanceInfo.instanceGuid == "DefaultPlayer" )
-//				Player.createPlayer("DefaultPlayer", Network.LOCAL );
+				Player.createPlayer(Player.DEFAULT_PLAYER, Network.LOCAL );
+//			else if ( VoxelModel.controlledModel && VoxelModel.controlledModel.instanceInfo.instanceGuid == Player.DEFAULT_PLAYER )
+//				Player.createPlayer(Player.DEFAULT_PLAYER,Network.LOCAL );
 
 			_loaded = false;
 			if ( 0 == count ) {
@@ -178,7 +177,7 @@ package com.voxelengine.worldmodel
 			else
 				Globals.g_landscapeTaskController.paused = false
 
-
+			ModelEvent.addListener( ModelEvent.TAKE_CONTROL, takeControlEvent );
 			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name, Log.DEBUG );
 		}	
 		
@@ -275,26 +274,31 @@ package com.voxelengine.worldmodel
 				//VoxelModel.controlledModel.instanceInfo.positionSetComp(0,0,0);
 			}
 		}
-		
-		public function applyRegionInfoToPlayer( $avatar:Player ):void {
-			Log.out( "Region.applyRegionInfoToPlayer - DISABLED", Log.WARN );
-/*
+
+
+		public function takeControlEvent( e:ModelEvent ):void {
+
+			var avatar:Avatar = VoxelModel.controlledModel as Avatar;
+			if ( null == avatar ) {
+				Log.out("Region.applyRegionInfoToPlayer - NO PLAYER DEFINED", Log.WARN);
+				return;
+			}
+
 			if ( playerPosition ) {
 				//Log.out( "Player.onLoadingPlayerComplete - setting position to  - x: "  + playerPosition.x + "   y: " + playerPosition.y + "   z: " + playerPosition.z );
-				$avatar.instanceInfo.positionSetComp( playerPosition.x, playerPosition.y, playerPosition.z );
+				avatar.instanceInfo.positionSetComp( playerPosition.x, playerPosition.y, playerPosition.z );
 			}
 			else
-				$avatar.instanceInfo.positionSetComp( 0, 0, 0 );
+				avatar.instanceInfo.positionSetComp( 0, 0, 0 );
 			
 			if ( playerRotation ) {
 				//Log.out( "Player.onLoadingPlayerComplete - setting player rotation to  -  y: " + playerRotation );
-				$avatar.instanceInfo.rotationSet = new Vector3D( 0, playerRotation.y, 0 );
+				avatar.instanceInfo.rotationSet = new Vector3D( 0, playerRotation.y, 0 );
 			}
 			else
-				$avatar.instanceInfo.rotationSet = new Vector3D( 0, 0, 0 );
+				avatar.instanceInfo.rotationSet = new Vector3D( 0, 0, 0 );
 				
-			$avatar.usesGravity = gravity;
-*/
+			avatar.usesGravity = gravity;
 		}
 		
 		public function setPlayerPosition( $obj:Object ):void {
@@ -313,7 +317,8 @@ package com.voxelengine.worldmodel
 		override public function save():void {
 			// The null owner check makes it to we dont save local loaded regions to persistance
 			if ( null != owner && Globals.isGuid( guid ) )
-				super.save()
+				if ( changed )
+					super.save()
 		}
 		
 		override protected function toObject():void {

@@ -60,16 +60,10 @@ public class Inventory extends PersistanceObject
 	//////////////////////////////////////////////////////////////////
 	
 	override public function save():void {
-		// TODO this needs to detect "changed"
 		if ( !loaded ) {
 			Log.out( "Inventory.save - Not LOADED - guid: " + guid, Log.DEBUG );
 			return; 
 		}
-		if ( !changed ) {
-			//Log.out( "Inventory.save - LOADED but not changed - guid: " + guid, Log.DEBUG );
-			return;
-		}
-		//Log.out( "Inventory.save - saving - guid: " + guid, Log.DEBUG );
 		super.save();
 	}
 	
@@ -85,16 +79,14 @@ public class Inventory extends PersistanceObject
 	}
 
 	public function fromObject( $dbo:DatabaseObject ):void {
-		var isNewRecord:Boolean = false
+		var isNewRecord:Boolean = false;
 		if ( $dbo ) {
-			dbo  = $dbo
+			dbo  = $dbo;
             _slots.fromObject( dbo );
 		}
 		else {
-			dbo = new DatabaseObject( _table, "0", "0", 0, true, null );
-			//info = dbo.oxelPersistance
-			dbo.createdDate	= new Date().toUTCString()
-			isNewRecord = true
+			super.assignNewDatabaseObject();
+			isNewRecord = true;
             _slots.addSlotDefaultData();
 		}
 		
@@ -102,7 +94,7 @@ public class Inventory extends PersistanceObject
 		// we can know what user carry around
 
 		if ( dbo && dbo.voxelData ) {
-			var ba:ByteArray = dbo.voxelData
+			var ba:ByteArray = dbo.voxelData;
 			if ( ba && 0 < ba.bytesAvailable ) {
 				try { ba.uncompress(); }
 				catch (error:Error) {

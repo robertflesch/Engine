@@ -78,14 +78,14 @@ public class Animation extends PersistanceObject
 		}
 		init( $importedData );
 
-		function assignNewDatabaseObject():void {
-			dbo = new DatabaseObject( table, "0", "0", 0, true, null );
-			dbo.name = "Default";
-			dbo.description = "Enter description here";
-			dbo.type =  ANIMATION_STATE;
-			dbo.owner = Network.userId;
-			changed = true;
-		}
+	}
+
+	override protected function assignNewDatabaseObject():void {
+		super.assignNewDatabaseObject();
+		dbo.name = "Default";
+		dbo.description = "Enter description here";
+		dbo.type =  ANIMATION_STATE;
+		dbo.owner = Network.userId;
 	}
 
 	private function init( $newData:Object = null ):void {
@@ -156,15 +156,6 @@ public class Animation extends PersistanceObject
 		changed = false;
 		throw new Error( "Animation.restoreFromBackup - REFACTOR");
 //		loadFromInfo( $info )
-	}
-	
-	override public function save():void {
-		if ( !Globals.isGuid( guid ) ) {
-			Log.out( "Animation.save - NOT Saving INVALID GUID: " + guid, Log.WARN );
-			return;
-		}
-		if ( changed )
-			super.save();
 	}
 	
 	override protected function toObject():void {

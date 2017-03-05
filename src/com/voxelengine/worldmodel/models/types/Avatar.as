@@ -123,7 +123,7 @@ public class Avatar extends ControllableVoxelModel
 		{
 			stateSet( "Stand", 1 );
 		}
-		//trace( "Player.update - end" );
+		//trace( "Avatar.update - end" );
 	}
 
 	override protected function onChildAdded( me:ModelEvent ):void	{
@@ -132,18 +132,18 @@ public class Avatar extends ControllableVoxelModel
 
 		var vm:VoxelModel = modelInfo.childModelFind( me.instanceGuid );
 		if ( !vm ) {
-			Log.out( "Player.onChildAdded ERROR FIND CHILD MODEL: " + me.instanceGuid );
+			Log.out( "Avatar.onChildAdded ERROR FIND CHILD MODEL: " + me.instanceGuid );
 		}
 		//var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( me.instanceGuid );
-//Log.out( "Player.onChildAdded model: " + vm.toString() );
+//Log.out( "Avatar.onChildAdded model: " + vm.toString() );
 		if ( vm is Engine )
-			Log.out( "Player.onChildAdded - Player has ENGINE" )
+			Log.out( "Avatar.onChildAdded - Player has ENGINE" );
 		//_engines.push( vm );
 		if ( vm is Gun )
-			Log.out( "Player.onChildAdded - Player has GUN" )
+			Log.out( "Avatar.onChildAdded - Player has GUN" );
 		//_guns.push( vm );
 		if ( vm is Bomb )
-			Log.out( "Player.onChildAdded - Player has BOMP" )
+			Log.out( "Avatar.onChildAdded - Player has BOMP" );
 		//_bombs.push( vm );
 	}
 
@@ -238,7 +238,7 @@ public class Avatar extends ControllableVoxelModel
 	}
 
 	override protected function handleMouseMovement( $elapsedTimeMS:int ):void {
-//		Log.out( "Player.handleMouseMovement - Globals.active: " + Globals.active
+//		Log.out( "Avatar.handleMouseMovement - Globals.active: " + Globals.active
 //				+ "  MouseKeyboardHandler.ctrl: " + MouseKeyboardHandler.ctrl
 //				+ " MouseKeyboardHandler.active: " + MouseKeyboardHandler.active
 //				+ " Globals.openWindowCount: " + Globals.openWindowCount  );
@@ -259,11 +259,11 @@ public class Avatar extends ControllableVoxelModel
 			var dy:Number = MouseKeyboardHandler.getMouseXChange() / MOUSE_LOOK_CHANGE_RATE;
 			dy *= $elapsedTimeMS;
 
-			//Log.out( "Player.handleMouseMovement dy: " + dy + "   $elapsedTimeMS: " + $elapsedTimeMS )
+			//Log.out( "Avatar.handleMouseMovement dy: " + dy + "   $elapsedTimeMS: " + $elapsedTimeMS )
 			if ( MIN_TURN_AMOUNT >= Math.abs(dy) )
 				dy = 0;
 			//
-			//Log.out( "Player.handleMouseMovement - rotation: " + instanceInfo.rotationGet );
+			//Log.out( "Avatar.handleMouseMovement - rotation: " + instanceInfo.rotationGet );
 			// I only want to rotate the head here, not the whole body. in the X dir.
 			// so if I made the head the main body part, could I keep the rest of the head fixed on the x and z axis...
 			instanceInfo.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y + dy, instanceInfo.rotationGet.z );

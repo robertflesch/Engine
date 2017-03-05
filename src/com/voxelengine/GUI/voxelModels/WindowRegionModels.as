@@ -57,8 +57,8 @@ package com.voxelengine.GUI.voxelModels
 		}
 
 		private function onParentModelRemoved(event:ModelEvent):void {
-			if ( _modelPanel )
-				_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null, true );
+			//if ( _modelPanel )
+			//	_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null, true );
 		}
 
 		

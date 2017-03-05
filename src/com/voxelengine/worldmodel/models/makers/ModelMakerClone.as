@@ -43,8 +43,6 @@ import playerio.DatabaseObject;
 	 */
 public class ModelMakerClone extends ModelMakerBase {
 	
-	private var _vmTemp:VoxelModel;
-		
 	public function ModelMakerClone( $vm:VoxelModel, $killOldModel:Boolean = true ) {
 		var originalVM:VoxelModel = $vm;
 
@@ -170,9 +168,9 @@ public class ModelMakerClone extends ModelMakerBase {
 		//Log.out("ModelMakerClone.completeMake: " + ii.toString());
 		if ( null != modelInfo && null != _modelMetadata ) {
 
-			_vmTemp = make();
-			if ( _vmTemp ) {
-				_vmTemp.stateLock( true, 10000 ); // Lock state so that it has time to load animations
+			_vm = make();
+			if ( _vm ) {
+				_vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
 				// Since I already HAVE the oxel, I don't need to add it?
 				// So just listen for ready event, unlike importer
 				addOxelReadyDataCompleteListeners();
@@ -190,7 +188,7 @@ public class ModelMakerClone extends ModelMakerBase {
 			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid ) {
 				Log.out( "ModelMakerClone.allChildrenReady - modelMetadata.description: " + _modelMetadata.description, Log.WARN );
 				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
-				markComplete( true, _vmTemp );
+				markComplete( true );
 			}
 		}
 
@@ -199,7 +197,7 @@ public class ModelMakerClone extends ModelMakerBase {
 				removeOxelReadyDataCompleteListeners();
 				Log.out( "ModelMakerClone.oxelReady - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
 				if ( false == waitForChildren )
-					markComplete(true, _vmTemp);
+					markComplete( true );
 			}
 //			else
 //				Log.out( "ModelMakerClone.oxelReady - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
@@ -208,7 +206,7 @@ public class ModelMakerClone extends ModelMakerBase {
 		function oxelReadyFailedToLoad( $ode:OxelDataEvent):void {
 			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid  ) {
 				removeOxelReadyDataCompleteListeners();
-				markComplete( false, _vmTemp );
+				markComplete( false );
 			}
 //			else
 //				Log.out( "ModelMakerClone.oxelReadyFailedToLoad - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
@@ -226,28 +224,25 @@ public class ModelMakerClone extends ModelMakerBase {
 		}
 	}
 
-	override protected function markComplete( $success:Boolean, $vm:VoxelModel = null ):void {
+	override protected function markComplete( $success:Boolean ):void {
 		if ( false == $success && modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" ) {
 			// Are these needed?
 			ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
 			ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
-			_vmTemp.complete = true;
+			_vm.complete = true;
 
 			modelInfo.changed = true;
 			modelInfo.oxelPersistance.changed = true;
 			_modelMetadata.changed = true;
-			_vmTemp.save();
+			_vm.save();
 
-			if ( null == _vmTemp.instanceInfo.controllingModel ) {
+			if ( null == _vm.instanceInfo.controllingModel ) {
 				// Only do this for top level models.
 				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(500);
 				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
 				diffPos = diffPos.add(lav);
-				_vmTemp.instanceInfo.positionSet = diffPos;
-				//Region.currentRegion.modelCache.add( _vmTemp );
-				RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid, null );
+				_vm.instanceInfo.positionSet = diffPos;
 			}
-			RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vmTemp );
 			Log.out("ModelMakerClone.completeMake - needed info found: " + _modelMetadata.description );
 		} else {
 			Log.out( "ModelMakerClone.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.WARN );
@@ -255,11 +250,7 @@ public class ModelMakerClone extends ModelMakerBase {
 			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
 		}
 
-		super.markComplete( $success, _vmTemp );
-		// how are sub models handled?
-		//_isImporting = false;
-		_vmTemp = null;
-
+		super.markComplete( $success);
 	}
 	
 	///////////////////////////////////////////
