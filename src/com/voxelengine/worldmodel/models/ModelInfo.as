@@ -66,7 +66,7 @@ public class ModelInfo extends PersistanceObject
 	// overrideable in instanceInfo
 	// how to link this to instance info, when this is shared object???
 	public function get grainSize():int								{
-		if ( oxelPersistance && oxelPersistance.oxel )
+		if ( oxelPersistance && oxelPersistance.oxelCount )
 			return oxelPersistance.oxel.gc.grain;
 		else 
 			return dbo.grainSize ? dbo.grainSize : 4;
@@ -144,7 +144,7 @@ public class ModelInfo extends PersistanceObject
 	}
 
 	public function update( $context:Context3D, $elapsedTimeMS:int, $vm:VoxelModel ):void {
-		if ( oxelPersistance && oxelPersistance.oxel && oxelPersistance.oxel.chunkGet() )
+		if ( oxelPersistance && oxelPersistance.oxelCount && oxelPersistance.oxel.chunkGet() )
 			oxelPersistance.update( $vm );
 			
 		for each (var cm:VoxelModel in childVoxelModels ) {
@@ -206,14 +206,17 @@ public class ModelInfo extends PersistanceObject
 			oxelPersistance = $od;
 			// Set OxelPersistance to the baseLightLevel for this object.
 			//Log.out( "ModelInfo.retrievedData - set baseLightLevel: " + baseLightLevel);
-			oxelPersistance.baseLightLevel = baseLightLevel;
-
-			const priority:int = 5;
-			if (oxelPersistance && 0 == oxelPersistance.oxelCount)
-				oxelPersistance.createTaskToLoadFromByteArray(guid, priority);
-			else
-				OxelDataEvent.create( OxelDataEvent.OXEL_READY, 0, $od.guid, $od );
 		}
+		oxelPersistance.baseLightLevel = baseLightLevel;
+		if ( grainSize )
+			oxelPersistance.bound = grainSize;
+
+		const priority:int = 5;
+		if (oxelPersistance && 0 == oxelPersistance.oxelCount)
+			oxelPersistance.createTaskToLoadFromByteArray(guid, priority);
+		else
+			OxelDataEvent.create( OxelDataEvent.OXEL_READY, 0, $od.guid, $od );
+
 	}
 
 	private function retrievedData( $ode:OxelDataEvent):void {

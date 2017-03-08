@@ -69,9 +69,6 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 					smallestGrain = vm.modelInfo.dbo.smallestGrain
 			}
 			
-			//Globals.g_seed = 0;
-			const root_grain_size:int = _layer.offset;
-			const baseLightLevel:int = 51;
 			var masterMapSize:uint = Math.min( $oxel.size_in_world_coordinates(), 1024 );
 			
 			var octaves:int  = ( Math.random() * 144 ) % (Math.random() * 8);

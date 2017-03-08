@@ -1600,6 +1600,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 	
 	protected function quadAddOrRemoveFace( $face:int, $plane_facing:int, $grain:uint, $ti:TypeInfo ):int {
+		if ( $grain < 0 )
+			throw new Error( "Oxel.quadAddorRemoveFace invalid grain size: " + $grain + " check to make sure it is getting assigned correcting in ModelMakerGenerate.listenForGenerationComplete");
 		var validFace:Boolean = faceHas($face);
 		var quad:Quad = _quads[$face];
 		
@@ -3295,24 +3297,22 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		//////////////////////////////////////////////////////////
 		// Builds Solid Cube of any grain size
 		//////////////////////////////////////////////////////////
-		var root_grain_size:int = $layer.offset;
-		const baseLightLevel:int = 51;
-		var oxel:Oxel = Oxel.initializeRoot( root_grain_size );
+		var rootGrain:int = $layer.offset;
+		var oxel:Oxel = Oxel.initializeRoot( rootGrain );
 		//
-		var min_grain_size:int = root_grain_size - $layer.range;
-		if ( 0 > min_grain_size || min_grain_size > root_grain_size || ( 8 < (root_grain_size - min_grain_size)) )
-		{
-			min_grain_size = Math.max( 0, root_grain_size - 4 );
-			Log.out( "Oxel.generateCube - WARNING - Adjusting range: " + min_grain_size, Log.WARN );
+		var minGrain:int = rootGrain - $layer.range;
+		if ( rootGrain < 0 || minGrain < 0 || minGrain > rootGrain || ( 8 < (rootGrain - minGrain)) ) {
+			minGrain = Math.max( 0, rootGrain - 4 );
+			Log.out( "Oxel.generateCube - WARNING - Adjusting range: " + minGrain, Log.WARN );
 		}
 
-		//trace("GenerateCube.start on rootGrain of max size: " + root_grain_size + "  Filling with grain of size: " + min_grain_size + " of type: " + Globals.Info[_layer.type].name );
-		var loco:GrainCursor = GrainCursorPool.poolGet(root_grain_size);
-		var size:int = 1 << (root_grain_size - min_grain_size);
+		//trace("GenerateCube.start on rootGrain of max size: " + rootGrain + "  Filling with grain of size: " + minGrain + " of type: " + Globals.Info[_layer.type].name );
+		var loco:GrainCursor = GrainCursorPool.poolGet(rootGrain);
+		var size:int = 1 << (rootGrain - minGrain);
 		for ( var x:int = 0; x < size; x++ ) {
 			for ( var y:int = 0; y < size; y++ ) {
 				for ( var z:int = 0; z < size; z++ ) {
-					loco.set_values( x, y, z, min_grain_size )
+					loco.set_values( x, y, z, minGrain )
 					oxel.write( $modelGuid, loco, $layer.type, true );
 				}
 			}

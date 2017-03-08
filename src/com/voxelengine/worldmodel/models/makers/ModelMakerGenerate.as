@@ -151,7 +151,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			if ( $e.modelGuid == ii.modelGuid ) {
 				OxelDataEvent.removeListener( ModelBaseEvent.ADDED, listenForGenerationComplete );
 				Log.out( "ModelMakerGenerate.listenForGenerationComplete " + ii.modelGuid + " == " + $e.modelGuid );
-				modelInfo.oxelPersistance = $e.oxelData;
+				modelInfo.assignOxelDataToModelInfo( $e.oxelData );
 				markComplete( true );
 			}
 			else

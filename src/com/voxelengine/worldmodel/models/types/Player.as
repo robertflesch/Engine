@@ -12,6 +12,7 @@ import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.LoginEvent;
 import com.voxelengine.persistance.Persistance;
 import com.voxelengine.worldmodel.RegionManager;
+import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.inventory.ObjectAction;
 import com.voxelengine.worldmodel.inventory.ObjectTool;
 import com.voxelengine.worldmodel.models.types.Avatar;
@@ -99,7 +100,7 @@ public class Player
 
 		if ( DEFAULT_PLAYER == $modelGuid ) {
 			Log.out( "Avatar.createPlayer - creating DEFAULT_PLAYER from GenerateCube", Log.WARN )
-			var model:Object = GenerateCube.script();
+			var model:Object = GenerateCube.script( 4, TypeInfo.BLUE );
 			model.modelClass = "Avatar";
 			model.name = "Temp Avatar";
 			new ModelMakerGenerate( ii, model )

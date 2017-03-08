@@ -22,7 +22,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var model:Object = {};
 			model.name = "GenerateCube";
 			model.grainSize = $grain;
-			model.biomes = new Object();
+			model.biomes = {};
 			model.biomes.layers = new Vector.<Object>();
 			model.biomes.layers[0] = {};
 			model.biomes.layers[0].functionName = "GenerateCube";
