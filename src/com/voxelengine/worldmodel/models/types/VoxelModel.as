@@ -532,7 +532,7 @@ public class VoxelModel
 
 		if ( modelInfo ) {
 
-			if ( modelInfo.oxelPersistance ) {
+			if ( modelInfo.oxelPersistance && controlledModel ) {
 				var ppos:Vector3D = controlledModel.instanceInfo.positionGet;
 				var modelPos:Vector3D = this.instanceInfo.positionGet;
 				var d:int = ppos.subtract(modelPos).length;
@@ -601,7 +601,7 @@ public class VoxelModel
 	public function calculateCenter( $oxelCenter:int = 0 ):void {
 		if ( 0 == instanceInfo.center.length ) {
 			if ( 0 == $oxelCenter )
-				if ( modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxel ) {
+				if ( modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxelCount ) {
 					$oxelCenter = modelInfo.oxelPersistance.oxel.size_in_world_coordinates() / 2;
 					instanceInfo.centerSetComp( $oxelCenter, $oxelCenter, $oxelCenter )
 				}
@@ -819,7 +819,7 @@ public class VoxelModel
 	public function changeGrainSize( changeSize:int):void {
 		_timer = getTimer();
 		Oxel.nodes = 0;
-		if ( modelInfo.oxelPersistance.oxel ) {
+		if ( modelInfo.oxelPersistance.oxelCount ) {
 			modelInfo.oxelPersistance.oxel.changeGrainSize(changeSize, modelInfo.oxelPersistance.oxel.gc.bound + changeSize);
 			//Log.out("VoxelModel.changeGrainSize - took: " + (getTimer() - _timer) + " count " + Oxel.nodes);
 			modelInfo.oxelPersistance.visitor( VisitorFunctions.rebuild, "Oxel.rebuild" );
@@ -1171,13 +1171,13 @@ public class VoxelModel
 	}
 	
 	public function size():int {
-		if ( _modelInfo && _modelInfo.oxelPersistance && _modelInfo.oxelPersistance.oxel )
+		if ( _modelInfo && _modelInfo.oxelPersistance && _modelInfo.oxelPersistance.oxelCount )
 			return _modelInfo.oxelPersistance.oxel.size_in_world_coordinates();
 		else
 			return 0;
 	}
 	public function get grain():int {
-		if ( _modelInfo && _modelInfo.oxelPersistance && _modelInfo.oxelPersistance.oxel )
+		if ( _modelInfo && _modelInfo.oxelPersistance && _modelInfo.oxelPersistance.oxelCount )
 			return _modelInfo.oxelPersistance.oxel.gc.grain;
 		else
 			return 0;
@@ -1191,7 +1191,7 @@ public class VoxelModel
 	}
 
 	public function distanceFromPlayerToModel():Number {
-		if ( Player.player && controlledModel.instanceInfo ) {
+		if ( controlledModel && controlledModel.instanceInfo ) {
 			// this takes the origin of the oxel and converts it to world space.
 			// takes the resulting vector and subtracts the player position, and uses the length as the priority
 			//trace( "Chunk.refreshFacesAndQuads distance: priority: " + priority + "  chunk.oxel.gc: " + _oxel.gc.getModelVector().toString()  + "  Player.player: " +  Player.player.instanceInfo.positionGet )

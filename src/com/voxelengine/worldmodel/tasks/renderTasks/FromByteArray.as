@@ -30,6 +30,7 @@ public class FromByteArray extends AbstractTask
 	private var	_op:OxelPersistance;
 
 	static public function addTask( $guid:String, $taskPriority:int, $parent:OxelPersistance ): void {
+		Log.out( "FromByteArray.addTask: guid: " + $guid + "  taskPriority: " + $taskPriority + "  op: " + $parent, Log.WARN );
 		var fba:FromByteArray = new FromByteArray( $guid, $taskPriority, $parent );
 		Globals.g_landscapeTaskController.addTask( fba )
 	}
@@ -47,6 +48,7 @@ public class FromByteArray extends AbstractTask
 
 		try {
 			//Log.out("FromByteArray.start: guid: " + _guid, Log.WARN);
+			_op.ba.position = 0;
 			_op.loadFromByteArray();
 
 			if ("0" == _op.dbo.key) {

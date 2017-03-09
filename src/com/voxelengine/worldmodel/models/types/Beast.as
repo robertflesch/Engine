@@ -121,7 +121,7 @@ public class Beast extends ControllableVoxelModel
 
 	override protected function collisionPointsAdd():void {
 		// TO DO Should define this in meta oxelPersistance??? RSF or using extents?
-		if ( modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxel ) {
+		if ( modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxelCount ) {
 			var oxel:Oxel = modelInfo.oxelPersistance.oxel;
 			var sizeOxel:Number = oxel.gc.size() / 2;
 			_ct.addCollisionPoint( new CollisionPoint( FALL, new Vector3D( sizeOxel, -16, 0 ) ) );

@@ -35,7 +35,7 @@ public class GrowTreesOn extends LandscapeTask
 		//Log.out( "GrowTreesOn.start - enter: ", Log.ERROR);					
 		var vm:VoxelModel = getVoxelModel();
 		if ( vm ) {
-			if ( vm.modelInfo.oxelPersistance && vm.modelInfo.oxelPersistance.oxel ) {
+			if ( vm.modelInfo.oxelPersistance && vm.modelInfo.oxelPersistance.oxelCount ) {
 				// This should be 1 - 100 range
 				//var outOf:int = _layer.range;
 				//vm.oxel.growTreesOn( _layer.type, outOf ? outOf : 2000 );

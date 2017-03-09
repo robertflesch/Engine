@@ -93,7 +93,7 @@ public class WindowChangeType extends VVPopup
 			li = _cbTo.getItemAt(_cbTo.selectedIndex );
 			var toType:int = li.data;
 			
-			if ( _vm.modelInfo.oxelPersistance && _vm.modelInfo.oxelPersistance.oxel ) {
+			if ( _vm.modelInfo.oxelPersistance && _vm.modelInfo.oxelPersistance.oxelCount ) {
 				var oxel:Oxel = _vm.modelInfo.oxelPersistance.oxel;
 				oxel.changeTypeFromTo( fromType, toType );
 				_vm.modelInfo.oxelPersistance.changed = true

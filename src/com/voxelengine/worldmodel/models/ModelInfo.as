@@ -159,7 +159,7 @@ public class ModelInfo extends PersistanceObject
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
 //		var time:int = getTimer()
 
-		if ( oxelPersistance )
+		if ( oxelPersistance && oxelPersistance.oxelCount )
 			oxelPersistance.draw(	$mvp, $vm, $context, $selected, $isChild, $isAlpha );
 //		var t:int = (getTimer() - time) 	
 //		if ( t )
@@ -216,7 +216,6 @@ public class ModelInfo extends PersistanceObject
 			oxelPersistance.createTaskToLoadFromByteArray(guid, priority);
 		else
 			OxelDataEvent.create( OxelDataEvent.OXEL_READY, 0, $od.guid, $od );
-
 	}
 
 	private function retrievedData( $ode:OxelDataEvent):void {

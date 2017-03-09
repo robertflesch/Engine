@@ -64,7 +64,7 @@ public class Ship extends ControllableVoxelModel
 	override protected function collisionPointsAdd():void {
 		// TO DO Should define this in meta data??? RSF or using extents?
 
-		if ( modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxel ) {
+		if ( modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxelCount ) {
 			var oxel:Oxel = modelInfo.oxelPersistance.oxel;
 			var sizeOxel:Number = oxel.gc.size() / 2;
 			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, 0 ) ) );

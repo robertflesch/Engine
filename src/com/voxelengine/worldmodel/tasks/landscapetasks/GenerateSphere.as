@@ -31,9 +31,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var model:Object = new Object
 			model.grainSize = 6
 			model.name = "GenerateSphere"
-			model.biomes = new Object();
+			model.biomes = {};
 			model.biomes.layers = new Vector.<Object>();
-			model.biomes.layers[0] = new Object();
+			model.biomes.layers[0] = {};
 			model.biomes.layers[0].functionName = "GenerateSphere"
 			model.biomes.layers[0].type = "SAND"
 			model.biomes.layers[0].range = 3

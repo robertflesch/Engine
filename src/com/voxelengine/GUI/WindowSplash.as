@@ -92,8 +92,10 @@ import flash.display.Bitmap;
 				_outline.scaleY = Renderer.renderer.height/592; // 592 is height of splash screen
 			}*/
 
-			_outline.scaleX = Renderer.renderer.width/791; // 791 is width of splash screen
-			_outline.scaleY = Renderer.renderer.height/592; // 592 is height of splash screen
+//			_outline.scaleX = Renderer.renderer.width/791; // 791 is width of splash screen
+//			_outline.scaleY = Renderer.renderer.height/592; // 592 is height of splash screen
+			_outline.scaleX = Renderer.renderer.width/2791; // 791 is width of splash screen
+			_outline.scaleY = Renderer.renderer.height/2592; // 592 is height of splash screen
 		}
 		
 		// Window events

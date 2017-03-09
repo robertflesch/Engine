@@ -50,7 +50,7 @@ import flash.utils.getTimer;
 		private function modelInfoResult(e:ModelInfoEvent):void {
 			Log.out( "MergeLayer.modelInfoResult:" );
 			if ( e.modelGuid == _modelGuid ) {
-				if ( !e.vmi || !e.vmi.oxelPersistance || !e.vmi.oxelPersistance.oxel ) {
+				if ( !e.vmi || !e.vmi.oxelPersistance || !e.vmi.oxelPersistance.oxelCount ) {
 					ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoResult );
 					OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );		
 					Log.out( "MergeLayer.modelInfoResult = no oxel found, waiting on OXEL_READY", Log.WARN );

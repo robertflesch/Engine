@@ -220,28 +220,39 @@ public class Renderer extends EventDispatcher
 			return;
 		}
 		
+
+		backgroundColor();
+
 		// New in Flash 16
 		// Context3D's setFillMode()  "wireframe" or "solid".
 		var cm:VoxelModel = VoxelModel.controlledModel;
+		var cmRotation:Vector3D;
+
 		// Very early in render cycle the controlled model may not be instantitated yet.
-		if ( !cm )
-			return;
-			
-		backgroundColor();
-		
-		var wsPositionCamera:Vector3D = cm.instanceInfo.worldSpaceMatrix.transformVector( cm.camera.current.position );
-		
-		// This does not handle the case where the player has not collided with the model yet
-		// Say they are falling onto an island, and they hit the water first.
-		// I should probably adjust that algorithm to account for it.
-		if ( Player.player ) {
-			var lcm:VoxelModel = VoxelModel.controlledModel.lastCollisionModel
-			if ( null != lcm ) {
-				var camOxel:Oxel = lcm.getOxelAtWSPoint( wsPositionCamera, 4 )
-				if ( camOxel && Globals.BAD_OXEL != camOxel ) {
-					if ( TypeInfo.WATER == camOxel.type ) {
-						Globals.g_underwater = true
-						WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.CREATE ) )
+		var wsPositionCamera:Vector3D;
+		if ( !cm ) {
+			wsPositionCamera = new Vector3D();
+			cmRotation = new Vector3D();
+		}
+		else {
+			cmRotation = cm.camera.rotationGet;
+			wsPositionCamera = cm.instanceInfo.worldSpaceMatrix.transformVector(cm.camera.current.position);
+			// This does not handle the case where the player has not collided with the model yet
+			// Say they are falling onto an island, and they hit the water first.
+			// I should probably adjust that algorithm to account for it.
+			if ( cm) {
+				var lcm:VoxelModel = VoxelModel.controlledModel.lastCollisionModel
+				if ( null != lcm ) {
+					var camOxel:Oxel = lcm.getOxelAtWSPoint( wsPositionCamera, 4 )
+					if ( camOxel && Globals.BAD_OXEL != camOxel ) {
+						if ( TypeInfo.WATER == camOxel.type ) {
+							Globals.g_underwater = true
+							WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.CREATE ) )
+						}
+						else {
+							Globals.g_underwater = false
+							WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.ANNIHILATE ) )
+						}
 					}
 					else {
 						Globals.g_underwater = false
@@ -253,19 +264,13 @@ public class Renderer extends EventDispatcher
 					WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.ANNIHILATE ) )
 				}
 			}
-			else {
-				Globals.g_underwater = false
-				WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.ANNIHILATE ) )
-			}
 		}
-		
 //			trace( "Renderer.render - wsPositionCamera: " + wsPositionCamera );
 		wsPositionCamera.negate();
 		
 		// Empty starting matrix
 		_mvp.identity();
 		
-		const cmRotation:Vector3D = cm.camera.rotationGet;
 		_mvp.prependRotation( cmRotation.x, Vector3D.X_AXIS );
 		_mvp.prependRotation( cmRotation.y, Vector3D.Y_AXIS );
 		_mvp.prependRotation( cmRotation.z, Vector3D.Z_AXIS );
@@ -279,7 +284,8 @@ public class Renderer extends EventDispatcher
 		
 		_mvp.append( perspectiveProjection(90, _width/_height, Globals.g_nearplane, Globals.g_farplane) );
 
-		Region.currentRegion.modelCache.draw( _mvp, context3D );
+		if ( Region.currentRegion )
+			Region.currentRegion.modelCache.draw( _mvp, context3D );
 
 		if ( screenShot )
 			context3D.drawToBitmapData( screenShot );

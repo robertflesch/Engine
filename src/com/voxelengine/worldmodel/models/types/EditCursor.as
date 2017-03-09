@@ -173,7 +173,7 @@ public class EditCursor extends VoxelModel
 					CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, modelInfo.oxelPersistance.oxel.gc.grain ) );
 				}
 			else {
-				if ( modelInfo && modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxel ) {
+				if ( modelInfo && modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxelCount ) {
 					modelInfo.oxelPersistance.oxel.gc.bound = e.size;
 					modelInfo.oxelPersistance.oxel.gc.grain = e.size;
 				}
