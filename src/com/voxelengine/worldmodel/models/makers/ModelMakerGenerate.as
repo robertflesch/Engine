@@ -7,33 +7,18 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.RegionEvent;
-import com.voxelengine.worldmodel.models.types.Player;
-
-import flash.utils.ByteArray;
-import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
-import com.voxelengine.Globals;
-import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.PermissionsBase;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.ModelInfo;
-import com.voxelengine.worldmodel.models.types.VoxelModel
-import com.voxelengine.worldmodel.tasks.landscapetasks.TaskLibrary;
+import com.voxelengine.worldmodel.models.types.Player;
+
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF
@@ -85,7 +70,6 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			ModelInfoEvent.removeListener( ModelBaseEvent.EXISTS, modelInfoExists );
 			ModelInfoEvent.removeListener( ModelBaseEvent.EXISTS_FAILED, modelInfoDoesNotExists );
 		}
-
 	}
 
 
@@ -129,34 +113,18 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		_modelMetadata.owner = Network.userId;
 	}
 	
-	// once they both have been retrived, we can make the object
+	// once they both have been retrieved, we can make the object
 	override protected function attemptMake():void {
 		Log.out( "ModelMakerGenerate.attemptMake " + ii.modelGuid );
 		if ( null != modelInfo && null != _modelMetadata ) {
 			_vm = make();
 			if ( _vm ) {
-				if ( !_vm.modelInfo.oxelPersistance ) {
-					OxelDataEvent.addListener(ModelBaseEvent.ADDED, listenForGenerationComplete);
-					_modelInfo.oxelLoadData();
-				} else
-					markComplete( true );
+				markComplete( true );
 			}
 			else {
 				Log.out( "ModelMakerGenerate.attemptMake FAILED to generate from " + _name, Log.WARN );
 				markComplete( false );
 			}
-		}
-
-		function listenForGenerationComplete( $e:OxelDataEvent ):void {
-			if ( $e.modelGuid == ii.modelGuid ) {
-				OxelDataEvent.removeListener( ModelBaseEvent.ADDED, listenForGenerationComplete );
-				Log.out( "ModelMakerGenerate.listenForGenerationComplete " + ii.modelGuid + " == " + $e.modelGuid );
-				modelInfo.assignOxelDataToModelInfo( $e.oxelData );
-				markComplete( true );
-			}
-			else
-				Log.out( "ModelMakerGenerate.listenForGenerationComplete " + ii.modelGuid + " != " + $e.modelGuid );
-
 		}
 	}
 	
