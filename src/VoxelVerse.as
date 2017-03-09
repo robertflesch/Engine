@@ -92,20 +92,33 @@ public class VoxelVerse extends Sprite
 	}
 
 	private function initializeDataBeforeSplash():void {
-		Globals.setDebug = Capabilities.isDebugger;
 		Log.init();
 		//Log.out("VoxelVerse.initializeDataBeforeSplash this is " + (Globals.isDebug ? "debug" : "release") + " build", Log.WARN );
 
 		var url:String = stage.loaderInfo.loaderURL;
 		var index:int = url.lastIndexOf( "VoxelVerse.swf" );
-		if ( -1 == index )
-			index = url.lastIndexOf( "VoxelVerseD.swf" );
-		if ( -1 == index )
-			index = url.lastIndexOf( "VoxelVerseDDesk.swf" );
-		if ( -1 == index )
-			Log.out( "VoxelVerse.initializeDataBeforeSplash - App path not being set correctly appPath: " + url, Log.ERROR );
-		Globals.appPath = url.substring( 0, index );
-		//Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG )
+		// Release, debug false
+		if ( -1 != index ) {
+			Globals.setDebug = false;
+			Globals.appPath = url.substring(0, index);
+		}
+		else {
+			// Not release, so check for old debug
+			index = url.lastIndexOf("VoxelVerseD.swf");
+			if (-1 != index) {
+				Globals.setDebug = true;
+		    } else {
+				// check for new debug
+				index = url.lastIndexOf("VoxelVerseDDesk.swf");
+				if (-1 != index)
+					Globals.setDebug = true;
+				else
+					Log.out("VoxelVerse.initializeDataBeforeSplash - App path not being set correctly appPath: " + url, Log.ERROR);
+			}
+			Globals.appPath = url.substring(0, index);
+		}
+
+		Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG )
 
 		Renderer.renderer.init( stage );
 		VoxelVerseGUI.currentInstance.init();
