@@ -23,9 +23,9 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistanceEvent;
 import com.voxelengine.events.SoundEvent;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.models.PersistanceObject;
+import com.voxelengine.worldmodel.models.PersistenceObject;
 
-public class Ammo extends PersistanceObject
+public class Ammo extends PersistenceObject
 {
 	private var saving:Boolean
 	public function get name():String  				{ return dbo.name; }

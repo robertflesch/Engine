@@ -32,14 +32,14 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelCache;
-	import com.voxelengine.worldmodel.models.PersistanceObject;
+	import com.voxelengine.worldmodel.models.PersistenceObject;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	
 	/**
 	 * ...
 	 * @author Bob
 	 */
-	public class Region extends PersistanceObject {
+	public class Region extends PersistenceObject {
 		
 		
 		static public var _s_currentRegion:Region;

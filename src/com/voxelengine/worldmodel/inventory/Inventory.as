@@ -17,12 +17,12 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.*;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.models.PersistanceObject;
+import com.voxelengine.worldmodel.models.PersistenceObject;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 
-public class Inventory extends PersistanceObject
+public class Inventory extends PersistenceObject
 {
 	// support data for persistance
 	private var _generateNewInventory:Boolean;

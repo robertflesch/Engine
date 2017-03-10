@@ -39,7 +39,7 @@ import com.voxelengine.worldmodel.models.makers.ModelLibrary;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
-public class ModelInfo extends PersistanceObject
+public class ModelInfo extends PersistenceObject
 {
 	public function get animationInfo():Object						{ return dbo.animations; }
 	

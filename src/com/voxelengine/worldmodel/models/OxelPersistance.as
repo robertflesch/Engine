@@ -41,7 +41,7 @@ import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
  * @author Robert Flesch - RSF
  * OxelPersistance is the persistance wrapper for the oxel level data.
  */
-public class OxelPersistance extends PersistanceObject
+public class OxelPersistance extends PersistenceObject
 {
 	// 1 meter stone cube is reference
 	static private var 	 _aliasInitialized:Boolean				= false; // used to only register class names once

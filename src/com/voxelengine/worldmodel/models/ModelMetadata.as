@@ -36,7 +36,7 @@ import com.voxelengine.events.ModelBaseEvent;
  * @author Robert Flesch - RSF
  * The world model holds the active oxels
  */
-public class ModelMetadata extends PersistanceObject
+public class ModelMetadata extends PersistenceObject
 {
 	private var _permissions:PermissionsModel;
 	private var _thumbnail:BitmapData;

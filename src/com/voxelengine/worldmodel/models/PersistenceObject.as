@@ -21,9 +21,9 @@ import com.voxelengine.events.PersistanceEvent;
 /**
  * ...
  * @author Robert Flesch - RSF
- * PersistanceObject is the byte level representation of the oxel
+ * PersistenceObject is the byte level representation of the oxel
  */
-public class PersistanceObject
+public class PersistenceObject
 {
 	protected var 	_table:String;
 	private var 	_guid:String;
@@ -35,9 +35,9 @@ public class PersistanceObject
 	public function get version():int 							{ return dbo.version; }
 	public function set version( value:int ):void				{ dbo.version = value; }
 
-	public function PersistanceObject( $guid:String, $table:String ) {
+	public function PersistenceObject($guid:String, $table:String ) {
 		if ( null == $guid || "" == $guid )
-			throw new Error( "PersistanceObject - Missing guid in constructor" );
+			throw new Error( "PersistenceObject - Missing guid in constructor" );
 		_guid = $guid;
 		_table = $table;
 	}
@@ -60,7 +60,7 @@ public class PersistanceObject
 	public function get guid():String  { return _guid; }
 	public function set guid(value:String):void	{
 		if ( _guid != value && Globals.isGuid( _guid ) && Globals.isGuid( value ) )
-				Log.out( "PersistanceObject - WHY AM I CHANGING A VALID GUID  _guid: " + _guid + "  newGuid: " + value );
+				Log.out( "PersistenceObject - WHY AM I CHANGING A VALID GUID  _guid: " + _guid + "  newGuid: " + value );
 		_guid = value;
 	}
 	public function get dbo():DatabaseObject { return _dbo; }
@@ -68,14 +68,14 @@ public class PersistanceObject
 	public function get table():String { return _table; }
 	public function get changed():Boolean { return _changed; }
 	public function set changed(value:Boolean):void {
-		//Log.out( "PersistanceObject.Changed value: " + value + "  guid: " + _guid, Log.WARN);
+		//Log.out( "PersistenceObject.Changed value: " + value + "  guid: " + _guid, Log.WARN);
 		_changed = value; }
 	
 	public function get dynamicObj():Boolean { return _dynamicObj; }
 	public function set dynamicObj(value:Boolean):void { _dynamicObj = value; }
 	
 	public function clone( $guid:String ):* {
-		throw new Error( "PersistanceObject.clone - THIS METHOD NEEDS TO BE OVERRIDDEN", Log.ERROR );
+		throw new Error( "PersistenceObject.clone - THIS METHOD NEEDS TO BE OVERRIDDEN", Log.ERROR );
 	}
 	
 	protected function addSaveEvents():void {
@@ -110,7 +110,7 @@ public class PersistanceObject
 		if (!Globals.isGuid(guid)) {
 			if ( Player.DEFAULT_PLAYER == guid)
 				return;
-			Log.out("PersistanceObject.save - NOT Saving INVALID GUID: " + guid + " in table: " + table, Log.WARN);
+			Log.out("PersistenceObject.save - NOT Saving INVALID GUID: " + guid + " in table: " + table, Log.WARN);
 			return;
 		}
 
@@ -130,7 +130,7 @@ public class PersistanceObject
 			return;
 		if ( $pe.dbo && guid == $pe.guid ) {
 			removeSaveEvents();
-			Log.out(getQualifiedClassName( this ) + ".PersistanceObject.saveSucceed - save: " + guid + " in table: " + $pe.table);
+			Log.out(getQualifiedClassName( this ) + ".PersistenceObject.saveSucceed - save: " + guid + " in table: " + $pe.table);
 		}
 	}	
 	
@@ -143,15 +143,15 @@ public class PersistanceObject
 			// this was causing data to be lost!! So first save data, then copy over dbo, then restore data!
 			_dbo = $pe.dbo;
 			if ( dbo )
-				Log.out( getQualifiedClassName( this ) + ".PersistanceObject.createSuccess - ALT PATH created: " + guid + " in table: " + $pe.table, Log.DEBUG );
+				Log.out( getQualifiedClassName( this ) + ".PersistenceObject.createSuccess - ALT PATH created: " + guid + " in table: " + $pe.table, Log.DEBUG );
 			else
-				Log.out(getQualifiedClassName( this ) + ".PersistanceObject.createSuccess - ERROR: " + guid + " in table: " + $pe.table, Log.ERROR);
+				Log.out(getQualifiedClassName( this ) + ".PersistenceObject.createSuccess - ERROR: " + guid + " in table: " + $pe.table, Log.ERROR);
 		}
 		else {
 			if ( !$pe.dbo )
-				Log.out("PersistanceObject.createSucceed NO DBO Object this: " + this, Log.ERROR );
+				Log.out("PersistenceObject.createSucceed NO DBO Object this: " + this, Log.ERROR );
 			//else
-			//	Log.out( getQualifiedClassName( this ) + ".PersistanceObject.createSucceed ---- BUT guid: " + guid + " !=  $pe.dbo.guid: " + $pe.dbo.key, Log.DEBUG );
+			//	Log.out( getQualifiedClassName( this ) + ".PersistenceObject.createSucceed ---- BUT guid: " + guid + " !=  $pe.dbo.guid: " + $pe.dbo.key, Log.DEBUG );
 		}
 	}
 	
@@ -199,7 +199,7 @@ public class PersistanceObject
 		for( var p:String in obj0 ) {
 			if ( null != obj0[ p ]) {
 				dbo[p] = obj0[p];
-				//trace("PersistanceObject.mergeOverwrite " + p, ' : obj0', obj0[p], 'dbo', dbo[p], '-> new value = ', dbo[p]);
+				//trace("PersistenceObject.mergeOverwrite " + p, ' : obj0', obj0[p], 'dbo', dbo[p], '-> new value = ', dbo[p]);
 			}
 		}
 	}
@@ -207,7 +207,7 @@ public class PersistanceObject
 	protected function mergePreferExisting( obj0:Object ):void {
 		for( var p:String in obj0 ) {
 			dbo[ p ] = ( dbo[ p ] != null ) ? dbo[ p ] : obj0[ p ];
-			trace( "PersistanceObject.merge " + p, ' : obj0', obj0[ p ], 'dbo', dbo[ p ], '-> new value = ', dbo[ p ] );
+			trace( "PersistenceObject.merge " + p, ' : obj0', obj0[ p ], 'dbo', dbo[ p ], '-> new value = ', dbo[ p ] );
 		}
 	}
 

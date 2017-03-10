@@ -18,14 +18,14 @@ import playerio.DatabaseObject;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.models.PersistanceObject;
+import com.voxelengine.worldmodel.models.PersistenceObject;
 
 /**
  * ...
  * @author Robert Flesch - RSF 
  * 
  */
-public class Animation extends PersistanceObject
+public class Animation extends PersistenceObject
 {
 	static private const ANIMATION_STATE:String = "state";
 	static private const ANIMATION_ACTION:String = "action";

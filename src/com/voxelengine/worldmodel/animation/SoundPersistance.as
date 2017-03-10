@@ -14,7 +14,7 @@ import playerio.DatabaseObject
 import com.voxelengine.Log
 import com.voxelengine.Globals
 import com.voxelengine.events.PersistanceEvent
-import com.voxelengine.worldmodel.models.PersistanceObject
+import com.voxelengine.worldmodel.models.PersistenceObject
 import com.voxelengine.events.SoundEvent
 import com.voxelengine.events.ModelBaseEvent
 
@@ -24,7 +24,7 @@ import com.voxelengine.events.ModelBaseEvent
  * @author Robert Flesch - RSF
  * SoundPersistance is the persistance wrapper for the sound data.
  */
-public class SoundPersistance extends PersistanceObject
+public class SoundPersistance extends PersistenceObject
 {
 	private var _sound:Sound = new Sound();
 	private var _loaded:Boolean;
