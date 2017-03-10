@@ -8,7 +8,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.events
 {
 import flash.events.Event;
-import flash.events.EventDispatcher;
 
 /**
  * ...
@@ -36,7 +35,7 @@ public class ModelBaseEvent extends Event
 	static public const REQUEST_FAILED:String				= "REQUEST_FAILED";
 	static public const IMPORT_COMPLETE:String				= "IMPORT_COMPLETE";
 
-	// New sequesnce to see if data exists already, used by generation system
+	// New sequence to see if data exists already, used by generation system
 	static public const EXISTS_REQUEST:String				= "EXISTS_REQUEST";
 	static public const EXISTS:String						= "EXISTS";
 	static public const EXISTS_FAILED:String				= "EXISTS_FAILED";
@@ -49,8 +48,7 @@ public class ModelBaseEvent extends Event
 	static public const SAVE:String							= "SAVE";
 	static public const UPDATE:String						= "UPDATE";
 	static public const UPDATE_GUID:String					= "UPDATE_GUID";
-	static public const SAVE_FAILED:String					= "SAVE_FAILED";
-	
+
 	static public const DELETE:String						= "DELETE";
 
 	static public const GENERATION:String					= "GENERATION";

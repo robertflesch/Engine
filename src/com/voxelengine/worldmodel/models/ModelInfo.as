@@ -65,14 +65,14 @@ public class ModelInfo extends PersistanceObject
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// overrideable in instanceInfo
 	// how to link this to instance info, when this is shared object???
-	public function get grainSize():int								{
-		if ( oxelPersistance && oxelPersistance.oxelCount )
-			return oxelPersistance.oxel.gc.grain;
-		else 
-			return dbo.grainSize ? dbo.grainSize : 4;
-	}
-	public function set grainSize(val:int):void						{ dbo.grainSize = val; }
-	
+//	public function get grainSize():int								{
+//		if ( oxelPersistance && oxelPersistance.oxelCount )
+//			return oxelPersistance.oxel.gc.grain;
+//		else
+//			return dbo.grainSize ? dbo.grainSize : 4;
+//	}
+//	public function set grainSize(val:int):void						{ dbo.grainSize = val; }
+//
 	public function get baseLightLevel():uint 						{ return dbo.baseLightLevel; }
 	public function set baseLightLevel(val:uint):void 				{ dbo.baseLightLevel = val; changed = true; }
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -208,8 +208,6 @@ public class ModelInfo extends PersistanceObject
 			//Log.out( "ModelInfo.retrievedData - set baseLightLevel: " + baseLightLevel);
 		}
 		oxelPersistance.baseLightLevel = baseLightLevel;
-		if ( grainSize )
-			oxelPersistance.bound = grainSize;
 
 		const priority:int = 5;
 		if (oxelPersistance && 0 == oxelPersistance.oxelCount)
@@ -653,7 +651,6 @@ public class ModelInfo extends PersistanceObject
 		} else
 			return;
 
-		dbo.grainSize =  grainSize;
 		if ( null != associatedGrain )
 			dbo.associatedGrain = associatedGrain;
 		

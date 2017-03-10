@@ -7,14 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.voxelengine.events.InventoryEvent;
-import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.worldmodel.models.makers.ModelDestroyer;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.utils.Dictionary;
-import playerio.DatabaseObject;
-
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -22,46 +15,40 @@ import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.utils.StringUtils;
+import com.voxelengine.worldmodel.models.makers.ModelDestroyer;
 
-/**
- * ...
- * @author Bob
- */
 public class ModelInfoCache
 {
-	// this only loaded ModelInfo from the local files system.
-	// for the online system this information is embedded in the oxelPersistance segment.
 	static private var _modelInfo:Dictionary = new Dictionary(false);
 	static private var _block:Block = new Block();
 	
+	// This is required to be public.
 	public function ModelInfoCache() {}
 	
 	static public function init():void {
-		ModelInfoEvent.addListener( ModelBaseEvent.EXISTS_REQUEST, 		checkIfExists );
+		// These are the requests that are handled
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST, 			request );
-		ModelInfoEvent.addListener( ModelBaseEvent.DELETE, 				deleteHandler );
-		ModelInfoEvent.addListener( ModelBaseEvent.GENERATION, 			generated );
+		ModelInfoEvent.addListener( ModelBaseEvent.EXISTS_REQUEST, 		checkIfExists );
 		ModelInfoEvent.addListener( ModelBaseEvent.SAVE, 				save );
+		ModelInfoEvent.addListener( ModelBaseEvent.DELETE, 				deleteHandler );
 		ModelInfoEvent.addListener( ModelInfoEvent.DELETE_RECURSIVE, 	deleteRecursive );
+		ModelInfoEvent.addListener( ModelBaseEvent.GENERATION, 			generated );
 		ModelInfoEvent.addListener( ModelBaseEvent.UPDATE_GUID, 		updateGuid );
 		ModelInfoEvent.addListener( ModelBaseEvent.UPDATE, 				update );
 
+		// These are the events at the persistence layer
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
 		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );
-		//PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createdHandler );
-	}
-	
-	static private function save(e:ModelInfoEvent):void {
-		for each ( var modelInfo:ModelInfo in _modelInfo )
-			if ( modelInfo )
-				modelInfo.save();
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  ModelInfoEvent
+	//  ModelInfoEvents
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	static private function request( $mie:ModelInfoEvent ):void {
 		if ( null == $mie || null == $mie.modelGuid ) { // Validator
@@ -87,6 +74,12 @@ public class ModelInfoCache
 					Log.out("ModelInfoCache.request ModelInfoEvent is NULL: ", Log.WARN);
 			}
 		}
+	}
+
+	static private function save(e:ModelInfoEvent):void {
+		for each ( var modelInfo:ModelInfo in _modelInfo )
+			if ( modelInfo )
+				modelInfo.save();
 	}
 
 	static private function checkIfExists( $mie:ModelInfoEvent ):void {
@@ -154,13 +147,6 @@ public class ModelInfoCache
 		}
 	}
 
-
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  ModelInfoEvent
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  Persistance Events
-	/////////////////////////////////////////////////////////////////////////////////////////////
 	static private function updateGuid( $ode:ModelInfoEvent ):void {
 		var guidArray:Array = $ode.modelGuid.split( ":" );
 		var oldGuid:String = guidArray[0];
@@ -175,20 +161,9 @@ public class ModelInfoCache
 		}
 	}
 
-	// Just assign the dbo from the create to the region
-	static private function createdHandler( $pe:PersistanceEvent ):void {
-		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table )
-			return;
-		
-		//Log.out( "ModelInfoCache.createdHandler: " + $pe.guid );
-		// check for duplicates
-		var mi:ModelInfo = _modelInfo[$pe.guid]; 
-//		if ( mi )
-//			mi.fromObject( $pe.dbo )
-//		else
-//			Log.out( "ModelInfoCache.createdHandler: ERROR modelInfo not found for returned guid: " + $pe.guid, Log.WARN );
-	}
-
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//  ModelInfoEvent
+	/////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  Internal Methods
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -206,13 +181,16 @@ public class ModelInfoCache
 		}
 	}
 
+	/////////////////////////////////////////////////////////////////////////////////////////////
+	//  Persistence Events
+	/////////////////////////////////////////////////////////////////////////////////////////////
 	static private function loadSucceed( $pe:PersistanceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
 
 		var mi:ModelInfo = _modelInfo[$pe.guid];
 		if ( null != mi ) {
-			// we already have it, publishing this results in dulicate items being sent to inventory window.
+			// we already have it, publishing this results in duplicate items being sent to inventory window.
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, mi ) );
 			Log.out( "ModelInfoCache.loadSucceed - attempting to load duplicate ModelInfo guid: " + $pe.guid, Log.WARN );
 			return;
@@ -222,7 +200,6 @@ public class ModelInfoCache
 			mi = new ModelInfo( $pe.guid, $pe.dbo, null );
 			add( $pe.series, mi );
 		} else if ( $pe.data ) {
-			// need to check we don't have this info already
 			var fileData:String = String( $pe.data );
 			fileData = StringUtils.trim(fileData);
 			var newObjData:Object = JSONUtil.parse( fileData, $pe.guid + $pe.table, "ModelInfoCache.loadSucceed" );
@@ -247,7 +224,6 @@ public class ModelInfoCache
 		}
 	}
 
-
 	static private function loadFailed( $pe:PersistanceEvent ):void {
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
@@ -267,7 +243,7 @@ public class ModelInfoCache
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  End - Persistance Events
+	//  End - Persistence Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
 }
 }

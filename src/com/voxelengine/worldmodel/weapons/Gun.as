@@ -48,8 +48,8 @@ public class Gun extends ControllableVoxelModel
 	
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
-		if ( $mi.grainSize ) {
-			var centerLoc:int = 2 << ( $mi.grainSize - 2);
+		if ( $mi.oxelPersistance && $mi.oxelPersistance.bound ) {
+			var centerLoc:int = 2 << ( $mi.oxelPersistance.bound - 2);
 			calculateCenter( centerLoc );
 		}
 		

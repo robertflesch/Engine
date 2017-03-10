@@ -19,8 +19,6 @@ import flash.utils.getTimer;
 
 import playerio.DatabaseObject;
 
-import com.adobe.utils.Hex;
-
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LevelOfDetailEvent;
@@ -279,7 +277,10 @@ public class OxelPersistance extends PersistanceObject
 		type 	= "ivm";
 		version = Globals.VERSION;
 		ba		= toByteArray();
-		bound	= oxel.gc.bound;
+		if (oxel && oxel.gc )
+			bound	= oxel.gc.bound;
+		else
+			bound = 4;
 
 		function zeroPad(number:int, width:int):String {
 			var ret:String = ""+number;

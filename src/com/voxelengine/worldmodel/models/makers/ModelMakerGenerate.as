@@ -106,9 +106,9 @@ public class ModelMakerGenerate extends ModelMakerBase {
 
 		// Bypass the setter so that we dont set it to changed
 		if ( _type )
-			_modelMetadata.name = _name + TypeInfo.name( _type ) + "-" + modelInfo.grainSize + "-" + _name;
+			_modelMetadata.name = _name + TypeInfo.name( _type ) + "-" + _name;
 		else
-			_modelMetadata.name = _name + "-" + modelInfo.grainSize;
+			_modelMetadata.name = _name;
 		_modelMetadata.description = _name + "- GENERATED";
 		_modelMetadata.owner = Network.userId;
 	}
