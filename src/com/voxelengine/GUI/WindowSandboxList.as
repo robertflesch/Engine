@@ -9,8 +9,8 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.PersistanceEvent;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.VVWindowEvent;
 import com.voxelengine.renderer.Renderer;
 

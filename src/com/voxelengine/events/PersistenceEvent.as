@@ -16,7 +16,7 @@ import playerio.DatabaseObject;
  * ...
  * @author Robert Flesch - RSF 
  */
-public class PersistanceEvent extends Event
+public class PersistenceEvent extends Event
 {
 	static public const LOAD_REQUEST:String  	= "LOAD_REQUEST";
 	static public const LOAD_REQUEST_TYPE:String = "LOAD_REQUEST_TYPE";
@@ -53,7 +53,7 @@ public class PersistanceEvent extends Event
 	public function get table():String  { return _table; }
 	public function get format():String { return _format;}
 
-	public function PersistanceEvent( $type:String, $series:int, $table:String, $guid:String, $dbo:DatabaseObject = null, $data:* = null, $format:String = URLLoaderDataFormat.TEXT, $other:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function PersistenceEvent($type:String, $series:int, $table:String, $guid:String, $dbo:DatabaseObject = null, $data:* = null, $format:String = URLLoaderDataFormat.TEXT, $other:String = "", $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
 		_series = $series;
@@ -67,12 +67,12 @@ public class PersistanceEvent extends Event
 	
 	public override function clone():Event
 	{
-		return new PersistanceEvent(type, series, table, guid, dbo, data, format, other, bubbles, cancelable);
+		return new PersistenceEvent(type, series, table, guid, dbo, data, format, other, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString("PersistanceEvent", "series", "table", "guid", "dbo", "data", "format", "other" );
+		return formatToString("PersistenceEvent", "series", "table", "guid", "dbo", "data", "format", "other" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////
@@ -88,7 +88,7 @@ public class PersistanceEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:PersistanceEvent ) : Boolean {
+	static public function dispatch( $event:PersistenceEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 	

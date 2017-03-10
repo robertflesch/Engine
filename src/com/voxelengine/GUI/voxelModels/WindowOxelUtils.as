@@ -144,16 +144,16 @@ public class WindowOxelUtils extends VVPopup
 	}
 
 	private function generateLODHandler(event:UIMouseEvent):void {
-		//_vm.modelInfo.oxelPersistance.generateLOD();
+		//_vm.modelInfo.oxelPersistence.generateLOD();
 		_vm.generateAllLODs();
 	}
 
 	private function rotateHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.oxelPersistance.oxel.rotateCCW();
+		_vm.modelInfo.oxelPersistence.oxel.rotateCCW();
 	}
 
 	private function centerHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.oxelPersistance.oxel.centerOxel();
+		_vm.modelInfo.oxelPersistence.oxel.centerOxel();
 	}
 	
 	private function breakdownHandler(event:UIMouseEvent):void {
@@ -165,13 +165,13 @@ public class WindowOxelUtils extends VVPopup
 	}
 
 	private function mergeSameHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.oxelPersistance.oxel.mergeAndRebuild()
-		_vm.modelInfo.oxelPersistance.changed = true
+		_vm.modelInfo.oxelPersistence.oxel.mergeAndRebuild()
+		_vm.modelInfo.oxelPersistence.changed = true
 	}
 	
 	private function mergeAirHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.oxelPersistance.oxel.mergeAIRAndRebuild()
-		_vm.modelInfo.oxelPersistance.changed = true
+		_vm.modelInfo.oxelPersistence.oxel.mergeAIRAndRebuild()
+		_vm.modelInfo.oxelPersistence.changed = true
 	}
 	
 	private function decreaseGrainHandler(event:UIMouseEvent):void {
@@ -195,10 +195,10 @@ public class WindowOxelUtils extends VVPopup
 	}
 	
 	private function rebuildModelHandler(event:UIMouseEvent):void {
-		//_vm.modelInfo.oxelPersistance.visitor( Oxel.rebuild, "Oxel.rebuild" );
-		_vm.modelInfo.oxelPersistance.oxel.chunkGet().setDirtyRecursively();
-		_vm.modelInfo.oxelPersistance.oxel.chunkGet().buildFacesRecursively( _vm.modelInfo.guid, _vm, false );
-		_vm.modelInfo.oxelPersistance.oxel.chunkGet().buildQuadsRecursively( _vm.modelInfo.guid, _vm );
+		//_vm.modelInfo.oxelPersistence.visitor( Oxel.rebuild, "Oxel.rebuild" );
+		_vm.modelInfo.oxelPersistence.oxel.chunkGet().setDirtyRecursively();
+		_vm.modelInfo.oxelPersistence.oxel.chunkGet().buildFacesRecursively( _vm.modelInfo.guid, _vm, false );
+		_vm.modelInfo.oxelPersistence.oxel.chunkGet().buildQuadsRecursively( _vm.modelInfo.guid, _vm );
 
 	}
 	

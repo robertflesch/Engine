@@ -84,7 +84,7 @@ public class LightRemove extends LightTask
 
 		var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _guid );
 		if ( vm ) {
-			var lo:Oxel = vm..modelInfo.oxelPersistance.oxel.childFind( _gc );
+			var lo:Oxel = vm..modelInfo.oxelPersistence.oxel.childFind( _gc );
 			if ( LightTask.valid( lo ) ) {
 				lo.lighting.remove( lightID );
 				removeFromNeighbors( lo );

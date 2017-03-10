@@ -19,7 +19,7 @@ import flash.utils.ByteArray;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.utils.StringUtils;
 
 /*
@@ -31,10 +31,10 @@ public class PersistURL
 	static private var _filePath:String;
 
 	static public function addEvents():void {
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_REQUEST, load );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_REQUEST, load );
 	}
 
-	static private function isSupportedTable( $pe:PersistanceEvent ):Boolean {
+	static private function isSupportedTable( $pe:PersistenceEvent ):Boolean {
 		//if ( true == Globals.online )
 		//	return;
 
@@ -59,10 +59,10 @@ public class PersistURL
 		return true;
 	}
 
-	static private function load( $pe:PersistanceEvent ):void {
+	static private function load( $pe:PersistenceEvent ):void {
 		if ( !isSupportedTable( $pe ) ) {
 			//Log.out("PersistURL.load - EXTENSION IS NOT SUPPORTED EXT:" + $pe.table , Log.ERROR );
-			//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
+			//PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
 			return;
 		}
 
@@ -85,18 +85,18 @@ public class PersistURL
 			//Log.out( "PersistURL.loadSuccess - guid: " + $pe.guid + $pe.table, Log.DEBUG );
 			if ( URLLoaderDataFormat.BINARY == $pe.format ) {
 				var ba:ByteArray = event.target.data;
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $pe.guid, null, ba, $pe.format, $pe.other ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $pe.guid, null, ba, $pe.format, $pe.other ) );
 			}
 			else {
 
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $pe.guid, null, StringUtils.trim(event.target.data), $pe.format, $pe.other ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $pe.guid, null, StringUtils.trim(event.target.data), $pe.format, $pe.other ) );
 			}
 		}
 
 		function loadError(event:IOErrorEvent):void {
 			var errorMsg:String = "PersistURL.loadError - event: " + event.toString() + "  filePath: " + _filePath;
 			//Log.out( errorMsg, Log.WARN );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_FAILED, 0, $pe.table, $pe.guid, null, errorMsg, $pe.format, $pe.other ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_FAILED, 0, $pe.table, $pe.guid, null, errorMsg, $pe.format, $pe.other ) );
 		}
 
 		function configureListeners(dispatcher:URLLoader):void {

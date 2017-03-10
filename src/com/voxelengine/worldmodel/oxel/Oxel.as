@@ -21,7 +21,7 @@ import com.voxelengine.Globals;
 import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.events.LightEvent;
 import com.voxelengine.events.ImpactEvent;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.utils.Plane;
 import com.voxelengine.renderer.Quad;
 import com.voxelengine.renderer.Chunk;
@@ -34,7 +34,7 @@ import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.tasks.landscapetasks.TreeGenerator;
 import com.voxelengine.worldmodel.tasks.flowtasks.Flow;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
-import com.voxelengine.worldmodel.models.OxelPersistance;
+import com.voxelengine.worldmodel.models.OxelPersistence;
 
 /**
  * ...
@@ -1936,7 +1936,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 	OXEL_DATA_ADDITIONAL:uint  			    = 0x80000000; // deprecated used if oxel has flow or light data
 	*/
-	public function readOxelData($ba:ByteArray, $op:OxelPersistance ):void {
+	public function readOxelData($ba:ByteArray, $op:OxelPersistence ):void {
 		// Read off 1 bytes, the root size
 		var rootGrainSize:int = $op.bound;
 		gc.grain = gc.bound = rootGrainSize;
@@ -1955,12 +1955,12 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 
 	// Make sense, called from for Makers
-	private function extractVersionInfo( $ba:ByteArray, $op:OxelPersistance ):void {
+	private function extractVersionInfo( $ba:ByteArray, $op:OxelPersistence ):void {
 		$ba.position = 0;
 		// Read off first 3 bytes, the data format
 		var format:String = readFormat($ba);
 		if ("ivm" != format)
-			throw new Error("OxelPersistance.extractVersionInfo - Exception - unsupported format: " + format );
+			throw new Error("OxelPersistence.extractVersionInfo - Exception - unsupported format: " + format );
 
 		// Read off next 3 bytes, the data version
 		$op.version = readVersion($ba);
@@ -1970,7 +1970,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 
 		//Log.out( "Oxel.extractVersionInfo - format: " + format + "  version: " + $op.version );
-		//Log.out("OxelPersistance.extractVersionInfo - version: " + $op.version );
+		//Log.out("OxelPersistence.extractVersionInfo - version: " + $op.version );
 
 		// This reads the format info and advances position on byteArray
 		function readFormat($ba:ByteArray):String {
@@ -2008,7 +2008,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return result;
 	}
 
-	public function fromByteArray( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $op:OxelPersistance ):ByteArray {
+	public function fromByteArray( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $op:OxelPersistence ):ByteArray {
 		var faceData:uint = $ba.readUnsignedInt();
 		var typeData:uint = $ba.readUnsignedInt();
 		//Log.out( "fromByteArray " + getTabs($gc.bound - $gc.grain ) + "  data: " + faceData.toString(16));
@@ -3288,7 +3288,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	public static function generateCubeNah( $modelGuid:String, $layer:LayerInfo, $generateEvent:Boolean = true ):ByteArray {
 		var ba:ByteArray = COMPRESSED_REFERENCE_BA_SQUARE;
 		if ( $generateEvent )
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
 		return ba;
 	}
 
@@ -3330,8 +3330,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 //			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
 		//Log.out( "GenerateCube finished modelGuid: " + $modelGuid );
 		if ( $generateEvent )
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
-		//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
+		//PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
 		return ba;
 	}
 

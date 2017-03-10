@@ -178,8 +178,8 @@ public class ControllableVoxelModel extends VoxelModel
 	protected function collisionPointsAdd():void {
 		// TO DO Should define this in meta data??? RSF or using extents?
 		
-		if ( modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxelCount ) {
-			var oxel:Oxel = modelInfo.oxelPersistance.oxel;
+		if ( modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount ) {
+			var oxel:Oxel = modelInfo.oxelPersistence.oxel;
 			var sizeOxel:Number = oxel.gc.size() / 2;
 			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, 0 ) ) );
 			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel, sizeOxel*2 ) ) );
@@ -189,7 +189,7 @@ public class ControllableVoxelModel extends VoxelModel
 			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel*2, sizeOxel ) ) );
 		}
 		else
-			Log.out( "ControlableVoxelModel.collisionPointsAdd - modelInfo.oxelPersistance.oxel not found for guid: " + modelInfo.guid, Log.WARN );
+			Log.out( "ControlableVoxelModel.collisionPointsAdd - modelInfo.oxelPersistence.oxel not found for guid: " + modelInfo.guid, Log.WARN );
 		
 	}
 

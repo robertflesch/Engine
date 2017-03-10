@@ -122,7 +122,7 @@ public class AnimationSound
 	}
 	
 				
-	// FROM Persistance
+	// FROM Persistence
 	
 	public function play( $owner:VoxelModel, $val:Number ):void
 	{

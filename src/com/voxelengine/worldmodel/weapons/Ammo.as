@@ -20,7 +20,7 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.worldmodel.SoundCache;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.SoundEvent;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.PersistenceObject;
@@ -116,10 +116,10 @@ public class Ammo extends PersistenceObject
 		super.assignNewDatabaseObject();
 		setToDefault();
 
-//		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createdHandler );
-//		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, endSaving )
-//		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, endSaving )
-//		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, endSaving )
+//		PersistenceEvent.addListener( PersistenceEvent.CREATE_SUCCEED, 	createdHandler );
+//		PersistenceEvent.addListener( PersistenceEvent.SAVE_SUCCEED, endSaving )
+//		PersistenceEvent.addListener( PersistenceEvent.CREATE_FAILED, endSaving )
+//		PersistenceEvent.addListener( PersistenceEvent.SAVE_FAILED, endSaving )
 
 		function setToDefault():void {
 			dbo.name = "Blank";
@@ -196,7 +196,7 @@ public class Ammo extends PersistenceObject
 	}
 	
 	////////////////////////////////////////////////////////////////
-	// FROM Persistance
+	// FROM Persistence
 	////////////////////////////////////////////////////////////////
 	override protected function toObject():void {
 		Log.out( "Ammo.toObject guid: " + guid, Log.DEBUG );
@@ -262,13 +262,13 @@ public class Ammo extends PersistenceObject
 	}
 
 	// Just assign the dbo from the create to the region
-	private function createdHandler( $pe:PersistanceEvent ):void {
+	private function createdHandler( $pe:PersistenceEvent ):void {
 		if ( Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return
 		if ( guid != $pe.guid )
 			return
 		
-		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, 	createdHandler ); 			
+		PersistenceEvent.removeListener( PersistenceEvent.CREATE_SUCCEED, 	createdHandler );
 		// update the dbo with the saved version
 //		var oldInfo:Object = info
 		dbo = $pe.dbo
@@ -277,7 +277,7 @@ public class Ammo extends PersistenceObject
 		saving = false;
 	}	
 	
-	private function endSaving( $pe:PersistanceEvent ):void {
+	private function endSaving( $pe:PersistenceEvent ):void {
 		if ( Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return
 		if ( guid != $pe.guid )

@@ -9,7 +9,7 @@
 package com.voxelengine.GUI 
 {
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.PermissionsModel;
 import com.voxelengine.worldmodel.animation.AnimationCache;

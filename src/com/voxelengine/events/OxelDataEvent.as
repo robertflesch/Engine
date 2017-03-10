@@ -11,7 +11,7 @@ import flash.events.Event;
 import flash.utils.ByteArray;
 import flash.events.EventDispatcher;
 
-import com.voxelengine.worldmodel.models.OxelPersistance;
+import com.voxelengine.worldmodel.models.OxelPersistence;
 /**
  * ...
  * @author Robert Flesch - RSF 
@@ -21,15 +21,15 @@ public class OxelDataEvent extends ModelBaseEvent
 	static public const OXEL_READY:String					= "OXEL_READY";
 	static public const OXEL_FAILED:String					= "OXEL_FAILED";
 
-	private var _od:OxelPersistance;
+	private var _od:OxelPersistence;
 	private var _modelGuid:String;
 	private var _fromTables:Boolean;
 
-	public function get oxelData():OxelPersistance { return _od; }
+	public function get oxelData():OxelPersistence { return _od; }
 	public function get modelGuid():String  { return _modelGuid; }
 	public function get fromTables():Boolean  { return _fromTables; }
 	
-	public function OxelDataEvent( $type:String, $series:int, $guid:String, $vmd:OxelPersistance, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function OxelDataEvent($type:String, $series:int, $guid:String, $vmd:OxelPersistence, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $series, $bubbles, $cancellable );
 		_od = $vmd;
@@ -58,7 +58,7 @@ public class OxelDataEvent extends ModelBaseEvent
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function create( $type:String, $series:int, $guid:String, $vmd:OxelPersistance, $fromTable:Boolean = true ) : Boolean {
+	static public function create($type:String, $series:int, $guid:String, $vmd:OxelPersistence, $fromTable:Boolean = true ) : Boolean {
 		return _eventDispatcher.dispatchEvent( new OxelDataEvent( $type, $series, $guid, $vmd, $fromTable ) );
 	}
 	///////////////// Event handler interface /////////////////////////////

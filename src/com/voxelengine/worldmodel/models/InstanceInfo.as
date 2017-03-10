@@ -463,7 +463,7 @@ public class InstanceInfo extends Location	{
 			}
 			index++;	
 		}
-		// due to the back door way I access the oxelPersistance, I have to force a matrix update here.
+		// due to the back door way I access the oxelPersistence, I have to force a matrix update here.
 		if ( 0 < index )
 			recalculateMatrix( true );
 		return false;

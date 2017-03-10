@@ -20,7 +20,7 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.GUI.*;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region;

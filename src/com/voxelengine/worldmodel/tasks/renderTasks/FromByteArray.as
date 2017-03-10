@@ -16,7 +16,7 @@ import com.voxelengine.Globals
 import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.worldmodel.models.OxelPersistance;
+import com.voxelengine.worldmodel.models.OxelPersistence;
 
 import flash.utils.getTimer;
 
@@ -27,15 +27,15 @@ import flash.utils.getTimer;
 public class FromByteArray extends AbstractTask 
 {	
 	private var	_guid:String;
-	private var	_op:OxelPersistance;
+	private var	_op:OxelPersistence;
 
-	static public function addTask( $guid:String, $taskPriority:int, $parent:OxelPersistance ): void {
+	static public function addTask( $guid:String, $taskPriority:int, $parent:OxelPersistence ): void {
 		Log.out( "FromByteArray.addTask: guid: " + $guid + "  taskPriority: " + $taskPriority + "  op: " + $parent, Log.WARN );
 		var fba:FromByteArray = new FromByteArray( $guid, $taskPriority, $parent );
 		Globals.g_landscapeTaskController.addTask( fba )
 	}
 	
-	public function FromByteArray( $guid:String, $taskPriority:int, $parent:OxelPersistance ):void {
+	public function FromByteArray( $guid:String, $taskPriority:int, $parent:OxelPersistence ):void {
 		_guid = $guid;
 		_op = $parent;
 		super("FromByteArray", $taskPriority );

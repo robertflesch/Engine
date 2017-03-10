@@ -9,7 +9,7 @@ package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.models.OxelPersistance;
+import com.voxelengine.worldmodel.models.OxelPersistence;
 import com.voxelengine.worldmodel.oxel.Lighting;
 
 import flash.utils.ByteArray;
@@ -21,13 +21,13 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 
 /**
  * ...
  * @author Bob
  */
-public class OxelPersistanceCache
+public class OxelPersistenceCache
 {
 	// this acts as a holding spot for all model objects loaded from persistance
 	// dont use weak keys since this is THE spot that holds things.
@@ -35,7 +35,7 @@ public class OxelPersistanceCache
 	static private var _oxelDataDic:Dictionary = new Dictionary(false);
 	static private var _block:Block = new Block();
 	
-	public function OxelPersistanceCache() {}
+	public function OxelPersistenceCache() {}
 	
 	static public function init():void {
 		// These are the events that this object listens for.
@@ -45,19 +45,19 @@ public class OxelPersistanceCache
 		OxelDataEvent.addListener( ModelBaseEvent.UPDATE_GUID, 			updateGuid );
 		OxelDataEvent.addListener( ModelBaseEvent.SAVE, 				save );
 		
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.GENERATE_SUCCEED,generateSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
+		PersistenceEvent.addListener( PersistenceEvent.GENERATE_SUCCEED,generateSucceed );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, 	loadNotFound );
 	}
 
 	static private function save(e:OxelDataEvent):void {
-		for each ( var op:OxelPersistance in _oxelDataDic )
+		for each ( var op:OxelPersistence in _oxelDataDic )
 			if ( op )
 				op.save();
 	}
 
-	static private function add( $series:int, $od:OxelPersistance ):void { 
+	static private function add( $series:int, $od:OxelPersistence ):void {
 		if ( null == $od || null == $od.guid ) {
 			Log.out( "OxelDataCache.Add trying to add NULL OxelData or guid", Log.WARN );
 		} else if ( null == _oxelDataDic[$od.guid] ) { // check to make sure this is new data
@@ -68,7 +68,7 @@ public class OxelPersistanceCache
 			_loadingCount--;
 			OxelDataEvent.create( ModelBaseEvent.ADDED, $series, $od.guid, $od );
 			if ( 0 == _loadingCount ) {
-				//Log.out( "OxelPersistanceCache.add - done loading oxels: " + $od.guid, Log.WARN );
+				//Log.out( "OxelPersistenceCache.add - done loading oxels: " + $od.guid, Log.WARN );
 				// So does the loading of the VoxelModel or oxel complete region?
 				//RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
 			}
@@ -82,9 +82,9 @@ public class OxelPersistanceCache
 		var guidArray:Array = $ode.modelGuid.split( ":" );
 		var oldGuid:String = guidArray[0];
 		var newGuid:String = guidArray[1];
-		var oxelData:OxelPersistance = _oxelDataDic[oldGuid];
+		var oxelData:OxelPersistence = _oxelDataDic[oldGuid];
 		if ( null == oxelData ) {
-			Log.out( "OxelPersistanceCache.updateGuid - guid not found: " + oldGuid, Log.ERROR );
+			Log.out( "OxelPersistenceCache.updateGuid - guid not found: " + oldGuid, Log.ERROR );
 			return; }
 		else {
 			_oxelDataDic[oldGuid] = null;
@@ -99,7 +99,7 @@ public class OxelPersistanceCache
 		}
 		
 		//Log.out( "OxelDataCache.request guid: " + $ode.modelGuid, Log.DEBUG );
-		var od:OxelPersistance = _oxelDataDic[$ode.modelGuid]; 
+		var od:OxelPersistence = _oxelDataDic[$ode.modelGuid];
 		if ( null == od ) {
 			if ( _block.has( $ode.modelGuid ) )	
 				return;
@@ -107,9 +107,9 @@ public class OxelPersistanceCache
 				
 			_loadingCount++;
 			if ( true == Globals.online && $ode.fromTables )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ode.series, Globals.BIGDB_TABLE_OXEL_DATA, $ode.modelGuid ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ode.series, Globals.BIGDB_TABLE_OXEL_DATA, $ode.modelGuid ) );
 			else	
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ode.series, Globals.IVM_EXT, $ode.modelGuid, null, null, URLLoaderDataFormat.BINARY ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ode.series, Globals.IVM_EXT, $ode.modelGuid, null, null, URLLoaderDataFormat.BINARY ) );
 		}
 		else
 			OxelDataEvent.create( ModelBaseEvent.RESULT, $ode.series, $ode.modelGuid, od );
@@ -121,38 +121,38 @@ public class OxelPersistanceCache
 	
 	static private function deleteHandler( $ode:OxelDataEvent ):void {
 		//Log.out( "OxelDataCache.deleteHandler $ode: " + $ode, Log.WARN );
-		var od:OxelPersistance = _oxelDataDic[$ode.modelGuid];
+		var od:OxelPersistence = _oxelDataDic[$ode.modelGuid];
 		if ( null != od ) {
 			_oxelDataDic[$ode.modelGuid] = null; 
 			// TODO need to clean up eventually
 			od = null;
 		}
-		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $ode.series, Globals.BIGDB_TABLE_OXEL_DATA, $ode.modelGuid, null ) );
+		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, $ode.series, Globals.BIGDB_TABLE_OXEL_DATA, $ode.modelGuid, null ) );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End - OxelDataEvents
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  Persistance Events
+	//  Persistence Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	static private function loadSucceed( $pe:PersistanceEvent):void {
+	static private function loadSucceed( $pe:PersistenceEvent):void {
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
 
-		var op:OxelPersistance = _oxelDataDic[$pe.guid];
+		var op:OxelPersistence = _oxelDataDic[$pe.guid];
 		if ( null != op ) {
 			// we already have it, publishing this results in dulicate items being sent to inventory window.
 			OxelDataEvent.create( ModelBaseEvent.ADDED, $pe.series, $pe.guid, op );
-			Log.out( "OxelPersistanceCache.loadSucceed - attempting to load duplicate OxelPersistance guid: " + $pe.guid, Log.WARN );
+			Log.out( "OxelPersistenceCache.loadSucceed - attempting to load duplicate OxelPersistence guid: " + $pe.guid, Log.WARN );
 			return;
 		}
 
 		if ( $pe.dbo ) {
-			op = new OxelPersistance( $pe.guid, $pe.dbo, null );
+			op = new OxelPersistence( $pe.guid, $pe.dbo, null );
 			add( $pe.series, op );
 		} else if ( $pe.data ) {
-			op = new OxelPersistance( $pe.guid, null, $pe.data as ByteArray );
+			op = new OxelPersistence( $pe.guid, null, $pe.data as ByteArray );
 			add( $pe.series, op );
 		} else {
 			Log.out( "OxelDataCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.WARN );
@@ -161,15 +161,15 @@ public class OxelPersistanceCache
 	}
 
 	// This is the same as load succeed.
-	static private function generateSucceed( $pe:PersistanceEvent):void {
+	static private function generateSucceed( $pe:PersistenceEvent):void {
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
-		var od:OxelPersistance = new OxelPersistance( $pe.guid, null, $pe.data, true );
+		var od:OxelPersistence = new OxelPersistence( $pe.guid, null, $pe.data, true );
 		add( $pe.series, od );
 		Log.out( "OxelDataCache.generateSucceed " + $pe.toString(), Log.INFO );
 	}
 
-	static private function loadFailed( $pe:PersistanceEvent ):void {
+	static private function loadFailed( $pe:PersistenceEvent ):void {
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
 		//Log.out( "OxelDataCache.loadFailed " + $pe.toString(), Log.WARN );
@@ -178,7 +178,7 @@ public class OxelPersistanceCache
 		OxelDataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 	}
 	
-	static private function loadNotFound( $pe:PersistanceEvent):void  {
+	static private function loadNotFound( $pe:PersistenceEvent):void  {
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
 		//Log.out( "OxelDataCache.loadNotFound " + $pe.toString(), Log.WARN );
@@ -188,7 +188,7 @@ public class OxelPersistanceCache
 		OxelDataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  End - Persistance Events
+	//  End - Persistence Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
 }
 }

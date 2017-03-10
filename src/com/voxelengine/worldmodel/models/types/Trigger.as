@@ -42,7 +42,7 @@ public class Trigger extends VoxelModel
 	override public function update(context:Context3D, elapsedTimeMS:int):void {
 		super.update(context, elapsedTimeMS);
 		
-		if ( !VoxelModel.controlledModel || !modelInfo.oxelPersistance || 0 == modelInfo.oxelPersistance.oxelCount )
+		if ( !VoxelModel.controlledModel || !modelInfo.oxelPersistence || 0 == modelInfo.oxelPersistence.oxelCount )
 			return;
 			
 		var wsPositionCenter:Vector3D = VoxelModel.controlledModel.instanceInfo.worldSpaceMatrix.transformVector( VoxelModel.controlledModel.instanceInfo.center );
@@ -56,7 +56,7 @@ public class Trigger extends VoxelModel
 		else
 			msPos = worldToModel( wsPositionCenter );
 
-		var ox:Oxel = modelInfo.oxelPersistance.oxel;
+		var ox:Oxel = modelInfo.oxelPersistence.oxel;
 		var gct:GrainCursor = GrainCursorPool.poolGet( ox.gc.bound );
 		gct.getGrainFromVector( msPos, 0 );
 		if ( gct.is_inside( ox.gc ) ) {

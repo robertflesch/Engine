@@ -17,7 +17,7 @@ import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 /**
  * ...
  * @author Robert Flesch - RSF
@@ -80,18 +80,18 @@ public class PersistenceObject
 	
 	protected function addSaveEvents():void {
 		//Log.out( getQualifiedClassName( this ) + ".addSaveEvents - guid: " + guid, Log.DEBUG );
-		PersistanceEvent.addListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.CREATE_FAILED, 	createFailed );
-		PersistanceEvent.addListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.SAVE_FAILED, 	saveFail );
+		PersistenceEvent.addListener( PersistenceEvent.CREATE_SUCCEED, 	createSucceed );
+		PersistenceEvent.addListener( PersistenceEvent.CREATE_FAILED, 	createFailed );
+		PersistenceEvent.addListener( PersistenceEvent.SAVE_SUCCEED, 	saveSucceed );
+		PersistenceEvent.addListener( PersistenceEvent.SAVE_FAILED, 	saveFail );
 	}
 	
 	protected function removeSaveEvents():void {
 		//Log.out( getQualifiedClassName( this ) + ".removeSaveEvents - guid: " + guid, Log.DEBUG );
-		PersistanceEvent.removeListener( PersistanceEvent.CREATE_SUCCEED, 	createSucceed );
-		PersistanceEvent.removeListener( PersistanceEvent.CREATE_FAILED, 	createFailed );
-		PersistanceEvent.removeListener( PersistanceEvent.SAVE_SUCCEED, 	saveSucceed );
-		PersistanceEvent.removeListener( PersistanceEvent.SAVE_FAILED, 		saveFail );
+		PersistenceEvent.removeListener( PersistenceEvent.CREATE_SUCCEED, 	createSucceed );
+		PersistenceEvent.removeListener( PersistenceEvent.CREATE_FAILED, 	createFailed );
+		PersistenceEvent.removeListener( PersistenceEvent.SAVE_SUCCEED, 	saveSucceed );
+		PersistenceEvent.removeListener( PersistenceEvent.SAVE_FAILED, 		saveFail );
 	}
 	
 	protected function toObject():void { }
@@ -122,10 +122,10 @@ public class PersistenceObject
 		if (dbo && dbo.changed)
 			delete dbo.changed;
 
-		PersistanceEvent.dispatch(new PersistanceEvent(PersistanceEvent.SAVE_REQUEST, 0, table, guid, dbo, null));
+		PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.SAVE_REQUEST, 0, table, guid, dbo, null));
 	}
 	
-	private function saveSucceed( $pe:PersistanceEvent ):void { 
+	private function saveSucceed( $pe:PersistenceEvent ):void {
 		if ( _table != $pe.table )
 			return;
 		if ( $pe.dbo && guid == $pe.guid ) {
@@ -134,7 +134,7 @@ public class PersistenceObject
 		}
 	}	
 	
-	private function createSucceed( $pe:PersistanceEvent ):void {
+	private function createSucceed( $pe:PersistenceEvent ):void {
 		if ( _table != $pe.table )
 			return;
 		if ( $pe.dbo && guid == $pe.guid ) {
@@ -155,7 +155,7 @@ public class PersistenceObject
 		}
 	}
 	
-	private function createFailed( $pe:PersistanceEvent ):void  {
+	private function createFailed( $pe:PersistenceEvent ):void  {
 		if ( _table != $pe.table )
 			return;
 		removeSaveEvents();
@@ -164,7 +164,7 @@ public class PersistenceObject
 		
 	}
 	
-	private function saveFail( $pe:PersistanceEvent ):void { 
+	private function saveFail( $pe:PersistenceEvent ):void {
 		if ( _table != $pe.table )
 			return;
 		removeSaveEvents();
@@ -172,26 +172,26 @@ public class PersistenceObject
 	}	
 
 	protected function addLoadEvents():void {
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSuccess );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFailed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, notFound );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, loadSuccess );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, loadFailed );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, notFound );
 	}
 	
 	protected function removeLoadEvents():void {
-		PersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, loadSuccess );
-		PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFailed );
-		PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, notFound );
+		PersistenceEvent.removeListener( PersistenceEvent.LOAD_SUCCEED, loadSuccess );
+		PersistenceEvent.removeListener( PersistenceEvent.LOAD_FAILED, loadFailed );
+		PersistenceEvent.removeListener( PersistenceEvent.LOAD_NOT_FOUND, notFound );
 	}
 
-	protected function notFound($pe:PersistanceEvent):void {
+	protected function notFound($pe:PersistenceEvent):void {
 		throw new Error( getQualifiedClassName( this ) + ".notFound - Must be overridden" );
 	}
 	
-	protected function loadSuccess( $pe:PersistanceEvent ):void {
+	protected function loadSuccess( $pe:PersistenceEvent ):void {
 		throw new Error( getQualifiedClassName( this ) + ".loadSuccess - Must be overridden" );
 	}
 	
-	protected function loadFailed( $pe:PersistanceEvent ):void  {
+	protected function loadFailed( $pe:PersistenceEvent ):void  {
 		throw new Error( getQualifiedClassName( this ) + ".loadFailed - Must be overridden" );
 	}
 

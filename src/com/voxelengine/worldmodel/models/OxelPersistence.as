@@ -39,9 +39,9 @@ import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
 /**
  * ...
  * @author Robert Flesch - RSF
- * OxelPersistance is the persistance wrapper for the oxel level data.
+ * OxelPersistence is the persistance wrapper for the oxel level data.
  */
-public class OxelPersistance extends PersistenceObject
+public class OxelPersistence extends PersistenceObject
 {
 	// 1 meter stone cube is reference
 	static private var 	 _aliasInitialized:Boolean				= false; // used to only register class names once
@@ -77,7 +77,7 @@ public class OxelPersistance extends PersistenceObject
 	public 	function get oxel():Oxel 							{ return _oxels[_lod]; }
 	public 	function get oxelCount():int 						{ return _oxels.length; }
 
-	public function OxelPersistance( $guid:String, $dbo:DatabaseObject, $importedData:ByteArray, $generated:Boolean = false ):void {
+	public function OxelPersistence($guid:String, $dbo:DatabaseObject, $importedData:ByteArray, $generated:Boolean = false ):void {
 		super($guid, Globals.BIGDB_TABLE_OXEL_DATA);
 
 		if (!_aliasInitialized) {
@@ -95,9 +95,9 @@ public class OxelPersistance extends PersistenceObject
 			baseLightLevel = Lighting.defaultBaseLightIllumination;
 		} else {
 			dbo = $dbo;
-			//Log.out( "OxelPersistance: " + guid + "  compressed size: " + dbo.ba.length );
+			//Log.out( "OxelPersistence: " + guid + "  compressed size: " + dbo.ba.length );
 			dbo.ba.uncompress();
-			//Log.out( "OxelPersistance: " + guid + "  UNcompressed size: " + dbo.ba.length );
+			//Log.out( "OxelPersistence: " + guid + "  UNcompressed size: " + dbo.ba.length );
 		}
 
 		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, baseLightLevel );
@@ -114,7 +114,7 @@ public class OxelPersistance extends PersistenceObject
 		try {
 			$importedData.uncompress();
 		} catch (error:Error) {
-			Log.out("OxelPersistance.stripDataFromImport - Was expecting compressed data " + guid, Log.WARN);
+			Log.out("OxelPersistence.stripDataFromImport - Was expecting compressed data " + guid, Log.WARN);
 		}
 
 		try {
@@ -126,7 +126,7 @@ public class OxelPersistance extends PersistenceObject
 				// read off that many bytes, even though we are using the data from the modelInfo file
 				var modelInfoJson:String = $importedData.readUTFBytes(strLen);
 			} else {
-				Log.out("OxelPersistance.stripDataFromImport - REALLY OLD VERSION " + guid, Log.WARN);
+				Log.out("OxelPersistence.stripDataFromImport - REALLY OLD VERSION " + guid, Log.WARN);
 				// need to read off one dummy byte
 				$importedData.readByte();
 				// next byte is root grain size
@@ -151,7 +151,7 @@ public class OxelPersistance extends PersistenceObject
 		// Read off first 3 bytes, the data format
 		type = readFormat($ba);
 		if ("ivm" != type )
-			throw new Error("OxelPersistance.extractVersionInfo - Exception - unsupported format: " + type );
+			throw new Error("OxelPersistence.extractVersionInfo - Exception - unsupported format: " + type );
 
 		// Read off next 3 bytes, the data version
 		version = readVersion($ba);
@@ -212,7 +212,7 @@ public class OxelPersistance extends PersistenceObject
 			topMostChunk.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
 		else
 			topMostChunk.drawNew( $mvp, $vm, $context, $selected, $isChild );
-		//Log.out( "OxelPersistance.draw guid: " + $vm.instanceInfo.instanceGuid + " TOOK: " + (getTimer()-time) );
+		//Log.out( "OxelPersistence.draw guid: " + $vm.instanceInfo.instanceGuid + " TOOK: " + (getTimer()-time) );
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -225,7 +225,7 @@ public class OxelPersistance extends PersistenceObject
 				oxel.quadsBuild();
 			}
 			else {
-				//Log.out( "OxelPersistance.update ------------ calling refreshQuads guid: " + guid, Log.DEBUG );
+				//Log.out( "OxelPersistence.update ------------ calling refreshQuads guid: " + guid, Log.DEBUG );
 				topMostChunk.buildQuadsRecursively( guid, $vm, _initializeFacesAndQuads );
 				if ( _initializeFacesAndQuads )
 					_initializeFacesAndQuads = false
@@ -290,27 +290,27 @@ public class OxelPersistance extends PersistenceObject
 		}
 	}
 				
-	// FROM Persistance
+	// FROM Persistence
 	
 	public function loadFromByteArray():void {
-		//Log.out( "OxelPersistance.lodFromByteArray - guid: " + guid, Log.INFO );
+		//Log.out( "OxelPersistence.lodFromByteArray - guid: " + guid, Log.INFO );
 
 		_oxels[_lod] = Oxel.initializeRoot(bound);
 		oxel.readOxelData(ba, this );
-		//Log.out("OxelPersistance.lodFromByteArray - readOxelData took: " + (getTimer() - time), Log.INFO);
+		//Log.out("OxelPersistence.lodFromByteArray - readOxelData took: " + (getTimer() - time), Log.INFO);
 
 		_statistics.gather();
 
 		_topMostChunks[_lod] = oxel.chunk = Chunk.parse( oxel, null, _lightInfo );
-		//Log.out( "OxelPersistance.lodFromByteArray oxel.chunkGet(): " + oxel.chunkGet() +  "  lod: " + _lod + " _topMostChunks[_lod] " + _topMostChunks[_lod]  );
-		//Log.out( "OxelPersistance.lodFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
+		//Log.out( "OxelPersistence.lodFromByteArray oxel.chunkGet(): " + oxel.chunkGet() +  "  lod: " + _lod + " _topMostChunks[_lod] " + _topMostChunks[_lod]  );
+		//Log.out( "OxelPersistence.lodFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 	}
 
 	public function toByteArray():ByteArray {
 		ba = oxel.toByteArray();
-		Log.out( "OxelPersistance.toByteArray - guid: " + guid + "  Precompressed size: " + ba.length );
+		Log.out( "OxelPersistence.toByteArray - guid: " + guid + "  Precompressed size: " + ba.length );
 		ba.compress();
-		Log.out( "OxelPersistance.toByteArray - guid: " + guid + "  POSTcompressed size: " + ba.length );
+		Log.out( "OxelPersistence.toByteArray - guid: " + guid + "  POSTcompressed size: " + ba.length );
 		return ba;
 	}
 
@@ -402,7 +402,7 @@ public class OxelPersistance extends PersistenceObject
 		// ... continue until max - 2?
 
 		LevelOfDetailEvent.addListener( LevelOfDetailEvent.MODEL_CLONE_COMPLETE, lodCloneCompleteEvent )
-		new OxelCloner( $vm.modelInfo.oxelPersistance );
+		new OxelCloner( $vm.modelInfo.oxelPersistence );
 	}
 
 	private function lodCloneCompleteEvent(event:LevelOfDetailEvent):void {
@@ -410,7 +410,7 @@ public class OxelPersistance extends PersistenceObject
 
 
 		var size:uint = oxel.findSmallest();
-		Log.out( "OxelPersistance.lodCloneCompleteEvent smallest on new oxel: " + size );
+		Log.out( "OxelPersistence.lodCloneCompleteEvent smallest on new oxel: " + size );
 		if ( _oxels[0] && _oxels[0].gc.grain > 4 && size < _oxels[0].gc.grain - 2) {
 			LevelOfDetailEvent.addListener( LevelOfDetailEvent.MODEL_CLONE_COMPLETE, lodCloneCompleteEvent )
 			new OxelCloner( this );
@@ -441,13 +441,13 @@ public class OxelPersistance extends PersistenceObject
 	}
 	*/
 
-	public function cloneNew( $guid:String ):OxelPersistance {
+	public function cloneNew( $guid:String ):OxelPersistence {
 		throw new Error( "REFACTOR = 2.22.17");
 /*
 		// this adds the version header, need for the persistanceEvent
 		var ba:ByteArray = toByteArray( oxel );
 
-		var od:OxelPersistance = new OxelPersistance( $guid, null, ba, Lighting.defaultBaseLightIllumination );
+		var od:OxelPersistence = new OxelPersistence( $guid, null, ba, Lighting.defaultBaseLightIllumination );
 		return od;
 		*/
 		return null;

@@ -13,7 +13,7 @@ import com.voxelengine.GUI.actionBars.WindowBeastControl;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.ConfigManager;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.models.OxelPersistance;
+import com.voxelengine.worldmodel.models.OxelPersistence;
 import com.voxelengine.worldmodel.models.types.Player;
 import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
@@ -407,7 +407,7 @@ public class VoxelVerseGUI extends EventDispatcher
 					// save current oxelData
 					const _fileRef:FileReference = new FileReference();
 					if (VoxelModel.selectedModel) {
-						var ba:ByteArray = OxelPersistance.toByteArray(VoxelModel.selectedModel.modelInfo.oxelPersistance.oxel);
+						var ba:ByteArray = OxelPersistence.toByteArray(VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel);
 						var fileName:String = VoxelModel.selectedModel.metadata.name + "_NEW" + ".ivm";
 						_fileRef.save(ba, fileName);
 					}

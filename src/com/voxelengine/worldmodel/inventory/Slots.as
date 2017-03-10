@@ -89,10 +89,10 @@ public class Slots
 		initializeSlots();
 
 		// is guid model OR instance?
-		// its the MODEL guid, since models have default oxelPersistance, instances have specific oxelPersistance
+		// its the MODEL guid, since models have default oxelPersistence, instances have specific oxelPersistence
 		// so this message is handle by the model class.
 		// might need to be a table driven event also.
-		// so the default oxelPersistance is in the "class inventory" table
+		// so the default oxelPersistence is in the "class inventory" table
 		_owner.loaded = true;
 		InventorySlotEvent.create( InventorySlotEvent.DEFAULT_REQUEST, _owner.guid, _owner.guid, 0, null );
 	}

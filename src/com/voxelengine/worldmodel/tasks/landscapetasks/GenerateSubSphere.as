@@ -8,11 +8,11 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
-	import com.voxelengine.events.PersistanceEvent;
+	import com.voxelengine.events.PersistenceEvent;
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
-	import com.voxelengine.worldmodel.models.OxelPersistance;
+	import com.voxelengine.worldmodel.models.OxelPersistence;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -27,16 +27,16 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	public class GenerateSubSphere extends LandscapeTask 
 	{		
 		static public function script():Object {
-			var model:Object = new Object
-			model.grainSize = 6
-			model.name = "GenerateSubSphere"
-			model.biomes = new Object();
+			var model:Object = {};
+			model.grainSize = 6;
+			model.name = "GenerateSubSphere";
+			model.biomes = {};
 			model.biomes.layers = new Vector.<Object>();
-			model.biomes.layers[0] = new Object();
-			model.biomes.layers[0].functionName = "GenerateSubSphere"
-			model.biomes.layers[0].type = "SAND"
-			model.biomes.layers[0].range = 3
-			model.biomes.layers[0].offset = 7
+			model.biomes.layers[0] = {};
+			model.biomes.layers[0].functionName = "GenerateSubSphere";
+			model.biomes.layers[0].type = "SAND";
+			model.biomes.layers[0].range = 3;
+			model.biomes.layers[0].offset = 7;
 			
 			return model;
 		}
@@ -103,8 +103,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			oxel.facesBuild();
 			throw new Error( "REFACTOR = 2.22.17");
 /*
-			var ba:ByteArray = OxelPersistance.toByteArray( oxel );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba ) );
+			var ba:ByteArray = OxelPersistence.toByteArray( oxel );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba ) );
 */
 			
 			//Log.out( "GenerateSphere.start - completed layer of type: " + (Globals.Info[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));

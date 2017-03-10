@@ -37,7 +37,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		override public function start():void {
 			var timer:int =  getTimer();
-            super.start() // AbstractTask will send event
+            super.start(); // AbstractTask will send event
 
 			Oxel.generateCube( _modelGuid, _layer );
 

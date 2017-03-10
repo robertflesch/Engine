@@ -228,15 +228,15 @@ public class Animation extends PersistenceObject
 		return type;
 	}
 
-	public function fromPersistance( $dbo:DatabaseObject ):void {
-		var ba:ByteArray = _metadata.fromPersistance( $dbo );
+	public function fromPersistence( $dbo:DatabaseObject ):void {
+		var ba:ByteArray = _metadata.fromPersistence( $dbo );
 		ba.position = 0;
 		// how many bytes is the animation
 		var strLen:int = ba.readInt();
 		// read off that many bytes
 		var json:String = ba.readUTFBytes( strLen );
-		Log.out( "Animation.fromPersistance - name: " + metadata.name + "   "  + json );
-		var jsonResult:Object = JSONUtil.parse( json, _metadata.guid, "Animation.fromPersistance" );
+		Log.out( "Animation.fromPersistence - name: " + metadata.name + "   "  + json );
+		var jsonResult:Object = JSONUtil.parse( json, _metadata.guid, "Animation.fromPersistence" );
 		fromJSON( jsonResult );
 	}
 */

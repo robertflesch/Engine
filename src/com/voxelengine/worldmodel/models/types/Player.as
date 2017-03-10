@@ -10,7 +10,7 @@ package com.voxelengine.worldmodel.models.types
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.LoginEvent;
-import com.voxelengine.persistance.Persistance;
+import com.voxelengine.persistance.Persistence;
 import com.voxelengine.worldmodel.RegionManager;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.inventory.ObjectAction;
@@ -46,9 +46,9 @@ public class Player
 
 		function onLogin( $event:LoginEvent ):void {
 			LoginEvent.removeListener( LoginEvent.LOGIN_SUCCESS, onLogin );
-			Log.out( "Player.onLogin - retrieve player info from Persistance", Log.DEBUG );
+			Log.out( "Player.onLogin - retrieve player info from Persistence", Log.DEBUG );
 			// request that the database load the player Object
-			Persistance.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
+			Persistence.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
 		}
 
 		function onRegionLoad( $re:RegionEvent ):void {

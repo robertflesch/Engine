@@ -7,17 +7,17 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers {
 import com.voxelengine.events.LevelOfDetailEvent;
-import com.voxelengine.worldmodel.models.OxelPersistance;
+import com.voxelengine.worldmodel.models.OxelPersistence;
 
 import flash.utils.ByteArray;
 
 public class OxelCloner {
-    public function OxelCloner( $op:OxelPersistance ) {
+    public function OxelCloner( $op:OxelPersistence ) {
 
         throw new Error( "REFACTOR = 2.22.17");
 /*
         // this adds the version header, need for the persistanceEvent
-        var ba:ByteArray = OxelPersistance.toByteArray( $op.oxel );
+        var ba:ByteArray = OxelPersistence.toByteArray( $op.oxel );
         // We want to write the copy into the new lod, and reduce it from there.
         $op.incrementLOD();
         $op.lodFromByteArray( ba );

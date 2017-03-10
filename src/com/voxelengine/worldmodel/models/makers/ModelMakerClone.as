@@ -19,7 +19,7 @@ import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.ModelInfo;
-import com.voxelengine.worldmodel.models.OxelPersistance;
+import com.voxelengine.worldmodel.models.OxelPersistence;
 import com.voxelengine.worldmodel.models.types.VoxelModel
 import com.voxelengine.worldmodel.models.ModelMetadata
 import com.voxelengine.worldmodel.oxel.GrainCursor;
@@ -53,7 +53,7 @@ public class ModelMakerClone extends ModelMakerBase {
 		if ( $killOldModel ) {
 			originalVM.dead = true;
 		} else {
-			var size:int = GrainCursor.two_to_the_g( $vm.modelInfo.oxelPersistance.oxel.gc.grain );
+			var size:int = GrainCursor.two_to_the_g( $vm.modelInfo.oxelPersistence.oxel.gc.grain );
 			var offset:Vector3D = new Vector3D(1,1,1);
 			offset.scaleBy(size);
 			var v:Vector3D = ii.positionGet.clone();
@@ -232,7 +232,7 @@ public class ModelMakerClone extends ModelMakerBase {
 			_vm.complete = true;
 
 			modelInfo.changed = true;
-			modelInfo.oxelPersistance.changed = true;
+			modelInfo.oxelPersistence.changed = true;
 			_modelMetadata.changed = true;
 			_vm.save();
 

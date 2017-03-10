@@ -10,7 +10,7 @@ package com.voxelengine.worldmodel.animation
 import com.voxelengine.events.AnimationEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.server.Network;
@@ -54,7 +54,7 @@ public class AnimationMetadata
 	}
 
 	//////////////////////////////////////////////////////////////////
-	// TO Persistance
+	// TO Persistence
 	//////////////////////////////////////////////////////////////////
 
 	public function toObject( $ba:ByteArray ):Object {

@@ -34,11 +34,11 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			super.start();
 			var timer:int = getTimer();
 			var vm:VoxelModel = getVoxelModel();
-			var size:uint = vm.modelInfo.oxelPersistance.oxel.size_in_world_coordinates();
+			var size:uint = vm.modelInfo.oxelPersistence.oxel.size_in_world_coordinates();
 			var outOf:int = _layer.range;
 			Log.out( "GenerateGrassAndTrees - start - enter: ");					
 			
-			vm.modelInfo.oxelPersistance.oxel.dirtToGrassAndSand();
+			vm.modelInfo.oxelPersistence.oxel.dirtToGrassAndSand();
 			//vm.oxel.growTreesOn( _guid, TypeInfo.DIRT, outOf ? outOf : 2000 );
 			
 			Log.out( "GenerateGrassAndTrees - complete & trees - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) );	

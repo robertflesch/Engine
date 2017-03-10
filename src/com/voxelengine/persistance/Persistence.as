@@ -15,21 +15,21 @@ import playerio.Client;
 import playerio.BigDB;
 import playerio.DatabaseObject;
 
-import com.voxelengine.events.PlayerIOPersistanceEvent
+import com.voxelengine.events.PlayerIOPersistenceEvent
 	
 // This class wraps the bigDB class, registers event handlers, and checks for valid connections
 /* Generates Events
- * 		PersistanceEvent.PERSISTANCE_NO_CLIENT
- * 		PersistanceEvent.PERSISTANCE_NO_DB
+ * 		PersistenceEvent.PERSISTANCE_NO_CLIENT
+ * 		PersistenceEvent.PERSISTANCE_NO_DB
  * 
  * handles Events
  * 		NONE
  * 
  * Classes of events handled
- * 		PersistanceEvent
+ * 		PersistenceEvent
  * */
 
-public class Persistance
+public class Persistence
 {
 	static public function addEventHandlers():void {
 		PersistBigDB.addEvents();
@@ -38,11 +38,11 @@ public class Persistance
 	
 	static private function validateConnection():Boolean {
 		if ( !Network.client ) {
-			PlayerIOPersistanceEvent.dispatch( new PlayerIOPersistanceEvent( PlayerIOPersistanceEvent.PERSISTANCE_NO_CLIENT ) );
+			PlayerIOPersistenceEvent.dispatch( new PlayerIOPersistenceEvent( PlayerIOPersistenceEvent.PERSISTANCE_NO_CLIENT ) );
 			return false;
 		}
 		else if ( !Network.client.bigDB ) {
-			PlayerIOPersistanceEvent.dispatch( new PlayerIOPersistanceEvent( PlayerIOPersistanceEvent.PERSISTANCE_NO_DB ) );
+			PlayerIOPersistenceEvent.dispatch( new PlayerIOPersistenceEvent( PlayerIOPersistenceEvent.PERSISTANCE_NO_DB ) );
 			return false;
 		}
 		return true;

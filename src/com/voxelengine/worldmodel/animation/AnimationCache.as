@@ -18,7 +18,7 @@ import com.voxelengine.Globals;
 import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.events.AnimationEvent;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.utils.StringUtils;
 
 /**
@@ -45,9 +45,9 @@ public class AnimationCache
 		AnimationEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );		
 		AnimationEvent.addListener( ModelBaseEvent.SAVE, 			save );		
 
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, 	loadNotFound );
 	}
 	
 	static private function save(e:AnimationEvent):void {
@@ -74,10 +74,10 @@ public class AnimationCache
 		if ( anim ) {
 			_animations[$ae.aniGuid] = null;
 			if ( anim.sound )
-                PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_SOUNDS, anim.sound.guid, null ) );
+                PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_SOUNDS, anim.sound.guid, null ) );
 
 		}
-		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_ANIMATIONS, $ae.aniGuid, null ) );
+		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_ANIMATIONS, $ae.aniGuid, null ) );
 	}
 	
 	static private function updateGuid( $ae:AnimationEvent ):void {
@@ -108,15 +108,15 @@ public class AnimationCache
 		var ani:Animation = _animations[$ame.modelGuid]; 
 		if ( null == ani ) {
 			if ( true == Globals.online && $ame.fromTable )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.BIGDB_TABLE_ANIMATIONS, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ame.series, Globals.BIGDB_TABLE_ANIMATIONS, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
 			else	
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
 		}
 		else
 			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.RESULT, $ame.series, $ame.modelGuid, $ame.aniGuid, ani ) );
 	}
 
-	static private function loadSucceed( $pe:PersistanceEvent):void
+	static private function loadSucceed( $pe:PersistenceEvent):void
 	{
 		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
@@ -150,7 +150,7 @@ public class AnimationCache
 		}
 	}
 
-	static private function add( $pe:PersistanceEvent, $ani:Animation ):void 
+	static private function add($pe:PersistenceEvent, $ani:Animation ):void
 	{ 
 		if ( null == $ani || null == $pe.guid ) {
 			Log.out( "AnimationCache.Add trying to add NULL animations or guid", Log.WARN );
@@ -163,7 +163,7 @@ public class AnimationCache
 		}
 	}
 	
-	static private function loadFailed( $pe:PersistanceEvent ):void 
+	static private function loadFailed( $pe:PersistenceEvent ):void
 	{
 		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
@@ -171,7 +171,7 @@ public class AnimationCache
 		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
 	}
 	
-	static private function loadNotFound( $pe:PersistanceEvent):void 
+	static private function loadNotFound( $pe:PersistenceEvent):void
 	{
 		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;

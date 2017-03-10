@@ -38,7 +38,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			//Globals.g_seed = 0;
 			
 			var vm:VoxelModel = getVoxelModel();
-			var oxel:Oxel = vm.modelInfo.oxelPersistance.oxel;
+			var oxel:Oxel = vm.modelInfo.oxelPersistence.oxel;
 			var masterMapSize:uint = Math.min( oxel.size_in_world_coordinates(), 1024 );
 			
 			//var octaves:int  = ( Math.random() * 144 ) % (Math.random() * 12);

@@ -8,17 +8,10 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
-	import com.voxelengine.events.PersistanceEvent;
-	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.pools.GrainCursorPool;
 	import com.voxelengine.worldmodel.biomes.LayerInfo;
-	import com.voxelengine.worldmodel.models.OxelPersistance;
 	import com.voxelengine.worldmodel.oxel.Oxel;
-	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.TypeInfo;
-	import flash.utils.ByteArray;
 	import flash.utils.getTimer;
 	
 	/**
@@ -28,16 +21,16 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	public class GenerateSphere extends LandscapeTask 
 	{		
 		static public function script():Object {
-			var model:Object = new Object
-			model.grainSize = 6
-			model.name = "GenerateSphere"
+			var model:Object = {};
+			model.grainSize = 6;
+			model.name = "GenerateSphere";
 			model.biomes = {};
 			model.biomes.layers = new Vector.<Object>();
 			model.biomes.layers[0] = {};
-			model.biomes.layers[0].functionName = "GenerateSphere"
-			model.biomes.layers[0].type = "SAND"
-			model.biomes.layers[0].range = 3
-			model.biomes.layers[0].offset = 7
+			model.biomes.layers[0].functionName = "GenerateSphere";
+			model.biomes.layers[0].type = "SAND";
+			model.biomes.layers[0].range = 3;
+			model.biomes.layers[0].offset = 7;
 			
 			return model;
 		}
@@ -49,7 +42,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		override public function start():void
 		{
-			super.start() // AbstractTask will send event
+			super.start(); // AbstractTask will send event
 
 			var timer:int = getTimer();
 			
@@ -80,9 +73,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 			throw new Error( "REFACTOR = 2.22.17");
 /*
-			var ba:ByteArray = OxelPersistance.toByteArray( oxel );
+			var ba:ByteArray = OxelPersistence.toByteArray( oxel );
 			Log.out( "GenerateSphere finished modelGuid: " + _modelGuid );
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba ) );
 */
 			//Log.out( "GenerateSphere.start - completed layer of type: " + (Globals.Info[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
 			super.complete() // AbstractTask will send event

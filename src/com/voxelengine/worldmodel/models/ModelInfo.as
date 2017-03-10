@@ -25,7 +25,7 @@ import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelLoadingEvent;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.animation.Animation;
@@ -46,9 +46,9 @@ public class ModelInfo extends PersistenceObject
 	private var 		_animations:Vector.<Animation> 				= new Vector.<Animation>();	// Animations that this model has
 	public function get animations():Vector.<Animation> 			{ return _animations; }
 	
-	private var 		_oxelPersistance:OxelPersistance;
-	public function get oxelPersistance():OxelPersistance  					{ return _oxelPersistance; }
-	public function set oxelPersistance($oxel:OxelPersistance ):void			{ _oxelPersistance = $oxel; }
+	private var 		_oxelPersistence:OxelPersistence;
+	public function get oxelPersistence():OxelPersistence  					{ return _oxelPersistence; }
+	public function set oxelPersistence($oxel:OxelPersistence ):void			{ _oxelPersistence = $oxel; }
 
 	public function get scripts():Array 							{ return dbo.scripts; }
 	public function get modelClass():String							{ return dbo.modelClass; }
@@ -66,8 +66,8 @@ public class ModelInfo extends PersistenceObject
 	// overrideable in instanceInfo
 	// how to link this to instance info, when this is shared object???
 //	public function get grainSize():int								{
-//		if ( oxelPersistance && oxelPersistance.oxelCount )
-//			return oxelPersistance.oxel.gc.grain;
+//		if ( oxelPersistence && oxelPersistence.oxelCount )
+//			return oxelPersistence.oxel.gc.grain;
 //		else
 //			return dbo.grainSize ? dbo.grainSize : 4;
 //	}
@@ -125,7 +125,7 @@ public class ModelInfo extends PersistenceObject
 			if ( !$biomes.layers )
 				throw new Error( "ModelInfo.biomesFromObject - WARNING - unable to find layerInfo: " + guid );
 			_biomes.layersLoad( $biomes.layers );
-			// now remove the biome oxelPersistance from the object so it is not saved to persistance
+			// now remove the biome oxelPersistence from the object so it is not saved to persistance
 			delete dbo.biomes;
 		}
 	}
@@ -134,18 +134,18 @@ public class ModelInfo extends PersistenceObject
 		var oldGuid:String = super.guid;
 		super.guid = $newGuid;
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
-		if ( oxelPersistance ) {
+		if ( oxelPersistence ) {
 			if ( altGuid )
 				oldGuid = altGuid;
-			oxelPersistance.guid = $newGuid;
+			oxelPersistence.guid = $newGuid;
 			OxelDataEvent.create( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null );
 		}
 		changed = true;
 	}
 
 	public function update( $context:Context3D, $elapsedTimeMS:int, $vm:VoxelModel ):void {
-		if ( oxelPersistance && oxelPersistance.oxelCount && oxelPersistance.oxel.chunkGet() )
-			oxelPersistance.update( $vm );
+		if ( oxelPersistence && oxelPersistence.oxelCount && oxelPersistence.oxel.chunkGet() )
+			oxelPersistence.update( $vm );
 			
 		for each (var cm:VoxelModel in childVoxelModels ) {
 			if ("LeftArm" == cm.metadata.name){
@@ -159,8 +159,8 @@ public class ModelInfo extends PersistenceObject
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
 //		var time:int = getTimer()
 
-		if ( oxelPersistance && oxelPersistance.oxelCount )
-			oxelPersistance.draw(	$mvp, $vm, $context, $selected, $isChild, $isAlpha );
+		if ( oxelPersistence && oxelPersistence.oxelCount )
+			oxelPersistence.draw(	$mvp, $vm, $context, $selected, $isChild, $isAlpha );
 //		var t:int = (getTimer() - time) 	
 //		if ( t )
 //			Log.out( "ModelInfo.draw time: " + t );
@@ -175,7 +175,7 @@ public class ModelInfo extends PersistenceObject
 		super.release();
 		_biomes = null;
 		_animations = null;
-		oxelPersistance.release();
+		oxelPersistence.release();
 	}
 
 
@@ -187,7 +187,7 @@ public class ModelInfo extends PersistenceObject
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// start oxelPersistance (oxel) operations
+	// start oxelPersistence (oxel) operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private function addOxelDataCompleteListeners():void {
 		OxelDataEvent.addListener( ModelBaseEvent.ADDED, retrievedData );
@@ -201,17 +201,17 @@ public class ModelInfo extends PersistenceObject
 		OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );
 	}
 
-	public function assignOxelDataToModelInfo( $od:OxelPersistance ):void {
-		if ( null == oxelPersistance ) {
-			oxelPersistance = $od;
-			// Set OxelPersistance to the baseLightLevel for this object.
+	public function assignOxelDataToModelInfo( $od:OxelPersistence ):void {
+		if ( null == oxelPersistence ) {
+			oxelPersistence = $od;
+			// Set OxelPersistence to the baseLightLevel for this object.
 			//Log.out( "ModelInfo.retrievedData - set baseLightLevel: " + baseLightLevel);
 		}
-		oxelPersistance.baseLightLevel = baseLightLevel;
+		oxelPersistence.baseLightLevel = baseLightLevel;
 
 		const priority:int = 5;
-		if (oxelPersistance && 0 == oxelPersistance.oxelCount)
-			oxelPersistance.createTaskToLoadFromByteArray(guid, priority);
+		if (oxelPersistence && 0 == oxelPersistence.oxelCount)
+			oxelPersistence.createTaskToLoadFromByteArray(guid, priority);
 		else
 			OxelDataEvent.create( OxelDataEvent.OXEL_READY, 0, $od.guid, $od );
 	}
@@ -251,7 +251,7 @@ public class ModelInfo extends PersistenceObject
 			OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, _altGuid, null, ModelBaseEvent.USE_FILE_SYSTEM );
 		}
 		else {
-			//Log.out( "ModelInfo.loadFromBiomeData - building bio from layer oxelPersistance", Log.DEBUG );
+			//Log.out( "ModelInfo.loadFromBiomeData - building bio from layer oxelPersistence", Log.DEBUG );
 			biomes.addToTaskControllerUsingNewStyle( guid );
 		}
 	}
@@ -263,22 +263,22 @@ public class ModelInfo extends PersistenceObject
 	}
 	
 	public function changeOxel( $instanceGuid:String , $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
-		var result:Boolean = oxelPersistance.changeOxel( $instanceGuid, $gc, $type, $onlyChangeType );
+		var result:Boolean = oxelPersistence.changeOxel( $instanceGuid, $gc, $type, $onlyChangeType );
 		if ( TypeInfo.AIR == $type )
 			childRemoveByGC( $gc );
 		return result;
 	}
 
 	public function oxelDataChanged():void {
-		 oxelPersistance.changed = true;
+		 oxelPersistence.changed = true;
 	}
 	
 	public function oxelLoadData():void {
-		if ( oxelPersistance ) {
-			if ( oxelPersistance.oxelCount )
-				OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, oxelPersistance );
+		if ( oxelPersistence ) {
+			if ( oxelPersistence.oxelCount )
+				OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, oxelPersistence );
 			else {
-				oxelPersistance.createTaskToLoadFromByteArray(guid, OxelPersistance.NORMAL_BYTE_LOAD_PRIORITY );
+				oxelPersistence.createTaskToLoadFromByteArray(guid, OxelPersistence.NORMAL_BYTE_LOAD_PRIORITY );
 			}
 
 			//Log.out( "ModelInfo.loadOxelData - returning loaded oxel guid: " + guid );
@@ -615,7 +615,7 @@ public class ModelInfo extends PersistenceObject
 	private var _biomes:Biomes;										// used to generate terrain and apply other functions to oxel
 	private var _series:int											// used to make sure animation is part of same series when loading
 	private var _altGuid:String;									// used to handle loading from biome
-	private var _firstLoadFailed:Boolean;							// true if load from biomes oxelPersistance is needed
+	private var _firstLoadFailed:Boolean;							// true if load from biomes oxelPersistence is needed
 	
 	// These are temporary used for loading local objects
 	public function get altGuid():String 							{ return _altGuid; }
@@ -628,8 +628,8 @@ public class ModelInfo extends PersistenceObject
 		else
 			Log.out("ModelInfo.save - NOT Saving guid: " + guid + " NEED Animations or children to complete", Log.WARN);
 
-		if ( oxelPersistance )
-			oxelPersistance.save();
+		if ( oxelPersistence )
+			oxelPersistence.save();
 
 		for ( var i:int; i < childVoxelModels.length; i++ ) {
 			var child:VoxelModel = childVoxelModels[i];
@@ -720,7 +720,7 @@ public class ModelInfo extends PersistenceObject
 		var newObj:Object = JSON.parse(oldObj);
 		// also need to clone the oxel
 		var newModelInfo:ModelInfo = new ModelInfo( $guid, null, newObj );
-		newModelInfo.oxelPersistance = oxelPersistance.cloneNew( $guid );
+		newModelInfo.oxelPersistence = oxelPersistence.cloneNew( $guid );
 
 		return newModelInfo;
 	}
@@ -729,17 +729,17 @@ public class ModelInfo extends PersistenceObject
 		toObject();
 		var oldObj:String = JSON.stringify( dbo )
 
-		var pe:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.MODEL_INFO_EXT, $guid, null, oldObj )
-		PersistanceEvent.dispatch( pe )
+		var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.MODEL_INFO_EXT, $guid, null, oldObj )
+		PersistenceEvent.dispatch( pe )
 
 		// also need to clone the oxel
 		throw new Error( "REFACTOR = 2.22.17");
 		/*
 		// this adds the version header, need for the persistanceEvent
-		var ba:ByteArray = OxelPersistance.toByteArray( oxelPersistance.oxel );
+		var ba:ByteArray = OxelPersistence.toByteArray( oxelPersistence.oxel );
 
-		var ope:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $guid, null, ba )
-		PersistanceEvent.dispatch( ope )
+		var ope:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $guid, null, ba )
+		PersistenceEvent.dispatch( ope )
 		*/
 	}
 

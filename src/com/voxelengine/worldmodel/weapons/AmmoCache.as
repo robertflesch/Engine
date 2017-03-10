@@ -18,7 +18,7 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.events.AmmoEvent;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.utils.StringUtils;
 
@@ -38,9 +38,9 @@ public class AmmoCache
 	static public function init():void {
 		AmmoEvent.addListener( ModelBaseEvent.REQUEST, request );
 		
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, 	loadNotFound );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -56,15 +56,15 @@ public class AmmoCache
 		var ammo:Ammo = _ammoData[$ae.guid]; 
 		if ( null == ammo ) {
 			if ( true == Globals.online && $ae.fromTable )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $ae.series, Globals.BIGDB_TABLE_AMMO, $ae.guid ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ae.series, Globals.BIGDB_TABLE_AMMO, $ae.guid ) );
 			else	
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.AMMO_EXT, $ae.guid ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, 0, Globals.AMMO_EXT, $ae.guid ) );
 		}
 		else
 			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.RESULT, $ae.series, $ae.guid, ammo ) );
 	}
 	
-	static private function add( $pe:PersistanceEvent, $ammo:Ammo ):void 
+	static private function add($pe:PersistenceEvent, $ammo:Ammo ):void
 	{ 
 		if ( null == $ammo || null == $pe.guid ) {
 			Log.out( "AmmoCache.add trying to add NULL ammo or guid", Log.WARN );
@@ -77,7 +77,7 @@ public class AmmoCache
 		}
 	}
 	
-	static private function loadSucceed( $pe:PersistanceEvent):void 
+	static private function loadSucceed( $pe:PersistenceEvent):void
 	{
 		if ( Globals.AMMO_EXT != $pe.table && Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
@@ -111,7 +111,7 @@ public class AmmoCache
 		}
 	}
 	
-	static private function loadFailed( $pe:PersistanceEvent ):void 
+	static private function loadFailed( $pe:PersistenceEvent ):void
 	{
 		if ( Globals.AMMO_EXT != $pe.table && Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
@@ -119,7 +119,7 @@ public class AmmoCache
 		AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
-	static private function loadNotFound( $pe:PersistanceEvent):void 
+	static private function loadNotFound( $pe:PersistenceEvent):void
 	{
 		if ( Globals.AMMO_EXT != $pe.table && Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;

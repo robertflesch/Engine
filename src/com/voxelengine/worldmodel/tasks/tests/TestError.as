@@ -39,7 +39,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			// Builds Solid Cube of any grain size
 			//////////////////////////////////////////////////////////
 			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _modelGuid );
-			var oxel:Oxel = vm.modelInfo.oxelPersistance.oxel;
+			var oxel:Oxel = vm.modelInfo.oxelPersistence.oxel;
 			var gc:GrainCursor = GrainCursorPool.poolGet(oxel.gc.bound);
 			gc.copyFrom(oxel.gc);
 			var root_grain_size:uint = gc.grain;

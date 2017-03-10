@@ -7,7 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-import com.voxelengine.worldmodel.animation.SoundPersistance;
+import com.voxelengine.worldmodel.animation.SoundPersistence;
 import com.voxelengine.worldmodel.models.Block;
 import flash.events.Event
 import flash.events.IOErrorEvent
@@ -23,7 +23,7 @@ import com.voxelengine.Globals
 import com.voxelengine.Log
 import com.voxelengine.utils.MP3Pitch
 import com.voxelengine.events.ModelBaseEvent
-import com.voxelengine.events.PersistanceEvent
+import com.voxelengine.events.PersistenceEvent
 import com.voxelengine.events.SoundEvent
 import com.voxelengine.worldmodel.animation.AnimationSound
 
@@ -44,9 +44,9 @@ public class SoundCache
 		//SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid )		
 		//SoundEvent.addListener( ModelBaseEvent.SAVE, 			save )		
 
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed )
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed )
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound )		
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed )
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed )
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, 	loadNotFound )
 	}
 	
 	static private function request( $se:SoundEvent ):void {   
@@ -55,7 +55,7 @@ public class SoundCache
 			return
 		}
 		//Log.out( "SoundCache.request guid: " + $se.guid, Log.INFO )
-		var snd:SoundPersistance
+		var snd:SoundPersistence
 		if ( Globals.isGuid( $se.guid ) )
 			snd = _sounds[$se.guid]
 		else
@@ -70,22 +70,22 @@ public class SoundCache
 			_block.add( $se.guid );
 			
 			if ( true == Globals.online && $se.fromTables )
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $se.series, Globals.BIGDB_TABLE_SOUNDS, $se.guid, null, null, URLLoaderDataFormat.BINARY, $se.guid ) )
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $se.series, Globals.BIGDB_TABLE_SOUNDS, $se.guid, null, null, URLLoaderDataFormat.BINARY, $se.guid ) )
 			else	
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, $se.series, Globals.SOUND_EXT, $se.guid, null, null, URLLoaderDataFormat.BINARY, $se.guid ) )
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $se.series, Globals.SOUND_EXT, $se.guid, null, null, URLLoaderDataFormat.BINARY, $se.guid ) )
 		}
 		else
 			SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.RESULT, $se.series, $se.guid, snd ) )
 	}
 	
-	static private function loadSucceed( $pe:PersistanceEvent ):void {
+	static private function loadSucceed( $pe:PersistenceEvent ):void {
 		if ( Globals.SOUND_EXT != $pe.table && Globals.BIGDB_TABLE_SOUNDS != $pe.table )
 			return
 			// dbo is loading from table, data if loading from import
 		if ( $pe.dbo || $pe.data ) {
-			var sndPer:SoundPersistance = new SoundPersistance( $pe.guid )
+			var sndPer:SoundPersistence = new SoundPersistence( $pe.guid )
 			if ( null == sndPer ) {
-				Log.out( "SoundCache.loadSucceed - SoundPersistance error on creation: " + $pe.guid, Log.ERROR )
+				Log.out( "SoundCache.loadSucceed - SoundPersistence error on creation: " + $pe.guid, Log.ERROR )
 				return
 			}
 			if ( $pe.dbo ) {
@@ -107,7 +107,7 @@ public class SoundCache
 		}
 	}
 	
-	static private function add( $pe:PersistanceEvent, $sp:SoundPersistance ):void { 
+	static private function add($pe:PersistenceEvent, $sp:SoundPersistence ):void {
 		if ( null == $sp || null == $pe.guid ) {
 			Log.out( "SoundCache.Add trying to add NULL AnimationSounds or guid", Log.WARN )
 			return
@@ -122,7 +122,7 @@ public class SoundCache
 		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $sp ) )
 	}
 	
-	static private function loadFailed( $pe:PersistanceEvent ):void {
+	static private function loadFailed( $pe:PersistenceEvent ):void {
 		if ( Globals.SOUND_EXT != $pe.table && Globals.BIGDB_TABLE_SOUNDS != $pe.table )
 			return
 		Log.out( "SoundCache.loadFailed " + $pe.toString(), Log.ERROR )
@@ -131,7 +131,7 @@ public class SoundCache
 		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid ) )
 	}
 	
-	static private function loadNotFound( $pe:PersistanceEvent):void {
+	static private function loadNotFound( $pe:PersistenceEvent):void {
 		if ( Globals.SOUND_EXT != $pe.table && Globals.BIGDB_TABLE_SOUNDS != $pe.table )
 			return
 		Log.out( "SoundCache.loadNotFound " + $pe.toString(), Log.ERROR )
@@ -144,7 +144,7 @@ public class SoundCache
 	static private function deleteHandler( $ae:SoundEvent ):void {
 		if ( _sounds[$ae.guid] ) 
 			_sounds[$ae.guid] = null
-		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_SOUNDS, $ae.guid, null ) )
+		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_SOUNDS, $ae.guid, null ) )
 	}
 	
 	//static private function updateGuid( $ae:SoundEvent ):void {
@@ -162,7 +162,7 @@ public class SoundCache
 	//}
 	
 	//static private function save(e:SoundEvent):void {
-		//for each ( var snd:SoundPersistance in _sounds )
+		//for each ( var snd:SoundPersistence in _sounds )
 			//if ( snd )
 				//snd.save()
 	//}
@@ -233,7 +233,7 @@ public class SoundCache
 	//////////////////////////////////////////////////////////////////////////////
 	
 	static public function playSound( $guid:String ):void {
-		var snd:SoundPersistance = _sounds[ $guid ]
+		var snd:SoundPersistence = _sounds[ $guid ]
 		if ( !snd ) {
 			SoundEvent.addListener( ModelBaseEvent.ADDED, addSoundAndPlay )
 			SoundEvent.addListener( ModelBaseEvent.RESULT, addSoundAndPlay )
@@ -248,7 +248,7 @@ public class SoundCache
 		playSoundInternal( $se.snd );
 	}
 	
-	static private function playSoundInternal( $snd:SoundPersistance ):void {
+	static private function playSoundInternal( $snd:SoundPersistence ):void {
 	
 		// playSound( snd:Sound, $startTime:Number = 0, $loops:int = 0, $sndTransform:SoundTransform = null) : flash.media.SoundChannel
 		if ( $snd && !Globals.muted && $snd.sound )

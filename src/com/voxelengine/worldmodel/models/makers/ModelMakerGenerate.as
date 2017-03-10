@@ -137,7 +137,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			ModelInfoEvent.create( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelInfo );
 
 			if ( modelInfo.guid != Player.DEFAULT_PLAYER ) {
-				modelInfo.oxelPersistance.changed = true;
+				modelInfo.oxelPersistence.changed = true;
 				modelInfo.changed = true;
 				_modelMetadata.changed = true;
 				_vm.save();

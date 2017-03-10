@@ -9,7 +9,7 @@
 package com.voxelengine.GUI 
 {
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.RegionManager;
@@ -180,10 +180,10 @@ public class WindowRegionDetail extends VVPopup
 			// remove the event listeners on this temporary object
 //			_region.release();
 			//
-			var pe:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true )
+			var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true )
 			RegionManager.instance.add( pe, _region );
 			// This tell the region manager to add it to the region list
-			//PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true ) );			
+			//PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true ) );
 			// This tell the region to save itself!
 			RegionEvent.create( ModelBaseEvent.SAVE, 0, _region.guid );
 		}

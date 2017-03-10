@@ -7,7 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.events
 {
-import com.voxelengine.worldmodel.animation.SoundPersistance;
+import com.voxelengine.worldmodel.animation.SoundPersistence;
 import flash.events.Event
 import flash.events.EventDispatcher
 
@@ -19,14 +19,14 @@ import com.voxelengine.worldmodel.animation.AnimationSound
 public class SoundEvent extends ModelBaseEvent
 {
 	private var _guid:String // animation guid or fileName
-	private var _snd:SoundPersistance
+	private var _snd:SoundPersistence
 	private var _fromTables:Boolean
 
 	public function get guid():String  { return _guid }
 	public function get fromTables():Boolean  { return _fromTables }
-	public function get snd():SoundPersistance  { return _snd }
+	public function get snd():SoundPersistence  { return _snd }
 	
-	public function SoundEvent( $type:String, $series:int, $guid:String, $snd:SoundPersistance = null, $fromTables:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function SoundEvent($type:String, $series:int, $guid:String, $snd:SoundPersistence = null, $fromTables:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $series, $bubbles, $cancellable )
 		_guid = $guid

@@ -38,7 +38,7 @@ public class ModelCache
 		var list:Vector.<VoxelModel> = new Vector.<VoxelModel>();
 		for ( var i:int; i < _instances.length; i++ ){
 			var vm:VoxelModel = _instances[i];
-			if ( vm && vm.complete && vm.metadata.permissions.modify && vm != VoxelModel.controlledModel ) // vm.modelInfo.oxelPersistance.oxel
+			if ( vm && vm.complete && vm.metadata.permissions.modify && vm != VoxelModel.controlledModel ) // vm.modelInfo.oxelPersistence.oxel
 				list.push(vm);
 		}
 		return list;

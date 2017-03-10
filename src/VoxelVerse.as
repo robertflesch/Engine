@@ -13,7 +13,7 @@ import com.voxelengine.events.AnimationEvent
 import com.voxelengine.events.AppEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.WindowSplashEvent;
-import com.voxelengine.persistance.Persistance;
+import com.voxelengine.persistance.Persistence;
 import com.voxelengine.pools.PoolManager;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.renderer.shaders.Shader;
@@ -24,7 +24,7 @@ import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.ModelInfoCache;
 import com.voxelengine.worldmodel.models.ModelMetadataCache;
-import com.voxelengine.worldmodel.models.OxelPersistanceCache;
+import com.voxelengine.worldmodel.models.OxelPersistenceCache;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
 import com.voxelengine.worldmodel.tasks.lighting.LightRemove;
@@ -129,12 +129,12 @@ public class VoxelVerse extends Sprite
 
 		WindowWater.init();
 
-		Persistance.addEventHandlers();
+		Persistence.addEventHandlers();
 		ModelMetadataCache.init();
 		ModelInfoCache.init();
 		SoundCache.init();
 		AmmoCache.init();
-		OxelPersistanceCache.init();
+		OxelPersistenceCache.init();
 		AnimationCache.init();
 		ModelCacheUtils.init();
 

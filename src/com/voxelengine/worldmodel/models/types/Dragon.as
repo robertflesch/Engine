@@ -72,10 +72,10 @@ public class Dragon extends Beast
 */	
 	
 	override protected function collisionPointsAdd():void {
-		// TO DO Should define this in meta oxelPersistance??? RSF or using extents?
+		// TO DO Should define this in meta oxelPersistence??? RSF or using extents?
 		
-		if ( modelInfo.oxelPersistance && modelInfo.oxelPersistance.oxelCount ) {
-			var oxel:Oxel = modelInfo.oxelPersistance.oxel;
+		if ( modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount ) {
+			var oxel:Oxel = modelInfo.oxelPersistence.oxel;
 			var sizeOxel:Number = oxel.gc.size() / 2;
 			_ct.addCollisionPoint( new CollisionPoint( FALL, new Vector3D( sizeOxel, -16, 0 ) ) );
 			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( sizeOxel, -15, 0 ) ) ); // foot
@@ -96,7 +96,7 @@ public class Dragon extends Beast
 			//_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, -6, 0 ) ) ); // bottom
 		}
 		else
-			Log.out( "Dragon.collisionPointsAdd - modelInfo.oxelPersistance.oxel not found for guid: " + modelInfo.guid, Log.WARN );
+			Log.out( "Dragon.collisionPointsAdd - modelInfo.oxelPersistence.oxel not found for guid: " + modelInfo.guid, Log.WARN );
 	}
 
 	override protected function cameraAddLocations():void {

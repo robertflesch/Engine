@@ -235,7 +235,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			_vm.complete = true;
 
 			modelInfo.changed = true;
-			modelInfo.oxelPersistance.changed = true;
+			modelInfo.oxelPersistence.changed = true;
 			_modelMetadata.changed = true;
 			_vm.save();
 

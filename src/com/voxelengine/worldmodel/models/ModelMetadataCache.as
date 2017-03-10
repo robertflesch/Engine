@@ -13,7 +13,7 @@ import playerio.DatabaseObject;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.ModelInfoEvent;
@@ -47,9 +47,9 @@ public class ModelMetadataCache
 		//ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, 		generated );
 		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );		
 		
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );		
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, 	loadNotFound );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -71,14 +71,14 @@ public class ModelMetadataCache
 		// For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $vmm.guid, $vmm ) event
 		if ( Network.PUBLIC == $mme.modelGuid ) {
 			if ( false == _initializedPublic ) {
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, Network.PUBLIC, null, Globals.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, Network.PUBLIC, null, Globals.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
 				_initializedPublic = true;
 			}
 		}
 			
 		if ( Network.userId == $mme.modelGuid ) {
 			if ( false == _initializedPrivate ) {
-				PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, Network.userId, null, Globals.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, Network.userId, null, Globals.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
 				_initializedPrivate = true;
 			}
 		}
@@ -105,7 +105,7 @@ public class ModelMetadataCache
 				if (_block.has($mme.modelGuid))
 					return;
 				_block.add($mme.modelGuid);
-				PersistanceEvent.dispatch(new PersistanceEvent(PersistanceEvent.LOAD_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid));
+				PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.LOAD_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid));
 			}
 			else {
 				//Log.out( "ModelMetadataCache.request returning guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
@@ -155,9 +155,9 @@ public class ModelMetadataCache
 				_metadata[$mme.modelGuid] = null;
 				// TODO need to clean up eventually
 				mmd = null;
-				//Log.out( "ModelMetadataCache.deleteHandler making call to PersistanceEvent", Log.WARN );
+				//Log.out( "ModelMetadataCache.deleteHandler making call to PersistenceEvent", Log.WARN );
 			}
-			PersistanceEvent.dispatch(new PersistanceEvent(PersistanceEvent.DELETE_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid, null));
+			PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.DELETE_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid, null));
 		}
 	}
 	
@@ -179,10 +179,10 @@ public class ModelMetadataCache
 	//  End - ModelMetadataEvent
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  Persistance Events
+	//  Persistence Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
-	static private function loadSucceed( $pe:PersistanceEvent):void {
+	static private function loadSucceed( $pe:PersistenceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 
@@ -210,31 +210,31 @@ public class ModelMetadataCache
 			vmm = new ModelMetadata( $pe.guid, null, newData );
 			add( $pe.series, vmm );
 		} else {
-			Log.out( "ModelMetadataCache.loadSucceed NO oxelPersistance or DBO PersistanceEvent: " + $pe.toString(), Log.WARN );
+			Log.out( "ModelMetadataCache.loadSucceed NO oxelPersistence or DBO PersistenceEvent: " + $pe.toString(), Log.WARN );
 			ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 		}
 
 	}
 	
-	static private function loadFailed( $pe:PersistanceEvent ):void  {
+	static private function loadFailed( $pe:PersistenceEvent ):void  {
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid )
-		Log.out( "ModelMetadataCache.metadataLoadFailed PersistanceEvent: " + $pe.toString(), Log.ERROR );
+		Log.out( "ModelMetadataCache.metadataLoadFailed PersistenceEvent: " + $pe.toString(), Log.ERROR );
 		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 	}
 
-	static private function loadNotFound( $pe:PersistanceEvent):void {
+	static private function loadNotFound( $pe:PersistenceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid )
-		Log.out( "ModelMetadataCache.loadNotFound PersistanceEvent: " + $pe.toString(), Log.WARN );
+		Log.out( "ModelMetadataCache.loadNotFound PersistenceEvent: " + $pe.toString(), Log.WARN );
 		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  End - Persistance Events
+	//  End - Persistence Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  Internal Methods

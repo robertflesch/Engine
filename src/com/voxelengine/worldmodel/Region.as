@@ -19,7 +19,7 @@ package com.voxelengine.worldmodel
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.events.PersistanceEvent;
+	import com.voxelengine.events.PersistenceEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.events.LoadingEvent;
@@ -311,7 +311,7 @@ package com.voxelengine.worldmodel
 		
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////
-		// toPersistance
+		// toPersistence
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		override public function save():void {
@@ -324,7 +324,7 @@ package com.voxelengine.worldmodel
 		override protected function toObject():void {
 			//Log.out( "Region.toObject", Log.WARN );
 			// modelCache will be true if this region has been loaded.
-			// if it has not been loaded, just use the existing dbo.models oxelPersistance
+			// if it has not been loaded, just use the existing dbo.models oxelPersistence
 			if ( _modelCache )
 				dbo.models = _modelCache.toObject();
 				

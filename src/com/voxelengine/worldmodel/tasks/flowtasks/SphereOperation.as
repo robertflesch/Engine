@@ -69,7 +69,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			var guid:String = vm.instanceInfo.instanceGuid;
 			if ( vm )
 			{
-				var oxel:Oxel = vm.modelInfo.oxelPersistance.oxel.childGetOrCreate( _gc );
+				var oxel:Oxel = vm.modelInfo.oxelPersistence.oxel.childGetOrCreate( _gc );
 				if ( Globals.BAD_OXEL == oxel )
 				{
 					Log.out( "SphereOperation.start - BAD_OXEL found for gc: " + _gc, Log.ERROR );

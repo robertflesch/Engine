@@ -85,7 +85,7 @@ public class ConsoleCommands {
 	{
 		if ( VoxelModel.selectedModel )
 		{
-			VoxelModel.selectedModel.modelInfo.oxelPersistance.oxel.growTreesOn( VoxelModel.selectedModel.instanceInfo.instanceGuid, TypeInfo.GRASS );
+			VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.growTreesOn( VoxelModel.selectedModel.instanceInfo.instanceGuid, TypeInfo.GRASS );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -113,7 +113,7 @@ public class ConsoleCommands {
 	{
 		if ( VoxelModel.selectedModel )
 		{
-			VoxelModel.selectedModel.modelInfo.oxelPersistance.oxel.dirtToGrassAndSand();
+			VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.dirtToGrassAndSand();
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -123,7 +123,7 @@ public class ConsoleCommands {
 	{
 		if ( VoxelModel.selectedModel )
 		{
-			VoxelModel.selectedModel.modelInfo.oxelPersistance.oxel.vines( VoxelModel.selectedModel.instanceInfo.instanceGuid );
+			VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.vines( VoxelModel.selectedModel.instanceInfo.instanceGuid );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -135,7 +135,7 @@ public class ConsoleCommands {
 		if ( VoxelModel.selectedModel )
 		{
 			var ol:Vector.<Oxel> = new Vector.<Oxel>();
-			VoxelModel.selectedModel.modelInfo.oxelPersistance.oxel.lightingSunGatherList( ol );
+			VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.lightingSunGatherList( ol );
 		}
 		else {
 			Log.out( "No selected model" );
@@ -165,7 +165,7 @@ public class ConsoleCommands {
 	{
 		if ( VoxelModel.selectedModel )
 		{
-			VoxelModel.selectedModel.modelInfo.oxelPersistance.oxel.harvestTrees( VoxelModel.selectedModel.instanceInfo.instanceGuid );
+			VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.harvestTrees( VoxelModel.selectedModel.instanceInfo.instanceGuid );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
@@ -275,7 +275,7 @@ public class ConsoleCommands {
 			{ Log.out( "ConsoleCommands.lavaSpheresCarve  No model selected", Log.WARN ); return; }
 		
 		for ( var i:int; i < $count; i++ )
-			spheresCarve( vm, Oxel.locationRandomGet( vm.modelInfo.oxelPersistance.oxel ), TypeInfo.LAVA );
+			spheresCarve( vm, Oxel.locationRandomGet( vm.modelInfo.oxelPersistence.oxel ), TypeInfo.LAVA );
 	}
 	
 	private static function waterSpheres( $count:int = 10 ):void
@@ -285,13 +285,13 @@ public class ConsoleCommands {
 			{ Log.out( "ConsoleCommands.waterSpheresCarve  No model selected", Log.WARN ); return; }
 
 		for ( var i:int; i < $count; i++ )
-			spheresCarve( vm, Oxel.locationRandomGet( vm.modelInfo.oxelPersistance.oxel ), TypeInfo.WATER );
+			spheresCarve( vm, Oxel.locationRandomGet( vm.modelInfo.oxelPersistence.oxel ), TypeInfo.WATER );
 	}
 	
 	private static function spheresCarve( $vm:VoxelModel, $loc:Vector3D, $type:int, $radius:int = 32, $minGrain:int = 2 ):void {
 		var timer:int = getTimer();
 		Oxel.nodes = 0;
-		$vm.modelInfo.oxelPersistance.oxel.write_sphere( $vm.instanceInfo.instanceGuid
+		$vm.modelInfo.oxelPersistence.oxel.write_sphere( $vm.instanceInfo.instanceGuid
 											   , $loc.x
 											   , $loc.y
 											   , $loc.z
@@ -300,7 +300,7 @@ public class ConsoleCommands {
 											   , $minGrain );
 		Log.out( "ConsoleCommands.waterSpheresCarve  carve AIR time: " + (getTimer() - timer) + "  change count: " + Oxel.nodes );
 		timer = getTimer();
-		$vm.modelInfo.oxelPersistance.oxel.writeHalfSphere( $vm.instanceInfo.instanceGuid
+		$vm.modelInfo.oxelPersistence.oxel.writeHalfSphere( $vm.instanceInfo.instanceGuid
 											   , $loc.x
 											   , $loc.y
 											   , $loc.z
@@ -309,7 +309,7 @@ public class ConsoleCommands {
 											   , $minGrain );
 		Log.out( "ConsoleCommands.waterSpheresCarve  carve mats time: " + (getTimer() - timer) );
 		
-		Oxel.merge( $vm.modelInfo.oxelPersistance.oxel );
+		Oxel.merge( $vm.modelInfo.oxelPersistence.oxel );
 	}
 	
 	private static function ambientOcculsion():void {
@@ -320,7 +320,7 @@ public class ConsoleCommands {
 	private static function recalculateAmbient():void {
 		var vm:VoxelModel = VoxelModel.selectedModel
 		if ( vm )
-			vm.modelInfo.oxelPersistance.oxel.recalculateAmbient( vm.modelInfo.guid )
+			vm.modelInfo.oxelPersistence.oxel.recalculateAmbient( vm.modelInfo.guid )
 	}
 	
 	public static function addCommands():void

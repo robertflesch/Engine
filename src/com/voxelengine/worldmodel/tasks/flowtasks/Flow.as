@@ -77,7 +77,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			//Log.out( "Flow.start " + toString(), Log.WARN );
 			_vm = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
 			if ( _vm ) {
-				var $flowFromOxel:Oxel = _vm.modelInfo.oxelPersistance.oxel.childGetOrCreate( _gc );
+				var $flowFromOxel:Oxel = _vm.modelInfo.oxelPersistence.oxel.childGetOrCreate( _gc );
 				if ( null == $flowFromOxel  ) {
 					Log.out( "Flow.start - null == $flowFromOxel", Log.WARN );
 					return; }

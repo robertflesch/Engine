@@ -50,13 +50,13 @@ public class Inventory extends PersistenceObject
 		
 	public function deleteInventory():void {
 		
-		PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, guid, null ) );
+		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, guid, null ) );
 		_slots = null;
 		_voxels = null;
 	}
 
 	//////////////////////////////////////////////////////////////////
-	// Persistance
+	// Persistence
 	//////////////////////////////////////////////////////////////////
 	
 	override public function save():void {
@@ -98,7 +98,7 @@ public class Inventory extends PersistenceObject
 			if ( ba && 0 < ba.bytesAvailable ) {
 				try { ba.uncompress(); }
 				catch (error:Error) {
-					Log.out( "Inventory.fromObject - Was expecting compressed oxelPersistance " + guid, Log.WARN ); }
+					Log.out( "Inventory.fromObject - Was expecting compressed oxelPersistence " + guid, Log.WARN ); }
 				ba.position = 0;
 
 //				ba.uncompress();
@@ -119,11 +119,11 @@ public class Inventory extends PersistenceObject
 	public function load():void {
 		if ( Globals.online ) {
 			addLoadEvents();
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, guid ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, guid ) );
 		}
 	}
 	
-	override protected function notFound($pe:PersistanceEvent):void 
+	override protected function notFound($pe:PersistenceEvent):void
 	{
 		if ( table != $pe.table )
 			return;
@@ -134,7 +134,7 @@ public class Inventory extends PersistenceObject
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, guid, this ) );
 	}
 	
-	override protected function loadSuccess( $pe:PersistanceEvent ):void
+	override protected function loadSuccess( $pe:PersistenceEvent ):void
 	{
 		if ( table != $pe.table )
 			return;
@@ -147,7 +147,7 @@ public class Inventory extends PersistenceObject
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.RESPONSE, guid, this ) );
 	}
 	
-	override protected function loadFailed( $pe:PersistanceEvent ):void
+	override protected function loadFailed( $pe:PersistenceEvent ):void
 	{
 		if ( table != $pe.table )
 			return;

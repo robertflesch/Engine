@@ -68,8 +68,8 @@ public final class ProjectilePoolType
 		//ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, _projectileGuid, _modelMetadata ) )
 		//Log.out( "ProjectilePoolType.generateData: " + _modelInfo.toString() );
 		var ba:ByteArray  = Oxel.generateCube( _projectileGuid, _modelInfo.biomes.layers[0], false );
-		_modelInfo.oxelPersistance = new OxelPersistance( _projectileGuid, null, ba );
-		_modelInfo.oxelPersistance.loadFromByteArray();
+		_modelInfo.oxelPersistence = new OxelPersistence( _projectileGuid, null, ba );
+		_modelInfo.oxelPersistence.loadFromByteArray();
 	}
 		
 	private function newModel():Projectile {	

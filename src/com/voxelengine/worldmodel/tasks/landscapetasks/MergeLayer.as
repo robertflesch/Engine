@@ -50,7 +50,7 @@ import flash.utils.getTimer;
 		private function modelInfoResult(e:ModelInfoEvent):void {
 			Log.out( "MergeLayer.modelInfoResult:" );
 			if ( e.modelGuid == _modelGuid ) {
-				if ( !e.vmi || !e.vmi.oxelPersistance || !e.vmi.oxelPersistance.oxelCount ) {
+				if ( !e.vmi || !e.vmi.oxelPersistence || !e.vmi.oxelPersistence.oxelCount ) {
 					ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoResult );
 					OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );		
 					Log.out( "MergeLayer.modelInfoResult = no oxel found, waiting on OXEL_READY", Log.WARN );
@@ -58,7 +58,7 @@ import flash.utils.getTimer;
 					// what if it never loads?
 					return
 				}
-				var oxel:Oxel = e.vmi.oxelPersistance.oxel;
+				var oxel:Oxel = e.vmi.oxelPersistence.oxel;
 				processOxel( oxel )
 			}
 		}
@@ -83,8 +83,8 @@ import flash.utils.getTimer;
 			if ( vm )
 				vm.complete = true;
 				
-			vm.modelInfo.oxelPersistance.changed = true;
-			vm.modelInfo.oxelPersistance.save();
+			vm.modelInfo.oxelPersistence.changed = true;
+			vm.modelInfo.oxelPersistence.save();
 			
             super.complete(); // AbstractTask will send event
 			

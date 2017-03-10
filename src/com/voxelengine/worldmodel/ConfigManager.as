@@ -19,7 +19,7 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.Log;
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.events.LoginEvent;
-	import com.voxelengine.events.PersistanceEvent;
+	import com.voxelengine.events.PersistenceEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.server.Network;
 	
@@ -59,17 +59,17 @@ package com.voxelengine.worldmodel
 		
 		public function ConfigManager( ):void 
 		{
-			PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
-			PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFail );			
-			PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
+			PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
+			PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, loadFail );
+			PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
 			
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.APP_EXT, "config", null, null ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, 0, Globals.APP_EXT, "config", null, null ) );
 		}
 		
-		private function loadSucceed(e:PersistanceEvent):void {
-			PersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
-			PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFail );			
-			PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
+		private function loadSucceed(e:PersistenceEvent):void {
+			PersistenceEvent.removeListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
+			PersistenceEvent.removeListener( PersistenceEvent.LOAD_FAILED, loadFail );
+			PersistenceEvent.removeListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
 			
 			Log.out( "ConfigManager.loadSucceed: " + Globals.appPath + "config" + Globals.APP_EXT, Log.DEBUG )
 			
@@ -89,10 +89,10 @@ package com.voxelengine.worldmodel
 			TypeInfo.load( typeInfoFile );
 		}
 		
-		private function loadFail(e:PersistanceEvent):void {
-			PersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
-			PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFail );			
-			PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
+		private function loadFail(e:PersistenceEvent):void {
+			PersistenceEvent.removeListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
+			PersistenceEvent.removeListener( PersistenceEvent.LOAD_FAILED, loadFail );
+			PersistenceEvent.removeListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
 			var errorMsg:String = (e.data as String);
 			Log.out( "ConfigManager.loadFail - error: " + errorMsg + " file name and path: " + Globals.appPath + "config" + Globals.APP_EXT, Log.ERROR )
 		}

@@ -10,34 +10,29 @@ package com.voxelengine.events
 import flash.events.Event;
 import flash.events.EventDispatcher;
 
-/**
- * ...
- * @author Robert Flesch - RSF 
- * 
- */
-public class PlayerIOPersistanceEvent extends Event
+public class PlayerIOPersistenceEvent extends Event
 {
 	static public const PERSISTANCE_NO_CLIENT:String	= "PERSISTANCE_NO_CLIENT";
 	static public const PERSISTANCE_NO_DB:String		= "PERSISTANCE_NO_DB";
 	
-	public function PlayerIOPersistanceEvent( $type:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function PlayerIOPersistenceEvent($type:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $bubbles, $cancellable );
 	}
 	
 	public override function clone():Event
 	{
-		return new PlayerIOPersistanceEvent(type, bubbles, cancelable);
+		return new PlayerIOPersistenceEvent(type, bubbles, cancelable);
 	}
    
 	public override function toString():String
 	{
-		return formatToString("PersistanceEvent", "bubbles", "cancelable");
+		return formatToString("PersistenceEvent", "bubbles", "cancelable");
 	}
 	
 	///////////////// Event handler interface /////////////////////////////
 
-	// Used to distribue all persistance messages
+	// Used to distribue all persistence messages
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
@@ -48,7 +43,7 @@ public class PlayerIOPersistanceEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:PlayerIOPersistanceEvent) : Boolean {
+	static public function dispatch( $event:PlayerIOPersistenceEvent) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 

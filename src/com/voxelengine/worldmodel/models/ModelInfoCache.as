@@ -14,7 +14,7 @@ import com.voxelengine.Globals;
 
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
@@ -42,9 +42,9 @@ public class ModelInfoCache
 		ModelInfoEvent.addListener( ModelBaseEvent.UPDATE, 				update );
 
 		// These are the events at the persistence layer
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, 	loadSucceed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, 	loadFailed );
-		PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, 	loadNotFound );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
+		PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, 	loadNotFound );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -63,9 +63,9 @@ public class ModelInfoCache
 				_block.add($mie.modelGuid);
 
 				if (true == Globals.online && $mie.fromTables)
-					PersistanceEvent.dispatch(new PersistanceEvent(PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid));
+					PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.LOAD_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid));
 				else
-					PersistanceEvent.dispatch(new PersistanceEvent(PersistanceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.modelGuid));
+					PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.LOAD_REQUEST, $mie.series, Globals.MODEL_INFO_EXT, $mie.modelGuid));
 			}
 			else {
 				if ($mie)
@@ -101,7 +101,7 @@ public class ModelInfoCache
 			_modelInfo[$mie.modelGuid] = null; 
 			// TODO need to clean up eventually
 			mi = null;
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.DELETE_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid, null ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, $mie.series, Globals.BIGDB_TABLE_MODEL_INFO, $mie.modelGuid, null ) );
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.DELETE, $mie.modelGuid, null ) );
 		}
 	}
@@ -121,7 +121,7 @@ public class ModelInfoCache
 		} else 
 			Log.out( "ModelInfoCache.deleteRecursive - ModelInfo not found $mie" + $mie, Log.ERROR )
 		
-		// Now delete the parents oxelPersistance
+		// Now delete the parents oxelPersistence
 		ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 		OxelDataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null ) );
@@ -184,7 +184,7 @@ public class ModelInfoCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  Persistence Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	static private function loadSucceed( $pe:PersistanceEvent):void {
+	static private function loadSucceed( $pe:PersistenceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
 
@@ -224,19 +224,19 @@ public class ModelInfoCache
 		}
 	}
 
-	static private function loadFailed( $pe:PersistanceEvent ):void {
+	static private function loadFailed( $pe:PersistenceEvent ):void {
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
-		Log.out( "ModelInfoCache.loadFailed PersistanceEvent: " + $pe.toString(), Log.WARN );
+		Log.out( "ModelInfoCache.loadFailed PersistenceEvent: " + $pe.toString(), Log.WARN );
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid )
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
-	static private function loadNotFound( $pe:PersistanceEvent):void {
+	static private function loadNotFound( $pe:PersistenceEvent):void {
 		if ( Globals.BIGDB_TABLE_MODEL_INFO != $pe.table && Globals.MODEL_INFO_EXT != $pe.table )
 			return;
-		Log.out( "ModelInfoCache.loadNotFound PersistanceEvent: " + $pe.toString(), Log.WARN );
+		Log.out( "ModelInfoCache.loadNotFound PersistenceEvent: " + $pe.toString(), Log.WARN );
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid )
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );

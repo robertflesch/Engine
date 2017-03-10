@@ -8,7 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.Globals;
-import com.voxelengine.events.PersistanceEvent;
+import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.utils.JSONUtil;
 
@@ -165,14 +165,14 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 	}
 
 	//////////////////////////////////////////////////////////////////
-	// Persistance
+	// Persistence
 	//////////////////////////////////////////////////////////////////
 	// These two functions are slighting different in that the import uses
-	// $dbo.oxelPersistance
+	// $dbo.oxelPersistence
 	// and the read direct from persistance uses
 	// $dbo directly
 	// I abstract it away using the info object
-	// it was needed to save the oxelPersistance in an abstract way.
+	// it was needed to save the oxelPersistence in an abstract way.
 //	public function fromObjectImport( $newData:Object, $markAsChanged:Boolean = true ):void {
 //		loadFromInfo( $newData );
 //		if ( $markAsChanged && ( guid != Player.DEFAULT_PLAYER ) )
@@ -208,7 +208,7 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		var newModelMetadata:ModelMetadata = new ModelMetadata( $guid );
 		// this gets new persistance record
 		var newObj:Object = ModelMetadata.newObject();
-		newObj.oxelPersistance = objData;
+		newObj.oxelPersistence = objData;
 		newModelMetadata.fromObject( newObj as DatabaseObject );
 		newModelMetadata.description = description + " - Cloned";
 		newModelMetadata.owner = Network.userId;*/
@@ -222,8 +222,8 @@ Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
 		var oldObj:String = JSON.stringify( dbo );
 		dbo.name = oldName;
 
-		var pe:PersistanceEvent = new PersistanceEvent( PersistanceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, $newGuid, null, oldObj, URLLoaderDataFormat.TEXT, guid )
-		PersistanceEvent.dispatch( pe )
+		var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, $newGuid, null, oldObj, URLLoaderDataFormat.TEXT, guid )
+		PersistenceEvent.dispatch( pe )
 	}
 }
 }

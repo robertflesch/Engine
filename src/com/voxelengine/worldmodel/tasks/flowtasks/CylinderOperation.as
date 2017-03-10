@@ -73,7 +73,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			{
 				_runCount--;
 				//var oxel:Oxel = vm.oxel.childGetOrCreate( _gc );
-				var oxel:Oxel = vm.modelInfo.oxelPersistance.oxel.childFind( _gc );
+				var oxel:Oxel = vm.modelInfo.oxelPersistence.oxel.childFind( _gc );
 
 				if ( Globals.BAD_OXEL == oxel )
 				{

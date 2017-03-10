@@ -13,7 +13,7 @@ import playerio.DatabaseObject
 
 import com.voxelengine.Log
 import com.voxelengine.Globals
-import com.voxelengine.events.PersistanceEvent
+import com.voxelengine.events.PersistenceEvent
 import com.voxelengine.worldmodel.models.PersistenceObject
 import com.voxelengine.events.SoundEvent
 import com.voxelengine.events.ModelBaseEvent
@@ -22,9 +22,9 @@ import com.voxelengine.events.ModelBaseEvent
 /**
  * ...
  * @author Robert Flesch - RSF
- * SoundPersistance is the persistance wrapper for the sound data.
+ * SoundPersistence is the persistance wrapper for the sound data.
  */
-public class SoundPersistance extends PersistenceObject
+public class SoundPersistence extends PersistenceObject
 {
 	private var _sound:Sound = new Sound();
 	private var _loaded:Boolean;
@@ -37,7 +37,7 @@ public class SoundPersistance extends PersistenceObject
 	public function get hashTags():String			{ return dbo.hashTags }
 	public function set hashTags( $val:String):void	{ dbo.hashTags = $val }
 	
-	public function SoundPersistance( $guid:String ) {
+	public function SoundPersistence($guid:String ) {
 		super( $guid, Globals.BIGDB_TABLE_SOUNDS );
 		_loaded = false;
 	}
@@ -51,19 +51,19 @@ public class SoundPersistance extends PersistenceObject
 	
 	override public function save():void {
 		if ( false == _loaded ) {
-				//Log.out( "SoundPersistance.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN )
+				//Log.out( "SoundPersistence.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN )
 			return;
 		}
 		super.save()
 	}
 	
 	override protected function toObject():void {
-		// Just leave the raw mp3 oxelPersistance alone
-		//Log.out( "SoundPersistance.toObject size:" + dbo.oxelPersistance.ba.length, Log.WARN )
+		// Just leave the raw mp3 oxelPersistence alone
+		//Log.out( "SoundPersistence.toObject size:" + dbo.oxelPersistence.ba.length, Log.WARN )
 	}
 	
 					
-	public function fromObject( $pe:PersistanceEvent ):void {
+	public function fromObject( $pe:PersistenceEvent ):void {
 		dbo			= $pe.dbo;
 //		info 		= $pe.dbo;
 
@@ -71,7 +71,7 @@ public class SoundPersistance extends PersistenceObject
 		loaded = true
 	}
 
-	public function fromObjectImport( $pe:PersistanceEvent ):void {
+	public function fromObjectImport( $pe:PersistenceEvent ):void {
 		assignNewDatabaseObject();
 		sound.loadCompressedDataFromByteArray( $pe.data, $pe.data.length );
 		// On import mark it as changed.

@@ -7,7 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-	import com.voxelengine.events.PersistanceEvent;
+	import com.voxelengine.events.PersistenceEvent;
 	import com.voxelengine.pools.FlowInfoPool;
 	import flash.geom.Vector3D;
 
@@ -229,27 +229,27 @@ import flash.utils.getTimer;
 
 		static private var _fileName:String;
 		static public function load( $fileName:String ):void {
-			PersistanceEvent.addListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
-			PersistanceEvent.addListener( PersistanceEvent.LOAD_FAILED, loadFail );			
-			PersistanceEvent.addListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );
+			PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
+			PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, loadFail );
+			PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
 
 			_fileName = $fileName;
-			PersistanceEvent.dispatch( new PersistanceEvent( PersistanceEvent.LOAD_REQUEST, 0, Globals.APP_EXT, $fileName, null, null ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, 0, Globals.APP_EXT, $fileName, null, null ) );
 				
-			function loadSucceed(e:PersistanceEvent):void {
-				PersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
-				PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFail );			
-				PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
+			function loadSucceed(e:PersistenceEvent):void {
+				PersistenceEvent.removeListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
+				PersistenceEvent.removeListener( PersistenceEvent.LOAD_FAILED, loadFail );
+				PersistenceEvent.removeListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
 				
 				Log.out( "TypeInfo.loadSucceed: " + Globals.appPath + $fileName + Globals.APP_EXT, Log.DEBUG )
 
 				loadTypeDataFromJSON( e.data as String );
 			}
 			
-			function loadFail(e:PersistanceEvent):void {
-				PersistanceEvent.removeListener( PersistanceEvent.LOAD_SUCCEED, loadSucceed );			
-				PersistanceEvent.removeListener( PersistanceEvent.LOAD_FAILED, loadFail );			
-				PersistanceEvent.removeListener( PersistanceEvent.LOAD_NOT_FOUND, loadFail );			
+			function loadFail(e:PersistenceEvent):void {
+				PersistenceEvent.removeListener( PersistenceEvent.LOAD_SUCCEED, loadSucceed );
+				PersistenceEvent.removeListener( PersistenceEvent.LOAD_FAILED, loadFail );
+				PersistenceEvent.removeListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
 				Log.out("TypeInfo.load.loadFail: " + e.toString(), Log.ERROR);
 			}
 		}
