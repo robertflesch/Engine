@@ -36,7 +36,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		_name = $miJson.name;
 		_type = $miJson.biomes.layers[0].type;
 		_creationInfo = $miJson;
-		Log.out("ModelMakerGenerate - ii: " + $ii.toString() + "  using generation script: " + $miJson.biomes.layers[0].functionName);
+		//Log.out("ModelMakerGenerate - ii: " + $ii.toString() + "  using generation script: " + $miJson.biomes.layers[0].functionName);
 		super($ii);
 		retrieveOrGenerateModelInfo();
 	}
@@ -101,7 +101,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	}
 
 	override protected function retrieveBaseInfo():void {
-		Log.out( "ModelMakerGenerate.retrieveBaseInfo " + ii.modelGuid );
+		//Log.out( "ModelMakerGenerate.retrieveBaseInfo " + ii.modelGuid );
 		_modelMetadata = new ModelMetadata( ii.modelGuid );
 
 		// Bypass the setter so that we dont set it to changed
@@ -115,7 +115,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	
 	// once they both have been retrieved, we can make the object
 	override protected function attemptMake():void {
-		Log.out( "ModelMakerGenerate.attemptMake " + ii.modelGuid );
+		//Log.out( "ModelMakerGenerate.attemptMake " + ii.modelGuid );
 		if ( null != modelInfo && null != _modelMetadata ) {
 			_vm = make();
 			if ( _vm ) {
@@ -130,7 +130,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	
 	override protected function markComplete( $success:Boolean ):void {
 		// do this last as it nulls everything.
-		Log.out( "ModelMakerGenerate.markComplete " + ii.modelGuid );
+		//Log.out( "ModelMakerGenerate.markComplete " + ii.modelGuid );
 		if ( $success ){
 			// Everything worked, add these to the caches and save them
 			ModelMetadataEvent.create( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelMetadata );

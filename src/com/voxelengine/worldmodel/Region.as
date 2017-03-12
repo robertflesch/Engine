@@ -183,7 +183,7 @@ package com.voxelengine.worldmodel
 		
 		// Makes sense, called from Region
 		public function loadRegionObjects( $models:Object ):int {
-			Log.out( "Region.loadRegionObjects - START =============================" );
+			//Log.out( "Region.loadRegionObjects - START =============================" );
 			var count:int = 0;
 			for each ( var v:Object in $models ) {
 				if ( v ) {
@@ -195,7 +195,7 @@ package com.voxelengine.worldmodel
 					count++;
 				}
 			}
-			Log.out( "Region.loadRegionObjects - END " + "  count: " + count + "=============================" );
+			//Log.out( "Region.loadRegionObjects - END " + "  count: " + count + "=============================" );
 			return count;
 		}
 

@@ -9,8 +9,6 @@ package com.voxelengine.worldmodel
 {
 	import com.voxelengine.events.ContextEvent;
 	import com.voxelengine.Log;
-	import flash.utils.ByteArray;
-	import flash.utils.Timer;
 	import flash.utils.getTimer;
 	import flash.events.Event; // needed for local loading
 	import flash.display3D.Context3D;
@@ -35,29 +33,19 @@ package com.voxelengine.worldmodel
 	import flash.net.URLVariables;
 	import com.voxelengine.Globals;
 	
-	/**
-	 * ...
-	 * @author Robert Flesch - RSF 
-	 * 
-	 */
-	public class TextureBank 
+	public class TextureBank
 	{
-		private const LOCAL:Boolean = false;
-		private var _fileReference:FileReference = new FileReference();
-		
+		static private var _s_instance:TextureBank;
+		static public function get instance():TextureBank {
+			if ( null == _s_instance )
+				_s_instance = new TextureBank();
+			return _s_instance
+		}
+
 		private var _bitmapData:Dictionary = new Dictionary(true);
 		private var _textures:Dictionary = new Dictionary(true);
 		private var _texturesLoading:Dictionary = new Dictionary(true);
 
-		private var _timer:int = getTimer();
-		
-		static private var _s_instance:TextureBank;
-		static public function get instance():TextureBank {
-			if ( null == _s_instance )
-				_s_instance = new TextureBank();		
-			return _s_instance	
-		}
-		
 		public function TextureBank( ):void {
 			ContextEvent.addListener( ContextEvent.DISPOSED, disposeContext );
 			ContextEvent.addListener( ContextEvent.ACQUIRED, acquiredContext );
@@ -70,7 +58,6 @@ package com.voxelengine.worldmodel
 		}
 		
 		public function acquiredContext( $ce:ContextEvent ):void {
-			
 			//Log.out("TextureBank.reinitialize" );
 			for ( var key:String in _bitmapData )
 			{
@@ -81,8 +68,7 @@ package com.voxelengine.worldmodel
 			}
 		}
 		
-		public function getTexture( $context:Context3D, textureNameAndPath:String ):Texture
-		{
+		public function getTexture( $context:Context3D, textureNameAndPath:String ):Texture {
 			// is this texture loaded already?
 			var tex:Texture = _textures[textureNameAndPath];
 			if ( tex )
@@ -97,27 +83,22 @@ package com.voxelengine.worldmodel
 			return null;
 		}
 		
-		private function onFileLoadError(event:IOErrorEvent):void
-		{
-			Log.out("----------------------------------------------------------------------------------" );
-			Log.out("TextureBank.onFileLoadError - FILE LOAD ERROR, DIDNT FIND: Insuffience Info returned by event look at previous loads " + event.target.url, Log.ERROR );
-			Log.out("----------------------------------------------------------------------------------" );
-		}		
+		private function onFileLoadError(event:IOErrorEvent):void {
+			Log.out("TextureBank.onFileLoadError - FILE LOAD ERROR, DIDNT FIND: Insufficient Info returned by event look at previous loads " + event.target.url, Log.ERROR );
+		}
 		
-		private function loadTexture( $context:Context3D, textureNameAndPath:String ):void 
-		{
+		private function loadTexture( $context:Context3D, textureNameAndPath:String ):void {
 			_tempContext = $context;
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onTextureLoadComplete);
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError);
-			Log.out( "TextureBank.loadTexture - loading: " + Globals.appPath + textureNameAndPath );
+			//Log.out( "TextureBank.loadTexture - loading: " + Globals.appPath + textureNameAndPath );
 			loader.load(new URLRequest( Globals.appPath + textureNameAndPath ));
 			
 			_texturesLoading[textureNameAndPath] = true;
 		}
 
-		public function getFileNameFromString( fileNameAndPath:String ):String 
-		{
+		public function getFileNameFromString( fileNameAndPath:String ):String {
 			var lastIndex:int = fileNameAndPath.lastIndexOf('\\');
 			if ( -1 == lastIndex )
 				lastIndex = fileNameAndPath.lastIndexOf('/');
@@ -129,8 +110,7 @@ package com.voxelengine.worldmodel
 		}
 		
 		
-		public function getTextureNameAndPath( completePath:String ):String 
-		{
+		public function getTextureNameAndPath( completePath:String ):String {
 			var lastIndex:int = completePath.lastIndexOf('bin/');
 			if ( -1 == lastIndex )
 				lastIndex = completePath.lastIndexOf('bin\\');
@@ -141,8 +121,7 @@ package com.voxelengine.worldmodel
 			return fileName;	
 		}
 		
-		public function removeGlobalAppPath( completePath:String ):String 
-		{
+		public function removeGlobalAppPath( completePath:String ):String {
 			var gap:String = Globals.appPath;
 			var lastIndex:int = completePath.lastIndexOf( gap );
 			var fileName:String = completePath;
@@ -153,8 +132,7 @@ package com.voxelengine.worldmodel
 		}
 		
 		private var _tempContext:Context3D;
-		public function onTextureLoadComplete (event:Event):void 
-		{
+		public function onTextureLoadComplete (event:Event):void {
 			var textureBitmap:Bitmap = Bitmap(LoaderInfo(event.target).content);// .bitmapData;
 			var fileNameAndPath:String = event.target.url
 //			Log.out( "TextureBank.onTextureLoadComplete: " + fileNameAndPath );	
@@ -169,8 +147,7 @@ package com.voxelengine.worldmodel
 			_tempContext = null;
 		}			
 		
-		public function uploadTexture( $context:Context3D, bmp:Bitmap, useMips:Boolean = true ):Texture	
-		{
+		public function uploadTexture( $context:Context3D, bmp:Bitmap, useMips:Boolean = true ):Texture {
 			var tex:Texture = $context.createTexture(bmp.width, bmp.height, Context3DTextureFormat.BGRA, false);
 			if ( useMips )
 				uploadTextureWithMipmaps( tex, bmp.bitmapData );
