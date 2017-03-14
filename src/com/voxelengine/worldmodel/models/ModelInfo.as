@@ -189,6 +189,23 @@ public class ModelInfo extends PersistenceObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// start oxelPersistence (oxel) operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	public function oxelLoadData():void {
+		if ( oxelPersistence ) {
+			if ( oxelPersistence.oxelCount )
+				OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, oxelPersistence );
+			else {
+				oxelPersistence.createTaskToLoadFromByteArray(guid, OxelPersistence.NORMAL_BYTE_LOAD_PRIORITY );
+			}
+
+			//Log.out( "ModelInfo.loadOxelData - returning loaded oxel guid: " + guid );
+		} else {
+			addOxelDataCompleteListeners();
+			// try to load from tables first
+			//Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
+			OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_PERSISTANCE );
+		}
+	}
+
 	private function addOxelDataCompleteListeners():void {
 		OxelDataEvent.addListener( ModelBaseEvent.ADDED, retrievedData );
 		OxelDataEvent.addListener( ModelBaseEvent.RESULT, retrievedData );
@@ -269,27 +286,6 @@ public class ModelInfo extends PersistenceObject
 		return result;
 	}
 
-	public function oxelDataChanged():void {
-		 oxelPersistence.changed = true;
-	}
-	
-	public function oxelLoadData():void {
-		if ( oxelPersistence ) {
-			if ( oxelPersistence.oxelCount )
-				OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, oxelPersistence );
-			else {
-				oxelPersistence.createTaskToLoadFromByteArray(guid, OxelPersistence.NORMAL_BYTE_LOAD_PRIORITY );
-			}
-
-			//Log.out( "ModelInfo.loadOxelData - returning loaded oxel guid: " + guid );
-		} else {
-			addOxelDataCompleteListeners();
-			// try to load from tables first
-			//Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
-			OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_PERSISTANCE );
-		}
-	}
-	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// start script operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
