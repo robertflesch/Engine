@@ -72,7 +72,7 @@ public class PersistenceEvent extends Event
    
 	public override function toString():String
 	{
-		return formatToString("PersistenceEvent", "series", "table", "guid", "dbo", "data", "format", "other" );
+		return formatToString("PersistenceEvent", "type", "table", "guid", "dbo", "data", "series" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

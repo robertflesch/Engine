@@ -3288,7 +3288,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	public static function generateCubeNah( $modelGuid:String, $layer:LayerInfo, $generateEvent:Boolean = true ):ByteArray {
 		var ba:ByteArray = COMPRESSED_REFERENCE_BA_SQUARE;
 		if ( $generateEvent )
-			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba, null, $layer.offset.toString() ) );
 		return ba;
 	}
 
@@ -3307,30 +3307,30 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 
 		//trace("GenerateCube.start on rootGrain of max size: " + rootGrain + "  Filling with grain of size: " + minGrain + " of type: " + Globals.Info[_layer.type].name );
-		var loco:GrainCursor = GrainCursorPool.poolGet(rootGrain);
+		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrain);
 		var size:int = 1 << (rootGrain - minGrain);
 		for ( var x:int = 0; x < size; x++ ) {
 			for ( var y:int = 0; y < size; y++ ) {
 				for ( var z:int = 0; z < size; z++ ) {
-					loco.set_values( x, y, z, minGrain )
-					oxel.write( $modelGuid, loco, $layer.type, true );
+					gct.set_values( x, y, z, minGrain )
+					oxel.write( $modelGuid, gct, $layer.type, true );
 				}
 			}
 		}
+		GrainCursorPool.poolDispose( gct );
 		oxel.dirty = true;
-		// CRITICAL STEP. when restoring the oxel, it expects to have faces, not dirty faces
+		// CRITICAL STEP. oxels are expected to have faces, not dirty faces
 		// So this step turns the dirty faces into real faces.
-		// for multistep builds I will have to ponder this more.
-//			oxel.facesBuildWater();
+		// for multistep island builds I will have to ponder this more.
 		oxel.facesBuild();
-		GrainCursorPool.poolDispose( loco );
 
 		var ba:ByteArray = oxel.toByteArray();
 //			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
 //			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
 		//Log.out( "GenerateCube finished modelGuid: " + $modelGuid );
 		if ( $generateEvent )
-			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba, null, rootGrain.toString() ) );
+
 		//PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
 		return ba;
 	}

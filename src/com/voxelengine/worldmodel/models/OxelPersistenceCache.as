@@ -165,6 +165,12 @@ public class OxelPersistenceCache
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
 		var od:OxelPersistence = new OxelPersistence( $pe.guid, null, $pe.data, true );
+		if ( $pe.other )
+			od.bound = parseInt($pe.other);
+		else {
+			Log.out( "OxelDataCache.generateSucceed - BUT with unknown bound. Assigning bound of 0" + $pe.toString(), Log.WARN );
+			od.bound = 0;
+		}
 		add( $pe.series, od );
 		Log.out( "OxelDataCache.generateSucceed " + $pe.toString(), Log.INFO );
 	}
