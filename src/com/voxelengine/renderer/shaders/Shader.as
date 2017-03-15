@@ -31,8 +31,8 @@ package com.voxelengine.renderer.shaders
 
 		static private      var     _lastTextureName:String;
 		static private      var     _s_lights:Vector.<ShaderLight> = new Vector.<ShaderLight>();
-		static protected	var		_textureOffsetU:Number = 0.0
-		static protected	var		_textureOffsetV:Number = 0.0
+		static protected	var		_textureOffsetU:Number = 0.0;
+		static protected	var		_textureOffsetV:Number = 0.0;
 		
 		protected			var		_program3D:Program3D = null;	
 		protected			var		_textureName:String = "assets/textures/oxel.png";
@@ -53,7 +53,9 @@ package com.voxelengine.renderer.shaders
 		}
 		
 		static public  function     animationOffsetsUpdate( $elapsed:int ):void 						{ 
-			_textureOffsetV -= 0.000006 * $elapsed;
+			//_textureOffsetV -= 0.000006 * $elapsed;
+			// after removing the division by grain size in shader, I needed to slow it down a bit.
+			_textureOffsetV -= 0.000001 * $elapsed;
 			                   
 			//if ( _textureOffsetV < -0.888671875 )
 			if ( _textureOffsetV < -0.9296875 )  //Texture length - 64, so we dont run past end.
@@ -96,8 +98,10 @@ package com.voxelengine.renderer.shaders
 					// this result has the camera angle as part of the matrix, which is not good when calculating light
 					"mov op, vt0",       // move the transformed vertex data (vt0) in output position (op)
 
-					"div vt1, vc12.xy, va1.z",        // grain
-					"add v0, va1.xy, vt1.xy", // add in the UV offset (va1) and the animated offset (vc12) (may be 0 for non animated), and put in v0 which holds the UV offset
+//					"div vt1, vc12.xy, va1.z",        // grain, this did NOT work.
+					"mov vt1, vc12.xy",       // move the transformed UV offset
+
+					"add v0, va1.xy, vt1.xy", // add in the UV offset (va1) and the animated offset (vc12/vt1) (may be 0 for non animated), and put in v0 which holds the UV offset
 					"mov v1, va2",        	// pass texture color and brightness (va3) to the fragment shader via v1
 
 					// the transformed vertices without the camera data
@@ -312,7 +316,7 @@ package com.voxelengine.renderer.shaders
 		
 		public function setTextureInfo( json:Object ):void {
 			if ( json.textureName )
-				_textureName = json.textureName
+				_textureName = json.textureName;
 			if ( json.textureScale )
 				_textureScale = Number(json.textureScale);
 		}

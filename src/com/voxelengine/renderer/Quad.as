@@ -382,13 +382,6 @@ public class Quad {
 			components[componentIndex++].setNums( x, y, z );
 		}
 		
-		//if ( null == components[componentIndex] )
-			//components[componentIndex++] = new UV( u, v );
-		//else {
-			//_s_numArgs[0] = u;
-			//_s_numArgs[1] = v;
-			//components[componentIndex++].setNumArray( _s_numArgs );
-		//}
 		// va1
 		if ( null == components[componentIndex] )
 			components[componentIndex++] = new UVScale( u, v, $grain );
@@ -396,16 +389,6 @@ public class Quad {
 			components[componentIndex++].setNums( u, v, $grain );
 		}
 	
-		// TODO Should replace these with computed normals
-		// See http://www.volumesoffun.com/polyvox/documentation/dev/manual/Lighting.html#normal-calculation-for-cubic-meshes
-		// https://bitbucket.org/volumesoffun/polyvox/src/735b0ab6b153/examples/common/?at=develop
-		// va2
-//		if ( null == components[componentIndex] )
-//			components[componentIndex++] = new Normal( normalx, normaly, normalz );
-//		else {
-//			components[componentIndex++].setInts( normalx, normaly, normalz );
-//		}
-
 		// va3
 		if ( null == components[componentIndex] )
 			components[componentIndex++] = new ColorUINT( tint );
