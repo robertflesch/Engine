@@ -14,11 +14,11 @@ import com.voxelengine.Log
 import com.voxelengine.Globals
 import com.voxelengine.renderer.Chunk
 
+// Note that rendingTasks automatically add them selves to the queue.
 public class RefreshFaces extends RenderingTask
 {
     static public function addTask( $guid:String, $chunk:Chunk, $taskPriority:int ): void {
-        var rq:RefreshFaces = new RefreshFaces( $guid, $chunk, $taskPriority );
-        Globals.g_landscapeTaskController.addTask( rq )
+        new RefreshFaces( $guid, $chunk, $taskPriority );
     }
 
     public function RefreshFaces( $guid:String, $chunk:Chunk, $taskPriority:int ):void {

@@ -64,7 +64,13 @@ public class Inventory extends PersistenceObject
 			Log.out( "Inventory.save - Not LOADED - guid: " + guid, Log.DEBUG );
 			return; 
 		}
-		super.save();
+
+		if ( Player.DEFAULT_PLAYER == guid) {
+			Log.out("Inventory.save - Not saving DEFAULT_PLAYER - guid: " + guid, Log.DEBUG);
+			return;
+		}
+
+		validatedSave();
 	}
 	
 	override protected function toObject():void {

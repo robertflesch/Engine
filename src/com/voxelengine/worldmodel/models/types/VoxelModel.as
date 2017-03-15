@@ -468,8 +468,11 @@ public class VoxelModel
 		else {
 			Log.out( "VoxelModel.write - going to changeOxel");
 			var result:Boolean = modelInfo.changeOxel( instanceInfo.instanceGuid, $gc, $type, $onlyChangeType );
-			if ( result )
-				modelInfo.oxelPersistence.changed = true;
+			if ( result ) {
+				// Do immediate build, if we schedule task then faces are empty for a few frames.
+                modelInfo.oxelPersistence.oxel.facesBuild();
+				modelInfo.oxelPersistence.oxel.quadsBuild();
+			}
 			return result;
 		}
 		return false
@@ -1230,8 +1233,7 @@ public class VoxelModel
 				sl = new Lamp();
 				break;
 			case 1:
-				sl = new Torch();
-				(sl as Torch).flicker = true;
+				sl = new LampBright();
 				break;
 			case 2:
 				sl = new RainbowLight();
@@ -1240,7 +1242,8 @@ public class VoxelModel
 				sl = new BlackLamp();
 				break;
 			case 4:
-				sl = new LampBright();
+				sl = new Torch();
+				(sl as Torch).flicker = true;
 				_torchIndex = -1; // its going to get incremented
 				break;
 		}

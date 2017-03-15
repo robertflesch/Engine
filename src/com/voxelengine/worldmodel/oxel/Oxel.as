@@ -660,20 +660,16 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 		GrainCursorPool.poolDispose( gct );
 
-		this.parentMarkAs();
 		// remove chunk before changing type, so it know what VBO its in.
 		quadsDeleteAll();
-		this.type = TypeInfo.AIR;
-		this.dirty = true;
-
+		this.parentMarkAs();
 		if (lighting) {
 			LightingPool.poolReturn(lighting);
 			lighting = null;
 		}
 
-		if (_flowInfo) {
+		if (_flowInfo)
 			_flowInfo = null;
-		}
 
 		// Dont do this when generating terrain
 		if ( $invalidateNeighbors )
@@ -1186,10 +1182,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 	
 	public function facesBuildTerminal():void {
-		//if ( gc.eval( 5, 101, 72, 16 )) {
-		//	var result:Boolean = faceHasDirtyBits();
+		//if ( gc.eval( 4, 0, 3, 13 ))
 		//	Log.out("Oxel.facesBuildTerminal - not being lit");
-		//}
 
 		if ( TypeInfo.AIR == type )
 			facesMarkAllClean();
@@ -1566,6 +1560,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	protected function quadsBuildTerminal( $plane_facing:int = 1 ):void {
 		var changeCount:int = 0;
 		// Does this oxel have faces
+//		if ( gc.eval( 4,0, 3, 13) )
+//				Log.out ( "Watch pos y face" );
+
 		if ( facesHas() ) {
 			if ( null == _quads )
 				_quads = QuadsPool.poolGet();

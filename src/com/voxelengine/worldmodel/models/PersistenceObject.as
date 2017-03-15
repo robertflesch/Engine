@@ -107,15 +107,18 @@ public class PersistenceObject
 			return;
 		}
 
-		if (!Globals.isGuid(guid)) {
+		if ( !Globals.isGuid(guid)) {
 			if ( Player.DEFAULT_PLAYER == guid)
 				return;
 			Log.out("PersistenceObject.save - NOT Saving INVALID GUID: " + guid + " in table: " + table, Log.WARN);
 			return;
 		}
+		validatedSave();
+	}
 
-		changed = false;
+	protected function validatedSave():void {
 		var name:String = getQualifiedClassName(this);
+		changed = false;
 		Log.out(name + ".save - Saving to guid: " + guid + " in table: " + table, Log.DEBUG);
 		addSaveEvents();
 		toObject();

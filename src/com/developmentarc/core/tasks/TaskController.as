@@ -291,7 +291,7 @@ package com.developmentarc.core.tasks
 					this.next();
 					return;
 				}
-				// determine if it is a task or task base
+				// determine if it is a task group or task base
 				var task:ITask;
 				if(nextTask is ITaskGroup)
 				{
@@ -315,7 +315,9 @@ package com.developmentarc.core.tasks
 					
 					
 				} else {
+					//trace( "TaskController.nextTask.taskQueue.next() - length: " + taskQueue.length);
 					task = ITask(taskQueue.next());
+					//trace( "TaskController.nextTask.taskQueue.next() - length: " + taskQueue.length);
 				}
 				
 				
@@ -330,8 +332,9 @@ package com.developmentarc.core.tasks
 					task.addEventListener(TaskEvent.TASK_CANCEL, handleTaskEvent);
 					task.addEventListener(TaskEvent.TASK_ERROR, handleTaskEvent);
 					activeTasks.addItem(task, true);
+					//trace( "TaskController.nextTask - startING: " + task);
 					task.start();
-					//trace( "TaskController.nextTask - Executing" )
+					//trace( "TaskController.nextTask - startED: " + task );
 
 					// see if we can add more tasks
 					if (activeTasks.length < __activeTaskLimit) 

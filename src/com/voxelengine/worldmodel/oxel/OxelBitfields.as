@@ -8,7 +8,9 @@
 package com.voxelengine.worldmodel.oxel
 {
 	import com.voxelengine.Globals;
-	/**
+import com.voxelengine.worldmodel.TypeInfo;
+
+/**
 	 * ...
 	 * @author Robert Flesch RSF hides the bit masking of the raw data
 	 */
@@ -273,7 +275,15 @@ package com.voxelengine.worldmodel.oxel
 			return false;
 		}
 		
-		protected   function parentMarkAs():void 					{ _data |= OXEL_DATA_PARENT;  }
+		protected   function parentMarkAs():void 					{
+			_data |= OXEL_DATA_PARENT;
+			facesClearAll();
+			facesMarkAllClean();
+			type = TypeInfo.AIR;
+			dirty = true;
+			// should end up with 16778240 (0x1000400)
+			// dirty and parent
+		}
 		protected   function parentClear():void 					{ _data &= OXEL_DATA_PARENT_MASK; }
 		protected   function parentIs():Boolean 					{ return 0 < (_data & OXEL_DATA_PARENT) }
 		

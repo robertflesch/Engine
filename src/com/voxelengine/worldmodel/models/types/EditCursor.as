@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models.types
 {
 import com.adobe.utils.Hex;
+import com.voxelengine.GUI.voxelModels.WindowBluePrintCopy;
 
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
@@ -629,6 +630,11 @@ public class EditCursor extends VoxelModel
 			var fmRoot:Oxel = foundModel.modelInfo.oxelPersistence.oxel;
 			if ( CursorShapeEvent.SQUARE == cursorShape )
 			{
+				if ( foundModel.metadata.permissions.blueprint ) {
+					if ( !WindowBluePrintCopy.exists() )
+						new WindowBluePrintCopy( this)
+				}
+
 				var gcDelete:GrainCursor = GrainCursorPool.poolGet(foundModel.modelInfo.oxelPersistence.oxel.gc.bound);
 				// This is where it intersects with a grain 0
 				gcDelete.grainX = int( EditCursor.currentInstance.instanceInfo.positionGet.x + 0.05 );
@@ -882,13 +888,13 @@ public class EditCursor extends VoxelModel
 		if ( Globals.openWindowCount || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging || Log.showing )
 			return;
 		
-		Log.out( "EditCursor.mouseUp e: " + e.toString() )
+		//Log.out( "EditCursor.mouseUp e: " + e.toString() )
 		if ( doubleMessageHack ) {
 			switch (e.type) 
 			{
 				case "mouseUp": case Keyboard.NUMPAD_ADD:
 					if ( CursorOperationEvent.DELETE_OXEL == cursorOperation ) {
-						Log.out( "EditCursor.mouseUp DELETE IT" );
+						//Log.out( "EditCursor.mouseUp DELETE IT" );
 						deleteOxel();
 					}
 					else if ( CursorOperationEvent.INSERT_MODEL == cursorOperation )

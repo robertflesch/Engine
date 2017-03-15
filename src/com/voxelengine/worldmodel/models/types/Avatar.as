@@ -208,6 +208,8 @@ public class Avatar extends ControllableVoxelModel
 		//GUIEvent.dispatch( new GUIEvent(GUIEvent.TOOLBAR_SHOW));
 		var className:String = getQualifiedClassName( topmostControllingModel() );
 		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
+
+		torchToggle();
 	}
 
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {

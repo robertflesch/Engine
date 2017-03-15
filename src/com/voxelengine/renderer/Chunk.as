@@ -21,7 +21,7 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.tasks.renderTasks.BuildQuads;
 import com.voxelengine.worldmodel.tasks.renderTasks.RefreshFaces;
-import com.voxelengine.worldmodel.tasks.renderTasks.VistorTask;
+import com.voxelengine.worldmodel.tasks.renderTasks.VisitorTask;
 
 public class Chunk {
 	
@@ -221,7 +221,7 @@ public class Chunk {
 				_children[i].visitor( $guid, $func, $functionName );
 		}
 		else if ( _vertMan )
-			VistorTask.addTask( $guid, this, $func, 10000, $functionName )
+			VisitorTask.addTask( $guid, this, $func, 10000, $functionName )
 		
 	}
 

@@ -14,11 +14,12 @@ import com.voxelengine.Log
 import com.voxelengine.Globals
 import com.voxelengine.renderer.Chunk
 
+// Note that rendingTasks automatically add them selves to the queue.
 public class BuildQuads extends RenderingTask
 {
     static public function addTask( $guid:String, $chunk:Chunk, $taskPriority:int ): void {
-        var rq:BuildQuads = new BuildQuads( $guid, $chunk, $taskPriority );
-        Globals.g_landscapeTaskController.addTask( rq )
+        //Log.out("BuildQuads.addTask: guid: " + $guid, Log.WARN);
+        new BuildQuads( $guid, $chunk, $taskPriority );
     }
 
     public function BuildQuads( $guid:String, $chunk:Chunk, $taskPriority:int ):void {

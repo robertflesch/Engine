@@ -225,7 +225,7 @@ public class OxelPersistence extends PersistenceObject
 				oxel.quadsBuild();
 			}
 			else {
-				//Log.out( "OxelPersistence.update ------------ calling refreshQuads guid: " + guid, Log.DEBUG );
+				Log.out( "OxelPersistence.update ------------ calling refreshQuads guid: " + guid, Log.DEBUG );
 				topMostChunk.buildQuadsRecursively( guid, $vm, _initializeFacesAndQuads );
 				if ( _initializeFacesAndQuads )
 					_initializeFacesAndQuads = false
