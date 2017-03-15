@@ -1182,8 +1182,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 	
 	public function facesBuildTerminal():void {
-		//if ( gc.eval( 4, 0, 3, 13 ))
-		//	Log.out("Oxel.facesBuildTerminal - not being lit");
 
 		if ( TypeInfo.AIR == type )
 			facesMarkAllClean();
@@ -1258,17 +1256,19 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 						var rface:int;
 						if ( !TypeInfo.hasAlpha( type ) ) {
 							rface = Oxel.face_get_opposite( face );
-							// get the children of my neighbor, that touch me.
-							const dchildren:Vector.<Oxel> = oppositeOxel.childrenForDirection( rface );
-							for each ( var dchild:Oxel in dchildren ) 
-							{
-								// Need to gather the alpha info from each child
-								// if a neighbor child has alpha, then I need to generate a face
-								// if all neighbors are opaque, that face is not needed
-								if ( true == dchild.faceHasAlpha( rface ) ) {
-									faceSet( face );
-								}
-							}
+							if ( faceAlphaOrScalingNeedsFace( face, type, oppositeOxel ) )
+								faceSet( face );
+//							// get the children of my neighbor, that touch me.
+//							const dchildren:Vector.<Oxel> = oppositeOxel.childrenForDirection( rface );
+//							for each ( var dchild:Oxel in dchildren )
+//							{
+//								// Need to gather the alpha info from each child
+//								// if a neighbor child has alpha, then I need to generate a face
+//								// if all neighbors are opaque, that face is not needed
+//								if ( true == dchild.faceHasAlpha( rface ) || (dchild.flowInfo && dchild.flowInfo.flowScaling.has() ) ) {
+//									faceSet( face );
+//								}
+//							}
 						}
 						else {
 							faceClear( face );
@@ -1432,6 +1432,31 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return false;	
 	}
 
+	// returns true if face is required
+	// works like a charm!
+	public function faceAlphaOrScalingNeedsFace( $face:int, $type:int, $no:Oxel ):Boolean	{
+
+		//	we only need a face here is the nieghbor is alpha of a different type
+		if ( !$no.childrenHas() ) {
+			if ( TypeInfo.hasAlpha( $no.type ) || ( $no.flowInfo && $no.flowInfo.flowScaling.has() ) )
+				return !( $type == $no.type );
+			else
+				return false;
+		}
+
+		// get the children touching $face
+		const dchildren:Vector.<Oxel> = $no.childrenForDirection( Oxel.face_get_opposite( $face ) );
+		for each ( var dchild:Oxel in dchildren )
+		{
+			// if any of the children have alpha of a different type
+			if ( faceAlphaOrScalingNeedsFace( $face, $type, dchild ) )
+				return true;
+		}
+
+		// all children for that direction are opaque, so this face is opaque
+		return false;
+	}
+
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// face function END
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1559,9 +1584,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	
 	protected function quadsBuildTerminal( $plane_facing:int = 1 ):void {
 		var changeCount:int = 0;
-		// Does this oxel have faces
-//		if ( gc.eval( 4,0, 3, 13) )
-//				Log.out ( "Watch pos y face" );
+		if ( Globals.g_oxelBreakEnabled	)
+			if ( gc.evalGC( Globals.g_oxelBreakData ) )
+				trace( "Oxel.quadsBuildTerminal - setGC breakpoint" );
 
 		if ( facesHas() ) {
 			if ( null == _quads )
