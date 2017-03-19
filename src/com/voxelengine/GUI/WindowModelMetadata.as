@@ -8,23 +8,8 @@
 
 package com.voxelengine.GUI 
 {
-import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.PersistenceEvent;
-import com.voxelengine.renderer.Renderer;
-import com.voxelengine.worldmodel.PermissionsModel;
-import com.voxelengine.worldmodel.animation.AnimationCache;
-import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.PermissionsBase;
-import flash.events.Event;
-import playerio.DatabaseObject;
-
-import org.flashapi.collector.EventCollector;
 import org.flashapi.swing.*
-import org.flashapi.swing.core.UIObject;
 import org.flashapi.swing.event.*;
-//import org.flashapi.swing.constants.*;
-import org.flashapi.swing.list.ListItem;
-import org.flashapi.swing.constants.BorderStyle;
 import org.flashapi.swing.constants.LayoutOrientation;
 import org.flashapi.swing.button.RadioButtonGroup;
 import org.flashapi.swing.databinding.DataProvider;
@@ -33,9 +18,13 @@ import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.renderer.Renderer;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.ModelMetadataCache;
+import com.voxelengine.worldmodel.PermissionsModel;
+import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.ModelMetadata;
+import com.voxelengine.worldmodel.models.InstanceInfo;
 
 public class WindowModelMetadata extends VVPopup
 {
@@ -201,7 +190,6 @@ Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );
 		if ( _type == TYPE_EDIT ) {
 			// this field only exists when I am editting
 			_vmm.permissions.copyCount = parseInt( _copies.label, 10 );
-			ModelMetadataEvent.create( ModelBaseEvent.UPDATE, 0, _vmm.guid, _vmm );
 		} else { // TYPE_IMPORT so new data
 			ModelMetadataEvent.create( ModelBaseEvent.GENERATION, 0, _vmm.guid, _vmm );
 		}

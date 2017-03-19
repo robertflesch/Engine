@@ -119,7 +119,7 @@ public class PersistenceObject
 	protected function validatedSave():void {
 		var name:String = getQualifiedClassName(this);
 		changed = false;
-		Log.out(name + ".save - Saving to guid: " + guid + " in table: " + table, Log.DEBUG);
+		//Log.out(name + ".save - Saving to guid: " + guid + " in table: " + table, Log.DEBUG);
 		addSaveEvents();
 		toObject();
 		if (dbo && dbo.changed)

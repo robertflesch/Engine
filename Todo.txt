@@ -1,6 +1,9 @@
+5075AE29-86EE-9A95-AC60-B2B5F1892C13
+
 VoxelVerse todo
 
 dynamic lighting on all of dragon
+check collision for objects, make sure they are not all check everything every frame. Only selected object should do that, or ones that have collision.
 
 need to add clipVelocity and speedMultiplier to animation editor
 
@@ -53,3 +56,4 @@ ModelInfoEvent.addListener( ModelBaseEvent.SAVE, 				save );
 			if ( modelInfo )
 				modelInfo.save();
 	}
+CMRBEPXR

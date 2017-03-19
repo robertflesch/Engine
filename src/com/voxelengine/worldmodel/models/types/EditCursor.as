@@ -9,6 +9,8 @@ package com.voxelengine.worldmodel.models.types
 {
 import com.adobe.utils.Hex;
 import com.voxelengine.GUI.voxelModels.WindowBluePrintCopy;
+import com.voxelengine.events.RegionEvent;
+import com.voxelengine.worldmodel.Region;
 
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
@@ -281,12 +283,12 @@ public class EditCursor extends VoxelModel
 			return;
 			
 		_s_listenersAdded = true;	
-		CursorOperationEvent.addListener( CursorOperationEvent.NONE, 			resetEvent )
+		CursorOperationEvent.addListener( CursorOperationEvent.NONE, 			resetEvent );
 		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_OXEL, 	deleteOxelEvent );
 		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_MODEL, 	deleteModelEvent);
 		CursorOperationEvent.addListener( CursorOperationEvent.INSERT_OXEL, 	insertOxelEvent );
 		CursorOperationEvent.addListener( CursorOperationEvent.INSERT_MODEL, 	insertModelEvent );
-		
+
 		CursorShapeEvent.addListener( CursorShapeEvent.CYLINDER, 		shapeSetEvent );
 		CursorShapeEvent.addListener( CursorShapeEvent.MODEL_AUTO, 		shapeSetEvent );
 		CursorShapeEvent.addListener( CursorShapeEvent.SPHERE, 			shapeSetEvent );
@@ -301,7 +303,7 @@ public class EditCursor extends VoxelModel
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_UP, 	 mouseUp);
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_MOVE,  mouseMove);
 		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_DOWN,  mouseDown);
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);			
+		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
 	}
 
 	
@@ -883,12 +885,12 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function mouseUp(e:MouseEvent):void  {
-		repeatTimerStop()
+		repeatTimerStop();
 		
 		if ( Globals.openWindowCount || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging || Log.showing )
 			return;
 		
-		//Log.out( "EditCursor.mouseUp e: " + e.toString() )
+		Log.out( "EditCursor.mouseUp e: " + e.toString() + "  Globals.active == true" );
 		if ( doubleMessageHack ) {
 			switch (e.type) 
 			{
@@ -914,7 +916,7 @@ public class EditCursor extends VoxelModel
 			return
 			
 		if ( doubleMessageHack ) {
-			//Log.out( "EditCursor.mouseDown", Log.WARN );	
+			//Log.out( "EditCursor.mouseDown", Log.WARN );
 				
 			if ( null == _repeatTimer && 0 == _count) {
 				_repeatTimer = new Timer( 200 );
@@ -971,7 +973,7 @@ public class EditCursor extends VoxelModel
 			rot.y -= 90;
 
 		objectModel.instanceInfo.rotationSet = rot
-	}	
+	}
 }
 }
 

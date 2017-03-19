@@ -32,13 +32,13 @@ package com.voxelengine.renderer.shaders
 			createProgram( $context );
 		}
 		
-		override public function update( mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, selected:Boolean, $isChild:Boolean = false ): Boolean {
+		override public function update( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, selected:Boolean, $isChild:Boolean = false ): Boolean {
 			if ( !updateTexture( $context ) )
 				return false;
 			
 			$context.setProgram( program3D );	
-			setVertexData( mvp, $vm, $context );
-			setFragmentData( $isChild, $vm, $context );
+			setVertexData( $mvp, $vm, $context );
+			setFragmentData( $mvp, $vm, $context, $isChild );
 			
 			//$context.setCulling(Context3DTriangleFace.NONE);
 			$context.setCulling(Context3DTriangleFace.BACK);
@@ -68,8 +68,8 @@ package com.voxelengine.renderer.shaders
 			$context.setProgramConstantsFromVector(Context3DProgramType.VERTEX, 4, _offsets);
 		}
 		
-		override protected function setFragmentData( $isChild:Boolean, $vm:VoxelModel, $context:Context3D ): void { return; } // nothing needed here
-		
+		override protected function setFragmentData( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $isChild:Boolean ): void { return; } // nothing needed here
+
 		override public function createProgram( $context:Context3D ):void {
 			// This uses 3 peices of vertex data from - setVertexData
 			// va0 holds the vertex locations

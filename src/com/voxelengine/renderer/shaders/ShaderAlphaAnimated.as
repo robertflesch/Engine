@@ -29,7 +29,7 @@ package com.voxelengine.renderer.shaders
 			
 			$context.setProgram( program3D );	
 			setVertexData( mvp, $vm, $context );
-			setFragmentData( $isChild, $vm, $context );
+			setFragmentData( mvp, $vm, $context, $isChild );
 			
 			//$context.setCulling(Context3DTriangleFace.NONE);
 			$context.setCulling(Context3DTriangleFace.BACK);

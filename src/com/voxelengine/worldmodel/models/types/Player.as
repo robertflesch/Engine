@@ -99,7 +99,7 @@ public class Player
 		ii.instanceGuid = $userId;
 
 		if ( DEFAULT_PLAYER == $modelGuid ) {
-			Log.out( "Avatar.createPlayer - creating DEFAULT_PLAYER from GenerateCube", Log.WARN )
+			//Log.out( "Avatar.createPlayer - creating DEFAULT_PLAYER from GenerateCube", Log.WARN )
 			var model:Object = GenerateCube.script( 4, TypeInfo.BLUE );
 			model.modelClass = "Avatar";
 			model.name = "Temp Avatar";

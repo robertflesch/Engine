@@ -348,7 +348,7 @@ package com.voxelengine.worldmodel.models
 		
 		static public function whichModelsIsThisInfluencedBy( vm:VoxelModel ):Vector.<VoxelModel> {
 			var modelList:Vector.<VoxelModel> = new Vector.<VoxelModel>;
-			if ( !vm.modelInfo.oxelPersistence )
+			if ( !vm.modelInfo.oxelPersistence || 0 == vm.modelInfo.oxelPersistence.oxelCount )
 				return modelList;
 			var worldSpaceStartPointOrigin:Vector3D = vm.instanceInfo.positionGet;
 			_s_worldSpaceStartPointCorner.setTo( worldSpaceStartPointOrigin.x, worldSpaceStartPointOrigin.y, worldSpaceStartPointOrigin.z );

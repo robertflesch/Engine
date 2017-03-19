@@ -141,7 +141,7 @@ public class ModelCache
 		else
 		{
 			if ( vm is Avatar ) {
-				Log.out( "ModelCache.add AVATAR - vm.instanceInfo.instanceGuid: " + vm.instanceInfo.instanceGuid, Log.WARN );
+				//Log.out( "ModelCache.add AVATAR - vm.instanceInfo.instanceGuid: " + vm.instanceInfo.instanceGuid, Log.WARN );
 				// need to separate these out into their own category
 				if ( null == _instanceByGuid[vm.instanceInfo.instanceGuid] ) {
 					_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;

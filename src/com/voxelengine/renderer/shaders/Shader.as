@@ -251,8 +251,19 @@ package com.voxelengine.renderer.shaders
 				_constants[i++] = 0;
 		}
 		
-		protected function setFragmentData( $isChild:Boolean, $vm:VoxelModel, $context:Context3D ): void {
-			
+		protected function setFragmentData( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $isChild:Boolean  ): void {
+
+			var parentPos:Vector3D;
+			if ( $isChild ) {
+				// if child we need to calculate the position within the parent.
+				//trace( "Shader.setFragmentData position: " + $mvp.position );
+				//parentPos = parentVM.wsPositionGet()
+				//trace( "Shader.setFragmentData position: " + $mvp.position + "  light position: " + lp );
+			}
+			else
+				parentPos = new Vector3D();
+
+
 			// TODO - pass in multiple lights
 			var lp:Vector3D;
 			var color:Vector3D;
@@ -262,6 +273,11 @@ package com.voxelengine.renderer.shaders
 			if ( 0 < Shader.lightCount() ) { // This is currently ALWAYS true, no light is just a black light
 				light = lights(0);
 				lp = light.position;
+				if ( $isChild ) {
+					lp = $mvp.transformVector(lp);
+					trace( "Shader.setFragmentData  world view position: " + $mvp.position + "  light position: " + lp );
+				}
+
 				color = light.color;
 				nearDistance = light.nearDistance;
 				endDistance = light.endDistance;

@@ -30,7 +30,7 @@ public class FromByteArray extends AbstractTask
 	private var	_op:OxelPersistence;
 
 	static public function addTask( $guid:String, $taskPriority:int, $parent:OxelPersistence ): void {
-		Log.out( "FromByteArray.addTask: guid: " + $guid + "  taskPriority: " + $taskPriority + "  op: " + $parent, Log.WARN );
+		//Log.out( "FromByteArray.addTask: guid: " + $guid + "  taskPriority: " + $taskPriority + "  op: " + $parent, Log.WARN );
 		var fba:FromByteArray = new FromByteArray( $guid, $taskPriority, $parent );
 		Globals.g_landscapeTaskController.addTask( fba )
 	}
@@ -50,7 +50,7 @@ public class FromByteArray extends AbstractTask
 			// The ModelMakerImporter tries to double load the byte array.
 			// Rather then mess with importer, this work around was added RSF.
 			if ( 0 == _op.oxelCount) {
-				Log.out("FromByteArray.start: guid: " + _guid, Log.WARN);
+				//Log.out("FromByteArray.start: guid: " + _guid, Log.WARN);
 				_op.ba.position = 0;
 				_op.loadFromByteArray();
 

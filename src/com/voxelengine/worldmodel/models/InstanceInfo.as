@@ -176,13 +176,11 @@ public class InstanceInfo extends Location	{
 		var ii:Object 		= super.toObject()
 		ii.instanceGuid		= instanceGuid; 
 		ii.modelGuid 		= modelGuid;
-		ii.collision 		= collidable;
-//		ii.baseLightLevel 	= baseLightLevel;
-		
+
 		if ( velocityGet.length )
 			ii.velocity		= vector3DToObject( velocityGet );
 		if ( usesCollision )
-			ii.collision 		= usesCollision;
+			ii.usesCollision 		= usesCollision;
 		if ( collidable )
 			ii.collidable 		= collidable;
 		if ( _critical )
@@ -367,18 +365,18 @@ public class InstanceInfo extends Location	{
 	
 	public function setCollisionInfo( $info:Object ):void {
 		// is this object able to be collided with 
-		_collidable = true;
+		collidable = true;
 		if ( $info.collidable ) {
 			var collideableVal:String = $info.collidable;
 			if ( "false" == collideableVal.toLowerCase() )
-				_collidable = false;
+				collidable = false;
 		}	
 		
 		// does this object attempt to collide with other objects?
 		usesCollision = false;
-		if ( $info.collision )
+		if ( $info.usesCollision )
 		{
-			var collisionVal:String = $info.collision;
+			var collisionVal:String = $info.usesCollision;
 			if ( "true" == collisionVal.toLowerCase() )
 				usesCollision = true;
 		}

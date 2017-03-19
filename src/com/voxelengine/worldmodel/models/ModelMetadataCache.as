@@ -42,7 +42,6 @@ public class ModelMetadataCache
 		ModelMetadataEvent.addListener( ModelBaseEvent.EXISTS_REQUEST, 	checkIfExists );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, 	requestType );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, 		request );
-		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE, 			update );
 		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, 			deleteHandler );
 		//ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, 		generated );
 		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );		
@@ -127,23 +126,6 @@ public class ModelMetadataCache
 		}
 	}
 
-	
-	static private function update($mme:ModelMetadataEvent):void {
-		if ( null == $mme || null == $mme.modelGuid ) { // Validator
-			Log.out("ModelMetadataCache.update - event or guid is NULL: ", Log.ERROR);
-			ModelMetadataEvent.create(ModelBaseEvent.EXISTS_ERROR, ( $mme ? $mme.series : -1 ), "MISSING", null);
-		} else {
-			// check to make sure is not already there
-			var vmm:ModelMetadata = _metadata[$mme.modelGuid];
-			if ( null ==  vmm ) {
-				Log.out( "ModelMetadataCache.update trying update NULL metadata or guid, adding instead", Log.WARN );
-				add( 0, $mme.modelMetadata );
-			} else {
-				vmm.update( $mme.modelMetadata );
-			}
-		}
-	}
-	
 	static private function deleteHandler( $mme:ModelMetadataEvent ):void {
 		if ( null == $mme || null == $mme.modelGuid ) { // Validator
 			Log.out("ModelMetadataCache.deleteHandler - event or guid is NULL: ", Log.ERROR);

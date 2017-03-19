@@ -11,6 +11,8 @@ import com.voxelengine.GUI.WindowSplash;
 import com.voxelengine.GUI.WindowWater;
 import com.voxelengine.events.AnimationEvent
 import com.voxelengine.events.AppEvent;
+import com.voxelengine.events.CursorOperationEvent;
+import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.persistance.Persistence;
@@ -167,13 +169,10 @@ public class VoxelVerse extends Sprite
 
 		VoxelVerseGUI.currentInstance.buildGUI()
 
-		addEventListener(Event.DEACTIVATE, deactivate);
-		addEventListener(Event.ACTIVATE, activate);
 		stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
-		activate( new Event( Event.ACTIVATE ) );
+		stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
+		mouseUp( null );
 		Log.out("<===============VoxelVerse.readyToGo: " + (getTimer() - _s_timeEntered) );
-		return;
-
 	}
 
 	private var _fpsStat:int;
@@ -181,11 +180,11 @@ public class VoxelVerse extends Sprite
 
 	private var _s_timeEntered:int;
 	private var _s_timeExited:int = getTimer();
-	private var _s_timeRender:int;
-	private var _s_timeUpdate:int;
+
 	private var _s_timeLastFPS:int;
-	private var framesToDisplaySplash:int;
 	private var _s_frameCounter:int = 0;
+	private var framesToDisplaySplash:int;
+
 	private function enterFrame(e:Event):void {
 		if ( 0 == _s_timeEntered ) {
 			if ( _splashDisplayed && ( 1 == framesToDisplaySplash) )
@@ -206,10 +205,10 @@ public class VoxelVerse extends Sprite
 
 		RegionManager.instance.update( interFrameTime );
 		Shader.animationOffsetsUpdate( interFrameTime );
-		_s_timeUpdate = getTimer() - _s_timeEntered;
+		//var _timeUpdate:int = getTimer() - _s_timeEntered;
 
 		Renderer.renderer.render();
-		_s_timeRender = getTimer() - _s_timeEntered - _s_timeUpdate;
+		//var _timeRender:int = getTimer() - _s_timeEntered - _s_timeUpdate;
 
 		if ( showConsole )
 			toggleConsole();
@@ -236,60 +235,30 @@ public class VoxelVerse extends Sprite
 	 *  This allow the app to not pick up any other mouse or keyboard activity when app is not active
 	 */
 	public function mouseLeave( e:Event ):void {
-		//Log.out( "VoxelVerse.mouseLeave event" );
-		deactivate( e )
+		Log.out( "VoxelVerse.mouseLeave even" );
+		Globals.active = false;
+		VoxelVerseGUI.currentInstance.crossHairInactive();
+		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE, 0 ) );
+
+		MemoryManager.update();
+		MouseKeyboardHandler.reset();
+		stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
+		dispatchSaves();
 	}
 
-	private function deactivate(e:Event):void {
-		//Log.out( "VoxelVerse.deactivate event", Log.WARN );
-		if ( Globals.active )
-			appLostFocus(e);
+	// I only receive this if the mouse is over the app.
+	private function mouseUp(e:MouseEvent):void {
+		if ( e )
+			Log.out( "VoxelVerse.mouseUp event: localX: " + e.localX + "  localY: " + e.localY + "  stageX: " + e.stageX + "  stageY: " + e.stageY);
+		else
+			Log.out( "VoxelVerse.mouseUp event" );
 
-		function appLostFocus(e:Event):void {
-			Globals.active = false;
-//			Globals.clicked = false;
-			//Log.out( "VoxelVerse.appLostFocus Globals.active: " + Globals.active, Log.WARN );
-
-			VoxelVerseGUI.currentInstance.crossHairInactive();
-
-			MemoryManager.update();
-			MouseKeyboardHandler.reset();
-
-			// one way to wake us back up is thru the mouse click
-			//stage.addEventListener(MouseEvent.MOUSE_DOWN, mouseDown)
-			stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-			stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
-
-			if ( Globals.online ) {
-				AppEvent.dispatch( e );
-				dispatchSaves();
-			}
-			//else
-			//	Log.out( "VoxelVerse.deactivateApp - app already deactivated", Log.WARN )
-		}
-	}
-
-
-	private function activate(e:Event):void {
-        //Log.out( "VoxelVerse.activate Globals.active: " + Globals.active + "  Globals.clicked: " + Globals.clicked )
-		//Log.out( "VoxelVerse.activate Globals.active: " + Globals.active, Log.DEBUG )
-		if ( false == Globals.active )
-			appGainsFocus(e);
-
-		//else
-		//	Log.out( "VoxelVerse.activateApp - ignoring" )
-		function appGainsFocus(e:Event):void {
-			Globals.active = true;
-//			Globals.clicked = true;
-			//Log.out( "VoxelVerse.appGainsFocus Globals.active: " + Globals.active, Log.WARN )
-
+		if ( Globals.active == false ) {
+			Log.out( "VoxelVerse.activate Globals.active: " + Globals.active );
 			VoxelVerseGUI.currentInstance.crossHairActive();
-
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-
-			AppEvent.dispatch( e );
+			Globals.active = true;
 		}
-
 	}
 
 	private static function dispatchSaves():void {
@@ -303,18 +272,6 @@ public class VoxelVerse extends Sprite
 		}
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) );
 		OxelDataEvent.create( ModelBaseEvent.SAVE, 0, "", null );
-	}
-
-	//private function mouseDown(e:MouseEvent):void
-	//{
-		//stage.removeEventListener(MouseEvent.MOUSE_DOWN, mouseDown)
-
-	//}
-
-	private function mouseUp(e:MouseEvent):void {
-		//Log.out( "VoxelVerse.mouseUp event" )
-		stage.removeEventListener(MouseEvent.MOUSE_UP, mouseUp);
-		activate(e)
 	}
 
 	private function toggleConsole():void {

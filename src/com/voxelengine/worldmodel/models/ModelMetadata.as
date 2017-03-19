@@ -59,8 +59,9 @@ public class ModelMetadata extends PersistenceObject
 	public function get thumbnail():BitmapData 				{ return _thumbnail; }
 	public function set thumbnail(value:BitmapData):void 	{ _thumbnail = value; changed = true; }
 
-	public function get thumbnailLoaded():Boolean 			{ return dbo.thumbnailLoaded; }
-	public function set thumbnailLoaded($val:Boolean):void  { dbo.thumbnailLoaded = $val; }
+	private var _thumbnailLoaded:Boolean;
+	public function get thumbnailLoaded():Boolean 			{ return _thumbnailLoaded; }
+	public function set thumbnailLoaded($val:Boolean):void  { _thumbnailLoaded = $val; }
 	
 	public function toString():String {
 		return "name: " + name + "  description: " + description + "  guid: " + guid + "  owner: " + owner;
@@ -138,23 +139,7 @@ public class ModelMetadata extends PersistenceObject
 		
 	}
 	
-	public function update( $vmm:ModelMetadata ):void {
-		name 			= $vmm.name;
-		description 	= $vmm.description;
-		owner 			= $vmm.owner;
-		thumbnail 		= $vmm.thumbnail;
-		animationClass =  $vmm.animationClass;
-Log.out( "ModelMetadata.update - How do I handle permissions here?", Log.WARN );
-		//creator 		= $vmm.creator;
-		//template		= $vmm.template;
-		//templateGuid	= $vmm.templateGuid;
-		//copy			= $vmm.copy;
-		//copyCount		= $vmm.copyCount;
-		//modify		= $vmm.modify;
-		//transfer		= $vmm.transfer;
-	}
-	
-	// This was private, force a message to be sent to it. 
+	// This was private, force a message to be sent to it.
 	// But the voxelModel has a handle to it, seems silly to have to propgate it every where, so its public
 	private function saveEvent( $vmd:ModelMetadataEvent ):void {
 		if ( guid != $vmd.modelGuid ) {

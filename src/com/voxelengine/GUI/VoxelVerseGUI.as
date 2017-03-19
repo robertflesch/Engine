@@ -8,60 +8,44 @@
 
 package com.voxelengine.GUI
 {
-import com.voxelengine.GUI.actionBars.UserInventory;
-import com.voxelengine.GUI.actionBars.WindowBeastControl;
-import com.voxelengine.renderer.Renderer;
-import com.voxelengine.worldmodel.ConfigManager;
-import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.models.OxelPersistence;
-import com.voxelengine.worldmodel.models.types.Player;
-import flash.display.DisplayObjectContainer;
 import flash.display.Sprite;
-import flash.display.Stage;
-import flash.errors.IOError;
 import flash.events.Event;
 import flash.events.EventDispatcher;
-import flash.events.MouseEvent;
 import flash.events.KeyboardEvent;
 import flash.events.TimerEvent;
 import flash.net.FileReference;
 import flash.ui.Keyboard;
-import flash.utils.ByteArray;
-import flash.utils.ByteArray;
-import flash.utils.Timer;
-import flash.utils.getQualifiedClassName;
 import flash.events.FullScreenEvent;
 import flash.display.StageDisplayState;
-import org.flashapi.swing.Button;
+
 import org.flashapi.swing.event.UIOEvent;
 import org.flashapi.swing.Label;
-import org.flashapi.swing.Popup;
 import org.flashapi.swing.framework.FDTrace; // Allows FlashDevelop to trace FlashAPI messages
-
 import org.flashapi.swing.UIManager;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 
-import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.RoomEvent;
 
+import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.GUI.crafting.WindowCrafting;
 import com.voxelengine.GUI.inventory.WindowInventory;
 import com.voxelengine.GUI.inventory.WindowInventoryNew;
 import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 import com.voxelengine.GUI.voxelModels.WindowRegionModels;
 
+import com.voxelengine.renderer.Renderer;
+
 import com.voxelengine.server.WindowLogin;
 import com.voxelengine.server.RoomConnection;
 
-import com.voxelengine.worldmodel.biomes.LayerInfo;
+import com.voxelengine.worldmodel.ConfigManager;
+import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.RegionManager;
-//	import com.voxelengine.worldmodel.scripts.FireProjectileScript;
 
 public class VoxelVerseGUI extends EventDispatcher
 {
@@ -269,10 +253,10 @@ public class VoxelVerseGUI extends EventDispatcher
 		if ( !_built ) {
 			_releaseMenu = addReleaseMenu();
 			_releaseMenu.visible = false;
-			if ( true == Globals.isDebug ) {
-				_debugMenu = new WindowDebugMenu();
-				_debugMenu.visible = false;
-			}
+//			if ( true == Globals.isDebug ) {
+//				_debugMenu = new WindowDebugMenu();
+//				_debugMenu.visible = false;
+//			}
 			if ( !Renderer.renderer.hardwareAccelerated )
 				 new WindowNotHardware( "WARNING", "Hardware acceleration is not enabled in your browser, this is happening in Chrome on some machines, try FireFox or Internet Explorer" );
 			_built = true;
@@ -320,7 +304,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	private function onKeyPressed( e : KeyboardEvent) : void {
-		Log.out( "VoxelVerseGUI.onKeyPressed: KeyboardEvent: " + e.keyCode );
+		//Log.out( "VoxelVerseGUI.onKeyPressed: KeyboardEvent: " + e.keyCode );
 		if ( Keyboard.F11 == e.keyCode )
 			Renderer.renderer.screenShot( true ); // draws UI
 

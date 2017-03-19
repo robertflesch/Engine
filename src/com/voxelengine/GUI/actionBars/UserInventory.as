@@ -331,8 +331,7 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function onDeactivate( $ae:Event ):void {
-		Log.out( "UserInventory.onDeactivate STOPPING EDIT ON DEACTIVE NO LONGER ACTIVE", Log.DEBUG );
-//		processItemSelection( boxes[1], false )
+		processItemSelection( boxes[1], false )
 	}
 	
 	private function onCursorOperationNone(e:CursorOperationEvent):void { 
@@ -342,7 +341,7 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function processItemSelection( box:UIObject, $propagate:Boolean = true ):void {
-		//Log.out( "UserInventory.processItemSelection - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex + " box.name: " + box.name, Log.DEBUG );
+		Log.out( "UserInventory.processItemSelection - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex + " box.name: " + box.name, Log.DEBUG );
 		if ( 0 < Globals.openWindowCount )
 			return;
 			

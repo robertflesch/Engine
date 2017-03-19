@@ -23,13 +23,13 @@ package com.voxelengine.renderer.shaders
 			createProgram( $context );
 		}
 		
-		override public function update( mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, selected:Boolean, $isChild:Boolean = false ): Boolean {
+		override public function update( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, selected:Boolean, $isChild:Boolean = false ): Boolean {
 			if ( !updateTexture( $context ) )
 				return false;
 			
 			$context.setProgram( program3D );	
-			setVertexData( mvp, $vm, $context );
-			setFragmentData( $isChild, $vm, $context );
+			setVertexData( $mvp, $vm, $context );
+			setFragmentData( $mvp, $vm, $context, $isChild );
 			
 			$context.setCulling(Context3DTriangleFace.NONE);
 			//$context.setCulling(Context3DTriangleFace.BACK);
