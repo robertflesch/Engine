@@ -12,14 +12,17 @@ import flash.geom.Vector3D;
 	
 public class ShaderLight {
 	// R, G, B, A
+	private var _position:Vector3D = new Vector3D();
+	public function get position():Vector3D { return _position; }
+	public function set position(value:Vector3D):void { _position = value; }
 	public var color:Vector3D = new Vector3D( 1, 1, 1, 1 );
-	public var position:Vector3D = new Vector3D();
 	public var endDistance:Number = 400;
 	public var nearDistance:Number = 1;
 	
 	public function update():void
 	{
 	}
+
 }
 }
 
