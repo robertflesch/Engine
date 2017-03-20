@@ -128,9 +128,11 @@ public class PanelModels extends PanelBase
 //						continue;
 //				}
 				var itemName:String = "";
-				if ( vm.metadata.name )
+				if ( vm.instanceInfo.name )
+					itemName = vm.instanceInfo.name;
+				else if ( vm.metadata.name )
 					itemName = vm.metadata.name;
-				else	
+				else
 					itemName = vm.modelInfo.guid;
 				//Log.out( "PanelModels.populateModels - adding: " + itemName );
 				
