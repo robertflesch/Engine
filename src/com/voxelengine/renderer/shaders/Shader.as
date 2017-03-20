@@ -159,7 +159,7 @@ package com.voxelengine.renderer.shaders
 					
 					/////////////////////////////////////////////////
 					// light from brightness
-					"mul ft4.xyz, v4.xyz, ft0.xyz", // modify the texture by multipling by the light color
+					"mul ft4.xyz, v4.xyz, ft0.xyz", // modify the texture by multiplying by the light color
 					/////////////////////////////////////////////////
 					
 					/////////////////////////////////////////////////
@@ -250,57 +250,33 @@ package com.voxelengine.renderer.shaders
 				_constants[i++] = 0;
 				_constants[i++] = 0;
 		}
-		
+
 		protected function setFragmentData( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $isChild:Boolean  ): void {
-
-			var parentPos:Vector3D;
-			if ( $isChild ) {
-				// if child we need to calculate the position within the parent.
-				//trace( "Shader.setFragmentData position: " + $mvp.position );
-				//parentPos = parentVM.wsPositionGet()
-				//trace( "Shader.setFragmentData position: " + $mvp.position + "  light position: " + lp );
-			}
-			else
-				parentPos = new Vector3D();
-
-
 			// TODO - pass in multiple lights
 			var lp:Vector3D;
-			var color:Vector3D;
 			var light:ShaderLight;
-			var nearDistance:Number;
-			var endDistance:Number;
 			if ( 0 < Shader.lightCount() ) { // This is currently ALWAYS true, no light is just a black light
 				light = lights(0);
-				lp = light.position;
+
+				// this seems to be useless, but I might need to to light children models correctly.
 				if ( $isChild ) {
-					lp = $mvp.transformVector(lp);
-					trace( "Shader.setFragmentData  world view position: " + $mvp.position + "  light position: " + lp );
+					lp = $mvp.position;
+				} else {
+					lp = light.position;
 				}
 
-				color = light.color;
-				nearDistance = light.nearDistance;
-				endDistance = light.endDistance;
-				// this seems to be useless, but I might need to to light children models correctly.
-				//if ( $isChild )
-				//{
-					// TO DO  - RSF - I think I need to handle the torch differently
-					//var topMost:VoxelModel = $vm.topmostControllingModel();
-					//lp = topMost.instanceInfo.worldToModel( light.position );
-					//lp = topMost.instanceInfo.modelToWorld( light.position );
-				//}
 				var i:int = 0;
 				_constants[i++] = lp.x; // light position    |
 				_constants[i++] = lp.y; //                   |
 				_constants[i++] = lp.z; //                   | FC0
 				_constants[i++] = lp.w; //                   |_
 				_constants[i++] = 0.5; // fc1.x -not used    |
-				_constants[i++] = nearDistance; // startLight|
-				_constants[i++] = endDistance; // endLight;  | FC1
+				_constants[i++] = light.nearDistance; //     |
+				_constants[i++] = light.endDistance; // 	 | FC1
 				_constants[i++] = 1;//                       |_
-				_constants[i++] = color.x; //                |
-				_constants[i++] = color.y; //                |
-				_constants[i++] = color.z; //                | FC2
+				_constants[i++] = light.color.x; //          |
+				_constants[i++] = light.color.y; //          |
+				_constants[i++] = light.color.z; //          | FC2
 				_constants[i++] = 0;       //                |_
 			}
 			else
