@@ -34,122 +34,91 @@ public class InstanceInfo extends Location	{
 	
 	static private const MAX_ROT_RATE:Number 					= 2.0;
 	static private var _s_speedMultipler:Number					= 4;
-				
-	private var _usesCollision:Boolean 							= false;                        // toJSON
-	private var _collidable:Boolean 							= true;							// toJSON
-	private var _critical:Boolean 								= false;						// toJSON
 	private var	_moveSpeed:SecureNumber 						= new SecureNumber( 0.01 );
-	private var _transforms:Vector.<ModelTransform> 			= new Vector.<ModelTransform>;	// toJSON
-	private var _modelGuid:String;											                        // toJSON
-	private var _instanceGuid:String;															// toJSON
-				
-	private var _detailSize:int 								= 0;                            // INSTANCE NOT EXPORTED
-	private var _type:int 										= -1;                           // toJSON - This type overrides a native task type.
-				
+	public function get moveSpeed():Number  					{ return _moveSpeed.val; }
+	public function set moveSpeed(value:Number):void  			{ _moveSpeed.val = value; }
+	public function speed( $time:Number ):Number 				{
+		//Log.out( "InstanceInfo.speed - _moveSpeed.val: " + _moveSpeed.val + " _s_speedMultipler: " + _s_speedMultipler + " timeElapsed: " + $time );
+		return _moveSpeed.val * _s_speedMultipler * $time; }
+
+
+	private var _usesCollision:Boolean 							= false;                        // toObject
+	public function get usesCollision():Boolean 				{ return _usesCollision; }
+	public function set usesCollision(val:Boolean):void 		{ _usesCollision = val; }
+	private var _collidable:Boolean 							= true;							// toObject
+	public function get collidable():Boolean 					{ return _collidable; }
+	public function set collidable(val:Boolean):void 			{ _collidable = val; }
+
+	private var _critical:Boolean 								= false;						// toObject
+	public function get critical():Boolean 						{ return _critical; }
+	public function set critical(val:Boolean):void 				{
+		_critical = val;
+		ModelEvent.dispatch( new ModelEvent( ModelEvent.CRITICAL_MODEL_DETECTED, modelGuid ) );
+	}
+	private var _transforms:Vector.<ModelTransform> 			= new Vector.<ModelTransform>;	// toObject
+	public function get transforms():Vector.<ModelTransform>	{ return _transforms; }
+	public function set transforms(val:Vector.<ModelTransform>):void {
+		for each ( var mt:ModelTransform in val )
+			addTransformMT( mt );
+	}
+
+	private var _modelGuid:String;											                    // toObject
+	public function get modelGuid():String 						{ return _modelGuid; }
+	public function set modelGuid(val:String):void 				{ _modelGuid = val; changed = true; }
+	private var _instanceGuid:String;															// toObject
+	public function get instanceGuid():String 					{ return _instanceGuid; }
+	public function set instanceGuid(val:String):void 			{ _instanceGuid = val; }
+	private var _name:String									= "";							// toObject
+	public function set	name( $val:String):void 				{ _name = $val; changed = true; }
+	public function get name():String 							{ return _name; }
+
 	private var _dynamicObject:Boolean 							= false;						// INSTANCE NOT EXPORTED
-	private var _scripts:Array 									= [];							// toJSON
+	public function get dynamicObject():Boolean 				{ return _dynamicObject; }
+	public function set dynamicObject(val:Boolean):void 		{ _dynamicObject = val; }
+	private var _scripts:Array 									= [];							// toObject
 	private var _controllingModel:VoxelModel 					= null;    						// INSTANCE NOT EXPORTED
-	private var _owner:VoxelModel 								= null;               			// INSTANCE NOT EXPORTED
+	// this is the voxel model which controls the parent of the instanceInfo.
+	public function get controllingModel():VoxelModel  			{ return _controllingModel; }
+	public function set controllingModel(val:VoxelModel):void   {
+		if ( val && this == val.instanceInfo )
+			Log.out( "Instance	Info.controllingModel SET - trying to set this to itself" );
+		_controllingModel = val;
+	}
 	private var _info:Object 									= null;                         // INSTANCE NOT EXPORTED
 	private var _state:String 									= "";							// INSTANCE NOT EXPORTED
-				
+	public function get state():String 							{ return _state; }
+	public function set state(val:String):void					{ _state = val; }
+
 	private	var	_visible:Boolean 								= true;  // Should be exported/ move to instance
-	
 	public	function get visible():Boolean 						{ return _visible; }
 	public	function set visible(val:Boolean):void 				{ _visible = val; }
 	
 	private var 		_life:Vector3D 							= new Vector3D(1, 1, 1);		// INSTANCE NOT EXPORTED
 	public function get life():Vector3D 						{ return _life; }
 	
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// overrides values in modelInfo
-	//private var 		_shader:String 							= "ShaderOxel";					// toJSON
-	//public function get shader():String 						{ return _shader; }
-	//private var			_baseLightLevel:uint					= 0x33;
-	//public function get baseLightLevel():uint 					{ return _baseLightLevel; }
-	//public function set baseLightLevel(val:uint):void 			{ _baseLightLevel = val; }
-	//private var 		_grainSize:int 							= 0;                            // toJSON
-	//public function set grainSize(val:int):void					{ _grainSize = val; }
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	public function speed( $time:Number ):Number 				{
-		//Log.out( "InstanceInfo.speed - _moveSpeed.val: " + _moveSpeed.val + " _s_speedMultipler: " + _s_speedMultipler + " timeElapsed: " + $time );
-		return _moveSpeed.val * _s_speedMultipler * $time; }
-
-	public function get moveSpeed():Number  					{ return _moveSpeed.val; }
-	public function set moveSpeed(value:Number):void  			{ _moveSpeed.val = value; }
-	public function get dynamicObject():Boolean 				{ return _dynamicObject; }
-	public function set dynamicObject(val:Boolean):void 		{ _dynamicObject = val; }
-	public function get usesCollision():Boolean 				{ return _usesCollision; }
-	public function set usesCollision(val:Boolean):void 		{ _usesCollision = val; }
-	public function get collidable():Boolean 					{ return _collidable; }
-	public function set collidable(val:Boolean):void 			{ _collidable = val; }
-	public function get critical():Boolean 						{ return _critical; }
-	public function set critical(val:Boolean):void 				
-	{ 
-		_critical = val; 
-		ModelEvent.dispatch( new ModelEvent( ModelEvent.CRITICAL_MODEL_DETECTED, modelGuid ) );
-	}
-	public function 	modelGuidGet():String 						{ return _modelGuid; } // used by debug menu to monitor selected model
-	public function get modelGuid():String 							{ return _modelGuid; }
-	//public function set guid(val:String):void					{ _guid = val; }
-	public function set modelGuid(val:String):void { 
-		//Log.out( "InstanceInfo.GUID was: " + _guid + " is now: " + val );
-		_modelGuid = val; 
-		changed = true;
-	}
-	public function get instanceGuid():String 					{ return _instanceGuid; }
-	//public function set instanceGuid(val:String):void			{ _instanceGuid = val; }
-	public function set instanceGuid(val:String):void 			{ _instanceGuid = val; }
-	
-//	public function get grainSize():int  						{ return _grainSize; }
-	public function get detailSize():int  						{ return _detailSize; }
-	public function set detailSize(val:int):void				{ _detailSize = val; }  // This is used in the generation of spheres only
-	public function get type():int  							{ return _type; }
-	public function set type( val:int):void  					{ _type = val; }
-	// this is the voxel model which controls the parent of the instanceInfo.
-	public function get controllingModel():VoxelModel  			{ return _controllingModel; }
-	public function set controllingModel(val:VoxelModel):void 	
-	{ 
-		if ( val && this == val.instanceInfo )
-			Log.out( "Instance	Info.controllingModel SET - trying to set this to itself" );
-		_controllingModel = val; 
-	}
 	// this is the VoxelModel that the instanceInfo belongs to.
 	// mainly used to identify owner and send info backup the chain.
+	private var _owner:VoxelModel 								= null;               			// INSTANCE NOT EXPORTED
 	public function get owner():VoxelModel  					{ return _owner; }
-	public function set owner(val:VoxelModel):void 				
-	{ 
-		_owner = val; 
+	public function set owner(val:VoxelModel):void 				{
+		_owner = val;
 		// make sure we have a previous position
 		positionSet = positionGet;
 	}
-	public function get scripts():Array							{ return _scripts; }
-	public function get state():String 							{ return _state; }
-	public function set state(val:String):void					{ _state = val; }
-	// I dont like that sometimes this is in World Space, and sometimes in Model Space
-	// example?
-	public function get transforms():Vector.<ModelTransform>	{ return _transforms; }
-	public function set transforms(val:Vector.<ModelTransform>):void
-	{ 
-		for each ( var mt:ModelTransform in val )
-			addTransformMT( mt );
-	}
 
-	public function InstanceInfo() 
-	{ 
-	}
+	public function get scripts():Array							{ return _scripts; }
+
+	public function InstanceInfo() {}
 
 	public function release():void {
 		_moveSpeed 			= null;
 		_transforms 		= null;
-		//_shader			= null;
-		_modelGuid			= null;			                    
+		_modelGuid			= null;
 		_instanceGuid		= null;							
 		_scripts			= null;
 		_controllingModel	= null;    						
-		_owner				= null;               			
-		_info				= null;                         
+		_owner				= null;
+		_info				= null;
 		_state				= null;
 		_life				= null;		
 	}
@@ -173,29 +142,30 @@ public class InstanceInfo extends Location	{
 	
 	override public function toObject():Object {	
 		
-		var ii:Object 		= super.toObject()
-		ii.instanceGuid		= instanceGuid; 
-		ii.modelGuid 		= modelGuid;
+		var obj:Object 		= super.toObject()
+		obj.instanceGuid	= instanceGuid;
+		obj.modelGuid 		= modelGuid;
+		obj.name 			= name;
 
 		if ( velocityGet.length )
-			ii.velocity		= vector3DToObject( velocityGet );
+			obj.velocity		= vector3DToObject( velocityGet );
 		if ( usesCollision )
-			ii.usesCollision 		= usesCollision;
+			obj.usesCollision 		= usesCollision;
 		if ( collidable )
-			ii.collidable 		= collidable;
+			obj.collidable 		= collidable;
 		if ( _critical )
-			ii.critical		= _critical;
+			obj.critical		= _critical;
 //		if ( _grainSize ) // this is only used to override biomes data. So only from a generate script
-//			ii.grainSize		= _grainSize;
+//			obj.grainSize		= _grainSize;
 //		if ( "" != _state )
-//			ii.state			= _state;
+//			obj.state			= _state;
 // This is saving the animation transforms into the instanceInfotransforms			
-// do I add transforms in the ii? RSF - 4.27.15
+// do I add transforms in the obj? RSF - 4.27.15
 //		if ( _transforms && 0 < _transforms.length )
 //			obj.model.transforms		= _transforms;
-		instanceScriptOnly( ii );  //
+		instanceScriptOnly( obj );  //
 		
-		return ii;
+		return obj;
 		
 		function instanceScriptOnly( obj:Object ):void {
 			if ( _scripts.length ) {
@@ -216,13 +186,13 @@ public class InstanceInfo extends Location	{
 
 	public function explosionClone():InstanceInfo
 	{
-		var ii:InstanceInfo = new InstanceInfo();
+		var obj:InstanceInfo = new InstanceInfo();
 		if ( null != _info )
-			ii.fromObject( _info );
+			obj.fromObject( _info );
 		
-		ii.dynamicObject = true;
+		obj.dynamicObject = true;
 		
-		return ii;
+		return obj;
 	}
 
 	public function toString():String
@@ -238,16 +208,6 @@ public class InstanceInfo extends Location	{
 			   ;
 	}
 
-	private function onLoadingComplete( le:LoadingEvent ):void
-	{
-	}
-	
-	//public function topmostGuid():String {
-		//if ( controllingModel )
-			//return controllingModel.instanceInfo.topmostGuid();
-		//return instanceGuid;	
-	//}
-	
 	public function modelGuidChain( $models:Vector.<String> ):void {
 		if ( controllingModel ) {
 			$models.push( controllingModel.modelInfo.guid )
@@ -277,39 +237,25 @@ public class InstanceInfo extends Location	{
 			_info = $info;
 		
 		// fileName == templateName == guid ALL THE SAME
-		if ( _info.fileName ) {
-			modelGuid = _info.fileName;
-		}
-		
-		if ( _info.modelGuid ) {
-			modelGuid = _info.modelGuid;
-		}
-		
-		if ( _info.instanceGuid ) {
+		if ( _info.fileName )
+			_modelGuid = _info.fileName;
+
+		if ( _info.modelGuid )
+			_modelGuid = _info.modelGuid;
+
+		if ( _info.instanceGuid )
 			_instanceGuid = _info.instanceGuid;
-		}
-			
+
 		if ( !_info.instanceGuid && !_info.modelGuid && !_info.fileName )
 			Log.out( "InstanceInfo.fromObject - INVALID DATA, check: " + JSON.stringify( $info ) );
 		
-		if ( _info.name ) {
-			if ( owner && owner.metadata ) {
-				owner.metadata.name = _info.name;
-				Log.out( "InstanceInfo.fromObject - Setting Metadata Name from instance data: " + _info.name + "  guid: " + modelGuid );
-			}
-		}
-		
+		if ( _info.name )
+			_name = _info.name;
+
 		if ( _info.state )
 			_state = _info.state;
 
-	//	if ( _info.baseLightLevel )
-		//	baseLightLevel = _info.baseLightLevel;
-					
-		setTypeInfo( _info );
 		setTransformInfo( _info );
-		// moved to shader
-//			setTextureInfo( _creationJSON );
-		//setShaderInfo( _info );
 		setScriptInfo( _info );
 		setCollisionInfo( _info );
 		setCriticalInfo( _info );
@@ -388,24 +334,17 @@ public class InstanceInfo extends Location	{
 			//_shader = $info.shader;
 	//}
 	
-	public function setTypeInfo( $info:Object ):void {
-	
-		if ( $info.type )
-		{
-			var typeString:String = "INVALID";
-			typeString = $info.type.toLowerCase();
-			_type = TypeInfo.getTypeId( typeString );
-			if ( TypeInfo.INVALID == type )
-				Log.out( "InstanceInfo.setTypeInfo - WARNING - INVALID type found: " + typeString, Log.WARN );
-		}
-		
-		//if ( $info.grainSize )
-//			_grainSize = 	$info.grainSize;
-	//	else if ( $info.GrainSize )
-//			_grainSize = 	$info.GrainSize;
-//		else if ( $info.grainsize )
-	//		_grainSize = 	$info.grainsize;
-	}
+//	public function setTypeInfo( $info:Object ):void {
+//
+//		if ( $info.type )
+//		{
+//			var typeString:String = "INVALID";
+//			typeString = $info.type.toLowerCase();
+//			_type = TypeInfo.getTypeId( typeString );
+//			if ( TypeInfo.INVALID == type )
+//				Log.out( "InstanceInfo.setTypeInfo - WARNING - INVALID type found: " + typeString, Log.WARN );
+//		}
+//	}
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Tranformation functions
