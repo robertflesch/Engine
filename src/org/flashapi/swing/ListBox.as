@@ -33,7 +33,6 @@ package org.flashapi.swing {
 	import flash.display.DisplayObject;
 	import flash.display.Shape;
 	import flash.display.Sprite;
-	import flash.display3D.IndexBuffer3D;
 	import flash.events.KeyboardEvent;
 	import flash.geom.Rectangle;
 	import flash.ui.Keyboard;
@@ -1358,6 +1357,8 @@ package org.flashapi.swing {
 		
 		private function updateItemById(index:uint, dataCursor:uint):void {
 			var si:SelectableItem = _itemsCont.getObjectAt(index) as SelectableItem;
+			if ( !si )
+				return;
 			if (index >= $objList.size) {
 				resetSelectableItem(si);
 			} else  {
