@@ -222,17 +222,13 @@ public class Avatar extends ControllableVoxelModel
 
 		if ( 0 < Shader.lightCount() ) {
 			var sl:ShaderLight = Shader.lights(0);
-			if ( VoxelModel.controlledModel != this ) {
-				sl.position = VoxelModel.controlledModel.instanceInfo.positionGet.clone();
-				sl.position.y += 30;
-				sl.position.x += 4;
-			}
+			var vmPos:Vector3D;
+			if ( VoxelModel.controlledModel == this )
+				vmPos = instanceInfo.positionGet;
 			else
-			{
-				sl.position = instanceInfo.positionGet.clone();
-				sl.position.y += 30;
-				sl.position.x += 4;
-			}
+				vmPos = VoxelModel.controlledModel.instanceInfo.positionGet;
+
+			sl.position.setTo( vmPos.x + 4, vmPos.y + 30, vmPos.z );
 			sl.update();
 		}
 
