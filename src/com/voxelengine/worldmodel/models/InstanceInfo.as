@@ -176,7 +176,9 @@ public class InstanceInfo extends Location	{
 						//scripts["script" + i] = Script.getCurrentClassName( _scripts[i] );
 						scriptsArray[i] = _scripts[i].toObject();
 				}	}
-				obj.scripts = scriptsArray;
+				// Dont want to add empty arrays
+				if ( scriptsArray.length )
+					obj.scripts = scriptsArray;
 			}
 			else {
 				if ( obj.scripts )
