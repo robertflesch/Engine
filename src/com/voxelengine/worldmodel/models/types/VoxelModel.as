@@ -1031,8 +1031,11 @@ public class VoxelModel
 		}
 
 		var result:Boolean = true;
+		var myself:Vector.<VoxelModel> = new Vector.<VoxelModel>();
+		myself.push(this);
 		for each (var at:AnimationTransform in anim.transforms) {
-			result = result && addAnimationsInChildren(modelInfo.childVoxelModels, at, $scale);
+			//result = result && addAnimationsInChildren(modelInfo.childVoxelModels, at, $scale);
+			result = result && addAnimationsInChildren(myself, at, $scale);
 		}
 
 		if (true == result) {
