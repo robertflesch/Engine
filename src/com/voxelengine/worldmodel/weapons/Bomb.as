@@ -42,8 +42,8 @@ package com.voxelengine.worldmodel.weapons
 			super.init( $mi, $vmm );
 			
 			_bombHolder = _instanceInfo.controllingModel;
-			//SoundCache.getSound( _soundFile ); // Preload the sound file
-			SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, _soundFile, null, Globals.isGuid( _soundFile ) ? true : false ) )
+			//SoundCache.getSound( _soundFile ); // Preload the animationSound file
+			SoundEvent.create( ModelBaseEvent.REQUEST, 0, _soundFile, null, Globals.isGuid( _soundFile ) );
 			instanceInfo.dynamicObject = true;
 		}
 

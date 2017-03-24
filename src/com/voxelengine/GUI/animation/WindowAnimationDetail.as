@@ -167,11 +167,11 @@ public class WindowAnimationDetail extends VVPopup
 	
 	private function addSoundPanel():void {
 		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
-		ebco.title = " sound "
+		ebco.title = " animationSound "
 		ebco.width = WIDTH
 		ebco.rootObject = _ani
-		ebco.item = _ani.sound
-		ebco.itemBox.newItemText = "Add a sound"
+		ebco.item = _ani.animationSound
+		ebco.itemBox.newItemText = "Add a animationSound"
 		ebco.paddingTop = 7
 		addElement( new PanelAnimationSound( null, ebco ) )
 	}

@@ -26,10 +26,10 @@ public class PanelAnimationSound extends ExpandableBox
 	private var _sound:AnimationSound
 	public function PanelAnimationSound( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {
 		_ani = $ebco.rootObject
-		_ani.sound = $ebco.item
+		_ani.animationSound = $ebco.item
 		
 		if ( null == $ebco.item ) {
-			_ani.sound = $ebco.item = new AnimationSound( _ani, AnimationSound.DEFAULT_OBJECT )
+			_ani.animationSound = $ebco.item = new AnimationSound( _ani, AnimationSound.DEFAULT_OBJECT )
 		}
 		
 		$ebco.itemBox.showReset = true
@@ -37,25 +37,25 @@ public class PanelAnimationSound extends ExpandableBox
 	}
 	
 	override protected function collapasedInfo():String  {
-		if ( AnimationSound.SOUND_INVALID == _ani.sound.guid ) {
+		if ( AnimationSound.SOUND_INVALID == _ani.animationSound.guid ) {
 			_ebco.itemBox.showNew = true
-			return "No sound defined"
+			return "No animationSound defined"
 		}
 		
 		_ebco.itemBox.showNew = false
 		_ebco.itemBox.showReset = true
-		return _ani.sound.guid + " min: " + _ani.sound.soundRangeMin + " max: " + _ani.sound.soundRangeMax
+		return _ani.animationSound.guid + " min: " + _ani.animationSound.soundRangeMin + " max: " + _ani.animationSound.soundRangeMax
 	}
 	
 	override protected function resetElement():void  { 
-		_ani.sound.reset()
+		_ani.animationSound.reset()
 		changeMode()
 	}
 	
 	// This handles the new model transform
 	override protected function newItemHandler( $me:UIMouseEvent ):void 		{ 
 		
-		_ani.sound.guid = "Undefined Sound"
+		_ani.animationSound.guid = "Undefined Sound"
 		changeMode() // collapse container
 		changeMode() // reexpand so that new item is at the bottom
 	}
@@ -63,30 +63,30 @@ public class PanelAnimationSound extends ExpandableBox
 	override protected function expand():void {
 		super.expand()
 		
-		if ( AnimationSound.SOUND_INVALID == _ani.sound.guid ) {
+		if ( AnimationSound.SOUND_INVALID == _ani.animationSound.guid ) {
 			return
 		}
 		
 		_itemBox.addElement( new ComponentLabelInput( "Name"
-									, function ($e:TextEvent):void { _ani.sound.guid = $e.target.text; setChanged(); }
-									, _ani.sound.guid ? _ani.sound.guid : "No sound"
+									, function ($e:TextEvent):void { _ani.animationSound.guid = $e.target.text; setChanged(); }
+									, _ani.animationSound.guid ? _ani.animationSound.guid : "No animationSound"
 									, width - 20 ) )
 		
 		_itemBox.addElement( new ComponentLabelInput( "RangeMax"
-									  , function ($e:TextEvent):void { _ani.sound.soundRangeMax = int( $e.target.text ); setChanged(); }
-									  , _ani.sound.soundRangeMax ? String( _ani.sound.soundRangeMax ) : "No max range"
+									  , function ($e:TextEvent):void { _ani.animationSound.soundRangeMax = int( $e.target.text ); setChanged(); }
+									  , _ani.animationSound.soundRangeMax ? String( _ani.animationSound.soundRangeMax ) : "No max range"
 									  , width - 20 ) )
 											
 		_itemBox.addElement( new ComponentLabelInput( "RangeMin"
-									  , function ($e:TextEvent):void { _ani.sound.soundRangeMin = int( $e.target.text ); setChanged(); }
-									  , _ani.sound.soundRangeMin ? String( _ani.sound.soundRangeMin ) : "No min range"
+									  , function ($e:TextEvent):void { _ani.animationSound.soundRangeMin = int( $e.target.text ); setChanged(); }
+									  , _ani.animationSound.soundRangeMin ? String( _ani.animationSound.soundRangeMin ) : "No min range"
 									  , width - 20 ) )
 	}
 	
 	/*
 	private function deleteSound( $me:UIMouseEvent ):void {
 		removeElements();
-		_ani.sound = null;
+		_ani.animationSound = null;
 		var newItem:Button = new Button( "Add Sound", width - 20, ITEM_HEIGHT );
 		$evtColl.addEvent( newItem, UIMouseEvent.RELEASE, addSound );
 		addElement( newItem );
@@ -96,30 +96,30 @@ public class PanelAnimationSound extends ExpandableBox
 	/*
 	private function addSound( $me:UIMouseEvent ):void {
 		removeElements();
-		if ( null == _ani.sound )
-			_ani.sound = new AnimationSound();
+		if ( null == _ani.animationSound )
+			_ani.animationSound = new AnimationSound();
 		layout.orientation = LayoutOrientation.VERTICAL;			
 		
 		var cli:ComponentLabelInput;
 		cli = new ComponentLabelInput( "Name"
-									  , function ($e:TextEvent):void { _ani.sound.guid = $e.target.text; setChanged(); }
-									  , _ani.sound.guid ? _ani.sound.guid : "No sound"
+									  , function ($e:TextEvent):void { _ani.animationSound.guid = $e.target.text; setChanged(); }
+									  , _ani.animationSound.guid ? _ani.animationSound.guid : "No animationSound"
 									  , width - 20 )
 											
 		height += cli.height + padding;
 		addElement( cli );
 		
 		cli = new ComponentLabelInput( "RangeMax"
-									  , function ($e:TextEvent):void { _ani.sound.soundRangeMax = int( $e.target.text ); setChanged(); }
-									  , _ani.sound.soundRangeMax ? String( _ani.sound.soundRangeMax ) : "No max range"
+									  , function ($e:TextEvent):void { _ani.animationSound.soundRangeMax = int( $e.target.text ); setChanged(); }
+									  , _ani.animationSound.soundRangeMax ? String( _ani.animationSound.soundRangeMax ) : "No max range"
 									  , width - 20 )
 											
 		height += cli.height + padding;
 		addElement( cli );
 		
 		cli = new ComponentLabelInput( "RangeMin"
-									  , function ($e:TextEvent):void { _ani.sound.soundRangeMin = int( $e.target.text ); setChanged(); }
-									  , _ani.sound.soundRangeMin ? String( _ani.sound.soundRangeMin ) : "No min range"
+									  , function ($e:TextEvent):void { _ani.animationSound.soundRangeMin = int( $e.target.text ); setChanged(); }
+									  , _ani.animationSound.soundRangeMin ? String( _ani.animationSound.soundRangeMin ) : "No min range"
 									  , width - 20 )
 											
 		height += cli.height + padding + 10;

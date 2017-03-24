@@ -65,7 +65,7 @@ package com.voxelengine.worldmodel.weapons
 //			SoundBank.getSound( _soundFile ); // Preload the sound file
 			//SoundCache.getSound( _ammo.impactSound ); // Preload the sound file
 			if ( _ammo.impactSound && "" != _ammo.impactSound )
-				SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, _ammo.impactSound, null, Globals.isGuid( _ammo.impactSound ) ? true : false ) )
+				SoundEvent.create( ModelBaseEvent.REQUEST, 0, _ammo.impactSound, null, Globals.isGuid( _ammo.impactSound ) );
 
 
 			//if ( instanceInfo.controllingModel )

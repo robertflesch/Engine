@@ -107,8 +107,9 @@ public class Ammo extends PersistenceObject
 			SoundEvent.addListener( ModelBaseEvent.RESULT, verifySoundData )
 		}
 
-		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, dbo.launchSound, null, Globals.isGuid( dbo.launchSound ) ? true : false ) )
-		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, dbo.impactSound, null, Globals.isGuid( dbo.impactSound ) ? true : false ) )
+		SoundEvent.create( ModelBaseEvent.REQUEST, 0, dbo.launchSound, null, Globals.isGuid( dbo.launchSound ) );
+		//SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, dbo.impactSound, null, Globals.isGuid( dbo.impactSound ) ? true : false ) )
+		SoundEvent.create( ModelBaseEvent.REQUEST, 0, dbo.impactSound, null, Globals.isGuid( dbo.impactSound ) );
 	}
 
 

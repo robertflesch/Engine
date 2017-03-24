@@ -33,7 +33,7 @@ public class Animation extends PersistenceObject
 	//private var _loaded:Boolean = false;
 	private var _transforms:Vector.<AnimationTransform>;
 	private var _attachments:Vector.<AnimationAttachment>;
-	private var _sound:AnimationSound;
+	private var _animationSound:AnimationSound;
 	private var _permissions:PermissionsBase;
 	private var  _clipVelocity:SecureNumber 		= new SecureNumber( 0.95 );
 	private var  _speedMultiplier:SecureNumber 		= new SecureNumber( 0.95 );
@@ -60,8 +60,8 @@ public class Animation extends PersistenceObject
 	public function get description():String { return dbo.description; }
 	public function set description( $val:String ):void { dbo.description = $val; }
 	public function get owner():String { return dbo.owner; }
-	public function get sound():AnimationSound { return _sound; }
-	public function set sound( $val:AnimationSound ):void  { _sound = $val; }
+	public function get animationSound():AnimationSound { return _animationSound; }
+	public function set animationSound($val:AnimationSound ):void  { _animationSound = $val; }
 	override public function set guid( $newGuid:String ):void { 
 		var oldGuid:String = super.guid;
 		super.guid = $newGuid;
@@ -96,11 +96,12 @@ public class Animation extends PersistenceObject
 		if ( !owner )
 			dbo.owner = Network.PUBLIC;
 
-		Region.currentRegion.modelCache.requestModelInfoByModelGuid( owner );
-		Region.currentRegion.modelCache.instancesOfModelGet( owner );
+		// These don't appear to DO anything... they gather data that is not used
+		//Region.currentRegion.modelCache.requestModelInfoByModelGuid( owner );
+		//Region.currentRegion.modelCache.instancesOfModelGet( owner );
 
 		if ( dbo.sound )
-			_sound = new AnimationSound( this, dbo.sound );
+			_animationSound = new AnimationSound( this, dbo.sound );
 
 		if ( dbo.clipVelocity )
 			clipVelocity = dbo.clipVelocity;
@@ -133,8 +134,8 @@ public class Animation extends PersistenceObject
 		backupInfo.owner 			= String( dbo.owner );
 		backupInfo.type 			= String( dbo.type );
 		backupInfo.animationClass 	= String( dbo.animationClass );
-		if ( _sound )
-			backupInfo.sound = _sound.toObject();
+		if ( _animationSound )
+			backupInfo.sound = _animationSound.toObject();
 		if ( _transforms && _transforms.length )
 			backupInfo.animations = getAnimations();
 		if ( _attachments && _attachments.length )
@@ -163,12 +164,12 @@ public class Animation extends PersistenceObject
 		// but need to refresh
 		// permissions?
 		
-		if ( _sound )
-			dbo.sound = _sound.toObject();
+		if ( _animationSound )
+			dbo.sound = _animationSound.toObject();
 		if ( _transforms && _transforms.length )
 			dbo.animations = getAnimations();
 		if ( _attachments && _attachments.length )
-			dbo.attachments = getAttachments()
+			dbo.attachments = getAttachments();
 
 		dbo.clipVelocity = clipVelocity;
 		//Log.out( "Animation.toObject - clipVelocity: " + clipVelocity);
@@ -206,9 +207,9 @@ public class Animation extends PersistenceObject
 			else
 				Log.out( "Animation.fromJSON - ERROR unknown type: " + $json.type, Log.ERROR );
 		}
-		if ( $json.sound ) {
-			_sound = new AnimationSound();
-			_sound.init( $json.sound );
+		if ( $json.animationSound ) {
+			_animationSound = new AnimationSound();
+			_animationSound.init( $json.animationSound );
 		}
 		if ( $json.attachments ) {
 			_attachments = new Vector.<AnimationAttachment>;
@@ -242,8 +243,8 @@ public class Animation extends PersistenceObject
 */
 	/*
 	private function getJSON( obj:Object ):void {
-		if ( _sound )
-			_sound.getJSON( obj );
+		if ( _animationSound )
+			_animationSound.getJSON( obj );
 		if ( _attachments )
 			getAttachmentsJSON( obj );
 		if ( _transforms )
@@ -274,8 +275,8 @@ public class Animation extends PersistenceObject
 	*/
 	public function play( $owner:VoxelModel, $scale:Number ):void {
 		//Log.out( "Animation.play - name: " + _name );
-		if ( _sound )
-			_sound.play( $owner, $scale );
+		if ( _animationSound )
+			_animationSound.play( $scale );
 			
 		if ( _attachments && 0 < _attachments.length ) {
 			for each ( var aa:AnimationAttachment in _attachments ) {
@@ -287,8 +288,8 @@ public class Animation extends PersistenceObject
 	}
 	
 	public function stop( $owner:VoxelModel ):void {
-		if ( _sound )
-			_sound.stop();
+		if ( _animationSound )
+			_animationSound.stop();
 			
 		if ( _attachments && 0 < _attachments.length ) {
 			for each ( var aa:AnimationAttachment in _attachments ) {
@@ -300,8 +301,8 @@ public class Animation extends PersistenceObject
 	}
 	
 	public function update( $val:Number ):void {
-		if ( _sound )
-			_sound.update( $val / 3 );
+		if ( _animationSound )
+			_animationSound.update( $val / 3 );
 	}
 
 

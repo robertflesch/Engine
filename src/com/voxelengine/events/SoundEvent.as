@@ -11,16 +11,11 @@ import com.voxelengine.worldmodel.animation.SoundPersistence;
 import flash.events.Event
 import flash.events.EventDispatcher
 
-import com.voxelengine.worldmodel.animation.AnimationSound
-/**
- * ...
- * @author Robert Flesch - RSF 
- */
 public class SoundEvent extends ModelBaseEvent
 {
-	private var _guid:String // animation guid or fileName
-	private var _snd:SoundPersistence
-	private var _fromTables:Boolean
+	private var _guid:String; // animation guid or fileName
+	private var _snd:SoundPersistence;
+	private var _fromTables:Boolean;
 
 	public function get guid():String  { return _guid }
 	public function get fromTables():Boolean  { return _fromTables }
@@ -28,35 +23,35 @@ public class SoundEvent extends ModelBaseEvent
 	
 	public function SoundEvent($type:String, $series:int, $guid:String, $snd:SoundPersistence = null, $fromTables:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
-		super( $type, $series, $bubbles, $cancellable )
-		_guid = $guid
-		_fromTables = $fromTables
-		_snd = $snd
+		super( $type, $series, $bubbles, $cancellable );
+		_guid = $guid;
+		_fromTables = $fromTables;
+		_snd = $snd;
 	}
 	
 	public override function clone():Event {
-		return new SoundEvent(type, series, _guid, _snd, _fromTables, bubbles, cancelable)
+		return new SoundEvent(type, series, _guid, _snd, _fromTables, bubbles, cancelable);
 	}
    
 	public override function toString():String {
-		return formatToString("SoundEvent", "series", "guid", "snd", "fromTables" )
+		return formatToString("SoundEvent", "series", "guid", "snd", "fromTables" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////
 
-	// Used to distribute all persistance messages
-	static private var _eventDispatcher:EventDispatcher = new EventDispatcher()
+	// Used to distribute all persistence messages
+	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
-		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference )
+		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
 	}
 
 	static public function removeListener( $type:String, $listener:Function, $useCapture:Boolean=false) : void {
-		_eventDispatcher.removeEventListener( $type, $listener, $useCapture )
+		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:SoundEvent ) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event )
+	static public function create( $type:String, $series:int, $guid:String, $snd:SoundPersistence = null, $fromTables:Boolean = true ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new SoundEvent( $type, $series, $guid, $snd, $fromTables) );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

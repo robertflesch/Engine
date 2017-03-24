@@ -87,9 +87,8 @@ public class ModelInfo extends PersistenceObject
 		}
 
 		init( $newData );
-
-
 	}
+
 	override protected function assignNewDatabaseObject():void {
 		super.assignNewDatabaseObject();
 		setToDefault();
@@ -363,7 +362,9 @@ public class ModelInfo extends PersistenceObject
 			// This is only needed when I am importing objects into the app.
 			if ( ModelMakerImport.isImporting ) {
 				for each ( var ani:Object in animationInfo ) {
-					if ( ani.name == $ae.ani.name ) {
+					Log.out( "ModelInfo.animationAdd ani.name: " + ani.name.toLocaleLowerCase() + " ae.ani.name: " + $ae.ani.name.toLocaleLowerCase() );
+					if ( ani.name.toLocaleLowerCase() == $ae.ani.name.toLocaleLowerCase() ) {
+						Log.out( "ModelInfo.animationAdd ani.guid: " + ani.guid + " ae.ani.guid: " + $ae.ani.guid );
 						if ( ani.guid != $ae.ani.guid ) {
 							ani.guid = $ae.ani.guid = Globals.getUID()
 							ani.changed = true;
@@ -377,9 +378,24 @@ public class ModelInfo extends PersistenceObject
 	
 	public function animationUpdateGuid( $ae:AnimationEvent ):void {
 		Log.out( "ModelInfo.animationUpdateGuid $ae: " + $ae, Log.WARN );
-		if ( $ae.modelGuid == guid )
+		var guidArray:Array = $ae.aniGuid.split( ":" );
+		var oldGuid:String = guidArray[0];
+		var newGuid:String = guidArray[1];
+		Log.out( "ModelInfo.animationUpdateGuid - oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
+		var ani:Animation = _animations[oldGuid];
+		if ( ani ) {
+			_animations[oldGuid] = null;
+			_animations[newGuid] = ani;
+			Log.out( "ModelInfo.animationUpdateGuid - updating oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
 			changed = true;
+		}
+		else {
+			_animations[newGuid] = ani;
+			changed = true;
+			Log.out("ModelInfo.animationUpdateGuid - animation not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.ERROR);
+		}
 	}
+
 	
 	public function animationDeleteHandler( $ae:AnimationEvent ):void {
 		//Log.out( "ModelInfo.animationDelete $ae: " + $ae, Log.WARN );

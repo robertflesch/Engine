@@ -27,65 +27,40 @@ import com.voxelengine.events.ModelBaseEvent
 public class SoundPersistence extends PersistenceObject
 {
 	private var _sound:Sound = new Sound();
-	private var _loaded:Boolean;
-	
-	public function get loaded():Boolean  			{ return _loaded }
-	public function set loaded(value:Boolean):void  { _loaded = value }
+
 	public function get sound():Sound 				{ return _sound }
 	public function get name():String				{ return dbo.name }
 	public function get length():Number				{ return dbo.length }
 	public function get hashTags():String			{ return dbo.hashTags }
 	public function set hashTags( $val:String):void	{ dbo.hashTags = $val }
-	
-	public function SoundPersistence($guid:String ) {
+
+	public function SoundPersistence( $guid:String, $dbo:DatabaseObject, $newData:Object ):void  {
 		super( $guid, Globals.BIGDB_TABLE_SOUNDS );
-		_loaded = false;
-	}
-	
-	override public function set guid( $newGuid:String ):void { 
-		var oldGuid:String = super.guid
-		super.guid = $newGuid
-		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, this ) )
-		changed = true
-	}
-	
-	override public function save():void {
-		if ( false == _loaded ) {
-				//Log.out( "SoundPersistence.save - NOT Saving INVALID GUID: " + guid  + " in table: " + table, Log.WARN )
-			return;
+
+		if ( null == $dbo)
+			assignNewDatabaseObject();
+		else {
+			dbo = $dbo;
 		}
-		super.save()
+
+		init( $newData );
+
 	}
-	
-	override protected function toObject():void {
-		// Just leave the raw mp3 oxelPersistence alone
-		//Log.out( "SoundPersistence.toObject size:" + dbo.oxelPersistence.ba.length, Log.WARN )
-	}
-	
-					
-	public function fromObject( $pe:PersistenceEvent ):void {
-		dbo			= $pe.dbo;
-//		info 		= $pe.dbo;
+
+	public function init( $newData:Object ):void {
+		if ( $newData )
+			dbo.ba = $newData;
 
 		sound.loadCompressedDataFromByteArray( dbo.ba, dbo.ba.length );
-		loaded = true
-	}
-
-	public function fromObjectImport( $pe:PersistenceEvent ):void {
-		assignNewDatabaseObject();
-		sound.loadCompressedDataFromByteArray( $pe.data, $pe.data.length );
-		// On import mark it as changed.
-		loaded = true;
-		dbo.name = $pe.guid;
 		dbo.length = sound.length;
-		guid = Globals.getUID(); // do this last so that the rest of the data is filled in
-		save()
 	}
 
-	override protected function assignNewDatabaseObject():void {
-		super.assignNewDatabaseObject();
+	override public function set guid( $newGuid:String ):void { 
+		var oldGuid:String = super.guid;
+		super.guid = $newGuid;
+		SoundEvent.create( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, this );
+		changed = true
 	}
-
 }
 }
 

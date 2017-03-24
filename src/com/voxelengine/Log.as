@@ -12,8 +12,6 @@ package com.voxelengine
 	import com.furusystems.logging.slf4as.Logging
 	import com.furusystems.logging.slf4as.ILogger
 	
-	import playerio.ErrorLog
-	
 	import com.voxelengine.server.Network
 	
 	public class Log {

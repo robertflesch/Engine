@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.animation
 import flash.events.DataEvent;
 import flash.utils.ByteArray;
 import flash.net.URLLoaderDataFormat;
+import flash.utils.Dictionary;
 
 import playerio.DatabaseObject;
 
@@ -35,7 +36,7 @@ public class AnimationCache
 	
 	// this acts as a holding spot for all model objects loaded from persistance
 	// dont use weak keys since this is THE spot that holds things.
-	static private var _animations:Array = new Array();
+	static private var _animations:Dictionary = new Dictionary();
 	
 	public function AnimationCache() {}
 	
@@ -73,8 +74,8 @@ public class AnimationCache
 		var anim:Animation = _animations[$ae.aniGuid]
 		if ( anim ) {
 			_animations[$ae.aniGuid] = null;
-			if ( anim.sound )
-                PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_SOUNDS, anim.sound.guid, null ) );
+			if ( anim.animationSound )
+                PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_SOUNDS, anim.animationSound.guid, null ) );
 
 		}
 		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_ANIMATIONS, $ae.aniGuid, null ) );
@@ -85,14 +86,17 @@ public class AnimationCache
 		var guidArray:Array = $ae.aniGuid.split( ":" );
 		var oldGuid:String = guidArray[0];
 		var newGuid:String = guidArray[1];
+		Log.out( "AnimationCache.updateGuid - oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
 		var ani:Animation = _animations[oldGuid];
 		if ( ani ) {
 			_animations[oldGuid] = null;
 			_animations[newGuid] = ani;
+			Log.out( "AnimationCache.updateGuid - updating oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
 		}
-		else
+		else {
 			_animations[newGuid] = ani;
-//			Log.out( "AnimationCache.updateGuid - animation not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.ERROR );
+			Log.out("AnimationCache.updateGuid - animation not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.ERROR);
+		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,7 +127,7 @@ public class AnimationCache
 
 		var ani:Animation =  _animations[$pe.guid];
 		if ( null != ani ) {
-			// we already have it, publishing this results in dulicate items being sent to inventory window.
+			// we already have it, publishing this results in duplicate items
 			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.ADDED, $pe.series, $pe.other, $pe.guid, ani ) );
 			Log.out( "AnimationCache.loadSucceed - attempting to load duplicate AnimationC guid: " + $pe.guid, Log.WARN );
 			return;
@@ -142,7 +146,6 @@ public class AnimationCache
 				return;
 			}
 			ani = new Animation($pe.guid, null, newObjData );
-			ani.save();
 			add( $pe, ani );
 		} else {
 			Log.out( "AnimationCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR );

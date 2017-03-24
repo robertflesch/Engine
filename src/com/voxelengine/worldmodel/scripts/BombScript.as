@@ -45,8 +45,8 @@ public class BombScript extends Script
 			_bulletSize = $params.bulletSize;
 
 		addKeyboardListeners();
-		//SoundCache.getSound( _soundFile ); // Preload the sound file
-		SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, _soundFile, null, Globals.isGuid( _soundFile ) ? true : false ) )
+		//SoundCache.getSound( _soundFile ); // Preload the animationSound file
+		SoundEvent.create( ModelBaseEvent.REQUEST, 0, _soundFile, null, Globals.isGuid( _soundFile ) );
 		WeaponEvent.addListener( WeaponEvent.FIRE, onWeaponEventDrop, false, 0, true );
 	}
 	

@@ -12,7 +12,6 @@ import com.voxelengine.GUI.WindowWater;
 import com.voxelengine.events.AnimationEvent
 import com.voxelengine.events.AppEvent;
 import com.voxelengine.events.CursorOperationEvent;
-import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.persistance.Persistence;
@@ -57,8 +56,7 @@ import com.voxelengine.worldmodel.MemoryManager
 import com.voxelengine.worldmodel.MouseKeyboardHandler
 import com.voxelengine.worldmodel.Region
 
-//[SWF(frameRate='60',width='512',height='512',backgroundColor='0xffffff')]
-[SWF(frameRate="120",backgroundColor="0xffffff",width="960",height="540")]
+[SWF(frameRate="90",width="960",height="540",backgroundColor="0xffffff")]
 public class VoxelVerse extends Sprite
 {
 	private var _showConsole:Boolean = false;
@@ -248,10 +246,10 @@ public class VoxelVerse extends Sprite
 
 	// I only receive this if the mouse is over the app.
 	private function mouseUp(e:MouseEvent):void {
-		if ( e )
-			Log.out( "VoxelVerse.mouseUp event: localX: " + e.localX + "  localY: " + e.localY + "  stageX: " + e.stageX + "  stageY: " + e.stageY);
-		else
-			Log.out( "VoxelVerse.mouseUp event" );
+//		if ( e )
+//			Log.out( "VoxelVerse.mouseUp event: localX: " + e.localX + "  localY: " + e.localY + "  stageX: " + e.stageX + "  stageY: " + e.stageY);
+//		else
+//			Log.out( "VoxelVerse.mouseUp event" );
 
 		if ( Globals.active == false ) {
 			Log.out( "VoxelVerse.activate Globals.active: " + Globals.active );
