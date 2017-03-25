@@ -59,18 +59,19 @@ public class Inventory extends PersistenceObject
 	// Persistence
 	//////////////////////////////////////////////////////////////////
 	
-	override public function save():void {
+	override public function save():Boolean {
 		if ( !loaded ) {
 			Log.out( "Inventory.save - Not LOADED - guid: " + guid, Log.DEBUG );
-			return; 
+			return false;
 		}
 
 		if ( Player.DEFAULT_PLAYER == guid) {
 			Log.out("Inventory.save - Not saving DEFAULT_PLAYER - guid: " + guid, Log.DEBUG);
-			return;
+			return false;
 		}
 
 		validatedSave();
+		return true;
 	}
 	
 	override protected function toObject():void {

@@ -204,18 +204,18 @@ public class Ammo extends PersistenceObject
 		// No special handling needed
 	}
 
-	override public function save():void {
+	override public function save():Boolean {
 		// Watch how the guid is saved.
 		if ( saving ) {
 			Log.out( "Ammo.save - in process of saving:" + guid )
-			return
+			return false;
 		}
 		if ( !Globals.isGuid( launchSound ) || !Globals.isGuid( impactSound ) ) {
 			Log.out( "Ammo.save - sounds not guids:" + guid + " impactSound: " + impactSound + " launchSound: " + launchSound  )
-			return
+			return false;
 		}
 		saving = true;
-		super.save();
+		return super.save();
 	}
 
 	private function updateSoundGuid( $se:SoundEvent ):void {

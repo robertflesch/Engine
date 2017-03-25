@@ -249,12 +249,12 @@ public class OxelPersistence extends PersistenceObject
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// persistence operations
-	override public function save():void {
+	override public function save():Boolean {
 		if ( 0 == oxelCount ) {
 			//Log.out( "OxelPersistence.save - NOT Saving GUID: " + guid  + " oxel: " + (oxel?oxel:"No oxel") + " in table: " + table, Log.WARN );
-			return;
+			return false;
 		}
-		super.save();
+		return super.save();
 	}
 
 	override public function set changed(value:Boolean):void {

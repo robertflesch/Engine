@@ -117,7 +117,7 @@ public class AnimationCache
 				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ame.series, Globals.ANI_EXT, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
 		}
 		else
-			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.RESULT, $ame.series, $ame.modelGuid, $ame.aniGuid, ani ) );
+			AnimationEvent.create( ModelBaseEvent.RESULT, $ame.series, $ame.modelGuid, $ame.aniGuid, ani );
 	}
 
 	static private function loadSucceed( $pe:PersistenceEvent):void
@@ -128,7 +128,7 @@ public class AnimationCache
 		var ani:Animation =  _animations[$pe.guid];
 		if ( null != ani ) {
 			// we already have it, publishing this results in duplicate items
-			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.ADDED, $pe.series, $pe.other, $pe.guid, ani ) );
+			AnimationEvent.create( ModelBaseEvent.ADDED, $pe.series, $pe.other, $pe.guid, ani );
 			Log.out( "AnimationCache.loadSucceed - attempting to load duplicate AnimationC guid: " + $pe.guid, Log.WARN );
 			return;
 		}
@@ -142,14 +142,14 @@ public class AnimationCache
 			var newObjData:Object = JSONUtil.parse( fileData, $pe.guid + $pe.table, "AnimationCache.loadSucceed" );
 			if ( null == newObjData ) {
 				Log.out( "AnimationCache.loadSucceed - error parsing animation info on import. guid: " + $pe.guid, Log.ERROR );
-				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.other, $pe.guid, null ) );
+				AnimationEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.other, $pe.guid, null );
 				return;
 			}
 			ani = new Animation($pe.guid, null, newObjData );
 			add( $pe, ani );
 		} else {
 			Log.out( "AnimationCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR );
-			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
+			AnimationEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null );
 		}
 	}
 
@@ -162,7 +162,7 @@ public class AnimationCache
 		var ani:Animation =  _animations[$ani.guid];
 		if ( null == ani ) {
 			_animations[$ani.guid] = $ani;
-			AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.ADDED, $pe.series, $pe.other, $ani.guid, $ani ) );
+			AnimationEvent.create( ModelBaseEvent.ADDED, $pe.series, $pe.other, $ani.guid, $ani );
 		}
 	}
 	
@@ -171,7 +171,7 @@ public class AnimationCache
 		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		Log.out( "AnimationCache.loadFailed " + $pe.toString(), Log.ERROR );
-		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
+		AnimationEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null );
 	}
 	
 	static private function loadNotFound( $pe:PersistenceEvent):void
@@ -179,7 +179,7 @@ public class AnimationCache
 		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		Log.out( "AnimationCache.loadNotFound " + $pe.toString(), Log.ERROR );
-		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null ) );
+		AnimationEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null );
 	}
 	
 }

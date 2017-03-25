@@ -43,6 +43,7 @@ public class ModelInfo extends PersistenceObject
 {
 	public function get animationInfo():Object						{ return dbo.animations; }
 	
+	// This stores the instaniated objects
 	private var 		_animations:Vector.<Animation> 				= new Vector.<Animation>();	// Animations that this model has
 	public function get animations():Vector.<Animation> 			{ return _animations; }
 	
@@ -313,13 +314,13 @@ public class ModelInfo extends PersistenceObject
 	public function animationsLoad():void {
 		_series = 0;
 		animationsLoaded = true;
-		if ( animationInfo && 0 < animationInfo.length ) {
-			animationsLoaded = false;
-			AnimationEvent.addListener( ModelBaseEvent.DELETE, 		animationDeleteHandler );
-			AnimationEvent.addListener( ModelBaseEvent.ADDED, 		animationAdd );
-			AnimationEvent.addListener( ModelBaseEvent.UPDATE_GUID,	animationUpdateGuid );		
-			
+		if ( animationInfo ) {
 			for each ( var animData:Object in animationInfo ) {
+				if ( animationsLoaded ){
+					animationsLoaded = false;
+					AnimationEvent.addListener( ModelBaseEvent.DELETE, 		animationDeleteHandler );
+					AnimationEvent.addListener( ModelBaseEvent.ADDED, 		animationAdd );
+				}
 				_animsRemainingToLoad++; 
 				
 				// AnimationEvent( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $ani:Animation, $fromTable:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
@@ -330,6 +331,7 @@ public class ModelInfo extends PersistenceObject
 					ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, guid, animData.name, null, ModelBaseEvent.USE_FILE_SYSTEM );
 					
 				_series = ae.series;
+				// special case here since we need to use the series
 				AnimationEvent.dispatch( ae );
 			}
 		}
@@ -341,61 +343,28 @@ public class ModelInfo extends PersistenceObject
 			// Dont worry about removing the animations, since the modelInfo is being deleted.
 			for each ( var animData:Object in animationInfo ) {
 				Log.out( "ModelInfo.animationsDelete - deleteing animation: " + animData.guid );
-				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, guid, animData.guid, null ) );
+				AnimationEvent.create( ModelBaseEvent.DELETE, 0, guid, animData.guid, null );
 			}
 		}
 	}
 
 	public function animationAdd( $ae:AnimationEvent ):void {
-		//Log.out( "ModelInfo.addAnimation " + $ae, Log.WARN );
-		if ( _series == $ae.series ) {
-//			$ae.ani.modelGuid = guid;
-			_animations.push( $ae.ani );
-			_animsRemainingToLoad--;
-			if ( 0 == _animsRemainingToLoad ) {
-				animationsLoaded = true;
-				AnimationEvent.removeListener( ModelBaseEvent.DELETE, 		animationDeleteHandler );
-				AnimationEvent.removeListener( ModelBaseEvent.ADDED, 		animationAdd );
-				AnimationEvent.removeListener( ModelBaseEvent.UPDATE_GUID,	animationUpdateGuid );		
-				//Log.out( "ModelInfo.addAnimation safe to save now: " + guid, Log.WARN );
-			}
-			// This is only needed when I am importing objects into the app.
-			if ( ModelMakerImport.isImporting ) {
-				for each ( var ani:Object in animationInfo ) {
-					Log.out( "ModelInfo.animationAdd ani.name: " + ani.name.toLocaleLowerCase() + " ae.ani.name: " + $ae.ani.name.toLocaleLowerCase() );
-					if ( ani.name.toLocaleLowerCase() == $ae.ani.name.toLocaleLowerCase() ) {
-						Log.out( "ModelInfo.animationAdd ani.guid: " + ani.guid + " ae.ani.guid: " + $ae.ani.guid );
-						if ( ani.guid != $ae.ani.guid ) {
-							ani.guid = $ae.ani.guid = Globals.getUID()
-							ani.changed = true;
-							return;
-						}
-					}
+		if ( guid == $ae.modelGuid ) {
+			Log.out( "ModelInfo.addAnimation " + $ae, Log.WARN );
+			if (_series == $ae.series) {
+				if ( !Globals.isGuid($ae.ani.guid))
+						$ae.ani.guid = Globals.getUID();
+				_animations.push($ae.ani);
+				_animsRemainingToLoad--;
+				if (0 == _animsRemainingToLoad) {
+					animationsLoaded = true;
+					AnimationEvent.removeListener(ModelBaseEvent.DELETE, animationDeleteHandler);
+					AnimationEvent.removeListener(ModelBaseEvent.ADDED, animationAdd);
+					//Log.out( "ModelInfo.addAnimation safe to save now: " + guid, Log.WARN );
 				}
 			}
 		}
 	}
-	
-	public function animationUpdateGuid( $ae:AnimationEvent ):void {
-		Log.out( "ModelInfo.animationUpdateGuid $ae: " + $ae, Log.WARN );
-		var guidArray:Array = $ae.aniGuid.split( ":" );
-		var oldGuid:String = guidArray[0];
-		var newGuid:String = guidArray[1];
-		Log.out( "ModelInfo.animationUpdateGuid - oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
-		var ani:Animation = _animations[oldGuid];
-		if ( ani ) {
-			_animations[oldGuid] = null;
-			_animations[newGuid] = ani;
-			Log.out( "ModelInfo.animationUpdateGuid - updating oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
-			changed = true;
-		}
-		else {
-			_animations[newGuid] = ani;
-			changed = true;
-			Log.out("ModelInfo.animationUpdateGuid - animation not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.ERROR);
-		}
-	}
-
 	
 	public function animationDeleteHandler( $ae:AnimationEvent ):void {
 		//Log.out( "ModelInfo.animationDelete $ae: " + $ae, Log.WARN );
@@ -634,12 +603,16 @@ public class ModelInfo extends PersistenceObject
 	public function get biomes():Biomes 							{ return _biomes; }
 	public function set biomes(value:Biomes):void  					{ _biomes = value; }
 	
-	override public function save():void {
-		if (true == animationsLoaded && true == childrenLoaded)
-			super.save();
-		else
+	override public function save():Boolean {
+		if ( false == animationsLoaded || false == childrenLoaded) {
 			Log.out("ModelInfo.save - NOT Saving guid: " + guid + " NEED Animations or children to complete", Log.WARN);
+			return false;
+		}
 
+		if ( !super.save() )
+			return false;
+
+		// Parent saved, so we can save children.
 		if ( oxelPersistence )
 			oxelPersistence.save();
 
@@ -647,21 +620,22 @@ public class ModelInfo extends PersistenceObject
 			var child:VoxelModel = childVoxelModels[i];
 			child.save();
 		}
+		return true;
 	}
 	
 	override protected function toObject():void {
 		// I am faking a heirarchy here, not good object oriented behavior but needs major redesign to do what I want.
 		// so instead I just get the current setting from the class
 		var modelClassPrototype:Class = ModelLibrary.getAsset( modelClass );
-		if ( dbo.key != "0" ) {
+//		if ( dbo.key != "0" ) {
 			try {
 				modelClassPrototype.buildExportObject(dbo);
 			} catch (e:Error) {
 				VoxelModel.buildExportObject(dbo);
 				Log.out("ModelInfo.toObject - Error with Class: " + dbo.modelClass, Log.ERROR);
 			}
-		} else
-			return;
+//		} else
+//			return;
 
 		if ( null != associatedGrain )
 			dbo.associatedGrain = associatedGrain;
@@ -670,15 +644,17 @@ public class ModelInfo extends PersistenceObject
 		// how do I get original location and position, on animated objects?
 		if ( childrenLoaded )
 			childrenGet();
-			
-		//animationsGet();
+		else
+			Log.out( "ModelInfo.toObject - creating object with children still loading.", Log.WARN);
+
+		animationsGetSummary();
 		
 		function childrenGet():void {
 			// Same code that is in modelCache to build models in region
 			// this is just models in models
 			delete dbo.children;
 			if ( 0 < _childVoxelModels.length ) {
-				var children:Object = new Object();
+				var children:Object = {};
 				for ( var i:int; i < _childVoxelModels.length; i++ ) {
 					if ( null != _childVoxelModels[i] ) {
 						// Dont save the player as a child model
@@ -693,25 +669,26 @@ public class ModelInfo extends PersistenceObject
 			}
 		}
 		
-		/*
-		function animationsGet():void {
-			var len:int = _animations.length;
-			var oa:Vector.<Object> = new Vector.<Object>();
-			for ( var index:int; index < len; index++ ) {
-				var ao:Object = new Object();
-				ao.name = _animations[index].metadata.name;
-				ao.type = _animations[index].metadata.aniType;
-				ao.guid = _animations[index].metadata.guid;
-				Log.out( "ModelInfo.animationsGet - animation.metadata: " + _animations[index].metadata );
-				oa.push( ao );
-			}
-			if ( 0 < oa.length ) 
-				dbo.animations = JSON.stringify( oa );
-			oa = null;
+	}
+
+	private function animationsGetSummary():void {
+		delete dbo.animations;
+		var len:int = _animations.length;
+		var oa:Object = {};
+		for ( var index:int=0; index < len; index++ ) {
+			var ani:Animation = _animations[index];
+			var ao:Object = {};
+			ao.name = ani.name;
+			ao.type = ani.type;
+			ao.guid = ani.guid;
+			Log.out( "ModelInfo.animationsGet - animation.metadata: " + ani );
+			oa[index] = ao;
 		}
-		*/
-	} 	
-	
+		if ( oa[0] )
+			dbo.animations = oa;
+		oa = null;
+	}
+
 	/*
 	private function animationsFromObject( $animations:Object ):void {
 	// i.e. animData = { "name": "Glide", "guid":"Glide.ajson" }

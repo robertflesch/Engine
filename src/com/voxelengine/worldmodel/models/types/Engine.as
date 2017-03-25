@@ -48,7 +48,12 @@ package com.voxelengine.worldmodel.models.types
 		public function Engine( $ii:InstanceInfo ) { 
 			super( $ii );
 		}
-		
+
+		static public function buildExportObject( obj:Object ):Object {
+			VoxelModel.buildExportObject( obj )
+			return obj;
+		}
+
 		override protected function processClassJson():void {
 			super.processClassJson();
 			if ( modelInfo.dbo && modelInfo.dbo.engine )

@@ -7,7 +7,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-import com.voxelengine.worldmodel.animation.SoundPersistence;
+import com.voxelengine.Globals;
+import com.voxelengine.utils.GUID;
+import com.voxelengine.worldmodel.animation.AnimationSound;
 import com.voxelengine.worldmodel.models.Block;
 import flash.utils.Dictionary
 import flash.net.URLLoaderDataFormat
@@ -41,7 +43,7 @@ public class SoundCache
 			return;
 		}
 		Log.out( "SoundCache.request guid: " + $se.guid, Log.INFO );
-		var snd:SoundPersistence;
+		var snd:AnimationSound;
 		if ( Globals.isGuid( $se.guid ) )
 			snd = _sounds[$se.guid];
 		else
@@ -56,9 +58,9 @@ public class SoundCache
 			_block.add( $se.guid );
 			
 			if ( true == Globals.online && $se.fromTables )
-				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $se.series, Globals.BIGDB_TABLE_SOUNDS, $se.guid, null, null, URLLoaderDataFormat.BINARY, $se.guid ) )
-			else	
-				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $se.series, Globals.SOUND_EXT, $se.guid, null, null, URLLoaderDataFormat.BINARY, $se.guid ) )
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $se.series, Globals.BIGDB_TABLE_SOUNDS, $se.guid, null, null, URLLoaderDataFormat.BINARY, $se.guid ) );
+			else
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $se.series, Globals.SOUND_EXT, $se.guid, null, null, URLLoaderDataFormat.BINARY, $se.guid ) );
 		}
 		else
 			SoundEvent.create( ModelBaseEvent.RESULT, $se.series, $se.guid, snd );
@@ -72,10 +74,12 @@ public class SoundCache
 
 			// dbo is loading from table, data if loading from import
 		if ( $pe.dbo || $pe.data ) {
-			var sndPer:SoundPersistence = new SoundPersistence( $pe.guid, $pe.dbo, $pe.data );
+			var sndPer:AnimationSound = new AnimationSound( $pe.guid, $pe.dbo, $pe.data );
 			if ( _block.has( $pe.guid ) )
 				_block.clear( $pe.guid );
 			add( $pe, sndPer );
+			if ( !Globals.isGuid( $pe.guid ) )
+				sndPer.guid = Globals.getUID();
 		}
 		else {
 			Log.out( "SoundCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR )
@@ -83,7 +87,7 @@ public class SoundCache
 		}
 	}
 	
-	static private function add($pe:PersistenceEvent, $sp:SoundPersistence ):void {
+	static private function add($pe:PersistenceEvent, $sp:AnimationSound ):void {
 		if ( null == $sp || null == $pe.guid ) {
 			Log.out( "SoundCache.Add trying to add NULL AnimationSounds or guid", Log.WARN );
 			return
@@ -128,7 +132,7 @@ public class SoundCache
 		var guidArray:Array = $ae.guid.split( ":" );
 		var oldGuid:String = guidArray[0];
 		var newGuid:String = guidArray[1];
-		var snd:SoundPersistence = _sounds[$ae.guid];
+		var snd:AnimationSound = _sounds[oldGuid];
 		if ( snd ) {
 			_sounds[oldGuid] = null;
 			_sounds[newGuid] = snd;
@@ -209,7 +213,7 @@ public class SoundCache
 	//////////////////////////////////////////////////////////////////////////////
 	
 	static public function playSound( $guid:String ):void {
-		var snd:SoundPersistence = _sounds[ $guid ];
+		var snd:AnimationSound = _sounds[ $guid ];
 		if ( !snd ) {
 			SoundEvent.addListener( ModelBaseEvent.ADDED, addSoundAndPlay );
 			SoundEvent.addListener( ModelBaseEvent.RESULT, addSoundAndPlay );
@@ -224,7 +228,7 @@ public class SoundCache
 		playSoundInternal( $se.snd );
 	}
 	
-	static private function playSoundInternal( $snd:SoundPersistence ):void {
+	static private function playSoundInternal( $snd:AnimationSound ):void {
 	
 		// playSound( snd:Sound, $startTime:Number = 0, $loops:int = 0, $sndTransform:SoundTransform = null) : flash.media.SoundChannel
 		if ( $snd && !Globals.muted && $snd.sound )

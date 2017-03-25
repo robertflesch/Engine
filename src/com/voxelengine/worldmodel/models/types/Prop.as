@@ -30,6 +30,12 @@ package com.voxelengine.worldmodel.models.types
 			super( instanceInfo);
 		}
 
+		static public function buildExportObject( obj:Object ):Object {
+			Engine.buildExportObject( obj )
+			//obj.rotationRate = _rotationRate;
+			return obj;
+		}
+
 		override protected function processClassJson():void {
 			super.processClassJson();
 			if ( modelInfo.dbo && modelInfo.dbo.engine )

@@ -126,7 +126,7 @@ public class PanelAnimations extends PanelBase
 			{
 				var anim:Animation = _selectedAnimation;
 				//(new Alert( LanguageManager.localizedStringGet( "NOT IMPLEMENTED" ) )).display();
-				AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.DELETE, 0, _selectedModel.modelInfo.guid, anim.guid, null ) );
+				AnimationEvent.create( ModelBaseEvent.DELETE, 0, _selectedModel.modelInfo.guid, anim.guid, null );
 				populateAnimations( _selectedModel );
 				_selectedModel.modelInfo.changed = true;
 				_selectedModel.save();

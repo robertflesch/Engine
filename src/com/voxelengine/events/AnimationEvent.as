@@ -57,10 +57,14 @@ public class AnimationEvent extends ModelBaseEvent
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:AnimationEvent ) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
+	static public function create( $type:String, $series:int, $modelGuid:String, $aniGuid:String, $ani:Animation, $fromTable:Boolean = true ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new AnimationEvent( $type, $series, $modelGuid, $aniGuid, $ani, $fromTable) );
 	}
-	
+
+	static public function dispatch( $ae:AnimationEvent ) : Boolean {
+		return _eventDispatcher.dispatchEvent( $ae );
+	}
+
 	///////////////// Event handler interface /////////////////////////////
 }
 }

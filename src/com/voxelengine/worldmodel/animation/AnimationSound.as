@@ -7,6 +7,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.animation
 {
+import com.voxelengine.worldmodel.SoundCache;
+import com.voxelengine.worldmodel.models.PersistenceObject;
+
 import flash.media.Sound;
 import flash.media.SoundTransform;
 import com.voxelengine.events.ModelBaseEvent;
@@ -16,13 +19,15 @@ import com.voxelengine.Log;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.utils.MP3Pitch;
-	
+
+import playerio.DatabaseObject;
+
 /**
  * ...
  * @author Robert Flesch - RSF 
  * 
  */
-public class AnimationSound
+public class AnimationSound extends PersistenceObject
 {
 	static public var DEFAULT_OBJECT:Object = { 
 		name: SOUND_INVALID,
@@ -34,55 +39,66 @@ public class AnimationSound
 	
 	//////////////////////////////////////
 	
-	private var _hasValues:Boolean;
-	private var _guid:String = SOUND_INVALID;
 	private var _ani:Animation;
 	private var _pitch:MP3Pitch = null;
 	private var _pitchRate:Number;
-	private var _soundPersistance:SoundPersistence;
-	private var _soundRangeMax:int = 2000;
-	private var _soundRangeMin:int = 10;
 	private var _owner:VoxelModel = null;
+	private var _waitingOnLoad:Boolean;
 //		private var _checked:Boolean = false; // Could be expensive, dont check more then once a frame
 
-	public function get soundRangeMax():int { return _soundRangeMax; }
-	public function set soundRangeMax(value:int):void { _soundRangeMax = value; }
-	
-	public function get soundRangeMin():int { return _soundRangeMin; }
-	public function set soundRangeMin(value:int):void  { _soundRangeMin = value; }
-	
-	public function get guid():String  { return _guid; }
-	public function set guid(value:String):void  { _guid = value; }
-	
-	public function AnimationSound( $parentAnimation:Animation, $intiObj:Object ) {
-		_ani = $parentAnimation;
-		
-		if ( $intiObj.guid )
-			guid = $intiObj.guid;
-		else	
-			guid = $intiObj.name;
-		
-		if ( AnimationSound.DEFAULT_OBJECT.name != guid ) {
-			if (!Globals.isGuid(guid))
-				SoundEvent.addListener(ModelBaseEvent.UPDATE_GUID, updateGuid);
-			SoundEvent.addListener( ModelBaseEvent.ADDED, added );
-			SoundEvent.create( ModelBaseEvent.REQUEST, 0, guid, null, Globals.isGuid(guid) );
-		}
+	private var _sound:Sound = new Sound();
 
-		if ( $intiObj.soundRangeMax && ( $intiObj.soundRangeMax != 2000 ) ) {
-			_soundRangeMax = $intiObj.soundRangeMax;
-			_hasValues = true
-		}
-		if ( $intiObj.soundRangeMin && ( $intiObj.soundRangeMin != 10 ) ) {
-			_soundRangeMin = $intiObj.soundRangeMin;
-			_hasValues = true
-		}
+	public function get sound():Sound 				{ return _sound }
+	public function get name():String				{ return dbo.name }
+	public function get length():Number				{ return dbo.length }
+	public function get hashTags():String			{ return dbo.hashTags }
+	public function set hashTags( $val:String):void	{ dbo.hashTags = $val }
 
-		SoundEvent.addListener( ModelBaseEvent.ADDED, added );
-		SoundEvent.addListener( ModelBaseEvent.RESULT, added );
-		SoundEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failed );
+	public function get soundRangeMax():int { return dbo.soundRangeMax; }
+	public function set soundRangeMax(value:int):void { dbo.soundRangeMax = value; }
+	
+	public function get soundRangeMin():int { return dbo.soundRangeMin; }
+	public function set soundRangeMin(value:int):void  { dbo.soundRangeMin = value; }
+
+	override public function set guid( $newGuid:String ):void {
+		var oldGuid:String = super.guid;
+		super.guid = $newGuid;
+		SoundEvent.create( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, this );
+		changed = true
 	}
 
+	public function toAnimationData():Object {
+		var obj:Object = {};
+		obj.guid = guid;
+		obj.name = name;
+		return obj;
+	}
+
+	public function AnimationSound( $guid:String, $dbo:DatabaseObject, $initObj:Object ) {
+		super( $guid, Globals.BIGDB_TABLE_SOUNDS );
+
+		if ( null == $dbo)
+			assignNewDatabaseObject();
+		else {
+			dbo = $dbo;
+		}
+
+		init( $initObj );
+	}
+
+	public function init( $newData:Object ):void {
+		if ( $newData ){
+			dbo.ba = $newData;
+			soundRangeMax = 2000;
+			soundRangeMin = 10;
+			dbo.name = guid;
+		}
+
+		sound.loadCompressedDataFromByteArray( dbo.ba, dbo.ba.length );
+		dbo.length = sound.length;
+	}
+
+///////////////////////////////////////////////
 	//override public function release():void {
 		//throw new Error( "what to do here" )
 	//}
@@ -92,8 +108,8 @@ public class AnimationSound
 		SoundEvent.removeListener( ModelBaseEvent.RESULT, added );
 		SoundEvent.removeListener( ModelBaseEvent.UPDATE_GUID, updateGuid );
 		guid		= SOUND_INVALID;
-		_soundRangeMax	= 2000;
-		_soundRangeMin	= 10;
+		soundRangeMax	= 2000;
+		soundRangeMin	= 10;
 	}
 	
 	private function updateGuid( $se:SoundEvent ):void {
@@ -104,51 +120,50 @@ public class AnimationSound
 		if ( guid == oldGuid ) {
 			guid = newGuid;
 			SoundEvent.removeListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );
-			_hasValues = true;
 		}
 		_ani.changed = true
 	}
-	
-	
-	public function toObject():Object {
-		if ( _soundPersistance )
-			_soundPersistance.save();
 
-		if ( _hasValues ) {
-			var sound:Object = {};
-			sound.guid 			= _guid;
-			sound.soundRangeMax	= _soundRangeMax;
-			sound.soundRangeMin	= _soundRangeMin;
-		}
-		return sound;
+
+	override protected function toObject():void {
+		Log.out( "AnimationSound.toObject - Nothing here but break point")
 	}
 
-	private var _waitingOnLoad:Boolean;
-	// FROM Persistence
-	public function play( $val:Number ):void
-	{
+	public function play( $val:Number ):void {
 //		ModelEvent.addListener( ModelEvent.MOVED, onModelMoved );
-		if ( _soundPersistance )
-			playSoundWithPitch( $val );
-		else {
-			if ( !_waitingOnLoad ) {
-				_waitingOnLoad = true;
-				SoundEvent.addListener(ModelBaseEvent.RESULT, added)
-				Log.out("AnimationSound.play - _soundPersistance not loaded yet", Log.WARN);
-			}
+		// pitch is 0 to 1, but I find that values less then 0.5 don't work
+//		_pitchRate = 0.5 + Math.abs($pitchRate) * 2;
+		if ( !_sound ) {
+			requestSound();
+			return;
+		} else if ( !_pitch ){
+			_pitchRate = $val;
+			createPitch();
 		}
 	}
 
-	public function playSoundWithPitch( $pitchRate:Number ):void {
-		// pitch is 0 to 1, but I find that values less then 0.5 don't work
-		_pitchRate = 0.5 + Math.abs($pitchRate) * 2;
-		if ( _pitch ) {
-			//_pitch.volume = volume
-			_pitch.rate = _pitchRate;
+	private function createPitch():void {
+		_pitch = new MP3Pitch(sound);
+		_pitch.rate = _pitchRate;
+	}
+
+	private function requestSound():void {
+		if ( !_waitingOnLoad ) {
+			_waitingOnLoad = true;
+			SoundEvent.addListener(ModelBaseEvent.RESULT, added)
+			Log.out("AnimationSound.play - waiting on sound to load", Log.WARN);
 		}
-		else {
-			SoundEvent.addListener( ModelBaseEvent.RESULT, added )
-		}
+		Log.out("AnimationSound.play - _soundPersistance not loaded yet", Log.WARN);
+	}
+
+	public function playSoundWithPitch( $pitchRate:Number = 1 ):void {
+		if ( !_sound ) {
+			requestSound();
+			return;
+		} else if ( !_pitch )
+			createPitch();
+
+		_pitch.rate = _pitchRate;
 	}
 
 	public function stopSoundWithPitch( $pitch:MP3Pitch ): void {
@@ -174,30 +189,25 @@ public class AnimationSound
 	}
 
 	private function added( $se:SoundEvent ):void {
+		SoundEvent.removeListener( ModelBaseEvent.ADDED, added );
+		SoundEvent.removeListener( ModelBaseEvent.RESULT, added );
+		SoundEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failed );
+
 		if ( $se.guid == guid ) {
 			if ($se.snd) {
 				_waitingOnLoad = false;
-				_soundPersistance = $se.snd;
-				_pitch = new MP3Pitch(_soundPersistance.sound);
+				_pitch = new MP3Pitch(sound);
 				_pitch.rate = _pitchRate;
 
 				Log.out("AnimationSound.added - play animationSound: " + $se)
 			}
-			if (_waitingOnLoad) {
-				playSoundWithPitch(_pitchRate);
-				_waitingOnLoad = false;
-			}
-
-			SoundEvent.removeListener( ModelBaseEvent.ADDED, added );
-			SoundEvent.removeListener( ModelBaseEvent.RESULT, added );
-			SoundEvent.removeListener( ModelBaseEvent..REQUEST_FAILED, failed );
 		}
 	}
 	
 	public function stop():void
 	{
 //		ModelEvent.removeListener( ModelEvent.MOVED, onModelMoved );
-//		SoundCache.stopSoundWithPitch( _pitch );
+		_pitch.stop();
 		_pitch = null;
 		_owner = null;
 	}
@@ -224,8 +234,8 @@ public class AnimationSound
 				_pitch.adjustVolumeAndPan( _owner.instanceInfo.controllingModel.worldToModel( VoxelModel.controlledModel.instanceInfo.positionGet )
 										 , effectiveRotation
 										 , _owner.instanceInfo.positionGet.clone()
-										 , _soundRangeMax
-										 , _soundRangeMin );
+										 , soundRangeMax
+										 , soundRangeMin );
 			}
 		}
 	}

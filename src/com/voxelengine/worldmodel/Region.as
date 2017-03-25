@@ -314,11 +314,13 @@ package com.voxelengine.worldmodel
 		// toPersistence
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		override public function save():void {
+		override public function save():Boolean {
 			// The null owner check makes it to we dont save local loaded regions to persistance
-			if ( null != owner && Globals.isGuid( guid ) )
-				if ( changed )
-					super.save()
+			if ( null != owner && Globals.isGuid( guid ) ) {
+				if (changed)
+					return super.save();
+			}
+			return false;
 		}
 		
 		override protected function toObject():void {

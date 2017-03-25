@@ -62,6 +62,7 @@ public class PersistenceObject
 		if ( _guid != value && Globals.isGuid( _guid ) && Globals.isGuid( value ) )
 				Log.out( "PersistenceObject - WHY AM I CHANGING A VALID GUID  _guid: " + _guid + "  newGuid: " + value );
 		_guid = value;
+		_changed = true;
 	}
 	public function get dbo():DatabaseObject { return _dbo; }
 	public function set dbo(val:DatabaseObject ):void { _dbo = val; }
@@ -96,7 +97,7 @@ public class PersistenceObject
 	
 	protected function toObject():void { }
 	
-	public function save():void {
+	public function save():Boolean {
 		if ( !changed || !Globals.online || dynamicObj ) {
 //			if ( Globals.online && !changed )
 //				Log.out( name + " save - Not saving data - guid: " + guid + " NOT changed" );
@@ -104,16 +105,17 @@ public class PersistenceObject
 //				Log.out( name + " save - Not saving data - guid: " + guid + " NOT online" );
 //			else
 //				Log.out( name + " save - Not saving data - Offline and not changed" );
-			return;
+			return false;
 		}
 
 		if ( !Globals.isGuid(guid)) {
 			if ( Player.DEFAULT_PLAYER == guid)
-				return;
+				return false;
 			Log.out("PersistenceObject.save - NOT Saving INVALID GUID: " + guid + " in table: " + table, Log.WARN);
-			return;
+			return false;
 		}
 		validatedSave();
+		return true;
 	}
 
 	protected function validatedSave():void {

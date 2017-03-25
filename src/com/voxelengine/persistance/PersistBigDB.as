@@ -83,26 +83,26 @@ public class PersistBigDB
 				// This seems to be the case where no record exists, not the error handler
 				if ( !ModelMakerImport.isImporting )
 					Log.out( "PersistBigDB.load.loadSuccess - NULL DatabaseObject -  table: " + $pe.table + "  guid:" + $pe.guid + "  " + $pe.toString(), Log.DEBUG );
-				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_NOT_FOUND, $pe.series, $pe.table, $pe.guid ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_NOT_FOUND, $pe.series, $pe.table, $pe.guid, null, null, $pe.format, $pe.other ) );
 				return;
 			}
 			
-			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $dbo.key, $dbo, null ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $dbo.key, $dbo, null, $pe.format, $pe.other ) );
 		}
 		
 		function loadFail( $pioe:PlayerIOError ):void {
 			Log.out( "PersistBigDB.load.failed - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: " + $pioe, Log.ERROR, $pioe ) 
-			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data, $pe.format, $pe.other ) );
 		}		
 		
 		function errorNoClient( $piope:PlayerIOPersistenceEvent ):void {
 			Log.out( "PersistBigDB.load.errorNoClient - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: NOT CONNECTED TO THE INTERNET", Log.ERROR ) 
-			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data, $pe.format, $pe.other ) );
 		}		
 		
 		function errorNoDB( $piope:PlayerIOPersistenceEvent ):void {
 			Log.out( "PersistBigDB.load.errorNoDB - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: DATABASE NOT FOUND", Log.ERROR ) 
-			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data ) );
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_FAILED, $pe.series, $pe.table, $pe.guid, null, $pe.data, $pe.format, $pe.other ) );
 		}		
 	}
 	

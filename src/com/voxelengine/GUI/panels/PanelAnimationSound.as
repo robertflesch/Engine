@@ -28,12 +28,13 @@ public class PanelAnimationSound extends ExpandableBox
 		_ani = $ebco.rootObject
 		_ani.animationSound = $ebco.item
 		
-		if ( null == $ebco.item ) {
-			_ani.animationSound = $ebco.item = new AnimationSound( _ani, AnimationSound.DEFAULT_OBJECT )
-		}
-		
+
 		$ebco.itemBox.showReset = true
 		super( $parent, $ebco );
+		if ( null == $ebco.item ) {
+			throw new Error( "REFACTOR");
+//			_ani.animationSound = $ebco.item = new AnimationSound( _ani, AnimationSound.DEFAULT_OBJECT )
+		}
 	}
 	
 	override protected function collapasedInfo():String  {

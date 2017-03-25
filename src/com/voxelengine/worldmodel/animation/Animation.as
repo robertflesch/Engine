@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.animation
 {
 import com.voxelengine.events.AnimationEvent;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.SoundEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.PermissionsBase;
 import com.voxelengine.worldmodel.Region;
@@ -62,10 +63,10 @@ public class Animation extends PersistenceObject
 	public function get owner():String { return dbo.owner; }
 	public function get animationSound():AnimationSound { return _animationSound; }
 	public function set animationSound($val:AnimationSound ):void  { _animationSound = $val; }
-	override public function set guid( $newGuid:String ):void { 
+	override public function set guid( $newGuid:String ):void {
 		var oldGuid:String = super.guid;
 		super.guid = $newGuid;
-		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.UPDATE_GUID, 0, animationClass, oldGuid + ":" + $newGuid, null ) );
+		AnimationEvent.create( ModelBaseEvent.UPDATE_GUID, 0, animationClass, oldGuid + ":" + $newGuid, null );
 		changed = true;
 	}
 
@@ -88,6 +89,11 @@ public class Animation extends PersistenceObject
 		dbo.owner = Network.userId;
 	}
 
+	override public function save():Boolean {
+		if ( _animationSound )
+			_animationSound.save();
+		return super.save();
+	}
 	private function init( $newData:Object = null ):void {
 
 		if ($newData)
@@ -100,8 +106,15 @@ public class Animation extends PersistenceObject
 		//Region.currentRegion.modelCache.requestModelInfoByModelGuid( owner );
 		//Region.currentRegion.modelCache.instancesOfModelGet( owner );
 
-		if ( dbo.sound )
-			_animationSound = new AnimationSound( this, dbo.sound );
+		if ( dbo.sound ) {
+            _animationSound = null;
+            SoundEvent.addListener( ModelBaseEvent.ADDED, soundAdded );
+            SoundEvent.addListener( ModelBaseEvent.RESULT, soundAdded );
+            if ( dbo.sound.guid )
+                SoundEvent.create( ModelBaseEvent.REQUEST, 0, dbo.sound.guid );
+            else
+                SoundEvent.create( ModelBaseEvent.REQUEST, 0, dbo.sound.name, null, false );
+        }
 
 		if ( dbo.clipVelocity )
 			clipVelocity = dbo.clipVelocity;
@@ -124,6 +137,16 @@ public class Animation extends PersistenceObject
 		_permissions = new PermissionsBase( dbo );
 	}
 
+    private function soundAdded( $se:SoundEvent ):void {
+        SoundEvent.removeListener( ModelBaseEvent.ADDED, soundAdded );
+        SoundEvent.removeListener( ModelBaseEvent.RESULT, soundAdded );
+        _animationSound = $se.snd;
+        if ( dbo.sound.soundRangeMax )
+            _animationSound.soundRangeMax = dbo.sound.soundRangeMax;
+        if ( dbo.sound.soundRangeMin )
+            _animationSound.soundRangeMin = dbo.sound.soundRangeMin;
+    }
+
 	public function createBackCopy():Object {
 		// force the data from the dynamic classes into the object
 		// this give me an object that holds all of the data for the animation
@@ -135,7 +158,7 @@ public class Animation extends PersistenceObject
 		backupInfo.type 			= String( dbo.type );
 		backupInfo.animationClass 	= String( dbo.animationClass );
 		if ( _animationSound )
-			backupInfo.sound = _animationSound.toObject();
+			backupInfo.sound = _animationSound.sound;
 		if ( _transforms && _transforms.length )
 			backupInfo.animations = getAnimations();
 		if ( _attachments && _attachments.length )
@@ -163,9 +186,9 @@ public class Animation extends PersistenceObject
 		// just use the dbo as it is at base level
 		// but need to refresh
 		// permissions?
-		
+
 		if ( _animationSound )
-			dbo.sound = _animationSound.toObject();
+			dbo.sound = _animationSound.toAnimationData();
 		if ( _transforms && _transforms.length )
 			dbo.animations = getAnimations();
 		if ( _attachments && _attachments.length )

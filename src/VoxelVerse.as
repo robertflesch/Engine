@@ -263,7 +263,7 @@ public class VoxelVerse extends Sprite
 		//Log.out( "VoxelVerse.dispatchSaves", Log.WARN )
 		if ( Region.currentRegion )
 			RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );
-		AnimationEvent.dispatch( new AnimationEvent( ModelBaseEvent.SAVE, 0, null, null, null ) );
+		AnimationEvent.create( ModelBaseEvent.SAVE, 0, null, null, null );
 		var vm:VoxelModel = VoxelModel.controlledModel;
 		if ( null != vm && vm.instanceInfo ) {
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, vm.instanceInfo.instanceGuid , null ) );

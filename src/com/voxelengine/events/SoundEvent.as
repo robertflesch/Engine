@@ -7,21 +7,22 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.events
 {
-import com.voxelengine.worldmodel.animation.SoundPersistence;
 import flash.events.Event
 import flash.events.EventDispatcher
+
+import com.voxelengine.worldmodel.animation.AnimationSound;
 
 public class SoundEvent extends ModelBaseEvent
 {
 	private var _guid:String; // animation guid or fileName
-	private var _snd:SoundPersistence;
+	private var _snd:AnimationSound;
 	private var _fromTables:Boolean;
 
 	public function get guid():String  { return _guid }
 	public function get fromTables():Boolean  { return _fromTables }
-	public function get snd():SoundPersistence  { return _snd }
+	public function get snd():AnimationSound  { return _snd }
 	
-	public function SoundEvent($type:String, $series:int, $guid:String, $snd:SoundPersistence = null, $fromTables:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
+	public function SoundEvent($type:String, $series:int, $guid:String, $snd:AnimationSound = null, $fromTables:Boolean = true, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		super( $type, $series, $bubbles, $cancellable );
 		_guid = $guid;
@@ -50,7 +51,7 @@ public class SoundEvent extends ModelBaseEvent
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function create( $type:String, $series:int, $guid:String, $snd:SoundPersistence = null, $fromTables:Boolean = true ) : Boolean {
+	static public function create( $type:String, $series:int, $guid:String, $snd:AnimationSound = null, $fromTables:Boolean = true ) : Boolean {
 		return _eventDispatcher.dispatchEvent( new SoundEvent( $type, $series, $guid, $snd, $fromTables) );
 	}
 	

@@ -58,7 +58,7 @@ public class PersistenceEvent extends Event
 		super( $type, $bubbles, $cancellable );
 		_series = $series;
 		_guid = $guid;
-		_table = $table
+		_table = $table;
 		_dbo = $dbo;
 		_data = $data;
 		_format = $format;
