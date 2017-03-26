@@ -7,11 +7,11 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.animation
 {
-import com.voxelengine.worldmodel.SoundCache;
 import com.voxelengine.worldmodel.models.PersistenceObject;
 
 import flash.media.Sound;
 import flash.media.SoundTransform;
+
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.SoundEvent;
 import com.voxelengine.Globals;
@@ -22,11 +22,6 @@ import com.voxelengine.utils.MP3Pitch;
 
 import playerio.DatabaseObject;
 
-/**
- * ...
- * @author Robert Flesch - RSF 
- * 
- */
 public class AnimationSound extends PersistenceObject
 {
 	static public var DEFAULT_OBJECT:Object = { 
@@ -36,8 +31,6 @@ public class AnimationSound extends PersistenceObject
 	};
 	
 	public static const SOUND_INVALID:String = "SOUND_INVALID";
-	
-	//////////////////////////////////////
 	
 	private var _ani:Animation;
 	private var _pitch:MP3Pitch = null;
@@ -108,74 +101,10 @@ public class AnimationSound extends PersistenceObject
 		SoundEvent.removeListener( ModelBaseEvent.RESULT, added );
 		SoundEvent.removeListener( ModelBaseEvent.UPDATE_GUID, updateGuid );
 		guid		= SOUND_INVALID;
-		soundRangeMax	= 2000;
-		soundRangeMin	= 10;
-	}
-	
-	private function updateGuid( $se:SoundEvent ):void {
-		// Make sure this is saved correctly
-		var guidArray:Array = $se.guid.split( ":" );
-		var oldGuid:String = guidArray[0];
-		var newGuid:String = guidArray[1];
-		if ( guid == oldGuid ) {
-			guid = newGuid;
-			SoundEvent.removeListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );
-		}
-		_ani.changed = true
-	}
-
-
-	override protected function toObject():void {
-		Log.out( "AnimationSound.toObject - Nothing here but break point")
-	}
-
-	public function play( $val:Number ):void {
-//		ModelEvent.addListener( ModelEvent.MOVED, onModelMoved );
-		// pitch is 0 to 1, but I find that values less then 0.5 don't work
-//		_pitchRate = 0.5 + Math.abs($pitchRate) * 2;
-		if ( !_sound ) {
-			requestSound();
-			return;
-		} else if ( !_pitch ){
-			_pitchRate = $val;
-			createPitch();
-		}
-	}
-
-	private function createPitch():void {
-		_pitch = new MP3Pitch(sound);
-		_pitch.rate = _pitchRate;
-	}
-
-	private function requestSound():void {
-		if ( !_waitingOnLoad ) {
-			_waitingOnLoad = true;
-			SoundEvent.addListener(ModelBaseEvent.RESULT, added)
-			Log.out("AnimationSound.play - waiting on sound to load", Log.WARN);
-		}
-		Log.out("AnimationSound.play - _soundPersistance not loaded yet", Log.WARN);
-	}
-
-	public function playSoundWithPitch( $pitchRate:Number = 1 ):void {
-		if ( !_sound ) {
-			requestSound();
-			return;
-		} else if ( !_pitch )
-			createPitch();
-
-		_pitch.rate = _pitchRate;
-	}
-
-	public function stopSoundWithPitch( $pitch:MP3Pitch ): void {
-		if ( $pitch )
-			$pitch.stop()
-	}
-
-	public function playSound( snd:Sound, $startTime:Number = 0, $loops:int = 0, $sndTransform:SoundTransform = null) : flash.media.SoundChannel
-	{
-		if ( snd && !Globals.muted )
-			return snd.play( $startTime, $loops, $sndTransform )
-		return null
+		if (soundRangeMax != 2000)
+			soundRangeMax	= 2000;
+		if (soundRangeMin != 10)
+			soundRangeMin	= 10;
 	}
 
 	private function failed( $se:SoundEvent ):void {
@@ -203,22 +132,84 @@ public class AnimationSound extends PersistenceObject
 			}
 		}
 	}
-	
-	public function stop():void
-	{
+
+	private function updateGuid( $se:SoundEvent ):void {
+		// Make sure this is saved correctly
+		var guidArray:Array = $se.guid.split( ":" );
+		var oldGuid:String = guidArray[0];
+		var newGuid:String = guidArray[1];
+		if ( guid == oldGuid ) {
+			guid = newGuid;
+			SoundEvent.removeListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );
+		}
+		_ani.changed = true
+	}
+
+
+	override protected function toObject():void {
+		Log.out( "AnimationSound.toObject - Don't save default data to DB");
+		if (soundRangeMax == 2000)
+			delete dbo.soundRangeMax;
+		if (soundRangeMin == 10)
+			delete dbo.soundRangeMin;
+	}
+
+	private function createPitch():void {
+		_pitch = new MP3Pitch(sound);
+		_pitch.rate = _pitchRate;
+	}
+
+	private function requestSound():void {
+		if ( !_waitingOnLoad ) {
+			_waitingOnLoad = true;
+			SoundEvent.addListener(ModelBaseEvent.RESULT, added)
+			Log.out("AnimationSound.play - waiting on sound to load", Log.WARN);
+		}
+		Log.out("AnimationSound.play - _soundPersistance not loaded yet", Log.WARN);
+	}
+
+	public function play( $val:Number ):void {
+//		ModelEvent.addListener( ModelEvent.MOVED, onModelMoved );
+		// pitch is 0 to 1, but I find that values less then 0.5 don't work
+//		_pitchRate = 0.5 + Math.abs($pitchRate) * 2;
+		if ( !_sound ) {
+			requestSound();
+			return;
+		} else if ( !_pitch ){
+			_pitchRate = $val;
+			createPitch();
+		}
+	}
+
+	public function playSoundWithPitch( $pitchRate:Number = 1 ):void {
+		if ( !_sound ) {
+			requestSound();
+			return;
+		} else if ( !_pitch )
+			createPitch();
+
+		_pitch.rate = _pitchRate;
+	}
+
+	public function playSound( snd:Sound, $startTime:Number = 0, $loops:int = 0, $sndTransform:SoundTransform = null) : flash.media.SoundChannel {
+		if ( snd && !Globals.muted )
+			return snd.play( $startTime, $loops, $sndTransform )
+		return null
+	}
+
+	public function stop():void {
 //		ModelEvent.removeListener( ModelEvent.MOVED, onModelMoved );
-		_pitch.stop();
+		if ( _pitch )
+			_pitch.stop();
 		_pitch = null;
 		_owner = null;
 	}
 	
-	public function update( $val:Number ):void
-	{
-		//_pitch = SoundCache.playSoundWithPitch( $val, guid, _pitch  );
+	public function update( $val:Number ):void {
+		//playSoundWithPitch( $val );
 	}
 
-	private function onModelMoved( event:ModelEvent ):void
-	{
+	private function onModelMoved( event:ModelEvent ):void {
 		if ( event.instanceGuid == VoxelModel.controlledModel.instanceInfo.instanceGuid && null != _pitch )
 		{
 			//trace( "AnimationSound.onModelMoved - Player moved" );
