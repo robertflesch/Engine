@@ -91,7 +91,11 @@ public class PersistenceEvent extends Event
 	static public function dispatch( $event:PersistenceEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
-	
+
+	static public function create( $type:String, $series:int, $table:String, $guid:String, $dbo:DatabaseObject = null, $data:* = null, $format:String = URLLoaderDataFormat.TEXT, $other:String = "" ):Boolean {
+		return _eventDispatcher.dispatchEvent( new PersistenceEvent( $type, $series, $table, $guid, $dbo, $data, $format, $other ) );
+	}
+
 	///////////////// Event handler interface /////////////////////////////
 }
 }
