@@ -8,31 +8,24 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 import flash.utils.Dictionary;
-import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.server.Network;
 
 import com.voxelengine.utils.JSONUtil;
 import com.voxelengine.utils.StringUtils;
 
-/**
- * ...
- * @author Bob
- */
 public class ModelMetadataCache
 {
 	static private var _initializedPublic:Boolean;
 	static private var _initializedPrivate:Boolean;
 	
 	// this acts as a cache for all model objects loaded from persistance
-	// dont use weak keys since this is THE spot that holds things.
+	// don't use weak keys since this is THE spot that holds things.
 	static private var _metadata:Dictionary = new Dictionary(false);
 	static private var _block:Block = new Block();
 	
@@ -44,6 +37,8 @@ public class ModelMetadataCache
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, 		request );
 		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, 			deleteHandler );
 		//ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, 		generated );
+		ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, importComplete );
+
 		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );		
 		
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
@@ -156,7 +151,26 @@ public class ModelMetadataCache
 			_metadata[newGuid] = modelMetadataExisting;
 		}
 	}
-	
+
+	static private function importComplete( $mme:ModelMetadataEvent ):void {
+		add( $mme.series, $mme.modelMetadata );
+	}
+
+	static private function add( $series:int, $vmm:ModelMetadata ):void {
+		if ( null == $vmm || null == $vmm.guid ) {
+			Log.out( "ModelMetadataCache.add trying to add NULL metadata or guid", Log.WARN );
+			return;
+		}
+		// check to make sure is not already there
+		if ( null ==  _metadata[$vmm.guid] ) {
+			//Log.out( "ModelMetadataCache.add vmm: " + $vmm.guid, Log.WARN );
+			_metadata[$vmm.guid] = $vmm;
+			if ( _block.has( $vmm.guid ) )
+				_block.clear( $vmm.guid );
+			//Log.out( "ModelMetadataCache.add returning guid: " + $vmm.guid + "  owner: " + $vmm.owner, Log.WARN );
+			ModelMetadataEvent.create( ModelBaseEvent.ADDED, $series, $vmm.guid, $vmm );
+		}
+	}
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End - ModelMetadataEvent
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -195,7 +209,6 @@ public class ModelMetadataCache
 			Log.out( "ModelMetadataCache.loadSucceed NO oxelPersistence or DBO PersistenceEvent: " + $pe.toString(), Log.WARN );
 			ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 		}
-
 	}
 	
 	static private function loadFailed( $pe:PersistenceEvent ):void  {
@@ -218,23 +231,5 @@ public class ModelMetadataCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End - Persistence Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  Internal Methods
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	static private function add( $series:int, $vmm:ModelMetadata ):void { 
-		if ( null == $vmm || null == $vmm.guid ) {
-			Log.out( "ModelMetadataCache.add trying to add NULL metadata or guid", Log.WARN );
-			return;
-		}
-		// check to make sure is not already there
-		if ( null ==  _metadata[$vmm.guid] ) {
-			//Log.out( "ModelMetadataCache.add vmm: " + $vmm.guid, Log.WARN );
-			_metadata[$vmm.guid] = $vmm; 
-			if ( _block.has( $vmm.guid ) )
-				_block.clear( $vmm.guid )
-			//Log.out( "ModelMetadataCache.add returning guid: " + $vmm.guid + "  owner: " + $vmm.owner, Log.WARN );
-			ModelMetadataEvent.create( ModelBaseEvent.ADDED, $series, $vmm.guid, $vmm );
-		}
-	}
 }
 }
