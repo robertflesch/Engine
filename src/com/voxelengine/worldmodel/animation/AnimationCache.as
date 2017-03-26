@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.animation
 {
+import com.voxelengine.events.SoundEvent;
+
 import flash.events.DataEvent;
 import flash.utils.ByteArray;
 import flash.net.URLLoaderDataFormat;
@@ -74,11 +76,12 @@ public class AnimationCache
 		var anim:Animation = _animations[$ae.aniGuid]
 		if ( anim ) {
 			_animations[$ae.aniGuid] = null;
-			if ( anim.animationSound )
-                PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_SOUNDS, anim.animationSound.guid, null ) );
-
+			if ( anim.animationSound ) {
+				//PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_SOUNDS, anim.animationSound.guid, null));
+				SoundEvent.create( ModelBaseEvent.DELETE, 0, anim.animationSound.guid, null );
+			}
 		}
-		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_ANIMATIONS, $ae.aniGuid, null ) );
+		PersistenceEvent.create( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_ANIMATIONS, $ae.aniGuid, null );
 	}
 	
 	static private function updateGuid( $ae:AnimationEvent ):void {
@@ -104,12 +107,12 @@ public class AnimationCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	static private function request( $ame:AnimationEvent ):void 
 	{   
-		if ( null == $ame.modelGuid ) {
+		if ( null == $ame.aniGuid || null == $ame.modelGuid ) {
 			Log.out( "AnimationCache.request guid rquested is NULL: ", Log.WARN );
 			return;
 		}
 		//Log.out( "AnimationCache.request modelGuid: " + $ame.modelGuid + "  aniGuid: " + $ame.aniGuid, Log.INFO );
-		var ani:Animation = _animations[$ame.modelGuid]; 
+		var ani:Animation = _animations[$ame.aniGuid];
 		if ( null == ani ) {
 			if ( true == Globals.online && $ame.fromTable )
 				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ame.series, Globals.BIGDB_TABLE_ANIMATIONS, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
