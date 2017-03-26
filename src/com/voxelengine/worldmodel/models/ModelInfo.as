@@ -616,6 +616,10 @@ public class ModelInfo extends PersistenceObject
 		if ( oxelPersistence )
 			oxelPersistence.save();
 
+		if ( _animations && 0 < _animations.length )
+				for each ( var ani:Animation in _animations )
+					ani.save();
+
 		for ( var i:int; i < childVoxelModels.length; i++ ) {
 			var child:VoxelModel = childVoxelModels[i];
 			child.save();
