@@ -69,7 +69,8 @@ public class InventoryPanelModel extends VVContainer
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, addModelMetadataEvent );
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, addModelMetadataEvent );
 		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, removeModelMetadataEvent );
-		ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, addModelMetadataEvent );
+		// This was causing model to be added twice when importing.
+		//ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, addModelMetadataEvent );
 
 
 		upperTabsAdd();
@@ -368,7 +369,7 @@ public class InventoryPanelModel extends VVContainer
 		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, addModelMetadataEvent );
 		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, addModelMetadataEvent );
 		ModelMetadataEvent.removeListener( ModelBaseEvent.DELETE, removeModelMetadataEvent );
-		ModelMetadataEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, addModelMetadataEvent );
+		//ModelMetadataEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, addModelMetadataEvent );
 	}
 }
 }
