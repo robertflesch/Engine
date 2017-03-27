@@ -24,7 +24,10 @@ import playerio.DatabaseObject;
 
 public class AnimationSound extends PersistenceObject
 {
-	static public var DEFAULT_OBJECT:Object = { 
+	static public const BIGDB_TABLE_SOUNDS:String = "sounds";
+	static public const SOUND_EXT:String = ".mp3";
+
+	static public var DEFAULT_OBJECT:Object = {
 		name: SOUND_INVALID,
 		soundRangeMax: 2000,
 	    soundRangeMin: 10
@@ -68,7 +71,7 @@ public class AnimationSound extends PersistenceObject
 	}
 
 	public function AnimationSound( $guid:String, $dbo:DatabaseObject, $initObj:Object ) {
-		super( $guid, Globals.BIGDB_TABLE_SOUNDS );
+		super( $guid, AnimationSound.BIGDB_TABLE_SOUNDS );
 
 		if ( null == $dbo)
 			assignNewDatabaseObject();

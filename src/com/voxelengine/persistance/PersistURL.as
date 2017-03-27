@@ -7,6 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.persistance 
 {
+import com.voxelengine.worldmodel.animation.AnimationSound;
+
 import flash.events.Event;
 import flash.events.ProgressEvent;
 import flash.events.SecurityErrorEvent;
@@ -50,7 +52,7 @@ public class PersistURL
 			_filePath = Globals.modelPath + $pe.other + "/" + $pe.guid + $pe.table;
 		else if ( Globals.AMMO_EXT == $pe.table )
 			_filePath = Globals.modelPath + $pe.guid + $pe.table;
-		else if ( Globals.SOUND_EXT == $pe.table )
+		else if ( AnimationSound.SOUND_EXT == $pe.table )
 			_filePath = Globals.soundPath + $pe.guid + $pe.table;
 
 		else

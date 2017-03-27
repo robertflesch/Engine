@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.persistance 
 {
+import com.voxelengine.worldmodel.animation.AnimationSound;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
 import playerio.PlayerIOError;
@@ -47,7 +48,7 @@ public class PersistBigDB
 			return true;
 		else if ( Globals.BIGDB_TABLE_MODEL_INFO == $pe.table )	
 			return true;
-		else if ( Globals.BIGDB_TABLE_SOUNDS == $pe.table )	
+		else if ( AnimationSound.BIGDB_TABLE_SOUNDS == $pe.table )
 			return true;
 		else {
 			if ( Globals.isGuid( $pe.guid ) )

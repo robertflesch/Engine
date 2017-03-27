@@ -77,7 +77,6 @@ public class AnimationCache
 		if ( anim ) {
 			_animations[$ae.aniGuid] = null;
 			if ( anim.animationSound ) {
-				//PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_SOUNDS, anim.animationSound.guid, null));
 				SoundEvent.create( ModelBaseEvent.DELETE, 0, anim.animationSound.guid, null );
 			}
 		}

@@ -7,18 +7,17 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-import com.voxelengine.Globals;
-import com.voxelengine.utils.GUID;
-import com.voxelengine.worldmodel.animation.AnimationSound;
-import com.voxelengine.worldmodel.models.Block;
 import flash.utils.Dictionary
 import flash.net.URLLoaderDataFormat
 
-import com.voxelengine.Globals
 import com.voxelengine.Log
+import com.voxelengine.Globals
+
 import com.voxelengine.events.ModelBaseEvent
 import com.voxelengine.events.PersistenceEvent
 import com.voxelengine.events.SoundEvent
+import com.voxelengine.worldmodel.animation.AnimationSound;
+import com.voxelengine.worldmodel.models.Block;
 
 public class SoundCache
 {
@@ -30,7 +29,6 @@ public class SoundCache
 		SoundEvent.addListener( ModelBaseEvent.REQUEST, 		request );
 		SoundEvent.addListener( ModelBaseEvent.DELETE, 			deleteHandler );
 		SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );
-		//SoundEvent.addListener( ModelBaseEvent.SAVE, 			save );
 
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
@@ -58,16 +56,16 @@ public class SoundCache
 			_block.add( $se.guid );
 			
 			if ( true == Globals.online && $se.fromTables )
-				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $se.series, Globals.BIGDB_TABLE_SOUNDS, $se.guid, null, null, URLLoaderDataFormat.BINARY, $se.guid ) );
+				PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST, $se.series, AnimationSound.BIGDB_TABLE_SOUNDS, $se.guid, null, null, URLLoaderDataFormat.BINARY, $se.guid );
 			else
-				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $se.series, Globals.SOUND_EXT, $se.guid, null, null, URLLoaderDataFormat.BINARY, $se.guid ) );
+				PersistenceEvent.create( PersistenceEvent.LOAD_REQUEST, $se.series, AnimationSound.SOUND_EXT, $se.guid, null, null, URLLoaderDataFormat.BINARY, $se.guid );
 		}
 		else
 			SoundEvent.create( ModelBaseEvent.RESULT, $se.series, $se.guid, snd );
 	}
 	
 	static private function loadSucceed( $pe:PersistenceEvent ):void {
-		if ( Globals.SOUND_EXT != $pe.table && Globals.BIGDB_TABLE_SOUNDS != $pe.table )
+		if ( AnimationSound.SOUND_EXT != $pe.table && AnimationSound.BIGDB_TABLE_SOUNDS != $pe.table )
 			return;
 
 		Log.out( "SoundCache.request guid: " + $pe.guid, Log.INFO );
@@ -103,7 +101,7 @@ public class SoundCache
 	}
 	
 	static private function loadFailed( $pe:PersistenceEvent ):void {
-		if ( Globals.SOUND_EXT != $pe.table && Globals.BIGDB_TABLE_SOUNDS != $pe.table )
+		if ( AnimationSound.SOUND_EXT != $pe.table && AnimationSound.BIGDB_TABLE_SOUNDS != $pe.table )
 			return
 		Log.out( "SoundCache.loadFailed " + $pe.toString(), Log.ERROR );
 		if ( _block.has( $pe.guid ) )
@@ -112,19 +110,19 @@ public class SoundCache
 	}
 	
 	static private function loadNotFound( $pe:PersistenceEvent):void {
-		if ( Globals.SOUND_EXT != $pe.table && Globals.BIGDB_TABLE_SOUNDS != $pe.table )
+		if ( AnimationSound.SOUND_EXT != $pe.table && AnimationSound.BIGDB_TABLE_SOUNDS != $pe.table )
 			return;
 		Log.out( "SoundCache.loadNotFound " + $pe.toString(), Log.ERROR );
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid );
 		SoundEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid );
 	}
-	
-	
+
 	static private function deleteHandler( $ae:SoundEvent ):void {
 		if ( _sounds[$ae.guid] ) 
 			_sounds[$ae.guid] = null;
-		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_SOUNDS, $ae.guid, null ) );
+		// Delete regardless of whether or not is it already loaded.
+		PersistenceEvent.create( PersistenceEvent.DELETE_REQUEST, 0, AnimationSound.BIGDB_TABLE_SOUNDS, $ae.guid, null );
 	}
 	
 	static private function updateGuid( $ae:SoundEvent ):void {
@@ -140,91 +138,22 @@ public class SoundCache
 		else
 			Log.out( "SoundCache.updateGuid - animationSound not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
 	}
-	
-	//static private function save(e:SoundEvent):void {
-		//for each ( var snd:SoundPersistence in _sounds )
-			//if ( snd )
-				//snd.save()
-	//}
-/*
-	static public function getSound( soundName:String ):Sound {
-		var snd:Sound = _sounds[ soundName ]
-		if ( snd )
-			return snd
-			
-		var isLoading:Boolean = _soundsLoading[ soundName ]
-		if ( true == isLoading )
-			return null
 
-		// its not loading, and its not in bank, load it!
-		loadSound( soundName )
-		
-		return null
-	}
-	
-	
-	////////////////////////////////
-	// old loading
-	/////////////////////////////////
-	
-	// Need to use different loader here then customLoader since this is a static class. So 
-	// I cant keep a reference to the loader around.
-	static private function loadSound( soundName:String ):void 
-	{
-		var snd:Sound = new Sound()
-		//Log.out( "SoundBank.loadSound - loading: " + Globals.appPath + soundName, Log.WARN )
-		
-		//Log.out("SoundBank.loadSound: " + Globals.soundPath + soundName )
-		snd.load( new URLRequest( Globals.soundPath + soundName ) )
-		snd.addEventListener(Event.COMPLETE, onSoundLoadComplete, false, 0, true)
-		snd.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError)
-		
-		_soundsLoading[soundName] = true
-		_sounds[soundName] = snd
-	}
-
-	
-	static public function onSoundLoadComplete (event:Event):void 
-	{
-		var fileNameAndPath:String = event.target.url
-		//Log.out( "SoundBank.onSoundLoadComplete: " + fileNameAndPath, Log.WARN )		
-		var soundName:String = removeGlobalAppPath(fileNameAndPath)
-		_soundsLoading[soundName] = false
-
-		//Log.out("SoundBank.onSoundLoadComplete: " + Globals.soundPath + soundName )
-		function removeGlobalAppPath( completePath:String ):String 
-		{
-			var lastIndex:int = completePath.lastIndexOf( Globals.soundPath )
-			var fileName:String = completePath
-			if ( -1 != lastIndex )
-				fileName = completePath.substr( Globals.soundPath.length )
-				
-			return fileName	
-		}
-	}			
-	
-	static private function onFileLoadError(event:IOErrorEvent):void
-	{
-		Log.out("----------------------------------------------------------------------------------" )
-		Log.out("SoundBank.onFileLoadError - FILE LOAD ERROR, DIDNT FIND: " + event.target.url, Log.ERROR )
-		Log.out("----------------------------------------------------------------------------------" )
-	}	
-	*/
-	//////////////////////////////////////////////////////////////////////////////
-	
 	static public function playSound( $guid:String ):void {
 		var snd:AnimationSound = _sounds[ $guid ];
 		if ( !snd ) {
 			SoundEvent.addListener( ModelBaseEvent.ADDED, addSoundAndPlay );
 			SoundEvent.addListener( ModelBaseEvent.RESULT, addSoundAndPlay );
 			SoundEvent.create( ModelBaseEvent.REQUEST, 0, $guid, null, Globals.isGuid( $guid ) );
-			return
+			return;
 		}
 		
 		playSoundInternal( snd )
 	}
 	
 	static private function addSoundAndPlay( $se:SoundEvent ):void {
+		SoundEvent.removeListener( ModelBaseEvent.ADDED, addSoundAndPlay );
+		SoundEvent.removeListener( ModelBaseEvent.RESULT, addSoundAndPlay );
 		playSoundInternal( $se.snd );
 	}
 	
@@ -232,7 +161,8 @@ public class SoundCache
 	
 		// playSound( snd:Sound, $startTime:Number = 0, $loops:int = 0, $sndTransform:SoundTransform = null) : flash.media.SoundChannel
 		if ( $snd && !Globals.muted && $snd.sound )
-			//return $snd.play( $startTime, $loops, $sndTransform )
+			// http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/media/SoundTransform.html
+			// return $snd.play( $startTime, $loops, $sndTransform )
 			$snd.sound.play( 0, 1, null )
 	}
 }
