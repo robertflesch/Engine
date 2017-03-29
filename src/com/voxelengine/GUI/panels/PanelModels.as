@@ -47,15 +47,17 @@ public class PanelModels extends PanelBase
 	private var _parentModel:VoxelModel;
 	private var _listModels:ListBox;
 	private var _dictionarySource:Function;
-	private var _buttonContainer:Container
+	private var _buttonContainer:Container;
+	private var _level:int;
 
 	private var _dupButton:Button
 	private var _detailButton:Button
 	private var _deleteButton:Button
 	
-	public function PanelModels($parent:PanelModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number )	{
+	public function PanelModels($parent:PanelModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number, $level:int )	{
 		super( $parent, $widthParam, $heightParam );
 		_parent = $parent;
+		_level = $level;
 		
 		//Log.out( "PanelModels - list box width: width: " + width + "  padding: " + pbPadding, Log.WARN );
 		_listModels = new ListBox( width - pbPadding, $elementHeight, $heightParam );
@@ -98,7 +100,7 @@ public class PanelModels extends PanelBase
 		}
 
 		if ( modelFound && vm ) {
-			UIRegionModelEvent.dispatch(new UIRegionModelEvent(UIRegionModelEvent.SELECTED_MODEL_CHANGED, vm, _parentModel));
+			UIRegionModelEvent.create(UIRegionModelEvent.SELECTED_MODEL_CHANGED, vm, _parentModel, +_level );
 			// remove inventory
 			InventoryModelEvent.dispatch( new InventoryModelEvent( ModelBaseEvent.DELETE, "", vm.instanceInfo.instanceGuid, null ) )
 		}
@@ -237,7 +239,7 @@ public class PanelModels extends PanelBase
 				VoxelModel.selectedModel.dead = true;
 				populateModels( _dictionarySource, _parentModel );
 				buttonsDisable();
-				UIRegionModelEvent.dispatch( new UIRegionModelEvent( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, _parentModel ) );
+				UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, _parentModel, _level );
 //				InventoryModelEvent.dispatch( new InventoryModelEvent( InventoryModelEvent.INVENTORY_MODEL_CHANGE, Network.userId, _selectedModel.instanceInfo.guid, 1 ) );
 			}
 		}
@@ -304,16 +306,16 @@ public class PanelModels extends PanelBase
 	private function selectModel(event:ListEvent):void {
 		if ( doubleMessageHack ) {
 			if (event.target.data) {
-				Log.out("PanelModels.selectModel has TARGET DATA");
+				//Log.out("PanelModels.selectModel has TARGET DATA");
 				buttonsEnable();
 				VoxelModel.selectedModel = event.target.data
 				// TO DO this is the right path, but probably need a custom event for this...
-				UIRegionModelEvent.dispatch(new UIRegionModelEvent(UIRegionModelEvent.SELECTED_MODEL_CHANGED, VoxelModel.selectedModel, _parentModel));
+				UIRegionModelEvent.create(UIRegionModelEvent.SELECTED_MODEL_CHANGED, VoxelModel.selectedModel, _parentModel, _level);
 				//_parent.childPanelAdd( _selectedModel );
 				//_parent.animationPanelAdd( _selectedModel );
 			}
 			else {
-				Log.out("PanelModels.selectModel has NO target data");
+				//Log.out("PanelModels.selectModel has NO target data");
 				buttonsDisable();
 			}
 		}

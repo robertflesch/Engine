@@ -8,15 +8,10 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.events
 {
 import flash.events.Event;
-import flash.utils.ByteArray;
 import flash.events.EventDispatcher;
 
 import com.voxelengine.worldmodel.models.ModelInfo;
 
-/**
- * ...
- * @author Robert Flesch - RSF 
- */
 public class ModelInfoEvent extends ModelBaseEvent
 {
 	static public const DELETE_RECURSIVE:String					= "DELETE_RECURSIVE";
@@ -42,7 +37,7 @@ public class ModelInfoEvent extends ModelBaseEvent
 	
 	///////////////// Event handler interface /////////////////////////////
 
-	// Used to distribue all persistance messages
+	// Used to distribute all modelInfo messages
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function hasEventListener( $type:String ) : Boolean {
@@ -64,9 +59,6 @@ public class ModelInfoEvent extends ModelBaseEvent
 	static public  function create( $type:String, $series:int, $guid:String, $vmi:ModelInfo, $fromTable:Boolean = true ):Boolean {
 		return ModelInfoEvent.dispatch( new ModelInfoEvent( $type, $series, $guid, $vmi, $fromTable ) );
 	}
-
-
-
 	///////////////// Event handler interface /////////////////////////////
 }
 }

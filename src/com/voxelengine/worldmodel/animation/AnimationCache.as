@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.animation
 {
 import com.voxelengine.events.SoundEvent;
+import com.voxelengine.worldmodel.models.Block;
 
 import flash.events.DataEvent;
 import flash.utils.ByteArray;
@@ -39,7 +40,8 @@ public class AnimationCache
 	// this acts as a holding spot for all model objects loaded from persistance
 	// dont use weak keys since this is THE spot that holds things.
 	static private var _animations:Dictionary = new Dictionary();
-	
+	static private var _block:Block = new Block();
+
 	public function AnimationCache() {}
 	
 	static public function init():void {
@@ -51,54 +53,6 @@ public class AnimationCache
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, 	loadNotFound );
-	}
-	
-	static private function save(e:AnimationEvent):void {
-		for each ( var ani:Animation in _animations )
-			if ( ani )
-				ani.save();
-	}
-	
-	static public function requestAnimationClass( $modelClass:String ):String {
-		if ( $modelClass == "Dragon" )
-			return MODEL_DRAGON_12;
-		if ( $modelClass == "Avatar" )
-			return MODEL_BIPEDAL_10;
-		if ( $modelClass == "Player" )
-			return MODEL_BIPEDAL_10;
-		if ( $modelClass == "Propeller" )
-			return MODEL_PROPELLER;
-		
-		return "";
-	}
-
-	static private function deleteHandler( $ae:AnimationEvent ):void {
-		var anim:Animation = _animations[$ae.aniGuid]
-		if ( anim ) {
-			_animations[$ae.aniGuid] = null;
-			if ( anim.animationSound ) {
-				SoundEvent.create( ModelBaseEvent.DELETE, 0, anim.animationSound.guid, null );
-			}
-		}
-		PersistenceEvent.create( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_ANIMATIONS, $ae.aniGuid, null );
-	}
-	
-	static private function updateGuid( $ae:AnimationEvent ):void {
-		// Make sure this is saved correctly
-		var guidArray:Array = $ae.aniGuid.split( ":" );
-		var oldGuid:String = guidArray[0];
-		var newGuid:String = guidArray[1];
-		Log.out( "AnimationCache.updateGuid - oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
-		var ani:Animation = _animations[oldGuid];
-		if ( ani ) {
-			_animations[oldGuid] = null;
-			_animations[newGuid] = ani;
-			Log.out( "AnimationCache.updateGuid - updating oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
-		}
-		else {
-			_animations[newGuid] = ani;
-			Log.out("AnimationCache.updateGuid - animation not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.ERROR);
-		}
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,6 +67,10 @@ public class AnimationCache
 		//Log.out( "AnimationCache.request modelGuid: " + $ame.modelGuid + "  aniGuid: " + $ame.aniGuid, Log.INFO );
 		var ani:Animation = _animations[$ame.aniGuid];
 		if ( null == ani ) {
+			if (_block.has($ame.aniGuid))
+				return;
+			_block.add($ame.aniGuid);
+
 			if ( true == Globals.online && $ame.fromTable )
 				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ame.series, Globals.BIGDB_TABLE_ANIMATIONS, $ame.aniGuid, null, null, URLLoaderDataFormat.TEXT, $ame.modelGuid ) );
 			else	
@@ -149,6 +107,8 @@ public class AnimationCache
 			}
 			ani = new Animation($pe.guid, null, newObjData );
 			add( $pe, ani );
+			if ( _block.has( $pe.guid ) )
+				_block.clear( $pe.guid )
 		} else {
 			Log.out( "AnimationCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR );
 			AnimationEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null );
@@ -172,6 +132,8 @@ public class AnimationCache
 	{
 		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
+		if ( _block.has( $pe.guid ) )
+			_block.clear( $pe.guid )
 		Log.out( "AnimationCache.loadFailed " + $pe.toString(), Log.ERROR );
 		AnimationEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null );
 	}
@@ -180,9 +142,60 @@ public class AnimationCache
 	{
 		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
+		if ( _block.has( $pe.guid ) )
+			_block.clear( $pe.guid )
 		Log.out( "AnimationCache.loadNotFound " + $pe.toString(), Log.ERROR );
 		AnimationEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null );
 	}
-	
+
+	static private function save(e:AnimationEvent):void {
+		for each ( var ani:Animation in _animations )
+			if ( ani )
+				ani.save();
+	}
+
+	static public function requestAnimationClass( $modelClass:String ):String {
+		if ( $modelClass == "Dragon" )
+			return MODEL_DRAGON_12;
+		if ( $modelClass == "Avatar" )
+			return MODEL_BIPEDAL_10;
+		if ( $modelClass == "Player" )
+			return MODEL_BIPEDAL_10;
+		if ( $modelClass == "Propeller" )
+			return MODEL_PROPELLER;
+
+		return "";
+	}
+
+	static private function deleteHandler( $ae:AnimationEvent ):void {
+		var anim:Animation = _animations[$ae.aniGuid]
+		if ( anim ) {
+			_animations[$ae.aniGuid] = null;
+			if ( anim.animationSound ) {
+				SoundEvent.create( ModelBaseEvent.DELETE, 0, anim.animationSound.guid, null );
+			}
+		}
+		PersistenceEvent.create( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_ANIMATIONS, $ae.aniGuid, null );
+	}
+
+	static private function updateGuid( $ae:AnimationEvent ):void {
+		// Make sure this is saved correctly
+		var guidArray:Array = $ae.aniGuid.split( ":" );
+		var oldGuid:String = guidArray[0];
+		var newGuid:String = guidArray[1];
+		Log.out( "AnimationCache.updateGuid - oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
+		var ani:Animation = _animations[oldGuid];
+		if ( ani ) {
+			_animations[oldGuid] = null;
+			_animations[newGuid] = ani;
+			Log.out( "AnimationCache.updateGuid - updating oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
+		}
+		else {
+			_animations[newGuid] = ani;
+			Log.out("AnimationCache.updateGuid - animation not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.ERROR);
+		}
+	}
+
+
 }
 }

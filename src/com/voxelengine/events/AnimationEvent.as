@@ -11,10 +11,7 @@ import flash.events.Event;
 import flash.events.EventDispatcher;
 
 import com.voxelengine.worldmodel.animation.Animation;
-/**
- * ...
- * @author Robert Flesch - RSF 
- */
+
 public class AnimationEvent extends ModelBaseEvent
 {
 	private var _aniGuid:String; // animation guid or fileName
@@ -46,7 +43,7 @@ public class AnimationEvent extends ModelBaseEvent
 	
 	///////////////// Event handler interface /////////////////////////////
 
-	// Used to distribute all persistance messages
+	// Used to distribute all persistence messages
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {

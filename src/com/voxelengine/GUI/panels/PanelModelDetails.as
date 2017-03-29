@@ -28,14 +28,14 @@ package com.voxelengine.GUI.panels
 		private var _listAnimations:PanelAnimations;
 		private var _listScripts:PanelModelScripts;
 		private var _childPanel:PanelModelDetails;
+		private var _level:int;
 		
 		private const width_default:int = 200;
 		private const height_default:int = 150;
 		
-		public function PanelModelDetails($parent:PanelBase )
-		{
+		public function PanelModelDetails($parent:PanelBase, $level:int ) {
 			super( $parent, width_default, height_default );
-			
+			_level = $level;
 			modelPanelAdd();
 			
 			UIRegionModelEvent.addListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
@@ -98,7 +98,7 @@ package com.voxelengine.GUI.panels
 		private function modelPanelAdd():void {
 
 			if ( null == _listModels ) {
-				_listModels = new PanelModels( this, width_default, 15, height_default );
+				_listModels = new PanelModels( this, width_default, 15, height_default, _level );
 				addElement( _listModels );
 			}
 			//recalc( width, height );
@@ -106,7 +106,7 @@ package com.voxelengine.GUI.panels
 		
 		public function childPanelAdd( $selectedModel:VoxelModel ):void {
 			if ( null == _childPanel ) 
-				_childPanel = new PanelModelDetails( _parent );
+				_childPanel = new PanelModelDetails( _parent, (_level + 1) );
 			_childPanel.updateChildren( $selectedModel.modelInfo.childVoxelModelsGet, $selectedModel );
 			var topLevel:PanelBase = topLevelGet();
 			topLevel.addElement( _childPanel );
@@ -115,7 +115,7 @@ package com.voxelengine.GUI.panels
 		
 		public function animationPanelAdd( $vm:VoxelModel ):void {
 			if ( null == _listAnimations ) {
-				_listAnimations = new PanelAnimations( this, width_default, 15, height_default );
+				_listAnimations = new PanelAnimations( this, width_default, 15, height_default, _level );
 				addElement( _listAnimations );
 			}
 

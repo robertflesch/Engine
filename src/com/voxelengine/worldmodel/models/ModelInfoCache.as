@@ -55,7 +55,7 @@ public class ModelInfoCache
 			Log.out( "ModelInfoCache.request requested event or guid is NULL: ", Log.ERROR );
 			ModelInfoEvent.create( ModelBaseEvent.EXISTS_ERROR, ( $mie ? $mie.series: -1 ), "MISSING", null );
 		} else {
-			//Log.out( "ModelInfoCache.modelInfoRequest guid: " + $mie.modelGuid, Log.INFO );
+			Log.out( "ModelInfoCache.modelInfoRequest guid: " + $mie.modelGuid, Log.INFO );
 			var mi:ModelInfo = _modelInfo[$mie.modelGuid];
 			if (null == mi) {
 				if (_block.has($mie.modelGuid))

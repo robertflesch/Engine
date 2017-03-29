@@ -49,7 +49,7 @@ public class ModelMakerImport extends ModelMakerBase {
 		_isImporting = true;
 		_prompt = $prompt;
 		super( $ii, false );
-		Log.out( "ModelMakerImport - ii: " + ii.toString(), Log.WARN );
+		Log.out( "ModelMakerImport - ii: " + ii.toString(), Log.DEBUG );
 		retrieveBaseInfo();
 	}
 
@@ -235,7 +235,6 @@ public class ModelMakerImport extends ModelMakerBase {
 			_vm.complete = true;
 
 			modelInfo.changed = true;
-			modelInfo.oxelPersistence.changed = true;
 			_modelMetadata.changed = true;
 			_vm.save();
 

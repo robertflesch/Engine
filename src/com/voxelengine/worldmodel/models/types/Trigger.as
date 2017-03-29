@@ -7,26 +7,16 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.scripts.Script;
 import com.voxelengine.worldmodel.models.*;
-import com.voxelengine.worldmodel.*;
 import com.voxelengine.events.TriggerEvent;
 import com.voxelengine.pools.GrainCursorPool;
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
-import flash.geom.Matrix3D;
-import flash.utils.ByteArray;
 
-/**
- * ...
- * @author Robert Flesch - RSF 
- * The world model holds the active oxels
- */
-public class Trigger extends VoxelModel 
+public class Trigger extends VoxelModel
 {
 	private var _inside:Boolean = false;
 	
@@ -63,15 +53,15 @@ public class Trigger extends VoxelModel
 			// Only want to dispatch the event once per transition
 			if ( !_inside ) {
 				_inside = true;
-				//Log.out( "Trigger.update - INSIDE" );
-				TriggerEvent.dispatch( new TriggerEvent( TriggerEvent.INSIDE, instanceInfo.instanceGuid ) );
+				Log.out( "Trigger.update - INSIDE" );
+				TriggerEvent.create( TriggerEvent.INSIDE, instanceInfo.instanceGuid );
 			}
 		} 
 		else {
 			if ( _inside ) {
 				_inside = false;
-				//Log.out( "Trigger.update - OUTSIDE" );
-				TriggerEvent.dispatch( new TriggerEvent( TriggerEvent.OUTSIDE, instanceInfo.instanceGuid ) );
+				Log.out( "Trigger.update - OUTSIDE" );
+				TriggerEvent.create( TriggerEvent.OUTSIDE, instanceInfo.instanceGuid );
 			}
 		}
 		GrainCursorPool.poolDispose( gct );

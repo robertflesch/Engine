@@ -109,15 +109,6 @@ public class ModelInfo extends PersistenceObject
 		if ( !dbo.baseLightLevel )
 			dbo.baseLightLevel = Lighting.defaultBaseLightAttn;
 
-		// scripts are stored in the info object until needed, no more preloading
-		//scriptsFromObject( mi.scripts );
-
-		//if ( dbo.children )
-		//childrenFromObject();
-		// animations are stored in the info object until needed, no more preloading
-		//if ( mi.animations )
-		//animationsFromObject( mi.animations );
-
 		function biomesFromObject( $biomes:Object ):void {
 			// TODO this should only be true for new terrain models.
 			const createHeightMap:Boolean = true;
@@ -350,7 +341,7 @@ public class ModelInfo extends PersistenceObject
 
 	public function animationAdd( $ae:AnimationEvent ):void {
 		if ( guid == $ae.modelGuid ) {
-			Log.out( "ModelInfo.addAnimation " + $ae, Log.WARN );
+			//Log.out( "ModelInfo.addAnimation " + $ae, Log.WARN );
 			if (_series == $ae.series) {
 				if ( !Globals.isGuid($ae.ani.guid))
 						$ae.ani.guid = Globals.getUID();

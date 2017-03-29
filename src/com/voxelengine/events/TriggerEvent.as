@@ -10,11 +10,6 @@ package com.voxelengine.events
 import flash.events.Event;
 import flash.events.EventDispatcher;
 
-/**
- * ...
- * @author Robert Flesch - RSF 
- * 
- */
 public class TriggerEvent extends Event
 {
 	static public const INSIDE:String 			= "INSIDE";
@@ -24,25 +19,22 @@ public class TriggerEvent extends Event
 
 	public function get instanceGuid():String { return _instanceGuid; }
 	
-	public function TriggerEvent( $type:String, $owner:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
-	{
+	public function TriggerEvent( $type:String, $owner:String, $bubbles:Boolean = true, $cancellable:Boolean = false ) {
 		super( $type, $bubbles, $cancellable );
 		_instanceGuid = $owner;
 	}
 	
-	public override function clone():Event
-	{
+	public override function clone():Event {
 		return new TriggerEvent(type, _instanceGuid, bubbles, cancelable);
 	}
    
-	public override function toString():String
-	{
+	public override function toString():String {
 		return formatToString( "type", "instanceGuid" );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////
 
-	// Used to distribue all persistance messages
+	// Used to distribute all trigger messages
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
@@ -53,8 +45,8 @@ public class TriggerEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:TriggerEvent ) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
+	static public function create( $type:String, $owner:String ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new TriggerEvent( $type, $owner ) );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

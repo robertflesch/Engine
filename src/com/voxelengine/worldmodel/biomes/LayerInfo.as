@@ -80,8 +80,10 @@ package com.voxelengine.worldmodel.biomes
 			{
 				_functionName = layerInfo.functionName;
 				//Log.out( "LayerInfo.initJSON loading data for layer - " + _functionName );
-				if ( 0 <= _functionName.indexOf( "Test" ) )
-					_task = TestLibrary.getAsset( _functionName );
+				if ( 0 <= _functionName.indexOf( "Test" ) ) {
+					_task = TestLibrary.getAsset("GenerateCube");
+					Log.out( "LayerInfo.fromJSON - TEST FUNCTION IN MJSON function name: " + _functionName, Log.WARN );
+				}
 				else
 					_task = TaskLibrary.getAsset( _functionName );
 			}

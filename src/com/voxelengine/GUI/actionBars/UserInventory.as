@@ -341,7 +341,7 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function processItemSelection( box:UIObject, $propagate:Boolean = true ):void {
-		Log.out( "UserInventory.processItemSelection - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex + " box.name: " + box.name, Log.DEBUG );
+		//Log.out( "UserInventory.processItemSelection - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex + " box.name: " + box.name, Log.DEBUG );
 		if ( 0 < Globals.openWindowCount )
 			return;
 			

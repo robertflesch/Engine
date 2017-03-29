@@ -233,7 +233,7 @@ public class VoxelVerse extends Sprite
 	 *  This allow the app to not pick up any other mouse or keyboard activity when app is not active
 	 */
 	public function mouseLeave( e:Event ):void {
-		Log.out( "VoxelVerse.mouseLeave even" );
+		//Log.out( "VoxelVerse.mouseLeave" );
 		Globals.active = false;
 		VoxelVerseGUI.currentInstance.crossHairInactive();
 		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE, 0 ) );
@@ -252,7 +252,7 @@ public class VoxelVerse extends Sprite
 //			Log.out( "VoxelVerse.mouseUp event" );
 
 		if ( Globals.active == false ) {
-			Log.out( "VoxelVerse.activate Globals.active: " + Globals.active );
+			//Log.out( "VoxelVerse.activate Globals.active: " + Globals.active );
 			VoxelVerseGUI.currentInstance.crossHairActive();
 			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 			Globals.active = true;

@@ -84,7 +84,7 @@ package com.voxelengine.GUI.voxelModels
 			panelCanvas.layout.orientation = LayoutOrientation.HORIZONTAL;
 			addElement( panelCanvas );
 			
-			_modelPanel = new PanelModelDetails( panelCanvas );
+			_modelPanel = new PanelModelDetails( panelCanvas, 0 );
 			_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null );
 			panelCanvas.addElement( _modelPanel );
 		}

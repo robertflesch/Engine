@@ -48,7 +48,7 @@ import com.voxelengine.worldmodel.scripts.Script;
  * @author Robert Flesch - RSF
  * The world model holds the active oxels
  */
-public class VoxelModel 
+public class VoxelModel
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	private static var _s_controlledModel:VoxelModel = null;
@@ -1000,7 +1000,7 @@ public class VoxelModel
 
 	public function stateReset():void {
 		if (_anim) {
-			Log.out( "VoxelModel.stateReset - Stopping anim: " + _anim.name );
+			//Log.out( "VoxelModel.stateReset - Stopping anim: " + _anim.name );
 			_anim.stop( this );
 			_anim = null;
 		}
@@ -1040,7 +1040,7 @@ public class VoxelModel
 
 		if (true == result) {
 			_anim = anim;
-			Log.out( "VoxelModel.stateSet - Playing anim: " + _anim.name );
+			//Log.out( "VoxelModel.stateSet - Playing anim: " + _anim.name );
 			_anim.play(this, $scale);
 		}
 

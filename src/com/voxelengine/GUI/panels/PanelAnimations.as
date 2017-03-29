@@ -11,6 +11,7 @@ package com.voxelengine.GUI.panels
 import com.voxelengine.events.AnimationEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.GUI.animation.WindowAnimationDetail;
+import com.voxelengine.events.UIRegionModelEvent;
 import com.voxelengine.worldmodel.animation.AnimationAttachment;
 import com.voxelengine.worldmodel.MemoryManager;
 import flash.display.Bitmap;
@@ -31,6 +32,7 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 public class PanelAnimations extends PanelBase
 {
 	private var _listAnimations:			ListBox;
+	private var _level:						int;
 	private var _selectedAnimation:			Animation;
 	private var _buttonContainer:			Container;
 	private var _addButton:					Button;
@@ -38,9 +40,10 @@ public class PanelAnimations extends PanelBase
 	private var _detailButton:				Button;
 	private var _selectedModel:				VoxelModel;
 	
-	public function PanelAnimations($parent:PanelModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number )
+	public function PanelAnimations($parent:PanelModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number, $level:int )
 	{
 		super( $parent, $widthParam, $heightParam );
+		_level = $level;
 		
 		var ha:Label = new Label( "Has Animations", width );
 		ha.textAlign = TextAlign.CENTER;
@@ -53,12 +56,23 @@ public class PanelAnimations extends PanelBase
 		animationButtonsCreate();
 		//addEventListener( UIMouseEvent.ROLL_OVER, rollOverHandler );
 		//addEventListener( UIMouseEvent.ROLL_OUT, rollOutHandler );
-		
+
+		UIRegionModelEvent.addListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
 		recalc( width, height );
 	}
-	
+
+	private function selectedModelChanged(e:UIRegionModelEvent):void {
+		// if the parent of the selected model has changed
+		// then we should clear the list, and wait for the next call to populate animation
+		if ( e.level <= _level )
+			_listAnimations.removeAll();
+		if ( e.level == _level )
+			populateAnimations( e.voxelModel);
+	}
+
 	override public function close():void {
 		super.close();
+		UIRegionModelEvent.removeListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
 		_listAnimations = null;
 		_selectedAnimation = null;
 		_buttonContainer = null;
