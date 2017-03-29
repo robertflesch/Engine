@@ -7,10 +7,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.voxelengine.Globals;
-import com.voxelengine.events.PersistenceEvent;
-import com.voxelengine.server.Network;
-import com.voxelengine.utils.JSONUtil;
 
 import flash.display.Bitmap;
 import flash.display.BitmapData;
@@ -20,22 +16,17 @@ import flash.display.LoaderInfo
 import flash.events.Event;
 import flash.geom.Rectangle;
 import flash.net.URLRequest;
-import flash.utils.ByteArray;
 import flash.net.URLLoaderDataFormat;
 
 import playerio.DatabaseObject;
 
 import com.voxelengine.Globals;
-import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.worldmodel.PermissionsModel;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.PersistenceEvent;
+import com.voxelengine.worldmodel.PermissionsModel;
 
-/**
- * ...
- * @author Robert Flesch - RSF
- * The world model holds the active oxels
- */
+
 public class ModelMetadata extends PersistenceObject
 {
 	private var _permissions:PermissionsModel;

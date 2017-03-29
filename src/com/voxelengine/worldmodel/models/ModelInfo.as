@@ -7,13 +7,10 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.voxelengine.events.RegionEvent;
 
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
-import flash.utils.ByteArray;
-import flash.utils.getTimer
 
 import playerio.DatabaseObject;
 
@@ -25,6 +22,7 @@ import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelLoadingEvent;
+import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
@@ -36,32 +34,35 @@ import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 import com.voxelengine.worldmodel.models.makers.ModelLibrary;
-import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class ModelInfo extends PersistenceObject
 {
 	public function get animationInfo():Object						{ return dbo.animations; }
 	
-	// This stores the instaniated objects
+	// This stores the instantiated objects
 	private var 		_animations:Vector.<Animation> 				= new Vector.<Animation>();	// Animations that this model has
 	public function get animations():Vector.<Animation> 			{ return _animations; }
 	
 	private var 		_oxelPersistence:OxelPersistence;
-	public function get oxelPersistence():OxelPersistence  					{ return _oxelPersistence; }
-	public function set oxelPersistence($oxel:OxelPersistence ):void			{ _oxelPersistence = $oxel; }
+	public function get oxelPersistence():OxelPersistence  			{ return _oxelPersistence; }
+	public function set oxelPersistence($oxel:OxelPersistence ):void { _oxelPersistence = $oxel;  changed = true; }
 
 	public function get scripts():Array 							{ return dbo.scripts; }
 	public function get modelClass():String							{ return dbo.modelClass; }
-//	public function set modelClass(val:String):void 				{ dbo.modelClass = val; }
+	public function get childOfGuid():String						{ return dbo.childOfGuid; }
+	public function set childOfGuid( $val:String ):void				{ dbo.childOfGuid = $val; changed = true; }
+//	public function set modelClass(val:String):void 				{ dbo.modelClass = val;  changed = true; }
 	public function set modelClass(val:String):void 				{
 		if ( val == null )
 				throw new Error( "ModelInfo.modelClass CAN NOT BE NULL");
-		dbo.modelClass = val; }
+		dbo.modelClass = val;
+		changed = true;
+	}
 
 	private var 		_associatedGrain:GrainCursor;						// associates the model with a grain in the parent model
 	public function get associatedGrain():GrainCursor 				{ return _associatedGrain; }
-	public function set associatedGrain(value:GrainCursor):void 	{ _associatedGrain = value; }
+	public function set associatedGrain(value:GrainCursor):void 	{ _associatedGrain = value;  changed = true; }
 	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// overrideable in instanceInfo
@@ -72,7 +73,7 @@ public class ModelInfo extends PersistenceObject
 //		else
 //			return dbo.grainSize ? dbo.grainSize : 4;
 //	}
-//	public function set grainSize(val:int):void						{ dbo.grainSize = val; }
+//	public function set grainSize(val:int):void						{ dbo.grainSize = val;  changed = true; }
 //
 	public function get baseLightLevel():uint 						{ return dbo.baseLightLevel; }
 	public function set baseLightLevel(val:uint):void 				{ dbo.baseLightLevel = val; changed = true; }
@@ -447,6 +448,14 @@ public class ModelInfo extends PersistenceObject
 		}
 	}
 
+	public function brandChildren():void {
+		for each ( var child:VoxelModel in childVoxelModels ) {
+			child.modelInfo.childOfGuid = guid;
+			child.modelInfo.brandChildren();
+		}
+	}
+
+
 	public function childRemoveByGC( $gc:GrainCursor ):Boolean {
 		
 		var index:int = 0;
@@ -592,7 +601,7 @@ public class ModelInfo extends PersistenceObject
 	// These are temporary used for loading local objects
 	public function get altGuid():String 							{ return _altGuid; }
 	public function get biomes():Biomes 							{ return _biomes; }
-	public function set biomes(value:Biomes):void  					{ _biomes = value; }
+	public function set biomes(value:Biomes):void  					{ _biomes = value;  changed = true; }
 	
 	override public function save():Boolean {
 		if ( false == animationsLoaded || false == childrenLoaded) {

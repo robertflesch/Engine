@@ -234,6 +234,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
 			_vm.complete = true;
 
+			modelInfo.brandChildren();
 			modelInfo.changed = true;
 			_modelMetadata.changed = true;
 			_vm.save();

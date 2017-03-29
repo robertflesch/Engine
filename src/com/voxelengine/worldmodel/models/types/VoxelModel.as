@@ -904,11 +904,16 @@ public class VoxelModel
 		//trace( "VoxelModel.bounce toBeReflected: " + toBeReflected + "  velocity: " + model.instanceInfo.velocityGet );
 	}
 	
-	public function isInParentChain(collisionCandidate:VoxelModel):Boolean {
-		if (this == collisionCandidate)
+	// Before I add a model as a child, make sure it is not the same model is not a direct parent, or anywhere up the chain.
+	public function isInParentChain($possibleChildModel:VoxelModel):Boolean {
+		// Dont allow your own guid to be added to your child chain
+		if (this.modelInfo.guid == $possibleChildModel.modelInfo.guid)
 			return true;
-		if (instanceInfo.controllingModel && instanceInfo.controllingModel.isInParentChain(collisionCandidate))
-			return true;
+		if ( instanceInfo.controllingModel ) {
+			if (instanceInfo.controllingModel.isInParentChain($possibleChildModel)) {
+				return true;
+			}
+		}
 		return false;
 	}
 	
@@ -933,7 +938,10 @@ public class VoxelModel
 	}
 	
 	public function childAdd( $childModel:VoxelModel):void {
-		
+		if ( isInParentChain($childModel) ) {
+			Log.out( "VoxelModel.childAdd - TRYING TO ADD MODEL THIS IS A PARENT", Log.WARN );
+			return;
+		}
 		if ( false == modelInfo.childrenLoaded )
 			modelInfo.childAdd( $childModel );
 		else
