@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 
+import com.voxelengine.events.ModelInfoEvent;
+
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
@@ -46,7 +48,7 @@ public class ModelInfo extends PersistenceObject
 	
 	private var 		_oxelPersistence:OxelPersistence;
 	public function get oxelPersistence():OxelPersistence  			{ return _oxelPersistence; }
-	public function set oxelPersistence($oxel:OxelPersistence ):void { _oxelPersistence = $oxel;  changed = true; }
+	public function set oxelPersistence($oxel:OxelPersistence ):void { _oxelPersistence = $oxel; }
 
 	public function get scripts():Array 							{ return dbo.scripts; }
 	public function get modelClass():String							{ return dbo.modelClass; }
@@ -110,6 +112,8 @@ public class ModelInfo extends PersistenceObject
 		if ( !dbo.baseLightLevel )
 			dbo.baseLightLevel = Lighting.defaultBaseLightAttn;
 
+		if ( !$newData )
+			changed = false;
 		function biomesFromObject( $biomes:Object ):void {
 			// TODO this should only be true for new terrain models.
 			const createHeightMap:Boolean = true;
@@ -203,7 +207,7 @@ public class ModelInfo extends PersistenceObject
 		OxelDataEvent.addListener( ModelBaseEvent.RESULT, retrievedData );
 		OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );
 	}
-	
+
 	private function removeOxelDataCompleteListeners():void {
 		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, retrievedData );
 		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, retrievedData );
@@ -633,9 +637,9 @@ public class ModelInfo extends PersistenceObject
 		var modelClassPrototype:Class = ModelLibrary.getAsset( modelClass );
 //		if ( dbo.key != "0" ) {
 			try {
-				modelClassPrototype.buildExportObject(dbo);
+				modelClassPrototype.buildExportObject(dbo,this);
 			} catch (e:Error) {
-				VoxelModel.buildExportObject(dbo);
+				VoxelModel.buildExportObject(dbo,this);
 				Log.out("ModelInfo.toObject - Error with Class: " + dbo.modelClass, Log.ERROR);
 			}
 //		} else
@@ -685,7 +689,7 @@ public class ModelInfo extends PersistenceObject
 			ao.name = ani.name;
 			ao.type = ani.type;
 			ao.guid = ani.guid;
-			Log.out( "ModelInfo.animationsGet - animation.metadata: " + ani );
+			Log.out( "ModelInfo.animationsGet - animation.metadata: " + ani.name + "  model guid: " + guid );
 			oa[index] = ao;
 		}
 		if ( oa[0] )
@@ -709,12 +713,17 @@ public class ModelInfo extends PersistenceObject
 	
 	public function cloneNew( $guid:String ):ModelInfo {
 		toObject();
-		var oldObj:String = JSON.stringify( dbo );
-		var newObj:Object = JSON.parse(oldObj);
-		// also need to clone the oxel
-		var newModelInfo:ModelInfo = new ModelInfo( $guid, null, newObj );
+		var newModelInfo:ModelInfo = new ModelInfo( $guid, null, dbo );
+		for each ( var ani:Animation in _animations ) {
+			var newAni:Animation = ani.clone( guid );
+			newModelInfo._animations.push(newAni);
+		}
+		// these will be rebuilt when it is saved
+		delete newModelInfo.dbo.animations;
+		newModelInfo.animationsLoaded = true;
 		newModelInfo.oxelPersistence = oxelPersistence.cloneNew( $guid );
-
+		//TODO need handlers
+		ModelInfoEvent.create( ModelBaseEvent.CLONE, 0, newModelInfo.guid, newModelInfo );
 		return newModelInfo;
 	}
 

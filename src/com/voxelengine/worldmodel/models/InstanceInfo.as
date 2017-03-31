@@ -480,7 +480,7 @@ public class InstanceInfo extends Location	{
 
 	// this is a scalar magnitude in g0 units
 	public function setSpeedMultipler ( v:Number ):Number {
-		Log.out( "InstanceInfo.setSpeedMultiper - was: " + _s_speedMultipler + " will be: " + v );
+		//Log.out( "InstanceInfo.setSpeedMultiper - was: " + _s_speedMultipler + " will be: " + v );
 		return _s_speedMultipler = v;
 	}
 	

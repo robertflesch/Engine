@@ -31,10 +31,6 @@ public class PersistenceObject
 	private var 	_dynamicObj:Boolean;
 	private var 	_dbo:DatabaseObject;
 
-	public function get creator():int 							{ return dbo.creator; }
-	public function get version():int 							{ return dbo.version; }
-	public function set version( value:int ):void				{ dbo.version = value; }
-
 	public function PersistenceObject($guid:String, $table:String ) {
 		if ( null == $guid || "" == $guid )
 			throw new Error( "PersistenceObject - Missing guid in constructor" );
@@ -44,9 +40,7 @@ public class PersistenceObject
 
 	protected function assignNewDatabaseObject():void {
 		dbo = new DatabaseObject( table, "0", "0", 0, true, null);
-		version = Globals.VERSION;
 		changed = true;
-		dbo.hashTags = "#new";
 		dbo.createdDate	= new Date().toUTCString();
 		dbo.creator	= Network.userId;
 	}
@@ -109,8 +103,10 @@ public class PersistenceObject
 		}
 
 		if ( !Globals.isGuid(guid)) {
-			if ( Player.DEFAULT_PLAYER == guid)
+			if ( Player.DEFAULT_PLAYER == guid) {
+				changed = false;
 				return false;
+			}
 			Log.out("PersistenceObject.save - NOT Saving INVALID GUID: " + guid + " in table: " + table, Log.WARN);
 			return false;
 		}

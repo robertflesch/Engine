@@ -69,10 +69,8 @@ public class ControllableVoxelModel extends VoxelModel
 	protected var _inventoryBitmap:String					= "userInventory.png";
 
 	protected var _maxFallRate:SecureNumber 				= new SecureNumber( DEFAULT_FALL_RATE );
-	static protected var _maxSpeed:SecureNumber 					= new SecureNumber( DEFAULT_SPEED_MAX );
-	// This should be at the controllable model leve			
-	static private var 	_clipVelocityFactor:SecureNumber		= new SecureNumber(DEFAULT_CLIP_VELOCITY); 		// INSTANCE NOT EXPORTED
-	
+	// This should be at the controllable model leve
+
 	protected var 	_turnRate:Number 						= DEFAULT_TURN_RATE; // 2.5 for ship
 	protected var 	_accelRate:Number 						= DEFAULT_ACCEL_RATE;
 	private var 	_onSolidGround:Boolean														// INSTANCE NOT EXPORTED
@@ -81,11 +79,14 @@ public class ControllableVoxelModel extends VoxelModel
 	public function get 	onSolidGround():Boolean 				{ return _onSolidGround; }
 	public function set 	onSolidGround(val:Boolean):void 		{ _onSolidGround = val; }
 	public function get		accelRate():Number 						{ return _accelRate; }
-	static public function get		clipVelocityFactor():Number 			{ return _clipVelocityFactor.val; }
-	static public function set		clipVelocityFactor($val:Number):void { _clipVelocityFactor.val = $val;
-	}
-	static public function get 	maxSpeed():Number 						{ return _maxSpeed.val; }
-	static public function set 	maxSpeed($value:Number):void 			{ _maxSpeed.val = $value; }
+
+	private var 	_clipVelocityFactor:SecureNumber		= new SecureNumber(DEFAULT_CLIP_VELOCITY); 		// INSTANCE NOT EXPORTED
+	public function get		clipVelocityFactor():Number 			{ return _clipVelocityFactor.val; }
+	public function set		clipVelocityFactor($val:Number):void { _clipVelocityFactor.val = $val; }
+	protected var _maxSpeed:SecureNumber 					= new SecureNumber( DEFAULT_SPEED_MAX );
+	public function get 	maxSpeed():Number 						{ return _maxSpeed.val; }
+	public function set 	maxSpeed($value:Number):void 			{ _maxSpeed.val = $value; }
+
 	protected function get 	mMaxFallRate():Number 					{ return _maxFallRate.val; }
 	protected function set 	mMaxFallRate($value:Number):void 		{ _maxFallRate.val = $value; }
 	
@@ -141,11 +142,12 @@ public class ControllableVoxelModel extends VoxelModel
 //			Log.out( "ControllableVoxelModel.processClassJson - no ControllableModelInfo info found", Log.WARN );
 	}
 	
-	static public function buildExportObject( obj:Object ):Object {
-		VoxelModel.buildExportObject( obj )
-		obj.controllableVoxelModel = new Object();
-		obj.controllableVoxelModel.clipFactor = clipVelocityFactor * 100;
-		obj.controllableVoxelModel.maxSpeed = maxSpeed;
+	static public function buildExportObject( obj:Object, model:* ):Object {
+		VoxelModel.buildExportObject( obj, model );
+		obj.controllableVoxelModel = {};
+		var thisModel:ControllableVoxelModel = model as ControllableVoxelModel;
+		obj.controllableVoxelModel.clipFactor = thisModel.clipVelocityFactor * 100;
+		obj.controllableVoxelModel.maxSpeed = thisModel.maxSpeed;
 		return obj;
 	}
 	

@@ -75,7 +75,7 @@ public class Network
 		
 		function connectSuccess( $client:Client):void
 		{
-			Log.out("Network.login - connection to server established", Log.DEBUG );
+			//Log.out("Network.login - connection to server established", Log.DEBUG );
 			_userId = $client.connectUserId;
 			_client = $client
 			Globals.online = true;

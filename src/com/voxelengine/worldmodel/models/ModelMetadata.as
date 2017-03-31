@@ -8,6 +8,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.worldmodel.models.ModelMetadata;
+
 import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.JPEGEncoderOptions;
@@ -53,7 +56,12 @@ public class ModelMetadata extends PersistenceObject
 	private var _thumbnailLoaded:Boolean;
 	public function get thumbnailLoaded():Boolean 			{ return _thumbnailLoaded; }
 	public function set thumbnailLoaded($val:Boolean):void  { _thumbnailLoaded = $val; }
-	
+
+	public function get version():int 							{ return dbo.version; }
+	public function set version( value:int ):void				{ dbo.version = value; }
+
+	public function get creator():int 							{ return dbo.creator; }
+
 	public function toString():String {
 		return "name: " + name + "  description: " + description + "  guid: " + guid + "  owner: " + owner;
 	}
@@ -107,12 +115,14 @@ public class ModelMetadata extends PersistenceObject
 
 		function setToDefault():void {
 			dbo.thumbnailLoaded = false;
+			dbo.hashTags = "#new";
 			_thumbnail = null;
 			animationClass = "";
 			description = "Default";
 			name = "Default";
 			name = "Default";
 			owner = "";
+			version = Globals.VERSION;
 		}
 	}
 
@@ -140,28 +150,6 @@ public class ModelMetadata extends PersistenceObject
 		save();
 	}
 
-	//////////////////////////////////////////////////////////////////
-	// Persistence
-	//////////////////////////////////////////////////////////////////
-	// These two functions are slighting different in that the import uses
-	// $dbo.oxelPersistence
-	// and the read direct from persistance uses
-	// $dbo directly
-	// I abstract it away using the info object
-	// it was needed to save the oxelPersistence in an abstract way.
-//	public function fromObjectImport( $newData:Object, $markAsChanged:Boolean = true ):void {
-//		loadFromInfo( $newData );
-//		if ( $markAsChanged && ( guid != Player.DEFAULT_PLAYER ) )
-//			changed = true;
-//	}
-
-//	public function fromObject( $dbo:DatabaseObject ):void {
-//		dbo = $dbo;
-//		//info = $dbo;
-//
-//		loadFromInfo( this );
-//	}
-
     override protected function toObject():void {
 		//Log.out( "ModelMetadata.toObject", Log.WARN );
 		if ( thumbnail )
@@ -173,22 +161,11 @@ public class ModelMetadata extends PersistenceObject
 
 	public function cloneNew( $guid:String ):ModelMetadata {
 		toObject();
+		var newMM:ModelMetadata = new ModelMetadata( $guid, null, dbo );
 
-		var metadata:ModelMetadata = new ModelMetadata( Globals.getUID() );
-//		metadata.fromObjectImport( newObj );
-
-/*
-		// This is an easy way to copy the structure, probably not the best.
-		var objData:Object = JSON.parse( JSON.stringify( info ) );
-
-		var newModelMetadata:ModelMetadata = new ModelMetadata( $guid );
-		// this gets new persistance record
-		var newObj:Object = ModelMetadata.newObject();
-		newObj.oxelPersistence = objData;
-		newModelMetadata.fromObject( newObj as DatabaseObject );
-		newModelMetadata.description = description + " - Cloned";
-		newModelMetadata.owner = Network.userId;*/
-		return metadata;
+		//TODO need handlers
+		ModelMetadataEvent.create( ModelBaseEvent.CLONE, 0, newMM.guid, newMM );
+		return newMM;
 	}
 
 	override public function clone( $newGuid:String ):* {

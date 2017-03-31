@@ -48,7 +48,8 @@ public class AnimationCache
 		AnimationEvent.addListener( ModelBaseEvent.REQUEST, 		request );
 		AnimationEvent.addListener( ModelBaseEvent.DELETE, 			deleteHandler );
 		AnimationEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );		
-		AnimationEvent.addListener( ModelBaseEvent.SAVE, 			save );		
+		AnimationEvent.addListener( ModelBaseEvent.SAVE, 			save );
+		AnimationEvent.addListener( ModelBaseEvent.CLONE, 			clone );
 
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
@@ -115,6 +116,14 @@ public class AnimationCache
 		}
 	}
 
+	static private function clone( $ae:AnimationEvent):void {
+		var ani:Animation =  _animations[$ae.aniGuid];
+		if ( null == ani ) {
+			_animations[$ae.aniGuid] = $ae.ani;
+			//AnimationEvent.create( ModelBaseEvent.ADDED, $ae.series, $ae.modelGuid, $ae.aniGuid, $ae.ani );
+		}
+	}
+
 	static private function add($pe:PersistenceEvent, $ani:Animation ):void
 	{ 
 		if ( null == $ani || null == $pe.guid ) {
@@ -133,7 +142,7 @@ public class AnimationCache
 		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		if ( _block.has( $pe.guid ) )
-			_block.clear( $pe.guid )
+			_block.clear( $pe.guid );
 		Log.out( "AnimationCache.loadFailed " + $pe.toString(), Log.ERROR );
 		AnimationEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null );
 	}
@@ -143,7 +152,7 @@ public class AnimationCache
 		if ( Globals.ANI_EXT != $pe.table && Globals.BIGDB_TABLE_ANIMATIONS != $pe.table )
 			return;
 		if ( _block.has( $pe.guid ) )
-			_block.clear( $pe.guid )
+			_block.clear( $pe.guid );
 		Log.out( "AnimationCache.loadNotFound " + $pe.toString(), Log.ERROR );
 		AnimationEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.table, $pe.guid, null );
 	}

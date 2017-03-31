@@ -13,6 +13,7 @@ import com.voxelengine.events.SoundEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.PermissionsBase;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.animation.AnimationSound;
 import com.voxelengine.worldmodel.models.SecureNumber;
 
 import playerio.DatabaseObject;
@@ -87,6 +88,16 @@ public class Animation extends PersistenceObject
 		dbo.description = "Enter description here";
 		dbo.type =  ANIMATION_STATE;
 		dbo.owner = Network.userId;
+	}
+
+	override public function clone( $modelGuid:String ):* {
+		toObject();
+		var newAni:Animation = new Animation( Globals.getUID(), null, dbo );
+		AnimationEvent.create( ModelBaseEvent.CLONE, 0, $modelGuid, newAni.guid, newAni );
+		if ( _animationSound ) {
+			newAni._animationSound = _animationSound.clone(Globals.getUID());
+		}
+		return newAni;
 	}
 
 	override public function save():Boolean {

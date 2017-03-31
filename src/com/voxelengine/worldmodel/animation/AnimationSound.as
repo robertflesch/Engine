@@ -35,7 +35,6 @@ public class AnimationSound extends PersistenceObject
 	
 	public static const SOUND_INVALID:String = "SOUND_INVALID";
 	
-	private var _ani:Animation;
 	private var _pitch:MP3Pitch = null;
 	private var _pitchRate:Number;
 	private var _owner:VoxelModel = null;
@@ -90,8 +89,24 @@ public class AnimationSound extends PersistenceObject
 			dbo.name = guid;
 		}
 
-		sound.loadCompressedDataFromByteArray( dbo.ba, dbo.ba.length );
-		dbo.length = sound.length;
+		try {
+			sound.loadCompressedDataFromByteArray(dbo.ba, dbo.ba.length);
+		} catch (error:Error) {
+			Log.out( "AnimationSound.init - error trying to load sound from byteArray: " + error.message, Log.WARN);
+		}
+		dbo.length = int( sound.length );
+	}
+
+	override public function clone( $guid:String ):* {
+		dbo.ba.position = 0;
+		var newSnd:AnimationSound = new AnimationSound( Globals.getUID(), null, dbo.ba );
+		newSnd.dbo.name = name;
+		newSnd.dbo.soundRangeMax = soundRangeMax;
+		newSnd.dbo.soundRangeMin = soundRangeMin;
+		newSnd.hashTags = hashTags +"#cloned";
+		SoundEvent.create( ModelBaseEvent.CLONE, 0, newSnd.guid, newSnd );
+
+		return newSnd;
 	}
 
 ///////////////////////////////////////////////
@@ -145,7 +160,6 @@ public class AnimationSound extends PersistenceObject
 			guid = newGuid;
 			SoundEvent.removeListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );
 		}
-		_ani.changed = true
 	}
 
 

@@ -49,8 +49,8 @@ public class FromByteArray extends AbstractTask
 		try {
 			// The ModelMakerImporter tries to double load the byte array.
 			// Rather then mess with importer, this work around was added RSF.
+			Log.out("FromByteArray.start: guid: " + _guid, Log.WARN);
 			if ( 0 == _op.oxelCount) {
-				//Log.out("FromByteArray.start: guid: " + _guid, Log.WARN);
 				_op.ba.position = 0;
 				_op.loadFromByteArray();
 

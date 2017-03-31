@@ -160,22 +160,22 @@ public class Gun extends ControllableVoxelModel
 				break;
 		}
 	}
-	
-	static public function buildExportObject( obj:Object ):Object {
-		// For now just use the existing gun data
-		ControllableVoxelModel.buildExportObject( obj );
-		return obj;
 
+	static public function buildExportObject( $obj:Object, $model:* ):Object {
+		ControllableVoxelModel.buildExportObject( $obj, $model );
+		$obj.barrel = {};
+		var thisModel:Barrel = $model as Barrel;
 		//var gunData:Object = new Object();
 		//gunData.reloadSpeed = _reloadSpeed;
 		//
 		//var oa:Vector.<Object> = new Vector.<Object>();
 		//var ammosJson:Object = modelInfo.dbo.gun.ammos;
 		//for each ( var ammoInfo:Object in ammosJson )
-			//oa.push( { name: ammoInfo.name } );
+		//oa.push( { name: ammoInfo.name } );
 //
 		//gunData.ammos = oa;
 //		obj.gun = gunData;
+		return $obj;
 	}
 }
 }

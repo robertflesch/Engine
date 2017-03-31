@@ -27,26 +27,28 @@ public class Beast extends ControllableVoxelModel
 {
 	static private const MIN_TURN_AMOUNT:Number = 0.02;
 
-	// Trying to keep these numbers between 1 and 100
-	static private var  _climbRate:SecureNumber 		= new SecureNumber( 70 );
-	static private var	_maxClimbAngle:SecureNumber 	= new SecureNumber( 45 );
-	static private var  _maxTurnRate:SecureNumber 		= new SecureNumber( 100 );
-	static private var  _stallSpeed:SecureNumber 		= new SecureNumber( 2 );
-	static private var  _speedMultiplier:SecureNumber 	= new SecureNumber( 1.0 );
-	static protected var _seatLocation:Vector3D 		= new Vector3D( 8, 12, 13 );
+	protected var _seatLocation:Vector3D 		= new Vector3D( 8, 12, 13 );
 
-	static public function get 	speedMultiplier():Number 				{ return _speedMultiplier.val; }
 	// TODO What is the valid range for this?
-	static public function set 	speedMultiplier($value:Number):void		{ _speedMultiplier.val = $value; }
+	private var  _speedMultiplier:SecureNumber 	= new SecureNumber( 1.0 );
+	public function get 	speedMultiplier():Number 				{ return _speedMultiplier.val; }
+	public function set 	speedMultiplier($value:Number):void		{ _speedMultiplier.val = $value; }
 
-	static public function get climbRate():Number  					{ return _climbRate.val; }
-	static public function set climbRate($value:Number):void  		{ _climbRate.val = $value; }
-	static public function get maxClimbAngle():Number  				{ return _maxClimbAngle.val; }
-	static public function set maxClimbAngle($value:Number):void  	{ _maxClimbAngle.val = $value; }
-	static public function get maxTurnRate():Number  				{ return _maxTurnRate.val; }
-	static public function set maxTurnRate($value:Number):void  	{ _maxTurnRate.val = $value; }
-	static public function get stallSpeed():Number 					{ return _stallSpeed.val; }
-	static public function set stallSpeed($value:Number):void		{ _stallSpeed.val = $value; }
+	private var  _climbRate:SecureNumber 					= new SecureNumber( 70 );
+	public function get climbRate():Number  				{ return _climbRate.val; }
+	public function set climbRate($value:Number):void  		{ _climbRate.val = $value; }
+
+	private var	_maxClimbAngle:SecureNumber 				= new SecureNumber( 45 );
+	public function get maxClimbAngle():Number  			{ return _maxClimbAngle.val; }
+	public function set maxClimbAngle($value:Number):void  	{ _maxClimbAngle.val = $value; }
+
+	private var  _maxTurnRate:SecureNumber 					= new SecureNumber( 100 );
+	public function get maxTurnRate():Number  				{ return _maxTurnRate.val; }
+	public function set maxTurnRate($value:Number):void  	{ _maxTurnRate.val = $value; }
+
+	static private var  _stallSpeed:SecureNumber 			= new SecureNumber( 2 );
+	public function get stallSpeed():Number 				{ return _stallSpeed.val; }
+	public function set stallSpeed($value:Number):void		{ _stallSpeed.val = $value; }
 
 	static protected 	const 	TAIL:String					= "TAIL";
 	static protected 	const 	WING:String					= "WING";
@@ -69,15 +71,16 @@ public class Beast extends ControllableVoxelModel
 		collisionMarkers = true;
 	}
 
-	static public function buildExportObject( obj:Object ):Object {
-		ControllableVoxelModel.buildExportObject( obj )
-		obj.beast 					= new Object();
-		obj.beast.moveSpeed 		= speedMultiplier;
-		obj.beast.maxTurnRate 		= maxTurnRate;
-		obj.beast.maxClimbAngle		= maxClimbAngle;
-		obj.beast.climbRate 		= climbRate;
-		obj.beast.seatLocation 		= { x:int(_seatLocation.x), y:int(_seatLocation.y), z:int(_seatLocation.z) };
-		return obj;
+	static public function buildExportObject( $obj:Object, $model:* ):Object {
+		ControllableVoxelModel.buildExportObject( $obj, $model )
+		$obj.beast 					= {};
+		var thisModel:Beast = $model as Beast;
+		$obj.beast.moveSpeed 		= thisModel.speedMultiplier;
+		$obj.beast.maxTurnRate 		= thisModel.maxTurnRate;
+		$obj.beast.maxClimbAngle	= thisModel.maxClimbAngle;
+		$obj.beast.climbRate 		= thisModel.climbRate;
+		$obj.beast.seatLocation 		= { x:int(thisModel._seatLocation.x), y:int(thisModel._seatLocation.y), z:int(thisModel._seatLocation.z) };
+		return $obj;
 	}
 
 	override protected function processClassJson():void {
@@ -116,7 +119,7 @@ public class Beast extends ControllableVoxelModel
 		else
 			_seatLocation.setTo( 0, 0, 0 );
 
-		Log.out( "Beast.processClassJson values: " + JSON.stringify( buildExportObject( {} ) ) );
+		Log.out( "Beast.processClassJson values: " + JSON.stringify( buildExportObject( {}, this ) ) );
 	}
 
 	override protected function collisionPointsAdd():void {

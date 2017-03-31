@@ -152,7 +152,7 @@ public class GrainSelector extends QuickInventory
 		addSelector();			
 		// start off highlighting 1 meter
 		processGrainSelection( boxes[4] );
-		Log.out( "GrainSelector.buildItems exit" );
+		//Log.out( "GrainSelector.buildItems exit" );
 	}
 	
 	private function pressGrain(e:UIMouseEvent):void { processGrainSelection( e.target as UIObject ); }			
@@ -178,7 +178,7 @@ public class GrainSelector extends QuickInventory
 		var ti:ObjectGrain = $box.data as ObjectGrain;
 		_currentSize = int ( ti.name.toLowerCase() );
 		CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, _currentSize ) );
-		Log.out( "GrainSelector.processGrainSelection exit" );
+		//Log.out( "GrainSelector.processGrainSelection exit" );
 	}
 }
 }

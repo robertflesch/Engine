@@ -29,6 +29,7 @@ public class SoundCache
 		SoundEvent.addListener( ModelBaseEvent.REQUEST, 		request );
 		SoundEvent.addListener( ModelBaseEvent.DELETE, 			deleteHandler );
 		SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );
+		SoundEvent.addListener( ModelBaseEvent.CLONE, 			clone );
 
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
@@ -84,7 +85,16 @@ public class SoundCache
 			SoundEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid );
 		}
 	}
-	
+
+	static private function clone( $as:SoundEvent):void {
+		var ani:AnimationSound =  _sounds[$as.guid];
+		if ( null == ani ) {
+			_sounds[$as.guid] = $as.snd;
+			//SoundEvent.create( ModelBaseEvent.ADDED, $ae.series, $ae.modelGuid, $ae.aniGuid, $ae.ani );
+		}
+	}
+
+
 	static private function add($pe:PersistenceEvent, $sp:AnimationSound ):void {
 		if ( null == $sp || null == $pe.guid ) {
 			Log.out( "SoundCache.Add trying to add NULL AnimationSounds or guid", Log.WARN );

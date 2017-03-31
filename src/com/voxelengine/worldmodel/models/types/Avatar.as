@@ -68,9 +68,11 @@ public class Avatar extends ControllableVoxelModel
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
 	}
-	
-	static public function buildExportObject( obj:Object ):Object {
-		ControllableVoxelModel.buildExportObject( obj );
+
+	static public function buildExportObject( obj:Object, model:* ):Object {
+		ControllableVoxelModel.buildExportObject( obj, model );
+		obj.avatar = {};
+		//var thisModel:ControllableVoxelModel = model as ControllableVoxelModel;
 		return obj;
 	}
 	

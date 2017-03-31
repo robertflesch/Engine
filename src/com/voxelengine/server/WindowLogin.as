@@ -233,7 +233,7 @@ import com.voxelengine.renderer.Renderer;
 			_emailInput.glow = false;
 			_passwordInput.glow = false;
 			addLoginEventHandlers();
-			Log.out("WindowLogin.loginButtonHandler - Trying to establish connection to server", Log.DEBUG );
+			//Log.out("WindowLogin.loginButtonHandler - Trying to establish connection to server", Log.DEBUG );
 			Network.login( _emailInput.label, _passwordInput.text );
 //			Globals.active = true;
 		}

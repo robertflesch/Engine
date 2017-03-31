@@ -24,7 +24,7 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class Inventory extends PersistenceObject
 {
-	// support data for persistance
+	// support data for persistence
 	private var _generateNewInventory:Boolean;
 	private var _loaded:Boolean;
 
@@ -120,7 +120,9 @@ public class Inventory extends PersistenceObject
 		}
 		
 		if ( isNewRecord )
-			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, guid, null ) );		
+			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, guid, null ) );
+		else
+			changed = false;
 	}
 	
 	public function load():void {

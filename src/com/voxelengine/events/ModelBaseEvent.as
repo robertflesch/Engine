@@ -34,6 +34,7 @@ public class ModelBaseEvent extends Event
 	static public const RESULT_COMPLETE:String				= "RESULT_COMPLETE";
 	static public const REQUEST_FAILED:String				= "REQUEST_FAILED";
 	static public const IMPORT_COMPLETE:String				= "IMPORT_COMPLETE";
+	static public const CLONE:String						= "CLONE";
 
 	// New sequence to see if data exists already, used by generation system
 	static public const EXISTS_REQUEST:String				= "EXISTS_REQUEST";

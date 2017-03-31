@@ -53,11 +53,11 @@ public class OxelPersistence extends PersistenceObject
 	public function get bound():int 							{ return dbo.bound; }
 	public function set bound( value:int ):void					{ dbo.bound = value; }
 
-	public function get type():String 							{ return dbo.type; }
-	public function set type( value:String ):void				{ dbo.type = value; }
-
 	public function get ba():ByteArray 							{ return dbo.ba }
 	public function set ba( $ba:ByteArray):void 				{ dbo.ba = $ba; }
+
+	public function get version():int							{ return dbo.version; }
+	public function set version($val:int):void					{ dbo.version = $val; }
 
 	private var _lightInfo:LightInfo 							= LightInfoPool.poolGet();
 
@@ -108,6 +108,7 @@ public class OxelPersistence extends PersistenceObject
 		super.assignNewDatabaseObject();
 		ba		= null;
 		bound		= -1;
+		version = Globals.VERSION;
 	}
 
 	private function stripDataFromImport( $importedData:ByteArray ):void {
@@ -149,7 +150,7 @@ public class OxelPersistence extends PersistenceObject
 	// Make sense, called from for Makers
 	private function extractVersionInfo( $ba:ByteArray ):void {
 		// Read off first 3 bytes, the data format
-		type = readFormat($ba);
+		var type:String = readFormat($ba);
 		if ("ivm" != type )
 			throw new Error("OxelPersistence.extractVersionInfo - Exception - unsupported format: " + type );
 
@@ -254,6 +255,7 @@ public class OxelPersistence extends PersistenceObject
 			//Log.out( "OxelPersistence.save - NOT Saving GUID: " + guid  + " oxel: " + (oxel?oxel:"No oxel") + " in table: " + table, Log.WARN );
 			return false;
 		}
+		version = Globals.VERSION;
 		return super.save();
 	}
 
@@ -274,8 +276,6 @@ public class OxelPersistence extends PersistenceObject
 //	}
 
 	override protected function toObject():void {
-		type 	= "ivm";
-		version = Globals.VERSION;
 		ba		= toByteArray();
 		if (oxel && oxel.gc )
 			bound	= oxel.gc.bound;
@@ -293,7 +293,7 @@ public class OxelPersistence extends PersistenceObject
 	// FROM Persistence
 	
 	public function loadFromByteArray():void {
-		//Log.out( "OxelPersistence.lodFromByteArray - guid: " + guid, Log.INFO );
+		Log.out( "OxelPersistence.lodFromByteArray - guid: " + guid, Log.INFO );
 
 		_oxels[_lod] = Oxel.initializeRoot(bound);
 		oxel.readOxelData(ba, this );
@@ -442,15 +442,13 @@ public class OxelPersistence extends PersistenceObject
 	*/
 
 	public function cloneNew( $guid:String ):OxelPersistence {
-		throw new Error( "REFACTOR = 2.22.17");
-/*
-		// this adds the version header, need for the persistanceEvent
-		var ba:ByteArray = toByteArray( oxel );
-
-		var od:OxelPersistence = new OxelPersistence( $guid, null, ba, Lighting.defaultBaseLightIllumination );
-		return od;
-		*/
-		return null;
+		//toObject();
+		//var newOP:OxelPersistence = new OxelPersistence( $guid, null, dbo.ba, Lighting.defaultBaseLightIllumination );
+//		newOP.dbo.ba.uncompress();
+		var newOP:OxelPersistence = new OxelPersistence( $guid, null, oxel.toByteArray(), Lighting.defaultBaseLightIllumination );
+		newOP.bound = bound;
+		newOP.changed = true;
+		return newOP;
 	}
 }
 }

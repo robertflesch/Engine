@@ -36,7 +36,7 @@ package com.voxelengine.worldmodel.models.makers
 			Ship;
 			Beast;
 			Dragon;
-			Prop;
+			Propeller;
 			Target;
 			//
 			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.models.types.VoxelModel" ) );

@@ -56,10 +56,14 @@ public class Ship extends ControllableVoxelModel
 		Globals.g_app.addEventListener( ShipEvent.DIRECTION_CHANGED, directionEvent, false, 0, true );
 	}
 
-	static public function buildExportObject( obj:Object ):Object {
-		ControllableVoxelModel.buildExportObject( obj )
-		return obj;
+	static public function buildExportObject( $obj:Object, $model:* ):Object {
+		ControllableVoxelModel.buildExportObject( $obj, $model );
+		$obj.ship = {};
+		var thisModel:Ship = $model as Ship;
+		//$obj.ship.rotationRate = thisModel._rotationRate;
+		return $obj;
 	}
+
 
 	override protected function collisionPointsAdd():void {
 		// TO DO Should define this in meta data??? RSF or using extents?

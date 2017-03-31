@@ -63,61 +63,14 @@ public class ModelMakerClone extends ModelMakerBase {
 		Log.out( "ModelMakerClone - ii: " + ii.toString() );
 
 		addListeners();
-		//oldWay( originalVM );
-		newWay( originalVM );
-	}
 
-	private function newWay( $originalVM:VoxelModel ):void {
 		// This gives me two new objects that have not been saved.
-		_modelMetadata = $originalVM.metadata.cloneNew( ii.modelGuid );
-		_modelInfo = $originalVM.modelInfo.cloneNew( ii.modelGuid );
+		var newGuid:String = Globals.getUID();
+		_modelMetadata = $vm.metadata.cloneNew( newGuid );
+		_modelInfo = $vm.modelInfo.cloneNew( newGuid );
 		attemptMakeRetrieveParentModelInfo();
 	}
 
-/*
-	private function oldWay( $originalVM:VoxelModel ):void {
-		// this causes it to generate a ModelBaseEvent.ADDED event
-		$originalVM.modelInfo.clone( ii.modelGuid );
-		$originalVM.metadata.clone( ii.modelGuid );
-		attemptMakeRetrieveParentModelInfo();
-
-	}
-
-	override protected function addListeners():void {
-		super.addListeners()
-		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retrivedMetadata );
-		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retrivedMetadata );
-		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );
-	}
-
-	protected function removeListeners():void {
-		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrivedMetadata );
-		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrivedMetadata );
-		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );
-	}
-
-	private function retrivedMetadata( $mme:ModelMetadataEvent):void {
-		if ( ii.modelGuid == $mme.modelGuid ) {
-			removeListeners();
-			_modelMetadata = $mme.modelMetadata;
-			//Log.out( "ModelMaker.retrivedMetadata - metadata: " + _modelMetadata.toString() )
-			attemptMake();
-		}
-	}
-	
-	private function failedMetadata( $mme:ModelMetadataEvent):void {
-		if ( ii.modelGuid == $mme.modelGuid ) {
-			removeListeners();
-			markComplete(false);
-		}
-	}
-	
-	////////////////////////////////////////////
-	// next get or generate the metadata
-	override protected function attemptMake():void {
-		// ignore for these type of maker.
-	}
-*/
 	private function attemptMakeRetrieveParentModelInfo():void {
 		if ( parentModelGuid )
 			retrieveParentModelInfo();
@@ -225,6 +178,43 @@ public class ModelMakerClone extends ModelMakerBase {
 	}
 
 	override protected function markComplete( $success:Boolean ):void {
+		if ( true == $success ) {
+			ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
+			ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
+			_vm.complete = true;
+
+			modelInfo.brandChildren();
+			modelInfo.changed = true;
+			_modelMetadata.changed = true;
+			_vm.save();
+
+			if ( null == _vm.instanceInfo.controllingModel ) {
+				// Only do this for top level models.
+				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(500);
+				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
+				diffPos = diffPos.add(lav);
+				_vm.instanceInfo.positionSet = diffPos;
+			}
+
+		} else {
+			if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
+				Log.out( "ModelMakerClone.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.ERROR );
+			else if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName )
+				Log.out( "ModelMakerClone.markComplete - Failed import, Failed to load from IVM : " + modelInfo.guid, Log.ERROR );
+			else
+				Log.out( "ModelMakerClone.markComplete - Unknown error causing failure : " + ii.modelGuid, Log.ERROR );
+
+			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
+			ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
+		}
+
+		Log.out("ModelMakerImport.completeMake - needed info found: " + _modelMetadata.description );
+		super.markComplete( $success );
+		// how are sub models handled?
+		//_isImporting = false;
+	}
+/*	
+	override protected function markComplete( $success:Boolean ):void {
 		if ( false == $success && modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" ) {
 			// Are these needed?
 			ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
@@ -252,7 +242,7 @@ public class ModelMakerClone extends ModelMakerBase {
 
 		super.markComplete( $success);
 	}
-	
+*/	
 	///////////////////////////////////////////
 }	
 }

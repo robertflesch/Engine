@@ -209,7 +209,7 @@ public class PanelModels extends PanelBase
 
 		function deleteModelHandler(event:UIMouseEvent):void  {
 			if ( VoxelModel.selectedModel )
-				deleteModelCheck()
+				deleteModelCheck();
 			else
 				noModelSelected();
 			
@@ -248,7 +248,7 @@ public class PanelModels extends PanelBase
 			if ( $me.instanceGuid == VoxelModel.selectedModel.instanceInfo.instanceGuid ) {
 				ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved )
 				if ( null == _parentModel ) {
-					VoxelModel.selectedModel.selected = false
+					VoxelModel.selectedModel.selected = false;
 					VoxelModel.selectedModel = null
 				}
 			}

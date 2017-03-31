@@ -102,6 +102,12 @@ public class ModelMakerImport extends ModelMakerBase {
 		}
 		else {
 			//Log.out("ModelMakerImport.attemptMakeRetrieveParentModelInfo - completeMake " + ii.toString());
+			if ( modelInfo.modelClass ) {
+				var modelClass:String = modelInfo.modelClass;
+				_modelMetadata.animationClass = AnimationCache.requestAnimationClass(modelClass);
+			} else
+				_modelMetadata.animationClass = AnimationCache.MODEL_UNKNOWN;
+
 			completeMake();
 		}
 	}
