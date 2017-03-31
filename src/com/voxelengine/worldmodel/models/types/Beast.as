@@ -71,16 +71,14 @@ public class Beast extends ControllableVoxelModel
 		collisionMarkers = true;
 	}
 
-	static public function buildExportObject( $obj:Object, $model:* ):Object {
-		ControllableVoxelModel.buildExportObject( $obj, $model )
-		$obj.beast 					= {};
-		var thisModel:Beast = $model as Beast;
-		$obj.beast.moveSpeed 		= thisModel.speedMultiplier;
-		$obj.beast.maxTurnRate 		= thisModel.maxTurnRate;
-		$obj.beast.maxClimbAngle	= thisModel.maxClimbAngle;
-		$obj.beast.climbRate 		= thisModel.climbRate;
-		$obj.beast.seatLocation 		= { x:int(thisModel._seatLocation.x), y:int(thisModel._seatLocation.y), z:int(thisModel._seatLocation.z) };
-		return $obj;
+	override public function buildExportObject():void {
+		super.buildExportObject();
+		modelInfo.dbo.beast 					= {};
+		modelInfo.dbo.beast.moveSpeed 		= speedMultiplier;
+		modelInfo.dbo.beast.maxTurnRate 	= maxTurnRate;
+		modelInfo.dbo.beast.maxClimbAngle	= maxClimbAngle;
+		modelInfo.dbo.beast.climbRate 		= climbRate;
+		modelInfo.dbo.beast.seatLocation 		= { x:int(_seatLocation.x), y:int(_seatLocation.y), z:int(_seatLocation.z) };
 	}
 
 	override protected function processClassJson():void {
@@ -119,7 +117,7 @@ public class Beast extends ControllableVoxelModel
 		else
 			_seatLocation.setTo( 0, 0, 0 );
 
-		Log.out( "Beast.processClassJson values: " + JSON.stringify( buildExportObject( {}, this ) ) );
+		Log.out( "Beast.processClassJson values: " + JSON.stringify( this.modelInfo.dbo ) );
 	}
 
 	override protected function collisionPointsAdd():void {

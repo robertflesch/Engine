@@ -48,12 +48,8 @@ public class Dragon extends Beast
 		FunctionRegistry.functionAdd( loseControlHandler, "loseControlHandler" );
 	}
 
-	static public function buildExportObject( $obj:Object, $model:* ):Object {
-		Beast.buildExportObject( $obj, $model );
-		$obj.dragon = {};
-		var thisModel:Dragon = $model as Dragon;
-
-		return $obj;
+	override public function buildExportObject():void {
+		super.buildExportObject();
 	}
 	
 	override protected function processClassJson():void {

@@ -180,13 +180,13 @@ public class InventoryPanelModel extends VVContainer
 	private function addModel( $oi:ObjectInfo, allowDrag:Boolean = true ):BoxInventory {
 		//// Add the filled bar to the container and create a new container
 		
-		if ( ObjectInfo.OBJECTINFO_MODEL == $oi.objectType ) {
-			var om:ObjectModel = $oi as ObjectModel;
-			// dont show child models
-			if ( !WindowInventoryNew._s_hackShowChildren )
-				if ( null != om.vmm.animationClass && "" != om.vmm.animationClass )
-					return null;
-		}
+//		if ( ObjectInfo.OBJECTINFO_MODEL == $oi.objectType ) {
+//			var om:ObjectModel = $oi as ObjectModel;
+//			// dont show child models
+//			if ( !WindowInventoryNew._s_hackShowChildren )
+//				if ( null != om.vmm.animationClass && "" != om.vmm.animationClass )
+//					return null;
+//		}
 				
 		var box:BoxInventory = findFirstEmpty();	
 		if ( box ) {

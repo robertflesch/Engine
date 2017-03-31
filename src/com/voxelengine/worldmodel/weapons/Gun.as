@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.weapons
 {
 import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.worldmodel.models.types.ControllableVoxelModel;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 import flash.events.KeyboardEvent;
 import flash.ui.Keyboard;	
@@ -78,17 +80,32 @@ public class Gun extends ControllableVoxelModel
 		var ammo:Ammo = _armory.getAmmoByName( $name );
 		WeaponEvent.dispatch( new WeaponEvent( WeaponEvent.FIRE, this, ammo ) );			
 	}
-	
+
+	override public function buildExportObject():void {
+		super.buildExportObject();
+		modelInfo.dbo.gun = {};
+		//var gunData:Object = new Object();
+		//gunData.reloadSpeed = _reloadSpeed;
+		//
+		//var oa:Vector.<Object> = new Vector.<Object>();
+		//var ammosJson:Object = modelInfo.dbo.gun.ammos;
+		//for each ( var ammoInfo:Object in ammosJson )
+		//oa.push( { name: ammoInfo.name } );
+//
+		//gunData.ammos = oa;
+//		obj.gun = gunData;
+	}
+
 	private var _ammoCount:int;
 	override protected function processClassJson():void {
 		super.processClassJson();
 		
-//		if ( modelInfo.info && modelInfo.info.gun )
-//			var gunInfo:Object = modelInfo.info.gun;
-//		else {
-//			Log.out( "Gun.processClassJson - Gun section not found: " + modelInfo.dbo.toString(), Log.ERROR );
-//			return;
-//		}
+		if ( modelInfo.dbo.gun )
+			var gunInfo:Object = modelInfo.dbo.gun;
+		else {
+			Log.out( "Gun.processClassJson - Gun section not found: " + modelInfo.dbo.toString(), Log.ERROR );
+			return;
+		}
 		
 //		if ( gunInfo.reloadSpeed )
 //			_reloadSpeed = gunInfo.reloadSpeed;
@@ -159,23 +176,6 @@ public class Gun extends ControllableVoxelModel
 				instanceInfo.addNamedTransform( 0, 0, 0, 0.1, ModelTransform.ROTATION, "rotation" );			
 				break;
 		}
-	}
-
-	static public function buildExportObject( $obj:Object, $model:* ):Object {
-		ControllableVoxelModel.buildExportObject( $obj, $model );
-		$obj.barrel = {};
-		var thisModel:Barrel = $model as Barrel;
-		//var gunData:Object = new Object();
-		//gunData.reloadSpeed = _reloadSpeed;
-		//
-		//var oa:Vector.<Object> = new Vector.<Object>();
-		//var ammosJson:Object = modelInfo.dbo.gun.ammos;
-		//for each ( var ammoInfo:Object in ammosJson )
-		//oa.push( { name: ammoInfo.name } );
-//
-		//gunData.ammos = oa;
-//		obj.gun = gunData;
-		return $obj;
 	}
 }
 }

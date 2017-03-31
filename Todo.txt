@@ -2,7 +2,11 @@
 
 VoxelVerse todo
 
+
 dynamic lighting on all of dragon
+engine block on zeppelin does not light correctly 3.29.17
+if model is deleted from region models, the animation and script panels are not updated.
+adding -inline to the release compiler options causes function initializeDataBeforeSplash() to throw exceptions
 check collision for objects, make sure they are not all check everything every frame. Only selected object should do that, or ones that have collision.
 
 need to add clipVelocity and speedMultiplier to animation editor
@@ -12,48 +16,3 @@ When deleting a model that has inventory, make sure to delete its inventory.
 ! 12.1.16 need to add clipVelocity and speedMultiplier to rest of the animations, and to the setState, so that they are not hard coded.
 ! 12.4.16 static lighting on head of dragon
 
-
-Yale financial Aid - March 15
-Fafsa
-CSS
-Tax Return
-http://finaid.yale.edu/applying-aid/prospective-new-students
-
-Stanford-- Feb 15
-Fafsa
-CSS
-IDOC
-https://financialaid.stanford.edu/undergrad/apply/requirements/rd_us.html 
-
-Vanderbilt-- Feb 1
-Fafsa
-CSS
-IDOC
-http://www.vanderbilt.edu/financialaid/undergraduate/index.php
-(615) 322-3591
-
-Georgetown -- Feb 1
-Fafsa
-CSS
-Tax Return
-https://finaid.georgetown.edu/apply-now/first-year-undergraduate
-
-George Washington - Jan 1 ?
-Fafsa
-CSS
-Tax Return
-Verification of Family Member Enrollment
-https://financialaid.gwu.edu/2017-2018-forms
-Phone: 202-994-6620
-
-Redparrotbob2
-
-
-ModelInfoEvent.addListener( ModelBaseEvent.SAVE, 				save );
-
-	static private function save(e:ModelInfoEvent):void {
-		for each ( var modelInfo:ModelInfo in _modelInfo )
-			if ( modelInfo )
-				modelInfo.save();
-	}
-CMRBEPXR

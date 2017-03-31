@@ -7,40 +7,32 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.Log;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 
 public class Propeller extends VoxelModel
 {
-	// Todo: This needs to be global?
-	static private const SHIP_PROP:String 		= "prop";
-
-	// Todo: From metadata (someday)
 	private var _rotationRate:int = 1440;
 
 	public function Propeller(instanceInfo:InstanceInfo )  {
 		super( instanceInfo);
 	}
 
-	static public function buildExportObject( $obj:Object, $model:* ):Object {
-		VoxelModel.buildExportObject( $obj, $model );
-		$obj.propeller = {};
-		var thisModel:Propeller = $model as Propeller;
-		$obj.propeller.rotationRate = thisModel._rotationRate;
-		return $obj;
+	override public function buildExportObject():void {
+		super.buildExportObject();
+		modelInfo.dbo.propeller = {};
+		modelInfo.dbo.propeller.rotationRate = _rotationRate;
 	}
 
 	override protected function processClassJson():void {
 		super.processClassJson();
-		if ( modelInfo.dbo.propeller )
-		{
-			var propInfo:Object = modelInfo.dbo.Propeller;
+		if ( modelInfo.dbo.propeller ) {
+			var propInfo:Object = modelInfo.dbo.propeller;
 			if ( propInfo.rotationRate )
 				_rotationRate = propInfo.rotationRate;
 		}
 		else
-			trace( "Propeller.processClassJson - NO Engine INFO FOUND - Setting to defaults" );
-
-//			SoundBank.getSound( _soundFile ); // Preload the sound file
+			Log.out( "Propeller.processClassJson - NO Propeller INFO FOUND - Setting to defaults", Log.WARN );
 	}
 
 /*

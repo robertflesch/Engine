@@ -33,12 +33,10 @@ public class Stand extends VoxelModel
 //				trace( "Stand - NO Stand INFO FOUND" );
 	}
 
-	static public function buildExportObject( $obj:Object, $model:* ):Object {
-		VoxelModel.buildExportObject( $obj, $model );
-		$obj.stand = {};
-		var thisModel:Stand = $model as Stand;
-		$obj.stand.reloadSpeed = thisModel._reloadSpeed;
-		return $obj;
+	override public function buildExportObject():void {
+		super.buildExportObject();
+		modelInfo.dbo.stand = {};
+		modelInfo.dbo.reloadSpeed = _reloadSpeed;
 	}
 
 }

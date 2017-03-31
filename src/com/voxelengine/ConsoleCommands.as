@@ -19,7 +19,7 @@ import com.furusystems.logging.slf4as.ILogger;
 
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.models.ControllableVoxelModel;
+import com.voxelengine.worldmodel.models.types.ControllableVoxelModel;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.types.Player;

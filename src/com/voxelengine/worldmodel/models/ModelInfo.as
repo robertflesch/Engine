@@ -62,6 +62,10 @@ public class ModelInfo extends PersistenceObject
 		changed = true;
 	}
 
+	private var			_owner:VoxelModel;
+	public function get owner():VoxelModel 							{ return _owner; }
+	public function set owner(value:VoxelModel):void 				{ _owner = value; }
+
 	private var 		_associatedGrain:GrainCursor;						// associates the model with a grain in the parent model
 	public function get associatedGrain():GrainCursor 				{ return _associatedGrain; }
 	public function set associatedGrain(value:GrainCursor):void 	{ _associatedGrain = value;  changed = true; }
@@ -632,18 +636,7 @@ public class ModelInfo extends PersistenceObject
 	}
 	
 	override protected function toObject():void {
-		// I am faking a heirarchy here, not good object oriented behavior but needs major redesign to do what I want.
-		// so instead I just get the current setting from the class
-		var modelClassPrototype:Class = ModelLibrary.getAsset( modelClass );
-//		if ( dbo.key != "0" ) {
-			try {
-				modelClassPrototype.buildExportObject(dbo,this);
-			} catch (e:Error) {
-				VoxelModel.buildExportObject(dbo,this);
-				Log.out("ModelInfo.toObject - Error with Class: " + dbo.modelClass, Log.ERROR);
-			}
-//		} else
-//			return;
+		owner.buildExportObject();
 
 		if ( null != associatedGrain )
 			dbo.associatedGrain = associatedGrain;
@@ -712,7 +705,6 @@ public class ModelInfo extends PersistenceObject
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public function cloneNew( $guid:String ):ModelInfo {
-		toObject();
 		var newModelInfo:ModelInfo = new ModelInfo( $guid, null, dbo );
 		for each ( var ani:Animation in _animations ) {
 			var newAni:Animation = ani.clone( guid );
@@ -728,8 +720,7 @@ public class ModelInfo extends PersistenceObject
 	}
 
 	override public function clone( $guid:String ):* {
-		toObject();
-		var oldObj:String = JSON.stringify( dbo )
+		var oldObj:String = JSON.stringify( dbo );
 
 		var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.MODEL_INFO_EXT, $guid, null, oldObj )
 		PersistenceEvent.dispatch( pe )

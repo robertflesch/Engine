@@ -5,8 +5,9 @@ displays and printed documentation which are original works of
 authorship protected under United States Copyright Act.
 Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
-package com.voxelengine.worldmodel.models
+package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.events.CursorSizeEvent;
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.InventoryInterfaceEvent;
@@ -141,14 +142,12 @@ public class ControllableVoxelModel extends VoxelModel
 //		else
 //			Log.out( "ControllableVoxelModel.processClassJson - no ControllableModelInfo info found", Log.WARN );
 	}
-	
-	static public function buildExportObject( obj:Object, model:* ):Object {
-		VoxelModel.buildExportObject( obj, model );
-		obj.controllableVoxelModel = {};
-		var thisModel:ControllableVoxelModel = model as ControllableVoxelModel;
-		obj.controllableVoxelModel.clipFactor = thisModel.clipVelocityFactor * 100;
-		obj.controllableVoxelModel.maxSpeed = thisModel.maxSpeed;
-		return obj;
+
+	override public function buildExportObject():void {
+		super.buildExportObject();
+		modelInfo.dbo.controllableVoxelModel = {};
+		modelInfo.dbo.controllableVoxelModel.clipFactor = clipVelocityFactor * 100;
+		modelInfo.dbo.controllableVoxelModel.maxSpeed = maxSpeed;
 	}
 	
 	public function get keyboardControl():Boolean { return _keyboardControl; }

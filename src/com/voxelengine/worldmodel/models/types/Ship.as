@@ -56,14 +56,19 @@ public class Ship extends ControllableVoxelModel
 		Globals.g_app.addEventListener( ShipEvent.DIRECTION_CHANGED, directionEvent, false, 0, true );
 	}
 
-	static public function buildExportObject( $obj:Object, $model:* ):Object {
-		ControllableVoxelModel.buildExportObject( $obj, $model );
-		$obj.ship = {};
-		var thisModel:Ship = $model as Ship;
-		//$obj.ship.rotationRate = thisModel._rotationRate;
-		return $obj;
+	override public function buildExportObject():void {
+		super.buildExportObject();
+		modelInfo.dbo.ship = {};
 	}
 
+	override protected function processClassJson():void {
+		super.processClassJson();
+		if ( modelInfo.dbo.ship ) {
+			var info:Object = modelInfo.dbo.ship;
+		}
+		else
+			Log.out( "Propeller.processClassJson - NO Propeller INFO FOUND - Setting to defaults", Log.WARN );
+	}
 
 	override protected function collisionPointsAdd():void {
 		// TO DO Should define this in meta data??? RSF or using extents?

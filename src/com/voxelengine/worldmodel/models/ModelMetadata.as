@@ -160,7 +160,6 @@ public class ModelMetadata extends PersistenceObject
 
 
 	public function cloneNew( $guid:String ):ModelMetadata {
-		toObject();
 		var newMM:ModelMetadata = new ModelMetadata( $guid, null, dbo );
 
 		//TODO need handlers
@@ -169,7 +168,6 @@ public class ModelMetadata extends PersistenceObject
 	}
 
 	override public function clone( $newGuid:String ):* {
-		toObject();
 		var oldName:String = dbo.name;
 		dbo.name = dbo.name + "_duplicate";
 		var oldObj:String = JSON.stringify( dbo );

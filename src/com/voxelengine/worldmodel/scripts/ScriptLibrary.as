@@ -8,7 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.worldmodel.scripts
 {
-import com.voxelengine.worldmodel.models.ControllableVoxelModel;
+import com.voxelengine.worldmodel.models.types.ControllableVoxelModel;
 import com.voxelengine.worldmodel.models.types.Trigger;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.types.Zeppelin;

@@ -49,12 +49,10 @@ package com.voxelengine.worldmodel.models.types
 			super( $ii );
 		}
 
-		static public function buildExportObject( $obj:Object, $model:* ):Object {
-			VoxelModel.buildExportObject( $obj, $model );
-			$obj.engine = {};
-			var thisModel:Engine = $model as Engine;
-			$obj.engine.maxThrust = thisModel._maxThrust;
-			return $obj;
+		override public function buildExportObject():void {
+			super.buildExportObject();
+			modelInfo.dbo.engine = {};
+			modelInfo.dbo.engine.maxThrust = _maxThrust;
 		}
 
 		override protected function processClassJson():void {

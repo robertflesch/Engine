@@ -197,18 +197,12 @@ public class WindowDebugMenu extends VVCanvas
 		}
 	}
 
-	private function updateCMStats():void
-	{
-		// TO DO I dont like this direct call into the EditCursor
-		if (Globals.g_app && VoxelModel.controlledModel ) {
-			var modelClassPrototype:Class = ModelLibrary.getAsset( VoxelModel.controlledModel.modelInfo.modelClass );
-
-			_cmLabel.text = JSON.stringify( modelClassPrototype.buildExportObject( {} ));
-		}
+	private function updateCMStats():void {
+		if (Globals.g_app && VoxelModel.controlledModel )
+			_cmLabel.text = JSON.stringify( VoxelModel.controlledModel.modelInfo.dbo );
 	}
 
-	private function addModelLocation():void
-	{
+	private function addModelLocation():void {
 		addElement( _modelLoc );
 	}
 

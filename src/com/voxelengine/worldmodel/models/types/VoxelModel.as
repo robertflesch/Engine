@@ -152,6 +152,7 @@ public class VoxelModel
 	
 	public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		_modelInfo = $mi;
+		_modelInfo.owner = this;
 		_metadata = $vmm;
 
 		OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );
@@ -213,9 +214,8 @@ public class VoxelModel
 	}
 	
 	// The export object is a combination of modelInfo and instanceInfo
-	static public function buildExportObject( $obj:Object, $model:* ):Object {
+	public function buildExportObject():void {
 		//Log.out( "VoxelModel.buildExportObject" );
-		return $obj;
 	}
 
 	protected function cameraAddLocations():void

@@ -91,7 +91,6 @@ public class Animation extends PersistenceObject
 	}
 
 	override public function clone( $modelGuid:String ):* {
-		toObject();
 		var newAni:Animation = new Animation( Globals.getUID(), null, dbo );
 		AnimationEvent.create( ModelBaseEvent.CLONE, 0, $modelGuid, newAni.guid, newAni );
 		if ( _animationSound ) {
@@ -161,7 +160,6 @@ public class Animation extends PersistenceObject
 	public function createBackCopy():Object {
 		// force the data from the dynamic classes into the object
 		// this give me an object that holds all of the data for the animation
-		toObject();
 		var backupInfo:Object = {};
 		backupInfo.name 			= String( dbo.name );
 		backupInfo.description 		= String( dbo.description );

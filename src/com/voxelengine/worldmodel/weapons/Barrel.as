@@ -28,16 +28,11 @@ package com.voxelengine.worldmodel.weapons
 			if ( modelInfo.dbo.barrel ) {
 				var barrelInfo:Object = modelInfo.dbo.barrel;
 			}
-//			else
-//				trace( "Stand - NO Stand INFO FOUND" );
 		}
 
-		static public function buildExportObject( $obj:Object, $model:* ):Object {
-			VoxelModel.buildExportObject( $obj, $model );
-			$obj.barrel = {};
-			var thisModel:Barrel = $model as Barrel;
-			//$obj.barrel.reloadSpeed = thisModel._reloadSpeed;
-			return $obj;
+		override public function buildExportObject():void {
+			super.buildExportObject();
+			modelInfo.dbo.barrel = {};
 		}
 	}
 }

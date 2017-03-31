@@ -40,7 +40,7 @@ import com.voxelengine.Log;
 import com.voxelengine.server.Network
 
 import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.ControllableVoxelModel;
+import com.voxelengine.worldmodel.models.types.ControllableVoxelModel;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
@@ -69,11 +69,10 @@ public class Avatar extends ControllableVoxelModel
 		super.init( $mi, $vmm );
 	}
 
-	static public function buildExportObject( obj:Object, model:* ):Object {
-		ControllableVoxelModel.buildExportObject( obj, model );
-		obj.avatar = {};
-		//var thisModel:ControllableVoxelModel = model as ControllableVoxelModel;
-		return obj;
+	override public function buildExportObject():void {
+		super.buildExportObject();
+		modelInfo.dbo.avatar = {};
+		//var thisModel:ControllableVoxelModel = $vm as ControllableVoxelModel;
 	}
 	
 
