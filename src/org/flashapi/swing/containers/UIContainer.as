@@ -987,7 +987,7 @@ package org.flashapi.swing.containers {
 		}
 		
 		private function addTargetToObject(obj:*):void {
-			if (obj.hasOwnProperty("target")) obj.target = this;
+			if (obj && obj.hasOwnProperty("target")) obj.target = this;
 		}
 		
 		private function getAndAddText(text:String):void {			

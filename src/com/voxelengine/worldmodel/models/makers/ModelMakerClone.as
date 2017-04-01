@@ -65,9 +65,8 @@ public class ModelMakerClone extends ModelMakerBase {
 		addListeners();
 
 		// This gives me two new objects that have not been saved.
-		var newGuid:String = Globals.getUID();
-		_modelMetadata = $vm.metadata.cloneNew( newGuid );
-		_modelInfo = $vm.modelInfo.cloneNew( newGuid );
+		_modelMetadata = $vm.metadata.cloneNew( ii.modelGuid );
+		_modelInfo = $vm.modelInfo.cloneNew( ii.modelGuid );
 		attemptMakeRetrieveParentModelInfo();
 	}
 
