@@ -10,7 +10,6 @@ package com.voxelengine.worldmodel.models
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.types.Player;
 
-import flash.utils.ByteArray;
 import flash.utils.getQualifiedClassName;
 
 import playerio.DatabaseObject;
@@ -30,12 +29,16 @@ public class PersistenceObject
 	private var 	_changed:Boolean;
 	private var 	_dynamicObj:Boolean;
 	private var 	_dbo:DatabaseObject;
+	// BigDB doesn't like another save call in the middle of an existing one.
+	// So if we are in the "SAVING state, leave object "changed" and return.
+	private var 	_saving:Boolean;
 
 	public function PersistenceObject($guid:String, $table:String ) {
 		if ( null == $guid || "" == $guid )
 			throw new Error( "PersistenceObject - Missing guid in constructor" );
 		_guid = $guid;
 		_table = $table;
+		_saving = false;
 	}
 
 	protected function assignNewDatabaseObject():void {
@@ -74,19 +77,20 @@ public class PersistenceObject
 	}
 	
 	protected function addSaveEvents():void {
-		//Log.out( getQualifiedClassName( this ) + ".addSaveEvents - guid: " + guid, Log.DEBUG );
 		PersistenceEvent.addListener( PersistenceEvent.CREATE_SUCCEED, 	createSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.CREATE_FAILED, 	createFailed );
 		PersistenceEvent.addListener( PersistenceEvent.SAVE_SUCCEED, 	saveSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.SAVE_FAILED, 	saveFail );
+		_saving = true;
 	}
 	
 	protected function removeSaveEvents():void {
-		//Log.out( getQualifiedClassName( this ) + ".removeSaveEvents - guid: " + guid, Log.DEBUG );
+		Log.out( getQualifiedClassName( this ) + ".removeSaveEvents - guid: " + guid, Log.DEBUG );
 		PersistenceEvent.removeListener( PersistenceEvent.CREATE_SUCCEED, 	createSucceed );
 		PersistenceEvent.removeListener( PersistenceEvent.CREATE_FAILED, 	createFailed );
 		PersistenceEvent.removeListener( PersistenceEvent.SAVE_SUCCEED, 	saveSucceed );
 		PersistenceEvent.removeListener( PersistenceEvent.SAVE_FAILED, 		saveFail );
+		_saving = false;
 	}
 	
 	protected function toObject():void { }
@@ -115,7 +119,12 @@ public class PersistenceObject
 	}
 
 	protected function validatedSave():void {
-		var name:String = getQualifiedClassName(this);
+		if ( _saving ) {
+			var name:String = getQualifiedClassName(this);
+			Log.out("PersistenceObject.save - IN MIDDLE OF SAVE: " + name, Log.WARN);
+			return;
+		}
+
 		changed = false;
 		//Log.out(name + ".save - Saving to guid: " + guid + " in table: " + table, Log.DEBUG);
 		addSaveEvents();
@@ -129,7 +138,7 @@ public class PersistenceObject
 	private function saveSucceed( $pe:PersistenceEvent ):void {
 		if ( _table != $pe.table )
 			return;
-		if ( $pe.dbo && guid == $pe.guid ) {
+		if ( guid == $pe.guid ) {
 			removeSaveEvents();
 			Log.out(getQualifiedClassName( this ) + ".PersistenceObject.saveSucceed - save: " + guid + " in table: " + $pe.table);
 		}
