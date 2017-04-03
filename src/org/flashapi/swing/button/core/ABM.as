@@ -889,7 +889,14 @@ import flash.display.Sprite;
 		public function get selected():Boolean {
 			return $selected;
 		}
+
+		// items were getting selected and unselected with a single click
+		// this goes back to a bug in the mouse downhandler.
+		// I put a hack in to only fire it once per every 200 ms for buttons.
 		public function set selected(value:Boolean):void {
+//			trace( "ABM.selected value: " + value + " displayedLabel: " + _displayedLabel);
+			//if ( _displayedLabel == "Propeller" && value == false )
+			//	trace( "ABM.selected BREAK");
 			$selected = value;
 			setRefresh();
 		}
@@ -1379,6 +1386,7 @@ import flash.display.Sprite;
 		 * @private
 		 */
 		protected function setButtonBehaviour():void {
+			//trace( "ABM.setButtonBehaviour")
 			$evtColl.addEvent($hitArea, MouseEvent.MOUSE_OVER, mouseOverHandler);
 			$evtColl.addEvent($hitArea, MouseEvent.MOUSE_OUT, mouseOutHandler);
 			$evtColl.addEvent($hitArea, MouseEvent.MOUSE_DOWN, mouseDownHandler);
@@ -1686,8 +1694,10 @@ import flash.display.Sprite;
 		}
 		
 		private function mouseDownHandler(e:MouseEvent):void {
-		//trace( "ABM.mouseDownHandler guid: " + guid + " address: " + DebugUtils.getObjectMemoryHash( this ) + "  " + e );			
+		//var time = getTimer();
+		//trace( "ABM.mouseDownHandler guid: " + guid + " time: " + time );
 			if($active && $enabled  && doubleMessageHack) {
+				//trace( "ABM.mouseDownHandler ------FIRED-------" );
 				doMouseDownAction();
 				if(_boxhelp != null) _boxhelp.remove();
 				$isPressed = true;
@@ -1696,11 +1706,13 @@ import flash.display.Sprite;
 		}
 		
 		import flash.utils.getTimer;
+		// The waiting period was increased here do to a lot of handling of different elements
+		// during processing.
 		private var doubleMessageHackTime:int = getTimer();
 		private function get doubleMessageHack():Boolean {
 			var newTime:int = getTimer();
 			var result:Boolean = false;
-			if ( doubleMessageHackTime + Globals.DOUBLE_MESSAGE_WAITING_PERIOD < newTime ) {
+			if ( doubleMessageHackTime + (Globals.DOUBLE_MESSAGE_WAITING_PERIOD * 2) < newTime ) {
 				doubleMessageHackTime = newTime;
 				result = true;
 			}
