@@ -228,7 +228,7 @@ import com.voxelengine.renderer.Renderer;
 		private function loginButtonHandler(event:UIMouseEvent):void 
 		{
 			_loginButton.enabled = false;
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
+			LoadingImageEvent.create( LoadingImageEvent.CREATE );
 			_errorText.text = "";
 			_emailInput.glow = false;
 			_passwordInput.glow = false;
@@ -250,14 +250,14 @@ import com.voxelengine.renderer.Renderer;
 			LoginEvent.removeListener( LoginEvent.LOGIN_FAILURE, onUnknownFailure );
 			LoginEvent.removeListener( LoginEvent.LOGIN_FAILURE_PASSWORD, onPasswordFailure );
 			LoginEvent.removeListener( LoginEvent.LOGIN_FAILURE_EMAIL, onEmailFailure );
-			//LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
+			//LoadingImageEvent.create( LoadingImageEvent.ANNIHILATE ) );
 			_loginButton.enabled = true;
 		}
 		
 		private const BAD_EMAIL_PASSWORD:String = "Bad email or password";
 		private function onPasswordFailure( $e:LoginEvent ):void {
 			removeLoginEventHandlers();
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
+			LoadingImageEvent.create( LoadingImageEvent.ANNIHILATE );
 
 			Log.out("WindowLogin.onPasswordFailure" + $e.guid );
 			//_passwordInput.glow = true;
@@ -267,7 +267,7 @@ import com.voxelengine.renderer.Renderer;
 		
 		private function onEmailFailure( $e:LoginEvent ):void {
 			removeLoginEventHandlers()
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.ANNIHILATE ) );
+			LoadingImageEvent.create( LoadingImageEvent.ANNIHILATE );
 			Log.out("WindowLogin.onEmailFailure" + $e.guid );
 //			_emailInput.glow = true;
 //			_errorText.text = $e.guid;
@@ -276,7 +276,7 @@ import com.voxelengine.renderer.Renderer;
 		
 		private function onUnknownFailure( $e:LoginEvent ):void {
 			removeLoginEventHandlers()
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );
+			LoadingImageEvent.create( LoadingImageEvent.DESTROY );
 			Log.out("WindowLogin.onUnknownFailure: " + $e.guid, Log.ERROR );
 			_errorText.text = "Server error, try again later";
 		}
@@ -299,7 +299,7 @@ import com.voxelengine.renderer.Renderer;
 				Log.out("WindowLogin.loginSuccess - Unable to save user email", Log.WARN );
 				
 			//Log.out("WindowLogin.loginSuccess - Closing Login Window" );
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );
+			LoadingImageEvent.create( LoadingImageEvent.DESTROY );
 
 			remove();
 		}

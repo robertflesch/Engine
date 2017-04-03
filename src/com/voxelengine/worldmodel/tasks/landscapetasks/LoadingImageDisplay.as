@@ -25,7 +25,7 @@ public class LoadingImageDisplay extends LandscapeTask
 	override public function start():void {
 		super.start() // AbstractTask will send event
 		Log.out( "LoadingImageDisplay.start" );
-		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );						
+		LoadingImageEvent.create( LoadingImageEvent.CREATE );
 		super.complete() // AbstractTask will send event
 	}
 }

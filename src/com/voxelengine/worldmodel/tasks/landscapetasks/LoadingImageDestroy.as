@@ -26,7 +26,7 @@ public class LoadingImageDestroy extends LandscapeTask
 	override public function start():void {
 		super.start() // AbstractTask will send event
 		Log.out( "LoadingImageDestroy.start" );
-		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );						
+		LoadingImageEvent.create( LoadingImageEvent.DESTROY );
 		super.complete() // AbstractTask will send event
 	}
 }

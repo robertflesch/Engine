@@ -404,8 +404,9 @@ public class VoxelVerseGUI extends EventDispatcher
 	private function joinRoomFailureHandler( e:RoomEvent ):void {
 		
 		var popup:VVPopup = new VVPopup("NO SERVERS FOUND");
-		popup.width = 250;
-		popup.height = 50;
+		popup.autoSize = true;
+		//popup.width = 400;
+		//popup.height = 50;
 		//popup.innerPanel = popup.autoHeight = true;
 		
 		var label:Label = new Label("No servers were found for this room, try later");

@@ -36,7 +36,7 @@ import flash.display.Bitmap;
 			if ( WindowWater.isActive ) {
 				WindowWater._s_currentInstance.remove();
 				WindowWater._s_currentInstance = null;
-				LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );			
+				LoadingImageEvent.create( LoadingImageEvent.DESTROY );
 			}
 		}
 		
@@ -50,7 +50,7 @@ import flash.display.Bitmap;
 			{
 				WindowWater._s_currentInstance.remove();
 				WindowWater._s_currentInstance = null;
-				//LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTORY ) );			
+				//LoadingImageEvent.create( LoadingImageEvent.DESTORY ) );
 			}
 		}
 		

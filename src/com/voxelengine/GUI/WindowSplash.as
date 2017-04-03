@@ -32,7 +32,7 @@ import flash.display.Bitmap;
 			if ( WindowSplash.isActive ) {
 				WindowSplash._s_currentInstance.remove();
 				WindowSplash._s_currentInstance = null;
-				LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );			
+				LoadingImageEvent.create( LoadingImageEvent.DESTROY );
 			}
 		}
 		
@@ -46,7 +46,7 @@ import flash.display.Bitmap;
 			{
 				WindowSplash._s_currentInstance.remove();
 				WindowSplash._s_currentInstance = null;
-				//LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTORY ) );			
+				//LoadingImageEvent.create( LoadingImageEvent.DESTORY ) );
 			}
 		}
 		
@@ -79,7 +79,7 @@ import flash.display.Bitmap;
 			onResize(null);
 			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.SPLASH_LOAD_COMPLETE ) );
 			
-			//LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );			
+			//LoadingImageEvent.create( LoadingImageEvent.CREATE ) );
 		} 
 		
         protected function onResize(event:Event):void {

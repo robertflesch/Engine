@@ -170,13 +170,13 @@ public class ModelMakerBase {
 	static public function makerCountGet():int { return _makerCount }
 	static public function makerCountIncrement():void { 
 		if ( 0 == makerCountGet() )
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
+			LoadingImageEvent.create( LoadingImageEvent.CREATE );
 		_makerCount++;
 	}
 	static public function makerCountDecrement():void { 
 		_makerCount-- ;
 		if ( 0 == makerCountGet() ) {
-			LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.DESTROY ) );
+			LoadingImageEvent.create( LoadingImageEvent.DESTROY );
 			RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
 		}
 	}

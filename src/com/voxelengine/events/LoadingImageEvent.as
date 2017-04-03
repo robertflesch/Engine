@@ -30,9 +30,8 @@ public class LoadingImageEvent extends Event
 		return new LoadingImageEvent(type, bubbles, cancelable);
 	}
    
-	public override function toString():String
-	{
-		return formatToString("LoadingImageEvent");
+	public override function toString():String {
+		return formatToString("LoadingImageEvent, type");
 	}
 	
 	///////////////// Event handler interface /////////////////////////////
@@ -48,8 +47,8 @@ public class LoadingImageEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:LoadingImageEvent ) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
+	static public function create( $type:String ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new LoadingImageEvent( $type ) );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

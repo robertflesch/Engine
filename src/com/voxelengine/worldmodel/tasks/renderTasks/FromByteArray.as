@@ -39,7 +39,7 @@ public class FromByteArray extends AbstractTask
 		_guid = $guid;
 		_op = $parent;
 		super("FromByteArray", $taskPriority );
-		LoadingImageEvent.dispatch( new LoadingImageEvent( LoadingImageEvent.CREATE ) );
+		LoadingImageEvent.create( LoadingImageEvent.CREATE );
 	}
 	
 	override public function start():void {
@@ -64,7 +64,7 @@ public class FromByteArray extends AbstractTask
 			Log.out( "FromByteArray.start: ERROR: " + e.toString(), Log.ERROR, e );
 			OxelDataEvent.create( OxelDataEvent.OXEL_FAILED, 0, _guid, _op );
 		}
-		LoadingImageEvent.dispatch(new LoadingImageEvent(LoadingImageEvent.DESTROY));
+		LoadingImageEvent.create(LoadingImageEvent.DESTROY);
 		super.complete();
 		//Log.out( "FromByteArray.start: took: " + (getTimer() - time) + "  guid: " + _guid );
 	}
