@@ -70,7 +70,7 @@ public class Inventory extends PersistenceObject
 			return false;
 		}
 
-		validatedSave();
+		super.save();
 		return true;
 	}
 	
