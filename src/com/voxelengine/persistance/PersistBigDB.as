@@ -154,9 +154,6 @@ public class PersistBigDB
 	
 
 	static private function save( $pe:PersistenceEvent ):void {
-		if ( false == Globals.online )
-			return;
-			
 		PlayerIOPersistenceEvent.addListener( PlayerIOPersistenceEvent.PERSISTANCE_NO_CLIENT, errorNoClient );
 		PlayerIOPersistenceEvent.addListener( PlayerIOPersistenceEvent.PERSISTANCE_NO_DB, errorNoDB );
 		if ( "0" != $pe.dbo.key )
