@@ -82,14 +82,6 @@ public class ModelMaker extends ModelMakerBase {
 		}
 		removeListeners();
 
-		if ( null == _vm.instanceInfo.controllingModel ) {
-			// Only do this for top level models.
-			var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(500);
-			var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
-			diffPos = diffPos.add(lav);
-			_vm.instanceInfo.positionSet = diffPos;
-		}
-
 		// do this last as it nulls everything.
 		super.markComplete( $success );
 		
