@@ -140,7 +140,7 @@ public class PanelModels extends PanelBase
 	}
 
 	private function getItem( $index:int ):Object {
-		var listItem:ListItem = _listModels.getItemAt[ $index ];
+		var listItem:ListItem = _listModels.getItemAt( $index );
 		if ( listItem )
 			return listItem.data as Object;
 		else
