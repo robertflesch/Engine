@@ -31,9 +31,16 @@ public class ModelDestroyer {
 	private var _recursive:Boolean;
 	
 	public function ModelDestroyer( $modelguid:String, $recursive:Boolean ) {
-		
 		_modelGuid = $modelguid;
 		_recursive = $recursive;
+
+		// The Region could also listen for model delete
+		// this removes the on screen instances
+		var modelOnScreen:Vector.<VoxelModel> = Region.currentRegion.modelCache.instancesOfModelGet( _modelGuid );
+		// only instances have inventory, not models
+		for each ( var vm:VoxelModel in modelOnScreen )
+			vm.dead = true;
+
 		Log.out( "ModelDestroyer - removing modelGuid: " + _modelGuid + ( _recursive ? " and children from" : " from" ) + " persistance" );
 
 		// request the ModelData so that we can get the modelInfo from it.
@@ -42,13 +49,6 @@ public class ModelDestroyer {
 		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, dataResultFailed );
 
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
-
-		// The Region could also listen for model delete
-		// this removes the on screen instances
-		var modelOnScreen:Vector.<VoxelModel> = Region.currentRegion.modelCache.instancesOfModelGet( _modelGuid );
-		// only instances have inventory, not models
-		for each ( var vm:VoxelModel in modelOnScreen )
-			vm.dead = true;
 	}
 
 	private function dataResultFailed( $mie:ModelInfoEvent):void {

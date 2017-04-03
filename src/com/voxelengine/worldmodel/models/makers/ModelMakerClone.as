@@ -7,6 +7,8 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
+import flash.geom.Vector3D;
+
 import com.voxelengine.Log
 import com.voxelengine.Globals
 import com.voxelengine.events.ModelBaseEvent
@@ -14,55 +16,27 @@ import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent
 import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.RegionEvent;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.Region
 import com.voxelengine.worldmodel.animation.AnimationCache;
-import com.voxelengine.worldmodel.models.ModelInfo;
-import com.voxelengine.worldmodel.models.OxelPersistence;
 import com.voxelengine.worldmodel.models.types.VoxelModel
-import com.voxelengine.worldmodel.models.ModelMetadata
 import com.voxelengine.worldmodel.oxel.GrainCursor;
-import com.voxelengine.worldmodel.oxel.GrainCursorUtils;
-import com.voxelengine.worldmodel.oxel.Lighting;
-import com.voxelengine.worldmodel.oxel.Oxel;
 
-import flash.geom.Vector3D;
-import flash.utils.ByteArray;
-
-import org.flashapi.swing.Alert;
-
-import playerio.DatabaseObject;
-
-/**
-	 * ...
-	 * @author Robert Flesch - RSF
-	 * This class is used to load a model once its metadata AND data has been loaded from persistance
-	 * it then removes its listeners, which should cause it be to be garbage collected.
-	 * Might I need to add a timeout on this object in case if never completes.
-	 */
 public class ModelMakerClone extends ModelMakerBase {
 	
 	public function ModelMakerClone( $vm:VoxelModel, $killOldModel:Boolean = true ) {
-		var originalVM:VoxelModel = $vm;
-
-		Log.out( "ModelMakerClone - clone model with instanceGuid: " + $vm.instanceInfo.instanceGuid  + "  modelGuid: " + $vm.instanceInfo.modelGuid );
-		super( originalVM.instanceInfo.clone(), false );
+		super($vm.instanceInfo.clone(), false);
+		Log.out("ModelMakerClone - clone model with instanceGuid: " + $vm.instanceInfo.instanceGuid + "  modelGuid: " + $vm.instanceInfo.modelGuid);
 		ii.modelGuid = Globals.getUID();
-		Log.out( "ModelMakerClone - clone model with NEW instanceGuid: " + ii.instanceGuid  + "  NEW modelGuid: " + ii.modelGuid );
-		if ( $killOldModel ) {
-			originalVM.dead = true;
+		Log.out("ModelMakerClone - clone model with NEW instanceGuid: " + ii.instanceGuid + "  NEW modelGuid: " + ii.modelGuid);
+		if ($killOldModel) {
+			$vm.dead = true;
 		} else {
-			var size:int = GrainCursor.two_to_the_g( $vm.modelInfo.oxelPersistence.oxel.gc.grain );
-			var offset:Vector3D = new Vector3D(1,1,1);
-			offset.scaleBy(size);
-			var v:Vector3D = ii.positionGet.clone();
-			v = v.add( offset );
-			ii.positionSetComp( v.x, v.y, v.z  );
+			// Only do this for top level models.
+			if ( null == $vm.instanceInfo.controllingModel ) {
+				var size:int = GrainCursor.two_to_the_g( $vm.modelInfo.oxelPersistence.oxel.gc.grain );
+				var v:Vector3D = ii.positionGet.clone();
+				ii.positionSetComp(v.x + size / 4, v.y + size / 4, v.z + size / 4);
+			}
 		}
-		Log.out( "ModelMakerClone - ii: " + ii.toString() );
-
-		addListeners();
 
 		// This gives me two new objects that have not been saved.
 		_modelMetadata = $vm.metadata.cloneNew( ii.modelGuid );
@@ -115,8 +89,8 @@ public class ModelMakerClone extends ModelMakerBase {
 		}
 	}
 
-	private var waitForChildren:Boolean;
 	private function completeMake():void {
+		var waitForChildren:Boolean = false;
 		//Log.out("ModelMakerClone.completeMake: " + ii.toString());
 		if ( null != modelInfo && null != _modelMetadata ) {
 
@@ -164,7 +138,6 @@ public class ModelMakerClone extends ModelMakerBase {
 //				Log.out( "ModelMakerClone.oxelReadyFailedToLoad - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
 		}
 
-
 		function addOxelReadyDataCompleteListeners():void {
 			OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelReady );
 			OxelDataEvent.addListener( OxelDataEvent.OXEL_FAILED, oxelReadyFailedToLoad );
@@ -186,15 +159,6 @@ public class ModelMakerClone extends ModelMakerBase {
 			modelInfo.changed = true;
 			_modelMetadata.changed = true;
 			_vm.save();
-
-			if ( null == _vm.instanceInfo.controllingModel ) {
-				// Only do this for top level models.
-				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(500);
-				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
-				diffPos = diffPos.add(lav);
-				_vm.instanceInfo.positionSet = diffPos;
-			}
-
 		} else {
 			if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
 				Log.out( "ModelMakerClone.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.ERROR );
@@ -207,41 +171,8 @@ public class ModelMakerClone extends ModelMakerBase {
 			ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
 		}
 
-		Log.out("ModelMakerImport.completeMake - needed info found: " + _modelMetadata.description );
+		Log.out("ModelMakerClone.completeMake - needed info found: " + _modelMetadata.description );
 		super.markComplete( $success );
-		// how are sub models handled?
-		//_isImporting = false;
 	}
-/*	
-	override protected function markComplete( $success:Boolean ):void {
-		if ( false == $success && modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" ) {
-			// Are these needed?
-			ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
-			ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
-			_vm.complete = true;
-
-			modelInfo.changed = true;
-			modelInfo.oxelPersistence.changed = true;
-			_modelMetadata.changed = true;
-			_vm.save();
-
-			if ( null == _vm.instanceInfo.controllingModel ) {
-				// Only do this for top level models.
-				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(500);
-				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
-				diffPos = diffPos.add(lav);
-				_vm.instanceInfo.positionSet = diffPos;
-			}
-			Log.out("ModelMakerClone.completeMake - needed info found: " + _modelMetadata.description );
-		} else {
-			Log.out( "ModelMakerClone.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.WARN );
-
-			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
-		}
-
-		super.markComplete( $success);
-	}
-*/	
-	///////////////////////////////////////////
-}	
+}
 }

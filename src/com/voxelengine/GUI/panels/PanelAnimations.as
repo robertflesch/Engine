@@ -95,12 +95,12 @@ public class PanelAnimations extends PanelBase
 	
 	public function populateAnimations( $vm:VoxelModel ):void
 	{
+		_listAnimations.removeAll();
 		if ( !$vm ) {
 			Log.out( "PanelAnimations.populateAnimations - $VM is NULL", Log.WARN );
 			return;
 		}
 		_selectedModel = $vm;
-		_listAnimations.removeAll();
 		var anims:Vector.<Animation> = $vm.modelInfo.animations;
 		for each ( var anim:Animation in anims )
 		{

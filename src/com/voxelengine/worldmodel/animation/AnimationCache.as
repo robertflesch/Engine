@@ -181,6 +181,7 @@ public class AnimationCache
 		if ( anim ) {
 			_animations[$ae.aniGuid] = null;
 			if ( anim.animationSound ) {
+				anim.animationSound.reset();
 				SoundEvent.create( ModelBaseEvent.DELETE, 0, anim.animationSound.guid, null );
 			}
 		}

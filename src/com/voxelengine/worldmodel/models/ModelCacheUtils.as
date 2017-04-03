@@ -366,7 +366,7 @@ package com.voxelengine.worldmodel.models
 					continue;
 				// I suspect there is a way faster way to eliminate models that are far away.
 				// TODO - optimize RSF
-				if ( collideCandidate && collideCandidate.complete && collideCandidate != vm )
+				if ( collideCandidate && collideCandidate.complete && !collideCandidate.dead && collideCandidate != vm )
 				{
 					if ( !collideCandidate.modelInfo.oxelPersistence )
 						continue;

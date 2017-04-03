@@ -1085,16 +1085,20 @@ public class VoxelModel
 	{
 		instanceInfo.removeAllNamedTransforms();
 		//Log.out( "VoxelModel.stateSet - attachment found: " + modelInfo.fileName + " initializer: " + $useInitializer + "  setting data " + $at );
-		if ($at.hasPosition)
-			instanceInfo.positionSet = $at.position;
-		else
-			instanceInfo.positionReset();
-			
-		if ($at.hasRotation)
-			instanceInfo.rotationSet = $at.rotation;
-		else
-			instanceInfo.rotationReset();
-			
+		// if the object has a parent model, then use this data to reset the position within the parent model
+		// We DON'T want to change the position of objects which DON'T have a parent model
+		if ( instanceInfo.controllingModel ) {
+			if ($at.hasPosition)
+				instanceInfo.positionSet = $at.position;
+			else
+				instanceInfo.positionReset();
+
+			if ($at.hasRotation)
+				instanceInfo.rotationSet = $at.rotation;
+			else
+				instanceInfo.rotationReset();
+		}
+
 		if ($at.hasScale)
 			instanceInfo.scale = $at.scale;
 		else

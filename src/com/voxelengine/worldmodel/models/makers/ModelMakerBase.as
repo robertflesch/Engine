@@ -21,6 +21,8 @@ import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.*
 import com.voxelengine.worldmodel.models.types.VoxelModel
 
+import flash.geom.Vector3D;
+
 import org.flashapi.swing.Alert;
 
 /**
@@ -135,6 +137,7 @@ public class ModelMakerBase {
 	protected function markComplete( $success:Boolean ):void {
 		if ( $success ) {
 			_vm.complete = true;
+
 			if ( _vm && _addToRegionWhenComplete )
 				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vm );
 			RegionEvent.create(ModelBaseEvent.SAVE, 0, Region.currentRegion.guid, null);

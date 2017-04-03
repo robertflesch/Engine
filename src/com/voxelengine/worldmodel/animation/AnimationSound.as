@@ -27,14 +27,6 @@ public class AnimationSound extends PersistenceObject
 	static public const BIGDB_TABLE_SOUNDS:String = "sounds";
 	static public const SOUND_EXT:String = ".mp3";
 
-	static public var DEFAULT_OBJECT:Object = {
-		name: SOUND_INVALID,
-		soundRangeMax: 2000,
-	    soundRangeMin: 10
-	};
-	
-	public static const SOUND_INVALID:String = "SOUND_INVALID";
-	
 	private var _pitch:MP3Pitch = null;
 	private var _pitchRate:Number;
 	private var _owner:VoxelModel = null;
@@ -87,6 +79,7 @@ public class AnimationSound extends PersistenceObject
 			soundRangeMax = 2000;
 			soundRangeMin = 10;
 			dbo.name = guid;
+			dbo.hashTags = "#" + guid;
 		}
 
 		try {
@@ -99,7 +92,7 @@ public class AnimationSound extends PersistenceObject
 
 	override public function clone( $guid:String ):* {
 		dbo.ba.position = 0;
-		var newSnd:AnimationSound = new AnimationSound( Globals.getUID(), null, dbo.ba );
+		var newSnd:AnimationSound = new AnimationSound( $guid, null, dbo.ba );
 		newSnd.dbo.name = name;
 		newSnd.dbo.soundRangeMax = soundRangeMax;
 		newSnd.dbo.soundRangeMin = soundRangeMin;
@@ -115,10 +108,10 @@ public class AnimationSound extends PersistenceObject
 	//}
 	
 	public function reset():void {
+		stop();
 		SoundEvent.removeListener( ModelBaseEvent.ADDED, added );
 		SoundEvent.removeListener( ModelBaseEvent.RESULT, added );
 		SoundEvent.removeListener( ModelBaseEvent.UPDATE_GUID, updateGuid );
-		guid		= SOUND_INVALID;
 		if (soundRangeMax != 2000)
 			soundRangeMax	= 2000;
 		if (soundRangeMin != 10)

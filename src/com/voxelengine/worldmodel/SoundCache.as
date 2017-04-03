@@ -22,7 +22,6 @@ import com.voxelengine.worldmodel.models.Block;
 public class SoundCache
 {
 	static private var _sounds:Dictionary = new Dictionary(true);
-	static private var _soundsByName:Dictionary = new Dictionary(true);
 	static private var _block:Block = new Block();
 	
 	static public function init():void {
@@ -42,12 +41,8 @@ public class SoundCache
 			return;
 		}
 		Log.out( "SoundCache.request guid: " + $se.guid, Log.INFO );
-		var snd:AnimationSound;
-		if ( Globals.isGuid( $se.guid ) )
-			snd = _sounds[$se.guid];
-		else
-			snd = _soundsByName[$se.guid];
-			
+		var snd:AnimationSound = _sounds[$se.guid];
+
 		if ( null == snd ) {
 			if ( _block.has( $se.guid ) ) {
 				//Log.out( "SoundCache.request blocking on : " + $se.guid, Log.WARN )
@@ -69,7 +64,7 @@ public class SoundCache
 		if ( AnimationSound.SOUND_EXT != $pe.table && AnimationSound.BIGDB_TABLE_SOUNDS != $pe.table )
 			return;
 
-		Log.out( "SoundCache.request guid: " + $pe.guid, Log.INFO );
+		Log.out( "SoundCache.loadSucceed guid: " + $pe.guid, Log.INFO );
 
 			// dbo is loading from table, data if loading from import
 		if ( $pe.dbo || $pe.data ) {
@@ -104,9 +99,6 @@ public class SoundCache
 		if ( null == _sounds[$sp.guid] )
 			_sounds[$sp.guid] = $sp;
 		
-		if ( null == _soundsByName[$sp.dbo.name] )
-			_soundsByName[$sp.dbo.name] = $sp;
-			
 		SoundEvent.create( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $sp );
 	}
 	
@@ -129,8 +121,10 @@ public class SoundCache
 	}
 
 	static private function deleteHandler( $ae:SoundEvent ):void {
-		if ( _sounds[$ae.guid] ) 
+		if ( _sounds[$ae.guid] ) {
+			Log.out("SoundCache.deleteHandler guid: " + $ae.guid, Log.WARN);
 			_sounds[$ae.guid] = null;
+		}
 		// Delete regardless of whether or not is it already loaded.
 		PersistenceEvent.create( PersistenceEvent.DELETE_REQUEST, 0, AnimationSound.BIGDB_TABLE_SOUNDS, $ae.guid, null );
 	}

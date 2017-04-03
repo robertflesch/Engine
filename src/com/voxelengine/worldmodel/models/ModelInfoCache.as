@@ -98,6 +98,7 @@ public class ModelInfoCache
 	static private function deleteHandler( $mie:ModelInfoEvent ):void {
 		var mi:ModelInfo = _modelInfo[$mie.modelGuid]; 
 		if ( null != mi ) {
+			mi.release();
 			_modelInfo[$mie.modelGuid] = null; 
 			// TODO need to clean up eventually
 			mi = null;

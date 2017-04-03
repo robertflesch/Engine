@@ -17,7 +17,9 @@ import com.voxelengine.worldmodel.models.InstanceInfo
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase
 import com.voxelengine.worldmodel.models.types.VoxelModel
 
-	/**
+import flash.geom.Vector3D;
+
+/**
 	 * ...
 	 * @author Robert Flesch - RSF
 	 * This class is the main class of the model makers used to load data from persistance, 
@@ -79,7 +81,15 @@ public class ModelMaker extends ModelMakerBase {
 				WindowSplashEvent.dispatch(new WindowSplashEvent(WindowSplashEvent.ANNIHILATE))
 		}
 		removeListeners();
-		
+
+		if ( null == _vm.instanceInfo.controllingModel ) {
+			// Only do this for top level models.
+			var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(500);
+			var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
+			diffPos = diffPos.add(lav);
+			_vm.instanceInfo.positionSet = diffPos;
+		}
+
 		// do this last as it nulls everything.
 		super.markComplete( $success );
 		

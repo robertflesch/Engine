@@ -71,13 +71,25 @@ public class Animation extends PersistenceObject
 		changed = true;
 	}
 
-	public function Animation( $guid:String, $dbo:DatabaseObject, $importedData:Object ):void {
+	override public function clone( $modelGuid:String ):* {
+		var newAni:Animation = new Animation( Globals.getUID(), null, dbo, _animationSound );
+		AnimationEvent.create( ModelBaseEvent.CLONE, 0, $modelGuid, newAni.guid, newAni );
+		return newAni;
+	}
+
+	public function Animation( $guid:String, $dbo:DatabaseObject, $importedData:Object, $animationSound:AnimationSound = null ):void {
 		super( $guid, Globals.BIGDB_TABLE_ANIMATIONS );
 		if ( null == $dbo ) {
 			assignNewDatabaseObject();
 		} else {
 			dbo = $dbo;
 		}
+		if ( $animationSound ) {
+			_animationSound = $animationSound.clone(Globals.getUID());
+			if ( $importedData.sound )
+				delete $importedData.sound;
+		}
+
 		init( $importedData );
 
 	}
@@ -88,15 +100,6 @@ public class Animation extends PersistenceObject
 		dbo.description = "Enter description here";
 		dbo.type =  ANIMATION_STATE;
 		dbo.owner = Network.userId;
-	}
-
-	override public function clone( $modelGuid:String ):* {
-		var newAni:Animation = new Animation( Globals.getUID(), null, dbo );
-		AnimationEvent.create( ModelBaseEvent.CLONE, 0, $modelGuid, newAni.guid, newAni );
-		if ( _animationSound ) {
-			newAni._animationSound = _animationSound.clone(Globals.getUID());
-		}
-		return newAni;
 	}
 
 	override public function save():Boolean {

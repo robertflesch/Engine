@@ -8,18 +8,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.panels
 {
-import com.voxelengine.events.InventoryModelEvent;
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.ModelEvent;
-import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.GUI.panels.PanelBase;
-import com.voxelengine.GUI.voxelModels.WindowModelDetail;
-import com.voxelengine.worldmodel.models.ModelCache;
-import com.voxelengine.worldmodel.models.ModelCache;
-import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
@@ -27,19 +15,21 @@ import org.flashapi.swing.event.ListEvent;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.layout.AbsoluteLayout;
 import org.flashapi.swing.list.ListItem;
-import org.flashapi.swing.dnd.DnDOperation;
-
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.ModelEvent;
+import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.UIRegionModelEvent;
 import com.voxelengine.GUI.*;
 import com.voxelengine.GUI.inventory.WindowInventoryNew;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.GUI.voxelModels.WindowModelDetail;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.inventory.InventoryManager;
-import com.voxelengine.worldmodel.inventory.Inventory;
+import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 
 // all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
 public class PanelModels extends PanelBase
@@ -50,9 +40,9 @@ public class PanelModels extends PanelBase
 	private var _buttonContainer:Container;
 	private var _level:int;
 
-	private var _dupButton:Button
-	private var _detailButton:Button
-	private var _deleteButton:Button
+	private var _dupButton:Button;
+	private var _detailButton:Button;
+	private var _deleteButton:Button;
 	
 	public function PanelModels($parent:PanelModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number, $level:int )	{
 		super( $parent, $widthParam, $heightParam );
@@ -89,21 +79,21 @@ public class PanelModels extends PanelBase
 
 	private function modelDeletedGlobally( e:ModelInfoEvent ): void {
 		var modelFound:Boolean = true;
-		for ( var i:int; i < _listModels.length; i++ ) {
-			var listItem:ListItem = _listModels.getItemAt( i );
-			var vm:VoxelModel = listItem.data as VoxelModel;
-			if ( e.modelGuid == vm.modelInfo.guid ) {
+		for ( var i:int = 0; i < _listModels.length; i++ ) {
+			var guids:Object = getItem( i );
+			if ( e.modelGuid == guids.modelGuid ) {
 				_listModels.removeItemAt( i );
 				modelFound = true;
 				break;
 			}
 		}
-
+/*
 		if ( modelFound && vm ) {
-			UIRegionModelEvent.create(UIRegionModelEvent.SELECTED_MODEL_CHANGED, vm, _parentModel, +_level );
+			UIRegionModelEvent.create(UIRegionModelEvent.SELECTED_MODEL_REMOVED, vm, _parentModel, +_level );
 			// remove inventory
 			InventoryModelEvent.dispatch( new InventoryModelEvent( ModelBaseEvent.DELETE, "", vm.instanceInfo.instanceGuid, null ) )
 		}
+*/
 	}
 	
 	override public function close():void {
@@ -121,7 +111,7 @@ public class PanelModels extends PanelBase
 		_dictionarySource = $source;
 		_parentModel = $parentModel;
 		_listModels.removeAll();
-		var countAdded:int;
+		var countAdded:int = 0;
 		for each ( var vm:VoxelModel in _dictionarySource() )
 		{
 			if ( vm && !vm.instanceInfo.dynamicObject && !vm.dead ) {
@@ -137,12 +127,24 @@ public class PanelModels extends PanelBase
 				else
 					itemName = vm.modelInfo.guid;
 				//Log.out( "PanelModels.populateModels - adding: " + itemName );
-				
-				_listModels.addItem( itemName, vm );
+
+				addItem( itemName, vm.instanceInfo.instanceGuid, vm.modelInfo.guid );
 				countAdded++;
 			}
 		}
 		return countAdded;
+	}
+
+	private function addItem( $name:String, $instanceGuid:String, $modelGuid:String ):void {
+		_listModels.addItem( $name, { "instanceGuid" : $instanceGuid, "modelGuid" : $modelGuid } );
+	}
+
+	private function getItem( $index:int ):Object {
+		var listItem:ListItem = _listModels.getItemAt[ $index ];
+		if ( listItem )
+			return listItem.data as Object;
+		else
+			return { "instanceGuid" : "", "modelGuid" : "" };
 	}
 
 	//// FIXME This would be much better with drag and drop
@@ -214,7 +216,7 @@ public class PanelModels extends PanelBase
 				noModelSelected();
 			
 			function deleteModelCheck():void {
-				var alert:Alert = new Alert( "Do you really want to delete the model '" + VoxelModel.selectedModel.metadata.name + "'?", 400 )
+				var alert:Alert = new Alert( "Do you really want to delete the model '" + VoxelModel.selectedModel.metadata.name + "'?", 400 );
 				alert.setLabels( "Yes", "No" );
 				alert.alertMode = AlertMode.CHOICE;
 				$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
@@ -222,9 +224,9 @@ public class PanelModels extends PanelBase
 				
 				function alertAction( $ae:AlertEvent ):void {
 					if ( AlertEvent.ACTION == $ae.action )
-						deleteElement()
-					else ( AlertEvent.CHOICE == $ae.action )
-						doNotDelete()
+						deleteElement();
+					else if ( AlertEvent.CHOICE == $ae.action )
+						doNotDelete();
 				}
 				
 				function doNotDelete():void { /* do nothing */ }
@@ -232,7 +234,7 @@ public class PanelModels extends PanelBase
 			
 			function deleteElement():void {
 				Log.out( "PanelModels.deleteModel - " + VoxelModel.selectedModel.toString(), Log.WARN );
-				ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved )
+				ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
 				if ( VoxelModel.selectedModel.associatedGrain && VoxelModel.selectedModel.instanceInfo.controllingModel ) {
 					VoxelModel.selectedModel.instanceInfo.controllingModel.write( VoxelModel.selectedModel.associatedGrain, TypeInfo.AIR );
 				}
@@ -246,7 +248,7 @@ public class PanelModels extends PanelBase
 		
 		function modelRemoved( $me:ModelEvent ):void {
 			if ( $me.instanceGuid == VoxelModel.selectedModel.instanceInfo.instanceGuid ) {
-				ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved )
+				ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
 				if ( null == _parentModel ) {
 					VoxelModel.selectedModel.selected = false;
 					VoxelModel.selectedModel = null
@@ -270,26 +272,26 @@ public class PanelModels extends PanelBase
 		var instances:Vector.<VoxelModel> = Region.currentRegion.modelCache.instancesOfModelGet( $mme.modelGuid );
 		// should be one if I just imported it.
 		for each ( var vm:VoxelModel in instances ){
-			_listModels.addItem( vm.metadata.name, vm );
+			addItem( vm.metadata.name, vm.instanceInfo.instanceGuid, vm.modelInfo.guid );
 		}
 	}
 
 	private function metadataChanged( $mme:ModelMetadataEvent ):void {
-		
+		Log.out( "PanelModels.metaDataChanged - IS THIS NEEDED?", Log.WARN);
 		//if ( $mme.modelGuid == om.modelGuid ) {
 			//ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged )
 			//om.vmm = $mme.modelMetadata
 			//updateObjectInfo( om )
 		//}
+/*
 		for ( var i:int; i < _listModels.length; i++ ) {
 			var listItem:ListItem = _listModels.getItemAt( i )
-			var vm:VoxelModel = listItem.data as VoxelModel
-			if ( $mme.modelGuid == vm.modelInfo.guid ) {
-				//_listModels.removeItemAt( i )
-				_listModels.updateItemAt( i, vm.metadata.name, vm )
+			var guid:String = listItem.data as String;
+			if ( $mme.modelGuid == guid ) {
+				_listModels.updateItemAt( i, $mme., vm )
 			}
 		}
-		
+*/
 	}
 
 	import flash.utils.getTimer;
@@ -308,15 +310,20 @@ public class PanelModels extends PanelBase
 			if (event.target.data) {
 				//Log.out("PanelModels.selectModel has TARGET DATA");
 				buttonsEnable();
-				VoxelModel.selectedModel = event.target.data
-				// TO DO this is the right path, but probably need a custom event for this...
-				UIRegionModelEvent.create(UIRegionModelEvent.SELECTED_MODEL_CHANGED, VoxelModel.selectedModel, _parentModel, _level);
-				//_parent.childPanelAdd( _selectedModel );
-				//_parent.animationPanelAdd( _selectedModel );
+				var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( event.target.data.instanceGuid );
+				if ( vm ) {
+					VoxelModel.selectedModel = vm;
+					// TO DO this is the right path, but probably need a custom event for this...
+					UIRegionModelEvent.create(UIRegionModelEvent.SELECTED_MODEL_CHANGED, VoxelModel.selectedModel, _parentModel, _level);
+					//_parent.childPanelAdd( _selectedModel );
+					//_parent.animationPanelAdd( _selectedModel );
+				} else
+					buttonsDisable();
 			}
 			else {
 				//Log.out("PanelModels.selectModel has NO target data");
 				buttonsDisable();
+				VoxelModel.selectedModel = null;
 			}
 		}
 	}
@@ -343,7 +350,7 @@ public class PanelModels extends PanelBase
 		}
 	}
 	
-	private function noModelSelected():void	{
+	static private function noModelSelected():void	{
 		(new Alert( LanguageManager.localizedStringGet( "No_Model_Selected" ) )).display();
 	}
 	

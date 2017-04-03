@@ -245,14 +245,6 @@ public class ModelMakerImport extends ModelMakerBase {
 			_modelMetadata.changed = true;
 			_vm.save();
 
-			if ( null == _vm.instanceInfo.controllingModel ) {
-				// Only do this for top level models.
-				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(500);
-				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
-				diffPos = diffPos.add(lav);
-				_vm.instanceInfo.positionSet = diffPos;
-			}
-
 		} else {
 			if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
 				Log.out( "ModelMakerImport.markComplete - Failed import, BUT has biomes to attemptMake instead : " + modelInfo.guid, Log.ERROR );

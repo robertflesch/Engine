@@ -38,35 +38,26 @@ public class PanelAnimationSound extends ExpandableBox
 	}
 	
 	override protected function collapasedInfo():String  {
-		if ( AnimationSound.SOUND_INVALID == _ani.animationSound.guid ) {
-			_ebco.itemBox.showNew = true
-			return "No animationSound defined"
-		}
-		
-		_ebco.itemBox.showNew = false
-		_ebco.itemBox.showReset = true
+		_ebco.itemBox.showNew = false;
+		_ebco.itemBox.showReset = true;
 		return _ani.animationSound.guid + " min: " + _ani.animationSound.soundRangeMin + " max: " + _ani.animationSound.soundRangeMax
 	}
 	
 	override protected function resetElement():void  { 
-		_ani.animationSound.reset()
+		_ani.animationSound.reset();
 		changeMode()
 	}
 	
 	// This handles the new model transform
 	override protected function newItemHandler( $me:UIMouseEvent ):void 		{ 
 		
-		_ani.animationSound.guid = "Undefined Sound"
-		changeMode() // collapse container
-		changeMode() // reexpand so that new item is at the bottom
+		_ani.animationSound.guid = "Undefined Sound";
+		changeMode(); // collapse container
+		changeMode(); // reexpand so that new item is at the bottom
 	}
 	
 	override protected function expand():void {
-		super.expand()
-		
-		if ( AnimationSound.SOUND_INVALID == _ani.animationSound.guid ) {
-			return
-		}
+		super.expand();
 		
 		_itemBox.addElement( new ComponentLabelInput( "Name"
 									, function ($e:TextEvent):void { _ani.animationSound.guid = $e.target.text; setChanged(); }

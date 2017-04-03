@@ -39,12 +39,14 @@ package com.voxelengine.GUI.panels
 			modelPanelAdd();
 			
 			UIRegionModelEvent.addListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
+			UIRegionModelEvent.addListener( UIRegionModelEvent.SELECTED_MODEL_REMOVED, selectedModelRemoved );
         }
 		
 		override public function close():void {
 			super.close();
 			UIRegionModelEvent.removeListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
-			
+			UIRegionModelEvent.removeListener( UIRegionModelEvent.SELECTED_MODEL_REMOVED, selectedModelRemoved );
+
 			_listModels.close();
 			_listModels = null;
 			
@@ -79,7 +81,15 @@ package com.voxelengine.GUI.panels
 				scriptPanelAdd( e.voxelModel );
 			}
 		}
-		
+
+		private function selectedModelRemoved(e:UIRegionModelEvent):void {
+			if ( _level >= e.level ) {
+				childPanelRemove();
+				animationPanelRemove();
+				scriptPanelRemove();
+			}
+		}
+
 		public function updateChildren( $source:Function, $parentModel:VoxelModel, $removeAniAndScripts:Boolean = false ):void {
 			_parentModel = $parentModel;
 			if ( null != _listModels ) {

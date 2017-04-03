@@ -342,7 +342,7 @@ public class ModelInfo extends PersistenceObject
 			Log.out( "ModelInfo.animationsDelete - animations found" );
 			// Dont worry about removing the animations, since the modelInfo is being deleted.
 			for each ( var animData:Object in animationInfo ) {
-				Log.out( "ModelInfo.animationsDelete - deleteing animation: " + animData.guid );
+				Log.out( "ModelInfo.animationsDelete - deleting animation: " + animData.name + "  guid: " + animData.guid );
 				AnimationEvent.create( ModelBaseEvent.DELETE, 0, guid, animData.guid, null );
 			}
 		}
