@@ -53,13 +53,9 @@ public class ModelDestroyer {
 
 	private function dataResultFailed( $mie:ModelInfoEvent):void {
 		if ( _modelGuid == $mie.modelGuid ) {
-			//Log.out( "ModelDestroyer.dataResult - received modelInfo: " + $mie, Log.WARN );
-			// ModelInfo is model flaky right now, so if we don't find it, make sure to delete the Metadata and OxelData
-			ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, dataResult);
-			ModelInfoEvent.removeListener(ModelBaseEvent.ADDED, dataResult);
-
-			ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
-			OxelDataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
+			Log.out( "ModelDestroyer.dataResultFailed - received modelInfo: " + $mie, Log.WARN );
+			removeListeners();
+			removeTheRest();
 		}
 	}
 
@@ -67,10 +63,9 @@ public class ModelDestroyer {
 		if ( _modelGuid == $mie.modelGuid ) {
 			//Log.out( "ModelDestroyer.dataResult - received modelInfo: " + $mie, Log.WARN );
 			// Now that we have the modelData, we can extract the modelInfo
-			ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, dataResult );
-			ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, dataResult );
+			removeListeners();
 			
-			// now tell the modelData to remove all of the guids associated with this model.
+			// now have the modelData to remove all of the guids associated with this model.
 			if ( $mie.vmi )
 				$mie.vmi.animationsDelete();
 
@@ -80,10 +75,21 @@ public class ModelDestroyer {
 			else
 				ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
 
-			// Now delete the parents data
-			ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, _modelGuid, null );
-			OxelDataEvent.create( ModelBaseEvent.DELETE, 0, _modelGuid, null );
+			removeTheRest();
 		}
 	}
-}	
+
+	private function removeTheRest():void {
+		ModelMetadataEvent.create(ModelBaseEvent.DELETE, 0, _modelGuid, null);
+		OxelDataEvent.create(ModelBaseEvent.DELETE, 0, _modelGuid, null);
+		// TODO Inventory is by instance... but this is removing the model template.
+//			InventoryModelEvent.dispatch( new InventoryModelEvent( ModelBaseEvent.DELETE, "", vm.instanceInfo.instanceGuid, null ) )
+	}
+
+	private function removeListeners():void {
+		ModelInfoEvent.removeListener(ModelBaseEvent.RESULT, dataResult);
+		ModelInfoEvent.removeListener(ModelBaseEvent.ADDED, dataResult);
+	}
+
+}
 }
