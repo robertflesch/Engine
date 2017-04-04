@@ -8,7 +8,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 
+import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 
 import flash.display.Bitmap;
@@ -32,6 +34,7 @@ import com.voxelengine.worldmodel.PermissionsModel;
 
 public class ModelMetadata extends PersistenceObject
 {
+	private const DEFAULT_BOUND:int                       = 10;
 	private var _permissions:PermissionsModel;
 	private var _thumbnail:BitmapData;
 	
@@ -49,18 +52,25 @@ public class ModelMetadata extends PersistenceObject
 	
 	public function get animationClass():String 			{ return dbo.animationClass; }
 	public function set animationClass(value:String):void  	{ dbo.animationClass = value; changed = true; }
-	
+
+	public function get version():int 							{ return dbo.version; }
+	public function set version( value:int ):void				{ dbo.version = value; }
+
+	public function get bound():int 							{ return dbo.bound; }
+	public function set bound( value:int ):void					{
+		if ( dbo.bound != value ) {
+			changed = true;
+			dbo.bound = value;
+		} }
+
+	public function get creator():int 							{ return dbo.creator; }
+
 	public function get thumbnail():BitmapData 				{ return _thumbnail; }
 	public function set thumbnail(value:BitmapData):void 	{ _thumbnail = value; changed = true; }
 
 	private var _thumbnailLoaded:Boolean;
 	public function get thumbnailLoaded():Boolean 			{ return _thumbnailLoaded; }
 	public function set thumbnailLoaded($val:Boolean):void  { _thumbnailLoaded = $val; }
-
-	public function get version():int 							{ return dbo.version; }
-	public function set version( value:int ):void				{ dbo.version = value; }
-
-	public function get creator():int 							{ return dbo.creator; }
 
 	public function toString():String {
 		return "name: " + name + "  description: " + description + "  guid: " + guid + "  owner: " + owner;
@@ -77,8 +87,21 @@ public class ModelMetadata extends PersistenceObject
 
 		init( this, $newData );
 
-		if ( "EditCursor" != guid )
-			ModelMetadataEvent.addListener( ModelBaseEvent.SAVE, saveEvent );
+		if ( "EditCursor" != guid ) {
+			ModelMetadataEvent.addListener(ModelBaseEvent.SAVE, saveEvent);
+			OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelReady );
+			ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
+		}
+
+		function oxelReady( $ode:OxelDataEvent ):void {
+			if ( $ode.modelGuid == guid ) {
+				if ($ode.oxelData && $ode.oxelData.bound) {
+					bound = $ode.oxelData.bound;
+				}
+				save();
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelReady );
+			}
+		}
 
 		function init( $modelMetadata:ModelMetadata, $newData:Object = null ):void {
 
@@ -109,12 +132,20 @@ public class ModelMetadata extends PersistenceObject
 
 	}
 
+	private function metadataChanged( $mme:ModelMetadataEvent ):void {
+		Log.out( "PanelModels.metaDataChanged - IS THIS NEEDED?", Log.WARN);
+		if ( $mme.modelGuid == guid ) {
+			Log.out( "ModelMetaData.changed - how to do update with new data?", Log.WARN );
+			// or do I even need to?
+		}
+	}
+
+
 	override protected function assignNewDatabaseObject():void {
 		super.assignNewDatabaseObject();
 		setToDefault();
 
 		function setToDefault():void {
-			dbo.thumbnailLoaded = false;
 			dbo.hashTags = "#new";
 			_thumbnail = null;
 			animationClass = "";
@@ -123,6 +154,7 @@ public class ModelMetadata extends PersistenceObject
 			name = "Default";
 			owner = "";
 			version = Globals.VERSION;
+			bound = DEFAULT_BOUND;
 		}
 	}
 
@@ -130,14 +162,12 @@ public class ModelMetadata extends PersistenceObject
 		var oldGuid:String = super.guid;
 		super.guid = $newGuid;
 		ModelMetadataEvent.create( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null );
-		changed = true;
 	}
 	
 	
 	override public function release():void {
 		ModelMetadataEvent.removeListener( ModelBaseEvent.SAVE, saveEvent );
-		//ModelMetadataEvent.removeListener( ModelBaseEvent.LOAD, 		load );
-		
+		ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
 	}
 	
 	// This was private, force a message to be sent to it.
