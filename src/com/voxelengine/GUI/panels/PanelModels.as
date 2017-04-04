@@ -31,13 +31,14 @@ import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 
+import org.flashapi.swing.text.UITextField;
+
 // all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
 public class PanelModels extends PanelBase
 {
 	private var _parentModel:VoxelModel;
 	private var _listModels:ListBox;
 	private var _dictionarySource:Function;
-	private var _buttonContainer:Container;
 	private var _level:int;
 
 	private var _dupButton:Button;
@@ -55,7 +56,6 @@ public class PanelModels extends PanelBase
 		_listModels.draggable = true;
 
 		_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, selectModel );		
-		ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
 		ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
 
 		buttonsCreate();
@@ -77,6 +77,7 @@ public class PanelModels extends PanelBase
 		//_listModels.eventCollector.addEvent( _listModels, ListEvent.DATA_PROVIDER_CHANGED, function( $le:ListEvent ):void { Log.out( "PanelModel.listModelEvent - DATA_PROVIDER_CHANGED $le: " + $le ) } )		
 	}
 
+	// This model is being removed from the library of models, remove all instances of it.
 	private function modelDeletedGlobally( e:ModelInfoEvent ): void {
 		var modelFound:Boolean = true;
 		for ( var i:int = 0; i < _listModels.length; i++ ) {
@@ -84,14 +85,15 @@ public class PanelModels extends PanelBase
 			if ( e.modelGuid == guids.modelGuid ) {
 				_listModels.removeItemAt( i );
 				modelFound = true;
-				break;
+				if ( VoxelModel.selectedModel && VoxelModel.selectedModel.modelInfo == guids.modelInfo ) {
+					VoxelModel.selectedModel = null;
+					_selectedText.text = "";
+				}
 			}
 		}
 /*
 		if ( modelFound && vm ) {
 			UIRegionModelEvent.create(UIRegionModelEvent.SELECTED_MODEL_REMOVED, vm, _parentModel, +_level );
-			// remove inventory
-			InventoryModelEvent.dispatch( new InventoryModelEvent( ModelBaseEvent.DELETE, "", vm.instanceInfo.instanceGuid, null ) )
 		}
 */
 	}
@@ -99,7 +101,6 @@ public class PanelModels extends PanelBase
 	override public function close():void {
 		super.close();
 		_listModels.removeEventListener( ListEvent.LIST_CHANGED, selectModel );
-		ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged );
 		ModelMetadataEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
 
 		_parentModel = null;
@@ -147,60 +148,69 @@ public class PanelModels extends PanelBase
 			return { "instanceGuid" : "", "modelGuid" : "" };
 	}
 
+	private var _selectedText:Text
 	//// FIXME This would be much better with drag and drop
 	// meaning removing the buttons completely
 	private function buttonsCreate():void {
 		
 		const btnWidth:int = width - 10;
+		var container:Container;
+
 		//Log.out( "PanelModels.buttonsCreate" );
-		_buttonContainer = new Container( width, 10 );
-		//_buttonContainer.layout.orientation = LayoutOrientation.VERTICAL;
-		_buttonContainer.layout = new AbsoluteLayout();
-		_buttonContainer.padding = 0;
-		_buttonContainer.height = 0;
-		addElementAt( _buttonContainer, 0 );
+		container = new Container( width, 10 );
+		//container.layout.orientation = LayoutOrientation.VERTICAL;
+		container.layout = new AbsoluteLayout();
+		container.padding = 0;
+		container.height = 0;
+		addElementAt( container, 0 );
+		const BUTTON_DISTANCE:int = 25;
+		var currentY:int = 5;
+
+		_selectedText = new Text( width, 30 );
+		container.addElement( _selectedText );
+		_selectedText.y = currentY;
 
 		var addButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Add" )  );
 		//addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
 		addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, addModel );
 		
-		addButton.y = 5;			
+		addButton.y = currentY = currentY + BUTTON_DISTANCE;
 		addButton.x = 2;			
 		addButton.width = btnWidth;
-		_buttonContainer.addElement( addButton );
-		_buttonContainer.height += addButton.height + pbPadding;
+		container.addElement( addButton );
+		container.height += addButton.height + pbPadding;
 		
 		_deleteButton = new Button( LanguageManager.localizedStringGet( "Model_Delete" ) );
-		_deleteButton.y = 30;			
+		_deleteButton.y = currentY = currentY + BUTTON_DISTANCE;
 		_deleteButton.x = 2;			
 		_deleteButton.width = width - 10;
 		_deleteButton.enabled = false;
 		_deleteButton.active = false;
 		_deleteButton.eventCollector.addEvent( _deleteButton, UIMouseEvent.CLICK, deleteModelHandler );
 		_deleteButton.width = btnWidth;
-		_buttonContainer.addElement( _deleteButton );
-		_buttonContainer.height += _deleteButton.height + pbPadding;
+		container.addElement( _deleteButton );
+		container.height += _deleteButton.height + pbPadding;
 		
 		_detailButton = new Button( LanguageManager.localizedStringGet( "Model_Detail" ) );
-		_detailButton.y = 55;			
+		_detailButton.y = currentY = currentY + BUTTON_DISTANCE;
 		_detailButton.x = 2;			
 		_detailButton.width = width - 10;
 		_detailButton.enabled = false;
 		_detailButton.active = false;
 		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new WindowModelDetail( VoxelModel.selectedModel ); } );
 		_detailButton.width = btnWidth;
-		_buttonContainer.addElement( _detailButton );
+		container.addElement( _detailButton );
 
 		if ( Globals.isDebug ) {
 			_dupButton = new Button( LanguageManager.localizedStringGet( "DUP" ) );
-			_dupButton.y = 75;
+			_dupButton.y = currentY = currentY + BUTTON_DISTANCE;
 			_dupButton.x = 2;
 			_dupButton.width = width - 10;
 			_dupButton.enabled = false;
 			_dupButton.active = false;
 			_dupButton.eventCollector.addEvent( _dupButton, UIMouseEvent.CLICK, dupModel );
 			_dupButton.width = btnWidth;
-			_buttonContainer.addElement( _dupButton );
+			container.addElement( _dupButton );
 
 		}
 
@@ -276,24 +286,6 @@ public class PanelModels extends PanelBase
 		}
 	}
 
-	private function metadataChanged( $mme:ModelMetadataEvent ):void {
-		Log.out( "PanelModels.metaDataChanged - IS THIS NEEDED?", Log.WARN);
-		//if ( $mme.modelGuid == om.modelGuid ) {
-			//ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged )
-			//om.vmm = $mme.modelMetadata
-			//updateObjectInfo( om )
-		//}
-/*
-		for ( var i:int; i < _listModels.length; i++ ) {
-			var listItem:ListItem = _listModels.getItemAt( i )
-			var guid:String = listItem.data as String;
-			if ( $mme.modelGuid == guid ) {
-				_listModels.updateItemAt( i, $mme., vm )
-			}
-		}
-*/
-	}
-
 	import flash.utils.getTimer;
 	private var doubleMessageHackTime:int = getTimer();
 	private function get doubleMessageHack():Boolean {
@@ -313,6 +305,7 @@ public class PanelModels extends PanelBase
 				var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( event.target.data.instanceGuid );
 				if ( vm ) {
 					VoxelModel.selectedModel = vm;
+					_selectedText.text = vm.metadata.name;
 					// TO DO this is the right path, but probably need a custom event for this...
 					UIRegionModelEvent.create(UIRegionModelEvent.SELECTED_MODEL_CHANGED, VoxelModel.selectedModel, _parentModel, _level);
 					//_parent.childPanelAdd( _selectedModel );
@@ -324,6 +317,7 @@ public class PanelModels extends PanelBase
 				//Log.out("PanelModels.selectModel has NO target data");
 				buttonsDisable();
 				VoxelModel.selectedModel = null;
+				_selectedText.text = "";
 			}
 		}
 	}
