@@ -11,8 +11,11 @@ import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
+
 import flash.display.DisplayObject;
 import flash.events.Event;
+import flash.geom.Vector3D;
 import flash.net.FileReference;
 import flash.net.FileFilter;
 
@@ -217,6 +220,17 @@ public class InventoryPanelModel extends VVContainer
 			ii.instanceGuid = Globals.getUID();
 			if ( VoxelModel.selectedModel )
 				ii.controllingModel = VoxelModel.selectedModel;
+			else {
+				// Only do this for top level models.
+				var size:int = Math.max( GrainCursor.get_the_g0_edge_for_grain(om.vmm.bound), 32 );
+				// this give me edge,  really want center.
+				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
+				lav.setTo( lav.x - size/2, lav.y - size/2, lav.z - size/2);
+				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
+				diffPos = diffPos.add(lav);
+				ii.positionSet = diffPos;
+			}
+
 			ModelMakerBase.load( ii );
 		}
 	}

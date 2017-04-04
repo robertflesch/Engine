@@ -14,6 +14,7 @@ import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.oxel.VisitorFunctions;
 
@@ -244,6 +245,17 @@ public class ModelMakerImport extends ModelMakerBase {
 			modelInfo.changed = true;
 			_modelMetadata.changed = true;
 			_vm.save();
+
+			if ( modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxel && modelInfo.oxelPersistence.oxel.gc.bound ){
+				// Only do this for top level models.
+				var size:int = Math.max( GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 32 );
+				// this give me edge,  really want center.
+				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
+				lav.setTo( lav.x - size/2, lav.y - size/2, lav.z - size/2);
+				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
+				diffPos = diffPos.add(lav);
+				ii.positionSet = diffPos;
+			}
 
 		} else {
 			if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
