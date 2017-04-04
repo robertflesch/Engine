@@ -10,21 +10,15 @@ package com.voxelengine.worldmodel.models.makers
 import com.voxelengine.Log
 import com.voxelengine.events.ModelMetadataEvent
 import com.voxelengine.events.ModelBaseEvent
-import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.WindowSplashEvent
-import com.voxelengine.worldmodel.Region
 import com.voxelengine.worldmodel.models.InstanceInfo
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase
-import com.voxelengine.worldmodel.models.types.VoxelModel
-
-import flash.geom.Vector3D;
 
 /**
 	 * ...
 	 * @author Robert Flesch - RSF
 	 * This class is the main class of the model makers used to load data from persistance, 
-	 * The base class loads the modelInfo, this class loads the model metadata
-	 * when both are non null, the voxel model is created.
+	 * The base class loads the modelInfo (which exists on the disk for imported models),
+ 	 * this class loads the model metadata and attempts to create the model
 	 * ModelMakers are temporary objects which go away after the model has loaded or failed.
 	 */
 public class ModelMaker extends ModelMakerBase {
@@ -43,14 +37,14 @@ public class ModelMaker extends ModelMakerBase {
 	
 	override protected function retrieveBaseInfo():void {
 		super.retrieveBaseInfo();
-		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retrivedMetadata );
-		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retrivedMetadata );
+		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retrievedMetadata );
+		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retrievedMetadata );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );
 	
 		ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null );
 	}
 	
-	private function retrivedMetadata( $mme:ModelMetadataEvent):void {
+	private function retrievedMetadata( $mme:ModelMetadataEvent):void {
 		if ( ii.modelGuid == $mme.modelGuid ) {
 			_modelMetadata = $mme.modelMetadata;
 			//Log.out( "ModelMaker.retrivedMetadata - metadata: " + _modelMetadata.toString() )
@@ -64,7 +58,7 @@ public class ModelMaker extends ModelMakerBase {
 		}
 	}
 	
-	// once they both have been retrived, we can make the object
+	// once they both have been retrieved, we can make the object
 	override protected function attemptMake():void {
 		if ( null != _modelMetadata && null != modelInfo ) {
 			//Log.out( "ModelMaker.attemptMake - ii: " + ii.toString() )
@@ -86,8 +80,8 @@ public class ModelMaker extends ModelMakerBase {
 		super.markComplete( $success );
 		
 		function removeListeners():void {
-			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrivedMetadata );
-			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrivedMetadata );
+			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrievedMetadata );
+			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrievedMetadata );
 			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata )	
 		}		
 		
