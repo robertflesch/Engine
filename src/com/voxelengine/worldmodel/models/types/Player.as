@@ -97,6 +97,7 @@ public class Player
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.modelGuid = $modelGuid;
 		ii.instanceGuid = $userId;
+		ii.centerSetComp(7.5,0,7.5);
 
 		if ( DEFAULT_PLAYER == $modelGuid ) {
 			//Log.out( "Avatar.createPlayer - creating DEFAULT_PLAYER from GenerateCube", Log.WARN )
