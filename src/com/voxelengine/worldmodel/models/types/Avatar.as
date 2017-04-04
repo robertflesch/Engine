@@ -7,22 +7,16 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelEvent;
-import com.voxelengine.events.ModelLoadingEvent;
-import com.voxelengine.renderer.lamps.BlackLamp;
-import com.voxelengine.renderer.lamps.Lamp;
-import com.voxelengine.renderer.lamps.LampBright;
-import com.voxelengine.renderer.lamps.RainbowLight;
 import com.voxelengine.renderer.lamps.ShaderLight;
-import com.voxelengine.renderer.lamps.Torch;
 import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.worldmodel.MouseKeyboardHandler;
-import com.voxelengine.worldmodel.inventory.ObjectAction;
-import com.voxelengine.worldmodel.inventory.ObjectTool;
+import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.CameraLocation;
 import com.voxelengine.worldmodel.models.CollisionPoint;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+import com.voxelengine.worldmodel.models.CollisionTest;
+import com.voxelengine.worldmodel.models.Location;
+import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.weapons.Bomb;
 import com.voxelengine.worldmodel.weapons.Gun;
 
@@ -31,16 +25,10 @@ import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.utils.getQualifiedClassName;
 
-import playerio.PlayerIOError;
-import playerio.DatabaseObject;
-
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 
-import com.voxelengine.server.Network
-
 import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.types.ControllableVoxelModel;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
@@ -72,10 +60,10 @@ public class Avatar extends ControllableVoxelModel
 		instanceInfo.usesCollision = true;
 		clipVelocityFactor = AVATAR_CLIP_FACTOR;
 		torchToggle();
-		collisionPointsAdd();
-		_displayCollisionMarkers = true;
-		if ( _displayCollisionMarkers )
-			_ct.markersAdd();
+//		collisionPointsAdd();
+//		_displayCollisionMarkers = true;
+//		if ( _displayCollisionMarkers )
+//			_ct.markersAdd();
 	}
 
 	override public function buildExportObject():void {
@@ -93,8 +81,7 @@ public class Avatar extends ControllableVoxelModel
 			//if ( lastCollisionModel && lastCollisionModel.instanceInfo.dead )
 			//lastCollisionModelReset();
 
-			if ( false == controlledModelChecks( $elapsedTimeMS ) )
-			{
+			if ( false == controlledModelChecks( $elapsedTimeMS ) ) {
 				stateSet( "PlayerAniStand", 1 ); // Should be crash?
 				return false;
 			}
@@ -112,27 +99,16 @@ public class Avatar extends ControllableVoxelModel
 		 {
 		 stateSet( "Pick", 1 );
 		 }*/
-
 		if ( -0.4 > instanceInfo.velocityGet.y )
-		{
 			updateAnimations( "Jump", 1 );
-		}
 		else if ( 0.4 < instanceInfo.velocityGet.y )
-		{
 			updateAnimations( "Fall", 1 );
-		}
 		else if ( 0.2 < Math.abs( instanceInfo.velocityGet.z )  )
-		{
 			updateAnimations( "Walk", 2 );
-		}
 		else if ( 0.2 < Math.abs( instanceInfo.velocityGet.x )  )
-		{
 			updateAnimations( "Slide", 1 );
-		}
 		else
-		{
 			stateSet( "Stand", 1 );
-		}
 		//trace( "Avatar.update - end" );
 	}
 
@@ -173,7 +149,8 @@ public class Avatar extends ControllableVoxelModel
 		if ( !_ct.hasPoints() ) {
 			_ct.addCollisionPoint( new CollisionPoint( FALL, new Vector3D( 7.5, -1, 7.5 ), false ) );
 
-			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
+			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 1, Globals.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
+			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 14, Globals.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
 			//_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX/2, 0 ) ) );
 			//_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX, 0 ) ) );
 			//			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 11, Globals.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
@@ -190,7 +167,183 @@ public class Avatar extends ControllableVoxelModel
 			//_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 0, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
 		}
 
-		//_ct.markersAdd();
+		// so I have to generate the markers first
+		if ( "" == CollisionTest.markerGuid ) {
+			CollisionTest.markerGuid = Globals.getUID();
+			var model:Object = GenerateCube.script(0, TypeInfo.RED);
+			model.name = "CollisionPoint";
+
+			var collisionPointMarker:InstanceInfo = new InstanceInfo();
+			collisionPointMarker.instanceGuid = Globals.getUID();
+			collisionPointMarker.modelGuid = CollisionTest.markerGuid;
+			collisionPointMarker.name = "DefaultCollisionPoint";
+			collisionPointMarker.dynamicObject = true;
+			new ModelMakerGenerate( collisionPointMarker, model, false );
+		}
+	}
+
+	// returns -1 if new position is valid, returns 0-2 if there was collision
+	// 0-2 is the number of steps back to take in position queue
+	override protected function collisionCheckNew( $elapsedTimeMS:Number, $loc:Location, $collisionCandidate:VoxelModel, $stepUpCheck:Boolean = true ):int {
+
+		//if ( $loc.velocityGet.y != 0 )
+		//	Log.out( "Player.collisionCheckNew - ENTER: vel.y: " + instanceInfo.velocityGet.y );
+		var foot:int = 0;
+		var body:int = 0;
+		var head:int = 0;
+		var fall:int = 0;
+		// reset all the points to be in a non collided state
+		_ct.setValid();
+		var points:Vector.<CollisionPoint> = _ct.collisionPoints();
+		// the amount that the test point pushes forward from current position
+		// currently basing it on velocity in Z dir
+		const LOOK_AHEAD:int = 10;
+		var velocityScale:Number = $loc.velocityGet.z * LOOK_AHEAD;
+
+		for each ( var cp:CollisionPoint in points )
+		{
+			if ( cp.scaled )
+				cp.scale( velocityScale );
+
+			// takes the cp point which is in model space, and puts it in world space
+			var posWs:Vector3D = $loc.modelToWorld( cp.pointScaled );
+
+			// pass in the world space coordinate to get back whether the oxel at the location is solid
+			$collisionCandidate.isSolidAtWorldSpace( cp, posWs, MIN_COLLISION_GRAIN, this );
+			// if collided, increment the count on that collision point set
+			if ( true == cp.collided )
+			{
+				if ( FALL == cp.name ) fall++;
+				else if ( FOOT == cp.name ) foot++;
+				else if ( BODY == cp.name ) body++;
+				else if ( HEAD == cp.name ) head++;
+			}
+		}
+		// fall point is in space! falling....
+		if ( !fall )
+		{
+			//Log.out( "Player.collisionCheckNew - fall" );
+			//Log.out( "Player.collisionCheckNew - FALL fall = 0, foot=0, stepUp: " + $stepUpCheck + " velocityGet.y: " + $loc.velocityGet.y );
+			if ( usesGravity ) {
+				this.fall( $loc, $elapsedTimeMS );
+			}
+
+			onSolidGround = false;
+			if ( foot || body || head )
+			{
+				if ( mMaxFallRate > $loc.velocityGet.y && usesGravity )
+					$loc.velocitySetComp( 0, $loc.velocityGet.y + (0.0033333333333333 * $elapsedTimeMS) + 0.5, 0 );
+
+				return -1;
+			}
+			return -1;
+		}
+
+		// Everything is clear
+		if ( !head && !foot && !body )
+		{
+			//Log.out( "Player.collisionCheckNew - all good" );
+			return -1;
+		}
+		else if ( foot && !body && !head )
+		{
+			//Log.out( "Player.collisionCheckNew - foot" );
+			lastCollisionModel = $collisionCandidate;
+			onSolidGround = true;
+			$loc.velocityResetY();
+
+			// oxel that fall point is in
+			var go:Oxel = points[0].oxel;
+			// its localation in MS (ModelSpace)
+			var msCoord:int = go.gc.getModelY();
+			// add its height in MS
+			msCoord += go.size_in_world_coordinates();
+			// if foot oxel, then there are two choices
+			// 1) foot is in ground, in which case we should adjust avatars position
+			// 2) there is a step up chance
+
+			// oxel that foot point is in
+			var fo:Oxel = points[1].oxel;
+			var msCoordFoot:int = fo.gc.getModelY();
+			msCoordFoot += fo.size_in_world_coordinates();
+			// we need to do minor adjustment on foot position?
+			if ( fo.gc.grain == go.gc.grain && fo.gc.grainY == go.gc.grainY || msCoord == msCoordFoot )
+			{
+				//Log.out( "Player.collisionCheckNew - FOOT in solid ground adjusting foot height" );
+				// add its height in MS
+				msCoord = msCoordFoot;
+				_sScratchVector.setTo( 0, msCoord, 0 );
+				var wsCoord:Vector3D = $collisionCandidate.modelToWorld( _sScratchVector );
+				$loc.positionSetComp( $loc.positionGet.x, wsCoord.y, $loc.positionGet.z );
+				//Log.out( "Player.collisionCheckNew - FOOT in solid ground adjusting foot height to: " + wsCoord.y );
+				return -1;
+			}
+			else // step up chance
+			{
+				var stepUpSize:int = msCoordFoot - msCoord;
+				if ( 0 == stepUpSize )
+				{
+					Log.out( "Player.collisionCheckNew - REJECT - step up size is 0 why? " + stepUpSize );
+					return 0;
+				}
+				else if ( STEP_UP_MAX < stepUpSize )
+				{
+					Log.out( "Player.collisionCheckNew - REJECT - step TOO large: " + stepUpSize );
+					return 0;
+				}
+
+				const STEP_SIZE_GRAIN:int = 4;
+				if ( STEP_SIZE_GRAIN == fo.gc.grain )
+				{
+					var stepUpOxel:Oxel = fo.neighbor(Globals.POSY);
+					if ( stepUpOxel.childrenHas() )
+					{
+						Log.out( "Player.collisionCheckNew - REJECT - step has kids or is solid: " + stepUpSize + " need a more detailed examination of children" );
+						return 0;
+					}
+				}
+				else if ( STEP_SIZE_GRAIN > fo.gc.grain ) // This grain is too small, bump up to STEP_SIZE
+				{
+					Log.out( "Player.collisionCheckNew - step smaller then l meter:" );
+					var stepUpOxel1:Oxel = fo.neighbor(Globals.POSY);
+					if ( Globals.BAD_OXEL != stepUpOxel1 )
+					{
+						var msCoordFoot1:int = stepUpOxel1.gc.getModelY();
+						msCoordFoot1 += stepUpOxel1.size_in_world_coordinates();
+						_sScratchVector.setTo( 0, msCoordFoot1, 0 );
+						var wsCoord1:Vector3D = $collisionCandidate.modelToWorld( _sScratchVector );
+						$loc.positionSetComp( $loc.positionGet.x, wsCoord1.y, $loc.positionGet.z );
+						Log.out( "Player.collisionCheckNew - step  too small: adjusting foot height to: " + wsCoord1.y );
+						return -1;
+//						Log.out( "Player.collisionCheckNew - REJECT - step  too small: " + fo.gc.grain + " need a more detailed examination of children" );
+//						return 0;
+					}
+				}
+				//Log.out( "Player.collisionCheckNew - PASS stepupSize: " + stepUpSize + " ADDING transform" );
+
+				// Dont like adding this to instance info... when everything else is using loc
+				jump( 1 );
+			}
+		}
+		else if ( ( head || body ) && !foot )
+		{
+			// We probably jumped up into something
+			//Log.out( "Player.collisionCheckNew - HEAD failed to clear" );
+			return 2;
+		}
+		else if ( head && body && foot )
+		{
+			// Wall crawling
+			//Log.out( "Player.collisionCheckNew - EVERYTHING failed to clear" );
+			return 0;
+		}
+		else if ( head || body || foot )
+		{
+			Log.out( "Player.collisionCheckNew - something failed to clear foot:" + foot + " body: " + body + " head: " + head );
+			return 1;
+		}
+		Log.out( "Player.collisionCheckNew - ALL CLEAR" );
+		return -1;
 	}
 
 	override protected function cameraAddLocations():void {
