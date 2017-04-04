@@ -31,7 +31,7 @@ import playerio.DatabaseObject;
 public class ModelMakerLocal extends ModelMakerBase {
 	
 	public function ModelMakerLocal( $ii:InstanceInfo ) {
-		Log.out( "------------------ModelMakerLocal ii.modelGuid: " + $ii.modelGuid + "-----------------------", Log.ERROR );
+		Log.out( "------------------ModelMakerLocal ii.modelGuid: " + $ii.modelGuid + "-----------------------", Log.DEBUG );
 		super( $ii, false );
 		// keeps track of how many makers there currently are.
 		makerCountIncrement();
