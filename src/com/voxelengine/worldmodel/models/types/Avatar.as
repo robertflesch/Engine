@@ -67,6 +67,15 @@ public class Avatar extends ControllableVoxelModel
 	
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
+		// should just do this for the players avatar
+		hasInventory = true;
+		instanceInfo.usesCollision = true;
+		clipVelocityFactor = AVATAR_CLIP_FACTOR;
+		torchToggle();
+		collisionPointsAdd();
+		_displayCollisionMarkers = true;
+		if ( _displayCollisionMarkers )
+			_ct.markersAdd();
 	}
 
 	override public function buildExportObject():void {
@@ -224,13 +233,12 @@ public class Avatar extends ControllableVoxelModel
 		if ( 0 < Shader.lightCount() ) {
 			var sl:ShaderLight = Shader.lights(0);
 			var vmPos:Vector3D;
-			if ( VoxelModel.controlledModel == this )
-				vmPos = instanceInfo.positionGet;
-			else
-				vmPos = VoxelModel.controlledModel.instanceInfo.positionGet;
-
-			sl.position.setTo( vmPos.x + 4, vmPos.y + 30, vmPos.z );
-			sl.update();
+			var cm:VoxelModel = VoxelModel.controlledModel;
+			if ( cm ) {
+				vmPos = cm.instanceInfo.positionGet;
+				sl.position.setTo(vmPos.x + 4, vmPos.y + 30, vmPos.z);
+				sl.update();
+			}
 		}
 
 		super.update( $context, $elapsedTimeMS );
