@@ -580,9 +580,10 @@ public class ControllableVoxelModel extends VoxelModel
 		//Log.out( "updateVelocity this == VoxelModel.controlledModel " + (this == VoxelModel.controlledModel) + " Globals.active: " + Globals.active );
 
 		var changed:Boolean = false;
-		
+
+		var cm:VoxelModel = VoxelModel.controlledModel;
 		// if app is not active, we still need to clip velocitys, but we dont need keyboard or mouse movement
-		if ( this == VoxelModel.controlledModel && Globals.active )
+		if ( this == cm && Globals.active )
 		{
 			var vel:Vector3D = instanceInfo.velocityGet;
 			var speedVal:Number = instanceInfo.speed( $elapsedTimeMS ) / 4;
@@ -605,18 +606,15 @@ public class ControllableVoxelModel extends VoxelModel
 			if ( MouseKeyboardHandler.down )	  	{ instanceInfo.velocitySetComp( vel.x, vel.y + speedVal, vel.z ); changed = true; }
 			if ( MouseKeyboardHandler.up )
 			{
-				if ( VoxelModel.controlledModel && VoxelModel.controlledModel.usesGravity )
-				{
+				if ( cm.usesGravity ) {
 					// Idea here is to keep the player from jumping unless their feet are on the ground.
 					// If you wanted to add rocket boots, this is where is what it would effect
-					if ( onSolidGround )
-					{
+					if ( onSolidGround ) {
 						jump( 2 );
 						changed = true;
 					}
 				}
-				else 
-				{
+				else  {
 					instanceInfo.velocitySetComp( vel.x, vel.y - speedVal, vel.z )
 					changed = true;
 				}
