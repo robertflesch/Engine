@@ -151,6 +151,7 @@ package com.voxelengine.worldmodel
 			if ( _s_currentRegion )
 				RegionEvent.create( RegionEvent.UNLOAD, 0, _s_currentRegion.guid );
 			_s_currentRegion = this;
+			VoxelModel.selectedModel = null;
 			
 			_modelCache = new ModelCache();
 			
