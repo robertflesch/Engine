@@ -12,9 +12,6 @@ import com.developmentarc.core.tasks.tasks.AbstractTask;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.OxelPersistence;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -43,16 +40,16 @@ public class OxelLoadAndBuildTasks extends AbstractTask {
     override public function start():void {
         super.start(); // AbstractTask will send event
 
-        OxelDataEvent.addListener(OxelDataEvent.OXEL_READY, fromByteArrayComplete );
-        OxelDataEvent.addListener(OxelDataEvent.OXEL_FAILED, fromByteArrayFailed );
+        OxelDataEvent.addListener(OxelDataEvent.OXEL_FBA_COMPLETE, fromByteArrayComplete );
+        OxelDataEvent.addListener(OxelDataEvent.OXEL_FBA_FAILED, fromByteArrayFailed );
 
         FromByteArray.addTask(_guid, _op, FromByteArray.NORMAL_BYTE_LOAD_PRIORITY);
     }
 
     private function fromByteArrayComplete( $ode:OxelDataEvent ):void {
         if ( $ode.modelGuid == _guid ) {
-            OxelDataEvent.removeListener(OxelDataEvent.OXEL_READY, fromByteArrayComplete );
-            OxelDataEvent.removeListener(OxelDataEvent.OXEL_FAILED, fromByteArrayFailed );
+            OxelDataEvent.removeListener(OxelDataEvent.OXEL_FBA_COMPLETE, fromByteArrayComplete );
+            OxelDataEvent.removeListener(OxelDataEvent.OXEL_FBA_FAILED, fromByteArrayFailed );
             Log.out("OxelLoadAndBuildTasks.fromByteArrayComplete guid: " + _guid);
 
             var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
@@ -71,8 +68,8 @@ public class OxelLoadAndBuildTasks extends AbstractTask {
 
     private function fromByteArrayFailed( $ode:OxelDataEvent ):void {
         if ( $ode.modelGuid == _guid ) {
-            OxelDataEvent.removeListener(OxelDataEvent.OXEL_READY, fromByteArrayComplete );
-            OxelDataEvent.removeListener(OxelDataEvent.OXEL_FAILED, fromByteArrayFailed );
+            OxelDataEvent.removeListener(OxelDataEvent.OXEL_FBA_COMPLETE, fromByteArrayComplete );
+            OxelDataEvent.removeListener(OxelDataEvent.OXEL_FBA_FAILED, fromByteArrayFailed );
             OxelDataEvent.create( OxelDataEvent.OXEL_BUILD_FAILED, 0, _guid, null );
             Log.out("OxelLoadAndBuildTasks.fromByteArrayFailed - ERROR in fromByteArray - guid" + _guid, Log.WARN);
             super.complete(); // AbstractTask will send event

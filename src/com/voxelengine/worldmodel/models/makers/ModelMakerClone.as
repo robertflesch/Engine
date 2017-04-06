@@ -17,7 +17,6 @@ import com.voxelengine.events.ModelBaseEvent
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.ModelMetadataEvent
-import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.animation.AnimationCache;
 import com.voxelengine.worldmodel.models.types.VoxelModel
 import com.voxelengine.worldmodel.oxel.GrainCursor;
@@ -92,20 +91,14 @@ public class ModelMakerClone extends ModelMakerBase {
 	}
 
 	private function completeMake():void {
-		var waitForChildren:Boolean = false;
 		//Log.out("ModelMakerClone.completeMake: " + ii.toString());
 		if ( null != modelInfo && null != _modelMetadata ) {
 
 			_vm = make();
 			if ( _vm ) {
 				_vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
-				// Since I already HAVE the oxel, I don't need to add it?
-				// So just listen for ready event, unlike importer
 				OxelLoadAndBuildTasks.addTask( modelInfo.guid, modelInfo.oxelPersistence );
-//				addOxelReadyDataCompleteListeners();
-//				modelInfo.oxelLoadData();
 				if ( false == modelInfo.childrenLoaded ){ // its true if they are loaded or the model has no children.
-					waitForChildren = true;
 					ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
 				} else
 					markComplete( true );
@@ -113,8 +106,8 @@ public class ModelMakerClone extends ModelMakerBase {
 				markComplete(false);
 			}
 		}
-//		else
-//			Log.out( "ModelMakerClone.completeMake - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
+		else
+			Log.out( "ModelMakerClone.completeMake - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
 
 		function childrenAllReady( $ode:ModelLoadingEvent):void {
 			if ( modelInfo.guid == $ode.modelGuid  ) {

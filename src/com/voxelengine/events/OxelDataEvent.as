@@ -10,16 +10,12 @@ package com.voxelengine.events
 
 import flash.events.Event;
 import flash.events.EventDispatcher;
-
 import com.voxelengine.worldmodel.models.OxelPersistence;
-/**
- * ...
- * @author Robert Flesch - RSF 
- */
+
 public class OxelDataEvent extends ModelBaseEvent
 {
-	static public const OXEL_READY:String					= "OXEL_READY";
-	static public const OXEL_FAILED:String					= "OXEL_FAILED";
+	static public const OXEL_FBA_COMPLETE:String			= "OXEL_FBA_COMPLETE";
+	static public const OXEL_FBA_FAILED:String				= "OXEL_FBA_FAILED";
 	static public const OXEL_FACES_BUILT_PARTIAL:String		= "OXEL_FACES_BUILT_PARTIAL";
 	static public const OXEL_FACES_BUILT_COMPLETE:String	= "OXEL_FACES_BUILT_COMPLETE";
 	static public const OXEL_QUADS_BUILT_PARTIAL:String		= "OXEL_QUADS_BUILT_PARTIAL";
@@ -39,8 +35,7 @@ public class OxelDataEvent extends ModelBaseEvent
 	public function get generated():Boolean  { return _generated; }
 	public function get generationData():Object  { return _generationData; }
 
-	public function OxelDataEvent($type:String, $series:int, $guid:String, $vmd:OxelPersistence, $fromTable:Boolean, $generated:Boolean, $generationData:Object )
-	{
+	public function OxelDataEvent($type:String, $series:int, $guid:String, $vmd:OxelPersistence, $fromTable:Boolean, $generated:Boolean, $generationData:Object ) {
 		super( $type, $series );
 		_od = $vmd;
 		_modelGuid = $guid;
@@ -50,7 +45,7 @@ public class OxelDataEvent extends ModelBaseEvent
 	}
 	
 	public override function clone():Event {
-		return new OxelDataEvent(type, series, _modelGuid, _od, _fromTables, _generated, _generationData);
+		return new OxelDataEvent(type, series, modelGuid, oxelData, fromTables, generated, generationData);
 	}
    
 	public override function toString():String {
@@ -59,7 +54,7 @@ public class OxelDataEvent extends ModelBaseEvent
 	
 	///////////////// Event handler interface /////////////////////////////
 
-	// Used to distribute all persistance messages
+	// Used to distribute all persistence messages
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
