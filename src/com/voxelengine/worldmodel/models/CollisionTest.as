@@ -7,7 +7,12 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import flash.geom.Vector3D;
+import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
+
+import flash.geom.Vector3D;
 
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
@@ -72,6 +77,24 @@ package com.voxelengine.worldmodel.models
 			for each ( var cp:CollisionPoint in _collisionPoints )
 				cp.markerRemove( _owner );
 		}
-		
+
+		static public var markerGuid:String = "";
+		static public function createMarkers():void {
+			// so I have to generate the markers first
+		if ( "" == CollisionTest.markerGuid ) {
+			CollisionTest.markerGuid = Globals.getUID();
+			var model:Object = GenerateOxel.cubeScript(0, TypeInfo.RED);
+			model.name = "CollisionPoint";
+
+			var collisionPointMarker:InstanceInfo = new InstanceInfo();
+			collisionPointMarker.modelGuid = CollisionTest.markerGuid;
+			collisionPointMarker.name = "DefaultCollisionPoint";
+			collisionPointMarker.visible = false;
+			collisionPointMarker.dynamicObject = true;
+			new ModelMakerGenerate( collisionPointMarker, model );
+		}
+		}
+
+
 	}
 }

@@ -31,7 +31,6 @@ public class ModelBaseEvent extends Event
 	//// tells us the manager has add this from persistance
 	static public const ADDED:String						= "ADDED";
 	static public const RESULT:String						= "RESULT";
-	static public const RESULT_COMPLETE:String				= "RESULT_COMPLETE";
 	static public const REQUEST_FAILED:String				= "REQUEST_FAILED";
 	static public const IMPORT_COMPLETE:String				= "IMPORT_COMPLETE";
 	static public const CLONE:String						= "CLONE";
@@ -53,7 +52,8 @@ public class ModelBaseEvent extends Event
 	static public const DELETE:String						= "DELETE";
 
 	static public const GENERATION:String					= "GENERATION";
-	
+	static public const GENERATION_FAILED:String			= "GENERATION_FAILED";
+
 	public function ModelBaseEvent( $type:String, $series:int, $bubbles:Boolean = true, $cancellable:Boolean = false )
 	{
 		if ( ( $type == REQUEST || $type == REQUEST_TYPE ) && 0 == $series )

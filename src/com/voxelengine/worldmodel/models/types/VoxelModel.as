@@ -93,7 +93,6 @@ public class VoxelModel
 	private		var	_camera:Camera								= new Camera();
 	private		var	_usesGravity:Boolean; 														
 	private		var	_timer:int 									= getTimer(); 				
-	private		var	_initialized:Boolean;
 	private 	var _hasInventory:Boolean;
 	protected	var	_stateLock:Boolean;
 	protected	var	_complete:Boolean;
@@ -104,9 +103,6 @@ public class VoxelModel
 	public function get hasInventory():Boolean 					{ return _hasInventory; }
 	public function set hasInventory(value:Boolean):void  		{ _hasInventory = value; }
 				
-	protected function get initialized():Boolean 				{ return _initialized; }
-	protected function set initialized( val:Boolean ):void		{ _initialized = val; }
-	
 	public	function get instanceInfo():InstanceInfo			{ return _instanceInfo; }
 	public	function get modelInfo():ModelInfo 					{ return _modelInfo; }
 	public	function set modelInfo(val:ModelInfo):void			{ _modelInfo = val; }
@@ -155,8 +151,8 @@ public class VoxelModel
 		_modelInfo.owner = this;
 		_metadata = $vmm;
 
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_FAILED, oxelDataRetrievedFailed );
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete );
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed );
 
 		if ( null == _metadata ) {
 			Log.out("VoxelModel.init - IS NULL ModelMetadata valid?", Log.ERROR);
@@ -187,26 +183,27 @@ public class VoxelModel
 			}
 		}
 	}
-	
-	private function oxelDataRetrieved(e:OxelDataEvent):void {
+
+	private function oxelBuildComplete(e:OxelDataEvent):void {
 		if ( e.modelGuid == modelInfo.guid ) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FAILED, oxelDataRetrievedFailed );
-			calculateCenter()
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed );
+			calculateCenter();
+			complete = true;
 		}
 	}
 
-	private function oxelDataRetrievedFailed(e:OxelDataEvent):void {
+	private function oxelBuildFailed(e:OxelDataEvent):void {
 		if ( e.modelGuid == modelInfo.guid ) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FAILED, oxelDataRetrievedFailed );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed );
 			dead = true;
 			// TODO need to change model picture to BROKEN, or just totally delete it.
 			Log.out("VoxelModel.oxelDataRetrievedFailed - Error reading OXEL data guid: " + modelInfo.guid, Log.ERROR);
 		}
 	}
 
-	
+
 	protected function processClassJson():void {
 		modelInfo.childrenLoad( this );
 		modelInfo.scriptsLoad( instanceInfo );
@@ -574,14 +571,6 @@ public class VoxelModel
 	public function update($context:Context3D, $elapsedTimeMS:int):void	{
 		//if ( "DragonTailFirst" == metadata.name )
 		//	Log.out( "VoxelModel.update - name: " + metadata.name, Log.DEBUG );
-		if (!initialized) {
-			initialized = true;
-			//Log.out( "VoxelModel.update - loading oxel data: " + modelInfo.guid, Log.WARN );
-			OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelComplete );
-
-			modelInfo.oxelLoadData();
-		}
-		
 		if ( complete && modelInfo.oxelPersistence ) {
 			instanceInfo.update($elapsedTimeMS);
 			modelInfo.update($context,$elapsedTimeMS, this );
@@ -591,16 +580,6 @@ public class VoxelModel
 		}
 	}
 	
-	private function oxelComplete( $ode:OxelDataEvent ):void {
-		//Log.out( "VoxelModel.oxelComplete evalutate - guid: " + $ode.modelGuid, Log.WARN );
-		// add $ode.modelGuid == metadata.name for imported from local file system models.
-		if ( $ode.modelGuid == instanceInfo.modelGuid || $ode.modelGuid == metadata.name ) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelComplete );
-			//Log.out( "VoxelModel.oxelComplete guid: " + $ode.modelGuid, Log.WARN );
-			complete = true;
-		}
-	}
-
 	public function calculateCenter( $oxelCenter:int = 0 ):void {
 		if ( 0 == instanceInfo.center.length ) {
 			if ( 0 == $oxelCenter )
@@ -1269,29 +1248,14 @@ public class VoxelModel
 		Shader.lightAdd( sl );
 	}
 
-	static public function cubeModel( $guid:String, $class:Class, $bound:int = 4 ):VoxelModel {
-		var metadata:ModelMetadata = new ModelMetadata( $guid );
-		metadata.permissions.modify = false;
-
-		var modelInfo:ModelInfo = new ModelInfo( $guid, null, {} );
-		modelInfo.modelClass = flash.utils.getQualifiedClassName( $class );
-
-		var instanceInfo:InstanceInfo = new InstanceInfo();
-		instanceInfo.modelGuid = $guid;
-		var newModel:VoxelModel = new $class( instanceInfo );
-		newModel.init( modelInfo, metadata );
-		newModel.modelInfo.oxelPersistence = new OxelPersistence( $guid, null, Oxel.COMPRESSED_REFERENCE_BA_SQUARE );
-		newModel.modelInfo.oxelPersistence.bound = $bound;
-		newModel.modelInfo.oxelPersistence.loadFromByteArray();
-
-		return newModel;
-	}
 
 	static public function visitor( $func:Function, $functionName:String = "" ):void {
 		if ( selectedModel ) {
 			selectedModel.modelInfo.oxelPersistence.visitor( $func, $functionName );
 		}
 	}
+
+
 }
 }
 

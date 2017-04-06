@@ -197,8 +197,8 @@ public class WindowOxelUtils extends VVPopup
 	private function rebuildModelHandler(event:UIMouseEvent):void {
 		//_vm.modelInfo.oxelPersistence.visitor( Oxel.rebuild, "Oxel.rebuild" );
 		_vm.modelInfo.oxelPersistence.oxel.chunkGet().setDirtyRecursively();
-		_vm.modelInfo.oxelPersistence.oxel.chunkGet().buildFacesRecursively( _vm.modelInfo.guid, _vm, false );
-		_vm.modelInfo.oxelPersistence.oxel.chunkGet().buildQuadsRecursively( _vm.modelInfo.guid, _vm );
+		_vm.modelInfo.oxelPersistence.oxel.chunkGet().buildFaces( _vm.modelInfo.guid, _vm, false );
+		_vm.modelInfo.oxelPersistence.oxel.chunkGet().buildQuads( _vm.modelInfo.guid, _vm );
 
 	}
 	

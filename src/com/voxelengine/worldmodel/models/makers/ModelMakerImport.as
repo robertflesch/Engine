@@ -7,29 +7,23 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-import com.voxelengine.events.ModelLoadingEvent;
-import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.RegionEvent;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.animation.AnimationCache;
-import com.voxelengine.worldmodel.models.types.Player;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.oxel.GrainCursor;
-import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.oxel.VisitorFunctions;
 
 import flash.geom.Vector3D;
-import org.flashapi.swing.Alert;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelMetadataEvent;
-import com.voxelengine.worldmodel.Region;
+import com.voxelengine.events.ModelLoadingEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.GUI.WindowModelMetadata;
+import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
+import com.voxelengine.worldmodel.animation.AnimationCache;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
 
 	/**
 	 * ...
@@ -159,75 +153,52 @@ public class ModelMakerImport extends ModelMakerBase {
 			_vm = make();
 			if ( _vm ) {
 				_vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
-				OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelAdded );
-				OxelDataEvent.addListener( ModelBaseEvent.GENERATION, oxelAdded );
-				modelInfo.oxelLoadData();
-				if ( false == modelInfo.childrenLoaded ){ // its true if they are loaded or the model has no children.
+				// Now request that the oxel be built
+				OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+				OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+				OxelDataEvent.addListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+
+				OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, ModelBaseEvent.USE_FILE_SYSTEM );
+				if ( false == modelInfo.childrenLoaded ) { // its true if they are loaded or the model has no children.
 					waitForChildren = true;
-					ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
+					ModelLoadingEvent.addListener(ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady);
 				}
 			}
 		}
-//		else
-//			Log.out( "ModelMakerImport.completeMake - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
+		else
+			Log.out( "ModelMakerImport.completeMake ERROR - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
 
 		function childrenAllReady( $ode:ModelLoadingEvent):void {
-			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid ) {
+			if ( modelInfo.guid == $ode.modelGuid ) {
 				Log.out( "ModelMakerImport.allChildrenReady - modelMetadata.description: " + _modelMetadata.description, Log.WARN );
 				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
 				markComplete( true );
 			}
 		}
 
-		function oxelAdded( $ode:OxelDataEvent):void {
-			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid ) {
-				//Log.out( "ModelMakerImport.oxelReady - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
-				OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelAdded );
-				OxelDataEvent.removeListener( ModelBaseEvent.GENERATION, oxelAdded );
-				addOxelReadyDataCompleteListeners();
-				modelInfo.assignOxelDataToModelInfo( $ode.oxelData );
+		function oxelBuildComplete($ode:OxelDataEvent):void {
+			if ($ode.modelGuid == modelInfo.guid ) {
+				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+				OxelDataEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+				if ( !waitForChildren )
+					markComplete( true );
 			}
-//			else
-//				Log.out( "ModelMakerImport.oxelReady - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
 		}
 
-		function oxelReady( $ode:OxelDataEvent):void {
-			if ( modelInfo && ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid ) ) {
-				removeOxelReadyDataCompleteListeners();
-				Log.out( "ModelMakerImport.oxelReady - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
-
-				VisitorFunctions.resetScaling( $ode.oxelData.oxel );
-				//Oxel.rebuild( $ode.oxelData.oxel );
-
-				if ( false == waitForChildren )
-					markComplete(true );
-			}
-//			else
-//				Log.out( "ModelMakerImport.oxelReady - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
-		}
-
-		function oxelReadyFailedToLoad( $ode:OxelDataEvent):void {
-			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid  ) {
-				removeOxelReadyDataCompleteListeners();
+		function oxelBuildFailed($ode:OxelDataEvent):void {
+			if ($ode.modelGuid == modelInfo.guid ) {
+				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+				OxelDataEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+				if ( waitForChildren ) {
+					Log.out("ModelMakerImport - ERROR LOADING OXEL", Log.WARN);
+					// TODO cancel children loading???
+				}
 				markComplete( false );
 			}
-//			else
-//				Log.out( "ModelMakerImport.oxelReadyFailedToLoad - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
-		}
-
-
-		function addOxelReadyDataCompleteListeners():void {
-			OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelReady );
-			OxelDataEvent.addListener( OxelDataEvent.OXEL_FAILED, oxelReadyFailedToLoad );
-		}
-
-		function removeOxelReadyDataCompleteListeners():void {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelReady );
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FAILED, oxelReadyFailedToLoad );
 		}
 	}
-
-
 
 	override protected function markComplete( $success:Boolean ):void {
 		if ( true == $success ) {
@@ -245,6 +216,17 @@ public class ModelMakerImport extends ModelMakerBase {
 			modelInfo.changed = true;
 			_modelMetadata.changed = true;
 			_vm.save();
+
+			/*if ( ModelMakerImport.isImporting ) {
+				// Only do this for top level models.
+				var size:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 32);
+				// this give me edge,  really want center.
+				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
+				lav.setTo(lav.x - size / 2, lav.y - size / 2, lav.z - size / 2);
+				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
+				diffPos = diffPos.add(lav);
+				ii.positionSet = diffPos;
+			}*/
 
 			if ( modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxel && modelInfo.oxelPersistence.oxel.gc.bound ){
 				// Only do this for top level models.

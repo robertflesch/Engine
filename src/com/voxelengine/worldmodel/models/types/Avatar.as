@@ -63,6 +63,7 @@ public class Avatar extends ControllableVoxelModel
 //		collisionPointsAdd();
 //		_displayCollisionMarkers = true;
 //		if ( _displayCollisionMarkers )
+//			CollisionTest.createMarkers();
 //			_ct.markersAdd();
 	}
 
@@ -72,7 +73,6 @@ public class Avatar extends ControllableVoxelModel
 		//var thisModel:ControllableVoxelModel = $vm as ControllableVoxelModel;
 	}
 	
-
 	override public function collisionTest( $elapsedTimeMS:Number ):Boolean {
 
 //		if ( this === VoxelModel.controlledModel )
@@ -167,19 +167,6 @@ public class Avatar extends ControllableVoxelModel
 			//_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 0, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
 		}
 
-		// so I have to generate the markers first
-		if ( "" == CollisionTest.markerGuid ) {
-			CollisionTest.markerGuid = Globals.getUID();
-			var model:Object = GenerateCube.script(0, TypeInfo.RED);
-			model.name = "CollisionPoint";
-
-			var collisionPointMarker:InstanceInfo = new InstanceInfo();
-			collisionPointMarker.instanceGuid = Globals.getUID();
-			collisionPointMarker.modelGuid = CollisionTest.markerGuid;
-			collisionPointMarker.name = "DefaultCollisionPoint";
-			collisionPointMarker.dynamicObject = true;
-			new ModelMakerGenerate( collisionPointMarker, model, false );
-		}
 	}
 
 	// returns -1 if new position is valid, returns 0-2 if there was collision

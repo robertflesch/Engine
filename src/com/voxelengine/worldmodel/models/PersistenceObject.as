@@ -153,7 +153,7 @@ public class PersistenceObject
 			// this was causing data to be lost!! So first save data, then copy over dbo, then restore data!
 			_dbo = $pe.dbo;
 			if ( dbo )
-				Log.out( getQualifiedClassName( this ) + ".PersistenceObject.createSuccess - ALT PATH created: " + guid + " in table: " + $pe.table, Log.DEBUG );
+				Log.out( getQualifiedClassName( this ) + ".PersistenceObject.createSuccess - created: " + guid + " in table: " + $pe.table, Log.DEBUG );
 			else
 				Log.out(getQualifiedClassName( this ) + ".PersistenceObject.createSuccess - ERROR: " + guid + " in table: " + $pe.table, Log.ERROR);
 		}

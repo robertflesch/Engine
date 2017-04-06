@@ -10,8 +10,10 @@ package com.voxelengine.worldmodel.models.makers
 import com.voxelengine.Log
 import com.voxelengine.events.ModelMetadataEvent
 import com.voxelengine.events.ModelBaseEvent
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.WindowSplashEvent
 import com.voxelengine.worldmodel.models.InstanceInfo
+import com.voxelengine.worldmodel.tasks.landscapetasks.OxelLoadAndBuildTasks;
 
 /**
 	 * ...
@@ -46,6 +48,7 @@ public class ModelMaker extends ModelMakerBase {
 	
 	private function retrievedMetadata( $mme:ModelMetadataEvent):void {
 		if ( ii.modelGuid == $mme.modelGuid ) {
+			removeMetadataListeners();
 			_modelMetadata = $mme.modelMetadata;
 			//Log.out( "ModelMaker.retrivedMetadata - metadata: " + _modelMetadata.toString() )
 			attemptMake();
@@ -54,9 +57,17 @@ public class ModelMaker extends ModelMakerBase {
 	
 	private function failedMetadata( $mme:ModelMetadataEvent):void {
 		if ( ii.modelGuid == $mme.modelGuid ) {
+			removeMetadataListeners();
 			markComplete(false);
 		}
 	}
+
+	private function removeMetadataListeners():void {
+		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrievedMetadata );
+		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrievedMetadata );
+		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata )
+	}
+
 	
 	// once they both have been retrieved, we can make the object
 	override protected function attemptMake():void {
@@ -64,27 +75,44 @@ public class ModelMaker extends ModelMakerBase {
 			//Log.out( "ModelMaker.attemptMake - ii: " + ii.toString() )
 			
 			_vm = make();
-			markComplete( true )
+			if ( _vm ) {
+				OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+				OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+				OxelDataEvent.addListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+				OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null );
+			} else {
+				markComplete(false);
+			}
+		}
+
+		function oxelBuildComplete($ode:OxelDataEvent):void {
+			if ($ode.modelGuid == modelInfo.guid ) {
+				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+				OxelDataEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+				markComplete( true );
+			}
+		}
+
+		function oxelBuildFailed($ode:OxelDataEvent):void {
+			if ($ode.modelGuid == modelInfo.guid ) {
+				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+				OxelDataEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+				markComplete( false );
+			}
 		}
 	}
-	
+
 	override protected function markComplete( $success:Boolean ):void {
 		if ( _addToCount ) {
 			makerCountDecrement();
 			if (0 == makerCountGet())
 				WindowSplashEvent.dispatch(new WindowSplashEvent(WindowSplashEvent.ANNIHILATE))
 		}
-		removeListeners();
 
 		// do this last as it nulls everything.
 		super.markComplete( $success );
-		
-		function removeListeners():void {
-			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrievedMetadata );
-			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrievedMetadata );
-			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata )	
-		}		
-		
 	}
 }	
 }

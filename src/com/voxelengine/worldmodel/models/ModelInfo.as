@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models
 {
 
 import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
 
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
@@ -128,6 +129,9 @@ public class ModelInfo extends PersistenceObject
 			// now remove the biome oxelPersistence from the object so it is not saved to persistance
 			delete dbo.biomes;
 		}
+
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, assignOxelData );
+
 	}
 
 	override public function set guid($newGuid:String):void { 
@@ -135,8 +139,6 @@ public class ModelInfo extends PersistenceObject
 		super.guid = $newGuid;
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null ) );
 		if ( oxelPersistence ) {
-			if ( altGuid )
-				oldGuid = altGuid;
 			oxelPersistence.guid = $newGuid;
 			OxelDataEvent.create( ModelBaseEvent.UPDATE_GUID, 0, oldGuid + ":" + $newGuid, null );
 		}
@@ -175,7 +177,10 @@ public class ModelInfo extends PersistenceObject
 		super.release();
 		_biomes = null;
 		_animations = null;
-		oxelPersistence.release();
+		if ( oxelPersistence ) {
+			oxelPersistence.release();
+			oxelPersistence = null;
+		}
 	}
 
 
@@ -185,87 +190,31 @@ public class ModelInfo extends PersistenceObject
 				childRemove(deadCandidate.instanceInfo);
 		}
 	}
-	
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// start oxelPersistence (oxel) operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public function oxelLoadData():void {
-		if ( oxelPersistence ) {
-			if ( oxelPersistence.oxelCount )
-				OxelDataEvent.create( ModelBaseEvent.RESULT_COMPLETE, 0, guid, oxelPersistence );
-			else {
-				oxelPersistence.createTaskToLoadFromByteArray(guid, OxelPersistence.NORMAL_BYTE_LOAD_PRIORITY );
-			}
+	public function assignOxelData( $ode:OxelDataEvent ):void {
+		if ( guid == $ode.modelGuid ) {
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, assignOxelData );
+			if (null == oxelPersistence) {
+				oxelPersistence = $ode.oxelData;
+				// Set OxelPersistence to the baseLightLevel for this object.
+				Log.out("ModelInfo.assignOxelData - set baseLightLevel: " + baseLightLevel);
 
-			//Log.out( "ModelInfo.loadOxelData - returning loaded oxel guid: " + guid );
-		} else {
-			addOxelDataCompleteListeners();
-			// try to load from tables first
-			//Log.out( "ModelInfo.loadOxelData - requesting oxel guid: " + guid );
-			OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_PERSISTANCE );
-		}
-	}
 
-	private function addOxelDataCompleteListeners():void {
-		OxelDataEvent.addListener( ModelBaseEvent.ADDED, retrievedData );
-		OxelDataEvent.addListener( ModelBaseEvent.RESULT, retrievedData );
-		OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedData );
-	}
-
-	private function removeOxelDataCompleteListeners():void {
-		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, retrievedData );
-		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, retrievedData );
-		OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedData );
-	}
-
-	public function assignOxelDataToModelInfo( $od:OxelPersistence ):void {
-		if ( null == oxelPersistence ) {
-			oxelPersistence = $od;
-			// Set OxelPersistence to the baseLightLevel for this object.
-			//Log.out( "ModelInfo.retrievedData - set baseLightLevel: " + baseLightLevel);
-		}
-		oxelPersistence.baseLightLevel = baseLightLevel;
-
-		const priority:int = 5;
-		if (oxelPersistence && 0 == oxelPersistence.oxelCount)
-			oxelPersistence.createTaskToLoadFromByteArray(guid, priority);
-		else
-			OxelDataEvent.create( OxelDataEvent.OXEL_READY, 0, $od.guid, $od );
-	}
-
-	private function retrievedData( $ode:OxelDataEvent):void {
-		if ( guid == $ode.modelGuid || altGuid == $ode.modelGuid ) {
-			removeOxelDataCompleteListeners();
-			assignOxelDataToModelInfo( $ode.oxelData );
-		}
-	}
-	
-	private function failedData( $ode:OxelDataEvent):void {
-		if ( guid == $ode.modelGuid || altGuid == $ode.modelGuid ) {
-			if ( _firstLoadFailed ) {
-				removeOxelDataCompleteListeners();
-				Log.out( "ModelInfo.failedData - unable to process request for guid: " + guid, Log.ERROR );
-				OxelDataEvent.create( ModelBaseEvent.REQUEST_FAILED, 0, guid, null );
-			}
-			else {
-				_firstLoadFailed = true;
-				if ( biomes ) // this should generate the VMD
-					loadFromBiomeData();
-				else {
-					removeOxelDataCompleteListeners();
-					Log.out( "ModelInfo.failedData - no alternative processing method: " + guid, Log.ERROR );
-					OxelDataEvent.create( ModelBaseEvent.REQUEST_FAILED, 0, guid, null );
-				}
+			} else {
+				Log.out("ModelInfo.assignOxelData - OXEL PERSISTENCE ALREADY EXISTS", Log.ERROR);
 			}
 		}
 	}
-	
+
 	public function loadFromBiomeData():void {
 		var layer1:LayerInfo = biomes.layers[0];
 		if ( "LoadModelFromIVM" == layer1.functionName ) {
-			_altGuid = layer1.data;
+			guid = layer1.data;
 			//Log.out( "ModelInfo.loadFromBiomeData - trying to load from local file with alternate name - altGuid: " + _altGuid, Log.DEBUG );
-			OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, _altGuid, null, ModelBaseEvent.USE_FILE_SYSTEM );
+			OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, guid, null, ModelBaseEvent.USE_FILE_SYSTEM );
 		}
 		else {
 			//Log.out( "ModelInfo.loadFromBiomeData - building bio from layer oxelPersistence", Log.DEBUG );
@@ -603,11 +552,9 @@ public class ModelInfo extends PersistenceObject
 	
 	private var _biomes:Biomes;										// used to generate terrain and apply other functions to oxel
 	private var _series:int											// used to make sure animation is part of same series when loading
-	private var _altGuid:String;									// used to handle loading from biome
 	private var _firstLoadFailed:Boolean;							// true if load from biomes oxelPersistence is needed
 	
 	// These are temporary used for loading local objects
-	public function get altGuid():String 							{ return _altGuid; }
 	public function get biomes():Biomes 							{ return _biomes; }
 	public function set biomes(value:Biomes):void  					{ _biomes = value;  changed = true; }
 	

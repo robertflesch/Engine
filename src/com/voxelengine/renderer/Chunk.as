@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.renderer {
 
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.pools.ChildOxelPool;
 import com.voxelengine.pools.GrainCursorPool;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
@@ -39,6 +40,7 @@ public class Chunk {
 	private var _children:Vector.<Chunk>; 	// These are created when needed
 	private var _vertMan:VertexManager;
 	private var _parent:Chunk;
+	private var _guid:String;
 
 	private var _gc:GrainCursor; 			// Object that give us our location allocates memory for the grain
 	public function get  gc():GrainCursor { return _gc }; 			// Object that give us our location allocates memory for the grain
@@ -63,8 +65,9 @@ public class Chunk {
 	}
 	public function childrenHas():Boolean { return null != _children; }
 	
-	public function Chunk( $parent:Chunk, $bound:uint ):void {
+	public function Chunk( $parent:Chunk, $bound:uint, $guid ):void {
 		_parent = $parent;
+		_guid = $guid;
 		_dirty = true;
 		_gc = GrainCursorPool.poolGet( $bound );
 		_s_chunkCount++;
@@ -92,10 +95,10 @@ public class Chunk {
 	// public function merge():Chunk
 	// public function divide():?
 	
-	static public function parse( $oxel:Oxel, $parent:Chunk, $lightInfo:LightInfo ):Chunk {
+	static public function parse( $oxel:Oxel, $parent:Chunk, $lightInfo:LightInfo, $guid:String ):Chunk {
 		var time:int = getTimer();
 		var bound:uint = $oxel.gc.bound;
-		var chunk:Chunk = new Chunk( $parent, bound );
+		var chunk:Chunk = new Chunk( $parent, bound, $guid );
 
 		chunk._gc.grain = $parent ? ($parent._gc.grain - 1) : $oxel.gc.bound;
 
@@ -112,7 +115,7 @@ public class Chunk {
 			//Log.out( "chunk.parse - creating children chunks: " + $oxel.childCount, Log.WARN );
 			chunk._children = new Vector.<Chunk>(OCT_TREE_SIZE, true);
 			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
-				chunk._children[i] = parse($oxel.children[i], chunk, $lightInfo);
+				chunk._children[i] = parse($oxel.children[i], chunk, $lightInfo, chunk._guid );
 				gct.copyFrom( chunk._gc );
 				gct.become_child( i );
 				chunk._children[i]._gc.copyFrom( gct );
@@ -154,52 +157,95 @@ public class Chunk {
 		else if ( _vertMan )
 			_vertMan.drawNewAlpha( $mvp, $vm, $context, $selected, $isChild );
 	}
-	
-	public function buildQuadsRecursively( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {
+
+	private var _quadTasks:int;
+	public function buildQuads( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {
+		_quadTasks = 0;
+		var priority:int;
+		if ( $firstTime && $vm )
+			priority = $vm.distanceFromPlayerToModel(); // This should really be done on a per chuck basis
+		else
+			priority = 100; // high but not too high?
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
+		buildQuadsRecursively( $guid, priority, $firstTime );
+		if ( 0 == _quadTasks) {
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
+			OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, null);
+		}
+	}
+
+	private function buildQuadsRecursively( $guid:String, $priority:int, $firstTime:Boolean = false ):void {
 		if ( childrenHas() ) {
 			dirtyClear();
 			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
 				//if ( _children[i].dirty && _children[i]._oxel && _children[i]._oxel.dirty )
 				if ( _children[i].dirty )
-					_children[i].buildQuadsRecursively( $guid, $vm, $firstTime );
+					_children[i].buildQuadsRecursively( $guid, $priority, $firstTime );
 			}
-		}
-		else {
+		} else {
 			// Since task has been added for this chunk, mark it as clear
-			dirtyClear();
-			if ( _oxel && _oxel.dirty ) {
-				var priority:int;
-				if ( $firstTime )
-					priority = $vm.distanceFromPlayerToModel();
-				else
-					priority = 4; // high but not too high?
-
-				BuildQuads.addTask( $guid, this, priority )
+			// NOTE: oxels loaded from NoSQL are not dirty. But need to be built
+			//if ( _oxel && _oxel.dirty ) {
+			if ( _oxel ) {
+				dirtyClear();
+				_quadTasks++;
+				BuildQuads.addTask( $guid, this, $priority )
+			}
+			else {
+				Log.out( "Chunk.buildQuadsRecursively - HOW DID I GET HERE?", Log.WARN);
+				dirtyClear(); // Better clear it anyways
 			}
 		}
 	}
 
-	public function buildFacesRecursively( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {
+	private function quadsBuildPartialComplete( $ode:OxelDataEvent ):void {
+		_quadTasks--;
+		if ( 0 == _quadTasks) {
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
+			OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, null);
+		}
+	}
+
+	private var _faceTasks:int;
+	public function buildFaces( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {
+		_faceTasks = 0;
+		var priority:int;
+		if ( $firstTime && $vm )
+			priority = $vm.distanceFromPlayerToModel(); // This should really be done on a per chuck basis
+		else
+			priority = 100; // high but not too high?
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
+		buildFacesRecursively( $guid, priority, $firstTime );
+		if ( 0 == _faceTasks) {
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
+			OxelDataEvent.create(OxelDataEvent.OXEL_FACES_BUILT_COMPLETE, 0, _guid, null);
+		}
+	}
+
+	private function buildFacesRecursively( $guid:String, $priority:int, $firstTime:Boolean = false ):void {
 		if ( childrenHas() ) {
 			dirtyClear();
 			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
 				//if ( _children[i].dirty && _children[i]._oxel && _children[i]._oxel.dirty )
 				if ( _children[i].dirty )
-					_children[i].buildFacesRecursively( $guid, $vm, $firstTime );
+					_children[i].buildFacesRecursively( $guid, $priority, $firstTime );
 			}
 		}
 		else {
 			// Since task has been added for this chunk, mark it as clear
 			dirtyClear();
 			if ( _oxel && _oxel.dirty ) {
-				var priority:int;
-				if ( $firstTime )
-					 priority = $vm.distanceFromPlayerToModel();
-				else
-					priority = 4; // high but not too high?
-
-				RefreshFaces.addTask( $guid, this, priority );
+				_faceTasks++;
+				RefreshFaces.addTask( $guid, this, $priority );
 			}
+		}
+	}
+
+	private function facesBuildPartialComplete( $ode:OxelDataEvent ):void {
+		_faceTasks--;
+		if ( 0 == _faceTasks) {
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
+			OxelDataEvent.create( OxelDataEvent.OXEL_FACES_BUILT_COMPLETE, 0, _guid, null );
 		}
 	}
 

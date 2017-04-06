@@ -1503,7 +1503,8 @@
 		 */
 		public static function registerPlugins(... args:Array):void {
 			for (var i:int = 0; i < args.length; i++) {
-				(console as DConsole).pluginManager.registerPlugin(args[i]);
+				throw new Error("DConsole.registerPlugins");
+				//(console as DConsole).pluginManager.registerPlugin(args[i]);
 			}
 		}
 		

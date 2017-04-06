@@ -9,8 +9,11 @@ package com.voxelengine.worldmodel.models.types
 {
 import com.adobe.utils.Hex;
 import com.voxelengine.GUI.voxelModels.WindowBluePrintCopy;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
 
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
@@ -78,7 +81,23 @@ public class EditCursor extends VoxelModel
 	
 	static public function get currentInstance():EditCursor {
 		if ( null == _s_currentInstance ) {
-			_s_currentInstance = VoxelModel.cubeModel( EDIT_CURSOR, EditCursor ) as EditCursor;
+			var instanceInfo:InstanceInfo = new InstanceInfo();
+			instanceInfo.modelGuid = EDIT_CURSOR;
+			_s_currentInstance= new EditCursor( instanceInfo );
+			var metadata:ModelMetadata = new ModelMetadata( EDIT_CURSOR );
+			metadata.permissions.modify = false;
+			var modelInfo:ModelInfo = new ModelInfo( EDIT_CURSOR, null, {} );
+			_s_currentInstance.init( modelInfo, metadata );
+			var creationInfo:Object = GenerateOxel.cubeScript( 4, TypeInfo.BLUE );
+			creationInfo.modelClass = "EDIT_CURSOR";
+			creationInfo.name = "EDIT_CURSOR";
+			OxelDataEvent.create(ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, true, true, creationInfo);
+/*
+			newModel.modelInfo.oxelPersistence = new OxelPersistence( EDIT_CURSOR, null, Oxel.COMPRESSED_REFERENCE_BA_SQUARE );
+			newModel.modelInfo.oxelPersistence.bound = 4;
+			newModel.modelInfo.oxelPersistence.loadFromByteArray();
+*/
+			//_s_currentInstance = VoxelModel.cubeModel( EDIT_CURSOR, EditCursor ) as EditCursor;
 			/*
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			instanceInfo.modelGuid = EDIT_CURSOR

@@ -12,14 +12,17 @@ import com.voxelengine.Log;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 
-	/**
+/**
 	 * ...
 	 * @author Robert Flesch - RSF
 	 * This class is used to generate the modelInfo and the modelMetadata
@@ -142,6 +145,11 @@ public class ModelMakerGenerate extends ModelMakerBase {
 				_modelMetadata.changed = true;
 				_vm.save();
 			}
+			// If the actual voxel model has not been built yet, create it now.
+			if ( !modelInfo.oxelPersistence ) {
+				OxelDataEvent.create(ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, true, true, _creationInfo);
+			}
+
 		} else {
 			Log.out( "ModelMakerGenerate.markComplete - guid: " + modelInfo.guid, Log.WARN );
 			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );

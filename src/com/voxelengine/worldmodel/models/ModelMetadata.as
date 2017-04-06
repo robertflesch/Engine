@@ -89,17 +89,17 @@ public class ModelMetadata extends PersistenceObject
 
 		if ( "EditCursor" != guid ) {
 			ModelMetadataEvent.addListener(ModelBaseEvent.SAVE, saveEvent);
-			OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelReady );
+			OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelbuildComplete );
 			ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
 		}
 
-		function oxelReady( $ode:OxelDataEvent ):void {
+		function oxelbuildComplete( $ode:OxelDataEvent ):void {
 			if ( $ode.modelGuid == guid ) {
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelbuildComplete );
 				if ($ode.oxelData && $ode.oxelData.bound) {
 					bound = $ode.oxelData.bound;
 				}
 				save();
-				OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelReady );
 			}
 		}
 

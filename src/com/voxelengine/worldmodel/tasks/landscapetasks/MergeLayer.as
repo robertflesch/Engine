@@ -38,31 +38,31 @@ import flash.utils.getTimer;
 			ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, _modelGuid, null ) );
 		}
 		
-		private function oxelDataRetrieved(e:OxelDataEvent):void {
-			Log.out( "MergeLayer.oxelDataRetrieved:");
-			if ( e.modelGuid == _modelGuid ) {
-				OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );
-				var oxel:Oxel = e.oxelData.oxel;
-				processOxel( oxel )
-			}
-		}
-		
 		private function modelInfoResult(e:ModelInfoEvent):void {
 			Log.out( "MergeLayer.modelInfoResult:" );
 			if ( e.modelGuid == _modelGuid ) {
 				if ( !e.vmi || !e.vmi.oxelPersistence || !e.vmi.oxelPersistence.oxelCount ) {
 					ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoResult );
-					OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelDataRetrieved );		
-					Log.out( "MergeLayer.modelInfoResult = no oxel found, waiting on OXEL_READY", Log.WARN );
+					OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelDataRetrieved );
+					Log.out( "MergeLayer.modelInfoResult = no oxel found, waiting on OXEL_BUILD_COMPLETE", Log.WARN );
 					// error handling???
 					// what if it never loads?
-					return
+					return;
 				}
 				var oxel:Oxel = e.vmi.oxelPersistence.oxel;
 				processOxel( oxel )
 			}
 		}
-		
+
+		private function oxelDataRetrieved(e:OxelDataEvent):void {
+			Log.out( "MergeLayer.oxelDataRetrieved:");
+			if ( e.modelGuid == _modelGuid ) {
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelDataRetrieved );
+				var oxel:Oxel = e.oxelData.oxel;
+				processOxel( oxel )
+			}
+		}
+
 		private function processOxel( $oxel:Oxel ):void {
 			Log.out( "MergeLayer.processOxel:" );
 

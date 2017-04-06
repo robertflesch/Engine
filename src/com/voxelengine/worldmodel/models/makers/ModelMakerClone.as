@@ -7,6 +7,8 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
+import com.voxelengine.worldmodel.tasks.landscapetasks.OxelLoadAndBuildTasks;
+
 import flash.geom.Vector3D;
 
 import com.voxelengine.Log
@@ -99,53 +101,33 @@ public class ModelMakerClone extends ModelMakerBase {
 				_vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
 				// Since I already HAVE the oxel, I don't need to add it?
 				// So just listen for ready event, unlike importer
-				addOxelReadyDataCompleteListeners();
-				modelInfo.oxelLoadData();
+				OxelLoadAndBuildTasks.addTask( modelInfo.guid, modelInfo.oxelPersistence );
+//				addOxelReadyDataCompleteListeners();
+//				modelInfo.oxelLoadData();
 				if ( false == modelInfo.childrenLoaded ){ // its true if they are loaded or the model has no children.
 					waitForChildren = true;
 					ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
-				}
+				} else
+					markComplete( true );
+			} else {
+				markComplete(false);
 			}
 		}
 //		else
 //			Log.out( "ModelMakerClone.completeMake - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
 
 		function childrenAllReady( $ode:ModelLoadingEvent):void {
-			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid ) {
+			if ( modelInfo.guid == $ode.modelGuid  ) {
 				Log.out( "ModelMakerClone.allChildrenReady - modelMetadata.description: " + _modelMetadata.description, Log.WARN );
 				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
 				markComplete( true );
 			}
 		}
-
-		function oxelReady( $ode:OxelDataEvent):void {
-			if ( modelInfo && ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid ) ) {
-				removeOxelReadyDataCompleteListeners();
-				Log.out( "ModelMakerClone.oxelReady - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
-				if ( false == waitForChildren )
-					markComplete( true );
-			}
-//			else
-//				Log.out( "ModelMakerClone.oxelReady - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
-		}
-
-		function oxelReadyFailedToLoad( $ode:OxelDataEvent):void {
-			if ( modelInfo.guid == $ode.modelGuid || modelInfo.altGuid == $ode.modelGuid  ) {
-				removeOxelReadyDataCompleteListeners();
-				markComplete( false );
-			}
-//			else
-//				Log.out( "ModelMakerClone.oxelReadyFailedToLoad - modelInfo.guid != $ode.modelGuid - modelInfo.guid: " + modelInfo.guid + "  $ode.modelGuid: " + $ode.modelGuid , Log.WARN );
-		}
-
-		function addOxelReadyDataCompleteListeners():void {
-			OxelDataEvent.addListener( OxelDataEvent.OXEL_READY, oxelReady );
-			OxelDataEvent.addListener( OxelDataEvent.OXEL_FAILED, oxelReadyFailedToLoad );
-		}
-
-		function removeOxelReadyDataCompleteListeners():void {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_READY, oxelReady );
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FAILED, oxelReadyFailedToLoad );
+		function childLoadFailed():void {
+			/*
+			TODO How to prepare for this?
+			Look at modelLoading event, and see if the guid is one of our children?
+			 */
 		}
 	}
 

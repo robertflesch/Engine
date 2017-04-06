@@ -30,8 +30,9 @@ package com.developmentarc.core.tasks
 	import com.developmentarc.core.tasks.groups.ITaskGroup;
 	import com.developmentarc.core.tasks.tasks.ITask;
 	import com.voxelengine.Globals;
-	
-	import flash.events.EventDispatcher;
+import com.voxelengine.Log;
+
+import flash.events.EventDispatcher;
 
 	/**
 	 * The TaskController class is the main manager of the task system framework. This class is 
@@ -77,7 +78,8 @@ package com.developmentarc.core.tasks
 		 */		
 		protected var notReadyQueue:HashTable;
 		
-		private var __activeTaskLimit:uint = 1;
+		//private var __activeTaskLimit:uint = 1;
+		private var __activeTaskLimit:uint = 2; // Since tasks call tasks...
 		private var __isBlocked:Boolean = false;
 		
 		//public static var _s_taskCount:int = 0;
@@ -137,6 +139,7 @@ package com.developmentarc.core.tasks
 			var result:Boolean;
 			// apply overrides
 			// if overrides dont override this task add task
+			Log.out( "TaskController.addTask - type: " + task.taskType, Log.WARN );
 			if(applyOverrides(task)) { 
 			
 				// determine priority and placement
@@ -259,7 +262,7 @@ package com.developmentarc.core.tasks
 		
 		public function next():int
 		{
-			if ( !_paused ) {
+			if ( !paused ) {
 				nextTask();
 			}
 //			else	
@@ -270,8 +273,7 @@ package com.developmentarc.core.tasks
 		private var _paused:Boolean = false;
 		public function get paused():Boolean  { return _paused }
 		public function set paused(value:Boolean):void  { _paused = value }
-		
-		 
+
 		protected function nextTask():void
 		{
 			//trace( "TaskController.nextTask __activeTaskLimit: " + __activeTaskLimit );
@@ -376,7 +378,7 @@ package com.developmentarc.core.tasks
 					// unblock, if the task is a blocker
 					if(task.isBlocker) __isBlocked = false;
 					
-					_paused = true;					
+					//paused = true;
 					next();
 				break;
 				
@@ -385,7 +387,7 @@ package com.developmentarc.core.tasks
 					notReadyQueue.remove(task);
 					task.removeEventListener(TaskEvent.TASK_READY, handleTaskEvent);
 					taskQueue.addItem(task, 1); // set to one to override all but zero
-					_paused = true;					
+					paused = true;
 					next();
 				break;
 			}

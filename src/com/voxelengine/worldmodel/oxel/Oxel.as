@@ -3315,7 +3315,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 
 
-	public static function generateCube( $modelGuid:String, $layer:LayerInfo, $generateEvent:Boolean = true ):ByteArray {
+	public static function generateCube( $modelGuid:String, $layer:Object, $generateEvent:Boolean = true ):ByteArray {
 		//////////////////////////////////////////////////////////
 		// Builds Solid Cube of any grain size
 		//////////////////////////////////////////////////////////
@@ -3344,12 +3344,13 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		// CRITICAL STEP. oxels are expected to have faces, not dirty faces
 		// So this step turns the dirty faces into real faces.
 		// for multistep island builds I will have to ponder this more.
-		oxel.facesBuild();
+		//oxel.facesBuild();
+		// This is now performed by the OxelLoadAndBuildTask
 
 		var ba:ByteArray = oxel.toByteArray();
 //			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
 //			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
-		//Log.out( "GenerateCube finished modelGuid: " + $modelGuid );
+		Log.out( "GenerateCube finished modelGuid: " + $modelGuid );
 		if ( $generateEvent )
 			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba, null, rootGrain.toString() ) );
 

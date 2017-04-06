@@ -8,16 +8,17 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
+import com.voxelengine.Log;
+import com.voxelengine.Globals;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
-import com.voxelengine.Log;
-import flash.utils.getTimer;
 import com.voxelengine.worldmodel.TypeInfo;
 
-public class GenerateCube extends LandscapeTask
-{
-	static public function script( $grain:int = 6, $type:int = 0 ):Object {
-		if ( 0 == $type )
+// This class generates a cube, and starts a face and quad build on it
+// DEPRECATED, use GenerateOxel
+public class GenerateCube extends LandscapeTask {
+	static public function script($grain:int = 6, $type:int = 0):Object {
+		if (0 == $type)
 			$type = TypeInfo.SAND;
 		var model:Object = {};
 		model.name = "GenerateCube";
@@ -27,24 +28,28 @@ public class GenerateCube extends LandscapeTask
 		nbiomes.layers = new Vector.<Object>();
 		nbiomes.layers[0] = {};
 		nbiomes.layers[0].functionName = "GenerateCube";
-		nbiomes.layers[0].type = TypeInfo.name( $type );
+		nbiomes.layers[0].type = $type;
 		model.biomes = nbiomes;
 
 		return model;
 	}
 
-	public function GenerateCube( $guid:String, layer:LayerInfo ):void {
-		super($guid, layer, "GenerateCube");
+	static public function addTask($guid:String, layer:LayerInfo, $taskPriority:int = 5 ):void {
+		var genCube:GenerateCube = new GenerateCube($guid, layer, $taskPriority);
+		Globals.g_landscapeTaskController.addTask(genCube);
+	}
+
+	// HAS to be public, but should NEVER be called
+	public function GenerateCube($guid:String, layer:LayerInfo, $taskPriority:int):void {
+		super($guid, layer, "GenerateCube", $taskPriority);
 	}
 
 	override public function start():void {
-		var timer:int =  getTimer();
-		super.start(); // AbstractTask will send event
-
-		Oxel.generateCube( _modelGuid, _layer );
-
-		super.complete(); // AbstractTask will send event
-		//Log.out( "GenerateCube.start guid: " + _modelGuid + " type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + " took: " + (getTimer() - timer), Log.WARN );
+		super.start();
+		Log.out("GenerateCube.start");
+		// This generates a GENERATION_SUCCESS, which is picked up by the OxelPersistenceCache
+		// which then starts the build process
+		Oxel.generateCube(_modelGuid, _layer);
 	}
 }
 }

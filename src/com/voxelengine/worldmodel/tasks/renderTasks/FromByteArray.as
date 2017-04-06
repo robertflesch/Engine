@@ -25,17 +25,17 @@ import flash.utils.getTimer;
  * @author Robert Flesch
  */
 public class FromByteArray extends AbstractTask 
-{	
+{
+	static public const NORMAL_BYTE_LOAD_PRIORITY:int = 5;
 	private var	_guid:String;
 	private var	_op:OxelPersistence;
 
-	static public function addTask( $guid:String, $taskPriority:int, $parent:OxelPersistence ): void {
-		//Log.out( "FromByteArray.addTask: guid: " + $guid + "  taskPriority: " + $taskPriority + "  op: " + $parent, Log.WARN );
-		var fba:FromByteArray = new FromByteArray( $guid, $taskPriority, $parent );
+	static public function addTask( $guid:String, $parent:OxelPersistence, $taskPriority:int ): void {
+		var fba:FromByteArray = new FromByteArray( $guid, $parent, $taskPriority );
 		Globals.g_landscapeTaskController.addTask( fba )
 	}
 	
-	public function FromByteArray( $guid:String, $taskPriority:int, $parent:OxelPersistence ):void {
+	public function FromByteArray( $guid:String, $parent:OxelPersistence, $taskPriority:int ):void {
 		_guid = $guid;
 		_op = $parent;
 		super("FromByteArray", $taskPriority );

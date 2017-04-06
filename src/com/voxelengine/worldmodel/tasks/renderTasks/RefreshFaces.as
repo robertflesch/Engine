@@ -8,6 +8,8 @@
 
 package com.voxelengine.worldmodel.tasks.renderTasks
 {
+import com.voxelengine.events.OxelDataEvent;
+
 import flash.utils.getTimer
 
 import com.voxelengine.Log
@@ -35,6 +37,7 @@ public class RefreshFaces extends RenderingTask
             _chunk.oxel.facesBuild();
         var pt:int = (getTimer() - time);
         // if the processing time is less then 1 ms, do the next task
+        OxelDataEvent.create( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, 0, _guid, null );
         super.complete();
         if ( pt < 1 ) {
             Log.out( "RefreshFaces.start - refreshQuads guid: " + _guid + "  took: " + pt + " ms STARTING ANOTHER TASK", Log.WARN );

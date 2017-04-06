@@ -45,15 +45,18 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		private function modelInfoResult(e:ModelInfoEvent):void {
 			Log.out( "GenerateLayer.modelInfoResult: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );
+			throw new Error( "REFACTOR with new oxel generation scheme");
 			if ( e.modelGuid == _modelGuid ) {
 				ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, modelInfoResult );
-				var oxel:Oxel = e.vmi.oxelPersistence.oxel
-				if ( null == oxel ) {
-					Log.out( "GenerateLayer.modelInfoResult = no oxel found, waiting on OXEL_READY", Log.WARN )
-					super.complete()
-					return
+				if ( e.vmi.oxelPersistence.oxelCount ) {
+					var oxel:Oxel = e.vmi.oxelPersistence.oxel;
+					if (null == oxel) {
+						Log.out("GenerateLayer.modelInfoResult = no oxel found, waiting on OXEL_READY", Log.WARN)
+						super.complete()
+						return
+					}
+					processOxel(oxel)
 				}
-				processOxel( oxel )
 			}
 		}
 		

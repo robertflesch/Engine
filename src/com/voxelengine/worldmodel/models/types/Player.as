@@ -16,6 +16,7 @@ import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.inventory.ObjectAction;
 import com.voxelengine.worldmodel.inventory.ObjectTool;
 import com.voxelengine.worldmodel.models.types.Avatar;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
 
 import playerio.DatabaseObject;
 import playerio.PlayerIOError;
@@ -101,7 +102,7 @@ public class Player
 
 		if ( DEFAULT_PLAYER == $modelGuid ) {
 			//Log.out( "Avatar.createPlayer - creating DEFAULT_PLAYER from GenerateCube", Log.WARN )
-			var model:Object = GenerateCube.script( 4, TypeInfo.BLUE );
+			var model:Object = GenerateOxel.cubeScript( 4, TypeInfo.BLUE );
 			model.modelClass = "Avatar";
 			model.name = "Temp Avatar";
 			new ModelMakerGenerate( ii, model )

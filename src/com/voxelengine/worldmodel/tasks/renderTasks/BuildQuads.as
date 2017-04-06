@@ -8,6 +8,8 @@
 
 package com.voxelengine.worldmodel.tasks.renderTasks
 {
+import com.voxelengine.events.OxelDataEvent;
+
 import flash.utils.getTimer
 
 import com.voxelengine.Log
@@ -38,6 +40,7 @@ public class BuildQuads extends RenderingTask
         }
         var pt:int = (getTimer() - time);
         // if the processing time is less then 1 ms, do the next task
+        OxelDataEvent.create( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, 0, _guid, null );
         super.complete();
         if ( pt < 1 ) {
             //Log.out( "BuildQuads.start - refreshQuads guid: " + _guid + "  took: " + pt + " ms STARTING ANOTHER TASK", Log.WARN );

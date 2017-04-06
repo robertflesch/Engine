@@ -28,13 +28,13 @@ package com.developmentarc.core.tasks.tasks
 	
 	import flash.events.EventDispatcher;
 
-	[Event(name="taskReady",type="com.developmentarc.core.controllers.events.TaskEvent")]
-	[Event(name="taskCompelte",type="com.developmentarc.core.controllers.events.TaskEvent")] 
-	[Event(name="taskQueued",type="com.developmentarc.core.controllers.events.TaskEvent")] 
-	[Event(name="taskStart",type="com.developmentarc.core.controllers.events.TaskEvent")] 
-	[Event(name="taskPause",type="com.developmentarc.core.controllers.events.TaskEvent")] 
-	[Event(name="taskCancel",type="com.developmentarc.core.controllers.events.TaskEvent")]
-	[Event(name="taskError",type="com.developmentarc.core.controllers.events.TaskEvent")] 
+//	[Event(name="taskReady",type="com.developmentarc.core.controllers.events.TaskEvent")]
+//	[Event(name="taskCompelte",type="com.developmentarc.core.controllers.events.TaskEvent")]
+//	[Event(name="taskQueued",type="com.developmentarc.core.controllers.events.TaskEvent")]
+//	[Event(name="taskStart",type="com.developmentarc.core.controllers.events.TaskEvent")]
+//	[Event(name="taskPause",type="com.developmentarc.core.controllers.events.TaskEvent")]
+//	[Event(name="taskCancel",type="com.developmentarc.core.controllers.events.TaskEvent")]
+//	[Event(name="taskError",type="com.developmentarc.core.controllers.events.TaskEvent")]
 	/**
 	 * The AbstractTask is the base class to extend all Tasks from.
 	 * The TaskController does not require a Task to extend from AbstractTask, 

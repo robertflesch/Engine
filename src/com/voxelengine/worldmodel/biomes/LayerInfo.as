@@ -55,7 +55,14 @@ package com.voxelengine.worldmodel.biomes
 			
 			return newLayerInfo;
 		}
-					
+
+		static public function fromObject( $obj:Object ):LayerInfo
+		{
+			var biomes:Object = $obj.biomes;
+			var layer:Object =	biomes.layers[0];
+			return new LayerInfo( layer.functionName, "", layer.type, 0, $obj.grainSize, "", 0 );
+		}
+
 		public function LayerInfo( functionName:String = null, data:String = "", type:int = 0 , range:int = 0, offset:int = 0, optional1:String = "", optional2:int = 0 )
 		{
 			_functionName = functionName;
@@ -81,7 +88,7 @@ package com.voxelengine.worldmodel.biomes
 				_functionName = layerInfo.functionName;
 				//Log.out( "LayerInfo.initJSON loading data for layer - " + _functionName );
 				if ( 0 <= _functionName.indexOf( "Test" ) ) {
-					_task = TestLibrary.getAsset("GenerateCube");
+					_task = TestLibrary.getAsset("GenerateOxel");
 					Log.out( "LayerInfo.fromJSON - TEST FUNCTION IN MJSON function name: " + _functionName, Log.WARN );
 				}
 				else

@@ -13,12 +13,8 @@ import com.voxelengine.Log
 import com.voxelengine.Globals
 import com.voxelengine.worldmodel.models.*
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.oxel.Lighting;
-import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube
 import com.voxelengine.worldmodel.weapons.Projectile
 
-import flash.utils.ByteArray;
 
 public final class ProjectilePoolType 
 { 
@@ -57,6 +53,9 @@ public final class ProjectilePoolType
 		_projectileGuid = Globals.getUID();
 		//throw new Error( "Need to refactor this, I broke it when I added the island generation" );
 		// This is a special case for _modelInfo, the _modelInfo its self is contained in the generate script
+
+		throw new Error( "Refactor - 4.6.17 - Update to GenerateOxel.cubeScript");
+		/*
 		_modelInfo = new ModelInfo( _projectileGuid, null, GenerateCube.script( 2, TypeInfo.BLUE ) );
 		_modelInfo.dynamicObj = true;
 
@@ -70,6 +69,7 @@ public final class ProjectilePoolType
 		var ba:ByteArray  = Oxel.generateCube( _projectileGuid, _modelInfo.biomes.layers[0], false );
 		_modelInfo.oxelPersistence = new OxelPersistence( _projectileGuid, null, ba );
 		_modelInfo.oxelPersistence.loadFromByteArray();
+		*/
 	}
 		
 	private function newModel():Projectile {	

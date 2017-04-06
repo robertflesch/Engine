@@ -157,10 +157,7 @@ public class ModelMakerBase {
 	static public function load( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true, $addToCountORPrompt:Boolean = true ):void {
 		//Log.out( "ModelMakerBase.load - choose maker ii: " + $ii.toString() )
 		if ( !Globals.isGuid( $ii.modelGuid ) )
-			if ( Globals.online )
-				new ModelMakerImport( $ii, $addToCountORPrompt );
-			else
-				new ModelMakerLocal( $ii );
+			new ModelMakerImport( $ii, $addToCountORPrompt );
 		else
 			new ModelMaker( $ii, $addToRegionWhenComplete, $addToCountORPrompt );
 	}

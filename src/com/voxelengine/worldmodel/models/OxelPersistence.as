@@ -65,7 +65,7 @@ public class OxelPersistence extends PersistenceObject
 	public 	function get statistics():ModelStatisics			{ return _statistics; }
 
 	private var _topMostChunks:Vector.<Chunk>					= new Vector.<Chunk>();
-	private function get topMostChunk():Chunk					{ return _topMostChunks[_lod]; }
+	public function get topMostChunk():Chunk					{ return _topMostChunks[_lod]; }
 
 	private var _lod:int;
 	public function set setLOD( $lod:int ):void 				{ _lod = $lod; }
@@ -199,11 +199,6 @@ public class OxelPersistence extends PersistenceObject
 		LightInfoPool.poolReturn(_lightInfo)
 	}
 
-	static public const NORMAL_BYTE_LOAD_PRIORITY:int = 5;
-	public function createTaskToLoadFromByteArray($guid:String, $taskPriority:int ):void {
-		FromByteArray.addTask( $guid, $taskPriority, this )
-	}
-	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
 		//var time:int = getTimer();
 		if ( !oxel || null == topMostChunk )
@@ -227,7 +222,7 @@ public class OxelPersistence extends PersistenceObject
 			}
 			else {
 				Log.out( "OxelPersistence.update ------------ calling refreshQuads guid: " + guid, Log.DEBUG );
-				topMostChunk.buildQuadsRecursively( guid, $vm, _initializeFacesAndQuads );
+				topMostChunk.buildQuads( guid, $vm, _initializeFacesAndQuads );
 				if ( _initializeFacesAndQuads )
 					_initializeFacesAndQuads = false
 			}
@@ -293,7 +288,7 @@ public class OxelPersistence extends PersistenceObject
 	// FROM Persistence
 	
 	public function loadFromByteArray():void {
-		Log.out( "OxelPersistence.lodFromByteArray - guid: " + guid, Log.INFO );
+		Log.out( "OxelPersistence.loadFromByteArray - guid: " + guid, Log.INFO );
 
 		_oxels[_lod] = Oxel.initializeRoot(bound);
 		oxel.readOxelData(ba, this );
@@ -301,7 +296,7 @@ public class OxelPersistence extends PersistenceObject
 
 		_statistics.gather();
 
-		_topMostChunks[_lod] = oxel.chunk = Chunk.parse( oxel, null, _lightInfo );
+		_topMostChunks[_lod] = oxel.chunk = Chunk.parse( oxel, null, _lightInfo, guid );
 		//Log.out( "OxelPersistence.lodFromByteArray oxel.chunkGet(): " + oxel.chunkGet() +  "  lod: " + _lod + " _topMostChunks[_lod] " + _topMostChunks[_lod]  );
 		//Log.out( "OxelPersistence.lodFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 	}

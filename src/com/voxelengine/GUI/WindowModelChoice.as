@@ -13,6 +13,8 @@ import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.tasks.landscapetasks.*;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
+
 import flash.accessibility.Accessibility;
 import flash.geom.Vector3D;
 
@@ -92,11 +94,11 @@ public class WindowModelChoice extends VVPopup
 		var model:Object
 		switch ( _rbGroup.index ) {
 			case 0: // From Cube
-				model = GenerateCube.script();
+				model = GenerateOxel.cubeScript();
 				parameters( model )
 				break;
 			case 1: // Sphere
-				model = GenerateSphere.script();
+				model = GenerateOxel.sphereScript();
 				parameters( model )
 				break;
 			case 2: // Island
