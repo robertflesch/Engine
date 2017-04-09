@@ -141,11 +141,14 @@ public class Chunk {
 	}
 
 	public function drawNew( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean = false ):void {
+		//trace( "Chunk.drawNew gc:" + gc);
 		if ( childrenHas() ) {
+			//trace( "Chunk.drawNew gc:" + gc + "  parent");
 			for ( var i:int; i < OCT_TREE_SIZE; i++ )
 				_children[i].drawNew( $mvp, $vm, $context, $selected, $isChild );
 		}
-		else if ( _vertMan )
+		else if ( _vertMan ) // TODO optimize by marking if this node has content.
+			//trace( "Chunk.drawNew gc:" + gc + "  vert " + _vertMan._vertBuf.totalOxels());
 			_vertMan.drawNew( $mvp, $vm, $context, $selected, $isChild );
 	}
 	

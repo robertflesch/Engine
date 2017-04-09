@@ -104,10 +104,10 @@ public class SoundCache
 	
 	static private function loadFailed( $pe:PersistenceEvent ):void {
 		if ( AnimationSound.SOUND_EXT != $pe.table && AnimationSound.BIGDB_TABLE_SOUNDS != $pe.table )
-			return
+			return;
 		Log.out( "SoundCache.loadFailed " + $pe.toString(), Log.ERROR );
 		if ( _block.has( $pe.guid ) )
-			_block.clear( $pe.guid )
+			_block.clear( $pe.guid );
 		SoundEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid );
 	}
 	
@@ -138,9 +138,11 @@ public class SoundCache
 		if ( snd ) {
 			_sounds[oldGuid] = null;
 			_sounds[newGuid] = snd;
+			SoundEvent.create( ModelBaseEvent.UPDATE_GUID_COMPLETE, 0, $ae.guid, snd );
 		}
 		else
 			Log.out( "SoundCache.updateGuid - animationSound not found oldGuid: " + oldGuid + "  newGuid: " + newGuid, Log.WARN );
+
 	}
 
 	static public function playSound( $guid:String ):void {

@@ -92,7 +92,7 @@ public class ModelMakerBase {
 	
 	
 	protected function retrievedModelInfo($mie:ModelInfoEvent):void  {
-		if (_ii &&  _ii.modelGuid == $mie.modelGuid ) {
+		if (_ii.modelGuid == $mie.modelGuid ) {
 			//Log.out( "ModelMakerBase.retrievedModelInfo - ii: " + _ii.toString(), Log.DEBUG )
 			removeListeners();
 			_modelInfo = $mie.vmi;

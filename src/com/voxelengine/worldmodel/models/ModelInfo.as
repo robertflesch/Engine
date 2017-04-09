@@ -197,15 +197,9 @@ public class ModelInfo extends PersistenceObject
 	public function assignOxelData( $ode:OxelDataEvent ):void {
 		if ( guid == $ode.modelGuid ) {
 			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, assignOxelData );
-			if (null == oxelPersistence) {
-				oxelPersistence = $ode.oxelData;
-				// Set OxelPersistence to the baseLightLevel for this object.
-				Log.out("ModelInfo.assignOxelData - set baseLightLevel: " + baseLightLevel);
-
-
-			} else {
-				Log.out("ModelInfo.assignOxelData - OXEL PERSISTENCE ALREADY EXISTS", Log.ERROR);
-			}
+			oxelPersistence = $ode.oxelData;
+			// Set OxelPersistence to the baseLightLevel for this object.
+			Log.out("ModelInfo.assignOxelData - set baseLightLevel: " + baseLightLevel);
 		}
 	}
 

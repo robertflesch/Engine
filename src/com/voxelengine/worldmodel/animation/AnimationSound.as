@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.animation
 {
 import com.voxelengine.worldmodel.models.PersistenceObject;
+import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
 import flash.media.Sound;
 import flash.media.SoundTransform;

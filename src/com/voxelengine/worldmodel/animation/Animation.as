@@ -15,6 +15,7 @@ import com.voxelengine.worldmodel.PermissionsBase;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.animation.AnimationSound;
 import com.voxelengine.worldmodel.models.SecureNumber;
+import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
 import playerio.DatabaseObject;
 import com.voxelengine.Log;
@@ -109,8 +110,9 @@ public class Animation extends PersistenceObject
 	}
 	private function init( $newData:Object = null ):void {
 
-		if ($newData)
+		if ($newData) {
 			mergeOverwrite($newData);
+		}
 
 		if ( !owner )
 			dbo.owner = Network.PUBLIC;
@@ -151,6 +153,8 @@ public class Animation extends PersistenceObject
 	}
 
     private function soundAdded( $se:SoundEvent ):void {
+		if ( ModelMakerImport.isImporting )
+			SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID_COMPLETE, updateSoundGuid );
         SoundEvent.removeListener( ModelBaseEvent.ADDED, soundAdded );
         SoundEvent.removeListener( ModelBaseEvent.RESULT, soundAdded );
         _animationSound = $se.snd;
@@ -159,6 +163,20 @@ public class Animation extends PersistenceObject
         if ( dbo.sound.soundRangeMin )
             _animationSound.soundRangeMin = dbo.sound.soundRangeMin;
     }
+
+	private function updateSoundGuid( $se:SoundEvent ):void {
+		// Make sure this is saved correctly
+		var guidArray:Array = $se.guid.split( ":" );
+		var oldGuid:String = guidArray[0];
+		var newGuid:String = guidArray[1];
+		if ( _animationSound ){
+			if ( _animationSound.guid == oldGuid || _animationSound.guid == newGuid ) {
+				SoundEvent.removeListener( ModelBaseEvent.UPDATE_GUID, 	updateSoundGuid );
+				changed = true;
+				save();
+			}
+		}
+	}
 
 	public function createBackCopy():Object {
 		// force the data from the dynamic classes into the object

@@ -48,6 +48,7 @@ public class ModelBaseEvent extends Event
 	static public const SAVE:String							= "SAVE";
 	static public const UPDATE:String						= "UPDATE";
 	static public const UPDATE_GUID:String					= "UPDATE_GUID";
+	static public const UPDATE_GUID_COMPLETE:String			= "UPDATE_GUID_COMPLETE";
 
 	static public const DELETE:String						= "DELETE";
 

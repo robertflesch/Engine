@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.Player;
 
 import flash.utils.getQualifiedClassName;
@@ -77,6 +78,7 @@ public class PersistenceObject
 	}
 	
 	protected function addSaveEvents():void {
+		//Log.out( getQualifiedClassName( this ) + ".addSaveEvents - guid: " + guid, Log.DEBUG );
 		PersistenceEvent.addListener( PersistenceEvent.CREATE_SUCCEED, 	createSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.CREATE_FAILED, 	createFailed );
 		PersistenceEvent.addListener( PersistenceEvent.SAVE_SUCCEED, 	saveSucceed );
@@ -85,12 +87,16 @@ public class PersistenceObject
 	}
 	
 	protected function removeSaveEvents():void {
-		Log.out( getQualifiedClassName( this ) + ".removeSaveEvents - guid: " + guid, Log.DEBUG );
+		//Log.out( getQualifiedClassName( this ) + ".removeSaveEvents - guid: " + guid, Log.DEBUG );
 		PersistenceEvent.removeListener( PersistenceEvent.CREATE_SUCCEED, 	createSucceed );
 		PersistenceEvent.removeListener( PersistenceEvent.CREATE_FAILED, 	createFailed );
 		PersistenceEvent.removeListener( PersistenceEvent.SAVE_SUCCEED, 	saveSucceed );
 		PersistenceEvent.removeListener( PersistenceEvent.SAVE_FAILED, 		saveFail );
 		_saving = false;
+		// if I changed came in while I was saving, the object will still be dirty.
+		// So go head and save it again.
+		if ( changed )
+			save();
 	}
 	
 	protected function toObject():void { }
@@ -107,7 +113,7 @@ public class PersistenceObject
 		}
 
 		if ( !Globals.isGuid(guid)) {
-			if ( Player.DEFAULT_PLAYER == guid) {
+			if ( Player.DEFAULT_PLAYER == guid || EditCursor.EDIT_CURSOR == guid ) {
 				changed = false;
 				return false;
 			}
@@ -119,8 +125,8 @@ public class PersistenceObject
 	}
 
 	protected function validatedSave():void {
+		var name:String = getQualifiedClassName(this);
 		if ( _saving ) {
-			var name:String = getQualifiedClassName(this);
 			Log.out("PersistenceObject.save - IN MIDDLE OF SAVE: " + name, Log.WARN);
 			return;
 		}
@@ -136,26 +142,28 @@ public class PersistenceObject
 	}
 	
 	private function saveSucceed( $pe:PersistenceEvent ):void {
-		if ( _table != $pe.table )
+		if ( table != $pe.table )
 			return;
+		//Log.out(getQualifiedClassName(this) + ".saveSucceed. guid: " + guid + " in table: " + table, Log.DEBUG);
 		if ( guid == $pe.guid ) {
 			removeSaveEvents();
-			Log.out(getQualifiedClassName( this ) + ".PersistenceObject.saveSucceed - save: " + guid + " in table: " + $pe.table);
+			//Log.out(getQualifiedClassName( this ) + ".PersistenceObject.saveSucceed - save: " + guid + " in table: " + $pe.table);
 		}
 	}	
 	
 	private function createSucceed( $pe:PersistenceEvent ):void {
-		if ( _table != $pe.table )
+		if ( table != $pe.table )
 			return;
+		//Log.out(getQualifiedClassName(this) + ".createSucceed. guid: " + guid + " in table: " + table, Log.DEBUG);
 		if ( $pe.dbo && guid == $pe.guid ) {
-			removeSaveEvents();
 			// the create result was coming back after some additional saves had been made
 			// this was causing data to be lost!! So first save data, then copy over dbo, then restore data!
 			_dbo = $pe.dbo;
-			if ( dbo )
-				Log.out( getQualifiedClassName( this ) + ".PersistenceObject.createSuccess - created: " + guid + " in table: " + $pe.table, Log.DEBUG );
-			else
-				Log.out(getQualifiedClassName( this ) + ".PersistenceObject.createSuccess - ERROR: " + guid + " in table: " + $pe.table, Log.ERROR);
+			removeSaveEvents();
+//			if ( dbo )
+//				Log.out( getQualifiedClassName( this ) + ".PersistenceObject.createSuccess - created: " + guid + " in table: " + $pe.table, Log.DEBUG );
+//			else
+//				Log.out(getQualifiedClassName( this ) + ".PersistenceObject.createSuccess - ERROR: " + guid + " in table: " + $pe.table, Log.ERROR);
 		}
 		else {
 			if ( !$pe.dbo )

@@ -84,13 +84,13 @@ public class OxelLoadAndBuildTasks extends AbstractTask {
             var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid(_guid);
             OxelDataEvent.addListener(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, quadBuildComplete );
             _op.oxel.chunkGet().buildQuads(_guid, vm, true);
+            OxelDataEvent.create( OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op );
         }
     }
     private function quadBuildComplete( $ode:OxelDataEvent ):void {
         if ($ode.modelGuid == _guid) {
             OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, quadBuildComplete );
             Log.out("OxelLoadAndBuildTasks.quadBuildComplete guid: " + _guid, Log.INFO);
-            OxelDataEvent.create( OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op );
             super.complete();
         }
     }

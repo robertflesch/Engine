@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.models.makers
 {
 import com.voxelengine.Log
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelMetadataEvent
 import com.voxelengine.events.ModelBaseEvent
 import com.voxelengine.events.OxelDataEvent;
@@ -37,15 +38,34 @@ public class ModelMaker extends ModelMakerBase {
 		retrieveBaseInfo();
 	}
 	
-	override protected function retrieveBaseInfo():void {
-		super.retrieveBaseInfo();
-		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retrievedMetadata );
-		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retrievedMetadata );
-		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );
-	
-		ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null );
+	override protected function retrievedModelInfo($mie:ModelInfoEvent):void  {
+		if (ii.modelGuid == $mie.modelGuid ) {
+			//Log.out( "ModelMakerBase.retrievedModelInfo - ii: " + _ii.toString(), Log.DEBUG )
+			removeListeners();
+			_modelInfo = $mie.vmi;
+			ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, retrievedMetadata );
+			ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, retrievedMetadata );
+			ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata );
+
+			ModelMetadataEvent.create( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null );
+		}
 	}
-	
+
+	override protected function failedModelInfo( $mie:ModelInfoEvent):void  {
+		if ( ii.modelGuid == $mie.modelGuid ) {
+			Log.out( "ModelMakerBase.failedData - ii: " + ii.toString(), Log.WARN );
+			removeListeners();
+			markComplete( false );
+		}
+	}
+
+	private function removeListeners():void {
+		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retrievedModelInfo );
+		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retrievedModelInfo );
+		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
+	}
+
+
 	private function retrievedMetadata( $mme:ModelMetadataEvent):void {
 		if ( ii.modelGuid == $mme.modelGuid ) {
 			removeMetadataListeners();
