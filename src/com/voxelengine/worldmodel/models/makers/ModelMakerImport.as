@@ -158,11 +158,15 @@ public class ModelMakerImport extends ModelMakerBase {
 				OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
 				OxelDataEvent.addListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
 
-				OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, ModelBaseEvent.USE_FILE_SYSTEM );
 				if ( false == modelInfo.childrenLoaded ) { // its true if they are loaded or the model has no children.
 					waitForChildren = true;
 					ModelLoadingEvent.addListener(ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady);
 				}
+
+				if ( modelInfo && modelInfo.biomes && modelInfo.biomes.layers[0] && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
+					OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, true, true, modelInfo.toGenerationObject() );
+				else
+					OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, ModelBaseEvent.USE_FILE_SYSTEM );
 			}
 		}
 		else
@@ -228,15 +232,18 @@ public class ModelMakerImport extends ModelMakerBase {
 				ii.positionSet = diffPos;
 			}*/
 
-			if ( modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxel && modelInfo.oxelPersistence.oxel.gc.bound ){
-				// Only do this for top level models.
-				var size:int = Math.max( GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 32 );
-				// this give me edge,  really want center.
-				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
-				lav.setTo( lav.x - size/2, lav.y - size/2, lav.z - size/2);
-				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
-				diffPos = diffPos.add(lav);
-				ii.positionSet = diffPos;
+			if ( !ii.controllingModel ) {
+				if (modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxel && modelInfo.oxelPersistence.oxel.gc.bound) {
+					// Only do this for top level models.
+					var size:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 32);
+					// this gives me corner.
+					var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
+					// add in half the size to get center
+					lav.setTo(lav.x - size / 2, lav.y - size / 2, lav.z - size / 2);
+					var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
+					diffPos = diffPos.add(lav);
+					ii.positionSet = diffPos;
+				}
 			}
 
 		} else {
