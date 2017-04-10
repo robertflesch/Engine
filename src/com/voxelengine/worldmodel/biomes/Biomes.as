@@ -51,6 +51,15 @@ public class Biomes
 		return outString
 	}
 
+	public function toGenerationObject():Object {
+		var obj:Object = {};
+		obj.layers = [];
+		for ( var i:int; i < layers.length; i++ ) {
+			obj.layers.push( layers[i].toJSON( null ) );
+		}
+		return obj;
+	}
+
 	// Removed the completed task
 	public function addToTaskControllerUsingNewStyle( $guid:String ):void {
 		// land task controller
