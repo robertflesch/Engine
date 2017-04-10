@@ -134,6 +134,14 @@ public class ModelInfo extends PersistenceObject
 
 	}
 
+	// Only used when importing object from disk
+	public function toGenerationObject():Object {
+		var obj:Object = {};
+		obj.modelClass = modelClass;
+		obj.biomes = _biomes.toGenerationObject();
+		return obj;
+	}
+
 	override public function set guid($newGuid:String):void { 
 		var oldGuid:String = super.guid;
 		super.guid = $newGuid;
@@ -575,7 +583,7 @@ public class ModelInfo extends PersistenceObject
 		}
 		return true;
 	}
-	
+
 	override protected function toObject():void {
 		owner.buildExportObject();
 
