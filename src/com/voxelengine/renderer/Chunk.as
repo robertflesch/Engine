@@ -80,7 +80,9 @@ public class Chunk {
 			}
 		}
 		else {
-			_vertMan.release();
+			if ( _vertMan )
+				_vertMan.release();
+			_vertMan = null;
 			_oxel = null;
 			_parent = null;
 			_s_chunkCount--;
