@@ -29,6 +29,7 @@ public class GenerateCube extends LandscapeTask {
 		nbiomes.layers[0] = {};
 		nbiomes.layers[0].functionName = "GenerateCube";
 		nbiomes.layers[0].type = $type;
+		nbiomes.layers[0].offset = $grain;
 		model.biomes = nbiomes;
 
 		return model;

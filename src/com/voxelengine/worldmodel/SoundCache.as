@@ -74,6 +74,7 @@ public class SoundCache
 			add( $pe, sndPer );
 			if ( !Globals.isGuid( $pe.guid ) )
 				sndPer.guid = Globals.getUID();
+			sndPer.save();
 		}
 		else {
 			Log.out( "SoundCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR )
@@ -136,8 +137,7 @@ public class SoundCache
 		var newGuid:String = guidArray[1];
 		var snd:AnimationSound = _sounds[oldGuid];
 		if ( snd ) {
-			_sounds[oldGuid] = null;
-			_sounds[newGuid] = snd;
+			_sounds[newGuid] = snd; // This leaves the old one, but it will only be there during import.
 			SoundEvent.create( ModelBaseEvent.UPDATE_GUID_COMPLETE, 0, $ae.guid, snd );
 		}
 		else

@@ -60,7 +60,12 @@ package com.voxelengine.worldmodel.biomes
 		{
 			var biomes:Object = $obj.biomes;
 			var layer:Object =	biomes.layers[0];
-			return new LayerInfo( layer.functionName, "", layer.type, 0, $obj.grainSize, "", 0 );
+			var grainSize:int;
+			if ( $obj.grainSize )
+				grainSize = $obj.grainSize;
+			else
+				grainSize = layer.offset;
+			return new LayerInfo( layer.functionName, "", layer.type, 0, grainSize, "", 0 );
 		}
 
 		public function LayerInfo( functionName:String = null, data:String = "", type:int = 0 , range:int = 0, offset:int = 0, optional1:String = "", optional2:int = 0 )

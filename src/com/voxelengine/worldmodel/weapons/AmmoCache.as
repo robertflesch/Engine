@@ -58,7 +58,7 @@ public class AmmoCache
 			if ( true == Globals.online && $ae.fromTable )
 				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ae.series, Globals.BIGDB_TABLE_AMMO, $ae.guid ) );
 			else	
-				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, 0, Globals.AMMO_EXT, $ae.guid ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ae.series, Globals.AMMO_EXT, $ae.guid ) );
 		}
 		else
 			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.RESULT, $ae.series, $ae.guid, ammo ) );

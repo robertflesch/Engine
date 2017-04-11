@@ -91,7 +91,7 @@ public class EditCursor extends VoxelModel
 			var creationInfo:Object = GenerateOxel.cubeScript( 4, TypeInfo.BLUE );
 			creationInfo.modelClass = "EDIT_CURSOR";
 			creationInfo.name = "EDIT_CURSOR";
-			OxelDataEvent.create(ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, true, true, creationInfo);
+			OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, true, true, creationInfo );
 /*
 			newModel.modelInfo.oxelPersistence = new OxelPersistence( EDIT_CURSOR, null, Oxel.COMPRESSED_REFERENCE_BA_SQUARE );
 			newModel.modelInfo.oxelPersistence.bound = 4;

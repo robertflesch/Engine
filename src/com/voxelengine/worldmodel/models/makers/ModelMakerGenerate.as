@@ -147,7 +147,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			}
 			// If the actual voxel model has not been built yet, create it now.
 			if ( !modelInfo.oxelPersistence ) {
-				OxelDataEvent.create(ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, true, true, _creationInfo);
+				OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, true, true, _creationInfo );
 			}
 
 		} else {

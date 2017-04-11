@@ -84,16 +84,18 @@ public class Gun extends ControllableVoxelModel
 	override public function buildExportObject():void {
 		super.buildExportObject();
 		modelInfo.dbo.gun = {};
-		//var gunData:Object = new Object();
-		//gunData.reloadSpeed = _reloadSpeed;
-		//
-		//var oa:Vector.<Object> = new Vector.<Object>();
-		//var ammosJson:Object = modelInfo.dbo.gun.ammos;
-		//for each ( var ammoInfo:Object in ammosJson )
-		//oa.push( { name: ammoInfo.name } );
-//
-		//gunData.ammos = oa;
-//		obj.gun = gunData;
+
+		modelInfo.dbo.gun.reloadSpeed = _reloadSpeed;
+		var ammo:Vector.<Ammo> = _armory.getAmmoList();
+		if ( ammo.length ) {
+			modelInfo.dbo.gun.ammos = [];
+			for (var count:int = 0; count < ammo.length; count++) {
+				modelInfo.dbo.gun.ammos.push({name: ammo[count].name})
+			}
+		}
+		if ( _ammoCount ) {
+			modelInfo.changed = true;
+		}
 	}
 
 	private var _ammoCount:int;
@@ -107,24 +109,25 @@ public class Gun extends ControllableVoxelModel
 			return;
 		}
 		
-//		if ( gunInfo.reloadSpeed )
-//			_reloadSpeed = gunInfo.reloadSpeed;
-//
-//		if ( gunInfo.ammos ) {
-//			AmmoEvent.addListener( ModelBaseEvent.RESULT, result );
-//			AmmoEvent.addListener( ModelBaseEvent.ADDED, result );
-//			AmmoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, resultFailed );
-//			var ammosJson:Object = gunInfo.ammos;
-//			for each ( var ammoInfo:Object in ammosJson ) {
-//				var ae:AmmoEvent = new AmmoEvent( ModelBaseEvent.REQUEST, _series, ammoInfo.guid, null );
-//				_series = ae.series;
-//				AmmoEvent.dispatch( ae );
-//				_ammoCount++;
-//			}
-//		}
+		if ( gunInfo.reloadSpeed )
+			_reloadSpeed = gunInfo.reloadSpeed;
+
+		if ( gunInfo.ammos ) {
+			AmmoEvent.addListener( ModelBaseEvent.RESULT, result );
+			AmmoEvent.addListener( ModelBaseEvent.ADDED, result );
+			AmmoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, resultFailed );
+			var ammosJson:Object = gunInfo.ammos;
+			for each ( var ammoInfo:Object in ammosJson ) {
+				var ae:AmmoEvent = new AmmoEvent( ModelBaseEvent.REQUEST, _series, ammoInfo.guid, null );
+				_series = ae.series;
+				AmmoEvent.dispatch( ae );
+				_ammoCount++;
+			}
+		}
 	}
 	
 	private function result(e:AmmoEvent):void {
+		Log.out( "Gun.result - _series ("+_series+") == e.series("+e.series+ ")", Log.WARN );
 		if ( _series == e.series ) {
 			_ammoCount--;
 			_armory.add( e.ammo );
@@ -142,8 +145,14 @@ public class Gun extends ControllableVoxelModel
 	}
 	
 	private function ifLoadCompleteThenBroadcast():void {
-		if ( 0 == _ammoCount )
-			GunEvent.dispatch( new GunEvent( GunEvent.AMMO_LOAD_COMPLETE, instanceInfo.modelGuid, instanceInfo.instanceGuid ) );
+		if ( 0 == _ammoCount ) {
+			GunEvent.dispatch(new GunEvent(GunEvent.AMMO_LOAD_COMPLETE, instanceInfo.modelGuid, instanceInfo.instanceGuid));
+			AmmoEvent.removeListener( ModelBaseEvent.RESULT, result );
+			AmmoEvent.removeListener( ModelBaseEvent.ADDED, result );
+			AmmoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, resultFailed );
+			save();
+		}
+
 	}
 	
 	// When is this used?

@@ -215,7 +215,19 @@ public class Ammo extends PersistenceObject
 			return false;
 		}
 		saving = true;
-		return super.save();
+
+		if ( !changed || !Globals.online || dynamicObj ) {
+//			if ( Globals.online && !changed )
+//				Log.out( name + " save - Not saving data - guid: " + guid + " NOT changed" );
+//			else if ( !Globals.online && changed )
+//				Log.out( name + " save - Not saving data - guid: " + guid + " NOT online" );
+//			else
+//				Log.out( name + " save - Not saving data - Offline and not changed" );
+			return false;
+		}
+
+		validatedSave();
+		return true;
 	}
 
 	private function updateSoundGuid( $se:SoundEvent ):void {
