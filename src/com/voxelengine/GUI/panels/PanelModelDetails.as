@@ -8,22 +8,27 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.panels
 {
-import com.voxelengine.GUI.LanguageManager;
-import com.voxelengine.worldmodel.weapons.Gun;
 
 import org.flashapi.swing.*;
 import org.flashapi.swing.constants.BorderStyle;
 import org.flashapi.swing.event.*;
+import org.flashapi.swing.layout.AbsoluteLayout;
 
 import com.voxelengine.Log;
 import com.voxelengine.events.UIRegionModelEvent;
+import com.voxelengine.GUI.LanguageManager;
+import com.voxelengine.worldmodel.weapons.Gun;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
-import org.flashapi.swing.layout.AbsoluteLayout;
 
 // all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
 public class PanelModelDetails extends PanelBase
 {
+	static private const BTN_WIDTH:int = 190;
+	static private const WIDTH_DEFAULT:int = 200;
+	static private const HEIGHT_DEFAULT:int = 300;
+	static private const HEIGHT_LIST_DEFAULT:int = 150;
+
 	private var _parentModel:VoxelModel;
 	private var _listModels:PanelModels;
 	private var _listAnimations:PanelAnimations;
@@ -33,62 +38,53 @@ public class PanelModelDetails extends PanelBase
 	private var _aniButton:Button;
 	private var _scriptsButton:Button;
 	private var _level:int;
-	private var _btnWidth:int;
+	private var height_calculated:int;
+
 	private var _selectedModel:VoxelModel;
 	public function get selectedModel():VoxelModel { return _selectedModel; }
 	public function set selectedModel( $vm:VoxelModel ):void { _selectedModel = $vm; }
 
-	private const WIDTH_DEFAULT:int = 200;
-	private const HEIGHT_DEFAULT:int = 300;
-	private const HEIGHT_LIST_DEFAULT:int = 150;
-	private var height_calculated:int;
-	
 	public function PanelModelDetails($parent:PanelBase, $level:int ) {
 		super( $parent, WIDTH_DEFAULT, HEIGHT_DEFAULT );
 		_level = $level;
 		borderStyle = BorderStyle.GROOVE;
 		layout = new AbsoluteLayout();
 		modelPanelAdd();
-		padding = 2;
-		_btnWidth = width - 10;
 
-		Log.out( "PanelModelDetails addListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged )", Log.WARN );
 		UIRegionModelEvent.addListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
-		UIRegionModelEvent.addListener( UIRegionModelEvent.SELECTED_MODEL_REMOVED, selectedModelRemoved );
 	}
 	
 	override public function close():void {
-		super.close();
-		Log.out( "PanelModelDetails.CLOSE removeListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged )", Log.WARN );
 		UIRegionModelEvent.removeListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
-		UIRegionModelEvent.removeListener( UIRegionModelEvent.SELECTED_MODEL_REMOVED, selectedModelRemoved );
 
-		modelPanelRemove();
 		childPanelRemove();
-		scriptPanelRemove();
-		animationPanelRemove();
-		removeButtons();
+		removeListsAndButtons();
+		modelPanelRemove();
 		_parentModel = null;
+		_selectedModel = null;
+
+		super.close();
 	}
 	
 	private function selectedModelChanged(e:UIRegionModelEvent):void {
+		//Log.out("PanelModelDetails.selectedModelChanged - level: " + _level + "  e.level: " + e.level );
 		if ( e.level == _level ) {
+			//Log.out("PanelModelDetails.selectedModelChanged - level: " + _level + "  e.level: " + e.level + "  e.voxelModel: " + e.voxelModel + " e.parentVM: " + e.voxelModel + "  _parentModel: " + _parentModel, Log.WARN);
 			selectedModel = e.voxelModel;
-			Log.out("PanelModelDetails.selectedModelChanged - level: " + _level + "  selectedModel: " + ( selectedModel ? selectedModel.metadata.name : "NONE") + "  parentModel: " + ( _parentModel ? _parentModel.metadata.name : "No parent" ), Log.WARN);
-			if ( null == e.voxelModel )
-				childPanelRemove();
-			// true if our child changed the model
-			else if (e.parentVM == _parentModel) {
-				//Log.out( "PanelModelDetails.selectedModelChanged");
-				childPanelAdd(e.voxelModel);
-				removeListsAndButtons();
-				addListsAndButtons(e.voxelModel);
-			}
-		} else if ( e.level < _level ) {
 			childPanelRemove();
 			removeListsAndButtons();
+			if ( e.voxelModel ) {
+				//Log.out("PanelModelDetails.selectedModelChanged - e.voxelModel.metadata.name: " + e.voxelModel.metadata.name, Log.WARN );
+				childPanelAdd( e.voxelModel );
+				addListsAndButtons( e.voxelModel );
+			}
 		}
-		// ELSE do nothing, the parent will control it.
+		height = height_calculated;
+	}
+
+	public function updateChildren( $source:Function, $parentModel:VoxelModel, $removeAniAndScripts:Boolean = false ):void {
+		_parentModel = $parentModel;
+		var countAdded:int = _listModels.populateModels( $source, $parentModel );
 	}
 
 	private function removeListsAndButtons():void {
@@ -115,32 +111,8 @@ public class PanelModelDetails extends PanelBase
 
 		if ( $vm is Gun )
 			ammoPanelAdd( $vm as Gun );
-
-		height = height_calculated;
 	}
 	
-	private function selectedModelRemoved(e:UIRegionModelEvent):void {
-		if ( _level >= e.level ) {
-			removeListsAndButtons();
-		}
-	}
-
-	public function updateChildren( $source:Function, $parentModel:VoxelModel, $removeAniAndScripts:Boolean = false ):void {
-		_parentModel = $parentModel;
-		var countAdded:int = _listModels.populateModels( $source, $parentModel );
-//				if ( 0 == countAdded )
-			childPanelRemove();
-
-		if ( $removeAniAndScripts ) {
-			removeListsAndButtons();
-		}
-	}
-
-	private function removeButtons():void {
-		scriptButtonRemove();
-		animationButtonRemove();
-	}
-
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	private function modelPanelAdd():void {
@@ -167,7 +139,8 @@ public class PanelModelDetails extends PanelBase
 
 	public function childPanelRemove():void {
 		if ( null != _childPanel ) {
-			_childPanel.remove();
+			_childPanel.close();
+			_childPanel.remove(); // removes from display list
 			_childPanel = null;
 		}
 	}
@@ -186,6 +159,7 @@ public class PanelModelDetails extends PanelBase
 
 	public function animationPanelRemove():void {
 		if ( null != _listAnimations ) {
+			_listAnimations.close();
 			removeElement(_listAnimations);
 			_listAnimations = null;
 		}
@@ -194,12 +168,12 @@ public class PanelModelDetails extends PanelBase
 	private function animationButtonAdd($vm:VoxelModel):void {
 		_aniButton = new Button( LanguageManager.localizedStringGet( "Add_an animation" ) );
 		_aniButton.x = 5;
-		_aniButton.y = height_calculated;
-		_aniButton.width = _btnWidth;
+		_aniButton.y = height_calculated + 5;
+		_aniButton.width = BTN_WIDTH;
 		_aniButton.enabled = true;
 		_aniButton.eventCollector.addEvent( _aniButton, UIMouseEvent.CLICK, function (e:UIMouseEvent):void { removeElement( e.target ); animationPanelAdd( $vm ) } );
 		addElement( _aniButton );
-		height_calculated += HEIGHT_BUTTON_DEFAULT;
+		height_calculated += HEIGHT_BUTTON_DEFAULT + 10;
 	}
 	
 	public function animationButtonRemove():void {
@@ -224,6 +198,7 @@ public class PanelModelDetails extends PanelBase
 
 	public function scriptPanelRemove():void {
 		if (null != _listScripts) {
+			_listScripts.close();
 			removeElement(_listScripts);
 			_listScripts = null;
 		}
@@ -239,12 +214,12 @@ public class PanelModelDetails extends PanelBase
 	private function scriptButtonAdd($vm:VoxelModel):void {
 		_scriptsButton = new Button( LanguageManager.localizedStringGet( "Add a script" ) );
 		_scriptsButton.x = 5;
-		_scriptsButton.y = height_calculated;
-		_scriptsButton.width = _btnWidth;
+		_scriptsButton.y = height_calculated + 5;
+		_scriptsButton.width = BTN_WIDTH;
 		_scriptsButton.enabled = true;
 		_scriptsButton.eventCollector.addEvent( _scriptsButton, UIMouseEvent.CLICK, function (e:UIMouseEvent):void { removeElement( e.target ); scriptPanelAdd( $vm ) } );
 		addElement( _scriptsButton );
-		height_calculated += HEIGHT_BUTTON_DEFAULT;
+		height_calculated += HEIGHT_BUTTON_DEFAULT + 10;
 	}
 
 	//////////////////////////////////////////////////////////////////////////
@@ -258,7 +233,6 @@ public class PanelModelDetails extends PanelBase
 		}
 
 		_listAmmo.populateAmmos( $vm );
-		//recalc( width, height );
 	}
 
 	public function ammoPanelRemove():void {

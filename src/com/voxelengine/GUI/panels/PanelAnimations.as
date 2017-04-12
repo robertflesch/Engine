@@ -19,6 +19,7 @@ import flash.display.Bitmap;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
+import org.flashapi.swing.layout.AbsoluteLayout;
 import org.flashapi.swing.list.ListItem;
 import org.flashapi.swing.containers.UIContainer;	
 
@@ -46,19 +47,20 @@ public class PanelAnimations extends PanelBase
 		super( $parent, $widthParam, $heightParam );
 		_level = $level;
 		autoHeight = false;
-		
+		layout = new AbsoluteLayout();
+
 		var ha:Label = new Label( "Has Animations", width );
 		ha.textAlign = TextAlign.CENTER;
 		ha.y = _currentY;
 		addElement( ha );
 
-		_listAnimations = new ListBox(  width - 10, $elementHeight, $heightParam );
+		_listAnimations = new ListBox(  $widthParam - 10, $elementHeight, $heightParam );
 		_listAnimations.x = 5;
 		_listAnimations.y = _currentY = _currentY + HEIGHT_BUTTON_DEFAULT - 5;
 		_listAnimations.eventCollector.addEvent( _listAnimations, ListEvent.LIST_CHANGED, select );
 		addElement( _listAnimations );
 
-		const btnWidth:int = width - 10;
+		const btnWidth:int = $widthParam - 10;
 		_addButton = new Button( LanguageManager.localizedStringGet( "Animation_Add" )  );
 		_addButton.y = _currentY = _currentY + _listAnimations.height + 10;
 		_addButton.x = 5;
@@ -95,24 +97,25 @@ public class PanelAnimations extends PanelBase
 				noAnimationSelected();
 		}
 
-		UIRegionModelEvent.addListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
+//		UIRegionModelEvent.addListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
 
-		height =  _currentY + HEIGHT_BUTTON_DEFAULT + 10;
+		_currentY = _currentY + HEIGHT_BUTTON_DEFAULT;
+		height =  _currentY;
 		recalc( width, height );
 	}
 
-	private function selectedModelChanged(e:UIRegionModelEvent):void {
-		// if the parent of the selected model has changed
-		// then we should clear the list, and wait for the next call to populate animation
-		if ( e.level <= _level )
-			_listAnimations.removeAll();
-		if ( e.level == _level )
-			populateAnimations( e.voxelModel);
-	}
+//	private function selectedModelChanged(e:UIRegionModelEvent):void {
+//		// if the parent of the selected model has changed
+//		// then we should clear the list, and wait for the next call to populate animation
+//		if ( e.level <= _level )
+//			_listAnimations.removeAll();
+//		if ( e.level == _level )
+//			populateAnimations( e.voxelModel);
+//	}
 
 	override public function close():void {
 		super.close();
-		UIRegionModelEvent.removeListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
+//		UIRegionModelEvent.removeListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
 		_listAnimations = null;
 		_selectedAnimation = null;
 		_buttonContainer = null;
