@@ -68,7 +68,7 @@ package com.voxelengine.worldmodel.tasks.tests
 		
 		private function addFlowTask( gc:GrainCursor ):void {
 			//trace( "adding new TestFlowSingleOxelFaces task");
-			Globals.g_flowTaskController.addFlowTask( this );
+			Globals.taskController.addFlowTask( this );
 		}
 
 		override public function cancel():void {

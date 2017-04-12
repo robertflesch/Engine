@@ -30,10 +30,10 @@ public class BuildQuads extends RenderingTask
     }
 
     override public function start():void {
+        var time:int = getTimer();
         super.start();
         //Log.out("BuildQuads.start: guid: " + _guid, Log.WARN);
 
-        var time:int = getTimer();
         if ( _chunk ) {
             _chunk.oxel.quadsBuild();
             //Log.out("BuildQuads.start: guid: " + _guid + "  gc: " + _chunk.gc + "  chunk count: " + Chunk.chunkCount(), Log.WARN);
@@ -41,14 +41,8 @@ public class BuildQuads extends RenderingTask
         var pt:int = (getTimer() - time);
         // if the processing time is less then 1 ms, do the next task
         OxelDataEvent.create( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, 0, _guid, null );
+        Log.out("BuildQuads.start: guid: " + _guid + "  childCount " + _chunk.oxel.childCount + " time: " + (getTimer()-time), Log.WARN);
         super.complete();
-        if ( pt < 1 ) {
-            //Log.out( "BuildQuads.start - refreshQuads guid: " + _guid + "  took: " + pt + " ms STARTING ANOTHER TASK", Log.WARN );
-            Globals.g_landscapeTaskController.next();
-        }
-//        else
-//            Log.out( "BuildQuads.start - refreshQuads guid: " + _guid + "  took: " + pt + " ms", Log.WARN );
-
     }
 }
 }

@@ -41,7 +41,7 @@ public class RefreshFaces extends RenderingTask
         super.complete();
         if ( pt < 1 ) {
             Log.out( "RefreshFaces.start - refreshQuads guid: " + _guid + "  took: " + pt + " ms STARTING ANOTHER TASK", Log.WARN );
-            Globals.g_landscapeTaskController.next();
+            Globals.taskController.next();
         }
         else
             Log.out( "RefreshFaces.start - refreshQuads guid: " + _guid + "  took: " + pt + " ms", Log.WARN );

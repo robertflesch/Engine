@@ -57,7 +57,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			_currentGrain = currentGrain;
 			_what = what;
 			_startTime = getTimer();
-			Globals.g_landscapeTaskController.addTask( this );
+			Globals.taskController.addTask( this );
 		}
 		
 		override public function start():void {

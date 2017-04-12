@@ -37,7 +37,7 @@ public class GenerateCube extends LandscapeTask {
 
 	static public function addTask($guid:String, layer:LayerInfo, $taskPriority:int = 5 ):void {
 		var genCube:GenerateCube = new GenerateCube($guid, layer, $taskPriority);
-		Globals.g_landscapeTaskController.addTask(genCube);
+		Globals.taskController.addTask(genCube);
 	}
 
 	// HAS to be public, but should NEVER be called

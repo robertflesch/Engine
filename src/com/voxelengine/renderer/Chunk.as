@@ -30,7 +30,8 @@ public class Chunk {
 	// But the higher it is, the longer updates take.
 	//static private const MAX_CHILDREN:uint = 32768; // draw for all chunks on island takes 1ms
 	//static private const MAX_CHILDREN:uint = 16384;
-	static private const MAX_CHILDREN:uint = 8192;
+	static private const MAX_CHILDREN:uint = 6000;
+	//static private const MAX_CHILDREN:uint = 8192;
 	static public var _s_chunkCount:int;
 	static public function chunkCount():int { return _s_chunkCount; }
 	//static private const MAX_CHILDREN:uint = 4096; // draw for all chunks on island takes 5ms

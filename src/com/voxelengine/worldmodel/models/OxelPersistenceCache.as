@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 
+import com.voxelengine.worldmodel.models.makers.OxelLoadAndBuildManager;
+
 import flash.utils.ByteArray;
 import flash.utils.Dictionary;
 import flash.net.URLLoaderDataFormat;
@@ -19,8 +21,6 @@ import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
-import com.voxelengine.worldmodel.tasks.landscapetasks.OxelLoadAndBuildTasks;
-import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
 
 /**
  * ...
@@ -67,8 +67,8 @@ public class OxelPersistenceCache
 			_loadingCount--;
 			OxelDataEvent.create( ModelBaseEvent.ADDED, $series, $op.guid, $op );
 			// Once the data has been loaded, this will start the build faces and quads process
-			OxelLoadAndBuildTasks.addTask( $op.guid, $op, FromByteArray.NORMAL_BYTE_LOAD_PRIORITY, $rebuildFacesAndScaling );
-
+			//OxelLoadAndBuildTasks.addTask( $op.guid, $op, FromByteArray.NORMAL_BYTE_LOAD_PRIORITY, $rebuildFacesAndScaling );
+			new OxelLoadAndBuildManager( $op.guid, $op, $rebuildFacesAndScaling );
 			if ( 0 == _loadingCount ) {
 				//Log.out( "OxelPersistenceCache.add - done loading oxels: " + $op.guid, Log.WARN );
 				// So does the loading of the VoxelModel or oxel complete region?

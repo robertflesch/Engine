@@ -41,7 +41,7 @@ package com.voxelengine.worldmodel.tasks.tests
 		
 		private function addFlowTask( gc:GrainCursor ):void {
 			//trace( "TestRemoveSequential.addFlowTask");
-			Globals.g_flowTaskController.addFlowTask( new TestFlowRemoveSequential( _guid, gc ), true);
+			Globals.taskController.addFlowTask( new TestFlowRemoveSequential( _guid, gc ), true);
 		}
 
 		override public function cancel():void {

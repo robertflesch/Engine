@@ -58,7 +58,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		
 		static public function addTask( $instanceGuid:String, gc:GrainCursor, $type:int, $flowInfo:FlowInfo, $taskPriority:int ):void 
 		{
-			Globals.g_flowTaskController.addTask( new FlowFlop( $instanceGuid, gc, $type, $flowInfo, FlowTask.TASK_TYPE, FlowTask.TASK_PRIORITY + $taskPriority ) );
+			Globals.taskController.addTask( new FlowFlop( $instanceGuid, gc, $type, $flowInfo, FlowTask.TASK_TYPE, FlowTask.TASK_PRIORITY + $taskPriority ) );
 		}
 		
 		public function FlowFlop( $instanceGuid:String, $gc:GrainCursor, $type:int, $flowInfo:FlowInfo, $taskType:String = TASK_TYPE, $taskPriority:int = TASK_PRIORITY ):void {
@@ -159,7 +159,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		}
 		
 		private function flowTasksAdd( flowTarget:Oxel, $upOrDown:Boolean, $flowInfo:FlowInfo ):void {
-			//Log.out( "Oxel.flowTaskAdd - $count: " + $countDown + "  countOut: " + $countOut + " gc data: " + flowCanditate.gc.toString() + " tasks: " + (Globals.g_flowTaskController.queueSize() + 1) );
+			//Log.out( "Oxel.flowTaskAdd - $count: " + $countDown + "  countOut: " + $countOut + " gc data: " + flowCanditate.gc.toString() + " tasks: " + (Globals.taskController.queueSize() + 1) );
 			var	taskPriority:int = 0;
 			if ( $upOrDown )
 				taskPriority = 1;

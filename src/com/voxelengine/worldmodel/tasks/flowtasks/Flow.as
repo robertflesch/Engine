@@ -53,7 +53,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			}
 			var f:Flow = new Flow( $instanceGuid, $gc, $type, $gc.toID(), $taskPriority );
 			f.selfOverride = true;
-			Globals.g_flowTaskController.addTask( f );
+			Globals.taskController.addTask( f );
 		}
 		
 		public function Flow( $instanceGuid:String, $gc:GrainCursor, $type:int, $taskType:String, $taskPriority:int ):void {
@@ -265,7 +265,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				if ( !$upOrDown && 0 == $flowInfo.flowScaling.min() )
 					continue
 				
-				//Log.out( "Oxel.flowTaskAdd - $count: " + $countDown + "  countOut: " + $countOut + " gc data: " + flowCanditate.gc.toString() + " tasks: " + (Globals.g_flowTaskController.queueSize() + 1) );
+				//Log.out( "Oxel.flowTaskAdd - $count: " + $countDown + "  countOut: " + $countOut + " gc data: " + flowCanditate.gc.toString() + " tasks: " + (Globals.taskController.queueSize() + 1) );
 				if (  null == flowTest.flowCandidate.flowInfo )
 					flowTest.flowCandidate.flowInfo = FlowInfoPool.poolGet()
 

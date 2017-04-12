@@ -32,7 +32,7 @@ public class FromByteArray extends AbstractTask
 
 	static public function addTask( $guid:String, $parent:OxelPersistence, $taskPriority:int ): void {
 		var fba:FromByteArray = new FromByteArray( $guid, $parent, $taskPriority );
-		Globals.g_landscapeTaskController.addTask( fba )
+		Globals.taskController.addTask( fba )
 	}
 	
 	public function FromByteArray( $guid:String, $parent:OxelPersistence, $taskPriority:int ):void {

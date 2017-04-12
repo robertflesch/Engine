@@ -176,7 +176,7 @@ package com.voxelengine.worldmodel
 				WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.DESTORY ) );
 			}
 			else
-				Globals.g_landscapeTaskController.paused = false
+				Globals.taskController.paused = false
 
 			ModelEvent.addListener( ModelEvent.TAKE_CONTROL, takeControlEvent );
 			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name, Log.DEBUG );

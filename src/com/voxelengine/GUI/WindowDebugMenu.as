@@ -99,9 +99,7 @@ public class WindowDebugMenu extends VVCanvas
 		//addInt( "ProjectilePool:", ProjectilePool.remaining );
 		//addSpace();
 
-		addInt( "Land Tasks:", Globals.g_landscapeTaskController.queueSize );
-		addInt( "Flow Tasks:", Globals.g_flowTaskController.queueSize );
-		addInt( "Light Tasks:", Globals.g_lightTaskController.queueSize );
+		addInt( "Land Tasks:", Globals.taskController.queueSize );
 		addSpace();
 		addSpace();
 

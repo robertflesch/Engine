@@ -215,18 +215,7 @@ public class ModelCache
 
 		//var taskTime:int = getTimer();
 		// Make sure to call this before the model update, so that models have time to repair them selves.
-		if ( 0 == Globals.g_landscapeTaskController.next() )
-		{
-			Globals.g_flowTaskController.next();
-			//while ( 0 < Globals.g_lightTaskController.queueSize() )
-			Globals.g_lightTaskController.next();
-		}
-		else  {
-			Globals.g_landscapeTaskController.paused = false
-		}
-		//taskTime = getTimer() - taskTime;
-
-		//var dynModelTime:int = getTimer();
+		Globals.taskController.next();
 
 		var context3D:Context3D = Renderer.renderer.context3D;
 		var vm:VoxelModel;

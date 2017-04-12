@@ -32,7 +32,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	{		
 		static public function addTask( $instanceGuid:String, gc:GrainCursor, $type:int, $flowInfo:FlowInfo, $taskPriority:int ):void 
 		{
-			Globals.g_flowTaskController.addTask( new FlowLimited( $instanceGuid, gc, $type, $flowInfo, "FlowLimited", FlowTask.TASK_PRIORITY + $taskPriority ) );
+			Globals.taskController.addTask( new FlowLimited( $instanceGuid, gc, $type, $flowInfo, "FlowLimited", FlowTask.TASK_PRIORITY + $taskPriority ) );
 		}
 		
 		public function FlowLimited( $instanceGuid:String, $gc:GrainCursor, $type:int, $flowInfo:FlowInfo, $taskType:String = TASK_TYPE, $taskPriority:int = TASK_PRIORITY ):void {

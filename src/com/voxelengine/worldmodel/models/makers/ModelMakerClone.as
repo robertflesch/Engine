@@ -7,8 +7,6 @@
  ==============================================================================*/
 package com.voxelengine.worldmodel.models.makers
 {
-import com.voxelengine.worldmodel.tasks.landscapetasks.OxelLoadAndBuildTasks;
-
 import flash.geom.Vector3D;
 
 import com.voxelengine.Log
@@ -97,7 +95,7 @@ public class ModelMakerClone extends ModelMakerBase {
 			_vm = make();
 			if ( _vm ) {
 				_vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
-				OxelLoadAndBuildTasks.addTask( modelInfo.guid, modelInfo.oxelPersistence );
+				new OxelLoadAndBuildManager( modelInfo.guid, modelInfo.oxelPersistence, false );
 				if ( false == modelInfo.childrenLoaded ){ // its true if they are loaded or the model has no children.
 					ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
 				} else

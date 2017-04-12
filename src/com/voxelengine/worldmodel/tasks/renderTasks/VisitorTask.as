@@ -39,7 +39,7 @@ public class VisitorTask extends RenderingTask
 		var pt:int = (getTimer() - time);
 		// if the processing time is less then 1 ms, do the next task
 		if ( pt < 1 )
-			Globals.g_landscapeTaskController.next();
+			Globals.taskController.next();
 		//else	
 		Log.out( "VisitorTask.func: " + _taskName + " chunkSize: " + ( (_chunk && _chunk.oxel) ? _chunk.oxel.childCount : 0) +  "  took: " + pt, Log.DEBUG )
 		

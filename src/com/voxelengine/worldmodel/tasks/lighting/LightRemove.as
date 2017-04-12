@@ -62,7 +62,7 @@ public class LightRemove extends LightTask
 		//Log.out( "Light.addTask: for gc: " + $gc.toString() + "  taskId: " + $gc.toID() );
 		var lt:LightRemove = new LightRemove( $instanceGuid, $gc, $lightID, $gc.toID(), $gc.grain );
 		lt.selfOverride = true;
-		Globals.g_lightTaskController.addTask( lt );
+		Globals.taskController.addTask( lt );
 	}
 
 	// NEVER use this, use the static function

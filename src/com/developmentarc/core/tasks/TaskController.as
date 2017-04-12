@@ -78,8 +78,8 @@ import flash.events.EventDispatcher;
 		 */		
 		protected var notReadyQueue:HashTable;
 		
-		//private var __activeTaskLimit:uint = 1;
-		private var __activeTaskLimit:uint = 2; // Since tasks call tasks...
+		private var __activeTaskLimit:uint = 1;
+		//private var __activeTaskLimit:uint = 2; // Since tasks call tasks...
 		private var __isBlocked:Boolean = false;
 		
 		//public static var _s_taskCount:int = 0;
@@ -139,7 +139,7 @@ import flash.events.EventDispatcher;
 			var result:Boolean;
 			// apply overrides
 			// if overrides dont override this task add task
-			Log.out( "TaskController.addTask - type: " + task.taskType, Log.WARN );
+			//Log.out( "TaskController.addTask - type: " + task.taskType, Log.WARN );
 			if(applyOverrides(task)) { 
 			
 				// determine priority and placement
@@ -153,7 +153,8 @@ import flash.events.EventDispatcher;
 				result = false;
 			}
 			// call next, to check queue state
-			next();
+// I dont want it to run right away
+//			next();
 			return result;
 		}
 		
@@ -339,8 +340,8 @@ import flash.events.EventDispatcher;
 					//trace( "TaskController.nextTask - startED: " + task );
 
 					// see if we can add more tasks
-					if (activeTasks.length < __activeTaskLimit) 
-						next();
+//					if (activeTasks.length < __activeTaskLimit)
+//						next();
 				} else {
 					// the task is not ready, add to the not ready queue
 					task.addEventListener(TaskEvent.TASK_READY, handleTaskEvent);
@@ -379,7 +380,7 @@ import flash.events.EventDispatcher;
 					if(task.isBlocker) __isBlocked = false;
 					
 					//paused = true;
-					next();
+//					next();
 				break;
 				
 				case TaskEvent.TASK_READY:

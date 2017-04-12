@@ -92,7 +92,7 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 		static private function addTask( $instanceGuid:String, $gc:GrainCursor, $lightID:uint, $lightDir:uint ):void {
 			var lt:LightAdd = new LightAdd( $instanceGuid, $gc, $lightID, $lightDir, $gc.toID(), $gc.grain );
 			lt.selfOverride = true;
-			Globals.g_lightTaskController.addTask( lt );
+			Globals.taskController.addTask( lt );
 		}
 		
 		private var _lightDir:uint;

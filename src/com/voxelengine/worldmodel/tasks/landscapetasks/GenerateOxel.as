@@ -55,7 +55,7 @@ public class GenerateOxel extends LandscapeTask {
 
     static public function addTask($guid:String, layer:LayerInfo, $taskPriority:int = 5 ):void {
         var gen:GenerateOxel = new GenerateOxel($guid, layer, $taskPriority);
-        Globals.g_landscapeTaskController.addTask(gen);
+        Globals.taskController.addTask(gen);
     }
 
     // HAS to be public, but should NEVER be called

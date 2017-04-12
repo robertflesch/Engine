@@ -35,7 +35,7 @@ package com.voxelengine.worldmodel.tasks.renderTasks
 			_chunk = $chunk
 			_taskCount++
 			super(taskType, taskPriority)
-			Globals.g_landscapeTaskController.addTask( this )			
+			Globals.taskController.addTask( this )
 		}
 		
 		override public function complete():void {

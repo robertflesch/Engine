@@ -63,7 +63,7 @@ public class Biomes
 	// Removed the completed task
 	public function addToTaskControllerUsingNewStyle( $guid:String ):void {
 		// land task controller
-		Globals.g_landscapeTaskController.paused = true
+		Globals.taskController.paused = true;
 
 		// Create task group
 		var taskGroup:TaskGroup = new TaskGroup("Generate Model for " + $guid, 2);
@@ -107,14 +107,14 @@ public class Biomes
 		//task =  new OutlineBoundries( $guid, null );
 		//taskGroup.addTask(task);
 
-		Globals.g_landscapeTaskController.addTask( taskGroup );
+		Globals.taskController.addTask( taskGroup );
 
 		// This unblocks the landscape task controller when all terrain tasks have been added
-		Globals.g_landscapeTaskController.paused = false
+		Globals.taskController.paused = false
 	}
 
 	public function addParticleTaskToController( $vm:VoxelModel ):void  {
-		Globals.g_landscapeTaskController.paused = true
+		Globals.taskController.paused = true
 		var guid:String = $vm.instanceInfo.instanceGuid;
 
 		// Create task group
@@ -123,8 +123,8 @@ public class Biomes
 		var task:ITask = new ParticleLoadingTask( $vm );
 		taskGroup.addTask(task);
 
-		Globals.g_landscapeTaskController.addTask( taskGroup );
-		Globals.g_landscapeTaskController.paused = false
+		Globals.taskController.addTask( taskGroup );
+		Globals.taskController.paused = false
 	}
 
 

@@ -106,7 +106,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			trace( "CarveOutsideSurfaceNoTaper - took: " + (getTimer() - timer) ); // + " in queue for: " + (timer - _startTime) );					
 			Oxel.merge( oxel );			
 			// Why was this in here?
-			//Globals.g_flowTaskController.emptyQueue();
+			//Globals.taskController.emptyQueue();
 			
 			super.complete();
 		}

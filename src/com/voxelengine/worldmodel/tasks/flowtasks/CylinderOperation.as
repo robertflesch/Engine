@@ -60,7 +60,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			_what = what;
 			_runCount = runCount;
 			_startTime = getTimer();
-			Globals.g_landscapeTaskController.addTask( this );
+			Globals.taskController.addTask( this );
 		}
 		
 		override public function start():void {

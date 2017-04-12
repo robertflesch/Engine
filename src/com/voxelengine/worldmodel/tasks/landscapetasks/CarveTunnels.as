@@ -42,7 +42,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			ct.view = $view.clone();
 			var taskGroup:TaskGroup = new TaskGroup("CarveTunnels for " + $guid, 2);
 			taskGroup.addTask( ct );
-			Globals.g_landscapeTaskController.addTask( taskGroup );
+			Globals.taskController.addTask( taskGroup );
 		}
 		
 		public function CarveTunnels( guid:String,layer:LayerInfo ):void {
