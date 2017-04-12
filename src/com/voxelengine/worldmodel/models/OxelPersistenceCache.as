@@ -58,7 +58,7 @@ public class OxelPersistenceCache
 	/*
 	* OxelDataEvent.create( ModelBaseEvent.ADDED, $series, $od.guid, $od );
 	*/
-	static private function add( $series:int, $op:OxelPersistence, $generated:Boolean = false ):void {
+	static private function add( $series:int, $op:OxelPersistence, $rebuildFacesAndScaling:Boolean = false ):void {
 		if ( null == _oxelDataDic[$op.guid] ) { // check to make sure this is new data
 			Log.out( "OxelDataCache.add adding: " + $op.guid, Log.INFO );
 			_oxelDataDic[$op.guid] = $op;
@@ -67,7 +67,7 @@ public class OxelPersistenceCache
 			_loadingCount--;
 			OxelDataEvent.create( ModelBaseEvent.ADDED, $series, $op.guid, $op );
 			// Once the data has been loaded, this will start the build faces and quads process
-			OxelLoadAndBuildTasks.addTask( $op.guid, $op, FromByteArray.NORMAL_BYTE_LOAD_PRIORITY, $generated );
+			OxelLoadAndBuildTasks.addTask( $op.guid, $op, FromByteArray.NORMAL_BYTE_LOAD_PRIORITY, $rebuildFacesAndScaling );
 
 			if ( 0 == _loadingCount ) {
 				//Log.out( "OxelPersistenceCache.add - done loading oxels: " + $op.guid, Log.WARN );
@@ -162,7 +162,7 @@ public class OxelPersistenceCache
 			add( $pe.series, op );
 		} else if ( $pe.data ) {
 			op = new OxelPersistence( $pe.guid, null, $pe.data as ByteArray );
-			add( $pe.series, op );
+			add( $pe.series, op, true ); // This rebuilds the faces and scaling of the imported models
 		} else {
 			Log.out( "OxelDataCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.WARN );
 			OxelDataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
