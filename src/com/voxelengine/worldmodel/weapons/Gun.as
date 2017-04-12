@@ -89,8 +89,8 @@ public class Gun extends ControllableVoxelModel
 		var ammo:Vector.<Ammo> = _armory.getAmmoList();
 		if ( ammo.length ) {
 			modelInfo.dbo.gun.ammos = [];
-			for (var count:int = 0; count < ammo.length; count++) {
-				modelInfo.dbo.gun.ammos.push({name: ammo[count].name})
+			for (var index:int = 0; index < ammo.length; index++) {
+				modelInfo.dbo.gun.ammos.push({guid: ammo[index].guid, remaining: 1000})
 			}
 		}
 		if ( _ammoCount ) {
@@ -127,7 +127,7 @@ public class Gun extends ControllableVoxelModel
 	}
 	
 	private function result(e:AmmoEvent):void {
-		Log.out( "Gun.result - _series ("+_series+") == e.series("+e.series+ ")", Log.WARN );
+		//Log.out( "Gun.result - _series ("+_series+") == e.series("+e.series+ ")", Log.WARN );
 		if ( _series == e.series ) {
 			_ammoCount--;
 			_armory.add( e.ammo );

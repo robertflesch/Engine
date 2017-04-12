@@ -40,6 +40,7 @@ public class PanelModels extends PanelBase
 	private var _listModels:ListBox;
 	private var _dictionarySource:Function;
 	private var _level:int;
+	private var _selectedText:Text
 
 	private var _dupButton:Button;
 	private var _detailButton:Button;
@@ -49,16 +50,21 @@ public class PanelModels extends PanelBase
 		super( $parent, $widthParam, $heightParam );
 		_parent = $parent;
 		_level = $level;
-		
+		autoHeight = false;
+		layout = new AbsoluteLayout();
+
 		//Log.out( "PanelModels - list box width: width: " + width + "  padding: " + pbPadding, Log.WARN );
-		_listModels = new ListBox( width - pbPadding, $elementHeight, $heightParam );
-		_listModels.dragEnabled = true;
-		_listModels.draggable = true;
+		_listModels = new ListBox( width - 10, $elementHeight, $heightParam );
+		_listModels.x = 5;
+//		_listModels.dragEnabled = true;
+//		_listModels.draggable = true;
 
 		_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, selectModel );		
 		ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
 
-		buttonsCreate();
+		var bHeight:int = buttonsCreate();
+		_listModels.y = bHeight;
+		height =  _listModels.y + _listModels.height + 10;
 		addElement( _listModels );
 
 		//ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.DELETE, 0, _modelGuid, null ) );
@@ -87,7 +93,7 @@ public class PanelModels extends PanelBase
 				modelFound = true;
 				if ( VoxelModel.selectedModel && VoxelModel.selectedModel.modelInfo == guids.modelInfo ) {
 					VoxelModel.selectedModel = null;
-					_selectedText.text = "";
+					_selectedText.text = "Previous Model Deleted";
 				}
 			}
 		}
@@ -111,7 +117,10 @@ public class PanelModels extends PanelBase
 		//Log.out( "PanelModels.populateModels - parentModel:" + $parentModel, Log.WARN )
 		_dictionarySource = $source;
 		_parentModel = $parentModel;
-		_listModels.removeAll();
+		_selectedText.text = "Nothing Selected";
+		if ( _listModels )
+			_listModels.removeAll();
+
 		var countAdded:int = 0;
 		for each ( var vm:VoxelModel in _dictionarySource() )
 		{
@@ -148,10 +157,9 @@ public class PanelModels extends PanelBase
 			return { "instanceGuid" : "", "modelGuid" : "" };
 	}
 
-	private var _selectedText:Text
 	//// FIXME This would be much better with drag and drop
 	// meaning removing the buttons completely
-	private function buttonsCreate():void {
+	private function buttonsCreate():int {
 		
 		const btnWidth:int = width - 10;
 		var container:Container;
@@ -167,25 +175,27 @@ public class PanelModels extends PanelBase
 		var currentY:int = 5;
 
 		_selectedText = new Text( width, 30 );
+		_selectedText.text = "Nothing Selected";
+		_selectedText.textAlign = TextAlign.CENTER;
 		container.addElement( _selectedText );
 		_selectedText.y = currentY;
+		_selectedText.x = 5;
 
 		var addButton:Button = new Button( LanguageManager.localizedStringGet( "Model_Add" )  );
 		//addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowModelList(); } );
 		addButton.eventCollector.addEvent( addButton, UIMouseEvent.CLICK, addModel );
 		
 		addButton.y = currentY = currentY + BUTTON_DISTANCE;
-		addButton.x = 2;			
+		addButton.x = 5;
 		addButton.width = btnWidth;
 		container.addElement( addButton );
 		container.height += addButton.height + pbPadding;
 		
 		_deleteButton = new Button( LanguageManager.localizedStringGet( "Model_Delete" ) );
 		_deleteButton.y = currentY = currentY + BUTTON_DISTANCE;
-		_deleteButton.x = 2;			
-		_deleteButton.width = width - 10;
+		_deleteButton.x = 5;
+		_deleteButton.width = btnWidth;
 		_deleteButton.enabled = false;
-		_deleteButton.active = false;
 		_deleteButton.eventCollector.addEvent( _deleteButton, UIMouseEvent.CLICK, deleteModelHandler );
 		_deleteButton.width = btnWidth;
 		container.addElement( _deleteButton );
@@ -193,26 +203,24 @@ public class PanelModels extends PanelBase
 		
 		_detailButton = new Button( LanguageManager.localizedStringGet( "Model_Detail" ) );
 		_detailButton.y = currentY = currentY + BUTTON_DISTANCE;
-		_detailButton.x = 2;			
-		_detailButton.width = width - 10;
-		_detailButton.enabled = false;
-		_detailButton.active = false;
-		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new WindowModelDetail( VoxelModel.selectedModel ); } );
+		_detailButton.x = 5;
 		_detailButton.width = btnWidth;
+		_detailButton.enabled = false;
+		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, function ($e:UIMouseEvent):void { new WindowModelDetail( VoxelModel.selectedModel ); } );
 		container.addElement( _detailButton );
 
 		if ( Globals.isDebug ) {
 			_dupButton = new Button( LanguageManager.localizedStringGet( "DUP" ) );
 			_dupButton.y = currentY = currentY + BUTTON_DISTANCE;
-			_dupButton.x = 2;
-			_dupButton.width = width - 10;
-			_dupButton.enabled = false;
-			_dupButton.active = false;
-			_dupButton.eventCollector.addEvent( _dupButton, UIMouseEvent.CLICK, dupModel );
+			_dupButton.x = 5;
 			_dupButton.width = btnWidth;
+			_dupButton.enabled = false;
+			_dupButton.eventCollector.addEvent( _dupButton, UIMouseEvent.CLICK, dupModel );
 			container.addElement( _dupButton );
 
 		}
+
+		return currentY + BUTTON_DISTANCE;
 
 		function dupModel(event:UIMouseEvent):void  {
 			if ( VoxelModel.selectedModel )
@@ -298,7 +306,9 @@ public class PanelModels extends PanelBase
 		return result;
 	}
 	private function selectModel(event:ListEvent):void {
+		Log.out("PanelModels.selectModel - B4 Double");
 		if ( doubleMessageHack ) {
+			Log.out("PanelModels.selectModel - AFTER Double");
 			if (event.target.data) {
 				//Log.out("PanelModels.selectModel has TARGET DATA");
 				buttonsEnable();
@@ -307,7 +317,7 @@ public class PanelModels extends PanelBase
 					VoxelModel.selectedModel = vm;
 					_selectedText.text = vm.metadata.name;
 					// TO DO this is the right path, but probably need a custom event for this...
-					UIRegionModelEvent.create(UIRegionModelEvent.SELECTED_MODEL_CHANGED, VoxelModel.selectedModel, _parentModel, _level);
+					UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, vm, _parentModel, _level);
 					//_parent.childPanelAdd( _selectedModel );
 					//_parent.animationPanelAdd( _selectedModel );
 				} else
@@ -317,7 +327,8 @@ public class PanelModels extends PanelBase
 				//Log.out("PanelModels.selectModel has NO target data");
 				buttonsDisable();
 				VoxelModel.selectedModel = null;
-				_selectedText.text = "";
+				_selectedText.text = "Nothing Selected";
+				UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, _parentModel, _level);
 			}
 		}
 	}

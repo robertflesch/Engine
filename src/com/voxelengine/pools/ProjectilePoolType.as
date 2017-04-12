@@ -11,8 +11,11 @@ package com.voxelengine.pools
 
 import com.voxelengine.Log
 import com.voxelengine.Globals
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.models.*
 import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
 import com.voxelengine.worldmodel.weapons.Projectile
 
 
@@ -45,7 +48,8 @@ public final class ProjectilePoolType
 		while( --i > -1 ) 
 			addToPool( newModel() )
 	}
-	
+
+    static private const 		PROJECTILE:String 					= "PROJECTILE";
 	private function generateData( $type:uint ):void {
 		
 		// I dont like that I create new metadata and _modelInfo for each projectile.
@@ -54,22 +58,25 @@ public final class ProjectilePoolType
 		//throw new Error( "Need to refactor this, I broke it when I added the island generation" );
 		// This is a special case for _modelInfo, the _modelInfo its self is contained in the generate script
 
-		throw new Error( "Refactor - 4.6.17 - Update to GenerateOxel.cubeScript");
-		/*
-		_modelInfo = new ModelInfo( _projectileGuid, null, GenerateCube.script( 2, TypeInfo.BLUE ) );
-		_modelInfo.dynamicObj = true;
+        _modelMetadata = new ModelMetadata( PROJECTILE );
+        _modelMetadata.permissions.modify = false;
+        _modelMetadata.dynamicObj = true;
+        _modelMetadata.name = _projectileGuid;
+        _modelMetadata.description = _projectileGuid + " - GENERATED";
+        _modelMetadata.owner = "";
+        var creationInfo:Object = GenerateOxel.cubeScript( 4, TypeInfo.BLUE );
+        creationInfo.modelClass = "PROJECTILE";
+        creationInfo.name = "EDIT_CURSOR";
+        //_modelInfo = new ModelInfo( _projectileGuid, null, GenerateOxel.cubeScript( 2, TypeInfo.BLUE ) );
+        //_modelInfo = new ModelInfo( PROJECTILE, null, creationInfo );
+        _modelInfo = new ModelInfo( PROJECTILE, null, {} );
+        _modelInfo.dynamicObj = true;
+        OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, _modelInfo.guid, null, true, true, creationInfo );
 
-		_modelMetadata = new ModelMetadata( _projectileGuid );
-		_modelMetadata.dynamicObj = true;
-		_modelMetadata.name = _projectileGuid;
-		_modelMetadata.description = _projectileGuid + " - GENERATED";
-		_modelMetadata.owner = "";
-		//ModelMetadataEvent.dispatch( new ModelMetadataEvent ( ModelBaseEvent.GENERATION, 0, _projectileGuid, _modelMetadata ) )
-		//Log.out( "ProjectilePoolType.generateData: " + _modelInfo.toString() );
-		var ba:ByteArray  = Oxel.generateCube( _projectileGuid, _modelInfo.biomes.layers[0], false );
-		_modelInfo.oxelPersistence = new OxelPersistence( _projectileGuid, null, ba );
-		_modelInfo.oxelPersistence.loadFromByteArray();
-		*/
+//		var ba:ByteArray  = Oxel.generateCube( _projectileGuid, _modelInfo.biomes.layers[0], false );
+//		_modelInfo.oxelPersistence = new OxelPersistence( _projectileGuid, null, ba );
+//		_modelInfo.oxelPersistence.loadFromByteArray();
+
 	}
 		
 	private function newModel():Projectile {	

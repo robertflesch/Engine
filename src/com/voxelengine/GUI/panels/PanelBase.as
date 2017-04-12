@@ -19,6 +19,9 @@ package com.voxelengine.GUI.panels
 	// all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
 	public class PanelBase extends Box
 	{
+		protected const HEIGHT_BUTTON_DEFAULT:int = 25;
+		protected const WIDTH_BUTTON_DEFAULT:int = 180;
+
 		protected var _parent:PanelBase;
 		protected const pbPadding:int = 5;
 		

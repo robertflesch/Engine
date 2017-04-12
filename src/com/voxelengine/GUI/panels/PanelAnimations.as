@@ -39,25 +39,65 @@ public class PanelAnimations extends PanelBase
 	private var _deleteButton:				Button;
 	private var _detailButton:				Button;
 	private var _selectedModel:				VoxelModel;
-	
+	private var _currentY:                  int;
+
 	public function PanelAnimations($parent:PanelModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number, $level:int )
 	{
 		super( $parent, $widthParam, $heightParam );
 		_level = $level;
+		autoHeight = false;
 		
 		var ha:Label = new Label( "Has Animations", width );
 		ha.textAlign = TextAlign.CENTER;
+		ha.y = _currentY;
 		addElement( ha );
-		
-		_listAnimations = new ListBox(  width - pbPadding, $elementHeight, $heightParam );
-		_listAnimations.eventCollector.addEvent( _listAnimations, ListEvent.LIST_CHANGED, select );			
+
+		_listAnimations = new ListBox(  width - 10, $elementHeight, $heightParam );
+		_listAnimations.x = 5;
+		_listAnimations.y = _currentY = _currentY + HEIGHT_BUTTON_DEFAULT - 5;
+		_listAnimations.eventCollector.addEvent( _listAnimations, ListEvent.LIST_CHANGED, select );
 		addElement( _listAnimations );
-		
-		animationButtonsCreate();
-		//addEventListener( UIMouseEvent.ROLL_OVER, rollOverHandler );
-		//addEventListener( UIMouseEvent.ROLL_OUT, rollOutHandler );
+
+		const btnWidth:int = width - 10;
+		_addButton = new Button( LanguageManager.localizedStringGet( "Animation_Add" )  );
+		_addButton.y = _currentY = _currentY + _listAnimations.height + 10;
+		_addButton.x = 5;
+		_addButton.eventCollector.addEvent( _addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowAnimationDetail( _selectedModel.modelInfo.guid, null ); } );
+		_addButton.width = btnWidth;
+		addElement( _addButton );
+
+		_deleteButton = new Button( LanguageManager.localizedStringGet( "Animation_Delete" ) );
+		_deleteButton.y = _currentY = _currentY + HEIGHT_BUTTON_DEFAULT;
+		_deleteButton.x = 5;
+		_deleteButton.eventCollector.addEvent( _deleteButton, UIMouseEvent.CLICK, deleteAnimationHandler );
+		_deleteButton.enabled = false;
+		_deleteButton.width = btnWidth;
+		addElement( _deleteButton );
+
+		_detailButton = new Button( LanguageManager.localizedStringGet( "Animation_Detail" ) );
+		_detailButton.y = _currentY = _currentY + HEIGHT_BUTTON_DEFAULT;
+		_detailButton.x = 5;
+		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, animationDetailHandler );
+		_detailButton.enabled = false;
+		_detailButton.width = btnWidth;
+
+		function deleteAnimationHandler(event:UIMouseEvent):void  {
+			if ( _selectedAnimation )
+			{
+				var anim:Animation = _selectedAnimation;
+				//(new Alert( LanguageManager.localizedStringGet( "NOT IMPLEMENTED" ) )).display();
+				AnimationEvent.create( ModelBaseEvent.DELETE, 0, _selectedModel.modelInfo.guid, anim.guid, null );
+				populateAnimations( _selectedModel );
+				_selectedModel.modelInfo.changed = true;
+				_selectedModel.save();
+			}
+			else
+				noAnimationSelected();
+		}
 
 		UIRegionModelEvent.addListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
+
+		height =  _currentY + HEIGHT_BUTTON_DEFAULT + 10;
 		recalc( width, height );
 	}
 
@@ -79,20 +119,6 @@ public class PanelAnimations extends PanelBase
 		_selectedModel = null;
 	}
 	
-	private function rollOverHandler(e:UIMouseEvent):void 
-	{
-		if ( null == _buttonContainer )
-			animationButtonsCreate();
-	}
-	
-	private function rollOutHandler(e:UIMouseEvent):void 
-	{
-		if ( null != _buttonContainer ) {
-			_buttonContainer.remove();
-			_buttonContainer = null;
-		}
-	}
-	
 	public function populateAnimations( $vm:VoxelModel ):void
 	{
 		_listAnimations.removeAll();
@@ -108,53 +134,7 @@ public class PanelAnimations extends PanelBase
 		}
 	}
 	
-	// FIXME This would be much better with drag and drop
-	private function animationButtonsCreate():void {
-		//Log.out( "PanelAnimations.animationButtonsCreate - width: " + width + "  height: " + height );
-		_buttonContainer = new Container( width, 100 );
-		_buttonContainer.layout.orientation = LayoutOrientation.VERTICAL;
-		_buttonContainer.padding = 2;
-		_buttonContainer.height = 0;
-		
-		addElement( _buttonContainer );
 
-		_addButton = new Button( LanguageManager.localizedStringGet( "Animation_Add" )  );
-		_addButton.eventCollector.addEvent( _addButton, UIMouseEvent.CLICK, function (event:UIMouseEvent):void { new WindowAnimationDetail( _selectedModel.modelInfo.guid, null ); } );
-		_addButton.width = width - 2 * pbPadding;
-		_buttonContainer.addElement( _addButton );
-		_buttonContainer.height += _addButton.height + pbPadding;
-		
-		_deleteButton = new Button( LanguageManager.localizedStringGet( "Animation_Delete" ) );
-		_deleteButton.eventCollector.addEvent( _deleteButton, UIMouseEvent.CLICK, deleteAnimationHandler );
-		_deleteButton.enabled = false;
-		_deleteButton.active = false;
-		_deleteButton.width = width - 2 * pbPadding;
-		_buttonContainer.addElement( _deleteButton );
-		_buttonContainer.height += _deleteButton.height + pbPadding;
-		
-		_detailButton = new Button( LanguageManager.localizedStringGet( "Animation_Detail" ) );
-		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, animationDetailHandler );
-		_detailButton.enabled = false;
-		_detailButton.active = false;
-		_detailButton.width = width - 2 * pbPadding;
-		_buttonContainer.addElement( _detailButton );
-		
-		function deleteAnimationHandler(event:UIMouseEvent):void  {
-			if ( _selectedAnimation )
-			{
-				var anim:Animation = _selectedAnimation;
-				//(new Alert( LanguageManager.localizedStringGet( "NOT IMPLEMENTED" ) )).display();
-				AnimationEvent.create( ModelBaseEvent.DELETE, 0, _selectedModel.modelInfo.guid, anim.guid, null );
-				populateAnimations( _selectedModel );
-				_selectedModel.modelInfo.changed = true;
-				_selectedModel.save();
-			}
-			else
-				noAnimationSelected();
-		}
-		//Log.out( "PanelAnimations.animationButtonsCreate AFTER - width: " + width + "  height: " + height + " buttoncontainer - AFTER - width: " + _buttonContainer.width + "  height: " + _buttonContainer.height );
-	}
-	
 	private function select(event:ListEvent):void 
 	{
 		_selectedAnimation = event.target.data;
