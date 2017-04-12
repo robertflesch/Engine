@@ -308,11 +308,11 @@ public class PanelModels extends PanelBase
 		return result;
 	}
 	private function selectModel(event:ListEvent):void {
-		Log.out("PanelModels.selectModel - B4 Double");
+		//Log.out("PanelModels.selectModel - B4 Double");
 		if ( doubleMessageHack ) {
-			Log.out("PanelModels.selectModel - AFTER Double");
+			//Log.out("PanelModels.selectModel - AFTER Double");
 			if (event.target.data) {
-				Log.out("PanelModels.selectModel has TARGET DATA");
+				//Log.out("PanelModels.selectModel has TARGET DATA");
 				buttonsEnable();
 				var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( event.target.data.instanceGuid );
 				if ( vm ) {
@@ -326,7 +326,7 @@ public class PanelModels extends PanelBase
 					buttonsDisable();
 			}
 			else {
-				Log.out("PanelModels.selectModel has NO target data");
+				//Log.out("PanelModels.selectModel has NO target data");
 				buttonsDisable();
 				VoxelModel.selectedModel = null;
 				_selectedText.text = "Nothing Selected";

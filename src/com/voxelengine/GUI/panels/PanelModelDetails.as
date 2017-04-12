@@ -166,7 +166,7 @@ public class PanelModelDetails extends PanelBase
 	}
 
 	private function animationButtonAdd($vm:VoxelModel):void {
-		_aniButton = new Button( LanguageManager.localizedStringGet( "Add_an animation" ) );
+		_aniButton = new Button( LanguageManager.localizedStringGet( "add_an_animation" ) );
 		_aniButton.x = 5;
 		_aniButton.y = height_calculated + 5;
 		_aniButton.width = BTN_WIDTH;
@@ -212,7 +212,7 @@ public class PanelModelDetails extends PanelBase
 	}
 
 	private function scriptButtonAdd($vm:VoxelModel):void {
-		_scriptsButton = new Button( LanguageManager.localizedStringGet( "Add a script" ) );
+		_scriptsButton = new Button( LanguageManager.localizedStringGet( "add_a_script" ) );
 		_scriptsButton.x = 5;
 		_scriptsButton.y = height_calculated + 5;
 		_scriptsButton.width = BTN_WIDTH;
