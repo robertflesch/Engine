@@ -60,6 +60,7 @@ public class AnimationAttachment
 		
 		Log.out( "AnimationAttachment - _attachsTo: " + _attachsTo + " fileName: " + $obj.fileName );
 		_instanceInfo = new InstanceInfo();
+		_instanceInfo.dynamicObject = true;
 		_instanceInfo.fromObject( $obj );
 	}
 /*
@@ -100,10 +101,11 @@ public class AnimationAttachment
 		Log.out( "AnimationAttachment.create owner: " + $owner.toString() );
 		_owner = $owner;
 		_instanceInfo.controllingModel = $owner;
+
 		if ( null == _voxelModel )
 		{
 			ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onAttachmentCreated );
-			ModelMakerBase.load( _instanceInfo );
+			ModelMakerBase.load( _instanceInfo, true, false );
 		}
 		else
 		{

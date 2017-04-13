@@ -26,13 +26,15 @@ import com.voxelengine.worldmodel.models.InstanceInfo
 public class ModelMaker extends ModelMakerBase {
 	
 	private var		_addToCount:Boolean;
-	
+	public function get addToCount():Boolean { return _addToCount; }
+	public function set addToCount(value:Boolean):void { _addToCount = value; }
+
 	public function ModelMaker( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean, $addToCount:Boolean = true ) {
 		//Log.out( "ModelMaker.constructor ii: " + $ii.toString(), Log.DEBUG );
 		super( $ii );
 		_addToRegionWhenComplete = $addToRegionWhenComplete;
 		_addToCount = $addToCount;
-		if ( _addToCount )
+		if ( addToCount )
 			makerCountIncrement();
 		retrieveBaseInfo();
 	}
@@ -96,6 +98,8 @@ public class ModelMaker extends ModelMakerBase {
 			_vm = make();
 			if ( _vm ) {
 				OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+				OxelDataEvent.addListener(ModelBaseEvent.RESULT, oxelBuildComplete );
+				OxelDataEvent.addListener(ModelBaseEvent.ADDED, oxelBuildComplete );
 				OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
 				OxelDataEvent.addListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
 				OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null );
@@ -106,7 +110,11 @@ public class ModelMaker extends ModelMakerBase {
 
 		function oxelBuildComplete($ode:OxelDataEvent):void {
 			if ($ode.modelGuid == modelInfo.guid ) {
+
+// does the op get assigned to the modelInfo for the result and add cases????
 				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+				OxelDataEvent.removeListener(ModelBaseEvent.RESULT, oxelBuildComplete );
+				OxelDataEvent.removeListener(ModelBaseEvent.ADDED, oxelBuildComplete );
 				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
 				OxelDataEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
 				markComplete( true );
@@ -116,6 +124,8 @@ public class ModelMaker extends ModelMakerBase {
 		function oxelBuildFailed($ode:OxelDataEvent):void {
 			if ($ode.modelGuid == modelInfo.guid ) {
 				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+				OxelDataEvent.removeListener(ModelBaseEvent.RESULT, oxelBuildComplete );
+				OxelDataEvent.removeListener(ModelBaseEvent.ADDED, oxelBuildComplete );
 				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
 				OxelDataEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
 				markComplete( false );
@@ -124,7 +134,7 @@ public class ModelMaker extends ModelMakerBase {
 	}
 
 	override protected function markComplete( $success:Boolean ):void {
-		if ( _addToCount ) {
+		if ( addToCount ) {
 			makerCountDecrement();
 			if (0 == makerCountGet())
 				WindowSplashEvent.dispatch(new WindowSplashEvent(WindowSplashEvent.ANNIHILATE))
@@ -133,5 +143,5 @@ public class ModelMaker extends ModelMakerBase {
 		// do this last as it nulls everything.
 		super.markComplete( $success );
 	}
-}	
+}
 }

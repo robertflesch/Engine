@@ -312,12 +312,14 @@ public class PanelModels extends PanelBase
 		if ( doubleMessageHack ) {
 			//Log.out("PanelModels.selectModel - AFTER Double");
 			if (event.target.data) {
-				//Log.out("PanelModels.selectModel has TARGET DATA");
+				Log.out("PanelModels.selectModel has TARGET DATA: " + event.target.data as String);
 				buttonsEnable();
 				var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( event.target.data.instanceGuid );
+				Log.out("PanelModels.selectModel vm: " + vm );
 				if ( vm ) {
 					VoxelModel.selectedModel = vm;
 					_selectedText.text = vm.metadata.name;
+					Log.out("PanelModels.selectModel vm.metadata.name: " + vm.metadata.name );
 					// TO DO this is the right path, but probably need a custom event for this...
 					UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, vm, _parentModel, _level);
 					//_parent.childPanelAdd( _selectedModel );
@@ -326,11 +328,11 @@ public class PanelModels extends PanelBase
 					buttonsDisable();
 			}
 			else {
-				//Log.out("PanelModels.selectModel has NO target data");
+				Log.out("PanelModels.selectModel has NO target data");
 				buttonsDisable();
 				VoxelModel.selectedModel = null;
 				_selectedText.text = "Nothing Selected";
-				UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, _parentModel, _level);
+				UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, null, _level);
 			}
 		}
 	}

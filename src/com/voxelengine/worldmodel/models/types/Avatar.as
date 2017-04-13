@@ -335,7 +335,7 @@ public class Avatar extends ControllableVoxelModel
 
 	override protected function cameraAddLocations():void {
 		//if ( Globals.isDebug )
-		//	camera.addLocation( new CameraLocation( true, 0, 0, 0 ) );
+			camera.addLocation( new CameraLocation( true, 0, 0, 0 ) );
 
 //			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, 0 ) );
 //			camera.addLocation( new CameraLocation( true, 0, Globals.AVATAR_HEIGHT - 4, 0) );

@@ -354,6 +354,13 @@ public class ModelInfo extends PersistenceObject
 	public		function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
 	public		function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
 	/////////////////////
+	public		function 	 unloadedChildCount():int		{
+		var count:int = 0;
+		for each ( var v:Object in dbo.children )
+			count++;
+		return count;
+	}
+
 	public function childrenLoad( $vm:VoxelModel ):void {
 		childrenLoaded	= true;
 		_childCount = 0;
@@ -606,12 +613,16 @@ public class ModelInfo extends PersistenceObject
 			if ( 0 < _childVoxelModels.length ) {
 				var children:Object = {};
 				for ( var i:int; i < _childVoxelModels.length; i++ ) {
-					if ( null != _childVoxelModels[i] ) {
+					var cm:VoxelModel = _childVoxelModels[i];
+					if ( null != cm ) {
+						// Don't save animation attachments!
+						if ( cm.instanceInfo.dynamicObject )
+							continue;
 						// Dont save the player as a child model
-						if ( _childVoxelModels[i] == VoxelModel.controlledModel )
-							continue
+						if ( cm == VoxelModel.controlledModel )
+							continue;
 						//children["instanceInfo" + i]  = _childrenInstanceInfo[i].toObject();
-						children[i]  = _childVoxelModels[i].instanceInfo.toObject();
+						children[i]  = cm.instanceInfo.toObject();
 					}
 				}
 				if ( children[0] ) // since the player might be a child model

@@ -100,6 +100,11 @@ public class WindowModelDeleteChildrenQuery extends VVPopup
 				_cb.selected = true;
 				addElement(_cb);
 				addElement( new Spacer( width, 20 ) );
+			} else if ( mi.unloadedChildCount() ) {
+				_cb = new CheckBox("Delete all child models too?");
+				_cb.selected = true;
+				addElement(_cb);
+				addElement( new Spacer( width, 20 ) );
 			}
 
 			var button:Button = new Button( "Delete", 100 );

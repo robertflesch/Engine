@@ -142,9 +142,9 @@ public class Animation extends PersistenceObject
 				_transforms.push( new AnimationTransform( transformObj ) );
 		}
 
-		if ( dbo.attachment ) {
+		if ( dbo.attachments ) {
 			_attachments = new Vector.<AnimationAttachment>;
-			for each ( var attachmentJson:Object in dbo.attachment )
+			for each ( var attachmentJson:Object in dbo.attachments )
 				_attachments.push( new AnimationAttachment( attachmentJson ) );
 		}
 

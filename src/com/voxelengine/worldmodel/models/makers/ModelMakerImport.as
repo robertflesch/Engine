@@ -94,6 +94,7 @@ public class ModelMakerImport extends ModelMakerBase {
 		if ( parentModelGuid ) {
 			//Log.out("ModelMakerImport.attemptMakeRetrieveParentModelInfo - retrieveParentModelInfo " + ii.toString());
 			retrieveParentModelInfo();
+			_modelMetadata.childOf = parentModelGuid;
 		}
 		else {
 			//Log.out("ModelMakerImport.attemptMakeRetrieveParentModelInfo - completeMake " + ii.toString());
