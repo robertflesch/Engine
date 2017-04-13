@@ -67,6 +67,7 @@ public class VoxelVerse extends Sprite
 	public function VoxelVerse():void {
 		addEventListener(Event.ADDED_TO_STAGE, init);
 		Globals.g_app = this;
+		_s_appStartTime = getTimer();
 	}
 
 	private function init(e:Event = null):void {
@@ -179,12 +180,14 @@ public class VoxelVerse extends Sprite
 	private var _s_timeEntered:int;
 	private var _s_timeExited:int = getTimer();
 
+	private var _s_appStartTime:int;
 	private var _s_timeLastFPS:int;
 	private var _s_frameCounter:int = 0;
 	private var framesToDisplaySplash:int;
 
 	private function enterFrame(e:Event):void {
 		if ( 0 == _s_timeEntered ) {
+			// Give the app one frame to display splash screen before doing anything
 			if ( _splashDisplayed && ( 1 == framesToDisplaySplash) )
 				readyToGo();
 			else{
@@ -203,10 +206,10 @@ public class VoxelVerse extends Sprite
 
 		RegionManager.instance.update( interFrameTime );
 		Shader.animationOffsetsUpdate( interFrameTime );
-		//var _timeUpdate:int = getTimer() - _s_timeEntered;
+		var _timeUpdate:int = getTimer() - _s_timeEntered;
 
 		Renderer.renderer.render();
-		//var _timeRender:int = getTimer() - _s_timeEntered - _s_timeUpdate;
+		var _timeRender:int = getTimer() - _s_timeEntered - _timeUpdate;
 
 		if ( showConsole )
 			toggleConsole();
@@ -219,10 +222,11 @@ public class VoxelVerse extends Sprite
 		}
 
 //		if ( ( 20 < _s_timeRender || 10 < _s_timeUpdate ) && Globals.active && Globals.isDebug )
-//			Log.out( "VoxelVerse.enterFrame - update: "  + _s_timeUpdate + " render: " + _s_timeRender  + "  total: " +  _s_frameTime + "  interFrameTime: " + interFrameTime, Log.INFO )
+//			Log.out( "VoxelVerse.enterFrame - update: "  + _timeUpdate + " render: " + _timeRender  + "  total: " +  (getTimer()-_s_timeEntered) + "  interFrameTime: " + interFrameTime, Log.INFO )
+// Log.out( "VoxelVerse.enterFrame - update: "  + _timeUpdate + " render: " + _timeRender  + "  total: " +  (getTimer()-_s_timeEntered + " running for: " + ((getTimer()-_s_appStartTime)/1000) + " seconds"), Log.INFO )
 
 		// For some reason is was important to make sure everything was updated before this got passed on to child classes.
-		AppEvent.dispatch( e )
+		AppEvent.dispatch( e );
 
 		_s_timeExited = getTimer();
 	}

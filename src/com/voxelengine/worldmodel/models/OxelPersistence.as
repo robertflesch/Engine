@@ -8,8 +8,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 
-import com.voxelengine.pools.LightInfoPool;
-import com.voxelengine.worldmodel.oxel.FlowInfo;
 
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
@@ -24,6 +22,10 @@ import com.voxelengine.Globals;
 import com.voxelengine.events.LevelOfDetailEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.renderer.Chunk;
+import com.voxelengine.pools.LightInfoPool;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.oxel.FlowInfo;
+import com.voxelengine.worldmodel.oxel.VisitorFunctions;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.LightInfo;
@@ -111,82 +113,6 @@ public class OxelPersistence extends PersistenceObject
 		version = Globals.VERSION;
 	}
 
-	private function stripDataFromImport( $importedData:ByteArray ):void {
-		try {
-			$importedData.uncompress();
-		} catch (error:Error) {
-			Log.out("OxelPersistence.stripDataFromImport - Was expecting compressed data " + guid, Log.WARN);
-		}
-
-		try {
-			$importedData.position = 0;
-			extractVersionInfo( $importedData );
-			var manifestVersion:int = $importedData.readByte();
-			if (version >= 4) {
-				var strLen:int = $importedData.readInt();
-				// read off that many bytes, even though we are using the data from the modelInfo file
-				var modelInfoJson:String = $importedData.readUTFBytes(strLen);
-			} else {
-				Log.out("OxelPersistence.stripDataFromImport - REALLY OLD VERSION " + guid, Log.WARN);
-				// need to read off one dummy byte
-				$importedData.readByte();
-				// next byte is root grain size
-			}
-
-			// Read off 1 bytes, the root size
-			bound = $importedData.readByte();
-
-			// Copy just the oxel data into the ba
-			ba = new ByteArray();
-			ba.writeBytes( $importedData, $importedData.position );
-			ba.position = 0;
-		}
-		catch (error:Error) {
-			Log.out("OxelPersistence.stripDataFromImport - exception stripping imported data " + guid, Log.WARN);
-		}
-	}
-
-/////////////////
-	// Make sense, called from for Makers
-	private function extractVersionInfo( $ba:ByteArray ):void {
-		// Read off first 3 bytes, the data format
-		var type:String = readFormat($ba);
-		if ("ivm" != type )
-			throw new Error("OxelPersistence.extractVersionInfo - Exception - unsupported format: " + type );
-
-		// Read off next 3 bytes, the data version
-		version = readVersion($ba);
-
-		// This reads the format info and advances position on byteArray
-		function readFormat($ba:ByteArray):String {
-			var format:String;
-			var byteRead:int = 0;
-			byteRead = $ba.readByte();
-			format = String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-			format += String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-			format += String.fromCharCode(byteRead);
-			return format;
-		}
-
-		// This reads the version info and advances position on byteArray
-		function readVersion($ba:ByteArray):int {
-			var version:String;
-			var byteRead:int = 0;
-			byteRead = $ba.readByte();
-			version = String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-			version += String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-			version += String.fromCharCode(byteRead);
-
-			return int(version);
-		}
-	}
-/////////////////
-
-
 	override public function release():void {
 		_statistics.release();
 		for each ( var o:Oxel in _oxels )
@@ -222,9 +148,7 @@ public class OxelPersistence extends PersistenceObject
 			}
 			else {
 				Log.out( "OxelPersistence.update ------------ calling refreshQuads guid: " + guid, Log.DEBUG );
-				topMostChunk.buildQuads( guid, $vm, _initializeFacesAndQuads );
-				if ( _initializeFacesAndQuads )
-					_initializeFacesAndQuads = false
+				topMostChunk.buildQuads( guid );
 			}
 		}
 	}
@@ -254,22 +178,6 @@ public class OxelPersistence extends PersistenceObject
 		return super.save();
 	}
 
-	override public function set changed(value:Boolean):void {
-//		if ( parent )
-//			parent.changed = value;
-		super.changed = value;
-	}
-
-//	private function versionGlobal():String {
-//		return zeroPad( Globals.VERSION, 3 );
-//		function zeroPad(number:int, width:int):String {
-//			var ret:String = ""+number;
-//			while( ret.length < width )
-//				ret="0" + ret;
-//			return ret;
-//		}
-//	}
-
 	override protected function toObject():void {
 		ba		= toByteArray();
 		if (oxel && oxel.gc )
@@ -289,16 +197,13 @@ public class OxelPersistence extends PersistenceObject
 	
 	public function loadFromByteArray():void {
 		Log.out( "OxelPersistence.loadFromByteArray - guid: " + guid, Log.INFO );
-
+		ba.position = 0;
 		_oxels[_lod] = Oxel.initializeRoot(bound);
 		oxel.readOxelData(ba, this );
-		//Log.out("OxelPersistence.lodFromByteArray - readOxelData took: " + (getTimer() - time), Log.INFO);
-
 		_statistics.gather();
-
 		_topMostChunks[_lod] = oxel.chunk = Chunk.parse( oxel, null, _lightInfo, guid );
-		//Log.out( "OxelPersistence.lodFromByteArray oxel.chunkGet(): " + oxel.chunkGet() +  "  lod: " + _lod + " _topMostChunks[_lod] " + _topMostChunks[_lod]  );
-		//Log.out( "OxelPersistence.lodFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
+		//Log.out( "OxelPersistence.loadFromByteArray oxel.chunkGet(): " + oxel.chunkGet() +  "  lod: " + _lod + " _topMostChunks[_lod] " + _topMostChunks[_lod]  );
+		//Log.out( "OxelPersistence.loadFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 	}
 
 	public function toByteArray():ByteArray {
@@ -307,16 +212,6 @@ public class OxelPersistence extends PersistenceObject
 		ba.compress();
 		Log.out( "OxelPersistence.toByteArray - guid: " + guid + "  POSTcompressed size: " + ba.length );
 		return ba;
-	}
-
-	static public function toByteArrayOld( $oxel:Oxel ):ByteArray {
-		var ba:ByteArray = new ByteArray();
-		writeVersionedHeaderOld( ba );
-		throw new Error("Refactor");
-		//ba = $oxel.toByteArray( ba );
-		ba.compress();
-		return ba;
-
 	}
 
 	static private function writeVersionedHeaderOld( $ba:ByteArray):void {
@@ -416,25 +311,16 @@ public class OxelPersistence extends PersistenceObject
 		Log.out( "lodCloneFailureEvent event: " + event, Log.ERROR );
 	}
 
-
-
-
-	/*
-	// legacy function for reference
-	static public function extractModelInfo( $ba:ByteArray ):Object {
-
-		// how many bytes is the modelInfo
-		var strLen:int = $ba.readInt();
-		// read off that many bytes
-		var modelInfoJson:String = $ba.readUTFBytes( strLen );
-		//Log.out( "ModelMakerBase.modelInfoFromByteArray - STRING modelInfo: " + modelInfoJson,	Log.WARN );
-		// create the modelInfo object from embedded metadata
-		modelInfoJson = decodeURI(modelInfoJson);
-		var jsonResult:Object = JSON.parse(modelInfoJson);
-		return jsonResult;		
-		
+	public function rescaleAndBuildFaces():void {
+		//OxelDataEvent.create( OxelDataEvent.OXEL_FACES_BUILT_FAIL, 0, guid, null );
+		VisitorFunctions.resetScaling( oxel );
+		oxel.chunkGet().buildFaces( true);
 	}
-	*/
+
+	public function buildQuads( $firstTime:Boolean = false):void {
+		//OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_FAIL, 0, guid, null);
+		oxel.chunkGet().buildQuads( $firstTime);
+	}
 
 	public function cloneNew( $guid:String ):OxelPersistence {
 		//toObject();
@@ -445,6 +331,84 @@ public class OxelPersistence extends PersistenceObject
 		newOP.changed = true;
 		return newOP;
 	}
+
+/////////////////
+	// Make sense, called from for Import Maker
+
+	private function stripDataFromImport( $importedData:ByteArray ):void {
+		try {
+			$importedData.uncompress();
+		} catch (error:Error) {
+			Log.out("OxelPersistence.stripDataFromImport - Was expecting compressed data " + guid, Log.WARN);
+		}
+
+		try {
+			$importedData.position = 0;
+			extractVersionInfo( $importedData );
+			var manifestVersion:int = $importedData.readByte();
+			if (version >= 4) {
+				var strLen:int = $importedData.readInt();
+				// read off that many bytes, even though we are using the data from the modelInfo file
+				var modelInfoJson:String = $importedData.readUTFBytes(strLen);
+			} else {
+				Log.out("OxelPersistence.stripDataFromImport - REALLY OLD VERSION " + guid, Log.WARN);
+				// need to read off one dummy byte
+				$importedData.readByte();
+				// next byte is root grain size
+			}
+
+			// Read off 1 bytes, the root size
+			bound = $importedData.readByte();
+
+			// Copy just the oxel data into the ba
+			ba = new ByteArray();
+			ba.writeBytes( $importedData, $importedData.position );
+			ba.position = 0;
+		}
+		catch (error:Error) {
+			Log.out("OxelPersistence.stripDataFromImport - exception stripping imported data " + guid, Log.WARN);
+		}
+	}
+
+	private function extractVersionInfo( $ba:ByteArray ):void {
+		// Read off first 3 bytes, the data format
+		var type:String = readFormat($ba);
+		if ("ivm" != type )
+			throw new Error("OxelPersistence.extractVersionInfo - Exception - unsupported format: " + type );
+
+		// Read off next 3 bytes, the data version
+		version = readVersion($ba);
+
+		// This reads the format info and advances position on byteArray
+		function readFormat($ba:ByteArray):String {
+			var format:String;
+			var byteRead:int = 0;
+			byteRead = $ba.readByte();
+			format = String.fromCharCode(byteRead);
+			byteRead = $ba.readByte();
+			format += String.fromCharCode(byteRead);
+			byteRead = $ba.readByte();
+			format += String.fromCharCode(byteRead);
+			return format;
+		}
+
+		// This reads the version info and advances position on byteArray
+		function readVersion($ba:ByteArray):int {
+			var version:String;
+			var byteRead:int = 0;
+			byteRead = $ba.readByte();
+			version = String.fromCharCode(byteRead);
+			byteRead = $ba.readByte();
+			version += String.fromCharCode(byteRead);
+			byteRead = $ba.readByte();
+			version += String.fromCharCode(byteRead);
+
+			return int(version);
+		}
+	}
+/////////////////
+
+
 }
 }
 

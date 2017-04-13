@@ -14,13 +14,11 @@ import flash.utils.ByteArray;
 public class OxelCloner {
     public function OxelCloner( $op:OxelPersistence ) {
 
-        throw new Error( "REFACTOR = 2.22.17");
-/*
         // this adds the version header, need for the persistanceEvent
-        var ba:ByteArray = OxelPersistence.toByteArray( $op.oxel );
+        //var ba:ByteArray = OxelPersistence.toByteArray( $op.oxel );
         // We want to write the copy into the new lod, and reduce it from there.
         $op.incrementLOD();
-        $op.lodFromByteArray( ba );
+        $op.loadFromByteArray();
 
         // the clone should be set to the current oxel , this should be called on the clone
         var lodCount:int = $op.lodModelCount();
@@ -33,7 +31,7 @@ public class OxelCloner {
         // Oxel.rebuild( oxel );
 
         LevelOfDetailEvent.dispatch( new LevelOfDetailEvent( LevelOfDetailEvent.MODEL_CLONE_COMPLETE ) );
-        */
+
     }
 }
 }

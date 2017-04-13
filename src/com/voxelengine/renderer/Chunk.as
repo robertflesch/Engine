@@ -10,6 +10,7 @@ package com.voxelengine.renderer {
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.pools.ChildOxelPool;
 import com.voxelengine.pools.GrainCursorPool;
+import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 
 import flash.geom.Matrix3D;
@@ -30,8 +31,8 @@ public class Chunk {
 	// But the higher it is, the longer updates take.
 	//static private const MAX_CHILDREN:uint = 32768; // draw for all chunks on island takes 1ms
 	//static private const MAX_CHILDREN:uint = 16384;
-	static private const MAX_CHILDREN:uint = 6000;
-	//static private const MAX_CHILDREN:uint = 8192;
+	//static private const MAX_CHILDREN:uint = 6000;
+	static private const MAX_CHILDREN:uint = 8192;
 	static public var _s_chunkCount:int;
 	static public function chunkCount():int { return _s_chunkCount; }
 	//static private const MAX_CHILDREN:uint = 4096; // draw for all chunks on island takes 5ms
@@ -165,15 +166,16 @@ public class Chunk {
 	}
 
 	private var _quadTasks:int;
-	public function buildQuads( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {
+	public function buildQuads( $firstTime:Boolean = false ):void {
+		var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
 		_quadTasks = 0;
 		var priority:int;
-		if ( $firstTime && $vm )
-			priority = $vm.distanceFromPlayerToModel(); // This should really be done on a per chuck basis
+		if ( $firstTime && vm )
+			priority = vm.distanceFromPlayerToModel(); // This should really be done on a per chuck basis
 		else
 			priority = 100; // high but not too high?
 		OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
-		buildQuadsRecursively( $guid, priority, $firstTime );
+		buildQuadsRecursively( _guid, priority, $firstTime );
 		if ( 0 == _quadTasks) {
 			OxelDataEvent.removeListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
 			OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, null);
@@ -213,15 +215,16 @@ public class Chunk {
 	}
 
 	private var _faceTasks:int;
-	public function buildFaces( $guid:String, $vm:VoxelModel, $firstTime:Boolean = false ):void {
+	public function buildFaces( $firstTime:Boolean = false ):void {
+		var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
 		_faceTasks = 0;
 		var priority:int;
-		if ( $firstTime && $vm )
-			priority = $vm.distanceFromPlayerToModel(); // This should really be done on a per chuck basis
+		if ( $firstTime && vm )
+			priority = vm.distanceFromPlayerToModel(); // This should really be done on a per chuck basis
 		else
 			priority = 100; // high but not too high?
 		OxelDataEvent.addListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
-		buildFacesRecursively( $guid, priority, $firstTime );
+		buildFacesRecursively( _guid, priority, $firstTime );
 		if ( 0 == _faceTasks) {
 			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
 			OxelDataEvent.create(OxelDataEvent.OXEL_FACES_BUILT_COMPLETE, 0, _guid, null);

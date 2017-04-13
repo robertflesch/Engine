@@ -130,7 +130,7 @@ public class ModelInfo extends PersistenceObject
 			delete dbo.biomes;
 		}
 
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, assignOxelData );
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_FBA_COMPLETE, assignOxelData );
 
 	}
 
@@ -204,10 +204,10 @@ public class ModelInfo extends PersistenceObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public function assignOxelData( $ode:OxelDataEvent ):void {
 		if ( guid == $ode.modelGuid ) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, assignOxelData );
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FBA_COMPLETE, assignOxelData );
 			oxelPersistence = $ode.oxelData;
 			// Set OxelPersistence to the baseLightLevel for this object.
-			Log.out("ModelInfo.assignOxelData - set baseLightLevel: " + baseLightLevel);
+			Log.out("ModelInfo.assignOxelData - TODO set baseLightLevel: " + baseLightLevel, Log.WARN);
 		}
 	}
 

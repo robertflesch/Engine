@@ -1959,7 +1959,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	OXEL_DATA_ADDITIONAL:uint  			    = 0x80000000; // deprecated used if oxel has flow or light data
 	*/
 	public function readOxelData($ba:ByteArray, $op:OxelPersistence ):void {
-		// Read off 1 bytes, the root size
+		var time:int = getTimer();
 		var rootGrainSize:int = $op.bound;
 		gc.grain = gc.bound = rootGrainSize;
 
@@ -1973,6 +1973,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		else
 			fromByteArray($op.version, null, gct, $ba, $op );
 
+		Log.out("Oxel.readOxelData - readOxelData took: " + (getTimer() - time), Log.INFO);
 		GrainCursorPool.poolDispose(gct);
 	}
 

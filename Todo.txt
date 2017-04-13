@@ -3,6 +3,9 @@
 VoxelVerse todo
 
 
+need to display ammo for gun models in voxel model panel
+HashTag not set in import
+SoundRange not set on import?
 dynamic lighting on all of dragon
 engine block on zeppelin does not light correctly 3.29.17
 if model is deleted from region models, the animation and script panels are not updated.
@@ -16,3 +19,18 @@ When deleting a model that has inventory, make sure to delete its inventory.
 ! 12.1.16 need to add clipVelocity and speedMultiplier to rest of the animations, and to the setState, so that they are not hard coded.
 ! 12.4.16 static lighting on head of dragon
 
+
+USAA - 30 year fixed
+4.375%	4.456%	-1.0
+4.125%	4.247%	0.5
+4.25%	4.33%	-0.5
+
+Chase
+4.000%	4.105%	1.250
+
+Fifth Third
+4.125%	4.23%	0.5
+
+WellsFargo
+4.250%	4.280%
+5/1 ARM	3.625%	3.905%
