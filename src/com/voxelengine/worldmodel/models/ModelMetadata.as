@@ -53,6 +53,9 @@ public class ModelMetadata extends PersistenceObject
 	public function get animationClass():String 			{ return dbo.animationClass; }
 	public function set animationClass(value:String):void  	{ dbo.animationClass = value; changed = true; }
 
+	public function get childOf():String 					{ return dbo.childOf; }
+	public function set childOf(value:String):void  		{ dbo.childOf = value; changed = true; }
+
 	public function get version():int 							{ return dbo.version; }
 	public function set version( value:int ):void				{ dbo.version = value; }
 
