@@ -3,13 +3,13 @@
   <component name="FlexBuildConfigurationManager" active="Debug">
     <configurations>
       <configuration name="Debug" pure-as="true" main-class="VoxelVerse" output-file="VoxelVerseDDesk.swf" output-folder="$MODULE_DIR$/../Resources/bin">
-        <dependencies target-player="22.0">
+        <dependencies target-player="25.0">
           <entries>
             <entry library-id="48f9b327-4678-43d7-b9fb-d2f59f02eb89">
               <dependency linkage="Merged" />
             </entry>
           </entries>
-          <sdk name="22.0" />
+          <sdk name="25.0" />
         </dependencies>
         <compiler-options>
           <map>
@@ -22,13 +22,13 @@
         <packaging-ios />
       </configuration>
       <configuration name="Release" pure-as="true" main-class="VoxelVerse" output-file="VoxelVerse.swf" output-folder="$MODULE_DIR$/../Resources/bin">
-        <dependencies target-player="22.0">
+        <dependencies target-player="25.0">
           <entries>
             <entry library-id="558cca8f-e53a-41d4-be0a-081cf3c8cf31">
               <dependency linkage="Merged" />
             </entry>
           </entries>
-          <sdk name="22.0" />
+          <sdk name="25.0" />
         </dependencies>
         <compiler-options>
           <map>
@@ -71,7 +71,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
     </content>
-    <orderEntry type="jdk" jdkName="23.0&#9;22.0" jdkType="__CompositeFlexSdk__" />
+    <orderEntry type="jdk" jdkName="25.0&#9;23.0" jdkType="__CompositeFlexSdk__" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="module-library" exported="">
       <library type="flex">
