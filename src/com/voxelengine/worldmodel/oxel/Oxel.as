@@ -3345,9 +3345,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		// CRITICAL STEP. oxels are expected to have faces, not dirty faces
 		// So this step turns the dirty faces into real faces.
 		// for multistep island builds I will have to ponder this more.
-		//oxel.facesBuild();
-		// This is now performed by the OxelLoadAndBuildTask
-
+		// TODO Ahhhh, you have to build faces HERE AND NOW
+		// Since the toByteArray does NOT save dirty bits!!!!
+		oxel.facesBuild();
 		var ba:ByteArray = oxel.toByteArray();
 //			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
 //			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
