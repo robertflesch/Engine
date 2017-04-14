@@ -279,7 +279,7 @@ public class ModelInfo extends PersistenceObject
 				if ( Globals.isGuid( animData.guid ) )
 					ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, guid, animData.guid, null, ModelBaseEvent.USE_PERSISTANCE );
 				else
-					ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, guid, animData.name, null, ModelBaseEvent.USE_FILE_SYSTEM );
+					ae = new AnimationEvent( ModelBaseEvent.REQUEST, _series, guid, animData.guid, null, ModelBaseEvent.USE_FILE_SYSTEM );
 					
 				_series = ae.series;
 				// special case here since we need to use the series
