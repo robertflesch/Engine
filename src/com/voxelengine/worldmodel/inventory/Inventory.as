@@ -65,15 +65,21 @@ public class Inventory extends PersistenceObject
 			return false;
 		}
 
-		if ( Player.DEFAULT_PLAYER == guid) {
-			Log.out("Inventory.save - Not saving DEFAULT_PLAYER - guid: " + guid, Log.DEBUG);
+		if ( !changed || !Globals.online || dynamicObj ) {
+	//			if ( Globals.online && !changed )
+	//				Log.out( name + " save - Not saving data - guid: " + guid + " NOT changed" );
+	//			else if ( !Globals.online && changed )
+	//				Log.out( name + " save - Not saving data - guid: " + guid + " NOT online" );
+	//			else
+	//				Log.out( name + " save - Not saving data - Offline and not changed" );
 			return false;
 		}
 
-		super.save();
+		// Network names are not valid guids, but we need to save them anyways!
+		validatedSave();
 		return true;
 	}
-	
+
 	override protected function toObject():void {
 		_slots.toObject( dbo );
 		dbo.modifiedData = new Date().toUTCString()
