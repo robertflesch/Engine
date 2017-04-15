@@ -83,6 +83,12 @@ public class AnimationSound extends PersistenceObject
 			dbo.hashTags = "#" + guid;
 		}
 
+		if ( !dbo.soundRangeMax )
+			soundRangeMax = 2000;
+
+		if ( !dbo.soundRangeMin )
+			soundRangeMin = 10;
+
 		try {
 			sound.loadCompressedDataFromByteArray(dbo.ba, dbo.ba.length);
 		} catch (error:Error) {
