@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.panels
 {
+import com.voxelengine.Globals;
 import com.voxelengine.worldmodel.animation.AnimationSound;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
@@ -31,16 +32,19 @@ public class PanelAnimationSound extends ExpandableBox
 
 		$ebco.itemBox.showReset = true
 		super( $parent, $ebco );
-		if ( null == $ebco.item ) {
-			throw new Error( "REFACTOR");
+//		if ( null == $ebco.item ) {
+//			throw new Error( "REFACTOR");
 //			_ani.animationSound = $ebco.item = new AnimationSound( _ani, AnimationSound.DEFAULT_OBJECT )
-		}
+//		}
 	}
 	
 	override protected function collapasedInfo():String  {
-		_ebco.itemBox.showNew = false;
+		//_ebco.itemBox.showNew = false;
 		_ebco.itemBox.showReset = true;
-		return _ani.animationSound.guid + " min: " + _ani.animationSound.soundRangeMin + " max: " + _ani.animationSound.soundRangeMax
+		if ( _ani && _ani.animationSound )
+			return " min: " + _ani.animationSound.soundRangeMin + " max: " + _ani.animationSound.soundRangeMax + "  " + _ani.animationSound.guid
+		else
+			return "New Animation Transform";
 	}
 	
 	override protected function resetElement():void  { 
@@ -49,30 +53,41 @@ public class PanelAnimationSound extends ExpandableBox
 	}
 	
 	// This handles the new model transform
-	override protected function newItemHandler( $me:UIMouseEvent ):void 		{ 
-		
-		_ani.animationSound.guid = "Undefined Sound";
+	override protected function newItemHandler( $me:UIMouseEvent ):void 		{
+		_ani.animationSound = new AnimationSound( Globals.getUID(), null, null );
+		//_ani.animationSound.guid = "Undefined Sound";
 		changeMode(); // collapse container
 		changeMode(); // reexpand so that new item is at the bottom
 	}
 	
 	override protected function expand():void {
 		super.expand();
-		
-		_itemBox.addElement( new ComponentLabelInput( "Name"
-									, function ($e:TextEvent):void { _ani.animationSound.guid = $e.target.text; setChanged(); }
-									, _ani.animationSound.guid ? _ani.animationSound.guid : "No animationSound"
-									, width - 20 ) )
-		
-		_itemBox.addElement( new ComponentLabelInput( "RangeMax"
-									  , function ($e:TextEvent):void { _ani.animationSound.soundRangeMax = int( $e.target.text ); setChanged(); }
-									  , _ani.animationSound.soundRangeMax ? String( _ani.animationSound.soundRangeMax ) : "No max range"
-									  , width - 20 ) )
-											
-		_itemBox.addElement( new ComponentLabelInput( "RangeMin"
-									  , function ($e:TextEvent):void { _ani.animationSound.soundRangeMin = int( $e.target.text ); setChanged(); }
-									  , _ani.animationSound.soundRangeMin ? String( _ani.animationSound.soundRangeMin ) : "No min range"
-									  , width - 20 ) )
+
+		if ( _ani.animationSound ) {
+			_itemBox.addElement(new ComponentLabelInput("Name"
+					, function ($e:TextEvent):void {
+						_ani.animationSound.guid = $e.target.text;
+						setChanged();
+					}
+					, _ani.animationSound.guid
+					, width - 20))
+
+			_itemBox.addElement(new ComponentLabelInput("RangeMax"
+					, function ($e:TextEvent):void {
+						_ani.animationSound.soundRangeMax = int($e.target.text);
+						setChanged();
+					}
+					, String(_ani.animationSound.soundRangeMax)
+					, width - 20))
+
+			_itemBox.addElement(new ComponentLabelInput("RangeMin"
+					, function ($e:TextEvent):void {
+						_ani.animationSound.soundRangeMin = int($e.target.text);
+						setChanged();
+					}
+					, String(_ani.animationSound.soundRangeMin)
+					, width - 20))
+		}
 	}
 	
 	/*

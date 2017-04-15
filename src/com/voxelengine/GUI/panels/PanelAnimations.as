@@ -82,6 +82,7 @@ public class PanelAnimations extends PanelBase
 		_detailButton.eventCollector.addEvent( _detailButton, UIMouseEvent.CLICK, animationDetailHandler );
 		_detailButton.enabled = false;
 		_detailButton.width = btnWidth;
+		addElement( _detailButton );
 
 		function deleteAnimationHandler(event:UIMouseEvent):void  {
 			if ( _selectedAnimation )
@@ -99,7 +100,7 @@ public class PanelAnimations extends PanelBase
 
 //		UIRegionModelEvent.addListener( UIRegionModelEvent.SELECTED_MODEL_CHANGED, selectedModelChanged );
 
-		_currentY = _currentY + HEIGHT_BUTTON_DEFAULT;
+		_currentY = _currentY + HEIGHT_BUTTON_DEFAULT + 5;
 		height =  _currentY;
 		recalc( width, height );
 	}

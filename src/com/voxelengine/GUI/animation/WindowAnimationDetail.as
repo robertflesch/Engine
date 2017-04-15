@@ -159,8 +159,6 @@ public class WindowAnimationDetail extends VVPopup
 		ebco.items = _ani.transforms as Vector.<*>;
 		ebco.itemDisplayObject = PanelAnimationTransform;
 		ebco.itemBox.newItemText = "Add transforms";
-		ebco.itemBox.showNew = true;
-		ebco.itemBox.title = "animatable elements";
 		ebco.paddingTop = 7;
 		addElement( new PanelVectorContainer( null, ebco ) )
 	}
@@ -171,8 +169,10 @@ public class WindowAnimationDetail extends VVPopup
 		ebco.width = WIDTH
 		ebco.rootObject = _ani
 		ebco.item = _ani.animationSound
-		ebco.itemBox.newItemText = "Add a animationSound"
+		ebco.itemBox.newItemText = "Add a Sound"
 		ebco.paddingTop = 7
+        ebco.itemBox.showNew = true;
+        ebco.itemBox.title = "Add a Sound(1)";
 		addElement( new PanelAnimationSound( null, ebco ) )
 	}
 /*	
