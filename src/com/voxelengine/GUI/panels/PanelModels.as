@@ -296,20 +296,7 @@ public class PanelModels extends PanelBase
 		}
 	}
 
-	import flash.utils.getTimer;
-	private var doubleMessageHackTime:int = getTimer();
-	private function get doubleMessageHack():Boolean {
-		var newTime:int = getTimer();
-		var result:Boolean = false;
-		if ( doubleMessageHackTime + Globals.DOUBLE_MESSAGE_WAITING_PERIOD * 10 < newTime ) {
-			doubleMessageHackTime = newTime;
-			result = true;
-		}
-		return result;
-	}
 	private function selectModel(event:ListEvent):void {
-		//Log.out("PanelModels.selectModel - B4 Double");
-		if ( doubleMessageHack ) {
 			//Log.out("PanelModels.selectModel - AFTER Double");
 			if (event.target.data) {
 				Log.out("PanelModels.selectModel has TARGET DATA: " + event.target.data as String);
@@ -334,7 +321,6 @@ public class PanelModels extends PanelBase
 				_selectedText.text = "Nothing Selected";
 				UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, null, _level);
 			}
-		}
 	}
 	
 	private function buttonsDisable():void {

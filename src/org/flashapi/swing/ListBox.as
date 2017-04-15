@@ -29,8 +29,10 @@ package org.flashapi.swing {
 	 *  @version 3.0.1, 11/04/2011 02:00
 	 *  @see http://www.flashapi.org/
 	 */
-	
-	import flash.display.DisplayObject;
+
+import com.voxelengine.Globals;
+
+import flash.display.DisplayObject;
 	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.events.KeyboardEvent;
@@ -1382,6 +1384,7 @@ package org.flashapi.swing {
 		
 		private function createSelectableItem():void {
 			var si:SelectableItem = new SelectableItem("");
+
 			si.enabled = false;
 			si.width = _itemsWidth;
 			addItemHandlers(si);
@@ -1393,6 +1396,11 @@ package org.flashapi.swing {
 			removeItemHandlers(si)
 			si.finalize();
 			si = null;
+		}
+
+		private function siToString( $si:SelectableItem):String {
+			return $si.label + " w: " + $si.width + " h: " +  $si.height  + " h: " + $si.html;
+
 		}
 		
 		private function setMaxScroll():void {
@@ -1497,20 +1505,40 @@ package org.flashapi.swing {
 		}
 		
 		private function removeItemHandlers(si:SelectableItem):void {
+			//trace("ListBox.removeItemHandlers si:" + siToString( si ));
 			$listEvtColl.removeEvent(si, UIMouseEvent.PRESS, pressHandler);
 			$listEvtColl.removeEvent(si, UIMouseEvent.RELEASE, releaseHandler);
 		}
 		
 		private function addItemHandlers(si:SelectableItem):void {
+			//trace("ListBox.addItemHandlers si:" + siToString( si ));
 			$listEvtColl.addEvent(si, UIMouseEvent.PRESS, pressHandler);
 			$listEvtColl.addEvent(si, UIMouseEvent.RELEASE, releaseHandler);
 		}
-		
+
+
+		import flash.utils.getTimer;
+		private var doubleMessageHackTime:int = getTimer();
+		private function get doubleMessageHack():Boolean {
+			var newTime:int = getTimer();
+			var result:Boolean = false;
+			if ( doubleMessageHackTime + Globals.DOUBLE_MESSAGE_WAITING_PERIOD < newTime ) {
+				doubleMessageHackTime = newTime;
+				result = true;
+			}
+			return result;
+		}
+
 		private function pressHandler(e:UIMouseEvent):void {
 			Scrollable.spas_internal::changeCurrentScrollable(_vScroll);
 			var si:SelectableItem = e.target as SelectableItem;
-			currentItemChanged(si);
-			dispatchEvent(new ListEvent(ListEvent.ITEM_PRESSED));
+			if ( doubleMessageHack ) {
+				currentItemChanged(si);
+				//trace("ListBox.pressHandler si:" + siToString(si));
+				dispatchEvent(new ListEvent(ListEvent.ITEM_PRESSED));
+			} else
+				trace("ListBox.pressHandler si:" + siToString(si) + " REJECTED <---------------------");
+
 		}
 		
 		private function updateSelectableItem(si:SelectableItem, value:*):void {
