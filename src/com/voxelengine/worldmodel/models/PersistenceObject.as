@@ -28,11 +28,15 @@ public class PersistenceObject
 	protected var 	_table:String;
 	private var 	_guid:String;
 	private var 	_changed:Boolean;
-	private var 	_dynamicObj:Boolean;
+
 	private var 	_dbo:DatabaseObject;
 	// BigDB doesn't like another save call in the middle of an existing one.
 	// So if we are in the "SAVING state, leave object "changed" and return.
-	private var 	_saving:Boolean;
+	protected var 	_saving:Boolean;
+
+	private var 	_dynamicObj:Boolean;
+	public function get dynamicObj():Boolean { return _dynamicObj; }
+	public function set dynamicObj(value:Boolean):void { _dynamicObj = value; }
 
 	public function PersistenceObject($guid:String, $table:String ) {
 		if ( null == $guid || "" == $guid )
@@ -69,9 +73,6 @@ public class PersistenceObject
 	public function set changed(value:Boolean):void {
 		//Log.out( "PersistenceObject.Changed value: " + value + "  guid: " + _guid, Log.WARN);
 		_changed = value; }
-	
-	public function get dynamicObj():Boolean { return _dynamicObj; }
-	public function set dynamicObj(value:Boolean):void { _dynamicObj = value; }
 	
 	public function clone( $guid:String ):* {
 		throw new Error( "PersistenceObject.clone - THIS METHOD NEEDS TO BE OVERRIDDEN", Log.ERROR );
@@ -127,7 +128,7 @@ public class PersistenceObject
 	protected function validatedSave():void {
 		var name:String = getQualifiedClassName(this);
 		if ( _saving ) {
-			Log.out("PersistenceObject.save - IN MIDDLE OF SAVE: " + name, Log.WARN);
+			//Log.out("PersistenceObject.save - IN MIDDLE OF SAVE: " + name, Log.WARN);
 			return;
 		}
 
