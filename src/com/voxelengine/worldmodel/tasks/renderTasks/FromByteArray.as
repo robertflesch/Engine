@@ -44,7 +44,7 @@ public class FromByteArray extends AbstractTask
 	override public function start():void {
 		super.start();
 		try {
-			Log.out("FromByteArray.start: guid: " + _guid, Log.WARN);
+			//Log.out("FromByteArray.start: guid: " + _guid, Log.WARN);
 			if ( 0 == _op.oxelCount) {
 				_op.loadFromByteArray();
 

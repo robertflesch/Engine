@@ -117,7 +117,7 @@ public class ModelCache
 		// if this is a child model, give it to parent, 
 		// next check to see if its a dynamic model
 		//otherwise add it to ModelCache list.
-		Log.out( "ModelCache.add - name: " + vm.metadata.name + "  guid: " + vm.instanceInfo.modelGuid + "  instanceGuid: " + vm.instanceInfo.instanceGuid, Log.WARN );
+		//Log.out( "ModelCache.add - name: " + vm.metadata.name + "  guid: " + vm.instanceInfo.modelGuid + "  instanceGuid: " + vm.instanceInfo.instanceGuid, Log.WARN );
 		if ( null == vm || null == vm.instanceInfo )
 			Log.out( "ModelCache.add - trying to add NULL model to cache", Log.WARN );
 
