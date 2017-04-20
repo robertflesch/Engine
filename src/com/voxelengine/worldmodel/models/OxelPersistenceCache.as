@@ -51,7 +51,7 @@ public class OxelPersistenceCache
 
 	static private function save(e:OxelDataEvent):void {
 		for each ( var op:OxelPersistence in _oxelDataDic )
-			if ( op )
+			if ( op && !op.dynamicObj )
 				op.save();
 	}
 
@@ -174,14 +174,17 @@ public class OxelPersistenceCache
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
 		Log.out( "OxelDataCache.generateSucceed " + $pe.toString(), Log.INFO );
-		var od:OxelPersistence = new OxelPersistence( $pe.guid, null, $pe.data, true );
+		var op:OxelPersistence = new OxelPersistence( $pe.guid, null, $pe.data, true );
+		if ( "PROJECTILE"  == $pe.guid )
+			op.dynamicObj = true;
+
 		if ( $pe.other )
-			od.bound = parseInt($pe.other);
+			op.bound = parseInt($pe.other);
 		else {
 			Log.out( "OxelDataCache.generateSucceed - BUT with unknown bound. Assigning bound of 0" + $pe.toString(), Log.WARN );
-			od.bound = 0;
+			op.bound = 0;
 		}
-		add( $pe.series, od, true );
+		add( $pe.series, op, true );
 	}
 
 	static private function loadFailed( $pe:PersistenceEvent ):void {
