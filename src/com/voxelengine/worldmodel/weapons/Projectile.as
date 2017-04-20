@@ -48,8 +48,7 @@ package com.voxelengine.worldmodel.weapons
 		//private var _explosionRadius:int 			= 16; // oxel.gc.grain * 8
 		//private var _explosionMin:int 				= 2; // oxel.gc.grain * 2
 		//
-		public function Projectile( $instanceInfo:InstanceInfo ) 
-		{ 
+		public function Projectile( $instanceInfo:InstanceInfo ) {
 			super( $instanceInfo );
 		}
 		

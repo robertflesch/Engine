@@ -32,10 +32,10 @@ import com.voxelengine.worldmodel.scripts.Script;
  */
 public class Gun extends ControllableVoxelModel 
 {
-	protected var _series:int;
-	protected var _armory:Armory;
-	protected var _reloadSpeed:Number = 1000;
-	protected var _weaponType:String = "HandGun";
+	protected var _series:int			= 0;
+	protected var _armory:Armory 		= new Armory();
+	protected var _reloadSpeed:Number 	= 1000;
+	protected var _weaponType:String 	= Armory.DEFAULT_WEAPON_TYPE;
 	private var _ammoLoaded:Boolean;
 
 	public function get weaponType():String  { return _weaponType; }
@@ -55,7 +55,6 @@ public class Gun extends ControllableVoxelModel
 	
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
-		_armory = new Armory();
 		if ( $mi.oxelPersistence && $mi.oxelPersistence.bound ) {
 			var centerLoc:int = 2 << ( $mi.oxelPersistence.bound - 2);
 			calculateCenter( centerLoc );
@@ -97,7 +96,7 @@ public class Gun extends ControllableVoxelModel
 		if ( ammo.length ) {
 			modelInfo.dbo.gun.ammos = [];
 			for (var index:int = 0; index < ammo.length; index++) {
-				modelInfo.dbo.gun.ammos.push({guid: ammo[index].guid, remaining: 1000})
+				modelInfo.dbo.gun.ammos.push({guid: ammo[index].guid})
 			}
 		}
 		if ( _ammoCount ) {

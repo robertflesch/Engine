@@ -27,8 +27,12 @@ import com.voxelengine.worldmodel.models.PersistenceObject;
 
 public class Ammo extends PersistenceObject
 {
-	private var saving:Boolean
+	public static const TYPE_SINGLE_SHOT:int = 1;
+	public static const TYPE_MULTI_SHOT:int = 2;
+
+	//private var saving:Boolean
 	public function get name():String  				{ return dbo.name; }
+	// RSF BAD RSF. what is TYPE?
 	public function get type():int  				{ return dbo.type; }
 	public function set type(val:int):void			{ dbo.type = val; }
 	public function get count():int  				{ return dbo.count; }
@@ -68,7 +72,7 @@ public class Ammo extends PersistenceObject
 			mergeOverwrite($newData);
 
 		if ( !dbo.type )
-			dbo.type = 1;
+			dbo.type = TYPE_SINGLE_SHOT;
 		if ( !dbo.count )
 			dbo.count = 1;
 		if ( !dbo.grain )
@@ -95,22 +99,24 @@ public class Ammo extends PersistenceObject
 
 
 		if ( !dbo.launchSound )
-			dbo.launchSound = "Cannon";
+			dbo.launchSound = "";
 		if ( !Globals.isGuid( dbo.launchSound ) )
-			SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, updateSoundGuid )
+			SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, updateSoundGuid );
 
 		if ( !dbo.impactSound )
-			dbo.impactSound = "CannonBallExploding";
+			dbo.impactSound = "";
 
 		if ( !Globals.isGuid( dbo.impactSound ) || !Globals.isGuid( dbo.launchSound ) ) {
-			SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, updateSoundGuid )
-			SoundEvent.addListener( ModelBaseEvent.ADDED, verifySoundData )
-			SoundEvent.addListener( ModelBaseEvent.RESULT, verifySoundData )
+			SoundEvent.addListener( ModelBaseEvent.UPDATE_GUID, updateSoundGuid );
+//			SoundEvent.addListener( ModelBaseEvent.ADDED, verifySoundData );
+//			SoundEvent.addListener( ModelBaseEvent.RESULT, verifySoundData );
 		}
 
-		SoundEvent.create( ModelBaseEvent.REQUEST, 0, dbo.launchSound, null, Globals.isGuid( dbo.launchSound ) );
+		if ( dbo.launchSound != "" )
+			SoundEvent.create( ModelBaseEvent.REQUEST, 0, dbo.launchSound, null, Globals.isGuid( dbo.launchSound ) );
 		//SoundEvent.dispatch( new SoundEvent( ModelBaseEvent.REQUEST, 0, dbo.impactSound, null, Globals.isGuid( dbo.impactSound ) ? true : false ) )
-		SoundEvent.create( ModelBaseEvent.REQUEST, 0, dbo.impactSound, null, Globals.isGuid( dbo.impactSound ) );
+		if ( dbo.impactSound != "" )
+			SoundEvent.create( ModelBaseEvent.REQUEST, 0, dbo.impactSound, null, Globals.isGuid( dbo.impactSound ) );
 	}
 
 
@@ -125,7 +131,7 @@ public class Ammo extends PersistenceObject
 
 		function setToDefault():void {
 			dbo.name = "Blank";
-			dbo.type = 1;
+			dbo.type = TYPE_SINGLE_SHOT;
 			dbo.count = 1;
 			dbo.grain = 2;
 			dbo.accuracy = 0.1;
@@ -206,17 +212,6 @@ public class Ammo extends PersistenceObject
 	}
 
 	override public function save():Boolean {
-		// Watch how the guid is saved.
-		if ( saving ) {
-			Log.out( "Ammo.save - in process of saving:" + guid )
-			return false;
-		}
-		if ( !Globals.isGuid( launchSound ) || !Globals.isGuid( impactSound ) ) {
-			Log.out( "Ammo.save - sounds not guids:" + guid + " impactSound: " + impactSound + " launchSound: " + launchSound  )
-			return false;
-		}
-		saving = true;
-
 		if ( !changed || !Globals.online || dynamicObj ) {
 //			if ( Globals.online && !changed )
 //				Log.out( name + " save - Not saving data - guid: " + guid + " NOT changed" );
@@ -242,63 +237,63 @@ public class Ammo extends PersistenceObject
 			   + " ammo old guid: " + oldGuid 
 			   + " ammo new guid: " + newGuid 
 			   + " impactSound: " + impactSound 
-			   + " launchSound: " + launchSound  )
+			   + " launchSound: " + launchSound  );
 		
 		if ( dbo.impactSound == oldGuid ) {
-			dbo.impactSound = newGuid
+			dbo.impactSound = newGuid;
 			changed = true
 		}
 		if ( dbo.launchSound == oldGuid ) {
-			dbo.launchSound = newGuid
+			dbo.launchSound = newGuid;
 			changed = true
 		}
 		
-		if ( changed )
+		if ( (impactSound == "" || Globals.isGuid(impactSound)) && (launchSound == "" || Globals.isGuid(launchSound)) )
 			save()
 	}
-	
+	/*
 	private function verifySoundData( $se:SoundEvent ):void {
 		Log.out( "Ammo.verifySoundData: " + guid 
 		       + " ammo name: " + $se.snd.dbo.name 
 			   + " ammo guid: " + $se.snd.guid 
 			   + " impactSound: " + impactSound 
-			   + " launchSound: " + launchSound  )
+			   + " launchSound: " + launchSound  );
 		if ( dbo.launchSound == $se.snd.dbo.name ) {
-			dbo.launchSound = $se.snd.guid
+			dbo.launchSound = $se.snd.guid;
 			changed = true
 		}
 		if ( dbo.impactSound == $se.snd.dbo.name ) {
-			dbo.impactSound = $se.snd.guid
+			dbo.impactSound = $se.snd.guid;
 			changed = true
 		}
 		if ( changed )
 			save()
 	}
-
+*/
 	// Just assign the dbo from the create to the region
 	private function createdHandler( $pe:PersistenceEvent ):void {
 		if ( Globals.BIGDB_TABLE_AMMO != $pe.table )
-			return
+			return;
 		if ( guid != $pe.guid )
-			return
+			return;
 		
 		PersistenceEvent.removeListener( PersistenceEvent.CREATE_SUCCEED, 	createdHandler );
 		// update the dbo with the saved version
 //		var oldInfo:Object = info
-		dbo = $pe.dbo
+		dbo = $pe.dbo;
 //		dbo.ammo = oldInfo
-		Log.out( "Ammo.createdHandler: " + guid )
-		saving = false;
+		Log.out( "Ammo.createdHandler: " + guid );
+		_saving = false;
 	}	
 	
 	private function endSaving( $pe:PersistenceEvent ):void {
 		if ( Globals.BIGDB_TABLE_AMMO != $pe.table )
-			return
+			return;
 		if ( guid != $pe.guid )
-			return
+			return;
 		
-		Log.out( "Ammo.saved: " + guid )
-		saving = false;
+		Log.out( "Ammo.saved: " + guid );
+		_saving = false;
 	}
 }
 }

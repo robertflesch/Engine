@@ -109,7 +109,8 @@ public class AmmoCache
 					return;
 				}
 				ammo = new Ammo( $pe.guid, null, newObjData );
-				ammo.save();
+				if ( ammo.impactSound == "" && ammo.launchSound == "" )
+					ammo.save();
 			}
 			
 			add( $pe, ammo );
