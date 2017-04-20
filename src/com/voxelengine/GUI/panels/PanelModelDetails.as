@@ -27,7 +27,7 @@ public class PanelModelDetails extends PanelBase
 	static private const BTN_WIDTH:int = 190;
 	static private const WIDTH_DEFAULT:int = 200;
 	static private const HEIGHT_DEFAULT:int = 300;
-	static private const HEIGHT_LIST_DEFAULT:int = 150;
+	static private const HEIGHT_LIST_DEFAULT:int = 250;
 
 	private var _parentModel:VoxelModel;
 	private var _listModels:PanelModels;
@@ -149,7 +149,7 @@ public class PanelModelDetails extends PanelBase
 	//////////////////////////////////////////////////////////////////////////
 	public function animationPanelAdd( $vm:VoxelModel ):void {
 		if ( null == _listAnimations ) {
-			_listAnimations = new PanelAnimations( this, WIDTH_DEFAULT, 15, HEIGHT_LIST_DEFAULT, _level );
+			_listAnimations = new PanelAnimations( this, WIDTH_DEFAULT, 15, HEIGHT_LIST_DEFAULT/2, _level );
 			_listAnimations.y = height_calculated;
 			addElement( _listAnimations );
 			height_calculated += _listAnimations.height;
@@ -187,7 +187,7 @@ public class PanelModelDetails extends PanelBase
 	
 	public function scriptPanelAdd( $vm:VoxelModel ):void {
 		if ( null == _listScripts ) {
-			_listScripts = new PanelModelScripts( this, WIDTH_DEFAULT, 15, HEIGHT_LIST_DEFAULT - 100 );
+			_listScripts = new PanelModelScripts( this, WIDTH_DEFAULT, 15, HEIGHT_LIST_DEFAULT/3 );
 			_listScripts.y = height_calculated;
 			addElement( _listScripts );
 			height_calculated += _listScripts.height;
@@ -227,7 +227,7 @@ public class PanelModelDetails extends PanelBase
 	
 	public function ammoPanelAdd( $vm:Gun ):void {
 		if ( null == _listAmmo ) {
-			_listAmmo = new PanelModelAmmo( this, WIDTH_DEFAULT, 15, HEIGHT_LIST_DEFAULT );
+			_listAmmo = new PanelModelAmmo( this, WIDTH_DEFAULT, 15, HEIGHT_LIST_DEFAULT/3 );
 			_listAmmo.y = height_calculated;
 			addElement( _listAmmo );
 			height_calculated += _listAmmo.height;
@@ -242,17 +242,5 @@ public class PanelModelDetails extends PanelBase
 			_listAmmo = null;
 		}
 	}
-
-//	private function addButtonAmmo($vm:Gun):void {
-//		_ammoButton = new Button( LanguageManager.localizedStringGet( "Add Ammo" ) );
-//		_ammoButton.width = width - 10;
-//		_ammoButton.enabled = true;
-//		//_ammoButton.active = false;
-//		_ammoButton.eventCollector.addEvent( _ammoButton, UIMouseEvent.CLICK, function (e:UIMouseEvent):void { removeElement( e.target ); ammoPanelAdd( $vm ) } );
-//		_ammoButton.width = _listModels.width - 10;
-//		addElement( _ammoButton );
-//	}
-
-
 }
 }

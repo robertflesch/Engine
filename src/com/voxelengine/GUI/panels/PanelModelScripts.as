@@ -103,6 +103,7 @@ public class PanelModelScripts extends PanelBase
 
     override public function close():void {
         super.close();
+        ScriptEvent.removeListener( ScriptEvent.SCRIPT_SELECTED, scriptSelected );
         _listScripts.removeAll();
         _listScripts = null;
         _selectedScript = null;

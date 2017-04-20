@@ -33,11 +33,16 @@ import com.voxelengine.worldmodel.scripts.Script;
 public class Gun extends ControllableVoxelModel 
 {
 	protected var _series:int;
-	protected var _armory:Armory = new Armory();
-	protected var _reloadSpeed:Number;
+	protected var _armory:Armory;
+	protected var _reloadSpeed:Number = 1000;
+	protected var _weaponType:String = "HandGun";
 	private var _ammoLoaded:Boolean;
 
+	public function get weaponType():String  { return _weaponType; }
+
 	public function get armory():Armory  { return _armory; }
+	public function armoryAddAmmo( $ammo:Ammo ):void  { _armory.add( $ammo ); modelInfo.changed = true; }
+	public function armoryRemoveAmmo( $ammo:Ammo ):void  { _armory.remove( $ammo ); modelInfo.changed = true; }
 	public function get reloadSpeed():Number { return _reloadSpeed; }
 	//Barrel
 	//Stand
@@ -50,6 +55,7 @@ public class Gun extends ControllableVoxelModel
 	
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
+		_armory = new Armory();
 		if ( $mi.oxelPersistence && $mi.oxelPersistence.bound ) {
 			var centerLoc:int = 2 << ( $mi.oxelPersistence.bound - 2);
 			calculateCenter( centerLoc );
@@ -85,6 +91,7 @@ public class Gun extends ControllableVoxelModel
 		super.buildExportObject();
 		modelInfo.dbo.gun = {};
 
+		modelInfo.dbo.gun.weaponType = _weaponType;
 		modelInfo.dbo.gun.reloadSpeed = _reloadSpeed;
 		var ammo:Vector.<Ammo> = _armory.getAmmoList();
 		if ( ammo.length ) {
@@ -105,10 +112,13 @@ public class Gun extends ControllableVoxelModel
 		if ( modelInfo.dbo.gun )
 			var gunInfo:Object = modelInfo.dbo.gun;
 		else {
-			Log.out( "Gun.processClassJson - Gun section not found: " + modelInfo.dbo.toString(), Log.ERROR );
+			Log.out( "Gun.processClassJson - Gun section not found: " + modelInfo.dbo.toString(), Log.WARN );
 			return;
 		}
-		
+
+		if ( gunInfo.weaponType )
+			_weaponType = gunInfo.weaponType;
+
 		if ( gunInfo.reloadSpeed )
 			_reloadSpeed = gunInfo.reloadSpeed;
 

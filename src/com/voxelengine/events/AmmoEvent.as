@@ -17,6 +17,8 @@ import com.voxelengine.worldmodel.weapons.Ammo;
  */
 public class AmmoEvent extends ModelBaseEvent
 {
+	static public const AMMO_SELECTED:String	= "AMMO_SELECTED";
+
 	private var _guid:String;
 	private var _ammo:Ammo;
 	private var _fromTable:Boolean;
@@ -56,7 +58,11 @@ public class AmmoEvent extends ModelBaseEvent
 	static public function dispatch( $event:AmmoEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
-	
+
+	static public function create( $type:String, $series:int, $guid:String, $ammo:Ammo, $fromTable:Boolean = true) : Boolean {
+		return _eventDispatcher.dispatchEvent( new AmmoEvent( $type, $series, $guid, $ammo, $fromTable ) );
+	}
+
 	///////////////// Event handler interface /////////////////////////////
 }
 }

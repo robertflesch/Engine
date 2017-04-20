@@ -30,6 +30,7 @@ public class Globals  {
 	static public const BIGDB_TABLE_REGIONS:String = "regions";
 
 	// Yahoo Game Networks Big DB table indexs
+	static public const BIGDB_TABLE_AMMO_INDEX_WEAPON_TYPE:String = "weaponType";
 	static public const BIGDB_TABLE_REGIONS_INDEX_OWNER:String = "owner";
 	static public const BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER:String = "owner";
 

@@ -7,24 +7,38 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.weapons
 {
+import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.weapons.Ammo;
 
 /**
  * ...
  * @author Robert Flesch - RSF 
  */
-public class Armory 
-{
+public class Armory {
+
+	public static const WEAPON_TYPE_HANDGUN:String = "WEAPON_TYPE_HANDGUN";
+	public static const WEAPON_TYPE_RIFLE:String = "WEAPON_TYPE_RIFLE";
+	public static const WEAPON_TYPE_CANNON:String = "WEAPON_TYPE_CANNON";
+	public static const WEAPON_TYPE_BOMB:String = "WEAPON_TYPE_BOMB";
+	public static const DEFAULT_WEAPON_TYPE:String = WEAPON_TYPE_HANDGUN;
+
 	private var _selectedAmmoIndex:int;
 	private var _ammos:Vector.<Ammo> = new Vector.<Ammo>;
-	
-	public function Armory()  { 
+
+	public function Armory()  {
 	}
 	
 	public function add( $ammo:Ammo ):void {
 		_ammos.push( $ammo );
 	}
-	
+
+	public function remove( $ammo:Ammo ):void {
+		for ( var i:int; i < _ammos.length; i++ ) {
+			if ( _ammos[i] && $ammo.name == _ammos[i].name )
+				_ammos.splice( i, 1);
+		}
+	}
+
 	public function currentSelection():Ammo {
 		if ( _ammos.length ) {
 			if ( _selectedAmmoIndex >= _ammos.length )

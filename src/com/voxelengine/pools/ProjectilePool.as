@@ -9,22 +9,21 @@
 package com.voxelengine.pools 
 {
 
+import com.voxelengine.Log
 import com.voxelengine.events.AmmoEvent
 import com.voxelengine.events.ModelBaseEvent
-import com.voxelengine.Log
-import com.voxelengine.events.LoadingEvent
 import com.voxelengine.worldmodel.weapons.Ammo;
 import com.voxelengine.worldmodel.weapons.Projectile
      
 public final class ProjectilePool 
 { 
-	private static var _currentPoolSize:int 
-	private static var _growthValue:int
+	private static var _currentPoolSize:int;
+	private static var _growthValue:int;
 	private static var _pools:Object = {};
 	
 	public static function initialize( $initialPoolSize:uint, $growthValue:uint ):void { 
-		_currentPoolSize = $initialPoolSize
-		_growthValue = $growthValue 
+		_currentPoolSize = $initialPoolSize;
+		_growthValue = $growthValue;
 		AmmoEvent.addListener( ModelBaseEvent.ADDED, ammoAdded )
 	} 
 	
@@ -33,17 +32,17 @@ public final class ProjectilePool
 	}
 	
 	public static function poolGet( ammo:Ammo ):Projectile { 
-		var pool:ProjectilePoolType = _pools[ammo.name]
+		var pool:ProjectilePoolType = _pools[ammo.name];
 		if ( !pool )
-			pool = _pools[ammo.name] = new ProjectilePoolType(ammo.oxelType, _currentPoolSize, _growthValue)
+			pool = _pools[ammo.name] = new ProjectilePoolType(ammo.oxelType, _currentPoolSize, _growthValue);
 		return pool.poolGet() 
 	} 
 
 	public static function poolDispose( $disposedProjectile:Projectile):void { 
-		var name:String = $disposedProjectile.ammo.name
-		var pool:ProjectilePoolType = _pools[name]
+		var name:String = $disposedProjectile.ammo.name;
+		var pool:ProjectilePoolType = _pools[name];
 		if ( !pool ) {
-			Log.out( "ProjectilePool.poolDispose - no pool found for name: " + name + " ammo: " + $disposedProjectile.ammo.toString() )
+			Log.out( "ProjectilePool.poolDispose - no pool found for name: " + name + " ammo: " + $disposedProjectile.ammo.toString() );
 			return
 		}
 		pool.poolDispose( $disposedProjectile )

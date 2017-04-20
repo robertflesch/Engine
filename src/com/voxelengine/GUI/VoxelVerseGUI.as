@@ -17,6 +17,7 @@ import flash.net.FileReference;
 import flash.ui.Keyboard;
 import flash.events.FullScreenEvent;
 import flash.display.StageDisplayState;
+import flash.utils.Timer;
 
 import org.flashapi.swing.event.UIOEvent;
 import org.flashapi.swing.Label;
@@ -99,29 +100,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		else
 			Globals.g_app.stage.displayState =	StageDisplayState.NORMAL;
 	}
-	
-	private function createProjectile( vm:VoxelModel ):void  {
-		/*
-		if ( _projectileEnabled )
-		{
-			var ps:FireProjectileScript = new FireProjectileScript( _bulletSize );
-			ps.accuracy = 0;
-			ps.velocity = 1200;
-			ps.owner = Player.player.instanceInfo.instanceGuid;
-			ps.onModelEvent( new ModelEvent( WeaponEvent.FIRE, "" ) );
-			
-			_projectileEnabled = false;
-			var pt:Timer = new Timer( 1000, 1 );
-			pt.addEventListener(TimerEvent.TIMER, onEnableProjectile );
-			pt.start();
-		}
-		*/
-	}
 
-	protected function onEnableProjectile(event:TimerEvent):void {
-		_projectileEnabled = true;
-	}
-	
 	//public function saveModelIVM():void {
 		//Log.out("VoxelVerseGUI.saveModel - Saving model to FILE");
 		 ////three steps
@@ -415,6 +394,60 @@ public class VoxelVerseGUI extends EventDispatcher
 		popup.display( Renderer.renderer.width / 2 - (((popup.width + 10) / 2) + popup.x ), Renderer.renderer.height / 2 - (((popup.height + 10) / 2) + popup.y) );
 		popup.eventCollector.addEvent( popup, UIOEvent.REMOVED, function( e:UIOEvent ):void { new WindowSandboxList(); popup.remove(); } );
 	}
-	
+
+
+	import com.voxelengine.worldmodel.scripts.FireProjectileScript;
+	import com.voxelengine.events.WeaponEvent;
+	import com.voxelengine.worldmodel.models.InstanceInfo;
+	import com.voxelengine.worldmodel.weapons.Ammo;
+	import com.voxelengine.worldmodel.weapons.Gun;
+
+	private var _gunTest:Gun
+	private function createProjectile( vm:VoxelModel ):void  {
+		if ( _projectileEnabled )
+		{
+			if ( null == _gunTest ) {
+				var gunii:InstanceInfo = new InstanceInfo();
+				gunii.modelGuid = "1MeterRedBlock";
+				gunii.instanceGuid = Globals.getUID();
+				_gunTest = new Gun(gunii);
+//				_gunTest.init( )
+
+				var ammo:Object = {
+					"guid": "AvatarTest",
+					"name": "AvatarAmmoTest",
+					"accuracy" : 0.05,
+					"velocity" : 200,
+					"type" : 1,
+					"count" : 10,
+					"oxelType" : "DragonEarth",
+					"life" : 5000,
+					"grain" : 2,
+					"model" : "CannonBall",
+					"launchSound" : "",
+					"impactSound" : "",
+					"contactScript" : "ExplosionScript"
+				};
+				_gunTest.armory.add( new Ammo( "AvatarAmmoTest", null, ammo ) )
+			}
+			var ps:FireProjectileScript = new FireProjectileScript( {} );
+			WeaponEvent.dispatch( new WeaponEvent( WeaponEvent.FIRE, _gunTest,  _gunTest.armory.currentSelection() ) );
+//			ps.accuracy = 0;
+//			ps.velocity = 1200;
+//			ps.owner = VoxelModel.controlledModel.instanceInfo.instanceGuid;
+//			ps.onModelEvent( new ModelEvent( WeaponEvent.FIRE, "" ) );
+
+			_projectileEnabled = false;
+			var pt:Timer = new Timer( 1000, 1 );
+			pt.addEventListener(TimerEvent.TIMER, onEnableProjectile );
+			pt.start();
+		}
+	}
+
+	protected function onEnableProjectile(event:TimerEvent):void {
+		_projectileEnabled = true;
+	}
+
+
 }
 }

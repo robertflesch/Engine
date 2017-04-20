@@ -41,6 +41,7 @@ public class Ammo extends PersistenceObject
 	public function set velocity(val:Number):void 	{ dbo.velocity = val; }
 	public function get life():Number 				{ return dbo.life; }
 	public function set life(val:Number):void 		{ dbo.life = val; }
+	public function get weaponType():String  		{ return dbo.weaponType; }
 	public function get launchSound():String  		{ return dbo.launchSound; }
 	public function get impactSound():String  		{ return dbo.impactSound; }
 	public function get contactScript():String  	{ return dbo.contactScript; }

@@ -32,8 +32,7 @@ import flash.utils.getQualifiedClassName;
 
 		public function Script( $params:Object ){ }
 
-		public function init():void {
-		}
+		public function init():void {}
 		
 		public function dispose():void { 
 			_vm = null; 

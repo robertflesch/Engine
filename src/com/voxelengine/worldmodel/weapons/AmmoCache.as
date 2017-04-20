@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.weapons
 {
+import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
 import flash.utils.ByteArray;
@@ -37,7 +38,8 @@ public class AmmoCache
 	
 	static public function init():void {
 		AmmoEvent.addListener( ModelBaseEvent.REQUEST, request );
-		
+		AmmoEvent.addListener( ModelBaseEvent.REQUEST_TYPE, requestType );
+
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, 	loadNotFound );
@@ -46,7 +48,17 @@ public class AmmoCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  modelData
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	static private function request( $ae:AmmoEvent ):void 
+
+	static private function requestType( $ae:AmmoEvent ):void {
+		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $ae.series, Globals.BIGDB_TABLE_AMMO, $ae.guid, null, Globals.BIGDB_TABLE_AMMO_INDEX_WEAPON_TYPE ) );
+		for each ( var ammo:Ammo in _ammoData ) {
+			if ( ammo.weaponType == $ae.guid )
+				AmmoEvent.dispatch(new AmmoEvent(ModelBaseEvent.RESULT, 0, ammo.guid, ammo));
+		}
+	}
+
+
+	static private function request( $ae:AmmoEvent ):void
 	{   
 		if ( null == $ae.guid ) {
 			Log.out( "AmmoCache.request guid requested is NULL", Log.WARN );
