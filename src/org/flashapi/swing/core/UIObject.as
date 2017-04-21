@@ -2672,7 +2672,10 @@ package org.flashapi.swing.core {
 					lookAndFeel = null;
 				}
 //				$uiRef.lafList.deleteObserver(this); RSF commented out since it was an error 11/21/2016
-				if ($uiRef.lafList.countObservers() == 0) $uiRef.lafList = null;
+				if ( $uiRef.lafList ) {
+					if ($uiRef.lafList.countObservers() == 0)
+						$uiRef.lafList = null;
+				}
 			}
 			spas_internal::lafDTO.spas_internal::finalize();
 			spas_internal::lafDTO = null;
