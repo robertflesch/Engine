@@ -35,7 +35,6 @@ public class Animation extends PersistenceObject
 	
 	//private var _loaded:Boolean = false;
 	private var _transforms:Vector.<AnimationTransform>;
-	private var _attachments:Vector.<AnimationAttachment>;
 	private var _animationSound:AnimationSound;
 	private var _permissions:PermissionsBase;
 	private var  _clipVelocity:SecureNumber 		= new SecureNumber( 0.95 );
@@ -47,7 +46,6 @@ public class Animation extends PersistenceObject
 	public function get speedMultiplier():Number  					{ return _speedMultiplier.val; }
 	public function set speedMultiplier($value:Number):void  		{ _speedMultiplier.val = $value; }
 
-	public function get attachments():Vector.<AnimationAttachment> { return _attachments; }
 	public function get transforms():Vector.<AnimationTransform> { return _transforms; }
 	//public function get loaded():Boolean { return _loaded; }
 	
@@ -142,12 +140,6 @@ public class Animation extends PersistenceObject
 				_transforms.push( new AnimationTransform( transformObj ) );
 		}
 
-		if ( dbo.attachments ) {
-			_attachments = new Vector.<AnimationAttachment>;
-			for each ( var attachmentJson:Object in dbo.attachments )
-				_attachments.push( new AnimationAttachment( attachmentJson ) );
-		}
-
 		// the permission object is just an encapsulation of the permissions section of the object
 		_permissions = new PermissionsBase( dbo );
 	}
@@ -191,8 +183,6 @@ public class Animation extends PersistenceObject
 			backupInfo.sound = _animationSound.sound;
 		if ( _transforms && _transforms.length )
 			backupInfo.animations = getAnimations();
-		if ( _attachments && _attachments.length )
-			backupInfo.attachments = getAttachments();
 		// TODO - add clip velocity and speed multiplier
 //		dbo.clipVelocity = clipVelocity;
 //		dbo.speedMultiplier = speedMultiplier;
@@ -221,22 +211,11 @@ public class Animation extends PersistenceObject
 			dbo.sound = _animationSound.toAnimationData();
 		if ( _transforms && _transforms.length )
 			dbo.animations = getAnimations();
-		if ( _attachments && _attachments.length )
-			dbo.attachments = getAttachments();
 
 		dbo.clipVelocity = clipVelocity;
 		//Log.out( "Animation.toObject - clipVelocity: " + clipVelocity);
 		dbo.speedMultiplier = speedMultiplier;
 		//Log.out( "Animation.toObject - speedMultiplier: " + speedMultiplier);
-	}
-	
-	private function getAttachments():Object {
-		var attachments:Array = [];
-		for each ( var aa:AnimationAttachment in _attachments ) {
-			var aao:Object = aa.toObject();
-			attachments.push( aao );
-		}
-		return attachments
 	}
 	
 	private function getAnimations():Object {
@@ -330,27 +309,29 @@ public class Animation extends PersistenceObject
 		//Log.out( "Animation.play - name: " + _name );
 		if ( _animationSound )
 			_animationSound.play( $scale );
-			
-		if ( _attachments && 0 < _attachments.length ) {
-			for each ( var aa:AnimationAttachment in _attachments ) {
-				var cm:VoxelModel = $owner.childFindByName( aa.attachsTo );
-				if ( cm )
-					aa.create( cm );
-			}
-		}
+
+		// TODO thinking for each transform, add attachments
+
+//		if ( _attachments && 0 < _attachments.length ) {
+//			for each ( var aa:AnimationAttachment in _attachments ) {
+//				var cm:VoxelModel = $owner.childFindByName( aa.attachsTo );
+//				if ( cm )
+//					aa.create( cm );
+//			}
+//		}
 	}
 	
 	public function stop( $owner:VoxelModel ):void {
 		if ( _animationSound )
 			_animationSound.stop();
 			
-		if ( _attachments && 0 < _attachments.length ) {
-			for each ( var aa:AnimationAttachment in _attachments ) {
-				var cm:VoxelModel = $owner.childFindByName( aa.attachsTo );
-				if ( cm )
-					aa.detach();
-			}
-		}
+//		if ( _attachments && 0 < _attachments.length ) {
+//			for each ( var aa:AnimationAttachment in _attachments ) {
+//				var cm:VoxelModel = $owner.childFindByName( aa.attachsTo );
+//				if ( cm )
+//					aa.detach();
+//			}
+//		}
 	}
 	
 	public function update( $val:Number ):void {

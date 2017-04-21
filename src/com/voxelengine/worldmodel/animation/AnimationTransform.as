@@ -25,9 +25,11 @@ public class AnimationTransform
 	private var _rotation:Vector3D = new Vector3D();
 	private var _scale:Vector3D = new Vector3D(1,1,1);
 	private var _transforms:Vector.<ModelTransform> = new Vector.<ModelTransform>;
+//    private var _attachments:Vector.<AnimationAttachment>;
+//  public function get hasAttachments():Boolean  				{ return (_attachments && 0 < _attachments.length); }
 	private var _notNamed:Boolean = false;
 
-	// for compatability with PanelVectorContainer
+	// for compatibility with PanelVectorContainer
 	public function get name():String 							{ return _attachmentName; }
 	public function get attachmentName():String 				{ return _attachmentName; }
 	public function set attachmentName( $val:String ):void 		{ _attachmentName = $val; }
@@ -50,13 +52,13 @@ public class AnimationTransform
 		if ( false == $val )
 			_scale.setTo( 1, 1, 1 );
 	}
-	public function get hasTransform():Boolean  				{ return 0 < _transforms.length; }
+  	public function get hasTransform():Boolean  				{ return 0 < _transforms.length; }
 	// what the heck does this do? 9.28.15 RSF
 	public function get notNamed():Boolean 						{ return _notNamed; }
 	
 	public function resetInitialPosition():void {
-		_position.setTo(0,0,0)
-		_rotation.setTo(0,0,0)
+		_position.setTo(0,0,0);
+		_rotation.setTo(0,0,0);
 		_scale.setTo(1,1,1)
 	}
 	
@@ -89,7 +91,13 @@ public class AnimationTransform
 		if ( $obj.rotation ) {
 			_rotation = new Vector3D( $obj.rotation.x, $obj.rotation.y, $obj.rotation.z );
 		}
-			
+
+//		if ( $obj.attachments ) {
+//            _attachments = new Vector.<AnimationAttachment>;
+//            for each ( var attachmentJson:Object in $obj.attachments )
+//                _attachments.push( new AnimationAttachment( attachmentJson, attachmentName ) );
+//        }
+
 		if ( $obj.transforms ) {
 			for each ( var modelTransform:Object in $obj.transforms ) {
 				var type:int = ModelTransform.stringToType( modelTransform.type.toLowerCase() );
@@ -119,7 +127,7 @@ public class AnimationTransform
 	}
 
 	public function toObject():Object {			
-		var obj:Object = new Object()
+		var obj:Object = [];
 		obj.attachmentName 	= _attachmentName;
 		if ( hasPosition )
 			obj.position	= vector3DIntToObject( _position );
@@ -129,19 +137,30 @@ public class AnimationTransform
 			obj.scale		= vector3DToObject( _scale );
 		if ( hasTransform )
 			obj.transforms = getTransformsObj();
-			
-		return obj
+//        if ( hasAttachments )
+//            obj.attachments = getAttachmentsObj();
+
+		return obj;
 		
 		function getTransformsObj():Object {
-			var ot:Array = new Array();
+			var ot:Array = [];
 			for each ( var mt:ModelTransform in _transforms ) {
 				var obj:Object = mt.toObject();
 				ot.push( obj );
 			}
-			return ot
+			return ot;
 		}
-		
-		function vector3DToObject( $vec:Vector3D ):Object {
+
+//        function getAttachmentsObj():Object {
+//            var oa:Array = [];
+//            for each ( var aa:AnimationAttachment in _attachments ) {
+//                var obj:Object = aa.toObject();
+//                oa.push( obj );
+//            }
+//            return oa;
+//        }
+
+        function vector3DToObject( $vec:Vector3D ):Object {
 			return { x:$vec.x, y:$vec.y, z:$vec.z };
 		}
 		
@@ -152,7 +171,7 @@ public class AnimationTransform
 
 	public function clone( $val:Number = 1 ):AnimationTransform	{
 		new Error( "AnimationTransform.clone - NOT VALIDATED" );
-		var obj:Object = new Object();
+		var obj:Object = {};
 		obj.attachmentName = _attachmentName;
 		var at:AnimationTransform = new AnimationTransform( obj );
 		at._position = position.clone();

@@ -45,13 +45,10 @@ public class AnimationAttachment
 	public function set guid(value:String):void { _guid = value; }
 	
 	
-	public function AnimationAttachment( $obj:Object ) 
+	public function AnimationAttachment( $obj:Object, $attachesTo:String )
 	{
-		if ( $obj.attachsTo )
-			_attachsTo = $obj.attachsTo;
-		else
-			throw new Error( "AnimationAttachment.construct - NO attachsTo" );
-			
+		_attachsTo = $attachesTo;
+
 		if ( $obj.fileName )
 			_guid = $obj.fileName;
 		else

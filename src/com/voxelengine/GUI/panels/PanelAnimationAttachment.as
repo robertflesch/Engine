@@ -29,7 +29,7 @@ public class PanelAnimationAttachment extends ExpandableBox
 	public function PanelAnimationAttachment( $ani:Animation, $aniAttach:AnimationAttachment, $widthParam = 250 ) {
 		_ani = $ani;
 		if ( null == $aniAttach )
-			$aniAttach = new AnimationAttachment( AnimationAttachment.DEFAULT_OBJECT );
+			$aniAttach = new AnimationAttachment( AnimationAttachment.DEFAULT_OBJECT, "WHAT EVER THE PARENT IS" );
 		_aniAttach = $aniAttach;
 		
 		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
