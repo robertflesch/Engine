@@ -78,14 +78,16 @@ public class WindowModelDetail extends VVPopup
 
 		addElement( new ComponentSpacer( WIDTH ) );
 		addElement( new ComponentTextInput( "Instance Name "
-										  , function ($e:TextEvent):void { _vm.instanceInfo.name = $e.target.text; setChanged(); }
+										  , function ($e:TextEvent):void { ii.name = $e.target.text; setChanged(); }
 										  , ii.name ? ii.name : "Unnamed Instance"
 										  , WIDTH ) );
 		// TODO: this should be read only
-		addElement( new ComponentTextInput( "Model Name "
-				, function ($e:TextEvent):void { _vm.metadata.name = $e.target.text; setChanged(); }
-				, _vm.metadata.name ? _vm.metadata.name : "Unnamed Model"
-				, WIDTH ) );
+//		addElement( new ComponentTextInput( "Model Name "
+//				, function ($e:TextEvent):void { _vm.metadata.name = $e.target.text; setChanged(); }
+//				, _vm.metadata.name ? _vm.metadata.name : "Unnamed Model"
+//				, WIDTH ) );
+		addElement( new ComponentLabel( "Model Name ",  _vm.metadata.name ? _vm.metadata.name : "Unnamed Model", WIDTH ) );
+
 
 		_photoContainer.layout.orientation = LayoutOrientation.VERTICAL;
 		_photoContainer.layout.horizontalAlignment = HorizontalAlignment.CENTER;
@@ -97,10 +99,11 @@ public class WindowModelDetail extends VVPopup
 		addElement(_photoContainer);
 		addPhoto()
 
-		addElement( new ComponentTextArea( "Description "
-										 , function ($e:TextEvent):void { _vm.metadata.description = $e.target.text; setChanged(); }
-										 , _vm.metadata.description ? _vm.metadata.description : "No Description"
-										 , WIDTH ) );
+//		addElement( new ComponentTextArea( "Description "
+//										 , function ($e:TextEvent):void { _vm.metadata.description = $e.target.text; setChanged(); }
+//										 , _vm.metadata.description ? _vm.metadata.description : "No Description"
+//										 , WIDTH ) );
+		addElement( new ComponentLabel( "Description",  _vm.metadata.description ? _vm.metadata.description : "No Description", WIDTH ) );
 
 		addElement( new ComponentVector3DToObject( setChanged, ii.setPositionInfo, "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, WIDTH, updateVal ) );
 		addElement( new ComponentVector3DToObject( setChanged, ii.setRotationInfo, "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, WIDTH, updateVal ) );
@@ -220,8 +223,8 @@ public class WindowModelDetail extends VVPopup
 	}
 
 	private function setChanged():void {
-		_vm.metadata.changed = true;
-		_vm.modelInfo.changed = true;
+//		_vm.metadata.changed = true;
+//		_vm.modelInfo.changed = true;
 		_vm.instanceInfo.changed = true;
 		if ( _vm.instanceInfo.controllingModel )
 			_vm.instanceInfo.controllingModel.modelInfo.changed = true;
@@ -240,11 +243,11 @@ public class WindowModelDetail extends VVPopup
 
 		if ( _vm.metadata.changed ) {
 			ModelMetadataEvent.create( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.metadata );
-			ModelMetadataEvent.create( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, null );
+			ModelMetadataEvent.create( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, _vm.metadata );
 		}
 		if ( _vm.modelInfo.changed ) {
 			ModelInfoEvent.create( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.modelInfo );
-			ModelInfoEvent.create( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, null );
+			ModelInfoEvent.create( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, _vm.modelInfo );
 		}
 //			ModelEvent.dispatch( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.instanceGuid ) );
 		RegionEvent.create( ModelBaseEvent.CHANGED, 0, Region.currentRegion.guid );
