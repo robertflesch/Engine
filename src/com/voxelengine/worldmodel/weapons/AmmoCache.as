@@ -7,13 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.weapons
 {
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
-import flash.utils.ByteArray;
 import flash.utils.Dictionary;
-import flash.net.URLLoaderDataFormat;
-import playerio.DatabaseObject;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -22,16 +17,11 @@ import com.voxelengine.events.AmmoEvent;
 import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.utils.StringUtils;
+import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
-
-/**
- * ...
- * @author Bob
- */
-public class AmmoCache
-{
-	// this acts as a holding spot for all model objects loaded from persistance
-	// dont use weak keys since this is THE spot that holds things.
+public class AmmoCache {
+	// this acts as a holding spot for all model objects loaded from persistence
+	// don't use weak keys since this is THE spot that holds things.
 	static private var _ammoData:Dictionary = new Dictionary(false);
 	
 	public function AmmoCache() {}
@@ -45,10 +35,6 @@ public class AmmoCache
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_NOT_FOUND, 	loadNotFound );
 	}
 	
-	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  modelData
-	/////////////////////////////////////////////////////////////////////////////////////////////
-
 	static private function requestType( $ae:AmmoEvent ):void {
 		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $ae.series, Globals.BIGDB_TABLE_AMMO, $ae.guid, null, Globals.BIGDB_TABLE_AMMO_INDEX_WEAPON_TYPE ) );
 		for each ( var ammo:Ammo in _ammoData ) {
@@ -57,9 +43,7 @@ public class AmmoCache
 		}
 	}
 
-
-	static private function request( $ae:AmmoEvent ):void
-	{   
+	static private function request( $ae:AmmoEvent ):void {
 		if ( null == $ae.guid ) {
 			Log.out( "AmmoCache.request guid requested is NULL", Log.WARN );
 			return;
@@ -76,21 +60,24 @@ public class AmmoCache
 			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.RESULT, $ae.series, $ae.guid, ammo ) );
 	}
 	
-	static private function add($pe:PersistenceEvent, $ammo:Ammo ):void
-	{ 
+	static private function add($pe:PersistenceEvent, $ammo:Ammo ):void {
 		if ( null == $ammo || null == $pe.guid ) {
 			Log.out( "AmmoCache.add trying to add NULL ammo or guid", Log.WARN );
 			return;
 		}
+		var ammo:Ammo = _ammoData[$pe.guid];
 		// check to make sure this is new data
-		if ( null ==  _ammoData[$pe.guid] ) {
+		if ( null == ammo ) {
+			ammo = $ammo;
 			_ammoData[$pe.guid] = $ammo; 
-			AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $ammo ) );
 		}
+		else {
+			Log.out( "AmmoCache.add Trying to add the same ammo twice " + $pe.toString(), Log.WARN );
+		}
+		AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.ADDED, $pe.series, $pe.guid, $ammo ) );
 	}
 	
-	static private function loadSucceed( $pe:PersistenceEvent):void
-	{
+	static private function loadSucceed( $pe:PersistenceEvent):void {
 		if ( Globals.AMMO_EXT != $pe.table && Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
 		if ( $pe.dbo || $pe.data ) {
@@ -112,11 +99,7 @@ public class AmmoCache
 				if ( ammo.impactSound == "" && ammo.launchSound == "" )
 					ammo.save();
 			}
-			
 			add( $pe, ammo );
-//			if ( _block.has( $pe.guid ) )
-//				_block.clear( $pe.guid )
-				
 		}
 		else {
 			Log.out( "AmmoCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.WARN );
@@ -124,16 +107,14 @@ public class AmmoCache
 		}
 	}
 	
-	static private function loadFailed( $pe:PersistenceEvent ):void
-	{
+	static private function loadFailed( $pe:PersistenceEvent ):void {
 		if ( Globals.AMMO_EXT != $pe.table && Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
 		Log.out( "AmmoCache.loadFailed this means the table is missing!" + $pe.toString(), Log.ERROR );
 		AmmoEvent.dispatch( new AmmoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
-	static private function loadNotFound( $pe:PersistenceEvent):void
-	{
+	static private function loadNotFound( $pe:PersistenceEvent):void {
 		if ( Globals.AMMO_EXT != $pe.table && Globals.BIGDB_TABLE_AMMO != $pe.table )
 			return;
 		// maybe this ammo has not been loaded into the table yet, try loading it from json file
