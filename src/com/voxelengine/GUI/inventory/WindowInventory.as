@@ -7,6 +7,7 @@
  ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 import com.voxelengine.renderer.Renderer;
+import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 	import flash.display.Bitmap;
 	import flash.display.DisplayObject;
@@ -153,28 +154,40 @@ import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 		
 		private function dropMaterial(e:DnDEvent):void 
 		{
-			if ( e.dragOperation.initiator.data is TypeInfo )
+			if ( e.dragOperation.dropFormat[0].data is TypeInfo )
 			{
 				e.dropTarget.backgroundTexture = e.dragOperation.initiator.backgroundTexture;
-				e.dropTarget.data = e.dragOperation.initiator.data;
-				
-				if ( e.dropTarget.target is PanelMaterials ) {
-					CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.MATERIAL_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
-				}
-				else if ( e.dropTarget.target is PanelBonuses ) {
-					CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.BONUS_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
-					e.dropTarget.backgroundTextureManager.resize( 32, 32 );
-				}
+				e.dropTarget.data = e.dragOperation.dropFormat[0].data;
+			}
+			else
+				return;
+
+			if ( e.dropTarget.target is PanelMaterials ) {
+				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.MATERIAL_DROPPED, e.dragOperation.dropFormat[0].data ) );
+			}
+			else if ( e.dropTarget.target is PanelBonuses ) {
+				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.BONUS_DROPPED, e.dragOperation.dropFormat[0].data ) );
+				e.dropTarget.backgroundTextureManager.resize( 32, 32 );
 			}
 		}
 		
 		private function doDrag(e:UIMouseEvent):void 
 		{
+			var bi:BoxInventory = e.target as BoxInventory;
 			_dragOp.initiator = e.target as UIObject;
 			_dragOp.dragImage = e.target as DisplayObject;
 			// this adds a drop format, which is checked again what the target is expecting
+			var category:String = "";
+			if ( bi.objectInfo is ObjectVoxel ) {
+				var ti:TypeInfo = TypeInfo.typeInfo[(bi.objectInfo as ObjectVoxel).type];
+				category = ti.category;
+			}
+			else {
+				throw new Error( "What do I use for cat in this case?");
+			}
+
 			_dragOp.resetDropFormat();
-			var dndFmt:DnDFormat = new DnDFormat( e.target.data.category, e.target.data.subCat );
+			var dndFmt:DnDFormat = new DnDFormat( category, ti );
 			_dragOp.addDropFormat( dndFmt );
 			
 			UIManager.dragManager.startDragDrop(_dragOp);

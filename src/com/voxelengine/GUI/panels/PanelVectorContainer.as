@@ -23,11 +23,11 @@ public class PanelVectorContainer extends ExpandableBox {
 		_itemBox.height = 0;
 		for ( var i:int; i < _ebco.items.length; i++ ) {
 			var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
-			ebco.rootObject = _ebco.rootObject
-			ebco.item = _ebco.items[i]
-			ebco.items = _ebco.items
-			ebco.width = _itemBox.width
-			ebco.title = ""
+			ebco.rootObject = _ebco.rootObject;
+			ebco.item = _ebco.items[i];
+			ebco.items = _ebco.items;
+			ebco.width = _itemBox.width;
+			ebco.title = "";
 			var item:* = new _ebco.itemDisplayObject( this, ebco );
 			_itemBox.addElement( item );
 		}
@@ -41,7 +41,7 @@ public class PanelVectorContainer extends ExpandableBox {
 	override protected function newItemHandler( $me:UIMouseEvent ):void 		{
 		if ( _ebco && _ebco.item )
 			_ebco.item.showNew = false;
-		var item:* = new _ebco.itemDisplayObject( this, _ebco.clone() )
+		var item:* = new _ebco.itemDisplayObject( this, _ebco.clone() );
 		_itemBox.addElement( item );
 		resizePane( null );
 	}
