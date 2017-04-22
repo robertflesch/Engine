@@ -197,7 +197,7 @@ public class WindowModelDetail extends VVPopup
 
 	private function changeBaseLightLevel( $e:UIMouseEvent ):void  {
 		if ( _vm.modelInfo.oxelPersistence && _vm.modelInfo.oxelPersistence.oxelCount ) {
-			var oxel:Oxel = _vm.modelInfo.oxelPersistence.oxel;
+			//var oxel:Oxel = _vm.modelInfo.oxelPersistence.oxel;
 			_vm.applyBaseLightLevel();
 			_vm.modelInfo.oxelPersistence.changed = true;
 			_vm.modelInfo.save();
@@ -223,8 +223,6 @@ public class WindowModelDetail extends VVPopup
 	}
 
 	private function setChanged():void {
-//		_vm.metadata.changed = true;
-//		_vm.modelInfo.changed = true;
 		_vm.instanceInfo.changed = true;
 		if ( _vm.instanceInfo.controllingModel )
 			_vm.instanceInfo.controllingModel.modelInfo.changed = true;
@@ -241,15 +239,6 @@ public class WindowModelDetail extends VVPopup
 		_s_inExistance--;
 		_s_currentInstance = null;
 
-		if ( _vm.metadata.changed ) {
-			ModelMetadataEvent.create( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.metadata );
-			ModelMetadataEvent.create( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, _vm.metadata );
-		}
-		if ( _vm.modelInfo.changed ) {
-			ModelInfoEvent.create( ModelBaseEvent.CHANGED, 0, _vm.modelInfo.guid, _vm.modelInfo );
-			ModelInfoEvent.create( ModelBaseEvent.SAVE, 0, _vm.modelInfo.guid, _vm.modelInfo );
-		}
-//			ModelEvent.dispatch( new ModelEvent( ModelEvent.MODEL_MODIFIED, _vm.instanceInfo.instanceGuid ) );
 		RegionEvent.create( ModelBaseEvent.CHANGED, 0, Region.currentRegion.guid );
 		RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );
 	}
@@ -261,24 +250,6 @@ public class WindowModelDetail extends VVPopup
 		vm.stateLock( false );
 		vm.stateSet( state );
 		vm.stateLock( true );
-	}
-
-	private function close(e:MouseEvent):void { setHeight(0); }
-	private function open():void { setHeight(20); }
-
-	private function setHeight(height:Number):void {
-
-		//_GrainSize.height = height;
-		//_InstanceGUID.height = height;
-		//_ModelGUID.height = height;
-		//_Parent.height = height;
-		//_Script.height = height;
-		//_Texture.height = height;
-		//_TextureScale.height = height;
-		//_ModelClass.height = height;
-		_panelAdvanced.height = 20;
-		//_image.height = height;
-		//_.label = height == 0 ? "Double click to open" : "Double click to close";
 	}
 
 }

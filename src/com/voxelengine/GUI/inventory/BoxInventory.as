@@ -7,10 +7,13 @@
 ==============================================================================*/
 
 package com.voxelengine.GUI.inventory {
-	
+
+import com.voxelengine.GUI.voxelModels.PopupMetadataAndModelInfo;
+import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 import com.voxelengine.events.ModelBaseEvent;
 import flash.display.Bitmap;
 import flash.display.BitmapData;
+import flash.events.MouseEvent;
 import flash.geom.Matrix;
 
 import org.flashapi.swing.*;
@@ -35,6 +38,7 @@ public class BoxInventory extends VVBox
 	private var _count:Label
 	private var _name:Label
 	private var _bpValue:Image
+	private var _editData:Image
 	private var _objectInfo:ObjectInfo;
 	public function get objectInfo():ObjectInfo { return _objectInfo; }
 	
@@ -117,15 +121,27 @@ public class BoxInventory extends VVBox
 				setHelp( "guid: " + om.vmm.guid );
 
 				if ( om.vmm.permissions.blueprint ) {
-					_bpValue = new Image( Globals.texturePath + "blueprint.png" )
+					_bpValue = new Image( Globals.texturePath + "blueprint.png" );
 					if ( 128 == width )
-						_bpValue.x = _bpValue.y = 64
+						_bpValue.x = _bpValue.y = 64;
 					addElement( _bpValue )
 				}
 				else if ( _bpValue ) {
-					removeElement( _bpValue )
+					removeElement( _bpValue );
 					_bpValue = null
 				}
+
+				if ( om.vmm.permissions.creator == Network.userId ) {
+					_editData = new Image( Globals.texturePath + "editModelData.png" );
+					$evtColl.addEvent( _editData, UIMouseEvent.PRESS, editModelData );
+					if ( 128 == width )
+						_editData.x = _editData.y = 0;
+					addElement( _editData )
+				} else if ( _editData ) {
+					removeElement( _editData );
+					_editData = null;
+				}
+
 			}
 			break;
 			
@@ -173,7 +189,15 @@ public class BoxInventory extends VVBox
 				
 			break;
 		}
+
+		function editModelData( $me:UIMouseEvent ):void {
+			var t:ObjectModel = _objectInfo as ObjectModel;
+			var vmm:ModelMetadata = t.vmm;
+			if ( !PopupMetadataAndModelInfo.inExistance )
+				new PopupMetadataAndModelInfo( vmm );
+		}
 	}
+
 	override protected function onRemoved( event:UIOEvent ):void {
 		super.onRemoved( event );
 		// while it is active we want to monitor the count of oxels as they change

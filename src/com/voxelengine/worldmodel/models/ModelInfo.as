@@ -74,14 +74,14 @@ public class ModelInfo extends PersistenceObject
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// overrideable in instanceInfo
 	// how to link this to instance info, when this is shared object???
-//	public function get grainSize():int								{
-//		if ( oxelPersistence && oxelPersistence.oxelCount )
-//			return oxelPersistence.oxel.gc.grain;
-//		else
-//			return dbo.grainSize ? dbo.grainSize : 4;
-//	}
-//	public function set grainSize(val:int):void						{ dbo.grainSize = val;  changed = true; }
-//
+	public function get grainSize():int								{
+		if ( oxelPersistence && oxelPersistence.oxelCount )
+			return oxelPersistence.oxel.gc.grain;
+		else
+			return dbo.grainSize;
+	}
+	public function set grainSize(val:int):void						{ dbo.grainSize = val;  changed = true; }
+
 	public function get baseLightLevel():uint 						{ return dbo.baseLightLevel; }
 	public function set baseLightLevel(val:uint):void 				{ dbo.baseLightLevel = val; changed = true; }
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

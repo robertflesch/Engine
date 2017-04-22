@@ -66,7 +66,8 @@ public class ModelMetadata extends PersistenceObject
 			dbo.bound = value;
 		} }
 
-	public function get creator():int 							{ return dbo.creator; }
+	public function get hashTags():String 					{ return dbo.hashTags; }
+	public function set hashTags($val:String):void			{ dbo.hashTags = $val; }
 
 	public function get thumbnail():BitmapData 				{ return _thumbnail; }
 	public function set thumbnail(value:BitmapData):void 	{ _thumbnail = value; changed = true; }
@@ -149,7 +150,7 @@ public class ModelMetadata extends PersistenceObject
 		setToDefault();
 
 		function setToDefault():void {
-			dbo.hashTags = "#new";
+			hashTags = "#new";
 			_thumbnail = null;
 			animationClass = "";
 			description = "Default";

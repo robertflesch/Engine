@@ -38,6 +38,9 @@ public class PersistenceObject
 	public function get dynamicObj():Boolean { return _dynamicObj; }
 	public function set dynamicObj(value:Boolean):void { _dynamicObj = value; }
 
+	public function get createdDate():String { return dbo.createdDate; }
+	public function get creator():String { return dbo.creator; }
+
 	public function PersistenceObject($guid:String, $table:String ) {
 		if ( null == $guid || "" == $guid )
 			throw new Error( "PersistenceObject - Missing guid in constructor" );

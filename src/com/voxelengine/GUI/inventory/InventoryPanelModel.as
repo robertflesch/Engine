@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
+import com.voxelengine.GUI.voxelModels.PopupMetadataAndModelInfo;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
@@ -231,7 +232,8 @@ public class InventoryPanelModel extends VVContainer
 				ii.positionSet = diffPos;
 			}
 
-			ModelMakerBase.load( ii );
+			if ( !PopupMetadataAndModelInfo.inExistance )
+				ModelMakerBase.load( ii );
 		}
 	}
 	
