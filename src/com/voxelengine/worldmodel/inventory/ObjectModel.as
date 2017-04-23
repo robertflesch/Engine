@@ -18,23 +18,15 @@ import com.voxelengine.events.ModelBaseEvent
 import com.voxelengine.events.ModelMetadataEvent
 import com.voxelengine.GUI.inventory.BoxInventory
 import com.voxelengine.server.Network
-import com.voxelengine.worldmodel.inventory.ObjectInfo
 import com.voxelengine.worldmodel.models.ModelMetadata
 
-/**
- * ...
- * @author Robert Flesch
- * Base class for the representation of edit cursor size selection
- */
-public class ObjectModel extends ObjectInfo 
+public class ObjectModel extends ObjectInfo
 {
 	protected var _modelGuid:ModelGuid = new ModelGuid();
-
-	protected var _vmm:ModelMetadata;
-	
 	public function get modelGuid():String 						{ return _modelGuid.val; }
 	public function set modelGuid(value:String):void 			{ _modelGuid.valSet = value; }
-	
+
+	protected var _vmm:ModelMetadata;
 	public function get vmm():ModelMetadata 					{ return _vmm }
 	public function set vmm(value:ModelMetadata):void 			{ _vmm = value }
 	
@@ -45,9 +37,9 @@ public class ObjectModel extends ObjectInfo
 	
 	override public function asInventoryString():String {
 		if ( ObjectInfo.OBJECTINFO_MODEL == _objectType )
-			return String( _objectType + ";" + _modelGuid );
-			
-		return String( _objectType )	;
+			return String( _objectType + ";" + modelGuid );
+
+		return String( _objectType );
 	}
 	
 	override public function fromInventoryString( $data:String, $slotId:int ): ObjectInfo {
