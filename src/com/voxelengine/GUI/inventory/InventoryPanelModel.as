@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
+import com.voxelengine.GUI.VVBox;
+import com.voxelengine.GUI.crafting.BoxCharacterSlot;
 import com.voxelengine.GUI.voxelModels.PopupMetadataAndModelInfo;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
@@ -354,6 +356,20 @@ public class InventoryPanelModel extends VVContainer
 				
 				new WindowModelDeleteChildrenQuery( droppedItem.modelGuid, removeModel );				
 			}
+
+			if ( e.dropTarget is BoxCharacterSlot ) {
+					var bcs:BoxCharacterSlot = e.dropTarget as BoxCharacterSlot;
+				trace( "InventoryPanelModel.dropMaterial - slot: " + bcs.data );
+					var om:ObjectModel = e.dragOperation.initiator.data;
+
+					if ( om.vmm ) {
+						if (om.vmm.thumbnailLoaded && om.vmm.thumbnail) {
+							bcs.backgroundTexture = VVBox.drawScaled(om.vmm.thumbnail, bcs.width, bcs.height);
+						}
+					}
+					Log.out( "InventoryPanelModel.dropMaterial in BoxCharacterSlot ", Log.WARN );
+			}
+
 			
 			if ( e.dropTarget.target is QuickInventory ) {
 				if ( e.dropTarget is BoxInventory ) {

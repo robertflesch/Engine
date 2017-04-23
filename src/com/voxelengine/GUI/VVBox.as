@@ -7,6 +7,9 @@
 ==============================================================================*/
 
 package com.voxelengine.GUI {
+import flash.display.BitmapData;
+import flash.geom.Matrix;
+
 import org.flashapi.swing.*;
 import org.flashapi.swing.constants.BorderStyle;
 import org.flashapi.swing.event.*;
@@ -33,5 +36,14 @@ public class VVBox extends Box
 		eventCollector.addEvent( this, UIMouseEvent.ROLL_OVER, function (e:UIMouseEvent):void { _boxhelp.display(); } );
 		eventCollector.addEvent( this, UIMouseEvent.ROLL_OUT, function (e:UIMouseEvent):void { _boxhelp.remove(); } );					
 	}
+
+	static public function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
+		var m:Matrix = new Matrix();
+		m.scale(destWidth/obj.width, destHeight/obj.height);
+		var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
+		bmpd.draw(obj, m);
+		return bmpd;
+	}
+
 }
 }

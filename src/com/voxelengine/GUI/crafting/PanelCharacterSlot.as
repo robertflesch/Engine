@@ -16,7 +16,7 @@ import com.voxelengine.GUI.panels.PanelBase;
 import com.voxelengine.worldmodel.TypeInfo;
 
 public class PanelCharacterSlot extends PanelBase {
-    private const BOX_SIZE:int = 32;
+    private const BOX_SIZE:int = 64;
 
     public function PanelCharacterSlot($parent:PanelBase, $widthParam:Number, $heightParam:Number, $slotName:String )
     {
@@ -26,7 +26,7 @@ public class PanelCharacterSlot extends PanelBase {
         padding = 5;
         var lb:Label = new Label( "LeftHand" );
         addElement( lb );
-        addElement( new BoxCraftingBase( BOX_SIZE, "Model" ) );
+        addElement( new BoxCharacterSlot( BOX_SIZE, "Model" ) );
     }
 
     private function doDrag(e:UIMouseEvent):void
@@ -35,7 +35,7 @@ public class PanelCharacterSlot extends PanelBase {
         var mb:Box = e.target as Box;
         mb.backgroundTexture = null;
         var ti:TypeInfo = mb.data;
-        CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.BONUS_REMOVED, ti ) );
+        CraftingItemEvent.create( CraftingItemEvent.BONUS_REMOVED, ti );
     }
 
 }

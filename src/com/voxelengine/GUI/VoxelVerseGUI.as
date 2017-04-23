@@ -361,9 +361,9 @@ public class VoxelVerseGUI extends EventDispatcher
 					new WindowModelDetail( VoxelModel.selectedModel );
 				
 			if ( Keyboard.C == e.keyCode ) {
-				new WindowCrafting();
-				new WindowInventory();
-//				new WindowCharacter();
+//				new WindowCrafting();
+//				new WindowInventory();
+				new WindowCharacter();
 			}
 /*
 			// allows for saving of ivm to disk

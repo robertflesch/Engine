@@ -133,7 +133,7 @@ public class BoxInventory extends VVBox
 
 				if ( om.vmm.permissions.creator == Network.userId ) {
 					_editData = new Image( Globals.texturePath + "editModelData.png" );
-					$evtColl.addEvent( _editData, UIMouseEvent.PRESS, editModelData );
+					$evtColl.addEvent( _editData, UIMouseEvent.CLICK, editModelData );
 					if ( 128 == width )
 						_editData.x = _editData.y = 0;
 					addElement( _editData )
@@ -214,16 +214,5 @@ public class BoxInventory extends VVBox
 
 		_objectInfo = new ObjectInfo( this, ObjectInfo.OBJECTINFO_EMPTY );
 	}
-	
-	private function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
-		var m:Matrix = new Matrix();
-		m.scale(destWidth/obj.width, destHeight/obj.height);
-		var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
-		bmpd.draw(obj, m);
-		return bmpd;
-	}	
-	
-	
-}	
-
+}
 }

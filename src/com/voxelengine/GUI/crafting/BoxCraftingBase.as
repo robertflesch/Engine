@@ -6,13 +6,13 @@
  Unauthorized reproduction, translation, or display is prohibited.
  ==============================================================================*/
 package com.voxelengine.GUI.crafting {
-import org.flashapi.swing.Box;
+import com.voxelengine.GUI.VVBox;
 import org.flashapi.swing.constants.BorderStyle;
-import org.flashapi.swing.dnd.DnDFormat;
 
-public class BoxCraftingBase extends Box {
+public class BoxCraftingBase extends VVBox {
     private var _acceptsCategory:String;
     private var _acceptsSubCat:String;
+
     public function BoxCraftingBase( $size:Number, $acceptsCategory:String, $acceptsSubCat:String = "", $borderStyle:String = BorderStyle.INSET ) {
         super($size, $size, borderStyle);
         _acceptsCategory = $acceptsCategory;
@@ -21,8 +21,8 @@ public class BoxCraftingBase extends Box {
         dropEnabled = true;
         dragEnabled = true;
         borderStyle = $borderStyle;
-        var dndFmt:DnDFormat = new DnDFormat( _acceptsCategory, _acceptsSubCat );
-        addDropFormat( dndFmt );
+        //var dndFmt:DnDFormat = new DnDFormat( _acceptsCategory, _acceptsSubCat );
+        //addDropFormat( dndFmt );
     }
 }
 }

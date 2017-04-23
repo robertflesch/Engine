@@ -6,19 +6,13 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.crafting.items {
-import com.voxelengine.events.CraftingItemEvent;
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.worldmodel.crafting.Bonus;
-import com.voxelengine.worldmodel.crafting.CraftingManager;
+import com.voxelengine.events.CraftingItemEvent;
 import com.voxelengine.worldmodel.crafting.Material;
 import com.voxelengine.worldmodel.crafting.Recipe;
 import com.voxelengine.worldmodel.TypeInfo;
 
-/**
- * ...
- * @author Bob
- */
 public class CraftedItem extends Recipe
 {
 	private var _materialsUsed:Vector.<TypeInfo> = new Vector.<TypeInfo>();
@@ -100,13 +94,13 @@ public class CraftedItem extends Recipe
 			var bonus:TypeInfo = _bonusesUsed[i];
 			if ( bonus.subCat == $typeInfo.subCat ) {
 				_bonusesUsed[i] = $typeInfo;
-				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+				CraftingItemEvent.create( CraftingItemEvent.STATS_UPDATED, $typeInfo );
 				return;
 			}
 		}
 		
 		_bonusesUsed.push( $typeInfo );
-		CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+		CraftingItemEvent.create( CraftingItemEvent.STATS_UPDATED, $typeInfo );
 	}
 	
 	public function materialAdd( $typeInfo:TypeInfo ):void {
@@ -115,13 +109,13 @@ public class CraftedItem extends Recipe
 			var mat:TypeInfo = _materialsUsed[i];
 			if ( mat.category == $typeInfo.category ) {
 				_materialsUsed[i] = $typeInfo;
-				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+				CraftingItemEvent.create( CraftingItemEvent.STATS_UPDATED, $typeInfo );
 				return;
 			}
 		}
 		
 		_materialsUsed.push( $typeInfo );
-		CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+		CraftingItemEvent.create( CraftingItemEvent.STATS_UPDATED, $typeInfo );
 	}
 	
 	public function materialRemove( $typeInfo:TypeInfo ):void {
@@ -130,7 +124,7 @@ public class CraftedItem extends Recipe
 			var mat:TypeInfo = _materialsUsed[i];
 			if ( mat.category == $typeInfo.category ) {
 				_materialsUsed.splice( i, 1 );
-				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+				CraftingItemEvent.create( CraftingItemEvent.STATS_UPDATED, $typeInfo );
 				return;
 			}
 		}
@@ -143,7 +137,7 @@ public class CraftedItem extends Recipe
 			var bonus:TypeInfo = _bonusesUsed[i];
 			if ( bonus.subCat == $typeInfo.subCat ) {
 				_bonusesUsed.splice( i, 1 );
-				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.STATS_UPDATED, $typeInfo ) );	
+				CraftingItemEvent.create( CraftingItemEvent.STATS_UPDATED, $typeInfo );
 				return;
 			}
 		}

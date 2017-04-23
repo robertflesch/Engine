@@ -207,10 +207,10 @@ public class InventoryPanelVoxel extends VVContainer
 			e.dropTarget.data = e.dragOperation.initiator.data;
 			
 			if ( e.dropTarget.target is PanelMaterials ) {
-				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.MATERIAL_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
+				CraftingItemEvent.create( CraftingItemEvent.MATERIAL_DROPPED, e.dragOperation.initiator.data as TypeInfo );
 			}
 			else if ( e.dropTarget.target is PanelBonuses ) {
-				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.BONUS_DROPPED, e.dragOperation.initiator.data as TypeInfo ) );	
+				CraftingItemEvent.create( CraftingItemEvent.BONUS_DROPPED, e.dragOperation.initiator.data as TypeInfo );
 				e.dropTarget.backgroundTextureManager.resize( 32, 32 );
 			}
 			else if ( e.dropTarget.target is QuickInventory ) {

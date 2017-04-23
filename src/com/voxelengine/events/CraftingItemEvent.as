@@ -59,10 +59,9 @@ public class CraftingItemEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:CraftingItemEvent ) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
+	static public function create( $type:String, $typeInfo:TypeInfo ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new CraftingItemEvent( $type, $typeInfo ) );
 	}
-	
 	///////////////// Event handler interface /////////////////////////////
 }
 }

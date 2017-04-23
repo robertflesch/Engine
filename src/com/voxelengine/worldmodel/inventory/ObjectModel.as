@@ -51,7 +51,7 @@ public class ObjectModel extends ObjectInfo
 			return this
 		}
 		_objectType = values[0];
-		_modelGuid = values[1];
+		modelGuid = values[1];
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, metadataAdded );
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, metadataAdded );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );

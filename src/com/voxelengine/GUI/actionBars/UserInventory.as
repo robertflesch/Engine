@@ -33,19 +33,12 @@ import com.voxelengine.Globals;
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.InventoryInterfaceEvent;
 import com.voxelengine.events.InventoryEvent;
-import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.events.RoomEvent;
-import com.voxelengine.GUI.LoadingImage;
 import com.voxelengine.GUI.inventory.BoxInventory;
-import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.*;
 import com.voxelengine.worldmodel.inventory.*;
-import com.voxelengine.worldmodel.models.ModelCacheUtils;
-import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.makers.ModelMaker;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 
 public class  UserInventory extends QuickInventory
@@ -56,9 +49,9 @@ public class  UserInventory extends QuickInventory
 	private var _toolSize:GrainSelector;
 	private var _shape:ShapeSelector;
 	private var _modelTools:ModelPlacementType;
-	private var _inventory:InventoryIcon
-	private var _propList:PropListIcon
-	private var _lastCursorType:int
+	private var _inventory:InventoryIcon;
+	private var _propList:PropListIcon;
+	private var _lastCursorType:int;
 		
 	private var _remove:Boolean;
 	private var _owner:String;
@@ -108,8 +101,8 @@ public class  UserInventory extends QuickInventory
 		
 		hideGrainTools();
 		hideModelTools();
-		_inventory.visible = false
-		_propList.visible = false
+		_inventory.visible = false;
+		_propList.visible = false;
 		
 		_s_currentInstance = this;
 		
@@ -118,14 +111,14 @@ public class  UserInventory extends QuickInventory
 		RoomEvent.addListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
 		InventoryEvent.addListener( InventoryEvent.RESPONSE, inventoryLoaded );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, _owner, null ) );
-		InventoryModelEvent.addListener( ModelBaseEvent.DELETE, modelDeleted )	
+		InventoryModelEvent.addListener( ModelBaseEvent.DELETE, modelDeleted );
 		CursorOperationEvent.addListener( CursorOperationEvent.NONE, onCursorOperationNone )	
 	}
 	
 	private function modelDeleted(e:InventoryModelEvent):void {
 		for each ( var bi:BoxInventory in boxes ) {
 			if ( bi.objectInfo is ObjectModel ) {
-				var om:ObjectModel = bi.objectInfo as ObjectModel
+				var om:ObjectModel = bi.objectInfo as ObjectModel;
 				if ( e.itemGuid == om.modelGuid )
 					InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, _owner, "", int(bi.name), null );
 					if ( int(bi.name) == lastBoxesSelection ) {
@@ -148,11 +141,11 @@ public class  UserInventory extends QuickInventory
 		InventoryEvent.removeListener( InventoryEvent.RESPONSE, inventoryLoaded );
 		AppEvent.removeListener( Event.DEACTIVATE, onDeactivate );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.UNLOAD_REQUEST, _owner, null ) );
-		CursorOperationEvent.removeListener( CursorOperationEvent.NONE, onCursorOperationNone )	
-		_toolSize.remove()
-		_shape.remove()
-		_inventory.remove()
-		_propList.remove()
+		CursorOperationEvent.removeListener( CursorOperationEvent.NONE, onCursorOperationNone )	;
+		_toolSize.remove();
+		_shape.remove();
+		_inventory.remove();
+		_propList.remove();
 		_s_currentInstance = null;
 		
 		super.remove();
@@ -172,9 +165,9 @@ public class  UserInventory extends QuickInventory
 		if ( Globals.inRoom && _s_currentInstance ) {
 			with ( _s_currentInstance ) {
 				// display it!
-				visible = true
-				_inventory.visible = true
-				_propList.visible = true
+				visible = true;
+				_inventory.visible = true;
+				_propList.visible = true;
 //				EditCursor.editing = true;
 				addListeners();
 				display();
@@ -200,7 +193,7 @@ public class  UserInventory extends QuickInventory
 			var slots:Slots = inv.slots;
 			
 			var items:Vector.<ObjectInfo> = slots.items;
-			for ( var i:int; i < Slots.ITEM_COUNT; i++ ) {
+			for ( var i:int = 0; i < Slots.ITEM_COUNT; i++ ) {
 				var item:ObjectInfo = items[i];
 				item.box = (boxes[i] as BoxInventory);
 				(boxes[i] as BoxInventory).updateObjectInfo( item );
@@ -335,8 +328,8 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function onCursorOperationNone(e:CursorOperationEvent):void { 
-		hideModelTools()
-		hideGrainTools()
+		hideModelTools();
+		hideGrainTools();
 		moveSelector( boxes[1] );
 	}
 	
@@ -360,8 +353,8 @@ public class  UserInventory extends QuickInventory
 				itemMaterialSelection = boxesIndex;
 				CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.INSERT_OXEL, selectedTypeId ) ); 
 			}
-			hideModelTools()
-			showGrainTools()
+			hideModelTools();
+			showGrainTools();
 		}
 		else if ( oi is ObjectAction ) {
 			//Log.out( "UserInventory.processItemSelection - ObjectAction - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
@@ -385,7 +378,7 @@ public class  UserInventory extends QuickInventory
 		}
 		else if ( oi is ObjectTool ) {
 			//Log.out( "UserInventory.processItemSelection - ObjectTool");
-			hideModelTools()
+			hideModelTools();
 			var ot:ObjectTool = oi as ObjectTool;
 			if ( lastBoxesSelection == boxesIndex ) {
 				//Log.out( "UserInventory.processItemSelection - ObjectTool - lastItemSelection == boxesIndex - lastItemSelection: " + lastBoxesSelection + " boxesIndex: " + boxesIndex, Log.DEBUG );
@@ -419,14 +412,14 @@ public class  UserInventory extends QuickInventory
 			var om:ObjectModel = oi as ObjectModel;
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.INSERT_MODEL, ti1.type, om ) ); 
 			
-			hideGrainTools()
-			showModelTools()
+			hideGrainTools();
+			showModelTools();
 		}
 		else if ( oi is ObjectInfo ) {
 			//Log.out( "UserInventory.processItemSelection - ObjectInfo");
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE ) ); 
-			hideGrainTools()
-			hideModelTools()
+			hideGrainTools();
+			hideModelTools();
 		}
 		
 		lastBoxesSelection = boxesIndex;
