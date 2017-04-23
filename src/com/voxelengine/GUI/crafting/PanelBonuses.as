@@ -50,34 +50,18 @@ package com.voxelengine.GUI.crafting {
 			var mb:Box = e.target as Box;
 			mb.backgroundTexture = null;
 			var ti:TypeInfo = mb.data;
-			CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.BONUS_REMOVED, ti ) );	
+			CraftingItemEvent.create( CraftingItemEvent.BONUS_REMOVED, ti );
 		}			
 
 		private function buildBonusBox( bonus:Bonus ):Box 
 		{
 			var subCat:String = bonus.subCat.toUpperCase();
-			var mb:Box;
-			if ( Globals.MODIFIER_DAMAGE == subCat )
-				mb = new BoxDamage( BOX_SIZE, BOX_SIZE );
-			else if ( Globals.MODIFIER_SPEED == subCat )
-				mb = new BoxSpeed( BOX_SIZE, BOX_SIZE );
-			else if ( Globals.MODIFIER_DURABILITY == subCat )
-				mb = new BoxDurability( BOX_SIZE, BOX_SIZE );
-			else if ( Globals.MODIFIER_LUCK == subCat )
-				mb = new BoxLuck( BOX_SIZE, BOX_SIZE );
-			else {
-				Log.out( "PanelBonus - Unknown bonus type found: " + bonus.category + " subCat: " +   bonus.subCat, Log.WARN );
-				mb = new Box( BOX_SIZE, BOX_SIZE );
-			}
-				
-			mb.dropEnabled = true;
-			mb.dragEnabled = true;
-			mb.borderStyle = BorderStyle.INSET;
+			var mb:Box = new BoxCraftingBase( BOX_SIZE, bonus.category, bonus.subCat );
+
+
 			eventCollector.addEvent( mb, UIMouseEvent.PRESS, doDrag);
 
-			var dndFmt:DnDFormat = new DnDFormat( bonus.category, bonus.subCat );
-			mb.addDropFormat( dndFmt );
-			
+
 			return mb;
 		}
 	}

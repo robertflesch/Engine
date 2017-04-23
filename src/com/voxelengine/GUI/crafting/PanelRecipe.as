@@ -70,6 +70,7 @@ public class PanelRecipe extends PanelBase
 		_panelButtons.padding = 5;
 		addElement( _panelButtons );
 		var craftButton:Button = new Button( LanguageManager.localizedStringGet( "Craft_Item" ) );
+		craftButton.color = 0x333333;
 		eventCollector.addEvent( craftButton, UIMouseEvent.CLICK, craft );
 		_panelButtons.addElement( craftButton );
 		_panelButtons.addElement( new Label( "Drag Items from Inventory", 200 ) );

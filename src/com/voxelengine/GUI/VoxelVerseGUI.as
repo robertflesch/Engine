@@ -8,6 +8,8 @@
 
 package com.voxelengine.GUI
 {
+import com.voxelengine.GUI.crafting.WindowCharacter;
+
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.EventDispatcher;
@@ -18,6 +20,8 @@ import flash.ui.Keyboard;
 import flash.events.FullScreenEvent;
 import flash.display.StageDisplayState;
 import flash.utils.Timer;
+
+import org.flashapi.swing.constants.TextAlign;
 
 import org.flashapi.swing.event.UIOEvent;
 import org.flashapi.swing.Label;
@@ -349,9 +353,6 @@ public class VoxelVerseGUI extends EventDispatcher
 				//Log.out( "VVGui.onKeyPressed - decreased bullet size to: " + _bulletSize );
 			//}
 				
-			if ( Keyboard.F == e.keyCode )
-				createProjectile( VoxelModel.controlledModel )
-			
 			if ( Keyboard.P == e.keyCode )
 				new WindowSandboxList();
 				
@@ -362,6 +363,7 @@ public class VoxelVerseGUI extends EventDispatcher
 			if ( Keyboard.C == e.keyCode ) {
 				new WindowCrafting();
 				new WindowInventory();
+//				new WindowCharacter();
 			}
 /*
 			// allows for saving of ivm to disk
@@ -383,12 +385,15 @@ public class VoxelVerseGUI extends EventDispatcher
 	private function joinRoomFailureHandler( e:RoomEvent ):void {
 		
 		var popup:VVPopup = new VVPopup("NO SERVERS FOUND");
-		popup.autoSize = true;
-		//popup.width = 400;
-		//popup.height = 50;
+		popup.autoSize = false;
+		popup.width = 400;
+		popup.height = 100;
 		//popup.innerPanel = popup.autoHeight = true;
 		
-		var label:Label = new Label("No servers were found for this room, try later");
+		var label:Label = new Label("No servers were found for this room, try later. Its our (or our partner's) problem");
+		label.width = 400;
+		label.height = 50;
+		label.textAlign = TextAlign.CENTER;
 		popup.addElement(label);
 		
 		popup.display( Renderer.renderer.width / 2 - (((popup.width + 10) / 2) + popup.x ), Renderer.renderer.height / 2 - (((popup.height + 10) / 2) + popup.y) );

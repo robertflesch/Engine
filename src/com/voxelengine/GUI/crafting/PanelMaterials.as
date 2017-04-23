@@ -52,8 +52,8 @@ package com.voxelengine.GUI.crafting {
 			// reset the material
 			var mb:Box = e.target as Box;
 			mb.backgroundTexture = null;
-			var ti:TypeInfo = mb.data;
-			CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.MATERIAL_REMOVED, ti ) );	
+			var ti:TypeInfo = TypeInfo.typeInfo[ mb.data.type ];
+			CraftingItemEvent.create( CraftingItemEvent.MATERIAL_REMOVED, ti );
 		}			
 		
 		private function onDrop(e:DnDEvent):void 
@@ -63,25 +63,8 @@ package com.voxelengine.GUI.crafting {
 		
 		private function buildMaterialBox( category:String ):Box 
 		{
-			var mb:Box;
-			if ( Globals.CATEGORY_PLANT == category )
-				mb = new BoxWood( BOX_SIZE, BOX_SIZE );
-			else if ( Globals.CATEGORY_METAL == category )
-				mb = new BoxMetal( BOX_SIZE, BOX_SIZE );
-			else if ( Globals.CATEGORY_LEATHER == category )
-				mb = new BoxLeather( BOX_SIZE, BOX_SIZE );
-			else {
-				Log.out( "PanelMaterials - Unknown category type found in Recipe: " + category, Log.WARN );
-				mb = new Box( BOX_SIZE, BOX_SIZE );
-			}
-				
-			mb.dropEnabled = true;
-			mb.dragEnabled = true;
-			var dndFmt:DnDFormat = new DnDFormat( category );
-			mb.addDropFormat( dndFmt );
-		
+			var mb:Box = new BoxCraftingBase( BOX_SIZE, category );
 			mb.addEventListener( DnDEvent.DND_DROP, onDrop );
-			mb.borderStyle = BorderStyle.INSET;
 			eventCollector.addEvent( mb, UIMouseEvent.PRESS, doDrag);
 			return mb;
 		}

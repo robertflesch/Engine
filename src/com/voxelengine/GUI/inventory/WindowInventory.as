@@ -154,21 +154,27 @@ import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 		
 		private function dropMaterial(e:DnDEvent):void 
 		{
-			if ( e.dragOperation.dropFormat[0].data is TypeInfo )
-			{
-				e.dropTarget.backgroundTexture = e.dragOperation.initiator.backgroundTexture;
-				e.dropTarget.data = e.dragOperation.dropFormat[0].data;
+			e.dropTarget.backgroundTexture = e.dragOperation.initiator.backgroundTexture;
+			e.dropTarget.data = e.dragOperation.initiator.data;
+
+			var ti:TypeInfo;
+			if ( e.dragOperation.initiator.data is TypeInfo )
+				ti = e.dragOperation.initiator.data;
+			else if ( e.dragOperation.initiator.data is ObjectVoxel ) {
+				ti = TypeInfo.typeInfo[ e.dragOperation.initiator.data.type ];
 			}
-			else
-				return;
+			else {
+				throw new Error( "WindowInventory - WHAT AM I DROPPING?");
+			}
 
 			if ( e.dropTarget.target is PanelMaterials ) {
-				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.MATERIAL_DROPPED, e.dragOperation.dropFormat[0].data ) );
+				CraftingItemEvent.create( CraftingItemEvent.MATERIAL_DROPPED, ti );
 			}
 			else if ( e.dropTarget.target is PanelBonuses ) {
-				CraftingItemEvent.dispatch( new CraftingItemEvent( CraftingItemEvent.BONUS_DROPPED, e.dragOperation.dropFormat[0].data ) );
+				CraftingItemEvent.create( CraftingItemEvent.BONUS_DROPPED, ti );
 				e.dropTarget.backgroundTextureManager.resize( 32, 32 );
 			}
+
 		}
 		
 		private function doDrag(e:UIMouseEvent):void 
@@ -178,16 +184,18 @@ import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 			_dragOp.dragImage = e.target as DisplayObject;
 			// this adds a drop format, which is checked again what the target is expecting
 			var category:String = "";
+			var subCat:String = "";
 			if ( bi.objectInfo is ObjectVoxel ) {
 				var ti:TypeInfo = TypeInfo.typeInfo[(bi.objectInfo as ObjectVoxel).type];
 				category = ti.category;
+				subCat = ti.subCat;
 			}
 			else {
 				throw new Error( "What do I use for cat in this case?");
 			}
 
 			_dragOp.resetDropFormat();
-			var dndFmt:DnDFormat = new DnDFormat( category, ti );
+			var dndFmt:DnDFormat = new DnDFormat( category, subCat );
 			_dragOp.addDropFormat( dndFmt );
 			
 			UIManager.dragManager.startDragDrop(_dragOp);
