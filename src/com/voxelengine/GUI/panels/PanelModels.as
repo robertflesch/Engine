@@ -144,6 +144,7 @@ public class PanelModels extends PanelBase
 				countAdded++;
 			}
 		}
+		buttonsDisable();
 		return countAdded;
 	}
 
@@ -301,7 +302,11 @@ public class PanelModels extends PanelBase
 			if (event.target.data) {
 				Log.out("PanelModels.selectModel has TARGET DATA: " + event.target.data as String);
 				buttonsEnable();
-				var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( event.target.data.instanceGuid );
+				var vm:VoxelModel;
+				if ( null == _parentModel )
+					vm = Region.currentRegion.modelCache.instanceGet( event.target.data.instanceGuid );
+				else
+					vm = _parentModel.childFindInstanceGuid( event.target.data.instanceGuid );
 				Log.out("PanelModels.selectModel vm: " + vm );
 				if ( vm ) {
 					VoxelModel.selectedModel = vm;
