@@ -72,10 +72,10 @@ public class AnimationAttachment
 	*/
 	public function toObject( ):Object {			
 		var obj:Object = new Object()
-		obj.fileName 		= _guid
-		obj.attachsTo 		= _attachsTo
-		obj.location		= vector3DIntToObject( _instanceInfo.positionGet )
-		obj.rotation		= vector3DToObject( _instanceInfo.rotationGet )
+		obj.fileName 		= _guid;
+		obj.attachsTo 		= _attachsTo;
+		obj.location		= vector3DIntToObject( _instanceInfo.positionGet );
+		obj.rotation		= vector3DToObject( _instanceInfo.rotationGet );
 		return obj
 		
 		function vector3DToObject( $vec:Vector3D ):Object {

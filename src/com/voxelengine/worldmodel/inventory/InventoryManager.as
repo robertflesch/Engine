@@ -9,8 +9,12 @@ package com.voxelengine.worldmodel.inventory {
 	
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
+import com.voxelengine.events.CharacterSlotEvent;
 import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.animation.AnimationAttachment;
+import com.voxelengine.worldmodel.animation.AnimationAttachment;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 	/**
@@ -33,8 +37,23 @@ public class InventoryManager
 		InventoryEvent.addListener( InventoryEvent.SAVE_REQUEST, save );
 		InventoryEvent.addListener( InventoryEvent.SAVE_FORCE, saveForce );
 		InventoryEvent.addListener( InventoryEvent.DELETE, deleteInventory );
+		CharacterSlotEvent.addListener( CharacterSlotEvent.SLOT_CHANGE, characterSlotChange );
+
 	}
 
+	static private function characterSlotChange( $cse:CharacterSlotEvent ): void {
+		if ( Globals.online ) {
+			if ( null == _s_inventoryByGuid[$cse.owner] ){
+
+				var aa:AnimationAttachment = new AnimationAttachment( { fileName:$cse.guid }, $cse.slot );
+				aa.create( Region.currentRegion.modelCache.instanceGet( $cse.owner ) );
+
+				//$cse.slot;
+				//$cse.guid;
+			}
+		}
+
+	}
 
 	static private function save( e:InventoryEvent ):void {
 		if ( Globals.online ) {

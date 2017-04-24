@@ -10,6 +10,7 @@ package com.voxelengine.GUI.inventory {
 import com.voxelengine.GUI.VVBox;
 import com.voxelengine.GUI.crafting.BoxCharacterSlot;
 import com.voxelengine.GUI.voxelModels.PopupMetadataAndModelInfo;
+import com.voxelengine.events.CharacterSlotEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
@@ -358,16 +359,13 @@ public class InventoryPanelModel extends VVContainer
 			}
 
 			if ( e.dropTarget is BoxCharacterSlot ) {
-					var bcs:BoxCharacterSlot = e.dropTarget as BoxCharacterSlot;
-				trace( "InventoryPanelModel.dropMaterial - slot: " + bcs.data );
-					var om:ObjectModel = e.dragOperation.initiator.data;
+				var bcs:BoxCharacterSlot = e.dropTarget as BoxCharacterSlot;
+				var om:ObjectModel = e.dragOperation.initiator.data;
+				if ( om.vmm && om.vmm.thumbnailLoaded && om.vmm.thumbnail)
+					bcs.backgroundTexture = VVBox.drawScaled(om.vmm.thumbnail, bcs.width, bcs.height);
 
-					if ( om.vmm ) {
-						if (om.vmm.thumbnailLoaded && om.vmm.thumbnail) {
-							bcs.backgroundTexture = VVBox.drawScaled(om.vmm.thumbnail, bcs.width, bcs.height);
-						}
-					}
-					Log.out( "InventoryPanelModel.dropMaterial in BoxCharacterSlot ", Log.WARN );
+				CharacterSlotEvent.create( CharacterSlotEvent.SLOT_CHANGE, Network.userId, bcs.data, om.modelGuid );
+				Log.out( "InventoryPanelModel.dropMaterial - slot: " + bcs.data + "  guid: " + om.modelGuid, Log.WARN );
 			}
 
 			

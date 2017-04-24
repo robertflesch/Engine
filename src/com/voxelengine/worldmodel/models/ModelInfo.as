@@ -555,7 +555,7 @@ public class ModelInfo extends PersistenceObject
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// persistance functions
+	// persistence functions
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	private static const DEFAULT_CLASS:String		= "VoxelModel";
 	
@@ -635,7 +635,10 @@ public class ModelInfo extends PersistenceObject
 	private function animationsGetSummary():void {
 		delete dbo.animations;
 		var len:int = _animations.length;
-		var oa:Object = {};
+		if ( 0 == len )
+			return;
+
+		dbo.animations = [];
 		for ( var index:int=0; index < len; index++ ) {
 			var ani:Animation = _animations[index];
 			var ao:Object = {};
@@ -643,11 +646,8 @@ public class ModelInfo extends PersistenceObject
 			ao.type = ani.type;
 			ao.guid = ani.guid;
 			Log.out( "ModelInfo.animationsGet - animation.metadata: " + ani.name + "  model guid: " + guid );
-			oa[index] = ao;
+			dbo.animations.push( ao );
 		}
-		if ( oa[0] )
-			dbo.animations = oa;
-		oa = null;
 	}
 
 	/*

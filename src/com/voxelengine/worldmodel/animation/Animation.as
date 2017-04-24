@@ -102,9 +102,10 @@ public class Animation extends PersistenceObject
 	}
 
 	override public function save():Boolean {
+		var result:Boolean = super.save();
 		if ( _animationSound )
 			_animationSound.save();
-		return super.save();
+		return result;
 	}
 	private function init( $newData:Object = null ):void {
 
@@ -220,7 +221,7 @@ public class Animation extends PersistenceObject
 	
 	private function getAnimations():Object {
 		var transforms:Array = [];
-		for ( var i:int; i < _transforms.length; i++ ) {
+		for ( var i:int=0; i < _transforms.length; i++ ) {
 			var at:AnimationTransform = _transforms[i];
 			var ato:Object = at.toObject();
 			transforms.push( ato );

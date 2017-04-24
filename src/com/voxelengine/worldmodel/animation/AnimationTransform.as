@@ -7,17 +7,10 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.animation
 {
-import com.voxelengine.Globals;
-import com.voxelengine.Log;
 import flash.geom.Vector3D;
-import org.flashapi.swing.text.ATM;
+import com.voxelengine.Log;
 import com.voxelengine.worldmodel.models.ModelTransform;
 
-/**
- * ...
- * @author Robert Flesch - RSF 
- * 
- */
 public class AnimationTransform
 {
 	private var _attachmentName:String = "INVALID_ATTACHMENT";
@@ -25,12 +18,9 @@ public class AnimationTransform
 	private var _rotation:Vector3D = new Vector3D();
 	private var _scale:Vector3D = new Vector3D(1,1,1);
 	private var _transforms:Vector.<ModelTransform> = new Vector.<ModelTransform>;
-//    private var _attachments:Vector.<AnimationAttachment>;
-//  public function get hasAttachments():Boolean  				{ return (_attachments && 0 < _attachments.length); }
 	private var _notNamed:Boolean = false;
 
 	// for compatibility with PanelVectorContainer
-	public function get name():String 							{ return _attachmentName; }
 	public function get attachmentName():String 				{ return _attachmentName; }
 	public function set attachmentName( $val:String ):void 		{ _attachmentName = $val; }
 	public function get position():Vector3D 					{ return _position; }
@@ -127,7 +117,7 @@ public class AnimationTransform
 	}
 
 	public function toObject():Object {			
-		var obj:Object = [];
+		var obj:Object = {};
 		obj.attachmentName 	= _attachmentName;
 		if ( hasPosition )
 			obj.position	= vector3DIntToObject( _position );
