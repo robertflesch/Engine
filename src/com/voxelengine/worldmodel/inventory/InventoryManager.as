@@ -11,10 +11,9 @@ import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.CharacterSlotEvent;
 import com.voxelengine.events.InventoryEvent;
-import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.animation.AnimationAttachment;
-import com.voxelengine.worldmodel.animation.AnimationAttachment;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 	/**
@@ -43,16 +42,25 @@ public class InventoryManager
 
 	static private function characterSlotChange( $cse:CharacterSlotEvent ): void {
 		if ( Globals.online ) {
-			if ( null == _s_inventoryByGuid[$cse.owner] ){
+			var inv:Inventory = _s_inventoryByGuid[$cse.owner];
+			if ( null != inv ){
 
-				var aa:AnimationAttachment = new AnimationAttachment( { fileName:$cse.guid }, $cse.slot );
-				aa.create( Region.currentRegion.modelCache.instanceGet( $cse.owner ) );
-
-				//$cse.slot;
-				//$cse.guid;
+				var ownerModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( $cse.owner );
+				if ( ownerModel ) {
+					var attachToModel:VoxelModel = ownerModel.modelInfo.childModelFindByName($cse.slot);
+					if ( attachToModel ) {
+						var ii:InstanceInfo = new InstanceInfo();
+						ii.controllingModel = attachToModel;
+						ii.dynamicObject = true;
+						ii.rotationSetComp(90, 0, 0);
+						ii.modelGuid = $cse.guid;
+						ModelMakerBase.load(ii);
+					}
+				}
+			}  else {
+				throw new Error( "InventoryManager.characterSlotChange - inventory NOT found for guid " + $cse.owner );
 			}
 		}
-
 	}
 
 	static private function save( e:InventoryEvent ):void {

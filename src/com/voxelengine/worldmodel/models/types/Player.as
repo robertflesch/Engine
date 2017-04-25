@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.Globals;
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.LoginEvent;
@@ -33,13 +34,18 @@ import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 
-public class Player
+public class Player extends PersistenceObject
 {
 	private static var _s_player:Player;
-	public static function get player():Player { return _s_player; }
-	public static function set player( val:Player ):void { _s_player = val; }
+	public static function get player():Player {
+		if ( null == _s_player )
+				_s_player = new Player();
+		return _s_player; }
+	//public static function set player( val:Player ):void { _s_player = val; }
+	public static var _playerModel:Avatar;
 	
 	public function Player() {
+		super( "local", "PlayerObjects" );
 		Log.out( "Player.construct" );
 		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, onLogin );
 		RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, onRegionLoad );
@@ -51,24 +57,25 @@ public class Player
 			// request that the database load the player Object
 			Persistence.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
 		}
+	}
 
-		function onRegionLoad( $re:RegionEvent ):void {
-			if ( VoxelModel.controlledModel ) {
-				if ( null == Region.currentRegion.modelCache.instanceGet( VoxelModel.controlledModel.instanceInfo.instanceGuid ) )
-					RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, VoxelModel.controlledModel );
-			} else {
-				ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
-			}
-
-			//if ( Region.currentRegion )
-			//	Region.currentRegion.applyRegionInfoToPlayer();
+	private function onRegionLoad( $re:RegionEvent ):void {
+		if ( VoxelModel.controlledModel ) {
+			if ( null == Region.currentRegion.modelCache.instanceGet( VoxelModel.controlledModel.instanceInfo.instanceGuid ) )
+				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, VoxelModel.controlledModel );
+		} else {
+			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 		}
+
+		//if ( Region.currentRegion )
+		//	Region.currentRegion.applyRegionInfoToPlayer();
 	}
 
 
 
 	static public const DEFAULT_PLAYER:String = "DefaultPlayer";
-	static public function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
+	public function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
+		dbo = $dbo;
 		if ( $dbo ) {
 			if ( null == $dbo.modelGuid ) {
 				// Assign the Avatar the default avatar
@@ -91,27 +98,33 @@ public class Player
 		}
 	}
 
-	static public function createPlayer( $modelGuid:String, $userId:String ):void	{
-		if ( null == player )
-			player = new Player();
+	public function createPlayer( $modelGuid:String, $userId:String ):void {
 
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.modelGuid = $modelGuid;
 		ii.instanceGuid = $userId;
-		ii.centerSetComp(7.5,0,7.5);
+		ii.centerSetComp(7.5, 0, 7.5);
 
-		if ( DEFAULT_PLAYER == $modelGuid ) {
+		if (DEFAULT_PLAYER == $modelGuid) {
 			//Log.out( "Avatar.createPlayer - creating DEFAULT_PLAYER from GenerateCube", Log.WARN )
-			var model:Object = GenerateOxel.cubeScript( 4, TypeInfo.BLUE );
+			var model:Object = GenerateOxel.cubeScript(4, TypeInfo.BLUE);
 			model.modelClass = "Avatar";
 			model.name = "Temp Avatar";
-			new ModelMakerGenerate( ii, model )
+			new ModelMakerGenerate(ii, model)
 		}
 		else {
 			ModelMakerBase.load(ii, false, false);
 		}
 	}
 
+//	private function modelLoadComplete( $mle:ModelLoadingEvent ):void {
+//		if ( Globals.online ) {
+//			if (dbo.modelGuid == $mle.modelGuid) {
+//				ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete);
+//				_playerModel = $mle.vm as Avatar;
+//			}
+//		}
+//	}
 
 	static public function onPlayerLoadError(error:PlayerIOError):void {
 		Log.out("Avatar.onPlayerLoadError", Log.ERROR, error );
@@ -119,6 +132,7 @@ public class Player
 
 	static private function playerModelLoaded( $mle:ModelLoadingEvent ):void {
 		if ( $mle.vm && ( $mle.vm.instanceInfo.instanceGuid == Network.userId || $mle.vm.instanceInfo.instanceGuid == Network.LOCAL ) ){
+			_playerModel = $mle.vm as Avatar;
 			if ( null == Region.currentRegion.modelCache.instanceGet( $mle.vm.instanceInfo.instanceGuid ) ) {
 				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, $mle.vm );
 
@@ -127,7 +141,6 @@ public class Player
 				ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded);
 			}
 			$mle.vm.takeControl( VoxelModel.controlledModel, false );
-
 		}
 	}
 

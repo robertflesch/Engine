@@ -5,25 +5,21 @@
   authorship protected under United States Copyright Act.
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
-package com.voxelengine.renderer 
-{
+package com.voxelengine.renderer {
 
-import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.display3D.VertexBuffer3D;
 import flash.display3D.IndexBuffer3D;
 import flash.display3D.Context3D;
-import flash.display3D.Context3DVertexBufferFormat;
 import flash.geom.Vector3D;
 import flash.utils.getTimer;
 import flash.utils.ByteArray;
 import flash.utils.Endian;
 
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.renderer.Quad;
 import com.voxelengine.pools.VertexIndexBuilderPool;
 import com.voxelengine.renderer.vertexComponents.VertexComponent;
+import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 
 public class VertexIndexBuilder
@@ -37,7 +33,7 @@ public class VertexIndexBuilder
 	private static var _s_totalOxels:int = 0;
 
 	private static const BUFFER_LIMIT:int = 65535;
-	private static const BYTES_PER_WORD:uint = 4
+	private static const BYTES_PER_WORD:uint = 4;
 	private static const MAX_QUADS:int = (BUFFER_LIMIT + 1) / 4; // Buffer limit is max number of vertexes, and each quad has 4
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +88,7 @@ public class VertexIndexBuilder
 	}
 	
 	static private var _s_compareVec:Vector3D;
-	private function compareFunction( x:Oxel, y:Oxel ):int {
+	static private function compareFunction( x:Oxel, y:Oxel ):int {
 		if ( !x.gc )
 			return 1;
 		if ( !y.gc )
@@ -127,10 +123,10 @@ public class VertexIndexBuilder
 		_sortCount = 0;
 	}
 
-	public static function resetStatics():void {
-		_s_totalVertexMemory = 0;
-		_s_totalIndexMemory = 0;
-	}
+//	public static function resetStatics():void {
+//		_s_totalVertexMemory = 0;
+//		_s_totalIndexMemory = 0;
+//	}
 	
 	public function print():void {
 		for each ( var oxel:Oxel in _oxels ) 
@@ -155,7 +151,7 @@ public class VertexIndexBuilder
 
 		if ( _oxels )
 		{
-			for ( var index:int; index < _oxels.length; index++ )
+			for ( var index:int = 0; index < _oxels.length; index++ )
 			{
 				if ( oxel == _oxels[index] ) {
 					_oxels.splice( index, 1 );
@@ -253,10 +249,10 @@ public class VertexIndexBuilder
 		// NEW 2
 		var _offsetIndices:Vector.<uint> = new Vector.<uint>( $quadsToProcess * Quad.INDICES );
 
-		var i:uint;
+		var i:uint=0;
 		var oxel:Oxel;
 		var quad:Quad;
-		var quadCount:uint;
+		var quadCount:uint=0;
 		var indice:uint;
 		for ( var index:int = $oxelStartingIndex; index < $oxelStartingIndex + $oxelsToProcess; index++ ) {
 			oxel = _oxels[index];
@@ -282,10 +278,10 @@ public class VertexIndexBuilder
 		try {
 			var vb:VertexBuffer3D = $context.createVertexBuffer( quadCount * Quad.VERTEX_PER_QUAD, _vertexDataSize );
 		} catch (error:ArgumentError) {
-			Log.out('VertexIndexBuilder.quadsCopyToVertexBuffersByteArray - An argument error has occured', Log.ERROR);
+			Log.out('VertexIndexBuilder.quadsCopyToVertexBuffersByteArray - An argument error has occurred', Log.ERROR);
 			return;
 		} catch (error:Error) {
-			Log.out('VertexIndexBuilder.quadsCopyToVertexBuffersByteArray - An error has occured which is not argument related', Log.ERROR );
+			Log.out('VertexIndexBuilder.quadsCopyToVertexBuffersByteArray - An error has occurred which is not argument related', Log.ERROR );
 			return;
 		}
 		if ( null == vb ) {
@@ -307,14 +303,16 @@ public class VertexIndexBuilder
 		var oxelSize:int = _oxels.length;
 		var oxel:Oxel;
 		var quad:Quad;
+		var indexQuad:int;
+		var i:uint;
 		//for each ( var oxel:Oxel in _oxels ) { // This is a slower way
-		for ( var index:int; index < oxelSize; index++ ) {
+		for ( var index:int=0; index < oxelSize; index++ ) {
 		    oxel = _oxels[index];
 			if ( oxel.quads ) {
-				for ( var indexQuad:int; indexQuad < oxel.quads.length; indexQuad++ ) {
+				for ( indexQuad=0; indexQuad < oxel.quads.length; indexQuad++ ) {
 					quad = oxel.quads[indexQuad];
 					if ( quad && 0 < quad.components.length ) {
-						for ( var i:uint; i < Quad.COMPONENT_COUNT; i++ ) {
+						for ( i=0; i < Quad.COMPONENT_COUNT; i++ ) {
 							_vc[i] = quad.components[i];
 							_vertexDataSize += quad.components[i].size();
 						}
@@ -326,13 +324,13 @@ public class VertexIndexBuilder
 		Log.out( "VertexIndexBuilder.addComponentData - No components found", Log.WARN );
 	}
 	
-	public function BufferCopyToGPU( context:Context3D ) : void 
+	public function bufferCopyToGPU(context:Context3D ) : void
 	{
 		var vb:VertexBuffer3D;
 		var ib:IndexBuffer3D;
 		var index:uint;
 		var offset:uint;
-		var timer:int = getTimer();
+		//var timer:int = getTimer();
 		for (var i:int = 0; i < _buffers; i++) {
 			vb = _vertexBuffers[i];
 			

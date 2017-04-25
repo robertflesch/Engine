@@ -165,7 +165,7 @@ package com.voxelengine.worldmodel
 
 			// for startup use before you go online
 			if ( !Globals.online )
-				Player.createPlayer(Player.DEFAULT_PLAYER, Network.LOCAL );
+				Player.player.createPlayer(Player.DEFAULT_PLAYER, Network.LOCAL );
 //			else if ( VoxelModel.controlledModel && VoxelModel.controlledModel.instanceInfo.instanceGuid == Player.DEFAULT_PLAYER )
 //				Player.createPlayer(Player.DEFAULT_PLAYER,Network.LOCAL );
 

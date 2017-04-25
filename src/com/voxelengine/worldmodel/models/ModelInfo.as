@@ -9,6 +9,8 @@ package com.voxelengine.worldmodel.models
 {
 
 import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.worldmodel.models.types.Avatar;
+import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
 
 import flash.display3D.Context3D;
@@ -518,7 +520,22 @@ public class ModelInfo extends PersistenceObject
 		Globals.g_app.dispatchEvent(me);
 		changed = true;				
 	}
-	
+
+	public function childModelFindByName( $name:String, $recursive:Boolean = true ):VoxelModel	{
+		for each (var child:VoxelModel in childVoxelModels) {
+			if (child.metadata.name ==  $name )
+				return child;
+		}
+		// didnt find it at first level, lets look recurvsivly
+		if ( $recursive ) {
+			for each (child in childVoxelModels) {
+				return child.modelInfo.childModelFindByName($name);
+			}
+		}
+		//Log.out(  "VoxelModel.childFind - not found for guid: " + guid, Log.WARN );
+		return null
+	}
+
 	public function childModelFind(guid:String, $recursive:Boolean = true ):VoxelModel	{
 		for each (var child:VoxelModel in childVoxelModels) {
 			if (child.instanceInfo.instanceGuid == guid)
@@ -612,14 +629,14 @@ public class ModelInfo extends PersistenceObject
 			delete dbo.children;
 			if ( 0 < _childVoxelModels.length ) {
 				var children:Object = {};
-				for ( var i:int; i < _childVoxelModels.length; i++ ) {
+				for ( var i:int=0; i < _childVoxelModels.length; i++ ) {
 					var cm:VoxelModel = _childVoxelModels[i];
 					if ( null != cm ) {
 						// Don't save animation attachments!
 						if ( cm.instanceInfo.dynamicObject )
 							continue;
-						// Dont save the player as a child model
-						if ( cm == VoxelModel.controlledModel )
+						// Don't save the player as a child model
+						if ( cm is Avatar )
 							continue;
 						//children["instanceInfo" + i]  = _childrenInstanceInfo[i].toObject();
 						children[i]  = cm.instanceInfo.toObject();

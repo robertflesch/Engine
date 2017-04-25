@@ -247,7 +247,21 @@ public class VoxelModel
 	public function wsPositionGet():Vector3D {
 		return modelToWorld( msPositionGet() );
 	}
-	
+
+	public function childFindInstanceGuid( $guid:String, $recursive:Boolean = true ):VoxelModel {
+		for each (var child:VoxelModel in modelInfo.childVoxelModels) {
+			if (child.instanceInfo.instanceGuid == $guid)
+				return child;
+
+			else { // check its children
+				var cvm:VoxelModel = child.childFindInstanceGuid( $guid );
+				if ( cvm )
+					return cvm;
+			}
+		}
+		return null;
+	}
+
 	public function childFindByName($name:String, $recursive:Boolean = true ):VoxelModel {
 		// Are we that model?
 		if ( metadata.name == $name )

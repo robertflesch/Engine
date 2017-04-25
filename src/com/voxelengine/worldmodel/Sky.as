@@ -118,7 +118,7 @@ package com.voxelengine.worldmodel
 		
 		public function draw( context:Context3D ):void {
 			buffersBuildFromOxels( context );
-			_bufferObject.BufferCopyToGPU( context );
+			_bufferObject.bufferCopyToGPU( context );
 			//_bufferObject.moveSkyTrianglesToGPU( context );
 		}
 		

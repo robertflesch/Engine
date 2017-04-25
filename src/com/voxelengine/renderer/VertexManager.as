@@ -161,7 +161,7 @@ public class VertexManager {
 			if ( _shaders[0].update( $mvp, $vm, $context, $selected, $isChild ) )
 			{
 				_vertBuf.buffersBuildFromOxels( $context );
-				_vertBuf.BufferCopyToGPU( $context );
+				_vertBuf.bufferCopyToGPU( $context );
 			}
 		}
 		
@@ -170,7 +170,7 @@ public class VertexManager {
 			if ( _shaders[1].update( $mvp, $vm, $context, $selected, $isChild ) )
 			{
 				_vertBufAnimated.buffersBuildFromOxels( $context );
-				_vertBufAnimated.BufferCopyToGPU( $context );
+				_vertBufAnimated.bufferCopyToGPU( $context );
 			}
 		}
 		
@@ -188,7 +188,7 @@ public class VertexManager {
 			if ( _shaders[3].update( $mvp, $vm, $context, $selected, $isChild ) ) {
 				_vertBufAnimatedAlpha.sort();
 				_vertBufAnimatedAlpha.buffersBuildFromOxels( $context );
-				_vertBufAnimatedAlpha.BufferCopyToGPU( $context );
+				_vertBufAnimatedAlpha.bufferCopyToGPU( $context );
 			}
 		}
 		
@@ -196,7 +196,7 @@ public class VertexManager {
 			if ( _shaders[4].update( $mvp, $vm, $context, $selected, $isChild ) ) {
 				_vertBufFire.sort();
 				_vertBufFire.buffersBuildFromOxels( $context );
-				_vertBufFire.BufferCopyToGPU( $context );
+				_vertBufFire.bufferCopyToGPU( $context );
 			}
 		}	
 		
@@ -210,7 +210,7 @@ public class VertexManager {
 				//}
 				_vertBufAlpha.sort();
 				_vertBufAlpha.buffersBuildFromOxels( $context );
-				_vertBufAlpha.BufferCopyToGPU( $context );
+				_vertBufAlpha.bufferCopyToGPU( $context );
 			}
 		}
 		

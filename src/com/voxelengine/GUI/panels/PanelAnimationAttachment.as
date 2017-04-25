@@ -8,6 +8,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.panels
 {
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+
 import org.flashapi.swing.Alert;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.layout.AbsoluteLayout;
@@ -15,46 +18,45 @@ import org.flashapi.swing.layout.AbsoluteLayout;
 import com.voxelengine.Log;
 import com.voxelengine.GUI.components.*;
 import com.voxelengine.worldmodel.animation.Animation;
-import com.voxelengine.worldmodel.animation.AnimationAttachment;
 
 
 public class PanelAnimationAttachment extends ExpandableBox
 {
 	private var _ani:Animation;
-	private var _aniAttach:AnimationAttachment;
+	private var _aniAttach:VoxelModel;
 	
 	static private const ITEM_HEIGHT:int = 20;
 	static private const TITLE:String = "";
 	static private const NEW_ITEM_TEXT:String = "Animation Transform";
-	public function PanelAnimationAttachment( $ani:Animation, $aniAttach:AnimationAttachment, $widthParam = 250 ) {
+	public function PanelAnimationAttachment( $ani:Animation, $aniAttach:VoxelModel, $widthParam = 250 ) {
+		super( null, ebco );
 		_ani = $ani;
 		if ( null == $aniAttach )
-			$aniAttach = new AnimationAttachment( AnimationAttachment.DEFAULT_OBJECT, "WHAT EVER THE PARENT IS" );
+			$aniAttach = new VoxelModel( new InstanceInfo() );
 		_aniAttach = $aniAttach;
 		
 		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
-		ebco.showNew = true;
+//		ebco.showNew = true;
 		ebco.paddingTop = 2;
 		ebco.width = $widthParam;
 		//ebco.backgroundColor = 0x0000ff;
-		ebco.showNew = false;
-		super( ebco );
+//		ebco.showNew = false;
 	}
 	
 	//override public function deleteElementCheck( $me:UIMouseEvent ):void {
 		//(new Alert( "PanelAnimationAttachment.deleteElementCheck", 350 )).display();
 	//}
 	
-	override public function collapasedInfo():String  {
-		if ( _aniAttach )
-			return _aniAttach.attachsTo;
-		
-		return "New Animation Attachment";
-	}
+//	public function collapasedInfo():String  {
+//		if ( _aniAttach )
+//			return _aniAttach.attachsTo;
+//
+//		return "New Animation Attachment";
+//	}
 	
 	override protected function expand():void {
 		super.expand();
-		
+		/*
 		var cli1:ComponentLabelInput = new ComponentLabelInput( "Attachs To"
 										  , function ($e:TextEvent):void { _aniAttach.attachsTo = $e.target.text; setChanged(); }
 										  , _aniAttach.attachsTo ? _aniAttach.attachsTo : "Missing Attachment Name"
@@ -65,7 +67,7 @@ public class PanelAnimationAttachment extends ExpandableBox
 										  , _aniAttach.guid ? _aniAttach.guid : "Missing Attachment Guid"
 										  , _itemBox.width )
 		_itemBox.addElement( cli );
-		
+		*/
 		var cv3:ComponentVector3DSideLabel;
 		cv3 = new ComponentVector3DSideLabel( setChanged, "location", "X: ", "Y: ", "Z: ",  _aniAttach.instanceInfo.positionGet, _itemBox.width, updateVal );
 		_itemBox.addElement( cv3 );

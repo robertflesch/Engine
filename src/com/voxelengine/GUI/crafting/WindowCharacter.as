@@ -61,19 +61,6 @@ public class WindowCharacter extends VVPopup {
         rh.y = 210;
         addElement( rh );
 
-//        _panelBase = new PanelBase( null, width, height  );
-//        _panelBase.layout.orientation = LayoutOrientation.HORIZONTAL;
-//        _panelBase.backgroundTexture = "assets/textures/characterBackgroundMale.png";
-//        addElement( _panelBase );
-
-//        _panelSlots = new PanelCharacterSlot( _panelBase, width, height, "Left Hand" );
-//        _panelSlots.borderStyle = BorderStyle.NONE;
-//        _panelBase.addElement( _panelSlots );
-//
-//        _panelSlots = new PanelCharacterSlot( _panelBase, width, height, "Right Hand" );
-//        _panelSlots.borderStyle = BorderStyle.NONE;
-//        _panelBase.addElement( _panelSlots );
-
         display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
     }
 
@@ -81,18 +68,7 @@ public class WindowCharacter extends VVPopup {
         super.remove();
     }
 
-    public function close():void
-    {
-        //super.onRemoved(e);
-    //    _craftedItem.cancel();
-    //    _craftedItem = null;
-    //    _panelForumla.remove();
-    //    _panelBonuses.remove();
-    //    _panelMaterials.remove();
-    //    _panelPreview.remove();
-    //    _panelButtons.remove();
-
-    }
+    public function close():void { }
 
 }
 }
