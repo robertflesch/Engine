@@ -174,7 +174,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			Log.out( "ModelMakerImport.completeMake ERROR - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
 
 		function childrenAllReady( $ode:ModelLoadingEvent):void {
-			if ( modelInfo.guid == $ode.modelGuid ) {
+			if ( modelInfo.guid == $ode.data.modelGuid ) {
 				Log.out( "ModelMakerImport.allChildrenReady - modelMetadata.description: " + _modelMetadata.description, Log.WARN );
 				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
 				markComplete( true );

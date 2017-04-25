@@ -69,7 +69,7 @@ public class ObjectModel extends ObjectInfo
 			if ( box )
 				box.reset();
 			Log.out( "ObjectModel.metadataFailed - guid: " + e.modelGuid, Log.WARN );
-			InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, _slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) );
+			InventorySlotEvent.create( InventorySlotEvent.CHANGE, Network.userId, Network.userId, _slotId, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) );
 		}
 	}
 	

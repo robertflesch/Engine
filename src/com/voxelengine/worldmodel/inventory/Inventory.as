@@ -48,7 +48,11 @@ public class Inventory extends PersistenceObject
 //	private function childLoadingComplete( $mle:ModelLoadingEvent ):void {
 //		_characterSlots.loadCharacterInventory();
 //	}
-	
+
+	public function characterSlotGet( $slot:String ):String {
+		return _characterSlots.items[$slot];
+	}
+
 	public function unload():void {
 		//Log.out( "Inventory.unload - owner: " + guid, Log.WARN );
 		_slots.unload();

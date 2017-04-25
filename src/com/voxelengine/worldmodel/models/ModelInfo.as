@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models
 {
 
 import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.events.ObjectHierarchyData;
 import com.voxelengine.worldmodel.models.types.Avatar;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
@@ -411,7 +412,9 @@ public class ModelInfo extends PersistenceObject
 				//Log.out( "ModelInfo.onChildAdded - modelInfo: " + guid + "  children COMPLETE", Log.WARN );
 				ModelEvent.removeListener(ModelEvent.CHILD_MODEL_ADDED, onChildAdded);
 				childrenLoaded = true;
-				ModelLoadingEvent.dispatch(new ModelLoadingEvent(ModelLoadingEvent.CHILD_LOADING_COMPLETE, guid));
+				var ohd:ObjectHierarchyData = new ObjectHierarchyData();
+				ohd.fromModel( me.vm );
+				ModelLoadingEvent.create( ModelLoadingEvent.CHILD_LOADING_COMPLETE, ohd, me.vm );
 			}
 		}
 	}

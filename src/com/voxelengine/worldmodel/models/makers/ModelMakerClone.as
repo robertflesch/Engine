@@ -108,7 +108,7 @@ public class ModelMakerClone extends ModelMakerBase {
 			Log.out( "ModelMakerClone.completeMake - modelInfo: " + modelInfo + "  modelMetadata: " + _modelMetadata, Log.WARN );
 
 		function childrenAllReady( $ode:ModelLoadingEvent):void {
-			if ( modelInfo.guid == $ode.modelGuid  ) {
+			if ( modelInfo.guid == $ode.data.modelGuid  ) {
 				Log.out( "ModelMakerClone.allChildrenReady - modelMetadata.description: " + _modelMetadata.description, Log.WARN );
 				ModelLoadingEvent.removeListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childrenAllReady );
 				markComplete( true );

@@ -17,7 +17,7 @@ import flash.events.EventDispatcher;
  */
 public class InventorySlotEvent extends Event
 {
-	static public const SLOT_CHANGE:String  			= "SLOT_CHANGE";
+	static public const CHANGE:String  			= "CHANGE";
 	static public const DEFAULT_REQUEST:String  		= "DEFAULT_REQUEST";
 	static public const DEFAULT_RESPONSE:String  		= "DEFAULT_RESPONSE";
 	

@@ -21,7 +21,7 @@ public class Slots
 
 	public function Slots( $owner:Inventory ) {
 		// Do I need to unregister this?
-		InventorySlotEvent.addListener( InventorySlotEvent.SLOT_CHANGE,	slotChange );
+		InventorySlotEvent.addListener( InventorySlotEvent.CHANGE,	slotChange );
 		//InventorySlotEvent.addListener( InventorySlotEvent.DEFAULT_RESPONSE, defaultResponse );
 		_owner = $owner;
 		FunctionRegistry.functionAdd( noneSlots, "noneSlots" );
@@ -42,7 +42,7 @@ public class Slots
 	}
 	*/
 	public function unload():void {
-		InventorySlotEvent.removeListener( InventorySlotEvent.SLOT_CHANGE,	slotChange );
+		InventorySlotEvent.removeListener( InventorySlotEvent.CHANGE,	slotChange );
 	}
 	
 	public function slotChange(e:InventorySlotEvent):void {

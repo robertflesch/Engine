@@ -151,9 +151,9 @@ public class Player extends PersistenceObject
 			Log.out( "Player.getDefaultSlotData - Loading default data into slots" , Log.WARN );
 
 			var ot:ObjectTool = new ObjectTool( null, "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );
-			InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, 0, ot );
+			InventorySlotEvent.create( InventorySlotEvent.CHANGE, Network.userId, Network.userId, 0, ot );
 			var oa:ObjectAction = new ObjectAction( null, "noneSlots", "none.png", "Do nothing" );
-			InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, 1, oa );
+			InventorySlotEvent.create( InventorySlotEvent.CHANGE, Network.userId, Network.userId, 1, oa );
 
 
 //			for each ( var gun:Gun in _guns )

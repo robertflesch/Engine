@@ -228,7 +228,7 @@ public class Dragon extends Beast
 			Log.out( "Dragon.getDefaultSlotData - Loading default data into slots" , Log.WARN );
 			
 			var oa:ObjectAction = new ObjectAction( null, "loseControlHandler", "dismount.png", "Dismount" );
-			InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, instanceInfo.instanceGuid, instanceInfo.instanceGuid, 0, oa );
+			InventorySlotEvent.create( InventorySlotEvent.CHANGE, instanceInfo.instanceGuid, instanceInfo.instanceGuid, 0, oa );
 			
 			for each ( var gun:Gun in _guns )
 				InventorySlotEvent.create( InventorySlotEvent.DEFAULT_REQUEST, instanceInfo.instanceGuid, gun.instanceInfo.instanceGuid, 0, null );

@@ -537,7 +537,7 @@ public class EditCursor extends VoxelModel
 		
 		//Now we need to listen for the model to be built, then use associatedGrain to see the location on the new ModelBaseEvent
 		function modelInsertComplete( $mle:ModelLoadingEvent ): void {
-			if ( $mle.modelGuid == ii.modelGuid && $mle.vm.instanceInfo.instanceGuid == ii.instanceGuid ) {
+			if ( $mle.data.modelGuid == ii.modelGuid && $mle.vm.instanceInfo.instanceGuid == ii.instanceGuid ) {
 				Log.out( "EditCursor.insertModel - Set associated grain here", Log.WARN );
 				$mle.vm.associatedGrain = _pl.gc;
 			}

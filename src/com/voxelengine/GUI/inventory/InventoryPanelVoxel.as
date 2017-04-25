@@ -219,7 +219,7 @@ public class InventoryPanelVoxel extends VVContainer
 					var item:ObjectVoxel = e.dragOperation.initiator.data as ObjectVoxel;
 					bi.updateObjectInfo( item ); // 
 					var slotId:int = int( bi.name );
-					InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, Network.userId, Network.userId, slotId, item );
+					InventorySlotEvent.create( InventorySlotEvent.CHANGE, Network.userId, Network.userId, slotId, item );
 				}
 			}
 		}

@@ -15,6 +15,7 @@ import com.voxelengine.events.LoadingEvent
 import com.voxelengine.events.LoadingImageEvent
 import com.voxelengine.events.ModelLoadingEvent
 import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.events.ObjectHierarchyData;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
@@ -135,16 +136,20 @@ public class ModelMakerBase {
 	}
 
 	protected function markComplete( $success:Boolean ):void {
+		var ohd:ObjectHierarchyData = new ObjectHierarchyData();
 		if ( $success ) {
 			_vm.complete = true;
 
 			if ( _vm && _addToRegionWhenComplete )
 				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vm );
 			RegionEvent.create(ModelBaseEvent.SAVE, 0, Region.currentRegion.guid, null);
-			ModelLoadingEvent.dispatch(new ModelLoadingEvent(ModelLoadingEvent.MODEL_LOAD_COMPLETE, _ii.modelGuid, _parentModelGuid, _vm ));
+			ohd.fromModel( _vm );
+			ModelLoadingEvent.create( ModelLoadingEvent.MODEL_LOAD_COMPLETE, ohd, _vm );
 		}
-		else
-			ModelLoadingEvent.dispatch(new ModelLoadingEvent(ModelLoadingEvent.MODEL_LOAD_FAILURE, _ii.modelGuid, _parentModelGuid));
+		else {
+			ohd.fromGuids( _ii.modelGuid, _parentModelGuid );
+			ModelLoadingEvent.create( ModelLoadingEvent.MODEL_LOAD_FAILURE, ohd );
+		}
 
 		_modelMetadata = null;
 		_modelInfo = null;

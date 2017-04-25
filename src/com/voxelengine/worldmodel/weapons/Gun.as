@@ -76,7 +76,7 @@ public class Gun extends ControllableVoxelModel
 				var oa:ObjectAction = new ObjectAction( null, "fire", ammo.guid + ".png", "Fire" );
 				oa.ammoName = ammo.name;
 				oa.instanceGuid = instanceInfo.instanceGuid;
-				InventorySlotEvent.create( InventorySlotEvent.SLOT_CHANGE, e.ownerGuid, instanceInfo.instanceGuid, -1, oa );
+				InventorySlotEvent.create( InventorySlotEvent.CHANGE, e.ownerGuid, instanceInfo.instanceGuid, -1, oa );
 			}
 		}
 	}
