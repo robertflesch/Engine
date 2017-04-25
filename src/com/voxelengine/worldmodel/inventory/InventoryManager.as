@@ -12,6 +12,7 @@ import com.voxelengine.Log;
 import com.voxelengine.events.CharacterSlotEvent;
 import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.inventory.Inventory;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
@@ -40,23 +41,31 @@ public class InventoryManager
 
 	}
 
+    static public function addModelToInstance( $ownerGuid:String, $slotName:String, $modelGuid:String ):void {
+        var ownerModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( $ownerGuid );
+        if ( ownerModel ) {
+            var attachToModel:VoxelModel = ownerModel.modelInfo.childModelFindByName( $slotName );
+            if ( attachToModel ) {
+                var ii:InstanceInfo = new InstanceInfo();
+                ii.controllingModel = attachToModel;
+                ii.dynamicObject = true;
+                ii.rotationSetComp(90, 0, 0);
+                ii.modelGuid = $modelGuid;
+                ModelMakerBase.load(ii);
+            }
+            else {
+                Log.out( "InventoryManager.addModelToModel - attachmentModel not found guid: " + $slotName );
+            }
+        } else {
+                Log.out( "InventoryManager.addModelToModel - ownerModel not found guid: " + $ownerGuid );
+        }
+    }
+
 	static private function characterSlotChange( $cse:CharacterSlotEvent ): void {
 		if ( Globals.online ) {
 			var inv:Inventory = _s_inventoryByGuid[$cse.owner];
 			if ( null != inv ){
-
-				var ownerModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( $cse.owner );
-				if ( ownerModel ) {
-					var attachToModel:VoxelModel = ownerModel.modelInfo.childModelFindByName($cse.slot);
-					if ( attachToModel ) {
-						var ii:InstanceInfo = new InstanceInfo();
-						ii.controllingModel = attachToModel;
-						ii.dynamicObject = true;
-						ii.rotationSetComp(90, 0, 0);
-						ii.modelGuid = $cse.guid;
-						ModelMakerBase.load(ii);
-					}
-				}
+                addModelToInstance( $cse.owner, $cse.slot, $cse.guid );
 			}  else {
 				throw new Error( "InventoryManager.characterSlotChange - inventory NOT found for guid " + $cse.owner );
 			}

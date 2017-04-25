@@ -30,6 +30,7 @@ public class Inventory extends PersistenceObject
 
 	private var  _slots:Slots
 	private var _voxels:Voxels;
+	private var _characterSlots:CharacterSlots;
 	public function get slots():Slots  { return _slots; }
 	public function get voxels():Voxels  { return _voxels; }
 	
@@ -40,12 +41,19 @@ public class Inventory extends PersistenceObject
 		super( $guid, Globals.BIGDB_TABLE_INVENTORY );
 		_slots = new Slots( this );
 		_voxels = new Voxels( this );
+		_characterSlots = new CharacterSlots( this );
+//		ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 	}
+
+//	private function childLoadingComplete( $mle:ModelLoadingEvent ):void {
+//		_characterSlots.loadCharacterInventory();
+//	}
 	
 	public function unload():void {
 		//Log.out( "Inventory.unload - owner: " + guid, Log.WARN );
 		_slots.unload();
 		_voxels.unload();
+		_characterSlots.unload();
 	}
 		
 	public function deleteInventory():void {
@@ -53,6 +61,7 @@ public class Inventory extends PersistenceObject
 		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, guid, null ) );
 		_slots = null;
 		_voxels = null;
+		_characterSlots = null;
 	}
 
 	//////////////////////////////////////////////////////////////////
@@ -89,6 +98,7 @@ public class Inventory extends PersistenceObject
 		_voxels.toByteArray( ba );
 		ba.compress();
 		dbo.voxelData = ba;
+		_characterSlots.toObject( dbo );
 	}
 
 	public function fromObject( $dbo:DatabaseObject ):void {
@@ -124,7 +134,17 @@ public class Inventory extends PersistenceObject
 			if ( ownerModel && ownerModel == VoxelModel.controlledModel )
 				_voxels.addTestData();
 		}
-		
+
+		if ( $dbo ) {
+			dbo  = $dbo;
+			_characterSlots.fromObject( dbo );
+		}
+		else {
+			super.assignNewDatabaseObject();
+			isNewRecord = true;
+			//_characterSlots.addSlotDefaultData();
+		}
+
 		if ( isNewRecord )
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, guid, null ) );
 		else

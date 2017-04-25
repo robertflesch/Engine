@@ -48,7 +48,9 @@
 	import com.furusystems.messaging.pimp.Message;
 	import com.furusystems.messaging.pimp.MessageData;
 	import com.furusystems.messaging.pimp.PimpCentral;
-	import flash.desktop.Clipboard;
+import com.voxelengine.Log;
+
+import flash.desktop.Clipboard;
 	import flash.desktop.ClipboardFormats;
 	import flash.display.DisplayObject;
 	import flash.display.Loader;
@@ -1503,7 +1505,7 @@
 		 */
 		public static function registerPlugins(... args:Array):void {
 			for (var i:int = 0; i < args.length; i++) {
-				throw new Error("DConsole.registerPlugins");
+				Log.out("DConsole.registerPlugins REFACTOR???", Log.WARN);
 				//(console as DConsole).pluginManager.registerPlugin(args[i]);
 			}
 		}

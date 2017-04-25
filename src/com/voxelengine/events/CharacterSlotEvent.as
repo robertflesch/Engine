@@ -12,6 +12,8 @@ import flash.events.EventDispatcher;
 public class CharacterSlotEvent extends Event {
 
     static public const SLOT_CHANGE:String  			= "SLOT_CHANGE";
+    static public const DEFAULT_REQUEST:String  		= "DEFAULT_REQUEST";
+
 
     private var _owner:String; // Guid of model which is implementing this action
     public function get owner():String { return _owner; }
