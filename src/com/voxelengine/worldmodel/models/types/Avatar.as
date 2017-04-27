@@ -342,6 +342,7 @@ public class Avatar extends ControllableVoxelModel
 		//camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, Globals.AVATAR_WIDTH/2) );
 		camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, Globals.AVATAR_WIDTH/2 - 4) );
 		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, 50) );
+		camera.addLocation( new CameraLocation( false, -Globals.AVATAR_WIDTH, Globals.AVATAR_HEIGHT - 4, 50) );
 //			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT + 20, 50) );
 		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 100) );
 //			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 250) );
