@@ -190,9 +190,24 @@ public class InventoryPanelModel extends VVContainer
 		if ( ObjectInfo.OBJECTINFO_MODEL == $oi.objectType ) {
 			var om:ObjectModel = $oi as ObjectModel;
 			// dont show child models
-			if ( !WindowInventoryNew._s_hackShowChildren )
-				if ( null != om.vmm.childOf && "" != om.vmm.childOf )
+			//if ( !WindowInventoryNew._s_hackShowChildren )
+			if ( VoxelModel.selectedModel ) {
+				if ( null != om.vmm.childOf && "" != om.vmm.childOf ) {
+					if ( VoxelModel.selectedModel.metadata.name != om.vmm.childOf ) {
+						Log.out( "InventoryPanelModel.addModel - child model of wrong parent: " + om.vmm.name, Log.ERROR );
+						return null;
+					}
+				} else {
+					Log.out("InventoryPanelModel.addModel - NOT child model of: " + om.vmm.name, Log.ERROR);
 					return null;
+				}
+
+			} else {
+				if ( null != om.vmm.childOf && "" != om.vmm.childOf ) {
+					Log.out( "InventoryPanelModel.addModel - NOT added child model of: " + om.vmm.name, Log.ERROR );
+					return null;
+				}
+			}
 		}
 				
 		var box:BoxInventory = findFirstEmpty();	
@@ -329,7 +344,7 @@ public class InventoryPanelModel extends VVContainer
 				if ( om.modelGuid == $modelGuid ) {
 					var newOI:ObjectInfo = new ObjectInfo(null, ObjectInfo.OBJECTINFO_EMPTY)
 					box.updateObjectInfo( newOI );
-					Log.out( "InventoryPanelModels.removeModel found model: " + $modelGuid );
+					//Log.out( "InventoryPanelModels.removeModel found model: " + $modelGuid );
 					return;
 				}
 			}
@@ -354,8 +369,8 @@ public class InventoryPanelModel extends VVContainer
 			if ( e.dropTarget is BoxTrashCan ) {
 				//var btc:BoxTrashCan = e.dropTarget as BoxTrashCan;
 				var droppedItem:ObjectModel = e.dragOperation.initiator.data;
-				
-				new WindowModelDeleteChildrenQuery( droppedItem.modelGuid, removeModel );				
+
+				new WindowModelDeleteChildrenQuery( droppedItem.modelGuid, removeModel );
 			}
 
 			if ( e.dropTarget is BoxCharacterSlot ) {
