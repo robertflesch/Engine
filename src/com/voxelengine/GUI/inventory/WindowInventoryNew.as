@@ -103,7 +103,7 @@ import org.flashapi.swing.*
 			_ownedVsStore.name = "ownedVsStore";
 			// TODO I should really iterate thru the types and collect the categories - RSF
             _ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_OWNED ), INVENTORY_OWNED );
-			_ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_STORE ), INVENTORY_STORE );
+			//_ownedVsStore.addItem( LanguageManager.localizedStringGet( INVENTORY_STORE ), INVENTORY_STORE );
 			_ownedVsStore.setButtonsWidth( 256, 36 );
 			if ( startingTabName == INVENTORY_STORE )
 				_ownedVsStore.selectedIndex = 1;
