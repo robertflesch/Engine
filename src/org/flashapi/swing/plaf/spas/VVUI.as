@@ -80,7 +80,8 @@ public class VVUI implements LookAndFeel {
      */
             // http://www.google.com/design/spec/style/color.html
     public static const DEFAULT_COLOR:uint = 0xC0C0C0;
-//		public static const DEFAULT_COLOR:uint = 0xE1F5FE;
+    //public static const DEFAULT_COLOR:uint = 0xE1F5FE;
+    //public static const DEFAULT_COLOR:uint = 0x00FF00;
     public static const DEFAULT_BUTTON_COLOR:uint = 0x0277BD;
     public static const DEFAULT_CLOSE_BUTTON_COLOR:uint = 0xF44336;
 
