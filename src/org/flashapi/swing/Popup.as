@@ -282,10 +282,10 @@ package org.flashapi.swing {
 		private function displayWindow():void {
 			lookAndFeel.drawWindow();
 			$borderDecorator.drawBackground();
-			if($innerPanel) lookAndFeel.drawInnerPanel();
+			if($innerPanel)
+				lookAndFeel.drawInnerPanel();
 			$borderDecorator.drawBorders();
 			drawMask();
-			//lookAndFeel.drawMask();
 			lookAndFeel.drawTitleBar();
 		}
 		

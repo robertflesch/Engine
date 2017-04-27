@@ -30,7 +30,7 @@ package org.flashapi.swing.plaf.libs {
 	* @see http://www.flashapi.org/
 	*/
 	
-	import org.flashapi.swing.plaf.spas.SpasWindowUI;
+	import org.flashapi.swing.plaf.spas.VVWindowUI;
 	import org.flashapi.swing.util.Observable;
 	
 	/**
@@ -57,7 +57,7 @@ package org.flashapi.swing.plaf.libs {
 		 * 			object.
 		 */
 		public static function getDefaultUI():Class {
-			return SpasWindowUI;
+			return VVWindowUI;
 		}
 		
 		//--------------------------------------------------------------------------
