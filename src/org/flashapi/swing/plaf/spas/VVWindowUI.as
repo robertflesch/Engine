@@ -42,7 +42,7 @@ import org.flashapi.swing.wtk.WTKButton;
  * 	@playerversion Flash Player 9
  * 	@productversion SPAS 3.0 alpha
  */
-public class VVWindowUI extends SpasUI implements WindowUI {
+public class VVWindowUI extends VVUI implements WindowUI {
 
     //--------------------------------------------------------------------------
     //
@@ -208,7 +208,7 @@ public class VVWindowUI extends SpasUI implements WindowUI {
     /**
      *  @inheritDoc
      */
-    private const TITLEBAR_HEIGHT:uint = 18;
+    private const TITLEBAR_HEIGHT:uint = 24;
     public function getTitleBarHeight():Number {
         return TITLEBAR_HEIGHT;
     }
@@ -370,9 +370,7 @@ public class VVWindowUI extends SpasUI implements WindowUI {
             var f:Figure = Figure.setFigure(tgt);
             var m:Matrix = MatrixUtil.getMatrix(w, h);
             f.clear();
-            //f.beginGradientFill(GradientType.LINEAR, [color2.darker(), dto.color], [a, a], [0, 250], m);
-            //f.beginGradientFill(GradientType.LINEAR, [color2.darker(), color2.darker()], [a, a], [0, 250], m);
-            f.beginFill( color2.darker(), a );
+            f.beginFill( color2.darker(0.9), a );
             f.lineStyle(1, 0x969696, .5, true);
 //				f.lineGradientStyle(GradientType.LINEAR, [0x969696, 0x505050], [1, 1], [0, 250], m);
             f.lineGradientStyle(GradientType.LINEAR, [0x969696, 0x969696], [1, 1], [0, 250], m);
