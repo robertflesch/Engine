@@ -65,10 +65,10 @@ package com.voxelengine.worldmodel
 		public function set gravity(val:Boolean):void { dbo.gravity = val; }
 		public function get playerPosition():Object { return dbo.playerPosition; }
 		public function get playerRotation():Object {return dbo.playerRotation; }
-		
+		public function setPlayerPosition( $obj:Object ):void { dbo.playerPosition = $obj }
+		public function setPlayerRotation( $obj:Object ):void { dbo.playerRotation = $obj }
+
 		public function set changedForce(val:Boolean):void { changed = val; }
-		public function get criticalModelDetected():Boolean { return  _criticalModelDetected; } 
-		
 
 		public function get loaded():Boolean { return _loaded; }
 		public function get modelCache():ModelCache  { return _modelCache; }
@@ -166,8 +166,6 @@ package com.voxelengine.worldmodel
 			// for startup use before you go online
 			if ( !Globals.online )
 				Player.player.createPlayer(Player.DEFAULT_PLAYER, Network.LOCAL );
-//			else if ( VoxelModel.controlledModel && VoxelModel.controlledModel.instanceInfo.instanceGuid == Player.DEFAULT_PLAYER )
-//				Player.createPlayer(Player.DEFAULT_PLAYER,Network.LOCAL );
 
 			_loaded = false;
 			if ( 0 == count ) {
@@ -268,15 +266,6 @@ package com.voxelengine.worldmodel
 			return outString;
 		}
 		
-		static public function resetPosition():void {
-			if ( VoxelModel.controlledModel ) {
-				VoxelModel.controlledModel.instanceInfo.positionSetComp( currentRegion.playerPosition.x, currentRegion.playerPosition.y, currentRegion.playerPosition.z );
-				VoxelModel.controlledModel.instanceInfo.rotationSetComp( currentRegion.playerRotation.x, currentRegion.playerRotation.y, currentRegion.playerRotation.z );
-				//VoxelModel.controlledModel.instanceInfo.positionSetComp(0,0,0);
-			}
-		}
-
-
 		public function takeControlEvent( e:ModelEvent ):void {
 
 			var avatar:Avatar = VoxelModel.controlledModel as Avatar;
@@ -302,15 +291,14 @@ package com.voxelengine.worldmodel
 			avatar.usesGravity = gravity;
 		}
 		
-		public function setPlayerPosition( $obj:Object ):void {
-			dbo.playerPosition = $obj
+		static public function resetPosition():void {
+			if ( VoxelModel.controlledModel ) {
+				VoxelModel.controlledModel.instanceInfo.positionSetComp( currentRegion.playerPosition.x, currentRegion.playerPosition.y, currentRegion.playerPosition.z );
+				VoxelModel.controlledModel.instanceInfo.rotationSetComp( currentRegion.playerRotation.x, currentRegion.playerRotation.y, currentRegion.playerRotation.z );
+				//VoxelModel.controlledModel.instanceInfo.positionSetComp(0,0,0);
+			}
 		}
-		
-		public function setPlayerRotation( $obj:Object ):void {
-			dbo.playerRotation = $obj
-		}
-		
-		
+
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 		// toPersistence
 		////////////////////////////////////////////////////////////////////////////////////////////////////
