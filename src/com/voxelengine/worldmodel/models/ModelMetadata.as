@@ -20,6 +20,7 @@ import flash.display.Loader;
 import flash.display.LoaderInfo
 import flash.events.Event;
 import flash.geom.Rectangle;
+import flash.geom.Vector3D;
 import flash.net.URLRequest;
 import flash.net.URLLoaderDataFormat;
 
@@ -39,38 +40,48 @@ public class ModelMetadata extends PersistenceObject
 	private var _thumbnail:BitmapData;
 	
 	public function get permissions():PermissionsModel 			{ return _permissions; }
-	public function set permissions( val:PermissionsModel):void	{ _permissions = val; changed = true; }
+	public function set permissions( $val:PermissionsModel):void	{ _permissions = $val; changed = true; }
 	
 	public function get name():String  						{ return dbo.name; }
-	public function set name(value:String):void  			{ dbo.name = value; changed = true; }
+	public function set name($val:String):void  			{ dbo.name = $val; changed = true; }
 	
 	public function get description():String  				{ return dbo.description; }
-	public function set description(value:String):void  	{ dbo.description = value; changed = true; }
+	public function set description($val:String):void  		{ dbo.description = $val; changed = true; }
 	
 	public function get owner():String  					{ return dbo.owner; }
-	public function set owner(value:String):void  			{ dbo.owner = value; changed = true; }
+	public function set owner($val:String):void  			{ dbo.owner = $val; changed = true; }
 	
 	public function get animationClass():String 			{ return dbo.animationClass; }
-	public function set animationClass(value:String):void  	{ dbo.animationClass = value; changed = true; }
+	public function set animationClass($val:String):void  	{ dbo.animationClass = $val; changed = true; }
 
 	public function get childOf():String 					{ return dbo.childOf; }
-	public function set childOf(value:String):void  		{ dbo.childOf = value; changed = true; }
+	public function set childOf($val:String):void  			{ dbo.childOf = $val; changed = true; }
 
-	public function get version():int 							{ return dbo.version; }
-	public function set version( value:int ):void				{ dbo.version = value; }
+	public function modelScalingVec3D():Vector3D 			{ return new Vector3D( dbo.modelScaling.x, dbo.modelScaling.y, dbo.modelScaling.z ); }
+	public function modelScalingInfo():Object 				{ return dbo.modelScaling }
+	public function get modelScaling():Object 				{ return dbo.modelScaling; }
+	public function set modelScaling($val:Object):void  	{ dbo.modelScaling = $val; changed = true; }
 
-	public function get bound():int 							{ return dbo.bound; }
-	public function set bound( value:int ):void					{
-		if ( dbo.bound != value ) {
+	public function modelPositionVec3D():Vector3D 			{ return new Vector3D( dbo.modelPosition.x, dbo.modelPosition.y, dbo.modelPosition.z ); }
+	public function modelPositionInfo():Object 			{ return dbo.modelPosition }
+	public function get modelPosition():Object 				{ return dbo.modelPosition; }
+	public function set modelPosition($val:Object):void  	{ dbo.modelPosition = $val; changed = true; }
+
+	public function get version():int 						{ return dbo.version; }
+	public function set version( $val:int ):void			{ dbo.version = $val; }
+
+	public function get bound():int 						{ return dbo.bound; }
+	public function set bound( $val:int ):void				{
+		if ( dbo.bound != $val ) {
 			changed = true;
-			dbo.bound = value;
+			dbo.bound = $val;
 		} }
 
 	public function get hashTags():String 					{ return dbo.hashTags; }
 	public function set hashTags($val:String):void			{ dbo.hashTags = $val; }
 
 	public function get thumbnail():BitmapData 				{ return _thumbnail; }
-	public function set thumbnail(value:BitmapData):void 	{ _thumbnail = value; changed = true; }
+	public function set thumbnail($val:BitmapData):void 	{ _thumbnail = $val; changed = true; }
 
 	private var _thumbnailLoaded:Boolean;
 	public function get thumbnailLoaded():Boolean 			{ return _thumbnailLoaded; }
