@@ -92,9 +92,8 @@ public class BoxInventory extends VVBox
 
 		switch ( $item.objectType ) {
 		case ObjectInfo.OBJECTINFO_EMPTY:
+			reset();
 			backgroundTexture = $item.backgroundTexture( width );
-			setHelp( "Empty" );
-			_count.text = "";
 			break;
 		case ObjectInfo.OBJECTINFO_MODEL:
 			var om:ObjectModel = _objectInfo as ObjectModel;
@@ -204,12 +203,17 @@ public class BoxInventory extends VVBox
 	}
 	
 	public function reset():void {
+		setHelp( "Empty" );
 		_count.text = "";
 		backgroundTexture = "assets/textures/blank.png";
 		data = null;
 		if ( _bpValue ) {
-			removeElement( _bpValue )
+			removeElement( _bpValue );
 			_bpValue = null
+		}
+		if ( _editData ) {
+			removeElement( _editData );
+			_editData = null
 		}
 
 		_objectInfo = new ObjectInfo( this, ObjectInfo.OBJECTINFO_EMPTY );
