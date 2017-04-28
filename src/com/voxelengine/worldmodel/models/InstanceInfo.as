@@ -155,14 +155,8 @@ public class InstanceInfo extends Location	{
 			obj.collidable 		= collidable;
 		if ( _critical )
 			obj.critical		= _critical;
-//		if ( _grainSize ) // this is only used to override biomes data. So only from a generate script
-//			obj.grainSize		= _grainSize;
 //		if ( "" != _state )
 //			obj.state			= _state;
-// This is saving the animation transforms into the instanceInfotransforms			
-// do I add transforms in the obj? RSF - 4.27.15
-//		if ( _transforms && 0 < _transforms.length )
-//			obj.model.transforms		= _transforms;
 		instanceScriptOnly( obj );  //
 		
 		return obj;
