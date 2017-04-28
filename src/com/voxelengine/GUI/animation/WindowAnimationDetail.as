@@ -11,7 +11,7 @@ import com.voxelengine.worldmodel.models.types.VoxelModel
 import org.flashapi.swing.*
 import org.flashapi.swing.event.*
 import org.flashapi.swing.constants.*
-import org.flashapi.swing.plaf.spas.SpasUI
+import org.flashapi.swing.plaf.spas.VVUI;
 
 import com.voxelengine.Log
 import com.voxelengine.GUI.VVPopup
@@ -71,10 +71,10 @@ public class WindowAnimationDetail extends VVPopup
 		remove()
 		
 		function queryToSaveChanges():void {
-			var alert:Alert = new Alert( "You have unsaved changes, want do you want to do?", 400 )
+			var alert:Alert = new Alert( "You have unsaved changes, want do you want to do?", 400 );
 			alert.setLabels( "Save", "Abandon" )
 			alert.alertMode = AlertMode.CHOICE
-			$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction )
+			$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
 			alert.display()
 			
 			function alertAction( $ae:AlertEvent ):void {
@@ -88,26 +88,26 @@ public class WindowAnimationDetail extends VVPopup
 	}
 	
 	private function addButtonPanel():void {
-		var buttonBox:Box = new Box( width, 35, BorderStyle.NONE )
-		buttonBox.layout.orientation = LayoutOrientation.HORIZONTAL
-		buttonBox.backgroundColor = SpasUI.DEFAULT_COLOR
-		buttonBox.padding = 2
-		addElement( buttonBox )
+		var buttonBox:Box = new Box( width, 35, BorderStyle.NONE );
+		buttonBox.layout.orientation = LayoutOrientation.HORIZONTAL;
+		buttonBox.backgroundColor = VVUI.DEFAULT_COLOR;
+		buttonBox.padding = 2;
+		addElement( buttonBox );
 		
-		const BUTTON_COUNT:int = 2
-		var saveAnimation:Button = new Button( LanguageManager.localizedStringGet( "Save" ))
-		saveAnimation.addEventListener(UIMouseEvent.CLICK, saveHandler )
-		saveAnimation.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * BUTTON_COUNT
-		buttonBox.addElement( saveAnimation )
+		const BUTTON_COUNT:int = 2;
+		var saveAnimation:Button = new Button( LanguageManager.localizedStringGet( "Save" ));
+		saveAnimation.addEventListener(UIMouseEvent.CLICK, saveHandler );
+		saveAnimation.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * BUTTON_COUNT;
+		buttonBox.addElement( saveAnimation );
 		
 		//var apply:Button = new Button( LanguageManager.localizedStringGet( "Apply" ))
 		//apply.addEventListener(UIMouseEvent.CLICK, applyHandler )
 		//apply.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * BUTTON_COUNT
 		//buttonBox.addElement( apply )
 		
-		var revert:Button = new Button( LanguageManager.localizedStringGet( "Revert" ))
-		revert.addEventListener(UIMouseEvent.CLICK, revertHandler )
-		revert.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * BUTTON_COUNT
+		var revert:Button = new Button( LanguageManager.localizedStringGet( "Revert" ));
+		revert.addEventListener(UIMouseEvent.CLICK, revertHandler );
+		revert.width = buttonBox.width/BUTTON_COUNT - buttonBox.padding * BUTTON_COUNT;
 		buttonBox.addElement( revert )
 	}
 	

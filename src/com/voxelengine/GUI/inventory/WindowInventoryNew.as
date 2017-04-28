@@ -16,7 +16,7 @@ import org.flashapi.swing.*
 	import org.flashapi.swing.dnd.*;
 	import org.flashapi.swing.button.RadioButtonGroup;
 	import org.flashapi.swing.databinding.DataProvider;
-	import org.flashapi.swing.plaf.spas.SpasUI;
+	import org.flashapi.swing.plaf.spas.VVUI;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
@@ -114,7 +114,7 @@ import org.flashapi.swing.*
             addGraphicElements( _ownedVsStore );
 			
 			_underline = new Box( width, 5 );
-			_underline.backgroundColor = SpasUI.DEFAULT_COLOR
+			_underline.backgroundColor = VVUI.DEFAULT_COLOR
 			addGraphicElements( _underline );			
 			
 			displaySelectedContainer( startingTabName, $tabTokens );

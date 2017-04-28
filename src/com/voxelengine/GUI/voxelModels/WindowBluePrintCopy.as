@@ -15,7 +15,7 @@ import flash.events.Event;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
-import org.flashapi.swing.plaf.spas.SpasUI
+import org.flashapi.swing.plaf.spas.VVUI;
 
 import com.voxelengine.Globals
 import com.voxelengine.GUI.VVPopup

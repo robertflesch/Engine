@@ -25,7 +25,7 @@ import com.voxelengine.renderer.Renderer;
 	import org.flashapi.swing.button.ButtonGroup;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
-	import org.flashapi.swing.plaf.spas.SpasUI;
+	import org.flashapi.swing.plaf.spas.VVUI;
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
@@ -103,7 +103,7 @@ import com.voxelengine.renderer.Renderer;
 			pwContainer.padding = 0;
 			infoPanel.addElement( pwContainer );
 			var labelPW:Label = new Label( " Password", 110 );
-			labelPW.fontColor = SpasUI.LABEL_FONT_COLOR;
+			labelPW.fontColor = VVUI.LABEL_FONT_COLOR;
 			labelPW.boldFace = true;
 			pwContainer.addElement( labelPW );
 			
@@ -126,7 +126,7 @@ import com.voxelengine.renderer.Renderer;
 			_errorText = new Label( "", width - 120 );
 			_errorText.tabEnabled = false;
 			_errorText.textAlign = TextAlign.CENTER;
-			_errorText.backgroundColor = SpasUI.DEFAULT_COLOR;
+			_errorText.backgroundColor = VVUI.DEFAULT_COLOR;
 			_errorText.fontColor = 0xff0000; // Red
 			otherPanel.addElement( _errorText );
 			

@@ -12,7 +12,7 @@ import org.flashapi.swing.Box;
 import org.flashapi.swing.TextInput;
 import org.flashapi.swing.event.TextEvent;
 import org.flashapi.swing.constants.BorderStyle;
-import org.flashapi.swing.plaf.spas.VVUI;;
+import org.flashapi.swing.plaf.spas.VVUI;
 import com.voxelengine.Globals;
 public class VVTextInput extends TextInput
 {

@@ -27,7 +27,7 @@ import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
-import org.flashapi.swing.plaf.spas.SpasUI;
+import org.flashapi.swing.plaf.spas.VVUI;
 
 public class WindowModelDetail extends VVPopup {
 	static private const WIDTH:int = 330;
@@ -70,7 +70,7 @@ public class WindowModelDetail extends VVPopup {
 		_photoContainer.height = PHOTO_SIZE + 10;
 		_photoContainer.padding = 5;
 		_photoContainer.name = "pc";
-		_photoContainer.backgroundColor = SpasUI.DEFAULT_COLOR;
+		_photoContainer.backgroundColor = VVUI.DEFAULT_COLOR;
 		_photoContainer.title = "Photo";
 		_photoContainer.borderStyle = BorderStyle.GROOVE;
 
