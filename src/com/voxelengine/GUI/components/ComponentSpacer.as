@@ -9,7 +9,7 @@
 package com.voxelengine.GUI.components {
 import org.flashapi.swing.Box;
 import org.flashapi.swing.constants.BorderStyle;
-import org.flashapi.swing.plaf.spas.VVUI;;
+import org.flashapi.swing.plaf.spas.VVUI;
 
 public class ComponentSpacer extends Box
 {

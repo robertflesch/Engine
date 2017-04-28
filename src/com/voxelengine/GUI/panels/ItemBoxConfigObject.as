@@ -8,7 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.panels
 {
-import org.flashapi.swing.plaf.spas.VVUI;;
+import org.flashapi.swing.plaf.spas.VVUI;
 import org.flashapi.swing.constants.*;
 
 public class ItemBoxConfigObject extends Object

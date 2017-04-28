@@ -41,7 +41,7 @@ package org.flashapi.swing.plaf.spas.brushes {
 	import org.flashapi.swing.constants.States;
 	import org.flashapi.swing.draw.MatrixUtil;
 	import org.flashapi.swing.plaf.core.LafDTO;
-	import org.flashapi.swing.plaf.spas.VVUI;;
+	import org.flashapi.swing.plaf.spas.VVUI;
 	import org.flashapi.swing.util.AltColors;
 	
 	/**

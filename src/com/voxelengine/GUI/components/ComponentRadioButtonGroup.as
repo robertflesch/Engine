@@ -12,7 +12,7 @@ import org.flashapi.swing.event.ButtonsGroupEvent;
 import org.flashapi.swing.constants.BorderStyle;
 import org.flashapi.swing.button.RadioButtonGroup;
 import org.flashapi.swing.databinding.DataProvider;
-import org.flashapi.swing.plaf.spas.VVUI;;
+import org.flashapi.swing.plaf.spas.VVUI;
 
 public class ComponentRadioButtonGroup extends Box
 {

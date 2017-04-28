@@ -36,7 +36,7 @@ package org.flashapi.swing.skin {
 	import flash.geom.Rectangle;
 	import flash.utils.describeType;
 	import org.flashapi.swing.core.spas_internal;
-	import org.flashapi.swing.plaf.spas.VVUI;;
+	import org.flashapi.swing.plaf.spas.VVUI;
 	
 	use namespace spas_internal;
 	

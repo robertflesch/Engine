@@ -12,7 +12,7 @@ import org.flashapi.swing.Label;
 import org.flashapi.swing.TextInput;
 import org.flashapi.swing.event.TextEvent;
 import org.flashapi.swing.constants.BorderStyle;
-import org.flashapi.swing.plaf.spas.VVUI;;
+import org.flashapi.swing.plaf.spas.VVUI;
 
 public class ComponentLabel extends Box
 {

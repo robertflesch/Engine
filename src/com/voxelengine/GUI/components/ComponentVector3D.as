@@ -12,7 +12,7 @@ import flash.geom.Vector3D;
 import org.flashapi.swing.*
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
-import org.flashapi.swing.plaf.spas.VVUI;;
+import org.flashapi.swing.plaf.spas.VVUI;
 
 
 public class ComponentVector3D extends Box

@@ -15,7 +15,7 @@ import org.flashapi.swing.*
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.containers.*;
-import org.flashapi.swing.plaf.spas.VVUI;;
+import org.flashapi.swing.plaf.spas.VVUI;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;

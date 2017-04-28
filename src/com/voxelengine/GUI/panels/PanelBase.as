@@ -11,7 +11,7 @@ package com.voxelengine.GUI.panels
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
-	import org.flashapi.swing.plaf.spas.VVUI;;
+	import org.flashapi.swing.plaf.spas.VVUI;
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;

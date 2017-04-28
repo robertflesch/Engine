@@ -9,7 +9,7 @@
 package com.voxelengine.GUI.components {
 import org.flashapi.swing.Container;
 import org.flashapi.swing.Label;
-import org.flashapi.swing.plaf.spas.VVUI;;
+import org.flashapi.swing.plaf.spas.VVUI;
 import org.flashapi.swing.constants.*;
 
 public class ComponentLabelSide extends Container

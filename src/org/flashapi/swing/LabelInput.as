@@ -38,7 +38,7 @@ package org.flashapi.swing {
 	import org.flashapi.swing.plaf.libs.LabelInputUIRef;
 	import org.flashapi.swing.text.TLGBase;
 	import org.flashapi.swing.util.Observer;
-	import org.flashapi.swing.plaf.spas.VVUI;;
+	import org.flashapi.swing.plaf.spas.VVUI;
 	
 	
 	use namespace spas_internal;

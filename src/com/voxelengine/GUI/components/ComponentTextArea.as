@@ -11,7 +11,7 @@ import org.flashapi.swing.Box;
 import org.flashapi.swing.TextArea;
 import org.flashapi.swing.event.TextEvent;
 import org.flashapi.swing.constants.BorderStyle;
-import org.flashapi.swing.plaf.spas.VVUI;;
+import org.flashapi.swing.plaf.spas.VVUI;
 
 public class ComponentTextArea extends Box
 {

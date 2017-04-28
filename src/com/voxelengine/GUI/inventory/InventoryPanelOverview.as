@@ -11,7 +11,7 @@ package com.voxelengine.GUI.inventory {
 	import org.flashapi.swing.containers.UIContainer;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
-	import org.flashapi.swing.plaf.spas.VVUI;;
+	import org.flashapi.swing.plaf.spas.VVUI;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;

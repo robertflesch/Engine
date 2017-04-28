@@ -11,7 +11,7 @@ import org.flashapi.swing.CheckBox
 import org.flashapi.swing.Container;
 import org.flashapi.swing.Label;
 import org.flashapi.swing.event.UIMouseEvent;
-import org.flashapi.swing.plaf.spas.VVUI;;
+import org.flashapi.swing.plaf.spas.VVUI;
 import org.flashapi.swing.constants.*;
 
 public class ComponentCheckBox extends Container
