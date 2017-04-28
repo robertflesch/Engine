@@ -9,6 +9,8 @@ package com.voxelengine.worldmodel.animation
 {
 import com.voxelengine.events.SoundEvent;
 import com.voxelengine.worldmodel.models.Block;
+import com.voxelengine.worldmodel.models.makers.ModelLibrary;
+import com.voxelengine.worldmodel.models.types.Avatar;
 
 import flash.events.DataEvent;
 import flash.utils.ByteArray;
@@ -32,9 +34,10 @@ import com.voxelengine.utils.StringUtils;
 public class AnimationCache
 {
 	// This should be a list so that it can be added to easily, this is hard coded.
-	static public const MODEL_BIPEDAL_10:String = "MODEL_BIPEDAL_10";
 	static public const MODEL_DRAGON_12:String =  "MODEL_DRAGON_12";
 	static public const MODEL_PROPELLER:String =  "MODEL_PROPELLER";
+	static public const MODEL_QUADRUPED:String =  "MODEL_QUADRUPED";
+
 	static public const MODEL_UNKNOWN:String =  "MODEL_UNKNOWN";
 	
 	// this acts as a holding spot for all model objects loaded from persistance
@@ -164,20 +167,12 @@ public class AnimationCache
 	}
 
 	static public function requestAnimationClass( $modelClass:String ):String {
-		if ( $modelClass == "Dragon" )
-			return MODEL_DRAGON_12;
-		if ( $modelClass == "Avatar" )
-			return MODEL_BIPEDAL_10;
-		if ( $modelClass == "Player" )
-			return MODEL_BIPEDAL_10;
-		if ( $modelClass == "Propeller" )
-			return MODEL_PROPELLER;
-
-		return "";
+		var modelClass:Class = ModelLibrary.getAsset( $modelClass );
+		return modelClass.getAnimationClass();
 	}
 
 	static private function deleteHandler( $ae:AnimationEvent ):void {
-		var anim:Animation = _animations[$ae.aniGuid]
+		var anim:Animation = _animations[$ae.aniGuid];
 		if ( anim ) {
 			_animations[$ae.aniGuid] = null;
 			if ( anim.animationSound ) {

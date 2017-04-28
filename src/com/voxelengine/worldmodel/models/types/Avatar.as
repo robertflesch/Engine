@@ -49,12 +49,65 @@ public class Avatar extends ControllableVoxelModel
 	static private const 	AVATAR_CLIP_FACTOR:Number 	= 0.90;
 	static private var  	STEP_UP_MAX:int 			= 16;
 
-	public function Avatar( instanceInfo:InstanceInfo )
-	{ 
+	static public const MODEL_BIPEDAL_10:String = "MODEL_BIPEDAL_10";
+    static public function getAnimationClass():String { return MODEL_BIPEDAL_10; }
+    static public const MODEL_BIPEDAL_10_HEAD       :String = "Head";
+    static public const MODEL_BIPEDAL_10_TORSO      :String = "Torso";
+    static public const MODEL_BIPEDAL_10_ARMLEFT    :String = "ArmLeft";
+    static public const MODEL_BIPEDAL_10_ARMRIGHT   :String = "ArmRight";
+    static public const MODEL_BIPEDAL_10_HANDLEFT   :String = "HandLeft";
+    static public const MODEL_BIPEDAL_10_HANDRIGHT  :String = "HandRight";
+    static public const MODEL_BIPEDAL_10_THIGHLEFT  :String = "ThighLeft";
+    static public const MODEL_BIPEDAL_10_THIGHRIGHT :String = "ThighRight";
+    static public const MODEL_BIPEDAL_10_FOOTLEFT   :String = "FootLeft";
+    static public const MODEL_BIPEDAL_10_FOOTRIGHT  :String = "FootRight";
+
+    static public const MODEL_BIPEDAL_10_STAND      :String = "Stand";
+	static public const MODEL_BIPEDAL_10_JUMP       :String = "Jump";
+	static public const MODEL_BIPEDAL_10_FALL       :String = "Fall";
+	static public const MODEL_BIPEDAL_10_WALK       :String = "Walk";
+	static public const MODEL_BIPEDAL_10_SLIDE      :String = "Slide";
+	static public const MODEL_BIPEDAL_10_RIDE       :String = "Ride";
+
+    public function Avatar( instanceInfo:InstanceInfo ) {
 		//Log.out( "Avatar CREATED" );
 		super( instanceInfo );
+		collectAttachments();
+		collectStates();
 	}
-	
+
+    static private var _attachmentsInitialized:Boolean;
+    static private var _attachments:Vector.<String> = new Vector.<String>();
+    static private function collectAttachments():void {
+        if ( !_attachmentsInitialized ) {
+            _attachmentsInitialized = true;
+            _attachments.push(MODEL_BIPEDAL_10_HEAD);
+            _attachments.push(MODEL_BIPEDAL_10_TORSO);
+            _attachments.push(MODEL_BIPEDAL_10_ARMLEFT);
+            _attachments.push(MODEL_BIPEDAL_10_ARMRIGHT);
+            _attachments.push(MODEL_BIPEDAL_10_HANDLEFT);
+            _attachments.push(MODEL_BIPEDAL_10_HANDRIGHT);
+            _attachments.push(MODEL_BIPEDAL_10_THIGHLEFT);
+            _attachments.push(MODEL_BIPEDAL_10_THIGHRIGHT);
+            _attachments.push(MODEL_BIPEDAL_10_FOOTLEFT);
+            _attachments.push(MODEL_BIPEDAL_10_FOOTRIGHT);
+        }
+    }
+
+	static private var _statesInitialized:Boolean;
+	static private var _states:Vector.<String> = new Vector.<String>();
+	static private function collectStates():void {
+		if ( !_statesInitialized ) {
+			_statesInitialized = true;
+			_states.push(MODEL_BIPEDAL_10_STAND);
+			_states.push(MODEL_BIPEDAL_10_JUMP);
+			_states.push(MODEL_BIPEDAL_10_FALL);
+			_states.push(MODEL_BIPEDAL_10_WALK);
+			_states.push(MODEL_BIPEDAL_10_SLIDE);
+			_states.push(MODEL_BIPEDAL_10_RIDE);
+		}
+	}
+
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
 		// should just do this for the players avatar
@@ -84,7 +137,7 @@ public class Avatar extends ControllableVoxelModel
 			//lastCollisionModelReset();
 
 			if ( false == controlledModelChecks( $elapsedTimeMS ) ) {
-				stateSet( "PlayerAniStand", 1 ); // Should be crash?
+				stateSet( MODEL_BIPEDAL_10_STAND, 1 ); // Should be crash?
 				return false;
 			}
 			else
@@ -94,23 +147,22 @@ public class Avatar extends ControllableVoxelModel
 		return true;
 	}
 
-
 	override protected function setAnimation():void	{
-
+		//MODEL_BIPEDAL_10_RIDE
 		/*if ( EditCursor.toolOrBlockEnabled )
 		 {
 		 stateSet( "Pick", 1 );
 		 }*/
 		if ( -0.4 > instanceInfo.velocityGet.y )
-			updateAnimations( "Jump", 1 );
+			updateAnimations( MODEL_BIPEDAL_10_JUMP, 1 );
 		else if ( 0.4 < instanceInfo.velocityGet.y )
-			updateAnimations( "Fall", 1 );
+			updateAnimations( MODEL_BIPEDAL_10_FALL, 1 );
 		else if ( 0.2 < Math.abs( instanceInfo.velocityGet.z )  )
-			updateAnimations( "Walk", 2 );
+			updateAnimations( MODEL_BIPEDAL_10_WALK, 2 );
 		else if ( 0.2 < Math.abs( instanceInfo.velocityGet.x )  )
-			updateAnimations( "Slide", 1 );
+			updateAnimations( MODEL_BIPEDAL_10_SLIDE, 1 );
 		else
-			stateSet( "Stand", 1 );
+			stateSet( MODEL_BIPEDAL_10_STAND, 1 );
 		//trace( "Avatar.update - end" );
 	}
 

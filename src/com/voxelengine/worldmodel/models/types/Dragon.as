@@ -29,6 +29,9 @@ import com.voxelengine.worldmodel.models.CollisionPoint;
  */
 public class Dragon extends Beast 
 {
+	static public const MODEL_DRAGON_12:String = "MODEL_DRAGON_12";
+	static public function getAnimationClass():String { return MODEL_DRAGON_12; }
+
 	public function Dragon( ii:InstanceInfo ) { 
 		super( ii );
 	}

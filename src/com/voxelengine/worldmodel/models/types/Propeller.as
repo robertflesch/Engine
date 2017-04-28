@@ -12,6 +12,9 @@ import com.voxelengine.worldmodel.models.InstanceInfo;
 
 public class Propeller extends VoxelModel
 {
+	static public const MODEL_PROPELLER:String = "MODEL_PROPELLER";
+	static public function getAnimationClass():String { return MODEL_PROPELLER; }
+
 	private var _rotationRate:int = 1440;
 
 	public function Propeller(instanceInfo:InstanceInfo )  {

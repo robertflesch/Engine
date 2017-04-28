@@ -26,6 +26,8 @@ import com.voxelengine.worldmodel.MouseKeyboardHandler;
 public class Beast extends ControllableVoxelModel
 {
 	static private const MIN_TURN_AMOUNT:Number = 0.02;
+	static public const MODEL_QUADRUPED:String = "MODEL_QUADRUPED";
+	static public function getAnimationClass():String { return MODEL_QUADRUPED; }
 
 	protected var _seatLocation:Vector3D 		= new Vector3D( 8, 12, 13 );
 
