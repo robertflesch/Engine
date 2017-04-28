@@ -66,9 +66,6 @@ public class Player extends PersistenceObject
 		} else {
 			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 		}
-
-		//if ( Region.currentRegion )
-		//	Region.currentRegion.applyRegionInfoToPlayer();
 	}
 
 
@@ -172,7 +169,6 @@ public class Player extends PersistenceObject
 	 addEventHandlers();
 	 takeControl( null );
 	 torchToggle();
-	 collisionPointsAdd();
 	 if ( _displayCollisionMarkers )
 	 _ct.markersAdd();
 	 }

@@ -11,6 +11,7 @@ import com.voxelengine.events.ModelEvent;
 import com.voxelengine.renderer.lamps.ShaderLight;
 import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.worldmodel.MouseKeyboardHandler;
+import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.CameraLocation;
 import com.voxelengine.worldmodel.models.CollisionPoint;
@@ -21,6 +22,7 @@ import com.voxelengine.worldmodel.weapons.Bomb;
 import com.voxelengine.worldmodel.weapons.Gun;
 
 import flash.display3D.Context3D;
+import flash.geom.Vector3D;
 
 import flash.geom.Vector3D;
 import flash.utils.getQualifiedClassName;
@@ -60,7 +62,7 @@ public class Avatar extends ControllableVoxelModel
 		instanceInfo.usesCollision = true;
 		clipVelocityFactor = AVATAR_CLIP_FACTOR;
 		torchToggle();
-//		collisionPointsAdd();
+		collisionPointsAdd();
 //		_displayCollisionMarkers = true;
 //		if ( _displayCollisionMarkers )
 //			CollisionTest.createMarkers();
@@ -421,6 +423,28 @@ public class Avatar extends ControllableVoxelModel
 			//trace( "handleMouseMovement instanceInfo.rotationGet: " + instanceInfo.rotationGet + "  camera.rotation: " + camera.rotationGet );
 		}
 	}
+
+	public function applyRegionInfoToPlayer():void {
+		Log.out( "Region.applyRegionInfoToPlayer - DISABLED", Log.WARN );
+		var playerPosition:Object = Region.currentRegion.playerPosition;
+		if ( Region.currentRegion.playerPosition ) {
+			//Log.out( "Player.onLoadingPlayerComplete - setting position to  - x: "  + playerPosition.x + "   y: " + playerPosition.y + "   z: " + playerPosition.z );
+			instanceInfo.positionSetComp( playerPosition.x, playerPosition.y, playerPosition.z );
+		}
+		else
+			instanceInfo.positionSetComp( 0, 0, 0 );
+
+		var playerRotation:Object = Region.currentRegion.playerPosition;
+		if ( playerRotation ) {
+			//Log.out( "Player.onLoadingPlayerComplete - setting player rotation to  -  y: " + playerRotation );
+			instanceInfo.rotationSet = new Vector3D( 0, playerRotation.y, 0 );
+		}
+		else
+			instanceInfo.rotationSet = new Vector3D( 0, 0, 0 );
+
+		usesGravity = Region.currentRegion.gravity;
+	}
+
 
 }
 }
