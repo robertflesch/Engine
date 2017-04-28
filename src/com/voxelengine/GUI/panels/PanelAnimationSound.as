@@ -14,7 +14,7 @@ import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.list.ListItem;
-import org.flashapi.swing.plaf.spas.SpasUI;
+import org.flashapi.swing.plaf.spas.VVUI;;
 import org.flashapi.swing.layout.AbsoluteLayout;
 
 import com.voxelengine.Log;

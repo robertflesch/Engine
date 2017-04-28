@@ -44,7 +44,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasRichTextEditorUI extends SpasUI implements RichTextEditorUI {
+	public class SpasRichTextEditorUI extends VVUI implements RichTextEditorUI {
 		
 		//--------------------------------------------------------------------------
 		//
@@ -69,7 +69,7 @@ package org.flashapi.swing.plaf.spas {
 		 *  @inheritDoc
 		 */
 		public function getButtonLaf():Class {
-			return SpasButtonUI;
+			return VVButtonUI;
 		}
 		
 		/**

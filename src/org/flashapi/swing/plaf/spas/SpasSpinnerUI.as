@@ -46,7 +46,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasSpinnerUI extends SpasUI implements SpinnerUI {
+	public class SpasSpinnerUI extends VVUI implements SpinnerUI {
 		
 		//--------------------------------------------------------------------------
 		//
@@ -78,7 +78,7 @@ package org.flashapi.swing.plaf.spas {
 		 *  @inheritDoc 
 		 */
 		public function getButtonLaf():Class {
-			return SpasButtonUI;
+			return VVButtonUI;
 		}
 		
 		/**

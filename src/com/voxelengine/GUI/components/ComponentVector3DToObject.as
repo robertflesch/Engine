@@ -15,7 +15,7 @@ import org.flashapi.swing.*
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.containers.*;
-import org.flashapi.swing.plaf.spas.SpasUI;
+import org.flashapi.swing.plaf.spas.VVUI;;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
@@ -39,7 +39,7 @@ public class ComponentVector3DToObject extends Box
 		padding = 0;
 		paddingTop = 2;
 		borderStyle = BorderStyle.NONE;
-		backgroundColor = SpasUI.DEFAULT_COLOR;
+		backgroundColor = VVUI.DEFAULT_COLOR;
 		layout.orientation = LayoutOrientation.HORIZONTAL;
 		autoSize = false;
 		

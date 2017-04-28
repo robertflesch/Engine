@@ -9,7 +9,7 @@
 package com.voxelengine.GUI.components {
 import org.flashapi.swing.Container;
 import org.flashapi.swing.Label;
-import org.flashapi.swing.plaf.spas.SpasUI;
+import org.flashapi.swing.plaf.spas.VVUI;;
 import org.flashapi.swing.constants.*;
 
 public class ComponentLabelSide extends Container
@@ -20,7 +20,7 @@ public class ComponentLabelSide extends Container
 	
 		layout.orientation = LayoutOrientation.HORIZONTAL
 		padding = $padding;
-		backgroundColor = SpasUI.DEFAULT_COLOR;
+		backgroundColor = VVUI.DEFAULT_COLOR;
 		
 		addElement( new Label( $label, ($width - 20) * 0.40 ) )
 		addElement( new Label( $initialValue, ($width - 20) * 0.60 ) )

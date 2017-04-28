@@ -52,7 +52,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha 5.7
 	 */
-	public class SpasViewportDataGridUI extends SpasUI implements ViewportDataGridUI {
+	public class SpasViewportDataGridUI extends VVUI implements ViewportDataGridUI {
 		
 		//--------------------------------------------------------------------------
 		//

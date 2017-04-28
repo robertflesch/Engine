@@ -38,7 +38,7 @@ package org.flashapi.swing.skin {
 	import flash.utils.describeType;
 	import org.flashapi.swing.core.spas_internal;
 	import org.flashapi.swing.geom.Geometry;
-	import org.flashapi.swing.plaf.spas.SpasUI;
+	import org.flashapi.swing.plaf.spas.VVUI;;
 	
 	use namespace spas_internal;
 	
@@ -278,7 +278,7 @@ package org.flashapi.swing.skin {
 		 * 	@return	The default color of the skin.
 		 */
 		public function getColor():uint {
-			return SpasUI.DEFAULT_COLOR;
+			return VVUI.DEFAULT_COLOR;
 		}
 		
 		//--------------------------------------------------------------------------

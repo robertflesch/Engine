@@ -44,7 +44,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha 5.5
 	 */
-	public class SpasProgressPanelUI extends SpasUI implements ProgressPanelUI {
+	public class SpasProgressPanelUI extends VVUI implements ProgressPanelUI {
 		
 		//--------------------------------------------------------------------------
 		//

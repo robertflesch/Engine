@@ -44,7 +44,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasTabbedPaneUI extends SpasUI implements TabbedPaneUI {
+	public class SpasTabbedPaneUI extends VVUI implements TabbedPaneUI {
 		
 		//--------------------------------------------------------------------------
 		//

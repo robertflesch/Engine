@@ -45,7 +45,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasDataGridUI extends SpasUI implements DataGridUI {
+	public class SpasDataGridUI extends VVUI implements DataGridUI {
 		
 		//--------------------------------------------------------------------------
 		//

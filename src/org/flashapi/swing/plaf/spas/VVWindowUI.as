@@ -224,7 +224,7 @@ public class VVWindowUI extends VVUI implements WindowUI {
      *  @inheritDoc
      */
     public function getButtonLaf():Class {
-        return SpasButtonUI;
+        return VVButtonUI;
     }
 
     /**

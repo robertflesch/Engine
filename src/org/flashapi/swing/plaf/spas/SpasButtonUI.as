@@ -87,7 +87,7 @@ package org.flashapi.swing.plaf.spas {
 		public function drawOutState():void {
 			//var bntColor:uint = (dto.colors.up != StateObjectValue.NONE) ? dto.colors.up : dto.color;
 			//var bntColor:uint = 0xe0e0e0;
-			var bntColor:uint = SpasUI.DEFAULT_COLOR
+			var bntColor:uint = VVUI.DEFAULT_COLOR
 			var lineColor1:uint = 0x888888;//0x969696
 			var lineColor2:int = 0x505050;//0x505050
 			if (dto.borderColors.up != StateObjectValue.NONE){
@@ -133,7 +133,7 @@ package org.flashapi.swing.plaf.spas {
 		public function drawInactiveState():void {
 			//var bntColor:uint = (dto.colors.disabled != StateObjectValue.NONE) ? dto.colors.disabled : new RGB(dto.color).brighter(0.99);
 //			var bntColor:uint = 0xdfdfdf //0x0b0d0e //0xACA899;
-			var bntColor:uint = SpasUI.DEFAULT_COLOR
+			var bntColor:uint = VVUI.DEFAULT_COLOR
 			var lineColor:uint = (dto.borderColors.disabled != StateObjectValue.NONE) ? dto.borderColors.disabled : getGrayTintColor();
 			drawButtonShape(ButtonState.DISABLED, bntColor, lineColor);
 		}

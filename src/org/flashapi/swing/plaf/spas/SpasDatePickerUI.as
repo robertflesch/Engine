@@ -54,7 +54,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasDatePickerUI extends SpasUI implements DatePickerUI {
+	public class SpasDatePickerUI extends VVUI implements DatePickerUI {
 		
 		//--------------------------------------------------------------------------
 		//
@@ -233,7 +233,7 @@ package org.flashapi.swing.plaf.spas {
 		 *  @inheritDoc 
 		 */
 		public function getButtonLaf():Class {
-			return SpasButtonUI;
+			return VVButtonUI;
 		}
 		
 		/**

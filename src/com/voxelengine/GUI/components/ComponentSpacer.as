@@ -9,7 +9,7 @@
 package com.voxelengine.GUI.components {
 import org.flashapi.swing.Box;
 import org.flashapi.swing.constants.BorderStyle;
-import org.flashapi.swing.plaf.spas.SpasUI;
+import org.flashapi.swing.plaf.spas.VVUI;;
 
 public class ComponentSpacer extends Box
 {
@@ -18,7 +18,7 @@ public class ComponentSpacer extends Box
 		super( $width, $height );
 		
 		padding = $padding;
-		backgroundColor = SpasUI.DEFAULT_COLOR;
+		backgroundColor = VVUI.DEFAULT_COLOR;
 
 		borderStyle = BorderStyle.NONE;
 	}

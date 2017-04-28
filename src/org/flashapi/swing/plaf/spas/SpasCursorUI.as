@@ -45,7 +45,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasCursorUI extends SpasUI implements CursorUI {
+	public class SpasCursorUI extends VVUI implements CursorUI {
 		
 		//--------------------------------------------------------------------------
 		//

@@ -11,7 +11,7 @@ package com.voxelengine.GUI.panels
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
-	import org.flashapi.swing.plaf.spas.SpasUI;
+	import org.flashapi.swing.plaf.spas.VVUI;;
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
@@ -30,7 +30,7 @@ package com.voxelengine.GUI.panels
 			super( $widthParam, $heightParam );
 			autoSize = true;
 			//backgroundColor = 0xCCCCCC;
-			backgroundColor = SpasUI.DEFAULT_COLOR;
+			backgroundColor = VVUI.DEFAULT_COLOR;
 			layout.orientation = LayoutOrientation.VERTICAL;
 			padding = pbPadding - 1;
 			_parent = $parent;

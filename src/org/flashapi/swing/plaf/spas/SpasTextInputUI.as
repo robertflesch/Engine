@@ -45,7 +45,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasTextInputUI extends SpasUI implements TextInputUI {
+	public class SpasTextInputUI extends VVUI implements TextInputUI {
 		
 		//--------------------------------------------------------------------------
 		//

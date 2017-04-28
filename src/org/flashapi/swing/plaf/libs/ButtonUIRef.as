@@ -31,7 +31,8 @@ package org.flashapi.swing.plaf.libs {
 	*/
 	
 	import org.flashapi.swing.plaf.spas.SpasButtonUI;
-	import org.flashapi.swing.util.Observable;
+import org.flashapi.swing.plaf.spas.VVButtonUI;
+import org.flashapi.swing.util.Observable;
 	
 	/**
 	 * 	<strong>FOR DEVELOPERS ONLY.</strong>
@@ -57,7 +58,7 @@ package org.flashapi.swing.plaf.libs {
 		 * 			object.
 		 */
 		public static function getDefaultUI():Class {
-			return SpasButtonUI;
+			return VVButtonUI;
 		}
 		
 		//--------------------------------------------------------------------------

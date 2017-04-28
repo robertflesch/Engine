@@ -11,7 +11,7 @@ import org.flashapi.swing.Box;
 import org.flashapi.swing.TextInput;
 import org.flashapi.swing.event.TextEvent;
 import org.flashapi.swing.constants.BorderStyle;
-import org.flashapi.swing.plaf.spas.SpasUI;
+import org.flashapi.swing.plaf.spas.VVUI;;
 
 //import com.voxelengine.Log;
 
@@ -24,7 +24,7 @@ public class ComponentTextInput extends Box
 		
 		padding = $padding;
 		paddingTop = $padding + 3;
-		backgroundColor = SpasUI.DEFAULT_COLOR;
+		backgroundColor = VVUI.DEFAULT_COLOR;
 		title = label;
 		borderStyle = BorderStyle.GROOVE;
 		

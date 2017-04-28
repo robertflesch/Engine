@@ -11,7 +11,7 @@ package com.voxelengine.GUI.inventory {
 	import org.flashapi.swing.containers.UIContainer;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
-	import org.flashapi.swing.plaf.spas.SpasUI;
+	import org.flashapi.swing.plaf.spas.VVUI;;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
@@ -95,7 +95,7 @@ package com.voxelengine.GUI.inventory {
 			eventCollector.addEvent( _barUpper, ListEvent.ITEM_CLICKED, selectCategory );
             addGraphicElements( _barUpper );
 			_underline = new Box( width, 5);
-			_underline.backgroundColor = SpasUI.DEFAULT_COLOR
+			_underline.backgroundColor = VVUI.DEFAULT_COLOR
             addGraphicElements( _underline );			
 			
 		}

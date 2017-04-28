@@ -48,7 +48,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasBubbleHelpUI extends SpasUI implements BubbleHelpUI {
+	public class SpasBubbleHelpUI extends VVUI implements BubbleHelpUI {
 		
 		//--------------------------------------------------------------------------
 		//

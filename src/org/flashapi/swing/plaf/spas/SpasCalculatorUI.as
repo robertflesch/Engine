@@ -44,7 +44,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasCalculatorUI extends SpasUI implements CalculatorUI {
+	public class SpasCalculatorUI extends VVUI implements CalculatorUI {
 		
 		//--------------------------------------------------------------------------
 		//
@@ -76,7 +76,7 @@ package org.flashapi.swing.plaf.spas {
 		 *  @inheritDoc 
 		 */
 		public function getButtonLaf():Class {
-			return SpasButtonUI;
+			return VVButtonUI;
 		}
 		
 		/**

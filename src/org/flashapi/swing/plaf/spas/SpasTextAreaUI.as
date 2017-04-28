@@ -45,7 +45,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasTextAreaUI extends SpasUI implements TextAreaUI {
+	public class SpasTextAreaUI extends VVUI implements TextAreaUI {
 		
 		//--------------------------------------------------------------------------
 		//

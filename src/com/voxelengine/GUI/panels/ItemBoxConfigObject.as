@@ -8,13 +8,13 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI.panels
 {
-import org.flashapi.swing.plaf.spas.SpasUI;
+import org.flashapi.swing.plaf.spas.VVUI;;
 import org.flashapi.swing.constants.*;
 
 public class ItemBoxConfigObject extends Object
 {
 	public var borderStyle:String = BorderStyle.GROOVE;
-	public var backgroundColor:uint = SpasUI.DEFAULT_COLOR;
+	public var backgroundColor:uint = VVUI.DEFAULT_COLOR;
 	
 	public var paddingLeft:int = 4;
 	public var paddingTop:int = 5;

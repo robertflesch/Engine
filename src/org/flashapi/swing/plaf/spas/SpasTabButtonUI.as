@@ -107,7 +107,7 @@ package org.flashapi.swing.plaf.spas {
 				//$lineColor2 = -1;
 			//}
 			//drawButtonShape(bntColor, $lineColor1, $lineColor2);
-			drawButtonShapeMD( dto.color, false );
+			drawButtonShapeMD( false );
 		}
 		
 		/**
@@ -119,7 +119,7 @@ package org.flashapi.swing.plaf.spas {
 			//var lineColor:uint = (dto.fontColors.over != StateObjectValue.NONE) ?
 				//dto.fontColors.over : 0x505050;
 			//drawButtonShape(bntColor, lineColor);
-			drawButtonShapeMD( dto.color, false );
+			drawButtonShapeMD( false );
 		}
 		
 		/**
@@ -131,7 +131,7 @@ package org.flashapi.swing.plaf.spas {
 			//var lineColor:uint = (dto.fontColors.down != StateObjectValue.NONE) ?
 				//dto.fontColors.down : 0x505050;
 			//drawButtonShape(bntColor, lineColor);
-			drawButtonShapeMD( dto.color, false );
+			drawButtonShapeMD( false );
 		}
 		
 		/**
@@ -144,10 +144,9 @@ package org.flashapi.swing.plaf.spas {
 			//var lineColor:uint = (dto.fontColors.selected != StateObjectValue.NONE) ?
 				//dto.fontColors.selected : DEFAULT_FONT_COLOR;
 			//drawButtonShape(bntColor, lineColor, -1, true );
-			var selectedColor:uint = new RGB(dto.color).darker( 0.9 );
-			
+
 			//drawButtonShapeMD( dto.color, true );
-			drawButtonShapeMD( selectedColor, true );
+			drawButtonShapeMD( true );
 		}
 		
 		/**
@@ -159,7 +158,7 @@ package org.flashapi.swing.plaf.spas {
 			//var lineColor:uint = (dto.fontColors.disabled != StateObjectValue.NONE) ?
 				//dto.fontColors.disabled : 0xcccccc;
 			//drawButtonShape(lineColor, bntColor, bntColor);
-			drawButtonShapeMD( dto.color, false );
+			drawButtonShapeMD( false );
 		}
 		
 		/**
@@ -295,10 +294,14 @@ package org.flashapi.swing.plaf.spas {
 		//
 		//--------------------------------------------------------------------------
 		
-		private function drawButtonShapeMD( $buttonColor:uint, $selected:Boolean = false ):void {
+		private function drawButtonShapeMD( $selected:Boolean = false ):void {
+			var buttonColor:uint = dto.color;
+			if ( $selected )
+				buttonColor = new RGB(buttonColor).darker( 0.9 );
+
 			var f:Figure = Figure.setFigure( dto.currentTarget );
 			f.clear();
-			f.beginFill( $buttonColor );
+			f.beginFill( buttonColor );
 			var w:Number = dto.width;
 			var h:Number = dto.height;
 			f.drawRectangle( 0, 0, w, h );

@@ -48,7 +48,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasMenuBarUI extends SpasUI implements MenuBarUI {
+	public class SpasMenuBarUI extends VVUI implements MenuBarUI {
 		
 		//--------------------------------------------------------------------------
 		//

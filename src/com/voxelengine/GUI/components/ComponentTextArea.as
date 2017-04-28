@@ -11,7 +11,7 @@ import org.flashapi.swing.Box;
 import org.flashapi.swing.TextArea;
 import org.flashapi.swing.event.TextEvent;
 import org.flashapi.swing.constants.BorderStyle;
-import org.flashapi.swing.plaf.spas.SpasUI;
+import org.flashapi.swing.plaf.spas.VVUI;;
 
 public class ComponentTextArea extends Box
 {
@@ -20,7 +20,7 @@ public class ComponentTextArea extends Box
 		super( $width, $height );
 		
 		padding = $padding;
-		backgroundColor = SpasUI.DEFAULT_COLOR;
+		backgroundColor = VVUI.DEFAULT_COLOR;
 		title = $label;
 		borderStyle = BorderStyle.GROOVE;
 		

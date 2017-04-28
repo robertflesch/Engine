@@ -45,7 +45,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasDigitalClockUI extends SpasUI implements DigitalClockUI {
+	public class SpasDigitalClockUI extends VVUI implements DigitalClockUI {
 		
 		//--------------------------------------------------------------------------
 		//

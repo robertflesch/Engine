@@ -38,7 +38,7 @@ package org.flashapi.swing {
 	import org.flashapi.swing.plaf.libs.LabelInputUIRef;
 	import org.flashapi.swing.text.TLGBase;
 	import org.flashapi.swing.util.Observer;
-	import org.flashapi.swing.plaf.spas.SpasUI;
+	import org.flashapi.swing.plaf.spas.VVUI;;
 	
 	
 	use namespace spas_internal;
@@ -98,7 +98,7 @@ package org.flashapi.swing {
 			super(LabelInputUIRef, Selectors.LABEL_INPUT, title, defaultText, width, baseline, height);
 			initObj();
 			// per material design, non interactive labels are grey.
-			fontColor = SpasUI.LABEL_FONT_COLOR;
+			fontColor = VVUI.LABEL_FONT_COLOR;
 		}
 		
 		//--------------------------------------------------------------------------

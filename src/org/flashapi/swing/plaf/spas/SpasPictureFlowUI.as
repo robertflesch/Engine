@@ -44,7 +44,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasPictureFlowUI extends SpasUI implements PictureFlowUI {
+	public class SpasPictureFlowUI extends VVUI implements PictureFlowUI {
 		
 		//--------------------------------------------------------------------------
 		//

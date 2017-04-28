@@ -11,7 +11,7 @@ import org.flashapi.swing.*
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.containers.*;
-import org.flashapi.swing.plaf.spas.SpasUI;
+import org.flashapi.swing.plaf.spas.VVUI;;
 
 public class ComponentComboBoxWithLabel extends Box
 {
@@ -24,7 +24,7 @@ public class ComponentComboBoxWithLabel extends Box
 		
 		padding = $padding;
 		paddingTop = $padding + 3;
-		backgroundColor = SpasUI.DEFAULT_COLOR;
+		backgroundColor = VVUI.DEFAULT_COLOR;
 		borderStyle = BorderStyle.NONE;
 		
 		_cbType.autoSize = false;

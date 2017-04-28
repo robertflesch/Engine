@@ -41,7 +41,7 @@ package org.flashapi.swing.plaf.spas.brushes {
 	import org.flashapi.swing.constants.States;
 	import org.flashapi.swing.draw.MatrixUtil;
 	import org.flashapi.swing.plaf.core.LafDTO;
-	import org.flashapi.swing.plaf.spas.SpasUI;
+	import org.flashapi.swing.plaf.spas.VVUI;;
 	import org.flashapi.swing.util.AltColors;
 	
 	/**
@@ -139,7 +139,7 @@ package org.flashapi.swing.plaf.spas.brushes {
 		
 		private function initObj():void {
 			if (_matrix == null) _matrix = MatrixUtil.getMatrix(18, 18);
-			_rgb = new RGB(SpasUI.DEFAULT_COLOR);
+			_rgb = new RGB(VVUI.DEFAULT_COLOR);
 		}
 		
 		private function drawRadioButtonIcon(lineColor1:uint, lineColor2:uint, buttonColor1:uint, buttonColor2:uint, state:String):void {

@@ -52,7 +52,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasPanelUI extends SpasUI implements PanelUI {
+	public class SpasPanelUI extends VVUI implements PanelUI {
 		
 		//--------------------------------------------------------------------------
 		//

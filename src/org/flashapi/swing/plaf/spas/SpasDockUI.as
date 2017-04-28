@@ -46,7 +46,7 @@ package org.flashapi.swing.plaf.spas {
 	 * 	@playerversion Flash Player 9
 	 * 	@productversion SPAS 3.0 alpha
 	 */
-	public class SpasDockUI extends SpasUI implements DockUI {
+	public class SpasDockUI extends VVUI implements DockUI {
 		
 		//--------------------------------------------------------------------------
 		//
