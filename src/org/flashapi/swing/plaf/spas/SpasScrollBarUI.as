@@ -131,10 +131,10 @@ package org.flashapi.swing.plaf.spas {
 				}
 			} else {
 				if (isActive) {
-					c = [0x7D7D7D, 0x2D2F34];
+					c = [DEFAULT_SCROLL_BAR_BACKGROUND, DEFAULT_COLOR]; //[0x7D7D7D, 0x2D2F34];
 					lineColor = dto.color;
 				} else {
-					c = [0xDADADA, 0x9B9B9B];
+					c = [DEFAULT_SCROLL_BAR_BACKGROUND, DEFAULT_COLOR]; //[0xDADADA, 0x9B9B9B];
 					lineColor = 0x838383;
 				}
 			}
@@ -148,7 +148,8 @@ package org.flashapi.swing.plaf.spas {
 			var t:Figure = Figure.setFigure(tgt);
 			var tl:Graphics = tgt.graphics;
 			t.clear();
-			t.beginGradientFill(GradientType.LINEAR, c, a, r, m, SpreadMethod.PAD);
+t.beginFill(DEFAULT_SCROLL_BAR_BACKGROUND);
+			//t.beginGradientFill(GradientType.LINEAR, c, a, r, m, SpreadMethod.PAD);
 			t.drawRectangle(0, 0, w, len);
 			t.lineStyle(0, lineColor, 1, true, LineScaleMode.NORMAL, CapsStyle.NONE);
 			tl.moveTo(0, 0);
@@ -189,7 +190,7 @@ package org.flashapi.swing.plaf.spas {
 			var tc:Number = isActive ?
 				dto.scrollColors.scrollbarJoinColor : dto.scrollColors.scrollbarInactiveJoinColor;
 			var color:uint;
-			if (isNaN(tc)) color = isActive ? DEFAULT_COLOR : 0x818181;
+			if (isNaN(tc)) color = isActive ? DEFAULT_SCROLL_BAR_BACKGROUND : 0x818181;
 			else color = uint(tc);
 			var w:Number = dto.thickness;
 			var f:Figure = Figure.setFigure(dto.rightCornerContainer);
@@ -285,7 +286,7 @@ package org.flashapi.swing.plaf.spas {
 				g.drawRoundRect(1, 0, w-2.5, l, cd, cd);
 				//g.moveTo(w/2, 0);
 				g.lineStyle(0, 0, 0);
-				g.beginFill(0xFFFFFF, .2);
+				g.beginFill(0x0000FF, .2); // was FFFFFF
 				g.moveTo(w/2, 0);
 				g.curveTo(w/2+sch, l/4, w/2, l/2);
 				g.curveTo(w/2-sch, 3*l/4, w/2, l);
@@ -307,7 +308,7 @@ package org.flashapi.swing.plaf.spas {
 				g.drawRect(1, 0, w - 2.5, l);
 				//g.moveTo(w/2, 0);
 				g.lineStyle(0, 0, 0);
-				g.beginFill(0xFFFFFF, .2);
+				g.beginFill(0x0000FF, .2); // was FFFFFF
 				g.moveTo(w/2, 0);
 				g.curveTo(w/2+sch, l/4, w/2, l/2);
 				g.curveTo(w / 2 - sch, 3 * l / 4, w / 2, l);
@@ -334,9 +335,11 @@ package org.flashapi.swing.plaf.spas {
 			var h:Number = BUTTON_LENGTH;
 			var b:Figure = Figure.setFigure(btn);
 			b.clear();
-			b.beginFill(0, 0);
+var ct:uint = 0x00FF00;
+			b.beginFill(ct, 0); // was (0,0)
 			b.drawRectangle(0, 0, w, h);
 			var c:uint = isNaN(dto.scrollColors.scrollbarArrowColor) ? 0xFFFFFF : dto.scrollColors.scrollbarArrowColor;
+var c:uint = 0xFF0000;
 			if(dto.state != States.INACTIVE) {
 				b.beginFill(c, 1);
 				switch(direction) {
@@ -350,7 +353,7 @@ package org.flashapi.swing.plaf.spas {
 			}
 			b.endFill();
 		}
-		
+		private const DEFAULT_SCROLL_BAR_BACKGROUND:int = 0x224177;
 		private function drawBackgroundButtonShape(btn:Sprite, direction:String):void {
 			var h:Number = BUTTON_LENGTH;
 			var w:Number = dto.thickness;
@@ -388,7 +391,7 @@ package org.flashapi.swing.plaf.spas {
 					m = new Matrix();
 					m.createGradientBox(w+2, length, Math.PI);
 					beginGradientFill(GradientType.LINEAR, c, a, r, m);
-				} else beginFill(0x818181);
+				} else beginFill(DEFAULT_SCROLL_BAR_BACKGROUND); // 0x818181
 				lineStyle(0, lineColor, alpha);
 				if(_cornerStyle == ScrollBarCornerStyle.ROUND) {
 					switch(direction) {
