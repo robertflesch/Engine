@@ -46,7 +46,7 @@ public class PanelModels extends PanelBase
 	private var _detailButton:Button;
 	private var _deleteButton:Button;
 	
-	public function PanelModels($parent:PanelModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number, $level:int )	{
+	public function PanelModels($parent:ContainerModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number, $level:int )	{
 		super( $parent, $widthParam, $heightParam );
 		width = $widthParam;
 		height = $heightParam;

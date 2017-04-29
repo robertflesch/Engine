@@ -30,7 +30,7 @@ public class PanelModelAmmo extends PanelBase
     private var _detailButton:				Button;
     private var _selectedModel:				Gun;
 
-    public function PanelModelAmmo($parent:PanelModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number )
+    public function PanelModelAmmo($parent:ContainerModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number )
     {
         var currentY:int = 5;
         super( $parent, $widthParam, $heightParam );

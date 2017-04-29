@@ -33,7 +33,7 @@ public class PanelModelScripts extends PanelBase
     private var _detailButton:				Button;
     private var _currentY:                  int;
 
-    public function PanelModelScripts($parent:PanelModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number )
+    public function PanelModelScripts($parent:ContainerModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number )
     {
         super( $parent, $widthParam, $heightParam );
         autoHeight = false;
@@ -78,7 +78,7 @@ public class PanelModelScripts extends PanelBase
         function deleteScriptHandler(event:UIMouseEvent):void  {
             if ( _selectedScript )
             {
-                var scripts:Array = (_parent as PanelModelDetails).selectedModel.instanceInfo.scripts;
+                var scripts:Array = (_parent as ContainerModelDetails).selectedModel.instanceInfo.scripts;
                 for ( var i:int; i < scripts.length; i++ ){
                     if ( _selectedScript == scripts[i] ) {
                         scripts[i].dispose();
@@ -86,7 +86,7 @@ public class PanelModelScripts extends PanelBase
                         scripts.splice( i, 1 );
                     }
                 }
-                populateScripts( (_parent as PanelModelDetails).selectedModel );
+                populateScripts( (_parent as ContainerModelDetails).selectedModel );
                 // these are instance scripts, not model scripts.
                 //_selectedModel.modelInfo.changed = true;
                 Region.currentRegion.changed = true;
@@ -131,9 +131,9 @@ public class PanelModelScripts extends PanelBase
 
         if ( _selectedScript )
         {
-            (_parent as PanelModelDetails).selectedModel.stateLock( false );
-            (_parent as PanelModelDetails).selectedModel.stateSet( _selectedScript.name );
-            (_parent as PanelModelDetails).selectedModel.stateLock( true );
+            (_parent as ContainerModelDetails).selectedModel.stateLock( false );
+            (_parent as ContainerModelDetails).selectedModel.stateSet( _selectedScript.name );
+            (_parent as ContainerModelDetails).selectedModel.stateLock( true );
             _detailButton.enabled = true;
             _detailButton.active = true;
             _deleteButton.enabled = true;
@@ -154,7 +154,7 @@ public class PanelModelScripts extends PanelBase
 
     private function scriptAddHandler(event:UIMouseEvent):void {
         ScriptEvent.addListener( ScriptEvent.SCRIPT_SELECTED, scriptSelected );
-        new WindowScriptList( (_parent as PanelModelDetails).selectedModel );
+        new WindowScriptList( (_parent as ContainerModelDetails).selectedModel );
     }
 
     ///////////////////////////////////////////////////////////////////////
@@ -165,7 +165,7 @@ public class PanelModelScripts extends PanelBase
 
     private function scriptSelected(se:ScriptEvent):void {
         // I am misusing se.name here, name is really the 'type'
-        var addedScript:Script = (_parent as PanelModelDetails).selectedModel.instanceInfo.addScript( se.name, false);
+        var addedScript:Script = (_parent as ContainerModelDetails).selectedModel.instanceInfo.addScript( se.name, false);
         _listScripts.addItem(  se.name, addedScript );
         RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid, null );
     }

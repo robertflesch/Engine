@@ -138,8 +138,6 @@ package org.flashapi.swing.plaf.spas {
 					lineColor = 0x838383;
 				}
 			}
-			var a:Array = [1, 1];
-			var r:Array = [0, 250];
 			var m:Matrix = new Matrix();
 			var w:Number = dto.thickness;
 			var len:Number = dto.length;
@@ -148,8 +146,13 @@ package org.flashapi.swing.plaf.spas {
 			var t:Figure = Figure.setFigure(tgt);
 			var tl:Graphics = tgt.graphics;
 			t.clear();
-t.beginFill(DEFAULT_SCROLL_BAR_BACKGROUND);
-			//t.beginGradientFill(GradientType.LINEAR, c, a, r, m, SpreadMethod.PAD);
+			if ( true ) // this style effectively hides the scroll bar when it is not active.
+				t.beginFill(DEFAULT_SCROLL_BAR_BACKGROUND);
+			else {
+				var a:Array = [1, 1];
+				var r:Array = [0, 250];
+				t.beginGradientFill(GradientType.LINEAR, c, a, r, m, SpreadMethod.PAD);
+			}
 			t.drawRectangle(0, 0, w, len);
 			t.lineStyle(0, lineColor, 1, true, LineScaleMode.NORMAL, CapsStyle.NONE);
 			tl.moveTo(0, 0);

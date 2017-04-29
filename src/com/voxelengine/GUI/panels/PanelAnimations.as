@@ -35,7 +35,7 @@ public class PanelAnimations extends PanelBase
 	private var _selectedModel:				VoxelModel;
 	private var _currentY:                  int;
 
-	public function PanelAnimations($parent:PanelModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number, $level:int )
+	public function PanelAnimations($parent:ContainerModelDetails, $widthParam:Number, $elementHeight:Number, $heightParam:Number, $level:int )
 	{
 		super( $parent, $widthParam, $heightParam );
 		_level = $level;

@@ -22,11 +22,11 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 
 // all of the keys used in resourceGet are in the file en.xml which is in the assets/language/lang_en/ dir
-public class PanelModelDetails extends PanelBase
+public class ContainerModelDetails extends PanelBase
 {
 	static private const BTN_WIDTH:int = 190;
 	static private const WIDTH_DEFAULT:int = 200;
-	static private const HEIGHT_DEFAULT:int = 300;
+	static private const HEIGHT_DEFAULT:int = 390;
 	static private const HEIGHT_LIST_DEFAULT:int = 250;
 
 	private var _parentModel:VoxelModel;
@@ -34,7 +34,7 @@ public class PanelModelDetails extends PanelBase
 	private var _listAnimations:PanelAnimations;
 	private var _listScripts:PanelModelScripts;
 	private var _listAmmo:PanelModelAmmo;
-	private var _childPanel:PanelModelDetails;
+	private var _childPanel:ContainerModelDetails;
 	private var _aniButton:Button;
 	private var _scriptsButton:Button;
 	private var _level:int;
@@ -44,7 +44,7 @@ public class PanelModelDetails extends PanelBase
 	public function get selectedModel():VoxelModel { return _selectedModel; }
 	public function set selectedModel( $vm:VoxelModel ):void { _selectedModel = $vm; }
 
-	public function PanelModelDetails($parent:PanelBase, $level:int ) {
+	public function ContainerModelDetails($parent:PanelBase, $level:int ) {
 		super( $parent, WIDTH_DEFAULT, HEIGHT_DEFAULT );
 		_level = $level;
 		borderStyle = BorderStyle.GROOVE;
@@ -131,7 +131,7 @@ public class PanelModelDetails extends PanelBase
 
 	public function childPanelAdd( $selectedModel:VoxelModel ):void {
 		if ( null == _childPanel ) 
-			_childPanel = new PanelModelDetails( _parent, (_level + 1) );
+			_childPanel = new ContainerModelDetails( _parent, (_level + 1) );
 		_childPanel.updateChildren( $selectedModel.modelInfo.childVoxelModelsGet, $selectedModel );
 		var topLevel:PanelBase = topLevelGet();
 		topLevel.addElement( _childPanel );
