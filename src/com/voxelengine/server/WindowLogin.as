@@ -92,7 +92,7 @@ import com.voxelengine.renderer.Renderer;
 			// otherwise use empty
 				
 			var emailAddy:String = _userInfo.data.email ?  _userInfo.data.email : $email;
-			_emailInput = new LabelInput( " Email", emailAddy, width );
+			_emailInput = new LabelInput( " Email", emailAddy, width - 5 );
 			_emailInput.labelControl.width = 80;
 			_emailInput.tabIndex = 0;
 			infoPanel.addElement( _emailInput );
@@ -109,7 +109,7 @@ import com.voxelengine.renderer.Renderer;
 			
 			var password:String = _userInfo.data.password ?  _userInfo.data.password : $password;
 			//_passwordInput = new LabelInput( " Password", password, width );
-			_passwordInput = new VVTextInput( password, width );
+			_passwordInput = new VVTextInput( password, width - 115 );
 			_passwordInput.displayAsPassword = true;
 			_passwordInput.tabIndex = 1;
 			
