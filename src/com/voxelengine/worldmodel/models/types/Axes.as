@@ -34,11 +34,14 @@ public class Axes extends VoxelModel
 	static private var _model:VoxelModel = null;
 	static private var _loading:Boolean;
 	static private const AXES_MODEL_GUID:String = "Axes";
+	static private const AXES_MODEL_GUID_X:String = "AxesX";
+	static private const AXES_MODEL_GUID_Y:String = "AxesY";
+	static private const AXES_MODEL_GUID_Z:String = "AxesZ";
 
 	static public function createAxes():void {
 		var ii:InstanceInfo = new InstanceInfo();
 		var model:Object;
-		model = GenerateOxel.cubeScript( 0, TypeInfo.RED );
+		model = GenerateOxel.cubeScript( 0, TypeInfo.AIR );
 		model.modelClass = "Axes";
 		ii.modelGuid = AXES_MODEL_GUID;
 		_loading = true;
@@ -51,6 +54,25 @@ public class Axes extends VoxelModel
 				ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
 				_model = $mle.vm;
 				_loading = false;
+
+				var iiR:InstanceInfo = new InstanceInfo();
+				iiR.modelGuid = AXES_MODEL_GUID_X;
+				iiR.controllingModel = _model;
+				iiR.positionSetComp( 0, -1, -1 );
+				new ModelMakerGenerate( iiR, GenerateOxel.cubeScript( 0, TypeInfo.RED ) );
+
+				var iiG:InstanceInfo = new InstanceInfo();
+				iiG.modelGuid = AXES_MODEL_GUID_Y;
+				iiG.controllingModel = _model;
+				iiG.positionSetComp( -1, 0, -1 );
+				new ModelMakerGenerate( iiG, GenerateOxel.cubeScript( 0, TypeInfo.GREEN ) );
+
+				var iiB:InstanceInfo = new InstanceInfo();
+				iiB.modelGuid = AXES_MODEL_GUID_Z;
+				iiB.controllingModel = _model;
+				iiB.positionSetComp( -1, -1, 0 );
+				new ModelMakerGenerate( iiB, GenerateOxel.cubeScript( 0, TypeInfo.BLUE ) );
+
 			}
 		}
 	}
@@ -66,7 +88,7 @@ public class Axes extends VoxelModel
 	
 	static public function hide():void {
 		if ( _model ) {
-			//Log.out( "Axes.hide: " + VoxelModel.selectedModel , Log.WARN );
+			Log.out( "Axes.hide: " + VoxelModel.selectedModel , Log.WARN );
 			VoxelModel.selectedModel.modelInfo.childRemove( _model.instanceInfo );
 			_model.instanceInfo.visible = false
 		}
@@ -76,8 +98,18 @@ public class Axes extends VoxelModel
 		if ( _model ) {
 			Log.out( "Axes.show: " + VoxelModel.selectedModel , Log.WARN );
 			var bound:int = VoxelModel.selectedModel.metadata.bound;
-			var scale:uint = GrainCursor.two_to_the_g(bound);
-			_model.instanceInfo.setScaleInfo( { x: scale, y : scale, z: scale } );
+			var newScaleVal:uint = GrainCursor.two_to_the_g(bound);
+			_model.instanceInfo.setScaleInfo( { x: newScaleVal, y : newScaleVal, z: newScaleVal } );
+
+			var vmx:VoxelModel = _model.childFindModelGuid(AXES_MODEL_GUID_X);
+			vmx.instanceInfo.setScaleInfo( { x: 1, y : 1/newScaleVal, z: 1/newScaleVal } );
+
+			var vmy:VoxelModel = _model.childFindModelGuid(AXES_MODEL_GUID_Y);
+			vmy.instanceInfo.setScaleInfo( { x: 1, y : 1, z: 1 } );
+
+			var vmz:VoxelModel = _model.childFindModelGuid(AXES_MODEL_GUID_Z);
+			vmz.instanceInfo.setScaleInfo( { x: 1/newScaleVal, y : 1/newScaleVal, z: 1 } );
+
 			_model.instanceInfo.visible = true;
 			VoxelModel.selectedModel.modelInfo.childAdd( _model );
 		}
