@@ -446,7 +446,7 @@ public class Avatar extends ControllableVoxelModel
 //				+ " Globals.openWindowCount: " + Globals.openWindowCount  );
 		if ( Globals.active
 				//&& 0 == Globals.openWindowCount // this allows it to be handled in the getMouseYChange
-				&& false == MouseKeyboardHandler.ctrl
+				&& false == MouseKeyboardHandler.isCtrlKeyDown
 				&& true == MouseKeyboardHandler.active
 				&& 0 == Globals.openWindowCount )
 		{

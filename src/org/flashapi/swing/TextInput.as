@@ -57,14 +57,14 @@ package org.flashapi.swing {
 	 *
 	 *  @eventType org.flashapi.swing.event.FocusEvent.FOCUS_IN
 	 */
-	[Event(name = "focusIn", type = "org.flashapi.swing.event.FocusEvent")]
+	//[Event(name = "focusIn", type = "org.flashapi.swing.event.FocusEvent")]
 	
 	/**
 	 *  Dispatched when the <code>TextInput</code> looses the focus.
 	 *
 	 *  @eventType org.flashapi.swing.event.FocusEvent.FOCUS_OUT
 	 */
-	[Event(name = "focusOut", type = "org.flashapi.swing.event.FocusEvent")]
+	//[Event(name = "focusOut", type = "org.flashapi.swing.event.FocusEvent")]
 	
 	/**
 	 * 	<img src="TextInput.png" alt="TextInput" width="18" height="18"/>

@@ -186,17 +186,20 @@ public class EditCursor extends VoxelModel
 			if ( VoxelModel.selectedModel )
 				if ( e.size <= VoxelModel.selectedModel.modelInfo.oxelPersistence.bound && 0 <= e.size ) {
 					modelInfo.oxelPersistence.bound = e.size;
+					modelInfo.oxelPersistence.oxel.gc.bound = e.size;
 					modelInfo.oxelPersistence.oxel.gc.grain = e.size;
 				}
 				else {	
 					// reseting so I have to inform others
 					modelInfo.oxelPersistence.bound = 4;
+					modelInfo.oxelPersistence.oxel.gc.bound = 4;
 					modelInfo.oxelPersistence.oxel.gc.grain = 4;
 					CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, modelInfo.oxelPersistence.bound ) );
 				}
 			else {
 				if ( modelInfo && modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount ) {
 					modelInfo.oxelPersistence.bound = e.size;
+					modelInfo.oxelPersistence.oxel.gc.bound = e.size;
 					modelInfo.oxelPersistence.oxel.gc.grain = e.size;
 				}
 			}
@@ -416,6 +419,7 @@ public class EditCursor extends VoxelModel
 		
 		if ( objectModel ) {
 			modelInfo.oxelPersistence.bound = _objectModel.grain;
+			modelInfo.oxelPersistence.oxel.gc.bound = _objectModel.grain;
 			modelInfo.oxelPersistence.oxel.gc.grain = _objectModel.grain;
 		}
 		if ( CursorShapeEvent.CYLINDER == cursorShape || CursorShapeEvent.SPHERE == cursorShape ) {
@@ -845,7 +849,7 @@ public class EditCursor extends VoxelModel
 		var foundModel:VoxelModel;
 		switch (e.keyCode) {
 			case Keyboard.CONTROL:
-				if ( MouseKeyboardHandler.leftMouseDown )
+				if ( MouseKeyboardHandler.isLeftMouseDown )
 					oxelTexture = EDITCURSOR_HAND_UD
 				else
 					oxelTexture = EDITCURSOR_HAND_LR
@@ -871,7 +875,7 @@ public class EditCursor extends VoxelModel
 	private static var _s_dy:Number = 0;
 	private static var _s_dx:Number = 0;
 	private function mouseMove(e:MouseEvent):void {
-		if ( MouseKeyboardHandler.ctrl ) {
+		if ( MouseKeyboardHandler.isCtrlKeyDown ) {
 			if ( 0 == _s_dx && 0 == _s_dy ) {
 				_s_dy = Globals.g_app.stage.mouseY;
 				_s_dx = Globals.g_app.stage.mouseX;
@@ -893,7 +897,7 @@ public class EditCursor extends VoxelModel
 			
 			if ( VoxelModel.selectedModel ) {
 				var t:Vector3D = VoxelModel.selectedModel.instanceInfo.positionGet;
-				if ( MouseKeyboardHandler.leftMouseDown ) {
+				if ( MouseKeyboardHandler.isLeftMouseDown ) {
 					t.y += dy;
 					t.y += dx;
 				} else {
@@ -912,7 +916,7 @@ public class EditCursor extends VoxelModel
 			return;
 		
 		Log.out( "EditCursor.mouseUp e: " + e.toString() + "  Globals.active == true" );
-		if ( doubleMessageHack ) {
+		//if ( doubleMessageHack ) {
 			switch (e.type) 
 			{
 				case "mouseUp": case Keyboard.NUMPAD_ADD:
@@ -926,10 +930,10 @@ public class EditCursor extends VoxelModel
 						insertOxel();
 					break;
 			}
-		}
-		else {
-			Log.out( "EditCursor.mouseUp doubleMessageHack is false" );
-		}
+//		}
+//		else {
+//			Log.out( "EditCursor.mouseUp doubleMessageHack is false" );
+//		}
 	}
 	
 	private function mouseDown(e:MouseEvent):void {

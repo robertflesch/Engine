@@ -3,7 +3,7 @@
 VoxelVerse todo
 
 
-need to display ammo for gun models in voxel model panel
+need to display ammo for gun models in voxel model panel - Or just allow infinity ammo
 HashTag not set in import
 SoundRange not set on import?
 dynamic lighting on all of dragon
@@ -11,6 +11,7 @@ engine block on zeppelin does not light correctly 3.29.17
 if model is deleted from region models, the animation and script panels are not updated.
 adding -inline to the release compiler options causes function initializeDataBeforeSplash() to throw exceptions
 check collision for objects, make sure they are not all check everything every frame. Only selected object should do that, or ones that have collision.
+could use a bitmapdisplacement filter on water overlay to give it the moving water effect.
 
 need to add clipVelocity and speedMultiplier to animation editor
 
@@ -20,28 +21,6 @@ When deleting a model that has inventory, make sure to delete its inventory.
 ! 12.4.16 static lighting on head of dragon
 
 
-USAA - 30 year fixed
-4.375%	4.456%	-1.0
-4.125%	4.247%	0.5
-4.25%	4.33%	-0.5
-
-Chase
-4.000%	4.105%	1.250
-
-Fifth Third
-4.125%	4.23%	0.5
-
-WellsFargo
-4.250%	4.280%
-5/1 ARM	3.625%	3.905%
-
-780CFE2A-3943-1800-A2E6-F962C65AF355
-
-gwadm@gw.edu
-
-
-Katie May
-202 994 6642
 
 https://news.ycombinator.com/item?id=14149570
 https://voodoomfg.com/jobs/product-manager
@@ -54,3 +33,7 @@ https://www.linkedin.com/jobs/view/296843203/
 ABD7501A-8ECE-4571-10ED-9D33ACF0DCFD - Torch
 C9389DB5-7A87-A5D8-2495-445D8391CDC1 - Pistol
 2E077FF7-A065-B77D-EAFD-DEDBB97DA597 - Pick
+
+What is VoxelVerse.
+
+My goal is to create a platform we everyone is able to create and share 3D models.

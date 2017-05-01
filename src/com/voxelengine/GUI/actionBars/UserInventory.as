@@ -196,7 +196,7 @@ public class  UserInventory extends QuickInventory
 			for ( var i:int = 0; i < Slots.ITEM_COUNT; i++ ) {
 				var item:ObjectInfo = items[i];
 				item.box = (boxes[i] as BoxInventory);
-				(boxes[i] as BoxInventory).updateObjectInfo( item );
+				(boxes[i] as BoxInventory).updateObjectInfo( item, false );
 			}
 		}
 //		else
@@ -410,7 +410,7 @@ public class  UserInventory extends QuickInventory
 			//Log.out( "UserInventory.processItemSelection - ObjectModel", Log.WARN);
 			var ti1:TypeInfo = TypeInfo.typeInfoByName[ "CLEAR GLASS" ];
 			var om:ObjectModel = oi as ObjectModel;
-			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.INSERT_MODEL, ti1.type, om ) ); 
+			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.INSERT_MODEL, ti1.type, om ) );
 			
 			hideGrainTools();
 			showModelTools();

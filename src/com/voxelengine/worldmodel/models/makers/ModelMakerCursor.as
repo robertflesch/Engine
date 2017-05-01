@@ -17,7 +17,7 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
 	/**
 	 * ...
 	 * @author Robert Flesch - RSF
-	 * This class is used to load a model once its metadata AND data has been loaded from persistance
+	 * This class is used to load a model once its metadata AND data has been loaded from persistence
 	 * it then removes its listeners, which should cause it be to be garbage collected.
 	 * Might I need to add a timeout on this object in case if never completes.
 	 */
@@ -35,13 +35,14 @@ public class ModelMakerCursor extends ModelMakerBase {
 	override protected function attemptMake():void {
 		if ( null != modelInfo ) {
 			Log.out( "ModelMakerCursor.attemptMake - ii: " + ii.toString(), Log.DEBUG );
-			var vm:* = make();
-			if ( vm ) {
-				vm.complete = true;
-				EditCursor.currentInstance.objectModelSet( vm );
-				vm.calculateCenter()
+			_vm = make();
+			if ( _vm ) {
+				EditCursor.currentInstance.objectModelSet( _vm );
+				_vm.calculateCenter();
+				markComplete( true );
 			}
-			markComplete( true );
+			else
+				markComplete( false );
 		}
 	}
 	

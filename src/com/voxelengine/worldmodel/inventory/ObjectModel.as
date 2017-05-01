@@ -22,6 +22,7 @@ import com.voxelengine.worldmodel.models.ModelMetadata
 
 public class ObjectModel extends ObjectInfo
 {
+	private var _displayAddons:Boolean = true;
 	protected var _modelGuid:ModelGuid = new ModelGuid();
 	public function get modelGuid():String 						{ return _modelGuid.val; }
 	public function set modelGuid(value:String):void 			{ _modelGuid.valSet = value; }
@@ -52,6 +53,7 @@ public class ObjectModel extends ObjectInfo
 		}
 		_objectType = values[0];
 		modelGuid = values[1];
+		_displayAddons = false;
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, metadataAdded );
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, metadataAdded );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
@@ -95,7 +97,7 @@ public class ObjectModel extends ObjectInfo
 	private function delayOver(event:TimerEvent):void
 	{
 		if ( box )
-			box.updateObjectInfo( this )
+			box.updateObjectInfo( this, _displayAddons )
 	}
 	
 	override public function reset():void {

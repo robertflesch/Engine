@@ -128,11 +128,11 @@ public class VisitorFunctions {
             if (Globals.BAD_OXEL == $oxel)
                 return;
             if ($oxel.flowInfo && $oxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling.has()) {
-                if (TypeInfo.flowable[$oxel.type])
-                    return;
+//                if (TypeInfo.flowable[$oxel.type])
+//                    return;
 
                 $oxel.flowInfo.flowScaling.reset();
-//				$oxel.facesMarkAllDirty();
+				$oxel.facesMarkAllDirty();
                 $oxel.quadsDeleteAll();
             }
         }

@@ -11,11 +11,6 @@ import com.voxelengine.worldmodel.inventory.ObjectModel;
 import flash.events.Event;
 import flash.events.EventDispatcher;
 
-/**
- * ...
- * @author Robert Flesch - RSF 
- * 
- */
 public class CursorOperationEvent extends Event
 {
 	static public	const NONE:String 			= "NONE";
@@ -23,6 +18,7 @@ public class CursorOperationEvent extends Event
 	static public	const INSERT_MODEL:String 	= "INSERT_MODEL";
 	static public 	const DELETE_OXEL:String 	= "DELETE_OXEL";
 	static public 	const DELETE_MODEL:String 	= "DELETE_MODEL";
+	static public 	const ACTIVATE:String 		= "ACTIVATE";
 
 	private var _oxelType:int;
 	private var _om:ObjectModel;
@@ -30,20 +26,17 @@ public class CursorOperationEvent extends Event
 	public function get oxelType():int { return _oxelType; }
 	public function get om():ObjectModel { return _om; }
 	
-	public function CursorOperationEvent( $type:String, $oxelType:int = 0, $om:ObjectModel = null, $bubbles:Boolean = true, $cancellable:Boolean = false )
-	{
+	public function CursorOperationEvent( $type:String, $oxelType:int = 0, $om:ObjectModel = null, $bubbles:Boolean = true, $cancellable:Boolean = false ) {
 		super( $type, $bubbles, $cancellable );
 		_oxelType	= $oxelType;
 		_om 		= $om;
 	}
 	
-	public override function clone():Event
-	{
+	public override function clone():Event {
 		return new CursorOperationEvent(type, _oxelType, _om, bubbles, cancelable);
 	}
    
-	public override function toString():String
-	{
+	public override function toString():String {
 		return formatToString("CursorEvent", "type", "_oxelType", "_om", "bubbles", "cancelable");
 	}
 	
@@ -63,6 +56,11 @@ public class CursorOperationEvent extends Event
 	static public function dispatch( $event:CursorOperationEvent ) : Boolean {
 		return _eventDispatcher.dispatchEvent( $event );
 	}
+
+	static public function create( $type:String, $oxelType:int = 0, $om:ObjectModel = null ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new CursorOperationEvent( $type, $oxelType, $om ) );
+	}
+
 	
 	
 	///////////////// Event handler interface /////////////////////////////

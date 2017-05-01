@@ -388,7 +388,7 @@ public class InventoryPanelModel extends VVContainer
 				if ( e.dropTarget is BoxInventory ) {
 					var bi:BoxInventory = e.dropTarget as BoxInventory;
 					var item:ObjectModel = e.dragOperation.initiator.data;
-					bi.updateObjectInfo( item );
+					bi.updateObjectInfo( item, false );
 					var slotId:int = int( bi.name );
 					InventorySlotEvent.create( InventorySlotEvent.CHANGE, Network.userId, Network.userId, slotId, item );
 					// we are going to need the oxelPersistence to build the model for this.

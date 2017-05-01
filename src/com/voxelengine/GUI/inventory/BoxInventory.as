@@ -82,7 +82,7 @@ public class BoxInventory extends VVBox
 	}
 	
 	
-	public function updateObjectInfo( $item:ObjectInfo ):void {
+	public function updateObjectInfo( $item:ObjectInfo, $displayAddons:Boolean = true ):void {
 		if ( null == $item )
 			return;
 			
@@ -119,27 +119,39 @@ public class BoxInventory extends VVBox
 
 				setHelp( "guid: " + om.vmm.guid );
 
-				if ( om.vmm.permissions.blueprint ) {
-					_bpValue = new Image( Globals.texturePath + "blueprint.png" );
-					if ( 128 == width )
-						_bpValue.x = _bpValue.y = 64;
-					addElement( _bpValue )
-				}
-				else if ( _bpValue ) {
-					removeElement( _bpValue );
-					_bpValue = null
+				if ( $displayAddons ) {
+					if (om.vmm.permissions.blueprint) {
+						_bpValue = new Image(Globals.texturePath + "blueprint.png");
+						if (128 == width)
+							_bpValue.x = _bpValue.y = 64;
+						addElement(_bpValue)
+					}
+					else if (_bpValue) {
+						removeElement(_bpValue);
+						_bpValue = null
+					}
+
+					if (om.vmm.permissions.creator == Network.userId) {
+						_editData = new Image(Globals.texturePath + "editModelData.png");
+						$evtColl.addEvent(_editData, UIMouseEvent.CLICK, editModelData);
+						if (128 == width)
+							_editData.x = _editData.y = 0;
+						addElement(_editData)
+					} else if (_editData) {
+						removeElement(_editData);
+						_editData = null;
+					}
+				} else {
+					if ( _bpValue ) {
+						removeElement(_bpValue);
+						_bpValue = null;
+					}
+					if ( _editData ) {
+						removeElement(_editData);
+						_editData = null;
+					}
 				}
 
-				if ( om.vmm.permissions.creator == Network.userId ) {
-					_editData = new Image( Globals.texturePath + "editModelData.png" );
-					$evtColl.addEvent( _editData, UIMouseEvent.CLICK, editModelData );
-					if ( 128 == width )
-						_editData.x = _editData.y = 0;
-					addElement( _editData )
-				} else if ( _editData ) {
-					removeElement( _editData );
-					_editData = null;
-				}
 
 			}
 			break;

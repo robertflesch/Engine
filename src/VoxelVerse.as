@@ -289,7 +289,7 @@ public class VoxelVerse extends Sprite
 			case Keyboard.ENTER:
 				// trying to stop the BACKQUOTE from getting to the doomsday console.
 				//e.stopImmediatePropagation()
-				if ( MouseKeyboardHandler.ctrl )
+				if ( MouseKeyboardHandler.isCtrlKeyDown )
 					showConsole = true;
 				break;
 		}
