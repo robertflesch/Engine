@@ -262,6 +262,20 @@ public class VoxelModel
 		return null;
 	}
 
+	public function childFindModelGuid( $guid:String, $recursive:Boolean = true ):VoxelModel {
+		for each (var child:VoxelModel in modelInfo.childVoxelModels) {
+			if (child.modelInfo.guid == $guid)
+				return child;
+
+			else { // check its children
+				var cvm:VoxelModel = child.childFindModelGuid( $guid );
+				if ( cvm )
+					return cvm;
+			}
+		}
+		return null;
+	}
+
 	public function childFindByName($name:String, $recursive:Boolean = true ):VoxelModel {
 		// Are we that model?
 		if ( metadata.name == $name )
@@ -325,7 +339,9 @@ public class VoxelModel
 		var dvMyVelocity:Vector3D = _sScratchMatrix.transformVector( instanceInfo.velocityGet );
 		_sScratchVector.setTo( $loc.positionGet.x, $loc.positionGet.y, $loc.positionGet.z );
 		_sScratchVector.decrementBy( instanceInfo.velocityGet );
-		$loc.positionSet = _sScratchVector;
+		if ( !$loc.positionGet.nearEquals(_sScratchVector, 0.01 ) ) {
+			$loc.positionSet = _sScratchVector;
+		}
 		
 		//Log.out( "VoxelModel.calculateTargetPosition - worldSpaceTargetPosition: " + worldSpaceTargetPosition );
 	}
