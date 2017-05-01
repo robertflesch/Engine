@@ -17,6 +17,7 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.Room;
+import com.voxelengine.worldmodel.models.types.Axes;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 /**
@@ -142,7 +143,8 @@ public class RegionManager
 	
 	public function configComplete( $e:LoadingEvent ):void {
 		startWithEmptyRegion();
-		
+		Axes.createAxes();
+
 		// Add a listener to tell when file has been loaded
 //		RegionEvent.addListener( ModelBaseEvent.ADDED, startingRegionLoaded );
 		// now request the file be loaded

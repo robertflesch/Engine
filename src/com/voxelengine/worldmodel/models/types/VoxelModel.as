@@ -63,18 +63,18 @@ public class VoxelModel
 			return;
 		//Log.out( "VoxelModel.selectedModel: " + ( $val ? $val.toString() : "null") , Log.DEBUG );
 		// unselect the old model
-		if ( _s_selectedModel )
+		if ( _s_selectedModel ) {
 			_s_selectedModel.selected = false;
+			Axes.hide();
+		}
 		// change the static to new model
 		_s_selectedModel = $val;
 		// set new model as selected
 		if ( _s_selectedModel ) {
 			_s_selectedModel.selected = true;
-			//Axes.show()
+			Axes.show();
 		}
-		//if ( null == $val )
-		//	Axes.hide()
-			
+
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	

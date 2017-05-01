@@ -342,7 +342,7 @@ var ct:uint = 0x00FF00;
 			b.beginFill(ct, 0); // was (0,0)
 			b.drawRectangle(0, 0, w, h);
 			var c:uint = isNaN(dto.scrollColors.scrollbarArrowColor) ? 0xFFFFFF : dto.scrollColors.scrollbarArrowColor;
-var c:uint = 0xFF0000;
+			c = 0xFF0000;
 			if(dto.state != States.INACTIVE) {
 				b.beginFill(c, 1);
 				switch(direction) {

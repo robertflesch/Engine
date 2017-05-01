@@ -38,6 +38,7 @@ public class RegionEvent extends ModelBaseEvent
 	// Used by the sandbox list and config manager to request a join of a server region
 	static public const JOIN:String							= "JOIN";
 	static public const ADD_MODEL:String					= "ADD_MODEL";
+	static public const REMOVE_MODEL:String					= "REMOVE_MODEL";
 
 	private var _guid:String;
 	private var _regionOrModel:*;

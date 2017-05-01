@@ -368,7 +368,7 @@ public class ModelInfo extends PersistenceObject
 		childrenLoaded	= true;
 		_childCount = 0;
 		if ( !dbo || !dbo.children )
-			return
+			return;
 		
 		//Log.out( "ModelInfo.childrenLoad - loading for model: " + guid );
 		for each ( var v:Object in dbo.children ) {
@@ -399,9 +399,7 @@ public class ModelInfo extends PersistenceObject
 		//Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
 		//Log.out( "VoxelModel.childrenLoad - loading child models END" );
 		if ( ModelMakerImport.isImporting )
-			delete dbo.children
-		
-
+			delete dbo.children;
 	}
 
 	protected function onChildAdded( me:ModelEvent ):void {
@@ -473,35 +471,39 @@ public class ModelInfo extends PersistenceObject
 		}
 		
 		// templates would like to add the child for each instance, that is a no no..
-		if ( !childExists( $child ) )
-			childVoxelModels.push( $child);
-		
-		// Dont add child that already exist
-		if ( dbo.children ) {
-			for each ( var child:Object in dbo.children ) {
-				if ( child.instanceGuid === $child.instanceInfo.instanceGuid )
-					return;
-			}
+		if ( !childExists( $child ) ) {
+			childVoxelModels.push($child);
+			if ( !$child.instanceInfo.dynamicObject )
+				changed = true;
 		}
-		else 
-			dbo.children = new Array();
-
-			
-		// Dont add the player to the dbo.children, or you end up in a recursive loop
-		if ( $child == VoxelModel.controlledModel )
-			return;
-		changed = true;
-		dbo.children[dbo.children.length] = $child.instanceInfo.toObject();
+		
+//		// Dont add child that already exist
+//		if ( dbo.children ) {
+//			for each ( var child:Object in dbo.children ) {
+//				if ( child.instanceGuid === $child.instanceInfo.instanceGuid )
+//					return;
+//			}
+//		}
+//		else
+//			dbo.children = new Array();
+//
+//
+//		// Dont add the player to the dbo.children, or you end up in a recursive loop
+//		if ( $child == VoxelModel.controlledModel )
+//			return;
+//
+//		dbo.children[dbo.children.length] = $child.instanceInfo.toObject();
 	}
 	
 	// This leaves the model, but detaches it from parent.
 	public function childDetach( $vm:VoxelModel, $vmParent:VoxelModel ):void	{
-		// removethis child from the parents info
+		// remove this child from the parents info
 		childRemove($vm.instanceInfo);
 		
 		// this make it belong to the world
 		$vm.instanceInfo.controllingModel = null;
 		//if ( !($vm is Player) )
+		// we are adding the detached model to the region
 		RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, $vm );
 
 		
@@ -556,22 +558,26 @@ public class ModelInfo extends PersistenceObject
 	}
 	
 	public function childRemove( $ii:InstanceInfo ):void	{
-		// Must remove the model, and the child dependancy
-		for ( var j:int; j < childVoxelModels.length; j++ ) {
-			if ( childVoxelModels[j].instanceInfo ==  $ii )
-				childVoxelModels.splice( j, 1 );
-		}
-		var	newChildren:Object = new Object();
-		var i:int;
-		for each ( var obj:Object in  dbo.children ) {
-			if ( obj.instanceGuid != $ii.instanceGuid ) {
-				newChildren[i] = obj;
-				i++
+		// Must remove the model, and the child dependency
+		for ( var j:int = 0; j < childVoxelModels.length; j++ ) {
+			if ( childVoxelModels[j].instanceInfo ==  $ii ) {
+				if ( !childVoxelModels[j].instanceInfo.dynamicObject )
+					changed = true;
+				childVoxelModels.splice(j, 1);
+
 			}
+
 		}
-		delete dbo.children;
-		dbo.children = newChildren;
-		changed = true;
+//		var	newChildren:Object = new Object();
+//		var i:int;
+//		for each ( var obj:Object in  dbo.children ) {
+//			if ( obj.instanceGuid != $ii.instanceGuid ) {
+//				newChildren[i] = obj;
+//				i++
+//			}
+//		}
+//		delete dbo.children;
+//		dbo.children = newChildren;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -7,17 +7,22 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
+
+import flash.geom.Vector3D
+
 import com.voxelengine.Log
 import com.voxelengine.Globals
 import com.voxelengine.events.ModelLoadingEvent
 import com.voxelengine.worldmodel.models.InstanceInfo
-import com.voxelengine.worldmodel.models.ModelMetadata
-import com.voxelengine.worldmodel.models.ModelInfo
+import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase
-import com.voxelengine.worldmodel.models.types.VoxelModel
-//import flash.display3D.Context3D;
-import flash.geom.Matrix3D;
-import flash.geom.Vector3D
+import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
+
 
 /**
  * ...
@@ -26,45 +31,55 @@ import flash.geom.Vector3D
  */
 public class Axes extends VoxelModel 
 {
-	static private var _model:VoxelModel
-	static private var _loading:Boolean
-	static private const AXES_MODEL_GUID:String = "A74EDB66-074E-EB7E-739A-B307D5AA89D9"
-	static public function display():void {
-		if ( null == _model && false == _loading ) {
-			_loading = true
-			var ii:InstanceInfo = new InstanceInfo()
-			ii.modelGuid = AXES_MODEL_GUID
-			ii.dynamicObject = true
-			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, axesLoaded )
+	static private var _model:VoxelModel = null;
+	static private var _loading:Boolean;
+	static private const AXES_MODEL_GUID:String = "Axes";
 
-			ModelMakerBase.load( ii, true, false )
-		}
-		
-		function axesLoaded( $mle:ModelLoadingEvent):void {
-			if ( $mle.modelGuid == AXES_MODEL_GUID ) {
-				ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, axesLoaded )
-				_model = $mle.vm
-				_loading = false
+	static public function createAxes():void {
+		var ii:InstanceInfo = new InstanceInfo();
+		var model:Object;
+		model = GenerateOxel.cubeScript( 0, TypeInfo.RED );
+		model.modelClass = "Axes";
+		ii.modelGuid = AXES_MODEL_GUID;
+		_loading = true;
+
+		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
+		new ModelMakerGenerate( ii, model );
+
+		function modelLoadComplete ( $mle:ModelLoadingEvent ):void {
+			if ( $mle.data.modelGuid == AXES_MODEL_GUID ) {
+				ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
+				_model = $mle.vm;
+				_loading = false;
 			}
 		}
 	}
 
-	//static public function draw(mvp:Matrix3D, $context:Context3D, $isChild:Boolean, $alpha:Boolean ):void	{
-		//if ( _model )
-			//_model.draw( mvp, $context, $isChild, $alpha )
-	//}
+	public function Axes( instanceInfo:InstanceInfo ) {
+		super( instanceInfo );
+		instanceInfo.dynamicObject = true;
+	}
+
+	override public function set dead(val:Boolean):void {
+		Log.out( "Axes.dead - THIS MODEL IS IMMORTAL");
+	}
 	
 	static public function hide():void {
 		if ( _model ) {
 			//Log.out( "Axes.hide: " + VoxelModel.selectedModel , Log.WARN );
+			VoxelModel.selectedModel.modelInfo.childRemove( _model.instanceInfo );
 			_model.instanceInfo.visible = false
 		}
 	}
 	
 	static public function show():void {
 		if ( _model ) {
-			//Log.out( "Axes.show: " + VoxelModel.selectedModel , Log.WARN );
-			_model.instanceInfo.visible = true
+			Log.out( "Axes.show: " + VoxelModel.selectedModel , Log.WARN );
+			var bound:int = VoxelModel.selectedModel.metadata.bound;
+			var scale:uint = GrainCursor.two_to_the_g(bound);
+			_model.instanceInfo.setScaleInfo( { x: scale, y : scale, z: scale } );
+			_model.instanceInfo.visible = true;
+			VoxelModel.selectedModel.modelInfo.childAdd( _model );
 		}
 	}
 	
@@ -94,9 +109,6 @@ public class Axes extends VoxelModel
 	}
 	
 	
-	public function Axes( instanceInfo:InstanceInfo ) { 
-		super( instanceInfo )
-	}
 	override public	function get selected():Boolean 					{ return false; }
 	override public	function set selected(val:Boolean):void  			{ _selected = false; }
 	
