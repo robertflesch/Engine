@@ -28,7 +28,8 @@ public final class ProjectilePool
 	} 
 	
 	static private function ammoAdded(e:AmmoEvent):void {
-		_pools[e.ammo.name] = new ProjectilePoolType( e.ammo.oxelType, _currentPoolSize, _growthValue )
+		if ( null == _pools[e.ammo.name] )
+			_pools[e.ammo.name] = new ProjectilePoolType( e.ammo.oxelType, _currentPoolSize, _growthValue )
 	}
 	
 	public static function poolGet( ammo:Ammo ):Projectile { 
