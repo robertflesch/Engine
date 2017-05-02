@@ -43,19 +43,19 @@ public class Axes extends VoxelModel
 				iiR.modelGuid = AXES_MODEL_GUID_X;
 				iiR.controllingModel = _model;
 				iiR.positionSetComp( 0, -1, -1 );
-				new ModelMakerGenerate( iiR, GenerateOxel.cubeScript( 0, TypeInfo.RED ) );
+				new ModelMakerGenerate( iiR, GenerateOxel.cubeScript( 0, TypeInfo.RED, true ) );
 
 				var iiG:InstanceInfo = new InstanceInfo();
 				iiG.modelGuid = AXES_MODEL_GUID_Y;
 				iiG.controllingModel = _model;
 				iiG.positionSetComp( -1, 0, -1 );
-				new ModelMakerGenerate( iiG, GenerateOxel.cubeScript( 0, TypeInfo.GREEN ) );
+				new ModelMakerGenerate( iiG, GenerateOxel.cubeScript( 0, TypeInfo.GREEN, true ) );
 
 				var iiB:InstanceInfo = new InstanceInfo();
 				iiB.modelGuid = AXES_MODEL_GUID_Z;
 				iiB.controllingModel = _model;
 				iiB.positionSetComp( -1, -1, 0 );
-				new ModelMakerGenerate( iiB, GenerateOxel.cubeScript( 0, TypeInfo.BLUE ) );
+				new ModelMakerGenerate( iiB, GenerateOxel.cubeScript( 0, TypeInfo.BLUE, true ) );
 			}
 		}
 	}

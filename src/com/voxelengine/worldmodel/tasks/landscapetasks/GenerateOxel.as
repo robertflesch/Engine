@@ -18,12 +18,13 @@ import com.voxelengine.worldmodel.TypeInfo;
 
 // This class generates a cube, and starts a face and quad build on it
 public class GenerateOxel extends LandscapeTask {
-    static public function cubeScript($grain:int = 6, $type:int = 0):Object {
+    static public function cubeScript($grain:int = 6, $type:int = 0, $lockLight:Boolean = false):Object {
         if (0 == $type)
             $type = TypeInfo.SAND;
         var model:Object = {};
         model.name = "GenerateCube";
         model.grainSize = $grain;
+        model.lockLight = $lockLight;
 
         var nbiomes:Object = {};
         nbiomes.layers = new Vector.<Object>();

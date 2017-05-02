@@ -25,6 +25,10 @@ public class LightInfo
 {
 	public static const MAX:uint = 0xff;
 
+	private var _locked:Boolean;		// This light level is locked, for models such as Axes
+	public function get locked():Boolean { return _locked; }
+	public function set locked(value:Boolean):void { _locked = value; }
+
 	private var _lightIs:Boolean;		// Is this object indeed a light source, or just an air oxel
 	public function get lightIs():Boolean { return _lightIs; }
 
@@ -173,7 +177,12 @@ public class LightInfo
 		
 		if ( LightInfo.MAX < $illumination ) {
 			$illumination = LightInfo.MAX
-			Log.out( "LightInfo.setAll - attn > MAX" );
+			Log.out( "LightInfo.setIlluminationLevel - attn > MAX" );
+		}
+
+		if ( _locked ) {
+			Log.out( "LightInfo.setIlluminationLevel - Light Level Locked", Log.WARN );
+			return;
 		}
 
 		b000 = $illumination;

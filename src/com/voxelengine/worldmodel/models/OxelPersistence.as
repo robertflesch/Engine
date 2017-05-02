@@ -23,7 +23,6 @@ import com.voxelengine.events.LevelOfDetailEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.renderer.Chunk;
 import com.voxelengine.pools.LightInfoPool;
-import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.oxel.FlowInfo;
 import com.voxelengine.worldmodel.oxel.VisitorFunctions;
 import com.voxelengine.worldmodel.TypeInfo;
@@ -35,13 +34,12 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.makers.OxelCloner;
-import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
 
 
 /**
  * ...
  * @author Robert Flesch - RSF
- * OxelPersistence is the persistance wrapper for the oxel level data.
+ * OxelPersistence is the persistence wrapper for the oxel level data.
  */
 public class OxelPersistence extends PersistenceObject
 {
@@ -50,7 +48,11 @@ public class OxelPersistence extends PersistenceObject
 	private var _initializeFacesAndQuads:Boolean				= true;
 	
 	public function get baseLightLevel():int 					{ return dbo.baseLightLevel; }
-	public function set baseLightLevel( value:int ):void		{ dbo.baseLightLevel = value; }
+	public function set baseLightLevel( value:int ):void		{
+		dbo.baseLightLevel = value;
+		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, baseLightLevel );
+		changed = true;
+	}
 
 	public function get bound():int 							{ return dbo.bound; }
 	public function set bound( value:int ):void					{ dbo.bound = value; }
@@ -62,6 +64,9 @@ public class OxelPersistence extends PersistenceObject
 	public function set version($val:int):void					{ dbo.version = $val; }
 
 	private var _lightInfo:LightInfo 							= LightInfoPool.poolGet();
+
+	public function get lockLight():Boolean 					{ return _lightInfo.locked; }
+	public function set lockLight( value:Boolean ):void			{  _lightInfo.locked = value; }
 
 	private	var	_statistics:ModelStatisics						= new ModelStatisics();
 	public 	function get statistics():ModelStatisics			{ return _statistics; }
@@ -102,8 +107,9 @@ public class OxelPersistence extends PersistenceObject
 			//Log.out( "OxelPersistence: " + guid + "  UNcompressed size: " + dbo.ba.length );
 		}
 
-		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, baseLightLevel );
-
+		Log.out( "OxelPersistence - setting RANDOM Base light level" );
+		//_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, baseLightLevel );
+		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, Math.random() * 255 );
 	}
 
 	override protected function assignNewDatabaseObject():void {

@@ -66,6 +66,9 @@ public class ModelInfo extends PersistenceObject
 		changed = true;
 	}
 
+	public function get lockLight():Boolean { return dbo.lockLight; }
+	public function set lockLight( $val:Boolean ):void { dbo.lockLight = $val; changed = true; }
+
 	private var			_owner:VoxelModel;
 	public function get owner():VoxelModel 							{ return _owner; }
 	public function set owner(value:VoxelModel):void 				{ _owner = value; }
@@ -85,8 +88,6 @@ public class ModelInfo extends PersistenceObject
 	}
 	public function set grainSize(val:int):void						{ dbo.grainSize = val;  changed = true; }
 
-	public function get baseLightLevel():uint 						{ return dbo.baseLightLevel; }
-	public function set baseLightLevel(val:uint):void 				{ dbo.baseLightLevel = val; changed = true; }
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	public function ModelInfo( $guid:String, $dbo:DatabaseObject, $newData:Object ):void  {
@@ -115,10 +116,9 @@ public class ModelInfo extends PersistenceObject
 
 		if ( $newData )
 			mergeOverwrite( $newData );
+
 		if ( dbo.biomes )
 			biomesFromObject( dbo.biomes );
-		if ( !dbo.baseLightLevel )
-			dbo.baseLightLevel = Lighting.defaultBaseLightAttn;
 
 		if ( !$newData )
 			changed = false;
@@ -209,8 +209,8 @@ public class ModelInfo extends PersistenceObject
 		if ( guid == $ode.modelGuid ) {
 			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FBA_COMPLETE, assignOxelData );
 			oxelPersistence = $ode.oxelData;
-			// Set OxelPersistence to the baseLightLevel for this object.
-			Log.out("ModelInfo.assignOxelData - TODO set baseLightLevel: " + baseLightLevel, Log.WARN);
+			if ( lockLight )
+				oxelPersistence.lockLight = true;
 		}
 	}
 
@@ -380,8 +380,7 @@ public class ModelInfo extends PersistenceObject
 			var ii:InstanceInfo = new InstanceInfo();
 			ii.fromObject( v );
 			ii.controllingModel = $vm;
-			//ii.baseLightLevel = $vm.instanceInfo.baseLightLevel;
-			
+
 			//Log.out( "VoxelModel.childrenLoad - create child of parent.instance: " + instanceInfo.guid + "  - child.instanceGuid: " + child.instanceGuid );					
 			if ( null == ii.modelGuid )
 				continue;
