@@ -1241,17 +1241,15 @@ public class VoxelModel
 		}
 	}
 
-	public function applyBaseLightLevel():void {
-		//modelInfo.oxelPersistence.visitor( Oxel.rebuildLightingRecursive, "Oxel.rebuildLightingRecursive" );
-		modelInfo.oxelPersistence.oxel.lightsStaticSetDefault( modelInfo.baseLightLevel );
+	public function applyBaseLightLevel( $baseLightLevel:uint ):void {
+		modelInfo.oxelPersistence.oxel.lightsStaticSetDefault( $baseLightLevel );
+		modelInfo.oxelPersistence.changed = true;
 		var children:Vector.<VoxelModel> = modelInfo.childVoxelModelsGet();
 		for each ( var child:VoxelModel in children ) {
-//			if ( child.metadata.name == "DragonHead" )
-//				Log.out( "VoxelModel.CHECK THIS OUT" );
-			child.modelInfo.baseLightLevel = modelInfo.baseLightLevel;
-			child.applyBaseLightLevel()
+			child.applyBaseLightLevel( $baseLightLevel );
 		}
 	}
+
 	private var _torchIndex:int;
 	public function torchToggle():void {
 		Shader.lightsClear();
