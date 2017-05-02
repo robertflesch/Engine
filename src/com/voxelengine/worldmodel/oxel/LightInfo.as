@@ -7,18 +7,13 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
-	import flash.geom.Vector3D;
 	import flash.utils.ByteArray;
-	import flash.utils.Dictionary;
-
 	import com.voxelengine.Log;
-	import com.voxelengine.Globals;
-	import com.voxelengine.utils.ColorUtils;
-	
+
 /**
  * ...
  * @author Robert Flesch
- * This holds all of the color and attenuation for one color in an oxel
+ * This holds all of the color and attenuation for one light source in an oxel
  */
 
 public class LightInfo
@@ -48,8 +43,6 @@ public class LightInfo
 			               , $baseAttn:uint
 			               , $baseLightIllumination:uint
 			               , $lightIs:Boolean = false ):void {
-//		if ( Lighting.DEFAULT_LIGHT_ID == $ID )
-//				Log.out( "LightInfo.default");
 		ID = $ID;
 		color = $color;
 		_lightIs = $lightIs;
@@ -75,21 +68,16 @@ public class LightInfo
 	}
 
 	public function fromByteArray( $ba:ByteArray ):ByteArray {
-		try {
-			_lightIs 	= $ba.readBoolean();
-			ID 			= $ba.readUnsignedInt();
-			color 		= $ba.readUnsignedInt();
-			bLower		= $ba.readUnsignedInt();
-			bHigher 	= $ba.readUnsignedInt();
+		_lightIs 	= $ba.readBoolean();
+		ID 			= $ba.readUnsignedInt();
+		color 		= $ba.readUnsignedInt();
+		bLower		= $ba.readUnsignedInt();
+		bHigher 	= $ba.readUnsignedInt();
 //			Log.out("LightInfo.fromByteArray \t\t\tlightIs: \t" + _lightIs);
 //			Log.out("LightInfo.fromByteArray \t\t\tID: \t\t" + ID);
 //			Log.out("LightInfo.fromByteArray \t\t\tcolor: \t" + color.toString(16));
 //			Log.out("LightInfo.fromByteArray \t\t\tbLower: \t" + bLower.toString(16));
 //			Log.out("LightInfo.fromByteArray \t\t\tbHigher: \t" + bHigher.toString(16));
-		}
-		catch( e:Error ){
-			Log.out( "LightinInfo.fromByteArray error: " + e.toString() );
-		}
 		return $ba;
 	}
 
