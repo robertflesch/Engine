@@ -51,7 +51,7 @@ public class OxelPersistenceCache
 
 	static private function save(e:OxelDataEvent):void {
 		for each ( var op:OxelPersistence in _oxelDataDic )
-			if ( op && !op.dynamicObj )
+			if ( op && !op.doNotPersist )
 				op.save();
 	}
 
@@ -176,7 +176,7 @@ public class OxelPersistenceCache
 		Log.out( "OxelDataCache.generateSucceed " + $pe.toString(), Log.INFO );
 		var op:OxelPersistence = new OxelPersistence( $pe.guid, null, $pe.data, true );
 		if ( "PROJECTILE"  == $pe.guid )
-			op.dynamicObj = true;
+			op.doNotPersist = true;
 
 		if ( $pe.other )
 			op.bound = parseInt($pe.other);

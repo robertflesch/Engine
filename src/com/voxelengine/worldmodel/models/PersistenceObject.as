@@ -34,9 +34,9 @@ public class PersistenceObject
 	// So if we are in the "SAVING state, leave object "changed" and return.
 	protected var 	_saving:Boolean;
 
-	private var 	_dynamicObj:Boolean;
-	public function get dynamicObj():Boolean { return _dynamicObj; }
-	public function set dynamicObj(value:Boolean):void { _dynamicObj = value; }
+	private var 	_doNotPersist:Boolean;
+	public function get doNotPersist():Boolean { return _doNotPersist; }
+	public function set doNotPersist(value:Boolean):void { _doNotPersist = value; }
 
 	public function get createdDate():String { return dbo.createdDate; }
 	public function get creator():String { return dbo.creator; }
@@ -106,7 +106,7 @@ public class PersistenceObject
 	protected function toObject():void { }
 	
 	public function save():Boolean {
-		if ( !changed || !Globals.online || dynamicObj ) {
+		if ( !changed || !Globals.online || doNotPersist ) {
 //			if ( Globals.online && !changed )
 //				Log.out( name + " save - Not saving data - guid: " + guid + " NOT changed" );
 //			else if ( !Globals.online && changed )
@@ -117,11 +117,7 @@ public class PersistenceObject
 		}
 
 		if ( !Globals.isGuid(guid)) {
-			if ( Player.DEFAULT_PLAYER == guid || EditCursor.EDIT_CURSOR == guid ) {
-				changed = false;
-				return false;
-			}
-			Log.out("PersistenceObject.save - NOT Saving INVALID GUID: " + guid + " in table: " + table, Log.WARN);
+			changed = false;
 			return false;
 		}
 		validatedSave();
@@ -129,7 +125,7 @@ public class PersistenceObject
 	}
 
 	protected function validatedSave():void {
-		var name:String = getQualifiedClassName(this);
+		//var name:String = getQualifiedClassName(this);
 		if ( _saving ) {
 			//Log.out("PersistenceObject.save - IN MIDDLE OF SAVE: " + name, Log.WARN);
 			return;

@@ -212,7 +212,7 @@ public class Ammo extends PersistenceObject
 	}
 
 	override public function save():Boolean {
-		if ( !changed || !Globals.online || dynamicObj ) {
+		if ( !changed || !Globals.online || doNotPersist ) {
 //			if ( Globals.online && !changed )
 //				Log.out( name + " save - Not saving data - guid: " + guid + " NOT changed" );
 //			else if ( !Globals.online && changed )

@@ -48,7 +48,7 @@ public class WindowAnimationDetail extends VVPopup
 //			_ani = Animation.defaultObject( $guid )
 		}
 		_infoBackup = _ani.createBackCopy()
-		_ani.dynamicObj = true // true while editing
+		_ani.doNotPersist = true // true while editing
 		
 		layout.orientation = LayoutOrientation.VERTICAL
 		padding = 5
@@ -113,7 +113,7 @@ public class WindowAnimationDetail extends VVPopup
 	
 	private function revertHandler(event:UIMouseEvent):void  {
 		_ani.restoreFromBackup( _infoBackup )
-		_ani.dynamicObj = false
+		_ani.doNotPersist = false
 		_ani.changed = false
 		remove()
 	}
@@ -127,7 +127,7 @@ public class WindowAnimationDetail extends VVPopup
 	//}
 
 	private  function saveHandler(event:UIMouseEvent):void  {
-		_ani.dynamicObj = false
+		_ani.doNotPersist = false
 		_ani.save()
 		remove()
 	}
