@@ -11,11 +11,11 @@ package com.voxelengine.worldmodel.models
 	import flash.geom.Vector3D;
 	import flash.geom.Matrix3D;
 	
-	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	
 	public class Location
 	{
+		private static var _scratchVec:Vector3D 				= new Vector3D();
 		private var _changed:Boolean 							= false;					// INSTANCE NOT EXPORTED
 		private var _useOrigPosition:Boolean 					= false;					// Set via script
 
@@ -36,7 +36,7 @@ package com.voxelengine.worldmodel.models
 		private var _invModelMatrix:Matrix3D 					= new Matrix3D();			// INSTANCE NOT EXPORTED
 				
 		public function get changed():Boolean 					{ return _changed; }
-		public function set changed($val:Boolean):void			{ _changed = $val; }
+		[inline] public function set changed($val:Boolean):void			{ _changed = $val; }
 
 		public function get useOrigPosition():Boolean 					{ return _useOrigPosition; }
 		public function set useOrigPosition($val:Boolean):void			{ _useOrigPosition = $val; }
@@ -48,9 +48,9 @@ package com.voxelengine.worldmodel.models
 		public function get center():Vector3D 					{ return _center };
 		public function set center($val:Vector3D):void			{ centerSetComp( $val.x, $val.y, $val.z ); }			
 		public function 	centerSetComp( $x:Number, $y:Number, $z:Number ):void { 
-			_changed = true;
+			changed = true;
 			_centerNotScaled.setTo( $x, $y, $z ); 
-			_center.setTo( _centerNotScaled.x * _scale.x, _centerNotScaled.y * _scale.y, _centerNotScaled.z * _scale.z );
+			_center.setTo( _centerNotScaled.x * scale.x, _centerNotScaled.y * scale.y, _centerNotScaled.z * scale.z );
 			//Log.out( "set center - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
 		}
 		public function get centerNotScaled():Vector3D 					{ return _centerNotScaled };
@@ -60,17 +60,22 @@ package com.voxelengine.worldmodel.models
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		public function get scale():Vector3D 					{ return _scale };
 		public function 	scaleSetComp( $x:Number, $y:Number, $z:Number ):void { 
-			_changed = true;
+			changed = true;
+			//trace( "Location.scaleSetComp x: " + $x + " y: " + $y + " z: " + $z );
 			_scale.setTo( $x, $y, $z ); 
 			_center.setTo( _centerNotScaled.x * $x, _centerNotScaled.y * $y, _centerNotScaled.z * $z );
 		}
 		public function set scale($val:Vector3D):void 			{ 
-			_changed = true;
-			_scale.setTo( $val.x, $val.y, $val.z ); 
+			changed = true;
+			//trace( "Location.scale x: " + $val.x + " y: " + $val.y + " z: " + $val.z );
+			_scale.setTo( $val.x, $val.y, $val.z );
 			_center.setTo( _centerNotScaled.x * $val.x, _centerNotScaled.y * $val.y, _centerNotScaled.z * $val.z );
 			//Log.out( "set scale - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
 		}
-		public function scaleReset():void 	{ scaleSetComp( _scaleOrig.x, _scaleOrig.y, _scaleOrig.z ); }
+		public function scaleReset():void 	{
+			//trace( "Location.scaleReset x: " + _scaleOrig.x + " y: " + _scaleOrig.y + " z: " + _scaleOrig.z );
+			scaleSetComp( _scaleOrig.x, _scaleOrig.y, _scaleOrig.z );
+		}
 		public function scaleGetOriginal():Vector3D 	{ return _scaleOrig; }
 				
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,7 +88,7 @@ package com.voxelengine.worldmodel.models
 		public function 	rotationSetComp( $x:Number, $y:Number, $z:Number ):void { 
 			//Log.out( "PosAndRot rot: " + _rotation.x+" " +_rotation.y+" " +_rotation.z );
 			// Copy old rotation
-			_changed = true;
+			changed = true;
 			
 			_rotations[2].setTo( _rotations[1].x, _rotations[1].y, _rotations[1].z );
 			_rotations[1].setTo( _rotations[0].x, _rotations[0].y, _rotations[0].z );
@@ -101,7 +106,7 @@ package com.voxelengine.worldmodel.models
 		public function set positionSet( $val:Vector3D ):void 	{ positionSetComp( $val.x, $val.y, $val.z ); }
 		public function 	positionSetComp( $x:Number, $y:Number, $z:Number ):void 
 		{ 
-			_changed = true;
+			changed = true;
 			
 			_positions[2].setTo( _positions[1].x, _positions[1].y, _positions[1].z );
 			_positions[1].setTo( _positions[0].x, _positions[0].y, _positions[0].z );
@@ -149,6 +154,8 @@ package com.voxelengine.worldmodel.models
 			velocitySet = $val.velocityGet;
 			center.setTo( $val.center.x, $val.center.y, $val.center.z );
 			_scale = $val._scale;
+			//trace( "Location.setTo scale: " + _scale );
+
 		}
 		
 		public function restoreOld( index:int = 1 ):void
@@ -156,7 +163,7 @@ package com.voxelengine.worldmodel.models
 			//trace( "Location.restoreOld position["+index+"] position: " + _positions[index] );
 			_position.setTo( _positions[index].x, _positions[index].y, _positions[index].z );
 			_rotation.setTo( _rotations[index].x, _rotations[index].y, _rotations[index].z );
-			_changed = true;
+			changed = true;
 		}
 		
 		public function nearEquals( $val:Location ):Boolean
@@ -183,21 +190,21 @@ package com.voxelengine.worldmodel.models
 				_modelMatrix.prependRotation( rotationGet.x, Vector3D.X_AXIS, _center );
 				_modelMatrix.prependRotation( rotationGet.y,  Vector3D.Y_AXIS, _center );
 				_modelMatrix.prependRotation( rotationGet.z, Vector3D.Z_AXIS, _center );
-				
-				var wsp:Vector3D = positionGet.clone();
-				wsp.negate();
-				_modelMatrix.prependTranslation( wsp.x
-											  , wsp.y
-											  , wsp.z );
-				
+
+				_scratchVec.copyFrom( _position );
+				_scratchVec.negate();
+				_modelMatrix.prependTranslation( _scratchVec.x
+											   , _scratchVec.y
+											   , _scratchVec.z );
+
 				_modelMatrix.appendScale( 1 / _scale.x, 1 / _scale.y, 1 / _scale.z );
-				_invModelMatrix.copyFrom( _modelMatrix )
+				_invModelMatrix.copyFrom( _modelMatrix );
 				_invModelMatrix.transpose();
 												  
 				_worldMatrix.copyFrom( _modelMatrix );
 				_worldMatrix.invert();
 				
-				changed = false;
+				_changed = false;
 			}
 		}
 		
@@ -275,12 +282,14 @@ package com.voxelengine.worldmodel.models
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		public function setScaleInfo( $obj:Object ):void {
 				if ( $obj.x && $obj.x > 0.001 )
-					scale.x = $obj.x
+					scale.x = $obj.x;
 				if ( $obj.y && $obj.y > 0.001 )
-					scale.y = $obj.y
+					scale.y = $obj.y;
 				if ( $obj.z && $obj.z > 0.001 )
-					scale.z = $obj.z
-			_scaleOrig.setTo( scale.x, scale.y, scale.z )
+					scale.z = $obj.z;
+			_scaleOrig.setTo( scale.x, scale.y, scale.z );
+			//Log.out( "Location.setScaleInfo - scale: " + _scale );
+			changed = true;
 		}
 		
 		public function setCenterInfo( $obj:Object ):void {
@@ -311,7 +320,7 @@ package com.voxelengine.worldmodel.models
 		}
 		
 		public function toObject():Object {
-			var obj:Object = new Object();
+			var obj:Object = {};
 		
 			// Save original or current positions? would seem like current
 			// why was I using original?
