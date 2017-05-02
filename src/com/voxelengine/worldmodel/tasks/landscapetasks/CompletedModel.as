@@ -10,7 +10,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 {
 	import com.voxelengine.events.ModelBaseEvent;
 	import com.voxelengine.events.ModelLoadingEvent;
-	import com.voxelengine.events.RegionEvent;
+import com.voxelengine.events.ObjectHierarchyData;
+import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import flash.utils.getTimer;
@@ -50,7 +51,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				if ( vm ) {
 //					Log.out( "CompletedModel.start - VoxelModel marked as complete: " + _guid );
  					vm.complete = true;
-					vm.calculateCenter();
+					//vm.calculateCenter();
+					var ohd:ObjectHierarchyData = new ObjectHierarchyData();
+					ohd.fromModel( vm );
 
 					// This is only called when executing a script or series of scripts on an object
 					if ( Globals.online ) {
@@ -63,9 +66,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 					}
 					else {
 						if ( vm.instanceInfo.critical )
-							ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CRITICAL_MODEL_LOADED, _modelGuid ));
+							ModelLoadingEvent.create( ModelLoadingEvent.CRITICAL_MODEL_LOADED, ohd );
 						else
-							ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.MODEL_LOAD_COMPLETE, _modelGuid ) );
+							ModelLoadingEvent.create( ModelLoadingEvent.MODEL_LOAD_COMPLETE, ohd );
 					}
 				}
 				else
@@ -81,7 +84,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				
 			if ( 0 == _count  ) { // && _playerLoaded  should I add ( null != Player.player )
 				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _modelGuid );
-				ModelLoadingEvent.dispatch( new ModelLoadingEvent( ModelLoadingEvent.CHILD_LOADING_COMPLETE, _modelGuid ) );
+				ModelLoadingEvent.create( ModelLoadingEvent.CHILD_LOADING_COMPLETE, ohd );
 			}
 			
 			
