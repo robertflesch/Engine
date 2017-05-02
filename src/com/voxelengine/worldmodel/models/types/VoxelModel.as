@@ -704,11 +704,13 @@ public class VoxelModel
 		//else
 		{
 			// this is returning model space intersections
-			modelInfo.oxelPersistence.oxel.lineIntersect(modelSpaceStartPoint, modelSpaceEndPoint, $intersections );
-		
-			for each (var gci:GrainCursorIntersection in $intersections) {
-				gci.wsPoint = modelToWorld(gci.point);
-				gci.model = this;
+			if ( modelInfo.oxelPersistence ){
+				modelInfo.oxelPersistence.oxel.lineIntersect(modelSpaceStartPoint, modelSpaceEndPoint, $intersections );
+
+				for each (var gci:GrainCursorIntersection in $intersections) {
+					gci.wsPoint = modelToWorld(gci.point);
+					gci.model = this;
+				}
 			}
 		}
 		//GrainCursorPool.poolDispose( gct );
