@@ -257,11 +257,13 @@ public class ControllableVoxelModel extends VoxelModel
 			
 		super.update($context, $elapsedTimeMS);
 		
-		camera.positionSet = instanceInfo.positionGet;
+		if ( !camera.positionGet.nearEquals( instanceInfo.positionGet, 0.01 ) )
+			camera.positionSet = instanceInfo.positionGet;
 		//camera.scale = instanceInfo.scale;
 		// track not copied intentionally
 		// Y Axis ok, X is wrong
-		camera.center.setTo( instanceInfo.center.x, instanceInfo.center.y, instanceInfo.center.z );
+// I think this is not longer needed. RSF - 5.1.2017
+//		camera.center.setTo( instanceInfo.center.x, instanceInfo.center.y, instanceInfo.center.z );
 		//var ccenter:Vector3D = camera.current.position;
 		//camera.center.setTo( instanceInfo.center.x + ccenter.x, instanceInfo.center.y + ccenter.y, instanceInfo.center.z + ccenter.z );
 		
@@ -357,6 +359,7 @@ public class ControllableVoxelModel extends VoxelModel
 		// set our next position by adding in velocities
 		// If there is no collision or gravity, this is where the model would end up.
 		var loc:Location = _s_scratchLocation;
+// TEMP
 		loc.setTo( instanceInfo );
 		setTargetLocation( loc );
 		//Log.out( "CVM.controlledModelChecks - loc.positionSet: " + loc.positionGet );
@@ -370,6 +373,7 @@ public class ControllableVoxelModel extends VoxelModel
 				if ( usesGravity )
 					fall( loc, $elapsedTimeMS );
 				onSolidGround = false;
+// TEMP
 				instanceInfo.setTo( loc );
 			} else {
 				for each ( var collisionCandidate:VoxelModel in _collisionCandidates ) {
@@ -382,13 +386,17 @@ public class ControllableVoxelModel extends VoxelModel
 						instanceInfo.velocityReset();
 						return false;
 					}
-					else 					// New position is valid
-						instanceInfo.setTo( loc );
+					else {		// New position is valid
+// TEMP
+						instanceInfo.setTo(loc);
+					}
 				}
 			}
 		}
-		else
-			instanceInfo.setTo( loc );
+		else {
+// TEMP
+			instanceInfo.setTo(loc);
+		}
 		
 		return true;
 	}
