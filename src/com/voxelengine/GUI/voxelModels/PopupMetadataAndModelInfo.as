@@ -133,8 +133,8 @@ public class PopupMetadataAndModelInfo extends VVPopup
         lc.layout.orientation = LayoutOrientation.HORIZONTAL;
 
         lc.addElement( new ComponentLabelInput( "Light(0-255)"
-                , function ($e:TextEvent):void { _mi.baseLightLevel = Math.max( Math.min( uint( $e.target.label ), 255 ), 0 );  }
-                , String( _mi.baseLightLevel )
+                , function ($e:TextEvent):void { _mi.oxelPersistence.baseLightLevel = Math.max( Math.min( uint( $e.target.label ), 255 ), 0 );  }
+                , String( _mi.oxelPersistence.baseLightLevel )
                 , WIDTH - 120 ) );
 
         addElement( lc );
