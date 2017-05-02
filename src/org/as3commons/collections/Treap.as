@@ -250,12 +250,13 @@ package org.as3commons.collections {
 		 * @inheritDoc
 		 */
 		public function toArray() : Array {
-			var array : Array = new Array();
-			var iterator : IIterator = iterator();
-			while (iterator.hasNext()) {
-				array.push(iterator.next());
-			}
-			return array;
+			throw new Error( "Treap.toArray - NEEDS IMPLEMENTATION");
+//			var array : Array = new Array();
+//			var iterator : IIterator = iterator();
+//			while (iterator.hasNext()) {
+//				array.push(iterator.next());
+//			}
+//			return array;
 		}
 
 		/**
