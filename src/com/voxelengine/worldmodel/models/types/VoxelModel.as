@@ -182,26 +182,30 @@ public class VoxelModel
 
 			}
 		}
-	}
 
-	private function oxelBuildComplete(e:OxelDataEvent):void {
-		if ( e.modelGuid == modelInfo.guid ) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete );
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed );
-			calculateCenter();
-			complete = true;
+		function oxelBuildComplete( $ode:OxelDataEvent):void {
+			if ( $ode.modelGuid == modelInfo.guid ) {
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete );
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed );
+				calculateCenter();
+				metadata.bound = $ode.oxelData.bound;
+				complete = true;
+				Log.out("VoxelModel.oxelBuildComplete - metadata.name: " + metadata.name );
+			}
+		}
+
+		function oxelBuildFailed(e:OxelDataEvent):void {
+			if ( e.modelGuid == modelInfo.guid ) {
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete );
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed );
+				complete = true;
+				dead = true;
+				// TODO need to change model picture to BROKEN, or just totally delete it.
+				Log.out("VoxelModel.oxelDataRetrievedFailed - Error reading OXEL data guid: " + modelInfo.guid, Log.ERROR);
+			}
 		}
 	}
 
-	private function oxelBuildFailed(e:OxelDataEvent):void {
-		if ( e.modelGuid == modelInfo.guid ) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete );
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed );
-			dead = true;
-			// TODO need to change model picture to BROKEN, or just totally delete it.
-			Log.out("VoxelModel.oxelDataRetrievedFailed - Error reading OXEL data guid: " + modelInfo.guid, Log.ERROR);
-		}
-	}
 
 
 	protected function processClassJson():void {
