@@ -67,20 +67,20 @@ public class ContainerModelDetails extends PanelBase
 	}
 	
 	private function selectedModelChanged(e:UIRegionModelEvent):void {
-		Log.out("PanelModelDetails.selectedModelChanged - level: " + _level + "  e.level: " + e.level );
+		//Log.out("PanelModelDetails.selectedModelChanged - level: " + _level + "  e.level: " + e.level );
 		if ( e.level == _level ) {
 			selectedModel = e.voxelModel;
-			Log.out("PanelModelDetails.selectedModelChanged - selectedModel: " + selectedModel + " e.parentVM: " + e.voxelModel + "  _parentModel: " + _parentModel, Log.WARN);
+			//Log.out("PanelModelDetails.selectedModelChanged - selectedModel: " + selectedModel + " e.parentVM: " + e.voxelModel + "  _parentModel: " + _parentModel, Log.WARN);
 			childPanelRemove();
 			removeListsAndButtons();
 			if ( selectedModel ) {
-				Log.out("PanelModelDetails.selectedModelChanged - selectedModel.metadata.name: " + selectedModel.metadata.name, Log.WARN );
+				//Log.out("PanelModelDetails.selectedModelChanged - selectedModel.metadata.name: " + selectedModel.metadata.name, Log.WARN );
 				childPanelAdd( selectedModel );
 				addListsAndButtons( selectedModel );
 			}
 		}
 		height = height_calculated;
-		Log.out("==============================================================" );
+		//Log.out("==============================================================" );
 	}
 
 	public function updateChildren( $source:Function, $parentModel:VoxelModel, $removeAniAndScripts:Boolean = false ):void {
