@@ -7,22 +7,15 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
+import flash.utils.ByteArray;
+
+import com.voxelengine.Log;
+import com.voxelengine.Globals;
 import com.voxelengine.pools.LightInfoPool;
-import com.voxelengine.renderer.Quad;
-	import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
-
-import flash.geom.Vector3D;
-	import flash.utils.ByteArray;
-
-	import com.voxelengine.Log;
-	import com.voxelengine.Globals;
-	import com.voxelengine.utils.ColorUtils;
+import com.voxelengine.utils.ColorUtils;
 	
-/**
- * ...
- * @author Robert Flesch
- */
 public class Lighting  {
 	
 	/*
@@ -40,7 +33,7 @@ public class Lighting  {
 	 *        \/
 	 */
 	public static const DEFAULT_COLOR:uint = 0x00ffffff;
-	private static const DEFAULT_SIGMA:uint = 2;
+//	private static const DEFAULT_SIGMA:uint = 2;
 //	public static const _defaultBaseLightAttn:uint = 0x33; // out of 255
 
 	public static const AMBIENT_ADD:Boolean = true;
@@ -64,18 +57,18 @@ public class Lighting  {
 	static public function get eaoEnabled():Boolean { return _s_eaoEnabled; }
 	static public function set eaoEnabled(value:Boolean):void  { _s_eaoEnabled = value; }
 	static public function get defaultBaseLightAttn():uint { return _defaultBaseLightAttn; }
-	static public function set defaultBaseLightAttn(value:uint):void  { _defaultBaseLightAttn = value; }
+//	static public function set defaultBaseLightAttn(value:uint):void  { _defaultBaseLightAttn = value; }
 
 	static public function get defaultBaseLightIllumination():uint { return _defaultBaseLightIllumination; }
-	static public function set defaultBaseLightIllumination(value:uint):void  { _defaultBaseLightIllumination = value; }
+//	static public function set defaultBaseLightIllumination(value:uint):void  { _defaultBaseLightIllumination = value; }
 
-	public static function defaultLightIlluminationSetter():uint {
-		var temp:uint = _defaultBaseLightIllumination;
-		temp = temp | (_defaultBaseLightIllumination << 8);
-		temp = temp | (_defaultBaseLightIllumination << 16);
-		temp = temp | (_defaultBaseLightIllumination << 24);
-		return temp;
-	}
+//	public static function defaultLightIlluminationSetter():uint {
+//		var temp:uint = _defaultBaseLightIllumination;
+//		temp = temp | (_defaultBaseLightIllumination << 8);
+//		temp = temp | (_defaultBaseLightIllumination << 16);
+//		temp = temp | (_defaultBaseLightIllumination << 24);
+//		return temp;
+//	}
 	
 	static public const B000:uint = 0;
 	static public const B001:uint = 1;
@@ -584,8 +577,6 @@ public class Lighting  {
 
 	public function resetToAmbient():void {
 		_lights = new Vector.<LightInfo>();
-		// TODO how do I add the default light from chunk back in here?
-//		add( DEFAULT_LIGHT_ID, DEFAULT_COLOR, Lighting.DEFAULT_ATTN, _defaultBaseLightAttn );
 	}
 
 	public function mergeChildren( $childID:uint, $b:Lighting, $grainUnits:uint, $hasAlpha:Boolean ):void {
