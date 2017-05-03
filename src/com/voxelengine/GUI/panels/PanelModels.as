@@ -61,7 +61,7 @@ public class PanelModels extends PanelBase
 //		_listModels.dragEnabled = true;
 //		_listModels.draggable = true;
 
-		_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, selectModel );		
+		_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, selectModel );
 		ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
 
 		var bHeight:int = buttonsCreate();
@@ -256,8 +256,8 @@ public class PanelModels extends PanelBase
 			function deleteElement():void {
 				Log.out( "PanelModels.deleteModel - " + VoxelModel.selectedModel.toString(), Log.WARN );
 				ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
-				if ( VoxelModel.selectedModel.associatedGrain && VoxelModel.selectedModel.instanceInfo.controllingModel ) {
-					VoxelModel.selectedModel.instanceInfo.controllingModel.write( VoxelModel.selectedModel.associatedGrain, TypeInfo.AIR );
+				if ( VoxelModel.selectedModel.instanceInfo.associatedGrain && VoxelModel.selectedModel.instanceInfo.controllingModel ) {
+					VoxelModel.selectedModel.instanceInfo.controllingModel.write( VoxelModel.selectedModel.instanceInfo.associatedGrain, TypeInfo.AIR );
 				}
 				VoxelModel.selectedModel.dead = true;
 				populateModels( _dictionarySource, _parentModel );
@@ -300,24 +300,9 @@ public class PanelModels extends PanelBase
 	private function selectModel(event:ListEvent):void {
 			//Log.out("PanelModels.selectModel - AFTER Double");
 			if (event.target.data) {
+				var instanceGuid:String = event.target.data.instanceGuid;
 				Log.out("PanelModels.selectModel has TARGET DATA: " + event.target.data as String);
-				buttonsEnable();
-				var vm:VoxelModel;
-				if ( null == _parentModel )
-					vm = Region.currentRegion.modelCache.instanceGet( event.target.data.instanceGuid );
-				else
-					vm = _parentModel.childFindInstanceGuid( event.target.data.instanceGuid );
-				Log.out("PanelModels.selectModel vm: " + vm );
-				if ( vm ) {
-					VoxelModel.selectedModel = vm;
-					_selectedText.text = vm.metadata.name;
-					Log.out("PanelModels.selectModel vm.metadata.name: " + vm.metadata.name );
-					// TO DO this is the right path, but probably need a custom event for this...
-					UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, vm, _parentModel, _level);
-					//_parent.childPanelAdd( _selectedModel );
-					//_parent.animationPanelAdd( _selectedModel );
-				} else
-					buttonsDisable();
+				displayModelData( instanceGuid );
 			}
 			else {
 				Log.out("PanelModels.selectModel has NO target data");
@@ -326,6 +311,26 @@ public class PanelModels extends PanelBase
 				_selectedText.text = "Nothing Selected";
 				UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, null, null, _level);
 			}
+	}
+
+	private function displayModelData( $instanceGuid:String ):void {
+		buttonsEnable();
+		var vm:VoxelModel;
+		if ( null == _parentModel )
+			vm = Region.currentRegion.modelCache.instanceGet( $instanceGuid );
+		else
+			vm = _parentModel.childFindInstanceGuid( $instanceGuid );
+		Log.out("PanelModels.selectModel vm: " + vm );
+		if ( vm ) {
+			VoxelModel.selectedModel = vm;
+			_selectedText.text = vm.metadata.name;
+			Log.out("PanelModels.selectModel vm.metadata.name: " + vm.metadata.name );
+			// TO DO this is the right path, but probably need a custom event for this...
+			UIRegionModelEvent.create( UIRegionModelEvent.SELECTED_MODEL_CHANGED, vm, _parentModel, _level);
+			//_parent.childPanelAdd( _selectedModel );
+			//_parent.animationPanelAdd( _selectedModel );
+		} else
+			buttonsDisable();
 	}
 	
 	private function buttonsDisable():void {
