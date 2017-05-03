@@ -135,11 +135,11 @@ public class MouseKeyboardHandler
 	}
 
 	static public function leftMouseDownEvent( $me:MouseEvent ):void {
-//		Log.out( "MKH.leftMouseDownEvent target: " + $me ? String($me.target) : "No target" );
+		Log.out( "MKH.leftMouseDownEvent target: " + ($me ? String($me.target) : "No target") );
 		_s_leftMouseDown = true;
 	}
 	static public function leftMouseUpEvent( $me:MouseEvent ):void {
-//		Log.out( "MKH.leftMouseUpEvent target: " + $me ? String($me.target) : "No target" );
+		Log.out( "MKH.leftMouseUpEvent target: " + ($me ? String($me.target) : "No target") );
 		CursorOperationEvent.create( CursorOperationEvent.ACTIVATE );
 		_s_leftMouseDown = false;
 	}
