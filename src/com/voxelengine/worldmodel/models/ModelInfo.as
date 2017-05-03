@@ -12,6 +12,7 @@ import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ObjectHierarchyData;
 import com.voxelengine.worldmodel.models.types.Avatar;
 import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
 
 import flash.display3D.Context3D;
@@ -73,10 +74,6 @@ public class ModelInfo extends PersistenceObject
 	public function get owner():VoxelModel 							{ return _owner; }
 	public function set owner(value:VoxelModel):void 				{ _owner = value; }
 
-	private var 		_associatedGrain:GrainCursor;						// associates the model with a grain in the parent model
-	public function get associatedGrain():GrainCursor 				{ return _associatedGrain; }
-	public function set associatedGrain(value:GrainCursor):void 	{ _associatedGrain = value;  changed = true; }
-	
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// overrideable in instanceInfo
 	// how to link this to instance info, when this is shared object???
@@ -197,8 +194,12 @@ public class ModelInfo extends PersistenceObject
 
 	public function bringOutYourDead():void {
 		for each (var deadCandidate:VoxelModel in childVoxelModels) {
-			if (true == deadCandidate.dead)
-				childRemove(deadCandidate.instanceInfo);
+			if (true == deadCandidate.dead) {
+				if ( deadCandidate.instanceInfo.associatedGrain )
+					changeOxel( deadCandidate.instanceInfo.instanceGuid, deadCandidate.instanceInfo.associatedGrain, TypeInfo.AIR );
+				else
+					childRemove(deadCandidate.instanceInfo);
+			}
 		}
 	}
 
@@ -430,11 +431,20 @@ public class ModelInfo extends PersistenceObject
 		var gc:GrainCursor;
 		var result:Boolean;
 		for each (var child:VoxelModel in childVoxelModels) {
-			if ( !child || !child.associatedGrain )
+			if ( !child || !child.instanceInfo.associatedGrain )
 				continue;
-			gc = child.associatedGrain;	
+			gc = child.instanceInfo.associatedGrain;
 			if ( gc.is_equal( $gc ) ) {
 				childVoxelModels.splice(index, 1);
+                child.instanceInfo.associatedGrainReset();
+				var oxel:Oxel = VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.childFind( $gc );
+				if ( oxel && oxel.gc.is_equal( $gc ) )
+					oxel.hasModel = false;
+				else
+					Log.out( "ModelInfo.childRemoveByGC - Can't find GC to mark for model");
+
+				changed = true;
+				child.dead = true;
 				result = true;
 				break;
 			}
@@ -560,12 +570,10 @@ public class ModelInfo extends PersistenceObject
 		// Must remove the model, and the child dependency
 		for ( var j:int = 0; j < childVoxelModels.length; j++ ) {
 			if ( childVoxelModels[j].instanceInfo ==  $ii ) {
-				if ( !childVoxelModels[j].instanceInfo.dynamicObject )
+				if (!childVoxelModels[j].instanceInfo.dynamicObject)
 					changed = true;
 				childVoxelModels.splice(j, 1);
-
 			}
-
 		}
 //		var	newChildren:Object = new Object();
 //		var i:int;
@@ -619,9 +627,6 @@ public class ModelInfo extends PersistenceObject
 	override protected function toObject():void {
 		owner.buildExportObject();
 
-		if ( null != associatedGrain )
-			dbo.associatedGrain = associatedGrain;
-		
 		// this updates the original positions, to the current positions...
 		// how do I get original location and position, on animated objects?
 		if ( childrenLoaded )
@@ -631,30 +636,30 @@ public class ModelInfo extends PersistenceObject
 
 		animationsGetSummary();
 		
-		function childrenGet():void {
-			// Same code that is in modelCache to build models in region
-			// this is just models in models
-			delete dbo.children;
-			if ( 0 < _childVoxelModels.length ) {
-				var children:Object = {};
-				for ( var i:int=0; i < _childVoxelModels.length; i++ ) {
-					var cm:VoxelModel = _childVoxelModels[i];
-					if ( null != cm ) {
-						// Don't save animation attachments!
-						if ( cm.instanceInfo.dynamicObject )
-							continue;
-						// Don't save the player as a child model
-						if ( cm is Avatar )
-							continue;
-						//children["instanceInfo" + i]  = _childrenInstanceInfo[i].toObject();
-						children[i]  = cm.instanceInfo.toObject();
-					}
-				}
-				if ( children[0] ) // since the player might be a child model
-					dbo.children = children;
+
+	}
+
+	private function childrenGet():void {
+		// Same code that is in modelCache to build models in region
+		// this is just models in models
+		delete dbo.children;
+		if ( 0 == _childVoxelModels.length )
+			return;
+
+		var children:Object = {};
+		for ( var i:int=0; i < _childVoxelModels.length; i++ ) {
+			var cm:VoxelModel = _childVoxelModels[i];
+			if ( null != cm ) {
+				// Don't save animation attachments!
+				if ( cm.instanceInfo.dynamicObject )
+					continue;
+				// Don't save the player as a child model
+				if ( cm is Avatar )
+					continue;
+				children[i]  = cm.instanceInfo.toObject();
 			}
 		}
-		
+		dbo.children = children;
 	}
 
 	private function animationsGetSummary():void {
@@ -686,7 +691,7 @@ public class ModelInfo extends PersistenceObject
 	}
 */
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	//  end persistance functions
+	//  end persistence functions
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
 	public function cloneNew( $guid:String ):ModelInfo {

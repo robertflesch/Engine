@@ -28,6 +28,9 @@ import com.voxelengine.worldmodel.TypeInfo;
 		private static const OXEL_DATA_LIGHT_INFO:uint				= 0x00000002;
 		private static const OXEL_DATA_LIGHT_INFO_CLEAR:uint		= 0xfffffffd;
 
+		private static const OXEL_DATA_UNUSED:uint				    = 0x8001f9fc; // 1000 0000 0000 0001 1111 1001 1111 1100
+		//private static const OXEL_DATA_UNUSED_CLEAR:uint		    = 0xfffffffd;
+
 		private static const OXEL_DATA_FIRE:uint					= 0x00000200;
 		private static const OXEL_DATA_FIRE_CLEAR:uint 				= 0xfffffdff;
 
@@ -37,10 +40,10 @@ import com.voxelengine.worldmodel.TypeInfo;
 		private static const OXEL_DATA_FACE_BITS_CLEAR:uint  		= 0x8181ffff;
 		private static const OXEL_DATA_CLEAR:uint					= 0x00000000;
 
-		private static const OXEL_DATA_ADDITIONAL_CLEAR:uint  		= 0x7fffffff; // used if oxel has flow or light data
-		private static const OXEL_DATA_ADDITIONAL:uint  			= 0x80000000; // used if oxel has flow or light data
+		private static const OXEL_DATA_ADDITIONAL_CLEAR:uint  		= 0x7fffffff; // deprecated - used if oxel has flow or light data
+		private static const OXEL_DATA_ADDITIONAL:uint  			= 0x80000000; // deprecated - used if oxel has flow or light data
 
-		private static const OXEL_WRITE_DATA:uint  		            = 0x7e000603; // only these bits are valid for writing
+		private static const OXEL_WRITE_DATA:uint  		            = 0x7e010603; // only these bits are valid for writing
 
 		private static const OXEL_DATA_FACES_CLEAR:uint				= 0x81ffffff;
 		private static const OXEL_DATA_FACES:uint  					= 0x7e000000;
@@ -75,7 +78,11 @@ import com.voxelengine.worldmodel.TypeInfo;
 		private static const OXEL_DATA_FACES_DIRTY_POSZ:uint		= 0x00040000;
 		private static const OXEL_DATA_FACES_DIRTY_NEGZ:uint		= 0x00020000;
 
-		// bottom 10 bits not used. Used to be type data, now stored in its own full int
+		private static const OXEL_DATA_MODEL:uint					= 0x00010000;
+		private static const OXEL_DATA_MODEL_CLEAR:uint				= 0xfffeffff;
+
+
+	// bottom 10 bits not used. Used to be type data, now stored in its own full int
 
 		private static const OXEL_DATA_TYPE_MASK_TEMP:uint			= 0xfe7fffff;
 		
@@ -93,13 +100,20 @@ import com.voxelengine.worldmodel.TypeInfo;
 				_data |= OXEL_DATA_DIRTY; 
 		}
 
+		public  function get hasModel():Boolean 		{ return 0 < (_data & OXEL_DATA_MODEL); }
+		public  function set hasModel( $val:Boolean ):void {
+			_data &= OXEL_DATA_MODEL_CLEAR;
+			if ( $val )
+				_data |= OXEL_DATA_MODEL;
+		}
+
 		protected  function get onFire():Boolean 		{ return 0 < (_data & OXEL_DATA_FIRE); }
-		protected  function set onFire( $val:Boolean ):void { 
+		protected  function set onFire( $val:Boolean ):void {
 			_data &= OXEL_DATA_FIRE_CLEAR;
 			if ( $val )
-				_data |= OXEL_DATA_FIRE; 
+				_data |= OXEL_DATA_FIRE;
 		}
-		
+
 		protected  function get addedToVertex():Boolean 		{ return 0 < (_data & OXEL_DATA_ADD_VERTEX); }
 		protected  function set addedToVertex( $val:Boolean ):void { 
 			_data &= OXEL_DATA_ADD_VERTEX_CLEAR;

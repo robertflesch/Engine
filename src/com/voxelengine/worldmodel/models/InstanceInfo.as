@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models
 {
 import com.voxelengine.events.ScriptEvent;
 import com.voxelengine.events.TransformEvent;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
 
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
@@ -106,6 +107,19 @@ public class InstanceInfo extends Location	{
 		positionSet = positionGet;
 	}
 
+	// if this model is a child of a larger model
+	private		var _associatedGrain:GrainCursor;
+	public  function get associatedGrain():GrainCursor			{ return _associatedGrain; }
+	public  function set associatedGrain( $val:GrainCursor ):void {
+		if ( null == _associatedGrain )
+			_associatedGrain = new GrainCursor();
+		_associatedGrain.copyFrom( $val );
+	}
+
+	public  function associatedGrainReset():void {
+		_associatedGrain = null;
+	}
+
 	public function get scripts():Array							{ return _scripts; }
 
 	public function InstanceInfo() {}
@@ -146,11 +160,13 @@ public class InstanceInfo extends Location	{
 		obj.instanceGuid	= instanceGuid;
 		obj.modelGuid 		= modelGuid;
 		obj.name 			= name;
+		if ( associatedGrain )
+			obj.associatedGrain	= associatedGrain.toObject();
 
 		if ( velocityGet.length )
 			obj.velocity		= vector3DToObject( velocityGet );
 		if ( usesCollision )
-			obj.usesCollision 		= usesCollision;
+			obj.usesCollision 	= usesCollision;
 		if ( collidable )
 			obj.collidable 		= collidable;
 		if ( _critical )
@@ -250,6 +266,12 @@ public class InstanceInfo extends Location	{
 
 		if ( _info.state )
 			_state = _info.state;
+
+		if ( _info.associatedGrain ) {
+			_associatedGrain = GrainCursorPool.poolGet(0);
+			_associatedGrain.fromObject( _info.associatedGrain );
+		}
+
 
 		setTransformInfo( _info );
 		setScriptInfo( _info );

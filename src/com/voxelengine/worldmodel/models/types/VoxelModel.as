@@ -85,9 +85,7 @@ public class VoxelModel
 	// This is a unique instance from the region data or server
 	protected 	var	_instanceInfo:InstanceInfo;
 	
-	// if this model is a child of a larger model
-	private		var _associatedGrain:GrainCursor;											
-	
+
 	// state data
 	private		var	_anim:Animation;
 	private		var	_camera:Camera								= new Camera();
@@ -118,13 +116,7 @@ public class VoxelModel
 	public 	function get complete():Boolean						{ return _complete; }
 	public 	function set complete(val:Boolean):void				{ _complete = val; }
 	public 	function 	 toString():String 						{ return metadata.toString() + " ii: " + instanceInfo.toString(); }
-	public  function get associatedGrain():GrainCursor			{ return _associatedGrain; }
-	public  function set associatedGrain( $val:GrainCursor ):void {  
-		if ( null == _associatedGrain )
-			_associatedGrain = new GrainCursor();
-		_associatedGrain.copyFrom( $val ); 
-	}
-	
+
 	private var 			_lastCollisionModel:VoxelModel; 											// INSTANCE NOT EXPORTED
 	public function get		lastCollisionModel():VoxelModel 		{ return _lastCollisionModel; }
 	public function set		lastCollisionModel(val:VoxelModel):void { _lastCollisionModel = val; }
@@ -649,7 +641,6 @@ public class VoxelModel
 		modelInfo.release();
 		instanceInfo.release();
 		metadata.release();	
-		associatedGrain = null;
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
