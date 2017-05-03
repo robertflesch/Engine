@@ -99,9 +99,26 @@ public class GrainCursor
 		_gy = gy;
 		_gz = gz;
 		grain = g;
-		
 	}
-	
+
+	public function toObject():Object {
+		var obj:Object = {};
+		obj.gx = _gx;
+		obj.gy = _gy;
+		obj.gz = _gz;
+		obj.grain = grain;
+		obj.bound = bound;
+		return obj;
+	}
+
+	public function fromObject( $obj:Object ):void {
+		_gx = $obj.gx;
+		_gy = $obj.gy;
+		_gz = $obj.gz;
+		bound = $obj.bound;
+		grain = $obj.grain;
+	}
+
 	[inline]
 	public static function roundToInt( x:Number, y:Number, z:Number, gct:GrainCursor ):void
 	{
