@@ -186,7 +186,7 @@ import flash.geom.Vector3D;
 		 
 		public static function ARGBToHex(a:uint, r:uint, g:uint, b:uint):uint
 		{
-			var hex:uint = (a << 25 | r << 16 | g << 8 | b);
+			var hex:uint = (a << 24 | r << 16 | g << 8 | b);
 			return hex;
 		}
 		

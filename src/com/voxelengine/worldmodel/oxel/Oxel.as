@@ -326,7 +326,10 @@ public class Oxel extends OxelBitfields
 			
 		if ( $gc.is_equal( gc ) )
 			return this;
-			
+
+		if ( hasModel ) // Don't allow sub oxel if it has a model
+			return this;
+
 		if ( !childrenHas() )
 		{
 			// become octa-mom
@@ -357,7 +360,10 @@ public class Oxel extends OxelBitfields
 			Log.out( "Oxel.childFind - Looking for a larger grain within a smaller grain");
 			return Globals.BAD_OXEL;
 		}
-			
+
+		if ( hasModel )
+			return this;
+
 		if ( $gc.is_equal( gc ) ) 
 			return this;
 
@@ -1588,6 +1594,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			if ( gc.evalGC( Globals.g_oxelBreakData ) )
 				trace( "Oxel.quadsBuildTerminal - setGC breakpoint" );
 
+		if ( type == 125 )
+				return;
 		if ( facesHas() ) {
 			if ( null == _quads )
 				_quads = QuadsPool.poolGet();
@@ -3466,6 +3474,12 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 
-
+	public function minimumOxelForModel():Oxel {
+		if ( hasModel )
+				return this;
+		if ( parent )
+				return parent.minimumOxelForModel();
+		return null;
+	}
 } // end of class Oxel
 } // end of package

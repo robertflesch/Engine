@@ -101,7 +101,8 @@ public class Renderer extends EventDispatcher
 		//Context3DProfile.BASELINE_CONSTRAINED
 		Log.out( "Renderer.init - requestContext3D Profile: Context3DProfile.BASELINE_CONSTRAINED", Log.DEBUG );	
 		// http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display3D/Context3DProfile.html
-		stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE_CONSTRAINED);
+		stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.STANDARD_EXTENDED);
+		//stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE_CONSTRAINED);
 		//stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE);
 	}
 	

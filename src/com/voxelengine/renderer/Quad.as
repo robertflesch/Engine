@@ -392,13 +392,13 @@ public class Quad {
 			components[componentIndex++].setNums( u, v, $grain );
 		}
 	
-		// va3
+		// va2
 		if ( null == components[componentIndex] )
 			components[componentIndex++] = new ColorUINT( tint );
 		else	
 			components[componentIndex++].setUint( tint );
 
-		// va4
+		// va3
 		if ( null == components[componentIndex] )
 			components[componentIndex++] = new ColorUINT( light );
 		else	

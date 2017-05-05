@@ -102,7 +102,7 @@ package com.voxelengine.renderer.shaders
 					"mov vt1, vc12.xy",       // move the transformed UV offset
 
 					"add v0, va1.xy, vt1.xy", // add in the UV offset (va1) and the animated offset (vc12/vt1) (may be 0 for non animated), and put in v0 which holds the UV offset
-					"mov v1, va2",        	// pass texture color and brightness (va3) to the fragment shader via v1
+					"mov v1, va2",        	// pass texture tint (va2) to the fragment shader via v1
 
 					// the transformed vertices without the camera data
 	//				"mov v3, vt0",       	// no no no
@@ -110,7 +110,7 @@ package com.voxelengine.renderer.shaders
 	//				"m44 v3, va0, vc0",  	// works great for default. Not for translated cube
 	//				"m44 v3, va0, vc4",  	// works great for default. Not for translated cube
 					"m44 v3, va0, vc8",  	// the transformed vertices with out the camera data, works great for default AND for translated cube, rotated cube broken still
-					"mov v4, va3",        	// pass light color and brightness (va3) to the fragment shader via v4
+					"mov v4, va3",        	// pass composite light color (va3) to the fragment shader via v4
 
 					//"m44 v5, va2, vc4",  	// transform vertex normal, send to fragment shader
 					// A non working method for a generated normal
@@ -121,7 +121,7 @@ package com.voxelengine.renderer.shaders
 				_vertexShaderAssembler.assemble(Context3DProgramType.VERTEX, vertexShader.join("\n"));
 			}
 			
-			// This uses 4 peices of data from vertex shader
+			// This uses 4 pieces of data from vertex shader
 			// v0 holds the offset UV data
 			// v1 holds the texture color and brightness
 			// v2 holds the rotated normal data for the triangle
@@ -151,14 +151,17 @@ package com.voxelengine.renderer.shaders
 					// Fix for Pre-Multiplied Alpha in PNGs
 					// Wow, gives really strange effect
 					//"div ft0.rgb, ft0.rgb, ft0.a",  // un-premultiply png
+
+					////////////////
+					////////////////
 					
 					/////////////////////////////////////////////////
 					// TINT on base texture
-					"mul ft0.xyz, v1.xyz, ft0.xyz", // mutliply by texture tint - v1.xyz
+					"mul ft0.xyz, v1.xyz, ft0.xyz", // multiply by texture tint - v1.xyz
 					/////////////////////////////////////////////////
 					
 					/////////////////////////////////////////////////
-					// light from brightness
+					// composite light data
 					"mul ft4.xyz, v4.xyz, ft0.xyz", // modify the texture by multiplying by the light color
 					/////////////////////////////////////////////////
 					

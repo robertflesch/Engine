@@ -20,6 +20,8 @@ When deleting a model that has inventory, make sure to delete its inventory.
 ! 12.1.16 need to add clipVelocity and speedMultiplier to rest of the animations, and to the setState, so that they are not hard coded.
 ! 12.4.16 static lighting on head of dragon
 
+For voice
+https://wiki.mumble.info/wiki/Main_Page
 
 
 https://news.ycombinator.com/item?id=14149570
@@ -37,3 +39,17 @@ C9389DB5-7A87-A5D8-2495-445D8391CDC1 - Pistol
 What is VoxelVerse.
 
 My goal is to create a platform we everyone is able to create and share 3D models.
+
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelbuildComplete );
+		function oxelbuildComplete( $ode:OxelDataEvent ):void {
+			if ( $ode.modelGuid == guid ) {
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelbuildComplete );
+				if ( $ode.oxelData )
+					bound = $ode.oxelData.bound;
+				else
+					Log.out( "ModelMetadata.oxelBuildComplete - ERROR no oxelData found", Log.WARN );	
+				
+				save();
+			}
+		}
+

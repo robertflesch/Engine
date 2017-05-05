@@ -15,6 +15,7 @@ public class GrainCursorIntersection
 {
 	public var point:Vector3D = new Vector3D();
 	public var wsPoint:Vector3D = new Vector3D();
+	public var invalid:Boolean = false;
 	public var oxel:Oxel = null;
 	public var model:VoxelModel = null;
 	public var gc:GrainCursor = new GrainCursor();

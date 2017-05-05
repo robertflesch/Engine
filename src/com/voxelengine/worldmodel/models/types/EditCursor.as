@@ -81,39 +81,20 @@ public class EditCursor extends VoxelModel
 	
 	static public function get currentInstance():EditCursor {
 		if ( null == _s_currentInstance ) {
+
 			var instanceInfo:InstanceInfo = new InstanceInfo();
 			instanceInfo.modelGuid = EDIT_CURSOR;
 			_s_currentInstance= new EditCursor( instanceInfo );
+
 			var metadata:ModelMetadata = new ModelMetadata( EDIT_CURSOR );
 			metadata.permissions.modify = false;
 			var modelInfo:ModelInfo = new ModelInfo( EDIT_CURSOR, null, {} );
 			_s_currentInstance.init( modelInfo, metadata );
+
 			var creationInfo:Object = GenerateOxel.cubeScript( 4, TypeInfo.BLUE );
 			creationInfo.modelClass = "EDIT_CURSOR";
 			creationInfo.name = "EDIT_CURSOR";
 			OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, true, true, creationInfo );
-/*
-			newModel.modelInfo.oxelPersistence = new OxelPersistence( EDIT_CURSOR, null, Oxel.COMPRESSED_REFERENCE_BA_SQUARE );
-			newModel.modelInfo.oxelPersistence.bound = 4;
-			newModel.modelInfo.oxelPersistence.loadFromByteArray();
-*/
-			//_s_currentInstance = VoxelModel.cubeModel( EDIT_CURSOR, EditCursor ) as EditCursor;
-			/*
-			var instanceInfo:InstanceInfo = new InstanceInfo();
-			instanceInfo.modelGuid = EDIT_CURSOR
-			_s_currentInstance = new EditCursor( instanceInfo );
-
-			var metadata:ModelMetadata = new ModelMetadata( EDIT_CURSOR );
-			metadata.permissions.modify = false;
-
-			var mi:Object = new Object();
-			mi.modelClass = EDIT_CURSOR;
-			mi.fileName = EDIT_CURSOR;
-			var modelInfo:ModelInfo = new ModelInfo( EDIT_CURSOR, null, mi );
-
-			_s_currentInstance.init( modelInfo, metadata );
-			_s_currentInstance.modelInfo.createEditCursor( EDIT_CURSOR, Oxel.COMPRESSED_REFERENCE_BA_SQUARE );
-			*/
 		}
 		return _s_currentInstance;
 	}
@@ -341,7 +322,16 @@ public class EditCursor extends VoxelModel
 		var gct:GrainCursor = GrainCursorPool.poolGet( $gciData.model.modelInfo.oxelPersistence.bound );
 		GrainCursor.roundToInt( $gciData.point.x, $gciData.point.y, $gciData.point.z, gct );
 		// we have to make the grain scale up to the size of the edit cursor
-		gct.become_ancestor( modelInfo.oxelPersistence.oxel.gc.grain );
+		if ( $gciData.invalid ) {
+			$gciData.invalid = false;
+			//modelInfo.oxelPersistence.oxel.gc.bound = $gciData.oxel.gc.bound;
+			//modelInfo.oxelPersistence.oxel.gc.grain = $gciData.oxel.gc.grain;
+			gct.become_ancestor( gciData.oxel.gc.grain );
+			modelInfo.oxelPersistence.oxel.gc.bound = gciData.oxel.gc.bound;
+			modelInfo.oxelPersistence.oxel.gc.grain = gciData.oxel.gc.grain;
+		} else {
+			gct.become_ancestor( modelInfo.oxelPersistence.oxel.gc.grain );
+		}
 		_gciData.gc.copyFrom( gct );
 		GrainCursorPool.poolDispose( gct );
 	}
@@ -443,19 +433,12 @@ public class EditCursor extends VoxelModel
 			modelInfo.oxelPersistence.oxel.faceSet( Globals.NEGZ );
 		}
 		
-		if ( !modelInfo.oxelPersistence.oxel.lighting ) {
-			modelInfo.oxelPersistence.oxel.lighting = LightingPool.poolGet(0xff);
-		}
 		var li:LightInfo = modelInfo.oxelPersistence.oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
 		if ( null == li ) {
 			modelInfo.oxelPersistence.oxel.lighting.add(modelInfo.oxelPersistence.oxel.chunkGet().lightInfo);
 			li = modelInfo.oxelPersistence.oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
 		}
-		modelInfo.oxelPersistence.oxel.lighting.setAll( Lighting.DEFAULT_LIGHT_ID, Lighting.MAX_LIGHT_LEVEL );
-		modelInfo.oxelPersistence.oxel.write( EDIT_CURSOR, modelInfo.oxelPersistence.oxel.gc, oxelTexture, true );
-
-		if ( null == li )
-			Log.out( "EditCursor - LightInfo is bad", Log.WARN);
+		li.setIlluminationLevel( LightInfo.MAX );
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
 			li.color = cursorColorRainbow();
 		else if ( CursorOperationEvent.INSERT_OXEL == cursorOperation && EDITCURSOR_INVALID == oxelTexture )
@@ -464,7 +447,11 @@ public class EditCursor extends VoxelModel
 			li.color = 0x00ff0000; // RED for invalid
 		else
 			li.color = 0xffffffff;
-		
+
+		li.color = 0x00ff0000; // RED for invalid
+		modelInfo.oxelPersistence.oxel.write( EDIT_CURSOR, modelInfo.oxelPersistence.oxel.gc, oxelTexture, true );
+
+
 		modelInfo.oxelPersistence.oxel.quadsBuild();
 
 		function cursorColorRainbow():uint {
@@ -477,6 +464,7 @@ public class EditCursor extends VoxelModel
 			color |= green << 8;
 			color |= blue << 0;
 			_phase += 0.03;
+			//trace( "cursorColorRainbow color: " + color );
 			return color;
 		}
 	}
@@ -530,7 +518,7 @@ public class EditCursor extends VoxelModel
 			ii.controllingModel = VoxelModel.selectedModel;
 			// This places an oxel that is invisible, but collidable at the same location as the model
 			// This should lock the model to that location, otherwise the oxel is invalid.
-			VoxelModel.selectedModel.write( _pl.gc, 99 );
+			VoxelModel.selectedModel.write( _pl.gc, 125 );
 			// This adds a link from the model to the placement location
 			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelInsertComplete );			
 		}
@@ -543,7 +531,12 @@ public class EditCursor extends VoxelModel
 		function modelInsertComplete( $mle:ModelLoadingEvent ): void {
 			if ( $mle.data.modelGuid == ii.modelGuid && $mle.vm.instanceInfo.instanceGuid == ii.instanceGuid ) {
 				Log.out( "EditCursor.insertModel - Set associated grain here", Log.WARN );
-				$mle.vm.associatedGrain = _pl.gc;
+				$mle.vm.instanceInfo.associatedGrain = _pl.gc;
+				var oxel:Oxel = VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.childFind( _pl.gc );
+				if ( oxel )
+					oxel.hasModel = true;
+				else
+					Log.out( "EditCursor.insertModel - Can't find GC to mark for model");
 			}
 		}
 	}

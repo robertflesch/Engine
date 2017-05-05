@@ -240,7 +240,7 @@ public class VoxelVerse extends Sprite
 		//Log.out( "VoxelVerse.mouseLeave" );
 		Globals.active = false;
 		VoxelVerseGUI.currentInstance.crossHairInactive();
-		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE, 0 ) );
+//		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE, 0 ) );
 
 		MemoryManager.update();
 		MouseKeyboardHandler.reset();

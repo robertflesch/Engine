@@ -12,7 +12,9 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.TypeInfo;
-	import flash.geom.Matrix3D;
+import com.voxelengine.worldmodel.oxel.Oxel;
+
+import flash.geom.Matrix3D;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
@@ -118,9 +120,19 @@ package com.voxelengine.worldmodel.models
 
 					_gci = _totalIntersections.shift();
 					/////////////////////////////////////////
-					if ( _gci )
-					{
+					if ( _gci ) {
+						if ( ! _gci.oxel ) {
+							Log.out( "ModelCacheUtil.highLightEditableOxel - Why no oxel?")
+						}
 						//_gci.point = editableModel.worldToModel( _gci.point );
+						if ( _gci.oxel ) {
+							var modelOxel:Oxel = _gci.oxel.minimumOxelForModel();
+							if ( modelOxel  ){
+								//_gci.gc.copyFrom( modelOxel.gc );
+								//_gci.oxel = modelOxel;
+								_gci.invalid = true;
+							}
+						}
 						EditCursor.currentInstance.gciDataSet( _gci );
 					}
 					else	

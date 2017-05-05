@@ -25,7 +25,6 @@ public final class ProjectilePoolType
 	private var _growthValue:uint 
 	private var _counter:uint 
 	private var _pool:Vector.<Projectile> 
-	private var _projectileGuid:String
 	private var _modelInfo:ModelInfo
 	private var _modelMetadata:ModelMetadata
 	
@@ -54,25 +53,28 @@ public final class ProjectilePoolType
 		
 		// I dont like that I create new metadata and _modelInfo for each projectile.
 		// I should be able to create instances
-		_projectileGuid = Globals.getUID();
 		//throw new Error( "Need to refactor this, I broke it when I added the island generation" );
 		// This is a special case for _modelInfo, the _modelInfo its self is contained in the generate script
 
-        _modelMetadata = new ModelMetadata( PROJECTILE );
+        _modelMetadata = new ModelMetadata( PROJECTILE + $type );
         _modelMetadata.permissions.modify = false;
-        _modelMetadata.dynamicObj = true;
-        _modelMetadata.name = _projectileGuid;
-        _modelMetadata.description = _projectileGuid + " - GENERATED";
+        _modelMetadata.doNotPersist = true;
+        _modelMetadata.name = PROJECTILE  + $type;
+        _modelMetadata.description = PROJECTILE + $type + " - GENERATED";
         _modelMetadata.owner = "";
-        var creationInfo:Object = GenerateOxel.cubeScript( 4, TypeInfo.BLUE );
-        creationInfo.modelClass = "PROJECTILE";
-        creationInfo.name = "EDIT_CURSOR";
+
+        //creationInfo.name = "EDIT_CURSOR";
         //_modelInfo = new ModelInfo( _projectileGuid, null, GenerateOxel.cubeScript( 2, TypeInfo.BLUE ) );
         //_modelInfo = new ModelInfo( PROJECTILE, null, creationInfo );
-        _modelInfo = new ModelInfo( PROJECTILE, null, {} );
-        _modelInfo.dynamicObj = true;
+        _modelInfo = new ModelInfo( PROJECTILE + $type, null, {} );
+        _modelInfo.doNotPersist = true;
+
+		var creationInfo:Object = GenerateOxel.cubeScript( 4, TypeInfo.BLUE );
+		creationInfo.modelClass = "PROJECTILE";
         OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, _modelInfo.guid, null, true, true, creationInfo );
 
+		if ( Globals.isGuid( _modelInfo.guid ) )
+				Log.out( "IsGuid");
 //		var ba:ByteArray  = Oxel.generateCube( _projectileGuid, _modelInfo.biomes.layers[0], false );
 //		_modelInfo.oxelPersistence = new OxelPersistence( _projectileGuid, null, ba );
 //		_modelInfo.oxelPersistence.loadFromByteArray();
@@ -82,7 +84,7 @@ public final class ProjectilePoolType
 	private function newModel():Projectile {	
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.instanceGuid = Globals.getUID();
-		ii.modelGuid = _projectileGuid;
+		ii.modelGuid = _modelInfo.guid;
 		ii.usesCollision = true;
 		ii.dynamicObject = true;
 		var vm:Projectile = new Projectile( ii );

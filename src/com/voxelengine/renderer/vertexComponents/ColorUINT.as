@@ -23,12 +23,10 @@ public class ColorUINT extends VertexComponent {
 		_ABGR = ColorUtils.convertRGBAToABGR( $RGBA );
 	}
 	
-	override public function setUint( $argb:uint ):void {
-
-		_ABGR = ColorUtils.convertRGBAToABGR( $argb );
+	override public function setUint( $RGBA:uint ):void {
+		_ABGR = ColorUtils.convertRGBAToABGR( $RGBA );
 	}
-	
-	
+
 	override public function writeToByteArray( $ba:ByteArray ):void {
 		$ba.writeUnsignedInt( _ABGR );
 	}

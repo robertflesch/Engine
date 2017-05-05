@@ -40,8 +40,7 @@ public final class PoolManager
 			// These two should always be the same
 			GrainCursorPool.initialize( INITIAL_POOL_SETTINGS * 6, INITIAL_POOL_SETTINGS * 2 );
 			OxelPool.initialize( INITIAL_POOL_SETTINGS * 6, INITIAL_POOL_SETTINGS );
-			//ParticlePool.initialize( INITIAL_POOL_SETTINGS/1000, INITIAL_POOL_SETTINGS/200 );
-			ProjectilePool.initialize( INITIAL_POOL_SETTINGS/1000, INITIAL_POOL_SETTINGS/200 );
+			ParticlePool.initialize( Math.max( 10, INITIAL_POOL_SETTINGS/10000), Math.max( 10, INITIAL_POOL_SETTINGS/10000) );
 		}
 	}
 
