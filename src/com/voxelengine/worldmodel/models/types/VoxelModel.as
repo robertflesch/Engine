@@ -48,8 +48,10 @@ import com.voxelengine.worldmodel.scripts.Script;
  * @author Robert Flesch - RSF
  * The world model holds the active oxels
  */
-public class VoxelModel
-{
+public class VoxelModel {
+	//static public const MODEL_VOXEL:String = "MODEL_VOXEL";
+	static public function getAnimationClass():String { return null; }
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////////
 	private static var _s_controlledModel:VoxelModel = null;
 	public static function get controlledModel():VoxelModel { return _s_controlledModel; }
@@ -1228,8 +1230,6 @@ public class VoxelModel
 		modelInfo.oxelPersistence.visitor( VisitorFunctions.rebuildLightingRecursive, "Oxel.rebuildLightingRecursive" );
 		var children:Vector.<VoxelModel> = modelInfo.childVoxelModelsGet();
 		for each ( var child:VoxelModel in children ) {
-			if ( child.metadata.name == "DragonHead" )
-				Log.out( "VoxelModel.CHECK THIS OUT" );
 			child.rebuildLightingHandler();
 		}
 	}

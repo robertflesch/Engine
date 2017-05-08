@@ -7,12 +7,15 @@
 ==============================================================================*/
 package com.voxelengine.server
 {
-	import com.voxelengine.events.LoadingImageEvent;
+import com.voxelengine.GUI.components.ComponentComboBoxWithLabel;
+import com.voxelengine.events.LoadingImageEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.events.WindowSplashEvent;
 	import com.voxelengine.GUI.components.VVTextInput;
 	import com.voxelengine.GUI.VoxelVerseGUI;
 import com.voxelengine.renderer.Renderer;
+
+import org.flashapi.swing.list.ListItem;
 
 //import com.voxelengine.GUI.WindowSplash;
 	import flash.display.Bitmap;
@@ -54,7 +57,7 @@ import com.voxelengine.renderer.Renderer;
 		{
 			super( "Login" );
 			width = 309;
-			height = 336;
+			height = 366;
 			tabEnabled = false;
 			tabIndex = -1;
 			layout.orientation = LayoutOrientation.VERTICAL;
@@ -164,12 +167,32 @@ import com.voxelengine.renderer.Renderer;
 			buttonPanel.addElement( lostPasswordButton );
 			
 			addElement( buttonPanel );
+
+			var dropDownPanel:Container = new Container( width, buttonHeight );
+
+			var servers:Vector.<String> = new Vector.<String>();
+			var configs:Vector.<ServerConfigObject> = ServerConfig.configListGet();
+			for each ( var obj:Object in configs ) {
+				servers.push( obj.name );
+			}
+			dropDownPanel.addElement( new ComponentComboBoxWithLabel( "Choose Server"
+					, changeServer
+					, servers[0]
+					, servers
+					, configs
+					, width ) );
+			addElement( dropDownPanel );
+
 			
 			display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
 		}
-		
+
+		private function changeServer( $le:ListEvent ):void {
+			var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex )
+			ServerConfig.configSetCurrent( li.data );
+		}
 		private function closeFunction():void {
 			// This forces the shutdown of the spalsh screen.
 			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );

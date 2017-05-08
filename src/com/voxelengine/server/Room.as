@@ -17,8 +17,6 @@ import com.voxelengine.events.RoomEvent;
 
 public class Room
 {
-	static public var _guid:String;
-	
 	static private var _connection:Connection = null;
 	static public function connection():Connection { return _connection; }
 	
@@ -28,29 +26,28 @@ public class Room
 		LoadingImageEvent.create( LoadingImageEvent.CREATE );
 		RoomConnection.removeEventHandlers( _connection );
 		
-		//Set developmentsever (Comment out to connect to your server online)
-		//trace( "joinRoom: " + Network.client.multiplayer.developmentServer );
-		//Network.client.multiplayer.developmentServer = "localhost:8184";
-		//trace( "joinRoom: " + Network.client.multiplayer.developmentServer );
-		
-		// Save the region id for when we need to load the region.
-		_guid = $guid;
-		
-		//trace("Room.joinRoom - trying to join room at host: " + Network.client.multiplayer.developmentServer );
+		//Set developmentServer (Comment out to connect to your server online)
+		if ( ServerConfig.configGetCurrent().localServer ) {
+			trace( "joinRoom: start " + Network.client.multiplayer.developmentServer );
+			Network.client.multiplayer.developmentServer = "localhost:8184";
+			trace( "joinRoom: end " + Network.client.multiplayer.developmentServer );
+		}
+
+		//trace("Room.joinRoom - trying to join room at host: " + Network.client.multi-player.developmentServer );
 		//Create pr join the room test
 		//public function createJoinRoom (roomId:String, roomType:String, visible:Boolean, roomData:Object, joinData:Object, callback:Function=null, errorHandler:Function=null) : void;
 		Network.client.multiplayer.createJoinRoom(
-			_guid,								//Room id. If set to null a random roomid is used
-			"VoxelVerse",						//The game type started on the server
+			$guid,								//Room id. If set to null a random roomId is used
+			ServerConfig.configGetCurrent().gameType, //The game type started on the server
 			false,								//Should the room be visible in the lobby?
-			{},									//Room data. This data is returned to lobby list. Variabels can be modifed on the server
+			{},									//Room data. This data is returned to lobby list. Variables can be modified on the server
 			{},									//User join data
 			handleJoin,							//Function executed on successful joining of the room
 			handleJoinError						//Function executed if we got a join error
 		);
 		
 		function handleJoin(connection:Connection):void {
-			Log.out("Room.handleJoin. Sucessfully joined Room", Log.DEBUG );
+			Log.out("Room.handleJoin. Successfully joined Room", Log.DEBUG );
 			_connection = connection;
 			
 			//Add disconnect listener
@@ -58,14 +55,14 @@ public class Room
 			
 			RoomConnection.addEventHandlers( _connection );
 			Globals.inRoom = true;
-			RoomEvent.dispatch( new RoomEvent( RoomEvent.ROOM_JOIN_SUCCESS, null, _guid ) );
+			RoomEvent.dispatch( new RoomEvent( RoomEvent.ROOM_JOIN_SUCCESS, null, $guid ) );
 			
 			// This disconnection from room server - Tested - RSF 9.6.14
 			function handleDisconnect():void {
 				Log.out ("Room.handleDisconnect - Disconnected from server", Log.WARN );
 				RoomConnection.removeEventHandlers( _connection );
 				Globals.inRoom = false;
-				RoomEvent.dispatch( new RoomEvent( RoomEvent.ROOM_DISCONNECT, null, _guid ) );
+				RoomEvent.dispatch( new RoomEvent( RoomEvent.ROOM_DISCONNECT, null, $guid ) );
 			}
 			LoadingImageEvent.create( LoadingImageEvent.DESTROY );
 		}
@@ -74,7 +71,7 @@ public class Room
 		{
 			Log.out( "Room.handleJoinError - Join Room Error: " + error.message, Log.ERROR, error );
 			Globals.inRoom = false;
-			RoomEvent.dispatch( new RoomEvent( RoomEvent.ROOM_JOIN_FAILURE, error, _guid ) );
+			RoomEvent.dispatch( new RoomEvent( RoomEvent.ROOM_JOIN_FAILURE, error, $guid ) );
 			LoadingImageEvent.create( LoadingImageEvent.DESTROY );
 		}
 	}

@@ -169,7 +169,7 @@ import flash.display.Bitmap;
 		
 		private function captchaLoad():void {
 			addElement( new Image( _retrievingCaptcha, 270, 108, true ) ); // element 5
-			PlayerIO.quickConnect.simpleGetCaptcha( Globals.GAME_ID, CAPTCHA_WIDTH, CAPTCHA_HEIGHT, captchaReceive, captchaFailure );
+			PlayerIO.quickConnect.simpleGetCaptcha( ServerConfig.configGetCurrent().key, CAPTCHA_WIDTH, CAPTCHA_HEIGHT, captchaReceive, captchaFailure );
 		}
 		
 		private var _ci:Container
@@ -276,7 +276,7 @@ import flash.display.Bitmap;
 		}		
 		
 		private function captchaReload($event:UIMouseEvent):void {
-			PlayerIO.quickConnect.simpleGetCaptcha( Globals.GAME_ID, CAPTCHA_WIDTH, CAPTCHA_HEIGHT, captchaReReceive, captchaFailure );
+			PlayerIO.quickConnect.simpleGetCaptcha( ServerConfig.configGetCurrent().key, CAPTCHA_WIDTH, CAPTCHA_HEIGHT, captchaReReceive, captchaFailure );
 
 		}		
 		
@@ -301,7 +301,7 @@ import flash.display.Bitmap;
 			Log.out( "userName: " + _userName + "  password: " + _password + "  email:" + _email, Log.DEBUG );
 			PlayerIO.quickConnect.simpleRegister(
 									Globals.g_app.stage,
-									Globals.GAME_ID,
+									ServerConfig.configGetCurrent().key,
 									_userName,
 									_password,
 									_email,
@@ -335,7 +335,7 @@ import flash.display.Bitmap;
 			Log.out( "userName: " + _userName + "  password: " + _password + "  email:" + _email, Log.DEBUG );
 			PlayerIO.quickConnect.simpleRegister(
 									Globals.g_app.stage,
-									Globals.GAME_ID,
+									ServerConfig.configGetCurrent().key,
 									_userName,
 									_password,
 									_email,

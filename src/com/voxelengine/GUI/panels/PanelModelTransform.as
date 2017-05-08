@@ -77,7 +77,7 @@ public class PanelModelTransform extends ExpandableBox
 		
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 4 ) )
 		
-		_itemBox.addElement( new ComponentComboBoxWithLabel( "Transform type", typeChanged, ModelTransform.typeToString( _mt.type ), ModelTransform.typesList(), _itemBox.width ) )
+		_itemBox.addElement( new ComponentComboBoxWithLabel( "Transform type", typeChanged, ModelTransform.typeToString( _mt.type ), ModelTransform.typesList(), ModelTransform.typesList(), _itemBox.width ) )
 		_itemBox.addElement( new ComponentLabelInput( "time (ms)"
 											  , timeChanged
 											  , _mt.originalTime ? String( _mt.originalTime ) : "Missing time"
