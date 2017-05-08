@@ -78,7 +78,7 @@ public class Globals  {
 
 	public static var g_underwater:Boolean
 	public static var g_oxelBreakEnabled:Boolean
-	public static var g_oxelBreakData:GrainCursor = new GrainCursor()
+	public static var g_oxelBreakData:GrainCursor = new GrainCursor();
 	public static function oxelBreakDataSet( $gc:GrainCursor ):void { g_oxelBreakData.bound = $gc.grain; g_oxelBreakData.set_values( $gc.grainX, $gc.grainY, $gc.grainZ, $gc.grain ); g_oxelBreakEnabled = true }
 	public static function oxelBreakDataReset():void { g_oxelBreakData.set_values( 0,0,0,0 ); g_oxelBreakEnabled = false }
 
@@ -86,8 +86,7 @@ public class Globals  {
 	public static function get taskController():TaskController { return g_taskController; }
 
 	public static var GAME_ID:String = "voxelverse-lpeje46xj0krryqaxq0vog";
-	public static var GAME_ID_DEV:String = "voxelversedev-yeiensar20ofthu906l6ma"
-	//public static var g_gamesNetworkID:String = "servertestgame-co3lwnb10a4ytwvxddjtq";
+	public static var GAME_ID_DEV:String = "voxelversedev-yeiensar20ofthu906l6ma";
 
 	private static var g_debug:Boolean  = false;
 	public static function get isDebug():Boolean  { return g_debug };
