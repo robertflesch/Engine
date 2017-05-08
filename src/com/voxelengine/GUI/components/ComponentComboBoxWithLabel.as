@@ -17,7 +17,7 @@ public class ComponentComboBoxWithLabel extends Box
 {
 	private var _cbType:ComboBox  = new ComboBox()
 	
-	public function ComponentComboBoxWithLabel( $label:String, $changeHandler:Function, $initialValue:String, $types:Vector.<String>, $width:int, $height:int = 35, $padding:int = 2 )
+	public function ComponentComboBoxWithLabel( $label:String, $changeHandler:Function, $initialValue:String, $types:Vector.<String>, data:*, $width:int, $height:int = 35, $padding:int = 2 )
 	{
 		super( $width, $height );
 		addElement( new Label( $label, int($width * 0.35) ) );
@@ -28,9 +28,9 @@ public class ComponentComboBoxWithLabel extends Box
 		borderStyle = BorderStyle.NONE;
 		
 		_cbType.autoSize = false;
-		_cbType.width = int($width * 0.60)
-		for each ( var item:String in $types ) {
-			_cbType.addItem( item );
+		_cbType.width = int($width * 0.60);
+		for ( var i:int = 0; i < $types.length; i++ ) {
+			_cbType.addItem( $types[i], data[i] );
 		}
 		for ( var j:int; j < $types.length; j++ ) {
 			if ( $types[j] == $initialValue )
