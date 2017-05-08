@@ -1,6 +1,3 @@
-/**
- * Created by dev on 12/9/2016.
- */
 /*==============================================================================
  Copyright 2011-2017 Robert Flesch
  All rights reserved.  This product contains computer programs, screen
