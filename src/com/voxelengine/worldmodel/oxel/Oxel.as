@@ -12,7 +12,6 @@ import com.adobe.utils.Hex;
 
 import flash.geom.Point;
 import flash.geom.Vector3D;
-import flash.net.registerClassAlias;
 import flash.utils.ByteArray;
 import flash.utils.getTimer;
 
@@ -47,7 +46,7 @@ public class Oxel extends OxelBitfields
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	static public const COMPRESSED_REFERENCE_BA_SQUARE:ByteArray	= Hex.toArray( "78:da:cb:2c:cb:35:30:b0:48:61:00:02:96:7f:0c:60:90:c1:90:c0:c0:f0:1f:0a:18:a0:80:11:42:00:45:8c:a1:00:00:e2:da:10:a2" );
-	static public const REFERENCE_BA_SQUARE:ByteArray 			= Hex.toArray( "69:76:6d:30:30:38:64:00:00:00:00:04:fe:00:00:00:00:00:00:68:00:60:00:00:ff:ff:ff:ff:ff:ff:ff:ff:00:00:00:00:00:00:00:00:01:00:00:00:00:01:00:ff:ff:ff:33:33:33:33:33:33:33:33" );
+	//static public const REFERENCE_BA_SQUARE:ByteArray 			= Hex.toArray( "69:76:6d:30:30:38:64:00:00:00:00:04:fe:00:00:00:00:00:00:68:00:60:00:00:ff:ff:ff:ff:ff:ff:ff:ff:00:00:00:00:00:00:00:00:01:00:00:00:00:01:00:ff:ff:ff:33:33:33:33:33:33:33:33" );
 
 	private static const OXEL_CHILD_COUNT:int = 8;
 	
@@ -62,7 +61,7 @@ public class Oxel extends OxelBitfields
 	static private 		var _s_scratchVector:Vector3D 					= null;
 
 	static private 		var _s_nodes:int 								= 0;
-	static private 		var _aliasInitialized:Boolean					= false; // used to only register class names once
+	//static private 		var _aliasInitialized:Boolean					= false; // used to only register class names once
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//     Member Variables
@@ -215,20 +214,13 @@ public class Oxel extends OxelBitfields
 		return true;
 	}
 	
-	static public function initializeRoot( $grainBound:int ):Oxel
-	{
-		try {
-			var gct:GrainCursor = GrainCursorPool.poolGet( $grainBound );
-			gct.grain = $grainBound;
-			var oxel:Oxel = OxelPool.poolGet();
-			oxel.initialize(null, gct, 0, TypeInfo.AIR);
-			GrainCursorPool.poolDispose( gct );
-		}
-		catch (e:Error) {
-			Log.out( "Oxel.initialize_root_oxel - grain: " + oxel.gc.grain );					
-		}
+	static public function initializeRoot( $grainBound:int ):Oxel {
+		var gct:GrainCursor = GrainCursorPool.poolGet( $grainBound );
+		gct.grain = $grainBound;
+		var oxel:Oxel = OxelPool.poolGet();
+		oxel.initialize(null, gct, 0, TypeInfo.AIR);
+		GrainCursorPool.poolDispose( gct );
 		return oxel;
-		//Log.out( "VoxelModel.initialize_root_oxel - instanceInfo.guid: " + instanceInfo.guid + " grain: " + gc.grain + "(" + oxel.size_in_world_coordinates() + ") out of " + Globals.Info[type].name );					
 	}
 	
 	// This is used to initialize all oxel nodes that are read from the byte array
@@ -1415,7 +1407,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	
 	// returns true if face is required
 	// works like a charm!
-	public function faceAlphaNeedsFace( $face:int, $type:int, $no:Oxel ):Boolean	{
+	static public function faceAlphaNeedsFace( $face:int, $type:int, $no:Oxel ):Boolean	{
 
 		//	we only need a face here is the nieghbor is alpha of a different type
 		if ( !$no.childrenHas() ) {
@@ -1440,7 +1432,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 	// returns true if face is required
 	// works like a charm!
-	public function faceAlphaOrScalingNeedsFace( $face:int, $type:int, $no:Oxel ):Boolean	{
+	static public function faceAlphaOrScalingNeedsFace( $face:int, $type:int, $no:Oxel ):Boolean	{
 
 		//	we only need a face here is the nieghbor is alpha of a different type
 		if ( !$no.childrenHas() ) {
@@ -1469,7 +1461,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// lighting START
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public static var _s_oxelsCreated:int = 0;
+	//public static var _s_oxelsCreated:int = 0;
 	public static var _s_oxelsEvaluated:int = 0;
 	public static var _s_lightsFound:int = 0;
 	
@@ -1490,23 +1482,22 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		_lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
 	}
 
-	public function lightingFromSun( $modelGuid:String, $face:int ):void {
-		if ( childrenHas() )
-		{
-			for each ( var child:Oxel in _children )
-				child.lightingFromSun( $modelGuid, $face );
-		}
-		else
-		{
-			// Does this oxel have the a face in the $face direction, if not move on
-			if ( faceHas( $face ) )
-			{
-				_s_oxelsEvaluated++;
-				//LightSunCheck.addTask( $modelGuid, gc, 1, $face );
-			}
-
-		}
-	}
+//	public function lightingFromSun( $modelGuid:String, $face:int ):void {
+//		if ( childrenHas() )
+//		{
+//			for each ( var child:Oxel in _children )
+//				child.lightingFromSun( $modelGuid, $face );
+//		}
+//		else
+//		{
+//			// Does this oxel have the a face in the $face direction, if not move on
+//			if ( faceHas( $face ) )
+//			{
+//				_s_oxelsEvaluated++;
+//				//LightSunCheck.addTask( $modelGuid, gc, 1, $face );
+//			}
+//		}
+//	}
 	
 	// This would only be run once when model loads
 	// set the activeVoxelinstanceGuid before calling
