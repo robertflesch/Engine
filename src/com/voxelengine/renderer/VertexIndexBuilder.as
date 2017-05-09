@@ -95,8 +95,8 @@ public class VertexIndexBuilder
 			return -1;
 
 		// this could be speed up for sure	
-		var xdist:Number = x.gc.getDistance( _s_compareVec );
-		var ydist:Number = y.gc.getDistance( _s_compareVec );
+		var xdist:Number = x.getDistance( _s_compareVec );
+		var ydist:Number = y.getDistance( _s_compareVec );
 		
 		if ( xdist == ydist ) return 0;
 		if ( xdist < ydist ) return -1;

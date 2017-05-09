@@ -296,7 +296,7 @@ public class Avatar extends ControllableVoxelModel
 			// oxel that fall point is in
 			var go:Oxel = points[0].oxel;
 			// its localation in MS (ModelSpace)
-			var msCoord:int = go.gc.getModelY();
+			var msCoord:int = go.getModelY();
 			// add its height in MS
 			msCoord += go.size_in_world_coordinates();
 			// if foot oxel, then there are two choices
@@ -305,7 +305,7 @@ public class Avatar extends ControllableVoxelModel
 
 			// oxel that foot point is in
 			var fo:Oxel = points[1].oxel;
-			var msCoordFoot:int = fo.gc.getModelY();
+			var msCoordFoot:int = fo.getModelY();
 			msCoordFoot += fo.size_in_world_coordinates();
 			// we need to do minor adjustment on foot position?
 			if ( fo.gc.grain == go.gc.grain && fo.gc.grainY == go.gc.grainY || msCoord == msCoordFoot )
@@ -349,7 +349,7 @@ public class Avatar extends ControllableVoxelModel
 					var stepUpOxel1:Oxel = fo.neighbor(Globals.POSY);
 					if ( Globals.BAD_OXEL != stepUpOxel1 )
 					{
-						var msCoordFoot1:int = stepUpOxel1.gc.getModelY();
+						var msCoordFoot1:int = stepUpOxel1.getModelY();
 						msCoordFoot1 += stepUpOxel1.size_in_world_coordinates();
 						_sScratchVector.setTo( 0, msCoordFoot1, 0 );
 						var wsCoord1:Vector3D = $collisionCandidate.modelToWorld( _sScratchVector );

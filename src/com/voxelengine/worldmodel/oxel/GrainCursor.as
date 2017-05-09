@@ -35,6 +35,7 @@ public class GrainCursor
 		_data |= val; 
 	}
 
+
 	[inline]
 	public function get bound():uint { return (_data & 0xffff0000)>>16; }
 	[inline]
@@ -52,7 +53,8 @@ public class GrainCursor
 	public function get grainZ( ):uint { return _gz; }
 	[inline]
 	public function set grainZ( val:uint ):void { _gz = val; }
-	
+
+
 	////////////////////////////////////////////////////////////////////
 	// Static functions
 	////////////////////////////////////////////////////////////////////
@@ -189,33 +191,6 @@ public class GrainCursor
 	}	
 	
 	[inline]
-	public function getDistance( v:Vector3D ):Number 
-	{
-		// using static speeds it up by 40%
-		_s_v3.x = v.x - getModelX();
-		_s_v3.y = v.y - getModelY();
-		_s_v3.z = v.z - getModelZ();
-		return _s_v3.length;
-	}
-	
-	[inline]
-	public function getWorldCoordinate( axis:int ):int 
-	{
-		switch (axis)
-		{
-			case Globals.AXIS_X:
-				return getModelX();
-			case Globals.AXIS_Y:
-				return getModelY();
-			case Globals.AXIS_Z:
-				return getModelZ();
-			default:
-				throw new Error("GrainCursor.GetWorldCoordinate - Axis Value not found");
-		}
-		
-	}
-
-	[inline]
 	private function roundNumber( numIn:Number, decimalPlaces:int ):Number 
 	{
 		var nExp:int = Math.pow(10,decimalPlaces) ;
@@ -232,99 +207,6 @@ public class GrainCursor
 		//return v;
 	}
 	
-	private static var _s_min:Vector3D = new Vector3D();
-	private static var _s_max:Vector3D = new Vector3D();
-	private static var _s_beginToEnd:Vector3D = new Vector3D();
-	public function lineIntersect( $o:Oxel, $modelSpaceStartPoint:Vector3D, $modelSpaceEndPoint:Vector3D, $intersections:Vector.<GrainCursorIntersection> ):Boolean
-	{
-		_s_beginToEnd.x = $modelSpaceEndPoint.x - $modelSpaceStartPoint.x;
-		_s_beginToEnd.y = $modelSpaceEndPoint.y - $modelSpaceStartPoint.y;
-		_s_beginToEnd.z = $modelSpaceEndPoint.z - $modelSpaceStartPoint.z;
-
-		_s_min.setTo(0, 0, 0);
-		_s_min.x -= $modelSpaceStartPoint.x;
-		_s_min.y -= $modelSpaceStartPoint.y;
-		_s_min.z -= $modelSpaceStartPoint.z;
-		_s_min.x += getModelX();
-		_s_min.y += getModelY();
-		_s_min.z += getModelZ();
-
-		_s_max.setTo(size(),size(),size());
-		_s_max.x -= $modelSpaceStartPoint.x;
-		_s_max.y -= $modelSpaceStartPoint.y;
-		_s_max.z -= $modelSpaceStartPoint.z;
-		_s_max.x += getModelX();
-		_s_max.y += getModelY();
-		_s_max.z += getModelZ();
-
-		var tNear:Number = -10000000;
-		var tFar:Number = 10000000;
-		var tNearAxis:int = -1;
-		var tFarAxis:int = -1;
-		for each ( var axis:int in AXES )
-		{
-			if ( getCoordinate(_s_beginToEnd, axis) == 0) // parallel
-			{
-				if ( getCoordinate( _s_min, axis) > 0 || getCoordinate( _s_max, axis) < 0)
-					return false; // segment is not between planes, return empty set
-			}
-			else
-			{
-				var t1:Number = getCoordinate( _s_min, axis) / getCoordinate(_s_beginToEnd,axis);
-				var t2:Number = getCoordinate( _s_max, axis) / getCoordinate(_s_beginToEnd,axis);
-				var tMin:Number = Math.min(t1, t2);
-				var tMax:Number = Math.max(t1, t2);
-				if (tMin > tNear) {
-					tNear = tMin;
-					tNearAxis = axis;
-				}
-				if (tMax < tFar)  {
-					tFar = tMax;
-					tFarAxis = axis;
-				}
-				if (tNear > tFar || tFar < 0) 
-					return false; // empty set
-			}
-		}
-		
-		if (tNear >= 0 && tNear <= 1) {
-			var gci:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tNear, tNearAxis, true );
-			gci.oxel = $o;
-			$intersections.push( gci );
-			//trace( "GrainCursor.lineIntersectTest3 - intersection near " + gciNear.toString() );
-		}
-		
-		// RSF 07.04.12 If tFar compared to 1, then there is a dead zone where it doesnt intersect with model correctly
-		//if (tFar >= 0 && tFar <= 1) 
-//		if (tFar >= 0 && tFar <= 32) 
-// tFar = 0 occurs when starting point is on face of oxel
-
-		// failing on really large models
-		//if (tFar > 0 && tFar <= 32)
-		if (tFar > 0 && tFar <= 100) // what does 100 represent?
-		{
-			var gci1:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tFar, tFarAxis, false );
-			gci1.oxel = $o;
-			$intersections.push( gci1 );
-		}
-		return true;
-	}	
-
-	private function buildIntersection( $modelSpaceStartPoint:Vector3D, $magnitude:Number, $axis:int, $nearAxis:Boolean ):GrainCursorIntersection  {
-		var gci:GrainCursorIntersection = new GrainCursorIntersection();
-		gci.point.copyFrom( _s_beginToEnd );
-		gci.point.scaleBy( $magnitude );
-		gci.point = $modelSpaceStartPoint.add( gci.point );
-		roundVector( gci.point );
-		gci.gc.copyFrom( this );
-		gci.near = $nearAxis;
-		gci.axis = $axis;
-		if ( ((1 << gci.gc.grain) + getWorldCoordinate( gci.axis)) == GrainCursor.getCoordinate( gci.point, gci.axis ) )
-			GrainCursor.setCoordinate( gci.point, gci.axis, 0.001 );
-		if ( getWorldCoordinate( gci.axis) == GrainCursor.getCoordinate( gci.point, gci.axis ) )
-			GrainCursor.setCoordinate( gci.point, gci.axis, -0.001 );
-		return gci;
-	}
 
 	[inline]
 	public function childId():uint {
@@ -386,6 +268,8 @@ public class GrainCursor
 		_gz = $gc._gz;
 		_data = $gc._data;
 	}
+
+
 
 	[inline]
 	public function g0_edgeval():uint

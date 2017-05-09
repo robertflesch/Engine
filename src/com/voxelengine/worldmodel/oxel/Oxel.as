@@ -1544,7 +1544,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	public function faceCenterGet( face:int ):Vector3D
 	{
 		const size:int = gc.size() / 2;
-		var faceCenter:Vector3D = new Vector3D( gc.getModelX() + size, gc.getModelY() + size, gc.getModelZ() + size );
+		var faceCenter:Vector3D = new Vector3D( getModelX() + size, getModelY() + size, getModelZ() + size );
 		if ( Globals.POSX == face )
 			faceCenter.x += size;
 		else if ( Globals.NEGX == face ) 	
@@ -1639,7 +1639,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		if ( validFace && quad ) {
 			if ( quad.dirty ) {
 				quadLighting( $face, $ti );
-				quad.rebuildScaled( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $grain, _lighting, _flowInfo );
+				quad.rebuild( type, getModelX(), getModelY(), getModelZ(), $face, $plane_facing, $grain, _lighting, _flowInfo );
 			}
 			return 1;
 		}
@@ -1648,7 +1648,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		{
 			quadLighting( $face, $ti );				
 			quad = QuadPool.poolGet();
-			if ( !quad.buildScaled( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, $plane_facing, $grain, _lighting, flowInfo ) ) {
+			if ( !quad.build( type, getModelX(), getModelY(), getModelZ(), $face, $plane_facing, $grain, _lighting, flowInfo ) ) {
 				QuadPool.poolDispose( quad );
 				return 0;
 			}
@@ -1682,9 +1682,197 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		if ( quad )
 		{
 			var plane_facing:int = 1;
-			quad.rebuildScaled( type, gc.getModelX(), gc.getModelY(), gc.getModelZ(), $face, plane_facing, gc.grain, _lighting, _flowInfo );
+			quad.rebuild( type, getModelX(), getModelY(), getModelZ(), $face, plane_facing, gc.grain, _lighting, _flowInfo );
 		}
 	}
+
+	[inline]
+	public function getModelX():uint { return gc.grainX << gc.grain; }
+	[inline]
+	public function getModelY():uint { return gc.grainY << gc.grain; }
+	[inline]
+	public function getModelZ():uint { return gc.grainZ << gc.grain; }
+
+	public function getModelVector():Vector3D {
+		return new Vector3D( getModelX(), getModelY(), getModelZ() );
+	}
+
+	[inline]
+	private static var _s_v3:Vector3D = new Vector3D;
+	public function getDistance( v:Vector3D ):Number
+	{
+		// using static speeds it up by 40%
+		_s_v3.x = v.x - getModelX();
+		_s_v3.y = v.y - getModelY();
+		_s_v3.z = v.z - getModelZ();
+		return _s_v3.length;
+	}
+
+	[inline]
+	public function getWorldCoordinate( axis:int ):int
+	{
+		switch (axis)
+		{
+			case Globals.AXIS_X:
+				return getModelX();
+			case Globals.AXIS_Y:
+				return getModelY();
+			case Globals.AXIS_Z:
+				return getModelZ();
+			default:
+				throw new Error("GrainCursor.GetWorldCoordinate - Axis Value not found");
+		}
+
+	}
+	private static const AXES:Vector.<int> = new <int>[0,1,2];
+	private static var _s_min:Vector3D = new Vector3D();
+	private static var _s_max:Vector3D = new Vector3D();
+	private static var _s_beginToEnd:Vector3D = new Vector3D();
+	public function lineIntersect( $o:Oxel, $modelSpaceStartPoint:Vector3D, $modelSpaceEndPoint:Vector3D, $intersections:Vector.<GrainCursorIntersection>, $ignoreType:uint = 100 ):Boolean
+	{
+		if ( $ignoreType == type && !childrenHas() )
+			return false;
+		if ( TypeInfo.AIR == type && !childrenHas() )
+			return false;
+
+		_s_beginToEnd.x = $modelSpaceEndPoint.x - $modelSpaceStartPoint.x;
+		_s_beginToEnd.y = $modelSpaceEndPoint.y - $modelSpaceStartPoint.y;
+		_s_beginToEnd.z = $modelSpaceEndPoint.z - $modelSpaceStartPoint.z;
+
+		_s_min.setTo(0, 0, 0);
+		_s_min.x -= $modelSpaceStartPoint.x;
+		_s_min.y -= $modelSpaceStartPoint.y;
+		_s_min.z -= $modelSpaceStartPoint.z;
+		_s_min.x += getModelX();
+		_s_min.y += getModelY();
+		_s_min.z += getModelZ();
+
+		var size:uint = gc.size();
+		_s_max.setTo(size,size,size);
+		_s_max.x -= $modelSpaceStartPoint.x;
+		_s_max.y -= $modelSpaceStartPoint.y;
+		_s_max.z -= $modelSpaceStartPoint.z;
+		_s_max.x += getModelX();
+		_s_max.y += getModelY();
+		_s_max.z += getModelZ();
+
+		var tNear:Number = -10000000;
+		var tFar:Number = 10000000;
+		var tNearAxis:int = -1;
+		var tFarAxis:int = -1;
+		for each ( var axis:int in AXES )
+		{
+			if ( getCoordinate(_s_beginToEnd, axis) == 0) // parallel
+			{
+				if ( getCoordinate( _s_min, axis) > 0 || getCoordinate( _s_max, axis) < 0)
+					return false; // segment is not between planes, return empty set
+			}
+			else
+			{
+				var t1:Number = getCoordinate( _s_min, axis) / getCoordinate(_s_beginToEnd,axis);
+				var t2:Number = getCoordinate( _s_max, axis) / getCoordinate(_s_beginToEnd,axis);
+				var tMin:Number = Math.min(t1, t2);
+				var tMax:Number = Math.max(t1, t2);
+				if (tMin > tNear) {
+					tNear = tMin;
+					tNearAxis = axis;
+				}
+				if (tMax < tFar)  {
+					tFar = tMax;
+					tFarAxis = axis;
+				}
+				if (tNear > tFar || tFar < 0)
+					return false; // empty set
+			}
+		}
+
+		if (tNear >= 0 && tNear <= 1) {
+			var gci:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tNear, tNearAxis, true );
+			gci.oxel = $o;
+			$intersections.push( gci );
+			//trace( "GrainCursor.lineIntersectTest3 - intersection near " + gciNear.toString() );
+		}
+
+		// RSF 07.04.12 If tFar compared to 1, then there is a dead zone where it doesnt intersect with model correctly
+		//if (tFar >= 0 && tFar <= 1)
+//		if (tFar >= 0 && tFar <= 32)
+// tFar = 0 occurs when starting point is on face of oxel
+
+		// failing on really large models
+		//if (tFar > 0 && tFar <= 32)
+		if (tFar > 0 && tFar <= 100) // what does 100 represent?
+		{
+			var gci1:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tFar, tFarAxis, false );
+			gci1.oxel = $o;
+			$intersections.push( gci1 );
+		}
+		return true;
+	}
+
+	private function buildIntersection( $modelSpaceStartPoint:Vector3D, $magnitude:Number, $axis:int, $nearAxis:Boolean ):GrainCursorIntersection  {
+		var gci:GrainCursorIntersection = new GrainCursorIntersection();
+		gci.point.copyFrom( _s_beginToEnd );
+		gci.point.scaleBy( $magnitude );
+		gci.point = $modelSpaceStartPoint.add( gci.point );
+		roundVector( gci.point );
+		gci.gc.copyFrom( gc );
+		gci.near = $nearAxis;
+		gci.axis = $axis;
+		if ( ((1 << gci.gc.grain) + getWorldCoordinate( gci.axis)) == getCoordinate( gci.point, gci.axis ) )
+			setCoordinate( gci.point, gci.axis, 0.001 );
+		if ( getWorldCoordinate( gci.axis) == getCoordinate( gci.point, gci.axis ) )
+			setCoordinate( gci.point, gci.axis, -0.001 );
+		return gci;
+	}
+
+	[inline]
+	public function roundVector( v:Vector3D, places:int = 4 ):void
+	{
+		v.x = roundNumber(v.x,places);
+		v.y = roundNumber(v.y,places);
+		v.z = roundNumber(v.z,places);
+
+		//return v;
+	}
+
+	[inline]
+	private function roundNumber( numIn:Number, decimalPlaces:int ):Number
+	{
+		var nExp:int = Math.pow(10,decimalPlaces) ;
+		return Math.round(numIn * nExp) / nExp;
+	}
+
+	[inline]
+	private static function getCoordinate(  vector:Vector3D,  axis:int ):Number {
+		switch (axis) {
+			case 0:
+				return vector.x;
+			case 1:
+				return vector.y;
+			case 2:
+				return vector.z;
+			default:
+				throw new Error("GrainCursor.GetCoordinate - Axis Value not found");
+		}
+	}
+
+	[inline]
+	private static function setCoordinate(  vector:Vector3D,  axis:int,  adjustment:Number ):void {
+		switch (axis) {
+			case 0:
+				vector.x -= adjustment;
+				break;
+			case 1:
+				vector.y -= adjustment;
+				break;
+			case 2:
+				vector.z -= adjustment;
+				break;
+			default:
+				throw new Error("GrainCursor.SetCoordinate - Axis Value not found");
+		}
+	}
+
 
 	public function quadMarkDirty( $face:int ):void {
 		if  ( !_quads )
@@ -2116,20 +2304,16 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Intersection functions START
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public function lineIntersect( $msStartPoint:Vector3D, $msEndPoint:Vector3D, $intersections:Vector.<GrainCursorIntersection>, $ignoreType:uint = 100 ):void {
-		if ( $ignoreType == type && !childrenHas() )
-			return;
-		if ( TypeInfo.AIR == type && !childrenHas() )
-			return;
-		gc.lineIntersect( this, $msStartPoint, $msEndPoint, $intersections );
-	}
+//	public function lineIntersect( $msStartPoint:Vector3D, $msEndPoint:Vector3D, $intersections:Vector.<GrainCursorIntersection>, $ignoreType:uint = 100 ):void {
+//		gc.lineIntersect( this, $msStartPoint, $msEndPoint, $intersections );
+//	}
 
 	public function lineIntersectWithChildren( $msStartPoint:Vector3D, $msEndPoint:Vector3D, $msIntersections:Vector.<GrainCursorIntersection>, $ignoreType:uint, $minSize:int = 2 ):void	{
 		
 		if ( !childrenHas() && $ignoreType != type )
-			gc.lineIntersect( this, $msStartPoint, $msEndPoint, $msIntersections );
+			lineIntersect( this, $msStartPoint, $msEndPoint, $msIntersections );
 		else if ( gc.grain <=  $minSize	)			
-			gc.lineIntersect( this, $msStartPoint, $msEndPoint, $msIntersections );		
+			lineIntersect( this, $msStartPoint, $msEndPoint, $msIntersections );
 		// find the oxel that is closest to the start point, and is solid?
 		// first do a quick check to see if ray hits any children.
 		// then for any children it hits, do a hit test with its children
@@ -2140,7 +2324,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			var totalIntersections:Vector.<GrainCursorIntersection> = new Vector.<GrainCursorIntersection>();
 			for each ( var child:Oxel in _children ) 
 			{
-				child.lineIntersect( $msStartPoint, $msEndPoint, childIntersections, $ignoreType );
+				child.lineIntersect( child, $msStartPoint, $msEndPoint, childIntersections, $ignoreType );
 				for each ( var gcIntersection:GrainCursorIntersection in childIntersections )
 				{
 					gcIntersection.oxel = child;
@@ -2364,7 +2548,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		
 		if ( true == GrainCursorUtils.is_inside_sphere( gc, cx, cy, cz, radius ) )
 		{
-			if ( gc.getModelY() < cy && gc.getModelY() + gc.size() > cy ) {
+			if ( getModelY() < cy && getModelY() + gc.size() > cy ) {
 				childrenCreate();
 				for each ( var newChild:Oxel in _children )
 				{
@@ -2374,10 +2558,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				// if I put a return here, the top layer stays the same, but changes occur below the surface.
 				//return;
 			} 
-			else if ( gc.getModelY() + gc.size() > cy )
+			else if ( getModelY() + gc.size() > cy )
 				return;
 				
-//				Log.out( "writeHalfSphere gc: " + gc.toString() + "  cy: " + cy + " gc.getModelY(): " + gc.getModelY() + "  gc.size: " + gc.size() );
+//				Log.out( "writeHalfSphere gc: " + gc.toString() + "  cy: " + cy + " getModelY(): " + getModelY() + "  gc.size: " + gc.size() );
 			write( $modelGuid, gc, $newType );
 			return;
 		}
@@ -2721,20 +2905,20 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				_o_min = gc.grain;
 			if ( _o_max < gc.grain )
 				_o_max = gc.grain;
-			if ( _x_min > gc.getWorldCoordinate( 0 ) )
-				_x_min = gc.getWorldCoordinate( 0 );
-			if ( _x_max < gc.getWorldCoordinate( 0 ) + gc.size() )
-				_x_max = gc.getWorldCoordinate( 0 ) + gc.size();
+			if ( _x_min > getWorldCoordinate( 0 ) )
+				_x_min = getWorldCoordinate( 0 );
+			if ( _x_max < getWorldCoordinate( 0 ) + gc.size() )
+				_x_max = getWorldCoordinate( 0 ) + gc.size();
 				
-			if ( _y_min > gc.getWorldCoordinate( 1 ) )
-				_y_min = gc.getWorldCoordinate( 1 );
-			if ( _y_max < gc.getWorldCoordinate( 1 ) + gc.size() )
-				_y_max = gc.getWorldCoordinate( 1 ) + gc.size();
+			if ( _y_min > getWorldCoordinate( 1 ) )
+				_y_min = getWorldCoordinate( 1 );
+			if ( _y_max < getWorldCoordinate( 1 ) + gc.size() )
+				_y_max = getWorldCoordinate( 1 ) + gc.size();
 				
-			if ( _z_min > gc.getWorldCoordinate( 2 ) )
-				_z_min = gc.getWorldCoordinate( 2 );
-			if ( _z_max < gc.getWorldCoordinate( 2 ) + gc.size() )
-				_z_max = gc.getWorldCoordinate( 2 ) + gc.size();
+			if ( _z_min > getWorldCoordinate( 2 ) )
+				_z_min = getWorldCoordinate( 2 );
+			if ( _z_max < getWorldCoordinate( 2 ) + gc.size() )
+				_z_max = getWorldCoordinate( 2 ) + gc.size();
 		}
 		// otherwise its air and doest not count
 	}
@@ -3028,8 +3212,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	public function layDownWater( $waterHeight:int ):void
 	{
 		// If this is below water height it should be full of water.
-		var bottom_height:int = gc.getModelY();
-		var top_height:int = gc.getModelY() + gc.size();
+		var bottom_height:int = getModelY();
+		var top_height:int = getModelY() + gc.size();
 		var child:Oxel;
 		// bottom of oxel is at water height or greater
 		if ( childrenHas() )

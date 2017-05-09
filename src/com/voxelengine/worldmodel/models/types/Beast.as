@@ -228,7 +228,7 @@ public class Beast extends ControllableVoxelModel
 					if ( no != Globals.BAD_OXEL )
 					{
 						//Log.out( "Beast.collisionCheckNew - Adjusting foot position" );
-						var msCoord:int = no.gc.getWorldCoordinate( Globals.AXIS_Y );
+						var msCoord:int = no.getWorldCoordinate( Globals.AXIS_Y );
 						var wsCoord:Vector3D = $collisionCandidate.modelToWorld( new Vector3D( 0, msCoord, 0 ) );
 						$loc.positionSetComp( $loc.positionGet.x, wsCoord.y - points[0].point.y, $loc.positionGet.z );
 						return -1;
