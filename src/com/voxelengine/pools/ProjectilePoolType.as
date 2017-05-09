@@ -15,6 +15,7 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.models.*
 import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
 import com.voxelengine.worldmodel.weapons.Projectile
 
@@ -69,7 +70,7 @@ public final class ProjectilePoolType
         _modelInfo = new ModelInfo( PROJECTILE + $type, null, {} );
         _modelInfo.doNotPersist = true;
 
-		var creationInfo:Object = GenerateOxel.cubeScript( 4, TypeInfo.BLUE );
+		var creationInfo:Object = GenerateCube.script( 4, TypeInfo.BLUE );
 		creationInfo.modelClass = "PROJECTILE";
         OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, _modelInfo.guid, null, true, true, creationInfo );
 

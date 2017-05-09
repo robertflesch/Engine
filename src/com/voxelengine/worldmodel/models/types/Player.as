@@ -104,7 +104,7 @@ public class Player extends PersistenceObject
 
 		if (DEFAULT_PLAYER == $modelGuid) {
 			//Log.out( "Avatar.createPlayer - creating DEFAULT_PLAYER from GenerateCube", Log.WARN )
-			var model:Object = GenerateOxel.cubeScript(4, TypeInfo.BLUE);
+			var model:Object = GenerateCube.script(4, TypeInfo.BLUE);
 			model.modelClass = "Avatar";
 			model.name = "Temp Avatar";
 			new ModelMakerGenerate(ii, model)

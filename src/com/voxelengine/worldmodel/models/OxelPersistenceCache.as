@@ -110,8 +110,10 @@ public class OxelPersistenceCache
 			_block.add( $ode.modelGuid );
 				
 			_loadingCount++;
-			if ( true == $ode.generated )
-				GenerateOxel.addTask( $ode.modelGuid, LayerInfo.fromObject( $ode.generationData ) );
+			if ( true == $ode.generated ) {
+				var genClass:Class = GenerateOxel.resolveGenerationType( $ode.generationData.biomes.layers[0].functionName );
+				genClass.addTask($ode.modelGuid, LayerInfo.fromObject($ode.generationData));
+			}
 			else if ( !$ode.fromTables )
 				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST, $ode.series, Globals.IVM_EXT, $ode.modelGuid, null, null, URLLoaderDataFormat.BINARY ) );
 			else if ( true == Globals.online && $ode.fromTables )

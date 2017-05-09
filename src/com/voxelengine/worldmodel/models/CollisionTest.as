@@ -83,7 +83,7 @@ import flash.geom.Vector3D;
 			// so I have to generate the markers first
 		if ( "" == CollisionTest.markerGuid ) {
 			CollisionTest.markerGuid = Globals.getUID();
-			var model:Object = GenerateOxel.cubeScript(0, TypeInfo.RED);
+			var model:Object = GenerateCube.script(0, TypeInfo.RED);
 			model.name = "CollisionPoint";
 
 			var collisionPointMarker:InstanceInfo = new InstanceInfo();

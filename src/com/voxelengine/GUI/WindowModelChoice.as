@@ -83,7 +83,7 @@ public class WindowModelChoice extends VVPopup
 			panelCreateModel()
 		}
 		else if ( 1 == bge.target.index )
-			panelCreateSphere()
+			panelCreateSphere();
 		else if ( 2 == bge.target.index )
 			panelGenerateIsland()
 	}
@@ -91,20 +91,20 @@ public class WindowModelChoice extends VVPopup
 	private function createObject():void {
 		var ii:InstanceInfo = new InstanceInfo();
 		var detailSize:int;		
-		var model:Object
+		var model:Object;
 		switch ( _rbGroup.index ) {
 			case 0: // From Cube
-				model = GenerateOxel.cubeScript();
-				parameters( model )
+				model = GenerateCube.script( 7 );
+				parameters( model );
 				break;
 			case 1: // Sphere
-				model = GenerateOxel.sphereScript();
-				parameters( model )
+				model = GenerateSphere.script( 7 );
+				parameters( model );
 				break;
 			case 2: // Island
 				model = GenerateIsland.script();
-				parameters( model )
-				ii.modelGuid = model.name
+				parameters( model );
+				ii.modelGuid = model.name;
 				break;
 //				case 2: // From Sphere
 				//ii.modelGuid = "GenerateSubSphere";

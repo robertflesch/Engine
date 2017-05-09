@@ -28,6 +28,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	public class LandscapeTask extends AbstractTask 
 	{		
 		protected var _modelGuid:String;
+		//protected function get guid():String { return _modelGuid; }
 		protected var _layer:LayerInfo;
 		protected var _startTime:int;
 		static protected var _autoFlowState:Boolean;

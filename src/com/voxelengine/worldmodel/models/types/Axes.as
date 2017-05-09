@@ -13,6 +13,7 @@ import com.voxelengine.events.ModelLoadingEvent
 import com.voxelengine.worldmodel.models.InstanceInfo
 import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
 import com.voxelengine.worldmodel.TypeInfo;
 
@@ -27,7 +28,7 @@ public class Axes extends VoxelModel
 	static public function createAxes():void {
 		var ii:InstanceInfo = new InstanceInfo();
 		var model:Object;
-		model = GenerateOxel.cubeScript( 0, TypeInfo.AIR );
+		model = GenerateCube.script( 0, TypeInfo.AIR );
 		model.modelClass = "Axes";
 		ii.modelGuid = AXES_MODEL_GUID;
 
@@ -43,19 +44,19 @@ public class Axes extends VoxelModel
 				iiR.modelGuid = AXES_MODEL_GUID_X;
 				iiR.controllingModel = _model;
 				iiR.positionSetComp( 0, -1, -1 );
-				new ModelMakerGenerate( iiR, GenerateOxel.cubeScript( 0, TypeInfo.RED, true ) );
+				new ModelMakerGenerate( iiR, GenerateCube.script( 0, TypeInfo.RED, true ) );
 
 				var iiG:InstanceInfo = new InstanceInfo();
 				iiG.modelGuid = AXES_MODEL_GUID_Y;
 				iiG.controllingModel = _model;
 				iiG.positionSetComp( -1, 0, -1 );
-				new ModelMakerGenerate( iiG, GenerateOxel.cubeScript( 0, TypeInfo.GREEN, true ) );
+				new ModelMakerGenerate( iiG, GenerateCube.script( 0, TypeInfo.GREEN, true ) );
 
 				var iiB:InstanceInfo = new InstanceInfo();
 				iiB.modelGuid = AXES_MODEL_GUID_Z;
 				iiB.controllingModel = _model;
 				iiB.positionSetComp( -1, -1, 0 );
-				new ModelMakerGenerate( iiB, GenerateOxel.cubeScript( 0, TypeInfo.BLUE, true ) );
+				new ModelMakerGenerate( iiB, GenerateCube.script( 0, TypeInfo.BLUE, true ) );
 			}
 		}
 	}

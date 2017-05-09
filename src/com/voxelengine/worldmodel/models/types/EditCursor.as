@@ -13,6 +13,7 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
 
 import flash.display3D.Context3D;
@@ -91,7 +92,7 @@ public class EditCursor extends VoxelModel
 			var modelInfo:ModelInfo = new ModelInfo( EDIT_CURSOR, null, {} );
 			_s_currentInstance.init( modelInfo, metadata );
 
-			var creationInfo:Object = GenerateOxel.cubeScript( 4, TypeInfo.BLUE );
+			var creationInfo:Object = GenerateCube.script( 4, TypeInfo.BLUE );
 			creationInfo.modelClass = "EDIT_CURSOR";
 			creationInfo.name = "EDIT_CURSOR";
 			OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, true, true, creationInfo );
