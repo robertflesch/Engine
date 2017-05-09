@@ -173,6 +173,7 @@ public class  UserInventory extends QuickInventory
 				display();
 				resizeObject( null );
 				AppEvent.addListener( Event.DEACTIVATE, onDeactivate );
+				processItemSelection( boxes[1], false );
 			}
 		}
 	}
@@ -344,7 +345,7 @@ public class  UserInventory extends QuickInventory
 		//hideGrainTools();
 		//;
 		//EditCursor.editing = false;
-		
+
 		var oi:ObjectInfo = box.data as ObjectInfo;
 		if ( oi is ObjectVoxel ) {
 			var ti:ObjectVoxel = oi as ObjectVoxel;
@@ -470,7 +471,7 @@ public class  UserInventory extends QuickInventory
 
 	private var _listenersAdded:Boolean;
 	private function addListeners():void {
-		//Log.out( "UserInventory.addListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
+		Log.out( "UserInventory.addListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 		if ( false == _listenersAdded ) {
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
@@ -479,13 +480,14 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function removeListeners():void {
-		//Log.out( "UserInventory.removeListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
+		Log.out( "UserInventory.removeListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
 		_listenersAdded = false;
 	}
 
 	private function hotKeyInventory(e:KeyboardEvent):void {
+		Log.out( "UserInventory.hotKeyInventory ", Log.WARN );
 		if  ( !Globals.active )
 			return;
 			

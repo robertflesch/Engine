@@ -155,7 +155,7 @@ public class InventoryPanelModel extends VVContainer
 		displaySelectedCategory( "All" );	
 	}
 	
-	// TODO I see problem here when langauge is different then what is in TypeInfo RSF - 11.16.14
+	// TODO I see problem here when language is different then what is in TypeInfo RSF - 11.16.14
 	// That is if I use the target "Name"
 	private function displaySelectedCategory( $category:String ):void
 	{	
@@ -194,7 +194,7 @@ public class InventoryPanelModel extends VVContainer
 			if ( VoxelModel.selectedModel ) {
 				if ( null != om.vmm.childOf && "" != om.vmm.childOf ) {
 					if ( VoxelModel.selectedModel.metadata.name != om.vmm.childOf ) {
-						Log.out( "InventoryPanelModel.addModel - child model of wrong parent: " + om.vmm.name, Log.ERROR );
+						Log.out( "InventoryPanelModel.addModel - child model of wrong parent: " + om.vmm.name, Log.INFO );
 						return null;
 					}
 				} else {
@@ -204,7 +204,7 @@ public class InventoryPanelModel extends VVContainer
 
 			} else {
 				if ( null != om.vmm.childOf && "" != om.vmm.childOf ) {
-					Log.out( "InventoryPanelModel.addModel - NOT added child model of: " + om.vmm.name, Log.ERROR );
+					Log.out( "InventoryPanelModel.addModel - NOT added child model of: " + om.vmm.name, Log.INFO );
 					return null;
 				}
 			}
