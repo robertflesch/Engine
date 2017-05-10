@@ -496,7 +496,7 @@ public class VoxelModel {
 			if ( result ) {
 				// Do immediate build, if we schedule task then faces are empty for a few frames.
                 modelInfo.oxelPersistence.oxel.facesBuild();
-				modelInfo.oxelPersistence.oxel.quadsBuild();
+				modelInfo.oxelPersistence.quadsRebuildDirty();
 			}
 			return result;
 		}
@@ -1178,13 +1178,6 @@ public class VoxelModel {
 		return changed;	
 	}
 	
-	// This should be called from voxelModel
-	public function lightSetDefault( $attn:uint ):void {
-//		instanceInfo.baseLightLevel = $attn;
-		modelInfo.oxelPersistence.oxel.lightsStaticSetDefault( $attn );
-	}
-
-	
 	import com.voxelengine.worldmodel.inventory.*;
 	public function getDefaultSlotData():Vector.<ObjectInfo> {
 		
@@ -1234,12 +1227,16 @@ public class VoxelModel {
 		}
 	}
 
-	public function applyBaseLightLevel( $baseLightLevel:uint ):void {
-		modelInfo.oxelPersistence.oxel.lightsStaticSetDefault( $baseLightLevel );
+	public function applyBaseLightLevel():void {
+		modelInfo.oxelPersistence.quadsRebuildAll();
+		modelInfo.oxelPersistence.oxel.setAllDirty();
 		modelInfo.oxelPersistence.changed = true;
 		var children:Vector.<VoxelModel> = modelInfo.childVoxelModelsGet();
 		for each ( var child:VoxelModel in children ) {
-			child.applyBaseLightLevel( $baseLightLevel );
+			if ( !child.modelInfo.oxelPersistence.lightInfo.locked ) {
+				child.modelInfo.oxelPersistence.baseLightLevel = modelInfo.oxelPersistence.baseLightLevel;
+				child.applyBaseLightLevel();
+			}
 		}
 	}
 

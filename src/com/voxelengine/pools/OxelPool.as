@@ -8,61 +8,46 @@
 
 package com.voxelengine.pools 
 {
-
-import flash.utils.getTimer;
 import com.voxelengine.Log;
 import com.voxelengine.worldmodel.oxel.Oxel
      
 public final class OxelPool 
-{ 
-	private static var _currentPoolSize:uint; 
-	private static var _growthValue:uint; 
-	private static var _counter:uint; 
-	private static var _pool:Vector.<Oxel>; 
-	private static var _currentOxel:Oxel; 
-	
-	static public function remaining():uint { return _counter; }
-	static public function totalUsed():uint { return _currentPoolSize - _counter; }
-	static public function total():uint { return _currentPoolSize; }
+{
+	private static var _initialPoolSize:int;
+	private static var _growthValue:int;
+	private static var _pools:Object = {};
 
-	public static function initialize( $initialPoolSize:uint, growthValue:uint ):void 
-	{ 
-		_currentPoolSize = $initialPoolSize; 
-		_counter = $initialPoolSize; 
-		_growthValue = growthValue; 
-		
-		var i:uint = $initialPoolSize; 
-		_pool = new Vector.<Oxel>(_currentPoolSize); 
-		while( --i > -1 ) 
-			_pool[i] = new Oxel(); 
-	} 
-	 
-	public static function poolGet():Oxel 
-	{ 
-		if ( _counter > 0 ) 
-			return _pool[--_counter]; 
-			 
-		Log.out( "OxelPool.poolGet - Allocating more Oxel: " + _currentPoolSize );
-		var timer:int = getTimer();
+	public static function initialize( $initialPoolSize:uint, $growthValue:uint ):void {
+		_initialPoolSize = $initialPoolSize;
+		_growthValue = $growthValue;
+	}
 
-		_currentPoolSize += _growthValue;
-		_pool = null
-		_pool = new Vector.<Oxel>(_currentPoolSize);
-		for ( var newIndex:int = 0; newIndex < _growthValue; newIndex++ )
-		{
-			_pool[newIndex] = new Oxel();
+	public static function poolGet( $type:uint ):Oxel {
+
+		var poolId:int = poolForType($type);
+		var pool:OxelTypePool = _pools[poolId];
+		if ( !pool )
+			pool = _pools[poolId] = new OxelTypePool(poolId, _initialPoolSize, _growthValue);
+		return pool.poolGet()
+	}
+
+	public static function poolDispose( $oxel:Oxel ):void {
+		var pool:OxelTypePool = _pools[$oxel.type];
+		if ( !pool ) {
+			Log.out( "OxelPool.poolDispose - no pool found for type: " + $oxel.type );
+			return
 		}
-		_counter = newIndex - 1; 
-		
-		Log.out( "OxelPool.poolGet - Done allocating more Oxel: " + _currentPoolSize  + " took: " + (getTimer() - timer) );
-		
-		return poolGet(); 
-		 
-	} 
+		pool.poolDispose( $oxel );
+	}
 
-	public static function poolDispose( $disposedOxel:Oxel):void 
-	{ 
-		_pool[_counter++] = $disposedOxel; 
-	} 
+	private static function poolForType( $type:uint ):int {
+		if ( $type < 1000 )
+			return 0;
+		else if ( $type == 152 ) // Vines
+			return 1;
+
+		return 0;
+	}
+
 } 
 }

@@ -85,7 +85,7 @@ public class OxelLoadAndBuildManager {
             OxelDataEvent.addListener(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, quadBuildComplete );
             OxelDataEvent.addListener(OxelDataEvent.OXEL_QUADS_BUILT_FAIL, quadBuildFail );
 
-            _op.buildQuads(true);
+            _op.quadsRebuildAll();
         }
     }
 

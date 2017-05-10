@@ -144,7 +144,7 @@ public class WindowModelDetail extends VVPopup {
 	private function changeBaseLightLevel( $e:MouseEvent ):void  {
 		if ( _vm.modelInfo.oxelPersistence && _vm.modelInfo.oxelPersistence.oxelCount ) {
 			//var oxel:Oxel = _vm.modelInfo.oxelPersistence.oxel;
-			_vm.applyBaseLightLevel( _vm.modelInfo.oxelPersistence.baseLightLevel );
+			_vm.applyBaseLightLevel();
 		}
 	}
 

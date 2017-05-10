@@ -49,9 +49,11 @@ public class OxelPersistence extends PersistenceObject
 	
 	public function get baseLightLevel():int 					{ return dbo.baseLightLevel; }
 	public function set baseLightLevel( value:int ):void		{
-		dbo.baseLightLevel = value;
-		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, baseLightLevel );
-		changed = true;
+		if ( !_lightInfo.locked ) {
+			dbo.baseLightLevel = value;
+			_lightInfo.setIlluminationLevel(baseLightLevel);
+			changed = true;
+		}
 	}
 
 	public function get bound():int 							{ return dbo.bound; }
@@ -64,6 +66,7 @@ public class OxelPersistence extends PersistenceObject
 	public function set version($val:int):void					{ dbo.version = $val; }
 
 	private var _lightInfo:LightInfo 							= LightInfoPool.poolGet();
+	public function get lightInfo():LightInfo 						{ return _lightInfo; }
 
 	public function get lockLight():Boolean 					{ return _lightInfo.locked; }
 	public function set lockLight( value:Boolean ):void			{  _lightInfo.locked = value; }
@@ -99,7 +102,6 @@ public class OxelPersistence extends PersistenceObject
 				ba = $importedData;
 			else
 				stripDataFromImport( $importedData );
-			baseLightLevel = Lighting.defaultBaseLightIllumination;
 		} else {
 			dbo = $dbo;
 			//Log.out( "OxelPersistence: " + guid + "  compressed size: " + dbo.ba.length );
@@ -107,9 +109,10 @@ public class OxelPersistence extends PersistenceObject
 			//Log.out( "OxelPersistence: " + guid + "  UNcompressed size: " + dbo.ba.length );
 		}
 
-		Log.out( "OxelPersistence - setting RANDOM Base light level" );
-		//_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, baseLightLevel );
-		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, Math.random() * 255 );
+		// need to set the id and levels the first time
+		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, baseLightLevel );
+		//Log.out( "OxelPersistence - setting RANDOM Base light level" );
+		//baseLightLevel = Math.random() * 255;
 	}
 
 	override protected function assignNewDatabaseObject():void {
@@ -150,11 +153,11 @@ public class OxelPersistence extends PersistenceObject
 		if ( topMostChunk && topMostChunk.dirty ) {
 			if ( EditCursor.EDIT_CURSOR == guid ) {
 				oxel.facesBuild();
-				oxel.quadsBuild();
+				quadsRebuildAll();
 			}
 			else {
 				Log.out( "OxelPersistence.update ------------ calling refreshQuads guid: " + guid, Log.DEBUG );
-				topMostChunk.buildQuads( guid );
+				quadsRebuildDirty();
 			}
 		}
 	}
@@ -323,9 +326,34 @@ public class OxelPersistence extends PersistenceObject
 		oxel.chunkGet().buildFaces( true);
 	}
 
-	public function buildQuads( $firstTime:Boolean = false):void {
-		//OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_FAIL, 0, guid, null);
-		oxel.chunkGet().buildQuads( $firstTime);
+	//////////////////////////////////////////////////////////////////
+	/* OxelPersistence - owns - top chunk - owns other chunks - owns oxels
+	* Three cases of rebuilding quads with options
+	* rebuild just ONE oxel (real-time) - NO CHUNK VERSION
+	* rebuild one chunk (one hierarchy of oxels) (real-time OR threaded)
+	* rebuild DIRTY chunks (all oxels in a model) threaded
+	* rebuild ALL chunks (all oxels in a model) threaded
+	 */
+
+	// This is immediate, not on thread
+	public function quadsRebuildChunkAll( $chunk:Chunk ):void {
+		$chunk.oxel.quadsRebuildAllRecursively();
+	}
+
+	// This is immediate, not on thread
+	public function quadsRebuildChunkDirty( $chunk:Chunk ):void {
+		$chunk.oxel.quadsRebuildDirtyRecursively();
+	}
+
+	// This is a series of tasks
+	public function quadsRebuildDirty():void {
+		oxel.chunkGet().quadsBuild();
+	}
+
+	// This is a series of tasks
+	public function quadsRebuildAll():void {
+		var forceAll:Boolean = true;
+		oxel.chunkGet().quadsBuild( forceAll )
 	}
 
 	public function cloneNew( $guid:String ):OxelPersistence {

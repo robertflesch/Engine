@@ -198,8 +198,7 @@ public class WindowOxelUtils extends VVPopup
 		//_vm.modelInfo.oxelPersistence.visitor( Oxel.rebuild, "Oxel.rebuild" );
 		_vm.modelInfo.oxelPersistence.oxel.chunkGet().setDirtyRecursively();
 		_vm.modelInfo.oxelPersistence.oxel.chunkGet().buildFaces( false );
-		_vm.modelInfo.oxelPersistence.oxel.chunkGet().buildQuads( );
-
+		_vm.modelInfo.oxelPersistence.oxel.chunkGet().quadsBuild( true );
 	}
 	
 	private function resetOxelScalingHandler(event:UIMouseEvent):void {

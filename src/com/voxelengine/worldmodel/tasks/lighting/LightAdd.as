@@ -212,8 +212,8 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 				
 			//var baseLightLevel:uint = Lighting.defaultLightLevelSetter();
 			var baseLightLevel:uint = Lighting.defaultBaseLightAttn;
-			var bt:Lighting = LightingPool.poolGet( baseLightLevel );
-			var btp:Lighting = LightingPool.poolGet( baseLightLevel );
+			var bt:Lighting = LightingPool.poolGet();
+			var btp:Lighting = LightingPool.poolGet();
 			
 			var grainUnits:uint = $lo.gc.size();
 			// project the light oxel onto the virtual brightness
@@ -294,7 +294,7 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 			var dchild:Vector.<Oxel> = $no.childrenForDirection( of );
 			//var lobTestChild:Vector.<uint> = Oxel.childIDsForDirection( of );
 
-			var bt:Lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
+			var bt:Lighting = LightingPool.poolGet();
 			for ( var childIndex:int = 0; childIndex < 4; childIndex++ )
 			{
 				var noChild:Oxel = dchild[childIndex];

@@ -79,11 +79,11 @@ public class VisitorFunctions {
         else {
             if ( $oxel.facesHas() ) {
                 if ( !$oxel.lighting ) {
-                    $oxel.lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
+                    $oxel.lighting = LightingPool.poolGet();
                     $oxel.lighting.add( $oxel.chunkGet().lightInfo ); // Get the parent chunk
                 }
                 $oxel.dirty = true;
-                $oxel.quadsRebuildAll();
+                $oxel.quadsRebuildDirtyRecursively();
             }
         }
     }
@@ -146,7 +146,7 @@ public class VisitorFunctions {
         }
         else if ( $oxel.lighting ) {
             if ( $oxel.lighting.reset() )
-                $oxel.quadsRebuildAll();
+                $oxel.quadsRebuildAllRecursively();
         }
     }
 } // end of class Oxel

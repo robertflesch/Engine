@@ -453,7 +453,7 @@ public class EditCursor extends VoxelModel
 		modelInfo.oxelPersistence.oxel.write( EDIT_CURSOR, modelInfo.oxelPersistence.oxel.gc, oxelTexture, true );
 
 
-		modelInfo.oxelPersistence.oxel.quadsBuild();
+//		modelInfo.oxelPersistence.oxel.quadsBuild();
 
 		function cursorColorRainbow():uint {
 			var frequency:Number = 2.4;

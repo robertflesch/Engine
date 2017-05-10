@@ -67,8 +67,8 @@ public class WindowDebugMenu extends VVCanvas
 		addSpace();
 
 		addInt( "Drawn Oxels:", VertexIndexBuilder.totalOxels );
-		addInt( "Used Oxels: ", OxelPool.totalUsed );
-		addInt( "Remaining: ", OxelPool.remaining );
+//		addInt( "Used Oxels: ", OxelPool.totalUsed );
+//		addInt( "Remaining: ", OxelPool.remaining );
 		addSpace();
 
 		addInt( "Used Chunks: ", Chunk.chunkCount );

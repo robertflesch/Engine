@@ -158,10 +158,6 @@ public class ModelInfo extends PersistenceObject
 			oxelPersistence.update( $vm );
 			
 		for each (var cm:VoxelModel in childVoxelModels ) {
-			if ("LeftArm" == cm.metadata.name){
-				var i:int = 3;
-				//Log.out( "ModelInfo.update - vm.metadata.name: " + vm.metadata.name );
-			}
 			cm.update($context, $elapsedTimeMS);
 		}
 	}
@@ -210,8 +206,10 @@ public class ModelInfo extends PersistenceObject
 		if ( guid == $ode.modelGuid ) {
 			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FBA_COMPLETE, assignOxelData );
 			oxelPersistence = $ode.oxelData;
-			if ( lockLight )
+			if ( lockLight ) {
+				oxelPersistence.baseLightLevel = Lighting.MAX_LIGHT_LEVEL;
 				oxelPersistence.lockLight = true;
+			}
 		}
 	}
 

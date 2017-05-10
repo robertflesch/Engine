@@ -93,7 +93,5 @@ public class GenerateCube extends LandscapeTask {
 		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba, null, rootGrain.toString() ) );
 		super.complete();
 	}
-
-
 }
 }

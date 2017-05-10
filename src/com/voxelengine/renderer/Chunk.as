@@ -53,7 +53,6 @@ public class Chunk {
 	private var _oxel:Oxel;
 	public function get oxel():Oxel  { return _oxel; }
 	
-	// TODO Should just add dirty chunks to a rebuild queue, which would get me a more incremental build
 	private var _dirty:Boolean;
 	public function get dirty():Boolean { return _dirty; }
 	public function dirtyClear():void { _dirty = false; }
@@ -65,6 +64,19 @@ public class Chunk {
 		if ( _vertMan )			
 			_vertMan.VIBGet( $type ).dirty = true;
 	}
+
+	public function setAllTypesDirty():void {
+		_dirty = true;
+		if ( childrenHas() ) {
+			for ( var i:int = 0; i < OCT_TREE_SIZE; i++ )
+				_children[i].setAllTypesDirty();
+		}
+		else {
+			if ( _vertMan )
+				_vertMan.setAllTypesDirty();
+		}
+	}
+
 	public function childrenHas():Boolean { return null != _children; }
 	
 	public function Chunk( $parent:Chunk, $bound:uint, $guid ):void {
@@ -166,44 +178,41 @@ public class Chunk {
 	}
 
 	private var _quadTasks:int;
-	public function buildQuads( $firstTime:Boolean = false ):void {
+	public function quadsBuild( $forceAll:Boolean = false ):void {
 		var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
 		_quadTasks = 0;
 		var priority:int;
-		if ( $firstTime && vm )
+		if ( $forceAll && vm )
 			priority = vm.distanceFromPlayerToModel(); // This should really be done on a per chuck basis
 		else
 			priority = 100; // high but not too high?
 		OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
-		buildQuadsRecursively( _guid, priority, $firstTime );
+		quadsBuildDirtyRecursively( _guid, priority, $forceAll );
 		if ( 0 == _quadTasks) {
 			OxelDataEvent.removeListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
 			OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, null);
 		}
 	}
 
-	private function buildQuadsRecursively( $guid:String, $priority:int, $firstTime:Boolean = false ):void {
+	private function quadsBuildDirtyRecursively( $guid:String, $priority:int, $forceAll:Boolean ):void {
 		if ( childrenHas() ) {
-			dirtyClear();
-			for ( var i:int; i < OCT_TREE_SIZE; i++ ) {
-				//if ( _children[i].dirty && _children[i]._oxel && _children[i]._oxel.dirty )
-				if ( _children[i].dirty )
-					_children[i].buildQuadsRecursively( $guid, $priority, $firstTime );
+			for ( var i:int = 0; i < OCT_TREE_SIZE; i++ ) {
+				if ( $forceAll || _children[i].dirty )
+					_children[i].quadsBuildDirtyRecursively( $guid, $priority, $forceAll );
 			}
 		} else {
 			// Since task has been added for this chunk, mark it as clear
 			// NOTE: oxels loaded from NoSQL are not dirty. But need to be built
 			//if ( _oxel && _oxel.dirty ) {
 			if ( _oxel ) {
-				dirtyClear();
 				_quadTasks++;
-				BuildQuads.addTask( $guid, this, $priority )
+				BuildQuads.addTask( $guid, this, $forceAll, $priority )
 			}
 			else {
 				Log.out( "Chunk.buildQuadsRecursively - HOW DID I GET HERE?", Log.WARN);
-				dirtyClear(); // Better clear it anyways
 			}
 		}
+		dirtyClear(); // Better clear it anyways
 	}
 
 	private function quadsBuildPartialComplete( $ode:OxelDataEvent ):void {
@@ -294,6 +303,5 @@ public class Chunk {
 
 		_vertMan.oxelAdd( $oxel );
 	}
-	
 }
 }

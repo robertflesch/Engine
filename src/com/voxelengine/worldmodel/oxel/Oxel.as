@@ -92,7 +92,13 @@ public class Oxel extends OxelBitfields
 				ch.dirtySet( type );
 		}
 	}
-	
+
+	public function setAllDirty():void {
+		var ch:Chunk = chunkGet();
+		if ( ch )
+			ch.setAllTypesDirty();
+	}
+
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//     Getters/Setters
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,9 +173,6 @@ public class Oxel extends OxelBitfields
 	//     Member Functions 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-//		public function get isLight():Boolean { return TypeInfo.typeInfo[type].lightInfo.lightSource; }
-	
-	
 	public function get childCount():uint  						{ return _childCount; }
 	public function set childCount(value:uint):void { 
 		if ( _parent )
@@ -207,7 +210,8 @@ public class Oxel extends OxelBitfields
 			return false;
 		
 		if ( !$o.lighting ) { // does this oxel already have a brightness?
-			$o.lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
+			$o.lighting = LightingPool.poolGet();
+			$o.lighting.add( $o.chunkGet().lightInfo );
 			$o.lighting.materialFallOffFactor = TypeInfo.typeInfo[$o.type].lightInfo.fallOffFactor;
 		}
 
@@ -217,7 +221,7 @@ public class Oxel extends OxelBitfields
 	static public function initializeRoot( $grainBound:int ):Oxel {
 		var gct:GrainCursor = GrainCursorPool.poolGet( $grainBound );
 		gct.grain = $grainBound;
-		var oxel:Oxel = OxelPool.poolGet();
+		var oxel:Oxel = OxelPool.poolGet( TypeInfo.AIR );
 		oxel.initialize(null, gct, 0, TypeInfo.AIR);
 		GrainCursorPool.poolDispose( gct );
 		return oxel;
@@ -269,9 +273,9 @@ public class Oxel extends OxelBitfields
 			FlowInfoPool.poolReturn( _flowInfo );
 			_flowInfo = null;
 		}
-		if ( _lighting ) { 
-			LightingPool.poolReturn( _lighting );
-			_lighting = null;
+		if ( lighting ) {
+			LightingPool.poolReturn( lighting );
+			lighting = null;
 		}
 		
 		// kill any existing family, you can be parent type OR physical type, not both
@@ -631,7 +635,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		var gct:GrainCursor = GrainCursorPool.poolGet(root_get().gc.bound );
 		_children = ChildOxelPool.poolGet();
 		for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ ) {
-			_children[i]  = OxelPool.poolGet();
+			_children[i]  = OxelPool.poolGet( type );
 			gct.copyFrom( gc );
 			gct.become_child( i );   
 			_children[i].initialize( this, gct, 0, type );
@@ -640,8 +644,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			//super.facesMarkAllDirty();
 			_children[i].facesMarkAllDirty();
 			
-			if ( _lighting ) {
-				_children[i].lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
+			if ( lighting ) {
+				_children[i].lighting = LightingPool.poolGet();
+				_children[i].lighting.add( chunkGet().lightInfo );
 				lighting.childGetAllLights( gct.childId(), _children[i].lighting );
 				// child should attenuate light at same rate.
 				_children[i].lighting.materialFallOffFactor = lighting.materialFallOffFactor;
@@ -869,7 +874,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			if ( child.childrenHas() )
 				return false; // Dont delete parents!
 			
-			if ( null != child._lighting )
+			if ( null != child.lighting )
 				hasBrightnessData = true;
 		}
 		
@@ -877,16 +882,18 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		
 		/// merge the brightness data into parent.
 		if ( hasBrightnessData ) {
-			if ( null == _lighting )
-				_lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
+			if ( null == lighting ) {
+				lighting = LightingPool.poolGet();
+				lighting.add( chunkGet().lightInfo );
+			}
 			for each ( var childForBrightness:Oxel in _children ) 
 			{
-				if ( childForBrightness._lighting ) {
-					_lighting.mergeChildren( childForBrightness.gc.childId(), childForBrightness._lighting, childForBrightness.gc.size(), TypeInfo.hasAlpha( type ) );
+				if ( childForBrightness.lighting ) {
+					lighting.mergeChildren( childForBrightness.gc.childId(), childForBrightness.lighting, childForBrightness.gc.size(), TypeInfo.hasAlpha( type ) );
 					// Need to set this from a valid child
 					// Parent should have same brightness attn as children did.
-					_lighting.materialFallOffFactor = childForBrightness.lighting.materialFallOffFactor;
-					_lighting.color = childForBrightness.lighting.color;
+					lighting.materialFallOffFactor = childForBrightness.lighting.materialFallOffFactor;
+					lighting.color = childForBrightness.lighting.color;
 				}
 			}
 		}
@@ -1322,7 +1329,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 		facesMarkAllClean();
 	}
-	
+
 	import flash.utils.Timer;
 	import flash.events.TimerEvent;
 	
@@ -1464,23 +1471,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	//public static var _s_oxelsCreated:int = 0;
 	public static var _s_oxelsEvaluated:int = 0;
 	public static var _s_lightsFound:int = 0;
-	
-	private function quadLighting( $face:int, $ti:TypeInfo ):void {
-		
-		if ( !_lighting ) {
-			_lighting = LightingPool.poolGet( _chunk.lightInfo.avg );
-            _lighting.add( _chunk.lightInfo );
-			_lighting.materialFallOffFactor = $ti.lightInfo.fallOffFactor;
-			_lighting.color = $ti.color;
-		}
-		
-		if ( true == $ti.lightInfo.fullBright && false == $ti.lightInfo.lightSource ) {
-            if ( 1 == _lighting.lightCount() )
-                _lighting.addFullBright();
-        }
-
-		_lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
-	}
 
 //	public function lightingFromSun( $modelGuid:String, $face:int ):void {
 //		if ( childrenHas() )
@@ -1514,24 +1504,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 	
-	// This should be called from voxelModel
-	public function lightsStaticSetDefault( $attn:uint ):void {
-		if ( childrenHas() )
-		{
-			for each ( var child:Oxel in _children )
-				child.lightsStaticSetDefault( $attn );
-		}
-		else
-		{
-			if ( _lighting && _lighting.lightHas( Lighting.DEFAULT_LIGHT_ID ) ) {
-				var li:LightInfo = _lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-				li.setIlluminationLevel( $attn );
-				quadsRebuildAll();
-			}
-		}
-	}
-
-	
 	public function faceCenterGet( face:int ):Vector3D
 	{
 		const size:int = gc.size() / 2;
@@ -1560,102 +1532,174 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	// Begin Quad functions
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public function quadsBuild( $plane_facing:int = 1 ):void {
+	public function quadsRebuildDirtyRecursively( $plane_facing:int = 1 ):void {
 		if ( dirty ) {
 			if ( childrenHas() ) {
-				// parents dont have quads!
-				if ( dirty  && _quads )
-					quadsDeleteAll();
-
-				facesCleanAllFaceBits();
-
-				for each ( var child:Oxel in _children )
-					if ( child.dirty )
-						child.quadsBuild( $plane_facing );
+				for each ( var child:Oxel in _children ) {
+					if (child.dirty)
+						child.quadsRebuildDirtyRecursively($plane_facing);
+				}
 				dirty = false;
 			}
 			else
 				quadsBuildTerminal( $plane_facing );
 		}
 	}
-	
+
+	public function quadsRebuildAllRecursively( $plane_facing:int = 1 ):void {
+		if ( childrenHas() ) {
+			for each ( var child:Oxel in _children ) {
+				child.quadsRebuildAllRecursively($plane_facing);
+			}
+		}
+		else {
+			quadsMarkAllDirty();
+			quadsBuildTerminal( $plane_facing );
+		}
+	}
+
+	public function quadsMarkAllDirty():void {
+		if ( !_quads )
+			return;
+		for ( var i:int = 0; i <= Globals.NEGZ; i++ ) {
+			var quad:Quad = _quads[i];
+			if (quad)
+				quad.dirty = 1;
+		}
+	}
+
 	protected function quadsBuildTerminal( $plane_facing:int = 1 ):void {
-		var changeCount:int = 0;
 		if ( Globals.g_oxelBreakEnabled	)
 			if ( gc.evalGC( Globals.g_oxelBreakData ) )
 				trace( "Oxel.quadsBuildTerminal - setGC breakpoint" );
 
-		if ( type == 125 )
+		if ( type == 125 ) // This is the shell for the model
 				return;
+
+		var changeCount:int = 0;
 		if ( facesHas() ) {
 			if ( null == _quads )
 				_quads = QuadsPool.poolGet();
 
-			// all oxels with faces need lighting
-			if ( !lighting )
-				lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
-			if ( 0 == lighting.lightCount() ) // add default chunk light
+			if ( null == _lighting ){
+				lighting = LightingPool.poolGet();
 				lighting.add( chunkGet().lightInfo );
+				lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
+			}
 
-			var ti:TypeInfo = TypeInfo.typeInfo[type];
+			var thisGrain:int = gc.grain;
 			// We have to go thru each one, since some may be added, and others removed.
 			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
-				changeCount += quadAddOrRemoveFace( face, $plane_facing, gc.grain, ti );
-		}
-		else  // if no faces release all quads
-			changeCount = quadsDeleteAll();
-		
-		// did any of the quads change?
-		if ( changeCount ) {
-			// if those this oxel has not been added to vertex manager do it now.
-			if ( !facesHas() && addedToVertex ) 
-				quadsDeleteAll();
-			// this feels like I might be double adding faces
-			else if ( facesHas() && !addedToVertex ) 
-				chunkAddOxel();
-		}
-		else if ( addedToVertex ) // I was added to vertex, but I lost all my face, so remove oxel
-			quadsDeleteAll();
+				changeCount += quadAddOrRemoveFace( face, $plane_facing, thisGrain );
 
+			if ( changeCount ) {
+				if (!addedToVertex)
+					chunkAddOxel();
+				else
+					chunkGet().dirtySet( type );
+			}
+
+		}
+		else { // if no faces release all quads
+			quadsDeleteAll();
+		}
+		
 		dirty = false;
 	}
-	
-	protected function quadAddOrRemoveFace( $face:int, $plane_facing:int, $grain:uint, $ti:TypeInfo ):int {
-		if ( $grain < 0 )
-			throw new Error( "Oxel.quadAddorRemoveFace invalid grain size: " + $grain + " check to make sure it is getting assigned correcting in ModelMakerGenerate.listenForGenerationComplete");
+
+	public function quadRebuild( $face:int ):void {
+		if ( quads ) {
+			var quad:Quad = _quads[$face];
+			if (quad)
+				quad.dirty = 1;
+			quadAddOrRemoveFace($face, 1, gc.grain);
+		}
+	}
+
+	public function quadsDeleteAll():int {
+		var changeCount:int = 0;
+		if  ( _quads ) {
+			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
+				var quad:Quad = _quads[face];
+				if ( quad ) {
+					quadDelete( quad, face );
+					changeCount++;
+				}
+			}
+		}
+
+		return changeCount;
+	}
+
+	protected function quadAddOrRemoveFace( $face:int, $plane_facing:int, $grain:uint ):int {
 		var validFace:Boolean = faceHas($face);
 		var quad:Quad = _quads[$face];
-		
-		// has face and quad
-		if ( validFace && quad ) {
+		var scale:int = 1 << $grain;
+		var g0:Number = scale/16;
+		var result:Boolean;
+
+		if ( validFace && quad ) { // has Face and Quad
 			if ( quad.dirty ) {
-				quadLighting( $face, $ti );
-				quad.rebuild( type, getModelX(), getModelY(), getModelZ(), $face, $plane_facing, $grain, _lighting, _flowInfo );
+				if ( Lighting.eaoEnabled ) // NO IDEA OF WHAT THIS DOES
+					lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
+				if ( 152 == type )
+					result = build152( true, $face, quad, g0, $plane_facing, scale, $grain );
+				else
+					result = quad.build( true, type, getModelX(), getModelY(), getModelZ(), $face, $plane_facing, scale, scale, scale, $grain, lighting, _flowInfo );
+				if ( !result ) {
+					QuadPool.poolDispose( quad );
+					return 0;
+				}
 			}
 			return 1;
-		}
-		// face but no quad
-		else if ( validFace && !quad ) 
-		{
-			quadLighting( $face, $ti );				
+		} else if ( validFace && !quad ) { // Face exists, but no quad
+			if ( Lighting.eaoEnabled ) // NO IDEA OF WHAT THIS DOES
+				lighting.evaluateAmbientOcculusion( this, $face, Lighting.AMBIENT_ADD );
 			quad = QuadPool.poolGet();
-			if ( !quad.build( type, getModelX(), getModelY(), getModelZ(), $face, $plane_facing, $grain, _lighting, flowInfo ) ) {
+			if ( 152 == type ) {
+				result = build152( false, $face, quad, g0, $plane_facing, scale, $grain );
+			} else {
+				result = quad.build( false, type, getModelX(), getModelY(), getModelZ(), $face, $plane_facing, scale, scale, scale, $grain, lighting, flowInfo);
+			}
+			if ( !result ) {
 				QuadPool.poolDispose( quad );
 				return 0;
 			}
 			_quads[$face] = quad;
 			return 1;
-		}
-		// no face but has a quad
-		else if ( !validFace && quad )
-		{
+
+		} else if ( !validFace && quad ) { // no face but has a quad
 			quadDelete( quad, $face );
-			return 0;
 		}
 		// last case is no face and no quad		
 		return 0;	
 	}
-	
+
+	private function build152( $isRebuild:Boolean, $face:int, $quad:Quad, $g0:Number, $plane_facing:int, $scale:int, $grain:uint):Boolean {
+		var result:Boolean;
+		switch ($face) {
+			case Globals.POSX:
+				result = $quad.build($isRebuild, type, getModelX(), getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 9 * $g0, $scale, 2 * $g0, $grain, lighting, flowInfo);
+				break;
+			case Globals.NEGX:
+				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 7 * $g0, $scale, 2 * $g0, $grain, lighting, flowInfo);
+				break;
+			case Globals.POSY:
+				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, lighting, flowInfo);
+				break;
+			case Globals.NEGY:
+				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, lighting, flowInfo);
+				break;
+			case Globals.POSZ:
+				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, lighting, flowInfo);
+				break;
+			case Globals.NEGZ:
+				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, lighting, flowInfo);
+				break;
+		}
+		return result;
+	}
+
 	public function quadDeleteFace( $face:int ):void {
 		if  ( !_quads )
 			return;
@@ -1665,206 +1709,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			quadDelete( quad, $face );
 	}
 
-	public function quadRebuild( $face:int ):void {
-		if  ( !_quads )
-			return;
-		dirty = true;
-		var quad:Quad = _quads[$face];
-		if ( quad )
-		{
-			var plane_facing:int = 1;
-			quad.rebuild( type, getModelX(), getModelY(), getModelZ(), $face, plane_facing, gc.grain, _lighting, _flowInfo );
-		}
-	}
-
-	[inline]
-	public function getModelX():uint { return gc.grainX << gc.grain; }
-	[inline]
-	public function getModelY():uint { return gc.grainY << gc.grain; }
-	[inline]
-	public function getModelZ():uint { return gc.grainZ << gc.grain; }
-
-	public function getModelVector():Vector3D {
-		return new Vector3D( getModelX(), getModelY(), getModelZ() );
-	}
-
-	[inline]
-	private static var _s_v3:Vector3D = new Vector3D;
-	public function getDistance( v:Vector3D ):Number
-	{
-		// using static speeds it up by 40%
-		_s_v3.x = v.x - getModelX();
-		_s_v3.y = v.y - getModelY();
-		_s_v3.z = v.z - getModelZ();
-		return _s_v3.length;
-	}
-
-	[inline]
-	public function getWorldCoordinate( axis:int ):int
-	{
-		switch (axis)
-		{
-			case Globals.AXIS_X:
-				return getModelX();
-			case Globals.AXIS_Y:
-				return getModelY();
-			case Globals.AXIS_Z:
-				return getModelZ();
-			default:
-				throw new Error("GrainCursor.GetWorldCoordinate - Axis Value not found");
-		}
-
-	}
-	private static const AXES:Vector.<int> = new <int>[0,1,2];
-	private static var _s_min:Vector3D = new Vector3D();
-	private static var _s_max:Vector3D = new Vector3D();
-	private static var _s_beginToEnd:Vector3D = new Vector3D();
-	public function lineIntersect( $o:Oxel, $modelSpaceStartPoint:Vector3D, $modelSpaceEndPoint:Vector3D, $intersections:Vector.<GrainCursorIntersection>, $ignoreType:uint = 100 ):Boolean
-	{
-		if ( $ignoreType == type && !childrenHas() )
-			return false;
-		if ( TypeInfo.AIR == type && !childrenHas() )
-			return false;
-
-		_s_beginToEnd.x = $modelSpaceEndPoint.x - $modelSpaceStartPoint.x;
-		_s_beginToEnd.y = $modelSpaceEndPoint.y - $modelSpaceStartPoint.y;
-		_s_beginToEnd.z = $modelSpaceEndPoint.z - $modelSpaceStartPoint.z;
-
-		_s_min.setTo(0, 0, 0);
-		_s_min.x -= $modelSpaceStartPoint.x;
-		_s_min.y -= $modelSpaceStartPoint.y;
-		_s_min.z -= $modelSpaceStartPoint.z;
-		_s_min.x += getModelX();
-		_s_min.y += getModelY();
-		_s_min.z += getModelZ();
-
-		var size:uint = gc.size();
-		_s_max.setTo(size,size,size);
-		_s_max.x -= $modelSpaceStartPoint.x;
-		_s_max.y -= $modelSpaceStartPoint.y;
-		_s_max.z -= $modelSpaceStartPoint.z;
-		_s_max.x += getModelX();
-		_s_max.y += getModelY();
-		_s_max.z += getModelZ();
-
-		var tNear:Number = -10000000;
-		var tFar:Number = 10000000;
-		var tNearAxis:int = -1;
-		var tFarAxis:int = -1;
-		for each ( var axis:int in AXES )
-		{
-			if ( getCoordinate(_s_beginToEnd, axis) == 0) // parallel
-			{
-				if ( getCoordinate( _s_min, axis) > 0 || getCoordinate( _s_max, axis) < 0)
-					return false; // segment is not between planes, return empty set
-			}
-			else
-			{
-				var t1:Number = getCoordinate( _s_min, axis) / getCoordinate(_s_beginToEnd,axis);
-				var t2:Number = getCoordinate( _s_max, axis) / getCoordinate(_s_beginToEnd,axis);
-				var tMin:Number = Math.min(t1, t2);
-				var tMax:Number = Math.max(t1, t2);
-				if (tMin > tNear) {
-					tNear = tMin;
-					tNearAxis = axis;
-				}
-				if (tMax < tFar)  {
-					tFar = tMax;
-					tFarAxis = axis;
-				}
-				if (tNear > tFar || tFar < 0)
-					return false; // empty set
-			}
-		}
-
-		if (tNear >= 0 && tNear <= 1) {
-			var gci:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tNear, tNearAxis, true );
-			gci.oxel = $o;
-			$intersections.push( gci );
-			//trace( "GrainCursor.lineIntersectTest3 - intersection near " + gciNear.toString() );
-		}
-
-		// RSF 07.04.12 If tFar compared to 1, then there is a dead zone where it doesnt intersect with model correctly
-		//if (tFar >= 0 && tFar <= 1)
-//		if (tFar >= 0 && tFar <= 32)
-// tFar = 0 occurs when starting point is on face of oxel
-
-		// failing on really large models
-		//if (tFar > 0 && tFar <= 32)
-		if (tFar > 0 && tFar <= 100) // what does 100 represent?
-		{
-			var gci1:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tFar, tFarAxis, false );
-			gci1.oxel = $o;
-			$intersections.push( gci1 );
-		}
-		return true;
-	}
-
-	private function buildIntersection( $modelSpaceStartPoint:Vector3D, $magnitude:Number, $axis:int, $nearAxis:Boolean ):GrainCursorIntersection  {
-		var gci:GrainCursorIntersection = new GrainCursorIntersection();
-		gci.point.copyFrom( _s_beginToEnd );
-		gci.point.scaleBy( $magnitude );
-		gci.point = $modelSpaceStartPoint.add( gci.point );
-		roundVector( gci.point );
-		gci.gc.copyFrom( gc );
-		gci.near = $nearAxis;
-		gci.axis = $axis;
-		if ( ((1 << gci.gc.grain) + getWorldCoordinate( gci.axis)) == getCoordinate( gci.point, gci.axis ) )
-			setCoordinate( gci.point, gci.axis, 0.001 );
-		if ( getWorldCoordinate( gci.axis) == getCoordinate( gci.point, gci.axis ) )
-			setCoordinate( gci.point, gci.axis, -0.001 );
-		return gci;
-	}
-
-	[inline]
-	public function roundVector( v:Vector3D, places:int = 4 ):void
-	{
-		v.x = roundNumber(v.x,places);
-		v.y = roundNumber(v.y,places);
-		v.z = roundNumber(v.z,places);
-
-		//return v;
-	}
-
-	[inline]
-	private function roundNumber( numIn:Number, decimalPlaces:int ):Number
-	{
-		var nExp:int = Math.pow(10,decimalPlaces) ;
-		return Math.round(numIn * nExp) / nExp;
-	}
-
-	[inline]
-	private static function getCoordinate(  vector:Vector3D,  axis:int ):Number {
-		switch (axis) {
-			case 0:
-				return vector.x;
-			case 1:
-				return vector.y;
-			case 2:
-				return vector.z;
-			default:
-				throw new Error("GrainCursor.GetCoordinate - Axis Value not found");
-		}
-	}
-
-	[inline]
-	private static function setCoordinate(  vector:Vector3D,  axis:int,  adjustment:Number ):void {
-		switch (axis) {
-			case 0:
-				vector.x -= adjustment;
-				break;
-			case 1:
-				vector.y -= adjustment;
-				break;
-			case 2:
-				vector.z -= adjustment;
-				break;
-			default:
-				throw new Error("GrainCursor.SetCoordinate - Axis Value not found");
-		}
-	}
-
-
 	public function quadMarkDirty( $face:int ):void {
 		if  ( !_quads )
 			return;
@@ -1873,35 +1717,28 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		if ( quad )
 			quad.dirty = 1;
 	}
-	
-	public function quadsRebuildAll():void {
-		if  ( !_quads )
-			return;
-			
-		for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
-			quadRebuild( face );
-	}
-	
-	////////////////////////////////////////
-	public function quadsDeleteAll():int {
-		var changeCount:int = 0;
-		if  ( _quads ) {
-			//Log.out( "Oxel.quadsDeleteAll" );
-			dirty = true;
-			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
-				// _quads can go away in middle of loop
-				if ( _quads ) {
-					var quad:Quad = _quads[face];
-					if ( quad ) {
-						quadDelete( quad, face );
-						changeCount++;
-					}
-				}
-			}
-		}
-		
-		return changeCount;
-	}
+
+//	public function quadsRebuildAll():void {
+//		var ti:TypeInfo = TypeInfo.typeInfo[type];
+//		var grain:int = gc.grain;
+//		for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
+//			quadAddOrRemoveFace( face, 1, grain, ti );
+//	}
+
+//	public function quadRebuildOLD( $face:int ):void {
+//		quadAddOrRemoveFace( $face, 1, gc.grain, TypeInfo.typeInfo[type] );
+//		if  ( !_quads )
+//			return;
+//		dirty = true;
+//		var quad:Quad = _quads[$face];
+//		if ( quad )
+//		{
+//			var plane_facing:int = 1;
+//			var scale:int = 1 << gc.grain;
+//			quad.build( true, type, getModelX(), getModelY(), getModelZ(), $face, plane_facing, scale, scale, scale, gc.grain, lighting, _flowInfo );
+//			//quad.rebuild( type, getModelX(), getModelY(), getModelZ(), $face, plane_facing, gc.grain, lighting, _flowInfo );
+//		}
+//	}
 
 	// TODO, I see some risk here when I am changing oxel type from things like sand to glass
 	// Its going to assume that it was solid, which works for sand to glass
@@ -1909,9 +1746,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	protected function quadDelete( quad:Quad, face:int ):void {
 		QuadPool.poolDispose( quad );
 		_quads[face] = null;
-		var hasQuads:Boolean
-		for ( var cface:int = Globals.POSX; cface <= Globals.NEGZ; cface++ ) {
-			if ( null != _quads[cface] )
+		var hasQuads:Boolean;
+		for ( var cFace:int = Globals.POSX; cFace <= Globals.NEGZ; cFace++ ) {
+			if ( null != _quads[cFace] )
 				hasQuads = true
 		}
 		if ( false == hasQuads ) {
@@ -1974,8 +1811,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				flowInfo = FlowInfoPool.poolGet();
 			flowInfo.toByteArray( $ba );
 
-			if ( !lighting )
-				lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
+			if ( !lighting ) {
+				lighting = LightingPool.poolGet();
+				lighting.add( chunkGet().lightInfo );
+			}
 			lighting.toByteArray( $ba );
 		}
 		else {
@@ -2087,8 +1926,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			$ba = flowInfo.fromByteArray( $version, $ba );
 			
 			// the baseLightLevel gets overridden by data from byte array.
-			if ( !lighting )
-				lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
+			if ( !lighting ) {
+				lighting = LightingPool.poolGet();
+				lighting.add( chunkGet().lightInfo );
+			}
 			$ba = lighting.fromByteArray( $version, $ba );
 			
 			if ( $parent ) {
@@ -2113,7 +1954,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 			for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
 			{
-				_children[i]  = OxelPool.poolGet();
+				_children[i]  = OxelPool.poolGet( type );
 				gct.copyFrom( $gc );
 				gct.become_child(i);   
 				_children[i].fromByteArrayV8( $version, this, gct, $ba, $stats );
@@ -2230,7 +2071,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			_children = ChildOxelPool.poolGet();
 			var gct:GrainCursor = GrainCursorPool.poolGet( gc.grain );
 			for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ ) {
-				_children[i]  = OxelPool.poolGet();
+				_children[i]  = OxelPool.poolGet(type);
 				gct.copyFrom( $gc );
 				gct.become_child(i);
 				_children[i].fromByteArray( $version, this, gct, $ba, $op );
@@ -2247,8 +2088,13 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			}
 
 			if (OxelBitfields.lightInfoHas(faceData)) {
-				lighting = LightingPool.poolGet( Lighting.defaultBaseLightAttn );
+				lighting = LightingPool.poolGet();
 				lighting.fromByteArray( $version, $ba );
+				lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
+			}
+			if ( facesHas() ){
+				lighting = LightingPool.poolGet();
+				lighting.add( $op.lightInfo );
 				lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
 			}
 		}
@@ -2273,7 +2119,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			var gct:GrainCursor = GrainCursorPool.poolGet( gc.bound );
 			for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
 			{
-				_children[i]  = OxelPool.poolGet();
+				_children[i]  = OxelPool.poolGet(type);
 				gct.copyFrom( $gc );
 				gct.become_child(i);   
 				_children[i].fromByteArrayV0( this, gct, $ba, $stats );
@@ -2853,12 +2699,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		breakdown(2);
 	}
 	
-	public function fullBright( $attn:uint ):void {
-		var timer:int = getTimer();
-		lightsStaticSetDefault( $attn );
-		Log.out("Oxel.fullBright - rebuildAll took: " + (getTimer() - timer));
-	}
-	
 	public function breakdown( smallest: int ):void {
 		if ( smallest < gc.grain && !childrenHas() )
 		{
@@ -3122,14 +2962,14 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			for each ( var child:Oxel in children )
 				child.vines( $modelGuid );
 		}
-		else if ( 152 == type  )
+		else if ( TypeInfo.STONE == type  )
 		{
-			var nou:Oxel = neighbor( Globals.POSY )
-			if ( Globals.BAD_OXEL == nou && TypeInfo.AIR == nou.type && !nou.childrenHas() && nou.gc.grain <= 4 )
-				nou.write( $modelGuid, gc, 152 );
+//			var nou:Oxel = neighbor( Globals.POSY )
+//			if ( Globals.BAD_OXEL == nou && TypeInfo.AIR == nou.type && !nou.childrenHas() && nou.gc.grain == 4 )
+//				nou.write( $modelGuid, gc, 152 );
 			var nod:Oxel = neighbor( Globals.NEGY )
-			if ( Globals.BAD_OXEL != nod && TypeInfo.AIR == nod.type && !nod.childrenHas() && nod.gc.grain <= 4 )
-				nou.write( $modelGuid, gc, 152 );
+			if ( Globals.BAD_OXEL != nod && TypeInfo.AIR == nod.type && !nod.childrenHas() && nod.gc.grain >= 4 )
+				nod.write( $modelGuid, nod.gc, 152 );
 		}
 	}
 	
@@ -3152,8 +2992,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 	
 	public function reset():void {
-		if ( _lighting )
-			_lighting.reset()
+		if ( lighting )
+			lighting.reset()
 		if ( _flowInfo )
 			_flowInfo.reset( this );			
 		quadsDeleteAll();
@@ -3489,58 +3329,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			quadsDeleteAll();
 		}
 	}
-	
-	
-	public static function generateCubeNah( $modelGuid:String, $layer:LayerInfo, $generateEvent:Boolean = true ):ByteArray {
-		var ba:ByteArray = COMPRESSED_REFERENCE_BA_SQUARE;
-		if ( $generateEvent )
-			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba, null, $layer.offset.toString() ) );
-		return ba;
-	}
-
-
-	public static function generateCube( $modelGuid:String, $layer:Object, $generateEvent:Boolean = true ):ByteArray {
-		//////////////////////////////////////////////////////////
-		// Builds Solid Cube of any grain size
-		//////////////////////////////////////////////////////////
-		var rootGrain:int = $layer.offset;
-		var oxel:Oxel = Oxel.initializeRoot( rootGrain );
-		//
-		var minGrain:int = rootGrain - $layer.range;
-		if ( rootGrain < 0 || minGrain < 0 || minGrain > rootGrain || ( 8 < (rootGrain - minGrain)) ) {
-			minGrain = Math.max( 0, rootGrain - 4 );
-			Log.out( "Oxel.generateCube - WARNING - Adjusting range: " + minGrain, Log.WARN );
-		}
-
-		//trace("GenerateCube.start on rootGrain of max size: " + rootGrain + "  Filling with grain of size: " + minGrain + " of type: " + Globals.Info[_layer.type].name );
-		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrain);
-		var size:int = 1 << (rootGrain - minGrain);
-		for ( var x:int = 0; x < size; x++ ) {
-			for ( var y:int = 0; y < size; y++ ) {
-				for ( var z:int = 0; z < size; z++ ) {
-					gct.set_values( x, y, z, minGrain )
-					oxel.write( $modelGuid, gct, $layer.type, true );
-				}
-			}
-		}
-		GrainCursorPool.poolDispose( gct );
-		oxel.dirty = true;
-		// CRITICAL STEP. oxels are expected to have faces, not dirty faces
-		// So this step turns the dirty faces into real faces.
-		// for multistep island builds I will have to ponder this more.
-		// TODO Ahhhh, you have to build faces HERE AND NOW
-		// Since the toByteArray does NOT save dirty bits!!!!
-		oxel.facesBuild();
-		var ba:ByteArray = oxel.toByteArray();
-//			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
-//			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
-		Log.out( "GenerateCube finished modelGuid: " + $modelGuid );
-		if ( $generateEvent )
-			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba, null, rootGrain.toString() ) );
-
-		//PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, $modelGuid, null, ba ) );
-		return ba;
-	}
 
 	public function generateLOD( $minGrain:uint ):void {
 		Log.out( "Oxel.generateLOD creating model of with min grain: " + $minGrain );
@@ -3656,5 +3444,206 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				return parent.minimumOxelForModel();
 		return null;
 	}
+
+	static public function getClassFromType( $type ):Class {
+		return Oxel;
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// Begin Intersection functions
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	[inline]
+	public function getModelX():uint { return gc.grainX << gc.grain; }
+	[inline]
+	public function getModelY():uint { return gc.grainY << gc.grain; }
+	[inline]
+	public function getModelZ():uint { return gc.grainZ << gc.grain; }
+
+	public function getModelVector():Vector3D {
+		return new Vector3D( getModelX(), getModelY(), getModelZ() );
+	}
+
+	[inline]
+	private static var _s_v3:Vector3D = new Vector3D;
+	public function getDistance( v:Vector3D ):Number
+	{
+		// using static speeds it up by 40%
+		_s_v3.x = v.x - getModelX();
+		_s_v3.y = v.y - getModelY();
+		_s_v3.z = v.z - getModelZ();
+		return _s_v3.length;
+	}
+
+	[inline]
+	public function getWorldCoordinate( axis:int ):int
+	{
+		switch (axis)
+		{
+			case Globals.AXIS_X:
+				return getModelX();
+			case Globals.AXIS_Y:
+				return getModelY();
+			case Globals.AXIS_Z:
+				return getModelZ();
+			default:
+				throw new Error("GrainCursor.GetWorldCoordinate - Axis Value not found");
+		}
+
+	}
+	private static const AXES:Vector.<int> = new <int>[0,1,2];
+	private static var _s_min:Vector3D = new Vector3D();
+	private static var _s_max:Vector3D = new Vector3D();
+	private static var _s_beginToEnd:Vector3D = new Vector3D();
+	public function lineIntersect( $o:Oxel, $modelSpaceStartPoint:Vector3D, $modelSpaceEndPoint:Vector3D, $intersections:Vector.<GrainCursorIntersection>, $ignoreType:uint = 100 ):Boolean
+	{
+		if ( $ignoreType == type && !childrenHas() )
+			return false;
+		if ( TypeInfo.AIR == type && !childrenHas() )
+			return false;
+
+		_s_beginToEnd.x = $modelSpaceEndPoint.x - $modelSpaceStartPoint.x;
+		_s_beginToEnd.y = $modelSpaceEndPoint.y - $modelSpaceStartPoint.y;
+		_s_beginToEnd.z = $modelSpaceEndPoint.z - $modelSpaceStartPoint.z;
+
+		_s_min.setTo(0, 0, 0);
+		_s_min.x -= $modelSpaceStartPoint.x;
+		_s_min.y -= $modelSpaceStartPoint.y;
+		_s_min.z -= $modelSpaceStartPoint.z;
+		_s_min.x += getModelX();
+		_s_min.y += getModelY();
+		_s_min.z += getModelZ();
+
+		var size:uint = gc.size();
+		_s_max.setTo(size,size,size);
+		_s_max.x -= $modelSpaceStartPoint.x;
+		_s_max.y -= $modelSpaceStartPoint.y;
+		_s_max.z -= $modelSpaceStartPoint.z;
+		_s_max.x += getModelX();
+		_s_max.y += getModelY();
+		_s_max.z += getModelZ();
+
+		var tNear:Number = -10000000;
+		var tFar:Number = 10000000;
+		var tNearAxis:int = -1;
+		var tFarAxis:int = -1;
+		for each ( var axis:int in AXES )
+		{
+			if ( getCoordinate(_s_beginToEnd, axis) == 0) // parallel
+			{
+				if ( getCoordinate( _s_min, axis) > 0 || getCoordinate( _s_max, axis) < 0)
+					return false; // segment is not between planes, return empty set
+			}
+			else
+			{
+				var t1:Number = getCoordinate( _s_min, axis) / getCoordinate(_s_beginToEnd,axis);
+				var t2:Number = getCoordinate( _s_max, axis) / getCoordinate(_s_beginToEnd,axis);
+				var tMin:Number = Math.min(t1, t2);
+				var tMax:Number = Math.max(t1, t2);
+				if (tMin > tNear) {
+					tNear = tMin;
+					tNearAxis = axis;
+				}
+				if (tMax < tFar)  {
+					tFar = tMax;
+					tFarAxis = axis;
+				}
+				if (tNear > tFar || tFar < 0)
+					return false; // empty set
+			}
+		}
+
+		if (tNear >= 0 && tNear <= 1) {
+			var gci:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tNear, tNearAxis, true );
+			gci.oxel = $o;
+			$intersections.push( gci );
+			//trace( "GrainCursor.lineIntersectTest3 - intersection near " + gciNear.toString() );
+		}
+
+		// RSF 07.04.12 If tFar compared to 1, then there is a dead zone where it doesnt intersect with model correctly
+		//if (tFar >= 0 && tFar <= 1)
+//		if (tFar >= 0 && tFar <= 32)
+// tFar = 0 occurs when starting point is on face of oxel
+
+		// failing on really large models
+		//if (tFar > 0 && tFar <= 32)
+		if (tFar > 0 && tFar <= 100) // what does 100 represent?
+		{
+			var gci1:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tFar, tFarAxis, false );
+			gci1.oxel = $o;
+			$intersections.push( gci1 );
+		}
+		return true;
+	}
+
+	private function buildIntersection( $modelSpaceStartPoint:Vector3D, $magnitude:Number, $axis:int, $nearAxis:Boolean ):GrainCursorIntersection  {
+		var gci:GrainCursorIntersection = new GrainCursorIntersection();
+		gci.point.copyFrom( _s_beginToEnd );
+		gci.point.scaleBy( $magnitude );
+		gci.point = $modelSpaceStartPoint.add( gci.point );
+		roundVector( gci.point );
+		gci.gc.copyFrom( gc );
+		gci.near = $nearAxis;
+		gci.axis = $axis;
+		if ( ((1 << gci.gc.grain) + getWorldCoordinate( gci.axis)) == getCoordinate( gci.point, gci.axis ) )
+			setCoordinate( gci.point, gci.axis, 0.001 );
+		if ( getWorldCoordinate( gci.axis) == getCoordinate( gci.point, gci.axis ) )
+			setCoordinate( gci.point, gci.axis, -0.001 );
+		return gci;
+	}
+
+	[inline]
+	public function roundVector( v:Vector3D, places:int = 4 ):void
+	{
+		v.x = roundNumber(v.x,places);
+		v.y = roundNumber(v.y,places);
+		v.z = roundNumber(v.z,places);
+
+		//return v;
+	}
+
+	[inline]
+	private function roundNumber( numIn:Number, decimalPlaces:int ):Number
+	{
+		var nExp:int = Math.pow(10,decimalPlaces) ;
+		return Math.round(numIn * nExp) / nExp;
+	}
+
+	[inline]
+	private static function getCoordinate(  vector:Vector3D,  axis:int ):Number {
+		switch (axis) {
+			case 0:
+				return vector.x;
+			case 1:
+				return vector.y;
+			case 2:
+				return vector.z;
+			default:
+				throw new Error("GrainCursor.GetCoordinate - Axis Value not found");
+		}
+	}
+
+	[inline]
+	private static function setCoordinate(  vector:Vector3D,  axis:int,  adjustment:Number ):void {
+		switch (axis) {
+			case 0:
+				vector.x -= adjustment;
+				break;
+			case 1:
+				vector.y -= adjustment;
+				break;
+			case 2:
+				vector.z -= adjustment;
+				break;
+			default:
+				throw new Error("GrainCursor.SetCoordinate - Axis Value not found");
+		}
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// End Intersection functions
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
 } // end of class Oxel
 } // end of package

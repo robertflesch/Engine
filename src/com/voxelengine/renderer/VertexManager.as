@@ -72,16 +72,7 @@ public class VertexManager {
 	}
 	
 	public function acquiredContext( $ce:ContextEvent ):void {
-		if ( _vertBuf )
-			_vertBuf.dirty = true;
-		if ( _vertBufAlpha )
-			_vertBufAlpha.dirty = true;
-		if ( _vertBufAnimated )
-			_vertBufAnimated.dirty = true;
-		if ( _vertBufAnimatedAlpha )
-			_vertBufAnimatedAlpha.dirty = true;
-		if ( _vertBufFire )
-			_vertBufFire.dirty = true;
+		setAllTypesDirty();
 		for each ( var shader:Shader in _shaders )
 			shader.createProgram( $ce.context3D );
 	}
@@ -233,7 +224,20 @@ public class VertexManager {
 //		if ( 0 == vib.length )
 //			Log.out( "VertexManger.oxelRemove - TODO how do I release every when last oxel is removed?", Log.WARN );
 	}
-	
+
+	public function setAllTypesDirty():void {
+		if ( _vertBuf )
+			_vertBuf.dirty = true;
+		if ( _vertBufAlpha )
+			_vertBufAlpha.dirty = true;
+		if ( _vertBufAnimated )
+			_vertBufAnimated.dirty = true;
+		if ( _vertBufAnimatedAlpha )
+			_vertBufAnimatedAlpha.dirty = true;
+		if ( _vertBufFire )
+			_vertBufFire.dirty = true;
+	}
+
 	public function VIBGet( $type:uint ):VertexIndexBuilder
 	{
 		var ti:TypeInfo = TypeInfo.typeInfo[$type];

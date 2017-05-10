@@ -43,6 +43,10 @@ public class LightInfo
 			               , $baseAttn:uint
 			               , $baseLightIllumination:uint
 			               , $lightIs:Boolean = false ):void {
+		if ( 0 == $ID )
+			Log.out( "ERROR WILL ROBINSON", Log.ERROR);
+		if ( locked )
+			return;
 		ID = $ID;
 		color = $color;
 		_lightIs = $lightIs;
@@ -164,7 +168,7 @@ public class LightInfo
 	public function setIlluminationLevel( $illumination:uint ):void	{
 		
 		if ( LightInfo.MAX < $illumination ) {
-			$illumination = LightInfo.MAX
+			$illumination = LightInfo.MAX;
 			Log.out( "LightInfo.setIlluminationLevel - attn > MAX" );
 		}
 
