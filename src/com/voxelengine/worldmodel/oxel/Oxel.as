@@ -1616,20 +1616,51 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 
-	public function quadsDeleteAll():int {
-		var changeCount:int = 0;
+	public function quadsDeleteAll():void {
 		if  ( _quads ) {
 			for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
 				var quad:Quad = _quads[face];
 				if ( quad ) {
-					quadDelete( quad, face );
-					changeCount++;
+					QuadPool.poolDispose( quad );
+					_quads[face] = null;
 				}
 			}
-		}
+			QuadsPool.poolDispose( _quads );
+			_quads = null;
 
-		return changeCount;
+			if ( addedToVertex ) {
+				// Todo - this should just mark the oxels, and clean up should happen later
+				chunkGet().oxelRemove( this );
+				addedToVertex = false;
+			}
+		}
 	}
+
+	// TODO, I see some risk here when I am changing oxel type from things like sand to glass
+	// Its going to assume that it was solid, which works for sand to glass
+	// how about water to sand? the oxel would lose all its faces, but never go away.
+	protected function quadDelete( quad:Quad, face:int ):void {
+		QuadPool.poolDispose( quad );
+		_quads[face] = null;
+		var hasQuads:Boolean;
+		for ( var cFace:int = Globals.POSX; cFace <= Globals.NEGZ; cFace++ ) {
+			if ( null != _quads[cFace] )
+				hasQuads = true
+		}
+		if ( false == hasQuads ) {
+			if ( _quads )
+				QuadsPool.poolDispose( _quads );
+			_quads = null;
+
+			if ( addedToVertex ) {
+				// Todo - this should just mark the oxels, and clean up should happen later
+				chunkGet().oxelRemove( this );
+				addedToVertex = false;
+			}
+		}
+	}
+
+
 
 	protected function quadAddOrRemoveFace( $face:int, $plane_facing:int, $grain:uint ):int {
 		var validFace:Boolean = faceHas($face);
@@ -1700,70 +1731,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return result;
 	}
 
-	public function quadDeleteFace( $face:int ):void {
-		if  ( !_quads )
-			return;
-		dirty = true;
-		var quad:Quad = _quads[$face];
-		if ( quad )
-			quadDelete( quad, $face );
-	}
-
-	public function quadMarkDirty( $face:int ):void {
-		if  ( !_quads )
-			return;
-		dirty = true;
-		var quad:Quad = _quads[$face];
-		if ( quad )
-			quad.dirty = 1;
-	}
-
-//	public function quadsRebuildAll():void {
-//		var ti:TypeInfo = TypeInfo.typeInfo[type];
-//		var grain:int = gc.grain;
-//		for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
-//			quadAddOrRemoveFace( face, 1, grain, ti );
-//	}
-
-//	public function quadRebuildOLD( $face:int ):void {
-//		quadAddOrRemoveFace( $face, 1, gc.grain, TypeInfo.typeInfo[type] );
-//		if  ( !_quads )
-//			return;
-//		dirty = true;
-//		var quad:Quad = _quads[$face];
-//		if ( quad )
-//		{
-//			var plane_facing:int = 1;
-//			var scale:int = 1 << gc.grain;
-//			quad.build( true, type, getModelX(), getModelY(), getModelZ(), $face, plane_facing, scale, scale, scale, gc.grain, lighting, _flowInfo );
-//			//quad.rebuild( type, getModelX(), getModelY(), getModelZ(), $face, plane_facing, gc.grain, lighting, _flowInfo );
-//		}
-//	}
-
-	// TODO, I see some risk here when I am changing oxel type from things like sand to glass
-	// Its going to assume that it was solid, which works for sand to glass
-	// how about water to sand? the oxel would lose all its faces, but never go away.
-	protected function quadDelete( quad:Quad, face:int ):void {
-		QuadPool.poolDispose( quad );
-		_quads[face] = null;
-		var hasQuads:Boolean;
-		for ( var cFace:int = Globals.POSX; cFace <= Globals.NEGZ; cFace++ ) {
-			if ( null != _quads[cFace] )
-				hasQuads = true
-		}
-		if ( false == hasQuads ) {
-			if ( _quads ) 
-				QuadsPool.poolDispose( _quads );
-			_quads = null;
-
-			if ( addedToVertex ) {
-				// Todo - this should just mark the oxels, and clean up should happen later
-				chunkGet().oxelRemove( this );
-				addedToVertex = false;
-			}
-		}
-	}
-	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// End Quad functions
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
