@@ -449,11 +449,10 @@ public class EditCursor extends VoxelModel
 		else
 			li.color = 0xffffffff;
 
-		li.color = 0x00ff0000; // RED for invalid
 		modelInfo.oxelPersistence.oxel.write( EDIT_CURSOR, modelInfo.oxelPersistence.oxel.gc, oxelTexture, true );
 
 
-//		modelInfo.oxelPersistence.oxel.quadsBuild();
+		modelInfo.oxelPersistence.oxel.quadsRebuildAllRecursively();
 
 		function cursorColorRainbow():uint {
 			var frequency:Number = 2.4;
