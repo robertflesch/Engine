@@ -13,15 +13,35 @@ import com.voxelengine.GUI.voxelModels.PopupMetadataAndModelInfo;
 import com.voxelengine.events.CharacterSlotEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
+import com.voxelengine.pools.GrainCursorPool;
+import com.voxelengine.pools.LightInfoPool;
+import com.voxelengine.pools.LightingPool;
+import com.voxelengine.utils.ColorUtils;
+import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.models.OxelPersistence;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
+import com.voxelengine.worldmodel.oxel.LightInfo;
+import com.voxelengine.worldmodel.oxel.Lighting;
+import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
+
+import flash.display.Bitmap;
+
+import flash.display.BitmapData;
 
 import flash.display.DisplayObject;
+import flash.display.Loader;
+import flash.display.LoaderInfo;
 import flash.events.Event;
+import flash.geom.Matrix;
 import flash.geom.Vector3D;
 import flash.net.FileReference;
 import flash.net.FileFilter;
+import flash.net.URLRequest;
 
 import org.flashapi.swing.*
 import org.flashapi.swing.core.UIObject;
@@ -309,13 +329,111 @@ public class InventoryPanelModel extends VVContainer
 	static private function addDesktopModelHandler(event:UIMouseEvent):void {
 		var fr:FileReference = new FileReference();
 		fr.addEventListener(Event.SELECT, onDesktopModelFileSelected );
-		var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
-		fr.browse([swfTypeFilter]);
+		//var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
+		//fr.browse([swfTypeFilter]);
+        fr.browse();
 	}
 	
 	static public function onDesktopModelFileSelected(e:Event):void {
+        Log.out("onDesktopModelFileSelected : " + e.toString());
+
+        //if ( selectedModel
+        var fileName:String = e.currentTarget.name;
+        var shortFileName:String = fileName.substr(0, fileName.indexOf("."));
+
+        var bitmapData:BitmapData;
+
+        var loader:Loader = new Loader();
+        loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onComplete);
+        loader.load(new URLRequest( Globals.texturePath + fileName));
+
+        function onComplete(event:Event):void {
+            var bm:Bitmap = Bitmap(LoaderInfo(event.target).content);
+            bitmapData = drawScaled( bm.bitmapData, 64, 64 );
+
+            var model:Object = GenerateCube.script( 6, TypeInfo.AIR, true );
+            model.name = shortFileName;
+            var ii:InstanceInfo = new InstanceInfo();
+            ii.modelGuid = Globals.getUID();
+			addListeners();
+            new ModelMakerGenerate(ii, model);
+
+			function oxelBuildComplete($ode:OxelDataEvent):void {
+				if ($ode.modelGuid == ii.modelGuid ) {
+					removeListeners();
+					oxelCreated( $ode )
+				}
+			}
+
+			function oxelBuildFailed($ode:OxelDataEvent):void {
+				if ($ode.modelGuid == ii.modelGuid ) {
+					removeListeners();
+					return;
+				}
+			}
+
+			function addListeners():void {
+				OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+				OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+				OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+				OxelDataEvent.addListener( ModelBaseEvent.RESULT, oxelBuildComplete );
+				OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelBuildComplete );
+			}
+
+			function removeListeners():void {
+				OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelBuildComplete );
+				OxelDataEvent.removeListener( ModelBaseEvent.RESULT, oxelBuildComplete );
+				OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+			}
+
+            function oxelCreated( $ode:OxelDataEvent ):void {
+                $ode.oxelData.loadFromByteArray();
+
+				createModelFromBitmap( $ode.oxelData, bitmapData );
+
+			}
+        }
+    }
+
+	static public function createModelFromBitmap( $op:OxelPersistence, $bitmapData:BitmapData ):void {
+		var w:int = $bitmapData.width;
+		var h:int = $bitmapData.height;
+		var oxel:Oxel = $op.oxel;
+        //$op.lightInfo.setIlluminationLevel( Lighting.MAX_LIGHT_LEVEL );
+        var gct:GrainCursor = GrainCursorPool.poolGet( 6 );
+        gct.grainX = 0;
+		for ( var iw:int = 0; iw < w; iw++ ){
+			for ( var ih:int = 0; ih < h; ih++ ){
+				//trace( ColorUtils.displayInHex( $bitmapData.getPixel(iw,ih)) );
+                gct.grainY = ih;
+                gct.grainZ = iw;
+				var tOxel:Oxel = oxel.write( $op.guid, gct, TypeInfo.GLASS, true);
+                if ( !tOxel.lighting ){
+                    tOxel.lighting = LightingPool.poolGet();
+                    var light:LightInfo = LightInfoPool.poolGet();
+                    light.setIlluminationLevel( Lighting.MAX_LIGHT_LEVEL );
+                    light.color = $bitmapData.getPixel(iw,h-1-ih);
+                    tOxel.lighting.add( light );
+
+                }
+			}
+		}
+
+	}
+
+    static public function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
+        var m:Matrix = new Matrix();
+        m.scale(destWidth/obj.width, destHeight/obj.height);
+        var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
+        bmpd.draw(obj, m);
+        return bmpd;
+    }
+
+	static public function onDesktopModelFileSelectedImportModel(e:Event):void {
 		Log.out( "onDesktopModelFileSelected : " + e.toString() );
-		
+
 		//if ( selectedModel
 		var fileName:String = e.currentTarget.name;
 		fileName = fileName.substr( 0, fileName.indexOf( "." ) );
@@ -324,7 +442,7 @@ public class InventoryPanelModel extends VVContainer
 		ii.modelGuid = fileName;
 		ModelMakerBase.load( ii );
 	}
-	
+
 	private function removeModel( $modelGuid:String ):void {
 		
 		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;

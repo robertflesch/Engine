@@ -8,13 +8,11 @@
 package com.voxelengine.worldmodel.models.makers
 {
 import com.voxelengine.Log;
-import com.voxelengine.events.LoadingImageEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.types.EditCursor;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 	/**
 	 * ...
@@ -42,52 +40,45 @@ public class ModelMakerCursor extends ModelMakerBase {
 			if ( _vm ) {
 				EditCursor.currentInstance.objectModelSet( _vm );
 
-				OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
-				OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
-				OxelDataEvent.addListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
-				OxelDataEvent.addListener(ModelBaseEvent.RESULT, addOrResult );
-				OxelDataEvent.addListener(ModelBaseEvent.ADDED, addOrResult );
+				addListeners();
 				OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null );
 			}
 			else
 				markComplete( false );
 		}
 
-		function addOrResult($ode:OxelDataEvent):void {
-			if ($ode.modelGuid == modelInfo.guid ) {
-				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
-				OxelDataEvent.removeListener(ModelBaseEvent.RESULT, addOrResult );
-				OxelDataEvent.removeListener(ModelBaseEvent.ADDED, addOrResult );
-				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
-				OxelDataEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
-				markComplete( true );
-			}
-		}
-
 		function oxelBuildComplete($ode:OxelDataEvent):void {
 			if ($ode.modelGuid == modelInfo.guid ) {
-				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
-				OxelDataEvent.removeListener(ModelBaseEvent.RESULT, oxelBuildComplete );
-				OxelDataEvent.removeListener(ModelBaseEvent.ADDED, oxelBuildComplete );
-				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
-				OxelDataEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+				removeListeners();
 				markComplete( true );
 			}
 		}
 
 		function oxelBuildFailed($ode:OxelDataEvent):void {
 			if ($ode.modelGuid == modelInfo.guid ) {
-				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
-				OxelDataEvent.removeListener(ModelBaseEvent.RESULT, oxelBuildComplete );
-				OxelDataEvent.removeListener(ModelBaseEvent.ADDED, oxelBuildComplete );
-				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
-				OxelDataEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+				removeListeners();
 				markComplete( false );
 			}
+
+		}
+		function addListeners():void {
+			OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+			OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+			OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+			OxelDataEvent.addListener( ModelBaseEvent.RESULT, oxelBuildComplete );
+			OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelBuildComplete );
 		}
 
+		function removeListeners():void {
+			OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelBuildComplete );
+			OxelDataEvent.removeListener( ModelBaseEvent.RESULT, oxelBuildComplete );
+			OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+		}
 	}
-	
+
+
 	override protected function markComplete( $success:Boolean ):void {
 		super.markComplete( $success );
 		makerCountDecrement();

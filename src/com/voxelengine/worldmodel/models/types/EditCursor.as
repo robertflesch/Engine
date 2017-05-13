@@ -7,14 +7,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-import com.adobe.utils.Hex;
-import com.voxelengine.GUI.voxelModels.WindowBluePrintCopy;
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.events.RegionEvent;
-import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
 
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
@@ -23,7 +15,6 @@ import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.events.TimerEvent;
 import flash.ui.Keyboard;
-import flash.utils.ByteArray;
 import flash.utils.Timer;
 import flash.utils.getTimer;
 
@@ -35,7 +26,9 @@ import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.events.CursorShapeEvent;
 import com.voxelengine.events.CursorSizeEvent;
-import com.voxelengine.pools.LightingPool;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.GUI.voxelModels.WindowBluePrintCopy;
 import com.voxelengine.pools.GrainCursorPool;
 import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.TypeInfo;
@@ -48,12 +41,8 @@ import com.voxelengine.worldmodel.models.makers.ModelMakerCursor;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.tasks.flowtasks.CylinderOperation;
 import com.voxelengine.worldmodel.tasks.flowtasks.SphereOperation;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 
-/**
- * ...
- * @author Robert Flesch - RSF 
- * 
- */
 public class EditCursor extends VoxelModel
 {
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -67,18 +56,20 @@ public class EditCursor extends VoxelModel
 	static private const 		EDITCURSOR_SQUARE:uint				= 1000;
 	static private const 		EDITCURSOR_ROUND:uint				= 1001;
 	static private const 		EDITCURSOR_CYLINDER:uint			= 1002;
-	static private const 		EDITCURSOR_CYLINDER_ANIMATED:uint	= 1003;
+	//static private const 		EDITCURSOR_CYLINDER_ANIMATED:uint	= 1003;
 	static private const 		EDITCURSOR_INVALID:uint				= 1004;
 	static private const 		EDITCURSOR_HAND_LR:uint				= 1005;
 	static private const 		EDITCURSOR_HAND_UD:uint				= 1006;
-	static private var 			_s_listenersAdded:Boolean;
-	
+
 	static private var 			_editing:Boolean;
 	static private function  get editing():Boolean 					{ return _editing; }
-	static private function  set editing(val:Boolean):void 			{
-		//Log.out( "EditCursor.editing: " + val );
-		_editing = val; }
+	static private function  set editing(val:Boolean):void 			{ _editing = val; }
 	static public function   get isEditing():Boolean 				{ return _editing; }
+
+	static private var _lastSize:int;
+	static private function set lastSize(val:int):void 				{ _lastSize = val; }
+	static private function get lastSize():int 						{ return _lastSize; }
+
 	
 	static public function get currentInstance():EditCursor {
 		if ( null == _s_currentInstance ) {
@@ -103,7 +94,6 @@ public class EditCursor extends VoxelModel
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// instance data
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	private 			var	_repeatTime:int = 100;
 	private 			var _repeatTimer:Timer;
 	private  			var _count:int = 0;
 	private 			var _phase:Number = 0; // used by the rainbow cursor
@@ -114,7 +104,7 @@ public class EditCursor extends VoxelModel
 	private  function 	set cursorOperation(val:String):void 			{ 
 		_cursorOperation = val; 
 		if ( _cursorOperation == CursorOperationEvent.NONE ) {
-			editing = false
+			editing = false;
 			repeatTimerStop()
 		}
 		else
@@ -151,46 +141,62 @@ public class EditCursor extends VoxelModel
 
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
-		addListeners();
-	}
-	
-	override public function release():void {
-		super.release();
-		
-		removeListeners();
+		CursorOperationEvent.addListener( CursorOperationEvent.NONE, 			resetEvent );
+		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_OXEL, 	deleteOxelEvent );
+		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_MODEL, 	deleteModelEvent);
+		CursorOperationEvent.addListener( CursorOperationEvent.INSERT_OXEL, 	insertOxelEvent );
+		CursorOperationEvent.addListener( CursorOperationEvent.INSERT_MODEL, 	insertModelEvent );
+
+		CursorShapeEvent.addListener( CursorShapeEvent.CYLINDER, 		shapeSetEvent );
+		CursorShapeEvent.addListener( CursorShapeEvent.MODEL_AUTO, 		shapeSetEvent );
+		CursorShapeEvent.addListener( CursorShapeEvent.SPHERE, 			shapeSetEvent );
+		CursorShapeEvent.addListener( CursorShapeEvent.SQUARE, 			shapeSetEvent );
+
+		CursorSizeEvent.addListener( CursorSizeEvent.SET, 			sizeSetEvent );
+		CursorSizeEvent.addListener( CursorSizeEvent.GROW, 			sizeGrowEvent );
+		CursorSizeEvent.addListener( CursorSizeEvent.SHRINK, 		sizeShrinkEvent );
+
+		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
+		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
+		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_UP, 	 mouseUp);
+		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_MOVE,  mouseMove);
+		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_DOWN,  mouseDown);
+		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
 	}
 	
 	////////////////////////////////////////////////
 	// CursorSizeEvents
+	////////////////////////////////////////////////
 	private function sizeSetEvent(e:CursorSizeEvent):void {
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation
 		  || CursorOperationEvent.INSERT_OXEL == cursorOperation ) {
-			if ( VoxelModel.selectedModel )
-				if ( e.size <= VoxelModel.selectedModel.modelInfo.oxelPersistence.bound && 0 <= e.size ) {
-					modelInfo.oxelPersistence.bound = e.size;
-					modelInfo.oxelPersistence.oxel.gc.bound = e.size;
-					modelInfo.oxelPersistence.oxel.gc.grain = e.size;
+			if ( VoxelModel.selectedModel ) {
+				var vmBound:int = VoxelModel.selectedModel.modelInfo.oxelPersistence.bound;
+				if (e.size <= vmBound && 0 <= e.size) {
+					lastSize = e.size;
 				}
-				else {	
-					// reseting so I have to inform others
-					modelInfo.oxelPersistence.bound = 4;
-					modelInfo.oxelPersistence.oxel.gc.bound = 4;
-					modelInfo.oxelPersistence.oxel.gc.grain = 4;
-					CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, modelInfo.oxelPersistence.bound ) );
+				else {
+					// too big or too small
+					lastSize = vmBound;
+					CursorSizeEvent.dispatch(new CursorSizeEvent(CursorSizeEvent.SET, modelInfo.oxelPersistence.bound));
 				}
-			else {
+			} else {
 				if ( modelInfo && modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount ) {
-					modelInfo.oxelPersistence.bound = e.size;
-					modelInfo.oxelPersistence.oxel.gc.bound = e.size;
-					modelInfo.oxelPersistence.oxel.gc.grain = e.size;
+					lastSize = e.size;
 				}
 			}
 		}
 	}
 	private function sizeGrowEvent(e:CursorSizeEvent):void {
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation || CursorOperationEvent.INSERT_OXEL == cursorOperation ) {
-			if ( modelInfo.oxelPersistence.oxel.gc.grain < 6 )
+			var maxCursorSize:int = 6;
+			if ( Globals.isDebug ){
+				maxCursorSize = 31;
+			}
+			if ( modelInfo.oxelPersistence.oxel.gc.grain < maxCursorSize ) {
+				modelInfo.oxelPersistence.oxel.gc.bound++;
 				modelInfo.oxelPersistence.oxel.gc.grain++;
+			}
 			CursorSizeEvent.dispatch( new CursorSizeEvent( CursorSizeEvent.SET, modelInfo.oxelPersistence.oxel.gc.grain ) );
 		}
 	}
@@ -204,7 +210,7 @@ public class EditCursor extends VoxelModel
 	
 	////////////////////////////////////////////////
 	// CursorOperationEvents
-	private function resetEvent(e:CursorOperationEvent):void {
+	static private function resetEvent(e:CursorOperationEvent):void {
 		editing = false
 	}
 	
@@ -239,13 +245,13 @@ public class EditCursor extends VoxelModel
 		
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.modelGuid = e.om.modelGuid;
-		var mm:ModelMakerCursor = new ModelMakerCursor( ii, e.om.vmm );
+		new ModelMakerCursor( ii, e.om.vmm );
 	}
 	
 	////////////////////////////////////////////////
 	// CursorShapeEvents
 	private function shapeSetEvent(e:CursorShapeEvent):void { 
-		_cursorShape = e.type 
+		_cursorShape = e.type ;
 
 		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation || CursorOperationEvent.INSERT_MODEL == cursorOperation ) {	
 			if ( CursorShapeEvent.CYLINDER == cursorShape )
@@ -257,60 +263,6 @@ public class EditCursor extends VoxelModel
 		}
 	}
 	
-	private function removeListeners():void {	
-		//Log.out( "EditCursor.removeListeners", Log.WARN );
-		//_s_listenersAdded = false;
-		////CursorOperationEvent.removeListener( CursorOperationEvent.NONE, 		resetEvent );
-		//CursorOperationEvent.removeListener( CursorOperationEvent.DELETE_OXEL, 	deleteOxelEvent );
-		//CursorOperationEvent.removeListener( CursorOperationEvent.DELETE_MODEL, deleteModelEvent );
-		//CursorOperationEvent.removeListener( CursorOperationEvent.INSERT_OXEL, 	insertOxelEvent );
-		//CursorOperationEvent.removeListener( CursorOperationEvent.INSERT_MODEL, insertModelEvent );
-		//
-		//CursorShapeEvent.removeListener( CursorShapeEvent.CYLINDER, 	shapeSetEvent );
-		//CursorShapeEvent.removeListener( CursorShapeEvent.MODEL_AUTO, 	shapeSetEvent );
-		//CursorShapeEvent.removeListener( CursorShapeEvent.SPHERE, 		shapeSetEvent );
-		//CursorShapeEvent.removeListener( CursorShapeEvent.SQUARE, 		shapeSetEvent );
-		//
-		//CursorSizeEvent.removeListener( CursorSizeEvent.SET, 			sizeSetEvent );
-		//CursorSizeEvent.removeListener( CursorSizeEvent.GROW, 			sizeGrowEvent );
-		//CursorSizeEvent.removeListener( CursorSizeEvent.SHRINK, 		sizeShrinkEvent );
-//
-		//Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-		//Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_UP, 	mouseUp);
-		//Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_DOWN, 	mouseDown);
-		//Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_MOVE, 	mouseMove);
-	}
-	
-	private function addListeners():void {
-		
-		if ( _s_listenersAdded )
-			return;
-			
-		_s_listenersAdded = true;	
-		CursorOperationEvent.addListener( CursorOperationEvent.NONE, 			resetEvent );
-		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_OXEL, 	deleteOxelEvent );
-		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_MODEL, 	deleteModelEvent);
-		CursorOperationEvent.addListener( CursorOperationEvent.INSERT_OXEL, 	insertOxelEvent );
-		CursorOperationEvent.addListener( CursorOperationEvent.INSERT_MODEL, 	insertModelEvent );
-
-		CursorShapeEvent.addListener( CursorShapeEvent.CYLINDER, 		shapeSetEvent );
-		CursorShapeEvent.addListener( CursorShapeEvent.MODEL_AUTO, 		shapeSetEvent );
-		CursorShapeEvent.addListener( CursorShapeEvent.SPHERE, 			shapeSetEvent );
-		CursorShapeEvent.addListener( CursorShapeEvent.SQUARE, 			shapeSetEvent );
-		
-		CursorSizeEvent.addListener( CursorSizeEvent.SET, 			sizeSetEvent );
-		CursorSizeEvent.addListener( CursorSizeEvent.GROW, 			sizeGrowEvent );
-		CursorSizeEvent.addListener( CursorSizeEvent.SHRINK, 		sizeShrinkEvent );
-		
-		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_UP, 	 mouseUp);
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_MOVE,  mouseMove);
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_DOWN,  mouseDown);
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
-	}
-
-	
 	////////////////////////////////////////////////
 	// EditCursor positioning
 	public function gciDataClear():void { gciData = null; }
@@ -318,7 +270,7 @@ public class EditCursor extends VoxelModel
 		_gciData = $gciData;
 		modelInfo.oxelPersistence.bound = $gciData.model.modelInfo.oxelPersistence.bound;
 		if ( modelInfo.oxelPersistence.oxel.gc.grain > modelInfo.oxelPersistence.bound )
-			modelInfo.oxelPersistence.oxel.gc.grain == modelInfo.oxelPersistence.bound;
+			modelInfo.oxelPersistence.oxel.gc.grain = modelInfo.oxelPersistence.bound;
 		//// This cleans up (int) the location of the gc
 		var gct:GrainCursor = GrainCursorPool.poolGet( $gciData.model.modelInfo.oxelPersistence.bound );
 		GrainCursor.roundToInt( $gciData.point.x, $gciData.point.y, $gciData.point.z, gct );
@@ -355,12 +307,11 @@ public class EditCursor extends VoxelModel
 			objectModel.draw( $mvp, $context, true, $alpha );
 		}
 
-		if ( gciData ) { // if no intersection dont draw
+		if ( gciData ) { // if no intersection don't draw
 			var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
 			viewMatrix.prependScale( 1 + SCALE_FACTOR, 1 + SCALE_FACTOR, 1 + SCALE_FACTOR ); 
-			var positionscaled:Vector3D = viewMatrix.position;
 			var t:Number = modelInfo.oxelPersistence.oxel.gc.size() * SCALE_FACTOR/2;
-			viewMatrix.prependTranslation( -t, -t, -t)
+			viewMatrix.prependTranslation( -t, -t, -t);
 			viewMatrix.append($mvp);
 			
 			modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha )
@@ -379,7 +330,7 @@ public class EditCursor extends VoxelModel
 		if ( gciData ) {
 			if ( cursorOperation == CursorOperationEvent.INSERT_OXEL || cursorOperation == CursorOperationEvent.INSERT_MODEL ) {
 				// This gets the closest open oxel along the ray
-				insertLocationCalculate( gciData.model );
+				insertLocationCalculate();
 				PlacementLocation.INVALID == _pl.state ?  oxelTexture = EDITCURSOR_INVALID : oxelTexture = oxelTextureValid;
 
 				if ( cursorShape == CursorShapeEvent.MODEL_AUTO && objectModel )
@@ -407,12 +358,48 @@ public class EditCursor extends VoxelModel
 	
 	private function buildCursorModel():void {	
 		modelInfo.oxelPersistence.oxel.editCursorReset();
-		
+
+		// if the cursor is a model, set the cursor size to the model size
 		if ( objectModel ) {
 			modelInfo.oxelPersistence.bound = _objectModel.grain;
 			modelInfo.oxelPersistence.oxel.gc.bound = _objectModel.grain;
 			modelInfo.oxelPersistence.oxel.gc.grain = _objectModel.grain;
 		}
+
+		var li:LightInfo = modelInfo.oxelPersistence.oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+		if ( null == li ) {
+			modelInfo.oxelPersistence.oxel.lighting.add(modelInfo.oxelPersistence.oxel.chunkGet().lightInfo);
+			li = modelInfo.oxelPersistence.oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+		}
+		li.setIlluminationLevel( LightInfo.MAX );
+
+		// Set cursor color
+		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
+			li.color = cursorColorRainbow();
+		else if ( CursorOperationEvent.INSERT_OXEL == cursorOperation && EDITCURSOR_INVALID == oxelTexture )
+			li.color = 0x00ff0000; // RED for invalid
+		else
+			li.color = 0xffffffff;
+
+		// if cursor is a move cursor, that make it the size of the model
+		if ( EDITCURSOR_HAND_LR == oxelTexture || EDITCURSOR_HAND_UD == oxelTexture ) {
+			modelInfo.oxelPersistence.oxel.gc.bound = gciData.oxel.gc.bound;
+			modelInfo.oxelPersistence.oxel.gc.grain = gciData.oxel.gc.bound;
+			var gct:GrainCursor = GrainCursorPool.poolGet( gciData.oxel.gc.bound );
+			gct.grain = gciData.oxel.gc.bound;
+			modelInfo.oxelPersistence.oxel.write( EDIT_CURSOR, gct, oxelTexture, true);
+			GrainCursorPool.poolDispose(gct);
+		}
+		else {
+			modelInfo.oxelPersistence.bound = lastSize;
+			modelInfo.oxelPersistence.oxel.gc.bound = lastSize;
+			modelInfo.oxelPersistence.oxel.gc.grain = lastSize;
+		}
+
+		modelInfo.oxelPersistence.oxel.write( EDIT_CURSOR, modelInfo.oxelPersistence.oxel.gc, oxelTexture, true );
+
+
+		// This decides how many sides the edit cursor has.
 		if ( CursorShapeEvent.CYLINDER == cursorShape || CursorShapeEvent.SPHERE == cursorShape ) {
 			// I could use gciData.near to determine which single face to use, but seems like overkill
 			if ( Globals.AXIS_X == _gciData.axis ) {
@@ -425,7 +412,7 @@ public class EditCursor extends VoxelModel
 				modelInfo.oxelPersistence.oxel.faceSet( Globals.POSZ );
 				modelInfo.oxelPersistence.oxel.faceSet( Globals.NEGZ );
 			}
-		} else {	
+		} else {
 			modelInfo.oxelPersistence.oxel.faceSet( Globals.POSX );
 			modelInfo.oxelPersistence.oxel.faceSet( Globals.NEGX );
 			modelInfo.oxelPersistence.oxel.faceSet( Globals.POSY );
@@ -433,43 +420,24 @@ public class EditCursor extends VoxelModel
 			modelInfo.oxelPersistence.oxel.faceSet( Globals.POSZ );
 			modelInfo.oxelPersistence.oxel.faceSet( Globals.NEGZ );
 		}
-		
-		var li:LightInfo = modelInfo.oxelPersistence.oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-		if ( null == li ) {
-			modelInfo.oxelPersistence.oxel.lighting.add(modelInfo.oxelPersistence.oxel.chunkGet().lightInfo);
-			li = modelInfo.oxelPersistence.oxel.lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-		}
-		li.setIlluminationLevel( LightInfo.MAX );
-		if ( CursorOperationEvent.DELETE_OXEL == cursorOperation )
-			li.color = cursorColorRainbow();
-		else if ( CursorOperationEvent.INSERT_OXEL == cursorOperation && EDITCURSOR_INVALID == oxelTexture )
-			li.color = 0x00ff0000; // RED for invalid
-		else if ( CursorOperationEvent.INSERT_MODEL == cursorOperation && EDITCURSOR_INVALID == oxelTexture )
-			li.color = 0x00ff0000; // RED for invalid
-		else
-			li.color = 0xffffffff;
-
-		modelInfo.oxelPersistence.oxel.write( EDIT_CURSOR, modelInfo.oxelPersistence.oxel.gc, oxelTexture, true );
-
 
 		modelInfo.oxelPersistence.oxel.quadsRebuildAllRecursively();
 
 		function cursorColorRainbow():uint {
 			var frequency:Number = 2.4;
 			var red:uint = Math.max( 0, Math.sin( frequency + 2 + _phase ) ) * 255;
-			var green:uint = Math.max( 0, Math.sin( frequency + 0 + _phase ) ) * 255;
+			var green:uint = Math.max( 0, Math.sin( frequency + _phase ) ) * 255;
 			var blue:uint = Math.max( 0, Math.sin( frequency + 4 + _phase ) ) * 255;
-			var color:uint;
+			var color:uint = 0;
 			color |= red << 16;
 			color |= green << 8;
 			color |= blue << 0;
 			_phase += 0.03;
-			//trace( "cursorColorRainbow color: " + color );
 			return color;
 		}
 	}
 	
-	private function isAvatarInsideThisOxel( vm:VoxelModel, oxel:Oxel ):Boolean {
+	private function isAvatarInsideThisOxel( vm:VoxelModel ):Boolean {
 		var mp:Vector3D = vm.worldToModel( ModelCacheUtils.worldSpaceStartPoint );
 		// check head
 		var result:Boolean = modelInfo.oxelPersistence.oxel.gc.is_point_inside( mp );
@@ -483,7 +451,7 @@ public class EditCursor extends VoxelModel
 		
 		var foundModel:VoxelModel = VoxelModel.selectedModel;
 		// placementResult - { oxel:Globals.BAD_OXEL, gci:gci, positive:posMove, negative:negMove };
-		insertLocationCalculate( foundModel );
+		insertLocationCalculate();
 		if ( PlacementLocation.INVALID == _pl.state )
 		{
 			Log.out( "EditCursor.getHighlightedOxel NO PLACEMENT FOUND" );
@@ -553,7 +521,7 @@ public class EditCursor extends VoxelModel
 				return;
 			}
 	
-			if ( isAvatarInsideThisOxel( foundModel, oxelToBeModified ) )
+			if ( isAvatarInsideThisOxel( foundModel ) )
 			{
 				Log.out( "EditCursor.insertOxel - Trying to place an oxel on top of ourself" );
 				return;
@@ -574,7 +542,7 @@ public class EditCursor extends VoxelModel
 		}
 	}
 	
-	private function insertLocationCalculate( foundModel:VoxelModel ):void {
+	private function insertLocationCalculate():void {
 		var gci:GrainCursorIntersection = EditCursor.currentInstance.gciData;
 		if ( !gci )
 			return;
@@ -619,8 +587,6 @@ public class EditCursor extends VoxelModel
 			}
 			break;
 		}
-			
-		return;
 	}
 	
 	static private function getOxelFromPoint( vm:VoxelModel, gci:GrainCursorIntersection ):Oxel {
@@ -647,7 +613,6 @@ public class EditCursor extends VoxelModel
 			VoxelModel.controlledModel.stateLock( true, 300 );
 			
 			foundModel = VoxelModel.selectedModel;
-			var fmRoot:Oxel = foundModel.modelInfo.oxelPersistence.oxel;
 			if ( CursorShapeEvent.SQUARE == cursorShape )
 			{
 				if ( foundModel.metadata.permissions.blueprint ) {
@@ -724,7 +689,7 @@ public class EditCursor extends VoxelModel
 			var what:int = oxelTexture;
 			if ( CursorOperationEvent.INSERT_OXEL == cursorOperation )
 			{
-				insertLocationCalculate( foundModel );
+				insertLocationCalculate();
 				if ( PlacementLocation.INVALID == _pl.state )
 					return;
 				
@@ -734,14 +699,14 @@ public class EditCursor extends VoxelModel
 			else
 			{
 				where = gciCyl.gc;
-				radius -= radius / 8
+				radius -= radius / 8;
 				what = TypeInfo.AIR;
 			}
 			
 			var cuttingPointCyl:Vector3D = new Vector3D();
 			cuttingPointCyl.x = where.getModelX() + radius;
-			cuttingPointCyl.y = where.getModelY() + radius
-			cuttingPointCyl.z = where.getModelZ() + radius
+			cuttingPointCyl.y = where.getModelY() + radius;
+			cuttingPointCyl.z = where.getModelZ() + radius;
 			
 			var minGrain:int = Math.max( EditCursor.currentInstance.modelInfo.oxelPersistence.oxel.gc.grain - 4, 0 );
 			var startingGrain:int = EditCursor.currentInstance.modelInfo.oxelPersistence.oxel.gc.grain - 1;
@@ -791,18 +756,16 @@ public class EditCursor extends VoxelModel
 			var what:int = oxelTexture;
 			if ( CursorOperationEvent.INSERT_OXEL == cursorOperation )
 			{
-				offset = gciCyl.gc.size();
-				insertLocationCalculate( foundModel );
+				insertLocationCalculate();
 				if ( PlacementLocation.INVALID == _pl.state )
 					return;
 				
-				//where = temp.gci.gc;						
 				where = _pl.gc;
 			}
 			else // CURSOR_OP_DELETE
 			{
 				where = gciCyl.gc;
-				radius -= radius / 8
+				radius -= radius / 8;
 				//radius += radius / 16
 				what = TypeInfo.AIR;
 			}
@@ -836,16 +799,16 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function keyDown(e:KeyboardEvent):void  {
-		if ( Globals.openWindowCount || e.ctrlKey || !Globals.active || !editing )
+		if ( Globals.openWindowCount || !Globals.active || !editing ) // removed || e.ctrlKey
 			return;
-			
-		var foundModel:VoxelModel;
+
 		switch (e.keyCode) {
 			case Keyboard.CONTROL:
 				if ( MouseKeyboardHandler.isLeftMouseDown )
-					oxelTexture = EDITCURSOR_HAND_UD
+					oxelTexture = EDITCURSOR_HAND_UD;
 				else
-					oxelTexture = EDITCURSOR_HAND_LR
+					oxelTexture = EDITCURSOR_HAND_LR;
+				break;
 			case 107: case Keyboard.NUMPAD_ADD:
 			case 45: case Keyboard.INSERT:
 					insertOxel();
@@ -867,7 +830,7 @@ public class EditCursor extends VoxelModel
 	
 	private static var _s_dy:Number = 0;
 	private static var _s_dx:Number = 0;
-	private function mouseMove(e:MouseEvent):void {
+	static private function mouseMove(e:MouseEvent):void {
 		if ( MouseKeyboardHandler.isCtrlKeyDown ) {
 			if ( 0 == _s_dx && 0 == _s_dy ) {
 				_s_dy = Globals.g_app.stage.mouseY;
@@ -876,16 +839,16 @@ public class EditCursor extends VoxelModel
 			}
 			var dy:Number = Globals.g_app.stage.mouseY - _s_dy;
 			if ( 0 < dy )
-				dy = 1
+				dy = 1;
 			else if ( dy < 0 )
-				dy = -1
+				dy = -1;
 			_s_dy = Globals.g_app.stage.mouseY;
 			var dx:Number =  Globals.g_app.stage.mouseX - _s_dx;
 			if ( 0 < dx )
-				dx = 1
+				dx = 1;
 			else if ( dx < 0 )
-				dx = -1
-			_s_dx = Globals.g_app.stage.mouseX
+				dx = -1;
+			_s_dx = Globals.g_app.stage.mouseX;
 			//Log.out( "EditCursor.mouse move dx: " + dx + "  dy: " + dy + " _s_dx: " + _s_dx + "  _s_dy: " + _s_dy, Log.WARN );
 			
 			if ( VoxelModel.selectedModel ) {
@@ -931,7 +894,7 @@ public class EditCursor extends VoxelModel
 	
 	private function mouseDown(e:MouseEvent):void {
 		if ( Globals.openWindowCount  || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging || Log.showing )
-			return
+			return;
 			
 		if ( doubleMessageHack ) {
 			//Log.out( "EditCursor.mouseDown", Log.WARN );
@@ -955,7 +918,7 @@ public class EditCursor extends VoxelModel
 		
 	protected function onRepeat(event:TimerEvent):void {
 		if ( Globals.openWindowCount || !Globals.active || !editing ) {
-			repeatTimerStop()		
+			repeatTimerStop();
 			return; }
 			
 		if ( 1 < _count )

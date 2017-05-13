@@ -209,11 +209,8 @@ public class Oxel extends OxelBitfields
 		if ( Globals.BAD_OXEL == $o ) // This is expected, if oxel is on edge of model
 			return false;
 		
-		if ( !$o.lighting ) { // does this oxel already have a brightness?
-			$o.lighting = LightingPool.poolGet();
-			$o.lighting.add( $o.chunkGet().lightInfo );
-			$o.lighting.materialFallOffFactor = TypeInfo.typeInfo[$o.type].lightInfo.fallOffFactor;
-		}
+		if ( !$o.lighting ) // does this oxel already have a brightness?
+			$o.lightingAddDefault( $o.chunkGet().lightInfo );
 
 		return true;
 	}
@@ -645,12 +642,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			_children[i].facesMarkAllDirty();
 			
 			if ( lighting ) {
-				_children[i].lighting = LightingPool.poolGet();
-				_children[i].lighting.add( chunkGet().lightInfo );
+				_children[i].lightingAddDefault( chunkGet().lightInfo );
+                _children[i].lighting.color = lighting.color;
 				lighting.childGetAllLights( gct.childId(), _children[i].lighting );
 				// child should attenuate light at same rate.
-				_children[i].lighting.materialFallOffFactor = lighting.materialFallOffFactor;
-				_children[i].lighting.color = lighting.color;
 			}
 			
 			// Special case for grass, leave upper oxels as grass.
@@ -779,7 +774,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			
 		// Now we can change type
 		type = $newType;
-		
+
 		// This is only used by terrain builder scripts.
 		if ( $onlyChangeType ) 
 			return this;
@@ -883,8 +878,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		/// merge the brightness data into parent.
 		if ( hasBrightnessData ) {
 			if ( null == lighting ) {
-				lighting = LightingPool.poolGet();
-				lighting.add( chunkGet().lightInfo );
+				lightingAddDefault( chunkGet().lightInfo );
 			}
 			for each ( var childForBrightness:Oxel in _children ) 
 			{
@@ -1581,10 +1575,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			if ( null == _quads )
 				_quads = QuadsPool.poolGet();
 
-			if ( null == _lighting ){
-				lighting = LightingPool.poolGet();
-				lighting.add( chunkGet().lightInfo );
-				lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
+			if ( !lighting ){
+                lightingAddDefault( chunkGet().lightInfo );
 			}
 
 			var thisGrain:int = gc.grain;
@@ -1605,6 +1597,12 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 		
 		dirty = false;
+	}
+
+	public function lightingAddDefault( $li:LightInfo ):void {
+		lighting = LightingPool.poolGet();
+		lighting.add( $li );
+		lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
 	}
 
 	public function quadRebuild( $face:int ):void {
@@ -1778,10 +1776,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				flowInfo = FlowInfoPool.poolGet();
 			flowInfo.toByteArray( $ba );
 
-			if ( !lighting ) {
-				lighting = LightingPool.poolGet();
-				lighting.add( chunkGet().lightInfo );
-			}
+			if ( !lighting )
+				lightingAddDefault( chunkGet().lightInfo );
 			lighting.toByteArray( $ba );
 		}
 		else {
@@ -1894,8 +1890,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			
 			// the baseLightLevel gets overridden by data from byte array.
 			if ( !lighting ) {
-				lighting = LightingPool.poolGet();
-				lighting.add( chunkGet().lightInfo );
+				lightingAddDefault( chunkGet().lightInfo );
 			}
 			$ba = lighting.fromByteArray( $version, $ba );
 			
@@ -2060,9 +2055,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
 			}
 			if ( facesHas() ){
-				lighting = LightingPool.poolGet();
-				lighting.add( $op.lightInfo );
-				lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
+				lightingAddDefault( $op.lightInfo );
 			}
 		}
 

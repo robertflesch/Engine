@@ -487,7 +487,7 @@ public class  UserInventory extends QuickInventory
 	}
 
 	private function hotKeyInventory(e:KeyboardEvent):void {
-		Log.out( "UserInventory.hotKeyInventory ", Log.WARN );
+		//Log.out( "UserInventory.hotKeyInventory ", Log.WARN );
 		if  ( !Globals.active )
 			return;
 			
