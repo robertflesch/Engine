@@ -67,7 +67,7 @@ public static function poolReturn( $disposedBrightness:LightInfo ):void
         return;
     }
     //                  setInfo( $ID:uint , $color:uint , $baseAttn:uint , $baseLightLevel:uint , $lightIs:Boolean = false ):void {
-    $disposedBrightness.setInfo( 0, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, Lighting.DEFAULT_ILLUMINATION, false )
+    $disposedBrightness.setInfo( 1, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, Lighting.DEFAULT_ILLUMINATION, false )
 
     _pool[_counter++] = $disposedBrightness;
     }
