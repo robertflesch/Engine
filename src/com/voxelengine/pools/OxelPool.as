@@ -32,7 +32,11 @@ public final class OxelPool
 	}
 
 	public static function poolDispose( $oxel:Oxel ):void {
-		var pool:OxelTypePool = _pools[$oxel.type];
+		var pool:OxelTypePool = _pools[0];
+		if ( $oxel.type < 1000 )
+			pool = _pools[0];
+		else if ( $oxel.type == 152 ) // Vines
+			pool = _pools[1];
 		if ( !pool ) {
 			Log.out( "OxelPool.poolDispose - no pool found for type: " + $oxel.type );
 			return
