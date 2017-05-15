@@ -54,8 +54,6 @@ public class GenerateWater extends LandscapeTask
 			
 			trace( "GenerateWater.start - water height: " + rangeInG0 );	
 			oxel.layDownWater( rangeInG0 );
-			Log.out( "GenerateWater.start - CREATED CHILDREN: " + Oxel.TEMP_COUNT );
-
 		}
 		else
 			Log.out( "GenerateWater.start - VM not found for guid: " + _modelGuid );
