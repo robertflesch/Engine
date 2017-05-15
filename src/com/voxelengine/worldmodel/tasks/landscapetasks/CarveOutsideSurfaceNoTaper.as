@@ -39,7 +39,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var masterHeightMap:Array = null;
 			var masterMapSize:uint = 0;
 
-			var oxel:Oxel = oxel;
+			var oxel:Oxel = vm.modelInfo.oxelPersistence.oxel;
 			var size:int = oxel.size_in_world_coordinates();
 			masterMapSize = Math.min( size, 1024 );
 			masterHeightMap = NoiseGenerator.generate_height_map( masterMapSize );
