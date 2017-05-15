@@ -410,13 +410,12 @@ public class InventoryPanelModel extends VVContainer
                 gct.grainY = ih;
                 gct.grainZ = iw;
 				var tOxel:Oxel = oxel.write( $op.guid, gct, TypeInfo.GLASS, true);
+				tOxel.color = $bitmapData.getPixel(iw,h-1-ih);
                 if ( !tOxel.lighting ){
                     tOxel.lighting = LightingPool.poolGet();
                     var light:LightInfo = LightInfoPool.poolGet();
                     light.setIlluminationLevel( Lighting.MAX_LIGHT_LEVEL );
-                    light.color = $bitmapData.getPixel(iw,h-1-ih);
                     tOxel.lighting.add( light );
-
                 }
 			}
 		}
