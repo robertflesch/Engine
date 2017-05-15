@@ -1824,7 +1824,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 		$ba.writeUnsignedInt(maskWriteData()); // data contains info on faces, lighting, flow
 		$ba.writeUnsignedInt(type); //
-		$ba.writeUnsignedInt(color); // color
+		if ( colorHas(data))
+			$ba.writeUnsignedInt(color); // color
 
         if ( childrenHas() )
             writeChildren();
@@ -1912,7 +1913,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
     public function fromByteArray( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $op:OxelPersistence ):ByteArray {
         var faceData:uint = $ba.readUnsignedInt();
         var typeData:uint = $ba.readUnsignedInt();
-		color = $ba.readUnsignedInt();
+		if ( colorHas(faceData))
+			color = $ba.readUnsignedInt();
 
         //Log.out( "fromByteArray " + getTabs($gc.bound - $gc.grain ) + "  data: " + faceData.toString(16));
         //Log.out( "fromByteArray " + getTabs($gc.bound - $gc.grain ) + "  type: " + typeData );

@@ -28,7 +28,10 @@ import com.voxelengine.worldmodel.TypeInfo;
 		private static const OXEL_DATA_LIGHT_INFO:uint				= 0x00000002;
 		private static const OXEL_DATA_LIGHT_INFO_CLEAR:uint		= 0xfffffffd;
 
-		private static const OXEL_DATA_UNUSED:uint				    = 0x8001f9fc; // 1000 0000 0000 0001 1111 1001 1111 1100
+		private static const OXEL_DATA_COLOR:uint					= 0x00000004;
+		private static const OXEL_DATA_COLOR_CLEAR:uint				= 0xfffffffb;
+
+		private static const OXEL_DATA_UNUSED:uint				    = 0x8001f9f8; // 1000 0000 0000 0001 1111 1001 1111 1100
 		//private static const OXEL_DATA_UNUSED_CLEAR:uint		    = 0xfffffffd;
 
 		private static const OXEL_DATA_FIRE:uint					= 0x00000200;
@@ -43,7 +46,7 @@ import com.voxelengine.worldmodel.TypeInfo;
 		private static const OXEL_DATA_ADDITIONAL_CLEAR:uint  		= 0x7fffffff; // deprecated - used if oxel has flow or light data
 		private static const OXEL_DATA_ADDITIONAL:uint  			= 0x80000000; // deprecated - used if oxel has flow or light data
 
-		private static const OXEL_WRITE_DATA:uint  		            = 0x7e010603; // only these bits are valid for writing
+		private static const OXEL_WRITE_DATA:uint  		            = 0x7e010607; // only these bits are valid for writing
 
 		private static const OXEL_DATA_FACES_CLEAR:uint				= 0x81ffffff;
 		private static const OXEL_DATA_FACES:uint  					= 0x7e000000;
@@ -131,7 +134,13 @@ import com.voxelengine.worldmodel.TypeInfo;
 		static protected const  DEFAULT_COLOR:uint = 0xff000000;
 		private var _color:uint = DEFAULT_COLOR;				// holds color data
 		public function get color():uint 						{ return _color; }
-		public function set color( val:uint ):void 				{ _color = val; }
+		public function set color( val:uint ):void 				{
+			_color = val;
+			if ( DEFAULT_COLOR == val )
+				colorClear();
+			else
+				colorMark();
+		}
 
 		private static const OXEL_DATA_TYPE_MASK_CLEAR:uint 		= 0xfffffc00;
 		private static const OXEL_DATA_TYPE_OLD_MASK:uint			= 0x000003ff;
@@ -329,6 +338,14 @@ import com.voxelengine.worldmodel.TypeInfo;
 		[inline] public function lightInfoClear():void						{ _data &= OXEL_DATA_LIGHT_INFO_CLEAR }
 		static public function lightInfoHas( $data:uint ):Boolean {
 			var t:uint = ($data & OXEL_DATA_LIGHT_INFO);
+			t = t >> 1;
+			return 0 < t;
+		}
+
+		[inline] public function colorMark():void						{ _data |= OXEL_DATA_COLOR;  }
+		[inline] public function colorClear():void						{ _data &= OXEL_DATA_COLOR_CLEAR }
+		static public function colorHas( $data:uint ):Boolean {
+			var t:uint = ($data & OXEL_DATA_COLOR);
 			t = t >> 1;
 			return 0 < t;
 		}
