@@ -11,6 +11,7 @@ package com.voxelengine.renderer {
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.renderer.vertexComponents.*;
+import com.voxelengine.utils.ColorUtils;
 import com.voxelengine.worldmodel.TileType;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.FlowInfo;
@@ -77,6 +78,7 @@ public class Quad {
 							$planeFacing:int,				// facing
 							$xHeight:int, $yScale:int, zScale:int,
 							$grain:Number,
+							$color:uint,
 							$lighting:Lighting,
 							$flowInfo:FlowInfo ):Boolean	// the scaled for flow distance
 	{
@@ -86,7 +88,7 @@ public class Quad {
 				return false;
 		}
 
-		add( $type, $x, $y, $z, $face, $planeFacing, $xHeight, $yScale, zScale, $grain, typeInfo, $lighting, $flowInfo );
+		add( $type, $x, $y, $z, $face, $planeFacing, $xHeight, $yScale, zScale, $grain, typeInfo, $color, $lighting, $flowInfo );
 		dirty = 0;
 		return true;
 	}
@@ -292,7 +294,7 @@ public class Quad {
 	//     Member Functions 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	static private const SCALE_FACTOR:uint = 16;
-	private function add( $type:int, $x:Number, $y:Number, $z:Number, $face:int, $planeFacing:int, $xHeight:int, $yHeight:int, $zHeight:int, $grain:Number, $ti:TypeInfo, $lighting:Lighting, $flowInfo:FlowInfo ):int
+	private function add( $type:int, $x:Number, $y:Number, $z:Number, $face:int, $planeFacing:int, $xHeight:int, $yHeight:int, $zHeight:int, $grain:Number, $ti:TypeInfo, $color:uint, $lighting:Lighting, $flowInfo:FlowInfo ):int
 	{
 		// Can;t do this, since I just get a set of empty components.
 //		if ( $ti.type == 125 )
@@ -310,9 +312,10 @@ public class Quad {
 		else
 			fs = _s_flowScaling;
 			
-		//Log.out( "Quad.add type: " + $type );
 		var tint:uint = $ti.color;
-		
+		if ( $ti.type == 124 )
+			tint = ColorUtils.RGBMinValue( $color, $ti.color );
+
 		switch ( $face ) 
 		{
 			case Globals.POSX:
