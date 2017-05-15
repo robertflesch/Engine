@@ -7,7 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
-	import com.voxelengine.Globals;
+import com.voxelengine.Globals;
 import com.voxelengine.worldmodel.TypeInfo;
 
 /**
@@ -91,8 +91,7 @@ import com.voxelengine.worldmodel.TypeInfo;
 		private static const OXEL_DATA_TYPE_1_MASK:uint				= 0x0000ffff;
 
 		private var _data:uint = 0;					// holds face data
-		private var _type:uint = 0;					// holds type data
-		
+
 		public function get dirty():Boolean 					{ return 0 < (_data & OXEL_DATA_DIRTY); }
 		public function set dirty( $val:Boolean ):void { 
 			_data &= OXEL_DATA_DIRTY_CLEAR;
@@ -122,11 +121,17 @@ import com.voxelengine.worldmodel.TypeInfo;
 		}
 		
 		// Type is stored in the lower 2 bytes of the _type variable
+		private var _type:uint = 0;					// holds type data
 		public function get type():int 							{ return (_type & OXEL_DATA_TYPE_1_MASK); }
 		public function set type( val:int ):void { 
 			_type &= OXEL_DATA_TYPE_1_MASK_CLEAR;
 			_type |= (val & OXEL_DATA_TYPE_1_MASK); 
 		}
+
+		static protected const  DEFAULT_COLOR:uint = 0xff000000;
+		private var _color:uint = DEFAULT_COLOR;				// holds color data
+		public function get color():uint 						{ return _color; }
+		public function set color( val:uint ):void 				{ _color = val; }
 
 		private static const OXEL_DATA_TYPE_MASK_CLEAR:uint 		= 0xfffffc00;
 		private static const OXEL_DATA_TYPE_OLD_MASK:uint			= 0x000003ff;
@@ -150,12 +155,12 @@ import com.voxelengine.worldmodel.TypeInfo;
 		public 		function facesCleanAllFaceBits():void 				{ _data &= OXEL_DATA_FACE_BITS_CLEAR; } //  doesnt touch dirty;
 		// faces marked as dirty that need re-evaluation to determine if a face exists there.
 		protected	function faceHasDirtyBits():Boolean 			{ return 0 < (_data & OXEL_DATA_FACES_DIRTY); }
-//		public		function facesMarkAllClean():void 		{ _data &= OXEL_DATA_FACES_DIRTY_CLEAR; dirty = true; }
-		public		function facesMarkAllClean():void 		{ _data &= OXEL_DATA_FACES_DIRTY_CLEAR; }
+//		public		function facesMarkAllClean():void 			{ _data &= OXEL_DATA_FACES_DIRTY_CLEAR; dirty = true; }
+		public		function facesMarkAllClean():void 			{ _data &= OXEL_DATA_FACES_DIRTY_CLEAR; }
 //		public		function facesSetAll():void 				{ _data |= OXEL_DATA_FACES;  dirty = true;}
 		public		function facesSetAll():void 				{ _data |= OXEL_DATA_FACES;  }
-		public		function facesClearAll():void 			{ _data &= OXEL_DATA_FACES_CLEAR;  dirty = true;	 }
-		public		function facesMarkAllDirty():void 		{
+		public		function facesClearAll():void 				{ _data &= OXEL_DATA_FACES_CLEAR;  dirty = true;	 }
+		public		function facesMarkAllDirty():void 			{
 			_data |= OXEL_DATA_FACES_DIRTY;
 			dirty = true; 
 		}
@@ -327,7 +332,7 @@ import com.voxelengine.worldmodel.TypeInfo;
 			t = t >> 1;
 			return 0 < t;
 		}
-	}
+}
 }
 		
 		

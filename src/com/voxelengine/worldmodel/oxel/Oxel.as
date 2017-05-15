@@ -8,8 +8,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.oxel
 {
 
-import com.adobe.utils.Hex;
-
 import flash.geom.Point;
 import flash.geom.Vector3D;
 import flash.utils.ByteArray;
@@ -20,7 +18,6 @@ import com.voxelengine.Globals;
 import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.events.LightEvent;
 import com.voxelengine.events.ImpactEvent;
-import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.utils.Plane;
 import com.voxelengine.renderer.Quad;
 import com.voxelengine.renderer.Chunk;
@@ -32,7 +29,6 @@ import com.voxelengine.worldmodel.models.ModelStatisics;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.tasks.landscapetasks.TreeGenerator;
 import com.voxelengine.worldmodel.tasks.flowtasks.Flow;
-import com.voxelengine.worldmodel.biomes.LayerInfo;
 import com.voxelengine.worldmodel.models.OxelPersistence;
 
 /**
@@ -45,7 +41,7 @@ public class Oxel extends OxelBitfields
 	//     Static Variables
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	static public const COMPRESSED_REFERENCE_BA_SQUARE:ByteArray	= Hex.toArray( "78:da:cb:2c:cb:35:30:b0:48:61:00:02:96:7f:0c:60:90:c1:90:c0:c0:f0:1f:0a:18:a0:80:11:42:00:45:8c:a1:00:00:e2:da:10:a2" );
+	//static public const COMPRESSED_REFERENCE_BA_SQUARE:ByteArray	= Hex.toArray( "78:da:cb:2c:cb:35:30:b0:48:61:00:02:96:7f:0c:60:90:c1:90:c0:c0:f0:1f:0a:18:a0:80:11:42:00:45:8c:a1:00:00:e2:da:10:a2" );
 	//static public const REFERENCE_BA_SQUARE:ByteArray 			= Hex.toArray( "69:76:6d:30:30:38:64:00:00:00:00:04:fe:00:00:00:00:00:00:68:00:60:00:00:ff:ff:ff:ff:ff:ff:ff:ff:00:00:00:00:00:00:00:00:01:00:00:00:00:01:00:ff:ff:ff:33:33:33:33:33:33:33:33" );
 
 	private static const OXEL_CHILD_COUNT:int = 8;
@@ -567,8 +563,7 @@ public class Oxel extends OxelBitfields
 		else if ( Globals.POSZ == dir ) mask = ALL_POSZ_CHILD;
 		else if ( Globals.NEGZ == dir ) mask = ALL_NEGZ_CHILD;
 
-		for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++)
-		{
+		for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++) {
 			if( mask & ( 1 << i ) ) // is bit i set
 				childrenDirectional.push( _children[i] );
 		}
@@ -588,8 +583,7 @@ public class Oxel extends OxelBitfields
 		else if ( Globals.POSZ == dir ) mask = ALL_POSZ_CHILD;
 		else if ( Globals.NEGZ == dir ) mask = ALL_NEGZ_CHILD;
 
-		for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++)
-		{
+		for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++) {
 			if( mask & ( 1 << i ) ) // is bit i set
 				childIDsDirectional.push( i );
 		}
@@ -1463,26 +1457,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	// lighting START
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//public static var _s_oxelsCreated:int = 0;
-	public static var _s_oxelsEvaluated:int = 0;
 	public static var _s_lightsFound:int = 0;
 
-//	public function lightingFromSun( $modelGuid:String, $face:int ):void {
-//		if ( childrenHas() )
-//		{
-//			for each ( var child:Oxel in _children )
-//				child.lightingFromSun( $modelGuid, $face );
-//		}
-//		else
-//		{
-//			// Does this oxel have the a face in the $face direction, if not move on
-//			if ( faceHas( $face ) )
-//			{
-//				_s_oxelsEvaluated++;
-//				//LightSunCheck.addTask( $modelGuid, gc, 1, $face );
-//			}
-//		}
-//	}
-	
 	// This would only be run once when model loads
 	// set the activeVoxelinstanceGuid before calling
 	public function lightsStaticCount( $modelGuid:String ):void {
@@ -1658,8 +1634,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 
-
-
 	protected function quadAddOrRemoveFace( $face:int, $plane_facing:int, $grain:uint ):int {
 		var validFace:Boolean = faceHas($face);
 		var quad:Quad = _quads[$face];
@@ -1674,7 +1648,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				if ( 152 == type )
 					result = build152( true, $face, quad, g0, $plane_facing, scale, $grain );
 				else
-					result = quad.build( true, type, getModelX(), getModelY(), getModelZ(), $face, $plane_facing, scale, scale, scale, $grain, lighting, _flowInfo );
+					result = quad.build( true, type, getModelX(), getModelY(), getModelZ(), $face, $plane_facing, scale, scale, scale, $grain, color, lighting, _flowInfo );
 				if ( !result ) {
 					QuadPool.poolDispose( quad );
 					return 0;
@@ -1688,7 +1662,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			if ( 152 == type ) {
 				result = build152( false, $face, quad, g0, $plane_facing, scale, $grain );
 			} else {
-				result = quad.build( false, type, getModelX(), getModelY(), getModelZ(), $face, $plane_facing, scale, scale, scale, $grain, lighting, flowInfo);
+				result = quad.build( false, type, getModelX(), getModelY(), getModelZ(), $face, $plane_facing, scale, scale, scale, $grain, color, lighting, flowInfo);
 			}
 			if ( !result ) {
 				QuadPool.poolDispose( quad );
@@ -1708,22 +1682,22 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		var result:Boolean;
 		switch ($face) {
 			case Globals.POSX:
-				result = $quad.build($isRebuild, type, getModelX(), getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 9 * $g0, $scale, 2 * $g0, $grain, lighting, flowInfo);
+				result = $quad.build($isRebuild, type, getModelX(), getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 9 * $g0, $scale, 2 * $g0, $grain, color, lighting, flowInfo);
 				break;
 			case Globals.NEGX:
-				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 7 * $g0, $scale, 2 * $g0, $grain, lighting, flowInfo);
+				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 7 * $g0, $scale, 2 * $g0, $grain, color, lighting, flowInfo);
 				break;
 			case Globals.POSY:
-				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, lighting, flowInfo);
+				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, color, lighting, flowInfo);
 				break;
 			case Globals.NEGY:
-				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, lighting, flowInfo);
+				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, color, lighting, flowInfo);
 				break;
 			case Globals.POSZ:
-				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, lighting, flowInfo);
+				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, color, lighting, flowInfo);
 				break;
 			case Globals.NEGZ:
-				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, lighting, flowInfo);
+				result = $quad.build($isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, color, lighting, flowInfo);
 				break;
 		}
 		return result;
@@ -1745,10 +1719,11 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Saving and Restoring from File
+    // toByteArray for different versions
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public function toByteArray():ByteArray {
 		var ba:ByteArray = new ByteArray();
-		toByteArrayRecursiveV9( ba );
+		toByteArrayRecursiveV10( ba );
 		//Log.out( "Oxel.toByteArray - length: " + ba.length );
 		ba.position = 0;
 		return ba;
@@ -1797,44 +1772,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 
-	private function cleanUpChild():void {
-		additionalDataClear();
-
-		if ( flowInfo && flowInfo.flowScaling.has() )
-			flowInfoMark();
-		else {
-			resetFlowInfo();
-		}
-
-		if ( lighting && (1 < lighting.lightCount() || lighting.color != 0xffffffff || lighting.ambientHas) )
-			lightInfoMark();
-		else {
-			resetLighting();
-		}
-	}
-
-	private function resetLighting():void {
-		lightInfoClear();
-		if ( lighting ) {
-			LightingPool.poolReturn(lighting);
-			lighting = null;
-		}
-	}
-
-	private function resetFlowInfo():void {
-		flowInfoClear();
-		flowInfo = null;
-	}
-
-	private function cleanUpParent():void {
-		additionalDataClear();
-		if ( flowInfo )
-			resetFlowInfo();
-
-		if ( lighting )
-			resetLighting();
-	}
-
 	private function toByteArrayRecursiveV9( $ba:ByteArray ):void {
 		// This version has to do a bit of clean up on flowInfo and lightInfo
 		// In versions previous to 9, I save the flowInfo and lightInfo on every voxel if it had faces.
@@ -1870,158 +1807,154 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				lighting.toByteArray($ba);
 		}
 	}
-	
-	public function fromByteArrayV8( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $stats:ModelStatisics ):ByteArray 	{
-		var faceData:uint = $ba.readUnsignedInt();
-		if ( $version <= Globals.VERSION_006 )
-			initialize( $parent, $gc, OxelBitfields.dataFromRawDataOld( faceData ), OxelBitfields.typeFromRawDataOld( faceData ) );	
-		else {
-			var typeData:uint = $ba.readUnsignedInt();
-			initialize( $parent, $gc, faceData, typeData );	
+
+    private function toByteArrayRecursiveV10( $ba:ByteArray ):void {
+        // This version has to do a bit of clean up on flowInfo and lightInfo
+        // In versions previous to 9, I save the flowInfo and lightInfo on every voxel if it had faces.
+        // Now I only save that info if there is non default values in it.
+        // So if I find default values, I clear that info and don't save it.
+        if ( childrenHas() )
+            cleanUpParent();
+        else
+            cleanUpChild();
+
+        // Write oxel's core data to array
+        //Log.out("toByteArrayRecursive " + getTabs(gc.bound - gc.grain ) + "data: " + maskWriteData().toString(16));
+        //Log.out("toByteArrayRecursive " + getTabs(gc.bound - gc.grain ) + "type: " + type);
+
+		$ba.writeUnsignedInt(maskWriteData()); // data contains info on faces, lighting, flow
+		$ba.writeUnsignedInt(type); //
+		$ba.writeUnsignedInt(color); // color
+
+        if ( childrenHas() )
+            writeChildren();
+        else
+            writeFlowAndLightingInfo();
+
+        function writeChildren():void {
+            for each ( var child:Oxel in _children )
+                child.toByteArrayRecursiveV10( $ba );
+        }
+
+        function writeFlowAndLightingInfo():void {
+            if (flowInfo)
+                flowInfo.toByteArray($ba);
+
+            if (lighting)
+                lighting.toByteArray($ba);
 		}
-		//Log.out( "Oxel.fromByteArray - faceData: " + faceData.toString(16) );
-		//Log.out( "Oxel.fromByteArray - type    : " + type );
+    }
 
-		// Check for flow and brightnessInfo
-		if ( OxelBitfields.dataHasAdditional( faceData ) ) {
-			if ( !flowInfo )
-				flowInfo = FlowInfoPool.poolGet();
-			$ba = flowInfo.fromByteArray( $version, $ba );
-			
-			// the baseLightLevel gets overridden by data from byte array.
-			if ( !lighting ) {
-				lightingAddDefault( chunkGet().lightInfo );
-			}
-			$ba = lighting.fromByteArray( $version, $ba );
-			
-			if ( $parent ) {
-				// override the stored data with the baseLightLevel set in the instance.
-				var li:LightInfo = lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-				// TODO needs to be adjusted for new lighting schema
-//				var avgLight:uint = root_get().lighting.avg;
-//				if ( li )
-//					li.setAll( avgLight );
-			}
-//			else {
-//				var baseLightLevel:uint = Lighting.defaultBaseLightAttn; //lighting.avg;
-//				lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).setAll( baseLightLevel );
-//			}
-			lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
-		}
-		
-		if ( OxelBitfields.dataIsParent( faceData ) ) {
-			_children = ChildOxelPool.poolGet();
-			var gct:GrainCursor = GrainCursorPool.poolGet( $stats.largest );
-			//Log.out( "Oxel.fromByteArray - ------------- read children -------" );
+    private function cleanUpChild():void {
+        additionalDataClear();
 
-			for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
-			{
-				_children[i]  = OxelPool.poolGet( type );
-				gct.copyFrom( $gc );
-				gct.become_child(i);   
-				_children[i].fromByteArrayV8( $version, this, gct, $ba, $stats );
-			}
-			//Log.out( "Oxel.fromByteArray - ------------- read children -------" );
-			GrainCursorPool.poolDispose( gct );
-		}
-		else {
-			childCount = 1;
-			$stats.statAdd( type, gc.grain );
-		}
+        if ( flowInfo && flowInfo.flowScaling.has() )
+            flowInfoMark();
+        else {
+            resetFlowInfo();
+        }
 
-		return $ba;
-	}
+        if ( lighting && (1 < lighting.lightCount() || lighting.color != 0xffffffff || lighting.ambientHas) )
+            lightInfoMark();
+        else {
+            resetLighting();
+        }
+    }
 
-	/* meaning of oxel data read from ivm
-	OXEL_DATA_FLOW_INFO:uint				= 0x00000001;
-	OXEL_DATA_LIGHT_INFO:uint				= 0x00000002;
-	OXEL_DATA_FIRE:uint						= 0x00000200;
-	OXEL_DATA_PARENT:uint					= 0x00000400;
+    private function resetLighting():void {
+        lightInfoClear();
+        if ( lighting ) {
+            LightingPool.poolReturn(lighting);
+            lighting = null;
+        }
+    }
 
-	OXEL_DATA_FACES:uint  					= 0x7e000000;
-	OXEL_DATA_FACES_NEGZ:uint				= 0x02000000;
-	OXEL_DATA_FACES_POSZ:uint				= 0x04000000;
-	OXEL_DATA_FACES_NEGY:uint				= 0x08000000;
-	OXEL_DATA_FACES_POSY:uint				= 0x10000000;
-	OXEL_DATA_FACES_NEGX:uint				= 0x20000000;
-	OXEL_DATA_FACES_POSX:uint				= 0x40000000;
+    private function resetFlowInfo():void {
+        flowInfoClear();
+        flowInfo = null;
+    }
 
-	OXEL_DATA_ADDITIONAL:uint  			    = 0x80000000; // deprecated used if oxel has flow or light data
-	*/
-	public function readOxelData($ba:ByteArray, $op:OxelPersistence ):void {
-		var time:int = getTimer();
-		var rootGrainSize:int = $op.bound;
-		gc.grain = gc.bound = rootGrainSize;
+    private function cleanUpParent():void {
+        additionalDataClear();
 
-		var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
-		gct.grain = rootGrainSize;
+		color = DEFAULT_COLOR;
+        if ( flowInfo )
+            resetFlowInfo();
 
-		if (Globals.VERSION_000 == $op.version)
-			fromByteArrayV0(null, gct, $ba, $op.statistics);
-		else if (Globals.VERSION_008 >= $op.version)
-			fromByteArrayV8($op.version, null, gct, $ba, $op.statistics);
-		else
-			fromByteArray($op.version, null, gct, $ba, $op );
+        if ( lighting )
+            resetLighting();
+    }
 
-		Log.out("Oxel.readOxelData - readOxelData took: " + (getTimer() - time), Log.INFO);
-		GrainCursorPool.poolDispose(gct);
-	}
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // fromByteArray for different versions
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public function readOxelData($ba:ByteArray, $op:OxelPersistence ):void {
+        var time:int = getTimer();
+        var rootGrainSize:int = $op.bound;
+        gc.grain = gc.bound = rootGrainSize;
 
-	// Make sense, called from for Makers
-	private function extractVersionInfo( $ba:ByteArray, $op:OxelPersistence ):void {
-		$ba.position = 0;
-		// Read off first 3 bytes, the data format
-		var format:String = readFormat($ba);
-		if ("ivm" != format)
-			throw new Error("OxelPersistence.extractVersionInfo - Exception - unsupported format: " + format );
+        var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
+        gct.grain = rootGrainSize;
 
-		// Read off next 3 bytes, the data version
-		$op.version = readVersion($ba);
-		if ( $op.version >= 4 ) {
-			// Read off next byte, the manifest version
-			var t:int = $ba.readByte();
-		}
+        if (Globals.VERSION_000 == $op.version)
+            fromByteArrayV0(null, gct, $ba, $op.statistics);
+        else if (Globals.VERSION_008 >= $op.version)
+            fromByteArrayV8($op.version, null, gct, $ba, $op.statistics);
+        else if (Globals.VERSION_009 == $op.version)
+            fromByteArrayV9($op.version, null, gct, $ba, $op );
+        else
+            fromByteArray($op.version, null, gct, $ba, $op );
 
-		//Log.out( "Oxel.extractVersionInfo - format: " + format + "  version: " + $op.version );
-		//Log.out("OxelPersistence.extractVersionInfo - version: " + $op.version );
+        Log.out("Oxel.readOxelData - readOxelData took: " + (getTimer() - time), Log.INFO);
+        GrainCursorPool.poolDispose(gct);
+    }
 
-		// This reads the format info and advances position on byteArray
-		function readFormat($ba:ByteArray):String {
-			var format:String;
-			var byteRead:int = 0;
-			byteRead = $ba.readByte();
-			format = String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-			format += String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-			format += String.fromCharCode(byteRead);
-			return format;
-		}
+    public function fromByteArray( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $op:OxelPersistence ):ByteArray {
+        var faceData:uint = $ba.readUnsignedInt();
+        var typeData:uint = $ba.readUnsignedInt();
+		color = $ba.readUnsignedInt();
 
-		// This reads the version info and advances position on byteArray
-		function readVersion($ba:ByteArray):int {
-			var version:String;
-			var byteRead:int = 0;
-			byteRead = $ba.readByte();
-			version = String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-			version += String.fromCharCode(byteRead);
-			byteRead = $ba.readByte();
-			version += String.fromCharCode(byteRead);
+        //Log.out( "fromByteArray " + getTabs($gc.bound - $gc.grain ) + "  data: " + faceData.toString(16));
+        //Log.out( "fromByteArray " + getTabs($gc.bound - $gc.grain ) + "  type: " + typeData );
 
-			return int(version);
-		}
-	}
+        initialize( $parent, $gc, faceData, typeData );
 
-	private function getTabs( count:int ):String {
-		var result:String = "";
-		for ( var i:int; i < count; i++ ){
-			result += "\t";
-		}
-		return result;
-	}
+        if ( OxelBitfields.dataIsParent( faceData ) ) {
+            _children = ChildOxelPool.poolGet();
+            var gct:GrainCursor = GrainCursorPool.poolGet( gc.grain );
+            for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ ) {
+                _children[i]  = OxelPool.poolGet(type);
+                gct.copyFrom( $gc );
+                gct.become_child(i);
+                _children[i].fromByteArray( $version, this, gct, $ba, $op );
+            }
+            GrainCursorPool.poolDispose( gct );
+        }
+        else {
+            childCount = 1;
+            $op.statistics.statAdd( type, gc.grain );
 
-	public function fromByteArray( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $op:OxelPersistence ):ByteArray {
+
+            if (OxelBitfields.flowInfoHas(faceData)){
+                flowInfo = FlowInfoPool.poolGet();
+                flowInfo.fromByteArray( $version, $ba );
+            }
+
+            if (OxelBitfields.lightInfoHas(faceData)) {
+                lighting = LightingPool.poolGet();
+                lighting.fromByteArray( $version, $ba );
+                lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
+            }
+
+            if ( facesHas() ){
+                lightingAddDefault( $op.lightInfo );
+            }
+        }
+
+        return $ba;
+    }
+
+    public function fromByteArrayV9( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $op:OxelPersistence ):ByteArray {
 		var faceData:uint = $ba.readUnsignedInt();
 		var typeData:uint = $ba.readUnsignedInt();
 		//Log.out( "fromByteArray " + getTabs($gc.bound - $gc.grain ) + "  data: " + faceData.toString(16));
@@ -2036,7 +1969,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				_children[i]  = OxelPool.poolGet(type);
 				gct.copyFrom( $gc );
 				gct.become_child(i);
-				_children[i].fromByteArray( $version, this, gct, $ba, $op );
+				_children[i].fromByteArrayV9( $version, this, gct, $ba, $op );
 			}
 			GrainCursorPool.poolDispose( gct );
 		}
@@ -2062,7 +1995,66 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return $ba;
 	}
 
+    public function fromByteArrayV8( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $stats:ModelStatisics ):ByteArray 	{
+        var faceData:uint = $ba.readUnsignedInt();
+        if ( $version <= Globals.VERSION_006 )
+            initialize( $parent, $gc, OxelBitfields.dataFromRawDataOld( faceData ), OxelBitfields.typeFromRawDataOld( faceData ) );
+        else {
+            var typeData:uint = $ba.readUnsignedInt();
+            initialize( $parent, $gc, faceData, typeData );
+        }
+        //Log.out( "Oxel.fromByteArray - faceData: " + faceData.toString(16) );
+        //Log.out( "Oxel.fromByteArray - type    : " + type );
 
+        // Check for flow and brightnessInfo
+        if ( OxelBitfields.dataHasAdditional( faceData ) ) {
+            if ( !flowInfo )
+                flowInfo = FlowInfoPool.poolGet();
+            $ba = flowInfo.fromByteArray( $version, $ba );
+
+            // the baseLightLevel gets overridden by data from byte array.
+            if ( !lighting ) {
+                lightingAddDefault( chunkGet().lightInfo );
+            }
+            $ba = lighting.fromByteArray( $version, $ba );
+
+            if ( $parent ) {
+                // override the stored data with the baseLightLevel set in the instance.
+                var li:LightInfo = lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
+                // TODO needs to be adjusted for new lighting schema
+//				var avgLight:uint = root_get().lighting.avg;
+//				if ( li )
+//					li.setAll( avgLight );
+            }
+//			else {
+//				var baseLightLevel:uint = Lighting.defaultBaseLightAttn; //lighting.avg;
+//				lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).setAll( baseLightLevel );
+//			}
+            lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
+        }
+
+        if ( OxelBitfields.dataIsParent( faceData ) ) {
+            _children = ChildOxelPool.poolGet();
+            var gct:GrainCursor = GrainCursorPool.poolGet( $stats.largest );
+            //Log.out( "Oxel.fromByteArray - ------------- read children -------" );
+
+            for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
+            {
+                _children[i]  = OxelPool.poolGet( type );
+                gct.copyFrom( $gc );
+                gct.become_child(i);
+                _children[i].fromByteArrayV8( $version, this, gct, $ba, $stats );
+            }
+            //Log.out( "Oxel.fromByteArray - ------------- read children -------" );
+            GrainCursorPool.poolDispose( gct );
+        }
+        else {
+            childCount = 1;
+            $stats.statAdd( type, gc.grain );
+        }
+
+        return $ba;
+    }
 
 	public function fromByteArrayV0( $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $stats:ModelStatisics ):ByteArray {
 		var oxelData:uint = $ba.readInt();
@@ -2095,8 +2087,16 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		var hex:String = ("0x00000000").substr(2,8 - str.length) + str;
 		return hex;
 	}
-	
-	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private function getTabs( count:int ):String {
+        var result:String = "";
+        for ( var i:int; i < count; i++ ){
+            result += "\t";
+        }
+        return result;
+    }
+
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// End Saving and Restoring from File
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Intersection functions START
@@ -2444,7 +2444,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	}
 
 	public function effect_sphere( $modelGuid:String, cx:int, cy:int, cz:int, ie:ImpactEvent ):void {
-		var radius:int = ie.radius
+		var radius:int = ie.radius;
 		var writeType:int = 0;
 		var ip:InteractionParams = null;
 		// I never see this get called - RSF
@@ -2927,7 +2927,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 //			var nou:Oxel = neighbor( Globals.POSY )
 //			if ( Globals.BAD_OXEL == nou && TypeInfo.AIR == nou.type && !nou.childrenHas() && nou.gc.grain == 4 )
 //				nou.write( $modelGuid, gc, 152 );
-			var nod:Oxel = neighbor( Globals.NEGY )
+			var nod:Oxel = neighbor( Globals.NEGY );
 			if ( Globals.BAD_OXEL != nod && TypeInfo.AIR == nod.type && !nod.childrenHas() && nod.gc.grain >= 4 )
 				nod.write( $modelGuid, nod.gc, 152 );
 		}
@@ -2953,7 +2953,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	
 	public function reset():void {
 		if ( lighting )
-			lighting.reset()
+			lighting.reset();
 		if ( _flowInfo )
 			_flowInfo.reset( this );			
 		quadsDeleteAll();
@@ -2967,39 +2967,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		facesMarkAllClean();
 	}
 
-	public function lightingSunGatherList( ol:Vector.<Oxel> ):void {
-
-		if ( childrenHas() )
-		{
-			for each ( var child:Oxel in children )
-				child.lightingSunGatherList( ol );
-		}
-		else if ( TypeInfo.AIR != type )
-		{
-			var no:Oxel = neighbor( Globals.POSY );
-			if ( Globals.BAD_OXEL == no ) {
-				ol.push( this );
-				//trace( "light it - Globals.BAD_OXEL" + "  gc: " + gc.toString() );
-			}
-			else if ( no.childrenHas() )
-			{
-				// check opposite face to see if it has alpha
-				if ( no.faceHasAlpha( Globals.NEGY ) ) {
-					ol.push( this );
-					//trace( "light it has hole - notype: " + no.type + "  gc: " + gc.toString() + "  no.gc: " + no.gc.toString() );
-				}
-			}
-			else if ( !TypeInfo.isSolid( no.type ) )	{
-				ol.push( this );
-				//trace( "light it - notype: " + no.type + "  gc: " + gc.toString() + "  no.gc: " + no.gc.toString() );
-			}
-			//else if ( !no.isSolid )	
-			//	trace( "ignore - : " + type + "  gc: " + gc.toString() );
-
-		}
-	}
-	
-	public static var TEMP_COUNT:int = 0;
 	public function layDownWater( $waterHeight:int ):void
 	{
 		// If this is below water height it should be full of water.
@@ -3007,50 +2974,34 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		var top_height:int = getModelY() + gc.size();
 		var child:Oxel;
 		// bottom of oxel is at water height or greater
-		if ( childrenHas() )
-		{
+		if ( childrenHas() ) {
 			for each ( child in children )
 				child.layDownWater( $waterHeight );
-		}
-		else if ( bottom_height >= $waterHeight )
-		{
+		} else if ( bottom_height >= $waterHeight ) {
 			// This is oxel above water height, nothing to see here
-			return;
-		}
-		else if ( top_height <= $waterHeight )
-		{
+		} else if ( top_height <= $waterHeight ) {
 			// This is oxel is below the water height, it better be full
 			// if it has children keep on digging down
-			if ( childrenHas() )
-			{
+			if ( childrenHas() ) {
 				for each ( child in children )
 					child.layDownWater( $waterHeight );
-			}
-			else if ( TypeInfo.AIR == type )
-			{
+			} else if ( TypeInfo.AIR == type ) {
 				type = TypeInfo.WATER;
 				//writeFromHeightMap( gc, TypeInfo.AIR );
 			}
 //				else if ( TypeInfo.DIRT != type )
 //					Log.out( "what did I hit? type: " + Globals.Info[type].name );
-		}
-		else if ( top_height >= $waterHeight && bottom_height < $waterHeight )
-		{
+		} else if ( top_height >= $waterHeight && bottom_height < $waterHeight ) {
 			// Still something wrong here...
 			
 			// This is on the boarder, it needs to be broken up
 			// I am seeing app trying to create children on a grain 0 here.
 			if ( 0 == gc.grain ) {
 				var s:uint = gc.size();	
-				s = gc.size();	
 			}
 			
 			if ( !childrenHas() )
-			{
-				TEMP_COUNT += 8;
-				//Log.out( "Oxel.layDownWater - CREATED CHILDREN: " + TEMP_COUNT );
 				childrenCreate();
-			}
 
 			for each ( child in children)
 				child.layDownWater( $waterHeight );
@@ -3255,12 +3206,11 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			for ( var i:int = 0; i < bg - gc.grain; i++ ) {
 				t += "\t";
 			}
-		var r:String;
+		var r:String = "";
 		if ( TypeInfo.INVALID == type )
 			r = "\t\t oxel of type: " + TypeInfo.typeInfo[type].name;
 		else
-			var str:String = "";
-			str = maskTempData().toString(16);
+			var str:String = maskTempData().toString(16);
 			var hex:String = ("0x00000000").substr(2,8 - str.length) + str;
 			r = t + " oxel of type: " + TypeInfo.typeInfo[type].name + "\t location: " + gc.toString() + "  data: " + hex + " parent: " + p + " children: " + c;
 		}
@@ -3268,10 +3218,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			r = "Uninitialized Oxel" + p + c;
 
 		return r;
-	}
-	
-	public function toStringShort():String {
-		return "oxel of type: " + TypeInfo.typeInfo[type].name + "\t location: " + gc.toString();
 	}
 	
 	//// This rebuilds just this oxel and its children
@@ -3292,7 +3238,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 	public function generateLOD( $minGrain:uint ):void {
 		Log.out( "Oxel.generateLOD creating model of with min grain: " + $minGrain );
-		var childrenFound:Boolean = true;
 		while ( $minGrain > findSmallest() ) {
 			// this should be called on the clone.
 			generateLODRecursiveInternal($minGrain);
@@ -3329,7 +3274,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
         // this releases the children
 //		Log.out( "Oxel.collapse gc: " + gc.toString() );
         var typesWithin:Array = [];
-        var airCount:int;
+        var airCount:int = 0;
 		if ( childrenHas() ) {
 			for (var i:int = 0; i < OXEL_CHILD_COUNT; i++) {
 				child = children[i];
@@ -3349,7 +3294,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				}
 			}
 
-			var mostFrequentTypeCount:int;
+			var mostFrequentTypeCount:int = 0;
 			var mostFrequentType:int = TypeInfo.AIR;
 			if (airCount <= 5) {
 				for (var typeData:String in typesWithin) {
