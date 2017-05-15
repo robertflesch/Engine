@@ -21,7 +21,8 @@ import flash.geom.Vector3D;
 			
 			return newTint;
 		}
-		
+
+		// Experiment, but don't like results
 		public static function combineRGBAndIntensity( c1:Vector3D, c1Int:Number, c2:Vector3D, c2Int:Number ):Vector3D {
 			// Determine RGBA colour received by combining two colours
 			// http://stackoverflow.com/questions/10781953/determine-rgba-colour-received-by-combining-two-colours
@@ -52,6 +53,7 @@ import flash.geom.Vector3D;
 			return newTint;
 		}
 
+		// Experiment, but don't like results
 		public static function testInt( c1:uint, αa:Number, c2:uint, αb:Number, defaultColor:uint ):uint {
 			var newTint:uint;
 			newTint = RGBToHex( Math.max( extractRed(defaultColor),   Math.max( extractRed(c1) * αa, extractRed(c2) * αb ) )
@@ -68,29 +70,57 @@ import flash.geom.Vector3D;
 							, Math.max( extractGreen(c1) * αa, extractGreen(base) )
 							, Math.max( extractBlue(c1) * αa, extractBlue(base) ) );
 		}
-		
+
+		// Experiment, but don't like results
+		public static function combineRGB_UINT( c1:uint, c2:uint ):uint {
+			var newTint:uint = 0xff000000;
+			newTint = placeRed(   newTint, (( extractRed(c1) * extractRed(c2) ) / 2 ));
+			newTint = placeGreen( newTint, (( extractGreen(c1) * extractGreen(c2)  ) / 2 ));
+			newTint = placeBlue(  newTint, (( extractBlue(c1) * extractBlue(c2) ) / 2 ));
+			return newTint;
+		}
+
+		// Experiment, but don't like results
 		public static function combineRGB( c1:Vector3D, c2:Vector3D ):Vector3D {
 			var newTint:Vector3D = new Vector3D(1,1,1,1);
-			newTint.x = ( c1.x + c2.x ) / 2;
-			newTint.y = ( c1.y + c2.y ) / 2;
-			newTint.z = ( c1.z + c2.z ) / 2;
+			newTint.x = c1.x - ( c1.x + c2.x ) / 2;
+			newTint.y = c1.y - ( c1.y + c2.y ) / 2;
+			newTint.z = c1.z - ( c1.z + c2.z ) / 2;
 			
 			return newTint;
 		}
-		
+
+		// Experiment, but don't like results
 		public static function maxValuesARGB( c1:uint, c2:uint ):uint {
 			return ARGBToHex ( Math.max( extractIntensity(c1), extractIntensity(c2) )
 							, Math.max( extractRed(c1), extractRed(c2) )
 							, Math.max( extractGreen(c1), extractGreen(c2) )
 							, Math.max( extractBlue(c1), extractBlue(c2) ) );
 		}
-		
+
+		// Experiment, but don't like results
 		public static function averageRGB( c1:uint, c2:uint ):uint {
 			return RGBToHex( ( extractRed(c1) + extractRed(c2) )/ 2
 			               , ( extractGreen(c1) + extractGreen(c2) )/ 2 
 						   , ( extractBlue(c1) + extractBlue(c2) ) / 2 );
 		}
-		
+
+		// Experiment, but don't like results
+		public static function RGBMaxValue( c1:uint, c2:uint ):uint {
+			return ARGBToHex( 255
+					        , Math.max( extractRed(c1), extractRed(c2) )
+							, Math.max( extractGreen(c1), extractGreen(c2) )
+					        , Math.max( extractBlue(c1), extractBlue(c2) ) );
+		}
+
+		// This allows me to take a white surface like ffffff and combine it with red ff0000 and get red.
+		public static function RGBMinValue( c1:uint, c2:uint ):uint {
+			return ARGBToHex( 255
+					, Math.min( extractRed(c1), extractRed(c2) )
+					, Math.min( extractGreen(c1), extractGreen(c2) )
+					, Math.min( extractBlue(c1), extractBlue(c2) ) );
+		}
+
 		public static function extractAlpha(c:uint):uint {
 			return (( c >> 24 ) & 0xFF);
 		}
@@ -126,8 +156,24 @@ import flash.geom.Vector3D;
 			return color;
 		}
 
+		public static function placeRed( color:uint, value:uint ):uint
+		{
+			color = color & 0xff00ffff;
+			value = value & 0x000000ff;
+			color = color | ( value << 16 );
+			return color;
+		}
+
 		public static function extractGreen(c:uint):uint {
 			return ( (c >> 8) & 0xFF );
+		}
+
+		public static function placeGreen( color:uint, value:uint ):uint
+		{
+			color = color & 0xffff00ff;
+			value = value & 0x000000ff;
+			color = color | ( value << 8 );
+			return color;
 		}
 
 		public static function placeGreenNumber( color:uint, value:Number ):uint
@@ -149,7 +195,15 @@ import flash.geom.Vector3D;
 			color = color | ( intValue );
 			return color;
 		}
-		
+
+		public static function placeBlue( color:uint, value:uint ):uint
+		{
+			color = color & 0xffffff00;
+			value = value & 0x000000ff;
+			color = color | ( value );
+			return color;
+		}
+
 		public static function convertRGBAToABGR( $ARGB:uint ):uint {
 			
 			var color:uint = $ARGB;
