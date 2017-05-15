@@ -31,8 +31,8 @@ package com.voxelengine.renderer.shaders
 			setVertexData( $mvp, $vm, $context );
 			setFragmentData( $mvp, $vm, $context, $isChild );
 			
-			$context.setCulling(Context3DTriangleFace.NONE);
-			//$context.setCulling(Context3DTriangleFace.BACK);
+			//$context.setCulling(Context3DTriangleFace.NONE);
+			$context.setCulling(Context3DTriangleFace.BACK);
 
 			var sourceFactor:String = Context3DBlendFactor.SOURCE_ALPHA;
 			//var destinationFactor:String = Context3DBlendFactor.SOURCE_COLOR;
