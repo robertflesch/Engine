@@ -72,12 +72,13 @@ public class Globals  {
 	static public const VERSION_007:int 		  = 7;
 	static public const VERSION_008:int 		  = 8;
 	static public const VERSION_009:int 		  = 9;
-	static public const VERSION:int 			  = VERSION_009;
+	static public const VERSION_010:int 		  = 10; // Added color uint to oxel
+	static public const VERSION:int 			  = VERSION_010;
 
 	static public const MANIFEST_VERSION:int = 100;
 
-	public static var g_underwater:Boolean
-	public static var g_oxelBreakEnabled:Boolean
+	public static var g_underwater:Boolean;
+	public static var g_oxelBreakEnabled:Boolean;
 	public static var g_oxelBreakData:GrainCursor = new GrainCursor();
 	public static function oxelBreakDataSet( $gc:GrainCursor ):void { g_oxelBreakData.bound = $gc.grain; g_oxelBreakData.set_values( $gc.grainX, $gc.grainY, $gc.grainZ, $gc.grain ); g_oxelBreakEnabled = true }
 	public static function oxelBreakDataReset():void { g_oxelBreakData.set_values( 0,0,0,0 ); g_oxelBreakEnabled = false }
@@ -89,8 +90,8 @@ public class Globals  {
 	public static var GAME_ID_DEV:String = "voxelversedev-yeiensar20ofthu906l6ma";
 
 	private static var g_debug:Boolean  = false;
-	public static function get isDebug():Boolean  { return g_debug };
-	public static function set setDebug( $val:Boolean ):void  { g_debug = $val };
+	public static function get isDebug():Boolean  { return g_debug; }
+	public static function set setDebug( $val:Boolean ):void  { g_debug = $val; }
 
 	public static const CATEGORY_METAL:String				= "METAL";
 	public static const CATEGORY_LEATHER:String				= "LEATHER";
