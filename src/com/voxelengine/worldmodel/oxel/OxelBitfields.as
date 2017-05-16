@@ -126,7 +126,9 @@ import com.voxelengine.worldmodel.TypeInfo;
 		// Type is stored in the lower 2 bytes of the _type variable
 		private var _type:uint = 0;					// holds type data
 		public function get type():int 							{ return (_type & OXEL_DATA_TYPE_1_MASK); }
-		public function set type( val:int ):void { 
+		public function set type( val:int ):void {
+			if ( val > 1023 )
+				val = TypeInfo.RED;
 			_type &= OXEL_DATA_TYPE_1_MASK_CLEAR;
 			_type |= (val & OXEL_DATA_TYPE_1_MASK); 
 		}
