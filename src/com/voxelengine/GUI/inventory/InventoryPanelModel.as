@@ -219,7 +219,7 @@ public class InventoryPanelModel extends VVContainer
 						return null;
 					}
 				} else {
-					Log.out("InventoryPanelModel.addModel - NOT child model of: " + om.vmm.name, Log.ERROR);
+					Log.out("InventoryPanelModel.addModel - NOT child model of: " + om.vmm.name, Log.WARN);
 					return null;
 				}
 
@@ -317,7 +317,7 @@ public class InventoryPanelModel extends VVContainer
 			eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		}
 		if ( Globals.isDebug ) {
-			box = addModel( new ObjectAction( box, "importObjectStainedGlass", "import128.png", "Click to import picture" ), false );
+			box = addModel( new ObjectAction( box, "importObjectStainedGlass", "importPicture128.png", "Click to import picture" ), false );
 			eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		}
 	}
@@ -358,8 +358,8 @@ public class InventoryPanelModel extends VVContainer
 	static private function addDesktopPictureHandler(event:UIMouseEvent):void {
 		var fr:FileReference = new FileReference();
 		fr.addEventListener(Event.SELECT, onDesktopPictureFileSelected );
-		var swfTypeFilter:FileFilter = new FileFilter("Photo Files","*.png,*.jpg");
-		fr.browse([swfTypeFilter]);
+		var imageTypeFilter:FileFilter = new FileFilter("Images", "*.jpg;*.jpeg;*.gif;*.png");
+		fr.browse([imageTypeFilter]);
 	}
 
 	static public function onDesktopPictureFileSelected(e:Event):void {
