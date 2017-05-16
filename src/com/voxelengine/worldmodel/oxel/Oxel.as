@@ -1578,7 +1578,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	public function lightingAddDefault( $li:LightInfo ):void {
 		lighting = LightingPool.poolGet();
 		lighting.add( $li );
-		lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
+		if ( type <= 1023  )
+			lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
+		else
+			Log.out( "Oxel.lightingAddDefault type is OUT OF RANGE: " + type, Log.WARN);
 	}
 
 	public function quadRebuild( $face:int ):void {
@@ -1900,7 +1903,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
         if (Globals.VERSION_000 == $op.version)
             fromByteArrayV0(null, gct, $ba, $op.statistics);
         else if (Globals.VERSION_008 >= $op.version)
-            fromByteArrayV8($op.version, null, gct, $ba, $op.statistics);
+            fromByteArrayV8($op.version, null, gct, $ba, $op );
         else if (Globals.VERSION_009 == $op.version)
             fromByteArrayV9($op.version, null, gct, $ba, $op );
         else
@@ -1997,7 +2000,8 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return $ba;
 	}
 
-    public function fromByteArrayV8( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $stats:ModelStatisics ):ByteArray 	{
+    public function fromByteArrayV8( $version:int, $parent:Oxel, $gc:GrainCursor, $ba:ByteArray, $op:OxelPersistence ):ByteArray 	{
+
         var faceData:uint = $ba.readUnsignedInt();
         if ( $version <= Globals.VERSION_006 )
             initialize( $parent, $gc, OxelBitfields.dataFromRawDataOld( faceData ), OxelBitfields.typeFromRawDataOld( faceData ) );
@@ -2016,28 +2020,14 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
             // the baseLightLevel gets overridden by data from byte array.
             if ( !lighting ) {
-                lightingAddDefault( chunkGet().lightInfo );
+                lightingAddDefault( $op.lightInfo );
             }
             $ba = lighting.fromByteArray( $version, $ba );
-
-            if ( $parent ) {
-                // override the stored data with the baseLightLevel set in the instance.
-                var li:LightInfo = lighting.lightGet( Lighting.DEFAULT_LIGHT_ID );
-                // TODO needs to be adjusted for new lighting schema
-//				var avgLight:uint = root_get().lighting.avg;
-//				if ( li )
-//					li.setAll( avgLight );
-            }
-//			else {
-//				var baseLightLevel:uint = Lighting.defaultBaseLightAttn; //lighting.avg;
-//				lighting.lightGet( Lighting.DEFAULT_LIGHT_ID ).setAll( baseLightLevel );
-//			}
-            lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
         }
 
         if ( OxelBitfields.dataIsParent( faceData ) ) {
             _children = ChildOxelPool.poolGet();
-            var gct:GrainCursor = GrainCursorPool.poolGet( $stats.largest );
+            var gct:GrainCursor = GrainCursorPool.poolGet( $gc.bound );
             //Log.out( "Oxel.fromByteArray - ------------- read children -------" );
 
             for ( var i:int = 0; i < OXEL_CHILD_COUNT; i++ )
@@ -2045,14 +2035,14 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
                 _children[i]  = OxelPool.poolGet( type );
                 gct.copyFrom( $gc );
                 gct.become_child(i);
-                _children[i].fromByteArrayV8( $version, this, gct, $ba, $stats );
+                _children[i].fromByteArrayV8( $version, this, gct, $ba, $op );
             }
             //Log.out( "Oxel.fromByteArray - ------------- read children -------" );
             GrainCursorPool.poolDispose( gct );
         }
         else {
             childCount = 1;
-            $stats.statAdd( type, gc.grain );
+			$op.statistics.statAdd( type, gc.grain );
         }
 
         return $ba;

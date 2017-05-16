@@ -7,6 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
+import com.voxelengine.worldmodel.Light;
+
 import flash.utils.ByteArray;
 
 import com.voxelengine.Log;
@@ -259,7 +261,7 @@ public class Lighting  {
 	// Just a convience value to prevent the recalculation of the color values unless needed
 	private var _compositeColor:uint;
 
-	private var _materialFallOffFactor:uint = 0x1; // Multiplier on the lights attn rate
+	private var _materialFallOffFactor:uint = Light.DEFAULT_FALLOFF_FACTOR; // Multiplier on the lights attn rate
 	public function get materialFallOffFactor():uint { return _materialFallOffFactor; }
 	public function set materialFallOffFactor( val:uint ):void { _materialFallOffFactor = val; }
 	
@@ -983,13 +985,9 @@ public class Lighting  {
 	}
 	
 	public function lightFullBright():void {
-		
 		var li:LightInfo = lightGet( Lighting.DEFAULT_LIGHT_ID );
 		if ( li )
-				if ( Lighting.DEFAULT_LIGHT_ID == li.ID )
-					Log.out( "Brightness.lightFullBright - CAN'T SET DEFAULT LIGHT TO FULL BRIGHT", Log.WARN );
-				else
-					li.setIlluminationLevel( Lighting.MAX_LIGHT_LEVEL );
+			li.setIlluminationLevel( Lighting.MAX_LIGHT_LEVEL );
 		else
 			Log.out( "Brightness.lightFullBright - MISSING DEFAULT LIGHTS", Log.WARN );
 	}

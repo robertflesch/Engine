@@ -93,6 +93,7 @@ public class InventoryPanelModel extends VVContainer
 		
 		FunctionRegistry.functionAdd( createNewObjectIPM, "createNewObjectIPM" );
 		FunctionRegistry.functionAdd( importObjectIPM, "importObjectIPM" );
+		FunctionRegistry.functionAdd( importObjectStainedGlass, "importObjectStainedGlass" );
 		ModelMetadataEvent.addListener( ModelBaseEvent.ADDED, addModelMetadataEvent );
 		ModelMetadataEvent.addListener( ModelBaseEvent.RESULT, addModelMetadataEvent );
 		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, removeModelMetadataEvent );
@@ -315,6 +316,10 @@ public class InventoryPanelModel extends VVContainer
 			box = addModel( new ObjectAction( box, "importObjectIPM", "import128.png", "Click to import local model" ), false );
 			eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		}
+		if ( Globals.isDebug ) {
+			box = addModel( new ObjectAction( box, "importObjectStainedGlass", "import128.png", "Click to import picture" ), false );
+			eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
+		}
 	}
 	
 	static private function createNewObjectIPM():void {
@@ -325,16 +330,39 @@ public class InventoryPanelModel extends VVContainer
 	static private function importObjectIPM():void {
 		addDesktopModelHandler( null );
 	}
-	
+
+	static private function importObjectStainedGlass():void {
+		addDesktopPictureHandler( null );
+	}
+
 	static private function addDesktopModelHandler(event:UIMouseEvent):void {
 		var fr:FileReference = new FileReference();
 		fr.addEventListener(Event.SELECT, onDesktopModelFileSelected );
-		//var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
-		//fr.browse([swfTypeFilter]);
-        fr.browse();
+		var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
+		fr.browse([swfTypeFilter]);
 	}
-	
+
 	static public function onDesktopModelFileSelected(e:Event):void {
+		Log.out( "onDesktopModelFileSelected : " + e.toString() );
+
+		//if ( selectedModel
+		var fileName:String = e.currentTarget.name;
+		fileName = fileName.substr( 0, fileName.indexOf( "." ) );
+
+		var ii:InstanceInfo = new InstanceInfo();
+		ii.modelGuid = fileName;
+		ModelMakerBase.load( ii );
+	}
+
+
+	static private function addDesktopPictureHandler(event:UIMouseEvent):void {
+		var fr:FileReference = new FileReference();
+		fr.addEventListener(Event.SELECT, onDesktopPictureFileSelected );
+		var swfTypeFilter:FileFilter = new FileFilter("Photo Files","*.png,*.jpg");
+		fr.browse([swfTypeFilter]);
+	}
+
+	static public function onDesktopPictureFileSelected(e:Event):void {
         Log.out("onDesktopModelFileSelected : " + e.toString());
 
         //if ( selectedModel
@@ -390,7 +418,7 @@ public class InventoryPanelModel extends VVContainer
 
             function oxelCreated( $ode:OxelDataEvent ):void {
                 $ode.oxelData.loadFromByteArray();
-
+				$ode.oxelData.lightInfo.setIlluminationLevel(LightInfo.MAX);
 				createModelFromBitmap( $ode.oxelData, bitmapData );
 
 			}
@@ -419,27 +447,6 @@ public class InventoryPanelModel extends VVContainer
                 }
 			}
 		}
-
-	}
-
-    static public function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
-        var m:Matrix = new Matrix();
-        m.scale(destWidth/obj.width, destHeight/obj.height);
-        var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
-        bmpd.draw(obj, m);
-        return bmpd;
-    }
-
-	static public function onDesktopModelFileSelectedImportModel(e:Event):void {
-		Log.out( "onDesktopModelFileSelected : " + e.toString() );
-
-		//if ( selectedModel
-		var fileName:String = e.currentTarget.name;
-		fileName = fileName.substr( 0, fileName.indexOf( "." ) );
-
-		var ii:InstanceInfo = new InstanceInfo();
-		ii.modelGuid = fileName;
-		ModelMakerBase.load( ii );
 	}
 
 	private function removeModel( $modelGuid:String ):void {
@@ -532,6 +539,14 @@ public class InventoryPanelModel extends VVContainer
 		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, addModelMetadataEvent );
 		ModelMetadataEvent.removeListener( ModelBaseEvent.DELETE, removeModelMetadataEvent );
 		//ModelMetadataEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, addModelMetadataEvent );
+	}
+
+	static public function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
+		var m:Matrix = new Matrix();
+		m.scale(destWidth/obj.width, destHeight/obj.height);
+		var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
+		bmpd.draw(obj, m);
+		return bmpd;
 	}
 }
 }

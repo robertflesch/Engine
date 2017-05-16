@@ -7,18 +7,12 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-	import com.voxelengine.Globals;
-	import com.voxelengine.Log;
-
-	/**
-	 * ...
-	 * @author Bob
-	 */
-	public class Light 
+	public class Light
 	{
+		public static const DEFAULT_FALLOFF_FACTOR:int = 0x1;
 		private var _color:uint					= 0xffffffff;
 		private var _attn:uint					= 0x10;			// How fast the light decays in air
-		private var _fallOffFactor:uint  		= 0x1;			// A multiplier to how fast the light decays, i.e. going thru leaves.
+		private var _fallOffFactor:uint  		= DEFAULT_FALLOFF_FACTOR; // A multiplier to how fast the light decays, i.e. going thru leaves.
 		private var _fullBright:Boolean			= false;
 		private var _lightSource:Boolean		= false;
 		

@@ -110,7 +110,7 @@ public class OxelPersistence extends PersistenceObject
 		}
 
 		// need to set the id and levels the first time
-		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, baseLightLevel );
+		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, Lighting.DEFAULT_ILLUMINATION );
 		//Log.out( "OxelPersistence - setting RANDOM Base light level" );
 		//baseLightLevel = Math.random() * 255;
 	}

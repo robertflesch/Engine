@@ -88,6 +88,7 @@ public class VVUI implements LookAndFeel {
 
     /**
      *  A constant integer that defines the default background color value.
+     *  This is the background for text input boxes ONLY
      */
     public static const DEFAULT_BACKGROUND_COLOR:uint = 0xFFFFFF;
 
