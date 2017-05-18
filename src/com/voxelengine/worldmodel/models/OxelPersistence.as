@@ -45,14 +45,14 @@ public class OxelPersistence extends PersistenceObject
 {
 	// 1 meter stone cube is reference
 	static private var 	 _aliasInitialized:Boolean				= false; // used to only register class names once
-	private var _initializeFacesAndQuads:Boolean				= true;
-	
+
 	public function get baseLightLevel():int 					{ return dbo.baseLightLevel; }
 	public function set baseLightLevel( value:int ):void		{
 		if ( !_lightInfo.locked ) {
 			dbo.baseLightLevel = value;
 			_lightInfo.setIlluminationLevel(baseLightLevel);
 			changed = true;
+			forceQuads = true;
 		}
 	}
 
@@ -66,10 +66,18 @@ public class OxelPersistence extends PersistenceObject
 	public function set version($val:int):void					{ dbo.version = $val; }
 
 	private var _lightInfo:LightInfo 							= LightInfoPool.poolGet();
-	public function get lightInfo():LightInfo 						{ return _lightInfo; }
+	public function get lightInfo():LightInfo 					{ return _lightInfo; }
 
 	public function get lockLight():Boolean 					{ return _lightInfo.locked; }
 	public function set lockLight( value:Boolean ):void			{  _lightInfo.locked = value; }
+
+	private  var _forceQuads:Boolean;
+	public function get forceQuads():Boolean 					{ return _forceQuads; }
+	public function set forceQuads( value:Boolean ):void		{  _forceQuads = value; }
+
+	private  var _forceFaces:Boolean;
+	public function get forceFaces():Boolean 					{ return _forceFaces; }
+	public function set forceFaces( value:Boolean ):void		{  _forceFaces = value; }
 
 	private	var	_statistics:ModelStatisics						= new ModelStatisics();
 	public 	function get statistics():ModelStatisics			{ return _statistics; }
@@ -111,6 +119,7 @@ public class OxelPersistence extends PersistenceObject
 
 		// need to set the id and levels the first time
 		_lightInfo.setInfo( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR, Lighting.DEFAULT_ATTN, Lighting.DEFAULT_ILLUMINATION );
+		forceQuads = true;
 		//Log.out( "OxelPersistence - setting RANDOM Base light level" );
 		//baseLightLevel = Math.random() * 255;
 	}
@@ -148,17 +157,13 @@ public class OxelPersistence extends PersistenceObject
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Chunk operations
-	
+
 	public function update( $vm:VoxelModel ):void {
-		if ( topMostChunk && topMostChunk.dirty ) {
-			if ( EditCursor.EDIT_CURSOR == guid ) {
-				oxel.facesBuild();
-				quadsRebuildAll();
-			}
-			else {
-				Log.out( "OxelPersistence.update ------------ calling refreshQuads guid: " + guid, Log.DEBUG );
-				quadsRebuildDirty();
-			}
+		if ( topMostChunk && ( topMostChunk.dirtyFacesOrQuads || forceFaces || forceQuads ) ) {
+			Log.out( "OxelPersistence.update ------------ calling facesAndQuadsBuild guid: " + guid + "  with forceFaces: " + forceFaces + "  forceQuads: " + forceQuads, Log.DEBUG );
+			oxel.chunkGet().faceAndQuadsBuild( forceFaces, forceQuads );
+			forceFaces = false;
+			forceQuads = false;
 		}
 	}
 	
@@ -169,10 +174,14 @@ public class OxelPersistence extends PersistenceObject
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// oxel operations
-	public function changeOxel( $instanceGuid:String, $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
-		var result:Boolean = oxel.changeOxel( $instanceGuid, $gc, $type, $onlyChangeType );
-		if ( result )
+	public function change( $instanceGuid:String, $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
+		var result:Boolean = oxel.change( $instanceGuid, $gc, $type, $onlyChangeType );
+		if ( result ) {
+			// Do immediate build, if we schedule task then faces are empty for a few frames.
 			changed = true;
+			oxel.facesBuild();
+			oxel.quadsBuild();
+		}
 		return result;
 	}
 	
@@ -210,7 +219,11 @@ public class OxelPersistence extends PersistenceObject
 		_oxels[_lod] = Oxel.initializeRoot(bound);
 		oxel.readOxelData(ba, this );
 		_statistics.gather();
-		_topMostChunks[_lod] = oxel.chunk = Chunk.parse( oxel, null, _lightInfo, guid );
+
+		var chunk:Chunk = new Chunk( this, null, bound, guid, _lightInfo );
+		chunk.parse( oxel );
+		_topMostChunks[_lod] = oxel.chunk = chunk;
+
 		//Log.out( "OxelPersistence.loadFromByteArray oxel.chunkGet(): " + oxel.chunkGet() +  "  lod: " + _lod + " _topMostChunks[_lod] " + _topMostChunks[_lod]  );
 		//Log.out( "OxelPersistence.loadFromByteArray - Chunk.parse lod: " + _lod + "  guid: " + guid + " took: " + (getTimer() - time), Log.INFO );
 	}
@@ -320,12 +333,6 @@ public class OxelPersistence extends PersistenceObject
 		Log.out( "lodCloneFailureEvent event: " + event, Log.ERROR );
 	}
 
-	public function rescaleAndBuildFaces():void {
-		//OxelDataEvent.create( OxelDataEvent.OXEL_FACES_BUILT_FAIL, 0, guid, null );
-		VisitorFunctions.resetScaling( oxel );
-		oxel.chunkGet().buildFaces( true);
-	}
-
 	//////////////////////////////////////////////////////////////////
 	/* OxelPersistence - owns - top chunk - owns other chunks - owns oxels
 	* Three cases of rebuilding quads with options
@@ -334,27 +341,6 @@ public class OxelPersistence extends PersistenceObject
 	* rebuild DIRTY chunks (all oxels in a model) threaded
 	* rebuild ALL chunks (all oxels in a model) threaded
 	 */
-
-	// This is immediate, not on thread
-	public function quadsRebuildChunkAll( $chunk:Chunk ):void {
-		$chunk.oxel.quadsRebuildAllRecursively();
-	}
-
-	// This is immediate, not on thread
-	public function quadsRebuildChunkDirty( $chunk:Chunk ):void {
-		$chunk.oxel.quadsRebuildDirtyRecursively();
-	}
-
-	// This is a series of tasks
-	public function quadsRebuildDirty():void {
-		oxel.chunkGet().quadsBuild();
-	}
-
-	// This is a series of tasks
-	public function quadsRebuildAll():void {
-		var forceAll:Boolean = true;
-		oxel.chunkGet().quadsBuild( forceAll )
-	}
 
 	public function cloneNew( $guid:String ):OxelPersistence {
 		//toObject();

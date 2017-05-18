@@ -249,7 +249,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			for ( var t:int = 0; t < trunkHeight; t++ ) {
 				var ao:Oxel = oxel.root_get().childFind( gct );
 				if ( Globals.BAD_OXEL != ao )
-					ao.write( $guid, gct, e_trunkType );
+					ao.change( $guid, gct, e_trunkType );
 				gct.move_posy();
 			}
 		}

@@ -50,7 +50,7 @@ public class GenerateCube extends LandscapeTask {
 
 	override public function start():void {
 		super.start();
-		Log.out("GenerateCube.start");
+		//Log.out("GenerateCube.start");
 		// This generates a GENERATION_SUCCESS, which is picked up by the OxelPersistenceCache
 		// which then starts the build process
 
@@ -73,7 +73,7 @@ public class GenerateCube extends LandscapeTask {
 			for ( var y:int = 0; y < size; y++ ) {
 				for ( var z:int = 0; z < size; z++ ) {
 					gct.set_values( x, y, z, minGrain )
-					oxel.write( _modelGuid, gct, _layer.type, true );
+					oxel.change( _modelGuid, gct, _layer.type, true );
 				}
 			}
 		}
@@ -88,7 +88,7 @@ public class GenerateCube extends LandscapeTask {
 		var ba:ByteArray = oxel.toByteArray();
 //			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
 //			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
-		Log.out( "GenerateCube finished modelGuid: " + _modelGuid );
+		//Log.out( "GenerateCube finished modelGuid: " + _modelGuid );
 
 		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba, null, rootGrain.toString() ) );
 		super.complete();

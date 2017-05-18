@@ -194,6 +194,7 @@ public class VertexIndexBuilder
 			return false;
 		}
 
+		//trace( "VertexIndexBuilder.buffersBuildFromOxels - DIRTY" );
 //		var time:int = getTimer();
 		dispose();
 		if ( 0 < _oxels.length )

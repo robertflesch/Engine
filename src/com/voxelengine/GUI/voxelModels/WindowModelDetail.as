@@ -35,6 +35,7 @@ public class WindowModelDetail extends VVPopup {
 
 	private var _photoContainer:Box 		= new Box( width, 128 );
 	private var _vm:VoxelModel = null;
+	private var _baseLightLevel:int = 0;
 
 	public function WindowModelDetail( $vm:VoxelModel )
 	{
@@ -87,8 +88,9 @@ public class WindowModelDetail extends VVPopup {
 		lc.padding = 0;
 		lc.layout.orientation = LayoutOrientation.HORIZONTAL;
 
+		_baseLightLevel = _vm.modelInfo.oxelPersistence.baseLightLevel;
 		lc.addElement( new ComponentLabelInput( "Light(0-255)"
-								  , function ($e:TextEvent):void { _vm.modelInfo.oxelPersistence.baseLightLevel = Math.max( Math.min( uint( $e.target.label ), 255 ), 0 );  }
+								  , function ($e:TextEvent):void { _baseLightLevel = Math.max( Math.min( uint( $e.target.label ), 255 ), 0 );  }
 								  , String( _vm.modelInfo.oxelPersistence.baseLightLevel )
 								  , WIDTH - 120 ) );
 
@@ -143,8 +145,7 @@ public class WindowModelDetail extends VVPopup {
 
 	private function changeBaseLightLevel( $e:MouseEvent ):void  {
 		if ( _vm.modelInfo.oxelPersistence && _vm.modelInfo.oxelPersistence.oxelCount ) {
-			//var oxel:Oxel = _vm.modelInfo.oxelPersistence.oxel;
-			_vm.applyBaseLightLevel();
+			_vm.modelInfo.oxelPersistence.baseLightLevel = _baseLightLevel;
 		}
 	}
 

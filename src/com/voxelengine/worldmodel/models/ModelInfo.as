@@ -233,7 +233,7 @@ public class ModelInfo extends PersistenceObject
 	}
 	
 	public function changeOxel( $instanceGuid:String , $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
-		var result:Boolean = oxelPersistence.changeOxel( $instanceGuid, $gc, $type, $onlyChangeType );
+		var result:Boolean = oxelPersistence.change( $instanceGuid, $gc, $type, $onlyChangeType );
 		if ( TypeInfo.AIR == $type )
 			childRemoveByGC( $gc );
 		return result;
@@ -673,7 +673,7 @@ public class ModelInfo extends PersistenceObject
 			ao.name = ani.name;
 			ao.type = ani.type;
 			ao.guid = ani.guid;
-			Log.out( "ModelInfo.animationsGet - animation.metadata: " + ani.name + "  model guid: " + guid );
+			//Log.out( "ModelInfo.animationsGetSummary - animation.metadata: " + ani.name + "  model guid: " + guid );
 			dbo.animations.push( ao );
 		}
 	}

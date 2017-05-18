@@ -63,8 +63,10 @@ import flash.utils.getTimer;
 		public static const BRONZE:uint							= enum_val++;	// 122
 		public static const STEEL:uint							= enum_val++;	// 123
 		public static const GLASS:uint							= enum_val++;	// 124
-		public static const FIRE:uint							= 145;	
-		// NO MORE!!
+		public static const SHELL:uint							= 125;
+		public static const FIRE:uint							= 145;
+		public static const VINE:uint							= 152;
+	// NO MORE!!
 		
 		// WARNING use sparingly
 		static public function getTypeId( type:* ):int	{

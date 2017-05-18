@@ -237,7 +237,7 @@ public class VoxelVerseGUI extends EventDispatcher
 			_releaseMenu = addReleaseMenu();
 			_releaseMenu.visible = false;
 //			if ( true == Globals.isDebug ) {
-//				_debugMenu = new WindowDebugMenu();
+				_debugMenu = new WindowDebugMenu();
 //				_debugMenu.visible = false;
 //			}
 			if ( !Renderer.renderer.hardwareAccelerated )

@@ -248,9 +248,9 @@ public class InventoryPanelModel extends VVContainer
 	private function addModelTo( e:UIMouseEvent ):void {
 		if ( e.target.objectInfo is ObjectAction ) {
 			var oa:ObjectAction = e.target.objectInfo as ObjectAction
-			var cb:Function = oa.callBack
+			var cb:Function = oa.callBack;
 			// just execute the callback here, dont need to do cb(), which calls it twice, interesting
-			cb
+			cb;
 		}
 		else if ( e.target.objectInfo is ObjectModel ) {
 			var om:ObjectModel = (e.target.objectInfo as ObjectModel);
@@ -437,7 +437,7 @@ public class InventoryPanelModel extends VVContainer
 				//trace( ColorUtils.displayInHex( $bitmapData.getPixel(iw,ih)) );
                 gct.grainY = ih;
                 gct.grainZ = iw;
-				var tOxel:Oxel = oxel.write( $op.guid, gct, TypeInfo.GLASS, true);
+				var tOxel:Oxel = oxel.change( $op.guid, gct, TypeInfo.GLASS, true);
 				tOxel.color = $bitmapData.getPixel(iw,h-1-ih);
                 if ( !tOxel.lighting ){
                     tOxel.lighting = LightingPool.poolGet();
@@ -452,7 +452,7 @@ public class InventoryPanelModel extends VVContainer
 	private function removeModel( $modelGuid:String ):void {
 		
 		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
-		var column:int = 0
+		var column:int = 0;
 		var rows:int = _itemContainer.numElements;
 		for ( var row:int; row < rows; row++ ) {
 			var rowElement:Element = _itemContainer.getElementAt( row );

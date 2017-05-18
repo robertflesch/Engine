@@ -83,7 +83,7 @@ public class VisitorFunctions {
                     $oxel.lighting.add( $oxel.chunkGet().lightInfo ); // Get the parent chunk
                 }
                 $oxel.dirty = true;
-                $oxel.quadsRebuildDirtyRecursively();
+                $oxel.quadsBuild(true);
             }
         }
     }
@@ -146,7 +146,7 @@ public class VisitorFunctions {
         }
         else if ( $oxel.lighting ) {
             if ( $oxel.lighting.reset() )
-                $oxel.quadsRebuildAllRecursively();
+                $oxel.quadsBuild(true);
         }
     }
 } // end of class Oxel

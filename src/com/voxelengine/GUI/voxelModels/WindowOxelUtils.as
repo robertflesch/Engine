@@ -10,6 +10,7 @@ package com.voxelengine.GUI.voxelModels
 {
 import com.voxelengine.GUI.VVPopup;
 import com.voxelengine.renderer.Chunk;
+import com.voxelengine.worldmodel.models.makers.RebuildFacesAndQuads;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.oxel.VisitorFunctions;
@@ -196,9 +197,9 @@ public class WindowOxelUtils extends VVPopup
 	
 	private function rebuildModelHandler(event:UIMouseEvent):void {
 		//_vm.modelInfo.oxelPersistence.visitor( Oxel.rebuild, "Oxel.rebuild" );
-		_vm.modelInfo.oxelPersistence.oxel.chunkGet().setDirtyRecursively();
-		_vm.modelInfo.oxelPersistence.oxel.chunkGet().buildFaces( false );
-		_vm.modelInfo.oxelPersistence.oxel.chunkGet().quadsBuild( true );
+		var forceFaces:Boolean = true;
+		var forceQuads:Boolean = true;
+		_vm.modelInfo.oxelPersistence.oxel.chunkGet().faceAndQuadsBuild( forceFaces, forceQuads );
 	}
 	
 	private function resetOxelScalingHandler(event:UIMouseEvent):void {

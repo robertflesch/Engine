@@ -373,7 +373,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			var writeType:int = TypeInfo.getTypeId( ip.type );
 			if ( type != writeType )
 				// changed types are not flowable
-				no.write( _guid, no.gc, writeType, false );
+				no.change( _guid, no.gc, writeType, false );
 		}
 		
 		/*

@@ -387,7 +387,7 @@ public class EditCursor extends VoxelModel
 			modelInfo.oxelPersistence.oxel.gc.grain = gciData.oxel.gc.bound;
 			var gct:GrainCursor = GrainCursorPool.poolGet( gciData.oxel.gc.bound );
 			gct.grain = gciData.oxel.gc.bound;
-			modelInfo.oxelPersistence.oxel.write( EDIT_CURSOR, gct, oxelTexture, true);
+			modelInfo.oxelPersistence.oxel.change( EDIT_CURSOR, gct, oxelTexture, true);
 			GrainCursorPool.poolDispose(gct);
 		}
 		else {
@@ -396,7 +396,7 @@ public class EditCursor extends VoxelModel
 			modelInfo.oxelPersistence.oxel.gc.grain = lastSize;
 		}
 
-		modelInfo.oxelPersistence.oxel.write( EDIT_CURSOR, modelInfo.oxelPersistence.oxel.gc, oxelTexture, true );
+		modelInfo.oxelPersistence.oxel.change( EDIT_CURSOR, modelInfo.oxelPersistence.oxel.gc, oxelTexture, true );
 
 
 		// This decides how many sides the edit cursor has.
@@ -421,7 +421,7 @@ public class EditCursor extends VoxelModel
 			modelInfo.oxelPersistence.oxel.faceSet( Globals.NEGZ );
 		}
 
-		modelInfo.oxelPersistence.oxel.quadsRebuildAllRecursively();
+		modelInfo.oxelPersistence.oxel.quadsBuild( true );
 
 		function cursorColorRainbow():uint {
 			var frequency:Number = 2.4;
@@ -910,8 +910,8 @@ public class EditCursor extends VoxelModel
 	private function repeatTimerStop():void  {
 		if ( _repeatTimer ) {
 			_repeatTimer.removeEventListener( TimerEvent.TIMER, onRepeat );
-			_repeatTimer.stop()
-			_repeatTimer = null
+			_repeatTimer.stop();
+			_repeatTimer = null;
 			_count = 0
 		}
 	}

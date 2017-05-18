@@ -170,7 +170,8 @@ public class LightRemove extends LightTask
 	static private function rebuildFaces( $o:Oxel ):void {
 
 		if ( $o.quads && 0 < $o.quads.length )
-			$o.quadsRebuildDirtyRecursively();
+			$o.facesBuild( true );
+			$o.quadsBuild( true );
 	}
 
 	/*

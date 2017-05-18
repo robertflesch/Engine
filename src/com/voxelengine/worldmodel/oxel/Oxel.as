@@ -12,6 +12,9 @@ import flash.geom.Point;
 import flash.geom.Vector3D;
 import flash.utils.ByteArray;
 import flash.utils.getTimer;
+import flash.utils.Timer;
+import flash.events.TimerEvent;
+
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -84,15 +87,9 @@ public class Oxel extends OxelBitfields
 				_parent.dirty = true;
 				
 			var ch:Chunk = chunkGet(); // Get the parent chunk
-			if ( ch && $isDirty ) // only mark it dirty, dont mark on clean
-				ch.dirtySet( type );
+			if ( ch && $isDirty ) // only mark it dirty, don't mark on clean
+				ch.dirtyFacesOrQuads = true;
 		}
-	}
-
-	public function setAllDirty():void {
-		var ch:Chunk = chunkGet();
-		if ( ch )
-			ch.setAllTypesDirty();
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -210,7 +207,16 @@ public class Oxel extends OxelBitfields
 
 		return true;
 	}
-	
+
+	public function lightingAddDefault( $li:LightInfo ):void {
+		lighting = LightingPool.poolGet();
+		lighting.add( $li );
+		if ( type <= 1023  )
+			lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
+		else
+			Log.out( "Oxel.lightingAddDefault type is OUT OF RANGE: " + type, Log.WARN);
+	}
+
 	static public function initializeRoot( $grainBound:int ):Oxel {
 		var gct:GrainCursor = GrainCursorPool.poolGet( $grainBound );
 		gct.grain = $grainBound;
@@ -742,72 +748,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.CHANGE, Network.userId, typeIdToUse, amountInGrain0 ) );
 	}
 	
-	private function writeInternal( $modelGuid:String, $newType:int, $onlyChangeType:Boolean ):Oxel {
-		
-		nodes++;
-
-		// so I am changing type to new type
-		// if type == air then I am removing x amount of newType from inventory
-		//const EDIT_CURSOR_MIN:int = 990;
-		// we dont want to add edit cursor to our inventory
-		// also if we have a scripts that generates blocks, not sure how to handle that.
-		// TODO how do we handle scripts the generate blocks, need to take inventory status first?
-		if ( EditCursor.EDIT_CURSOR != $modelGuid && false == $onlyChangeType )
-			updateInventory( $newType );
-		
-		// kill any existing family, you can be parent type OR physical type, not both
-		if ( childrenHas() )
-		{
-			// If there are children, then the neighbors might point to the children
-			// Since they are being deleted, we have to make sure any pointers to them are removed.
-			childrenPrune();
-			neighborsInvalidate();
-		}
-		
-		additionalDataClear();
-			
-		// Now we can change type
-		type = $newType;
-
-		// This is only used by terrain builder scripts.
-		if ( $onlyChangeType ) 
-			return this;
-		
-		// anytime oxel changes, neighbors need to know
-		neighborsMarkDirtyFaces( $modelGuid, gc.size() );
-		
-		var p:Oxel = _parent;
-		// This is only a two level merge, brain not up to a n level recursive today...
-		if ( TypeInfo.AIR == type && p )
-			p.mergeRecursive();
-		
-		// what to return if recursive merge happens?
-		return this;
-	}
-	
-	// This write to a child if it is a valid child of the oxel
-	// if the child does not exist, it is created
-	public function write( $modelGuid:String, $gc:GrainCursor, $newType:int, $onlyChangeType:Boolean = false ):Oxel	{
-		
-		// thisa finds the closest oxel, could be target oxel, could be parent
-		var co:Oxel = childFind( $gc );
-		
-		if ( co.type != $newType && !gc.is_equal( $gc ) )
-			// this gets the exact oxel we are looking for if it is different from returned type.
-			co = co.childGetOrCreate( $gc );
-			
-		if ( Globals.BAD_OXEL == co )
-		{
-			Log.out( "Oxel.write - cant find child!", Log.ERROR );
-			return co;
-		}
-		
-		if ( $newType == co.type && $gc.bound == co.gc.bound && !co.childrenHas() )
-			return co;
-		
-		return co.writeInternal( $modelGuid, $newType, $onlyChangeType );	
-	}
-			
 	//public function dispose():void {
 		//if ( _chunk ) 
 			//_chunk.dispose();
@@ -1097,85 +1037,43 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	
 	override protected function faceMarkDirty( $modelGuid:String, $face:uint, $propogateCount:int = 2 ):void {
 		
-		if ( childrenHas() ) {
+		if ( childrenHas() )
+		{
 			const children:Vector.<Oxel> = childrenForDirection( $face );
 			for each ( var child:Oxel in children ) {
 				child.faceMarkDirty( $modelGuid, $face, $propogateCount );
 			}
 		}
-		else {
-			if ( _quads && _quads[$face] )
-				_quads[$face].dirty = 1;
-			/*
-			if ( lighting )
-				lighting.occlusionResetFace( $face );
-			*/
+		else
+		{
 			super.faceMarkDirty( $modelGuid, $face, $propogateCount );
+			if ( _quads && _quads[$face] ) {
+				_quads[$face].dirty = 1;
+			}
+//			if ( lighting )
+//				lighting.occlusionResetFace( $face );
 		}
 	}
 
-	override public function facesMarkAllDirty():void {
-		super.facesMarkAllDirty();
-		facesClearAll();
-	}
-	
-	public function faces_rebuild( $modelGuid:String ):void {
-		quadsDeleteAll();
-		
-		// anytime oxel changes, neighbors need to know
-		neighborsMarkDirtyFaces( $modelGuid, gc.size() );
-		facesMarkAllDirty();
-	}
-
-	//private function facesBuildWater():void {
-		//_s_oxelsEvaluated++;
-		//var no:Oxel = null;
-		//for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
-			//no = neighbor( face );
-			//if ( Globals.BAD_OXEL == no ) 
-				//continue;
-			//if ( TypeInfo.WATER == no.type && !no.childrenHas() )
-				//continue;
-			//
-			//// so the neighbor has children, are all the children facing us water oxels?
-			//// if there is anything other then a water oxel facing this face, it needs to break up into smaller oxel
-			//const dchildren:Vector.<Oxel> = no.childrenForDirection( Oxel.face_get_opposite( face ) );
-			//var breakup:Boolean;
-			//for each ( var dchild:Oxel in dchildren ) {
-				//if ( TypeInfo.WATER != dchild.type ) {
-					//breakup = true;
-					//break;
-				//}
-			//}
-			//if ( breakup && 0 < gc.grain  ) {
-				//childrenCreate();
-				//_s_oxelsCreated += 8;
-				//facesBuild();
-			//}
-		//}
-	//}
-
-	public function facesBuild():void {
-		//if ( gc.eval( 5, 101, 72, 16 ))
-		//	Log.out( "Oxel.facesBuild - not being lit" );
-
-		if ( dirty ) {
+	public function facesBuild( $forceRebuild:Boolean = false ):void {
+		if ( dirty || $forceRebuild ) {
 			if ( childrenHas() ) {
-				// parents dont have faces!
-				if ( facesHas() )
+				if ( facesHas() ) // parents don't have faces!
 					facesClearAll();
-					
 				for each ( var child:Oxel in _children )
-					if ( child.dirty )
-						child.facesBuild();
+					if ( child.dirty || $forceRebuild )
+						child.facesBuild( $forceRebuild );
 			}
-			else
+			else {
+				if ( $forceRebuild )
+					facesMarkAllDirty();
 				facesBuildTerminal();
+			}
 		}
 	}
 	
 	public function facesBuildTerminal():void {
-
+		//Log.out( "Oxel.faceBuildTerminal gc: " + gc);
 		if ( TypeInfo.AIR == type )
 			facesMarkAllClean();
 		else  if ( TypeInfo.LEAF == type )
@@ -1318,9 +1216,6 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		facesMarkAllClean();
 	}
 
-	import flash.utils.Timer;
-	import flash.events.TimerEvent;
-	
 	public function setOnFire( $modelGuid:String ):void {
 		var ti:TypeInfo = TypeInfo.typeInfo[type];
 		if ( ti.flammable ) {
@@ -1335,7 +1230,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		
 		function burnUp(e:TimerEvent):void {
 			if ( onFire )
-				changeOxel( $modelGuid, gc, TypeInfo.AIR );
+				change( $modelGuid, gc, TypeInfo.AIR );
 			onFire = false
 		}
 	}
@@ -1366,11 +1261,11 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 		else // I have children, so check each child on that face
 		{
-			const dchildren:Vector.<Oxel> = childrenForDirection( dir );
-			for each ( var dchild:Oxel in dchildren ) 
+			const dChildren:Vector.<Oxel> = childrenForDirection( dir );
+			for each ( var dChild:Oxel in dChildren )
 			{
 				// Need to gather the alpha info from each child
-				if ( true == dchild.faceHasAlpha( dir ) )
+				if ( true == dChild.faceHasAlpha( dir ) )
 					return true;
 			}
 		}
@@ -1387,11 +1282,11 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 		else // I have children, so check each child on that face
 		{
-			const dchildren:Vector.<Oxel> = childrenForDirection( dir );
-			for each ( var dchild:Oxel in dchildren ) 
+			const dChildren:Vector.<Oxel> = childrenForDirection( dir );
+			for each ( var dChild:Oxel in dChildren )
 			{
 				// Need to gather the alpha info from each child
-				if ( true == dchild.faceHasWater( dir ) )
+				if ( true == dChild.faceHasWater( dir ) )
 					return true;
 			}
 		}
@@ -1413,11 +1308,11 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 
 		// get the children touching $face
-		const dchildren:Vector.<Oxel> = $no.childrenForDirection( Oxel.face_get_opposite( $face ) );
-		for each ( var dchild:Oxel in dchildren ) 
+		const dChildren:Vector.<Oxel> = $no.childrenForDirection( Oxel.face_get_opposite( $face ) );
+		for each ( var dChild:Oxel in dChildren )
 		{
 			// if any of the children have alpha of a different type
-			if ( faceAlphaNeedsFace( $face, $type, dchild ) )
+			if ( faceAlphaNeedsFace( $face, $type, dChild ) )
 				return true;
 		}
 
@@ -1429,9 +1324,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	// works like a charm!
 	static public function faceAlphaOrScalingNeedsFace( $face:int, $type:int, $no:Oxel ):Boolean	{
 
-		//	we only need a face here is the nieghbor is alpha of a different type
+		//	we only need a face here is the neighbor is alpha of a different type
 		if ( !$no.childrenHas() ) {
-			if ( TypeInfo.hasAlpha( $no.type ) || ( $no.flowInfo && $no.flowInfo.flowScaling.has() ) )
+			if ( TypeInfo.hasAlpha( $no.type ) || ( $no.flowInfo && $no.flowInfo.flowScaling.has() || $no.type == TypeInfo.VINE ) )
 				return !( $type == $no.type );
 			else
 				return false;
@@ -1449,6 +1344,35 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		// all children for that direction are opaque, so this face is opaque
 		return false;
 	}
+
+	//private function facesBuildWater():void {
+	//_s_oxelsEvaluated++;
+	//var no:Oxel = null;
+	//for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
+	//no = neighbor( face );
+	//if ( Globals.BAD_OXEL == no )
+	//continue;
+	//if ( TypeInfo.WATER == no.type && !no.childrenHas() )
+	//continue;
+	//
+	//// so the neighbor has children, are all the children facing us water oxels?
+	//// if there is anything other then a water oxel facing this face, it needs to break up into smaller oxel
+	//const dchildren:Vector.<Oxel> = no.childrenForDirection( Oxel.face_get_opposite( face ) );
+	//var breakup:Boolean;
+	//for each ( var dchild:Oxel in dchildren ) {
+	//if ( TypeInfo.WATER != dchild.type ) {
+	//breakup = true;
+	//break;
+	//}
+	//}
+	//if ( breakup && 0 < gc.grain  ) {
+	//childrenCreate();
+	//_s_oxelsCreated += 8;
+	//facesBuild();
+	//}
+	//}
+	//}
+
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// face function END
@@ -1502,43 +1426,36 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	// Begin Quad functions
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	public function quadsRebuildDirtyRecursively( $plane_facing:int = 1 ):void {
-		if ( dirty ) {
+	public function quadsBuild( $forceQuads:Boolean = false):void {
+		if ( dirty || $forceQuads ) {
 			if ( childrenHas() ) {
 				for each ( var child:Oxel in _children ) {
-					if (child.dirty)
-						child.quadsRebuildDirtyRecursively($plane_facing);
+					if ( child.dirty || $forceQuads )
+						child.quadsBuild( $forceQuads );
 				}
 				dirty = false;
 			}
-			else
-				quadsBuildTerminal( $plane_facing );
-		}
-	}
+			else{
+				if ( $forceQuads )
+					quadsMarkAllDirty();
+				quadsBuildTerminal();
+			}
 
-	public function quadsRebuildAllRecursively( $plane_facing:int = 1 ):void {
-		if ( childrenHas() ) {
-			for each ( var child:Oxel in _children ) {
-				child.quadsRebuildAllRecursively($plane_facing);
+		}
+
+		function quadsMarkAllDirty():void {
+			if ( !_quads )
+				return;
+			for ( var i:int = 0; i <= Globals.NEGZ; i++ ) {
+				var quad:Quad = _quads[i];
+				if (quad)
+					quad.dirty = 1;
 			}
 		}
-		else {
-			quadsMarkAllDirty();
-			quadsBuildTerminal( $plane_facing );
-		}
 	}
 
-	public function quadsMarkAllDirty():void {
-		if ( !_quads )
-			return;
-		for ( var i:int = 0; i <= Globals.NEGZ; i++ ) {
-			var quad:Quad = _quads[i];
-			if (quad)
-				quad.dirty = 1;
-		}
-	}
 
-	protected function quadsBuildTerminal( $plane_facing:int = 1 ):void {
+	public function quadsBuildTerminal( $plane_facing:int = 1 ):void {
 		if ( Globals.g_oxelBreakEnabled	)
 			if ( gc.evalGC( Globals.g_oxelBreakData ) )
 				trace( "Oxel.quadsBuildTerminal - setGC breakpoint" );
@@ -1564,7 +1481,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				if (!addedToVertex)
 					chunkAddOxel();
 				else
-					chunkGet().dirtySet( type );
+					chunkGet().dirtyVertexsSet( type );
 			}
 
 		}
@@ -1575,15 +1492,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		dirty = false;
 	}
 
-	public function lightingAddDefault( $li:LightInfo ):void {
-		lighting = LightingPool.poolGet();
-		lighting.add( $li );
-		if ( type <= 1023  )
-			lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
-		else
-			Log.out( "Oxel.lightingAddDefault type is OUT OF RANGE: " + type, Log.WARN);
-	}
-
+	// used for lighting
 	public function quadRebuild( $face:int ):void {
 		if ( quads ) {
 			var quad:Quad = _quads[$face];
@@ -2308,7 +2217,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	public function write_sphere( $modelGuid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, gmin:uint = 0 ):void {
 		if ( true == GrainCursorUtils.is_inside_sphere( gc, cx, cy, cz, radius ))
 		{
-			write( $modelGuid, gc, $newType );
+			change( $modelGuid, gc, $newType );
 			return;
 		}
 		
@@ -2351,7 +2260,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				return;
 				
 //				Log.out( "writeHalfSphere gc: " + gc.toString() + "  cy: " + cy + " getModelY(): " + getModelY() + "  gc.size: " + gc.size() );
-			write( $modelGuid, gc, $newType );
+			change( $modelGuid, gc, $newType );
 			return;
 		}
 		
@@ -2383,7 +2292,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			
 		if ( true == GrainCursorUtils.isInsideCircle( gc, cx, cy, cz, radius, axis ))
 		{
-			write( $modelGuid, gc, $newType );
+			change( $modelGuid, gc, $newType );
 			return result;
 		}
 		else if ( gc.grain < startingSize && true == GrainCursorUtils.isOutsideCircle( gc, cx, cy, cz, radius, axis ))
@@ -2413,7 +2322,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	public function empty_square( $modelGuid:String, cx:int, cy:int, cz:int, radius:int, gmin:uint=0 ):void {
 		if ( true == GrainCursorUtils.is_inside_square( gc, cx, cy, cz, radius ))
 		{
-			write( $modelGuid, gc, TypeInfo.AIR );
+			change( $modelGuid, gc, TypeInfo.AIR );
 			return;
 		} 
 		if ( true == GrainCursorUtils.is_outside_square( gc, cx, cy, cz, radius ))
@@ -2423,7 +2332,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		
 		if ( gc.grain <= gmin )
 		{
-			write( $modelGuid, gc, TypeInfo.AIR );
+			change( $modelGuid, gc, TypeInfo.AIR );
 			return;	
 		}
 
@@ -2446,7 +2355,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			writeType = TypeInfo.getTypeId( ip.type );
 			if ( type == writeType )
 				return;
-			write( $modelGuid, gc, writeType, false );
+			change( $modelGuid, gc, writeType, false );
 			return;
 		} 
 		
@@ -2463,7 +2372,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				return;
 //				if ( "melt" == ip.script )
 //					flowInfo.type = FlowInfo.FLOW_TYPE_MELT;
-			write( $modelGuid, gc, writeType, false );
+			change( $modelGuid, gc, writeType, false );
 			//else if ( "" != ip.script )
 				//Log.out( "Oxel.effect_sphere - " + ip.script + " source type: " + type +  " writeType: " + writeType );
 			return;	
@@ -2921,7 +2830,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 //				nou.write( $modelGuid, gc, 152 );
 			var nod:Oxel = neighbor( Globals.NEGY );
 			if ( Globals.BAD_OXEL != nod && TypeInfo.AIR == nod.type && !nod.childrenHas() && nod.gc.grain >= 4 )
-				nod.write( $modelGuid, nod.gc, 152 );
+				nod.change( $modelGuid, nod.gc, 152 );
 		}
 	}
 	
@@ -2939,7 +2848,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 		else if ( TypeInfo.LEAF == type || TypeInfo.BARK == type )
 		{
-			write( $modelGuid, gc, TypeInfo.AIR );
+			change( $modelGuid, gc, TypeInfo.AIR );
 		}
 	}
 	
@@ -3081,7 +2990,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	
 	// This function writes to the root oxel, and lets the root find the correct target
 	// it also add flow and lighting
-	public function changeOxel( $instanceGuid:String, $gc:GrainCursor, $newType:int, $onlyChangeType:Boolean = false ):Boolean
+	public function change( $instanceGuid:String, $gc:GrainCursor, $newType:int, $onlyChangeType:Boolean = false ):Oxel
 	{
 		// thisa finds the closest oxel, could be target oxel, could be parent
 		var changeCandidate:Oxel = childFind( $gc );
@@ -3090,12 +2999,12 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			changeCandidate = changeCandidate.childGetOrCreate( $gc );
 			
 		if ( Globals.BAD_OXEL == changeCandidate ) {
-			Log.out( "Oxel.write - cant find child!", Log.ERROR );
-			return false;
+			Log.out( "Oxel.changeOxel - cant find child!", Log.ERROR );
+			return null;
 		}
 		
 		if ( $newType == changeCandidate.type && $gc.bound == changeCandidate.gc.bound && !changeCandidate.childrenHas() )
-			return false;
+			return changeCandidate;
 			
 		if ( !$onlyChangeType )
 			changeCandidate.removeOldLightInfo( $instanceGuid );
@@ -3106,8 +3015,73 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			changeCandidate.applyFlowInfo( $instanceGuid, $newType )
 		}
 		changeCandidate.writeInternal( $instanceGuid, $newType, $onlyChangeType );
-		return true
+		return changeCandidate;
 	}
+/*
+	// This write to a child if it is a valid child of the oxel
+	// if the child does not exist, it is created
+	public function write( $modelGuid:String, $gc:GrainCursor, $newType:int, $onlyChangeType:Boolean = false ):Oxel	{
+
+		// this is a finds the closest oxel, could be target oxel, could be parent
+		var co:Oxel = childFind( $gc );
+
+		if ( co.type != $newType && !gc.is_equal( $gc ) )
+		// this gets the exact oxel we are looking for if it is different from returned type.
+			co = co.childGetOrCreate( $gc );
+
+		if ( Globals.BAD_OXEL == co )
+		{
+			Log.out( "Oxel.write - cant find child!", Log.ERROR );
+			return co;
+		}
+
+		if ( $newType == co.type && $gc.bound == co.gc.bound && !co.childrenHas() )
+			return co;
+
+		return co.writeInternal( $modelGuid, $newType, $onlyChangeType );
+	}
+*/
+	private function writeInternal( $modelGuid:String, $newType:int, $onlyChangeType:Boolean ):Oxel {
+		nodes++;
+		// so I am changing type to new type
+		// if type == air then I am removing x amount of newType from inventory
+		//const EDIT_CURSOR_MIN:int = 990;
+		// we dont want to add edit cursor to our inventory
+		// also if we have a scripts that generates blocks, not sure how to handle that.
+		// TODO how do we handle scripts the generate blocks, need to take inventory status first?
+		if ( EditCursor.EDIT_CURSOR != $modelGuid && false == $onlyChangeType )
+			updateInventory( $newType );
+
+		// kill any existing family, you can be parent type OR physical type, not both
+		if ( childrenHas() ) {
+			// If there are children, then the neighbors might point to the children
+			// Since they are being deleted, we have to make sure any pointers to them are removed.
+			childrenPrune();
+			neighborsInvalidate();
+		}
+
+		additionalDataClear();
+
+		// Now we can change type
+		type = $newType;
+
+		// This is only used by terrain builder scripts.
+		if ( $onlyChangeType )
+			return this;
+
+		// anytime oxel changes, neighbors need to know
+		neighborsMarkDirtyFaces( $modelGuid, gc.size() );
+
+		var p:Oxel = _parent;
+		// This is only a two level merge, brain not up to a n level recursive today...
+		if ( TypeInfo.AIR == type && p )
+			p.mergeRecursive();
+
+		// what to return if recursive merge happens?
+		return this;
+	}
+
+
 
 	private function removeOldLightInfo( $instanceGuid:String ):void {
 		if ( lighting ) {

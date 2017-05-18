@@ -68,7 +68,7 @@ public class OxelPersistenceCache
 			OxelDataEvent.create( ModelBaseEvent.ADDED, $series, $op.guid, $op );
 			// Once the data has been loaded, this will start the build faces and quads process
 			//OxelLoadAndBuildTasks.addTask( $op.guid, $op, FromByteArray.NORMAL_BYTE_LOAD_PRIORITY, $rebuildFacesAndScaling );
-			new OxelLoadAndBuildManager( $op.guid, $op, $rebuildFacesAndScaling );
+			new OxelLoadAndBuildManager( $op.guid, $op );
 			if ( 0 == _loadingCount ) {
 				//Log.out( "OxelPersistenceCache.add - done loading oxels: " + $op.guid, Log.WARN );
 				// So does the loading of the VoxelModel or oxel complete region?
@@ -175,7 +175,7 @@ public class OxelPersistenceCache
 	static private function generateSucceed( $pe:PersistenceEvent):void {
 		if ( Globals.IVM_EXT != $pe.table && Globals.BIGDB_TABLE_OXEL_DATA != $pe.table )
 			return;
-		Log.out( "OxelDataCache.generateSucceed " + $pe.toString(), Log.INFO );
+		//Log.out( "OxelDataCache.generateSucceed " + $pe.toString(), Log.INFO );
 		var op:OxelPersistence = new OxelPersistence( $pe.guid, null, $pe.data, true );
 		if ( "PROJECTILE"  == $pe.guid )
 			op.doNotPersist = true;

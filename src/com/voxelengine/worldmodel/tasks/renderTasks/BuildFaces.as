@@ -16,24 +16,27 @@ import com.voxelengine.Log
 import com.voxelengine.renderer.Chunk
 
 // Note that rendingTasks automatically add them selves to the queue.
-public class RefreshFaces extends RenderingTask
+public class BuildFaces extends RenderingTask
 {
-    static public function addTask( $guid:String, $chunk:Chunk, $taskPriority:int ): void {
-        new RefreshFaces( $guid, $chunk, $taskPriority );
+    private var _forceRebuild:Boolean;
+    static public function addTask( $guid:String, $chunk:Chunk, $taskPriority:int, $forceRebuild:Boolean = false ): void {
+        Log.out("BuildFaces.addTask: guid: " + $guid + "  forceRebuild: " + $forceRebuild, Log.WARN);
+        new BuildFaces( $guid, $chunk, $taskPriority, $forceRebuild );
     }
 
-    public function RefreshFaces( $guid:String, $chunk:Chunk, $taskPriority:int ):void {
+    public function BuildFaces($guid:String, $chunk:Chunk, $taskPriority:int, $forceRebuild:Boolean ):void {
         // public function RenderingTask( $guid:String, $chunk:Chunk, taskType:String = TASK_TYPE, $taskPriority:int = TASK_PRIORITY ):void {
+        _forceRebuild = $forceRebuild;
         super( $guid, $chunk, "RefreshFaces", $taskPriority )
     }
 
     override public function start():void {
         super.start();
-        //Log.out("RefreshFaces.start: guid: " + _guid, Log.WARN);
+        //Log.out("BuildFaces.start: guid: " + _guid, Log.WARN);
 
         var time:int = getTimer();
         if ( _chunk )
-            _chunk.oxel.facesBuild();
+            _chunk.oxel.facesBuild( _forceRebuild );
         // if the processing time is less then 1 ms, do the next task
         OxelDataEvent.create( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, 0, _guid, null );
         super.complete();

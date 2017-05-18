@@ -491,13 +491,8 @@ public class VoxelModel {
 				new WindowBluePrintCopy( this)
 		}
 		else {
-			Log.out( "VoxelModel.write - going to changeOxel");
+			//Log.out( "VoxelModel.write - going to changeOxel");
 			var result:Boolean = modelInfo.changeOxel( instanceInfo.instanceGuid, $gc, $type, $onlyChangeType );
-			if ( result ) {
-				// Do immediate build, if we schedule task then faces are empty for a few frames.
-                modelInfo.oxelPersistence.oxel.facesBuild();
-				modelInfo.oxelPersistence.quadsRebuildDirty();
-			}
 			return result;
 		}
 		return false
@@ -1228,8 +1223,6 @@ public class VoxelModel {
 	}
 
 	public function applyBaseLightLevel():void {
-		modelInfo.oxelPersistence.quadsRebuildAll();
-		modelInfo.oxelPersistence.oxel.setAllDirty();
 		modelInfo.oxelPersistence.changed = true;
 		var children:Vector.<VoxelModel> = modelInfo.childVoxelModelsGet();
 		for each ( var child:VoxelModel in children ) {
