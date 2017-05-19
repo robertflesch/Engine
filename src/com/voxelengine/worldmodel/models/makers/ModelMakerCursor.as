@@ -40,42 +40,13 @@ public class ModelMakerCursor extends ModelMakerBase {
 			if ( _vm ) {
 				EditCursor.currentInstance.objectModelSet( _vm );
 
-				addListeners();
+				addODEListeners();
 				OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null );
 			}
 			else
 				markComplete( false );
 		}
 
-		function oxelBuildComplete($ode:OxelDataEvent):void {
-			if ($ode.modelGuid == modelInfo.guid ) {
-				removeListeners();
-				markComplete( true );
-			}
-		}
-
-		function oxelBuildFailed($ode:OxelDataEvent):void {
-			if ($ode.modelGuid == modelInfo.guid ) {
-				removeListeners();
-				markComplete( false );
-			}
-
-		}
-		function addListeners():void {
-			OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
-			OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
-			OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
-			OxelDataEvent.addListener( ModelBaseEvent.RESULT, oxelBuildComplete );
-			OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelBuildComplete );
-		}
-
-		function removeListeners():void {
-			OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelBuildComplete );
-			OxelDataEvent.removeListener( ModelBaseEvent.RESULT, oxelBuildComplete );
-			OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
-		}
 	}
 
 

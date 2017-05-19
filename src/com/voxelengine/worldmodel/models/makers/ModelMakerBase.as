@@ -81,21 +81,14 @@ public class ModelMakerBase {
 	
 	protected function retrieveBaseInfo():void {
 		//Log.out( "ModelMakerBase.retrieveBaseInfo - _ii.modelGuid: " + _ii.modelGuid );
-		addListeners();
+		addMIEListeners();
 		ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null );
 	}
-	
-	protected function addListeners():void {
-		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retrievedModelInfo );
-		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retrievedModelInfo );
-		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
-	}
-	
 	
 	protected function retrievedModelInfo($mie:ModelInfoEvent):void  {
 		if (_ii.modelGuid == $mie.modelGuid ) {
 			//Log.out( "ModelMakerBase.retrievedModelInfo - ii: " + _ii.toString(), Log.DEBUG )
-			removeListeners();
+			removeMIEListeners();
 			_modelInfo = $mie.vmi;
 			attemptMake();
 		}
@@ -104,11 +97,54 @@ public class ModelMakerBase {
 	protected function failedModelInfo( $mie:ModelInfoEvent):void  {
 		if ( _ii && _ii.modelGuid == $mie.modelGuid ) {
 			Log.out( "ModelMakerBase.failedData - ii: " + _ii.toString(), Log.WARN );
-			removeListeners();
+			removeMIEListeners();
 			markComplete( false );
 		}
 	}
-	
+
+	protected function addMIEListeners():void {
+		ModelInfoEvent.addListener( ModelBaseEvent.ADDED, retrievedModelInfo );
+		ModelInfoEvent.addListener( ModelBaseEvent.RESULT, retrievedModelInfo );
+		ModelInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
+	}
+
+	protected function removeMIEListeners():void {
+		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retrievedModelInfo );
+		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retrievedModelInfo );
+		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
+	}
+
+	/////////////////////////////////////////////////////////////
+	protected function retrievedMetadata( $mme:ModelMetadataEvent):void {
+		if ( ii.modelGuid == $mme.modelGuid ) {
+			removeMetadataListeners();
+			_modelMetadata = $mme.modelMetadata;
+			//Log.out( "ModelMakerBase.retrievedMetadata - metadata: " + _modelMetadata.toString() )
+			attemptMake();
+		}
+	}
+
+	protected function failedMetadata( $mme:ModelMetadataEvent):void {
+		if ( ii.modelGuid == $mme.modelGuid ) {
+			removeMetadataListeners();
+			markComplete(false);
+		}
+	}
+
+	protected function addMetadataListeners():void {
+		ModelMetadataEvent.addListener(ModelBaseEvent.ADDED, retrievedMetadata);
+		ModelMetadataEvent.addListener(ModelBaseEvent.RESULT, retrievedMetadata);
+		ModelMetadataEvent.addListener(ModelBaseEvent.REQUEST_FAILED, failedMetadata);
+	}
+
+	protected function removeMetadataListeners():void {
+		ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, retrievedMetadata );
+		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrievedMetadata );
+		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata )
+	}
+
+	/////////////////////////////////////////////////////////////
+
 	// check to make sure all of info required is here
 	protected function attemptMake():void { throw new Error( "ModelMakerBase.attemptMake is an abstract method" ) }
 	
@@ -129,11 +165,43 @@ public class ModelMakerBase {
 
 	}
 
-	private function removeListeners():void {
-		ModelInfoEvent.removeListener( ModelBaseEvent.ADDED, retrievedModelInfo );
-		ModelInfoEvent.removeListener( ModelBaseEvent.RESULT, retrievedModelInfo );
-		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	protected function addODEListeners():void {
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+		OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+		OxelDataEvent.addListener( ModelBaseEvent.RESULT, oxelBuildComplete );
+		OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelBuildComplete );
 	}
+
+	protected function removeODEListeners():void {
+		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelBuildComplete );
+		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, oxelBuildComplete );
+		OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+		OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+		OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+	}
+
+	protected function oxelBuildComplete($ode:OxelDataEvent):void {
+		if ($ode.modelGuid == modelInfo.guid ) {
+			removeODEListeners();
+			var op:OxelPersistence = $ode.oxelPersistence;
+			op.forceFaces = false;
+			op.forceQuads = false;
+			modelInfo.oxelPersistence = op;
+			markComplete( true );
+		}
+	}
+
+	protected function oxelBuildFailed($ode:OxelDataEvent):void {
+		if ($ode.modelGuid == modelInfo.guid ) {
+			removeODEListeners();
+			modelInfo.oxelPersistence = null;
+			markComplete( false );
+		}
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 	protected function markComplete( $success:Boolean ):void {
 		var ohd:ObjectHierarchyData = new ObjectHierarchyData();

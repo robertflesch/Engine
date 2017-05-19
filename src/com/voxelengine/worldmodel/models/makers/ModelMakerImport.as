@@ -8,6 +8,8 @@
 package com.voxelengine.worldmodel.models.makers
 {
 
+import com.voxelengine.worldmodel.models.OxelPersistence;
+
 import flash.geom.Vector3D;
 
 import com.voxelengine.Log;
@@ -49,7 +51,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	}
 
 	override protected function retrieveBaseInfo():void {
-		addListeners();	
+		addMIEListeners();
 		// Since this is the import, it uses the local file system rather then persistance
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );
 	}
@@ -155,9 +157,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			if ( _vm ) {
 				_vm.stateLock( true, 10000 ); // Lock state so that it has time to load animations
 				// Now request that the oxel be built
-				OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
-				OxelDataEvent.addListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
-				OxelDataEvent.addListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+				addODEListeners();
 
 				if ( false == modelInfo.childrenLoaded ) { // its true if they are loaded or the model has no children.
 					waitForChildren = true;
@@ -181,27 +181,42 @@ public class ModelMakerImport extends ModelMakerBase {
 			}
 		}
 
-		function oxelBuildComplete($ode:OxelDataEvent):void {
-			if ($ode.modelGuid == modelInfo.guid ) {
-				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
-				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
-				OxelDataEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
-				if ( !waitForChildren )
-					markComplete( true );
-			}
-		}
+	}
 
-		function oxelBuildFailed($ode:OxelDataEvent):void {
-			if ($ode.modelGuid == modelInfo.guid ) {
-				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
-				OxelDataEvent.removeListener(OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
-				OxelDataEvent.removeListener(ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
-				if ( waitForChildren ) {
-					Log.out("ModelMakerImport - ERROR LOADING OXEL", Log.WARN);
-					// TODO cancel children loading???
-				}
-				markComplete( false );
+	// This listens to a limited set of success options, which is only the COMPLETE success
+	override protected function addODEListeners():void {
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+		OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+	}
+
+	override protected function removeODEListeners():void {
+		OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+		OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+		OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+	}
+
+
+	override protected function oxelBuildComplete($ode:OxelDataEvent):void {
+		if ($ode.modelGuid == modelInfo.guid ) {
+			removeODEListeners();
+			var op:OxelPersistence = $ode.oxelPersistence;
+			op.forceFaces = false;
+			op.forceQuads = false;
+			modelInfo.oxelPersistence = op;
+			if ( !waitForChildren )
+				markComplete( true );
+		}
+	}
+
+	override protected function oxelBuildFailed($ode:OxelDataEvent):void {
+		if ($ode.modelGuid == modelInfo.guid ) {
+			removeODEListeners();
+			if ( waitForChildren ) {
+				Log.out("ModelMakerImport - ERROR LOADING OXEL", Log.WARN);
+				// TODO cancel children loading???
 			}
+			markComplete( false );
 		}
 	}
 
