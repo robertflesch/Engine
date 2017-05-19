@@ -8,6 +8,7 @@
 
 package com.voxelengine.worldmodel.tasks.renderTasks
 {
+import com.voxelengine.Log;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.renderer.Chunk
 
@@ -16,18 +17,20 @@ public class BuildQuads extends RenderingTask
 {
     private var _forceQuads:Boolean;
     // Note that rendingTasks automatically add them selves to the queue.
-    static public function addTask( $guid:String, $chunk:Chunk, $forceAll:Boolean, $taskPriority:int ): void {
-        new BuildQuads( $guid, $chunk, $forceAll, $taskPriority );
+    static public function addTask( $guid:String, $chunk:Chunk, $forceQuads:Boolean, $taskPriority:int ): void {
+        //Log.out("BuildQuads.addTask: guid: " + $guid + "  forceRebuild: " + $forceQuads + "  taskPriority: " + $taskPriority, Log.WARN);
+        new BuildQuads( $guid, $chunk, $forceQuads, $taskPriority );
     }
 
-    public function BuildQuads( $guid:String, $chunk:Chunk, $forceAll:Boolean, $taskPriority:int ):void {
+    public function BuildQuads( $guid:String, $chunk:Chunk, $forceQuads:Boolean, $taskPriority:int ):void {
         // public function RenderingTask( $guid:String, $chunk:Chunk, taskType:String = TASK_TYPE, $taskPriority:int = TASK_PRIORITY ):void {
         super( $guid, $chunk, "BuildQuads", $taskPriority );
-        _forceQuads = $forceAll;
+        _forceQuads = $forceQuads;
     }
 
     override public function start():void {
         super.start();
+        //Log.out("BuildQuads.start: guid: " + _guid + "  gc: " + _chunk.gc  + "  forceQuads: " + _forceQuads, Log.WARN);
         // This builds the quads from the oxels, and places them in rendering queue.
         _chunk.oxel.quadsBuild( _forceQuads );
         OxelDataEvent.create( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, 0, _guid, null );

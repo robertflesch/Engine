@@ -44,6 +44,35 @@ public class Chunk {
 	private var _guid:String;
 	private var _bound:uint;
 
+	private var _faceTasks:int;
+	public function get faceTasks():int { return _faceTasks; }
+	public function faceTasksReset():void { _faceTasks = 0; }
+	public function faceTasksInc():void {
+		_faceTasks++;
+		if ( _parent )
+			_parent.faceTasksInc()
+	}
+	public function faceTasksDec():void {
+		_faceTasks--;
+		if ( _parent )
+			_parent.faceTasksDec();
+	}
+
+	private var _quadTasks:int;
+	public function get quadTasks():int { return _quadTasks; }
+	public function quadTasksReset():void { _quadTasks = 0; }
+	public function quadTasksInc():void {
+		_quadTasks++;
+		if ( _parent )
+			_parent.quadTasksInc();
+	}
+
+	public function quadTasksDec():void {
+		_quadTasks--;
+		if ( _parent )
+			_parent.quadTasksDec();
+	}
+
 	private var _gc:GrainCursor; 			// Object that give us our location allocates memory for the grain
 	public function get  gc():GrainCursor { return _gc; } 			// Object that give us our location allocates memory for the grain
 
@@ -141,7 +170,8 @@ public class Chunk {
 			_children = new Vector.<Chunk>(OCT_TREE_SIZE, true);
 			for ( var i:int=0; i < OCT_TREE_SIZE; i++ ) {
 				var newChunk:Chunk = new Chunk( _op, this, _bound, _guid, _lightInfo );
-				_children[i] = newChunk.parse( $oxel.children[i] );
+				newChunk.parse( $oxel.children[i] );
+				_children[i] = newChunk;
 				gct.copyFrom( _gc );
 				gct.become_child( i );
 				_children[i]._gc.copyFrom( gct );
@@ -188,7 +218,7 @@ public class Chunk {
 /*
 	public function quadsBuild( $forceAll:Boolean = false ):void {
 		var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
-		_quadTasks = 0;
+		quadTasks = 0;
 		var priority:int;
 		if ( $forceAll && vm )
 			priority = vm.distanceFromPlayerToModel(); // This should really be done on a per chuck basis
@@ -253,21 +283,27 @@ public class Chunk {
 		}
 	}
 */
-	private var _faceTasks:int;
-	private var _quadTasks:int;
 	public function faceAndQuadsBuild( $forceFaces:Boolean = false, $forceQuads:Boolean = false ):void {
 		var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
-		_quadTasks = 0;
-		_faceTasks = 0;
+		quadTasksReset();
+		faceTasksReset();
 		var priority:int;
 		if ( ( $forceFaces || $forceQuads ) && vm )
 			priority = vm.distanceFromPlayerToModel(); // This should really be done on a per chuck basis
 		else
 			priority = 100; // high but not too high?
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
+		OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
 		faceAndQuadsBuildRecursively( priority, $forceFaces ,$forceQuads );
-		if ( 0 == _quadTasks) {
+		// When would either of these happen? Answer: Trying to build a clean model
+		if ( 0 == faceTasks) {
+			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
+			OxelDataEvent.create(OxelDataEvent.OXEL_FACES_BUILT_COMPLETE, 0, _guid, _op);
+		}
+		if ( 0 == quadTasks) {
 			OxelDataEvent.removeListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
-			OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, null);
+			OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, _op);
+			OxelDataEvent.create(OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op);
 		}
 	}
 
@@ -289,28 +325,37 @@ public class Chunk {
 	}
 
 	private function addFaceTask( $priority:int, $forceFaces:Boolean ):void {
-		_faceTasks++;
+		faceTasksInc();
 		BuildFaces.addTask( _guid, this, $priority, $forceFaces )
 	}
 
 	private function addQuadTask( $priority:int, $forceQuads:Boolean ):void {
-		_quadTasks++;
+		quadTasksInc();
 		BuildQuads.addTask( _guid, this, $forceQuads, $priority )
 	}
 
-	private function quadsBuildPartialComplete( $ode:OxelDataEvent ):void {
-		_quadTasks--;
-		if ( 0 == _quadTasks) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
-			OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, null);
+	private function facesBuildPartialComplete( $ode:OxelDataEvent ):void {
+		//Log.out( "Chunk.facesBuildPartialComplete - Partial - guid: " + _guid + "  $ode.modelGuid: " + $ode.modelGuid, Log.WARN );
+		if ( $ode.modelGuid == _guid ) {
+			faceTasksDec();
+			if (0 == faceTasks) {
+				//Log.out("Chunk.facesBuildPartialComplete - COMPLETE - guid: " + _guid + "  $ode.modelGuid: " + $ode.modelGuid, Log.WARN);
+				OxelDataEvent.removeListener(OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete);
+				OxelDataEvent.create(OxelDataEvent.OXEL_FACES_BUILT_COMPLETE, 0, _guid, _op);
+			}
 		}
 	}
 
-	private function facesBuildPartialComplete( $ode:OxelDataEvent ):void {
-		_faceTasks--;
-		if ( 0 == _faceTasks) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
-			OxelDataEvent.create( OxelDataEvent.OXEL_FACES_BUILT_COMPLETE, 0, _guid, null );
+	private function quadsBuildPartialComplete( $ode:OxelDataEvent ):void {
+		//Log.out( "Chunk.quadsBuildPartialComplete - Partial - guid: " + _guid + "  $ode.modelGuid: " + $ode.modelGuid, Log.WARN );
+		if ( $ode.modelGuid == _guid ) {
+			quadTasksDec();
+			if (0 == quadTasks) {
+				//Log.out("Chunk.quadsBuildPartialComplete - COMPLETE - guid: " + _guid + "  $ode.modelGuid: " + $ode.modelGuid, Log.WARN);
+				OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete);
+				OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, _op);
+				OxelDataEvent.create(OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op);
+			}
 		}
 	}
 
