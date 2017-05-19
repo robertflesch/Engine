@@ -20,6 +20,7 @@ public final class OxelPool
 	public static function initialize( $initialPoolSize:uint, $growthValue:uint ):void {
 		_initialPoolSize = $initialPoolSize;
 		_growthValue = $growthValue;
+		poolDispose( poolGet( 100 ) );
 	}
 
 	public static function poolGet( $type:uint ):Oxel {

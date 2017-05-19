@@ -9,20 +9,13 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.voxelModels
 {
 import com.voxelengine.GUI.VVPopup;
-import com.voxelengine.renderer.Chunk;
-import com.voxelengine.worldmodel.models.makers.RebuildFacesAndQuads;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.oxel.VisitorFunctions;
 
-import flash.utils.ByteArray;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 
 
-import com.voxelengine.Globals;
-import com.voxelengine.Log;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class WindowOxelUtils extends VVPopup
