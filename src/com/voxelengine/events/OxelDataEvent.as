@@ -25,13 +25,13 @@ public class OxelDataEvent extends ModelBaseEvent
 	static public const OXEL_BUILD_COMPLETE:String			= "OXEL_BUILD_COMPLETE";
 	static public const OXEL_BUILD_FAILED:String			= "OXEL_BUILD_FAILED";
 
-	private var _od:OxelPersistence;
+	private var _op:OxelPersistence;
 	private var _modelGuid:String;
 	private var _fromTables:Boolean;
 	private var _generated:Boolean;
 	private var _generationData:Object;
 
-	public function get oxelData():OxelPersistence { return _od; }
+	public function get oxelPersistence():OxelPersistence { return _op; }
 	public function get modelGuid():String  { return _modelGuid; }
 	public function get fromTables():Boolean  { return _fromTables; }
 	public function get generated():Boolean  { return _generated; }
@@ -39,7 +39,7 @@ public class OxelDataEvent extends ModelBaseEvent
 
 	public function OxelDataEvent($type:String, $series:int, $guid:String, $vmd:OxelPersistence, $fromTable:Boolean, $generated:Boolean, $generationData:Object ) {
 		super( $type, $series );
-		_od = $vmd;
+		_op = $vmd;
 		_modelGuid = $guid;
 		_fromTables = $fromTable;
 		_generated = $generated;
@@ -47,7 +47,7 @@ public class OxelDataEvent extends ModelBaseEvent
 	}
 	
 	public override function clone():Event {
-		return new OxelDataEvent(type, series, modelGuid, oxelData, fromTables, generated, generationData);
+		return new OxelDataEvent(type, series, modelGuid, oxelPersistence, fromTables, generated, generationData);
 	}
    
 	public override function toString():String {

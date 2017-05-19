@@ -58,7 +58,7 @@ import flash.utils.getTimer;
 			Log.out( "MergeLayer.oxelDataRetrieved:");
 			if ( e.modelGuid == _modelGuid ) {
 				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelDataRetrieved );
-				var oxel:Oxel = e.oxelData.oxel;
+				var oxel:Oxel = e.oxelPersistence.oxel;
 				processOxel( oxel )
 			}
 		}

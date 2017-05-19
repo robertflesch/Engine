@@ -205,7 +205,7 @@ public class ModelInfo extends PersistenceObject
 	public function assignOxelData( $ode:OxelDataEvent ):void {
 		if ( guid == $ode.modelGuid ) {
 			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FBA_COMPLETE, assignOxelData );
-			oxelPersistence = $ode.oxelData;
+			oxelPersistence = $ode.oxelPersistence;
 			if ( lockLight ) {
 				oxelPersistence.baseLightLevel = Lighting.MAX_LIGHT_LEVEL;
 				oxelPersistence.lockLight = true;

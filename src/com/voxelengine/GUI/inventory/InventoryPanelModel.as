@@ -417,9 +417,9 @@ public class InventoryPanelModel extends VVContainer
 			}
 
             function oxelCreated( $ode:OxelDataEvent ):void {
-                $ode.oxelData.loadFromByteArray();
-				$ode.oxelData.lightInfo.setIlluminationLevel(LightInfo.MAX);
-				createModelFromBitmap( $ode.oxelData, bitmapData );
+                $ode.oxelPersistence.loadFromByteArray();
+				$ode.oxelPersistence.lightInfo.setIlluminationLevel(LightInfo.MAX);
+				createModelFromBitmap( $ode.oxelPersistence, bitmapData );
 
 			}
         }

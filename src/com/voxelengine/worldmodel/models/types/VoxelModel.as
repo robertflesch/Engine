@@ -182,7 +182,7 @@ public class VoxelModel {
 				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete );
 				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed );
 				calculateCenter();
-				metadata.bound = $ode.oxelData.bound;
+				metadata.bound = $ode.oxelPersistence.bound;
 				complete = true;
 				Log.out("VoxelModel.oxelBuildComplete - metadata.name: " + metadata.name );
 			}
