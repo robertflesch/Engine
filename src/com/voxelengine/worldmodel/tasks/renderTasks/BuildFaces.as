@@ -27,7 +27,7 @@ public class BuildFaces extends RenderingTask
     public function BuildFaces($guid:String, $chunk:Chunk, $taskPriority:int, $forceRebuild:Boolean ):void {
         // public function RenderingTask( $guid:String, $chunk:Chunk, taskType:String = TASK_TYPE, $taskPriority:int = TASK_PRIORITY ):void {
         _forceFaces = $forceRebuild;
-        super( $guid, $chunk, "RefreshFaces", $taskPriority )
+        super( $guid, $chunk, "BuildFaces", $taskPriority )
     }
 
     override public function start():void {

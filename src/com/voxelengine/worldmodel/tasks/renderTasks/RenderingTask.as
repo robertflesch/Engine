@@ -8,7 +8,9 @@
 
 package com.voxelengine.worldmodel.tasks.renderTasks
 {
-	import flash.utils.getTimer
+import com.voxelengine.Log;
+
+import flash.utils.getTimer
 	
 	import com.developmentarc.core.tasks.tasks.AbstractTask
 	
@@ -23,25 +25,33 @@ package com.voxelengine.worldmodel.tasks.renderTasks
 	 */
 	public class RenderingTask extends AbstractTask 
 	{		
-		public static const TASK_TYPE:String = "ABSTRACT_LANDSCAPE_TASK"
-        public static const TASK_PRIORITY:int = 1
+		public static const TASK_TYPE:String = "ABSTRACT_LANDSCAPE_TASK";
+        public static const TASK_PRIORITY:int = 1;
 		
-		protected var _guid:String
-		protected var _chunk:Chunk
-		protected var _taskCount:int
+		protected var _guid:String;
+		protected var _chunk:Chunk;
+		protected var _taskCount:int;
+		protected var _time:int;
 		
-		public function RenderingTask( $guid:String, $chunk:Chunk, taskType:String = TASK_TYPE, taskPriority:int = TASK_PRIORITY ):void {
-			_guid = $guid
-			_chunk = $chunk
-			_taskCount++
-			super(taskType, taskPriority)
-			Globals.taskController.addTask( this )
+		public function RenderingTask( $guid:String, $chunk:Chunk, $taskType:String = TASK_TYPE, taskPriority:int = TASK_PRIORITY ):void {
+			_guid = $guid;
+			_chunk = $chunk;
+			_taskCount++;
+			super( $taskType, taskPriority);
+			Globals.taskController.addTask( this );
+			Log.out( taskType + " task created for guid: " + $guid, Log.WARN);
 		}
-		
+
+		override public function start():void {
+			super.start();
+			_time = getTimer();
+		}
+
 		override public function complete():void {
-			_taskCount--
-			_chunk = null
-			super.complete()	
+			_taskCount--;
+			_chunk = null;
+			Log.out( taskType + " task took: " + ( getTimer() - _time ) + "  guid: " + _guid );
+			super.complete();
 		}
 		
 		protected function getVoxelModel():VoxelModel {

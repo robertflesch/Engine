@@ -34,7 +34,6 @@ import com.voxelengine.events.WindowWaterEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.oxel.Oxel;
 
 public class Renderer extends EventDispatcher 
@@ -43,36 +42,24 @@ public class Renderer extends EventDispatcher
 	public static function get renderer():Renderer 	{ return _s_renderer };
 
 	private var timer:Timer;
-	private const resizeInterval:Number = 1500; //amount of time you believe is enough to say that continuous resizing is ended after last discrete Event.RESIZE
 	private var _width:int;
 	private var _height:int;
-	private var _startingWidth:int = 0;
-	private var _startingHeight:int = 0;
-	
-	private var _stage3D:Stage3D
+
+	private var _stage3D:Stage3D;
 	public function get stage3D():Stage3D { return _stage3D; }
 	public function get context3D():Context3D { return _stage3D.context3D; }
 	
-	private var _isFullScreen:Boolean = false;
-	private var _isResizing:Boolean = false;
-
 	private var _isHW:Boolean = true;
 
 	private var _mvp:Matrix3D = new Matrix3D();
-	private var _viewOffset:Vector3D = new Vector3D();
-	
+
 	
 	public function get width():int { return _width; }
 	public function get height():int { return _height; }
 	
 	public function get hardwareAccelerated():Boolean { return _isHW; }
 	
-	public function viewOffsetSet( x:int, y:int, z:int ):void 
-	{ 
-		_viewOffset.x = x; _viewOffset.y = y; _viewOffset.z = z; 
-	}
-
-	private function addStageListeners():void 
+	private function addStageListeners():void
 	{
 		Globals.g_app.stage.addEventListener( Event.RESIZE, resizeEvent );
 	}
@@ -89,11 +76,12 @@ public class Renderer extends EventDispatcher
 		addStageListeners();
 		
 		_stage3D = stage.stage3Ds[0];
-		addStage3DListeners()
+		addStage3DListeners();
 
 		stage3D.x = 0;
 		stage3D.y = 0;
-		
+
+		const resizeInterval:Number = 1500; //amount of time you believe is enough to say that continuous resizing is ended after last discrete Event.RESIZE
 		timer = new Timer(resizeInterval);
 		timer.addEventListener(TimerEvent.TIMER, timerHandler);
 
@@ -101,15 +89,15 @@ public class Renderer extends EventDispatcher
 		//Context3DProfile.BASELINE_CONSTRAINED
 		Log.out( "Renderer.init - requestContext3D Profile: Context3DProfile.BASELINE_CONSTRAINED", Log.DEBUG );	
 		// http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display3D/Context3DProfile.html
-		stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.STANDARD_EXTENDED);
+		//stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.STANDARD_EXTENDED);
 		//stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE_CONSTRAINED);
-		//stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE);
+		stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE);
 	}
 	
 	
 	public function resizeEvent(event:Event):void {
 		setStageSize( Globals.g_app.stage.stageWidth, Globals.g_app.stage.stageHeight);
-		configureBackBuffer()
+		configureBackBuffer();
 		//if (timer.running) {
 			////Log.out("Renderer.resizeEvent - reset timer");
 			//timer.reset();
@@ -134,9 +122,6 @@ public class Renderer extends EventDispatcher
 		//Log.out( "Renderer.setStageSize w: " + w + "  h: " + h );
 		_width = w;
 		_height = h;
-
-		_startingWidth = _width;
-		_startingHeight = _height;
 	}
 	
 	public function modelShot():BitmapData {
@@ -182,11 +167,8 @@ public class Renderer extends EventDispatcher
 		}
 
 		if ( context3D ) {
-			if ( Globals.isDebug )
-				context3D.enableErrorChecking = true;
-			else	
-				context3D.enableErrorChecking = false;
-				
+			context3D.enableErrorChecking = Globals.isDebug;
+
 			configureBackBuffer();
 			_isHW = context3D.driverInfo.toLowerCase().indexOf("software") == -1;
 			if ( !_isHW )
@@ -242,26 +224,26 @@ public class Renderer extends EventDispatcher
 			// Say they are falling onto an island, and they hit the water first.
 			// I should probably adjust that algorithm to account for it.
 			if ( cm) {
-				var lcm:VoxelModel = VoxelModel.controlledModel.lastCollisionModel
+				var lcm:VoxelModel = VoxelModel.controlledModel.lastCollisionModel;
 				if ( null != lcm ) {
-					var camOxel:Oxel = lcm.getOxelAtWSPoint( wsPositionCamera, 4 )
+					var camOxel:Oxel = lcm.getOxelAtWSPoint( wsPositionCamera, 4 );
 					if ( camOxel && Globals.BAD_OXEL != camOxel ) {
 						if ( TypeInfo.WATER == camOxel.type ) {
-							Globals.g_underwater = true
+							Globals.g_underwater = true;
 							WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.CREATE ) )
 						}
 						else {
-							Globals.g_underwater = false
+							Globals.g_underwater = false;
 							WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.ANNIHILATE ) )
 						}
 					}
 					else {
-						Globals.g_underwater = false
+						Globals.g_underwater = false;
 						WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.ANNIHILATE ) )
 					}
 				}
 				else {
-					Globals.g_underwater = false
+					Globals.g_underwater = false;
 					WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.ANNIHILATE ) )
 				}
 			}
@@ -295,7 +277,7 @@ public class Renderer extends EventDispatcher
 		
 	}
 	
-	private function perspectiveProjection(fov:Number = 90, aspect:Number = 1, near:Number = 1, far:Number = 2048):Matrix3D {
+	static private function perspectiveProjection(fov:Number = 90, aspect:Number = 1, near:Number = 1, far:Number = 2048):Matrix3D {
 		var y2:Number = near * Math.tan(fov * Math.PI / 360); 
 		var y1:Number = -y2;
 		var x1:Number = y1 * aspect;

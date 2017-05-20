@@ -24,21 +24,18 @@ import flash.utils.getTimer;
  * ...
  * @author Robert Flesch
  */
-public class FromByteArray extends AbstractTask 
+public class FromByteArray extends RenderingTask
 {
 	static public const NORMAL_BYTE_LOAD_PRIORITY:int = 5;
-	private var	_guid:String;
 	private var	_op:OxelPersistence;
 
 	static public function addTask( $guid:String, $parent:OxelPersistence, $taskPriority:int ): void {
-		var fba:FromByteArray = new FromByteArray( $guid, $parent, $taskPriority );
-		Globals.taskController.addTask( fba )
+		new FromByteArray( $guid, $parent, $taskPriority );
 	}
 	
 	public function FromByteArray( $guid:String, $parent:OxelPersistence, $taskPriority:int ):void {
-		_guid = $guid;
+		super( $guid, null, "FromByteArray", $taskPriority );
 		_op = $parent;
-		super("FromByteArray", $taskPriority );
 	}
 	
 	override public function start():void {
@@ -59,7 +56,6 @@ public class FromByteArray extends AbstractTask
 			OxelDataEvent.create( OxelDataEvent.OXEL_FBA_FAILED, 0, _guid, _op );
 		}
 		super.complete();
-		//Log.out( "FromByteArray.start: took: " + (getTimer() - time) + "  guid: " + _guid );
 	}
 }
 }

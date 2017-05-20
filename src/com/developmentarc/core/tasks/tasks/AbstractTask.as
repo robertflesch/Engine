@@ -74,7 +74,7 @@ package com.developmentarc.core.tasks.tasks
 		protected var currentOverrides:Array;
 		
 		/* PRIVATE PROPERTIES */
-		private var __type:String;
+		protected var __type:String;
 		private var __priority:int;
 		private var __selfOverride:Boolean;
 		private var __uid:Object;
