@@ -36,7 +36,7 @@ public class BuildFaces extends RenderingTask
         //Log.out("BuildFaces.start: guid: " + _guid  + "  gc: " + _chunk.gc + "  forceFaces: " + _forceFaces, Log.WARN);
 
         var time:int = getTimer();
-        if ( _chunk )
+        if ( _chunk && _chunk.oxel )
             _chunk.oxel.facesBuild( _forceFaces );
         // if the processing time is less then 1 ms, do the next task
         OxelDataEvent.create( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, 0, _guid, null );

@@ -409,7 +409,7 @@ public class  UserInventory extends QuickInventory
 		}
 		else if ( oi is ObjectModel ) {
 			Log.out( "UserInventory.processItemSelection - ObjectModel", Log.WARN);
-			var ti1:TypeInfo = TypeInfo.typeInfo[ 125 ];
+			var ti1:TypeInfo = TypeInfo.typeInfo[ TypeInfo.NO_QUADS ];
 			var om:ObjectModel = oi as ObjectModel;
 			CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.INSERT_MODEL, ti1.type, om ) );
 			

@@ -37,7 +37,7 @@ public class ModelInfoCache
 		ModelInfoEvent.addListener( ModelBaseEvent.SAVE, 				save );
 		ModelInfoEvent.addListener( ModelBaseEvent.DELETE, 				deleteHandler );
 		ModelInfoEvent.addListener( ModelInfoEvent.DELETE_RECURSIVE, 	deleteRecursive );
-		ModelInfoEvent.addListener( ModelBaseEvent.GENERATION, 			generated );
+		ModelInfoEvent.addListener( ModelBaseEvent.GENERATION, 			generationComplete );
 		ModelInfoEvent.addListener( ModelBaseEvent.UPDATE_GUID, 		updateGuid );
 		ModelInfoEvent.addListener( ModelBaseEvent.UPDATE, 				update );
 
@@ -129,7 +129,7 @@ public class ModelInfoCache
 	}
 
 
-	static private function generated( $mie:ModelInfoEvent ):void  {
+	static private function generationComplete( $mie:ModelInfoEvent ):void  {
 		add( 0, $mie.vmi );
 	}
 

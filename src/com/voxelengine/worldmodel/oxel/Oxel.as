@@ -1460,7 +1460,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			if ( gc.evalGC( Globals.g_oxelBreakData ) )
 				trace( "Oxel.quadsBuildTerminal - setGC breakpoint" );
 
-		if ( type == 125 ) // This is the shell for the model
+		if ( type == TypeInfo.NO_QUADS ) // This is the shell for the model
 				return;
 
 		var changeCount:int = 0;

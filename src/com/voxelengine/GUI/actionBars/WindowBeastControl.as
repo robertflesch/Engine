@@ -9,7 +9,7 @@
 package com.voxelengine.GUI.actionBars
 {
 	import com.voxelengine.GUI.WindowBeastControlQuery;
-	import com.voxelengine.GUI.WindowHeading;
+	import com.voxelengine.GUI.CanvasHeading;
 	import com.voxelengine.worldmodel.inventory.FunctionRegistry;
 	import com.voxelengine.worldmodel.inventory.ObjectAction;
 	import com.voxelengine.worldmodel.inventory.ObjectInfo;
@@ -51,7 +51,7 @@ package com.voxelengine.GUI.actionBars
 		private var _beastInstanceGuid:String;
 		private const TOOL_BAR_HEIGHT:int = 140;
 		private const ITEM_COUNT:int = 10;
-		private var _windowHeading:WindowHeading = null;
+		private var _windowHeading:CanvasHeading = null;
 		
 		static public function handleModelEvents( $me:ModelEvent ):void {
 			if ( ModelEvent.TAKE_CONTROL == $me.type ) {
@@ -81,7 +81,7 @@ package com.voxelengine.GUI.actionBars
 			
 //			addEventListener(UIOEvent.REMOVED, onRemoved );
 			
-			_windowHeading = new WindowHeading( _beastInstanceGuid );
+			_windowHeading = new CanvasHeading( _beastInstanceGuid );
 		
 			if ( WindowBeastControlQuery.currentInstance )
 				WindowBeastControlQuery.currentInstance.remove();

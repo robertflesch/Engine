@@ -7,32 +7,16 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
-import com.voxelengine.GUI.VVBox;
-import com.voxelengine.GUI.crafting.BoxCharacterSlot;
-import com.voxelengine.GUI.voxelModels.PopupMetadataAndModelInfo;
-import com.voxelengine.events.CharacterSlotEvent;
-import com.voxelengine.events.OxelDataEvent;
-import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
-import com.voxelengine.pools.GrainCursorPool;
-import com.voxelengine.pools.LightInfoPool;
-import com.voxelengine.pools.LightingPool;
+import com.voxelengine.GUI.WindowPictureImport;
+import com.voxelengine.events.ModelEvent;
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.utils.ColorUtils;
-import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.models.OxelPersistence;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.oxel.GrainCursor;
-import com.voxelengine.worldmodel.oxel.LightInfo;
-import com.voxelengine.worldmodel.oxel.Lighting;
-import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
+import com.voxelengine.utils.ColorUtils;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.models.ModelInfo;
 
 import flash.display.Bitmap;
-
 import flash.display.BitmapData;
-
 import flash.display.DisplayObject;
 import flash.display.Loader;
 import flash.display.LoaderInfo;
@@ -56,16 +40,37 @@ import com.voxelengine.Globals;
 import com.voxelengine.GUI.VVContainer;
 import com.voxelengine.GUI.WindowModelChoice;
 import com.voxelengine.GUI.LanguageManager;
+import com.voxelengine.GUI.VVBox;
+import com.voxelengine.GUI.actionBars.QuickInventory;
+import com.voxelengine.GUI.crafting.BoxCharacterSlot;
+import com.voxelengine.GUI.voxelModels.PopupMetadataAndModelInfo;
+import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
+
+import com.voxelengine.events.CharacterSlotEvent;
+import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
+
+import com.voxelengine.pools.GrainCursorPool;
+import com.voxelengine.pools.LightInfoPool;
+import com.voxelengine.pools.LightingPool;
 import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.models.OxelPersistence;
+import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
+import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
+import com.voxelengine.worldmodel.oxel.LightInfo;
+import com.voxelengine.worldmodel.oxel.Lighting;
+import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 import com.voxelengine.worldmodel.inventory.FunctionRegistry;
 import com.voxelengine.worldmodel.inventory.ObjectAction;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import com.voxelengine.worldmodel.inventory.ObjectModel;
-import com.voxelengine.GUI.actionBars.QuickInventory;
 
 public class InventoryPanelModel extends VVContainer
 {
@@ -99,7 +104,6 @@ public class InventoryPanelModel extends VVContainer
 		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, removeModelMetadataEvent );
 		// This was causing model to be added twice when importing.
 		//ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, addModelMetadataEvent );
-
 
 		upperTabsAdd();
 		addItemContainer();
@@ -166,8 +170,7 @@ public class InventoryPanelModel extends VVContainer
 		infoContainer.addElement( b );
 	}
 	
-	private function selectCategory(e:ListEvent):void 
-	{			
+	private function selectCategory(e:ListEvent):void {
 		var test:String = e.target.value;
 		while ( 1 <= _itemContainer.numElements )
 			_itemContainer.removeElementAt( 0 );
@@ -178,8 +181,7 @@ public class InventoryPanelModel extends VVContainer
 	
 	// TODO I see problem here when language is different then what is in TypeInfo RSF - 11.16.14
 	// That is if I use the target "Name"
-	private function displaySelectedCategory( $category:String ):void
-	{	
+	private function displaySelectedCategory( $category:String ):void {
 		//Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
 		// The series makes it so that I dont see results from other objects requests
 		// This grabs the current series counter which will be used on the REQUEST_TYPE call
@@ -192,9 +194,7 @@ public class InventoryPanelModel extends VVContainer
 		removeModel( $mme.modelGuid );
 	}
 
-
 	private function addModelMetadataEvent($mme:ModelMetadataEvent):void {
-
 		// I only want the results from the series I asked for
 		if ( _seriesModelMetadataEvent == $mme.series || 0 == $mme.series ) {
 			if ( "Player" == $mme.modelGuid)
@@ -207,7 +207,6 @@ public class InventoryPanelModel extends VVContainer
 	
 	private function addModel( $oi:ObjectInfo, allowDrag:Boolean = true ):BoxInventory {
 		//// Add the filled bar to the container and create a new container
-		
 		if ( ObjectInfo.OBJECTINFO_MODEL == $oi.objectType ) {
 			var om:ObjectModel = $oi as ObjectModel;
 			// dont show child models
@@ -306,9 +305,7 @@ public class InventoryPanelModel extends VVContainer
 	}
 	
 	private function addTools():void {
-
 		var box:BoxInventory;
-		
 		box = addModel( new ObjectAction( box, "createNewObjectIPM", "NewModel128.png", "Click to create new model" ), false );
 		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		
@@ -331,8 +328,26 @@ public class InventoryPanelModel extends VVContainer
 		addDesktopModelHandler( null );
 	}
 
+	static private var _pictureType:uint = 167; //TypeInfo.GLASS;
 	static private function importObjectStainedGlass():void {
-		addDesktopPictureHandler( null );
+		var alert:Alert = new Alert( "Do you want stained glass or solid?", 450 );
+		alert.buttonsWidth = 150;
+		alert.setLabels( "Stained Glass", "Solid" );
+		alert.alertMode = AlertMode.CHOICE;
+		alert.eventCollector.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
+		alert.display();
+
+		function alertAction( $ae:AlertEvent ):void {
+			Log.out( "InventoryPanelModel - importPicture action: " + $ae.action );
+			if ( AlertEvent.CHOICE == $ae.action ) {
+				_pictureType = TypeInfo.WHITE;
+				addDesktopPictureHandler( null );
+			}
+			else { //( AlertEvent.CHOICE == $ae.action )
+				_pictureType = 167; //TypeInfo.GLASS;
+				addDesktopPictureHandler( null );
+			}
+		}
 	}
 
 	static private function addDesktopModelHandler(event:UIMouseEvent):void {
@@ -369,15 +384,22 @@ public class InventoryPanelModel extends VVContainer
         var fileName:String = e.currentTarget.name;
         var shortFileName:String = fileName.substr(0, fileName.indexOf("."));
 
-        var bitmapData:BitmapData;
 
         var loader:Loader = new Loader();
         loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onComplete);
         loader.load(new URLRequest( Globals.texturePath + fileName));
 
+		var bitmapData:BitmapData;
         function onComplete(event:Event):void {
             var bm:Bitmap = Bitmap(LoaderInfo(event.target).content);
-            bitmapData = drawScaled( bm.bitmapData, 64, 64 );
+			if ( bm.width > 64 || bm.height > 64 ) {
+				if ( bm.width > bm.height )
+					bitmapData = drawScaled(bm.bitmapData, 64, bm.height/bm.width * 64 );
+				else
+					bitmapData = drawScaled(bm.bitmapData, bm.width/bm.height * 64, 64  );
+			} else
+				bitmapData= bm.bitmapData;
+
 
             var model:Object = GenerateCube.script( 6, TypeInfo.AIR, true );
             model.name = shortFileName;
@@ -396,7 +418,6 @@ public class InventoryPanelModel extends VVContainer
 			function oxelBuildFailed($ode:OxelDataEvent):void {
 				if ($ode.modelGuid == ii.modelGuid ) {
 					removeListeners();
-					return;
 				}
 			}
 
@@ -420,7 +441,6 @@ public class InventoryPanelModel extends VVContainer
                 $ode.oxelPersistence.loadFromByteArray();
 				$ode.oxelPersistence.lightInfo.setIlluminationLevel(LightInfo.MAX);
 				createModelFromBitmap( $ode.oxelPersistence, bitmapData );
-
 			}
         }
     }
@@ -432,21 +452,45 @@ public class InventoryPanelModel extends VVContainer
         //$op.lightInfo.setIlluminationLevel( Lighting.MAX_LIGHT_LEVEL );
         var gct:GrainCursor = GrainCursorPool.poolGet( 6 );
         gct.grainX = 0;
+		const ironThreshold:uint = 0x01;
 		for ( var iw:int = 0; iw < w; iw++ ){
 			for ( var ih:int = 0; ih < h; ih++ ){
-				//trace( ColorUtils.displayInHex( $bitmapData.getPixel(iw,ih)) );
                 gct.grainY = ih;
                 gct.grainZ = iw;
-				var tOxel:Oxel = oxel.change( $op.guid, gct, TypeInfo.GLASS, true);
-				tOxel.color = $bitmapData.getPixel(iw,h-1-ih);
-                if ( !tOxel.lighting ){
-                    tOxel.lighting = LightingPool.poolGet();
-                    var light:LightInfo = LightInfoPool.poolGet();
-                    light.setIlluminationLevel( Lighting.MAX_LIGHT_LEVEL );
-                    tOxel.lighting.add( light );
-                }
+				var pixelColor:uint = $bitmapData.getPixel32(iw,h-1-ih);
+				var alphaPixelColor:uint = $bitmapData.getPixel32(iw,h-1-ih);
+				var alpha:uint = ColorUtils.extractAlpha( pixelColor );
+				//trace( "alpha value: " + alpha.toString(16) + " overall color: " + pixelColor.toString(16) );
+				var tOxel:Oxel;
+				if ( alphaPixelColor == 0x0 )
+					tOxel = oxel.change( $op.guid, gct, TypeInfo.AIR, true);
+				else if (  ColorUtils.extractRed( pixelColor ) < ironThreshold
+						&& ColorUtils.extractBlue( pixelColor ) < ironThreshold
+						&& ColorUtils.extractGreen( pixelColor ) < ironThreshold )
+					tOxel = oxel.change( $op.guid, gct, TypeInfo.IRON, true);
+				else {
+					tOxel = oxel.change($op.guid, gct, _pictureType, true);
+					tOxel.color = $bitmapData.getPixel32(iw,h-1-ih);
+				}
 			}
 		}
+		$op.save();
+        new WindowPictureImport();
+
+        var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( $op.guid );
+        if ( vm ){
+            if ($op && $op.oxel && $op.oxel.gc.bound) {
+                // Only do this for top level models.
+                var size:int = Math.max(GrainCursor.get_the_g0_edge_for_grain($op.oxel.gc.bound), 32);
+                // this gives me corner.
+                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
+                // add in half the size to get center
+                lav.setTo(lav.x - size / 2, lav.y - size / 2, lav.z - size / 2);
+                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
+                diffPos = diffPos.add(lav);
+                vm.instanceInfo.positionSet = diffPos;
+            }
+        }
 	}
 
 	private function removeModel( $modelGuid:String ):void {

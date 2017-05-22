@@ -28,17 +28,17 @@ import com.voxelengine.renderer.VertexIndexBuilder;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-public class WindowDebugMenu extends VVCanvas
+public class CanvasDebugMenu extends VVCanvas
 {
-	static private var _s_currentInstance:WindowDebugMenu = null;
-	static public function get currentInstance():WindowDebugMenu { return _s_currentInstance; }
+	static private var _s_currentInstance:CanvasDebugMenu = null;
+	static public function get currentInstance():CanvasDebugMenu { return _s_currentInstance; }
 	private var _smids:Vector.<StaticMemoryDisplay> = new Vector.<StaticMemoryDisplay>;
 	private var _modelLoc:Label = new Label();
 	private var _gcLabel:Label = new Label("grain: 0 x: 0  y: 0  z: 0");
 	private var _cmLabel:Label = new Label("grain: 0 x: 0  y: 0  z: 0"); // Controlled model stats
 
 
-	public function WindowDebugMenu():void
+	public function CanvasDebugMenu():void
 	{
 		super( 500, 100 );
 		_s_currentInstance = this;

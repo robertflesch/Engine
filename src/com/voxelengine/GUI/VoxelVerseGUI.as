@@ -67,9 +67,9 @@ public class VoxelVerseGUI extends EventDispatcher
 	private var _crossHairHide:Boolean = false;
 	
 	private var _built:Boolean = false;
-	private var _debugMenu:WindowDebugMenu = null;
-	private var _releaseMenu:WindowReleaseMenu = null;
-	public function releaseMenu():WindowReleaseMenu { return _releaseMenu; }
+	private var _debugMenu:CanvasDebugMenu = null;
+	private var _releaseMenu:CanvasReleaseMenu = null;
+	public function releaseMenu():CanvasReleaseMenu { return _releaseMenu; }
 
 	private var _fileReference:FileReference = new FileReference();
 	private var _projectileEnabled:Boolean = true;
@@ -151,13 +151,13 @@ public class VoxelVerseGUI extends EventDispatcher
 		crossHairChange();
 	}
 	
-	private function addReleaseMenu():WindowReleaseMenu {
+	private function addReleaseMenu():CanvasReleaseMenu {
 		if ( ConfigManager.instance.showButtons && ConfigManager.instance.showEditMenu )
 		{
 			crossHairAdd();
 		}
 		
-		return new WindowReleaseMenu();
+		return new CanvasReleaseMenu();
 	}
 	
 	private function crossHairAdd():void {
@@ -237,7 +237,7 @@ public class VoxelVerseGUI extends EventDispatcher
 			_releaseMenu = addReleaseMenu();
 			_releaseMenu.visible = false;
 //			if ( true == Globals.isDebug ) {
-				_debugMenu = new WindowDebugMenu();
+				_debugMenu = new CanvasDebugMenu();
 //				_debugMenu.visible = false;
 //			}
 			if ( !Renderer.renderer.hardwareAccelerated )

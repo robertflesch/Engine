@@ -486,7 +486,7 @@ public class EditCursor extends VoxelModel
 			ii.controllingModel = VoxelModel.selectedModel;
 			// This places an oxel that is invisible, but collidable at the same location as the model
 			// This should lock the model to that location, otherwise the oxel is invalid.
-			VoxelModel.selectedModel.write( _pl.gc, 125 );
+			VoxelModel.selectedModel.write( _pl.gc, TypeInfo.NO_QUADS );
 			// This adds a link from the model to the placement location
 			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelInsertComplete );			
 		}

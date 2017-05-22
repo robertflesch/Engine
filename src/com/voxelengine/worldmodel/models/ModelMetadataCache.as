@@ -36,7 +36,7 @@ public class ModelMetadataCache
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST_TYPE, 	requestType );
 		ModelMetadataEvent.addListener( ModelBaseEvent.REQUEST, 		request );
 		ModelMetadataEvent.addListener( ModelBaseEvent.DELETE, 			deleteHandler );
-		//ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, 		generated );
+		ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, 		generationComplete );
 		ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, importComplete );
 
 		ModelMetadataEvent.addListener( ModelBaseEvent.UPDATE_GUID, 	updateGuid );		
@@ -153,6 +153,10 @@ public class ModelMetadataCache
 	}
 
 	static private function importComplete( $mme:ModelMetadataEvent ):void {
+		add( $mme.series, $mme.modelMetadata );
+	}
+
+	static private function generationComplete( $mme:ModelMetadataEvent ):void {
 		add( $mme.series, $mme.modelMetadata );
 	}
 

@@ -57,13 +57,13 @@ import flash.utils.getTimer;
 		public static const BALLOON:uint						= enum_val++;	// 116
 		public static const ROPE:uint							= enum_val++;	// 117
 		public static const IRON:uint							= enum_val++;	// 118
-		public static const UNUSED_1:uint						= enum_val++;	// 119
+		public static const WHITE:uint							= enum_val++;	// 119
 		public static const STONE_WALL:uint						= enum_val++;	// 120
 		public static const COPPER:uint							= enum_val++;	// 121
 		public static const BRONZE:uint							= enum_val++;	// 122
 		public static const STEEL:uint							= enum_val++;	// 123
 		public static const GLASS:uint							= enum_val++;	// 124
-		public static const SHELL:uint							= 125;
+		public static const NO_QUADS:uint						= enum_val++;	// 125;
 		public static const FIRE:uint							= 145;
 		public static const VINE:uint							= 152;
 	// NO MORE!!

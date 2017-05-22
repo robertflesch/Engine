@@ -313,7 +313,7 @@ public class Quad {
 			fs = _s_flowScaling;
 			
 		var tint:uint = $ti.color;
-		if ( $ti.type == 124 )
+		if ( $ti.type == TypeInfo.GLASS || $ti.type == TypeInfo.WHITE || $ti.type == 167 )
 			tint = ColorUtils.RGBMinValue( $color, $ti.color );
 
 		switch ( $face ) 

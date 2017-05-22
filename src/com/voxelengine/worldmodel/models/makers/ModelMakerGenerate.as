@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.models.makers
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.server.Network;
@@ -108,11 +109,11 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		_modelMetadata = new ModelMetadata( ii.modelGuid );
 
 		// Bypass the setter so that we dont set it to changed
-		if ( _type )
+		if ( _type && 0 == _name.length )
 			_modelMetadata.name = _name + TypeInfo.name( _type ) + "-" + _name;
 		else
 			_modelMetadata.name = _name;
-		_modelMetadata.description = _name + "- GENERATED";
+		_modelMetadata.description = _name + " - GENERATED";
 		_modelMetadata.owner = Network.userId;
 	}
 	
@@ -144,6 +145,8 @@ public class ModelMakerGenerate extends ModelMakerBase {
 				modelInfo.changed = true;
 				_modelMetadata.changed = true;
 				_vm.save();
+				ModelMetadataEvent.create( ModelBaseEvent.GENERATION, 0, _modelMetadata.guid, _modelMetadata );
+				ModelInfoEvent.create( ModelBaseEvent.GENERATION, 0, _modelInfo.guid, _modelInfo );
 			}
 			// If the actual voxel model has not been built yet, create it now.
 			if ( !modelInfo.oxelPersistence ) {

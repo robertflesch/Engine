@@ -22,9 +22,9 @@ import com.voxelengine.worldmodel.models.types.Player;
 	import flash.events.Event;
 	import flash.events.TimerEvent;
 	
-	public class WindowHeading extends VVCanvas
+	public class CanvasHeading extends VVCanvas
 	{
-		static private var _s_currentInstance:WindowHeading = null;
+		static private var _s_currentInstance:CanvasHeading = null;
 
 		private var _instanceGuid:String;
 		private var fudgeFactor:int = 20;
@@ -32,9 +32,9 @@ import com.voxelengine.worldmodel.models.types.Player;
 		private var _loc:Text = null;
 		private var _vel:Text = null;
 		private var _repeatTimer:Timer = null;
-		static public function get currentInstance():WindowHeading { return _s_currentInstance; }
+		static public function get currentInstance():CanvasHeading { return _s_currentInstance; }
 
-		public function WindowHeading( $instanceGuid:String ):void 
+		public function CanvasHeading($instanceGuid:String ):void
 		{ 
 			super();
 			_s_currentInstance = this;

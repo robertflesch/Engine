@@ -64,9 +64,9 @@ import flash.events.Event;
 			{
 				WindowGunControl.currentInstance.remove();
 			}
-			if ( WindowHeading.currentInstance )
+			if ( CanvasHeading.currentInstance )
 			{
-				WindowHeading.currentInstance.remove();
+				CanvasHeading.currentInstance.remove();
 			}
 			if ( WindowBombControl.currentInstance )
 			{

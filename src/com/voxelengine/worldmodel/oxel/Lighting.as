@@ -2015,7 +2015,7 @@ public class Lighting  {
 		else if (no.gc.grain == $o.gc.grain) // equal grain can have children
 			projectOnEqualGrain($o, nno, $face, af, $addOrRemoveAmbient);
 		else
-			Log.out("LightAdd.evaluateAmbientOcculusion - invalid condition - neighbor is smaller: ", Log.ERROR);
+			Log.out("Lighting.extracted - invalid condition - neighbor is smaller: ", Log.ERROR);
 	}
 	
 	public function projectOnLargerGrain( $o:Oxel, $nno:Oxel, $face:int, $af:int, $addOrRemoveAmbient:Boolean, $index:int ):void {

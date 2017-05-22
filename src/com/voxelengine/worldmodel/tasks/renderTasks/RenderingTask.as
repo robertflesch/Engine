@@ -39,7 +39,7 @@ import flash.utils.getTimer
 			_taskCount++;
 			super( $taskType, taskPriority);
 			Globals.taskController.addTask( this );
-			Log.out( taskType + " task created for guid: " + $guid, Log.WARN);
+			//Log.out( taskType + " task created for guid: " + $guid, Log.WARN);
 		}
 
 		override public function start():void {
@@ -50,7 +50,7 @@ import flash.utils.getTimer
 		override public function complete():void {
 			_taskCount--;
 			_chunk = null;
-			Log.out( taskType + " task took: " + ( getTimer() - _time ) + "  guid: " + _guid );
+			//Log.out( taskType + " task took: " + ( getTimer() - _time ) + "  guid: " + _guid );
 			super.complete();
 		}
 		

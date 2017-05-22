@@ -32,7 +32,7 @@ public class WindowShipControlQuery extends VVCanvas
 		private var _instanceGuid:String = "";
 		private var _windowShipControl:WindowShipControl = null;
 		private var _windowGunControl:WindowGunControl = null;
-		private var _windowHeading:WindowHeading = null;
+		private var _windowHeading:CanvasHeading = null;
 		
 		static private var _s_currentInstance:WindowShipControlQuery = null;
 		
@@ -130,7 +130,7 @@ public class WindowShipControlQuery extends VVCanvas
 			
 			_windowGunControl = new WindowGunControl( _instanceGuid );
 			//_windowBombControl = new WindowBombControl( _instanceGuid );
-			_windowHeading = new WindowHeading( _instanceGuid );
+			_windowHeading = new CanvasHeading( _instanceGuid );
 			
 			//new WindowQuest( "Second Quest", "assets/quests/secondQuest.txt", 0, 150 );
 			
