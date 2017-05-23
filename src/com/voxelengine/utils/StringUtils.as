@@ -9,6 +9,13 @@
 
 	public class StringUtils {
 
+		public static function zeroPad(number:int, width:int, $radix:int = 10):String {
+			var ret:String = ""+number.toString($radix);
+			while( ret.length < width )
+				ret="0" + ret;
+			return ret;
+		}
+
 		/**
 		*	Returns everything after the first occurrence of the provided character in the string.
 		*
