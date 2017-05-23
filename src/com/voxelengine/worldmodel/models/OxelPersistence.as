@@ -5,10 +5,7 @@ displays and printed documentation which are original works of
 authorship protected under United States Copyright Act.
 Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
-package com.voxelengine.worldmodel.models
-{
-
-
+package com.voxelengine.worldmodel.models {
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.net.registerClassAlias;
@@ -23,18 +20,16 @@ import com.voxelengine.events.LevelOfDetailEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.renderer.Chunk;
 import com.voxelengine.pools.LightInfoPool;
+import com.voxelengine.utils.StringUtils;
 import com.voxelengine.worldmodel.oxel.FlowInfo;
-import com.voxelengine.worldmodel.oxel.VisitorFunctions;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.LightInfo;
 import com.voxelengine.worldmodel.oxel.OxelBitfields;
 import com.voxelengine.worldmodel.oxel.Lighting;
 import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.makers.OxelCloner;
-
 
 /**
  * ...
@@ -248,19 +243,13 @@ public class OxelPersistence extends PersistenceObject
 		$ba.writeByte('i'.charCodeAt());
 		$ba.writeByte('v'.charCodeAt());
 		$ba.writeByte('m'.charCodeAt());
-		var outVersion:String = zeroPad( Globals.VERSION, 3 );
+		var outVersion:String = StringUtils.zeroPad( Globals.VERSION, 3 );
 		$ba.writeByte(outVersion.charCodeAt(0));
 		$ba.writeByte(outVersion.charCodeAt(1));
 		$ba.writeByte(outVersion.charCodeAt(2));
 
 		writeManifest( $ba );
 
-		function zeroPad(number:int, width:int):String {
-		   var ret:String = ""+number;
-		   while( ret.length < width )
-			   ret="0" + ret;
-		   return ret;
-		}
 		function writeManifest( $ba:ByteArray ):void {
 
 			// Always write the manifest into the IVM.

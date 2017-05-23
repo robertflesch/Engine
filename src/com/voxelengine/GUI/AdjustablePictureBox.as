@@ -4,8 +4,9 @@
 package com.voxelengine.GUI {
 import flash.filters.ColorMatrixFilter;
 import flash.geom.Point;
-import flash.display.Bitmap;
 import flash.display.BitmapData;
+
+import org.flashapi.swing.Box;
 
 import org.flashapi.swing.Container;
 import org.flashapi.swing.Label;
@@ -16,13 +17,11 @@ import org.flashapi.swing.constants.ScrollableOrientation;
 import org.flashapi.swing.constants.TextAlign;
 import org.flashapi.swing.event.ScrollEvent;
 import fl.motion.AdjustColor;
-import fl.motion.ColorMatrix;
 
-import org.flashapi.swing.text.UITextFormat;
+import org.flashapi.swing.layout.AbsoluteLayout;
 
 
 public class AdjustablePictureBox extends VVBox {
-    private var _bitmap:Bitmap;
     private var _referenceBitmapData:BitmapData;
     private var _workingBitmapData:BitmapData;
     private var _brightnessHSlider:Slider;
@@ -35,15 +34,14 @@ public class AdjustablePictureBox extends VVBox {
     private var _saturationLabel:Label;
     private var _color:AdjustColor = new AdjustColor();
     private var _filter:ColorMatrixFilter;
+
     public function AdjustablePictureBox($widthParam:Number, $heightParam:Number, $borderStyle:String = BorderStyle.GROOVE) {
         super($widthParam, $heightParam, $borderStyle);
-        addUI();
-        layout.orientation = LayoutOrientation.VERTICAL;
-
-//        onBrightness(null);
+        layout = new AbsoluteLayout();
     }
 
     public function addPicture( $bmd:BitmapData ):void {
+        removeUI();
         _referenceBitmapData = $bmd.clone();
         _workingBitmapData = $bmd.clone();
         _color.brightness = 0;
@@ -51,36 +49,73 @@ public class AdjustablePictureBox extends VVBox {
         _color.hue = 0;
         _color.saturation = 0;
         backgroundTexture = VVBox.drawScaled( $bmd,width, height);
+        addUI();
+    }
+
+    private var yPos:int = 0;
+    private function removeUI():void {
+        removeElements();
+        _brightnessLabel = null;
+        _brightnessHSlider = null;
+        _contrastLabel = null;
+        _contrastHSlider = null;
+        _hueLabel = null;
+        _hueHSlider = null;
+        _saturationLabel = null;
+        _saturationHSlider = null;
+        yPos = 0;
     }
 
     private function addUI():void {
-        var val:Object = addSlider( "Brightness: 0", -100, 100 );
+        var container:Box = new Box(width/2, height/2);
+        container.y = height / 2;
+        container.x = width / 2;
+        container.backgroundColor = 0x444444 ;
+        container.backgroundAlpha = 0.5;
+        container.padding = 0;
+        container.layout = new AbsoluteLayout();
+        var posY:int = 0;
+
+        var val:Object = addSlider( posY, container, "Brightness: 0", -100, 100 );
         _brightnessLabel = val.label;
         _brightnessHSlider = val.slider;
+        posY += height/8;
 
-        val = addSlider( "Contrast: 0", -100, 100 );
+        val = addSlider( posY, container, "Contrast: 0", -100, 100 );
         _contrastLabel = val.label;
         _contrastHSlider = val.slider;
+        posY += height/8;
 
-        val = addSlider( "Hue: 0", -180, 180 );
+        val = addSlider( posY, container, "Hue: 0", -180, 180 );
         _hueLabel = val.label;
         _hueHSlider = val.slider;
+        posY += height/8;
 
-        val = addSlider( "Saturation: 0", -100, 100 );
+        val = addSlider( posY, container, "Saturation: 0", -100, 100 );
         _saturationLabel = val.label;
         _saturationHSlider = val.slider;
+
+        addElement( container );
     }
 
-    private function addSlider( $text:String, $min:int, $max:int ):Object {
-        var bContainer:Container = new Container(width, 40);
-        bContainer.layout.orientation = LayoutOrientation.VERTICAL;
-        var label:Label = new Label( $text, width );
+    private function addSlider( $posY:int, $container:Box, $text:String, $min:int, $max:int ):Object {
+        var itemWidth:int = $container.width - 8;
+        var bContainer:Container = new Container( itemWidth, 40);
+        bContainer.y = $posY;
+        bContainer.layout = new AbsoluteLayout();
+        $container.addElement( bContainer );
+        var label:Label = new Label( $text, itemWidth );
+        label.x = 4;
+        label.y = 0;
         label.textFormat.color = 0xffffff;
-        label.textFormat.size = 18;
+        label.textFormat.size = 12;
         label.textAlign = TextAlign.CENTER;
         bContainer.addElement( label );
-        var slider:Slider = new Slider(width-20, ScrollableOrientation.HORIZONTAL );
+        var slider:Slider = new Slider(itemWidth, ScrollableOrientation.HORIZONTAL );
+        slider.showTicks = false;
         $evtColl.addEvent( slider, ScrollEvent.SCROLL, onBrightness );
+        slider.x = 4;
+        slider.y = 8;
         slider.maximum = $max;
         slider.minimum = $min;
         slider.value = 0;
@@ -104,6 +139,10 @@ public class AdjustablePictureBox extends VVBox {
             _workingBitmapData.applyFilter(_referenceBitmapData, _referenceBitmapData.rect, new Point(), _filter.clone());
             backgroundTexture = VVBox.drawScaled( _workingBitmapData, width, height);
         }
+    }
+
+    public function finalPicture():BitmapData {
+        return _workingBitmapData;
     }
 }
 }
