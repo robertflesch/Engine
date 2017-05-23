@@ -330,24 +330,26 @@ public class InventoryPanelModel extends VVContainer
 
 	static private var _pictureType:uint = 167; //TypeInfo.GLASS;
 	static private function importObjectStainedGlass():void {
-		var alert:Alert = new Alert( "Do you want stained glass or solid?", 450 );
-		alert.buttonsWidth = 150;
-		alert.setLabels( "Stained Glass", "Solid" );
-		alert.alertMode = AlertMode.CHOICE;
-		alert.eventCollector.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
-		alert.display();
+		new WindowPictureImport();
 
-		function alertAction( $ae:AlertEvent ):void {
-			Log.out( "InventoryPanelModel - importPicture action: " + $ae.action );
-			if ( AlertEvent.CHOICE == $ae.action ) {
-				_pictureType = TypeInfo.WHITE;
-				addDesktopPictureHandler( null );
-			}
-			else { //( AlertEvent.CHOICE == $ae.action )
-				_pictureType = 167; //TypeInfo.GLASS;
-				addDesktopPictureHandler( null );
-			}
-		}
+//		var alert:Alert = new Alert( "Do you want stained glass or solid?", 450 );
+//		alert.buttonsWidth = 150;
+//		alert.setLabels( "Stained Glass", "Solid" );
+//		alert.alertMode = AlertMode.CHOICE;
+//		alert.eventCollector.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
+//		alert.display();
+//
+//		function alertAction( $ae:AlertEvent ):void {
+//			Log.out( "InventoryPanelModel - importPicture action: " + $ae.action );
+//			if ( AlertEvent.CHOICE == $ae.action ) {
+//				_pictureType = TypeInfo.WHITE;
+//				addDesktopPictureHandler( null );
+//			}
+//			else { //( AlertEvent.CHOICE == $ae.action )
+//				_pictureType = 167; //TypeInfo.GLASS;
+//				addDesktopPictureHandler( null );
+//			}
+//		}
 	}
 
 	static private function addDesktopModelHandler(event:UIMouseEvent):void {
@@ -475,7 +477,6 @@ public class InventoryPanelModel extends VVContainer
 			}
 		}
 		$op.save();
-        new WindowPictureImport();
 
         var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( $op.guid );
         if ( vm ){

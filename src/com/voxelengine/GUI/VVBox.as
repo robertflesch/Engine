@@ -20,7 +20,7 @@ public class VVBox extends Box
 {
 	private var _boxhelp:BoxHelp;
 	
-	public function VVBox( $widthParam:Number, $heightParam:Number, $borderStyle:String )
+	public function VVBox( $widthParam:Number, $heightParam:Number = 100, $borderStyle:String = BorderStyle.GROOVE )
 	{
 		super( $widthParam, $heightParam, $borderStyle );
 		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );

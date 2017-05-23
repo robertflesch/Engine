@@ -17,7 +17,7 @@ public class ComponentLabelInput extends LabelInput
 {
 	public function ComponentLabelInput( $label:String, $changeHandler:Function, $initialValue:String, $width:int, $height:int = 20, $padding:int = 15 )
 	{
-		super( $label, $initialValue, $width )
+		super( $label, $initialValue, $width );
 		backgroundColor = VVUI.DEFAULT_COLOR;
 		
 		addEventListener( TextEvent.EDITED, $changeHandler );

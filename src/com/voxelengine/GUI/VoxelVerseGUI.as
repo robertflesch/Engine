@@ -281,7 +281,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		if ( ConfigManager.instance.showHelp )
 			new WindowHelp();
 		else
-			new WindowLogin( "", "" );
+			new WindowPictureImport(); //new WindowLogin( "", "" );
 
 		addKeyboardListeners();
 	}

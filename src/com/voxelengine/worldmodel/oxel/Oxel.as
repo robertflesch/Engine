@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.oxel
 {
 
+import com.voxelengine.worldmodel.Light;
+
 import flash.geom.Point;
 import flash.geom.Vector3D;
 import flash.utils.ByteArray;
@@ -211,8 +213,13 @@ public class Oxel extends OxelBitfields
 	public function lightingAddDefault( $li:LightInfo ):void {
 		lighting = LightingPool.poolGet();
 		lighting.add( $li );
-		if ( type <= 1023  )
-			lighting.materialFallOffFactor = TypeInfo.typeInfo[type].lightInfo.fallOffFactor;
+		if ( type <= 1023  ) {
+			var ti:TypeInfo = TypeInfo.typeInfo[type];
+			if ( ti && ti.lightInfo )
+				lighting.materialFallOffFactor = ti.lightInfo.fallOffFactor;
+			else
+				lighting.materialFallOffFactor = Light.DEFAULT_FALLOFF_FACTOR;
+		}
 		else
 			Log.out( "Oxel.lightingAddDefault type is OUT OF RANGE: " + type, Log.WARN);
 	}
