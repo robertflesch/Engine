@@ -72,7 +72,7 @@ public class GenerateCube extends LandscapeTask {
 		for ( var x:int = 0; x < size; x++ ) {
 			for ( var y:int = 0; y < size; y++ ) {
 				for ( var z:int = 0; z < size; z++ ) {
-					gct.set_values( x, y, z, minGrain )
+					gct.set_values( x, y, z, minGrain );
 					oxel.change( _modelGuid, gct, _layer.type, true );
 				}
 			}

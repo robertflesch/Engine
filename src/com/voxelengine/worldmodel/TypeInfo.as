@@ -66,6 +66,7 @@ import flash.utils.getTimer;
 		public static const NO_QUADS:uint						= enum_val++;	// 125;
 		public static const FIRE:uint							= 145;
 		public static const VINE:uint							= 152;
+		public static const CUSTOM_GLASS:uint					= 167;
 	// NO MORE!!
 		
 		// WARNING use sparingly

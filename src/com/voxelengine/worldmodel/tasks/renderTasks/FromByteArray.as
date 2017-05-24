@@ -8,22 +8,10 @@
 
 package com.voxelengine.worldmodel.tasks.renderTasks
 {
-import com.developmentarc.core.tasks.tasks.AbstractTask
-
 import com.voxelengine.Log
-import com.voxelengine.Globals
-
-import com.voxelengine.events.LoadingImageEvent;
-import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.models.OxelPersistence;
 
-import flash.utils.getTimer;
-
-/**
- * ...
- * @author Robert Flesch
- */
 public class FromByteArray extends RenderingTask
 {
 	static public const NORMAL_BYTE_LOAD_PRIORITY:int = 5;

@@ -15,7 +15,7 @@ import org.flashapi.swing.plaf.spas.VVUI;
 
 public class ComponentComboBoxWithLabel extends Box
 {
-	private var _cbType:ComboBox  = new ComboBox()
+	private var _cbType:ComboBox  = new ComboBox();
 	
 	public function ComponentComboBoxWithLabel( $label:String, $changeHandler:Function, $initialValue:String, $types:Vector.<String>, data:*, $width:int, $height:int = 35, $padding:int = 2 )
 	{
@@ -38,6 +38,17 @@ public class ComponentComboBoxWithLabel extends Box
 		}
 		addElement( _cbType );
 		eventCollector.addEvent( _cbType, ListEvent.LIST_CHANGED, $changeHandler );
+	}
+
+	public function get selectedItemValue():String {
+		if ( -1 == _cbType.selectedIndex )
+			return "-1";
+		return _cbType.getItemAt( _cbType.selectedIndex ).value;
+	}
+	public function get selectedItemData():* {
+		if ( -1 == _cbType.selectedIndex )
+			return -1;
+		return _cbType.getItemAt( _cbType.selectedIndex ).data;
 	}
 }
 }

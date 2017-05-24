@@ -8,12 +8,33 @@
 
 package com.voxelengine.GUI {
 
+import com.voxelengine.GUI.PictureImportProperties;
+import com.voxelengine.GUI.components.ComponentComboBoxWithLabel;
+import com.voxelengine.Globals;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.pools.GrainCursorPool;
+import com.voxelengine.utils.ColorUtils;
 import com.voxelengine.utils.StringUtils;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.OxelPersistence;
+import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
+import com.voxelengine.worldmodel.oxel.LightInfo;
+import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 
 import flash.display.BitmapData;
+
+import flash.display.BitmapData;
+import flash.display.BlendMode;
 import flash.display.Loader;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
+import flash.geom.Vector3D;
 import flash.net.URLLoader;
 import flash.net.URLLoaderDataFormat;
 import flash.net.URLRequest;
@@ -27,6 +48,7 @@ import org.flashapi.swing.event.ButtonsGroupEvent;
 import org.flashapi.swing.event.ListEvent;
 import org.flashapi.swing.event.TextEvent;
 import org.flashapi.swing.event.UIMouseEvent;
+import org.flashapi.swing.event.UIOEvent;
 import org.flashapi.swing.layout.AbsoluteLayout;
 import org.flashapi.swing.list.ListItem;
 
@@ -36,6 +58,7 @@ import com.voxelengine.worldmodel.TypeInfo;
 
 public class WindowPictureImport extends VVPopup {
     private var _container:AdjustablePictureBox;
+    private var _ccbl:ComponentComboBoxWithLabel;
     private var _cb:ComponentCheckBox;
     private var _pti:TextInput;
     private var _plbl:Label;
@@ -52,7 +75,7 @@ public class WindowPictureImport extends VVPopup {
         box1.addElement( new Label( "Picture Style") );
         var rbGroup:RadioButtonGroup = new RadioButtonGroup( box1 );
         var radioButtons:DataProvider = new DataProvider();
-        radioButtons.addAll( { label:"Stained Glass Style (semi-transparent)", data:TypeInfo.GLASS }
+        radioButtons.addAll( { label:"Stained Glass Style (semi-transparent)", data:TypeInfo.CUSTOM_GLASS }
                            , { label:"Mural Style (opaque)", data:TypeInfo.WHITE } );
         rbGroup.dataProvider = radioButtons;
         $evtColl.addEvent( rbGroup, ButtonsGroupEvent.GROUP_CHANGED, styleChanged );
@@ -85,20 +108,23 @@ public class WindowPictureImport extends VVPopup {
         addElement( new Spacer( width, 10 ) );
 
         var values:Vector.<String> = new Vector.<String>();
+        values.push("1");
         values.push("2");
-        values.push("3");
         values.push("4");
+        values.push("8");
         var data:Vector.<int> = new Vector.<int>();
-        data.push(2);
-        data.push(3);
         data.push(4);
+        data.push(5);
+        data.push(6);
+        data.push(7);
 
-        addElement( new ComponentComboBoxWithLabel( "Size in meters"
-                , pictureSize
-                , values[0]
-                , values
-                , data
-                , width ) );
+        _ccbl = new ComponentComboBoxWithLabel( "Size in meters"
+                                              , pictureSize
+                                              , "-1"
+                                              , values
+                                              , data
+                                              , width );
+        addElement( _ccbl );
 
         addElement( new Spacer( width, 10 ) );
 
@@ -107,14 +133,17 @@ public class WindowPictureImport extends VVPopup {
         addElement( but );
 
         display(30, 30);
+        $evtColl.addEvent( this, UIOEvent.REMOVED, onRemoved );
     }
 
     private function styleChanged( event:ButtonsGroupEvent ):void {
         if ( 0 == event.target.index ){
-            PictureImportProperties.pictureStyle = TypeInfo.GLASS;
+            PictureImportProperties.pictureStyle = TypeInfo.CUSTOM_GLASS;
+            PictureImportProperties.hasTransparency = true;
             enableDisablePixelOptions( true );
         } else if ( 1 == event.target.index ) {
             PictureImportProperties.pictureStyle = TypeInfo.WHITE;
+            PictureImportProperties.hasTransparency = false;
             enableDisablePixelOptions( false );
         }
     }
@@ -132,14 +161,14 @@ public class WindowPictureImport extends VVPopup {
         _cb = new ComponentCheckBox("Remove Transparent Pixels", PictureImportProperties.removeTransPixels, width * 1.4, toggleRemoveTransparent);
         tContainer.addElement(_cb);
 
-        _pti = new TextInput("", 44);
+        _pti = new TextInput("", 50);
         _pti.x = 206;
         _pti.y = 4;
         _pti.text = StringUtils.zeroPad( PictureImportProperties.transColor, 6, 16 );
         $evtColl.addEvent( _pti, TextEvent.EDITED, transChanged );
         tContainer.addElement( _pti );
 
-        _plbl = new Label("Color 0x", 44);
+        _plbl = new Label("Color ", 40);
         _plbl.textAlign = TextAlign.RIGHT;
         _plbl.x = 162;
         _plbl.y = 4;
@@ -151,48 +180,166 @@ public class WindowPictureImport extends VVPopup {
     private function transChanged( $te:TextEvent ):void {
         var transColorST:String = $te.target.text;
         var transColor:uint = parseInt( transColorST );
+        transColor = transColor | 0xff000000;
         PictureImportProperties.transColor = transColor;
     }
 
+    private function pictureSize( $le:ListEvent ):void {
+        var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex );
+        PictureImportProperties.grain = li.data;
+        trace("picture GRAIN: " + PictureImportProperties.grain);
+        var size:int = GrainCursor.get_the_g0_size_for_grain( PictureImportProperties.grain );
+        var correctSize:BitmapData = VVBox.drawScaled( PictureImportProperties.finalBitmapData, size, size, PictureImportProperties.hasTransparency );
+        _container.backgroundTexture = VVBox.drawScaled( correctSize, _container.width, _container.height, PictureImportProperties.hasTransparency );
+    }
+
+    private function toggleRemoveTransparent( $me:UIMouseEvent ):void {
+        PictureImportProperties.removeTransPixels = ($me.target as CheckBox).selected;
+    }
+
+    private var _loading:Boolean = false; // I get this message three times. Disable until complete
     private function urlChanged( $te:TextEvent ):void {
-        trace("WindowPictureImport.urlChanged $te: " + $te.type );
-        var urlRequest:URLRequest = new URLRequest( $te.target.text );
+        if (  _loading )
+            return;
+        trace("WindowPictureImport.urlChanged $te: " + $te.target.text );
+        PictureImportProperties.url = $te.target.text;
+        var urlRequest:URLRequest = new URLRequest( PictureImportProperties.url );
         var urlLoader:URLLoader = new URLLoader();
         urlLoader.dataFormat = URLLoaderDataFormat.BINARY;
+        _loading = true;
         urlLoader.addEventListener(Event.COMPLETE, urlLoader_complete);
         urlLoader.addEventListener(IOErrorEvent.IO_ERROR, urlLoader_error);
         urlLoader.load(urlRequest);
 
         function urlLoader_complete($event:Event):void {
+            urlLoader.removeEventListener(Event.COMPLETE, urlLoader_complete);
+            urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, urlLoader_error);
+            _loading = false;
             var loader:Loader = new Loader();
-            // INIT is needed to handle async aspect of loader
+            // Event.INIT is needed to handle async aspect of loader
             loader.contentLoaderInfo.addEventListener(Event.INIT, function(e:Event):void {
                 var bmpData:BitmapData = new BitmapData(e.target.width,e.target.height);
-                bmpData.draw(loader);
+                bmpData.draw(loader,null,null);
                 _container.addPicture( bmpData );
             });
+            loader.addEventListener(IOErrorEvent.IO_ERROR, unknownType);
             loader.loadBytes($event.target.data);
         }
 
         function urlLoader_error(evt:IOErrorEvent):void {
+            _loading = false;
             trace("file obviously not found");
+        }
+
+        function unknownType(evt:IOErrorEvent):void {
+            _loading = false;
+            (new Alert( "Unknown file format (try again sometimes helps)" )).display();
         }
     }
 
     private function createHandler( $me:UIMouseEvent ):void {
-        trace("createHandler: " + PictureImportProperties.oxelSize);
-        PictureImportProperties.finalBitmapData = _container.finalPicture();
+        if ( !PictureImportProperties.finalBitmapData ){
+            (new Alert( LanguageManager.localizedStringGet( "No Image selected" ) )).display();
+            return;
+        }
+        if ( "-1" == _ccbl.selectedItemValue ){
+            (new Alert( LanguageManager.localizedStringGet( "No Size Selected" ) )).display();
+            return;
+        }
+        var model:Object = GenerateCube.script( PictureImportProperties.grain, TypeInfo.AIR, true );
+        model.name = "Picture Import";
+        model.description = PictureImportProperties.url;
+        var ii:InstanceInfo = new InstanceInfo();
+        ii.modelGuid = Globals.getUID();
+        addListeners();
+        new ModelMakerGenerate(ii, model);
+
+        function oxelBuildComplete($ode:OxelDataEvent):void {
+            if ($ode.modelGuid == ii.modelGuid ) {
+                removeListeners();
+                oxelCreated( $ode )
+            }
+        }
+
+        function oxelBuildFailed($ode:OxelDataEvent):void {
+            if ($ode.modelGuid == ii.modelGuid ) {
+                removeListeners();
+            }
+        }
+
+        function addListeners():void {
+            OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+            OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+            OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+            OxelDataEvent.addListener( ModelBaseEvent.RESULT, oxelBuildComplete );
+            OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelBuildComplete );
+        }
+
+        function removeListeners():void {
+            OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelBuildComplete );
+            OxelDataEvent.removeListener( ModelBaseEvent.RESULT, oxelBuildComplete );
+            OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
+            OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
+            OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
+        }
+
+        function oxelCreated( $ode:OxelDataEvent ):void {
+            $ode.oxelPersistence.loadFromByteArray();
+            $ode.oxelPersistence.lightInfo.setIlluminationLevel(LightInfo.MAX);
+            createModelFromBitmap( $ode.oxelPersistence );
+        }
     }
 
-    private function pictureSize( $le:ListEvent ):void {
-        var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex );
-        PictureImportProperties.oxelSize = li.data;
-        trace("pictureSize: " + PictureImportProperties.oxelSize);
+    static public function createModelFromBitmap( $op:OxelPersistence ):void {
+        //var grains:uint = Globals.UNITS_PER_METER * PictureImportProperties.grain;
+        var grains:uint = GrainCursor.get_the_g0_size_for_grain( PictureImportProperties.grain );
+        var bitmapData:BitmapData = VVBox.drawScaled( PictureImportProperties.referenceBitmapData, grains, grains, PictureImportProperties.hasTransparency );
+        var oxel:Oxel = $op.oxel;
+        var gct:GrainCursor = GrainCursorPool.poolGet( PictureImportProperties.grain );
+        gct.grainX = 0;
+        PictureImportProperties.traceProperties();
+        const ironThreshold:uint = 0x01;
+        for ( var iw:int = 0; iw < grains; iw++ ){
+            for ( var ih:int = 0; ih < grains; ih++ ){
+                gct.grainY = ih;
+                gct.grainZ = iw;
+                var pixelColor:uint = bitmapData.getPixel32(iw,grains-1-ih);
+                var tOxel:Oxel;
+                if ( pixelColor == PictureImportProperties.transColor )
+                    tOxel = oxel.change( $op.guid, gct, TypeInfo.AIR, true);
+                else if (  ColorUtils.extractRed( pixelColor ) < ironThreshold
+                        && ColorUtils.extractBlue( pixelColor ) < ironThreshold
+                        && ColorUtils.extractGreen( pixelColor ) < ironThreshold )
+                    tOxel = oxel.change( $op.guid, gct, TypeInfo.IRON, true);
+                else {
+                    tOxel = oxel.change($op.guid, gct, PictureImportProperties.pictureStyle, true);
+                    tOxel.color = pixelColor;
+                }
+            }
+        }
+        $op.save();
+
+        var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( $op.guid );
+        if ( vm ){
+            if ($op && $op.oxel && $op.oxel.gc.bound) {
+                // Only do this for top level models.
+                var size:int = Math.max(GrainCursor.get_the_g0_edge_for_grain($op.oxel.gc.bound), 32);
+                // this gives me corner.
+                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
+                // add in half the size to get center
+                lav.setTo(lav.x - size / 2, lav.y - size / 2, lav.z - size / 2);
+                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
+                diffPos = diffPos.add(lav);
+                vm.instanceInfo.positionSet = diffPos;
+            }
+        }
     }
-    
-    private function toggleRemoveTransparent( $me:UIMouseEvent ):void {
-        PictureImportProperties.removeTransPixels = ($me.target as CheckBox).selected;
+
+    override protected function onRemoved( event:UIOEvent ):void {
+        super.onRemoved(event);
+        PictureImportProperties.reset();
     }
+
 }
 }
 

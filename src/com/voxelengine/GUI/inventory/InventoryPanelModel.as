@@ -7,25 +7,19 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
-import com.voxelengine.GUI.WindowPictureImport;
-import com.voxelengine.events.ModelEvent;
-import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.utils.ColorUtils;
-import com.voxelengine.utils.ColorUtils;
-import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.GUI.PictureImportProperties;
+import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
 import flash.display.Bitmap;
 import flash.display.BitmapData;
+
 import flash.display.DisplayObject;
 import flash.display.Loader;
 import flash.display.LoaderInfo;
 import flash.events.Event;
-import flash.geom.Matrix;
 import flash.geom.Vector3D;
 import flash.net.FileReference;
 import flash.net.FileFilter;
-import flash.net.URLRequest;
 
 import org.flashapi.swing.*
 import org.flashapi.swing.core.UIObject;
@@ -45,6 +39,7 @@ import com.voxelengine.GUI.actionBars.QuickInventory;
 import com.voxelengine.GUI.crafting.BoxCharacterSlot;
 import com.voxelengine.GUI.voxelModels.PopupMetadataAndModelInfo;
 import com.voxelengine.GUI.WindowModelDeleteChildrenQuery;
+import com.voxelengine.GUI.WindowPictureImport;
 
 import com.voxelengine.events.CharacterSlotEvent;
 import com.voxelengine.events.OxelDataEvent;
@@ -52,21 +47,11 @@ import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 
-import com.voxelengine.pools.GrainCursorPool;
-import com.voxelengine.pools.LightInfoPool;
-import com.voxelengine.pools.LightingPool;
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.models.OxelPersistence;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
-import com.voxelengine.worldmodel.oxel.LightInfo;
-import com.voxelengine.worldmodel.oxel.Lighting;
-import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 import com.voxelengine.worldmodel.inventory.FunctionRegistry;
 import com.voxelengine.worldmodel.inventory.ObjectAction;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
@@ -83,7 +68,8 @@ public class InventoryPanelModel extends VVContainer
 	
 	static private const MODEL_CONTAINER_WIDTH:int = 512;
 	static private const MODEL_IMAGE_WIDTH:int = 128;
-	
+	static private const MODEL_IMAGE_HEIGHT:int = 128;
+
 	private var _dragOp:DnDOperation = new DnDOperation();
 	private var _barLeft:TabBar;
 	// This hold the items to be displayed
@@ -152,7 +138,7 @@ public class InventoryPanelModel extends VVContainer
 		_itemContainer = new ScrollPane();
 		_itemContainer.autoSize = false;
 		_itemContainer.width = MODEL_CONTAINER_WIDTH + 15;
-		_itemContainer.height = MODEL_IMAGE_WIDTH;
+		_itemContainer.height = MODEL_IMAGE_HEIGHT;
 		_itemContainer.scrollPolicy = ScrollPolicy.VERTICAL;
 		_itemContainer.layout.orientation = LayoutOrientation.VERTICAL;
 		addElement( _itemContainer );
@@ -244,9 +230,9 @@ public class InventoryPanelModel extends VVContainer
 		return null
 	}
 	
-	private function addModelTo( e:UIMouseEvent ):void {
+	static private function addModelTo( e:UIMouseEvent ):void {
 		if ( e.target.objectInfo is ObjectAction ) {
-			var oa:ObjectAction = e.target.objectInfo as ObjectAction
+			var oa:ObjectAction = e.target.objectInfo as ObjectAction;
 			var cb:Function = oa.callBack;
 			// just execute the callback here, dont need to do cb(), which calls it twice, interesting
 			cb;
@@ -276,12 +262,12 @@ public class InventoryPanelModel extends VVContainer
 	}
 	
 	private function addEmptyRow( $countMax:int ):void {
-		_currentRow = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_WIDTH );
+		_currentRow = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_HEIGHT );
 		_currentRow.layout = new AbsoluteLayout();
 		_itemContainer.addElement( _currentRow );
 		_itemContainer.height = _itemContainer.numElements * MODEL_IMAGE_WIDTH;
-		for ( var i:int; i < $countMax; i++ ) {
-			var box:BoxInventory = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_WIDTH, BorderStyle.NONE );
+		for ( var i:int=0; i < $countMax; i++ ) {
+			var box:BoxInventory = new BoxInventory(MODEL_IMAGE_WIDTH, MODEL_IMAGE_HEIGHT, BorderStyle.NONE );
 			box.updateObjectInfo( new ObjectInfo( box, ObjectInfo.OBJECTINFO_EMPTY ) );
 			box.x = i * MODEL_IMAGE_WIDTH;
 			_currentRow.addElement( box );
@@ -292,7 +278,7 @@ public class InventoryPanelModel extends VVContainer
 		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
 		if ( null == _currentRow )
 			addEmptyRow( countMax );
-		for ( var i:int; i < countMax; i++ ) {
+		for ( var i:int=0; i < countMax; i++ ) {
 			var bie:* = _currentRow.getElementAt( i );
 			var bi:* = bie.getElement();
 			var box:BoxInventory = bi as BoxInventory;
@@ -305,16 +291,15 @@ public class InventoryPanelModel extends VVContainer
 	}
 	
 	private function addTools():void {
-		var box:BoxInventory;
+		var box:BoxInventory = null;
 		box = addModel( new ObjectAction( box, "createNewObjectIPM", "NewModel128.png", "Click to create new model" ), false );
 		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		
+		box = addModel( new ObjectAction( box, "importObjectStainedGlass", "importPicture128.png", "Click to import picture" ), false );
+		eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
+
 		if ( Globals.isDebug ) {
 			box = addModel( new ObjectAction( box, "importObjectIPM", "import128.png", "Click to import local model" ), false );
-			eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
-		}
-		if ( Globals.isDebug ) {
-			box = addModel( new ObjectAction( box, "importObjectStainedGlass", "importPicture128.png", "Click to import picture" ), false );
 			eventCollector.addEvent( box, UIMouseEvent.CLICK, function( e:UIMouseEvent ):void { (e.target.objectInfo as ObjectAction).callBack(); } );
 		}
 	}
@@ -328,178 +313,37 @@ public class InventoryPanelModel extends VVContainer
 		addDesktopModelHandler( null );
 	}
 
-	static private var _pictureType:uint = 167; //TypeInfo.GLASS;
 	static private function importObjectStainedGlass():void {
 		new WindowPictureImport();
-
-//		var alert:Alert = new Alert( "Do you want stained glass or solid?", 450 );
-//		alert.buttonsWidth = 150;
-//		alert.setLabels( "Stained Glass", "Solid" );
-//		alert.alertMode = AlertMode.CHOICE;
-//		alert.eventCollector.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
-//		alert.display();
-//
-//		function alertAction( $ae:AlertEvent ):void {
-//			Log.out( "InventoryPanelModel - importPicture action: " + $ae.action );
-//			if ( AlertEvent.CHOICE == $ae.action ) {
-//				_pictureType = TypeInfo.WHITE;
-//				addDesktopPictureHandler( null );
-//			}
-//			else { //( AlertEvent.CHOICE == $ae.action )
-//				_pictureType = 167; //TypeInfo.GLASS;
-//				addDesktopPictureHandler( null );
-//			}
-//		}
 	}
 
 	static private function addDesktopModelHandler(event:UIMouseEvent):void {
-		var fr:FileReference = new FileReference();
-		fr.addEventListener(Event.SELECT, onDesktopModelFileSelected );
-		var swfTypeFilter:FileFilter = new FileFilter("Model Files","*.mjson");
-		fr.browse([swfTypeFilter]);
+		var fileRef:FileReference = new FileReference();
+		fileRef.addEventListener(Event.SELECT, onDesktopModelFileSelected );
+		fileRef.browse([new FileFilter("Model Files","*.mjson")]);
 	}
 
 	static public function onDesktopModelFileSelected(e:Event):void {
 		Log.out( "onDesktopModelFileSelected : " + e.toString() );
+		e.target.removeEventListener(Event.SELECT, onDesktopModelFileSelected );
 
-		//if ( selectedModel
 		var fileName:String = e.currentTarget.name;
 		fileName = fileName.substr( 0, fileName.indexOf( "." ) );
 
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.modelGuid = fileName;
-		ModelMakerBase.load( ii );
+		new ModelMakerImport( ii );
 	}
 
 
-	static private function addDesktopPictureHandler(event:UIMouseEvent):void {
-		var fr:FileReference = new FileReference();
-		fr.addEventListener(Event.SELECT, onDesktopPictureFileSelected );
-		var imageTypeFilter:FileFilter = new FileFilter("Images", "*.jpg;*.jpeg;*.gif;*.png");
-		fr.browse([imageTypeFilter]);
-	}
 
-	static public function onDesktopPictureFileSelected(e:Event):void {
-        Log.out("onDesktopModelFileSelected : " + e.toString());
-
-        //if ( selectedModel
-        var fileName:String = e.currentTarget.name;
-        var shortFileName:String = fileName.substr(0, fileName.indexOf("."));
-
-
-        var loader:Loader = new Loader();
-        loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onComplete);
-        loader.load(new URLRequest( Globals.texturePath + fileName));
-
-		var bitmapData:BitmapData;
-        function onComplete(event:Event):void {
-            var bm:Bitmap = Bitmap(LoaderInfo(event.target).content);
-			if ( bm.width > 64 || bm.height > 64 ) {
-				if ( bm.width > bm.height )
-					bitmapData = drawScaled(bm.bitmapData, 64, bm.height/bm.width * 64 );
-				else
-					bitmapData = drawScaled(bm.bitmapData, bm.width/bm.height * 64, 64  );
-			} else
-				bitmapData= bm.bitmapData;
-
-
-            var model:Object = GenerateCube.script( 6, TypeInfo.AIR, true );
-            model.name = shortFileName;
-            var ii:InstanceInfo = new InstanceInfo();
-            ii.modelGuid = Globals.getUID();
-			addListeners();
-            new ModelMakerGenerate(ii, model);
-
-			function oxelBuildComplete($ode:OxelDataEvent):void {
-				if ($ode.modelGuid == ii.modelGuid ) {
-					removeListeners();
-					oxelCreated( $ode )
-				}
-			}
-
-			function oxelBuildFailed($ode:OxelDataEvent):void {
-				if ($ode.modelGuid == ii.modelGuid ) {
-					removeListeners();
-				}
-			}
-
-			function addListeners():void {
-				OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
-				OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
-				OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
-				OxelDataEvent.addListener( ModelBaseEvent.RESULT, oxelBuildComplete );
-				OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelBuildComplete );
-			}
-
-			function removeListeners():void {
-				OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelBuildComplete );
-				OxelDataEvent.removeListener( ModelBaseEvent.RESULT, oxelBuildComplete );
-				OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
-				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
-				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
-			}
-
-            function oxelCreated( $ode:OxelDataEvent ):void {
-                $ode.oxelPersistence.loadFromByteArray();
-				$ode.oxelPersistence.lightInfo.setIlluminationLevel(LightInfo.MAX);
-				createModelFromBitmap( $ode.oxelPersistence, bitmapData );
-			}
-        }
-    }
-
-	static public function createModelFromBitmap( $op:OxelPersistence, $bitmapData:BitmapData ):void {
-		var w:int = $bitmapData.width;
-		var h:int = $bitmapData.height;
-		var oxel:Oxel = $op.oxel;
-        //$op.lightInfo.setIlluminationLevel( Lighting.MAX_LIGHT_LEVEL );
-        var gct:GrainCursor = GrainCursorPool.poolGet( 6 );
-        gct.grainX = 0;
-		const ironThreshold:uint = 0x01;
-		for ( var iw:int = 0; iw < w; iw++ ){
-			for ( var ih:int = 0; ih < h; ih++ ){
-                gct.grainY = ih;
-                gct.grainZ = iw;
-				var pixelColor:uint = $bitmapData.getPixel32(iw,h-1-ih);
-				var alphaPixelColor:uint = $bitmapData.getPixel32(iw,h-1-ih);
-				var alpha:uint = ColorUtils.extractAlpha( pixelColor );
-				//trace( "alpha value: " + alpha.toString(16) + " overall color: " + pixelColor.toString(16) );
-				var tOxel:Oxel;
-				if ( alphaPixelColor == 0x0 )
-					tOxel = oxel.change( $op.guid, gct, TypeInfo.AIR, true);
-				else if (  ColorUtils.extractRed( pixelColor ) < ironThreshold
-						&& ColorUtils.extractBlue( pixelColor ) < ironThreshold
-						&& ColorUtils.extractGreen( pixelColor ) < ironThreshold )
-					tOxel = oxel.change( $op.guid, gct, TypeInfo.IRON, true);
-				else {
-					tOxel = oxel.change($op.guid, gct, _pictureType, true);
-					tOxel.color = $bitmapData.getPixel32(iw,h-1-ih);
-				}
-			}
-		}
-		$op.save();
-
-        var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( $op.guid );
-        if ( vm ){
-            if ($op && $op.oxel && $op.oxel.gc.bound) {
-                // Only do this for top level models.
-                var size:int = Math.max(GrainCursor.get_the_g0_edge_for_grain($op.oxel.gc.bound), 32);
-                // this gives me corner.
-                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
-                // add in half the size to get center
-                lav.setTo(lav.x - size / 2, lav.y - size / 2, lav.z - size / 2);
-                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
-                diffPos = diffPos.add(lav);
-                vm.instanceInfo.positionSet = diffPos;
-            }
-        }
-	}
 
 	private function removeModel( $modelGuid:String ):void {
 		
 		var countMax:int = MODEL_CONTAINER_WIDTH / MODEL_IMAGE_WIDTH;
 		var column:int = 0;
 		var rows:int = _itemContainer.numElements;
-		for ( var row:int; row < rows; row++ ) {
+		for ( var row:int=0; row < rows; row++ ) {
 			var rowElement:Element = _itemContainer.getElementAt( row );
 			var rowCont:* = rowElement.getElement();
 			for ( column = 0; column < countMax; column++ ) {
@@ -511,7 +355,7 @@ public class InventoryPanelModel extends VVContainer
 					continue;
 				var om:ObjectModel = bi.objectInfo as ObjectModel;
 				if ( om.modelGuid == $modelGuid ) {
-					var newOI:ObjectInfo = new ObjectInfo(null, ObjectInfo.OBJECTINFO_EMPTY)
+					var newOI:ObjectInfo = new ObjectInfo(null, ObjectInfo.OBJECTINFO_EMPTY);
 					box.updateObjectInfo( newOI );
 					//Log.out( "InventoryPanelModels.removeModel found model: " + $modelGuid );
 					return;
@@ -584,14 +428,6 @@ public class InventoryPanelModel extends VVContainer
 		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, addModelMetadataEvent );
 		ModelMetadataEvent.removeListener( ModelBaseEvent.DELETE, removeModelMetadataEvent );
 		//ModelMetadataEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, addModelMetadataEvent );
-	}
-
-	static public function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
-		var m:Matrix = new Matrix();
-		m.scale(destWidth/obj.width, destHeight/obj.height);
-		var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
-		bmpd.draw(obj, m);
-		return bmpd;
 	}
 }
 }

@@ -6,27 +6,24 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
-package com.voxelengine.worldmodel.tasks.landscapetasks
-{
+package com.voxelengine.worldmodel.tasks.renderTasks {
 import com.voxelengine.Log;
 import com.voxelengine.events.LoadingImageEvent;
-import com.voxelengine.worldmodel.biomes.LayerInfo;
-/**
- * ...
- * @author Robert Flesch
- */
-public class LoadingImageDisplay extends LandscapeTask 
-{		
-	public function LoadingImageDisplay( $guid:String, $layer:LayerInfo ):void {
-		super( $guid, $layer, "LoadingImageDisplay" );
-		Log.out( "LoadingImageDisplay" );
+
+public class LoadingImageDestroy extends RenderingTask {
+	static public function addTask( $guid:String ): void {
+		new LoadingImageDestroy( $guid );
 	}
-	
+
+	public function LoadingImageDestroy( $guid:String ):void {
+		super( $guid, null, "LoadingImageDisplay", 1 );
+	}
+
 	override public function start():void {
-		super.start() // AbstractTask will send event
-		Log.out( "LoadingImageDisplay.start" );
-		LoadingImageEvent.create( LoadingImageEvent.CREATE );
-		super.complete() // AbstractTask will send event
+		super.start();
+		Log.out( "LoadingImageDestroy.start" );
+		LoadingImageEvent.create( LoadingImageEvent.DESTROY );
+		super.complete();
 	}
 }
 }

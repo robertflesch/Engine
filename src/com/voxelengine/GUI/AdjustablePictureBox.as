@@ -22,8 +22,6 @@ import org.flashapi.swing.layout.AbsoluteLayout;
 
 
 public class AdjustablePictureBox extends VVBox {
-    private var _referenceBitmapData:BitmapData;
-    private var _workingBitmapData:BitmapData;
     private var _brightnessHSlider:Slider;
     private var _contrastHSlider:Slider;
     private var _hueHSlider:Slider;
@@ -42,13 +40,13 @@ public class AdjustablePictureBox extends VVBox {
 
     public function addPicture( $bmd:BitmapData ):void {
         removeUI();
-        _referenceBitmapData = $bmd.clone();
-        _workingBitmapData = $bmd.clone();
+        PictureImportProperties.referenceBitmapData = $bmd.clone();
+        PictureImportProperties.finalBitmapData = $bmd.clone();
         _color.brightness = 0;
         _color.contrast = 0;
         _color.hue = 0;
         _color.saturation = 0;
-        backgroundTexture = VVBox.drawScaled( $bmd,width, height);
+        backgroundTexture = VVBox.drawScaled( $bmd, width, height, PictureImportProperties.hasTransparency );
         addUI();
     }
 
@@ -134,15 +132,14 @@ public class AdjustablePictureBox extends VVBox {
         _hueLabel.text = "Hue: " + _hueHSlider.value;
         _saturationLabel.text = "Saturation: " + _saturationHSlider.value;
 
-        if ( _workingBitmapData ) {
+        if ( PictureImportProperties.finalBitmapData ) {
             _filter = new ColorMatrixFilter( _color.CalculateFinalFlatArray() );
-            _workingBitmapData.applyFilter(_referenceBitmapData, _referenceBitmapData.rect, new Point(), _filter.clone());
-            backgroundTexture = VVBox.drawScaled( _workingBitmapData, width, height);
+            PictureImportProperties.finalBitmapData.applyFilter( PictureImportProperties.finalBitmapData
+                                                               , PictureImportProperties.finalBitmapData.rect
+                                                               , new Point()
+                                                               , _filter.clone());
+            backgroundTexture = VVBox.drawScaled( PictureImportProperties.finalBitmapData, width, height, PictureImportProperties.hasTransparency );
         }
-    }
-
-    public function finalPicture():BitmapData {
-        return _workingBitmapData;
     }
 }
 }

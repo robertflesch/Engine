@@ -1810,11 +1810,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
     //////////////////////////////////////////////////////////////////////////////////////////////////////////////
     public function readOxelData($ba:ByteArray, $op:OxelPersistence ):void {
         var time:int = getTimer();
-        var rootGrainSize:int = $op.bound;
-        gc.grain = gc.bound = rootGrainSize;
+        gc.grain = gc.bound = $op.bound;
 
-        var gct:GrainCursor = GrainCursorPool.poolGet(rootGrainSize);
-        gct.grain = rootGrainSize;
+        var gct:GrainCursor = GrainCursorPool.poolGet($op.bound);
+        gct.grain = $op.bound;
 
         if (Globals.VERSION_000 == $op.version)
             fromByteArrayV0(null, gct, $ba, $op.statistics);
@@ -2999,17 +2998,20 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	// it also add flow and lighting
 	public function change( $instanceGuid:String, $gc:GrainCursor, $newType:int, $onlyChangeType:Boolean = false ):Oxel
 	{
-		// thisa finds the closest oxel, could be target oxel, could be parent
+		// this a finds the closest oxel, could be target oxel, could be parent
 		var changeCandidate:Oxel = childFind( $gc );
-		if ( !changeCandidate.gc.is_equal( $gc ) )
-			// this gets the exact oxel we are looking for if it is different gc from returned oxel.
-			changeCandidate = changeCandidate.childGetOrCreate( $gc );
-			
+
+		// should never be bad unless GC is too large.
 		if ( Globals.BAD_OXEL == changeCandidate ) {
 			Log.out( "Oxel.changeOxel - cant find child!", Log.ERROR );
 			return null;
 		}
-		
+
+		if ( !changeCandidate.gc.is_equal( $gc ) ) {
+			// this gets the exact oxel we are looking for if it is different gc from returned oxel.
+			changeCandidate = changeCandidate.childGetOrCreate($gc);
+		}
+
 		if ( $newType == changeCandidate.type && $gc.bound == changeCandidate.gc.bound && !changeCandidate.childrenHas() )
 			return changeCandidate;
 			

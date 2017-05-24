@@ -229,10 +229,7 @@ public class ModelMakerBase {
 	// A factory method to build the correct object
 	static public function load( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true, $addToCountORPrompt:Boolean = true ):void {
 		//Log.out( "ModelMakerBase.load - choose maker ii: " + $ii.toString() )
-		if ( !Globals.isGuid( $ii.modelGuid ) )
-			new ModelMakerImport( $ii, $addToCountORPrompt );
-		else
-			new ModelMaker( $ii, $addToRegionWhenComplete, $addToCountORPrompt );
+		new ModelMaker( $ii, $addToRegionWhenComplete, $addToCountORPrompt );
 	}
 	
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

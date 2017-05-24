@@ -119,14 +119,6 @@ public class Quad {
 		}
 	}
 	
-	private const GLASS:String = "GLASS";
-	private function calculateGlassOffset( typeInfo:TypeInfo, face:int, scale:Number, $lighting:Lighting ):void	{
-			// count the number of corners that have ambient
-			//var count:int;
-			//if ( 0 == count )
-				//_v[0] += 0.0078125;
-	}
-	
 	private function calculateUV( typeInfo:TypeInfo, face:int, $grain:Number, $flowInfo:FlowInfo, $lighting:Lighting ):Boolean {
 		resetUV();
 		
@@ -313,7 +305,7 @@ public class Quad {
 			fs = _s_flowScaling;
 			
 		var tint:uint = $ti.color;
-		if ( $ti.type == TypeInfo.GLASS || $ti.type == TypeInfo.WHITE || $ti.type == 167 )
+		if ( $ti.type == TypeInfo.GLASS || $ti.type == TypeInfo.WHITE || $ti.type == TypeInfo.CUSTOM_GLASS )
 			tint = ColorUtils.RGBMinValue( $color, $ti.color );
 
 		switch ( $face ) 

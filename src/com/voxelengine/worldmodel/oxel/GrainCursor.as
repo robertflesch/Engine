@@ -86,7 +86,47 @@ public class GrainCursor
 		// 2 raised to the power of g - 1
 		return two_to_the_g_minus_1(g);
 	}
-	
+
+	[inline]
+	public static function oxelSizeFromMeters( $meters:uint ):uint {
+		if ( 1/16 == $meters )
+			return 0;
+		else if ( 1/8 == $meters )
+			return 1;
+		else if ( 1/4 == $meters )
+			return 2;
+		else if ( 1/2 == $meters )
+			return 3;
+		else if ( 1 == $meters )
+			return 4;
+		else if ( 2 == $meters )
+			return 5;
+		else if ( 4 == $meters )
+			return 6;
+		else if ( 8 == $meters )
+			return 7;
+		else if ( 16 == $meters )
+			return 8;
+		else if ( 32 == $meters )
+			return 9;
+		else if ( 64 == $meters )
+			return 10;
+		else if ( 128 == $meters )
+			return 11;
+		else if ( 256 == $meters )
+			return 12;
+		else if ( 512 == $meters )
+			return 13;
+		else if ( 1024 == $meters )
+			return 14;
+		else if ( 2048 == $meters )
+			return 15;
+		else if ( 4096 == $meters )
+			return 16;
+
+		return 17;
+	}
+
 	////////////////////////////////////////////////////////////////////
 	// Member functions
 	////////////////////////////////////////////////////////////////////
