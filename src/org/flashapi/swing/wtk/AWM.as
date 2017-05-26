@@ -29,8 +29,10 @@ package org.flashapi.swing.wtk {
 	* @version 1.5.0, 13/11/2010 16:27
 	* @see http://www.flashapi.org/
 	*/
-	
-	import flash.display.Sprite;
+
+import com.voxelengine.events.HelpEvent;
+
+import flash.display.Sprite;
 	import flash.events.MouseEvent;
 	import flash.geom.Rectangle;
 	import flash.text.TextField;
@@ -246,7 +248,7 @@ package org.flashapi.swing.wtk {
 		public function get closeButton():WTKButton {
 			return $closeButton;
 		}
-		
+
 		/**
 		 * 	@inheritDoc
 		 */
@@ -256,7 +258,9 @@ package org.flashapi.swing.wtk {
 		public function set closeButtonActive(value:Boolean):void {
 			$closeButton.active = value;
 		}
-		
+
+
+		protected var $helpButton:WindowButton;
 		/**
 		 * 	<strong>FOR DEVELOPERS ONLY.</strong>
 		 * 
@@ -754,7 +758,12 @@ package org.flashapi.swing.wtk {
 				$closeButton.finalize();
 				$closeButton = null;
 			}
-			if (iconMenu != null) {
+            if ($helpButton != null) {
+                $helpButton.finalize();
+                $helpButton = null;
+            }
+
+            if (iconMenu != null) {
 				iconMenu.finalize();
 				iconMenu = null;
 			}
@@ -1051,11 +1060,16 @@ package org.flashapi.swing.wtk {
 			spas_internal::uioSprite.addChild($iconContainer);
 			$icon.target = $iconContainer;
 			$closeButton.target = $titleBarContainer;
-			//_closeButton.alt = _closeButtonAlt;
-			//initCloseButton();
 			$closeButton.display();
-			$titleBarContainer.hitArea = $titleBarHitArea;
 			setCloseButtonBehavior();
+//			$helpButton.target = $titleBarContainer;
+//			$helpButton.active = true;
+//			$helpButton.label = "?";
+//			$helpButton.boldFace = true;
+//			$helpButton.display( width/2 - 8, 5 );
+			setHelpButtonBehavior();
+
+			$titleBarContainer.hitArea = $titleBarHitArea;
 		}
 		
 		/**
@@ -1217,7 +1231,17 @@ package org.flashapi.swing.wtk {
 			$evtColl.addEvent($closeButton, UIMouseEvent.PRESS, closeBtnMouseDownHandler);
 			$evtColl.addEvent($closeButton, UIMouseEvent.RELEASE, closeBtnMouseUpHandler);
 		}
-		
+
+		protected function setHelpButtonBehavior():void {
+			$evtColl.addEvent($helpButton, UIMouseEvent.PRESS, helpBtnMouseDownHandler);
+			$evtColl.addEvent($helpButton, UIMouseEvent.RELEASE
+					         ,function( $me:MouseEvent ):void {HelpEvent.create( HelpEvent.CREATE, "" ) } );
+
+			function helpBtnMouseDownHandler(e:UIMouseEvent):void {
+				setButtonCommonBehavior(e);
+			}
+		}
+
 		/**
 		 * @private
 		 */
@@ -1495,6 +1519,7 @@ package org.flashapi.swing.wtk {
 		private function createUIObjects():void {
 //			$closeButton = new WindowButton();
 			$closeButton = new WindowButtonClose();
+			$helpButton = new WindowButtonHelp();
 			spas_internal::lafDTO.closeButton = $closeButton;
 			$closeButton.alt = $closeButtonAlt;
 			$icon = new Icon();

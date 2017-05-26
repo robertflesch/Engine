@@ -7,6 +7,8 @@ import com.voxelengine.worldmodel.oxel.GrainCursor;
 
 import flash.display.BitmapData;
 
+import org.flashapi.swing.core.DeniedConstructorAccess;
+
 public class PictureImportProperties {
     static public var pictureStyle:int = TypeInfo.CUSTOM_GLASS;
     static public var removeTransPixels:Boolean = true;
@@ -18,6 +20,7 @@ public class PictureImportProperties {
     static public var hasTransparency:Boolean = false;
 
     public function PictureImportProperties() {
+        new DeniedConstructorAccess(this);
     }
 
     static public function reset():void {

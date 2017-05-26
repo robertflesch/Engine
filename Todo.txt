@@ -40,16 +40,70 @@ What is VoxelVerse.
 
 My goal is to create a platform we everyone is able to create and share 3D models.
 
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelbuildComplete );
-		function oxelbuildComplete( $ode:OxelDataEvent ):void {
-			if ( $ode.modelGuid == guid ) {
-				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelbuildComplete );
-				if ( $ode.oxelData )
-					bound = $ode.oxelData.bound;
-				else
-					Log.out( "ModelMetadata.oxelBuildComplete - ERROR no oxelData found", Log.WARN );	
-				
-				save();
-			}
+How do you choose models that can be added to a parent model. - Models that are smaller than the parent, and not children of something else.
+
+Look AT
+lightsStaticSetDefault
+remove quadsRebuildAll - since it does force a rebuild, and the rebuild should happen at the parent level
+maybe at a force parementer
+
+Notes on checking
+OxelDataEvent member changed from oxelData to oxelPersistence
+
+copy of our drivers license.
+
+in lighting
+// this returns a composite color made of default color plus any additional colors for the indicated corner
+	public function lightGetComposite( $face:int, $corner:uint, $tint:uint ):uint {
+		_compositeColor = 0;
+		
+		for ( var i:int = 0; i < _lights.length; i++ ) {
+			var li:LightInfo = _lights[i];
+			_compositeColor = ColorUtils.combineARGBLights( _compositeColor, li.color, li.illuminationLevelGet( $corner ) );
 		}
 
+		// took this out of the vertex information in the shader
+		// adds a little more work here, but removes it from the data send down with the quad from 4 ints to 3 ints.
+		// so makes the update 12% faster since the vertex data is the same.
+		_compositeColor = ColorUtils.multiplyRGBByTint( _compositeColor, $tint );
+		
+		if ( Lighting.eaoEnabled ) {
+			var cornerAttn:uint = cornerForFace( $face, $corner );
+			if ( 0 < cornerAttn ) {
+				cornerAttn = MAX_LIGHT_LEVEL - cornerAttn * li.attn * 2; // 4 for darker corners
+				cornerAttn = Math.max( cornerAttn, 0 );
+				_compositeColor = ColorUtils.placeAlpha( _compositeColor, cornerAttn );
+	//			Log.out( "Brightness.lightGetComposite for corner - _compositeColor: " + ColorUtils.extractAlpha( _compositeColor ) );
+	_compositeColor = ColorUtils.placeAlpha( _compositeColor, 0x00 );
+			} else {
+				_compositeColor = ColorUtils.placeAlpha( _compositeColor, MAX_LIGHT_LEVEL );
+			}
+		}
+		return _compositeColor;
+	}
+	
+		private function build152( $isRebuild:Boolean, $face:int, $quad:Quad, $g0:Number, $plane_facing:int, $scale:int, $grain:uint):Boolean {
+		var result:Boolean;
+		switch ( $face ){
+			case Globals.POSX:
+				result = $quad.build( $isRebuild, type, getModelX(), getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 9 * $g0, $scale, 2 * $g0, $grain, _lighting, flowInfo);
+				break;
+			case Globals.NEGX:
+				result = $quad.build( $isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 7 * $g0, $scale, 2 * $g0, $grain, _lighting, flowInfo);
+				break;
+			case Globals.POSY:
+				result = $quad.build( $isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, _lighting, flowInfo);
+				break;
+			case Globals.NEGY:
+				result = $quad.build( $isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, _lighting, flowInfo);
+				break;
+			case Globals.POSZ:
+				result = $quad.build( $isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, _lighting, flowInfo);
+				break;
+			case Globals.NEGZ:
+				result = $quad.build( $isRebuild, type, getModelX() + 7 * $g0, getModelY(), getModelZ() + 7 * $g0, $face, $plane_facing, 2 * $g0, $scale, 2 * $g0, $grain, _lighting, flowInfo);
+				break;
+		}
+		return result;
+	}
+build152( isRebuild, $face, quad, g0, $plane_facing, scale, $grain );

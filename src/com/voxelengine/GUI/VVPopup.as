@@ -21,9 +21,9 @@ import com.voxelengine.Globals;
 public class VVPopup extends Popup
 {
 	
-	public function VVPopup( title:String )
+	public function VVPopup( title:String, width:Number = 150, height:Number = 80 )
 	{
-		super( title );
+		super( title, width, height );
 		
 //		hasDisplayEffect = true;
 //		displayEffectRef = ScaleIn;

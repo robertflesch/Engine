@@ -198,16 +198,18 @@ public class InventoryPanelModel extends VVContainer
 			// dont show child models
 			//if ( !WindowInventoryNew._s_hackShowChildren )
 			if ( VoxelModel.selectedModel ) {
+				var bound:int = VoxelModel.selectedModel.modelInfo.oxelPersistence.bound;
 				if ( null != om.vmm.childOf && "" != om.vmm.childOf ) {
 					if ( VoxelModel.selectedModel.metadata.name != om.vmm.childOf ) {
 						Log.out( "InventoryPanelModel.addModel - child model of wrong parent: " + om.vmm.name, Log.INFO );
 						return null;
 					}
 				} else {
-					Log.out("InventoryPanelModel.addModel - NOT child model of: " + om.vmm.name, Log.WARN);
-					return null;
+					if ( om.vmm.bound >= bound ) {
+						Log.out("InventoryPanelModel.addModel - NOT child model of: " + om.vmm.name + " AND is larger", Log.WARN);
+						return null;
+					}
 				}
-
 			} else {
 				if ( null != om.vmm.childOf && "" != om.vmm.childOf ) {
 					Log.out( "InventoryPanelModel.addModel - NOT added child model of: " + om.vmm.name, Log.INFO );

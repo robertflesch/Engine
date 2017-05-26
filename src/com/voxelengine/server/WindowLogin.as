@@ -55,9 +55,7 @@ import org.flashapi.swing.list.ListItem;
 		
 		public function WindowLogin( $email:String, $password:String )
 		{
-			super( "Login" );
-			width = 309;
-			height = 366;
+			super( "Login", 309, 366 );
 			tabEnabled = false;
 			tabIndex = -1;
 			layout.orientation = LayoutOrientation.VERTICAL;

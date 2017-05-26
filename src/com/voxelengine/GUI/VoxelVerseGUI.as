@@ -9,6 +9,7 @@
 package com.voxelengine.GUI
 {
 import com.voxelengine.GUI.crafting.WindowCharacter;
+import com.voxelengine.events.HelpEvent;
 
 import flash.display.Sprite;
 import flash.events.Event;
@@ -83,6 +84,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		Globals.g_app.stage.addEventListener( FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
 		LoadingImage.init();
 		UserInventory.init();
+		WindowHelp.init();
 	}
 	
 	private function fullScreenEvent(event:FullScreenEvent):void {
@@ -278,12 +280,19 @@ public class VoxelVerseGUI extends EventDispatcher
 			//WindowLogin.autoLogin();
 		}
 
-		if ( ConfigManager.instance.showHelp )
-			new WindowHelp();
+		if ( ConfigManager.instance.showHelp ) {
+			HelpEvent.add( HelpEvent.CLOSED, loginOnClose );
+			HelpEvent.create(HelpEvent.CREATE, "help.txt");
+		}
 		else
 			new WindowLogin( "", "" );
 
 		addKeyboardListeners();
+	}
+
+	private function loginOnClose( $he:HelpEvent ):void {
+		HelpEvent.remove(HelpEvent.CLOSED, loginOnClose);
+		new WindowLogin("", "");
 	}
 	
 	private function onKeyPressed( e : KeyboardEvent) : void {
