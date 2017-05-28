@@ -169,7 +169,7 @@ public class RegionManager
 	/////////////////////////////////////////////////////////////////////////////////////////
 	/////////////////////////////////////////////////////////////////////////////////////////
 	static public function requestServerJoin( e:RegionEvent ):void {
-		Log.out( "RegionManager.requestServerJoin - guid: " + e.guid, Log.DEBUG );
+		//Log.out( "RegionManager.requestServerJoin - guid: " + e.guid, Log.DEBUG );
 		Room.createJoinRoom( e.guid );	
 	}
 	
@@ -181,7 +181,7 @@ public class RegionManager
 	}
 	
 	public function onJoinRoomEvent( e:RoomEvent ):void {
-		Log.out( "RegionManager.onJoinRoomEvent - guid: " + e.guid, Log.DEBUG );
+		//Log.out( "RegionManager.onJoinRoomEvent - guid: " + e.guid, Log.DEBUG );
 		RegionEvent.create( RegionEvent.LOAD, 0, e.guid );
 	}
 	

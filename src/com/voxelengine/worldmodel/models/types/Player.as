@@ -19,6 +19,8 @@ import com.voxelengine.worldmodel.inventory.ObjectTool;
 import com.voxelengine.worldmodel.models.types.Avatar;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
 
+import flash.geom.Vector3D;
+
 import playerio.DatabaseObject;
 import playerio.PlayerIOError;
 
@@ -63,15 +65,35 @@ public class Player extends PersistenceObject
 		if ( VoxelModel.controlledModel ) {
 			if ( null == Region.currentRegion.modelCache.instanceGet( VoxelModel.controlledModel.instanceInfo.instanceGuid ) )
 				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, VoxelModel.controlledModel );
-		} else {
-			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
+
+			var avatar:Avatar = VoxelModel.controlledModel as Avatar;
+			if ( null == avatar ) {
+				Log.out("Region.applyRegionInfoToPlayer - NO PLAYER DEFINED", Log.WARN);
+				return;
+			}
+
+			var region:Region = Region.currentRegion;
+			if ( region.playerPosition ) {
+				//Log.out( "Player.onLoadingPlayerComplete - setting position to  - x: "  + playerPosition.x + "   y: " + playerPosition.y + "   z: " + playerPosition.z );
+				avatar.instanceInfo.positionSetComp( region.playerPosition.x, region.playerPosition.y, region.playerPosition.z );
+			}
+			else
+				avatar.instanceInfo.positionSetComp( 0, 0, 0 );
+
+			if ( region.playerRotation ) {
+				//Log.out( "Player.onLoadingPlayerComplete - setting player rotation to  -  y: " + playerRotation );
+				avatar.instanceInfo.rotationSet = new Vector3D( 0, region.playerRotation.y, 0 );
+			}
+			else
+				avatar.instanceInfo.rotationSet = new Vector3D( 0, 0, 0 );
+
+			avatar.usesGravity = region.gravity;
 		}
 	}
 
-
-
 	static public const DEFAULT_PLAYER:String = "DefaultPlayer";
 	public function onPlayerLoadedAction( $dbo:DatabaseObject ):void {
+		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 		dbo = $dbo;
 		if ( $dbo ) {
 			if ( null == $dbo.modelGuid ) {
@@ -102,33 +124,27 @@ public class Player extends PersistenceObject
 		ii.instanceGuid = $userId;
 		ii.centerSetComp(7.5, 0, 7.5);
 
+		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 		if (DEFAULT_PLAYER == $modelGuid) {
 			//Log.out( "Avatar.createPlayer - creating DEFAULT_PLAYER from GenerateCube", Log.WARN )
 			var model:Object = GenerateCube.script(4, TypeInfo.BLUE);
 			model.modelClass = "Avatar";
 			model.name = "Temp Avatar";
-			new ModelMakerGenerate(ii, model)
+			new ModelMakerGenerate(ii, model, true)
 		}
 		else {
 			ModelMakerBase.load(ii, false, false);
 		}
 	}
 
-//	private function modelLoadComplete( $mle:ModelLoadingEvent ):void {
-//		if ( Globals.online ) {
-//			if (dbo.modelGuid == $mle.modelGuid) {
-//				ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete);
-//				_playerModel = $mle.vm as Avatar;
-//			}
-//		}
-//	}
-
 	static public function onPlayerLoadError(error:PlayerIOError):void {
 		Log.out("Avatar.onPlayerLoadError", Log.ERROR, error );
 	}
 
 	static private function playerModelLoaded( $mle:ModelLoadingEvent ):void {
+		Log.out( "Player.playerModelLoaded");
 		if ( $mle.vm && ( $mle.vm.instanceInfo.instanceGuid == Network.userId || $mle.vm.instanceInfo.instanceGuid == Network.LOCAL ) ){
+			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 			_playerModel = $mle.vm as Avatar;
 			if ( null == Region.currentRegion.modelCache.instanceGet( $mle.vm.instanceInfo.instanceGuid ) ) {
 				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, $mle.vm );
@@ -157,6 +173,15 @@ public class Player extends PersistenceObject
 //				InventorySlotEvent.dispatch( new InventorySlotEvent( InventorySlotEvent.DEFAULT_REQUEST, instanceInfo.instanceGuid, gun.instanceInfo.instanceGuid, 0, null ) );
 		}
 	}
+
+	static private function onCriticalModelLoaded( le:ModelLoadingEvent ):void {
+		//ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
+		Log.out( "Player.onCriticalModelLoaded - CRITICAL model" );
+		// if there is a critical model, don't turn on gravity until it is loaded
+		// NOTE- RSF - I think this needs to be the OXEL loaded
+		VoxelModel.controlledModel.usesGravity = Region.currentRegion.gravity;
+	}
+
 
 	/*
 	 override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
@@ -208,21 +233,6 @@ public class Player extends PersistenceObject
 		lastCollisionModelReset();
 	}
 */
-	private function onCriticalModelLoaded( le:ModelLoadingEvent ):void {
-		//ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_LOADED, onCriticalModelLoaded );
-		Log.out( "Player.onCriticalModelLoaded - CRITICAL model" );
-		// if there is a critical model, don't turn on gravity until it is loaded 
-		// NOTE- RSF - I think this needs to be the OXEL loaded
-		gravityOn()
-	}
-
-	private function gravityOn():void {
-		if ( true == Region.currentRegion.gravity )
-			VoxelModel.controlledModel.usesGravity = true;
-		else
-			VoxelModel.controlledModel.usesGravity = false;
-	}
-
 	/*
 */
 	/*

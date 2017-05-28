@@ -156,46 +156,43 @@ package com.voxelengine.worldmodel
 			_modelCache = new ModelCache();
 			
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
-			
+
+			if ( !Globals.online )
+				Player.player.createPlayer(Player.DEFAULT_PLAYER, Network.LOCAL );
+
+
 			addLoadingEventListeners();
 			RegionEvent.create( RegionEvent.LOAD_BEGUN, 0, guid );
 			// old style uses region.
 			setSkyColor( dbo.skyColor );
-			var count:int = loadRegionObjects(dbo.models);
-
-			// for startup use before you go online
-			if ( !Globals.online )
-				Player.player.createPlayer(Player.DEFAULT_PLAYER, Network.LOCAL );
-
 			_loaded = false;
-			if ( 0 == count ) {
-				_loaded = true;
-				RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
-				WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.DESTORY ) );
-			}
-			else
-				Globals.taskController.paused = false
+			loadRegionObjects( dbo.models );
 
-			ModelEvent.addListener( ModelEvent.TAKE_CONTROL, takeControlEvent );
 			Log.out( "Region.load - completed GUID: " + guid + "  name: " +  name, Log.DEBUG );
 		}	
 		
 		// Makes sense, called from Region
+		private var _objectCount:int = 0;
 		public function loadRegionObjects( $models:Object ):int {
 			//Log.out( "Region.loadRegionObjects - START =============================" );
-			var count:int = 0;
 			for each ( var v:Object in $models ) {
 				if ( v ) {
 					var instance:InstanceInfo = new InstanceInfo();
 					instance.fromObject( v );
-					if ( !instance.instanceGuid )
-						instance.instanceGuid = Globals.getUID();
+//					if ( !instance.instanceGuid )
+//						instance.instanceGuid = Globals.getUID();
+					_objectCount++;
 					ModelMakerBase.load( instance );
-					count++;
 				}
 			}
-			//Log.out( "Region.loadRegionObjects - END " + "  count: " + count + "=============================" );
-			return count;
+			Log.out( "Region.loadRegionObjects - END " + "  count: " + _objectCount + "=============================" );
+			if ( 0 == _objectCount ) {
+				_loaded = true;
+				RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
+				WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.DESTORY ) );
+			}
+
+			return _objectCount;
 		}
 
 		private function addLoadingEventListeners():void {
@@ -206,7 +203,7 @@ package com.voxelengine.worldmodel
 			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_FAILURE,removeFailedObjectFromRegion );
 				
 			ModelEvent.addListener( ModelEvent.CRITICAL_MODEL_DETECTED,			onCriticalModelDetected );
-			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED,				modelChanged );
+			ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED,				parentModelAdded );
 			ModelEvent.addListener( ModelEvent.PARENT_MODEL_REMOVED,			modelChanged );
 		}
 
@@ -219,7 +216,7 @@ package com.voxelengine.worldmodel
 			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_FAILURE,	removeFailedObjectFromRegion );
 
 			ModelEvent.removeListener( ModelEvent.CRITICAL_MODEL_DETECTED, 		onCriticalModelDetected );
-			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED,			regionChanged );
+			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED,			parentModelAdded );
 			ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED,			regionChanged );
 		}
 
@@ -229,27 +226,35 @@ package com.voxelengine.worldmodel
 				changed = true;
 			}
 		}
-		
+
+		private function parentModelAdded( $me:ModelEvent ):void  {
+			if ( 0 == _objectCount )
+				changed = true;
+			_objectCount--;
+		}
+
+		private function removeFailedObjectFromRegion( $e:ModelLoadingEvent ):void {
+			// Do I need to remove this failed load?
+			Log.out( "Region.removeFailedObjectFromRegion - failed to load: " + $e.data, Log.WARN );
+			currentRegion.changedForce = true;
+			_objectCount--;
+		}
+
 		private function modelChanged(e:ModelEvent):void {
 			if ( Region.currentRegion.guid == guid ) {
 				Log.out( "Region.modelChanged" );
-				changed = true;
+				if ( 0 == _objectCount )
+					changed = true;
 			}
 		}
 		
 		private function unload( $re:RegionEvent ):void {
 			removeLoadingEventListeners();
-			Log.out( "Region.unload guid: " + guid + " complete modelCache.count: " + _modelCache, Log.DEBUG );
+			//Log.out( "Region.unload guid: " + guid + " complete modelCache.count: " + _modelCache, Log.DEBUG );
 			_modelCache.unload();
 			//release(); // Dont release it, memory is invalidated
 		}
 		
-		private function removeFailedObjectFromRegion( $e:ModelLoadingEvent ):void {
-			// Do I need to remove this failed load?
-			Log.out( "Region.removeFailedObjectFromRegion - failed to load: " + $e.data, Log.WARN );
-			currentRegion.changedForce = true;
-		}
-	
 		private function onLoadingComplete( le:LoadingEvent ):void {
 			//Log.out( "Region.onLoadingComplete: regionId: " + guid, Log.WARN );
 			_loaded = true;
@@ -264,31 +269,6 @@ package com.voxelengine.worldmodel
 			outString += "  owner:" + owner;
 			outString += "  gravity:" +  gravity;
 			return outString;
-		}
-		
-		public function takeControlEvent( e:ModelEvent ):void {
-
-			var avatar:Avatar = VoxelModel.controlledModel as Avatar;
-			if ( null == avatar ) {
-				Log.out("Region.applyRegionInfoToPlayer - NO PLAYER DEFINED", Log.WARN);
-				return;
-			}
-
-			if ( playerPosition ) {
-				//Log.out( "Player.onLoadingPlayerComplete - setting position to  - x: "  + playerPosition.x + "   y: " + playerPosition.y + "   z: " + playerPosition.z );
-				avatar.instanceInfo.positionSetComp( playerPosition.x, playerPosition.y, playerPosition.z );
-			}
-			else
-				avatar.instanceInfo.positionSetComp( 0, 0, 0 );
-			
-			if ( playerRotation ) {
-				//Log.out( "Player.onLoadingPlayerComplete - setting player rotation to  -  y: " + playerRotation );
-				avatar.instanceInfo.rotationSet = new Vector3D( 0, playerRotation.y, 0 );
-			}
-			else
-				avatar.instanceInfo.rotationSet = new Vector3D( 0, 0, 0 );
-				
-			avatar.usesGravity = gravity;
 		}
 		
 		static public function resetPosition():void {
