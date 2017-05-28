@@ -252,10 +252,11 @@ public class WindowPictureImport extends VVPopup {
         var ii:InstanceInfo = new InstanceInfo();
         ii.modelGuid = Globals.getUID();
         addListeners();
-        new ModelMakerGenerate(ii, model);
+        new ModelMakerGenerate(ii, model, false );
 
         function oxelBuildComplete($ode:OxelDataEvent):void {
             if ($ode.modelGuid == ii.modelGuid ) {
+                trace( "WindowPictureImport.oxelBuildComplete");
                 removeListeners();
                 oxelCreated( $ode )
             }
