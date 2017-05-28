@@ -137,9 +137,9 @@ public class Chunk {
 
 		// when I create the chunk I add a light level to it.
 		if ( 0 == _lightInfo.ID )
-			Log.out( "chunk.parse - LIGHT ID IS ZERO lightInfo: " + _lightInfo, Log.WARN );
+			Log.out( "Chunk - LIGHT ID IS ZERO lightInfo: " + _lightInfo, Log.WARN );
 		//else
-		//	Log.out( "chunk.parse - new chunk: " + $oxel.childCount + "  $lightInfo: " + $lightInfo, Log.WARN );
+		//	Log.out( "Chunk - new chunk: " + $oxel.childCount + "  $lightInfo: " + $lightInfo, Log.WARN );
 	}
 	
 	public function release():void {
@@ -170,11 +170,11 @@ public class Chunk {
 			_children = new Vector.<Chunk>(OCT_TREE_SIZE, true);
 			for ( var i:int=0; i < OCT_TREE_SIZE; i++ ) {
 				var newChunk:Chunk = new Chunk( _op, this, _bound, _guid, _lightInfo );
-				newChunk.parse( $oxel.children[i] );
-				_children[i] = newChunk;
 				gct.copyFrom( _gc );
 				gct.become_child( i );
-				_children[i]._gc.copyFrom( gct );
+				newChunk._gc.copyFrom( gct );
+				newChunk.parse( $oxel.children[i] );
+				_children[i] = newChunk;
 				//Log.out( "chunk.parse - chunk gc: " + _children[i]._gc + " count: " + (_children[i].oxel ? _children[i].oxel.childCount : "parent")  + " chunkCount: " + Chunk.chunkCount(), Log.WARN );
 			}
 			GrainCursorPool.poolDispose( gct );
@@ -283,7 +283,13 @@ public class Chunk {
 		}
 	}
 */
-	public function faceAndQuadsBuild( $forceFaces:Boolean = false, $forceQuads:Boolean = false ):void {
+	public function get isBuilding():Boolean {
+		return faceTasks || quadTasks;
+	}
+
+	public function faceAndQuadsBuild( $buildFaces:Boolean, $forceFaces:Boolean = false, $forceQuads:Boolean = false ):void {
+//		Log.out("--Chunk faceAndQuadsBuild - guid: "  + _guid + " $buildFaces: " + $buildFaces + " forceFaces: " + $forceFaces + "  forceQuads: " + $forceQuads, Log.WARN);
+
 		var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
 		quadTasksReset();
 		faceTasksReset();
@@ -294,7 +300,7 @@ public class Chunk {
 			priority = 100; // high but not too high?
 		OxelDataEvent.addListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
 		OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_PARTIAL, quadsBuildPartialComplete );
-		faceAndQuadsBuildRecursively( priority, $forceFaces ,$forceQuads );
+		faceAndQuadsBuildRecursively( priority, $buildFaces, $forceFaces ,$forceQuads );
 		// When would either of these happen? Answer: Trying to build a clean model
 		if ( 0 == faceTasks) {
 			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FACES_BUILT_PARTIAL, facesBuildPartialComplete );
@@ -305,21 +311,29 @@ public class Chunk {
 			OxelDataEvent.create(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, 0, _guid, _op);
 			OxelDataEvent.create(OxelDataEvent.OXEL_BUILD_COMPLETE, 0, _guid, _op);
 		}
+//		Log.out("--Chunk faceAndQuadsBuild - EXIT guid: "  + _guid + " faceTasks: " + faceTasks + " quadTasks: " + quadTasks, Log.WARN);
 	}
 
-	public function faceAndQuadsBuildRecursively( $priority:int, $forceFaces:Boolean = false, $forceQuads:Boolean = false  ):void {
+	public function faceAndQuadsBuildRecursively( $priority:int, $buildFaces:Boolean, $forceFaces:Boolean = false, $forceQuads:Boolean = false  ):void {
 		_dirtyFacesOrQuads = false;
 		if ( childrenHas() ) {
 			for ( var i:int=0; i < OCT_TREE_SIZE; i++ ) {
 				if ( _children[i].dirtyFacesOrQuads || $forceFaces || $forceQuads )
-					_children[i].faceAndQuadsBuildRecursively( $priority, $forceFaces, $forceQuads );
+					_children[i].faceAndQuadsBuildRecursively( $priority, $buildFaces, $forceFaces, $forceQuads );
 			}
 		}
 		else {
-			if ( _oxel && ( _oxel.dirty || $forceFaces || $forceQuads ) ) {
-				if ( _oxel.dirty || $forceFaces )
-					addFaceTask( $priority, $forceFaces );
-				addQuadTask( $priority, $forceQuads );
+			if ( _oxel ) {
+				// This adjusts the order so that the larger grains draw first.
+				// This makes the overall object appear faster.
+				var adjustedPriority:int = $priority - gc.grain;
+				if (( _oxel.dirty && $buildFaces ) || $forceFaces ) {
+					//Log.out("--Chunk addFaceTask - guid: "  + _guid + " gc: " + gc + " buildFaces?: " + ( _oxel.dirty || $buildFaces ) + "  forceFaces: " + $forceFaces, Log.WARN);
+					addFaceTask( adjustedPriority, $forceFaces );
+				}
+				if ( _oxel.dirty || $forceQuads ) {
+					addQuadTask( adjustedPriority, $forceQuads );
+				}
 			}
 		}
 	}
