@@ -154,11 +154,20 @@ public class OxelPersistence extends PersistenceObject
 	// Chunk operations
 
 	public function update( $vm:VoxelModel ):void {
-		if ( topMostChunk && ( topMostChunk.dirtyFacesOrQuads || forceFaces || forceQuads ) ) {
-			Log.out( "OxelPersistence.update ------------ calling facesAndQuadsBuild guid: " + guid + "  with forceFaces: " + forceFaces + "  forceQuads: " + forceQuads, Log.DEBUG );
-			oxel.chunkGet().faceAndQuadsBuild( forceFaces, forceQuads );
-			forceFaces = false;
-			forceQuads = false;
+		if ( topMostChunk ) {
+			if ( topMostChunk.isBuilding )
+					return;
+			if ( topMostChunk.dirtyFacesOrQuads || forceFaces || forceQuads )
+			{
+				if ( "EditCursor" != guid )
+					Log.out("OxelPersistence.update ------------ calling facesAndQuadsBuild guid: " + guid + "  with forceFaces: " + forceFaces + "  forceQuads: " + forceQuads + "  dirtyFacesOrQuads: " + topMostChunk.dirtyFacesOrQuads, Log.DEBUG);
+				if ( forceFaces || forceQuads )
+						changed = true;
+				var buildFaces:Boolean = true;
+				oxel.chunkGet().faceAndQuadsBuild(buildFaces, forceFaces, forceQuads);
+				forceFaces = false;
+				forceQuads = false;
+			}
 		}
 	}
 	
@@ -187,8 +196,11 @@ public class OxelPersistence extends PersistenceObject
 			//Log.out( "OxelPersistence.save - NOT Saving GUID: " + guid  + " oxel: " + (oxel?oxel:"No oxel") + " in table: " + table, Log.WARN );
 			return false;
 		}
+
 		version = Globals.VERSION;
-		return super.save();
+		var result:Boolean = super.save();
+		Log.out( "OxelPersistence.save: " + ( result ? "Succeeded" : "Failed" ), Log.WARN );
+		return result;
 	}
 
 	override protected function toObject():void {
@@ -209,7 +221,7 @@ public class OxelPersistence extends PersistenceObject
 	// FROM Persistence
 	
 	public function loadFromByteArray():void {
-		Log.out( "OxelPersistence.loadFromByteArray - guid: " + guid, Log.INFO );
+		//Log.out( "OxelPersistence.loadFromByteArray - guid: " + guid, Log.INFO );
 		ba.position = 0;
 		_oxels[_lod] = Oxel.initializeRoot(bound);
 		oxel.readOxelData(ba, this );
