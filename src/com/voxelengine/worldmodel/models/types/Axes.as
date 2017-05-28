@@ -33,7 +33,7 @@ public class Axes extends VoxelModel
 		ii.modelGuid = AXES_MODEL_GUID;
 
 		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
-		new ModelMakerGenerate( ii, model );
+		new ModelMakerGenerate( ii, model, true );
 
 		function modelLoadComplete ( $mle:ModelLoadingEvent ):void {
 			if ( $mle.data.modelGuid == AXES_MODEL_GUID ) {
@@ -44,19 +44,19 @@ public class Axes extends VoxelModel
 				iiR.modelGuid = AXES_MODEL_GUID_X;
 				iiR.controllingModel = _model;
 				iiR.positionSetComp( 0, -1, -1 );
-				new ModelMakerGenerate( iiR, GenerateCube.script( 0, TypeInfo.RED, true ) );
+				new ModelMakerGenerate( iiR, GenerateCube.script( 0, TypeInfo.RED, true ), true );
 
 				var iiG:InstanceInfo = new InstanceInfo();
 				iiG.modelGuid = AXES_MODEL_GUID_Y;
 				iiG.controllingModel = _model;
 				iiG.positionSetComp( -1, 0, -1 );
-				new ModelMakerGenerate( iiG, GenerateCube.script( 0, TypeInfo.GREEN, true ) );
+				new ModelMakerGenerate( iiG, GenerateCube.script( 0, TypeInfo.GREEN, true ), true );
 
 				var iiB:InstanceInfo = new InstanceInfo();
 				iiB.modelGuid = AXES_MODEL_GUID_Z;
 				iiB.controllingModel = _model;
 				iiB.positionSetComp( -1, -1, 0 );
-				new ModelMakerGenerate( iiB, GenerateCube.script( 0, TypeInfo.BLUE, true ) );
+				new ModelMakerGenerate( iiB, GenerateCube.script( 0, TypeInfo.BLUE, true ), true );
 			}
 		}
 	}
@@ -67,7 +67,8 @@ public class Axes extends VoxelModel
 	}
 
 	override public function set dead(val:Boolean):void {
-		Log.out( "Axes.dead - THIS MODEL IS IMMORTAL", Log.WARN );
+		//Log.out( "Axes.dead - THIS MODEL IS IMMORTAL", Log.WARN );
+		// Do nothing for this object, since you dont want to have to recreate each time you change regions.
 	}
 	
 	static public function hide():void {

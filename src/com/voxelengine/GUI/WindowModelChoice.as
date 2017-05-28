@@ -121,7 +121,7 @@ public class WindowModelChoice extends VVPopup
 		// this needs to be key for database.
 		ii.modelGuid = Globals.getUID();
 		
-		new ModelMakerGenerate( ii, model );
+		new ModelMakerGenerate( ii, model, false );
 
 	}
 	

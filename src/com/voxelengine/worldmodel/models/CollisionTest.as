@@ -91,7 +91,7 @@ import flash.geom.Vector3D;
 			collisionPointMarker.name = "DefaultCollisionPoint";
 			collisionPointMarker.visible = false;
 			collisionPointMarker.dynamicObject = true;
-			new ModelMakerGenerate( collisionPointMarker, model );
+			new ModelMakerGenerate( collisionPointMarker, model, true );
 		}
 		}
 
