@@ -67,9 +67,6 @@ public class ModelInfo extends PersistenceObject
 		changed = true;
 	}
 
-	public function get lockLight():Boolean { return dbo.lockLight; }
-	public function set lockLight( $val:Boolean ):void { dbo.lockLight = $val; changed = true; }
-
 	private var			_owner:VoxelModel;
 	public function get owner():VoxelModel 							{ return _owner; }
 	public function set owner(value:VoxelModel):void 				{ _owner = value; }
@@ -154,8 +151,9 @@ public class ModelInfo extends PersistenceObject
 	}
 
 	public function update( $context:Context3D, $elapsedTimeMS:int, $vm:VoxelModel ):void {
-		if ( oxelPersistence && oxelPersistence.oxelCount && oxelPersistence.oxel.chunkGet() )
-			oxelPersistence.update( $vm );
+		if ( oxelPersistence && oxelPersistence.oxelCount && oxelPersistence.oxel.chunkGet() ) {
+			oxelPersistence.update($vm);
+		}
 			
 		for each (var cm:VoxelModel in childVoxelModels ) {
 			cm.update($context, $elapsedTimeMS);
@@ -206,10 +204,7 @@ public class ModelInfo extends PersistenceObject
 		if ( guid == $ode.modelGuid ) {
 			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FBA_COMPLETE, assignOxelData );
 			oxelPersistence = $ode.oxelPersistence;
-			if ( lockLight ) {
-				oxelPersistence.baseLightLevel = Lighting.MAX_LIGHT_LEVEL;
-				oxelPersistence.lockLight = true;
-			}
+			oxelPersistence.doNotPersist = doNotPersist;
 		}
 	}
 
@@ -591,9 +586,8 @@ public class ModelInfo extends PersistenceObject
 	private static const DEFAULT_CLASS:String		= "VoxelModel";
 	
 	private var _biomes:Biomes;										// used to generate terrain and apply other functions to oxel
-	private var _series:int											// used to make sure animation is part of same series when loading
-	private var _firstLoadFailed:Boolean;							// true if load from biomes oxelPersistence is needed
-	
+	private var _series:int;											// used to make sure animation is part of same series when loading
+
 	// These are temporary used for loading local objects
 	public function get biomes():Biomes 							{ return _biomes; }
 	public function set biomes(value:Biomes):void  					{ _biomes = value;  changed = true; }
@@ -606,10 +600,6 @@ public class ModelInfo extends PersistenceObject
 
 		if ( !super.save() )
 			return false;
-
-		// Parent saved, so we can save children.
-		if ( oxelPersistence )
-			oxelPersistence.save();
 
 		if ( _animations && 0 < _animations.length )
 				for each ( var ani:Animation in _animations )
