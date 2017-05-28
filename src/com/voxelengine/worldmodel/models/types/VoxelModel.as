@@ -1037,7 +1037,7 @@ public class VoxelModel {
 		stateReset();
 		var anim:Animation = modelInfo.animationGet( $state );
 		if ( null == anim ) {
-			Log.out("VoxelModel.stateSet - no animation found for state: " + $state);
+			//Log.out("VoxelModel.stateSet - no animation found for state: " + $state);
 			return;
 		}
 

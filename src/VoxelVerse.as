@@ -11,7 +11,6 @@ import com.voxelengine.GUI.WindowSplash;
 import com.voxelengine.GUI.WindowWater;
 import com.voxelengine.events.AnimationEvent
 import com.voxelengine.events.AppEvent;
-import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.persistance.Persistence;
@@ -39,8 +38,6 @@ import flash.events.KeyboardEvent
 import flash.events.MouseEvent
 import flash.events.ErrorEvent
 import flash.events.UncaughtErrorEvent
-import flash.system.Capabilities;
-import flash.system.Security
 import flash.ui.Keyboard
 import flash.utils.getTimer
 
@@ -67,7 +64,7 @@ public class VoxelVerse extends Sprite
 	public function VoxelVerse():void {
 		addEventListener(Event.ADDED_TO_STAGE, init);
 		Globals.g_app = this;
-		_s_appStartTime = getTimer();
+		//_s_appStartTime = getTimer();
 	}
 
 	private function init(e:Event = null):void {
@@ -119,14 +116,14 @@ public class VoxelVerse extends Sprite
 			Globals.appPath = url.substring(0, index);
 		}
 
-		Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath, Log.DEBUG )
+		Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath);
 
 		Renderer.renderer.init( stage );
 		VoxelVerseGUI.currentInstance.init();
 		WindowSplash.init();
 	}
 
-	private function initializeDataAfterSplash():void {
+	static private function initializeDataAfterSplash():void {
 
 		WindowWater.init();
 
@@ -154,7 +151,7 @@ public class VoxelVerse extends Sprite
 
 	// after the splash and config have been loaded
 	public function readyToGo():void	{
-		Log.out( "<===============VoxelVerse.readyToGo - ENTER", Log.DEBUG )
+		Log.out( "<===============VoxelVerse.readyToGo - ENTER", Log.DEBUG );
 
 		_s_timeEntered = getTimer();
 
@@ -166,7 +163,7 @@ public class VoxelVerse extends Sprite
 		//Security.loadPolicyFile( "http://cdn.playerio.com/crossdomain.xml" )
 		//Security.loadPolicyFile( "https://content.playerio.com/crossdomain.xml" );
 
-		VoxelVerseGUI.currentInstance.buildGUI()
+		VoxelVerseGUI.currentInstance.buildGUI();
 
 		stage.addEventListener(Event.MOUSE_LEAVE, mouseLeave);
 		stage.addEventListener(MouseEvent.MOUSE_UP, mouseUp);
@@ -175,12 +172,12 @@ public class VoxelVerse extends Sprite
 	}
 
 	private var _fpsStat:int;
-	public function get fps():int 					{ return _fpsStat };
+	public function get fps():int 					{ return _fpsStat; }
 
 	private var _s_timeEntered:int;
 	private var _s_timeExited:int = getTimer();
 
-	private var _s_appStartTime:int;
+	//private var _s_appStartTime:int;
 	private var _s_timeLastFPS:int;
 	private var _s_frameCounter:int = 0;
 	private var framesToDisplaySplash:int;
@@ -206,10 +203,10 @@ public class VoxelVerse extends Sprite
 
 		RegionManager.instance.update( interFrameTime );
 		Shader.animationOffsetsUpdate( interFrameTime );
-		var _timeUpdate:int = getTimer() - _s_timeEntered;
+		//var _timeUpdate:int = getTimer() - _s_timeEntered;
 
 		Renderer.renderer.render();
-		var _timeRender:int = getTimer() - _s_timeEntered - _timeUpdate;
+		//var _timeRender:int = getTimer() - _s_timeEntered - _timeUpdate;
 
 		if ( showConsole )
 			toggleConsole();

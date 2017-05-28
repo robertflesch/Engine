@@ -8,12 +8,10 @@
 
 package com.voxelengine.worldmodel.tasks.renderTasks
 {
-import com.voxelengine.events.OxelDataEvent;
-
-import flash.utils.getTimer
 
 import com.voxelengine.Log
 import com.voxelengine.renderer.Chunk
+import com.voxelengine.events.OxelDataEvent;
 
 // Note that rendingTasks automatically add them selves to the queue.
 public class BuildFaces extends RenderingTask
@@ -32,10 +30,8 @@ public class BuildFaces extends RenderingTask
 
     override public function start():void {
         super.start();
-        //Log.out("BuildFaces.start: guid: " + _guid, Log.WARN);
         //Log.out("BuildFaces.start: guid: " + _guid  + "  gc: " + _chunk.gc + "  forceFaces: " + _forceFaces, Log.WARN);
 
-        var time:int = getTimer();
         if ( _chunk && _chunk.oxel )
             _chunk.oxel.facesBuild( _forceFaces );
         // if the processing time is less then 1 ms, do the next task

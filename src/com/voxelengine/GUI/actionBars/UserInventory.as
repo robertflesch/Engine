@@ -471,7 +471,7 @@ public class  UserInventory extends QuickInventory
 
 	private var _listenersAdded:Boolean;
 	private function addListeners():void {
-		Log.out( "UserInventory.addListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
+		Log.out( "UserInventory.addListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================" );
 		if ( false == _listenersAdded ) {
 			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
 			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	

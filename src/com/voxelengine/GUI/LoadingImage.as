@@ -39,7 +39,7 @@ public class LoadingImage extends VVCanvas
 
     static private function create(e:LoadingImageEvent):void {
         _count++;
-        Log.out( "LoadingImage.create called count: " + _count, Log.WARN );
+        //Log.out( "LoadingImage.create called count: " + _count, Log.WARN );
         if ( !LoadingImage.isActive )
             new LoadingImage();
     }
@@ -47,7 +47,7 @@ public class LoadingImage extends VVCanvas
     static private function destroy(e:LoadingImageEvent):void {
         if ( 0 < _count )
             _count--;
-        Log.out( "LoadingImage.destroy called count: " + _count, Log.WARN );
+        //Log.out( "LoadingImage.destroy called count: " + _count, Log.WARN );
         if ( LoadingImage.isActive && _count == 0 ) {
             //Log.out( "LoadingImage.DESTROYED", Log.WARN );
             LoadingImage._s_currentInstance.remove();

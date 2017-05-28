@@ -1824,7 +1824,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
         else
             fromByteArray($op.version, null, gct, $ba, $op );
 
-        Log.out("Oxel.readOxelData - readOxelData took: " + (getTimer() - time), Log.INFO);
+        //Log.out("Oxel.readOxelData - readOxelData took: " + (getTimer() - time), Log.INFO);
         GrainCursorPool.poolDispose(gct);
     }
 

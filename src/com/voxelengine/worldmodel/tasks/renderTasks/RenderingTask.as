@@ -27,7 +27,10 @@ import flash.utils.getTimer
 	{		
 		public static const TASK_TYPE:String = "ABSTRACT_LANDSCAPE_TASK";
         public static const TASK_PRIORITY:int = 1;
-		
+		public static var _frameSmoothing:Boolean;
+		public static function get frameSmoothing():Boolean { return _frameSmoothing; }
+		public static function set frameSmoothing(value:Boolean):void { _frameSmoothing = value; }
+
 		protected var _guid:String;
 		protected var _chunk:Chunk;
 		protected var _taskCount:int;
@@ -44,14 +47,22 @@ import flash.utils.getTimer
 
 		override public function start():void {
 			super.start();
-			_time = getTimer();
+//			_time = getTimer();
 		}
 
 		override public function complete():void {
 			_taskCount--;
 			_chunk = null;
-			//Log.out( taskType + " task took: " + ( getTimer() - _time ) + "  guid: " + _guid );
+			var took:int = getTimer() - _time;
+//			Log.out( taskType + " task took: " + took + "  guid: " + _guid );
 			super.complete();
+			if ( _frameSmoothing && took > 15 ) {
+				var framesToSkip:int = took/15;
+				Log.out( "Skipping " + framesToSkip + " tasks");
+				for ( var i:int = 0; i < framesToSkip; i++ ) {
+					SkipTask.addTask();
+				}
+			}
 		}
 		
 		protected function getVoxelModel():VoxelModel {
