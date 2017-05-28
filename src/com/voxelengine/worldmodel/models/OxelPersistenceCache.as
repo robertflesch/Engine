@@ -11,6 +11,7 @@ import flash.utils.ByteArray;
 import flash.net.URLLoaderDataFormat;
 
 import org.as3commons.collections.Map;
+import org.as3commons.collections.iterators.FilterIterator;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
@@ -18,9 +19,9 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
 import com.voxelengine.worldmodel.models.makers.OxelLoadAndBuildManager;
-
+import com.voxelengine.worldmodel.models.types.EditCursor;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
 
 public class OxelPersistenceCache
 {
@@ -39,7 +40,7 @@ public class OxelPersistenceCache
 		OxelDataEvent.addListener( ModelBaseEvent.DELETE, 				deleteHandler );
 		OxelDataEvent.addListener( ModelBaseEvent.UPDATE_GUID, 			updateGuid );
 		OxelDataEvent.addListener( ModelBaseEvent.SAVE, 				save );
-		
+
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_SUCCEED, 	loadSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.GENERATE_SUCCEED,generateSucceed );
 		PersistenceEvent.addListener( PersistenceEvent.LOAD_FAILED, 	loadFailed );
@@ -47,17 +48,24 @@ public class OxelPersistenceCache
 	}
 
 	static private function save(e:OxelDataEvent):void {
-		for each ( var op:OxelPersistence in _oxelDataMap )
-			if ( op && !op.doNotPersist )
+		var iterator:FilterIterator = new FilterIterator( _oxelDataMap, filter );
+		var op:OxelPersistence;
+		while (iterator.hasNext()) {
+			op = iterator.next() as OxelPersistence;
+			if ( op ) {
+				trace("OP.saving " + op.guid);
 				op.save();
+			}
+		}
+
+		function filter(item :OxelPersistence ): Boolean {
+			return item.changed && !item.doNotPersist && EditCursor.EDIT_CURSOR != item.guid ;
+		}
 	}
 
-	/*
-	* OxelDataEvent.create( ModelBaseEvent.ADDED, $series, $od.guid, $od );
-	*/
 	static private function add( $series:int, $op:OxelPersistence ):void {
 		if ( null ==getOP( $op.guid ) ) { // check to make sure this is new data
-			Log.out( "OxelDataCache.add adding: " + $op.guid, Log.INFO );
+			//Log.out( "OxelDataCache.add adding: " + $op.guid, Log.INFO );
 			_oxelDataMap.add( $op.guid, $op );
 			if ( _block.has( $op.guid ) )
 				_block.clear( $op.guid );
@@ -69,6 +77,7 @@ public class OxelPersistenceCache
 			OxelDataEvent.create(ModelBaseEvent.ADDED, $series, $op.guid, $op);
 		}
 	}
+	
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  OxelDataEvents
 	/////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,8 +105,8 @@ public class OxelPersistenceCache
 		}
 		
 		//Log.out( "OxelDataCache.request guid: " + $ode.modelGuid, Log.DEBUG );
-		var od:OxelPersistence = getOP( $ode.modelGuid );
-		if ( null == od ) {
+		var op:OxelPersistence = getOP( $ode.modelGuid );
+		if ( null == op ) {
 			if ( _block.has( $ode.modelGuid ) )	
 				return;
 			_block.add( $ode.modelGuid );
@@ -105,6 +114,7 @@ public class OxelPersistenceCache
 			_loadingCount++;
 			if ( true == $ode.generated ) {
 				var genClass:Class = GenerateOxel.resolveGenerationType( $ode.generationData.biomes.layers[0].functionName );
+				// TODO need to add Locked to new OP here
 				genClass.addTask($ode.modelGuid, LayerInfo.fromObject($ode.generationData));
 			}
 			else if ( !$ode.fromTables )
@@ -115,12 +125,7 @@ public class OxelPersistenceCache
 				Log.out( "OxelPersistenceCache.request - Trying to load an asset from tables when not online guid: " + $ode.modelGuid, Log.ERROR);
 		}
 		else
-			OxelDataEvent.create( ModelBaseEvent.RESULT, $ode.series, $ode.modelGuid, od );
-	}
-	
-	static private function generated( $ode:OxelDataEvent ):void  {
-		Log.out( "OxelDataCache.generated modelGuid: " + $ode.modelGuid, Log.INFO );
-		add( 0, $ode.oxelPersistence );
+			OxelDataEvent.create( ModelBaseEvent.RESULT, $ode.series, $ode.modelGuid, op );
 	}
 	
 	static private function deleteHandler( $ode:OxelDataEvent ):void {
@@ -168,9 +173,6 @@ public class OxelPersistenceCache
 			return;
 		//Log.out( "OxelDataCache.generateSucceed " + $pe.toString(), Log.INFO );
 		var op:OxelPersistence = new OxelPersistence( $pe.guid, null, $pe.data, true );
-		if ( "PROJECTILE"  == $pe.guid )
-			op.doNotPersist = true;
-
 		if ( $pe.other )
 			op.bound = parseInt($pe.other);
 		else {
