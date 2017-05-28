@@ -35,11 +35,13 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	private var _creationInfo:Object;
 	private var _name:String;
 	private var _type:int;
+	private var _doNotPersist:Boolean;
 
-	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object ) {
+	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object, $doNotPersist:Boolean ) {
 		_name = $miJson.name;
 		_type = $miJson.biomes.layers[0].type;
 		_creationInfo = $miJson;
+		_doNotPersist = $doNotPersist;
 		//Log.out("ModelMakerGenerate - ii: " + $ii.toString() + "  using generation script: " + $miJson.biomes.layers[0].functionName);
 		super($ii);
 		retrieveOrGenerateModelInfo();
@@ -57,16 +59,16 @@ public class ModelMakerGenerate extends ModelMakerBase {
 				return;
 			removeModelInfoEventHandler();
 			_modelInfo = $e.vmi;
+			_modelInfo.doNotPersist = _doNotPersist;
 			retrieveOrGenerateModelMetadata();
 		}
 
 		function modelInfoDoesNotExists( $e:ModelInfoEvent ):void {
 			if ( $e.modelGuid != ii.modelGuid )
 				return;
-
 			removeModelInfoEventHandler();
-
 			_modelInfo = new ModelInfo( ii.modelGuid, null, _creationInfo );
+			_modelInfo.doNotPersist = _doNotPersist;
 			retrieveOrGenerateModelMetadata();
 		}
 
@@ -87,6 +89,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 				return;
 			removeModelMetadataEventHandler();
 			_modelMetadata = $e.modelMetadata;
+			_modelInfo.doNotPersist = _doNotPersist;
 			attemptMake();
 		}
 
@@ -94,7 +97,17 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			if ( $e.modelGuid != ii.modelGuid )
 				return;
 			removeModelMetadataEventHandler();
-			retrieveBaseInfo();
+			//Log.out( "ModelMakerGenerate.retrieveBaseInfo " + ii.modelGuid );
+			_modelMetadata = new ModelMetadata( ii.modelGuid );
+			_modelMetadata.doNotPersist = _doNotPersist;
+
+			// Bypass the setter so that we dont set it to changed
+			if ( _type && 0 == _name.length )
+				_modelMetadata.name = _name + TypeInfo.name( _type ) + "-" + _name;
+			else
+				_modelMetadata.name = _name;
+			_modelMetadata.description = _name + " - GENERATED";
+			_modelMetadata.owner = Network.userId;
 			attemptMake();
 		}
 
@@ -104,23 +117,10 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		}
 	}
 
-	override protected function retrieveBaseInfo():void {
-		//Log.out( "ModelMakerGenerate.retrieveBaseInfo " + ii.modelGuid );
-		_modelMetadata = new ModelMetadata( ii.modelGuid );
-
-		// Bypass the setter so that we dont set it to changed
-		if ( _type && 0 == _name.length )
-			_modelMetadata.name = _name + TypeInfo.name( _type ) + "-" + _name;
-		else
-			_modelMetadata.name = _name;
-		_modelMetadata.description = _name + " - GENERATED";
-		_modelMetadata.owner = Network.userId;
-	}
-	
 	// once they both have been retrieved, we can make the object
 	override protected function attemptMake():void {
 		//Log.out( "ModelMakerGenerate.attemptMake " + ii.modelGuid );
-		if ( null != modelInfo && null != _modelMetadata ) {
+		if ( null != _modelInfo && null != _modelMetadata ) {
 			_vm = make();
 			if ( _vm ) {
 				markComplete( true );
