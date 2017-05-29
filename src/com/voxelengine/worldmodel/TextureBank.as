@@ -98,18 +98,6 @@ package com.voxelengine.worldmodel
 			_texturesLoading[textureNameAndPath] = true;
 		}
 
-		public function getFileNameFromString( fileNameAndPath:String ):String {
-			var lastIndex:int = fileNameAndPath.lastIndexOf('\\');
-			if ( -1 == lastIndex )
-				lastIndex = fileNameAndPath.lastIndexOf('/');
-			var fileName:String = fileNameAndPath;
-			if ( -1 != lastIndex )
-				fileName = fileNameAndPath.substr( lastIndex + 1 );
-				
-			return fileName;	
-		}
-		
-		
 		public function getTextureNameAndPath( completePath:String ):String {
 			var lastIndex:int = completePath.lastIndexOf('bin/');
 			if ( -1 == lastIndex )
