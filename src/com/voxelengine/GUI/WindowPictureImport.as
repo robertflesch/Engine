@@ -164,7 +164,7 @@ public class WindowPictureImport extends VVPopup {
         _pti = new TextInput("", 50);
         _pti.x = 206;
         _pti.y = 4;
-        _pti.text = StringUtils.zeroPad( PictureImportProperties.transColor, 6, 16 );
+        _pti.text = StringUtils.zeroPadUint( PictureImportProperties.transColor, 8, 16 );
         $evtColl.addEvent( _pti, TextEvent.EDITED, transChanged );
         tContainer.addElement( _pti );
 
@@ -247,7 +247,7 @@ public class WindowPictureImport extends VVPopup {
             return;
         }
         var model:Object = GenerateCube.script( PictureImportProperties.grain, TypeInfo.AIR, true );
-        model.name = "Picture Import";
+        model.name = StringUtils.getFileNameFromString(PictureImportProperties.url ); //"Picture Import";
         model.description = PictureImportProperties.url;
         var ii:InstanceInfo = new InstanceInfo();
         ii.modelGuid = Globals.getUID();
@@ -318,6 +318,7 @@ public class WindowPictureImport extends VVPopup {
                 }
             }
         }
+        $op.oxel.facesBuild();
         $op.save();
 
         var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( $op.guid );
