@@ -37,7 +37,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	private var _type:int;
 	private var _doNotPersist:Boolean;
 
-	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object, $doNotPersist:Boolean ) {
+	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object, $doNotPersist:Boolean = false ) {
 		_name = $miJson.name;
 		_type = $miJson.biomes.layers[0].type;
 		_creationInfo = $miJson;
