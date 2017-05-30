@@ -268,7 +268,7 @@ public class PanelModels extends PanelBase
 		}
 		
 		function modelRemoved( $me:ModelEvent ):void {
-			if ( $me.instanceGuid == VoxelModel.selectedModel.instanceInfo.instanceGuid ) {
+			if ( VoxelModel.selectedModel && $me.instanceGuid == VoxelModel.selectedModel.instanceInfo.instanceGuid ) {
 				ModelEvent.removeListener( ModelEvent.PARENT_MODEL_REMOVED, modelRemoved );
 				if ( null == _parentModel ) {
 					VoxelModel.selectedModel.selected = false;

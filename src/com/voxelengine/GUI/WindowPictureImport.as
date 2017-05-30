@@ -199,7 +199,7 @@ public class WindowPictureImport extends VVPopup {
         pContainer.layout.orientation = LayoutOrientation.VERTICAL;
         pContainer.autoHeight = true;
 
-        var ccb:ComponentCheckBox = new ComponentCheckBox("Remove Transparent Pixels", PictureImportProperties.removeTransPixels, width * 1.4, toggleRemoveTransparent);
+        var ccb:ComponentCheckBox = new ComponentCheckBox("Remove Transparent Pixels", PictureImportProperties.hasTransparency, width * 1.4, toggleRemoveTransparent);
         pContainer.addElement(ccb);
 
         var values:Vector.<String> = new Vector.<String>();
@@ -223,7 +223,7 @@ public class WindowPictureImport extends VVPopup {
         addElement(pContainer);
 
         function toggleRemoveTransparent( $me:UIMouseEvent ):void {
-            PictureImportProperties.removeTransPixels = ($me.target as CheckBox).selected;
+            PictureImportProperties.hasTransparency = ($me.target as CheckBox).selected;
         }
 
         function whiteTolerance( $le:ListEvent ):void {
@@ -343,7 +343,7 @@ public class WindowPictureImport extends VVPopup {
     static public function createModelFromBitmap( $op:OxelPersistence ):void {
         //var grains:uint = Globals.UNITS_PER_METER * PictureImportProperties.grain;
         var grains:uint = GrainCursor.get_the_g0_size_for_grain( PictureImportProperties.grain );
-        var bitmapData:BitmapData = VVBox.drawScaled( PictureImportProperties.referenceBitmapData, grains, grains, PictureImportProperties.hasTransparency );
+        var bitmapData:BitmapData = VVBox.drawScaled( PictureImportProperties.finalBitmapData, grains, grains, PictureImportProperties.hasTransparency );
         var oxel:Oxel = $op.oxel;
         var gct:GrainCursor = GrainCursorPool.poolGet( PictureImportProperties.grain );
         gct.grainX = 0;
@@ -354,12 +354,12 @@ public class WindowPictureImport extends VVPopup {
                 gct.grainZ = iw;
                 var pixelColor:uint = bitmapData.getPixel32(iw,grains-1-ih);
                 var tOxel:Oxel;
-                if ( PictureImportProperties.removeTransPixels
+                if ( PictureImportProperties.hasTransparency
                         && ColorUtils.extractRed( pixelColor ) >= PictureImportProperties.transColor
                         && ColorUtils.extractBlue( pixelColor ) >= PictureImportProperties.transColor
                         && ColorUtils.extractGreen( pixelColor ) >= PictureImportProperties.transColor )
                     tOxel = oxel.change( $op.guid, gct, TypeInfo.AIR, true);
-                else if (  PictureImportProperties.replaceBlackWithIron
+                else if (  PictureImportProperties.replaceBlackWithIron && PictureImportProperties.hasTransparency
                         && ColorUtils.extractRed( pixelColor ) <= PictureImportProperties.blackColor
                         && ColorUtils.extractBlue( pixelColor ) <= PictureImportProperties.blackColor
                         && ColorUtils.extractGreen( pixelColor ) <= PictureImportProperties.blackColor )

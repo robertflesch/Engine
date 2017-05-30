@@ -237,9 +237,13 @@ public class OxelPersistence extends PersistenceObject
 
 	public function toByteArray():ByteArray {
 		ba = oxel.toByteArray();
-		Log.out( "OxelPersistence.toByteArray - guid: " + guid + "  Precompressed size: " + ba.length );
+		//Log.out( "OxelPersistence.toByteArray - guid: " + guid + "  Precompressed size: " + ba.length );
 		ba.compress();
-		Log.out( "OxelPersistence.toByteArray - guid: " + guid + "  POSTcompressed size: " + ba.length );
+		if ( ba.length > 500000 ) {
+			Log.out( "OxelPersistence.toByteArray -- Over max size for model, how is this possible? ", Log.ERROR );
+			throw new Error("Error 1000, Over max size for model, how is this possible? ");
+		}
+		//Log.out( "OxelPersistence.toByteArray - guid: " + guid + "  POSTcompressed size: " + ba.length );
 		return ba;
 	}
 

@@ -178,7 +178,7 @@ public class EditCursor extends VoxelModel
 				else {
 					// too big or too small
 					lastSize = vmBound;
-					CursorSizeEvent.dispatch(new CursorSizeEvent(CursorSizeEvent.SET, modelInfo.oxelPersistence.bound));
+					//CursorSizeEvent.dispatch(new CursorSizeEvent(CursorSizeEvent.SET, modelInfo.oxelPersistence.bound));
 				}
 			} else {
 				if ( modelInfo && modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount ) {

@@ -132,7 +132,8 @@ public class AdjustablePictureBox extends VVBox {
         _hueLabel.text = "Hue: " + _hueHSlider.value;
         _saturationLabel.text = "Saturation: " + _saturationHSlider.value;
 
-        if ( PictureImportProperties.finalBitmapData ) {
+        if ( PictureImportProperties.referenceBitmapData ) {
+            PictureImportProperties.finalBitmapData = PictureImportProperties.referenceBitmapData.clone();
             _filter = new ColorMatrixFilter( _color.CalculateFinalFlatArray() );
             PictureImportProperties.finalBitmapData.applyFilter( PictureImportProperties.finalBitmapData
                                                                , PictureImportProperties.finalBitmapData.rect

@@ -431,6 +431,8 @@ public class ModelInfo extends PersistenceObject
 				childVoxelModels.splice(index, 1);
                 child.instanceInfo.associatedGrainReset();
 				var oxel:Oxel = VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.childFind( $gc );
+				if ( oxel == Globals.BAD_OXEL )
+					return false;
 				if ( oxel && oxel.gc.is_equal( $gc ) )
 					oxel.hasModel = false;
 				else

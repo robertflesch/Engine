@@ -11,15 +11,14 @@ import org.flashapi.swing.core.DeniedConstructorAccess;
 
 public class PictureImportProperties {
     static public var pictureStyle:int = TypeInfo.CUSTOM_GLASS;
-    static public var removeTransPixels:Boolean = true;
     static public var replaceBlackWithIron:Boolean = true;
     static public var blackColor:uint = 0x11;
+    static public var hasTransparency:Boolean = false;
     static public var transColor:uint = 0xf0;
     static public var grain:uint = 5;
     static public var referenceBitmapData:BitmapData = null;
     static public var finalBitmapData:BitmapData = null;
     static public var url:String = "";
-    static public var hasTransparency:Boolean = false;
 
     public function PictureImportProperties() {
         new DeniedConstructorAccess(this);
@@ -27,7 +26,6 @@ public class PictureImportProperties {
 
     static public function reset():void {
         pictureStyle = TypeInfo.CUSTOM_GLASS;
-        removeTransPixels = true;
         replaceBlackWithIron = true;
         blackColor = 0x11;
         transColor = 0xf0;
@@ -41,7 +39,7 @@ public class PictureImportProperties {
     static public function traceProperties():void {
         trace( "======== PictureProperties =============");
         trace( "pictureStyle = " + pictureStyle );
-        trace( "removeTransPixels = " + removeTransPixels );
+        trace( "hasTransparency = " + hasTransparency );
         trace( "replaceBlackWithIron = " + replaceBlackWithIron );
         trace( "blackColor = " + blackColor.toString(16) );
         trace( "transColor = " + transColor.toString(16) );
@@ -49,7 +47,6 @@ public class PictureImportProperties {
         trace( "referenceBitmapData w: " + referenceBitmapData.width + " h: " + referenceBitmapData.height);
         trace( "finalBitmapData w: " + finalBitmapData.width + " h: " + finalBitmapData.height);
         trace( "url = " + url );
-        trace( "hasTransparency = " + hasTransparency );
     }
 
     static public function traceBitmapData( $bmd:BitmapData, $pixelsToTrace:int = 64 ):void {

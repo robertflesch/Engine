@@ -37,7 +37,7 @@ import flash.text.TextField;
 			return fileName;
 		}
 
-		function drawString(target:BitmapData,text:String,x:Number,y:Number):void {
+		public function drawString(target:BitmapData,text:String,x:Number,y:Number):void {
 			var tf:TextField = new TextField();
 			tf.text = text;
 			var bmd:BitmapData = new BitmapData(tf.width,tf.height);
