@@ -11,6 +11,7 @@ import org.flashapi.swing.*
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.containers.*;
+import org.flashapi.swing.list.ListItem;
 import org.flashapi.swing.plaf.spas.VVUI;
 
 public class ComponentComboBoxWithLabel extends Box
@@ -31,14 +32,28 @@ public class ComponentComboBoxWithLabel extends Box
 		_cbType.width = int($width * 0.60);
 		for ( var i:int = 0; i < $types.length; i++ ) {
 			_cbType.addItem( $types[i], data[i] );
+
 		}
-		for ( var j:int; j < $types.length; j++ ) {
-			if ( $types[j] == $initialValue )
-				_cbType.selectedIndex = j;		
-		}
+		setComboProp( $initialValue );
+
 		addElement( _cbType );
 		eventCollector.addEvent( _cbType, ListEvent.LIST_CHANGED, $changeHandler );
 	}
+
+	public function setComboProp(value:Object):void {
+		var val:String = String(value).toLowerCase();
+		var v:String = _cbType.value.toLowerCase();
+		if (v == val) return;
+		var l:int = _cbType.length - 1;
+		for (; l >= 0; l--) {
+			v = _cbType.getItemAt(l).value.toLowerCase();
+			if (v == val) {
+				_cbType.selectedIndex = l;
+				return;
+			}
+		}
+	}
+	
 
 	public function get selectedItemValue():String {
 		if ( -1 == _cbType.selectedIndex )
