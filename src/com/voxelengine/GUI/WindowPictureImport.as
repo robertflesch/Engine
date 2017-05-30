@@ -8,11 +8,12 @@
 
 package com.voxelengine.GUI {
 
-import com.voxelengine.GUI.PictureImportProperties;
-import com.voxelengine.GUI.components.ComponentComboBoxWithLabel;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.ModelInfoEvent;
+import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.RegionEvent;
 import com.voxelengine.pools.GrainCursorPool;
 import com.voxelengine.utils.ColorUtils;
 import com.voxelengine.utils.StringUtils;
@@ -22,15 +23,12 @@ import com.voxelengine.worldmodel.models.OxelPersistence;
 import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
-import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.LightInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 
-import flash.display.BitmapData;
 
 import flash.display.BitmapData;
-import flash.display.BlendMode;
 import flash.display.Loader;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
@@ -49,7 +47,6 @@ import org.flashapi.swing.event.ListEvent;
 import org.flashapi.swing.event.TextEvent;
 import org.flashapi.swing.event.UIMouseEvent;
 import org.flashapi.swing.event.UIOEvent;
-import org.flashapi.swing.layout.AbsoluteLayout;
 import org.flashapi.swing.list.ListItem;
 
 import com.voxelengine.GUI.components.ComponentCheckBox;
@@ -59,14 +56,14 @@ import com.voxelengine.worldmodel.TypeInfo;
 public class WindowPictureImport extends VVPopup {
     private var _container:AdjustablePictureBox;
     private var _ccbl:ComponentComboBoxWithLabel;
-    private var _cb:ComponentCheckBox;
-    private var _pti:TextInput;
-    private var _plbl:Label;
+
+    private var iContainer:VVBox;
+    private var pContainer:VVBox;
 
     public function WindowPictureImport() {
         super("Picture Import");
         width = 256;
-        height = 550;
+        autoHeight = true;
         padding = 2;
         layout.orientation = LayoutOrientation.VERTICAL;
 
@@ -82,6 +79,7 @@ public class WindowPictureImport extends VVPopup {
         addElement( box1 );
 
         addPixelOptions();
+        addIronOptions();
 
         // Set radio button index this after pixel options have been added
         rbGroup.index = 0;
@@ -120,7 +118,7 @@ public class WindowPictureImport extends VVPopup {
 
         _ccbl = new ComponentComboBoxWithLabel( "Size in meters"
                                               , pictureSize
-                                              , "-1"
+                                              , values[0]
                                               , values
                                               , data
                                               , width );
@@ -141,47 +139,97 @@ public class WindowPictureImport extends VVPopup {
             PictureImportProperties.pictureStyle = TypeInfo.CUSTOM_GLASS;
             PictureImportProperties.hasTransparency = true;
             enableDisablePixelOptions( true );
+            enableDisableIronOptions( true );
         } else if ( 1 == event.target.index ) {
             PictureImportProperties.pictureStyle = TypeInfo.WHITE;
             PictureImportProperties.hasTransparency = false;
             enableDisablePixelOptions( false );
+            enableDisableIronOptions( false );
+        }
+    }
+
+    private function enableDisableIronOptions( $state:Boolean ): void {
+        iContainer.visible = $state;
+    }
+
+    private function addIronOptions():void {
+        iContainer = new VVBox(width-4, 30);
+        iContainer.autoHeight = true;
+        iContainer.layout.orientation = LayoutOrientation.VERTICAL;
+
+        var ccb:ComponentCheckBox = new ComponentCheckBox("Replace Black with Iron", PictureImportProperties.replaceBlackWithIron, width * 1.4, toggleReplaceBlackWithIron);
+        iContainer.addElement(ccb);
+
+        var values:Vector.<String> = new Vector.<String>();
+        values.push("lots (0x11)");
+        values.push("a little (0x05)");
+        values.push("pitch black (0x00)");
+        var data:Vector.<int> = new Vector.<int>();
+        data.push(0x11);
+        data.push(0x05);
+        data.push(0x00);
+
+        var ccbl:ComponentComboBoxWithLabel;
+        ccbl = new ComponentComboBoxWithLabel( "Black Tolerance"
+                , blackTolerance
+                , values[0]
+                , values
+                , data
+                , width - 10 );
+        iContainer.addElement( ccbl );
+
+        addElement(iContainer);
+
+        function toggleReplaceBlackWithIron($me:UIMouseEvent):void {
+            PictureImportProperties.replaceBlackWithIron = ($me.target as CheckBox).selected;
+        }
+
+        function blackTolerance( $le:ListEvent ):void {
+            var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex );
+            PictureImportProperties.blackColor = li.data;
         }
     }
 
     private function enableDisablePixelOptions( $state:Boolean ): void {
-        _cb.visible = $state;
-        _pti.visible = $state;
-        _plbl.visible = $state;
+        pContainer.visible = $state;
     }
 
     private function addPixelOptions():void {
-        var tContainer:Container = new Container( width, 30);
-        tContainer.layout = new AbsoluteLayout();
+        pContainer = new VVBox( width-4, 30);
+        pContainer.layout.orientation = LayoutOrientation.VERTICAL;
+        pContainer.autoHeight = true;
 
-        _cb = new ComponentCheckBox("Remove Transparent Pixels", PictureImportProperties.removeTransPixels, width * 1.4, toggleRemoveTransparent);
-        tContainer.addElement(_cb);
+        var ccb:ComponentCheckBox = new ComponentCheckBox("Remove Transparent Pixels", PictureImportProperties.removeTransPixels, width * 1.4, toggleRemoveTransparent);
+        pContainer.addElement(ccb);
 
-        _pti = new TextInput("", 50);
-        _pti.x = 206;
-        _pti.y = 4;
-        _pti.text = StringUtils.zeroPadUint( PictureImportProperties.transColor, 8, 16 );
-        $evtColl.addEvent( _pti, TextEvent.EDITED, transChanged );
-        tContainer.addElement( _pti );
+        var values:Vector.<String> = new Vector.<String>();
+        values.push("off white (0xf0)");
+        values.push("White Smoke (0xf5)");
+        values.push("pure white (0xff)");
+        var data:Vector.<int> = new Vector.<int>();
+        data.push(0xf0);
+        data.push(0xf5);
+        data.push(0xff);
 
-        _plbl = new Label("Color ", 40);
-        _plbl.textAlign = TextAlign.RIGHT;
-        _plbl.x = 162;
-        _plbl.y = 4;
-        tContainer.addElement( _plbl );
+        var ccbl:ComponentComboBoxWithLabel;
+        ccbl = new ComponentComboBoxWithLabel( "White Tolerance"
+                , whiteTolerance
+                , values[0]
+                , values
+                , data
+                , width - 10 );
+        pContainer.addElement( ccbl );
 
-        addElement(tContainer);
-    }
+        addElement(pContainer);
 
-    private function transChanged( $te:TextEvent ):void {
-        var transColorST:String = $te.target.text;
-        var transColor:uint = parseInt( transColorST );
-        transColor = transColor | 0xff000000;
-        PictureImportProperties.transColor = transColor;
+        function toggleRemoveTransparent( $me:UIMouseEvent ):void {
+            PictureImportProperties.removeTransPixels = ($me.target as CheckBox).selected;
+        }
+
+        function whiteTolerance( $le:ListEvent ):void {
+            var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex );
+            PictureImportProperties.transColor = li.data;
+        }
     }
 
     private function pictureSize( $le:ListEvent ):void {
@@ -189,12 +237,10 @@ public class WindowPictureImport extends VVPopup {
         PictureImportProperties.grain = li.data;
         trace("picture GRAIN: " + PictureImportProperties.grain);
         var size:int = GrainCursor.get_the_g0_size_for_grain( PictureImportProperties.grain );
+        if ( null == PictureImportProperties.finalBitmapData )
+                return;
         var correctSize:BitmapData = VVBox.drawScaled( PictureImportProperties.finalBitmapData, size, size, PictureImportProperties.hasTransparency );
         _container.backgroundTexture = VVBox.drawScaled( correctSize, _container.width, _container.height, PictureImportProperties.hasTransparency );
-    }
-
-    private function toggleRemoveTransparent( $me:UIMouseEvent ):void {
-        PictureImportProperties.removeTransPixels = ($me.target as CheckBox).selected;
     }
 
     private var _loading:Boolean = false; // I get this message three times. Disable until complete
@@ -252,7 +298,7 @@ public class WindowPictureImport extends VVPopup {
         var ii:InstanceInfo = new InstanceInfo();
         ii.modelGuid = Globals.getUID();
         addListeners();
-        new ModelMakerGenerate(ii, model, false );
+        new ModelMakerGenerate(ii, model );
 
         function oxelBuildComplete($ode:OxelDataEvent):void {
             if ($ode.modelGuid == ii.modelGuid ) {
@@ -265,6 +311,9 @@ public class WindowPictureImport extends VVPopup {
         function oxelBuildFailed($ode:OxelDataEvent):void {
             if ($ode.modelGuid == ii.modelGuid ) {
                 removeListeners();
+                (new Alert( LanguageManager.localizedStringGet( "picture_import_failed" ) )).display();
+                ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
+                ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
             }
         }
 
@@ -272,13 +321,13 @@ public class WindowPictureImport extends VVPopup {
             OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
             OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
             OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
-            OxelDataEvent.addListener( ModelBaseEvent.RESULT, oxelBuildComplete );
-            OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelBuildComplete );
+//            OxelDataEvent.addListener( ModelBaseEvent.RESULT, oxelBuildComplete );
+//            OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelBuildComplete );
         }
 
         function removeListeners():void {
-            OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelBuildComplete );
-            OxelDataEvent.removeListener( ModelBaseEvent.RESULT, oxelBuildComplete );
+//            OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelBuildComplete );
+//            OxelDataEvent.removeListener( ModelBaseEvent.RESULT, oxelBuildComplete );
             OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
             OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
             OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
@@ -299,18 +348,21 @@ public class WindowPictureImport extends VVPopup {
         var gct:GrainCursor = GrainCursorPool.poolGet( PictureImportProperties.grain );
         gct.grainX = 0;
         PictureImportProperties.traceProperties();
-        const ironThreshold:uint = 0x01;
         for ( var iw:int = 0; iw < grains; iw++ ){
             for ( var ih:int = 0; ih < grains; ih++ ){
                 gct.grainY = ih;
                 gct.grainZ = iw;
                 var pixelColor:uint = bitmapData.getPixel32(iw,grains-1-ih);
                 var tOxel:Oxel;
-                if ( pixelColor == PictureImportProperties.transColor )
+                if ( PictureImportProperties.removeTransPixels
+                        && ColorUtils.extractRed( pixelColor ) >= PictureImportProperties.transColor
+                        && ColorUtils.extractBlue( pixelColor ) >= PictureImportProperties.transColor
+                        && ColorUtils.extractGreen( pixelColor ) >= PictureImportProperties.transColor )
                     tOxel = oxel.change( $op.guid, gct, TypeInfo.AIR, true);
-                else if (  ColorUtils.extractRed( pixelColor ) < ironThreshold
-                        && ColorUtils.extractBlue( pixelColor ) < ironThreshold
-                        && ColorUtils.extractGreen( pixelColor ) < ironThreshold )
+                else if (  PictureImportProperties.replaceBlackWithIron
+                        && ColorUtils.extractRed( pixelColor ) <= PictureImportProperties.blackColor
+                        && ColorUtils.extractBlue( pixelColor ) <= PictureImportProperties.blackColor
+                        && ColorUtils.extractGreen( pixelColor ) <= PictureImportProperties.blackColor )
                     tOxel = oxel.change( $op.guid, gct, TypeInfo.IRON, true);
                 else {
                     tOxel = oxel.change($op.guid, gct, PictureImportProperties.pictureStyle, true);
@@ -318,6 +370,8 @@ public class WindowPictureImport extends VVPopup {
                 }
             }
         }
+        // Since I tell the oxel.change to only change this oxel - the true.
+        // I need to force it to build faces now.
         $op.oxel.facesBuild();
         $op.save();
 
@@ -335,6 +389,7 @@ public class WindowPictureImport extends VVPopup {
                 vm.instanceInfo.positionSet = diffPos;
             }
         }
+        RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );
     }
 
     override protected function onRemoved( event:UIOEvent ):void {
