@@ -181,18 +181,18 @@ package com.voxelengine.worldmodel
 					instance.fromObject( v );
 //					if ( !instance.instanceGuid )
 //						instance.instanceGuid = Globals.getUID();
-					_objectCount++;
+					incrementObjectCount();
 					ModelMakerBase.load( instance );
 				}
 			}
-			Log.out( "Region.loadRegionObjects - END " + "  count: " + _objectCount + "=============================" );
-			if ( 0 == _objectCount ) {
+			Log.out( "Region.loadRegionObjects - END " + "  count: " + getObjectCount() + "=============================" );
+			if ( 0 == getObjectCount() ) {
 				_loaded = true;
 				RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
 				WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.DESTORY ) );
 			}
 
-			return _objectCount;
+			return getObjectCount();
 		}
 
 		private function addLoadingEventListeners():void {
@@ -227,23 +227,26 @@ package com.voxelengine.worldmodel
 			}
 		}
 
+		private function getObjectCount():int { return _objectCount;  }
+		private function incrementObjectCount():void { _objectCount++;  }
+		private function decrementObjectCount():void { if ( _objectCount > 0 ) _objectCount--;  }
 		private function parentModelAdded( $me:ModelEvent ):void  {
-			if ( 0 == _objectCount )
+			if ( 0 == getObjectCount() )
 				changed = true;
-			_objectCount--;
+			decrementObjectCount();
 		}
 
 		private function removeFailedObjectFromRegion( $e:ModelLoadingEvent ):void {
 			// Do I need to remove this failed load?
 			Log.out( "Region.removeFailedObjectFromRegion - failed to load: " + $e.data, Log.WARN );
 			currentRegion.changedForce = true;
-			_objectCount--;
+			decrementObjectCount();
 		}
 
 		private function modelChanged(e:ModelEvent):void {
 			if ( Region.currentRegion.guid == guid ) {
 				Log.out( "Region.modelChanged" );
-				if ( 0 == _objectCount )
+				if ( 0 == getObjectCount() )
 					changed = true;
 			}
 		}
@@ -284,10 +287,12 @@ package com.voxelengine.worldmodel
 		////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		override public function save():Boolean {
-			// The null owner check makes it to we dont save local loaded regions to persistance
+			// The null owner check makes it to we dont save local loaded regions to persistence
 			if ( null != owner && Globals.isGuid( guid ) ) {
-				if (changed)
+				if (changed) {
+					Log.out( "RegionManager.save saving region name: " + name, Log.WARN );
 					return super.save();
+				}
 			}
 			return false;
 		}
