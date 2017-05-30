@@ -218,28 +218,20 @@ public class RegionManager
 	}
 	
 	public function regionHas( $guid:String ):Boolean {
-		for each ( var region:Region in _regions ) {
-			if ( region && region.guid == $guid ) {
-				return true;
-			}
-		}
-		return false;
+		var region:Region = regionGet( $guid );
+		return (null != region);
 	}
 
-	private function save(event:RegionEvent):void {
-		for each ( var region:Region in _regions ) {
-			if ( region && region.guid == event.guid ) {
-				region.save();
-			}
-		}
+	private function save( $re:RegionEvent ):void {
+		var region:Region = regionGet( $re.guid );
+		if ( region )
+			region.save();
 	}
 
-	private function addModel(event:RegionEvent):void {
-		for each ( var region:Region in _regions ) {
-			if ( region && region.guid == event.guid ) {
-				region.modelCache.add( event.data );
-			}
-		}
+	private function addModel( $re:RegionEvent ):void {
+		var region:Region = regionGet( $re.guid );
+		if ( region )
+			region.modelCache.add( $re.data );
 	}
 
 } // RegionManager
