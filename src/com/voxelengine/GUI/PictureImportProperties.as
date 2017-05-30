@@ -12,7 +12,9 @@ import org.flashapi.swing.core.DeniedConstructorAccess;
 public class PictureImportProperties {
     static public var pictureStyle:int = TypeInfo.CUSTOM_GLASS;
     static public var removeTransPixels:Boolean = true;
-    static public var transColor:uint = 0xffffffff;
+    static public var replaceBlackWithIron:Boolean = true;
+    static public var blackColor:uint = 0x11;
+    static public var transColor:uint = 0xf0;
     static public var grain:uint = 5;
     static public var referenceBitmapData:BitmapData = null;
     static public var finalBitmapData:BitmapData = null;
@@ -26,7 +28,9 @@ public class PictureImportProperties {
     static public function reset():void {
         pictureStyle = TypeInfo.CUSTOM_GLASS;
         removeTransPixels = true;
-        transColor = 0xffffffff;
+        replaceBlackWithIron = true;
+        blackColor = 0x11;
+        transColor = 0xf0;
         grain = 5;
         referenceBitmapData = null;
         finalBitmapData = null;
@@ -38,6 +42,8 @@ public class PictureImportProperties {
         trace( "======== PictureProperties =============");
         trace( "pictureStyle = " + pictureStyle );
         trace( "removeTransPixels = " + removeTransPixels );
+        trace( "replaceBlackWithIron = " + replaceBlackWithIron );
+        trace( "blackColor = " + blackColor.toString(16) );
         trace( "transColor = " + transColor.toString(16) );
         trace( "grain = " + grain );
         trace( "referenceBitmapData w: " + referenceBitmapData.width + " h: " + referenceBitmapData.height);
