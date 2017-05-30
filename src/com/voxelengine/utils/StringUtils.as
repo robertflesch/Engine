@@ -1,6 +1,9 @@
 ﻿package com.voxelengine.utils {
+import flash.display.BitmapData;
+import flash.geom.Matrix;
+import flash.text.TextField;
 
-	/**
+/**
 	* 	String Utilities class by Ryan Matsikas, Feb 10 2006
 	*
 	*	Visit www.gskinner.com for documentation, updates and more free code.
@@ -34,7 +37,16 @@
 			return fileName;
 		}
 
-
+		function drawString(target:BitmapData,text:String,x:Number,y:Number):void {
+			var tf:TextField = new TextField();
+			tf.text = text;
+			var bmd:BitmapData = new BitmapData(tf.width,tf.height);
+			bmd.draw(tf);
+			var mat:Matrix = new Matrix();
+			mat.translate(x,y);
+			target.draw(bmd,mat);
+			bmd.dispose();
+		}
 
 		/**
 		*	Returns everything after the first occurrence of the provided character in the string.
