@@ -1065,11 +1065,11 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	public function facesBuild( $forceRebuild:Boolean = false ):void {
 		if ( dirty || $forceRebuild ) {
 			if ( childrenHas() ) {
-				if ( facesHas() ) // parents don't have faces!
-					facesClearAll();
-				for each ( var child:Oxel in _children )
+				for ( var i:int=0; i < 8; i++ ) {
+                    var child:Oxel = _children[i];
 					if ( child.dirty || $forceRebuild )
 						child.facesBuild( $forceRebuild );
+				}
 			}
 			else {
 				if ( $forceRebuild )
