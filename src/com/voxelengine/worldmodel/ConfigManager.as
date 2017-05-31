@@ -106,7 +106,7 @@ package com.voxelengine.worldmodel
 				Network.autoLogin( _defaultRegionJson.config.region.startingRegion );
 			}
 			else // loading local
-				LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_CONFIG_COMPLETE, _defaultRegionJson.config.region.startingRegion ) );
+				LoadingEvent.create( LoadingEvent.LOAD_CONFIG_COMPLETE, _defaultRegionJson.config.region.startingRegion );
 		}
 		
 		private function listenForLoginSuccess( $event:LoginEvent ):void {

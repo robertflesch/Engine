@@ -62,7 +62,7 @@ import com.voxelengine.events.RegionEvent;
 						
 					if ( vm == VoxelModel.controlledModel )
 					{
-						LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.PLAYER_LOAD_COMPLETE, _modelGuid ) );
+						LoadingEvent.create( LoadingEvent.PLAYER_LOAD_COMPLETE, _modelGuid );
 					}
 					else {
 						if ( vm.instanceInfo.critical )
@@ -83,7 +83,7 @@ import com.voxelengine.events.RegionEvent;
 			//Log.out( "CompletedModel.start - completedModel: " + _guid + "  count: " + _count );
 				
 			if ( 0 == _count  ) { // && _playerLoaded  should I add ( null != Player.player )
-				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the LoadingEvent.LOAD_COMPLETE event vm: " + _modelGuid );
+				Log.out( "CompletedModel.start - ALL MODELS LOADED - dispatching the ModelLoadingEvent.CHILD_LOADING_COMPLETE event vm: " + _modelGuid );
 				ModelLoadingEvent.create( ModelLoadingEvent.CHILD_LOADING_COMPLETE, ohd );
 			}
 			

@@ -66,12 +66,6 @@ import flash.events.Event;
 			event.target.removeEventListener(ImageEvent.IMAGE_LOADED, imageLoaded );
 		}
 		
-		private function onModelLoadComplete( event:LoadingEvent):void
-		{
-			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onModelLoadComplete );
-			buildActions();
-		}
-		
 		private function onRemoved( event:UIOEvent ):void
  		{
 			removeListeners();

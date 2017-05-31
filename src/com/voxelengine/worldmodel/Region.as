@@ -8,18 +8,10 @@
 package com.voxelengine.worldmodel
 {
 	import flash.geom.Vector3D;
-	import flash.events.Event;
-    import flash.events.TimerEvent;
-	import flash.utils.ByteArray;
-    import flash.utils.Timer;
-
-	import org.flashapi.swing.Alert;
-	
 	import playerio.DatabaseObject;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
-	import com.voxelengine.events.PersistenceEvent;
 	import com.voxelengine.events.ModelEvent;
 	import com.voxelengine.events.RegionEvent;
 	import com.voxelengine.events.LoadingEvent;
@@ -28,7 +20,6 @@ package com.voxelengine.worldmodel
 	import com.voxelengine.events.ModelLoadingEvent;
 	import com.voxelengine.server.Network;
 	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-	import com.voxelengine.worldmodel.models.types.Avatar;
 	import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.InstanceInfo;
 	import com.voxelengine.worldmodel.models.ModelCache;
@@ -53,8 +44,8 @@ package com.voxelengine.worldmodel
 		// INSTANCE AND EXPORTED - Run time optimization
 		private var _skyColor:Vector3D = new Vector3D();
 
-		public function get worldId():String { return dbo.worldId; }
-		public function set worldId(val:String):void { dbo.worldId = val; }
+		//public function get worldId():String { return dbo.worldId; }
+		//public function set worldId(val:String):void { dbo.worldId = val; }
 		public function get owner():String { return dbo.owner; }
 		public function set owner(val:String):void { dbo.owner = val; }
 		public function get desc():String { return dbo.desc; }
@@ -115,7 +106,7 @@ package com.voxelengine.worldmodel
 		}
 
 		override protected function assignNewDatabaseObject():void {
-			super.assignNewDatabaseObject()
+			super.assignNewDatabaseObject();
 			dbo.models = [];
 			dbo.skyColor = {"x": 92, "y": 172, "z": 238};
 			dbo.gravity = false;
@@ -198,8 +189,8 @@ package com.voxelengine.worldmodel
 		private function addLoadingEventListeners():void {
 			RegionEvent.addListener( ModelBaseEvent.CHANGED, 					regionChanged );
 			RegionEvent.addListener( RegionEvent.UNLOAD, 						unload );
-				
-			LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, 				onLoadingComplete );
+
+			RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, 				onLoadingComplete );
 			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_FAILURE,removeFailedObjectFromRegion );
 				
 			ModelEvent.addListener( ModelEvent.CRITICAL_MODEL_DETECTED,			onCriticalModelDetected );
@@ -211,7 +202,7 @@ package com.voxelengine.worldmodel
 			RegionEvent.removeListener( ModelBaseEvent.CHANGED, 				regionChanged );
 			RegionEvent.removeListener( RegionEvent.UNLOAD, 					unload );
 
-			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, 			onLoadingComplete );
+			RegionEvent.removeListener( RegionEvent.LOAD_COMPLETE, 				onLoadingComplete );
 
 			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_FAILURE,	removeFailedObjectFromRegion );
 
@@ -258,10 +249,10 @@ package com.voxelengine.worldmodel
 			//release(); // Dont release it, memory is invalidated
 		}
 		
-		private function onLoadingComplete( le:LoadingEvent ):void {
+		private function onLoadingComplete( le:RegionEvent ):void {
 			//Log.out( "Region.onLoadingComplete: regionId: " + guid, Log.WARN );
 			_loaded = true;
-			LoadingEvent.removeListener( LoadingEvent.LOAD_COMPLETE, onLoadingComplete );
+			RegionEvent.removeListener( RegionEvent.LOAD_COMPLETE, onLoadingComplete );
 			//RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, 0, guid ) );
 		}
 		public function toString():String {

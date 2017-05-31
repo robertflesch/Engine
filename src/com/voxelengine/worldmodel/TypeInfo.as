@@ -293,7 +293,7 @@ import flash.utils.getTimer;
 					TypeInfo.typeInfoByName[ti.name.toUpperCase()] = ti;
 				}
 
-				LoadingEvent.dispatch( new LoadingEvent( LoadingEvent.LOAD_TYPES_COMPLETE ) );
+				LoadingEvent.create( LoadingEvent.LOAD_TYPES_COMPLETE );
 			}
 			catch ( error:Error )
 			{

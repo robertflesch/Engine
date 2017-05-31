@@ -244,7 +244,8 @@ public class ModelMakerBase {
 		_makerCount-- ;
 		if ( 0 == makerCountGet() ) {
 			LoadingImageEvent.create( LoadingImageEvent.DESTROY );
-			RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
+			if ( !Region.currentRegion.loaded )
+				RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
 		}
 	}
 	

@@ -17,7 +17,6 @@ import flash.events.EventDispatcher;
  */
 public class LoadingEvent extends Event
 {
-	static public const LOAD_COMPLETE:String			= "LOAD_COMPLETE";
 	static public const PLAYER_LOAD_COMPLETE:String		= "PLAYER_LOAD_COMPLETE";
 // MOVE TO MODEL EVENT		
 	static public const TEMPLATE_MODEL_COMPLETE:String	= "TEMPLATE_MODEL_COMPLETE";
@@ -39,7 +38,7 @@ public class LoadingEvent extends Event
 	
 	///////////////// Event handler interface /////////////////////////////
 
-	// Used to distribue all persistance messages
+	// Used to distribute all persistence messages
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
@@ -50,10 +49,9 @@ public class LoadingEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:LoadingEvent ) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
+	static public function create( $type:String, $modelGuid:String = "" ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new LoadingEvent( $type, $modelGuid ) );
 	}
-
 	///////////////// Event handler interface /////////////////////////////
 }
 }

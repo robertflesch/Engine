@@ -43,7 +43,6 @@ package com.voxelengine.worldmodel.scripts
 					OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete )
 					
 					//LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
-					//LoadingEvent.addListener( LoadingEvent.LOAD_COMPLETE, onLoadingPlayerComplete );
 				}
 			}
 		}
