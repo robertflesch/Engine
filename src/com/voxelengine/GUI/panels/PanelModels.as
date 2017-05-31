@@ -204,7 +204,7 @@ public class PanelModels extends PanelBase
 		container.addElement( _deleteButton );
 		container.height += _deleteButton.height + pbPadding;
 		
-		_detailButton = new Button( LanguageManager.localizedStringGet( "Model_Detail" ) );
+		_detailButton = new Button( LanguageManager.localizedStringGet( "instance_details" ) );
 		_detailButton.y = currentY = currentY + BUTTON_DISTANCE;
 		_detailButton.x = 5;
 		_detailButton.width = btnWidth;
