@@ -18,17 +18,13 @@ import com.voxelengine.Globals;
 import com.voxelengine.events.*;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.PersistenceObject;
-import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 
-public class Inventory extends PersistenceObject
-{
-	// support data for persistence
-	private var _generateNewInventory:Boolean;
+public class Inventory extends PersistenceObject {
 	private var _loaded:Boolean;
 
-	private var  _slots:Slots
+	private var  _slots:Slots;
 	private var _voxels:Voxels;
 	private var _characterSlots:CharacterSlots;
 	public function get slots():Slots  { return _slots; }
@@ -42,12 +38,7 @@ public class Inventory extends PersistenceObject
 		_slots = new Slots( this );
 		_voxels = new Voxels( this );
 		_characterSlots = new CharacterSlots( this );
-//		ModelLoadingEvent.addListener( ModelLoadingEvent.CHILD_LOADING_COMPLETE, childLoadingComplete );
 	}
-
-//	private function childLoadingComplete( $mle:ModelLoadingEvent ):void {
-//		_characterSlots.loadCharacterInventory();
-//	}
 
 	public function characterSlotGet( $slot:String ):String {
 		return _characterSlots.items[$slot];
@@ -61,7 +52,6 @@ public class Inventory extends PersistenceObject
 	}
 		
 	public function deleteInventory():void {
-		
 		PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, 0, Globals.BIGDB_TABLE_INVENTORY, guid, null ) );
 		_slots = null;
 		_voxels = null;
@@ -95,7 +85,7 @@ public class Inventory extends PersistenceObject
 
 	override protected function toObject():void {
 		_slots.toObject( dbo );
-		dbo.modifiedData = new Date().toUTCString()
+		dbo.modifiedData = new Date().toUTCString();
 		// voxels
 		var ba:ByteArray = new ByteArray(); 
 		ba.writeUTF( guid );
@@ -106,21 +96,13 @@ public class Inventory extends PersistenceObject
 	}
 
 	public function fromObject( $dbo:DatabaseObject ):void {
-		var isNewRecord:Boolean = false;
 		if ( $dbo ) {
 			dbo  = $dbo;
+			// Slot data is stored as fields for easy analysis
+			// we can know what user carry around
             _slots.fromObject( dbo );
-		}
-		else {
-			super.assignNewDatabaseObject();
-			isNewRecord = true;
-            _slots.addSlotDefaultData();
-		}
-		
-		// Slot data is stored as fields for easy analysis
-		// we can know what user carry around
+			_characterSlots.fromObject( dbo );
 
-		if ( dbo && dbo.voxelData ) {
 			var ba:ByteArray = dbo.voxelData;
 			if ( ba && 0 < ba.bytesAvailable ) {
 				try { ba.uncompress(); }
@@ -128,29 +110,21 @@ public class Inventory extends PersistenceObject
 					Log.out( "Inventory.fromObject - Was expecting compressed oxelPersistence " + guid, Log.WARN ); }
 				ba.position = 0;
 
-//				ba.uncompress();
+				// have to read it!
+				// TODO should version it!
 				var ownerId:String = ba.readUTF();
 				_voxels.fromObject( ba );
 			}
 		}
 		else {
+			super.assignNewDatabaseObject();
+            _slots.addDefaultData();
 			var ownerModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( guid );
 			if ( ownerModel && ownerModel == VoxelModel.controlledModel )
 				_voxels.addTestData();
-		}
-
-		if ( $dbo ) {
-			dbo  = $dbo;
-			_characterSlots.fromObject( dbo );
-		}
-		else {
-			super.assignNewDatabaseObject();
-			isNewRecord = true;
-			//_characterSlots.addSlotDefaultData();
-		}
-
-		if ( isNewRecord )
+			_characterSlots.addDefaultData();
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, guid, null ) );
+		}
 	}
 	
 	public function load():void {

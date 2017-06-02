@@ -10,6 +10,7 @@ package com.voxelengine.GUI
 {
 import com.voxelengine.GUI.crafting.WindowCharacter;
 import com.voxelengine.events.HelpEvent;
+import com.voxelengine.worldmodel.models.types.EditCursor;
 
 import flash.display.Sprite;
 import flash.events.Event;

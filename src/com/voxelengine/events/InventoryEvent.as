@@ -68,6 +68,9 @@ public class InventoryEvent extends Event
 		return _eventDispatcher.dispatchEvent( $event );
 	}
 
+	static public function create( $type:String, $owner:String, $result:* ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new InventoryEvent( $type, $owner, $result ) );
+	}
 	///////////////// Event handler interface /////////////////////////////
 }
 }

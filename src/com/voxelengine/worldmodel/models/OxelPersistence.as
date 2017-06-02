@@ -156,8 +156,8 @@ public class OxelPersistence extends PersistenceObject
 					return;
 			if ( topMostChunk.dirtyFacesOrQuads || forceFaces || forceQuads )
 			{
-				if ( "EditCursor" != guid )
-					Log.out("OxelPersistence.update ------------ calling facesAndQuadsBuild guid: " + guid + "  with forceFaces: " + forceFaces + "  forceQuads: " + forceQuads + "  dirtyFacesOrQuads: " + topMostChunk.dirtyFacesOrQuads, Log.DEBUG);
+//				if ( "EditCursor" != guid )
+//					Log.out("OxelPersistence.update ------------ calling facesAndQuadsBuild guid: " + guid + "  with forceFaces: " + forceFaces + "  forceQuads: " + forceQuads + "  dirtyFacesOrQuads: " + topMostChunk.dirtyFacesOrQuads, Log.DEBUG);
 //				if ( forceFaces || forceQuads )
 //						changed = true;
 				var buildFaces:Boolean = true;

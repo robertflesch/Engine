@@ -43,7 +43,11 @@ public class CharacterSlots {
         }
     }
 
-    private function createObjectFromInventoryString($data:String, $slotId:int):ObjectInfo {
+    public function addDefaultData():void {
+        Log.out( "CharacterSlots.addDefaultData", Log.WARN );
+    }
+
+    static private function createObjectFromInventoryString($data:String, $slotId:int):ObjectInfo {
         // find the first comma so we can get the substring with the object type
         var type:int = int($data.charAt(0));
         if (type == 1)

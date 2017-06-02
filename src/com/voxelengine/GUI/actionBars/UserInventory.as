@@ -12,6 +12,7 @@ import com.voxelengine.events.AppEvent;
 import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.events.InventoryModelEvent;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.models.ModelPlacementType;
 import flash.display.DisplayObject;
 import flash.events.Event;
@@ -106,11 +107,8 @@ public class  UserInventory extends QuickInventory
 		
 		_s_currentInstance = this;
 		
-		EditCursor.currentInstance;
-
 		RoomEvent.addListener( RoomEvent.ROOM_JOIN_SUCCESS, onJoinRoomEvent );
 		InventoryEvent.addListener( InventoryEvent.RESPONSE, inventoryLoaded );
-		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, _owner, null ) );
 		InventoryModelEvent.addListener( ModelBaseEvent.DELETE, modelDeleted );
 		CursorOperationEvent.addListener( CursorOperationEvent.NONE, onCursorOperationNone )	
 	}
@@ -165,6 +163,7 @@ public class  UserInventory extends QuickInventory
 		if ( Globals.inRoom && _s_currentInstance ) {
 			with ( _s_currentInstance ) {
 				// display it!
+				populate();
 				visible = true;
 				_inventory.visible = true;
 				_propList.visible = true;
@@ -184,7 +183,12 @@ public class  UserInventory extends QuickInventory
 		_s_currentInstance.remove();
 		//Log.out( "UserInventory.closeEvent ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
 	}
-	
+
+	private function populate():void {
+		InventoryEvent.addListener( InventoryEvent.RESPONSE, inventoryLoaded );
+		InventoryEvent.create( InventoryEvent.REQUEST, _owner, null );
+
+	}
 	private function inventoryLoaded(e:InventoryEvent):void {
 		//Log.out( "UserInventory.inventoryLoaded - ENTER - owner: " + _owner + "  e.owner: " + e.owner, Log.WARN );
 		if ( e.owner == _owner ) {
@@ -192,7 +196,7 @@ public class  UserInventory extends QuickInventory
 			_inventoryLoaded = true;
 			var inv:Inventory = e.result as Inventory;
 			var slots:Slots = inv.slots;
-			
+
 			var items:Vector.<ObjectInfo> = slots.items;
 			for ( var i:int = 0; i < Slots.ITEM_COUNT; i++ ) {
 				var item:ObjectInfo = items[i];
@@ -426,35 +430,22 @@ public class  UserInventory extends QuickInventory
 		lastBoxesSelection = boxesIndex;
 	}
 	
-	private function cursorReady(e:LoadingEvent):void  {
-		LoadingImageEvent.create( LoadingImageEvent.DESTROY );
-		//Log.out( "UserInventory.cursorReady - ObjectModel guid: " + e.guid, Log.WARN );
-	}
-	
 	private function onMouseWheel(event:MouseEvent):void {
-		
 		if ( event.ctrlKey || event.shiftKey || event.altKey )
 			return;
 			
 		if ( 0 < event.delta ) {
 			if ( lastBoxesSelection < (Slots.ITEM_COUNT - 1)  )
-			{
 				selectByIndex( lastBoxesSelection + 1 );
-			}
 			else if ( ( Slots.ITEM_COUNT -1 ) == lastBoxesSelection )
-			{
 				selectByIndex( 0 );
-			}
-		} else
-			if ( 0 == lastBoxesSelection )
-			{
-				selectByIndex( Slots.ITEM_COUNT - 1 );
-			}
-			else if ( 0 < lastBoxesSelection )
-			{
-				selectByIndex( lastBoxesSelection - 1 );
-			}
-	}	
+		} else {
+			if (0 == lastBoxesSelection)
+				selectByIndex(Slots.ITEM_COUNT - 1);
+			else if (0 < lastBoxesSelection)
+				selectByIndex(lastBoxesSelection - 1);
+		}
+	}
 
 	private function showGrainTools():void {
 		_toolSize.show();

@@ -177,7 +177,7 @@ public class ModelMakerBase {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// OxelPersistence
 	protected function addODEListeners():void {
-		Log.out( "ModelMakerBase.addODEListeners  guid: " + modelInfo.guid, Log.WARN );
+		//Log.out( "ModelMakerBase.addODEListeners  guid: " + modelInfo.guid, Log.WARN );
 		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
 		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
 		OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
@@ -194,7 +194,7 @@ public class ModelMakerBase {
 	}
 
 	protected function oxelPersistenceComplete($ode:OxelDataEvent):void {
-		Log.out( "ModelMakerBase.oxelPersistenceComplete  $ode.modelGuid: " + $ode.modelGuid + " type: " + $ode.type , Log.WARN );
+		//Log.out( "ModelMakerBase.oxelPersistenceComplete  $ode.modelGuid: " + $ode.modelGuid + " type: " + $ode.type , Log.WARN );
 		if ($ode.modelGuid == modelInfo.guid ) {
 			Log.out( "ModelMakerBase.oxelPersistenceComplete  guid: " + modelInfo.guid + " type: " + $ode.type , Log.WARN );
 			modelInfo.oxelPersistence = $ode.oxelPersistence;
@@ -207,15 +207,15 @@ public class ModelMakerBase {
 			_vm.complete = true;
 			if ( _vm && addToRegionWhenComplete )
 				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vm );
-		} else {
-			Log.out( "ModelMakerBase.oxelPersistenceComplete guid: " + modelInfo.guid + "  is REJECTING guid: " + $ode.modelGuid, Log.WARN );
-		}
+		} //else {
+			//Log.out( "ModelMakerBase.oxelPersistenceComplete guid: " + modelInfo.guid + "  is REJECTING guid: " + $ode.modelGuid, Log.WARN );
+		//}
 	}
 
 	// This last step is needed for model which have children.
 	protected function oxelBuildComplete($ode:OxelDataEvent):void {
 		if ($ode.modelGuid == modelInfo.guid ) {
-			Log.out( "ModelMakerBase.oxelBuildComplete  guid: " + modelInfo.guid, Log.WARN );
+			//Log.out( "ModelMakerBase.oxelBuildComplete  guid: " + modelInfo.guid, Log.WARN );
 			removeODEListeners();
 			markComplete( true );
 		}

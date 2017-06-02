@@ -7,18 +7,8 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-import com.voxelengine.Globals;
-import com.voxelengine.events.InventorySlotEvent;
-import com.voxelengine.events.LoadingEvent;
-import com.voxelengine.events.LoginEvent;
-import com.voxelengine.persistance.Persistence;
-import com.voxelengine.worldmodel.RegionManager;
-import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.inventory.ObjectAction;
-import com.voxelengine.worldmodel.inventory.ObjectTool;
-import com.voxelengine.worldmodel.models.makers.ModelMaker;
-import com.voxelengine.worldmodel.models.types.Avatar;
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
+
+import com.voxelengine.events.InventoryEvent;
 
 import flash.geom.Vector3D;
 
@@ -26,27 +16,26 @@ import playerio.DatabaseObject;
 import playerio.PlayerIOError;
 
 import com.voxelengine.Log;
-
+import com.voxelengine.events.InventorySlotEvent;
+import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.RegionEvent;
+import com.voxelengine.persistance.Persistence;
 import com.voxelengine.server.Network;
-
+import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.inventory.ObjectAction;
+import com.voxelengine.worldmodel.inventory.ObjectTool;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.*;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 
 public class Player extends PersistenceObject
 {
-	private static var _s_player:Player;
-	public static function get player():Player {
-		if ( null == _s_player )
-				_s_player = new Player();
-		return _s_player; }
-	//public static function set player( val:Player ):void { _s_player = val; }
-	public static var _playerModel:Avatar;
-	
+	private static var _s_player:Player = null;
+	public static function get player():Player { return _s_player; }
+
 	public function Player() {
 		super( "local", "PlayerObjects" );
 		Log.out( "Player.construct" );
@@ -62,7 +51,7 @@ public class Player extends PersistenceObject
 		}
 	}
 
-	private function onRegionLoad( $re:RegionEvent ):void {
+	static private function onRegionLoad( $re:RegionEvent ):void {
 		if ( VoxelModel.controlledModel ) {
 			if ( null == Region.currentRegion.modelCache.instanceGet( VoxelModel.controlledModel.instanceInfo.instanceGuid ) )
 				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, VoxelModel.controlledModel );
@@ -110,7 +99,8 @@ public class Player extends PersistenceObject
 				$dbo.createdDate = new Date().toUTCString();
 				$dbo.save();
 			}
-			// Dont modify the modelGuid, change it in the DB if needed
+			// Don't modify the modelGuid, change it in the DB if needed
+			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, Network.userId, null ) );
 			createPlayer( $dbo.modelGuid, Network.userId );
 		}
 		else {
@@ -118,7 +108,11 @@ public class Player extends PersistenceObject
 		}
 	}
 
-	public function createPlayer( $modelGuid:String, $userId:String ):void {
+	static public function createPlayer( $modelGuid:String, $userId:String ):void {
+
+		if ( null == _s_player ) {
+			_s_player = new Player();
+		}
 
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.modelGuid = $modelGuid;
@@ -131,7 +125,7 @@ public class Player extends PersistenceObject
 			var model:Object = GenerateCube.script(4, TypeInfo.BLUE);
 			model.modelClass = "Avatar";
 			model.name = "Temp Avatar";
-			new ModelMakerGenerate(ii, model, true)
+			new ModelMakerGenerate(ii, model, true);
 		}
 		else {
 			new ModelMaker(ii, false, false);
@@ -146,7 +140,7 @@ public class Player extends PersistenceObject
 		Log.out( "Player.playerModelLoaded");
 		if ( $mle.vm && ( $mle.vm.instanceInfo.instanceGuid == Network.userId || $mle.vm.instanceInfo.instanceGuid == Network.LOCAL ) ){
 			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
-			_playerModel = $mle.vm as Avatar;
+			//_playerModel = $mle.vm as Avatar;
 			if ( null == Region.currentRegion.modelCache.instanceGet( $mle.vm.instanceInfo.instanceGuid ) ) {
 				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, $mle.vm );
 
@@ -161,7 +155,7 @@ public class Player extends PersistenceObject
 	static private function defaultSlotDataRequest( $ise:InventorySlotEvent ):void {
 		// inventory is always on a instance guid.
 		if ( VoxelModel.controlledModel.instanceInfo.instanceGuid == $ise.instanceGuid ) {
-			InventorySlotEvent.removeListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest )
+			InventorySlotEvent.removeListener( InventorySlotEvent.DEFAULT_REQUEST, defaultSlotDataRequest );
 			Log.out( "Player.getDefaultSlotData - Loading default data into slots" , Log.WARN );
 
 			var ot:ObjectTool = new ObjectTool( null, "D0D49F95-706B-0E76-C187-DCFD920B8883", "pickToolSlots", "pick.png", "pick" );

@@ -60,7 +60,6 @@ public class OxelDataEvent extends ModelBaseEvent
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
-		trace( "OxelDataEvent.addListener type: " + $type );
 		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
 	}
 
@@ -69,7 +68,6 @@ public class OxelDataEvent extends ModelBaseEvent
 	}
 
 	static public function create($type:String, $series:int, $guid:String, $vmd:OxelPersistence, $fromTable:Boolean = true, $generated:Boolean = false, $generationData:Object = null ) : Boolean {
-		trace( "OxelDataEvent.create type: " + $type );
 		return _eventDispatcher.dispatchEvent( new OxelDataEvent( $type, $series, $guid, $vmd, $fromTable, $generated, $generationData ) );
 	}
 	///////////////// Event handler interface /////////////////////////////

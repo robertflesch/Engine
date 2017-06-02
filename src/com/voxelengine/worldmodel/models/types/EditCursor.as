@@ -72,26 +72,26 @@ public class EditCursor extends VoxelModel
 	static private function get lastSize():int 						{ return _lastSize; }
 
 	
-	static public function get currentInstance():EditCursor {
-		if ( null == _s_currentInstance ) {
-			var ii:InstanceInfo = new InstanceInfo();
-			ii.modelGuid = EDIT_CURSOR;
-			var creationInfo:Object = GenerateCube.script( 4, TypeInfo.BLUE );
-			creationInfo.modelClass = EDIT_CURSOR;
-			creationInfo.name = EDIT_CURSOR;
-			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, buildComplete );
-			new ModelMakerGenerate( ii, creationInfo, true, false );
+	static public function get currentInstance():EditCursor { return _s_currentInstance; }
+
+	static public function createCursor():void {
+		var ii:InstanceInfo = new InstanceInfo();
+		ii.modelGuid = EDIT_CURSOR;
+		var creationInfo:Object = GenerateCube.script( 4, TypeInfo.BLUE );
+		creationInfo.modelClass = EDIT_CURSOR;
+		creationInfo.name = EDIT_CURSOR;
+		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, buildComplete );
+		new ModelMakerGenerate( ii, creationInfo, true, false );
+
+		function buildComplete( $mle:ModelLoadingEvent ):void {
+			var ohd:ObjectHierarchyData = $mle.data;
+			if ( EDIT_CURSOR == ohd.modelGuid ) {
+				_s_currentInstance = $mle.vm as EditCursor;
+				ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, buildComplete );
+			}
 		}
-		return _s_currentInstance;
 	}
 
-	static private function buildComplete( $mle:ModelLoadingEvent ):void {
-		var ohd:ObjectHierarchyData = $mle.data;
-		if ( EDIT_CURSOR == ohd.modelGuid ) {
-			_s_currentInstance = $mle.vm as EditCursor;
-			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, buildComplete );
-		}
-	}
 
 	override public function set dead(val:Boolean):void {
 		Log.out( "EditCursor.dead - THIS MODEL IS IMMORTAL", Log.WARN );
@@ -109,14 +109,14 @@ public class EditCursor extends VoxelModel
 	
 	private 		  	var _cursorOperation:String 					= CursorOperationEvent.NONE;
 	private  function 	get cursorOperation():String 					{ return _cursorOperation; }
-	private  function 	set cursorOperation(val:String):void 			{ 
-		_cursorOperation = val; 
+	private  function 	set cursorOperation(val:String):void 			{
+		_cursorOperation = val;
 		if ( _cursorOperation == CursorOperationEvent.NONE ) {
 			editing = false;
 			repeatTimerStop()
 		}
 		else
-			editing = true
+			editing = true;
 	}
 	
 	private 		 	var _cursorShape:String 						= CursorShapeEvent.SQUARE;		// round, square, cylinder
@@ -149,6 +149,10 @@ public class EditCursor extends VoxelModel
 
 	override public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
 		super.init( $mi, $vmm );
+		addListeners();
+	}
+
+	private function addListeners():void {
 		CursorOperationEvent.addListener( CursorOperationEvent.NONE, 			resetEvent );
 		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_OXEL, 	deleteOxelEvent );
 		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_MODEL, 	deleteModelEvent);
@@ -221,7 +225,6 @@ public class EditCursor extends VoxelModel
 	static private function resetEvent(e:CursorOperationEvent):void {
 		editing = false
 	}
-	
 	private function deleteOxelEvent(e:CursorOperationEvent):void {
 		editing = true;
 		cursorOperation = e.type;
@@ -406,7 +409,6 @@ public class EditCursor extends VoxelModel
 
 		modelInfo.oxelPersistence.oxel.change( EDIT_CURSOR, modelInfo.oxelPersistence.oxel.gc, oxelTexture, true );
 
-
 		// This decides how many sides the edit cursor has.
 		if ( CursorShapeEvent.CYLINDER == cursorShape || CursorShapeEvent.SPHERE == cursorShape ) {
 			// I could use gciData.near to determine which single face to use, but seems like overkill
@@ -429,7 +431,8 @@ public class EditCursor extends VoxelModel
 			modelInfo.oxelPersistence.oxel.faceSet( Globals.NEGZ );
 		}
 
-		modelInfo.oxelPersistence.oxel.quadsBuild( true );
+		modelInfo.oxelPersistence.oxel.facesBuild();
+		modelInfo.oxelPersistence.oxel.quadsBuild();
 
 		function cursorColorRainbow():uint {
 			var frequency:Number = 2.4;

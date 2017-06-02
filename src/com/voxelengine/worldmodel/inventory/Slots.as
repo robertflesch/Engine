@@ -83,9 +83,8 @@ public class Slots
 		return new ObjectInfo( null, ObjectInfo.OBJECTINFO_INVALID );
 	}
 
-	import flash.utils.getQualifiedClassName;
-	public function addSlotDefaultData():void {
-		Log.out( "Slots.addSlotDefaultData", Log.WARN );
+	public function addDefaultData():void {
+		Log.out( "Slots.addDefaultData", Log.WARN );
 		initializeSlots();
 
 		// is guid model OR instance?
@@ -96,9 +95,6 @@ public class Slots
 		_owner.loaded = true;
 		InventorySlotEvent.create( InventorySlotEvent.DEFAULT_REQUEST, _owner.guid, _owner.guid, 0, null );
 	}
-
-
-
 
 	public function fromObject( $info:Object ):void {	
 		if ( $info && $info.slot0 ) {
@@ -168,7 +164,7 @@ public class Slots
 	
 
 	private function initializeSlots():void {
-		for ( var i:int; i < ITEM_COUNT; i++ ) {
+		for ( var i:int=0; i < ITEM_COUNT; i++ ) {
 			setItemData( i, new ObjectInfo( null, ObjectInfo.OBJECTINFO_EMPTY ) );
 		}
 	}

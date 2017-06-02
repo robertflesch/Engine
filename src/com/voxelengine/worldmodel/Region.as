@@ -153,7 +153,7 @@ import flash.geom.Vector3D;
 			Log.out( "Region.load - loading    GUID: " + guid + "  name: " +  name, Log.DEBUG );
 
 			if ( !Globals.online )
-				Player.player.createPlayer(Player.DEFAULT_PLAYER, Network.LOCAL );
+				Player.createPlayer(Player.DEFAULT_PLAYER, Network.LOCAL );
 
 
 			addLoadingEventListeners();
