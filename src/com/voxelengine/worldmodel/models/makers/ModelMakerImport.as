@@ -45,12 +45,12 @@ public class ModelMakerImport extends ModelMakerBase {
 		// This should never happen in a release version, so dont worry about setting it to false when done
 		_isImporting = true;
 		_prompt = $prompt;
-		super( $ii, false );
+		super( $ii );
 		Log.out( "ModelMakerImport - ii: " + ii.toString(), Log.DEBUG );
-		retrieveBaseInfo();
+		requestModelInfo();
 	}
 
-	override protected function retrieveBaseInfo():void {
+	override protected function requestModelInfo():void {
 		addMIEListeners();
 		// Since this is the import, it uses the local file system rather then persistance
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST, 0, ii.modelGuid, null, ModelBaseEvent.USE_FILE_SYSTEM ) );
@@ -183,27 +183,11 @@ public class ModelMakerImport extends ModelMakerBase {
 
 	}
 
-	// This listens to a limited set of success options, which is only the COMPLETE success
-	override protected function addODEListeners():void {
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
-		OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
-	}
-
-	override protected function removeODEListeners():void {
-		OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
-		OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
-		OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
-	}
-
-
 	override protected function oxelBuildComplete($ode:OxelDataEvent):void {
 		if ($ode.modelGuid == modelInfo.guid ) {
+			Log.out( "ModelMakerBase.oxelBuildComplete  guid: " + modelInfo.guid, Log.ERROR );
 			removeODEListeners();
-			var op:OxelPersistence = $ode.oxelPersistence;
-			op.forceFaces = false;
-			op.forceQuads = false;
-			modelInfo.oxelPersistence = op;
+			// This has the additional wait for children
 			if ( !waitForChildren )
 				markComplete( true );
 		}
@@ -212,6 +196,8 @@ public class ModelMakerImport extends ModelMakerBase {
 	override protected function oxelBuildFailed($ode:OxelDataEvent):void {
 		if ($ode.modelGuid == modelInfo.guid ) {
 			removeODEListeners();
+			modelInfo.oxelPersistence = null;
+			_vm.dead = true;
 			if ( waitForChildren ) {
 				Log.out("ModelMakerImport - ERROR LOADING OXEL", Log.WARN);
 				// TODO cancel children loading???

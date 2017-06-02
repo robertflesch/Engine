@@ -193,7 +193,7 @@ import org.flashapi.swing.list.ListItem;
 		}
 		private function closeFunction():void {
 			// This forces the shutdown of the spalsh screen.
-			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.ANNIHILATE ) );
+			WindowSplashEvent.create( WindowSplashEvent.ANNIHILATE );
 		}
 		
 		// Allows the enter key to activate the login key.

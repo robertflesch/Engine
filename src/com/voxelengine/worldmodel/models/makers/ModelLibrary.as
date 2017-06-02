@@ -8,7 +8,9 @@
 
 package com.voxelengine.worldmodel.models.makers
 {
-	import flash.utils.getDefinitionByName;
+import com.voxelengine.worldmodel.models.types.EditCursor;
+
+import flash.utils.getDefinitionByName;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
@@ -38,6 +40,7 @@ package com.voxelengine.worldmodel.models.makers
 			Dragon;
 			Propeller;
 			Target;
+			EditCursor;
 			//
 			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.models.types.VoxelModel" ) );
 			try 

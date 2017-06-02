@@ -149,8 +149,8 @@ public class OxelPersistenceCache
 
 		var op:OxelPersistence = getOP( $pe.guid );
 		if ( null != op ) {
-			// we already have it, publishing this results in dulicate items being sent to inventory window.
-			OxelDataEvent.create( ModelBaseEvent.ADDED, $pe.series, $pe.guid, op );
+			// we already have it, publishing this results in duplicate items being sent to inventory window.
+			OxelDataEvent.create( ModelBaseEvent.RESULT, $pe.series, $pe.guid, op );
 			Log.out( "OxelPersistenceCache.loadSucceed - attempting to load duplicate OxelPersistence guid: " + $pe.guid, Log.WARN );
 			return;
 		}

@@ -16,6 +16,7 @@ import com.voxelengine.worldmodel.RegionManager;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.inventory.ObjectAction;
 import com.voxelengine.worldmodel.inventory.ObjectTool;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.types.Avatar;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
 
@@ -133,7 +134,7 @@ public class Player extends PersistenceObject
 			new ModelMakerGenerate(ii, model, true)
 		}
 		else {
-			ModelMakerBase.load(ii, false, false);
+			new ModelMaker(ii, false, false);
 		}
 	}
 

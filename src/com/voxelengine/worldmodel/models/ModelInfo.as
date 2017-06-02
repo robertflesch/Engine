@@ -8,12 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models
 {
 
-import com.voxelengine.events.ModelInfoEvent;
-import com.voxelengine.events.ObjectHierarchyData;
-import com.voxelengine.worldmodel.models.types.Avatar;
-import com.voxelengine.worldmodel.models.types.Player;
-import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.tasks.renderTasks.FromByteArray;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
 
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
@@ -36,11 +31,12 @@ import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.animation.Animation;
 import com.voxelengine.worldmodel.biomes.Biomes;
 import com.voxelengine.worldmodel.biomes.LayerInfo;
-import com.voxelengine.worldmodel.oxel.Lighting;
+import com.voxelengine.events.ObjectHierarchyData;
+import com.voxelengine.worldmodel.models.types.Avatar;
+import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
-import com.voxelengine.worldmodel.models.makers.ModelLibrary;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 public class ModelInfo extends PersistenceObject
@@ -98,11 +94,7 @@ public class ModelInfo extends PersistenceObject
 
 	override protected function assignNewDatabaseObject():void {
 		super.assignNewDatabaseObject();
-		setToDefault();
-
-		function setToDefault():void {
-			modelClass = DEFAULT_CLASS;
-		}
+		dbo.modelClass = DEFAULT_CLASS;
 	}
 
 
@@ -114,8 +106,6 @@ public class ModelInfo extends PersistenceObject
 		if ( dbo.biomes )
 			biomesFromObject( dbo.biomes );
 
-		if ( !$newData )
-			changed = false;
 		function biomesFromObject( $biomes:Object ):void {
 			// TODO this should only be true for new terrain models.
 			const createHeightMap:Boolean = true;
@@ -127,7 +117,7 @@ public class ModelInfo extends PersistenceObject
 			delete dbo.biomes;
 		}
 
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_FBA_COMPLETE, assignOxelData );
+		//OxelDataEvent.addListener( OxelDataEvent.OXEL_FBA_COMPLETE, assignOxelData );
 
 	}
 
@@ -200,13 +190,6 @@ public class ModelInfo extends PersistenceObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// start oxelPersistence (oxel) operations
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public function assignOxelData( $ode:OxelDataEvent ):void {
-		if ( guid == $ode.modelGuid ) {
-			OxelDataEvent.removeListener( OxelDataEvent.OXEL_FBA_COMPLETE, assignOxelData );
-			oxelPersistence = $ode.oxelPersistence;
-			oxelPersistence.doNotPersist = doNotPersist;
-		}
-	}
 
 	public function loadFromBiomeData():void {
 		var layer1:LayerInfo = biomes.layers[0];
@@ -222,9 +205,7 @@ public class ModelInfo extends PersistenceObject
 	}
 
 	public function boimeHas():Boolean {
-		if ( _biomes && _biomes.layers && 0 < _biomes.layers.length )
-			return true;
-		return false;
+		return  ( _biomes && _biomes.layers && 0 < _biomes.layers.length );
 	}
 	
 	public function changeOxel( $instanceGuid:String , $gc:GrainCursor, $type:int, $onlyChangeType:Boolean = false ):Boolean {
@@ -243,7 +224,7 @@ public class ModelInfo extends PersistenceObject
 		// Currently both are loaded into instanceInfo, which is not great, but it is quick, which is needed
 		if ( scripts ) {
 			var len:int = scripts.length;
-			for ( var index:int; index < len; index++ ) {
+			for ( var index:int = 0; index < len; index++ ) {
 				var scriptName:String = scripts[index].name;
 				$instanceInfo.addScript( scriptName, true );
 			}
@@ -317,7 +298,7 @@ public class ModelInfo extends PersistenceObject
 	public function animationDeleteHandler( $ae:AnimationEvent ):void {
 		//Log.out( "ModelInfo.animationDelete $ae: " + $ae, Log.WARN );
 		if ( $ae.modelGuid == guid ) {
-			for ( var i:int; i < _animations.length; i++ ) {
+			for ( var i:int=0; i < _animations.length; i++ ) {
 				var anim:Animation = _animations[i];
 				if ( anim.guid == $ae.aniGuid ) {
 					_animations.splice( i, 1 );
@@ -329,7 +310,7 @@ public class ModelInfo extends PersistenceObject
 	}
 	
 	public function animationGet( $animName:String ):Animation {
-		for ( var i:int; i < _animations.length; i++ ) {
+		for ( var i:int=0; i < _animations.length; i++ ) {
 			var anim:Animation = _animations[i];
 			if ( anim.name == $animName ) {
 				return anim;
@@ -347,13 +328,13 @@ public class ModelInfo extends PersistenceObject
 	public		function get childVoxelModels():Vector.<VoxelModel>			{ return _childVoxelModels; }
 	public		function 	 childVoxelModelsGet():Vector.<VoxelModel>		{ return _childVoxelModels; } // This is so the function can be passed as parameter
 
-	private 	var			_childrenLoaded:Boolean
+	private 	var			_childrenLoaded:Boolean;
 	public		function get childrenLoaded():Boolean 				{ return _childrenLoaded; }
 	public		function set childrenLoaded(value:Boolean):void  	{ _childrenLoaded = value; }
 	/////////////////////
 	public		function 	 unloadedChildCount():int		{
 		var count:int = 0;
-		for each ( var v:Object in dbo.children )
+		for each ( var unused:Object in dbo.children )
 			count++;
 		return count;
 	}
@@ -387,7 +368,7 @@ public class ModelInfo extends PersistenceObject
 			//Log.out( "VoxelModel.childrenLoad - THIS CAUSES A CIRCULAR REFERENCE - calling maker on: " + childInstanceInfo.modelGuid + " parentGuid: " + instanceInfo.modelGuid, Log.ERROR );
 			_childCount++;
 			//Log.out( "VoxelModel.childrenLoad - calling load on ii: " + ii + "  childCount: " + _childCount );
-			ModelMakerBase.load( ii, true, false );
+			new ModelMaker( ii, true, false );
 		}
 		//Log.out( "VoxelModel.childrenLoad - addListener for ModelLoadingEvent.CHILD_LOADING_COMPLETE  -  model name: " + $vm.metadata.name );
 		//Log.out( "VoxelModel.childrenLoad - loading child models END" );
@@ -468,7 +449,7 @@ public class ModelInfo extends PersistenceObject
 		// this examines all of the parents in that model guid.
 		// Since this would allow B owns A, and you could add B to A, which would cause a recurvise error
 		var modelGuidChain:Vector.<String> = new Vector.<String>;
-		 $child.instanceInfo.modelGuidChain( modelGuidChain )
+		$child.instanceInfo.modelGuidChain( modelGuidChain );
 		for each ( var modelGuid:String in modelGuidChain ) {
 			if ( $child.modelInfo.guid == modelGuid )
 				return
@@ -477,8 +458,9 @@ public class ModelInfo extends PersistenceObject
 		// templates would like to add the child for each instance, that is a no no..
 		if ( !childExists( $child ) ) {
 			childVoxelModels.push($child);
-			if ( !$child.instanceInfo.dynamicObject )
-				changed = true;
+			// this is the wrong place to do this. I should set it in the GUI rather than here.
+			//if ( !$child.instanceInfo.dynamicObject && Globals.isGuid( $child.modelInfo.guid) )
+			//	changed = true;
 		}
 		
 //		// Dont add child that already exist
@@ -535,7 +517,7 @@ public class ModelInfo extends PersistenceObject
 			if (child.metadata.name ==  $name )
 				return child;
 		}
-		// didnt find it at first level, lets look recurvsivly
+		// didn't find it at first level, lets look recursively
 		if ( $recursive ) {
 			for each (child in childVoxelModels) {
 				return child.modelInfo.childModelFindByName($name);
@@ -550,7 +532,7 @@ public class ModelInfo extends PersistenceObject
 			if (child.instanceInfo.instanceGuid == guid)
 				return child;
 		}
-		// didnt find it at first level, lets look recurvsivly
+		// didn't find it at first level, lets look recursively
 		for each ( child in childVoxelModels) {
 			var cvm:VoxelModel = child.modelInfo.childModelFind( guid );
 			if ( cvm )
@@ -607,7 +589,7 @@ public class ModelInfo extends PersistenceObject
 				for each ( var ani:Animation in _animations )
 					ani.save();
 
-		for ( var i:int; i < childVoxelModels.length; i++ ) {
+		for ( var i:int=0; i < childVoxelModels.length; i++ ) {
 			var child:VoxelModel = childVoxelModels[i];
 			child.save();
 		}
@@ -703,7 +685,7 @@ public class ModelInfo extends PersistenceObject
 		var oldObj:String = JSON.stringify( dbo );
 
 		var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.MODEL_INFO_EXT, $guid, null, oldObj )
-		PersistenceEvent.dispatch( pe )
+		PersistenceEvent.dispatch( pe );
 
 		// also need to clone the oxel
 		throw new Error( "REFACTOR = 2.22.17");

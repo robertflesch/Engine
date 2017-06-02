@@ -27,9 +27,9 @@ public class ModelMakerCursor extends ModelMakerBase {
 		Log.out( "ModelMakerCursor.constructor ii: " + $ii.toString(), Log.DEBUG );
 		super( $ii );
 		_modelMetadata = $vmm;
-		_addToRegionWhenComplete = false;
+		addToRegionWhenComplete = false;
 		makerCountIncrement();
-		retrieveBaseInfo();
+		requestModelInfo();
 	}
 	
 	// once the ModelInfo has been retrieved by base class, we can make the object

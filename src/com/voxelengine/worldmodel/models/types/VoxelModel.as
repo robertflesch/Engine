@@ -145,9 +145,6 @@ public class VoxelModel {
 		_modelInfo.owner = this;
 		_metadata = $vmm;
 
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete );
-		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed );
-
 		if ( null == _metadata ) {
 			Log.out("VoxelModel.init - IS NULL ModelMetadata valid?", Log.ERROR);
 			return;
@@ -174,28 +171,6 @@ public class VoxelModel {
 				s.vm = this;
 				s.init();
 
-			}
-		}
-
-		function oxelBuildComplete( $ode:OxelDataEvent):void {
-			if ( $ode.modelGuid == modelInfo.guid ) {
-				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete );
-				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed );
-				calculateCenter();
-				metadata.bound = $ode.oxelPersistence.bound;
-				complete = true;
-				Log.out("VoxelModel.oxelBuildComplete - metadata.name: " + metadata.name );
-			}
-		}
-
-		function oxelBuildFailed(e:OxelDataEvent):void {
-			if ( e.modelGuid == modelInfo.guid ) {
-				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete );
-				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed );
-				complete = true;
-				dead = true;
-				// TODO need to change model picture to BROKEN, or just totally delete it.
-				Log.out("VoxelModel.oxelDataRetrievedFailed - Error reading OXEL data guid: " + modelInfo.guid, Log.ERROR);
 			}
 		}
 	}
@@ -1027,7 +1002,7 @@ public class VoxelModel {
 			
 		if ( false == modelInfo.childrenLoaded ) {
 			// really need to check if children are complete, not just added
-			Log.out("VoxelModel.stateSet - children not all loaded yet: " + $state );
+			//Log.out("VoxelModel.stateSet - children not all loaded yet: " + $state );
 			return; // not all children have loaded yet
 		}
 		
@@ -1222,13 +1197,15 @@ public class VoxelModel {
 		}
 	}
 
-	public function applyBaseLightLevel():void {
+	public function applyBaseLightLevel( $applyToChildren:Boolean ):void {
 		modelInfo.oxelPersistence.changed = true;
-		var children:Vector.<VoxelModel> = modelInfo.childVoxelModelsGet();
-		for each ( var child:VoxelModel in children ) {
-			if ( !child.modelInfo.oxelPersistence.lightInfo.locked ) {
-				child.modelInfo.oxelPersistence.baseLightLevel = modelInfo.oxelPersistence.baseLightLevel;
-				child.applyBaseLightLevel();
+		if ( $applyToChildren ) {
+			var children:Vector.<VoxelModel> = modelInfo.childVoxelModelsGet();
+			for each (var child:VoxelModel in children) {
+				if (!child.modelInfo.oxelPersistence.lightInfo.locked) {
+					child.instanceInfo.baseLightLevel = instanceInfo.baseLightLevel;
+					child.applyBaseLightLevel( $applyToChildren );
+				}
 			}
 		}
 	}

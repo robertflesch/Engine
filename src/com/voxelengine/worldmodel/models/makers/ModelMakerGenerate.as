@@ -37,13 +37,14 @@ public class ModelMakerGenerate extends ModelMakerBase {
 	private var _type:int;
 	private var _doNotPersist:Boolean;
 
-	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object, $doNotPersist:Boolean = false ) {
+	public function ModelMakerGenerate( $ii:InstanceInfo, $miJson:Object, $doNotPersist:Boolean = false, $addToRegionWhenComplete:Boolean = true ) {
+		super($ii);
 		_name = $miJson.name;
 		_type = $miJson.biomes.layers[0].type;
 		_creationInfo = $miJson;
 		_doNotPersist = $doNotPersist;
-		//Log.out("ModelMakerGenerate - ii: " + $ii.toString() + "  using generation script: " + $miJson.biomes.layers[0].functionName);
-		super($ii);
+		addToRegionWhenComplete = $addToRegionWhenComplete;
+		Log.out("ModelMakerGenerate - ii: " + $ii.toString() + "  using generation script: " + $miJson.biomes.layers[0].functionName);
 		retrieveOrGenerateModelInfo();
 	}
 
@@ -100,14 +101,13 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			//Log.out( "ModelMakerGenerate.retrieveBaseInfo " + ii.modelGuid );
 			_modelMetadata = new ModelMetadata( ii.modelGuid );
 			_modelMetadata.doNotPersist = _doNotPersist;
-
-			// Bypass the setter so that we dont set it to changed
+			var name:String;
 			if ( _type && 0 == _name.length )
-				_modelMetadata.name = _name + TypeInfo.name( _type ) + "-" + _name;
+				name = _name + TypeInfo.name( _type ) + "-" + _name;
 			else
-				_modelMetadata.name = _name;
-			_modelMetadata.description = _name + " - GENERATED";
-			_modelMetadata.owner = Network.userId;
+				name = _name;
+			// Bypass the setter so that we don't set it to changed
+			_modelMetadata.setGeneratedData( name, Network.userId );
 			attemptMake();
 		}
 
@@ -123,7 +123,8 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		if ( null != _modelInfo && null != _modelMetadata ) {
 			_vm = make();
 			if ( _vm ) {
-				markComplete( true );
+				addODEListeners();
+				OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, true, true, _creationInfo );
 			}
 			else {
 				Log.out( "ModelMakerGenerate.attemptMake FAILED to generate from " + _name, Log.WARN );
@@ -137,22 +138,17 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		//Log.out( "ModelMakerGenerate.markComplete " + ii.modelGuid );
 		if ( $success ){
 			// Everything worked, add these to the caches and save them
-			ModelMetadataEvent.create( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelMetadata );
-			ModelInfoEvent.create( ModelBaseEvent.GENERATION, 0, ii.modelGuid, _modelInfo );
 
-			if ( modelInfo.guid != Player.DEFAULT_PLAYER ) {
-				//modelInfo.oxelPersistence.changed = true;
-				modelInfo.changed = true;
-				_modelMetadata.changed = true;
-				_vm.save();
-				ModelMetadataEvent.create( ModelBaseEvent.GENERATION, 0, _modelMetadata.guid, _modelMetadata );
-				ModelInfoEvent.create( ModelBaseEvent.GENERATION, 0, _modelInfo.guid, _modelInfo );
-			}
-			// If the actual voxel model has not been built yet, create it now.
-			if ( !modelInfo.oxelPersistence ) {
-				OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, true, true, _creationInfo );
-			}
-
+//			if ( modelInfo.guid != Player.DEFAULT_PLAYER ) {
+				modelInfo.oxelPersistence.doNotPersist = _doNotPersist;
+				if ( !_doNotPersist ) {
+					modelInfo.changed = true;
+					_modelMetadata.changed = true;
+					_vm.save();
+				}
+//			}
+			ModelMetadataEvent.create( ModelBaseEvent.GENERATION, 0, _modelMetadata.guid, _modelMetadata );
+			ModelInfoEvent.create( ModelBaseEvent.GENERATION, 0, _modelInfo.guid, _modelInfo );
 		} else {
 			Log.out( "ModelMakerGenerate.markComplete - guid: " + modelInfo.guid, Log.WARN );
 			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );

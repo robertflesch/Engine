@@ -8,129 +8,104 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine
 {
-import com.furusystems.dconsole2.plugins.plugcollections.BasicPlugins;
-import com.voxelengine.worldmodel.oxel.VisitorFunctions;
 
 import flash.utils.getTimer;
 
 import com.furusystems.dconsole2.DConsole;
-import com.furusystems.logging.slf4as.Logging;
-import com.furusystems.logging.slf4as.ILogger;
+import com.furusystems.dconsole2.plugins.plugcollections.BasicPlugins;
 
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.types.ControllableVoxelModel;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.oxel.Lighting;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.tasks.landscapetasks.*;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.oxel.VisitorFunctions;
 
 public class ConsoleCommands {
 	
 	private static function setGC():void {
 		if ( Globals.g_oxelBreakEnabled ) {
-			Globals.oxelBreakDataReset()
+			Globals.oxelBreakDataReset();
 			Log.out( "Selected Oxel break point is off", Log.WARN );
 		}
 		else {
-			Globals.oxelBreakDataSet( EditCursor.currentInstance.gciData.gc )
+			Globals.oxelBreakDataSet( EditCursor.currentInstance.gciData.gc );
 			Log.out( "Selected Oxel break point is ON data: " + EditCursor.currentInstance.gciData.gc.toString(), Log.WARN );
 		}
 	}
 
-	private static function reset():void
-	{
-		if ( VoxelModel.controlledModel )
-			VoxelModel.controlledModel.instanceInfo.reset();
+	private static function reset():void {
+		InstanceInfo.reset();
 	}
 	
-	private static function trail():void
-	{
+	private static function trail():void {
 		if ( VoxelModel.controlledModel )
 		{
 			var vm:ControllableVoxelModel = VoxelModel.controlledModel as ControllableVoxelModel;
 			vm.leaveTrail = ! vm.leaveTrail;
 			Log.out( "Trail is " + (vm.leaveTrail ? "ON" : "OFF"), Log.WARN );
-		}
-		else
+		} else
 			Log.out( "No model is under control to use trail on", Log.WARN );
 	}
 	
-	private static function markers():void
-	{
+	private static function markers():void {
 		if ( VoxelModel.controlledModel )
 		{
 			var vm:ControllableVoxelModel = VoxelModel.controlledModel as ControllableVoxelModel;
 			vm.collisionMarkers = ! vm.collisionMarkers;
 			Log.out( "CollisionPoints are " + (vm.collisionMarkers ? "ON" : "OFF"), Log.WARN );
-		}
-		else
+		} else
 			Log.out( "No model is under control to use collisionPoints on", Log.WARN );
 	}
 	
-	private static function gravity():void
-	{
-		if ( VoxelModel.controlledModel )
-		{
+	private static function gravity():void {
+		if ( VoxelModel.controlledModel ) {
 			VoxelModel.controlledModel.usesGravity = ! VoxelModel.controlledModel.usesGravity;
 			Log.out( "Gravity is " + (VoxelModel.controlledModel.usesGravity ? "ON" : "OFF"), Log.WARN );
-		}
-		else
+		} else
 			Log.out( "No model is under control to use gravity on", Log.WARN );
 	}
 	
-	private static function trees():void
-	{
-		if ( VoxelModel.selectedModel )
-		{
+	private static function trees():void {
+		if ( VoxelModel.selectedModel ) {
 			VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.growTreesOn( VoxelModel.selectedModel.instanceInfo.instanceGuid, TypeInfo.GRASS );
-		}
-		else
+		} else
 			Log.out( "No selected model", Log.WARN );
 	}
 	
-	private static function tree():void
-	{
-		if ( VoxelModel.selectedModel )
-		{
+	private static function tree():void {
+		if ( VoxelModel.selectedModel ) {
 			var oxel:Oxel = EditCursor.currentInstance.getHighlightedOxel();
-			if ( Globals.BAD_OXEL == oxel )
-			{
+			if ( Globals.BAD_OXEL == oxel ) {
 				Log.out( "Invalid location", Log.WARN );
 				return;
 			}
 
 			TreeGenerator.generateTree( VoxelModel.selectedModel.instanceInfo.instanceGuid, oxel, 1 );
-		}
-		else
+		} else
 			Log.out( "No selected model", Log.WARN );
 	}
 	
 	
-	private static function sand():void
-	{
-		if ( VoxelModel.selectedModel )
-		{
+	private static function sand():void {
+		if ( VoxelModel.selectedModel ) {
 			VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.dirtToGrassAndSand();
-		}
-		else
+		} else
 			Log.out( "No selected model", Log.WARN );
 	}
 	
-	private static function vines():void
-	{
-		if ( VoxelModel.selectedModel )
-		{
+	private static function vines():void {
+		if ( VoxelModel.selectedModel ) {
 			VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.vines( VoxelModel.selectedModel.instanceInfo.instanceGuid );
-		}
-		else
+		} else
 			Log.out( "No selected model", Log.WARN );
 	}
 	
-	private static function lightingSun():void
-	{
+	private static function lightingSun():void {
 		/*
 		if ( VoxelModel.selectedModel )
 		{
@@ -274,7 +249,7 @@ public class ConsoleCommands {
 		if ( !vm )
 			{ Log.out( "ConsoleCommands.lavaSpheresCarve  No model selected", Log.WARN ); return; }
 		
-		for ( var i:int; i < $count; i++ )
+		for ( var i:int=0; i < $count; i++ )
 			spheresCarve( vm, Oxel.locationRandomGet( vm.modelInfo.oxelPersistence.oxel ), TypeInfo.LAVA );
 	}
 	
@@ -284,7 +259,7 @@ public class ConsoleCommands {
 		if ( !vm )
 			{ Log.out( "ConsoleCommands.waterSpheresCarve  No model selected", Log.WARN ); return; }
 
-		for ( var i:int; i < $count; i++ )
+		for ( var i:int=0; i < $count; i++ )
 			spheresCarve( vm, Oxel.locationRandomGet( vm.modelInfo.oxelPersistence.oxel ), TypeInfo.WATER );
 	}
 	
@@ -318,7 +293,7 @@ public class ConsoleCommands {
 	}
 	
 	private static function recalculateAmbient():void {
-		var vm:VoxelModel = VoxelModel.selectedModel
+		var vm:VoxelModel = VoxelModel.selectedModel;
 		if ( vm )
 			vm.modelInfo.oxelPersistence.oxel.recalculateAmbient( vm.modelInfo.guid )
 	}

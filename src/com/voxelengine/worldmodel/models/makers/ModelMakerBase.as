@@ -51,7 +51,10 @@ public class ModelMakerBase {
 	
 	static private var _s_parentChildCount:Array = [];
 	protected  			var _vm:VoxelModel;
-	protected 			var _addToRegionWhenComplete:Boolean = true;
+
+	private var _addToRegionWhenComplete:Boolean = true;
+	public function get addToRegionWhenComplete():Boolean { return _addToRegionWhenComplete; }
+	public function set addToRegionWhenComplete(value:Boolean):void { _addToRegionWhenComplete = value; }
 
 
 	/*
@@ -61,9 +64,9 @@ public class ModelMakerBase {
 	//   event
 	*/
 
-	public function ModelMakerBase( $ii:InstanceInfo, $fromTables:Boolean = true ) {
+	public function ModelMakerBase( $ii:InstanceInfo ) {
 		if ( null == $ii )
-			throw new Error( "ModelMakerBase - NO instanceInfo recieve in constructor" );
+			throw new Error( "ModelMakerBase - NO instanceInfo received in constructor" );
 		//Log.out( "ModelMakerBase - ii: " + $ii.toString(), Log.DEBUG )
 		_ii = $ii;
 		//Log.out( "ModelMakerBase - _ii.modelGuid: " + _ii.modelGuid );
@@ -78,8 +81,11 @@ public class ModelMakerBase {
 			_s_parentChildCount[_parentModelGuid] = ++count
 		}
 	}
-	
-	protected function retrieveBaseInfo():void {
+
+	/////////////////////////////////////////////////////////////
+	// ModelInfo
+
+	protected function requestModelInfo():void {
 		//Log.out( "ModelMakerBase.retrieveBaseInfo - _ii.modelGuid: " + _ii.modelGuid );
 		addMIEListeners();
 		ModelInfoEvent.create( ModelBaseEvent.REQUEST, 0, _ii.modelGuid, null );
@@ -93,7 +99,7 @@ public class ModelMakerBase {
 			attemptMake();
 		}
 	}
-		
+
 	protected function failedModelInfo( $mie:ModelInfoEvent):void  {
 		if ( _ii && _ii.modelGuid == $mie.modelGuid ) {
 			Log.out( "ModelMakerBase.failedData - ii: " + _ii.toString(), Log.WARN );
@@ -114,7 +120,10 @@ public class ModelMakerBase {
 		ModelInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedModelInfo );
 	}
 
+	// ModelInfo
 	/////////////////////////////////////////////////////////////
+	// ModelMetadata
+
 	protected function retrievedMetadata( $mme:ModelMetadataEvent):void {
 		if ( ii.modelGuid == $mme.modelGuid ) {
 			removeMetadataListeners();
@@ -142,7 +151,7 @@ public class ModelMakerBase {
 		ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, retrievedMetadata );
 		ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, failedMetadata )
 	}
-
+	// ModelMetadata
 	/////////////////////////////////////////////////////////////
 
 	// check to make sure all of info required is here
@@ -166,29 +175,48 @@ public class ModelMakerBase {
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// OxelPersistence
 	protected function addODEListeners():void {
+		Log.out( "ModelMakerBase.addODEListeners  guid: " + modelInfo.guid, Log.WARN );
 		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
 		OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
 		OxelDataEvent.addListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
-		OxelDataEvent.addListener( ModelBaseEvent.RESULT, oxelBuildComplete );
-		OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelBuildComplete );
+		OxelDataEvent.addListener( ModelBaseEvent.RESULT, oxelPersistenceComplete );
+		OxelDataEvent.addListener( ModelBaseEvent.ADDED, oxelPersistenceComplete );
 	}
 
 	protected function removeODEListeners():void {
-		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelBuildComplete );
-		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, oxelBuildComplete );
+		OxelDataEvent.removeListener( ModelBaseEvent.ADDED, oxelPersistenceComplete );
+		OxelDataEvent.removeListener( ModelBaseEvent.RESULT, oxelPersistenceComplete );
 		OxelDataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, oxelBuildFailed);
 		OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_FAILED, oxelBuildFailed);
 		OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, oxelBuildComplete);
 	}
 
+	protected function oxelPersistenceComplete($ode:OxelDataEvent):void {
+		Log.out( "ModelMakerBase.oxelPersistenceComplete  $ode.modelGuid: " + $ode.modelGuid + " type: " + $ode.type , Log.WARN );
+		if ($ode.modelGuid == modelInfo.guid ) {
+			Log.out( "ModelMakerBase.oxelPersistenceComplete  guid: " + modelInfo.guid + " type: " + $ode.type , Log.WARN );
+			modelInfo.oxelPersistence = $ode.oxelPersistence;
+			// This is before quads have been built
+			if ( ii.baseLightLevel )
+				modelInfo.oxelPersistence.baseLightLevel( ii.baseLightLevel, false );
+			// This puts the object into the model cache which will then add the rendering tasks needed.
+			_vm.calculateCenter();
+			_vm.metadata.bound = $ode.oxelPersistence.bound;
+			_vm.complete = true;
+			if ( _vm && addToRegionWhenComplete )
+				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vm );
+		} else {
+			Log.out( "ModelMakerBase.oxelPersistenceComplete guid: " + modelInfo.guid + "  is REJECTING guid: " + $ode.modelGuid, Log.WARN );
+		}
+	}
+
+	// This last step is needed for model which have children.
 	protected function oxelBuildComplete($ode:OxelDataEvent):void {
 		if ($ode.modelGuid == modelInfo.guid ) {
+			Log.out( "ModelMakerBase.oxelBuildComplete  guid: " + modelInfo.guid, Log.WARN );
 			removeODEListeners();
-			var op:OxelPersistence = $ode.oxelPersistence;
-			op.forceFaces = false;
-			op.forceQuads = false;
-			modelInfo.oxelPersistence = op;
 			markComplete( true );
 		}
 	}
@@ -197,20 +225,18 @@ public class ModelMakerBase {
 		if ($ode.modelGuid == modelInfo.guid ) {
 			removeODEListeners();
 			modelInfo.oxelPersistence = null;
+			_vm.dead = true;
 			markComplete( false );
+			Log.out("ModelMakerBase.oxelBuildFailed - Error generating OXEL data guid: " + modelInfo.guid, Log.ERROR);
 		}
 	}
-	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	// OxelPersistence
+	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected function markComplete( $success:Boolean ):void {
 		var ohd:ObjectHierarchyData = new ObjectHierarchyData();
 		if ( $success ) {
-			_vm.complete = true;
-
-			if ( _vm && _addToRegionWhenComplete )
-				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vm );
-			RegionEvent.create(ModelBaseEvent.SAVE, 0, Region.currentRegion.guid, null);
 			ohd.fromModel( _vm );
 			ModelLoadingEvent.create( ModelLoadingEvent.MODEL_LOAD_COMPLETE, ohd, _vm );
 		}
@@ -224,16 +250,7 @@ public class ModelMakerBase {
 		_ii = null;
 		_vm = null;
 	}
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
-	// A factory method to build the correct object
-	static public function load( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true, $addToCountORPrompt:Boolean = true ):void {
-		//Log.out( "ModelMakerBase.load - choose maker ii: " + $ii.toString() )
-		new ModelMaker( $ii, $addToRegionWhenComplete, $addToCountORPrompt );
-	}
-	
-	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	static public function makerCountGet():int { return _makerCount }
 	static public function makerCountIncrement():void { 
 		if ( 0 == makerCountGet() )
@@ -248,6 +265,5 @@ public class ModelMakerBase {
 				RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
 		}
 	}
-	
-}	
+}
 }

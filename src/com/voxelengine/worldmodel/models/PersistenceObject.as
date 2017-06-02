@@ -25,11 +25,7 @@ import com.voxelengine.events.PersistenceEvent;
  */
 public class PersistenceObject
 {
-	protected var 	_table:String;
-	private var 	_guid:String;
-	private var 	_changed:Boolean;
 
-	private var 	_dbo:DatabaseObject;
 	// BigDB doesn't like another save call in the middle of an existing one.
 	// So if we are in the "SAVING state, leave object "changed" and return.
 	protected var 	_saving:Boolean;
@@ -41,6 +37,29 @@ public class PersistenceObject
 	public function get createdDate():String { return dbo.createdDate; }
 	public function get creator():String { return dbo.creator; }
 
+
+	private var 	_guid:String;
+	public function get guid():String  { return _guid; }
+	public function set guid(value:String):void	{
+		if ( _guid != value && Globals.isGuid( _guid ) && Globals.isGuid( value ) )
+				Log.out( "PersistenceObject - WHY AM I CHANGING A VALID GUID  _guid: " + _guid + "  newGuid: " + value );
+		_guid = value;
+		changed = true;
+	}
+
+	private var 	_dbo:DatabaseObject;
+	public function get dbo():DatabaseObject { return _dbo; }
+	public function set dbo(val:DatabaseObject ):void { _dbo = val; }
+	private var 	_table:String;
+	public function get table():String { return _table; }
+
+	private var 	_changed:Boolean  = false;
+	public function get changed():Boolean { return _changed; }
+	public function set changed(value:Boolean):void {
+		if ( value )
+			Log.out( "PersistenceObject.Changed value: " + value + "  guid: " + _guid, Log.WARN);
+		_changed = value; }
+
 	public function PersistenceObject($guid:String, $table:String ) {
 		if ( null == $guid || "" == $guid )
 			throw new Error( "PersistenceObject - Missing guid in constructor" );
@@ -51,9 +70,12 @@ public class PersistenceObject
 
 	protected function assignNewDatabaseObject():void {
 		dbo = new DatabaseObject( table, "0", "0", 0, true, null);
-		changed = true;
 		dbo.createdDate	= new Date().toUTCString();
 		dbo.creator	= Network.userId;
+	}
+
+	public function clone( $guid:String ):* {
+		throw new Error( "PersistenceObject.clone - THIS METHOD NEEDS TO BE OVERRIDDEN", Log.ERROR );
 	}
 
 	public function release():void {
@@ -61,26 +83,7 @@ public class PersistenceObject
 		_table = null;
 		_dbo = null;
 	}
-	
-	public function get guid():String  { return _guid; }
-	public function set guid(value:String):void	{
-		if ( _guid != value && Globals.isGuid( _guid ) && Globals.isGuid( value ) )
-				Log.out( "PersistenceObject - WHY AM I CHANGING A VALID GUID  _guid: " + _guid + "  newGuid: " + value );
-		_guid = value;
-		_changed = true;
-	}
-	public function get dbo():DatabaseObject { return _dbo; }
-	public function set dbo(val:DatabaseObject ):void { _dbo = val; }
-	public function get table():String { return _table; }
-	public function get changed():Boolean { return _changed; }
-	public function set changed(value:Boolean):void {
-		//Log.out( "PersistenceObject.Changed value: " + value + "  guid: " + _guid, Log.WARN);
-		_changed = value; }
-	
-	public function clone( $guid:String ):* {
-		throw new Error( "PersistenceObject.clone - THIS METHOD NEEDS TO BE OVERRIDDEN", Log.ERROR );
-	}
-	
+
 	protected function addSaveEvents():void {
 		//Log.out( getQualifiedClassName( this ) + ".addSaveEvents - guid: " + guid, Log.DEBUG );
 		PersistenceEvent.addListener( PersistenceEvent.CREATE_SUCCEED, 	createSucceed );

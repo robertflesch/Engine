@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.models.types
 {
 
+
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
@@ -26,10 +27,11 @@ import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.events.CursorShapeEvent;
 import com.voxelengine.events.CursorSizeEvent;
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.events.ObjectHierarchyData;
 import com.voxelengine.GUI.voxelModels.WindowBluePrintCopy;
 import com.voxelengine.pools.GrainCursorPool;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
+import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.*;
@@ -38,7 +40,6 @@ import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.makers.ModelMakerCursor;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.tasks.flowtasks.CylinderOperation;
 import com.voxelengine.worldmodel.tasks.flowtasks.SphereOperation;
 import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
@@ -73,23 +74,30 @@ public class EditCursor extends VoxelModel
 	
 	static public function get currentInstance():EditCursor {
 		if ( null == _s_currentInstance ) {
-
-			var instanceInfo:InstanceInfo = new InstanceInfo();
-			instanceInfo.modelGuid = EDIT_CURSOR;
-			_s_currentInstance= new EditCursor( instanceInfo );
-
-			var metadata:ModelMetadata = new ModelMetadata( EDIT_CURSOR );
-			metadata.permissions.modify = false;
-			var modelInfo:ModelInfo = new ModelInfo( EDIT_CURSOR, null, {} );
-			_s_currentInstance.init( modelInfo, metadata );
-
+			var ii:InstanceInfo = new InstanceInfo();
+			ii.modelGuid = EDIT_CURSOR;
 			var creationInfo:Object = GenerateCube.script( 4, TypeInfo.BLUE );
-			creationInfo.modelClass = "EDIT_CURSOR";
-			creationInfo.name = "EDIT_CURSOR";
-			OxelDataEvent.create( ModelBaseEvent.REQUEST, 0, modelInfo.guid, null, true, true, creationInfo );
+			creationInfo.modelClass = EDIT_CURSOR;
+			creationInfo.name = EDIT_CURSOR;
+			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, buildComplete );
+			new ModelMakerGenerate( ii, creationInfo, true, false );
 		}
 		return _s_currentInstance;
 	}
+
+	static private function buildComplete( $mle:ModelLoadingEvent ):void {
+		var ohd:ObjectHierarchyData = $mle.data;
+		if ( EDIT_CURSOR == ohd.modelGuid ) {
+			_s_currentInstance = $mle.vm as EditCursor;
+			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, buildComplete );
+		}
+	}
+
+	override public function set dead(val:Boolean):void {
+		Log.out( "EditCursor.dead - THIS MODEL IS IMMORTAL", Log.WARN );
+		// Do nothing for this object, since you dont want to have to recreate each time you change regions.
+	}
+
 
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// instance data
@@ -492,8 +500,8 @@ public class EditCursor extends VoxelModel
 		}
 		
 		Log.out( "EditCursor.insertModel - before load" );		
-		ModelMakerBase.load( ii, true );
-		Log.out( "EditCursor.insertModel - after load" );		
+		new ModelMaker( ii );
+		Log.out( "EditCursor.insertModel - after load" );
 		
 		//Now we need to listen for the model to be built, then use associatedGrain to see the location on the new ModelBaseEvent
 		function modelInsertComplete( $mle:ModelLoadingEvent ): void {

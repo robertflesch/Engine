@@ -16,11 +16,9 @@ import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 
-import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.GUI.panels.*;
 import com.voxelengine.GUI.*;
 import com.voxelengine.GUI.components.*;
 import com.voxelengine.worldmodel.Region;
@@ -88,10 +86,10 @@ public class WindowModelDetail extends VVPopup {
 		lc.padding = 0;
 		lc.layout.orientation = LayoutOrientation.HORIZONTAL;
 
-		_baseLightLevel = _vm.modelInfo.oxelPersistence.baseLightLevel;
+		_baseLightLevel = _vm.instanceInfo.baseLightLevel;
 		lc.addElement( new ComponentLabelInput( "Light(0-255)"
 								  , function ($e:TextEvent):void { _baseLightLevel = Math.max( Math.min( uint( $e.target.label ), 255 ), 0 );  }
-								  , String( _vm.modelInfo.oxelPersistence.baseLightLevel )
+								  , String( _baseLightLevel )
 								  , WIDTH - 120 ) );
 
 		var applyLight:Button = new Button( "Apply Light", 110 );
@@ -134,6 +132,7 @@ public class WindowModelDetail extends VVPopup {
 		bmpd.draw(obj, m);
 		return bmpd;
 	}
+
 	private function addPhoto():void {
 		_photoContainer.removeElements();
 		var bmd:BitmapData = null;
@@ -145,7 +144,8 @@ public class WindowModelDetail extends VVPopup {
 
 	private function changeBaseLightLevel( $e:MouseEvent ):void  {
 		if ( _vm.modelInfo.oxelPersistence && _vm.modelInfo.oxelPersistence.oxelCount ) {
-			_vm.modelInfo.oxelPersistence.baseLightLevel = _baseLightLevel;
+			_vm.modelInfo.oxelPersistence.baseLightLevel( _baseLightLevel, true );
+			_vm.instanceInfo.baseLightLevel = _baseLightLevel;
 		}
 	}
 

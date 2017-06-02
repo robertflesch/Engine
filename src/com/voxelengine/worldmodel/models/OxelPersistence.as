@@ -41,12 +41,12 @@ public class OxelPersistence extends PersistenceObject
 	// 1 meter stone cube is reference
 	static private var 	 _aliasInitialized:Boolean				= false; // used to only register class names once
 
-	public function get baseLightLevel():int 					{ return dbo.baseLightLevel; }
-	public function set baseLightLevel( value:int ):void		{
+	//public function get baseLightLevel():int 					{ return dbo.baseLightLevel; }
+	public function baseLightLevel( $value:int, $markChanged:Boolean = true ):void		{
 		if ( !_lightInfo.locked ) {
-			dbo.baseLightLevel = value;
-			_lightInfo.setIlluminationLevel(baseLightLevel);
-			changed = true;
+			_lightInfo.setIlluminationLevel($value);
+			if ( $markChanged )
+				changed = true;
 			forceQuads = true;
 		}
 	}
@@ -62,9 +62,6 @@ public class OxelPersistence extends PersistenceObject
 
 	private var _lightInfo:LightInfo 							= LightInfoPool.poolGet();
 	public function get lightInfo():LightInfo 					{ return _lightInfo; }
-
-	public function get lockLight():Boolean 					{ return _lightInfo.locked; }
-	public function set lockLight( value:Boolean ):void			{  _lightInfo.locked = value; }
 
 	private  var _forceQuads:Boolean;
 	public function get forceQuads():Boolean 					{ return _forceQuads; }
@@ -161,8 +158,8 @@ public class OxelPersistence extends PersistenceObject
 			{
 				if ( "EditCursor" != guid )
 					Log.out("OxelPersistence.update ------------ calling facesAndQuadsBuild guid: " + guid + "  with forceFaces: " + forceFaces + "  forceQuads: " + forceQuads + "  dirtyFacesOrQuads: " + topMostChunk.dirtyFacesOrQuads, Log.DEBUG);
-				if ( forceFaces || forceQuads )
-						changed = true;
+//				if ( forceFaces || forceQuads )
+//						changed = true;
 				var buildFaces:Boolean = true;
 				oxel.chunkGet().faceAndQuadsBuild(buildFaces, forceFaces, forceQuads);
 				forceFaces = false;

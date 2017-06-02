@@ -7,7 +7,9 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-	import flash.geom.Vector3D;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
+
+import flash.geom.Vector3D;
 	import playerio.DatabaseObject;
 	
 	import com.voxelengine.Globals;
@@ -38,6 +40,8 @@ package com.voxelengine.worldmodel
 
 		// INSTANCE NOT EXPORTED
 		private var _loaded:Boolean;
+		private var _unloading:Boolean;
+
 		private var _criticalModelDetected:Boolean = false;
 		private var _modelCache:ModelCache;
 		private var _permissions:PermissionsRegion;
@@ -168,19 +172,19 @@ package com.voxelengine.worldmodel
 			//Log.out( "Region.loadRegionObjects - START =============================" );
 			for each ( var v:Object in $models ) {
 				if ( v ) {
-					var instance:InstanceInfo = new InstanceInfo();
-					instance.fromObject( v );
+					var ii:InstanceInfo = new InstanceInfo();
+					ii.fromObject( v );
 //					if ( !instance.instanceGuid )
 //						instance.instanceGuid = Globals.getUID();
 					incrementObjectCount();
-					ModelMakerBase.load( instance );
+					new ModelMaker( ii );
 				}
 			}
 			Log.out( "Region.loadRegionObjects - END " + "  count: " + getObjectCount() + "=============================" );
 			if ( 0 == getObjectCount() ) {
 				_loaded = true;
 				RegionEvent.create( RegionEvent.LOAD_COMPLETE, 0, Region.currentRegion.guid );
-				WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.DESTORY ) );
+				WindowSplashEvent.create( WindowSplashEvent.DESTORY );
 			}
 
 			return getObjectCount();
@@ -236,6 +240,8 @@ package com.voxelengine.worldmodel
 
 		private function modelChanged(e:ModelEvent):void {
 			if ( Region.currentRegion.guid == guid ) {
+				if ( _unloading )
+					return;
 				Log.out( "Region.modelChanged" );
 				if ( 0 == getObjectCount() )
 					changed = true;
@@ -244,8 +250,10 @@ package com.voxelengine.worldmodel
 		
 		private function unload( $re:RegionEvent ):void {
 			removeLoadingEventListeners();
+			_unloading = true;
 			//Log.out( "Region.unload guid: " + guid + " complete modelCache.count: " + _modelCache, Log.DEBUG );
 			_modelCache.unload();
+			_unloading = false;
 			//release(); // Dont release it, memory is invalidated
 		}
 		

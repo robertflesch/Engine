@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.GUI.inventory {
 
 import com.voxelengine.GUI.PictureImportProperties;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
 import flash.display.Bitmap;
@@ -259,10 +260,11 @@ public class InventoryPanelModel extends VVContainer
 			}
 
 			if ( !PopupMetadataAndModelInfo.inExistance )
-				ModelMakerBase.load( ii );
+				new ModelMaker( ii );
 		}
 	}
-	
+
+
 	private function addEmptyRow( $countMax:int ):void {
 		_currentRow = new Container( MODEL_CONTAINER_WIDTH, MODEL_IMAGE_HEIGHT );
 		_currentRow.layout = new AbsoluteLayout();

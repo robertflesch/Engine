@@ -119,7 +119,9 @@ public class ModelCache
 		//otherwise add it to ModelCache list.
 		//Log.out( "ModelCache.add - name: " + vm.metadata.name + "  guid: " + vm.instanceInfo.modelGuid + "  instanceGuid: " + vm.instanceInfo.instanceGuid, Log.WARN );
 		if ( null == vm || null == vm.instanceInfo )
-			Log.out( "ModelCache.add - trying to add NULL model to cache", Log.WARN );
+			Log.out( "ModelCache.add - trying to add NULL model to cache", Log.ERROR );
+        if ( vm.modelInfo.guid == EditCursor.EDIT_CURSOR )
+            Log.out( "ModelCache.add - WHO IS DOING THIS", Log.ERROR );
 
 		if ( vm.instanceInfo.controllingModel )
 		{

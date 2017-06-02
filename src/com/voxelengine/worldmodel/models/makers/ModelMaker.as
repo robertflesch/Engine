@@ -29,14 +29,14 @@ public class ModelMaker extends ModelMakerBase {
 	public function get addToCount():Boolean { return _addToCount; }
 	public function set addToCount(value:Boolean):void { _addToCount = value; }
 
-	public function ModelMaker( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean, $addToCount:Boolean = true ) {
+	public function ModelMaker( $ii:InstanceInfo, $addToRegionWhenComplete:Boolean = true, $addToCount:Boolean = true ) {
 		//Log.out( "ModelMaker.constructor ii: " + $ii.toString(), Log.DEBUG );
 		super( $ii );
-		_addToRegionWhenComplete = $addToRegionWhenComplete;
-		_addToCount = $addToCount;
+		addToRegionWhenComplete = $addToRegionWhenComplete;
+		addToCount = $addToCount;
 		if ( addToCount )
 			makerCountIncrement();
-		retrieveBaseInfo();
+		requestModelInfo();
 	}
 	
 	override protected function retrievedModelInfo($mie:ModelInfoEvent):void  {
@@ -70,7 +70,7 @@ public class ModelMaker extends ModelMakerBase {
 		if ( addToCount ) {
 			makerCountDecrement();
 			if (0 == makerCountGet())
-				WindowSplashEvent.dispatch(new WindowSplashEvent(WindowSplashEvent.ANNIHILATE))
+				WindowSplashEvent.create(WindowSplashEvent.ANNIHILATE);
 		}
 
 		// do this last as it nulls everything.

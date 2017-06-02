@@ -151,8 +151,6 @@ public class Inventory extends PersistenceObject
 
 		if ( isNewRecord )
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.SAVE_REQUEST, guid, null ) );
-		else
-			changed = false;
 	}
 	
 	public function load():void {

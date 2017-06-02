@@ -7,45 +7,41 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.voxelengine.events.ScriptEvent;
-import com.voxelengine.events.TransformEvent;
-import com.voxelengine.worldmodel.oxel.GrainCursor;
 
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.events.LoadingEvent;
 import com.voxelengine.events.ModelEvent;
-import com.voxelengine.events.RegionEvent;
-import com.voxelengine.worldmodel.models.*;
+import com.voxelengine.events.TransformEvent;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.scripts.ScriptLibrary;
 import com.voxelengine.worldmodel.scripts.Script;
 import com.voxelengine.pools.GrainCursorPool;
 
-/**
- * ...
- * @author Bob
- */
 public class InstanceInfo extends Location	{
 	
-	static private const MAX_ROT_RATE:Number 					= 2.0;
-	static private var _s_speedMultipler:Number					= 4;
+	private var _speedMultiplier:Number							= 4;
+	public function setSpeedMultiplier ( v:Number ):Number { 	// this is a scalar magnitude in g0 units
+		//Log.out( "InstanceInfo.setSpeedMultiplier - was: " + _s_speedMultiplier + " will be: " + v );
+		return _speedMultiplier = v;
+	}
+
 	private var	_moveSpeed:SecureNumber 						= new SecureNumber( 0.01 );
-	public function get moveSpeed():Number  					{ return _moveSpeed.val; }
+//	public function get moveSpeed():Number  					{ return _moveSpeed.val; }
 	public function set moveSpeed(value:Number):void  			{ _moveSpeed.val = value; }
 	public function speed( $time:Number ):Number 				{
-		//Log.out( "InstanceInfo.speed - _moveSpeed.val: " + _moveSpeed.val + " _s_speedMultipler: " + _s_speedMultipler + " timeElapsed: " + $time );
-		return _moveSpeed.val * _s_speedMultipler * $time; }
+		//Log.out( "InstanceInfo.speed - _moveSpeed.val: " + _moveSpeed.val + " _speedMultiplier: " + _speedMultiplier + " timeElapsed: " + $time );
+		return _moveSpeed.val * _speedMultiplier * $time; }
 
 
 	private var _usesCollision:Boolean 							= false;                        // toObject
 	public function get usesCollision():Boolean 				{ return _usesCollision; }
 	public function set usesCollision(val:Boolean):void 		{ _usesCollision = val; }
+
 	private var _collidable:Boolean 							= true;							// toObject
 	public function get collidable():Boolean 					{ return _collidable; }
 	public function set collidable(val:Boolean):void 			{ _collidable = val; }
@@ -58,17 +54,19 @@ public class InstanceInfo extends Location	{
 	}
 	private var _transforms:Vector.<ModelTransform> 			= new Vector.<ModelTransform>;	// toObject
 	public function get transforms():Vector.<ModelTransform>	{ return _transforms; }
-	public function set transforms(val:Vector.<ModelTransform>):void {
-		for each ( var mt:ModelTransform in val )
-			addTransformMT( mt );
-	}
+//	public function set transforms(val:Vector.<ModelTransform>):void {
+//		for each ( var mt:ModelTransform in val )
+//			addTransformMT( mt );
+//	}
 
 	private var _modelGuid:String;											                    // toObject
 	public function get modelGuid():String 						{ return _modelGuid; }
 	public function set modelGuid(val:String):void 				{ _modelGuid = val; changed = true; }
+
 	private var _instanceGuid:String;															// toObject
 	public function get instanceGuid():String 					{ return _instanceGuid; }
 	public function set instanceGuid(val:String):void 			{ _instanceGuid = val; }
+
 	private var _name:String									= "";							// toObject
 	public function set	name( $val:String):void 				{ _name = $val; changed = true; }
 	public function get name():String 							{ return _name; }
@@ -76,9 +74,9 @@ public class InstanceInfo extends Location	{
 	private var _dynamicObject:Boolean 							= false;						// INSTANCE NOT EXPORTED
 	public function get dynamicObject():Boolean 				{ return _dynamicObject; }
 	public function set dynamicObject(val:Boolean):void 		{ _dynamicObject = val; }
-	private var _scripts:Array 									= [];							// toObject
-	private var _controllingModel:VoxelModel 					= null;    						// INSTANCE NOT EXPORTED
+
 	// this is the voxel model which controls the parent of the instanceInfo.
+	private var _controllingModel:VoxelModel 					= null;    						// INSTANCE NOT EXPORTED
 	public function get controllingModel():VoxelModel  			{ return _controllingModel; }
 	public function set controllingModel(val:VoxelModel):void   {
 		if ( val && this == val.instanceInfo )
@@ -110,16 +108,17 @@ public class InstanceInfo extends Location	{
 	// if this model is a child of a larger model
 	private		var _associatedGrain:GrainCursor;
 	public  function get associatedGrain():GrainCursor			{ return _associatedGrain; }
+	public  function associatedGrainReset():void { _associatedGrain = null; }
 	public  function set associatedGrain( $val:GrainCursor ):void {
 		if ( null == _associatedGrain )
 			_associatedGrain = new GrainCursor();
-		_associatedGrain.copyFrom( $val );
-	}
+		_associatedGrain.copyFrom( $val ); }
 
-	public  function associatedGrainReset():void {
-		_associatedGrain = null;
-	}
+	private var _baseLightLevel:uint 							= 0;
+	public function get baseLightLevel():int 					{ return _baseLightLevel; }
+	public function set baseLightLevel( value:int ):void		{ _baseLightLevel = value; changed = true; }
 
+	private var _scripts:Array 									= [];							// toObject
 	public function get scripts():Array							{ return _scripts; }
 
 	public function InstanceInfo() {}
@@ -128,17 +127,16 @@ public class InstanceInfo extends Location	{
 		_moveSpeed 			= null;
 		_transforms 		= null;
 		_modelGuid			= null;
-		_instanceGuid		= null;							
+		_instanceGuid		= null;
 		_scripts			= null;
-		_controllingModel	= null;    						
+		_controllingModel	= null;
 		_owner				= null;
 		_info				= null;
 		_state				= null;
-		_life				= null;		
+		_life				= null;
 	}
 	
-	public function clone():InstanceInfo
-	{
+	public function clone():InstanceInfo {
 		var ii:InstanceInfo = new InstanceInfo();
 		var obj:Object = toObject();
 		ii.fromObject( obj );
@@ -146,20 +144,22 @@ public class InstanceInfo extends Location	{
 		return ii;
 	}
 	
-	private function vector3DToObject( $vec:Vector3D ):Object {
+	static private function vector3DToObject( $vec:Vector3D ):Object {
 		return { x:$vec.x, y:$vec.y, z:$vec.z };
 	}
-	
-	private function vector3DIntToObject( $vec:Vector3D ):Object {
-		return { x:int($vec.x), y:int($vec.y), z:int($vec.z) };
-	}
+
+//	static private function vector3DIntToObject( $vec:Vector3D ):Object {
+//		return { x:int($vec.x), y:int($vec.y), z:int($vec.z) };
+//	}
 	
 	override public function toObject():Object {	
 		
-		var obj:Object 		= super.toObject()
+		var obj:Object 		= super.toObject();
 		obj.instanceGuid	= instanceGuid;
 		obj.modelGuid 		= modelGuid;
 		obj.name 			= name;
+		obj.baseLightLevel	= _baseLightLevel;
+
 		if ( associatedGrain )
 			obj.associatedGrain	= associatedGrain.toObject();
 
@@ -180,7 +180,7 @@ public class InstanceInfo extends Location	{
 		function instanceScriptOnly( obj:Object ):void {
 			if ( _scripts.length ) {
 				var scriptsArray:Array = [];
-				for ( var i:int; i < _scripts.length; i++ ) {
+				for ( var i:int = 0; i < _scripts.length; i++ ) {
 					if ( _scripts[i]  && !_scripts[i].modelScript ) {
 						//Log.out( "InstanceInfo.instanceScriptOnly - script: " + Script.getCurrentClassName( _scripts[i] ) );
 						//scripts["script" + i] = Script.getCurrentClassName( _scripts[i] );
@@ -196,19 +196,17 @@ public class InstanceInfo extends Location	{
 		}	}
 	}
 
-	public function explosionClone():InstanceInfo
-	{
-		var obj:InstanceInfo = new InstanceInfo();
-		if ( null != _info )
-			obj.fromObject( _info );
-		
-		obj.dynamicObject = true;
-		
-		return obj;
-	}
+//	public function explosionClone():InstanceInfo {
+//		var obj:InstanceInfo = new InstanceInfo();
+//		if ( null != _info )
+//			obj.fromObject( _info );
+//
+//		obj.dynamicObject = true;
+//
+//		return obj;
+//	}
 
-	public function toString():String
-	{
+	public function toString():String {
 		var cmString:String = "";
 		if ( null != controllingModel) 
 			cmString = "   controllingModel: " + controllingModel.instanceInfo.toString();
@@ -222,7 +220,7 @@ public class InstanceInfo extends Location	{
 
 	public function modelGuidChain( $models:Vector.<String> ):void {
 		if ( controllingModel ) {
-			$models.push( controllingModel.modelInfo.guid )
+			$models.push( controllingModel.modelInfo.guid );
 			return controllingModel.instanceInfo.modelGuidChain( $models );
 		}
 	}
@@ -272,6 +270,8 @@ public class InstanceInfo extends Location	{
 			_associatedGrain.fromObject( _info.associatedGrain );
 		}
 
+		if ( _info.baseLightLevel )
+			_baseLightLevel = _info.baseLightLevel;
 
 		setTransformInfo( _info );
 		setScriptInfo( _info );
@@ -287,8 +287,7 @@ public class InstanceInfo extends Location	{
 		
 		_scripts.push( script );
 		
-		if ( script )
-		{
+		if ( script ) {
 			script.modelScript = $modelScript;
 			script.instanceGuid = instanceGuid;
 			script.vm		= owner;
@@ -317,13 +316,10 @@ public class InstanceInfo extends Location	{
 	}
 	
 	public function setCriticalInfo( $info:Object ):void {
-		if ( $info.critical )
-		{
+		if ( $info.critical ) {
 			var criticalJson:String = $info.critical;
 			if ( "true" == criticalJson.toLowerCase() )
-			{
 				critical = true;
-			}
 		}
 	}
 	
@@ -345,36 +341,16 @@ public class InstanceInfo extends Location	{
 				usesCollision = true;
 		}
 	}
-	
-	
-	//public function setShaderInfo( $info:Object ):void {
-		//if ( $info.shader )
-			//_shader = $info.shader;
-	//}
-	
-//	public function setTypeInfo( $info:Object ):void {
-//
-//		if ( $info.type )
-//		{
-//			var typeString:String = "INVALID";
-//			typeString = $info.type.toLowerCase();
-//			_type = TypeInfo.getTypeId( typeString );
-//			if ( TypeInfo.INVALID == type )
-//				Log.out( "InstanceInfo.setTypeInfo - WARNING - INVALID type found: " + typeString, Log.WARN );
-//		}
-//	}
-	
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	// Tranformation functions
+	// Transformation functions
 	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// TODO Do I need name for transformation here?
 	public function setTransformInfo( $info:Object ):void {
-		if ( $info.transforms )
-		{
-			for each ( var modelTransform:Object in $info.transforms )
-			{
+		if ( $info.transforms ) {
+			for each ( var modelTransform:Object in $info.transforms ) {
 				Log.out( "InstanceInfo.setTransformInfo - modelTransform.type: " + modelTransform.type , Log.WARN );
-				var transformType:int
+				var transformType:int;
 				if ( modelTransform.type is String )
 					transformType = ModelTransform.stringToType( modelTransform.type );
 				else	
@@ -400,8 +376,7 @@ public class InstanceInfo extends Location	{
 
 	public function advance( $elapsedTimeMS:int ):Boolean {
 		var index:int = 0;
-		for each ( var mt:ModelTransform in transforms )
-		{
+		for each ( var mt:ModelTransform in transforms ) {
 			//Log.out( "InstanceInfo.update: " + trans );
 			// Update transform, performing appropriate action and
 			// check to see if there is time remaining on this transform
@@ -424,11 +399,11 @@ public class InstanceInfo extends Location	{
 		return false;
 	}
 	
-	public function removeNamedTransform( type:int, name:String ):void {
+	public function removeNamedTransform( $type:int, name:String ):void {
 		var index:int = 0;
 		// see if the transformations contain one already with this name.
 		for each ( var mt:ModelTransform in transforms ) {
-			if ( mt.name == name && mt.type == type ) {
+			if ( mt.name == name && mt.type == $type ) {
 				// this transform is now expired!
 				//Log.out( "InstanceInfo.update - removing NAMED transform", Log.ERROR );
 				transforms.splice( index, 1 );
@@ -454,9 +429,9 @@ public class InstanceInfo extends Location	{
 		}
 	}
 	
-	public function addNamedTransform( x:Number, y:Number, z:Number, time:Number, type:int, name:String = "Default" ):void {
-		removeNamedTransform( type, name );
-		addTransform( x, y, z, time, type, name );
+	public function addNamedTransform( x:Number, y:Number, z:Number, time:Number, $type:int, name:String = "Default" ):void {
+		removeNamedTransform( $type, name );
+		addTransform( x, y, z, time, $type, name );
 	}
 	
 	public function addNamedTransformMT( $mt:ModelTransform ):void {
@@ -467,10 +442,8 @@ public class InstanceInfo extends Location	{
 	public function updateNamedTransform( $mt:ModelTransform, $val:Number ):void {
 		var index:int = 0;
 		// see if the transformations contain one already with this name.
-		for each ( var mt:ModelTransform in transforms )
-		{
-			if ( mt.name == $mt.name && mt.type == $mt.type )
-			{
+		for each ( var mt:ModelTransform in transforms ) {
+			if ( mt.name == $mt.name && mt.type == $mt.type ) {
 				mt.modify( $mt, $val );
 				break;
 			}
@@ -494,13 +467,7 @@ public class InstanceInfo extends Location	{
 	}
 	
 
-	// this is a scalar magnitude in g0 units
-	public function setSpeedMultipler ( v:Number ):Number {
-		//Log.out( "InstanceInfo.setSpeedMultiper - was: " + _s_speedMultipler + " will be: " + v );
-		return _s_speedMultipler = v;
-	}
-	
-	public function reset():void {
+	static public function reset():void {
 		Region.resetPosition();
 		resetCamera();
 	}
@@ -537,7 +504,7 @@ public class InstanceInfo extends Location	{
 	}
 	
 	// http://blog.bengarney.com/category/flash/
-	final public function transformVec(m:Matrix3D, i:Vector3D, o:Vector3D):void {
+	public static function transformVec(m:Matrix3D, i:Vector3D, o:Vector3D):void {
 		const x:Number = i.x, y:Number = i.y, z:Number = i.z;
 		const d:Vector.<Number> = m.rawData;
 

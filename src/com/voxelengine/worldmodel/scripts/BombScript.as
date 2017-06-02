@@ -13,6 +13,8 @@ package com.voxelengine.worldmodel.scripts
  */
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.SoundEvent;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
+
 import flash.media.Sound;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
@@ -107,7 +109,7 @@ public class BombScript extends Script
 		var newShip:VoxelModel = Region.currentRegion.modelCache.instanceGet( shipGuid );
 		ii.controllingModel = newShip;
 
-		ModelMakerBase.load( ii );    
+		new ModelMaker( ii );
 	}
 	
 	

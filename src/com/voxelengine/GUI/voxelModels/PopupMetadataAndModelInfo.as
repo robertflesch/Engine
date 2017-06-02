@@ -128,20 +128,20 @@ public class PopupMetadataAndModelInfo extends VVPopup
 //        addElement( new ComponentLabel( "Created Date",  _mi.createdDate, WIDTH ) );
 //        addElement( new ComponentLabel( "Creator",  _mi.creator, WIDTH ) );
 
-        if (  _mi.oxelPersistence ) {
-            var lc:Container = new Container(WIDTH, 30);
-            lc.padding = 0;
-            lc.layout.orientation = LayoutOrientation.HORIZONTAL;
-
-            lc.addElement(new ComponentLabelInput("Light(0-255)"
-                    , function ($e:TextEvent):void {
-                        _mi.oxelPersistence.baseLightLevel = Math.max(Math.min(uint($e.target.label), 255), 0);
-                    }
-                    , String(_mi.oxelPersistence.baseLightLevel)
-                    , WIDTH - 120));
-
-            addElement(lc);
-        }
+//        if (  _mi.oxelPersistence ) {
+//            var lc:Container = new Container(WIDTH, 30);
+//            lc.padding = 0;
+//            lc.layout.orientation = LayoutOrientation.HORIZONTAL;
+//
+//            lc.addElement(new ComponentLabelInput("Light(0-255)"
+//                    , function ($e:TextEvent):void {
+//                        _mi.oxelPersistence.baseLightLevel = Math.max(Math.min(uint($e.target.label), 255), 0);
+//                    }
+//                    , String(_mi.oxelPersistence.baseLightLevel)
+//                    , WIDTH - 120));
+//
+//            addElement(lc);
+//        }
 
         // TODO need to be able to handle an array of scripts.
 //            var scriptsPanel:PanelModelScripts = new PanelModelScripts( this, width, 20, 200);

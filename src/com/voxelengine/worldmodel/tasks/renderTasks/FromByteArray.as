@@ -33,9 +33,9 @@ public class FromByteArray extends RenderingTask
 			if ( 0 == _op.oxelCount) {
 				_op.loadFromByteArray();
 
-				if ("0" == _op.dbo.key) {
-					_op.changed = true;
-				}
+//				if ("0" == _op.dbo.key) {
+//					_op.changed = true;
+//				}
 			}
 			OxelDataEvent.create( OxelDataEvent.OXEL_FBA_COMPLETE, 0, _guid, _op );
 		}

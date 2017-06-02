@@ -77,7 +77,7 @@ import flash.display.Bitmap;
 			
 			VoxelVerseGUI.currentInstance.hideGUI()
 			onResize(null);
-			WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.SPLASH_LOAD_COMPLETE ) );
+			WindowSplashEvent.create( WindowSplashEvent.SPLASH_LOAD_COMPLETE );
 			
 			//LoadingImageEvent.create( LoadingImageEvent.CREATE ) );
 		} 

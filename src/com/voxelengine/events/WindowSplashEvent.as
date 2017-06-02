@@ -34,7 +34,7 @@ public class WindowSplashEvent extends Event
 	
 	///////////////// Event handler interface /////////////////////////////
 
-	// Used to distribue all persistance messages
+	// Used to distribute all persistence messages
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
@@ -45,10 +45,12 @@ public class WindowSplashEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:WindowSplashEvent ) : Boolean {
+	static public function create( $type:String ) : Boolean {
 		//Log.out( $event.toString(), Log.WARN );
-		return _eventDispatcher.dispatchEvent( $event );
+		return _eventDispatcher.dispatchEvent( new WindowSplashEvent( $type ) );
 	}
+
+
 	
 	///////////////// Event handler interface /////////////////////////////
 }

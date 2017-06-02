@@ -22,7 +22,7 @@ import com.voxelengine.worldmodel.oxel.GrainCursor;
 public class ModelMakerClone extends ModelMakerBase {
 	
 	public function ModelMakerClone( $vm:VoxelModel, $killOldModel:Boolean = true ) {
-		super($vm.instanceInfo.clone(), false);
+		super($vm.instanceInfo.clone());
 		Log.out("ModelMakerClone - clone model with instanceGuid: " + $vm.instanceInfo.instanceGuid + "  modelGuid: " + $vm.instanceInfo.modelGuid);
 		ii.modelGuid = Globals.getUID();
 		Log.out("ModelMakerClone - clone model with NEW instanceGuid: " + ii.instanceGuid + "  NEW modelGuid: " + ii.modelGuid);

@@ -73,12 +73,12 @@ public class ModelMetadata extends PersistenceObject
 	public function get bound():int 						{ return dbo.bound; }
 	public function set bound( $val:int ):void				{
 		if ( dbo.bound != $val ) {
-			changed = true;
+			//changed = true;
 			dbo.bound = $val;
 		} }
 
 	public function get hashTags():String 					{ return dbo.hashTags; }
-	public function set hashTags($val:String):void			{ dbo.hashTags = $val; }
+	public function set hashTags($val:String):void			{ dbo.hashTags = $val; changed = true }
 
 	public function get thumbnail():BitmapData 				{ return _thumbnail; }
 	public function set thumbnail($val:BitmapData):void 	{ _thumbnail = $val; changed = true; }
@@ -143,21 +143,25 @@ public class ModelMetadata extends PersistenceObject
 		}
 	}
 
+	public function setGeneratedData( $name:String, $owner:String ): void {
+		dbo.name = $name;
+		dbo.description = $name + " - GENERATED";
+		dbo..owner = $owner;
+	}
 
 	override protected function assignNewDatabaseObject():void {
 		super.assignNewDatabaseObject();
 		setToDefault();
 
 		function setToDefault():void {
-			hashTags = "#new";
-			_thumbnail = null;
-			animationClass = "";
-			description = "Default";
-			name = "Default";
-			name = "Default";
-			owner = "";
-			version = Globals.VERSION;
-			bound = DEFAULT_BOUND;
+			dbo.hashTags 		= "#new";
+			_thumbnail 			= null;
+			dbo.animationClass 	= "";
+			dbo.description 	= "Default";
+			dbo.name 			= "Default";
+			dbo.owner 			= "";
+			dbo.version 		= Globals.VERSION;
+			dbo.bound 			= DEFAULT_BOUND;
 		}
 	}
 

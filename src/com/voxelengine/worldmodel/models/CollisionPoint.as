@@ -7,7 +7,9 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import flash.geom.Vector3D;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
+
+import flash.geom.Vector3D;
 	
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
@@ -49,7 +51,7 @@ package com.voxelengine.worldmodel.models
 			collisionPointMarker.positionSet 		= point;
 			collisionPointMarker.controllingModel 	= $owner;
 			//collisionPointMarker.name				= "CollisionPoint";
-			ModelMakerBase.load( collisionPointMarker );
+			new ModelMaker( collisionPointMarker );
 		}
 		
 		public function markerRemove( $owner:VoxelModel ):void {

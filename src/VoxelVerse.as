@@ -78,7 +78,7 @@ public class VoxelVerse extends Sprite
 		initializeDataBeforeSplash();
 
 		WindowSplashEvent.addListener( WindowSplashEvent.SPLASH_LOAD_COMPLETE, onSplashLoaded );
-		WindowSplashEvent.dispatch( new WindowSplashEvent( WindowSplashEvent.CREATE ) );
+		WindowSplashEvent.create( WindowSplashEvent.CREATE );
 	}
 
 	private var _splashDisplayed:Boolean;

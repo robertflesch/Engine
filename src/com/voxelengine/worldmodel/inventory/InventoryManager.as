@@ -15,6 +15,7 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
@@ -70,7 +71,7 @@ public class InventoryManager
             oxelSize = (1 << oxelSize)/2;
             ii.positionSetComp(0, -oxelSize, -oxelSize);
             ii.modelGuid = $modelGuid;
-            ModelMakerBase.load(ii);
+			new ModelMaker( ii );
         }
 
     }

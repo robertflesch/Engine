@@ -13,6 +13,7 @@ import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.InventoryInterfaceEvent;
 import com.voxelengine.GUI.actionBars.UserInventory;
 import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.oxel.Oxel;
@@ -118,10 +119,10 @@ public class ControllableVoxelModel extends VoxelModel
 	protected function adjustSpeedMultiplier( e:CursorSizeEvent ): void {
 		if ( this == VoxelModel.controlledModel && EditCursor.isEditing ) {
 			//Log.out( "Player.adjustSpeedMultiplier - size: " + e.size );
-			VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( Math.max( e.size, 0.5 ) );
+			VoxelModel.controlledModel.instanceInfo.setSpeedMultiplier( Math.max( e.size, 0.5 ) );
 		} else {
 			//Log.out( "Player.adjustSpeedMultiplier - is controlledModel? : " + (this == VoxelModel.controlledModel) + " isEditing: " + EditCursor.isEditing );
-			VoxelModel.controlledModel.instanceInfo.setSpeedMultipler( 1 );
+			VoxelModel.controlledModel.instanceInfo.setSpeedMultiplier( 1 );
 		}
 	}
 
@@ -562,7 +563,7 @@ public class ControllableVoxelModel extends VoxelModel
 			trailMarker.positionSet = wsCenter;
 			trailMarker.addTransform( 0, 0, 0, 10000, ModelTransform.LIFE );
 			
-			ModelMakerBase.load( trailMarker );
+			new ModelMaker( trailMarker );
 		}
 		count++;
 	}
