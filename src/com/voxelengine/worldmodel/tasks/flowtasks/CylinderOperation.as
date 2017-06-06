@@ -11,8 +11,9 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	import com.developmentarc.core.tasks.tasks.AbstractTask;
 	import com.voxelengine.worldmodel.models.types.EditCursor;
 	import com.voxelengine.worldmodel.TypeInfo;
-	
-	import flash.utils.getTimer;
+import com.voxelengine.worldmodel.oxel.OxelBad;
+
+import flash.utils.getTimer;
 	
 	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
@@ -75,7 +76,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				//var oxel:Oxel = vm.oxel.childGetOrCreate( _gc );
 				var oxel:Oxel = vm.modelInfo.oxelPersistence.oxel.childFind( _gc );
 
-				if ( Globals.BAD_OXEL == oxel )
+				if ( OxelBad.INVALID_OXEL == oxel )
 				{
 					Log.out( "CylinderOperation.start - BAD_OXEL found for gc: " + _gc, Log.ERROR );
 				}

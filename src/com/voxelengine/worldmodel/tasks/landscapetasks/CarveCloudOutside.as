@@ -14,7 +14,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.biomes.*;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
-	import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
+import com.voxelengine.worldmodel.oxel.OxelBad;
+import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 	import com.voxelengine.worldmodel.TypeInfo;
 	import flash.utils.getTimer;
 	
@@ -66,7 +67,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var endZ:int = size/minGrainInG0;
 			var offset:int = 0;
 			var bound:int = vm.modelInfo.oxelPersistence.oxel.gc.bound;
-			var to:Oxel = Globals.BAD_OXEL;
+			var to:Oxel = OxelBad.INVALID_OXEL;
 			var gct:GrainCursor = GrainCursorPool.poolGet( bound );
 			gct.become_ancestor( minGrain );
 			var mapIncrement:int = minGrainInG0;
@@ -96,7 +97,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 						{
 							GrainCursor.roundToInt( x, y, z, gct );
 							to = vm.modelInfo.oxelPersistence.oxel.childFind( gct );
-							if ( Globals.BAD_OXEL != to )
+							if ( OxelBad.INVALID_OXEL != to )
 								to.change( _modelGuid, gct, TypeInfo.AIR )
 						}
 					}

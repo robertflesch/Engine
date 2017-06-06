@@ -16,6 +16,7 @@ import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.oxel.OxelBad;
 
 /**
  * ...
@@ -39,7 +40,7 @@ public class LightRemove extends LightTask
 		// walk thru the neighbors, if the no has less light then remove that light (just that or all lights?)
 		for ( var facer:uint = Globals.POSX; facer <= Globals.NEGZ; facer++ ) {
 			var nor:Oxel = lor.neighbor(facer);
-			if ( Globals.BAD_OXEL == nor )
+			if ( OxelBad.INVALID_OXEL == nor )
 				continue;
 
 			if ( TypeInfo.hasAlpha( nor.type ) && nor.lighting ) {
@@ -106,7 +107,7 @@ public class LightRemove extends LightTask
 		{
 			var no:Oxel = $lo.neighbor(face);
 
-			if ( Globals.BAD_OXEL == no )
+			if ( OxelBad.INVALID_OXEL == no )
 				continue;
 
 			if ( no.childrenHas() )

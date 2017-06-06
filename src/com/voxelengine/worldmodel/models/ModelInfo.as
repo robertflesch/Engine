@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models
 {
 
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
+import com.voxelengine.worldmodel.oxel.OxelBad;
 
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
@@ -412,7 +413,7 @@ public class ModelInfo extends PersistenceObject
 				childVoxelModels.splice(index, 1);
                 child.instanceInfo.associatedGrainReset();
 				var oxel:Oxel = VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.childFind( $gc );
-				if ( oxel == Globals.BAD_OXEL )
+				if ( oxel == OxelBad.INVALID_OXEL )
 					return false;
 				if ( oxel && oxel.gc.is_equal( $gc ) )
 					oxel.hasModel = false;

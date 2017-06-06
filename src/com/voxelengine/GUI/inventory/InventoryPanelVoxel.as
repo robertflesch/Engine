@@ -6,12 +6,7 @@
   Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
-import com.voxelengine.GUI.actionBars.QuickInventory;
 import flash.display.DisplayObject;
-import flash.events.MouseEvent;
-import org.flashapi.swing.containers.UIContainer;
-
-//import org.flashapi.collector.EventCollector;
 import org.flashapi.swing.*
 import org.flashapi.swing.core.UIObject;
 import org.flashapi.swing.event.*;
@@ -20,18 +15,16 @@ import org.flashapi.swing.list.ListItem;
 import org.flashapi.swing.dnd.*;
 import org.flashapi.swing.layout.AbsoluteLayout;
 
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.events.CraftingItemEvent;
 import com.voxelengine.events.InventoryVoxelEvent;
 import com.voxelengine.events.InventorySlotEvent;
 import com.voxelengine.GUI.crafting.*;
 import com.voxelengine.GUI.*;
+import com.voxelengine.GUI.actionBars.QuickInventory;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.SecureInt;
-import com.voxelengine.worldmodel.inventory.InventoryManager;
-import com.voxelengine.worldmodel.inventory.ObjectInfo;
 import com.voxelengine.worldmodel.inventory.ObjectVoxel;
 
 public class InventoryPanelVoxel extends VVContainer
@@ -51,15 +44,16 @@ public class InventoryPanelVoxel extends VVContainer
 
 	static private const VOXEL_CONTAINER_WIDTH:int = 512;
 	static private const VOXEL_IMAGE_WIDTH:int = 64;
-	
+	static private const VOXEL_IMAGE_HEIGHT:int = 64;
+
 	private var _dragOp:DnDOperation = new DnDOperation();
 	private var _barUpper:TabBar;
 	private var _barLower:TabBar;
-	private var _itemContainer:Container = new Container( VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_WIDTH);
+	private var _itemContainer:Container = new Container( VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_HEIGHT);
 	
 	public function InventoryPanelVoxel( $parent:VVContainer )
 	{
-		// TODO I notice when I repeatatly open and close this window that more and more memory is allocated
+		// TODO I notice when I repeatedly open and close this window that more and more memory is allocated
 		// so something is not be released, or maybe I jsut need to be most patient for GC.
 		super( $parent );
 //			autoSize = true;
@@ -162,31 +156,32 @@ public class InventoryPanelVoxel extends VVContainer
 		InventoryVoxelEvent.removeListener( InventoryVoxelEvent.TYPES_RESULT, populateVoxels );
 		
 		var count:int = 0;
-		var pc:Container = new Container( VOXEL_CONTAINER_WIDTH, VOXEL_IMAGE_WIDTH );
+		var pc:Container = new Container( VOXEL_CONTAINER_WIDTH, VOXEL_IMAGE_HEIGHT );
 		pc.layout = new AbsoluteLayout();
 
-		var countMax:int = VOXEL_CONTAINER_WIDTH / VOXEL_IMAGE_WIDTH;
+		var countMax:int = VOXEL_CONTAINER_WIDTH / VOXEL_IMAGE_HEIGHT;
 		var box:BoxInventory;
 		var item:TypeInfo;
 		
-		for (var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
+		for (var typeId:int=0; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
 		{
 			item = TypeInfo.typeInfo[typeId];
+			if ( 152 == typeId)
+					Log.out( "InventoryPanelVoxel.populateVoxel type ID is VINE");
 			if ( null == item )
 				continue;
 			var voxelCount:int = results[typeId].val;
-			//if ( item.placeable && 0 < voxelCount)
-			if ( item.placeable && -1 < voxelCount )
-			{
+			if ( voxelCount <= 0 )
+					voxelCount = 1000000;
+			if ( item.placeable && -1 < voxelCount ) {
 				// Add the filled bar to the container and create a new container
-				if ( countMax == count )
-				{
+				if ( countMax == count ) {
 					_itemContainer.addElement( pc );
-					pc = new Container( VOXEL_CONTAINER_WIDTH, VOXEL_IMAGE_WIDTH );
+					pc = new Container( VOXEL_CONTAINER_WIDTH, VOXEL_IMAGE_HEIGHT );
 					pc.layout = new AbsoluteLayout();
 					count = 0;		
 				}
-				box = new BoxInventory(VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_WIDTH, BorderStyle.NONE );
+				box = new BoxInventory(VOXEL_IMAGE_WIDTH, VOXEL_IMAGE_HEIGHT, BorderStyle.NONE );
 				box.updateObjectInfo( new ObjectVoxel( box, typeId ) );
 				box.x = count * VOXEL_IMAGE_WIDTH;
 				pc.addElement( box );

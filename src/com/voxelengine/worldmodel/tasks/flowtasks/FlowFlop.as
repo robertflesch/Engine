@@ -189,7 +189,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			var flowIntoChild:Oxel = null;
 			var flowFromChild:Oxel = null;
 			var flowIntoParent:Oxel = $flowOxel.neighbor( $dir );
-			if ( Globals.BAD_OXEL == flowIntoParent && TypeInfo.AIR == flowIntoParent.type )
+			if ( OxelBad.INVALID_OXEL == flowIntoParent && TypeInfo.AIR == flowIntoParent.type )
 			{
 				var gct:GrainCursor = GrainCursorPool.poolGet( $flowOxel.gc.bound );
 				// this is oxel next to the one we want, but the flowIntoParent might be a larger grain.

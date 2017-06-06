@@ -19,8 +19,9 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	
 	import com.developmentarc.core.tasks.tasks.ITask;
 	import com.developmentarc.core.tasks.TaskController;
-	
-	import flash.utils.getTimer;
+import com.voxelengine.worldmodel.oxel.OxelBad;
+
+import flash.utils.getTimer;
 	
 	/**
 	 * ...
@@ -70,7 +71,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			if ( vm )
 			{
 				var oxel:Oxel = vm.modelInfo.oxelPersistence.oxel.childGetOrCreate( _gc );
-				if ( Globals.BAD_OXEL == oxel )
+				if ( OxelBad.INVALID_OXEL == oxel )
 				{
 					Log.out( "SphereOperation.start - BAD_OXEL found for gc: " + _gc, Log.ERROR );
 				}

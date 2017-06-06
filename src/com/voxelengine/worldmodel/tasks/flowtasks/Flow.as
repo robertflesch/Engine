@@ -8,7 +8,9 @@
 
 package com.voxelengine.worldmodel.tasks.flowtasks
 {
-	import flash.utils.Timer;
+import com.voxelengine.worldmodel.oxel.OxelBad;
+
+import flash.utils.Timer;
 	import flash.utils.getTimer;
 	import flash.events.TimerEvent;
 
@@ -179,7 +181,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		
 			var no:Oxel = flowOxel.neighbor($face);
 			var partial:Boolean = false;
-			if ( Globals.BAD_OXEL != no && no.gc && no.gc.grain >= MIN_FLOW_GRAIN )
+			if ( OxelBad.INVALID_OXEL != no && no.gc && no.gc.grain >= MIN_FLOW_GRAIN )
 			{
 				// if our neighbor is air, just flow into it.o
 				if ( no.type == TypeInfo.AIR && !no.childrenHas() ) {
@@ -196,7 +198,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 						// getChild will crack the neighbor, if neighbor was larger to start
 						var crackedOxel:Oxel = no.childGetOrCreate( gct );
 						GrainCursorPool.poolDispose( gct );
-						if ( Globals.BAD_OXEL != crackedOxel )
+						if ( OxelBad.INVALID_OXEL != crackedOxel )
 							$fc.push( new FlowCandidate( $face, crackedOxel ) );
 					}
 				}
@@ -314,7 +316,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 			$flowIntoOxel.flowInfo.flowScaling.calculate( $flowIntoOxel );
 		
 			// if I flow under another of the same type
-			if ( Globals.BAD_OXEL != flowUnder ) {
+			if ( OxelBad.INVALID_OXEL != flowUnder ) {
 				if ( flowUnder.type == $flowIntoOxel.type ) {
 					//flowUnder.flowInfo.flowScaling.reset( flowUnder, true )
 					flowUnder.flowInfo.inheritFlowMax( $flowIntoOxel.flowInfo )
@@ -328,7 +330,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				}
 			}
 			// if I flow over another oxel of the same type, reset its scaling
-			if ( Globals.BAD_OXEL != flowOver ) {
+			if ( OxelBad.INVALID_OXEL != flowOver ) {
 				if ( flowOver.type == $flowIntoOxel.type ) {
 					flowOver.flowInfo.flowScaling.reset( flowOver, true )
 					flowOver.flowInfo.inheritFlowMax( $flowIntoOxel.flowInfo )

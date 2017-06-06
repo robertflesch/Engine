@@ -52,6 +52,7 @@ public class QuickInventory extends VVCanvas
 		_offsetFromBottom = $offsetFromBottom;
 		
 		_outline = new Image( Globals.texturePath + $outlineName );
+		_outline.cacheAsBitmap = true;
 		addElement( _outline );
 		
 		Globals.g_app.stage.addEventListener( Event.RESIZE, resizeObject );

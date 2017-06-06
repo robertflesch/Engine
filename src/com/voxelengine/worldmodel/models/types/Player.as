@@ -356,7 +356,7 @@ public class Player extends PersistenceObject
 				{
 					Log.out( "Player.collisionCheckNew - step smaller then l meter:" );
 					var stepUpOxel1:Oxel = fo.neighbor(Globals.POSY);
-					if ( Globals.BAD_OXEL != stepUpOxel1 )
+					if ( OxelBad.INVALID_OXEL != stepUpOxel1 )
 					{
 						var msCoordFoot1:int = stepUpOxel1.gc.getModelY();
 						msCoordFoot1 += stepUpOxel1.size_in_world_coordinates();

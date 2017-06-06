@@ -146,7 +146,7 @@ public class FlowScaling
 		// now check to see if we need to reset the scaling of our neighbors
 		for each ( var dir:int in Globals.horizontalDirections ) {
 			var fromOxel:Oxel = $oxel.neighbor( dir );
-			if ( Globals.BAD_OXEL == fromOxel )
+			if ( OxelBad.INVALID_OXEL == fromOxel )
 				continue;
 			if ( fromOxel.type == $oxel.type && null != fromOxel.flowInfo ) {
 				if ( $propgateMaxs )
@@ -213,7 +213,7 @@ public class FlowScaling
 	private function grabNeighborInfluences( $oxel:Oxel, $dir:int ):void {
 		
 		var fromOxel:Oxel = $oxel.neighbor( Oxel.face_get_opposite( $dir ) );
-		if ( Globals.BAD_OXEL == fromOxel )
+		if ( OxelBad.INVALID_OXEL == fromOxel )
 			return;
 		var fromOxelScale:FlowScaling
 		if ( TypeInfo.typeInfo[fromOxel.type].flowable && fromOxel.flowInfo && fromOxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling ) {

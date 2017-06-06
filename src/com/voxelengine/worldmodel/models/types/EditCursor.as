@@ -461,29 +461,29 @@ public class EditCursor extends VoxelModel
 	public function getHighlightedOxel(recurse:Boolean = false):Oxel {
 		
 		var foundModel:VoxelModel = VoxelModel.selectedModel;
-		// placementResult - { oxel:Globals.BAD_OXEL, gci:gci, positive:posMove, negative:negMove };
+		// placementResult - { oxel:OxelBad.INVALID_OXEL, gci:gci, positive:posMove, negative:negMove };
 		insertLocationCalculate();
 		if ( PlacementLocation.INVALID == _pl.state )
 		{
 			Log.out( "EditCursor.getHighlightedOxel NO PLACEMENT FOUND" );
-			return Globals.BAD_OXEL;
+			return OxelBad.INVALID_OXEL;
 		}
 		var oxelToBeModified:Oxel = foundModel.modelInfo.oxelPersistence.oxel.childGetOrCreate( _pl.gc );
-		if ( Globals.BAD_OXEL == oxelToBeModified )
+		if ( OxelBad.INVALID_OXEL == oxelToBeModified )
 		{
 			Log.out( "EditCursor.getHighlightedOxel BAD OXEL OLD" );
 			if ( recurse )
-				return Globals.BAD_OXEL;
+				return OxelBad.INVALID_OXEL;
 				
 			if ( _pl )
-				return Globals.BAD_OXEL;
+				return OxelBad.INVALID_OXEL;
 				
 			if ( EditCursor.currentInstance.gciData )
 			{
 				Log.out( "EditCursor.getHighlightedOxel BAD OXEL NEW gciData.point" + EditCursor.currentInstance.gciData.point + "  gciData.gc: " + EditCursor.currentInstance.gciData.gc );
 				// What does this do?
 				//insertOxel( true );
-				return Globals.BAD_OXEL;
+				return OxelBad.INVALID_OXEL;
 			}
 //					foundModel.grow( _pl );
 		}
@@ -526,7 +526,7 @@ public class EditCursor extends VoxelModel
 		if ( foundModel )
 		{
 			var oxelToBeModified:Oxel = getHighlightedOxel( recurse );
-			if ( Globals.BAD_OXEL == oxelToBeModified )
+			if ( OxelBad.INVALID_OXEL == oxelToBeModified )
 			{
 				Log.out( "EditCursor.insertOxel - Invalid location" );
 				return;
@@ -639,7 +639,7 @@ public class EditCursor extends VoxelModel
 				// we have to make the grain scale up to the size of the edit cursor
 				gcDelete.become_ancestor( EditCursor.currentInstance.modelInfo.oxelPersistence.oxel.gc.grain );
 				var oxelToBeDeleted:Oxel = foundModel.modelInfo.oxelPersistence.oxel.childGetOrCreate( gcDelete );
-				if ( Globals.BAD_OXEL != oxelToBeDeleted ) {
+				if ( OxelBad.INVALID_OXEL != oxelToBeDeleted ) {
 					Log.out( "EditCursor - found oxel to be deleted");
 					foundModel.write(gcDelete, TypeInfo.AIR);
 				}

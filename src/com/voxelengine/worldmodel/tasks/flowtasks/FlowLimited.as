@@ -79,11 +79,11 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					flowIntoNeighbor = flowOxel.neighbor( Globals.NEGY );
 				// is oxel above or below free?	
 				var flowIntoTarget:Oxel = null;
-				if ( Globals.BAD_OXEL != flowIntoNeighbor && TypeInfo.AIR == flowIntoNeighbor.type )
+				if ( OxelBad.INVALID_OXEL != flowIntoNeighbor && TypeInfo.AIR == flowIntoNeighbor.type )
 				{
 					//childGetOrCreate
 					flowIntoTarget = neighborGetOrCreate( flowOxel, flowIntoNeighbor );
-					if ( Globals.BAD_OXEL != flowIntoTarget && TypeInfo.AIR == flowIntoTarget.type )
+					if ( OxelBad.INVALID_OXEL != flowIntoTarget && TypeInfo.AIR == flowIntoTarget.type )
 					{
 						flowIntoTarget.flowInfo = _flowInfo; // flowInfo has to be present when write is performed
 						flowIntoTarget.write( _guid, flowIntoTarget.gc, _type );
@@ -106,10 +106,10 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					// we have a valid flow direction
 					flowIntoNeighbor = flowOxel.neighbor( _flowInfo.direction );
 					
-				if ( Globals.BAD_OXEL != flowIntoNeighbor && TypeInfo.AIR == flowIntoNeighbor.type )
+				if ( OxelBad.INVALID_OXEL != flowIntoNeighbor && TypeInfo.AIR == flowIntoNeighbor.type )
 				{
 					flowIntoTarget = neighborGetOrCreate( flowOxel, flowIntoNeighbor );
-					if ( Globals.BAD_OXEL != flowIntoTarget && TypeInfo.AIR == flowIntoTarget.type )
+					if ( OxelBad.INVALID_OXEL != flowIntoTarget && TypeInfo.AIR == flowIntoTarget.type )
 					{
 						flowIntoTarget.flowInfo = _flowInfo; // flowInfo has to be present when write is performed
 						flowIntoTarget.write( _guid, flowIntoTarget.gc, _type );

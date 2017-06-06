@@ -18,6 +18,7 @@ import com.voxelengine.Globals;
 import com.voxelengine.pools.GrainCursorPool;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.oxel.OxelBad;
 
 // * @author Robert Flesch
 public class LightTask extends AbstractTask
@@ -66,7 +67,7 @@ public class LightTask extends AbstractTask
 
     static protected function valid( $o:Oxel ):Boolean {
 
-        if ( Globals.BAD_OXEL == $o ) // This is expected, if oxel is on edge of model
+        if ( OxelBad.INVALID_OXEL == $o ) // This is expected, if oxel is on edge of model
             return false;
 
         if ( !$o.lighting ) // does this oxel already have a brightness?

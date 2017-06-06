@@ -48,7 +48,7 @@ public class Oxel extends OxelBitfields
 
 	//static public const COMPRESSED_REFERENCE_BA_SQUARE:ByteArray	= Hex.toArray( "78:da:cb:2c:cb:35:30:b0:48:61:00:02:96:7f:0c:60:90:c1:90:c0:c0:f0:1f:0a:18:a0:80:11:42:00:45:8c:a1:00:00:e2:da:10:a2" );
 	//static public const REFERENCE_BA_SQUARE:ByteArray 			= Hex.toArray( "69:76:6d:30:30:38:64:00:00:00:00:04:fe:00:00:00:00:00:00:68:00:60:00:00:ff:ff:ff:ff:ff:ff:ff:ff:00:00:00:00:00:00:00:00:01:00:00:00:00:01:00:ff:ff:ff:33:33:33:33:33:33:33:33" );
-
+	// code throws an exception when WRITE or READ is done from this object
 	private static const OXEL_CHILD_COUNT:int = 8;
 	
 	private static		const ALL_NEGZ_CHILD:uint						= 0x0f;
@@ -201,7 +201,7 @@ public class Oxel extends OxelBitfields
 
 	static public function validLightable( $o:Oxel ):Boolean {
 		
-		if ( Globals.BAD_OXEL == $o ) // This is expected, if oxel is on edge of model
+		if ( OxelBad.INVALID_OXEL == $o ) // This is expected, if oxel is on edge of model
 			return false;
 		
 		if ( !$o.lighting ) // does this oxel already have a brightness?
@@ -324,7 +324,7 @@ public class Oxel extends OxelBitfields
 	
 	public function childGetOrCreate( $gc:GrainCursor ):Oxel {
 		if ( !$gc.is_inside( gc ) )
-			return Globals.BAD_OXEL;
+			return OxelBad.INVALID_OXEL;
 			
 		if ( $gc.is_equal( gc ) )
 			return this;
@@ -346,7 +346,7 @@ public class Oxel extends OxelBitfields
 				return child.childGetOrCreate( $gc );
 		}
 
-		return Globals.BAD_OXEL;
+		return OxelBad.INVALID_OXEL;
 	}
 
 	// find locates a oxel within a tree
@@ -360,7 +360,7 @@ public class Oxel extends OxelBitfields
 	public function childFind( $gc:GrainCursor ):Oxel {
 		if ( $gc.grain > gc.grain ) {
 			Log.out( "Oxel.childFind - Looking for a larger grain within a smaller grain");
-			return Globals.BAD_OXEL;
+			return OxelBad.INVALID_OXEL;
 		}
 
 		if ( hasModel )
@@ -370,7 +370,7 @@ public class Oxel extends OxelBitfields
 			return this;
 
 		if ( 0 == gc.grain || $gc.grain == gc.grain )
-			return Globals.BAD_OXEL;
+			return OxelBad.INVALID_OXEL;
 		
 		if ( $gc.is_inside( gc ) ) {
 			for each ( var child:Oxel in _children ) {
@@ -385,7 +385,7 @@ public class Oxel extends OxelBitfields
 		if ( $gc.is_inside( gc ) )
 			return this;
 
-		return Globals.BAD_OXEL;
+		return OxelBad.INVALID_OXEL;
 	}
 
 	public function childrenForKittyCorner( $face:int, $af:int ):Object {
@@ -559,7 +559,7 @@ public class Oxel extends OxelBitfields
 			}
 		}
 			
-		return Globals.BAD_OXEL;
+		return OxelBad.INVALID_OXEL;
 	}
 
 	public function childrenForDirection( dir:int ):Vector.<Oxel> {
@@ -718,7 +718,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 		
 		var child:Oxel = childGetOrCreate( $gc );
-		if ( Globals.BAD_OXEL == child )
+		if ( OxelBad.INVALID_OXEL == child )
 			return false;
 		
 		return child.write_empty( $modelGuid, $gc, $type );
@@ -913,7 +913,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		
 		// lazy evaluation
 		var no:Oxel = _neighbors[ $face ];
-		//if ( no && no != Globals.BAD_OXEL && no.gc.grain > gc.grain && no.childrenHas() )
+		//if ( no && no != OxelBad.INVALID_OXEL && no.gc.grain > gc.grain && no.childrenHas() )
 		//	Log.out( "Oxel.neighbor - this should never happen this:" + toString() + "  no: " + no.toString() );
 		if ( null == no )
 		{
@@ -922,7 +922,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				_neighbors[ $face ] = root_get().childFind( _s_scratchGrain );
 			}
 			else
-				_neighbors[ $face ] = Globals.BAD_OXEL;
+				_neighbors[ $face ] = OxelBad.INVALID_OXEL;
 		}
 		return _neighbors[ $face ];
 	}
@@ -964,9 +964,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ )
 		{
 			no = neighbor(face);
-//			if ( no != Globals.BAD_OXEL && no.gc.eval( 5, 22, 49, 44 ) )
+//			if ( no != OxelBad.INVALID_OXEL && no.gc.eval( 5, 22, 49, 44 ) )
 //				Log.out( "Oxel.neighborsMarkDirtyFaces - found it", Log.WARN )
-			if ( Globals.BAD_OXEL == no )
+			if ( OxelBad.INVALID_OXEL == no )
 				continue;
 
 			var noti:TypeInfo = TypeInfo.typeInfo[no.type];
@@ -1015,7 +1015,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		// regardless of whether or not I have neighbors, I need to create them so them I can tell them I have changed!
 		for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
 			var no:Oxel = neighbor(face);
-			if ( no && Globals.BAD_OXEL != no ) {
+			if ( no && OxelBad.INVALID_OXEL != no ) {
 				no.neighborInvalidate( Oxel.face_get_opposite( face ) );
 			}
 		}
@@ -1101,7 +1101,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				{
 					// get the oxel opposite to this face
 					oppositeOxel = neighbor( face );
-					if ( Globals.BAD_OXEL == oppositeOxel ) {
+					if ( OxelBad.INVALID_OXEL == oppositeOxel ) {
 						// this is an external face. that is on the edge of the grain space
 						faceSet( face );
 					}
@@ -1357,7 +1357,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	//var no:Oxel = null;
 	//for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
 	//no = neighbor( face );
-	//if ( Globals.BAD_OXEL == no )
+	//if ( OxelBad.INVALID_OXEL == no )
 	//continue;
 	//if ( TypeInfo.WATER == no.type && !no.childrenHas() )
 	//continue;
@@ -2658,7 +2658,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 	}
 	/*
-	// { oxel:Globals.BAD_OXEL, gci:gci, positive:posMove, negative:negMove };
+	// { oxel:OxelBad.INVALID_OXEL, gci:gci, positive:posMove, negative:negMove };
 	// RSF - This only works correctly on the + sides, fails for some reason on neg side.
 	public function grow( result:Object ):Oxel {
 		if ( null != _parent )
@@ -2738,7 +2738,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		else if ( $type == type )
 		{
 			var upperNeighbor:Oxel = neighbor( Globals.POSY );
-			if ( Globals.BAD_OXEL != upperNeighbor && TypeInfo.AIR == upperNeighbor.type ) // false == upperNeighbor.hasAlpha
+			if ( OxelBad.INVALID_OXEL != upperNeighbor && TypeInfo.AIR == upperNeighbor.type ) // false == upperNeighbor.hasAlpha
 			{
 				TreeGenerator.generateTree( $modelGuid, this, $chance );
 			}
@@ -2754,7 +2754,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		else
 		{
 			var upperNeighbor:Oxel = neighbor( Globals.POSY );
-			if ( Globals.BAD_OXEL != upperNeighbor && TypeInfo.AIR == upperNeighbor.type )
+			if ( OxelBad.INVALID_OXEL != upperNeighbor && TypeInfo.AIR == upperNeighbor.type )
 			{
 				TreeGenerator.generateTree( $modelGuid, this, $chance );
 			}
@@ -2763,7 +2763,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	
 	private function dirtAndGrassToSand( $dir:int ):void {
 		var no:Oxel = neighbor( $dir );
-		if ( Globals.BAD_OXEL == no )
+		if ( OxelBad.INVALID_OXEL == no )
 			return;
 			
 		var noType:int = no.type;
@@ -2798,7 +2798,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	
 	public function evaluateForChangeToGrass():void {
 		var no:Oxel = neighbor( Globals.POSY );
-		if ( Globals.BAD_OXEL == no )
+		if ( OxelBad.INVALID_OXEL == no )
 				type = TypeInfo.GRASS;
 		else if ( TypeInfo.hasAlpha( no.type ) && no.childrenHas() ) {
 			if ( no.faceHasAlpha( Globals.NEGY ) ) {
@@ -2832,10 +2832,10 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		else if ( TypeInfo.STONE == type  )
 		{
 //			var nou:Oxel = neighbor( Globals.POSY )
-//			if ( Globals.BAD_OXEL == nou && TypeInfo.AIR == nou.type && !nou.childrenHas() && nou.gc.grain == 4 )
+//			if ( OxelBad.INVALID_OXEL == nou && TypeInfo.AIR == nou.type && !nou.childrenHas() && nou.gc.grain == 4 )
 //				nou.write( $modelGuid, gc, 152 );
 			var nod:Oxel = neighbor( Globals.NEGY );
-			if ( Globals.BAD_OXEL != nod && TypeInfo.AIR == nod.type && !nod.childrenHas() && nod.gc.grain >= 4 )
+			if ( OxelBad.INVALID_OXEL != nod && TypeInfo.AIR == nod.type && !nod.childrenHas() && nod.gc.grain >= 4 )
 				nod.change( $modelGuid, nod.gc, 152 );
 		}
 	}
@@ -3002,7 +3002,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		var changeCandidate:Oxel = childFind( $gc );
 
 		// should never be bad unless GC is too large.
-		if ( Globals.BAD_OXEL == changeCandidate ) {
+		if ( OxelBad.INVALID_OXEL == changeCandidate ) {
 			Log.out( "Oxel.changeOxel - cant find child!", Log.ERROR );
 			return null;
 		}
@@ -3038,7 +3038,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		// this gets the exact oxel we are looking for if it is different from returned type.
 			co = co.childGetOrCreate( $gc );
 
-		if ( Globals.BAD_OXEL == co )
+		if ( OxelBad.INVALID_OXEL == co )
 		{
 			Log.out( "Oxel.write - cant find child!", Log.ERROR );
 			return co;
@@ -3138,7 +3138,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 				addFlowTask( $instanceGuid, newTypeInfo );
 				
 				var neighborAbove:Oxel = neighbor( Globals.POSY );
-				if ( Globals.BAD_OXEL == neighborAbove || TypeInfo.AIR == neighborAbove.type )
+				if ( OxelBad.INVALID_OXEL == neighborAbove || TypeInfo.AIR == neighborAbove.type )
 					FlowScaling.scaleTopFlowFace( this )
 			}
 			else

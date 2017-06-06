@@ -14,7 +14,9 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.TypeInfo;
-	import flash.geom.Point;	
+import com.voxelengine.worldmodel.oxel.OxelBad;
+
+import flash.geom.Point;
 	
 	/**
 	 * ...
@@ -177,7 +179,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
         private static function write( $guid:String, oxel:Oxel, gc:GrainCursor, e_type:int ):void 
 		{
 			var ao:Oxel = oxel.root_get().childFind( gc );
-			if ( Globals.BAD_OXEL != ao )
+			if ( OxelBad.INVALID_OXEL != ao )
 				//ao.write( $guid, gc, e_type, true );
 				// write was over writting the trunk.
 				ao.write_empty( $guid, gc, e_type );	
@@ -248,7 +250,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 //			gct.move_posy();  this lets tree grow into ground one level
 			for ( var t:int = 0; t < trunkHeight; t++ ) {
 				var ao:Oxel = oxel.root_get().childFind( gct );
-				if ( Globals.BAD_OXEL != ao )
+				if ( OxelBad.INVALID_OXEL != ao )
 					ao.change( $guid, gct, e_trunkType );
 				gct.move_posy();
 			}

@@ -8,6 +8,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.renderer 
 {
+import com.voxelengine.worldmodel.oxel.OxelBad;
+
 import flash.display.Stage3D;
 import flash.display.BitmapData;
 import flash.display.Stage;
@@ -227,7 +229,7 @@ public class Renderer extends EventDispatcher
 				var lcm:VoxelModel = VoxelModel.controlledModel.lastCollisionModel;
 				if ( null != lcm ) {
 					var camOxel:Oxel = lcm.getOxelAtWSPoint( wsPositionCamera, 4 );
-					if ( camOxel && Globals.BAD_OXEL != camOxel ) {
+					if ( camOxel && OxelBad.INVALID_OXEL != camOxel ) {
 						if ( TypeInfo.WATER == camOxel.type ) {
 							Globals.g_underwater = true;
 							WindowWaterEvent.dispatch( new WindowWaterEvent( WindowWaterEvent.CREATE ) )

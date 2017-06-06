@@ -2,7 +2,7 @@
 
 VoxelVerse todo
 
-
+Camera needs to collide with world!
 need to display ammo for gun models in voxel model panel - Or just allow infinity ammo
 HashTag not set in import
 SoundRange not set on import?
@@ -38,3 +38,14 @@ C9389DB5-7A87-A5D8-2495-445D8391CDC1 - Pistol
 What is VoxelVerse.
 
 My goal is to create a platform we everyone is able to create and share 3D voxel models, games, adventures.
+User created content
+User rated content
+User sellable content
+User created regions
+PvP action in Zeppelins, Dragons
+Destruction of other users content (temp or perm?)
+Almost everywhere is buildable and destructable
+New adventures created but user everyday
+
+1024
+256

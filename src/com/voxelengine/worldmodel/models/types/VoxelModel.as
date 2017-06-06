@@ -19,6 +19,7 @@ import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.worldmodel.models.makers.ModelMakerClone;
 import com.voxelengine.worldmodel.oxel.GrainCursorUtils;
 import com.voxelengine.worldmodel.oxel.Lighting;
+import com.voxelengine.worldmodel.oxel.OxelBad;
 import com.voxelengine.worldmodel.oxel.VisitorFunctions;
 
 import flash.display3D.Context3D;
@@ -695,7 +696,7 @@ public class VoxelModel {
 	public function isInside(x:int, y:int, z:int, gct:GrainCursor):Boolean {
 		GrainCursor.getGrainFromPoint(x, y, z, gct, gct.bound);
 		var fo:Oxel = modelInfo.oxelPersistence.oxel.childFind(gct);
-		if (Globals.BAD_OXEL == fo)
+		if (OxelBad.INVALID_OXEL == fo)
 		{
 			//Log.out( "Camera.isNewPositionValid - oxel is BAD, so passable")
 			return false;
@@ -716,7 +717,7 @@ public class VoxelModel {
 		GrainCursor.getGrainFromPoint(x, y, z, gct, collideAtGrain);
 		var fo:Oxel = modelInfo.oxelPersistence.oxel.childFind(gct);
 		var result:Boolean = true;
-		if (Globals.BAD_OXEL == fo)
+		if (OxelBad.INVALID_OXEL == fo)
 		{
 			//Log.out( "Camera.isNewPositionValid - oxel is BAD, so passable")
 			result = true;
@@ -745,7 +746,7 @@ public class VoxelModel {
 		GrainCursor.getGrainFromPoint($x, $y, $z, gct, collideAtGrain);
 		var fo:Oxel = modelInfo.oxelPersistence.oxel.childFind(gct);
 		var result:Boolean = true;
-		if (Globals.BAD_OXEL == fo)
+		if (OxelBad.INVALID_OXEL == fo)
 		{
 			//Log.out( "Camera.isNewPositionValid - oxel is BAD, so passable")
 			result = true;
@@ -773,7 +774,7 @@ public class VoxelModel {
 	
 	public function isSolidAtWorldSpace($cp:CollisionPoint, $pos:Vector3D, $collideAtGrain:uint, $collidingModel:VoxelModel = null ):void {
 		$cp.oxel = getOxelAtWSPoint($pos, $collideAtGrain);
-		if (Globals.BAD_OXEL == $cp.oxel)
+		if (OxelBad.INVALID_OXEL == $cp.oxel)
 		{
 			$cp.collided = false;
 		}

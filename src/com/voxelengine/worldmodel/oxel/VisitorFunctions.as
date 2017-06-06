@@ -105,7 +105,7 @@ public class VisitorFunctions {
                     for ( var face:int = Globals.POSX; face <= Globals.NEGZ; face++ ) {
                         if ( Globals.isHorizontalDirection( face ) || Globals.NEGY == face ) {
                             no = $oxel.neighbor(face);
-                            if ( Globals.BAD_OXEL == no )
+                            if ( OxelBad.INVALID_OXEL == no )
                                 $oxel.type = TypeInfo.SAND;
                             else if ( TypeInfo.AIR == no.type && !no.childrenHas() )
                                 $oxel.type = TypeInfo.SAND;
@@ -125,7 +125,7 @@ public class VisitorFunctions {
                 resetScaling(child);
         }
         else {
-            if (Globals.BAD_OXEL == $oxel)
+            if (OxelBad.INVALID_OXEL == $oxel)
                 return;
             if ($oxel.flowInfo && $oxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling.has()) {
 //                if (TypeInfo.flowable[$oxel.type])

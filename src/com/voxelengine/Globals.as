@@ -12,10 +12,8 @@ import flash.system.Capabilities;
 
 import com.developmentarc.core.tasks.TaskController;
 
-import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
-import com.voxelengine.worldmodel.oxel.OxelBad;
 import com.voxelengine.utils.GUID;
 
 public class Globals  {
@@ -46,7 +44,7 @@ public class Globals  {
 	public static var g_app:VoxelVerse;
 
 	public static var g_mouseKeyboardHandler:MouseKeyboardHandler = new MouseKeyboardHandler();
-	public static var g_textInput:Boolean
+	public static var g_textInput:Boolean;
 
 	public static const DOUBLE_MESSAGE_WAITING_PERIOD:int = 100;
 
@@ -101,11 +99,6 @@ public class Globals  {
 	public static const MODIFIER_SPEED:String				= "SPEED";
 	public static const MODIFIER_DURABILITY:String			= "DURABILITY";
 	public static const MODIFIER_LUCK:String				= "LUCK";
-
-	// code throws an exception when WRITE or READ is done from this object
-	public static const BAD_OXEL:OxelBad = new OxelBad();
-
-
 
 	static private const PLANE_INWARD_FACING:int = -1;
 	static private const PLANE_OUTWARD_FACING:int = 1;

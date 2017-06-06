@@ -7,6 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.Globals;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.renderer.lamps.ShaderLight;
 import com.voxelengine.renderer.shaders.Shader;
@@ -18,6 +19,7 @@ import com.voxelengine.worldmodel.models.CollisionPoint;
 import com.voxelengine.worldmodel.models.CollisionTest;
 import com.voxelengine.worldmodel.models.Location;
 import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.oxel.OxelBad;
 import com.voxelengine.worldmodel.weapons.Bomb;
 import com.voxelengine.worldmodel.weapons.Gun;
 
@@ -295,7 +297,7 @@ public class Avatar extends ControllableVoxelModel
 
 			// oxel that fall point is in
 			var go:Oxel = points[0].oxel;
-			// its localation in MS (ModelSpace)
+			// its location in MS (ModelSpace)
 			var msCoord:int = go.getModelY();
 			// add its height in MS
 			msCoord += go.size_in_world_coordinates();
@@ -305,6 +307,8 @@ public class Avatar extends ControllableVoxelModel
 
 			// oxel that foot point is in
 			var fo:Oxel = points[1].oxel;
+			if ( OxelBad.INVALID_OXEL == fo )
+					return -1;
 			var msCoordFoot:int = fo.getModelY();
 			msCoordFoot += fo.size_in_world_coordinates();
 			// we need to do minor adjustment on foot position?
@@ -347,7 +351,7 @@ public class Avatar extends ControllableVoxelModel
 				{
 					Log.out( "Player.collisionCheckNew - step smaller then l meter:" );
 					var stepUpOxel1:Oxel = fo.neighbor(Globals.POSY);
-					if ( Globals.BAD_OXEL != stepUpOxel1 )
+					if ( OxelBad.INVALID_OXEL != stepUpOxel1 )
 					{
 						var msCoordFoot1:int = stepUpOxel1.getModelY();
 						msCoordFoot1 += stepUpOxel1.size_in_world_coordinates();
@@ -394,9 +398,9 @@ public class Avatar extends ControllableVoxelModel
 //			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, 0 ) );
 //			camera.addLocation( new CameraLocation( true, 0, Globals.AVATAR_HEIGHT - 4, 0) );
 		//camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, Globals.AVATAR_WIDTH/2) );
-		camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, Globals.AVATAR_WIDTH/2 - 4) );
-		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, 50) );
-		camera.addLocation( new CameraLocation( false, -Globals.AVATAR_WIDTH, Globals.AVATAR_HEIGHT - 4, 50) );
+		camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT + 0, Globals.AVATAR_WIDTH/2 - 4) );
+		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT + 0, 50) );
+		camera.addLocation( new CameraLocation( false, -Globals.AVATAR_WIDTH, Globals.AVATAR_HEIGHT + 0, 50) );
 //			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT + 20, 50) );
 		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 100) );
 //			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 250) );

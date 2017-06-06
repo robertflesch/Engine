@@ -1932,7 +1932,7 @@ public class Lighting  {
 		
 		// get the oxel next to the face we are evaluating.
 		var no:Oxel = $o.neighbor( $face );
-		if ( Globals.BAD_OXEL == no )
+		if ( OxelBad.INVALID_OXEL == no )
 			return;
 		// if the neighbor is solid, return
 		if ( false == TypeInfo.hasAlpha( no.type ) )
@@ -1983,7 +1983,7 @@ public class Lighting  {
 		
 		// get the oxel next to the face we are evaluating.
 		var no:Oxel = $o.neighbor( $face );
-		if ( Globals.BAD_OXEL == no )
+		if ( OxelBad.INVALID_OXEL == no )
 			return;
 		// if the neighbor is solid, return
 		if ( false == TypeInfo.hasAlpha( no.type ) )

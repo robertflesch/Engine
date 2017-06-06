@@ -8,19 +8,10 @@
 package com.voxelengine.worldmodel.oxel
 {
 	import com.voxelengine.worldmodel.TypeInfo;
-	import flash.display3D.Context3D;
+//
+	public class OxelBad extends Oxel {
+		public static const INVALID_OXEL:OxelBad = new OxelBad();
 
-	import com.voxelengine.Globals;
-	import com.voxelengine.worldmodel.oxel.GrainCursor;
-	import com.voxelengine.worldmodel.models.ModelStatisics;
-
-
-	/**
-	 * ...
-	 * @author Robert Flesch RSF OxelBad - An OctTree / VOxelBad - model
-	 */
-	public class OxelBad extends Oxel
-	{
 		private static var _s_constructed_count:int = 0;
 		
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

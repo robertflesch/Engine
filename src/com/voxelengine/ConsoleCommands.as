@@ -9,6 +9,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine
 {
 
+import com.voxelengine.worldmodel.oxel.OxelBad;
+
 import flash.utils.getTimer;
 
 import com.furusystems.dconsole2.DConsole;
@@ -80,7 +82,7 @@ public class ConsoleCommands {
 	private static function tree():void {
 		if ( VoxelModel.selectedModel ) {
 			var oxel:Oxel = EditCursor.currentInstance.getHighlightedOxel();
-			if ( Globals.BAD_OXEL == oxel ) {
+			if ( OxelBad.INVALID_OXEL == oxel ) {
 				Log.out( "Invalid location", Log.WARN );
 				return;
 			}

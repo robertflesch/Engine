@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.worldmodel.oxel.OxelBad;
+
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
@@ -225,7 +227,7 @@ public class Beast extends ControllableVoxelModel
 					var co:Oxel = points[0].oxel;
 					var no:Oxel = co.neighbor( Globals.POSY );
 					// TODO how to handle children in no
-					if ( no != Globals.BAD_OXEL )
+					if ( no != OxelBad.INVALID_OXEL )
 					{
 						//Log.out( "Beast.collisionCheckNew - Adjusting foot position" );
 						var msCoord:int = no.getWorldCoordinate( Globals.AXIS_Y );
