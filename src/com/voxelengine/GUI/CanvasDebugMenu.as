@@ -7,29 +7,24 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI
 {
-import com.voxelengine.events.AppEvent;
-import com.voxelengine.renderer.Chunk;
-import com.voxelengine.worldmodel.models.makers.ModelLibrary;
-import com.voxelengine.worldmodel.models.types.EditCursor;
-import com.voxelengine.worldmodel.models.types.Player;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 import flash.events.Event;
-import org.flashapi.swing.*;
-import org.flashapi.swing.event.*;
-import org.flashapi.swing.layout.*;
-import org.flashapi.swing.constants.*;
-
 import flash.geom.Vector3D;
 
+import org.flashapi.swing.*;
+import org.flashapi.swing.constants.*;
+
+import com.voxelengine.Globals;
 import com.voxelengine.worldmodel.MemoryManager;
 import com.voxelengine.pools.*;
 import com.voxelengine.renderer.VertexIndexBuilder;
+import com.voxelengine.events.AppEvent;
+import com.voxelengine.renderer.Chunk;
+import com.voxelengine.worldmodel.models.ModelCacheUtils;
+import com.voxelengine.worldmodel.models.types.EditCursor;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
 
-import com.voxelengine.Log;
-import com.voxelengine.Globals;
-public class CanvasDebugMenu extends VVCanvas
-{
+public class CanvasDebugMenu extends VVCanvas {
 	static private var _s_currentInstance:CanvasDebugMenu = null;
 	static public function get currentInstance():CanvasDebugMenu { return _s_currentInstance; }
 	private var _smids:Vector.<StaticMemoryDisplay> = new Vector.<StaticMemoryDisplay>;
@@ -38,8 +33,7 @@ public class CanvasDebugMenu extends VVCanvas
 	private var _cmLabel:Label = new Label("grain: 0 x: 0  y: 0  z: 0"); // Controlled model stats
 
 
-	public function CanvasDebugMenu():void
-	{
+	public function CanvasDebugMenu():void {
 		super( 500, 100 );
 		_s_currentInstance = this;
 
@@ -103,6 +97,9 @@ public class CanvasDebugMenu extends VVCanvas
 		addSpace();
 		addSpace();
 
+		addVector3D( "Starting", ModelCacheUtils.worldSpaceStartPointFunction );
+		addVector3D( "  Ending", ModelCacheUtils.worldSpaceEndPointFunction );
+
 		addString( "selected model:", null );
 		addString( "controlled model:", null );
 
@@ -114,7 +111,6 @@ public class CanvasDebugMenu extends VVCanvas
 		_cmLabel.textFormat.color = 0xFFFFFF;
 		addElement( _cmLabel );
 
-		//addStaticMemoryNumberDisplay( _target, 100, 0, "           Total Voxels: ", Quad.count );
 
 		display( 0, 250 );
 		onResize( null );
@@ -124,27 +120,32 @@ public class CanvasDebugMenu extends VVCanvas
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 	}
 
-	protected function onResize(event:Event):void
-	{
+	protected function onResize(event:Event):void {
 		//move( Renderer.renderer.width - 160, 150 ); right side
 		move( 20, 150 );
 	}
 
-	private function addInt( title:String, callback:Function ):void
-	{
+	private function addInt( title:String, callback:Function ):void {
 		var smid:StaticMemoryIntDisplay = new StaticMemoryIntDisplay( title, callback );
 		smid.width = 200;
 		addElement( smid );
 		_smids.push( smid );
 	}
 
-	private function addString( title:String, callback:Function ):void
-	{
+	private function addString( title:String, callback:Function ):void {
 		var smsd:StaticMemoryStringDisplay = new StaticMemoryStringDisplay( title, callback );
 		smsd.width = 200;
 		addElement( smsd );
 		_smids.push( smsd );
 	}
+
+	private function addVector3D( title:String, callback:Function ):void {
+		var smid:StaticMemoryVector3DDisplay = new StaticMemoryVector3DDisplay( title, callback );
+		smid.width = 200;
+		addElement( smid );
+		_smids.push( smid );
+	}
+
 	/*
 	private function addButton( title:String, callback:Function ):void
 	{
@@ -154,22 +155,17 @@ public class CanvasDebugMenu extends VVCanvas
 		addElement( but );
 	}
 	*/
-	private function addSpace():void
-	{
+	private function addSpace():void {
 		var space:Label = new Label();
 		space.height = 10;
 		addElement( space );
 	}
 
-	private function onEnterFrame( event:Event ):void
-	{
+	private function onEnterFrame( event:Event ):void {
 		for each ( var smid:StaticMemoryDisplay in _smids )
-		{
 			smid.updateFunction();
-		}
 
-		if ( _modelLoc )
-		{
+		if ( _modelLoc ) {
 			_modelLoc.text = "";
 			if ( VoxelModel.controlledModel )
 			{
@@ -182,8 +178,7 @@ public class CanvasDebugMenu extends VVCanvas
 		updateCMStats();
 	}
 
-	private function updateGC():void
-	{
+	private function updateGC():void {
 		// TO DO I dont like this direct call into the EditCursor
 		if (Globals.g_app && EditCursor.isEditing ) {
 			if ( VoxelModel.selectedModel && EditCursor.currentInstance.gciData )
@@ -207,7 +202,11 @@ public class CanvasDebugMenu extends VVCanvas
 }
 }
 
+import com.voxelengine.utils.StringUtils;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+
+import flash.geom.Vector3D;
+
 import org.flashapi.swing.Label;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.layout.AbsoluteLayout;
@@ -221,8 +220,7 @@ public function StaticMemoryDisplay() {
 public function updateFunction():void {}
 }
 
-class StaticMemoryIntDisplay extends StaticMemoryDisplay
-{
+class StaticMemoryIntDisplay extends StaticMemoryDisplay {
 private var _prefix:Label = new Label();
 private var _data:Label = new Label();
 private var _value:Function = null;
@@ -230,8 +228,7 @@ static private const PREFIX_WIDTH:int = 90;
 static private const FONT_COLOR:int = 0xffffff;
 
 
-public function StaticMemoryIntDisplay( prefix:String, value:Function )
-{
+public function StaticMemoryIntDisplay( prefix:String, value:Function ) {
 	super();
 	_value = value;
 
@@ -285,16 +282,14 @@ public static function addCommasToLargeInt( value:int ):String
 }
 }
 
-class StaticMemoryStringDisplay extends StaticMemoryDisplay
-{
+class StaticMemoryStringDisplay extends StaticMemoryDisplay {
 private var _prefix:Label = new Label();
 private var _data:Label = new Label();
 private var _value:Function = null;
 static private const PREFIX_WIDTH:int = 90;
 static private const FONT_COLOR:int = 0xffffff;
 
-public function StaticMemoryStringDisplay( prefix:String, value:Function )
-{
+public function StaticMemoryStringDisplay( prefix:String, value:Function ) {
 	super();
 	_value = value;
 
@@ -323,5 +318,42 @@ override public function updateFunction():void
 	else
 		_data.text = "";
 }
+}
+
+class StaticMemoryVector3DDisplay extends StaticMemoryDisplay {
+	private var _prefix:Label = new Label();
+	private var _data:Label = new Label();
+	private var _value:Function = null;
+	static private const PREFIX_WIDTH:int = 90;
+	static private const FONT_COLOR:int = 0xffffff;
+
+	public function StaticMemoryVector3DDisplay(prefix:String, value:Function) {
+		super();
+		_value = value;
+
+		layout = new AbsoluteLayout();
+		_prefix.textAlign = TextAlign.LEFT;
+		_prefix.text = prefix;
+		_prefix.width = PREFIX_WIDTH;
+		_prefix.x = 0;
+		_prefix.y = 0;
+		_prefix.fontColor = FONT_COLOR;
+		_prefix.fontSize = 10;
+		addElement(_prefix);
+		_data.textAlign = TextAlign.RIGHT;
+		_data.width = 200;
+		_data.x = PREFIX_WIDTH;
+		_data.y = 0;
+		_data.fontColor = FONT_COLOR;
+		_data.fontSize = 10;
+		addElement(_data);
+	}
+
+	override public function updateFunction():void
+	{
+		var k:Vector3D = _value();
+		var result:String = "x: " + k.x.toFixed(2) + "  y: " + k.y.toFixed(2) + "  z: " + k.z.toFixed(2);
+		_data.text = result;
+	}
 
 }

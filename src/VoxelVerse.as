@@ -201,6 +201,10 @@ public class VoxelVerse extends Sprite
 
 		MemoryManager.update();
 
+		ModelCacheUtils.worldSpaceStartAndEndPointCalculate();
+
+		Globals.taskController.next();
+
 		RegionManager.instance.update( interFrameTime );
 		Shader.animationOffsetsUpdate( interFrameTime );
 		//var _timeUpdate:int = getTimer() - _s_timeEntered;

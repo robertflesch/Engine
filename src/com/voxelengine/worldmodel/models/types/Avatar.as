@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models.types
 {
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelEvent;
+import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.renderer.lamps.ShaderLight;
 import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.worldmodel.MouseKeyboardHandler;
@@ -117,11 +118,7 @@ public class Avatar extends ControllableVoxelModel
 		instanceInfo.usesCollision = true;
 		clipVelocityFactor = AVATAR_CLIP_FACTOR;
 		torchToggle();
-		collisionPointsAdd();
-//		_displayCollisionMarkers = true;
-//		if ( _displayCollisionMarkers )
-//			CollisionTest.createMarkers();
-//			_ct.markersAdd();
+		collisionMarkers = true;
 	}
 
 	override public function buildExportObject():void {
@@ -190,6 +187,29 @@ public class Avatar extends ControllableVoxelModel
 	}
 
 	override protected function collisionPointsAdd():void {
+		// TO DO Should define this in meta data??? RSF or using extents?
+		// diamond around feet
+		if ( !_ct.hasPoints() ) {
+			_ct.addCollisionPoint( new CollisionPoint( FALL, new Vector3D( 7.5, -1, 7.5 ), false ) );
+			_ct.addCollisionPoint( new CollisionPoint( "CENTER", new Vector3D( 7.5, 0, 7.5 ), false ) );
+			 _ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 4, Globals.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
+			 _ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 11, Globals.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
+			 //_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX/2, 0 ) ) );
+			 //_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX, 0 ) ) );
+			 //			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 11, Globals.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
+			 //			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT, 11 ) ) );
+			 //			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 4, Globals.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
+			 // middle of chest
+			 _ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST - 4, 7.5 ) ) );
+			 _ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST, 7.5 ) ) );
+			 _ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST + 4, 7.5 ) ) );
+			 // diamond around feet
+			 _ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
+			 _ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 7.5 ), false ) );
+			 //_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 15 ) ) );
+			 //_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 0, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
+		}
+
 		/*  0,0xxxxxx8xxxxxx15,0
 		 *  x                x
 		 *  x                x
@@ -200,29 +220,6 @@ public class Avatar extends ControllableVoxelModel
 		 *  0,15xxxxx8xxxxxx15,15
 		 *
 		 * */
-		// TO DO Should define this in meta data??? RSF or using extents?
-		// diamond around feet
-		if ( !_ct.hasPoints() ) {
-			_ct.addCollisionPoint( new CollisionPoint( FALL, new Vector3D( 7.5, -1, 7.5 ), false ) );
-
-			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 1, Globals.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
-			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 14, Globals.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
-			//_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX/2, 0 ) ) );
-			//_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX, 0 ) ) );
-			//			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 11, Globals.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
-			//			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT, 11 ) ) );
-			//			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 4, Globals.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
-			// middle of chest
-			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST - 4, 7.5 ) ) );
-			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST, 7.5 ) ) );
-			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST + 4, 7.5 ) ) );
-			// diamond around feet
-			_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
-			_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 7.5 ), false ) );
-			//_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 15 ) ) );
-			//_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 0, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
-		}
-
 	}
 
 	// returns -1 if new position is valid, returns 0-2 if there was collision

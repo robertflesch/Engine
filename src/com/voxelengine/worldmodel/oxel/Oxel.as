@@ -2015,9 +2015,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	public function lineIntersectWithChildren( $msStartPoint:Vector3D, $msEndPoint:Vector3D, $msIntersections:Vector.<GrainCursorIntersection>, $ignoreType:uint, $minSize:int = 2 ):void	{
 		
 		if ( !childrenHas() && $ignoreType != type )
-			lineIntersect( this, $msStartPoint, $msEndPoint, $msIntersections );
+			lineIntersect( $msStartPoint, $msEndPoint, $msIntersections );
 		else if ( gc.grain <=  $minSize	)			
-			lineIntersect( this, $msStartPoint, $msEndPoint, $msIntersections );
+			lineIntersect( $msStartPoint, $msEndPoint, $msIntersections );
 		// find the oxel that is closest to the start point, and is solid?
 		// first do a quick check to see if ray hits any children.
 		// then for any children it hits, do a hit test with its children
@@ -2028,7 +2028,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			var totalIntersections:Vector.<GrainCursorIntersection> = new Vector.<GrainCursorIntersection>();
 			for each ( var child:Oxel in _children ) 
 			{
-				child.lineIntersect( child, $msStartPoint, $msEndPoint, childIntersections, $ignoreType );
+				child.lineIntersect( $msStartPoint, $msEndPoint, childIntersections, $ignoreType );
 				for each ( var gcIntersection:GrainCursorIntersection in childIntersections )
 				{
 					gcIntersection.oxel = child;
@@ -3375,7 +3375,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	private static var _s_min:Vector3D = new Vector3D();
 	private static var _s_max:Vector3D = new Vector3D();
 	private static var _s_beginToEnd:Vector3D = new Vector3D();
-	public function lineIntersect( $o:Oxel, $modelSpaceStartPoint:Vector3D, $modelSpaceEndPoint:Vector3D, $intersections:Vector.<GrainCursorIntersection>, $ignoreType:uint = 100 ):Boolean
+	public function lineIntersect( $modelSpaceStartPoint:Vector3D, $modelSpaceEndPoint:Vector3D, $intersections:Vector.<GrainCursorIntersection>, $ignoreType:uint = 100 ):Boolean
 	{
 		if ( $ignoreType == type && !childrenHas() )
 			return false;
@@ -3435,7 +3435,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 		if (tNear >= 0 && tNear <= 1) {
 			var gci:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tNear, tNearAxis, true );
-			gci.oxel = $o;
+			gci.oxel = this;
 			$intersections.push( gci );
 			//trace( "GrainCursor.lineIntersectTest3 - intersection near " + gciNear.toString() );
 		}
@@ -3450,7 +3450,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		if (tFar > 0 && tFar <= 100) // what does 100 represent?
 		{
 			var gci1:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tFar, tFarAxis, false );
-			gci1.oxel = $o;
+			gci1.oxel = this;
 			$intersections.push( gci1 );
 		}
 		return true;

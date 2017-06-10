@@ -25,7 +25,7 @@ import flash.geom.Vector3D;
 	public class CollisionTest 
 	{
 		private var _collisionPoints:Vector.<CollisionPoint> = new Vector.<CollisionPoint>();
-		private var _owner:VoxelModel = null
+		private var _owner:VoxelModel = null;
 		
 		// Collision points are defined in World Space coordinates
 		public function CollisionTest( $owner:VoxelModel ) 				{ _owner = $owner }
@@ -68,9 +68,8 @@ import flash.geom.Vector3D;
 		public function hasPoints():Boolean { return  0 == _collisionPoints.length ? false : true; }
 			
 		public function markersAdd():void {
-			
-			for each ( var cp:CollisionPoint in _collisionPoints )
-				cp.markerAdd( _owner );
+			for each (var cp:CollisionPoint in _collisionPoints)
+				cp.markerAdd(_owner);
 		}
 		
 		public function markersRemove():void {

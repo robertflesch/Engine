@@ -117,7 +117,9 @@ public class Player extends PersistenceObject
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.modelGuid = $modelGuid;
 		ii.instanceGuid = $userId;
-		ii.centerSetComp(7.5, 0, 7.5);
+		//ii.centerSetComp(7.5, 0, 7.5);
+		ii.centerSetComp(8, 0, 8);
+
 
 		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 		if (DEFAULT_PLAYER == $modelGuid) {

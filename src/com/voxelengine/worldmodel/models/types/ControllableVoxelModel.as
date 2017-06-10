@@ -56,7 +56,9 @@ public class ControllableVoxelModel extends VoxelModel
 	static protected    const DEFAULT_SPEED_MAX:int			= 15;
 	static protected    const DEFAULT_TURN_RATE:Number		= 20;
 	static protected    const DEFAULT_ACCEL_RATE:Number		= 0.5;
-	
+
+	public static const COLLISION_MARKER:String 			= "COLLISION_MARKER";
+
 	// scratch objects to save on allocation of memory
 	//private static const _sZERO_VEC:Vector3D 				= new Vector3D();
 	protected static var _sScratchVector:Vector3D			= new Vector3D();
@@ -179,7 +181,9 @@ public class ControllableVoxelModel extends VoxelModel
 	}
 	protected function collisionPointsAdd():void {
 		// TO DO Should define this in meta data??? RSF or using extents?
-		
+		if ( 0 < _ct.hasPoints() )
+			return;
+
 		if ( modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount ) {
 			var oxel:Oxel = modelInfo.oxelPersistence.oxel;
 			var sizeOxel:Number = oxel.gc.size() / 2;
@@ -573,8 +577,10 @@ public class ControllableVoxelModel extends VoxelModel
 	public function get collisionMarkers():Boolean { return _displayCollisionMarkers; }
 	public function set collisionMarkers($value:Boolean):void 
 	{
-		if ( $value )
+		if ( $value ) {
+			collisionPointsAdd();
 			_ct.markersAdd();
+		}
 		else
 			_ct.markersRemove();
 

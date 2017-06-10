@@ -10,6 +10,8 @@ package com.voxelengine.worldmodel
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.LoadingEvent;
+import com.voxelengine.events.ModelLoadingEvent;
+import com.voxelengine.events.ObjectHierarchyData;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.RoomEvent;
 import com.voxelengine.events.PersistenceEvent;
@@ -17,8 +19,12 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.WindowSplashEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.server.Room;
+import com.voxelengine.worldmodel.models.CollisionPoint;
 import com.voxelengine.worldmodel.models.types.Axes;
+import com.voxelengine.worldmodel.models.types.ControllableVoxelModel;
 import com.voxelengine.worldmodel.models.types.EditCursor;
+import com.voxelengine.worldmodel.models.types.EditCursor;
+import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 /**
@@ -143,8 +149,12 @@ public class RegionManager
 	////////////////////////////////////////////////////////////////////////////////////////
 	
 	public function configComplete( $e:LoadingEvent ):void {
-		startWithEmptyRegion();
+		var startingRegion:Region = new Region( "Blank", null, {} );
+		add( null, startingRegion );
+		RegionEvent.create( RegionEvent.LOAD, 0, "Blank" );
+		CollisionPoint.createPoint();
 		Axes.createAxes();
+		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, buildComplete );
 		EditCursor.createCursor();
 
 		// Add a listener to tell when file has been loaded
@@ -152,15 +162,16 @@ public class RegionManager
 		// now request the file be loaded
 //		RegionEvent.dispatch( new RegionEvent( ModelBaseEvent.REQUEST, 0, $guid ) );
 	}
-	
-	public function startWithEmptyRegion():void {
-		var startingRegion:Region = new Region( "Blank", null, {} );
-		add( null, startingRegion );
-		RegionEvent.create( RegionEvent.LOAD, 0, startingRegion.guid );
-		//RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD_COMPLETE, 0, startingRegion.guid ) );
-		// This tells the config manager that the local region was loaded and is ready to load rest of data.
+
+	private function buildComplete( $mle:ModelLoadingEvent ):void {
+		var ohd:ObjectHierarchyData = $mle.data;
+		// Since the collision markers are needed for avatar, don't load avatar until it is complete.
+		if ( ControllableVoxelModel.COLLISION_MARKER == ohd.modelGuid) {
+			ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, buildComplete);
+			Player.createPlayer(Player.DEFAULT_PLAYER, Network.LOCAL );
+		}
 	}
-	
+
 	private function startingRegionLoaded( $re:RegionEvent):void {
 		// remove this handler
 		RegionEvent.removeListener( ModelBaseEvent.ADDED, startingRegionLoaded );

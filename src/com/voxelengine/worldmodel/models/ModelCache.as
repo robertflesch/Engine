@@ -213,12 +213,6 @@ public class ModelCache
 		//if ( 50 < $elapsedTimeMS )
 			//Log.out( "ModelCache.update - its been more then " + $elapsedTimeMS +  " since this animation was updated." );
 
-		ModelCacheUtils.worldSpaceStartAndEndPointCalculate();
-
-		//var taskTime:int = getTimer();
-		// Make sure to call this before the model update, so that models have time to repair them selves.
-		Globals.taskController.next();
-
 		var context3D:Context3D = Renderer.renderer.context3D;
 		var vm:VoxelModel;
 		for ( var i:int = 0; i < _instancesDynamic.length; i++ ) {

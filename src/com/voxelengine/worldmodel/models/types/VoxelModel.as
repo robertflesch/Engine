@@ -669,7 +669,7 @@ public class VoxelModel {
 		{
 			// this is returning model space intersections
 			if ( modelInfo.oxelPersistence ){
-				modelInfo.oxelPersistence.oxel.lineIntersect( modelInfo.oxelPersistence.oxel ,modelSpaceStartPoint, modelSpaceEndPoint, $intersections );
+				modelInfo.oxelPersistence.oxel.lineIntersect( modelSpaceStartPoint, modelSpaceEndPoint, $intersections );
 
 				for each (var gci:GrainCursorIntersection in $intersections) {
 					gci.wsPoint = modelToWorld(gci.point);

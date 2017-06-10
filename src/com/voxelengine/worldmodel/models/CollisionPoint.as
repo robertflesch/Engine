@@ -7,7 +7,12 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.events.ModelLoadingEvent;
+import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
+import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
+import com.voxelengine.worldmodel.models.types.ControllableVoxelModel;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 
 import flash.geom.Vector3D;
 	
@@ -15,15 +20,9 @@ import flash.geom.Vector3D;
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.Region;
-	import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 	import com.voxelengine.worldmodel.models.types.VoxelModel;
-	import com.voxelengine.worldmodel.models.InstanceInfo;
-	import com.voxelengine.worldmodel.models.ModelInfo;
-	/**
-	 * ...
-	 * @author Robert Flesch
-	 */
-	public class CollisionPoint 
+
+	public class CollisionPoint
 	{
 		private var _name:String;
 		private var _point:Vector3D 		= null;
@@ -32,8 +31,22 @@ import flash.geom.Vector3D;
 		private var _collided:Boolean 		= false;
 		private var _oxel:Oxel 				= null;
 		private var _instanceGuid:String	= null;
-		private var _vm:VoxelModel			= null;
-		
+		private static var _vm:VoxelModel			= null;
+
+		public static function createPoint():void {
+			var iiR:InstanceInfo = new InstanceInfo();
+			iiR.modelGuid = ControllableVoxelModel.COLLISION_MARKER;
+			ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete );
+			new ModelMakerGenerate( iiR, GenerateCube.script( 0, TypeInfo.RED, true ), true, false );
+
+			function modelLoadComplete ( $mle:ModelLoadingEvent ):void {
+				if ($mle.data.modelGuid == ControllableVoxelModel.COLLISION_MARKER) {
+					ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, modelLoadComplete);
+					_vm = $mle.vm;
+				}
+			}
+		}
+
 		public function CollisionPoint( $name:String, $point:Vector3D, $scaled:Boolean = true )
 		{
 			_name = $name;
@@ -43,20 +56,20 @@ import flash.geom.Vector3D;
 		}
 		
 		public function markerAdd( $owner:VoxelModel ):void {
-			
 			var collisionPointMarker:InstanceInfo 	= new InstanceInfo();
-			collisionPointMarker.modelGuid			= "1MeterRedBlock";
+			collisionPointMarker.modelGuid			= ControllableVoxelModel.COLLISION_MARKER;
 			instanceGuid = collisionPointMarker.instanceGuid		= Globals.getUID();
-			collisionPointMarker.scale 				= new Vector3D( 1/16, 1/16, 1/16 );
+			//collisionPointMarker.scale 				= new Vector3D( 1/16, 1/16, 1/16 );
 			collisionPointMarker.positionSet 		= point;
 			collisionPointMarker.controllingModel 	= $owner;
-			//collisionPointMarker.name				= "CollisionPoint";
-			new ModelMaker( collisionPointMarker );
+			collisionPointMarker.name				= ControllableVoxelModel.COLLISION_MARKER + point;
+			new ModelMaker( collisionPointMarker, true , false );
 		}
 		
 		public function markerRemove( $owner:VoxelModel ):void {
-			
 			$owner.modelInfo.childRemove( _vm.instanceInfo );
+			var vm:VoxelModel = $owner.modelInfo.childModelFind( _instanceGuid );
+			vm.dead = true;
 			_vm = null;
 			_instanceGuid = null;
 		}

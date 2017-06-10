@@ -2,7 +2,11 @@
 
 VoxelVerse todo
 
+--Collision
 Camera needs to collide with world!
+When side of the avatar is touching an oxel it get pushed up over and over again.
+
+
 need to display ammo for gun models in voxel model panel - Or just allow infinity ammo
 HashTag not set in import
 SoundRange not set on import?
@@ -45,7 +49,5 @@ User created regions
 PvP action in Zeppelins, Dragons
 Destruction of other users content (temp or perm?)
 Almost everywhere is buildable and destructable
-New adventures created but user everyday
-
-1024
-256
+New adventures created by user everyday
+Very low cost per user.

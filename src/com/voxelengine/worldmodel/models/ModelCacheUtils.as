@@ -43,7 +43,10 @@ import flash.geom.Matrix3D;
 		static private var _viewDistances:Vector.<Vector3D> = new Vector.<Vector3D>(6); 
 		
 		static public function get worldSpaceStartPoint():Vector3D { return _worldSpaceStartPoint; }
-		
+		static public function get worldSpaceEndPoint():Vector3D { return _worldSpaceEndPoint; }
+		static public function worldSpaceStartPointFunction():Vector3D { return _worldSpaceStartPoint ? _worldSpaceStartPoint : new Vector3D(); }
+		static public function worldSpaceEndPointFunction():Vector3D { return _worldSpaceEndPoint ? _worldSpaceEndPoint : new Vector3D(); }
+
 		static public function get gci():GrainCursorIntersection { return _gci; }
 		
 		public function ModelCacheUtils() { }
