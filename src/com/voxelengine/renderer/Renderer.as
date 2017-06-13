@@ -210,22 +210,22 @@ public class Renderer extends EventDispatcher
 
 		// New in Flash 16
 		// Context3D's setFillMode()  "wireframe" or "solid".
-		var cm:VoxelModel = VoxelModel.controlledModel;
-		var cmRotation:Vector3D;
+		var controlledModel:VoxelModel = VoxelModel.controlledModel;
+		var controlledModelRotation:Vector3D;
 
 		// Very early in render cycle the controlled model may not be instantitated yet.
 		var wsPositionCamera:Vector3D;
-		if ( !cm ) {
+		if ( !controlledModel ) {
 			wsPositionCamera = new Vector3D();
-			cmRotation = new Vector3D();
+			controlledModelRotation = new Vector3D();
 		}
 		else {
-			cmRotation = cm.camera.rotationGet;
-			wsPositionCamera = cm.instanceInfo.worldSpaceMatrix.transformVector(cm.camera.current.position);
+			controlledModelRotation = controlledModel.camera.rotationGet;
+			wsPositionCamera = controlledModel.instanceInfo.worldSpaceMatrix.transformVector(controlledModel.camera.current.position);
 			// This does not handle the case where the player has not collided with the model yet
 			// Say they are falling onto an island, and they hit the water first.
 			// I should probably adjust that algorithm to account for it.
-			if ( cm) {
+			if ( controlledModel) {
 				var lcm:VoxelModel = VoxelModel.controlledModel.lastCollisionModel;
 				if ( null != lcm ) {
 					var camOxel:Oxel = lcm.getOxelAtWSPoint( wsPositionCamera, 4 );
@@ -256,9 +256,9 @@ public class Renderer extends EventDispatcher
 		// Empty starting matrix
 		_mvp.identity();
 		
-		_mvp.prependRotation( cmRotation.x, Vector3D.X_AXIS );
-		_mvp.prependRotation( cmRotation.y, Vector3D.Y_AXIS );
-		_mvp.prependRotation( cmRotation.z, Vector3D.Z_AXIS );
+		_mvp.prependRotation( controlledModelRotation.x, Vector3D.X_AXIS );
+		_mvp.prependRotation( controlledModelRotation.y, Vector3D.Y_AXIS );
+		_mvp.prependRotation( controlledModelRotation.z, Vector3D.Z_AXIS );
 
 		// the position of the controlled model
 		_mvp.prependTranslation( wsPositionCamera.x, wsPositionCamera.y, wsPositionCamera.z ); 

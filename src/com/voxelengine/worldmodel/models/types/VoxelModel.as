@@ -91,7 +91,7 @@ public class VoxelModel {
 
 	// state data
 	private		var	_anim:Animation;
-	private		var	_camera:Camera								= new Camera();
+	private		var	_camera:Camera								= null;
 	private		var	_usesGravity:Boolean; 														
 	private		var	_timer:int 									= getTimer(); 				
 	private 	var _hasInventory:Boolean;
@@ -139,6 +139,7 @@ public class VoxelModel {
 	public function VoxelModel( $ii:InstanceInfo ):void {
 		_instanceInfo = $ii;
 		_instanceInfo.owner = this; // This tells the instanceInfo that this voxel model is its owner.
+		_camera = new Camera( this );
 	}
 	
 	public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
