@@ -557,12 +557,7 @@ public class EditCursor extends VoxelModel
 		var gci:GrainCursorIntersection = EditCursor.currentInstance.gciData;
 		if ( !gci )
 			return;
-			
-		// determines whether a block can be placed
-		// calculate difference between avatar location and intersection point
-		var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
-		diffPos = diffPos.subtract( gci.wsPoint );
-		
+
 		_pl.reset();
 		_pl.state = PlacementLocation.VALID;
 		// copy the location of the cursor in the larger model
@@ -571,7 +566,7 @@ public class EditCursor extends VoxelModel
 		// test the results of the step, to see if a blocks has been sent out of bounds.
 		switch ( gci.axis ) {
 		case Globals.AXIS_X:
-			if ( 0 < diffPos.x ) {
+			if ( gci.point.x > gci.gc.getModelX() + gci.gc.size()/2 ) {
 				if ( !_pl.gc.move_posx() ) _pl.state = PlacementLocation.INVALID;
 				_pl.positive = true;
 			} else {
@@ -580,7 +575,7 @@ public class EditCursor extends VoxelModel
 			}
 			break;
 		case Globals.AXIS_Y:
-			if ( 0 < diffPos.y ) {
+			if ( gci.point.y > gci.gc.getModelY() + gci.gc.size()/2 ) {
 				if ( !_pl.gc.move_posy() ) _pl.state = PlacementLocation.INVALID;
 				_pl.positive = true;
 			} else {
@@ -589,7 +584,7 @@ public class EditCursor extends VoxelModel
 			}
 			break;
 		case Globals.AXIS_Z:
-			if ( 0 < diffPos.z ) {
+			if ( gci.point.z > gci.gc.getModelZ() + gci.gc.size()/2 ) {
 				if ( !_pl.gc.move_posz() ) _pl.state = PlacementLocation.INVALID;
 				_pl.positive = true;
 			} else {	
