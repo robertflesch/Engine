@@ -1114,7 +1114,9 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 							if ( gc.grain < oppositeOxel.gc.grain && ( 0 == gc.grainY % 2 ) )
 								faceClear( face );
 							else { // opposite can not be smaller and be the same type
-								if ( null == oppositeOxel.flowInfo && null == flowInfo )
+								if ( type == TypeInfo.VINE )
+									faceSet( face );
+								else if ( null == oppositeOxel.flowInfo && null == flowInfo )
 									faceClear( face );
 								else if ( oppositeOxel.flowInfo && oppositeOxel.flowInfo.flowScaling.has() && null == flowInfo )
 									faceSet( face );
@@ -1137,16 +1139,21 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 										//Log.out( "faceBuildTerminal face: " + face + "  p1: " + p1.toString() + " size: " + gc.size() + "  p2: " + p2.toString() + " size: " + oppositeOxel.gc.size() , Log.WARN )
 										faceSet( face );
 									}
-								}
-								else {
+								} else {
 									// The both have flowInfo (all external faces do), but neither has scaling
-									faceClear( face ); // what case is this?
+									if ( type == TypeInfo.VINE )
+										faceSet( face );
+									else
+										faceClear( face ); // what case is this?
 								}
 								
 							}
+						} else {
+							if (type == TypeInfo.VINE)
+								faceSet(face);
+							else
+								faceClear(face);
 						}
-						else
-							faceClear( face );
 					}
 					else if ( oppositeOxel.childrenHas() ) {
 						// so I am a larger face looking to see if there is visability to me.
