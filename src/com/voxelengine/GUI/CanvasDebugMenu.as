@@ -340,8 +340,8 @@ class StaticMemoryVector3DDisplay extends StaticMemoryDisplay {
 		_prefix.fontColor = FONT_COLOR;
 		_prefix.fontSize = 10;
 		addElement(_prefix);
-		_data.textAlign = TextAlign.RIGHT;
-		_data.width = 200;
+		_data.textAlign = TextAlign.LEFT;
+		_data.width = 150;
 		_data.x = PREFIX_WIDTH;
 		_data.y = 0;
 		_data.fontColor = FONT_COLOR;

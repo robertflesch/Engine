@@ -89,14 +89,11 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 	
 	private function fullScreenEvent(event:FullScreenEvent):void {
-		if ( event.fullScreen )
-		{
+		if ( event.fullScreen ) {
 			//Log.out( "Renderer - enter fullscreen has been called" + event );
 			if( !Globals.g_app.stage.mouseLock )
 				Globals.g_app.stage.mouseLock = true;
-		}
-		else if ( !event.fullScreen )
-		{
+		} else if ( !event.fullScreen ) {
 			//Log.out( "Renderer - leaving fullscreen has been called" + event );
 		}
 	}
@@ -128,15 +125,13 @@ public class VoxelVerseGUI extends EventDispatcher
 	
 	private function crossHairResize(event:Event):void {
 		//Log.out( "VoxelVerseGUI.crossHairResize" );
-		if ( _crossHairHorizontal )
-		{
+		if ( _crossHairHorizontal ) {
 			var halfRW:int = Renderer.renderer.width / 2;
 			var halfRH:int = Renderer.renderer.height / 2;
 			_crossHairHorizontal.x = halfRW - _crossHairHorizontal.width/2;
 			_crossHairHorizontal.y = halfRH;
 			_crossHairVertical.x = halfRW;
 			_crossHairVertical.y = halfRH - _crossHairVertical.height / 2;
-			
 		}
 	}
 	
@@ -156,10 +151,8 @@ public class VoxelVerseGUI extends EventDispatcher
 	
 	private function addReleaseMenu():CanvasReleaseMenu {
 		if ( ConfigManager.instance.showButtons && ConfigManager.instance.showEditMenu )
-		{
 			crossHairAdd();
-		}
-		
+
 		return new CanvasReleaseMenu();
 	}
 	
@@ -417,7 +410,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	import com.voxelengine.worldmodel.weapons.Ammo;
 	import com.voxelengine.worldmodel.weapons.Gun;
 
-	private var _gunTest:Gun
+	private var _gunTest:Gun;
 	private function createProjectile( vm:VoxelModel ):void  {
 		if ( _projectileEnabled )
 		{

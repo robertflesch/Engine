@@ -28,15 +28,14 @@ public class WindowRegionModels extends VVPopup
 
 	static public function toggle():void {
 		if ( null == _s_instance )
-			_s_instance = new WindowRegionModels()
+			_s_instance = new WindowRegionModels();
 		else {
-			_s_instance.remove()
+			_s_instance.remove();
 			_s_instance = null
 		}
 	}
 
-	public function WindowRegionModels()
-	{
+	public function WindowRegionModels() {
 		super( LanguageManager.localizedStringGet( "Voxel_Model" ) );
 		autoSize = true;
 		padding = 0;
@@ -54,8 +53,7 @@ public class WindowRegionModels extends VVPopup
 			_modelPanel.updateChildren( Region.currentRegion.modelCache.modelsGet, null );
 	}
 
-	override protected function onRemoved(event:UIOEvent):void
-	{
+	override protected function onRemoved(event:UIOEvent):void {
 		//Log.out( "WindowRegionModels.onRemoved", Log.WARN );
 		super.onRemoved(event);
 		ModelEvent.removeListener( ModelEvent.PARENT_MODEL_ADDED, onParentModelAdded );
@@ -66,8 +64,7 @@ public class WindowRegionModels extends VVPopup
 		_s_instance = null
 	}
 
-	private function createTopLevel():void
-	{
+	private function createTopLevel():void {
 		// Popup is NOT a UIContainer for some reason.
 		// So we have to create this holding object for all of the panels
 		// so that they may resize correctly

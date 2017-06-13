@@ -44,7 +44,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 		_creationInfo = $miJson;
 		_doNotPersist = $doNotPersist;
 		addToRegionWhenComplete = $addToRegionWhenComplete;
-		Log.out("ModelMakerGenerate - ii: " + $ii.toString() + "  using generation script: " + $miJson.biomes.layers[0].functionName);
+//Log.out("ModelMakerGenerate construct - instanceGuid: " + ii.instanceGuid + "  model guid: " + ii.modelGuid + "  using generation script: " + $miJson.biomes.layers[0].functionName, Log.WARN);
 		retrieveOrGenerateModelInfo();
 	}
 
@@ -78,7 +78,6 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			ModelInfoEvent.removeListener( ModelBaseEvent.EXISTS_FAILED, modelInfoDoesNotExists );
 		}
 	}
-
 
 	private function retrieveOrGenerateModelMetadata(): void {
 		ModelMetadataEvent.addListener( ModelBaseEvent.EXISTS, modelMetadataExists );
@@ -150,7 +149,7 @@ public class ModelMakerGenerate extends ModelMakerBase {
 			ModelMetadataEvent.create( ModelBaseEvent.GENERATION, 0, _modelMetadata.guid, _modelMetadata );
 			ModelInfoEvent.create( ModelBaseEvent.GENERATION, 0, _modelInfo.guid, _modelInfo );
 		} else {
-			Log.out( "ModelMakerGenerate.markComplete - guid: " + modelInfo.guid, Log.WARN );
+			Log.out( "ModelMakerGenerate.markComplete FAILURE - guid: " + modelInfo.guid, Log.WARN );
 			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
 		}
 
