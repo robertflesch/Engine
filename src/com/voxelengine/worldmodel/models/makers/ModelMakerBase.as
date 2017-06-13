@@ -67,9 +67,9 @@ public class ModelMakerBase {
 	public function ModelMakerBase( $ii:InstanceInfo ) {
 		if ( null == $ii )
 			throw new Error( "ModelMakerBase - NO instanceInfo received in constructor" );
-		//Log.out( "ModelMakerBase - ii: " + $ii.toString(), Log.DEBUG )
 		_ii = $ii;
-		//Log.out( "ModelMakerBase - _ii.modelGuid: " + _ii.modelGuid );
+		if ( null == _ii.instanceGuid )
+			_ii.instanceGuid = Globals.getUID();
 
 		if ( $ii.controllingModel ) {
 			//Log.out( "ModelMakerBase - _ii.modelGuid: " + _ii.modelGuid + "  $ii.controllingModel: " + $ii.controllingModel);
@@ -161,9 +161,7 @@ public class ModelMakerBase {
 	protected function make():VoxelModel {
 		var modelAsset:String = _modelInfo.modelClass;
 		var modelClass:Class = ModelLibrary.getAsset( modelAsset );
-		if ( null == _ii.instanceGuid )
-			 _ii.instanceGuid = Globals.getUID();
-		
+
 		var vm:VoxelModel = new modelClass( _ii );
 		if ( null == vm ) {
 			Log.out( "ModelMakerBase.make - Model failed in creation - modelAsset: " + modelAsset + "  modelClass: " + modelClass, Log.ERROR );
@@ -196,7 +194,10 @@ public class ModelMakerBase {
 	protected function oxelPersistenceComplete($ode:OxelDataEvent):void {
 		//Log.out( "ModelMakerBase.oxelPersistenceComplete  $ode.modelGuid: " + $ode.modelGuid + " type: " + $ode.type , Log.WARN );
 		if ($ode.modelGuid == modelInfo.guid ) {
-			Log.out( "ModelMakerBase.oxelPersistenceComplete  guid: " + modelInfo.guid + " type: " + $ode.type , Log.WARN );
+			//Log.out( "ModelMakerBase.oxelPersistenceComplete type: " + $ode.type  + "  guid: " + modelInfo.guid , Log.WARN );
+			if ( $ode.type == ModelBaseEvent.RESULT )
+				removeODEListeners();
+
 			modelInfo.oxelPersistence = $ode.oxelPersistence;
 			// This is before quads have been built
 			if ( ii.baseLightLevel )
@@ -207,6 +208,8 @@ public class ModelMakerBase {
 			_vm.complete = true;
 			if ( _vm && addToRegionWhenComplete )
 				RegionEvent.create( RegionEvent.ADD_MODEL, 0, Region.currentRegion.guid, _vm );
+			if ( $ode.type == ModelBaseEvent.RESULT )
+				markComplete( true );
 		} //else {
 			//Log.out( "ModelMakerBase.oxelPersistenceComplete guid: " + modelInfo.guid + "  is REJECTING guid: " + $ode.modelGuid, Log.WARN );
 		//}
@@ -215,7 +218,7 @@ public class ModelMakerBase {
 	// This last step is needed for model which have children.
 	protected function oxelBuildComplete($ode:OxelDataEvent):void {
 		if ($ode.modelGuid == modelInfo.guid ) {
-			//Log.out( "ModelMakerBase.oxelBuildComplete  guid: " + modelInfo.guid, Log.WARN );
+            //Log.out("ModelMakerBase.oxelBuildComplete  type: " + $ode.type + "  guid: " + modelInfo.guid, Log.WARN);
 			removeODEListeners();
 			markComplete( true );
 		}
@@ -235,6 +238,7 @@ public class ModelMakerBase {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	protected function markComplete( $success:Boolean ):void {
+		//Log.out("ModelMakerBase.markComplete - instanceGuid: " + ii.instanceGuid + "  model guid: " + modelInfo.guid + "  success: " + $success, Log.WARN);
 		var ohd:ObjectHierarchyData = new ObjectHierarchyData();
 		if ( $success ) {
 			ohd.fromModel( _vm );
