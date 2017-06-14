@@ -47,7 +47,7 @@ public class Room
 		);
 		
 		function handleJoin(connection:Connection):void {
-			Log.out("Room.handleJoin. Successfully joined Room", Log.DEBUG );
+			Log.out("Room.handleJoin. Successfully joined Room", Log.INFO );
 			_connection = connection;
 			
 			//Add disconnect listener

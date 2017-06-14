@@ -73,7 +73,7 @@ public class Renderer extends EventDispatcher
 	}
 
 	public function init( stage:Stage ):void {
-		Log.out( "Renderer.init", Log.DEBUG );			
+		Log.out( "Renderer.init", Log.INFO );
 		setStageSize( stage.stageWidth, stage.stageHeight );
 		addStageListeners();
 		
@@ -88,12 +88,11 @@ public class Renderer extends EventDispatcher
 		timer.addEventListener(TimerEvent.TIMER, timerHandler);
 
 		// This allows flash to run on older video drivers.
-		//Context3DProfile.BASELINE_CONSTRAINED
-		Log.out( "Renderer.init - requestContext3D Profile: Context3DProfile.BASELINE_CONSTRAINED", Log.DEBUG );	
+		//const profile:String = Context3DProfile.STANDARD_EXTENDED;
+        const profile:String = Context3DProfile.BASELINE;
 		// http://help.adobe.com/en_US/FlashPlatform/reference/actionscript/3/flash/display3D/Context3DProfile.html
-		//stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.STANDARD_EXTENDED);
-		//stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE_CONSTRAINED);
-		stage3D.requestContext3D( Context3DRenderMode.AUTO, Context3DProfile.BASELINE);
+        Log.out( "Renderer.init - requestContext3D Profile: " + profile, Log.INFO );
+		stage3D.requestContext3D( Context3DRenderMode.AUTO, profile);
 	}
 	
 	
@@ -176,7 +175,7 @@ public class Renderer extends EventDispatcher
 			if ( !_isHW )
 				Log.out( "Renderer.onContext - SOFTWARE RENDERING - driverInfo: " + context3D.driverInfo, Log.WARN );
 			else
-				Log.out( "Renderer.onContext - driverInfo: " + context3D.driverInfo, Log.DEBUG );
+				Log.out( "Renderer.onContext - driverInfo: " + context3D.driverInfo, Log.INFO );
 				
 			context3D.clear();
 			ContextEvent.create( ContextEvent.ACQUIRED, context3D );

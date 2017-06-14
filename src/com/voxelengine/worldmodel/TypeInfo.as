@@ -236,7 +236,7 @@ public class TypeInfo
 			PersistenceEvent.removeListener( PersistenceEvent.LOAD_FAILED, loadFail );
 			PersistenceEvent.removeListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
 
-			Log.out( "TypeInfo.loadSucceed: " + Globals.appPath + $fileName + Globals.APP_EXT, Log.DEBUG )
+			Log.out( "TypeInfo.loadSucceed: " + Globals.appPath + $fileName + Globals.APP_EXT, Log.INFO );
 
 			loadTypeDataFromJSON( e.data as String );
 		}

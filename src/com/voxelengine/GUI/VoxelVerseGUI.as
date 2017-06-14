@@ -228,7 +228,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	
 	
 	public function buildGUI():void {
-		Log.out( "VoxelVerseGUI.buildGUI", Log.DEBUG ); 
+		Log.out( "VoxelVerseGUI.buildGUI", Log.INFO );
 		if ( !_built ) {
 			_releaseMenu = addReleaseMenu();
 			_releaseMenu.visible = false;

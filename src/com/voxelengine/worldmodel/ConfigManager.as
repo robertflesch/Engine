@@ -71,7 +71,7 @@ package com.voxelengine.worldmodel
 			PersistenceEvent.removeListener( PersistenceEvent.LOAD_FAILED, loadFail );
 			PersistenceEvent.removeListener( PersistenceEvent.LOAD_NOT_FOUND, loadFail );
 			
-			Log.out( "ConfigManager.loadSucceed: " + Globals.appPath + "config" + Globals.APP_EXT, Log.DEBUG )
+			Log.out( "ConfigManager.loadSucceed: " + Globals.appPath + "config" + Globals.APP_EXT, Log.INFO );
 			
 			_defaultRegionJson = JSONUtil.parse( e.data, Globals.appPath + "config" + Globals.APP_EXT, "ConfigManager.loadSucceed" );
 			if ( null == _defaultRegionJson ) {
