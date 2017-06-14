@@ -7,37 +7,29 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+
+import flash.display3D.Context3D;
+
+import flash.geom.Vector3D;
+import flash.utils.getQualifiedClassName;
+
+import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.ModelEvent;
-import com.voxelengine.events.ModelLoadingEvent;
 import com.voxelengine.renderer.lamps.ShaderLight;
 import com.voxelengine.renderer.shaders.Shader;
 import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.CameraLocation;
 import com.voxelengine.worldmodel.models.CollisionPoint;
-import com.voxelengine.worldmodel.models.CollisionTest;
 import com.voxelengine.worldmodel.models.Location;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.oxel.OxelBad;
 import com.voxelengine.worldmodel.weapons.Bomb;
 import com.voxelengine.worldmodel.weapons.Gun;
-
-import flash.display3D.Context3D;
-import flash.geom.Vector3D;
-
-import flash.geom.Vector3D;
-import flash.utils.getQualifiedClassName;
-
-import com.voxelengine.Globals;
-import com.voxelengine.Log;
-
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.ModelInfo;
-import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube
 
 
 public class Avatar extends ControllableVoxelModel
@@ -389,18 +381,12 @@ public class Avatar extends ControllableVoxelModel
 	}
 
 	override protected function cameraAddLocations():void {
-		//if ( Globals.isDebug )
-			camera.addLocation( new CameraLocation( true, 0, 0, 0 ) );
-
-//			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, 0 ) );
-//			camera.addLocation( new CameraLocation( true, 0, Globals.AVATAR_HEIGHT - 4, 0) );
-		//camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT - 4, Globals.AVATAR_WIDTH/2) );
-		camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT + 0, Globals.AVATAR_WIDTH/2 - 4) );
-		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT + 0, 50) );
-		camera.addLocation( new CameraLocation( false, -Globals.AVATAR_WIDTH, Globals.AVATAR_HEIGHT + 0, 50) );
-//			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT + 20, 50) );
+		//camera.addLocation( new CameraLocation( true, 0, 0, 0 ) );
+		camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, Globals.AVATAR_WIDTH/2 - 4) );
+		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 50) );
+		camera.addLocation( new CameraLocation( false, -Globals.AVATAR_WIDTH, Globals.AVATAR_HEIGHT, 50) );
+		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT * 2, 50) );
 		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 100) );
-//			camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 250) );
 	}
 
 	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
@@ -452,8 +438,7 @@ public class Avatar extends ControllableVoxelModel
 				&& 0 == Globals.openWindowCount )
 		{
 			// up down
-			var dx:Number = 0;
-			dx = MouseKeyboardHandler.getMouseYChange() / MOUSE_LOOK_CHANGE_RATE;
+			var dx:Number = MouseKeyboardHandler.getMouseYChange() / MOUSE_LOOK_CHANGE_RATE;
 			dx *= $elapsedTimeMS;
 			if ( MIN_TURN_AMOUNT >= Math.abs(dx) )
 				dx = 0;

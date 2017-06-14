@@ -97,7 +97,7 @@ import flash.geom.Matrix3D;
 			_worldSpaceIntersections.length = 0;
 			
 			// We should only use the models in the view frustrum - TODO - RSF
-			var ignoreType:uint = Globals.g_underwater ? TypeInfo.WATER : TypeInfo.AIR
+			var ignoreType:uint = Globals.g_underwater ? TypeInfo.WATER : TypeInfo.AIR;
 			var editableModel:VoxelModel = findEditableModel();
 			_totalIntersections.length = 0;
 			_worldSpaceIntersections.length = 0;
@@ -112,7 +112,7 @@ import flash.geom.Matrix3D;
 				{
 					const minSize:int = EditCursor.currentInstance.grain;
 					
-					editableModel.lineIntersectWithChildren( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections, $ignoreType, minSize )
+					editableModel.lineIntersectWithChildren( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections, $ignoreType, minSize );
 						
 					for each ( var gcIntersection:GrainCursorIntersection in _worldSpaceIntersections )
 					{
@@ -164,7 +164,7 @@ import flash.geom.Matrix3D;
 			if ( vm )
 			{
 				const minSize:int = 2; // TODO pass this in?
-				vm.lineIntersectWithChildren( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections, TypeInfo.AIR, minSize )
+				vm.lineIntersectWithChildren( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections, TypeInfo.AIR, minSize );
 					
 				for each ( var gcIntersection:GrainCursorIntersection in _worldSpaceIntersections )
 				{
@@ -176,7 +176,7 @@ import flash.geom.Matrix3D;
 				var gci:GrainCursorIntersection = _totalIntersections.shift();
 			}
 			totalIntersectionsClear();
-			worldSpaceIntersectionsClear()
+			worldSpaceIntersectionsClear();
 			
 			return gci;
 		}
@@ -306,7 +306,7 @@ import flash.geom.Matrix3D;
 			const numOfCorners:int = 8;
 			var points:Vector.<Vector3D> = new Vector.<Vector3D>(numOfCorners, true);
 			var scratch:Vector3D = new Vector3D();
-			var size:int = vm.modelInfo.oxelPersistence.oxel.gc.size()
+			var size:int = vm.modelInfo.oxelPersistence.oxel.gc.size();
 			
 			var origin:Vector3D = vm.worldToModel( vm.instanceInfo.positionGet );
 			points[0] = vm.modelToWorld( origin );
