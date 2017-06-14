@@ -40,7 +40,7 @@ import flash.geom.Matrix3D;
 		static private var _gci:GrainCursorIntersection;
 		static private var _cameraMatrix:Matrix3D = new Matrix3D();
 		
-		static private var _viewDistances:Vector.<Vector3D> = new Vector.<Vector3D>(6); 
+		static private var _viewVectors:Vector.<Vector3D> = new Vector.<Vector3D>(6); 
 		
 		static public function get worldSpaceStartPoint():Vector3D { return _worldSpaceStartPoint; }
 		static public function get worldSpaceEndPoint():Vector3D { return _worldSpaceEndPoint; }
@@ -52,12 +52,12 @@ import flash.geom.Matrix3D;
 		public function ModelCacheUtils() { }
 		
 		static public function init():void {
-			_viewDistances[FRONT] = new Vector3D(0, 0, -1);
-			_viewDistances[BACK] = new Vector3D(0, 0, 1);
-			_viewDistances[LEFT] = new Vector3D(-1, 0, 0);
-			_viewDistances[RIGHT] = new Vector3D(1, 0, 0);
-			_viewDistances[UP] = new Vector3D(0, 1, 0);
-			_viewDistances[DOWN] = new Vector3D(0, -1, 0);
+			_viewVectors[FRONT] = new Vector3D(0, 0, -1);
+			_viewVectors[BACK] = new Vector3D(0, 0, 1);
+			_viewVectors[LEFT] = new Vector3D(-1, 0, 0);
+			_viewVectors[RIGHT] = new Vector3D(1, 0, 0);
+			_viewVectors[UP] = new Vector3D(0, 1, 0);
+			_viewVectors[DOWN] = new Vector3D(0, -1, 0);
 		}
 		
 		static public function viewVectorNormalizedGet():Vector3D {
@@ -207,34 +207,26 @@ import flash.geom.Matrix3D;
 		
 		static public	function worldSpaceStartAndEndPointCalculate( $direction:int = FRONT, $editRange:int = EDIT_RANGE ):void {
 			//////////////////////////////////////
-			// This works for camera at 0,0,0
+			// This works for camera at 0,0,0 - Seems to be working for all now
 			//////////////////////////////////////
 			// Empty starting matrix
 			var cm:VoxelModel = VoxelModel.controlledModel;
 			if ( cm )
 			{
-				
 				_cameraMatrix.identity();
 				
 				const cmRotation:Vector3D = cm.camera.rotationGet;
 				_cameraMatrix.prependRotation( -cmRotation.x, Vector3D.X_AXIS );
 				//_cameraMatrix.prependRotation( -cmRotation.y, Vector3D.Y_AXIS );
 				_cameraMatrix.prependRotation( -cmRotation.z, Vector3D.Z_AXIS );
-				
 				_cameraMatrix.append( cm.instanceInfo.worldSpaceMatrix );
-				//var p:Vector3D = cm.instanceInfo.worldSpaceMatrix.position;
-				//var p1:Vector3D = cm.instanceInfo.positionGet;
-				
+
 				var msCamPos:Vector3D = cm.camera.current.position;
-				//_worldSpaceStartPoint = _cameraMatrix.transformVector( msCamPos );
-				//trace( "ModelCacheUtils.calculate - _worldSpaceStartPoint 1: " + _worldSpaceStartPoint );
-				
-				// This is ugly...
-				_worldSpaceStartPoint = cm.instanceInfo.worldSpaceMatrix.transformVector( msCamPos );
-				_worldSpaceStartPoint.y = _cameraMatrix.transformVector( msCamPos ).y;
+				var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
+				_worldSpaceStartPoint = adjCameraPos;
 				//trace( "ModelCacheUtils.calculate - _worldSpaceStartPoint 2: " + _worldSpaceStartPoint + " p: " + p + "  p1: " + p1 );
 				
-				var viewDistance:Vector3D = _viewDistances[$direction].clone();
+				var viewDistance:Vector3D = _viewVectors[$direction].clone();
 				viewDistance.scaleBy( $editRange );
 				msCamPos = msCamPos.add( viewDistance );
 				_worldSpaceEndPoint = _cameraMatrix.transformVector( msCamPos );
