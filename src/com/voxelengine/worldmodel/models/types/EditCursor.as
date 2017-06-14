@@ -435,7 +435,7 @@ public class EditCursor extends VoxelModel
 		modelInfo.oxelPersistence.oxel.quadsBuild();
 
 		function cursorColorRainbow():uint {
-			var frequency:Number = 2.4;
+			var frequency:Number = 0.6; //2.4;
 			var red:uint = Math.max( 0, Math.sin( frequency + 2 + _phase ) ) * 255;
 			var green:uint = Math.max( 0, Math.sin( frequency + _phase ) ) * 255;
 			var blue:uint = Math.max( 0, Math.sin( frequency + 4 + _phase ) ) * 255;
