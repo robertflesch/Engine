@@ -202,7 +202,7 @@ public class ModelCache
 				vm.draw( $mvp, $context, false, true );	
 		}
 		
-		if ( EditCursor.isEditing ) //  && ModelPlacementType.PLACEMENT_TYPE_PARENT == ModelPlacementType.modelPlacementTypeGet()
+		if ( EditCursor.isEditing )
 			EditCursor.currentInstance.drawCursor( $mvp, $context, false, true );
 		
 		bringOutYourDead();

@@ -11,29 +11,26 @@ package com.voxelengine.worldmodel.models
 import com.voxelengine.events.CursorShapeEvent;
 import com.voxelengine.GUI.VVCanvas;
 import com.voxelengine.renderer.Renderer;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
 import flash.events.KeyboardEvent;
-import flash.events.MouseEvent;
 import flash.events.Event;
 
 import org.flashapi.swing.Box;
 import org.flashapi.swing.Label;
 import org.flashapi.swing.Image;
-import org.flashapi.swing.constants.BorderStyle;
 import org.flashapi.swing.event.UIMouseEvent;
 import org.flashapi.swing.layout.AbsoluteLayout;
 
 import com.voxelengine.Globals;
-import com.voxelengine.Log;
-import com.voxelengine.worldmodel.models.types.EditCursor;
-import com.voxelengine.worldmodel.TypeInfo;
 
 public class ModelPlacementType extends VVCanvas
 {
 	protected var _outline:Image;
 	private const IMAGE_SIZE:int = 64;
 	private var _butCurrent:Box;
-	
+	static public var placementType:String;
+	static public const PLACEMENT_TYPE_PARENT:String = "PLACEMENT_TYPE_PARENT";
+	static public const PLACEMENT_TYPE_CHILD:String = "PLACEMENT_TYPE_CHILD";
+
 	public function ModelPlacementType()
 	{
 		super( 84, 74 );
@@ -59,10 +56,10 @@ public class ModelPlacementType extends VVCanvas
 		_butCurrent.x = 10;
 		_butCurrent.y = 10;
 		_butCurrent.data = "auto";
-		_butCurrent.backgroundTexture = "assets/textures/auto.jpg";
+		_butCurrent.backgroundTexture = "assets/textures/parent.jpg";
 		addElement( _butCurrent );
-		
-		
+		placementType = PLACEMENT_TYPE_PARENT;
+
 		var hk:Label = new Label("", 20);
 		hk.x = 33;
 		hk.y = -4;
@@ -88,18 +85,22 @@ public class ModelPlacementType extends VVCanvas
 	
 	private function nextShape():void
 	{
-		if ( "child" == _butCurrent.data) {
-			_butCurrent.data = "auto";	
-			_butCurrent.backgroundTexture = "assets/textures/auto.jpg";
-		} 
-		else if ( "parent" == _butCurrent.data) {
+//		if ( "child" == _butCurrent.data) {
+//			_butCurrent.data = "auto";
+//			_butCurrent.backgroundTexture = "assets/textures/auto.jpg";
+//			placementType = PLACEMENT_TYPE_INDEPENDENT;
+//		}
+		if ( "parent" == _butCurrent.data) {
 			_butCurrent.data = "child";	
 			_butCurrent.backgroundTexture = "assets/textures/child.jpg";
-		} 
-		else if ( "auto" == _butCurrent.data) {
-			_butCurrent.data = "parent";	
+			placementType = PLACEMENT_TYPE_CHILD;
+		}
+		else { //  if ( "child" == _butCurrent.data) {
+			_butCurrent.data = "parent";
 			_butCurrent.backgroundTexture = "assets/textures/parent.jpg";
-		} 
+			placementType = PLACEMENT_TYPE_PARENT;
+		}
+
 		show();
 	}
 	
@@ -112,13 +113,6 @@ public class ModelPlacementType extends VVCanvas
 		visible = true;
 		_outline.visible = true;
 		
-		//if ( "child" == _butCurrent.data)
-			//CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_CHILD ) );
-		//else if ( "parent" == _butCurrent.data)	
-			//CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_PARENT ) );
-		//else if ( "auto" == _butCurrent.data)	
-			//CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_AUTO ) );
-			
 		CursorShapeEvent.dispatch( new CursorShapeEvent( CursorShapeEvent.MODEL_AUTO ) );
 	}
 	

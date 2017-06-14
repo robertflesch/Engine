@@ -196,7 +196,7 @@ public class OxelPersistence extends PersistenceObject
 
 		version = Globals.VERSION;
 		var result:Boolean = super.save();
-		Log.out( "OxelPersistence.save: " + ( result ? "Succeeded" : "Failed" ), Log.WARN );
+		//Log.out( "OxelPersistence.save: " + ( result ? "Succeeded" : "Failed" ), Log.WARN );
 		return result;
 	}
 

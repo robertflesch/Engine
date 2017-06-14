@@ -9,6 +9,8 @@ package com.voxelengine.worldmodel.models.types
 {
 
 
+import com.voxelengine.worldmodel.models.ModelPlacementType;
+
 import flash.display3D.Context3D;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
@@ -341,8 +343,13 @@ public class EditCursor extends VoxelModel
 		if ( gciData ) {
 			if ( cursorOperation == CursorOperationEvent.INSERT_OXEL || cursorOperation == CursorOperationEvent.INSERT_MODEL ) {
 				// This gets the closest open oxel along the ray
-				insertLocationCalculate();
-				PlacementLocation.INVALID == _pl.state ?  oxelTexture = EDITCURSOR_INVALID : oxelTexture = oxelTextureValid;
+				if ( ModelPlacementType.placementType == ModelPlacementType.PLACEMENT_TYPE_CHILD ) {
+					insertLocationCalculate();
+					PlacementLocation.INVALID == _pl.state ? oxelTexture = EDITCURSOR_INVALID : oxelTexture = oxelTextureValid;
+				}
+				else {
+					_pl.state = PlacementLocation.VALID;
+				}
 
 				if ( cursorShape == CursorShapeEvent.MODEL_AUTO && objectModel )
 					objectModel.instanceInfo.positionSetComp( _pl.gc.getModelX(), _pl.gc.getModelY(), _pl.gc.getModelZ() );
@@ -361,6 +368,7 @@ public class EditCursor extends VoxelModel
 			vv.scaleBy( objectModel.modelInfo.oxelPersistence.oxel.gc.size() * 4 );
 			vv = vv.add( VoxelModel.controlledModel.instanceInfo.positionGet );
 			objectModel.instanceInfo.positionSet = vv;
+			_pl.state = PlacementLocation.VALID;
 		}
 		
 		if ( objectModel )
@@ -492,8 +500,13 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function insertModel():void {
+		if ( PlacementLocation.INVALID == _pl.state) {
+			Log.out( "EditCursor.insertModel - placement location invalid", Log.WARN );
+			return;
+		}
+
 		var ii:InstanceInfo = objectModel.instanceInfo.clone();
-		if ( VoxelModel.selectedModel && PlacementLocation.INVALID != _pl.state) {
+		if ( VoxelModel.selectedModel && ModelPlacementType.placementType == ModelPlacementType.PLACEMENT_TYPE_CHILD ) {
 			ii.controllingModel = VoxelModel.selectedModel;
 			// This places an oxel that is invisible, but collidable at the same location as the model
 			// This should lock the model to that location, otherwise the oxel is invalid.
@@ -635,12 +648,12 @@ public class EditCursor extends VoxelModel
 				gcDelete.become_ancestor( EditCursor.currentInstance.modelInfo.oxelPersistence.oxel.gc.grain );
 				var oxelToBeDeleted:Oxel = foundModel.modelInfo.oxelPersistence.oxel.childGetOrCreate( gcDelete );
 				if ( OxelBad.INVALID_OXEL != oxelToBeDeleted ) {
-					Log.out( "EditCursor - found oxel to be deleted");
+					//Log.out( "EditCursor - found oxel to be deleted");
 					foundModel.write(gcDelete, TypeInfo.AIR);
 				}
 				else {
 					// I didnt find grain cursor, why?
-					Log.out( "EditCursor - DIDN'T find oxel to be deleted");
+					Log.out( "EditCursor - DIDN'T find oxel to be deleted", Log.WARN);
 				}
 				GrainCursorPool.poolDispose( gcDelete );
 			}
@@ -877,7 +890,7 @@ public class EditCursor extends VoxelModel
 		if ( Globals.openWindowCount || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging || Log.showing )
 			return;
 		
-		Log.out( "EditCursor.mouseUp e: " + e.toString() + "  Globals.active == true" );
+		//Log.out( "EditCursor.mouseUp e: " + e.toString() + "  Globals.active == true" );
 		//if ( doubleMessageHack ) {
 			switch (e.type) 
 			{
