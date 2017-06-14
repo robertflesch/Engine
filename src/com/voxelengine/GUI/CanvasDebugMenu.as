@@ -107,9 +107,9 @@ public class CanvasDebugMenu extends VVCanvas {
 		_gcLabel.textFormat.color = 0xFFFFFF;
 		addElement( _gcLabel );
 
-		_cmLabel.textAlign = TextAlign.LEFT;
-		_cmLabel.textFormat.color = 0xFFFFFF;
-		addElement( _cmLabel );
+//		_cmLabel.textAlign = TextAlign.LEFT;
+//		_cmLabel.textFormat.color = 0xFFFFFF;
+//		addElement( _cmLabel );
 
 
 		display( 0, 250 );
@@ -175,24 +175,22 @@ public class CanvasDebugMenu extends VVCanvas {
 		}
 
 		updateGC();
-		updateCMStats();
-	}
-
-	private function updateGC():void {
-		// TO DO I dont like this direct call into the EditCursor
-		if (Globals.g_app && EditCursor.isEditing ) {
-			if ( VoxelModel.selectedModel && EditCursor.currentInstance.gciData )
-			{
-				var gci:GrainCursorIntersection = EditCursor.currentInstance.gciData;
-				//var rot:Vector3D = VoxelModel.controlledModel.instanceInfo.rotationGet;
-				_gcLabel.text = "grain: " + gci.gc.grain + " x: " + int( gci.gc.grainX ) + "  y: " + int( gci.gc.grainY ) + "  z: " + int( gci.gc.grainZ );
+		//updateCMStats();
+		function updateGC():void {
+			// TO DO I dont like this direct call into the EditCursor
+			if (Globals.g_app && EditCursor.isEditing ) {
+				if ( VoxelModel.selectedModel && EditCursor.currentInstance.gciData ) {
+					var gci:GrainCursorIntersection = EditCursor.currentInstance.gciData;
+					//var rot:Vector3D = VoxelModel.controlledModel.instanceInfo.rotationGet;
+					_gcLabel.text = "grain: " + gci.gc.grain + " x: " + int( gci.gc.grainX ) + "  y: " + int( gci.gc.grainY ) + "  z: " + int( gci.gc.grainZ );
+				}
 			}
 		}
-	}
 
-	private function updateCMStats():void {
-		if (Globals.g_app && VoxelModel.controlledModel )
-			_cmLabel.text = JSON.stringify( VoxelModel.controlledModel.modelInfo.dbo );
+		function updateCMStats():void {
+			if (Globals.g_app && VoxelModel.controlledModel )
+				_cmLabel.text = JSON.stringify( VoxelModel.controlledModel.modelInfo.dbo );
+		}
 	}
 
 	private function addModelLocation():void {
@@ -202,8 +200,6 @@ public class CanvasDebugMenu extends VVCanvas {
 }
 }
 
-import com.voxelengine.utils.StringUtils;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 import flash.geom.Vector3D;
 
@@ -211,6 +207,7 @@ import org.flashapi.swing.Label;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.layout.AbsoluteLayout;
 import com.voxelengine.GUI.VVCanvas;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 class StaticMemoryDisplay extends VVCanvas
 {
 public function StaticMemoryDisplay() {
