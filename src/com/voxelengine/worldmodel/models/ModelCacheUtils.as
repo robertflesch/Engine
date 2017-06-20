@@ -13,6 +13,7 @@ package com.voxelengine.worldmodel.models
 	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.oxel.OxelBad;
 
 import flash.geom.Matrix3D;
 	import com.voxelengine.Log;
@@ -185,20 +186,36 @@ import flash.geom.Matrix3D;
 			var foundModel:VoxelModel = null;
 			var intersections:Vector.<GrainCursorIntersection> = findRayIntersections( Region.currentRegion.modelCache.getEditableModels, true );
 			intersections.sort( sortIntersections );
-			// get first (closest) interesction
-			var intersection:GrainCursorIntersection = intersections.shift();
-			if ( intersection && intersection.point.length )
-			{
-				//if ( intersection.point.length < EDIT_RANGE )
+			// get first (closest) intersection, that is not empty
+			for each ( var intersection:GrainCursorIntersection in intersections ){
+				if ( intersection && intersection.point.length ) {
+					// now get the oxel that corresponds to the oxel at that location
+					var oxel:Oxel = intersection.model.getOxelAtMSPoint( intersection.point, EditCursor.currentInstance.grain );
+					if ( OxelBad.INVALID_OXEL == oxel )
+						continue;
+					if( oxel.type == TypeInfo.AIR && 1 == oxel.childCount )
+						continue;
+
 					foundModel = intersection.model;
-				//else
-				//	trace( "out of range" );
+					break;
+				}
+
 			}
+
+//			var intersection:GrainCursorIntersection = intersections.shift();
+//			if ( intersection && intersection.point.length )
+//			{
+//				//if ( intersection.point.length < EDIT_RANGE )
+//					foundModel = intersection.model;
+//				//else
+//				//	trace( "out of range" );
+//			}
 			
 			if ( null == foundModel && null != _lastFoundModel )
 			{
 				EditCursor.currentInstance.instanceInfo.visible = false;
 				_lastFoundModel	= null;
+				trace( "no model found, disable edit cursor" );
 			}
 			
 			return foundModel;

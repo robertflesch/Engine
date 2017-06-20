@@ -165,7 +165,7 @@ public class Gun extends ControllableVoxelModel
 	}
 	
 	// When is this used?
-	override protected function onKeyDown(e:KeyboardEvent):void 
+	override protected function keyDown(e:KeyboardEvent):void
 	{
 		switch (e.keyCode) {
 			case 87: case Keyboard.UP: 
@@ -184,7 +184,7 @@ public class Gun extends ControllableVoxelModel
 	}
 	
 	// When is this used?
-	override protected function onKeyUp(e:KeyboardEvent):void 
+	override protected function keyUp(e:KeyboardEvent):void
 	{
 		switch (e.keyCode) {
 			case 87: case Keyboard.UP:

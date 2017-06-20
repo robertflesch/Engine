@@ -154,8 +154,7 @@ public class Ship extends ControllableVoxelModel
 	}
 
 	// This is for direct control of model, such as in the voxel bomber.
-	override protected function onKeyDown(e:KeyboardEvent):void
-	{
+	override protected function keyDown(e:KeyboardEvent):void {
 		switch (e.keyCode) {
 			case 87: case Keyboard.UP:
 				if ( !_up )
@@ -194,8 +193,7 @@ public class Ship extends ControllableVoxelModel
 	//	Log.out( "Ship.onKeyDown" );
 	}
 
-	override protected function onKeyUp(e:KeyboardEvent):void
-	{
+	override protected function keyUp(e:KeyboardEvent):void {
 		switch (e.keyCode) {
 			case 87: case Keyboard.UP:
 			case 83: case Keyboard.DOWN:

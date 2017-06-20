@@ -10,6 +10,8 @@ package com.voxelengine.GUI.actionBars
 {
 	import com.voxelengine.events.LoadingEvent;
 	import com.voxelengine.GUI.VVCanvas;
+import com.voxelengine.events.VVKeyboardEvent;
+import com.voxelengine.events.VVMouseEvent;
 import com.voxelengine.renderer.Renderer;
 
 import flash.events.Event;
@@ -76,16 +78,16 @@ import flash.events.Event;
 		
 		public function addListeners():void
 		{
-			Globals.g_app.stage.addEventListener( KeyboardEvent.KEY_DOWN, hotKeyItem );
-			Globals.g_app.stage.addEventListener( MouseEvent.MOUSE_WHEEL, onMouseWheel );	
+			VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, hotKeyItem );
+			VVMouseEvent.addListener( MouseEvent.MOUSE_WHEEL, onMouseWheel );
 			Globals.g_app.stage.addEventListener( Event.RESIZE, resizeToolBar );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 		}
 		
 		public function removeListeners():void
 		{
-			Globals.g_app.stage.removeEventListener( KeyboardEvent.KEY_DOWN, hotKeyItem );
-			Globals.g_app.stage.removeEventListener( MouseEvent.MOUSE_WHEEL, onMouseWheel );	
+			VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, hotKeyItem );
+			VVMouseEvent.removeListener( MouseEvent.MOUSE_WHEEL, onMouseWheel );
 			Globals.g_app.stage.removeEventListener( Event.RESIZE, resizeToolBar );
 			removeEventListener(UIOEvent.REMOVED, onRemoved );
 		}

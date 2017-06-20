@@ -8,6 +8,7 @@
 
 package com.voxelengine.GUI.actionBars
 {
+import com.voxelengine.events.VVKeyboardEvent;
 import com.voxelengine.renderer.Renderer;
 
 import flash.events.KeyboardEvent
@@ -110,7 +111,7 @@ public class ShapeSelector extends VVCanvas
 	{
 		_outline.visible = true
 		if ( false == visible )
-			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory )
+			VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, hotKeyInventory )
 		visible = true
 		Globals.g_app.stage.addEventListener( Event.RESIZE, resizeObject )
 		if ( "square" == _butCurrent.data)
@@ -126,7 +127,7 @@ public class ShapeSelector extends VVCanvas
 	{
 		_outline.visible = false
 		if ( true == visible )
-			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory )
+			VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, hotKeyInventory )
 		visible = false
 		Globals.g_app.stage.removeEventListener( Event.RESIZE, resizeObject )
 	}

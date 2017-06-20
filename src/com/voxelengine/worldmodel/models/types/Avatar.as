@@ -252,17 +252,8 @@ public class Avatar extends ControllableVoxelModel
 			}
 		}
 		// fall point is in space! falling....
-		if ( !fall )
-		{
-			//Log.out( "Player.collisionCheckNew - fall" );
-			//Log.out( "Player.collisionCheckNew - FALL fall = 0, foot=0, stepUp: " + $stepUpCheck + " velocityGet.y: " + $loc.velocityGet.y );
-			if ( usesGravity ) {
-				this.fall( $loc, $elapsedTimeMS );
-			}
-
-			onSolidGround = false;
-			if ( foot || body || head )
-			{
+		if ( !fall ) {
+			if ( foot || body || head ) {
 				if ( mMaxFallRate > $loc.velocityGet.y && usesGravity )
 					$loc.velocitySetComp( 0, $loc.velocityGet.y + (0.0033333333333333 * $elapsedTimeMS) + 0.5, 0 );
 
@@ -272,13 +263,13 @@ public class Avatar extends ControllableVoxelModel
 		}
 
 		// Everything is clear
-		if ( !head && !foot && !body )
-		{
+		if ( !head && !foot && !body ) {
 			//Log.out( "Player.collisionCheckNew - all good" );
+			// We are not falling, and our feet are not in the ground.
+			onSolidGround = true;
 			return -1;
 		}
-		else if ( foot && !body && !head )
-		{
+		else if ( foot && !body && !head ) {
 			//Log.out( "Player.collisionCheckNew - foot" );
 			lastCollisionModel = $collisionCandidate;
 			onSolidGround = true;

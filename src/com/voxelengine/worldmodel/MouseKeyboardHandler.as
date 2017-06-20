@@ -11,6 +11,9 @@ package com.voxelengine.worldmodel
 import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.GUI.WindowSplash;
+import com.voxelengine.events.VVKeyboardEvent;
+import com.voxelengine.events.VVMouseEvent;
+
 import flash.events.KeyboardEvent;
 import flash.events.FullScreenEvent;
 import flash.events.MouseEvent;
@@ -70,9 +73,9 @@ public class MouseKeyboardHandler
 
 	static public function fullScreenEvent(event:FullScreenEvent):void {
 		if ( event.fullScreen )
-			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_MOVE, onMove );
+			VVMouseEvent.addListener( MouseEvent.MOUSE_MOVE, onMove );
 		else if ( !event.fullScreen )
-			Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_MOVE, onMove );
+			VVMouseEvent.removeListener( MouseEvent.MOUSE_MOVE, onMove );
 	}
 
 	// this is only used in full screen mode
@@ -122,13 +125,12 @@ public class MouseKeyboardHandler
 	static private function addInputListeners():void {
 		if ( false == _s_handlersAdded ) {
 			_s_handlersAdded = true;
-			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 			Globals.g_app.stage.addEventListener(FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
-			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_DOWN, leftMouseDownEvent );
-			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_UP, leftMouseUpEvent );
-			Globals.g_app.stage.addEventListener(MouseEvent.RELEASE_OUTSIDE, leftMouseUpEvent );
-			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
+			VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, keyDown );
+			VVKeyboardEvent.addListener( KeyboardEvent.KEY_UP, keyUp );
+			VVMouseEvent.addListener( MouseEvent.MOUSE_DOWN, leftMouseDownEvent );
+			VVMouseEvent.addListener( MouseEvent.MOUSE_UP, leftMouseUpEvent );
+			VVMouseEvent.addListener( MouseEvent.RELEASE_OUTSIDE, leftMouseUpEvent );
 			RegionEvent.addListener( RegionEvent.LOAD_BEGUN, loadBegun );
 			RegionEvent.addListener( RegionEvent.LOAD_COMPLETE, loadComplete );
 		}
@@ -147,12 +149,12 @@ public class MouseKeyboardHandler
 	static private function removeInputListeners():void {
 		if ( true == _s_handlersAdded ) {
 			_s_handlersAdded = false;
-			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_UP, keyUp);
 			Globals.g_app.stage.removeEventListener(FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
-			Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_DOWN, leftMouseDownEvent );
-			Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_UP, leftMouseUpEvent );
-			Globals.g_app.stage.removeEventListener(MouseEvent.RELEASE_OUTSIDE, leftMouseUpEvent );
+			VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, keyDown );
+			VVKeyboardEvent.removeListener( KeyboardEvent.KEY_UP, keyUp );
+			VVMouseEvent.removeListener( MouseEvent.MOUSE_DOWN, leftMouseDownEvent );
+			VVMouseEvent.removeListener( MouseEvent.MOUSE_UP, leftMouseUpEvent );
+			VVMouseEvent.removeListener( MouseEvent.RELEASE_OUTSIDE, leftMouseUpEvent );
 			RegionEvent.removeListener( RegionEvent.LOAD_BEGUN, loadBegun );
 			RegionEvent.removeListener( RegionEvent.LOAD_COMPLETE, loadComplete );
 		}

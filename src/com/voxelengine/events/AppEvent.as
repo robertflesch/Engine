@@ -41,8 +41,8 @@ public class AppEvent extends Event
 		_eventDispatcher.removeEventListener( $type, $listener, $useCapture );
 	}
 
-	static public function dispatch( $event:Event ) : Boolean {
-		return _eventDispatcher.dispatchEvent( $event );
+	static public function create( $type:String ) : Boolean {
+		return _eventDispatcher.dispatchEvent( new AppEvent( $type ) );
 	}
 	
 	///////////////// Event handler interface /////////////////////////////

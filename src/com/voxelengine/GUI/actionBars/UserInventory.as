@@ -12,6 +12,8 @@ import com.voxelengine.events.AppEvent;
 import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.events.InventoryModelEvent;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.VVKeyboardEvent;
+import com.voxelengine.events.VVMouseEvent;
 import com.voxelengine.worldmodel.inventory.InventoryManager;
 import com.voxelengine.worldmodel.models.ModelPlacementType;
 import flash.display.DisplayObject;
@@ -329,7 +331,8 @@ public class  UserInventory extends QuickInventory
 	}
 	
 	private function onDeactivate( $ae:Event ):void {
-		processItemSelection( boxes[1], false )
+		Log.out( " UserInventory - onDeactivate - DISABLE EDIT CURSOR DISABLED", Log.WARN );
+		//processItemSelection( boxes[1], false )
 	}
 	
 	private function onCursorOperationNone(e:CursorOperationEvent):void { 
@@ -464,16 +467,16 @@ public class  UserInventory extends QuickInventory
 	private function addListeners():void {
 		Log.out( "UserInventory.addListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================" );
 		if ( false == _listenersAdded ) {
-			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
-			Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+			VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, hotKeyInventory );
+			VVMouseEvent.addListener( MouseEvent.MOUSE_WHEEL, onMouseWheel);
 			_listenersAdded = true
 		}
 	}
 	
 	private function removeListeners():void {
 		Log.out( "UserInventory.removeListeners ===================== <<<<<<<<<<< " + _owner + " <<<<<<<<<< ========================", Log.WARN );
-		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
-		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+		VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, hotKeyInventory );
+		VVMouseEvent.addListener( MouseEvent.MOUSE_WHEEL, onMouseWheel);
 		_listenersAdded = false;
 	}
 

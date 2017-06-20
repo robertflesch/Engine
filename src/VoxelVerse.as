@@ -56,10 +56,6 @@ import com.voxelengine.worldmodel.Region
 [SWF(frameRate="90",width="960",height="540",backgroundColor="0xffffff")]
 public class VoxelVerse extends Sprite
 {
-	private var _showConsole:Boolean = false;
-	public function get showConsole():Boolean { return _showConsole }
-	public function set showConsole(value:Boolean):void { _showConsole = value }
-
 	// Main C'tor for project
 	public function VoxelVerse():void {
 		addEventListener(Event.ADDED_TO_STAGE, init);
@@ -212,9 +208,6 @@ public class VoxelVerse extends Sprite
 		Renderer.renderer.render();
 		//var _timeRender:int = getTimer() - _s_timeEntered - _timeUpdate;
 
-		if ( showConsole )
-			toggleConsole();
-
 		if( _s_timeEntered - 1000 > _s_timeLastFPS ) {
 			_s_timeLastFPS = getTimer();
 			_fpsStat = _s_frameCounter;
@@ -227,7 +220,7 @@ public class VoxelVerse extends Sprite
 // Log.out( "VoxelVerse.enterFrame - update: "  + _timeUpdate + " render: " + _timeRender  + "  total: " +  (getTimer()-_s_timeEntered + " running for: " + ((getTimer()-_s_appStartTime)/1000) + " seconds"), Log.INFO )
 
 		// For some reason is was important to make sure everything was updated before this got passed on to child classes.
-		AppEvent.dispatch( e );
+		AppEvent.create( e.type );
 
 		_s_timeExited = getTimer();
 	}
@@ -238,14 +231,9 @@ public class VoxelVerse extends Sprite
 	 *  This allow the app to not pick up any other mouse or keyboard activity when app is not active
 	 */
 	public function mouseLeave( e:Event ):void {
-		//Log.out( "VoxelVerse.mouseLeave" );
-		Globals.active = false;
 		VoxelVerseGUI.currentInstance.crossHairInactive();
-//		CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE, 0 ) );
-
 		MemoryManager.update();
 		MouseKeyboardHandler.reset();
-		stage.removeEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		dispatchSaves();
 	}
 
@@ -256,12 +244,7 @@ public class VoxelVerse extends Sprite
 //		else
 //			Log.out( "VoxelVerse.mouseUp event" );
 
-		if ( Globals.active == false ) {
-			//Log.out( "VoxelVerse.activate Globals.active: " + Globals.active );
-			VoxelVerseGUI.currentInstance.crossHairActive();
-			stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-			Globals.active = true;
-		}
+		VoxelVerseGUI.currentInstance.crossHairActive();
 	}
 
 	private static function dispatchSaves():void {
@@ -275,25 +258,6 @@ public class VoxelVerse extends Sprite
 		}
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.SAVE, 0, "", null ) );
 		OxelDataEvent.create( ModelBaseEvent.SAVE, 0, "", null );
-	}
-
-	private function toggleConsole():void {
-		showConsole = false;
-		if ( Log.showing )
-			Log.hide();
-		else
-			Log.show();
-	}
-
-	private function keyDown(e:KeyboardEvent):void {
-		switch (e.keyCode) {
-			case Keyboard.ENTER:
-				// trying to stop the BACKQUOTE from getting to the doomsday console.
-				//e.stopImmediatePropagation()
-				if ( MouseKeyboardHandler.isCtrlKeyDown )
-					showConsole = true;
-				break;
-		}
 	}
 
 	private static function uncaughtErrorHandler(event:UncaughtErrorEvent):void {

@@ -9,13 +9,20 @@
 package com.voxelengine.GUI
 {
 import com.voxelengine.GUI.crafting.WindowCharacter;
+import com.voxelengine.Globals;
+import com.voxelengine.events.AppEvent;
+import com.voxelengine.events.CursorOperationEvent;
 import com.voxelengine.events.HelpEvent;
+import com.voxelengine.events.VVKeyboardEvent;
+import com.voxelengine.events.VVMouseEvent;
+import com.voxelengine.worldmodel.MouseKeyboardHandler;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 
 import flash.display.Sprite;
 import flash.events.Event;
 import flash.events.EventDispatcher;
 import flash.events.KeyboardEvent;
+import flash.events.MouseEvent;
 import flash.events.TimerEvent;
 import flash.net.FileReference;
 import flash.ui.Keyboard;
@@ -78,7 +85,12 @@ public class VoxelVerseGUI extends EventDispatcher
 	
 	static private var _currentInstance:VoxelVerseGUI = null;
 	static public function get currentInstance():VoxelVerseGUI { return ( _currentInstance ? _currentInstance : _currentInstance = new VoxelVerseGUI() ); }
-	
+
+	private var _showConsole:Boolean = false;
+	public function get showConsole():Boolean { return _showConsole }
+	public function set showConsole(value:Boolean):void { _showConsole = value }
+
+
 	//	CONSTRUCTOR
 	//	----------------------------------------------------------------
 	public function VoxelVerseGUI(title : String = null) { 
@@ -86,6 +98,11 @@ public class VoxelVerseGUI extends EventDispatcher
 		LoadingImage.init();
 		UserInventory.init();
 		WindowHelp.init();
+		AppEvent.addListener( Event.DEACTIVATE, onDeactivate );
+		Globals.g_app.stage.addEventListener( MouseEvent.MOUSE_UP, 	 mouseEvent);
+		Globals.g_app.stage.addEventListener( MouseEvent.MOUSE_MOVE,  mouseEvent);
+		Globals.g_app.stage.addEventListener( MouseEvent.MOUSE_DOWN,  mouseEvent);
+		Globals.g_app.stage.addEventListener( MouseEvent.MOUSE_WHEEL, mouseEvent);
 	}
 	
 	private function fullScreenEvent(event:FullScreenEvent):void {
@@ -134,19 +151,86 @@ public class VoxelVerseGUI extends EventDispatcher
 			_crossHairVertical.y = halfRH - _crossHairVertical.height / 2;
 		}
 	}
-	
-	public function crossHairActive():void {
-		//Log.out( "VoxelVerseGUI.crossHairActive event Globals.active: " + Globals.active, Log.WARN );
 
-		_crossHairColor = CROSS_HAIR_YELLOW;
-		crossHairChange();
+	private var deactivated:Boolean;
+	private function onDeactivate( $ae:Event ):void {
+		deactivated = true;
+		Log.out( " VoxelVerseGUI.onDeactivate", Log.WARN );
+		//processItemSelection( boxes[1], false )
+	}
+
+	public function crossHairActive():void {
+		if ( CROSS_HAIR_RED == _crossHairColor ) {
+			if ( true == deactivated ) {
+				deactivated = false;
+				return;
+			}
+			_crossHairColor = CROSS_HAIR_YELLOW;
+			Globals.g_app.stage.addEventListener( KeyboardEvent.KEY_DOWN, keyDown );
+			Globals.g_app.stage.addEventListener( KeyboardEvent.KEY_UP, keyUp );
+			Log.out( "VoxelVerseGUI.crossHairActive", Log.WARN );
+			Globals.active = true;
+			crossHairChange();
+		}
 	}
 	
 	public function crossHairInactive():void {
-		//Log.out( "VoxelVerseGUI.crossHairInactive event Globals.active: " + Globals.active, Log.WARN );
+		if ( CROSS_HAIR_YELLOW == _crossHairColor ) {
+			_crossHairColor = CROSS_HAIR_RED;
+			Globals.g_app.stage.removeEventListener( KeyboardEvent.KEY_DOWN, keyDown );
+			Globals.g_app.stage.removeEventListener( KeyboardEvent.KEY_UP, keyUp );
+			Log.out("VoxelVerseGUI.crossHairInactive", Log.WARN);
+			Globals.active = false;
+			crossHairChange();
+			//CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE, 0 ) );
+		}
+	}
 
-		_crossHairColor = CROSS_HAIR_RED;
-		crossHairChange();
+	private function mouseEvent( $e:MouseEvent ):void {
+		if ( !Globals.active ) {
+			Log.out("VoxelVerseGUI.mouseEvent", Log.WARN );
+			return;
+		}
+		VVMouseEvent.dispatch( $e );
+	}
+
+	protected function keyDown( $e:KeyboardEvent ):void {
+//		Log.out("VoxelVerseGUI.keyDown - key: " + $e.keyCode, Log.WARN);
+		if ( !Globals.active ) {
+			Log.out("VoxelVerseGUI.keyDown - NOT ACTIVE IGNORING ALL KEYS", Log.WARN);
+			return;
+		}
+
+		VVKeyboardEvent.dispatch( $e );
+
+		switch ( $e.keyCode) {
+			case Keyboard.ENTER:
+				// trying to stop the BACKQUOTE from getting to the doomsday console.
+				//e.stopImmediatePropagation()
+				if ( MouseKeyboardHandler.isCtrlKeyDown )
+					showConsole = true;
+				break;
+		}
+	}
+
+	private function keyUp( e:KeyboardEvent ):void {
+		//Log.out("VoxelVerseGUI.keyUp - key: " + e.keyCode, Log.WARN);
+		if ( !Globals.active ) {
+			Log.out("VoxelVerseGUI.keyUp - NOT ACTIVE IGNORING ALL KEYS", Log.WARN);
+			return;
+		}
+
+		VVKeyboardEvent.dispatch( e );
+	}
+
+	public function update( $interframeTime:int ):void {
+		if ( showConsole ) {
+			showConsole = false;
+			if ( Log.showing )
+				Log.hide();
+			else
+				Log.show();
+		}
 	}
 	
 	private function addReleaseMenu():CanvasReleaseMenu {
@@ -247,23 +331,17 @@ public class VoxelVerseGUI extends EventDispatcher
 		UIManager.debugger = new FDTrace();
 		RegionEvent.addListener( RegionEvent.LOAD_BEGUN, onRegionLoadingComplete );
 		ModelEvent.addListener( ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
-		LoginEvent.addListener(LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
-		RoomEvent.addListener(RoomEvent.ROOM_JOIN_FAILURE, joinRoomFailureHandler );
+		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
+		RoomEvent.addListener( RoomEvent.ROOM_JOIN_FAILURE, joinRoomFailureHandler );
 		
 		LanguageManager.init();
 	}
 	
 	private function addKeyboardListeners() : void {
 		Log.out( "VoxelVerseGUI.addKeyboardListeners");
-		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
+		Globals.g_app.stage.addEventListener( KeyboardEvent.KEY_DOWN, onKeyPressed);
 	}
 
-	//private function removeKeyboardListeners(event : Event) : void
-	//{
-		//Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
-	//}
-
-	
 	private function onRegionLoadingComplete(event : RegionEvent ) : void {
 		RegionEvent.removeListener(RegionEvent.LOAD_BEGUN, onRegionLoadingComplete);
 		

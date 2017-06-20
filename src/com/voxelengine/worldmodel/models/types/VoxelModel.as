@@ -383,10 +383,6 @@ public class VoxelModel {
 */
 	
 	public function collisionTest($elapsedTimeMS:Number):Boolean {
-		// I dont think this is needed
-		if (instanceInfo.controllingModel)
-			return true;
-		
 		// Since this is not colliding, just use the instanceInfo to do calculations
 		setTargetLocation( instanceInfo );
 		
@@ -575,7 +571,10 @@ public class VoxelModel {
 			instanceInfo.update($elapsedTimeMS);
 			modelInfo.update($context,$elapsedTimeMS, this );
 			
-			collisionTest($elapsedTimeMS);
+			// Only collide parent models
+			if ( null == instanceInfo.controllingModel && instanceInfo.usesCollision )
+				collisionTest($elapsedTimeMS);
+			// TODO this seems like extra work, dead models should add them selves to a queue to be removed
 			modelInfo.bringOutYourDead();
 		}
 	}
@@ -772,7 +771,15 @@ public class VoxelModel {
 		GrainCursorPool.poolDispose(gct);
 		return fo;
 	}
-	
+
+	public function getOxelAtMSPoint($posMs:Vector3D, $collideAtGrain:uint):Oxel {
+		var gct:GrainCursor = GrainCursorPool.poolGet(modelInfo.oxelPersistence.oxel.gc.bound);
+		gct.getGrainFromVector($posMs, $collideAtGrain);
+		var fo:Oxel = modelInfo.oxelPersistence.oxel.childFind(gct);
+		GrainCursorPool.poolDispose(gct);
+		return fo;
+	}
+
 	public function isSolidAtWorldSpace($cp:CollisionPoint, $pos:Vector3D, $collideAtGrain:uint, $collidingModel:VoxelModel = null ):void {
 		$cp.oxel = getOxelAtWSPoint($pos, $collideAtGrain);
 		if (OxelBad.INVALID_OXEL == $cp.oxel)
@@ -903,7 +910,7 @@ public class VoxelModel {
 		//else	
 			//Log.out( "VoxelModel.takeControl of : " + modelInfo.fileName );
 		
-		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+		VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, nextCamera );
 		
 		VoxelModel.controlledModel = this;
 		
@@ -917,21 +924,9 @@ public class VoxelModel {
 //		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
 	}
 	
-	public function childAdd( $childModel:VoxelModel):void {
-		if ( isInParentChain($childModel) ) {
-			Log.out( "VoxelModel.childAdd - TRYING TO ADD MODEL THIS IS A PARENT", Log.WARN );
-			return;
-		}
-		if ( false == modelInfo.childrenLoaded )
-			modelInfo.childAdd( $childModel );
-		else
-			if ( metadata.permissions.modify )
-				modelInfo.childAdd( $childModel )
-	}
-	
 	public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void
 	{
-		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyDown);
+		VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, nextCamera );
 		
 		// remove the player to the child list
 		if ( $detachChild )
@@ -942,7 +937,7 @@ public class VoxelModel {
 	}
 	
 	// handle the tab key event to move camera around, this is only for controlled model
-	protected function onKeyDown(e:KeyboardEvent):void {
+	protected function nextCamera(e:KeyboardEvent):void {
 		if (Keyboard.TAB == e.keyCode && 0 == Globals.openWindowCount ) {
 			camera.next();
 			// I want the camera for the controlled object, not the avatar.
@@ -954,10 +949,20 @@ public class VoxelModel {
 				GUIEvent.dispatch( new GUIEvent(GUIEvent.TOOLBAR_HIDE));
 		}
 	}
-	
-	// overridden by decendants
-	protected function onKeyUp(e:KeyboardEvent):void  { }
-	
+
+	public function childAdd( $childModel:VoxelModel):void {
+		if ( isInParentChain($childModel) ) {
+			Log.out( "VoxelModel.childAdd - TRYING TO ADD MODEL THIS IS A PARENT", Log.WARN );
+			return;
+		}
+		if ( false == modelInfo.childrenLoaded )
+			modelInfo.childAdd( $childModel );
+		else
+		if ( metadata.permissions.modify )
+			modelInfo.childAdd( $childModel )
+	}
+
+
 	protected function dispatchMovementEvent():void {
 		var me:ModelEvent = new ModelEvent(ModelEvent.MOVED, instanceInfo.instanceGuid, instanceInfo.positionGet, instanceInfo.rotationGet);
 		Globals.g_app.dispatchEvent(me);

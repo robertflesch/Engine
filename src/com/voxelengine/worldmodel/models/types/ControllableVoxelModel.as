@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.events.VVKeyboardEvent;
 import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.events.CursorSizeEvent;
 import com.voxelengine.events.InventoryEvent;
@@ -355,7 +356,7 @@ public class ControllableVoxelModel extends VoxelModel
 	public function jump( mutliplier:Number = 1 ):void
 	{
 		//Log.out( "Jump PRE: " + instanceInfo.velocityGet.y );
-		instanceInfo.addTransform( 0, -8 * mutliplier, 0, 100, ModelTransform.VELOCITY );
+		instanceInfo.addNamedTransform( 0, -8 * mutliplier, 0, 100, ModelTransform.VELOCITY, "jump" );
 		//Log.out( "Jump PST: " + instanceInfo.velocityGet.y );
 	}
 
@@ -372,30 +373,37 @@ public class ControllableVoxelModel extends VoxelModel
 		const STEP_UP_CHECK:Boolean = true;
 		// does model have collision, if no collision, then why bother with gravity
 		if ( instanceInfo.usesCollision ) {
-			_collisionCandidates = ModelCacheUtils.whichModelsIsThisInfluencedBy( this )
+			_collisionCandidates = ModelCacheUtils.whichModelsIsThisInfluencedBy( this );
 			//trace( "collisionTest: " + _collisionCandidates.length )
+			onSolidGround = false;
 			if ( 0 == _collisionCandidates.length ) {
 				if ( usesGravity )
 					fall( loc, $elapsedTimeMS );
-				onSolidGround = false;
 // TEMP
 				instanceInfo.setTo( loc );
 			} else {
+				var maxCollisionPointCount:int = -1;
 				for each ( var collisionCandidate:VoxelModel in _collisionCandidates ) {
 					// if it collided or failed to step up
 					// restore the previous position
-					var restorePoint:int = collisionCheckNew( $elapsedTimeMS, loc, collisionCandidate, STEP_UP_CHECK )
-					if ( -1 < restorePoint ) {
-						Globals.g_app.dispatchEvent( new CollisionEvent( CollisionEvent.COLLIDED, this.instanceInfo.instanceGuid ) );
-						instanceInfo.restoreOld( restorePoint );
-						instanceInfo.velocityReset();
-						return false;
-					}
-					else {		// New position is valid
-// TEMP
-						instanceInfo.setTo(loc);
-					}
+					var collisionPointCount:int = collisionCheckNew( $elapsedTimeMS, loc, collisionCandidate, STEP_UP_CHECK );
+					maxCollisionPointCount = Math.max( maxCollisionPointCount, collisionPointCount );
 				}
+
+				if ( -1 < collisionPointCount ) {
+					Globals.g_app.dispatchEvent( new CollisionEvent( CollisionEvent.COLLIDED, this.instanceInfo.instanceGuid ) );
+					instanceInfo.restoreOld( collisionPointCount );
+					instanceInfo.velocityReset();
+					return false;
+				}
+				else {		// New position is valid
+// TEMP - why TEMP RSF???
+					if ( true == usesGravity && false == onSolidGround  )
+						fall( loc, $elapsedTimeMS );
+
+					instanceInfo.setTo(loc);
+				}
+
 			}
 		}
 		else {
@@ -458,11 +466,11 @@ public class ControllableVoxelModel extends VoxelModel
 					// restore the previous position
 
 
-					var restorePoint:int = collisionCheckNew( $elapsedTimeMS, loc, collisionCandidate, STEP_UP_CHECK )
-					if ( -1 < restorePoint )
+					var collisionPointCount:int = collisionCheckNew( $elapsedTimeMS, loc, collisionCandidate, STEP_UP_CHECK )
+					if ( -1 < collisionPointCount )
 					{
 						Globals.g_app.dispatchEvent( new CollisionEvent( CollisionEvent.COLLIDED, this.instanceInfo.instanceGuid ) );
-						instanceInfo.restoreOld( restorePoint );
+						instanceInfo.restoreOld( collisionPointCount );
 						instanceInfo.velocityReset();
 						return false;
 					}
@@ -482,6 +490,9 @@ public class ControllableVoxelModel extends VoxelModel
 		super.takeControl( $modelLosingControl, $addAsChild );
 		if ( Network.userId != Network.LOCAL )
 			InventoryInterfaceEvent.dispatch( new InventoryInterfaceEvent( InventoryInterfaceEvent.DISPLAY, instanceInfo.instanceGuid, inventoryBitmap ) );
+
+		VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, keyDown );
+		VVKeyboardEvent.addListener( KeyboardEvent.KEY_UP, keyUp );
 	}
 	
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {
@@ -491,8 +502,21 @@ public class ControllableVoxelModel extends VoxelModel
 		// no longer controlling this model
 		// shut down the toolbar
 		InventoryInterfaceEvent.dispatch( new InventoryInterfaceEvent( InventoryInterfaceEvent.CLOSE, instanceInfo.instanceGuid, null ) );
+		VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, keyDown );
+		VVKeyboardEvent.removeListener( KeyboardEvent.KEY_UP, keyUp );
 	}
-	
+
+	// This is for direct control of model, such as in the voxel bomber.
+	protected function keyDown(e:KeyboardEvent):void {
+		throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, instanceInfo.instanceGuid, -_accelRate ) );
+	}
+
+	// This is for direct control of model, such as in the voxel bomber.
+	protected function keyUp(e:KeyboardEvent):void {
+		throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, instanceInfo.instanceGuid, _accelRate ) );
+	}
+
+
 	/*
 	 * Checks whether this $loc is valid, meaning none of the object's collision points
 	 * are in a solid oxel. This is the most basic approach. The model just stops if it collides.
@@ -533,20 +557,6 @@ public class ControllableVoxelModel extends VoxelModel
 	
 	protected function stopEngines():void
 	{
-	}
-	
-	// This is for direct control of model, such as in the voxel bomber.
-	override protected function onKeyDown(e:KeyboardEvent):void 
-	{
-		super.onKeyDown( e );
-		switch (e.keyCode) {
-			case 87: case Keyboard.UP:
-				throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, instanceInfo.instanceGuid, _accelRate ) );
-				break;
-			case 83: case Keyboard.DOWN: 
-				throttleEvent( new ShipEvent( ShipEvent.THROTTLE_CHANGED, instanceInfo.instanceGuid, -_accelRate ) );
-				break;
-		}
 	}
 	
 	private var  	count:int 			= 0;

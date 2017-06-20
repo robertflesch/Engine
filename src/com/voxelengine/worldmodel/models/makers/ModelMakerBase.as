@@ -230,7 +230,7 @@ public class ModelMakerBase {
 			modelInfo.oxelPersistence = null;
 			_vm.dead = true;
 			markComplete( false );
-			Log.out("ModelMakerBase.oxelBuildFailed - Error generating OXEL data guid: " + modelInfo.guid, Log.ERROR);
+			Log.out("ModelMakerBase.oxelBuildFailed - Error generating OXEL data guid: " + $ode.modelGuid, Log.ERROR);
 		}
 	}
 

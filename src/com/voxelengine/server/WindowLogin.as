@@ -10,7 +10,8 @@ package com.voxelengine.server
 import com.voxelengine.GUI.components.ComponentComboBoxWithLabel;
 import com.voxelengine.events.LoadingImageEvent;
 	import com.voxelengine.events.RegionEvent;
-	import com.voxelengine.events.WindowSplashEvent;
+import com.voxelengine.events.VVKeyboardEvent;
+import com.voxelengine.events.WindowSplashEvent;
 	import com.voxelengine.GUI.components.VVTextInput;
 	import com.voxelengine.GUI.VoxelVerseGUI;
 import com.voxelengine.renderer.Renderer;
@@ -184,7 +185,7 @@ import org.flashapi.swing.list.ListItem;
 			
 			display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 
-			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
+			VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, onKeyPressed );
 		}
 
 		private function changeServer( $le:ListEvent ):void {
@@ -199,7 +200,7 @@ import org.flashapi.swing.list.ListItem;
 		// Allows the enter key to activate the login key.
 		private function onKeyPressed( e : KeyboardEvent) : void {
 			if ( Keyboard.ENTER == e.keyCode ) {
-				Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
+				VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, onKeyPressed);
 				loginButtonHandler(null);
 			}
 		}
@@ -326,7 +327,7 @@ import org.flashapi.swing.list.ListItem;
 		}
 		
 		override protected function onRemoved( event:UIOEvent ):void {
-			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
+			VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, onKeyPressed );
 			super.onRemoved( event );
 			VoxelVerseGUI.currentInstance.showGUI();
 		}

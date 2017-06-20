@@ -9,6 +9,8 @@ package com.voxelengine.worldmodel.models.types
 {
 
 
+import com.voxelengine.events.VVKeyboardEvent;
+import com.voxelengine.events.VVMouseEvent;
 import com.voxelengine.worldmodel.models.ModelPlacementType;
 
 import flash.display3D.Context3D;
@@ -131,8 +133,8 @@ public class EditCursor extends VoxelModel
 	
 	
 	private 			var _objectModel:VoxelModel;
-	private function 	get	objectModel( ):VoxelModel { return _objectModel;}
-	private function 		objectModelClear():void { _objectModel = null; }
+	public function 	get	objectModel( ):VoxelModel { return _objectModel;}
+	public function 		objectModelClear():void { _objectModel = null; }
 	
 	// This saves the last valid texture that was set.
 	private 		  	var _oxelTextureValid:int		 				= EDITCURSOR_SQUARE;
@@ -157,7 +159,7 @@ public class EditCursor extends VoxelModel
 	private function addListeners():void {
 		CursorOperationEvent.addListener( CursorOperationEvent.NONE, 			resetEvent );
 		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_OXEL, 	deleteOxelEvent );
-		CursorOperationEvent.addListener( CursorOperationEvent.DELETE_MODEL, 	deleteModelEvent);
+		//CursorOperationEvent.addListener( CursorOperationEvent.DELETE_MODEL, 	deleteModelEvent);
 		CursorOperationEvent.addListener( CursorOperationEvent.INSERT_OXEL, 	insertOxelEvent );
 		CursorOperationEvent.addListener( CursorOperationEvent.INSERT_MODEL, 	insertModelEvent );
 
@@ -170,12 +172,13 @@ public class EditCursor extends VoxelModel
 		CursorSizeEvent.addListener( CursorSizeEvent.GROW, 			sizeGrowEvent );
 		CursorSizeEvent.addListener( CursorSizeEvent.SHRINK, 		sizeShrinkEvent );
 
-		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
-		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_UP, keyUp);
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_UP, 	 mouseUp);
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_MOVE,  mouseMove);
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_DOWN,  mouseDown);
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);
+		VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, keyDown);
+		VVKeyboardEvent.addListener( KeyboardEvent.KEY_UP, keyUp);
+
+		VVMouseEvent.addListener( MouseEvent.MOUSE_UP, 	  mouseUp );
+		VVMouseEvent.addListener( MouseEvent.MOUSE_MOVE,  mouseMove );
+		VVMouseEvent.addListener( MouseEvent.MOUSE_DOWN,  mouseDown );
+		VVMouseEvent.addListener( MouseEvent.MOUSE_WHEEL, onMouseWheel );
 	}
 	
 	////////////////////////////////////////////////
@@ -244,11 +247,11 @@ public class EditCursor extends VoxelModel
 		oxelTextureValid = oxelTexture = e.oxelType;
 		objectModelClear();
 	}
-	private function deleteModelEvent(e:CursorOperationEvent):void {
-		editing = true;
-		cursorShape = CursorShapeEvent.MODEL_AUTO;
-		cursorOperation = e.type;
-	}
+//	private function deleteModelEvent(e:CursorOperationEvent):void {
+//		editing = true;
+//		cursorShape = CursorShapeEvent.MODEL_AUTO;
+//		cursorOperation = e.type;
+//	}
 	private function insertModelEvent(e:CursorOperationEvent):void {
 		Log.out( "EditCursor.insertModelEvent", Log.WARN );
 		editing = true;
@@ -341,34 +344,42 @@ public class EditCursor extends VoxelModel
 
 		// We generate gci data for INSERT_MODEL with cursorShape == MODEL_CHILD || MODEL_AUTO
 		if ( gciData ) {
-			if ( cursorOperation == CursorOperationEvent.INSERT_OXEL || cursorOperation == CursorOperationEvent.INSERT_MODEL ) {
+			if ( cursorOperation == CursorOperationEvent.INSERT_MODEL ) {
+				insertLocationCalculate();
 				// This gets the closest open oxel along the ray
 				if ( ModelPlacementType.placementType == ModelPlacementType.PLACEMENT_TYPE_CHILD ) {
-					insertLocationCalculate();
 					PlacementLocation.INVALID == _pl.state ? oxelTexture = EDITCURSOR_INVALID : oxelTexture = oxelTextureValid;
 				}
 				else {
 					_pl.state = PlacementLocation.VALID;
 				}
 
-				if ( cursorShape == CursorShapeEvent.MODEL_AUTO && objectModel )
+				if ( objectModel )
 					objectModel.instanceInfo.positionSetComp( _pl.gc.getModelX(), _pl.gc.getModelY(), _pl.gc.getModelZ() );
 
+			} else  if ( cursorOperation == CursorOperationEvent.INSERT_OXEL ) {
+				//Log.out( "EditCursor.update - CursorOperationEvent.INSERT_OXEL");
+				insertLocationCalculate();
+				PlacementLocation.INVALID == _pl.state ? oxelTexture = EDITCURSOR_INVALID : oxelTexture = oxelTextureValid;
 				instanceInfo.positionSetComp( _pl.gc.getModelX(), _pl.gc.getModelY(), _pl.gc.getModelZ() );
 			}
-			else if ( cursorOperation == CursorOperationEvent.DELETE_OXEL || cursorOperation == CursorOperationEvent.DELETE_MODEL ) {
+			else if ( cursorOperation == CursorOperationEvent.DELETE_OXEL ) {
+				//Log.out( "EditCursor.update - CursorOperationEvent.DELETE_OXEL x: " + _gciData.gc.getModelX() );
 				instanceInfo.positionSetComp( _gciData.gc.getModelX(), _gciData.gc.getModelY(), _gciData.gc.getModelZ() );
 			}
 			buildCursorModel();	
-		} 
-		
-		if ( !gciData && objectModel && objectModel.complete && objectModel.modelInfo.oxelPersistence && objectModel.modelInfo.oxelPersistence.oxel ) { // this is the INSERT_MODEL where its not on a parent model
-			oxelTexture = oxelTextureValid;
-			var vv:Vector3D = ModelCacheUtils.viewVectorNormalizedGet();
-			vv.scaleBy( objectModel.modelInfo.oxelPersistence.oxel.gc.size() * 4 );
-			vv = vv.add( VoxelModel.controlledModel.instanceInfo.positionGet );
-			objectModel.instanceInfo.positionSet = vv;
-			_pl.state = PlacementLocation.VALID;
+		} else { // null == gciData So the model or oxel is being placed outside of another model
+			if ( objectModel && objectModel.complete && objectModel.modelInfo.oxelPersistence && objectModel.modelInfo.oxelPersistence.oxel ) { // this is the INSERT_MODEL where its not on a parent model
+				oxelTexture = oxelTextureValid;
+				var vv:Vector3D = ModelCacheUtils.viewVectorNormalizedGet();
+				vv.scaleBy(objectModel.modelInfo.oxelPersistence.oxel.gc.size() * 4);
+				vv = vv.add(VoxelModel.controlledModel.instanceInfo.positionGet);
+				objectModel.instanceInfo.positionSet = vv;
+				_pl.state = PlacementLocation.VALID;
+			} else {
+				//Log.out( "EditCursor.update - NO GCI data and no valid object model")
+			}
+
 		}
 		
 		if ( objectModel )
@@ -502,6 +513,16 @@ public class EditCursor extends VoxelModel
 	private function insertModel():void {
 		if ( PlacementLocation.INVALID == _pl.state) {
 			Log.out( "EditCursor.insertModel - placement location invalid", Log.WARN );
+			return;
+		}
+
+		if ( !Globals.active ){
+			Log.out( "EditCursor.insertModel - NOT ACTIVE", Log.WARN );
+			return;
+		}
+
+		if ( 0 < Globals.openWindowCount ){
+			Log.out( "EditCursor.insertModel - openWindowCount", Log.WARN );
 			return;
 		}
 
@@ -885,6 +906,7 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function mouseUp(e:MouseEvent):void  {
+        Log.out( "EditCursor.MOUSE_UP");
 		repeatTimerStop();
 		
 		if ( Globals.openWindowCount || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging || Log.showing )
@@ -912,6 +934,7 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function mouseDown(e:MouseEvent):void {
+        Log.out( "EditCursor.MOUSE_DOWN");
 		if ( Globals.openWindowCount  || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging || Log.showing )
 			return;
 			

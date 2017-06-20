@@ -5,6 +5,7 @@ VoxelVerse todo
 --Collision
 Camera needs to collide with world!
 When side of the avatar is touching an oxel it get pushed up over and over again.
+what happens to vines when sub oxels are created?
 
 
 need to display ammo for gun models in voxel model panel - Or just allow infinity ammo

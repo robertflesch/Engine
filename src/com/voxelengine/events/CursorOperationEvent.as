@@ -17,7 +17,7 @@ public class CursorOperationEvent extends Event
 	static public	const INSERT_OXEL:String 	= "INSERT_OXEL";
 	static public	const INSERT_MODEL:String 	= "INSERT_MODEL";
 	static public 	const DELETE_OXEL:String 	= "DELETE_OXEL";
-	static public 	const DELETE_MODEL:String 	= "DELETE_MODEL";
+	//static public 	const DELETE_MODEL:String 	= "DELETE_MODEL";
 	static public 	const ACTIVATE:String 		= "ACTIVATE";
 
 	private var _oxelType:int;

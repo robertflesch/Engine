@@ -11,7 +11,9 @@ package com.voxelengine.worldmodel.scripts
 	 * ...
 	 * @author Bob
 	 */
-	import com.voxelengine.worldmodel.weapons.Ammo;
+
+import com.voxelengine.events.VVKeyboardEvent;
+import com.voxelengine.worldmodel.weapons.Ammo;
 	import com.voxelengine.worldmodel.weapons.Gun;
 	import flash.events.TimerEvent;
 	import flash.events.KeyboardEvent;
@@ -42,8 +44,8 @@ package com.voxelengine.worldmodel.scripts
 			
 			//_ammo.accuracy = 0.000;
 			//_ammo.velocity = 1000;
-			
-			Globals.g_app.stage.addEventListener( KeyboardEvent.KEY_DOWN
+
+			VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN
 			                                    , function(e:KeyboardEvent) : void  { Keyboard.F == e.keyCode ? fire():null }
 												, false
 												, 0

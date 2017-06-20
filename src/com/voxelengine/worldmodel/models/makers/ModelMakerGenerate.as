@@ -144,6 +144,8 @@ public class ModelMakerGenerate extends ModelMakerBase {
 					modelInfo.changed = true;
 					_modelMetadata.changed = true;
 					_vm.save();
+					modelInfo.oxelPersistence.changed = true;
+					modelInfo.oxelPersistence.save();
 				}
 //			}
 			ModelMetadataEvent.create( ModelBaseEvent.GENERATION, 0, _modelMetadata.guid, _modelMetadata );

@@ -8,23 +8,21 @@
 
 package com.voxelengine.GUI.actionBars
 {
-import flash.events.MouseEvent;
-import flash.events.KeyboardEvent;
-import flash.events.Event;
 
-import org.flashapi.swing.Box;
+import com.voxelengine.events.VVMouseEvent;
+
+import flash.events.KeyboardEvent;
+import flash.events.MouseEvent;
+
 import org.flashapi.swing.Label;
-import org.flashapi.swing.constants.*;
 import org.flashapi.swing.core.UIObject;
 import org.flashapi.swing.event.UIMouseEvent;
 
 import com.voxelengine.Log;
 import com.voxelengine.Globals;
 import com.voxelengine.events.CursorSizeEvent;
+import com.voxelengine.events.VVKeyboardEvent;
 import com.voxelengine.GUI.inventory.BoxInventory;
-import com.voxelengine.worldmodel.models.types.EditCursor;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.inventory.ObjectGrain;
 import com.voxelengine.worldmodel.inventory.ObjectInfo;
 
@@ -40,14 +38,14 @@ public class GrainSelector extends QuickInventory
 	}
 	
 	public function addListeners():void {
-		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
-		Globals.g_app.stage.addEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+		VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, hotKeyInventory );
+		VVMouseEvent.addListener( MouseEvent.MOUSE_WHEEL, onMouseWheel );
 		CursorSizeEvent.addListener( CursorSizeEvent.SET, onSizeSet );
 	}
 	
 	public function removeListeners():void {
-		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, hotKeyInventory );
-		Globals.g_app.stage.removeEventListener(MouseEvent.MOUSE_WHEEL, onMouseWheel);	
+		VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, hotKeyInventory );
+		VVMouseEvent.removeListener( MouseEvent.MOUSE_WHEEL, onMouseWheel );
 		CursorSizeEvent.removeListener( CursorSizeEvent.SET, onSizeSet );
 	}
 	

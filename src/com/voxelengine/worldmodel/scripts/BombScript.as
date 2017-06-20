@@ -13,6 +13,7 @@ package com.voxelengine.worldmodel.scripts
  */
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.SoundEvent;
+import com.voxelengine.events.VVKeyboardEvent;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
 
 import flash.media.Sound;
@@ -64,7 +65,7 @@ public class BombScript extends Script
 	
 	private function addKeyboardListeners() : void
 	{
-		Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
+		VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, onKeyPressed);
 	}
 
 	private function onKeyPressed( e : KeyboardEvent) : void
@@ -77,7 +78,7 @@ public class BombScript extends Script
 	
 	private function drop():void
 	{
-		Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, onKeyPressed);
+		VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, onKeyPressed);
 		
 		//var snd:Sound = SoundCache.getSound( _soundFile );
 		//_channel = snd.play();

@@ -63,6 +63,8 @@ public class PanelModels extends PanelBase
 
 		_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, selectModel );
 		ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
+		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, childModelAdded );
+		ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED, parentModelAdded );
 
 		var bHeight:int = buttonsCreate();
 		_listModels.y = bHeight;
@@ -358,8 +360,27 @@ public class PanelModels extends PanelBase
 	static private function noModelSelected():void	{
 		(new Alert( LanguageManager.localizedStringGet( "No_Model_Selected" ) )).display();
 	}
-	
-	//private function rollOverHandler(e:UIMouseEvent):void 
+
+	private function childModelAdded( $me:ModelEvent ):void {
+		if ( 0 == _level )
+				return;
+		var pig:String = $me.parentInstanceGuid;
+		var ig:String = $me.instanceGuid;
+		var vm:VoxelModel = $me.vm;
+		if ( vm && _parentModel && pig == _parentModel.instanceInfo.instanceGuid )
+			addItem( vm.metadata.name, vm.instanceInfo.instanceGuid, vm.modelInfo.guid );
+	}
+
+	private function parentModelAdded( $me:ModelEvent ):void {
+		if ( 0 <= _level )
+			return;
+		var ig:String = $me.instanceGuid;
+		var vm:VoxelModel = $me.vm;
+		if ( vm )
+			addItem( vm.metadata.name, vm.instanceInfo.instanceGuid, vm.modelInfo.guid );
+
+	}
+	//private function rollOverHandler(e:UIMouseEvent):void
 	//{
 		//Log.out( "PanelModels.UIMouseEvent.ROLL_OVER: " + e.toString() );
 		//if ( null == _buttonContainer ) {

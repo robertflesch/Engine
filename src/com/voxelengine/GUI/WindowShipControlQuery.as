@@ -12,6 +12,7 @@ package com.voxelengine.GUI
 	import com.voxelengine.GUI.actionBars.WindowGunControl;
 	import com.voxelengine.GUI.actionBars.WindowShipControl;
 	import com.voxelengine.Log;
+import com.voxelengine.events.VVKeyboardEvent;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.models.types.Player;
 	import com.voxelengine.worldmodel.models.types.Ship;
@@ -50,7 +51,7 @@ public class WindowShipControlQuery extends VVCanvas
 			button.width = 300;
 			button.height = 80;
 			button.addEventListener(MouseEvent.CLICK, takeControlMouse );
-			Globals.g_app.stage.addEventListener(KeyboardEvent.KEY_DOWN, takeControlKey );
+			VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, takeControlKey );
 
 			addElement( button );
 			
@@ -74,7 +75,7 @@ public class WindowShipControlQuery extends VVCanvas
  		{
             Globals.g_app.stage.removeEventListener(Event.RESIZE, onResizeHeading );
 			removeEventListener(UIOEvent.REMOVED, onRemoved );
-			Globals.g_app.stage.removeEventListener(KeyboardEvent.KEY_DOWN, takeControlKey );
+			VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, takeControlKey );
 			_s_currentInstance = null;
 		}
 
