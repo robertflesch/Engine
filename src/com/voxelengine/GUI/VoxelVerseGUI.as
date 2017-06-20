@@ -188,7 +188,7 @@ public class VoxelVerseGUI extends EventDispatcher
 
 	private function mouseEvent( $e:MouseEvent ):void {
 		if ( !Globals.active ) {
-			Log.out("VoxelVerseGUI.mouseEvent", Log.WARN );
+			//Log.out("VoxelVerseGUI.mouseEvent", Log.WARN );
 			return;
 		}
 		VVMouseEvent.dispatch( $e );

@@ -30,7 +30,7 @@ public class InstanceInfo extends Location	{
 		return _speedMultiplier = v;
 	}
 
-	private var	_moveSpeed:SecureNumber 						= new SecureNumber( 0.01 );
+	private var	_moveSpeed:SecureNumber 						= new SecureNumber( 0.02 );
 //	public function get moveSpeed():Number  					{ return _moveSpeed.val; }
 	public function set moveSpeed(value:Number):void  			{ _moveSpeed.val = value; }
 	public function speed( $time:Number ):Number 				{
@@ -472,7 +472,7 @@ public class InstanceInfo extends Location	{
 		resetCamera();
 	}
 	
-	static private function resetCamera():void {
+	static public function resetCamera():void {
 		if ( VoxelModel.controlledModel ) {
 			VoxelModel.controlledModel.instanceInfo.rotationSet = new Vector3D( 0,0,0 );
 		}

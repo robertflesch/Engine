@@ -13,6 +13,8 @@ import com.voxelengine.events.RegionEvent;
 import com.voxelengine.GUI.WindowSplash;
 import com.voxelengine.events.VVKeyboardEvent;
 import com.voxelengine.events.VVMouseEvent;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 
 import flash.events.KeyboardEvent;
 import flash.events.FullScreenEvent;
@@ -126,8 +128,8 @@ public class MouseKeyboardHandler
 		if ( false == _s_handlersAdded ) {
 			_s_handlersAdded = true;
 			Globals.g_app.stage.addEventListener(FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
-			VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, keyDown );
 			VVKeyboardEvent.addListener( KeyboardEvent.KEY_UP, keyUp );
+			VVKeyboardEvent.addListener( KeyboardEvent.KEY_DOWN, keyDown );
 			VVMouseEvent.addListener( MouseEvent.MOUSE_DOWN, leftMouseDownEvent );
 			VVMouseEvent.addListener( MouseEvent.MOUSE_UP, leftMouseUpEvent );
 			VVMouseEvent.addListener( MouseEvent.RELEASE_OUTSIDE, leftMouseUpEvent );
@@ -150,8 +152,8 @@ public class MouseKeyboardHandler
 		if ( true == _s_handlersAdded ) {
 			_s_handlersAdded = false;
 			Globals.g_app.stage.removeEventListener(FullScreenEvent.FULL_SCREEN_INTERACTIVE_ACCEPTED, fullScreenEvent );
-			VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, keyDown );
 			VVKeyboardEvent.removeListener( KeyboardEvent.KEY_UP, keyUp );
+			VVKeyboardEvent.removeListener( KeyboardEvent.KEY_DOWN, keyDown );
 			VVMouseEvent.removeListener( MouseEvent.MOUSE_DOWN, leftMouseDownEvent );
 			VVMouseEvent.removeListener( MouseEvent.MOUSE_UP, leftMouseUpEvent );
 			VVMouseEvent.removeListener( MouseEvent.RELEASE_OUTSIDE, leftMouseUpEvent );
@@ -178,15 +180,17 @@ public class MouseKeyboardHandler
 		_s_alt = false;
 	}
 
-	static private function keyDown( $ke:KeyboardEvent):void { processKey( $ke, true );
-		//if ( Keyboard.HOME == $ke.keyCode ) 									resetCamera();
-		//if ( Keyboard.KEYNAME_BREAK == $ke.keyCode ) 							resetPosition()
+	static private function keyDown( $ke:KeyboardEvent):void {
+		processKey( $ke, true );
 	}
-	static private function keyUp( $ke:KeyboardEvent ):void  { processKey( $ke, false ); }
+	static private function keyUp( $ke:KeyboardEvent ):void  {
+		processKey( $ke, false );
+	}
+
 	static private function processKey( $ke:KeyboardEvent, $setter:Boolean):void  {
 		switch ($ke.keyCode) {
 			case Keyboard.CONTROL: 					_s_ctrl = $setter; break;
-			case Keyboard.SHIFT: 					_s_shift = $setter;
+			case Keyboard.SHIFT: 					_s_shift = $setter; break;
 			case Keyboard.ALTERNATE: 				_s_alt = $setter; break;
 			case Keyboard.Q: 						_s_down = $setter; break;
 			case Keyboard.E: case Keyboard.SPACE:	_s_up = $setter; break;
@@ -195,6 +199,8 @@ public class MouseKeyboardHandler
 			case Keyboard.S: case Keyboard.DOWN: 	_s_backward = $setter; break;
 			case Keyboard.A: case Keyboard.LEFT: 	_s_left = $setter; break;
 			case Keyboard.D: case Keyboard.RIGHT: 	_s_right = $setter; break;
+			case Keyboard.HOME: InstanceInfo.resetCamera(); break;
+			case Keyboard.KEYNAME_BREAK: Region.resetPosition(); break;
 		}
 	}
 }

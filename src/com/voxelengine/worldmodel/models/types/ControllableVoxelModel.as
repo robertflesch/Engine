@@ -616,7 +616,10 @@ public class ControllableVoxelModel extends VoxelModel
 			// Add in movement factors
 			if ( MouseKeyboardHandler.forward )	{
 				if ( instanceInfo.velocityGet.length < maxSpeed ) {
-					instanceInfo.velocitySetComp( vel.x, vel.y, vel.z + speedVal );
+					if ( MouseKeyboardHandler.isShiftKeyDown )
+						instanceInfo.velocitySetComp( vel.x, vel.y, vel.z + speedVal * 4 );
+					else
+						instanceInfo.velocitySetComp( vel.x, vel.y, vel.z + speedVal );
 					changed = true; 
 					mForward = true; 
 				}
