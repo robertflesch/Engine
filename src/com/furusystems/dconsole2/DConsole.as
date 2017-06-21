@@ -1038,6 +1038,10 @@ import flash.desktop.Clipboard;
 			}
 			if (e.keyCode == Keyboard.ENTER && stage.focus == input.inputTextField) {
 				out.swallowEvent = true;
+				if ( e.ctrlKey ) {
+					Log.hide();
+					return out;
+				}
 				if (input.text.length < 1) {
 					//input.focus();
 					return out;
