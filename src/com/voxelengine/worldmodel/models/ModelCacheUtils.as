@@ -18,9 +18,11 @@ import com.voxelengine.worldmodel.oxel.OxelBad;
 import flash.geom.Matrix3D;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
-	import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
-	
-	public class ModelCacheUtils
+	import com.voxelengine.worldmodel.oxel.GrainIntersection;
+
+import org.as3commons.collections.Set;
+
+public class ModelCacheUtils
 	{
 		static public const FRONT:int = 0;
 		static public const BACK:int = 1;
@@ -34,11 +36,17 @@ import flash.geom.Matrix3D;
 		
 		static private const EDIT_RANGE:int = 250;
 		
-		static private var _totalIntersections:Vector.<GrainCursorIntersection> = new Vector.<GrainCursorIntersection>();
-		static private var _worldSpaceIntersections:Vector.<GrainCursorIntersection> = new Vector.<GrainCursorIntersection>();
+		static private var _modelIntersections:Vector.<GrainIntersection> = new Vector.<GrainIntersection>();
+		static private	function get modelIntersections():Vector.<GrainIntersection>  { return _modelIntersections; }
+		static private	function modelIntersectionsClear():void { _modelIntersections.splice(0, _modelIntersections.length ); }
+
+		static private var _oxelIntersections:Vector.<GrainIntersection> = new Vector.<GrainIntersection>();
+		static private	function get oxelIntersections():Vector.<GrainIntersection>  { return _oxelIntersections; }
+		static private	function oxelIntersectionsClear():void { _oxelIntersections.splice(0, _oxelIntersections.length ); }
+
 		static private var _worldSpaceStartPoint:Vector3D;
 		static private var _worldSpaceEndPoint:Vector3D;
-		static private var _gci:GrainCursorIntersection;
+		static private var _gci:GrainIntersection;
 		static private var _cameraMatrix:Matrix3D = new Matrix3D();
 		
 		static private var _viewVectors:Vector.<Vector3D> = new Vector.<Vector3D>(6); 
@@ -48,7 +56,7 @@ import flash.geom.Matrix3D;
 		static public function worldSpaceStartPointFunction():Vector3D { return _worldSpaceStartPoint ? _worldSpaceStartPoint : new Vector3D(); }
 		static public function worldSpaceEndPointFunction():Vector3D { return _worldSpaceEndPoint ? _worldSpaceEndPoint : new Vector3D(); }
 
-		static public function get gci():GrainCursorIntersection { return _gci; }
+		static public function get gci():GrainIntersection { return _gci; }
 		
 		public function ModelCacheUtils() { }
 		
@@ -67,19 +75,7 @@ import flash.geom.Matrix3D;
 			return newV;
 		}
 		
-		static private function sortIntersectionsGeneral( pointModel1:Object, pointModel2:Object ):Number	{
-			// CHECK WORLD SPACE DATA HERE in pointModels
-			var point1Rel:Number = _worldSpaceStartPoint.subtract( pointModel1.wsPoint ).length;
-			var point2Rel:Number = _worldSpaceStartPoint.subtract( pointModel2.wsPoint ).length;
-			if ( point1Rel < point2Rel )
-				return -1;
-			else if ( point1Rel > point2Rel ) 
-				return 1;
-			else 
-				return 0;			
-		}
-		
-		static private function sortIntersections( pointModel1:GrainCursorIntersection, pointModel2:GrainCursorIntersection ):Number {
+		static private function sortIntersections(pointModel1:GrainIntersection, pointModel2:GrainIntersection ):Number {
 			var point1Rel:Number = _worldSpaceStartPoint.subtract( pointModel1.wsPoint ).length;
 			var point2Rel:Number = _worldSpaceStartPoint.subtract( pointModel2.wsPoint ).length;
 			if ( point1Rel < point2Rel )
@@ -91,137 +87,64 @@ import flash.geom.Matrix3D;
 		}
 
 		static public function highLightEditableOxel( $ignoreType:uint = 100 ):void {
-			if ( !VoxelModel.controlledModel )
-				return;
-			
-			_totalIntersections.length = 0;
-			_worldSpaceIntersections.length = 0;
-			
-			// We should only use the models in the view frustrum - TODO - RSF
-			var ignoreType:uint = Globals.g_underwater ? TypeInfo.WATER : TypeInfo.AIR;
-			var editableModel:VoxelModel = findEditableModel();
-			_totalIntersections.length = 0;
-			_worldSpaceIntersections.length = 0;
-			if ( editableModel )
-			{
-				//if ( _lastFoundModel != editableModel && _lastFoundModel )
-					//EditCursor.currentInstance.visible = false;	
-				
-				VoxelModel.selectedModel = editableModel;
-				
-				if ( EditCursor.isEditing )
-				{
-					const minSize:int = EditCursor.currentInstance.grain;
-					
-					editableModel.lineIntersectWithChildren( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections, $ignoreType, minSize );
-						
-					for each ( var gcIntersection:GrainCursorIntersection in _worldSpaceIntersections )
-					{
-						gcIntersection.model = editableModel;
-						_totalIntersections.push( gcIntersection );
-					}
-					_totalIntersections.sort( sortIntersections );
-
-					_gci = _totalIntersections.shift();
-					/////////////////////////////////////////
-					if ( _gci ) {
-						if ( ! _gci.oxel ) {
-							Log.out( "ModelCacheUtil.highLightEditableOxel - Why no oxel?")
-						}
-						//_gci.point = editableModel.worldToModel( _gci.point );
-						if ( _gci.oxel ) {
-							var modelOxel:Oxel = _gci.oxel.minimumOxelForModel();
-							if ( modelOxel  ){
-								//_gci.gc.copyFrom( modelOxel.gc );
-								//_gci.oxel = modelOxel;
-								_gci.invalid = true;
-							}
-						}
-						EditCursor.currentInstance.gciDataSet( _gci );
-					}
-					else	
-					{
-						EditCursor.currentInstance.instanceInfo.visible = false;	
-						EditCursor.currentInstance.gciDataClear();
-					}
-					_lastFoundModel = editableModel;
-				}
-			}
-			else
+			if ( !VoxelModel.controlledModel && !EditCursor.isEditing ) {
 				VoxelModel.selectedModel = null;
-			
-			totalIntersectionsClear();
-			worldSpaceIntersectionsClear()
-		}
-		
-		static public function findClosestIntersectionInDirection( $dir:int = UP ):GrainCursorIntersection	{
-			if ( !VoxelModel.controlledModel )
-				return null;
-			
-			worldSpaceStartAndEndPointCalculate( $dir );
-			
-			// We should only use the models in the view frustrum - TODO - RSF
-			var vm:VoxelModel = findEditableModel();
-			if ( vm )
-			{
-				const minSize:int = 2; // TODO pass this in?
-				vm.lineIntersectWithChildren( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections, TypeInfo.AIR, minSize );
-					
-				for each ( var gcIntersection:GrainCursorIntersection in _worldSpaceIntersections )
-				{
-					gcIntersection.model = vm;
-					_totalIntersections.push( gcIntersection );
-				}
-				_totalIntersections.sort( sortIntersections );
-
-				var gci:GrainCursorIntersection = _totalIntersections.shift();
+				_gci = null;
+				EditCursor.currentInstance.gciDataSet( _gci );
+				return;
 			}
-			totalIntersectionsClear();
-			worldSpaceIntersectionsClear();
-			
-			return gci;
-		}
+			// TODO - We should only use the models in the view frustum - RSF
+			var ignoreType:uint = Globals.g_underwater ? TypeInfo.WATER : TypeInfo.AIR;
+			modelIntersectionsClear(); // findRayIntersectionsWithBoundingBox uses modelIntersections static
+			var boundingBoxIntersections:Vector.<GrainIntersection> = findRayIntersectionsWithBoundingBox( Region.currentRegion.modelCache.getEditableModels );
+			boundingBoxIntersections = sortIntersectionsAndRemoveDups( boundingBoxIntersections );
 
-		static private	function findEditableModel():VoxelModel {
-			var foundModel:VoxelModel = null;
-			var intersections:Vector.<GrainCursorIntersection> = findRayIntersections( Region.currentRegion.modelCache.getEditableModels, true );
-			intersections.sort( sortIntersections );
-			// get first (closest) intersection, that is not empty
-			for each ( var intersection:GrainCursorIntersection in intersections ){
-				if ( intersection && intersection.point.length ) {
-					// now get the oxel that corresponds to the oxel at that location
-					var oxel:Oxel = intersection.model.getOxelAtMSPoint( intersection.point, EditCursor.currentInstance.grain );
-					if ( OxelBad.INVALID_OXEL == oxel )
-						continue;
-					if( oxel.type == TypeInfo.AIR && 1 == oxel.childCount )
-						continue;
+			const minSize:int = EditCursor.currentInstance.grain;
+			// this gets the child intersections with each model, since two models might overlap
+			// its important to collect all of them first
+			oxelIntersectionsClear();
+			for each( var bbIntersection:GrainIntersection in boundingBoxIntersections ) {
+				bbIntersection.model.lineIntersectWithChildOxels( _worldSpaceStartPoint, _worldSpaceEndPoint, oxelIntersections, $ignoreType, minSize);
+			}
+			oxelIntersections.sort(sortIntersections);
+			_gci = null;
+			for each( var childIntersection:GrainIntersection in oxelIntersections ) {
+				// now get the oxel that corresponds to the oxel at that location
+				var oxel:Oxel = childIntersection.model.getOxelAtWSPoint(childIntersection.wsPoint, EditCursor.currentInstance.grain);
+				if (OxelBad.INVALID_OXEL == oxel)
+					continue;
+				if (oxel.type == TypeInfo.AIR && 1 == oxel.childCount)
+					continue;
 
-					foundModel = intersection.model;
-					break;
-				}
-
+				_gci = childIntersection;
+				VoxelModel.selectedModel = childIntersection.model;
+				EditCursor.currentInstance.gciDataSet( _gci );
+				_lastFoundModel = _gci.model;
+				break;
 			}
 
-//			var intersection:GrainCursorIntersection = intersections.shift();
-//			if ( intersection && intersection.point.length )
-//			{
-//				//if ( intersection.point.length < EDIT_RANGE )
-//					foundModel = intersection.model;
-//				//else
-//				//	trace( "out of range" );
-//			}
-			
-			if ( null == foundModel && null != _lastFoundModel )
-			{
+			if ( null == _gci ) {
 				EditCursor.currentInstance.instanceInfo.visible = false;
-				_lastFoundModel	= null;
-				trace( "no model found, disable edit cursor" );
+				EditCursor.currentInstance.gciDataClear();
 			}
-			
-			return foundModel;
 		}
 
-		
+		static private function sortIntersectionsAndRemoveDups( intersections:Vector.<GrainIntersection> ):Vector.<GrainIntersection> {
+			if ( 0 == intersections.length )
+				return intersections;
+			intersections.sort( sortIntersections );
+			var modelDups:Set = new Set();
+			var deDuppedIntersections:Vector.<GrainIntersection> = new Vector.<GrainIntersection>();
+			for each ( var intersection:GrainIntersection in intersections ) {
+				if ( !modelDups.has( intersection.model ) ) {
+					modelDups.add(intersection.model);
+					deDuppedIntersections.push(intersection);
+				}
+			}
+			return deDuppedIntersections;
+		}
+
+
 		static public	function worldSpaceStartAndEndPointCalculate( $direction:int = FRONT, $editRange:int = EDIT_RANGE ):void {
 			//////////////////////////////////////
 			// This works for camera at 0,0,0 - Seems to be working for all now
@@ -249,30 +172,23 @@ import flash.geom.Matrix3D;
 				_worldSpaceEndPoint = _cameraMatrix.transformVector( msCamPos );
 			}
 		}
-		
-		static private	function worldSpaceIntersectionsClear():void { _worldSpaceIntersections.splice(0, _worldSpaceIntersections.length ); }
-		static private	function totalIntersectionsClear():void { _totalIntersections.splice(0, _totalIntersections.length ); }
 
-		// TODO RSF - If the closest model has a hole in it, that the ray should pass thru
-		// it still stops and identifies that as the closest model.
-		static public function findRayIntersections( $candidateModels:Vector.<VoxelModel>, $checkChildModels:Boolean = false ):Vector.<GrainCursorIntersection> {
+		// TODO - NEED TO call modelIntersectionsClear() first
+		static public function findRayIntersectionsWithBoundingBox( $candidateModels:Vector.<VoxelModel>, $checkChildModels:Boolean = false ):Vector.<GrainIntersection> {
 			// TODO - RSF  - We should only use the models in the view frustrum
-			for each ( var vm:VoxelModel in $candidateModels )
-			{
-				worldSpaceIntersectionsClear();
+			for each ( var vm:VoxelModel in $candidateModels ) {
 				// finds up to two intersecting planes per model
-				vm.lineIntersect( _worldSpaceStartPoint, _worldSpaceEndPoint, _worldSpaceIntersections );
+				vm.lineIntersect( _worldSpaceStartPoint, _worldSpaceEndPoint, modelIntersections );
 
-				for each ( var gcIntersection:GrainCursorIntersection in _worldSpaceIntersections )
-					_totalIntersections.push( gcIntersection );
-
-				// did I intersect this model, and do I need to check its children?
-				// this will add any intersection with the child model to the totalIntersections list
-				if ( true == $checkChildModels && 0 < _worldSpaceIntersections.length && 0 < vm.modelInfo.childVoxelModels.length )
-					findRayIntersections( vm.modelInfo.childVoxelModelsGet(), true );
+				// so I intersected a model, and do I need to check its children?
+				// this will add any intersection with the child model to the modelIntersections list
+				if ( true == $checkChildModels && 0 < modelIntersections.length && 0 < vm.modelInfo.childVoxelModels.length ) {
+					// TODO - RSF this does not check for editable model, it just gets all models
+					findRayIntersectionsWithBoundingBox(vm.modelInfo.childVoxelModelsGet(), true);
+				}
 			}
 			
-			return _totalIntersections;
+			return modelIntersections;
 		}
 
 		static public function sphereCollideWithModels( $testObject:VoxelModel ):Vector.<VoxelModel> {

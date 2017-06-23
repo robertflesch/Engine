@@ -11,7 +11,7 @@ package com.voxelengine.worldmodel.oxel
 import flash.geom.Vector3D;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
-public class GrainCursorIntersection
+public class GrainIntersection
 {
 	public var point:Vector3D = new Vector3D();
 	public var wsPoint:Vector3D = new Vector3D();

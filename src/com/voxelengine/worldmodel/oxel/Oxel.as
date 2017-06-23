@@ -2019,25 +2019,24 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 //		gc.lineIntersect( this, $msStartPoint, $msEndPoint, $intersections );
 //	}
 
-	public function lineIntersectWithChildren( $msStartPoint:Vector3D, $msEndPoint:Vector3D, $msIntersections:Vector.<GrainCursorIntersection>, $ignoreType:uint, $minSize:int = 2 ):void	{
+	public function lineIntersectWithChildren($msStartPoint:Vector3D, $msEndPoint:Vector3D, $intersections:Vector.<GrainIntersection>, $ignoreType:uint, $minSize:int = 2 ):void	{
 		
 		if ( !childrenHas() && $ignoreType != type )
-			lineIntersect( $msStartPoint, $msEndPoint, $msIntersections );
+			lineIntersect( $msStartPoint, $msEndPoint, $intersections );
 		else if ( gc.grain <=  $minSize	)			
-			lineIntersect( $msStartPoint, $msEndPoint, $msIntersections );
+			lineIntersect( $msStartPoint, $msEndPoint, $intersections );
 		// find the oxel that is closest to the start point, and is solid?
 		// first do a quick check to see if ray hits any children.
 		// then for any children it hits, do a hit test with its children
 		else if ( childrenHas() )
 		{
-			// have to seperate childIntersections from totalIntersections
-			var childIntersections:Vector.<GrainCursorIntersection> = new Vector.<GrainCursorIntersection>();
-			var totalIntersections:Vector.<GrainCursorIntersection> = new Vector.<GrainCursorIntersection>();
-			for each ( var child:Oxel in _children ) 
+			// have to separate childIntersections from totalIntersections
+			var childIntersections:Vector.<GrainIntersection> = new Vector.<GrainIntersection>();
+			var totalIntersections:Vector.<GrainIntersection> = new Vector.<GrainIntersection>();
+			for each ( var child:Oxel in _children )
 			{
 				child.lineIntersect( $msStartPoint, $msEndPoint, childIntersections, $ignoreType );
-				for each ( var gcIntersection:GrainCursorIntersection in childIntersections )
-				{
+				for each ( var gcIntersection:GrainIntersection in childIntersections ) {
 					gcIntersection.oxel = child;
 					totalIntersections.push( gcIntersection );
 				}
@@ -2047,34 +2046,31 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			// if nothing to work with leave early
 			if ( 0 == totalIntersections.length )
 				return;
-			
+
 			// scratchVector is used by sort function
 			_s_scratchVector = $msStartPoint;
 			// sort getting closest ones first
 			totalIntersections.sort( intersectionsSort );
-			
-			for each ( var gci:GrainCursorIntersection in totalIntersections )
-			{
+
+			for each ( var gci:GrainIntersection in totalIntersections ) {
 				// closest child might be empty, if no intersection with this child, try the next one.
-				gci.oxel.lineIntersectWithChildren( $msStartPoint, $msEndPoint, $msIntersections, $ignoreType, $minSize );
-				// does this bail after the first found interesection?
-				if ( 0 != $msIntersections.length )
-				{
+				gci.oxel.lineIntersectWithChildren( $msStartPoint, $msEndPoint, $intersections, $ignoreType, $minSize );
+				// does this bail after the first found intersection?
+				if ( 0 != $intersections.length )
 					return;
-				}
 			}
 		}
-		
-		function intersectionsSort( pointModel1:GrainCursorIntersection, pointModel2:GrainCursorIntersection ):Number {
+
+		function intersectionsSort(pointModel1:GrainIntersection, pointModel2:GrainIntersection ):Number {
 			// TODO subtract is SLOW
 			var point1Rel:Number = _s_scratchVector.subtract( pointModel1.point ).length;
 			var point2Rel:Number = _s_scratchVector.subtract( pointModel2.point ).length;
 			if ( point1Rel < point2Rel )
 				return -1;
-			else if ( point1Rel > point2Rel ) 
+			else if ( point1Rel > point2Rel )
 				return 1;
-			else 
-				return 0;			
+			else
+				return 0;
 		}
 	}
 	
@@ -2095,15 +2091,11 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		
 		// our first test is the simplest case where this grain is
 		// entirely inside the parameter sphere
-		if ( true == GrainCursorUtils.is_inside_sphere( gc, cx, cy, cz, radius ))
-		{
+		if ( true == GrainCursorUtils.is_inside_sphere( gc, cx, cy, cz, radius )) {
 			// this grain and 100% of children (if any) are inside the radius
 			// so if the grain has children or it has an opaque type it will be selected
-			if(false
-				|| true == childrenHas()
-				|| true == TypeInfo.hasAlpha( type )
-			)
-			the_list.push(this);
+			if( true == childrenHas() || true == TypeInfo.hasAlpha( type ) )
+				the_list.push(this);
 			return;
 		}
 		
@@ -3382,7 +3374,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 	private static var _s_min:Vector3D = new Vector3D();
 	private static var _s_max:Vector3D = new Vector3D();
 	private static var _s_beginToEnd:Vector3D = new Vector3D();
-	public function lineIntersect( $modelSpaceStartPoint:Vector3D, $modelSpaceEndPoint:Vector3D, $intersections:Vector.<GrainCursorIntersection>, $ignoreType:uint = 100 ):Boolean
+	public function lineIntersect($modelSpaceStartPoint:Vector3D, $modelSpaceEndPoint:Vector3D, $intersections:Vector.<GrainIntersection>, $ignoreType:uint = 100 ):Boolean
 	{
 		if ( $ignoreType == type && !childrenHas() )
 			return false;
@@ -3441,7 +3433,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		}
 
 		if (tNear >= 0 && tNear <= 1) {
-			var gci:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tNear, tNearAxis, true );
+			var gci:GrainIntersection = buildIntersection( $modelSpaceStartPoint, tNear, tNearAxis, true );
 			gci.oxel = this;
 			$intersections.push( gci );
 			//trace( "GrainCursor.lineIntersectTest3 - intersection near " + gciNear.toString() );
@@ -3456,15 +3448,15 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		//if (tFar > 0 && tFar <= 32)
 		if (tFar > 0 && tFar <= 100) // what does 100 represent?
 		{
-			var gci1:GrainCursorIntersection = buildIntersection( $modelSpaceStartPoint, tFar, tFarAxis, false );
+			var gci1:GrainIntersection = buildIntersection( $modelSpaceStartPoint, tFar, tFarAxis, false );
 			gci1.oxel = this;
 			$intersections.push( gci1 );
 		}
 		return true;
 	}
 
-	private function buildIntersection( $modelSpaceStartPoint:Vector3D, $magnitude:Number, $axis:int, $nearAxis:Boolean ):GrainCursorIntersection  {
-		var gci:GrainCursorIntersection = new GrainCursorIntersection();
+	private function buildIntersection( $modelSpaceStartPoint:Vector3D, $magnitude:Number, $axis:int, $nearAxis:Boolean ):GrainIntersection  {
+		var gci:GrainIntersection = new GrainIntersection();
 		gci.point.copyFrom( _s_beginToEnd );
 		gci.point.scaleBy( $magnitude );
 		gci.point = $modelSpaceStartPoint.add( gci.point );

@@ -22,7 +22,7 @@ import com.voxelengine.renderer.Chunk;
 import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.types.EditCursor;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
+import com.voxelengine.worldmodel.oxel.GrainIntersection;
 
 public class CanvasDebugMenu extends VVCanvas {
 	static private var _s_currentInstance:CanvasDebugMenu = null;
@@ -180,7 +180,7 @@ public class CanvasDebugMenu extends VVCanvas {
 			// TO DO I dont like this direct call into the EditCursor
 			if (Globals.g_app && EditCursor.isEditing ) {
 				if ( VoxelModel.selectedModel && EditCursor.currentInstance.gciData ) {
-					var gci:GrainCursorIntersection = EditCursor.currentInstance.gciData;
+					var gci:GrainIntersection = EditCursor.currentInstance.gciData;
 					//var rot:Vector3D = VoxelModel.controlledModel.instanceInfo.rotationGet;
 					_gcLabel.text = "grain: " + gci.gc.grain + " x: " + int( gci.gc.grainX ) + "  y: " + int( gci.gc.grainY ) + "  z: " + int( gci.gc.grainZ );
 				}

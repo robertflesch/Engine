@@ -39,7 +39,7 @@ import com.voxelengine.pools.GrainCursorPool;
 import com.voxelengine.worldmodel.*;
 import com.voxelengine.worldmodel.animation.*;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
-import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
+import com.voxelengine.worldmodel.oxel.GrainIntersection;
 import com.voxelengine.worldmodel.oxel.Oxel;
 import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.scripts.Script;
@@ -642,7 +642,7 @@ public class VoxelModel {
 	public function worldToModelNew(v:Vector3D,d:Vector3D):void { return instanceInfo.worldToModelNew(v,d); }
 	public function modelToWorld(v:Vector3D):Vector3D { return instanceInfo.modelToWorld(v); }
 	
-	public function lineIntersect( $worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, $intersections:Vector.<GrainCursorIntersection> ):void {
+	public function lineIntersect( $worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, $intersections:Vector.<GrainIntersection> ):void {
 		var modelSpaceStartPoint:Vector3D = worldToModel( $worldSpaceStartPoint );
 		var modelSpaceEndPoint:Vector3D   = worldToModel( $worldSpaceEndPoint );
 		
@@ -671,22 +671,28 @@ public class VoxelModel {
 			if ( modelInfo.oxelPersistence ){
 				modelInfo.oxelPersistence.oxel.lineIntersect( modelSpaceStartPoint, modelSpaceEndPoint, $intersections );
 
-				for each (var gci:GrainCursorIntersection in $intersections) {
-					gci.wsPoint = modelToWorld(gci.point);
-					gci.model = this;
+				for each (var gci:GrainIntersection in $intersections) {
+					if ( null == gci.model ) {
+						gci.wsPoint = modelToWorld(gci.point);
+						gci.model = this;
+					}
 				}
 			}
 		}
 		//GrainCursorPool.poolDispose( gct );
 	}
 	
-	public function lineIntersectWithChildren($worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, worldSpaceIntersections:Vector.<GrainCursorIntersection>, $ignoreType:uint, minSize:int):void {
+	public function lineIntersectWithChildOxels($worldSpaceStartPoint:Vector3D, $worldSpaceEndPoint:Vector3D, $intersections:Vector.<GrainIntersection>, $ignoreType:uint, minSize:int):void {
 		var msStartPoint:Vector3D = worldToModel( $worldSpaceStartPoint );
 		var msEndPoint:Vector3D   = worldToModel( $worldSpaceEndPoint );
-		modelInfo.oxelPersistence.oxel.lineIntersectWithChildren( msStartPoint, msEndPoint, worldSpaceIntersections, $ignoreType, minSize );
+		modelInfo.oxelPersistence.oxel.lineIntersectWithChildren( msStartPoint, msEndPoint, $intersections, $ignoreType, minSize );
 		// lineIntersect returns modelSpaceIntersections, convert to world space.
-		for each (var gci:GrainCursorIntersection in worldSpaceIntersections)
-			gci.wsPoint = modelToWorld(gci.point);
+		for each (var gci:GrainIntersection in $intersections) {
+			if ( null == gci.model ) {
+				gci.wsPoint = modelToWorld(gci.point);
+				gci.model = this;
+			}
+		}
 	}
 	
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -851,16 +857,16 @@ public class VoxelModel {
 			startPoint.z += -100 * toBeReflected.originalDelta.z;
 		}
 		
-		var worldSpaceIntersections:Vector.<GrainCursorIntersection> = new Vector.<GrainCursorIntersection>();
+		var worldSpaceIntersections:Vector.<GrainIntersection> = new Vector.<GrainIntersection>();
 		var worldSpaceStartPoint:Vector3D = model.instanceInfo.positionGet.add(model.instanceInfo.center);
 		
 		var worldSpaceEndPoint:Vector3D = model.instanceInfo.worldSpaceMatrix.transformVector(new Vector3D(0, 0, -250));
 		// are parmeter here backwards?
-		collisionCandidate.lineIntersectWithChildren(worldSpaceEndPoint, worldSpaceStartPoint, worldSpaceIntersections, TypeInfo.AIR, modelInfo.oxelPersistence.oxel.gc.bound);
+		collisionCandidate.lineIntersectWithChildOxels(worldSpaceEndPoint, worldSpaceStartPoint, worldSpaceIntersections, TypeInfo.AIR, modelInfo.oxelPersistence.oxel.gc.bound);
 		
 		if (worldSpaceIntersections.length)
 		{
-			var gci:GrainCursorIntersection = worldSpaceIntersections.shift();
+			var gci:GrainIntersection = worldSpaceIntersections.shift();
 			trace("VoxelModel.bounce  - worldSpaceIntersections.length: " + worldSpaceIntersections.length);
 			// reverse on the plane that intersects
 			switch (gci.axis)

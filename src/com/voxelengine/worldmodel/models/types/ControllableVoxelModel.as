@@ -27,7 +27,7 @@ import com.voxelengine.events.InventoryEvent;
 import com.voxelengine.events.InventoryInterfaceEvent;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.models.*;
-import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
+import com.voxelengine.worldmodel.oxel.GrainIntersection;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
 import com.voxelengine.worldmodel.oxel.Oxel;
@@ -409,7 +409,7 @@ public class ControllableVoxelModel extends VoxelModel
 		if ( instanceInfo.usesCollision )
 		{
 			var timer:int = getTimer();
-			var test:GrainCursorIntersection;
+			var test:GrainIntersection;
 			//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.FRONT);
 			//Log.out("CVM.test - findClosestIntersectionInDirection point: " + test.point );
 			//test = Globals.g_modelManager.findClosestIntersectionInDirection(ModelManager.BACK);
