@@ -153,6 +153,7 @@ public class RegionManager
 		add( null, startingRegion );
 		RegionEvent.create( RegionEvent.LOAD, 0, "Blank" );
 		CollisionPoint.createPoint();
+		ControllableVoxelModel.trailMarkerCreate();
 		Axes.createAxes();
 		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, buildComplete );
 		EditCursor.createCursor();

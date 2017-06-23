@@ -7,38 +7,32 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
-import com.voxelengine.events.VVKeyboardEvent;
-import com.voxelengine.worldmodel.models.*;
-import com.voxelengine.events.CursorSizeEvent;
-import com.voxelengine.events.InventoryEvent;
-import com.voxelengine.events.InventoryInterfaceEvent;
-import com.voxelengine.GUI.actionBars.UserInventory;
-import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.makers.ModelMaker;
-import com.voxelengine.worldmodel.models.types.EditCursor;
-import com.voxelengine.worldmodel.models.types.Player;
-import com.voxelengine.worldmodel.oxel.Oxel;
 import flash.display3D.Context3D;
-import flash.events.Event;
 import flash.geom.Vector3D;
 import flash.utils.getTimer;
 import flash.geom.Matrix3D;
 
 import flash.events.KeyboardEvent;
-import flash.ui.Keyboard;	
 
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 import com.voxelengine.worldmodel.*;
-import com.voxelengine.worldmodel.models.*
 import com.voxelengine.events.CollisionEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.ShipEvent;
+import com.voxelengine.events.VVKeyboardEvent;
+import com.voxelengine.events.CursorSizeEvent;
+import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.InventoryInterfaceEvent;
+import com.voxelengine.server.Network;
+import com.voxelengine.worldmodel.models.*;
 import com.voxelengine.worldmodel.oxel.GrainCursorIntersection;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.scripts.Script;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
+import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
+import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
+
 
 /**
  * ...
@@ -59,18 +53,18 @@ public class ControllableVoxelModel extends VoxelModel
 	static protected    const DEFAULT_ACCEL_RATE:Number		= 0.5;
 
 	public static const COLLISION_MARKER:String 			= "COLLISION_MARKER";
+	public static const TRAIL_MARKER:String 				= "TRAIL_MARKER";
 
 	// scratch objects to save on allocation of memory
 	//private static const _sZERO_VEC:Vector3D 				= new Vector3D();
 	protected static var _sScratchVector:Vector3D			= new Vector3D();
 	protected static var _sScratchMatrix:Matrix3D			= new Matrix3D();
 	
-	protected var _gravityScalar:Vector3D 					= new Vector3D(0, -1, 0);
 	protected var _ct:CollisionTest							= null;
 	protected var _collisionCandidates:Vector.<VoxelModel> 	= null;
-	protected var _displayCollisionMarkers:Boolean 			= false
-	protected var _leaveTrail:Boolean 						= false
-	protected var _forward:Boolean 							= false
+	protected var _displayCollisionMarkers:Boolean 			= false;
+	protected var _leaveTrail:Boolean 						= false;
+	protected var _forward:Boolean 							= false;
 	protected var _inventoryBitmap:String					= "userInventory.png";
 
 	protected var _maxFallRate:SecureNumber 				= new SecureNumber( DEFAULT_FALL_RATE );
@@ -78,9 +72,8 @@ public class ControllableVoxelModel extends VoxelModel
 
 	protected var 	_turnRate:Number 						= DEFAULT_TURN_RATE; // 2.5 for ship
 	protected var 	_accelRate:Number 						= DEFAULT_ACCEL_RATE;
-	private var 	_onSolidGround:Boolean														// INSTANCE NOT EXPORTED
-	private var 	_keyboardControl:Boolean													// INSTANCE NOT EXPORTED
-	
+	private var 	_onSolidGround:Boolean;					// INSTANCE NOT EXPORTED
+
 	public function get 	onSolidGround():Boolean 				{ return _onSolidGround; }
 	public function set 	onSolidGround(val:Boolean):void 		{ _onSolidGround = val; }
 	public function get		accelRate():Number 						{ return _accelRate; }
@@ -154,18 +147,7 @@ public class ControllableVoxelModel extends VoxelModel
 		modelInfo.dbo.controllableVoxelModel.maxSpeed = maxSpeed;
 	}
 	
-	public function get keyboardControl():Boolean { return _keyboardControl; }
-	public function set keyboardControl(val:Boolean):void
-	{
-		if (val)
-			Log.out("ControllableVoxelModel.keyboardControl is NOW: " + instanceInfo.instanceGuid );
-		else
-			Log.out("ControllableVoxelModel.keyboardControl WAS: " + instanceInfo.instanceGuid );
-		_keyboardControl = val;
-	}
-	
-	
-	override public function set dead(val:Boolean):void { 
+	override public function set dead(val:Boolean):void {
 		super.dead = val;
 		
 		if ( VoxelModel.controlledModel && VoxelModel.controlledModel == this )
@@ -562,25 +544,23 @@ public class ControllableVoxelModel extends VoxelModel
 	private var  	count:int 			= 0;
 	private function leaveTrailMarkers():void
 	{
-		if ( 0 == count % 20 )
-		{
-			// Take the center of the oxel, and collide around it
-			var offsetMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone()
-			var centerLoc:Vector3D = instanceInfo.center;
-			offsetMatrix.prependTranslation( centerLoc.x, 0, centerLoc.z );
-			var wsCenter:Vector3D =  offsetMatrix.position;
-			
-			var trailMarker:InstanceInfo = new InstanceInfo();
-			trailMarker.modelGuid = "1MeterRedBlock";
-			trailMarker.dynamicObject = true;
-			trailMarker.scale = new Vector3D( 0.25, 0.25, 0.25 );
-			trailMarker.positionSet = wsCenter;
-			trailMarker.addTransform( 0, 0, 0, 10000, ModelTransform.LIFE );
-			
-			new ModelMaker( trailMarker );
+		if ( 0 == count % 20 ) {
+			var trailMarker:InstanceInfo 	= new InstanceInfo();
+			trailMarker.modelGuid			= ControllableVoxelModel.TRAIL_MARKER;
+			trailMarker.positionSet 		= instanceInfo.positionGet;
+            trailMarker.addTransform( 0, 0, 0, 2000, ModelTransform.LIFE );
+			trailMarker.name				= ControllableVoxelModel.TRAIL_MARKER + count;
+			new ModelMaker( trailMarker, true , false );
 		}
 		count++;
 	}
+
+	static public function trailMarkerCreate():void {
+		var iiR:InstanceInfo = new InstanceInfo();
+		iiR.modelGuid = ControllableVoxelModel.TRAIL_MARKER;
+		new ModelMakerGenerate( iiR, GenerateCube.script( 0, TypeInfo.BLUE, true ), true, false );
+	}
+
 	
 	public function get leaveTrail():Boolean { return _leaveTrail; }
 	public function set leaveTrail(value:Boolean):void { _leaveTrail = value; }
@@ -643,7 +623,7 @@ public class ControllableVoxelModel extends VoxelModel
 					}
 				}
 				else  {
-					instanceInfo.velocitySetComp( vel.x, vel.y - speedVal, vel.z )
+					instanceInfo.velocitySetComp( vel.x, vel.y - speedVal, vel.z );
 					changed = true;
 				}
 			}

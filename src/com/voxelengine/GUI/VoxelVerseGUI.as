@@ -8,15 +8,6 @@
 
 package com.voxelengine.GUI
 {
-import com.voxelengine.GUI.crafting.WindowCharacter;
-import com.voxelengine.Globals;
-import com.voxelengine.events.AppEvent;
-import com.voxelengine.events.CursorOperationEvent;
-import com.voxelengine.events.HelpEvent;
-import com.voxelengine.events.VVKeyboardEvent;
-import com.voxelengine.events.VVMouseEvent;
-import com.voxelengine.worldmodel.MouseKeyboardHandler;
-import com.voxelengine.worldmodel.models.types.EditCursor;
 
 import flash.display.Sprite;
 import flash.events.Event;
@@ -44,13 +35,16 @@ import com.voxelengine.events.LoginEvent;
 import com.voxelengine.events.ModelEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.RoomEvent;
+import com.voxelengine.events.AppEvent;
+import com.voxelengine.events.HelpEvent;
+import com.voxelengine.events.VVKeyboardEvent;
+import com.voxelengine.events.VVMouseEvent;
 
 import com.voxelengine.GUI.actionBars.UserInventory;
-import com.voxelengine.GUI.crafting.WindowCrafting;
-import com.voxelengine.GUI.inventory.WindowInventory;
 import com.voxelengine.GUI.inventory.WindowInventoryNew;
 import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 import com.voxelengine.GUI.voxelModels.WindowRegionModels;
+import com.voxelengine.GUI.crafting.WindowCharacter;
 
 import com.voxelengine.renderer.Renderer;
 
@@ -85,11 +79,6 @@ public class VoxelVerseGUI extends EventDispatcher
 	
 	static private var _currentInstance:VoxelVerseGUI = null;
 	static public function get currentInstance():VoxelVerseGUI { return ( _currentInstance ? _currentInstance : _currentInstance = new VoxelVerseGUI() ); }
-
-	private var _showConsole:Boolean = false;
-	public function get showConsole():Boolean { return _showConsole }
-	public function set showConsole(value:Boolean):void { _showConsole = value }
-
 
 	//	CONSTRUCTOR
 	//	----------------------------------------------------------------
@@ -203,13 +192,11 @@ public class VoxelVerseGUI extends EventDispatcher
 
 		VVKeyboardEvent.dispatch( $e );
 
-		switch ( $e.keyCode) {
-			case Keyboard.ENTER:
-				// trying to stop the BACKQUOTE from getting to the doomsday console.
-				//e.stopImmediatePropagation()
-				if ( MouseKeyboardHandler.isCtrlKeyDown )
-					showConsole = true;
-				break;
+		if ( $e.keyCode == Keyboard.ENTER && $e.ctrlKey ) {
+			if ( Log.showing )
+				Log.hide();
+			else
+				Log.show();
 		}
 	}
 
@@ -224,13 +211,6 @@ public class VoxelVerseGUI extends EventDispatcher
 	}
 
 	public function update( $interframeTime:int ):void {
-		if ( showConsole ) {
-			showConsole = false;
-			if ( Log.showing )
-				Log.hide();
-			else
-				Log.show();
-		}
 	}
 	
 	private function addReleaseMenu():CanvasReleaseMenu {
