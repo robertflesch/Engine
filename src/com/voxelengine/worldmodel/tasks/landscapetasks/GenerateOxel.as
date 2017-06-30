@@ -27,6 +27,8 @@ public class GenerateOxel {
             return GenerateCube;
         else if ( "GenerateSphere" == $functionName )
             return GenerateSphere;
+        else if ( "GenerateTree" == $functionName )
+            return GenerateTree;
         throw new Error( "Unknown generation type");
         return GenerateCube;
     }

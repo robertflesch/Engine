@@ -52,6 +52,7 @@ public class TypeInfo
 	public static const STEEL:uint							= enum_val++;	// 123
 	public static const GLASS:uint							= enum_val++;	// 124
 	public static const NO_QUADS:uint						= enum_val++;	// 125;
+	public static const BRANCH:uint							= enum_val++;	// 126;
 	public static const FIRE:uint							= 145;
 	public static const VINE:uint							= 152;
 	public static const CUSTOM_GLASS:uint					= 167;

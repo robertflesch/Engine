@@ -41,8 +41,8 @@ public class PersistenceObject
 	private var 	_guid:String;
 	public function get guid():String  { return _guid; }
 	public function set guid(value:String):void	{
-		if ( _guid != value && Globals.isGuid( _guid ) && Globals.isGuid( value ) )
-				Log.out( "PersistenceObject - WHY AM I CHANGING A VALID GUID  _guid: " + _guid + "  newGuid: " + value );
+//		if ( _guid != value && Globals.isGuid( _guid ) && Globals.isGuid( value ) )
+//				Log.out( "PersistenceObject - WHY AM I CHANGING A VALID GUID  _guid: " + _guid + "  newGuid: " + value );
 		_guid = value;
 		changed = true;
 	}
@@ -56,8 +56,8 @@ public class PersistenceObject
 	private var 	_changed:Boolean  = false;
 	public function get changed():Boolean { return _changed; }
 	public function set changed(value:Boolean):void {
-		if ( value )
-			Log.out( "PersistenceObject.Changed value: " + value + "  guid: " + _guid, Log.WARN);
+//		if ( value )
+//			Log.out( "PersistenceObject.Changed value: " + value + "  guid: " + _guid, Log.WARN);
 		_changed = value; }
 
 	public function PersistenceObject($guid:String, $table:String ) {

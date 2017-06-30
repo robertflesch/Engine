@@ -22,6 +22,7 @@ public class Globals  {
 	static public const BIGDB_TABLE_INVENTORY:String = "inventory";
 	static public const BIGDB_TABLE_MODEL_METADATA:String = "modelMetadata";
 	static public const BIGDB_TABLE_MODEL_INFO:String = "modelInfo";
+	static public const BIGDB_TABLE_TREE_INFO:String = "treeInfo";
 	static public const BIGDB_TABLE_OXEL_DATA:String = "oxelData";
 	static public const BIGDB_TABLE_ANIMATIONS:String = "animations";
 	static public const BIGDB_TABLE_AMMO:String = "ammo";
@@ -131,7 +132,31 @@ public class Globals  {
 		return false
 	}
 
-	private static const  g_allButDownDirections:Array = [ Globals.POSY, Globals.POSX, Globals.NEGX, Globals.POSZ, Globals.NEGZ ];
+	public static function randomHorizontalDirection():int {
+		var r:Number = Math.random();
+		if (r < 0.25)
+			return POSZ;
+		if (r < 0.50)
+			return NEGX;
+		if (r < 0.75)
+			return NEGZ;
+		return POSX;
+	}
+
+	public static function nextHorizontalDirection( $dir:int ):int {
+		if ( POSX == $dir )
+			return POSZ;
+		if ( POSZ == $dir )
+			return NEGX;
+		if ( NEGX == $dir )
+			return NEGZ;
+		return POSX;
+	}
+
+	public static function orthagonalDirections( $dir:int ):Array {
+		return ( POSX == $dir )||( NEGX == $dir )? [ POSZ, NEGZ ] : [ POSX, NEGX ]; }
+
+	private static const  g_allButDownDirections:Array = [ POSY, POSX, NEGX, POSZ, NEGZ ];
 	public static function get allButDownDirections():Array { return g_allButDownDirections; }
 
 	private static const g_adjacentFacesPOSX:Array = [POSY, NEGY, POSZ, NEGZ];

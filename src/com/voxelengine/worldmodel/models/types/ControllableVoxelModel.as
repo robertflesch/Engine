@@ -245,8 +245,8 @@ public class ControllableVoxelModel extends VoxelModel
 			
 		super.update($context, $elapsedTimeMS);
 		
-		if ( !camera.positionGet.nearEquals( instanceInfo.positionGet, 0.01 ) )
-			camera.positionSet = instanceInfo.positionGet;
+		if ( !instanceInfo.positionGet.nearEquals( instanceInfo.positionGet, 0.01 ) )
+			instanceInfo.positionSet = instanceInfo.positionGet;
 		//camera.scale = instanceInfo.scale;
 		// track not copied intentionally
 		// Y Axis ok, X is wrong

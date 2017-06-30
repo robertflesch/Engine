@@ -42,7 +42,6 @@ public final class OxelTypePool
     }
 
     private function grow( $growthValue:int ):void {
-        Log.out( "OxelTypePool.poolGet - Allocating more Oxel: " + _currentPoolSize );
         var timer:int = getTimer();
         _currentPoolSize += $growthValue;
         _pool = null;
@@ -51,13 +50,14 @@ public final class OxelTypePool
             _pool[newIndex] = new _oxelClass();
 
         _counter = newIndex - 1;
-        Log.out( "OxelTypePool.poolGet - Done allocating more Oxel: " + _currentPoolSize  + " took: " + (getTimer() - timer) );
+//        Log.out( "OxelTypePool.poolGet - Done allocating more Oxel: " + _currentPoolSize  + " took: " + (getTimer() - timer) );
     }
 
     public function poolGet():Oxel {
         if ( _counter > 0 )
             return _pool[--_counter];
 
+        Log.out( "OxelTypePool.poolGet - Allocating more Oxel: " + _currentPoolSize );
         grow( _growthValue );
 
         return poolGet();

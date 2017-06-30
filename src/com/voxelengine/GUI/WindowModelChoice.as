@@ -8,14 +8,6 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.GUI
 {
-import com.voxelengine.GUI.panels.*;
-import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
-import com.voxelengine.worldmodel.models.ModelCacheUtils;
-import com.voxelengine.worldmodel.oxel.GrainCursor;
-import com.voxelengine.worldmodel.tasks.landscapetasks.*;
-import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
-
-import flash.accessibility.Accessibility;
 import flash.geom.Vector3D;
 
 import org.flashapi.swing.*;
@@ -24,38 +16,38 @@ import org.flashapi.swing.databinding.DataProvider;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.list.ListItem;
-import org.flashapi.swing.containers.*;
-
-import com.voxelengine.Log;
 import com.voxelengine.Globals;
-import com.voxelengine.events.ModelEvent;
-import com.voxelengine.GUI.voxelModels.WindowModelDetail;
 import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
-import com.voxelengine.worldmodel.models.ModelInfo;
 import com.voxelengine.worldmodel.models.InstanceInfo;
-import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.models.makers.ModelMakerGenerate;
+import com.voxelengine.worldmodel.models.ModelCacheUtils;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
+import com.voxelengine.worldmodel.tasks.landscapetasks.*;
 
 public class WindowModelChoice extends VVPopup
 {
-	private var _rbGroup:RadioButtonGroup
-	private var _panelContainer:Container
-	private var _name:String = "Default"
-	
+	private var _rbGroup:RadioButtonGroup;
+	private var _panelContainer:Container;
+	private var _name:String = "Default";
+	private const CUBE:int = 0;
+	private const SPHERE:int = 1;
+	private const ISLAND:int = 2;
+	private const TREE:int = 3;
+
 	public function WindowModelChoice()
 	{
 		super( LanguageManager.localizedStringGet( "Model Choice" ) );
 
 		autoSize = true;
-		padding = 10
+		padding = 10;
 		layout.orientation = LayoutOrientation.VERTICAL;
 		
 		_rbGroup = new RadioButtonGroup( this );
 		eventCollector.addEvent( _rbGroup, ButtonsGroupEvent.GROUP_CHANGED, modelTypeChanged  );
 		var radioButtons:DataProvider = new DataProvider();
 //            radioButtons.addAll( { label:"My Models" }, { label:"All Models" }, { label:"From Cube" }, { label:"From Model Template" }, { label:"New Model Template" } );
-		radioButtons.addAll( { label:"Cube" }, { label:"Sphere" }, { label:"Island" }); // , { label:"From SubSphere" } 
+		radioButtons.addAll( { label:"Cube" }, { label:"Sphere" }, { label:"Island" }, { label:"Tree" }); // , { label:"From SubSphere" }
 		_rbGroup.dataProvider = radioButtons;
 		addElement( new Spacer( width, 15 ) );
 		
@@ -79,13 +71,14 @@ public class WindowModelChoice extends VVPopup
 		if ( _panelContainer && _panelContainer.numElements ) {
 			_panelContainer.removeElements()
 		}
-		if ( 0 == bge.target.index ) {
-			panelCreateModel()
-		}
-		else if ( 1 == bge.target.index )
+		if ( CUBE == bge.target.index )
+			panelCreateModel();
+		else if ( SPHERE == bge.target.index )
 			panelCreateSphere();
-		else if ( 2 == bge.target.index )
-			panelGenerateIsland()
+		else if ( ISLAND == bge.target.index )
+			panelGenerateIsland();
+		else if ( TREE == bge.target.index )
+			panelCreateTree();
 	}
 
 	private function createObject():void {
@@ -93,15 +86,15 @@ public class WindowModelChoice extends VVPopup
 		var detailSize:int;		
 		var model:Object;
 		switch ( _rbGroup.index ) {
-			case 0: // From Cube
+			case CUBE: // From Cube
 				model = GenerateCube.script( 7 );
 				parameters( model );
 				break;
-			case 1: // Sphere
+			case SPHERE: // Sphere
 				model = GenerateSphere.script( 7 );
 				parameters( model );
 				break;
-			case 2: // Island
+			case ISLAND: // Island
 				model = GenerateIsland.script();
 				parameters( model );
 				ii.modelGuid = model.name;
@@ -110,7 +103,10 @@ public class WindowModelChoice extends VVPopup
 				//ii.modelGuid = "GenerateSubSphere";
 				//li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
 				//detailSize = li.data;			
-
+			case TREE: // Tree
+				model = GenerateTree.script(7);
+				parameters( model );
+				ii.modelGuid = model.name;
 				break;
 		}
 		
@@ -127,7 +123,7 @@ public class WindowModelChoice extends VVPopup
 	
 	private var _cbType:ComboBox  = new ComboBox()
 	private function addType( $label:String ):void {
-		_cbType  = new ComboBox()
+		_cbType  = new ComboBox();
 		var typeContainer:Container = new Container( width/2, 50 );
 		typeContainer.layout.orientation = LayoutOrientation.VERTICAL;
 		typeContainer.addElement( new Label( $label ) );
@@ -147,9 +143,9 @@ public class WindowModelChoice extends VVPopup
 		_panelContainer.addElement( typeContainer );
 	}
 	
-	private var _cbSize:ComboBox  = new ComboBox()
+	private var _cbSize:ComboBox  = new ComboBox();
 	private function addSize( $label:String, $low:int, $high:int, $selectedIndex:int ):void {
-		_cbSize = new ComboBox()
+		_cbSize = new ComboBox();
 		var grainContainer:Container = new Container( width/2, 50 );
 		grainContainer.layout.orientation = LayoutOrientation.VERTICAL;
 		grainContainer.addElement( new Label( $label ) );
@@ -159,13 +155,13 @@ public class WindowModelChoice extends VVPopup
 		//if ( $high - $low >= $selectedIndex )
 			//_cbSize.selectedIndex = $selectedIndex;
 		//else
-			_cbSize.selectedIndex = 0
+			_cbSize.selectedIndex = 0;
 		_panelContainer.addElement( grainContainer )
 	}
 	
-	private var _cbDetail:ComboBox  = new ComboBox()
+	private var _cbDetail:ComboBox  = new ComboBox();
 	private function addDetail( $label:String, $low:int, $high:int, $selectedIndex:int ):void {
-		_cbDetail = new ComboBox()
+		_cbDetail = new ComboBox();
 		var detailContainer:Container = new Container( width / 2, 50 );
 		detailContainer.layout.orientation = LayoutOrientation.VERTICAL;
 		detailContainer.addElement( new Label( $label ) );
@@ -175,60 +171,66 @@ public class WindowModelChoice extends VVPopup
 		//if ( $high - $low >= $selectedIndex )
 			//_cbDetail.selectedIndex = $selectedIndex
 		//else
-			_cbDetail.selectedIndex = 0
+			_cbDetail.selectedIndex = 0;
 		_panelContainer.addElement( detailContainer )
 	}
 	
 	private function reset():void	{
 		if ( _cbSize ) {
-			_cbSize.remove()
+			_cbSize.remove();
 			_cbSize = null
 		}
 		if ( _cbDetail ) {
-			_cbDetail.remove()
+			_cbDetail.remove();
 			_cbDetail = null
 		}
 		if ( _cbType ) {
-			_cbType.remove()
+			_cbType.remove();
 			_cbType = null
 		}
 		_panelContainer.removeElements()
 	}
 
 	private function panelGenerateIsland():void	{
-		reset()
-		_name = "GenerateIsland"
+		reset();
+		_name = "GenerateIsland";
 		addSize("Island size in meters", 6, 13, 4 );	
 		addDetail( "Smallest Block in Meters", 3, 5, 2 );	
 	}
 	
 	private function panelCreateModel():void {
-		reset()
-		_name = "GenerateModel"
-		addSize( "Size in meters", 4, 12, 6 )
+		reset();
+		_name = "GenerateModel";
+		addSize( "Size in meters", 4, 12, 6 );
 		addType( "Made of Type" )
 	}
 	
 	private function panelCreateSphere():void {
-		reset()
-		_name = "GenerateSphere"
-		addSize( "Size in meters", 4, 12, 6 )
+		reset();
+		_name = "GenerateSphere";
+		addSize( "Size in meters", 4, 12, 6 );
 		addDetail( "Smallest Block in Meters", 3, 5, 2 );	
 		addType( "Made of Type" )
 	}
-	
+
+	private function panelCreateTree():void {
+		reset();
+		_name = "GenerateTree";
+		addSize( "Size in meters", 8, 14, 12 );
+	}
+
 	private function parameters( $model:Object ):Object {
-		$model.name = _name
-		var li:ListItem
+		$model.name = _name;
+		var li:ListItem;
 		if ( _cbSize ) {
-			li = _cbSize.getItemAt(_cbSize.selectedIndex )
-			$model.grainSize = li.data
+			li = _cbSize.getItemAt(_cbSize.selectedIndex );
+			$model.grainSize = li.data;
 			$model.biomes.layers[0].offset = li.data;
 		}
 		if ( _cbDetail ) {
-			li = _cbDetail.getItemAt(_cbDetail.selectedIndex )
-			$model.smallestGrain = li.data
-			$model.biomes.layers[0].range = li.data
+			li = _cbDetail.getItemAt(_cbDetail.selectedIndex );
+			$model.smallestGrain = li.data;
+			$model.biomes.layers[0].range = li.data;
 		}
 		if ( _cbType ) {
 			li = _cbType.getItemAt( _cbType.selectedIndex );

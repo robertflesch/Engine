@@ -448,7 +448,7 @@ public class Avatar extends ControllableVoxelModel
 			instanceInfo.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y + dy, instanceInfo.rotationGet.z );
 			//camera.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y, instanceInfo.rotationGet.z );
 			// this uses the camera y rotation, but it breaks other things like where to dig.
-			camera.rotationSetComp( camera.rotationGet.x + dx, instanceInfo.rotationGet.y, instanceInfo.rotationGet.z );
+			instanceInfo.rotationSetComp( instanceInfo.rotationGet.x + dx, instanceInfo.rotationGet.y, instanceInfo.rotationGet.z );
 			//trace( "handleMouseMovement instanceInfo.rotationGet: " + instanceInfo.rotationGet + "  camera.rotation: " + camera.rotationGet );
 		}
 	}

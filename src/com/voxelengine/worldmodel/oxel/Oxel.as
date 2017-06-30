@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 package com.voxelengine.worldmodel.oxel
 {
 
+import com.voxelengine.Globals;
 import com.voxelengine.worldmodel.Light;
 
 import flash.geom.Point;
@@ -2219,18 +2220,21 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return temp;
 	}
 	
-	public function write_sphere( $modelGuid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, gmin:uint = 0 ):void {
+	public function write_sphere( $modelGuid:String, cx:int, cy:int, cz:int, radius:int, $newType:int, gmin:uint = 0, $noChangeIfNotEmpty:Boolean = false ):void {
 		if ( true == GrainCursorUtils.is_inside_sphere( gc, cx, cy, cz, radius ))
 		{
-			change( $modelGuid, gc, $newType );
-			return;
-		}
-		
-		if ( true == GrainCursorUtils.is_outside_sphere( gc, cx, cy, cz, radius ))
+			if ( $noChangeIfNotEmpty && ( TypeInfo.AIR != type || (TypeInfo.AIR == type && childrenHas()) ) ) {
+				//Log.out( "Oxel.write_sphere - ignoring non empty - breaking into children" );
+			}
+			else {
+				change($modelGuid, gc, $newType);
+				return;
+			}
+		} else if ( true == GrainCursorUtils.is_outside_sphere( gc, cx, cy, cz, radius ))
 			return;
 		
 		if ( gc.grain <= gmin )
-			return;	
+			return;
 
 		if ( false == childrenHas() )
 			childrenCreate();
@@ -2243,7 +2247,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		{
 			// make sure child has not already been released.
 			if ( child && child.gc )
-				child.write_sphere( $modelGuid, cx, cy, cz, radius, $newType, gmin );
+				child.write_sphere( $modelGuid, cx, cy, cz, radius, $newType, gmin, $noChangeIfNotEmpty );
 		}
 	}
 	
@@ -3326,6 +3330,51 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
 	static public function getClassFromType( $type ):Class {
 		return Oxel;
+	}
+
+	public function markBoundaries( $guid:String ):void {
+		var gct:GrainCursor = GrainCursorPool.poolGet(gc.bound);
+		var size:uint = (1 << gc.bound ) - 1;
+		gct.grainX = 0;
+		gct.grainY = 0;
+		gct.grainZ = 0;
+		gct.grain = 0;
+		change( $guid, gct, TypeInfo.RED);
+		gct.grainX = size;
+		gct.grainY = 0;
+		gct.grainZ = 0;
+		gct.grain = 0;
+		change( $guid, gct, TypeInfo.RED );
+		gct.grainX = size;
+		gct.grainY = 0;
+		gct.grainZ = size;
+		gct.grain = 0;
+		change( $guid, gct, TypeInfo.RED);
+		gct.grainX = 0;
+		gct.grainY = 0;
+		gct.grainZ = size;
+		gct.grain = 0;
+		change( $guid, gct, TypeInfo.RED);
+		gct.grainX = 0;
+		gct.grainY = size;
+		gct.grainZ = 0;
+		gct.grain = 0;
+		change( $guid, gct, TypeInfo.RED);
+		gct.grainX = size;
+		gct.grainY = size;
+		gct.grainZ = 0;
+		gct.grain = 0;
+		change( $guid, gct, TypeInfo.RED );
+		gct.grainX = size;
+		gct.grainY = size;
+		gct.grainZ = size;
+		gct.grain = 0;
+		change( $guid, gct, TypeInfo.RED);
+		gct.grainX = 0;
+		gct.grainY = size;
+		gct.grainZ = size;
+		gct.grain = 0;
+		change( $guid, gct, TypeInfo.RED);
 	}
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

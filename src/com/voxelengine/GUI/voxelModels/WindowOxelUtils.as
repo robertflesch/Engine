@@ -195,6 +195,7 @@ public class WindowOxelUtils extends VVPopup
 //		var forceQuads:Boolean = true;
 		_vm.modelInfo.oxelPersistence.forceFaces = true;
 		_vm.modelInfo.oxelPersistence.forceQuads = true;
+		_vm.modelInfo.oxelPersistence.changed = true;
 		//_vm.modelInfo.oxelPersistence.oxel.chunkGet().faceAndQuadsBuild( buildFaces, forceFaces, forceQuads );
 	}
 	

@@ -15,6 +15,7 @@ import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.pools.GrainCursorPool;
+import com.voxelengine.renderer.Renderer;
 import com.voxelengine.utils.ColorUtils;
 import com.voxelengine.utils.StringUtils;
 import com.voxelengine.worldmodel.Region;
@@ -32,6 +33,7 @@ import flash.display.BitmapData;
 import flash.display.Loader;
 import flash.events.Event;
 import flash.events.IOErrorEvent;
+import flash.geom.Matrix;
 import flash.geom.Vector3D;
 import flash.net.URLLoader;
 import flash.net.URLLoaderDataFormat;
@@ -61,7 +63,7 @@ public class WindowPictureImport extends VVPopup {
     private var pContainer:VVBox;
 
     public function WindowPictureImport() {
-        super("Picture Import");
+        super( LanguageManager.localizedStringGet( "Picture Import" ));
         width = 256;
         autoHeight = true;
         padding = 2;
@@ -379,14 +381,38 @@ public class WindowPictureImport extends VVPopup {
         if ( vm ){
             if ($op && $op.oxel && $op.oxel.gc.bound) {
                 // Only do this for top level models.
-                var size:int = Math.max(GrainCursor.get_the_g0_edge_for_grain($op.oxel.gc.bound), 32);
+                var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain($op.oxel.gc.bound), 16)/2;
                 // this gives me corner.
-                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
+                var msCamPos:Vector3D = VoxelModel.controlledModel.camera.current.position;
+                var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
+
+                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector( new Vector3D( radius + 8, adjCameraPos.y-radius, -radius * 1.5 ) );
+                //var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
                 // add in half the size to get center
-                lav.setTo(lav.x - size / 2, lav.y - size / 2, lav.z - size / 2);
-                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
+                //lav.setTo(lav.x - size / 2, lav.y - size / 2, lav.z - size / 2);
+                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
                 diffPos = diffPos.add(lav);
                 vm.instanceInfo.positionSet = diffPos;
+                vm.instanceInfo.rotationSetComp( 0, 90, 0 );
+                vm.metadata.hashTags = "#architecture#window#stained";
+
+                OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE,  quadsComplete );
+            }
+
+            function quadsComplete( $ode:OxelDataEvent ) {
+                var bmpd:BitmapData = Renderer.renderer.modelShot();
+                vm.metadata.thumbnail = drawScaled( bmpd, 128, 128 );
+                ModelMetadataEvent.create( ModelBaseEvent.CHANGED, 0, vm.metadata.guid, vm.metadata );
+            }
+
+            function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
+                var m:Matrix = new Matrix();
+                m.scale(destWidth/obj.width, destHeight/obj.height);
+                var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
+                bmpd.draw(obj, m);
+                return bmpd;
+
+                // take photo?
             }
         }
         RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );

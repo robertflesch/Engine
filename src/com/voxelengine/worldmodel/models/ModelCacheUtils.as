@@ -155,7 +155,7 @@ public class ModelCacheUtils
 			{
 				_cameraMatrix.identity();
 				
-				const cmRotation:Vector3D = cm.camera.rotationGet;
+				const cmRotation:Vector3D = cm.instanceInfo.rotationGet;
 				_cameraMatrix.prependRotation( -cmRotation.x, Vector3D.X_AXIS );
 				//_cameraMatrix.prependRotation( -cmRotation.y, Vector3D.Y_AXIS );
 				_cameraMatrix.prependRotation( -cmRotation.z, Vector3D.Z_AXIS );

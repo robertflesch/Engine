@@ -61,10 +61,13 @@ import com.voxelengine.worldmodel.inventory.ObjectModel;
 public class InventoryPanelModel extends VVContainer
 {
 	// TODO need a more central location for these
-	static public const MODEL_CAT_ARCHITECTURE:String = "Architecture";
-	static public const MODEL_CAT_CHARACTERS:String = "Characters";
-	static public const MODEL_CAT_PLANTS:String = "Plants";
-	static public const MODEL_CAT_FURNITURE:String = "Furniture";
+	static public const MODEL_CAT_ARCHITECTURE:String = "architecture";
+	static public const MODEL_CAT_CHARACTERS:String = "avatar";
+	static public const MODEL_CAT_PLANTS:String = "plant";
+	static public const MODEL_CAT_FURNITURE:String = "furniture";
+	static public const MODEL_CAT_ISLAND:String = "island";
+	static public const MODEL_CAT_CRAFT:String = "craft";
+	static public const MODEL_CAT_CREATURE:String = "creature";
 	static public const MODEL_CAT_ALL:String = "ALL";
 	
 	static private const MODEL_CONTAINER_WIDTH:int = 512;
@@ -78,6 +81,7 @@ public class InventoryPanelModel extends VVContainer
 	private var _itemContainer:ScrollPane;
 	private var _currentRow:Container;
 	private var _seriesModelMetadataEvent:int;
+	private var _category:String = "All"
 	
 	public function InventoryPanelModel( $parent:VVContainer ) {
 		super( $parent );
@@ -126,8 +130,12 @@ public class InventoryPanelModel extends VVContainer
 		// TODO I should really iterate thru the types and collect the categories - RSF
 		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_ARCHITECTURE ), MODEL_CAT_ARCHITECTURE );
 		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_CHARACTERS ), MODEL_CAT_CHARACTERS );
+		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_CRAFT ), MODEL_CAT_CRAFT );
+		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_CREATURE ), MODEL_CAT_CREATURE );
+		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_ISLAND ), MODEL_CAT_ISLAND );
 		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_PLANTS ), MODEL_CAT_PLANTS );
-		_barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_FURNITURE ), MODEL_CAT_FURNITURE );
+
+
 		var li:ListItem = _barLeft.addItem( LanguageManager.localizedStringGet( MODEL_CAT_ALL ), MODEL_CAT_ALL );
 		_barLeft.setButtonsWidth( 96, 32 );
 		_barLeft.selectedIndex = li.index;
@@ -158,12 +166,12 @@ public class InventoryPanelModel extends VVContainer
 	}
 	
 	private function selectCategory(e:ListEvent):void {
-		var test:String = e.target.value;
+		_category = e.target.value;
 		while ( 1 <= _itemContainer.numElements )
 			_itemContainer.removeElementAt( 0 );
 		_barLeft.selectedIndex = -1;
 			
-		displaySelectedCategory( "All" );	
+		displaySelectedCategory( _category );
 	}
 	
 	// TODO I see problem here when language is different then what is in TypeInfo RSF - 11.16.14
@@ -186,9 +194,14 @@ public class InventoryPanelModel extends VVContainer
 		if ( _seriesModelMetadataEvent == $mme.series || 0 == $mme.series ) {
 			if ( "Player" == $mme.modelGuid)
 					return;
-			var om:ObjectModel = new ObjectModel( null, $mme.modelGuid );
+			var om:ObjectModel = new ObjectModel(null, $mme.modelGuid);
 			om.vmm = $mme.modelMetadata;
-			addModel( om );
+			var cat:String = _category.toLowerCase();
+			if ( "all" == cat ) {
+				addModel(om);
+			} else if ( 0 <= $mme.modelMetadata.hashTags.indexOf(cat)) {
+				addModel(om);
+			}
 		}
 	}
 	

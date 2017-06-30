@@ -320,7 +320,7 @@ public class Beast extends ControllableVoxelModel
 				}
 			}
 
-			camera.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y, instanceInfo.rotationGet.z );
+			instanceInfo.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y, instanceInfo.rotationGet.z );
 		}
 	}
 

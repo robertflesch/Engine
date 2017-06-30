@@ -30,7 +30,6 @@ public class VVKeyboardEvent extends KeyboardEvent {
     static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
     static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
-        trace( "VVKeyboardEvent - addListener: " + $type );
         _eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference );
     }
 

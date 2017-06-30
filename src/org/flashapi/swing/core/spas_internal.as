@@ -24,22 +24,5 @@ package org.flashapi.swing.core {
 	// spas_internal.as
 	// -----------------------------------------------------------
 
-	/**
-	* @author Pascal ECHEMANN
-	* @version 1.0.0, 28/07/2007 11:40
-	* @see http://www.flashapi.org/
-	*/
-	
-	/**
-	 * 	<strong>FOR DEVELOPERS ONLY.</strong>
-	 * 
-	 * 	A reference to the SPAS 3.0 internal scope that must be used by the 
-	 * 	SPAS 3.0 core API developers only.
-	 * 	
-	 * 	@langversion ActionScript 3.0
-	 * 	@playerversion Flash Player 9
-	 * 	@productversion SPAS 3.0 alpha
-	 */
-	//public namespace spas_internal = "http://www.flashapi.org/spas/internal";
-	public namespace spas_internal = "http://www.doesthisurlmatter.org/";
+	public namespace spas_internal = "internal";
 }

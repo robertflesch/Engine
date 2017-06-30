@@ -7,7 +7,10 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.Log;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
+
+import flash.geom.Vector3D;
 
 /**
  * ...
@@ -17,7 +20,7 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
  * Additional camera locations are stored in the cameras, and the current camera is the one that
  * has the index.
  */
-public class Camera extends Location
+public class Camera //extends Location
 {
 	private   var   _cameras:Vector.<CameraLocation>= new Vector.<CameraLocation>();
 	private var 	_index:int 						= CameraLocation.FIRST_PERSON;
@@ -60,6 +63,11 @@ public class Camera extends Location
 		if ( _index >= _cameras.length )
 			_index = 0;
 	}
+
+//	override public function get positionGet():Vector3D {
+//		Log.out( "Camera.positionGet - ERROR - this does not return the correct camera position!!", Log.ERROR );
+//		return new Vector3D();
+//	}
 }
 }
 

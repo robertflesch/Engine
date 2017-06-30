@@ -219,14 +219,14 @@ public class Renderer extends EventDispatcher
 			controlledModelRotation = new Vector3D();
 		}
 		else {
-			controlledModelRotation = controlledModel.camera.rotationGet;
+			controlledModelRotation = controlledModel.instanceInfo.rotationGet;
 			wsPositionCamera = controlledModel.instanceInfo.worldSpaceMatrix.transformVector(controlledModel.camera.current.position);
 			// This does not handle the case where the player has not collided with the model yet
 			// Say they are falling onto an island, and they hit the water first.
 			// I should probably adjust that algorithm to account for it.
 			if ( controlledModel) {
 				var lcm:VoxelModel = VoxelModel.controlledModel.lastCollisionModel;
-				if ( null != lcm ) {
+				if ( null != lcm && !lcm.dead ) {
 					var camOxel:Oxel = lcm.getOxelAtWSPoint( wsPositionCamera, 4 );
 					if ( camOxel && OxelBad.INVALID_OXEL != camOxel ) {
 						if ( TypeInfo.WATER == camOxel.type ) {

@@ -925,7 +925,7 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function mouseUp(e:MouseEvent):void  {
-        Log.out( "EditCursor.MOUSE_UP");
+        //Log.out( "EditCursor.MOUSE_UP");
 		repeatTimerStop();
 		
 		if ( Globals.openWindowCount || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging || Log.showing )
@@ -953,7 +953,7 @@ public class EditCursor extends VoxelModel
 	}
 	
 	private function mouseDown(e:MouseEvent):void {
-        Log.out( "EditCursor.MOUSE_DOWN");
+        //Log.out( "EditCursor.MOUSE_DOWN");
 		if ( Globals.openWindowCount  || e.ctrlKey || !Globals.active || !editing || UIManager.dragManager.isDragging || Log.showing )
 			return;
 			

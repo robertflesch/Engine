@@ -20,10 +20,10 @@ package com.voxelengine.GUI.inventory {
 	public class InventoryPanelAnimation extends VVContainer
 	{
 		// TODO need a more central location for these
-        static public const MODEL_CAT_ARCHITECTURE:String = "Architecture";
-        static public const MODEL_CAT_CHARACTERS:String = "Characters";
-        static public const MODEL_CAT_PLANTS:String = "Plants";
-        static public const MODEL_CAT_FURNITURE:String = "Furniture";
+        static public const MODEL_CAT_ARCHITECTURE:String = "architecture";
+        static public const MODEL_CAT_CHARACTERS:String = "characters";
+        static public const MODEL_CAT_PLANTS:String = "plants";
+        static public const MODEL_CAT_FURNITURE:String = "furniture";
 		
 		private var _barUpper:TabBar = new TabBar();
 		// This hold the items to be displayed
