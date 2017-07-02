@@ -304,5 +304,11 @@ public class ModelCache
 			}
 		}
 	}
+
+	public function markAllModelsVisible( $visible:Boolean ):void {
+		for ( var i:int = 0; i < _instances.length; i++ ) {
+			_instances[i].instanceInfo.visible = $visible;
+		}
+	}
 }
 }

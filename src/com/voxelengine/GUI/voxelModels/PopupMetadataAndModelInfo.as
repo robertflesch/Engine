@@ -8,22 +8,15 @@
 
 package com.voxelengine.GUI.voxelModels
 {
-import com.voxelengine.worldmodel.models.ModelInfo;
-import com.voxelengine.worldmodel.models.ModelMetadata;
 
 import flash.display.Bitmap;
 import flash.display.BitmapData;
-import flash.events.MouseEvent;
 import flash.geom.Matrix;
 
-import org.flashapi.collector.EventCollector;
 import org.flashapi.swing.*;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 
-import com.voxelengine.Log;
-import com.voxelengine.Globals;
-import com.voxelengine.events.RegionEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelInfoEvent;
 import com.voxelengine.events.ModelMetadataEvent;
@@ -32,10 +25,9 @@ import com.voxelengine.GUI.*;
 import com.voxelengine.GUI.components.*;
 import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelInfo;
+import com.voxelengine.worldmodel.models.ModelMetadata;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.oxel.Oxel;
-
 
 public class PopupMetadataAndModelInfo extends VVPopup
 {
@@ -45,7 +37,6 @@ public class PopupMetadataAndModelInfo extends VVPopup
     static public function get currentInstance():PopupMetadataAndModelInfo { return _s_currentInstance; }
     static private const WIDTH:int = 330;
 
-    private var _panelAdvanced:Panel;
     private var _photoContainer:Container 		= new Container( width, 128 );
 
     private var _mmd:ModelMetadata = null;
@@ -146,7 +137,6 @@ public class PopupMetadataAndModelInfo extends VVPopup
         // TODO need to be able to handle an array of scripts.
 //            var scriptsPanel:PanelModelScripts = new PanelModelScripts( this, width, 20, 200);
 
-        const GRAINS_PER_METER:int = 16;
         addElement( new ComponentLabel( "Grain Size",  String(_mi.grainSize), WIDTH ) );
 //        if ( _mi.oxelPersistence && _mi.oxelPersistence.bound )
 //            addElement( new ComponentLabel( "Size in Meters", String( (_mi.oxelPersistence.bound ^ 2)/GRAINS_PER_METER ), WIDTH ) );
@@ -171,15 +161,17 @@ public class PopupMetadataAndModelInfo extends VVPopup
     }
 
     static private const PHOTO_WIDTH:int = 128;
+    static private const PHOTO_HEIGHT:int = 128;
     static private const PHOTO_CAPTURE_WIDTH:int = 128;
     private function newPhoto( $me:UIMouseEvent ):void {
-        var bmpd:BitmapData = Renderer.renderer.modelShot();
-        _mmd.thumbnail = drawScaled( bmpd, PHOTO_CAPTURE_WIDTH, PHOTO_CAPTURE_WIDTH );
+        var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _mi.guid );
+        var bmpd:BitmapData = Renderer.renderer.modelShot( vm );
+        _mmd.thumbnail = drawScaled( bmpd, PHOTO_CAPTURE_WIDTH, PHOTO_HEIGHT );
         addPhoto();
         ModelMetadataEvent.create( ModelBaseEvent.CHANGED, 0, _mmd.guid, _mmd );
     }
 
-    private function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
+    static private function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
         var m:Matrix = new Matrix();
         m.scale(destWidth/obj.width, destHeight/obj.height);
         var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
@@ -190,8 +182,8 @@ public class PopupMetadataAndModelInfo extends VVPopup
         _photoContainer.removeElements();
         var bmd:BitmapData = null;
         if ( _mmd.thumbnail )
-            bmd = drawScaled( _mmd.thumbnail, PHOTO_WIDTH, PHOTO_WIDTH );
-        var pic:Image = new Image( new Bitmap( bmd ), PHOTO_WIDTH, PHOTO_WIDTH );
+            bmd = drawScaled( _mmd.thumbnail, PHOTO_WIDTH, PHOTO_HEIGHT );
+        var pic:Image = new Image( new Bitmap( bmd ), PHOTO_WIDTH, PHOTO_HEIGHT );
         _photoContainer.addElement( pic );
         _photoContainer.addElement( new ComponentSpacer( WIDTH ) );
         var btn:Button = new Button( "Take New Picture", WIDTH , 24 );
@@ -199,23 +191,14 @@ public class PopupMetadataAndModelInfo extends VVPopup
         _photoContainer.addElement(btn);
     }
 
-    private function changeBaseLightLevel( $e:UIMouseEvent ):void  {
-        if ( _mi.oxelPersistence && _mi.oxelPersistence.oxelCount ) {
-            var oxel:Oxel = _mi.oxelPersistence.oxel;
-//            _vm.applyBaseLightLevel();
-            _mi.oxelPersistence.changed = true;
-            _mi.save();
-        }
-    }
-
-    private function updateScaleVal( $e:SpinButtonEvent ):Number {
-        var ival:Number = Number( $e.target.data.text );
-        if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival = ival/2;
-        else 											ival = ival*2;
-        $e.target.data.text = ival.toString();
-        setChanged();
-        return ival;
-    }
+//    private function updateScaleVal( $e:SpinButtonEvent ):Number {
+//        var ival:Number = Number( $e.target.data.text );
+//        if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival = ival/2;
+//        else 											ival = ival*2;
+//        $e.target.data.text = ival.toString();
+//        setChanged();
+//        return ival;
+//    }
 
     private function updateVal( $e:SpinButtonEvent ):int {
         var ival:int = int( $e.target.data.text );
