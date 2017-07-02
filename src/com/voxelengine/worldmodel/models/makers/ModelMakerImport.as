@@ -8,7 +8,11 @@
 package com.voxelengine.worldmodel.models.makers
 {
 
+import com.voxelengine.renderer.Renderer;
 import com.voxelengine.worldmodel.models.OxelPersistence;
+
+import flash.display.BitmapData;
+import flash.geom.Matrix;
 
 import flash.geom.Vector3D;
 
@@ -40,12 +44,14 @@ public class ModelMakerImport extends ModelMakerBase {
 	static public function get isImporting():Boolean { return _isImporting; }
 	
 	private var _prompt:Boolean;
+    private var _originalGuid:String;
 
 	public function ModelMakerImport( $ii:InstanceInfo, $prompt:Boolean = true ) {
 		// This should never happen in a release version, so dont worry about setting it to false when done
 		_isImporting = true;
 		_prompt = $prompt;
 		super( $ii );
+        _originalGuid = ii.modelGuid;
 		Log.out( "ModelMakerImport - ii: " + ii.toString(), Log.DEBUG );
 		requestModelInfo();
 	}
@@ -63,7 +69,7 @@ public class ModelMakerImport extends ModelMakerBase {
 			// The new guid is generated in the Window or in the hidden metadata creation
 			if ( _prompt ) {
 				//Log.out( "ModelMakerImport - attemptMake: gathering metadata " + ii.toString() );
-				ModelMetadataEvent.addListener( ModelBaseEvent.GENERATION, metadataFromUI );
+				ModelMetadataEvent.addListener( ModelMetadataEvent.DATA_COLLECTED, metadataFromUI );
 				new WindowModelMetadata( ii, WindowModelMetadata.TYPE_IMPORT ); }
 			else {
 				//Log.out( "ModelMakerImport - attemptMake: generating metadata " + ii.toString() );
@@ -84,7 +90,7 @@ public class ModelMakerImport extends ModelMakerBase {
 	
 	private function metadataFromUI( $mme:ModelMetadataEvent):void {
 		if ( $mme.modelGuid == modelInfo.guid ) {
-			ModelMetadataEvent.removeListener( ModelBaseEvent.GENERATION, metadataFromUI );
+			ModelMetadataEvent.removeListener( ModelMetadataEvent.DATA_COLLECTED, metadataFromUI );
 			_modelMetadata = $mme.modelMetadata;
 			// Now check if this has a parent model, if so, get the animation class from the parent.
 			//Log.out( "ModelMakerImport.metadataFromUI: " + ii.toString() );
@@ -185,7 +191,7 @@ public class ModelMakerImport extends ModelMakerBase {
 
 	override protected function oxelBuildComplete($ode:OxelDataEvent):void {
 		if ($ode.modelGuid == modelInfo.guid ) {
-			Log.out( "ModelMakerBase.oxelBuildComplete  guid: " + modelInfo.guid, Log.ERROR );
+			Log.out( "ModelMakerBase.oxelBuildComplete  guid: " + modelInfo.guid, Log.WARN );
 			removeODEListeners();
 			// This has the additional wait for children
 			if ( !waitForChildren )
@@ -214,39 +220,9 @@ public class ModelMakerImport extends ModelMakerBase {
 			modelInfo.guid = _modelMetadata.guid;
 			ii.modelGuid 	= _modelMetadata.guid;
 
-			ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
-			ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
-			_vm.complete = true;
-
 			modelInfo.brandChildren();
-			modelInfo.changed = true;
-			_modelMetadata.changed = true;
-			_vm.save();
 
-			/*if ( ModelMakerImport.isImporting ) {
-				// Only do this for top level models.
-				var size:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 32);
-				// this give me edge,  really want center.
-				var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
-				lav.setTo(lav.x - size / 2, lav.y - size / 2, lav.z - size / 2);
-				var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
-				diffPos = diffPos.add(lav);
-				ii.positionSet = diffPos;
-			}*/
-
-			if ( !ii.controllingModel ) {
-				if (modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxel && modelInfo.oxelPersistence.oxel.gc.bound) {
-					// Only do this for top level models.
-					var size:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 32);
-					// this gives me corner.
-					var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
-					// add in half the size to get center
-					lav.setTo(lav.x - size / 2, lav.y - size / 2, lav.z - size / 2);
-					var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet().clone();
-					diffPos = diffPos.add(lav);
-					ii.positionSet = diffPos;
-				}
-			}
+			OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE,  quadsComplete );
 
 		} else {
 			if ( modelInfo && modelInfo.boimeHas() && modelInfo.biomes.layers[0].functionName != "LoadModelFromIVM" )
@@ -258,12 +234,54 @@ public class ModelMakerImport extends ModelMakerBase {
 
 			ModelInfoEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
 			ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, ii.modelGuid, null );
+			super.markComplete( $success );
+		}
+	}
+
+	private	function quadsComplete( $ode:OxelDataEvent ):void {
+		if ( _modelMetadata.guid == $ode.modelGuid || _originalGuid == $ode.modelGuid ) {
+			//ModelMetadataEvent.create(ModelBaseEvent.CHANGED, 0, _vm.metadata.guid, _vm.metadata );
+
+            if ( !ii.controllingModel ) {
+                // Only do this for top level models.
+                var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain(modelInfo.oxelPersistence.oxel.gc.bound), 16)/2;
+                // this gives me corner.
+                var msCamPos:Vector3D = VoxelModel.controlledModel.camera.current.position;
+                var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
+
+                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector( new Vector3D( -(radius + 8), adjCameraPos.y-radius, -radius * 3 ) );
+                var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
+                diffPos = diffPos.add(lav);
+                _vm.instanceInfo.positionSet = diffPos;
+            }
+
+            OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, quadsComplete);
+            var bmpd:BitmapData = Renderer.renderer.modelShot( _vm );
+            _vm.metadata.thumbnail = drawScaled(bmpd, 128, 128);
+
+            ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
+            ModelInfoEvent.create( ModelBaseEvent.UPDATE, 0, ii.modelGuid, _modelInfo );
+            _vm.complete = true;
+
+            modelInfo.changed = true;
+            _modelMetadata.changed = true;
+            _vm.save();
+
+            Log.out("ModelMakerImport.completeMake - needed info found: " + _modelMetadata.description );
+			super.markComplete(true);
 		}
 
-		Log.out("ModelMakerImport.completeMake - needed info found: " + _modelMetadata.description );
-		super.markComplete( $success );
-		// how are sub models handled?
-		//_isImporting = false;
+		function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
+			var m:Matrix = new Matrix();
+			m.scale(destWidth/obj.width, destHeight/obj.height);
+			var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
+			bmpd.draw(obj, m);
+			return bmpd;
+		}
 	}
-}	
+
+
 }
+}
+
+

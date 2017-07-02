@@ -386,10 +386,7 @@ public class WindowPictureImport extends VVPopup {
                 var msCamPos:Vector3D = VoxelModel.controlledModel.camera.current.position;
                 var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
 
-                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector( new Vector3D( radius + 8, adjCameraPos.y-radius, -radius * 1.5 ) );
-                //var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.lookAtVector(size * 1.5);
-                // add in half the size to get center
-                //lav.setTo(lav.x - size / 2, lav.y - size / 2, lav.z - size / 2);
+                var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector( new Vector3D( radius + 8, adjCameraPos.y-radius, -radius * 1.25 ) );
                 var diffPos:Vector3D = VoxelModel.controlledModel.wsPositionGet();
                 diffPos = diffPos.add(lav);
                 vm.instanceInfo.positionSet = diffPos;
@@ -399,10 +396,13 @@ public class WindowPictureImport extends VVPopup {
                 OxelDataEvent.addListener( OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE,  quadsComplete );
             }
 
-            function quadsComplete( $ode:OxelDataEvent ) {
-                var bmpd:BitmapData = Renderer.renderer.modelShot();
-                vm.metadata.thumbnail = drawScaled( bmpd, 128, 128 );
-                ModelMetadataEvent.create( ModelBaseEvent.CHANGED, 0, vm.metadata.guid, vm.metadata );
+            function quadsComplete( $ode:OxelDataEvent ):void {
+                if (vm.metadata.guid == $ode.modelGuid) {
+                    OxelDataEvent.removeListener(OxelDataEvent.OXEL_QUADS_BUILT_COMPLETE, quadsComplete);
+                    var bmpd:BitmapData = Renderer.renderer.modelShot( vm );
+                    vm.metadata.thumbnail = drawScaled(bmpd, 128, 128);
+                    ModelMetadataEvent.create(ModelBaseEvent.CHANGED, 0, vm.metadata.guid, vm.metadata);
+                }
             }
 
             function drawScaled(obj:BitmapData, destWidth:int, destHeight:int ):BitmapData {
@@ -411,8 +411,6 @@ public class WindowPictureImport extends VVPopup {
                 var bmpd:BitmapData = new BitmapData(destWidth, destHeight, false);
                 bmpd.draw(obj, m);
                 return bmpd;
-
-                // take photo?
             }
         }
         RegionEvent.create( ModelBaseEvent.SAVE, 0, Region.currentRegion.guid );

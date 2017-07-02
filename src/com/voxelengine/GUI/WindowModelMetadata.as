@@ -30,6 +30,8 @@ public class WindowModelMetadata extends VVPopup
 {
 	private var _name:LabelInput;
 	private var _desc:LabelInput;
+	private var _hashTags:LabelInput;
+
 	private var _copies:LabelInput;
 	private var _vmm:ModelMetadata;
 	private var _type:int;
@@ -92,7 +94,10 @@ public class WindowModelMetadata extends VVPopup
 
 			_desc = new LabelInput( "Description: ", _vmm.description );
 			addElement( _desc );
-		
+
+			_hashTags = new LabelInput( "HashTags: ", "#imported" );
+			addElement( _hashTags );
+
 		} else {
 			var creator:LabelInput = new LabelInput( "Creator: ", _vmm.permissions.creator );
 			creator.editable = false;
@@ -105,8 +110,11 @@ public class WindowModelMetadata extends VVPopup
 
 			_desc = new LabelInput( "Description: ", _vmm.description );
 			addElement( _desc );
-		
-			addElement( new HorizontalSeparator( width ) );		
+
+			_hashTags = new LabelInput( "HashTags: ", "#imported" );
+			addElement( _hashTags );
+
+			addElement( new HorizontalSeparator( width ) );
 			
 			var rbGroup:RadioButtonGroup = new RadioButtonGroup( this );
 			var radioButtons:DataProvider = new DataProvider();
@@ -191,7 +199,7 @@ Log.out( "WindowModelMetadata - need drop down list of Bind types", Log.WARN );
 			// this field only exists when I am editting
 			_vmm.permissions.copyCount = parseInt( _copies.label, 10 );
 		} else { // TYPE_IMPORT so new data
-			ModelMetadataEvent.create( ModelBaseEvent.GENERATION, 0, _vmm.guid, _vmm );
+			ModelMetadataEvent.create( ModelMetadataEvent.DATA_COLLECTED, 0, _vmm.guid, _vmm );
 		}
 		remove();
 	}
