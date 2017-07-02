@@ -35,6 +35,8 @@ public class Ship extends ControllableVoxelModel
 	private const SHIP_CLIP_FACTOR:Number = 0.98;
 //		private const MAX_ROTATION_RATE:int = 1440;
 
+	// says it is unused, but it is used dynamically by AnimationCache.requestAnimationClass
+	static public function getAnimationClass():String { return null; }
 	protected var _engines:Vector.<VoxelModel> = new Vector.<VoxelModel>;
 	protected var _guns:Vector.<Gun> = new Vector.<Gun>;
 	protected var _bombs:Vector.<VoxelModel> = new Vector.<VoxelModel>;
