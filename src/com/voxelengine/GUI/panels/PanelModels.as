@@ -62,7 +62,7 @@ public class PanelModels extends PanelBase
 //		_listModels.draggable = true;
 
 		_listModels.eventCollector.addEvent( _listModels, ListEvent.ITEM_PRESSED, selectModel );
-		ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
+		//ModelMetadataEvent.addListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, childModelAdded );
 		ModelEvent.addListener( ModelEvent.PARENT_MODEL_ADDED, parentModelAdded );
 
@@ -111,7 +111,7 @@ public class PanelModels extends PanelBase
 	override public function close():void {
 		super.close();
 		_listModels.removeEventListener( ListEvent.LIST_CHANGED, selectModel );
-		ModelMetadataEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
+		//ModelMetadataEvent.removeListener( ModelBaseEvent.IMPORT_COMPLETE, metadataImported );
 
 		_parentModel = null;
 		_dictionarySource = null;
@@ -291,13 +291,13 @@ public class PanelModels extends PanelBase
 	}
 
 	//ModelMetadataEvent.create( ModelBaseEvent.IMPORT_COMPLETE, 0, ii.modelGuid, _modelMetadata );
-	private function metadataImported( $mme:ModelMetadataEvent ):void {
-		var instances:Vector.<VoxelModel> = Region.currentRegion.modelCache.instancesOfModelGet( $mme.modelGuid );
-		// should be one if I just imported it.
-		for each ( var vm:VoxelModel in instances ){
-			addItem( vm.metadata.name, vm.instanceInfo.instanceGuid, vm.modelInfo.guid );
-		}
-	}
+//	private function metadataImported( $mme:ModelMetadataEvent ):void {
+//		var instances:Vector.<VoxelModel> = Region.currentRegion.modelCache.instancesOfModelGet( $mme.modelGuid );
+//		// should be one if I just imported it.
+//		for each ( var vm:VoxelModel in instances ){
+//			addItem( vm.metadata.name, vm.instanceInfo.instanceGuid, vm.modelInfo.guid );
+//		}
+//	}
 
 	private function selectModel(event:ListEvent):void {
 			//Log.out("PanelModels.selectModel - AFTER Double");
