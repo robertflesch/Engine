@@ -125,10 +125,19 @@ public class Renderer extends EventDispatcher
 		_height = h;
 	}
 	
-	public function modelShot():BitmapData {
+	public function modelShot( $vm:VoxelModel = null ):BitmapData {
+		if ( $vm ) {
+			Region.currentRegion.modelCache.markAllModelsVisible( false );
+			$vm.instanceInfo.visible = true;
+		}
 		var tmp : BitmapData = new BitmapData( _width, _height, false );
 		// this draws the stage3D on the bitmap.
 		render(tmp);
+
+		if ( $vm ) {
+			Region.currentRegion.modelCache.markAllModelsVisible( true );
+			$vm.instanceInfo.visible = true;
+		}
 		return tmp;
 	}
 	
