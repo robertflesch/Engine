@@ -144,8 +144,7 @@ public class VoxelVerseGUI extends EventDispatcher
 	private var deactivated:Boolean;
 	private function onDeactivate( $ae:Event ):void {
 		deactivated = true;
-		Log.out( " VoxelVerseGUI.onDeactivate", Log.WARN );
-		//processItemSelection( boxes[1], false )
+		//Log.out( " VoxelVerseGUI.onDeactivate", Log.WARN );
 	}
 
 	public function crossHairActive():void {
@@ -157,7 +156,7 @@ public class VoxelVerseGUI extends EventDispatcher
 			_crossHairColor = CROSS_HAIR_YELLOW;
 			Globals.g_app.stage.addEventListener( KeyboardEvent.KEY_DOWN, keyDown );
 			Globals.g_app.stage.addEventListener( KeyboardEvent.KEY_UP, keyUp );
-			Log.out( "VoxelVerseGUI.crossHairActive", Log.WARN );
+			//Log.out( "VoxelVerseGUI.crossHairActive", Log.WARN );
 			Globals.active = true;
 			crossHairChange();
 		}
@@ -168,7 +167,7 @@ public class VoxelVerseGUI extends EventDispatcher
 			_crossHairColor = CROSS_HAIR_RED;
 			Globals.g_app.stage.removeEventListener( KeyboardEvent.KEY_DOWN, keyDown );
 			Globals.g_app.stage.removeEventListener( KeyboardEvent.KEY_UP, keyUp );
-			Log.out("VoxelVerseGUI.crossHairInactive", Log.WARN);
+			//Log.out("VoxelVerseGUI.crossHairInactive", Log.WARN);
 			Globals.active = false;
 			crossHairChange();
 			//CursorOperationEvent.dispatch( new CursorOperationEvent( CursorOperationEvent.NONE, 0 ) );
