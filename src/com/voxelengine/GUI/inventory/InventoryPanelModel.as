@@ -7,16 +7,10 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.GUI.inventory {
 
-import com.voxelengine.GUI.PictureImportProperties;
 import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
-import flash.display.Bitmap;
-import flash.display.BitmapData;
-
 import flash.display.DisplayObject;
-import flash.display.Loader;
-import flash.display.LoaderInfo;
 import flash.events.Event;
 import flash.geom.Vector3D;
 import flash.net.FileReference;
@@ -49,7 +43,6 @@ import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.ModelMetadataEvent;
 
 import com.voxelengine.server.Network;
-import com.voxelengine.worldmodel.models.makers.ModelMakerBase;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.models.InstanceInfo;
 import com.voxelengine.worldmodel.oxel.GrainCursor;
@@ -61,14 +54,14 @@ import com.voxelengine.worldmodel.inventory.ObjectModel;
 public class InventoryPanelModel extends VVContainer
 {
 	// TODO need a more central location for these
-	static public const MODEL_CAT_ARCHITECTURE:String = "architecture";
-	static public const MODEL_CAT_CHARACTERS:String = "avatar";
-	static public const MODEL_CAT_PLANTS:String = "plant";
-	static public const MODEL_CAT_FURNITURE:String = "furniture";
-	static public const MODEL_CAT_ISLAND:String = "island";
-	static public const MODEL_CAT_CRAFT:String = "craft";
-	static public const MODEL_CAT_CREATURE:String = "creature";
-	static public const MODEL_CAT_ALL:String = "ALL";
+	static public const MODEL_CAT_ARCHITECTURE:String = "Architecture";
+	static public const MODEL_CAT_CHARACTERS:String = "Avatar";
+	static public const MODEL_CAT_PLANTS:String = "Plant";
+	static public const MODEL_CAT_FURNITURE:String = "Furniture";
+	static public const MODEL_CAT_ISLAND:String = "Island";
+	static public const MODEL_CAT_CRAFT:String = "Craft";
+	static public const MODEL_CAT_CREATURE:String = "Creature";
+	static public const MODEL_CAT_ALL:String = "All";
 	
 	static private const MODEL_CONTAINER_WIDTH:int = 512;
 	static private const MODEL_IMAGE_WIDTH:int = 128;
@@ -81,7 +74,7 @@ public class InventoryPanelModel extends VVContainer
 	private var _itemContainer:ScrollPane;
 	private var _currentRow:Container;
 	private var _seriesModelMetadataEvent:int;
-	private var _category:String = "All"
+	private var _category:String = MODEL_CAT_ALL;
 	
 	public function InventoryPanelModel( $parent:VVContainer ) {
 		super( $parent );
@@ -99,8 +92,7 @@ public class InventoryPanelModel extends VVContainer
 		upperTabsAdd();
 		addItemContainer();
 		addTrashCan();
-		addTools();
-		displaySelectedCategory( "all" );
+		displaySelectedCategory( MODEL_CAT_ALL );
 		
 		// This forces the window into a multiple of MODEL_IMAGE_WIDTH width
 		var count:int = width / MODEL_IMAGE_WIDTH;
@@ -180,6 +172,9 @@ public class InventoryPanelModel extends VVContainer
 		//Log.out( "InventoryPanelModels.displaySelectedCategory - Not implemented", Log.WARN );
 		// The series makes it so that I dont see results from other objects requests
 		// This grabs the current series counter which will be used on the REQUEST_TYPE call
+		if ( MODEL_CAT_ALL == $category ) {
+			addTools();
+		}
 		_seriesModelMetadataEvent = ModelBaseEvent.seriesCounter;
 		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId, null );
 		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_TYPE, _seriesModelMetadataEvent, Network.PUBLIC, null );
@@ -197,6 +192,7 @@ public class InventoryPanelModel extends VVContainer
 			var om:ObjectModel = new ObjectModel(null, $mme.modelGuid);
 			om.vmm = $mme.modelMetadata;
 			var cat:String = _category.toLowerCase();
+			Log.out( "IPM.addModelMetadataEvent cat: " + cat + "  hasTags: " + $mme.modelMetadata.hashTags + "  found? " + $mme.modelMetadata.hashTags.indexOf(cat));
 			if ( "all" == cat ) {
 				addModel(om);
 			} else if ( 0 <= $mme.modelMetadata.hashTags.indexOf(cat)) {
