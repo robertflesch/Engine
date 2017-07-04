@@ -158,12 +158,16 @@ public class InventoryPanelModel extends VVContainer
 	}
 	
 	private function selectCategory(e:ListEvent):void {
-		_category = e.target.value;
-		while ( 1 <= _itemContainer.numElements )
-			_itemContainer.removeElementAt( 0 );
-		_barLeft.selectedIndex = -1;
-			
-		displaySelectedCategory( _category );
+		var newCat:String = e.target.value as String;
+		if ( _category != newCat ) {
+			_category = newCat;
+			while (1 <= _itemContainer.numElements) {
+				_itemContainer.removeElementAt(0);
+			}
+			_barLeft.selectedIndex = -1;
+			_currentRow = null;
+			displaySelectedCategory(_category);
+		}
 	}
 	
 	// TODO I see problem here when language is different then what is in TypeInfo RSF - 11.16.14
