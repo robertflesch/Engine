@@ -248,12 +248,14 @@ public class ModelMetadataCache
 		return vectorOfTreeModels;
 	}
 
+	static private var _vectorOfTreeModels:Vector.<ModelMetadata> = null;
 	static public function getRandomTree():ModelMetadata {
-		var vectorOfTreeModels:Vector.<ModelMetadata> = getTrees();
-		if ( 0 == vectorOfTreeModels.length )
+		if ( null == _vectorOfTreeModels )
+			_vectorOfTreeModels = getTrees();
+		if ( 0 == _vectorOfTreeModels.length )
 			return null;
-		var index:int = int( Math.random() ) * vectorOfTreeModels.length;
-		var mmd:ModelMetadata = vectorOfTreeModels[index];
+		var index:int = int( Math.random() ) * _vectorOfTreeModels.length;
+		var mmd:ModelMetadata = _vectorOfTreeModels[index];
 		return mmd;
 	}
 
