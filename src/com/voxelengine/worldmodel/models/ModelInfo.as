@@ -152,8 +152,6 @@ public class ModelInfo extends PersistenceObject
 	}
 	
 	public function draw( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $selected:Boolean, $isChild:Boolean, $isAlpha:Boolean ):void {
-//		var time:int = getTimer()
-
 		if ( oxelPersistence && oxelPersistence.oxelCount )
 			oxelPersistence.draw(	$mvp, $vm, $context, $selected, $isChild, $isAlpha );
 //		var t:int = (getTimer() - time) 	

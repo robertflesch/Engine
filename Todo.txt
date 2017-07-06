@@ -52,3 +52,8 @@ Destruction of other users content (temp or perm?)
 Almost everywhere is buildable and destructable
 New adventures created by user everyday
 Very low cost per user.
+
+8 meter 72 -36(128)64  64 - (100) = -36   0 - 1/2 r - 4  camera height - radius
+4 meter 40 -4 (64)32   32 - (64) = -4     0 - 16
+2 meter 24 12 (32)16   16 - (4) = 12       d - 1/2r - 4
+1 meter 16 20 (16)8       X = radius + 8   d + 1/2r

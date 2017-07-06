@@ -10,6 +10,13 @@ package com.voxelengine.worldmodel.oxel
 
 import com.voxelengine.Globals;
 import com.voxelengine.worldmodel.Light;
+import com.voxelengine.worldmodel.models.InstanceInfo;
+import com.voxelengine.worldmodel.models.ModelMetadata;
+import com.voxelengine.worldmodel.models.ModelMetadataCache;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.oxel.GrainCursor;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateOxel;
 
 import flash.geom.Point;
 import flash.geom.Vector3D;
@@ -2732,22 +2739,46 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return newOxel;
 	}
 	*/
-	public function growTreesOn( $modelGuid:String, $type:int, $chance:int = 2000 ):void {
+
+	static public function growTreeAt( $vm:VoxelModel, $oxel:Oxel ):void {
+		var tree:ModelMetadata = ModelMetadataCache.getRandomTree();
+		if ( tree ) {
+			var treeII:InstanceInfo = new InstanceInfo();
+			treeII.modelGuid = tree.guid;
+			var modelHalfSize:int = GrainCursor.two_to_the_g( tree.bound )/2;
+			treeII.positionSetComp( $oxel.gc.getModelX() - modelHalfSize, $oxel.gc.getModelY(), $oxel.gc.getModelZ() - modelHalfSize );
+			treeII.name = "Tree";
+			treeII.controllingModel = $vm;
+			new ModelMaker(treeII, true, false);
+		}
+	}
+
+	public function growTreesOn( $vm:VoxelModel, $type:int, $chance:int ):void {
 		if ( childrenHas() )
 		{
 			for each ( var child:Oxel in children )
-				child.growTreesOn( $modelGuid, $type, $chance );
-		}
-		else if ( $type == type )
-		{
-			var upperNeighbor:Oxel = neighbor( Globals.POSY );
-			if ( OxelBad.INVALID_OXEL != upperNeighbor && TypeInfo.AIR == upperNeighbor.type ) // false == upperNeighbor.hasAlpha
-			{
-				TreeGenerator.generateTree( $modelGuid, this, $chance );
+				child.growTreesOn( $vm, $type, $chance );
+		} else if ( $type == type ) {
+			var chance:Number = 1 / $chance;
+			if ( chance > Math.random() ) {
+				var upperNeighbor:Oxel = neighbor(Globals.POSY);
+				//trace( "GrownTreesOn upperNeighbor.type: " + upperNeighbor.type + "  this.type: "+ type + "  this.grain: " + gc.grain )
+				if (OxelBad.INVALID_OXEL != upperNeighbor && TypeInfo.AIR == upperNeighbor.type && !upperNeighbor.childrenHas() ) {
+					var tree:ModelMetadata = ModelMetadataCache.getRandomTree();
+					if (tree) {
+						var treeII:InstanceInfo = new InstanceInfo();
+						treeII.instanceGuid = Globals.getUID();
+						treeII.modelGuid = tree.guid;
+						treeII.positionSet = gc.getModelVector();
+						treeII.name = "Tree";
+						treeII.controllingModel = $vm;
+						new ModelMaker(treeII, true, false);
+					}
+				}
 			}
 		}
 	}
-	
+
 	public function growTreesOnAnything( $modelGuid:String, $chance:int = 2000 ):void {
 		if ( childrenHas() )
 		{
@@ -2763,7 +2794,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			}
 		}
 	}
-	
+
 	private function dirtAndGrassToSand( $dir:int ):void {
 		var no:Oxel = neighbor( $dir );
 		if ( OxelBad.INVALID_OXEL == no )

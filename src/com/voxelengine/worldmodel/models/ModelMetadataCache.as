@@ -7,6 +7,11 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
+import com.voxelengine.worldmodel.inventory.ObjectModel;
+import com.voxelengine.worldmodel.models.ModelMetadata;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+
 import flash.utils.Dictionary;
 
 import com.voxelengine.Log;
@@ -216,7 +221,7 @@ public class ModelMetadataCache
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		if ( _block.has( $pe.guid ) )
-			_block.clear( $pe.guid )
+			_block.clear( $pe.guid );
 		Log.out( "ModelMetadataCache.metadataLoadFailed PersistenceEvent: " + $pe.toString(), Log.ERROR );
 		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 	}
@@ -225,12 +230,32 @@ public class ModelMetadataCache
 		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		if ( _block.has( $pe.guid ) )
-			_block.clear( $pe.guid )
+			_block.clear( $pe.guid );
 		Log.out( "ModelMetadataCache.loadNotFound PersistenceEvent: " + $pe.toString(), Log.WARN );
 		ModelMetadataEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null );
 	}
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  End - Persistence Events
 	/////////////////////////////////////////////////////////////////////////////////////////////
+
+	static public function getTrees():Vector.<ModelMetadata> {
+		var vectorOfTreeModels:Vector.<ModelMetadata> = new Vector.<ModelMetadata>();
+		for each( var mmd:ModelMetadata in _metadata ){
+			if ( 0 <= mmd.hashTags.indexOf("tree")) {
+				vectorOfTreeModels.push(mmd);
+			}
+		}
+		return vectorOfTreeModels;
+	}
+
+	static public function getRandomTree():ModelMetadata {
+		var vectorOfTreeModels:Vector.<ModelMetadata> = getTrees();
+		if ( 0 == vectorOfTreeModels.length )
+			return null;
+		var index:int = int( Math.random() ) * vectorOfTreeModels.length;
+		var mmd:ModelMetadata = vectorOfTreeModels[index];
+		return mmd;
+	}
+
 }
 }

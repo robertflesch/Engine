@@ -9,6 +9,7 @@ package com.voxelengine.renderer {
 
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.worldmodel.models.OxelPersistence;
+import com.voxelengine.worldmodel.tasks.landscapetasks.GrowTreesOn;
 import com.voxelengine.worldmodel.tasks.renderTasks.BuildFaces;
 
 import flash.geom.Matrix3D;
@@ -380,8 +381,20 @@ public class Chunk {
 		}
 		else if ( _vertMan )
 			VisitorTask.addTask( $guid, this, $func, 10000, $functionName )
-		
 	}
+
+    // Similar to visitor task, but requires guid
+    public function buildTrees( $chance:int ):void {
+        if ( childrenHas() ) {
+            for ( var i:int=0; i < OCT_TREE_SIZE; i++ ) {
+                _children[i].buildTrees( $chance );
+            }
+        }
+        else {
+            if ( _oxel )
+                GrowTreesOn.addTask( _guid, this, $chance );
+        }
+    }
 
 	public function oxelRemove( $oxel:Oxel ):void {
 		if ( _vertMan )
@@ -397,5 +410,6 @@ public class Chunk {
 
 		_vertMan.oxelAdd( $oxel );
 	}
+
 }
 }

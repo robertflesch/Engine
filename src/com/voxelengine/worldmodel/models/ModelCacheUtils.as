@@ -110,7 +110,7 @@ public class ModelCacheUtils
 			_gci = null;
 			for each( var childIntersection:GrainIntersection in oxelIntersections ) {
 				// now get the oxel that corresponds to the oxel at that location
-				var oxel:Oxel = childIntersection.model.getOxelAtWSPoint(childIntersection.wsPoint, EditCursor.currentInstance.grain);
+				var oxel:Oxel = childIntersection.model.getOxelAtWSPoint(childIntersection.wsPoint, childIntersection.model.grain);
 				if (OxelBad.INVALID_OXEL == oxel)
 					continue;
 				if (oxel.type == TypeInfo.AIR && 1 == oxel.childCount)

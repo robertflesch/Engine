@@ -1260,7 +1260,12 @@ public class VoxelModel {
 		}
 	}
 
-
+	public function harvestTreesOn():void {
+		for each ( var tree:VoxelModel in modelInfo.childVoxelModels ) {
+			if (tree)
+				tree.dead = true;
+		}
+	}
 }
 }
 

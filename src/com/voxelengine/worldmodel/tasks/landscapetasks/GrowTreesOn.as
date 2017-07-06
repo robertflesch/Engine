@@ -8,51 +8,33 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
-import com.voxelengine.Globals;
 import com.voxelengine.Log;
-import com.voxelengine.worldmodel.biomes.LayerInfo;
+import com.voxelengine.renderer.Chunk;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
+import com.voxelengine.worldmodel.tasks.renderTasks.RenderingTask;
 
-import flash.utils.getTimer;
-
-/**
- * ...
- * @author Robert Flesch
- */
-public class GrowTreesOn extends LandscapeTask 
-{		
-	public function GrowTreesOn( guid:String, layer:LayerInfo ):void {
-		Log.out( "GrowTreesOn.created" );					
-		super(guid, layer);
+public class GrowTreesOn extends RenderingTask
+{
+	private var _chance:int;
+	static public function addTask( $guid:String, $chunk:Chunk, $chance:int ): void {
+		Log.out("GrowTreesOn.addTask: guid: " + $guid, Log.WARN);
+		new GrowTreesOn( $guid, $chunk, 100, $chance );
 	}
-	
+
+	public function GrowTreesOn($guid:String, $chunk:Chunk, $taskPriority:int, $chance:int ):void {
+		super( $guid, $chunk, "GrowTreesOn", $taskPriority )
+		_chance = $chance;
+	}
+
 	override public function start():void {
 		super.start();
-		var timer:int = getTimer();
-		
-		//Log.out( "GrowTreesOn.start - enter: ", Log.ERROR);					
-		var vm:VoxelModel = getVoxelModel();
-		if ( vm ) {
-			if ( vm.modelInfo.oxelPersistence && vm.modelInfo.oxelPersistence.oxelCount ) {
-				// This should be 1 - 100 range
-				//var outOf:int = _layer.range;
-				//vm.oxel.growTreesOn( _layer.type, outOf ? outOf : 2000 );
-				// 100 is 100
-				// 1 is 2000
-				var oxel:Oxel = vm.modelInfo.oxelPersistence.oxel;
-				var outOf:int = 81 + 1900 / _layer.range;
-				oxel.growTreesOn( _modelGuid, _layer.type, outOf ? outOf : 1000 );
-			}
-			else
-				Log.out( "GrowTreesOn.start - vm.modelInfo.oxelPersistence || vm.modelInfo.oxelPersistence.oxel not found for guid: " + _modelGuid, Log.WARN );
-		}
-		else
-			Log.out( "GrowTreesOn.start - VM not found for guid: " + _modelGuid, Log.WARN );
+		Log.out("GrowTreesOn.start: guid: " + _guid  + "  gc: " + _chunk.gc, Log.WARN);
 
-		Log.out( "GrowTreesOn.start - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime) );	
-		
+		var vm:VoxelModel = Region.currentRegion.modelCache.getModelFromModelGuid( _guid );
+		if ( _chunk && _chunk.oxel )
+			_chunk.oxel.growTreesOn( vm, TypeInfo.GRASS, _chance );
 		super.complete();
 	}
 }

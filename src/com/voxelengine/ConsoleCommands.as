@@ -72,9 +72,11 @@ public class ConsoleCommands {
 			Log.out( "No model is under control to use gravity on", Log.WARN );
 	}
 	
-	private static function trees():void {
+	private static function trees( $change:int = 1000 ):void {
 		if ( VoxelModel.selectedModel ) {
-			VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.growTreesOn( VoxelModel.selectedModel.instanceInfo.instanceGuid, TypeInfo.GRASS );
+			//VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.growTreesOn( VoxelModel.selectedModel, TypeInfo.GRASS );
+			VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.chunkGet().buildTrees( $change );
+
 		} else
 			Log.out( "No selected model", Log.WARN );
 	}
@@ -87,7 +89,8 @@ public class ConsoleCommands {
 				return;
 			}
 
-			TreeGenerator.generateTree( VoxelModel.selectedModel.instanceInfo.instanceGuid, oxel, 1 );
+			Oxel.growTreeAt( VoxelModel.selectedModel, oxel );
+//			TreeGenerator.generateTree( VoxelModel.selectedModel.instanceInfo.instanceGuid, oxel, 1 );
 		} else
 			Log.out( "No selected model", Log.WARN );
 	}
@@ -142,7 +145,8 @@ public class ConsoleCommands {
 	{
 		if ( VoxelModel.selectedModel )
 		{
-			VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.harvestTrees( VoxelModel.selectedModel.instanceInfo.instanceGuid );
+            VoxelModel.selectedModel.harvestTreesOn();
+			//VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.harvestTrees( VoxelModel.selectedModel.instanceInfo.instanceGuid );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
