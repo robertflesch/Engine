@@ -95,13 +95,14 @@ public class CanvasDebugMenu extends VVCanvas {
 
 		addInt( "Land Tasks:", Globals.taskController.queueSize );
 		addSpace();
-		addSpace();
 
 		addVector3D( "Starting", ModelCacheUtils.worldSpaceStartPointFunction );
 		addVector3D( "  Ending", ModelCacheUtils.worldSpaceEndPointFunction );
+		addSpace();
 
-		addString( "selected model:", null );
-		addString( "controlled model:", null );
+		//addString( "selected model:", null );
+		//addString( "controlled model:", null );
+		//addSpace();
 
 		_gcLabel.textAlign = TextAlign.CENTER;
 		_gcLabel.textFormat.color = 0xFFFFFF;
