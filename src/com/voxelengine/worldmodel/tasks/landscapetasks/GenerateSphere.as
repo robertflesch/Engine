@@ -8,24 +8,25 @@
 
 package com.voxelengine.worldmodel.tasks.landscapetasks
 {
-	import com.voxelengine.Log;
-	import com.voxelengine.worldmodel.biomes.LayerInfo;
+import com.voxelengine.Globals;
+import com.voxelengine.Log;
+import com.voxelengine.events.PersistenceEvent;
+import com.voxelengine.worldmodel.biomes.LayerInfo;
 	import com.voxelengine.worldmodel.oxel.Oxel;
 	import com.voxelengine.worldmodel.TypeInfo;
-	import flash.utils.getTimer;
+
+import flash.utils.ByteArray;
+//import flash.utils.getTimer;
 	
-	/**
-	 * ...
-	 * @author Robert Flesch
-	 */
-	public class GenerateSphere extends LandscapeTask 
+	public class GenerateSphere extends LandscapeTask
 	{		
-		static public function script($grain:int = 6, $type:int = 0):Object {
+		static public function script($grain:int = 6, $type:int = 0, $lockLight:Boolean = false ):Object {
 			if (0 == $type)
 				$type = TypeInfo.SAND;
 			var model:Object = {};
 			model.name = "GenerateSphere";
 			model.grainSize = $grain;
+			model.lockLight = $lockLight;
 			var nBiomes:Object = {};
 			nBiomes.layers = new Vector.<Object>();
 			nBiomes.layers[0] = {};
@@ -38,28 +39,30 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			return model;
 		}
 
-		
-		public function GenerateSphere( guid:String,layer:LayerInfo ):void {
+		static public function addTask($guid:String, layer:LayerInfo, $taskPriority:int = 5 ):void {
+			var genCube:GenerateSphere = new GenerateSphere($guid, layer, $taskPriority);
+			Globals.taskController.addTask(genCube);
+		}
+
+		public function GenerateSphere( guid:String, layer:LayerInfo, $taskPriority:int ):void {
 			//Log.out( "GenerateSphere.construct of type: " + (Globals.Info[layer.type].name.toUpperCase()) );					
-			super(guid, layer, "GenerateSphere: " + (TypeInfo.typeInfo[layer.type].name.toUpperCase()) );
+			super(guid, layer, "GenerateSphere: " + (TypeInfo.typeInfo[layer.type].name.toUpperCase()), $taskPriority );
 		}
 		
-		override public function start():void
-		{
+		override public function start():void {
 			super.start(); // AbstractTask will send event
-
-			var timer:int = getTimer();
+			//var timer:int = getTimer();
 			
 			//////////////////////////////////////////////////////////
 			// Builds Sphere Cube of any grain size
 			//////////////////////////////////////////////////////////
-			const root_grain_size:int = _layer.offset;
-			var oxel:Oxel = Oxel.initializeRoot( root_grain_size );
+			const rootGrain:int = _layer.offset;
+			var oxel:Oxel = Oxel.initializeRoot( rootGrain );
 			//
 			var min_grain_size:int = _layer.range;
-			if ( 0 > min_grain_size || min_grain_size > (root_grain_size - 3) || ( 8 < (root_grain_size - min_grain_size)) )
+			if ( 0 > min_grain_size || min_grain_size > (rootGrain - 3) || ( 8 < (rootGrain - min_grain_size)) )
 			{
-				min_grain_size = Math.max( 0, root_grain_size - 5 );
+				min_grain_size = Math.max( 0, rootGrain - 5 );
 				Log.out( "GenerateSphere.start - WARNING - Adjusting range: " + min_grain_size, Log.WARN );
 			}
 
@@ -67,22 +70,21 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 			Log.out( "GenerateSphere.using params oxel.gc.bound: " + oxel.gc.bound + "  c: " + c + " min grain: " + min_grain_size, Log.WARN );
 			oxel.write_sphere( _modelGuid, c, c, c, c, _layer.type, min_grain_size );
-
+			//////////////////
 			oxel.dirty = true;
-			// CRITICAL STEP FOR GENERATION TASKS. when drawing the oxel, it expects to have faces, not dirty faces
+			// CRITICAL STEP. oxels are expected to have faces, not dirty faces
 			// So this step turns the dirty faces into real faces.
-			// for multistep builds I will have to ponder this more.
-			//oxel.facesBuildWater();
+			// for multistep island builds I will have to ponder this more.
+			// TODO Ahhhh, you have to build faces HERE AND NOW
+			// Since the toByteArray does NOT save dirty bits!!!!
 			oxel.facesBuild();
+			var ba:ByteArray = oxel.toByteArray();
+//			Log.out( "GenerateCube finished object: " + Hex.fromArray( ba, true ) );
+//			Log.out( "GenerateCube finished compressed object: " + Hex.fromArray( ba, true ) );
+			//Log.out( "GenerateCube finished modelGuid: " + _modelGuid );
 
-			throw new Error( "REFACTOR = 2.22.17");
-/*
-			var ba:ByteArray = OxelPersistence.toByteArray( oxel );
-			Log.out( "GenerateSphere finished modelGuid: " + _modelGuid );
-			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba ) );
-*/
-			//Log.out( "GenerateSphere.start - completed layer of type: " + (Globals.Info[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
-			super.complete() // AbstractTask will send event
+			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.GENERATE_SUCCEED, 0, Globals.IVM_EXT, _modelGuid, null, ba, null, rootGrain.toString() ) );
+			super.complete();
 		}
 		
 		override public function cancel():void {
