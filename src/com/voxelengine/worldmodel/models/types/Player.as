@@ -119,6 +119,7 @@ public class Player extends PersistenceObject
 		ii.instanceGuid = $userId;
 		//ii.centerSetComp(7.5, 0, 7.5);
 		ii.centerSetComp(8, 0, 8);
+		ii.lockCenter = true;
 
 
 		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
