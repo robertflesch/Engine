@@ -11,30 +11,15 @@ package com.voxelengine.worldmodel.models
 import flash.geom.Vector3D;
 import flash.geom.Matrix3D;
 
-import com.voxelengine.Log;
-
 public class Location
 {
 	private static var _scratchVec:Vector3D 				= new Vector3D();
 	private var _changed:Boolean 							= false;					// INSTANCE NOT EXPORTED
 	private var _useOrigPosition:Boolean 					= false;					// Set via script
 
-	private var _position:Vector3D 							= new Vector3D();			// toJSON
-	private var _positionOrig:Vector3D 						= new Vector3D();			// toJSON
-	private var _rotation:Vector3D 							= new Vector3D();			// toJSON
-	private var _rotationOrig:Vector3D 							= new Vector3D();			// toJSON
-	private var _rotations:Vector.<Vector3D> 				= new Vector.<Vector3D>(3); // INSTANCE NOT EXPORTED
-	private var _positions:Vector.<Vector3D> 				= new Vector.<Vector3D>(3); // INSTANCE NOT EXPORTED
-	private var _scale:Vector3D 							= new Vector3D(1, 1, 1);	// toJSON
-	private var _scaleOrig:Vector3D 							= new Vector3D(1, 1, 1);	// toJSON
-	private var _velocity:Vector3D 							= new Vector3D();			// INSTANCE NOT EXPORTED
-
-	private var _modelMatrix:Matrix3D 						= new Matrix3D();			// INSTANCE NOT EXPORTED
-	private var _worldMatrix:Matrix3D 						= new Matrix3D();			// INSTANCE NOT EXPORTED
-	private var _invModelMatrix:Matrix3D 					= new Matrix3D();			// INSTANCE NOT EXPORTED
 
 	public function get changed():Boolean 					{ return _changed; }
-	[inline] public function set changed($val:Boolean):void	{ _changed = $val; }
+	public function set changed($val:Boolean):void			{ _changed = $val; }
 
 	public function get useOrigPosition():Boolean 			{ return _useOrigPosition; }
 	public function set useOrigPosition($val:Boolean):void	{ _useOrigPosition = $val; }
@@ -49,14 +34,13 @@ public class Location
 
 	private var _center:Vector3D 							= new Vector3D();			// INSTANCE NOT EXPORTED
 	public function get center():Vector3D 					{ return _center; }
-	//public function set center($val:Vector3D):void			{ centerSetComp( $val.x, $val.y, $val.z ); }
 	public function 	centerSetComp( $x:Number, $y:Number, $z:Number ):void {
 		if ( lockCenter )
 			return;
 		changed = true;
 		_centerNotScaled.setTo( $x, $y, $z );
 		_center.setTo( _centerNotScaled.x * scale.x, _centerNotScaled.y * scale.y, _centerNotScaled.z * scale.z );
-		Log.out( "set centerSetComp - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
+		//Log.out( "set centerSetComp - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
 	}
 	private var _centerNotScaled:Vector3D 					= new Vector3D();			// INSTANCE NOT EXPORTED
 	public function get centerNotScaled():Vector3D 			{ return _centerNotScaled; }
@@ -64,30 +48,35 @@ public class Location
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Scale
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public function get scale():Vector3D 					{ return _scale };
+	private var _scale:Vector3D 							= new Vector3D(1, 1, 1);	// toJSON
+	public function get scale():Vector3D 					{ return _scale; }
 	public function 	scaleSetComp( $x:Number, $y:Number, $z:Number ):void {
 		changed = true;
 		//trace( "Location.scaleSetComp x: " + $x + " y: " + $y + " z: " + $z );
 		_scale.setTo( $x, $y, $z );
 		_center.setTo( _centerNotScaled.x * $x, _centerNotScaled.y * $y, _centerNotScaled.z * $z );
-		Log.out( "set scaleSetComp - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
+		//Log.out( "set scaleSetComp - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
 	}
 	public function set scale($val:Vector3D):void 			{
 		changed = true;
 		//trace( "Location.scale x: " + $val.x + " y: " + $val.y + " z: " + $val.z );
 		_scale.setTo( $val.x, $val.y, $val.z );
 		_center.setTo( _centerNotScaled.x * $val.x, _centerNotScaled.y * $val.y, _centerNotScaled.z * $val.z );
-		Log.out( "set scale - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
+		//Log.out( "set scale - scale: " + _scale + "  center: " + center + "  centerConst: " + _centerNotScaled );
 	}
 	public function scaleReset():void 	{
 		//trace( "Location.scaleReset x: " + _scaleOrig.x + " y: " + _scaleOrig.y + " z: " + _scaleOrig.z );
 		scaleSetComp( _scaleOrig.x, _scaleOrig.y, _scaleOrig.z );
 	}
+
+	private var _scaleOrig:Vector3D 							= new Vector3D(1, 1, 1);	// toJSON
 	public function scaleGetOriginal():Vector3D 	{ return _scaleOrig; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Rotation
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	private var _rotation:Vector3D 							= new Vector3D();			// toJSON
+	private var _rotations:Vector.<Vector3D> 				= new Vector.<Vector3D>(3); // INSTANCE NOT EXPORTED
 	public function get rotationGet():Vector3D 				{ return _rotation; }
 	public function 	rotationGetComp():Vector3D 				{ return _rotation; }
 	public function set rotationSet($val:Vector3D):void 	{ rotationSetComp( $val.x, $val.y, $val.z ); }
@@ -103,12 +92,16 @@ public class Location
 
 		_rotation.setTo( $x % 360, $y % 360, $z % 360 );
 	}
+
+	private var _rotationOrig:Vector3D 							= new Vector3D();			// toJSON
 	public function rotationReset():void 	{ rotationSetComp( _rotationOrig.x, _rotationOrig.y, _rotationOrig.z ); }
 	public function rotationGetOriginal():Vector3D 	{ return _rotationOrig; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Position - positions are in MODEL SPACE (ms)
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	private var _position:Vector3D 							= new Vector3D();			// toJSON
+	private var _positions:Vector.<Vector3D> 				= new Vector.<Vector3D>(3); // INSTANCE NOT EXPORTED
 	public function get positionGet():Vector3D 				{ return _position; }
 	public function set positionSet( $val:Vector3D ):void 	{ positionSetComp( $val.x, $val.y, $val.z ); }
 	public function 	positionSetComp( $x:Number, $y:Number, $z:Number ):void
@@ -122,13 +115,16 @@ public class Location
 
 		_position.setTo( $x, $y, $z );
 	}
+
+	private var _positionOrig:Vector3D 						= new Vector3D();			// toJSON
 	public function positionReset():void 	{ positionSetComp( _positionOrig.x, _positionOrig.y, _positionOrig.z ); }
 	public function positionGetOriginal():Vector3D 	{ return _positionOrig; }
 
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Velocity
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-	public function get velocityGet():Vector3D 				{ return _velocity };
+	private var _velocity:Vector3D 							= new Vector3D();			// INSTANCE NOT EXPORTED
+	public function get velocityGet():Vector3D 				{ return _velocity; }
 	public function set velocitySet( $val:Vector3D ):void 	{ velocitySetComp( $val.x, $val.y, $val.z ); }
 	public function 	velocityReset():void 				{ velocitySetComp( 0, 0, 0 ); }
 	public function 	velocityResetY():void				{ _velocity.y = 0;}
@@ -185,8 +181,12 @@ public class Location
 	////////////////////////////////////////////////////////////////////////////////////
 	// matrix ops
 	////////////////////////////////////////////////////////////////////////////////////
-	// dont recalculate unless it is needed
+	// don't recalculate unless it is needed
 	// that is when ever it is access and the data in it has changed
+	private var _modelMatrix:Matrix3D 						= new Matrix3D();			// INSTANCE NOT EXPORTED
+	private var _worldMatrix:Matrix3D 						= new Matrix3D();			// INSTANCE NOT EXPORTED
+	private var _invModelMatrix:Matrix3D 					= new Matrix3D();			// INSTANCE NOT EXPORTED
+
 	protected function recalculateMatrix( force:Boolean = false ):void
 	{
 		if ( changed || force )

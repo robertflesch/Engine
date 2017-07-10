@@ -66,10 +66,15 @@ public class Renderer extends EventDispatcher
 		Globals.g_app.stage.addEventListener( Event.RESIZE, resizeEvent );
 	}
 	
-	private function addStage3DListeners():void 
-	{
+	private function addStage3DListeners():void  {
 		stage3D.addEventListener( Event.CONTEXT3D_CREATE, onContextCreated );
 		stage3D.addEventListener( ErrorEvent.ERROR, onStage3DError );
+
+		// display message
+		function onStage3DError ( e:ErrorEvent ):void {
+			//legend.text = "This content is not correctly embedded. Please change the wmode value to allow this content to run.";
+			Log.out( "Renderer.onStage3DError !!!!!!!!!!!!!!!!!!!!!!!!!!!!Stage3DError occured!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! e: " + e, Log.ERROR );
+		}
 	}
 
 	public function init( stage:Stage ):void {
@@ -191,14 +196,7 @@ public class Renderer extends EventDispatcher
 			ContextEvent.create( ContextEvent.REBUILD, context3D );
 		}
 	}
-	
-	// display message
-	private function onStage3DError ( e:ErrorEvent ):void {
-		//legend.text = "This content is not correctly embedded. Please change the wmode value to allow this content to run.";
-		Log.out( "Renderer.onStage3DError !!!!!!!!!!!!!!!!!!!!!!!!!!!!Stage3DError occured!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", Log.ERROR );
-	}		
 
-	
 	public function render( screenShot:BitmapData = null ):void 
 	{
 		if ( null == context3D )
@@ -216,20 +214,25 @@ public class Renderer extends EventDispatcher
 
 		backgroundColor();
 
-		// New in Flash 16
-		// Context3D's setFillMode()  "wireframe" or "solid".
+		// http://www.adobe.com/devnet/flashplayer/articles/stage3d-wireframe-mode-support.html
+		// Wireframe mode is implemented in AIR 16 and above, and is available in AIR desktop only.
+		//context3D.setFillMode(Context3DFillMode.SOLID);
+
 		var controlledModel:VoxelModel = VoxelModel.controlledModel;
 		var controlledModelRotation:Vector3D;
 
-		// Very early in render cycle the controlled model may not be instantitated yet.
+
+		// Very early in render cycle the controlled model may not be instantiated yet.
 		var wsPositionCamera:Vector3D;
 		if ( !controlledModel ) {
 			wsPositionCamera = new Vector3D();
 			controlledModelRotation = new Vector3D();
 		}
 		else {
-			controlledModelRotation = controlledModel.instanceInfo.rotationGet;
-			wsPositionCamera = controlledModel.instanceInfo.worldSpaceMatrix.transformVector(controlledModel.camera.current.position);
+			//controlledModelRotation = controlledModel.instanceInfo.rotationGet;
+			controlledModelRotation = controlledModel.cameraContainer.current.rotation;
+
+			wsPositionCamera = controlledModel.instanceInfo.worldSpaceMatrix.transformVector(controlledModel.cameraContainer.current.position);
 			// This does not handle the case where the player has not collided with the model yet
 			// Say they are falling onto an island, and they hit the water first.
 			// I should probably adjust that algorithm to account for it.

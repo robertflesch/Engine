@@ -312,8 +312,8 @@ public class ControllableVoxelModel extends VoxelModel
 		// If you are are on solid ground, you cant change the angle of the avatar( or controlled object ) 
 		// other then turning right and left
 		_sScratchMatrix.identity();
-		if ( !onSolidGround )
-			_sScratchMatrix.appendRotation( -$loc.rotationGet.x, Vector3D.X_AXIS );
+//		if ( !onSolidGround )
+//			_sScratchMatrix.appendRotation( -$loc.rotationGet.x, Vector3D.X_AXIS );
 		_sScratchMatrix.appendRotation( -$loc.rotationGet.y,   Vector3D.Y_AXIS );
 		
 		var dvMyVelocity:Vector3D = _sScratchMatrix.transformVector( $loc.velocityGet );
@@ -347,7 +347,7 @@ public class ControllableVoxelModel extends VoxelModel
 		// set our next position by adding in velocities
 		// If there is no collision or gravity, this is where the model would end up.
 		var loc:Location = _s_scratchLocation;
-// TEMP
+// TEMP - why TEMP RSF???
 		loc.setTo( instanceInfo );
 		setTargetLocation( loc );
 		//Log.out( "CVM.controlledModelChecks - loc.positionSet: " + loc.positionGet );
@@ -361,7 +361,7 @@ public class ControllableVoxelModel extends VoxelModel
 			if ( 0 == _collisionCandidates.length ) {
 				if ( usesGravity )
 					fall( loc, $elapsedTimeMS );
-// TEMP
+// TEMP - why TEMP RSF???
 				instanceInfo.setTo( loc );
 			} else {
 				var maxCollisionPointCount:int = -1;
@@ -389,7 +389,7 @@ public class ControllableVoxelModel extends VoxelModel
 			}
 		}
 		else {
-// TEMP
+// TEMP - why TEMP RSF???
 			instanceInfo.setTo(loc);
 		}
 		
@@ -579,7 +579,8 @@ public class ControllableVoxelModel extends VoxelModel
 	
 	public function get inventoryBitmap():String { return _inventoryBitmap; }
 	public function set inventoryBitmap(value:String):void { _inventoryBitmap = value; }
-	
+
+	private static const ROTATE_FACTOR:Number = 0.04;
 	override public function updateVelocity( $elapsedTimeMS:int, $clipFactor:Number ):Boolean
 	{
 		//Log.out( "updateVelocity this == VoxelModel.controlledModel " + (this == VoxelModel.controlledModel) + " Globals.active: " + Globals.active );
@@ -592,7 +593,7 @@ public class ControllableVoxelModel extends VoxelModel
 		{
 			var vel:Vector3D = instanceInfo.velocityGet;
 			var speedVal:Number = instanceInfo.speed( $elapsedTimeMS ) / 4;
-			
+
 			// Add in movement factors
 			if ( MouseKeyboardHandler.forward )	{
 				if ( instanceInfo.velocityGet.length < maxSpeed ) {
@@ -600,17 +601,31 @@ public class ControllableVoxelModel extends VoxelModel
 						instanceInfo.velocitySetComp( vel.x, vel.y, vel.z + speedVal * 4 );
 					else
 						instanceInfo.velocitySetComp( vel.x, vel.y, vel.z + speedVal );
-					changed = true; 
-					mForward = true; 
+					changed = true;
+					mForward = true;
 				}
 			}
-			else { 
-				mForward = false; 
+			else {
+				mForward = false;
 			}
-			
+
 			if ( MouseKeyboardHandler.backward )	{ instanceInfo.velocitySetComp( vel.x, vel.y, vel.z - speedVal ); changed = true; }
-			if ( MouseKeyboardHandler.leftSlide )	{ instanceInfo.velocitySetComp( vel.x + speedVal, vel.y, vel.z ); changed = true; }
-			if ( MouseKeyboardHandler.rightSlide )	{ instanceInfo.velocitySetComp( vel.x - speedVal, vel.y, vel.z ); changed = true; }
+//			if ( MouseKeyboardHandler.leftSlide )	{ instanceInfo.velocitySetComp( vel.x + speedVal, vel.y, vel.z ); changed = true; }
+//			if ( MouseKeyboardHandler.rightSlide )	{ instanceInfo.velocitySetComp( vel.x - speedVal, vel.y, vel.z ); changed = true; }
+			if ( MouseKeyboardHandler.leftSlide )	{
+				const currentRotP:Vector3D = instanceInfo.rotationGet;
+				instanceInfo.rotationSetComp( currentRotP.x, currentRotP.y - ROTATE_FACTOR * $elapsedTimeMS, currentRotP.z );;
+				const currentCamRotP:Vector3D = cameraContainer.current.rotation;
+				cameraContainer.current.rotation = new Vector3D( currentCamRotP.x, currentCamRotP.y - ROTATE_FACTOR * $elapsedTimeMS, currentCamRotP.z );
+				changed = true;
+			}
+			if ( MouseKeyboardHandler.rightSlide ) {
+				const currentRot:Vector3D = instanceInfo.rotationGet;
+				instanceInfo.rotationSetComp(currentRot.x, currentRot.y + ROTATE_FACTOR * $elapsedTimeMS, currentRot.z);
+				const currentCamRot:Vector3D = cameraContainer.current.rotation;
+				cameraContainer.current.rotation = new Vector3D( currentCamRot.x, currentCamRot.y + ROTATE_FACTOR * $elapsedTimeMS, currentCamRot.z );
+				changed = true;
+			}
 			if ( MouseKeyboardHandler.down )	  	{ instanceInfo.velocitySetComp( vel.x, vel.y + speedVal, vel.z ); changed = true; }
 			if ( MouseKeyboardHandler.up )
 			{

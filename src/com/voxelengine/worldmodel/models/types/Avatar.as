@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models.types
 {
 
 import flash.display3D.Context3D;
+import flash.geom.Vector3D;
 
 import flash.geom.Vector3D;
 import flash.utils.getQualifiedClassName;
@@ -118,8 +119,53 @@ public class Avatar extends ControllableVoxelModel
 		modelInfo.dbo.avatar = {};
 		//var thisModel:ControllableVoxelModel = $vm as ControllableVoxelModel;
 	}
-	
-	override public function collisionTest( $elapsedTimeMS:Number ):Boolean {
+
+    override public function setTargetLocation( $loc:Location ):void
+    {
+        /*
+         * This is all current broken - not sure what it does, but I think it transfers the motion of the collision model to the player
+         if ( lastCollisionModel )
+         {
+         // Add into your position, the change due to the change in ships position
+         // this takes into account gravity. I am really only trying to maintain the x,z here.
+         // except for when I have a UP transform.
+         loc.positionSet = lastCollisionModel.modelToWorld( positionGetOld );
+         // if we dont use this, then we dont get benifit of gravity
+         //worldSpaceTargetPosition.y = _worldSpacePosition.y;
+
+         // Add into your rotation, the change due to the change in ships rotation
+         var rotDiff:Vector3D = lastCollisionModel.instanceInfo.rotationGet.subtract( rotationGetOld );
+         if ( false == _sZERO_VEC.nearEquals( rotDiff, 0.01 ) )
+         rotationSet = rotationGet.subtract( rotDiff );
+         }
+         */
+
+        // clamp player mouse rotation
+        if ( $loc.rotationGet.x >= 90 )
+            $loc.rotationSet = new Vector3D( 89.99, $loc.rotationGet.y, $loc.rotationGet.z );
+        else if ( $loc.rotationGet.x <= -90 )
+            $loc.rotationSet = new Vector3D( -89.99, $loc.rotationGet.y, $loc.rotationGet.z );
+
+        // If you are are on solid ground, you cant change the angle of the avatar( or controlled object )
+        // other then turning right and left
+        _sScratchMatrix.identity();
+//		if ( !onSolidGround )
+//			_sScratchMatrix.appendRotation( -$loc.rotationGet.x, Vector3D.X_AXIS );
+        _sScratchMatrix.appendRotation( -$loc.rotationGet.y,   Vector3D.Y_AXIS );
+
+        var dvMyVelocity:Vector3D = _sScratchMatrix.transformVector( $loc.velocityGet );
+        if ( dvMyVelocity.length )
+        {
+            _sScratchVector.setTo( $loc.positionGet.x, $loc.positionGet.y, $loc.positionGet.z );
+            _sScratchVector.decrementBy( dvMyVelocity );
+            $loc.positionSet = _sScratchVector;
+        }
+
+        //Log.out( "ControllableVoxelModel.calculateTargetPosition - worldSpaceTargetPosition: " + worldSpaceTargetPosition );
+    }
+
+
+    override public function collisionTest( $elapsedTimeMS:Number ):Boolean {
 
 //		if ( this === VoxelModel.controlledModel )
 		{
@@ -373,11 +419,11 @@ public class Avatar extends ControllableVoxelModel
 
 	override protected function cameraAddLocations():void {
 		//camera.addLocation( new CameraLocation( true, 0, 0, 0 ) );
-		camera.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, Globals.AVATAR_WIDTH/2 - 4) );
-		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 50) );
-		camera.addLocation( new CameraLocation( false, -Globals.AVATAR_WIDTH, Globals.AVATAR_HEIGHT, 50) );
-		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT * 2, 50) );
-		camera.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 100) );
+		cameraContainer.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, Globals.AVATAR_WIDTH/2 - 4) );
+		cameraContainer.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 50) );
+		cameraContainer.addLocation( new CameraLocation( false, -Globals.AVATAR_WIDTH, Globals.AVATAR_HEIGHT, 50) );
+		cameraContainer.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT * 2, 50) );
+		cameraContainer.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 100) );
 	}
 
 	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {
@@ -441,14 +487,41 @@ public class Avatar extends ControllableVoxelModel
 			//Log.out( "Avatar.handleMouseMovement dy: " + dy + "   $elapsedTimeMS: " + $elapsedTimeMS )
 			if ( MIN_TURN_AMOUNT >= Math.abs(dy) )
 				dy = 0;
+
+			const currentCamRotation:Vector3D = cameraContainer.current.rotation;
+			cameraContainer.current.rotation.setTo( currentCamRotation.x + dx
+												  , currentCamRotation.y + dy
+					                              , 0 );
+			const currentBodyRotation:Vector3D = instanceInfo.rotationGet;
+			var head:VoxelModel = childFindByName( "Head" );
+			if ( head ){
+//				trace( "head: " + head.instanceInfo.rotationGet ); // + " dx: " + dx + "  dy: " + dy );
+//				trace( "camera: " + currentCamRotation );
+//				trace( "body: " + currentBodyRotation );
+				const headRot:Vector3D = head.instanceInfo.rotationGetOriginal();
+				head.instanceInfo.rotationSetComp( (headRot.x + currentBodyRotation.x - currentCamRotation.x + dx)
+												 , -(headRot.y + currentBodyRotation.y - currentCamRotation.y + dy)
+						                         , 0 );
+			}
+//			if ( onSolidGround ) {
+//				//instanceInfo.rotationGet.setTo( 0, instanceInfo.rotationGet.y + dy, 0 );
+//				//const currentRotation:Vector3D = instanceInfo.rotationGet;
+//				const currentRotation:Vector3D = cameraContainer.current.rotation;
+//				cameraContainer.current.rotation = new Vector3D( currentRotation.x + dx, currentRotation.y, 0 );
+//			} else {
+//				instanceInfo.rotationGet.setTo( instanceInfo.rotationGet.x + dx
+//						                      , instanceInfo.rotationGet.y + dy
+//						                      , 0 );
+//			}
+
 			//
 			//Log.out( "Avatar.handleMouseMovement - rotation: " + instanceInfo.rotationGet );
 			// I only want to rotate the head here, not the whole body. in the X dir.
 			// so if I made the head the main body part, could I keep the rest of the head fixed on the x and z axis...
-			instanceInfo.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y + dy, instanceInfo.rotationGet.z );
+//			instanceInfo.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y + dy, instanceInfo.rotationGet.z );
 			//camera.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y, instanceInfo.rotationGet.z );
 			// this uses the camera y rotation, but it breaks other things like where to dig.
-			instanceInfo.rotationSetComp( instanceInfo.rotationGet.x + dx, instanceInfo.rotationGet.y, instanceInfo.rotationGet.z );
+//			instanceInfo.rotationSetComp( instanceInfo.rotationGet.x + dx, instanceInfo.rotationGet.y, instanceInfo.rotationGet.z );
 			//trace( "handleMouseMovement instanceInfo.rotationGet: " + instanceInfo.rotationGet + "  camera.rotation: " + camera.rotationGet );
 		}
 	}
