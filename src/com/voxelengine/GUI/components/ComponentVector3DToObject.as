@@ -7,18 +7,12 @@
  ==============================================================================*/
 
 package com.voxelengine.GUI.components {
-import flash.geom.ColorTransform;
 import flash.geom.Vector3D;
-import org.flashapi.swing.color.Color;
 
 import org.flashapi.swing.*
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
-import org.flashapi.swing.containers.*;
 import org.flashapi.swing.plaf.spas.VVUI;
-
-import com.voxelengine.Globals;
-import com.voxelengine.Log;
 
 public class ComponentVector3DToObject extends Box
 {
@@ -50,7 +44,7 @@ public class ComponentVector3DToObject extends Box
 		lbl.width = int(width/5);
 		lbl.height = 20;
 		lbl.textAlign = TextAlign.LEFT;
-		addElement( lbl )
+		addElement( lbl );
 		
 		addSpinLabel( $s1Label
 					, function($e:SpinButtonEvent):void { $origUpdate( cnto( $changeFunction($e), $vect.y, $vect.z ) ); }
@@ -67,20 +61,19 @@ public class ComponentVector3DToObject extends Box
 	}
 	
 	// cnto = componentNumbersToObject
-	private function cnto( $x:Number, $y:Number, $z:Number ):Object {
+	static private function cnto( $x:Number, $y:Number, $z:Number ):Object {
 			return { x:$x, y:$y, z:$z };
 	}
-	private function componentIntToObject( $x:int, $y:int, $z:int ):Object {
-			return { x:$x, y:$y, z:$z };
-	}	
-	//override public function get height () : Number { return super.height + 5; }	
-	
+//	static private function componentIntToObject( $x:int, $y:int, $z:int ):Object {
+//			return { x:$x, y:$y, z:$z };
+//	}
+
 	static private function updateVal( $e:SpinButtonEvent ):int {
-		var ival:int = int( $e.target.data.text );
-		if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	ival--;
-		else 											ival++;
-		$e.target.data.text = ival.toString();
-		return ival;
+		var iVal:int = int( $e.target.data.text );
+		if ( SpinButtonEvent.CLICK_DOWN == $e.type ) 	iVal--;
+		else 											iVal++;
+		$e.target.data.text = iVal.toString();
+		return iVal
 	}
 	
 	private function addSpinLabel( label:String, clickHandler:Function, textChanged:Function, initialValue:String ):TextInput
