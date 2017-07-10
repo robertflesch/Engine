@@ -161,7 +161,7 @@ public class ModelCacheUtils
 				_cameraMatrix.prependRotation( -cmRotation.z, Vector3D.Z_AXIS );
 				_cameraMatrix.append( cm.instanceInfo.worldSpaceMatrix );
 
-				var msCamPos:Vector3D = cm.camera.current.position;
+				var msCamPos:Vector3D = cm.cameraContainer.current.position;
 				var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
 				_worldSpaceStartPoint = adjCameraPos;
 				//trace( "ModelCacheUtils.calculate - _worldSpaceStartPoint 2: " + _worldSpaceStartPoint + " p: " + p + "  p1: " + p1 );
@@ -218,7 +218,7 @@ public class ModelCacheUtils
 			{
 				for each ( var vm:VoxelModel in modelList )
 				{
-					var wsCenterPointOfModel:Vector3D = cm.instanceInfo.worldSpaceMatrix.transformVector( cm.camera.current.position );
+					var wsCenterPointOfModel:Vector3D = cm.instanceInfo.worldSpaceMatrix.transformVector( cm.cameraContainer.current.position );
 
 					var msp:Vector3D = vm.worldToModel( wsCenterPointOfModel );
 					// RSF 9.13/13 - Verify that vm.modelInfo.oxelPersistence.oxel.gc.grain is correct value to pass in.

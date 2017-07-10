@@ -7,10 +7,7 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.voxelengine.Log;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
-
-import flash.geom.Vector3D;
 
 /**
  * ...
@@ -20,18 +17,17 @@ import flash.geom.Vector3D;
  * Additional camera locations are stored in the cameras, and the current camera is the one that
  * has the index.
  */
-public class Camera //extends Location
+public class CameraContainer //extends Location
 {
 	private   var   _cameras:Vector.<CameraLocation>= new Vector.<CameraLocation>();
 	private var 	_index:int 						= CameraLocation.FIRST_PERSON;
 	private var     _vm:VoxelModel 					= null;
 
-	public function Camera( $vm:VoxelModel ):void {
+	public function CameraContainer($vm:VoxelModel ):void {
 		_vm = $vm;
 	}
 
-	public function addLocation( c:CameraLocation ):void
-	{
+	public function addLocation( c:CameraLocation ):void {
 		_cameras.push( c );
 	}
 
@@ -45,29 +41,21 @@ public class Camera //extends Location
 
 	public function get count():int { return _cameras.length; }
 
-	public function get index():int
-	{
+	public function get index():int {
 		return _index;
 	}
 
-	public function set index( $val:int ):void
-	{
+	public function set index( $val:int ):void {
 		_index = $val;
 		if ( _index >= _cameras.length )
 			_index = 0;
 	}
 
-	public function next():void
-	{
+	public function next():void {
 		_index++;
 		if ( _index >= _cameras.length )
 			_index = 0;
 	}
-
-//	override public function get positionGet():Vector3D {
-//		Log.out( "Camera.positionGet - ERROR - this does not return the correct camera position!!", Log.ERROR );
-//		return new Vector3D();
-//	}
 }
 }
 

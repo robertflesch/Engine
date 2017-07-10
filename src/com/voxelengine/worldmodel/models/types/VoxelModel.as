@@ -91,7 +91,7 @@ public class VoxelModel {
 
 	// state data
 	private		var	_anim:Animation;
-	private		var	_camera:Camera								= null;
+	private		var	_cameraContainer:CameraContainer								= null;
 	private		var	_usesGravity:Boolean; 														
 	private		var	_timer:int 									= getTimer(); 				
 	private 	var _hasInventory:Boolean;
@@ -112,7 +112,7 @@ public class VoxelModel {
 	
 	public	function get usesGravity():Boolean 					{ return _usesGravity; }
 	public	function set usesGravity(val:Boolean):void 			{ _usesGravity = val; }
-	public	function get camera():Camera						{ return _camera; }
+	public	function get cameraContainer():CameraContainer		{ return _cameraContainer; }
 	public	function get anim():Animation 						{ return _anim; }
 	public	function get selected():Boolean 					{ return _selected; }
 	public	function set selected(val:Boolean):void  			{ _selected = val; }
@@ -139,7 +139,7 @@ public class VoxelModel {
 	public function VoxelModel( $ii:InstanceInfo ):void {
 		_instanceInfo = $ii;
 		_instanceInfo.owner = this; // This tells the instanceInfo that this voxel model is its owner.
-		_camera = new Camera( this );
+		_cameraContainer = new CameraContainer( this );
 	}
 	
 	public function init( $mi:ModelInfo, $vmm:ModelMetadata ):void {
@@ -192,7 +192,7 @@ public class VoxelModel {
 
 	protected function cameraAddLocations():void
 	{
-		_camera.addLocation( new CameraLocation( false, 0, 0, 0) );
+		_cameraContainer.addLocation( new CameraLocation( false, 0, 0, 0) );
 	}
 	
 	// returns the location of this model in the model space
@@ -579,14 +579,12 @@ public class VoxelModel {
 		}
 	}
 	
-	public function calculateCenter( $oxelCenter:int = 0 ):void {
-		if ( 0 == instanceInfo.center.length ) {
-			if ( 0 == $oxelCenter )
-				if ( modelInfo.oxelPersistence && modelInfo.oxelPersistence.oxelCount ) {
-					$oxelCenter = modelInfo.oxelPersistence.oxel.size_in_world_coordinates() / 2;
-					instanceInfo.centerSetComp( $oxelCenter, $oxelCenter, $oxelCenter )
-				}
+	public function calculateCenter( $oxelCenter:Number = 0 ):void {
+		if ( 0 == $oxelCenter  && modelInfo.oxelPersistence ) {
+			//$oxelCenter = modelInfo.oxelPersistence.oxel.size_in_world_coordinates() / 2;
+			$oxelCenter = GrainCursor.get_the_g0_size_for_grain(modelInfo.oxelPersistence.bound) / 2;
 		}
+		instanceInfo.centerSetComp( $oxelCenter, $oxelCenter, $oxelCenter )
 	}
 	
 	public function print():void
@@ -923,7 +921,7 @@ public class VoxelModel {
 		// adds the player to the child list
 		if ( $modelLosingControl && !($modelLosingControl is Avatar) )
 			childAdd($modelLosingControl);
-		camera.index = 0;
+		cameraContainer.index = 0;
 		
 		// Pass in the name of the class that is taking control.
 //		var className:String = getQualifiedClassName(this)
@@ -937,7 +935,7 @@ public class VoxelModel {
 		// remove the player to the child list
 		if ( $detachChild )
 			modelInfo.childDetach( $modelDetaching, this );
-		camera.index = 0;
+		cameraContainer.index = 0;
 		//var className:String = getQualifiedClassName(this)
 		//ModelEvent.dispatch( new ModelEvent( ModelEvent.RELEASE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
 	}
@@ -945,9 +943,9 @@ public class VoxelModel {
 	// handle the tab key event to move camera around, this is only for controlled model
 	protected function nextCamera(e:KeyboardEvent):void {
 		if (Keyboard.TAB == e.keyCode && 0 == Globals.openWindowCount ) {
-			camera.next();
+			cameraContainer.next();
 			// I want the camera for the controlled object, not the avatar.
-			var currentCamera:CameraLocation = VoxelModel.controlledModel.camera.current;
+			var currentCamera:CameraLocation = VoxelModel.controlledModel.cameraContainer.current;
 //			trace("VoxelModel.keyDown cameraLocation: " + currentCamera.position + "  " + currentCamera.rotation);
 			if ( currentCamera.toolBarVisible )
 				GUIEvent.dispatch( new GUIEvent(GUIEvent.TOOLBAR_SHOW));

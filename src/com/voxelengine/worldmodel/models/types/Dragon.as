@@ -101,12 +101,12 @@ public class Dragon extends Beast
 	}
 
 	override protected function cameraAddLocations():void {
-		camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 20, 0) );
-		camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 20, 50) );
-		camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 30, 80) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 20, 0) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 20, 50) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 30, 80) );
 		//camera.addLocation( new CameraLocation( true, 16, Globals.AVATAR_HEIGHT - 40, 50) );
-		camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT, 100) );
-		camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT, 250) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT, 100) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT, 250) );
 	}
 
 	override public function stateSet($state:String, $lockTime:Number = 1):void {

@@ -383,7 +383,7 @@ public class WindowPictureImport extends VVPopup {
                 // Only do this for top level models.
                 var radius:int = Math.max(GrainCursor.get_the_g0_edge_for_grain($op.oxel.gc.bound), 16)/2;
                 // this gives me corner.
-                var msCamPos:Vector3D = VoxelModel.controlledModel.camera.current.position;
+                var msCamPos:Vector3D = VoxelModel.controlledModel.cameraContainer.current.position;
                 var adjCameraPos:Vector3D = VoxelModel.controlledModel.modelToWorld( msCamPos );
 
                 var lav:Vector3D = VoxelModel.controlledModel.instanceInfo.invModelMatrix.deltaTransformVector( new Vector3D( radius + 8, adjCameraPos.y-radius, -radius * 1.25 ) );

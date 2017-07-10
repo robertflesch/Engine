@@ -152,12 +152,12 @@ public class Beast extends ControllableVoxelModel
 	}
 
 	override protected function cameraAddLocations():void {
-		camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 20, 0) );
-		camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 20, 50) );
-		camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 30, 80) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 20, 0) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 20, 50) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 30, 80) );
 		//camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT - 40, 50) );
-		camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 40, 100) );
-		camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 50, 250) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 40, 100) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 50, 250) );
 	}
 
 	override protected function collisionCheckNew( $elapsedTimeMS:Number, $loc:Location, $collisionCandidate:VoxelModel, $stepUpCheck:Boolean = false ):int {
@@ -355,12 +355,6 @@ public class Beast extends ControllableVoxelModel
 		}
 	}
 
-	override public function updateVelocity( $elapsedTimeMS:int, $clipFactor:Number ):Boolean
-	{
-		// TODO What should default behavoir be for a beast?
-		return super.updateVelocity( $elapsedTimeMS, $clipFactor );
-	}
-
 	override protected function setAnimation():void	{
 		throw new Error( "Beast.setAnimation - OVERRIDE THIS FUNCTION" );
 	}
@@ -378,7 +372,7 @@ public class Beast extends ControllableVoxelModel
 		//Log.out( "Beast.takeControl - after position set: " + $vm.instanceInfo.positionGet );
 		Globals.g_app.addEventListener( ShipEvent.THROTTLE_CHANGED, throttleEvent );
 		instanceInfo.usesCollision = true;
-		camera.index = 2;
+		cameraContainer.index = 2;
 	}
 
 	override public function loseControl($modelDetaching:VoxelModel, $detachChild:Boolean = true):void {

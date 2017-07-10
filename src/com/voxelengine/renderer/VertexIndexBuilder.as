@@ -113,7 +113,7 @@ public class VertexIndexBuilder
 		if ( _oxels && 0 < _oxels.length ) {
 			// this causes a major bottleneck if done each frame.
 			// AND it doesnt work correctly
-			_s_compareVec = VoxelModel.controlledModel.modelToWorld( VoxelModel.controlledModel.camera.current.position );
+			_s_compareVec = VoxelModel.controlledModel.modelToWorld( VoxelModel.controlledModel.cameraContainer.current.position );
 			//Log.out( "VertexIndexBuilder.sort - VoxelModel.controlledModel.modelToWorld: " + VoxelModel.controlledModel.modelToWorld( new Vector3D( 8, 8, 8) ) )
 			//Log.out( "VertexIndexBuilder.sort - camera.center: " + VoxelModel.controlledModel.camera.center )
 			//Log.out( "VertexIndexBuilder.sort - _s_compareVec: " + _s_compareVec );
