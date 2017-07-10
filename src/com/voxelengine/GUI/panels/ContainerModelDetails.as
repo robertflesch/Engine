@@ -194,7 +194,7 @@ public class ContainerModelDetails extends PanelBase
 		}
 
 		_listScripts.populateScripts( $vm );
-		//recalc( width, height );
+		height = height_calculated;
 	}
 
 	public function scriptPanelRemove():void {
