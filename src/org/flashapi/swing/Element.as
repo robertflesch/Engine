@@ -213,11 +213,13 @@ package org.flashapi.swing {
 		 * 	@private
 		 */
 		spas_internal static function removeLayoutListener(value:*):void {
-			if (value is IUIObject) value.target.eventCollector.removeEvent(value, UIOEvent.METRICS_CHANGED, addToLayoutManagerQueue);
+			if (value is IUIObject && value.target )
+				value.target.eventCollector.removeEvent(value, UIOEvent.METRICS_CHANGED, addToLayoutManagerQueue);
 			else {
 				if (!hasResizableProperty(value)) return;
 				var obj:Object = spas_internal::elementStack[value];
-				obj.target.eventCollector.removeEvent(value, Event.CHANGE, Element.spas_internal::proxyLayoutListener);
+				if ( obj )
+					obj.target.eventCollector.removeEvent(value, Event.CHANGE, Element.spas_internal::proxyLayoutListener);
 				spas_internal::elementStack[value] = null;
 				delete spas_internal::elementStack[value];
 			}
