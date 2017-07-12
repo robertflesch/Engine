@@ -30,7 +30,7 @@ package com.voxelengine.worldmodel.tasks.tests
 		}
 		
 		override public function start():void {
-            super.start() // AbstractTask will send event
+            super.start(); // AbstractTask will send event
 			
 			var timer:int = getTimer();
 			
@@ -63,7 +63,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			vm.write( gc, TypeInfo.STONE );
 			
 			trace( "TestGrain0inCorner - took: "  + (getTimer() - timer) );					
-            super.complete() // AbstractTask will send event
+            super.complete(); // AbstractTask will send event
 		}
 		
 		override public function cancel():void {

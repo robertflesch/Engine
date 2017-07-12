@@ -32,7 +32,7 @@ import com.voxelengine.worldmodel.models.ModelMetadata;
 
 public class BoxTrashCan extends VVBox
 {
-	private var _count:Label
+	private var _count:Label;
 	private var _objectInfo:ObjectInfo;
 	public function get objectInfo():ObjectInfo { return _objectInfo; }
 	

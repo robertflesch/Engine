@@ -23,14 +23,14 @@ import com.voxelengine.GUI.components.*;
 
 public class PanelAnimationSound extends ExpandableBox
 {
-	private var _ani:Animation
-	private var _sound:AnimationSound
+	private var _ani:Animation;
+	private var _sound:AnimationSound;
 	public function PanelAnimationSound( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {
-		_ani = $ebco.rootObject
-		_ani.animationSound = $ebco.item
+		_ani = $ebco.rootObject;
+		_ani.animationSound = $ebco.item;
 		
 
-		$ebco.itemBox.showReset = true
+		$ebco.itemBox.showReset = true;
 		super( $parent, $ebco );
 //		if ( null == $ebco.item ) {
 //			throw new Error( "REFACTOR");
@@ -42,7 +42,7 @@ public class PanelAnimationSound extends ExpandableBox
 		//_ebco.itemBox.showNew = false;
 		_ebco.itemBox.showReset = true;
 		if ( _ani && _ani.animationSound )
-			return " min: " + _ani.animationSound.soundRangeMin + " max: " + _ani.animationSound.soundRangeMax + "  " + _ani.animationSound.guid
+			return " min: " + _ani.animationSound.soundRangeMin + " max: " + _ani.animationSound.soundRangeMax + "  " + _ani.animationSound.guid;
 		else
 			return "New Animation Transform";
 	}
@@ -70,7 +70,7 @@ public class PanelAnimationSound extends ExpandableBox
 						setChanged();
 					}
 					, _ani.animationSound.guid
-					, width - 20))
+					, width - 20));
 
 			_itemBox.addElement(new ComponentLabelInput("RangeMax"
 					, function ($e:TextEvent):void {
@@ -78,7 +78,7 @@ public class PanelAnimationSound extends ExpandableBox
 						setChanged();
 					}
 					, String(_ani.animationSound.soundRangeMax)
-					, width - 20))
+					, width - 20));
 
 			_itemBox.addElement(new ComponentLabelInput("RangeMin"
 					, function ($e:TextEvent):void {

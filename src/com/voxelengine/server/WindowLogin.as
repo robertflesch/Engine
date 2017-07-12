@@ -48,7 +48,7 @@ import org.flashapi.swing.list.ListItem;
 		private var _errorText:Label;
 		private var _userInfo:SharedObject;
 		private var _savePW:CheckBox;
-		private var _loginButton:Button
+		private var _loginButton:Button;
 
 		private var _topImage:Bitmap;
 		[Embed(source='../../../../embed/textures/loginImage.png')]
@@ -158,7 +158,7 @@ import org.flashapi.swing.list.ListItem;
 			buttonPanel.addElement( registerButton );
 			
 			var lostPasswordButton:Button = new Button( "Lost Password", buttonWidth, buttonHeight - 15 );
-			lostPasswordButton.padding = 0
+			lostPasswordButton.padding = 0;
 			lostPasswordButton.fontSize = 9;
 			lostPasswordButton.shadow = true;
 			$evtColl.addEvent( lostPasswordButton, UIMouseEvent.CLICK, lostPasswordHandler );
@@ -189,7 +189,7 @@ import org.flashapi.swing.list.ListItem;
 		}
 
 		private function changeServer( $le:ListEvent ):void {
-			var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex )
+			var li:ListItem = $le.target.getItemAt( $le.target.selectedIndex );
 			ServerConfig.configSetCurrent( li.data );
 		}
 		private function closeFunction():void {
@@ -288,7 +288,7 @@ import org.flashapi.swing.list.ListItem;
 		}
 		
 		private function onEmailFailure( $e:LoginEvent ):void {
-			removeLoginEventHandlers()
+			removeLoginEventHandlers();
 			LoadingImageEvent.create( LoadingImageEvent.ANNIHILATE );
 			Log.out("WindowLogin.onEmailFailure" + $e.guid );
 //			_emailInput.glow = true;

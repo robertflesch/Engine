@@ -31,7 +31,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		override public function start():void
 		{
-			super.start() // AbstractTask will send event
+			super.start(); // AbstractTask will send event
 
 			try
 			{
@@ -51,7 +51,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				Log.out( "DynamicCompletedModel.start - exception was thrown for model guid: " + _modelGuid, Log.ERROR );
 			}
 			
-			super.complete() // This MUST be called for tasks to continue
+			super.complete(); // This MUST be called for tasks to continue
 		}
 		
 		override public function cancel():void {

@@ -35,7 +35,7 @@ public class LightTask extends AbstractTask
 
     public function LightTask( $instanceGuid:String, $gc:GrainCursor, $lightID:uint, $taskType:String = TASK_TYPE, $taskPriority:int = TASK_PRIORITY ):void {
 
-        _guid = $instanceGuid
+        _guid = $instanceGuid;
         // the grain id
         _gc = GrainCursorPool.poolGet( $gc.bound );
         _gc.copyFrom( $gc );

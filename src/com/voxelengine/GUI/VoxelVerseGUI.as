@@ -369,7 +369,7 @@ public class VoxelVerseGUI extends EventDispatcher
 			}
 
 			if ( Keyboard.N == e.keyCode && false == Globals.g_textInput )
-				WindowRegionModels.toggle()
+				WindowRegionModels.toggle();
 				//new WindowVideoTest(); Wait for hummingbird
 
 			//if ( Keyboard.O == e.keyCode )

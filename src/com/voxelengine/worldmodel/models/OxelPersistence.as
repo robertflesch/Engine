@@ -315,7 +315,7 @@ public class OxelPersistence extends PersistenceObject
 		// first level of detail is level 1 - min grain 4? 5? - distance unknown
 		// ... continue until max - 2?
 
-		LevelOfDetailEvent.addListener( LevelOfDetailEvent.MODEL_CLONE_COMPLETE, lodCloneCompleteEvent )
+		LevelOfDetailEvent.addListener( LevelOfDetailEvent.MODEL_CLONE_COMPLETE, lodCloneCompleteEvent );
 		new OxelCloner( $vm.modelInfo.oxelPersistence );
 	}
 
@@ -326,7 +326,7 @@ public class OxelPersistence extends PersistenceObject
 		var size:uint = oxel.findSmallest();
 		Log.out( "OxelPersistence.lodCloneCompleteEvent smallest on new oxel: " + size );
 		if ( _oxels[0] && _oxels[0].gc.grain > 4 && size < _oxels[0].gc.grain - 2) {
-			LevelOfDetailEvent.addListener( LevelOfDetailEvent.MODEL_CLONE_COMPLETE, lodCloneCompleteEvent )
+			LevelOfDetailEvent.addListener( LevelOfDetailEvent.MODEL_CLONE_COMPLETE, lodCloneCompleteEvent );
 			new OxelCloner( this );
 		}
 	}
@@ -404,7 +404,7 @@ public class OxelPersistence extends PersistenceObject
 		// This reads the format info and advances position on byteArray
 		function readFormat($ba:ByteArray):String {
 			var format:String;
-			var byteRead:int = 0;
+			var byteRead:int;
 			byteRead = $ba.readByte();
 			format = String.fromCharCode(byteRead);
 			byteRead = $ba.readByte();
@@ -417,7 +417,7 @@ public class OxelPersistence extends PersistenceObject
 		// This reads the version info and advances position on byteArray
 		function readVersion($ba:ByteArray):int {
 			var version:String;
-			var byteRead:int = 0;
+			var byteRead:int;
 			byteRead = $ba.readByte();
 			version = String.fromCharCode(byteRead);
 			byteRead = $ba.readByte();

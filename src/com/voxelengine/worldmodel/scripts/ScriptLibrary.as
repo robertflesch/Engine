@@ -57,22 +57,38 @@ public class ScriptLibrary
 
 	public static function getAsset ( assetLinkageID : String ) : Class {
 		// placeholder class declarations
-		ControlObjectScript;
-		AutoControlObjectScript;
-		ControlBeastScript;
-		DefaultScript;
-		FireProjectileScript;
-		BombScript;
-		AutoFireProjectileScript;
-		ExplosionScript;
-		AcidScript;
-		IceScript;
-		FireScript;
-		DragonFireScript;
-		RotateAroundYScript;
-		RotateScript;
-		BobbleScript;
-		ResetStartingPosition;
+		//noinspection BadExpressionStatementJS
+        ControlObjectScript;
+		//noinspection BadExpressionStatementJS
+        AutoControlObjectScript;
+		//noinspection BadExpressionStatementJS
+        ControlBeastScript;
+		//noinspection BadExpressionStatementJS
+        DefaultScript;
+		//noinspection BadExpressionStatementJS
+        FireProjectileScript;
+		//noinspection BadExpressionStatementJS
+        BombScript;
+		//noinspection BadExpressionStatementJS
+        AutoFireProjectileScript;
+		//noinspection BadExpressionStatementJS
+        ExplosionScript;
+		//noinspection BadExpressionStatementJS
+        AcidScript;
+		//noinspection BadExpressionStatementJS
+        IceScript;
+		//noinspection BadExpressionStatementJS
+        FireScript;
+		//noinspection BadExpressionStatementJS
+        DragonFireScript;
+		//noinspection BadExpressionStatementJS
+        RotateAroundYScript;
+		//noinspection BadExpressionStatementJS
+        RotateScript;
+		//noinspection BadExpressionStatementJS
+        BobbleScript;
+		//noinspection BadExpressionStatementJS
+        ResetStartingPosition;
 
 
 		var asset:Class;

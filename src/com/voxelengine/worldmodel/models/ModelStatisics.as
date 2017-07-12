@@ -33,11 +33,11 @@ import flash.utils.getTimer;
 		private var _solid_max:int = 0;
 		private var _solid_min:int = 31;
 
-		public function get largest():int { return _solid_max };
-		public function get smallest():int { return _solid_min };
-		public function get range():int { return _solid_max - _solid_min };
-		public function get count():int { return _count };
-		public function get countInMeters():int { return _count/GRAINS_PER_SQUARE_METER };
+		public function get largest():int { return _solid_max; }
+		public function get smallest():int { return _solid_min; }
+		public function get range():int { return _solid_max - _solid_min; }
+		public function get count():int { return _count; }
+		public function get countInMeters():int { return _count/GRAINS_PER_SQUARE_METER; }
 
 		private function initialize():void {
 

@@ -16,7 +16,7 @@ package com.voxelengine.utils
         private var _dir:int;
         //private World _world;
 
-		private static var enum_val:int = -1
+		private static var enum_val:int = -1;
 		public static const INVALID:int = enum_val++; 	// -1
 		public static const POSX:int = enum_val++; 	// 0
 		public static const POSY:int = enum_val++; 	// 1
@@ -25,7 +25,7 @@ package com.voxelengine.utils
 		public static const NEGY:int = enum_val++; 	// 1
 		public static const NEGZ:int = enum_val++;	// 2
 		
-		private static var enum_val2:int = 0
+		private static var enum_val2:int = 0;
 		public static const COMPX:int = enum_val2++; 	// 0
 		public static const COMPY:int = enum_val2++; 	// 1
 		public static const COMPZ:int = enum_val2++;	// 2

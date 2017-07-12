@@ -21,10 +21,10 @@ public class Network
 	public static const PUBLIC:String = "public";
 	
 	static private var _client:Client;	
-	static public function get client():Client { return _client; };
+	static public function get client():Client { return _client; }
 	
 	static private var _userId:String = LOCAL;
-	static public function get userId():String { return _userId; };
+	static public function get userId():String { return _userId; }
 	
 	// This was a test to see if I could make a client that didnt need user interaction.
 	// This will allow me to do things like post to Facebook things that users create.
@@ -43,7 +43,7 @@ public class Network
 		{
 			Log.out("Network.autoLogin.connectSuccess - connection to server established using AUTOLOGIN", Log.DEBUG );
 			_userId = $client.connectUserId;
-			_client = $client
+			_client = $client;
 			Globals.online = true;
 			
 			LoginEvent.dispatch( new LoginEvent( LoginEvent.LOGIN_SUCCESS, $startingRegionGuid ) );
@@ -77,7 +77,7 @@ public class Network
 		{
 			//Log.out("Network.login - connection to server established", Log.DEBUG );
 			_userId = $client.connectUserId;
-			_client = $client
+			_client = $client;
 			Globals.online = true;
 			LoginEvent.dispatch( new LoginEvent( LoginEvent.LOGIN_SUCCESS ) );
 		}

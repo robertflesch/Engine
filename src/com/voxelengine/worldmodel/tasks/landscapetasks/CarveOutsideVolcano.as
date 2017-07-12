@@ -31,7 +31,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		}
 		
 		override public function start():void {
-            super.start() // AbstractTask will send event
+            super.start(); // AbstractTask will send event
 			
 			/*
 			 * Note I dont know that this is using the layer info correct or uniformly
@@ -46,7 +46,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var masterMapSize:uint = Math.min( oxel.size_in_world_coordinates(), 1024 );
 			
 			//var octaves:int  = ( Math.random() * 144 ) % (Math.random() * 12);
-			var octaves:int;
+			var octaves:int = 0;
 			if ( 0 == octaves )
 				octaves = 6;
 			Log.out( "CarveOutsideVolcano - start - generating random number of octives Octaves: " + octaves );					
@@ -118,7 +118,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			oxel.write_height_map( _modelGuid, _layer.type, minHeightMapArray, maxHeightMapArray, minGrain, arrayOffset, ignoreSolid );
 			Log.out( "CarveOutsideVolcano - completed layer of type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer() - timer) ); // + " in queue for: " + (timer - _startTime));
 			
-            super.complete() // AbstractTask will send event
+            super.complete(); // AbstractTask will send event
 		}
 		
 		override public function cancel():void {

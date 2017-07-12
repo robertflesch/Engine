@@ -31,12 +31,9 @@ public class CanvasReleaseMenu extends VVCanvas
 	public function fps():String { return _fpsLabel.text; }
 	private var _locLabel:Label = new Label("x: 0  y: 0  z: 0");
 	private var _rotLabel:Label = new Label("x: 0  y: 0  z: 0");
-
-	private var _startTime:int = 0;
 	protected var _prefix:String = "";
 
-	public function CanvasReleaseMenu():void
-	{
+	public function CanvasReleaseMenu():void {
 		super();
 		_s_currentInstance = this;
 		autoSize = false;
@@ -60,7 +57,7 @@ public class CanvasReleaseMenu extends VVCanvas
 		fs.fontColor = 0x0000ff;
 		addElement( fs );
 
-		_startTime = getTimer();
+		var _startTime:int = getTimer();
 		_prefix = "FPS: ";
 		_fpsLabel.fontSize = 14;
 		_fpsLabel.fontColor = 0xff0000;
@@ -80,7 +77,7 @@ public class CanvasReleaseMenu extends VVCanvas
 
 		display( 0, 0 );
 
-		AppEvent.addListener( Event.ENTER_FRAME, onEnterFrame )
+		AppEvent.addListener( Event.ENTER_FRAME, onEnterFrame );
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 
 		onResize(null);

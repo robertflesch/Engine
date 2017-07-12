@@ -79,7 +79,7 @@ public class PanelModelScripts extends PanelBase
             if ( _selectedScript )
             {
                 var scripts:Array = (_parent as ContainerModelDetails).selectedModel.instanceInfo.scripts;
-                for ( var i:int; i < scripts.length; i++ ){
+                for ( var i:int = 0; i < scripts.length; i++ ){
                     if ( _selectedScript == scripts[i] ) {
                         scripts[i].dispose();
                         scripts[i] = null;

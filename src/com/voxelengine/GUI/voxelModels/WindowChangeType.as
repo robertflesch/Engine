@@ -47,7 +47,7 @@ public class WindowChangeType extends VVPopup
 		_cbTo = new ComboBox( "New Type" );
 		panel.addElement( _cbTo );
 		
-		var item:TypeInfo
+		var item:TypeInfo;
 		for ( var i:int = TypeInfo.MIN_TYPE_INFO; i < TypeInfo.MAX_TYPE_INFO; i++ )
 		{
 			item = TypeInfo.typeInfo[i];
@@ -96,7 +96,7 @@ public class WindowChangeType extends VVPopup
 			if ( _vm.modelInfo.oxelPersistence && _vm.modelInfo.oxelPersistence.oxelCount ) {
 				var oxel:Oxel = _vm.modelInfo.oxelPersistence.oxel;
 				oxel.changeTypeFromTo( fromType, toType );
-				_vm.modelInfo.oxelPersistence.changed = true
+				_vm.modelInfo.oxelPersistence.changed = true;
 				_vm.modelInfo.oxelPersistence.save()
 			}
 			else

@@ -69,7 +69,7 @@ public class ObjectAction extends ObjectInfo
 		_name = values[2];
 		_callBackName = values[3];
 		_ammoName = values[4];
-		_instanceGuid = values[5]
+		_instanceGuid = values[5];
 		//_callBack = ;
 		return this;
 	}

@@ -30,7 +30,7 @@ public class ComponentVector3D extends Box
 		width = 300;
 		height = 30;
 		padding = 5;
-		paddingTop = 8
+		paddingTop = 8;
 		title = $title;
 		borderStyle = BorderStyle.NONE;
 		backgroundColor = VVUI.DEFAULT_COLOR;

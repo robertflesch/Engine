@@ -29,18 +29,19 @@ public class PanelAnimationAttachment extends ExpandableBox
 	static private const TITLE:String = "";
 	static private const NEW_ITEM_TEXT:String = "Animation Transform";
 	public function PanelAnimationAttachment( $ani:Animation, $aniAttach:VoxelModel, $widthParam = 250 ) {
-		super( null, ebco );
-		_ani = $ani;
-		if ( null == $aniAttach )
-			$aniAttach = new VoxelModel( new InstanceInfo() );
-		_aniAttach = $aniAttach;
-		
 		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
 //		ebco.showNew = true;
 		ebco.paddingTop = 2;
 		ebco.width = $widthParam;
 		//ebco.backgroundColor = 0x0000ff;
 //		ebco.showNew = false;
+
+		super( null, ebco );
+		_ani = $ani;
+		if ( null == $aniAttach )
+			$aniAttach = new VoxelModel( new InstanceInfo() );
+		_aniAttach = $aniAttach;
+		
 	}
 	
 	//override public function deleteElementCheck( $me:UIMouseEvent ):void {

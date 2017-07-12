@@ -19,13 +19,13 @@ public class PanelModelTransformContainer extends ExpandableBox {
 		super.expand();
 		
 		_itemBox.height = 0;
-		for ( var i:int; i < _ebco.items.length; i++ ) {
-			var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
-			ebco.rootObject = _ebco.rootObject
-			ebco.item = _ebco.items[i]
-			ebco.items = _ebco.items
-			ebco.width = _itemBox.width
-			ebco.title = ""
+		for ( var i:int = 0; i < _ebco.items.length; i++ ) {
+			var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
+			ebco.rootObject = _ebco.rootObject;
+			ebco.item = _ebco.items[i];
+			ebco.items = _ebco.items;
+			ebco.width = _itemBox.width;
+			ebco.title = "";
 			ebco.itemBox.showDelete = true;
 			var item:* = new _ebco.itemDisplayObject( this, ebco );
 			_itemBox.addElement( item );
@@ -37,18 +37,18 @@ public class PanelModelTransformContainer extends ExpandableBox {
 	
 	// This handles the new model transform
 	override protected function newItemHandler( $me:UIMouseEvent ):void 		{ 
-		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
-		ebco.rootObject = _ebco.rootObject
-		ebco.item = null
-		ebco.items = _ebco.items
-		ebco.width = _itemBox.width
-		ebco.title = ""
+		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
+		ebco.rootObject = _ebco.rootObject;
+		ebco.item = null;
+		ebco.items = _ebco.items;
+		ebco.width = _itemBox.width;
+		ebco.title = "";
 		ebco.itemBox.showDelete = true;
 		var item:* = new _ebco.itemDisplayObject( this, ebco );
 		_itemBox.addElement( item );
-		changeMode() // collapse container
-		changeMode() // reexpand so that new item is at the bottom
-		item.changeMode() // this should expand the newly added item, but it doesnt
+		changeMode(); // collapse container
+		changeMode(); // reexpand so that new item is at the bottom
+		item.changeMode(); // this should expand the newly added item, but it doesnt
 	}
 }
 }

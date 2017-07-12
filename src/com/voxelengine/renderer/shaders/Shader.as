@@ -251,7 +251,7 @@ package com.voxelengine.renderer.shaders
 				_constants[i++] = 0;
 				_constants[i++] = 0;
 				_constants[i++] = 0;
-				_constants[i++] = 0;
+				_constants[i] = 0;
 		}
 
 		protected function setFragmentData( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $isChild:Boolean  ): void {
@@ -280,7 +280,7 @@ package com.voxelengine.renderer.shaders
 				_constants[i++] = light.color.x; //          |
 				_constants[i++] = light.color.y; //          |
 				_constants[i++] = light.color.z; //          | FC2
-				_constants[i++] = 0;       //                |_
+				_constants[i] = 0;       //                |_
 			}
 			else
 				constantsReset();

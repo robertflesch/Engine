@@ -39,7 +39,7 @@ package com.voxelengine.worldmodel.models.types
 	public class Engine extends VoxelModel 
 	{
 		// Todo: This needs to be global?
-		static private const SHIP_VELOCITY:String 	= "velocity"
+		static private const SHIP_VELOCITY:String 	= "velocity";
 		
 		
 		// Todo: From metadata (someday)

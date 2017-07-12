@@ -7,9 +7,11 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-	import com.voxelengine.worldmodel.models.types.Avatar;
+import com.voxelengine.worldmodel.models.types.Avatar;
+import com.voxelengine.worldmodel.models.types.Avatar;
 	import com.voxelengine.worldmodel.models.types.EditCursor;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.worldmodel.TypeInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
@@ -19,6 +21,8 @@ import flash.geom.Matrix3D;
 	import com.voxelengine.Log;
 	import com.voxelengine.Globals;
 	import com.voxelengine.worldmodel.oxel.GrainIntersection;
+
+import flash.geom.Vector3D;
 
 import org.as3commons.collections.Set;
 
@@ -144,8 +148,31 @@ public class ModelCacheUtils
 			return deDuppedIntersections;
 		}
 
+	static public	function worldSpaceStartAndEndPointCalculate( $direction:int = FRONT, $editRange:int = EDIT_RANGE ):void {
+		var pm:Avatar = Player.pm;
+		if ( pm ) {
+            var msCamPos:Vector3D = pm.cameraContainer.current.position;
+            _worldSpaceStartPoint = pm.modelToWorld( msCamPos );
+            //trace( "ModelCacheUtils.calculate - Start: " + _worldSpaceStartPoint + "  y rot: " + pm.instanceInfo.rotationGet.y );
 
-		static public	function worldSpaceStartAndEndPointCalculate( $direction:int = FRONT, $editRange:int = EDIT_RANGE ):void {
+            // now create a vector in direction we are looking
+            var cmRotation:Vector3D = CameraLocation.rotation;
+            _cameraMatrix.identity();
+            _cameraMatrix.prependRotation( -cmRotation.x, Vector3D.X_AXIS );
+			//_cameraMatrix.prependRotation( -cmRotation.y, Vector3D.Y_AXIS );
+            _cameraMatrix.prependRotation( 0, Vector3D.Y_AXIS );
+            _cameraMatrix.prependRotation( 0, Vector3D.Z_AXIS );
+            var endPoint:Vector3D = _viewVectors[$direction].clone();
+            endPoint.scaleBy( $editRange );
+            var viewVector:Vector3D = _cameraMatrix.deltaTransformVector( endPoint );
+
+            _worldSpaceEndPoint = _worldSpaceStartPoint.add( viewVector );
+            trace( "MCU - cam rot : " + CameraLocation.rotation + "  viewVector: " + viewVector );
+            trace( "MCU - Start: " + _worldSpaceStartPoint + "  end: " + _worldSpaceEndPoint );
+		}
+	}
+
+	static public	function worldSpaceStartAndEndPointCalculateOld( $direction:int = FRONT, $editRange:int = EDIT_RANGE ):void {
 			//////////////////////////////////////
 			// This works for camera at 0,0,0 - Seems to be working for all now
 			//////////////////////////////////////

@@ -22,7 +22,7 @@ public class RainbowLight extends ShaderLight {
 	{
 		var frequency:Number = 2.4;
 		color.x = Math.max( 0, Math.sin( frequency + 2 + _phase ) );
-		color.y = Math.max( 0, Math.sin( frequency + 0 + _phase ) );
+		color.y = Math.max( 0, Math.sin( frequency + _phase ) );
 		color.z = Math.max( 0, Math.sin( frequency + 4 + _phase ) );
 		 _phase += 0.03;
 	}

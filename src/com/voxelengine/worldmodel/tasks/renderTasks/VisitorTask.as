@@ -41,7 +41,7 @@ public class VisitorTask extends RenderingTask
 		if ( pt < 1 )
 			Globals.taskController.next();
 		//else	
-		Log.out( "VisitorTask.func: " + _taskName + " chunkSize: " + ( (_chunk && _chunk.oxel) ? _chunk.oxel.childCount : 0) +  "  took: " + pt, Log.DEBUG )
+		Log.out( "VisitorTask.func: " + _taskName + " chunkSize: " + ( (_chunk && _chunk.oxel) ? _chunk.oxel.childCount : 0) +  "  took: " + pt, Log.DEBUG );
 		
 		super.complete()
 	}

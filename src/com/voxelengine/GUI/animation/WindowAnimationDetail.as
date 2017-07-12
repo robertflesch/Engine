@@ -22,41 +22,41 @@ import com.voxelengine.worldmodel.animation.Animation
 
 public class WindowAnimationDetail extends VVPopup
 {
-	private const _TOTAL_BUTTON_PANEL_HEIGHT:int = 30
-	private var _modelKey:String
-	private static const WIDTH:int = 400
-	private var _ani:Animation
-	private var _infoBackup:Object
-	private var _create:Boolean
+	private const _TOTAL_BUTTON_PANEL_HEIGHT:int = 30;
+	private var _modelKey:String;
+	private static const WIDTH:int = 400;
+	private var _ani:Animation;
+	private var _infoBackup:Object;
+	private var _create:Boolean;
 	
 	public function WindowAnimationDetail( $guid:String, $ani:Animation )
 	{
-		var title:String
-		if ( $ani ) 	title = LanguageManager.localizedStringGet( "Edit_Animation" )
-		else			title = LanguageManager.localizedStringGet( "New_Animation" )
-		super( title )	
-		autoSize = false
-		autoHeight = true
-		width = WIDTH
+		var title:String;
+		if ( $ani ) 	title = LanguageManager.localizedStringGet( "Edit_Animation" );
+		else			title = LanguageManager.localizedStringGet( "New_Animation" );
+		super( title );
+		autoSize = false;
+		autoHeight = true;
+		width = WIDTH;
 	
 		if ( $ani ) {
 			_ani = $ani
 		}
 		else {
-			_create = true
+			_create = true;
 			throw new Error( "WindowAnimationDetail - What to do here?");
 //			_ani = Animation.defaultObject( $guid )
 		}
-		_infoBackup = _ani.createBackCopy()
-		_ani.doNotPersist = true // true while editing
+		_infoBackup = _ani.createBackCopy();
+		_ani.doNotPersist = true; // true while editing
 		
-		layout.orientation = LayoutOrientation.VERTICAL
-		padding = 5
-		addMetadataPanel()
-		addAnimationsPanel()
-		addSoundPanel()
+		layout.orientation = LayoutOrientation.VERTICAL;
+		padding = 5;
+		addMetadataPanel();
+		addAnimationsPanel();
+		addSoundPanel();
 		//addAttachmentPanel()
-		addButtonPanel()
+		addButtonPanel();
 		
 		display()
 		defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION
@@ -66,22 +66,22 @@ public class WindowAnimationDetail extends VVPopup
 	private function closeFunction():void {
 		// ask about saving changes?
 		if ( _ani.changed ) 
-			queryToSaveChanges()
+			queryToSaveChanges();
 			
 		remove()
 		
 		function queryToSaveChanges():void {
 			var alert:Alert = new Alert( "You have unsaved changes, want do you want to do?", 400 );
-			alert.setLabels( "Save", "Abandon" )
-			alert.alertMode = AlertMode.CHOICE
+			alert.setLabels( "Save", "Abandon" );
+			alert.alertMode = AlertMode.CHOICE;
 			$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
-			alert.display()
+			alert.display();
 			
 			function alertAction( $ae:AlertEvent ):void {
 				if ( AlertEvent.ACTION == $ae.action ) {
 					saveHandler( null )
 				}
-				else ( AlertEvent.CHOICE == $ae.action )
+				else if ( AlertEvent.CHOICE == $ae.action )
 					revertHandler( null )
 			}
 		}
@@ -112,9 +112,9 @@ public class WindowAnimationDetail extends VVPopup
 	}
 	
 	private function revertHandler(event:UIMouseEvent):void  {
-		_ani.restoreFromBackup( _infoBackup )
-		_ani.doNotPersist = false
-		_ani.changed = false
+		_ani.restoreFromBackup( _infoBackup );
+		_ani.doNotPersist = false;
+		_ani.changed = false;
 		remove()
 	}
 	
@@ -127,22 +127,22 @@ public class WindowAnimationDetail extends VVPopup
 	//}
 
 	private  function saveHandler(event:UIMouseEvent):void  {
-		_ani.doNotPersist = false
-		_ani.save()
+		_ani.doNotPersist = false;
+		_ani.save();
 		remove()
 	}
 	
 	private function addMetadataPanel():void {
-		addElement( new ComponentSpacer( width ) )
+		addElement( new ComponentSpacer( width ) );
 		addElement( new ComponentTextInput( "Name"
 										  , function ($e:TextEvent):void { _ani.name = $e.target.text; setChanged(); }
 										  , _ani.name ? _ani.name : "No Name"
-										  , width ) )
+										  , width ) );
 		addElement( new ComponentTextArea( "Desc"
 										 , function ($e:TextEvent):void { _ani.description = $e.target.text; setChanged(); }
 										 , _ani.description ? _ani.description : "No Description"
-										 , width ) )
-		addElement( new ComponentLabel( "AnimationClass", _ani.animationClass, width ) )
+										 , width ) );
+		addElement( new ComponentLabel( "AnimationClass", _ani.animationClass, width ) );
 		addElement( new ComponentLabel( "Type", _ani.type, width ) )
 		
 	}
@@ -152,7 +152,7 @@ public class WindowAnimationDetail extends VVPopup
 	}
 	
 	private function addAnimationsPanel():void {
-		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
+		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
 		ebco.title = " animated elements ";
 		ebco.width = WIDTH;
 		ebco.rootObject = _ani;
@@ -164,13 +164,13 @@ public class WindowAnimationDetail extends VVPopup
 	}
 	
 	private function addSoundPanel():void {
-		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject()
-		ebco.title = " animationSound "
-		ebco.width = WIDTH
-		ebco.rootObject = _ani
-		ebco.item = _ani.animationSound
-		ebco.itemBox.newItemText = "Add a Sound"
-		ebco.paddingTop = 7
+		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
+		ebco.title = " animationSound ";
+		ebco.width = WIDTH;
+		ebco.rootObject = _ani;
+		ebco.item = _ani.animationSound;
+		ebco.itemBox.newItemText = "Add a Sound";
+		ebco.paddingTop = 7;
         ebco.itemBox.showNew = true;
         ebco.itemBox.title = "Add a Sound(1)";
 		addElement( new PanelAnimationSound( null, ebco ) )

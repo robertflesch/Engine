@@ -49,7 +49,7 @@ public class ComponentVector3DSideLabel extends Box
 		lbl.width = int(width/5);
 		lbl.height = 20;
 		lbl.textAlign = TextAlign.LEFT;
-		addElement( lbl )
+		addElement( lbl );
 		
 		addSpinLabel( $s1Label
 					, function($e:SpinButtonEvent):void { $vect.setTo( $changeFunction($e), $vect.y, $vect.z ); $markDirty() }

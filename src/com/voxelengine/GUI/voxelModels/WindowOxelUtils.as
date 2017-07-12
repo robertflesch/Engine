@@ -159,12 +159,12 @@ public class WindowOxelUtils extends VVPopup
 	}
 
 	private function mergeSameHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.oxelPersistence.oxel.mergeAndRebuild()
+		_vm.modelInfo.oxelPersistence.oxel.mergeAndRebuild();
 		_vm.modelInfo.oxelPersistence.changed = true
 	}
 	
 	private function mergeAirHandler(event:UIMouseEvent):void {
-		_vm.modelInfo.oxelPersistence.oxel.mergeAIRAndRebuild()
+		_vm.modelInfo.oxelPersistence.oxel.mergeAIRAndRebuild();
 		_vm.modelInfo.oxelPersistence.changed = true
 	}
 	

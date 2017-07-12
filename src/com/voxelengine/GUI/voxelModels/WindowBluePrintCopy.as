@@ -25,21 +25,21 @@ import com.voxelengine.GUI.LanguageManager
 
 	public class WindowBluePrintCopy extends VVPopup
 	{
-		static private var _instance:WindowBluePrintCopy
+		static private var _instance:WindowBluePrintCopy;
 		static public function exists():Boolean { return null == _instance ? false : true }
 		
-		private var _vm:VoxelModel
+		private var _vm:VoxelModel;
 		public function WindowBluePrintCopy( $vm:VoxelModel ) {
-			_instance = this
-			_vm = $vm
+			_instance = this;
+			_vm = $vm;
 	
-			super( "This is a Blue Print Model" ) //( "Would you like to create a copy of this blue print?", 350 );
+			super( "This is a Blue Print Model" ); //( "Would you like to create a copy of this blue print?", 350 );
 			layout.orientation = LayoutOrientation.VERTICAL;
-			autoSize = false
-			padding = 5
-			width = 250
-			height = 100
-			addButtonPanel()
+			autoSize = false;
+			padding = 5;
+			width = 250;
+			height = 100;
+			addButtonPanel();
 			display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 			
 			
@@ -56,18 +56,18 @@ import com.voxelengine.GUI.LanguageManager
 			addElement( new Label( "You have no copies left to make of this object, and it is not editable", width - padding * 2 ) )
 		}
 		else {
-			var saveAnimation:Button = new Button( LanguageManager.localizedStringGet( "Create copy of Blue Print" ))
-			saveAnimation.addEventListener(UIMouseEvent.CLICK, saveHandler )
-			saveAnimation.width = width - padding * 2
-			saveAnimation.height = height/2 - padding
+			var saveAnimation:Button = new Button( LanguageManager.localizedStringGet( "Create copy of Blue Print" ));
+			saveAnimation.addEventListener(UIMouseEvent.CLICK, saveHandler );
+			saveAnimation.width = width - padding * 2;
+			saveAnimation.height = height/2 - padding;
 			addElement( saveAnimation )
 		}
 		
-		var revert:Button = new Button( LanguageManager.localizedStringGet( "Dont create copy, do nothing" ))
-		revert.autoSize = false
-		revert.addEventListener(UIMouseEvent.CLICK, revertHandler )
-		revert.width = width - padding * 2
-		revert.height = height/2 - padding
+		var revert:Button = new Button( LanguageManager.localizedStringGet( "Dont create copy, do nothing" ));
+		revert.autoSize = false;
+		revert.addEventListener(UIMouseEvent.CLICK, revertHandler );
+		revert.width = width - padding * 2;
+		revert.height = height/2 - padding;
 		addElement( revert )
 	}
 
@@ -87,7 +87,7 @@ import com.voxelengine.GUI.LanguageManager
 
 	// Window events
 	private function onRemoved( event:UIOEvent ):void {
-		_instance = null
+		_instance = null;
 		Globals.g_app.stage.removeEventListener(Event.RESIZE, onResizeHeading );
 		removeEventListener(UIOEvent.REMOVED, onRemoved );
 	}

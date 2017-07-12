@@ -7,16 +7,11 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel
 {
-import com.voxelengine.Globals;
-import com.voxelengine.Log;
-/**
- * ...
- * @author Bob
- */
+
 public class Interactions 
 {
-	private var _interactions:Array = new Array();
-	private var _belongsTo:String
+	private var _interactions:Array = [];
+	private var _belongsTo:String;
 	private var _defaults:Array = [ "PICK", "SHOVEL", "AXE", "DFIRE", "DICE", "WATER", "AIR", "EARTH" ];
 	
 	public function Interactions( $belongsTo:String )
@@ -30,7 +25,7 @@ public class Interactions
 		{
 			for ( var name:String in io )
 			{
-				var ip:InteractionParams = new InteractionParams( name )
+				var ip:InteractionParams = new InteractionParams( name );
 				ip.fromJson( io[name] );
 				_interactions[name] = ip;
 			}
@@ -41,7 +36,7 @@ public class Interactions
 	{
 		for each ( var name:String in _defaults )
 		{
-			var ip:InteractionParams = new InteractionParams( name )
+			var ip:InteractionParams = new InteractionParams( name );
 			ip.setDefault();
 			_interactions[name] = ip;
 		}
@@ -49,14 +44,14 @@ public class Interactions
 	
 	public function IOGet( $name:String ):InteractionParams
 	{
-		$name = $name.toUpperCase()
+		$name = $name.toUpperCase();
 		for ( var name:String in _interactions )
 		{
 			if ( name == $name )
 				return _interactions[$name];
 		}
 		//Log.out( "Interactions.IOGet for " + $name + " no interaction defined" );
-		var ip:InteractionParams = new InteractionParams( name )
+		var ip:InteractionParams = new InteractionParams( name );
 		ip.setDefault();
 		return ip;
 	}

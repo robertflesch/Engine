@@ -134,8 +134,8 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 				}
 				catch (error:Error) {
 					
-					Log.out( "LightAdd.start - Exception Caught: " + error.getStackTrace() );
-					Log.out( "LightAdd.start - Exception Caught: " + error.message + " lo.gc: " + lo.gc.toString(), Log.ERROR );
+					Log.out( "LightAdd.start - Exception Caught: " + error.getStackTrace(), Log.ERROR );
+					//Log.out( "LightAdd.start - Exception Caught: " + error.message + " lo.gc: " + lo.gc.toString(), Log.ERROR );
 				}
 			}
 			else
@@ -289,7 +289,7 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 			
 			// I am getting the indexes for the imaginary children that are facing the real children
 			// and a list of the real children
-			var lobChild:Vector.<uint> = Oxel.childIDsForDirection( $face )
+			var lobChild:Vector.<uint> = Oxel.childIDsForDirection( $face );
 			var of:int = Oxel.face_get_opposite( $face );
 			var dchild:Vector.<Oxel> = $no.childrenForDirection( of );
 			//var lobTestChild:Vector.<uint> = Oxel.childIDsForDirection( of );
@@ -321,7 +321,7 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 						// Project the virtual brightness object on the real child of the same size
 						if ( noChild.lighting.influenceAdd( lightID, bt, $face, !TypeInfo.hasAlpha(noChild.type), noChild.gc.size() ) ) {
 							if ( TypeInfo.hasAlpha( noChild.type ) )
-								add( noChild )
+								add( noChild );
 							else
 								rebuildFace( noChild, $face );
 						}

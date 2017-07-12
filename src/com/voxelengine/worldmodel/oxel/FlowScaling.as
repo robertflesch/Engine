@@ -20,10 +20,10 @@ package com.voxelengine.worldmodel.oxel
  */
 public class FlowScaling
 {
-	private static var _s_flowScaling:FlowScaling = new FlowScaling() 
+	private static var _s_flowScaling:FlowScaling = new FlowScaling();
 	private const DEFAULT_TOTAL_SCALE:uint = 0xffffffff;
 	
-	private 		var _calculated:Boolean = false
+	private 		var _calculated:Boolean = false;
 	public function get calculated():Boolean { return _calculated; }
 	
 	// has scaling for this oxel be calcualted
@@ -46,19 +46,19 @@ public class FlowScaling
 
 	public function set PxPz( value:uint ):void { 
 		if ( 15 < value )
-			Log.out( "FlowScaling.PxPz PAST MAX: " + value, Log.WARN )
+			Log.out( "FlowScaling.PxPz PAST MAX: " + value, Log.WARN );
 		_data = ((_data & 0xfffffff0) | ( value )); }
 	public function set PxNz( value:uint ):void { 
 		if ( 15 < value )
-			Log.out( "FlowScaling.PxNz PAST MAX: " + value, Log.WARN )
+			Log.out( "FlowScaling.PxNz PAST MAX: " + value, Log.WARN );
 		_data = ((_data & 0xffffff0f) | (( value ) << 4) ); }
 	public function set NxNz( value:uint ):void { 
 		if ( 15 < value )
-			Log.out( "FlowScaling.NxNz PAST MAX: " + value, Log.WARN )
+			Log.out( "FlowScaling.NxNz PAST MAX: " + value, Log.WARN );
 		_data = ((_data & 0xfffff0ff) | (( value ) << 8) ); }
 	public function set NxPz( value:uint ):void { 
 		if ( 15 < value )
-			Log.out( "FlowScaling.NxPz PAST MAX: " + value, Log.WARN )
+			Log.out( "FlowScaling.NxPz PAST MAX: " + value, Log.WARN );
 		_data = ((_data & 0xffff0fff) | (( value ) << 12) ); }
 	
 	/*
@@ -115,7 +115,7 @@ public class FlowScaling
 			//trace( "FlowScaling.fromByteArray - \t\t data: " + _data.toString(16) );
 		}
 		else {
-			Log.out( "FlowSacaling.fromByteArray - The version of data is not handled", Log.WARN )
+			Log.out( "FlowSacaling.fromByteArray - The version of data is not handled", Log.WARN );
 			_data = $ba.readUnsignedInt();
 		}
 		return $ba;
@@ -135,7 +135,7 @@ public class FlowScaling
 		_calculated = false;
 		// first reset this oxels scaling
 		if ( has() ) {
-			_data = DEFAULT_TOTAL_SCALE
+			_data = DEFAULT_TOTAL_SCALE;
 			if ( $oxel )
 				$oxel.rebuild();
 				//VisitorFunctions.rebuild();
@@ -150,7 +150,7 @@ public class FlowScaling
 				continue;
 			if ( fromOxel.type == $oxel.type && null != fromOxel.flowInfo ) {
 				if ( $propgateMaxs )
-					fromOxel.flowInfo.inheritFlowMax( $oxel.flowInfo )
+					fromOxel.flowInfo.inheritFlowMax( $oxel.flowInfo );
 				fromOxel.flowInfo.flowScaling.recalculate( fromOxel )
 			}
 		}
@@ -184,9 +184,9 @@ public class FlowScaling
 		
 		// The origin of the flow should never scale.
 		if ( $oxel.flowInfo.isSource() )
-			return
+			return;
 		// set these to a minimum level, so that their influence for the other corners can be felt
-		setToZero()
+		setToZero();
 
 		for each ( var horizontalDir:int in Globals.horizontalDirections )
 			grabNeighborInfluences( $oxel, horizontalDir );
@@ -194,15 +194,15 @@ public class FlowScaling
 		//Log.out( "FlowScaling.calculate after grabNeighborInfluences: " + toString() );
 		// if these corners have not been influenced by another vert
 		// set them to scale
-		const fallRatePerMeter:uint = 2
-		const amountToFall:uint = (fallRatePerMeter * $oxel.gc.size() / Globals.UNITS_PER_METER)
+		const fallRatePerMeter:uint = 2;
+		const amountToFall:uint = (fallRatePerMeter * $oxel.gc.size() / Globals.UNITS_PER_METER);
 		if ( max() > amountToFall ) {
 			if ( CORNER_MIN == PxPz )
-				PxPz = max() - amountToFall
+				PxPz = max() - amountToFall;
 			if ( CORNER_MIN == PxNz )
-				PxNz = max() - amountToFall
+				PxNz = max() - amountToFall;
 			if ( CORNER_MIN == NxNz )
-				NxNz = max() - amountToFall
+				NxNz = max() - amountToFall;
 			if ( CORNER_MIN == NxPz )
 				NxPz = max() - amountToFall
 		}
@@ -215,19 +215,19 @@ public class FlowScaling
 		var fromOxel:Oxel = $oxel.neighbor( Oxel.face_get_opposite( $dir ) );
 		if ( OxelBad.INVALID_OXEL == fromOxel )
 			return;
-		var fromOxelScale:FlowScaling
+		var fromOxelScale:FlowScaling;
 		if ( TypeInfo.typeInfo[fromOxel.type].flowable && fromOxel.flowInfo && fromOxel.flowInfo.flowScaling && $oxel.flowInfo.flowScaling ) {
 			
 			// only accounts for one level of difference
 			if ( $oxel.gc.grain < fromOxel.gc.grain && fromOxel.flowInfo ) {
 				// calculate GC of opposite oxel on face
-				var gct:GrainCursor = GrainCursorPool.poolGet( $oxel.gc.bound )
-				gct.copyFrom( $oxel.gc )
-				gct.move( $dir )
-				var iDOpposite:uint = Oxel.childIdOpposite( Oxel.face_get_opposite( $dir ), $oxel.gc.childId()  )
+				var gct:GrainCursor = GrainCursorPool.poolGet( $oxel.gc.bound );
+				gct.copyFrom( $oxel.gc );
+				gct.move( $dir );
+				var iDOpposite:uint = Oxel.childIdOpposite( Oxel.face_get_opposite( $dir ), $oxel.gc.childId()  );
 				// this gets gets a copy of the virtual child in that position
-				childGetScale( iDOpposite, fromOxel.flowInfo.flowScaling, _s_flowScaling )			
-				GrainCursorPool.poolDispose( gct )
+				childGetScale( iDOpposite, fromOxel.flowInfo.flowScaling, _s_flowScaling );
+				GrainCursorPool.poolDispose( gct );
 				fromOxelScale = _s_flowScaling
 			}
 			else
@@ -272,8 +272,8 @@ public class FlowScaling
 			}
 			else if ( Globals.POSY == $dir )
 			{
-				reset()
-				fromOxel.quadsDeleteAll()
+				reset();
+				fromOxel.quadsDeleteAll();
 				fromRecalc = true;
 			}
 			//if ( fromRecalc )
@@ -331,11 +331,11 @@ public class FlowScaling
 		// remember that scaling is relative to the size of the oxel
 		// and that some of the oxel might become AIR if scaling is low.
 		
-		var childID:uint = $child.gc.childId()
+		var childID:uint = $child.gc.childId();
 		
-		childGetScale( childID, this, $child.flowInfo.flowScaling )
+		childGetScale( childID, this, $child.flowInfo.flowScaling );
 		if ( 0 == childFS.max() )
-			$child.type = TypeInfo.AIR
+			$child.type = TypeInfo.AIR;
 		
 		Log.out( "FlowScaling.childGetScaleAndType - childID: " + childID + "  childFS: " + childFS.toString(), Log.WARN )
 	}
@@ -346,74 +346,74 @@ public class FlowScaling
 		// and that some of the oxel might become AIR if scaling is low.
 		
 		if ( 0 == $childID ) { // b000
-			$childFS.NxNz = Math.min( 15, ($pfs.NxNz * 2 + 1) )
-			$childFS.PxNz = Math.min( 15, ($pfs.NxNz + $pfs.PxNz  + 1 ) )
-			$childFS.PxPz = Math.min( 15, ($pfs.NxNz + $pfs.PxPz + 1) )
+			$childFS.NxNz = Math.min( 15, ($pfs.NxNz * 2 + 1) );
+			$childFS.PxNz = Math.min( 15, ($pfs.NxNz + $pfs.PxNz  + 1 ) );
+			$childFS.PxPz = Math.min( 15, ($pfs.NxNz + $pfs.PxPz + 1) );
 			$childFS.NxPz = Math.min( 15, ($pfs.NxPz + $pfs.NxNz  + 1) )
 		}
 		else if ( 1 == $childID )	{ // b100
-			$childFS.NxNz = Math.min( 15, ($pfs.NxNz + $pfs.PxNz + 1) )
-			$childFS.PxNz = Math.min( 15, ($pfs.PxNz * 2 + 1) )
-			$childFS.PxPz = Math.min( 15, ($pfs.PxNz + $pfs.PxPz + 1) )
+			$childFS.NxNz = Math.min( 15, ($pfs.NxNz + $pfs.PxNz + 1) );
+			$childFS.PxNz = Math.min( 15, ($pfs.PxNz * 2 + 1) );
+			$childFS.PxPz = Math.min( 15, ($pfs.PxNz + $pfs.PxPz + 1) );
 			$childFS.NxPz = Math.min( 15, ($pfs.NxNz + $pfs.PxPz + 1) )
 		}
 		else if ( 2 == $childID )	{ // b010
-			$childFS.NxNz = Math.max( 0, (($pfs.NxNz - 8) * 2 + 1) )
-			$childFS.PxNz = Math.max( 0, ($pfs.NxNz + $pfs.PxNz - 15) )
-			$childFS.PxPz = Math.max( 0, ($pfs.NxNz + $pfs.PxPz - 15) )
-			$childFS.NxPz = Math.max( 0, ($pfs.NxPz + $pfs.NxNz - 15) )
+			$childFS.NxNz = Math.max( 0, (($pfs.NxNz - 8) * 2 + 1) );
+			$childFS.PxNz = Math.max( 0, ($pfs.NxNz + $pfs.PxNz - 15) );
+			$childFS.PxPz = Math.max( 0, ($pfs.NxNz + $pfs.PxPz - 15) );
+			$childFS.NxPz = Math.max( 0, ($pfs.NxPz + $pfs.NxNz - 15) );
 		}
 		else if ( 3 == $childID ) { // b110
-			$childFS.NxNz = Math.max( 0, $pfs.NxNz + $pfs.PxNz - 15 )
-			$childFS.PxNz = Math.max( 0, (($pfs.PxNz - 8) * 2 + 1) )
-			$childFS.PxPz = Math.max( 0, $pfs.PxNz + $pfs.PxPz - 15 )
-			$childFS.NxPz = Math.max( 0, $pfs.NxNz + $pfs.PxPz - 15 )
+			$childFS.NxNz = Math.max( 0, $pfs.NxNz + $pfs.PxNz - 15 );
+			$childFS.PxNz = Math.max( 0, (($pfs.PxNz - 8) * 2 + 1) );
+			$childFS.PxPz = Math.max( 0, $pfs.PxNz + $pfs.PxPz - 15 );
+			$childFS.NxPz = Math.max( 0, $pfs.NxNz + $pfs.PxPz - 15 );
 		}
 		else if ( 4 == $childID )	{ // b001
-			$childFS.NxNz = Math.min( 15, ($pfs.NxNz + $pfs.NxPz + 1) )
-			$childFS.PxNz = Math.min( 15, ($pfs.NxNz + $pfs.PxPz + 1) )
-			$childFS.PxPz = Math.min( 15, ($pfs.NxPz + $pfs.PxPz + 1) )
+			$childFS.NxNz = Math.min( 15, ($pfs.NxNz + $pfs.NxPz + 1) );
+			$childFS.PxNz = Math.min( 15, ($pfs.NxNz + $pfs.PxPz + 1) );
+			$childFS.PxPz = Math.min( 15, ($pfs.NxPz + $pfs.PxPz + 1) );
 			$childFS.NxPz = Math.min( 15, ($pfs.NxPz  * 2 + 1) )
 		}
 		else if ( 5 == $childID )	{ // b101
-			$childFS.NxNz = Math.min( 15, ($pfs.NxNz + $pfs.PxPz + 1) )
-			$childFS.PxNz = Math.min( 15, ($pfs.PxNz + $pfs.PxPz + 1) )
-			$childFS.PxPz = Math.min( 15, (($pfs.PxPz * 2) + 1) )
-			$childFS.NxPz = Math.min( 15, ($pfs.NxPz + $pfs.PxPz + 1) )
+			$childFS.NxNz = Math.min( 15, ($pfs.NxNz + $pfs.PxPz + 1) );
+			$childFS.PxNz = Math.min( 15, ($pfs.PxNz + $pfs.PxPz + 1) );
+			$childFS.PxPz = Math.min( 15, (($pfs.PxPz * 2) + 1) );
+			$childFS.NxPz = Math.min( 15, ($pfs.NxPz + $pfs.PxPz + 1) );
 		}
 		else if ( 6 == $childID )	{ // b011
-			$childFS.NxNz = Math.max( 0, ($pfs.NxNz + $pfs.NxPz - 15) )
-			$childFS.PxNz = Math.max( 0, ($pfs.NxNz + $pfs.PxPz - 15) )
-			$childFS.PxPz = Math.max( 0, ($pfs.NxPz + $pfs.PxPz - 15) )
+			$childFS.NxNz = Math.max( 0, ($pfs.NxNz + $pfs.NxPz - 15) );
+			$childFS.PxNz = Math.max( 0, ($pfs.NxNz + $pfs.PxPz - 15) );
+			$childFS.PxPz = Math.max( 0, ($pfs.NxPz + $pfs.PxPz - 15) );
 			$childFS.NxPz = Math.max( 0, (($pfs.NxPz - 8) * 2 + 1) )
 		}
 		else if ( 7 == $childID )	{ // b111
-			$childFS.NxNz = Math.max( 0, ($pfs.NxNz + $pfs.PxPz - 15) )
-			$childFS.PxNz = Math.max( 0, ($pfs.PxNz + $pfs.PxPz - 15) )
-			$childFS.PxPz = Math.max( 0, (($pfs.PxPz - 8) * 2 + 1) )
-			$childFS.NxPz = Math.max( 0, ($pfs.NxPz + $pfs.PxPz - 15) )
+			$childFS.NxNz = Math.max( 0, ($pfs.NxNz + $pfs.PxPz - 15) );
+			$childFS.PxNz = Math.max( 0, ($pfs.PxNz + $pfs.PxPz - 15) );
+			$childFS.PxPz = Math.max( 0, (($pfs.PxPz - 8) * 2 + 1) );
+			$childFS.NxPz = Math.max( 0, ($pfs.NxPz + $pfs.PxPz - 15) );
 		}	
 		
 		Log.out( "FlowScaling.childGetScale - childID: " + $childID + "  childFS: " + $childFS.toString(), Log.WARN )
 	}
 	
 	static public function scaleTopFlowFace( $oxelToScale:Oxel ):void {
-		var fs:FlowScaling = $oxelToScale.flowInfo.flowScaling
+		var fs:FlowScaling = $oxelToScale.flowInfo.flowScaling;
 		if ( !fs.has() ) {
-			var newScale:int = 15 // 15 is max
+			var newScale:int = 15; // 15 is max
 			if ( 5 == $oxelToScale.gc.grain )
-				newScale = 14
+				newScale = 14;
 			else if ( 4 == $oxelToScale.gc.grain )
-				newScale = 13
+				newScale = 13;
 			else if ( 3 == $oxelToScale.gc.grain )
-				newScale = 11
+				newScale = 11;
 			else if ( 2 == $oxelToScale.gc.grain )
-				newScale = 7
-				
-			fs.NxNz = newScale
- 			fs.NxPz = newScale
-			fs.PxNz = newScale
-			fs.PxPz = newScale
+				newScale = 7;
+
+			fs.NxNz = newScale;
+ 			fs.NxPz = newScale;
+			fs.PxNz = newScale;
+			fs.PxPz = newScale;
 		}
 		//Log.out( "FlowScaling.scaleTopFlowFace - flowScale: " + fs.toString(), Log.WARN )
 	}

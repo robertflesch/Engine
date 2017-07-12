@@ -36,7 +36,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		}
 		
 		override public function start():void {
-            super.start() // AbstractTask will send event
+            super.start(); // AbstractTask will send event
 			Log.out( "GenerateLayer.start: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );
 			// is it  ready?
 			ModelInfoEvent.addListener( ModelBaseEvent.RESULT, modelInfoResult );
@@ -51,8 +51,8 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 				if ( e.vmi.oxelPersistence.oxelCount ) {
 					var oxel:Oxel = e.vmi.oxelPersistence.oxel;
 					if (null == oxel) {
-						Log.out("GenerateLayer.modelInfoResult = no oxel found, waiting on OXEL_READY", Log.WARN)
-						super.complete()
+						Log.out("GenerateLayer.modelInfoResult = no oxel found, waiting on OXEL_READY", Log.WARN);
+						super.complete();
 						return
 					}
 					processOxel(oxel)
@@ -64,10 +64,10 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var timer:int = getTimer();
 			Log.out( "GenerateLayer.processOxel: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );
 			
-			var smallestGrain:int = 4
-			var vm:VoxelModel = getVoxelModel()
+			var smallestGrain:int = 4;
+			var vm:VoxelModel = getVoxelModel();
 			if ( vm ) {
-				vm.complete = false
+				vm.complete = false;
 				if ( vm.modelInfo.dbo.smallestGrain )
 					smallestGrain = vm.modelInfo.dbo.smallestGrain
 			}
@@ -126,7 +126,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			$oxel.write_height_map( _modelGuid, _layer.type, minHeightMapArray, maxHeightMapArray, minGrain, arrayOffset, ignoreSolid );
 			Log.out( "GenerateLayer - completed layer of type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer() - timer) ); // + " in queue for: " + (timer - _startTime));
 			
-            super.complete() // AbstractTask will send event
+            super.complete(); // AbstractTask will send event
 			
 		}
 		

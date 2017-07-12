@@ -40,7 +40,7 @@ package com.voxelengine.worldmodel.scripts
 					Log.out( "AutoControlObjectScript.AutoControlObjectScript player controlling this object: " + vm.metadata.name );
 				}
 				else {
-					OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete )
+					OxelDataEvent.addListener( OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete );
 					
 					//LoadingEvent.addListener( LoadingEvent.PLAYER_LOAD_COMPLETE, onLoadingPlayerComplete );
 				}
@@ -49,7 +49,7 @@ package com.voxelengine.worldmodel.scripts
 		
 		private function onOxelBuildComplete( $ode:OxelDataEvent ):void {
 			if ( $ode.modelGuid == VoxelModel.controlledModel.modelInfo.guid ) {
-				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete )
+				OxelDataEvent.removeListener( OxelDataEvent.OXEL_BUILD_COMPLETE, onOxelBuildComplete );
 				var player:VoxelModel = VoxelModel.controlledModel;
 				var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( instanceGuid );
 				if ( player && vm ) {

@@ -45,8 +45,8 @@ public class LightingTests  {
 			
 			Log.out( "BrightnessTests.resetTests	START" );
 
-			const ResetString:String = "  lastLightID: 1  b000: 51  b001: 51  b100: 51  b101: 51  b010: 51  b011: 51  b110: 51  b111: 51  colorCount: 1"
-			const DefaultMax:String = "  lastLightID: 1  b000: 255  b001: 255  b100: 255  b101: 255  b010: 255  b011: 255  b110: 255  b111: 255  colorCount: 1"
+			const ResetString:String = "  lastLightID: 1  b000: 51  b001: 51  b100: 51  b101: 51  b010: 51  b011: 51  b110: 51  b111: 51  colorCount: 1";
+			const DefaultMax:String = "  lastLightID: 1  b000: 255  b001: 255  b100: 255  b101: 255  b010: 255  b011: 255  b110: 255  b111: 255  colorCount: 1";
 			var bt:Lighting = LightingPool.poolGet();
 			bt.reset();
 			if ( ResetString == bt.toString() )
@@ -72,8 +72,8 @@ public class LightingTests  {
 
 			Log.out( "BrightnessTests.setAllTests	START" );
 			
-			const ColorNotDefined:String = "Brightness.setAll - Color not defined"
-			const OneOhOneMax:String = "  lastLightID: 101  b000: 255  b001: 255  b100: 255  b101: 255  b010: 255  b011: 255  b110: 255  b111: 255  colorCount: 2"
+			const ColorNotDefined:String = "Brightness.setAll - Color not defined";
+			const OneOhOneMax:String = "  lastLightID: 101  b000: 255  b001: 255  b100: 255  b101: 255  b010: 255  b011: 255  b110: 255  b111: 255  colorCount: 2";
 
 			//public function setAll( $lightID:uint, $attn:uint ):void	{
 			// bad conditions
@@ -137,7 +137,7 @@ public class LightingTests  {
 			for ( var faceTest:int = Globals.POSX; faceTest <= Globals.NEGZ; faceTest++ ) {
 				bt.reset();
 				//public function influenceAdd( $ID:uint, $lob:Brightness, $faceFrom:int, $faceOnly:Boolean, $grainUnits:int ):Boolean
-				bt.influenceAdd( lightId, lob, faceTest, faceOnly, grainUnits )
+				bt.influenceAdd( lightId, lob, faceTest, faceOnly, grainUnits );
 				//trace(addResult[faceTest]);
 				//trace(bt.toString());
 				if ( addResult[faceTest] == bt.toString() )

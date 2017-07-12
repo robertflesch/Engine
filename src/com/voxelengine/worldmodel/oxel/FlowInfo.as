@@ -99,16 +99,16 @@ public class FlowInfo
 	}
 	
 	public function childGet( $child:Oxel ):void {
-		$child.flowInfo = FlowInfoPool.poolGet()
-		$child.flowInfo.copyToChild( this )
+		$child.flowInfo = FlowInfoPool.poolGet();
+		$child.flowInfo.copyToChild( this );
 		_flowScaling.childGetScaleAndType( $child, $child.flowInfo.flowScaling )
 	}
 
 	public function copyToChild( $rhs:FlowInfo ):void {
-		type = $rhs.type
-		downRefSet( $rhs.downRef )
-		down = $rhs.down
-		direction = $rhs.direction
+		type = $rhs.type;
+		downRefSet( $rhs.downRef );
+		down = $rhs.down;
+		direction = $rhs.direction;
 
 		// if its top grain, reduce down by half of unit value
 		// need to do for out too, screw it!
@@ -117,31 +117,31 @@ public class FlowInfo
 	}
 	
 	public function copy( $rhs:FlowInfo ):void {
-		_data = $rhs._data
+		_data = $rhs._data;
 			
 		flowScaling.copy( $rhs.flowScaling )
 	}
 		
 	public 	function changeType( $stepSize:uint ):Boolean  { 
 		if ( down < $stepSize )
-			return true
+			return true;
 		else if ( down < $stepSize * 2 )
-			return Math.random() < 0.80
+			return Math.random() < 0.80;
 		else if ( down < $stepSize * 3 )
-			return Math.random() < 0.5
+			return Math.random() < 0.5;
 		else if ( down < $stepSize * 4 )
-			return Math.random() < 0.20
+			return Math.random() < 0.20;
 		return false	
 	}
 	public 	function directionSetAndDecrement( $dir:int, $stepSize:uint ):void  { 
-		direction = $dir
+		direction = $dir;
 		
 		if ( Globals.ALL_DIRS == direction )
 			return;
 		else if ( Globals.POSY == direction || Globals.NEGY == direction ) {
 			if ( 0 < down ) {
 				if ( down < $stepSize )
-					down = 0
+					down = 0;
 				else
 					downDec( $stepSize );
 				
@@ -150,8 +150,8 @@ public class FlowInfo
 		}
 		else {
 			// reset down value when we go out, like we reset out when we go down.
-			down = downRef
-			flowScaling.setToZero()
+			down = downRef;
+			flowScaling.setToZero();
 			out = out + 1
 		}
 		//Log.out( "FlowInfo.dirAndSet - out: " + out + "  oxelSize: " + $stepSize );
@@ -165,13 +165,13 @@ public class FlowInfo
 	}
 	
 	public function reset( $oxel:Oxel = null ):void {
-		_data = 0
+		_data = 0;
 		flowScaling.reset( $oxel )
 	}
 	
 	public function initialize( isChild:Boolean, $sourceOxel:Oxel  ):FlowInfo {
-		var fi:FlowInfo = FlowInfoPool.poolGet()
-		fi.copy( this )
+		var fi:FlowInfo = FlowInfoPool.poolGet();
+		fi.copy( this );
 		return fi
 	}
 	
@@ -202,14 +202,14 @@ public class FlowInfo
 	public function toByteArray( $ba:ByteArray ):ByteArray {
 		$ba.writeUnsignedInt( _data );
 		//trace( "FlowInfo.toByteArray - " + _data.toString(16) );
-		$ba = flowScaling.toByteArray( $ba )
+		$ba = flowScaling.toByteArray( $ba );
 		return $ba;
 	}
 	
 	public function fromByteArray( $version:int, $ba:ByteArray ):ByteArray {
 		_data = $ba.readUnsignedInt();
 		//trace( "FlowInfo.fromByteArray - \t data: " + _data.toString(16) );
-		$ba = flowScaling.fromByteArray( $version, $ba )
+		$ba = flowScaling.fromByteArray( $version, $ba );
 		return $ba;
 	}
 	

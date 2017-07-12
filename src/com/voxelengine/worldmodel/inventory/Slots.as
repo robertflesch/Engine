@@ -98,7 +98,7 @@ public class Slots
 
 	public function fromObject( $info:Object ):void {	
 		if ( $info && $info.slot0 ) {
-			var index:int;
+			var index:int = 0;
 			setItemData( index, createObjectFromInventoryString( $info.slot0, index++ ) );
 			setItemData( index, createObjectFromInventoryString( $info.slot1, index++ ) );
 			setItemData( index, createObjectFromInventoryString( $info.slot2, index++ ) );
@@ -145,7 +145,7 @@ public class Slots
 	
 	
 	private function findFirstEmptySlot():int {
-		for ( var i:int; i < _items.length; i++ ) {
+		for ( var i:int = 0; i < _items.length; i++ ) {
 			//Log.out( "Slots.findFirstEmptySlot: " + i );
 			if ( ObjectInfo.OBJECTINFO_EMPTY == _items[i].objectType ) {
 				return i;

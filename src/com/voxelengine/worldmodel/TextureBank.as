@@ -122,7 +122,7 @@ package com.voxelengine.worldmodel
 		private var _tempContext:Context3D;
 		public function onTextureLoadComplete (event:Event):void {
 			var textureBitmap:Bitmap = Bitmap(LoaderInfo(event.target).content);// .bitmapData;
-			var fileNameAndPath:String = event.target.url
+			var fileNameAndPath:String = event.target.url;
 //			Log.out( "TextureBank.onTextureLoadComplete: " + fileNameAndPath );	
 			
 			var tex:Texture = uploadTexture( _tempContext, textureBitmap );

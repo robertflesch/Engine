@@ -57,7 +57,7 @@ public class WindowSandboxList extends VVPopup
 	
 	
 	private var _listbox1:ListBox = new ListBox( WIDTH, 15 );
-	private var _createFileButton:Button		
+	private var _createFileButton:Button;
 	
 	public function WindowSandboxList()
 	{
@@ -91,7 +91,7 @@ public class WindowSandboxList extends VVPopup
 		buttonPanel.addElement( _createFileButton );
 		addElement( buttonPanel );
 		eventCollector.addEvent( _createFileButton , UIMouseEvent.CLICK
-							   , createRegion )
+							   , createRegion );
 		
 		// Event handlers
 		eventCollector.addEvent( _listbox1, UIMouseEvent.CLICK, loadthisRegion );

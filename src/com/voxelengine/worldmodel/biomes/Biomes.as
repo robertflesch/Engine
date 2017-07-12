@@ -42,7 +42,7 @@ public class Biomes
 
 	public function toString():String {
 		var outString:String = "";
-		for ( var i:int; i < layers.length; i++ )
+		for ( var i:int = 0; i < layers.length; i++ )
 		{
 			outString += layers[i].toString();
 			if ( (i + 1) < layers.length )
@@ -54,7 +54,7 @@ public class Biomes
 	public function toGenerationObject():Object {
 		var obj:Object = {};
 		obj.layers = [];
-		for ( var i:int; i < layers.length; i++ ) {
+		for ( var i:int = 0; i < layers.length; i++ ) {
 			obj.layers.push( layers[i].toJSON( null ) );
 		}
 		return obj;
@@ -70,8 +70,8 @@ public class Biomes
 
 		// This loads the tasks into the LandscapeTaskQueue
 		var task:ITask;
-		var layer:LayerInfo
-		for ( var i:int; i < layers.length; i++ )
+		var layer:LayerInfo;
+		for ( var i:int = 0; i < layers.length; i++ )
 		{
 			layer = layers[i];
 			// instanceInfo can override type
@@ -114,7 +114,7 @@ public class Biomes
 	}
 
 	public function addParticleTaskToController( $vm:VoxelModel ):void  {
-		Globals.taskController.paused = true
+		Globals.taskController.paused = true;
 		var guid:String = $vm.instanceInfo.instanceGuid;
 
 		// Create task group

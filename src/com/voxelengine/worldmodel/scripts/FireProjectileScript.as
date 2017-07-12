@@ -51,7 +51,7 @@ public class FireProjectileScript extends Script
 
 
 		var dr:Vector3D;
-		var gunWSLocation:Vector3D
+		var gunWSLocation:Vector3D;
 		if ( 0 ) {
 			// This takes the model space position of the gun, and uses the cumulative model rotation
 			gunWSLocation = gunModel.wsPositionGet();
@@ -83,7 +83,7 @@ public class FireProjectileScript extends Script
 
 	static public function createProjectile( pe:ProjectileEvent ):void {
 		Log.out( "FireProjectileScript.createProjectile - ProjectileEvent: " + pe );
-		SoundCache.playSound( pe.ammo.launchSound )
+		SoundCache.playSound( pe.ammo.launchSound );
 		/*
 		var ownerGuid:String = pe.owner;
 		var gunModel:VoxelModel = Region.currentRegion.modelCache.instanceGet( ownerGuid );

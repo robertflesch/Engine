@@ -36,7 +36,7 @@ public class ExpandableBox extends ResizablePanelVV
 	
 	public function ExpandableBox( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {
 		_ebco = $ebco;
-		_parent = $parent
+		_parent = $parent;
 		
 		super( _ebco.width, _ebco.itemSize + 2, _ebco.itemBox.borderStyle );
 		setConfigInfo();
@@ -52,7 +52,7 @@ public class ExpandableBox extends ResizablePanelVV
 		$evtColl.addEvent( _expandCollapse, UIMouseEvent.RELEASE, expandOrCollapse );
 		addElement( _expandCollapse );
 		
-		_ebco.itemBox.width = width - 31
+		_ebco.itemBox.width = width - 31;
 		_itemBox = new ResizablePanelVV( _ebco.itemBox.width, _ebco.itemBox.height, BorderStyle.NONE );
 		_itemBox.layout = new AbsoluteLayout();
 		_itemBox.autoSize =  false;
@@ -68,7 +68,7 @@ public class ExpandableBox extends ResizablePanelVV
 	}
 
 	public function deleteElementCheck( $me:UIMouseEvent ):void {
-		var alert:Alert = new Alert( "Do you really want to delete this " + _ebco.itemBox.title + "?", 350 )
+		var alert:Alert = new Alert( "Do you really want to delete this " + _ebco.itemBox.title + "?", 350 );
 		alert.setLabels( "Yes", "No" );
 		alert.alertMode = AlertMode.CHOICE;
 		$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
@@ -76,8 +76,8 @@ public class ExpandableBox extends ResizablePanelVV
 		
 		function alertAction( $ae:AlertEvent ):void {
 			if ( AlertEvent.ACTION == $ae.action )
-				yesDelete()
-			else ( AlertEvent.CHOICE == $ae.action )
+				yesDelete();
+			else //if ( AlertEvent.CHOICE == $ae.action );
 				doNotDelete()
 		}
 		
@@ -89,7 +89,7 @@ public class ExpandableBox extends ResizablePanelVV
 	}
 	
 	public function resetElementCheck( $me:UIMouseEvent ):void {
-		var alert:Alert = new Alert( "Do you really want to reset this " + _ebco.itemBox.title + "?", 350 )
+		var alert:Alert = new Alert( "Do you really want to reset this " + _ebco.itemBox.title + "?", 350 );
 		alert.setLabels( "Yes", "No" );
 		alert.alertMode = AlertMode.CHOICE;
 		$evtColl.addEvent( alert, AlertEvent.BUTTON_CLICK, alertAction );
@@ -97,8 +97,8 @@ public class ExpandableBox extends ResizablePanelVV
 		
 		function alertAction( $ae:AlertEvent ):void {
 			if ( AlertEvent.ACTION == $ae.action )
-				resetElement()
-			else ( AlertEvent.CHOICE == $ae.action )
+				resetElement();
+			else //if ( AlertEvent.CHOICE == $ae.action );
 				doNotReset()
 		}
 		
@@ -130,7 +130,7 @@ public class ExpandableBox extends ResizablePanelVV
 		height = _itemBox.height + ( _ebco.paddingTop + _ebco.paddingBottom );	
 		// Make sure that the min size is larger then the button size plus twice padding
 		if ( height < ( _expandCollapse.height + (_ebco.paddingTop + _ebco.paddingBottom) ) )
-			height = ( _expandCollapse.height + (_ebco.paddingTop + _ebco.paddingBottom) )
+			height = ( _expandCollapse.height + (_ebco.paddingTop + _ebco.paddingBottom) );
 			
 		if ( target )
 			target.dispatchEvent(new ResizerEvent(ResizerEvent.RESIZE_UPDATE));
@@ -167,9 +167,9 @@ public class ExpandableBox extends ResizablePanelVV
 		newItemButton.backgroundColor = 0x28BF58;
 		
 		var lbl:Label = new Label( _ebco.itemBox.newItemText, _itemBox.width );
-		lbl.height = _ebco.itemSize
-		lbl.textAlign = TextAlign.CENTER
-		lbl.verticalAlignment = VerticalAlignment.MIDDLE
+		lbl.height = _ebco.itemSize;
+		lbl.textAlign = TextAlign.CENTER;
+		lbl.verticalAlignment = VerticalAlignment.MIDDLE;
 		lbl.y = 1;
 		newItemButton.addElement( lbl );
 		
@@ -219,12 +219,12 @@ public class ExpandableBox extends ResizablePanelVV
 			resetButton.autoSize = false;
 			resetButton.width = _ebco.expandButtonSize * 3;
 			resetButton.height = _ebco.expandButtonSize;
-			resetButton.borderStyle = BorderStyle.RIDGE
+			resetButton.borderStyle = BorderStyle.RIDGE;
 			resetButton.padding = 0;
 			resetButton.paddingTop = 1;
 			resetButton.paddingLeft = 4;
 			resetButton.backgroundColor = 0xff0000;
-			var rbLabel:Label = new Label( "Reset", _ebco.expandButtonSize * 3 )
+			var rbLabel:Label = new Label( "Reset", _ebco.expandButtonSize * 3 );
 			rbLabel.textAlign = TextAlign.CENTER;
 			resetButton.addElement( rbLabel );
 			$evtColl.addEvent( resetButton, UIMouseEvent.RELEASE, resetElementCheck );

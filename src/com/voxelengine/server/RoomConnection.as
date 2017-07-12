@@ -103,12 +103,12 @@ public class RoomConnection
 	
 	static private function sourceProjectileEvent( event:ProjectileEvent ):void {
 		if ( Globals.online ) {
-			var msg:Message = _connection.createMessage( PROJECTILE_SHOT_MESSAGE )
-			msg.add( Network.userId )
-			msg.add( event.owner )
-			msg.add( event.position.x, event.position.y, event.position.z )
-			msg.add( event.direction.x, event.direction.y, event.direction.z )
-			msg.add( event.ammo.guid )
+			var msg:Message = _connection.createMessage( PROJECTILE_SHOT_MESSAGE );
+			msg.add( Network.userId );
+			msg.add( event.owner );
+			msg.add( event.position.x, event.position.y, event.position.z );
+			msg.add( event.direction.x, event.direction.y, event.direction.z );
+			msg.add( event.ammo.guid );
 			//trace( "sourceProjjectileEvent: " + msg );
 			_connection.sendMessage( msg )
 		}
@@ -185,12 +185,12 @@ public class RoomConnection
 		const userid:String = m.getString(0);
 		// ignore move message for self
 		if ( userid == Network.userId )
-			return 
+			return;
 			
 		//trace("RoomConnection.handleMoveMessage - Received move message", m);
 		var avatar:Avatar = Region.currentRegion.modelCache.instanceGet( userid ) as Avatar;
 		if ( avatar )
-			avatar.instanceInfo.positionSetComp( m.getNumber( 1 ), m.getNumber( 2 ), m.getNumber( 3 ) )
+			avatar.instanceInfo.positionSetComp( m.getNumber( 1 ), m.getNumber( 2 ), m.getNumber( 3 ) );
 		//else	
 		//	trace("RoomConnection.handleMoveMessage - Ignoring move messages for self")
 	}

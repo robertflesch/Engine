@@ -163,20 +163,21 @@ public class  UserInventory extends QuickInventory
 		}
 		
 		if ( Globals.inRoom && _s_currentInstance ) {
-			with ( _s_currentInstance ) {
-				// display it!
-				populate();
-				visible = true;
-				_inventory.visible = true;
-				_propList.visible = true;
-//				EditCursor.editing = true;
-				addListeners();
-				display();
-				resizeObject( null );
-				AppEvent.addListener( Event.DEACTIVATE, onDeactivate );
-				processItemSelection( boxes[1], false );
-			}
+			_s_currentInstance.displayIt();
 		}
+	}
+
+	private function displayIt():void {
+		populate();
+		visible = true;
+		_inventory.visible = true;
+		_propList.visible = true;
+//				EditCursor.editing = true;
+		addListeners();
+		display();
+		resizeObject( null );
+		AppEvent.addListener( Event.DEACTIVATE, onDeactivate );
+		processItemSelection( boxes[1], false );
 	}
 	
 	static private function closeEvent(e:InventoryInterfaceEvent):void {

@@ -180,7 +180,7 @@ public class WindowRegionDetail extends VVPopup
 			// remove the event listeners on this temporary object
 //			_region.release();
 			//
-			var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true )
+			var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true );
 			RegionManager.instance.add( pe, _region );
 			// This tell the region manager to add it to the region list
 			//PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_REGIONS, _region.guid, _region.dbo, true ) );

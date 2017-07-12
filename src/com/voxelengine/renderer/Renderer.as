@@ -8,6 +8,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 
 package com.voxelengine.renderer 
 {
+import com.voxelengine.worldmodel.models.CameraLocation;
 import com.voxelengine.worldmodel.oxel.OxelBad;
 
 import flash.display.Stage3D;
@@ -41,7 +42,7 @@ import com.voxelengine.worldmodel.oxel.Oxel;
 public class Renderer extends EventDispatcher 
 {
 	private static var _s_renderer:Renderer = new Renderer();
-	public static function get renderer():Renderer 	{ return _s_renderer };
+	public static function get renderer():Renderer 	{ return _s_renderer }
 
 	private var timer:Timer;
 	private var _width:int;
@@ -230,7 +231,7 @@ public class Renderer extends EventDispatcher
 		}
 		else {
 			//controlledModelRotation = controlledModel.instanceInfo.rotationGet;
-			controlledModelRotation = controlledModel.cameraContainer.current.rotation;
+			controlledModelRotation = CameraLocation.rotation;
 
 			wsPositionCamera = controlledModel.instanceInfo.worldSpaceMatrix.transformVector(controlledModel.cameraContainer.current.position);
 			// This does not handle the case where the player has not collided with the model yet

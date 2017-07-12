@@ -34,7 +34,7 @@ package com.voxelengine.GUI
 			var rect:Rectangle = event.target.parent.getBounds(event.target.parent);
 			var bmp:BitmapData = new BitmapData(rect.width, rect.height, true, 0);
 			bmp.draw(event.target.parent);			
-    		var pixelValue:uint = bmp.getPixel(event.localX, event.localY)
+    		var pixelValue:uint = bmp.getPixel(event.localX, event.localY);
 			
 			Log.out("ColorPicker.clickListener - picked color: " + pixelValue.toString(16) );
 			

@@ -20,7 +20,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 	// * @author Robert Flesch
 	public class FlowTask extends AbstractTask 
 	{		
-		private static var _s_flowInfo:FlowInfo = new FlowInfo()
+		private static var _s_flowInfo:FlowInfo = new FlowInfo();
 		
 		protected var _guid:String;
 		protected var _gc:GrainCursor;
@@ -32,7 +32,7 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		
 		public function FlowTask( $instanceGuid:String, $gc:GrainCursor, $type:int, $taskType:String = TASK_TYPE, $taskPriority:int = TASK_PRIORITY ):void {
 			// The model containing the grain 
-			_guid = $instanceGuid
+			_guid = $instanceGuid;
 			// the grain id
 			_gc = GrainCursorPool.poolGet( $gc.bound );
 			_gc.copyFrom( $gc );
@@ -43,8 +43,8 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		}
 
 		protected function neighborGetOrCreate( flowOxel:Oxel, flowIntoNeighbor:Oxel ):Oxel {
-			Log.out( "FlowTask.neighborGetOrCreate - REFACTOR", Log.WARN )
-			var flowIntoTarget:Oxel = null;
+			Log.out( "FlowTask.neighborGetOrCreate - REFACTOR", Log.WARN );
+			var flowIntoTarget:Oxel;
 			var gct:GrainCursor = GrainCursorPool.poolGet( flowOxel.gc.bound );
 			// this is oxel next to the one we want, but the flowIntoNeighbor might be a larger grain.
 			// so find the address we want, then getChild on that oxel. Which causes the oxel to break up if needed.
@@ -67,10 +67,10 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		public function get type():int { return _type; }
 		
 		override public function toString():String {
-			var output:String =  _guid
+			var output:String =  _guid;
 			if ( _gc )
-				output += "  gc: " + _gc.toString()
-			output += "  type: " + _type
+				output += "  gc: " + _gc.toString();
+			output += "  type: " + _type;
 			return output
 		}
 

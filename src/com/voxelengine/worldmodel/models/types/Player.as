@@ -36,6 +36,9 @@ public class Player extends PersistenceObject
 	private static var _s_player:Player = null;
 	public static function get player():Player { return _s_player; }
 
+	static private var _vm:Avatar;
+	static public function get pm():Avatar { return _vm; }
+
 	public function Player() {
 		super( "local", "PlayerObjects" );
 		Log.out( "Player.construct" );
@@ -152,6 +155,7 @@ public class Player extends PersistenceObject
 				ModelLoadingEvent.removeListener(ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded);
 			}
 			$mle.vm.takeControl( VoxelModel.controlledModel, false );
+			_vm = $mle.vm as Avatar;
 		}
 	}
 

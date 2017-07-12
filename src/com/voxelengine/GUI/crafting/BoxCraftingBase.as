@@ -10,13 +10,11 @@ import com.voxelengine.GUI.VVBox;
 import org.flashapi.swing.constants.BorderStyle;
 
 public class BoxCraftingBase extends VVBox {
-    private var _acceptsCategory:String;
-    private var _acceptsSubCat:String;
 
     public function BoxCraftingBase( $size:Number, $acceptsCategory:String, $acceptsSubCat:String = "", $borderStyle:String = BorderStyle.INSET ) {
         super($size, $size, borderStyle);
-        _acceptsCategory = $acceptsCategory;
-        _acceptsSubCat = $acceptsSubCat;
+        var _acceptsCategory:String = $acceptsCategory;
+        var _acceptsSubCat:String = $acceptsSubCat;
 
         dropEnabled = true;
         dragEnabled = true;

@@ -25,12 +25,12 @@ public class VVTextInput extends TextInput
 	}
 	
 	private function focusIn(e:TextEvent):void {
-		Log.out( "VVTextInput.focusIn" )
+		Log.out( "VVTextInput.focusIn" );
 		Globals.g_textInput = true
 	}
 	
 	private function focusOut(e:TextEvent):void {
-		Log.out( "VVTextInput.focusOut" )
+		Log.out( "VVTextInput.focusOut" );
 		Globals.g_textInput = false
 	}
 }

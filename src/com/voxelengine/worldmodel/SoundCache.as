@@ -77,7 +77,7 @@ public class SoundCache
 			sndPer.save();
 		}
 		else {
-			Log.out( "SoundCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR )
+			Log.out( "SoundCache.loadSucceed ERROR NO DBO OR DATA " + $pe.toString(), Log.ERROR );
 			SoundEvent.create( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid );
 		}
 	}

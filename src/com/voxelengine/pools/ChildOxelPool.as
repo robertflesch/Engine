@@ -47,7 +47,7 @@ public final class ChildOxelPool
 		var timer:int = getTimer();
 
 		_currentPoolSize += _growthValue;
-		_pool = null
+		_pool = null;
 		_pool = new Vector.<Vector.<Oxel> >(_currentPoolSize); 
 		for ( var newIndex:int = 0; newIndex < _growthValue; newIndex++ )
 		{

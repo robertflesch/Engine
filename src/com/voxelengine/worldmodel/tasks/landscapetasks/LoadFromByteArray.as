@@ -46,7 +46,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			//else
 				//Log.out( "LoadFromByteArray.loadByteArray - FAILED to find either voxel model or byte array: guid: " + _guid + "  data: " + _layer.data , Log.ERROR );
 //
-			super.complete() // AbstractTask will send event
+			super.complete(); // AbstractTask will send event
 		}
 		
 		override public function cancel():void {

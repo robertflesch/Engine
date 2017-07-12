@@ -25,7 +25,7 @@ public class Voxels
 		_owner = $owner;
 		
 		var allTypes:Vector.<TypeInfo> = TypeInfo.typeInfo;
-		for ( var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
+		for ( var typeId:int = 0; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ )
 			_items[typeId] = new SecureInt( 0 );
 			
 		InventoryVoxelEvent.addListener( InventoryVoxelEvent.CHANGE, 			change );
@@ -50,9 +50,9 @@ public class Voxels
 			}
 				
 			var result:Vector.<SecureInt> = new Vector.<SecureInt>(TypeInfo.MAX_TYPE_INFO, true);
-			for ( var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ ) {
+			for ( var typeId:int = 0; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ ) {
 				result[typeId] = new SecureInt( 0 );
-				var ti:TypeInfo = TypeInfo.typeInfo[typeId]
+				var ti:TypeInfo = TypeInfo.typeInfo[typeId];
 				if ( ti ) { 
 					var catData:String = ti.category;
 					if ( cat == catData.toUpperCase() ) {
@@ -84,7 +84,7 @@ public class Voxels
 	}
 	
 	public function addTestData():void {
-		for ( var typeId:int; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ ) {
+		for ( var typeId:int = 0; typeId < TypeInfo.MAX_TYPE_INFO; typeId++ ) {
 			if ( _items[typeId] )
 				_items[typeId].val = Math.random() * 1000000;
 		}
@@ -106,14 +106,13 @@ public class Voxels
 			//Log.out( "Voxels.change - Succeeded test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
 			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_RESULT, _owner.guid, typeId, voxelCount ) );
 			_owner.changed = true;
-			return;
 		}
 		//Log.out( "Voxels.change - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
 	}
 	
 	public function fromObject( $ba:ByteArray ):void {
 		const typesCount:int = $ba.readInt();
-		for ( var i:int; i < typesCount; i++ ) {
+		for ( var i:int = 0; i < typesCount; i++ ) {
 			if ( $ba.bytesAvailable < 4 )
 				return;
 			_items[i].val = $ba.readInt();
@@ -121,8 +120,8 @@ public class Voxels
 	}
 	
 	public function toByteArray( $ba:ByteArray ):ByteArray { 
-		$ba.writeInt( TypeInfo.MAX_TYPE_INFO )
-		for ( var i:int; i < TypeInfo.MAX_TYPE_INFO; i++ ) {
+		$ba.writeInt( TypeInfo.MAX_TYPE_INFO );
+		for ( var i:int = 0; i < TypeInfo.MAX_TYPE_INFO; i++ ) {
 			$ba.writeInt( _items[i].val )
 		}
 		return $ba; 

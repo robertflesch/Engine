@@ -40,7 +40,7 @@ public class VertexColor {
 	// http://jacksondunstan.com/articles/1288 could this be faster?
 	private var _colors:Dictionary = new Dictionary(true);
 	private var _changed:Boolean = true;
-	private var _composite:uint
+	private var _composite:uint;
 	
 	public function VertexColor( $lightID:uint, $colorAndBrightness:uint ) {
 		if ( 0 == $lightID )
@@ -64,7 +64,7 @@ public class VertexColor {
 	}
 	
 	public function lightCount():uint {
-		var count:uint
+		var count:uint = 0;
 		for (var lightID:String in _colors )
 		{
 			count++;

@@ -42,18 +42,13 @@ C9389DB5-7A87-A5D8-2495-445D8391CDC1 - Pistol
 
 What is VoxelVerse.
 
-My goal is to create a platform we everyone is able to create and share 3D voxel models, games, adventures.
+My goal is to create a browser based platform where everyone is able to create, explore, and share 3D voxel models, games, adventures.
 User created content
 User rated content
 User sellable content
 User created regions
-PvP action in Zeppelins, Dragons
+PvP action in Zeppelins, Dragons, etc
 Destruction of other users content (temp or perm?)
-Almost everywhere is buildable and destructable
+PvP area's are buildable and destructable, private or shared common area's require permission.
 New adventures created by user everyday
 Very low cost per user.
-
-8 meter 72 -36(128)64  64 - (100) = -36   0 - 1/2 r - 4  camera height - radius
-4 meter 40 -4 (64)32   32 - (64) = -4     0 - 16
-2 meter 24 12 (32)16   16 - (4) = 12       d - 1/2r - 4
-1 meter 16 20 (16)8       X = radius + 8   d + 1/2r

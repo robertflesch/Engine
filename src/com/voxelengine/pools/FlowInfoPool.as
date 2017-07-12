@@ -46,7 +46,7 @@ public final class FlowInfoPool
 		var timer:int = getTimer();
 
 		_currentPoolSize += GROWTH_VALUE;
-		_pool = null
+		_pool = null;
 		_pool = new Vector.<FlowInfo>(_currentPoolSize);
 		for ( var newIndex:int = 0; newIndex < GROWTH_VALUE; newIndex++ )
 			_pool[newIndex] = new FlowInfo();

@@ -21,7 +21,7 @@ public class ComponentCheckBox extends Container
 	{
 		super( $width, 25 );
 	
-		layout.orientation = LayoutOrientation.HORIZONTAL
+		layout.orientation = LayoutOrientation.HORIZONTAL;
 		padding = 3;
 		backgroundColor = VVUI.DEFAULT_COLOR;
 		

@@ -18,11 +18,11 @@ public class ComponentLabelSide extends Container
 	{
 		super( $width, $height );
 	
-		layout.orientation = LayoutOrientation.HORIZONTAL
+		layout.orientation = LayoutOrientation.HORIZONTAL;
 		padding = $padding;
 		backgroundColor = VVUI.DEFAULT_COLOR;
 		
-		addElement( new Label( $label, ($width - 20) * 0.40 ) )
+		addElement( new Label( $label, ($width - 20) * 0.40 ) );
 		addElement( new Label( $initialValue, ($width - 20) * 0.60 ) )
 	}
 }

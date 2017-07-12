@@ -105,6 +105,7 @@ public class CraftingManager
 	
 	public static function getClass( $className : String ) : Class
 	{
+		//noinspection BadExpressionStatementJS
 		Pick;
 		try 
 		{

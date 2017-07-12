@@ -121,7 +121,7 @@ public class WindowModelChoice extends VVPopup
 
 	}
 	
-	private var _cbType:ComboBox  = new ComboBox()
+	private var _cbType:ComboBox  = new ComboBox();
 	private function addType( $label:String ):void {
 		_cbType  = new ComboBox();
 		var typeContainer:Container = new Container( width/2, 50 );

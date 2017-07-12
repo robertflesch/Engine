@@ -429,7 +429,7 @@ public class ControllableVoxelModel extends VoxelModel
 //				Log.out("CVM.test - findClosestIntersectionInDirection took: " + (getTimer() - timer));
 
 
-			_collisionCandidates = ModelCacheUtils.whichModelsIsThisInfluencedBy( this )
+			_collisionCandidates = ModelCacheUtils.whichModelsIsThisInfluencedBy( this );
 			//trace( "collisionTest: " + _collisionCandidates.length )
 			if ( 0 == _collisionCandidates.length )
 			{
@@ -448,7 +448,7 @@ public class ControllableVoxelModel extends VoxelModel
 					// restore the previous position
 
 
-					var collisionPointCount:int = collisionCheckNew( $elapsedTimeMS, loc, collisionCandidate, STEP_UP_CHECK )
+					var collisionPointCount:int = collisionCheckNew( $elapsedTimeMS, loc, collisionCandidate, STEP_UP_CHECK );
 					if ( -1 < collisionPointCount )
 					{
 						Globals.g_app.dispatchEvent( new CollisionEvent( CollisionEvent.COLLIDED, this.instanceInfo.instanceGuid ) );
@@ -614,16 +614,16 @@ public class ControllableVoxelModel extends VoxelModel
 //			if ( MouseKeyboardHandler.rightSlide )	{ instanceInfo.velocitySetComp( vel.x - speedVal, vel.y, vel.z ); changed = true; }
 			if ( MouseKeyboardHandler.leftSlide )	{
 				const currentRotP:Vector3D = instanceInfo.rotationGet;
-				instanceInfo.rotationSetComp( currentRotP.x, currentRotP.y - ROTATE_FACTOR * $elapsedTimeMS, currentRotP.z );;
-				const currentCamRotP:Vector3D = cameraContainer.current.rotation;
-				cameraContainer.current.rotation = new Vector3D( currentCamRotP.x, currentCamRotP.y - ROTATE_FACTOR * $elapsedTimeMS, currentCamRotP.z );
+				instanceInfo.rotationSetComp( currentRotP.x, currentRotP.y - ROTATE_FACTOR * $elapsedTimeMS, currentRotP.z );
+				const currentCamRotP:Vector3D = CameraLocation.rotation;
+				CameraLocation.rotation.setTo( currentCamRotP.x, currentCamRotP.y - ROTATE_FACTOR * $elapsedTimeMS, 0 );
 				changed = true;
 			}
 			if ( MouseKeyboardHandler.rightSlide ) {
 				const currentRot:Vector3D = instanceInfo.rotationGet;
 				instanceInfo.rotationSetComp(currentRot.x, currentRot.y + ROTATE_FACTOR * $elapsedTimeMS, currentRot.z);
-				const currentCamRot:Vector3D = cameraContainer.current.rotation;
-				cameraContainer.current.rotation = new Vector3D( currentCamRot.x, currentCamRot.y + ROTATE_FACTOR * $elapsedTimeMS, currentCamRot.z );
+				const currentCamRot:Vector3D = CameraLocation.rotation;
+				CameraLocation.rotation.setTo( currentCamRot.x, currentCamRot.y + ROTATE_FACTOR * $elapsedTimeMS, 0 );
 				changed = true;
 			}
 			if ( MouseKeyboardHandler.down )	  	{ instanceInfo.velocitySetComp( vel.x, vel.y + speedVal, vel.z ); changed = true; }

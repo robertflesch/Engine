@@ -19,10 +19,14 @@ package com.voxelengine.renderer.shaders
         
         public static function getAsset ( assetLinkageID : String ) : Class
         {
-			ShaderOxel;
-			ShaderAlpha;
-			ShaderAlphaAnimated;
-			ShaderFire;
+			//noinspection BadExpressionStatementJS
+            ShaderOxel;
+			//noinspection BadExpressionStatementJS
+            ShaderAlpha;
+			//noinspection BadExpressionStatementJS
+            ShaderAlphaAnimated;
+			//noinspection BadExpressionStatementJS
+            ShaderFire;
 			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.renderer.shaders.ShaderOxel" ) );
 			try 
 			{

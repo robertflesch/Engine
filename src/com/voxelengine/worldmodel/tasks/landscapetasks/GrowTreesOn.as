@@ -24,7 +24,7 @@ public class GrowTreesOn extends RenderingTask
 	}
 
 	public function GrowTreesOn($guid:String, $chunk:Chunk, $taskPriority:int, $chance:int ):void {
-		super( $guid, $chunk, "GrowTreesOn", $taskPriority )
+		super( $guid, $chunk, "GrowTreesOn", $taskPriority );
 		_chance = $chance;
 	}
 

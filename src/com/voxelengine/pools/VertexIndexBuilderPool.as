@@ -41,7 +41,7 @@ public final class VertexIndexBuilderPool
 			return _pool[--_counter]; 
 			 
 		_currentPoolSize += _growthValue;
-		_pool = null
+		_pool = null;
 		_pool = new Vector.<VertexIndexBuilder>(_currentPoolSize); 
 		for ( var newIndex:int = 0; newIndex < _growthValue; newIndex++ )
 		{

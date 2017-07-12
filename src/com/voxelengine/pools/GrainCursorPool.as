@@ -51,7 +51,7 @@ public final class GrainCursorPool
 		var timer:int = getTimer();
 
 		_currentPoolSize += _growthValue;
-		_pool = null
+		_pool = null;
 		_pool = new Vector.<GrainCursor>(_currentPoolSize);
 		for ( var newIndex:int = 0; newIndex < _growthValue; newIndex++ )
 		{

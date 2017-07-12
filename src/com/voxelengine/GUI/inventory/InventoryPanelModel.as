@@ -251,6 +251,7 @@ public class InventoryPanelModel extends VVContainer
 			var oa:ObjectAction = e.target.objectInfo as ObjectAction;
 			var cb:Function = oa.callBack;
 			// just execute the callback here, dont need to do cb(), which calls it twice, interesting
+			//noinspection BadExpressionStatementJS
 			cb;
 		}
 		else if ( e.target.objectInfo is ObjectModel ) {

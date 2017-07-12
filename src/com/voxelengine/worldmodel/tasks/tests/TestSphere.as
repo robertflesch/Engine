@@ -32,14 +32,14 @@ package com.voxelengine.worldmodel.tasks.tests
 		
 		override public function start():void
 		{
-			super.start() // AbstractTask will send event
+			super.start(); // AbstractTask will send event
 
 			var timer:int = getTimer();
 			
 			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _modelGuid );
 			if ( vm )
 			{
-				var root_grain_size:uint = vm.modelInfo.oxelPersistence.oxel.gc.bound
+				var root_grain_size:uint = vm.modelInfo.oxelPersistence.oxel.gc.bound;
 				var min_grain_size:int = root_grain_size - _layer.range;
 				if ( 0 > min_grain_size || min_grain_size >= (root_grain_size - 2) || ( 8 < (root_grain_size - min_grain_size)) )
 				{

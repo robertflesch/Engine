@@ -43,7 +43,7 @@ public final class QuadsPool
 			return pool[--counter]; 
 			 
 		_currentPoolSize += _growthValue;
-		pool = null
+		pool = null;
 		pool = new Vector.<Vector.<Quad>>(_currentPoolSize); 
 		for ( var newIndex:int = 0; newIndex < _growthValue; newIndex++ )
 		{

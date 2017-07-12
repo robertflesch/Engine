@@ -49,8 +49,6 @@ public class AdjustablePictureBox extends VVBox {
         backgroundTexture = VVBox.drawScaled( $bmd, width, height, PictureImportProperties.hasTransparency );
         addUI();
     }
-
-    private var yPos:int = 0;
     private function removeUI():void {
         removeElements();
         _brightnessLabel = null;
@@ -61,7 +59,6 @@ public class AdjustablePictureBox extends VVBox {
         _hueHSlider = null;
         _saturationLabel = null;
         _saturationHSlider = null;
-        yPos = 0;
     }
 
     private function addUI():void {

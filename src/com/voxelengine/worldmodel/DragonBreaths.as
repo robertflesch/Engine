@@ -21,7 +21,7 @@ public class DragonBreaths
 	private var _water:String = "AIR"; 
 	private var _air:String = "AIR";
 	private var _earth:String = "AIR";
-	public function DragonBreaths() { ;}
+	public function DragonBreaths() { }
 	
 	public function fromJson( db:Object ):void
 	{

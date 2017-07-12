@@ -141,7 +141,7 @@ public class GrainCursorUtils
 
 	static private function getFar2D( a:int, b:int, a1:int, b1:int, K:int ):Number
 	{
-		var longest:Number = 0;
+		var longest:Number;
 		var dist:Number;
 		
 		dist = fast_distance_2d( a, b, a1    , b1     );                      longest = dist;
@@ -180,7 +180,7 @@ public class GrainCursorUtils
 	
 	static private function getNear2D( a:int, b:int, a1:int, b1:int, K:int ):Number
 	{
-		var closest:Number = 0;
+		var closest:Number;
 		var dist:Number;
 		
 		dist = fast_distance_2d( a, b, a1    , b1     );                      closest = dist;
@@ -193,7 +193,7 @@ public class GrainCursorUtils
 	
 	static public function getNearDistance2D( gc:GrainCursor, x:int, y:int, z:int, axis:int ):Number
 	{
-		var closest:Number = 0;
+		var closest:Number;
 		var K:int = gc.size()-1;
 		var d:Number;
 		

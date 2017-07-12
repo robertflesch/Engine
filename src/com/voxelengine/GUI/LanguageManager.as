@@ -38,7 +38,7 @@ package com.voxelengine.GUI
 			var currentLocale:ILocale = _getCurrentLocale( );
 			var supportedCodes:Array  = _getSupportedCodes( );
 			
-			_provider = new DefaultProviderManager( Globals.appPath )
+			_provider = new DefaultProviderManager( Globals.appPath );
 			_factory  = new DefaultProviderFactory;
 			_localization = LocalizationManager.instance;
 			_localization.setProviderStrategy( _provider, _factory );
@@ -72,7 +72,7 @@ package com.voxelengine.GUI
 			}
 		
 		static public function localizedStringGet( $key:String ):String {
-			var lowerKey:String = $key.toLowerCase()
+			var lowerKey:String = $key.toLowerCase();
 			if ( _localization.currentBundle.hasResource( lowerKey ) && _initialized ) {
 				return _localization.currentBundle.getResourceString( lowerKey );
 			}

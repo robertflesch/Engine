@@ -21,8 +21,8 @@ package com.voxelengine.renderer.shaders
 	
 	public class ShaderFire extends Shader {
 
-		private	var		_textureOffsetFireU:Number = 0.0
-		private	var		_textureOffsetFireV:Number = 0.0
+		private	var		_textureOffsetFireU:Number = 0.0;
+		private	var		_textureOffsetFireV:Number = 0.0;
 		
 		static private	var	_vertexShaderAssembler:AGALMiniAssembler = new AGALMiniAssembler();
 		static private	var _fragmentAssembler:AGALMiniAssembler = new AGALMiniAssembler();
@@ -46,7 +46,7 @@ package com.voxelengine.renderer.shaders
 			var sourceFactor:String = Context3DBlendFactor.SOURCE_ALPHA;
 		//	var destinationFactor:String = Context3DBlendFactor.SOURCE_COLOR;
 		//  var destinationFactor:String = Context3DBlendFactor.ONE_MINUS_SOURCE_COLOR
-			var destinationFactor:String = Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA
+			var destinationFactor:String = Context3DBlendFactor.ONE_MINUS_SOURCE_ALPHA;
 			$context.setBlendFactors( sourceFactor, destinationFactor );
 			
 			return true;

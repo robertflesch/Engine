@@ -78,13 +78,11 @@ public class QuickInventory extends VVCanvas
 //		_selector = new Canvas(_imageSize, _imageSize);
 		_selector = new Sprite();
 		_selector.y = height - _imageSize;
-		_selector.x = _selectorXOffset
+		_selector.x = _selectorXOffset;
 		_selector.filters = [new GlowFilter(0xff0000, .5)];
-		with (_selector.graphics) {
-			lineStyle(2, 0xff0000, .5);
-			drawRect(2, 2, _imageSize - 3, _imageSize - 3);
-			endFill();
-		}
+		_selector.graphics.lineStyle(2, 0xff0000, .5);
+		_selector.graphics.drawRect(2, 2, _imageSize - 3, _imageSize - 3);
+		_selector.graphics.endFill();
 		addElement(_selector);
 	}
 	

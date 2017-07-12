@@ -22,7 +22,7 @@ public class CursorSizeEvent extends Event
 	static public	const SHRINK:String 		= "SHRINK";
 	static public	const SET:String 			= "SET";
 
-	private var _size:int
+	private var _size:int;
 	public function get size():int  { return _size; }
 	
 	public function CursorSizeEvent( $type:String, $size:int = 4, $bubbles:Boolean = true, $cancellable:Boolean = false )

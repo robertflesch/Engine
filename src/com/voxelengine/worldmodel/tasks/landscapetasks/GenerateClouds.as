@@ -56,7 +56,7 @@ public class GenerateClouds extends LandscapeTask
 		//vm.print();
 
 		trace( "GenerateClouds.start - took: "  + (getTimer() - timer) );
-		super.complete() // AbstractTask will send event
+		super.complete(); // AbstractTask will send event
 	}
 
 	override public function cancel():void {

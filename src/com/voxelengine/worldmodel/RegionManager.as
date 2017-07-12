@@ -33,7 +33,7 @@ import com.voxelengine.worldmodel.models.types.VoxelModel;
  */
 public class RegionManager 
 {
-	private var _regions:Vector.<Region> = null
+	private var _regions:Vector.<Region> = null;
 	private var _requestPublic:Boolean;
 	//private var _resultsPublic:Boolean;
 	private var _requestPrivate:Boolean;
@@ -215,7 +215,7 @@ public class RegionManager
 		
 		Log.out( "RegionManager.regionCreatedHandler: " + $pe.guid );
 		// check for duplicates
-		var region:Region = regionGet( $pe.guid )
+		var region:Region = regionGet( $pe.guid );
 		if ( region )
 			region.dbo = $pe.dbo;
 		else	

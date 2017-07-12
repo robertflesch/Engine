@@ -20,9 +20,9 @@ public class CameraLocation
 	public function get position():Vector3D { return _position; }
 	public function set position(value:Vector3D):void { _position = value; }
 
-	private var _rotation:Vector3D = null;
-	public function get rotation():Vector3D { return _rotation; }
-	public function set rotation(value:Vector3D):void { _rotation = value; }
+	private static var _rotation:Vector3D = null;
+	static public function get rotation():Vector3D { return _rotation; }
+	//static public function set rotation(value:Vector3D):void { _rotation = value; }
 
 	private var _toolBarVisible:Boolean = false;
 	public function get toolBarVisible():Boolean { return _toolBarVisible; }

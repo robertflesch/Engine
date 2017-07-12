@@ -79,7 +79,7 @@ public class WindowModelDetail extends VVPopup {
 		addElement( new ComponentVector3DToObject( setChanged, ii.setPositionInfo, "Position", "X: ", "Y: ", "Z: ",  ii.positionGet, WIDTH, updateVal ) );
 		addElement( new ComponentVector3DToObject( setChanged, ii.setRotationInfo, "Rotation", "X: ", "Y: ", "Z: ",  ii.rotationGet, WIDTH, updateVal ) );
 		addElement( new ComponentVector3DToObject( setChanged, ii.setScaleInfo, "Scale", "X: ", "Y: ", "Z: ",  ii.scale, WIDTH, updateScaleVal, 4 ) );
-		addElement( new ComponentVector3DToObject( setChanged, ii.setCenterInfo, "Unscaled Center", "X: ", "Y: ", "Z: ",  ii.centerNotScaled, WIDTH, updateVal ) );
+		addElement( new ComponentVector3DToObject( setChanged, ii.setCenterInfo, "Center", "X: ", "Y: ", "Z: ",  ii.centerNotScaled, WIDTH, updateVal ) );
 		addElement( new ComponentSpacer( WIDTH ) );
 
 		var lc:Container = new Container( WIDTH, 30 );
@@ -97,7 +97,7 @@ public class WindowModelDetail extends VVPopup {
 		lc.addElement( applyLight );
 		addElement( lc );
 
-		// TODO need to be able to handle an array of scipts.
+		// TODO need to be able to handle an array of scripts.
 		//addElement( new ComponentTextInput( "Script",  function ($e:TextEvent):void { ii.scriptName = $e.target.text; }, ii.scriptName, WIDTH ) );
 		const GRAINS_PER_METER:int = 16;
 		if ( $vm.modelInfo.oxelPersistence && $vm.modelInfo.oxelPersistence.oxelCount )

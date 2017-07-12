@@ -982,7 +982,7 @@ package com.voxelengine.utils.transitions {
 		public static function onEnterFrame(e:Event):void {
 			updateTime();
 			updateFrame();
-			var hasUpdated:Boolean = false;
+			var hasUpdated:Boolean;
 			hasUpdated = updateTweens();
 			if (!hasUpdated) stopEngine();	// There's no tweening to update or wait, so it's better to stop the engine
 		}

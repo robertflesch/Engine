@@ -29,7 +29,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		}
 		
 		override public function start():void {
-            super.start() // AbstractTask will send event
+            super.start(); // AbstractTask will send event
 			
 			var timer:int = getTimer();
 			
@@ -46,7 +46,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var bid:int = 0;
 			const end:int = vm.oxel.gc.size();
 			
-			var y:int = 0;
+			var y:int;
 
 			gc.set_values( 0, 0, 0, 0 );
 			for ( y = 0; y < end; y++ ) 
@@ -134,7 +134,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			}
 			
 			//trace( "OutlineBoundries - completed layer of type: " + (Globals.Info[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
-            super.complete() // AbstractTask will send event
+            super.complete(); // AbstractTask will send event
 		}
 		
 		override public function cancel():void {

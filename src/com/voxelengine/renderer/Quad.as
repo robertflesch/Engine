@@ -113,7 +113,7 @@ public class Quad {
 	}
 	
 	private function resetUV():void {
-		for ( var i:int; i < QUAD_UV_COUNT; i++ ) {
+		for ( var i:int = 0; i < QUAD_UV_COUNT; i++ ) {
 			_u[i] = 0;
 			_v[i] = 0;
 		}
@@ -421,7 +421,7 @@ public class Quad {
 				
 				_indices[indiceIndex++] = 0;
 				_indices[indiceIndex++] = 1;
-				_indices[indiceIndex++] = 3;
+				_indices[indiceIndex] = 3;
 			}
 			else {
 				_indices[indiceIndex++] = 0;
@@ -430,7 +430,7 @@ public class Quad {
 				
 				_indices[indiceIndex++] = 2;
 				_indices[indiceIndex++] = 3;
-				_indices[indiceIndex++] = 0;
+				_indices[indiceIndex] = 0;
 			}
 		} else {
 			// CW
@@ -441,7 +441,7 @@ public class Quad {
 				
 				_indices[indiceIndex++] = 3;
 				_indices[indiceIndex++] = 1;
-				_indices[indiceIndex++] = 0;
+				_indices[indiceIndex] = 0;
 			}
 			else {
 				_indices[indiceIndex++] = 0;
@@ -450,7 +450,7 @@ public class Quad {
 				
 				_indices[indiceIndex++] = 2;
 				_indices[indiceIndex++] = 0;
-				_indices[indiceIndex++] = 3;
+				_indices[indiceIndex] = 3;
 				
 			}
 		}

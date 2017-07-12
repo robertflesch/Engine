@@ -35,10 +35,10 @@ import com.voxelengine.worldmodel.models.ModelMetadata;
 
 public class BoxInventory extends VVBox
 {
-	private var _count:Label
-	private var _name:Label
-	private var _bpValue:Image
-	private var _editData:Image
+	private var _count:Label;
+	private var _name:Label;
+	private var _bpValue:Image;
+	private var _editData:Image;
 	private var _objectInfo:ObjectInfo;
 	public function get objectInfo():ObjectInfo { return _objectInfo; }
 	
@@ -46,18 +46,18 @@ public class BoxInventory extends VVBox
 	{
 		super( $widthParam, $heightParam, $borderStyle );
 		layout = new AbsoluteLayout();
-		padding = 0
+		padding = 0;
 		autoSize = false;
 		dragEnabled = true;
 		_count = new Label( "", $widthParam );
 		_count.fontColor = 0xffffff;
-		_count.textAlign = TextAlign.CENTER
+		_count.textAlign = TextAlign.CENTER;
 		//_count.x = 16;
 		_count.y = 20;
 
 		_name = new Label( "", $widthParam );
 		_name.fontColor = 0xffffff;
-		_name.textAlign = TextAlign.CENTER
+		_name.textAlign = TextAlign.CENTER;
 		//_count.x = 16;
 		_name.y = 90;
 		addElement(_count);
@@ -65,18 +65,18 @@ public class BoxInventory extends VVBox
 	}
 	
 	private function thumbnailLoaded( $mme:ModelMetadataEvent ):void {
-		var om:ObjectModel = _objectInfo as ObjectModel
+		var om:ObjectModel = _objectInfo as ObjectModel;
 		if ( $mme.modelGuid == om.modelGuid ) {
-			ModelMetadataEvent.removeListener( ModelMetadataEvent.BITMAP_LOADED, thumbnailLoaded )				
+			ModelMetadataEvent.removeListener( ModelMetadataEvent.BITMAP_LOADED, thumbnailLoaded );
 			backgroundTexture = drawScaled( om.vmm.thumbnail, width, height );
 		}
 	}
 	
 	private function metadataChanged( $mme:ModelMetadataEvent ):void {
-		var om:ObjectModel = _objectInfo as ObjectModel
+		var om:ObjectModel = _objectInfo as ObjectModel;
 		if ( om && ( $mme.modelGuid == om.modelGuid ) ) {
-			ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged )
-			om.vmm = $mme.modelMetadata
+			ModelMetadataEvent.removeListener( ModelBaseEvent.CHANGED, metadataChanged );
+			om.vmm = $mme.modelMetadata;
 			updateObjectInfo( om )
 		}
 	}
@@ -104,10 +104,10 @@ public class BoxInventory extends VVBox
 //					om.vmm.thumbnail = drawScaled( bmpd, width, height );
 				}
 				else
-					ModelMetadataEvent.addListener( ModelMetadataEvent.BITMAP_LOADED, thumbnailLoaded )				
+					ModelMetadataEvent.addListener( ModelMetadataEvent.BITMAP_LOADED, thumbnailLoaded );
 				
 				// listen for changes to this object
-				ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged )
+				ModelMetadataEvent.addListener( ModelBaseEvent.CHANGED, metadataChanged );
 				_name.text = om.vmm.name;
 				var modelsOfThisGuid:int = om.vmm.permissions.copyCount;
 				if ( 99999 < modelsOfThisGuid )

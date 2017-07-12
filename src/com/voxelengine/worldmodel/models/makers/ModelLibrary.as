@@ -25,22 +25,40 @@ import flash.utils.getDefinitionByName;
         
         public static function getAsset ( assetLinkageID : String ) : Class
         {
-			Projectile;
-			Gun;
-			Barrel;
-			Stand;
-			Trigger;
-			Player;
-			Avatar;
-			VoxelModel;
-			Engine;
-			Bomb;
-			Ship;
-			Beast;
-			Dragon;
-			Propeller;
-			Target;
-			EditCursor;
+			{
+				//noinspection BadExpressionStatementJS
+				Projectile;
+				//noinspection BadExpressionStatementJS
+				Gun;
+				//noinspection BadExpressionStatementJS
+				Barrel;
+				//noinspection BadExpressionStatementJS
+				Stand;
+				//noinspection BadExpressionStatementJS
+				Trigger;
+				//noinspection BadExpressionStatementJS
+				Player;
+				//noinspection BadExpressionStatementJS
+				Avatar;
+				//noinspection BadExpressionStatementJS
+				VoxelModel;
+				//noinspection BadExpressionStatementJS
+				Engine;
+				//noinspection BadExpressionStatementJS
+				Bomb;
+				//noinspection BadExpressionStatementJS
+				Ship;
+				//noinspection BadExpressionStatementJS
+				Beast;
+				//noinspection BadExpressionStatementJS
+				Dragon;
+				//noinspection BadExpressionStatementJS
+				Propeller;
+				//noinspection BadExpressionStatementJS
+				Target;
+				//noinspection BadExpressionStatementJS
+				EditCursor;
+			}
 			//
 			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.models.types.VoxelModel" ) );
 			try 

@@ -38,12 +38,12 @@ import com.voxelengine.worldmodel.models.InstanceInfo;
 
 public class BombScript extends Script 
 {
-	private var _bulletSize:int = 2;
 	//private var _channel:SoundChannel;
 	protected var _soundFile:String = "BombDrop.mp3";		
 	
 	public function BombScript( $params:Object ) {
 		super( $params );
+		var _bulletSize:int = 2;
 		if ( $params && $params.bulletSize )
 			_bulletSize = $params.bulletSize;
 
@@ -82,7 +82,7 @@ public class BombScript extends Script
 		
 		//var snd:Sound = SoundCache.getSound( _soundFile );
 		//_channel = snd.play();
-		SoundCache.playSound( _soundFile )
+		SoundCache.playSound( _soundFile );
 		
 		var bomb:Bomb = Region.currentRegion.modelCache.instanceGet( instanceGuid ) as Bomb;
 		if ( bomb )

@@ -33,7 +33,7 @@ public class Armory {
 	}
 
 	public function remove( $ammo:Ammo ):void {
-		for ( var i:int; i < _ammos.length; i++ ) {
+		for ( var i:int = 0; i < _ammos.length; i++ ) {
 			if ( _ammos[i] && $ammo.name == _ammos[i].name )
 				_ammos.splice( i, 1);
 		}
@@ -56,7 +56,7 @@ public class Armory {
 	}
 	
 	public function getAmmoByName( $name:String ):Ammo {
-		for ( var i:int; i < _ammos.length; i++ ) {
+		for ( var i:int = 0; i < _ammos.length; i++ ) {
 			if ( _ammos[i] && $name == _ammos[i].name )
 				return _ammos[i];
 		}

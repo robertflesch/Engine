@@ -382,7 +382,7 @@ package com.voxelengine.utils.transitions.properties {
 					angleToSplit = 0;
 				}
 				hues[angleToSplit].angle = (hues[0].angle + hues[1].angle)/2;
-				hues[angleToSplit].matrix = getHueMatrix(hues[angleToSplit].angle)
+				hues[angleToSplit].matrix = getHueMatrix(hues[angleToSplit].angle);
 				hues[angleToSplit].distance = getHueDistance(mtx, hues[angleToSplit].matrix);
 			}
 

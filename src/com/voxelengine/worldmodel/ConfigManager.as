@@ -32,7 +32,7 @@ package com.voxelengine.worldmodel
 		private var _showHelp:Boolean = true;
 		private var _showEditMenu:Boolean = true;
 		private var _showButtons:Boolean = true;
-		private var _defaultRegionJson:Object
+		private var _defaultRegionJson:Object;
 		
 		public function get showHelp():Boolean { return _showHelp; }
 		public function get showEditMenu():Boolean { return _showEditMenu; }

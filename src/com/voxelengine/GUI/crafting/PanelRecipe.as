@@ -22,8 +22,8 @@ import com.voxelengine.GUI.LanguageManager;
 
 public class PanelRecipe extends PanelBase
 {
-	private var _panelForumla:PanelBase
-	private var _panelButtons:PanelBase
+	private var _panelForumla:PanelBase;
+	private var _panelButtons:PanelBase;
 	private var _panelMaterials:PanelMaterials;
 	private var _panelBonuses:PanelBonuses;
 	private var _panelPreview:PanelPreview;

@@ -37,7 +37,7 @@ import flash.utils.Timer;
 	 */
 	public class Flow extends FlowTask 
 	{		
-		private var _vm:VoxelModel	// temp holder for VM, it is set to null when start routine exits.
+		private var _vm:VoxelModel;	// temp holder for VM, it is set to null when start routine exits.
 		static public function addTask( $instanceGuid:String, $gc:GrainCursor, $type:int, $taskPriority:int ):void {
 			// http://jacksondunstan.com/articles/2439 for a better assert
 			if ( TypeInfo.INVALID == $type ) {
@@ -61,7 +61,7 @@ import flash.utils.Timer;
 		public function Flow( $instanceGuid:String, $gc:GrainCursor, $type:int, $taskType:String, $taskPriority:int ):void {
 			super( $instanceGuid, $gc, $type, $taskType, $taskPriority );
 			//Log.out( "Flow.create flow: " + toString() );
-			var spreadInterval:int = TypeInfo.typeInfo[$type].spreadInterval // How fast this type spreads
+			var spreadInterval:int = TypeInfo.typeInfo[$type].spreadInterval; // How fast this type spreads
 			var pt:Timer = new Timer( spreadInterval, 1 );
 			pt.addEventListener(TimerEvent.TIMER, timeout );
 			pt.start();
@@ -87,7 +87,7 @@ import flash.utils.Timer;
 					Log.out( "Flow.start - null == $flowFromOxel.flowInfo", Log.WARN );
 					return; }
 				
-				var flowType:uint = $flowFromOxel.flowInfo.type
+				var flowType:uint = $flowFromOxel.flowInfo.type;
 				//Log.out( "Flow.start - flowable oxel of type: " + ft );
 				if ( FlowInfo.FLOW_TYPE_CONTINUOUS == flowType )
 					flowStartContinous($flowFromOxel);
@@ -97,14 +97,14 @@ import flash.utils.Timer;
 					flowStartSpring($flowFromOxel);
 				else {
 					Log.out( "Flow.start - NO FLOW TYPE FOUND ft: " + flowType + " using continuous flow", Log.WARN );
-					$flowFromOxel.flowInfo.type = FlowInfo.FLOW_TYPE_CONTINUOUS
+					$flowFromOxel.flowInfo.type = FlowInfo.FLOW_TYPE_CONTINUOUS;
 					flowStartContinous($flowFromOxel)
 				}
 			}
 			else
 				Log.out( "Flow.start - VoxelModel not found: " + _guid, Log.ERROR );
 				
-			_vm = null	
+			_vm = null;
 			super.complete();
 			//Log.out( "Flow.start - Complete time: " + (getTimer() - timeStart) );
 		}
@@ -119,7 +119,7 @@ import flash.utils.Timer;
 			// each child voxel should try to flow at least 8 before stopping
 			if ( MIN_MELT_GRAIN > $flowFromOxel.gc.grain )
 				//$flowFromOxel.changeOxel( _guid, $flowFromOxel.gc, TypeInfo.AIR )
-				_vm.write( $flowFromOxel.gc, TypeInfo.AIR )
+				_vm.write( $flowFromOxel.gc, TypeInfo.AIR );
 				return;
 				
 			//FlowFlop.addTask( _guid, $flowFromOxel.gc, $flowFromOxel.type, $flowFromOxel.flowInfo, 1 );
@@ -138,7 +138,7 @@ import flash.utils.Timer;
 			
 			if ( Globals.g_oxelBreakEnabled	)
 				if ( $flowFromOxel.gc.evalGC( Globals.g_oxelBreakData ) )
-					trace( "Flow.flowStartContinous - setGC breakpoint" )
+					trace( "Flow.flowStartContinous - setGC breakpoint" );
 					
 			var downwardFlow:Boolean = false;
 			if ( floatiumTypeID == type )
@@ -155,7 +155,7 @@ import flash.utils.Timer;
 				// reset list
 				flowCandidates.length = 0;	
 			} else if ( downwardFlow ) {
-				trace( "Flow.flowStartContinous - partial" )
+				trace( "Flow.flowStartContinous - partial" );
 				return
 			}
 				
@@ -221,7 +221,7 @@ import flash.utils.Timer;
 							// there is water or lava or any other flowable type that is the same below us, we should not flow out.
 							if ( Globals.NEGY == $face ) {
 								if ( no.flowInfo.flowScaling.has() )
-									no.flowInfo.flowScaling.reset( no )
+									no.flowInfo.flowScaling.reset( no );
 									no.flowInfo.flowScaling.neighborsRecalc( no, false );
 								partial = true;
 							}
@@ -238,7 +238,7 @@ import flash.utils.Timer;
 		private function attemptFlowIntoChildren( $no:Oxel, $face:int, $fc:Vector.<FlowCandidate> ):Boolean {
 			// 
 			if ( MIN_FLOW_GRAIN + 1 > $no.gc.grain )
-				return false
+				return false;
 				
 			var partial:Boolean = false;
 			const dchildren:Vector.<Oxel> = $no.childrenForDirection( Oxel.face_get_opposite( $face ) );
@@ -263,31 +263,31 @@ import flash.utils.Timer;
 		
 		private function flowTasksAdd( $fc:Vector.<FlowCandidate>, $upOrDown:Boolean, $flowInfo:FlowInfo ):void {
 			for each ( var flowTest:FlowCandidate in $fc ) {
-				const stepSize:int = ( flowTest.flowCandidate.gc.size() / Globals.UNITS_PER_METER) * 4
+				const stepSize:int = ( flowTest.flowCandidate.gc.size() / Globals.UNITS_PER_METER) * 4;
 				if ( !$upOrDown && 0 == $flowInfo.flowScaling.min() )
-					continue
+					continue;
 				
 				//Log.out( "Oxel.flowTaskAdd - $count: " + $countDown + "  countOut: " + $countOut + " gc data: " + flowCanditate.gc.toString() + " tasks: " + (Globals.taskController.queueSize() + 1) );
 				if (  null == flowTest.flowCandidate.flowInfo )
-					flowTest.flowCandidate.flowInfo = FlowInfoPool.poolGet()
+					flowTest.flowCandidate.flowInfo = FlowInfoPool.poolGet();
 
 				// now set the flowInfo in the flowCandidate, which will be using in the changeOxel
-				var fi:FlowInfo = flowTest.flowCandidate.flowInfo
-				fi.copy( $flowInfo )
-				fi.directionSetAndDecrement( flowTest.dir, stepSize )
+				var fi:FlowInfo = flowTest.flowCandidate.flowInfo;
+				fi.copy( $flowInfo );
+				fi.directionSetAndDecrement( flowTest.dir, stepSize );
 					
 				var	taskPriority:int = 3;
 				if ( $upOrDown ) {
-					taskPriority = 1
-					flowTest.flowCandidate.flowInfo.flowScaling.reset()
+					taskPriority = 1;
+					flowTest.flowCandidate.flowInfo.flowScaling.reset();
 					if ( 0 > fi.down )
-						continue
+						continue;
 					else if ( fi.changeType( stepSize ) ) {
-						var newType:uint = TypeInfo.changeType( type )
+						var newType:uint = TypeInfo.changeType( type );
 						if ( TypeInfo.AIR == newType )
-							continue
+							continue;
 						else {	
-							_type = newType
+							_type = newType;
 							fi.copy( TypeInfo.typeInfo[type].flowInfo )
 						}
 					}
@@ -296,7 +296,7 @@ import flash.utils.Timer;
 					
 				//Log.out( "Flow.flowTasksAdd fi.type: " + fi.type + "  fi.out" + fi.out + "  fi.flowScaling.min " + fi.flowScaling.min() )
 					
-				writeFlowTypeAndScaleNeighbors( flowTest.flowCandidate )
+				writeFlowTypeAndScaleNeighbors( flowTest.flowCandidate );
 				Flow.addTask( _guid, flowTest.flowCandidate.gc, type, taskPriority + 1 )
 			}
 		}
@@ -305,12 +305,12 @@ import flash.utils.Timer;
 		{
 			// I can only flow into AIR, everything else I interact with
 			//$flowIntoOxel.changeOxel( _guid, $flowIntoOxel.gc, type )
-			_vm.write( $flowIntoOxel.gc, type )
+			_vm.write( $flowIntoOxel.gc, type );
 			var flowOver:Oxel = $flowIntoOxel.neighbor( Globals.NEGY );
 			var flowUnder:Oxel = $flowIntoOxel.neighbor( Globals.POSY );
 			if ( TypeInfo.FIRE ==  type ) {
-				flowOver.setOnFire( _guid )
-				flowUnder.setOnFire( _guid )
+				flowOver.setOnFire( _guid );
+				flowUnder.setOnFire( _guid );
 				return
 			}
 			$flowIntoOxel.flowInfo.flowScaling.calculate( $flowIntoOxel );
@@ -319,12 +319,12 @@ import flash.utils.Timer;
 			if ( OxelBad.INVALID_OXEL != flowUnder ) {
 				if ( flowUnder.type == $flowIntoOxel.type ) {
 					//flowUnder.flowInfo.flowScaling.reset( flowUnder, true )
-					flowUnder.flowInfo.inheritFlowMax( $flowIntoOxel.flowInfo )
-					$flowIntoOxel.flowInfo.flowScaling.reset( $flowIntoOxel, true )
+					flowUnder.flowInfo.inheritFlowMax( $flowIntoOxel.flowInfo );
+					$flowIntoOxel.flowInfo.flowScaling.reset( $flowIntoOxel, true );
 					flowUnder.flowInfo.flowScaling.neighborsRecalc( flowUnder, true );
 				} else {
 					if ( flowUnder.childrenHas() ) 
-						attemptInteractionWithChildren( flowUnder, Globals.NEGY )
+						attemptInteractionWithChildren( flowUnder, Globals.NEGY );
 					else
 						interactRescale( flowUnder )
 				}
@@ -332,13 +332,13 @@ import flash.utils.Timer;
 			// if I flow over another oxel of the same type, reset its scaling
 			if ( OxelBad.INVALID_OXEL != flowOver ) {
 				if ( flowOver.type == $flowIntoOxel.type ) {
-					flowOver.flowInfo.flowScaling.reset( flowOver, true )
-					flowOver.flowInfo.inheritFlowMax( $flowIntoOxel.flowInfo )
-					flowOver.flowInfo.flowScaling.reset( $flowIntoOxel, true )
+					flowOver.flowInfo.flowScaling.reset( flowOver, true );
+					flowOver.flowInfo.inheritFlowMax( $flowIntoOxel.flowInfo );
+					flowOver.flowInfo.flowScaling.reset( $flowIntoOxel, true );
 					flowOver.flowInfo.flowScaling.neighborsRecalc( flowOver, true );
 				} else {
 					if ( flowOver.childrenHas() ) 
-						attemptInteractionWithChildren( flowOver, Globals.NEGY )
+						attemptInteractionWithChildren( flowOver, Globals.NEGY );
 					else
 						interactRescale( flowOver )
 				}
@@ -351,14 +351,14 @@ import flash.utils.Timer;
 		private function interactRescale( $interOxel:Oxel ):void {
 			var ipo:InteractionParams = TypeInfo.typeInfo[type].interactions.IOGet( TypeInfo.typeInfo[$interOxel.type].name );
 			if ( "AIR" != ipo.type && $interOxel.flowInfo && $interOxel.flowInfo.flowScaling.has() ) {
-				$interOxel.flowInfo.flowScaling.reset( $interOxel, true )
+				$interOxel.flowInfo.flowScaling.reset( $interOxel, true );
 				$interOxel.flowInfo.flowScaling.neighborsRecalc( $interOxel, true );
 			}
 		}
 		
 		private function attemptInteractionWithChildren( flowOver:Oxel, $face:int ):Boolean {
 			if ( MIN_FLOW_GRAIN + 1 > flowOver.gc.grain )
-				return false
+				return false;
 				
 			var partial:Boolean = false;
 			const dchildren:Vector.<Oxel> = flowOver.childrenForDirection( Oxel.face_get_opposite( $face ) );
@@ -406,7 +406,7 @@ internal class FlowCandidate
 	public var dir:int = Globals.ALL_DIRS;
 	
 	public function FlowCandidate( $dir:int, $fc:Oxel ) {
-		dir = $dir
+		dir = $dir;
 		flowCandidate = $fc
 	}
 }

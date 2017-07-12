@@ -63,7 +63,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		static private function crossListCreate():void { 
 			_crossList = new Vector.<Vector3D>(CROSS_LIST_SIZE, true);
-			var index:int
+			var index:int = 0;
 			_crossList[index++] = new Vector3D( 0, 0, 1 );
 			_crossList[index++] = new Vector3D( 0, 0, -1 );
 			_crossList[index++] = new Vector3D( 0, 1, 0 );
@@ -89,15 +89,15 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			_crossList[index++] = new Vector3D( -1, 1, 1 );
 			_crossList[index++] = new Vector3D( -1, 1, -1 );
 			_crossList[index++] = new Vector3D( -1, -1, 1 );
-			_crossList[index++] = new Vector3D( -1, -1, -1 );
+			_crossList[index] = new Vector3D( -1, -1, -1 );
 		}
 		
 		override public function start():void {
-            super.start() // AbstractTask will send event
+            super.start(); // AbstractTask will send event
 			var timer:int = getTimer();
             var vm:VoxelModel = getVoxelModel();
 			if ( !vm ) {
-				super.complete() // AbstractTask will send event
+				super.complete(); // AbstractTask will send event
 				return;
 			}
 			
@@ -133,12 +133,12 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 			trace( "CarveTunnels - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime)  );
 			Oxel.merge( vm.modelInfo.oxelPersistence.oxel );
-            super.complete() // AbstractTask will send event
+            super.complete(); // AbstractTask will send event
 		}
 		
 		private function rndOffset( $max:int ):int {
 			
-			var offset:int = 0.5 < Math.random() ? -Math.random() * $max/2 : Math.random() * $max/2
+			var offset:int = 0.5 < Math.random() ? -Math.random() * $max/2 : Math.random() * $max/2;
 			//trace( "rndOffset: " + offset );
 			return offset;
 		}

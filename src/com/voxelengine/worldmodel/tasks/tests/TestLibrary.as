@@ -22,10 +22,13 @@ package com.voxelengine.worldmodel.tasks.tests
         
         public static function getAsset ( assetLinkageID : String ) : Class
         {
+			//noinspection BadExpressionStatementJS
 			TestSphere;	
+			//noinspection BadExpressionStatementJS
 			GenerateCube;
+			//noinspection BadExpressionStatementJS
 			TestError;
-			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.tasks.tests.TestError" ) ) ;;
+			var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.tasks.tests.TestError" ) ) ;
 			try 
 			{
 				asset = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.tasks.tests." + assetLinkageID ) ) ;

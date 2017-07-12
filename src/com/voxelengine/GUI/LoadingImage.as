@@ -83,7 +83,7 @@ public class LoadingImage extends VVCanvas
 
     private function onResize(event:Event):void {
         // still kinda funky in placement.... but works.
-        _outline.x = Renderer.renderer.width / 2 - _outline.x / 2
+        _outline.x = Renderer.renderer.width / 2 - _outline.x / 2;
         _outline.y = Renderer.renderer.height / 2 - _outline.y / 2
     }
 
@@ -91,7 +91,7 @@ public class LoadingImage extends VVCanvas
     private function onRemoved( event:Event ):void {
         removeEventListener(UIOEvent.REMOVED, onRemoved );
         Globals.g_app.stage.removeEventListener( Event.RESIZE, onResize );
-        AppEvent.removeListener( Event.ENTER_FRAME, onEnterFrame )
+        AppEvent.removeListener( Event.ENTER_FRAME, onEnterFrame );
 
         _s_currentInstance = null;
     }

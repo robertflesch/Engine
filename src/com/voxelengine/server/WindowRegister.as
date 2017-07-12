@@ -49,10 +49,10 @@ import flash.display.Bitmap;
 		private var _captchaText:String = "";
 		private var _captchaKey:String = "";
 		private var _errorText:TextArea;
-		private var _passwordInput:TextInput
-		private var _passwordInput2:TextInput
-		private var _unInput:TextInput
-		private var _eInput:TextInput
+		private var _passwordInput:TextInput;
+		private var _passwordInput2:TextInput;
+		private var _unInput:TextInput;
+		private var _eInput:TextInput;
 		
 		private var _refresh:Bitmap;
 		[Embed(source='../../../../embed/textures/refresh.png')]
@@ -172,10 +172,10 @@ import flash.display.Bitmap;
 			PlayerIO.quickConnect.simpleGetCaptcha( ServerConfig.configGetCurrent().key, CAPTCHA_WIDTH, CAPTCHA_HEIGHT, captchaReceive, captchaFailure );
 		}
 		
-		private var _ci:Container
+		private var _ci:Container;
 		private function captchaReceive( $captchaKey:String, $captchaImageUrl:String):void
 		{
-			_captchaKey = $captchaKey
+			_captchaKey = $captchaKey;
 			var loader:Loader = new Loader();
 			loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onCaptchaLoadComplete );
 			loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onCaptchaLoadError );

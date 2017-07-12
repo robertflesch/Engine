@@ -19,34 +19,58 @@ public class TaskLibrary
 {
 	public static function getAsset ( assetLinkageID : String ) : Class
 	{
-		GenerateLayer; // Tested
-		CarveOutsideSurface; // Tested
-		CarveOutsideSurfaceNoTaper; // Tested
-		CarveOutsideVolcano; //
-		MergeLayer;
-		LoadingImageDisplay;
-		LoadingImageDestroy;
-		CarveTunnel; // One tunnel starting at edit cursor location
-		CarveTunnels;
-		GrowTreesOn; // Tested
-		GrowTreesOnAnything;
-		GenerateWater;
-		GenerateCube;
-		GenerateSphere;
-		LoadModelFromIVM;
-		Flow;
-		DirtToGrassAndSand;
+		//noinspection BadExpressionStatementJS
+        GenerateLayer; // Tested
+		//noinspection BadExpressionStatementJS
+        CarveOutsideSurface; // Tested
+		//noinspection BadExpressionStatementJS
+        CarveOutsideSurfaceNoTaper; // Tested
+		//noinspection BadExpressionStatementJS
+        CarveOutsideVolcano; //
+		//noinspection BadExpressionStatementJS
+        MergeLayer;
+		//noinspection BadExpressionStatementJS
+        LoadingImageDisplay;
+		//noinspection BadExpressionStatementJS
+        LoadingImageDestroy;
+		//noinspection BadExpressionStatementJS
+        CarveTunnel; // One tunnel starting at edit cursor location
+		//noinspection BadExpressionStatementJS
+        CarveTunnels;
+		//noinspection BadExpressionStatementJS
+        GrowTreesOn; // Tested
+		//noinspection BadExpressionStatementJS
+        GrowTreesOnAnything;
+		//noinspection BadExpressionStatementJS
+        GenerateWater;
+		//noinspection BadExpressionStatementJS
+        GenerateCube;
+		//noinspection BadExpressionStatementJS
+        GenerateSphere;
+		//noinspection BadExpressionStatementJS
+        LoadModelFromIVM;
+		//noinspection BadExpressionStatementJS
+        Flow;
+		//noinspection BadExpressionStatementJS
+        DirtToGrassAndSand;
 
 
 		/// old or untested
-		GenerateGrassAndTrees; // Old
-		GenerateVolcano; //
-		GenerateLavaPockets;
+		//noinspection BadExpressionStatementJS
+        GenerateGrassAndTrees; // Old
+		//noinspection BadExpressionStatementJS
+        GenerateVolcano; //
+		//noinspection BadExpressionStatementJS
+        GenerateLavaPockets;
 
-		GenerateSubSphere;
-		LandscapeError;
-		GenerateClouds;
-		CarveCloudOutside;
+		//noinspection BadExpressionStatementJS
+        GenerateSubSphere;
+		//noinspection BadExpressionStatementJS
+        LandscapeError;
+		//noinspection BadExpressionStatementJS
+        GenerateClouds;
+		//noinspection BadExpressionStatementJS
+        CarveCloudOutside;
 
 		var asset:Class = Class ( getDefinitionByName ( "com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeError" ) );
 		try

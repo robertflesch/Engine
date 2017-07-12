@@ -75,7 +75,7 @@ import flash.display.Bitmap;
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize );
 			
-			VoxelVerseGUI.currentInstance.hideGUI()
+			VoxelVerseGUI.currentInstance.hideGUI();
 			onResize(null);
 			WindowSplashEvent.create( WindowSplashEvent.SPLASH_LOAD_COMPLETE );
 			

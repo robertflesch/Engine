@@ -37,8 +37,8 @@ import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 			trace( "CarveOutsideSurface  - enter ", Log.ERROR );					
 			var vm:VoxelModel = getVoxelModel();
 
-			var masterHeightMap:Array = null;
-			var masterMapSize:uint = 0;
+			var masterHeightMap:Array;
+			var masterMapSize:uint;
 
 			var size:int = vm.modelInfo.oxelPersistence.oxel.size_in_world_coordinates();
 			var oxel:Oxel = vm.modelInfo.oxelPersistence.oxel;
@@ -93,14 +93,14 @@ import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 						//heightAdjustedMaxRadius *= 0.55;
 						heightAdjustedMaxRadius *= 0.50;
 						
-						var voxelDistToCenter:Number = Math.sqrt( (center - x * minGrainInG0 ) * (center - x* minGrainInG0) + (center - z* minGrainInG0) * (center - z* minGrainInG0) )	
+						var voxelDistToCenter:Number = Math.sqrt( (center - x * minGrainInG0 ) * (center - x* minGrainInG0) + (center - z* minGrainInG0) * (center - z* minGrainInG0) );
 						if ( voxelDistToCenter > heightAdjustedMaxRadius )
 						{
 							GrainCursor.roundToInt( x, y, z, gct );
 							to = oxel.childFind( gct );
 							if ( OxelBad.INVALID_OXEL != to )
 							{
-								to.change( _modelGuid, gct, TypeInfo.AIR )
+								to.change( _modelGuid, gct, TypeInfo.AIR );
 								//to.writeFromHeightMap( gct, TypeInfo.AIR );
 							}
 						}

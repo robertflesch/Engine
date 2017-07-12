@@ -49,7 +49,7 @@ package com.voxelengine.utils
 			_stream.addEventListener(HTTPStatusEvent.HTTP_STATUS, httpStatusHandler);
 			if (request != null){
 				load(request);
-			};
+			}
 		}
 		public function load(request:URLRequest):void {
 			_urlRequest = request;
@@ -75,12 +75,12 @@ package com.voxelengine.utils
 					if (bytes.length > 0){
 						_data = new URLVariables(bytes.toString());
 						break;
-					};
+					}
 				case "text":
 				default:
 					_data = bytes.toString();
 					break;
-			};
+			}
 			//trace("CustomURLLoader: (" + fileName + "): " + event.type);
 			dispatchEvent(event);
 		}

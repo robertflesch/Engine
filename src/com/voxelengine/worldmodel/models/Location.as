@@ -80,7 +80,7 @@ public class Location
 	public function get rotationGet():Vector3D 				{ return _rotation; }
 	public function 	rotationGetComp():Vector3D 				{ return _rotation; }
 	public function set rotationSet($val:Vector3D):void 	{ rotationSetComp( $val.x, $val.y, $val.z ); }
-	public function get rotationGetRadians():Vector3D 		{ return new Vector3D( _rotation.x * Math.PI / 180, _rotation.y * Math.PI / 180, _rotation.z * Math.PI / 180 ) };
+	public function get rotationGetRadians():Vector3D 		{ return new Vector3D( _rotation.x * Math.PI / 180, _rotation.y * Math.PI / 180, _rotation.z * Math.PI / 180 ) }
 	public function 	rotationSetComp( $x:Number, $y:Number, $z:Number ):void {
 		//Log.out( "PosAndRot rot: " + _rotation.x+" " +_rotation.y+" " +_rotation.z );
 		// Copy old rotation

@@ -22,27 +22,27 @@ import com.voxelengine.worldmodel.weapons.Projectile
 
 public final class ProjectilePoolType 
 { 
-	private var _currentPoolSize:uint 
-	private var _growthValue:uint 
-	private var _counter:uint 
-	private var _pool:Vector.<Projectile> 
-	private var _modelInfo:ModelInfo
-	private var _modelMetadata:ModelMetadata
+	private var _currentPoolSize:uint;
+	private var _growthValue:uint;
+	private var _counter:uint;
+	private var _pool:Vector.<Projectile>;
+	private var _modelInfo:ModelInfo;
+	private var _modelMetadata:ModelMetadata;
 	
 	public function remaining():uint { return _counter }
 	public function total():uint { return _pool.length }
 	public function totalUsed():uint { return _pool ? _pool.length - _counter : _growthValue }
 
 	public function ProjectilePoolType( $type:uint, $initialPoolSize:uint, $growthValue:uint ):void {
-		_currentPoolSize = $initialPoolSize 
-		_growthValue = $growthValue 
-		_counter = $initialPoolSize 
+		_currentPoolSize = $initialPoolSize;
+		_growthValue = $growthValue;
+		_counter = $initialPoolSize;
 		
-		var i:uint = _counter 
-		_pool = new Vector.<Projectile>(_counter)
-		_counter = 0
+		var i:uint = _counter;
+		_pool = new Vector.<Projectile>(_counter);
+		_counter = 0;
 		//Log.out( "ProjectilePoolType.onModelInfoLoaded: counter: " + _counter + "  _currentPoolSize: " + _currentPoolSize + " poolsize: " + _pool.length )
-		generateData( $type )
+		generateData( $type );
 		// This creates many instances of the same projectileGuid
 		// maybe some issues of grain size is different...
 		while( --i > -1 ) 
@@ -105,7 +105,7 @@ public final class ProjectilePoolType
 //		var timer:int = getTimer()
 
 		_currentPoolSize += _growthValue;
-		_pool = null
+		_pool = null;
 		_pool = new Vector.<Projectile>(_currentPoolSize);
 		for ( var newIndex:int = 0; newIndex < _growthValue; newIndex++ ) 
 			_pool[newIndex] = newModel()

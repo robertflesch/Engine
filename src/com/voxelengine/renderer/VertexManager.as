@@ -53,7 +53,7 @@ public class VertexManager {
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	public function createShaders($context:Context3D):void	{
 		_shaders = new Vector.<Shader>;
-		var shader:Shader = null;
+		var shader:Shader;
 		_shaders.push( new ShaderOxel($context) ); // oxel
 		
 		shader = new ShaderOxel($context); // animated oxel

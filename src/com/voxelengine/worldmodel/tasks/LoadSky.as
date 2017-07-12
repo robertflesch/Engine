@@ -33,14 +33,14 @@ package com.voxelengine.worldmodel.tasks
 		
 		override public function start():void
 		{
-			super.start() // AbstractTask will send event
+			super.start(); // AbstractTask will send event
 
 			var timer:int = getTimer();
 			
 			var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _modelGuid );
 
 			trace( "LoadSky.start - completed layer of type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
-			super.complete() // AbstractTask will send event
+			super.complete(); // AbstractTask will send event
 		}
 		
 		override public function cancel():void {

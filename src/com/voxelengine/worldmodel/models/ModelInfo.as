@@ -518,8 +518,8 @@ public class ModelInfo extends PersistenceObject
 		}
 		// didn't find it at first level, lets look recursively
 		if ( $recursive ) {
-			for each (child in childVoxelModels) {
-				return child.modelInfo.childModelFindByName($name);
+			for each (var child1:VoxelModel in childVoxelModels) {
+				return child1.modelInfo.childModelFindByName($name);
 			}
 		}
 		//Log.out(  "VoxelModel.childFind - not found for guid: " + guid, Log.WARN );
@@ -683,7 +683,7 @@ public class ModelInfo extends PersistenceObject
 	override public function clone( $guid:String ):* {
 		var oldObj:String = JSON.stringify( dbo );
 
-		var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.MODEL_INFO_EXT, $guid, null, oldObj )
+		var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.MODEL_INFO_EXT, $guid, null, oldObj );
 		PersistenceEvent.dispatch( pe );
 
 		// also need to clone the oxel

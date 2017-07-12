@@ -488,10 +488,11 @@ public class Avatar extends ControllableVoxelModel
 			if ( MIN_TURN_AMOUNT >= Math.abs(dy) )
 				dy = 0;
 
-			const currentCamRotation:Vector3D = cameraContainer.current.rotation;
-			cameraContainer.current.rotation.setTo( currentCamRotation.x + dx
-												  , currentCamRotation.y + dy
-					                              , 0 );
+			const currentCamRotation:Vector3D = CameraLocation.rotation;
+			const camCenter:Vector3D = instanceInfo.center;
+			CameraLocation.rotation.setTo( currentCamRotation.x + dx
+										 , currentCamRotation.y + dy
+										 , 0 );
 			const currentBodyRotation:Vector3D = instanceInfo.rotationGet;
 			var head:VoxelModel = childFindByName( "Head" );
 			if ( head ){

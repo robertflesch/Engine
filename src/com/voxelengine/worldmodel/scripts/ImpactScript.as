@@ -24,8 +24,9 @@ public class ImpactScript extends Script
 
 	public function ImpactScript( $params:Object ) {
 		super( $params );
-		Log.out( "ImpactScript - how are params passed in?")
-		$params //_ammo = $ammo;
+		Log.out( "ImpactScript - how are params passed in?");
+		//noinspection BadExpressionStatementJS
+		$params; //_ammo = $ammo;
 	}
 
 	public function impact( wsLoc:Vector3D ):void

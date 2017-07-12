@@ -18,9 +18,9 @@ public class VertexComponent {
 		_size = $size;
 	}
 	
-	public function setNums( one:Number, two:Number, three:Number ):void {;}
-	public function setInts( one:int, two:int, three:int):void {;}
-	public function setUint(args:uint):void {;}
+	public function setNums( one:Number, two:Number, three:Number ):void {}
+	public function setInts( one:int, two:int, three:int):void {}
+	public function setUint(args:uint):void {}
 	
 	public function writeToByteArray( ba:ByteArray ):void {}
 	

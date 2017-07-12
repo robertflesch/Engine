@@ -31,7 +31,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		}
 		
 		override public function start():void {
-            super.start() // AbstractTask will send event
+            super.start(); // AbstractTask will send event
 			
 			var timer:int = getTimer();
 			
@@ -42,7 +42,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var masterMapSize:uint = Math.min( oxel.size_in_world_coordinates(), 1024 );
 			
 			//var octaves:int  = ( Math.random() * 144 ) % (Math.random() * 12);
-			var octaves:int;
+			var octaves:int = 0;
 			if ( 0 == octaves )
 				octaves = 6;
 			Log.out( "GenerateVolcano - start - generating random number of octives Octaves: " + octaves );					
@@ -129,7 +129,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			//oxel.mergeRecursive();
 			//Log.out( "GenerateVolcano - merging 2 recovered: " + Oxel.nodes + " took: " + (getTimer() - timer), Log.ERROR );
 			
-            super.complete() // AbstractTask will send event
+            super.complete(); // AbstractTask will send event
 		}
 		
 		override public function cancel():void {

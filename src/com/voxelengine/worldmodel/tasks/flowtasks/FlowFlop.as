@@ -8,7 +8,10 @@
 
 package com.voxelengine.worldmodel.tasks.flowtasks
 {
-	import flash.utils.Timer;
+import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.oxel.OxelBad;
+
+import flash.utils.Timer;
 	import flash.utils.getTimer;
 	import flash.events.TimerEvent;
 
@@ -203,11 +206,11 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 				GrainCursorPool.poolDispose( gct );
 				if ( TypeInfo.AIR == flowIntoChild.type )
 				{
-					flowIntoChild.write( _guid, flowIntoChild.gc, _type );
+					flowIntoChild.change( _guid, flowIntoChild.gc, _type );
 					flowIntoChild.flowInfo.direction = $dir;
 					flowIntoChild.flowInfo.flowScaling.calculate( flowIntoChild );
 					flowFromChild = $flowOxel.childGetFromDirection( $dir, TOP_LEVEL, opposite );
-					flowFromChild.write( _guid, flowFromChild.gc, TypeInfo.AIR );
+					flowFromChild.change( _guid, flowFromChild.gc, TypeInfo.AIR );
 					return flowIntoChild;
 				}
 				else
@@ -217,11 +220,11 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 					flowFromChild = $flowOxel.childGetFromDirection( Oxel.face_get_opposite( $dir ), BOTTOM_LEVEL, opposite );
 					if ( TypeInfo.AIR == flowIntoChild.type )
 					{
-						flowIntoChild.write( _guid, flowIntoChild.gc, _type );
+						flowIntoChild.change( _guid, flowIntoChild.gc, _type );
 						flowIntoChild.flowInfo.direction = $dir;
 						flowIntoChild.flowInfo.flowScaling.calculate( flowIntoChild );
 						flowFromChild = $flowOxel.childGetFromDirection( $dir, TOP_LEVEL, opposite );
-						flowFromChild.write( _guid, flowFromChild.gc, TypeInfo.AIR );
+						flowFromChild.change( _guid, flowFromChild.gc, TypeInfo.AIR );
 						return flowIntoChild;
 					}
 				}
@@ -232,16 +235,15 @@ package com.voxelengine.worldmodel.tasks.flowtasks
 		
 		private function adjecentSideGet( $dir:int ):int
 		{
-			with (Globals) {
-				if ( POSX == $dir )
-					return NEGZ;
-				else if ( NEGX == $dir )
-					return POSZ;
-				else if ( POSZ == $dir )
-					return POSX;
-				else if ( NEGZ == $dir )
-					return POSZ;
-			return POSY;
+			if ( Globals.POSX == $dir )
+				return Globals.NEGZ;
+			else if ( Globals.NEGX == $dir )
+				return Globals.POSZ;
+			else if ( Globals.POSZ == $dir )
+				return Globals.POSX;
+			else if ( Globals.NEGZ == $dir )
+				return Globals.POSZ;
+			return Globals.POSY;
 			}
 		}
 		

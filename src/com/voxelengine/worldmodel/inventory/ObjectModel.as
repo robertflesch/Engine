@@ -81,7 +81,7 @@ public class ObjectModel extends ObjectInfo
 			ModelMetadataEvent.removeListener( ModelBaseEvent.ADDED, metadataAdded );
 			ModelMetadataEvent.removeListener( ModelBaseEvent.RESULT, metadataAdded );
 			ModelMetadataEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, metadataFailed );
-			_vmm = e.modelMetadata
+			_vmm = e.modelMetadata;
 			// a delay is needed since the metadata loads the thumbnail on a seperate thread.
 			delayedUpdate()
 		}

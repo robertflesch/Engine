@@ -19,21 +19,21 @@ import com.voxelengine.worldmodel.weapons.Gun;
  */
 public class WeaponEvent extends Event
 {
-	static public const INVALID:String					= "INVALID"
-	static public const FIRE:String 					= "FIRE"
+	static public const INVALID:String					= "INVALID";
+	static public const FIRE:String 					= "FIRE";
 	
-	private var _ammo:Ammo
-	private var _gun:Gun
+	private var _ammo:Ammo;
+	private var _gun:Gun;
 	
 	public function get ammo():Ammo { return _ammo }
 	public function get gun():Gun { return _gun }
 	
 	public function WeaponEvent( $type:String, $gun:Gun, $ammo:Ammo, $bubbles:Boolean = true, $cancellable:Boolean = false ) {
-		super( $type, $bubbles, $cancellable )
-		_ammo = $ammo
+		super( $type, $bubbles, $cancellable );
+		_ammo = $ammo;
 		if ( null == $ammo )
-			Log.out( "WeaponEvent.construction - NO AMMO DEFINED", Log.ERROR )
-		_gun = $gun
+			Log.out( "WeaponEvent.construction - NO AMMO DEFINED", Log.ERROR );
+		_gun = $gun;
 		if ( null == $gun )
 			Log.out( "WeaponEvent.construction - NO AMMO DEFINED", Log.ERROR )
 	}
@@ -49,7 +49,7 @@ public class WeaponEvent extends Event
 	///////////////// Event handler interface /////////////////////////////
 
 	// Used to distribute all persistance messages
-	static private var _eventDispatcher:EventDispatcher = new EventDispatcher()
+	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {
 		_eventDispatcher.addEventListener( $type, $listener, $useCapture, $priority, $useWeakReference )

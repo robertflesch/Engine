@@ -102,7 +102,7 @@ public class InventoryManager
 	static private function save( e:InventoryEvent ):void {
 		if ( Globals.online ) {
 			if ( null == _s_inventoryByGuid[e.owner] && null != e.result )
-				_s_inventoryByGuid[e.owner] == e.result as Inventory;
+				_s_inventoryByGuid[e.owner] = e.result as Inventory;
 
 			var inv:Inventory = _s_inventoryByGuid[e.owner];
 			if ( null != inv ) {
@@ -118,7 +118,7 @@ public class InventoryManager
 	static private function saveForce( e:InventoryEvent ):void {
 		if ( Globals.online ) {
 			if ( null == _s_inventoryByGuid[e.owner] && null != e.result )
-				_s_inventoryByGuid[e.owner] == e.result as Inventory;
+				_s_inventoryByGuid[e.owner] = e.result as Inventory;
 
 			var inv:Inventory = _s_inventoryByGuid[e.owner];
 			if ( null != inv ) {

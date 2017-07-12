@@ -41,7 +41,7 @@ import com.voxelengine.events.RegionEvent;
 		
 		override public function start():void
 		{
-			super.start() // AbstractTask will send event
+			super.start(); // AbstractTask will send event
 			_count--;
 
 //			Log.out( "CompletedModel.start - start: " + _guid );

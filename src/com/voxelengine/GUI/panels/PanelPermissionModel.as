@@ -24,7 +24,7 @@ public class PanelPermissionModel extends ExpandableBox
 {
 	private var _permissions:PermissionsModel;
 	public function PanelPermissionModel( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {		
-		_permissions = $ebco.rootObject
+		_permissions = $ebco.rootObject;
 		super( $parent, $ebco )
 	}
 	
@@ -34,11 +34,11 @@ public class PanelPermissionModel extends ExpandableBox
 	//}
 	
 	override protected function collapasedInfo():String  {
-		var outString:String = ""
+		var outString:String = "";
 		
-		outString += "creator: " + _permissions.creator + "   "
+		outString += "creator: " + _permissions.creator + "   ";
 		if ( _permissions.blueprint )
-			outString += "blue print: " + (_permissions.blueprint?"yes ":"no ")
+			outString += "blue print: " + (_permissions.blueprint?"yes ":"no ");
 		//if ( _at.hasScale )
 			//outString += formatVec3DToSummary( "scl:", _at.scale )
 		//if ( outString == "" ) {
@@ -62,36 +62,36 @@ public class PanelPermissionModel extends ExpandableBox
 	
 	override protected function hasElements():Boolean {
 		//if ( 0 < _ebco.item.delta.length ) 
-			return true
+			return true;
 		 
 		return false
 	}
 	
 	override protected function expand():void {
-		super.expand()
+		super.expand();
 	
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 4 ) );
 		// creator
-		_itemBox.addElement( new ComponentLabelSide( "Creator", _permissions.creator, _itemBox.width ) )
+		_itemBox.addElement( new ComponentLabelSide( "Creator", _permissions.creator, _itemBox.width ) );
 		// createdData
-		_itemBox.addElement( new ComponentLabelSide( "Created Date", _permissions.createdDate, _itemBox.width ) )
+		_itemBox.addElement( new ComponentLabelSide( "Created Date", _permissions.createdDate, _itemBox.width ) );
 		// copyCount
-		_itemBox.addElement( new ComponentLabelSide( "Copy Count", String( _permissions.copyCount ), _itemBox.width ) )
+		_itemBox.addElement( new ComponentLabelSide( "Copy Count", String( _permissions.copyCount ), _itemBox.width ) );
 		// blueprint
-		_itemBox.addElement( new ComponentCheckBox( "Blueprint", _permissions.blueprint, _itemBox.width, changeBluePrint ) )
+		_itemBox.addElement( new ComponentCheckBox( "Blueprint", _permissions.blueprint, _itemBox.width, changeBluePrint ) );
 		// blueprintGuid
-		_itemBox.addElement( new ComponentLabelSide( "Blue Print Guid", _permissions.blueprintGuid ? _permissions.blueprintGuid : "" , _itemBox.width ) )
+		_itemBox.addElement( new ComponentLabelSide( "Blue Print Guid", _permissions.blueprintGuid ? _permissions.blueprintGuid : "" , _itemBox.width ) );
 		// modifyData
-		_itemBox.addElement( new ComponentLabelSide( "Modified Date", _permissions.modifiedDate ? _permissions.modifiedDate : "", _itemBox.width ) )
+		_itemBox.addElement( new ComponentLabelSide( "Modified Date", _permissions.modifiedDate ? _permissions.modifiedDate : "", _itemBox.width ) );
 		// modify
-		_itemBox.addElement( new ComponentCheckBox( "Modify", _permissions.modify, _itemBox.width, changeModify ) )
+		_itemBox.addElement( new ComponentCheckBox( "Modify", _permissions.modify, _itemBox.width, changeModify ) );
 		// binding
 		_itemBox.addElement( new ComponentLabelSide( "Binding", _permissions.binding, _itemBox.width ) )
 	}
 	
 	private function changeModify(event:UIMouseEvent):void {
 		if ( Network.userId == _permissions.creator ) {
-			_permissions.modify = (event.target as CheckBox).selected
+			_permissions.modify = (event.target as CheckBox).selected;
 			_permissions.dboReference.changed = true
 		}
 		else
@@ -100,7 +100,7 @@ public class PanelPermissionModel extends ExpandableBox
 			
 	private function changeBluePrint(event:UIMouseEvent):void {
 		if ( Network.userId == _permissions.creator ) {
-			_permissions.blueprint = (event.target as CheckBox).selected
+			_permissions.blueprint = (event.target as CheckBox).selected;
 			_permissions.dboReference.changed = true
 		}
 		else

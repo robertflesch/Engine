@@ -44,7 +44,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		// use data = for model guid
 		override public function start():void {
 			var timer:int = getTimer();
-			super.start() // AbstractTask will send event
+			super.start(); // AbstractTask will send event
 
 			//var fileName:String = _layer.data;
 			//var index:int = fileName.indexOf( '*' );
@@ -94,7 +94,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		private	function errorAction(e:IOErrorEvent):void {
 			Log.out( "LoadModelFromIVM.errorAction: " + e.toString(), Log.ERROR );
-			super.complete() // AbstractTask will send event
+			super.complete(); // AbstractTask will send event
 		}	
 
 		private function loadByteArray( $ba:ByteArray ):void {
@@ -102,7 +102,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			var task:ITask = new LoadFromByteArray( _modelGuid, _layer );
 			Globals.taskController.addTask( task );
 
-			super.complete() // AbstractTask will send event
+			super.complete(); // AbstractTask will send event
 		}
 
 		

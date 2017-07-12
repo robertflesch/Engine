@@ -37,7 +37,7 @@ public class InventoryPanelRegions extends VVContainer
 	// This hold the items to be displayed
 	private var _itemContainer:Container;
 	private var _listbox1:ListBox;
-	private var _createFileButton:Button		
+	private var _createFileButton:Button;
 	
 	public function InventoryPanelRegions( $parent:VVContainer ) {
 		super( $parent );

@@ -36,7 +36,7 @@ public class ModelCache
 	public function get models():Vector.<VoxelModel> { return _instances; }
 	public function get getEditableModels():Vector.<VoxelModel> {
 		var list:Vector.<VoxelModel> = new Vector.<VoxelModel>();
-		for ( var i:int; i < _instances.length; i++ ){
+		for ( var i:int = 0; i < _instances.length; i++ ){
 			var vm:VoxelModel = _instances[i];
 			if ( vm && vm.complete && vm.metadata.permissions.modify && vm != VoxelModel.controlledModel ) // vm.modelInfo.oxelPersistence.oxel
 				list.push(vm);
@@ -51,7 +51,7 @@ public class ModelCache
 	}
 	
 	public function requestModelInfoByModelGuid( $modelGuid:String ):ModelInfo {
-		for ( var i:int; i < _instances.length; i++ ) {
+		for ( var i:int = 0; i < _instances.length; i++ ) {
 			var vm:VoxelModel = _instances[i];
 			if ( vm )
 				if ( $modelGuid == vm.modelInfo.guid )
@@ -61,7 +61,7 @@ public class ModelCache
 	}
 	
 	public function getModelFromModelGuid( $modelGuid:String ):VoxelModel {
-		for ( var i:int; i < _instances.length; i++ ) {
+		for ( var i:int = 0; i < _instances.length; i++ ) {
 			var vm:VoxelModel = _instances[i];
 			if ( vm )
 				if ( $modelGuid == vm.modelInfo.guid )

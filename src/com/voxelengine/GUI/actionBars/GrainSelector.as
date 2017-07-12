@@ -145,7 +145,7 @@ public class GrainSelector extends QuickInventory
 		
 		ti = new ObjectGrain( null, "6", "4meter.png" );
 		boxes[count] = buildItem( ti, count );
-		ti.box = boxes[count++];
+		ti.box = boxes[count];
 		
 		addSelector();			
 		// start off highlighting 1 meter

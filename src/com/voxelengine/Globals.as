@@ -128,7 +128,7 @@ public class Globals  {
 	public static function get horizontalDirections():Array { return g_horizontalDirections; }
 	public static function isHorizontalDirection( $val:uint ):Boolean {
 		if ( Globals.POSX == $val || Globals.NEGX == $val || Globals.POSZ == $val || Globals.NEGZ == $val )
-			return true
+			return true;
 		return false
 	}
 
@@ -177,7 +177,7 @@ public class Globals  {
 			return g_adjacentFacesNEGY;
 		else if ( POSZ == $face )
 			return g_adjacentFacesPOSZ;
-		else ( NEGZ == $face )
+		else if ( NEGZ == $face )
 			return g_adjacentFacesNEGZ;
 
 		return g_adjacentFacesNEGZ;
@@ -255,7 +255,7 @@ public class Globals  {
 	static public function set openWindowCount(value:int):void
 	{
 		_openWindowCount = value;
-		var isAndroid:Boolean = (Capabilities.manufacturer.indexOf("Android") != -1)
+		var isAndroid:Boolean = (Capabilities.manufacturer.indexOf("Android") != -1);
 		if ( isAndroid )
 				return;
 

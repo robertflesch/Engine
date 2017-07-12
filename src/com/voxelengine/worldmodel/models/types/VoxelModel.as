@@ -27,6 +27,7 @@ import flash.events.KeyboardEvent;
 import flash.events.TimerEvent;
 import flash.geom.Matrix3D;
 import flash.geom.Vector3D;
+import flash.geom.Vector3D;
 import flash.ui.Keyboard;
 import flash.utils.ByteArray;
 import flash.utils.getTimer;
@@ -221,6 +222,12 @@ public class VoxelModel {
 	// returns the location of this model in the world space
 	public function wsPositionGet():Vector3D {
 		return modelToWorld( msPositionGet() );
+	}
+
+	// returns the location of this model in the world space
+	public function wsPositionCenterGet():Vector3D {
+		var cp:Vector3D = msPositionGet().add( instanceInfo.centerNotScaled );
+		return modelToWorld( cp );
 	}
 
 	public function childFindInstanceGuid( $guid:String, $recursive:Boolean = true ):VoxelModel {
@@ -1185,7 +1192,7 @@ public class VoxelModel {
 
 	public function generateAllLODs():void {
 		var time:int = getTimer();
-		Log.out( "VoxelModel.generalAllLODs start")
+		Log.out( "VoxelModel.generalAllLODs start");
 		modelInfo.oxelPersistence.generateLOD( this );
 		Log.out( "VoxelModel.generalAllLODs took: " + (getTimer()-time));
 	}

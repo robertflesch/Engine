@@ -25,34 +25,34 @@ import com.voxelengine.worldmodel.models.types.VoxelModel
 
 public class PanelAnimationTransfromInitData extends ExpandableBox
 {
-	private var _at:AnimationTransform
-	private var _ani:Animation
+	private var _at:AnimationTransform;
+	private var _ani:Animation;
 	public function PanelAnimationTransfromInitData( $parent:ExpandableBox, $ebco:ExpandableBoxConfigObject ) {		
-		_at  = $ebco.item
-		_ani = $ebco.rootObject
-		$ebco.itemBox.showNew = false
+		_at  = $ebco.item;
+		_ani = $ebco.rootObject;
+		$ebco.itemBox.showNew = false;
 		super( $parent, $ebco )
 	}
 	
 	override protected function resetElement():void  { 
-		_at.resetInitialPosition()
+		_at.resetInitialPosition();
 		changeMode()
 	}
 	
 	override protected function collapasedInfo():String  {
-		var outString:String = ""
+		var outString:String = "";
 		if ( _at.hasPosition )
-			outString += formatVec3DToSummary( "pos:", _at.position )
+			outString += formatVec3DToSummary( "pos:", _at.position );
 		if ( _at.hasRotation )
-			outString += formatVec3DToSummary( "rot:", _at.rotation )
+			outString += formatVec3DToSummary( "rot:", _at.rotation );
 		if ( _at.hasScale )
-			outString += formatVec3DToSummary( "scl:", _at.scale )
+			outString += formatVec3DToSummary( "scl:", _at.scale );
 		if ( outString == "" ) {
-			outString = "No changes to initial settings"
+			outString = "No changes to initial settings";
 			_ebco.itemBox.showReset = false
 		}
 		else
-			_ebco.itemBox.showReset = true
+			_ebco.itemBox.showReset = true;
 		
 			
 		return outString
@@ -68,14 +68,14 @@ public class PanelAnimationTransfromInitData extends ExpandableBox
 	
 	override protected function hasElements():Boolean {
 		//if ( 0 < _ebco.item.delta.length ) 
-			return true
+			return true;
 		 
 		return false
 	}
 	
 	private function modelGet():VoxelModel {
 		if ( VoxelModel.selectedModel ) {
-			var parentVM:VoxelModel = VoxelModel.selectedModel.topmostControllingModel()
+			var parentVM:VoxelModel = VoxelModel.selectedModel.topmostControllingModel();
 			if ( parentVM ) 
 				return parentVM.childFindByName( _ebco.item.name )
 		}

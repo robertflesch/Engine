@@ -50,11 +50,11 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		}
 		
 		override public function start():void {
-            super.start() // AbstractTask will send event
+            super.start(); // AbstractTask will send event
 			var timer:int = getTimer();
-			var vm:VoxelModel = getVoxelModel()
+			var vm:VoxelModel = getVoxelModel();
 			if ( !vm ) {
-				super.complete() // AbstractTask will send event
+				super.complete(); // AbstractTask will send event
 				return;
 			}
 			
@@ -77,12 +77,12 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 			trace( "CarveTunnel - took: " + (getTimer() - timer) + " in queue for: " + (timer - _startTime)  );
 			Oxel.merge( vm.modelInfo.oxelPersistence.oxel );
-            super.complete() // AbstractTask will send event
+            super.complete(); // AbstractTask will send event
 		}
 		
 		private function rndOffset( $max:int ):int {
 			
-			var offset:int = 0.5 < Math.random() ? -Math.random() * $max/2 : Math.random() * $max/2
+			var offset:int = 0.5 < Math.random() ? -Math.random() * $max/2 : Math.random() * $max/2;
 			//trace( "rndOffset: " + offset );
 			return offset;
 		}

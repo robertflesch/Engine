@@ -95,7 +95,7 @@ public class Beast extends ControllableVoxelModel
 			return;
 		}
 		if ( beastInfo.moveSpeed) {
-			speedMultiplier = beastInfo.moveSpeed
+			speedMultiplier = beastInfo.moveSpeed;
 			//instanceInfo.moveSpeed = instanceInfo.moveSpeed * speedMultiplier;
 			instanceInfo.moveSpeed = speedMultiplier;
 		} else
@@ -253,14 +253,14 @@ public class Beast extends ControllableVoxelModel
 			if ( points[0].collided )
 			{
 				Log.out( "Beast.collisionCheckNew - left wing TIP collided" );
-				$loc.rotationSetComp( $loc.rotationGet.x,  $loc.rotationGet.y - 1, $loc.rotationGet.z )
+				$loc.rotationSetComp( $loc.rotationGet.x,  $loc.rotationGet.y - 1, $loc.rotationGet.z );
 				$loc.velocityScaleBy( 0.5 );
 				return -1;
 			}
 			else
 			{
 				Log.out( "Beast.collisionCheckNew - right wing TIP collided" );
-				$loc.rotationSetComp( $loc.rotationGet.x,  $loc.rotationGet.y + 1, $loc.rotationGet.z )
+				$loc.rotationSetComp( $loc.rotationGet.x,  $loc.rotationGet.y + 1, $loc.rotationGet.z );
 				$loc.velocityScaleBy( 0.5 );
 				return -1;
 			}
@@ -291,10 +291,10 @@ public class Beast extends ControllableVoxelModel
 			var climbFactor:Number = ( maxClimbAngle + instanceInfo.rotationGet.x) / maxClimbAngle;
 			var scaleFactor:Number = climbRate + climbFactor;
 			// When you are climbing you can turn faster because you are going slower
-			var effectiveTurnRate:Number = maxTurnRate * ( scaleFactor )
+			var effectiveTurnRate:Number = maxTurnRate * ( scaleFactor );
 //				Log.out( "Move Speed would be set to: " + mMoveSpeed * scaleFactor + "  instead setting to 0", Log.WARN );
 			//instanceInfo.moveSpeed = mMoveSpeed * scaleFactor;
-			var dx:Number
+			var dx:Number;
 			dx = MouseKeyboardHandler.getMouseYChange()/effectiveTurnRate;
 			dx *= $elapsedTimeMS;
 			if ( MIN_TURN_AMOUNT >= Math.abs(dx) )
@@ -323,18 +323,16 @@ public class Beast extends ControllableVoxelModel
 			instanceInfo.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y, instanceInfo.rotationGet.z );
 		}
 	}
-
-	private const _smoothingFactor:Number = 0.1;
 	private var   _workingAverage:Number = 0;
 	override public function draw( $mvp:Matrix3D, $context:Context3D, $isChild:Boolean, $alpha:Boolean ):void {
 
 		var viewMatrix:Matrix3D = instanceInfo.worldSpaceMatrix.clone();
 		viewMatrix.append( $mvp );
 
-		if ( !onSolidGround )
-		{
+		if ( !onSolidGround ) {
 			// This add a turn angle to the beast without causing the Z rotation to change turn characteristics.
-			_workingAverage = ( _dy * _smoothingFactor ) + ( _workingAverage * ( 1.0 - _smoothingFactor) )
+			var _smoothingFactor:Number = 0.1;
+			_workingAverage = ( _dy * _smoothingFactor ) + ( _workingAverage * ( 1.0 - _smoothingFactor) );
 			if ( 1.5 < Math.abs( _workingAverage ) )
 			{
 				if ( 0 < _workingAverage )

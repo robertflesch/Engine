@@ -23,7 +23,7 @@ public class CharacterSlots {
 
     private var _owner:Inventory;
     private var _items:Object = {};
-    public function get items():Object { return _items };
+    public function get items():Object { return _items; }
     private var _itemCount:int;
     private const ITEM_COUNT:int = 2;
 

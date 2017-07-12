@@ -53,7 +53,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 		
 		override public function start():void
 		{
-			super.start() // AbstractTask will send event
+			super.start(); // AbstractTask will send event
 
 			var timer:int = getTimer();
 			
@@ -108,7 +108,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 */
 			
 			//Log.out( "GenerateSphere.start - completed layer of type: " + (Globals.Info[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
-			super.complete() // AbstractTask will send event
+			super.complete(); // AbstractTask will send event
 		}
 		
 	}

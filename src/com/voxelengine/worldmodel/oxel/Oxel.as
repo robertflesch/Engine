@@ -2012,7 +2012,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 
     private function getTabs( count:int ):String {
         var result:String = "";
-        for ( var i:int; i < count; i++ ){
+        for ( var i:int = 0; i < count; i++ ){
             result += "\t";
         }
         return result;
@@ -2044,12 +2044,13 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 			for each ( var child:Oxel in _children )
 			{
 				child.lineIntersect( $msStartPoint, $msEndPoint, childIntersections, $ignoreType );
+				if ( 0 < childIntersections.length )
 				for each ( var gcIntersection:GrainIntersection in childIntersections ) {
 					gcIntersection.oxel = child;
 					totalIntersections.push( gcIntersection );
+					//childIntersections.splice( 0, childIntersections.length );
+					childIntersections.length = 0
 				}
-				//childIntersections.splice( 0, childIntersections.length );
-				childIntersections.length = 0
 			}
 			// if nothing to work with leave early
 			if ( 0 == totalIntersections.length )
@@ -3209,19 +3210,19 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		var p:String = _parent ? " has parent" : "  no parent";
 		var c:String = childrenHas() ? (" has " + _children.length + " kids") : "  no children";
 		var t:String = "";
+		var r:String = "";
 		if ( null != root_get().gc )
 		{
 			var bg:uint = root_get().gc.grain;
 			for ( var i:int = 0; i < bg - gc.grain; i++ ) {
 				t += "\t";
 			}
-		var r:String = "";
-		if ( TypeInfo.INVALID == type )
-			r = "\t\t oxel of type: " + TypeInfo.typeInfo[type].name;
-		else
-			var str:String = maskTempData().toString(16);
-			var hex:String = ("0x00000000").substr(2,8 - str.length) + str;
-			r = t + " oxel of type: " + TypeInfo.typeInfo[type].name + "\t location: " + gc.toString() + "  data: " + hex + " parent: " + p + " children: " + c;
+			if ( TypeInfo.INVALID == type )
+				r = "\t\t oxel of type: " + TypeInfo.typeInfo[type].name;
+			else
+				var str:String = maskTempData().toString(16);
+				var hex:String = ("0x00000000").substr(2,8 - str.length) + str;
+				r = t + " oxel of type: " + TypeInfo.typeInfo[type].name + "\t location: " + gc.toString() + "  data: " + hex + " parent: " + p + " children: " + c;
 		}
 		else
 			r = "Uninitialized Oxel" + p + c;

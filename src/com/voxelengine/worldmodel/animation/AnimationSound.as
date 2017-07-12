@@ -179,7 +179,7 @@ public class AnimationSound extends PersistenceObject
 	private function requestSound():void {
 		if ( !_waitingOnLoad ) {
 			_waitingOnLoad = true;
-			SoundEvent.addListener(ModelBaseEvent.RESULT, added)
+			SoundEvent.addListener(ModelBaseEvent.RESULT, added);
 			Log.out("AnimationSound.play - waiting on sound to load", Log.WARN);
 		}
 		Log.out("AnimationSound.play - _soundPersistance not loaded yet", Log.WARN);
@@ -210,7 +210,7 @@ public class AnimationSound extends PersistenceObject
 
 	public function playSound( snd:Sound, $startTime:Number = 0, $loops:int = 0, $sndTransform:SoundTransform = null) : flash.media.SoundChannel {
 		if ( snd && !Globals.muted )
-			return snd.play( $startTime, $loops, $sndTransform )
+			return snd.play( $startTime, $loops, $sndTransform );
 		return null
 	}
 

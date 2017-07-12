@@ -40,7 +40,7 @@ import org.flashapi.swing.*
         private var _ownedVsStore:TabBar;
 		private var _panelContainer:Container;
 		private var _rbGroup:RadioButtonGroup;
-		private var _underline:Box
+		private var _underline:Box;
 		
 		static public function makeStartingTabString( $parentTab:String, ...args ):String {
 			var result:String = $parentTab + ";";
@@ -56,9 +56,9 @@ import org.flashapi.swing.*
 		
 		static public function toggle( $startingTab:String ):void {
 			if ( null == _s_instance )
-				_s_instance = new WindowInventoryNew( $startingTab )
+				_s_instance = new WindowInventoryNew( $startingTab );
 			else {
-				_s_instance.remove()
+				_s_instance.remove();
 				_s_instance = null
 			}
 		}
@@ -114,7 +114,7 @@ import org.flashapi.swing.*
             addGraphicElements( _ownedVsStore );
 			
 			_underline = new Box( width, 5 );
-			_underline.backgroundColor = VVUI.DEFAULT_COLOR
+			_underline.backgroundColor = VVUI.DEFAULT_COLOR;
 			addGraphicElements( _underline );			
 			
 			displaySelectedContainer( startingTabName, $tabTokens );
@@ -132,8 +132,8 @@ import org.flashapi.swing.*
 			}
 			
 			super.onRemoved( event );
-			_s_hackShowChildren = false
-			_s_hackSupportClick = false
+			_s_hackShowChildren = false;
+			_s_hackSupportClick = false;
 			_s_instance = null
 		}
 		

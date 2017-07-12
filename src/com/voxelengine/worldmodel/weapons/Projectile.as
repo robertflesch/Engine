@@ -104,7 +104,7 @@ package com.voxelengine.worldmodel.weapons
 		*/
 		override public function collisionTest( $elapsedTimeMS:Number ):Boolean {
 			
-			var modelList:Vector.<VoxelModel> = ModelCacheUtils.whichModelsIsThisInsideOfNew( this )
+			var modelList:Vector.<VoxelModel> = ModelCacheUtils.whichModelsIsThisInsideOfNew( this );
 			for each ( var collisionCandidate:VoxelModel in modelList )
 			{
 				if ( _thatWhichCreatedYou && _thatWhichCreatedYou.isInParentChain( collisionCandidate ) )

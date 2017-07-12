@@ -17,7 +17,7 @@ import org.flashapi.swing.plaf.spas.VVUI;
 
 public class ComponentTextInput extends Box
 {
-	private var _li:TextInput
+	private var _li:TextInput;
 	public function ComponentTextInput( label:String, changeHandler:Function, initialValue:String, $width:int, $height:int = 30, $padding:int = 5 )
 	{
 		super( $width, $height );

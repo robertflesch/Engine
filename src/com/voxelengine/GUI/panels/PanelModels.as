@@ -40,7 +40,7 @@ public class PanelModels extends PanelBase
 	private var _listModels:ListBox;
 	private var _dictionarySource:Function;
 	private var _level:int;
-	private var _selectedText:Text
+	private var _selectedText:Text;
 
 	private var _dupButton:Button;
 	private var _detailButton:Button;

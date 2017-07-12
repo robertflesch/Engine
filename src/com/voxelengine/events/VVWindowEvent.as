@@ -17,7 +17,7 @@ package com.voxelengine.events
 	{
 		static public const WINDOW_CLOSING:String	= "WINDOW_CLOSING";
 
-		private var _windowTitle:String
+		private var _windowTitle:String;
 		
 		public function VVWindowEvent( $type:String, $windowTitle:String, $bubbles:Boolean = true, $cancellable:Boolean = false )
 		{

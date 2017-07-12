@@ -102,7 +102,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 
 		private function errorAction(e:IOErrorEvent):void {
 			Log.out( "ParticleLoadingTask.errorAction: " + e.toString(), Log.ERROR );
-			super.complete() // AbstractTask will send event
+			super.complete(); // AbstractTask will send event
 		}	
 		
 		override public function cancel():void {

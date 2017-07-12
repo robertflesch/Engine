@@ -39,16 +39,16 @@ public class ModelTransform
 
 	static public const INFINITE_TIME:int 		= -1;
 	
-	static public const POSITION_STRING:String 				= "position"
-	static public const POSITION_TO_STRING:String			= "position_to"
-	static public const POSITION_REPEATING_STRING:String 	= "position_repeating"
-	static public const SCALE_STRING:String 				= "scale"
-	static public const ROTATION_STRING:String 				= "rotation"
-	static public const ROTATE_TO_STRING:String 			= "rotate_to"
-	static public const ROTATION_REPEATING_STRING:String 	= "rotation_repeating"
-	static public const LIFE_STRING:String 					= "life"
-	static public const VELOCITY_STRING:String 				= "velocity"
-	static public const POSITION_TO_ME_STRING:String		= "position_to_me"
+	static public const POSITION_STRING:String 				= "position";
+	static public const POSITION_TO_STRING:String			= "position_to";
+	static public const POSITION_REPEATING_STRING:String 	= "position_repeating";
+	static public const SCALE_STRING:String 				= "scale";
+	static public const ROTATION_STRING:String 				= "rotation";
+	static public const ROTATE_TO_STRING:String 			= "rotate_to";
+	static public const ROTATION_REPEATING_STRING:String 	= "rotation_repeating";
+	static public const LIFE_STRING:String 					= "life";
+	static public const VELOCITY_STRING:String 				= "velocity";
+	static public const POSITION_TO_ME_STRING:String		= "position_to_me";
 
 	private var _time:int = 0;            // in milliseconds
 	private var _originalTime:Number = 0; // in milliseconds (NOW)
@@ -96,7 +96,7 @@ public class ModelTransform
 		var obj:Object = { 	time : 1,
 							delta: { x:0, y:0, z:0 },
 							type: ModelTransform.ROTATION_REPEATING,
-							name: "Default" }
+							name: "Default" };
 
 		return new ModelTransform( obj.delta.x, obj.delta.y, obj.delta.z, obj.time, obj.type, obj.name );
 	}
@@ -154,7 +154,7 @@ public class ModelTransform
 		if ( ModelTransform.INFINITE_TIME == $time )
 			time = ModelTransform.INFINITE_TIME;
 		else
-			time = $time
+			time = $time;
 			
 //			if ( ModelTransform.LIFE == type )
 //				Log.out( "ModelTransform.constructor - data: " + toString() );	
@@ -314,7 +314,7 @@ public class ModelTransform
 		obj.time 	= originalTime;
 		obj.delta	= vector3DToObject( _originalDelta );
 		obj.type 	= typeToString( _type );
-		return obj
+		return obj;
 		
 		function vector3DToObject( $vec:Vector3D ):Object {
 			return { x:$vec.x, y:$vec.y, z:$vec.z };

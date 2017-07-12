@@ -46,7 +46,7 @@ package com.voxelengine.worldmodel
 //		private const _ambientMax:Vector3D =  new Vector3D( 1, 1, 1 );
 		private var _bufferObject:VertexIndexBuilder;
 		private var _oxel:Oxel;
-		private var _cubeTex:CubeTexture
+		private var _cubeTex:CubeTexture;
 		private var _voxelModel:VoxelModel;
 
 		private var _moveSun:Boolean = false;
@@ -101,15 +101,15 @@ package com.voxelengine.worldmodel
 		}		
 		
 		private function makeCubeTexture(size:uint, context:Context3D ):CubeTexture {
-			var tex:CubeTexture = context.createCubeTexture(size, "bgra", false)
+			var tex:CubeTexture = context.createCubeTexture(size, "bgra", false);
 			
-			var mm:uint = 0
+			var mm:uint = 0;
 			for(; size != 0 ; size >>= 1){
-				tex.uploadFromBitmapData( bd(size, 0xff0000), 0, mm)
-				tex.uploadFromBitmapData( bd(size, 0x00ff00), 1, mm)
-				tex.uploadFromBitmapData( bd(size, 0x0000ff), 2, mm)
-				tex.uploadFromBitmapData( bd(size, 0xff00ff), 3, mm)
-				tex.uploadFromBitmapData( bd(size, 0xffff00), 4, mm)
+				tex.uploadFromBitmapData( bd(size, 0xff0000), 0, mm);
+				tex.uploadFromBitmapData( bd(size, 0x00ff00), 1, mm);
+				tex.uploadFromBitmapData( bd(size, 0x0000ff), 2, mm);
+				tex.uploadFromBitmapData( bd(size, 0xff00ff), 3, mm);
+				tex.uploadFromBitmapData( bd(size, 0xffff00), 4, mm);
 				tex.uploadFromBitmapData( bd(size, 0x00ffff), 5, mm)
 				mm ++
 			}
@@ -148,7 +148,7 @@ package com.voxelengine.worldmodel
 				
 			} else {
 				if ( _count++ > 100 ) {
-					_count = 0
+					_count = 0;
 					trace( "sun pos x: " + _sunPos.x + " y: " + _sunPos.y + " z: " + _sunPos.z + "  ambient x: " + _ambient.x + " y: " + _ambient.y + " z: " + _ambient.z );
 				}
 				

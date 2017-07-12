@@ -25,8 +25,6 @@ import com.voxelengine.worldmodel.models.types.Player;
 	public class CanvasHeading extends VVCanvas
 	{
 		static private var _s_currentInstance:CanvasHeading = null;
-
-		private var _instanceGuid:String;
 		private var fudgeFactor:int = 20;
 		private var _heading:Slider = null;
 		private var _loc:Text = null;
@@ -34,50 +32,49 @@ import com.voxelengine.worldmodel.models.types.Player;
 		private var _repeatTimer:Timer = null;
 		static public function get currentInstance():CanvasHeading { return _s_currentInstance; }
 
-		public function CanvasHeading($instanceGuid:String ):void
-		{ 
+		public function CanvasHeading($instanceGuid:String ):void {
 			super();
 			_s_currentInstance = this;
-			_instanceGuid = $instanceGuid;
+			var _instanceGuid:String=$instanceGuid;
 			//alpha = 0.5;
 			layout.orientation = LayoutOrientation.VERTICAL;
-			
+
 			_heading = new Slider( 400, "horizontal" );
 			/*
-			var laf:Object = _heading.getLaf();
-			var lafRef:Class = _heading.getLafRef();
-			var test:SpasLabelUI = _heading.lookAndFeel.getLabelLaf() as SpasLabelUI;
-			//var test2:SpasLabelUI = new SpasLabelUI( test.dto );
-			var tformat:UITextFormat = test.getTextFormat();
-			tformat.color = 0xFF0000;
-			//_heading.lookAndFeel.setLabelLaf( test2 );
-			*/
+			 var laf:Object = _heading.getLaf();
+			 var lafRef:Class = _heading.getLafRef();
+			 var test:SpasLabelUI = _heading.lookAndFeel.getLabelLaf() as SpasLabelUI;
+			 //var test2:SpasLabelUI = new SpasLabelUI( test.dto );
+			 var tformat:UITextFormat = test.getTextFormat();
+			 tformat.color = 0xFF0000;
+			 //_heading.lookAndFeel.setLabelLaf( test2 );
+			 */
 			_heading.liveDragging = false;
-			_heading.labels = ["S", "W", "N", "E", "S"];	
+			_heading.labels = ["S", "W", "N", "E", "S"];
 			_heading.value = 50;
 			addElement( _heading );
-			
+
 			_loc = new Text( 400, 30 );
 			_loc.text = "";
 			_loc.textAlign = TextAlign.CENTER;
 			_loc.textFormat.color = 0xFFFFFF;
 			addElement( _loc );
-			
+
 			_vel = new Text( 400, 30 );
 			_vel.text = "";
 			_vel.textAlign = TextAlign.CENTER;
 			_vel.textFormat.color = 0xFFFFFF;
 			addElement( _vel );
-			
+
 			display( Renderer.renderer.width / 2 - (_heading.trackLength + fudgeFactor) / 2, 0 );
-			
-            Globals.g_app.stage.addEventListener(Event.RESIZE, onResizeHeading );
+
+			Globals.g_app.stage.addEventListener(Event.RESIZE, onResizeHeading );
 			addEventListener(UIOEvent.REMOVED, onRemoved );
-			
+
 			_repeatTimer = new Timer( 250, 0 );
 			_repeatTimer.addEventListener(TimerEvent.TIMER, onRepeat);
 			_repeatTimer.start();
-		} 
+		}
 
 		protected function onRepeat(event:TimerEvent):void
 		{

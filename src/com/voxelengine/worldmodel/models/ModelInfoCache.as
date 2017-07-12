@@ -120,7 +120,7 @@ public class ModelInfoCache
 				}
 			}
 		} else 
-			Log.out( "ModelInfoCache.deleteRecursive - ModelInfo not found $mie" + $mie, Log.ERROR )
+			Log.out( "ModelInfoCache.deleteRecursive - ModelInfo not found $mie" + $mie, Log.ERROR );
 		
 		// Now delete the parents oxelPersistence
 		ModelMetadataEvent.create( ModelBaseEvent.DELETE, 0, $mie.modelGuid, null );
@@ -230,7 +230,7 @@ public class ModelInfoCache
 			return;
 		Log.out( "ModelInfoCache.loadFailed PersistenceEvent: " + $pe.toString(), Log.WARN );
 		if ( _block.has( $pe.guid ) )
-			_block.clear( $pe.guid )
+			_block.clear( $pe.guid );
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	
@@ -239,7 +239,7 @@ public class ModelInfoCache
 			return;
 		Log.out( "ModelInfoCache.loadNotFound PersistenceEvent: " + $pe.toString(), Log.WARN );
 		if ( _block.has( $pe.guid ) )
-			_block.clear( $pe.guid )
+			_block.clear( $pe.guid );
 		ModelInfoEvent.dispatch( new ModelInfoEvent( ModelBaseEvent.REQUEST_FAILED, $pe.series, $pe.guid, null ) );
 	}
 	

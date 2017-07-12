@@ -47,7 +47,7 @@ public final class NeighborPool
 		var timer:int = getTimer();
 
 		_currentPoolSize += GROWTH_VALUE;
-		pool = null
+		pool = null;
 		pool = new Vector.<Vector.<Oxel>>(_currentPoolSize); 
 		for ( var newIndex:int = 0; newIndex < GROWTH_VALUE; newIndex++ )
 		{

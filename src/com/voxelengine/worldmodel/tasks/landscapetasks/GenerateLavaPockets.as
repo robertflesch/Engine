@@ -87,7 +87,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
         }
 
 		override public function start():void {
-            super.start() // AbstractTask will send event
+            super.start(); // AbstractTask will send event
 			trace( "GenerateLavaPockets - enter - creating " +_layer.offset + " pockets of type " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) );					
 			var timer:int = getTimer();
             var vm:VoxelModel = Region.currentRegion.modelCache.instanceGet( _modelGuid );
@@ -105,7 +105,7 @@ package com.voxelengine.worldmodel.tasks.landscapetasks
 			
 
 			trace( "GenerateLavaPockets - GenerateLavaPockets - took: " + (getTimer() - timer) + " in queue for: " + (timer-_startTime)  );					
-            super.complete() // AbstractTask will send event
+            super.complete(); // AbstractTask will send event
         }
 	}
 }

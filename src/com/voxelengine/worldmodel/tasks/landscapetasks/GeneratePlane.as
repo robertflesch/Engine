@@ -51,7 +51,7 @@ public class GeneratePlane extends LandscapeTask
         //vm.print();
 
         trace( "GeneratePlane.start - took: "  + (getTimer() - timer) );
-        super.complete() // AbstractTask will send event
+        super.complete(); // AbstractTask will send event
     }
 
     override public function cancel():void {

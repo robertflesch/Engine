@@ -223,7 +223,7 @@ import flash.geom.Vector3D;
 			var r:String=extractRed(c).toString(16).toUpperCase();
 			var g:String=extractGreen(c).toString(16).toUpperCase();
 			var b:String=extractBlue(c).toString(16).toUpperCase();
-			var hs:String="";
+			var hs:String;
 			var zero:String="0";
 			if(r.length==1){ r=zero.concat(r); }
 			if (g.length == 1) { g = zero.concat(g); }
@@ -294,12 +294,11 @@ import flash.geom.Vector3D;
 			var max:uint = Math.max(r, g, b);
 			var min:uint = Math.min(r, g, b);
 			 
-			var hue:Number = 0;
-			var saturation:Number = 0;
-			var value:Number = 0;
+			var hue:Number;
+			var saturation:Number;
+			var value:Number;
 			 
-			var hsv:Array = [];
-			 
+
 			//get Hue
 			if(max == min){
 				hue = 0;
@@ -320,9 +319,8 @@ import flash.geom.Vector3D;
 				}else{
 				saturation = (max - min) / max;
 			}
-			 
-			hsv = [Math.round(hue), Math.round(saturation * 100), Math.round(value / 255 * 100)];
-			return hsv;
+
+			return [Math.round(hue), Math.round(saturation * 100), Math.round(value / 255 * 100)];
 		}
 		
 		

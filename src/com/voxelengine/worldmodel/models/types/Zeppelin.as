@@ -35,9 +35,9 @@ import flash.display3D.Context3D;
 	 */
 	public class Zeppelin extends Ship 
 	{
-		static protected const SHIP_VELOCITY:String 	= "velocity"
-		static protected const SHIP_ALTITUDE:String 	= "altitude"
-		static protected const SHIP_ROTATION:String 	= "rotation"
+		static protected const SHIP_VELOCITY:String 	= "velocity";
+		static protected const SHIP_ALTITUDE:String 	= "altitude";
+		static protected const SHIP_ROTATION:String 	= "rotation";
 		
 		public function Zeppelin( ii:InstanceInfo, mi:ModelInfo ):void 
 		{

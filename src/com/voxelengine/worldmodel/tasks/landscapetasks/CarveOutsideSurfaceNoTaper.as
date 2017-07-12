@@ -37,8 +37,8 @@ import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 			trace( "CarveOutsideSurfaceNoTaper  - enter ", Log.ERROR );					
 			var vm:VoxelModel = getVoxelModel();
 
-			var masterHeightMap:Array = null;
-			var masterMapSize:uint = 0;
+			var masterHeightMap:Array;
+			var masterMapSize:uint;
 
 			var oxel:Oxel = vm.modelInfo.oxelPersistence.oxel;
 			var size:int = oxel.size_in_world_coordinates();
@@ -85,7 +85,7 @@ import com.voxelengine.worldmodel.tasks.landscapetasks.LandscapeTask;
 					for ( var x:int = 0; x < endX; x++) {
 						
 						height = masterHeightMap[x * mapIncrement + offset][z * mapIncrement + offset];
-						var voxelDistToCenter:Number = Math.sqrt( (center - x * minGrainInG0 ) * (center - x* minGrainInG0) + (center - z* minGrainInG0) * (center - z* minGrainInG0) )	
+						var voxelDistToCenter:Number = Math.sqrt( (center - x * minGrainInG0 ) * (center - x* minGrainInG0) + (center - z* minGrainInG0) * (center - z* minGrainInG0) );
 						if ( voxelDistToCenter > (center * 0.9) )
 						{
 							GrainCursor.roundToInt( x, y, z, gct );

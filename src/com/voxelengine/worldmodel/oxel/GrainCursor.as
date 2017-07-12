@@ -267,10 +267,10 @@ public class GrainCursor
 	public function child_inc():void {
 		if ( !move_posx() )
 		{
-			set_values( 0, grainY, grainZ, grain )
+			set_values( 0, grainY, grainZ, grain );
 			if ( !move_posz() )
 			{
-				set_values( 0, grainY, 0, grain )
+				set_values( 0, grainY, 0, grain );
 				if ( !move_posy() )
 					return;
 			}
@@ -545,8 +545,7 @@ public class GrainCursor
 	[inline]
 	public function is_equal( $gc:GrainCursor ):Boolean {
 		//trace( "is_equal: g: " + grain + " = " + $gc.grain  + "  x: " + _gx + " = " + $gc._gx + "  y: "  + _gy + " = " + $gc._gy + "  z: "  + _gz + " = " + $gc._gz   );
-		return ( true
-			&& grain == $gc.grain
+		return ( grain == $gc.grain
 			&& _gx == $gc._gx
 			&& _gy == $gc._gy
 			&& _gz == $gc._gz
@@ -558,8 +557,7 @@ public class GrainCursor
 		///////////////////////////////
 		// true if this outside $gc
 		///////////////////////////////
-		return(true
-			&& is_inside( $gc )	== false
+		return(is_inside( $gc )	== false
 			&& $gc.is_inside( this )	== false
 		);
 	}
@@ -580,8 +578,7 @@ public class GrainCursor
 	[inline]
 	public function contains_g0_point( x:int, y:int, z:int ):Boolean {
 		// return true if the parameter point (g0 units) is inside this grain
-		return(true
-			&& _gx == (x >> grain)
+		return(_gx == (x >> grain)
 			&& _gy == (y >> grain)
 			&& _gz == (z >> grain)
 		);
@@ -589,8 +586,7 @@ public class GrainCursor
 	
 	public function containsModelSpacePoint( point:Vector3D ):Boolean {
 		// return true if the parameter point (g0 units) is inside this grain
-		return(true
-			&& _gx == ( point.x >> grain)
+		return(_gx == ( point.x >> grain)
 			&& _gy == ( point.y >> grain)
 			&& _gz == ( point.z >> grain)
 		);

@@ -104,8 +104,8 @@ public class LightInfo
 
 
 	private function toHex( val:uint ):String {
-		var str:String = "";
-		str = val.toString(16)
+		var str:String;
+		str = val.toString(16);
 		return ( ("0x00000000").substr(2,8 - str.length) + str );
 	}
 	

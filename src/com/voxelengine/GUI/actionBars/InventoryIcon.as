@@ -32,30 +32,30 @@ import com.voxelengine.GUI.inventory.WindowInventory;
 
 public class InventoryIcon extends VVCanvas
 {
-	protected var _outline:Image
-	private const IMAGE_SIZE:int = 128
-	private var _butCurrent:Box
-	private var _parentWidth:int
+	protected var _outline:Image;
+	private const IMAGE_SIZE:int = 128;
+	private var _butCurrent:Box;
+	private var _parentWidth:int;
 	
 	public function InventoryIcon( $width:int ) {
-		_parentWidth = $width
-		super( 128, 128 )
+		_parentWidth = $width;
+		super( 128, 128 );
 		// These numbers come from the size of the artwork, and from the size of the toolbar below it.
-		layout = new AbsoluteLayout()
-		_outline = new Image( Globals.texturePath + "backpack.png" )
+		layout = new AbsoluteLayout();
+		_outline = new Image( Globals.texturePath + "backpack.png" );
 		_outline.scaleX = 0.75;
 		_outline.scaleY = 0.75;
-		eventCollector.addEvent( _outline, UIMouseEvent.PRESS, pressShape )
-		addElement( _outline )
-		var it:UITextField = new UITextField()
-		it.text = "Inventory (I)"
+		eventCollector.addEvent( _outline, UIMouseEvent.PRESS, pressShape );
+		addElement( _outline );
+		var it:UITextField = new UITextField();
+		it.text = "Inventory (I)";
 		it.x = 24;
 		it.y = 48;
-		it.textColor = 0xFFFFFF
-		addElement( it )
-		display()
-		resizeObject( null )
-		visible = false
+		it.textColor = 0xFFFFFF;
+		addElement( it );
+		display();
+		resizeObject( null );
+		visible = false;
 		Globals.g_app.stage.addEventListener( Event.RESIZE, resizeObject );
 		eventCollector.addEvent( this, UIOEvent.REMOVED, onRemoved );
 	}
@@ -72,9 +72,9 @@ public class InventoryIcon extends VVCanvas
 	
 	
 	public function resizeObject(event:Event):void {
-		var halfRW:int = Renderer.renderer.width / 2
+		var halfRW:int = Renderer.renderer.width / 2;
 
-		y = Renderer.renderer.height - height- 30
+		y = Renderer.renderer.height - height- 30;
 		x = halfRW - (width / 2) - _parentWidth/2
 	}
 	
