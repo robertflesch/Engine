@@ -343,7 +343,7 @@ public class WindowPictureImport extends VVPopup {
     }
 
     static public function createModelFromBitmap( $op:OxelPersistence ):void {
-        //var grains:uint = Globals.UNITS_PER_METER * PictureImportProperties.grain;
+        //var grains:uint = Avatar.UNITS_PER_METER * PictureImportProperties.grain;
         var grains:uint = GrainCursor.get_the_g0_size_for_grain( PictureImportProperties.grain );
         var bitmapData:BitmapData = VVBox.drawScaled( PictureImportProperties.finalBitmapData, grains, grains, PictureImportProperties.hasTransparency );
         var oxel:Oxel = $op.oxel;

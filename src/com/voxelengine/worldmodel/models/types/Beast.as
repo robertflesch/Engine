@@ -152,12 +152,12 @@ public class Beast extends ControllableVoxelModel
 	}
 
 	override protected function cameraAddLocations():void {
-		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 20, 0) );
-		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 20, 50) );
-		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 30, 80) );
-		//camera.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT - 40, 50) );
-		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 40, 100) );
-		cameraContainer.addLocation( new CameraLocation( false, 16, Globals.AVATAR_HEIGHT + 50, 250) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Avatar.AVATAR_HEIGHT + 20, 0) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Avatar.AVATAR_HEIGHT + 20, 50) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Avatar.AVATAR_HEIGHT + 30, 80) );
+		//camera.addLocation( new CameraLocation( false, 16, Avatar.AVATAR_HEIGHT - 40, 50) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Avatar.AVATAR_HEIGHT + 40, 100) );
+		cameraContainer.addLocation( new CameraLocation( false, 16, Avatar.AVATAR_HEIGHT + 50, 250) );
 	}
 
 	override protected function collisionCheckNew( $elapsedTimeMS:Number, $loc:Location, $collisionCandidate:VoxelModel, $stepUpCheck:Boolean = false ):int {

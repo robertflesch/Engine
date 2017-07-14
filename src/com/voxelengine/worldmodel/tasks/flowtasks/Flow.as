@@ -8,6 +8,7 @@
 
 package com.voxelengine.worldmodel.tasks.flowtasks
 {
+import com.voxelengine.worldmodel.models.types.Avatar;
 import com.voxelengine.worldmodel.oxel.OxelBad;
 
 import flash.utils.Timer;
@@ -263,7 +264,7 @@ import flash.utils.Timer;
 		
 		private function flowTasksAdd( $fc:Vector.<FlowCandidate>, $upOrDown:Boolean, $flowInfo:FlowInfo ):void {
 			for each ( var flowTest:FlowCandidate in $fc ) {
-				const stepSize:int = ( flowTest.flowCandidate.gc.size() / Globals.UNITS_PER_METER) * 4;
+				const stepSize:int = ( flowTest.flowCandidate.gc.size() / Avatar.UNITS_PER_METER) * 4;
 				if ( !$upOrDown && 0 == $flowInfo.flowScaling.min() )
 					continue;
 				

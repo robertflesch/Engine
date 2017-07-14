@@ -8,6 +8,7 @@
 package com.voxelengine.worldmodel.oxel
 {
 import com.voxelengine.worldmodel.Light;
+import com.voxelengine.worldmodel.models.types.Avatar;
 
 import flash.utils.ByteArray;
 
@@ -602,7 +603,7 @@ public class Lighting  {
 			return;
 			
 		// This is special case which needs to take into account attn
-		var localattn:uint = materialFallOffFactor * sli.attn * $grainUnits / Globals.UNITS_PER_METER;
+		var localattn:uint = materialFallOffFactor * sli.attn * $grainUnits / Avatar.UNITS_PER_METER;
 		var sqrattn:Number =  Math.sqrt( 2 * (localattn * localattn) );
 		var csqrattn:Number = Math.sqrt( (localattn * localattn) + (sqrattn * sqrattn) );
 
@@ -1090,7 +1091,7 @@ public class Lighting  {
 		var li:LightInfo = lightGet( $ID );
 		
 		var c:Boolean = false;
-		const attnScaled:uint = materialFallOffFactor * sli.attn * $grainUnits / Globals.UNITS_PER_METER;
+		const attnScaled:uint = materialFallOffFactor * sli.attn * $grainUnits / Avatar.UNITS_PER_METER;
 		
 		if ( Globals.POSX == $faceFrom ) {
 			

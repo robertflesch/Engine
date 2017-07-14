@@ -607,12 +607,12 @@ public class Player extends PersistenceObject
 			var eyeLevelModelSpacePosition:Vector3D = collisionModel.worldToModel( instanceInfo.positionGet );
 			var leftFoot:Vector3D  = instanceInfo.lookRightVector( HIPWIDTH );
 			leftFoot.x = eyeLevelModelSpacePosition.x + leftFoot.x;
-			leftFoot.y = eyeLevelModelSpacePosition.y - Globals.AVATAR_HEIGHT_FOOT;
+			leftFoot.y = eyeLevelModelSpacePosition.y - Avatar.AVATAR_HEIGHT_FOOT;
 			leftFoot.z = eyeLevelModelSpacePosition.z + leftFoot.z;
 
 			var rightFoot:Vector3D = instanceInfo.lookRightVector(  -HIPWIDTH );
 			rightFoot.x = eyeLevelModelSpacePosition.x + rightFoot.x;
-			rightFoot.y = eyeLevelModelSpacePosition.y - Globals.AVATAR_HEIGHT_FOOT;
+			rightFoot.y = eyeLevelModelSpacePosition.y - Avatar.AVATAR_HEIGHT_FOOT;
 			rightFoot.z = eyeLevelModelSpacePosition.z + rightFoot.z;
 			
 			var gct0:GrainCursor = GrainCursorPool.poolGet( collisionModel.oxel.gc.bound );

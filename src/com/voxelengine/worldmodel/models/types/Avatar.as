@@ -35,7 +35,7 @@ import com.voxelengine.worldmodel.models.ModelInfo;
 
 public class Avatar extends ControllableVoxelModel
 {
-	//static private const 	HIPWIDTH:Number 			= (Globals.UNITS_PER_METER * 3)/8;
+	//static private const 	HIPWIDTH:Number 			= (Avatar.UNITS_PER_METER * 3)/8;
 	static private const 	FALL:String					= "FALL";
 	static private const 	FOOT:String					= "FOOT";
 	static private const 	HEAD:String					= "HEAD";
@@ -44,6 +44,14 @@ public class Avatar extends ControllableVoxelModel
 	static private const 	MIN_TURN_AMOUNT:Number 		= 0.09;
 	static private const 	AVATAR_CLIP_FACTOR:Number 	= 0.90;
 	static private var  	STEP_UP_MAX:int 			= 16;
+
+	public static const UNITS_PER_METER:int = 16;
+	static public const AVATAR_HEIGHT:Number = ( UNITS_PER_METER * 2 ) - ( UNITS_PER_METER * 0.2 ); // 80% of two meters
+	static public const AVATAR_WIDTH:int = UNITS_PER_METER;
+	static public const AVATAR_HEIGHT_FOOT:int = 0;
+	static public const AVATAR_HEIGHT_HEAD:Number = AVATAR_HEIGHT;
+	static public const AVATAR_HEIGHT_CHEST:int = 20;
+
 
 	static public const MODEL_BIPEDAL_10:String = "MODEL_BIPEDAL_10";
     static public function getAnimationClass():String { return MODEL_BIPEDAL_10; }
@@ -230,22 +238,22 @@ public class Avatar extends ControllableVoxelModel
 		if ( !_ct.hasPoints() ) {
 			_ct.addCollisionPoint( new CollisionPoint( FALL, new Vector3D( 7.5, -1, 7.5 ), false ) );
 			_ct.addCollisionPoint( new CollisionPoint( "CENTER", new Vector3D( 7.5, 0, 7.5 ), false ) );
-			 _ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 4, Globals.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
-			 _ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 11, Globals.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
-			 //_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX/2, 0 ) ) );
-			 //_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT + STEP_UP_MAX, 0 ) ) );
-			 //			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 11, Globals.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
-			 //			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_FOOT, 11 ) ) );
-			 //			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 4, Globals.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
+			 _ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 4, Avatar.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
+			 _ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 11, Avatar.AVATAR_HEIGHT_FOOT, 7.5 ), true ) );
+			 //_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Avatar.AVATAR_HEIGHT_FOOT + STEP_UP_MAX/2, 0 ) ) );
+			 //_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Avatar.AVATAR_HEIGHT_FOOT + STEP_UP_MAX, 0 ) ) );
+			 //			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 11, Avatar.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
+			 //			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 7.5, Avatar.AVATAR_HEIGHT_FOOT, 11 ) ) );
+			 //			_ct.addCollisionPoint( new CollisionPoint( FOOT, new Vector3D( 4, Avatar.AVATAR_HEIGHT_FOOT, 7.5 ) ) );
 			 // middle of chest
-			 _ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST - 4, 7.5 ) ) );
-			 _ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST, 7.5 ) ) );
-			 _ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_CHEST + 4, 7.5 ) ) );
+			 _ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Avatar.AVATAR_HEIGHT_CHEST - 4, 7.5 ) ) );
+			 _ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Avatar.AVATAR_HEIGHT_CHEST, 7.5 ) ) );
+			 _ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 7.5, Avatar.AVATAR_HEIGHT_CHEST + 4, 7.5 ) ) );
 			 // diamond around feet
-			 _ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
-			 _ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 7.5 ), false ) );
-			 //_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Globals.AVATAR_HEIGHT_HEAD, 15 ) ) );
-			 //_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 0, Globals.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
+			 _ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Avatar.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
+			 _ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Avatar.AVATAR_HEIGHT_HEAD, 7.5 ), false ) );
+			 //_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 7.5, Avatar.AVATAR_HEIGHT_HEAD, 15 ) ) );
+			 //_ct.addCollisionPoint( new CollisionPoint( HEAD, new Vector3D( 0, Avatar.AVATAR_HEIGHT_HEAD, 7.5 ) ) );
 		}
 
 		/*  0,0xxxxxx8xxxxxx15,0
@@ -419,11 +427,11 @@ public class Avatar extends ControllableVoxelModel
 
 	override protected function cameraAddLocations():void {
 		//camera.addLocation( new CameraLocation( true, 0, 0, 0 ) );
-		cameraContainer.addLocation( new CameraLocation( true, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, Globals.AVATAR_WIDTH/2 - 4) );
-		cameraContainer.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 50) );
-		cameraContainer.addLocation( new CameraLocation( false, -Globals.AVATAR_WIDTH, Globals.AVATAR_HEIGHT, 50) );
-		cameraContainer.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT * 2, 50) );
-		cameraContainer.addLocation( new CameraLocation( false, Globals.AVATAR_WIDTH/2, Globals.AVATAR_HEIGHT, 100) );
+		cameraContainer.addLocation( new CameraLocation( true, AVATAR_WIDTH/2, Avatar.AVATAR_HEIGHT, Avatar.AVATAR_WIDTH/2 - 4) );
+		cameraContainer.addLocation( new CameraLocation( false, AVATAR_WIDTH/2, Avatar.AVATAR_HEIGHT, 50) );
+		cameraContainer.addLocation( new CameraLocation( false, -AVATAR_WIDTH, Avatar.AVATAR_HEIGHT, 50) );
+		cameraContainer.addLocation( new CameraLocation( false, AVATAR_WIDTH/2, Avatar.AVATAR_HEIGHT * 2, 50) );
+		cameraContainer.addLocation( new CameraLocation( false, AVATAR_WIDTH/2, Avatar.AVATAR_HEIGHT, 100) );
 	}
 
 	override public function takeControl( $modelLosingControl:VoxelModel, $addAsChild:Boolean = true ):void {

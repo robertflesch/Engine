@@ -491,7 +491,7 @@ public class EditCursor extends VoxelModel
 		// check head
 		var result:Boolean = modelInfo.oxelPersistence.oxel.gc.is_point_inside( mp );
 		// and foot
-		mp.y -= Globals.AVATAR_HEIGHT;
+		mp.y -= Avatar.AVATAR_HEIGHT;
 		result = result || modelInfo.oxelPersistence.oxel.gc.is_point_inside( mp );
 		return result;
 	}

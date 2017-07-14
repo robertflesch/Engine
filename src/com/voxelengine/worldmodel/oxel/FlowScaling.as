@@ -7,7 +7,9 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.oxel
 {
-	import flash.geom.Point;
+import com.voxelengine.worldmodel.models.types.Avatar;
+
+import flash.geom.Point;
 	import flash.utils.ByteArray;
 	
 	import com.voxelengine.Log;
@@ -195,7 +197,7 @@ public class FlowScaling
 		// if these corners have not been influenced by another vert
 		// set them to scale
 		const fallRatePerMeter:uint = 2;
-		const amountToFall:uint = (fallRatePerMeter * $oxel.gc.size() / Globals.UNITS_PER_METER);
+		const amountToFall:uint = (fallRatePerMeter * $oxel.gc.size() / Avatar.UNITS_PER_METER);
 		if ( max() > amountToFall ) {
 			if ( CORNER_MIN == PxPz )
 				PxPz = max() - amountToFall;

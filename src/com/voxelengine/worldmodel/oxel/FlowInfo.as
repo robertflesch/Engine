@@ -58,8 +58,8 @@ public class FlowInfo
 	private var _flowScaling:FlowScaling					= new FlowScaling();
 	
 	// using out in a different way now
-	private 	function get out():int { return (_data & FLOW_OUT) >> FLOW_OUT_OFFSET; }
-	private 	function set out($val:int):void { $val = $val << FLOW_OUT_OFFSET;  _data &= FLOW_OUT_MASK; _data |= $val;  }
+	public 	function get out():int { return (_data & FLOW_OUT) >> FLOW_OUT_OFFSET; }
+	public 	function set out($val:int):void { $val = $val << FLOW_OUT_OFFSET;  _data &= FLOW_OUT_MASK; _data |= $val;  }
 	public 	function     outInc( $val:uint ):void { var i:int = out; i += $val; out = i; }
 	public 	function     outDec( $val:uint ):void { var i:int = out; i -= $val;  0 > i ? out = 0 : out = i; }
 	
@@ -113,7 +113,7 @@ public class FlowInfo
 		// if its top grain, reduce down by half of unit value
 		// need to do for out too, screw it!
 		//if ( $child.gc.grainY % 2 )
-		//	downInc( $child.gc.size() / Globals.UNITS_PER_METER) * 2 )
+		//	downInc( $child.gc.size() / Avatar.UNITS_PER_METER) * 2 )
 	}
 	
 	public function copy( $rhs:FlowInfo ):void {

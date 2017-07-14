@@ -8,12 +8,9 @@
 
 package com.voxelengine.worldmodel.biomes
 {
-	import com.voxelengine.Globals;
 	import com.voxelengine.Log;
 	import com.voxelengine.worldmodel.tasks.landscapetasks.*;
-	import com.voxelengine.worldmodel.tasks.flowtasks.*;
 	import com.voxelengine.worldmodel.tasks.tests.*;
-	import com.voxelengine.worldmodel.tasks.*;
 	import com.voxelengine.worldmodel.TypeInfo;
 
 

@@ -52,12 +52,6 @@ public class Globals  {
 	public static var g_nearplane:Number = 1/4;
 	//public static var g_farplane:Number = 65536 / 4;
 	public static var g_farplane:Number = 16777216 / 4; // MUCH MUCH better range at 24 bit Z buffer.
-	public static const UNITS_PER_METER:int = 16;
-	static public const AVATAR_HEIGHT:Number = ( UNITS_PER_METER * 2 ) - ( UNITS_PER_METER * 0.2 ); // 80% of two meters
-	static public const AVATAR_WIDTH:int = UNITS_PER_METER;
-	static public const AVATAR_HEIGHT_FOOT:int = 0;
-	static public const AVATAR_HEIGHT_HEAD:Number = AVATAR_HEIGHT;
-	static public const AVATAR_HEIGHT_CHEST:int = 20;
 
 	static public const GRAVITY:int = 10;
 

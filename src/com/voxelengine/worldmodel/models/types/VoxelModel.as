@@ -736,14 +736,14 @@ public class VoxelModel {
 		//if (fo.solid)
 		//{
 			//if (PositionTest.FOOT == positionResult.type)
-				//positionResult.footHeight = fo.gc.getModelY() + GrainCursor.get_the_g0_size_for_grain(fo.gc.grain) + Globals.AVATAR_HEIGHT_FOOT;
+				//positionResult.footHeight = fo.gc.getModelY() + GrainCursor.get_the_g0_size_for_grain(fo.gc.grain) + Avatar.AVATAR_HEIGHT_FOOT;
 			//Log.out( "Camera.isNewPositionValid - oxel is Solid")
 			//result = false;
 		//}
 		if (fo.childrenHas())
 		{
 			if (PositionTest.FOOT == positionResult.type)
-				positionResult.footHeight = fo.gc.getModelY() + GrainCursor.get_the_g0_size_for_grain(fo.gc.grain) + Globals.AVATAR_HEIGHT_FOOT;
+				positionResult.footHeight = fo.gc.getModelY() + GrainCursor.get_the_g0_size_for_grain(fo.gc.grain) + Avatar.AVATAR_HEIGHT_FOOT;
 			//Log.out( "Camera.isNewPositionValid - oxel has children")
 			result = false;
 		}

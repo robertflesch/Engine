@@ -15,7 +15,8 @@ import com.voxelengine.worldmodel.Region;
 	import com.voxelengine.events.LightEvent;
 	import com.voxelengine.pools.LightingPool;
 	import com.voxelengine.worldmodel.TypeInfo;
-	import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.models.types.Avatar;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
 	import com.voxelengine.worldmodel.oxel.GrainCursor;
 import com.voxelengine.worldmodel.oxel.LightInfo;
 import com.voxelengine.worldmodel.oxel.Oxel;
@@ -70,7 +71,7 @@ import com.voxelengine.worldmodel.oxel.Oxel;
                     // This oxel changed from solid to AIR or Translucent
                     // So I just need to rebalance it as an AIR oxel
                     var airAttn:uint = TypeInfo.typeInfo[ TypeInfo.AIR ].lightInfo.attn;
-                    const attnScaling:uint = co.lighting.materialFallOffFactor * airAttn * (co.gc.size() / Globals.UNITS_PER_METER);
+                    const attnScaling:uint = co.lighting.materialFallOffFactor * airAttn * (co.gc.size() / Avatar.UNITS_PER_METER);
                     co.lighting.balanceAttnAll( attnScaling );
                     // REVIEW - Just grabbing the ID of the brightest light, but I THINK all will spread.
                     // Did not work correctly with just brightest light in other places, replacing here with all lights

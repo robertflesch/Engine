@@ -96,7 +96,7 @@ public class VertexColor {
 		_changed = false;
 		
 		lightAdd( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_COLOR );
-		attnSet( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_BASE_ATTEN );
+		//attnSet( Lighting.DEFAULT_LIGHT_ID, Lighting.DEFAULT_BASE_ATTEN );
 	}
 	
 	public function attnGet( $lightID:uint ):uint {
@@ -114,7 +114,7 @@ if ( 0 == attn )
 if ( 0 == $lightID )
 	throw new Error( "VertexColor.attnSet - INVALID $lightID = 0" );
 if ( 0 == $attn || 255 < $attn ) {
-	$attn = Lighting.DEFAULT_BASE_ATTEN;
+	$attn = Lighting.defaultBaseLightIllumination;
 	throw new Error( "VertexColor.attnSet - attn == 0, reseting" ); }
 	
 		var val:uint = _colors[$lightID];
@@ -136,18 +136,18 @@ if ( 0 == val )
 	}
 	
 	// this returns a composite color made of default color plus any additional colors
-	public function lightGetComposite():uint {
-		if ( false == _changed )
-			return _composite;
-			
-		_composite = 0;
-		for each ( var color:uint in _colors ) {
-			_composite = ColorUtils.testCombineARGB( _composite, color );
-		}
-		
-		_changed = false;
-		return _composite;
-	}
+//	public function lightGetComposite():uint {
+//		if ( false == _changed )
+//			return _composite;
+//
+//		_composite = 0;
+//		for each ( var color:uint in _colors ) {
+//			_composite = ColorUtils.testCombineARGB( _composite, color );
+//		}
+//
+//		_changed = false;
+//		return _composite;
+//	}
 	
 } // end of class VertexColor
 } // end of package
