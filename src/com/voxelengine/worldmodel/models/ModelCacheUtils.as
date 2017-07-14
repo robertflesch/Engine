@@ -7,24 +7,21 @@
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.voxelengine.worldmodel.models.types.Avatar;
-import com.voxelengine.worldmodel.models.types.Avatar;
-	import com.voxelengine.worldmodel.models.types.EditCursor;
-import com.voxelengine.worldmodel.models.types.Player;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-	import com.voxelengine.worldmodel.Region;
-	import com.voxelengine.worldmodel.TypeInfo;
-import com.voxelengine.worldmodel.oxel.Oxel;
-import com.voxelengine.worldmodel.oxel.OxelBad;
-
 import flash.geom.Matrix3D;
-	import com.voxelengine.Log;
-	import com.voxelengine.Globals;
-	import com.voxelengine.worldmodel.oxel.GrainIntersection;
-
-import flash.geom.Vector3D;
 
 import org.as3commons.collections.Set;
+
+import com.voxelengine.Log;
+import com.voxelengine.Globals;
+import com.voxelengine.worldmodel.oxel.GrainIntersection;
+import com.voxelengine.worldmodel.models.types.Avatar;
+import com.voxelengine.worldmodel.models.types.EditCursor;
+import com.voxelengine.worldmodel.models.types.Player;
+import com.voxelengine.worldmodel.models.types.VoxelModel;
+import com.voxelengine.worldmodel.Region;
+import com.voxelengine.worldmodel.TypeInfo;
+import com.voxelengine.worldmodel.oxel.Oxel;
+import com.voxelengine.worldmodel.oxel.OxelBad;
 
 public class ModelCacheUtils
 	{
@@ -151,26 +148,32 @@ public class ModelCacheUtils
 	static public	function worldSpaceStartAndEndPointCalculate( $direction:int = FRONT, $editRange:int = EDIT_RANGE ):void {
 		var pm:Avatar = Player.pm;
 		if ( pm ) {
-            var msCamPos:Vector3D = pm.cameraContainer.current.position;
-            _worldSpaceStartPoint = pm.modelToWorld( msCamPos );
-            //trace( "ModelCacheUtils.calculate - Start: " + _worldSpaceStartPoint + "  y rot: " + pm.instanceInfo.rotationGet.y );
+			var msCamPos:Vector3D = new Vector3D( 8, Avatar.AVATAR_HEIGHT, 8 );
+            _worldSpaceStartPoint = pm.modelToWorld( msCamPos ); // Perfect, it scales it with avatar
+//            trace( "MCU - " + FM( "wssp: ", worldSpaceStartPoint )  ); // + FM( " avatar rot: ", pm.instanceInfo.rotationGet )
 
             // now create a vector in direction we are looking
             var cmRotation:Vector3D = CameraLocation.rotation;
             _cameraMatrix.identity();
+			_cameraMatrix.prependRotation( -cmRotation.z, Vector3D.Z_AXIS );
+			_cameraMatrix.prependRotation( -cmRotation.y, Vector3D.Y_AXIS );
             _cameraMatrix.prependRotation( -cmRotation.x, Vector3D.X_AXIS );
-			//_cameraMatrix.prependRotation( -cmRotation.y, Vector3D.Y_AXIS );
-            _cameraMatrix.prependRotation( 0, Vector3D.Y_AXIS );
-            _cameraMatrix.prependRotation( 0, Vector3D.Z_AXIS );
             var endPoint:Vector3D = _viewVectors[$direction].clone();
             endPoint.scaleBy( $editRange );
             var viewVector:Vector3D = _cameraMatrix.deltaTransformVector( endPoint );
+//			trace( "MCU - " + FM( "viewVector: ", viewVector ) + FM( "  cmRotation: ", cmRotation ) );
 
             _worldSpaceEndPoint = _worldSpaceStartPoint.add( viewVector );
-            trace( "MCU - cam rot : " + CameraLocation.rotation + "  viewVector: " + viewVector );
-            trace( "MCU - Start: " + _worldSpaceStartPoint + "  end: " + _worldSpaceEndPoint );
+//			trace( "MCU - " + FM( "worldSpaceEndPoint: ", _worldSpaceEndPoint ) );
+
+			/////////////////////////////////////
+		}
+
+		function FM( $title:String , $v:Vector3D ):String {
+			return $title + " { " + $v.x.toFixed(2) + " " + $v.y.toFixed(2)+ " " + $v.z.toFixed(2) + " }";
 		}
 	}
+
 
 	static public	function worldSpaceStartAndEndPointCalculateOld( $direction:int = FRONT, $editRange:int = EDIT_RANGE ):void {
 			//////////////////////////////////////
