@@ -580,7 +580,7 @@ public class ControllableVoxelModel extends VoxelModel
 	public function get inventoryBitmap():String { return _inventoryBitmap; }
 	public function set inventoryBitmap(value:String):void { _inventoryBitmap = value; }
 
-	private static const ROTATE_FACTOR:Number = 0.04;
+	private static const ROTATE_FACTOR:Number = 0.06;
 	override public function updateVelocity( $elapsedTimeMS:int, $clipFactor:Number ):Boolean
 	{
 		//Log.out( "updateVelocity this == VoxelModel.controlledModel " + (this == VoxelModel.controlledModel) + " Globals.active: " + Globals.active );

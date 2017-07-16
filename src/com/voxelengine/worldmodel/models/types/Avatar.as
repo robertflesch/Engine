@@ -10,6 +10,7 @@ package com.voxelengine.worldmodel.models.types
 
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
+import flash.geom.Vector3D;
 
 import flash.geom.Vector3D;
 import flash.utils.getQualifiedClassName;
@@ -496,42 +497,69 @@ public class Avatar extends ControllableVoxelModel
 			if ( MIN_TURN_AMOUNT >= Math.abs(dy) )
 				dy = 0;
 
-			const currentCamRotation:Vector3D = CameraLocation.rotation;
-			const camCenter:Vector3D = instanceInfo.center;
-			CameraLocation.rotation.setTo( currentCamRotation.x + dx
-										 , currentCamRotation.y + dy
-										 , 0 );
-			const currentBodyRotation:Vector3D = instanceInfo.rotationGet;
-			var head:VoxelModel = childFindByName( "Head" );
-			if ( head ){
-//				trace( "head: " + head.instanceInfo.rotationGet ); // + " dx: " + dx + "  dy: " + dy );
-//				trace( "camera: " + currentCamRotation );
-//				trace( "body: " + currentBodyRotation );
-				const headRot:Vector3D = head.instanceInfo.rotationGetOriginal();
-				head.instanceInfo.rotationSetComp( (headRot.x + currentBodyRotation.x - currentCamRotation.x + dx)
-												 , -(headRot.y + currentBodyRotation.y - currentCamRotation.y + dy)
-						                         , 0 );
-			}
-//			if ( onSolidGround ) {
-//				//instanceInfo.rotationGet.setTo( 0, instanceInfo.rotationGet.y + dy, 0 );
-//				//const currentRotation:Vector3D = instanceInfo.rotationGet;
-//				const currentRotation:Vector3D = cameraContainer.current.rotation;
-//				cameraContainer.current.rotation = new Vector3D( currentRotation.x + dx, currentRotation.y, 0 );
-//			} else {
-//				instanceInfo.rotationGet.setTo( instanceInfo.rotationGet.x + dx
-//						                      , instanceInfo.rotationGet.y + dy
-//						                      , 0 );
-//			}
+			if ( MouseKeyboardHandler.isLeftMouseDown ) {
 
-			//
-			//Log.out( "Avatar.handleMouseMovement - rotation: " + instanceInfo.rotationGet );
-			// I only want to rotate the head here, not the whole body. in the X dir.
-			// so if I made the head the main body part, could I keep the rest of the head fixed on the x and z axis...
-//			instanceInfo.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y + dy, instanceInfo.rotationGet.z );
-			//camera.rotationSetComp( instanceInfo.rotationGet.x, instanceInfo.rotationGet.y, instanceInfo.rotationGet.z );
-			// this uses the camera y rotation, but it breaks other things like where to dig.
-//			instanceInfo.rotationSetComp( instanceInfo.rotationGet.x + dx, instanceInfo.rotationGet.y, instanceInfo.rotationGet.z );
-			//trace( "handleMouseMovement instanceInfo.rotationGet: " + instanceInfo.rotationGet + "  camera.rotation: " + camera.rotationGet );
+                const currentCamRotationLMD:Vector3D = CameraLocation.rotation;
+//                CameraLocation.rotation.setTo(currentCamRotationLMD.x + dx
+//                        , currentCamRotationLMD.y + dy
+//                        , 0);
+				setCameraAndHead( currentCamRotationLMD.x + dx
+						        , currentCamRotationLMD.y + dy
+						        , 0
+						        , currentCamRotationLMD.y + dy );
+
+//                const currentBodyRotation:Vector3D = instanceInfo.rotationGet;
+//                var head:VoxelModel = childFindByName("Head");
+//                if (head) {
+////				trace( "head: " + head.instanceInfo.rotationGet ); // + " dx: " + dx + "  dy: " + dy );
+////				trace( "camera: " + currentCamRotation );
+////				trace( "body: " + currentBodyRotation );
+//                    const headRot:Vector3D = head.instanceInfo.rotationGetOriginal();
+//                    head.instanceInfo.rotationSetComp((headRot.x + currentBodyRotation.x - currentCamRotationLMD.x + dx)
+//                            , -(headRot.y + currentBodyRotation.y - currentCamRotationLMD.y + dy)
+//                            , 0);
+//                }
+            }
+            else {
+                const currentRotP:Vector3D = instanceInfo.rotationGet;
+                const newY:Number = currentRotP.y + dy / 20 * $elapsedTimeMS;
+                var newX:Number = currentRotP.x;
+                if ( onSolidGround ) {
+                    instanceInfo.rotationSetComp( newX, newY, 0 );
+    			} else {
+                    instanceInfo.rotationSetComp( newX + dx, newY, 0 );
+                }
+                setCameraRotation( dx );
+            }
+            trace( "avatar rot: " + currentRotP + "  head rot: " +  CameraLocation.rotation );
+		}
+	}
+
+    private function setCameraRotation( $dx:Number ):void {
+        const currentCamRotation:Vector3D = CameraLocation.rotation;
+		// I only care about rotation around y, for x your can always look up and down
+        if ( Math.abs( currentCamRotation.y - instanceInfo.rotationGet.y ) > 2  ){
+			// DECAY THE DIFFERENCE IN Y
+			const iRot:Vector3D = instanceInfo.rotationGet;
+			var decayVal:Number =  CameraLocation.rotation.y - iRot.y;
+			if ( decayVal < 0.01 && decayVal > -0.01 ) {
+				setCameraAndHead( iRot.x, iRot.y, iRot.z );
+			} else {
+				decayVal *= 0.97;
+				setCameraAndHead( iRot.x, iRot.y + decayVal, iRot.z, decayVal );
+			}
+        } else
+			setCameraAndHead( CameraLocation.rotation.x + $dx , instanceInfo.rotationGet.y , 0);
+    }
+
+	private function setCameraAndHead( $x:Number, $y:Number, $z:Number, $headRotY:Number = 0 ):void {
+		CameraLocation.rotation.setTo( $x , $y , $z );
+		var head:VoxelModel = childFindByName("Head");
+		if (head) {
+			const headRot:Vector3D = head.instanceInfo.rotationGetOriginal();
+			head.instanceInfo.rotationSetComp( ( headRot.x - CameraLocation.rotation.x )
+					, headRot.y + $headRotY
+					, 0);
 		}
 	}
 
