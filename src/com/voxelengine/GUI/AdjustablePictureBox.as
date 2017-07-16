@@ -2,6 +2,7 @@
  * Created by dev on 5/22/2017.
  */
 package com.voxelengine.GUI {
+
 import flash.filters.ColorMatrixFilter;
 import flash.geom.Point;
 import flash.display.BitmapData;
@@ -16,7 +17,7 @@ import org.flashapi.swing.constants.LayoutOrientation;
 import org.flashapi.swing.constants.ScrollableOrientation;
 import org.flashapi.swing.constants.TextAlign;
 import org.flashapi.swing.event.ScrollEvent;
-import fl.motion.AdjustColor;
+import com.voxelengine.utils.AdjustColor;
 
 import org.flashapi.swing.layout.AbsoluteLayout;
 
