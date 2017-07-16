@@ -1,7 +1,5 @@
 package fl.motion
 {
-	import __AS3__.vec.Vector;
-	
 	import flash.geom.Vector3D;
 	import flash.geom.Matrix3D;
 	

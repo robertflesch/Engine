@@ -5,7 +5,6 @@ package fl.motion
 	import flash.geom.Matrix;
 	import flash.geom.Matrix3D;
 	import flash.geom.Vector3D;
-	import __AS3__.vec.Vector;
 	import flash.geom.Point;
 
 /**
