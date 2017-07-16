@@ -103,7 +103,9 @@ public class LightingTests  {
 			}
 			
 			bt.reset();
-			bt.add( lightId, 0x00ff0000, Lighting.MAX_LIGHT_LEVEL );
+
+			//modelInfo.oxelPersistence.oxel.chunkGet().lightInfo
+			//bt.add( lightId, 0x00ff0000, Lighting.MAX_LIGHT_LEVEL );
 			bt.setAll( lightId, Lighting.MAX_LIGHT_LEVEL );
 			if ( OneOhOneMax == bt.toString() )
 				Log.out( "BrightnessTests.setAllTests	pass 3" );
@@ -127,7 +129,7 @@ public class LightingTests  {
 			
 			var lob:Lighting = LightingPool.poolGet();
 			var lightId:uint = 101;
-			lob.add( lightId, 0x00ff0000, Lighting.MAX_LIGHT_LEVEL );
+			//lob.add( lightId, 0x00ff0000, Lighting.MAX_LIGHT_LEVEL );
 			lob.setAll( lightId, Lighting.MAX_LIGHT_LEVEL );
 			var grainUnits:uint = 16;
 			
@@ -161,8 +163,8 @@ public class LightingTests  {
 			for ( var childID:uint = 0; childID < 8; childID++ ) {	
 				btp.reset();
 				// now extend the brightness child onto its parent!
-				//public function childAdd( $ID:uint, $childID:uint, $b:Brightness, $grainUnits:uint ):void {	
-				btp.childAdd(  Lighting.DEFAULT_LIGHT_ID, childID, bt, grainUnits );
+				//public function childAdd( $ID:uint, $childID:uint, $b:Brightness, $grainUnits:uint, hasAlpha:Boolean ):void {
+				btp.childAdd(  Lighting.DEFAULT_LIGHT_ID, childID, bt, grainUnits, false );
 				//bt.copyFrom( btp );
 				//grainUnits *= 2;
 				trace( btp.toString() );
@@ -175,7 +177,7 @@ public class LightingTests  {
 			
 			var lob:Lighting = LightingPool.poolGet();
 			var lightId:uint = 101;
-			lob.add( lightId, 0x00ff0000, Lighting.MAX_LIGHT_LEVEL );
+			//lob.add( lightId, 0x00ff0000, Lighting.MAX_LIGHT_LEVEL );
 			lob.setAll( lightId, Lighting.MAX_LIGHT_LEVEL );
 			
 			var btp:Lighting = LightingPool.poolGet();
