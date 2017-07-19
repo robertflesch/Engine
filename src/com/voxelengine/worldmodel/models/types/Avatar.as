@@ -473,16 +473,11 @@ public class Avatar extends ControllableVoxelModel
 	}
 
 	override protected function handleMouseMovement( $elapsedTimeMS:int ):void {
-//		Log.out( "Avatar.handleMouseMovement - Globals.active: " + Globals.active
-//				+ "  MouseKeyboardHandler.ctrl: " + MouseKeyboardHandler.ctrl
-//				+ " MouseKeyboardHandler.active: " + MouseKeyboardHandler.active
-//				+ " Globals.openWindowCount: " + Globals.openWindowCount  );
 		if ( Globals.active
-				//&& 0 == Globals.openWindowCount // this allows it to be handled in the getMouseYChange
-				&& false == MouseKeyboardHandler.isCtrlKeyDown
-				&& true == MouseKeyboardHandler.active
-				&& 0 == Globals.openWindowCount )
-		{
+		  && false == MouseKeyboardHandler.isCtrlKeyDown
+		  && true == MouseKeyboardHandler.active
+		  && 0 == Globals.openWindowCount ) {
+			
 			// up down
 			var dx:Number = MouseKeyboardHandler.getMouseYChange() / MOUSE_LOOK_CHANGE_RATE;
 			dx *= $elapsedTimeMS;
@@ -500,66 +495,36 @@ public class Avatar extends ControllableVoxelModel
 			if ( MouseKeyboardHandler.isLeftMouseDown ) {
 
                 const currentCamRotationLMD:Vector3D = CameraLocation.rotation;
-//                CameraLocation.rotation.setTo(currentCamRotationLMD.x + dx
-//                        , currentCamRotationLMD.y + dy
-//                        , 0);
 				setCameraAndHead( currentCamRotationLMD.x + dx
 						        , currentCamRotationLMD.y + dy
-						        , 0
-						        , currentCamRotationLMD.y + dy );
-
-//                const currentBodyRotation:Vector3D = instanceInfo.rotationGet;
-//                var head:VoxelModel = childFindByName("Head");
-//                if (head) {
-////				trace( "head: " + head.instanceInfo.rotationGet ); // + " dx: " + dx + "  dy: " + dy );
-////				trace( "camera: " + currentCamRotation );
-////				trace( "body: " + currentBodyRotation );
-//                    const headRot:Vector3D = head.instanceInfo.rotationGetOriginal();
-//                    head.instanceInfo.rotationSetComp((headRot.x + currentBodyRotation.x - currentCamRotationLMD.x + dx)
-//                            , -(headRot.y + currentBodyRotation.y - currentCamRotationLMD.y + dy)
-//                            , 0);
-//                }
+						        , 0 );
             }
             else {
-                const currentRotP:Vector3D = instanceInfo.rotationGet;
-                const newY:Number = currentRotP.y + dy / 20 * $elapsedTimeMS;
-                var newX:Number = currentRotP.x;
+                const currentBodyRot:Vector3D = instanceInfo.rotationGet;
+                const newY:Number = currentBodyRot.y + dy / 20 * $elapsedTimeMS;
+                var newX:Number = currentBodyRot.x;
                 if ( onSolidGround ) {
                     instanceInfo.rotationSetComp( newX, newY, 0 );
     			} else {
                     instanceInfo.rotationSetComp( newX + dx, newY, 0 );
                 }
-                setCameraRotation( dx );
+				// TODO Need to decay the y of the difference between camera rotation and body rotation
+				setCameraAndHead( CameraLocation.rotation.x + dx , newY , 0);
             }
-            trace( "avatar rot: " + currentRotP + "  head rot: " +  CameraLocation.rotation );
 		}
 	}
 
-    private function setCameraRotation( $dx:Number ):void {
-        const currentCamRotation:Vector3D = CameraLocation.rotation;
-		// I only care about rotation around y, for x your can always look up and down
-        if ( Math.abs( currentCamRotation.y - instanceInfo.rotationGet.y ) > 2  ){
-			// DECAY THE DIFFERENCE IN Y
-			const iRot:Vector3D = instanceInfo.rotationGet;
-			var decayVal:Number =  CameraLocation.rotation.y - iRot.y;
-			if ( decayVal < 0.01 && decayVal > -0.01 ) {
-				setCameraAndHead( iRot.x, iRot.y, iRot.z );
-			} else {
-				decayVal *= 0.97;
-				setCameraAndHead( iRot.x, iRot.y + decayVal, iRot.z, decayVal );
-			}
-        } else
-			setCameraAndHead( CameraLocation.rotation.x + $dx , instanceInfo.rotationGet.y , 0);
-    }
-
-	private function setCameraAndHead( $x:Number, $y:Number, $z:Number, $headRotY:Number = 0 ):void {
+	private function setCameraAndHead( $x:Number, $y:Number, $z:Number ):void {
 		CameraLocation.rotation.setTo( $x , $y , $z );
+		trace( "CameraLocation.rotation: " + CameraLocation.rotation + "  $x: " + $x + "  $y: " + $y + "  $z: " + $z );
 		var head:VoxelModel = childFindByName("Head");
 		if (head) {
-			const headRot:Vector3D = head.instanceInfo.rotationGetOriginal();
-			head.instanceInfo.rotationSetComp( ( headRot.x - CameraLocation.rotation.x )
-					, headRot.y + $headRotY
-					, 0);
+			const bodyRot:Vector3D = instanceInfo.rotationGet;
+			const originalHeadRot:Vector3D = head.instanceInfo.rotationGetOriginal();
+			head.instanceInfo.rotationSetComp( -$x
+											, originalHeadRot.y  - ( bodyRot.y - $y )
+											, 0);
+			trace( "bodyRot: " + bodyRot.y + "  head.instanceInfo.rotationGet: " + head.instanceInfo.rotationGet.y  + "   + originalHeadRot.y" +  + originalHeadRot.y);
 		}
 	}
 
