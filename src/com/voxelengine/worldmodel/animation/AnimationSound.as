@@ -191,7 +191,6 @@ public class AnimationSound extends PersistenceObject
 //		_pitchRate = 0.5 + Math.abs($pitchRate) * 2;
 		if ( !_sound ) {
 			requestSound();
-			return;
 		} else if ( !_pitch ){
 			_pitchRate = $val;
 			createPitch();

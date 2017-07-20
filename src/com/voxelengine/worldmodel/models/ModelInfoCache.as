@@ -155,7 +155,7 @@ public class ModelInfoCache
 		var modelInfoExisting:ModelInfo = _modelInfo[oldGuid];
 		if ( null == modelInfoExisting ) {
 			Log.out( "ModelInfoCache.updateGuid - guid not found: " + oldGuid, Log.ERROR );
-			return; }
+		}
 		else {
 			_modelInfo[oldGuid] = null;
 			_modelInfo[newGuid] = modelInfoExisting;

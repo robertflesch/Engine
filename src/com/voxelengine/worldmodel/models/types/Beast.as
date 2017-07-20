@@ -139,7 +139,7 @@ public class Beast extends ControllableVoxelModel
 			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( 0, sizeOxel, sizeOxel ) ) ); // left side
 			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel * 2, sizeOxel, sizeOxel ) ) ); // right side
 			/*
-			// note if I added these in from children, then I could get postion from children each frame...
+			// note if I added these in from children, then I could get position from children each frame...
 			_ct.addCollisionPoint( new CollisionPoint( WING_TIP, new Vector3D( -55, sizeOxel, sizeOxel ) ) ); // left wing tip
 			_ct.addCollisionPoint( new CollisionPoint( WING_TIP, new Vector3D( 80, sizeOxel, sizeOxel ) ) ); // right wing tip
 			_ct.addCollisionPoint( new CollisionPoint( WING, new Vector3D( -25, sizeOxel, sizeOxel ) ) ); // left wing
@@ -205,7 +205,7 @@ public class Beast extends ControllableVoxelModel
 		// only the point beneath the foot is touching
 		if ( fall && !foot && !body )
 		{
-			//Log.out( "Beast.collsionCheckNew - Only fall point is true" );
+			//Log.out( "Beast.collisionCheckNew - Only fall point is true" );
 			onSolidGround = true;
 			$loc.velocityResetY();
 		}
@@ -213,7 +213,7 @@ public class Beast extends ControllableVoxelModel
 		// get it out
 		else if ( fall && foot && (!body || !wingTip || !wing) )
 		{
-			//Log.out( "Beast.collsionCheckNew - Fall and Foot point is true" );
+			//Log.out( "Beast.collisionCheckNew - Fall and Foot point is true" );
 			onSolidGround = true;
 			$loc.velocityResetY();
 
@@ -221,7 +221,7 @@ public class Beast extends ControllableVoxelModel
 			{
 				//if ( 5 > $loc.velocityGet.length )
 				{
-					//Log.out( "Beast.collsionCheckNew - OK LAND" );
+					//Log.out( "Beast.collisionCheckNew - OK LAND" );
 					// So I can see a problem here, what if I come in diagonally, and one collision point is stuck in a wall
 					// and the other 3 in the floor.
 					var co:Oxel = points[0].oxel;
@@ -343,7 +343,7 @@ public class Beast extends ControllableVoxelModel
 			viewMatrix.appendRotation( _workingAverage * -20, Vector3D.Z_AXIS );
 		}
 
-		var selected:Boolean = VoxelModel.selectedModel == this ? true : false;
+		var selected:Boolean = (VoxelModel.selectedModel == this) ? true : false;
 		modelInfo.draw( viewMatrix, this, $context, selected, $isChild, $alpha );
 
 		for each ( var vm:VoxelModel in modelInfo.childVoxelModels )

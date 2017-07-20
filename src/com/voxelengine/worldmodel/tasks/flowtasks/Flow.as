@@ -118,10 +118,11 @@ import flash.utils.Timer;
 			// Crack oxel and send 1/8 down in flow direction
 			// go from 1,1,1 to 0,0,0 for flow order
 			// each child voxel should try to flow at least 8 before stopping
-			if ( MIN_MELT_GRAIN > $flowFromOxel.gc.grain )
+			if ( MIN_MELT_GRAIN > $flowFromOxel.gc.grain ) {
 				//$flowFromOxel.changeOxel( _guid, $flowFromOxel.gc, TypeInfo.AIR )
-				_vm.write( $flowFromOxel.gc, TypeInfo.AIR );
+				_vm.write($flowFromOxel.gc, TypeInfo.AIR);
 				return;
+			}
 				
 			//FlowFlop.addTask( _guid, $flowFromOxel.gc, $flowFromOxel.type, $flowFromOxel.flowInfo, 1 );
 			
@@ -171,7 +172,6 @@ import flash.utils.Timer;
 				if ( 0 < flowCandidates.length ) {
 					flowTasksAdd( flowCandidates, false, $flowFromOxel.flowInfo );
 					//Log.out( "Flow.flowStartContinous adding: " + flowCandidates.length + " new flows" )
-					return
 				}
 //				Log.out( "Flow.flowStartContinous NO new flows found" )
 			}

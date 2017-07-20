@@ -78,7 +78,6 @@ public class Voxels
 			var typeId:int = e.typeId;
 			var voxelCount:int = _items[typeId].val;
 			InventoryVoxelEvent.dispatch( new InventoryVoxelEvent( InventoryVoxelEvent.COUNT_RESULT, _owner.guid, typeId, voxelCount ) );
-			return;
 		}
 		//Log.out( "Voxels.voxelCount - Failed test of e.networkId: " + e.networkId + " == _networkId: " + _networkId, Log.WARN );
 	}
