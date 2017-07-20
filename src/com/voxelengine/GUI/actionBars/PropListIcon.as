@@ -34,7 +34,7 @@ public class PropListIcon extends VVCanvas
 	
 	public function PropListIcon( $width:int ) {
 		_parentWidth = $width;
-		super( 128, 128 )
+		super( 128, 128 );
 		// These numbers come from the size of the artwork, and from the size of the toolbar below it.
 		layout = new AbsoluteLayout();
 		_outline = new Image( Globals.texturePath + "list.png" );
@@ -43,7 +43,7 @@ public class PropListIcon extends VVCanvas
 		var it:UITextField = new UITextField();
 		it.text = "Propeller List (N)";
 		it.x = 24;
-		it.y = 48
+		it.y = 48;
 		it.textColor = 0xFFFFFF;
 		addElement( it );
 		display();

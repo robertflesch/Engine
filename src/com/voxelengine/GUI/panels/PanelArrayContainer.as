@@ -15,7 +15,7 @@ public class PanelArrayContainer extends Panel
 {
 	private var _rootObject:*;
 
-	public function PanelArrayContainer( $rootObject:*, $array:Array, $arrayItemContainer:Class, $widthParam = 300, $heightParam = 400 ) {
+	public function PanelArrayContainer( $rootObject:*, $array:Array, $arrayItemContainer:Class, $widthParam:int = 300, $heightParam:int = 400 ) {
 		super();
 		width = $widthParam;
 		height = $heightParam;

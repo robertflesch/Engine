@@ -193,7 +193,7 @@ public class PersistBigDB
 		}
 		
 		function saveFailure(e:PlayerIOError):void { 
-			Log.out( "PersistBigDB.save - Failed - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: " + e, Log.ERROR, e ) 
+			Log.out( "PersistBigDB.save - Failed - table: " + $pe.table + "  guid:" + $pe.guid + "  error data: " + e, Log.ERROR, e );
 			PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.SAVE_FAILED, $pe.series, $pe.table, $pe.guid ) );
 		}
 		

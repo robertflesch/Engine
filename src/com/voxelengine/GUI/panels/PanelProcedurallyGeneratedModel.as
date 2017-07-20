@@ -218,7 +218,7 @@ class LayerTypeData extends SimpleContainerBase
 		var cbType:ComboBox = new ComboBox( $value, 80, 10 );
 		cbType.addEventListener( ListEvent.LIST_CHANGED, callBack );
 		cbType.x = $width - 80;
-		var item:TypeInfo
+		var item:TypeInfo;
 		for ( var i:int = TypeInfo.MIN_TYPE_INFO; i < TypeInfo.MAX_TYPE_INFO; i++ )
 		{
 			item = TypeInfo.typeInfo[i];

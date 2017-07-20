@@ -77,6 +77,8 @@ package com.voxelengine.utils
 						break;
 					}
 				case "text":
+					_data = bytes.toString();
+					break;
 				default:
 					_data = bytes.toString();
 					break;

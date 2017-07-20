@@ -58,8 +58,8 @@ public class WindowAnimationDetail extends VVPopup
 		//addAttachmentPanel()
 		addButtonPanel();
 		
-		display()
-		defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION
+		display();
+		defaultCloseOperation = ClosableProperties.CALL_CLOSE_FUNCTION;
 		onCloseFunction = closeFunction
 	}
 	
@@ -68,7 +68,7 @@ public class WindowAnimationDetail extends VVPopup
 		if ( _ani.changed ) 
 			queryToSaveChanges();
 			
-		remove()
+		remove();
 		
 		function queryToSaveChanges():void {
 			var alert:Alert = new Alert( "You have unsaved changes, want do you want to do?", 400 );

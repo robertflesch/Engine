@@ -28,7 +28,7 @@ public class PanelAnimationAttachment extends ExpandableBox
 	static private const ITEM_HEIGHT:int = 20;
 	static private const TITLE:String = "";
 	static private const NEW_ITEM_TEXT:String = "Animation Transform";
-	public function PanelAnimationAttachment( $ani:Animation, $aniAttach:VoxelModel, $widthParam = 250 ) {
+	public function PanelAnimationAttachment( $ani:Animation, $aniAttach:VoxelModel, $widthParam:int = 250 ) {
 		var ebco:ExpandableBoxConfigObject = new ExpandableBoxConfigObject();
 //		ebco.showNew = true;
 		ebco.paddingTop = 2;

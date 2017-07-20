@@ -59,7 +59,7 @@ public class ShapeSelector extends VVCanvas
 		_butCurrent = new Box(IMAGE_SIZE, IMAGE_SIZE);
 		_butCurrent.x = 10;
 		_butCurrent.y = 10;
-		_butCurrent.data = "square"
+		_butCurrent.data = "square";
 		_butCurrent.backgroundTexture = "assets/textures/square.jpg";
 		addElement( _butCurrent );
 		
@@ -68,7 +68,7 @@ public class ShapeSelector extends VVCanvas
 		hk.x = 33;
 		hk.y = -4;
 		hk.fontColor = 0xffffff;
-		hk.text = "F8"
+		hk.text = "F8";
 		addElement(hk);
 		
 		eventCollector.addEvent( _butCurrent, UIMouseEvent.PRESS, pressShape );
@@ -78,7 +78,7 @@ public class ShapeSelector extends VVCanvas
 	public function hotKeyInventory(e:KeyboardEvent):void 
 	{
 		if  ( !Globals.active )
-			return
+			return;
 			
 		if ( 119 == e.keyCode )
 			pressShapeHotKey(e)

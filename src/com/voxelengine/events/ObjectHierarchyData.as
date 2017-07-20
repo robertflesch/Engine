@@ -25,12 +25,12 @@ public class ObjectHierarchyData {
 
     public function ObjectHierarchyData() {}
 
-    public function fromGuids(  $modelGuid
-                            , $instanceGuid
-                            , $parentModelGuid = null
-                            , $parentInstanceGuid = null
-                            , $rootModelGuid = null
-                            , $rootInstanceGuid = null ):void {
+    public function fromGuids(  $modelGuid:String
+                            , $instanceGuid:String
+                            , $parentModelGuid:String = null
+                            , $parentInstanceGuid:String = null
+                            , $rootModelGuid:String = null
+                            , $rootInstanceGuid:String = null ):void {
         _modelGuid          = $modelGuid;
         _instanceGuid       = $instanceGuid;
         _parentModelGuid    = $parentModelGuid;

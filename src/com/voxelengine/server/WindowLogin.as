@@ -297,7 +297,7 @@ import org.flashapi.swing.list.ListItem;
 		}
 		
 		private function onUnknownFailure( $e:LoginEvent ):void {
-			removeLoginEventHandlers()
+			removeLoginEventHandlers();
 			LoadingImageEvent.create( LoadingImageEvent.DESTROY );
 			Log.out("WindowLogin.onUnknownFailure: " + $e.guid, Log.ERROR );
 			_errorText.text = "Server error, try again later";

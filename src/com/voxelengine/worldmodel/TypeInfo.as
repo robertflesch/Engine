@@ -393,7 +393,7 @@ public class TypeInfo
 			if ( $json.flowable[3] )
 				_spreadInterval = $json.flowable[3];
 			if ( $json.flowable[4] )
-				_flowScalable = $json.flowable[4]
+				_flowScalable = $json.flowable[4];
 			if ( $json.flowable[5] )
 				_changeType = $json.flowable[5]
 		}
@@ -404,7 +404,7 @@ public class TypeInfo
 
 		if ( $json.flammable )
 		{
-			_spreadChance = $json.flammable[0]
+			_spreadChance = $json.flammable[0];
 			_burnTime = $json.flammable[1];
 			_flammable = true;
 		}

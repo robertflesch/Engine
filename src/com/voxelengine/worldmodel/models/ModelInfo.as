@@ -141,9 +141,9 @@ public class ModelInfo extends PersistenceObject
 		changed = true;
 	}
 
-	public function update( $context:Context3D, $elapsedTimeMS:int, $vm:VoxelModel ):void {
+	public function update( $context:Context3D, $elapsedTimeMS:int ):void {
 		if ( oxelPersistence && oxelPersistence.oxelCount && oxelPersistence.oxel.chunkGet() ) {
-			oxelPersistence.update($vm);
+			oxelPersistence.update();
 		}
 			
 		for each (var cm:VoxelModel in childVoxelModels ) {
@@ -519,7 +519,9 @@ public class ModelInfo extends PersistenceObject
 		// didn't find it at first level, lets look recursively
 		if ( $recursive ) {
 			for each (var child1:VoxelModel in childVoxelModels) {
-				return child1.modelInfo.childModelFindByName($name);
+				var result:VoxelModel = child1.modelInfo.childModelFindByName($name);
+				if ( result )
+					return result;
 			}
 		}
 		//Log.out(  "VoxelModel.childFind - not found for guid: " + guid, Log.WARN );

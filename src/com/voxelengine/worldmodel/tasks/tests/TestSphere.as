@@ -70,7 +70,7 @@ package com.voxelengine.worldmodel.tasks.tests
 			}
 
 			trace( "TestSphere.start - completed layer of type: " + (TypeInfo.typeInfo[_layer.type].name.toUpperCase()) + "  range: " + _layer.range + "  offset: " + _layer.offset + " took: " + (getTimer()-timer) + " in queue for: " + (timer-_startTime));
-			super.complete() // AbstractTask will send event
+			super.complete(); // AbstractTask will send event
 		}
 		
 		override public function cancel():void {

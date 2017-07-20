@@ -58,7 +58,7 @@ public class PanelAnimationTransform extends ExpandableBox
 		_itemBox.addElement( new Label( _ebco.item.attachmentName, _itemBox.width ) );
 		_itemBox.addElement( new ComponentSpacer( _itemBox.width, 6 ) );
 
-		var ebcoIb:ExpandableBoxConfigObject = _ebco.clone()
+		var ebcoIb:ExpandableBoxConfigObject = _ebco.clone();
 		ebcoIb.width = _itemBox.width;
 		ebcoIb.title = "initial setting ";
 		ebcoIb.paddingTop = 7;

@@ -3360,7 +3360,7 @@ if ( _flowInfo && _flowInfo.flowScaling.has() ) {
 		return null;
 	}
 
-	static public function getClassFromType( $type ):Class {
+	static public function getClassFromType( $type:String ):Class {
 		return Oxel;
 	}
 

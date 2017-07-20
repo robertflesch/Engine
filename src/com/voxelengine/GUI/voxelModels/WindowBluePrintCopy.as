@@ -77,7 +77,7 @@ import com.voxelengine.GUI.LanguageManager
 
 	private  function saveHandler(event:UIMouseEvent):void  {
 		
-		clone()
+		clone();
 		remove()
 	}
 	

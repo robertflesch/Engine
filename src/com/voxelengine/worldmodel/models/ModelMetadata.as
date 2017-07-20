@@ -210,7 +210,7 @@ public class ModelMetadata extends PersistenceObject
 		var oldObj:String = JSON.stringify( dbo );
 		dbo.name = oldName;
 
-		var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, $newGuid, null, oldObj, URLLoaderDataFormat.TEXT, guid )
+		var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, $newGuid, null, oldObj, URLLoaderDataFormat.TEXT, guid );
 		PersistenceEvent.dispatch( pe )
 	}
 }
