@@ -120,7 +120,7 @@ public class Avatar extends ControllableVoxelModel
 		instanceInfo.usesCollision = true;
 		clipVelocityFactor = AVATAR_CLIP_FACTOR;
 		torchToggle();
-		collisionMarkers = true;
+		collisionMarkers = false;
 	}
 
 	override public function buildExportObject():void {
@@ -477,7 +477,7 @@ public class Avatar extends ControllableVoxelModel
 		  && false == MouseKeyboardHandler.isCtrlKeyDown
 		  && true == MouseKeyboardHandler.active
 		  && 0 == Globals.openWindowCount ) {
-			
+
 			// up down
 			var dx:Number = MouseKeyboardHandler.getMouseYChange() / MOUSE_LOOK_CHANGE_RATE;
 			dx *= $elapsedTimeMS;
@@ -516,7 +516,7 @@ public class Avatar extends ControllableVoxelModel
 
 	private function setCameraAndHead( $x:Number, $y:Number, $z:Number ):void {
 		CameraLocation.rotation.setTo( $x , $y , $z );
-		trace( "CameraLocation.rotation: " + CameraLocation.rotation + "  $x: " + $x + "  $y: " + $y + "  $z: " + $z );
+		//trace( "CameraLocation.rotation: " + CameraLocation.rotation + "  $x: " + $x + "  $y: " + $y + "  $z: " + $z );
 		var head:VoxelModel = childFindByName("Head");
 		if (head) {
 			const bodyRot:Vector3D = instanceInfo.rotationGet;
@@ -524,7 +524,7 @@ public class Avatar extends ControllableVoxelModel
 			head.instanceInfo.rotationSetComp( -$x
 											, originalHeadRot.y  - ( bodyRot.y - $y )
 											, 0);
-			trace( "bodyRot: " + bodyRot.y + "  head.instanceInfo.rotationGet: " + head.instanceInfo.rotationGet.y  + "   + originalHeadRot.y" +  + originalHeadRot.y);
+			//trace( "bodyRot: " + bodyRot.y + "  head.instanceInfo.rotationGet: " + head.instanceInfo.rotationGet.y  + "   + originalHeadRot.y" +  + originalHeadRot.y);
 		}
 	}
 

@@ -150,18 +150,18 @@ public class OxelPersistence extends PersistenceObject
 	////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	// Chunk operations
 
-	public function update( $vm:VoxelModel ):void {
+	public function update():void {
 		if ( topMostChunk ) {
 			if ( topMostChunk.isBuilding )
 					return;
-			if ( topMostChunk.dirtyFacesOrQuads || forceFaces || forceQuads )
-			{
+			topMostChunk.markToSendToGPU();
+			if ( topMostChunk.dirtyFacesOrQuads || forceFaces || forceQuads ) {
 //				if ( "EditCursor" != guid )
 //					Log.out("OxelPersistence.update ------------ calling facesAndQuadsBuild guid: " + guid + "  with forceFaces: " + forceFaces + "  forceQuads: " + forceQuads + "  dirtyFacesOrQuads: " + topMostChunk.dirtyFacesOrQuads, Log.DEBUG);
 //				if ( forceFaces || forceQuads )
 //						changed = true;
 				var buildFaces:Boolean = true;
-				oxel.chunkGet().faceAndQuadsBuild(buildFaces, forceFaces, forceQuads);
+				topMostChunk.faceAndQuadsBuild(buildFaces, forceFaces, forceQuads);
 				forceFaces = false;
 				forceQuads = false;
 			}

@@ -238,6 +238,19 @@ public class VertexManager {
 			_vertBufFire.dirty = true;
 	}
 
+	public function markToSendToGPU():void {
+		if ( _vertBuf )
+			_vertBuf.sentToGPU = false;
+		if ( _vertBufAlpha )
+			_vertBufAlpha.sentToGPU = false;
+		if ( _vertBufAnimated )
+			_vertBufAnimated.sentToGPU = false;
+		if ( _vertBufAnimatedAlpha )
+			_vertBufAnimatedAlpha.sentToGPU = false;
+		if ( _vertBufFire )
+			_vertBufFire.sentToGPU = false;
+	}
+
 	public function VIBGet( $type:uint ):VertexIndexBuilder
 	{
 		var ti:TypeInfo = TypeInfo.typeInfo[$type];

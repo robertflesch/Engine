@@ -575,8 +575,8 @@ public class VoxelModel {
 		//if ( "DragonTailFirst" == metadata.name )
 		//	Log.out( "VoxelModel.update - name: " + metadata.name, Log.DEBUG );
 		if ( complete && modelInfo.oxelPersistence ) {
-			instanceInfo.update($elapsedTimeMS);
-			modelInfo.update($context,$elapsedTimeMS, this );
+			instanceInfo.update( $elapsedTimeMS );
+			modelInfo.update( $context, $elapsedTimeMS );
 			
 			// Only collide parent models
 			if ( null == instanceInfo.controllingModel && instanceInfo.usesCollision )

@@ -102,6 +102,7 @@ public class ControllableVoxelModel extends VoxelModel
 		ModelEvent.addListener( ModelEvent.CHILD_MODEL_ADDED, onChildAdded );
 		CursorSizeEvent.addListener( CursorSizeEvent.SET, adjustSpeedMultiplier );
 		_ct = new CollisionTest( this );
+		collisionPointsAdd();
 	}
 
 /*	protected function adjustSpeedMultiplier( e:CursorSizeEvent ): void {
@@ -178,7 +179,7 @@ public class ControllableVoxelModel extends VoxelModel
 			_ct.addCollisionPoint( new CollisionPoint( BODY, new Vector3D( sizeOxel, sizeOxel*2, sizeOxel ) ) );
 		}
 		else
-			Log.out( "ControlableVoxelModel.collisionPointsAdd - modelInfo.oxelPersistence.oxel not found for guid: " + modelInfo.guid, Log.WARN );
+			Log.out( "ControllableVoxelModel.collisionPointsAdd - modelInfo.oxelPersistence.oxel not found for guid: " + modelInfo.guid, Log.WARN );
 		
 	}
 
@@ -565,12 +566,9 @@ public class ControllableVoxelModel extends VoxelModel
 	public function get leaveTrail():Boolean { return _leaveTrail; }
 	public function set leaveTrail(value:Boolean):void { _leaveTrail = value; }
 	public function get collisionMarkers():Boolean { return _displayCollisionMarkers; }
-	public function set collisionMarkers($value:Boolean):void 
-	{
-		if ( $value ) {
-			collisionPointsAdd();
+	public function set collisionMarkers($value:Boolean):void {
+		if ( $value )
 			_ct.markersAdd();
-		}
 		else
 			_ct.markersRemove();
 

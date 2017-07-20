@@ -69,9 +69,11 @@ import flash.geom.Vector3D;
 		public function markerRemove( $owner:VoxelModel ):void {
 			$owner.modelInfo.childRemove( _vm.instanceInfo );
 			var vm:VoxelModel = $owner.modelInfo.childModelFind( _instanceGuid );
-			vm.dead = true;
-			_vm = null;
-			_instanceGuid = null;
+			if ( vm ) {
+				vm.dead = true;
+				_vm = null;
+				_instanceGuid = null;
+			}
 		}
 		
 		public function toString():String 
@@ -129,17 +131,17 @@ import flash.geom.Vector3D;
 			_oxel = value;
 		}
 		
-		public function get instanceGuid():String 
+		public function get instanceGuid():String
 		{
 			return _instanceGuid;
 		}
-		
-		public function set instanceGuid(value:String):void 
+
+		public function set instanceGuid(value:String):void
 		{
 			_instanceGuid = value;
 		}
-		
-		public function get pointScaled():Vector3D 
+
+		public function get pointScaled():Vector3D
 		{
 			return _pointScaled;
 		}

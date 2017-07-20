@@ -55,13 +55,16 @@ public class CollisionTest
 	public function hasPoints():Boolean { return  0 == _collisionPoints.length ? false : true; }
 
 	public function markersAdd():void {
+		markersRemove();
 		for each (var cp:CollisionPoint in _collisionPoints)
 			cp.markerAdd(_owner);
 	}
 
 	public function markersRemove():void {
-		for each ( var cp:CollisionPoint in _collisionPoints )
-			cp.markerRemove( _owner );
+		for each ( var cp:CollisionPoint in _collisionPoints ) {
+			if ( cp.instanceGuid )
+				cp.markerRemove(_owner);
+		}
 	}
 }
 }

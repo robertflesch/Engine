@@ -105,6 +105,17 @@ public class Chunk {
 			_vertMan.VIBGet( $type ).dirty = true;
 	}
 
+	public function markToSendToGPU():void {
+		if ( childrenHas() ) {
+			for ( var i:int = 0; i < OCT_TREE_SIZE; i++ )
+				_children[i].markToSendToGPU();
+		}
+		else {
+			if ( _vertMan )
+				_vertMan.markToSendToGPU();
+		}
+	}
+
 	public function setAllVertexTypesDirty():void {
 		_dirtyVertices = true;
 		if ( childrenHas() ) {

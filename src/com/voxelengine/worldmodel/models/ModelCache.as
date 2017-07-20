@@ -179,7 +179,7 @@ public class ModelCache
 				vm.draw( $mvp, $context, false, false );	
 		}
 		
-		// TODO - should sort models based on distance, and view frustrum - RSF
+		// TODO - should sort models based on distance, and view frustum - RSF
 		for ( i = 0; i < _instancesDynamic.length; i++ ) {
 			vm = _instancesDynamic[i];
 			if ( vm && vm.complete && vm.instanceInfo.visible )
@@ -195,7 +195,7 @@ public class ModelCache
 				vm.draw( $mvp, $context, false, true );	
 		}
 		
-		// TODO - This is expensive and not needed if I dont have projectiles without alpha.. RSF
+		// TODO - This is expensive and not needed if I dont have projectiles without(with?) alpha.. RSF
 		for ( i = 0; i < _instancesDynamic.length; i++ ) {
 			vm = _instancesDynamic[i];
 			if ( vm && vm.complete && vm.instanceInfo.visible )

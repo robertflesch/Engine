@@ -71,6 +71,11 @@ public class VertexIndexBuilder
 	
 	public function get dirty():Boolean { return _dirty; }
 	public function set dirty( val:Boolean ):void { _dirty = val; }
+
+	private var _sentToGPU:Boolean;
+	public function get sentToGPU():Boolean { return _sentToGPU; }
+	public function set sentToGPU( val:Boolean ):void { _sentToGPU = val; }
+
 	
 	public function get length():int { return _oxels ? _oxels.length : 0; }
 	public function get hasFaces():Boolean { return 0 < _bufferVertexMemory; }
@@ -240,8 +245,7 @@ public class VertexIndexBuilder
 		return true
 	}
 	
-	private function populateVertexAndIndexBuffers( $oxelStartingIndex:int, $oxelsToProcess:int, $quadsToProcess:int, $context:Context3D ):void { 
-		
+	private function populateVertexAndIndexBuffers( $oxelStartingIndex:int, $oxelsToProcess:int, $quadsToProcess:int, $context:Context3D ):void {
 		_s_totalUsed++;
 		_bufferVertexMemory += $quadsToProcess * Quad.VERTEX_PER_QUAD * _vertexDataSize * BYTES_PER_WORD;
 		
@@ -325,25 +329,23 @@ public class VertexIndexBuilder
 		Log.out( "VertexIndexBuilder.addComponentData - No components found", Log.WARN );
 	}
 	
-	public function bufferCopyToGPU(context:Context3D ) : void
-	{
+	public function bufferCopyToGPU(context:Context3D ) : void {
+		if ( true == sentToGPU )
+			return;
+		sentToGPU = true;
+
 		var vb:VertexBuffer3D;
-		var ib:IndexBuffer3D;
-		var index:uint;
-		var offset:uint;
 		//var timer:int = getTimer();
 		for (var i:int = 0; i < _buffers; i++) {
 			vb = _vertexBuffers[i];
-			
-			offset = 0;
-			for ( index = 0; index < _vc.length; index++ ) {
+			var offset:uint = 0;
+			for ( var index:uint = 0; index < _vc.length; index++ ) {
 				context.setVertexBufferAt( index, vb, offset, _vc[index].type() );
 				offset += _vc[index].size();
 			}
-			
-			ib = _indexBuffers[i];
+
 			try {
-				context.drawTriangles(ib);
+				context.drawTriangles( _indexBuffers[i] );
 			}
 			catch ( e:Error) {
 				Log.out( "VertexIndexBuilder.BufferCopyToGPU - Error caught: " + e.message );
