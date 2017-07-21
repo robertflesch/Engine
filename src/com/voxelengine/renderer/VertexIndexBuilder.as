@@ -319,7 +319,7 @@ public class VertexIndexBuilder
 					if ( quad && 0 < quad.components.length ) {
 						for ( i=0; i < Quad.COMPONENT_COUNT; i++ ) {
 							_vc[i] = quad.components[i];
-							_vertexDataSize += quad.components[i].size();
+							_vertexDataSize += quad.components[i].size;
 						}
 						return;
 					}
@@ -330,9 +330,9 @@ public class VertexIndexBuilder
 	}
 	
 	public function bufferCopyToGPU(context:Context3D ) : void {
-		if ( true == sentToGPU )
-			return;
-		sentToGPU = true;
+//		if ( true == sentToGPU )
+//			return;
+//		sentToGPU = true;
 
 		var vb:VertexBuffer3D;
 		//var timer:int = getTimer();
@@ -340,19 +340,19 @@ public class VertexIndexBuilder
 			vb = _vertexBuffers[i];
 			var offset:uint = 0;
 			for ( var index:uint = 0; index < _vc.length; index++ ) {
-				context.setVertexBufferAt( index, vb, offset, _vc[index].type() );
-				offset += _vc[index].size();
+				context.setVertexBufferAt( index, vb, offset, _vc[index].type );
+				offset += _vc[index].size;
 			}
 
-			try {
+//			try {
 				context.drawTriangles( _indexBuffers[i] );
-			}
-			catch ( e:Error) {
-				Log.out( "VertexIndexBuilder.BufferCopyToGPU - Error caught: " + e.message );
-				Log.out( e.getStackTrace() );
-				if ( e.errorID == 3601 ) // Error #3601: No valid index buffer set.
-					dirty = true; // Force rebuilding of index buffer. Got this error when installing MySQL Workbench while testing app
-			}
+//			}
+//			catch ( e:Error) {
+//				Log.out( "VertexIndexBuilder.BufferCopyToGPU - Error caught: " + e.message );
+//				Log.out( e.getStackTrace() );
+//				if ( e.errorID == 3601 ) // Error #3601: No valid index buffer set.
+//					dirty = true; // Force rebuilding of index buffer. Got this error when installing MySQL Workbench while testing app
+//			}
 		}
 		//trace ( "VertexIndexBuilder.bufferCopyToGPU - took: "  + (getTimer() - timer) + "  to process " + _buffers + " buffers" );			
 	}	

@@ -25,10 +25,10 @@ public class VertexComponent {
 	public function writeToByteArray( ba:ByteArray ):void {}
 	
 	[inline]
-	final public function type():String { return _type; }
+	final public function get type():String { return _type; }
 	
 	[inline]
-	final public function size():uint { return _size; }
+	final public function get size():uint { return _size; }
 }
 }
 

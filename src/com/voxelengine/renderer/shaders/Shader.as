@@ -33,7 +33,9 @@ package com.voxelengine.renderer.shaders
 		static private      var     _s_lights:Vector.<ShaderLight> = new Vector.<ShaderLight>();
 		static protected	var		_textureOffsetU:Number = 0.0;
 		static protected	var		_textureOffsetV:Number = 0.0;
-		
+		static protected    var 	_translation:Vector3D = new Vector3D();
+
+
 		protected			var		_program3D:Program3D = null;	
 		protected			var		_textureName:String = "assets/textures/oxel.png";
 		protected			var		_textureScale:Number = 2048; 
@@ -256,23 +258,23 @@ package com.voxelengine.renderer.shaders
 
 		protected function setFragmentData( $mvp:Matrix3D, $vm:VoxelModel, $context:Context3D, $isChild:Boolean  ): void {
 			// TODO - pass in multiple lights
-			var lp:Vector3D;
 			var light:ShaderLight;
 			if ( 0 < Shader.lightCount() ) { // This is currently ALWAYS true, no light is just a black light
 				light = lights(0);
 
 				// this seems to be useless, but I might need to to light children models correctly.
 				if ( $isChild ) {
-					lp = $mvp.position;
+					//lp = $mvp.position;
+					$mvp.copyColumnTo( 3, _translation );
 				} else {
-					lp = light.position;
+					_translation.setTo( light.position.x, light.position.y, light.position.z ) ;
 				}
 
 				var i:int = 0;
-				_constants[i++] = lp.x; // light position    |
-				_constants[i++] = lp.y; //                   |
-				_constants[i++] = lp.z; //                   | FC0
-				_constants[i++] = lp.w; //                   |_
+				_constants[i++] = _translation.x; // light position    |
+				_constants[i++] = _translation.y; //                   |
+				_constants[i++] = _translation.z; //                   | FC0
+				_constants[i++] = _translation.w; //                   |_
 				_constants[i++] = 0.5; // fc1.x -not used    |
 				_constants[i++] = light.nearDistance; //     |
 				_constants[i++] = light.endDistance; // 	 | FC1
