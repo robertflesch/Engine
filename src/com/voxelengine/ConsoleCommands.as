@@ -141,18 +141,22 @@ public class ConsoleCommands {
 			Log.out( "No selected model", Log.WARN );
 	}
 	
-	private static function harvestTrees():void
-	{
-		if ( VoxelModel.selectedModel )
-		{
+	private static function harvestTrees():void {
+		if ( VoxelModel.selectedModel ) {
             VoxelModel.selectedModel.harvestTreesOn();
-			//VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.harvestTrees( VoxelModel.selectedModel.instanceInfo.instanceGuid );
 		}
 		else
 			Log.out( "No selected model", Log.WARN );
 	}
-	
-	
+
+	private static function harvestTreesOld():void {
+		if ( VoxelModel.selectedModel ) {
+			VoxelModel.selectedModel.modelInfo.oxelPersistence.oxel.harvestTrees( VoxelModel.selectedModel.instanceInfo.instanceGuid );
+		}
+		else
+			Log.out( "No selected model", Log.WARN );
+	}
+
 	private static function collide():void
 	{
 		if ( VoxelModel.controlledModel )
@@ -318,6 +322,7 @@ public class ConsoleCommands {
 		DConsole.createCommand( "lightingReset", lightingReset );
 		DConsole.createCommand( "sun", lightingSun );
 		DConsole.createCommand( "harvestTrees", harvestTrees );
+		DConsole.createCommand( "harvestTreesOld", harvestTreesOld );
 		DConsole.createCommand( "markers", markers );
 		DConsole.createCommand( "flow", flow );
 		
