@@ -24,6 +24,9 @@ import com.voxelengine.Globals;
 import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.utils.StringUtils;
 
+import playerio.GameFS;
+import playerio.PlayerIO;
+
 /*
  * This class JUST loads objects from a URL (local or remote), it doesnt care what is in them.
  */
@@ -54,6 +57,8 @@ public class PersistURL
 			_filePath = Globals.modelPath + $pe.guid + $pe.table;
 		else if ( AnimationSound.SOUND_EXT == $pe.table )
 			_filePath = Globals.soundPath + $pe.guid + $pe.table;
+        else if ( Globals.APP_XML == $pe.table )
+            _filePath = Globals.appPath + "assets/languages/lang_en/" + $pe.guid + $pe.table;
 
 		else
 			return false;
@@ -70,13 +75,23 @@ public class PersistURL
 
 		//Log.out( "PersistURL.load - file: " + _filePath );
 
+		// You can also save the returned gamefs object and reuse it.
+
 		var urlLoader:URLLoader = new URLLoader();
 		configureListeners(urlLoader);
 		urlLoader.dataFormat = $pe.format;
 		urlLoader.addEventListener(Event.COMPLETE, loadSuccess );
 		urlLoader.addEventListener(IOErrorEvent.IO_ERROR, loadError);
 		try {
-			urlLoader.load(new URLRequest( _filePath ));
+			if ( "/" == Globals.appPath ) {
+                var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
+                var resolvedFilePath:String = fs.getUrl(_filePath);
+                urlLoader.load(new URLRequest(resolvedFilePath));
+            }
+			else {
+                urlLoader.load(new URLRequest( _filePath ));
+            }
+
 		} catch (error:Error) {
 			Log.out("PersistURL.load - Unable to load requested document." + error.getStackTrace(), Log.WARN );
 		}

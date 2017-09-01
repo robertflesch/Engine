@@ -20,28 +20,38 @@
  * THE SOFTWARE.
  */
 package com.enjoymondays.i18n.providers {
-	
-	import com.enjoymondays.i18n.core.ILocale;
-	import com.enjoymondays.i18n.core.ILocalizationManager;
-	import com.enjoymondays.i18n.core.IResourceBundle;
-	import com.enjoymondays.i18n.core.IResourceBundleParser;
-	import com.enjoymondays.i18n.core.IResourceBundleLoader;
-	import com.enjoymondays.i18n.core.IResourceBundleProvider;
-	import com.enjoymondays.i18n.core.IResourceBundleProviderFactory;
-	import com.enjoymondays.i18n.core.IResourceBundleProviderManager;
-	
-	
-	import com.enjoymondays.i18n.ResourceBundleVO;
-	import com.enjoymondays.i18n.events.ResourceBundleLoaderEvent;
-	import com.enjoymondays.i18n.providers.strategy.AbstractProviderStrategy;
-	
-	
-	import flash.events.Event;
-	import flash.events.EventDispatcher;
-	
+
+import com.enjoymondays.i18n.LocalizationManager;
+import com.enjoymondays.i18n.ResourceBundle;
+import com.enjoymondays.i18n.core.ILocale;
+import com.enjoymondays.i18n.core.ILocalizationManager;
+import com.enjoymondays.i18n.core.IResourceBundle;
+import com.enjoymondays.i18n.core.IResourceBundleProviderFactory;
+import com.enjoymondays.i18n.core.IResourceBundleProviderManager;
 
 
-	/**
+import com.enjoymondays.i18n.ResourceBundleVO;
+import com.enjoymondays.i18n.events.ResourceBundleLoaderEvent;
+import com.enjoymondays.i18n.providers.strategy.AbstractProviderStrategy;
+import com.voxelengine.Globals;
+import com.voxelengine.Log;
+import com.voxelengine.events.PersistenceEvent;
+
+import flash.display.Loader;
+import flash.display.LoaderInfo;
+import flash.events.Event;
+
+import flash.events.EventDispatcher;
+import flash.events.IOErrorEvent;
+import flash.net.URLLoader;
+import flash.net.URLRequest;
+
+import playerio.GameFS;
+
+import playerio.PlayerIO;
+
+
+/**
 	 * <code class="prettyprint">DefaultProviderManager</code>.
 	 *
 	 *	@langversion ActionScript 3.0
@@ -55,7 +65,7 @@ package com.enjoymondays.i18n.providers {
 		//private var _logger											:Logger = Logger.instance( DefaultProviderManager );
 		
 		/** @private **/
-		protected var _owner										:ILocalizationManager;
+		protected var _owner										:LocalizationManager;
 		
 		/** @private **/
 		protected var _factory										:IResourceBundleProviderFactory;
@@ -76,7 +86,7 @@ package com.enjoymondays.i18n.providers {
 		
 		/** @inheritDoc */
 		public function setOwner( owner:ILocalizationManager ):void {
-			_owner = owner;
+			_owner = owner as LocalizationManager;
 		}
 		
 		/** @inheritDoc */
@@ -89,12 +99,34 @@ package com.enjoymondays.i18n.providers {
 			_provider = _factory.buildProvider( locale ) as AbstractProviderStrategy;
 			
 			var vo:ResourceBundleVO = _factory.buildBundleVO( locale, _baseUrl );
-			
-			_provider.addEventListener( ResourceBundleLoaderEvent.LOADED, _handleProvider );
-			_provider.addEventListener( ResourceBundleLoaderEvent.ERROR, _handleProvider );
-			
-			_provider.load( vo );
+			Log.out( "DefaultProviderManager.loadResourceBundle Globals.appPath: " + Globals.appPath , Log.WARN);
+//			if ( "/" == Globals.appPath ) {
+				var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
+				var resolvedFilePath:String = fs.getUrl( vo.url );
+				var loader:URLLoader = new URLLoader();
+				loader.addEventListener(Event.COMPLETE, onResourceLoadComplete );
+				loader.addEventListener(IOErrorEvent.IO_ERROR, onResourceLoadError);
+				loader.load(new URLRequest(resolvedFilePath));
+//			}
+//			else {
+//                _provider.addEventListener(ResourceBundleLoaderEvent.LOADED, _handleProvider);
+//                _provider.addEventListener(ResourceBundleLoaderEvent.ERROR, _handleProvider);
+//
+//                _provider.load(vo);
+//            }
+
+            function onResourceLoadComplete (event:Event):void {
+				var externalXML:XML = new XML(loader.data);
+                var rb:IResourceBundle = _provider.parse(externalXML );
+                _owner.addBundle( vo.locale.code, rb );
+            }
+
+            function onResourceLoadError (event:Event):void {
+				Log.out( "DefaultProviderManager.onResourceLoadError - unable to load language", Log.WARN );
+            }
 		}
+
+
 		
 		/** @private */
 		private function _handleProvider( e:ResourceBundleLoaderEvent ):void {
@@ -109,7 +141,7 @@ package com.enjoymondays.i18n.providers {
 				break;
 				
 				case ResourceBundleLoaderEvent.ERROR:
-					_owner.onBundleLoaderError( e )
+					_owner.onBundleLoaderError( e );
 				break;
 				
 				if( hasEventListener( e.type ) ) dispatchEvent( e );

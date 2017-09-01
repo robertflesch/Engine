@@ -67,10 +67,11 @@ import flash.display.Bitmap;
 			
 			_s_currentInstance = this;
 			
-			//if ( Globals.isDebug )
-			//	display( Renderer.renderer.width - 791, 0 );
-			//else
-				display( 0, 0 );
+//			if ( Globals.isDebug )
+			Log.out( "WindowSplash - WARNING isDebug disabled.");
+				display( Renderer.renderer.width - 791, Renderer.renderer.height - 592);
+//			else
+//				display( 0, 0 );
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize );

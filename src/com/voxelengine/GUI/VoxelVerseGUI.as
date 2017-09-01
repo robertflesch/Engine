@@ -312,8 +312,6 @@ public class VoxelVerseGUI extends EventDispatcher
 		ModelEvent.addListener( ModelEvent.TAKE_CONTROL, WindowBeastControlQuery.handleModelEvents );
 		LoginEvent.addListener( LoginEvent.LOGIN_SUCCESS, WindowSandboxList.listenForLoginSuccess );
 		RoomEvent.addListener( RoomEvent.ROOM_JOIN_FAILURE, joinRoomFailureHandler );
-		
-		LanguageManager.init();
 	}
 	
 	private function addKeyboardListeners() : void {

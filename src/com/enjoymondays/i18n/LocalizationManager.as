@@ -311,7 +311,20 @@ package com.enjoymondays.i18n {
 		 	_resources.add( _locale.code, _resourceBundle );
 			_notifyReady( );
 		}
-		
+
+        /**
+         *
+         * @param	e
+         * @private
+         */
+        /** @inheritDoc **/
+        public function addBundle( $localCode:String, $resourceBundle:IResourceBundle ):void {
+            //_logger.warn("we have bundle loader result");
+            _resourceBundle = $resourceBundle;
+            _resources.add( $localCode, _resourceBundle );
+            _notifyReady( );
+        }
+
 		/**
 		 * TODO Find propper error handling strategy.
 		 * @param	e

@@ -38,8 +38,11 @@ public class Globals  {
 	static public const APP_EXT:String = ".json";
 	static public const IVM_EXT:String = ".ivm";
 	static public const MODEL_INFO_EXT:String = ".mjson";
+    static public const TEXTURE_PNG_EXT:String = ".png";
+    static public const TEXTURE_PG_EXT:String = ".jpg";
 	static public const ANI_EXT:String = ".ajson";
 	static public const AMMO_EXT:String = ".ammo";
+    static public const APP_XML:String = ".xml";
 
 	static public const VOXELVERSE:String 	= "VoxelVerse";
 	public static var g_app:VoxelVerse;

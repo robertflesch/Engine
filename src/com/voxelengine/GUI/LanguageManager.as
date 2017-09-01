@@ -73,7 +73,7 @@ package com.voxelengine.GUI
 		
 		static public function localizedStringGet( $key:String ):String {
 			var lowerKey:String = $key.toLowerCase();
-			if ( _localization.currentBundle.hasResource( lowerKey ) && _initialized ) {
+			if ( _initialized && _localization.currentBundle.hasResource( lowerKey )  ) {
 				return _localization.currentBundle.getResourceString( lowerKey );
 			}
 			else {

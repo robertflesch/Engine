@@ -55,8 +55,9 @@ public class RegionManager
 
 		RegionEvent.addListener( RegionEvent.JOIN, 				requestServerJoin ); 
 		RegionEvent.addListener( ModelBaseEvent.REQUEST_TYPE, 	regionTypeRequest );
-		RegionEvent.addListener( ModelBaseEvent.REQUEST, 		regionRequest );
+		RegionEvent.addListener( ModelBaseEvent.REQUEST, 		request );
 		RegionEvent.addListener( ModelBaseEvent.SAVE, 			save );
+		RegionEvent.addListener( ModelBaseEvent.DELETE,			deleteRegion );
 		RegionEvent.addListener( RegionEvent.ADD_MODEL, 		addModel );
 
 		RoomEvent.addListener( RoomEvent.ROOM_DISCONNECT, 		requestDefaultRegionLoad );
@@ -81,11 +82,31 @@ public class RegionManager
 		//RegionEvent.dispatch( new RegionEvent( RegionEvent.UNLOAD, 0, null ) );
 		//RegionEvent.dispatch( new RegionEvent( RegionEvent.LOAD, 0, $re.guid ) );
 	//}
-	
-	private function regionRequest( $re:RegionEvent):void {
+
+	private function deleteRegion( $re:RegionEvent ):void {
+		if ( null == $re.guid ) {
+			Log.out( "RegionManager.deleteRegion guid requested is NULL: ", Log.WARN );
+			return;
+		}
+		Log.out( "RegionManager.deleteRegion guid: " + $re.guid, Log.INFO );
+		var region:Region = regionGet( $re.guid );
+		if ( region ) {
+			for ( var i:int = 0; i <_regions.length; i++ ){
+				var candidateRegion:Region = _regions[i];
+				if ( candidateRegion.guid == $re.guid ) {
+					_regions.splice(i, 1);
+					PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.DELETE_REQUEST, $re.series, Globals.BIGDB_TABLE_REGIONS, $re.guid ) );
+					return;
+				}
+			}
+		}
+	}
+
+
+	private function request( $re:RegionEvent):void {
 		
 		if ( null == $re.guid ) {
-			Log.out( "RegionManager.regionRequest guid rquested is NULL: ", Log.WARN );
+			Log.out( "RegionManager.regionRequest guid requested is NULL: ", Log.WARN );
 			return;
 		}
 		Log.out( "RegionManager.regionRequest guid: " + $re.guid, Log.INFO );

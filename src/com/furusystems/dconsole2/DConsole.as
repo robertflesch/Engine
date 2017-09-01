@@ -1509,7 +1509,7 @@ import flash.desktop.Clipboard;
 		 */
 		public static function registerPlugins(... args:Array):void {
 			for (var i:int = 0; i < args.length; i++) {
-				Log.out("DConsole.registerPlugins REFACTOR???", Log.WARN);
+				trace("DConsole.registerPlugins REFACTOR???");
 				//(console as DConsole).pluginManager.registerPlugin(args[i]);
 			}
 		}

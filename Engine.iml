@@ -2,7 +2,7 @@
 <module type="Flex" version="4">
   <component name="FlexBuildConfigurationManager" active="Debug">
     <configurations>
-      <configuration name="Debug" pure-as="true" main-class="VoxelVerse" output-file="VoxelVerseDDesk.swf" output-folder="$MODULE_DIR$/../Resources/bin">
+      <configuration name="Debug" pure-as="true" main-class="VoxelVerse" output-file="VoxelVerseD.swf" output-folder="$MODULE_DIR$/../Resources/bin">
         <dependencies target-player="26.0">
           <entries>
             <entry library-id="48f9b327-4678-43d7-b9fb-d2f59f02eb89">
@@ -41,7 +41,7 @@
         <packaging-android />
         <packaging-ios />
       </configuration>
-      <configuration name="Device Debug" target-platform="Mobile" pure-as="true" main-class="VoxelVerse" output-file="VoxelVerseD.swf" output-folder="$MODULE_DIR$/../Resources/bin">
+      <configuration name="Device Debug" target-platform="Mobile" pure-as="true" main-class="VoxelVerse" output-file="VoxelVerseDeviceD.swf" output-folder="$MODULE_DIR$/../Resources/bin">
         <dependencies>
           <entries>
             <entry library-id="83af9a87-a6c3-4f5e-85f1-9b7cf3a3e0d9">

@@ -17,12 +17,14 @@ import flash.display.Bitmap;
 import flash.display.BitmapData;
 import flash.display.JPEGEncoderOptions;
 import flash.display.Loader;
+import flash.display.LoaderInfo;
 import flash.display.LoaderInfo
 import flash.events.Event;
 import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 import flash.net.URLRequest;
 import flash.net.URLLoaderDataFormat;
+import flash.system.ImageDecodingPolicy;
 
 import playerio.DatabaseObject;
 
@@ -31,6 +33,10 @@ import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.ModelBaseEvent;
 import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.worldmodel.PermissionsModel;
+
+import playerio.GameFS;
+
+import playerio.PlayerIO;
 
 
 public class ModelMetadata extends PersistenceObject
@@ -115,25 +121,53 @@ public class ModelMetadata extends PersistenceObject
 			// the permission object is just an encapsulation of the permissions section of the object
 			_permissions = new PermissionsModel( dbo );
 
-			var loader:Loader = new Loader();
-			loader.contentLoaderInfo.addEventListener(Event.INIT, bitmapLoaded );
 			if ( dbo.thumbnail ) {
-				loader.loadBytes( dbo.thumbnail );
+                //Log.out( "ModelMetadata.init - loading thumbnail", Log.WARN);
+                //loader.contentLoaderInfo.addEventListener(Event.COMPLETE, thumbNailLoaded );
+				//loader.loadBytes( dbo.thumbnail );
+				try {
+                    var bmd:BitmapData = new BitmapData(128,128,false);
+                    bmd.setPixels(new Rectangle(0, 0, 128, 128), dbo.thumbnail);
+                    _thumbnail = bmd;
+                    thumbnailLoaded = true;
+                    ModelMetadataEvent.create( ModelMetadataEvent.BITMAP_LOADED, 0, guid, $modelMetadata );
+                }
+				catch (e:Error) {
+                    loadNoImage();
+                }
 			}
 			else {
-				loader.load( new URLRequest( Globals.texturePath + "NoImage128.png" ) )
+				loadNoImage();
 			}
 
-			function bitmapLoaded(event:Event):void {
-				//Log.out( "ModelMetadata.init.bitmapLoaded for guid: " + guid, Log.WARN );
-				loader.contentLoaderInfo.removeEventListener(Event.INIT, bitmapLoaded );
-				// Bypass setter to keep it from getting marked as changed
-				_thumbnail = Bitmap( LoaderInfo(event.target).content).bitmapData;
-				thumbnailLoaded = true;
-				ModelMetadataEvent.create( ModelMetadataEvent.BITMAP_LOADED, 0, guid, $modelMetadata );
-			}
+            function loadNoImage():void {
+                var loader:Loader = new Loader();
+                loader.contentLoaderInfo.addEventListener(Event.INIT, imageLoaded );
+                if ( "/" == Globals.appPath ) {
+                    //Log.out( "ModelMetadata.init.loadNoImage - ( / == Globals.appPath )", Log.WARN);
+                    var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
+                    var resolvedFilePath:String = fs.getUrl(Globals.texturePath + "NoImage128.png");
+                    loader.load(new URLRequest(resolvedFilePath));
+                }
+                else {
+                    //Log.out( "ModelMetadata.init.loadNoImage - Globals.appPath NOT /" + Globals.appPath, Log.WARN);
+                    loader.load(new URLRequest(Globals.texturePath + "NoImage128.png"))
+                }
+
+                changed = true;
+            }
 		}
+
 	}
+
+    private function imageLoaded(event:Event):void {
+        Log.out( "ModelMetadata.init.imageLoaded for guid: " + guid, Log.WARN );
+        event.target.loader.contentLoaderInfo.removeEventListener(Event.INIT, imageLoaded );
+        _thumbnail = event.target.content.bitmapData;
+        thumbnailLoaded = true;
+        ModelMetadataEvent.create( ModelMetadataEvent.BITMAP_LOADED, 0, guid, this );
+        Log.out( "ModelMetadata.init.imageLoaded complete", Log.WARN );
+    }
 
 	private function metadataChanged( $mme:ModelMetadataEvent ):void {
 		Log.out( "PanelModels.metaDataChanged - IS THIS NEEDED?", Log.WARN);
@@ -190,7 +224,8 @@ public class ModelMetadata extends PersistenceObject
     override protected function toObject():void {
 		//Log.out( "ModelMetadata.toObject", Log.WARN );
 		if ( thumbnail )
-			dbo.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() );
+			//dbo.thumbnail 		= thumbnail.encode(new Rectangle(0, 0, 128, 128), new JPEGEncoderOptions() );
+            dbo.thumbnail 		= thumbnail.getPixels(new Rectangle(0, 0, 128, 128));
 		else
 			dbo.thumbnail = null;
 	}

@@ -7,35 +7,29 @@
 ==============================================================================*/
 package com.voxelengine.GUI
 {
-import com.voxelengine.events.LoginEvent;
-import com.voxelengine.events.ModelBaseEvent;
-import com.voxelengine.events.PersistenceEvent;
-import com.voxelengine.events.PersistenceEvent;
-import com.voxelengine.events.VVWindowEvent;
-import com.voxelengine.renderer.Renderer;
 
 import flash.events.Event;
 
-import org.flashapi.collector.EventCollector;
 import org.flashapi.swing.*
-import org.flashapi.swing.core.UIObject;
 import org.flashapi.swing.event.*;
 import org.flashapi.swing.constants.*;
 import org.flashapi.swing.list.ListItem;
-import org.flashapi.swing.constants.BorderStyle;
 
 import com.voxelengine.Globals;
 import com.voxelengine.Log;
 
 import com.voxelengine.events.RegionEvent;
+import com.voxelengine.events.LoginEvent;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.VVWindowEvent;
+import com.voxelengine.renderer.Renderer;
 import com.voxelengine.server.Network;
 import com.voxelengine.worldmodel.Region;
-import com.voxelengine.worldmodel.RegionManager;
 
 public class WindowSandboxList extends VVPopup
 {
 	static private const WIDTH:int = 200;
-	static public const WINDOWSANDBOXLIST_TITLE:String = "Sandbox List";
+	static private const TITLE:String = "Sandbox List";
 	
 	static private var _s_currentInstance:WindowSandboxList = null;
 	static public function get isActive():Boolean { return null != _s_currentInstance; }
@@ -56,12 +50,15 @@ public class WindowSandboxList extends VVPopup
 	}
 	
 	
-	private var _listbox1:ListBox = new ListBox( WIDTH, 15 );
+	private var _listBox1:ListBox = new ListBox( WIDTH, 15 );
+	private var _manageRegionButton:Button;
+	private var _loadRegionButton:Button;
 	private var _createFileButton:Button;
-	
+	private var _deleteFileButton:Button;
+
 	public function WindowSandboxList()
 	{
-		super(WINDOWSANDBOXLIST_TITLE);
+		super(TITLE);
 		autoSize = true;
 		layout.orientation = LayoutOrientation.VERTICAL;
 		showCloseButton = false;
@@ -70,7 +67,6 @@ public class WindowSandboxList extends VVPopup
 		bar.setButtonsWidth( WIDTH/3 );
 		bar.addItem( Globals.MODE_PUBLIC );
 		bar.addItem( Globals.MODE_PRIVATE );
-		bar.addItem( Globals.MODE_MANAGE );
 		var openType:String = Globals.mode;
 		if ( Globals.MODE_PUBLIC == openType )
 			bar.selectedIndex = 0;
@@ -81,26 +77,37 @@ public class WindowSandboxList extends VVPopup
 			
 		addGraphicElements( bar );
 		eventCollector.addEvent( bar, ListEvent.ITEM_CLICKED, selectCategory );
-		eventCollector.addEvent( bar, ListEvent.ITEM_PRESSED, pressCategory );
 
 		addElement(new Label( "Click Sandbox to load" ));
-		addElement( _listbox1 );
-		
-		var buttonPanel:Container = new Container( WIDTH, 20);
+		addElement( _listBox1 );
+
+		var _buttonPanel:Container = new Container( WIDTH, 20);
+
+		_loadRegionButton = new Button( "Load" );
+		_buttonPanel.addElement( _loadRegionButton );
+		eventCollector.addEvent( _loadRegionButton , UIMouseEvent.CLICK , loadRegion );
+		_loadRegionButton.visible = false;
+
 		_createFileButton = new Button( "Create" );
-		buttonPanel.addElement( _createFileButton );
-		addElement( buttonPanel );
-		eventCollector.addEvent( _createFileButton , UIMouseEvent.CLICK
-							   , createRegion );
-		
+		_buttonPanel.addElement( _createFileButton );
+		eventCollector.addEvent( _createFileButton , UIMouseEvent.CLICK , createRegion );
+		_createFileButton.visible = false;
+
+		_deleteFileButton = new Button( "Delete" );
+		_buttonPanel.addElement( _deleteFileButton );
+		eventCollector.addEvent( _deleteFileButton , UIMouseEvent.CLICK , deleteRegion );
+		_deleteFileButton.visible = false;
+
+		_manageRegionButton = new Button( "Manage" );
+		_buttonPanel.addElement( _manageRegionButton );
+		eventCollector.addEvent( _manageRegionButton , UIMouseEvent.CLICK , manageRegion );
+		_manageRegionButton.visible = false;
+		addElement( _buttonPanel );
+
+
 		// Event handlers
-		eventCollector.addEvent( _listbox1, UIMouseEvent.CLICK, loadthisRegion );
-		//eventCollector.addEventListener( _listbox1, ListEvent.LIST_CHANGED, selectSandbox);
-		// These events are needed to keep mouse clicks from leaking thru window
-		// This needs to be handled by stage
-		eventCollector.addEvent( this, UIMouseEvent.CLICK, windowClick );
-		eventCollector.addEvent( this, UIMouseEvent.PRESS, pressWindow );
-		
+//		eventCollector.addEvent( _listBox1, UIMouseEvent.CLICK, loadThisRegion );
+
 		Globals.g_app.stage.addEventListener(Event.RESIZE, onResize);
 		
 		RegionEvent.addListener( ModelBaseEvent.ADDED, regionLoadedEvent );
@@ -111,14 +118,42 @@ public class WindowSandboxList extends VVPopup
 		display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );
 	}
 	
-	private function createRegion(e:UIMouseEvent):void
-	{
+	private function createRegion(e:UIMouseEvent):void {
 		new WindowRegionDetail( null, WindowSandboxList );
 		remove();
 	}
-	
-	private function selectCategory(e:ListEvent):void 
-	{			
+
+	private function deleteRegion(e:UIMouseEvent):void {
+		var li:ListItem = getSelectedItem();
+		if ( li ) {
+			RegionEvent.create(ModelBaseEvent.DELETE, 0, li.data);
+			displaySelectedRegionList( type )
+		}
+	}
+
+	private function manageRegion(e:UIMouseEvent):void {
+		var li:ListItem = getSelectedItem();
+		if ( li ) {
+			new WindowRegionDetail( li.data, WindowSandboxList );
+			remove();
+		}
+	}
+
+	private function loadRegion(event:UIMouseEvent):void {
+		var li:ListItem = getSelectedItem();
+		if ( li ) {
+			RegionEvent.create( RegionEvent.JOIN, 0, li.data );
+			remove();
+		}
+	}
+
+	private function getSelectedItem():ListItem {
+		if ( _listBox1 && -1 == _listBox1.selectedIndex )
+			return null;
+		return _listBox1.getItemAt( _listBox1.selectedIndex );
+	}
+
+	private function selectCategory(e:ListEvent):void {
 		displaySelectedRegionList( e.target.value );	
 	}
 
@@ -130,45 +165,28 @@ public class WindowSandboxList extends VVPopup
 		Globals.g_app.dispatchEvent( new VVWindowEvent( VVWindowEvent.WINDOW_CLOSING, label ) );
 		_s_currentInstance = null;
 	}
-	
-	private function loadthisRegion(event:UIMouseEvent):void 
-	{
-		//Log.out( "WindowSandboxList.loadthisRegion - _listbox1.selectedIndex: " + _listbox1.selectedIndex, Log.WARN );
-		if ( -1 == _listbox1.selectedIndex )
-			return;
-			
-		var li:ListItem = _listbox1.getItemAt( _listbox1.selectedIndex );
-		if ( li )
-		{
-			if ( Globals.MODE_PRIVATE != Globals.mode && Globals.MODE_PUBLIC != Globals.mode ) {
-				new WindowRegionDetail( li.data, WindowSandboxList );
-				remove();
-				return;
-			}
-			
-			if ( li.data )
-				RegionEvent.create( RegionEvent.JOIN, 0, li.data );
-			else
-				Log.out( "WindowSandboxList.loadthisRegion - NO REGION GUID FOUND", Log.ERROR );
-		}
-		remove();
-	}
-	
+
+
 	private function displaySelectedRegionList( type:String ):void
 	{
-		_listbox1.removeAll();
+		const startingState:Boolean = true;
+		_createFileButton.visible = startingState;
+		_deleteFileButton.visible = startingState;
+		_loadRegionButton.visible = startingState;
+		_manageRegionButton.visible = startingState;
+		_listBox1.removeAll();
 		Globals.mode = type;
-		if ( Globals.MODE_PRIVATE == type )
-		{
+		if ( Globals.MODE_PRIVATE == type ) {
 			RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId );
-		}
-		else if ( Globals.MODE_PUBLIC == type )
-		{
-			RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC );
-		}
-		else
-		{
-			RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.userId );
+			_createFileButton.visible = true;
+			_deleteFileButton.visible = true;
+			_loadRegionButton.visible = true;
+			_manageRegionButton.visible = true;
+		} else if ( Globals.MODE_PUBLIC == type ) {
+			_createFileButton.visible = false;
+			_deleteFileButton.visible = false;
+			_loadRegionButton.visible = true;
+			_manageRegionButton.visible = false;
 			RegionEvent.create( ModelBaseEvent.REQUEST_TYPE, 0, Network.PUBLIC );
 		}
 	}
@@ -181,30 +199,18 @@ public class WindowSandboxList extends VVPopup
 		if ( Globals.MODE_PRIVATE == Globals.mode )
 		{
 			if ( Network.userId == region.owner )
-				_listbox1.addItem( region.name, region.guid );
+				_listBox1.addItem( region.name, region.guid );
 		}
 		else if ( Globals.MODE_PUBLIC == Globals.mode )
 		{
 			if ( Network.PUBLIC == region.owner )
-				_listbox1.addItem( region.name, region.guid );
+				_listBox1.addItem( region.name, region.guid );
 		}
 		else // ManageMode
 		{
-			_listbox1.addItem( region.name, region.guid );
+			_listBox1.addItem( region.name, region.guid );
 		}
 	}
 	
-	private function pressWindow(e:UIMouseEvent):void
-	{
-		//Log.out( "WindowInventory.pressWindow" );
-	}
-	private function windowClick(e:UIMouseEvent):void
-	{
-		//Log.out( "WindowInventory.windowClick" );
-	}
-	private function pressCategory(e:UIMouseEvent):void
-	{
-		//Log.out( "WindowInventory.pressCategory" );
-	}
 }
 }

@@ -29,8 +29,10 @@ package org.flashapi.swing.draw {
 	* @version 1.0.3, 30/05/2009 00:32
 	* @see http://www.flashapi.org/
 	*/
-	
-	import flash.display.Bitmap;
+
+import com.voxelengine.Log;
+
+import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.Shape;
@@ -292,17 +294,21 @@ package org.flashapi.swing.draw {
 		}
 		
 		private function completeEvent(e:LoaderEvent):void {
-			setPattern(e.data.content)
+            Log.out( "Pattern.completeEvent");
+			setPattern(e.data.content);
 			_eventCollector.removeEvent(_target, LoaderEvent.GRAPHIC_COMPLETE, completeEvent);
 		}
 		
 		import flash.geom.Matrix;
 		public function setPattern(bitmap:Bitmap):void {
 			// this always loads the bitmap at the native resolution
+            Log.out( "Pattern.setPattern - new bitmap");
 			_bmpData = new BitmapData(bitmap.width, bitmap.height, false, 0);
 			// this version allows me to scale the textures
 			var matrix:Matrix = new Matrix();
+            Log.out( "Pattern.setPattern - matrix.scale");
             matrix.scale(width/bitmap.width, height/bitmap.height);
+            Log.out( "Pattern.setPattern - draw");
 			_bmpData.draw( bitmap, matrix );
 			drawPattern();
 		}

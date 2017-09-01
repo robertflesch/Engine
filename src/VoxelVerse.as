@@ -7,6 +7,7 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 
 package {
+import com.voxelengine.GUI.LanguageManager;
 import com.voxelengine.GUI.WindowSplash;
 import com.voxelengine.GUI.WindowWater;
 import com.voxelengine.events.AnimationEvent
@@ -38,6 +39,7 @@ import flash.events.KeyboardEvent
 import flash.events.MouseEvent
 import flash.events.ErrorEvent
 import flash.events.UncaughtErrorEvent
+import flash.system.Security;
 import flash.ui.Keyboard
 import flash.utils.getTimer
 
@@ -89,29 +91,34 @@ public class VoxelVerse extends Sprite
 		Log.init();
 		//Log.out("VoxelVerse.initializeDataBeforeSplash this is " + (Globals.isDebug ? "debug" : "release") + " build", Log.WARN );
 
-		var url:String = stage.loaderInfo.loaderURL;
-		var index:int = url.lastIndexOf( "VoxelVerse.swf" );
+//		var url:String = stage.loaderInfo.loaderURL;
+//		var index:int = url.lastIndexOf( "VoxelVerse.swf" );
 		// Release, debug false
-		if ( -1 != index ) {
-			Globals.setDebug = false;
-			Globals.appPath = url.substring(0, index);
-		}
-		else {
-			// Not release, so check for old debug
-			index = url.lastIndexOf("VoxelVerseD.swf");
-			if (-1 != index) {
-				Globals.setDebug = true;
-		    } else {
-				// check for new debug
-				index = url.lastIndexOf("VoxelVerseDDesk.swf");
-				if (-1 != index)
-					Globals.setDebug = true;
-				else
-					Log.out("VoxelVerse.initializeDataBeforeSplash - App path not being set correctly appPath: " + url, Log.ERROR);
-			}
-			Globals.appPath = url.substring(0, index);
-		}
+//		if ( -1 != index ) {
+//			Globals.setDebug = false;
+//			Globals.appPath = url.substring(0, index);
+//		}
+//		else {
+//			// Not release, so check for old debug
+//			index = url.lastIndexOf("VoxelVerseD.swf");
+//			if (-1 != index) {
+//				Globals.setDebug = true;
+//		    } else {
+//				// check for new debug
+//				index = url.lastIndexOf("VoxelVerseDDesk.swf");
+//				if (-1 != index)
+//					Globals.setDebug = true;
+//				else
+//					Log.out("VoxelVerse.initializeDataBeforeSplash - App path not being set correctly appPath: " + url, Log.ERROR);
+//			}
+//			//Globals.appPath = url.substring(0, index);
+//            Globals.appPath = "/";
+////            Globals.appPath = "http://voxelverse.com/";
+//		}
 
+        Globals.appPath = "/";
+
+		Log.show();
 		Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath);
 
 		Renderer.renderer.init( stage );
@@ -142,6 +149,7 @@ public class VoxelVerse extends Sprite
 
 		// All the init time is trivial compared to this.
 		new PoolManager();
+        LanguageManager.init();
 
 	}
 
@@ -156,7 +164,7 @@ public class VoxelVerse extends Sprite
 		// These two should be the same
 		// https://gamesnet.yahoo.net/forum/viewtopic.php?f=33&t=35896&sid=1f0b0c5bef7f97c6961760b6a3418c69
 		// for reference
-		//Security.loadPolicyFile( "http://cdn.playerio.com/crossdomain.xml" )
+		//Security.loadPolicyFile( "http://cdn.playerio.com/crossdomain.xml" );
 		//Security.loadPolicyFile( "https://content.playerio.com/crossdomain.xml" );
 
 		VoxelVerseGUI.currentInstance.buildGUI();
