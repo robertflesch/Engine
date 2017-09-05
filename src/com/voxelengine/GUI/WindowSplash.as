@@ -42,11 +42,9 @@ import flash.display.Bitmap;
 		}
 		
 		static private function destroy(e:WindowSplashEvent):void {
-			if ( WindowSplash.isActive && Globals.online )
-			{
+			if ( WindowSplash.isActive && Globals.online ) {
 				WindowSplash._s_currentInstance.remove();
 				WindowSplash._s_currentInstance = null;
-				//LoadingImageEvent.create( LoadingImageEvent.DESTORY ) );
 			}
 		}
 		
@@ -67,11 +65,10 @@ import flash.display.Bitmap;
 			
 			_s_currentInstance = this;
 			
-//			if ( Globals.isDebug )
-			Log.out( "WindowSplash - WARNING isDebug disabled.");
+			if ( Globals.isDebug )
 				display( Renderer.renderer.width - 791, Renderer.renderer.height - 592);
-//			else
-//				display( 0, 0 );
+			else
+				display( 0, 0 );
 			
 			addEventListener(UIOEvent.REMOVED, onRemoved );
 			Globals.g_app.stage.addEventListener( Event.RESIZE, onResize );
@@ -84,19 +81,13 @@ import flash.display.Bitmap;
 		} 
 		
         protected function onResize(event:Event):void {
-			/*if ( Globals.isDebug ) {
-				// this scales the window down, so we can see it, but it shows we are in debug
-				_outline.scaleX = Renderer.renderer.width/2791;
-				_outline.scaleY = Renderer.renderer.height/2592;
+            if ( Globals.isDebug ){
+				_outline.scaleX = Renderer.renderer.width/2791; // 791 is width of splash screen
+				_outline.scaleY = Renderer.renderer.height/2592; // 592 is height of splash screen
 			} else {
-				_outline.scaleX = Renderer.renderer.width/791; // 791 is width of splash screen
-				_outline.scaleY = Renderer.renderer.height/592; // 592 is height of splash screen
-			}*/
-
-//			_outline.scaleX = Renderer.renderer.width/791; // 791 is width of splash screen
-//			_outline.scaleY = Renderer.renderer.height/592; // 592 is height of splash screen
-			_outline.scaleX = Renderer.renderer.width/2791; // 791 is width of splash screen
-			_outline.scaleY = Renderer.renderer.height/2592; // 592 is height of splash screen
+                _outline.scaleX = Renderer.renderer.width/791; // 791 is width of splash screen
+                _outline.scaleY = Renderer.renderer.height/592; // 592 is height of splash screen
+			}
 		}
 		
 		// Window events

@@ -28,7 +28,7 @@ public class VVTextInput extends TextInput
 		Log.out( "VVTextInput.focusIn" );
 		Globals.g_textInput = true
 	}
-	
+
 	private function focusOut(e:TextEvent):void {
 		Log.out( "VVTextInput.focusOut" );
 		Globals.g_textInput = false

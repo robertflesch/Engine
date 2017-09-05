@@ -39,9 +39,9 @@ public class ObjectVoxel extends ObjectInfo
 	override public function backgroundTexture( size:int = 64 ):String { 
 		var typeInfo:TypeInfo = TypeInfo.typeInfo[_typeId];
 		if ( typeInfo )
-			return "assets/textures/" + typeInfo.image;
+			return typeInfo.image;
 			
-		return "assets/textures/invalid.png";
+		return "invalid.png";
 	}
 	
 	

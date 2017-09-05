@@ -21,7 +21,7 @@ package com.voxelengine.GUI
 
         public function ColorPicker( x:int = 200, y:int = 200 ) {
 			Globals.openWindowCount = Globals.openWindowCount + 1;
-			var image:Image = new Image( Globals.texturePath + "colors.png");
+			var image:Image = new Image( "colors.png");
 			addElement( image );
 			display( x, y );
 			eventCollector.addEvent( image, UIMouseEvent.PRESS, clickListener );

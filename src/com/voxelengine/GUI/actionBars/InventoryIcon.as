@@ -42,7 +42,7 @@ public class InventoryIcon extends VVCanvas
 		super( 128, 128 );
 		// These numbers come from the size of the artwork, and from the size of the toolbar below it.
 		layout = new AbsoluteLayout();
-		_outline = new Image( Globals.texturePath + "backpack.png" );
+		_outline = new Image( "backpack.png" );
 		_outline.scaleX = 0.75;
 		_outline.scaleY = 0.75;
 		eventCollector.addEvent( _outline, UIMouseEvent.PRESS, pressShape );

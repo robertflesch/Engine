@@ -37,7 +37,7 @@ public class PropListIcon extends VVCanvas
 		super( 128, 128 );
 		// These numbers come from the size of the artwork, and from the size of the toolbar below it.
 		layout = new AbsoluteLayout();
-		_outline = new Image( Globals.texturePath + "list.png" );
+		_outline = new Image( "list.png" );
 		eventCollector.addEvent( _outline, UIMouseEvent.PRESS, pressShape );
 		addElement( _outline );
 		var it:UITextField = new UITextField();

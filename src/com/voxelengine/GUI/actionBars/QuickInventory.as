@@ -51,7 +51,7 @@ public class QuickInventory extends VVCanvas
 		_imageSize = $imageSize;
 		_offsetFromBottom = $offsetFromBottom;
 		
-		_outline = new Image( Globals.texturePath + $outlineName );
+		_outline = new Image( $outlineName );
 		_outline.cacheAsBitmap = true;
 		addElement( _outline );
 		

@@ -100,7 +100,7 @@ public class GrainSelector extends QuickInventory
 		box.y = height - _imageSize;
 		box.name = String( count );
 		box.data = item;
-		box.backgroundTexture = "assets/textures/" + item.image;
+		box.backgroundTexture = item.image;
 		addElement( box );
 		
 		hk.data = item;

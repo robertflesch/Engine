@@ -30,22 +30,33 @@ package org.flashapi.swing.draw {
 	* @see http://www.flashapi.org/
 	*/
 
+import com.voxelengine.Globals;
 import com.voxelengine.Log;
+import com.voxelengine.events.ModelMetadataEvent;
+import com.voxelengine.worldmodel.TextureBank;
 
 import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
-	import flash.display.Shape;
+import flash.display.Loader;
+import flash.display.Shape;
 	import flash.display.Sprite;
-	import flash.geom.ColorTransform;
+import flash.events.Event;
+import flash.geom.ColorTransform;
 	import flash.geom.Rectangle;
-	import org.flashapi.collector.EventCollector;
+import flash.net.URLRequest;
+
+import org.flashapi.collector.EventCollector;
 	import org.flashapi.swing.constants.PrimitiveType;
 	import org.flashapi.swing.draw.Figure;
 	import org.flashapi.swing.event.LoaderEvent;
 	import org.flashapi.swing.net.UILoader;
-	
-	/**
+
+import playerio.GameFS;
+
+import playerio.PlayerIO;
+
+/**
 	 * 	A convenient class that allows to create and manage a pattern image from a
 	 * 	<code>BitmapData</code>, a <code>Shape</code>, a <code>Sprite</code>, a 
 	 * 	<code>Bitmap</code> object or any extenal graphical asset, specified by the
@@ -280,12 +291,17 @@ import flash.display.Bitmap;
 				} else {
 					switch(typeof _texture) {
 						case PrimitiveType.STRING :
-							finalizeUILoader();
-							_uiLoader = new UILoader(_target);
-							_uiLoader.load(_texture);
-							_eventCollector.addEvent(_target, LoaderEvent.GRAPHIC_COMPLETE, completeEvent);
-							break;
-						case PrimitiveType.OBJECT : 
+//                            var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
+//                            var resolvedFilePath:String = fs.getUrl(Globals.appPath + texture);
+
+							TextureBank.instance.getGUITexture( texture, imageLoaded );
+
+                        	function imageLoaded(event:Event):void {
+                                //Log.out( "Pattern.createPattern LOADED data from texture name: " + texture );
+								setPattern( Bitmap( event.target.content ) );
+							}
+                            break;
+						case PrimitiveType.OBJECT :
 							setPattern(new Bitmap(new _texture(0, 0)));
 							break;
 					}
@@ -302,13 +318,13 @@ import flash.display.Bitmap;
 		import flash.geom.Matrix;
 		public function setPattern(bitmap:Bitmap):void {
 			// this always loads the bitmap at the native resolution
-            Log.out( "Pattern.setPattern - new bitmap");
+            //Log.out( "Pattern.setPattern - new bitmap");
 			_bmpData = new BitmapData(bitmap.width, bitmap.height, false, 0);
 			// this version allows me to scale the textures
 			var matrix:Matrix = new Matrix();
-            Log.out( "Pattern.setPattern - matrix.scale");
+            //Log.out( "Pattern.setPattern - matrix.scale");
             matrix.scale(width/bitmap.width, height/bitmap.height);
-            Log.out( "Pattern.setPattern - draw");
+            //Log.out( "Pattern.setPattern - draw");
 			_bmpData.draw( bitmap, matrix );
 			drawPattern();
 		}

@@ -39,7 +39,7 @@ public class ShapeSelector extends VVCanvas
 	public function ShapeSelector() {
 		super( 84, 74 );
 		layout = new AbsoluteLayout();
-		_outline = new Image( Globals.texturePath + "toolSelector.png" );
+		_outline = new Image( "toolSelector.png" );
 		addElement( _outline );
 		display();
 		addShapeSelector();
@@ -60,7 +60,7 @@ public class ShapeSelector extends VVCanvas
 		_butCurrent.x = 10;
 		_butCurrent.y = 10;
 		_butCurrent.data = "square";
-		_butCurrent.backgroundTexture = "assets/textures/square.jpg";
+		_butCurrent.backgroundTexture = "square.jpg";
 		addElement( _butCurrent );
 		
 		
@@ -92,17 +92,17 @@ public class ShapeSelector extends VVCanvas
 		if ( "square" == _butCurrent.data)
 		{
 			_butCurrent.data = "cylinder";
-			_butCurrent.backgroundTexture = "assets/textures/cylinder.jpg"
+			_butCurrent.backgroundTexture = "cylinder.jpg"
 		} 
 		else if ( "cylinder" == _butCurrent.data)
 		{
 			_butCurrent.data = "sphere";
-			_butCurrent.backgroundTexture = "assets/textures/sphere.jpg"
+			_butCurrent.backgroundTexture = "sphere.jpg"
 		} 
 		else if ( "sphere" == _butCurrent.data)
 		{
 			_butCurrent.data = "square";
-			_butCurrent.backgroundTexture = "assets/textures/square.jpg"
+			_butCurrent.backgroundTexture = "square.jpg"
 		}
 		show()
 	}

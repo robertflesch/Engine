@@ -34,7 +34,7 @@ public class TextureBank
 		return _s_instance
 	}
 
-	private var _bitmapData:Dictionary = new Dictionary(true);
+	private var _bitmap:Dictionary = new Dictionary(true);
 	private var _textures:Dictionary = new Dictionary(true);
 	private var _texturesLoading:Dictionary = new Dictionary(true);
 
@@ -51,10 +51,10 @@ public class TextureBank
 
 	public function acquiredContext( $ce:ContextEvent ):void {
 		//Log.out("TextureBank.reinitialize" );
-		for ( var key:String in _bitmapData )
+		for ( var key:String in _bitmap )
 		{
 			_textures[key] = null;
-			var bmp:Bitmap = _bitmapData[key];
+			var bmp:Bitmap = _bitmap[key];
 			var tex:Texture = uploadTexture( $ce.context3D, bmp, true );
 			_textures[key] = tex;
 		}
@@ -75,10 +75,6 @@ public class TextureBank
 		return null;
 	}
 
-	static private function onFileLoadError(event:IOErrorEvent):void {
-		Log.out("TextureBank.onFileLoadError - FILE LOAD ERROR, DIDN'T FIND: Insufficient Info returned by event look at previous loads " + event.target.url, Log.ERROR );
-	}
-
 	private function loadTexture( $context:Context3D, textureNameAndPath:String ):void {
 		_tempContext = $context;
 		var loader:Loader = new Loader();
@@ -97,16 +93,82 @@ public class TextureBank
 
 
 		_texturesLoading[textureNameAndPath] = true;
-	}
+        function onFileLoadError(event:IOErrorEvent):void {
+            Log.out("TextureBank.onFileLoadError - FILE LOAD ERROR, DIDN'T FIND: " + Globals.appPath + textureNameAndPath, Log.ERROR );
+        }
 
-	static public function removeGlobalAppPath( completePath:String ):String {
-		var lastIndex:int = completePath.lastIndexOf( "assets/textures/" );
-		var fileName:String = completePath;
-		if ( -1 != lastIndex )
-			fileName = completePath.substr( lastIndex );
+    }
 
-		return fileName;
-	}
+    public function getGUITexture( $textureName:String, $successFunction:Function, $errorFunction:Function = null ):Bitmap {
+        // is this texture loaded already?
+        //Log.out( "TextureBank.getGUITexture: " + $textureName );
+
+        var tex:Bitmap = _bitmap[$textureName];
+        if ( tex ) {
+//            Log.out("TextureBank.getGUITexture.FOUND: " + $textureName);
+            return tex;
+        }
+
+        var result:Boolean = _texturesLoading[ $textureName ];
+        if ( false == result ) {
+            _texturesLoading[$textureName] = true;
+            loadGUITexture($textureName, $successFunction, $errorFunction);
+        }
+
+        return null;
+    }
+
+    private function loadGUITexture( $textureName:String, $successFunction:Function, $errorFunction:Function ):void {
+        var loader:Loader = new Loader();
+        loader.contentLoaderInfo.addEventListener(Event.COMPLETE, onGUITextureLoadComplete );
+        loader.contentLoaderInfo.addEventListener(IOErrorEvent.IO_ERROR, onFileLoadError );
+
+        //Log.out( "TextureBank.loadTexture - loading: " + Globals.appPath + $textureName );
+
+        if ( "/" == Globals.appPath ) {
+            var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
+            var resolvedFilePath:String = fs.getUrl(Globals.texturePath + $textureName);
+            //Log.out( "TextureBank.loadGUITexture: " + $textureName );
+            loader.load(new URLRequest(resolvedFilePath));
+        } else {
+            Log.out( "TextureBank.loadGUITexture: " + Globals.texturePath + $textureName );
+            loader.load(new URLRequest( Globals.texturePath + $textureName ));
+
+        }
+
+        function onFileLoadError(event:IOErrorEvent):void {
+            loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, $successFunction );
+			if ( $errorFunction )
+            	loader.contentLoaderInfo.removeEventListener(Event.COMPLETE, $errorFunction );
+            Log.out("TextureBank.onFileLoadError - FILE LOAD ERROR, DIDN'T FIND: " + Globals.texturePath + $textureName, Log.ERROR );
+			if ( $errorFunction )
+            	$errorFunction( event );
+        }
+
+        function onGUITextureLoadComplete (event:Event):void {
+            var textureBitmap:Bitmap = Bitmap(LoaderInfo(event.target).content);// .bitmapData;
+            var fileNameAndPath:String = event.target.url;
+            var $textureName:String = removeGlobalTexturePath(fileNameAndPath);
+            //Log.out( "TextureBank.onGUITextureLoadComplete: " + $textureName );
+
+            _bitmap[$textureName] = textureBitmap;
+            _texturesLoading[$textureName] = false;
+            _tempContext = null;
+
+			$successFunction( event );
+        }
+
+        function removeGlobalTexturePath( completePath:String ):String {
+            var lastIndex:int = completePath.lastIndexOf( "assets/textures/" );
+            var fileName:String = completePath;
+            if ( -1 != lastIndex ) {
+                lastIndex += 16; // sizeOf("assets/textures/")
+                fileName = completePath.substr(lastIndex);
+            }
+
+            return fileName;
+        }
+    }
 
 	private var _tempContext:Context3D;
 	public function onTextureLoadComplete (event:Event):void {
@@ -118,10 +180,19 @@ public class TextureBank
 		var textureNameAndPath:String = removeGlobalAppPath(fileNameAndPath);
 		Log.out( "TextureBank.onTextureLoadComplete: " + textureNameAndPath );
 
-		_bitmapData[textureNameAndPath] = textureBitmap;
+		_bitmap[textureNameAndPath] = textureBitmap;
 		_textures[textureNameAndPath] = tex;
 		_texturesLoading[textureNameAndPath] = false;
 		_tempContext = null;
+
+        function removeGlobalAppPath( completePath:String ):String {
+            var lastIndex:int = completePath.lastIndexOf( "assets/textures/" );
+            var fileName:String = completePath;
+            if ( -1 != lastIndex )
+                fileName = completePath.substr( lastIndex );
+
+            return fileName;
+        }
 	}
 
 	static public function uploadTexture( $context:Context3D, bmp:Bitmap, useMips:Boolean = true ):Texture {

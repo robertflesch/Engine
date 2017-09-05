@@ -121,7 +121,7 @@ public class BoxInventory extends VVBox
 
 				if ( $displayAddons ) {
 					if (om.vmm.permissions.blueprint) {
-						_bpValue = new Image(Globals.texturePath + "blueprint.png");
+						_bpValue = new Image( "blueprint.png");
 						if (128 == width)
 							_bpValue.x = _bpValue.y = 64;
 						addElement(_bpValue)
@@ -132,7 +132,7 @@ public class BoxInventory extends VVBox
 					}
 
 					if (om.vmm.permissions.creator == Network.userId) {
-						_editData = new Image(Globals.texturePath + "editModelData.png");
+						_editData = new Image( "editModelData.png");
 						$evtColl.addEvent(_editData, UIMouseEvent.CLICK, editModelData);
 						if (128 == width)
 							_editData.x = _editData.y = 0;
@@ -217,7 +217,7 @@ public class BoxInventory extends VVBox
 	public function reset():void {
 		setHelp( "Empty" );
 		_count.text = "";
-		backgroundTexture = "assets/textures/blank.png";
+		backgroundTexture = "blank.png";
 		data = null;
 		if ( _bpValue ) {
 			removeElement( _bpValue );

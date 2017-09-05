@@ -29,8 +29,11 @@ package org.flashapi.swing.net {
 	* @version 1.0.4, 12/05/2011 23:25
 	* @see http://www.flashapi.org/
 	*/
-	
-	import flash.display.Loader;
+
+import com.voxelengine.Globals;
+import com.voxelengine.Log;
+
+import flash.display.Loader;
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
@@ -47,8 +50,12 @@ package org.flashapi.swing.net {
 	import org.flashapi.swing.core.spas_internal;
 	import org.flashapi.swing.event.LoaderEvent;
 	import org.flashapi.swing.framework.locale.Locale;
-	
-	use namespace spas_internal;
+
+import playerio.GameFS;
+
+import playerio.PlayerIO;
+
+use namespace spas_internal;
 	
 	/**
 	 * 	The <code>UILoader</code> class decorates SPAS 3.0 objects to let them
@@ -191,7 +198,11 @@ package org.flashapi.swing.net {
 		 * 						additional parameters for loading the external asset.
 		 */
 		public function load(url:String, parameters:LoaderParameters = null):void {
-			var request:URLRequest = new URLRequest(url);
+            //Log.out( "UContainer.loadAndAddChild - loading: " + url );
+
+            var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
+            var resolvedFilePath:String = fs.getUrl(Globals.texturePath + url );
+            var request:URLRequest = new URLRequest(resolvedFilePath);
 			if (parameters != null) {
 				if (parameters.urlVariables != null) {
 					request.data = parameters.urlVariables;
@@ -357,6 +368,7 @@ package org.flashapi.swing.net {
 		
 		private function graphicComplete(e:Event):void {
 			_evtColl.removeAllEvents();
+			//Log.out( "UILoader.graphicComplete url: " + e.target.url );
 			dispatchCompleteEvent(LoaderEvent.GRAPHIC_COMPLETE, _loader);
 		}
 		

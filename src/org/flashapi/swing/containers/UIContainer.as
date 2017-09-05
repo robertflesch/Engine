@@ -29,8 +29,10 @@ package org.flashapi.swing.containers {
 	* @version 1.2.0, 29/03/2011 17:17
 	* @see http://www.flashapi.org/
 	*/
-	
-	import flash.display.DisplayObject;
+
+import com.voxelengine.Log;
+
+import flash.display.DisplayObject;
 	import flash.display.Loader;
 	import flash.geom.Rectangle;
 	import flash.net.URLLoader;
@@ -862,6 +864,7 @@ package org.flashapi.swing.containers {
 			_uiLoaderStack[l] = l;
 			_uiLoaderStackLength += 1;
 			l.loaderContext = loaderContext;
+			//Log.out( "UContainer.loadAndAddChild - loading: " + value );
 			l.load(value);
 			//addToLayout(uiLoader.loader);
 			return l.loader;

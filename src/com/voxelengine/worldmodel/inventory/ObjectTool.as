@@ -39,9 +39,9 @@ public class ObjectTool extends ObjectInfo
 	
 	override public function backgroundTexture( size:int = 64 ):String { 
 		if ( 64 == size )
-			return "assets/textures/" + thumbnail;
+			return thumbnail;
 			
-		return "assets/textures/" + thumbnail;
+		return thumbnail;
 	}
 	
 	override public function asInventoryString():String {

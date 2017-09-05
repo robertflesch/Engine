@@ -62,7 +62,6 @@ public class VoxelVerse extends Sprite
 	public function VoxelVerse():void {
 		addEventListener(Event.ADDED_TO_STAGE, init);
 		Globals.g_app = this;
-		//_s_appStartTime = getTimer();
 	}
 
 	private function init(e:Event = null):void {
@@ -91,35 +90,36 @@ public class VoxelVerse extends Sprite
 		Log.init();
 		//Log.out("VoxelVerse.initializeDataBeforeSplash this is " + (Globals.isDebug ? "debug" : "release") + " build", Log.WARN );
 
-//		var url:String = stage.loaderInfo.loaderURL;
-//		var index:int = url.lastIndexOf( "VoxelVerse.swf" );
-		// Release, debug false
-//		if ( -1 != index ) {
-//			Globals.setDebug = false;
-//			Globals.appPath = url.substring(0, index);
-//		}
-//		else {
-//			// Not release, so check for old debug
-//			index = url.lastIndexOf("VoxelVerseD.swf");
-//			if (-1 != index) {
-//				Globals.setDebug = true;
-//		    } else {
-//				// check for new debug
-//				index = url.lastIndexOf("VoxelVerseDDesk.swf");
-//				if (-1 != index)
-//					Globals.setDebug = true;
-//				else
-//					Log.out("VoxelVerse.initializeDataBeforeSplash - App path not being set correctly appPath: " + url, Log.ERROR);
-//			}
-//			//Globals.appPath = url.substring(0, index);
-//            Globals.appPath = "/";
-////            Globals.appPath = "http://voxelverse.com/";
-//		}
-
+		var url:String = stage.loaderInfo.loaderURL;
+		var index:int = url.lastIndexOf( "VoxelVerse.swf" );
         Globals.appPath = "/";
+		if ( -1 != index ) {
+			Globals.setDebug = false;
+//			Globals.appPath = url.substring(0, index);
+		}
+		else {
+			// Not release, so check for old debug
+			index = url.lastIndexOf("VoxelVerseD.swf");
+			if (-1 != index) {
+				Globals.setDebug = true;
+		    } else {
+				// check for new debug
+				index = url.lastIndexOf("VoxelVerseDDesk.swf");
+				if (-1 != index)
+					Globals.setDebug = true;
+				else
+					Log.out("VoxelVerse.initializeDataBeforeSplash - App path not being set correctly appPath: " + url, Log.ERROR);
+			}
+			//Globals.appPath = url.substring(0, index);
+            //Globals.appPath = "/";
+            //Globals.appPath = "http://voxelverse.com/";
+		}
 
+		// TODO REMOVE - Shows command console on startup
 		Log.show();
-		Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath);
+        // TODO REMOVE
+
+		Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath + " isDebug: " + Globals.isDebug );
 
 		Renderer.renderer.init( stage );
 		VoxelVerseGUI.currentInstance.init();

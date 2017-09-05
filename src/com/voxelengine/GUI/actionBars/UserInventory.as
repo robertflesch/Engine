@@ -273,12 +273,12 @@ public class  UserInventory extends QuickInventory
 		{
 			box.data = actionItem;
 			if ( actionItem is ObjectVoxel )
-				box.backgroundTexture = "assets/textures/" + (actionItem as TypeInfo).image;
+				box.backgroundTexture = (actionItem as TypeInfo).image;
 		}
 		else
 		{
 			box.data = null;
-			box.backgroundTexture = "assets/textures/blank.png";
+			box.backgroundTexture = "blank.png";
 			box.dropEnabled = true;
 		}
 		addElement( box );

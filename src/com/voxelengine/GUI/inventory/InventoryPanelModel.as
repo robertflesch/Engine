@@ -152,7 +152,7 @@ public class InventoryPanelModel extends VVContainer
 		addElement( infoContainer );
 
 		var b:BoxTrashCan = new BoxTrashCan(100, 100, BorderStyle.RIDGE );
-		b.backgroundTexture = "assets/textures/trashCan.png";
+		b.backgroundTexture = "trashCan.png";
 		b.dropEnabled = true;
 		infoContainer.addElement( b );
 	}

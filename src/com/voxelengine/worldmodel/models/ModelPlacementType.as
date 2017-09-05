@@ -40,7 +40,7 @@ public class ModelPlacementType extends VVCanvas {
 	public function ModelPlacementType() {
 		super( 84, 74 );
 		layout = new AbsoluteLayout();
-		_outline = new Image( Globals.texturePath + "toolSelector.png" );
+		_outline = new Image( "toolSelector.png" );
 		addElement( _outline );
 		display();
 		addModelPlacementType();
@@ -60,7 +60,7 @@ public class ModelPlacementType extends VVCanvas {
 		_butCurrent.x = 10;
 		_butCurrent.y = 10;
 		_butCurrent.data = "auto";
-		_butCurrent.backgroundTexture = "assets/textures/parent.jpg";
+		_butCurrent.backgroundTexture = "parent.jpg";
 		addElement( _butCurrent );
 		placementType = PLACEMENT_TYPE_PARENT;
 
@@ -81,12 +81,12 @@ public class ModelPlacementType extends VVCanvas {
 	private function nextShape():void {
 //		if ( "child" == _butCurrent.data) {
 //			_butCurrent.data = "auto";
-//			_butCurrent.backgroundTexture = "assets/textures/auto.jpg";
+//			_butCurrent.backgroundTexture = "auto.jpg";
 //			placementType = PLACEMENT_TYPE_INDEPENDENT;
 //		}
 		if ( "parent" == _butCurrent.data) {
 			_butCurrent.data = "child";	
-			_butCurrent.backgroundTexture = "assets/textures/child.jpg";
+			_butCurrent.backgroundTexture = "child.jpg";
 			placementType = PLACEMENT_TYPE_CHILD;
 			var cursorModel:VoxelModel = EditCursor.currentInstance.objectModel;
 			if ( cursorModel && cursorModel.modelInfo.oxelPersistence && cursorModel.modelInfo.oxelPersistence.oxelCount ) {
@@ -101,7 +101,7 @@ public class ModelPlacementType extends VVCanvas {
 		}
 		else { //  if ( "child" == _butCurrent.data) {
 			_butCurrent.data = "parent";
-			_butCurrent.backgroundTexture = "assets/textures/parent.jpg";
+			_butCurrent.backgroundTexture = "parent.jpg";
 			placementType = PLACEMENT_TYPE_PARENT;
 		}
 

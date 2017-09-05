@@ -11,6 +11,7 @@ package com.voxelengine.worldmodel.models
 import com.voxelengine.Log;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.OxelDataEvent;
+import com.voxelengine.worldmodel.TextureBank;
 import com.voxelengine.worldmodel.models.ModelMetadata;
 
 import flash.display.Bitmap;
@@ -24,6 +25,7 @@ import flash.geom.Rectangle;
 import flash.geom.Vector3D;
 import flash.net.URLRequest;
 import flash.net.URLLoaderDataFormat;
+import flash.system.Capabilities;
 import flash.system.ImageDecodingPolicy;
 
 import playerio.DatabaseObject;
@@ -143,16 +145,11 @@ public class ModelMetadata extends PersistenceObject
             function loadNoImage():void {
                 var loader:Loader = new Loader();
                 loader.contentLoaderInfo.addEventListener(Event.INIT, imageLoaded );
-                if ( "/" == Globals.appPath ) {
-                    //Log.out( "ModelMetadata.init.loadNoImage - ( / == Globals.appPath )", Log.WARN);
-                    var fs:GameFS = PlayerIO.gameFS(Globals.GAME_ID);
-                    var resolvedFilePath:String = fs.getUrl(Globals.texturePath + "NoImage128.png");
-                    loader.load(new URLRequest(resolvedFilePath));
-                }
-                else {
-                    //Log.out( "ModelMetadata.init.loadNoImage - Globals.appPath NOT /" + Globals.appPath, Log.WARN);
-                    loader.load(new URLRequest(Globals.texturePath + "NoImage128.png"))
-                }
+				var bitmap:Bitmap = TextureBank.instance.getGUITexture( "NoImage128.png", imageLoaded );
+				if ( bitmap ) {
+					_thumbnail = bitmap.bitmapData;
+					thumbnailLoaded = true;
+				}
 
                 changed = true;
             }
@@ -161,12 +158,12 @@ public class ModelMetadata extends PersistenceObject
 	}
 
     private function imageLoaded(event:Event):void {
-        Log.out( "ModelMetadata.init.imageLoaded for guid: " + guid, Log.WARN );
+//        Log.out( "ModelMetadata.init.imageLoaded for guid: " + guid, Log.WARN );
         event.target.loader.contentLoaderInfo.removeEventListener(Event.INIT, imageLoaded );
         _thumbnail = event.target.content.bitmapData;
         thumbnailLoaded = true;
         ModelMetadataEvent.create( ModelMetadataEvent.BITMAP_LOADED, 0, guid, this );
-        Log.out( "ModelMetadata.init.imageLoaded complete", Log.WARN );
+  //      Log.out( "ModelMetadata.init.imageLoaded complete isDebug: " + Globals.isDebug + " + Capabilities.isDebugger: " + Capabilities.isDebugger, Log.WARN );
     }
 
 	private function metadataChanged( $mme:ModelMetadataEvent ):void {

@@ -7,6 +7,11 @@ Camera needs to collide with world!
 When side of the avatar is touching an oxel it get pushed up over and over again.
 what happens to vines when sub oxels are created?
 
+TB records
+alexa flesch kaiser 1906546
+medical records - 770 220 3870
+
+https://medium.com/@solkimicreb/the-react-stack-challenge-5fd166e1245f
 
 need to display ammo for gun models in voxel model panel - Or just allow infinity ammo
 HashTag not set in import
@@ -52,3 +57,45 @@ Destruction of other users content (temp or perm?)
 PvP area's are buildable and destructable, private or shared common area's require permission.
 New adventures created by user everyday
 Very low cost per user.
+
+
+3 tbsp soy sauce
+out - 1 tbsp worcestershire sauce
+1 tsp ground black pepper
+1 tsp ground lemon pepper
+1 tsp curry powder (red)
+1 tsp garlic powder
+1 tsp onion powder
+
+1 What do you do?
+
+VoxelVerse is a 3D content and game generation tool for everyone.
+
+2) How big is the market?
+
+The market is currently worth around 200 million per year. 
+But we see that expanding to over 1 billion per year over the next 5 years.
+
+3) Whats your progress?
+
+The content generation tool is complete along with the majority of the UI.
+The server technology is functional
+
+4) What's your unique insight?
+
+Content needs to be democratized
+While 3D mesh models are pretty, only professionals can create them, this limits content creation to 0.0001% of people.
+After running 3D mesh worlds for 10 years, I came to apprecaite the power of user generated content.
+
+5) Whats my business model?
+
+Freemium - anyone can use, create, and explore for free. But to sell, expand your creations, speed your exploration, you have to spend.
+
+6) Who's on my team?
+
+This project has been a solo, part time interest for a number of years.
+Now I am at a point where the core functionality has been proven, and needs to be expanded to include more team members.
+
+7. What do you want?
+
+I am looking for a 500k seed investment.
