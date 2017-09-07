@@ -183,7 +183,6 @@ public class TextureBank
 		_bitmap[textureNameAndPath] = textureBitmap;
 		_textures[textureNameAndPath] = tex;
 		_texturesLoading[textureNameAndPath] = false;
-		_tempContext = null;
 
         function removeGlobalAppPath( completePath:String ):String {
             var lastIndex:int = completePath.lastIndexOf( "assets/textures/" );

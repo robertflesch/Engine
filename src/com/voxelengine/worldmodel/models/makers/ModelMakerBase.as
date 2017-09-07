@@ -20,6 +20,7 @@ import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.RegionEvent;
 import com.voxelengine.worldmodel.Region;
 import com.voxelengine.worldmodel.models.*
+import com.voxelengine.worldmodel.models.types.Avatar;
 import com.voxelengine.worldmodel.models.types.VoxelModel
 
 import flash.geom.Vector3D;
@@ -255,14 +256,16 @@ public class ModelMakerBase {
 		_vm = null;
 	}
 
-	static public function makerCountGet():int { return _makerCount }
-	static public function makerCountIncrement():void { 
-		if ( 0 == makerCountGet() )
+	public function makerCountGet():int { return _makerCount }
+	public function makerCountIncrement():void {
+		if ( 0 == makerCountGet() && !( _vm is Avatar ) )
 			LoadingImageEvent.create( LoadingImageEvent.CREATE );
-		_makerCount++;
+		if (!( _vm is Avatar ))
+			_makerCount++;
 	}
-	static public function makerCountDecrement():void { 
-		_makerCount-- ;
+	public function makerCountDecrement():void {
+        if (!( _vm is Avatar ))
+			_makerCount-- ;
 		if ( 0 == makerCountGet() ) {
 			LoadingImageEvent.create( LoadingImageEvent.DESTROY );
 			if ( !Region.currentRegion.loaded )

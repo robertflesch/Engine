@@ -9,6 +9,7 @@ package com.voxelengine.worldmodel.models.types
 {
 
 import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.WindowSplashEvent;
 
 import flash.geom.Vector3D;
 
@@ -81,6 +82,7 @@ public class Player extends PersistenceObject
 				avatar.instanceInfo.rotationSet = new Vector3D( 0, 0, 0 );
 
 			avatar.usesGravity = region.gravity;
+            WindowSplashEvent.create(WindowSplashEvent.ANNIHILATE);
 		}
 	}
 

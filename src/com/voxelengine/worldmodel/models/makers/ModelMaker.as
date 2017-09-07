@@ -14,6 +14,7 @@ import com.voxelengine.events.ModelBaseEvent
 import com.voxelengine.events.OxelDataEvent;
 import com.voxelengine.events.WindowSplashEvent
 import com.voxelengine.worldmodel.models.InstanceInfo
+import com.voxelengine.worldmodel.models.types.Avatar;
 
 /**
 	 * ...
@@ -69,8 +70,8 @@ public class ModelMaker extends ModelMakerBase {
 	override protected function markComplete( $success:Boolean ):void {
 		if ( addToCount ) {
 			makerCountDecrement();
-			if (0 == makerCountGet())
-				WindowSplashEvent.create(WindowSplashEvent.ANNIHILATE);
+//			if (0 == makerCountGet())
+//				WindowSplashEvent.create(WindowSplashEvent.ANNIHILATE);
 		}
 
 		// do this last as it nulls everything.

@@ -116,7 +116,7 @@ public class VoxelVerse extends Sprite
 		}
 
 		// TODO REMOVE - Shows command console on startup
-		Log.show();
+		//Log.show();
         // TODO REMOVE
 
 		Log.out( "VVInitializer.initialize - set appPath to: " + Globals.appPath + " isDebug: " + Globals.isDebug );

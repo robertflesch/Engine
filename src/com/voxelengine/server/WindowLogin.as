@@ -192,7 +192,7 @@ public class WindowLogin extends VVPopup
 	}
 	private function closeFunction():void {
 		// This forces the shutdown of the spalsh screen.
-		WindowSplashEvent.create( WindowSplashEvent.ANNIHILATE );
+		//WindowSplashEvent.create( WindowSplashEvent.ANNIHILATE );
 	}
 
 	// Allows the enter key to activate the login key.
