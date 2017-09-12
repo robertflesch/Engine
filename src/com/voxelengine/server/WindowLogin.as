@@ -48,7 +48,8 @@ public class WindowLogin extends VVPopup
 
 	public function WindowLogin( $email:String, $password:String )
 	{
-		super( "Login ", 309, 366 );
+		var windowHeight:int = Globals.isDebug ? 366 : 336;
+        super("Login ", 309, windowHeight);
 		tabEnabled = true;
 //		tabIndex
         tabChildren = true;
@@ -172,13 +173,15 @@ public class WindowLogin extends VVPopup
 		for each ( var obj:Object in configs ) {
 			servers.push( obj.name );
 		}
-		dropDownPanel.addElement( new ComponentComboBoxWithLabel( "Choose Server"
-				, changeServer
-				, servers[0]
-				, servers
-				, configs
-				, width ) );
-		addElement( dropDownPanel );
+		if ( Globals.isDebug ) {
+            dropDownPanel.addElement(new ComponentComboBoxWithLabel("Choose Server"
+                    , changeServer
+                    , servers[0]
+                    , servers
+                    , configs
+                    , width));
+            addElement(dropDownPanel);
+        }
 
 
 		display( Renderer.renderer.width / 2 - (((width + 10) / 2) + x ), Renderer.renderer.height / 2 - (((height + 10) / 2) + y) );

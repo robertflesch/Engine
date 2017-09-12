@@ -154,7 +154,6 @@ public class ModelMetadata extends PersistenceObject
                 changed = true;
             }
 		}
-
 	}
 
     private function imageLoaded(event:Event):void {
