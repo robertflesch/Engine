@@ -43,6 +43,9 @@ import playerio.PlayerIO;
 
 public class ModelMetadata extends PersistenceObject
 {
+    static public const BIGDB_TABLE_MODEL_METADATA:String = "modelMetadata";
+    static public const BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER:String = "owner";
+
 	private const DEFAULT_BOUND:int                       = 10;
 	private var _permissions:PermissionsModel;
 	private var _thumbnail:BitmapData;
@@ -100,7 +103,7 @@ public class ModelMetadata extends PersistenceObject
 	}
 	
 	public function ModelMetadata( $guid:String, $dbo:DatabaseObject = null, $newData:Object = null ) {
-		super( $guid, Globals.BIGDB_TABLE_MODEL_METADATA );
+		super( $guid, BIGDB_TABLE_MODEL_METADATA );
 
 		if ( null == $dbo)
 			assignNewDatabaseObject();
@@ -241,7 +244,7 @@ public class ModelMetadata extends PersistenceObject
 		var oldObj:String = JSON.stringify( dbo );
 		dbo.name = oldName;
 
-		var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, Globals.BIGDB_TABLE_MODEL_METADATA, $newGuid, null, oldObj, URLLoaderDataFormat.TEXT, guid );
+		var pe:PersistenceEvent = new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, 0, BIGDB_TABLE_MODEL_METADATA, $newGuid, null, oldObj, URLLoaderDataFormat.TEXT, guid );
 		PersistenceEvent.dispatch( pe )
 	}
 }

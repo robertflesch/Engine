@@ -20,7 +20,6 @@ public class Globals  {
 
 	// Yahoo Game Networks Big DB table names
 	static public const BIGDB_TABLE_INVENTORY:String = "inventory";
-	static public const BIGDB_TABLE_MODEL_METADATA:String = "modelMetadata";
 	static public const BIGDB_TABLE_MODEL_INFO:String = "modelInfo";
 	static public const BIGDB_TABLE_TREE_INFO:String = "treeInfo";
 	static public const BIGDB_TABLE_OXEL_DATA:String = "oxelData";
@@ -31,7 +30,6 @@ public class Globals  {
 	// Yahoo Game Networks Big DB table indexs
 	static public const BIGDB_TABLE_AMMO_INDEX_WEAPON_TYPE:String = "weaponType";
 	static public const BIGDB_TABLE_REGIONS_INDEX_OWNER:String = "owner";
-	static public const BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER:String = "owner";
 
 	// Local file names for import
 	static public const REGION_EXT:String = ".rjson";

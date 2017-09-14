@@ -77,7 +77,7 @@ public class PersistenceEvent extends Event
 	
 	///////////////// Event handler interface /////////////////////////////
 
-	// Used to distribue all persistance messages
+	// Used to distribute all persistence messages
 	static private var _eventDispatcher:EventDispatcher = new EventDispatcher();
 
 	static public function addListener( $type:String, $listener:Function, $useCapture:Boolean = false, $priority:int = 0, $useWeakReference:Boolean = false) : void {

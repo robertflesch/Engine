@@ -8,6 +8,8 @@
 package com.voxelengine.persistance 
 {
 import com.voxelengine.worldmodel.animation.AnimationSound;
+import com.voxelengine.worldmodel.models.ModelMetadata;
+import com.voxelengine.worldmodel.models.Role;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
 import playerio.PlayerIOError;
@@ -34,7 +36,7 @@ public class PersistBigDB
 		if ( false == Globals.online )
 			return false;
 			
-		if ( Globals.BIGDB_TABLE_MODEL_METADATA == $pe.table )
+		if ( ModelMetadata.BIGDB_TABLE_MODEL_METADATA == $pe.table )
 			return true;
 		else if ( Globals.BIGDB_TABLE_OXEL_DATA == $pe.table )	
 			return true;
@@ -50,6 +52,8 @@ public class PersistBigDB
 			return true;
 		else if ( AnimationSound.BIGDB_TABLE_SOUNDS == $pe.table )
 			return true;
+        else if ( Role.BIGDB_TABLE_ROLES == $pe.table )
+            return true;
 		else {
 			if ( Globals.isGuid( $pe.guid ) )
 				Log.out( "PersistBigDB.isSupportedTable - FAILED table: " + $pe.table + " is not supported", Log.ERROR );
@@ -129,7 +133,7 @@ public class PersistBigDB
 		PlayerIOPersistenceEvent.removeListener( PlayerIOPersistenceEvent.PERSISTANCE_NO_DB, loadTypeNoDB );
 				
 		function loadTypeSucceed( dba:Array ):void {
-			//Log.out( "PersistRegion.loadType.succeed - regions loaded: " + dba.length, Log.DEBUG );
+			Log.out( "PersistRegion.loadType.succeed - regions loaded: " + dba.length, Log.DEBUG );
 			for each ( var $dbo:DatabaseObject in dba )
 			{
 				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_SUCCEED, $pe.series, $pe.table, $dbo.key, $dbo, false ) );

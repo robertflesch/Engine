@@ -7,15 +7,9 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models
 {
-import com.voxelengine.worldmodel.inventory.ObjectModel;
-import com.voxelengine.worldmodel.models.ModelMetadata;
-import com.voxelengine.worldmodel.models.makers.ModelMaker;
-import com.voxelengine.worldmodel.models.types.VoxelModel;
-
 import flash.utils.Dictionary;
 
 import com.voxelengine.Log;
-import com.voxelengine.Globals;
 import com.voxelengine.events.ModelMetadataEvent;
 import com.voxelengine.events.PersistenceEvent;
 import com.voxelengine.events.ModelBaseEvent;
@@ -29,12 +23,12 @@ public class ModelMetadataCache
 	static private var _initializedPublic:Boolean;
 	static private var _initializedPrivate:Boolean;
 	
-	// this acts as a cache for all model objects loaded from persistance
+	// this acts as a cache for all model metadata objects loaded from persistence
 	// don't use weak keys since this is THE spot that holds things.
 	static private var _metadata:Dictionary = new Dictionary(false);
 	static private var _block:Block = new Block();
 	
-	public function ModelMetadataCache() {	}
+	public function ModelMetadataCache() {}
 	
 	static public function init():void {
 		ModelMetadataEvent.addListener( ModelBaseEvent.EXISTS_REQUEST, 	checkIfExists );
@@ -54,30 +48,22 @@ public class ModelMetadataCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	//  ModelMetadataEvent
 	/////////////////////////////////////////////////////////////////////////////////////////////
-	//static private function requestChildren( $mme:ModelMetadataEvent):void {
-		//for each ( var mmd:ModelMetadata in _metadata ) {
-			//if ( mmd && mmd.parentModelGuid == $mme.modelGuid )
-				//ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.RESULT_CHILDREN, $mme.series, $mme.modelGuid, mmd ) );		
-		//}
-		//// this is the end of series message
-		//ModelMetadataEvent.dispatch( new ModelMetadataEvent( ModelMetadataEvent.RESULT_CHILDREN, $mme.series, $mme.modelGuid, null ) );		
-	//}
-	
 	// This loads the first 100 objects from the users inventory OR the public inventory
+	// TODO NEED TO ADDED HANDLER WHEN MORE ARE NEEDED - RSF 9.14.2017
 	static private function requestType( $mme:ModelMetadataEvent ):void {
 		
 		//Log.out( "ModelMetadataCache.requestType  owner: " + $mme.modelGuid, Log.WARN );
 		// For each one loaded this will send out a new ModelMetadataEvent( ModelBaseEvent.ADDED, $vmm.guid, $vmm ) event
 		if ( Network.PUBLIC == $mme.modelGuid ) {
 			if ( false == _initializedPublic ) {
-				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, Network.PUBLIC, null, Globals.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, ModelMetadata.BIGDB_TABLE_MODEL_METADATA, Network.PUBLIC, null, ModelMetadata.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
 				_initializedPublic = true;
 			}
 		}
 			
 		if ( Network.userId == $mme.modelGuid ) {
 			if ( false == _initializedPrivate ) {
-				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, Network.userId, null, Globals.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
+				PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, $mme.series, ModelMetadata.BIGDB_TABLE_MODEL_METADATA, Network.userId, null, ModelMetadata.BIGDB_TABLE_MODEL_METADATA_INDEX_OWNER ) );
 				_initializedPrivate = true;
 			}
 		}
@@ -104,7 +90,7 @@ public class ModelMetadataCache
 				if (_block.has($mme.modelGuid))
 					return;
 				_block.add($mme.modelGuid);
-				PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.LOAD_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid));
+				PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.LOAD_REQUEST, $mme.series, ModelMetadata.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid));
 			}
 			else {
 				//Log.out( "ModelMetadataCache.request returning guid: " + vmm.guid + "  owner: " + vmm.owner, Log.WARN );
@@ -139,7 +125,7 @@ public class ModelMetadataCache
 				mmd = null;
 				//Log.out( "ModelMetadataCache.deleteHandler making call to PersistenceEvent", Log.WARN );
 			}
-			PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.DELETE_REQUEST, $mme.series, Globals.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid, null));
+			PersistenceEvent.dispatch(new PersistenceEvent(PersistenceEvent.DELETE_REQUEST, $mme.series, ModelMetadata.BIGDB_TABLE_MODEL_METADATA, $mme.modelGuid, null));
 		}
 	}
 	
@@ -185,7 +171,7 @@ public class ModelMetadataCache
 	/////////////////////////////////////////////////////////////////////////////////////////////
 	
 	static private function loadSucceed( $pe:PersistenceEvent):void {
-		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
+		if ( ModelMetadata.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 
 		var vmm:ModelMetadata = _metadata[$pe.guid];
@@ -218,7 +204,7 @@ public class ModelMetadataCache
 	}
 	
 	static private function loadFailed( $pe:PersistenceEvent ):void  {
-		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
+		if ( ModelMetadata.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid );
@@ -227,7 +213,7 @@ public class ModelMetadataCache
 	}
 
 	static private function loadNotFound( $pe:PersistenceEvent):void {
-		if ( Globals.BIGDB_TABLE_MODEL_METADATA != $pe.table )
+		if ( ModelMetadata.BIGDB_TABLE_MODEL_METADATA != $pe.table )
 			return;
 		if ( _block.has( $pe.guid ) )
 			_block.clear( $pe.guid );
