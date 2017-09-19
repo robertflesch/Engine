@@ -8,7 +8,10 @@
 package com.voxelengine.worldmodel.models.types
 {
 
+import com.voxelengine.Globals;
 import com.voxelengine.events.InventoryEvent;
+import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.PlayerInfoEvent;
 import com.voxelengine.events.WindowSplashEvent;
 
 import flash.geom.Vector3D;
@@ -34,11 +37,68 @@ import com.voxelengine.worldmodel.tasks.landscapetasks.GenerateCube;
 
 public class Player extends PersistenceObject
 {
-	private static var _s_player:Player = null;
+	private var _nameArray:Array = [
+			"Ellyn",
+			"Vilma",
+			"Danyell",
+			"Celia",
+			"Shaunna",
+			"Tatyana",
+			"Verdie",
+			"Lucrecia",
+			"Genesis",
+			"Ivy",
+			"Madie",
+			"Edmund",
+			"Enoch",
+			"Elvia",
+			"Melania",
+			"Irwin",
+			"Huong",
+			"Trenton",
+			"Rosio",
+			"Johnna",
+			"Sudie",
+			"Gertude",
+			"Ryan",
+			"Tamika",
+			"Maxine",
+			"Adan",
+			"Xenia",
+			"Latashia",
+			"Anton",
+			"Maggie",
+			"Agnes",
+			"Nancy",
+			"Ingeborg",
+			"Emilie",
+			"Paris",
+			"Tawnya",
+			"Elda",
+			"Marquetta",
+			"Natosha",
+			"Joy",
+			"Kurt",
+			"Velva",
+			"Hector",
+			"Ciara",
+			"Reyna",
+			"Eustolia",
+			"Johnny",
+			"Shannon",
+			"Deetta",
+			"Vida",
+			"Lucky" ];
+
+
+    private static var _s_player:Player = null;
 	public static function get player():Player { return _s_player; }
 
 	static private var _vm:Avatar;
 	static public function get pm():Avatar { return _vm; }
+
+    static private var _instanceID:String	;
+    static public function get instanceID():String { return _instanceID; }
 
 	public function Player() {
 		super( "local", "PlayerObjects" );
@@ -53,6 +113,7 @@ public class Player extends PersistenceObject
 			// request that the database load the player Object
 			Persistence.loadMyPlayerObject( onPlayerLoadedAction, onPlayerLoadError );
 		}
+        _instanceID = Globals.getUID();
 	}
 
 	static private function onRegionLoad( $re:RegionEvent ):void {
@@ -95,17 +156,22 @@ public class Player extends PersistenceObject
 				// Assign the Avatar the default avatar
 				$dbo.modelGuid = DEFAULT_PLAYER;
 
-				var userName:String = $dbo.key.substring( 6 );
-				var firstChar:String = userName.substr(0, 1);
-				var restOfString:String = userName.substr(1, userName.length);
-				$dbo.userName = firstChar.toUpperCase() + restOfString.toLowerCase();
+//				var userName:String = $dbo.key.substring( 6 );
+//				var firstChar:String = userName.substr(0, 1);
+//				var restOfString:String = userName.substr(1, userName.length);
+//				$dbo.userName = firstChar.toUpperCase() + restOfString.toLowerCase();
+                $dbo.userName = _nameArray[ (_nameArray.length - 1) * Math.random() ];
 				$dbo.description = "New Player Avatar";
 				$dbo.modifiedDate = new Date().toUTCString();
 				$dbo.createdDate = new Date().toUTCString();
+				$dbo.role = Role.USER;
 				$dbo.save();
 			}
 			// Don't modify the modelGuid, change it in the DB if needed
 			InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, Network.userId, null ) );
+			var pi:PlayerInfo = new PlayerInfo( instanceID, null );
+			pi.modelGuid = dbo.modelGuid;
+			PlayerInfoEvent.create( ModelBaseEvent.SAVE, instanceID, pi );
 			createPlayer( $dbo.modelGuid, Network.userId );
 		}
 		else {
@@ -121,13 +187,13 @@ public class Player extends PersistenceObject
 
 		var ii:InstanceInfo = new InstanceInfo();
 		ii.modelGuid = $modelGuid;
-		ii.instanceGuid = $userId;
+        ii.instanceGuid = instanceID;
 		//ii.centerSetComp(7.5, 0, 7.5);
 		ii.centerSetComp(8, 0, 8);
 		ii.lockCenter = true;
 
-
 		ModelLoadingEvent.addListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
+
 		if (DEFAULT_PLAYER == $modelGuid) {
 			//Log.out( "Avatar.createPlayer - creating DEFAULT_PLAYER from GenerateCube", Log.WARN )
 			var model:Object = GenerateCube.script(4, TypeInfo.BLUE);
@@ -145,7 +211,7 @@ public class Player extends PersistenceObject
 	}
 
 	static private function playerModelLoaded( $mle:ModelLoadingEvent ):void {
-		if ( $mle.vm && ( $mle.vm.instanceInfo.instanceGuid == Network.userId || $mle.vm.instanceInfo.instanceGuid == Network.LOCAL ) ){
+		if ( $mle.vm && ( $mle.vm.instanceInfo.instanceGuid == instanceID || $mle.vm.instanceInfo.instanceGuid == Network.LOCAL ) ){
 			Log.out( "Player.playerModelLoaded");
 			ModelLoadingEvent.removeListener( ModelLoadingEvent.MODEL_LOAD_COMPLETE, playerModelLoaded );
 			//_playerModel = $mle.vm as Avatar;

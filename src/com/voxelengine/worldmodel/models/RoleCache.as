@@ -33,6 +33,13 @@ public class RoleCache {
         PersistenceEvent.dispatch( new PersistenceEvent( PersistenceEvent.LOAD_REQUEST_TYPE, 0, Role.BIGDB_TABLE_ROLES, "true", null, BIGDB_TABLE_ROLES_INDEX ) );
     }
 
+    static public function roleGet( $roleID:String ):Role {
+        var role:Role = _roles[ $roleID ];
+        if ( null == role )
+            Log.out( "RoleCache.roleGet ERROR - NO ROLE WITH ID: " + $roleID + " found", Log.ERROR );
+        return role;
+    }
+
     static private function loadSucceed( $pe:PersistenceEvent ):void {
         if ( Role.BIGDB_TABLE_ROLES != $pe.table )
             return;

@@ -153,7 +153,7 @@ public class TextureBank
 
             _bitmap[$textureName] = textureBitmap;
             _texturesLoading[$textureName] = false;
-            _tempContext = null;
+            //_tempContext = null;
 
 			$successFunction( event );
         }

@@ -26,6 +26,7 @@ import com.voxelengine.worldmodel.models.ModelCacheUtils;
 import com.voxelengine.worldmodel.models.ModelInfoCache;
 import com.voxelengine.worldmodel.models.ModelMetadataCache;
 import com.voxelengine.worldmodel.models.OxelPersistenceCache;
+import com.voxelengine.worldmodel.models.PlayerInfoCache;
 import com.voxelengine.worldmodel.models.RoleCache;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 import com.voxelengine.worldmodel.tasks.lighting.LightAdd;
@@ -135,6 +136,7 @@ public class VoxelVerse extends Sprite
         RoleCache.init();
 		ModelMetadataCache.init();
 		ModelInfoCache.init();
+        PlayerInfoCache.init();
 		SoundCache.init();
 		AmmoCache.init();
 		OxelPersistenceCache.init();

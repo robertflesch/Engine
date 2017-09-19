@@ -323,7 +323,7 @@ public class VoxelVerseGUI extends EventDispatcher
 		RegionEvent.removeListener(RegionEvent.LOAD_BEGUN, onRegionLoadingComplete);
 		
 		if ( false == Globals.inRoom ) {
-			RoomConnection.addEventHandlers();
+			//RoomConnection.addEventHandlers();
 		} else {
 			Globals.mode = Globals.MODE_PUBLIC;
 			//WindowLogin.autoLogin();

@@ -10,6 +10,8 @@ import playerio.DatabaseObject;
 
 public class Role  extends PersistenceObject {
     static public const BIGDB_TABLE_ROLES:String = "roles";
+    static public const USER:String = "User";
+    static public const ADMIN:String = "Admin";
 
     private var _modelPublicDelete:Boolean;
     private var _modelNominate:Boolean;

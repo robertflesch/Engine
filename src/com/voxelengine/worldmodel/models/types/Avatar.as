@@ -445,7 +445,7 @@ public class Avatar extends ControllableVoxelModel
 
 		//GUIEvent.dispatch( new GUIEvent(GUIEvent.TOOLBAR_SHOW));
 		var className:String = getQualifiedClassName( topmostControllingModel() );
-		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
+        ModelEvent.create( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className );
 
 		torchToggle();
 	}
@@ -468,6 +468,8 @@ public class Avatar extends ControllableVoxelModel
 				sl.update();
 			}
 		}
+
+
 
 		super.update( $context, $elapsedTimeMS );
 	}

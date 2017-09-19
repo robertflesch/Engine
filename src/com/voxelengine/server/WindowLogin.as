@@ -48,6 +48,7 @@ public class WindowLogin extends VVPopup
 
 	public function WindowLogin( $email:String, $password:String )
 	{
+        Log.out("WindowLogin.create", Log.WARN );
 		var windowHeight:int = Globals.isDebug ? 366 : 336;
         super("Login ", 309, windowHeight);
 		tabEnabled = true;
@@ -239,8 +240,7 @@ public class WindowLogin extends VVPopup
 	////////////////////////////////////////////////////////////////////////////////
 	// register new account
 	////////////////////////////////////////////////////////////////////////////////
-	private function registerButtonHandler(event:UIMouseEvent):void
-	{
+	private function registerButtonHandler(event:UIMouseEvent):void {
 		new WindowRegister();
 		remove();
 	}
@@ -305,21 +305,26 @@ public class WindowLogin extends VVPopup
 	}
 
 	private function loginSuccess( $e:LoginEvent ):void {
-		removeLoginEventHandlers();
-		if ( _userInfo ) {
-			_userInfo.data.email = _emailInput.label;
-			if ( _savePW.selected )
-				_userInfo.data.password = _passwordInput.text;
-			else
-				_userInfo.data.password = null;
-			_userInfo.flush();
+        Log.out("WindowLogin.loginSuccess", Log.WARN );
+		try {
+            removeLoginEventHandlers();
+            if (_userInfo) {
+                _userInfo.data.email = _emailInput.label;
+                if (_savePW.selected)
+                    _userInfo.data.password = _passwordInput.text;
+                else
+                    _userInfo.data.password = null;
+                _userInfo.flush();
 
-			//TODO use encrypted local storage instead
-			//EncryptedLocalStorage.setItem('key', byteArray);
+                //TODO use encrypted local storage instead
+                //EncryptedLocalStorage.setItem('key', byteArray);
 
+            }
+            else
+                Log.out("WindowLogin.loginSuccess - Unable to save user email", Log.WARN);
+        } catch ( e:Error ) {
+            Log.out("WindowLogin.error saving email and passworld to local object store - Unable to save user email", Log.ERROR );
 		}
-		else
-			Log.out("WindowLogin.loginSuccess - Unable to save user email", Log.WARN );
 
 		//Log.out("WindowLogin.loginSuccess - Closing Login Window" );
 		LoadingImageEvent.create( LoadingImageEvent.DESTROY );

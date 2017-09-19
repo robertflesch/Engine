@@ -24,8 +24,9 @@ import flash.display.Bitmap;
 	import org.flashapi.swing.*;
     import org.flashapi.swing.event.*;
     import org.flashapi.swing.constants.*;
-	
-	import playerio.Client;
+import org.flashapi.swing.plaf.spas.VVUI;
+
+import playerio.Client;
 	import playerio.PlayerIO;
 	import playerio.PlayerIOError;
 	import playerio.PlayerIORegistrationError;
@@ -51,7 +52,7 @@ import flash.display.Bitmap;
 		private var _errorText:TextArea;
 		private var _passwordInput:TextInput;
 		private var _passwordInput2:TextInput;
-		private var _unInput:TextInput;
+        private var _unInput:TextInput;
 		private var _eInput:TextInput;
 		
 		private var _refresh:Bitmap;
@@ -71,7 +72,8 @@ import flash.display.Bitmap;
 			showCloseButton = false;
 			padding = 5;
 			width = 280;
-			height = 320;
+			//height = 350; //with capathca
+            height = 260; //without capathca
 			layout.orientation = LayoutOrientation.VERTICAL;
 			
 			_refresh = (new _refreshImageTest() as Bitmap);
@@ -140,13 +142,13 @@ import flash.display.Bitmap;
 			}
 			addElement( pwc2 );
 			
-			_errorText = new TextArea( 240, 40);
-			_errorText.backgroundColor = 0xC0C0C0;
+			_errorText = new TextArea( width, 40);
+			_errorText.backgroundColor =  VVUI.DEFAULT_COLOR;
 			_errorText.scrollPolicy = ScrollPolicy.NONE;
 			_errorText.fontColor = 0xff0000;
 			_errorText.tabEnabled = false;
 			_errorText.editable = false;
-			//_errorText.text = "Test Message"
+			_errorText.text = "Test Message";
 			
 			defaultCloseOperation = ClosableProperties.DO_NOTHING_ON_CLOSE;
 			//$evtColl.addEvent( this, WindowEvent.CLOSE_BUTTON_CLICKED, cancel );
@@ -246,6 +248,7 @@ import flash.display.Bitmap;
 				createAccountButton.addEventListener(UIMouseEvent.CLICK, createAccountButtonHandlerNoCaptcha );
 				addElement( createAccountButton );
 
+            addElement( new Spacer( width, 10 ) );
 			var backButton:Button = new Button( "Back", 265, 40 );
 			backButton.addEventListener(UIMouseEvent.CLICK, backButtonHandler );
 			addElement( backButton );

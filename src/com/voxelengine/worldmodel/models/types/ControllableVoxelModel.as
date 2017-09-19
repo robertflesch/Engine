@@ -7,6 +7,8 @@ Unauthorized reproduction, translation, or display is prohibited.
 ==============================================================================*/
 package com.voxelengine.worldmodel.models.types
 {
+import com.voxelengine.Globals;
+
 import flash.display3D.Context3D;
 import flash.geom.Vector3D;
 import flash.utils.getTimer;
@@ -234,6 +236,7 @@ public class ControllableVoxelModel extends VoxelModel
 	}
 	
 	//static var temp:int = 0;
+	private var _timeSinceLastMessageTime:int;
 	override public function update($context:Context3D, $elapsedTimeMS:int):void {
 		
 		//var cm:* = VoxelModel.controlledModel;
@@ -258,7 +261,17 @@ public class ControllableVoxelModel extends VoxelModel
 		
 		if ( leaveTrail )
 			leaveTrailMarkers();
-			
+
+        _timeSinceLastMessageTime += $elapsedTimeMS;
+		if ( Globals.online && this == VoxelModel.controlledModel ) {
+            if ( _timeSinceLastMessageTime > 60 ) {
+                _timeSinceLastMessageTime = 0;
+                Log.out( "MovementMessage - dispatch movement message" );
+                dispatchMovementEvent();
+			}
+		}
+
+
 		//if ( 20 <= temp )
 		//{
 			//Log.out( "ControllableVoxelModel.update - ii position: " + instanceInfo.positionGet + "  cam position: " + camera.positionGet );
@@ -362,8 +375,10 @@ public class ControllableVoxelModel extends VoxelModel
 			if ( 0 == _collisionCandidates.length ) {
 				if ( usesGravity )
 					fall( loc, $elapsedTimeMS );
-// TEMP - why TEMP RSF???
-				instanceInfo.setTo( loc );
+
+				// check the adjusted location to see if it is near the old location, if so, don't change it
+				if ( !instanceInfo.nearEquals( loc ) )
+					instanceInfo.setTo( loc );
 			} else {
 				var maxCollisionPointCount:int = -1;
 				for each ( var collisionCandidate:VoxelModel in _collisionCandidates ) {

@@ -9,6 +9,10 @@ package com.voxelengine.server {
 
 import com.voxelengine.events.AmmoEvent;
 import com.voxelengine.events.ModelBaseEvent;
+import com.voxelengine.events.PlayerInfoEvent;
+import com.voxelengine.worldmodel.models.Block;
+import com.voxelengine.worldmodel.models.PlayerInfo;
+import com.voxelengine.worldmodel.models.makers.ModelMaker;
 import com.voxelengine.worldmodel.models.types.Player;
 import com.voxelengine.worldmodel.models.types.VoxelModel;
 
@@ -61,9 +65,9 @@ public class RoomConnection
 				
 			// Only need this if we are online
 			ModelEvent.addListener( ModelEvent.MOVED, sourceMovementEvent );
+
+            ProjectileEvent.addListener( ProjectileEvent.PROJECTILE_SHOT, sourceProjectileEvent );
 		}
-			
-		ProjectileEvent.addListener( ProjectileEvent.PROJECTILE_SHOT, sourceProjectileEvent );
 	}
 	
 	static public function removeEventHandlers( $connection:Connection = null ):void {
@@ -93,18 +97,68 @@ public class RoomConnection
 	}
 	
 	static private function sourceMovementEvent( event:ModelEvent ):void {
-		//trace("RoomConnection.handleMovementEvent - Received move event: " + event)
+		trace("RoomConnection.sourceMovementEvent - Send move event: " + event)
 		var msg:Message = _connection.createMessage( MOVE_MESSAGE );
-		msg.add( Network.userId );
+		msg.add( Player.instanceID );
 		msg.add( event.position.x, event.position.y, event.position.z );
 		msg.add( event.rotation.x, event.rotation.y, event.rotation.z );
 		_connection.sendMessage( msg );
 	}
-	
+
+    static private var _block:Block = new Block();
+
+    static private function handleMoveMessage(m:Message):void {
+        const userGuid:String = m.getString(0);
+        // ignore move message for self
+        if ( userGuid == Player.instanceID )
+            return;
+
+        trace("RoomConnection.handleMoveMessage from someone else - Received move message", m);
+        var avatar:Avatar = Region.currentRegion.modelCache.instanceGet( userGuid ) as Avatar;
+        if ( avatar ) {
+            avatar.instanceInfo.positionSetComp(m.getNumber(1), m.getNumber(2), m.getNumber(3));
+            avatar.instanceInfo.rotationSetComp(m.getNumber(4), m.getNumber(5), m.getNumber(6));
+        }
+        else {
+            trace("RoomConnection.handleMoveMessage from someone else - Received move message", m);
+			// So first I have to grab the
+			// TODO I NEED TO ADD A BLOCK HERE??
+            if (_block.has(userGuid)) {
+                trace("RoomConnection.handleMoveMessage waiting on avatar to load", m);
+                return;
+            }
+            _block.add(userGuid);
+
+            PlayerInfoEvent.addListener( ModelBaseEvent.ADDED, playerFound );
+            PlayerInfoEvent.addListener( ModelBaseEvent.REQUEST_FAILED, playerNotFound );
+			PlayerInfoEvent.create( ModelBaseEvent.REQUEST, userGuid );
+        }
+    }
+
+	static private function playerFound( $pe:PlayerInfoEvent ):void {
+        PlayerInfoEvent.removeListener( ModelBaseEvent.ADDED, playerFound );
+        PlayerInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, playerNotFound );
+        _block.clear($pe.guid);
+        trace("RoomConnection.playerFound - Model for player avatar retrieved from db");
+        var ii:InstanceInfo = new InstanceInfo();
+		var pi:PlayerInfo = $pe.playerInfo;
+        ii.modelGuid = pi.modelGuid;
+        ii.instanceGuid = pi.guid;
+        ii.centerSetComp(8, 0, 8);
+        ii.lockCenter = true;
+        new ModelMaker( ii, true, false );
+	}
+
+    static private function playerNotFound( $pe:PlayerInfoEvent ):void {
+        PlayerInfoEvent.removeListener( ModelBaseEvent.ADDED, playerFound );
+        PlayerInfoEvent.removeListener( ModelBaseEvent.REQUEST_FAILED, playerNotFound );
+		Log.out( "RoomConnection.playerNotFound userGuid: " + $pe.guid, Log.ERROR );
+    }
+
 	static private function sourceProjectileEvent( event:ProjectileEvent ):void {
 		if ( Globals.online ) {
 			var msg:Message = _connection.createMessage( PROJECTILE_SHOT_MESSAGE );
-			msg.add( Network.userId );
+			msg.add( Player.instanceID );
 			msg.add( event.owner );
 			msg.add( event.position.x, event.position.y, event.position.z );
 			msg.add( event.direction.x, event.direction.y, event.direction.z );
@@ -181,18 +235,5 @@ public class RoomConnection
 		//Globals.createPlayer();
 	//}
 			
-	static private function handleMoveMessage(m:Message):void {
-		const userid:String = m.getString(0);
-		// ignore move message for self
-		if ( userid == Network.userId )
-			return;
-			
-		//trace("RoomConnection.handleMoveMessage - Received move message", m);
-		var avatar:Avatar = Region.currentRegion.modelCache.instanceGet( userid ) as Avatar;
-		if ( avatar )
-			avatar.instanceInfo.positionSetComp( m.getNumber( 1 ), m.getNumber( 2 ), m.getNumber( 3 ) );
-		//else	
-		//	trace("RoomConnection.handleMoveMessage - Ignoring move messages for self")
-	}
-}	
+}
 }

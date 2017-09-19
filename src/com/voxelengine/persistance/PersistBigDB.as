@@ -9,6 +9,7 @@ package com.voxelengine.persistance
 {
 import com.voxelengine.worldmodel.animation.AnimationSound;
 import com.voxelengine.worldmodel.models.ModelMetadata;
+import com.voxelengine.worldmodel.models.PlayerInfoCache;
 import com.voxelengine.worldmodel.models.Role;
 import com.voxelengine.worldmodel.models.makers.ModelMakerImport;
 
@@ -38,7 +39,9 @@ public class PersistBigDB
 			
 		if ( ModelMetadata.BIGDB_TABLE_MODEL_METADATA == $pe.table )
 			return true;
-		else if ( Globals.BIGDB_TABLE_OXEL_DATA == $pe.table )	
+        else if ( PlayerInfoCache.BIGDB_TABLE_PLAYEROBJECTS == $pe.table )
+            return true;
+		else if ( Globals.BIGDB_TABLE_OXEL_DATA == $pe.table )
 			return true;
 		else if ( Globals.BIGDB_TABLE_REGIONS == $pe.table )	
 			return true;
