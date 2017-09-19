@@ -134,7 +134,7 @@ public class VoxelModel {
 			for each (var script:Script in instanceInfo.scripts) 
 				script.dispose()
 		}
-		ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_REMOVED, instanceInfo.instanceGuid ) );
+        ModelEvent.create( ModelEvent.PARENT_MODEL_REMOVED, instanceInfo.instanceGuid );
 	}
 
 	public function VoxelModel( $ii:InstanceInfo ):void {
@@ -975,8 +975,7 @@ public class VoxelModel {
 
 
 	protected function dispatchMovementEvent():void {
-		var me:ModelEvent = new ModelEvent(ModelEvent.MOVED, instanceInfo.instanceGuid, instanceInfo.positionGet, instanceInfo.rotationGet);
-		Globals.g_app.dispatchEvent(me);
+        ModelEvent.create( ModelEvent.MOVED, instanceInfo.instanceGuid, instanceInfo.positionGet, instanceInfo.rotationGet );
 	}
 	
 	public function getAccumulatedYRotation(rotationY:Number):Number {

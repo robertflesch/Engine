@@ -130,7 +130,7 @@ public class ModelCache
 			// ah, this is the instance by guid, basically the look up spot for things...
 			// not the instances, which are used to draw everything.
 			_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
-			ModelEvent.dispatch( new ModelEvent( ModelEvent.CHILD_MODEL_ADDED, vm.instanceInfo.instanceGuid, null, null, vm.instanceInfo.controllingModel.instanceInfo.instanceGuid, vm ) );
+            ModelEvent.create( ModelEvent.CHILD_MODEL_ADDED, vm.instanceInfo.instanceGuid, null, null, vm.instanceInfo.controllingModel.instanceInfo.instanceGuid, vm );
 		}
 		else if ( vm.instanceInfo.dynamicObject )
 		{
@@ -138,7 +138,7 @@ public class ModelCache
 				vm.instanceInfo.instanceGuid = Globals.getUID();
 			_instancesDynamic.push(vm);
 			_instanceByGuidDynamic[vm.instanceInfo.instanceGuid] = vm;
-			ModelEvent.dispatch( new ModelEvent( ModelEvent.DYNAMIC_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
+            ModelEvent.create( ModelEvent.DYNAMIC_MODEL_ADDED, vm.instanceInfo.instanceGuid );
 		}
 		else
 		{
@@ -148,7 +148,7 @@ public class ModelCache
 				if ( null == _instanceByGuid[vm.instanceInfo.instanceGuid] ) {
 					_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
 					_instances.push(vm);
-					ModelEvent.dispatch( new ModelEvent( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.instanceGuid, null, null, null, vm ) );
+                    ModelEvent.create( ModelEvent.AVATAR_MODEL_ADDED, vm.instanceInfo.instanceGuid, null, null, null, vm );
 				}
 				else
 					Log.out( "ModelCache.add - Trying to add a AVATAR with the same MODEL AND INSTANCE for a second time", Log.ERROR );
@@ -160,7 +160,7 @@ public class ModelCache
 				if ( null == _instanceByGuid[vm.instanceInfo.instanceGuid] ) {
 					_instanceByGuid[vm.instanceInfo.instanceGuid] = vm;
 					_instances.push(vm);
-					ModelEvent.dispatch( new ModelEvent( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.instanceGuid ) );
+                    ModelEvent.create( ModelEvent.PARENT_MODEL_ADDED, vm.instanceInfo.instanceGuid );
 				}
 				else
 					Log.out( "ModelCache.add - Trying to add the same MODEL AND INSTANCE for a second time", Log.ERROR );

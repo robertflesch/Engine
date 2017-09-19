@@ -152,7 +152,7 @@ public class Dragon extends Beast
 		$modelLosingControl.stateSet( "Ride");
 		$modelLosingControl.stateLock( true );
 		var className:String = getQualifiedClassName( topmostControllingModel() );
-		ModelEvent.dispatch( new ModelEvent( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className ) );
+        ModelEvent.create( ModelEvent.TAKE_CONTROL, instanceInfo.instanceGuid, null, null, className );
 		InventoryEvent.dispatch( new InventoryEvent( InventoryEvent.REQUEST, instanceInfo.instanceGuid, null ) );
 	}
 

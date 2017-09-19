@@ -50,7 +50,7 @@ public class InstanceInfo extends Location	{
 	public function get critical():Boolean 						{ return _critical; }
 	public function set critical(val:Boolean):void 				{
 		_critical = val;
-		ModelEvent.dispatch( new ModelEvent( ModelEvent.CRITICAL_MODEL_DETECTED, modelGuid ) );
+        ModelEvent.create( ModelEvent.CRITICAL_MODEL_DETECTED, modelGuid );
 	}
 	private var _transforms:Vector.<ModelTransform> 			= new Vector.<ModelTransform>;	// toObject
 	public function get transforms():Vector.<ModelTransform>	{ return _transforms; }
