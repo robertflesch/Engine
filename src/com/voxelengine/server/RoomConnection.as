@@ -97,7 +97,7 @@ public class RoomConnection
 	}
 	
 	static private function sourceMovementEvent( event:ModelEvent ):void {
-		trace("RoomConnection.sourceMovementEvent - Send move event: " + event)
+		//trace("RoomConnection.sourceMovementEvent - Send move event: " + event)
 		var msg:Message = _connection.createMessage( MOVE_MESSAGE );
 		msg.add( Player.instanceID );
 		msg.add( event.position.x, event.position.y, event.position.z );

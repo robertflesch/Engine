@@ -266,7 +266,7 @@ public class ControllableVoxelModel extends VoxelModel
 		if ( Globals.online && this == VoxelModel.controlledModel ) {
             if ( _timeSinceLastMessageTime > 60 ) {
                 _timeSinceLastMessageTime = 0;
-                Log.out( "MovementMessage - dispatch movement message" );
+                //Log.out( "MovementMessage - dispatch movement message" );
                 dispatchMovementEvent();
 			}
 		}
